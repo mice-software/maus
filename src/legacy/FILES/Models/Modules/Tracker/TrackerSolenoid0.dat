@@ -9,7 +9,7 @@ Module TrackerSolenoid0
   Volume Cylinder
   Dimensions 702.0 2733.0 mm
   PropertyHep3Vector MagneticField 0.0 0.0 -4.0 tesla
-  PropertyString Material Galactic
+  PropertyString Material He
   PropertyBool Invisible 1
   PropertyInt KalmanSolenoid 1
   Module Tracker/Cryostat0.dat
@@ -26,6 +26,16 @@ Module TrackerSolenoid0
   {
     Position 0.0 0.0 -416.5 mm
     Rotation 0.0 180.0 0.0 degree
+  }
+  Module Tracker/HeWindow.dat
+  {
+    Position 0.0 0.0 315.75 mm
+    Rotation 0.0 0.0 0.0 degree
+  }
+  Module Tracker/TrackerVacuumSection.dat
+  {
+    Position 0.0 0.0 887.375 mm
+    Rotation 0.0 0.0 0.0 degree
   }
   Module Tracker/TrackerCoil.dat
   {
