@@ -85,18 +85,13 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         # Check the mean and standard deviation of some final track data
         tree.Draw("_spill._recon._scifi_event._scifitracks._P_value>>h1")
         h1 = ROOT.gDirectory.Get('h1')
-        self.assertGreater(h1.GetMean(), 0.90)
-        self.assertLess(h1.GetRMS(), 0.15)
+        self.assertAlmostEqual(h1.GetMean(), 0.50, delta=0.1)
+        self.assertLess(h1.GetRMS(), 0.35)
 
-        tree.Draw("_spill._recon._scifi_event._scifitracks._f_chi2>>h2")
+        tree.Draw("_spill._recon._scifi_event._scifitracks._chi2>>h2")
         h2 = ROOT.gDirectory.Get('h2')
-        self.assertLess(h2.GetMean(), 10)
-        self.assertLess(h2.GetRMS(), 5)
-
-        tree.Draw("_spill._recon._scifi_event._scifitracks._s_chi2>>h3")
-        h3 = ROOT.gDirectory.Get('h3')
-        self.assertLess(h3.GetMean(), 20)
-        self.assertLess(h3.GetRMS(), 10)
+        self.assertLess(h2.GetMean(), 15)
+        self.assertLess(h2.GetRMS(), 10)
 
         # Most particles should be identified correctly as positives
         tree.Draw("_spill._recon._scifi_event._scifitracks._charge>>h4")

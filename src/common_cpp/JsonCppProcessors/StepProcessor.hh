@@ -32,6 +32,7 @@ class StepProcessor : public ObjectProcessor<Step> {
     StepProcessor();
 
   private:
+    StringProcessor _string_proc;
     DoubleProcessor _double_proc;
     ThreeVectorProcessor _three_vec_proc;
 };

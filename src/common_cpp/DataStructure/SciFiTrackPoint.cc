@@ -25,8 +25,7 @@ SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
                                      _station(-1),
                                      _plane(-1),
                                      _channel(666),
-                                     _f_chi2(-1),
-                                     _s_chi2(-1),
+                                     _chi2(-1),
                                      _pos(ThreeVector(0, 0, 0)),
                                      _mom(ThreeVector(0, 0, 0)),
                                      _pull(-1),
@@ -54,8 +53,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   _plane   = (id-1)%3;
   _channel = kalman_site->measurement()(0, 0);
 
-  _f_chi2 = kalman_site->chi2(KalmanState::Filtered);
-  _s_chi2 = kalman_site->chi2(KalmanState::Smoothed);
+  _chi2 = kalman_site->chi2();
 
   TMatrixD state_vector = kalman_site->a(KalmanState::Smoothed);
   int dimension = state_vector.GetNrows();
@@ -69,9 +67,9 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
     _mom.setY(state_vector(3, 0));
   } else if ( dimension == 5 ) {
     _pos.setX(state_vector(0, 0));
-    _mom.setX(state_vector(1, 0)/fabs(state_vector(4, 0)));
+    _mom.setX(state_vector(1, 0));
     _pos.setY(state_vector(2, 0));
-    _mom.setY(state_vector(3, 0)/fabs(state_vector(4, 0)));
+    _mom.setY(state_vector(3, 0));
     _pos.setZ(kalman_site->z());
     _mom.setZ(1./fabs(state_vector(4, 0)));
   }
@@ -87,7 +85,6 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   std::vector<double> covariance(matrix_elements, matrix_elements+num_elements);
   _covariance = covariance;
 
-  // std::cerr << "Adding cluster with address " << kalman_site->cluster() << " to track point\n";
   _cluster = new TRef(kalman_site->cluster());
 }
 
@@ -100,8 +97,7 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _plane   = point.plane();
   _channel = point.channel();
 
-  _f_chi2 = point.f_chi2();
-  _s_chi2 = point.s_chi2();
+  _chi2 = point.chi2();
 
   _pos = point.pos();
   _mom = point.mom();
@@ -125,8 +121,7 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _plane   = rhs.plane();
   _channel = rhs.channel();
 
-  _f_chi2 = rhs.f_chi2();
-  _s_chi2 = rhs.s_chi2();
+  _chi2 = rhs.chi2();
 
   _pos = rhs.pos();
   _mom = rhs.mom();
