@@ -46,6 +46,7 @@
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
+#include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
 
@@ -55,81 +56,59 @@ typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
 typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
 
 struct fADCdata {
-  int    _orientation;
-  double _charge;
-  int    _time;
-  int    _deltat;
-  int    _spill;
+  int _orientation;
+  int _charge;
+  int _time;
+  int _spill;
+  int _deltat;
 };
 
 typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
 typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
 
-class MapCppEMRPlaneHits {
-
+class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
  public:
+  MapCppEMRPlaneHits();
+
+ private:
 
  /** @brief Sets up the worker
  *
  *  @param argJsonConfigDocument a JSON document with
  *         the configuration.
  */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
  *
  *  This takes no arguments and does nothing.
  */
-  bool death();
-
-  /** @brief process JSON document
- *
- *  @param document ?????.
- */
-  std::string process(std::string document);
+  void _death();
 
   /** @brief process the data object
  *
  *  @param
  */
-  void process(MAUS::Data *data);
+  void _process(MAUS::Data *data) const;
 
- private:
+  void processDBB(MAUS::EMRDaq EMRdaq,
+		  int nPartTrigger,
+		  EMRDBBEventVector emr_dbb_events_tmp,
+		  EMRfADCEventVector emr_fadc_events_tmp) const;
 
-  /** @brief resets fADC and DBB data
- *
- *  Resizes the DBB and fADC event
- *  vectors and reinitialize their
- *  values and parameters
- */
-  void reset_data_tmp(int nPartEvts);
+  void processFADC(MAUS::EMRDaq EMRdaq,
+		   int nPartTrigger,
+		   EMRfADCEventVector emr_fadc_events_tmp) const;
 
-  /** @brief fill DBB Events
- *
- *  Fill DBBEventVector
- */
-  void processDBB(EMRDaq EMRdaq, int nPartTrigger);
+  void fill(MAUS::Spill *spill,
+	    int nPartTrigger,
+	    EMRDBBEventVector emr_dbb_events_tmp,
+	    EMRfADCEventVector emr_fadc_events_tmp) const;
 
-  /** @brief fill fADC Events
- *
- *  Fill fADCEventVector
- */
-  void processFADC(EMRDaq EMRdaq, int nPartTrigger);
-
-  /** @brief fill Recon Events
- *
- *  Fill the EMRData with 
- *  reconstructed events
- */
-  void fill(Spill *spill, int nPartTrigger);
-
-  std::string _classname;
+  EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
+  EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
 
   EMRChannelMap _emrMap;
-
-  // fADC and DBB data arrays
-  EMRDBBEventVector  _emr_dbb_events_tmp;
-  EMRfADCEventVector _emr_fadc_events_tmp;
 
   // Detector parameters
   int _number_of_planes;

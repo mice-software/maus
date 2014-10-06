@@ -485,6 +485,20 @@ EMRarrivalTimeGausWidth = 3
 EMRarrivalTimeUniformWidth = 12.5
 EMRpulseShapeLandauWidth = 2
 
+# EMR reconstruction
+EMRsecondaryHitsBunchingDistance = 1000 # ns
+EMRsecondaryHitsBunchingWidth = 200 # ns
+
+EMRprimaryTriggerMinXhits = 1
+EMRprimaryTriggerMinYhits = 1
+EMRprimaryTriggerMinNhits = 4
+EMRsecondaryTriggerMinXhits = 1
+EMRsecondaryTriggerMinYhits = 1
+EMRsecondaryTriggerMinNhits = 2
+EMRsecondaryTriggerMinTot = 4
+
+EMRmaxSecondaryToPrimaryTrackDistance = 5
+
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 
