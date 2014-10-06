@@ -20,6 +20,7 @@ import json
 import unittest
 from Configuration import Configuration
 import MAUS
+import maus_cpp.converter
 
 class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
     """Tests for MapCppEMRPlaneHits"""
@@ -31,18 +32,17 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
 
     def test_empty(self):
         """Check can handle empty configuration"""
-        result = self.mapper.birth("")
-        self.assertFalse(result)
+        self.assertRaises(ValueError, self.mapper.birth, "")
+        #self.mapper.birth("")
         result = self.mapper.process("")
-        doc = json.loads(result)
+        doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("errors" in doc)
         self.assertTrue("bad_json_document" in doc["errors"] or 
                         "no_channel_map" in doc["errors"])
 
     def test_init(self):
         """Check birth with default configuration"""
-        success = self.mapper.birth(self. c.getConfigJSON())
-        self.assertTrue(success)
+        self.mapper.birth(self. c.getConfigJSON())
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
@@ -52,7 +52,7 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         data = fin.read()
         # test with no data.
         result = self.mapper.process(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         n_ev = len(spill_out['recon_events'])
         #print spill_out["errors"]
         self.assertEqual(0, n_ev)
@@ -68,7 +68,7 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         # test with some crazy events.
         result = self.mapper.process(data)
         #spill_in = json.loads(data)
-        spill_out = json.loads(result)
+        spill_out = maus_cpp.converter.json_repr(result)
         #print spill_out['recon_events'][4]['emr_event']\
         #                        ['emr_plane_hits']
         self.assertFalse("bad_json_document" in spill_out["errors"])
