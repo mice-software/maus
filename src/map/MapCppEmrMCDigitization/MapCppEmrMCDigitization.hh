@@ -35,6 +35,7 @@
 #include <algorithm>
 
 // MAUS
+#include "Utils/EMRCalibrationMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"

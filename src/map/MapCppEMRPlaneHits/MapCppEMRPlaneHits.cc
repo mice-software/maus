@@ -43,7 +43,7 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
   if (!pMAUS_ROOT_DIR) {
     throw MAUS::Exception(Exception::recoverable,
                       "Could not resolve ${MAUS_ROOT_DIR} environment variable",
-                      "MapCppEMRHits::birth");
+                      "MapCppEMRPlaneHits::birth");
   }
 
   //  JsonCpp setup
@@ -74,8 +74,8 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
   bool loaded = _emrMap.InitFromFile(xMapFile);
   if (!loaded)
     throw MAUS::Exception(Exception::recoverable,
-                          "Failed to load EMR Map File",
-                          "MapCppEMRHits::birth");
+                          "Failed to load EMR Channel Map File",
+                          "MapCppEMRPlaneHits::birth");
 
   // Enable fADC unpacking
   xEnable_V1731_Unpacking = JsonWrapper::GetProperty(configJSON,
@@ -83,7 +83,7 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
                                                      JsonWrapper::booleanValue);
   if (!xEnable_V1731_Unpacking.asBool()) {
     Squeak::mout(Squeak::warning)
-    << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+    << "WARNING in MapCppEMRPlaneHits::birth. The unpacking of the flashADC V1731 is disabled!!!"
     << " Are you shure you want this?"
     << std::endl;
   }
@@ -94,7 +94,7 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
                                                      JsonWrapper::booleanValue);
   if (!xEnable_DBB_Unpacking.asBool()) {
     Squeak::mout(Squeak::warning)
-    << "WARNING in MapCppKLDigits::birth. The unpacking of the flashADC V1724 is disabled!!!"
+    << "WARNING in MapCppEMRPlaneHits::birth. The unpacking of the VRBs is disabled!!!"
     << " Are you shure you want this?"
     << std::endl;
   }

@@ -46,7 +46,7 @@
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
-#include "src/common_cpp/API/MapBase.hh"
+#include "API/MapBase.hh"
 
 namespace MAUS {
 
