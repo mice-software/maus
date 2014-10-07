@@ -54,7 +54,8 @@ std::string STEP =
         std::string("\"spin\":{\"x\":12.,\"y\":13.,\"z\":14.},")+
         std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
         std::string("\"b_field\":{\"x\":11.,\"y\":12.,\"z\":13.},")+
-        std::string("\"e_field\":{\"x\":14.,\"y\":15.,\"z\":16.}}");
+        std::string("\"e_field\":{\"x\":14.,\"y\":15.,\"z\":16.},")+
+        std::string("\"volume\":\"vol\", \"material\":\"mat\"}");
 
 std::string TRACK_SEED =
         std::string("{\"particle_id\":1,\"track_id\":2,\"kill_reason\":\"Z\",")+

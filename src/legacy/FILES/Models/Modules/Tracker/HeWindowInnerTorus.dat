@@ -1,0 +1,10 @@
+Module HeWindowInnerTorus
+{
+Volume Torus
+PropertyDouble TorusInnerRadius 0.0 mm
+PropertyDouble TorusOuterRadius 122.65 mm
+PropertyDouble TorusRadiusOfCurvature 181.28 mm
+PropertyDouble TorusAngleStart 0.0 degree
+PropertyDouble TorusOpeningAngle 360.0 degree
+PropertyString Material GALACTIC
+}

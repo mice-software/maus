@@ -67,7 +67,9 @@ class KalmanFilter {
 
   /** @brief  Computes the difference between the estimation and measurement for different stages.
    */
-  void SetResidual(KalmanState *a_site, KalmanState::State kalman_state);
+  void ComputeResidual(KalmanState *a_site, KalmanState::State kalman_state);
+
+  void ComputeChi2(KalmanState *a_site);
 
   void UpdateV(const KalmanState *a_site);
 
@@ -84,6 +86,8 @@ class KalmanFilter {
  private:
   int _n_parameters;
 
+  int _measurement_dim;
+
   TMatrixD _V;
 
   TMatrixD _H;
@@ -94,7 +98,9 @@ class KalmanFilter {
 
   TMatrixD _K;
 
-  SciFiParams FibreParameters;
+  MaterialParams FibreParameters;
+
+  double _sigma_alpha;
 };
 
 } // ~namespace MAUS

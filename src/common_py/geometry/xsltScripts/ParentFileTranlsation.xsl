@@ -33,10 +33,11 @@
 
                             //Substitutions
                             <xsl:variable name="run_number" select="MICE_Information/Configuration_Information/run/@runNumber"/>
+		            <xsl:variable name="diffuserThickness" select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
                             <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run/@beamStop, 'false') or contains(MICE_Information/Configuration_Information/run/@beamStop, 'true')">
                             Substitution $beamStop <xsl:value-of select="MICE_Information/Configuration_Information/run/@beamStop"/>
                             
-                            Substitution $diffuserThickness <xsl:value-of select="MICE_Information/Configuration_Information/run/@protonAbsorberThickness"/>
+                            Substitution $diffuserThickness <xsl:value-of select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
                             Substitution $protonAbsorberThickness <xsl:value-of select="MICE_Information/Configuration_Information/run/@beamStop"/><xsl:text>
                                 
                             </xsl:text>
@@ -51,7 +52,7 @@
 			    Substitution $D2Polarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'DS')">Substitution $DSCurrent <xsl:value-of select="@setCurrent"/>
+                            <xsl:when test="contains(@name, 'DS') and contains(string-length(@name),2)">Substitution $DSCurrent <xsl:value-of select="@setCurrent"/>
 			    Substitution $DSPolarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
@@ -94,6 +95,10 @@
                             </xsl:text></xsl:when>
                             <xsl:when test="contains(@name, 'SSU')">Substitution $SSUCurrent <xsl:value-of select="@setCurrent"/>
 			    Substitution $SSUPolarity <xsl:value-of select="@polarity"/><xsl:text>
+
+                            </xsl:text></xsl:when>
+                            <xsl:when test="contains(@name, 'DDS')">Substitution $DDSCurrent <xsl:value-of select="@setCurrent"/>
+			    Substitution $DDSPolarity <xsl:value-of select="@polarity"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
                             <xsl:when test="contains(@name, 'FCU')">Substitution $FCUCurrent <xsl:value-of select="@setCurrent"/>
@@ -165,13 +170,78 @@
 	                                Rotation <xsl:choose><xsl:when test="rotationref/@ref = 'RotateY90'"> 0.0 90.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX90'"> 90.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX270'"> 270.0 0.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX180'"> 180.0 0.0 0.0 deg</xsl:when><xsl:when test="contains(rotation/@name, 'rotRef')"><xsl:value-of select="rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@z"/> deg </xsl:when><xsl:otherwise> 0.0 0.0 0.0 deg</xsl:otherwise></xsl:choose> 
                                     }
                             </xsl:for-each> 
-                	    
 			<xsl:for-each select="MICE_Information/Detector_Information/Diffuser">
-			    Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/>iris<xsl:value-of select="Iris/@name"/>_open.dat
-			    {
-			    Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
-                            Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
-			    }
+			                Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/>iris<xsl:value-of select="Iris/@name"/><xsl:choose>
+			                    <xsl:when test="contains(Iris/@name,'1') and contains($diffuserThickness,'0000') and boolean($run_number)">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0010')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0100')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0110')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1000')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1010')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1100')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1110')">_open.dat</xsl:when>
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0001')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0011')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0101')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0111')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1001')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1011')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1101')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0000')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0100')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1000')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1100')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0001')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0101')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1001')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1101')">_open.dat</xsl:when>
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0010')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0110')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1010')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1110')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0011')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0111')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1011')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0000')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0001')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0010')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0011')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1000')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1001')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1010')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1011')">_open.dat</xsl:when>
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0100')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0101')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0110')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0111')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1100')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1101')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0000')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0001')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0010')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0011')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0100')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0101')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0110')">_open.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0111')">_open.dat</xsl:when>
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1000')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1001')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1010')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1011')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1100')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1101')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1110')">_closed.dat</xsl:when> 
+			        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+			        <xsl:otherwise>_open.dat</xsl:otherwise>
+			     </xsl:choose>
+			                {
+			                Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
+			                Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
+			                }
                		</xsl:for-each>
                             //Module Tracker/TrackerSolenoid0.dat
                             //{
@@ -209,8 +279,8 @@
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">(-1.864e-3 + $D1Polarity*$D1Current*3.83e-3 + 3.04e-6*$D1Polarity*$D1Current*$D1Polarity*$D1Current + 5.69e-10*$D1Polarity*$D1Current*$D1Polarity*$D1Current*$D1Polarity*$D1Current)/(-0.5559)</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">(-1.864e-3 + $D1Polarity*$D1Current*3.83e-3 + 3.04e-6*$D1Polarity*$D1Current*$D1Polarity*$D1Current + 5.69e-10*$D1Polarity*$D1Current*$D1Polarity*$D1Current*$D1Polarity*$D1Current)/(-0.5559)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">0.71415*(8.648/1000.0+$D1Polarity*$D1Current*9.36614/1000.0+$D1Current*$D1Current*6.3209/1000.0/1000.0-$D1Polarity*$D1Current*$D1Current*$D1Current*3.7394/1000.0/1000.0/1000.0)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">0.71415*(8.648/1000.0+$D2Polarity*$D2Current*9.36614/1000.0+$D2Current*$D2Current*6.3209/1000.0/1000.0-$D2Polarity*$D2Current*$D2Current*$D2Current*3.7394/1000.0/1000.0/1000.0)</xsl:when>
                                 <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
                             </xsl:choose>
                             Volume <xsl:value-of select="Volume/@name"/>
@@ -264,7 +334,17 @@
                             PropertyDouble Length <xsl:value-of select="Length/@value"/>
                             PropertyDouble Thickness <xsl:value-of select="Thickness/@value"/>
                             PropertyDouble InnerRadius <xsl:value-of select="InnerRadius/@value"/>
-                            ScaleFactor <xsl:value-of select="ScaleFactor/@name"/>
+                            ScaleFactor <xsl:choose>
+                                <xsl:when test="contains(FieldName/@name, 'Match') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity*$SSUCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity*$SSUCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity*$SSUCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_0') and boolean($run_number)">$SSUPolarity*$FCMCurrent/180*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'Match') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity*$DDSCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity*$DDSCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity*$DDSCurrent/281*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_1') and boolean($run_number)">$DDSPolarity*$FCMCurrent/180*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:otherwise><xsl:value-of select="ScaleFactor/@name"/></xsl:otherwise>
+                            </xsl:choose>
                             }
                 </xsl:for-each>
 		}        

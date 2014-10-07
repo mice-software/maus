@@ -318,6 +318,7 @@ void MapCppEMRPlaneHits::fill(MAUS::Spill *spill,
 
     evt->SetEMRPlaneHitArray(plArray);
     recEvts->at(ipe)->SetEMREvent(evt);
+    recEvts->at(ipe)->SetPartEventNumber(ipe);
   }
   spill->SetReconEvents(recEvts);
 }

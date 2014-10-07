@@ -1,0 +1,6 @@
+Module TrackerVacuumSection
+{
+Volume Cylinder
+Dimensions 200.0 958.25 mm
+PropertyString Material Galactic
+}
