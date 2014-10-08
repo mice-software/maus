@@ -389,6 +389,7 @@ class Beam(): # pylint: disable=R0902
             particle_array = self.__process_get_particle_array()
             hit = self.__process_array_to_hit(particle_array,
                                 self.reference["pid"], self.momentum_defined_by)
+            hit = self.__process_a_p_correlation(hit)
         spin = self.__process_beam_polarisation()
         primary = self.__process_hit_to_primary(hit)
         primary["spin"] = {"x":spin[0], "y":spin[1], "z":spin[2]}
@@ -511,12 +512,11 @@ class Beam(): # pylint: disable=R0902
         latexed version of this.
         """
         if self.a_p_correlation == {}:
-            return
+            return hit
         space = ["x", "px", "y", "py"]
-        means = dict(zip(space, self.beam_mean[0:4]))
         cov_inv = numpy.linalg.inv(self.beam_matrix[0:4, 0:4])
         cov_det = numpy.linalg.det(self.beam_matrix[0:4, 0:4])
-        ps_vec = numpy.matrix([hit[var] for var in space])
+        ps_vec = numpy.matrix([hit[var] for var in space])-self.beam_mean[0:4]
         amplitude = (ps_vec*cov_inv*ps_vec.transpose())[0, 0]*cov_det**0.25
         mom_var = self.a_p_correlation["momentum_variable"]
         mom = hit[mom_var]
@@ -528,6 +528,7 @@ class Beam(): # pylint: disable=R0902
             hit.mass_shell_condition('energy')
         elif mom_var == 'energy':
             hit.mass_shell_condition('p')
+        return hit
 
     array_keys = ["x", "px", "y", "py", "t"]
     momentum_keys = ['p', 'pz', 'energy']

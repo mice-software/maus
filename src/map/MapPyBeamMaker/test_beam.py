@@ -701,6 +701,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             a_beam.make_one_primary()
 
     def test_process_a_p_correlation(self):
+        """Test beam.py a-p correlation routine"""
         self._beam.beam_matrix = numpy.diag([0.1]*6)
         self._beam.beam_mean = numpy.zeros((6))
         self._beam.a_p_correlation = {"momentum_variable":"pz", "magnitude":0.5}

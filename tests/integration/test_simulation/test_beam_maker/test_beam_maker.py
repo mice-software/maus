@@ -44,6 +44,7 @@ TEST_DIR = os.path.join(MAUS_ROOT_DIR, "tests", "integration", \
 DEF_SIM = os.path.join(TMP_PATH, 'simulation_defaults.out')
 BIN_SIM = os.path.join(TMP_PATH, 'simulation_binomial.out')
 NAN_SIM = os.path.join(TMP_PATH, 'simulation_nan.out')
+AP_SIM = os.path.join(TMP_PATH, 'simulation_ap_corr.out')
 BIN_P = 0.1
 BIN_N = 20
 N_SPILLS = 1000
@@ -66,7 +67,7 @@ def run_simulations():
     pull it out into a separate part of the test.
     """
     out = open(TMP_PATH+'/test_beam_maker_output.out', 'w')
-    
+    """    
     # run simulation
     subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
                            os.path.join(TEST_DIR, 'default_beam_config.py')], \
@@ -102,6 +103,19 @@ def run_simulations():
                           '-output_json_file_name', NAN_SIM], \
                            stdout = out)
     subproc.wait()
+
+    # run simulation
+    subproc = subprocess.Popen([SIM_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'ap_corr_beam_config.py')], \
+                           stdout = out)
+    subproc.wait()
+    # run format conversion
+    subproc = subprocess.Popen([CONV_PATH, '-configuration_file', \
+                           os.path.join(TEST_DIR, 'ap_corr_beam_config.py'),
+                          '-output_json_file_name', AP_SIM], \
+                           stdout = out)
+    subproc.wait()
+    """
 
     out.close()
 
@@ -282,6 +296,32 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         canvas.Update()
         canvas.Print(PLOT_DIR+"/uniform_time_distribution_test.png")
         self.assertGreater(ks_value, 1e-3)
+
+    def test_ap_corr(self):
+        """
+        Check that beam maker generates uniform t distribution correctly
+        """
+        print "loading ap"
+        bunch = Bunch.new_from_read_builtin('maus_primary', AP_SIM)
+        print "doing ap"
+        p_list = [hit['pz']-200. for hit in bunch]
+        amp_list = [bunch.get_hit_variable(hit, 'amplitude x y') for hit in bunch]
+        p_a_list = [amp/mom for mom, amp in zip(p_list, amp_list)]
+        p_a_mean = sum(p_a_list)/len(p_a_list)
+        p_a_sigma = sum([p_a**2-p_a_mean**2 for p_a in p_a_list])/len(p_a_list)
+        print "mean ratio:", p_a_mean, "sigma ratio:", p_a_sigma
+        canvas = Common.make_root_canvas("a-p correlation")
+        canvas.Draw()
+        hist, graph = Common.make_root_graph('a-p correlation',
+                                             p_list, "dp_{z} [MeV/c]",
+                                             amp_list, "A_{trans} [mm]")
+        hist.Draw()
+        graph.SetMarkerStyle(7)
+        graph.Draw('p')
+        graph.Fit("pol1")
+        canvas.Update()
+        canvas.Print(PLOT_DIR+"/beam_ap_corr_test.png")
+        raw_input()
 
     setup_done = False
 
