@@ -39,7 +39,7 @@
                 Module Virtuals
                                 {
                                         Volume None
-                                        Position 0.0 0.0 0.0+0.1*@RepeatNumber m
+                                        Position 0.0 0.0 -7000.0+0.1*@RepeatNumber m
                                         PropertyString SensitiveDetector Virtual
                                         PropertyBool RepeatModule2 True
                                         PropertyInt NumberOfRepeats 70
