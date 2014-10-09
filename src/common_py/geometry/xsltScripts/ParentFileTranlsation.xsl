@@ -166,23 +166,79 @@
                                     }
                             </xsl:for-each> 
                             
-                            <!--<xsl:choose><xsl:when test="not contains(structure/volume/physvol/file/@name"></xsl:when></xsl:choose>-->    
-                                            //Other Modules
-<!--
-                    <xsl:variable name="isCool" select="'Cooling_Channel'"/>
-                                    <xsl:choose><xsl:when test="not boolean(structure/volume/physvol/"></xsl:when></xsl:choose>
-                           
-                    
-                            //<xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @diffuserThickness)">
-                            //Diffuser thickness is <xsl:value-of select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
-                            //Go and select the diffuser model
-                            //</xsl:when></xsl:choose>
-                
-                            //<xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run, @protonAbsorberThickness)">
-                            //Diffuser thickness is <xsl:value-of select="MICE_Information/Configuration_Information/run/@protonAbsorberThickness"/>
-                            //Go and select the diffuser model
-                            //</xsl:when></xsl:choose>
--->
+                <xsl:for-each select="MICE_Information/Detector_Information/Diffuser">
+                    Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/>iris<xsl:value-of select="Iris/@name"/><xsl:choose>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0000')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0010')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0100')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0110')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1000')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1010')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1100')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1110')">_open.dat</xsl:when>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0001')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0011')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0101')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0111')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1001')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1011')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1101')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0000')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0100')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1000')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1100')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0001')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0101')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1001')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1101')">_open.dat</xsl:when>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0010')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0110')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1010')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1110')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0011')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'0111')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1011')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0000')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0001')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0010')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0011')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1000')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1001')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1010')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1011')">_open.dat</xsl:when>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0100')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0101')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0110')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'0111')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1100')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1101')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0000')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0001')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0010')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0011')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0100')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0101')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0110')">_open.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'0111')">_open.dat</xsl:when>
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1000')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1001')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1010')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1011')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1100')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1101')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1110')">_closed.dat</xsl:when> 
+                        <xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'1111')">_closed.dat</xsl:when>
+                        <xsl:otherwise>_open.dat</xsl:otherwise>
+                    </xsl:choose>
+                    {
+                    Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
+                    Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
+                    }
+                </xsl:for-each>
                             // Fields
                 <xsl:for-each select="MICE_Information/G4Field_Information/Dipole">
                             Module <xsl:value-of select="FieldName/@name"/>
