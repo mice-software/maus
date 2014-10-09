@@ -65,7 +65,9 @@ int main() {
                 // TOF event holds TOF information for the particle trigger
                 MAUS::TOFEvent* tof_event =
                                    (*spill->GetReconEvents())[i]->GetTOFEvent();
-                MAUS::TOFEventDigit digits = tof_event->GetTOFEventDigit();
+                MAUS::TOFEventDigit digits;
+                if (tof_event != NULL)
+                    digits = tof_event->GetTOFEventDigit();
                 // Iterate over TOF digits
                 for (size_t j = 0; j < digits.GetTOF1DigitArray().size(); ++j) {
                     MAUS::TOFDigit tof1_digit = digits.GetTOF1DigitArray()[j];
