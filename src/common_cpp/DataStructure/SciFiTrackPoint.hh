@@ -88,11 +88,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Sets the filtered chi2 for this track point.
    */
-  void set_f_chi2(double f_chi2)                { _f_chi2 = f_chi2;     }
-
-  /** @brief  Sets the smoothed chi2 for this track point.
-   */
-  void set_s_chi2(double s_chi2)                { _s_chi2 = s_chi2;     }
+  void set_chi2(double chi2)                    { _chi2 = chi2;     }
 
   /** @brief  Sets the x coordinate.
    */
@@ -136,11 +132,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Returns filtered chi2 value.
    */
-  double f_chi2()            const { return _f_chi2;   }
-
-  /** @brief  Returns the smoothed chi2 value.
-   */
-  double s_chi2()            const { return _s_chi2;   }
+  double chi2()            const { return _chi2;   }
 
   /** @brief  Returns the x position.
    */
@@ -227,11 +219,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief filtered chi2
    */
-  double _f_chi2;
-
-  /** @brief smoothed chi2
-   */
-  double _s_chi2;
+  double _chi2;
 
   /** @brief position
    */

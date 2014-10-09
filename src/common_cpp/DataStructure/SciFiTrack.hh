@@ -52,11 +52,7 @@ class SciFiTrack {
 
   /** @brief Sets the filtered chi2.
    */
-  void set_f_chi2(double chi2) { _f_chi2 = chi2; }
-
-  /** @brief Sets the smoothed chi2.
-   */
-  void set_s_chi2(double chi2) { _s_chi2 = chi2; }
+  void set_chi2(double chi2) { _chi2 = chi2; }
 
   /** @brief Sets the ndf for this track.
    */
@@ -80,11 +76,7 @@ class SciFiTrack {
 
   /** @brief Returns the filtered chi2.
    */
-  double f_chi2()    const   { return _f_chi2; }
-
-  /** @brief Returns the smoothed chi2.
-   */
-  double s_chi2()    const   { return _s_chi2; }
+  double chi2()    const   { return _chi2; }
 
   /** @brief Returns the ndf.
    */
@@ -119,9 +111,7 @@ class SciFiTrack {
  private:
   int _tracker;
 
-  double _f_chi2;
-
-  double _s_chi2;
+  double _chi2;
 
   int _ndf;
 

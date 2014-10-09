@@ -1,0 +1,6 @@
+Module HeWindowInnerCylinder
+{
+Volume Cylinder
+Dimensions 106.0 185.0 mm
+PropertyString Material Galactic
+}

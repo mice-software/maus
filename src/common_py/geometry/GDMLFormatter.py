@@ -79,14 +79,15 @@ class Formatter: #pylint: disable = R0902
                      fname.find('Fastrad') >= 0 or \
                      fname.find('Step_IV')>=0:
                 self.configuration_file = fname
+            elif fname.find('Cooling_Channel') >= 0:
+                self.tracker_file = fname
             elif fname.find('Maus_Information') >= 0 or \
                                             fname.find('maus_information') >= 0\
                         or fname.find('Field') >= 0 or fname.find('field') >= 0:
+                print 'Found ',fname
                 self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
                 self.beamline_file = fname
-            # elif fname.find('Tracker') >= 0:
-            #     self.tracker_file = fname
             else:
                 self.stepfiles.append(fname)
         if self.maus_information_file == None:
@@ -349,7 +350,17 @@ class Formatter: #pylint: disable = R0902
             self.format_materials(self.configuration_file)
             self.insert_materials_ref(self.txt_file)
         print "Formatted Configuration File"
-        
+
+        if self.tracker_file != None:
+            self.format_check(self.tracker_file)
+            if self.formatted == False:
+                print self.tracker_file
+                self.format_schema_location(self.tracker_file)
+                self.merge_maus_info(self.tracker_file)
+                self.format_materials(self.tracker_file)
+                self.insert_materials_ref(self.txt_file)
+            print "Formatted cooling channel and trackers"
+         
         noofstepfiles = len(self.stepfiles)
         for num in range(0, noofstepfiles):
             self.format_check(self.stepfiles[num])

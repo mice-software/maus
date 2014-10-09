@@ -15,8 +15,6 @@
  *
  */
 
-// TODO: use Pattern Recognition to set up _particle_charge
-
 #include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
@@ -24,7 +22,7 @@ namespace MAUS {
 // Ascending z.
 template <class element>
 bool SortByZ(const element *a, const element *b) {
-  return ( a->get_position().z() < b->get_position().z() );
+  return ( a->get_position().z() > b->get_position().z() );
 }
 
 KalmanSeed::KalmanSeed() : _Bz(0.),
@@ -40,8 +38,8 @@ KalmanSeed::KalmanSeed(SciFiGeometryMap map): _Bz(0.),
                                               _n_parameters(-1),
                                               _particle_charge(1) {
   Json::Value *json = Globals::GetConfigurationCards();
-  _seed_cov    = (*json)["SciFiSeedCovariance"].asDouble();
-  _plane_width = (*json)["SciFiParams_Plane_Width"].asDouble();
+  _seed_cov       = (*json)["SciFiSeedCovariance"].asDouble();
+  _pos_resolution = (*json)["SciFi_sigma_triplet"].asDouble();
 }
 
 KalmanSeed::~KalmanSeed() {}
@@ -59,7 +57,6 @@ KalmanSeed& KalmanSeed::operator=(const KalmanSeed &rhs) {
 
   _clusters.resize(rhs._clusters.size());
   for (size_t i = 0; i < rhs._clusters.size(); ++i) {
-    // _clusters[i] = new SciFiCluster(*rhs._clusters[i]);
     _clusters[i] = rhs._clusters[i];
   }
 
@@ -80,7 +77,6 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 
   _clusters.resize(seed._clusters.size());
   for (size_t i = 0; i < seed._clusters.size(); ++i) {
-    // _clusters[i] = new SciFiCluster(*seed._clusters[i]);
      _clusters[i] = seed._clusters[i];
   }
 
@@ -92,33 +88,39 @@ KalmanSeed::KalmanSeed(const KalmanSeed &seed) {
 }
 
 void KalmanSeed::BuildKalmanStates() {
-  size_t numb_sites = _clusters.size();
-  for ( size_t j = 0; j < numb_sites; ++j ) {
-    // SciFiCluster& cluster = (*_clusters[j]);
+  size_t n_scifi_planes = 15;
 
+  int sign =1;
+  if ( _tracker == 0 ) sign = -1;
+
+  for ( size_t j = n_scifi_planes; j >= 1; --j ) {
     KalmanState* a_site = new KalmanState();
     a_site->Initialise(_n_parameters);
 
-    int id = _clusters[j]->get_id();
-    a_site->set_spill(_clusters[j]->get_spill());
-    a_site->set_event(_clusters[j]->get_event());
+    int id = sign*j;
     a_site->set_id(id);
-    a_site->set_measurement(_clusters[j]->get_alpha());
-    a_site->set_direction(_clusters[j]->get_direction());
-    a_site->set_z(_clusters[j]->get_position().z());
-    a_site->set_cluster(_clusters[j]);
-
-    std::map<int, SciFiPlaneGeometry>::iterator iterator;
-    iterator = _geometry_map.find(id);
-    SciFiPlaneGeometry this_plane = (*iterator).second;
-    ThreeVector plane_position  = this_plane.Position;
-
-    TMatrixD shift(3, 1);
-    shift(0, 0) = plane_position.x();
-    shift(1, 0) = plane_position.y();
-    shift(2, 0) = 0.0;
-    a_site->set_input_shift(shift);
-
+    // Add more info if the plane registered a measurement:
+    for ( size_t i = 0; i < _clusters.size(); ++i ) {
+      if ( _clusters.at(i)->get_id() == id ) {
+            a_site->set_spill(_clusters.at(i)->get_spill());
+            a_site->set_event(_clusters.at(i)->get_event());
+            a_site->set_id(id);
+            a_site->contains_measurement(true);
+            a_site->set_measurement(_clusters.at(i)->get_alpha());
+            a_site->set_direction(_clusters.at(i)->get_direction());
+            a_site->set_z(_clusters.at(i)->get_position().z());
+            a_site->set_cluster(_clusters.at(i));
+            std::map<int, SciFiPlaneGeometry>::iterator iterator;
+            iterator = _geometry_map.find(_clusters.at(i)->get_id());
+            SciFiPlaneGeometry this_plane = (*iterator).second;
+            ThreeVector plane_position  = this_plane.Position;
+            TMatrixD shift(3, 1);
+            shift(0, 0) = plane_position.x();
+            shift(1, 0) = plane_position.y();
+            shift(2, 0) = 0.0;
+            a_site->set_input_shift(shift);
+      }
+    }
     _kalman_sites.push_back(a_site);
   }
   //
@@ -128,48 +130,52 @@ void KalmanSeed::BuildKalmanStates() {
   for ( int i = 0; i < _n_parameters; ++i ) {
     C(i, i) = _seed_cov;
   }
-  C(0, 0) = _plane_width*_plane_width/12.;
-  C(2, 2) = _plane_width*_plane_width/12.;
   _kalman_sites[0]->set_a(_a0, KalmanState::Projected);
   _kalman_sites[0]->set_covariance_matrix(C, KalmanState::Projected);
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
-  double x, y, z;
-  x = spacepoints.front()->get_position().x();
-  y = spacepoints.front()->get_position().y();
-  z = spacepoints.front()->get_position().z();
   // Get seed values.
   double r  = seed->get_R();
   // Get pt in MeV.
   double c  = CLHEP::c_light;
   // Charge guess should come from PR.
-  // int _particle_charge = seed->get_charge();
+  int _particle_charge = seed->get_charge();
 
-  double pt = -_particle_charge*c*_Bz*r;
+  double pt = _particle_charge*c*_Bz*r;
 
-  double dsdz  = seed->get_dsdz();
-  double tan_lambda = 1./dsdz;
+  double dsdz  = fabs(seed->get_dsdz());
 
-  double pz = pt*tan_lambda;
+  double pz = fabs(pt/dsdz);
 
-  double kappa = _particle_charge*fabs(1./pz);
-  double phi_0 = seed->get_phi0();
+  double x, y, z;
+  x = spacepoints.front()->get_position().x();
+  y = spacepoints.front()->get_position().y();
+  z = spacepoints.front()->get_position().z();
 
-  if ( _tracker == 0 ) {
+  double phi_0;
+  if ( _tracker == 1 ) {
     phi_0 = seed->get_phi().back();
+  } else {
+    phi_0 = seed->get_phi().front();
   }
+
   double phi = phi_0 + TMath::PiOver2();
   double px  = pt*cos(phi);
   double py  = pt*sin(phi);
 
+  // Remove PR momentum bias.
+  // ThreeVector mom(px, py, pz);
+  // double reduction_factor = (mom.mag()-1.4)/mom.mag();
+  // ThreeVector new_momentum = mom*reduction_factor;
+
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
-  a(1, 0) = px*fabs(kappa);
+  a(1, 0) = px; // new_momentum.x();
   a(2, 0) = y;
-  a(3, 0) = py*fabs(kappa);
-  a(4, 0) = kappa;
+  a(3, 0) = py; // new_momentum.y();
+  a(4, 0) = _particle_charge/pz; // _particle_charge/new_momentum.z();
 
   return a;
 }

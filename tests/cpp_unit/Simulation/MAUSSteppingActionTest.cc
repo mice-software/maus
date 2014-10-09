@@ -18,6 +18,11 @@
 
 #include "Geant4/G4Step.hh"
 #include "Geant4/G4ParticleTable.hh"
+#include "Geant4/G4Material.hh" 
+#include "Geant4/G4GRSVolume.hh"
+#include "Geant4/G4RotationMatrix.hh"
+#include "Geant4/G4ThreeVector.hh"
+#include "Geant4/G4PVPlacement.hh"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -35,7 +40,8 @@ class MAUSSteppingActionTest : public ::testing::Test {
     G4ParticleDefinition* pd =
                          G4ParticleTable::GetParticleTable()->FindParticle(-13);
     G4DynamicParticle* dyn =
-                        new G4DynamicParticle(pd, G4ThreeVector(1., 2., 3.));
+                           new G4DynamicParticle(pd, G4ThreeVector(1., 2., 3.));
+
     track = new G4Track(dyn, 7., G4ThreeVector(4., 5., 6.));
 
     step = new G4Step(); // memory leak?
@@ -130,6 +136,9 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
 }
 // test that we write to json correctly
 TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
+  G4Material material("material_test", 1, 1, 1.);
+  post->SetMaterial(&material);
+
   Json::Value out = stepping->StepToJson(step, true);
   EXPECT_DOUBLE_EQ(out["position"]["x"].asDouble(), point->GetPosition().x());
   EXPECT_DOUBLE_EQ(out["position"]["y"].asDouble(), point->GetPosition().y());
@@ -152,9 +161,30 @@ TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
   EXPECT_DOUBLE_EQ(out["proper_time"].asDouble(), point->GetProperTime());
   EXPECT_DOUBLE_EQ(out["path_length"].asDouble(), track->GetTrackLength());
 
+  EXPECT_EQ(out["material"].asString(), "");
+  EXPECT_EQ(out["volume"].asString(), "");
+
   out = stepping->StepToJson(step, false);
   EXPECT_DOUBLE_EQ(out["time"].asDouble(), post->GetGlobalTime());
+  EXPECT_EQ(out["material"].asString(), "material_test");
 }
+
+// test that we write volume to json correctly; disabled because it throws a
+// G4Exception
+/*
+TEST_F(MAUSSteppingActionTest, StepToJsonVolumeTest) {
+  G4RotationMatrix rot;
+  G4ThreeVector vec(1., 1., 1.);
+ 	G4PVPlacement vol(&rot, vec, NULL, "volume_test", NULL, false, 0);
+  G4GRSVolume touchable(&vol, rot, vec);
+
+  point->SetTouchableHandle(&touchable);
+
+  Json::Value out = stepping->StepToJson(step, true);
+  EXPECT_EQ(out["volume"].asString(), "volume_test");
+}
+*/
+
 G4Track* SetG4TrackAndStep(G4Step* step) {
   G4ParticleDefinition* pd =
                        G4ParticleTable::GetParticleTable()->FindParticle(-13);
