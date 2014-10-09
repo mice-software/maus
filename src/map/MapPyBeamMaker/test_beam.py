@@ -719,7 +719,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             self._beam._Beam__process_a_p_correlation(hit2)
             self._beam._Beam__process_a_p_correlation(hit3)
             self.assertAlmostEqual(hit2['pz'], hit3['pz'])
-            self.assertAlmostEqual(hit2['pz']-ref_pz, ref_pz*0.5*4.)
+            self.assertAlmostEqual(hit2['pz']-ref_pz, ref_pz*0.5*4.*105.658**2)
 
     def __cmp_matrix(self, ref_matrix, test_matrix):
         """Compare to numpy matrices"""
