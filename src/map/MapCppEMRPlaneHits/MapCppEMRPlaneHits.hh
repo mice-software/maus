@@ -93,17 +93,17 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
 
   void processDBB(MAUS::EMRDaq EMRdaq,
 		  int nPartTrigger,
-		  EMRDBBEventVector emr_dbb_events_tmp,
-		  EMRfADCEventVector emr_fadc_events_tmp) const;
+		  EMRDBBEventVector& emr_dbb_events_tmp,
+		  EMRfADCEventVector& emr_fadc_events_tmp) const;
 
   void processFADC(MAUS::EMRDaq EMRdaq,
 		   int nPartTrigger,
-		   EMRfADCEventVector emr_fadc_events_tmp) const;
+		   EMRfADCEventVector& emr_fadc_events_tmp) const;
 
   void fill(MAUS::Spill *spill,
 	    int nPartTrigger,
-	    EMRDBBEventVector emr_dbb_events_tmp,
-	    EMRfADCEventVector emr_fadc_events_tmp) const;
+	    EMRDBBEventVector& emr_dbb_events_tmp,
+	    EMRfADCEventVector& emr_fadc_events_tmp) const;
 
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
   EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;

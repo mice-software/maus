@@ -33,12 +33,10 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
     def test_empty(self):
         """Check can handle empty configuration"""
         self.assertRaises(ValueError, self.mapper.birth, "")
-        #self.mapper.birth("")
         result = self.mapper.process("")
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"] or 
-                        "no_channel_map" in doc["errors"])
+        self.assertTrue("MapCppEMRPlaneHits" in doc["errors"])
 
     def test_init(self):
         """Check birth with default configuration"""
@@ -67,10 +65,9 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         data = fin.read()
         # test with some crazy events.
         result = self.mapper.process(data)
-        #spill_in = json.loads(data)
+        # spill_in = json.loads(data)
         spill_out = maus_cpp.converter.json_repr(result)
-        #print spill_out['recon_events'][4]['emr_event']\
-        #                        ['emr_plane_hits']
+
         self.assertFalse("bad_json_document" in spill_out["errors"])
         self.assertFalse("bad_cpp_data" in spill_out["errors"])
         n_ev = len(spill_out['recon_events'])
