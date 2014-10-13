@@ -21,8 +21,10 @@ from geometry.CADImport import CADImport
 
 CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileTranlsation.xsl"
-#  TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
-#         "/src/common_py/geometry/xsltScripts/TrackerTranslation.xsl"
+CONFIGXSL2 = os.environ["MAUS_ROOT_DIR"] + \
+        "/src/common_py/geometry/xsltScripts/ParentFileTranslation.xsl"
+TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
+         "/src/common_py/geometry/xsltScripts/CoolingChannelTranslation.xsl"
 MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
                          "/src/common_py/geometry/xsltScripts/MMTranslation.xsl"
 DET_GDML = ['TOF0.gdml', 'TOF1.gdml', 'TOF2.gdml', \
@@ -79,6 +81,9 @@ class GDMLtomaus(): #pylint: disable = R0903
                    fname == 'Step_IV.gdml':
                 found_file = os.path.join(self.path, fname)
                 self.config_file = found_file
+            if fname == 'Cooling_Channel.gdml':
+                found_file = os.path.join(self.path, fname)
+                self.tracker_file = found_file
             if fname.find('Maus_Information') >= 0:
                 found_file = os.path.join(self.path, fname)
                 self.maus_information_file = found_file
@@ -91,12 +96,13 @@ class GDMLtomaus(): #pylint: disable = R0903
                and fname.find('Maus_Information') < 0 \
                and fname.find('Beamline') < 0 \
                and fname[-5:] == '.gdml' \
-               and fname.find('Step_IV') < 0:
-            
+               and fname.find('Step_IV') < 0 \
+               and fname.find('Cooling_Channel.gdml') < 0:
+                
                 stepfile = os.path.join(self.path, fname)
                 self.step_files.append(stepfile)
 
-    def convert_to_maus(self, output):
+    def convert_to_maus(self, output): #pylint: disable = R0914
         """
         @method convert_to_maus This method converts the GDMLs to MAUS Modules.
         
@@ -112,14 +118,25 @@ class GDMLtomaus(): #pylint: disable = R0903
             raise IOError('Output path doesnt exist '+str(output))
         else:
             outputfile1 = os.path.join(output, "ParentGeometryFile.dat")
-            # outputfile2 = os.path.join(output, "TrackerGeometryFile.dat")
             # outputfile3 = os.path.join(output, "RotatedGeometryFile.dat")
-            config_file = CADImport(xmlin1 = str(self.config_file), \
-                           xsl = str(CONFIGXSL), output = str(outputfile1))
-            config_file.parse_xslt()
-            # tracker_file = CADImport(xmlin1 = str(self.config_file), \
-            #                xsl = str(TRACKERXSL), output = str(outputfile2))
-            # tracker_file.parse_xslt()
+            
+            if str(self.tracker_file).find('Cooling_Channel') >= 0:
+                outputfile2 = os.path.join(output, "Cooling_Channel.dat")
+                config_file = CADImport(xmlin1 = str(self.config_file), \
+                                        xsl = str(CONFIGXSL2), \
+                                        output = str(outputfile1))
+                config_file.parse_xslt()
+                tracker_file = CADImport(xmlin1 = str(self.tracker_file), \
+                                         xsl = str(TRACKERXSL), \
+                                         output = str(outputfile2))
+                tracker_file.parse_xslt()
+                print "Applying translation assuming a secondary mother volume"
+            else:
+                config_file = CADImport(xmlin1 = str(self.config_file), \
+                                        xsl = str(CONFIGXSL), \
+                                        output = str(outputfile1))
+                config_file.parse_xslt()
+                print "Applying single config file translation"
             # rotated_file = CADImport(xmlin1 = str(self.config_file), \
             #         xsl = str(ROTATEDXSL), output = str(outputfile3))
             # rotated_file.parse_xslt()
