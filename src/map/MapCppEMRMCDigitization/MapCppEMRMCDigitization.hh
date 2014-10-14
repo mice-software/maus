@@ -16,7 +16,7 @@
  */
 
 
-/** @class MapCppEmrMCDigitization
+/** @class MapCppEMRMCDigitization
  * Digitization of the EMR MC data.
  *
  */
@@ -31,11 +31,13 @@
 // C++ headers
 #include <string>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <algorithm>
 
 // MAUS
 #include "Utils/EMRCalibrationMap.hh"
+#include "Utils/EMRAttenuationMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
@@ -49,6 +51,7 @@
 #include "DataStructure/Primary.hh"
 #include "Utils/Globals.hh"
 #include "Globals/GlobalsManager.hh"
+#include "API/MapBase.hh"
 
 // ROOT
 #include "TROOT.h"
@@ -79,119 +82,67 @@ struct fADCdata {
 typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
 typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
 
-class MapCppEmrMCDigitization {
+class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
  public:
+  MapCppEMRMCDigitization();
+
+ private:
   /** @brief Sets up the worker
    *
    *  argJsonConfigDocument a JSON document with
    *  the configuration
    */
-  bool birth(std::string argJsonConfigDocument);
+  void _birth(const std::string& argJsonConfigDocument);
 
   /** @brief Shutdowns the worker
    *
    *  This takes no arguments and does nothing
    */
-  bool death();
+  void _death();
 
   /** @brief process JSON document
    *
    *  Receive a document with MC hits and return
    *  a document with digitized recEvts
    */
-  std::string process(std::string document);
+  void _process(MAUS::Data *data) const;
 
- private:
 
-  /** @brief resets fADC and DBB data
- *
- *  Resizes the DBB and fADC event
- *  vectors and reinitialize their
- *  values and parameters
- */
-  void reset_data_tmp(int nPartEvts);
+  void processDBB(MAUS::EMRHitArray *EMRhits,
+		  int xPe,
+		  double pTime,
+		  EMRDBBEventVector& emr_dbb_events_tmp,
+		  EMRfADCEventVector& emr_fadc_events_tmp) const;
 
-  /** @brief fill DBB Events
- *
- *  Fill DBBEventVector
- */
-  void processDBB(EMRHitArray *hits, int xPe, int ptime);
+  void processFADC(MAUS::EMRHitArray *EMRhits,
+		  int xPe,
+		  EMRfADCEventVector& emr_fadc_events_tmp) const;
 
-  /** @brief fill fADC Events
- *
- *  Fill fADCEventVector
- */
-  void processFADC(EMRHitArray *hits, int xPe, int ptime);
+  void digitize(MAUS::EMREvent *EMRevt,
+		int xPe,
+		int nPartEvents,
+		int *deltat_limits,
+		EMRDBBEventVector& emr_dbb_events_tmp,
+		EMRfADCEventVector& emr_fadc_events_tmp) const;
 
-  /** @brief fill Recon Events
- *
- *  Fill the EMRData with 
- *  reconstructed events
- */
-  void fill(Spill *spill, int nPartEvents);
+  void fill(MAUS::Spill *spill,
+	    int nPartEvents,
+	    int xSpill,
+	    EMRDBBEventVector emr_dbb_events_tmp,
+	    EMRfADCEventVector emr_fadc_events_tmp) const;
 
-  /** @brief digitize ReconEvents
- *
- *  Fill the EMRData with 
- *  digitized data
- */
-  void digitize(EMREvent *evt, int xPe, int nPartEvents);
+  EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
+  EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
 
-  /** @brief fiber attenuation map
- *
- *  Receive a Bar, PMT ID and position and
- *  return an attenuation value
- */
-  double fiber_atten_map(int planeid, int barid, double x, double y, int pmt);
-
-  /** @brief fiber delay map
- *
- *  Receive a Bar, PMT ID and position and
- *  return a delay value in ns
- */
-  int fiber_delay_map(int planeid, int barid, double x, double y, int pmt);
-
-  /** @brief clear fiber length map
- *
- *  Receive a Bar, PMT ID and return
- *  return a length value in mm
- */
-  double clear_fiber_length_map(int barid, int pmt);
-
-  /** @brief connector attenuation map
- *
- *  Receive a Bar and PMT ID and return
- *  an attenuation value
- */
-  double connector_atten_map(int barid, int pmt);
-
-  std::string _classname;
-
-  // Spill count
-  int _spillCount;
-
-  // fADC and DBB data arrays
-  EMRDBBEventVector  _emr_dbb_events_tmp;
-  EMRfADCEventVector _emr_fadc_events_tmp;
-
-  // Parmaters defined in the configuration files
-  FILE *_configfile;
-  TString _calibfilename;
-  FILE *_calibfile;
-  TString _cflengthfilename;
-  FILE *_cflengthfile;
-  TString _cattenfilename;
-  FILE *_cattenfile;
+  // Maps
+  EMRCalibrationMap _calibMap;
+  EMRAttenuationMap _attenMap;
 
   // Detector parameters
   int _number_of_planes;
   int _number_of_bars;
 
   // Hit pre-selection cuts
-  int _deltat_signal_up;
-  int _deltat_signal_low;
-  int _deltat_noise_up;
-  int _deltat_noise_low;
   int _tot_noise_up;
   int _tot_noise_low;
 
@@ -206,13 +157,8 @@ class MapCppEmrMCDigitization {
   double _nADC_per_pe_SAPMT;
   double _electronics_response_spread_MAPMT;
   double _electronics_response_spread_SAPMT;
-  double _atten_WLSf;
-  double _atten_CLRf;
-  int _bar_length;
-  int _nbars;
   double _dbb_count;
   double _fadc_count;
-  int _spill_width;
   int _time_response_spread;
   double _tot_func_p1;
   double _tot_func_p2;
