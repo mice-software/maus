@@ -102,7 +102,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                 stepfile = os.path.join(self.path, fname)
                 self.step_files.append(stepfile)
 
-    def convert_to_maus(self, output):
+    def convert_to_maus(self, output): #pylint: disable = R0914
         """
         @method convert_to_maus This method converts the GDMLs to MAUS Modules.
         
@@ -123,15 +123,18 @@ class GDMLtomaus(): #pylint: disable = R0903
             if str(self.tracker_file).find('Cooling_Channel') >= 0:
                 outputfile2 = os.path.join(output, "Cooling_Channel.dat")
                 config_file = CADImport(xmlin1 = str(self.config_file), \
-                                        xsl = str(CONFIGXSL2), output = str(outputfile1))
+                                        xsl = str(CONFIGXSL2), \
+                                        output = str(outputfile1))
                 config_file.parse_xslt()
                 tracker_file = CADImport(xmlin1 = str(self.tracker_file), \
-                                         xsl = str(TRACKERXSL), output = str(outputfile2))
+                                         xsl = str(TRACKERXSL), \
+                                         output = str(outputfile2))
                 tracker_file.parse_xslt()
                 print "Applying translation assuming a secondary mother volume"
             else:
                 config_file = CADImport(xmlin1 = str(self.config_file), \
-                                        xsl = str(CONFIGXSL), output = str(outputfile1))
+                                        xsl = str(CONFIGXSL), \
+                                        output = str(outputfile1))
                 config_file.parse_xslt()
                 print "Applying single config file translation"
             # rotated_file = CADImport(xmlin1 = str(self.config_file), \

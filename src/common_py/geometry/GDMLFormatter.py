@@ -84,7 +84,7 @@ class Formatter: #pylint: disable = R0902
             elif fname.find('Maus_Information') >= 0 or \
                                             fname.find('maus_information') >= 0\
                         or fname.find('Field') >= 0 or fname.find('field') >= 0:
-                print 'Found ',fname
+                print 'Found ', fname
                 self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
                 self.beamline_file = fname

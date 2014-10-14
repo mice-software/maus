@@ -1,0 +1,21 @@
+import os
+
+geometry_validation = {
+    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
+    "will_plot":True,
+    "will_track":True,
+    "z_start":-1000.,
+    "z_end":1000.,
+    "x_start":-1.,
+    "x_step":1.,
+    "y_start":2.,
+    "y_step":-2.,
+    "n_steps":3,
+    "plot_formats":["ps", "png"],
+    "1d_plot_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_1d"),
+    "2d_plot_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_2d"),
+}
+
+max_step_length = 1.
+
+
