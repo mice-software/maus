@@ -16,7 +16,6 @@
 """Tests for MapCppEMRPlaneHits"""
 
 import os
-import json
 import unittest
 from Configuration import Configuration
 import MAUS
