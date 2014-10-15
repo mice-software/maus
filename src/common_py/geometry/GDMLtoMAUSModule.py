@@ -31,7 +31,7 @@ DET_GDML = ['TOF0.gdml', 'TOF1.gdml', 'TOF2.gdml', \
             'Tracker0.gdml', 'Tracker1.gdml',\
             'KL.gdml', 'Ckov1.gdml', 'Ckov2.gdml', 'Disk_LiH.gdml',\
             'Wedge_LiH_90.gdml', 'Wedge_LiH_45.gdml', 'LH2.gdml','EMR.gdml',\
-            'HeWindow.gdml', \
+            'HeWindow.gdml', 'HeVolDSCap.gdml', 'HeVolUSCap.gdml',\
             'iris1_closed.gdml', 'iris2_open.gdml', 'iris3_open.gdml',\
             'iris3_closed.gdml', 'iris4_open.gdml',\
             'iris2_closed.gdml', 'iris1_open.gdml',\
