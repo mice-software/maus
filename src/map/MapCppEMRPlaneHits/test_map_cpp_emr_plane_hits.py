@@ -71,9 +71,9 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         self.assertEqual(5, n_ev)
 
 	# consitent amount of plane hit in each event (1 per event)
-	for i in range(0, n_ev):
+        for i in range(0, n_ev):
             n_hits = len(spill_out['recon_events'][i]['emr_event']\
-					['emr_plane_hits'])
+				  ['emr_plane_hits'])
             self.assertEqual(1, n_hits)
 
 if __name__ == "__main__":

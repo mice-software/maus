@@ -511,7 +511,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 			 - pulse_shape->Integral(_signal_integration_window+1,
 			   _signal_integration_window*2);
     double signal_area = pedestal_baseline*static_cast<double>(_signal_integration_window)
-		       - pulse_shape->Integral(arrival_time-10+1, 
+		       - pulse_shape->Integral(arrival_time-10+1,
 					       arrival_time+_signal_integration_window-10);
 
     // set pulse area
