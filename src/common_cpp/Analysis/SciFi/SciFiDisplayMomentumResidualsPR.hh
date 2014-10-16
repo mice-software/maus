@@ -15,34 +15,35 @@
  *
  */
 
-/** @class SciFiDisplayMomentumResiduals
+/** @class SciFiDisplayMomentumResidualsPR
  *
- *  Abstract base class for other SciFi reduced data classes
+ *  Class to pattern recognition momentum residuals as ROOT histograms
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESIDUALS_
-#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESDIUALS_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESIDUALSPR_
+#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESDIUALSPR_
 
 // ROOT headers
 #include "TCanvas.h"
 #include "TTree.h"
+#include "TH1D.h"
 
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
 
 
 namespace MAUS {
 
-class SciFiDisplayMomentumResiduals : public SciFiDisplayBase {
+class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
   public:
     /** Default constructor */
-    SciFiDisplayMomentumResiduals();
+    SciFiDisplayMomentumResidualsPR();
 
     /** Destructor */
-    virtual ~SciFiDisplayMomentumResiduals();
+    virtual ~SciFiDisplayMomentumResidualsPR();
 
     /** Plot the data currently held */
     virtual void Plot(TCanvas* aCanvas = NULL);
@@ -64,8 +65,17 @@ class SciFiDisplayMomentumResiduals : public SciFiDisplayBase {
      */
     SciFiDataBase* SetUpSciFiData();
 
-    TTree* mTree;
-    SciFiDataMomentum* mData;
+    TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
+    SciFiDataMomentumPR* mSpillData;  /** The reduced data object, covering one spill */
+    MomentumDataPR mTrackData;       /** Struct containing reduced data for one track in a spill */
+
+    // Residual histograms
+    TH1D* mResidualPtT1;         /** Pt residual histogram for tracker 1 */
+    TH1D* mResidualPzT1;         /** Pz residual histogram for tracker 1 */
+    TH1D* mResidualPzT1Log;      /** Pz residual histogram for tracker 1 (log scale) */
+    TH1D* mResidualPtT2;         /** Pt residual histogram for tracker 2 */
+    TH1D* mResidualPzT2;         /** Pz residual histogram for tracker 2 */
+    TH1D* mResidualPzT2Log;      /** Pz residual histogram for tracker 2 (log scale) */
 };
 
 } // ~namespace MAUS

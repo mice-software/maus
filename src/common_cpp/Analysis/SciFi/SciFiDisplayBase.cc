@@ -23,4 +23,9 @@ namespace MAUS {
 SciFiDisplayBase::SciFiDisplayBase() : mCanvas(NULL) {
   // Do nothing
 }
+
+SciFiDisplayBase::~SciFiDisplayBase() {
+  if (mCanvas) delete mCanvas;
 }
+
+} // ~namespace MAUS

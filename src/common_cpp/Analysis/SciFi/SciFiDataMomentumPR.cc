@@ -20,7 +20,7 @@
 #include <map>
 
 // MAUS headers
-#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
 #include "src/common_cpp/Plotting/SciFi/SciFiAnalysisTools.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -35,41 +35,44 @@
 
 namespace MAUS {
 
-SciFiDataMomentum::SciFiDataMomentum() : mTree(NULL) {
-  mTree = new TTree("mTree", "SciFi Momentum Data");
-  mTree->Branch("SpillNumber", &mDataStruct.SpillNumber, "SpillNumber/I");
-  mTree->Branch("TrackerNumber", &mDataStruct.TrackerNumber, "TrackerNumber/I");
-  mTree->Branch("NumberOfPoints", &mDataStruct.NumberOfPoints, "NumberOfPoints/I");
-  mTree->Branch("Charge", &mDataStruct.Charge, "Charge/I");
-  mTree->Branch("PtMc", &mDataStruct.PtMc, "PtMc/D");
-  mTree->Branch("PzMc", &mDataStruct.PzMc, "PtMz/D");
-  mTree->Branch("PtRec", &mDataStruct.PtRec, "PtRec/D");
-  mTree->Branch("PzRec", &mDataStruct.PzRec, "PtRec/D");
+SciFiDataMomentumPR::SciFiDataMomentumPR() : mNBadTracks(0),
+                                             mNMatchedTracks(0),
+                                             mNMismatchedTracks(0),
+                                             mNMissedTracks(0),
+                                             mData(0) {
+  // Do nothing
 }
 
-SciFiDataMomentum::~SciFiDataMomentum() {
-  delete mTree;
+SciFiDataMomentumPR::~SciFiDataMomentumPR() {
+  // Do nothing
 }
 
-bool SciFiDataMomentum::Accumulate(Spill* aSpill) {
+bool SciFiDataMomentumPR::Process(Spill* aSpill) {
   if (aSpill != NULL && aSpill->GetDaqEventType() == "physics_event") {
-    mDataStruct.SpillNumber = aSpill->GetSpillNumber();
-
     // Loop over MC events in the aSpill
     for (size_t iMaSFEvent = 0; iMaSFEvent < aSpill->GetMCEvents()->size(); ++iMaSFEvent) {
       MCEvent *aMcEvent = (*aSpill->GetMCEvents())[iMaSFEvent];
       SciFiEvent *aSFEvent = (*aSpill->GetReconEvents())[iMaSFEvent]->GetSciFiEvent();
+      std::cerr << "SciFiDataMomentumPR: Reducing data...\n";
       ReduceData(aMcEvent, aSFEvent);
+      std::cerr << "SciFiDataMomentumPR: Data reduction complete\n";
     }
   } else {
-    std::cerr << "SciFiDataMomentum: Not a usable spill" << std::endl;
+    std::cerr << "SciFiDataMomentumPR: Not a usable spill" << std::endl;
     return false;
   }
   return true;
 }
 
+void SciFiDataMomentumPR::Clear() {
+  mNBadTracks = 0;
+  mNMatchedTracks = 0;
+  mNMismatchedTracks = 0;
+  mNMissedTracks = 0;
+  mData.clear();
+}
 
-void SciFiDataMomentum::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
+void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
   std::vector<SciFiHelicalPRTrack*> htrks = aSFEvent->helicalprtracks();
 
   // Create the lookup bridge between MC and Recon
@@ -82,17 +85,19 @@ void SciFiDataMomentum::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
   // Loop over helical pattern recognition tracks in event
   for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
     SciFiHelicalPRTrack* trk = htrks[iTrk];
-    mDataStruct.PtRec = 0.0;
-    mDataStruct.PzRec = 0.0;
+
     if ((trk->get_R() != 0.0) & (trk->get_dsdz() != 0.0)) {
-      mDataStruct.NumberOfPoints = trk->get_num_points();
-      std::vector< std::vector<int> > spoint_mc_tids;  // Vector of MC track ids for each spoint
+      MomentumDataPR lDataStruct;
+      lDataStruct.TrackerNumber = trk->get_tracker();
+      lDataStruct.Charge = trk->get_charge();
+      lDataStruct.NumberOfPoints = trk->get_num_points();
 
       // Calc recon momentum
-      mDataStruct.PtRec = 1.2 * trk->get_R();
-      mDataStruct.PzRec = mDataStruct.PtRec / trk->get_dsdz();
+      lDataStruct.PtRec = 1.2 * trk->get_R();
+      lDataStruct.PzRec = lDataStruct.PtRec / trk->get_dsdz();
 
       // Calc MC momentum
+      std::vector< std::vector<int> > spoint_mc_tids;  // Vector of MC track ids for each spoint
       // Loop over seed spacepoints associated with the track
       std::vector<SciFiSpacePoint*> spnts = trk->get_spacepoints_pointers();
       for ( size_t k = 0; k < spnts.size(); ++k ) {
@@ -143,33 +148,34 @@ void SciFiDataMomentum::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
         break;
       }
       // If we have found a common track id amoung the spoints, fill the tree
-      mMcTrackId = track_id;
       mNMatchedTracks = counter;
       mNMismatchedTracks = spoint_mc_tids.size() - counter;
       mNMissedTracks = 5 - counter; // TODO: improve
 
       // Calc the MC track momentum using hits only with this track id
-      mDataStruct.PtMc = 0.0;
-      mDataStruct.PzMc = 0.0;
+      lDataStruct.PtMc = 0.0;
+      lDataStruct.PzMc = 0.0;
       int counter2 = 0;
       for ( size_t k = 0; k < spnts.size(); ++k ) {
         ThreeVector mom_mc;
         bool success = SciFiAnalysisTools::find_mc_spoint_momentum(track_id, spnts[k],
                                                                    lkup, mom_mc);
-        if (!success) continue;
-        mDataStruct.PtMc += sqrt(mom_mc.x()*mom_mc.x() + mom_mc.y()*mom_mc.y());
-        mDataStruct.PzMc += mom_mc.z();
+        if (!success) {
+          std::cerr << "Failed to find mc mom for track in tracker " << trk->get_tracker() << "\n";
+          continue;
+        }
+        lDataStruct.PtMc += sqrt(mom_mc.x()*mom_mc.x() + mom_mc.y()*mom_mc.y());
+        lDataStruct.PzMc += mom_mc.z();
         ++counter2;
       }
-      mDataStruct.PtMc /= counter2;
-      mDataStruct.PzMc /= counter2;
+      lDataStruct.PtMc /= counter2;
+      lDataStruct.PzMc /= counter2;
 
-      mDataStruct.TrackerNumber = trk->get_tracker();
-      mDataStruct.Charge = trk->get_charge();
-      mTree->Fill();
+      mData.push_back(lDataStruct);
     } else {
       std::cout << "Bad track, skipping" << std::endl;
     }
-  }
+  }  // ~ Loop over helical pattern recognition tracks in event
 }
-}
+
+} // ~namespace MAUS

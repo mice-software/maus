@@ -42,7 +42,7 @@ class SciFiDataBase  {
     /** Pure virtual function hence must be overidden in daughter classes.
      *  Takes in the data, one spill at a time
      */
-    virtual bool Accumulate(Spill* spill) = 0;
+    virtual bool Process(Spill* spill) = 0;
 };
 
 } // ~namespace MAUS

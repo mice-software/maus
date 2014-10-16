@@ -31,6 +31,7 @@ SciFiAnalysis::~SciFiAnalysis() {
 
 bool SciFiAnalysis::Accumulate(Spill* aSpill) {
   // Check the spill pointer
+  std::cerr << "SciFiAnalysis: Checking spill pointer...\n";
   if ( !aSpill ) {
     std::cerr << "SciFiAnalysis: Warning: Empty Spill pointer passed\n";
     return false;
@@ -41,22 +42,28 @@ bool SciFiAnalysis::Accumulate(Spill* aSpill) {
      std::cerr << "SciFiAnalysis: Warning: SciFiData member not set up\n";
     return false;
   }
+  std::cerr << "Pass\n";
 
   // Reduce the SciFi Data and store in the SciFiData object
-  mSciFiData->Accumulate(aSpill);
+  mSciFiData->Process(aSpill);
+  std::cerr << "SciFiAnalysis: Accumulate finished\n";
 
   // Update each of the displays objects added
   std::vector<SciFiDisplayBase*>::iterator lDisplay;
-  for ( mDisplays.begin(); lDisplay != mDisplays.end(); ++lDisplay ) {
-    (*lDisplay)->Update();
+  std::cerr << "SciFiAnalysis: Looping over displays...\n";
+  for ( size_t i = 0; i < mDisplays.size(); ++i ) {
+    std::cerr << "SciFiAnalysis: Updating display...\n";
+    mDisplays[i]->Update();
+    std::cerr << "SciFiAnalysis: Updating display complete\n";
   }
+  std::cerr << "SciFiAnalysis: Displays loop finished\n";
   return true;
 }
 
 void SciFiAnalysis::Plot() {
   std::vector<SciFiDisplayBase*>::iterator lDisplay;
-  for ( mDisplays.begin(); lDisplay != mDisplays.end(); ++lDisplay ) {
-    (*lDisplay)->Plot();
+  for ( size_t i = 0; i < mDisplays.size(); ++i ) {
+    mDisplays[i]->Plot();
   }
 }
 

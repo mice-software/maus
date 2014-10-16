@@ -34,7 +34,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResiduals.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsPR.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
@@ -111,16 +111,16 @@ int main(int argc, char *argv[]) {
 //   std::cout << "Pz resolution histogram fit upper bound: " << analyser.get_pz_fit_max() << "\n";
 //   std::cout << "Resolution graphs number of points:  " << analyser.get_n_points() << "\n";
 //   std::cout << "Resolution graphs lower bound:  "
-               << analyser.get_resol_lower_bound() << " MeV/c\n";
+//               << analyser.get_resol_lower_bound() << " MeV/c\n";
 //   std::cout << "Resolution graphs upper bound:  "
-               << analyser.get_resol_upper_bound() << " MeV/c\n";
+//               << analyser.get_resol_upper_bound() << " MeV/c\n";
 //   std::cout << "Pz rec cut: " << analyser.get_cut_pz_rec() << " MeV/c\n";
-  MAUS::SciFiDisplayMomentumResiduals* display = new MAUS::SciFiDisplayMomentumResiduals();
+  MAUS::SciFiDisplayMomentumResidualsPR* display = new MAUS::SciFiDisplayMomentumResidualsPR();
   analyser.AddDisplay(display);
   analyser.SetUpDisplays();
 
   // Set up ROOT app, input file, and MAUS data class
-  // TApplication theApp("App", &argc, argv);
+  TApplication theApp("App", &argc, argv);
   std::cout << "Opening file " << filename << std::endl;
   irstream infile(filename.c_str(), "Spill");
   MAUS::Data data;
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
   // Tidy up
 //   analyser.save_root();
   infile.close();
-  // theApp.Run();
+  theApp.Run();
 
   // Print some results
 //   std::cerr << "\n-------------------------Results-------------------------\n";

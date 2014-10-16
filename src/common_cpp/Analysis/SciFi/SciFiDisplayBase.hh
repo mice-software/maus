@@ -39,7 +39,7 @@ class SciFiDisplayBase  {
     SciFiDisplayBase();
 
     /** Destructor */
-    virtual ~SciFiDisplayBase() {}
+    virtual ~SciFiDisplayBase();
 
     /** Return the member Canvas */
     TCanvas* GetCanvas() { return mCanvas; }

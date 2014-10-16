@@ -15,14 +15,14 @@
  *
  */
 
-/** @class SciFiDataMomentum
+/** @class SciFiDataMomentumPR
  *
- *  Class for SciFi reduced momentum data
+ *  Class for producing SciFi pattern recognition reduced momentum data
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUM_
-#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUM_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMPR_
+#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMPR_
 
 // Root headers
 #include "TTree.h"
@@ -34,8 +34,7 @@
 
 namespace MAUS {
 
-struct MomentumData {
-  int SpillNumber;
+struct MomentumDataPR {
   int TrackerNumber;
   int NumberOfPoints;
   int Charge;
@@ -45,31 +44,32 @@ struct MomentumData {
   double PzRec;
 };
 
-class SciFiDataMomentum : public SciFiDataBase {
-  friend class SciFiDisplayMomentumResiduals;
+class SciFiDataMomentumPR : public SciFiDataBase {
+  friend class SciFiDisplayMomentumResidualsPR;
 
   public:
-
     /** Default constructor */
-    SciFiDataMomentum();
+    SciFiDataMomentumPR();
 
     /** Destructor */
-    virtual ~SciFiDataMomentum();
+    virtual ~SciFiDataMomentumPR();
 
-    /** Accuulate data from this spill*/
-    virtual bool Accumulate(Spill* spill);
+    /** Set all the member variables to zero */
+    void Clear();
 
-    /** Calculate the reduced momentum data for this spill */
+    /** Process data from this spill*/
+    virtual bool Process(Spill* spill);
+
+    /** Calculate the reduced momentum data for an event */
     void ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent);
 
   protected:
-    int mMcTrackId;
     int mNBadTracks;
-    int mNMatchedTracks;
+    int mNMatchedTracks;                /** Number of recon tracks matched to an MC track */
     int mNMismatchedTracks;
-    int mNMissedTracks;
-    MomentumData mDataStruct;
-    TTree* mTree;
+    int mNMissedTracks;                 /** Number of tracks missed by the reconstruction */
+    std::vector<MomentumDataPR> mData;  /** Vector whose elements hold reduced data for one track */
+
 };
 
 } // ~namespace MAUS
