@@ -47,14 +47,21 @@ class SciFiDisplayBase  {
     /** Plot the data on a ROOT TCanvas */
     virtual void Plot(TCanvas* aCanvas = NULL) = 0;
 
+    /** Save the data and plots (e.g. as pdfs, to ROOT file, ...) */
+    virtual void Save() = 0;
+
     /** Sets up the SciFiData object needed by the display, and any other objects (e.g. ROOT Trees).
      *  The display does not own the SciFiData object, but rather this should be called by
      *  the SciFiAnalysis class which then assumes ownership.
      */
     virtual SciFiDataBase* SetUp() = 0;
 
-    /** Update the internal data used to make the plots using the pointer to the SciFiData object */
-    virtual void Update() = 0;
+    /** Update the internal data used to make the plots using the pointer to the SciFiData object.
+     *  Data may accumulate inside the derived class (e.g. in a ROOT TTree) for plotting
+     *  cumulative data at the end of a run, or simply replace the existing data to allow plotting
+     *  spill by spill.
+     */
+    virtual void Fill() = 0;
 
   protected:
     TCanvas* mCanvas; /** The ROOT TCanvas on which to plot the data */

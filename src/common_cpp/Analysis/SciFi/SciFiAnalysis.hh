@@ -47,9 +47,6 @@ class SciFiAnalysis {
     /** Destructor */
     virtual ~SciFiAnalysis();
 
-    /** Takes in the data, one spill at a time */
-    bool Accumulate(Spill* aSpill);
-
     /** Add a data display module */
     void AddDisplay(SciFiDisplayBase* aDisplay) { mDisplays.push_back(aDisplay); }
 
@@ -59,12 +56,15 @@ class SciFiAnalysis {
     /** Produce the plots */
     void Plot();
 
-    /** Setup the member variables by initiallising the displays,
-     *  and setting the SciFiData pointer */
-    void SetUpDisplays();
+    /** Takes in the data, one spill at a time */
+    bool Process(Spill* aSpill);
 
     /** Save the data to a ROOT File */
     void Save();
+
+    /** Setup the member variables by initialising the displays,
+     *  and setting the SciFiData pointer */
+    void SetUpDisplays();
 
     /** Set the SciFiData, which particular derived class depends on what analysis is required */
     void SetSciFiData(SciFiDataBase* aSciFiData) { mSciFiData = aSciFiData; }

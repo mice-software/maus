@@ -91,30 +91,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Set up analysis class
+  // Set up analysis and display classes
   MAUS::SciFiAnalysis analyser;
-//   analyser.set_n_pt_bins(n_pt_bins);
-//   analyser.set_n_pz_bins(n_pz_bins);
-//   analyser.set_n_points(n_points);
-//   analyser.set_pt_fit_min(pt_fit_min);
-//   analyser.set_pt_fit_max(pt_fit_max);
-//   analyser.set_pz_fit_min(pz_fit_min);
-//   analyser.set_pz_fit_max(pz_fit_max);
-//   analyser.set_resol_lower_bound(lower_bound);
-//   analyser.set_resol_upper_bound(upper_bound);
-//   analyser.set_cut_pz_rec(pz_rec_cut);
-//   std::cout << "Pt resolution histogram number of bins: " << analyser.get_n_pt_bins() << "\n";
-//   std::cout << "Pt resolution histogram fit lower bound: " << analyser.get_pt_fit_min() << "\n";
-//   std::cout << "Pt resolution histogram fit upper bound: " << analyser.get_pt_fit_max() << "\n";
-//   std::cout << "Pz resolution histogram number of bins: " << analyser.get_n_pz_bins() << "\n";
-//   std::cout << "Pz resolution histogram fit lower bound: " << analyser.get_pz_fit_min() << "\n";
-//   std::cout << "Pz resolution histogram fit upper bound: " << analyser.get_pz_fit_max() << "\n";
-//   std::cout << "Resolution graphs number of points:  " << analyser.get_n_points() << "\n";
-//   std::cout << "Resolution graphs lower bound:  "
-//               << analyser.get_resol_lower_bound() << " MeV/c\n";
-//   std::cout << "Resolution graphs upper bound:  "
-//               << analyser.get_resol_upper_bound() << " MeV/c\n";
-//   std::cout << "Pz rec cut: " << analyser.get_cut_pz_rec() << " MeV/c\n";
   MAUS::SciFiDisplayMomentumResidualsPR* display = new MAUS::SciFiDisplayMomentumResidualsPR();
   analyser.AddDisplay(display);
   analyser.SetUpDisplays();
@@ -133,7 +111,7 @@ int main(int argc, char *argv[]) {
     MAUS::Spill* spill = data.GetSpill();
     if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
       if ( fmod(counter, 1000) == 0 ) std::cout << "Total number of spills: " << counter << ".\n";
-      analyser.Accumulate(spill);
+      analyser.Process(spill);
       if (bool_pause) {
         std::cout << "Press Enter to Continue";
         std::cin.ignore();
@@ -143,17 +121,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Make the final plots
+  // Make the final plots and save
   analyser.Plot();
-//   analyser.make_residual_histograms();
-//   analyser.make_residual_graphs();
-//   analyser.make_pt_resolutions();
-//   analyser.make_pz_resolutions();
-//   analyser.make_resolution_graphs();
-//   if (save_type != "") analyser.save_graphics(save_type);
+  analyser.Save();
 
   // Tidy up
-//   analyser.save_root();
   infile.close();
   theApp.Run();
 

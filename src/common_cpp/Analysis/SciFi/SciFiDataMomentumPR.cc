@@ -35,10 +35,8 @@
 
 namespace MAUS {
 
-SciFiDataMomentumPR::SciFiDataMomentumPR() : mNBadTracks(0),
+SciFiDataMomentumPR::SciFiDataMomentumPR() : mNUnmatchedTracks(0),
                                              mNMatchedTracks(0),
-                                             mNMismatchedTracks(0),
-                                             mNMissedTracks(0),
                                              mData(0) {
   // Do nothing
 }
@@ -53,9 +51,7 @@ bool SciFiDataMomentumPR::Process(Spill* aSpill) {
     for (size_t iMaSFEvent = 0; iMaSFEvent < aSpill->GetMCEvents()->size(); ++iMaSFEvent) {
       MCEvent *aMcEvent = (*aSpill->GetMCEvents())[iMaSFEvent];
       SciFiEvent *aSFEvent = (*aSpill->GetReconEvents())[iMaSFEvent]->GetSciFiEvent();
-      std::cerr << "SciFiDataMomentumPR: Reducing data...\n";
       ReduceData(aMcEvent, aSFEvent);
-      std::cerr << "SciFiDataMomentumPR: Data reduction complete\n";
     }
   } else {
     std::cerr << "SciFiDataMomentumPR: Not a usable spill" << std::endl;
@@ -65,10 +61,8 @@ bool SciFiDataMomentumPR::Process(Spill* aSpill) {
 }
 
 void SciFiDataMomentumPR::Clear() {
-  mNBadTracks = 0;
+  mNUnmatchedTracks = 0;
   mNMatchedTracks = 0;
-  mNMismatchedTracks = 0;
-  mNMissedTracks = 0;
   mData.clear();
 }
 
@@ -80,7 +74,7 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
   lkup.make_hits_map(aMcEvent);
 
   // Reset tracks counters
-  mNBadTracks = 0;
+  mNUnmatchedTracks = 0;
 
   // Loop over helical pattern recognition tracks in event
   for (size_t iTrk = 0; iTrk < htrks.size(); ++iTrk) {
@@ -144,13 +138,10 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
       // If we have not found a common track id, abort for this track
       if (!success) {
         std::cerr << "Malformed track, skipping\n";
-        ++mNBadTracks;
+        ++mNUnmatchedTracks;
         break;
       }
-      // If we have found a common track id amoung the spoints, fill the tree
-      mNMatchedTracks = counter;
-      mNMismatchedTracks = spoint_mc_tids.size() - counter;
-      mNMissedTracks = 5 - counter; // TODO: improve
+      ++mNMatchedTracks;
 
       // Calc the MC track momentum using hits only with this track id
       lDataStruct.PtMc = 0.0;

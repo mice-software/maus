@@ -39,9 +39,10 @@ class SciFiDataBase  {
     /** Destructor */
     virtual ~SciFiDataBase() {}
 
-    /** Pure virtual function hence must be overidden in daughter classes.
-     *  Takes in the data, one spill at a time
-     */
+    /** Clear the data for the spill, ready for the next */
+    virtual void Clear() = 0;
+
+    /**  Takes in the data, one spill at a time */
     virtual bool Process(Spill* spill) = 0;
 };
 

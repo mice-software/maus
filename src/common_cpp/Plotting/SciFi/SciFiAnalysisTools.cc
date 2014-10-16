@@ -83,6 +83,8 @@ bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid
     }
   }
 
+  // If one and only one MC track ID has been found for 3 or more spacepoints in the track, then
+  // all is well and we return the MC track ID and the number of spacepoints associated with it
   std::map<int, int>::iterator mit1;
   tid = 0;
   for ( mit1 = track_id_counter.begin(); mit1 != track_id_counter.end(); ++mit1 ) {

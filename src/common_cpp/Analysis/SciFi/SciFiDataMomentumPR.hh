@@ -24,6 +24,9 @@
 #ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMPR_
 #define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMPR_
 
+// C++ headers
+#include <vector>
+
 // Root headers
 #include "TTree.h"
 
@@ -64,14 +67,10 @@ class SciFiDataMomentumPR : public SciFiDataBase {
     void ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent);
 
   protected:
-    int mNBadTracks;
-    int mNMatchedTracks;                /** Number of recon tracks matched to an MC track */
-    int mNMismatchedTracks;
-    int mNMissedTracks;                 /** Number of tracks missed by the reconstruction */
+    int mNUnmatchedTracks;              /** No. of tracks which could not associate with MC track */
+    int mNMatchedTracks;                /** No. of recon tracks matched to an MC track */
     std::vector<MomentumDataPR> mData;  /** Vector whose elements hold reduced data for one track */
-
 };
-
 } // ~namespace MAUS
 
 #endif
