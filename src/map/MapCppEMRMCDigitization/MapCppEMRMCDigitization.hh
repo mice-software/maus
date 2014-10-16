@@ -61,7 +61,6 @@
 #include "TString.h"
 #include "TRandom3.h"
 #include "TH1F.h"
-#include "TCanvas.h"
 
 namespace MAUS {
 
@@ -74,8 +73,7 @@ struct fADCdata {
   int    _orientation;
   double _charge;
   double _pedestal_area;
-  int    _arrival_time;
-  double _g4_edep_mev;
+  int    _time;
   std::vector<int> _samples;
 };
 

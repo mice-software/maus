@@ -247,7 +247,6 @@ void MapCppEMRMCDigitization::processDBB(MAUS::EMRHitArray *EMRhits,
     bHit.SetTot(tot);
     bHit.SetHitTime(lt);
     bHit.SetDeltaT(delta_t);
-    bHit.SetHitTime(lt);
     emr_dbb_events_tmp[xPe][xPlane][xBar].push_back(bHit);
   }
 }
@@ -278,7 +277,7 @@ void MapCppEMRMCDigitization::processFADC(MAUS::EMRHitArray *EMRhits,
     fADCdata data;
     data._orientation = planeid % 2;
     data._charge = xCharge;
-    data._arrival_time = 0;
+    data._time = 0;
     emr_fadc_events_tmp[xPe][xPlane] = data;
   }
 }
@@ -314,6 +313,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
       EMRBar *bar = plHit->GetEMRBarArray().at(iBar);
       int xBar = bar->GetBar();
       int nBarHits = bar->GetEMRBarHitArray().size();
+      bool matched = false;
 
       for (int iHit = 0; iHit < nBarHits; iHit++) {
 	EMRBarHit barHit = bar->GetEMRBarHitArray().at(iHit);
@@ -368,7 +368,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 	naph_SAPMT_hit = static_cast<int>(static_cast<double>(naph_SAPMT_hit)
 		       *_attenMap.connectorAtten(xKey, "SA"));
 
-	if (time < 10/*!!! TO DO !!! use a parameter*/) naph_SAPMT += naph_SAPMT_hit;
+	if (time > deltat_limits[0] && time < deltat_limits[1]) naph_SAPMT += naph_SAPMT_hit;
 
 	// sample naph with Poisson
 	if (_do_sampling) naph_MAPMT = _rand->Poisson(naph_MAPMT);
@@ -429,10 +429,12 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 	// discriminate noise and decays from signal events
 	if (xDeltaTDigi >= deltat_limits[0] && xDeltaTDigi < deltat_limits[1]) {
 	  emr_dbb_events_tmp[xPe][xPlane][xBar].push_back(bHit);
+	  matched = true;
 	} else if (xDeltaTDigi >= deltat_limits[2] && xDeltaTDigi < deltat_limits[3] &&
 		   xTotDigi > _tot_noise_low && xTotDigi < _tot_noise_up ) {
 	  emr_dbb_events_tmp[nPartEvents][xPlane][xBar].push_back(bHit);
-	} else {
+	  matched = true;
+	} else if (iHit == nBarHits-1 && !matched) {
 	  bHit.SetDeltaT(0);
 	  emr_dbb_events_tmp[nPartEvents+1][xPlane][xBar].push_back(bHit);
 	}
@@ -440,8 +442,6 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
     }
 
     int xOri = plHit->GetOrientation();
-    double xCharge = plHit->GetCharge();/*eV*/
-    double energy = xCharge/1000000.0;/*MeV*/
 
     /*------------ SAPMT signal simulation -------*/
 
@@ -511,8 +511,8 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 			 - pulse_shape->Integral(_signal_integration_window+1,
 			   _signal_integration_window*2);
     double signal_area = pedestal_baseline*static_cast<double>(_signal_integration_window)
-		       - pulse_shape->Integral(arrival_time-10+1,
-		         arrival_time+_signal_integration_window-10);
+		       - pulse_shape->Integral(arrival_time-10+1, 
+					       arrival_time+_signal_integration_window-10);
 
     // set pulse area
     double xAreaDigi = signal_area;
@@ -539,9 +539,8 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
     data._orientation = xOri;
     data._charge = xAreaDigi;/*ADC*/
     data._pedestal_area = xPedestalAreaDigi;/*ADC*/
-    data._arrival_time = xArrivalTimeDigi;/*ADC*/
+    data._time = xArrivalTimeDigi;/*ADC*/
     data._samples = xSamplesDigi;/*#*/
-    data._g4_edep_mev = energy;/*MeV*/
     emr_fadc_events_tmp[xPe][xPlane] = data;
 
     delete pulse_shape;
@@ -578,7 +577,7 @@ void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
       int xOri  = emr_fadc_events_tmp[iPe][iPlane]._orientation;
       double xCharge = emr_fadc_events_tmp[iPe][iPlane]._charge;
-      int xPos = emr_fadc_events_tmp[iPe][iPlane]._arrival_time;
+      int xPos = emr_fadc_events_tmp[iPe][iPlane]._time;
       double xPedestalArea = emr_fadc_events_tmp[iPe][iPlane]._pedestal_area;
       std::vector<int> xSamples = emr_fadc_events_tmp[iPe][iPlane]._samples;
 

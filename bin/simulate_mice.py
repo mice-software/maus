@@ -33,17 +33,17 @@ def run():
     my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
 
     # TOF
-    # my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
-    # my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
-    # my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
+    my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
+    my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
+    my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
     # KL
-    # my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
-    # my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
+    my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
+    my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
 
     # SciFi
-    # my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
-    # my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+    my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
+    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
     # EMR
     my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitizer

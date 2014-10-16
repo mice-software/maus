@@ -50,13 +50,56 @@ class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
         # test with no data.
         result = self.mapper.process(data)
         spill_out = maus_cpp.converter.json_repr(result)
+        self.assertFalse("MapCppEMRMCDigitization" in spill_out["errors"])
+
         n_ev = len(spill_out['recon_events'])
         self.assertEqual(0, n_ev)
-        self.assertFalse("bad_json_document" in spill_out["errors"])
-        self.assertFalse("bad_cpp_data" in spill_out["errors"])
 
-    #def test_process(self):
-        #"""Test MapCppEMRMCDigitization process method"""
+    def test_process(self):
+        """Test MapCppEMRMCDigitization process method"""
+        test2 = ('%s/src/map/MapCppEMRMCDigitization/processTest.json' % 
+                 os.environ.get("MAUS_ROOT_DIR"))
+        fin = open(test2,'r')
+        data = fin.read()
+        # test with a mu+, its decay product e+ and a noise hit (e-)
+        result = self.mapper.process(data)
+        spill_out = maus_cpp.converter.json_repr(result)
+        self.assertFalse("MapCppEMRMCDigitization" in spill_out["errors"])
+
+	# consistent amount of reconEvents (3 = 1primary+1noise+1decay)
+        n_ev = len(spill_out['recon_events'])
+        self.assertEqual(3, n_ev)
+	# consistent amount of primary plane hits, charge and ToTs
+        n_hits_0 = len(spill_out['recon_events'][0]['emr_event']\
+				['emr_plane_hits'])
+	self.assertEqual(24, n_hits_0)
+	for i in range(0, n_hits_0):
+	    self.assertTrue(spill_out['recon_events'][0]['emr_event']\
+					['emr_plane_hits'][i]['charge'] > 0)
+	    self.assertTrue(spill_out['recon_events'][0]['emr_event']\
+					['emr_plane_hits'][i]['emr_bars'][0]\
+					['emr_bar_hits'][0]['tot'] > 5)
+	    self.assertTrue(spill_out['recon_events'][0]['emr_event']\
+					['emr_plane_hits'][i]['emr_bars'][0]\
+					['emr_bar_hits'][0]['tot'] > 5)
+	# consistent amount of noise and time from the primary
+        n_hits_1 = len(spill_out['recon_events'][1]['emr_event']\
+				['emr_plane_hits'])
+	self.assertEqual(1, n_hits_1)
+	self.assertTrue(spill_out['recon_events'][1]['emr_event']['emr_plane_hits']\
+					[0]['emr_bars'][0]['emr_bar_hits']
+					[0]['delta_t'] - spill_out['recon_events'][0]\
+					['emr_event']['emr_plane_hits'][0]['emr_bars'][0]\
+					['emr_bar_hits'][0]['delta_t'] > 20)
+
+	# consistent amount of decay plane hits and bar hits in each plane 
+        n_hits_2 = len(spill_out['recon_events'][2]['emr_event']\
+				['emr_plane_hits'])
+	self.assertEqual(8, n_hits_2)
+	for i in range(0, n_hits_2):
+	    n_bars = len(spill_out['recon_events'][2]['emr_event']\
+					['emr_plane_hits'][i]['emr_bars'])
+   	    self.assertTrue(2, n_bars)
 
 if __name__ == "__main__":
     unittest.main()
