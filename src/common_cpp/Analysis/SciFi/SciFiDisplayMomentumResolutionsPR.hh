@@ -15,14 +15,14 @@
  *
  */
 
-/** @class SciFiDisplayPzResolutionsPR
+/** @class SciFiDisplayMomentumResolutionsPR
  *
  *  Class to pattern recognition momentum residuals as ROOT histograms
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYPZRESOLUTIONSPR_
-#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYPZRESOLUTIONSPR_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESOLUTIONSPR_
+#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESOLUTIONSPR_
 
 #include <string>
 
@@ -41,13 +41,13 @@
 
 namespace MAUS {
 
-class SciFiDisplayPzResolutionsPR : public SciFiDisplayBase {
+class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
   public:
     /** Default constructor */
-    SciFiDisplayPzResolutionsPR();
+    SciFiDisplayMomentumResolutionsPR();
 
     /** Destructor */
-    virtual ~SciFiDisplayPzResolutionsPR();
+    virtual ~SciFiDisplayMomentumResolutionsPR();
 
     /** Calculate the pz resolution for a particular pt_mc interval,
      *  by plotting a histo of the pz_mc - pz for the interval,
@@ -95,7 +95,10 @@ class SciFiDisplayPzResolutionsPR : public SciFiDisplayBase {
     double get_resol_upper_bound() const { return _resol_upper_bound; }
 
     /** Make pz resolution graphs, as a function of pt_mc */
-    void make_pz_resolutions();
+    void make_pzpt_resolutions();
+
+    /** Make pz resolution graphs, as a function of pt_mc */
+    void make_pzpz_resolutions();
 
     /** Plot the data currently held */
     virtual void Plot(TCanvas* aCanvas = NULL);

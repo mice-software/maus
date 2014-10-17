@@ -35,7 +35,7 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsPR.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayPzResolutionsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsPR.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
@@ -100,7 +100,8 @@ int main(int argc, char *argv[]) {
   // analyser.AddDisplay(residuals);
 
   // Add Pat Rec momentum resolutions display
-  MAUS::SciFiDisplayPzResolutionsPR* resolutions = new MAUS::SciFiDisplayPzResolutionsPR();
+  MAUS::SciFiDisplayMomentumResolutionsPR* resolutions = 
+    new MAUS::SciFiDisplayMomentumResolutionsPR();
   resolutions->set_n_pt_bins(n_pt_bins);
   resolutions->set_n_pz_bins(n_pz_bins);
   resolutions->set_n_points(n_points);
