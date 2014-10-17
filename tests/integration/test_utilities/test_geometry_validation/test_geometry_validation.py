@@ -49,7 +49,7 @@ class TestGeometryValidation(unittest.TestCase): #pylint: disable=R0904
         lines = [line for line in open(TEST).readlines()]
         n_steps = 3
         self.assertEqual(len(lines), n_steps)
-        first_event = json.loads(lines[0])[0]["tracks"][0]       
+        first_event = json.loads(lines[0])[0]["tracks"][0]
         self.assertAlmostEqual(first_event["initial_position"]["x"], -1.)
         self.assertAlmostEqual(first_event["initial_position"]["y"], 2.)
         self.assertAlmostEqual(first_event["initial_position"]["z"], -500.)
@@ -62,7 +62,11 @@ class TestGeometryValidation(unittest.TestCase): #pylint: disable=R0904
         self.assertAlmostEqual(last_event["initial_position"]["z"], -500.)
         self.assertGreater(len(last_event["steps"]), 1)
         for _format in ["ps", "png"]:
-            for pic in ["geometry_validation_1d", "geometry_validation_2d"]:
+            for pic in ["test_geometry_validation_materials_1d",
+                        "test_geometry_validation_materials_2d",
+                        "test_geometry_validation_volumes_1d",
+                        "test_geometry_validation_volumes_2d",
+                       ]:
                 fname = os.path.expandvars("${MAUS_TMP_DIR}/"+pic+"."+_format)
                 self.assertTrue(os.path.exists(fname), msg=fname)
         fin = open(os.path.expandvars(
