@@ -57,6 +57,32 @@ Uses the "geometry_validation" dictionary of datacards, with dictionary keys:
 - "geometry_validation_volumes_2d" (string) name of the 2D plot to be printed
             by MAUS showing volume bounding rectangles and name labels. The
             appropriate suffix will be appended for each format.
+- "2d_volume_plot_label_size" (float) between 0.0 and 1.0 that tells how big the
+  labels should be in the 2d volume plot. Labels are stacked vertically, so if
+  the label size is small more labels can be put on the plot
+- "volume_bounding_box_dump" (string) file name for dumping bounding boxes to.
+  Format is json, going something something like:
+{
+  <string volume name>: {
+    "z_min": <float minimum z of steps in volume>,
+    "z_max": <float maximum z of steps in volume>, 
+    "r_min": <float minimum radius of steps in volume>,
+    "r_max": <float maximum radius of steps in volume>, 
+    "material": <string material name>
+  },
+  ...
+}
+e.g.
+{
+  "Vol14": {
+    "z_max": 320.0, 
+    "r_min": 0.0, 
+    "material": "G4_Al", 
+    "r_max": 2.23606806280132, 
+    "z_min": 280.0
+  },
+  ...
+}
 """
 
 # pylint: disable=E1101

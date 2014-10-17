@@ -1,0 +1,132 @@
+Configuration config
+{
+    PropertyHep3Vector Dimensions 1 1 10 m
+    PropertyString Material Galactic
+    MiceModule Vol9
+    {
+        PropertyHep3Vector Position 0.0 0.0 0.0 m
+        PropertyHep3Vector Dimensions 0.09 0.09 -1 m
+        PropertyString Volume Cylinder
+        PropertyString Material Al
+        MiceModule Vol8
+        {
+            PropertyHep3Vector Position 0.0 0.0 0.0 m
+            PropertyHep3Vector Dimensions 0.08 0.08 -1 m
+            PropertyString Volume Cylinder
+            PropertyString Material Al
+            MiceModule Vol7
+            {
+                PropertyHep3Vector Position 0.0 0.0 0.0 m
+                PropertyHep3Vector Dimensions 0.07 0.07 -1 m
+                PropertyString Volume Cylinder
+                PropertyString Material Al
+                MiceModule Vol6
+                {
+                    PropertyHep3Vector Position 0.0 0.0 0.0 m
+                    PropertyHep3Vector Dimensions 0.06 0.06 -1 m
+                    PropertyString Volume Cylinder
+                    PropertyString Material Al
+                    MiceModule Vol5
+                    {
+                        PropertyHep3Vector Position 0.0 0.0 0.0 m
+                        PropertyHep3Vector Dimensions 0.05 0.05 -1 m
+                        PropertyString Volume Cylinder
+                        PropertyString Material Al
+                        MiceModule Vol4
+                        {
+                            PropertyHep3Vector Position 0.0 0.0 0.0 m
+                            PropertyHep3Vector Dimensions 0.04 0.04 -1 m
+                            PropertyString Volume Cylinder
+                            PropertyString Material Al
+                            MiceModule Vol3
+                            {
+                                PropertyHep3Vector Position 0.0 0.0 0.0 m
+                                PropertyHep3Vector Dimensions 0.03 0.03 -1 m
+                                PropertyString Volume Cylinder
+                                PropertyString Material Al
+                                MiceModule Vol2
+                                {
+                                    PropertyHep3Vector Position 0.0 0.0 0.0 m
+                                    PropertyHep3Vector Dimensions 0.02 0.02 -1 m
+                                    PropertyString Volume Cylinder
+                                    PropertyString Material Al
+                                    MiceModule Vol1
+                                    {
+                                        PropertyHep3Vector Position 0.0 0.0 0.0 m
+                                        PropertyHep3Vector Dimensions 0.01 0.01 -1 m
+                                        PropertyString Volume Cylinder
+                                        PropertyString Material Al
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    MiceModule Vol19
+    {
+        PropertyHep3Vector Position 0.0 0.0 0.3 m
+        PropertyHep3Vector Dimensions 0.09 0.09 -1 m
+        PropertyString Volume Cylinder
+        PropertyString Material Al
+        MiceModule Vol18
+        {
+            PropertyHep3Vector Position 0.0 0.0 0.0 m
+            PropertyHep3Vector Dimensions 0.08 0.08 -1 m
+            PropertyString Volume Cylinder
+            PropertyString Material Al
+            MiceModule Vol17
+            {
+                PropertyHep3Vector Position 0.0 0.0 0.0 m
+                PropertyHep3Vector Dimensions 0.07 0.07 -1 m
+                PropertyString Volume Cylinder
+                PropertyString Material Al
+                MiceModule Vol16
+                {
+                    PropertyHep3Vector Position 0.0 0.0 0.0 m
+                    PropertyHep3Vector Dimensions 0.06 0.06 -1 m
+                    PropertyString Volume Cylinder
+                    PropertyString Material Al
+                    MiceModule Vol15
+                    {
+                        PropertyHep3Vector Position 0.0 0.0 0.0 m
+                        PropertyHep3Vector Dimensions 0.05 0.05 -1 m
+                        PropertyString Volume Cylinder
+                        PropertyString Material Al
+                        MiceModule Vol14
+                        {
+                            PropertyHep3Vector Position 0.0 0.0 0.0 m
+                            PropertyHep3Vector Dimensions 0.04 0.04 -1 m
+                            PropertyString Volume Cylinder
+                            PropertyString Material Al
+                            MiceModule Vol13
+                            {
+                                PropertyHep3Vector Position 0.0 0.0 0.0 m
+                                PropertyHep3Vector Dimensions 0.03 0.03 -1 m
+                                PropertyString Volume Cylinder
+                                PropertyString Material Al
+                                MiceModule Vol12
+                                {
+                                    PropertyHep3Vector Position 0.0 0.0 0.0 m
+                                    PropertyHep3Vector Dimensions 0.02 0.02 -1 m
+                                    PropertyString Volume Cylinder
+                                    PropertyString Material Al
+                                    MiceModule Vol11
+                                    {
+                                        PropertyHep3Vector Position 0.0 0.0 0.0 m
+                                        PropertyHep3Vector Dimensions 0.01 0.01 -1 m
+                                        PropertyString Volume Cylinder
+                                        PropertyString Material Al
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
