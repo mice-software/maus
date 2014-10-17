@@ -225,30 +225,39 @@ class Plotting(object): # pylint: disable=R0902
         draw_list = step_data.keys()
         draw_list = self.move(draw_list, "G4_AIR", 0)
         draw_list = self.move(draw_list, "G4_Galactic", 1)
-        x_list, z_list = [], []
+        black_x_list, black_y_list = [], []
+        grey_x_list, grey_y_list = [], []
         canvas = common.make_root_canvas("Material vs z")
         hist = ROOT.TH2D("name", "Material vs z", 30000, z_range[0], z_range[1],
                          len(draw_list)+1, -0.5, len(draw_list)+0.5)
         common._hist_persistent.append(hist) #pylint: disable=W0212
         for material in draw_list:
-            hist.Fill(0., material, 1.)
+            hist.Fill(z_range[0], material, 1.)
         hist.SetBit(ROOT.TH1.kCanRebin)
         hist.SetStats(0)
         hist.LabelsDeflate("Y")
         hist.LabelsOption("v")
         hist.Draw()
-        for material in draw_list:
-            x_list += [step["r"] for step in step_data[material] \
-                                                            if step["r"] < 1e-9]
-            z_list += [step["z"] for step in step_data[material] \
-                                                            if step["r"] < 1e-9]
-        if len(x_list) != len(z_list) or len(x_list) == 0:
-            print "Detected no steps on axis, aborting 1d plot"
-        hist, graph = common.make_root_graph("", z_list, "z [mm]",
-                                               x_list, "r [mm]")
-        common._graph_persistent.append(graph) #pylint: disable=W0212
+        for i, material in enumerate(draw_list):
+            grey_x_list += [i+0.1 for step in step_data[material]]
+            grey_y_list += [step["z"] for step in step_data[material]]
+            black_x_list += [i for step in step_data[material] \
+                                                        if step["r"] < 1e-9]
+            black_y_list += [step["z"] for step in step_data[material] \
+                                                        if step["r"] < 1e-9]
+
+        if len(grey_x_list) == 0:
+            return
+        hist, graph = common.make_root_graph("", grey_y_list, "z [mm]",
+                                               grey_x_list, "material index")
+        graph.SetMarkerColor(ROOT.TColor.GetColor(0.5, 0.5, 0.5))
         graph.SetMarkerStyle(7)
         graph.Draw('p')
+        if len(black_x_list) != 0:
+            hist, graph = common.make_root_graph("", black_y_list, "z [mm]",
+                                                 black_x_list, "material index")
+            graph.SetMarkerStyle(7)
+            graph.Draw('p')
         canvas.Update()
         for _format in self.formats:
             canvas.Print(self.mat_1d+"."+_format)
@@ -277,7 +286,7 @@ class Plotting(object): # pylint: disable=R0902
                         self.volume_data[volume]["z_max"]]
             y_list = [i+0.1, i+0.1]
             hist, graph = common.make_root_graph("", x_list, "z [mm]",
-                                                   y_list, "material index")
+                                                   y_list, "volume index")
             graph.SetLineColor(ROOT.TColor.GetColor(0.5, 0.5, 0.5))
             graph.Draw('l')
             if self.volume_data[volume]["r_min"] < 1e-9:
