@@ -22,6 +22,9 @@ import time
 import json
 
 TEST = os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json")
+VOL_REF = [u'DummyPV', u'Vol1', u'Vol11', u'Vol12', u'Vol13', u'Vol14',
+    u'Vol15', u'Vol16', u'Vol17', u'Vol18', u'Vol19', u'Vol2', u'Vol3',
+    u'Vol4', u'Vol5', u'Vol6', u'Vol7', u'Vol8', u'Vol9']
 
 def run_subprocess():
     """Run the geometry validation"""
@@ -32,7 +35,7 @@ def run_subprocess():
     print exe
     proc = subprocess.Popen([exe, "--configuration_file", cards],
                             stdin=subprocess.PIPE)
-    while proc.poll() == None:
+    while proc.poll() == None: # and __name__ != "__main__":
         proc.communicate('\n')
         time.sleep(1)
     proc.wait()
@@ -46,7 +49,6 @@ class TestGeometryValidation(unittest.TestCase): #pylint: disable=R0904
         lines = [line for line in open(TEST).readlines()]
         n_steps = 3
         self.assertEqual(len(lines), n_steps)
-        #print lines[0]
         first_event = json.loads(lines[0])[0]["tracks"][0]       
         self.assertAlmostEqual(first_event["initial_position"]["x"], -1.)
         self.assertAlmostEqual(first_event["initial_position"]["y"], 2.)
@@ -63,6 +65,12 @@ class TestGeometryValidation(unittest.TestCase): #pylint: disable=R0904
             for pic in ["geometry_validation_1d", "geometry_validation_2d"]:
                 fname = os.path.expandvars("${MAUS_TMP_DIR}/"+pic+"."+_format)
                 self.assertTrue(os.path.exists(fname), msg=fname)
+        fin = open(os.path.expandvars(
+                    "${MAUS_TMP_DIR}/test_geometry_validation_volumes.json"))
+        bbs = json.loads(fin.read())
+        vol_list = sorted(bbs.keys())
+        self.assertEqual(vol_list, VOL_REF)
+
 
 if __name__ == "__main__":
     unittest.main()
