@@ -19,6 +19,7 @@ import unittest
 import shutil
 import os 
 import subprocess
+import time
 
 import cdb
 
@@ -42,11 +43,17 @@ def validate_geometry(geometry_id = None):
                              "--geometry_download_by", "id",
                              "--geometry_download_directory", "geometry",
                              "--geometry_download_id", str(geometry_id)])
+    while proc.poll() == None:
+        proc.communicate('\n')
+        time.sleep(10)
     proc.wait()
     testpass = proc.returncode == 0
     for conf in ["conf1", "conf2", "conf3"]:
         proc = subprocess.Popen(["python", validate,
                                  "--configuration_file", test_path+conf])
+        while proc.poll() == None:
+            proc.communicate('\n')
+            time.sleep(10)
         proc.wait()
         testpass &= proc.returncode == 0
     return testpass
