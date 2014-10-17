@@ -5,7 +5,7 @@ geometry_validation = {
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
     "will_plot":True,
     "will_track":True,
-    "z_start":-1000.,
+    "z_start":-500.,
     "z_end":1000.,
     "x_start":-1.,
     "x_step":1.,

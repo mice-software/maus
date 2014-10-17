@@ -180,6 +180,7 @@ class Plotting(object): # pylint: disable=R0902
     def _load_data(self):
         """Load the data"""
         step_data = {}
+        print "Loading data"
         for line in self._readline_generator():
             json_data = json.loads(line)
             for event in json_data:
@@ -254,17 +255,17 @@ class Plotting(object): # pylint: disable=R0902
 
     def _draw_volumes_1d(self, z_range):
         """Make a 1D plot of position vs volume along the z axis"""
-        # we plot G4_AIR first, then G4_GALACTIC?
-        draw_list = sorted(self.volume_data.keys())
+        draw_list = sorted(self.volume_data.keys(), self._sort_cmp)
         x_list = []
         canvas = common.make_root_canvas("Volume Name vs z")
         # set up axis labels
+        print "VOLUME PLOT", z_range
         hist = ROOT.TH2D("name", "Volume Name vs z", 30000,
                          z_range[0], z_range[1],
                          len(draw_list)+1, -0.5, len(draw_list)+0.5)
         common._hist_persistent.append(hist) #pylint: disable=W0212
         for material in draw_list:
-            hist.Fill(0., material, 1.)
+            hist.Fill(z_range[0], material, 1.)
         hist.SetBit(ROOT.TH1.kCanRebin)
         hist.SetStats(0)
         hist.LabelsDeflate("Y")

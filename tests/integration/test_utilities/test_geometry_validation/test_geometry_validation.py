@@ -23,8 +23,8 @@ import json
 
 TEST = os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json")
 VOL_REF = [u'DummyPV', u'Vol1', u'Vol11', u'Vol12', u'Vol13', u'Vol14',
-    u'Vol15', u'Vol16', u'Vol17', u'Vol18', u'Vol19', u'Vol2', u'Vol3',
-    u'Vol4', u'Vol5', u'Vol6', u'Vol7', u'Vol8', u'Vol9']
+    u'Vol15', u'Vol16', u'Vol17', u'Vol18', u'Vol19', u'Vol2', u'Vol20',
+    u'Vol3', u'Vol4', u'Vol5', u'Vol6', u'Vol7', u'Vol8', u'Vol9']
 
 def run_subprocess():
     """Run the geometry validation"""
@@ -52,14 +52,14 @@ class TestGeometryValidation(unittest.TestCase): #pylint: disable=R0904
         first_event = json.loads(lines[0])[0]["tracks"][0]       
         self.assertAlmostEqual(first_event["initial_position"]["x"], -1.)
         self.assertAlmostEqual(first_event["initial_position"]["y"], 2.)
-        self.assertAlmostEqual(first_event["initial_position"]["z"], -1000.)
+        self.assertAlmostEqual(first_event["initial_position"]["z"], -500.)
         self.assertGreater(len(first_event["steps"]), 1)
         last_event = json.loads(lines[-1])[0]["tracks"][0]
         self.assertAlmostEqual(last_event["initial_position"]["x"],
                                -1.+1.*(n_steps-1))
         self.assertAlmostEqual(last_event["initial_position"]["y"],
                                2.-2.*(n_steps-1))
-        self.assertAlmostEqual(last_event["initial_position"]["z"], -1000.)
+        self.assertAlmostEqual(last_event["initial_position"]["z"], -500.)
         self.assertGreater(len(last_event["steps"]), 1)
         for _format in ["ps", "png"]:
             for pic in ["geometry_validation_1d", "geometry_validation_2d"]:
