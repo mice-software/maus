@@ -1,0 +1,66 @@
+simulation_geometry_filename = "geometry/ParentGeometryFile.dat"
+verbose_level = 1
+keep_steps = False
+max_step_length=1
+simulation_reference_particle = {
+  "random_seed": 0,
+  "energy":(105.658**2+200.**2)**0.5,
+  "particle_id":-13,
+  "time": 0.0,
+  "position":{"x":0.0, "y":0.0, "z":15000.},
+  "momentum":{"x":0.0, "y":0.0, "z":1.0}
+}
+
+spill_generator_number_of_spills = 1000
+
+beam = {
+    "particle_generator":"counter", # routine for generating empty primaries
+    "random_seed":5, # random seed for beam generation; controls also how the MC
+                     # seeds are generated
+
+#    "particle_generator":"g4bl", # Uses G4BL as input for MAUS
+#    "g4bl_generator":"True", # Call G4BL each time new spill is created
+#    "random_seed":5,
+    "definitions":[
+    ##### MUONS #######
+    {
+       "reference":simulation_reference_particle, # reference particle
+       "random_seed_algorithm":"incrementing_random", # algorithm for seeding MC
+       "n_particles_per_spill":10, # probability of generating a particle
+       "transverse":{
+          "transverse_mode":"constant_solenoid", # transverse distribution matched to constant solenoid field
+          "emittance_4d":6., # 4d emittance
+          "normalised_angular_momentum":0.0, # angular momentum from diffuser
+          "bz":4.e-3 # magnetic field strength for angular momentum calculation
+       },
+       "longitudinal":{"longitudinal_mode":"sawtooth_time", # longitudinal distribution sawtooth in time
+                   "momentum_variable":"p", # Gaussian in total momentum (options energy, pz)
+                   "sigma_p":25., # RMS total momentum
+                   "t_start":-1.e6, # start time of sawtooth
+                   "t_end":+1.e6}, # end time of sawtooth
+       "coupling":{"coupling_mode":"none"} # no dispersion
+       #"spin":{"x":0.0, "y":0.0, "z":1.0}
+    },
+    ]
+}
+
+geometry_validation = {
+    "file_name":"tracking.json",
+    "will_plot":False,
+    "will_track":True,
+    "z_start":0.,
+    "z_end":23000.,
+    "x_start":0.,
+    "x_step":1./2.**0.5,
+    "y_start":0.,
+    "y_step":1./2.**0.5,
+    "n_steps":300,
+    "plot_formats":["root", "png"],
+    "1d_material_plot":"geometry_validation_materials_1d",
+    "2d_material_plot":"geometry_validation_materials_2d",
+    "1d_volume_plot":"geometry_validation_volumes_1d",
+    "2d_volume_plot":"geometry_validation_volumes_2d",
+    "2d_volume_plot_label_size":0.05,
+    "volume_bounding_box_dump":"geometry_validation_volumes.json",
+}
+
