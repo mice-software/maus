@@ -49,6 +49,7 @@ struct MomentumDataPR {
 
 class SciFiDataMomentumPR : public SciFiDataBase {
   friend class SciFiDisplayMomentumResidualsPR;
+  friend class SciFiDisplayPzResolutionsPR;
 
   public:
     /** Default constructor */

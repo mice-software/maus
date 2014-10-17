@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
-  int n_pt_bins = 0;           // No. of bins in histos used to find pt resols (0 = let ROOT decide)
-  int n_pz_bins = 0;           // No. of bins in histos used to find pz resols (0 = let ROOT decide)
+  int n_pt_bins = 100;           // No. of bins in histos used to find pt resols (0 = let ROOT decide)
+  int n_pz_bins = 100;           // No. of bins in histos used to find pz resols (0 = let ROOT decide)
   int n_points = 9;            // No. of data points in each resolution plot
   double pt_fit_min = -10.0;   // Lower bound of the gaussian fit to histos used to find pt resols
   double pt_fit_max = 10.0;    // Upper bound of the gaussian fit to histos used to find pt resols

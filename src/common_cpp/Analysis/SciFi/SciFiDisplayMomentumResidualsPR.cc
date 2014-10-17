@@ -35,7 +35,7 @@
 namespace MAUS {
 
 SciFiDisplayMomentumResidualsPR::SciFiDisplayMomentumResidualsPR() : mOf1(NULL),
-		                                                                 mTree(NULL),
+                                                                     mTree(NULL),
                                                                      mSpillData(NULL),
                                                                      mResidualPtT1(NULL),
                                                                      mResidualPzT1(NULL),
@@ -55,8 +55,8 @@ SciFiDisplayMomentumResidualsPR::~SciFiDisplayMomentumResidualsPR() {
   if (mResidualPzT2) delete mResidualPzT2;
   if (mResidualPzT2Log) delete mResidualPzT2Log;
   if (mOf1) {
-	  mOf1->Close();
-	  delete mOf1;
+    mOf1->Close();
+    delete mOf1;
   }
 }
 

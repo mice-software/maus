@@ -35,6 +35,7 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayPzResolutionsPR.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
@@ -48,8 +49,8 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
-  int n_pt_bins = 0;           // No. of bins in histos used to find pt resols (0 = let ROOT decide)
-  int n_pz_bins = 0;           // No. of bins in histos used to find pz resols (0 = let ROOT decide)
+  int n_pt_bins = 100;           // No. of bins in histos used to find pt resols (0 = let ROOT decide)
+  int n_pz_bins = 100;           // No. of bins in histos used to find pz resols (0 = let ROOT decide)
   int n_points = 9;            // No. of data points in each resolution plot
   double pt_fit_min = -10.0;   // Lower bound of the gaussian fit to histos used to find pt resols
   double pt_fit_max = 10.0;    // Upper bound of the gaussian fit to histos used to find pt resols
@@ -93,8 +94,36 @@ int main(int argc, char *argv[]) {
 
   // Set up analysis and display classes
   MAUS::SciFiAnalysis analyser;
-  MAUS::SciFiDisplayMomentumResidualsPR* display = new MAUS::SciFiDisplayMomentumResidualsPR();
-  analyser.AddDisplay(display);
+
+  // Add Pat Rec momentum residual display
+  // MAUS::SciFiDisplayMomentumResidualsPR* residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
+  // analyser.AddDisplay(residuals);
+
+  // Add Pat Rec momentum resolutions display
+  MAUS::SciFiDisplayPzResolutionsPR* resolutions = new MAUS::SciFiDisplayPzResolutionsPR();
+  resolutions->set_n_pt_bins(n_pt_bins);
+  resolutions->set_n_pz_bins(n_pz_bins);
+  resolutions->set_n_points(n_points);
+  resolutions->set_pt_fit_min(pt_fit_min);
+  resolutions->set_pt_fit_max(pt_fit_max);
+  resolutions->set_pz_fit_min(pz_fit_min);
+  resolutions->set_pz_fit_max(pz_fit_max);
+  resolutions->set_resol_lower_bound(lower_bound);
+  resolutions->set_resol_upper_bound(upper_bound);
+  resolutions->set_cut_pz_rec(pz_rec_cut);
+  std::cout << "Pt resolution histogram number of bins: " << resolutions->get_n_pt_bins() << "\n";
+  std::cout << "Pt resolution histogram fit lower bound: " << resolutions->get_pt_fit_min() << "\n";
+  std::cout << "Pt resolution histogram fit upper bound: " << resolutions->get_pt_fit_max() << "\n";
+  std::cout << "Pz resolution histogram number of bins: " << resolutions->get_n_pz_bins() << "\n";
+  std::cout << "Pz resolution histogram fit lower bound: " << resolutions->get_pz_fit_min() << "\n";
+  std::cout << "Pz resolution histogram fit upper bound: " << resolutions->get_pz_fit_max() << "\n";
+  std::cout << "Resolution graphs number of points:  " << resolutions->get_n_points() << "\n";
+  std::cout << "Resolution graphs lower bound:  " << resolutions->get_resol_lower_bound() << " MeV/c\n";
+  std::cout << "Resolution graphs upper bound:  " << resolutions->get_resol_upper_bound() << " MeV/c\n";
+  std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
+  analyser.AddDisplay(resolutions);
+
+  // Set up the displays
   analyser.SetUpDisplays();
 
   // Set up ROOT app, input file, and MAUS data class

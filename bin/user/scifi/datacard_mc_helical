@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 100
+spill_generator_number_of_spills = 10000
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
