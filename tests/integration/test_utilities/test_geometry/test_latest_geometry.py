@@ -42,7 +42,8 @@ def validate_geometry(geometry_id = None):
     proc = subprocess.Popen(["python", download,
                              "--geometry_download_by", "id",
                              "--geometry_download_directory", "geometry",
-                             "--geometry_download_id", str(geometry_id)])
+                             "--geometry_download_id", str(geometry_id)],
+                            stdin=subprocess.PIPE)
     while proc.poll() == None:
         proc.communicate('\n')
         time.sleep(10)
@@ -50,7 +51,8 @@ def validate_geometry(geometry_id = None):
     testpass = proc.returncode == 0
     for conf in ["conf1", "conf2", "conf3"]:
         proc = subprocess.Popen(["python", validate,
-                                 "--configuration_file", test_path+conf])
+                                 "--configuration_file", test_path+conf],
+                                 stdin=subprocess.PIPE)
         while proc.poll() == None:
             proc.communicate('\n')
             time.sleep(10)
