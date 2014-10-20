@@ -49,12 +49,12 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     /** Destructor */
     virtual ~SciFiDisplayMomentumResolutionsPR();
 
-    /** Calculate the pz resolution for a particular pt_mc interval,
-     *  by plotting a histo of the pz_mc - pz for the interval,
+    /** Calculate the resolution for a particular MC truth momentum interval,
+     *  by plotting a histo of the MC - Recon data for the interval,
      *  fitting a gaussian, and returning the sigma and error on sigma.
      */
-    bool calc_pz_resolution(const std::string& residual, const TCut cut,
-                            double &res, double &res_err);
+    bool calc_resolution(const std::string& residual, const TCut cut,
+                         double &res, double &res_err);
 
     /** Make a TCut out of a variable and operator, input as strings, and a value input as double */
     TCut form_tcut(const std::string &var, const std::string &op, double value);
@@ -93,6 +93,9 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
 
     /** Return the upper bound of the pt_mc range used in the pz resolution plots */
     double get_resol_upper_bound() const { return _resol_upper_bound; }
+
+    /** Make pt resolution graphs, as a function of pt_mc */
+    void make_ptpt_resolutions();
 
     /** Make pz resolution graphs, as a function of pt_mc */
     void make_pzpt_resolutions();
@@ -162,9 +165,11 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     MomentumDataPR mTrackData;        /** Struct containing reduced data for one track in a spill */
 
     // Resolution Graphs
+    TGraphErrors* _t1_pt_resol_pt_mc;
+    TGraphErrors* _t2_pt_resol_pt_mc;
     TGraphErrors* _t1_pz_resol_pt_mc;
-    TGraphErrors* _t1_pz_resol_pz_mc;
     TGraphErrors* _t2_pz_resol_pt_mc;
+    TGraphErrors* _t1_pz_resol_pz_mc;
     TGraphErrors* _t2_pz_resol_pz_mc;
 
     // Parameters

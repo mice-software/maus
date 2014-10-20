@@ -42,9 +42,11 @@ namespace MAUS {
 SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NULL),
                                                                          mTree(NULL),
                                                                          mSpillData(NULL),
+                                                                         _t1_pt_resol_pt_mc(NULL),
+                                                                         _t2_pt_resol_pt_mc(NULL),
                                                                          _t1_pz_resol_pt_mc(NULL),
-                                                                         _t1_pz_resol_pz_mc(NULL),
                                                                          _t2_pz_resol_pt_mc(NULL),
+                                                                         _t1_pz_resol_pz_mc(NULL),
                                                                          _t2_pz_resol_pz_mc(NULL),
                                                                          _n_pt_bins(200),
                                                                          _n_pz_bins(200),
@@ -62,9 +64,11 @@ SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NU
 SciFiDisplayMomentumResolutionsPR::~SciFiDisplayMomentumResolutionsPR() {
   if (mTree) delete mTree;
   if (mSpillData) delete mSpillData;
+  if (_t1_pt_resol_pt_mc) delete _t1_pt_resol_pt_mc;
+  if (_t2_pt_resol_pt_mc) delete _t2_pt_resol_pt_mc;
   if (_t1_pz_resol_pt_mc) delete _t1_pz_resol_pt_mc;
-  if (_t1_pz_resol_pz_mc) delete _t1_pz_resol_pz_mc;
   if (_t2_pz_resol_pt_mc) delete _t2_pz_resol_pt_mc;
+  if (_t1_pz_resol_pz_mc) delete _t1_pz_resol_pz_mc;
   if (_t2_pz_resol_pz_mc) delete _t2_pz_resol_pz_mc;
   if (mOf1) {
     mOf1->Close();
@@ -72,22 +76,21 @@ SciFiDisplayMomentumResolutionsPR::~SciFiDisplayMomentumResolutionsPR() {
   }
 }
 
-bool SciFiDisplayMomentumResolutionsPR::calc_pz_resolution(const std::string& residual,
-                                                           const TCut cut, double &res,
-                                                           double &res_err) {
+bool SciFiDisplayMomentumResolutionsPR::calc_resolution(const std::string& residual,
+                                                        const TCut cut, double &res,
+                                                        double &res_err) {
   if (mTree) {
     mOf1->cd();
     TCanvas lCanvas;
     TH1D* hResidual(NULL);
 
     // Create a histogram of the input residual for the mc variable interval defined by input cut
-
     std::string htitle = residual + " " + cut.GetTitle();
     hResidual = new TH1D("hResidual", htitle.c_str(), _n_pz_bins, _pz_fit_min, _pz_fit_max);
     mTree->Draw((residual + ">>hResidual").c_str(), cut);
 
     if (!hResidual) {
-      std::cerr << "SciFiDisplayMomentumResolutionsPR::calc_pz_resolution: Invalid tracker #\n";
+      std::cerr << "SciFiDisplayMomentumResolutionsPR::calc_resolution: Invalid tracker #\n";
       return false;
     }
 
@@ -95,7 +98,7 @@ bool SciFiDisplayMomentumResolutionsPR::calc_pz_resolution(const std::string& re
     hResidual->Fit("gaus", "", "", _pz_fit_min, _pz_fit_max);
     TF1 *fit1 = hResidual->GetFunction("gaus");
     if (!fit1) {
-      std::cerr << "SciFiDisplayMomentumResolutionsPR::calc_pz_resolution: Fit failed\n";
+      std::cerr << "SciFiDisplayMomentumResolutionsPR::calc_resolution: Fit failed\n";
       return false;
     }
 
@@ -139,6 +142,68 @@ TCut SciFiDisplayMomentumResolutionsPR::form_tcut(const std::string &var, const 
   ss1 >> s1;
   cut = s1;
   return cut;
+}
+
+void SciFiDisplayMomentumResolutionsPR::make_ptpt_resolutions() {
+
+  double x_range = _resol_upper_bound - _resol_lower_bound;  // Range of the pz resolution graph
+  double resolution_error =  x_range / ( _n_points * 2 );    // Error in pt_mc of each data point
+  // The mid pt_mc value of the first data point
+  double first_resolution_point = _resol_lower_bound + resolution_error;
+
+  std::vector<TCut> vCuts(_n_points);          // The cuts defining the pt_mc intervals
+  std::vector<double> vPtMc(_n_points);        // The centre of the pt_mc intervals
+  std::vector<double> vPtMcErr(_n_points);     // The width of the intervals
+  std::vector<double> vPtRes_t1(_n_points);    // The resultant pt resolutions
+  std::vector<double> vPtResErr_t1(_n_points); // The errors associated with the pt res
+  std::vector<double> vPtRes_t2(_n_points);    // The resultant pt resolutions
+  std::vector<double> vPtResErr_t2(_n_points); // The errors associated with the pt res
+
+  // Cuts in pt_mc
+  std::string s1 = "PtMc>=";
+  std::string s2 = "&&PtMc<";
+  for (int i = 0; i < _n_points; ++i) {
+    std::stringstream ss1;
+    double point_lower_bound = _resol_lower_bound + (resolution_error * 2 * i);
+    double point_upper_bound = point_lower_bound + (resolution_error * 2);
+    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
+    vCuts[i] = ss1.str().c_str();
+    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
+  }
+
+  // The central MC momentum & error associated with the MC momentum (just the interval half width)
+  for (int i = 0; i < _n_points; ++i) {
+    vPtMc[i] = first_resolution_point + (resolution_error * 2 * i);
+    vPtMcErr[i] = resolution_error;
+    std::cerr << "vPtMc[" << i << "] = " << vPtMc[i] << std::endl;
+  }
+
+  // Cuts for to select each tracker
+  TCut cutT1 = "TrackerNumber==0";
+  TCut cutT2 = "TrackerNumber==1";
+
+  // Form the reconstructed pt TCut
+  // TCut tcut_ptrec = form_tcut("TMath::Abs(pt_rec)", "<", _cutPtRec);
+
+  // Loop over the momentum intervals and calculate the resolution for each
+  for (int i = 0; i < _n_points; ++i) {
+    std::string residual("PtMc-PtRec");
+    // TCut input_cut = vCuts[i]&&cutT1&&tcut_ptrec;
+    TCut input_cut = vCuts[i]&&cutT1;
+    calc_resolution(residual, input_cut, vPtRes_t1[i], vPtResErr_t1[i]);
+  }
+  for (int i = 0; i < _n_points; ++i) {
+    std::string residual("PtMc-PtRec");
+    // TCut input_cut = vCuts[i]&&cutT2&&tcut_ptrec;
+    TCut input_cut = vCuts[i]&&cutT2;
+    calc_resolution(residual, input_cut, vPtRes_t2[i], vPtResErr_t2[i]);
+  }
+
+  // Create the resultant resolution plots
+  _t1_pt_resol_pt_mc = new TGraphErrors(_n_points, &vPtMc[0], &vPtRes_t1[0],
+                                        &vPtMcErr[0], &vPtResErr_t1[0]);
+  _t2_pt_resol_pt_mc = new TGraphErrors(_n_points, &vPtMc[0], &vPtRes_t2[0],
+                                        &vPtMcErr[0], &vPtResErr_t2[0]);
 }
 
 void SciFiDisplayMomentumResolutionsPR::make_pzpt_resolutions() {
@@ -185,12 +250,12 @@ void SciFiDisplayMomentumResolutionsPR::make_pzpt_resolutions() {
   for (int i = 0; i < _n_points; ++i) {
     std::string residual("PzMc+Charge*PzRec");
     TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
-    calc_pz_resolution(residual, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
+    calc_resolution(residual, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
   }
   for (int i = 0; i < _n_points; ++i) {
     std::string residual("PzMc-Charge*PzRec");
     TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
-    calc_pz_resolution(residual, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
+    calc_resolution(residual, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
   }
 
   // Create the resultant resolution plots
@@ -246,12 +311,12 @@ void SciFiDisplayMomentumResolutionsPR::make_pzpz_resolutions() {
   for (int i = 0; i < _n_points; ++i) {
     std::string residual("PzMc+Charge*PzRec");
     TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
-    calc_pz_resolution(residual, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
+    calc_resolution(residual, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
   }
   for (int i = 0; i < _n_points; ++i) {
     std::string residual("PzMc-Charge*PzRec");
     TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
-    calc_pz_resolution(residual, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
+    calc_resolution(residual, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
   }
 
   // Create the resultant resolution plots
@@ -270,25 +335,48 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
     if (mCanvas) {
       mCanvas->Clear();
     } else {
-      mCanvas = new TCanvas("cPzResolutions", "Pz Resolutions");
+      mCanvas = new TCanvas("cResolutions", "Momentum Resolutions");
     }
     lCanvas = mCanvas;
   }
   // Prepare the TCanvas
   lCanvas->cd();
-  lCanvas->Divide(2,2);
+  lCanvas->Divide(3,2);
 
   // Create the graphs
+  make_ptpt_resolutions();
   make_pzpt_resolutions();
   make_pzpz_resolutions();
 
   // Draw the graphs
-  if (_t1_pz_resol_pt_mc) {
-    std::cout << "Drawing pz resolution as function of pt_mc in T1\n";
+  if (_t1_pt_resol_pt_mc) {
+    std::cout << "Drawing pt resolution as function of pt_mc in T1\n";
     lCanvas->cd(1);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
-    _t1_pz_resol_pt_mc->SetName("t1_pz_resol");
+    _t1_pt_resol_pt_mc->SetName("t1_ptpt_resol");
+    _t1_pt_resol_pt_mc->SetTitle("T1 p_{t} Resolution");
+    _t1_pt_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+    _t1_pt_resol_pt_mc->GetYaxis()->SetTitle("p_{t} Resolution (MeV/c)");
+    _t1_pt_resol_pt_mc->Draw("AP");
+  }
+  if (_t2_pt_resol_pt_mc) {
+    std::cout << "Drawing pt resolution as function of pt_mc in T2\n";
+    lCanvas->cd(4);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t2_pt_resol_pt_mc->SetName("t2_ptpt_resol");
+    _t2_pt_resol_pt_mc->SetTitle("T2 p_{t} Resolution");
+    _t2_pt_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
+    _t2_pt_resol_pt_mc->GetYaxis()->SetTitle("p_{t} Resolution (MeV/c)");
+    _t2_pt_resol_pt_mc->Draw("AP");
+  }
+  if (_t1_pz_resol_pt_mc) {
+    std::cout << "Drawing pz resolution as function of pt_mc in T1\n";
+    lCanvas->cd(2);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t1_pz_resol_pt_mc->SetName("t1_pzpt_resol");
     _t1_pz_resol_pt_mc->SetTitle("T1 p_{z} Resolution");
     _t1_pz_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
     _t1_pz_resol_pt_mc->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
@@ -296,10 +384,10 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
   if (_t2_pz_resol_pt_mc) {
     std::cout << "Drawing pz resolution as function of pt_mc in T2\n";
-    lCanvas->cd(2);
+    lCanvas->cd(5);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
-    _t2_pz_resol_pt_mc->SetName("t2_pz_resol");
+    _t2_pz_resol_pt_mc->SetName("t2_pzpt_resol");
     _t2_pz_resol_pt_mc->SetTitle("T2 p_{z} Resolution");
     _t2_pz_resol_pt_mc->GetXaxis()->SetTitle("p_{t}^{MC} (MeV/c)");
     _t2_pz_resol_pt_mc->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
@@ -318,7 +406,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
   if (_t2_pz_resol_pz_mc) {
     std::cout << "Drawing pz resolution as function of pz_mc in T2\n";
-    lCanvas->cd(4);
+    lCanvas->cd(6);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
     _t2_pz_resol_pz_mc->SetName("t2_pzpz_resol");
@@ -334,6 +422,8 @@ void SciFiDisplayMomentumResolutionsPR::Save() {
     mOf1->cd();
     if (mTree) mTree->Write();
     if (mCanvas) mCanvas->Write();
+    if (_t1_pt_resol_pt_mc) _t1_pt_resol_pt_mc->Write();
+    if (_t2_pt_resol_pt_mc) _t2_pt_resol_pt_mc->Write();
     if (_t1_pz_resol_pt_mc) _t1_pz_resol_pt_mc->Write();
     if (_t2_pz_resol_pt_mc) _t2_pz_resol_pt_mc->Write();
     if (_t1_pz_resol_pz_mc) _t1_pz_resol_pz_mc->Write();
