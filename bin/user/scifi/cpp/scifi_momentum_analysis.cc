@@ -48,16 +48,16 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
-  int n_pt_bins = 100;           // No. of bins in histos used to find pt resols (0 = let ROOT decide)
-  int n_pz_bins = 100;           // No. of bins in histos used to find pz resols (0 = let ROOT decide)
-  int n_points = 9;            // No. of data points in each resolution plot
-  double pt_fit_min = -10.0;   // Lower bound of the gaussian fit to histos used to find pt resols
-  double pt_fit_max = 10.0;    // Upper bound of the gaussian fit to histos used to find pt resols
-  double pz_fit_min = -50.0;   // Lower bound of the gaussian fit to histos used to find pz resols
-  double pz_fit_max = 50.0;    // Upper bound of the gaussian fit to histos used to find pz resols
-  double lower_bound = 0;      // Lower bound on pt_mc of resolution plots
-  double upper_bound = 90;     // Upper bound on pt_mc of resolution plots
-  double pz_rec_cut = 500.0;   // Cut on reconstruction pz applied to histos used to find pz resols
+  int n_pt_bins = 100;        // No. of bins in histos used to find pt resols (0 = let ROOT decide)
+  int n_pz_bins = 100;        // No. of bins in histos used to find pz resols (0 = let ROOT decide)
+  int n_points = 9;           // No. of data points in each resolution plot
+  double pt_fit_min = -10.0;  // Lower bound of the gaussian fit to histos used to find pt resols
+  double pt_fit_max = 10.0;   // Upper bound of the gaussian fit to histos used to find pt resols
+  double pz_fit_min = -50.0;  // Lower bound of the gaussian fit to histos used to find pz resols
+  double pz_fit_max = 50.0;   // Upper bound of the gaussian fit to histos used to find pz resols
+  double lower_bound = 0;     // Lower bound on pt_mc of resolution plots
+  double upper_bound = 90;    // Upper bound on pt_mc of resolution plots
+  double pz_rec_cut = 500.0;  // Cut on reconstruction pz applied to histos used to find pz resols
 
   // Parse any extra arguments supplied from the command line
   //   -p -> pause between events

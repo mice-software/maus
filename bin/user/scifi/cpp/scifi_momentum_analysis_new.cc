@@ -49,16 +49,16 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
-  int n_pt_bins = 100;           // No. of bins in histos used to find pt resols (0 = let ROOT decide)
-  int n_pz_bins = 100;           // No. of bins in histos used to find pz resols (0 = let ROOT decide)
-  int n_points = 9;            // No. of data points in each resolution plot
-  double pt_fit_min = -10.0;   // Lower bound of the gaussian fit to histos used to find pt resols
-  double pt_fit_max = 10.0;    // Upper bound of the gaussian fit to histos used to find pt resols
-  double pz_fit_min = -50.0;   // Lower bound of the gaussian fit to histos used to find pz resols
-  double pz_fit_max = 50.0;    // Upper bound of the gaussian fit to histos used to find pz resols
-  double lower_bound = 0;      // Lower bound on pt_mc of resolution plots
-  double upper_bound = 90;     // Upper bound on pt_mc of resolution plots
-  double pz_rec_cut = 500.0;   // Cut on reconstruction pz applied to histos used to find pz resols
+  int n_pt_bins = 100;        // No. of bins in histos used to find pt resols (0 = let ROOT decide)
+  int n_pz_bins = 100;        // No. of bins in histos used to find pz resols (0 = let ROOT decide)
+  int n_points = 9;           // No. of data points in each resolution plot
+  double pt_fit_min = -10.0;  // Lower bound of the gaussian fit to histos used to find pt resols
+  double pt_fit_max = 10.0;   // Upper bound of the gaussian fit to histos used to find pt resols
+  double pz_fit_min = -50.0;  // Lower bound of the gaussian fit to histos used to find pz resols
+  double pz_fit_max = 50.0;   // Upper bound of the gaussian fit to histos used to find pz resols
+  double lower_bound = 0;     // Lower bound on pt_mc of resolution plots
+  double upper_bound = 90;    // Upper bound on pt_mc of resolution plots
+  double pz_rec_cut = 500.0;  // Cut on reconstruction pz applied to histos used to find pz resols
 
   // Parse any extra arguments supplied from the command line
   //   -p -> pause between events
@@ -96,11 +96,12 @@ int main(int argc, char *argv[]) {
   MAUS::SciFiAnalysis analyser;
 
   // Add Pat Rec momentum residual display
-  // MAUS::SciFiDisplayMomentumResidualsPR* residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
+  // MAUS::SciFiDisplayMomentumResidualsPR* residuals
+       = new MAUS::SciFiDisplayMomentumResidualsPR();
   // analyser.AddDisplay(residuals);
 
   // Add Pat Rec momentum resolutions display
-  MAUS::SciFiDisplayMomentumResolutionsPR* resolutions = 
+  MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
     new MAUS::SciFiDisplayMomentumResolutionsPR();
   resolutions->set_n_pt_bins(n_pt_bins);
   resolutions->set_n_pz_bins(n_pz_bins);
@@ -112,15 +113,15 @@ int main(int argc, char *argv[]) {
   resolutions->set_resol_lower_bound(lower_bound);
   resolutions->set_resol_upper_bound(upper_bound);
   resolutions->set_cut_pz_rec(pz_rec_cut);
-  std::cout << "Pt resolution histogram number of bins: " << resolutions->get_n_pt_bins() << "\n";
-  std::cout << "Pt resolution histogram fit lower bound: " << resolutions->get_pt_fit_min() << "\n";
-  std::cout << "Pt resolution histogram fit upper bound: " << resolutions->get_pt_fit_max() << "\n";
-  std::cout << "Pz resolution histogram number of bins: " << resolutions->get_n_pz_bins() << "\n";
-  std::cout << "Pz resolution histogram fit lower bound: " << resolutions->get_pz_fit_min() << "\n";
-  std::cout << "Pz resolution histogram fit upper bound: " << resolutions->get_pz_fit_max() << "\n";
-  std::cout << "Resolution graphs number of points:  " << resolutions->get_n_points() << "\n";
-  std::cout << "Resolution graphs lower bound:  " << resolutions->get_resol_lower_bound() << " MeV/c\n";
-  std::cout << "Resolution graphs upper bound:  " << resolutions->get_resol_upper_bound() << " MeV/c\n";
+  std::cout << "Pt resol histogram number of bins: " << resolutions->get_n_pt_bins() << "\n";
+  std::cout << "Pt resol histogram fit lower bound: " << resolutions->get_pt_fit_min() << "\n";
+  std::cout << "Pt resol histogram fit upper bound: " << resolutions->get_pt_fit_max() << "\n";
+  std::cout << "Pz resol histogram number of bins: " << resolutions->get_n_pz_bins() << "\n";
+  std::cout << "Pz resol histogram fit lower bound: " << resolutions->get_pz_fit_min() << "\n";
+  std::cout << "Pz resol histogram fit upper bound: " << resolutions->get_pz_fit_max() << "\n";
+  std::cout << "Resol graphs number of points:  " << resolutions->get_n_points() << "\n";
+  std::cout << "Resol graphs lower bound:  " << resolutions->get_resol_lower_bound() << " MeV/c\n";
+  std::cout << "Resol graphs upper bound:  " << resolutions->get_resol_upper_bound() << " MeV/c\n";
   std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
   analyser.AddDisplay(resolutions);
 

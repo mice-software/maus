@@ -16,6 +16,7 @@
  */
 
 // C++ headers
+#include <vector>
 #include <sstream>
 
 // ROOT headers
@@ -122,10 +123,9 @@ void SciFiDisplayMomentumResolutionsPR::Fill() {
     for ( size_t i = 0; i < mSpillData->mData.size(); ++i ) {
       mTrackData = mSpillData->mData[i];
       mTree->Fill();
-      if (mTrackData.TrackerNumber==0) {
-
-      } else if (mTrackData.TrackerNumber==1) {
-
+      if (mTrackData.TrackerNumber == 0) {
+        // TODO: Do I want anything here?
+      } else if (mTrackData.TrackerNumber == 1) {
       }
     }
   } else {
@@ -341,7 +341,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
   // Prepare the TCanvas
   lCanvas->cd();
-  lCanvas->Divide(3,2);
+  lCanvas->Divide(3, 2);
 
   // Create the graphs
   make_ptpt_resolutions();
