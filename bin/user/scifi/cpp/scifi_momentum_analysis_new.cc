@@ -96,8 +96,7 @@ int main(int argc, char *argv[]) {
   MAUS::SciFiAnalysis analyser;
 
   // Add Pat Rec momentum residual display
-  // MAUS::SciFiDisplayMomentumResidualsPR* residuals
-       = new MAUS::SciFiDisplayMomentumResidualsPR();
+  // MAUS::SciFiDisplayMomentumResidualsPR* residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
   // analyser.AddDisplay(residuals);
 
   // Add Pat Rec momentum resolutions display
@@ -110,6 +109,8 @@ int main(int argc, char *argv[]) {
   resolutions->set_pt_fit_max(pt_fit_max);
   resolutions->set_pz_fit_min(pz_fit_min);
   resolutions->set_pz_fit_max(pz_fit_max);
+  resolutions->set_lower_bound_pzmc(150.0);
+  resolutions->set_upper_bound_pzmc(250.0);
   resolutions->set_resol_lower_bound(lower_bound);
   resolutions->set_resol_upper_bound(upper_bound);
   resolutions->set_cut_pz_rec(pz_rec_cut);
@@ -120,8 +121,14 @@ int main(int argc, char *argv[]) {
   std::cout << "Pz resol histogram fit lower bound: " << resolutions->get_pz_fit_min() << "\n";
   std::cout << "Pz resol histogram fit upper bound: " << resolutions->get_pz_fit_max() << "\n";
   std::cout << "Resol graphs number of points:  " << resolutions->get_n_points() << "\n";
-  std::cout << "Resol graphs lower bound:  " << resolutions->get_resol_lower_bound() << " MeV/c\n";
-  std::cout << "Resol graphs upper bound:  " << resolutions->get_resol_upper_bound() << " MeV/c\n";
+  std::cout << "Resol graphs pzmc lower bound:  " << resolutions->get_lower_bound_pzmc()
+            << " MeV/c\n";
+  std::cout << "Resol graphs pzmc upper bound:  " << resolutions->get_upper_bound_pzmc()
+            << " MeV/c\n";
+  std::cout << "Resol graphs ptmc lower bound:  " << resolutions->get_resol_lower_bound()
+            << " MeV/c\n";
+  std::cout << "Resol graphs ptmc upper bound:  " << resolutions->get_resol_upper_bound()
+            << " MeV/c\n";
   std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
   analyser.AddDisplay(resolutions);
 

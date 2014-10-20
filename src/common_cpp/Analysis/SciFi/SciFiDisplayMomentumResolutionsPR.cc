@@ -47,6 +47,8 @@ SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NU
                                                                          _t2_pt_resol_pt_mc(NULL),
                                                                          _t1_pz_resol_pt_mc(NULL),
                                                                          _t2_pz_resol_pt_mc(NULL),
+                                                                         _t1_pt_resol_pz_mc(NULL),
+                                                                         _t2_pt_resol_pz_mc(NULL),
                                                                          _t1_pz_resol_pz_mc(NULL),
                                                                          _t2_pz_resol_pz_mc(NULL),
                                                                          _n_pt_bins(200),
@@ -56,6 +58,8 @@ SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NU
                                                                          _pt_fit_max(50),
                                                                          _pz_fit_min(-50),
                                                                          _pz_fit_max(50),
+                                                                         _upper_bound_pzmc(250.0),
+                                                                         _lower_bound_pzmc(150.0),
                                                                          _resol_lower_bound(0.0),
                                                                          _resol_upper_bound(90.0),
                                                                          _cut_pz_rec(500.0) {
@@ -265,14 +269,75 @@ void SciFiDisplayMomentumResolutionsPR::make_pzpt_resolutions() {
                                         &vPtMcErr[0], &vPzResErr_t2[0]);
 }
 
-void SciFiDisplayMomentumResolutionsPR::make_pzpz_resolutions() {
+void SciFiDisplayMomentumResolutionsPR::make_ptpz_resolutions() {
 
-  double upper_bound = 250.0;
-  double lower_bound = 150.0;
-  double x_range = upper_bound - lower_bound;  // Range of the pz resolution graph
+  double _upper_bound_pzmc = 250.0;
+  double _lower_bound_pzmc = 150.0;
+  double x_range = _upper_bound_pzmc - _lower_bound_pzmc;  // Range of the pz resolution graph
   double x_error =  x_range / ( _n_points * 2 );    // Error in pt_mc of each data point
   // The mid pt_mc value of the first data point
-  double first_resolution_point = lower_bound + x_error;
+  double first_resolution_point = _lower_bound_pzmc + x_error;
+  std::vector<TCut> vCuts(_n_points);          // The cuts defining the pt_mc intervals
+  std::vector<double> vPzMc(_n_points);        // The centre of the pt_mc intervals
+  std::vector<double> vPzMcErr(_n_points);     // The width of the intervals
+  std::vector<double> vPtRes_t1(_n_points);    // The resultant pz resolutions
+  std::vector<double> vPtResErr_t1(_n_points); // The errors associated with the pz res
+  std::vector<double> vPtRes_t2(_n_points);    // The resultant pz resolutions
+  std::vector<double> vPtResErr_t2(_n_points); // The errors associated with the pz res
+
+  // Cuts in pt_mc
+  std::string s1 = "PzMc>=";
+  std::string s2 = "&&PzMc<";
+  for (int i = 0; i < _n_points; ++i) {
+    std::stringstream ss1;
+    double point_lower_bound = _lower_bound_pzmc + (x_error * 2 * i);
+    double point_upper_bound = point_lower_bound + (x_error * 2);
+    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
+    vCuts[i] = ss1.str().c_str();
+    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
+  }
+
+  // The central MC momentum & error associated with the MC momentum (just the interval half width)
+  for (int i = 0; i < _n_points; ++i) {
+    vPzMc[i] = first_resolution_point + (x_error * 2 * i);
+    vPzMcErr[i] = x_error;
+    std::cerr << "vPzMc[" << i << "] = " << vPzMc[i] << std::endl;
+  }
+
+  // Cuts for to select each tracker
+  TCut cutT1 = "TrackerNumber==0";
+  TCut cutT2 = "TrackerNumber==1";
+
+  // Form the reconstructed pz TCut
+  // TCut tcut_pzrec = form_tcut("TMath::Abs(PzRec)", "<", _cut_pz_rec);
+
+  // Loop over the momentum intervals and calculate the resolution for each
+  for (int i = 0; i < _n_points; ++i) {
+    std::string residual("PtMc-PtRec");
+    // TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
+    TCut input_cut = vCuts[i]&&cutT1;
+    calc_resolution(residual, input_cut, vPtRes_t1[i], vPtResErr_t1[i]);
+  }
+  for (int i = 0; i < _n_points; ++i) {
+    std::string residual("PtMc-PtRec");
+    // TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
+    TCut input_cut = vCuts[i]&&cutT2;
+    calc_resolution(residual, input_cut, vPtRes_t2[i], vPtResErr_t2[i]);
+  }
+
+  // Create the resultant resolution plots
+  _t1_pt_resol_pz_mc = new TGraphErrors(_n_points, &vPzMc[0], &vPtRes_t1[0],
+                                        &vPzMcErr[0], &vPtResErr_t1[0]);
+  _t2_pt_resol_pz_mc = new TGraphErrors(_n_points, &vPzMc[0], &vPtRes_t2[0],
+                                        &vPzMcErr[0], &vPtResErr_t2[0]);
+}
+
+void SciFiDisplayMomentumResolutionsPR::make_pzpz_resolutions() {
+
+  double x_range = _upper_bound_pzmc - _lower_bound_pzmc;  // Range of the pz resolution graph
+  double x_error =  x_range / ( _n_points * 2 );    // Error in pt_mc of each data point
+  // The mid pt_mc value of the first data point
+  double first_resolution_point = _lower_bound_pzmc + x_error;
   std::vector<TCut> vCuts(_n_points);          // The cuts defining the pt_mc intervals
   std::vector<double> vPzMc(_n_points);        // The centre of the pt_mc intervals
   std::vector<double> vPzMcErr(_n_points);     // The width of the intervals
@@ -286,7 +351,7 @@ void SciFiDisplayMomentumResolutionsPR::make_pzpz_resolutions() {
   std::string s2 = "&&PzMc<";
   for (int i = 0; i < _n_points; ++i) {
     std::stringstream ss1;
-    double point_lower_bound = lower_bound + (x_error * 2 * i);
+    double point_lower_bound = _lower_bound_pzmc + (x_error * 2 * i);
     double point_upper_bound = point_lower_bound + (x_error * 2);
     ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
     vCuts[i] = ss1.str().c_str();
@@ -341,11 +406,12 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
   // Prepare the TCanvas
   lCanvas->cd();
-  lCanvas->Divide(3, 2);
+  lCanvas->Divide(4, 2);
 
   // Create the graphs
   make_ptpt_resolutions();
   make_pzpt_resolutions();
+  make_ptpz_resolutions();
   make_pzpz_resolutions();
 
   // Draw the graphs
@@ -362,7 +428,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
   if (_t2_pt_resol_pt_mc) {
     std::cout << "Drawing pt resolution as function of pt_mc in T2\n";
-    lCanvas->cd(4);
+    lCanvas->cd(5);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
     _t2_pt_resol_pt_mc->SetName("t2_ptpt_resol");
@@ -384,7 +450,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
   if (_t2_pz_resol_pt_mc) {
     std::cout << "Drawing pz resolution as function of pt_mc in T2\n";
-    lCanvas->cd(5);
+    lCanvas->cd(6);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
     _t2_pz_resol_pt_mc->SetName("t2_pzpt_resol");
@@ -393,9 +459,31 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
     _t2_pz_resol_pt_mc->GetYaxis()->SetTitle("p_{z} Resolution (MeV/c)");
     _t2_pz_resol_pt_mc->Draw("AP");
   }
+  if (_t1_pt_resol_pz_mc) {
+    std::cout << "Drawing pt resolution as function of pz_mc in T1\n";
+    lCanvas->cd(3);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t1_pt_resol_pz_mc->SetName("t1_ptpz_resol");
+    _t1_pt_resol_pz_mc->SetTitle("T1 p_{t} Resolution");
+    _t1_pt_resol_pz_mc->GetXaxis()->SetTitle("p_{z}^{MC} (MeV/c)");
+    _t1_pt_resol_pz_mc->GetYaxis()->SetTitle("p_{t} Resolution (MeV/c)");
+    _t1_pt_resol_pz_mc->Draw("AP");
+  }
+  if (_t2_pt_resol_pz_mc) {
+    std::cout << "Drawing pt resolution as function of pz_mc in T2\n";
+    lCanvas->cd(7);
+    gPad->SetGridx(1);
+    gPad->SetGridy(1);
+    _t2_pt_resol_pz_mc->SetName("t2_ptpz_resol");
+    _t2_pt_resol_pz_mc->SetTitle("T2 p_{t} Resolution");
+    _t2_pt_resol_pz_mc->GetXaxis()->SetTitle("p_{z}^{MC} (MeV/c)");
+    _t2_pt_resol_pz_mc->GetYaxis()->SetTitle("p_{t} Resolution (MeV/c)");
+    _t2_pt_resol_pz_mc->Draw("AP");
+  }
   if (_t1_pz_resol_pz_mc) {
     std::cout << "Drawing pz resolution as function of pz_mc in T1\n";
-    lCanvas->cd(3);
+    lCanvas->cd(4);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
     _t1_pz_resol_pz_mc->SetName("t1_pzpz_resol");
@@ -406,7 +494,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
   if (_t2_pz_resol_pz_mc) {
     std::cout << "Drawing pz resolution as function of pz_mc in T2\n";
-    lCanvas->cd(6);
+    lCanvas->cd(8);
     gPad->SetGridx(1);
     gPad->SetGridy(1);
     _t2_pz_resol_pz_mc->SetName("t2_pzpz_resol");
@@ -426,6 +514,8 @@ void SciFiDisplayMomentumResolutionsPR::Save() {
     if (_t2_pt_resol_pt_mc) _t2_pt_resol_pt_mc->Write();
     if (_t1_pz_resol_pt_mc) _t1_pz_resol_pt_mc->Write();
     if (_t2_pz_resol_pt_mc) _t2_pz_resol_pt_mc->Write();
+    if (_t1_pt_resol_pz_mc) _t1_pt_resol_pz_mc->Write();
+    if (_t2_pt_resol_pz_mc) _t2_pt_resol_pz_mc->Write();
     if (_t1_pz_resol_pz_mc) _t1_pz_resol_pz_mc->Write();
     if (_t2_pz_resol_pz_mc) _t2_pz_resol_pz_mc->Write();
   }

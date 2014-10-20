@@ -88,10 +88,16 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     /** Return the upper limit of each fit used to calc the pz resolution pnts */
     int get_pz_fit_max() const { return _pz_fit_max; }
 
-    /** Return the lower bound of the pt_mc range used in the pz resolution plots */
+    /** Return the lower bound of the pz_mc range used in the resolution plots */
+    double get_lower_bound_pzmc() const { return _lower_bound_pzmc; }
+
+    /** Return the upper bound of the pz_mc range used in the resolution plots */
+    double get_upper_bound_pzmc() const { return _upper_bound_pzmc; }
+
+    /** Return the lower bound of the pt_mc range used in the resolution plots */
     double get_resol_lower_bound() const { return _resol_lower_bound; }
 
-    /** Return the upper bound of the pt_mc range used in the pz resolution plots */
+    /** Return the upper bound of the pt_mc range used in the resolution plots */
     double get_resol_upper_bound() const { return _resol_upper_bound; }
 
     /** Make pt resolution graphs, as a function of pt_mc */
@@ -100,7 +106,10 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     /** Make pz resolution graphs, as a function of pt_mc */
     void make_pzpt_resolutions();
 
-    /** Make pz resolution graphs, as a function of pt_mc */
+    /** Make pt resolution graphs, as a function of pz_mc */
+    void make_ptpz_resolutions();
+
+    /** Make pz resolution graphs, as a function of pz_mc */
     void make_pzpz_resolutions();
 
     /** Plot the data currently held */
@@ -139,10 +148,16 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     /** Set the upper limit of each fit used to calc the pz resolution pnts  */
     void set_pz_fit_max(double pz_fit_max) { _pz_fit_max = pz_fit_max; }
 
-    /** Set the lower bound of the pt_mc range used in the pz resolution plots */
+    /** Set the lower bound of the pz_mc range used in the resolution plots */
+    void set_lower_bound_pzmc(double lower_bound_pzmc) { _lower_bound_pzmc = lower_bound_pzmc; }
+
+    /** Set the lower bound of the pz_mc range used in the resolution plots */
+    void set_upper_bound_pzmc(double upper_bound_pzmc) { _upper_bound_pzmc = upper_bound_pzmc; }
+
+    /** Set the lower bound of the pt_mc range used in the resolution plots */
     void set_resol_lower_bound(double pz_lower_bound) { _resol_lower_bound = pz_lower_bound; }
 
-    /** Set the upper bound of the pt_mc range used in the pz resolution plots */
+    /** Set the upper bound of the pt_mc range used in the resolution plots */
     void set_resol_upper_bound(double pz_upper_bound) { _resol_upper_bound = pz_upper_bound; }
 
     /** Set up the SciFiData object and ROOT tree */
@@ -169,6 +184,8 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     TGraphErrors* _t2_pt_resol_pt_mc;
     TGraphErrors* _t1_pz_resol_pt_mc;
     TGraphErrors* _t2_pz_resol_pt_mc;
+    TGraphErrors* _t1_pt_resol_pz_mc;
+    TGraphErrors* _t2_pt_resol_pz_mc;
     TGraphErrors* _t1_pz_resol_pz_mc;
     TGraphErrors* _t2_pz_resol_pz_mc;
 
@@ -180,6 +197,8 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     int _pt_fit_max;          /// The upper limit of each fit used to calc the pt resolution pnts
     int _pz_fit_min;          /// The lower limit of each fit used to calc the pz resolution pnts
     int _pz_fit_max;          /// The upper limit of each fit used to calc the pz resolution pnts
+    double _upper_bound_pzmc;
+    double _lower_bound_pzmc;
     double _resol_lower_bound;   /// The lower bound of the pt_mc range for the pz resolution graphs
     double _resol_upper_bound;   /// The upper bound of the pt_mc range for the pz resolution graph
     double _cut_pz_rec;         /// Cut on the reconstructed pz
