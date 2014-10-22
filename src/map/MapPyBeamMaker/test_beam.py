@@ -133,14 +133,20 @@ TEST_TWISS_L_F1 = {"longitudinal_mode":"twiss", "momentum_variable":"p",
 TEST_TWISS_L_F2 = {"longitudinal_mode":"twiss", "momentum_variable":"p",
                 "beta_l":10., "alpha_l":-1., "emittance_l":-0.1}
 
-TEST_GAUSSIAN_L = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
+TEST_GAUSSIAN_L1 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
                 "sigma_t":1.e6, "sigma_pz":100.}
+
+TEST_GAUSSIAN_L2 = {"longitudinal_mode":"gaussian", "momentum_variable":"p",
+                "sigma_t":100., "sigma_p":100., "cov(t,p)":9999.}
 
 TEST_GAUSSIAN_L_F1 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
                 "sigma_t":-1.e6, "sigma_pz":100.}
 
 TEST_GAUSSIAN_L_F2 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
                 "sigma_t":1.e6, "sigma_pz":-100.}
+
+TEST_GAUSSIAN_L_F3 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
+                "sigma_t":100., "sigma_pz":100., "cov(t,pz)":10001.}
 
 
 TEST_AP_1 = {"magnitude":0.1, "momentum_variable":"p"}
@@ -412,17 +418,27 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
 
     def test_birth_long_gaussian(self):
         """Beam longitudinal - gaussian mode"""
-        self._beam._Beam__birth_longitudinal_ellipse(TEST_GAUSSIAN_L)
+        self._beam._Beam__birth_longitudinal_ellipse(TEST_GAUSSIAN_L1)
+        self.assertEqual(self._beam.longitudinal_mode, "gaussian")
+        equality_matrix = numpy.equal(self._beam.beam_matrix,
+                                      numpy.diag([1.]*4+[1.e12, 1.e4]))
+        self.assertTrue(numpy.all(equality_matrix))
+        self._beam._Beam__birth_longitudinal_ellipse(TEST_GAUSSIAN_L2)
         self.assertEqual( self._beam.longitudinal_mode, "gaussian" )
-        self.assertTrue( numpy.all(numpy.equal(self._beam.beam_matrix,
-                                            numpy.diag([1.]*4+[1.e12, 1.e4])
-                       )))
+        test_matrix = numpy.diag([1.]*4+[1.e4, 1.e4])
+        test_matrix[4, 5] = 100.*100.-1.
+        test_matrix[5, 4] = 100.*100.-1.
+        equality_matrix = numpy.equal(self._beam.beam_matrix, test_matrix)
+        self.assertTrue(numpy.all(equality_matrix))
         self.assertRaises(ValueError,
                           self._beam._Beam__birth_longitudinal_ellipse,
                           TEST_GAUSSIAN_L_F1)
         self.assertRaises(ValueError,
                           self._beam._Beam__birth_longitudinal_ellipse,
                           TEST_GAUSSIAN_L_F2)
+        self.assertRaises(ValueError,
+                          self._beam._Beam__birth_longitudinal_ellipse,
+                          TEST_GAUSSIAN_L_F3)
 
     def test_birth_long_t_dist(self):
         """Beam longitudinal - sawtooth/uniform time distributions"""
