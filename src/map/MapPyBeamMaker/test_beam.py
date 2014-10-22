@@ -139,12 +139,6 @@ TEST_GAUSSIAN_L1 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
 TEST_GAUSSIAN_L2 = {"longitudinal_mode":"gaussian", "momentum_variable":"p",
                 "sigma_t":100., "sigma_p":100., "cov(t,p)":9999.}
 
-TEST_GAUSSIAN_L_F1 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
-                "sigma_t":-1.e6, "sigma_pz":100.}
-
-TEST_GAUSSIAN_L_F2 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
-                "sigma_t":1.e6, "sigma_pz":-100.}
-
 TEST_GAUSSIAN_L_F3 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
                 "sigma_t":100., "sigma_pz":100., "cov(t,pz)":10001.}
 
@@ -430,12 +424,6 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         test_matrix[5, 4] = 100.*100.-1.
         equality_matrix = numpy.equal(self._beam.beam_matrix, test_matrix)
         self.assertTrue(numpy.all(equality_matrix))
-        self.assertRaises(ValueError,
-                          self._beam._Beam__birth_longitudinal_ellipse,
-                          TEST_GAUSSIAN_L_F1)
-        self.assertRaises(ValueError,
-                          self._beam._Beam__birth_longitudinal_ellipse,
-                          TEST_GAUSSIAN_L_F2)
         self.assertRaises(ValueError,
                           self._beam._Beam__birth_longitudinal_ellipse,
                           TEST_GAUSSIAN_L_F3)
