@@ -23,7 +23,6 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
 #include "src/common_cpp/Plotting/SciFi/SciFiAnalysisTools.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
-#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
@@ -36,28 +35,12 @@
 namespace MAUS {
 
 SciFiDataMomentumPR::SciFiDataMomentumPR() : mNUnmatchedTracks(0),
-                                             mNMatchedTracks(0),
-                                             mData(0) {
+                                             mNMatchedTracks(0) {
   // Do nothing
 }
 
 SciFiDataMomentumPR::~SciFiDataMomentumPR() {
   // Do nothing
-}
-
-bool SciFiDataMomentumPR::Process(Spill* aSpill) {
-  if (aSpill != NULL && aSpill->GetDaqEventType() == "physics_event") {
-    // Loop over MC events in the aSpill
-    for (size_t iMaSFEvent = 0; iMaSFEvent < aSpill->GetMCEvents()->size(); ++iMaSFEvent) {
-      MCEvent *aMcEvent = (*aSpill->GetMCEvents())[iMaSFEvent];
-      SciFiEvent *aSFEvent = (*aSpill->GetReconEvents())[iMaSFEvent]->GetSciFiEvent();
-      ReduceData(aMcEvent, aSFEvent);
-    }
-  } else {
-    std::cerr << "SciFiDataMomentumPR: Not a usable spill" << std::endl;
-    return false;
-  }
-  return true;
 }
 
 void SciFiDataMomentumPR::Clear() {
@@ -81,7 +64,7 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     SciFiHelicalPRTrack* trk = htrks[iTrk];
 
     if ((trk->get_R() != 0.0) & (trk->get_dsdz() != 0.0)) {
-      MomentumDataPR lDataStruct;
+      MomentumData lDataStruct;
       lDataStruct.TrackerNumber = trk->get_tracker();
       lDataStruct.Charge = trk->get_charge();
       lDataStruct.NumberOfPoints = trk->get_num_points();
@@ -152,7 +135,7 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
         bool success = SciFiAnalysisTools::find_mc_spoint_momentum(track_id, spnts[k],
                                                                    lkup, mom_mc);
         if (!success) {
-          std::cerr << "Failed to find mc mom for track in tracker " << trk->get_tracker() << "\n";
+          std::cerr << "Failed to find MC mom for track in tracker " << trk->get_tracker() << "\n";
           continue;
         }
         lDataStruct.PtMc += sqrt(mom_mc.x()*mom_mc.x() + mom_mc.y()*mom_mc.y());

@@ -15,49 +15,56 @@
  *
  */
 
-/** @class SciFiDataMomentumPR
+/** @class SciFiDataMomentum
  *
- *  Class for producing SciFi pattern recognition reduced momentum data
+ *  Holds reduced SciFi momentum data
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMPR_
-#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMPR_
+#ifndef _SRC_COMMON_CPP_ANALYSIS_SCIFI_SCIFIDATAMOMENTUM_HH_
+#define _SRC_COMMON_CPP_ANALYSIS_SCIFI_SCIFIDATAMOMENTUM_HH_
 
 // C++ headers
 #include <vector>
 
-// Root headers
-#include "TTree.h"
-
 // MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
-
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 
 namespace MAUS {
 
-class SciFiDataMomentumPR : public SciFiDataMomentum {
+struct MomentumData {
+  int TrackerNumber;
+  int NumberOfPoints;
+  int Charge;
+  double PtMc;
+  double PzMc;
+  double PtRec;
+  double PzRec;
+};
+
+class SciFiDataMomentum : public SciFiDataBase {
   friend class SciFiDisplayMomentumResidualsPR;
   friend class SciFiDisplayMomentumResolutionsPR;
 
   public:
     /** Default constructor */
-    SciFiDataMomentumPR();
+    SciFiDataMomentum();
 
     /** Destructor */
-    virtual ~SciFiDataMomentumPR();
+    virtual ~SciFiDataMomentum();
 
-    /** Set all the member variables to zero */
-    void Clear();
+    /** Process data from this spill*/
+    virtual bool Process(Spill* spill);
 
     /** Calculate the reduced momentum data for an event */
-    virtual void ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent);
+    virtual void ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) = 0;
 
   protected:
-    int mNUnmatchedTracks;  /** No. of tracks which could not associate with MC track */
-    int mNMatchedTracks;    /** No. of recon tracks matched to an MC track */
+    std::vector<MomentumData> mData;  /** Vector whose elements hold reduced data for one track */
 };
-} // ~namespace MAUS
+}
 
 #endif

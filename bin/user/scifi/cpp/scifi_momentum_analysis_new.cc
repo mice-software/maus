@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   // First argument to code should be the input ROOT file name
   std::string filename = std::string(argv[1]);
 
-  // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
+  // Analysis parameters - some may be overridden with command line arguments. All momenta in MeV/c.
   int n_pt_bins = 100;        // No. of bins in histos used to find pt resols (0 = let ROOT decide)
   int n_pz_bins = 100;        // No. of bins in histos used to find pz resols (0 = let ROOT decide)
   int n_points = 9;           // No. of data points in each resolution plot
@@ -132,11 +132,12 @@ int main(int argc, char *argv[]) {
   std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
   analyser.AddDisplay(resolutions);
 
+
   // Set up the displays
   analyser.SetUpDisplays();
 
   // Set up ROOT app, input file, and MAUS data class
-  TApplication theApp("App", &argc, argv);
+  // TApplication theApp("App", &argc, argv);
   std::cout << "Opening file " << filename << std::endl;
   irstream infile(filename.c_str(), "Spill");
   MAUS::Data data;
@@ -159,13 +160,14 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // Tidy up
+  infile.close();
+
   // Make the final plots and save
   analyser.Plot();
   analyser.Save();
 
-  // Tidy up
-  infile.close();
-  theApp.Run();
+  // theApp.Run();
 
   // Print some results
 //   std::cerr << "\n-------------------------Results-------------------------\n";

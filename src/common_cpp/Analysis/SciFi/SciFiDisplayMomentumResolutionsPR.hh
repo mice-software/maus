@@ -177,7 +177,7 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     TFile* mOf1;                      /** The output ROOT file */
     TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
     SciFiDataMomentumPR* mSpillData;  /** The reduced data object, covering one spill */
-    MomentumDataPR mTrackData;        /** Struct containing reduced data for one track in a spill */
+    MomentumData mTrackData;          /** Struct containing reduced data for one track in a spill */
 
     // Resolution Graphs
     TGraphErrors* _t1_pt_resol_pt_mc;

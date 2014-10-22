@@ -32,6 +32,7 @@
 
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
 
@@ -77,7 +78,7 @@ class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
     TFile* mOf1;                      /** The output ROOT file */
     TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
     SciFiDataMomentumPR* mSpillData;  /** The reduced data object, covering one spill */
-    MomentumDataPR mTrackData;        /** Struct containing reduced data for one track in a spill */
+    MomentumData mTrackData;          /** Struct containing reduced data for one track in a spill */
 
     // Residual histograms
     TH1D* mResidualPtT1;         /** Pt residual histogram for tracker 1 */

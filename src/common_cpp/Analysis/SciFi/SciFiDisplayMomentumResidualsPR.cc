@@ -85,6 +85,7 @@ void SciFiDisplayMomentumResidualsPR::Fill() {
 
 void SciFiDisplayMomentumResidualsPR::Plot(TCanvas* aCanvas) {
   // If canvas if passed in use it, otherwise initialise the member canvas
+  mOf1->cd();
   TCanvas* lCanvas(NULL);
   if ( aCanvas ) {
     lCanvas = aCanvas;
@@ -127,7 +128,9 @@ void SciFiDisplayMomentumResidualsPR::Save() {
     if (mResidualPzT2) mResidualPzT2->Write();
     if (mResidualPzT2Log) mResidualPzT2Log->Write();
     if (mCanvas) mCanvas->Write();
+    mOf1->Close();
   }
+
 }
 
 SciFiDataBase* SciFiDisplayMomentumResidualsPR::SetUp() {
@@ -143,7 +146,7 @@ SciFiDataBase* SciFiDisplayMomentumResidualsPR::SetUpSciFiData() {
 
 bool SciFiDisplayMomentumResidualsPR::SetUpRoot() {
   // Setup the output TFile
-  mOf1 = new TFile("scifi_analysis_output.root", "recreate");
+  mOf1 = new TFile("SciFiDisplayMomentumResidualsPROutput.root", "recreate");
   // Set up the TTree
   mTree = new TTree("mTree", "SciFi Momentum Data");
   mTree->Branch("TrackerNumber", &mTrackData.TrackerNumber, "TrackerNumber/I");

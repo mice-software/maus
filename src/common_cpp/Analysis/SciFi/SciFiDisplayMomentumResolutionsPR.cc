@@ -392,6 +392,7 @@ void SciFiDisplayMomentumResolutionsPR::make_pzpz_resolutions() {
 }
 
 void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
+  mOf1->cd();
   // If canvas if passed in use it, otherwise initialise the member canvas
   TCanvas* lCanvas(NULL);
   if ( aCanvas ) {
@@ -518,6 +519,7 @@ void SciFiDisplayMomentumResolutionsPR::Save() {
     if (_t2_pt_resol_pz_mc) _t2_pt_resol_pz_mc->Write();
     if (_t1_pz_resol_pz_mc) _t1_pz_resol_pz_mc->Write();
     if (_t2_pz_resol_pz_mc) _t2_pz_resol_pz_mc->Write();
+    mOf1->Close();
   }
 }
 
