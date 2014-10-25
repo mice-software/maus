@@ -75,6 +75,7 @@ void MapCppEMRMCDigitization::_birth(const std::string& argJsonConfigDocument) {
   _tot_func_p2 = configJSON["EMRtotFuncP2"].asDouble();
   _tot_func_p3 = configJSON["EMRtotFuncP3"].asDouble();
   _tot_func_p4 = configJSON["EMRtotFuncP4"].asDouble();
+  _tot_func_p5 = configJSON["EMRtotFuncP5"].asDouble();
   _acquisition_window = configJSON["EMRacquisitionWindow"].asInt();
   _signal_integration_window = configJSON["EMRsignalIntegrationWindow"].asInt();
   _arrival_time_shift = configJSON["EMRarrivalTimeShift"].asInt();
@@ -128,7 +129,6 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
       return;
 
   int nPartEvents = spill->GetMCEventSize();
-  int xSpill = spill->GetSpillNumber();
 
   // Check the Recon event array is initialised, and if not make it so
   if (!spill->GetReconEvents()) {
@@ -183,7 +183,7 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
     }
   }
 
-  fill(spill, nPartEvents, xSpill, emr_dbb_events_tmp, emr_fadc_events_tmp);
+  fill(spill, nPartEvents, emr_dbb_events_tmp, emr_fadc_events_tmp);
 
   // Reset/Resize DBB and fADC arrays with n+2 events (1 per trigger + noise + decays)
   emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents+2);
@@ -198,7 +198,7 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
     }
   }
 
-  fill(spill, nPartEvents+2, xSpill, emr_dbb_events_tmp, emr_fadc_events_tmp);
+  fill(spill, nPartEvents+2, emr_dbb_events_tmp, emr_fadc_events_tmp);
 }
 
 void MapCppEMRMCDigitization::processDBB(MAUS::EMRHitArray *EMRhits,
@@ -315,8 +315,8 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
       int nBarHits = bar->GetEMRBarHitArray().size();
       bool matched = false;
 
-      for (int iHit = 0; iHit < nBarHits; iHit++) {
-	EMRBarHit barHit = bar->GetEMRBarHitArray().at(iHit);
+      for (int iBarHit = 0; iBarHit < nBarHits; iBarHit++) {
+	EMRBarHit barHit = bar->GetEMRBarHitArray().at(iBarHit);
 	EMRChannelKey xKey(xPlane, xPlane%2, xBar, "emr");
         double x  = barHit.GetX();/*mm*/
 	double y  = barHit.GetY();/*mm*/
@@ -434,7 +434,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 		   xTotDigi > _tot_noise_low && xTotDigi < _tot_noise_up ) {
 	  emr_dbb_events_tmp[nPartEvents][xPlane][xBar].push_back(bHit);
 	  matched = true;
-	} else if (iHit == nBarHits-1 && !matched) {
+	} else if (iBarHit == nBarHits-1 && !matched) {
 	  bHit.SetDeltaT(0);
 	  emr_dbb_events_tmp[nPartEvents+1][xPlane][xBar].push_back(bHit);
 	}
@@ -549,12 +549,12 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 
 void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
 				   int nPartEvents,
-				   int xSpill,
 				   EMRDBBEventVector emr_dbb_events_tmp,
 				   EMRfADCEventVector emr_fadc_events_tmp) const {
 
   int recPartEvents = spill->GetReconEventSize();
   ReconEventPArray *recEvts =  spill->GetReconEvents();
+  int xSpill = spill->GetSpillNumber();
 
   // Resize the recon event to harbour all the EMR noise+decays
   if (recPartEvents == 0) { // No recEvts yet

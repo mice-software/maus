@@ -113,8 +113,8 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
 		  EMRfADCEventVector& emr_fadc_events_tmp) const;
 
   void processFADC(MAUS::EMRHitArray *EMRhits,
-		  int xPe,
-		  EMRfADCEventVector& emr_fadc_events_tmp) const;
+		   int xPe,
+		   EMRfADCEventVector& emr_fadc_events_tmp) const;
 
   void digitize(MAUS::EMREvent *EMRevt,
 		int xPe,
@@ -125,7 +125,6 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
 
   void fill(MAUS::Spill *spill,
 	    int nPartEvents,
-	    int xSpill,
 	    EMRDBBEventVector emr_dbb_events_tmp,
 	    EMRfADCEventVector emr_fadc_events_tmp) const;
 

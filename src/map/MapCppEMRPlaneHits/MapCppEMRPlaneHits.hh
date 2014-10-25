@@ -17,9 +17,8 @@
 
 
 /** @class MapCppEMRPlaneHits
- * Reconstruct TOF data and creat Slab hits
- * by running over the TOF digits.
- *
+ * Reconstruct EMR data and create EMR bar hits
+ * by running over the fADC and DBB data
  */
 
 #ifndef _MAP_MAPCPPEMRPLANEHITS_H_
