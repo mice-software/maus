@@ -93,16 +93,14 @@ bool EMRCalibrationMap::Load(std::string calibFile) {
   try {
     while (fgets(line, 100, file)) {
       char pmt[10], fom[10];
-      int plane(-1), bar(-1);
-      float epsilon(-1.0);
-      sscanf(line, "%s %s %d %d %f", pmt, fom, &plane, &bar, &epsilon);
-      if (strcmp(pmt, "MA") == 0 && strcmp(fom, _fom.c_str()) == 0) {
-	int n = FindEMRChannelKey(EMRChannelKey(plane, plane%2, bar, "emr"));
-        _eps_MA[n] = epsilon;
-      }
-      if (strcmp(pmt, "SA") == 0 && strcmp(fom, _fom.c_str()) == 0) {
-	int n = FindEMRChannelKey(EMRChannelKey(plane, plane%2, bar, "emr"));
-        _eps_SA[n] = epsilon;
+      int plane(-9), bar(-9);
+      double epsilon(-1.0);
+      sscanf(line, "%s %s %d %d %lf", pmt, fom, &plane, &bar, &epsilon);
+      int n = FindEMRChannelKey(EMRChannelKey(plane, plane%2, bar, "emr"));
+
+      if (strcmp(fom, _fom.c_str()) == 0 && n != NOCALIB) {
+        if (strcmp(pmt, "MA") == 0) _eps_MA[n] = epsilon;
+        if (strcmp(pmt, "SA") == 0) _eps_SA[n] = epsilon;
       }
     }
 
@@ -118,7 +116,7 @@ bool EMRCalibrationMap::Load(std::string calibFile) {
 }
 
 int EMRCalibrationMap::FindEMRChannelKey(EMRChannelKey key) const {
-  for (unsigned int i = 0; i < _Ckey.size(); ++i )
+  for (unsigned int i = 0; i < _Ckey.size(); i++ )
     if (_Ckey.at(i) == key)
       return i;
 
