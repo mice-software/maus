@@ -70,7 +70,8 @@ bool find_mc_spoint_momentum(const int track_id, const MAUS::SciFiSpacePoint* sp
   return false;
 }
 
-bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid, int &counter) {
+bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, const int min_matches,
+                 int &tid, int &counter) {
 
   std::map<int, int> track_id_counter;  // Map of track id to freq for each spoint
   for ( size_t i = 0; i < spoint_mc_tids.size(); ++i ) {
@@ -88,10 +89,10 @@ bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid
   std::map<int, int>::iterator mit1;
   tid = 0;
   for ( mit1 = track_id_counter.begin(); mit1 != track_id_counter.end(); ++mit1 ) {
-    if ( mit1->second > 2 && tid == 0 ) {
+    if ( mit1->second >= min_matches && tid == 0 ) {
       tid = mit1->first;
       counter = mit1->second;
-    } else if ( mit1->second > 2 && tid != 0 ) {
+    } else if ( mit1->second >= min_matches && tid != 0 ) {
       tid = -1;  // A malformed track, cannot associate with an mc track id
       counter = 0;
       return false;

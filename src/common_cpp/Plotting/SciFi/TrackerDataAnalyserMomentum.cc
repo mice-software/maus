@@ -213,7 +213,7 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
       // Is there a track id associated with 3 or more spoints?
       int track_id = 0;
       int counter = 0;
-      bool success = SciFiAnalysisTools::find_mc_tid(spoint_mc_tids, track_id, counter);
+      bool success = SciFiAnalysisTools::find_mc_tid(spoint_mc_tids, 3, track_id, counter);
       // If we have not found a common track id, abort for this track
       if (!success) {
         std::cerr << "Malformed track, skipping\n";

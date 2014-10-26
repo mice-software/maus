@@ -64,8 +64,8 @@ void SciFiDisplayMomentumResidualsPR::Fill() {
   mOf1->cd();
   if (mTree) {
     // Loop over the data for each track in the spill and fill the tree with reduced data
-    for ( size_t i = 0; i < mSpillData->mData.size(); ++i ) {
-      mTrackData = mSpillData->mData[i];
+    for ( size_t i = 0; i < mSpillData->mDataPR.size(); ++i ) {
+      mTrackData = mSpillData->mDataPR[i];
       mTree->Fill();
       int q = mTrackData.Charge;
       if (mTrackData.TrackerNumber == 0) {
@@ -159,17 +159,17 @@ bool SciFiDisplayMomentumResidualsPR::SetUpRoot() {
   // Set up the residual histograms
   int res_n_bins = 100;
   mResidualPtT1 = new TH1D("ResidualPtT1", "T1 p_{t} Residual", res_n_bins, -5, 5);
-  mResidualPtT1->GetXaxis()->SetTitle("p_{T}^{MC} - p_{T} (MeV/c)");
+  mResidualPtT1->GetXaxis()->SetTitle("p_{T} - p_{T}^{MC} (MeV/c)");
   mResidualPzT1 = new TH1D("ResidualPzT1", "T1 p_{z} Residual", res_n_bins, -30, 30);
-  mResidualPzT1->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+  mResidualPzT1->GetXaxis()->SetTitle("p_{z} - p_{z}^{MC} (MeV/c)");
   mResidualPzT1Log = new TH1D("ResidualPzT1Log", "T1 p_{z} Residual", res_n_bins, -500, 500);
-  mResidualPzT1Log->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+  mResidualPzT1Log->GetXaxis()->SetTitle("p_{z} p_{z}^{MC} (MeV/c)");
   mResidualPtT2 = new TH1D("ResidualPtT2", "T2 p_{t} Residual", res_n_bins, -5, 5);
-  mResidualPtT2->GetXaxis()->SetTitle("p_{T}^{MC} - p_{T} (MeV/c)");
+  mResidualPtT2->GetXaxis()->SetTitle("p_{T} - p_{T}^{MC}(MeV/c)");
   mResidualPzT2 = new TH1D("ResidualPzT2", "T2 p_{z} Residual", res_n_bins, -30, 30);
-  mResidualPzT2->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+  mResidualPzT2->GetXaxis()->SetTitle("p_{z} - p_{z}^{MC} (MeV/c)");
   mResidualPzT2Log = new TH1D("ResidualPzT2Log", "T2 p_{z} Residual", res_n_bins, -500, 500);
-  mResidualPzT2Log->GetXaxis()->SetTitle("p_{z}^{MC} - p_{z} (MeV/c)");
+  mResidualPzT2Log->GetXaxis()->SetTitle("p_{z} - p_{z}^{MC} (MeV/c)");
   return true;
 }
 } // ~namespace MAUS

@@ -35,6 +35,7 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsPR.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -96,8 +97,12 @@ int main(int argc, char *argv[]) {
   MAUS::SciFiAnalysis analyser;
 
   // Add Pat Rec momentum residual display
-  // MAUS::SciFiDisplayMomentumResidualsPR* residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
-  // analyser.AddDisplay(residuals);
+  MAUS::SciFiDisplayMomentumResidualsPR* pr_residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
+  analyser.AddDisplay(pr_residuals);
+
+  // Add a Kalman fit momentum residual display
+  MAUS::SciFiDisplayMomentumResidualsKF* kf_residuals = new MAUS::SciFiDisplayMomentumResidualsKF();
+  // analyser.AddDisplay(kf_residuals);
 
   // Add Pat Rec momentum resolutions display
   MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
@@ -130,7 +135,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Resol graphs ptmc upper bound:  " << resolutions->get_resol_upper_bound()
             << " MeV/c\n";
   std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
-  analyser.AddDisplay(resolutions);
+  // analyser.AddDisplay(resolutions);
 
 
   // Set up the displays

@@ -48,7 +48,8 @@ bool find_mc_spoint_momentum(const int track_id, const MAUS::SciFiSpacePoint* sp
                              MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom);
 
 /** Find the MC track ID number given a vector of spacepoint numbers and their MC track IDs */
-bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, int &tid, int &counter);
+bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, const int min_matches,
+                 int &tid, int &counter);
 
 /** @brief Find the number of MC tracks which intercept 4 or more stations in each tracker
  *  @param pdg_id The particle data group ID. If set to zero, all particles are counted

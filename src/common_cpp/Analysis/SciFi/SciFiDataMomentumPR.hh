@@ -37,6 +37,16 @@
 
 namespace MAUS {
 
+struct MomentumDataPR {
+  int TrackerNumber;
+  int NumberOfPoints;
+  int Charge;
+  double PtMc;
+  double PzMc;
+  double PtRec;
+  double PzRec;
+};
+
 class SciFiDataMomentumPR : public SciFiDataMomentum {
   friend class SciFiDisplayMomentumResidualsPR;
   friend class SciFiDisplayMomentumResolutionsPR;
@@ -57,6 +67,7 @@ class SciFiDataMomentumPR : public SciFiDataMomentum {
   protected:
     int mNUnmatchedTracks;  /** No. of tracks which could not associate with MC track */
     int mNMatchedTracks;    /** No. of recon tracks matched to an MC track */
+    std::vector<MomentumDataPR> mDataPR;  /** Vector holding reduced data for one track */
 };
 } // ~namespace MAUS
 

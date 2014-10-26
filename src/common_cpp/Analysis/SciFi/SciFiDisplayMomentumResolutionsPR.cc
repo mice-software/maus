@@ -124,8 +124,8 @@ void SciFiDisplayMomentumResolutionsPR::Fill() {
   mOf1->cd();
   if (mTree) {
     // Loop over the data for each track in the spill and fill the tree with reduced data
-    for ( size_t i = 0; i < mSpillData->mData.size(); ++i ) {
-      mTrackData = mSpillData->mData[i];
+    for ( size_t i = 0; i < mSpillData->mDataPR.size(); ++i ) {
+      mTrackData = mSpillData->mDataPR[i];
       mTree->Fill();
       if (mTrackData.TrackerNumber == 0) {
         // TODO: Do I want anything here?

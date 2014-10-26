@@ -78,7 +78,7 @@ class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
     TFile* mOf1;                      /** The output ROOT file */
     TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
     SciFiDataMomentumPR* mSpillData;  /** The reduced data object, covering one spill */
-    MomentumData mTrackData;          /** Struct containing reduced data for one track in a spill */
+    MomentumDataPR mTrackData;          /** Struct containing reduced data for one track in a spill */
 
     // Residual histograms
     TH1D* mResidualPtT1;         /** Pt residual histogram for tracker 1 */

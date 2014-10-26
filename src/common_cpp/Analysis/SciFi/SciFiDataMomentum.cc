@@ -20,7 +20,7 @@
 
 namespace MAUS {
 
-SciFiDataMomentum::SciFiDataMomentum() : mData(0) {
+SciFiDataMomentum::SciFiDataMomentum() {
   // Do nothing
 }
 

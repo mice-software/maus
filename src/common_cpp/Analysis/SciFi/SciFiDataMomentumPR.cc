@@ -35,7 +35,8 @@
 namespace MAUS {
 
 SciFiDataMomentumPR::SciFiDataMomentumPR() : mNUnmatchedTracks(0),
-                                             mNMatchedTracks(0) {
+                                             mNMatchedTracks(0),
+                                             mDataPR(0) {
   // Do nothing
 }
 
@@ -46,7 +47,7 @@ SciFiDataMomentumPR::~SciFiDataMomentumPR() {
 void SciFiDataMomentumPR::Clear() {
   mNUnmatchedTracks = 0;
   mNMatchedTracks = 0;
-  mData.clear();
+  mDataPR.clear();
 }
 
 void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
@@ -64,7 +65,7 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     SciFiHelicalPRTrack* trk = htrks[iTrk];
 
     if ((trk->get_R() != 0.0) & (trk->get_dsdz() != 0.0)) {
-      MomentumData lDataStruct;
+      MomentumDataPR lDataStruct;
       lDataStruct.TrackerNumber = trk->get_tracker();
       lDataStruct.Charge = trk->get_charge();
       lDataStruct.NumberOfPoints = trk->get_num_points();
@@ -117,7 +118,7 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
       // Is there a track id associated with 3 or more spoints?
       int track_id = 0;
       int counter = 0;
-      bool success = SciFiAnalysisTools::find_mc_tid(spoint_mc_tids, track_id, counter);
+      bool success = SciFiAnalysisTools::find_mc_tid(spoint_mc_tids, 3, track_id, counter);
       // If we have not found a common track id, abort for this track
       if (!success) {
         std::cerr << "Malformed track, skipping\n";
@@ -145,7 +146,7 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
       lDataStruct.PtMc /= counter2;
       lDataStruct.PzMc /= counter2;
 
-      mData.push_back(lDataStruct);
+      mDataPR.push_back(lDataStruct);
     } else {
       std::cout << "Bad track, skipping" << std::endl;
     }

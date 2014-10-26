@@ -35,15 +35,7 @@
 
 namespace MAUS {
 
-struct MomentumData {
-  int TrackerNumber;
-  int NumberOfPoints;
-  int Charge;
-  double PtMc;
-  double PzMc;
-  double PtRec;
-  double PzRec;
-};
+
 
 class SciFiDataMomentum : public SciFiDataBase {
   friend class SciFiDisplayMomentumResidualsPR;
@@ -61,9 +53,6 @@ class SciFiDataMomentum : public SciFiDataBase {
 
     /** Calculate the reduced momentum data for an event */
     virtual void ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) = 0;
-
-  protected:
-    std::vector<MomentumData> mData;  /** Vector whose elements hold reduced data for one track */
 };
 }
 
