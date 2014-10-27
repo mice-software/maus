@@ -115,7 +115,7 @@ EMRChannelKey::EMRChannelKey(string keyStr) throw(Exception) {
   }
 }
 
-bool EMRChannelKey::operator==( EMRChannelKey const key ) {
+bool EMRChannelKey::operator==( EMRChannelKey const key ) const {
   if ( _orientation == key._orientation &&
        _plane == key._plane &&
        _bar == key._bar &&
@@ -126,7 +126,7 @@ bool EMRChannelKey::operator==( EMRChannelKey const key ) {
   }
 }
 
-bool EMRChannelKey::operator!=( EMRChannelKey const key ) {
+bool EMRChannelKey::operator!=( EMRChannelKey const key ) const {
   if ( _orientation == key._orientation &&
        _plane == key._plane &&
        _bar == key._bar &&
