@@ -550,6 +550,9 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "y_step":0.,
     "n_steps":301,
     "plot_formats":["root", "png"],
-    "1d_plot_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_1d"),
-    "2d_plot_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_2d"),
+    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
+    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
+    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
+    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
+    "2d_volume_plot_label_size":0.25,
 }
