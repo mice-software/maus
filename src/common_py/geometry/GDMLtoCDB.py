@@ -318,9 +318,9 @@ class Downloader: #pylint: disable = R0902
             raise OSError('Path '+downloadpath+' does not exist')
         else:        
             coolingchannel_cdb = cdb.CoolingChannel()
-            downloadedfile = coolingchannel_cdb.get_coolingchannel_for_run_xml(run_id)
+            downloadedfile = coolingchannel_cdb.get_coolingchannel_for_run(run_id)
             path = downloadpath + '/CoolingChannelInfo.gdml'
             fout = open(path, 'w')
-            fout.write(downloadedfile)
+            fout.write(str(downloadedfile))
             fout.close()
 

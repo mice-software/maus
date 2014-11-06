@@ -190,7 +190,10 @@ Name & Meaning \\
 \verb|emittance_l| & In Twiss mode, set $\epsilon_l$\\
 \hline
 \verb|sigma_t| & In \verb|gaussian| mode, set the RMS time. \\
+\hline
 \begin{tabular}{l} \verb|sigma_p| \\ \verb|sigma_energy| \\ \verb|sigma_pz| \end{tabular} & In \verb|gaussian|, \verb|uniform_time|, \verb|sawtooth_time| mode, set the RMS energy/p/pz. \\
+\hline
+\begin{tabular}{l} \verb|cov(t,p)| \\ \verb|cov(t,energy)| \\ \verb|cov(t,pz)| \end{tabular} & In \verb|gaussian| mode, set the covariance between p/energy/pz and time and energy. It is an error if this results in a matrix that is not positive definite (eigenvalues positive).\\
 \hline
 \verb|t_start| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the start time of the parent distribution \\
 \verb|t_end| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the end time of the parent distribution \\

@@ -285,12 +285,13 @@ class Beam(): # pylint: disable=R0902
         elif self.longitudinal_mode == 'gaussian':
             long_matrix[0, 0] = beam_def['sigma_t']**2.
             long_matrix[1, 1] = beam_def['sigma_'+self.momentum_defined_by]**2.
-            if beam_def['sigma_t'] <= 0.:
-                raise ValueError("sigma_t "+str(long_matrix[0, 0])+
-                                 " must be > 0")
-            if beam_def['sigma_'+self.momentum_defined_by] <= 0.:
-                raise ValueError('sigma_'+self.momentum_defined_by+ \
-                                 " "+str(long_matrix[0, 0])+" must be > 0")
+            corr_key = 'cov(t,'+self.momentum_defined_by+')'
+            if corr_key in beam_def:
+                long_matrix[0, 1] = beam_def[corr_key]
+                long_matrix[1, 0] = long_matrix[0, 1]
+            if numpy.linalg.det(long_matrix) <= 0:
+                raise ValueError('longitudinal matrix\n'+str(long_matrix)+\
+                                 'must be positive definite.')
         elif self.longitudinal_mode == 'uniform_time' or \
              self.longitudinal_mode == 'sawtooth_time':
             self.t_dist = self.longitudinal_mode
@@ -303,7 +304,6 @@ class Beam(): # pylint: disable=R0902
         else:
             raise ValueError("Did not recognise beam longitudinal_mode "+\
                              str(self.longitudinal_mode))
-
         for i in range(2):
             for j in range(2):
                 self.beam_matrix[i+4, j+4] = long_matrix[i, j]

@@ -94,7 +94,7 @@ class Formatter: #pylint: disable = R0902
             elif fname.find('CoolingChannelInfo') >= 0:
                 self.coolingChannel_file = fname
                 print 'Found ', fname
-            elif fname.find('Quad') >= 0:
+            elif fname.find('Quad') >= 0 or fname.find('Dipole') >=0:
                 self.modulefiles.append(fname)
             else:
                 self.stepfiles.append(fname)

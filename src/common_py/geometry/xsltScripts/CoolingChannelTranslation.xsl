@@ -59,7 +59,8 @@
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'0')">_open.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'2')">_open.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'4')">_open.dat</xsl:when> 
-					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'6')">_open.dat</xsl:when> 
+					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'6')">_open.dat</xsl:when>
+					<xsl:when test="contains(Iris/@name,'1') and not(boolean($run_number))">_open.dat</xsl:when>
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'8')">_open.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'10')">_open.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'1') and contains($diffuserThickness,'12')">_open.dat</xsl:when> 
@@ -82,6 +83,7 @@
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'13')">_open.dat</xsl:when>
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'2')">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'6')">_closed.dat</xsl:when> 
+					<xsl:when test="contains(Iris/@name,'2') and not(boolean($run_number))">_closed.dat</xsl:when>
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'10')">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'4')">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'2') and contains($diffuserThickness,'3')">_closed.dat</xsl:when> 
@@ -98,7 +100,8 @@
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'11')">_open.dat</xsl:when>
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'4')">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'5')">_closed.dat</xsl:when> 
-					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'6')">_closed.dat</xsl:when> 
+					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'6')">_closed.dat</xsl:when>
+					<xsl:when test="contains(Iris/@name,'3') and not(boolean($run_number))">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'7')">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'12')">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'3') and contains($diffuserThickness,'13')">_closed.dat</xsl:when> 
@@ -110,7 +113,8 @@
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'3')">_open.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'4')">_open.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'5')">_open.dat</xsl:when> 
-					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'6')">_open.dat</xsl:when> 
+					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'6')">_open.dat</xsl:when>
+					<xsl:when test="contains(Iris/@name,'4') and not(boolean($run_number))">_open.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'7')">_open.dat</xsl:when>
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'8')">_closed.dat</xsl:when> 
 					<xsl:when test="boolean($run_number) and contains(Iris/@name,'4') and contains($diffuserThickness,'9')">_closed.dat</xsl:when> 

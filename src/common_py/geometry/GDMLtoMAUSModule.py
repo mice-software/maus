@@ -94,6 +94,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                 self.maus_information_file = found_file
             if fname == 'Quad456.gdml' or \
                    fname == 'Quad789.gdml' or \
+                   fname == 'Dipole2.gdml' or \
                    fname == 'SpectrometerSolenoidDS.gdml' or \
                    fname == 'AFC.gdml':
                  found_file = os.path.join(self.path, fname)
@@ -111,6 +112,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                and fname.find('Cooling_Channel') < 0\
                and fname.find('Quad456') < 0\
                and fname.find('Quad789') < 0\
+               and fname.find('Dipole2.gdml') < 0\
                and fname.find('AFC') < 0:
                 
                 stepfile = os.path.join(self.path, fname)
