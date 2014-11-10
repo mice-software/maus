@@ -31,10 +31,12 @@
 #include "TApplication.h"
 #include "TGClient.h"
 #include "TCut.h"
-#include "TPaveText.h"
 
 // MAUS headers
-#include "src/common_cpp/Plotting/SciFi/TrackerDataAnalyserMomentum.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsKF.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsPR.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
@@ -47,7 +49,7 @@ int main(int argc, char *argv[]) {
   // First argument to code should be the input ROOT file name
   std::string filename = std::string(argv[1]);
 
-  // Analysis parameters - some may be overidden with command line arguments. All momenta in MeV/c.
+  // Analysis parameters - some may be overridden with command line arguments. All momenta in MeV/c.
   int n_pt_bins = 100;        // No. of bins in histos used to find pt resols (0 = let ROOT decide)
   int n_pz_bins = 100;        // No. of bins in histos used to find pz resols (0 = let ROOT decide)
   int n_points = 9;           // No. of data points in each resolution plot
@@ -91,29 +93,52 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Set up analysis class
-  MAUS::TrackerDataAnalyserMomentum analyser;
-  analyser.set_n_pt_bins(n_pt_bins);
-  analyser.set_n_pz_bins(n_pz_bins);
-  analyser.set_n_points(n_points);
-  analyser.set_pt_fit_min(pt_fit_min);
-  analyser.set_pt_fit_max(pt_fit_max);
-  analyser.set_pz_fit_min(pz_fit_min);
-  analyser.set_pz_fit_max(pz_fit_max);
-  analyser.set_resol_lower_bound(lower_bound);
-  analyser.set_resol_upper_bound(upper_bound);
-  analyser.set_cut_pz_rec(pz_rec_cut);
-  std::cout << "Pt resolution histogram number of bins: " << analyser.get_n_pt_bins() << "\n";
-  std::cout << "Pt resolution histogram fit lower bound: " << analyser.get_pt_fit_min() << "\n";
-  std::cout << "Pt resolution histogram fit upper bound: " << analyser.get_pt_fit_max() << "\n";
-  std::cout << "Pz resolution histogram number of bins: " << analyser.get_n_pz_bins() << "\n";
-  std::cout << "Pz resolution histogram fit lower bound: " << analyser.get_pz_fit_min() << "\n";
-  std::cout << "Pz resolution histogram fit upper bound: " << analyser.get_pz_fit_max() << "\n";
-  std::cout << "Resolution graphs number of points:  " << analyser.get_n_points() << "\n";
-  std::cout << "Resolution graphs lower bound:  " << analyser.get_resol_lower_bound() << " MeV/c\n";
-  std::cout << "Resolution graphs upper bound:  " << analyser.get_resol_upper_bound() << " MeV/c\n";
-  std::cout << "Pz rec cut: " << analyser.get_cut_pz_rec() << " MeV/c\n";
-  analyser.setUp();
+  // Set up analysis and display classes
+  MAUS::SciFiAnalysis analyser;
+
+  // Create Pat Rec momentum residual display
+  MAUS::SciFiDisplayMomentumResidualsPR* pr_residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
+
+  // Create a Kalman fit momentum residual display
+  MAUS::SciFiDisplayMomentumResidualsKF* kf_residuals = new MAUS::SciFiDisplayMomentumResidualsKF();
+
+  // Create Pat Rec momentum resolutions display
+  MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
+    new MAUS::SciFiDisplayMomentumResolutionsPR();
+  resolutions->set_n_pt_bins(n_pt_bins);
+  resolutions->set_n_pz_bins(n_pz_bins);
+  resolutions->set_n_points(n_points);
+  resolutions->set_pt_fit_min(pt_fit_min);
+  resolutions->set_pt_fit_max(pt_fit_max);
+  resolutions->set_pz_fit_min(pz_fit_min);
+  resolutions->set_pz_fit_max(pz_fit_max);
+  resolutions->set_lower_bound_pzmc(150.0);
+  resolutions->set_upper_bound_pzmc(250.0);
+  resolutions->set_resol_lower_bound(lower_bound);
+  resolutions->set_resol_upper_bound(upper_bound);
+  resolutions->set_cut_pz_rec(pz_rec_cut);
+  std::cout << "Pt resol histogram number of bins: " << resolutions->get_n_pt_bins() << "\n";
+  std::cout << "Pt resol histogram fit lower bound: " << resolutions->get_pt_fit_min() << "\n";
+  std::cout << "Pt resol histogram fit upper bound: " << resolutions->get_pt_fit_max() << "\n";
+  std::cout << "Pz resol histogram number of bins: " << resolutions->get_n_pz_bins() << "\n";
+  std::cout << "Pz resol histogram fit lower bound: " << resolutions->get_pz_fit_min() << "\n";
+  std::cout << "Pz resol histogram fit upper bound: " << resolutions->get_pz_fit_max() << "\n";
+  std::cout << "Resol graphs number of points:  " << resolutions->get_n_points() << "\n";
+  std::cout << "Resol graphs pzmc lower bound:  " << resolutions->get_lower_bound_pzmc()
+            << " MeV/c\n";
+  std::cout << "Resol graphs pzmc upper bound:  " << resolutions->get_upper_bound_pzmc()
+            << " MeV/c\n";
+  std::cout << "Resol graphs ptmc lower bound:  " << resolutions->get_resol_lower_bound()
+            << " MeV/c\n";
+  std::cout << "Resol graphs ptmc upper bound:  " << resolutions->get_resol_upper_bound()
+            << " MeV/c\n";
+  std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
+
+  // Set up the displays
+  analyser.AddDisplay(pr_residuals);
+  analyser.AddDisplay(kf_residuals);
+  analyser.AddDisplay(resolutions);
+  analyser.SetUpDisplays();
 
   // Set up ROOT app, input file, and MAUS data class
   TApplication theApp("App", &argc, argv);
@@ -129,7 +154,7 @@ int main(int argc, char *argv[]) {
     MAUS::Spill* spill = data.GetSpill();
     if (spill != NULL && spill->GetDaqEventType() == "physics_event") {
       if ( fmod(counter, 1000) == 0 ) std::cout << "Total number of spills: " << counter << ".\n";
-      analyser.accumulate(spill);
+      analyser.Process(spill);
       if (bool_pause) {
         std::cout << "Press Enter to Continue";
         std::cin.ignore();
@@ -139,48 +164,26 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Make the final plots
-  analyser.make_residual_histograms();
-  analyser.make_residual_graphs();
-  analyser.make_pt_resolutions();
-  analyser.make_pz_resolutions();
-  analyser.make_resolution_graphs();
-  if (save_type != "") analyser.save_graphics(save_type);
+  // Tidy up
+  infile.close();
+
+  // Make the final plots and save
+  analyser.Plot();
+  analyser.Save();
+
+  theApp.Run();
 
   // Print some results
-  double efficiency = static_cast<double>(analyser.get_n_rec_tracks_matched())
-                      / static_cast<double>(analyser.get_n_mc_tracks_valid());
-  double purity = static_cast<double>(analyser.get_n_rec_tracks_matched())
-                  / static_cast<double>(analyser.get_n_rec_tracks_total());
-
-  std::cerr << "\n-------------------------Results-------------------------\n";
-  std::cerr << "n_mc_tracks_valid: " << analyser.get_n_mc_tracks_valid() << std::endl;
-  std::cerr << "n_rec_tracks_invalid: " << analyser.get_n_mc_tracks_invalid() << std::endl;
-  std::cerr << "n_rec_tracks_matched: " << analyser.get_n_rec_tracks_matched() << std::endl;
-  std::cerr << "n_rec_tracks_unmatched: " << analyser.get_n_rec_tracks_unmatched() << std::endl;
-  std::cerr << "n_rec_tracks_total: " << analyser.get_n_rec_tracks_total() << std::endl;
-  std::cerr << "=> Efficiency: " << efficiency << std::endl;
-  std::cerr << "=> Purity: " << purity << std::endl;
-
-  TCanvas c1("c1", "Info", 300, 200);
-  TPaveText tpt1(.05, .1, .95, .8);
-  tpt1.SetFillColor(kWhite);
-  tpt1.AddText("Run Results");
-  tpt1.AddLine(.0, .66, 1., .66);
-  std::stringstream ss1;
-  ss1 << "Efficiency: " << efficiency;
-  tpt1.AddText(ss1.str().c_str());
-  ss1.clear();
-  ss1.str("");
-  ss1 << "Purity: " << purity;
-  tpt1.AddText(ss1.str().c_str());
-  c1.Update();
-  tpt1.Draw();
-
-  // Tidy up
-  analyser.save_root();
-  infile.close();
-  theApp.Run();
+//   std::cerr << "\n-------------------------Results-------------------------\n";
+//   std::cerr << "n_mc_tracks_valid: " << analyser.get_n_mc_tracks_valid() << std::endl;
+//   std::cerr << "n_rec_tracks_invalid: " << analyser.get_n_mc_tracks_invalid() << std::endl;
+//   std::cerr << "n_rec_tracks_matched: " << analyser.get_n_rec_tracks_matched() << std::endl;
+//   std::cerr << "n_rec_tracks_unmatched: " << analyser.get_n_rec_tracks_unmatched() << std::endl;
+//   std::cerr << "n_rec_tracks_total: " << analyser.get_n_rec_tracks_total() << std::endl;
+//   std::cerr << "=> Efficiency: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
+//     / static_cast<double>(analyser.get_n_mc_tracks_valid()) << std::endl;
+//   std::cerr << "=> Purity: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
+//     / static_cast<double>(analyser.get_n_rec_tracks_total()) << std::endl;
 
   return 0;
 }
