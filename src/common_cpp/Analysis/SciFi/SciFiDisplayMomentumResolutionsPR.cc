@@ -401,7 +401,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
     if (mCanvas) {
       mCanvas->Clear();
     } else {
-      mCanvas = new TCanvas("cResolutions", "Momentum Resolutions");
+      mCanvas = new TCanvas("cMomResolutionsPR", "Momentum Resolutions PR");
     }
     lCanvas = mCanvas;
   }

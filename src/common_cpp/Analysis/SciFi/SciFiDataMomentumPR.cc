@@ -34,7 +34,8 @@
 
 namespace MAUS {
 
-SciFiDataMomentumPR::SciFiDataMomentumPR() : mNUnmatchedTracks(0),
+SciFiDataMomentumPR::SciFiDataMomentumPR() : mUseSecondaries(false),
+                                             mNUnmatchedTracks(0),
                                              mNMatchedTracks(0),
                                              mDataPR(0) {
   // Do nothing

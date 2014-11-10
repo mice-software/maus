@@ -177,7 +177,7 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     TFile* mOf1;                      /** The output ROOT file */
     TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
     SciFiDataMomentumPR* mSpillData;  /** The reduced data object, covering one spill */
-    MomentumDataPR mTrackData;          /** Struct containing reduced data for one track in a spill */
+    MomentumDataPR mTrackData;        /** Struct containing reduced data for 1 track in a spill */
 
     // Resolution Graphs
     TGraphErrors* _t1_pt_resol_pt_mc;
@@ -199,8 +199,8 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     int _pz_fit_max;          /// The upper limit of each fit used to calc the pz resolution pnts
     double _upper_bound_pzmc;
     double _lower_bound_pzmc;
-    double _resol_lower_bound;   /// The lower bound of the pt_mc range for the pz resolution graphs
-    double _resol_upper_bound;   /// The upper bound of the pt_mc range for the pz resolution graph
+    double _resol_lower_bound;  /// The lower bound of the pt_mc range for the pz resolution graphs
+    double _resol_upper_bound;  /// The upper bound of the pt_mc range for the pz resolution graphs
     double _cut_pz_rec;         /// Cut on the reconstructed pz
 };
 

@@ -50,6 +50,9 @@ class SciFiDisplayBase  {
     /** Save the data and plots (e.g. as pdfs, to ROOT file, ...) */
     virtual void Save() = 0;
 
+    /** Set the Canvas pointer, up to user to delete previous Canvas if needed */
+    void SetCanvas(TCanvas* aCanvas) { mCanvas = aCanvas; }
+
     /** Sets up the SciFiData object needed by the display, and any other objects (e.g. ROOT Trees).
      *  The display does not own the SciFiData object, but rather this should be called by
      *  the SciFiAnalysis class which then assumes ownership.

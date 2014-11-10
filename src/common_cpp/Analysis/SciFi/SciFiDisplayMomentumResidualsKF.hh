@@ -88,7 +88,6 @@ class SciFiDisplayMomentumResidualsKF : public SciFiDisplayBase {
     TH1D* mResidualPzT2;         /** Pz residual histogram for tracker 2 */
     TH1D* mResidualPzT2Log;      /** Pz residual histogram for tracker 2 (log scale) */
 };
-
 }
 
 #endif
