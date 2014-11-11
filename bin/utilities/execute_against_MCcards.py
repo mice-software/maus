@@ -76,16 +76,19 @@ def arg_parser():
     parser = argparse.ArgumentParser(description=DESCRIPTION, \
                            formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--input-file', dest='input_file', \
-                        help='Read in raw data tarball file with this name', \
+                        help='Read interface file with this name', \
+                        required=True)
+    parser.add_argument('--input-dir', dest='input_dir',\
+                        help='Read in raw data contained in the named directory', \
                         required=True)
     parser.add_argument('--test', dest='test_mode', \
                         help='Run the batch job using test cdb output',
                         action='store_true', default=False)
     parser.add_argument('--no-test', dest='test_mode', \
-                        help="Don't run the batch job using test cdb output",
+                        help="Don't run the batch job using test cdb output",\
                         action='store_false', default=False)
-    parser.add_argument('--batch-iteration', dest='batch_iteration', type=str,
-                        help='Batch iteration number for configuration DB',
+    parser.add_argument('--mcserialnumber', dest='mc_iteration', type=str,\
+                        help='MC Serial number for configuration DB',\
                         default='')
     return parser
 
@@ -132,7 +135,7 @@ class RunManager:
         @param args_in_ arg_parser object (called from arg_parser function)
         """
         self.logs = FileManager()
-        self.logs.open_log('download.log', 'sim.log', 'reco.log', 'batch.log')
+        self.logs.open_log('download.log', 'sim.log', 'batch.log')
         self.run_setup = RunSettings(args_in_)
         self.logs.tar_file_name = self.run_setup.tar_file_name
 
@@ -176,11 +179,11 @@ class RunManager:
         print 'Setup files'
         print '   ', self.run_setup.download_target
         print '   ', self.run_setup.input_file_name
+        print '   ', self.run_setup.input_dir_name
         print '   ', os.getcwd()
         self.cleanup()
         os.mkdir(self.run_setup.download_target)
-        tar_in = tarfile.open(self.run_setup.input_file_name)
-        tar_in.extractall()
+        
 
     def cleanup(self):
         """
@@ -242,8 +245,8 @@ class RunManager:
                                                        stderr=subprocess.STDOUT)
         proc.wait()
         self.logs.tar_queue.append(self.run_setup.mc_file_name)
-        print "Added ",self.run_setup.mc_file_name," to queue."
         print self.logs.tar_queue
+        # print self.logs.tar_queue
         
         # assuming all of the useful bits of the reconstruction are in simulate_mice we can stop here.
 
@@ -270,9 +273,9 @@ class RunManager:
         and closes log files.
         """
         if not self.run_setup == None:
+            self.logs.close_log()
             if not self.run_setup.test_mode:
                 self.cleanup()
-            self.logs.close_log()
 
 
 class RunSettings: #pylint: disable = R0902
@@ -293,19 +296,20 @@ class RunSettings: #pylint: disable = R0902
         All other file names etc are then built off that
         """
         self.input_file_name = args_in.input_file
+        self.input_dir_name  = args_in.input_dir
         self.test_mode = args_in.test_mode    
-        self.batch_iteration = args_in.batch_iteration
+        self.mc_iteration = args_in.mc_iteration
         self.run_number = self.get_run_number_from_file_name \
                                                           (self.input_file_name)
         self.run_number_as_string = str(self.run_number).rjust(5, '0')
         self.tar_file_name = self.run_number_as_string+"_offline.tar"
         self.recon_file_name = self.run_number_as_string+"_recon.root"
         self.mc_file_name = self.run_number_as_string+"_sim.root"
-        self.g4bl_interface = "jsondocother11_"+\
-                              str(self.run_number)+".txt"
+        self.g4bl_interface = os.path.join(self.input_dir_name,self.input_file_name)
+        print self.g4bl_interface
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = '%s/downloads' % os.getcwd()
-        self.geometry_id = '44'
+        self.geometry_id = '45'
         
 
     # This will need to be adjusted to handle the MC data card format.
@@ -320,7 +324,8 @@ class RunSettings: #pylint: disable = R0902
 
         @returns run number as an int
         """
-        file_name.lstrip('0')
+        # file_name.lstrip('jsondocother11_')
+        file_name = file_name.split('_')[1]
         file_name = file_name.split('.')[0]
         run_number = int(file_name)
         return run_number
@@ -406,7 +411,7 @@ class FileManager: # pylint: disable = R0902
         """
         return self._is_open
 
-    def open_log(self, download_name, sim_name, rec_name, batch_name):
+    def open_log(self, download_name, sim_name, batch_name):
         """
         Open the log files
 
@@ -420,7 +425,7 @@ class FileManager: # pylint: disable = R0902
         sys.stderr = self.batch_log
         sys.stdout = self.batch_log
         self.sim_log = open(sim_name, 'w')
-        self.rec_log = open(rec_name, 'w')
+        # self.rec_log = open(rec_name, 'w')
         self.tar_queue += [download_name, sim_name, batch_name]
         self._is_open = True
 
@@ -434,19 +439,17 @@ class FileManager: # pylint: disable = R0902
             return
         self.batch_log.close()
         self.sim_log.close()
-        self.rec_log.close()
         self.download_log.close()
         if self.tar_file_name != None:
             if os.path.isfile(self.tar_file_name):
                 os.remove(self.tar_file_name)
             tar_file = tarfile.open(self.tar_file_name, 'w:gz')
             for item in self.tar_queue:
-                print item
                 if os.path.isfile(self.tar_file_name):         
                     tar_file.add(item)
             tar_file.close()
             for item in self.tar_queue:
-                print item
+                # print item
                 if os.path.isfile(item):       
                     pass # cleanup does something weird...
         self._is_open = False
@@ -477,6 +480,7 @@ def main(argv):
     try:
         my_run = RunManager(args_in_)
         my_return_value = my_run.run()
+        del my_run
     # download errors are considered transient - i.e. try again later
     except DownloadError:
         print "Fail Download"
@@ -489,11 +493,11 @@ def main(argv):
     # some other exception - probably a failure in this script - needs
     # investigation
     except:
-        print "Fail Something Else"
+        #print "Fail Something Else"
         my_return_value = 3
         sys.excepthook(*sys.exc_info())
-    finally:
-        del my_run
+        
+
     return my_return_value
         
 

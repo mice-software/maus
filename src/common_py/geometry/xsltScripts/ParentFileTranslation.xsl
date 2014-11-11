@@ -150,7 +150,7 @@
                             </xsl:text></xsl:when>
                             <xsl:when test="contains(@name, 'FCD')">Substitution $FCDCurrent <xsl:value-of select="@iset"/>
                                 Substitution $FCDPolarity <xsl:value-of select="../@polarity"/>
-                                Substitution $FCDMode <xsl:wh select="../@mode"/><xsl:text>
+                                Substitution $FCDMode <xsl:value-of select="../@mode"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
                      </xsl:choose>
@@ -278,13 +278,13 @@
                             PropertyDouble Thickness <xsl:value-of select="Thickness/@value"/>
                             PropertyDouble InnerRadius <xsl:value-of select="InnerRadius/@value"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M2Polarity*$SSU_M2Current/135*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M1Polarity*$SSU_M1Current/113*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M2Polarity*$SSU_M2Current/140*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M1Polarity*$SSU_M1Current/112*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'EndCoil2') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_E2Polarity*$SSU_E2Current/134*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_CPolarity*$SSU_CCurrent/147*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'EndCoil1') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_E1Polarity*$SSU_E1Current/131*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M2Polarity*$FCMCurrent/180*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_M2Polarity*$FCMCurrent/180*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M2Polarity*$FCMCurrent/104*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_M2Polarity*$FCMCurrent/104*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'MatchCoil2') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_M2Polarity*$SSD_M2Current/140*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'MatchCoil1') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_M1Polarity*$SSD_M1Current/112*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'EndCoil2') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_E2Polarity*$SSD_E2Current/134*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
