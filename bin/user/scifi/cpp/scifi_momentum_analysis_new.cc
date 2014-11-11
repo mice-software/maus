@@ -96,15 +96,13 @@ int main(int argc, char *argv[]) {
   // Set up analysis and display classes
   MAUS::SciFiAnalysis analyser;
 
-  // Add Pat Rec momentum residual display
+  // Create Pat Rec momentum residual display
   MAUS::SciFiDisplayMomentumResidualsPR* pr_residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
-  analyser.AddDisplay(pr_residuals);
 
-  // Add a Kalman fit momentum residual display
+  // Create a Kalman fit momentum residual display
   MAUS::SciFiDisplayMomentumResidualsKF* kf_residuals = new MAUS::SciFiDisplayMomentumResidualsKF();
-  // analyser.AddDisplay(kf_residuals);
 
-  // Add Pat Rec momentum resolutions display
+  // Create Pat Rec momentum resolutions display
   MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
     new MAUS::SciFiDisplayMomentumResolutionsPR();
   resolutions->set_n_pt_bins(n_pt_bins);
@@ -135,14 +133,15 @@ int main(int argc, char *argv[]) {
   std::cout << "Resol graphs ptmc upper bound:  " << resolutions->get_resol_upper_bound()
             << " MeV/c\n";
   std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
-  // analyser.AddDisplay(resolutions);
-
 
   // Set up the displays
+  analyser.AddDisplay(pr_residuals);
+  analyser.AddDisplay(kf_residuals);
+  analyser.AddDisplay(resolutions);
   analyser.SetUpDisplays();
 
   // Set up ROOT app, input file, and MAUS data class
-  // TApplication theApp("App", &argc, argv);
+  TApplication theApp("App", &argc, argv);
   std::cout << "Opening file " << filename << std::endl;
   irstream infile(filename.c_str(), "Spill");
   MAUS::Data data;
@@ -172,7 +171,7 @@ int main(int argc, char *argv[]) {
   analyser.Plot();
   analyser.Save();
 
-  // theApp.Run();
+  theApp.Run();
 
   // Print some results
 //   std::cerr << "\n-------------------------Results-------------------------\n";

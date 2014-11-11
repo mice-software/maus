@@ -99,67 +99,67 @@ void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     // Calc MC momentum
     ///////////////////
 
-//    std::vector< std::vector<int> > mc_tids;  // Vector of MC track ids for each spoint
-//    std::vector<SciFiTrackPoint*> tps = trk->scifitrackpoints();
-//    // Loop over trackpoints associated with the track
-//    for ( size_t iTP = 0; iTP < tps.size(); ++iTP ) {
-//      std::map<int, int> track_id_counter;  // Map of track id to freq for each spoint
-//      SciFiCluster* clus = tps[iTP]->get_cluster_pointer();
-//      std::vector<SciFiDigit*> digits = clus->get_digits_pointers();
-//
-//      // Loop over digits
-//      for ( size_t m = 0; m < digits.size(); ++m ) {
-//        // Perform the digits to hits lookup
-//        std::vector<SciFiHit*> hits;
-//        if (!lkup.get_hits(digits[m], hits)) {
-//          std::cerr << "Lookup failed\n";
-//          continue;
-//        }
-//
-//        // Loop over MC hits
-//        for ( size_t n = 0; n < hits.size(); ++n ) {
-//          int track_id = hits[n]->GetTrackId();
-//          if (track_id_counter.count(track_id))
-//            track_id_counter[track_id] = track_id_counter[track_id] + 1;
-//          else
-//            track_id_counter[track_id] = 1;
-//        } // ~Loop over MC hits
-//      } // ~Loop over digits
-//
-//      // Find the track_ids for this spacepoint
-//      std::map<int, int>::iterator mit1;
-//      std::vector<int> mc_tracks_ids;
-//      for ( mit1 = track_id_counter.begin(); mit1 != track_id_counter.end(); ++mit1 ) {
-//        mc_tracks_ids.push_back(mit1->first);
-//      }
-//      mc_tids.push_back(mc_tracks_ids);
-//    } // ~Loop over track points
-//
-//    // Is there a track id associated with 3 or more track points?
-//    int track_id = 0;
-//    int counter = 0;
-//    bool success = SciFiAnalysisTools::find_mc_tid(mc_tids, 7, track_id, counter);
-//    // If we have not found a common track id, abort for this track
-//    if (!success) {
-//      std::cerr << "Malformed track, skipping\n";
-//      break;
-//    }
-//
+    std::vector< std::vector<int> > mc_tids;  // Vector of MC track ids for each spoint
+    std::vector<SciFiTrackPoint*> tps = trk->scifitrackpoints();
+    // Loop over trackpoints associated with the track
+    for ( size_t iTP = 0; iTP < tps.size(); ++iTP ) {
+      std::map<int, int> track_id_counter;  // Map of track id to freq for each spoint
+      SciFiCluster* clus = tps[iTP]->get_cluster_pointer();
+      std::vector<SciFiDigit*> digits = clus->get_digits_pointers();
+
+      // Loop over digits
+      for ( size_t m = 0; m < digits.size(); ++m ) {
+        // Perform the digits to hits lookup
+        std::vector<SciFiHit*> hits;
+        if (!lkup.get_hits(digits[m], hits)) {
+          std::cerr << "Lookup failed\n";
+          continue;
+        }
+
+        // Loop over MC hits
+        for ( size_t n = 0; n < hits.size(); ++n ) {
+          int track_id = hits[n]->GetTrackId();
+          if (track_id_counter.count(track_id))
+            track_id_counter[track_id] = track_id_counter[track_id] + 1;
+          else
+            track_id_counter[track_id] = 1;
+        } // ~Loop over MC hits
+      } // ~Loop over digits
+
+      // Find the track_ids for this spacepoint
+      std::map<int, int>::iterator mit1;
+      std::vector<int> mc_tracks_ids;
+      for ( mit1 = track_id_counter.begin(); mit1 != track_id_counter.end(); ++mit1 ) {
+        mc_tracks_ids.push_back(mit1->first);
+      }
+      mc_tids.push_back(mc_tracks_ids);
+    } // ~Loop over track points
+
+    // Is there a track id associated with 3 or more track points?
+    int track_id = 0;
+    int counter = 0;
+    bool success = SciFiAnalysisTools::find_mc_tid(mc_tids, 7, track_id, counter);
+    // If we have not found a common track id, abort for this track
+    if (!success) {
+      std::cerr << "Malformed track, skipping\n";
+      break;
+    }
 
     // Calc the MC track info using hits only with this track id
     ThreeVector mom;
     SciFiCluster* clus = tp->get_cluster_pointer();
-/*    success = SciFiAnalysisTools::find_mc_cluster_momentum(track_id, clus, lkup, mom);
+    success = SciFiAnalysisTools::find_mc_cluster_momentum(track_id, clus, lkup, mom);
     if (!success) {
       std::cerr << "Failed to find Kalman MC info\n";
       break;
-    } */
+    }
 
-
+/*
     SciFiDigit* dig = clus->get_digits_pointers().at(0);
     std::vector<SciFiHit*> hits;
     lkup.get_hits(dig, hits);
     mom = hits[0]->GetMomentum();
+*/
 
     lDataStruct.xMc = 0;
     lDataStruct.yMc = 0;

@@ -58,13 +58,20 @@ class SciFiDataMomentumPR : public SciFiDataMomentum {
     /** Destructor */
     virtual ~SciFiDataMomentumPR();
 
+    /** Get the flag determining if secondaries take part in the analyses */
+    bool GetUseSecondaries() { return mUseSecondaries; }
+
     /** Set all the member variables to zero */
     void Clear();
 
     /** Calculate the reduced momentum data for an event */
     virtual void ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent);
 
+    /** Get the flag determining if secondaries take part in the analyses */
+    void SetUseSecondaries(bool aUseSecondaries) { mUseSecondaries = aUseSecondaries; }
+
   protected:
+    bool mUseSecondaries;   /** Do we want to use secondaries in the analysis (default yes) */
     int mNUnmatchedTracks;  /** No. of tracks which could not associate with MC track */
     int mNMatchedTracks;    /** No. of recon tracks matched to an MC track */
     std::vector<MomentumDataPR> mDataPR;  /** Vector holding reduced data for one track */

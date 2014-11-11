@@ -47,11 +47,14 @@ class SciFiAnalysis {
     /** Destructor */
     virtual ~SciFiAnalysis();
 
+    /** Add a data module */
+    void AddSciFiData(SciFiDataBase* aData) { mSciFiData.push_back(aData); }
+
     /** Add a data display module */
     void AddDisplay(SciFiDisplayBase* aDisplay) { mDisplays.push_back(aDisplay); }
 
     /** Get the SciFiData member */
-    SciFiDataBase* GetSciFiData() { return mSciFiData; }
+    std::vector<SciFiDataBase*> GetSciFiData() { return mSciFiData; }
 
     /** Produce the plots */
     void Plot();
@@ -67,10 +70,10 @@ class SciFiAnalysis {
     void SetUpDisplays();
 
     /** Set the SciFiData, which particular derived class depends on what analysis is required */
-    void SetSciFiData(SciFiDataBase* aSciFiData) { mSciFiData = aSciFiData; }
+    void SetSciFiData(std::vector<SciFiDataBase*> aSciFiData) { mSciFiData = aSciFiData; }
 
   private:
-    SciFiDataBase* mSciFiData;                 /** The SciFiData object */
+    std::vector<SciFiDataBase*> mSciFiData;    /** The SciFiData objects */
     std::vector<SciFiDisplayBase*> mDisplays;  /** Vector of the different data displays */
 };
 

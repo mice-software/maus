@@ -82,7 +82,7 @@ void SciFiDisplayMomentumResidualsKF::Plot(TCanvas* aCanvas) {
     if (mCanvas) {
       mCanvas->Clear();
     } else {
-      mCanvas = new TCanvas("cResiduals", "Momentum Residuals");
+      mCanvas = new TCanvas("cMomResidualsKF", "Momentum Residuals KF");
     }
     lCanvas = mCanvas;
   }
@@ -119,7 +119,6 @@ void SciFiDisplayMomentumResidualsKF::Save() {
     if (mCanvas) mCanvas->Write();
     mOf1->Close();
   }
-
 }
 
 SciFiDataBase* SciFiDisplayMomentumResidualsKF::SetUp() {

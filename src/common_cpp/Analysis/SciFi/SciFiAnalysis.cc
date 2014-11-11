@@ -21,12 +21,14 @@
 
 namespace MAUS {
 
-SciFiAnalysis::SciFiAnalysis() : mSciFiData(NULL) {
+SciFiAnalysis::SciFiAnalysis() : mSciFiData(0) {
   // Do nothing
 }
 
 SciFiAnalysis::~SciFiAnalysis() {
-  if (mSciFiData) delete mSciFiData;
+  for ( size_t i = 0; i < mSciFiData.size(); ++i ) {
+    if (mSciFiData[i]) delete mSciFiData[i];
+  }
 }
 
 bool SciFiAnalysis::Process(Spill* aSpill) {
@@ -35,16 +37,15 @@ bool SciFiAnalysis::Process(Spill* aSpill) {
     return false;
   } else if ( aSpill->GetDaqEventType() != "physics_event" ) {
     return false;
-  } else if ( !mSciFiData ) {
-    return false;
   }
 
   // Reduce the SciFi Data and store in the SciFiData object
-  mSciFiData->Clear();
-  mSciFiData->Process(aSpill);
+  for ( size_t i = 0; i < mSciFiData.size(); ++i ) {
+    mSciFiData[i]->Clear();
+    mSciFiData[i]->Process(aSpill);
+  }
 
   // Update each of the displays objects added
-  std::vector<SciFiDisplayBase*>::iterator lDisplay;
   for ( size_t i = 0; i < mDisplays.size(); ++i ) {
     mDisplays[i]->Fill();
   }
@@ -54,6 +55,7 @@ bool SciFiAnalysis::Process(Spill* aSpill) {
 void SciFiAnalysis::Plot() {
   for ( size_t i = 0; i < mDisplays.size(); ++i ) {
     mDisplays[i]->Plot();
+    mDisplays[i]->GetCanvas()->Update();
   }
 }
 
@@ -64,9 +66,8 @@ void SciFiAnalysis::Save() {
 }
 
 void SciFiAnalysis::SetUpDisplays() {
-  if (mSciFiData) delete mSciFiData;
   for ( size_t i = 0; i < mDisplays.size(); ++i ) {
-    mSciFiData = mDisplays[i]->SetUp();
+    mSciFiData.push_back(mDisplays[i]->SetUp());
   }
 }
 
