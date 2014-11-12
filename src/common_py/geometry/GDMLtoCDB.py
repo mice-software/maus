@@ -304,24 +304,24 @@ class Downloader: #pylint: disable = R0902
             fout.close()
 
     
-    def download_coolingchannel_for_run(self, run_id, downloadpath): #pylint: disable = R0201, C0301
-        """
-        @Method download geometry for run 
+    # def download_coolingchannel_for_run(self, run_id, downloadpath): #pylint: disable = R0201, C0301
+    #    """
+    #    @Method download geometry for run 
 
-        This method gets the geometry, for the given run number, from the 
-        database then passes the string to the unpack method which unpacks it.
-        
-        @param  id The long ID run number for the desired geometry.
-        @param  downloadedpath The path location where the files will be 
-                               unpacked to.
-        """
-        if os.path.exists(downloadpath) == False:
-            raise OSError('Path '+downloadpath+' does not exist')
-        else:        
-            coolingchannel_cdb = cdb.CoolingChannel()
-            downloadedfile = coolingchannel_cdb.get_coolingchannel_for_run(run_id)
-            path = downloadpath + '/CoolingChannelInfo.gdml'
-            fout = open(path, 'w')
-            fout.write(str(downloadedfile))
-            fout.close()
+    #    This method gets the geometry, for the given run number, from the 
+    #    database then passes the string to the unpack method which unpacks it.
+    #    
+    #    @param  id The long ID run number for the desired geometry.
+    #    @param  downloadedpath The path location where the files will be 
+    #                           unpacked to.
+    #    """
+    #    if os.path.exists(downloadpath) == False:
+    #        raise OSError('Path '+downloadpath+' does not exist')
+    #    else:        
+    #        coolingchannel_cdb = cdb.CoolingChannel()
+    #        downloadedfile = coolingchannel_cdb.get_coolingchannel_for_run(run_id)
+    #        path = downloadpath + '/CoolingChannelInfo.gdml'
+    #        fout = open(path, 'w')
+    #        fout.write(str(downloadedfile))
+    #        fout.close()
 
