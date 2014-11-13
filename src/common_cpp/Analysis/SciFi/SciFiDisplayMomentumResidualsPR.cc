@@ -36,7 +36,6 @@ namespace MAUS {
 
 SciFiDisplayMomentumResidualsPR::SciFiDisplayMomentumResidualsPR() : mOf1(NULL),
                                                                      mTree(NULL),
-                                                                     mSpillData(NULL),
                                                                      mResidualPtT1(NULL),
                                                                      mResidualPzT1(NULL),
                                                                      mResidualPzT1Log(NULL),
@@ -64,8 +63,8 @@ void SciFiDisplayMomentumResidualsPR::Fill() {
   mOf1->cd();
   if (mTree) {
     // Loop over the data for each track in the spill and fill the tree with reduced data
-    for ( size_t i = 0; i < mSpillData->mDataPR.size(); ++i ) {
-      mTrackData = mSpillData->mDataPR[i];
+    for ( size_t i = 0; i < GetData()->mDataPR.size(); ++i ) {
+      mTrackData = GetData()->mDataPR[i];
       mTree->Fill();
       int q = mTrackData.Charge;
       if (mTrackData.TrackerNumber == 0) {
@@ -81,6 +80,15 @@ void SciFiDisplayMomentumResidualsPR::Fill() {
   } else {
     std::cerr << "SciFiDisplayMomentumResidualsPR: Warning, local ROOT Tree not setup\n";
   }
+}
+
+SciFiDataMomentumPR* SciFiDisplayMomentumResidualsPR::GetData() {
+  return dynamic_cast<SciFiDataMomentumPR*>(mSpillData);
+}
+
+SciFiDataBase* SciFiDisplayMomentumResidualsPR::MakeDataObject() {
+  SciFiDataMomentumPR* lData = new SciFiDataMomentumPR();
+  return dynamic_cast<SciFiDataBase*>(lData);
 }
 
 void SciFiDisplayMomentumResidualsPR::Plot(TCanvas* aCanvas) {
@@ -132,14 +140,18 @@ void SciFiDisplayMomentumResidualsPR::Save() {
   }
 }
 
-SciFiDataBase* SciFiDisplayMomentumResidualsPR::SetUp() {
-  SciFiDataBase* data = SetUpSciFiData();
-  SetUpRoot();
-  return data;
+SciFiDataBase* SciFiDisplayMomentumResidualsPR::SetData(SciFiDataBase* data) {
+  if ( dynamic_cast<SciFiDataMomentumPR*>(data) ) {
+    mSpillData = data;
+    return mSpillData;
+  } else {
+    return NULL;
+  }
 }
 
-SciFiDataBase* SciFiDisplayMomentumResidualsPR::SetUpSciFiData() {
-  mSpillData = new SciFiDataMomentumPR();
+SciFiDataBase* SciFiDisplayMomentumResidualsPR::SetUp() {
+  SetUpData();
+  SetUpRoot();
   return mSpillData;
 }
 

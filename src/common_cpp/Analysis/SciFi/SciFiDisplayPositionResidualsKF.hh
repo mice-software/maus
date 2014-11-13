@@ -1,3 +1,4 @@
+
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -15,14 +16,14 @@
  *
  */
 
-/** @class SciFiDisplayMomentumResidualsPR
+/** @class SciFiDisplayPositionResidualsKF
  *
- *  Class to pattern recognition momentum residuals as ROOT histograms
+ *  Class to Kalman fit position residuals as ROOT histograms
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESIDUALSPR_
-#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESDIUALSPR_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYPOSITIONRESIDUALSKF_
+#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYPOSITIONRESDIUALSKF_
 
 // ROOT headers
 #include "TCanvas.h"
@@ -33,30 +34,30 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
 
 
 namespace MAUS {
 
-class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
+class SciFiDisplayPositionResidualsKF : public SciFiDisplayBase {
   public:
     /** Default constructor */
-    SciFiDisplayMomentumResidualsPR();
+    SciFiDisplayPositionResidualsKF();
 
     /** Destructor */
-    virtual ~SciFiDisplayMomentumResidualsPR();
+    virtual ~SciFiDisplayPositionResidualsKF();
 
     /** Clears the class members */
     void Clear();
-
-    /** Return a pointer to the SciFiData object associated with the display */
-    virtual SciFiDataMomentumPR* GetData();
 
     /** Update the internal data used to make the plots using the pointer to the SciFiData object,
      *  accumulating data into the ROOT member variables
      */
     virtual void Fill();
+
+    /** Return a pointer to the SciFiData object associated with the display */
+    virtual SciFiDataKF* GetData();
 
     /** Create a new SciFiData object of the correct derived type */
     virtual SciFiDataBase* MakeDataObject();
@@ -77,19 +78,22 @@ class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
     /** Set up the ROOT TTree, call this after setting up the SciFiData member */
     bool SetUpRoot();
 
-    TFile* mOf1;                      /** The output ROOT file */
-    TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
-    MomentumDataPR mTrackData;        /** Struct containing reduced data for 1 track in a spill */
+    int mNBins;                /** Number of bins in each histogram */
+    int mLowerLimit;          /** Lower bound of the histogram displays */
+    int mUpperLimit;          /** Lower bound of the histogram displays */
+
+    TFile* mOf1;              /** The output ROOT file */
+    TTree* mTree;             /** The ROOT tree used to accumulate the reduced data */
+    DataKF mTrackData;        /** Struct containing reduced data for one track in a spill */
 
     // Residual histograms
-    TH1D* mResidualPtT1;         /** Pt residual histogram for tracker 1 */
-    TH1D* mResidualPzT1;         /** Pz residual histogram for tracker 1 */
-    TH1D* mResidualPzT1Log;      /** Pz residual histogram for tracker 1 (log scale) */
-    TH1D* mResidualPtT2;         /** Pt residual histogram for tracker 2 */
-    TH1D* mResidualPzT2;         /** Pz residual histogram for tracker 2 */
-    TH1D* mResidualPzT2Log;      /** Pz residual histogram for tracker 2 (log scale) */
+    TH1D* mResidualXT1;        /** x residual histogram for tracker 1 */
+    TH1D* mResidualYT1;        /** y residual histogram for tracker 1 */
+    TH1D* mResidualZT1;        /** z residual histogram for tracker 1 */
+    TH1D* mResidualXT2;        /** x residual histogram for tracker 2 */
+    TH1D* mResidualYT2;        /** y residual histogram for tracker 2 */
+    TH1D* mResidualZT2;        /** z residual histogram for tracker 2 */
 };
-
-} // ~namespace MAUS
+}
 
 #endif

@@ -20,12 +20,19 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
 namespace MAUS {
 
-SciFiDisplayBase::SciFiDisplayBase() : mCanvas(NULL) {
+SciFiDisplayBase::SciFiDisplayBase() : mSpillData(NULL), mCanvas(NULL) {
   // Do nothing
 }
 
 SciFiDisplayBase::~SciFiDisplayBase() {
   if (mCanvas) delete mCanvas;
+}
+
+SciFiDataBase* SciFiDisplayBase::SetUpData() {
+  if (!mSpillData) {
+    mSpillData = dynamic_cast<SciFiDataBase*>(MakeDataObject());
+  }
+  return mSpillData;
 }
 
 } // ~namespace MAUS

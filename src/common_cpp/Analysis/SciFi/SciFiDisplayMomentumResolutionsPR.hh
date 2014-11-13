@@ -64,8 +64,15 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
      */
     virtual void Fill();
 
+    /** Return a pointer to the SciFiData object associated with the display */
+    virtual SciFiDataMomentumPR* GetData();
+
     /** Return the cut on reconstructed pz */
     double get_cut_pz_rec() const { return _cut_pz_rec; }
+
+    /** Returns a pointer to the reduced data object associated with the display.
+     *  The data pointer is upcast to  the base class type */
+    virtual SciFiDataBase* GetBaseDataPointer() { return dynamic_cast<SciFiDataBase*>(mSpillData); }
 
     /** Return the number of bins used to make the histos for pt resolution graphs */
     int get_n_pt_bins() const { return _n_pt_bins; }
@@ -100,6 +107,9 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
     /** Return the upper bound of the pt_mc range used in the resolution plots */
     double get_resol_upper_bound() const { return _resol_upper_bound; }
 
+    /** Create a new SciFiData object of the correct derived type */
+    virtual SciFiDataBase* MakeDataObject();
+
     /** Make pt resolution graphs, as a function of pt_mc */
     void make_ptpt_resolutions();
 
@@ -120,6 +130,9 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
 
     /** Set the cut on reconstructed pz using a double, in MeV/c */
     void set_cut_pz_rec(double cut_pz_rec) { _cut_pz_rec = cut_pz_rec; }
+
+    /** Set the SciFiData object associated with the display */
+    SciFiDataBase* SetData(SciFiDataBase* data);
 
     /** Set the number of bins used to make the histos for resolution graphs
         Note: If set to 0, the histos will use the number of bins set automatically by ROOT
@@ -176,7 +189,6 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
 
     TFile* mOf1;                      /** The output ROOT file */
     TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
-    SciFiDataMomentumPR* mSpillData;  /** The reduced data object, covering one spill */
     MomentumDataPR mTrackData;        /** Struct containing reduced data for 1 track in a spill */
 
     // Resolution Graphs

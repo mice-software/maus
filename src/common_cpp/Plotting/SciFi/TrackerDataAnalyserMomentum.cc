@@ -234,8 +234,9 @@ void TrackerDataAnalyserMomentum::calc_pat_rec_efficiency(MCEvent *mc_evt, SciFi
       int counter2 = 0;
       for ( size_t k = 0; k < spnts.size(); ++k ) {
         ThreeVector mom_mc;
-        bool success = SciFiAnalysisTools::find_mc_spoint_momentum(track_id, spnts[k],
-                                                                   lkup, mom_mc);
+        ThreeVector pos_mc;  // We do not use this here, but function below needs the arg
+        bool success = SciFiAnalysisTools::find_mc_spoint_data(track_id, spnts[k],
+                                                               lkup, mom_mc, pos_mc);
         if (!success) continue;
         _pt_mc += sqrt(mom_mc.x()*mom_mc.x() + mom_mc.y()*mom_mc.y());
         _pz_mc += mom_mc.z();

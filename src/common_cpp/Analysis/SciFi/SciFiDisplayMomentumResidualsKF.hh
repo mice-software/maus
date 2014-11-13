@@ -17,7 +17,7 @@
 
 /** @class SciFiDisplayMomentumResidualsKF
  *
- *  Class to pattern recognition momentum residuals as ROOT histograms
+ *  Class to Kalman fit momentum residuals as ROOT histograms
  *
  */
 
@@ -33,7 +33,7 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumKF.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
 
 
@@ -50,10 +50,16 @@ class SciFiDisplayMomentumResidualsKF : public SciFiDisplayBase {
     /** Clears the class members */
     void Clear();
 
+    /** Return a pointer to the SciFiData object associated with the display */
+    virtual SciFiDataKF* GetData();
+
     /** Update the internal data used to make the plots using the pointer to the SciFiData object,
      *  accumulating data into the ROOT member variables
      */
     virtual void Fill();
+
+    /** Create a new SciFiData object of the correct derived type */
+    virtual SciFiDataBase* MakeDataObject();
 
     /** Plot the data currently held */
     virtual void Plot(TCanvas* aCanvas = NULL);
@@ -61,7 +67,9 @@ class SciFiDisplayMomentumResidualsKF : public SciFiDisplayBase {
     /** Save data and plots to a ROOT file  */
     void Save();
 
-    /** Set up the SciFiData object and ROOT tree */
+    /** Set the SciFiData object associated with the display */
+    SciFiDataBase* SetData(SciFiDataBase* data);
+
     virtual SciFiDataBase* SetUp();
 
  private:
@@ -69,16 +77,9 @@ class SciFiDisplayMomentumResidualsKF : public SciFiDisplayBase {
     /** Set up the ROOT TTree, call this after setting up the SciFiData member */
     bool SetUpRoot();
 
-    /** Sets up the SciFiData object needed by the display.
-     *  The display does not own the memory, but rather this should be called by
-     *  the SciFiAnalysis class which then assumes ownership.
-     */
-    SciFiDataBase* SetUpSciFiData();
-
-    TFile* mOf1;                      /** The output ROOT file */
-    TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
-    SciFiDataMomentumKF* mSpillData;  /** The reduced data object, covering one spill */
-    MomentumDataKF mTrackData;        /** Struct containing reduced data for one track in a spill */
+    TFile* mOf1;          /** The output ROOT file */
+    TTree* mTree;         /** The ROOT tree used to accumulate the reduced data */
+    DataKF mTrackData;    /** Struct containing reduced data for one track in a spill */
 
     // Residual histograms
     TH1D* mResidualPtT1;         /** Pt residual histogram for tracker 1 */

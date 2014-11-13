@@ -38,11 +38,18 @@ class SciFiDisplayBase  {
     /** Default constructor */
     SciFiDisplayBase();
 
-    /** Destructor */
+    /** Destructor. Note, the mSpillData pointer memory is not owned by the display class,
+     *  and so is not removed by the destructor  */
     virtual ~SciFiDisplayBase();
 
     /** Return the member Canvas */
     TCanvas* GetCanvas() { return mCanvas; }
+
+    /** Returns a derived class pointer to the reduced data object associated with the display */
+    virtual SciFiDataBase* GetData() = 0;
+
+    /** Create a new SciFiData object of the correct derived type */
+    virtual SciFiDataBase* MakeDataObject() = 0;
 
     /** Plot the data on a ROOT TCanvas */
     virtual void Plot(TCanvas* aCanvas = NULL) = 0;
@@ -53,11 +60,17 @@ class SciFiDisplayBase  {
     /** Set the Canvas pointer, up to user to delete previous Canvas if needed */
     void SetCanvas(TCanvas* aCanvas) { mCanvas = aCanvas; }
 
-    /** Sets up the SciFiData object needed by the display, and any other objects (e.g. ROOT Trees).
-     *  The display does not own the SciFiData object, but rather this should be called by
-     *  the SciFiAnalysis class which then assumes ownership.
-     */
+    /** Set the SciFi object */
+    virtual SciFiDataBase* SetData(SciFiDataBase* data) = 0;
+
+    /** Set up the display class */
     virtual SciFiDataBase* SetUp() = 0;
+
+    /** Ensures the SciFiData member is set up.  If the member is all ready set up it changes
+     *  nothing, if it is not, then MakeDataObject gets called, setting up a new data object for
+     *  the member.
+     */
+    SciFiDataBase* SetUpData();
 
     /** Update the internal data used to make the plots using the pointer to the SciFiData object.
      *  Data may accumulate inside the derived class (e.g. in a ROOT TTree) for plotting
@@ -67,7 +80,12 @@ class SciFiDisplayBase  {
     virtual void Fill() = 0;
 
   protected:
-    TCanvas* mCanvas; /** The ROOT TCanvas on which to plot the data */
+    /** The reduced data object, covering 1 spill. Memory is NOT owned by the display class! */
+    SciFiDataBase* mSpillData;
+    TCanvas* mCanvas;           /** The ROOT TCanvas on which to plot the data */
+
+  private:
+
 };
 
 } // ~namespace MAUS

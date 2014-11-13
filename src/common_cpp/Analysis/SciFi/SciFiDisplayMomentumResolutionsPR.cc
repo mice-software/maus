@@ -42,7 +42,6 @@ namespace MAUS {
 
 SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NULL),
                                                                          mTree(NULL),
-                                                                         mSpillData(NULL),
                                                                          _t1_pt_resol_pt_mc(NULL),
                                                                          _t2_pt_resol_pt_mc(NULL),
                                                                          _t1_pz_resol_pt_mc(NULL),
@@ -124,8 +123,8 @@ void SciFiDisplayMomentumResolutionsPR::Fill() {
   mOf1->cd();
   if (mTree) {
     // Loop over the data for each track in the spill and fill the tree with reduced data
-    for ( size_t i = 0; i < mSpillData->mDataPR.size(); ++i ) {
-      mTrackData = mSpillData->mDataPR[i];
+    for ( size_t i = 0; i < GetData()->mDataPR.size(); ++i ) {
+      mTrackData = GetData()->mDataPR[i];
       mTree->Fill();
       if (mTrackData.TrackerNumber == 0) {
         // TODO: Do I want anything here?
@@ -146,6 +145,15 @@ TCut SciFiDisplayMomentumResolutionsPR::form_tcut(const std::string &var, const 
   ss1 >> s1;
   cut = s1;
   return cut;
+}
+
+SciFiDataMomentumPR* SciFiDisplayMomentumResolutionsPR::GetData() {
+  return dynamic_cast<SciFiDataMomentumPR*>(mSpillData);
+}
+
+SciFiDataBase* SciFiDisplayMomentumResolutionsPR::MakeDataObject() {
+  SciFiDataMomentumPR* lData = new SciFiDataMomentumPR();
+  return dynamic_cast<SciFiDataBase*>(lData);
 }
 
 void SciFiDisplayMomentumResolutionsPR::make_ptpt_resolutions() {
@@ -523,14 +531,18 @@ void SciFiDisplayMomentumResolutionsPR::Save() {
   }
 }
 
-SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetUp() {
-  SciFiDataBase* data = SetUpSciFiData();
-  SetUpRoot();
-  return data;
+SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetData(SciFiDataBase* data) {
+  if ( dynamic_cast<SciFiDataMomentumPR*>(data) ) {
+    mSpillData = data;
+    return mSpillData;
+  } else {
+    return NULL;
+  }
 }
 
-SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetUpSciFiData() {
-  mSpillData = new SciFiDataMomentumPR();
+SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetUp() {
+  SetUpData();
+  SetUpRoot();
   return mSpillData;
 }
 

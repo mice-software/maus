@@ -35,6 +35,7 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayPositionResidualsKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsPR.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -97,10 +98,13 @@ int main(int argc, char *argv[]) {
   MAUS::SciFiAnalysis analyser;
 
   // Create Pat Rec momentum residual display
-  MAUS::SciFiDisplayMomentumResidualsPR* pr_residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
+  MAUS::SciFiDisplayMomentumResidualsPR* pr_mom_residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
+
+  // Create a Kalman fit position residual display
+  MAUS::SciFiDisplayPositionResidualsKF* kf_pos_residuals = new MAUS::SciFiDisplayPositionResidualsKF();
 
   // Create a Kalman fit momentum residual display
-  MAUS::SciFiDisplayMomentumResidualsKF* kf_residuals = new MAUS::SciFiDisplayMomentumResidualsKF();
+  MAUS::SciFiDisplayMomentumResidualsKF* kf_mom_residuals = new MAUS::SciFiDisplayMomentumResidualsKF();
 
   // Create Pat Rec momentum resolutions display
   MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
@@ -135,8 +139,9 @@ int main(int argc, char *argv[]) {
   std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
 
   // Set up the displays
-  analyser.AddDisplay(pr_residuals);
-  analyser.AddDisplay(kf_residuals);
+  analyser.AddDisplay(pr_mom_residuals);
+  analyser.AddDisplay(kf_pos_residuals);
+  analyser.AddDisplay(kf_mom_residuals);
   analyser.AddDisplay(resolutions);
   analyser.SetUpDisplays();
 

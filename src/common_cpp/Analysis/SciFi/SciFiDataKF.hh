@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMKF_
-#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAMOMENTUMKF_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAKF_
+#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDATAKF_
 
 // C++ headers
 #include <vector>
@@ -37,7 +37,7 @@
 
 namespace MAUS {
 
-struct MomentumDataKF {
+struct DataKF {
   int TrackerNumber;
   int NDF;
   int Charge;
@@ -45,6 +45,8 @@ struct MomentumDataKF {
   double xRec;
   double yMc;
   double yRec;
+  double zMc;
+  double zRec;
   double PxMc;
   double PxRec;
   double PyMc;
@@ -55,25 +57,27 @@ struct MomentumDataKF {
   double PzRec;
 };
 
-class SciFiDataMomentumKF : public SciFiDataMomentum {
+class SciFiDataKF : public SciFiDataMomentum {
+  friend class SciFiDisplayPositionResidualsKF;
   friend class SciFiDisplayMomentumResidualsKF;
   friend class SciFiDisplayMomentumResolutionsKF;
 
   public:
     /** Default constructor */
-    SciFiDataMomentumKF();
+    SciFiDataKF();
 
     /** Destructor */
-    virtual ~SciFiDataMomentumKF();
+    virtual ~SciFiDataKF();
 
     /** Set all the member variables to zero */
     void Clear();
 
-    /** Calculate the reduced momentum data for an event */
+    /** Calculate the reduced position andmomentum data for an event at the
+     *  tracker reference surface (station 1, plane 0) */
     virtual void ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent);
 
   protected:
-    std::vector<MomentumDataKF> mDataKF;  /** Vector holding reduced data for one track */
+    std::vector<DataKF> mDataKF;  /** Vector holding reduced data for one track */
 };
 } // ~namespace MAUS
 

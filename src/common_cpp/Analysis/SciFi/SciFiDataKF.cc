@@ -21,7 +21,7 @@
 #include <cmath>
 
 // MAUS headers
-#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumKF.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataKF.hh"
 #include "src/common_cpp/Plotting/SciFi/SciFiAnalysisTools.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
@@ -35,19 +35,19 @@
 
 namespace MAUS {
 
-SciFiDataMomentumKF::SciFiDataMomentumKF() {
+SciFiDataKF::SciFiDataKF() {
   // Do nothing
 }
 
-SciFiDataMomentumKF::~SciFiDataMomentumKF() {
+SciFiDataKF::~SciFiDataKF() {
   // Do nothing
 }
 
-void SciFiDataMomentumKF::Clear() {
+void SciFiDataKF::Clear() {
   mDataKF.clear();
 }
 
-void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
+void SciFiDataKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
   std::vector<SciFiTrack*> trks = aSFEvent->scifitracks();
 
   // Create the lookup bridge between MC and Recon
@@ -58,7 +58,7 @@ void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
   for (size_t iTrk = 0; iTrk < trks.size(); ++iTrk) {
     SciFiTrack* trk = trks[iTrk];
 
-    MomentumDataKF lDataStruct;
+    DataKF lDataStruct;
     lDataStruct.TrackerNumber = trk->tracker();
     lDataStruct.Charge = trk->charge();
     lDataStruct.NDF = trk->ndf();
@@ -81,6 +81,7 @@ void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     // If we found no track points in station, then give up on this track
     if (tps_s1.size() == 0) continue;
 
+    // Now, specify that the trackpoint must come from the reference plane (i.e. plane 0)
     SciFiTrackPoint* tp = NULL;
     for (size_t iTP = 0; iTP < tps_s1.size(); ++iTP) {
       if (tps_s1[iTP]->plane() == 0) {
@@ -91,6 +92,9 @@ void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     // If found not track point in plane 0, give up for this track
     if (!tp) break;
 
+    lDataStruct.xRec = tp->pos().x();
+    lDataStruct.yRec = tp->pos().y();
+    lDataStruct.zRec = tp->pos().z();
     lDataStruct.PxRec = tp->mom().x();
     lDataStruct.PyRec = tp->mom().y();
     lDataStruct.PtRec = std::sqrt(tp->mom().x()*tp->mom().x() + tp->mom().y()*tp->mom().y());
@@ -112,7 +116,7 @@ void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
         // Perform the digits to hits lookup
         std::vector<SciFiHit*> hits;
         if (!lkup.get_hits(digits[m], hits)) {
-          std::cerr << "Lookup failed\n";
+          std::cerr << "SciFiDataKF::Lookup failed\n";
           continue;
         }
 
@@ -141,16 +145,18 @@ void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     bool success = SciFiAnalysisTools::find_mc_tid(mc_tids, 7, track_id, counter);
     // If we have not found a common track id, abort for this track
     if (!success) {
-      std::cerr << "Malformed track, skipping\n";
+      std::cerr << "SciFiDataKF::Malformed track, skipping\n";
       break;
     }
 
     // Calc the MC track info using hits only with this track id
     ThreeVector mom;
+    ThreeVector pos;
     SciFiCluster* clus = tp->get_cluster_pointer();
-    success = SciFiAnalysisTools::find_mc_cluster_momentum(track_id, clus, lkup, mom);
+    success = SciFiAnalysisTools::find_mc_cluster_data(track_id, clus, lkup, mom, pos);
     if (!success) {
-      std::cerr << "Failed to find Kalman MC info\n";
+      std::cerr << "SciFiDataKF::Failed to find Kalman MC info with cluster at address "
+    		    << clus <<"\n";
       break;
     }
 
@@ -161,8 +167,9 @@ void SciFiDataMomentumKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     mom = hits[0]->GetMomentum();
 */
 
-    lDataStruct.xMc = 0;
-    lDataStruct.yMc = 0;
+    lDataStruct.xMc = pos.x();
+    lDataStruct.yMc = pos.y();
+    lDataStruct.zMc = pos.z();
     lDataStruct.PxMc = mom.x();
     lDataStruct.PyMc = mom.y();
     lDataStruct.PzMc = mom.z();
