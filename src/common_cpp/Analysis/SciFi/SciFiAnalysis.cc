@@ -74,7 +74,6 @@ void SciFiAnalysis::SetUpDisplays() {
 	    if (lData) break;
 	  }
 	  lData = mDisplays[i]->SetUp();
-	  std::cerr << "Memory address of data object:" << lData << std::endl;
     mSciFiData.push_back(lData);
   }
 }
