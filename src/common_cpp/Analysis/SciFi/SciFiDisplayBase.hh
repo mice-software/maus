@@ -83,9 +83,6 @@ class SciFiDisplayBase  {
     /** The reduced data object, covering 1 spill. Memory is NOT owned by the display class! */
     SciFiDataBase* mSpillData;
     TCanvas* mCanvas;           /** The ROOT TCanvas on which to plot the data */
-
-  private:
-
 };
 
 } // ~namespace MAUS

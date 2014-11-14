@@ -79,12 +79,11 @@ void SciFiDisplayPositionResidualsKF::Fill() {
 }
 
 SciFiDataKF* SciFiDisplayPositionResidualsKF::GetData() {
-  return dynamic_cast<SciFiDataKF*>(mSpillData);
+  return GetDataTemplate();
 }
 
 SciFiDataBase* SciFiDisplayPositionResidualsKF::MakeDataObject() {
-  SciFiDataKF* lData = new SciFiDataKF();
-  return dynamic_cast<SciFiDataBase*>(lData);
+  return MakeDataObjectTemplate();
 }
 
 void SciFiDisplayPositionResidualsKF::Plot(TCanvas* aCanvas) {
@@ -141,12 +140,7 @@ void SciFiDisplayPositionResidualsKF::Save() {
 }
 
 SciFiDataBase* SciFiDisplayPositionResidualsKF::SetData(SciFiDataBase* data) {
-  if ( dynamic_cast<SciFiDataKF*>(data) ) {
-    mSpillData = data;
-    return mSpillData;
-  } else {
-    return NULL;
-  }
+  return SetDataTemplate(data);
 }
 
 SciFiDataBase* SciFiDisplayPositionResidualsKF::SetUp() {

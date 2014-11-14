@@ -34,12 +34,12 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayDataInterface.hh"
 
 
 namespace MAUS {
 
-class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
+class SciFiDisplayMomentumResidualsPR : public SciFiDisplayDataInterface<SciFiDataMomentumPR> {
   public:
     /** Default constructor */
     SciFiDisplayMomentumResidualsPR();

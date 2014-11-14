@@ -98,15 +98,15 @@ int main(int argc, char *argv[]) {
   MAUS::SciFiAnalysis analyser;
 
   // Create Pat Rec momentum residual display
-  MAUS::SciFiDisplayMomentumResidualsPR* pr_mom_residuals 
+  MAUS::SciFiDisplayMomentumResidualsPR* pr_mom_residuals
     = new MAUS::SciFiDisplayMomentumResidualsPR();
 
   // Create a Kalman fit position residual display
-  MAUS::SciFiDisplayPositionResidualsKF* kf_pos_residuals 
+  MAUS::SciFiDisplayPositionResidualsKF* kf_pos_residuals
     = new MAUS::SciFiDisplayPositionResidualsKF();
 
   // Create a Kalman fit momentum residual display
-  MAUS::SciFiDisplayMomentumResidualsKF* kf_mom_residuals 
+  MAUS::SciFiDisplayMomentumResidualsKF* kf_mom_residuals
     = new MAUS::SciFiDisplayMomentumResidualsKF();
 
   // Create Pat Rec momentum resolutions display

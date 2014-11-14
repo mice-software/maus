@@ -148,12 +148,11 @@ TCut SciFiDisplayMomentumResolutionsPR::form_tcut(const std::string &var, const 
 }
 
 SciFiDataMomentumPR* SciFiDisplayMomentumResolutionsPR::GetData() {
-  return dynamic_cast<SciFiDataMomentumPR*>(mSpillData);
+  return GetDataTemplate();
 }
 
 SciFiDataBase* SciFiDisplayMomentumResolutionsPR::MakeDataObject() {
-  SciFiDataMomentumPR* lData = new SciFiDataMomentumPR();
-  return dynamic_cast<SciFiDataBase*>(lData);
+  return MakeDataObjectTemplate();
 }
 
 void SciFiDisplayMomentumResolutionsPR::make_ptpt_resolutions() {
@@ -532,12 +531,7 @@ void SciFiDisplayMomentumResolutionsPR::Save() {
 }
 
 SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetData(SciFiDataBase* data) {
-  if ( dynamic_cast<SciFiDataMomentumPR*>(data) ) {
-    mSpillData = data;
-    return mSpillData;
-  } else {
-    return NULL;
-  }
+  return SetDataTemplate(data);
 }
 
 SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetUp() {

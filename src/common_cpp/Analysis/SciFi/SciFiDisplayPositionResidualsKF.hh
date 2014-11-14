@@ -35,12 +35,12 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataKF.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayDataInterface.hh"
 
 
 namespace MAUS {
 
-class SciFiDisplayPositionResidualsKF : public SciFiDisplayBase {
+class SciFiDisplayPositionResidualsKF : public SciFiDisplayDataInterface<SciFiDataKF> {
   public:
     /** Default constructor */
     SciFiDisplayPositionResidualsKF();

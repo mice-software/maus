@@ -36,12 +36,12 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayDataInterface.hh"
 
 
 namespace MAUS {
 
-class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
+class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFiDataMomentumPR> {
   public:
     /** Default constructor */
     SciFiDisplayMomentumResolutionsPR();
@@ -69,10 +69,6 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayBase {
 
     /** Return the cut on reconstructed pz */
     double get_cut_pz_rec() const { return _cut_pz_rec; }
-
-    /** Returns a pointer to the reduced data object associated with the display.
-     *  The data pointer is upcast to  the base class type */
-    virtual SciFiDataBase* GetBaseDataPointer() { return dynamic_cast<SciFiDataBase*>(mSpillData); }
 
     /** Return the number of bins used to make the histos for pt resolution graphs */
     int get_n_pt_bins() const { return _n_pt_bins; }
