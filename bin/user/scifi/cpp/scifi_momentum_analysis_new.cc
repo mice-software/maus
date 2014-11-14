@@ -66,7 +66,6 @@ int main(int argc, char *argv[]) {
   //   -p -> pause between events
   //   -g -> enables saving xyz plots and gives output graphics file type
   bool bool_pause = false;
-  // bool bool_save = false;
   std::string save_type = "";
 
   for (int i = 2; i < argc; i++) {
@@ -77,7 +76,6 @@ int main(int argc, char *argv[]) {
       if ( (i+1) < argc ) save_type = argv[i + 1];
       if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
         std::cout << "Saving plots as " << save_type << " files.\n";
-        // bool_save = true;
       } else if ( save_type != "" ) {
         std::cerr << "Invalid graphics output type given\n";
       }
@@ -87,10 +85,10 @@ int main(int argc, char *argv[]) {
         ss1 >> n_pt_bins;
       }
     } else if ( std::strcmp(argv[i], "-n_pz_bins") == 0 ) {
-        if ( (i+1) < argc ) {
-          std::stringstream ss1(argv[i + 1]);
-          ss1 >> n_pz_bins;
-        }
+      if ( (i+1) < argc ) {
+        std::stringstream ss1(argv[i + 1]);
+        ss1 >> n_pz_bins;
+      }
     }
   }
 
@@ -130,16 +128,12 @@ int main(int argc, char *argv[]) {
   std::cout << "Pz resol histogram number of bins: " << resolutions->GetNBinsPz() << "\n";
   std::cout << "Pz resol histogram fit lower bound: " << resolutions->GetPzFitMin() << "\n";
   std::cout << "Pz resol histogram fit upper bound: " << resolutions->GetPzFitMax() << "\n";
-  std::cout << "Resol graphs number of points:  " << resolutions->get_n_points() << "\n";
-  std::cout << "Resol graphs pzmc lower bound:  " << resolutions->GetLowerBoundPzMC()
-            << " MeV/c\n";
-  std::cout << "Resol graphs pzmc upper bound:  " << resolutions->GetUpperBoundPzMC()
-            << " MeV/c\n";
-  std::cout << "Resol graphs ptmc lower bound:  " << resolutions->GetResolLowerBound()
-            << " MeV/c\n";
-  std::cout << "Resol graphs ptmc upper bound:  " << resolutions->GetResolUpperBound()
-            << " MeV/c\n";
-  std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
+  std::cout << "Resol graphs number of points: " << resolutions->GetNPoints() << "\n";
+  std::cout << "Resol graphs pzmc lower bound: " << resolutions->GetLowerBoundPzMC() << " MeV/c\n";
+  std::cout << "Resol graphs pzmc upper bound: " << resolutions->GetUpperBoundPzMC() << " MeV/c\n";
+  std::cout << "Resol graphs ptmc lower bound: " << resolutions->GetResolLowerBound() << " MeV/c\n";
+  std::cout << "Resol graphs ptmc upper bound: " << resolutions->GetResolUpperBound() << " MeV/c\n";
+  std::cout << "Pz rec cut: " << resolutions->GetCutPzRec() << " MeV/c\n";
 
   // Set up the displays
   analyser.AddDisplay(pr_mom_residuals);
@@ -178,20 +172,7 @@ int main(int argc, char *argv[]) {
   // Make the final plots and save
   analyser.Plot();
   analyser.Save();
-
   theApp.Run();
-
-  // Print some results
-//   std::cerr << "\n-------------------------Results-------------------------\n";
-//   std::cerr << "n_mc_tracks_valid: " << analyser.get_n_mc_tracks_valid() << std::endl;
-//   std::cerr << "n_rec_tracks_invalid: " << analyser.get_n_mc_tracks_invalid() << std::endl;
-//   std::cerr << "n_rec_tracks_matched: " << analyser.get_n_rec_tracks_matched() << std::endl;
-//   std::cerr << "n_rec_tracks_unmatched: " << analyser.get_n_rec_tracks_unmatched() << std::endl;
-//   std::cerr << "n_rec_tracks_total: " << analyser.get_n_rec_tracks_total() << std::endl;
-//   std::cerr << "=> Efficiency: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
-//     / static_cast<double>(analyser.get_n_mc_tracks_valid()) << std::endl;
-//   std::cerr << "=> Purity: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
-//     / static_cast<double>(analyser.get_n_rec_tracks_total()) << std::endl;
 
   return 0;
 }
