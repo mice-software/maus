@@ -112,32 +112,32 @@ int main(int argc, char *argv[]) {
   // Create Pat Rec momentum resolutions display
   MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
     new MAUS::SciFiDisplayMomentumResolutionsPR();
-  resolutions->set_n_pt_bins(n_pt_bins);
-  resolutions->set_n_pz_bins(n_pz_bins);
-  resolutions->set_n_points(n_points);
-  resolutions->set_pt_fit_min(pt_fit_min);
-  resolutions->set_pt_fit_max(pt_fit_max);
-  resolutions->set_pz_fit_min(pz_fit_min);
-  resolutions->set_pz_fit_max(pz_fit_max);
-  resolutions->set_lower_bound_pzmc(150.0);
-  resolutions->set_upper_bound_pzmc(250.0);
-  resolutions->set_resol_lower_bound(lower_bound);
-  resolutions->set_resol_upper_bound(upper_bound);
-  resolutions->set_cut_pz_rec(pz_rec_cut);
-  std::cout << "Pt resol histogram number of bins: " << resolutions->get_n_pt_bins() << "\n";
-  std::cout << "Pt resol histogram fit lower bound: " << resolutions->get_pt_fit_min() << "\n";
-  std::cout << "Pt resol histogram fit upper bound: " << resolutions->get_pt_fit_max() << "\n";
-  std::cout << "Pz resol histogram number of bins: " << resolutions->get_n_pz_bins() << "\n";
-  std::cout << "Pz resol histogram fit lower bound: " << resolutions->get_pz_fit_min() << "\n";
-  std::cout << "Pz resol histogram fit upper bound: " << resolutions->get_pz_fit_max() << "\n";
+  resolutions->SetNBinsPt(n_pt_bins);
+  resolutions->SetNBinsPz(n_pz_bins);
+  resolutions->SetNPoints(n_points);
+  resolutions->SetPtFitMin(pt_fit_min);
+  resolutions->SetPtFitMax(pt_fit_max);
+  resolutions->SetPzFitMin(pz_fit_min);
+  resolutions->SetPzFitMax(pz_fit_max);
+  resolutions->SetLowerBoundPzMC(150.0);
+  resolutions->SetUpperBoundPzMC(250.0);
+  resolutions->SetResolLowerBound(lower_bound);
+  resolutions->SetResolUpperBound(upper_bound);
+  resolutions->SetCutPzRec(pz_rec_cut);
+  std::cout << "Pt resol histogram number of bins: " << resolutions->GetNBbinsPt() << "\n";
+  std::cout << "Pt resol histogram fit lower bound: " << resolutions->GetPtFitMin() << "\n";
+  std::cout << "Pt resol histogram fit upper bound: " << resolutions->GetPtFitMax() << "\n";
+  std::cout << "Pz resol histogram number of bins: " << resolutions->GetNBinsPz() << "\n";
+  std::cout << "Pz resol histogram fit lower bound: " << resolutions->GetPzFitMin() << "\n";
+  std::cout << "Pz resol histogram fit upper bound: " << resolutions->GetPzFitMax() << "\n";
   std::cout << "Resol graphs number of points:  " << resolutions->get_n_points() << "\n";
-  std::cout << "Resol graphs pzmc lower bound:  " << resolutions->get_lower_bound_pzmc()
+  std::cout << "Resol graphs pzmc lower bound:  " << resolutions->GetLowerBoundPzMC()
             << " MeV/c\n";
-  std::cout << "Resol graphs pzmc upper bound:  " << resolutions->get_upper_bound_pzmc()
+  std::cout << "Resol graphs pzmc upper bound:  " << resolutions->GetUpperBoundPzMC()
             << " MeV/c\n";
-  std::cout << "Resol graphs ptmc lower bound:  " << resolutions->get_resol_lower_bound()
+  std::cout << "Resol graphs ptmc lower bound:  " << resolutions->GetResolLowerBound()
             << " MeV/c\n";
-  std::cout << "Resol graphs ptmc upper bound:  " << resolutions->get_resol_upper_bound()
+  std::cout << "Resol graphs ptmc upper bound:  " << resolutions->GetResolUpperBound()
             << " MeV/c\n";
   std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
 
