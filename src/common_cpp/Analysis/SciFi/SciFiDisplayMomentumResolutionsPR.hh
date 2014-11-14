@@ -53,8 +53,7 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
      *  by plotting a histo of the MC - Recon data for the interval,
      *  fitting a gaussian, and returning the sigma and error on sigma.
      */
-    bool CalcResolution(const std::string& residual, const TCut cut,
-                        double &res, double &res_err);
+    bool CalcResolution(const std::string& residual, const TCut cut, double &res, double &res_err);
 
     /** Make a TCut out of a variable and operator, input as strings, and a value input as double */
     TCut FormTCut(const std::string &var, const std::string &op, double value);
@@ -91,31 +90,31 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     /** Return the upper limit of each fit used to calc the pz resolution pnts */
     int GetPzFitMax() const { return mPzFitMax; }
 
-    /** Return the lower bound of the pz_mc range used in the resolution plots */
+    /** Return the lower bound of the PzMC range used in the resolution plots */
     double GetLowerBoundPzMC() const { return mLowerBoundPzMC; }
 
-    /** Return the upper bound of the pz_mc range used in the resolution plots */
+    /** Return the upper bound of the PzMC range used in the resolution plots */
     double GetUpperBoundPzMC() const { return mUpperBoundPzMC; }
 
-    /** Return the lower bound of the pt_mc range used in the resolution plots */
-    double GetResolLowerBound() const { return mResolLowerBound; }
+    /** Return the lower bound of the PtMC range used in the resolution plots */
+    double GetResolLowerBound() const { return mLowerBoundPtMC; }
 
-    /** Return the upper bound of the pt_mc range used in the resolution plots */
-    double GetResolUpperBound() const { return mResolUpperBound; }
+    /** Return the upper bound of the PtMC range used in the resolution plots */
+    double GetResolUpperBound() const { return mUpperBoundPtMC; }
 
     /** Create a new SciFiData object of the correct derived type */
     virtual SciFiDataBase* MakeDataObject();
 
-    /** Make pt resolution graphs, as a function of pt_mc */
+    /** Make pt resolution graphs, as a function of PtMC */
     void MakePtPtResolutions();
 
-    /** Make pz resolution graphs, as a function of pt_mc */
+    /** Make pz resolution graphs, as a function of PtMC */
     void make_pzpt_resolutions();
 
-    /** Make pt resolution graphs, as a function of pz_mc */
+    /** Make pt resolution graphs, as a function of PzMC */
     void MakePtPzResolutions();
 
-    /** Make pz resolution graphs, as a function of pz_mc */
+    /** Make pz resolution graphs, as a function of PzMC */
     void MakePzPzResolutions();
 
     /** Plot the data currently held */
@@ -157,17 +156,17 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     /** Set the upper limit of each fit used to calc the pz resolution pnts  */
     void SetPzFitMax(double pz_fit_max) { mPzFitMax = pz_fit_max; }
 
-    /** Set the lower bound of the pz_mc range used in the resolution plots */
+    /** Set the lower bound of the PzMC range used in the resolution plots */
     void SetLowerBoundPzMC(double lower_bound_pzmc) { mLowerBoundPzMC = lower_bound_pzmc; }
 
-    /** Set the lower bound of the pz_mc range used in the resolution plots */
+    /** Set the lower bound of the PzMC range used in the resolution plots */
     void SetUpperBoundPzMC(double upper_bound_pzmc) { mUpperBoundPzMC = upper_bound_pzmc; }
 
-    /** Set the lower bound of the pt_mc range used in the resolution plots */
-    void SetResolLowerBound(double pz_lower_bound) { mResolLowerBound = pz_lower_bound; }
+    /** Set the lower bound of the PtMC range used in the resolution plots */
+    void SetResolLowerBound(double pz_lower_bound) { mLowerBoundPtMC = pz_lower_bound; }
 
-    /** Set the upper bound of the pt_mc range used in the resolution plots */
-    void SetResolUpperBound(double pz_upper_bound) { mResolUpperBound = pz_upper_bound; }
+    /** Set the upper bound of the PtMC range used in the resolution plots */
+    void SetResolUpperBound(double pz_upper_bound) { mUpperBoundPtMC = pz_upper_bound; }
 
     /** Set up the SciFiData object and ROOT tree */
     virtual SciFiDataBase* SetUp();
@@ -183,9 +182,9 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
      */
     SciFiDataBase* SetUpSciFiData();
 
-    TFile* mOf1;                      /** The output ROOT file */
-    TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
-    MomentumDataPR mTrackData;        /** Struct containing reduced data for 1 track in a spill */
+    TFile* mOf1;                   /** The output ROOT file */
+    TTree* mTree;                  /** The ROOT tree used to accumulate the reduced data */
+    MomentumDataPR mTrackData;     /** Struct containing reduced data for 1 track in a spill */
 
     // Resolution Graphs
     TGraphErrors* mT1PtResolPtMC;
@@ -198,18 +197,18 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     TGraphErrors* mT2PzResolPzMC;
 
     // Parameters
-    int mNBinsPt;             /// Number of bins used to make the histos for pt resolution graphs
-    int mNBinsPz;             /// Number of bins used to make the histos for pz resolution graphs
-    int mNPoints;             /// Number of points in the resolution plots
-    int mPtFitMin;            /// The lower limit of each fit used to calc the pt resolution pnts
-    int mPtFitMax;            /// The upper limit of each fit used to calc the pt resolution pnts
-    int mPzFitMin;            /// The lower limit of each fit used to calc the pz resolution pnts
-    int mPzFitMax;            /// The upper limit of each fit used to calc the pz resolution pnts
-    double mUpperBoundPzMC;
-    double mLowerBoundPzMC;
-    double mResolLowerBound;  /// The lower bound of the pt_mc range for the pz resolution graphs
-    double mResolUpperBound;  /// The upper bound of the pt_mc range for the pz resolution graphs
-    double mCutPzRec;         /// Cut on the reconstructed pz
+    int mNBinsPt;            /// Number of bins used to make the histos for pt resolution graphs
+    int mNBinsPz;            /// Number of bins used to make the histos for pz resolution graphs
+    int mNPoints;            /// Number of points in the resolution plots
+    int mPtFitMin;           /// The lower limit of each fit used to calc the pt resolution pnts
+    int mPtFitMax;           /// The upper limit of each fit used to calc the pt resolution pnts
+    int mPzFitMin;           /// The lower limit of each fit used to calc the pz resolution pnts
+    int mPzFitMax;           /// The upper limit of each fit used to calc the pz resolution pnts
+    double mLowerBoundPtMC;  /// The lower bound of the PtMC range for the resolution graphs
+    double mUpperBoundPtMC;  /// The upper bound of the PtMC range for the resolution graphs
+    double mUpperBoundPzMC;  /// The upper bound of the PzMC range used for the resolution graphs
+    double mLowerBoundPzMC;  /// The lower bound of the PzMC range used for the resolution graphs
+    double mCutPzRec;        /// Cut on the reconstructed pz
 };
 
 } // ~namespace MAUS

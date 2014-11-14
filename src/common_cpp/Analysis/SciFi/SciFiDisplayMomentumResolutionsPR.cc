@@ -57,10 +57,10 @@ SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NU
                                                                          mPtFitMax(50),
                                                                          mPzFitMin(-50),
                                                                          mPzFitMax(50),
+                                                                         mLowerBoundPtMC(0.0),
+                                                                         mUpperBoundPtMC(90.0),
                                                                          mUpperBoundPzMC(250.0),
                                                                          mLowerBoundPzMC(150.0),
-                                                                         mResolLowerBound(0.0),
-                                                                         mResolUpperBound(90.0),
                                                                          mCutPzRec(500.0) {
   // Do nothing
 }
@@ -80,9 +80,8 @@ SciFiDisplayMomentumResolutionsPR::~SciFiDisplayMomentumResolutionsPR() {
   }
 }
 
-bool SciFiDisplayMomentumResolutionsPR::CalcResolution(const std::string& residual,
-                                                        const TCut cut, double &res,
-                                                        double &res_err) {
+bool SciFiDisplayMomentumResolutionsPR::CalcResolution(const std::string& residual, const TCut cut,
+                                                       double &res, double &res_err) {
   if (mTree) {
     mOf1->cd();
     TCanvas lCanvas;
@@ -137,7 +136,7 @@ void SciFiDisplayMomentumResolutionsPR::Fill() {
 }
 
 TCut SciFiDisplayMomentumResolutionsPR::FormTCut(const std::string &var, const std::string &op,
-                                                  double value) {
+                                                 double value) {
   TCut cut = "";
   std::stringstream ss1;
   TString s1;
@@ -156,11 +155,10 @@ SciFiDataBase* SciFiDisplayMomentumResolutionsPR::MakeDataObject() {
 }
 
 void SciFiDisplayMomentumResolutionsPR::MakePtPtResolutions() {
-
-  double x_range = mResolUpperBound - mResolLowerBound;  // Range of the pz resolution graph
+  double x_range = mUpperBoundPtMC - mLowerBoundPtMC;  // Range of the pz resolution graph
   double resolution_error =  x_range / ( mNPoints * 2 );    // Error in pt_mc of each data point
   // The mid pt_mc value of the first data point
-  double first_resolution_point = mResolLowerBound + resolution_error;
+  double first_resolution_point = mLowerBoundPtMC + resolution_error;
 
   std::vector<TCut> vCuts(mNPoints);          // The cuts defining the pt_mc intervals
   std::vector<double> vPtMc(mNPoints);        // The centre of the pt_mc intervals
@@ -175,7 +173,7 @@ void SciFiDisplayMomentumResolutionsPR::MakePtPtResolutions() {
   std::string s2 = "&&PtMc<";
   for (int i = 0; i < mNPoints; ++i) {
     std::stringstream ss1;
-    double point_lower_bound = mResolLowerBound + (resolution_error * 2 * i);
+    double point_lower_bound = mLowerBoundPtMC + (resolution_error * 2 * i);
     double point_upper_bound = point_lower_bound + (resolution_error * 2);
     ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
     vCuts[i] = ss1.str().c_str();
@@ -219,10 +217,10 @@ void SciFiDisplayMomentumResolutionsPR::MakePtPtResolutions() {
 
 void SciFiDisplayMomentumResolutionsPR::make_pzpt_resolutions() {
 
-  double pz_range = mResolUpperBound - mResolLowerBound;  // Range of the pz resolution graph
+  double pz_range = mUpperBoundPtMC - mLowerBoundPtMC;  // Range of the pz resolution graph
   double resolution_error =  pz_range / ( mNPoints * 2 );    // Error in pt_mc of each data point
   // The mid pt_mc value of the first data point
-  double first_resolution_point = mResolLowerBound + resolution_error;
+  double first_resolution_point = mLowerBoundPtMC + resolution_error;
   std::vector<TCut> vCuts(mNPoints);          // The cuts defining the pt_mc intervals
   std::vector<double> vPtMc(mNPoints);        // The centre of the pt_mc intervals
   std::vector<double> vPtMcErr(mNPoints);     // The width of the intervals
@@ -236,7 +234,7 @@ void SciFiDisplayMomentumResolutionsPR::make_pzpt_resolutions() {
   std::string s2 = "&&PtMc<";
   for (int i = 0; i < mNPoints; ++i) {
     std::stringstream ss1;
-    double point_lower_bound = mResolLowerBound + (resolution_error * 2 * i);
+    double point_lower_bound = mLowerBoundPtMC + (resolution_error * 2 * i);
     double point_upper_bound = point_lower_bound + (resolution_error * 2);
     ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
     vCuts[i] = ss1.str().c_str();
@@ -271,19 +269,19 @@ void SciFiDisplayMomentumResolutionsPR::make_pzpt_resolutions() {
 
   // Create the resultant resolution plots
   mT1PzResolPtMC = new TGraphErrors(mNPoints, &vPtMc[0], &vPzRes_t1[0],
-                                        &vPtMcErr[0], &vPzResErr_t1[0]);
+                                    &vPtMcErr[0], &vPzResErr_t1[0]);
   mT2PzResolPtMC = new TGraphErrors(mNPoints, &vPtMc[0], &vPzRes_t2[0],
-                                        &vPtMcErr[0], &vPzResErr_t2[0]);
+                                    &vPtMcErr[0], &vPzResErr_t2[0]);
 }
 
 void SciFiDisplayMomentumResolutionsPR::MakePtPzResolutions() {
 
-  double _upper_bound_pzmc = 250.0;
-  double _lower_bound_pzmc = 150.0;
-  double x_range = _upper_bound_pzmc - _lower_bound_pzmc;  // Range of the pz resolution graph
+  double mUpperBoundPzMC = 250.0;
+  double mLowerBoundPzMC = 150.0;
+  double x_range = mUpperBoundPzMC - mLowerBoundPzMC;  // Range of the pz resolution graph
   double x_error =  x_range / ( mNPoints * 2 );    // Error in pt_mc of each data point
   // The mid pt_mc value of the first data point
-  double first_resolution_point = _lower_bound_pzmc + x_error;
+  double first_resolution_point = mLowerBoundPzMC + x_error;
   std::vector<TCut> vCuts(mNPoints);          // The cuts defining the pt_mc intervals
   std::vector<double> vPzMc(mNPoints);        // The centre of the pt_mc intervals
   std::vector<double> vPzMcErr(mNPoints);     // The width of the intervals
@@ -297,7 +295,7 @@ void SciFiDisplayMomentumResolutionsPR::MakePtPzResolutions() {
   std::string s2 = "&&PzMc<";
   for (int i = 0; i < mNPoints; ++i) {
     std::stringstream ss1;
-    double point_lower_bound = _lower_bound_pzmc + (x_error * 2 * i);
+    double point_lower_bound = mLowerBoundPzMC + (x_error * 2 * i);
     double point_upper_bound = point_lower_bound + (x_error * 2);
     ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
     vCuts[i] = ss1.str().c_str();
