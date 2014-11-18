@@ -157,6 +157,13 @@ bool SciFiDisplayMomentumResidualsPR::SetUpRoot() {
   mTree->Branch("TrackerNumber", &mTrackData.TrackerNumber, "TrackerNumber/I");
   mTree->Branch("NumberOfPoints", &mTrackData.NumberOfPoints, "NumberOfPoints/I");
   mTree->Branch("Charge", &mTrackData.Charge, "Charge/I");
+  mTree->Branch("Radius", &mTrackData.Radius, "Radius/D");
+  mTree->Branch("CircleX0", &mTrackData.CircleX0, "CircleX0/D");
+  mTree->Branch("CircleY0", &mTrackData.CircleY0, "CircleY0/D");
+  mTree->Branch("CircleChiSq", &mTrackData.CircleChiSq, "CircleChiSq/D");
+  mTree->Branch("SZIntercept", &mTrackData.SZIntercept, "SZIntercept/D");
+  mTree->Branch("dsdz", &mTrackData.dsdz, "dsdz/D");
+  mTree->Branch("SZChiSq", &mTrackData.SZChiSq, "SZChiSq/D");
   mTree->Branch("PtMc", &mTrackData.PtMc, "PtMc/D");
   mTree->Branch("PzMc", &mTrackData.PzMc, "PtMz/D");
   mTree->Branch("PtRec", &mTrackData.PtRec, "PtRec/D");
