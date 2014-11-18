@@ -80,6 +80,9 @@ def arg_parser():
                         required=True)
     parser.add_argument('--input-dir', dest='input_dir',\
                         help='Read in raw data contained in the named directory', \
+                        required=False)
+    parser.add_argument('--run-number', dest='run_number',\
+                        help='Output index number', \
                         required=True)
     parser.add_argument('--test', dest='test_mode', \
                         help='Run the batch job using test cdb output',
@@ -242,7 +245,8 @@ class RunManager:
         simulation += self.run_setup.get_simulation_parameters()
         print simulation
         proc = subprocess.Popen(simulation, stdout=self.logs.sim_log, \
-                                                       stderr=subprocess.STDOUT)
+                                                       stderr=self.logs.sim_log)
+        # stderr=subprocess.STDOUT)
         proc.wait()
         self.logs.tar_queue.append(self.run_setup.mc_file_name)
         print self.logs.tar_queue
@@ -319,7 +323,7 @@ class RunSettings: #pylint: disable = R0902
 
         @param file_name Input file name
         
-        Assumes a file of format 000####.* where #### is some integer run
+        Assumes a file of format *_####.* where #### is some integer run
         number.
 
         @returns run number as an int
@@ -330,6 +334,37 @@ class RunSettings: #pylint: disable = R0902
         run_number = int(file_name)
         return run_number
 
+    def get_file_name_from_run_number(self, file_index, run_number):
+        """
+        Get the file identity from the file index input to the script
+
+        @param file_index run_number Input file index, run number
+
+        Assumes that the file index contains a list of file names and
+        that the run_number corresponds to a line number in the file.
+
+        @returns a file name as a string
+        """
+        index_command = 'wget '+file_index+' index.txt'
+        proc = subprocess.Popen(index_command, stdout=subprocess.STDOUT, \
+                                stderr=subprocess.STDOUT)
+        list = fopen('index.txt')
+        i = 0
+        interface_download = 'wget '
+        for entry in list:
+            if run_number == i:
+                interface_download += entry+' interface_'+str(i)+'.txt'
+                break
+            else:
+                i += 1
+        if i == run_number:
+            proc = subprocess.Popen(interface_download, stdout=subprocess.STDOUT,\
+                                    stderr=subprocess.STDOUT)
+            return 'interface_'+str(i)+'.txt'
+        else:
+            return 0
+        
+            
     def get_simulation_parameters(self):
         """
         Get the parameters for the simulation executable
@@ -448,9 +483,9 @@ class FileManager: # pylint: disable = R0902
                 if os.path.isfile(self.tar_file_name):         
                     tar_file.add(item)
             tar_file.close()
-            #for item in self.tar_queue:
-            #    if os.path.isfile(item):       
-            #        pass # cleanup does something weird...
+            for item in self.tar_queue:
+                if os.path.isfile(item):       
+                    pass # cleanup does something weird...
         self._is_open = False
         
     def __del__(self):
