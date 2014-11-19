@@ -42,6 +42,12 @@ class SciFiDisplayBase  {
      *  and so is not removed by the destructor  */
     virtual ~SciFiDisplayBase();
 
+    /** Return the flag which sets whether only tracks which produced spacepoints in every
+     *  station should be used when producing the plots.  The ROOT tree will continue to be
+     *  filled with all the data.
+     */
+    bool Get5StationOnly() { return m5StationOnly; }
+
     /** Return the member Canvas */
     TCanvas* GetCanvas() { return mCanvas; }
 
@@ -56,6 +62,12 @@ class SciFiDisplayBase  {
 
     /** Save the data and plots (e.g. as pdfs, to ROOT file, ...) */
     virtual void Save() = 0;
+
+    /** Set the flag which sets whether only tracks which produced spacepoints in every
+     *  station should be used when producing the plots.  The ROOT tree will continue to be
+     *  filled with all the data.
+     */
+    void Set5StationOnly(bool a5StationOnly) { m5StationOnly = a5StationOnly; }
 
     /** Set the Canvas pointer, up to user to delete previous Canvas if needed */
     void SetCanvas(TCanvas* aCanvas) { mCanvas = aCanvas; }
@@ -80,6 +92,7 @@ class SciFiDisplayBase  {
     virtual void Fill() = 0;
 
   protected:
+    bool m5StationOnly;    /** Only use 5 spacepoint tracks when producing plots */
     /** The reduced data object, covering 1 spill. Memory is NOT owned by the display class! */
     SciFiDataBase* mSpillData;
     TCanvas* mCanvas;           /** The ROOT TCanvas on which to plot the data */

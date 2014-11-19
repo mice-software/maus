@@ -20,7 +20,7 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
 namespace MAUS {
 
-SciFiDisplayBase::SciFiDisplayBase() : mSpillData(NULL), mCanvas(NULL) {
+SciFiDisplayBase::SciFiDisplayBase() : m5StationOnly(false), mSpillData(NULL), mCanvas(NULL) {
   // Do nothing
 }
 

@@ -67,6 +67,7 @@ void SciFiDisplayMomentumResidualsPR::Fill() {
       mTrackData = GetData()->mDataPR[i];
       mTree->Fill();
       int q = mTrackData.Charge;
+      if ( m5StationOnly && mTrackData.NumberOfPoints != 5 ) continue;
       if (mTrackData.TrackerNumber == 0) {
         mResidualPtT1->Fill(mTrackData.PtRec - mTrackData.PtMc);
         mResidualPzT1->Fill(q*mTrackData.PzRec + mTrackData.PzMc);

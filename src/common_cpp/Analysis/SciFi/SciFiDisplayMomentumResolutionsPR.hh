@@ -51,7 +51,8 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
 
     /** Calculate the resolution for a particular MC truth momentum interval,
      *  by plotting a histo of the MC - Recon data for the interval,
-     *  fitting a gaussian, and returning the sigma and error on sigma.
+     *  fitting a gaussian, and returning the sigma and error on sigma. Will make a cut
+     *  for 5 point tracks only if the m5StationOnly variable is set to true.
      */
     bool CalcResolution(const std::string& residual, const TCut cut, double &res, double &res_err);
 

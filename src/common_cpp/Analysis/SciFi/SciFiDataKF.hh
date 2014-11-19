@@ -41,6 +41,7 @@ struct DataKF {
   int TrackerNumber;
   int NDF;
   int Charge;
+  int NumberOfTrackPoints;
   double xMc;
   double xRec;
   double yMc;

@@ -56,6 +56,7 @@ void SciFiDisplayMomentumResidualsKF::Fill() {
       mTrackData = GetData()->mDataKF[i];
       mTree->Fill();
       // int q = mTrackData.Charge;
+      if ( m5StationOnly && mTrackData.NumberOfTrackPoints != 15 ) continue;
       if (mTrackData.TrackerNumber == 0) {
         mResidualPtT1->Fill(mTrackData.PtRec - mTrackData.PtMc);
         mResidualPzT1->Fill(mTrackData.PzRec - mTrackData.PzMc);
@@ -146,6 +147,7 @@ bool SciFiDisplayMomentumResidualsKF::SetUpRoot() {
   mTree->Branch("TrackerNumber", &mTrackData.TrackerNumber, "TrackerNumber/I");
   mTree->Branch("NDF", &mTrackData.NDF, "NDF/I");
   mTree->Branch("Charge", &mTrackData.Charge, "Charge/I");
+  mTree->Branch("NumberOfTrackPoints", &mTrackData.NumberOfTrackPoints, "NumberOfTrackPoints/I");
   mTree->Branch("PxMc", &mTrackData.PxMc, "PxMc/D");
   mTree->Branch("PyMc", &mTrackData.PxMc, "PyMc/D");
   mTree->Branch("PtMc", &mTrackData.PtMc, "PtMc/D");

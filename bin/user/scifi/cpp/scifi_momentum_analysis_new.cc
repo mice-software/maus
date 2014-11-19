@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Analysis parameters - some may be overridden with command line arguments. All momenta in MeV/c.
+  bool five_stations_only = true; // Only use tracks which produce spacepoints in all 5 stations
   int n_pt_bins = 100;        // No. of bins in histos used to find pt resols (0 = let ROOT decide)
   int n_pz_bins = 100;        // No. of bins in histos used to find pz resols (0 = let ROOT decide)
   int n_points = 9;           // No. of data points in each resolution plot
@@ -98,18 +99,22 @@ int main(int argc, char *argv[]) {
   // Create Pat Rec momentum residual display
   MAUS::SciFiDisplayMomentumResidualsPR* pr_mom_residuals
     = new MAUS::SciFiDisplayMomentumResidualsPR();
+  pr_mom_residuals->Set5StationOnly(five_stations_only);
 
   // Create a Kalman fit position residual display
   MAUS::SciFiDisplayPositionResidualsKF* kf_pos_residuals
     = new MAUS::SciFiDisplayPositionResidualsKF();
+  kf_pos_residuals->Set5StationOnly(five_stations_only);
 
   // Create a Kalman fit momentum residual display
   MAUS::SciFiDisplayMomentumResidualsKF* kf_mom_residuals
     = new MAUS::SciFiDisplayMomentumResidualsKF();
+  kf_mom_residuals->Set5StationOnly(five_stations_only);
 
   // Create Pat Rec momentum resolutions display
   MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
     new MAUS::SciFiDisplayMomentumResolutionsPR();
+  resolutions->Set5StationOnly(five_stations_only);
   resolutions->SetNBinsPt(n_pt_bins);
   resolutions->SetNBinsPz(n_pz_bins);
   resolutions->SetNPoints(n_points);

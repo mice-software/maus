@@ -62,6 +62,7 @@ void SciFiDataKF::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
     lDataStruct.TrackerNumber = trk->tracker();
     lDataStruct.Charge = trk->charge();
     lDataStruct.NDF = trk->ndf();
+    lDataStruct.NumberOfTrackPoints = trk->scifitrackpoints().size();
 
     // Calc recon momentum
     //////////////////////

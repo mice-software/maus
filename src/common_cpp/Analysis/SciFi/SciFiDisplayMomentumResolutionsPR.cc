@@ -86,11 +86,17 @@ bool SciFiDisplayMomentumResolutionsPR::CalcResolution(const std::string& residu
     mOf1->cd();
     TCanvas lCanvas;
     TH1D* hResidual(NULL);
+    TCut lCut = cut;
 
-    // Create a histogram of the input residual for the mc variable interval defined by input cut
-    std::string htitle = residual + " " + cut.GetTitle();
+    // Add to the cut if the only 5 spacepoint tracks are to used in the analysis
+    if (m5StationOnly) {
+      lCut = cut + "NumberOfPoints==5";
+    }
+
+    // Create a histogram of the input residual for the MC variable interval defined by input cut
+    std::string htitle = residual + " " + lCut.GetTitle();
     hResidual = new TH1D("hResidual", htitle.c_str(), mNBinsPz, mPzFitMin, mPzFitMax);
-    mTree->Draw((residual + ">>hResidual").c_str(), cut);
+    mTree->Draw((residual + ">>hResidual").c_str(), lCut);
 
     if (!hResidual) {
       std::cerr << "SciFiDisplayMomentumResolutionsPR::calc_resolution: Invalid tracker #\n";
