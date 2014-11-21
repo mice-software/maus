@@ -24,7 +24,7 @@ import maus_cpp.converter
 class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
     """Tests for MapCppEMRMCDigitization"""
     @classmethod
-    @unittest.skip('Skipping test_emr_mc_digitization.py')
+    # @unittest.skip('Skipping test_emr_mc_digitization.py')
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
         cls.mapper = MAUS.MapCppEMRMCDigitization()
