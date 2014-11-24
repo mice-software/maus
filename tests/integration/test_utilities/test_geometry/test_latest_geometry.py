@@ -41,7 +41,8 @@ def validate_geometry(geometry_id = None):
     os.chdir(path)
     proc = subprocess.Popen(["python", download,
                              "--geometry_download_by", "id",
-                             "--geometry_download_directory", path + "/geometry",
+                             "--geometry_download_directory", \
+                             path + "/geometry", \
                              "--geometry_download_id", str(geometry_id)],
                             stdin=subprocess.PIPE)
     while proc.poll() == None:

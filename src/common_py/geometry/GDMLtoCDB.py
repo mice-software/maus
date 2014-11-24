@@ -303,8 +303,9 @@ class Downloader: #pylint: disable = R0902
             fout.write(downloadedfile)
             fout.close()
 
-    
-    # def download_coolingchannel_for_run(self, run_id, downloadpath): #pylint: disable = R0201, C0301
+  
+    # def download_coolingchannel_for_run(self, run_id, downloadpath): 
+    #                                  #pylint: disable = R0201, C0301
     #    """
     #    @Method download geometry for run 
 
@@ -319,7 +320,8 @@ class Downloader: #pylint: disable = R0902
     #        raise OSError('Path '+downloadpath+' does not exist')
     #    else:        
     #        coolingchannel_cdb = cdb.CoolingChannel()
-    #        downloadedfile = coolingchannel_cdb.get_coolingchannel_for_run(run_id)
+    #        downloadedfile = \
+    #                     coolingchannel_cdb.get_coolingchannel_for_run(run_id)
     #        path = downloadpath + '/CoolingChannelInfo.gdml'
     #        fout = open(path, 'w')
     #        fout.write(str(downloadedfile))

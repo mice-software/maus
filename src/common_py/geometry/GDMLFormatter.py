@@ -24,6 +24,7 @@ from geometry.ConfigReader import Configreader
 SCHEMA_PATH = os.environ["MAUS_ROOT_DIR"]+\
               "/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd"
 
+# pylint: disable = C0103, R0915
 class Formatter: #pylint: disable = R0902
     """
     @Class formatter this class formats the raw outputted fastrad files so their
@@ -221,8 +222,8 @@ class Formatter: #pylint: disable = R0902
         """
         self.add_other_info()
         config = minidom.parse(os.path.join(self.path_out, gdmlfile))
-        print "config file ",os.path.join(self.path_out, gdmlfile)
-        print "information file ",os.path.join(self.path_out, \
+        print "config file ", os.path.join(self.path_out, gdmlfile)
+        print "information file ", os.path.join(self.path_out, \
                                                     self.maus_information_file)
         maus_information = minidom.parse(os.path.join(self.path_out, \
                                                     self.maus_information_file))
@@ -278,8 +279,10 @@ class Formatter: #pylint: disable = R0902
         fin.close()
         if run_info == False:
             maus_information = \
-                             minidom.parse(os.path.join(self.path_out, gdmlfile))
-            coolingChannel_path = os.path.join(self.path_in, self.coolingChannel_file)
+                             minidom.parse(os.path.join(self.path_out, \
+                                                            gdmlfile))
+            coolingChannel_path = os.path.join(self.path_in, \
+                                               self.coolingChannel_file)
             # print coolingChannel_path
             coolingChannel = minidom.parse(coolingChannel_path)
             for node in coolingChannel.getElementsByTagName("run"):

@@ -39,7 +39,7 @@ DET_GDML = ['TOF0.gdml', 'TOF1.gdml', 'TOF2.gdml', \
             'iris2_closed.gdml', 'iris1_open.gdml',\
             'iris4_closed.gdml']
 
-class GDMLtomaus(): #pylint: disable = R0903
+class GDMLtomaus(): #pylint: disable = R0902, R0903
     """
     @class GDMLtomaus This class converts GDMLs to MAUS Modules
     
@@ -97,8 +97,8 @@ class GDMLtomaus(): #pylint: disable = R0903
                    fname == 'Dipole2.gdml' or \
                    fname == 'SpectrometerSolenoidDS.gdml' or \
                    fname == 'AFC.gdml':
-                 found_file = os.path.join(self.path, fname)
-                 self.module_files.append(found_file)
+                found_file = os.path.join(self.path, fname)
+                self.module_files.append(found_file)
             if fname.find('materials') < 0 \
                and fname.find('fastrad') < 0 \
                and fname.find('Fastrad') < 0 \
@@ -169,7 +169,7 @@ class GDMLtomaus(): #pylint: disable = R0903
                 file_name = new_string[-1]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
                 module_file = CADImport(xmlin1 = str(self.module_files[fnum]), \
-                                        xsl = str(MODULEXSL), output = str(outputfile))
+                                 xsl = str(MODULEXSL), output = str(outputfile))
                 module_file.parse_xslt()
                 module_file = None
                 os.remove(self.module_files[fnum])
