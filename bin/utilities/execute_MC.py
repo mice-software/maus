@@ -66,6 +66,8 @@ import os
 import subprocess
 import shutil
 import math
+import shlex
+
 
 def arg_parser():
     """
@@ -78,9 +80,6 @@ def arg_parser():
     parser.add_argument('--input-file', dest='input_file', \
                         help='Read interface file with this name', \
                         required=True)
-    parser.add_argument('--input-dir', dest='input_dir',\
-                        help='Read in raw data contained in the named directory', \
-                        required=False)
     parser.add_argument('--run-number', dest='run_number',\
                         help='Output index number', \
                         required=True)
@@ -93,6 +92,9 @@ def arg_parser():
     parser.add_argument('--mcserialnumber', dest='mc_iteration', type=str,\
                         help='MC Serial number for configuration DB',\
                         default='')
+    parser.add_argument('--geometry-id', dest='geoid', \
+                        help='Geometry ID number to be used for the simulation',\
+                        required=True)
     return parser
 
 class DownloadError(Exception):
@@ -150,7 +152,6 @@ class RunManager:
         - Performs any setup on the working directory
         - downloads geometry files from cdb
         - executes the simulation code
-        - executes the reconstruction code
         """
         if not self.check_valid():
             print 'Error - run not valid'
@@ -182,7 +183,6 @@ class RunManager:
         print 'Setup files'
         print '   ', self.run_setup.download_target
         print '   ', self.run_setup.input_file_name
-        print '   ', self.run_setup.input_dir_name
         print '   ', os.getcwd()
         self.cleanup()
         os.mkdir(self.run_setup.download_target)
@@ -199,10 +199,10 @@ class RunManager:
         download_dir = self.run_setup.download_target
         if os.path.isdir(download_dir):
             shutil.rmtree(download_dir)
-        clean_target = glob.glob(self.run_setup.run_number_as_string+'*')
-        for item in clean_target:
-            if item[-3:] != 'tar':
-                os.remove(item)
+        if os.path.exists(self.run_setup.g4bl_interface):
+            os.remove(self.run_setup.g4bl_interface)
+        if os.path.exists(self.run_setup.input_file_name):
+            os.remove(self.run_setup.input_file_name)
       
     def download_geometry(self):
         """
@@ -277,9 +277,9 @@ class RunManager:
         and closes log files.
         """
         if not self.run_setup == None:
+            self.cleanup()
             self.logs.close_log()
             # if not self.run_setup.test_mode:
-            self.cleanup()
 
 
 class RunSettings: #pylint: disable = R0902
@@ -300,20 +300,23 @@ class RunSettings: #pylint: disable = R0902
         All other file names etc are then built off that
         """
         self.input_file_name = args_in.input_file
-        self.input_dir_name  = args_in.input_dir
+        # self.input_dir_name  = args_in.input_dir
         self.test_mode = args_in.test_mode    
         self.mc_iteration = args_in.mc_iteration
-        self.run_number = self.get_run_number_from_file_name \
-                                                          (self.input_file_name)
+        # self.run_number = self.get_run_number_from_file_name \
+        #                                                   (self.input_file_name)
+        self.run_number = args_in.run_number
         self.run_number_as_string = str(self.run_number).rjust(5, '0')
         self.tar_file_name = self.run_number_as_string+"_offline.tar"
-        self.recon_file_name = self.run_number_as_string+"_recon.root"
+        self.g4bl_interface = self.get_file_name_from_run_number(self.input_file_name,\
+                                                                 self.run_number)
+        # self.recon_file_name = self.run_number_as_string+"_recon.root"
         self.mc_file_name = self.run_number_as_string+"_sim.root"
-        self.g4bl_interface = os.path.join(self.input_dir_name,self.input_file_name)
+        
         print self.g4bl_interface
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = '%s/downloads' % os.getcwd()
-        self.geometry_id = '45'
+        self.geometry_id = args_in.geoid
         
 
     # This will need to be adjusted to handle the MC data card format.
@@ -345,25 +348,42 @@ class RunSettings: #pylint: disable = R0902
 
         @returns a file name as a string
         """
-        index_command = 'wget '+file_index+' index.txt'
-        proc = subprocess.Popen(index_command, stdout=subprocess.STDOUT, \
-                                stderr=subprocess.STDOUT)
-        list = fopen('index.txt')
+        
+        index = file_index.split('/')[-1]
+        index = os.path.join(os.getcwd(),index)
+        if os.path.exists(index):
+            os.remove(index)
+        
+        index_command = 'wget '+file_index
+        args = shlex.split(index_command)
+        proc = subprocess.Popen(args) # , stdout=subprocess.STDOUT, \
+                                # stderr=subprocess.STDOUT)
+        # parse the local file name from the address
+        proc.wait()
+        
+        list = open(index)
         i = 0
         interface_download = 'wget '
         for entry in list:
-            if run_number == i:
-                interface_download += entry+' interface_'+str(i)+'.txt'
+            if int(run_number) == i:
+                entry.rstrip('/n')
+                interface_download += entry
                 break
             else:
                 i += 1
-        if i == run_number:
-            proc = subprocess.Popen(interface_download, stdout=subprocess.STDOUT,\
-                                    stderr=subprocess.STDOUT)
-            return 'interface_'+str(i)+'.txt'
-        else:
-            return 0
         
+        file_name = interface_download.split('/')[-1]
+        if file_name.endswith('\n'):
+            file_name = file_name[:-1]
+            
+        file_name = os.path.join(os.getcwd(),file_name)
+        if os.path.exists(file_name):
+            os.remove(file_name)
+        args = shlex.split(interface_download)
+        proc = subprocess.Popen(args) #, stdout=subprocess.STDOUT,\
+                                # stderr=subprocess.STDOUT)
+        os.remove(index)
+        return file_name
             
     def get_simulation_parameters(self):
         """
@@ -483,9 +503,10 @@ class FileManager: # pylint: disable = R0902
                 if os.path.isfile(self.tar_file_name):         
                     tar_file.add(item)
             tar_file.close()
-            for item in self.tar_queue:
-                if os.path.isfile(item):       
-                    pass # cleanup does something weird...
+            #for item in self.tar_queue:
+            #    if os.path.isfile(item):
+            #        os.remove(item)
+            #        pass # cleanup does something weird...
         self._is_open = False
         
     def __del__(self):
