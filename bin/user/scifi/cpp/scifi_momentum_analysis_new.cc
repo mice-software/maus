@@ -38,6 +38,7 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayPositionResidualsKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsKF.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
@@ -112,39 +113,46 @@ int main(int argc, char *argv[]) {
   kf_mom_residuals->Set5StationOnly(five_stations_only);
 
   // Create Pat Rec momentum resolutions display
-  MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
+  MAUS::SciFiDisplayMomentumResolutionsPR* pr_resolutions =
     new MAUS::SciFiDisplayMomentumResolutionsPR();
-  resolutions->Set5StationOnly(five_stations_only);
-  resolutions->SetNBinsPt(n_pt_bins);
-  resolutions->SetNBinsPz(n_pz_bins);
-  resolutions->SetNPoints(n_points);
-  resolutions->SetPtFitMin(pt_fit_min);
-  resolutions->SetPtFitMax(pt_fit_max);
-  resolutions->SetPzFitMin(pz_fit_min);
-  resolutions->SetPzFitMax(pz_fit_max);
-  resolutions->SetLowerBoundPzMC(150.0);
-  resolutions->SetUpperBoundPzMC(250.0);
-  resolutions->SetResolLowerBound(lower_bound);
-  resolutions->SetResolUpperBound(upper_bound);
-  resolutions->SetCutPzRec(pz_rec_cut);
-  std::cout << "Pt resol histogram number of bins: " << resolutions->GetNBbinsPt() << "\n";
-  std::cout << "Pt resol histogram fit lower bound: " << resolutions->GetPtFitMin() << "\n";
-  std::cout << "Pt resol histogram fit upper bound: " << resolutions->GetPtFitMax() << "\n";
-  std::cout << "Pz resol histogram number of bins: " << resolutions->GetNBinsPz() << "\n";
-  std::cout << "Pz resol histogram fit lower bound: " << resolutions->GetPzFitMin() << "\n";
-  std::cout << "Pz resol histogram fit upper bound: " << resolutions->GetPzFitMax() << "\n";
-  std::cout << "Resol graphs number of points: " << resolutions->GetNPoints() << "\n";
-  std::cout << "Resol graphs pzmc lower bound: " << resolutions->GetLowerBoundPzMC() << " MeV/c\n";
-  std::cout << "Resol graphs pzmc upper bound: " << resolutions->GetUpperBoundPzMC() << " MeV/c\n";
-  std::cout << "Resol graphs ptmc lower bound: " << resolutions->GetResolLowerBound() << " MeV/c\n";
-  std::cout << "Resol graphs ptmc upper bound: " << resolutions->GetResolUpperBound() << " MeV/c\n";
-  std::cout << "Pz rec cut: " << resolutions->GetCutPzRec() << " MeV/c\n";
+  pr_resolutions->Set5StationOnly(five_stations_only);
+  pr_resolutions->SetNBinsPt(n_pt_bins);
+  pr_resolutions->SetNBinsPz(n_pz_bins);
+  pr_resolutions->SetNPoints(n_points);
+  pr_resolutions->SetPtFitMin(pt_fit_min);
+  pr_resolutions->SetPtFitMax(pt_fit_max);
+  pr_resolutions->SetPzFitMin(pz_fit_min);
+  pr_resolutions->SetPzFitMax(pz_fit_max);
+  pr_resolutions->SetLowerBoundPzMC(150.0);
+  pr_resolutions->SetUpperBoundPzMC(250.0);
+  pr_resolutions->SetResolLowerBound(lower_bound);
+  pr_resolutions->SetResolUpperBound(upper_bound);
+  pr_resolutions->SetCutPzRec(pz_rec_cut);
+
+  // Create Kalman momentum resolutions display
+  MAUS::SciFiDisplayMomentumResolutionsKF* kf_resolutions =
+    new MAUS::SciFiDisplayMomentumResolutionsKF();
+  kf_resolutions->Set5StationOnly(five_stations_only);
+  kf_resolutions->SetNBinsPt(n_pt_bins);
+  kf_resolutions->SetNBinsPz(n_pz_bins);
+  kf_resolutions->SetNPoints(n_points);
+  kf_resolutions->SetPtFitMin(pt_fit_min);
+  kf_resolutions->SetPtFitMax(pt_fit_max);
+  kf_resolutions->SetPzFitMin(pz_fit_min);
+  kf_resolutions->SetPzFitMax(pz_fit_max);
+  kf_resolutions->SetLowerBoundPzMC(150.0);
+  kf_resolutions->SetUpperBoundPzMC(250.0);
+  kf_resolutions->SetResolLowerBound(lower_bound);
+  kf_resolutions->SetResolUpperBound(upper_bound);
+  kf_resolutions->SetCutPzRec(pz_rec_cut);
+
 
   // Set up the displays
   // analyser.AddDisplay(pr_mom_residuals);
   // analyser.AddDisplay(kf_pos_residuals);
   // analyser.AddDisplay(kf_mom_residuals);
-  analyser.AddDisplay(resolutions);
+  // analyser.AddDisplay(pr_resolutions);
+  analyser.AddDisplay(kf_resolutions);
   analyser.SetUpDisplays();
 
   // Set up ROOT app, input file, and MAUS data class
