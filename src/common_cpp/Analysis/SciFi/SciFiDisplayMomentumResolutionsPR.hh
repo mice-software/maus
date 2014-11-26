@@ -37,7 +37,7 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayDataInterface.hh"
-
+#include "src/common_cpp/Analysis/SciFi/SciFiResolutionsMaker.hh"
 
 namespace MAUS {
 
@@ -49,11 +49,6 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     /** Destructor */
     virtual ~SciFiDisplayMomentumResolutionsPR();
 
-    /** Calculate the resolution for a particular MC truth momentum interval,
-     *  by plotting a histo of the MC - Recon data for the interval,
-     *  fitting a gaussian, and returning the sigma and error on sigma. Will make a cut
-     *  for 5 point tracks only if the m5StationOnly variable is set to true.
-     */
     bool CalcResolution(const std::string& residual, const TCut cut, double &res, double &res_err);
 
     /** Make a TCut out of a variable and operator, input as strings, and a value input as double */
@@ -110,7 +105,7 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     void MakePtPtResolutions();
 
     /** Make pz resolution graphs, as a function of PtMC */
-    void make_pzpt_resolutions();
+    void MakePzPtResolutions();
 
     /** Make pt resolution graphs, as a function of PzMC */
     void MakePtPzResolutions();
@@ -177,9 +172,8 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     /** Set up the ROOT TTree, call this after setting up the SciFiData member */
     bool SetUpRoot();
 
-    /** Sets up the SciFiData object needed by the display.
-     *  The display does not own the memory, but rather this should be called by
-     *  the SciFiAnalysis class which then assumes ownership.
+    /** Sets up the SciFiData object needed by the display. The display does not own the memory,
+     *  but rather this should be called by the SciFiAnalysis class which then assumes ownership.
      */
     SciFiDataBase* SetUpSciFiData();
 
@@ -187,7 +181,7 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     TTree* mTree;                  /** The ROOT tree used to accumulate the reduced data */
     MomentumDataPR mTrackData;     /** Struct containing reduced data for 1 track in a spill */
 
-    // Resolution Graphs
+    /** Resolution Graphs, T1 -> Tracker 1, T2 -> Tracker 2, y axis named first, x axis second */
     TGraphErrors* mT1PtResolPtMC;
     TGraphErrors* mT2PtResolPtMC;
     TGraphErrors* mT1PzResolPtMC;
@@ -196,6 +190,8 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     TGraphErrors* mT2PtResolPzMC;
     TGraphErrors* mT1PzResolPzMC;
     TGraphErrors* mT2PzResolPzMC;
+
+    SciFiResolutionsMaker mResolMaker;  /// The resolution maker class
 
     // Parameters
     int mNBinsPt;            /// Number of bins used to make the histos for pt resolution graphs

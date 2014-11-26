@@ -16,6 +16,7 @@
  */
 
 #include <iostream>
+#include <vector>
 #include <sstream>
 
 // ROOT headers
@@ -24,16 +25,16 @@
 #include "TF1.h"
 
 // MAUS headers
-#include "SciFiResolutionsMaker.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiResolutionsMaker.hh"
 
 namespace MAUS {
 
-SciFiResolutionsMaker::SciFiResolutionsMaker() : mNGraphPoints(9),
-                                                 mNHistoBins(200),
+SciFiResolutionsMaker::SciFiResolutionsMaker() : mNGraphPoints(0),
+                                                 mNHistoBins(0),
                                                  mGraphLowerBound(0.0),
-                                                 mGraphUpperBound(90.0),
-                                                 mFitMin(-50.0),
-                                                 mFitMax(50.0),
+                                                 mGraphUpperBound(0.0),
+                                                 mFitMin(0.0),
+                                                 mFitMax(0.0),
                                                  mCuts("") {
   // Do nothing
 }
@@ -76,10 +77,18 @@ bool SciFiResolutionsMaker::CalcResolution(TTree* aTree, const std::string& aRes
   }
 }
 
-void SciFiResolutionsMaker::MakeGraph(TTree* aTree, const std::string& aXParam,
-                                      const std::string&  aYResidualT1,
-                                      const std::string&  aYResidualT2,
-                                      TGraphErrors* aT1Graph, TGraphErrors* aT2Graph) {
+void SciFiResolutionsMaker::Clear() {
+  mNGraphPoints = 0;
+  mNHistoBins = 0;
+  mGraphLowerBound = 0.0;
+  mGraphUpperBound = 0.0;
+  mFitMin = 0.0;
+  mFitMax = 0.0;
+  mCuts = "";
+}
+
+TGraphErrors* SciFiResolutionsMaker::MakeGraph(TTree* aTree, const std::string& aXParam,
+                                               const std::string&  aYResidual) {
 
   double lXRange = mGraphUpperBound - mGraphLowerBound;        // x axis range of graph
   double lResolutionError =  lXRange / ( mNGraphPoints * 2 );  // Error in x of each data point
@@ -112,23 +121,18 @@ void SciFiResolutionsMaker::MakeGraph(TTree* aTree, const std::string& aXParam,
     std::cerr << "lX[" << i << "] = " << lX[i] << std::endl;
   }
 
-  // Cuts for to select each tracker
-  TCut cutT1 = "TrackerNumber==0";
-  TCut cutT2 = "TrackerNumber==1";
-
   // Loop over the momentum intervals and calculate the resolution for each
   for (int i = 0; i < mNGraphPoints; ++i) {
-    TCut lInputCut = lCuts[i]&&cutT1&&mCuts;
-    CalcResolution(aTree, aYResidualT1, lInputCut, lY_t1[i], lYErr_t1[i]);
+    TCut lInputCut = lCuts[i]&&mCuts;
+    CalcResolution(aTree, aYResidual, lInputCut, lY_t1[i], lYErr_t1[i]);
   }
   for (int i = 0; i < mNGraphPoints; ++i) {
-    TCut lInputCut = lCuts[i]&&cutT2&&mCuts;
-    CalcResolution(aTree, aYResidualT2, lInputCut, lY_t2[i], lYErr_t2[i]);
+    TCut lInputCut = lCuts[i]&&mCuts;
+    CalcResolution(aTree, aYResidual, lInputCut, lY_t2[i], lYErr_t2[i]);
   }
 
   // Create the resultant resolution plots
-  aT1Graph = new TGraphErrors(mNGraphPoints, &lX[0], &lY_t1[0], &lXErr[0], &lYErr_t1[0]);
-  aT2Graph = new TGraphErrors(mNGraphPoints, &lX[0], &lY_t2[0], &lXErr[0], &lYErr_t2[0]);
+  return new TGraphErrors(mNGraphPoints, &lX[0], &lY_t1[0], &lXErr[0], &lYErr_t1[0]);
 }
 
 } // ~namespace MAUS

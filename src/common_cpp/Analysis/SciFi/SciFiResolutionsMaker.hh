@@ -50,6 +50,9 @@ class SciFiResolutionsMaker {
     bool CalcResolution(TTree* aTree, const std::string& aResidual,
                         const TCut& aCut, double& aRes, double &aResError);
 
+    /** Clear all the member variables */
+    void Clear();
+
     /** Return the cuts */
     TCut GetCuts() const { return mCuts; }
 
@@ -81,10 +84,8 @@ class SciFiResolutionsMaker {
      *  @param aT1Graph The resolution graph for tracker 1
      *  @param aT2Graph The resolution graph for tracker 2
      */
-    void MakeGraph(TTree* aTree, const std::string& aXParam,
-                   const std::string&  aYResidualT1,
-                   const std::string&  aYResidualT2,
-                   TGraphErrors* aT1Graph, TGraphErrors* aT2Graph);
+    TGraphErrors* MakeGraph(TTree* aTree, const std::string& aXParam,
+                            const std::string& aYResidual);
 
     /** Set the cuts */
     void SetCuts(TCut aCuts) { mCuts = aCuts; }
@@ -102,7 +103,7 @@ class SciFiResolutionsMaker {
     void SetFitMax(double aFitMax) { mFitMax = aFitMax; }
 
     /** Set the number of points used in the resolution graph */
-    void SetNGraphPoints(double aNGraphPoints) { mNGraphPoints = aNGraphPoints; }
+    void SetNGraphPoints(int aNGraphPoints) { mNGraphPoints = aNGraphPoints; }
 
     /** Set the number of bins used in the resolution histos */
     void SetNHistoBins(double aNHistoBins) { mNHistoBins = aNHistoBins; }

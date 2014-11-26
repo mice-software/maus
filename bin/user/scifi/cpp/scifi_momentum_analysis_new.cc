@@ -141,9 +141,9 @@ int main(int argc, char *argv[]) {
   std::cout << "Pz rec cut: " << resolutions->GetCutPzRec() << " MeV/c\n";
 
   // Set up the displays
-  analyser.AddDisplay(pr_mom_residuals);
-  analyser.AddDisplay(kf_pos_residuals);
-  analyser.AddDisplay(kf_mom_residuals);
+  // analyser.AddDisplay(pr_mom_residuals);
+  // analyser.AddDisplay(kf_pos_residuals);
+  // analyser.AddDisplay(kf_mom_residuals);
   analyser.AddDisplay(resolutions);
   analyser.SetUpDisplays();
 

@@ -161,245 +161,81 @@ SciFiDataBase* SciFiDisplayMomentumResolutionsPR::MakeDataObject() {
 }
 
 void SciFiDisplayMomentumResolutionsPR::MakePtPtResolutions() {
-  double x_range = mUpperBoundPtMC - mLowerBoundPtMC;  // Range of the pz resolution graph
-  double resolution_error =  x_range / ( mNPoints * 2 );    // Error in pt_mc of each data point
-  // The mid pt_mc value of the first data point
-  double first_resolution_point = mLowerBoundPtMC + resolution_error;
+  mResolMaker.Clear();
+  mResolMaker.SetNGraphPoints(mNPoints);
+  mResolMaker.SetNHistoBins(mNBinsPt);
+  mResolMaker.SetGraphLowerBound(mLowerBoundPtMC);
+  mResolMaker.SetGraphUpperBound(mUpperBoundPtMC);
+  mResolMaker.SetFitMin(mPtFitMin);
+  mResolMaker.SetFitMax(mPtFitMax);
 
-  std::vector<TCut> vCuts(mNPoints);          // The cuts defining the pt_mc intervals
-  std::vector<double> vPtMc(mNPoints);        // The centre of the pt_mc intervals
-  std::vector<double> vPtMcErr(mNPoints);     // The width of the intervals
-  std::vector<double> vPtRes_t1(mNPoints);    // The resultant pt resolutions
-  std::vector<double> vPtResErr_t1(mNPoints); // The errors associated with the pt res
-  std::vector<double> vPtRes_t2(mNPoints);    // The resultant pt resolutions
-  std::vector<double> vPtResErr_t2(mNPoints); // The errors associated with the pt res
-
-  // Cuts in pt_mc
-  std::string s1 = "PtMc>=";
-  std::string s2 = "&&PtMc<";
-  for (int i = 0; i < mNPoints; ++i) {
-    std::stringstream ss1;
-    double point_lower_bound = mLowerBoundPtMC + (resolution_error * 2 * i);
-    double point_upper_bound = point_lower_bound + (resolution_error * 2);
-    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
-    vCuts[i] = ss1.str().c_str();
-    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
-  }
-
-  // The central MC momentum & error associated with the MC momentum (just the interval half width)
-  for (int i = 0; i < mNPoints; ++i) {
-    vPtMc[i] = first_resolution_point + (resolution_error * 2 * i);
-    vPtMcErr[i] = resolution_error;
-    std::cerr << "vPtMc[" << i << "] = " << vPtMc[i] << std::endl;
-  }
-
-  // Cuts for to select each tracker
-  TCut cutT1 = "TrackerNumber==0";
-  TCut cutT2 = "TrackerNumber==1";
-
-  // Form the reconstructed pt TCut
-  // TCut tcut_ptrec = form_tcut("TMath::Abs(pt_rec)", "<", _cutPtRec);
-
-  // Loop over the momentum intervals and calculate the resolution for each
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PtMc-PtRec");
-    // TCut input_cut = vCuts[i]&&cutT1&&tcut_ptrec;
-    TCut input_cut = vCuts[i]&&cutT1;
-    CalcResolution(residual, input_cut, vPtRes_t1[i], vPtResErr_t1[i]);
-  }
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PtMc-PtRec");
-    // TCut input_cut = vCuts[i]&&cutT2&&tcut_ptrec;
-    TCut input_cut = vCuts[i]&&cutT2;
-    CalcResolution(residual, input_cut, vPtRes_t2[i], vPtResErr_t2[i]);
-  }
-
-  // Create the resultant resolution plots
-  mT1PtResolPtMC = new TGraphErrors(mNPoints, &vPtMc[0], &vPtRes_t1[0],
-                                        &vPtMcErr[0], &vPtResErr_t1[0]);
-  mT2PtResolPtMC = new TGraphErrors(mNPoints, &vPtMc[0], &vPtRes_t2[0],
-                                        &vPtMcErr[0], &vPtResErr_t2[0]);
+  mResolMaker.SetCuts("TrackerNumber==0");
+  mT1PtResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PtMc-PtRec");
+  mResolMaker.SetCuts("TrackerNumber==1");
+  mT2PtResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PtMc-PtRec");
 }
 
-void SciFiDisplayMomentumResolutionsPR::make_pzpt_resolutions() {
+void SciFiDisplayMomentumResolutionsPR::MakePzPtResolutions() {
+  mResolMaker.Clear();
+  mResolMaker.SetNGraphPoints(mNPoints);
+  mResolMaker.SetNHistoBins(mNBinsPz);
+  mResolMaker.SetGraphLowerBound(mLowerBoundPtMC);
+  mResolMaker.SetGraphUpperBound(mUpperBoundPtMC);
+  mResolMaker.SetFitMin(mPzFitMin);
+  mResolMaker.SetFitMax(mPzFitMax);
 
-  double pz_range = mUpperBoundPtMC - mLowerBoundPtMC;  // Range of the pz resolution graph
-  double resolution_error =  pz_range / ( mNPoints * 2 );    // Error in pt_mc of each data point
-  // The mid pt_mc value of the first data point
-  double first_resolution_point = mLowerBoundPtMC + resolution_error;
-  std::vector<TCut> vCuts(mNPoints);          // The cuts defining the pt_mc intervals
-  std::vector<double> vPtMc(mNPoints);        // The centre of the pt_mc intervals
-  std::vector<double> vPtMcErr(mNPoints);     // The width of the intervals
-  std::vector<double> vPzRes_t1(mNPoints);    // The resultant pz resolutions
-  std::vector<double> vPzResErr_t1(mNPoints); // The errors associated with the pz res
-  std::vector<double> vPzRes_t2(mNPoints);    // The resultant pz resolutions
-  std::vector<double> vPzResErr_t2(mNPoints); // The errors associated with the pz res
+  TCut PzRecCut = FormTCut("TMath::Abs(PzRec)", "<", mCutPzRec);
+  TCut T1Cut = "TrackerNumber==0";
+  TCut T2Cut = "TrackerNumber==1";
+  TCut TotalCut = T1Cut + PzRecCut;
 
-  // Cuts in pt_mc
-  std::string s1 = "PtMc>=";
-  std::string s2 = "&&PtMc<";
-  for (int i = 0; i < mNPoints; ++i) {
-    std::stringstream ss1;
-    double point_lower_bound = mLowerBoundPtMC + (resolution_error * 2 * i);
-    double point_upper_bound = point_lower_bound + (resolution_error * 2);
-    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
-    vCuts[i] = ss1.str().c_str();
-    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
-  }
-
-  // The central MC momentum & error associated with the MC momentum (just the interval half width)
-  for (int i = 0; i < mNPoints; ++i) {
-    vPtMc[i] = first_resolution_point + (resolution_error * 2 * i);
-    vPtMcErr[i] = resolution_error;
-    std::cerr << "vPtMc[" << i << "] = " << vPtMc[i] << std::endl;
-  }
-
-  // Cuts for to select each tracker
-  TCut cutT1 = "TrackerNumber==0";
-  TCut cutT2 = "TrackerNumber==1";
-
-  // Form the reconstructed pz TCut
-  TCut tcut_pzrec = FormTCut("TMath::Abs(PzRec)", "<", mCutPzRec);
-
-  // Loop over the momentum intervals and calculate the resolution for each
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PzMc+Charge*PzRec");
-    TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
-    CalcResolution(residual, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
-  }
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PzMc-Charge*PzRec");
-    TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
-    CalcResolution(residual, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
-  }
-
-  // Create the resultant resolution plots
-  mT1PzResolPtMC = new TGraphErrors(mNPoints, &vPtMc[0], &vPzRes_t1[0],
-                                    &vPtMcErr[0], &vPzResErr_t1[0]);
-  mT2PzResolPtMC = new TGraphErrors(mNPoints, &vPtMc[0], &vPzRes_t2[0],
-                                    &vPtMcErr[0], &vPzResErr_t2[0]);
+  mResolMaker.SetCuts(TotalCut);
+  mT1PzResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PzMc+Charge*PzRec");
+  TotalCut = T2Cut + PzRecCut;
+  mResolMaker.SetCuts(TotalCut);
+  mT2PzResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PzMc-Charge*PzRec");
 }
 
 void SciFiDisplayMomentumResolutionsPR::MakePtPzResolutions() {
+  mResolMaker.Clear();
+  mResolMaker.SetNGraphPoints(mNPoints);
+  mResolMaker.SetNHistoBins(mNBinsPt);
+  mResolMaker.SetGraphLowerBound(mLowerBoundPzMC);
+  mResolMaker.SetGraphUpperBound(mUpperBoundPzMC);
+  mResolMaker.SetFitMin(mPtFitMin);
+  mResolMaker.SetFitMax(mPtFitMax);
 
-  double mUpperBoundPzMC = 250.0;
-  double mLowerBoundPzMC = 150.0;
-  double x_range = mUpperBoundPzMC - mLowerBoundPzMC;  // Range of the pz resolution graph
-  double x_error =  x_range / ( mNPoints * 2 );    // Error in pt_mc of each data point
-  // The mid pt_mc value of the first data point
-  double first_resolution_point = mLowerBoundPzMC + x_error;
-  std::vector<TCut> vCuts(mNPoints);          // The cuts defining the pt_mc intervals
-  std::vector<double> vPzMc(mNPoints);        // The centre of the pt_mc intervals
-  std::vector<double> vPzMcErr(mNPoints);     // The width of the intervals
-  std::vector<double> vPtRes_t1(mNPoints);    // The resultant pz resolutions
-  std::vector<double> vPtResErr_t1(mNPoints); // The errors associated with the pz res
-  std::vector<double> vPtRes_t2(mNPoints);    // The resultant pz resolutions
-  std::vector<double> vPtResErr_t2(mNPoints); // The errors associated with the pz res
+  TCut PzRecCut = FormTCut("TMath::Abs(PzRec)", "<", mCutPzRec);
+  TCut T1Cut = "TrackerNumber==0";
+  TCut T2Cut = "TrackerNumber==1";
+  TCut TotalCut = T1Cut + PzRecCut;
 
-  // Cuts in pt_mc
-  std::string s1 = "PzMc>=";
-  std::string s2 = "&&PzMc<";
-  for (int i = 0; i < mNPoints; ++i) {
-    std::stringstream ss1;
-    double point_lower_bound = mLowerBoundPzMC + (x_error * 2 * i);
-    double point_upper_bound = point_lower_bound + (x_error * 2);
-    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
-    vCuts[i] = ss1.str().c_str();
-    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
-  }
-
-  // The central MC momentum & error associated with the MC momentum (just the interval half width)
-  for (int i = 0; i < mNPoints; ++i) {
-    vPzMc[i] = first_resolution_point + (x_error * 2 * i);
-    vPzMcErr[i] = x_error;
-    std::cerr << "vPzMc[" << i << "] = " << vPzMc[i] << std::endl;
-  }
-
-  // Cuts for to select each tracker
-  TCut cutT1 = "TrackerNumber==0";
-  TCut cutT2 = "TrackerNumber==1";
-
-  // Form the reconstructed pz TCut
-  // TCut tcut_pzrec = form_tcut("TMath::Abs(PzRec)", "<", _cut_pz_rec);
-
-  // Loop over the momentum intervals and calculate the resolution for each
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PtMc-PtRec");
-    // TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
-    TCut input_cut = vCuts[i]&&cutT1;
-    CalcResolution(residual, input_cut, vPtRes_t1[i], vPtResErr_t1[i]);
-  }
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PtMc-PtRec");
-    // TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
-    TCut input_cut = vCuts[i]&&cutT2;
-    CalcResolution(residual, input_cut, vPtRes_t2[i], vPtResErr_t2[i]);
-  }
-
-  // Create the resultant resolution plots
-  mT1PtResolPzMC = new TGraphErrors(mNPoints, &vPzMc[0], &vPtRes_t1[0],
-                                        &vPzMcErr[0], &vPtResErr_t1[0]);
-  mT2PtResolPzMC = new TGraphErrors(mNPoints, &vPzMc[0], &vPtRes_t2[0],
-                                        &vPzMcErr[0], &vPtResErr_t2[0]);
+  mResolMaker.SetCuts(TotalCut);
+  mT1PtResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PtMc-PtRec");
+  TotalCut = T2Cut + PzRecCut;
+  mResolMaker.SetCuts(TotalCut);
+  mT2PtResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PtMc-PtRec");
 }
 
 void SciFiDisplayMomentumResolutionsPR::MakePzPzResolutions() {
+  mResolMaker.Clear();
+  mResolMaker.SetNGraphPoints(mNPoints);
+  mResolMaker.SetNHistoBins(mNBinsPz);
+  mResolMaker.SetGraphLowerBound(mLowerBoundPzMC);
+  mResolMaker.SetGraphUpperBound(mUpperBoundPzMC);
+  mResolMaker.SetFitMin(mPzFitMin);
+  mResolMaker.SetFitMax(mPzFitMax);
 
-  double x_range = mUpperBoundPzMC - mLowerBoundPzMC;  // Range of the pz resolution graph
-  double x_error =  x_range / ( mNPoints * 2 );    // Error in pt_mc of each data point
-  // The mid pt_mc value of the first data point
-  double first_resolution_point = mLowerBoundPzMC + x_error;
-  std::vector<TCut> vCuts(mNPoints);          // The cuts defining the pt_mc intervals
-  std::vector<double> vPzMc(mNPoints);        // The centre of the pt_mc intervals
-  std::vector<double> vPzMcErr(mNPoints);     // The width of the intervals
-  std::vector<double> vPzRes_t1(mNPoints);    // The resultant pz resolutions
-  std::vector<double> vPzResErr_t1(mNPoints); // The errors associated with the pz res
-  std::vector<double> vPzRes_t2(mNPoints);    // The resultant pz resolutions
-  std::vector<double> vPzResErr_t2(mNPoints); // The errors associated with the pz res
+  TCut PzRecCut = FormTCut("TMath::Abs(PzRec)", "<", mCutPzRec);
+  TCut T1Cut = "TrackerNumber==0";
+  TCut T2Cut = "TrackerNumber==1";
+  TCut TotalCut = T1Cut + PzRecCut;
 
-  // Cuts in pt_mc
-  std::string s1 = "PzMc>=";
-  std::string s2 = "&&PzMc<";
-  for (int i = 0; i < mNPoints; ++i) {
-    std::stringstream ss1;
-    double point_lower_bound = mLowerBoundPzMC + (x_error * 2 * i);
-    double point_upper_bound = point_lower_bound + (x_error * 2);
-    ss1 << s1 << point_lower_bound << s2 << point_upper_bound;
-    vCuts[i] = ss1.str().c_str();
-    std::cerr << "vCuts[" << i << "] = " << vCuts[i] << std::endl;
-  }
-
-  // The central MC momentum & error associated with the MC momentum (just the interval half width)
-  for (int i = 0; i < mNPoints; ++i) {
-    vPzMc[i] = first_resolution_point + (x_error * 2 * i);
-    vPzMcErr[i] = x_error;
-    std::cerr << "vPzMc[" << i << "] = " << vPzMc[i] << std::endl;
-  }
-
-  // Cuts for to select each tracker
-  TCut cutT1 = "TrackerNumber==0";
-  TCut cutT2 = "TrackerNumber==1";
-
-  // Form the reconstructed pz TCut
-  TCut tcut_pzrec = FormTCut("TMath::Abs(PzRec)", "<", mCutPzRec);
-
-  // Loop over the momentum intervals and calculate the resolution for each
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PzMc+Charge*PzRec");
-    TCut input_cut = vCuts[i]&&cutT1&&tcut_pzrec;
-    CalcResolution(residual, input_cut, vPzRes_t1[i], vPzResErr_t1[i]);
-  }
-  for (int i = 0; i < mNPoints; ++i) {
-    std::string residual("PzMc-Charge*PzRec");
-    TCut input_cut = vCuts[i]&&cutT2&&tcut_pzrec;
-    CalcResolution(residual, input_cut, vPzRes_t2[i], vPzResErr_t2[i]);
-  }
-
-  // Create the resultant resolution plots
-  mT1PzResolPzMC = new TGraphErrors(mNPoints, &vPzMc[0], &vPzRes_t1[0],
-                                        &vPzMcErr[0], &vPzResErr_t1[0]);
-  mT2PzResolPzMC = new TGraphErrors(mNPoints, &vPzMc[0], &vPzRes_t2[0],
-                                        &vPzMcErr[0], &vPzResErr_t2[0]);
+  mResolMaker.SetCuts(TotalCut);
+  mT1PzResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PzMc+Charge*PzRec");
+  TotalCut = T2Cut + PzRecCut;
+  mResolMaker.SetCuts(TotalCut);
+  mT2PzResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PzMc-Charge*PzRec");
 }
 
 void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
@@ -422,7 +258,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
 
   // Create the graphs
   MakePtPtResolutions();
-  make_pzpt_resolutions();
+  MakePzPtResolutions();
   MakePtPzResolutions();
   MakePzPzResolutions();
 
