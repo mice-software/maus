@@ -15,24 +15,11 @@
  *
  */
 
-
 // MAUS headers
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayDataInterface.hh"
+
 namespace MAUS {
 
-SciFiDisplayBase::SciFiDisplayBase() : m5StationOnly(false), mSpillData(NULL), mCanvas(NULL) {
-  // Do nothing
-}
-
-SciFiDisplayBase::~SciFiDisplayBase() {
-  if (mCanvas) delete mCanvas;
-}
-
-SciFiDataBase* SciFiDisplayBase::SetUpData() {
-  if (!mSpillData) {
-    mSpillData = dynamic_cast<SciFiDataBase*>(MakeDataObject());
-  }
-  return mSpillData;
-}
-
 } // ~namespace MAUS
+
+

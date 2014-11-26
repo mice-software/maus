@@ -25,7 +25,6 @@ namespace MAUS {
 
 SciFiDisplayMomentumResidualsKF::SciFiDisplayMomentumResidualsKF() : mOf1(NULL),
                                                                      mTree(NULL),
-                                                                     mSpillData(NULL),
                                                                      mResidualPtT1(NULL),
                                                                      mResidualPzT1(NULL),
                                                                      mResidualPzT1Log(NULL),
@@ -53,10 +52,11 @@ void SciFiDisplayMomentumResidualsKF::Fill() {
   mOf1->cd();
   if (mTree) {
     // Loop over the data for each track in the spill and fill the tree with reduced data
-    for ( size_t i = 0; i < mSpillData->mDataKF.size(); ++i ) {
-      mTrackData = mSpillData->mDataKF[i];
+    for ( size_t i = 0; i < GetData()->mDataKF.size(); ++i ) {
+      mTrackData = GetData()->mDataKF[i];
       mTree->Fill();
-      int q = mTrackData.Charge;
+      // int q = mTrackData.Charge;
+      if ( m5StationOnly && mTrackData.NumberOfTrackPoints != 15 ) continue;
       if (mTrackData.TrackerNumber == 0) {
         mResidualPtT1->Fill(mTrackData.PtRec - mTrackData.PtMc);
         mResidualPzT1->Fill(mTrackData.PzRec - mTrackData.PzMc);
@@ -70,6 +70,14 @@ void SciFiDisplayMomentumResidualsKF::Fill() {
   } else {
     std::cerr << "SciFiDisplayMomentumResidualsKF: Warning, local ROOT Tree not setup\n";
   }
+}
+
+SciFiDataKF* SciFiDisplayMomentumResidualsKF::GetData() {
+  return GetDataTemplate();
+}
+
+SciFiDataBase* SciFiDisplayMomentumResidualsKF::MakeDataObject() {
+  return MakeDataObjectTemplate();
 }
 
 void SciFiDisplayMomentumResidualsKF::Plot(TCanvas* aCanvas) {
@@ -121,14 +129,13 @@ void SciFiDisplayMomentumResidualsKF::Save() {
   }
 }
 
-SciFiDataBase* SciFiDisplayMomentumResidualsKF::SetUp() {
-  SciFiDataBase* data = SetUpSciFiData();
-  SetUpRoot();
-  return data;
+SciFiDataBase* SciFiDisplayMomentumResidualsKF::SetData(SciFiDataBase* data) {
+  return SetDataTemplate(data);
 }
 
-SciFiDataBase* SciFiDisplayMomentumResidualsKF::SetUpSciFiData() {
-  mSpillData = new SciFiDataMomentumKF();
+SciFiDataBase* SciFiDisplayMomentumResidualsKF::SetUp() {
+  SetUpData();
+  SetUpRoot();
   return mSpillData;
 }
 
@@ -140,6 +147,7 @@ bool SciFiDisplayMomentumResidualsKF::SetUpRoot() {
   mTree->Branch("TrackerNumber", &mTrackData.TrackerNumber, "TrackerNumber/I");
   mTree->Branch("NDF", &mTrackData.NDF, "NDF/I");
   mTree->Branch("Charge", &mTrackData.Charge, "Charge/I");
+  mTree->Branch("NumberOfTrackPoints", &mTrackData.NumberOfTrackPoints, "NumberOfTrackPoints/I");
   mTree->Branch("PxMc", &mTrackData.PxMc, "PxMc/D");
   mTree->Branch("PyMc", &mTrackData.PxMc, "PyMc/D");
   mTree->Branch("PtMc", &mTrackData.PtMc, "PtMc/D");

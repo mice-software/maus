@@ -23,10 +23,15 @@
 
 namespace SciFiAnalysisTools {
 
-bool find_mc_cluster_momentum(const int track_id, const MAUS::SciFiCluster* clus,
-                              MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom) {
+bool find_mc_cluster_data(const int track_id, const MAUS::SciFiCluster* clus,
+                          MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom,
+					      MAUS::ThreeVector &pos) {
+
+  mom = MAUS::ThreeVector(0.0, 0.0, 0.0);
+  pos = MAUS::ThreeVector(0.0, 0.0, 0.0);
 
   // Loop over digits within the cluster
+  int counter = 0;
   std::vector<MAUS::SciFiDigit*> digits = clus->get_digits_pointers();
   std::vector<MAUS::SciFiDigit*>::iterator dig_it;
   for (dig_it = digits.begin(); dig_it != digits.end(); ++dig_it) {
@@ -40,31 +45,42 @@ bool find_mc_cluster_momentum(const int track_id, const MAUS::SciFiCluster* clus
     std::vector<MAUS::SciFiHit*>::iterator hit_it;
     for (hit_it = hits.begin(); hit_it != hits.end(); ++hit_it) {
       if (track_id == (*hit_it)->GetTrackId()) {
-        mom = (*hit_it)->GetMomentum();
-        return true;
+        mom += (*hit_it)->GetMomentum();
+        pos += (*hit_it)->GetPosition();
+        ++counter;
       }
     }
+  }
+  if ( counter > 0 ) {
+    mom /= static_cast<double>(counter);
+    pos /= static_cast<double>(counter);
+    return true;
   }
   return false;
 }
 
-bool find_mc_spoint_momentum(const int track_id, const MAUS::SciFiSpacePoint* sp,
-                             MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom) {
+bool find_mc_spoint_data(const int track_id, const MAUS::SciFiSpacePoint* sp,
+                         MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom,
+					     MAUS::ThreeVector &pos) {
 
   std::vector<MAUS::SciFiCluster*> clusters = sp->get_channels_pointers();
   mom = MAUS::ThreeVector(0.0, 0.0, 0.0);
+  pos = MAUS::ThreeVector(0.0, 0.0, 0.0);
   int counter = 0;
 
   // Calculate the momentum for each cluster then take the average
   for (size_t i = 0; i < clusters.size(); ++i) {
     MAUS::ThreeVector clus_mom(0.0, 0.0, 0.0);
-    if ( find_mc_cluster_momentum(track_id, clusters[i], lkup, clus_mom) ) {
+    MAUS::ThreeVector clus_pos(0.0, 0.0, 0.0);
+    if ( find_mc_cluster_data(track_id, clusters[i], lkup, clus_mom, clus_pos) ) {
       mom += clus_mom;
+      pos += clus_pos;
       ++counter;
     }
   }
   if ( counter > 0 ) {
     mom /= static_cast<double>(counter);
+    pos /= static_cast<double>(counter);
     return true;
   }
   return false;

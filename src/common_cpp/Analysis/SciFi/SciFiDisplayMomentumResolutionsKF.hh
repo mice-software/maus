@@ -15,14 +15,14 @@
  *
  */
 
-/** @class SciFiDisplayMomentumResolutionsPR
+/** @class SciFiDisplayMomentumResolutionsKF
  *
  *  Class to pattern recognition momentum residuals as ROOT histograms
  *
  */
 
-#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESOLUTIONSPR_
-#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESOLUTIONSPR_
+#ifndef _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESOLUTIONSKF_
+#define _SRC_COMMON_CPP_RECON_SCIFI_SCIFIDISPLAYMOMENTUMRESOLUTIONSKF_
 
 #include <string>
 
@@ -35,19 +35,19 @@
 
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDataKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayDataInterface.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiResolutionsMaker.hh"
 
 namespace MAUS {
 
-class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFiDataMomentumPR> {
+class SciFiDisplayMomentumResolutionsKF : public SciFiDisplayDataInterface<SciFiDataKF> {
   public:
     /** Default constructor */
-    SciFiDisplayMomentumResolutionsPR();
+    SciFiDisplayMomentumResolutionsKF();
 
     /** Destructor */
-    virtual ~SciFiDisplayMomentumResolutionsPR();
+    virtual ~SciFiDisplayMomentumResolutionsKF();
 
     bool CalcResolution(const std::string& residual, const TCut cut, double &res, double &res_err);
 
@@ -60,7 +60,7 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
     virtual void Fill();
 
     /** Return a pointer to the SciFiData object associated with the display */
-    virtual SciFiDataMomentumPR* GetData();
+    virtual SciFiDataKF* GetData();
 
     /** Return the cut on reconstructed pz */
     double GetCutPzRec() const { return mCutPzRec; }
@@ -177,9 +177,9 @@ class SciFiDisplayMomentumResolutionsPR : public SciFiDisplayDataInterface<SciFi
      */
     SciFiDataBase* SetUpSciFiData();
 
-    TFile* mOf1;                   /** The output ROOT file */
-    TTree* mTree;                  /** The ROOT tree used to accumulate the reduced data */
-    MomentumDataPR mTrackData;     /** Struct containing reduced data for 1 track in a spill */
+    TFile* mOf1;           /** The output ROOT file */
+    TTree* mTree;          /** The ROOT tree used to accumulate the reduced data */
+    DataKF mTrackData;     /** Struct containing reduced data for 1 track in a spill */
 
     /** Resolution Graphs, T1 -> Tracker 1, T2 -> Tracker 2, y axis named first, x axis second */
     TGraphErrors* mT1PtResolPtMC;

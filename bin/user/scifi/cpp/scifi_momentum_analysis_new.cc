@@ -35,8 +35,10 @@
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayPositionResidualsKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResidualsKF.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsKF.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/JsonCppStreamer/IRStream.hh"
@@ -50,6 +52,7 @@ int main(int argc, char *argv[]) {
   std::string filename = std::string(argv[1]);
 
   // Analysis parameters - some may be overridden with command line arguments. All momenta in MeV/c.
+  bool five_stations_only = true; // Only use tracks which produce spacepoints in all 5 stations
   int n_pt_bins = 100;        // No. of bins in histos used to find pt resols (0 = let ROOT decide)
   int n_pz_bins = 100;        // No. of bins in histos used to find pz resols (0 = let ROOT decide)
   int n_points = 9;           // No. of data points in each resolution plot
@@ -65,7 +68,6 @@ int main(int argc, char *argv[]) {
   //   -p -> pause between events
   //   -g -> enables saving xyz plots and gives output graphics file type
   bool bool_pause = false;
-  // bool bool_save = false;
   std::string save_type = "";
 
   for (int i = 2; i < argc; i++) {
@@ -76,7 +78,6 @@ int main(int argc, char *argv[]) {
       if ( (i+1) < argc ) save_type = argv[i + 1];
       if ( (save_type == "eps") || (save_type == "pdf") || (save_type == "png") ) {
         std::cout << "Saving plots as " << save_type << " files.\n";
-        // bool_save = true;
       } else if ( save_type != "" ) {
         std::cerr << "Invalid graphics output type given\n";
       }
@@ -86,10 +87,10 @@ int main(int argc, char *argv[]) {
         ss1 >> n_pt_bins;
       }
     } else if ( std::strcmp(argv[i], "-n_pz_bins") == 0 ) {
-        if ( (i+1) < argc ) {
-          std::stringstream ss1(argv[i + 1]);
-          ss1 >> n_pz_bins;
-        }
+      if ( (i+1) < argc ) {
+        std::stringstream ss1(argv[i + 1]);
+        ss1 >> n_pz_bins;
+      }
     }
   }
 
@@ -97,47 +98,61 @@ int main(int argc, char *argv[]) {
   MAUS::SciFiAnalysis analyser;
 
   // Create Pat Rec momentum residual display
-  MAUS::SciFiDisplayMomentumResidualsPR* pr_residuals = new MAUS::SciFiDisplayMomentumResidualsPR();
+  MAUS::SciFiDisplayMomentumResidualsPR* pr_mom_residuals
+    = new MAUS::SciFiDisplayMomentumResidualsPR();
+  pr_mom_residuals->Set5StationOnly(five_stations_only);
+
+  // Create a Kalman fit position residual display
+  MAUS::SciFiDisplayPositionResidualsKF* kf_pos_residuals
+    = new MAUS::SciFiDisplayPositionResidualsKF();
+  kf_pos_residuals->Set5StationOnly(five_stations_only);
 
   // Create a Kalman fit momentum residual display
-  MAUS::SciFiDisplayMomentumResidualsKF* kf_residuals = new MAUS::SciFiDisplayMomentumResidualsKF();
+  MAUS::SciFiDisplayMomentumResidualsKF* kf_mom_residuals
+    = new MAUS::SciFiDisplayMomentumResidualsKF();
+  kf_mom_residuals->Set5StationOnly(five_stations_only);
 
   // Create Pat Rec momentum resolutions display
-  MAUS::SciFiDisplayMomentumResolutionsPR* resolutions =
+  MAUS::SciFiDisplayMomentumResolutionsPR* pr_resolutions =
     new MAUS::SciFiDisplayMomentumResolutionsPR();
-  resolutions->set_n_pt_bins(n_pt_bins);
-  resolutions->set_n_pz_bins(n_pz_bins);
-  resolutions->set_n_points(n_points);
-  resolutions->set_pt_fit_min(pt_fit_min);
-  resolutions->set_pt_fit_max(pt_fit_max);
-  resolutions->set_pz_fit_min(pz_fit_min);
-  resolutions->set_pz_fit_max(pz_fit_max);
-  resolutions->set_lower_bound_pzmc(150.0);
-  resolutions->set_upper_bound_pzmc(250.0);
-  resolutions->set_resol_lower_bound(lower_bound);
-  resolutions->set_resol_upper_bound(upper_bound);
-  resolutions->set_cut_pz_rec(pz_rec_cut);
-  std::cout << "Pt resol histogram number of bins: " << resolutions->get_n_pt_bins() << "\n";
-  std::cout << "Pt resol histogram fit lower bound: " << resolutions->get_pt_fit_min() << "\n";
-  std::cout << "Pt resol histogram fit upper bound: " << resolutions->get_pt_fit_max() << "\n";
-  std::cout << "Pz resol histogram number of bins: " << resolutions->get_n_pz_bins() << "\n";
-  std::cout << "Pz resol histogram fit lower bound: " << resolutions->get_pz_fit_min() << "\n";
-  std::cout << "Pz resol histogram fit upper bound: " << resolutions->get_pz_fit_max() << "\n";
-  std::cout << "Resol graphs number of points:  " << resolutions->get_n_points() << "\n";
-  std::cout << "Resol graphs pzmc lower bound:  " << resolutions->get_lower_bound_pzmc()
-            << " MeV/c\n";
-  std::cout << "Resol graphs pzmc upper bound:  " << resolutions->get_upper_bound_pzmc()
-            << " MeV/c\n";
-  std::cout << "Resol graphs ptmc lower bound:  " << resolutions->get_resol_lower_bound()
-            << " MeV/c\n";
-  std::cout << "Resol graphs ptmc upper bound:  " << resolutions->get_resol_upper_bound()
-            << " MeV/c\n";
-  std::cout << "Pz rec cut: " << resolutions->get_cut_pz_rec() << " MeV/c\n";
+  pr_resolutions->Set5StationOnly(five_stations_only);
+  pr_resolutions->SetNBinsPt(n_pt_bins);
+  pr_resolutions->SetNBinsPz(n_pz_bins);
+  pr_resolutions->SetNPoints(n_points);
+  pr_resolutions->SetPtFitMin(pt_fit_min);
+  pr_resolutions->SetPtFitMax(pt_fit_max);
+  pr_resolutions->SetPzFitMin(pz_fit_min);
+  pr_resolutions->SetPzFitMax(pz_fit_max);
+  pr_resolutions->SetLowerBoundPzMC(150.0);
+  pr_resolutions->SetUpperBoundPzMC(250.0);
+  pr_resolutions->SetResolLowerBound(lower_bound);
+  pr_resolutions->SetResolUpperBound(upper_bound);
+  pr_resolutions->SetCutPzRec(pz_rec_cut);
+
+  // Create Kalman momentum resolutions display
+  MAUS::SciFiDisplayMomentumResolutionsKF* kf_resolutions =
+    new MAUS::SciFiDisplayMomentumResolutionsKF();
+  kf_resolutions->Set5StationOnly(five_stations_only);
+  kf_resolutions->SetNBinsPt(n_pt_bins);
+  kf_resolutions->SetNBinsPz(n_pz_bins);
+  kf_resolutions->SetNPoints(n_points);
+  kf_resolutions->SetPtFitMin(pt_fit_min);
+  kf_resolutions->SetPtFitMax(pt_fit_max);
+  kf_resolutions->SetPzFitMin(pz_fit_min);
+  kf_resolutions->SetPzFitMax(pz_fit_max);
+  kf_resolutions->SetLowerBoundPzMC(150.0);
+  kf_resolutions->SetUpperBoundPzMC(250.0);
+  kf_resolutions->SetResolLowerBound(lower_bound);
+  kf_resolutions->SetResolUpperBound(upper_bound);
+  kf_resolutions->SetCutPzRec(pz_rec_cut);
+
 
   // Set up the displays
-  analyser.AddDisplay(pr_residuals);
-  analyser.AddDisplay(kf_residuals);
-  analyser.AddDisplay(resolutions);
+  // analyser.AddDisplay(pr_mom_residuals);
+  // analyser.AddDisplay(kf_pos_residuals);
+  // analyser.AddDisplay(kf_mom_residuals);
+  // analyser.AddDisplay(pr_resolutions);
+  analyser.AddDisplay(kf_resolutions);
   analyser.SetUpDisplays();
 
   // Set up ROOT app, input file, and MAUS data class
@@ -170,20 +185,7 @@ int main(int argc, char *argv[]) {
   // Make the final plots and save
   analyser.Plot();
   analyser.Save();
-
   theApp.Run();
-
-  // Print some results
-//   std::cerr << "\n-------------------------Results-------------------------\n";
-//   std::cerr << "n_mc_tracks_valid: " << analyser.get_n_mc_tracks_valid() << std::endl;
-//   std::cerr << "n_rec_tracks_invalid: " << analyser.get_n_mc_tracks_invalid() << std::endl;
-//   std::cerr << "n_rec_tracks_matched: " << analyser.get_n_rec_tracks_matched() << std::endl;
-//   std::cerr << "n_rec_tracks_unmatched: " << analyser.get_n_rec_tracks_unmatched() << std::endl;
-//   std::cerr << "n_rec_tracks_total: " << analyser.get_n_rec_tracks_total() << std::endl;
-//   std::cerr << "=> Efficiency: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
-//     / static_cast<double>(analyser.get_n_mc_tracks_valid()) << std::endl;
-//   std::cerr << "=> Purity: " << static_cast<double>(analyser.get_n_rec_tracks_matched())
-//     / static_cast<double>(analyser.get_n_rec_tracks_total()) << std::endl;
 
   return 0;
 }

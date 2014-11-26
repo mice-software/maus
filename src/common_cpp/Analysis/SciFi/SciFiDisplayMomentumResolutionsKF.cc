@@ -25,7 +25,7 @@
 #include "TF1.h"
 
 // MAUS headers
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsPR.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayMomentumResolutionsKF.hh"
 #include "src/common_cpp/Plotting/SciFi/SciFiAnalysisTools.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -40,7 +40,7 @@
 
 namespace MAUS {
 
-SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NULL),
+SciFiDisplayMomentumResolutionsKF::SciFiDisplayMomentumResolutionsKF() : mOf1(NULL),
                                                                          mTree(NULL),
                                                                          mT1PtResolPtMC(NULL),
                                                                          mT2PtResolPtMC(NULL),
@@ -65,7 +65,7 @@ SciFiDisplayMomentumResolutionsPR::SciFiDisplayMomentumResolutionsPR() : mOf1(NU
   // Do nothing
 }
 
-SciFiDisplayMomentumResolutionsPR::~SciFiDisplayMomentumResolutionsPR() {
+SciFiDisplayMomentumResolutionsKF::~SciFiDisplayMomentumResolutionsKF() {
   if (mTree) delete mTree;
   if (mSpillData) delete mSpillData;
   if (mT1PtResolPtMC) delete mT1PtResolPtMC;
@@ -80,7 +80,7 @@ SciFiDisplayMomentumResolutionsPR::~SciFiDisplayMomentumResolutionsPR() {
   }
 }
 
-bool SciFiDisplayMomentumResolutionsPR::CalcResolution(const std::string& residual, const TCut cut,
+bool SciFiDisplayMomentumResolutionsKF::CalcResolution(const std::string& residual, const TCut cut,
                                                        double &res, double &res_err) {
   if (mTree) {
     mOf1->cd();
@@ -99,7 +99,7 @@ bool SciFiDisplayMomentumResolutionsPR::CalcResolution(const std::string& residu
     mTree->Draw((residual + ">>hResidual").c_str(), lCut);
 
     if (!hResidual) {
-      std::cerr << "SciFiDisplayMomentumResolutionsPR::calc_resolution: Invalid tracker #\n";
+      std::cerr << "SciFiDisplayMomentumResolutionsKF::calc_resolution: Invalid tracker #\n";
       return false;
     }
 
@@ -107,7 +107,7 @@ bool SciFiDisplayMomentumResolutionsPR::CalcResolution(const std::string& residu
     hResidual->Fit("gaus", "", "", mPzFitMin, mPzFitMax);
     TF1 *fit1 = hResidual->GetFunction("gaus");
     if (!fit1) {
-      std::cerr << "SciFiDisplayMomentumResolutionsPR::calc_resolution: Fit failed\n";
+      std::cerr << "SciFiDisplayMomentumResolutionsKF::calc_resolution: Fit failed\n";
       return false;
     }
 
@@ -119,17 +119,17 @@ bool SciFiDisplayMomentumResolutionsPR::CalcResolution(const std::string& residu
 
     return true;
   } else {
-    std::cerr << "SciFiDisplayMomentumResolutionsPR::Tree pointer invalid" << std::endl;
+    std::cerr << "SciFiDisplayMomentumResolutionsKF::Tree pointer invalid" << std::endl;
     return false;
   }
 }
 
-void SciFiDisplayMomentumResolutionsPR::Fill() {
+void SciFiDisplayMomentumResolutionsKF::Fill() {
   mOf1->cd();
   if (mTree) {
     // Loop over the data for each track in the spill and fill the tree with reduced data
-    for ( size_t i = 0; i < GetData()->mDataPR.size(); ++i ) {
-      mTrackData = GetData()->mDataPR[i];
+    for ( size_t i = 0; i < GetData()->mDataKF.size(); ++i ) {
+      mTrackData = GetData()->mDataKF[i];
       mTree->Fill();
       if (mTrackData.TrackerNumber == 0) {
         // TODO: Do I want anything here?
@@ -137,11 +137,11 @@ void SciFiDisplayMomentumResolutionsPR::Fill() {
       }
     }
   } else {
-    std::cerr << "SciFiDisplayMomentumResolutionsPR: Warning, local ROOT Tree not setup\n";
+    std::cerr << "SciFiDisplayMomentumResolutionsKF: Warning, local ROOT Tree not setup\n";
   }
 }
 
-TCut SciFiDisplayMomentumResolutionsPR::FormTCut(const std::string &var, const std::string &op,
+TCut SciFiDisplayMomentumResolutionsKF::FormTCut(const std::string &var, const std::string &op,
                                                  double value) {
   TCut cut = "";
   std::stringstream ss1;
@@ -152,15 +152,15 @@ TCut SciFiDisplayMomentumResolutionsPR::FormTCut(const std::string &var, const s
   return cut;
 }
 
-SciFiDataMomentumPR* SciFiDisplayMomentumResolutionsPR::GetData() {
+SciFiDataKF* SciFiDisplayMomentumResolutionsKF::GetData() {
   return GetDataTemplate();
 }
 
-SciFiDataBase* SciFiDisplayMomentumResolutionsPR::MakeDataObject() {
+SciFiDataBase* SciFiDisplayMomentumResolutionsKF::MakeDataObject() {
   return MakeDataObjectTemplate();
 }
 
-void SciFiDisplayMomentumResolutionsPR::MakePtPtResolutions() {
+void SciFiDisplayMomentumResolutionsKF::MakePtPtResolutions() {
   mResolMaker.Clear();
   mResolMaker.SetNGraphPoints(mNPoints);
   mResolMaker.SetNHistoBins(mNBinsPt);
@@ -175,7 +175,7 @@ void SciFiDisplayMomentumResolutionsPR::MakePtPtResolutions() {
   mT2PtResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PtMc-PtRec");
 }
 
-void SciFiDisplayMomentumResolutionsPR::MakePzPtResolutions() {
+void SciFiDisplayMomentumResolutionsKF::MakePzPtResolutions() {
   mResolMaker.Clear();
   mResolMaker.SetNGraphPoints(mNPoints);
   mResolMaker.SetNHistoBins(mNBinsPz);
@@ -190,13 +190,13 @@ void SciFiDisplayMomentumResolutionsPR::MakePzPtResolutions() {
   TCut TotalCut = T1Cut + PzRecCut;
 
   mResolMaker.SetCuts(TotalCut);
-  mT1PzResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PzMc+Charge*PzRec");
+  mT1PzResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PzMc-Charge*PzRec");
   TotalCut = T2Cut + PzRecCut;
   mResolMaker.SetCuts(TotalCut);
   mT2PzResolPtMC = mResolMaker.MakeGraph(mTree, "PtMc", "PzMc-Charge*PzRec");
 }
 
-void SciFiDisplayMomentumResolutionsPR::MakePtPzResolutions() {
+void SciFiDisplayMomentumResolutionsKF::MakePtPzResolutions() {
   mResolMaker.Clear();
   mResolMaker.SetNGraphPoints(mNPoints);
   mResolMaker.SetNHistoBins(mNBinsPt);
@@ -217,7 +217,7 @@ void SciFiDisplayMomentumResolutionsPR::MakePtPzResolutions() {
   mT2PtResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PtMc-PtRec");
 }
 
-void SciFiDisplayMomentumResolutionsPR::MakePzPzResolutions() {
+void SciFiDisplayMomentumResolutionsKF::MakePzPzResolutions() {
   mResolMaker.Clear();
   mResolMaker.SetNGraphPoints(mNPoints);
   mResolMaker.SetNHistoBins(mNBinsPz);
@@ -232,13 +232,13 @@ void SciFiDisplayMomentumResolutionsPR::MakePzPzResolutions() {
   TCut TotalCut = T1Cut + PzRecCut;
 
   mResolMaker.SetCuts(TotalCut);
-  mT1PzResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PzMc+Charge*PzRec");
+  mT1PzResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PzMc-Charge*PzRec");
   TotalCut = T2Cut + PzRecCut;
   mResolMaker.SetCuts(TotalCut);
   mT2PzResolPzMC = mResolMaker.MakeGraph(mTree, "PzMc", "PzMc-Charge*PzRec");
 }
 
-void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
+void SciFiDisplayMomentumResolutionsKF::Plot(TCanvas* aCanvas) {
   mOf1->cd();
   // If canvas if passed in use it, otherwise initialise the member canvas
   TCanvas* lCanvas(NULL);
@@ -248,7 +248,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
     if (mCanvas) {
       mCanvas->Clear();
     } else {
-      mCanvas = new TCanvas("cMomResolutionsPR", "Momentum Resolutions PR");
+      mCanvas = new TCanvas("cMomResolutionsKF", "Momentum Resolutions KF");
     }
     lCanvas = mCanvas;
   }
@@ -353,7 +353,7 @@ void SciFiDisplayMomentumResolutionsPR::Plot(TCanvas* aCanvas) {
   }
 }
 
-void SciFiDisplayMomentumResolutionsPR::Save() {
+void SciFiDisplayMomentumResolutionsKF::Save() {
   if (mOf1) {
     mOf1->cd();
     if (mTree) mTree->Write();
@@ -370,23 +370,23 @@ void SciFiDisplayMomentumResolutionsPR::Save() {
   }
 }
 
-SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetData(SciFiDataBase* data) {
+SciFiDataBase* SciFiDisplayMomentumResolutionsKF::SetData(SciFiDataBase* data) {
   return SetDataTemplate(data);
 }
 
-SciFiDataBase* SciFiDisplayMomentumResolutionsPR::SetUp() {
+SciFiDataBase* SciFiDisplayMomentumResolutionsKF::SetUp() {
   SetUpData();
   SetUpRoot();
   return mSpillData;
 }
 
-bool SciFiDisplayMomentumResolutionsPR::SetUpRoot() {
+bool SciFiDisplayMomentumResolutionsKF::SetUpRoot() {
   // Setup the output TFile
-  mOf1 = new TFile("SciFiDisplayMomentumResolutionsPROutput.root", "recreate");
+  mOf1 = new TFile("SciFiDisplayMomentumResolutionsKFOutput.root", "recreate");
   // Set up the TTree
   mTree = new TTree("mTree", "SciFi Momentum Data");
   mTree->Branch("TrackerNumber", &mTrackData.TrackerNumber, "TrackerNumber/I");
-  mTree->Branch("NumberOfPoints", &mTrackData.NumberOfPoints, "NumberOfPoints/I");
+  mTree->Branch("NumberOfTrackPoints", &mTrackData.NumberOfTrackPoints, "NumberOfTrackPoints/I");
   mTree->Branch("Charge", &mTrackData.Charge, "Charge/I");
   mTree->Branch("PtMc", &mTrackData.PtMc, "PtMc/D");
   mTree->Branch("PzMc", &mTrackData.PzMc, "PtMz/D");
@@ -397,3 +397,5 @@ bool SciFiDisplayMomentumResolutionsPR::SetUpRoot() {
   return true;
 }
 } // ~namespace MAUS
+
+

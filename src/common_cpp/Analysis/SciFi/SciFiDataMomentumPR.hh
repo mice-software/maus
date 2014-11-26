@@ -41,6 +41,13 @@ struct MomentumDataPR {
   int TrackerNumber;
   int NumberOfPoints;
   int Charge;
+  double Radius;
+  double CircleX0;
+  double CircleY0;
+  double CircleChiSq;
+  double SZIntercept;
+  double dsdz;
+  double SZChiSq;
   double PtMc;
   double PzMc;
   double PtRec;
