@@ -15,10 +15,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+#pylint: disable = C0103
 """
 Appease pylint but does nothing
 """
-# pylint: disable = C0103, W0622
+
 DESCRIPTION = """
 This is the script used for offline submission to batch farm.
 
@@ -45,6 +46,7 @@ Return codes are:
 """
 
 # dynamically set __doc__ string so I can access it for argparse
+#pylint: disable = W0622, C0301
 __doc__ = DESCRIPTION+"""
 
 Three classes are defined
@@ -60,10 +62,11 @@ Three classes are defined
 import argparse
 import tarfile
 import sys
-import glob
 import os
 import subprocess
 import shutil
+import shlex
+
 
 def arg_parser():
     """
@@ -76,19 +79,21 @@ def arg_parser():
     parser.add_argument('--input-file', dest='input_file', \
                         help='Read interface file with this name', \
                         required=True)
-    parser.add_argument('--input-dir', dest='input_dir', \
-                        help='Read in raw data contained in the \
-                        named directory', \
+    parser.add_argument('--run-number', dest='run_number', \
+                        help='Output index number', \
                         required=True)
     parser.add_argument('--test', dest='test_mode', \
                         help='Run the batch job using test cdb output',
                         action='store_true', default=False)
     parser.add_argument('--no-test', dest='test_mode', \
-                        help="Don't run the batch job using test cdb output", \
+                        help="Don't run the batch job using test cdb output",\
                         action='store_false', default=False)
     parser.add_argument('--mcserialnumber', dest='mc_iteration', type=str, \
-                        help='MC Serial number for configuration DB', \
+                        help='MC Serial number for configuration DB',\
                         default='')
+    parser.add_argument('--geometry-id', dest='geoid', \
+                        help='The simulation geometry ID number',\
+                        required=True)
     return parser
 
 class DownloadError(Exception):
@@ -146,7 +151,6 @@ class RunManager:
         - Performs any setup on the working directory
         - downloads geometry files from cdb
         - executes the simulation code
-        - executes the reconstruction code
         """
         if not self.check_valid():
             print 'Error - run not valid'
@@ -178,7 +182,6 @@ class RunManager:
         print 'Setup files'
         print '   ', self.run_setup.download_target
         print '   ', self.run_setup.input_file_name
-        print '   ', self.run_setup.input_dir_name
         print '   ', os.getcwd()
         self.cleanup()
         os.mkdir(self.run_setup.download_target)
@@ -195,10 +198,10 @@ class RunManager:
         download_dir = self.run_setup.download_target
         if os.path.isdir(download_dir):
             shutil.rmtree(download_dir)
-        clean_target = glob.glob(self.run_setup.run_number_as_string+'*')
-        for item in clean_target:
-            if item[-3:] != 'tar':
-                os.remove(item)
+        if os.path.exists(self.run_setup.g4bl_interface):
+            os.remove(self.run_setup.g4bl_interface)
+        if os.path.exists(self.run_setup.input_file_name):
+            os.remove(self.run_setup.input_file_name)
       
     def download_geometry(self):
         """
@@ -213,9 +216,8 @@ class RunManager:
         @raises DownloadError on failure
         """
         print 'Getting geometry'
-        download = [os.path.join(self.run_setup.maus_root_dir, 'bin', 
-                                           'utilities', \
-                                           'download_fit_geometry.py')]
+        download = [os.path.join(self.run_setup.maus_root_dir, 'bin', \
+                                 'utilities', 'download_fit_geometry.py')]
         download += self.run_setup.get_download_parameters()
         proc = subprocess.Popen(download, stdout=self.logs.download_log, \
                                                        stderr=subprocess.STDOUT)
@@ -242,31 +244,15 @@ class RunManager:
         simulation += self.run_setup.get_simulation_parameters()
         print simulation
         proc = subprocess.Popen(simulation, stdout=self.logs.sim_log, \
-                                                       stderr=subprocess.STDOUT)
+                                                       stderr=self.logs.sim_log)
+        # stderr=subprocess.STDOUT)
         proc.wait()
         self.logs.tar_queue.append(self.run_setup.mc_file_name)
         print self.logs.tar_queue
         # print self.logs.tar_queue
         
-        # assuming all of the useful bits of the reconstruction 
-        # are in simulate_mice we can stop here.
-
-
-        #def execute_reconstruction(self):
-        #"""
-        #Execute the reconstruction
-
-        #Executes the reconstruction; puts the output file into the tar queue
-        #"""
-        #print 'Running reconstruction'
-        #reconstruction = [os.path.join(self.run_setup.maus_root_dir, 'bin', 
-        #                               'analyze_data_offline.py')]
-        #reconstruction += self.run_setup.get_reconstruction_parameters()
-        #print reconstruction
-        #proc = subprocess.Popen(reconstruction, stdout=self.logs.rec_log, \
-        #                                        stderr=subprocess.STDOUT)
-        #proc.wait()
-        #self.logs.tar_queue.append(self.run_setup.recon_file_name)
+        # assuming all of the useful bits of the reconstruction are in
+        # simulate_mice we can stop here.
 
     def __del__(self):
         """
@@ -274,9 +260,9 @@ class RunManager:
         and closes log files.
         """
         if not self.run_setup == None:
+            self.cleanup()
             self.logs.close_log()
-            if not self.run_setup.test_mode:
-                self.cleanup()
+            # if not self.run_setup.test_mode:
 
 
 class RunSettings: #pylint: disable = R0902
@@ -297,41 +283,71 @@ class RunSettings: #pylint: disable = R0902
         All other file names etc are then built off that
         """
         self.input_file_name = args_in.input_file
-        self.input_dir_name  = args_in.input_dir
         self.test_mode = args_in.test_mode    
         self.mc_iteration = args_in.mc_iteration
-        self.run_number = self.get_run_number_from_file_name \
-                                                          (self.input_file_name)
+        self.run_number = args_in.run_number
         self.run_number_as_string = str(self.run_number).rjust(5, '0')
         self.tar_file_name = self.run_number_as_string+"_offline.tar"
-        self.recon_file_name = self.run_number_as_string+"_recon.root"
+        self.g4bl_interface = \
+                   self.get_file_name_from_run_number(self.input_file_name,\
+                                                      self.run_number)
         self.mc_file_name = self.run_number_as_string+"_sim.root"
-        self.g4bl_interface = os.path.join(self.input_dir_name, \
-                                           self.input_file_name)
+        
         print self.g4bl_interface
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = '%s/downloads' % os.getcwd()
-        self.geometry_id = '45'
+        self.geometry_id = args_in.geoid
         
 
-    # This will need to be adjusted to handle the MC data card format.
-    def get_run_number_from_file_name(self, file_name): #pylint: disable = R0201
+    def get_file_name_from_run_number(self, file_index, run_number):
+        # pylint: disable = R0201
         """
-        Get the run number based on the file name
+        Get the file identity from the file index input to the script
 
-        @param file_name Input file name
+        @param file_index run_number Input file index, run number
+
+        Assumes that the file index contains a list of file names and
+        that the run_number corresponds to a line number in the file.
+
+        @returns a file name as a string
+        """
         
-        Assumes a file of format 000####.* where #### is some integer run
-        number.
-
-        @returns run number as an int
-        """
-        # file_name.lstrip('jsondocother11_')
-        file_name = file_name.split('_')[1]
-        file_name = file_name.split('.')[0]
-        run_number = int(file_name)
-        return run_number
-
+        index = file_index.split('/')[-1]
+        index = os.path.join(os.getcwd(), index)
+        if os.path.exists(index):
+            os.remove(index)
+        
+        index_command = 'wget '+file_index
+        args = shlex.split(index_command)
+        proc = subprocess.Popen(args) # , stdout=subprocess.STDOUT, \
+                                # stderr=subprocess.STDOUT)
+        # parse the local file name from the address
+        proc.wait()
+        
+        list = open(index)
+        i = 0
+        interface_download = 'wget '
+        for entry in list:
+            if int(run_number) == i:
+                entry.rstrip('/n')
+                interface_download += entry
+                break
+            else:
+                i += 1
+        
+        file_name = interface_download.split('/')[-1]
+        if file_name.endswith('\n'):
+            file_name = file_name[:-1]
+            
+        file_name = os.path.join(os.getcwd(), file_name)
+        if os.path.exists(file_name):
+            os.remove(file_name)
+        args = shlex.split(interface_download)
+        proc = subprocess.Popen(args) #, stdout=subprocess.STDOUT,\
+                                # stderr=subprocess.STDOUT)
+        os.remove(index)
+        return file_name
+            
     def get_simulation_parameters(self):
         """
         Get the parameters for the simulation executable
@@ -349,28 +365,9 @@ class RunSettings: #pylint: disable = R0902
             '-will_do_stack_trace', 'False',
         ]
 
-    ## This will possibly not be needed or it will be adjusted.
-    def get_reconstruction_parameters(self):
-        """
-        Get the parameters for the reconstruction exe
-
-        Sets output filename, geometry filename, verbose_level, daq file and 
-        path, verbose_level
-
-        @return list of command line arguments for reconstruction
-        """
-        return [
-            '-reconstruction_geometry_filename', os.path.join \
-                               (self.download_target, 'ParentGeometryFile.dat'),
-            '-output_root_file_name', str(self.recon_file_name),
-            '-daq_data_file', str(self.run_number),
-            '-daq_data_path', './',
-            '-verbose_level', '0',
-            '-will_do_stack_trace', 'False',
-        ]
-
-    ## This will need to be updated to reflect 
-    ## on the source of the MC data cards.
+    ## This will need to be updated to reflect the source of the MC
+    ## data cards.
+    
     def get_download_parameters(self):
         """
         Get the parameters for the reconstruction exe
@@ -451,10 +448,10 @@ class FileManager: # pylint: disable = R0902
                 if os.path.isfile(self.tar_file_name):         
                     tar_file.add(item)
             tar_file.close()
-            for item in self.tar_queue:
-                # print item
-                if os.path.isfile(item):       
-                    pass # cleanup does something weird...
+            #for item in self.tar_queue:
+            #    if os.path.isfile(item):
+            #        os.remove(item)
+            #        pass # cleanup does something weird...
         self._is_open = False
         
     def __del__(self):
@@ -463,7 +460,7 @@ class FileManager: # pylint: disable = R0902
         """
         self.close_log()
 
-def main(argv): # pylint: disable = C0103
+def main(argv):
     """
     Calls run manager to run the execution
 
@@ -483,7 +480,6 @@ def main(argv): # pylint: disable = C0103
     try:
         my_run = RunManager(args_in_)
         my_return_value = my_run.run()
-        del my_run
     # download errors are considered transient - i.e. try again later
     except DownloadError:
         print "Fail Download"
@@ -499,7 +495,8 @@ def main(argv): # pylint: disable = C0103
         #print "Fail Something Else"
         my_return_value = 3
         sys.excepthook(*sys.exc_info())
-        
+    finally:
+        del my_run
 
     return my_return_value
         
