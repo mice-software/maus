@@ -10,6 +10,7 @@ import glob
 import re
 from generate_doc_index import create_index_html # pylint: disable=F0401
 
+# pylint: disable = C0103
 if os.environ.get('MAUS_THIRD_PARTY') == None:
     print 'MAUS environment variables not set.'
     print 'Please make sure to source env.sh before running this script.'
@@ -147,7 +148,8 @@ def fix_doxygen_paths():
         # find the directory with the javascripts
         replace_in = os.path.expandvars("${MAUS_ROOT_DIR}")
         replace_out = '/maus/MAUS_latest_version'
-        jsdir = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', doxdir, 'html', 'search')
+        jsdir = os.path.join(os.environ['MAUS_ROOT_DIR'], \
+                             'doc', doxdir, 'html', 'search')
         os.chdir(jsdir)
         for inputFile in glob.glob("*.js"):
             # open a tmp file to write the modified lines into
