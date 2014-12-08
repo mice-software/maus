@@ -82,7 +82,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.charge = 3
         self.newline = ''
         self.grid_job = 0 
-	self.protonabsorberin = 1
+        self.protonabsorberin = 1
    
     def birth(self, json_configuration): #pylint: disable=R0912, R0915
         "birth doc string"      
