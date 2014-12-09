@@ -325,23 +325,40 @@ class RunSettings: #pylint: disable = R0902
         
         list = open(index)
         i = 0
-        interface_download = 'wget '
+        target_entry
         for entry in list:
             if int(run_number) == i:
                 entry.rstrip('/n')
-                interface_download += entry
+                target_entry = entry
                 break
             else:
                 i += 1
+        # default is a grid based copy
+        interface_download = 'lcg-cp -D se '
+        # file names on the grid are arbitrary so make
+        # it something logical for the local copy
+        file_name = "jsondoccp_"+str(run_number)+".txt"
         
-        file_name = interface_download.split('/')[-1]
-        if file_name.endswith('\n'):
-            file_name = file_name[:-1]
+        if target_entry.find("http") >= 0:
+            # use a wget algorithm instead
+            interface_download = 'wget '
+            # use the file name from the list for the
+            # local copy
+            file_name = target_entry.split('/')[-1]
+            if file_name.endswith('\n'):
+                file_name = file_name[:-1]
+            # build the download command and split it
+            # for the Popen command
+            interface_download += target_entry
+            args = shlex.split(interface_download)
+        else:
+            interface_download += target_entry
+            args = shlex.split(interface_download)
+            args.append(file_name)
             
         file_name = os.path.join(os.getcwd(), file_name)
         if os.path.exists(file_name):
             os.remove(file_name)
-        args = shlex.split(interface_download)
         proc = subprocess.Popen(args) #, stdout=subprocess.STDOUT,\
                                 # stderr=subprocess.STDOUT)
         os.remove(index)
