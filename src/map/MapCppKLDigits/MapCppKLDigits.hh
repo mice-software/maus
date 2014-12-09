@@ -38,6 +38,7 @@
 
 // G4MICE from commonCpp
 #include "Utils/KLChannelMap.hh"
+#include "Utils/KLCalibrationMap.hh"
 #include "API/MapBase.hh"
 
 namespace MAUS {
@@ -66,6 +67,7 @@ class MapCppKLDigits : public MapBase<Json::Value> {
 
  private:
   KLChannelMap _map;
+  KLCalibrationMap _mapcal;
 
   // Vector to hold the names of all detectors to be included
   // in the digits.

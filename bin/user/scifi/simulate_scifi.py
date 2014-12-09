@@ -32,7 +32,7 @@ def run():
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")
 
-    reducer = MAUS.ReduceCppPatternRecognition()
+    reducer = MAUS.ReduceCppPatternRecognition() # Turn on event display
     # reducer = MAUS.ReducePyDoNothing()
 
     # Then construct a MAUS output component - filename comes from datacards

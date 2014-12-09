@@ -5,6 +5,27 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.1
+  The following changes were made:
+    - Memory leak fixes #1489
+    - KL - MC tuning, calibrations in CDB
+    - TOF - calibrations by run-number
+    - MC - fine grained production thresholds by volume and particle type
+    - MC - add LiH material definition
+    - Geometry - updates, Ckov added
+    - Bug fixes
+MAUS-v0.9.0
+  The following changes were made:
+    - Data handling API changes propagated to inputers and mappers
+    - Memory leak fix #1489
+    - KL - tuning and calibration update
+    - Geometry - added diffuser irises, updated MiceModule translation
+    - Tracker - improvements, bug fixes, and additional tests
+    - Global PID framework - added Ckov, KL
+    - Updated documentation
+    - Bug fixes in build system
+    - JsonCpp version upgraded to 0.6.0-rc2
+  If upgrading from a previous version, please redo the entire installation
 MAUS-v0.8.5
   The following changes were made:
     - Bug fix - pi/mu decays in physics list (1470)

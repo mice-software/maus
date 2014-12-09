@@ -230,6 +230,8 @@ class MapPyBeamMaker: #pylint: disable=R0902
                 else:
                     a_beam = self.__process_choose_beam(index)
                     particle["primary"] = a_beam.make_one_primary()
+                if "spin" not in particle["primary"]:
+                    particle["primary"]["spin"] = {"x":0., "y":0., "z":1.}
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException(spill, self)
         return json.dumps(spill)

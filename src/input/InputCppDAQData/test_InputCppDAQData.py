@@ -35,7 +35,7 @@ class InputCppDAQDataTestCase(unittest.TestCase): # pylint: disable = R0904
         # It would be nicer to test with a smaller data file!
         self._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
-        self._datafile = '02873'
+        self._datafile = '05466'
         self._c = Configuration()
         self._mapper = InputCppDAQData()
 

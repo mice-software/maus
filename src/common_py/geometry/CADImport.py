@@ -63,6 +63,7 @@ class CADImport: #pylint: disable = R0903, C0103
             raise IOError(xmlin1 + " must be an xml or gdml file")
         else: 
             self.xml_in_1 = xmlin1
+            self.geodir = os.path.dirname(xmlin1)
 
         if xsl == None: 
             self.xsl = None        
@@ -143,7 +144,6 @@ class CADImport: #pylint: disable = R0903, C0103
         libxml2 python bindings directly.
         
         '''
-
         # Parse the target gdml file
         datafile = libxml2.parseFile(self.xml_in_1)
         # extract the top level object.
@@ -162,7 +162,241 @@ class CADImport: #pylint: disable = R0903, C0103
         for l in result:
             mmfile.write(l)
         mmfile.close()
-    
+
+    def AppendTubeSolid(self, datafile, result, solid):
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendTubeSolid to generate a MICE module from a gdml tube solid
+        '''
+        tube       = datafile.xpathEval("gdml/solids/tube")
+        for elem in tube:
+            # Extract the properties of a tube corresponding
+            # to the solid reference
+            if elem.prop('name') == solid:
+                if elem.prop('rmin'):
+                    result.append('Volume Tube\n')
+                    result.append('Dimensions '+\
+                                  elem.prop('rmin')+' '+\
+                                  elem.prop('rmax')+' '+\
+                                  elem.prop('z')+' '+\
+                                  elem.prop('lunit')+'\n')
+                else:
+                    result.append('Volume Cylinder\n')
+                    result.append('Dimensions '+\
+                                  elem.prop('rmax')+' '+\
+                                  elem.prop('z')+' '+\
+                                  elem.prop('lunit')+'\n')
+                break
+
+    def AppendBoxSolid(self, datafile, result, solid):
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendBoxSolid to generate a MICE module from a gdml box solid
+        '''
+        box        = datafile.xpathEval("gdml/solids/box")
+        for elem in box:
+            # Extract the properties of a box corresponding
+            # to the solid reference
+            if elem.prop('name') == solid:
+                result.append('Volume Box\n')
+                result.append('Dimensions '+elem.prop('x')+\
+                              ' '+elem.prop('y')+' '+\
+                              elem.prop('z')+' '+\
+                              elem.prop('lunit')+'\n')
+                break
+
+    def AppendTrdSolid(self, datafile, result, solid):
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendTrdSolid to generate a MICE module from a gdml trd solid
+        '''
+        trd      = datafile.xpathEval("gdml/solids/trd")
+        for elem in trd:
+            if elem.prop("name") == solid:
+                result.append('Volume Trapezoid\n')
+                result.append('PropertyDouble TrapezoidWidthX1 '+\
+                              elem.prop('x1')+'\n')
+                result.append('PropertyDouble TrapezoidWidthX2 '+\
+                              elem.prop('x2')+'\n')
+                result.append('PropertyDouble TrapezoidHeightY1 '+\
+                              elem.prop('y1')+'\n')
+                result.append('PropertyDouble TrapezoidHeightY2 '+\
+                              elem.prop('y2')+'\n')
+                result.append('PropertyDouble TrapezoidLengthZ '+\
+                              elem.prop('z')+'\n')
+                break
+            
+    def AppendSphereSolid(self, datafile, result, solid):
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendSphereSolid to generate a MICE module from a gdml sphere solid
+        '''
+        sphere  = datafile.xpathEval("gdml/solids/sphere")
+        for elem in sphere:
+            if elem.prop('name') == solid:
+                result.append('Volume Sphere\n')
+                result.append('Dimensions '+elem.prop('rmin')+' '+\
+                              elem.prop('rmax')+' '+\
+                              elem.prop('lunit')+'\n')
+                break
+    def AppendTorusSolid(self, datafile, result, solid):
+        #pylint: disable = R0201, R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendTorusSolid to generate a MICE module from a gdml torus solid
+        '''
+        torus  = datafile.xpathEval("gdml/solids/torus")
+        for elem in torus:
+            # look for a torus object with a name
+            # matching the volume
+            if elem.prop('name') == solid:
+                result.append('Volume Torus\n')
+                result.append('PropertyDouble TorusInnerRadius '\
+                              +elem.prop('rmin') +' '+elem.prop('lunit')+'\n')
+                result.append('PropertyDouble TorusOuterRadius '\
+                              +elem.prop('rmax') +' '+elem.prop('lunit')+'\n')
+                result.append('PropertyDouble TorusRadiusOfCurvature '\
+                              +elem.prop('rtor')+' '+elem.prop('lunit')+'\n')
+                result.append('PropertyDouble TorusAngleStart '\
+                              +elem.prop('startphi') +' '\
+                              +elem.prop('aunit')+'\n')
+                result.append('PropertyDouble TorusOpeningAngle '\
+                              +elem.prop('deltaphi')+' '\
+                              +elem.prop('aunit')+'\n')
+
+    def AppendPolyconeSolid(self, datafile, result, solid, name):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendPolyconeSolid to generate a MICE module from a gdml polycone solid
+        '''
+        # For a polycone, a data file should be written locally
+        # based on the listed vertices
+        polycone  = datafile.xpathEval("gdml/solids/polycone")
+        for elem in polycone:
+            # look for a polycone object with a name
+            # matching the volume
+            if elem.prop('name') == solid:
+                result.append('Volume Polycone\n')
+                points = []
+                zplane = elem.xpathEval('zplane')
+                # loop over the z planes of the object.
+                for p in zplane:
+                    point = []
+                    point.append(float(p.prop('z')))
+                    point.append(float(p.prop('rmin')))
+                    point.append(float(p.prop('rmax')))
+                    points.append(point)
+                    # Create a text files containing the z plane positions
+                    # particular to the volume.
+                    f = open(self.output[:-4]+"_"+name+\
+                             '.txt','w')
+                    f.write(" NumberOfPoints \t" + str(len(points)) +"\n")
+                    f.write(" Units    mm \n")
+                    f.write(" Z        RInner       ZOuter\n")
+                    for p in points:
+                        f.write(str(p[0])+"\t"+\
+                                str(p[1])+"\t"+str(p[2])+"\n")
+                        # close the text file
+                    f.close()
+
+    def AppendIntersectionSolid(self, datafile, result, solid):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendIntersectionSolid to generate a MICE module from a gdml intersection solid
+        '''
+        intersection = datafile.xpathEval("gdml/solids/intersection")
+        for elem in intersection:
+            # if the solid name matches the element name, we leave
+            # the solid definition to the auxiliary elements
+            if elem.prop('name') == solid:
+                result.append('Volume Boolean\n')
+                result.append('PropertyString BaseModule '+\
+                              os.path.join(self.geodir,\
+                                elem.xpathEval('first')[0].prop('ref'))+\
+                                '.dat\n')
+                # This gets fun now... The base module must be defined 
+                # independent of the # existance of a GDML volume. 
+                # For this reason using access module will not
+                # work because that uses a reference from a volume.
+                self.AccessBooleanModule(datafile, \
+                                         elem.xpathEval('first')[0].prop('ref'))
+                result.append('PropertyString BooleanModule1 '+\
+                              os.path.join(self.geodir,\
+                                elem.xpathEval('second')[0].prop('ref'))+\
+                                '.dat\n')
+                self.AccessBooleanModule(datafile, \
+                              elem.xpathEval('second')[0].prop('ref'))
+                result.append(\
+                             'PropertyString BooleanModule1Type Intersection\n'
+                             )
+                result.append('PropertyHep3Vector BooleanModule1Pos '+\
+                              elem.xpathEval('position')[0].prop('x')+' '+\
+                              elem.xpathEval('position')[0].prop('y')+' '+\
+                              elem.xpathEval('position')[0].prop('z')+' '+\
+                              elem.xpathEval('position')[0].prop('unit')+'\n')
+                result.append('PropertyHep3Vector BooleanModule1Rot '+\
+                              elem.xpathEval('rotation')[0].prop('x')+' '+\
+                              elem.xpathEval('rotation')[0].prop('y')+' '+\
+                              elem.xpathEval('rotation')[0].prop('z')+' '+\
+                              elem.xpathEval('rotation')[0].prop('unit')+'\n')
+                break
+
+    def AppendSubtractionSolid(self, datafile, result, solid):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AppendSubtractionSolid to generate a MICE module from a gdml subtraction solid
+        '''
+        subtraction = datafile.xpathEval("gdml/solids/subtraction")
+        for elem in subtraction:
+            if elem.prop('name') == solid:
+                result.append('Volume Boolean\n')
+                result.append('PropertyString BaseModule '+
+                              os.path.join(self.geodir,\
+                                elem.xpathEval('first')[0].prop('ref'))+
+                                '.dat\n')
+                self.AccessBooleanModule(datafile, \
+                                         elem.xpathEval('first')[0].prop('ref'))
+                result.append('PropertyString BooleanModule1 '+
+                              os.path.join(self.geodir,\
+                                elem.xpathEval('second')[0].prop('ref'))+
+                                '.dat\n')
+                self.AccessBooleanModule(datafile, \
+                              elem.xpathEval('second')[0].prop('ref'))
+                result.append('PropertyString BooleanModule1Type Subtraction\n')
+                result.append('PropertyHep3Vector BooleanModule1Pos '+\
+                              elem.xpathEval('position')[0].prop('x')+' ' +\
+                              elem.xpathEval('position')[0].prop('y')+' '+\
+                              elem.xpathEval('position')[0].prop('z')+' '+\
+                              elem.xpathEval('position')[0].prop('unit')+'\n')
+                result.append('PropertyHep3Vector BooleanModule1Rot '+\
+                              elem.xpathEval('rotation')[0].prop('x')+' '+\
+                              elem.xpathEval('rotation')[0].prop('y')+' '+\
+                              elem.xpathEval('rotation')[0].prop('z')+' '+\
+                              elem.xpathEval('rotation')[0].prop('unit')+'\n')
+                break
+
+    def AccessBooleanModule(self, datafile, moduleName):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        '''
+        @Method AccessBoolean Module to recursively generate a MICE module from a gdml file
+        '''
+        result = []
+        result.append("Module "+moduleName+'\n')
+        result.append("{\n")
+        # loop over all solids in the datafile to find the indicated module name
+        # This is done internal to the append solid subroutines.
+        self.AppendBoxSolid(datafile, result,  moduleName)
+        self.AppendTubeSolid(datafile, result,  moduleName)
+        self.AppendTrdSolid(datafile, result,  moduleName)
+        self.AppendSphereSolid(datafile, result, moduleName)
+        self.AppendTorusSolid(datafile, result,  moduleName)
+        self.AppendIntersectionSolid(datafile, result, moduleName)
+        self.AppendSubtractionSolid(datafile, result, moduleName)
+        result.append("}\n")
+        f = open(os.path.join(self.geodir, moduleName + '.dat'), 'w')
+        for line in result:
+            f.write(line)
+        f.close()
+        
     def AccessModule(self, datafile, result, moduleName, volumenumber=-1):
         #pylint: disable = R0912, R0913, R0914, R0915, C0103
         '''
@@ -179,92 +413,23 @@ class CADImport: #pylint: disable = R0903, C0103
         for vol in system:
             if vol.prop('name') == moduleName:
                 # find the reference to the solid used to generate the volume
-                solid      = vol.xpathEval("solidref")
+                solid      = vol.xpathEval("solidref")[0].prop('ref')
                 # This solid corresponds to a box, tube,
                 # or other, that we do not know a priori
-                box        = datafile.xpathEval("gdml/solids/box")
-                for elem in box:
-                    # Extract the properties of a box corresponding
-                    # to the solid reference
-                    if elem.prop('name') == solid[0].prop('ref'):
-                        result.append('Volume Box\n')
-                        result.append('Dimensions '+elem.prop('x')+\
-                                      ' '+elem.prop('y')+' '+\
-                                      elem.prop('z')+' '+\
-                                      elem.prop('lunit')+'\n')
-                        break
-                tube       = datafile.xpathEval("gdml/solids/tube")
-                for elem in tube:
-                    # Extract the properties of a tube corresponding
-                    # to the solid reference
-                    if elem.prop('name') == solid[0].prop('ref'):
-                        if elem.prop('rmin'):
-                            result.append('Volume Tube\n')
-                            result.append('Dimensions '+\
-                                          elem.prop('rmin')+' '+\
-                                          elem.prop('rmax')+' '+\
-                                          elem.prop('z')+' '+\
-                                          elem.prop('lunit')+'\n')
-                        else:
-                            result.append('Volume Cylinder\n')
-                            result.append('Dimensions '+\
-                                          elem.prop('rmax')+' '+\
-                                          elem.prop('z')+' '+\
-                                          elem.prop('lunit')+'\n')
-                        break
-                intersection = datafile.xpathEval("gdml/solids/intersection")
-                for elem in intersection:
-                    # if the solid name matches the element name, we leave
-                    # the solid definition to the auxiliary elements
-                    if elem.prop('name') == solid[0].prop('ref'):
-                        result.append('Volume Boolean')
-                        break
-                # In the case of a volume subtraction do nothing for the
-                # time being.
-                subtraction = datafile.xpathEval("gdml/solids/subtraction")
-                for elem in subtraction:
-                    if elem.prop('name') == solid[0].prop('ref'):
-                        # do nothing
-                        break
-                sphere  = datafile.xpathEval("gdml/solids/sphere")
-                for elem in sphere:
-                    if elem.prop('name') == solid[0].prop('ref'):
-                        result.append('Volume Sphere\n')
-                        result.append('Dimensions '+elem.prop('rmin')+' '+\
-                                      elem.prop('rmax')+' '+\
-                                      elem.prop('lunit')+'\n')
-                # For a polycone, a data file should be written locally
-                # based on the listed vertices
-                polycone  = datafile.xpathEval("gdml/solids/polycone")
-                for elem in polycone:
-                    # look for a polycone object with a name
-                    # matching the volume
-                    if elem.prop('name') == solid[0].prop('ref'):
-                        result.append('Volume Polycone\n')
-                        points = []
-                        zplane = elem.xpathEval('zplane')
-                        # loop over the z planes of the object.
-                        for p in zplane:
-                            point = []
-                            point.append(float(p.prop('z')))
-                            point.append(float(p.prop('rmin')))
-                            point.append(float(p.prop('rmax')))
-                            points.append(point)
-                        # Create a text files containing the z plane positions
-                        # particular to the volume.
-                        f = open(self.output[:-4]+"_"+vol.prop('name')+\
-                                 '.txt','w')
-                        f.write(" NumberOfPoints \t" + str(len(points)) +"\n")
-                        f.write(" Units    mm \n")
-                        f.write(" Z        RInner       ZOuter\n")
-                        for p in points:
-                            f.write(str(p[0])+"\t"+\
-                                    str(p[1])+"\t"+str(p[2])+"\n")
-                        # close the text file
-                        f.close()
+                # Try each in turn.
+                self.AppendBoxSolid(datafile, result, solid)
+                self.AppendTubeSolid(datafile, result, solid)
+                self.AppendTrdSolid(datafile, result, solid)
+                self.AppendSphereSolid(datafile, result, solid)
+                self.AppendTorusSolid(datafile, result, solid)
+                self.AppendPolyconeSolid(datafile, result, solid, moduleName)
+                self.AppendIntersectionSolid(datafile, result, solid)
+                self.AppendSubtractionSolid(datafile, result, solid)
+
                 aux        = vol.xpathEval('auxiliary')
+                
                 unit = "cm"
-                # Get the auxhilary elements of the volume
+                # Get the auxilary elements of the volume
                 for elem in aux:
                     elemtype, value = \
                               elem.prop('auxtype'), elem.prop('auxvalue')
@@ -272,7 +437,7 @@ class CADImport: #pylint: disable = R0903, C0103
                     if elemtype == 'unit':
                         unit = value
                     # Extract unitless double elements
-                    if elemtype =='RedColour' \
+                    elif elemtype =='RedColour' \
                            or elemtype == 'BlueColour'\
                            or elemtype == 'GreenColour' \
                            or elemtype == 'G4StepMax' \
@@ -285,11 +450,11 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'TrapezoidWidthX2'\
                            or elemtype == 'TrapezoidHeightY1'\
                            or elemtype == 'TrapezoidHeightY2'\
-                           or elemtype == 'TrapezoidLength'\
+                           or elemtype == 'TrapezoidLengthZ'\
                            or elemtype == 'NbOfBars':
                         result.append('PropertyDouble '+elemtype+' '+value+"\n")
                     # Extract double typed elements with units
-                    if elemtype == 'ActiveRadius' \
+                    elif elemtype == 'ActiveRadius' \
                            or elemtype == 'Pitch'\
                            or elemtype == 'FibreDiameter' \
                            or elemtype == 'CoreDiameter'\
@@ -356,6 +521,20 @@ class CADImport: #pylint: disable = R0903, C0103
                          or elemtype == 'Phi' or elemtype == 'Theta':
                         result.append('PropertyHep3Vector '+\
                                       elemtype+' '+value+"\n")
+                    elif elemtype == "PlaceModule" and value == 'Virtual':
+                        result.append('Module Virtual\n')
+                        result.append(' {\n')
+                        result.append('     Volume None\n')
+                        result.append('     Position 0.0 0.0 0.0 mm\n')
+                        result.append('     Rotation 0.0 0.0 0.0 degree\n')
+                        result.append(\
+                              '     PropertyString SensitiveDetector Virtual\n'\
+                                     )
+                        result.append(
+                              '     PropertyString IndependentVariable z\n'\
+                                     )
+                        result.append(' }\n')
+                        
                 # Get the material reference     
                 material = vol.xpathEval("materialref")
                 result.append("PropertyString Material "+\
@@ -363,10 +542,19 @@ class CADImport: #pylint: disable = R0903, C0103
                 # Access the physical volumes defined within the parent
                 physvol = vol.xpathEval("physvol")
                 for elem in physvol:
-                    vol_name = elem.xpathEval("volumeref")[0].prop('ref')
+                    vol_path = elem.xpathEval("volumeref")
+                    file_path = elem.xpathEval("file")
+                    vol_name = ""
                     # Access the daughter volume
-                    self.AccessModule(datafile, result, vol_name, \
-                                      volumenumber)
+                    if len(vol_path)==1:
+                        vol_name = vol_path[0].prop('ref')
+                        self.AccessModule(datafile, result, vol_name, \
+                                          volumenumber)
+                    # if there is no volume check if there is a file reference
+                    elif len(file_path)==1:
+                        newfile = file_path[0].prop("name")
+                        newfile = os.path.join(self.geodir, newfile[:-5])
+                        result.append("Module "+newfile+".dat\n")
                     # get the postion of the daughter
                     position = elem.xpathEval("position")[0]
                     result.append("Position "+\
@@ -392,11 +580,11 @@ class CADImport: #pylint: disable = R0903, C0103
                     # Bookkeeping for the MICE modules
                     if volumenumber > -1:
                         # If ending a replica volume add the replica number
-                        result.append("} // End"+vol_name\
+                        result.append("} // End "+vol_name\
                                       +str(volumenumber)+"\n\n")
                     else:
                         # Add the volume identity at the end for readability
-                        result.append("} // End"+vol_name+"\n\n")
+                        result.append("} // End "+vol_name+"\n\n")
                 # To simplify the definition of replicated volumes replicavol
                 # is available
                 replicavol = vol.xpathEval("replicavol")

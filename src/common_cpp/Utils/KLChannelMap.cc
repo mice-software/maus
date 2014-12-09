@@ -106,7 +106,7 @@ KLChannelKey::KLChannelKey(string keyStr) throw(Exception) {
   }
 }
 
-bool KLChannelKey::operator==( KLChannelKey const key ) {
+bool KLChannelKey::operator==( KLChannelKey const key ) const {
   if ( _cell == key._cell &&
        _pmt == key._pmt &&
        _detector == key._detector) {
@@ -116,7 +116,7 @@ bool KLChannelKey::operator==( KLChannelKey const key ) {
   }
 }
 
-bool KLChannelKey::operator!=( KLChannelKey const key ) {
+bool KLChannelKey::operator!=( KLChannelKey const key ) const {
   if ( _cell == key._cell &&
        _pmt == key._pmt &&
        _detector == key._detector) {

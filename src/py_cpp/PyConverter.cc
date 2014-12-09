@@ -53,13 +53,54 @@ PyObject* py_wrap_pyobject(PyObject* self, PyObject* args) {
     return py_wrap<PyObject>(self, args);
 }
 
+PyObject* py_del_data_repr(PyObject* self, PyObject* args) {
+    PyObject* py_data_in;
+    if (!PyArg_ParseTuple(args, "O", &py_data_in)) {
+      return NULL;
+    }
+    PyObject* name = PyObject_CallMethod(py_data_in,
+                                         const_cast<char*>("Class_Name"),
+                                         NULL);
+    if (!name) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve object as a ROOT type");
+        return NULL;
+    }
+    char* c_string = NULL;
+    if (!PyArg_Parse(name, "s", &c_string)) {
+        PyErr_SetString(PyExc_TypeError,
+           "Could not resolve object as a ROOT type - Class_Name() should return string");
+    }
+    if (c_string == NULL || strcmp(c_string, "MAUS::Data") != 0) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve object as a MAUS::Data type");
+    }
+    void * vptr = static_cast<void*>(TPyReturn(py_data_in));
+    Data* data = static_cast<Data*>(vptr);
+    delete data;
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string py_del_data_repr_docstring =
+  std::string("Free memory owned by MAUS.Data\n")+
+  std::string("  - data_representation: MAUS.Data representation of spill data\n")+
+  std::string("Returns None\n")+
+  std::string("Raises TypeError if data_representation is of incorrect type\n\n")+
+  std::string("Explicit free must be called on MICE data when in MAUS.Data\n")+
+  std::string("representation as underlying ROOT library does not respect\n")+
+  std::string("Python reference counting. Otherwise a memory leak will \n")+
+  std::string("ensue. Once freed, calling the referenced memory will result\n")+
+  std::string("in a python crash. I'm very sorry about that, I can't see a\n")+
+  std::string("better way.\n");
+
 PyMethodDef methods[] = {
     {"json_repr", (PyCFunction)py_wrap_pyobject, METH_VARARGS,
-     "Represent data as a (py)json object\n - data: MICE data in any representation"},
+     "Represent data as a (py)json object\n - data: MICE data in any representation."},
     {"data_repr", (PyCFunction)py_wrap_data, METH_VARARGS,
-     "Represent data as a MAUS.Data object\n - data: MICE data in any representation"},
+     "Represent data as a MAUS.Data object\n - data: MICE data in any representation."},
     {"string_repr", (PyCFunction)py_wrap_string, METH_VARARGS,
-     "Represent data as a string object\n - data: MICE data in any representation"},
+     "Represent data as a string object\n - data: MICE data in any representation."},
+    {"del_data_repr", (PyCFunction)py_del_data_repr, METH_VARARGS,
+     py_del_data_repr_docstring.c_str()},
     {NULL, NULL, 0, NULL}
 };
 

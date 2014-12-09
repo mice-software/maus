@@ -330,6 +330,9 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         test_primary = spill["mc_events"][4]["primary"]
         self.assertLess(abs(test_primary["position"]["x"]-7.88914), 1e-6)
         self.assertLess(abs(test_primary["time"]-913.768), 1e-6)
+        self.assertLess(abs(test_primary["spin"]["x"]), 1e-6)
+        self.assertLess(abs(test_primary["spin"]["y"]), 1e-6)
+        self.assertLess(abs(test_primary["spin"]["z"]-1.), 1e-6)
 
     def test_process(self):
         """

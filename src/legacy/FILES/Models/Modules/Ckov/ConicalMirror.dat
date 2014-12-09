@@ -3,17 +3,25 @@
 
 Module ConicalMirror
 {
+  Volume Trapezoid
   PropertyString G4Detector CkovMirror
   PropertyString Material B270
-
+  //PropertyString SensitiveDetector CKOV
+   
   PropertyDouble RedColour 0.5
   PropertyDouble GreenColour 1.0
   PropertyDouble BlueColour 0.0
 
-  PropertyDouble Thickness[mm]           3.00
-  PropertyDouble DiameterOfPmt[mm]     220.00
-  PropertyDouble DiameterOfGate[mm]    556.82
-  PropertyDouble XoffsetOfPmt[mm]      303.08
-  PropertyDouble ZoffsetOfPmt[mm]      169.50
+  PropertyDouble TrapezoidWidthX1	1.0
+  PropertyDouble TrapezoidWidthX2	250.33
+  PropertyDouble TrapezoidHeightY1	1.0
+  PropertyDouble TrapezoidHeightY2	250.33
+  PropertyDouble TrapezoidLengthZ 	50.562
+
+  //PropertyDouble Thickness[mm]           3.00
+  //PropertyDouble DiameterOfPmt[mm]     220.00
+  //PropertyDouble DiameterOfGate[mm]    556.82
+  //PropertyDouble XoffsetOfPmt[mm]      303.08
+  //PropertyDouble ZoffsetOfPmt[mm]      169.50
 }
 

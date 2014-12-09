@@ -44,8 +44,7 @@ TEST_F(SciFiTrackPointTestDS, test_default_contructor) {
   EXPECT_EQ(-1, tp1->station());
   EXPECT_EQ(-1, tp1->plane());
   EXPECT_EQ(666, tp1->channel());
-  EXPECT_EQ(-1, tp1->f_chi2());
-  EXPECT_EQ(-1, tp1->s_chi2());
+  EXPECT_EQ(-1, tp1->chi2());
   EXPECT_EQ(ThreeVector(0, 0, 0), tp1->pos());
   EXPECT_EQ(ThreeVector(0, 0, 0), tp1->mom());
   EXPECT_EQ(-1, tp1->pull());
@@ -109,11 +108,10 @@ TEST_F(SciFiTrackPointTestDS, test_kalman_state_contructor) {
 
   state1.set_a(a, MAUS::KalmanState::Filtered);
   state1.set_residual(residual, MAUS::KalmanState::Filtered);
-  state1.set_chi2(f_chi2, MAUS::KalmanState::Filtered);
+  state1.set_chi2(f_chi2);
 
   state1.set_a(smoothed_a, MAUS::KalmanState::Smoothed);
   state1.set_residual(smoothed_residual, MAUS::KalmanState::Smoothed);
-  state1.set_chi2(s_chi2, MAUS::KalmanState::Smoothed);
   state1.set_covariance_residual(covariance_residual, MAUS::KalmanState::Smoothed);
 
   int tracker = 1;

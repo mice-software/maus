@@ -20,12 +20,14 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "Geant4/G4VUserPhysicsList.hh"
 
 class G4VModularPhysicsList;
 class G4StepLimiter;
 class G4UserSpecialCuts;
+class G4Region;
 
 namespace MAUS {
 
@@ -201,7 +203,14 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
      */
     void SetParticleHalfLife(std::string particleName, double halfLife);
 
+    /** Set the production thresholds for a given volume
+     */
+    void SetProductionThresholdByVolume(
+                          std::string volumeName,
+                          double defaultProductionThreshold,
+                          std::map<std::string, double> particleIdToThreshold);
   private:
+    typedef std::map<std::string, std::map<std::string, double> > ProdMap;
 
     static const std::string _scatNames[];
     static const std::string _eLossNames[];
@@ -217,6 +226,7 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
     double      _piHalfLife;
     double      _muHalfLife;
     double      _productionThreshold;
+    ProdMap _fineGrainedProductionThreshold;
 
     static double _defaultChargedPiHalfLife;
     static double _defaultChargedMuHalfLife;
@@ -224,6 +234,7 @@ class MAUSPhysicsList: public G4VUserPhysicsList {
     G4VModularPhysicsList* _list;
     std::vector<G4StepLimiter*> _limits;
     std::vector<G4UserSpecialCuts*> _specialCuts;
+    std::vector<std::string> _regions;
 };
 }
 

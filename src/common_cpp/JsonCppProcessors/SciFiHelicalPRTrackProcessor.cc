@@ -33,9 +33,6 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("phi0", &_double_proc,
                         &SciFiHelicalPRTrack::get_phi0,
                         &SciFiHelicalPRTrack::set_phi0, true);
-    RegisterValueBranch("psi0", &_double_proc,
-                        &SciFiHelicalPRTrack::get_psi0,
-                        &SciFiHelicalPRTrack::set_psi0, true);
     RegisterValueBranch("dsdz", &_double_proc,
                         &SciFiHelicalPRTrack::get_dsdz,
                         &SciFiHelicalPRTrack::set_dsdz, true);
@@ -63,6 +60,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("chisq_dof", &_double_proc,
                         &SciFiHelicalPRTrack::get_chisq_dof,
                         &SciFiHelicalPRTrack::set_chisq_dof, true);
+    RegisterValueBranch("point_spread", &_double_proc,
+                        &SciFiHelicalPRTrack::get_point_spread,
+                        &SciFiHelicalPRTrack::set_point_spread, true);
     RegisterValueBranch("pos0", &_threevector_proc,
                         &SciFiHelicalPRTrack::get_pos0,
                         &SciFiHelicalPRTrack::set_pos0, true);

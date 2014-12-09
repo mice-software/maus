@@ -32,7 +32,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 100
+spill_generator_number_of_spills = 20
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
@@ -45,7 +45,7 @@ simulation_reference_particle = {
 # This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
 beam = {
     "particle_generator":"binomial", # routine for generating empty primaries
-    "binomial_n":2, # number of coin tosses
+    "binomial_n":1, # number of coin tosses
     "binomial_p":1.0, # probability of making a particle on each toss
     "random_seed":5, # random seed for beam generation; controls also how the MC
                      # seeds are generated

@@ -12,14 +12,20 @@ Configuration Stage1
   }
   Module TOF/TOF2.dat
   {
-    Position 0. 0. 3.059 m
+    Position 0. 0. -4.059 m
     Rotation 0. 0. 0. degree
   }
-  Module KL/KL.dat
+  MiceModule KL/KL.dat
   {
-    Position 0. 0. 3.206 m
+    Position 0. 0. -3.94745 m
     Rotation 0. 0. 0. degree
+    PropertyString Region KLregion
   }
+//  Module KL/KL.dat
+//  {
+//    Position 0. 0. -3.74745 m
+//    Rotation 0. 0. 0. degree
+//  }
 // EMR pending geometry update and SD from EMR group
 // DR March 10, 2014
 //Module EMR/EMR.dat
