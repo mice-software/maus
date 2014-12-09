@@ -36,6 +36,7 @@ class EMRBarHitProcessor : public ObjectProcessor<EMRBarHit> {
     EMRBarHitProcessor();
 
   private:
+    DoubleProcessor _double_proc;
     IntProcessor _int_proc;
 };
 }  // namespace MAUS

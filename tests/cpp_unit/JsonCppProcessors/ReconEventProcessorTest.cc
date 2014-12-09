@@ -28,18 +28,29 @@
 namespace MAUS {
 namespace ReconEventProcessorTest {
 
-std::string EMR_BAR_HIT = "{\"tot\":-1,\"delta_t\":-2}";
+std::string EMR_BAR_HIT =
+    std::string("{\"tot\":-1, \"delta_t\":-2, \"hittime\":-3, ")+
+    std::string("\"x\":-4., \"y\":-5., \"z\":-6., ")+
+    std::string("\"charge_corrected\":-7., \"total_charge_corrected\":-8.}");
 
-std::string EMR_BAR = "{\"bar\":-1,\"emr_bar_hits\":["+EMR_BAR_HIT+","+
-                                                       EMR_BAR_HIT+"]}";
+std::string EMR_BAR = "{\"bar\":-1, \"emr_bar_hits\":["+EMR_BAR_HIT+","+EMR_BAR_HIT+"]}";
 
 std::string EMR_PLANE_HIT =
-    std::string("{\"emr_bars\":["+EMR_BAR+","+EMR_BAR+"], \"plane\":-1,")+
-    std::string("\"orientation\":-2, \"charge\":-3, \"time\":-4,")+
-    std::string("\"spill\":-5, \"trigger\":-6, \"delta_t\":-7}");
+    std::string("{\"emr_bars\":["+EMR_BAR+","+EMR_BAR+"], ")+
+    std::string("\"emr_bars_primary\":["+EMR_BAR+","+EMR_BAR+"], ")+
+    std::string("\"emr_bars_secondary\":["+EMR_BAR+","+EMR_BAR+"], ")+
+    std::string("\"plane\":-1, \"orientation\":-2, \"charge\":-3., ")+
+    std::string("\"charge_corrected\":-4., \"pedestal_area\":-5., \"time\":-6, ")+
+    std::string("\"spill\":-7, \"trigger\":-8, \"run\":-9, \"delta_t\":-10, ")+
+    std::string("\"samples\":[1,2,3]}");
 
-std::string EMR_EVENT = "{\"emr_plane_hits\":["+EMR_PLANE_HIT+","+EMR_PLANE_HIT+
-                        "]}";
+std::string EMR_EVENT =
+    std::string("{\"emr_plane_hits\":["+EMR_PLANE_HIT+","+EMR_PLANE_HIT+"], ")+
+    std::string("\"initial_trigger\":true, \"has_primary\":true, ")+
+    std::string("\"range_primary\":-1., \"has_secondary\":true, ")+
+    std::string("\"range_secondary\":-2., \"secondary_to_primary_track_distance\":-3., ")+
+    std::string("\"total_charge_MA\":-4., \"charge_ratio_MA\":-5., ")+
+    std::string("\"total_charge_SA\":-6., \"charge_ratio_SA\":-7.}");
 
 std::string RECON_EVENT =
     std::string("{\"part_event_number\":1, \"emr_event\":"+EMR_EVENT+"}");

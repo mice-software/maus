@@ -1,0 +1,26 @@
+import os
+simulation_geometry_filename = os.path.expandvars("${MAUS_ROOT_DIR}/tests/integration/test_utilities/test_geometry_validation/test_geometry.dat")
+check_volume_overlaps = True
+geometry_validation = {
+    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
+    "will_plot":True,
+    "will_track":True,
+    "z_start":-500.,
+    "z_end":1000.,
+    "x_start":-1.,
+    "x_step":1.,
+    "y_start":2.,
+    "y_step":-2.,
+    "n_steps":3,
+    "plot_formats":["ps", "png"],
+    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/test_geometry_validation_materials_1d"),
+    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/test_geometry_validation_materials_2d"),
+    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/test_geometry_validation_volumes_1d"),
+    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/test_geometry_validation_volumes_2d"),
+    "2d_volume_plot_label_size":0.1,
+    "volume_bounding_box_dump":os.path.expandvars("${MAUS_TMP_DIR}/test_geometry_validation_volumes.json"),
+}
+
+max_step_length = 1.
+
+

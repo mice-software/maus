@@ -1,0 +1,6 @@
+Module HeWindowOuterSphere
+{
+Volume Sphere
+Dimensions 0.1 173.26 mm
+PropertyString Material GALACTIC
+}

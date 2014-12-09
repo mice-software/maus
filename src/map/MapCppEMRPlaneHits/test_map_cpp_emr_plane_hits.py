@@ -18,8 +18,8 @@
 import os
 import unittest
 from Configuration import Configuration
-import maus_cpp.converter
 import MAUS
+import maus_cpp.converter
 
 class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
     """Tests for MapCppEMRPlaneHits"""
@@ -34,6 +34,7 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         self.assertRaises(ValueError, self.mapper.birth, "")
         result = self.mapper.process("")
         doc = maus_cpp.converter.json_repr(result)
+        self.assertTrue("errors" in doc)
         self.assertTrue("MapCppEMRPlaneHits" in doc["errors"])
 
     def test_init(self):
@@ -49,10 +50,10 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         # test with no data.
         result = self.mapper.process(data)
         spill_out = maus_cpp.converter.json_repr(result)
-        n_ev = len(spill_out['recon_events'])
-        #print spill_out["errors"]
-        self.assertEqual(0, n_ev)
         self.assertFalse("MapCppEMRPlaneHits" in spill_out["errors"])
+
+        n_ev = len(spill_out['recon_events'])
+        self.assertEqual(0, n_ev)
 
     def test_process(self):
         """Test MapCppEMRPlaneHits process method"""
@@ -62,21 +63,18 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         data = fin.read()
         # test with some crazy events.
         result = self.mapper.process(data)
-        #spill_in = json.loads(data)
         spill_out = maus_cpp.converter.json_repr(result)
-        #print spill_out["errors"]
         self.assertFalse("MapCppEMRPlaneHits" in spill_out["errors"])
+
+	# consistent amount of reconEvents (5 = 3primary+1noise+1decay)
         n_ev = len(spill_out['recon_events'])
-        self.assertEqual(3, n_ev)
-        n_hits_0 = len(spill_out['recon_events'][0]['emr_event']\
-                                ['emr_plane_hits'])
-        self.assertEqual(1, n_hits_0)
-        n_hits_1 = len(spill_out['recon_events'][1]['emr_event']\
-                                ['emr_plane_hits'])
-        self.assertEqual(2, n_hits_1)
-        n_hits_2 = len(spill_out['recon_events'][2]['emr_event']\
-                                ['emr_plane_hits'])
-        self.assertEqual(1, n_hits_2)
+        self.assertEqual(5, n_ev)
+
+	# consitent amount of plane hit in each event (1 per event)
+        for i in range(0, n_ev):
+            n_hits = len(spill_out['recon_events'][i]['emr_event']\
+				  ['emr_plane_hits'])
+            self.assertEqual(1, n_hits)
 
 if __name__ == "__main__":
     unittest.main()

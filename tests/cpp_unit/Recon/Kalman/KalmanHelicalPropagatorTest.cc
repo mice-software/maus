@@ -33,8 +33,8 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
     double x0 = 0.;
     double y0 = 5.;
     double z0 = 0.;
-    double mx0 = 15.*fabs(kappa);
-    double my0 = 15.*fabs(kappa);
+    double px0 = 15.;
+    double py0 = 15.;
 
     // double x1 = 29.614;
     // double y1 = -3.0019;
@@ -48,9 +48,9 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
 
     TMatrixD a(5, 1);
     a(0, 0) = x0;
-    a(1, 0) = mx0;
+    a(1, 0) = px0;
     a(2, 0) = y0;
-    a(3, 0) = my0;
+    a(3, 0) = py0;
     a(4, 0) = kappa;
     old_site.set_a(a, MAUS::KalmanState::Filtered);
 
@@ -69,7 +69,7 @@ class KalmanHelicalPropagatorTest : public ::testing::Test {
   static const double _Bz = -0.004;
   static const double _tracker0_Bz = -0.0039815;
   static const double _tracker1_Bz = -0.00400066;
-  static const double err = 1.e-3;
+  static const double err = 1.e-4;
 };
 
 TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
@@ -86,19 +86,19 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
   double px0 = 5.04953;
   double py0 = -50.4535;
   double pz0 = 212.641;
-  double mx0 = px0/pz0;
-  double my0 = py0/pz0;
+  // double mx0 = px0/pz0;
+  // double my0 = py0/pz0;
   double charge = 1.;
   double kappa  = charge/pz0;
 
   double x15  = 98.65861;
   double y15  = -9.12456;
   double z15  = 16472.6;
-  double px15 = 24.22770;
-  double py15 = 44.5266;
-  double pz15 = 212.686;
-  double mx15 = px15/pz15;
-  double my15 = py15/pz15;
+  double px15 = 24.22264;
+  double py15 = 44.54567;
+  // double pz15 = 212.686;
+  // double mx15 = px15/pz15;
+  // double my15 = py15/pz15;
 
   state_0.set_z(z0);
   state_15.set_z(z15);
@@ -106,9 +106,9 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
 
   TMatrixD a(5, 1);
   a(0, 0) = x0;
-  a(1, 0) = mx0;
+  a(1, 0) = px0;
   a(2, 0) = y0;
-  a(3, 0) = my0;
+  a(3, 0) = py0;
   a(4, 0) = kappa;
   state_0.set_a(a, MAUS::KalmanState::Filtered);
 
@@ -117,9 +117,9 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
   a_projected = state_15.a(MAUS::KalmanState::Projected);
 
   EXPECT_NEAR(x15,    a_projected(0, 0), err);
-  EXPECT_NEAR(mx15,   a_projected(1, 0), err);
+  EXPECT_NEAR(px15,   a_projected(1, 0), err);
   EXPECT_NEAR(y15,    a_projected(2, 0), err);
-  EXPECT_NEAR(my15,   a_projected(3, 0), err);
+  EXPECT_NEAR(py15,   a_projected(3, 0), err);
   EXPECT_NEAR(kappa, a_projected(4, 0), err);
 
   delete propagator;
@@ -155,7 +155,6 @@ TEST_F(KalmanHelicalPropagatorTest, test_covariance_extrapolation) {
   //
   // MCS increases matrix elements.
   //
-  propagator->CalculateSystemNoise(&old_site, &new_site);
   propagator->CalculateCovariance(&old_site, &new_site);
   for ( int j = 0; j < 5; j++ ) {
     for ( int k = 0; k < 5; k++ ) {
@@ -175,9 +174,9 @@ TEST_F(KalmanHelicalPropagatorTest, GetTrackMomentumTest) {
 
   TMatrixD a(5, 1);
   a(0, 0) = 0.;
-  a(1, 0) = px/pz;
+  a(1, 0) = px;
   a(2, 0) = 0.;
-  a(3, 0) = py/pz;
+  a(3, 0) = py;
   a(4, 0) = 1./pz;
 
   MAUS::KalmanState state;

@@ -37,6 +37,9 @@
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Utils/Constants.hh"
+
 namespace MAUS {
 
 class KalmanPropagator {
@@ -61,13 +64,16 @@ class KalmanPropagator {
    */
   virtual void CalculatePredictedState(const KalmanState *old_site, KalmanState *new_site) = 0;
 
+  virtual TMatrixD GetIntermediateState(const KalmanState *old_site,
+                                        double delta_z, TMatrixD &F) = 0;
+
   /** @brief  Projects the Covariance matrix.
    */
   void CalculateCovariance(const KalmanState *old_site, KalmanState *new_site);
 
   /** @brief  Calculates the Energy loss according to Bethe Bloch formula.
    */
-  double BetheBlochStoppingPower(double p);
+  double BetheBlochStoppingPower(double p, std::string material);
 
   /** @brief  Subtracts the energy loss computed by BetheBlochStoppingPower.
    *
@@ -75,15 +81,11 @@ class KalmanPropagator {
    *       adition" in the particle tracking UP the beamline.
    *
    */
-  void SubtractEnergyLoss(const KalmanState *old_site, KalmanState *new_site);
-
-  /** @brief  Computes the contribution of MCS to the covariance matrix.
-   */
-  void CalculateSystemNoise(const KalmanState *old_site, const KalmanState *new_site);
+  void SubtractEnergyLoss(KalmanState *new_site);
 
   /** @brief  Smoothes the last fitted point, for which filtered values = smoothed ones.
    */
-  void PrepareForSmoothing(KalmanStatesPArray sites);
+  void PrepareForSmoothing(KalmanState *last_site);
 
   /** @brief  Smoothes the track points all the way to the beggining of the track.
    */
@@ -106,11 +108,25 @@ class KalmanPropagator {
    */
   virtual double GetTrackMomentum(const KalmanState *a_site) = 0;
 
-  TMatrixD BuildQ(double L0,
-                  double deltaZ,
-                  double mx,
-                  double my,
-                  double p);
+  virtual TMatrixD BuildQ(TMatrixD a, double L0, double w) = 0;
+
+  // void SetGeometryMap(SciFiGeometryMap map) { _geometry_map = map; }
+
+  // SciFiGeometryMap GetGeometryMap()         { return _geometry_map; }
+
+  double GetL(std::string material, double material_w);
+
+  TMatrixD AddSystemNoise(const KalmanState *old_site, TMatrixD C_old);
+
+  double GetA(std::string material);
+
+  double GetZ(std::string material);
+
+  double GetMeanExcitationEnergy(std::string material);
+
+  double GetDensity(std::string material);
+
+  double GetDensityCorrection(std::string material);
 
  protected:
   bool _use_MCS;
@@ -125,9 +141,19 @@ class KalmanPropagator {
 
   int _n_parameters;
 
-  SciFiParams FibreParameters;
+  MaterialParams FibreParameters;
 
-  AirParams AirParameters;
+  MaterialParams GasParameters;
+
+  MaterialParams MylarParameters;
+
+  // SciFiGeometryMap _geometry_map;
+
+  double _w_scifi;
+
+  double _w_mylar;
+
+  double _mm_to_cm;
 };
 
 } // ~namespace MAUS

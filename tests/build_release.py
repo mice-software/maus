@@ -133,14 +133,16 @@ def copy_targets():
     version = Configuration.Configuration().handler_maus_version(
                                                             {'maus_version':''})
     version = version.replace(' ', '_')
-    out_dir = os.path.join(TEMP_DST, version)
-    os.mkdir(out_dir)
+    tmp_out_dir = os.path.join(TEMP_DST, version)
+    os.mkdir(tmp_out_dir)
     doc_out_dir = os.path.join(TEMP_DST, version, 'doc')
     os.mkdir(doc_out_dir)
     print COPY_TARGETS
     for target in COPY_TARGETS:
         if 'doxygen' in target:
             out_dir = doc_out_dir
+        else:
+            out_dir = tmp_out_dir
         print 'Copying target', target
         if os.path.isdir(target):
             last = target.split('/')[-1]
