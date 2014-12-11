@@ -36,55 +36,62 @@ TEST_F(KalmanStateTest, getters_and_setters_test) {
   // Define projected states...
   TMatrixD projected_a(5, 1);
   projected_a(0, 0) = 1.0;
-  projected_a(0, 0) = 2.0;
-  projected_a(0, 0) = 3.0;
-  projected_a(0, 0) = 4.0;
-  projected_a(0, 0) = 5.0;
-  TMatrixD pull(2, 1);
+  projected_a(1, 0) = 2.0;
+  projected_a(2, 0) = 3.0;
+  projected_a(3, 0) = 4.0;
+  projected_a(4, 0) = 5.0;
+  // TMatrixD pull(2, 1);
+  TMatrixD pull(1, 1);
   pull(0, 0) = 1.2;
-  pull(1, 0) = 1.;
+  // pull(1, 0) = 1.;
 
   // ... filtered states...
   TMatrixD a(5, 1);
   a(0, 0) = 1.1;
-  a(0, 0) = 2.1;
-  a(0, 0) = 3.1;
-  a(0, 0) = 4.1;
-  a(0, 0) = 5.1;
-  TMatrixD residual(2, 1);
+  a(1, 0) = 2.1;
+  a(2, 0) = 3.1;
+  a(3, 0) = 4.1;
+  a(4, 0) = 5.1;
+  // TMatrixD residual(2, 1);
+  TMatrixD residual(1, 1);
   residual(0, 0) = 0.8;
-  residual(1, 0) = 2.;
-  double f_chi2 = 2.;
+  // residual(1, 0) = 2.;
+  double chi2 = 2.;
 
   // ... and smoothed states.
   TMatrixD smoothed_a(5, 1);
   smoothed_a(0, 0) = 1.2;
-  smoothed_a(0, 0) = 2.2;
-  smoothed_a(0, 0) = 3.2;
-  smoothed_a(0, 0) = 4.2;
-  smoothed_a(0, 0) = 5.2;
+  smoothed_a(1, 0) = 2.2;
+  smoothed_a(2, 0) = 3.2;
+  smoothed_a(3, 0) = 4.2;
+  smoothed_a(4, 0) = 5.2;
+
+  TMatrixD smoothed_residual(1, 1);
+  smoothed_residual(0, 0) = 0.6;
+
+  TMatrixD covariance_residual(1, 1);
+  covariance_residual(0, 0) = 1.;
+  /*
   TMatrixD smoothed_residual(2, 1);
   smoothed_residual(0, 0) = 0.6;
   smoothed_residual(1, 0) = 3.;
-  double s_chi2 = 1.;
 
   TMatrixD covariance_residual(2, 2);
   covariance_residual(0, 0) = 1.;
   covariance_residual(0, 1) = 2.;
   covariance_residual(1, 0) = 3.;
   covariance_residual(1, 1) = 4.;
-
+  */
   // Set them all.
   a_site.set_a(projected_a, MAUS::KalmanState::Projected);
   a_site.set_residual(pull, MAUS::KalmanState::Projected);
 
   a_site.set_a(a, MAUS::KalmanState::Filtered);
   a_site.set_residual(residual, MAUS::KalmanState::Filtered);
-  a_site.set_chi2(f_chi2, MAUS::KalmanState::Filtered);
+  a_site.set_chi2(chi2);
 
   a_site.set_a(smoothed_a, MAUS::KalmanState::Smoothed);
   a_site.set_residual(smoothed_residual, MAUS::KalmanState::Smoothed);
-  a_site.set_chi2(s_chi2, MAUS::KalmanState::Smoothed);
   a_site.set_covariance_residual(covariance_residual, MAUS::KalmanState::Smoothed);
 
   // Now, we can quickly check that these states were set as expected.
@@ -102,10 +109,7 @@ TEST_F(KalmanStateTest, getters_and_setters_test) {
             a(0, 0));
   EXPECT_EQ(a_site.a(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_a(0, 0));
-  EXPECT_EQ(a_site.chi2(MAUS::KalmanState::Filtered),
-            f_chi2);
-  EXPECT_EQ(a_site.chi2(MAUS::KalmanState::Smoothed),
-            s_chi2);
+  EXPECT_EQ(a_site.chi2(), chi2);
 
   // Are the copy constructor and the assignment operator working? Check them.
   // First, copy...
@@ -123,10 +127,7 @@ TEST_F(KalmanStateTest, getters_and_setters_test) {
             a(0, 0));
   EXPECT_EQ(copy.a(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_a(0, 0));
-  EXPECT_EQ(copy.chi2(MAUS::KalmanState::Filtered),
-            f_chi2);
-  EXPECT_EQ(copy.chi2(MAUS::KalmanState::Smoothed),
-            s_chi2);
+  EXPECT_EQ(copy.chi2(), chi2);
   EXPECT_EQ(copy.covariance_residual(MAUS::KalmanState::Smoothed)(0, 0),
             covariance_residual(0, 0));
 
@@ -146,16 +147,11 @@ TEST_F(KalmanStateTest, getters_and_setters_test) {
             a(0, 0));
   EXPECT_EQ(second_copy.a(MAUS::KalmanState::Smoothed)(0, 0),
             smoothed_a(0, 0));
-  EXPECT_EQ(second_copy.chi2(MAUS::KalmanState::Filtered),
-            f_chi2);
-  EXPECT_EQ(second_copy.chi2(MAUS::KalmanState::Smoothed),
-            s_chi2);
-  EXPECT_EQ(second_copy.covariance_residual(MAUS::KalmanState::Smoothed)(1, 1),
-            covariance_residual(1, 1));
+  EXPECT_EQ(second_copy.chi2(), chi2);
+  EXPECT_EQ(second_copy.covariance_residual(MAUS::KalmanState::Smoothed)(0, 0),
+            covariance_residual(0, 0));
 
   // Bad requests
-  EXPECT_THROW(a_site.set_chi2(0., MAUS::KalmanState::Initialized),
-               MAUS::Exception);
   EXPECT_THROW(a_site.set_covariance_residual(covariance_residual, MAUS::KalmanState::Initialized),
                MAUS::Exception);
   EXPECT_THROW(a_site.set_residual(smoothed_residual, MAUS::KalmanState::Initialized),

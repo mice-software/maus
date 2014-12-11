@@ -37,12 +37,9 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("channel", &_double_proc,
                         &SciFiTrackPoint::channel,
                         &SciFiTrackPoint::set_channel, false);
-    RegisterValueBranch("f_chi2", &_double_proc,
-                        &SciFiTrackPoint::f_chi2,
-                        &SciFiTrackPoint::set_f_chi2, false);
-    RegisterValueBranch("s_chi2", &_double_proc,
-                        &SciFiTrackPoint::s_chi2,
-                        &SciFiTrackPoint::set_s_chi2, false);
+    RegisterValueBranch("chi2", &_double_proc,
+                        &SciFiTrackPoint::chi2,
+                        &SciFiTrackPoint::set_chi2, false);
     RegisterValueBranch("pos", &_threevector_proc,
                         &SciFiTrackPoint::pos,
                         &SciFiTrackPoint::set_pos, false);

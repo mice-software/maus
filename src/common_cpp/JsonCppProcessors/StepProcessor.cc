@@ -39,6 +39,10 @@ StepProcessor::StepProcessor() {
                                                      &Step::SetBField, true);
     RegisterValueBranch("e_field", &_three_vec_proc, &Step::GetEField,
                                                      &Step::SetEField, true);
+    RegisterValueBranch("volume", &_string_proc, &Step::GetVolume,
+                                                 &Step::SetVolume, true);
+    RegisterValueBranch("material", &_string_proc, &Step::GetMaterial,
+                                                 &Step::SetMaterial, true);
 }
 }
 

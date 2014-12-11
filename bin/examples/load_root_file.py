@@ -72,6 +72,8 @@ def main():
             # vector directly
             for j in range(spill.GetReconEvents().size()):
                 tof_event = spill.GetReconEvents()[j].GetTOFEvent()
+                if not tof_event:
+                    continue
                 digits = tof_event.GetTOFEventDigit()
                 for k in range(digits.GetTOF1DigitArray().size()):
                     tof1_digit = digits.GetTOF1DigitArray()[k]
