@@ -65,7 +65,7 @@ import os
 import subprocess
 import shutil
 import shlex
-
+from time import sleep
 
 def arg_parser():
     """
@@ -315,17 +315,27 @@ class RunSettings: #pylint: disable = R0902
         index = os.path.join(os.getcwd(), index)
         if os.path.exists(index):
             os.remove(index)
+
+        n_max_tries = 5
+        retries = 0
         
         index_command = 'wget '+file_index
         args = shlex.split(index_command)
-        proc = subprocess.Popen(args) # , stdout=subprocess.STDOUT, \
-                                # stderr=subprocess.STDOUT)
+        while (retries < n_max_tries):
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE, \
+                                    stderr=subprocess.PIPE)
+            (stdout, stderr) = proc.communicate()
+            if stderr:
+                retries +=1
+                sleep(0.5)
+                continue
+            break
+        # if retries == n_max_tries: return NULL
         # parse the local file name from the address
-        proc.wait()
         
         list = open(index)
         i = 0
-        target_entry
+        target_entry = ''
         for entry in list:
             if int(run_number) == i:
                 entry.rstrip('/n')
@@ -334,7 +344,7 @@ class RunSettings: #pylint: disable = R0902
             else:
                 i += 1
         # default is a grid based copy
-        interface_download = 'lcg-cp -D se '
+        interface_download = 'lcg-cp --checksum '
         # file names on the grid are arbitrary so make
         # it something logical for the local copy
         file_name = "jsondoccp_"+str(run_number)+".txt"
@@ -359,8 +369,17 @@ class RunSettings: #pylint: disable = R0902
         file_name = os.path.join(os.getcwd(), file_name)
         if os.path.exists(file_name):
             os.remove(file_name)
-        proc = subprocess.Popen(args) #, stdout=subprocess.STDOUT,\
-                                # stderr=subprocess.STDOUT)
+        retries = 0
+        while (retries < n_max_tries):
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE,\
+                                    stderr=subprocess.PIPE)
+            (stdout, stderr) = proc.communicate()
+            if stderr:
+                sleep(0.5)
+                retries += 1
+                continue
+            break
+        # if retries == n_max_tries: return NULL
         os.remove(index)
         return file_name
             
