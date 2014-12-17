@@ -325,7 +325,8 @@ class RunSettings: #pylint: disable = R0902
             proc = subprocess.Popen(args, stdout=subprocess.PIPE, \
                                     stderr=subprocess.PIPE)
             (stdout, stderr) = proc.communicate()
-            if stderr:
+            print stderr
+            if stderr.find('saved') < 0:
                 retries +=1
                 sleep(0.5)
                 continue
@@ -374,7 +375,8 @@ class RunSettings: #pylint: disable = R0902
             proc = subprocess.Popen(args, stdout=subprocess.PIPE,\
                                     stderr=subprocess.PIPE)
             (stdout, stderr) = proc.communicate()
-            if stderr:
+            print stderr
+            if stderr.find('saved') < 0:
                 sleep(0.5)
                 retries += 1
                 continue
