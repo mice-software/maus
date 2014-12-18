@@ -44,7 +44,8 @@ namespace global {
 	 ++ImportedTrackIterator) {
       MAUS::DataStructure::Global::Track* ImportedTrack =
 	(*ImportedTrackIterator);
-      if (ImportedTrack->HasDetector(MAUS::DataStructure::Global::kTracker0)) {
+      if (ImportedTrack->HasDetector(MAUS::DataStructure::Global::kTracker0) ||
+	  ImportedTrack->HasDetector(MAUS::DataStructure::Global::kTracker1)) {
 	SciFiTrackArray->push_back(ImportedTrack);
       }
     }
@@ -53,8 +54,13 @@ namespace global {
       *GlobalSpacePointArray = global_event->get_space_points();
     MAUS::DataStructure::Global::TrackPArray TOFTrackArray;
     MakeTOFTracks(global_event, GlobalSpacePointArray, TOFTrackArray);
+    MAUS::DataStructure::Global::Track* KLTrack =
+      new MAUS::DataStructure::Global::Track();
+    MakeKLTracks(global_event, GlobalSpacePointArray, KLTrack);
+    if (KLTrack->GetTrackPoints().size() == 0) delete KLTrack;
 
     // Adding global tracks for case where global event contains both SciFi and TOF tracks
+    // (And KL track if applicable)
     if (!SciFiTrackArray->empty() && !TOFTrackArray.empty()) {
       for (unsigned int i = 0; i < SciFiTrackArray->size(); i++) {
 	for (unsigned int j = 0; j < TOFTrackArray.size(); j++) {
@@ -82,12 +88,24 @@ namespace global {
 	    tempSciFiTrackPoint->set_mapper_name(mapper_name);
 	    GlobalTrack->AddTrackPoint(tempSciFiTrackPoint);
 	  }
+	  if (KLTrack/*->GetTrackPoints().size() > 0*/) {
+	    std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+	      tempKLTrackPointArray = KLTrack->GetTrackPoints();
+	    for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
+	      MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
+		const_cast<MAUS::DataStructure::Global::TrackPoint*>
+		(tempKLTrackPointArray[l]);
+	      tempKLTrackPoint->set_mapper_name(mapper_name);
+	      GlobalTrack->AddTrackPoint(tempKLTrackPoint);
+	    }
+	  }
 	  global_event->add_track_recursive(GlobalTrack);
 	}
       }
     }
 
     // Adding global tracks for case where global event contains only TOF tracks
+    // (And KL track if applicable)
     if (SciFiTrackArray->empty() && !TOFTrackArray.empty()) {
       for (unsigned int i = 0; i < TOFTrackArray.size(); i++) {
 	MAUS::DataStructure::Global::Track* GlobalTrack =
@@ -102,11 +120,23 @@ namespace global {
 	    (tempTOFTrackPointArray[j]);
 	  GlobalTrack->AddTrackPoint(tempTOFTrackPoint);
 	}
+	if (KLTrack/*->GetTrackPoints().size() > 0*/) {
+	    std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+	      tempKLTrackPointArray = KLTrack->GetTrackPoints();
+	    for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
+	      MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
+		const_cast<MAUS::DataStructure::Global::TrackPoint*>
+		(tempKLTrackPointArray[l]);
+	      tempKLTrackPoint->set_mapper_name(mapper_name);
+	      GlobalTrack->AddTrackPoint(tempKLTrackPoint);
+	    }
+	  }
 	global_event->add_track_recursive(GlobalTrack);
       }
     }
 
     // Adding global tracks for case where global event contains only SciFi tracks
+    // (And KL track if applicable)
     if (!SciFiTrackArray->empty() && TOFTrackArray.empty()) {
       for (unsigned int i = 0; i < SciFiTrackArray->size(); i++) {
 	MAUS::DataStructure::Global::Track* GlobalTrack =
@@ -123,8 +153,36 @@ namespace global {
 	  tempSciFiTrackPoint->set_mapper_name(mapper_name);
 	  GlobalTrack->AddTrackPoint(tempSciFiTrackPoint);
 	}
+	if (KLTrack/*->GetTrackPoints().size() > 0*/) {
+	    std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+	      tempKLTrackPointArray = KLTrack->GetTrackPoints();
+	    for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
+	      MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
+		const_cast<MAUS::DataStructure::Global::TrackPoint*>
+		(tempKLTrackPointArray[l]);
+	      tempKLTrackPoint->set_mapper_name(mapper_name);
+	      GlobalTrack->AddTrackPoint(tempKLTrackPoint);
+	    }
+	}
 	global_event->add_track_recursive(GlobalTrack);
       }
+    }
+
+    // Adding global tracks for case where global event contains only a KL track
+    if (SciFiTrackArray->empty() && TOFTrackArray.empty() && KLTrack/*->GetTrackPoints().size() > 0*/) {
+      MAUS::DataStructure::Global::Track* GlobalTrack =
+	new MAUS::DataStructure::Global::Track();
+      GlobalTrack->set_mapper_name(mapper_name);
+      std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+	tempKLTrackPointArray = KLTrack->GetTrackPoints();
+      for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
+	MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
+	  const_cast<MAUS::DataStructure::Global::TrackPoint*>
+	  (tempKLTrackPointArray[l]);
+	tempKLTrackPoint->set_mapper_name(mapper_name);
+	GlobalTrack->AddTrackPoint(tempKLTrackPoint);
+      }
+      global_event->add_track_recursive(GlobalTrack);
     }
   }
 
@@ -213,6 +271,43 @@ namespace global {
       tempTOF2tp.clear();
     }
   }
+
+  void TrackMatching::MakeKLTracks(
+      MAUS::GlobalEvent* global_event,
+      std::vector<MAUS::DataStructure::Global::SpacePoint*>
+      *GlobalSpacePointArray,
+      MAUS::DataStructure::Global::Track* KLTrack) {
+
+
+    std::string local_mapper_name = "GlobalKLTrack";
+
+    std::vector<MAUS::DataStructure::Global::TrackPoint*> KLtp;
+
+    for (unsigned int i = 0; i < GlobalSpacePointArray->size(); ++i) {
+      MAUS::DataStructure::Global::SpacePoint* sp = GlobalSpacePointArray->at(i);
+      if (!sp) {
+	continue;
+      }
+      MAUS::DataStructure::Global::TrackPoint* tp;
+      if (sp->get_detector() == MAUS::DataStructure::Global::kCalorimeter) {
+	tp = new MAUS::DataStructure::Global::TrackPoint(sp);
+	KLtp.push_back(tp);
+      } else {
+	continue;
+      }
+    }
+
+    for (unsigned int i = 0; i < KLtp.size(); ++i) {
+
+      //MAUS::DataStructure::Global::Track* KLtrack =
+      //new MAUS::DataStructure::Global::Track();
+        KLTrack->set_mapper_name(local_mapper_name);
+	KLtp[i]->set_mapper_name(local_mapper_name);
+	KLTrack->AddTrackPoint(KLtp[i]);
+	global_event->add_track_point_recursive(KLtp[i]);
+      }
+    //global_event->add_track_recursive(KLTrack);
+    }
 
 } // ~namespace global
 } // ~namespace recon

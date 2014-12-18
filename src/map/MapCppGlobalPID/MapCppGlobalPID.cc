@@ -75,6 +75,8 @@ namespace MAUS {
 							   _hypotheses[i]));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
                                                            _hypotheses[i]));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
+                                                           _hypotheses[i]));
       // etc.
       }
     _configCheck = true;

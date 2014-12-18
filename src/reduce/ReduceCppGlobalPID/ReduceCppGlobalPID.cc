@@ -66,6 +66,8 @@ namespace MAUS {
 	_unique_identifier));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_hypothesis_name,
 	_unique_identifier));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_hypothesis_name,
+	_unique_identifier));
 
       _configCheck = true;
       return true;
