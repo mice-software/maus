@@ -169,7 +169,11 @@ class RunManager:
         @returns True if run is valid
         """
         print 'Checking run validity'
-        return True
+        
+        if os.path.exists(self.run_setup.g4bl_interface):
+            return True
+        else:
+            return False
 
     def setup(self):
         """
@@ -197,8 +201,6 @@ class RunManager:
         download_dir = self.run_setup.download_target
         if os.path.isdir(download_dir):
             shutil.rmtree(download_dir)
-        if os.path.exists(self.run_setup.g4bl_interface):
-            os.remove(self.run_setup.g4bl_interface)
         if os.path.exists(self.run_setup.input_file_name):
             os.remove(self.run_setup.input_file_name)
       
@@ -221,7 +223,7 @@ class RunManager:
         proc = subprocess.Popen(download, stdout=self.logs.download_log, \
                                                        stderr=subprocess.STDOUT)
         proc.wait()
-        if 0:  # self.run_setup.test_mode:
+        if self.run_setup.test_mode:
             test_path_in = os.path.join(self.run_setup.maus_root_dir, 'src',
                     'legacy', 'FILES', 'Models', 'Configurations', 'Test.dat')
             test_path_out = os.path.join(self.run_setup.download_target, \
@@ -290,9 +292,14 @@ class RunSettings: #pylint: disable = R0902
         self.g4bl_interface = \
                    self.get_file_name_from_run_number(self.input_file_name,\
                                                       self.run_number)
+        
         self.mc_file_name = self.run_number_as_string+"_sim.root"
         
         print self.g4bl_interface
+        
+        if os.path.exists(self.g4bl_interface):
+            print "Download of interface file successful"
+            
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = '%s/downloads' % os.getcwd()
         self.geometry_id = args_in.geoid
@@ -326,7 +333,7 @@ class RunSettings: #pylint: disable = R0902
                                     stderr=subprocess.PIPE)
             (stdout, stderr) = proc.communicate()
             print stderr
-            if stderr.find('saved') < 0:
+            if not os.path.exists(index):
                 retries +=1
                 sleep(0.5)
                 continue
@@ -362,12 +369,14 @@ class RunSettings: #pylint: disable = R0902
             # for the Popen command
             interface_download += target_entry
             args = shlex.split(interface_download)
+            file_name = os.path.join(os.getcwd(), file_name)
+            print args
         else:
             interface_download += target_entry
             args = shlex.split(interface_download)
-            args.append(file_name)
-            
-        file_name = os.path.join(os.getcwd(), file_name)
+            file_name = os.path.join(os.getcwd(), file_name)
+            args.append('file:/'+file_name)
+        
         if os.path.exists(file_name):
             os.remove(file_name)
         retries = 0
@@ -375,14 +384,16 @@ class RunSettings: #pylint: disable = R0902
             proc = subprocess.Popen(args, stdout=subprocess.PIPE,\
                                     stderr=subprocess.PIPE)
             (stdout, stderr) = proc.communicate()
-            print stderr
-            if stderr.find('saved') < 0:
+            print stdout, stderr
+            if os.path.exists(file_name):
+                print "Download successful"
+            else:
                 sleep(0.5)
                 retries += 1
                 continue
             break
         # if retries == n_max_tries: return NULL
-        os.remove(index)
+        # os.remove(index)
         return file_name
             
     def get_simulation_parameters(self):
