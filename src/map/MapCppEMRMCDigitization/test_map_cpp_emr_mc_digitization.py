@@ -24,7 +24,6 @@ import maus_cpp.converter
 class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
     """Tests for MapCppEMRMCDigitization"""
     @classmethod
-    @unittest.skip('Skipping test_emr_mc_digitization.py')
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
         cls.mapper = MAUS.MapCppEMRMCDigitization()
@@ -77,9 +76,6 @@ class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
         for i in range(0, n_hits_0):
             self.assertTrue(spill_out['recon_events'][0]['emr_event']\
 				     ['emr_plane_hits'][i]['charge'] > 0)
-            self.assertTrue(spill_out['recon_events'][0]['emr_event']\
-				     ['emr_plane_hits'][i]['emr_bars'][0]\
-				     ['emr_bar_hits'][0]['tot'] > 5)
             self.assertTrue(spill_out['recon_events'][0]['emr_event']\
 				     ['emr_plane_hits'][i]['emr_bars'][0]\
 				     ['emr_bar_hits'][0]['tot'] > 5)

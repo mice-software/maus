@@ -15,6 +15,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+#pylint: disable = C0103
 """
 Appease pylint but does nothing
 """
@@ -65,8 +66,9 @@ import os
 import subprocess
 import shutil
 import shlex
+import time
 from time import sleep
-from cdb._mcserialnumber_supermouse import MCSerialNumberSuperMouse
+import cdb
 
 def arg_parser():
     """
@@ -88,9 +90,9 @@ def arg_parser():
     parser.add_argument('--no-test', dest='test_mode', \
                         help="Don't run the batch job using test cdb output",\
                         action='store_false', default=False)
-    parser.add_argument('--mcserialnumber', dest='mc_iteration', type=str, \
+    parser.add_argument('--mcserialnumber', dest='mc_iteration', type=int, \
                         help='MC Serial number for configuration DB',\
-                        default='')
+                        default=0)
     parser.add_argument('--geometry-id', dest='geoid', \
                         help='The simulation geometry ID number',\
                         required=True)
@@ -156,6 +158,7 @@ class RunManager:
             print 'Error - run not valid'
             return 1
         self.setup()
+        self.download_cards()
         self.download_geometry()
         self.execute_simulation()
 
@@ -220,6 +223,7 @@ class RunManager:
         print 'Getting geometry'
         download = [os.path.join(self.run_setup.maus_root_dir, 'bin', \
                                  'utilities', 'download_fit_geometry.py')]
+        # check that there is a selection for the geometry in the datacards
         download += self.run_setup.get_download_parameters()
         proc = subprocess.Popen(download, stdout=self.logs.download_log, \
                                                        stderr=subprocess.STDOUT)
@@ -249,6 +253,8 @@ class RunManager:
                                                        stderr=self.logs.sim_log)
         # stderr=subprocess.STDOUT)
         proc.wait()
+        if proc.returncode != 0:
+            raise MausError("MAUS simulation returned "+str(proc.returncode))
         self.logs.tar_queue.append(self.run_setup.mc_file_name)
         print self.logs.tar_queue
         # print self.logs.tar_queue
@@ -304,20 +310,41 @@ class RunSettings: #pylint: disable = R0902
             
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = '%s/downloads' % os.getcwd()
+        self.sim_cards = 'sim.cards'
         self.geometry_id = args_in.geoid
-        
-    def get_mc_datacards(self):
-        """
-        Get the data cards from cdb based on the mc_serial_number
 
-        The results should be a string that can be split and added to
-        the simulation file command line.
+    def download_cards(self):
         """
+        Downloads the datacards from the configuration database
         
-        cdb = MCSerialNumberSuperMouse()
-        res = cdb.get_datacards(self.mc_iteration_number)
+        If running in test mode, uses legacy Stage4 geometry instead.
 
-        return res
+        @raises DownloadError on failure
+        """
+        print 'Getting cards'
+        bi_number = self.run_setup.batch_iteration
+        for i in range(5):
+            try:
+                print "    Contacting CDB"
+                if self.run_setup.test_mode:
+                    mcs_service = cdb.MCSerialNumber(
+                                              "http://preprodcdb.mice.rl.ac.uk")
+                else:
+                    mcs_service = cdb.MCSerialNumber()
+                print "    Found, accessing cards"
+                mc_cards = mcs_service.get_datacards(bi_number)['mc']
+                if mc_cards == 'null':
+                    raise DownloadError(
+                       "No MC cards for batch iteration number "+str(bi_number))
+                mc_out = open(self.run_setup.sim_cards, 'w')
+                mc_out.write(mc_cards)
+                return
+            except cdb.CdbTemporaryError:
+                print "CDB lookup failed on attempt", i+1
+                time.sleep(1)
+            except cdb.CdbPermanentError:
+                raise DownloadError("Failed to download cards - CDB not found")
+        raise DownloadError("Failed to download cards after 5 attempts")
 
     def get_file_name_from_run_number(self, file_index, run_number):
         # pylint: disable = R0201
@@ -369,7 +396,7 @@ class RunSettings: #pylint: disable = R0902
         interface_download = 'lcg-cp --checksum '
         # file names on the grid are arbitrary so make
         # it something logical for the local copy
-        file_name = "jsondoccp_"+str(run_number)+".txt"
+        file_name = "jsondoc_"+str(run_number)+".txt"
         
         if target_entry.find("http") >= 0:
             # use a wget algorithm instead
@@ -425,6 +452,7 @@ class RunSettings: #pylint: disable = R0902
             '-output_root_file_name', self.mc_file_name,
             '-verbose_level', '0',
             '-will_do_stack_trace', 'False',
+            '-configuration_file', 'sim.cards',
         ]
 
     ## This will need to be updated to reflect the source of the MC
@@ -438,12 +466,23 @@ class RunSettings: #pylint: disable = R0902
 
         @return list of command line arguments for download
         """
-        return [
-            '-geometry_download_id', str(self.geometry_id),
-            '-geometry_download_run_number', str(self.run_number),
-            '-geometry_download_directory', str(self.download_target),
-            '-verbose_level', '0',
-        ]
+        params = []
+        # The geometry id should be included in the data cards
+        if 'geometry_download_id' in open('sim.cards').read() or \
+               'geometry_download_by' in open('sim.cards').read():
+            params =  [
+                '-geometry_download_directory', str(self.download_target),
+                '-verbose_level', '0',
+                '-configuration_file','sim.cards'
+                ]
+        # otherwise, use the default download parameters.
+        else:
+            params = [
+                '-geometry_download_id', str(self.geometry_id),
+                '-geometry_download_directory', str(self.download_target),
+                '-verbose_level', '0',
+                ]
+        return params
 
 class FileManager: # pylint: disable = R0902
     """

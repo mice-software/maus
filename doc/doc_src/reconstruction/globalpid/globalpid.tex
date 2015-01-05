@@ -225,18 +225,21 @@ between the detectors falls within the minimum and maximum set within
 the class, will a valid value of the variable be returned. Otherwise, 
 the value of the variable is set to -1, such that it falls outside of 
 the allowed range for the variable, and so variable for the track is 
-not used in PDF production, or in the PID. The PDFs for pions, muons and positrons are 
-shown on the same plot in figure ~\ref{tofplot}, allowing for the separation between the peaks 
-for each particle to be seen. A point to note with PIDVarA is that it is momentum dependent, and 
+not used in PDF production, or in the PID. 
+A point to note with PIDVarA is that it is momentum dependent, and 
 so may not be included as a final PID variable.
 
-\begin{figure}[h!]
-\begin{center} 
-\includegraphics[width=4.5in]{reconstruction/globalpid/tofplot.jpg} 
-\caption{Difference between times at TOF0 and TOF1, for 200 Mev/c muons, pions and positrons.}
-\label{tofplot}
-\end{center} 
-\end{figure}
+% The PDFs for pions, muons and positrons are 
+% shown on the same plot in figure ~\ref{tofplot}, allowing for the separation between the peaks 
+% for each particle to be seen.
+% 
+% \begin{figure}[h!]
+% \begin{center} 
+% \includegraphics[width=4.5in]{reconstruction/globalpid/tofplot.jpg} 
+% \caption{Difference between times at TOF0 and TOF1, for 200 Mev/c muons, pions and positrons.}
+% \label{tofplot}
+% \end{center} 
+% \end{figure}
 
 \subsubsection{PIDVarB}
 \label{PIDVarB}
@@ -249,13 +252,15 @@ the class, will a valid value of the variable be returned. The tracker must also
 valid momentum measurement for a valid variable to be returned. Otherwise, 
 the value of the variable is set to (-1,-1), such that it falls outside of 
 the allowed range for the variable, and so variable for the track is 
-not used in PDF production, or in the PID. The PDFs for pions, muons and positrons are 
-shown on the same plot in figure ~\ref{tofplot}, showing the separation between their distributions.
+not used in PDF production, or in the PID. 
 
-\begin{figure}[h!]
-\begin{center} 
-\includegraphics[width=4.5in]{reconstruction/globalpid/toftrackerplot.jpg} 
-\caption{Difference between times at TOF0 and TOF1 vs momentum measured in upstream tracker, for 200 Mev/c muons, pions and positrons.}
-\label{toftrackerplot}
-\end{center} 
-\end{figure}
+% The PDFs for pions, muons and positrons are 
+% shown on the same plot in figure ~\ref{tofplot}, showing the separation between their distributions.
+% 
+% \begin{figure}[h!]
+% \begin{center} 
+% \includegraphics[width=4.5in]{reconstruction/globalpid/toftrackerplot.jpg} 
+% \caption{Difference between times at TOF0 and TOF1 vs momentum measured in upstream tracker, for 200 Mev/c muons, pions and positrons.}
+% \label{toftrackerplot}
+% \end{center} 
+% \end{figure}

@@ -75,7 +75,6 @@ void MapCppEMRMCDigitization::_birth(const std::string& argJsonConfigDocument) {
   _tot_func_p2 = configJSON["EMRtotFuncP2"].asDouble();
   _tot_func_p3 = configJSON["EMRtotFuncP3"].asDouble();
   _tot_func_p4 = configJSON["EMRtotFuncP4"].asDouble();
-  _tot_func_p5 = configJSON["EMRtotFuncP5"].asDouble();
   _acquisition_window = configJSON["EMRacquisitionWindow"].asInt();
   _signal_integration_window = configJSON["EMRsignalIntegrationWindow"].asInt();
   _arrival_time_shift = configJSON["EMRarrivalTimeShift"].asInt();
@@ -290,12 +289,6 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 				       EMRfADCEventVector& emr_fadc_events_tmp) const {
 
   int nPlHits = EMRevt->GetEMRPlaneHitArray().size();
-  int nBarsTotal = 0;
-
-  for (int iPlane = 0; iPlane < nPlHits; iPlane++) {
-    EMRPlaneHit *plHit = EMRevt->GetEMRPlaneHitArray().at(iPlane);
-    nBarsTotal += plHit->GetEMRBarArray().size();
-  }
 
   for (int iPlane = 0; iPlane < nPlHits; iPlane++) {
     EMRPlaneHit *plHit = EMRevt->GetEMRPlaneHitArray().at(iPlane);
@@ -637,6 +630,16 @@ EMRfADCEventVector MapCppEMRMCDigitization::get_fadc_data_tmp(int nPartEvts) con
   emr_fadc_events_tmp.resize(nPartEvts);
   for (int iPe = 0; iPe < nPartEvts ;iPe++) {
     emr_fadc_events_tmp[iPe].resize(_number_of_planes);
+    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+      fADCdata data;
+      data._orientation = iPlane%2;
+      data._charge = 0.0;
+      data._pedestal_area = 0.0;
+      data._time = 0;
+      std::vector<int> xSamples;
+      data._samples = xSamples;
+      emr_fadc_events_tmp[iPe][iPlane] = data;
+    }
   }
   return emr_fadc_events_tmp;
 }

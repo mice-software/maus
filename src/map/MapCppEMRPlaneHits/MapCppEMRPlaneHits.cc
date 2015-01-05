@@ -341,7 +341,16 @@ EMRfADCEventVector MapCppEMRPlaneHits::get_fadc_data_tmp(int nPartEvts) const {
   EMRfADCEventVector emr_fadc_events_tmp;
   emr_fadc_events_tmp.resize(nPartEvts);
   for (int iPe = 0; iPe < nPartEvts ;iPe++) {
-    emr_fadc_events_tmp[iPe].resize(_number_of_planes);
+    emr_fadc_events_tmp[iPe].resize(_number_of_planes);  // number of planes
+    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+      fADCdata data;
+      data._orientation = iPlane%2;
+      data._charge = 0;
+      data._time = 0;
+      data._deltat = 0;
+      data._spill = 0;
+      emr_fadc_events_tmp[iPe][iPlane] = data;
+    }
   }
   return emr_fadc_events_tmp;
 }
