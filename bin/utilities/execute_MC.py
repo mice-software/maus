@@ -66,6 +66,7 @@ import subprocess
 import shutil
 import shlex
 from time import sleep
+from cdb._mcserialnumber_supermouse import MCSerialNumberSuperMouse
 
 def arg_parser():
     """
@@ -292,7 +293,8 @@ class RunSettings: #pylint: disable = R0902
         self.g4bl_interface = \
                    self.get_file_name_from_run_number(self.input_file_name,\
                                                       self.run_number)
-        
+
+        self.mc_data_cards = self.get_mc_datacards()
         self.mc_file_name = self.run_number_as_string+"_sim.root"
         
         print self.g4bl_interface
@@ -304,6 +306,18 @@ class RunSettings: #pylint: disable = R0902
         self.download_target = '%s/downloads' % os.getcwd()
         self.geometry_id = args_in.geoid
         
+    def get_mc_datacards(self):
+        """
+        Get the data cards from cdb based on the mc_serial_number
+
+        The results should be a string that can be split and added to
+        the simulation file command line.
+        """
+        
+        cdb = MCSerialNumberSuperMouse()
+        res = cdb.get_datacards(self.mc_iteration_number)
+
+        return res
 
     def get_file_name_from_run_number(self, file_index, run_number):
         # pylint: disable = R0201
