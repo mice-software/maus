@@ -24,6 +24,7 @@ from geometry.ConfigReader import Configreader
 SCHEMA_PATH = os.environ["MAUS_ROOT_DIR"]+\
               "/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd"
 
+# pylint: disable = C0103, R0915
 class Formatter: #pylint: disable = R0902
     """
     @Class formatter this class formats the raw outputted fastrad files so their
@@ -57,10 +58,12 @@ class Formatter: #pylint: disable = R0902
         self.path_in = path_in
         self.path_out = path_out.rstrip('/') + '/'
         self.beamline_file = None
+        self.coolingChannel_file = None
         self.maus_information_file = None
         self.configuration_file = None
         self.material_file = None
         self.tracker_file = None
+        self.modulefiles = []
         self.stepfiles = []
         self.formatted = False
         self.txt_file = ""
@@ -69,6 +72,7 @@ class Formatter: #pylint: disable = R0902
         #if self.path_in == self.path_out:
         #    paths_equal = True
         for fname in gdmls:
+            # print fname
             if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
                 print fname+' not a gdml or xml file - ignored'
             elif fname.find('materials') >= 0:
@@ -79,14 +83,20 @@ class Formatter: #pylint: disable = R0902
                      fname.find('Fastrad') >= 0 or \
                      fname.find('Step_IV')>=0:
                 self.configuration_file = fname
+            elif fname.find('Cooling_Channel') >= 0:
+                self.tracker_file = fname
             elif fname.find('Maus_Information') >= 0 or \
                                             fname.find('maus_information') >= 0\
                         or fname.find('Field') >= 0 or fname.find('field') >= 0:
+                print 'Found ', fname
                 self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
                 self.beamline_file = fname
-            # elif fname.find('Tracker') >= 0:
-            #     self.tracker_file = fname
+            elif fname.find('CoolingChannelInfo') >= 0:
+                self.coolingChannel_file = fname
+                print 'Found ', fname
+            elif fname.find('Quad') >= 0 or fname.find('Dipole') >=0:
+                self.modulefiles.append(fname)
             else:
                 self.stepfiles.append(fname)
         if self.maus_information_file == None:
@@ -211,7 +221,10 @@ class Formatter: #pylint: disable = R0902
         configuration GDML.
         """
         self.add_other_info()
-        config = minidom.parse(os.path.join(self.path_out, gdmlfile)) 
+        config = minidom.parse(os.path.join(self.path_out, gdmlfile))
+        print "config file ", os.path.join(self.path_out, gdmlfile)
+        print "information file ", os.path.join(self.path_out, \
+                                                    self.maus_information_file)
         maus_information = minidom.parse(os.path.join(self.path_out, \
                                                     self.maus_information_file))
         for node in maus_information.getElementsByTagName("MICE_Information"):
@@ -224,7 +237,7 @@ class Formatter: #pylint: disable = R0902
         
     def merge_run_info(self, gdmlfile):
         """
-        @method merge_maus_info
+        @method merge_run_info
         
         This method adds the run information to the maus_information_file GDML.
         """
@@ -249,7 +262,41 @@ class Formatter: #pylint: disable = R0902
                 fout = open(os.path.join(self.path_out, gdmlfile), 'w')
                 maus_information.writexml(fout)
                 fout.close()
+            
         print 'Run information merged!'
+        
+    def merge_cooling_channel_info(self, gdmlfile):
+        """
+        @method merge_maus_info
+        
+        This method adds the run information to the maus_information_file GDML.
+        """
+        run_info = False
+        fin = open(os.path.join(self.path_out, gdmlfile))
+        #for lines in fin.readlines():
+        #    if lines.find('run') >= 0 or lines.find('runs') >= 0:
+        #        run_info = True
+        fin.close()
+        if run_info == False:
+            maus_information = \
+                             minidom.parse(os.path.join(self.path_out, \
+                                                            gdmlfile))
+            coolingChannel_path = os.path.join(self.path_in, \
+                                               self.coolingChannel_file)
+            # print coolingChannel_path
+            coolingChannel = minidom.parse(coolingChannel_path)
+            for node in coolingChannel.getElementsByTagName("run"):
+                run_info = node
+            if type(run_info) == bool:
+                raise IOError("Run number you have selected is not on the CDB")
+            else:
+                root_node = maus_information.childNodes[0].childNodes[1]
+                root_node.insertBefore(run_info, root_node.childNodes[0])
+                fout = open(os.path.join(self.path_out, gdmlfile), 'w')
+                maus_information.writexml(fout)
+                fout.close()
+            
+        print 'Cooling channel information merged!'
      
     def format_materials(self, gdmlfile):
         """
@@ -342,6 +389,9 @@ class Formatter: #pylint: disable = R0902
             shutil.copy(os.path.join(self.path_in, self.maus_information_file), 
                        os.path.join(self.path_out, self.maus_information_file))
 
+        if self.coolingChannel_file != None:
+            self.merge_cooling_channel_info(self.maus_information_file)
+
         if self.formatted == False:
             print self.configuration_file
             self.format_schema_location(self.configuration_file)
@@ -349,7 +399,25 @@ class Formatter: #pylint: disable = R0902
             self.format_materials(self.configuration_file)
             self.insert_materials_ref(self.txt_file)
         print "Formatted Configuration File"
-        
+
+        if self.tracker_file != None:
+            self.format_check(self.tracker_file)
+            if self.formatted == False:
+                print self.tracker_file
+                self.format_schema_location(self.tracker_file)
+                self.merge_maus_info(self.tracker_file)
+                self.format_materials(self.tracker_file)
+                self.insert_materials_ref(self.txt_file)
+            print "Formatted cooling channel and trackers"
+        for module in self.modulefiles:
+            self.format_check(module)
+            if self.formatted == False:
+                self.format_schema_location(module)
+                self.merge_maus_info(module)
+                self.format_materials(module)
+                self.insert_materials_ref(self.txt_file)
+            print "Formatted module files"
+    
         noofstepfiles = len(self.stepfiles)
         for num in range(0, noofstepfiles):
             self.format_check(self.stepfiles[num])

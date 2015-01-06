@@ -53,9 +53,51 @@ class EMRBarHit {
     /** Sets time from closest trigger */
     void SetDeltaT(int deltat);
 
+    /** Returns hit time */
+    int GetHitTime() const;
+
+    /** Sets hit time */
+    void SetHitTime(int hittime);
+
+    /** Returns X coordinate */
+    double GetX() const;
+
+    /** Sets X coordinate */
+    void SetX(double x);
+
+    /** Returns Y coordinate */
+    double GetY() const;
+
+    /** Sets Y coordinate */
+    void SetY(double y);
+
+    /** Returns Z coordinate */
+    double GetZ() const;
+
+    /** Sets Z coordinate */
+    void SetZ(double z);
+
+    /** Returns charge corrected by calibration */
+    double GetChargeCorrected() const;
+
+    /** Sets charge corrected by calibration */
+    void SetChargeCorrected(double charge_corrected);
+
+    /** Returns combined charge corrected by calibration */
+    double GetTotalChargeCorrected() const;
+
+    /** Sets combined charge corrected by calibration */
+    void SetTotalChargeCorrected(double total_charge_corrected);
+
   private:
-    int _tot;
-    int _deltat;
+    int _tot;/* dbb counts */
+    int _deltat;/* dbb counts */
+    int _hittime;/* dbb counts */
+    double _x;/* bar units: 0 to 60 */
+    double _y;/* bar units: 0 to 60 */
+    double _z;/* plane units: 0 to 49 */
+    double _charge_corrected;
+    double _total_charge_corrected;
 
     MAUS_VERSIONED_CLASS_DEF(EMRBarHit)
 };

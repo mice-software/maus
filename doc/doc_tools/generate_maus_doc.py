@@ -6,8 +6,11 @@
 import subprocess
 import os
 import sys
+import glob
+import re
 from generate_doc_index import create_index_html # pylint: disable=F0401
 
+# pylint: disable = C0103
 if os.environ.get('MAUS_THIRD_PARTY') == None:
     print 'MAUS environment variables not set.'
     print 'Please make sure to source env.sh before running this script.'
@@ -60,6 +63,7 @@ def main():
         else:
             run_doxygen(component, tagfiles)
         tagfiles = tagfiles + ' ' + tagfilesmaus_dict[component]
+    fix_doxygen_paths()
     create_index_html()
     exit()
 
@@ -130,6 +134,34 @@ def run_doxygen(component, tagfiles):
         """
     subprocess.call([script, str(component), str(tagfiles)], shell=True)
 
-
+def fix_doxygen_paths():
+    """Fix relative paths in doxygen search scripts"""
+    # Note that there may be a simpler way to do this with the doxy config
+    # however I have not been able to get that to work, hence this hack
+    #
+    # go through all doxygen generated components
+    doxy_comps = ['root', 'geant4', 'clhep', 'jsoncpp', \
+                 'framework', 'datastructure', 'input', 'map', 'reduce', \
+                 'output']
+    for component in doxy_comps:
+        doxdir = 'doxygen_' + component
+        # find the directory with the javascripts
+        replace_in = os.path.expandvars("${MAUS_ROOT_DIR}")
+        replace_out = '/maus/MAUS_latest_version'
+        jsdir = os.path.join(os.environ['MAUS_ROOT_DIR'], \
+                             'doc', doxdir, 'html', 'search')
+        os.chdir(jsdir)
+        for inputFile in glob.glob("*.js"):
+            # open a tmp file to write the modified lines into
+            tmpOut = inputFile + '.tmp'
+            tmpFd = open(tmpOut, "w")
+            # open the input js file
+            inputFd = open(inputFile)
+            for line in inputFd:
+                # replace
+                tmpFd.write(re.sub(replace_in, replace_out, line))
+            # close the tmp file and rename it
+            tmpFd.close()
+            os.rename(tmpOut, inputFile)
 if __name__ == "__main__":
     main()

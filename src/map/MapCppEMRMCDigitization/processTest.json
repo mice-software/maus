@@ -1,0 +1,1336 @@
+{
+   "run_number": 0,
+   "maus_event_type": "Spill",
+   "recon_events": [],
+   "spill_number": 1,
+   "daq_event_type": "physics_event",
+   "mc_events": [
+      {
+         "emr_hits": [
+            {
+               "energy_deposited": 2.5308454,
+               "energy": 245.25595,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 34
+               },
+               "charge": 1,
+               "time": -72232.34,
+               "position": {
+                  "y": 47.356777,
+                  "x": -482.5705,
+                  "z": -428.5
+               },
+               "momentum": {
+                  "y": -1.5518117,
+                  "x": -18.381517,
+                  "z": 220.55952
+               }
+            },
+            {
+               "energy_deposited": 0.6741151,
+               "energy": 244.58183,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 35
+               },
+               "charge": 1,
+               "time": -72232.3,
+               "position": {
+                  "y": 47.362362,
+                  "x": -483.64645,
+                  "z": -415.26907
+               },
+               "momentum": {
+                  "y": -0.06386245,
+                  "x": -15.523782,
+                  "z": 220.03543
+               }
+            },
+            {
+               "energy_deposited": 2.494487,
+               "energy": 242.08736,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 152
+               },
+               "charge": 1,
+               "time": -72232.22,
+               "position": {
+                  "y": 47.33062,
+                  "x": -485.2305,
+                  "z": -393.5
+               },
+               "momentum": {
+                  "y": 0.63804686,
+                  "x": -15.05548,
+                  "z": 217.29132
+               }
+            },
+            {
+               "energy_deposited": 0.5985941,
+               "energy": 241.48875,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 153
+               },
+               "charge": 1,
+               "time": -72232.164,
+               "position": {
+                  "y": 47.329357,
+                  "x": -486.16766,
+                  "z": -380.20227
+               },
+               "momentum": {
+                  "y": -0.32404807,
+                  "x": -17.465036,
+                  "z": 216.44398
+               }
+            },
+            {
+               "energy_deposited": 2.710477,
+               "energy": 238.77827,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 270
+               },
+               "charge": 1,
+               "time": -72232.086,
+               "position": {
+                  "y": 47.31328,
+                  "x": -487.87662,
+                  "z": -358.5
+               },
+               "momentum": {
+                  "y": -2.506635,
+                  "x": -12.240767,
+                  "z": 213.76448
+               }
+            },
+            {
+               "energy_deposited": 0.772513,
+               "energy": 238.00577,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 271
+               },
+               "charge": 1,
+               "time": -72232.04,
+               "position": {
+                  "y": 47.28475,
+                  "x": -488.93747,
+                  "z": -345.112
+               },
+               "momentum": {
+                  "y": -2.5762494,
+                  "x": -10.145333,
+                  "z": 213.01054
+               }
+            },
+            {
+               "energy_deposited": 2.5072234,
+               "energy": 235.49854,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 388
+               },
+               "charge": 1,
+               "time": -72231.95,
+               "position": {
+                  "y": 47.024696,
+                  "x": -490.00162,
+                  "z": -323.5
+               },
+               "momentum": {
+                  "y": 0.6553335,
+                  "x": -12.064162,
+                  "z": 210.11877
+               }
+            },
+            {
+               "energy_deposited": 0.4803598,
+               "energy": 235.01819,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 389
+               },
+               "charge": 1,
+               "time": -72231.9,
+               "position": {
+                  "y": 46.864735,
+                  "x": -490.68762,
+                  "z": -309.26196
+               },
+               "momentum": {
+                  "y": 0.2904589,
+                  "x": -10.454551,
+                  "z": 209.66753
+               }
+            },
+            {
+               "energy_deposited": 2.7980301,
+               "energy": 232.22015,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 506
+               },
+               "charge": 1,
+               "time": -72231.82,
+               "position": {
+                  "y": 46.898285,
+                  "x": -491.74374,
+                  "z": -288.5
+               },
+               "momentum": {
+                  "y": 0.8926133,
+                  "x": -9.429061,
+                  "z": 206.57397
+               }
+            },
+            {
+               "energy_deposited": 0.5338616,
+               "energy": 231.6863,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 507
+               },
+               "charge": 1,
+               "time": -72231.77,
+               "position": {
+                  "y": 46.920208,
+                  "x": -492.4447,
+                  "z": -274.37424
+               },
+               "momentum": {
+                  "y": 2.0611467,
+                  "x": -8.361757,
+                  "z": 206.01135
+               }
+            },
+            {
+               "energy_deposited": 2.8116064,
+               "energy": 228.87468,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 624
+               },
+               "charge": 1,
+               "time": -72231.695,
+               "position": {
+                  "y": 47.11272,
+                  "x": -493.3065,
+                  "z": -253.5
+               },
+               "momentum": {
+                  "y": 2.9492378,
+                  "x": -7.780134,
+                  "z": 202.85635
+               }
+            },
+            {
+               "energy_deposited": 0.69502586,
+               "energy": 228.17966,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 625
+               },
+               "charge": 1,
+               "time": -72231.64,
+               "position": {
+                  "y": 47.250916,
+                  "x": -493.85092,
+                  "z": -240.04352
+               },
+               "momentum": {
+                  "y": 3.5649848,
+                  "x": -8.575591,
+                  "z": 202.02974
+               }
+            },
+            {
+               "energy_deposited": 2.3217173,
+               "energy": 225.85794,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 742
+               },
+               "charge": 1,
+               "time": -72231.56,
+               "position": {
+                  "y": 47.62006,
+                  "x": -494.75085,
+                  "z": -218.5
+               },
+               "momentum": {
+                  "y": 3.5740762,
+                  "x": -10.079413,
+                  "z": 199.33327
+               }
+            },
+            {
+               "energy_deposited": 0.9731193,
+               "energy": 224.88483,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 743
+               },
+               "charge": 1,
+               "time": -72231.516,
+               "position": {
+                  "y": 47.83681,
+                  "x": -495.27808,
+                  "z": -206.22926
+               },
+               "momentum": {
+                  "y": 3.5984917,
+                  "x": -12.144602,
+                  "z": 198.11374
+               }
+            },
+            {
+               "energy_deposited": 2.3280368,
+               "energy": 222.55678,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 860
+               },
+               "charge": 1,
+               "time": -72231.43,
+               "position": {
+                  "y": 48.248554,
+                  "x": -496.62064,
+                  "z": -183.5
+               },
+               "momentum": {
+                  "y": 3.274077,
+                  "x": -12.111714,
+                  "z": 195.47485
+               }
+            },
+            {
+               "energy_deposited": 1.2001169,
+               "energy": 221.35667,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 861
+               },
+               "charge": 1,
+               "time": -72231.39,
+               "position": {
+                  "y": 48.44787,
+                  "x": -497.29755,
+                  "z": -172.46593
+               },
+               "momentum": {
+                  "y": 3.5909846,
+                  "x": -13.029248,
+                  "z": 194.04233
+               }
+            },
+            {
+               "energy_deposited": 1.940325,
+               "energy": 219.41634,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 978
+               },
+               "charge": 1,
+               "time": -72231.3,
+               "position": {
+                  "y": 48.880905,
+                  "x": -498.87582,
+                  "z": -148.5
+               },
+               "momentum": {
+                  "y": 5.316075,
+                  "x": -12.522087,
+                  "z": 191.81966
+               }
+            },
+            {
+               "energy_deposited": 1.5547117,
+               "energy": 217.86163,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 979
+               },
+               "charge": 1,
+               "time": -72231.26,
+               "position": {
+                  "y": 49.0689,
+                  "x": -499.5309,
+                  "z": -138.72278
+               },
+               "momentum": {
+                  "y": 5.871749,
+                  "x": -13.898426,
+                  "z": 189.92725
+               }
+            },
+            {
+               "energy_deposited": 1.4685426,
+               "energy": 216.39308,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1096
+               },
+               "charge": 1,
+               "time": -72231.164,
+               "position": {
+                  "y": 49.825558,
+                  "x": -501.3196,
+                  "z": -113.5
+               },
+               "momentum": {
+                  "y": 7.704666,
+                  "x": -12.039638,
+                  "z": 188.30286
+               }
+            },
+            {
+               "energy_deposited": 1.827563,
+               "energy": 214.56552,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1097
+               },
+               "charge": 1,
+               "time": -72231.13,
+               "position": {
+                  "y": 50.07251,
+                  "x": -501.87955,
+                  "z": -105.75389
+               },
+               "momentum": {
+                  "y": 8.006161,
+                  "x": -10.357092,
+                  "z": 186.28824
+               }
+            },
+            {
+               "energy_deposited": 0.85562646,
+               "energy": 213.7099,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1214
+               },
+               "charge": 1,
+               "time": -72231.03,
+               "position": {
+                  "y": 51.224735,
+                  "x": -503.47195,
+                  "z": -78.5
+               },
+               "momentum": {
+                  "y": 8.409125,
+                  "x": -10.285583,
+                  "z": 185.28822
+               }
+            },
+            {
+               "energy_deposited": 3.6616333,
+               "energy": 212.16649,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1215
+               },
+               "charge": 1,
+               "time": -72231.01,
+               "position": {
+                  "y": 51.44045,
+                  "x": -503.74866,
+                  "z": -73.52233
+               },
+               "momentum": {
+                  "y": 9.97665,
+                  "x": -11.376206,
+                  "z": 183.36296
+               }
+            },
+            {
+               "energy_deposited": 0.04469693,
+               "energy": 210.00357,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1332
+               },
+               "charge": 1,
+               "time": -72230.89,
+               "position": {
+                  "y": 53.38083,
+                  "x": -505.61642,
+                  "z": -43.5
+               },
+               "momentum": {
+                  "y": 12.889903,
+                  "x": -11.208439,
+                  "z": 180.68213
+               }
+            },
+            {
+               "energy_deposited": 2.6691954,
+               "energy": 208.87067,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1333
+               },
+               "charge": 1,
+               "time": -72230.89,
+               "position": {
+                  "y": 53.446453,
+                  "x": -505.67368,
+                  "z": -42.582108
+               },
+               "momentum": {
+                  "y": 14.358999,
+                  "x": -11.249774,
+                  "z": 179.2499
+               }
+            },
+            {
+               "energy_deposited": 0.8656824,
+               "energy": 205.70052,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1452
+               },
+               "charge": 1,
+               "time": -72230.76,
+               "position": {
+                  "y": 55.75904,
+                  "x": -507.797,
+                  "z": -8.5
+               },
+               "momentum": {
+                  "y": 10.430474,
+                  "x": -12.433901,
+                  "z": 175.74303
+               }
+            },
+            {
+               "energy_deposited": 3.0721686,
+               "energy": 203.5742,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1451
+               },
+               "charge": 1,
+               "time": -72230.74,
+               "position": {
+                  "y": 56.012016,
+                  "x": -508.05716,
+                  "z": -4.6304455
+               },
+               "momentum": {
+                  "y": 10.450395,
+                  "x": -13.737037,
+                  "z": 173.14978
+               }
+            },
+            {
+               "energy_deposited": 1.7028245,
+               "energy": 200.92552,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1570
+               },
+               "charge": 1,
+               "time": -72230.62,
+               "position": {
+                  "y": 57.991886,
+                  "x": -510.24634,
+                  "z": 26.5
+               },
+               "momentum": {
+                  "y": 8.21771,
+                  "x": -11.377391,
+                  "z": 170.32439
+               }
+            },
+            {
+               "energy_deposited": 1.5307636,
+               "energy": 199.39476,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1569
+               },
+               "charge": 1,
+               "time": -72230.586,
+               "position": {
+                  "y": 58.595284,
+                  "x": -510.8689,
+                  "z": 35.5976
+               },
+               "momentum": {
+                  "y": 6.3789253,
+                  "x": -11.195849,
+                  "z": 168.60765
+               }
+            },
+            {
+               "energy_deposited": 2.2347872,
+               "energy": 197.15997,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1688
+               },
+               "charge": 1,
+               "time": -72230.484,
+               "position": {
+                  "y": 59.657547,
+                  "x": -512.592,
+                  "z": 61.5
+               },
+               "momentum": {
+                  "y": 11.165693,
+                  "x": -11.21426,
+                  "z": 165.70435
+               }
+            },
+            {
+               "energy_deposited": 0.9740066,
+               "energy": 196.18596,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1687
+               },
+               "charge": 1,
+               "time": -72230.43,
+               "position": {
+                  "y": 60.14835,
+                  "x": -513.406,
+                  "z": 73.74071
+               },
+               "momentum": {
+                  "y": 10.334107,
+                  "x": -10.549485,
+                  "z": 164.6425
+               }
+            },
+            {
+               "energy_deposited": 3.4273646,
+               "energy": 194.74362,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1806
+               },
+               "charge": 1,
+               "time": -72230.34,
+               "position": {
+                  "y": 61.59885,
+                  "x": -514.8814,
+                  "z": 96.5
+               },
+               "momentum": {
+                  "y": 8.854385,
+                  "x": -8.77519,
+                  "z": 163.1134
+               }
+            },
+            {
+               "energy_deposited": 3.1046033,
+               "energy": 190.05608,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1924
+               },
+               "charge": 1,
+               "time": -72230.2,
+               "position": {
+                  "y": 63.312164,
+                  "x": -517.2384,
+                  "z": 131.5
+               },
+               "momentum": {
+                  "y": 5.35749,
+                  "x": -13.875047,
+                  "z": 157.2781
+               }
+            },
+            {
+               "energy_deposited": 0.11873545,
+               "energy": 187.09474,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1925
+               },
+               "charge": 1,
+               "time": -72230.14,
+               "position": {
+                  "y": 63.81516,
+                  "x": -518.6622,
+                  "z": 147.86218
+               },
+               "momentum": {
+                  "y": 5.6796856,
+                  "x": -14.076289,
+                  "z": 153.6566
+               }
+            },
+            {
+               "energy_deposited": 2.8551462,
+               "energy": 184.2396,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2042
+               },
+               "charge": 1,
+               "time": -72230.06,
+               "position": {
+                  "y": 64.50579,
+                  "x": -520.3702,
+                  "z": 166.5
+               },
+               "momentum": {
+                  "y": 3.8502948,
+                  "x": -14.035895,
+                  "z": 150.22885
+               }
+            },
+            {
+               "energy_deposited": 0.6175203,
+               "energy": 183.62207,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2043
+               },
+               "charge": 1,
+               "time": -72230.01,
+               "position": {
+                  "y": 65.012314,
+                  "x": -521.6485,
+                  "z": 180.43936
+               },
+               "momentum": {
+                  "y": 3.2198107,
+                  "x": -12.861769,
+                  "z": 149.59138
+               }
+            },
+            {
+               "energy_deposited": 4.5873733,
+               "energy": 182.79193,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2160
+               },
+               "charge": 1,
+               "time": -72229.92,
+               "position": {
+                  "y": 65.47819,
+                  "x": -523.4821,
+                  "z": 201.5
+               },
+               "momentum": {
+                  "y": 3.177263,
+                  "x": -11.889184,
+                  "z": 148.65312
+               }
+            },
+            {
+               "energy_deposited": 1.1210797,
+               "energy": 177.50859,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2161
+               },
+               "charge": 1,
+               "time": -72229.87,
+               "position": {
+                  "y": 65.743225,
+                  "x": -524.4627,
+                  "z": 213.96013
+               },
+               "momentum": {
+                  "y": -0.11218059,
+                  "x": -8.908903,
+                  "z": 142.3595
+               }
+            },
+            {
+               "energy_deposited": 2.9830844,
+               "energy": 176.71274,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2278
+               },
+               "charge": 1,
+               "time": -72229.77,
+               "position": {
+                  "y": 65.80613,
+                  "x": -525.9096,
+                  "z": 236.5
+               },
+               "momentum": {
+                  "y": 0.762357,
+                  "x": -8.654284,
+                  "z": 141.37971
+               }
+            },
+            {
+               "energy_deposited": 1.7518418,
+               "energy": 173.17186,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2279
+               },
+               "charge": 1,
+               "time": -72229.72,
+               "position": {
+                  "y": 65.837814,
+                  "x": -526.67004,
+                  "z": 248.7687
+               },
+               "momentum": {
+                  "y": -0.8885048,
+                  "x": -10.228348,
+                  "z": 136.81885
+               }
+            },
+            {
+               "energy_deposited": 2.8088784,
+               "energy": 169.72098,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2396
+               },
+               "charge": 1,
+               "time": -72229.625,
+               "position": {
+                  "y": 65.626274,
+                  "x": -528.2916,
+                  "z": 271.5
+               },
+               "momentum": {
+                  "y": -1.1254358,
+                  "x": -7.338993,
+                  "z": 132.6137
+               }
+            },
+            {
+               "energy_deposited": 1.754547,
+               "energy": 168.97867,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2397
+               },
+               "charge": 1,
+               "time": -72229.57,
+               "position": {
+                  "y": 65.47705,
+                  "x": -529.20026,
+                  "z": 284.4988
+               },
+               "momentum": {
+                  "y": -1.2456228,
+                  "x": -7.164008,
+                  "z": 131.6709
+               }
+            },
+            {
+               "energy_deposited": 3.1588118,
+               "energy": 164.80762,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2514
+               },
+               "charge": 1,
+               "time": -72229.48,
+               "position": {
+                  "y": 65.40641,
+                  "x": -530.3869,
+                  "z": 306.5
+               },
+               "momentum": {
+                  "y": -0.41480124,
+                  "x": -10.296232,
+                  "z": 126.062195
+               }
+            },
+            {
+               "energy_deposited": 0.94893247,
+               "energy": 163.85869,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2515
+               },
+               "charge": 1,
+               "time": -72229.42,
+               "position": {
+                  "y": 65.37927,
+                  "x": -531.1202,
+                  "z": 319.69672
+               },
+               "momentum": {
+                  "y": -0.17971016,
+                  "x": -9.186808,
+                  "z": 124.90616
+               }
+            },
+            {
+               "energy_deposited": 3.7636583,
+               "energy": 160.63303,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2632
+               },
+               "charge": 1,
+               "time": -72229.33,
+               "position": {
+                  "y": 65.34086,
+                  "x": -532.7547,
+                  "z": 341.5
+               },
+               "momentum": {
+                  "y": 0.16312917,
+                  "x": -12.099764,
+                  "z": 120.38625
+               }
+            },
+            {
+               "energy_deposited": 0.9319716,
+               "energy": 159.16306,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2633
+               },
+               "charge": 1,
+               "time": -72229.266,
+               "position": {
+                  "y": 65.34993,
+                  "x": -533.8919,
+                  "z": 354.7561
+               },
+               "momentum": {
+                  "y": 1.7338508,
+                  "x": -11.332804,
+                  "z": 118.48101
+               }
+            },
+            {
+               "energy_deposited": 3.6871643,
+               "energy": 155.89006,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2750
+               },
+               "charge": 1,
+               "time": -72229.17,
+               "position": {
+                  "y": 65.60984,
+                  "x": -535.93695,
+                  "z": 376.5
+               },
+               "momentum": {
+                  "y": 5.4540763,
+                  "x": -8.728198,
+                  "z": 114.15819
+               }
+            },
+            {
+               "energy_deposited": 1.4748578,
+               "energy": 154.00104,
+               "particle_id": -13,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 2751
+               },
+               "charge": 1,
+               "time": -72229.11,
+               "position": {
+                  "y": 65.715515,
+                  "x": -537.00903,
+                  "z": 389.0162
+               },
+               "momentum": {
+                  "y": 2.07817,
+                  "x": -7.4545803,
+                  "z": 111.77092
+               }
+            },
+            {
+               "energy_deposited": 1.24380177,
+               "energy": 1.7484836,
+               "particle_id": 11,
+               "track_id": 64,
+               "channel_id": {
+                  "bar": 2400
+               },
+               "charge": -1,
+               "time": -72159.03,
+               "position": {
+                  "y": 99.15738,
+                  "x": -384.0944,
+                  "z": 271.5
+               },
+               "momentum": {
+                  "y": 0.19665793,
+                  "x": 0.47497442,
+                  "z": 0.18663543
+               }
+            },
+            {
+               "energy_deposited": 2.500132,
+               "energy": 38.344543,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 925
+               },
+               "charge": 1,
+               "time": -70374.6,
+               "position": {
+                  "y": -109.29113,
+                  "x": 99.02909,
+                  "z": -166
+               },
+               "momentum": {
+                  "y": 3.1752882,
+                  "x": -1.2543604,
+                  "z": 38.188835
+               }
+            },
+            {
+               "energy_deposited": 2.5518665,
+               "energy": 34.142056,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 961
+               },
+               "charge": 1,
+               "time": -70374.7,
+               "position": {
+                  "y": -108.14133,
+                  "x": 97.97725,
+                  "z": -148.41637
+               },
+               "momentum": {
+                  "y": -4.216665,
+                  "x": -5.650399,
+                  "z": 33.402267
+               }
+            },
+            {
+               "energy_deposited": 1.5529134,
+               "energy": 30.330645,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1042
+               },
+               "charge": 1,
+               "time": -70374.75,
+               "position": {
+                  "y": -109.86525,
+                  "x": 95.3298,
+                  "z": -131
+               },
+               "momentum": {
+                  "y": -3.0353475,
+                  "x": -6.096997,
+                  "z": 29.551653
+               }
+            },
+            {
+               "energy_deposited": 1.6981924,
+               "energy": 29.935566,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1043
+               },
+               "charge": 1,
+               "time": -70374.75,
+               "position": {
+                  "y": -111.152725,
+                  "x": 93.762886,
+                  "z": -120.603455
+               },
+               "momentum": {
+                  "y": -2.675549,
+                  "x": -6.36838,
+                  "z": 29.123224
+               }
+            },
+            {
+               "energy_deposited": 1.7128878,
+               "energy": 26.919565,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1078
+               },
+               "charge": 1,
+               "time": -70374.75,
+               "position": {
+                  "y": -111.82646,
+                  "x": 92.20118,
+                  "z": -113.5
+               },
+               "momentum": {
+                  "y": -5.0117564,
+                  "x": -4.20384,
+                  "z": 26.107698
+               }
+            },
+            {
+               "energy_deposited": 1.2938744,
+               "energy": 26.310463,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1079
+               },
+               "charge": 1,
+               "time": -70374.8,
+               "position": {
+                  "y": -113.314316,
+                  "x": 89.77968,
+                  "z": -102.94721
+               },
+               "momentum": {
+                  "y": -4.119287,
+                  "x": -2.6238847,
+                  "z": 25.848135
+               }
+            },
+            {
+               "energy_deposited": 2.4697275,
+               "energy": 25.073158,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1160
+               },
+               "charge": 1,
+               "time": -70374.8,
+               "position": {
+                  "y": -114.569115,
+                  "x": 89.02055,
+                  "z": -96
+               },
+               "momentum": {
+                  "y": -4.999616,
+                  "x": -0.74094665,
+                  "z": 24.553144
+               }
+            },
+            {
+               "energy_deposited": 0.34315047,
+               "energy": 22.142168,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1159
+               },
+               "charge": 1,
+               "time": -70374.9,
+               "position": {
+                  "y": -117.68277,
+                  "x": 88.52376,
+                  "z": -80.97572
+               },
+               "momentum": {
+                  "y": -4.605282,
+                  "x": -0.43468907,
+                  "z": 21.647562
+               }
+            },
+            {
+               "energy_deposited": 1.7145814,
+               "energy": 20.427588,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1196
+               },
+               "charge": 1,
+               "time": -70374.9,
+               "position": {
+                  "y": -118.22823,
+                  "x": 88.49711,
+                  "z": -78.5
+               },
+               "momentum": {
+                  "y": -4.052676,
+                  "x": -0.19777428,
+                  "z": 20.014042
+               }
+            },
+            {
+               "energy_deposited": 1.0717723,
+               "energy": 19.355814,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1195
+               },
+               "charge": 1,
+               "time": -70374.94,
+               "position": {
+                  "y": -120.53305,
+                  "x": 88.28486,
+                  "z": -67.63832
+               },
+               "momentum": {
+                  "y": -2.8580513,
+                  "x": -0.34024337,
+                  "z": 19.133799
+               }
+            },
+            {
+               "energy_deposited": 3.4798572,
+               "energy": 12.301547,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1278
+               },
+               "charge": 1,
+               "time": -70374.94,
+               "position": {
+                  "y": -121.8507,
+                  "x": 88.21531,
+                  "z": -61
+               },
+               "momentum": {
+                  "y": -2.9946818,
+                  "x": -1.345034,
+                  "z": 11.844396
+               }
+            },
+            {
+               "energy_deposited": 1.225425,
+               "energy": 10.258669,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1277
+               },
+               "charge": 1,
+               "time": -70375,
+               "position": {
+                  "y": -124.52783,
+                  "x": 87.07209,
+                  "z": -48.913628
+               },
+               "momentum": {
+                  "y": -2.3426661,
+                  "x": -1.3686646,
+                  "z": 9.880174
+               }
+            },
+            {
+               "energy_deposited": 3.4433317,
+               "energy": 8.130082,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1313
+               },
+               "charge": 1,
+               "time": -70375,
+               "position": {
+                  "y": -126.52424,
+                  "x": 85.89301,
+                  "z": -42.641415
+               },
+               "momentum": {
+                  "y": -4.1686087,
+                  "x": -1.8302327,
+                  "z": 6.7164025
+               }
+            },
+            {
+               "energy_deposited": 0.31802535,
+               "energy": 6.3716774,
+               "particle_id": -11,
+               "track_id": 1,
+               "channel_id": {
+                  "bar": 1396
+               },
+               "charge": 1,
+               "time": -70375.06,
+               "position": {
+                  "y": -134.42366,
+                  "x": 82.50362,
+                  "z": -26
+               },
+               "momentum": {
+                  "y": -2.76118,
+                  "x": -1.5941268,
+                  "z": 5.492886
+               }
+            }
+         ],
+         "primary": {
+            "random_seed": 953453412,
+            "energy": 249.56262,
+            "particle_id": -13,
+            "time": -72254.42,
+            "position": {
+               "y": 24.0601,
+               "x": -1.5508633,
+               "z": -6400
+            },
+            "spin": {
+               "y": 0.11110152,
+               "x": 0.5471753,
+               "z": 0.8296118
+            },
+            "momentum": {
+               "y": 2.2794456,
+               "x": -17.665478,
+               "z": 225.38976
+            }
+	 }
+      }
+   ]
+}

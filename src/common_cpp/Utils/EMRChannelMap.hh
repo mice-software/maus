@@ -57,8 +57,8 @@ class EMRChannelKey {
   explicit EMRChannelKey(string keyStr) throw(Exception);
   virtual ~EMRChannelKey() {}
 
-  bool operator==( EMRChannelKey key );
-  bool operator!=( EMRChannelKey key );
+  bool operator==( EMRChannelKey key ) const;
+  bool operator!=( EMRChannelKey key ) const;
 
   friend ostream& operator<<( ostream& stream, EMRChannelKey key );
   friend istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exception);

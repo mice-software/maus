@@ -20,7 +20,12 @@
 namespace MAUS {
 
 EMREvent::EMREvent()
-  : _emrplanehitarray() {
+  : _emrplanehitarray(), _initial_trigger(false),
+    _has_primary(false), _range_primary(0.0),
+    _has_secondary(false), _range_secondary(0.0),
+    _secondary_to_primary_track_distance(0),
+    _total_charge_MA(0.0), _charge_ratio_MA(0.0),
+    _total_charge_SA(0.0), _charge_ratio_SA(0.0) {
 //    for (int planeid=0; planeid<48; planeid++) {
 //         EMRPlaneHit emrplanehit;
 //         emrplanehit.SetPlane(planeid);
@@ -28,7 +33,13 @@ EMREvent::EMREvent()
 //    }
 }
 
-EMREvent::EMREvent(const EMREvent& _emrevent) {
+EMREvent::EMREvent(const EMREvent& _emrevent)
+  : _emrplanehitarray(), _initial_trigger(false),
+    _has_primary(false), _range_primary(0.0),
+    _has_secondary(false), _range_secondary(0.0),
+    _secondary_to_primary_track_distance(0),
+    _total_charge_MA(0.0), _charge_ratio_MA(0.0),
+    _total_charge_SA(0.0), _charge_ratio_SA(0.0) {
   *this = _emrevent;
 }
 
@@ -37,6 +48,16 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
         return *this;
   }
   SetEMRPlaneHitArray(_emrevent._emrplanehitarray);
+  SetInitialTrigger(_emrevent._initial_trigger);
+  SetHasPrimary(_emrevent._has_primary);
+  SetRangePrimary(_emrevent._range_primary);
+  SetHasSecondary(_emrevent._has_secondary);
+  SetRangeSecondary(_emrevent._range_secondary);
+  SetSecondaryToPrimaryTrackDistance(_emrevent._secondary_to_primary_track_distance);
+  SetTotalChargeMA(_emrevent._total_charge_MA);
+  SetChargeRatioMA(_emrevent._charge_ratio_MA);
+  SetTotalChargeSA(_emrevent._total_charge_SA);
+  SetChargeRatioSA(_emrevent._charge_ratio_SA);
   return *this;
 }
 
@@ -55,6 +76,86 @@ void EMREvent::SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray) {
         delete _emrplanehitarray[i];
   }
   _emrplanehitarray = emrplanehitarray;
+}
+
+bool EMREvent::GetInitialTrigger() const {
+  return _initial_trigger;
+}
+
+void EMREvent::SetInitialTrigger(bool initial_trigger) {
+  _initial_trigger = initial_trigger;
+}
+
+bool EMREvent::GetHasPrimary() const {
+  return _has_primary;
+}
+
+void EMREvent::SetHasPrimary(bool has_primary) {
+  _has_primary = has_primary;
+}
+
+double EMREvent::GetRangePrimary() const {
+  return _range_primary;
+}
+
+void EMREvent::SetRangePrimary(double range_primary) {
+  _range_primary = range_primary;
+}
+
+bool EMREvent::GetHasSecondary() const {
+  return _has_secondary;
+}
+
+void EMREvent::SetHasSecondary(bool has_secondary) {
+  _has_secondary = has_secondary;
+}
+
+double EMREvent::GetRangeSecondary() const {
+  return _range_secondary;
+}
+
+void EMREvent::SetRangeSecondary(double range_secondary) {
+  _range_secondary = range_secondary;
+}
+
+double EMREvent::GetSecondaryToPrimaryTrackDistance() const {
+  return _secondary_to_primary_track_distance;
+}
+
+void EMREvent::SetSecondaryToPrimaryTrackDistance(double secondary_to_primary_track_distance) {
+  _secondary_to_primary_track_distance = secondary_to_primary_track_distance;
+}
+
+double EMREvent::GetTotalChargeMA() const {
+  return _total_charge_MA;
+}
+
+void EMREvent::SetTotalChargeMA(double total_charge_MA) {
+  _total_charge_MA = total_charge_MA;
+}
+
+double EMREvent::GetChargeRatioMA() const {
+  return _charge_ratio_MA;
+}
+
+void EMREvent::SetChargeRatioMA(double charge_ratio_MA) {
+  _charge_ratio_MA = charge_ratio_MA;
+}
+
+double EMREvent::GetTotalChargeSA() const {
+  return _total_charge_SA;
+}
+
+void EMREvent::SetTotalChargeSA(double total_charge_SA) {
+  _total_charge_SA = total_charge_SA;
+}
+
+double EMREvent::GetChargeRatioSA() const {
+  return _charge_ratio_SA;
+}
+
+void EMREvent::SetChargeRatioSA(double charge_ratio_SA) {
+  _charge_ratio_SA = charge_ratio_SA;
 }
 }
 

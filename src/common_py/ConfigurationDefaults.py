@@ -440,6 +440,74 @@ KLadcConversionFactor = 250000 # nphe/adc
 KLpmtGain = 2000000
 KLpmtSigmaGain = 1000000
 
+# EMR characteristics
+EMRnumberOfPlanes = 48
+EMRnumberOfBars = 60 # number of bars in one plane (+ test channel 0)
+EMRnBars = 2832 # total number of bars in the EMR
+EMRbarLength = 110 # cm, length of a scintillating bar
+
+# EMR event pre-selection
+EMRtotNoiseLow = 0
+EMRtotNoiseUp = 7 # noise time over threshold window
+
+EMRdeltatSignalLow = -240 # Step I
+EMRdeltatSignalUp = -220 # Step I
+EMRdeltatNoiseLow = -220 # Step I
+EMRdeltatNoiseUp = -175 # Step I
+
+# EMR digitization
+EMRdoSampling = 1 # sample number of scintillating photons as a Poisson distribution
+EMRnphPerMeV = 2000 # number of photons per MeV
+EMRtrapEff = 0.04 # photon trapping efficiency
+EMRseed = 2 # seed state of the pseudorandom number generator, change equivalent to a power cycle of fADC
+EMRattenWLSf = 2.0 # dB/m, attentuation factor of the WLS fibres
+EMRattenCLRf = 0.35 # dB/m, attentuation factor of the clear fibres
+EMRspillWidth = 4000000 # DBB counts
+EMRbirksConstant = 0.126 # mm/MeV
+EMRaveragePathLength = 17 # mm
+EMRsignalEnergyThreshold = 0.8 # Me
+EMRfom = "median" # figure_Of-Merit for signal calibration
+
+EMRdbbCount = 2.5 # ns, duration of a DBB cycle (f=400MHz)
+EMRqeMAPMT = 0.25 # MAPMT quantum efficiency
+EMRnadcPerPeMAPMT = 6 # number of ADC counts per photoelectron in the MAPMT
+EMRelectronicsResponseSpreadMAPMT = 8 # ADC counts
+EMRtimeResponseSpread = 1 # ADC counts
+EMRtotFuncP1 = -60.5 
+EMRtotFuncP2 = 15.0
+EMRtotFuncP3 = 70.0
+EMRtotFuncP4 = 2.0 # time over threshold vs charge logarithmic fit parameters
+EMRdeltatShift = 12 # ADC counts, distance from the trigger
+
+EMRfadcCount = 2.0 # ns, duration of an fADC cycle (f=500MHz)
+EMRqeSAPMT = 0.11 # SAPMT quantum efficiency
+EMRnadcPerPeSAPMT = 2 # number of ADC counts per photoelectron in the SAPMT
+EMRelectronicsResponseSpreadSAPMT = 1 # ADC count
+EMRbaselinePosition = 123 # SAPMT signal baseline
+EMRbaselineSpread = 10 # SAPMT signal baseline spread
+EMRmaximumNoiseLevel = 50 # SAPMT noise maximum value
+EMRacquisitionWindow = 302 # ADC counts
+EMRsignalIntegrationWindow = 40
+EMRarrivalTimeShift = 40
+EMRarrivalTimeSpread = 33
+EMRarrivalTimeGausWidth = 3
+EMRarrivalTimeUniformWidth = 12.5
+EMRpulseShapeLandauWidth = 2
+
+# EMR reconstruction
+EMRsecondaryHitsBunchingDistance = 1000 # ns
+EMRsecondaryHitsBunchingWidth = 200 # ns
+
+EMRprimaryTriggerMinXhits = 1
+EMRprimaryTriggerMinYhits = 1
+EMRprimaryTriggerMinNhits = 4
+EMRsecondaryTriggerMinXhits = 1
+EMRsecondaryTriggerMinYhits = 1
+EMRsecondaryTriggerMinNhits = 2
+EMRsecondaryTriggerMinTot = 4
+
+EMRmaxSecondaryToPrimaryTrackDistance = 5
+
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 
@@ -490,6 +558,15 @@ Enable_klgain_correction = True
 # this is used by the reconstuction of the EMR detectors
 EMR_cabling_file = "/files/cabling/EMRChannelMap.txt"
 
+# this sets the source of the EMR clear fiber length map
+EMR_clear_fiber_length_map = "/files/cabling/EMRClearFiberLengthMap.txt"
+
+# this sets the source of the EMR connector attenuation map
+EMR_connector_attenuation_map = "/files/cabling/EMRConnectorAttenuationMap.txt"
+
+# this sets the source of the calibrations for the EMR detectors
+EMR_calibration_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
+
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
 
@@ -537,3 +614,22 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+
+geometry_validation = { # see bin/utilities/geometry_validation.py for docs
+    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
+    "will_plot":True,
+    "will_track":True,
+    "z_start":-6000.,
+    "z_end":6000.,
+    "x_start":0.,
+    "x_step":1.,
+    "y_start":0.,
+    "y_step":0.,
+    "n_steps":301,
+    "plot_formats":["root", "png"],
+    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
+    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
+    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
+    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
+    "2d_volume_plot_label_size":0.25,
+}

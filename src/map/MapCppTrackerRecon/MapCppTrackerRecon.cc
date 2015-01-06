@@ -100,6 +100,10 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) const {
   // testing purposes.
   pr1.set_helical_pr_on(_helical_pr_on);
   pr1.set_straight_pr_on(_straight_pr_on);
+  std::cerr << "Bz T1 = " << _geometry_helper.GetFieldValue(0) << std::endl;
+  std::cerr << "Bz T2 = " << _geometry_helper.GetFieldValue(1) << std::endl;
+  pr1.set_bz_t1(_geometry_helper.GetFieldValue(0));
+  pr1.set_bz_t2(_geometry_helper.GetFieldValue(1));
   pr1.process(evt);
 }
 
