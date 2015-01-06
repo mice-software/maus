@@ -207,7 +207,50 @@ class RunManager:
             shutil.rmtree(download_dir)
         if os.path.exists(self.run_setup.input_file_name):
             os.remove(self.run_setup.input_file_name)
-      
+
+    
+    def download_cards(self):
+        """
+        Downloads the datacards from the configuration database
+        
+        If running in test mode, uses legacy Stage4 geometry instead.
+
+        If default mc_iteration number given (0) then CDB will not be accessed.
+
+        @raises DownloadError on failure
+        """
+        print 'Getting cards'
+        bi_number = self.run_setup.mc_iteration
+        if bi_number > 0:
+            for i in range(5):
+                try:
+                    print "    Contacting CDB"
+                    if self.run_setup.test_mode:
+                        mcs_service = cdb.MCSerialNumber(
+                            "http://preprodcdb.mice.rl.ac.uk")
+                    else:
+                        mcs_service = cdb.MCSerialNumber()
+                    print "    Found, accessing cards"
+                    mc_cards = mcs_service.get_datacards(bi_number)['mc']
+                    if mc_cards == 'null':
+                        raise DownloadError(
+                            "No MC cards for batch iteration number "+str(bi_number))
+                    mc_out = open(self.run_setup.sim_cards, 'w')
+                    mc_out.write(mc_cards)
+                    return
+                except cdb.CdbTemporaryError:
+                    print "CDB lookup failed on attempt", i+1
+                    time.sleep(1)
+                except cdb.CdbPermanentError:
+                    raise DownloadError("Failed to download cards - CDB not found")
+            raise DownloadError("Failed to download cards after 5 attempts")
+        else:
+            # write an empty file
+            mc_cards = ''
+            mc_out = open(self.run_setup.sim_cards, 'w')
+            mc_out.write(mc_cards)
+
+    
     def download_geometry(self):
         """
         Downloads the geometry from the configuration database
@@ -300,7 +343,7 @@ class RunSettings: #pylint: disable = R0902
                    self.get_file_name_from_run_number(self.input_file_name,\
                                                       self.run_number)
 
-        self.mc_data_cards = self.get_mc_datacards()
+        
         self.mc_file_name = self.run_number_as_string+"_sim.root"
         
         print self.g4bl_interface
@@ -312,39 +355,6 @@ class RunSettings: #pylint: disable = R0902
         self.download_target = '%s/downloads' % os.getcwd()
         self.sim_cards = 'sim.cards'
         self.geometry_id = args_in.geoid
-
-    def download_cards(self):
-        """
-        Downloads the datacards from the configuration database
-        
-        If running in test mode, uses legacy Stage4 geometry instead.
-
-        @raises DownloadError on failure
-        """
-        print 'Getting cards'
-        bi_number = self.run_setup.batch_iteration
-        for i in range(5):
-            try:
-                print "    Contacting CDB"
-                if self.run_setup.test_mode:
-                    mcs_service = cdb.MCSerialNumber(
-                                              "http://preprodcdb.mice.rl.ac.uk")
-                else:
-                    mcs_service = cdb.MCSerialNumber()
-                print "    Found, accessing cards"
-                mc_cards = mcs_service.get_datacards(bi_number)['mc']
-                if mc_cards == 'null':
-                    raise DownloadError(
-                       "No MC cards for batch iteration number "+str(bi_number))
-                mc_out = open(self.run_setup.sim_cards, 'w')
-                mc_out.write(mc_cards)
-                return
-            except cdb.CdbTemporaryError:
-                print "CDB lookup failed on attempt", i+1
-                time.sleep(1)
-            except cdb.CdbPermanentError:
-                raise DownloadError("Failed to download cards - CDB not found")
-        raise DownloadError("Failed to download cards after 5 attempts")
 
     def get_file_name_from_run_number(self, file_index, run_number):
         # pylint: disable = R0201
