@@ -76,7 +76,13 @@ void SciFiGeometryHelper::Build() {
       int plane_id =  3*(station_n-1) + (plane_n+1);
       plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
       _geometry_map.insert(std::make_pair(plane_id, this_plane));
-      _field_value[tracker_n] = FieldValue(reference, plane_rotation);
+
+      const MiceModule* trackerModule = plane->mother();
+      ThreeVector trackerPos = clhep_to_root( trackerModule->globalPosition() );
+      HepRotation trackerRot;
+      std::cerr << "Tracker pos = " << trackerModule->globalPosition()[2] << " & Tracker Field = " << FieldValue( trackerPos, plane_rotation ) << '\n';
+//      _field_value[tracker_n] = FieldValue(reference, plane_rotation);
+      _field_value[tracker_n] = FieldValue( trackerPos, plane_rotation );
     }
   }
 }

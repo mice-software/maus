@@ -76,7 +76,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
           track_fit(*event);
         }
       }
-      // print_event_info(*event);
+      print_event_info(*event);
     }
   } else {
     std::cout << "No recon events found\n";
@@ -130,31 +130,96 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
   }
 }
 
-// void MapCppTrackerRecon::print_event_info(SciFiEvent &event) {
-//   std::cerr << event.digits().size() << " "
-//                               << event.clusters().size() << " "
-//                               << event.spacepoints().size() << "; "
-//                               << event.straightprtracks().size() << " "
-//                               << event.helicalprtracks().size() << "; ";
-//   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
-//     std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
-//                            << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
-//                            << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
-//   }
-//   std::cerr << std::endl;
-//   /*
-//   Squeak::mout(Squeak::info) << event.digits().size() << " "
-//                               << event.clusters().size() << " "
-//                               << event.spacepoints().size() << "; "
-//                               << event.straightprtracks().size() << " "
-//                               << event.helicalprtracks().size() << "; ";
-//   for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
-//     Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
-//                  << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
-//                  << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
-//   }
-//   Squeak::mout(Squeak::info) << std::endl;
-//   */
-// }
+void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
+  /*
+  std::cerr << event.digits().size() << " "
+                              << event.clusters().size() << " "
+                              << event.spacepoints().size() << "; "
+                              << event.straightprtracks().size() << " "
+                              << event.helicalprtracks().size() << "; ";
+  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+    std::cerr << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+                           << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+                           << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+  }
+  std::cerr << std::endl;
+  */
+
+  /*
+  SciFiHelicalPRTrackPArray helices = event.helicalprtracks();
+  for ( unsigned int i = 0; i < helices.size(); ++i )
+  {
+    std::cerr << "Helix Charge = " << helices[i]->get_charge() << '\n';
+  }
+  SciFiStraightPRTrackPArray straights = event.straightprtracks();
+  for ( unsigned int i = 0; i < straights.size(); ++i )
+  {
+    std::cerr << "Straight Track Found!" << '\n';
+  }
+  SciFiTrackPArray tracks = event.scifitracks();
+  for ( unsigned int i = 0; i < tracks.size(); ++i )
+  {
+    std::cerr << "Track Charge = " << tracks[i]->charge() << '\n';
+  }
+  std::cerr << std::endl;
+  */
+
+
+  SciFiTrackPArray tracks = event.scifitracks();
+  for ( unsigned int i = 0; i < tracks.size(); ++i )
+  {
+    SciFiTrackPointPArray trackpoints = tracks[i]->scifitrackpoints();
+    for ( unsigned int j = 0; j < trackpoints.size(); ++j )
+    {
+      std::cerr << "Track Point = " << trackpoints[j]->pos()[0] << ", " << trackpoints[j]->pos()[1] << ", " << trackpoints[j]->pos()[2] << '\n';
+    }
+  }
+  std::cerr << std::endl;
+
+
+
+  /*
+  std::cerr << "Helix Pz Recon:\n";
+  SciFiHelicalPRTrackPArray helices = event.helicalprtracks();
+  for ( unsigned int i = 0; i < helices.size(); ++i )
+  {
+    double radius = helices[i]->get_R();
+    double patrec_pt = 1.19*radius;
+    double patrec_pz = patrec_pt / helices[i]->get_dsdz();
+    std::cerr << "Pz = " << patrec_pz << '\n';
+
+    DoubleArray phis = helices[i]->get_phi();
+    double start_phi = phis[0];
+    double end_phi = phis[ phis.size()-1 ];
+
+    double delta_phi = end_phi - start_phi;
+
+    double Z = ( 1100.0 * 2.0 * CLHEP::pi ) / delta_phi;
+    double pz = ( 1.19 * Z ) / ( 2.0 * CLHEP::pi );
+
+    std::cerr << "Pz = " << pz << "\n\n";
+
+    for ( unsigned int j = 0; j < phis.size(); ++j )
+    {
+      std::cerr << phis[j] << '\n';
+    }
+  }
+  std::cerr << std::endl;
+  */
+
+  /*
+  Squeak::mout(Squeak::info) << event.digits().size() << " "
+                              << event.clusters().size() << " "
+                              << event.spacepoints().size() << "; "
+                              << event.straightprtracks().size() << " "
+                              << event.helicalprtracks().size() << "; ";
+  for ( size_t track_i = 0; track_i < event.scifitracks().size(); track_i++ ) {
+    Squeak::mout(Squeak::info) << " Chi2: " << event.scifitracks()[track_i]->f_chi2() << "; "
+                 << " Chi2: " << event.scifitracks()[track_i]->s_chi2() << "; "
+                 << " P-Value: " << event.scifitracks()[track_i]->P_value() << "; ";
+  }
+  Squeak::mout(Squeak::info) << std::endl;
+  */
+}
 
 } // ~namespace MAUS

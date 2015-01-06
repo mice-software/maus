@@ -121,7 +121,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
    */
   void track_fit(MAUS::SciFiEvent &evt) const;
 
-  // void print_event_info(MAUS::SciFiEvent &event) const;
+  void print_event_info(MAUS::SciFiEvent &event) const;
 
  private:
   /// This will contain the configuration

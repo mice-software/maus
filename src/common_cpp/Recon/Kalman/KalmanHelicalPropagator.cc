@@ -89,6 +89,7 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(0, 3) = (cosine-1.)/u;
   // @x/@kappa
   // F(0, 4) = new_px*cosine*dtheta/u - new_py*sine*dtheta/u;
+  F(0, 4) = 0.;
 
   // @px/@x
   F(1, 0) = 0.;
@@ -100,6 +101,7 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(1, 3) = -sine;
   // @px/@kappa
   // F(1, 4) = -new_px*sine*dtheta - new_py*cosine*dtheta;
+  F(1, 4) = 0.;
 
   // @y/@x
   F(2, 0) = 0.;
@@ -111,6 +113,7 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(2, 3) = sine/u;
   // @y/@kappa
   // F(2, 4) = new_py*cosine*dtheta/u + new_px*sine*dtheta/u;
+  F(2, 4) = 0.;
 
   // @py/@x
   F(3, 0) = 0.;
@@ -122,6 +125,7 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(3, 3) = cosine;
   // @py/@kappa
   // F(3, 4) = -new_py*sine*dtheta + new_px*cosine*dtheta;
+  F(3, 4) = 0.;
 
   // @kappa/@x
   F(4, 0) = 0.;
@@ -230,6 +234,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(0, 3) = (cosine-1.)/u;
   // @x/@kappa
   // _F(0, 4) = px*cosine*dtheta/u - py*sine*dtheta/u;
+  _F(0, 4) = 0.;
 
   // @px/@x
   _F(1, 0) = 0.;
@@ -241,6 +246,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(1, 3) = -sine;
   // @px/@kappa
   // _F(1, 4) = -px*sine*dtheta - py*cosine*dtheta;
+  _F(1, 4) = 0.;
 
   // @y/@x
   _F(2, 0) = 0.;
@@ -252,6 +258,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(2, 3) = sine/u;
   // @y/@kappa
   // _F(2, 4) = py*cosine*dtheta/u + px*sine*dtheta/u;
+  _F(2, 4) = 0.;
 
   // @py/@x
   _F(3, 0) = 0.;
@@ -263,6 +270,7 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(3, 3) = cosine;
   // @py/@kappa
   // _F(3, 4) = -py*sine*dtheta + px*cosine*dtheta;
+  _F(3, 4) = 0.;
 
   // @kappa/@x
   _F(4, 0) = 0.;

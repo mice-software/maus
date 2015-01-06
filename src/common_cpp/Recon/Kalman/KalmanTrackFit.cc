@@ -45,6 +45,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
   for ( size_t i = 0; i < seeds.size(); ++i ) {
     // Current seed.
     KalmanSeed* seed = seeds[i];
+    std::cerr << "Seed Charge Start = " << seed->charge() << '\n';
     KalmanStatesPArray sites = seed->GetKalmanStates();
     SciFiTrack *track = new SciFiTrack();
     if ( seed->is_straight() ) {
@@ -97,6 +98,7 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     delete _filter;
     _propagator = NULL;
     _filter     = NULL;
+    std::cerr << "Seed Charge End = " << seed->charge() << '\n';
   }
 }
 
