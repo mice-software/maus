@@ -56,6 +56,8 @@ PatternRecognition::PatternRecognition(): _straight_pr_on(true),
                                           _verb(0),
                                           _n_trackers(2),
                                           _n_stations(5),
+                                          _bz_t1(4.0),
+                                          _bz_t2(4.0),
                                           _sd_1to4(0.3844),
                                           _sd_5(0.4298),
                                           _sd_phi_1to4(1.0),
@@ -80,6 +82,8 @@ void PatternRecognition::set_parameters_to_default() {
   _verb = 0;
   _n_trackers = 2;
   _n_stations = 5;
+  _bz_t1 = 4.0;
+  _bz_t2 = 4.0;
   _sd_1to4 = 0.3844;
   _sd_5 = 0.4298;
   _sd_phi_1to4 = 1.0;
@@ -585,33 +589,49 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   // Perform the s - z fit
   SimpleLine line_sz;
   std::vector<double> phi_i; // to hold change between turning angles wrt first spacepoint
-  int charge = 0;            // the particle track charge
-  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, phi_i, line_sz, charge);
+  int handedness = 0;            // the particle track handedness
+  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, phi_i, line_sz, handedness);
   if (!good_dsdz) {
     if ( _verb > 0 ) std::cerr << "dsdz fit failed, looping..." << std::endl;
     return NULL;
   }
 
-  // Form the helical track
-  // if (spnts[0]->get_tracker() == 0) track->set_dsdz(-track->get_dsdz());  // sign flip for t1
   // Set all the good sp to used and set the track seeds with them
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     spnts[i]->set_used(true);
   }
+
+  // Set the charge
+  int charge = 0;
+  if (spnts[0]->get_tracker() == 0) {
+    if ( _bz_t1 > 0 ) {
+      charge = - handedness;
+    } else {
+      charge = handedness;
+    }
+  } else {
+    if ( _bz_t2 > 0 ) {
+      charge = - handedness;
+    } else {
+      charge = handedness;
+    }
+  }
+
+  // Set the remaining track parameters
   double phi_0 = phi_i[0];
   double x0 = c_trial.get_x0() + c_trial.get_R()*cos(phi_0);
   double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);
   ThreeVector pos_0(x0, y0, -1);
+
+  // Form the track and return it
   SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, n_points, charge, pos_0, phi_0, c_trial,
                                                        line_sz, -1.0, -1.0, -1.0, phi_i, spnts);
-
-  // Return the completed track
   return track;
 }
 
 bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts,
                                    const SimpleCircle &circle, std::vector<double> &phi_i,
-                                   SimpleLine &line_sz, int &charge) {
+                                   SimpleLine &line_sz, int &handedness) {
 
   if (_verb > 0) std::cout << "sz chi2 cut: " << _sz_chisq_cut << std::endl;
 
@@ -641,9 +661,9 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
     phi_err.push_back(sd_phi);
   }
 
-  // Find the track charge and the number of turns made between tracker stations
+  // Find the track handedness and the number of turns made between tracker stations
   std::vector<double> true_phi_i;  // phi corrected for any extra 2*n*pi rotations
-  bool success = find_n_turns(z_i, phi_i, true_phi_i, charge);
+  bool success = find_n_turns(z_i, phi_i, true_phi_i, handedness);
   if (success) {
     phi_i = true_phi_i;
   } else {
@@ -683,7 +703,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
 }
 
 bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
-                                      std::vector<double> &true_phi, int &charge) {
+                                      std::vector<double> &true_phi, int &handedness) {
   // Sanity checks
   if ( (z.size() != phi.size()) || (z.size() < 3) || (z.size() > 5) ) {
     std::cerr << "find_n_turns: bad arguments supplied, aborting" << std::endl;
@@ -757,11 +777,11 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
   // If we have found a value of n which was accepted, calc the true turning angles
   if (found) {
     if ( true_n < 0 ) {
-      charge = -1;
+      handedness = -1;
     } else {
-      charge = 1;
+      handedness = 1;
     }
-    // std::cout << "Found particle track with charge " << charge << std::endl;
+    // std::cout << "Found particle track with handedness " << handedness << std::endl;
 
     // Transform dphi to phi
     for (size_t i = 0; i < close_dphi.size(); ++i) {
@@ -774,11 +794,11 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       if ( diff < CLHEP::pi ) {
         true_phi[i] = phi[i];
       } else if ( diff < 3*CLHEP::pi ) {
-        true_phi[i] = phi[i] + 2*charge*CLHEP::pi;
+        true_phi[i] = phi[i] + 2*handedness*CLHEP::pi;
       } else if ( diff < 5*CLHEP::pi ) {
-        true_phi[i] = phi[i] + 4*charge*CLHEP::pi;
+        true_phi[i] = phi[i] + 4*handedness*CLHEP::pi;
       } else if ( diff < 7*CLHEP::pi ) {
-        true_phi[i] = phi[i] + 6*charge*CLHEP::pi;
+        true_phi[i] = phi[i] + 6*handedness*CLHEP::pi;
       }
     }
     return true;

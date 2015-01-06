@@ -251,6 +251,8 @@ class Downloader: #pylint: disable = R0902
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
         self.download_beamline_for_run(run_num, download_path)
+        # To be included with an update to the cdb application
+        # self.download_coolingchannel_for_run(run_num, download_path)
         self.__write_zip_file(download_path, downloaded_file)
 
     def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
@@ -300,4 +302,28 @@ class Downloader: #pylint: disable = R0902
             fout = open(path, 'w')
             fout.write(downloadedfile)
             fout.close()
+
+  
+    # def download_coolingchannel_for_run(self, run_id, downloadpath): 
+    #                                  #pylint: disable = R0201, C0301
+    #    """
+    #    @Method download geometry for run 
+
+    #    This method gets the geometry, for the given run number, from the 
+    #    database then passes the string to the unpack method which unpacks it.
+    #    
+    #    @param  id The long ID run number for the desired geometry.
+    #    @param  downloadedpath The path location where the files will be 
+    #                           unpacked to.
+    #    """
+    #    if os.path.exists(downloadpath) == False:
+    #        raise OSError('Path '+downloadpath+' does not exist')
+    #    else:        
+    #        coolingchannel_cdb = cdb.CoolingChannel()
+    #        downloadedfile = \
+    #                     coolingchannel_cdb.get_coolingchannel_for_run(run_id)
+    #        path = downloadpath + '/CoolingChannelInfo.gdml'
+    #        fout = open(path, 'w')
+    #        fout.write(str(downloadedfile))
+    #        fout.close()
 

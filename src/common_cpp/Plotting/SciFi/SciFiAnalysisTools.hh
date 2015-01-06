@@ -40,12 +40,14 @@
 namespace SciFiAnalysisTools {
 
 /** Find the MC momentum of a track cluster */
-bool find_mc_cluster_momentum(const int track_id, const MAUS::SciFiCluster* clus,
-                              MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom);
+bool find_mc_cluster_data(const int track_id, const MAUS::SciFiCluster* clus,
+		                  MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom,
+						  MAUS::ThreeVector &pos);
 
 /** Find the MC momentum of a track spacepoint */
-bool find_mc_spoint_momentum(const int track_id, const MAUS::SciFiSpacePoint* sp,
-                             MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom);
+bool find_mc_spoint_data(const int track_id, const MAUS::SciFiSpacePoint* sp,
+                         MAUS::SciFiLookup &lkup, MAUS::ThreeVector &mom,
+						 MAUS::ThreeVector &pos);
 
 /** Find the MC track ID number given a vector of spacepoint numbers and their MC track IDs */
 bool find_mc_tid(const std::vector< std::vector<int> > &spoint_mc_tids, const int min_matches,

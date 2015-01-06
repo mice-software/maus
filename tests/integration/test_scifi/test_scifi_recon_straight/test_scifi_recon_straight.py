@@ -90,7 +90,7 @@ class TestSciFiReconStraight(unittest.TestCase): # pylint: disable=R0904
         h3 = ROOT.gDirectory.Get('h3')
         self.assertLess(h3.GetMean(), 15)
         self.assertLess(h3.GetRMS(), 15)
-        self.assertGreater(h3.GetEntries(), 30)
+        self.assertGreater(h3.GetEntries(), 25)
 
         tree.Draw(
           "_spill._recon._scifi_event._scifistraightprtracks._y_chisq>>h4",
@@ -98,7 +98,7 @@ class TestSciFiReconStraight(unittest.TestCase): # pylint: disable=R0904
         h4 = ROOT.gDirectory.Get('h4')
         self.assertLess(h4.GetMean(), 15)
         self.assertLess(h4.GetRMS(), 15)
-        self.assertGreater(h4.GetEntries(), 30)
+        self.assertGreater(h4.GetEntries(), 25)
 
         # Check chi^2 average is reasonably low for straight final tracks
         #tree.Draw("_spill._recon._scifi_event._scifitracks._chi2>>h5",
@@ -113,7 +113,7 @@ class TestSciFiReconStraight(unittest.TestCase): # pylint: disable=R0904
         #h6 = ROOT.gDirectory.Get('h6')
         #self.assertLess(h6.GetMean(), 15)
         #self.assertLess(h6.GetRMS(), 10)
-        #self.assertGreater(h6.GetEntries(), 30)
+        #self.assertGreater(h6.GetEntries(), 25)
 
 if __name__ == "__main__":
     unittest.main()

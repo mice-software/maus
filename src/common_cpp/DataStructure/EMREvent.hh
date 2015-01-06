@@ -50,8 +50,79 @@ class EMREvent {
     /** Sets  */
     void SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray);
 
+    /** Returns  */
+    bool GetInitialTrigger() const;
+
+    /** Sets  */
+    void SetInitialTrigger(bool initial_trigger);
+
+    /** Returns  */
+    bool GetHasPrimary() const;
+
+    /** Sets  */
+    void SetHasPrimary(bool has_primary);
+
+    /** Returns  */
+    double GetRangePrimary() const;
+
+    /** Sets  */
+    void SetRangePrimary(double range_primary);
+
+    /** Returns  */
+    bool GetHasSecondary() const;
+
+    /** Sets  */
+    void SetHasSecondary(bool has_secondary);
+
+    /** Returns  */
+    double GetRangeSecondary() const;
+
+    /** Sets  */
+    void SetRangeSecondary(double range_secondary);
+
+    /** Returns  */
+    double GetSecondaryToPrimaryTrackDistance() const;
+
+    /** Sets  */
+    void SetSecondaryToPrimaryTrackDistance(double secondary_to_primary_track_distance);
+
+    /** Returns  */
+    double GetTotalChargeMA() const;
+
+    /** Sets  */
+    void SetTotalChargeMA(double total_charge_MA);
+
+    /** Returns  */
+    double GetChargeRatioMA() const;
+
+    /** Sets  */
+    void SetChargeRatioMA(double charge_MA_ratio);
+
+    /** Returns  */
+    double GetTotalChargeSA() const;
+
+    /** Sets  */
+    void SetTotalChargeSA(double total_charge_SA);
+
+    /** Returns  */
+    double GetChargeRatioSA() const;
+
+    /** Sets  */
+    void SetChargeRatioSA(double charge_SA_ratio);
+
   private:
     EMRPlaneHitArray _emrplanehitarray;
+
+    bool _initial_trigger;
+    bool _has_primary;
+    double _range_primary;
+    bool _has_secondary;
+    double _range_secondary;
+    double _secondary_to_primary_track_distance;
+    double _total_charge_MA;
+    double _charge_ratio_MA;
+    double _total_charge_SA;
+    double _charge_ratio_SA;
 
     MAUS_VERSIONED_CLASS_DEF(EMREvent)
 };

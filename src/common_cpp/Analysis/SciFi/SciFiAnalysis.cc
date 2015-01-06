@@ -15,6 +15,7 @@
  *
  */
 
+#include <typeinfo>
 
 // MAUS headers
 #include "src/common_cpp/Analysis/SciFi/SciFiAnalysis.hh"
@@ -67,7 +68,13 @@ void SciFiAnalysis::Save() {
 
 void SciFiAnalysis::SetUpDisplays() {
   for ( size_t i = 0; i < mDisplays.size(); ++i ) {
-    mSciFiData.push_back(mDisplays[i]->SetUp());
+    SciFiDataBase* lData = NULL;
+    for (size_t j = 0; j < mSciFiData.size(); ++j) {
+	    lData = mDisplays[i]->SetData(mSciFiData[j]);
+	    if (lData) break;
+	  }
+	  lData = mDisplays[i]->SetUp();
+    mSciFiData.push_back(lData);
   }
 }
 

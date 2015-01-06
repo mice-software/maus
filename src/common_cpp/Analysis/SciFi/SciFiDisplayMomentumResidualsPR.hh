@@ -34,12 +34,12 @@
 #include "src/common_cpp/Analysis/SciFi/SciFiDataBase.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentum.hh"
 #include "src/common_cpp/Analysis/SciFi/SciFiDataMomentumPR.hh"
-#include "src/common_cpp/Analysis/SciFi/SciFiDisplayBase.hh"
+#include "src/common_cpp/Analysis/SciFi/SciFiDisplayDataInterface.hh"
 
 
 namespace MAUS {
 
-class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
+class SciFiDisplayMomentumResidualsPR : public SciFiDisplayDataInterface<SciFiDataMomentumPR> {
   public:
     /** Default constructor */
     SciFiDisplayMomentumResidualsPR();
@@ -50,10 +50,16 @@ class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
     /** Clears the class members */
     void Clear();
 
+    /** Return a pointer to the SciFiData object associated with the display */
+    virtual SciFiDataMomentumPR* GetData();
+
     /** Update the internal data used to make the plots using the pointer to the SciFiData object,
      *  accumulating data into the ROOT member variables
      */
     virtual void Fill();
+
+    /** Create a new SciFiData object of the correct derived type */
+    virtual SciFiDataBase* MakeDataObject();
 
     /** Plot the data currently held */
     virtual void Plot(TCanvas* aCanvas = NULL);
@@ -61,23 +67,18 @@ class SciFiDisplayMomentumResidualsPR : public SciFiDisplayBase {
     /** Save data and plots to a ROOT file  */
     void Save();
 
+    /** Set the SciFiData object associated with the display */
+    SciFiDataBase* SetData(SciFiDataBase* data);
+
     /** Set up the SciFiData object and ROOT tree */
     virtual SciFiDataBase* SetUp();
 
  private:
-
     /** Set up the ROOT TTree, call this after setting up the SciFiData member */
     bool SetUpRoot();
 
-    /** Sets up the SciFiData object needed by the display.
-     *  The display does not own the memory, but rather this should be called by
-     *  the SciFiAnalysis class which then assumes ownership.
-     */
-    SciFiDataBase* SetUpSciFiData();
-
     TFile* mOf1;                      /** The output ROOT file */
     TTree* mTree;                     /** The ROOT tree used to accumulate the reduced data */
-    SciFiDataMomentumPR* mSpillData;  /** The reduced data object, covering one spill */
     MomentumDataPR mTrackData;        /** Struct containing reduced data for 1 track in a spill */
 
     // Residual histograms

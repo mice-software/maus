@@ -62,8 +62,8 @@ class CallG4bl: #pylint: disable=R0903
         '1000080160':14895.10000, '1000020040':3727.417000, \
 	'1000070140':13043.78000, '1000060140':13043.93400, \
 	'1000030070': 6535.36500, '1000060120':11174.90000, \
-	'1000050100':9326.98900, \
-	'1000060130':12112.54500, '1000050110':10255.10100} #pylint: disable=C0103
+	'1000050100':9326.98900, '1000060130':12112.54500, \
+	'1000050110':10255.10100} #pylint: disable=C0103
 
         try:
             off = open(file_path+'/MAY09-B1B2-positives.in',"r")
@@ -270,14 +270,15 @@ class CallG4bl: #pylint: disable=R0903
                 key = 'entry'+str(i)
 
                 self.particles[key] = dict(spin = dict(\
-                x = math.cos(theta) * float(element[0]) + 392.39,
-                y = float(element[1]), 
-                z = math.sin(theta) * float(element[0]) - deltaz))
+                x = float(element[21]),
+                y = float(element[22]), 
+                z = float(element[23])))
 
                 self.particles[key].update(position = dict(\
-                x = math.cos(theta) * float(element[0]) + 392.39,
+            #    x = math.cos(theta) * float(element[0]) + 392.39,
+	        x = math.cos(theta) * float(element[0]) + 99.92,
                 y = float(element[1]), 
-                z = math.sin(theta) * float(element[0]) - deltaz))
+                z = math.sin(theta) * float(element[0]) + deltaz + 26.21))
 
                 self.particles[key].update(momentum = dict(\
                 x = math.cos(theta) * float(element[3]) - math.sin(theta) * float(element[5]), #pylint: disable = C0301

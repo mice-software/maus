@@ -70,6 +70,13 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
       lDataStruct.TrackerNumber = trk->get_tracker();
       lDataStruct.Charge = trk->get_charge();
       lDataStruct.NumberOfPoints = trk->get_num_points();
+      lDataStruct.Radius = trk->get_R();
+      lDataStruct.CircleX0 = trk->get_circle_x0();
+      lDataStruct.CircleY0 = trk->get_circle_y0();
+      lDataStruct.CircleChiSq = trk->get_circle_chisq();
+      lDataStruct.SZIntercept = trk->get_line_sz_c();
+      lDataStruct.dsdz = trk->get_dsdz();
+      lDataStruct.SZChiSq = trk->get_line_sz_chisq();
 
       // Calc recon momentum
       lDataStruct.PtRec = 1.2 * trk->get_R();
@@ -134,8 +141,9 @@ void SciFiDataMomentumPR::ReduceData(MCEvent *aMcEvent, SciFiEvent* aSFEvent) {
       int counter2 = 0;
       for ( size_t k = 0; k < spnts.size(); ++k ) {
         ThreeVector mom_mc;
-        bool success = SciFiAnalysisTools::find_mc_spoint_momentum(track_id, spnts[k],
-                                                                   lkup, mom_mc);
+        ThreeVector pos_mc;  // We do not use this here, but function below needs the argument
+        bool success = SciFiAnalysisTools::find_mc_spoint_data(track_id, spnts[k],
+                                                               lkup, mom_mc, pos_mc);
         if (!success) {
           std::cerr << "Failed to find MC mom for track in tracker " << trk->get_tracker() << "\n";
           continue;

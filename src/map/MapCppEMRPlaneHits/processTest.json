@@ -27,7 +27,7 @@
               "leading_edge_time": 109090, 
               "geo": 0, 
               "channel": 28, 
-              "trailing_edge_time": 109097
+              "trailing_edge_time": 109095
             }, 
             {
               "ldc": 2, 
@@ -37,24 +37,24 @@
               "trailing_edge_time": 179097
             }
           ], 
-          "spill_number": 1, 
+          "spill_number": 123, 
           "dbb_id": 0, 
           "time_stamp": 1381498105, 
           "detector": "emr", 
           "dbb_triggers": [
             {
               "ldc": 2, 
-              "leading_edge_time": 784783, 
+              "leading_edge_time": 785000, 
               "geo": 0, 
               "channel": 4, 
-              "trailing_edge_time": 784834
+              "trailing_edge_time": 785050
             }, 
             {
               "ldc": 2, 
-              "leading_edge_time": 109098, 
+              "leading_edge_time": 109290, 
               "geo": 0, 
               "channel": 4, 
-              "trailing_edge_time": 109148
+              "trailing_edge_time": 109340
             }, 
             {
               "ldc": 2, 

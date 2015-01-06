@@ -1,0 +1,13 @@
+// Dummy configuration for EMR simulation tests
+
+Configuration EMRTest
+{
+  Dimensions 36. 36. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 100.0 mm
+  Module EMR/EMR.dat
+  {
+    Position 0. 0. 0. m
+    Rotation 0. 0. 0. degree
+  }
+}
