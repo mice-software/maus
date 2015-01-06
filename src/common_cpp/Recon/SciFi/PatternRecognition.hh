@@ -241,16 +241,16 @@ class PatternRecognition {
     bool set_ignore_stations(const std::vector<int> &ignore_stations,
                              int &ignore_station_1, int &ignore_station_2);
 
-    /** @brief Return the value for the Bz field in the upstream tracker */
+    /** @brief Return the value for the Bz field in the upstream tracker, in tracker coords */
     double get_bz_t1() const { return _bz_t2; }
 
-    /** @brief Set the value for the Bz field in the upstream tracker */
+    /** @brief Set the value for the Bz field in the upstream tracker, in tracker coords */
     void set_bz_t1(double bz_t1) { _bz_t1 = bz_t1; }
 
-    /** @brief Return the value for the Bz field in the downstreamstream tracker */
+    /** @brief Return the value for the Bz field in the downstream tracker, in tracker coords */
     double get_bz_t2() const { return _bz_t2; }
 
-    /** @brief Set the value for the Bz field in the downstream tracker */
+    /** @brief Set the value for the Bz field in the downstream tracker, in tracker coords */
     void set_bz_t2(double bz_t2) { _bz_t2 = bz_t2; }
 
     /** @brief Return the whether straight pat rec is on */
