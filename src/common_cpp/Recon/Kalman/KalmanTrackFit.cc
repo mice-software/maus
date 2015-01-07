@@ -65,6 +65,10 @@ void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
     _filter->Process(sites.front());
     // int first_site_id = abs(sites.front()->id());
 
+    int measurements = 0;
+    for ( size_t j = 1; j < sites.size(); ++j ) { measurements += ( sites.at(j)->contains_measurement() ? 1 : 0 ); }
+    std::cerr << "Number Measurements = " << measurements << '\n';
+
     // Run the extrapolation & filter chain.
     size_t numb_sites = sites.size();
     // Loop over all 15 planes
