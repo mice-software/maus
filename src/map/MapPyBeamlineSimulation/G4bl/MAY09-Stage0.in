@@ -126,9 +126,11 @@ place DecaySolenoid z=12210.7
 place vacuumWindow z=14779.7
 
 # Proton Absorber
-box ProtonAbsorber width=400 height=400 length=$proton_absorber_thickness material=polyethylene \
+if protonabsorberin = 1 
+    material protonabsorber polyethylene,0.8390061049 B,0.05 O,0.1109938951 density=1.035
+    box ProtonAbsorber width=400 height=400 length=$proton_absorber_thickness material=protonabsorber \
         color=1,0,1
-place ProtonAbsorber z=14880
+    place ProtonAbsorber z=14880
 
 #first Geneva Counter 
 place GenevaBeamCounter rename=GVA1 z=15050
@@ -145,7 +147,7 @@ place GenevaBeamCounter rename=GVA1 z=15050
 		expr="Px1/Pz1" tolerance=0.000001
 #endif
 
-zntuple z=15050 format=ascii file=G4BLoutput.txt
+#zntuple z=15050 format=ascii file=G4BLoutput.txt
 #ntuple TriggerParticles category=NTuples detectors=*
 
 #place BendTypeI6inIron rename=B2 z=15808.1 x=100 rotation=Y15 By=0 \
@@ -156,5 +158,14 @@ zntuple z=15050 format=ascii file=G4BLoutput.txt
 
 #place BeamMonitor rename=BM1 z=16992
 
+#zntuple z=15050 format=asciiExtended file=maus_beam_output.txt
+
+place BendTypeI6inIron rename=B2 z=15808.1 x=100 rotation=Y15 By=0 \
+        fieldMaterial=Air
+place TypeI6inTaperedField z=15808.1 x=100 rotation=Y15 \
+        current=$B2current
+cornerarc z=15298.3 angle=30 centerRadius=2005.2 radiusCut=1000
+
+zntuple z=16808.1 format=asciiextended file=G4BLoutput.txt
 
 

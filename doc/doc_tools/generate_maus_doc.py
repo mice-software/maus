@@ -63,7 +63,7 @@ def main():
         else:
             run_doxygen(component, tagfiles)
         tagfiles = tagfiles + ' ' + tagfilesmaus_dict[component]
-        fix_doxygen_paths()
+    fix_doxygen_paths()
     create_index_html()
     exit()
 

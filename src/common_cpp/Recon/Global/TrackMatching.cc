@@ -169,7 +169,7 @@ namespace global {
     }
 
     // Adding global tracks for case where global event contains only a KL track
-    if (SciFiTrackArray->empty() && TOFTrackArray.empty() && KLTrack/*->GetTrackPoints().size() > 0*/) {
+    if (SciFiTrackArray->empty() && TOFTrackArray.empty() && KLTrack) {
       MAUS::DataStructure::Global::Track* GlobalTrack =
 	new MAUS::DataStructure::Global::Track();
       GlobalTrack->set_mapper_name(mapper_name);
@@ -298,15 +298,11 @@ namespace global {
     }
 
     for (unsigned int i = 0; i < KLtp.size(); ++i) {
-
-      //MAUS::DataStructure::Global::Track* KLtrack =
-      //new MAUS::DataStructure::Global::Track();
         KLTrack->set_mapper_name(local_mapper_name);
 	KLtp[i]->set_mapper_name(local_mapper_name);
 	KLTrack->AddTrackPoint(KLtp[i]);
 	global_event->add_track_point_recursive(KLtp[i]);
       }
-    //global_event->add_track_recursive(KLTrack);
     }
 
 } // ~namespace global

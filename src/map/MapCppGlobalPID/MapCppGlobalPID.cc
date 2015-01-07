@@ -60,7 +60,7 @@ namespace MAUS {
     _pid_vars.clear();
 
     PDF_file = _configJSON["PID_PDFs_file"].asString();
-    //PDF_file = "/home/celeste/MICE/MAUS/1389a/src/map/MapCppGlobalPID/PIDhists.root";
+    // PDF_file = "/home/celeste/MICE/MAUS/1389a/src/map/MapCppGlobalPID/PIDhists.root";
     std::cerr << PDF_file << std::endl;
 
     _histFile = new TFile(PDF_file.c_str(), "READ");

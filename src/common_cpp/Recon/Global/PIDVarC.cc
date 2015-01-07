@@ -39,7 +39,7 @@ namespace global {
   PIDVarC::~PIDVarC() {}
 
   std::pair<double, double> PIDVarC::Calc_Var(MAUS::DataStructure::Global::Track* track) {
-    int total_ADC_charge_product = 0; 
+    int total_ADC_charge_product = 0;
     MAUS::DataStructure::Global::DetectorPoint KL_DP =
       MAUS::DataStructure::Global::kCalorimeter;
     // Get trackpoint array from track
@@ -74,7 +74,7 @@ namespace global {
       kl_track_points.clear();
       return std::make_pair(-1, 0);
     } else {
-      for (size_t i=0; i<kl_track_points.size(); i++) {
+      for (size_t i = 0; i < kl_track_points.size(); i++) {
 	total_ADC_charge_product += kl_track_points[i]->get_ADC_charge_product();
       }
       if ( YminBin > (total_ADC_charge_product) || (total_ADC_charge_product) > YmaxBin ) {

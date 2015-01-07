@@ -72,7 +72,6 @@ namespace global {
 		      std::vector<MAUS::DataStructure::Global::SpacePoint*>
 		      *GlobalSpacePointArray,
 		      MAUS::DataStructure::Global::Track* KLTrack);
-
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon
