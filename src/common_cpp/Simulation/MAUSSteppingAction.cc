@@ -112,7 +112,19 @@ Json::Value MAUSSteppingAction::StepToJson
     step["path_length"] = aTrack->GetTrackLength();
     step["energy_deposited"] = aStep->GetTotalEnergyDeposit();
     step["time"] = point->GetGlobalTime();
-
+    // G4StepPoint GetPhysicalVolume is inlined
+    // point->GetTouchable()->GetPhysicalVolume() with no NULL check so we do it
+    // here
+    if (point->GetTouchable() != NULL && point->GetPhysicalVolume() != NULL) {
+        step["volume"] = point->GetPhysicalVolume()->GetName();
+    } else {
+        step["volume"] = "";
+    }
+    if (point->GetMaterial() != NULL) {
+        step["material"] = point->GetMaterial()->GetName();
+    } else {
+        step["material"] = "";
+    }
     return step;
 }
 

@@ -150,8 +150,7 @@ class Beam(): # pylint: disable=R0902
         self.beam_sigma_y = 5.0
         self.beam_sigma_z = 6.0
         #############################################
-
-
+        self.a_p_correlation = {}
 
     def birth(self, beam_def, particle_generator, random_seed):
         """
@@ -173,6 +172,7 @@ class Beam(): # pylint: disable=R0902
         self.__birth_trans_long_coupling(beam_def["coupling"])
         self.__birth_beam_mean()
         self.__birth_beam_polarisation(beam_def)
+        self.__birth_a_p_correlation(beam_def)
  
     def __birth_particle_generator(self, beam_def, particle_generator):
         """
@@ -285,12 +285,13 @@ class Beam(): # pylint: disable=R0902
         elif self.longitudinal_mode == 'gaussian':
             long_matrix[0, 0] = beam_def['sigma_t']**2.
             long_matrix[1, 1] = beam_def['sigma_'+self.momentum_defined_by]**2.
-            if beam_def['sigma_t'] <= 0.:
-                raise ValueError("sigma_t "+str(long_matrix[0, 0])+
-                                 " must be > 0")
-            if beam_def['sigma_'+self.momentum_defined_by] <= 0.:
-                raise ValueError('sigma_'+self.momentum_defined_by+ \
-                                 " "+str(long_matrix[0, 0])+" must be > 0")
+            corr_key = 'cov(t,'+self.momentum_defined_by+')'
+            if corr_key in beam_def:
+                long_matrix[0, 1] = beam_def[corr_key]
+                long_matrix[1, 0] = long_matrix[0, 1]
+            if numpy.linalg.det(long_matrix) <= 0:
+                raise ValueError('longitudinal matrix\n'+str(long_matrix)+\
+                                 'must be positive definite.')
         elif self.longitudinal_mode == 'uniform_time' or \
              self.longitudinal_mode == 'sawtooth_time':
             self.t_dist = self.longitudinal_mode
@@ -303,7 +304,6 @@ class Beam(): # pylint: disable=R0902
         else:
             raise ValueError("Did not recognise beam longitudinal_mode "+\
                              str(self.longitudinal_mode))
-
         for i in range(2):
             for j in range(2):
                 self.beam_matrix[i+4, j+4] = long_matrix[i, j]
@@ -316,6 +316,27 @@ class Beam(): # pylint: disable=R0902
             raise NotImplementedError\
                            ("No transverse - longitudinal coupling implemented")
 
+    def __birth_a_p_correlation(self, beam_def):
+        """
+        Setup amplitude momentum correlation
+        """
+        self.a_p_correlation = {}
+        if "a-p_correlation" not in beam_def.keys():
+            return
+        self.a_p_correlation = beam_def["a-p_correlation"]
+        if 'momentum_variable' not in self.a_p_correlation:
+            self.a_p_correlation['momentum_variable'] = self.momentum_defined_by
+        mom_var = self.a_p_correlation['momentum_variable']
+        if mom_var not in self.momentum_keys:
+            raise KeyError("Did not recognise a-p_correlation "+\
+                                       "momentum_variable '"+str(mom_var)+"'")
+        if 'magnitude' not in self.a_p_correlation:
+            raise KeyError("Need to define 'magnitude' in beam definition "+\
+                  "amplitude momentum correlation")
+        # check we can convert to a float
+        self.a_p_correlation['magnitude'] = \
+                                        float(self.a_p_correlation['magnitude'])
+
     def __birth_beam_mean(self):
         """
         Setup the beam mean from reference coordinates
@@ -323,7 +344,6 @@ class Beam(): # pylint: disable=R0902
         for i, key in enumerate(Beam.array_keys):
             self.beam_mean[i] = self.reference[key]
         self.beam_mean[5] = self.reference[self.momentum_defined_by]
-
     
     def __birth_beam_polarisation(self, beam_def):
         """
@@ -369,14 +389,10 @@ class Beam(): # pylint: disable=R0902
             particle_array = self.__process_get_particle_array()
             hit = self.__process_array_to_hit(particle_array,
                                 self.reference["pid"], self.momentum_defined_by)
-        spin_array = self.__process_beam_polarisation()
-        hit["sx"] = spin_array[0]
-        hit["sy"] = spin_array[1]
-        hit["sz"] = spin_array[2]
+            hit = self.__process_a_p_correlation(hit)
+        spin = self.__process_beam_polarisation()
         primary = self.__process_hit_to_primary(hit)
-        primary["spin"] = {"x": hit["sx"] , "y":hit["sy"], "z":hit["sz"]}
-        
-        
+        primary["spin"] = {"x":spin[0], "y":spin[1], "z":spin[2]}
         return primary
 
     def __process_beam_polarisation(self):
@@ -481,6 +497,39 @@ class Beam(): # pylint: disable=R0902
             return random_seed
         #raise NotImplementedError("Did not recognise seed algorithm "+\
                   #                str(self.particle_seed_algorithm))
+
+    def __process_a_p_correlation(self, hit):
+        """
+        Introduce a correlation between particle amplitude and momentum
+        (or energy)
+
+        Calculate the particle amplitude A based on the transverse matrix
+        defined in "transverse", like
+                            A = U V^{-1} U^{T}
+        Add to "momentum_variable" V an amount given by
+                            V = V+M*V*A
+        where M is self.a_p_corr["magnitude"]. See the MAUS user docs for
+        latexed version of this.
+        """
+        if self.a_p_correlation == {}:
+            return hit
+        space = ["x", "px", "y", "py"]
+        cov_inv = numpy.linalg.inv(self.beam_matrix[0:4, 0:4])
+        cov_det = numpy.linalg.det(self.beam_matrix[0:4, 0:4])
+        ps_vec = numpy.matrix([hit[var] for var in space])-self.beam_mean[0:4]
+        amplitude = (ps_vec*cov_inv*ps_vec.transpose())[0, 0]
+        amplitude *= cov_det**0.25*hit['mass']**2
+        mom_var = self.a_p_correlation["momentum_variable"]
+        mom = hit[mom_var]
+        mom = mom + self.a_p_correlation["magnitude"]*mom*amplitude
+        hit[mom_var] = mom
+        if mom_var == 'p':
+            hit.mass_shell_condition('energy')
+        elif mom_var == 'pz':
+            hit.mass_shell_condition('energy')
+        elif mom_var == 'energy':
+            hit.mass_shell_condition('p')
+        return hit
 
     array_keys = ["x", "px", "y", "py", "t"]
     momentum_keys = ['p', 'pz', 'energy']

@@ -20,7 +20,8 @@
 namespace MAUS {
 
 EMRPlaneHitProcessor::EMRPlaneHitProcessor()
-      : _hit_arr_proc(new EMRBarProcessor()) {
+      : _bar_arr_proc(new EMRBarProcessor()),
+	_int_arr_proc(new IntProcessor()) {
     RegisterValueBranch
           ("plane", &_int_proc, &EMRPlaneHit::GetPlane,
           &EMRPlaneHit::SetPlane, true);
@@ -28,11 +29,23 @@ EMRPlaneHitProcessor::EMRPlaneHitProcessor()
           ("orientation", &_int_proc, &EMRPlaneHit::GetOrientation,
           &EMRPlaneHit::SetOrientation, true);
     RegisterValueBranch
-          ("emr_bars", &_hit_arr_proc, &EMRPlaneHit::GetEMRBarArray,
+          ("emr_bars", &_bar_arr_proc, &EMRPlaneHit::GetEMRBarArray,
           &EMRPlaneHit::SetEMRBarArray, true);
     RegisterValueBranch
-          ("charge", &_int_proc, &EMRPlaneHit::GetCharge,
+          ("emr_bars_primary", &_bar_arr_proc, &EMRPlaneHit::GetEMRBarArrayPrimary,
+          &EMRPlaneHit::SetEMRBarArrayPrimary, true);
+    RegisterValueBranch
+          ("emr_bars_secondary", &_bar_arr_proc, &EMRPlaneHit::GetEMRBarArraySecondary,
+          &EMRPlaneHit::SetEMRBarArraySecondary, true);
+    RegisterValueBranch
+          ("charge", &_double_proc, &EMRPlaneHit::GetCharge,
           &EMRPlaneHit::SetCharge, true);
+    RegisterValueBranch
+          ("charge_corrected", &_double_proc, &EMRPlaneHit::GetChargeCorrected,
+          &EMRPlaneHit::SetChargeCorrected, true);
+    RegisterValueBranch
+          ("pedestal_area", &_double_proc, &EMRPlaneHit::GetPedestalArea,
+          &EMRPlaneHit::SetPedestalArea, true);
     RegisterValueBranch
           ("time", &_int_proc, &EMRPlaneHit::GetTime,
           &EMRPlaneHit::SetTime, true);
@@ -43,9 +56,14 @@ EMRPlaneHitProcessor::EMRPlaneHitProcessor()
           ("trigger", &_int_proc, &EMRPlaneHit::GetTrigger,
           &EMRPlaneHit::SetTrigger, true);
     RegisterValueBranch
+          ("run", &_int_proc, &EMRPlaneHit::GetRun,
+          &EMRPlaneHit::SetRun, true);
+    RegisterValueBranch
           ("delta_t", &_int_proc, &EMRPlaneHit::GetDeltaT,
           &EMRPlaneHit::SetDeltaT, true);
+    RegisterValueBranch
+          ("samples", &_int_arr_proc, &EMRPlaneHit::GetSamples,
+          &EMRPlaneHit::SetSamples, true);
 }
 }  // namespace MAUS
-
 

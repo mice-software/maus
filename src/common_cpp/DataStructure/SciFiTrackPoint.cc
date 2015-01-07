@@ -82,8 +82,13 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   int size = C.GetNrows();
   int num_elements = size*size;
   double* matrix_elements = C.GetMatrixArray();
-  std::vector<double> covariance(matrix_elements, matrix_elements+num_elements);
+  std::vector<double> covariance(matrix_elements, matrix_elements+(num_elements/sizeof(double)));
   _covariance = covariance;
+  std::vector<double> errors(size);
+  for ( int i = 0; i < size; ++i ) {
+    errors[i] = std::sqrt(fabs(C(i,i)));
+  }
+  _errors = errors;
 
   _cluster = new TRef(kalman_site->cluster());
 }

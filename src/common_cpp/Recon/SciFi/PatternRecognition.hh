@@ -175,7 +175,7 @@ class PatternRecognition {
      * @param line_sz - The output fitted line in s-z projection.
      */
     bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                   std::vector<double> &phi_i, SimpleLine &line_sz, int &charge);
+                   std::vector<double> &phi_i, SimpleLine &line_sz, int &handedness);
 
     /** @brief Find the number of 2pi rotations that occured between each station
      *
@@ -187,7 +187,7 @@ class PatternRecognition {
      * @param true_phi - the corrected turing angles
      */
     bool find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
-                      std::vector<double> &true_phi, int &charge);
+                      std::vector<double> &true_phi, int &handedness);
 
     /** @brief Checks that the spacepoints in trial track fall within longest acceptable time range
      *
@@ -241,6 +241,18 @@ class PatternRecognition {
     bool set_ignore_stations(const std::vector<int> &ignore_stations,
                              int &ignore_station_1, int &ignore_station_2);
 
+    /** @brief Return the value for the Bz field in the upstream tracker, in tracker coords */
+    double get_bz_t1() const { return _bz_t2; }
+
+    /** @brief Set the value for the Bz field in the upstream tracker, in tracker coords */
+    void set_bz_t1(double bz_t1) { _bz_t1 = bz_t1; }
+
+    /** @brief Return the value for the Bz field in the downstream tracker, in tracker coords */
+    double get_bz_t2() const { return _bz_t2; }
+
+    /** @brief Set the value for the Bz field in the downstream tracker, in tracker coords */
+    void set_bz_t2(double bz_t2) { _bz_t2 = bz_t2; }
+
     /** @brief Return the whether straight pat rec is on */
     bool get_straight_pr_on() { return _straight_pr_on; }
 
@@ -263,23 +275,25 @@ class PatternRecognition {
     void set_parameters_to_default();
 
   private:
-    bool _straight_pr_on;      /** Straight pattern recogntion on or off */
-    bool _helical_pr_on;      /** Helical pattern recogntion on or off */
-    int _verb;                /** Verbosity: 0=little, 1=more couts */
-    int _n_trackers;          /** Number of trackers */
-    int _n_stations;          /** Number of stations per tracker */
-    double _sd_1to4;          /** Position error associated with stations 1 t0 4 */
-    double _sd_5;             /** Position error associated with station 5 */
-    double _sd_phi_1to4;      /** Rotation error associated with stations 1 t0 4 */
-    double _sd_phi_5;         /** Rotation error associated with station 5 */
-    double _res_cut;          /** Road cut for linear fit in mm */
+    bool _straight_pr_on;       /** Straight pattern recogntion on or off */
+    bool _helical_pr_on;        /** Helical pattern recogntion on or off */
+    int _verb;                  /** Verbosity: 0=little, 1=more couts */
+    int _n_trackers;            /** Number of trackers */
+    int _n_stations;            /** Number of stations per tracker */
+    double _bz_t1;              /** Bz field in upstream tracker */
+    double _bz_t2;              /** Bz field in downstream tracker */
+    double _sd_1to4;            /** Position error associated with stations 1 t0 4 */
+    double _sd_5;               /** Position error associated with station 5 */
+    double _sd_phi_1to4;        /** Rotation error associated with stations 1 t0 4 */
+    double _sd_phi_5;           /** Rotation error associated with station 5 */
+    double _res_cut;            /** Road cut for linear fit in mm */
     double _straight_chisq_cut; /** Cut on the chi^2 of the least sqs fit in mm */
-    double _R_res_cut;        /** Cut on the radius of the track helix in mm */
-    double _circle_chisq_cut; /** Cut on the chi^2 of the circle least sqs fit in mm */
-    double _n_turns_cut;      /** Cut to decide if a given n turns value is good */
-    double _sz_chisq_cut;     /** Cut on the sz chi^2 from least sqs fit in mm */
-    double _Pt_max;           /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
-    double _Pz_min;           /** MeV/c min Pz for helical tracks (this is a guess) */
+    double _R_res_cut;          /** Cut on the radius of the track helix in mm */
+    double _circle_chisq_cut;   /** Cut on the chi^2 of the circle least sqs fit in mm */
+    double _n_turns_cut;        /** Cut to decide if a given n turns value is good */
+    double _sz_chisq_cut;       /** Cut on the sz chi^2 from least sqs fit in mm */
+    double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
+    double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
 };
 

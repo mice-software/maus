@@ -25,7 +25,24 @@ EMRBarHitProcessor::EMRBarHitProcessor() {
     RegisterValueBranch
           ("delta_t", &_int_proc, &EMRBarHit::GetDeltaT,
           &EMRBarHit::SetDeltaT, true);
+    RegisterValueBranch
+          ("hittime", &_int_proc, &EMRBarHit::GetHitTime,
+          &EMRBarHit::SetHitTime, true);
+    RegisterValueBranch
+          ("x", &_double_proc, &EMRBarHit::GetX,
+          &EMRBarHit::SetX, true);
+    RegisterValueBranch
+          ("y", &_double_proc, &EMRBarHit::GetY,
+          &EMRBarHit::SetY, true);
+    RegisterValueBranch
+          ("z", &_double_proc, &EMRBarHit::GetZ,
+          &EMRBarHit::SetZ, true);
+    RegisterValueBranch
+          ("charge_corrected", &_double_proc, &EMRBarHit::GetChargeCorrected,
+          &EMRBarHit::SetChargeCorrected, true);
+    RegisterValueBranch
+          ("total_charge_corrected", &_double_proc, &EMRBarHit::GetTotalChargeCorrected,
+          &EMRBarHit::SetTotalChargeCorrected, true);
 }
 }  // namespace MAUS
-
 

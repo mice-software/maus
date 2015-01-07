@@ -38,10 +38,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         tar xfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/source/
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        echo
-        echo "INFO: Unpacking geant4 data:"
-        echo
-        tar xfz ${MAUS_ROOT_DIR}/third_party/source/geant4.9.6_data.tar.gz
 
         echo
         echo "INFO: Generating make files:"

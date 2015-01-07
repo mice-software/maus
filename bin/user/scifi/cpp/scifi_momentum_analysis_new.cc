@@ -148,10 +148,10 @@ int main(int argc, char *argv[]) {
 
 
   // Set up the displays
-  // analyser.AddDisplay(pr_mom_residuals);
-  // analyser.AddDisplay(kf_pos_residuals);
-  // analyser.AddDisplay(kf_mom_residuals);
-  // analyser.AddDisplay(pr_resolutions);
+  analyser.AddDisplay(pr_mom_residuals);
+  analyser.AddDisplay(kf_pos_residuals);
+  analyser.AddDisplay(kf_mom_residuals);
+  analyser.AddDisplay(pr_resolutions);
   analyser.AddDisplay(kf_resolutions);
   analyser.SetUpDisplays();
 

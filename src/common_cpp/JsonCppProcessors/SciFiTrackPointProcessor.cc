@@ -58,6 +58,9 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("covariance", &_matrix_proc,
                         &SciFiTrackPoint::covariance,
                         &SciFiTrackPoint::set_covariance, false);
+    RegisterValueBranch("errors", &_matrix_proc,
+                        &SciFiTrackPoint::errors,
+                        &SciFiTrackPoint::set_errors, false);
     ObjectProcessor<SciFiTrackPoint>::RegisterTRef("cluster",
              &SciFiTrackPoint::get_cluster_tobject, &SciFiTrackPoint::set_cluster_tobject, true);
 }
