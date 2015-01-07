@@ -29,7 +29,7 @@ namespace global {
   PIDVarC::PIDVarC(std::string hypothesis, std::string unique_identifier)
     : PIDBase2D(VARIABLE, hypothesis, unique_identifier,
                  XminBin, XmaxBin, XnumBins, YminBin, YmaxBin, YnumBins) {
-    //_nonZeroHistEntries = true;
+    _nonZeroHistEntries = true;
   }
 
   PIDVarC::PIDVarC(TFile* file, std::string hypothesis)
