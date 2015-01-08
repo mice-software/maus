@@ -21,7 +21,7 @@ namespace MAUS {
 KalmanHelicalPropagator::KalmanHelicalPropagator() : KalmanPropagator() {}
 
 KalmanHelicalPropagator::KalmanHelicalPropagator(double Bz) : KalmanPropagator() {
-  _Bz = fabs(Bz);
+  _Bz = Bz;
   _n_parameters = 5;
   // Propagator matrix.
   _F.ResizeTo(_n_parameters, _n_parameters);

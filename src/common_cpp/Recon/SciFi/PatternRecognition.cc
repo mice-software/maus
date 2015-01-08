@@ -605,9 +605,9 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   int charge = 0;
   if (spnts[0]->get_tracker() == 0) {
     if ( _bz_t1 > 0 ) {
-      charge = - handedness;
-    } else {
       charge = handedness;
+    } else {
+      charge = - handedness;
     }
   } else {
     if ( _bz_t2 > 0 ) {

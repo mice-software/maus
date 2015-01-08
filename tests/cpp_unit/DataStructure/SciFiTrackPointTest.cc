@@ -64,43 +64,46 @@ TEST_F(SciFiTrackPointTestDS, test_kalman_state_contructor) {
   // Define projected states...
   TMatrixD projected_a(5, 1);
   projected_a(0, 0) = 1.0;
-  projected_a(0, 0) = 2.0;
-  projected_a(0, 0) = 3.0;
-  projected_a(0, 0) = 4.0;
-  projected_a(0, 0) = 5.0;
-  TMatrixD pull(2, 1);
+  projected_a(1, 0) = 2.0;
+  projected_a(2, 0) = 3.0;
+  projected_a(3, 0) = 4.0;
+  projected_a(4, 0) = 5.0;
+  TMatrixD pull(1, 1);
   pull(0, 0) = 1.2;
-  pull(1, 0) = 1.;
+//  pull(1, 0) = 1.;
 
   // ... filtered states...
   TMatrixD a(5, 1);
   a(0, 0) = 1.1;
-  a(0, 0) = 2.1;
-  a(0, 0) = 3.1;
-  a(0, 0) = 4.1;
-  a(0, 0) = 5.1;
-  TMatrixD residual(2, 1);
+  a(1, 0) = 2.1;
+  a(2, 0) = 3.1;
+  a(3, 0) = 4.1;
+  a(4, 0) = 5.1;
+  TMatrixD residual(1, 1);
   residual(0, 0) = 0.8;
-  residual(1, 0) = 2.;
+//  residual(1, 0) = 2.;
   double f_chi2 = 2.;
 
   // ... and smoothed states.
   TMatrixD smoothed_a(5, 1);
   smoothed_a(0, 0) = 1.2;
-  smoothed_a(0, 0) = 2.2;
-  smoothed_a(0, 0) = 3.2;
-  smoothed_a(0, 0) = 4.2;
-  smoothed_a(0, 0) = 5.2;
-  TMatrixD smoothed_residual(2, 1);
+  smoothed_a(1, 0) = 2.2;
+  smoothed_a(2, 0) = 3.2;
+  smoothed_a(3, 0) = 4.2;
+  smoothed_a(4, 0) = 5.2;
+  TMatrixD smoothed_residual(1, 1);
   smoothed_residual(0, 0) = 0.6;
-  smoothed_residual(1, 0) = 3.;
-  double s_chi2 = 1.;
+//  smoothed_residual(1, 0) = 3.;
 
-  TMatrixD covariance_residual(2, 2);
+  TMatrixD covariance_residual(1, 1);
   covariance_residual(0, 0) = 1.;
-  covariance_residual(0, 1) = 2.;
-  covariance_residual(1, 0) = 3.;
-  covariance_residual(1, 1) = 4.;
+
+  TMatrixD covariance_matrix(5, 5);
+  covariance_matrix(0, 0) = 1.;
+  covariance_matrix(1, 1) = 4.;
+  covariance_matrix(2, 2) = 9.;
+  covariance_matrix(3, 3) = 16.;
+  covariance_matrix(4, 4) = 25.;
 
   // Set them all.
   state1.set_a(projected_a, MAUS::KalmanState::Projected);
@@ -113,6 +116,7 @@ TEST_F(SciFiTrackPointTestDS, test_kalman_state_contructor) {
   state1.set_a(smoothed_a, MAUS::KalmanState::Smoothed);
   state1.set_residual(smoothed_residual, MAUS::KalmanState::Smoothed);
   state1.set_covariance_residual(covariance_residual, MAUS::KalmanState::Smoothed);
+  state1.set_covariance_matrix(covariance_matrix, MAUS::KalmanState::Smoothed);
 
   int tracker = 1;
   SciFiCluster* clus1 = new SciFiCluster();
@@ -125,6 +129,11 @@ TEST_F(SciFiTrackPointTestDS, test_kalman_state_contructor) {
   // Perform the tests
   EXPECT_EQ(clus1, tp1->get_cluster_pointer());
   EXPECT_EQ(tp1->get_cluster_pointer()->get_tracker(), tracker);
+
+  std::vector<double> errors = tp1->errors();
+  EXPECT_DOUBLE_EQ(errors[0], 1.0);
+  EXPECT_DOUBLE_EQ(errors[4], 5.0);
+
 
   delete tp1;
   delete clus1;

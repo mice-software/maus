@@ -77,12 +77,17 @@ void SciFiGeometryHelper::Build() {
       plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
       _geometry_map.insert(std::make_pair(plane_id, this_plane));
 
-      const MiceModule* trackerModule = plane->mother();
+      const MiceModule* trackerModule = plane->mother(); // tracker
       ThreeVector trackerPos = clhep_to_root( trackerModule->globalPosition() );
-      HepRotation trackerRot;
-      std::cerr << "Tracker pos = " << trackerModule->globalPosition()[2] << " & Tracker Field = " << FieldValue( trackerPos, plane_rotation ) << '\n';
+
 //      _field_value[tracker_n] = FieldValue(reference, plane_rotation);
-      _field_value[tracker_n] = FieldValue( trackerPos, plane_rotation );
+      // Assume field value at center of the tracker - not the tracker reference plane.
+      // Rotation requred as PattRec runs in the reference frame of the tracker.
+//      _field_value[tracker_n] = FieldValue( trackerPos, plane_rotation ); 
+
+      _field_value[tracker_n] = FieldValue( trackerModule ); 
+
+      std::cerr << "Tracker = " << tracker_n << ". Field = " << _field_value[tracker_n] << '\n';
     }
   }
 }
@@ -97,6 +102,42 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
   B_field *= plane_rotation;
   double Tracker_Bz = B_field.z();
   return Tracker_Bz;
+}
+
+double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
+//  Hep3Vector hepGlobalPos = trackerModule->globalPosition();
+  Hep3Vector globalPos = trackerModule->globalPosition();
+  Hep3Vector relativePos( 0., 0., 0.);
+  HepRotation trackerRotation = trackerModule->globalRotation();
+  double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
+  double position[4] = {0., 0., 0., 0.};
+  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
+  
+  Hep3Vector dims = trackerModule->dimensions();
+  double stepSize = 0.1; // mm
+  double halfLength = 0.5*dims[1];
+  double z_pos = - halfLength;
+  double sumBz = 0.0;
+  int numSteps = int( 2.0 * halfLength / stepSize );
+
+  do {
+    relativePos.setZ( z_pos );
+
+    Hep3Vector testPosition = ( trackerRotation*relativePos ) + globalPos;
+    position[0] = testPosition[0];
+    position[1] = testPosition[1];
+    position[2] = testPosition[2];
+    field->GetElectroMagneticField()->GetFieldValue(position, EMfield);
+
+    ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
+//    B_field *= trackerRotation;
+//    sumBz += B_field[2];
+    sumBz += EMfield[2];
+
+    z_pos += stepSize;
+  } while (z_pos < halfLength);
+
+  return sumBz / numSteps;
 }
 
 const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int plane) {

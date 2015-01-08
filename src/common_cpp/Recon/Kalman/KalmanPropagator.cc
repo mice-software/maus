@@ -305,7 +305,19 @@ void KalmanPropagator::UpdateBackTransportationMatrix(const KalmanState *optimum
   TMatrixD _F_transposed(_n_parameters, _n_parameters);
   _F_transposed.Transpose(_F);
 
+//  std::cerr << "*************************************\nC\n";
+//  C.Print();
+//  std::cerr << "\nFt\n";
+//  _F_transposed.Print();
+//  std::cerr << "Cp:\n";
+//  Cp.Print();
+//  std::cerr << "A:\n";
+
+
   _A = C*_F_transposed*Cp;
+
+//  _A.Print();
+//  std::cerr << "\n\n";
 }
 
 void KalmanPropagator::SmoothBack(const KalmanState *optimum_site,
