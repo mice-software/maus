@@ -32,6 +32,7 @@
 
 // External libs headers
 #include "TROOT.h"
+#include "TMatrixD.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
@@ -100,6 +101,20 @@ void PatternRecognition::set_parameters_to_default() {
 
 PatternRecognition::~PatternRecognition() {
   // Do nothing
+}
+
+TMatrixD PatternRecognition::combine_covariances(const TMatrixD& A, const TMatrixD& B) {
+  TMatrixD C(A.GetNrows() + B.GetNrows(), A.GetNcols() + B.GetNcols());
+  for (int i = 0; i < A.GetNrows(); ++i) {
+    for (int j = 0; j < A.GetNcols(); ++j) {
+      C(i, j) = A(i, j);
+    }
+  }
+  for (int i = A.GetNrows(); i < (A.GetNrows() + B.GetNrows()); ++i) {
+    for (int j = A.GetNcols(); j < (A.GetNcols() + B.GetNcols()); ++j) {
+      C(A.GetNrows() + i, A.GetNcols() + j) = B(i, j);
+    }
+  }
 }
 
 bool PatternRecognition::LoadGlobals() {
@@ -469,8 +484,12 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
         // Fit track
         SimpleLine line_x, line_y;
-        LeastSquaresFitter::linear_fit(z, x, x_err, line_x);
-        LeastSquaresFitter::linear_fit(z, y, y_err, line_y);
+        TMatrixD cov_x(2,2), cov_y(2,2);
+        LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
+        LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
+
+        // Squash the covariances of each fit into one matrix
+        TMatrixD covariance = combine_covariances(cov_x, cov_y);
 
         // Check track passes chisq test, then create SciFiStraightPRTrack
         if ( ( line_x.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) &&
@@ -478,7 +497,8 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
           if ( _verb > 0 )
             std::cout << "** chisq test passed, adding " << n_points << "pt track **\n";
-          SciFiStraightPRTrack* track = new SciFiStraightPRTrack(-1, n_points, line_x, line_y);
+          SciFiStraightPRTrack* track = new SciFiStraightPRTrack(-1, n_points, line_x, line_y,
+                                                                 covariance);
           if ( _verb > 0 ) {
             std::cout << "x0 = " << track->get_x0() << " mx = " << track->get_mx();
             std::cout << " y0 = " << track->get_y0() << " my = " << track->get_my() << "\n";
@@ -578,7 +598,9 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   // Perform a circle fit now that we have found a set of spacepoints
   SimpleCircle c_trial;
-  bool good_radius = LeastSquaresFitter::circle_fit(_sd_1to4, _sd_5, _R_res_cut, spnts, c_trial);
+  TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
+  bool good_radius = LeastSquaresFitter::circle_fit(_sd_1to4, _sd_5, _R_res_cut, spnts, c_trial,
+                                                    cov_circle);
 
   // If the radius calculated is too large or chisq fails, return NULL
   if ( !good_radius || !( c_trial.get_chisq() / ( n_points - 2 ) < _circle_chisq_cut ) ) {
@@ -588,13 +610,17 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   // Perform the s - z fit
   SimpleLine line_sz;
-  std::vector<double> phi_i; // to hold change between turning angles wrt first spacepoint
-  int handedness = 0;            // the particle track handedness
-  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, phi_i, line_sz, handedness);
+  std::vector<double> phi_i;  // The change between turning angles wrt first spacepoint
+  int handedness = 0;         // The particle track handedness
+  TMatrixD cov_sz(2, 2);      // The covariance matrix of the sz fit paramters c_sz, dsdz
+  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, phi_i, line_sz, cov_sz, handedness);
   if (!good_dsdz) {
     if ( _verb > 0 ) std::cerr << "dsdz fit failed, looping..." << std::endl;
     return NULL;
   }
+
+  // Squash the two covariances matrices from the fits into one
+  TMatrixD covariance = combine_covariances(cov_circle, cov_sz);
 
   // Set all the good sp to used and set the track seeds with them
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
@@ -625,13 +651,14 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   // Form the track and return it
   SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, n_points, charge, pos_0, phi_0, c_trial,
-                                                       line_sz, -1.0, -1.0, -1.0, phi_i, spnts);
+                                                       line_sz, -1.0, -1.0, -1.0, phi_i, spnts,
+                                                       covariance);
   return track;
 }
 
 bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts,
                                    const SimpleCircle &circle, std::vector<double> &phi_i,
-                                   SimpleLine &line_sz, int &handedness) {
+                                   SimpleLine &line_sz, TMatrixD& cov_sz, int &handedness) {
 
   if (_verb > 0) std::cout << "sz chi2 cut: " << _sz_chisq_cut << std::endl;
 
@@ -682,7 +709,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   }
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
-  LeastSquaresFitter::linear_fit(z_i, s_i, phi_err, line_sz);
+  LeastSquaresFitter::linear_fit(z_i, s_i, phi_err, line_sz, cov_sz);
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {

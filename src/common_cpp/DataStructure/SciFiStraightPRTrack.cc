@@ -19,6 +19,7 @@
 #include <vector>
 
 // ROOT headers
+#include "TMatrixD.h"
 #include "TRefArray.h"
 
 // MAUS headers
@@ -30,12 +31,13 @@ namespace MAUS {
 SciFiStraightPRTrack::SciFiStraightPRTrack() : _tracker(-1), _num_points(-1),
                                                _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                                _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
-  // Do nothing
+  _covariance.ResizeTo(4, 4); // Parameters: x0, mx, y0, my
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            double x0, double mx, double x_chisq,
-                                           double y0, double my, double y_chisq)
+                                           double y0, double my, double y_chisq,
+                                           const TMatrixD& covariance)
                                           : _tracker(-1), _num_points(-1),
                                             _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                             _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
@@ -47,10 +49,12 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
   _y0 = y0;
   _my = my;
   _y_chisq = y_chisq;
+  _covariance = covariance;
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
-                                           SimpleLine line_x, SimpleLine line_y)
+                                           SimpleLine line_x, SimpleLine line_y,
+                                           const TMatrixD& covariance)
                                           : _tracker(-1), _num_points(-1),
                                             _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                             _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
@@ -58,13 +62,12 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
   _x0 = line_x.get_c();
   _mx = line_x.get_m();
   _x_chisq = line_x.get_chisq();
-
   _y0 = line_y.get_c();
   _my = line_y.get_m();
   _y_chisq = line_y.get_chisq();
-
   _tracker = tracker;
   _num_points = num_points;
+  _covariance = covariance;
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &strk)
@@ -77,6 +80,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &strk)
                                             _my(strk.get_my()),
                                             _y_chisq(strk.get_y_chisq()) {
   _spoints = new TRefArray(*strk.get_spacepoints());
+  _covariance = strk.get_covariance();
 }
 
 // Destructor
@@ -96,6 +100,7 @@ SciFiStraightPRTrack &SciFiStraightPRTrack::operator=(const SciFiStraightPRTrack
     _my = strk.get_my();
     _y_chisq = strk.get_y_chisq();
     _spoints = new TRefArray(*(strk.get_spacepoints()));
+    _covariance = strk.get_covariance();
     return *this;
 }
 

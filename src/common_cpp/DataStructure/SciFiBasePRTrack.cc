@@ -20,7 +20,7 @@
 
 namespace MAUS {
 
-SciFiBasePRTrack::SciFiBasePRTrack() {
+SciFiBasePRTrack::SciFiBasePRTrack() : _covariance(0, 0) {
   _spoints = new TRefArray();
 }
 

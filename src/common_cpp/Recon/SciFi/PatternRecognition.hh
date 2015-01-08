@@ -63,6 +63,9 @@ class PatternRecognition {
     /** @brief Default destructor */
     ~PatternRecognition();
 
+    // Combine two covariance matrices into one (each matrix sits on the diagonal
+    TMatrixD combine_covariances(const TMatrixD& A, const TMatrixD& B);
+
     /** @brief Set the member variables using the Global singleton class */
     bool LoadGlobals();
 
@@ -175,7 +178,7 @@ class PatternRecognition {
      * @param line_sz - The output fitted line in s-z projection.
      */
     bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                   std::vector<double> &phi_i, SimpleLine &line_sz, int &handedness);
+                   std::vector<double> &phi_i, SimpleLine &line_sz, TMatrixD& cov_sz, int &handedness);
 
     /** @brief Find the number of 2pi rotations that occured between each station
      *

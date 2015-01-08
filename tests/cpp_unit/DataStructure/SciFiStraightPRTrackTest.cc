@@ -15,6 +15,8 @@
  *
  */
 
+#include "TMatrixD.h"
+
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 
@@ -40,10 +42,13 @@ TEST_F(SciFiStraightPRTrackTestDS, test_default_constructor) {
   EXPECT_EQ(prtrack.get_y_chisq(), -1.0);
   EXPECT_EQ(prtrack.get_tracker(), -1);
   EXPECT_EQ(prtrack.get_num_points(), -1);
+  EXPECT_EQ(prtrack.get_covariance().GetNrows(), 4);
+  EXPECT_EQ(prtrack.get_covariance().GetNcols(), 4);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_parameter_constructor) {
-  SciFiStraightPRTrack prtrack(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+  TMatrixD m1(0, 0);
+  SciFiStraightPRTrack prtrack(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, m1);
   EXPECT_EQ(prtrack.get_x0(), 1.0);
   EXPECT_EQ(prtrack.get_mx(), 2.0);
   EXPECT_EQ(prtrack.get_x_chisq(), 3.0);
@@ -52,17 +57,19 @@ TEST_F(SciFiStraightPRTrackTestDS, test_parameter_constructor) {
   EXPECT_EQ(prtrack.get_y_chisq(), 6.0);
   EXPECT_EQ(prtrack.get_tracker(), 0);
   EXPECT_EQ(prtrack.get_num_points(), 3);
+  EXPECT_TRUE(prtrack.get_covariance() == m1);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_simpleline_constructor) {
   SimpleLine lx, ly;
+  TMatrixD m1(0, 0);
   lx.set_c(1.0);
   lx.set_m(2.0);
   lx.set_chisq(3.0);
   ly.set_c(4.0);
   ly.set_m(5.0);
   ly.set_chisq(6.0);
-  SciFiStraightPRTrack prtrack(0, 3, lx, ly);
+  SciFiStraightPRTrack prtrack(0, 3, lx, ly, m1);
   EXPECT_EQ(prtrack.get_x0(), 1.0);
   EXPECT_EQ(prtrack.get_mx(), 2.0);
   EXPECT_EQ(prtrack.get_x_chisq(), 3.0);
@@ -71,10 +78,13 @@ TEST_F(SciFiStraightPRTrackTestDS, test_simpleline_constructor) {
   EXPECT_EQ(prtrack.get_y_chisq(), 6.0);
   EXPECT_EQ(prtrack.get_tracker(), 0);
   EXPECT_EQ(prtrack.get_num_points(), 3);
+  EXPECT_EQ(prtrack.get_covariance().GetNrows(), 0);
+  EXPECT_EQ(prtrack.get_covariance().GetNcols(), 0);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
-  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+  TMatrixD m1(0, 0);
+  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, m1);
 
   SciFiSpacePoint *spoint = new SciFiSpacePoint();
   spoint->set_tracker(1);
@@ -93,10 +103,12 @@ TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_tracker(), 0);
   EXPECT_EQ(trk2.get_num_points(), 3);
   EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
+  EXPECT_TRUE(trk2.get_covariance() == m1);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
-  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+  TMatrixD m1(0, 0);
+  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, m1);
 
   SciFiSpacePoint *spoint = new SciFiSpacePoint();
   spoint->set_tracker(1);
@@ -117,6 +129,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   EXPECT_EQ(trk2.get_tracker(), 0);
   EXPECT_EQ(trk2.get_num_points(), 3);
   EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
+  EXPECT_TRUE(trk2.get_covariance() == m1);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
@@ -134,6 +147,12 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   SciFiSpacePointPArray spoints;
   spoints.push_back(spoint);
 
+  TMatrixD m1(2, 2);
+  m1(0, 0) = 1.0;
+  m1(0, 1) = 2.0;
+  m1(1, 0) = 3.0;
+  m1(1, 1) = 4.0;
+
   SciFiStraightPRTrack prtrack;
 
   prtrack.set_x0(x0);
@@ -144,8 +163,8 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   prtrack.set_y_chisq(y_chisq);
   prtrack.set_tracker(tracker);
   prtrack.set_num_points(num_points);
-
   prtrack.set_spacepoints_pointers(spoints);
+  prtrack.set_covariance(m1);
 
   EXPECT_EQ(prtrack.get_x0(), x0);
   EXPECT_EQ(prtrack.get_mx(), mx);
@@ -155,8 +174,8 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   EXPECT_EQ(prtrack.get_y_chisq(), y_chisq);
   EXPECT_EQ(prtrack.get_tracker(), tracker);
   EXPECT_EQ(prtrack.get_num_points(), num_points);
-
   EXPECT_EQ(prtrack.get_spacepoints_pointers()[0]->get_tracker(), tracker);
+  EXPECT_TRUE(prtrack.get_covariance() == m1);
 }
 
 } // ~namespace MAUS

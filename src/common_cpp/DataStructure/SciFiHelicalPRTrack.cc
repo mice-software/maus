@@ -38,12 +38,14 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
                                               _pos0(-1.0, -1.0, -1.0),
                                               _phi(0) {
   _spoints = new TRefArray();
+  _covariance.ResizeTo(5, 5); // Parameters: alpha, beta, gamma, sz_c, dsdz
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
                                          double phi0, SimpleCircle circle, SimpleLine line_sz,
                                          double chisq, double chisq_dof, double point_spread,
-                                         DoubleArray phi, SciFiSpacePointPArray spoints) {
+                                         DoubleArray phi, SciFiSpacePointPArray spoints,
+                                         const TMatrixD& covariance) {
   _tracker = tracker;
   _num_points = num_points;
   _charge = charge;
@@ -64,6 +66,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge
     _spoints->Add(*sp);
   }
   _phi = phi;
+  _covariance = covariance;
 }
 
 // Destructor
@@ -94,6 +97,7 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   if (_spoints) delete _spoints;
   _spoints = new TRefArray(*(htrk.get_spacepoints()));
   _phi = htrk.get_phi();
+  _covariance = htrk.get_covariance();
   return *this;
 }
 
@@ -117,6 +121,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
 
     // Shallow copy the SpacePoints
     _spoints = new TRefArray(*(htrk.get_spacepoints()));
+
+    _covariance = htrk.get_covariance();
 }
 
 
