@@ -142,6 +142,10 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   double c  = CLHEP::c_light;
   // Charge guess should come from PR.
   _particle_charge = seed->get_charge();
+  // Downstream reconstruction goes in reverse.
+  if ( _tracker == 1 ) {
+    _Bz = -_Bz;
+  }
 
   double pt = _particle_charge*c*_Bz*r;
 

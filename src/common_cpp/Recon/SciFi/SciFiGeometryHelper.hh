@@ -87,6 +87,10 @@ class SciFiGeometryHelper {
    */
   double FieldValue(ThreeVector global_position, HepRotation plane_rotation);
 
+  /** @brief Finds the average on axis field value of a cylinder by calling the BTFieldConstructor.
+   */
+  double FieldValue(const MiceModule* trackerModule);
+
   SciFiGeometryMap GeometryMap() const { return _geometry_map; }
 
   double GetFieldValue(int tracker) const { return _field_value[tracker]; }

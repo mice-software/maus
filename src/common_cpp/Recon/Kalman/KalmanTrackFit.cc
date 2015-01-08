@@ -142,6 +142,9 @@ void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
 
   for ( size_t i = 0; i < numb_sites; ++i ) {
     KalmanState* site = sites.at(i);
+    TMatrix covariance_pre = site->covariance_matrix(KalmanState::Projected);
+    TMatrix covariance_fil = site->covariance_matrix(KalmanState::Filtered);
+    TMatrix covariance_smo = site->covariance_matrix(KalmanState::Smoothed);
     // Squeak::mout(Squeak::info)
     std::cerr
     << "=========================================="  << "\n"
@@ -151,20 +154,44 @@ void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
     << "Projection: " << (site->a(KalmanState::Projected))(0, 0) << " "
                       << (site->a(KalmanState::Projected))(1, 0) << " "
                       << (site->a(KalmanState::Projected))(2, 0) << " "
-                      << (site->a(KalmanState::Projected))(3, 0) << " "
-    << "Filtered: " << (site->a(KalmanState::Filtered))(0, 0) << " "
+                      << (site->a(KalmanState::Projected))(3, 0) << "\n"
+    << "Filtered: "   << (site->a(KalmanState::Filtered))(0, 0) << " "
                       << (site->a(KalmanState::Filtered))(1, 0) << " "
                       << (site->a(KalmanState::Filtered))(2, 0) << " "
                       << (site->a(KalmanState::Filtered))(3, 0) << "\n"
+    << "Smoothed: "   << (site->a(KalmanState::Smoothed))(0, 0) << " "
+                      << (site->a(KalmanState::Smoothed))(1, 0) << " "
+                      << (site->a(KalmanState::Smoothed))(2, 0) << " "
+                      << (site->a(KalmanState::Smoothed))(3, 0) << "\n"
     << "================Residuals================"   << "\n"
     << (site->residual(KalmanState::Projected))(0, 0)  << "\n"
     << (site->residual(KalmanState::Filtered))(0, 0)   << "\n"
     << (site->residual(KalmanState::Smoothed))(0, 0)   << "\n"
     << "=========================================="
-    << std::endl;
-    // site->covariance_matrix(KalmanState::Projected).Print();
-    // site->covariance_matrix(KalmanState::Filtered).Print();
-    // site->covariance_matrix(KalmanState::Smoothed).Print();
+    << "\nPredicted Covariance:\n";
+    int nrows = covariance_pre.GetNrows();
+    int ncols = covariance_pre.GetNcols();
+    for ( size_t j = 0; j < nrows; ++j ) {
+      for ( size_t k = 0; k < ncols; ++k ) {
+        std::cerr << covariance_pre( j, k ) << "   ";
+      }
+      std::cerr << '\n';
+    }
+    std::cerr << "\nFiltered Covariance:\n";
+    for ( size_t j = 0; j < nrows; ++j ) {
+      for ( size_t k = 0; k < ncols; ++k ) {
+        std::cerr << covariance_fil( j, k ) << "   ";
+      }
+      std::cerr << '\n';
+    }
+    std::cerr << "\nSmoothed Covariance:\n";
+    for ( size_t j = 0; j < nrows; ++j ) {
+      for ( size_t k = 0; k < ncols; ++k ) {
+        std::cerr << covariance_smo( j, k ) << "   ";
+      }
+      std::cerr << '\n';
+    }
+    std::cerr << "==========================================" << std::endl;
   }
 }
 
