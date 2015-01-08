@@ -146,6 +146,7 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   if ( _tracker == 1 ) {
     _Bz = -_Bz;
   }
+
   double pt = _particle_charge*c*_Bz*r;
 //  double pt = _particle_charge*1.199168*r;
 
