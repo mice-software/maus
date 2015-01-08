@@ -46,7 +46,7 @@ class CardsUploadTestCase(unittest.TestCase): # pylint: disable=R0904
         bi_super = cdb.BatchIterationSuperMouse(
                                               "http://preprodcdb.mice.rl.ac.uk")
         i = 0
-        for i in range(bi_hint, bi_hint+1000):
+        for i in range(bi_hint, bi_hint+10000):
             if bi_super.get_mc_datacards(i)['mc'] == 'null':
                 break # the bi number does not exist - we can set it
         print 'Found free row with batch iteration number', i

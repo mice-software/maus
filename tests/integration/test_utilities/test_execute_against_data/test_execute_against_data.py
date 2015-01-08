@@ -27,6 +27,7 @@ import subprocess
 import tarfile
 import time
 import ROOT
+import cdb
 import libMausCpp # pylint: disable=W0611
 
 RUN_NUMBER = "03541"
@@ -136,6 +137,14 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         Test script runs, the correct files are put in the tarball and the
         simulation and reconstruction have some data in them
         """
+        bi_super = cdb.BatchIterationSuperMouse(
+                                              "http://preprodcdb.mice.rl.ac.uk")
+        for bi_index in range(10000):
+            if bi_super.get_mc_datacards(bi_index)['mc'] == 'null':
+                break # the bi number does not exist - we can set it
+        print 'Found free row with batch iteration number', bi_index
+        bi_super.set_datacards(bi_index, "test data", "", "")
+
         if not get_data():
             print 'Error downloading file - abort test'
             return
@@ -145,7 +154,8 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
             os.path.join(os.environ["MAUS_ROOT_DIR"], "bin", "utilities",
                                                      "execute_against_data.py"),
             "--input-file", TEST_FILE,
-            "--test",]
+            "--test",
+            "--batch-iteration", str(bi_index)]
         proc = subprocess.Popen(args)
         proc.wait()
         self.assertEqual(proc.returncode, 0)
