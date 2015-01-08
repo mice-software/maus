@@ -140,6 +140,7 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         """
         bi_super = cdb.BatchIterationSuperMouse(
                                               "http://preprodcdb.mice.rl.ac.uk")
+        bi_index = 0
         for bi_index in range(10000):
             if bi_super.get_mc_datacards(bi_index)['mc'] == 'null':
                 break # the bi number does not exist - we can set it
@@ -148,7 +149,6 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
 
         if not get_data():
             raise RuntimeError('Error downloading file - abort test')
-            return
         here = os.getcwd()
         os.chdir(TEST_DIR)
         self.test_args.append(str(bi_index))
@@ -163,8 +163,8 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
             print '  Unpacking for testing'
             tar_out = tarfile.open(TEST_OUT, 'r:*')
             tar_out.extractall()
-            for file_name in [TEST_OUT, TEST_FILE, 'batch.log', 'download.log', \
-                       'reco.log', 'sim.log', RUN_NUMBER+'_recon.root', \
+            for file_name in [TEST_OUT, TEST_FILE, 'batch.log', 'download.log',
+                       'reco.log', 'sim.log', RUN_NUMBER+'_recon.root',
                        RUN_NUMBER+'_sim.root']:
                 self.assertTrue(os.path.isfile(file_name), file_name)
             self.__check_sim_file()
