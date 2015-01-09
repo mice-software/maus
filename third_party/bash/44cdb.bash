@@ -3,14 +3,17 @@
 
 #http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/download/head:/cdb1.0.0.0.tar.gz-20130212090645-5dg2axdjmtby60vz-1/cdb-1.0.0.0.tar.gz
 
-version=1.0.0.0
-unique_id=20130212090645-5dg2axdjmtby60vz-1
+version=1.1.2
+unique_id=20150106170046-pbqbtrp4s2ww6m6x-1
 directory=cdb-${version}
 filename=cdb-${version}.tar.gz
 filename_mash=cdb${version}.tar.gz-${unique_id}/${filename}
 # this url does not seem to work anymore - what? when?
 # url=http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/download/head:/${filename_mash}
-url=http://micewww.pp.rl.ac.uk/attachments/download/2180/cdb-${version}.tar.gz
+#url=http://micewww.pp.rl.ac.uk/attachments/download/2180/cdb-${version}.tar.gz
+# as of version 1.1.2 the tarballs are in Janusz's branch
+url=http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-python/download/head:/${filename_mash}
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
