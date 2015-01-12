@@ -117,7 +117,6 @@ TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   trk1.set_spacepoints_pointers(spoints);
 
   SciFiStraightPRTrack trk2;
-
   trk2 = trk1;
 
   EXPECT_EQ(trk2.get_x0(), 1.0);

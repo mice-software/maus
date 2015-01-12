@@ -31,13 +31,13 @@ namespace MAUS {
 SciFiStraightPRTrack::SciFiStraightPRTrack() : _tracker(-1), _num_points(-1),
                                                _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                                _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
-  _covariance.ResizeTo(4, 4); // Parameters: x0, mx, y0, my
+  // Do nothing
 }
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            double x0, double mx, double x_chisq,
                                            double y0, double my, double y_chisq,
-                                           const TMatrixD& covariance)
+                                           const DoubleArray& covariance)
                                           : _tracker(-1), _num_points(-1),
                                             _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                             _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
@@ -54,7 +54,7 @@ SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
 
 SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
                                            SimpleLine line_x, SimpleLine line_y,
-                                           const TMatrixD& covariance)
+                                           const DoubleArray& covariance)
                                           : _tracker(-1), _num_points(-1),
                                             _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
                                             _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {

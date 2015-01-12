@@ -24,7 +24,6 @@
 #include <vector>
 
 // ROOT headers
-#include "TMatrixD.h"
 #include "TRefArray.h"
 
 // MAUS headers
@@ -32,6 +31,8 @@
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
+
+typedef std::vector<double> DoubleArray;
 
 class SciFiBasePRTrack {
   public:
@@ -41,11 +42,11 @@ class SciFiBasePRTrack {
     /** Default destructor */
     virtual ~SciFiBasePRTrack();
 
-    /** Get the covariance matrix of the least square fit parameters */
-    TMatrixD get_covariance() const { return _covariance; }
+    /** Get the covariance matrix elements of the least square fit parameters */
+    std::vector<double> get_covariance() const { return _covariance; }
 
-    /** Set the covariance matrix of the least square fit parameters */
-    void set_covariance(const TMatrixD& covariance) { _covariance = covariance; }
+    /** Set the covariance matrix elements of the least square fit parameters */
+    void set_covariance(const std::vector<double>& covariance) { _covariance = covariance; }
 
     /** Get the vector holding pointers to the spacepoints used by the track */
     TRefArray* get_spacepoints() const { return _spoints; }
@@ -65,7 +66,7 @@ class SciFiBasePRTrack {
 
   protected:
     TRefArray* _spoints;
-    TMatrixD _covariance; // The covariance matrix derived from the fit
+    DoubleArray _covariance; // The covariance matrix derived from the fit
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };

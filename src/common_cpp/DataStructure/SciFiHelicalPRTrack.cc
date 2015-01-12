@@ -38,14 +38,13 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
                                               _pos0(-1.0, -1.0, -1.0),
                                               _phi(0) {
   _spoints = new TRefArray();
-  _covariance.ResizeTo(5, 5); // Parameters: alpha, beta, gamma, sz_c, dsdz
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
                                          double phi0, SimpleCircle circle, SimpleLine line_sz,
                                          double chisq, double chisq_dof, double point_spread,
                                          DoubleArray phi, SciFiSpacePointPArray spoints,
-                                         const TMatrixD& covariance) {
+                                         const DoubleArray& covariance) {
   _tracker = tracker;
   _num_points = num_points;
   _charge = charge;
