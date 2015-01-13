@@ -18,7 +18,7 @@
 /** @class ImportTOFRecon
  *  @author Celeste Pidcott, University of Warwick
  *  Imports the space points from the TOF detectors into
- *  the MAUS::recon::global format.  
+ *  the MAUS::recon::global format.
  */
 
 #ifndef _SRC_COMMON_CPP_RECON_GLOBAL_IMPORTTOFRECON_HH_
@@ -53,8 +53,8 @@ namespace global {
      *  @param global_event The Global Event, which will be changed
      */
     void process(const MAUS::TOFEvent &tof_event,
-		 MAUS::GlobalEvent* global_event,
-		 std::string mapper_name);
+     MAUS::GlobalEvent* global_event,
+     std::string mapper_name);
 
   private:
     /// Disallow copy constructor as unnecessary
@@ -64,15 +64,15 @@ namespace global {
     void operator=(const ImportTOFRecon);
 
     /**  @brief Add TOF space points to global event
-     *   
+     *
      *  @param tofEventSpacepoint  The reconstructed TOF Event
      *  @param global_event The Global Event, which will be changed
-     *  @param mapper_name 
+     *  @param mapper_name
      */
     void ImportTOFSpacePoints(
-			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
-			      MAUS::GlobalEvent* global_event,
-			      std::string mapper_name);
+            const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+            MAUS::GlobalEvent* global_event,
+            std::string mapper_name);
   }; // ~class ImportTOFRecon
 } // ~namespace global
 } // ~namespace recon
