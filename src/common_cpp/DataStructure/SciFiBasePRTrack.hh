@@ -66,6 +66,15 @@ class SciFiBasePRTrack {
 
   protected:
     TRefArray* _spoints;
+
+    /**
+     *  Vector of covariances from the least squared fits.
+     *  In the helical track case these are the covariances of:
+     *  alpha-alpha, alpha-beta, alpha-gamma, beta-alpha, beta-beta, beta-gamma,
+     *  gamma-alpha, gamma-beta, gamma-gamma, c_sz-c_sz, c_sz-m_sz, m_sz-c_sz, m_sz-m_sz.
+     *  In the straight track case these are the covariances of:
+     *  c_x-c_x, c_x-m_x, m_x-c_x, m_x-m_x, c_y-c_y, c_y-m_y, m_y-c_y, m_y-m_y.
+     */
     DoubleArray _covariance; // The covariance matrix derived from the fit
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
