@@ -175,6 +175,7 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
     SciFiTrackPointPArray trackpoints = tracks[i]->scifitrackpoints();
     for ( unsigned int j = 0; j < trackpoints.size(); ++j )
     {
+//      std::cerr << "Plane, Station, Tracker = " << trackpoints[j]->plane() << ", " << trackpoints[j]->station() << ", " << trackpoints[j]->tracker() << '\n';
       std::cerr << "Track Point = " << trackpoints[j]->pos()[0] << ", " << trackpoints[j]->pos()[1] << ", " << trackpoints[j]->pos()[2] << '\n';
     }
   }
