@@ -38,10 +38,12 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
 
     /** Constructor using explicit parameters */
     SciFiStraightPRTrack(int tracker, int num_points, double x0, double mx, double x_chisq,
-                         double y0, double my, double y_chisq);
+                         double y0, double my, double y_chisq,
+                         const DoubleArray& covariance);
 
     /** Constructor using SimpleLines */
-    SciFiStraightPRTrack(int tracker, int num_points, SimpleLine line_x, SimpleLine line_y);
+    SciFiStraightPRTrack(int tracker, int num_points, SimpleLine line_x, SimpleLine line_y,
+                         const DoubleArray& covariance);
 
     /** Copy constructor */
     SciFiStraightPRTrack(const SciFiStraightPRTrack &_strk);
