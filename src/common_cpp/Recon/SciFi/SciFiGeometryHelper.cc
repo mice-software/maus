@@ -87,7 +87,7 @@ void SciFiGeometryHelper::Build() {
 
       _field_value[tracker_n] = FieldValue( trackerModule ); 
 
-      std::cerr << "Tracker = " << tracker_n << ". Field = " << _field_value[tracker_n] << '\n';
+//      std::cerr << "Tracker = " << tracker_n << ". Field = " << _field_value[tracker_n] << '\n';
     }
   }
 }

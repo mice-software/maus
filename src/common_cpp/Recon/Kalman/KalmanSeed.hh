@@ -106,7 +106,7 @@ class KalmanSeed {
 
   void SetKalmanStates(KalmanStatesPArray sites) { _kalman_sites = sites; }
 
-  void SetField(double bz) { _Bz = fabs(bz); }
+  void SetField(double bz) { _Bz = bz; }
 
   double GetField() const { return _Bz; }
 
