@@ -86,7 +86,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   _covariance = covariance;
   std::vector<double> errors(size);
   for ( int i = 0; i < size; ++i ) {
-    errors[i] = std::sqrt(fabs(C(i,i)));
+    errors[i] = std::sqrt(fabs(C(i, i)));
   }
   _errors = errors;
 

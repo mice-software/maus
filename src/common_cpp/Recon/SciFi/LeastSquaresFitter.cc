@@ -16,8 +16,7 @@
  */
 
 // C headers
-#include <CLHEP/Matrix/Matrix.h>
-#include <CLHEP/Units/PhysicalConstants.h>
+#include "TMatrixD.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
@@ -27,52 +26,55 @@
 namespace LeastSquaresFitter {
 
 void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
-                const std::vector<double> &_y_err, MAUS::SimpleLine &line) {
+                const std::vector<double> &_y_err, MAUS::SimpleLine &line, TMatrixD& covariance) {
 
-  int n_points = static_cast<int>(_x.size());
-
-  CLHEP::HepMatrix A(n_points, 2); // rows, columns
-  CLHEP::HepMatrix V(n_points, n_points); // error matrix
-  CLHEP::HepMatrix Y(n_points, 1); // measurements
+  // Set up the matrices
+  int n_points = static_cast<int>(_x.size());  // Number of measurements
+  TMatrixD A(n_points, 2);                     // Represents the functional form; rows, columns
+  TMatrixD V_m(n_points, n_points);            // Covariance matrix of measurements
+  TMatrixD Y(n_points, 1);                     // Measurements
 
   for ( int i = 0; i < static_cast<int>(_x.size()); ++i ) {
-    // std::cout <<"( " << _x[i] << "," << _y[i] << " )" << std::endl;
     A[i][0] = 1;
     A[i][1] = _x[i];
-    V[i][i] = ( _y_err[i] * _y_err[i] );
+    V_m[i][i] = ( _y_err[i] * _y_err[i] );
     Y[i][0] = _y[i];
   }
 
-  CLHEP::HepMatrix At, tmpy, yparams;
+  // Perform the inversions and multiplications which make up the least squares fit
+  double* det = NULL;                   // To hold the determinant
+  V_m.Invert(det);                      // Invert in place
+  TMatrixD At(A);                       // Copy A to At
+  At.T();                               // Transpose At (leaving A unchanged)
+  TMatrixD V_p(At * V_m * A);           // The covariance matrix of the parameters of model (inv)
+  V_p.Invert(det);                      // Invert in place
+  covariance = V_p;
+  TMatrixD P(V_p * At * V_m * Y);       // The least sqaures estimate of the parameters
 
-  int ierr;
-  V.invert(ierr);
-  At = A.T();
+  // Extract the fit parameters
+  line.set_c(P[0][0]);
+  line.set_m(P[1][0]);
+  line.set_c_err(sqrt(V_p[0][0]));
+  line.set_m_err(sqrt(V_p[1][1]));
 
-  tmpy = At * V * A;
-  tmpy.invert(ierr);
-  yparams = tmpy * At * V * Y;
-
-  line.set_c(yparams[0][0]);
-  line.set_m(yparams[1][0]);
-  line.set_c_err(sqrt(tmpy[0][0]));
-  line.set_m_err(sqrt(tmpy[1][1]));
-
-  CLHEP::HepMatrix C, result;
-
-  C = Y - (A * yparams);
-  result = C.T() * V * C;
+  // Calculate the fit chisq
+  TMatrixD C(Y - (A * P));
+  TMatrixD Ct(C);
+  Ct.T();
+  TMatrixD result(Ct * V_m * C);
   line.set_chisq(result[0][0]);
   line.set_chisq_dof(result[0][0] / n_points);
 } // ~linear_fit(...)
 
 bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
-                const std::vector<MAUS::SciFiSpacePoint*> &spnts, MAUS::SimpleCircle &circle) {
+                const std::vector<MAUS::SciFiSpacePoint*> &spnts, MAUS::SimpleCircle &circle,
+                TMatrixD& covariance) {
 
-  int n_points = static_cast<int>(spnts.size());
-  CLHEP::HepMatrix A(n_points, 3); // rows, columns
-  CLHEP::HepMatrix V(n_points, n_points); // error matrix
-  CLHEP::HepMatrix K(n_points, 1);
+  // Set up the matrices
+  int n_points = static_cast<int>(spnts.size()); // Number of measurements
+  TMatrixD A(n_points, 3);                       // Represents the functional form; rows, columns
+  TMatrixD V_m(n_points, n_points);              // Covariance matrix of measurements
+  TMatrixD K(n_points, 1);                       // Vector of 1s, represents kappa in circle formula
 
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
     // This part will change once I figure out proper errors
@@ -89,23 +91,25 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
     A[i][1] = x_i;
     A[i][2] = y_i;
 
-    V[i][i] = ( sd * sd );
+    V_m[i][i] = ( sd * sd );
     K[i][0] = 1.;
   }
 
-  CLHEP::HepMatrix At, tmpx, tmp_params;
-  int ierr;
-  V.invert(ierr);
-  At = A.T();
-  tmpx = At * V * A;
-  tmpx.invert(ierr);
-  tmp_params = tmpx * At * V * K;
+  // Perform the inversions and multiplications which make up the least squares fit
+  double* det = NULL;              // To hold the determinant after inversions
+  V_m.Invert(det);                 // Invert the measurement covariance matrix in place
+  TMatrixD At(A);                  // Create a copy of A
+  At.T();                          // Transpose At (leaving A unchanged)
+  TMatrixD V_p(At * V_m * A);      // The covariance matrix of the parameters of model (inv)
+  V_p.Invert(det);                 // Invert in place
+  covariance = V_p;
+  TMatrixD P(V_p * At * V_m * K);  // The least sqaures estimate of the parameters
 
-  // These values will be used for delta_R calculation
+  // Extract the fit parameters
   double alpha, beta, gamma;
-  alpha = tmp_params[0][0];
-  beta = tmp_params[1][0];
-  gamma = tmp_params[2][0];
+  alpha = P[0][0];
+  beta = P[1][0];
+  gamma = P[2][0];
 
   // Convert the linear parameters into the circle center and radius
   double x0, y0, R;
@@ -129,12 +133,13 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
   circle.set_beta(beta);
   circle.set_gamma(gamma);
 
-  CLHEP::HepMatrix C, result;
-
-  C = K - (A * tmp_params);
-  result = C.T() * V * C;
+  // Calculate the fit chisq
+  TMatrixD C(K - (A * P));
+  TMatrixD Ct(C);
+  Ct.T();
+  TMatrixD result(Ct * V_m * C);
   double chi2 = result[0][0];
-  circle.set_chisq(chi2); // should I leave this un-reduced?
+  circle.set_chisq(chi2);       // Left unreduced (not dividing by NDF)
   return true;
 } // ~circle_fit(...)
 

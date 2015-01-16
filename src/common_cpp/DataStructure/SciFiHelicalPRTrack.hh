@@ -40,8 +40,6 @@
 
 namespace MAUS {
 
-typedef std::vector<double> DoubleArray;
-
 class SciFiHelicalPRTrack : public SciFiBasePRTrack {
   public:
 
@@ -51,7 +49,8 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Constructor from SimpleCircle and SimpleLine */
     SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
                         SimpleCircle circle, SimpleLine line_sz, double chisq, double chisq_dof,
-                        double point_spread, DoubleArray phi, SciFiSpacePointPArray spoints);
+                        double point_spread, DoubleArray phi, SciFiSpacePointPArray spoints,
+                        const DoubleArray& covariance);
 
     /** Copy constructor - any pointers are deep copied */
     SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);
@@ -180,7 +179,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     double _point_spread;
 
     ThreeVector _pos0; // Intercept of helix with tracker reference surface, not used at present
-
     DoubleArray _phi;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
