@@ -103,20 +103,6 @@ PatternRecognition::~PatternRecognition() {
   // Do nothing
 }
 
-TMatrixD PatternRecognition::combine_covariances(const TMatrixD& A, const TMatrixD& B) {
-  TMatrixD C(A.GetNrows() + B.GetNrows(), A.GetNcols() + B.GetNcols());
-  for (int i = 0; i < A.GetNrows(); ++i) {
-    for (int j = 0; j < A.GetNcols(); ++j) {
-      C(i, j) = A(i, j);
-    }
-  }
-  for (int i = A.GetNrows(); i < (A.GetNrows() + B.GetNrows()); ++i) {
-    for (int j = A.GetNcols(); j < (A.GetNcols() + B.GetNcols()); ++j) {
-      C(A.GetNrows() + i, A.GetNcols() + j) = B(i, j);
-    }
-  }
-}
-
 bool PatternRecognition::LoadGlobals() {
   if (Globals::HasInstance()) {
     Json::Value *json = Globals::GetConfigurationCards();
@@ -484,7 +470,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
         // Fit track
         SimpleLine line_x, line_y;
-        TMatrixD cov_x(2,2), cov_y(2,2);
+        TMatrixD cov_x(2, 2), cov_y(2, 2);
         LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
         LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
 

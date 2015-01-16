@@ -46,9 +46,9 @@ void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
   V_m.Invert(det);                      // Invert in place
   TMatrixD At(A);                       // Copy A to At
   At.T();                               // Transpose At (leaving A unchanged)
-  TMatrixD V_p(At * V_m * A);           // The covariance matrix of the parameters of the model
-  covariance = V_p;
+  TMatrixD V_p(At * V_m * A);           // The covariance matrix of the parameters of model (inv)
   V_p.Invert(det);                      // Invert in place
+  covariance = V_p;
   TMatrixD P(V_p * At * V_m * Y);       // The least sqaures estimate of the parameters
 
   // Extract the fit parameters
@@ -100,9 +100,9 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
   V_m.Invert(det);                 // Invert the measurement covariance matrix in place
   TMatrixD At(A);                  // Create a copy of A
   At.T();                          // Transpose At (leaving A unchanged)
-  TMatrixD V_p(At * V_m * A);      // The covariance matrix of the parameters of the model
-  covariance = V_p;
+  TMatrixD V_p(At * V_m * A);      // The covariance matrix of the parameters of model (inv)
   V_p.Invert(det);                 // Invert in place
+  covariance = V_p;
   TMatrixD P(V_p * At * V_m * K);  // The least sqaures estimate of the parameters
 
   // Extract the fit parameters

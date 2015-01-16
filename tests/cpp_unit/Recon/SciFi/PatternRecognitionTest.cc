@@ -1112,7 +1112,8 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   spnts.push_back(sp5);
 
   SimpleCircle circle;
-  bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle);
+  TMatrixD cov;
+  bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle, cov);
 
   double epsilon = 0.01;
 
@@ -1127,7 +1128,8 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   int n_points = 5;
   int charge = 0;
 
-  pr.find_dsdz(n_points, spnts, circle, dphi, line_sz, charge);
+  TMatrixD cov_sz;
+  pr.find_dsdz(n_points, spnts, circle, dphi, line_sz, cov_sz, charge);
 
   ASSERT_EQ(charge, 1);
   EXPECT_NEAR(line_sz.get_c(), 15.47, epsilon);
