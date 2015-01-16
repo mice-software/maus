@@ -80,6 +80,14 @@ class KalmanSeed {
   TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                      const SciFiSpacePointPArray &spacepoints);
 
+  /** @brief Computes the initial covariance matrix for helical track.
+   */
+  TMatrixD ComputeInitialCovariance(const SciFiHelicalPRTrack* seed);
+
+  /** @brief Computes the initial covariance matrix for straight track.
+   */
+  TMatrixD ComputeInitialCovariance(const SciFiStraightPRTrack* seed);
+
   /** @brief Fills the _clusters member.
    */
   void RetrieveClusters(SciFiSpacePointPArray &spacepoints);
@@ -135,6 +143,8 @@ class KalmanSeed {
    */
   double _seed_cov;
 
+  TMatrixD _full_covariance;
+
   double _pos_resolution;
 
   SciFiGeometryMap _geometry_map;
@@ -167,10 +177,12 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
   _tracker = pr_track->get_tracker();
 
   _a0.ResizeTo(_n_parameters, 1);
+  _full_covariance.ResizeTo(_n_parameters, _n_parameters);
 
   SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints_pointers();
   RetrieveClusters(spacepoints);
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
+  _full_covariance = ComputeInitialCovariance(pr_track);
   BuildKalmanStates();
 }
 

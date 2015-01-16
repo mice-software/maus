@@ -125,13 +125,8 @@ void KalmanSeed::BuildKalmanStates() {
   }
   //
   // Set up first state and its covariance.
-  TMatrixD C(_n_parameters, _n_parameters);
-  C.Zero();
-  for ( int i = 0; i < _n_parameters; ++i ) {
-    C(i, i) = _seed_cov;
-  }
   _kalman_sites[0]->set_a(_a0, KalmanState::Projected);
-  _kalman_sites[0]->set_covariance_matrix(C, KalmanState::Projected);
+  _kalman_sites[0]->set_covariance_matrix(_full_covariance, KalmanState::Projected);
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
@@ -221,6 +216,56 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
 
   std::sort(_clusters.begin(), _clusters.end(), SortByZ<SciFiCluster>);
   std::sort(spacepoints.begin(), spacepoints.end(), SortByZ<SciFiSpacePoint>);
+}
+
+TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiHelicalPRTrack* seed) {
+  TMatrixD covariance(_n_parameters, _n_parameters);
+  for ( int i = 0; i < _n_parameters; ++i ) {
+    covariance(i, i) = _seed_cov;
+  }
+  return covariance;
+}
+
+TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiStraightPRTrack* seed) {
+//  _full_covariance.Zero();
+//  for ( int i = 0; i < _n_parameters; ++i ) {
+//    _full_covariance(i, i) = _seed_cov;
+//  }
+  std::vector<double> cov = seed->get_covariance();
+  TMatrixD patrec_covariance( _n_parameters, _n_parameters );
+  TMatrixD covariance( _n_parameters, _n_parameters );
+
+  TMatrixD jacobian( _n_parameters, _n_parameters );
+  jacobian(0,0) = 1.0;
+  jacobian(1,2) = 1.0;
+  jacobian(2,1) = 1.0;
+  jacobian(3,3) = 1.0;
+  jacobian(0,2) = 1100.0;
+  jacobian(2,3) = 1100.0;
+
+  TMatrixD jacobianT(_n_parameters, _n_parameters);
+  jacobianT.Transpose( jacobian );
+
+  std::cerr << "COV SIZE = " << cov.size() << std::endl;
+
+  if ( cov.size() != _n_parameters*_n_parameters ) {
+    throw MAUS::Exception( MAUS::Exception::recoverable, 
+                          "Dimension of covariance matrix doesn not match the state vector",
+                          "KalmanSeed::ComputeInitalCovariance");
+  }
+
+  for ( size_t i = 0; i < _n_parameters; ++i ) {
+    for ( size_t j = 0; j < _n_parameters; ++j ) {
+      patrec_covariance(i,j) = cov.at( i*_n_parameters + j );
+    }
+  }
+
+  covariance = jacobian*patrec_covariance*jacobianT;
+
+  patrec_covariance.Print();
+  covariance.Print();
+
+  return covariance;
 }
 
 } // ~namespace MAUS
