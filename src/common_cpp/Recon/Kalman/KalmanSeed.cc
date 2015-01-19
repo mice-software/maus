@@ -223,6 +223,46 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiHelicalPRTrack* seed) {
   for ( int i = 0; i < _n_parameters; ++i ) {
     covariance(i, i) = _seed_cov;
   }
+  std::vector<double> cov = seed->get_covariance();
+  TMatrixD patrec_covariance( _n_parameters, _n_parameters );
+//  TMatrixD covariance( _n_parameters, _n_parameters );
+
+  TMatrixD jacobian( _n_parameters, _n_parameters );
+  jacobian(0,0) = 1.0;
+  jacobian(1,1) = 1.0;
+  jacobian(2,2) = 1.0;
+  jacobian(3,3) = 1.0;
+  jacobian(4,4) = 1.0;
+
+  TMatrixD jacobianT(_n_parameters, _n_parameters);
+  jacobianT.Transpose( jacobian );
+
+  std::cerr << "COV SIZE = " << cov.size() << std::endl;
+
+  for ( size_t i = 0 ; i < cov.size(); ++i ) {
+    std::cerr << cov.at( i ) << ' ';
+  }
+  std::cerr << std::flush;
+
+  if ( cov.size() != _n_parameters*_n_parameters ) {
+    throw MAUS::Exception( MAUS::Exception::recoverable, 
+                          "Dimension of covariance matrix does not match the state vector",
+                          "KalmanSeed::ComputeInitalCovariance(Helical)");
+  }
+
+  for ( int i = 0; i < _n_parameters; ++i ) {
+    for ( int j = 0; j < _n_parameters; ++j ) {
+      patrec_covariance(i,j) = cov.at( i*_n_parameters + j );
+    }
+  }
+
+//  covariance = jacobian*patrec_covariance*jacobianT;
+
+  patrec_covariance.Print();
+  covariance.Print();
+
+  return covariance;
+
   return covariance;
 }
 
@@ -248,14 +288,19 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiStraightPRTrack* seed) 
 
   std::cerr << "COV SIZE = " << cov.size() << std::endl;
 
+  for ( size_t i = 0 ; i < cov.size(); ++i ) {
+    std::cerr << cov.at( i ) << ' ';
+  }
+  std::cerr << std::flush;
+
   if ( cov.size() != _n_parameters*_n_parameters ) {
     throw MAUS::Exception( MAUS::Exception::recoverable, 
-                          "Dimension of covariance matrix doesn not match the state vector",
-                          "KalmanSeed::ComputeInitalCovariance");
+                          "Dimension of covariance matrix does not match the state vector",
+                          "KalmanSeed::ComputeInitalCovariance(Straight)");
   }
 
-  for ( size_t i = 0; i < _n_parameters; ++i ) {
-    for ( size_t j = 0; j < _n_parameters; ++j ) {
+  for ( int i = 0; i < _n_parameters; ++i ) {
+    for ( int j = 0; j < _n_parameters; ++j ) {
       patrec_covariance(i,j) = cov.at( i*_n_parameters + j );
     }
   }
