@@ -65,7 +65,6 @@ import sys
 import os
 import subprocess
 import shutil
-import shlex
 import time
 from time import sleep
 import cdb
@@ -369,7 +368,7 @@ class RunSettings: #pylint: disable = R0902
         @returns a file name as a string
         """
         
-        index = file_index.split('/')[-1]
+        index = os.path.basename(file_index)
         index = os.path.join(os.getcwd(), index)
         if os.path.exists(index):
             os.remove(index)
@@ -377,15 +376,14 @@ class RunSettings: #pylint: disable = R0902
         n_max_tries = 5
         retries = 0
         
-        index_command = 'wget '+file_index
-        args = shlex.split(index_command)
+        args = ['wget', file_index]
         while (retries < n_max_tries):
             proc = subprocess.Popen(args, stdout=subprocess.PIPE, \
                                     stderr=subprocess.PIPE)
             (stdout, stderr) = proc.communicate()
             print stderr
             if not os.path.exists(index):
-                retries +=1
+                retries += 1
                 sleep(0.5)
                 continue
             break
@@ -397,34 +395,29 @@ class RunSettings: #pylint: disable = R0902
         target_entry = ''
         for entry in list:
             if int(run_number) == i:
-                entry.rstrip('/n')
-                target_entry = entry
+                # need to remove the trailing carriage return
+                target_entry = entry[:-1]
                 break
             else:
                 i += 1
         # default is a grid based copy
-        interface_download = 'lcg-cp --checksum '
+        args = ['lcg-cp', '--checksum']
         # file names on the grid are arbitrary so make
         # it something logical for the local copy
         file_name = "jsondoc_"+str(run_number)+".txt"
-        
         if target_entry.find("http") >= 0:
             # use a wget algorithm instead
-            interface_download = 'wget '
+            args = ['wget']
             # use the file name from the list for the
             # local copy
-            file_name = target_entry.split('/')[-1]
-            if file_name.endswith('\n'):
-                file_name = file_name[:-1]
+            file_name = os.path.basename(target_entry)
             # build the download command and split it
             # for the Popen command
-            interface_download += target_entry
-            args = shlex.split(interface_download)
+            args.append(target_entry)
             file_name = os.path.join(os.getcwd(), file_name)
             print args
         else:
-            interface_download += target_entry
-            args = shlex.split(interface_download)
+            args.append(target_entry)
             file_name = os.path.join(os.getcwd(), file_name)
             args.append('file:/'+file_name)
         
@@ -432,7 +425,7 @@ class RunSettings: #pylint: disable = R0902
             os.remove(file_name)
         retries = 0
         while (retries < n_max_tries):
-            proc = subprocess.Popen(args, stdout=subprocess.PIPE,\
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE, \
                                     stderr=subprocess.PIPE)
             (stdout, stderr) = proc.communicate()
             print stdout, stderr
