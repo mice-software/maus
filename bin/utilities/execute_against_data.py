@@ -65,6 +65,8 @@ import glob
 import os
 import subprocess
 import shutil
+import cdb
+import time
 
 def arg_parser():
     """
@@ -83,9 +85,9 @@ def arg_parser():
     parser.add_argument('--no-test', dest='test_mode', \
                         help="Don't run the batch job using test cdb output",
                         action='store_false', default=False)
-    parser.add_argument('--batch-iteration', dest='batch_iteration', type=str,
+    parser.add_argument('--batch-iteration', dest='batch_iteration', type=int,
                         help='Batch iteration number for configuration DB',
-                        default='')
+                        default=0)
     return parser
 
 class DownloadError(Exception):
@@ -149,9 +151,10 @@ class RunManager:
             print 'Error - run not valid'
             return 1
         self.setup()
+        self.download_cards()
         self.download_geometry()
-        self.execute_simulation()
         self.execute_reconstruction()
+        self.execute_simulation()
 
     def check_valid(self): # pylint: disable = R0201
         """
@@ -196,7 +199,46 @@ class RunManager:
         for item in clean_target:
             if item[-3:] != 'tar':
                 os.remove(item)
-      
+
+    def download_cards(self):
+        """
+        Downloads the datacards from the configuration database
+        
+        If running in test mode, uses legacy Stage4 geometry instead.
+
+        @raises DownloadError on failure
+        """
+        print 'Getting cards'
+        bi_number = self.run_setup.batch_iteration
+        for i in range(5):
+            try:
+                print "    Contacting CDB"
+                if self.run_setup.test_mode:
+                    bi_service = cdb.BatchIteration(
+                                              "http://preprodcdb.mice.rl.ac.uk")
+                else:
+                    bi_service = cdb.BatchIteration()
+                print "    Found, accessing cards"
+                mc_cards = bi_service.get_mc_datacards(bi_number)['mc']
+                if mc_cards == 'null':
+                    raise DownloadError(
+                       "No MC cards for batch iteration number "+str(bi_number))
+                mc_out = open(self.run_setup.sim_cards, 'w')
+                mc_out.write(mc_cards)
+                reco_cards = bi_service.get_reco_datacards(bi_number)['reco']
+                if reco_cards == 'null':
+                    raise DownloadError(
+                       "No MC cards for batch iteration number "+str(bi_number))
+                reco_out = open(self.run_setup.reco_cards, 'w')
+                reco_out.write(reco_cards)
+                return
+            except cdb.CdbTemporaryError:
+                print "CDB lookup failed on attempt", i+1
+                time.sleep(1)
+            except cdb.CdbPermanentError:
+                raise DownloadError("Failed to download cards - CDB not found")
+        raise DownloadError("Failed to download cards after 5 attempts")
+
     def download_geometry(self):
         """
         Downloads the geometry from the configuration database
@@ -239,6 +281,8 @@ class RunManager:
         proc = subprocess.Popen(simulation, stdout=self.logs.sim_log, \
                                                        stderr=subprocess.STDOUT)
         proc.wait()
+        if proc.returncode != 0:
+            raise MausError("MAUS simulation returned "+str(proc.returncode))
         self.logs.tar_queue.append(self.run_setup.mc_file_name)
 
     def execute_reconstruction(self):
@@ -255,6 +299,8 @@ class RunManager:
         proc = subprocess.Popen(reconstruction, stdout=self.logs.rec_log, \
                                                        stderr=subprocess.STDOUT)
         proc.wait()
+        if proc.returncode != 0:
+            raise MausError("MAUS simulation returned "+str(proc.returncode))
         self.logs.tar_queue.append(self.run_setup.recon_file_name)
 
     def __del__(self):
@@ -286,7 +332,7 @@ class RunSettings: #pylint: disable = R0902
         All other file names etc are then built off that
         """
         self.input_file_name = args_in.input_file
-        self.test_mode = args_in.test_mode    
+        self.test_mode = args_in.test_mode
         self.batch_iteration = args_in.batch_iteration
         self.run_number = self.get_run_number_from_file_name \
                                                           (self.input_file_name)
@@ -296,6 +342,8 @@ class RunSettings: #pylint: disable = R0902
         self.mc_file_name = self.run_number_as_string+"_sim.root"
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = 'downloads'
+        self.reco_cards = 'reco.cards'
+        self.sim_cards = 'sim.cards'
 
     def get_run_number_from_file_name(self, file_name): #pylint: disable = R0201
         """
@@ -308,6 +356,7 @@ class RunSettings: #pylint: disable = R0902
 
         @returns run number as an int
         """
+        file_name = os.path.basename(file_name)
         file_name.lstrip('0')
         file_name = file_name.split('.')[0]
         run_number = int(file_name)
@@ -327,6 +376,7 @@ class RunSettings: #pylint: disable = R0902
             '-output_root_file_name', self.mc_file_name,
             '-verbose_level', '0',
             '-will_do_stack_trace', 'False',
+            '-configuration_file', self.sim_cards,
         ]
     
     def get_reconstruction_parameters(self):
@@ -346,6 +396,7 @@ class RunSettings: #pylint: disable = R0902
             '-daq_data_path', './',
             '-verbose_level', '0',
             '-will_do_stack_trace', 'False',
+            '-configuration_file', self.reco_cards,
         ]
 
     def get_download_parameters(self):
@@ -462,6 +513,7 @@ def main(argv):
     # download errors are considered transient - i.e. try again later
     except DownloadError:
         my_return_value = 1
+        sys.excepthook(*sys.exc_info())       
     # some failure in the reconstruction algorithms - needs investigation
     except MausError:
         my_return_value = 2
