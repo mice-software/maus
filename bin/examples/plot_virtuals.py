@@ -2,7 +2,9 @@
 
 
 """
-An attempt at extracting information from the special virtual planes
+R. Bayes
+
+An example of extracting information from the special virtual planes
 """
 
 # pylint: disable = E1101, C0103, C0301, W0611
