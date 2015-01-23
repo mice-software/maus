@@ -27,7 +27,7 @@ def main(args):
         ./plot_virtuals.py <leading file name> <first index> <last index>
 
         """
-        
+        return 0
 
     Bfield = []
     zpos   = []
