@@ -8,27 +8,29 @@ An example of extracting information from the special virtual planes
 """
 
 # pylint: disable = E1101, C0103, C0301, W0611
-
+import os
 import sys
 import ROOT
 import math
-
+import subprocess
 import libMausCpp
+
+def generate_simulation(outfile):
+    """
+    Run the simulation to make a data file for consideration
+    """
+    analysis = os.path.join\
+               (os.environ["MAUS_ROOT_DIR"],"bin","simulate_mice.py")
+    proc = subprocess.Popen(['python', analysis,\
+                             '--output_root_file_name', outfile,
+                             '--simulation_geometry_file', 'Stage4.dat'])
+    proc.wait()
 
 def main(args):
 
     """ extract information from the special virtual planes
     from the maus_output.root file in the current directory """
     
-    if len(args) != 3:
-        print """
-        plot_virtuals.py requires three arguments:
-
-        ./plot_virtuals.py <leading file name> <first index> <last index>
-
-        """
-        return 0
-
     Bfield = []
     zpos   = []
     h = ROOT.TH1D("hrate", \
@@ -51,9 +53,9 @@ def main(args):
                     240,0,24,100,0, 0.5)
     maxsize = -999
 
-    for fp in range(int(args[1]), int(args[2])):
+    for fp in args:
         
-        file = ROOT.TFile(str(args[0])+str(fp)+".root","R")
+        file = ROOT.TFile(str(fp),"R")
         if file.IsZombie():
             continue
         data = ROOT.MAUS.Data()
@@ -61,7 +63,7 @@ def main(args):
         if not tree:
             continue
         tree.SetBranchAddress("data", data) 
-        print "Evaluating maus_output_"+str(fp)+".root"
+        print "Evaluating "+str(fp)
         for i in range(tree.GetEntries()):
             tree.GetEntry(i)
             spill = data.GetSpill()
@@ -187,6 +189,12 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
-    
+    if len(sys.argv) > 1:
+        main(sys.argv[1:])
+    else:
+        outfile = os.path.join\
+                  (os.environ['MAUS_ROOT_DIR'],
+                   'tmp','example_simulation_file.root')
+        generate_simulation(outfile):
+        main([outfile])
     
