@@ -140,6 +140,7 @@ void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArr
       track->add_scifitrackpoint(track_point);
     }
   }
+  (*sites.rbegin())->covariance_matrix( KalmanState::Smoothed ).Print();
   event.add_scifitrack(track);
 }
 

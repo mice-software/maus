@@ -474,12 +474,15 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
         LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
         LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
 
-        // Squash the covariances of each fit into one vector
+        // Squash the covariances of each fit into one matrix
+        cov_x.ResizeTo(4,4);
+        for ( int i = 0; i < 2; ++i ) {
+          for ( int j = 0; j < 2; ++j ) {
+            cov_x(i+2, j+2) = cov_y(i, j);
+          }
+        }
         double* a1 = cov_x.GetMatrixArray();
-        std::vector<double> covariance(a1, a1 + sizeof a1 / sizeof a1[0]);
-        double* a2 = cov_y.GetMatrixArray();
-        std::vector<double> v2(a2, a2 + sizeof a2 / sizeof a2[0]);
-        covariance.insert(covariance.end(), v2.begin(), v2.end());
+        std::vector<double> covariance(a1, &a1[16]);
 
         // Check track passes chisq test, then create SciFiStraightPRTrack
         if ( ( line_x.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) &&
@@ -609,12 +612,15 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     return NULL;
   }
 
-  // Squash the two covariances matrices from the fits into a vector
+  // Squash the covariances of each fit into one matrix
+  cov_circle.ResizeTo(5,5);
+  for ( int i = 0; i < 2; ++i ) {
+    for ( int j = 0; j < 2; ++j ) {
+      cov_circle(i+3, j+3) = cov_sz(i, j);
+    }
+  }
   double* a1 = cov_circle.GetMatrixArray();
-  std::vector<double> covariance(a1, a1 + sizeof a1 / sizeof a1[0]);
-  double* a2 = cov_sz.GetMatrixArray();
-  std::vector<double> v2(a2, a2 + sizeof a2 / sizeof a2[0]);
-  covariance.insert(covariance.end(), v2.begin(), v2.end());
+  std::vector<double> covariance(a1, &a1[25]);
 
   // Set all the good sp to used and set the track seeds with them
   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {

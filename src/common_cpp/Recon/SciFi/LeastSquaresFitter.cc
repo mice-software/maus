@@ -102,7 +102,6 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
   At.T();                          // Transpose At (leaving A unchanged)
   TMatrixD V_p(At * V_m * A);      // The covariance matrix of the parameters of model (inv)
   V_p.Invert(det);                 // Invert in place
-  covariance = V_p;
   TMatrixD P(V_p * At * V_m * K);  // The least sqaures estimate of the parameters
 
   // Extract the fit parameters
@@ -119,6 +118,23 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
     R = 0;
   else
     R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
+
+  // Transform the covariance matrix to the same basis
+  TMatrixD jacobian( 3, 3 );
+  jacobian(0,0) = beta / (2.0*alpha*alpha);
+  jacobian(0,1) = -1.0 / (2.0*alpha);
+  jacobian(1,0) = gamma / (2.0*alpha*alpha);
+  jacobian(1,2) = -1.0 / (2.0*alpha);
+  jacobian(2,0) = ( -1.0/(2.0*alpha) ) * ( ( (beta*beta + gamma*gamma) / (2.0*alpha) ) + 1 ) /
+                                                sqrt( ( (beta*beta + gamma*gamma) / 4.0 ) + alpha );
+  jacobian(2,1) = ( beta/(4.0*alpha*alpha) ) /
+                            sqrt( ( (beta*beta + gamma*gamma)/(4.0*alpha*alpha) ) + ( 1.0/alpha ) );
+  jacobian(2,2) = ( gamma/(4.0*alpha*alpha) ) /
+                            sqrt( ( (beta*beta + gamma*gamma)/(4.0*alpha*alpha) ) + ( 1.0/alpha ) );
+  TMatrixD jacobianT(3,3);
+  jacobianT.Transpose( jacobian );
+
+  covariance = jacobian * V_p * jacobianT;
 
   // if ( R < 0. )
   //  std::cout << "R was < 0 but taking abs_val for physical correctness\n";

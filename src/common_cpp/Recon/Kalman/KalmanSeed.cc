@@ -142,54 +142,58 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
     _Bz = -_Bz;
   }
 
+  // Length of tracker
+  double length = 1100.0;
+
   double pt = _particle_charge*c*_Bz*r;
-//  double pt = _particle_charge*1.199168*r;
-
   double dsdz  = fabs(seed->get_dsdz());
+  double x0 = seed->get_circle_x0(); // Circle Center x
+  double y0 = seed->get_circle_y0(); // Circle Center y
+  double s = seed->get_line_sz_c() - _particle_charge*length*dsdz; // Path length at start plane
+  double phi_0 = s / r; // Phi at start plane
+  double phi = phi_0 + TMath::PiOver2(); // Direction of momentum
 
-  double pz = fabs(pt/dsdz);
+  ThreeVector patrec_momentum( pt*cos(phi), pt*sin(phi), fabs(pt/dsdz) );
+  double P = patrec_momentum.mag();
+  double patrec_bias = (P - 1.4) / P;
+  patrec_momentum = patrec_bias * patrec_momentum;
 
-  double x, y, z;
-  x = spacepoints.front()->get_position().x();
-  y = spacepoints.front()->get_position().y();
-  z = spacepoints.front()->get_position().z();
-
-  double phi_0;
-  if ( _tracker == 1 ) {
-    phi_0 = seed->get_phi().back();
-  } else {
-    phi_0 = seed->get_phi().front();
-  }
-
-  double phi = phi_0 + TMath::PiOver2();
-  double px  = pt*cos(phi);
-  double py  = pt*sin(phi);
-
-  // Remove PR momentum bias.
-  // ThreeVector mom(px, py, pz);
-  // double reduction_factor = (mom.mag()-1.4)/mom.mag();
-  // ThreeVector new_momentum = mom*reduction_factor;
+  double x = x0 + r*cos(phi_0);
+  double px = patrec_momentum.x();
+  double y = y0 + r*sin(phi_0);
+  double py = patrec_momentum.y();
+  double kappa = _particle_charge / patrec_momentum.z();
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
-  a(1, 0) = px; // new_momentum.x();
+  a(1, 0) = px; 
   a(2, 0) = y;
-  a(3, 0) = py; // new_momentum.y();
-  a(4, 0) = _particle_charge/pz; // _particle_charge/new_momentum.z();
+  a(3, 0) = py;
+  a(4, 0) = kappa;
 
   return a;
 }
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
-  double x, y, z;
+  // Length of tracker
+  double length = 1100.0;
 
-  x = spacepoints.front()->get_position().x();
-  y = spacepoints.front()->get_position().y();
-  z = spacepoints.front()->get_position().z();
-
+  double x0 = seed->get_x0();
+  double y0 = seed->get_y0();
   double mx = seed->get_mx();
   double my = seed->get_my();
+
+  double x, y;
+
+  // Downstream tracker starts at the other end.
+  if ( _tracker == 0 ) {
+    x = x0 + mx*length;
+    y = y0 + my*length;
+  } else {
+    x = x0 + mx*length;
+    y = y0 + my*length;
+  }
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
@@ -197,7 +201,13 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
   a(2, 0) = y;
   a(3, 0) = my;
 
-  std::cerr << "Straight Seed = " << x << ", " << mx << ", " << y << ", " << my << ", " << z << '\n';
+  double spx = spacepoints.front()->get_position().x();
+  double spy = spacepoints.front()->get_position().y();
+  double spz = spacepoints.front()->get_position().z();
+
+  std::cerr << "Space Point = " << spx << ", " << mx << ", " << spy << ", " << my << ", " << spz << '\n';
+
+  std::cerr << "Straight Seed = " << x << ", " << mx << ", " << y << ", " << my << '\n';
 
   return a;
 }
@@ -219,30 +229,47 @@ void KalmanSeed::RetrieveClusters(SciFiSpacePointPArray &spacepoints) {
 }
 
 TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiHelicalPRTrack* seed) {
-  TMatrixD covariance(_n_parameters, _n_parameters);
-  for ( int i = 0; i < _n_parameters; ++i ) {
-    covariance(i, i) = _seed_cov;
-  }
+//  TMatrixD covariance(_n_parameters, _n_parameters);
+//  for ( int i = 0; i < _n_parameters; ++i ) {
+//    covariance(i, i) = _seed_cov;
+//  }
+
   std::vector<double> cov = seed->get_covariance();
   TMatrixD patrec_covariance( _n_parameters, _n_parameters );
-//  TMatrixD covariance( _n_parameters, _n_parameters );
+  TMatrixD covariance( _n_parameters, _n_parameters );
+
+  double length = 1100.0;
+  double dsdz  = fabs(seed->get_dsdz());
+  double mc = _particle_charge*CLHEP::c_light*_Bz; // Magnetic constant
+  double r = seed->get_R();
+  double s = seed->get_line_sz_c() - _particle_charge*length*dsdz; // Path length at start plane
+  double phi = s / r; // Phi at start plane // TODO: Is this the correct phi?!
+  double sin = std::sin( phi );
+  double cos = std::cos( phi );
+  double sin_plus = std::sin( phi + TMath::PiOver2() );
+  double cos_plus = std::cos( phi + TMath::PiOver2() );
+  double ts = seed->get_dsdz();
 
   TMatrixD jacobian( _n_parameters, _n_parameters );
   jacobian(0,0) = 1.0;
-  jacobian(1,1) = 1.0;
-  jacobian(2,2) = 1.0;
-  jacobian(3,3) = 1.0;
-  jacobian(4,4) = 1.0;
+  jacobian(0,2) = cos + phi*sin;
+  jacobian(0,3) = -sin;
+
+  jacobian(1,2) = mc*cos_plus + mc*phi*sin_plus;
+  jacobian(1,3) = -mc*sin_plus;
+
+  jacobian(2,1) = 1.0;
+  jacobian(2,2) = sin - phi*cos;
+  jacobian(2,3) = cos;
+
+  jacobian(3,2) = mc*sin_plus - mc*phi*cos_plus;
+  jacobian(1,3) = mc*cos_plus;
+
+  jacobian(4,3) = -ts / (mc*r*r);
+  jacobian(4,4) = 1.0 / (mc*r);
 
   TMatrixD jacobianT(_n_parameters, _n_parameters);
   jacobianT.Transpose( jacobian );
-
-  std::cerr << "COV SIZE = " << cov.size() << std::endl;
-
-  for ( size_t i = 0 ; i < cov.size(); ++i ) {
-    std::cerr << cov.at( i ) << ' ';
-  }
-  std::cerr << std::flush;
 
   if ( cov.size() != _n_parameters*_n_parameters ) {
     throw MAUS::Exception( MAUS::Exception::recoverable, 
@@ -256,12 +283,10 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiHelicalPRTrack* seed) {
     }
   }
 
-//  covariance = jacobian*patrec_covariance*jacobianT;
+  covariance = jacobian*patrec_covariance*jacobianT;
 
   patrec_covariance.Print();
   covariance.Print();
-
-  return covariance;
 
   return covariance;
 }
@@ -271,27 +296,21 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiStraightPRTrack* seed) 
 //  for ( int i = 0; i < _n_parameters; ++i ) {
 //    _full_covariance(i, i) = _seed_cov;
 //  }
+
   std::vector<double> cov = seed->get_covariance();
   TMatrixD patrec_covariance( _n_parameters, _n_parameters );
   TMatrixD covariance( _n_parameters, _n_parameters );
 
   TMatrixD jacobian( _n_parameters, _n_parameters );
   jacobian(0,0) = 1.0;
-  jacobian(1,2) = 1.0;
-  jacobian(2,1) = 1.0;
+  jacobian(1,1) = 1.0;
+  jacobian(2,2) = 1.0;
   jacobian(3,3) = 1.0;
-  jacobian(0,2) = 1100.0;
+  jacobian(0,1) = 1100.0; // TODO: Read the correct value from the geometry
   jacobian(2,3) = 1100.0;
 
   TMatrixD jacobianT(_n_parameters, _n_parameters);
   jacobianT.Transpose( jacobian );
-
-  std::cerr << "COV SIZE = " << cov.size() << std::endl;
-
-  for ( size_t i = 0 ; i < cov.size(); ++i ) {
-    std::cerr << cov.at( i ) << ' ';
-  }
-  std::cerr << std::flush;
 
   if ( cov.size() != _n_parameters*_n_parameters ) {
     throw MAUS::Exception( MAUS::Exception::recoverable, 
