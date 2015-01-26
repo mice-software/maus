@@ -195,6 +195,6 @@ if __name__ == "__main__":
         outfile = os.path.join\
                   (os.environ['MAUS_ROOT_DIR'],
                    'tmp','example_simulation_file.root')
-        generate_simulation(outfile):
+        generate_simulation(outfile)
         main([outfile])
     
