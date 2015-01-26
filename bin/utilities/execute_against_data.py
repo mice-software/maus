@@ -408,6 +408,7 @@ class RunSettings: #pylint: disable = R0902
         @return list of command line arguments for download
         """
         return [
+            '-geometry_download_by', 'run_number',
             '-geometry_download_run_number', str(self.run_number),
             '-geometry_download_directory', str(self.download_target),
             '-verbose_level', '0',

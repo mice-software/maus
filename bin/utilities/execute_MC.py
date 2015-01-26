@@ -65,8 +65,9 @@ import sys
 import os
 import subprocess
 import shutil
-import shlex
-
+import time
+from time import sleep
+import cdb
 
 def arg_parser():
     """
@@ -88,9 +89,9 @@ def arg_parser():
     parser.add_argument('--no-test', dest='test_mode', \
                         help="Don't run the batch job using test cdb output",\
                         action='store_false', default=False)
-    parser.add_argument('--mcserialnumber', dest='mc_iteration', type=str, \
+    parser.add_argument('--mcserialnumber', dest='mc_iteration', type=int, \
                         help='MC Serial number for configuration DB',\
-                        default='')
+                        default=0)
     parser.add_argument('--geometry-id', dest='geoid', \
                         help='The simulation geometry ID number',\
                         required=True)
@@ -156,6 +157,7 @@ class RunManager:
             print 'Error - run not valid'
             return 1
         self.setup()
+        self.download_cards()
         self.download_geometry()
         self.execute_simulation()
 
@@ -170,7 +172,11 @@ class RunManager:
         @returns True if run is valid
         """
         print 'Checking run validity'
-        return True
+        
+        if os.path.exists(self.run_setup.g4bl_interface):
+            return True
+        else:
+            return False
 
     def setup(self):
         """
@@ -198,11 +204,52 @@ class RunManager:
         download_dir = self.run_setup.download_target
         if os.path.isdir(download_dir):
             shutil.rmtree(download_dir)
-        if os.path.exists(self.run_setup.g4bl_interface):
-            os.remove(self.run_setup.g4bl_interface)
         if os.path.exists(self.run_setup.input_file_name):
             os.remove(self.run_setup.input_file_name)
-      
+
+    
+    def download_cards(self):
+        """
+        Downloads the datacards from the configuration database
+        
+        If running in test mode, uses legacy Stage4 geometry instead.
+
+        If default mc_iteration number given (0) then CDB will not be accessed.
+
+        @raises DownloadError on failure
+        """
+        print 'Getting cards'
+        bi_number = self.run_setup.mc_iteration
+        if bi_number > 0:
+            for i in range(5):
+                try:
+                    print "    Contacting CDB"
+                    if self.run_setup.test_mode:
+                        mcs_service = cdb.MCSerialNumber(
+                            "http://preprodcdb.mice.rl.ac.uk")
+                    else:
+                        mcs_service = cdb.MCSerialNumber()
+                    print "    Found, accessing cards"
+                    mc_cards = mcs_service.get_datacards(bi_number)['mc']
+                    if mc_cards == 'null':
+                        raise DownloadError(
+                            "No MC cards for batch iteration number "+str(bi_number))
+                    mc_out = open(self.run_setup.sim_cards, 'w')
+                    mc_out.write(mc_cards)
+                    return
+                except cdb.CdbTemporaryError:
+                    print "CDB lookup failed on attempt", i+1
+                    time.sleep(1)
+                except cdb.CdbPermanentError:
+                    raise DownloadError("Failed to download cards - CDB not found")
+            raise DownloadError("Failed to download cards after 5 attempts")
+        else:
+            # write an empty file
+            mc_cards = ''
+            mc_out = open(self.run_setup.sim_cards, 'w')
+            mc_out.write(mc_cards)
+
+    
     def download_geometry(self):
         """
         Downloads the geometry from the configuration database
@@ -218,11 +265,12 @@ class RunManager:
         print 'Getting geometry'
         download = [os.path.join(self.run_setup.maus_root_dir, 'bin', \
                                  'utilities', 'download_fit_geometry.py')]
+        # check that there is a selection for the geometry in the datacards
         download += self.run_setup.get_download_parameters()
         proc = subprocess.Popen(download, stdout=self.logs.download_log, \
                                                        stderr=subprocess.STDOUT)
         proc.wait()
-        if 0:  # self.run_setup.test_mode:
+        if self.run_setup.test_mode:
             test_path_in = os.path.join(self.run_setup.maus_root_dir, 'src',
                     'legacy', 'FILES', 'Models', 'Configurations', 'Test.dat')
             test_path_out = os.path.join(self.run_setup.download_target, \
@@ -247,6 +295,8 @@ class RunManager:
                                                        stderr=self.logs.sim_log)
         # stderr=subprocess.STDOUT)
         proc.wait()
+        if proc.returncode != 0:
+            raise MausError("MAUS simulation returned "+str(proc.returncode))
         self.logs.tar_queue.append(self.run_setup.mc_file_name)
         print self.logs.tar_queue
         # print self.logs.tar_queue
@@ -291,13 +341,19 @@ class RunSettings: #pylint: disable = R0902
         self.g4bl_interface = \
                    self.get_file_name_from_run_number(self.input_file_name,\
                                                       self.run_number)
+
+        
         self.mc_file_name = self.run_number_as_string+"_sim.root"
         
         print self.g4bl_interface
+        
+        if os.path.exists(self.g4bl_interface):
+            print "Download of interface file successful"
+            
         self.maus_root_dir = os.environ["MAUS_ROOT_DIR"]
         self.download_target = '%s/downloads' % os.getcwd()
+        self.sim_cards = 'sim.cards'
         self.geometry_id = args_in.geoid
-        
 
     def get_file_name_from_run_number(self, file_index, run_number):
         # pylint: disable = R0201
@@ -312,40 +368,76 @@ class RunSettings: #pylint: disable = R0902
         @returns a file name as a string
         """
         
-        index = file_index.split('/')[-1]
+        index = os.path.basename(file_index)
         index = os.path.join(os.getcwd(), index)
         if os.path.exists(index):
             os.remove(index)
+
+        n_max_tries = 5
+        retries = 0
         
-        index_command = 'wget '+file_index
-        args = shlex.split(index_command)
-        proc = subprocess.Popen(args) # , stdout=subprocess.STDOUT, \
-                                # stderr=subprocess.STDOUT)
+        args = ['wget', file_index]
+        while (retries < n_max_tries):
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE, \
+                                    stderr=subprocess.PIPE)
+            (stdout, stderr) = proc.communicate()
+            print stderr
+            if not os.path.exists(index):
+                retries += 1
+                sleep(0.5)
+                continue
+            break
+        # if retries == n_max_tries: return NULL
         # parse the local file name from the address
-        proc.wait()
         
         list = open(index)
         i = 0
-        interface_download = 'wget '
+        target_entry = ''
         for entry in list:
             if int(run_number) == i:
-                entry.rstrip('/n')
-                interface_download += entry
+                # need to remove the trailing carriage return
+                target_entry = entry[:-1]
                 break
             else:
                 i += 1
+        # default is a grid based copy
+        args = ['lcg-cp', '--checksum']
+        # file names on the grid are arbitrary so make
+        # it something logical for the local copy
+        file_name = "jsondoc_"+str(run_number)+".txt"
+        if target_entry.find("http") >= 0:
+            # use a wget algorithm instead
+            args = ['wget']
+            # use the file name from the list for the
+            # local copy
+            file_name = os.path.basename(target_entry)
+            # build the download command and split it
+            # for the Popen command
+            args.append(target_entry)
+            file_name = os.path.join(os.getcwd(), file_name)
+            print args
+        else:
+            args.append(target_entry)
+            file_name = os.path.join(os.getcwd(), file_name)
+            args.append('file:/'+file_name)
         
-        file_name = interface_download.split('/')[-1]
-        if file_name.endswith('\n'):
-            file_name = file_name[:-1]
-            
-        file_name = os.path.join(os.getcwd(), file_name)
         if os.path.exists(file_name):
             os.remove(file_name)
-        args = shlex.split(interface_download)
-        proc = subprocess.Popen(args) #, stdout=subprocess.STDOUT,\
-                                # stderr=subprocess.STDOUT)
-        os.remove(index)
+        retries = 0
+        while (retries < n_max_tries):
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE, \
+                                    stderr=subprocess.PIPE)
+            (stdout, stderr) = proc.communicate()
+            print stdout, stderr
+            if os.path.exists(file_name):
+                print "Download successful"
+            else:
+                sleep(0.5)
+                retries += 1
+                continue
+            break
+        # if retries == n_max_tries: return NULL
+        # os.remove(index)
         return file_name
             
     def get_simulation_parameters(self):
@@ -363,6 +455,7 @@ class RunSettings: #pylint: disable = R0902
             '-output_root_file_name', self.mc_file_name,
             '-verbose_level', '0',
             '-will_do_stack_trace', 'False',
+            '-configuration_file', 'sim.cards',
         ]
 
     ## This will need to be updated to reflect the source of the MC
@@ -376,12 +469,23 @@ class RunSettings: #pylint: disable = R0902
 
         @return list of command line arguments for download
         """
-        return [
-            '-geometry_download_id', str(self.geometry_id),
-            '-geometry_download_run_number', str(self.run_number),
-            '-geometry_download_directory', str(self.download_target),
-            '-verbose_level', '0',
-        ]
+        params = []
+        # The geometry id should be included in the data cards
+        if 'geometry_download_id' in open('sim.cards').read() or \
+               'geometry_download_by' in open('sim.cards').read():
+            params =  [
+                '-geometry_download_directory', str(self.download_target),
+                '-verbose_level', '0',
+                '-configuration_file','sim.cards'
+                ]
+        # otherwise, use the default download parameters.
+        else:
+            params = [
+                '-geometry_download_id', str(self.geometry_id),
+                '-geometry_download_directory', str(self.download_target),
+                '-verbose_level', '0',
+                ]
+        return params
 
 class FileManager: # pylint: disable = R0902
     """
