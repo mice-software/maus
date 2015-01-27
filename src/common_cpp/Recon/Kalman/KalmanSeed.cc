@@ -131,8 +131,6 @@ void KalmanSeed::BuildKalmanStates() {
 
 TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
                                                const SciFiSpacePointPArray &spacepoints) {
-  // Get seed values.
-  double r  = seed->get_R();
   // Get pt in MeV.
   double c  = CLHEP::c_light;
   // Charge guess should come from PR.
@@ -145,6 +143,8 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
   // Length of tracker
   double length = 1100.0;
 
+  // Get seed values.
+  double r  = seed->get_R();
   double pt = _particle_charge*c*_Bz*r;
   double dsdz  = fabs(seed->get_dsdz());
   double x0 = seed->get_circle_x0(); // Circle Center x
@@ -155,7 +155,12 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiHelicalPRTrack* seed,
 
   ThreeVector patrec_momentum( pt*cos(phi), pt*sin(phi), fabs(pt/dsdz) );
   double P = patrec_momentum.mag();
-  double patrec_bias = (P - 1.4) / P;
+  double patrec_bias; // Account for two planes of energy loss
+  if ( _tracker == 0 ) {
+    patrec_bias = (P + 1.4) / P;
+  } else {
+    patrec_bias = (P - 1.4) / P;
+  }
   patrec_momentum = patrec_bias * patrec_momentum;
 
   double x = x0 + r*cos(phi_0);
@@ -184,30 +189,15 @@ TMatrixD KalmanSeed::ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
   double mx = seed->get_mx();
   double my = seed->get_my();
 
-  double x, y;
-
-  // Downstream tracker starts at the other end.
-  if ( _tracker == 0 ) {
-    x = x0 + mx*length;
-    y = y0 + my*length;
-  } else {
-    x = x0 + mx*length;
-    y = y0 + my*length;
-  }
+  // Get position at the starting end of tracker
+  double x = x0 + mx*length;
+  double y = y0 + my*length;
 
   TMatrixD a(_n_parameters, 1);
   a(0, 0) = x;
   a(1, 0) = mx;
   a(2, 0) = y;
   a(3, 0) = my;
-
-  double spx = spacepoints.front()->get_position().x();
-  double spy = spacepoints.front()->get_position().y();
-  double spz = spacepoints.front()->get_position().z();
-
-  std::cerr << "Space Point = " << spx << ", " << mx << ", " << spy << ", " << my << ", " << spz << '\n';
-
-  std::cerr << "Straight Seed = " << x << ", " << mx << ", " << y << ", " << my << '\n';
 
   return a;
 }
@@ -237,6 +227,12 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiHelicalPRTrack* seed) {
   std::vector<double> cov = seed->get_covariance();
   TMatrixD patrec_covariance( _n_parameters, _n_parameters );
   TMatrixD covariance( _n_parameters, _n_parameters );
+
+  if ( cov.size() != _n_parameters*_n_parameters ) {
+    throw MAUS::Exception( MAUS::Exception::recoverable, 
+                          "Dimension of covariance matrix does not match the state vector",
+                          "KalmanSeed::ComputeInitalCovariance(Helical)");
+  }
 
   double length = 1100.0;
   double dsdz  = fabs(seed->get_dsdz());
@@ -271,12 +267,6 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiHelicalPRTrack* seed) {
   TMatrixD jacobianT(_n_parameters, _n_parameters);
   jacobianT.Transpose( jacobian );
 
-  if ( cov.size() != _n_parameters*_n_parameters ) {
-    throw MAUS::Exception( MAUS::Exception::recoverable, 
-                          "Dimension of covariance matrix does not match the state vector",
-                          "KalmanSeed::ComputeInitalCovariance(Helical)");
-  }
-
   for ( int i = 0; i < _n_parameters; ++i ) {
     for ( int j = 0; j < _n_parameters; ++j ) {
       patrec_covariance(i,j) = cov.at( i*_n_parameters + j );
@@ -284,9 +274,6 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiHelicalPRTrack* seed) {
   }
 
   covariance = jacobian*patrec_covariance*jacobianT;
-
-  patrec_covariance.Print();
-  covariance.Print();
 
   return covariance;
 }
@@ -301,6 +288,12 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiStraightPRTrack* seed) 
   TMatrixD patrec_covariance( _n_parameters, _n_parameters );
   TMatrixD covariance( _n_parameters, _n_parameters );
 
+  if ( cov.size() != _n_parameters*_n_parameters ) {
+    throw MAUS::Exception( MAUS::Exception::recoverable, 
+                          "Dimension of covariance matrix does not match the state vector",
+                          "KalmanSeed::ComputeInitalCovariance(Straight)");
+  }
+
   TMatrixD jacobian( _n_parameters, _n_parameters );
   jacobian(0,0) = 1.0;
   jacobian(1,1) = 1.0;
@@ -312,12 +305,6 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiStraightPRTrack* seed) 
   TMatrixD jacobianT(_n_parameters, _n_parameters);
   jacobianT.Transpose( jacobian );
 
-  if ( cov.size() != _n_parameters*_n_parameters ) {
-    throw MAUS::Exception( MAUS::Exception::recoverable, 
-                          "Dimension of covariance matrix does not match the state vector",
-                          "KalmanSeed::ComputeInitalCovariance(Straight)");
-  }
-
   for ( int i = 0; i < _n_parameters; ++i ) {
     for ( int j = 0; j < _n_parameters; ++j ) {
       patrec_covariance(i,j) = cov.at( i*_n_parameters + j );
@@ -325,9 +312,6 @@ TMatrixD KalmanSeed::ComputeInitialCovariance(const SciFiStraightPRTrack* seed) 
   }
 
   covariance = jacobian*patrec_covariance*jacobianT;
-
-  patrec_covariance.Print();
-  covariance.Print();
 
   return covariance;
 }
