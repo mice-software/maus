@@ -86,8 +86,8 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
 
-    #def test_fill_Global_Event(self):
-        """Check that process fills global events from TOF, KL and scifi data"""
+    def test_fill_Global_Event(self):
+        """Check that process fills global events from detector data"""
         test5 = ('%s/src/map/MapCppGlobalReconImport/global_import_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         self.mapper.birth(self.c.getConfigJSON())
