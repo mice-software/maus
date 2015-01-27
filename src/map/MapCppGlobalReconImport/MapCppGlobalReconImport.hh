@@ -52,6 +52,7 @@
 
 #include "Recon/Global/ImportCkovRecon.hh"
 #include "Recon/Global/ImportKLRecon.hh"
+#include "Recon/Global/ImportEMRRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportSciFiRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportTOFRecon.hh"
 #include "src/common_cpp/API/MapBase.hh"
@@ -85,6 +86,15 @@ namespace MAUS {
      * @param MAUS data corresponding to a single MICE spill
      */
     void _process(MAUS::Data* data) const;
+
+    /** Import the existing MAUS::ReconEvent, creating a new
+     * MAUS::GlobalEvent and populating a
+     * MAUS::recon::global::Track object. 
+     * @param recon_event The ReconEvent to obtain the GlobalEvent from
+     *                  
+     * @return global_event The GlobalEvent with spacepoints and track(s)
+     */
+    MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
 
   private:
     /// Check that a valid configuration is passed to the process
