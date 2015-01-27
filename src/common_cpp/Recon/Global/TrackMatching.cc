@@ -31,7 +31,7 @@ namespace global {
     if (!global_event) {
       throw(Exception(Exception::recoverable,
 		      "Trying to import an empty global event.",
-		      "MapCppGlobalPID::TrackMatching"));
+		      "MapCppGlobalTrackMatching::TrackMatching"));
     }
 
     MAUS::DataStructure::Global::TrackPArray *ImportedTracks =

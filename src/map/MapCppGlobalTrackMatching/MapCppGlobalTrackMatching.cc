@@ -72,30 +72,15 @@ namespace MAUS {
       return;
     }
 
-    MAUS::GlobalEvent* global_event;
     MAUS::ReconEventPArray::iterator recon_event_iter;
     for (recon_event_iter = recon_events->begin();
 	 recon_event_iter != recon_events->end();
 	 ++recon_event_iter) {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
-      global_event = MakeTracks(recon_event);
+      MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+      MAUS::recon::global::TrackMatching track_matching;
+      track_matching.FormTracks(global_event, _classname);
     }
-  }
-
-  MAUS::GlobalEvent*
-  MapCppGlobalTrackMatching::MakeTracks(MAUS::ReconEvent* recon_event) const {
-    if (!recon_event) {
-      throw(Exception(Exception::recoverable,
-		      "Trying to use an empty recon event.",
-		      "MapCppGlobalTrackMatching::MakeTracks"));
-    }
-
-    MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
-
-    MAUS::recon::global::TrackMatching track_matching;
-    track_matching.FormTracks(global_event, _classname);
-    // Return the new GlobalEvent, to be added to the ReconEvent
-    return global_event;
   }
 } // ~MAUS

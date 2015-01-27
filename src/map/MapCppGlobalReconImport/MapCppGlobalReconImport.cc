@@ -96,6 +96,7 @@ namespace MAUS {
     MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
     MAUS::CkovEvent* ckov_event = recon_event->GetCkovEvent();
     MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
+    MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
 
     if (tof_event) {
       MAUS::recon::global::ImportTOFRecon tofrecon_importer;
