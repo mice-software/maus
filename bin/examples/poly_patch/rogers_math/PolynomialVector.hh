@@ -117,6 +117,16 @@ public:
     /// Could be static but faster as member function (use lookup table for _polyKey).
     double*          MakePolyVector(const double* point, double* polyVector) const;
 
+    /** Make a vector like \f$d^\vec{p}(c, x, x^2, x^3...)/d\vec{x}^\vec{p}\f$.
+     *  - positions: array of size PointDimension() containing the position at
+     *    which the vector should be calculated, \f$\vec{x}\f$
+     *  - deriv_indices: array in the index by vector format defining the
+     *    derivative index \vec{p}.
+     *  - deriv_vec: array that will hold the return value; should be
+     *    initialised to size at least NumberOfPolynomialCoefficients()
+     */
+    double* MakeDerivVector(const double* positions, const int* deriv_indices, double* deriv_vec);
+
     /// Transforms from a 1d index of polynomial coefficients to an nd index.
     /// This is slow - you should use it to build a lookup table.
     /// For polynomial term \f$x_1^i x_2^j ... x_d^n\f$ index like [i][j] ... [n]
@@ -168,6 +178,13 @@ public:
                                                        double chi2Start, double discardStep, double* chi2End, double chi2Limit, 
                                                        std::vector<double> weights, bool firstIsMean=false);
 
+    static PolynomialVector* PolynomialSolve(
+             int polynomialOrder,
+             const std::vector< std::vector<double> >& positions,
+             const std::vector< std::vector<double> >& values,
+             const std::vector< std::vector<double> > &deriv_positions,
+             const std::vector< std::vector<double> >& deriv_values,
+             const std::vector< std::vector<int> >& deriv_indices);
 
     /// Now some utility functions
     /// Should probably go in a "utility function" namespace, that does not currently exist.
@@ -216,6 +233,8 @@ public:
         /// if var is in inVariables return true
         bool             HasInVariable(int var) const {for(unsigned int i=0; i<_inVarByVec.size(); i++) if(_inVarByVec[i] == var) return true; return false;}
 
+
+
       private:
         std::vector<int> _inVarByVec;
         int              _outVar;
@@ -233,7 +252,7 @@ private:
 };
 
 std::ostream& operator<<(std::ostream&, const PolynomialVector&);
-
+std::ostream& operator << (std::ostream&, const PolynomialVector::PolynomialCoefficient&);
 
 //template function
 

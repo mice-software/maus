@@ -16,17 +16,17 @@ public:
     static PolynomialPatch* LeastSquaresFit(
                                 Mesh* points,
                                 std::vector<std::vector<double> > values,
-                                int polynomial_order,
-                                int smoothing_order);
+                                size_t polynomial_order,
+                                size_t smoothing_order);
     inline unsigned int PointDimension() const {return point_dimension_;}
     inline unsigned int ValueDimension() const {return value_dimension_;}
   	PolynomialPatch* Clone() const; //copy function
-    static std::vector<std::vector<int> > GetNearbyPoints(int point_dimension, int value_dimension, int npoints);
+    static std::vector<std::vector<int> > GetNearbyPoints(int point_dimension, int poly_patch_order);
     PolynomialVector* GetPolynomialVector(const double* point) const;
 
 private:
 
-    static void NearbyPointsRecursive(std::vector<int> check, size_t k, std::vector<std::vector<int> >& nearby_points);
+    static void NearbyPointsRecursive(std::vector<int> check, size_t check_index, size_t poly_power, std::vector<std::vector<int> >& nearby_points);
     Mesh* grid_points_;
     std::vector<PolynomialVector*> points_;
     unsigned int point_dimension_;

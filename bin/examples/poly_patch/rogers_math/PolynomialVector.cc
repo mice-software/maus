@@ -132,6 +132,27 @@ double*  PolynomialVector::MakePolyVector(const double* point, double* polyVecto
     return polyVector;
 }
 
+double* PolynomialVector::MakeDerivVector(const double* positions, const int* deriv_indices, double* deriv_vec) {
+    for (size_t i = 0; i < _polyKeyByPower.size(); ++i) {
+        deriv_vec[i] = 1.;
+        for (int j = 0; j < _pointDim; ++j) {
+            int power = _polyKeyByPower[i][j] - deriv_indices[j];
+            if (power < 0) {
+                std::cerr << "Faield on " << power << " " << i << " " << j << std::endl;
+                deriv_vec[i] = 0.;
+            } else {
+                // x^(n-m)
+                for (int k = 0; k < power; ++k)
+                    deriv_vec[i] *= positions[j];
+            }
+            // n*(n-1)*(n-2)*...*(n-m)
+            for (int k = _polyKeyByPower[i][j]; k > 0 && k > power; ++k)
+                deriv_vec[i] *= k;
+        }
+    }
+    return deriv_vec;
+}
+
 //Turn int index into a std::vector<int> 'a' of length 'd' with values x_1^a_1 x_2^a_2 ... x_d^a_d
 // e.g. x_1^4 x_2^3 = {4,3,0,0}
 std::vector<int> PolynomialVector::IndexByPower(int index, int nInputVariables)
@@ -177,6 +198,15 @@ std::ostream& operator<<(std::ostream& out, const PolynomialVector& pv)
 {
     if(PolynomialVector::_printHeaders) pv.PrintHeader(out, '.', ' ', 14, true);
     out << '\n' << pv.GetCoefficientsAsMatrix();
+    return out;
+}
+
+std::ostream& operator << (std::ostream& out, const PolynomialVector::PolynomialCoefficient& coeff) {
+    std::vector<int> in_var = coeff.InVariables();
+    for (size_t i = 0; i < coeff.InVariables().size(); ++i)
+        out << in_var[i] << " ";
+    out << "| " << coeff.OutVariable();
+    out << " | " << coeff.Coefficient();
     return out;
 }
 
@@ -258,6 +288,78 @@ MMatrix<double> PolynomialVector::Covariances(std::vector<std::vector<double> > 
   return cov;
 }
 
+PolynomialVector* PolynomialVector::PolynomialSolve(
+         int polynomialOrder,
+         const std::vector< std::vector<double> >& positions,
+         const std::vector< std::vector<double> >& values,
+         const std::vector< std::vector<double> > &deriv_positions,
+         const std::vector< std::vector<double> >& deriv_values,
+         const std::vector< std::vector<int> >& deriv_indices) {
+
+    // Algorithm:
+    // define G_i = vector of F_i and d^pF/dF^p with values taken from coeffs
+    // and derivs respectively
+    // define H_ij = vector of f_i and d^pf/df^p)
+    // Then use G = H A => A = H^-1 G
+    // where A is vector of polynomial coefficients
+    // First set up G_i from coeffs and derivs; then calculate H_ij;
+    // then do the matrix inversion
+    // It is an error to include the same polynomial index more than once in
+    // coeffs or derivs or both; any polynomial indices that are missing will be
+    // assigned 0 value; polynomial order will be taken as the maximum
+    // polynomial order from coeffs and derivs.
+    // PointDimension and ValueDimension will be taken from coeffs and derivs;
+    // it is an error if these do not all have the same dimensions.
+    
+    int nCoeffs = values.size();
+    int nDerivs = deriv_values.size();
+    std::cerr << "VALIDATE INPUT HERE PLEASE" << std::endl;
+    int pointDim = positions[0].size();
+    int valueDim = values[0].size();
+
+    int nPolyCoeffs = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
+    MMatrix<double> A(valueDim, nPolyCoeffs, 0.);
+    PolynomialVector* temp = new PolynomialVector(pointDim, A);
+    for (size_t y_index = 0; y_index < values[0].size(); ++y_index) {
+        MVector<double> G(nPolyCoeffs, 0.);
+        MMatrix<double> H(nPolyCoeffs, nPolyCoeffs, 0.);
+        // First fill the zeroth derivatives
+        for (int i = 0; i < nCoeffs; ++i) {
+            G(i+1) = values[i][y_index];
+            std::vector<double> poly_vec(nPolyCoeffs, 0.);
+            temp->MakePolyVector(&positions[i][0], &poly_vec[0]);
+            for (int j = 0; j < nCoeffs; ++j) {
+                H(i, j) = poly_vec[j];
+            }
+        }
+        // Now fill the first derivatives
+        for (int i = 0; i < nDerivs; ++i) {
+            G(i+nCoeffs+1) = deriv_values[i][y_index];
+            std::vector<double> deriv_vec(nPolyCoeffs, 0.);
+            temp->MakeDerivVector(&deriv_positions[i][0], &deriv_indices[i][0], &deriv_vec[0]);
+            for (int j = 0; j < nCoeffs; ++j) {
+                H(i+1, j+1) = deriv_vec[j];
+            }
+        }
+        try {
+            H.invert();
+        } catch (MAUS::Exception exc) {
+            delete temp;
+            throw exc;
+        }
+        MVector<double> A_vec = H*G;
+        for (int j = 0; j < nPolyCoeffs; ++j) {
+            A(y_index+1, j+1) = A_vec(j+1);
+        }
+    }
+    delete temp;
+    temp = new PolynomialVector(pointDim, A);
+    return temp;
+}
+
+
+
+
 PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector< std::vector<double> >& points, const std::vector< std::vector<double> >& values, 
                                                               int polynomialOrder, const std::vector<double>& weights)
 {
@@ -283,8 +385,8 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector<
   for(int i=0; i<nPoints; i++)
   {
     temp->MakePolyVector(&points[i][0], &tempFx[0]);
-    for(int k=0; k<nCoeffs;  k++) 
-      for(int j=0; j<nCoeffs;  j++) 
+    for(int k=0; k<nCoeffs;  k++)
+      for(int j=0; j<nCoeffs;  j++)
         F2(j+1, k+1) += tempFx[k]*tempFx[j]*wt[i];
     for(int j=0; j<nCoeffs; j++)
       for(int k=0; k<valueDim; k++)
@@ -299,12 +401,13 @@ PolynomialVector* PolynomialVector::PolynomialLeastSquaresFit(const std::vector<
   return temp;
 }
 
-PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(const std::vector< std::vector<double> >&  points, 
-                                    const std::vector< std::vector<double> >& values, 
-                                    int polynomialOrder, std::vector< PolynomialVector::PolynomialCoefficient > coeffs,
-                                    const std::vector<double>& weights)
-{
-  //Algorithm: we want g(x) = old_f(x) + new_f(x), 
+PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(
+                  const std::vector< std::vector<double> >&  points, 
+                  const std::vector< std::vector<double> >& values, 
+                  int polynomialOrder,
+                  std::vector< PolynomialVector::PolynomialCoefficient > coeffs,
+                  const std::vector<double>& weights) {
+  //Algorithm: we want g(x) = old_f(x) + new_f(x),
   //where old_f has polynomial terms in poly, new_f has all the rest
   //Use value - f(point) as input and do LLS forcing old_f(x) polynomial terms to 0
   //Nb: in this constrained case we have to go through the output vector and treat each like a 1D vector
@@ -314,6 +417,32 @@ PolynomialVector* PolynomialVector::ConstrainedPolynomialLeastSquaresFit(const s
   if(nPoints<1)                   throw(Squeal(Squeal::recoverable, "No data for LLS Fit", "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)"));
   if(int(values.size())!=nPoints) throw(Squeal(Squeal::recoverable, "Misaligned array in LLS Fit", "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)")); 
   int nCoeffsNew = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
+//  if(nPoints + int(coeffs.size()) < nCoeffsNew*valueDim)
+//      throw(Squeal(
+//                Squeal::recoverable,
+//                "Underconstrained fit (not enough input points)",
+//                "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)")); 
+  for (size_t i = 0; i < coeffs.size(); ++i) {
+      std::vector<int> in_var = coeffs[i].InVariables();
+      if (coeffs[i].OutVariable() >= valueDim)
+          throw(Squeal(
+                Squeal::recoverable,
+                "Coefficient output variable out of range",
+                "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)")); 
+      if ( int(in_var.size()) >= polynomialOrder) 
+          throw(Squeal(
+                Squeal::recoverable,
+                "Coefficient input variables of too high order",
+                "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)")); 
+      for (size_t j = 0; j < coeffs[i].InVariables().size(); ++j) {
+          if (in_var[j] >= pointDim)
+              throw(Squeal(
+                Squeal::recoverable,
+                "Coefficient input variable of too high dimension",
+                "PolynomialVector::ConstrainedPolynomialLeastSquaresFit(...)")); 
+      }
+  }
+
   MMatrix<double> A(valueDim, nCoeffsNew, 0.);
 
   std::vector<double>    wt    (nPoints,   1);

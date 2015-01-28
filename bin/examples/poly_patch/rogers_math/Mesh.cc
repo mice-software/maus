@@ -41,8 +41,18 @@ TwoDGrid::TwoDGrid(std::vector<double> x, std::vector<double> y)  : _x (x), _y(y
   SetConstantSpacing();
 }
 
-TwoDGrid::~TwoDGrid() 
-{
+TwoDGrid::~TwoDGrid() {
+}
+
+TwoDGrid* TwoDGrid::Dual () const {
+    std::vector<double> new_x(_x.size()-1), new_y(_y.size()-1);
+    for (size_t i = 0; i < _x.size()-1; ++i) {
+        new_x[i] = (_x[i]+_x[i+1])/2.;
+    }
+    for (size_t i = 0; i < _y.size()-1; ++i) {
+        new_y[i] = (_y[i]+_y[i+1])/2.;
+    }
+    return new TwoDGrid(new_x, new_y);
 }
 
 Mesh::Iterator TwoDGrid::Begin() const 
@@ -312,6 +322,23 @@ ThreeDGrid::ThreeDGrid(double dX, double dY, double dZ, double minX, double minY
 
 ThreeDGrid::~ThreeDGrid() 
 {
+}
+
+ThreeDGrid* ThreeDGrid::Dual() const {
+    std::vector<double> new_x(_x.size()-1);
+    std::vector<double> new_y(_y.size()-1);
+    std::vector<double> new_z(_z.size()-1);
+    for (size_t i = 0; i < _x.size()-1; ++i) {
+        new_x[i] = (_x[i]+_x[i+1])/2.;
+    }
+    for (size_t i = 0; i < _y.size()-1; ++i) {
+        new_y[i] = (_y[i]+_y[i+1])/2.;
+    }
+    for (size_t i = 0; i < _z.size()-1; ++i) {
+        new_z[i] = (_z[i]+_z[i+1])/2.;
+    }
+    return new ThreeDGrid(new_x, new_y, new_z);
+
 }
 
 //state starts at 1,1,1

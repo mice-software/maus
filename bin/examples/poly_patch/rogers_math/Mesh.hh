@@ -39,7 +39,7 @@ public:
     virtual Mesh* Clone() = 0;
     //Return the "Dual" of the mesh
     //Dual is a polyhedron that has centre of each face as a point on the mesh
-    virtual Mesh* Dual () = 0;
+    virtual Mesh* Dual () const = 0;
     virtual ~Mesh();
 
     //Overload these functions for Mesh::Iterator to work with your base class
@@ -173,7 +173,7 @@ public:
     class Iterator;
     //get value
     inline Mesh * Clone() {return new TwoDGrid(*this);}
-    inline Mesh * Dual () {return NULL;}
+    TwoDGrid* Dual () const;
     //ERROR SHOULD NOT ALLOW MESH WITH 1 GRID POINT (causes error in LowerBound)
     TwoDGrid();
     TwoDGrid(double dX, double dY, double minX, double minY, int numberOfXCoords, int numberOfYCoords);
@@ -278,7 +278,7 @@ class ThreeDGrid : public Mesh
 public:
     class Iterator;
     inline Mesh * Clone() {return new ThreeDGrid(*this);}
-    inline Mesh * Dual () {return NULL;}
+    inline ThreeDGrid* Dual () const;
     //get value
     //ERROR SHOULD NOT ALLOW MESH WITH 1 GRID POINT (causes error in LowerBound)
     ThreeDGrid();
@@ -391,7 +391,7 @@ public:
     class Iterator;
 
     inline Mesh * Clone() {return new NDGrid(*this);}
-    inline Mesh * Dual () {return NULL;}
+    inline Mesh * Dual () const {return NULL;}
     //get value
     NDGrid();
     NDGrid(int nDimensions, int* size, double* spacing, double* min);
