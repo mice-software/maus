@@ -133,12 +133,12 @@ double*  PolynomialVector::MakePolyVector(const double* point, double* polyVecto
 }
 
 double* PolynomialVector::MakeDerivVector(const double* positions, const int* deriv_indices, double* deriv_vec) {
-    for (size_t i = 0; i < _polyKeyByPower.size(); ++i) {
+    size_t pkey_size = _polyKeyByPower.size();
+    for (size_t i = 0; i < pkey_size; ++i) {
         deriv_vec[i] = 1.;
         for (int j = 0; j < _pointDim; ++j) {
             int power = _polyKeyByPower[i][j] - deriv_indices[j];
             if (power < 0) {
-                std::cerr << "Faield on " << power << " " << i << " " << j << std::endl;
                 deriv_vec[i] = 0.;
             } else {
                 // x^(n-m)
@@ -146,8 +146,9 @@ double* PolynomialVector::MakeDerivVector(const double* positions, const int* de
                     deriv_vec[i] *= positions[j];
             }
             // n*(n-1)*(n-2)*...*(n-m)
-            for (int k = _polyKeyByPower[i][j]; k > 0 && k > power; ++k)
+            for (int k = _polyKeyByPower[i][j]; k > 0 && k > power; --k) {
                 deriv_vec[i] *= k;
+            }
         }
     }
     return deriv_vec;
@@ -324,12 +325,12 @@ PolynomialVector* PolynomialVector::PolynomialSolve(
         MVector<double> G(nPolyCoeffs, 0.);
         MMatrix<double> H(nPolyCoeffs, nPolyCoeffs, 0.);
         // First fill the zeroth derivatives
-        for (int i = 0; i < nCoeffs; ++i) {
+        for (int i = 0; i < nPolyCoeffs; ++i) {
             G(i+1) = values[i][y_index];
             std::vector<double> poly_vec(nPolyCoeffs, 0.);
             temp->MakePolyVector(&positions[i][0], &poly_vec[0]);
-            for (int j = 0; j < nCoeffs; ++j) {
-                H(i, j) = poly_vec[j];
+            for (int j = 0; j < nPolyCoeffs; ++j) {
+                H(i+1, j+1) = poly_vec[j];
             }
         }
         // Now fill the first derivatives
