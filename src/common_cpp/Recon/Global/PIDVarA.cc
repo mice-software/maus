@@ -67,16 +67,16 @@ namespace global {
       }
     }
     if (checkCount0 > 1 || checkCount1 > 1) {
-      Squeak::mout(Squeak::info) << "Multiple measurements for TOF0/TOF1" <<
+      Squeak::mout(Squeak::debug) << "Multiple measurements for TOF0/TOF1" <<
 	" times, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
       return std::make_pair(-1, 0);
     } else if (checkCount0 == 0 ||
 	       checkCount1 == 0 || (TOF1_t -TOF0_t) <= 0) {
-      Squeak::mout(Squeak::info) << "Missing/invalid measurements for " <<
+      Squeak::mout(Squeak::debug) << "Missing/invalid measurements for " <<
 	"TOF0/TOF1 times, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
       return std::make_pair(-1, 0);
     } else if ( minBin > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > maxBin ) {
-      Squeak::mout(Squeak::info) << "Difference between TOF0 and TOF1 times" <<
+      Squeak::mout(Squeak::debug) << "Difference between TOF0 and TOF1 times" <<
 	" outside of range, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
       return std::make_pair(-1, 0);
     } else {

@@ -68,20 +68,20 @@ namespace global {
       }
     }
     if (tof0_track_points.size() > 1 || tof1_track_points.size() > 1) {
-      Squeak::mout(Squeak::info) << "Multiple measurements for TOF0/TOF1" <<
+      Squeak::mout(Squeak::debug) << "Multiple measurements for TOF0/TOF1" <<
 	" times, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
       tof0_track_points.clear();
       tof1_track_points.clear();
       return std::make_pair(-1, 0);
     } else if ( tof0_track_points.size() == 0 ||
 		tof1_track_points.size() == 0 ) {
-      Squeak::mout(Squeak::info) << "Missing measurements for " <<
+      Squeak::mout(Squeak::debug) << "Missing measurements for " <<
 	"TOF0/TOF1 times, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
       tof0_track_points.clear();
       tof1_track_points.clear();
       return std::make_pair(-1, 0);
     } else if (tracker0_track_points.size() < 1) {
-      Squeak::mout(Squeak::info) << "Global track contained no scifi" <<
+      Squeak::mout(Squeak::debug) << "Global track contained no scifi" <<
 	" trackpoints, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
       tracker0_track_points.clear();
       return std::make_pair(-1, 0);
@@ -91,7 +91,7 @@ namespace global {
       TOF1_t = (tof1_track_points[0])->get_position().T();
           tof1_track_points.clear();
       if ( YminBin > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > YmaxBin ) {
-	Squeak::mout(Squeak::info) << "Difference between TOF0 and TOF1 " <<
+	Squeak::mout(Squeak::debug) << "Difference between TOF0 and TOF1 " <<
 	  "times outside of range, Recon::Global::PIDVarB::Calc_Var()" <<
 	  std::endl;
 	return std::make_pair(-1, 0);
@@ -116,7 +116,7 @@ namespace global {
 	tracker0_track_points.clear();
 	tracker0_momentum = tracker0_trackpoint_mom/tracker0_tp_count;
 	if ( XminBin > tracker0_momentum || tracker0_momentum > XmaxBin ) {
-	  Squeak::mout(Squeak::info) << "Momentum for tracker 0 is outside " <<
+	  Squeak::mout(Squeak::debug) << "Momentum for tracker 0 is outside " <<
 	    "of range, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
 	  return std::make_pair(0, -1);
 	} else {
