@@ -140,7 +140,7 @@ namespace MAUS {
                 logL_200MeV_pi_plus += _pid_vars[pid_var_count]->logL(track);
               }
             } else {
-              Squeak::mout(Squeak::error) << "Unrecognised particle hypothesis,"
+              Squeak::mout(Squeak::debug) << "Unrecognised particle hypothesis,"
                   << " MapCppGlobalPID::process" << std::endl;
             }
           }
@@ -154,7 +154,7 @@ namespace MAUS {
                      (logL_200MeV_pi_plus - logL_200MeV_e_plus > 0.5)) {
             track->set_pid(MAUS::DataStructure::Global::kPiPlus);
           } else {
-            Squeak::mout(Squeak::error) << "PID for track could not be" <<
+            Squeak::mout(Squeak::debug) << "PID for track could not be" <<
                                            " determined." << std::endl;
             continue;
           }
