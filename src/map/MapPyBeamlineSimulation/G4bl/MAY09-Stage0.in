@@ -126,11 +126,12 @@ place DecaySolenoid z=12210.7
 place vacuumWindow z=14779.7
 
 # Proton Absorber
-if protonabsorberin = 1 
+if "$protonabsorberin==1" 
     material protonabsorber polyethylene,0.8390061049 B,0.05 O,0.1109938951 density=1.035
     box ProtonAbsorber width=400 height=400 length=$proton_absorber_thickness material=protonabsorber \
         color=1,0,1
     place ProtonAbsorber z=14880
+endif
 
 #first Geneva Counter 
 place GenevaBeamCounter rename=GVA1 z=15050
@@ -163,7 +164,7 @@ place GenevaBeamCounter rename=GVA1 z=15050
 place BendTypeI6inIron rename=B2 z=15808.1 x=100 rotation=Y15 By=0 \
         fieldMaterial=Air
 place TypeI6inTaperedField z=15808.1 x=100 rotation=Y15 \
-        current=$B2current
+        current=$d_2
 cornerarc z=15298.3 angle=30 centerRadius=2005.2 radiusCut=1000
 
 zntuple z=16808.1 format=asciiextended file=G4BLoutput.txt

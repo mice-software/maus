@@ -64,6 +64,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.q_2 = 0
         self.q_3 = 0
         self.d_1 = 0
+	self.d_2 = 0
         self.d_s = 0
         self.proton_weight = 0
         self.particles_per_spill = 0 
@@ -82,7 +83,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.charge = 3
         self.newline = ''
         self.grid_job = 0 
-        self.protonabsorberin = 1
+	self.protonabsorberin = 1
    
     def birth(self, json_configuration): #pylint: disable=R0912, R0915
         "birth doc string"      
@@ -138,7 +139,13 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             print("Error: d_1 is not found in the config file!")
             good_birth = False             
 
-        try:
+	try:
+            self.d_2 = config_doc["g4bl"]["d_2"]
+        except Exception: #pylint: disable=W0703
+           print("Error: d_2 is not found in the config file!")
+           good_birth = False
+	
+	try:
             self.d_s = config_doc["g4bl"]["d_s"]
         except Exception: #pylint: disable=W0703
             print("Error: d_s current is not found in" +\
@@ -252,6 +259,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             " q_2="+str(self.q_2)+ \
 	    " protonabsorberin="+str(self.protonabsorberin)+ \
             " q_3="+str(self.q_3)+" d_1="+ str(self.d_1) +\
+	    " d_2="+ str(self.d_2) +\
             " proton_absorber_thickness="+str(self.proton_absorber_thickness)+\
             " proton_number="+str(self.proton_number)+\
             " proton_weight="+str(self.proton_weight)+\
