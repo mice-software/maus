@@ -63,12 +63,12 @@ namespace global {
       }
     }
     if (kl_track_points.size() < 1) {
-      Squeak::mout(Squeak::error) << "Global track contained no KL" <<
+      Squeak::mout(Squeak::debug) << "Global track contained no KL" <<
 	" trackpoints, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
       kl_track_points.clear();
       return std::make_pair(-1, 0);
     } else if (tracker1_track_points.size() < 1) {
-      Squeak::mout(Squeak::error) << "Global track contained no downstream" <<
+      Squeak::mout(Squeak::debug) << "Global track contained no downstream" <<
 	" tracker trackpoints, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
       tracker1_track_points.clear();
       kl_track_points.clear();
@@ -78,7 +78,7 @@ namespace global {
 	total_ADC_charge_product += kl_track_points[i]->get_ADC_charge_product();
       }
       if ( YminBin > (total_ADC_charge_product) || (total_ADC_charge_product) > YmaxBin ) {
-	Squeak::mout(Squeak::error) << "KL ADC charge product " <<
+	Squeak::mout(Squeak::debug) << "KL ADC charge product " <<
 	  "outside of allowed range, Recon::Global::PIDVarC::Calc_Var()" <<
 	  std::endl;
 	kl_track_points.clear();
@@ -106,7 +106,7 @@ namespace global {
 	tracker1_track_points.clear();
 	tracker1_momentum = tracker1_trackpoint_mom/tracker1_tp_count;
 	if ( XminBin > tracker1_momentum || tracker1_momentum > XmaxBin ) {
-	  Squeak::mout(Squeak::error) << "Momentum for tracker 1 is outside " <<
+	  Squeak::mout(Squeak::debug) << "Momentum for tracker 1 is outside " <<
 	    "of range, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
 	  return std::make_pair(0, -1);
 	} else {
