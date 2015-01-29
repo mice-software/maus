@@ -60,6 +60,8 @@ namespace MAUS {
     _pid_vars.clear();
 
     PDF_file = _configJSON["PID_PDFs_file"].asString();
+    // PDF_file = "/home/celeste/MICE/MAUS/1389a/src/map/MapCppGlobalPID/PIDhists.root";
+    std::cerr << PDF_file << std::endl;
 
     _histFile = new TFile(PDF_file.c_str(), "READ");
 
@@ -72,8 +74,10 @@ namespace MAUS {
     for (unsigned int i =0; i < _hypotheses.size(); ++i) {
       // vector of pid vars
       _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
-							   _hypotheses[i]));
+        						   _hypotheses[i]));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
+                                                         _hypotheses[i]));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
                                                            _hypotheses[i]));
       // etc.
       }
