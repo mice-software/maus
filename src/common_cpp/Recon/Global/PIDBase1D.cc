@@ -84,14 +84,14 @@ namespace global {
   double PIDBase1D::logL(MAUS::DataStructure::Global::Track* track) {
     double var = (Calc_Var(track)).first;
     if (var < _XminBin || var > _XmaxBin) {
-      Squeak::mout(Squeak::error) << "Missing/invalid measurements for  " <<
+      Squeak::mout(Squeak::info) << "Missing/invalid measurements for  " <<
 	"TOF0/TOF1 times, Recon::Global::PIDBase1D::logL()" << std::endl;
       return 1;
     }
     int bin = _hist->FindBin(var);
     double entries = _hist->GetBinContent(bin);
     if (entries <=0) {
-      Squeak::mout(Squeak::error) << "Corresponding bin content in PDF is " <<
+      Squeak::mout(Squeak::info) << "Corresponding bin content in PDF is " <<
 	"not greater than zero, Recon::Global::PIDBase1D::logL()" << std::endl;
       return 1;
     }
@@ -102,7 +102,7 @@ namespace global {
   void PIDBase1D::Fill_Hist(MAUS::DataStructure::Global::Track* track) {
     double var = (Calc_Var(track)).first;
     if (var < _XminBin || var > _XmaxBin) {
-       Squeak::mout(Squeak::error) << "Calc_Var returned invalid value of "
+       Squeak::mout(Squeak::info) << "Calc_Var returned invalid value of "
 				   << "PID variable, not added to histogram, "
 				   << "Recon::Global::PIDBase1D::Fill_Hist()"
 				   << std::endl;
