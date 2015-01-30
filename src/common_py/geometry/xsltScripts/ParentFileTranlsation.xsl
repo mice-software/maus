@@ -150,7 +150,7 @@
                             </xsl:text></xsl:when>
                         <xsl:when test="contains(@name, 'FCD')">Substitution $FCDCurrent <xsl:value-of select="@iset"/>
                             Substitution $FCDPolarity <xsl:value-of select="../@polarity"/>
-                            Substitution $FCDMode <xsl:wh select="../@mode"/><xsl:text>
+                            Substitution $FCDMode <xsl:value-of select="../@mode"/><xsl:text>
                                 
                             </xsl:text></xsl:when>
                     </xsl:choose>

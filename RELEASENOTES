@@ -5,6 +5,15 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.3
+  The following changes were made:
+    - Documentation - Doxygen fix
+    - G4Beamline - a few updates, including to the deck
+    - Global - PIDVarC added
+    - Grid - updates to Grid execution scripts
+    - ROOT - MINUIT2 support added
+    - Tracker - a few miscellaneous updates
+  If upgrading from a previous version, please redo the entire installation
 MAUS-v0.9.2
   The following changes were made:
     - EMR - extensive updates

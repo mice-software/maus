@@ -85,6 +85,25 @@ namespace global {
      */
     virtual void Fill_Hist(MAUS::DataStructure::Global::Track* track) = 0;
 
+  private:
+
+    /// Name of PID variable
+    std::string _var_name;
+
+    /// Particle hypothesis
+    std::string _hyp;
+
+    /// Unique identifier for naming root files holding PDFs when reducer is run
+    std::string _unique_identifier;
+
+    /// _var_name + _hyp;
+    std::string _varhyp;
+
+    /// Filename of file containing PDF created by constructor
+    std::string _filename;
+
+    /// Directory of file containing PDF created by constructor
+    std::string _directory;
 
   protected:
 
@@ -106,26 +125,6 @@ namespace global {
 
     /// File that PDF is written to
     TFile *_writeFile;
-
-  private:
-
-    /// Name of PID variable
-    std::string _var_name;
-
-    /// Particle hypothesis
-    std::string _hyp;
-
-    /// Unique identifier for naming root files holding PDFs when reducer is run
-    std::string _unique_identifier;
-
-    /// _var_name + _hyp;
-    std::string _varhyp;
-
-    /// Filename of file containing PDF created by constructor
-    std::string _filename;
-
-    /// Directory of file containing PDF created by constructor
-    std::string _directory;
   };
 }
 }
