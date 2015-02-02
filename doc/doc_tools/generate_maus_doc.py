@@ -6,11 +6,9 @@
 import subprocess
 import os
 import sys
-import glob
-import re
 from generate_doc_index import create_index_html # pylint: disable=F0401
 
-# pylint: disable = C0103
+# pylint: disable = C0103, R0914
 if os.environ.get('MAUS_THIRD_PARTY') == None:
     print 'MAUS environment variables not set.'
     print 'Please make sure to source env.sh before running this script.'

@@ -7,7 +7,7 @@ R. Bayes
 An example of extracting information from the special virtual planes
 """
 
-# pylint: disable = E1101, C0103, C0301, W0611
+# pylint: disable = E1101, C0103, C0301, W0611, R0914, R0915
 import os
 import sys
 import ROOT
@@ -21,7 +21,7 @@ def generate_simulation(outfile):
     """
     analysis = os.path.join\
                (os.environ["MAUS_ROOT_DIR"],"bin","simulate_mice.py")
-    proc = subprocess.Popen(['python', analysis,\
+    proc = subprocess.Popen(['python', analysis, \
                              '--output_root_file_name', outfile,
                              '--simulation_geometry_file', 'Stage4.dat'])
     proc.wait()
@@ -55,11 +55,11 @@ def main(args):
 
     for fp in args:
         
-        file = ROOT.TFile(str(fp),"R")
-        if file.IsZombie():
+        rfile = ROOT.TFile(str(fp),"R")
+        if rfile.IsZombie():
             continue
         data = ROOT.MAUS.Data()
-        tree = file.Get("Spill")
+        tree = rfile.Get("Spill")
         if not tree:
             continue
         tree.SetBranchAddress("data", data) 
@@ -192,9 +192,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         main(sys.argv[1:])
     else:
-        outfile = os.path.join\
+        ofile = os.path.join\
                   (os.environ['MAUS_ROOT_DIR'],
                    'tmp','example_simulation_file.root')
-        generate_simulation(outfile)
-        main([outfile])
+        generate_simulation(ofile)
+        main([ofile])
     
