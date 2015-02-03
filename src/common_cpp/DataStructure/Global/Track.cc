@@ -225,6 +225,7 @@ void Track::SortTrackPointsByZ() {
 std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 Track::GetTrackPoints() const {
   std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
+  if (!_track_points) return temp_track_points;
   const MAUS::DataStructure::Global::TrackPoint* tp = NULL;
   for (int i = 0; i < _track_points->GetSize(); ++i) {
     tp = (const MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
