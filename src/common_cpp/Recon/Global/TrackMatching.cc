@@ -34,8 +34,7 @@ namespace global {
 		      "MapCppGlobalTrackMatching::TrackMatching"));
     }
 
-    MAUS::DataStructure::Global::TrackPArray *ImportedTracks =
-      global_event->get_tracks();
+    MAUS::DataStructure::Global::TrackPArray *ImportedTracks = global_event->get_tracks();
     MAUS::DataStructure::Global::TrackPArray::iterator ImportedTrackIterator;
     MAUS::DataStructure::Global::TrackPArray *SciFiTrackArray =
       new MAUS::DataStructure::Global::TrackPArray();
@@ -69,7 +68,17 @@ namespace global {
 	  GlobalTrack->set_mapper_name(mapper_name);
 	  MAUS::DataStructure::Global::Track* tempSciFiTrack =
 	    SciFiTrackArray->at(i);
+    if (!tempSciFiTrack) {
+      throw(Exception(Exception::recoverable,
+		      "Found an empty SciFi track pointer.",
+		      "MapCppGlobalPID::TrackMatching"));
+    }
 	  MAUS::DataStructure::Global::Track* tempTOFTrack = TOFTrackArray[j];
+    if (!tempTOFTrack) {
+      throw(Exception(Exception::recoverable,
+		      "Found an empty TOF track pointer.",
+		      "MapCppGlobalPID::TrackMatching"));
+    }
 	  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 	    tempSciFiTrackPointArray = tempSciFiTrack->GetTrackPoints();
 	  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
@@ -112,6 +121,11 @@ namespace global {
 	  new MAUS::DataStructure::Global::Track();
 	GlobalTrack->set_mapper_name(mapper_name);
 	MAUS::DataStructure::Global::Track* tempTOFTrack = TOFTrackArray[i];
+  if (!tempTOFTrack) {
+      throw(Exception(Exception::recoverable,
+		      "Found an empty TOF track pointer.",
+          "MapCppGlobalPID::TrackMatching"));
+  }
 	std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 	  tempTOFTrackPointArray = tempTOFTrack->GetTrackPoints();
 	for (unsigned int j = 0; j < tempTOFTrackPointArray.size(); j++) {
@@ -144,6 +158,11 @@ namespace global {
 	GlobalTrack->set_mapper_name(mapper_name);
 	MAUS::DataStructure::Global::Track* tempSciFiTrack =
 	  SciFiTrackArray->at(i);
+  if (!tempSciFiTrack) {
+    throw(Exception(Exception::recoverable,
+		    "Found an empty SciFi track pointer.",
+		    "MapCppGlobalPID::TrackMatching"));
+  }
 	std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 	  tempSciFiTrackPointArray = tempSciFiTrack->GetTrackPoints();
 	for (unsigned int j = 0; j < tempSciFiTrackPointArray.size(); j++) {
