@@ -100,21 +100,20 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         revt = revtarray[0]
         self.assertTrue('global_event' in revt)
         self.assertTrue('track_points' in revt['global_event'])
-        self.assertEqual(33, len(revt['global_event']['track_points']))
         numTMtrackpoints = 0
         for i in revt['global_event']['track_points']:
             self.assertTrue('mapper_name' in i)
             if i['mapper_name'] == 'MapCppGlobalTrackMatching':
                 numTMtrackpoints += 1
-        self.assertEqual(numTMtrackpoints, 33)
+        self.assertEqual(numTMtrackpoints, 30)
         self.assertTrue('tracks' in revt['global_event'])
-        self.assertEqual(4, len(revt['global_event']['tracks']))
+        self.assertEqual(3, len(revt['global_event']['tracks']))
         numTMtracks = 0
         for i in revt['global_event']['tracks']:
             self.assertTrue('mapper_name' in i)
             if i['mapper_name'] == 'MapCppGlobalTrackMatching':
                 numTMtracks += 1
-        self.assertEqual(numTMtracks, 2)
+        self.assertEqual(numTMtracks, 1)
         self.assertTrue('space_points' in revt['global_event'])
         self.assertEqual(33, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
