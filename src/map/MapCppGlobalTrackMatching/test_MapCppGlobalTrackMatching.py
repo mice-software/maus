@@ -85,40 +85,39 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalTrackMatching" in doc["errors"])
 
-    #def test_fill_Global_Event(self):
-        #"""Check that process makes global tracks from TOF and tracker data"""
-        #test5 = ('%s/src/map/MapCppGlobalTrackMatching/global_tm_test.json' %
-                 #os.environ.get("MAUS_ROOT_DIR"))
-        #self.mapper.birth(self. c.getConfigJSON())
-        #fin = open(test5,'r')
-        #line = fin.read()
-        #result = self.mapper.process(line)
-        #spill_out = maus_cpp.converter.json_repr(result)
-        #self.assertTrue('recon_events' in spill_out)
-        #revtarray = spill_out['recon_events']
-        #self.assertEqual(1, len(revtarray))
-        #revt = revtarray[0]
-        #self.assertTrue('global_event' in revt)
-        #self.assertTrue('track_points' in revt['global_event'])
-        #self.assertEqual(33, len(revt['global_event']['track_points']))
-        #numTMtrackpoints = 0
-        #for i in revt['global_event']['track_points']:
-            #self.assertTrue('mapper_name' in i)
-            #if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                #numTMtrackpoints += 1
-        #self.assertEqual(numTMtrackpoints, 33)
-        #self.assertTrue('tracks' in revt['global_event'])
-        #self.assertEqual(4, len(revt['global_event']['tracks']))
-        #numTMtracks = 0
-        #for i in revt['global_event']['tracks']:
-            #self.assertTrue('mapper_name' in i)
-            #if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                #numTMtracks += 1
-        #self.assertEqual(numTMtracks, 2)
-        #self.assertTrue('space_points' in revt['global_event'])
-        #self.assertEqual(33, len(revt['global_event']['space_points']))
-        #self.assertTrue('primary_chains' in revt['global_event'])
-        #self.assertEqual(0, len(revt['global_event']['primary_chains']))
+    def test_fill_Global_Event(self):
+        """Check that process makes global tracks from TOF and tracker data"""
+        test5 = ('%s/src/map/MapCppGlobalTrackMatching/global_tm_test.json' %
+                 os.environ.get("MAUS_ROOT_DIR"))
+        self.mapper.birth(self. c.getConfigJSON())
+        fin = open(test5,'r')
+        line = fin.read()
+        result = self.mapper.process(line)
+        spill_out = maus_cpp.converter.json_repr(result)
+        self.assertTrue('recon_events' in spill_out)
+        revtarray = spill_out['recon_events']
+        self.assertEqual(1, len(revtarray))
+        revt = revtarray[0]
+        self.assertTrue('global_event' in revt)
+        self.assertTrue('track_points' in revt['global_event'])
+        numTMtrackpoints = 0
+        for i in revt['global_event']['track_points']:
+            self.assertTrue('mapper_name' in i)
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                numTMtrackpoints += 1
+        self.assertEqual(numTMtrackpoints, 30)
+        self.assertTrue('tracks' in revt['global_event'])
+        self.assertEqual(3, len(revt['global_event']['tracks']))
+        numTMtracks = 0
+        for i in revt['global_event']['tracks']:
+            self.assertTrue('mapper_name' in i)
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                numTMtracks += 1
+        self.assertEqual(numTMtracks, 1)
+        self.assertTrue('space_points' in revt['global_event'])
+        self.assertEqual(33, len(revt['global_event']['space_points']))
+        self.assertTrue('primary_chains' in revt['global_event'])
+        self.assertEqual(0, len(revt['global_event']['primary_chains']))
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
