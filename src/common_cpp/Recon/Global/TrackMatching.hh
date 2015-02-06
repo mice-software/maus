@@ -50,9 +50,7 @@ namespace global {
     ~TrackMatching() {}
 
     /**  @brief Main process, constructing global tracks from space points
-     *   
-     *  
-     *  @param global_event The Global Event, which will be changed
+     *   @param global_event The Global Event, which will be changed
      */
     void FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name);
 
@@ -78,3 +76,4 @@ namespace global {
 } // ~namespace MAUS
 
 #endif
+
