@@ -38,6 +38,10 @@ def run():
     my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
     my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
+    # KL
+    my_map.append(MAUS.MapCppKLMCDigitizer())
+    my_map.append(MAUS.MapCppKLCellHits())
+
     # Global
     my_map.append(MAUS.MapCppGlobalReconImport())
     my_map.append(MAUS.MapCppGlobalTrackMatching())

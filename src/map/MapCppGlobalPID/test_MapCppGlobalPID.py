@@ -201,6 +201,30 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue('pid' in track)
             self.assertEqual(0, track['pid'])
 
+    def test_KL_PID(self):
+        """Check that PIDVarC pid"""
+        test4 = ('%s/src/map/MapCppGlobalPID/kl_pid_test.json' %
+                 os.environ.get("MAUS_ROOT_DIR"))
+        self.mapper.birth(self.c.getConfigJSON())
+        fin = open(test4,'r')
+        for line in fin:
+            result = self.mapper.process(line)
+            spill_out = maus_cpp.converter.json_repr(result)
+            self.assertTrue('recon_events' in spill_out)
+            revtarray = spill_out['recon_events']
+            self.assertEqual(1, len(revtarray))
+            revt = revtarray[0]
+            self.assertTrue('global_event' in revt)
+            gevt = revt['global_event']
+            self.assertEqual(4, len(gevt)) 
+            self.assertTrue('tracks' in gevt)
+            tracksarray = gevt['tracks']
+            for i in tracksarray:
+                if i['mapper_name'] == 'MapCppGlobalTrackMatching':
+                    track = i
+                    self.assertTrue('pid' in track)
+                    self.assertEqual(-13, track['pid'])
+
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Check that we can death() MapCppGlobalPID"""
