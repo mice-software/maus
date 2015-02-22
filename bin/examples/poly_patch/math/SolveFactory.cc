@@ -1,4 +1,4 @@
-#include "math/PolynomialPatch.hh"
+#include "math/PPSolveFactory.hh"
 #include "math/SolveFactory.hh"
 
 SolveFactory::SolveFactory(int polynomial_order, int smoothing_order, bool use_squares)
@@ -8,7 +8,7 @@ SolveFactory::SolveFactory(int polynomial_order, int smoothing_order, bool use_s
 std::vector<double> SolveFactory::MakeSquareVector(std::vector<double> x,
                                                    int lower,
                                                    int upper) {
-    std::vector< std::vector<int> > nearby_points = PolynomialPatch::GetNearbyPointsSquares(x.size(), lower, upper);
+    std::vector< std::vector<int> > nearby_points = PPSolveFactory::GetNearbyPointsSquares(x.size(), lower, upper);
     std::vector<double> square_vector(nearby_points.size(), 1.);
     for (size_t i = 0; i < nearby_points.size(); ++i) {
         std::vector<int> point = nearby_points[i];
@@ -20,7 +20,7 @@ std::vector<double> SolveFactory::MakeSquareVector(std::vector<double> x,
 }
 
 std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> positions, std::vector<int> deriv_indices, int upper) {
-    std::vector< std::vector<int> > nearby_points = PolynomialPatch::GetNearbyPointsSquares(positions.size(), -1, upper);
+    std::vector< std::vector<int> > nearby_points = PPSolveFactory::GetNearbyPointsSquares(positions.size(), -1, upper);
     std::vector<double> deriv_vec(nearby_points.size(), 1.);
     for (size_t i = 0; i < nearby_points.size(); ++i) {
         for (int j = 0; j < nearby_points[i].size(); ++j) {
@@ -44,8 +44,8 @@ std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> posi
 
 MMatrix<double> convert_A_square_to_A_triangle(int point_dim, int square_order, MMatrix<double> A_square) {
     int triangle_order = square_order*point_dim+1;
-    std::vector< std::vector<int> > triangle_points = PolynomialPatch::GetNearbyPointsTriangles(point_dim, 0, triangle_order);
-    std::vector< std::vector<int> > square_points = PolynomialPatch::GetNearbyPointsSquares(point_dim, -1, square_order);
+    std::vector< std::vector<int> > triangle_points = PPSolveFactory::GetNearbyPointsTriangles(point_dim, 0, triangle_order);
+    std::vector< std::vector<int> > square_points = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, square_order);
     MMatrix<double> A_triangle(A_square.num_row(), triangle_points.size(), 0.);
     for (size_t i = 0; i < triangle_points.size(); ++i) {
         for (size_t j = 0; j < square_points.size(); ++j) {
