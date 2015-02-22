@@ -15,8 +15,8 @@
 //along with xboa in the doc folder.  If not, see 
 //<http://www.gnu.org/licenses/>.
 
-#include "rogers_math/MVector.hh"
-#include "rogers_math/MMatrix.hh"
+#include "math/MVector.hh"
+#include "math/MMatrix.hh"
 
 ///////////////////////// m_complex ////////////////////////////
 

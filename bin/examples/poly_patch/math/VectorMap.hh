@@ -14,7 +14,7 @@
 
 #include "gsl/gsl_sf_gamma.h"
 
-#include "rogers_math/Mesh.hh"
+#include "math/Mesh.hh"
 
 ///// VectorMap  /////
 

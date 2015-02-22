@@ -1,5 +1,5 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
-#include "rogers_math/Mesh.hh"
+#include "math/Mesh.hh"
 #include "Utils/Exception.hh"
 typedef MAUS::Exception Squeal;
 

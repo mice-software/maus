@@ -29,7 +29,7 @@
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_eigen.h"
 
-#include "rogers_math/MMatrix.hh"
+#include "math/MMatrix.hh"
 
 ///////////////////////////////// MMATRIX ///////////////////////////////
 

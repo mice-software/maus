@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <math.h>
 
-#include "rogers_math/MVector.hh"
+#include "math/MVector.hh"
 
 //
 //Mesh is a set of classes to describe a grid of points in various dimensions etc

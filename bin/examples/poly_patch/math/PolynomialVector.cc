@@ -1,11 +1,11 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
-#include "rogers_math/PolynomialVector.hh"
+#include "math/PolynomialVector.hh"
 
 #include "Utils/Exception.hh"
 typedef MAUS::Exception Squeal;
 
-#include "rogers_math/MMatrix.hh"
-#include "rogers_math/MVector.hh"
+#include "math/MMatrix.hh"
+#include "math/MVector.hh"
 
 #include <iomanip>
 #include <sstream>
@@ -59,8 +59,7 @@ void PolynomialVector::SetCoefficients(std::vector<PolynomialCoefficient> coeff)
 
   int maxPolyOrder = 0;
   int valueDim     = 0;
-  for(unsigned int i=0; i<coeff.size(); i++)
-  {
+  for(unsigned int i=0; i<coeff.size(); i++) {
     int polyOrder = coeff[i].InVariables().size();
     for(unsigned int j=0; j<coeff[i].InVariables().size(); j++)
       if(coeff[i].InVariables()[j] > _pointDim) _pointDim = coeff[i].InVariables()[j];
@@ -132,7 +131,7 @@ double*  PolynomialVector::MakePolyVector(const double* point, double* polyVecto
     return polyVector;
 }
 
-double* PolynomialVector::MakeDerivVector(const double* positions, const int* deriv_indices, double* deriv_vec) {
+double* PolynomialVector::MakeDerivVector(const double* positions, const int* deriv_indices, double* deriv_vec) const {
     size_t pkey_size = _polyKeyByPower.size();
     for (size_t i = 0; i < pkey_size; ++i) {
         deriv_vec[i] = 1.;
@@ -288,7 +287,7 @@ MMatrix<double> PolynomialVector::Covariances(std::vector<std::vector<double> > 
 
   return cov;
 }
-
+/*
 PolynomialVector* PolynomialVector::PolynomialSolve(
          int polynomialOrder,
          const std::vector< std::vector<double> >& positions,
@@ -312,20 +311,59 @@ PolynomialVector* PolynomialVector::PolynomialSolve(
     // PointDimension and ValueDimension will be taken from coeffs and derivs;
     // it is an error if these do not all have the same dimensions.
     
+    // OPTIMISATION - if we are doing this many times and only changing values,
+    // can reuse H
     int nCoeffs = values.size();
     int nDerivs = deriv_values.size();
-    std::cerr << "VALIDATE INPUT HERE PLEASE" << std::endl;
-    int pointDim = positions[0].size();
-    int valueDim = values[0].size();
 
+    if (positions.size() != values.size())
+        throw MAUS::Exception(MAUS::Exception::recoverable,
+              "Positions misaligned with values",
+              "PolynomialVector::PolynomialSolve"
+        );
+    if (deriv_positions.size() != deriv_values.size() ||
+        deriv_positions.size() != deriv_indices.size())
+        throw MAUS::Exception(MAUS::Exception::recoverable,
+              "Derivative positions misaligned with values and indices",
+              "PolynomialVector::PolynomialSolve"
+        );
+    int pointDim = 0;
+    int valueDim = 0;
+    if (positions.size() > 0) {
+        pointDim = positions[0].size();
+        valueDim = values[0].size();
+    } else if (deriv_positions.size() > 0) {
+        pointDim = deriv_positions[0].size();
+        valueDim = deriv_values[0].size();
+    } else {
+        throw MAUS::Exception(MAUS::Exception::recoverable,
+              "No point data - can't solve!",
+              "PolynomialVector::PolynomialSolve"
+        );
+    }
+  
     int nPolyCoeffs = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
+    if (deriv_positions.size()+positions.size() != size_t(nPolyCoeffs))
+        throw MAUS::Exception(
+              MAUS::Exception::recoverable,
+              "Positions and derivatives over or under constrained",
+              "PolynomialVector::PolynomialSolve"
+        );
+
+    for (size_t i = 0; i < positions.size(); ++i) {
+        for (size_t j = 0; j < positions[i].size(); ++j) {
+            //std::cerr << positions[i][j] << " ";
+        }
+        //std::cerr << std::endl;
+    }
+
     MMatrix<double> A(valueDim, nPolyCoeffs, 0.);
     PolynomialVector* temp = new PolynomialVector(pointDim, A);
     for (size_t y_index = 0; y_index < values[0].size(); ++y_index) {
         MVector<double> G(nPolyCoeffs, 0.);
         MMatrix<double> H(nPolyCoeffs, nPolyCoeffs, 0.);
-        // First fill the zeroth derivatives
-        for (int i = 0; i < nPolyCoeffs; ++i) {
+        // First fill the values
+        for (int i = 0; i < nCoeffs && i < nPolyCoeffs; ++i) {
             G(i+1) = values[i][y_index];
             std::vector<double> poly_vec(nPolyCoeffs, 0.);
             temp->MakePolyVector(&positions[i][0], &poly_vec[0]);
@@ -333,16 +371,17 @@ PolynomialVector* PolynomialVector::PolynomialSolve(
                 H(i+1, j+1) = poly_vec[j];
             }
         }
-        // Now fill the first derivatives
+        // Now fill the derivatives
         for (int i = 0; i < nDerivs; ++i) {
             G(i+nCoeffs+1) = deriv_values[i][y_index];
             std::vector<double> deriv_vec(nPolyCoeffs, 0.);
             temp->MakeDerivVector(&deriv_positions[i][0], &deriv_indices[i][0], &deriv_vec[0]);
-            for (int j = 0; j < nCoeffs; ++j) {
-                H(i+1, j+1) = deriv_vec[j];
+            for (int j = 0; j < nPolyCoeffs; ++j) {
+                H(i+1+nCoeffs, j+1) = deriv_vec[j];
             }
         }
         try {
+            // std::cerr << "\nH Matrix\n" << H << "\n" << std::flush << H.determinant() << std::endl;
             H.invert();
         } catch (MAUS::Exception exc) {
             delete temp;
@@ -357,7 +396,14 @@ PolynomialVector* PolynomialVector::PolynomialSolve(
     temp = new PolynomialVector(pointDim, A);
     return temp;
 }
-
+*/
+void  PolynomialVector::FDeriv(const double*   point, const int* derivative_by_power, double* value) const {
+    MVector<double> polyVector(_polyKeyByVector.size(), 1);
+    MakeDerivVector(point, derivative_by_power, &polyVector(1));
+    MVector<double> answer = _polyCoeffs*polyVector;
+    for(unsigned int i=0; i<ValueDimension(); i++)
+        value[i] = answer(i+1);
+}
 
 
 

@@ -27,7 +27,7 @@
 #include "Utils/Exception.hh"
 typedef MAUS::Exception Squeal;
 
-#include "rogers_math/MVector.hh"
+#include "math/MVector.hh"
 
 
 ///////////////// MMatrix     /////////////////
