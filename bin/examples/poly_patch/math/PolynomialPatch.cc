@@ -241,11 +241,11 @@ void PolynomialPatch::SolverGetValues(int poly_patch_order,
     // these makes a point in the polynomial fit
     for (size_t i = 0; i < data_points_size; ++i) {
         std::vector<int> it_state = it.State();
-        for (size_t j = 0; j < pos_dim; ++j)
+        for (int j = 0; j < pos_dim; ++j)
             it_state[j]++;
         Mesh::Iterator it_current = Mesh::Iterator(it_state, points);
         bool out_of_bounds = false; // element is off the edge of the mesh
-        for (size_t j = 0; j < pos_dim; ++j) {
+        for (int j = 0; j < pos_dim; ++j) {
             it_current[j] -= data_points[i][j];
             out_of_bounds = out_of_bounds ||
                             it_current[j] < 1 ||
@@ -253,8 +253,7 @@ void PolynomialPatch::SolverGetValues(int poly_patch_order,
         }
         if (out_of_bounds) { // if off the edge, then just constrain to zero
             this_points.push_back(OutOfBoundsPosition(it_current));
-            std::vector<double> a_value(value_dim, 0.);
-            this_values.push_back(a_value);
+            this_values.push_back(values[it.ToInteger()]);
         } else { // else fit using values
             this_points.push_back(it_current.Position());
             this_values.push_back(values[it_current.ToInteger()]);
@@ -284,13 +283,13 @@ void PolynomialPatch::SolverGetDerivs(int poly_patch_order,
         std::cerr << "    Smooth " << Mesh::Iterator(smoothing_points[i], points) << std::endl;
     for (size_t i = 0; i < smoothing_points.size(); ++i) {
         std::vector<int> it_state = it.State();
-        for (size_t j = 0; j < pos_dim; ++j)
+        for (int j = 0; j < pos_dim; ++j)
             it_state[j]++;
         Mesh::Iterator it_current = Mesh::Iterator(it_state, points);
         // No corresponding polynomial for the element
         bool out_of_bounds = it_current.ToInteger() >= int(polynomials.size()); 
         // it_current is out of range
-        for (size_t j = 0; j < pos_dim; ++j) {
+        for (int j = 0; j < pos_dim; ++j) {
             it_current[j] -= smoothing_points[i][j];
             out_of_bounds = out_of_bounds ||
                             it_current[j] < 1 ||
@@ -333,7 +332,7 @@ void PolynomialPatch::SolverGetDerivs2(int poly_patch_order,
     for (size_t i = 0; i < smoothing_points.size(); ++i) {
         Mesh::Iterator it_current = it;
         bool out_of_bounds = false; // element is off the edge of the mesh
-        for (size_t j = 0; j < pos_dim; ++j) {
+        for (int j = 0; j < pos_dim; ++j) {
             it_current[j] += smoothing_points[i][j];
             out_of_bounds = out_of_bounds ||
                             it_current[j] < 1 ||
