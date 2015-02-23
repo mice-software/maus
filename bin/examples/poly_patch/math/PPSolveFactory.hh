@@ -42,8 +42,8 @@ class PPSolveFactory {
 
 
   private:
-    void SolverGetValues(Mesh::Iterator it);
-    void SolverGetDerivs(Mesh::Iterator it);
+    void GetValues(Mesh::Iterator it);
+    void GetDerivs(Mesh::Iterator it);
 
     std::vector<double> OutOfBoundsPosition(Mesh::Iterator out_of_bounds_it);
     static void NearbyPointsRecursive(std::vector<int> check, size_t check_index, size_t poly_power, std::vector<std::vector<int> >& nearby_points);

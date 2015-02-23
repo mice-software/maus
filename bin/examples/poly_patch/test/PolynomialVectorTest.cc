@@ -100,7 +100,7 @@ TEST(PolynomialVectorTest, TestPolynomialSolveNoDerivs) {
             ref_vec.F(&pos.back()[0], &values.back()[0]);
         }
 
-        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
+        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), 1).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
         std::cerr << ref_vec << std::endl;
         std::cerr << *test_vec << std::endl;
         for (size_t i = 0; i < pos.size(); ++i) {
@@ -146,7 +146,7 @@ TEST(PolynomialVectorTest, TestPolynomialSolvePseudoDerivs) {
                            &deriv_indices.back()[0],
                            &deriv_values.back()[0]);
         }
-        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
+        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), 1).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
         std::cerr << ref_vec << std::endl;
         std::cerr << *test_vec << std::endl;
         for (size_t i = 0; i < pos.size(); ++i) {
@@ -191,7 +191,7 @@ void run_test(int start_coefficient) {
                            &deriv_indices.back()[0],
                            &deriv_values.back()[0]);
         }
-        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
+        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), 1).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
         for (size_t i = 0; i < pos.size(); ++i) {
             std::vector<double> test_val(2);
             test_vec->F(&pos[i][0], &test_val[0]);
@@ -203,13 +203,15 @@ void run_test(int start_coefficient) {
 
 TEST(PolynomialVectorTest, TestMakeSquareDerivVector) {
     // std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> positions, std::vector<int> deriv_indices, int lower, int upper) const {
+    /*
+    SolveFactory fac(1, -1, pos.size())
     std::vector<double> pos(4, 1.);
     pos[1] = 2.;
     pos[2] = 3.;
     pos[3] = 4.;
     std::vector<int> deriv_indices(4, 0);
     std::vector<double> derivs;
-    derivs = SolveFactory::MakeSquareDerivVector(pos, deriv_indices, 1);
+    derivs = .MakeSquareDerivVector(pos, deriv_indices, 1);
     EXPECT_EQ(derivs.size(), 2*2*2*2);
     EXPECT_EQ(derivs.back(), 1.*2.*3.*4);
     EXPECT_EQ(derivs.front(), 1.);
@@ -231,7 +233,7 @@ TEST(PolynomialVectorTest, TestMakeSquareDerivVector) {
     EXPECT_EQ(derivs.size(), 4*4*4*4);
     EXPECT_EQ(derivs.back(), (3.*2.*1.)*(3.*2.*2.)*(3.*3.*3.)*(4.*4.*4.));
     EXPECT_EQ(derivs.front(), 0.);
-
+    */
 }
 
 TEST(PolynomialVectorTest, TestPolynomialSolveDerivs) {

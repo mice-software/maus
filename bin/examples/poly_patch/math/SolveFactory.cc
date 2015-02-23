@@ -1,40 +1,46 @@
+#include <gsl/gsl_sf_pow_int.h>
+
 #include "math/PPSolveFactory.hh"
 #include "math/SolveFactory.hh"
 
-SolveFactory::SolveFactory(int polynomial_order, int smoothing_order, int point_dim, bool use_squares)
-  : polynomial_order_(polynomial_order), smoothing_order_(smoothing_order), squares_(use_squares) {
+SolveFactory::SolveFactory(int polynomial_order, int smoothing_order, int point_dim, int value_dim)
+  : polynomial_order_(polynomial_order), smoothing_order_(smoothing_order) {
+    n_poly_coeffs_ = 1;
+    for (int i = 0; i < point_dim; ++i)
+        n_poly_coeffs_ *= smoothing_order_+1;
+
     int triangle_order = smoothing_order*point_dim+1;
     triangle_points_ = PPSolveFactory::GetNearbyPointsTriangles(point_dim, 0, triangle_order);
     square_points_ = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, smoothing_order);
     square_deriv_nearby_points_ = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, smoothing_order);
+    MMatrix<double> A_temp(value_dim, n_poly_coeffs_, 0.);
+    A_temp = ConvertASquareToATriangle(point_dim, smoothing_order_, A_temp);
+    triangle_temp_ = PolynomialVector(point_dim, A_temp);
 }
 
-std::vector<double> SolveFactory::MakeSquareVector(std::vector<double> x,
-                                                   int lower,
-                                                   int upper) {
-    std::vector< std::vector<int> > nearby_points = PPSolveFactory::GetNearbyPointsSquares(x.size(), lower, upper);
-    std::vector<double> square_vector(nearby_points.size(), 1.);
-    for (size_t i = 0; i < nearby_points.size(); ++i) {
-        std::vector<int> point = nearby_points[i];
+std::vector<double> SolveFactory::MakeSquareVector(std::vector<double> x) {
+    std::vector<double> square_vector(square_points_.size(), 1.);
+    for (size_t i = 0; i < square_points_.size(); ++i) {
+        std::vector<int>& point = square_points_[i];
         for (size_t j = 0; j < point.size(); ++j)
-            for (size_t k = 0; k < point[j]; ++k)
-                square_vector[i] *= x[j];
+            square_vector[i] *= gsl_sf_pow_int(x[j], point[j]);
     }
     return square_vector;
 }
 
 std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> positions, std::vector<int> deriv_indices, int upper) {
     std::vector<double> deriv_vec(square_deriv_nearby_points_.size(), 1.);
-    for (size_t i = 0; i < square_deriv_nearby_points_.size(); ++i) {
-        for (int j = 0; j < square_deriv_nearby_points_[i].size(); ++j) {
+    int square_deriv_nearby_points_size = square_deriv_nearby_points_.size();
+    int dim = square_deriv_nearby_points_[0].size();
+    for (int i = 0; i < square_deriv_nearby_points_size; ++i) {
+        for (int j = 0; j < dim; ++j) {
             int power = square_deriv_nearby_points_[i][j] - deriv_indices[j]; // p_j - q_j
             if (power < 0) {
                 deriv_vec[i] = 0.;
+                break;
             } else {
                 // x^(p_j-q_j)
-                for (int k = 0; k < power; ++k) {
-                    deriv_vec[i] *= positions[j];
-                }
+                deriv_vec[i] *= gsl_sf_pow_int(positions[j], power);
             }
             // p_j*(p_j-1)*(p_j-2)*...*(p_j-q_j)
             for (int k = square_deriv_nearby_points_[i][j]; k > power; --k) {
@@ -115,15 +121,7 @@ PolynomialVector* SolveFactory::PolynomialSolve(
         );
     }
 
-    int nPolyCoeffs = 1;
-    if (squares_) {
-        for (int i = 0; i < pointDim; ++i)
-            nPolyCoeffs *= smoothing_order_+1;
-    } else {
-       nPolyCoeffs = PolynomialVector::NumberOfPolynomialCoefficients(pointDim, smoothing_order_);
-    }
-    if (deriv_positions.size()+positions.size() != size_t(nPolyCoeffs)) {
-        std::cerr << "size " << deriv_positions.size()+positions.size() << " n_coeffs: " << nPolyCoeffs << std::endl;
+    if (deriv_positions.size()+positions.size() != size_t(n_poly_coeffs_)) {
         throw MAUS::Exception(
               MAUS::Exception::recoverable,
               "Positions and derivatives over or under constrained",
@@ -132,26 +130,19 @@ PolynomialVector* SolveFactory::PolynomialSolve(
     }
     for (size_t i = 0; i < positions.size(); ++i) {
         for (size_t j = 0; j < positions[i].size(); ++j) {
-            //std::cerr << positions[i][j] << " ";
         }
-        //std::cerr << std::endl;
     }
 
-    MMatrix<double> A(valueDim, nPolyCoeffs, 0.);
-    PolynomialVector* temp = new PolynomialVector(pointDim, A);
+    MMatrix<double> A(valueDim, n_poly_coeffs_, 0.);
     for (size_t y_index = 0; y_index < values[0].size(); ++y_index) {
-        MVector<double> G(nPolyCoeffs, 0.);
-        MMatrix<double> H(nPolyCoeffs, nPolyCoeffs, 0.);
+        MVector<double> G(n_poly_coeffs_, 0.);
+        MMatrix<double> H(n_poly_coeffs_, n_poly_coeffs_, 0.);
         // First fill the values
-        for (int i = 0; i < nCoeffs && i < nPolyCoeffs; ++i) {
+        for (int i = 0; i < nCoeffs && i < n_poly_coeffs_; ++i) {
             G(i+1) = values[i][y_index];
-            std::vector<double> poly_vec(nPolyCoeffs, 0.);
-            if (squares_) {
-                poly_vec = MakeSquareVector(positions[i], -1, smoothing_order_);
-            } else {
-                temp->MakePolyVector(&positions[i][0], &poly_vec[0]);
-            }
-            for (int j = 0; j < nPolyCoeffs; ++j) {
+            std::vector<double> poly_vec(n_poly_coeffs_, 0.);
+            poly_vec = MakeSquareVector(positions[i]);
+            for (int j = 0; j < n_poly_coeffs_; ++j) {
                 H(i+1, j+1) = poly_vec[j];
             }
         }
@@ -159,34 +150,23 @@ PolynomialVector* SolveFactory::PolynomialSolve(
         for (int i = 0; i < nDerivs; ++i) {
             G(i+nCoeffs+1) = deriv_values[i][y_index];
             std::vector<double> deriv_vec;
-            if (squares_) {
-                deriv_vec = MakeSquareDerivVector(deriv_positions[i], deriv_indices[i], smoothing_order_);
-            } else {
-                throw("Not implemented");
-            }
-            for (int j = 0; j < nPolyCoeffs; ++j) {
+            deriv_vec = MakeSquareDerivVector(deriv_positions[i], deriv_indices[i], smoothing_order_);
+            for (int j = 0; j < n_poly_coeffs_; ++j) {
                 H(i+1+nCoeffs, j+1) = deriv_vec[j];
             }
         }
         try {
-            std::cerr << "\nH Matrix\n" << H << "\n" << std::flush << H.determinant() << std::endl;
-            std::cerr << "\nG Matrix\n" << G << "\n" << std::endl;
             H.invert();
         } catch (MAUS::Exception exc) {
-            delete temp;
             throw exc;
         }
         MVector<double> A_vec = H*G;
-        // ERROR - mismatch between Square coefficients and triangular coefficients 
-        for (int j = 0; j < nPolyCoeffs; ++j) {
+        for (int j = 0; j < n_poly_coeffs_; ++j) {
             A(y_index+1, j+1) = A_vec(j+1);
         }
     }
-    std::cerr << "\nA Square\n" << A << "\n" << std::endl;
     A = ConvertASquareToATriangle(pointDim, smoothing_order_, A);
-    std::cerr << "\nA Triangle\n" << A << "\n" << std::endl;
-    delete temp;
-    temp = new PolynomialVector(pointDim, A);
-    std::cerr << "Allocate poly vector " << temp << std::endl;
+    PolynomialVector* temp = new PolynomialVector(triangle_temp_);
+    temp->SetCoefficients(A);
     return temp;
 }

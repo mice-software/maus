@@ -52,7 +52,10 @@ class PolynomialVector
 public:
 
     class PolynomialCoefficient;
-
+    /// Default constructor (leaves everything empty, call SetCoefficients to set up properly)
+    PolynomialVector();
+    /// Copy constructor
+    PolynomialVector (const PolynomialVector& pv); 
     /// Construct polynomial vector passing polynomial coefficients as a matrix.
     PolynomialVector (int pointDimension, MMatrix<double> polynomialCoefficients); 
     /// Construct polynomial vector passing polynomial coefficients as a list of PolynomialCoefficient objects.
@@ -222,6 +225,8 @@ public:
         /// inVariablesByVector is x power indexed like e.g. \f$x_1^4 x_2^3 =\f$ {1,1,1,1,2,2,2}
         PolynomialCoefficient(std::vector<int> inVariablesByVector, int outVariable, double coefficient) 
             : _inVarByVec(inVariablesByVector), _outVar(outVariable), _coefficient(coefficient) {}
+        PolynomialCoefficient(const PolynomialCoefficient& pc)
+            : _inVarByVec(pc._inVarByVec), _outVar(pc._outVar), _coefficient(pc._coefficient) {}
         /// Accessors
         /// Pass a parameter to *set*
         std::vector<int> InVariables() const {return _inVarByVec;}

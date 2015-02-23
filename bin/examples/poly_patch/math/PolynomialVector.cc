@@ -20,6 +20,21 @@ typedef MAUS::Exception Squeal;
 
 bool PolynomialVector::_printHeaders=true;
 
+PolynomialVector::PolynomialVector() 
+    : _pointDim(0), _polyKeyByPower(),
+      _polyKeyByVector(), _polyCoeffs(),
+      _polyVector() {
+}
+
+PolynomialVector::PolynomialVector (const PolynomialVector& pv) 
+    : _pointDim(pv._pointDim), _polyKeyByPower(pv._polyKeyByPower),
+      _polyKeyByVector(pv._polyKeyByVector),
+      _polyCoeffs(pv._polyCoeffs.num_row(), pv._polyCoeffs.num_col(), 0.),
+      _polyVector(pv._polyVector) {
+    SetCoefficients(pv._polyCoeffs);
+}
+
+
 PolynomialVector::PolynomialVector(int numberOfInputVariables, MMatrix<double> polynomialCoefficients)
         :  _pointDim(numberOfInputVariables), _polyKeyByPower(), _polyKeyByVector(), _polyCoeffs(polynomialCoefficients)
 {
