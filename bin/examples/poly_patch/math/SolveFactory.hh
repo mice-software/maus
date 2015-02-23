@@ -7,7 +7,13 @@
 
 class SolveFactory : public PolynomialVectorFactory {
   public:
-    SolveFactory(int polynomial_order, int smoothing_order, int point_dim, int value_dim);
+    SolveFactory(int polynomial_order,
+                 int smoothing_order,
+                 int point_dim,
+                 int value_dim,
+                 std::vector< std::vector<double> > positions,
+                 std::vector< std::vector<double> > deriv_positions,
+                 std::vector< std::vector<int> >& deriv_indices);
     ~SolveFactory() {}
     PolynomialVector* PolynomialSolve(
              const std::vector< std::vector<double> >& positions,
@@ -21,6 +27,10 @@ class SolveFactory : public PolynomialVectorFactory {
     MMatrix<double> ConvertASquareToATriangle(int point_dim, int square_order, MMatrix<double> A_square);
 
   private:
+    void BuildHInvMatrix(std::vector< std::vector<double> > positions,
+                         std::vector< std::vector<double> > deriv_positions,
+                         std::vector< std::vector<int> >& deriv_indices);
+
     int polynomial_order_;
     int smoothing_order_;
     int n_poly_coeffs_;
@@ -29,6 +39,7 @@ class SolveFactory : public PolynomialVectorFactory {
     std::vector< std::vector<int> > square_deriv_nearby_points_;
 
     PolynomialVector triangle_temp_;
+    MMatrix<double> h_inv_;
 
 };
 

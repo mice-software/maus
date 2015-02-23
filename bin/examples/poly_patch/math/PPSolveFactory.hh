@@ -42,7 +42,9 @@ class PPSolveFactory {
 
 
   private:
+    void GetPoints();
     void GetValues(Mesh::Iterator it);
+    void GetDerivPoints();
     void GetDerivs(Mesh::Iterator it);
 
     std::vector<double> OutOfBoundsPosition(Mesh::Iterator out_of_bounds_it);

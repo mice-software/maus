@@ -65,9 +65,12 @@ PolynomialPatch::~PolynomialPatch() {
 
 void PolynomialPatch::F(const double* point, double* value) const {
     Mesh::Iterator nearest = grid_points_->Nearest(point);
+    std::vector<double> point_temp(point_dimension_);
+    std::vector<double> nearest_pos = nearest.Position();
+    for (size_t i = 0; i < point_dimension_; ++i)
+        point_temp[i] = point[i] - nearest_pos[i];
     int points_index = nearest.ToInteger();
-    points_[points_index]->F(point, value);
-    //std::cerr << points_[points_index]->GetCoefficientsAsMatrix();
+    points_[points_index]->F(&point_temp[0], value);
 }
 
 PolynomialVector* PolynomialPatch::GetPolynomialVector(const double* point) const {

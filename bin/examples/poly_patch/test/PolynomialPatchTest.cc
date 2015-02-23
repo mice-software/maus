@@ -80,7 +80,7 @@ void test_points(int dim, int lower, int upper, std::vector< std::vector<int> > 
           upper_size = 0;
       // size should be difference in area of the squares
       EXPECT_EQ(pts.size(), upper_size - lower_size);
-      for (int i = 0; i < pts.size(); ++i) {
+      for (size_t i = 0; i < pts.size(); ++i) {
           // each pts element should have length dim
           EXPECT_EQ(pts[i].size(), dim);
           // each pts element should have indices with lower < size <= upper
@@ -90,7 +90,7 @@ void test_points(int dim, int lower, int upper, std::vector< std::vector<int> > 
           }
           EXPECT_TRUE(in_bounds);
           // each pts element should be unique
-          for (int j = 0; j < pts.size(); ++j) {
+          for (size_t j = 0; j < pts.size(); ++j) {
               if (j == i)
                   continue;
               bool equal = true;
