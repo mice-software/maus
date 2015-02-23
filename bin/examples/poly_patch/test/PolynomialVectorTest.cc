@@ -100,7 +100,7 @@ TEST(PolynomialVectorTest, TestPolynomialSolveNoDerivs) {
             ref_vec.F(&pos.back()[0], &values.back()[0]);
         }
 
-        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
+        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
         std::cerr << ref_vec << std::endl;
         std::cerr << *test_vec << std::endl;
         for (size_t i = 0; i < pos.size(); ++i) {
@@ -146,7 +146,7 @@ TEST(PolynomialVectorTest, TestPolynomialSolvePseudoDerivs) {
                            &deriv_indices.back()[0],
                            &deriv_values.back()[0]);
         }
-        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
+        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
         std::cerr << ref_vec << std::endl;
         std::cerr << *test_vec << std::endl;
         for (size_t i = 0; i < pos.size(); ++i) {
@@ -191,7 +191,7 @@ void run_test(int start_coefficient) {
                            &deriv_indices.back()[0],
                            &deriv_values.back()[0]);
         }
-        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
+        PolynomialVector* test_vec = SolveFactory(poly_order+1, -1, pos[0].size(), false).PolynomialSolve(pos, values, deriv_pos, deriv_values, deriv_indices);
         for (size_t i = 0; i < pos.size(); ++i) {
             std::vector<double> test_val(2);
             test_vec->F(&pos[i][0], &test_val[0]);

@@ -1,8 +1,12 @@
 #include "math/PPSolveFactory.hh"
 #include "math/SolveFactory.hh"
 
-SolveFactory::SolveFactory(int polynomial_order, int smoothing_order, bool use_squares)
+SolveFactory::SolveFactory(int polynomial_order, int smoothing_order, int point_dim, bool use_squares)
   : polynomial_order_(polynomial_order), smoothing_order_(smoothing_order), squares_(use_squares) {
+    int triangle_order = smoothing_order*point_dim+1;
+    triangle_points_ = PPSolveFactory::GetNearbyPointsTriangles(point_dim, 0, triangle_order);
+    square_points_ = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, smoothing_order);
+    square_deriv_nearby_points_ = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, smoothing_order);
 }
 
 std::vector<double> SolveFactory::MakeSquareVector(std::vector<double> x,
@@ -20,11 +24,10 @@ std::vector<double> SolveFactory::MakeSquareVector(std::vector<double> x,
 }
 
 std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> positions, std::vector<int> deriv_indices, int upper) {
-    std::vector< std::vector<int> > nearby_points = PPSolveFactory::GetNearbyPointsSquares(positions.size(), -1, upper);
-    std::vector<double> deriv_vec(nearby_points.size(), 1.);
-    for (size_t i = 0; i < nearby_points.size(); ++i) {
-        for (int j = 0; j < nearby_points[i].size(); ++j) {
-            int power = nearby_points[i][j] - deriv_indices[j]; // p_j - q_j
+    std::vector<double> deriv_vec(square_deriv_nearby_points_.size(), 1.);
+    for (size_t i = 0; i < square_deriv_nearby_points_.size(); ++i) {
+        for (int j = 0; j < square_deriv_nearby_points_[i].size(); ++j) {
+            int power = square_deriv_nearby_points_[i][j] - deriv_indices[j]; // p_j - q_j
             if (power < 0) {
                 deriv_vec[i] = 0.;
             } else {
@@ -34,7 +37,7 @@ std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> posi
                 }
             }
             // p_j*(p_j-1)*(p_j-2)*...*(p_j-q_j)
-            for (int k = nearby_points[i][j]; k > power; --k) {
+            for (int k = square_deriv_nearby_points_[i][j]; k > power; --k) {
                 deriv_vec[i] *= k;
             }
         }
@@ -42,16 +45,13 @@ std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> posi
     return deriv_vec;
 }
 
-MMatrix<double> convert_A_square_to_A_triangle(int point_dim, int square_order, MMatrix<double> A_square) {
-    int triangle_order = square_order*point_dim+1;
-    std::vector< std::vector<int> > triangle_points = PPSolveFactory::GetNearbyPointsTriangles(point_dim, 0, triangle_order);
-    std::vector< std::vector<int> > square_points = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, square_order);
-    MMatrix<double> A_triangle(A_square.num_row(), triangle_points.size(), 0.);
-    for (size_t i = 0; i < triangle_points.size(); ++i) {
-        for (size_t j = 0; j < square_points.size(); ++j) {
+MMatrix<double> SolveFactory::ConvertASquareToATriangle(int point_dim, int square_order, MMatrix<double> A_square) {
+    MMatrix<double> A_triangle(A_square.num_row(), triangle_points_.size(), 0.);
+    for (size_t i = 0; i < triangle_points_.size(); ++i) {
+        for (size_t j = 0; j < square_points_.size(); ++j) {
             bool is_equal = true;
-            for (size_t k = 0; k < square_points[j].size() && is_equal; ++k)
-                is_equal &= square_points[j][k] == triangle_points[i][k];
+            for (size_t k = 0; k < square_points_[j].size() && is_equal; ++k)
+                is_equal &= square_points_[j][k] == triangle_points_[i][k];
             if (is_equal) {
                 for (size_t k = 0; k < A_square.num_row(); ++k)
                     A_triangle(k+1, i+1) = A_square(k+1, j+1);
@@ -183,7 +183,7 @@ PolynomialVector* SolveFactory::PolynomialSolve(
         }
     }
     std::cerr << "\nA Square\n" << A << "\n" << std::endl;
-    A = convert_A_square_to_A_triangle(pointDim, smoothing_order_, A);
+    A = ConvertASquareToATriangle(pointDim, smoothing_order_, A);
     std::cerr << "\nA Triangle\n" << A << "\n" << std::endl;
     delete temp;
     temp = new PolynomialVector(pointDim, A);

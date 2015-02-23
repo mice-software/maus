@@ -2,9 +2,9 @@
 #include <vector>
 
 #include "math/Mesh.hh"
+#include "math/PolynomialVector.hh"
 
 class PolynomialPatch;
-class PolynomialVector;
 
 class PPSolveFactory {
   public:
@@ -65,5 +65,7 @@ class PPSolveFactory {
     std::vector< std::vector<double> > deriv_values_;
     std::vector< std::vector<int> > deriv_indices_;
 
+    std::vector<std::vector<std::vector<int> > > edge_points_;
+    std::vector< std::vector<int> > smoothing_points_;
 };
 

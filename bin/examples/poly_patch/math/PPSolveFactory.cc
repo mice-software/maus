@@ -24,7 +24,9 @@ PPSolveFactory::PPSolveFactory(Mesh* points,
     this_values_(),
     deriv_points_(),
     deriv_values_(),
-    deriv_indices_() {
+    deriv_indices_(),
+    edge_points_(),
+    smoothing_points_() {
     if (points == NULL) {
         throw MAUS::Exception(MAUS::Exception::recoverable,
                           "NULL Mesh input to Solve",
@@ -46,6 +48,14 @@ PPSolveFactory::PPSolveFactory(Mesh* points,
                           "Dual of Mesh was NULL",
                           "PPSolveFactory::Solve");
     value_dim_ = values[0].size();
+    int pos_dim = points->PositionDimension();
+    //    std::vector<std::vector<int> > edge_points = GetNearbyPointsSquares(equal_axes.size(), 0, delta_order);
+
+    int delta_order = smoothing_order_ - poly_patch_order_;
+    edge_points_ = std::vector< std::vector< std::vector<int> > >(pos_dim+1);
+    for (int i = 1; i <= pos_dim; ++i)
+        edge_points_[i] = GetNearbyPointsSquares(i, 0, smoothing_order-poly_patch_order);
+    smoothing_points_ = GetNearbyPointsSquares(pos_dim, poly_patch_order_-1, poly_patch_order_);
 }
 
 std::vector<Coeff> PPSolveFactory::GetConstraints(
@@ -241,26 +251,26 @@ void PPSolveFactory::SolverGetDerivs(Mesh::Iterator it) {
     std::cerr << "Start GetDerivs2" << std::endl;
     int pos_dim = it.State().size();
     // get the outer layer of points
-    std::vector<std::vector<int> > smoothing_points = GetNearbyPointsSquares(pos_dim, poly_patch_order_-1, poly_patch_order_);
+
     Mesh::Iterator end = it.GetMesh()->End()-1;
     int delta_order = smoothing_order_ - poly_patch_order_;
     if (delta_order <= 0)
         return;
-    for (size_t i = 0; i < smoothing_points.size(); ++i) {
+    for (size_t i = 0; i < smoothing_points_.size(); ++i) {
         Mesh::Iterator it_current = it;
         bool out_of_bounds = false; // element is off the edge of the mesh
         for (int j = 0; j < pos_dim; ++j) {
-            it_current[j] += smoothing_points[i][j];
+            it_current[j] += smoothing_points_[i][j];
             out_of_bounds = out_of_bounds ||
                             it_current[j] < 1 ||
                             it_current[j] > end[j]-1;
         }
         // make a list of the axes that are on the edge of the space
         std::vector<int> equal_axes;
-        for (size_t j = 0; j < smoothing_points[i].size(); ++j)
-            if (smoothing_points[i][j] == poly_patch_order_)
+        for (size_t j = 0; j < smoothing_points_[i].size(); ++j)
+            if (smoothing_points_[i][j] == poly_patch_order_)
                 equal_axes.push_back(j);
-        std::vector<std::vector<int> > edge_points = GetNearbyPointsSquares(equal_axes.size(), 0, delta_order);
+        std::vector<std::vector<int> > edge_points = edge_points_[equal_axes.size()];
         for (size_t j = 0; j < edge_points.size(); ++j) { // note the first point, 0,0, is ignored
             std::vector<int> deriv_index(pos_dim, 0.);
             for (size_t k = 0; k < edge_points[j].size(); ++k)
@@ -312,12 +322,12 @@ PolynomialPatch* PPSolveFactory::Solve() {
     int mesh_size = poly_mesh_->End().ToInteger();
     polynomials_ = std::vector<PolynomialVector*>(mesh_size, NULL);
     // get the list of points that are needed to make a given poly vector
+    SolveFactory solver(poly_patch_order_, smoothing_order_, poly_mesh_->PositionDimension(), true);
     for (Mesh::Iterator it = poly_mesh_->End()-1; it >= poly_mesh_->Begin(); --it) {
         // find the set of points that can be used to make the polynomial
         SolverGetValues(it);
         // The polynomial is found using simultaneous equation solve
         SolverGetDerivs(it);
-        SolveFactory solver(poly_patch_order_, smoothing_order_, true);
         polynomials_[it.ToInteger()] = solver.PolynomialSolve(
                 this_points_, this_values_,
                 deriv_points_, deriv_values_, deriv_indices_

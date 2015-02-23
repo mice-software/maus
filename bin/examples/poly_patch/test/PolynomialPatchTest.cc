@@ -303,14 +303,14 @@ TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
     ThreeDGrid* grid3 = new ThreeDGrid(1., 1., 1., 0., 0., 0., np, np, np);
     Mesh* grid_array[] = {grid2, grid3};
 
-    for (int grid_index = 0; grid_index < 1; ++grid_index) {
+    for (int grid_index = 1; grid_index < 2; ++grid_index) {
         Mesh* grid = grid_array[grid_index];
         std::vector<std::vector<double> > values;
         for (Mesh::Iterator it = grid->Begin(); it < grid->End(); ++it) {
             values.push_back(get_value(it.Position(), np));
         }
-        for (int smooth_order = 1; smooth_order < 4; ++smooth_order) {
-            for (int pp_order = 1; pp_order <= smooth_order; ++pp_order) {
+        for (int smooth_order = 3; smooth_order < 4; ++smooth_order) {
+            for (int pp_order = 2; pp_order <= 2; ++pp_order) {
                 std::cerr << "Building pp of order " << pp_order << " smooth " << smooth_order << std::endl;
                 PPSolveFactory fac(grid,
                                    values,
