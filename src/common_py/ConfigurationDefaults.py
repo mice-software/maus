@@ -614,6 +614,22 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+# Bounds set on values of PID variables, should probably only be varied when running PID,
+# although can also be used to set new limits for PDFs
+# Bounds for PIDVarA
+minBinA = 20
+maxBinA = 40
+# PIDVarB
+XminBinB = 10
+XmaxBinB = 250
+YminBinB = 20
+YmaxBinB = 40
+# PIDVarC
+XminBinC = 50
+XmaxBinC = 350
+YminBinC = 0
+YmaxBinC = 8000
+
 
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),

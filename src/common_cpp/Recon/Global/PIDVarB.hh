@@ -80,15 +80,15 @@ namespace global {
     /// Number of X bins in PDF
     static const int XnumBins = 240;
     /// Minimum value of X range of PDF
-    static const int XminBin = 10;
+    static const int XminBinB = 10;
     /// Maximum value of X range of PDF
-    static const int XmaxBin = 250;
+    static const int XmaxBinB = 250;
     /// Number of Y bins in PDF
     static const int YnumBins = 40;
     /// Minimum value of Y range of PDF
-    static const int YminBin = 20;
+    static const int YminBinB = 20;
     /// Maximum value of Y range of PDF
-    static const int YmaxBin = 40;
+    static const int YmaxBinB = 40;
   };
 }
 }

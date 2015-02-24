@@ -26,13 +26,13 @@ namespace global {
   const std::string PIDVarA::VARIABLE = "diffTOF1TOF0";
 
   PIDVarA::PIDVarA(std::string hypothesis, std::string unique_identifier)
-    : PIDBase1D(VARIABLE, hypothesis, unique_identifier, minBin, maxBin,
+    : PIDBase1D(VARIABLE, hypothesis, unique_identifier, minBinA, maxBinA,
                 numBins) {
     _nonZeroHistEntries = true;
   }
 
   PIDVarA::PIDVarA(TFile* file, std::string hypothesis)
-    : PIDBase1D(file, VARIABLE, hypothesis) {
+    : PIDBase1D(file, VARIABLE, hypothesis, minBinA, maxBinA) {
   }
 
   PIDVarA::~PIDVarA() {}
@@ -75,7 +75,7 @@ namespace global {
       Squeak::mout(Squeak::debug) << "Missing/invalid measurements for " <<
 	"TOF0/TOF1 times, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
       return std::make_pair(-1, 0);
-    } else if ( minBin > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > maxBin ) {
+    } else if ( minBinA > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > maxBinA ) {
       Squeak::mout(Squeak::debug) << "Difference between TOF0 and TOF1 times" <<
 	" outside of range, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
       return std::make_pair(-1, 0);
