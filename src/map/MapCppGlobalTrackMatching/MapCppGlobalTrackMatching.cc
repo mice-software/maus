@@ -82,24 +82,24 @@ namespace MAUS {
       //~ }
     //~ }
 
-    MAUS::MCEventPArray* mc_events = spill->GetMCEvents();
-    MAUS::MCEventPArray::iterator mc_event_iter;
-    for (mc_event_iter = mc_events->begin();
-         mc_event_iter != mc_events->end(); ++mc_event_iter) {
-      MAUS::MCEvent* mc_event = (*mc_event_iter);
-      MAUS::VirtualHitArray* virt_hits = mc_event->GetVirtualHits();
-      MAUS::VirtualHitArray::iterator virt_hits_iter;
-      for (virt_hits_iter = virt_hits->begin();
-           virt_hits_iter != virt_hits->end(); ++virt_hits_iter) {
-        ThreeVector pos = (*virt_hits_iter).GetPosition();
-        ThreeVector mom = (*virt_hits_iter).GetMomentum();
-        int id = (*virt_hits_iter).GetParticleId();
+    //~ MAUS::MCEventPArray* mc_events = spill->GetMCEvents();
+    //~ MAUS::MCEventPArray::iterator mc_event_iter;
+    //~ for (mc_event_iter = mc_events->begin();
+         //~ mc_event_iter != mc_events->end(); ++mc_event_iter) {
+      //~ MAUS::MCEvent* mc_event = (*mc_event_iter);
+      //~ MAUS::VirtualHitArray* virt_hits = mc_event->GetVirtualHits();
+      //~ MAUS::VirtualHitArray::iterator virt_hits_iter;
+      //~ for (virt_hits_iter = virt_hits->begin();
+           //~ virt_hits_iter != virt_hits->end(); ++virt_hits_iter) {
+        //~ ThreeVector pos = (*virt_hits_iter).GetPosition();
+        //~ ThreeVector mom = (*virt_hits_iter).GetMomentum();
+        //~ int id = (*virt_hits_iter).GetParticleId();
         //~ if (floor(pos.Z()) == 2773 or floor(pos.Z()) == 10572) {
         //~ if (floor(pos.Z()) == 11556) {
           //~ Squeak::mout(Squeak::error) << "TRUTH\n" << pos.X() << "\t" << pos.Y() << "\t" << pos.Z() << "\t" << mom.X() << "\t" << mom.Y() << "\t" << mom.Z() << " " << id << "\n";
         //~ }
-      }
-    }
+      //~ }
+    //~ }
     if (!recon_events) {
       return;
     }
@@ -112,6 +112,7 @@ namespace MAUS {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       global_event = MakeTracks(recon_event);
+
     }
   }
 
@@ -124,12 +125,13 @@ namespace MAUS {
     }
 
     MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+    //~ Squeak::mout(Squeak::error) << global_event << " GE\n";
 
     MAUS::recon::global::TrackMatching track_matching;
     //~ Squeak::mout(Squeak::error) << "###FormTracks###\n";
     track_matching.USTrack(global_event, _classname);
     track_matching.DSTrack(global_event, _classname);
-    // Return the new GlobalEvent, to be added to the ReconEvent
+    track_matching.throughTrack(global_event, _classname);
     return global_event;
   }
 } // ~MAUS

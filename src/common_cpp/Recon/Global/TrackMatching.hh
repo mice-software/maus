@@ -53,9 +53,10 @@ namespace global {
      *
      *  @param global_event The Global Event, which will be changed
      */
-    void FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name);
+    //~ void FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name);
     void USTrack(MAUS::GlobalEvent* global_event, std::string mapper_name);
     void DSTrack(MAUS::GlobalEvent* global_event, std::string mapper_name);
+    void throughTrack(MAUS::GlobalEvent* global_event, std::string mapper_name);
   private:
     /// Disallow copy constructor as unnecessary
     TrackMatching(const TrackMatching&);
@@ -63,10 +64,10 @@ namespace global {
     /// Disallow operator= as unnecessary
     void operator=(const TrackMatching);
 
-    void MakeTOFTracks(MAUS::GlobalEvent* global_event,
-           std::vector<MAUS::DataStructure::Global::SpacePoint*>
-           *GlobalSpacePointArray,
-           MAUS::DataStructure::Global::TrackPArray& TOFTrackArray);
+    //~ void MakeTOFTracks(MAUS::GlobalEvent* global_event,
+           //~ std::vector<MAUS::DataStructure::Global::SpacePoint*>
+           //~ *GlobalSpacePointArray,
+           //~ MAUS::DataStructure::Global::TrackPArray& TOFTrackArray);
     bool almostEquals(double var1, double var2, double tolerance) const;
   }; // ~class TrackMatching
 } // ~namespace global

@@ -38,9 +38,15 @@ def run():
     my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
     my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
+    # KL
+    my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
+    my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
+
     # Global
     my_map.append(MAUS.MapCppGlobalReconImport())
     my_map.append(MAUS.MapCppGlobalTrackMatching())
+
+    my_reduce = MAUS.ReduceCppGlobalReconEfficiency()
 
     # Then construct a MAUS output component - filename comes from datacards
     my_output = MAUS.OutputPyJSON()
@@ -50,7 +56,7 @@ def run():
 
     # The Go() drives all the components you pass in, then check the file
     # (default simulation.out) for output
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
+    MAUS.Go(my_input, my_map, my_reduce, my_output, datacards)
 
 if __name__ == '__main__':
     run()
