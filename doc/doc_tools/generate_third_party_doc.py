@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 """Generate doxygen documentation for third party libraries"""
 # This file should be run first (before generate_maus_doc.py).
 # For more information see README.

@@ -34,8 +34,7 @@ namespace global {
 		      "MapCppGlobalTrackMatching::TrackMatching"));
     }
 
-    MAUS::DataStructure::Global::TrackPArray *ImportedTracks =
-      global_event->get_tracks();
+    MAUS::DataStructure::Global::TrackPArray *ImportedTracks = global_event->get_tracks();
     MAUS::DataStructure::Global::TrackPArray::iterator ImportedTrackIterator;
     MAUS::DataStructure::Global::Track* ImportedSciFiTrack =
       new MAUS::DataStructure::Global::Track();
@@ -274,3 +273,4 @@ namespace global {
 } // ~namespace global
 } // ~namespace recon
 } // ~namespace MAUS
+
