@@ -198,7 +198,6 @@ void PPSolveFactory::GetDerivPoints() {
                 deriv_poly_vec_.back()(j+1) *= gsl_sf_fact(p_vec[l])/gsl_sf_fact(pow)*gsl_sf_pow_int(-delta_pos[l]/2., pow);
             }
         }
-        std::cerr << deriv_poly_vec_.back() << std::endl;
     }
 }
 
@@ -212,7 +211,6 @@ void PPSolveFactory::GetDerivs(Mesh::Iterator it) {
     int delta_order = smoothing_order_ - poly_patch_order_;
     if (delta_order <= 0)
         return;
-    std::cerr << " Iterator " << it << std::endl;
     for (size_t i = 0; i < deriv_points_.size(); ++i) {
         std::vector<double> point = std::vector<double>(pos_dim, 0.);
         Mesh::Iterator nearest = it;
@@ -234,18 +232,6 @@ void PPSolveFactory::GetDerivs(Mesh::Iterator it) {
             for(int j = 0; j < pos_dim; ++j)
                 deriv_values_[i][j] = values(j+1);
         }
-        std::cerr << "Positions ";
-        for (int j = 0; j < deriv_points_[i].size(); ++j)
-            std::cerr << deriv_points_[i][j] << " ";
-        std::cerr << " Indices ";
-        for (int j = 0; j < deriv_indices_[i].size(); ++j)
-            std::cerr << deriv_indices_[i][j] << " ";
-        std::cerr << " Nearest " << nearest << " poly " << polynomials_[nearest.ToInteger()] << " values ";
-        for (int j = 0; j < deriv_values_[i].size(); ++j)
-            std::cerr << deriv_values_[i][j] << " ";
-
-        std::cerr << std::endl;
-
     }
 }
 
@@ -273,7 +259,6 @@ PolynomialPatch* PPSolveFactory::Solve() {
                 this_points_, this_values_,
                 deriv_points_, deriv_values_, deriv_indices_
               );
-        std::cerr << *polynomials_[it.ToInteger()] << std::endl;
     }
     return new PolynomialPatch(poly_mesh_, polynomials_);
 }

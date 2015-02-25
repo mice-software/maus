@@ -225,15 +225,10 @@ std::vector<double> get_value(std::vector<double> x, int np) {
 }
 
 void plot(int n_points, std::vector<double> start, std::vector<double> end, PolynomialPatch* patch, int n_grid_points, std::string title) {
-    TCanvas* c1 = new TCanvas("canvas", "canvas");
-    c1->Draw();
     double delta_sq = 0;
     for (size_t i = 0; i < start.size(); ++i)
         delta_sq += (start[i]-end[i])*(start[i]-end[i]);
-    TH2D* h2 = new TH2D("h1", (title+";pos [AU]; Fit [AU]").c_str(), 10000, start[0]-(end[0]-start[0])/10., end[0]+(end[0]-start[0])/10., 1000, -5., 5.);
-    h2->SetStats(false);
-    h2->Draw();
-    std::vector<TGraph*> graphs(2*patch->ValueDimension(), NULL);
+    std::vector<TGraph*> graphs(3*patch->ValueDimension(), NULL);
     for (size_t j = 0; j < graphs.size(); ++j) {
         graphs[j] = new TGraph(n_points);
     }
@@ -245,17 +240,18 @@ void plot(int n_points, std::vector<double> start, std::vector<double> end, Poly
             std::cerr << point[j] << " ";
         }
         std::cerr << " ** ";
-        std::vector<double> value(patch->ValueDimension(), 0.);
-        patch->F(&point[0], &value[0]);
+        std::vector<double> fit_value(patch->ValueDimension(), 0.);
+        patch->F(&point[0], &fit_value[0]);
         for (size_t j = 0; j < patch->ValueDimension(); ++j) {
-            graphs[j]->SetPoint(i, point[0], value[j]);
-            std::cerr << value[j] << " ";
+            graphs[j]->SetPoint(i, point[0], fit_value[j]);
+            std::cerr << fit_value[j] << " ";
         }
-        value = get_value(point, n_grid_points);
+        std::vector<double> true_value = get_value(point, n_grid_points);
         std::cerr << " ** ";
         for (size_t j = 0; j < patch->ValueDimension(); ++j) {
-            graphs[j+patch->ValueDimension()]->SetPoint(i, point[0], value[j]);
-            std::cerr << value[j] << " ";
+            graphs[j+patch->ValueDimension()]->SetPoint(i, point[0], true_value[j]);
+            graphs[j+2*patch->ValueDimension()]->SetPoint(i, point[0], fabs(fit_value[j]-true_value[j]));
+            std::cerr << true_value[j] << " ";
         }
         std::cerr << std::endl;
     }
@@ -265,7 +261,13 @@ void plot(int n_points, std::vector<double> start, std::vector<double> end, Poly
     graphs[3]->SetTitle("True Bx");
     graphs[4]->SetTitle("True By");
     graphs[5]->SetTitle("True Bz");
-    for (size_t j = 0; j < graphs.size(); ++j) {
+
+    TCanvas* c1 = new TCanvas("canvas", "canvas", 1024, 768);
+    c1->Draw();
+    TH2D* h1 = new TH2D("h1", (title+";pos [AU]; Fit [AU]").c_str(), 10000, start[0]-(end[0]-start[0])/10., end[0]+(end[0]-start[0])/10., 1000, -5., 5.);
+    h1->SetStats(false);
+    h1->Draw();
+    for (size_t j = 0; j < 2*patch->ValueDimension(); ++j) {
         graphs[j]->SetFillColor(0);
         graphs[j]->SetLineColor(j+1);
         graphs[j]->SetMarkerColor(j+1);
@@ -275,8 +277,29 @@ void plot(int n_points, std::vector<double> start, std::vector<double> end, Poly
     static int test_index = 0;
     std::stringstream test_name;
     test_name << "test_" << test_index;
-    c1->Print((test_name.str()+".pdf").c_str());
+    c1->SetGridx();
+    c1->Print((test_name.str()+".png").c_str());
     c1->Print((test_name.str()+".root").c_str());
+
+    TCanvas* c2 = new TCanvas("deltas canvas", "deltas canvas", 1024, 768);
+    c2->Draw();
+    TH2D* h2 = new TH2D("h2", ("Residuals "+title+";pos [AU]; Fit [AU]").c_str(), 10000, start[0]-(end[0]-start[0])/10., end[0]+(end[0]-start[0])/10., 1000, 1e-6, 5.);
+    h2->SetStats(false);
+    h2->Draw();
+    graphs[6]->SetTitle("Delta Bx");
+    graphs[7]->SetTitle("Delta By");
+    graphs[8]->SetTitle("Delta Bz");
+    for (size_t j = 2*patch->ValueDimension(); j < 3*patch->ValueDimension(); ++j) {
+        graphs[j]->SetFillColor(0);
+        graphs[j]->SetLineColor(j+1);
+        graphs[j]->SetMarkerColor(j+1);
+        graphs[j]->Draw("l");
+    }
+    c2->BuildLegend();
+    c2->SetGridx();
+    c2->SetLogy();
+    c2->Print(("residuals_"+test_name.str()+".png").c_str());
+    c2->Print(("residuals_"+test_name.str()+".root").c_str());
     test_index++;
 }
 
@@ -299,7 +322,7 @@ void print_test(int np) {
 }
 
 TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
-    int np = 5;
+    int np = 10;
     TwoDGrid* grid2 = new TwoDGrid(1., 1., 0., 0., np, np);
     ThreeDGrid* grid3 = new ThreeDGrid(1., 1., 1., 0., 0., 0., np, np, np);
     Mesh* grid_array[] = {grid2, grid3};
@@ -310,8 +333,8 @@ TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
         for (Mesh::Iterator it = grid->Begin(); it < grid->End(); ++it) {
             values.push_back(get_value(it.Position(), np));
         }
-        for (int smooth_order = 2; smooth_order < 3; ++smooth_order) {
-            for (int pp_order = 1; pp_order < smooth_order; ++pp_order) {
+        for (int smooth_order = 2; smooth_order < 5; ++smooth_order) {
+            for (int pp_order = smooth_order-2; pp_order <= smooth_order; ++pp_order) {
                 std::cerr << "Building pp of order " << pp_order << " smooth " << smooth_order << std::endl;
                 PPSolveFactory fac(grid,
                                    values,
@@ -335,7 +358,6 @@ TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
         }
     }
     print_test(np);
-    sleep(10);
 }
 
 
