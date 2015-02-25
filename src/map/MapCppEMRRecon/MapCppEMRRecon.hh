@@ -120,8 +120,7 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 
   void coordinates_reconstruction(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
-				  EMRfADCEventVector& emr_fadc_events,
-				  EMRTrackEventVector& emr_track_events) const;
+				  EMRfADCEventVector& emr_fadc_events) const;
 
   void track_matching(int nPartEvents,
 		      EMRDBBEventVector *emr_dbb_events,

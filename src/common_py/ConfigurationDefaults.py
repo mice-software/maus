@@ -506,7 +506,7 @@ EMRsecondaryTriggerMinYhits = 1
 EMRsecondaryTriggerMinNhits = 2
 EMRsecondaryTriggerMinTot = 4
 
-EMRmaxSecondaryToPrimaryTrackDistance = 5
+EMRmaxSecondaryToPrimaryTrackDistance = 80
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
