@@ -65,7 +65,9 @@ class PPSolveFactory {
     std::vector< std::vector<double> > this_values_;
     std::vector< std::vector<double> > deriv_points_;
     std::vector< std::vector<double> > deriv_values_;
+    std::vector< std::vector<int> > deriv_origins_;
     std::vector< std::vector<int> > deriv_indices_;
+    std::vector< MVector<double> > deriv_poly_vec_;
     std::vector<int> deriv_index_by_power_;
 
     std::vector<std::vector<std::vector<int> > > edge_points_;

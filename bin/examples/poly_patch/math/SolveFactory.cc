@@ -39,6 +39,7 @@ void SolveFactory::BuildHInvMatrix(
             h_inv_(i+1+nCoeffs, j+1) = deriv_vec[j];
         }
     }
+    std::cerr << h_inv_ << std::endl;
     h_inv_.invert();
 }
 
@@ -115,6 +116,7 @@ SquarePolynomialVector* SolveFactory::PolynomialSolve(
         );
     int pointDim = 0;
     int valueDim = 0;
+    if (pointDim); // remove erroneous gcc warning
     if (positions.size() > 0) {
         pointDim = positions[0].size();
         valueDim = values[0].size();

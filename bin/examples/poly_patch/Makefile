@@ -1,4 +1,4 @@
-CPPFLAGS := -I${MAUS_ROOT_DIR}/src/common_cpp -I${MAUS_ROOT_DIR}/bin/examples/poly_patch -O3 -Wall -I${MAUS_THIRD_PARTY}/third_party/install/include -I${ROOTSYS}/include \
+CPPFLAGS := -I${MAUS_ROOT_DIR}/src/common_cpp -I${MAUS_ROOT_DIR}/bin/examples/poly_patch -g -pg -Wall -I${MAUS_THIRD_PARTY}/third_party/install/include -I${ROOTSYS}/include -Wno-sign-compare\
 
 MATH_OBJ_FILES :=  $(patsubst math/%.cc,object/%.o,$(wildcard math/*.cc))
 
@@ -30,7 +30,7 @@ all : $(TEST_OBJ_FILES) $(MATH_OBJ_FILES)
 	                      -lMausCpp \
 	                      -lgsl \
 	                      -lgtest \
-	                       -Wl,--no-as-needed -O3
+	                       -Wl,--no-as-needed -g -pg
 
 clean:
 	rm $(MATH_OBJ_FILES);

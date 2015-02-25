@@ -274,8 +274,9 @@ void plot(int n_points, std::vector<double> start, std::vector<double> end, Poly
     c1->BuildLegend();
     static int test_index = 0;
     std::stringstream test_name;
-    test_name << "test_" << test_index << ".pdf";
-    c1->Print(test_name.str().c_str());
+    test_name << "test_" << test_index;
+    c1->Print((test_name.str()+".pdf").c_str());
+    c1->Print((test_name.str()+".root").c_str());
     test_index++;
 }
 
@@ -298,7 +299,7 @@ void print_test(int np) {
 }
 
 TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
-    int np = 80;
+    int np = 5;
     TwoDGrid* grid2 = new TwoDGrid(1., 1., 0., 0., np, np);
     ThreeDGrid* grid3 = new ThreeDGrid(1., 1., 1., 0., 0., 0., np, np, np);
     Mesh* grid_array[] = {grid2, grid3};
@@ -309,8 +310,8 @@ TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
         for (Mesh::Iterator it = grid->Begin(); it < grid->End(); ++it) {
             values.push_back(get_value(it.Position(), np));
         }
-        for (int smooth_order = 4; smooth_order < 5; ++smooth_order) {
-            for (int pp_order = smooth_order-1; pp_order < smooth_order; ++pp_order) {
+        for (int smooth_order = 2; smooth_order < 3; ++smooth_order) {
+            for (int pp_order = 1; pp_order < smooth_order; ++pp_order) {
                 std::cerr << "Building pp of order " << pp_order << " smooth " << smooth_order << std::endl;
                 PPSolveFactory fac(grid,
                                    values,
