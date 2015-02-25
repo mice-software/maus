@@ -11,7 +11,7 @@
 class PolynomialPatch : public VectorMap {
   public:
     PolynomialPatch(Mesh* grid_points_,
-                    std::vector<PolynomialVector*> polynomials_);
+                    std::vector<SquarePolynomialVector*> polynomials_);
     PolynomialPatch();
 	  ~PolynomialPatch();
     virtual void  F(const double* point, double* value) const;
@@ -20,11 +20,11 @@ class PolynomialPatch : public VectorMap {
     inline unsigned int PointDimension() const {return point_dimension_;}
     inline unsigned int ValueDimension() const {return value_dimension_;}
   	PolynomialPatch* Clone() const; //copy function
-    PolynomialVector* GetPolynomialVector(const double* point) const;
+    SquarePolynomialVector* GetPolynomialVector(const double* point) const;
 
   private:
     Mesh* grid_points_;
-    std::vector<PolynomialVector*> points_;
+    std::vector<SquarePolynomialVector*> points_;
     unsigned int point_dimension_;
     unsigned int value_dimension_;
 

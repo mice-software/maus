@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "math/Mesh.hh"
-#include "math/PolynomialVector.hh"
+#include "math/SquarePolynomialVector.hh"
 
 class PolynomialPatch;
 
@@ -50,8 +50,8 @@ class PPSolveFactory {
     std::vector<double> OutOfBoundsPosition(Mesh::Iterator out_of_bounds_it);
     static void NearbyPointsRecursive(std::vector<int> check, size_t check_index, size_t poly_power, std::vector<std::vector<int> >& nearby_points);
 
-    std::vector<PolynomialVector::PolynomialCoefficient> GetConstraints(size_t pos_dim, size_t value_dim, size_t poly_patch_order);
-    PolynomialVector::PolynomialCoefficient GetDeltaIterator(Mesh::Iterator it1, Mesh::Iterator it2, int valueIndex);
+    std::vector<SquarePolynomialVector::PolynomialCoefficient> GetConstraints(size_t pos_dim, size_t value_dim, size_t poly_patch_order);
+    SquarePolynomialVector::PolynomialCoefficient GetDeltaIterator(Mesh::Iterator it1, Mesh::Iterator it2, int valueIndex);
 
     int poly_patch_order_;
     int smoothing_order_;
@@ -59,15 +59,18 @@ class PPSolveFactory {
     Mesh* poly_mesh_;
     Mesh* points_;
     std::vector<std::vector<double> > values_;
-    std::vector<PolynomialVector*> polynomials_;
+    std::vector<SquarePolynomialVector*> polynomials_;
 
     std::vector< std::vector<double> > this_points_;
     std::vector< std::vector<double> > this_values_;
     std::vector< std::vector<double> > deriv_points_;
     std::vector< std::vector<double> > deriv_values_;
     std::vector< std::vector<int> > deriv_indices_;
+    std::vector<int> deriv_index_by_power_;
 
     std::vector<std::vector<std::vector<int> > > edge_points_;
     std::vector< std::vector<int> > smoothing_points_;
+    std::vector<MVector<double> > deriv_pows_;
+
 };
 

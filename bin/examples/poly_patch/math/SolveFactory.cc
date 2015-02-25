@@ -11,18 +11,12 @@ SolveFactory::SolveFactory(int polynomial_order,
                            std::vector< std::vector<double> > deriv_positions,
                            std::vector< std::vector<int> >& deriv_indices)
   : polynomial_order_(polynomial_order), smoothing_order_(smoothing_order) {
-    n_poly_coeffs_ = 1;
-    for (int i = 0; i < point_dim; ++i)
-        n_poly_coeffs_ *= smoothing_order_+1;
-
-    int triangle_order = smoothing_order*point_dim+1;
-    triangle_points_ = PPSolveFactory::GetNearbyPointsTriangles(point_dim, 0, triangle_order);
+    n_poly_coeffs_ = SquarePolynomialVector::NumberOfPolynomialCoefficients(point_dim, smoothing_order);
     square_points_ = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, smoothing_order);
     square_deriv_nearby_points_ = PPSolveFactory::GetNearbyPointsSquares(point_dim, -1, smoothing_order);
-    MMatrix<double> A_temp(value_dim, n_poly_coeffs_, 0.);
-    A_temp = ConvertASquareToATriangle(point_dim, smoothing_order_, A_temp);
-    triangle_temp_ = PolynomialVector(point_dim, A_temp);
     BuildHInvMatrix(positions, deriv_positions, deriv_indices);
+    MMatrix<double> A_temp(value_dim, n_poly_coeffs_, 0.);
+    square_temp_ = SquarePolynomialVector(point_dim, A_temp);
 }
 
 void SolveFactory::BuildHInvMatrix(
@@ -81,24 +75,7 @@ std::vector<double> SolveFactory::MakeSquareDerivVector(std::vector<double> posi
     return deriv_vec;
 }
 
-MMatrix<double> SolveFactory::ConvertASquareToATriangle(int point_dim, int square_order, MMatrix<double> A_square) {
-    MMatrix<double> A_triangle(A_square.num_row(), triangle_points_.size(), 0.);
-    for (size_t i = 0; i < triangle_points_.size(); ++i) {
-        for (size_t j = 0; j < square_points_.size(); ++j) {
-            bool is_equal = true;
-            for (size_t k = 0; k < square_points_[j].size() && is_equal; ++k)
-                is_equal &= square_points_[j][k] == triangle_points_[i][k];
-            if (is_equal) {
-                for (size_t k = 0; k < A_square.num_row(); ++k)
-                    A_triangle(k+1, i+1) = A_square(k+1, j+1);
-                break;
-            }
-        }
-    }
-    return A_triangle;
-}
-
-PolynomialVector* SolveFactory::PolynomialSolve(
+SquarePolynomialVector* SolveFactory::PolynomialSolve(
          const std::vector< std::vector<double> >& positions,
          const std::vector< std::vector<double> >& values,
          const std::vector< std::vector<double> > &deriv_positions,
@@ -179,8 +156,7 @@ PolynomialVector* SolveFactory::PolynomialSolve(
             A(y_index+1, j+1) = A_vec(j+1);
         }
     }
-    A = ConvertASquareToATriangle(pointDim, smoothing_order_, A);
-    PolynomialVector* temp = new PolynomialVector(triangle_temp_);
+    SquarePolynomialVector* temp = new SquarePolynomialVector(square_temp_);
     temp->SetCoefficients(A);
     return temp;
 }

@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "math/PolynomialVector.hh"
+#include "math/SquarePolynomialVector.hh"
 #include "math/PolynomialPatch.hh"
 #include "math/PPSolveFactory.hh"
 
@@ -10,15 +10,15 @@
 #include "TH2.h"
 #include "TGraph.h"
 
-typedef PolynomialVector::PolynomialCoefficient PolyCoeff;
+typedef SquarePolynomialVector::PolynomialCoefficient PolyCoeff;
 
 // NEEDS MORE HERE
 TEST(PolynomialPatchTest, TestConstructorDestructor) {
-    std::vector<PolynomialVector*> poly;
+    std::vector<SquarePolynomialVector*> poly;
     PolynomialPatch();
 
     try {
-        PolynomialPatch(NULL, std::vector<PolynomialVector*>());
+        PolynomialPatch(NULL, std::vector<SquarePolynomialVector*>());
         EXPECT_TRUE(false);
     } catch (MAUS::Exception exc) {
     }
@@ -41,10 +41,10 @@ double check(PolynomialPatch* patch,
 TEST(PolynomialPatchTest, TestF) {
     ASSERT_TRUE(false);
     TwoDGrid* grid = new TwoDGrid(1., 2., -5., -10., 3, 3);
-    std::vector<PolynomialVector*> polynomials;
+    std::vector<SquarePolynomialVector*> polynomials;
     for (Mesh::Iterator it = grid->Begin(); it < grid->End(); ++it) {
         double it_index = grid->ToInteger(it);
-        polynomials.push_back(new PolynomialVector(2, MMatrix<double>(1, 1, it_index)));
+        polynomials.push_back(new SquarePolynomialVector(2, MMatrix<double>(1, 1, it_index)));
     }
     PolynomialPatch* patch = new PolynomialPatch(grid, polynomials);
 
@@ -153,12 +153,12 @@ TEST(PolynomialPatchTest, DISABLED_TestLeastSquaresFitTwoD) {
                 position[j] += 1e-6*delta;
                 double valPos[] = {0., 0.};
                 pp1->F(&position[0], valPos);
-                PolynomialVector* poly1 = pp1->GetPolynomialVector(&position[0]);
+                SquarePolynomialVector* poly1 = pp1->GetPolynomialVector(&position[0]);
                 // just below it.Position()
                 position[j] -= 2e-6*delta;
                 double valNeg[] = {0., 0.};
                 pp1->F(&position[0], valNeg);
-                PolynomialVector* poly2 = pp1->GetPolynomialVector(&position[0]);
+                SquarePolynomialVector* poly2 = pp1->GetPolynomialVector(&position[0]);
                 // should be equal (even though we are on adjacent mesh points)
                 for (size_t k = 0; k < it_delta.State().size(); ++k)
                     EXPECT_NEAR(valPos[k], valNeg[k], 6);
@@ -298,7 +298,7 @@ void print_test(int np) {
 }
 
 TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
-    int np = 10;
+    int np = 80;
     TwoDGrid* grid2 = new TwoDGrid(1., 1., 0., 0., np, np);
     ThreeDGrid* grid3 = new ThreeDGrid(1., 1., 1., 0., 0., 0., np, np, np);
     Mesh* grid_array[] = {grid2, grid3};
@@ -309,8 +309,8 @@ TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
         for (Mesh::Iterator it = grid->Begin(); it < grid->End(); ++it) {
             values.push_back(get_value(it.Position(), np));
         }
-        for (int smooth_order = 3; smooth_order < 4; ++smooth_order) {
-            for (int pp_order = 2; pp_order <= 2; ++pp_order) {
+        for (int smooth_order = 4; smooth_order < 5; ++smooth_order) {
+            for (int pp_order = smooth_order-1; pp_order < smooth_order; ++pp_order) {
                 std::cerr << "Building pp of order " << pp_order << " smooth " << smooth_order << std::endl;
                 PPSolveFactory fac(grid,
                                    values,
@@ -334,6 +334,7 @@ TEST(PolynomialPatchTest, TestThreeDSolveSinCos) {
         }
     }
     print_test(np);
+    sleep(10);
 }
 
 

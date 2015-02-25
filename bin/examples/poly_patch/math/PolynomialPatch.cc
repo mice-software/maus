@@ -2,7 +2,7 @@
 #include "math/PolynomialPatch.hh"
 
 PolynomialPatch::PolynomialPatch(Mesh* grid_points,
-                    std::vector<PolynomialVector*> polynomials) {
+                    std::vector<SquarePolynomialVector*> polynomials) {
     grid_points_ = grid_points;
     points_ = polynomials;
     if (grid_points_ == NULL)
@@ -73,7 +73,7 @@ void PolynomialPatch::F(const double* point, double* value) const {
     points_[points_index]->F(&point_temp[0], value);
 }
 
-PolynomialVector* PolynomialPatch::GetPolynomialVector(const double* point) const {
+SquarePolynomialVector* PolynomialPatch::GetPolynomialVector(const double* point) const {
     Mesh::Iterator nearest = grid_points_->Nearest(point);
     int points_index = nearest.ToInteger();
     return points_[points_index];

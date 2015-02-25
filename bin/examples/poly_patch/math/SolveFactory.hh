@@ -1,6 +1,6 @@
 #include "math/MMatrix.hh"
 #include "math/PolynomialVectorFactory.hh"
-#include "math/PolynomialVector.hh"
+#include "math/SquarePolynomialVector.hh"
 
 #ifndef SolveFactory_hh
 #define SolveFactory_hh
@@ -15,7 +15,7 @@ class SolveFactory : public PolynomialVectorFactory {
                  std::vector< std::vector<double> > deriv_positions,
                  std::vector< std::vector<int> >& deriv_indices);
     ~SolveFactory() {}
-    PolynomialVector* PolynomialSolve(
+    SquarePolynomialVector* PolynomialSolve(
              const std::vector< std::vector<double> >& positions,
              const std::vector< std::vector<double> >& values,
              const std::vector< std::vector<double> > &deriv_positions,
@@ -24,7 +24,6 @@ class SolveFactory : public PolynomialVectorFactory {
 
     std::vector<double> MakeSquareVector(std::vector<double> x);
     std::vector<double> MakeSquareDerivVector(std::vector<double> positions, std::vector<int> deriv_indices, int upper);
-    MMatrix<double> ConvertASquareToATriangle(int point_dim, int square_order, MMatrix<double> A_square);
 
   private:
     void BuildHInvMatrix(std::vector< std::vector<double> > positions,
@@ -34,11 +33,10 @@ class SolveFactory : public PolynomialVectorFactory {
     int polynomial_order_;
     int smoothing_order_;
     int n_poly_coeffs_;
-    std::vector< std::vector<int> > triangle_points_;
     std::vector< std::vector<int> > square_points_;
     std::vector< std::vector<int> > square_deriv_nearby_points_;
 
-    PolynomialVector triangle_temp_;
+    SquarePolynomialVector square_temp_;
     MMatrix<double> h_inv_;
 
 };
