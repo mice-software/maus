@@ -5,6 +5,23 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.3
+  The following changes were made:
+    - Documentation - Doxygen fix
+    - G4Beamline - a few updates, including to the deck
+    - Global - PIDVarC added
+    - Grid - updates to Grid execution scripts
+    - ROOT - MINUIT2 support added
+    - Tracker - a few miscellaneous updates
+    - install_build_test.bash updated to allow multi-core builds (use -j N)
+  If upgrading from a previous version, please redo the entire installation
+MAUS-v0.9.2
+  The following changes were made:
+    - EMR - extensive updates
+    - G4Beamline - changes to the deck for Grid running
+    - Geometry - Tracker He window added to legacy
+    - Grid - added script for MC running on the Grid (bin/utilities/execute_MC.py)
+    - Tracker - various updates, including to Kalman filter and final track datastructure
 MAUS-v0.9.1
   The following changes were made:
     - Memory leak fixes #1489

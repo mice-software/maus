@@ -87,8 +87,9 @@ header_and_footer_mode = "append" #append or dont_append
 # thickness will be retrieved from the CDB for the run_number specified
 g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2":-0.396,\
         "d_s":3.837,"particles_per_spill":0,"rotation_angle":30,"translation_z":680.31,\
-        "proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,"particle_charge":'all',\
-        "file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',"get_magnet_currents_pa_cdb":False}
+        "protonabsorberin":1,"proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,\
+        "particle_charge":'all',"file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',\
+        "get_magnet_currents_pa_cdb":False}
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
@@ -614,3 +615,22 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+
+geometry_validation = { # see bin/utilities/geometry_validation.py for docs
+    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
+    "will_plot":True,
+    "will_track":True,
+    "z_start":-6000.,
+    "z_end":6000.,
+    "x_start":0.,
+    "x_step":1.,
+    "y_start":0.,
+    "y_step":0.,
+    "n_steps":301,
+    "plot_formats":["root", "png"],
+    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
+    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
+    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
+    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
+    "2d_volume_plot_label_size":0.25,
+}

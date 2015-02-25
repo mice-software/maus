@@ -25,6 +25,7 @@ Tests the Beam class
 import unittest
 import beam
 import xboa.Hit #pylint: disable=F0401
+from xboa.Hit import Hit
 import copy
 import numpy
 
@@ -132,14 +133,27 @@ TEST_TWISS_L_F1 = {"longitudinal_mode":"twiss", "momentum_variable":"p",
 TEST_TWISS_L_F2 = {"longitudinal_mode":"twiss", "momentum_variable":"p",
                 "beta_l":10., "alpha_l":-1., "emittance_l":-0.1}
 
-TEST_GAUSSIAN_L = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
+TEST_GAUSSIAN_L1 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
                 "sigma_t":1.e6, "sigma_pz":100.}
 
-TEST_GAUSSIAN_L_F1 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
-                "sigma_t":-1.e6, "sigma_pz":100.}
+TEST_GAUSSIAN_L2 = {"longitudinal_mode":"gaussian", "momentum_variable":"p",
+                "sigma_t":100., "sigma_p":100., "cov(t,p)":9999.}
 
-TEST_GAUSSIAN_L_F2 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
-                "sigma_t":1.e6, "sigma_pz":-100.}
+TEST_GAUSSIAN_L_F3 = {"longitudinal_mode":"gaussian", "momentum_variable":"pz",
+                "sigma_t":100., "sigma_pz":100., "cov(t,pz)":10001.}
+
+
+TEST_AP_1 = {"magnitude":0.1, "momentum_variable":"p"}
+
+# "momentum_variable" defaults to "longitudinal_mode"
+TEST_AP_2 = {"magnitude":0.2}
+
+# these should throw - malformed inputs
+TEST_AP_F1 = {"magnitude":0.1, "momentum_variable":"bad"}
+
+TEST_AP_F2 = {"magnitude":"bad", "momentum_variable":"p"}
+
+TEST_AP_F3 = {"momentum_variable":"p"}
 
 TEST_SAWTOOTH_T = {"longitudinal_mode":"sawtooth_time",
                    "momentum_variable":"energy",
@@ -174,9 +188,7 @@ TEST_BIRTH = {
   "reference":TEST_PRIM_MU,
   "transverse":TEST_PENN,
   "longitudinal":TEST_TWISS_L,
-  "coupling":{"coupling_mode":"none"}
-  
-  
+  "coupling":{"coupling_mode":"none"},
 }
 
 TEST_GAUSSIAN_UNITS = {
@@ -196,7 +208,6 @@ TEST_GAUSSIAN_UNITS = {
              "beam_mean_z":20.} 
 }
 
-
 TEST_FORWARD = {
   "weight":0.5,
   "random_seed":10,
@@ -214,7 +225,6 @@ TEST_FORWARD = {
              "beam_mean_z":200.}
   
 }
-
 
 TEST_NO_POL = {
   "weight":0.5,
@@ -279,17 +289,12 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
                     "random_seed_algorithm":"bob"},
                     "counter")
 
-
     def test_birth_reference_particle(self):
         
         """Test __birth_reference_particle"""
         self._beam_no_ref._Beam__birth_reference_particle \
                                                      ({"reference":TEST_PRIM_P})
-        
-
-       
         ref = xboa.Hit.Hit.new_from_dict(TEST_REF)
-        
         self.assertEqual(
                 self._beam_no_ref.reference,
                 ref)
@@ -350,7 +355,6 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         matrix_penn = self._beam.beam_matrix[0:4, 0:4]
         self.__cmp_matrix(matrix_penn, matrix_const_sol)
         self.__cmp_matrix(matrix_penn, matrix_const_sol_neg)
-        
 
     def test_birth_transverse_twiss(self):
         """Beam transverse twiss mode"""
@@ -408,18 +412,21 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
 
     def test_birth_long_gaussian(self):
         """Beam longitudinal - gaussian mode"""
-        self._beam._Beam__birth_longitudinal_ellipse(TEST_GAUSSIAN_L)
+        self._beam._Beam__birth_longitudinal_ellipse(TEST_GAUSSIAN_L1)
+        self.assertEqual(self._beam.longitudinal_mode, "gaussian")
+        equality_matrix = numpy.equal(self._beam.beam_matrix,
+                                      numpy.diag([1.]*4+[1.e12, 1.e4]))
+        self.assertTrue(numpy.all(equality_matrix))
+        self._beam._Beam__birth_longitudinal_ellipse(TEST_GAUSSIAN_L2)
         self.assertEqual( self._beam.longitudinal_mode, "gaussian" )
-        self.assertTrue( numpy.all(numpy.equal(self._beam.beam_matrix,
-                                            numpy.diag([1.]*4+[1.e12, 1.e4])
-                       )))
+        test_matrix = numpy.diag([1.]*4+[1.e4, 1.e4])
+        test_matrix[4, 5] = 100.*100.-1.
+        test_matrix[5, 4] = 100.*100.-1.
+        equality_matrix = numpy.equal(self._beam.beam_matrix, test_matrix)
+        self.assertTrue(numpy.all(equality_matrix))
         self.assertRaises(ValueError,
                           self._beam._Beam__birth_longitudinal_ellipse,
-                          TEST_GAUSSIAN_L_F1)
-        self.assertRaises(ValueError,
-                          self._beam._Beam__birth_longitudinal_ellipse,
-                          TEST_GAUSSIAN_L_F2)
-
+                          TEST_GAUSSIAN_L_F3)
 
     def test_birth_long_t_dist(self):
         """Beam longitudinal - sawtooth/uniform time distributions"""
@@ -479,6 +486,28 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertEquals(self._beam.beam_mean_z, 20.0)
         self.assertEquals(self._beam.beam_sigma_z, 30.0)
         print "polarization test_beam", self._beam.beam_polarisation
+
+    def test_birth_a_p_correlation(self):
+        """Amplitude momentum correlation  - at birth"""
+        self._beam.momentum_defined_by = "energy"
+        self._beam._Beam__birth_a_p_correlation({"a-p_correlation":TEST_AP_1})
+        self.assertEquals(self._beam.a_p_correlation["magnitude"], 0.1)
+        self.assertEquals(self._beam.a_p_correlation["momentum_variable"], "p")
+
+        self._beam._Beam__birth_a_p_correlation({"a-p_correlation":TEST_AP_2})
+        self.assertEquals(self._beam.a_p_correlation["magnitude"], 0.2)
+        self.assertEquals(self._beam.a_p_correlation["momentum_variable"],
+                          "energy")
+
+        for test, exc in [(TEST_AP_F1, KeyError),
+                          (TEST_AP_F2, ValueError),
+                          (TEST_AP_F3, KeyError)]:
+            try:
+                test_def = {"a-p_correlation":test}
+                self._beam._Beam__birth_a_p_correlation(test_def)
+                raise(RuntimeError("should have thrown"))
+            except exc:
+                pass
 
     def test_birth(self):
         """ Overall check birth works """
@@ -543,7 +572,6 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
     def test_make_one_primary_gaus(self):
         """Check function that throws a particle - for gaussian distribution"""
         a_beam = beam.Beam()
-   
         a_beam.birth(TEST_BIRTH, "binomial", 2)
         for i in range(1000): # pylint: disable = W0612
             primary = a_beam.make_one_primary()
@@ -675,7 +703,28 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
             self.assertEqual(flag_more_y or flag_less_y, True) 
             self.assertEqual(flag_more_z or flag_less_z, True) 
             a_beam.make_one_primary()
-            
+
+    def test_process_a_p_correlation(self):
+        """Test beam.py a-p correlation routine"""
+        self._beam.beam_matrix = numpy.diag([0.1]*6)
+        self._beam.beam_mean = numpy.zeros((6))
+        self._beam.a_p_correlation = {"momentum_variable":"pz", "magnitude":0.5}
+        ref_pz = 200.
+        hit1 = Hit.new_from_dict({"pz":ref_pz, "mass":105.658}, "energy")
+        hit2  = hit1.deepcopy()
+        self._beam._Beam__process_a_p_correlation(hit2)
+        self.assertEqual(hit1, hit2)
+        for matrix in [numpy.diag([0.1]*6), numpy.diag([0.2]*6)]:
+            self._beam.beam_matrix = matrix
+            hit2 = hit1.deepcopy()
+            hit3 = hit1.deepcopy()
+            hit2['x'] = 2.
+            hit3['px'] = 2.
+            self._beam._Beam__process_a_p_correlation(hit2)
+            self._beam._Beam__process_a_p_correlation(hit3)
+            self.assertAlmostEqual(hit2['pz'], hit3['pz'])
+            self.assertAlmostEqual(hit2['pz']-ref_pz, ref_pz*0.5*4.*105.658**2)
+
     def __cmp_matrix(self, ref_matrix, test_matrix):
         """Compare to numpy matrices"""
         self.assertEqual(ref_matrix.shape, test_matrix.shape)

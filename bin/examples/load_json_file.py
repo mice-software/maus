@@ -79,7 +79,12 @@ def main():
         # bureaucracy
         print "DAQ event type", spill["daq_event_type"]
         if spill["daq_event_type"] == "physics_event":
+            # EMR adds extra events to the recon_event branch
+            # These extra events do not have anything other than emr_event
+            # i.e. no tof_event scifi_event etc
             for event in spill["recon_events"]:
+                if "tof_event" not in event:
+                    continue
                 tof_event = event["tof_event"]
                 digits = tof_event["tof_digits"]
                 for tof1_digit in digits["tof1"]:

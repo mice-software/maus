@@ -55,6 +55,8 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
     -queue is used to define the buffer
     Initialize and read in default configuration files and overide with data
     card parameters
+    -protonabsorberin set to 1 for proton absorber to be included in deck and
+    0 for no proton absorber
     """
     def __init__(self):
         
@@ -62,6 +64,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.q_2 = 0
         self.q_3 = 0
         self.d_1 = 0
+        self.d_2 = 0
         self.d_s = 0
         self.proton_weight = 0
         self.particles_per_spill = 0 
@@ -80,6 +83,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.charge = 3
         self.newline = ''
         self.grid_job = 0 
+        self.protonabsorberin = 1
    
     def birth(self, json_configuration): #pylint: disable=R0912, R0915
         "birth doc string"      
@@ -90,6 +94,12 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         except Exception: #pylint: disable=W0703
             print("Error: No configuration file!")
             good_birth = False
+
+        try:
+            self.protonabsorberin = config_doc["g4bl"]["protonabsorberin"]
+        except Exception: #pylint: disable=W0703
+            print("Error: protonabsorberin is not found in the config file!")
+            good_birth = False 
 
         try:
             self.q_1 = config_doc["g4bl"]["q_1"]
@@ -129,6 +139,12 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             print("Error: d_1 is not found in the config file!")
             good_birth = False             
 
+        try:
+            self.d_2 = config_doc["g4bl"]["d_2"]
+        except Exception: #pylint: disable=W0703
+            print("Error: d_2 is not found in the config file!")
+            good_birth = False
+	
         try:
             self.d_s = config_doc["g4bl"]["d_s"]
         except Exception: #pylint: disable=W0703
@@ -241,7 +257,9 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         try:
             self.newline = "param -unset q_1="+str(self.q_1)+ \
             " q_2="+str(self.q_2)+ \
+	    " protonabsorberin="+str(self.protonabsorberin)+ \
             " q_3="+str(self.q_3)+" d_1="+ str(self.d_1) +\
+	    " d_2="+ str(self.d_2) +\
             " proton_absorber_thickness="+str(self.proton_absorber_thickness)+\
             " proton_number="+str(self.proton_number)+\
             " proton_weight="+str(self.proton_weight)+\

@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 """Create index file to access documentation components."""
 
@@ -28,7 +28,7 @@ def create_index_html():
     tppath_segment = paths[0][len(commonprefix(paths))+1:]
     maus_path_segment = paths[1][len(commonprefix(paths))+1:]
     # Need to deal with the case where the two paths are the same
-    if not tppath_segment:
+    if tppath_segment == maus_path_segment:
         rel_tppath = ''
     # Generate the appropriate paths to link to the third party libaries.
     else:
