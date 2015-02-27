@@ -87,8 +87,9 @@ header_and_footer_mode = "append" #append or dont_append
 # thickness will be retrieved from the CDB for the run_number specified
 g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2":-0.396,\
         "d_s":3.837,"particles_per_spill":0,"rotation_angle":30,"translation_z":680.31,\
-        "proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,"particle_charge":'all',\
-        "file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',"get_magnet_currents_pa_cdb":False}
+        "protonabsorberin":1,"proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,\
+        "particle_charge":'all',"file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',\
+        "get_magnet_currents_pa_cdb":False}
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
@@ -506,7 +507,7 @@ EMRsecondaryTriggerMinYhits = 1
 EMRsecondaryTriggerMinNhits = 2
 EMRsecondaryTriggerMinTot = 4
 
-EMRmaxSecondaryToPrimaryTrackDistance = 5
+EMRmaxSecondaryToPrimaryTrackDistance = 80
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -614,6 +615,22 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+# Bounds set on values of PID variables, should probably only be varied when running PID,
+# although can also be used to set new limits for PDFs
+# Bounds for PIDVarA
+minBinA = 20
+maxBinA = 40
+# PIDVarB
+XminBinB = 10
+XmaxBinB = 250
+YminBinB = 20
+YmaxBinB = 40
+# PIDVarC
+XminBinC = 50
+XmaxBinC = 350
+YminBinC = 0
+YmaxBinC = 8000
+
 
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),

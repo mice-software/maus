@@ -63,8 +63,9 @@ namespace global {
   };
 
   PIDBase::PIDBase(TFile* file, std::string variable,
-		   std::string hypothesis)
-    : _var_name(variable), _hyp(hypothesis), _writeFile(NULL) {
+		   std::string hypothesis, int XminBin, int XmaxBin, int YminBin, int YmaxBin)
+    : _var_name(variable), _hyp(hypothesis),
+      _XminBin(XminBin), _XmaxBin(XmaxBin), _YminBin(YminBin), _YmaxBin(YmaxBin), _writeFile(NULL) {
     std::string histname = _var_name + "_" + _hyp;
   };
 

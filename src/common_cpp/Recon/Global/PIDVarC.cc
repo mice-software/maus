@@ -28,12 +28,12 @@ namespace global {
 
   PIDVarC::PIDVarC(std::string hypothesis, std::string unique_identifier)
     : PIDBase2D(VARIABLE, hypothesis, unique_identifier,
-                 XminBin, XmaxBin, XnumBins, YminBin, YmaxBin, YnumBins) {
+                 XminBinC, XmaxBinC, XnumBins, YminBinC, YmaxBinC, YnumBins) {
     _nonZeroHistEntries = true;
   }
 
   PIDVarC::PIDVarC(TFile* file, std::string hypothesis)
-    : PIDBase2D(file, VARIABLE, hypothesis) {
+    : PIDBase2D(file, VARIABLE, hypothesis, XminBinC, XmaxBinC, YminBinC, YmaxBinC) {
   }
 
   PIDVarC::~PIDVarC() {}
@@ -63,12 +63,12 @@ namespace global {
       }
     }
     if (kl_track_points.size() < 1) {
-      Squeak::mout(Squeak::error) << "Global track contained no KL" <<
+      Squeak::mout(Squeak::debug) << "Global track contained no KL" <<
 	" trackpoints, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
       kl_track_points.clear();
       return std::make_pair(-1, 0);
     } else if (tracker1_track_points.size() < 1) {
-      Squeak::mout(Squeak::error) << "Global track contained no downstream" <<
+      Squeak::mout(Squeak::debug) << "Global track contained no downstream" <<
 	" tracker trackpoints, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
       tracker1_track_points.clear();
       kl_track_points.clear();
@@ -77,8 +77,8 @@ namespace global {
       for (size_t i = 0; i < kl_track_points.size(); i++) {
 	total_ADC_charge_product += kl_track_points[i]->get_ADC_charge_product();
       }
-      if ( YminBin > (total_ADC_charge_product) || (total_ADC_charge_product) > YmaxBin ) {
-	Squeak::mout(Squeak::error) << "KL ADC charge product " <<
+      if ( YminBinC > (total_ADC_charge_product) || (total_ADC_charge_product) > YmaxBinC ) {
+	Squeak::mout(Squeak::debug) << "KL ADC charge product " <<
 	  "outside of allowed range, Recon::Global::PIDVarC::Calc_Var()" <<
 	  std::endl;
 	kl_track_points.clear();
@@ -105,8 +105,8 @@ namespace global {
 	kl_track_points.clear();
 	tracker1_track_points.clear();
 	tracker1_momentum = tracker1_trackpoint_mom/tracker1_tp_count;
-	if ( XminBin > tracker1_momentum || tracker1_momentum > XmaxBin ) {
-	  Squeak::mout(Squeak::error) << "Momentum for tracker 1 is outside " <<
+	if ( XminBinC > tracker1_momentum || tracker1_momentum > XmaxBinC ) {
+	  Squeak::mout(Squeak::debug) << "Momentum for tracker 1 is outside " <<
 	    "of range, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
 	  return std::make_pair(0, -1);
 	} else {

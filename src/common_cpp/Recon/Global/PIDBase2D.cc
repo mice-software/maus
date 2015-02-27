@@ -36,8 +36,8 @@ namespace global {
   };
 
   PIDBase2D::PIDBase2D(TFile* file, std::string variable,
-		   std::string hypothesis)
-    : PIDBase(file, variable, hypothesis) {
+		   std::string hypothesis, int XminBin, int XmaxBin, int YminBin, int YmaxBin)
+    : PIDBase(file, variable, hypothesis, XminBin, XmaxBin, YminBin, YmaxBin) {
     std::string histname = variable + "_" + hypothesis;
 
     if (!file || file->IsZombie()) {
@@ -51,10 +51,6 @@ namespace global {
 		      "Histogram not found in file.",
 		      "Recon::Global::PIDBase2D::PIDBase2D()"));
     }
-    _XminBin = _hist->GetXaxis()->GetXmin();
-    _XmaxBin = _hist->GetXaxis()->GetXmax();
-    _YminBin = _hist->GetYaxis()->GetXmin();
-    _YmaxBin = _hist->GetYaxis()->GetXmax();
   };
 
   PIDBase2D::~PIDBase2D() {
@@ -91,7 +87,7 @@ namespace global {
     double Yvar = (Calc_Var(track)).second;
     if ((Xvar < _XminBin || Xvar > _XmaxBin) ||
 	(Yvar < _YminBin || Yvar > _YmaxBin)) {
-      Squeak::mout(Squeak::error) << "Value of PID variable out of range, "
+      Squeak::mout(Squeak::debug) << "Value of PID variable out of range, "
 				  << "Recon::Global::PIDBase2D::logL()"
 				  << std::endl;
       return 1;
@@ -101,7 +97,7 @@ namespace global {
     int bin = _hist->GetBin(binx, biny, 0);
     double entries = _hist->GetBinContent(bin);
     if (entries <= 0) {
-      Squeak::mout(Squeak::error) << "Corresponding bin content in PDF is "
+      Squeak::mout(Squeak::debug) << "Corresponding bin content in PDF is "
 				  << "not greater than zero, "
 				  << "Recon::Global::PIDBase2D::logL()"
 				  << std::endl;
@@ -116,7 +112,7 @@ namespace global {
     double Yvar = (Calc_Var(track)).second;
     if ((Xvar < _XminBin || Xvar > _XmaxBin) ||
 	(Yvar < _YminBin || Yvar > _YmaxBin)) {
-       Squeak::mout(Squeak::error)
+       Squeak::mout(Squeak::debug)
 	 << "Calc_Var returned invalid value of "
 	 << "PID variable, not added to histogram, "
 	 << "Recon::Global::PIDBase2D::Fill_Hist()" << std::endl;

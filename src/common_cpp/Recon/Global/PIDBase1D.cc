@@ -34,8 +34,9 @@ namespace global {
   };
 
   PIDBase1D::PIDBase1D(TFile* file, std::string variable,
-		   std::string hypothesis)
-    : PIDBase(file, variable, hypothesis) {
+		   std::string hypothesis, int XminBin, int XmaxBin)
+    : PIDBase(file, variable, hypothesis, XminBin, XmaxBin,
+       YminBin, YmaxBin) {
     std::string histname = variable + "_" + hypothesis;
     if (!file || file->IsZombie()) {
       throw(Exception(Exception::recoverable,
@@ -48,8 +49,6 @@ namespace global {
 		      "Histogram not found in file.",
 		      "Recon::Global::PIDBase1D::PIDBase1D()"));
     }
-    _XminBin = _hist->GetXaxis()->GetXmin();
-    _XmaxBin = _hist->GetXaxis()->GetXmax();
   };
 
   PIDBase1D::~PIDBase1D() {
@@ -84,14 +83,14 @@ namespace global {
   double PIDBase1D::logL(MAUS::DataStructure::Global::Track* track) {
     double var = (Calc_Var(track)).first;
     if (var < _XminBin || var > _XmaxBin) {
-      Squeak::mout(Squeak::error) << "Missing/invalid measurements for  " <<
+      Squeak::mout(Squeak::debug) << "Missing/invalid measurements for  " <<
 	"TOF0/TOF1 times, Recon::Global::PIDBase1D::logL()" << std::endl;
       return 1;
     }
     int bin = _hist->FindBin(var);
     double entries = _hist->GetBinContent(bin);
     if (entries <=0) {
-      Squeak::mout(Squeak::error) << "Corresponding bin content in PDF is " <<
+      Squeak::mout(Squeak::debug) << "Corresponding bin content in PDF is " <<
 	"not greater than zero, Recon::Global::PIDBase1D::logL()" << std::endl;
       return 1;
     }
@@ -102,7 +101,7 @@ namespace global {
   void PIDBase1D::Fill_Hist(MAUS::DataStructure::Global::Track* track) {
     double var = (Calc_Var(track)).first;
     if (var < _XminBin || var > _XmaxBin) {
-       Squeak::mout(Squeak::error) << "Calc_Var returned invalid value of "
+       Squeak::mout(Squeak::debug) << "Calc_Var returned invalid value of "
 				   << "PID variable, not added to histogram, "
 				   << "Recon::Global::PIDBase1D::Fill_Hist()"
 				   << std::endl;

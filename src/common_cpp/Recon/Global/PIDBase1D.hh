@@ -53,7 +53,8 @@ namespace global {
            std::string unique_identifier, int XminBin, int XmaxBin,
            int XnumBins);
     /// Constructor to use a PDF to perform PID analysis
-    PIDBase1D(TFile* file, std::string variable, std::string hypothesis);
+    PIDBase1D(TFile* file, std::string variable, std::string hypothesis,
+	      int XminBin, int XmaxBin);
     /// Destructor
     virtual ~PIDBase1D();
 

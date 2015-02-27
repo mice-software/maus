@@ -34,11 +34,10 @@ namespace global {
 		      "Recon::Global::TrackMatching"));
     }
 
-    MAUS::DataStructure::Global::TrackPArray *ImportedTracks =
-      global_event->get_tracks();
+    MAUS::DataStructure::Global::TrackPArray *ImportedTracks = global_event->get_tracks();
     MAUS::DataStructure::Global::TrackPArray::iterator ImportedTrackIterator;
-    MAUS::DataStructure::Global::TrackPArray *SciFiTrackArray =
-      new MAUS::DataStructure::Global::TrackPArray();
+    MAUS::DataStructure::Global::Track* ImportedSciFiTrack =
+      new MAUS::DataStructure::Global::Track();
     for (ImportedTrackIterator = ImportedTracks->begin();
 	 ImportedTrackIterator != ImportedTracks->end();
 	 ++ImportedTrackIterator) {
@@ -46,7 +45,19 @@ namespace global {
 	(*ImportedTrackIterator);
       if (ImportedTrack->HasDetector(MAUS::DataStructure::Global::kTracker0) ||
 	  ImportedTrack->HasDetector(MAUS::DataStructure::Global::kTracker1)) {
-	SciFiTrackArray->push_back(ImportedTrack);
+	std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+	  tempSciFiTrackPointArray = ImportedTrack->GetTrackPoints();
+	for (unsigned int i = 0; i < tempSciFiTrackPointArray.size(); i++) {
+	  MAUS::DataStructure::Global::TrackPoint* tempSciFiTrackPoint =
+	    const_cast<MAUS::DataStructure::Global::TrackPoint*>
+	    (tempSciFiTrackPointArray[i]);
+	  tempSciFiTrackPoint->set_mapper_name(mapper_name);
+	  ImportedSciFiTrack->AddTrackPoint(tempSciFiTrackPoint);
+	}
+      }
+      if (ImportedSciFiTrack->GetTrackPoints().size() == 0) {
+	delete ImportedSciFiTrack;
+	ImportedSciFiTrack = NULL;
       }
     }
 
@@ -57,70 +68,48 @@ namespace global {
     MAUS::DataStructure::Global::Track* KLTrack =
       new MAUS::DataStructure::Global::Track();
     MakeKLTracks(global_event, GlobalSpacePointArray, KLTrack);
-    if (KLTrack->GetTrackPoints().size() == 0) delete KLTrack;
+    if (KLTrack->GetTrackPoints().size() == 0) {
+      delete KLTrack;
+      KLTrack = NULL;
+    }
 
     // Adding global tracks for case where global event contains both SciFi and TOF tracks
     // (And KL track if applicable)
-    if (!SciFiTrackArray->empty() && !TOFTrackArray.empty()) {
-      for (unsigned int i = 0; i < SciFiTrackArray->size(); i++) {
-	for (unsigned int j = 0; j < TOFTrackArray.size(); j++) {
-	  MAUS::DataStructure::Global::Track* GlobalTrack =
-	    new MAUS::DataStructure::Global::Track();
-	  GlobalTrack->set_mapper_name(mapper_name);
-	  MAUS::DataStructure::Global::Track* tempSciFiTrack =
-	    SciFiTrackArray->at(i);
-	  MAUS::DataStructure::Global::Track* tempTOFTrack = TOFTrackArray[j];
-	  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-	    tempSciFiTrackPointArray = tempSciFiTrack->GetTrackPoints();
-	  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-	    tempTOFTrackPointArray = tempTOFTrack->GetTrackPoints();
-	  for (unsigned int k = 0; k < tempTOFTrackPointArray.size(); k++) {
-	    MAUS::DataStructure::Global::TrackPoint* tempTOFTrackPoint =
-	      const_cast<MAUS::DataStructure::Global::TrackPoint*>
-	      (tempTOFTrackPointArray[k]);
-	    tempTOFTrackPoint->set_mapper_name(mapper_name);
-	    GlobalTrack->AddTrackPoint(tempTOFTrackPoint);
-	  }
-	  for (unsigned int k = 0; k < tempSciFiTrackPointArray.size(); k++) {
-	    MAUS::DataStructure::Global::TrackPoint* tempSciFiTrackPoint =
-	      const_cast<MAUS::DataStructure::Global::TrackPoint*>
-	      (tempSciFiTrackPointArray[k]);
-	    tempSciFiTrackPoint->set_mapper_name(mapper_name);
-	    GlobalTrack->AddTrackPoint(tempSciFiTrackPoint);
-	  }
-	  if (KLTrack/*->GetTrackPoints().size() > 0*/) {
-	    std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-	      tempKLTrackPointArray = KLTrack->GetTrackPoints();
-	    for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
-	      MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
-		const_cast<MAUS::DataStructure::Global::TrackPoint*>
-		(tempKLTrackPointArray[l]);
-	      tempKLTrackPoint->set_mapper_name(mapper_name);
-	      GlobalTrack->AddTrackPoint(tempKLTrackPoint);
-	    }
-	  }
-	  global_event->add_track_recursive(GlobalTrack);
+    if (ImportedSciFiTrack != NULL && !TOFTrackArray.empty()) {
+      for (unsigned int j = 0; j < TOFTrackArray.size(); j++) {
+	MAUS::DataStructure::Global::Track* GlobalTrack = TOFTrackArray[j]->Clone();
+	GlobalTrack->set_mapper_name(mapper_name);
+	std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+	  tempSciFiTrackPointArray = ImportedSciFiTrack->GetTrackPoints();
+	for (unsigned int k = 0; k < tempSciFiTrackPointArray.size(); k++) {
+	  MAUS::DataStructure::Global::TrackPoint* tempSciFiTrackPoint =
+	    const_cast<MAUS::DataStructure::Global::TrackPoint*>
+	    (tempSciFiTrackPointArray[k]);
+	  tempSciFiTrackPoint->set_mapper_name(mapper_name);
+	  GlobalTrack->AddTrackPoint(tempSciFiTrackPoint);
 	}
+	if (KLTrack != NULL) {
+	  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+	    tempKLTrackPointArray = KLTrack->GetTrackPoints();
+	  for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
+	    MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
+	      const_cast<MAUS::DataStructure::Global::TrackPoint*>
+	      (tempKLTrackPointArray[l]);
+	    tempKLTrackPoint->set_mapper_name(mapper_name);
+	    GlobalTrack->AddTrackPoint(tempKLTrackPoint);
+	  }
+	}
+	global_event->add_track_recursive(GlobalTrack);
       }
     }
 
     // Adding global tracks for case where global event contains only TOF tracks
     // (And KL track if applicable)
-    if (SciFiTrackArray->empty() && !TOFTrackArray.empty()) {
+    if (ImportedSciFiTrack == NULL && !TOFTrackArray.empty()) {
       for (unsigned int i = 0; i < TOFTrackArray.size(); i++) {
-	MAUS::DataStructure::Global::Track* GlobalTrack =
-	  new MAUS::DataStructure::Global::Track();
+	MAUS::DataStructure::Global::Track* GlobalTrack = TOFTrackArray[i]->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
-	MAUS::DataStructure::Global::Track* tempTOFTrack = TOFTrackArray[i];
-	std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-	  tempTOFTrackPointArray = tempTOFTrack->GetTrackPoints();
-	for (unsigned int j = 0; j < tempTOFTrackPointArray.size(); j++) {
-	  MAUS::DataStructure::Global::TrackPoint* tempTOFTrackPoint =
-	    const_cast<MAUS::DataStructure::Global::TrackPoint*>
-	    (tempTOFTrackPointArray[j]);
-	  GlobalTrack->AddTrackPoint(tempTOFTrackPoint);
-	}
-	if (KLTrack/*->GetTrackPoints().size() > 0*/) {
+	if (KLTrack != NULL) {
 	    std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 	      tempKLTrackPointArray = KLTrack->GetTrackPoints();
 	    for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
@@ -137,51 +126,27 @@ namespace global {
 
     // Adding global tracks for case where global event contains only SciFi tracks
     // (And KL track if applicable)
-    if (!SciFiTrackArray->empty() && TOFTrackArray.empty()) {
-      for (unsigned int i = 0; i < SciFiTrackArray->size(); i++) {
-	MAUS::DataStructure::Global::Track* GlobalTrack =
-	  new MAUS::DataStructure::Global::Track();
-	GlobalTrack->set_mapper_name(mapper_name);
-	MAUS::DataStructure::Global::Track* tempSciFiTrack =
-	  SciFiTrackArray->at(i);
+    if (ImportedSciFiTrack != NULL && TOFTrackArray.empty()) {
+      MAUS::DataStructure::Global::Track* GlobalTrack = ImportedSciFiTrack->Clone();
+      GlobalTrack->set_mapper_name(mapper_name);
+     if (KLTrack != NULL) {
 	std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-	  tempSciFiTrackPointArray = tempSciFiTrack->GetTrackPoints();
-	for (unsigned int j = 0; j < tempSciFiTrackPointArray.size(); j++) {
-	  MAUS::DataStructure::Global::TrackPoint* tempSciFiTrackPoint =
+	  tempKLTrackPointArray = KLTrack->GetTrackPoints();
+	for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
+	  MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
 	    const_cast<MAUS::DataStructure::Global::TrackPoint*>
-	    (tempSciFiTrackPointArray[j]);
-	  tempSciFiTrackPoint->set_mapper_name(mapper_name);
-	  GlobalTrack->AddTrackPoint(tempSciFiTrackPoint);
+	    (tempKLTrackPointArray[l]);
+	  tempKLTrackPoint->set_mapper_name(mapper_name);
+	  GlobalTrack->AddTrackPoint(tempKLTrackPoint);
 	}
-	if (KLTrack/*->GetTrackPoints().size() > 0*/) {
-	    std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-	      tempKLTrackPointArray = KLTrack->GetTrackPoints();
-	    for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
-	      MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
-		const_cast<MAUS::DataStructure::Global::TrackPoint*>
-		(tempKLTrackPointArray[l]);
-	      tempKLTrackPoint->set_mapper_name(mapper_name);
-	      GlobalTrack->AddTrackPoint(tempKLTrackPoint);
-	    }
-	}
-	global_event->add_track_recursive(GlobalTrack);
       }
+      global_event->add_track_recursive(GlobalTrack);
     }
 
     // Adding global tracks for case where global event contains only a KL track
-    if (SciFiTrackArray->empty() && TOFTrackArray.empty() && KLTrack) {
-      MAUS::DataStructure::Global::Track* GlobalTrack =
-	new MAUS::DataStructure::Global::Track();
+    if (ImportedSciFiTrack == NULL && TOFTrackArray.empty() && KLTrack != NULL) {
+      MAUS::DataStructure::Global::Track* GlobalTrack = KLTrack->Clone();
       GlobalTrack->set_mapper_name(mapper_name);
-      std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-	tempKLTrackPointArray = KLTrack->GetTrackPoints();
-      for (unsigned int l = 0; l < tempKLTrackPointArray.size(); l++) {
-	MAUS::DataStructure::Global::TrackPoint* tempKLTrackPoint =
-	  const_cast<MAUS::DataStructure::Global::TrackPoint*>
-	  (tempKLTrackPointArray[l]);
-	tempKLTrackPoint->set_mapper_name(mapper_name);
-	GlobalTrack->AddTrackPoint(tempKLTrackPoint);
-      }
       global_event->add_track_recursive(GlobalTrack);
     }
   }
@@ -261,7 +226,7 @@ namespace global {
 	}
 	TOFTrackArray.push_back(TOFtrack);
       } else {
-	Squeak::mout(Squeak::error) << "Global event returned multiple possible"
+	Squeak::mout(Squeak::debug) << "Global event returned multiple possible"
 				    << " TOF0 and/or TOF2 space points that "
 	                            << "could not be separated into tracks."
 				    << std::endl;
@@ -308,3 +273,4 @@ namespace global {
 } // ~namespace global
 } // ~namespace recon
 } // ~namespace MAUS
+

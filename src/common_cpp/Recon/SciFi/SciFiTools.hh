@@ -15,7 +15,7 @@
  *
  */
 
-/** @class SciFiTools
+/** @namespace SciFiTools
  *
  * Various tools encapsulated in a class for use with SciFi data
  * (in particular during Pattern Recognition).
