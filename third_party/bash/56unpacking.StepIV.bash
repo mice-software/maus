@@ -39,7 +39,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-#         cp SConstruct_unpacking ${MAUS_ROOT_DIR}/third_party/build/${directory}/SConstruct
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo
         echo "INFO: Making and installing"
@@ -49,6 +48,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
         cd build
         cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install \
+               -DSTEPIV_DATA=1 \
                ..
         make
         make install
