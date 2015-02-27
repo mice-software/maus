@@ -26,20 +26,23 @@ spill_generator_number_of_spills = 100
 # used by MapPyBeamMaker to generate input particle data
 # This is a sample beam distribution based on guesses by Chris Rogers of what
 # an optimised beam might look like
-def beam_definition(p):
-    print "beam definition", p
-    energy = (105.658**2.+p**2.)**0.5
-    return {
+ 
+beam = {
+    "particle_generator":"counter", # routine for generating empty primaries
+    "random_seed":1, # random seed for beam generation; controls also how the MC
+                     # seeds are generated
+    "definitions":[
+    {
        "reference":{
            "position":{"x":0.0, "y":-0.0, "z":11000.0},
            "momentum":{"x":0.0, "y":0.0, "z":1.0},
-           "particle_id":-13, "energy":energy, "time":0.0, "random_seed":10
+           "particle_id":-13, "energy":300, "time":0.0, "random_seed":10
        },
        "random_seed_algorithm":"incrementing_random", # algorithm for seeding MC
        "n_particles_per_spill":1, # probability of generating a particle
        "transverse":{
           "transverse_mode":"constant_solenoid", # transverse distribution matched to constant solenoid field
-          "emittance_4d":3., # 4d emittance
+          "emittance_4d":1., # 4d emittance
           "normalised_angular_momentum":0.1, # angular momentum from diffuser
           "bz":4.e-3 # magnetic field strength for angular momentum calculation
        },
@@ -49,15 +52,7 @@ def beam_definition(p):
                    "t_start":-1.e6, # start time of sawtooth
                    "t_end":+1.e6}, # end time of sawtooth
        "coupling":{"coupling_mode":"none"} # no dispersion
-    }
-
-
- 
-beam = {
-    "particle_generator":"counter", # routine for generating empty primaries
-    "random_seed":1, # random seed for beam generation; controls also how the MC
-                     # seeds are generated
-    "definitions":[beam_definition(p) for p in range(120, 310, 20)]
+    }]
 }
 
 particle_decay = False

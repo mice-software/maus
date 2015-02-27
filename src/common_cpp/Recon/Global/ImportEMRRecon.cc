@@ -30,6 +30,7 @@ namespace global {
              std::string mapper_name) {
 
     std::cerr << "We made it into the import" << std::endl;
+    std::cerr << global_event << std::endl;
 
     double z_ref = 18556.38;
     double x_ref = -500.0;
@@ -72,14 +73,14 @@ namespace global {
           y = (bar_hit.GetY() + 0.5)*17 + y_ref;
           z = (bar_hit.GetZ() + 0.5)*17 + z_ref;
           TLorentzVector pos(x, y, z, t);
-          std::cerr << "before creating the spacepoint" << std::endl;
+          //std::cerr << "before creating the spacepoint" << std::endl;
           MAUS::DataStructure::Global::SpacePoint* spoint =
             new MAUS::DataStructure::Global::SpacePoint();
           spoint->set_detector(MAUS::DataStructure::Global::kEMR);
-          std::cerr << "detector : " << spoint->get_detector() << std::endl;
+          //std::cerr << "detector : " << spoint->get_detector() << std::endl;
           spoint->set_position(pos);
-          std::cerr << "x pos : " << spoint->get_position().X() << std::endl;
-          std::cerr << "y pos : " << spoint->get_position().Y() << std::endl;
+          //std::cerr << "x pos : " << spoint->get_position().X() << std::endl;
+          //std::cerr << "y pos : " << spoint->get_position().Y() << std::endl;
           std::cerr << "z pos : " << spoint->get_position().Z() << std::endl;
           spoint->set_position_error(pos_err);
           std::cerr << "before adding the spacepoint to the global event" << std::endl;
