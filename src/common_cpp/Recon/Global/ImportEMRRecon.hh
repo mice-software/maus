@@ -17,7 +17,7 @@
 
 /** @class ImportEMRRecon
  *  @author Celeste Pidcott, University of Warwick
- *  Imports the space points from the EMR detector into
+ *  Imports the hits from the EMR detector into
  *  the MAUS::recon::global format.  
  */
 

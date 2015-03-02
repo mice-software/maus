@@ -99,6 +99,11 @@ namespace MAUS {
 	  MAUS::recon::global::ImportKLRecon klrecon_importer;
 	  klrecon_importer.process((*kl_event), global_event, _classname);
 	}
+	if (recon_event->GetEMREvent()) {
+	  MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
+	  MAUS::recon::global::ImportEMRRecon emrrecon_importer;
+	  emrrecon_importer.process((*emr_event), global_event, _classname);
+	}
       }
     }
   }
