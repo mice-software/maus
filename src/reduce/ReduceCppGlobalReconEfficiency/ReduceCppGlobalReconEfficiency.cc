@@ -233,7 +233,10 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
     //~ std::cerr << mClassname << ": Failed to import json to spill\n";
   //~ }
   //~ std::cerr << "\n#~#\n" << testint << "\n#~#\n";
-  return JsonWrapper::JsonToString(data_json);
+  std::string output_document = JsonWrapper::JsonToString(*data_json);
+  delete data_json;
+  delete data_cpp;
+  return output_document;
 }
 
 bool ReduceCppGlobalReconEfficiency::death()  {
