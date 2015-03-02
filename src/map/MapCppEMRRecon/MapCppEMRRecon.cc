@@ -470,12 +470,12 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 
       // Return the coordinates in metric, see EMR.dat for geometry
       if (iPlane % 2 == 0) {
-	double x = (_number_of_bars/2 - barid) * (_bar_width/2 + _gap);
+	double x = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
 	double y = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
 	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
 	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
       } else {
-	double x = (_number_of_bars/2 - y0) * (_bar_width/2 + _gap);
+	double x = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
 	double y = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
 	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
 	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);

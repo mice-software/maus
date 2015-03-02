@@ -59,8 +59,8 @@ void BarParameterisation::ComputeTransformation(const G4int copyNo,
     NbarsInPlane = 59-fNbOfBars%59;
 
 
-  G4double StartX = (NbarsInPlane/2)*(0.5*fBarWidth+fGap);
-  G4double StartY = - StartX;
+  G4double StartX = - (NbarsInPlane/2)*(0.5*fBarWidth+fGap);
+  G4double StartY = StartX;
   G4double StartZ = - (Nplanes/2)*(fBarHeight + fGap);
 
   placement.setZ(StartZ + planeID*(fBarHeight + fGap));
@@ -73,7 +73,7 @@ void BarParameterisation::ComputeTransformation(const G4int copyNo,
       rotation->rotateX(0.0*deg);
 
     rotation->rotateZ(90.0*deg);
-    placement.setX(StartX - barIDinPlane*(0.5*fBarWidth + fGap));
+    placement.setX(StartX + barIDinPlane*(0.5*fBarWidth + fGap));
     placement.setY(0.0*cm);
   } else {
     if (barIDinPlane%2 == 0)
@@ -83,7 +83,7 @@ void BarParameterisation::ComputeTransformation(const G4int copyNo,
 
     rotation->rotateZ(0.0*deg);
     placement.setX(0.0*cm);
-    placement.setY(StartY+barIDinPlane*(0.5*fBarWidth + fGap));
+    placement.setY(StartY + barIDinPlane*(0.5*fBarWidth + fGap));
   }
 
   physVol->SetTranslation(placement);
