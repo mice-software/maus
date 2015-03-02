@@ -446,6 +446,9 @@ EMRnumberOfPlanes = 48
 EMRnumberOfBars = 60 # number of bars in one plane (+ test channel 0)
 EMRnBars = 2832 # total number of bars in the EMR
 EMRbarLength = 110 # cm, length of a scintillating bar
+EMRbarWidth = 33 # mm, base of the triangle
+EMRbarHeight = 17 # mm, height of the triangle
+EMRgap = 0.5 # mm, gap between two adjacent bars
 
 # EMR event pre-selection
 EMRtotNoiseLow = 0

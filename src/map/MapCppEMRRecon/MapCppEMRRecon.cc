@@ -54,6 +54,9 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   // Fetch variables
   _number_of_planes = configJSON["EMRnumberOfPlanes"].asInt();
   _number_of_bars = configJSON["EMRnumberOfBars"].asInt();
+  _bar_width = configJSON["EMRbarWidth"].asDouble();
+  _bar_height = configJSON["EMRbarHeight"].asDouble();
+  _gap = configJSON["EMRgap"].asDouble();
 
   _secondary_hits_bunching_distance = configJSON["EMRsecondaryHitsBunchingDistance"].asInt();
   _secondary_hits_bunching_width = configJSON["EMRsecondaryHitsBunchingWidth"].asInt();
@@ -465,25 +468,24 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 	y0 = y2;
       }
 
-      // Coordinates in mm
+      // Return the coordinates in metric, see EMR.dat for geometry
       if (iPlane % 2 == 0) {
-	double x = (30 - barid) * 16.5;
-	double y = (30 - y0) * 16.5;
+	double x = (_number_of_bars/2 - barid) * (_bar_width/2 + _gap);
+	double y = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
 	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
 	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
-      }
-      if (iPlane % 2 == 1) {
-	double x = (30 - y0) * 16.5;
-	double y = (30 - barid) * 16.5;
+      } else {
+	double x = (_number_of_bars/2 - y0) * (_bar_width/2 + _gap);
+	double y = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
 	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
 	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
       }
 
       double z(-1);
       if (barid % 2 == 0)
-	z = x0*17 + 17./3;
+	z = x0 * (_bar_height + _gap) + 1./3 * _bar_height;
       else
-	z = x0*17 + 2*17./3;
+	z = x0 * (_bar_height + _gap) + 2./3 * _bar_height;
       emr_dbb_events[1][iPe][x0][barid][0].SetZ(z);
     }
   }

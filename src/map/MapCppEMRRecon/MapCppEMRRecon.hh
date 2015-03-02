@@ -142,6 +142,9 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   // Detector parameters
   int _number_of_planes;
   int _number_of_bars;
+  double _bar_width;
+  double _bar_height;
+  double _gap;
 
   // Configuration variables
   int _secondary_hits_bunching_distance;
