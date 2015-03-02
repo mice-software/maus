@@ -37,7 +37,7 @@ namespace global {
     double y;
     double z;
     double t = -1000000;
-    TLorentzVector pos_err(8.25, 8.25, 8.5, 0.0);
+    TLorentzVector pos_err(1.65, 1.65, 8.5, 0.0);
 
     // Check that EMR event has a primary track
     if (emr_event.GetHasPrimary()) {
@@ -65,28 +65,18 @@ namespace global {
 		 ++bar_hit_iter) {
 	      // Bar hit (get x and y)
 	      MAUS::EMRBarHit bar_hit = (*bar_hit_iter);
-	      // According to FD, x is the bar number in x, y is the average of bar numbers
-	      // based on papers and posters, the EMR coord system appears to switch x and y
-	      // with the MICE coordinate system, check against MC.
+	      // EMR coordinate system should now match MICE coordinate system
 	      x = bar_hit.GetX();
 	      y = bar_hit.GetY();
 	      z = bar_hit.GetZ() + z_ref;
 	      TLorentzVector pos(x, y, z, t);
-	      //std::cerr << "before creating the spacepoint" << std::endl;
 	      MAUS::DataStructure::Global::TrackPoint* tpoint =
 		new MAUS::DataStructure::Global::TrackPoint();
 	      tpoint->set_detector(MAUS::DataStructure::Global::kEMR);
-	      //std::cerr << "detector : " << tpoint->get_detector() << std::endl;
 	      tpoint->set_position(pos);
-	      //std::cerr << "x pos : " << tpoint->get_position().X() << std::endl;
-	      //std::cerr << "y pos : " << tpoint->get_position().Y() << std::endl;
-	      std::cerr << "z pos : " << tpoint->get_position().Z() << std::endl;
 	      tpoint->set_position_error(pos_err);
 	      tpoint->set_mapper_name("MapCppGlobalReconImport-EMR-Primary");
-	      std::cerr << "before adding the primary point to the global event" << std::endl;
-
 	      global_event->add_track_point(tpoint);
-	      std::cerr << "after adding the primary point to the global event" << std::endl;
 	    }
 	  }
 	  // Secondary Bar array
@@ -105,28 +95,18 @@ namespace global {
 		   ++bar_hit_iter) {
 		// Bar hit (get x and y)
 		MAUS::EMRBarHit bar_hit = (*bar_hit_iter);
-		// According to FD, x is the bar number in x, y is the average of bar numbers
-		// based on papers and posters, the EMR coord system appears to switch x and y
-		// with the MICE coordinate system, check against MC.
+		// EMR coordinate system should now match MICE coordinate system
 		x = bar_hit.GetX();
 		y = bar_hit.GetY();
 		z = bar_hit.GetZ() + z_ref;
 		TLorentzVector pos(x, y, z, t);
-		//std::cerr << "before creating the spacepoint" << std::endl;
 		MAUS::DataStructure::Global::TrackPoint* tpoint =
 		  new MAUS::DataStructure::Global::TrackPoint();
 		tpoint->set_detector(MAUS::DataStructure::Global::kEMR);
-		//std::cerr << "detector : " << tpoint->get_detector() << std::endl;
 		tpoint->set_position(pos);
-		//std::cerr << "x pos : " << tpoint->get_position().X() << std::endl;
-		//std::cerr << "y pos : " << tpoint->get_position().Y() << std::endl;
-		std::cerr << "z pos : " << tpoint->get_position().Z() << std::endl;
 		tpoint->set_position_error(pos_err);
 		tpoint->set_mapper_name("MapCppGlobalReconImport-EMR-Secondary");
-		std::cerr << "before adding the secondary point to the global event" << std::endl;
-
 		global_event->add_track_point(tpoint);
-		std::cerr << "after adding the secondary point to the global event" << std::endl;
 	      }
 	    }
 	  }
