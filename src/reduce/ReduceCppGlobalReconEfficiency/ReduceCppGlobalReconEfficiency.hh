@@ -73,6 +73,8 @@ class ReduceCppGlobalReconEfficiency {
   size_t tof2_matches_expected;
   size_t kl_matches;
   size_t kl_matches_expected;
+  size_t emr_matches;
+  size_t emr_matches_expected;
   std::string mClassname;
   //~ Json::Value mRoot;
   Spill* _spill;
