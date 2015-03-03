@@ -34,6 +34,7 @@
 #include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
 #include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterInfoBox.hh"
 #include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterXYZ.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 
 namespace MAUS {
 
@@ -63,7 +64,6 @@ class ReduceCppGlobalReconEfficiency {
                      int min, int max);
   bool checkDetector(const MAUS::DataStructure::Global::SpacePoint* space_point,
                      int min, int max);
-
  private:
   size_t tof0_matches;
   size_t tof0_matches_expected;
@@ -78,6 +78,9 @@ class ReduceCppGlobalReconEfficiency {
   Spill* _spill;
 };
 
+  std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
+      GetMCDetectors(MAUS::MCEvent* mc_event);
+      
 } // ~namespace MAUS
 
 #endif

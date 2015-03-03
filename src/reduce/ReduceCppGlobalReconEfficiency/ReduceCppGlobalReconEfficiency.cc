@@ -35,6 +35,7 @@
 #include "src/reduce/ReduceCppGlobalReconEfficiency/ReduceCppGlobalReconEfficiency.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
+#include "src/common_cpp/DataStructure/Global/Track.hh"
 
 namespace MAUS {
 
@@ -71,164 +72,185 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
   data_json = new Json::Value(imported_json);
   data_cpp = json2cppconverter(data_json);
   _spill = data_cpp->GetSpill();
+  if (MCEventPArray* mc_events = _spill->GetMCEvents()) {
+    MCEventPArray::iterator mc_event_iter;
+    for (mc_event_iter = mc_events->begin(); mc_event_iter != mc_events->end();
+         ++mc_event_iter) {
+      std::map<MAUS::DataStructure::Global::DetectorPoint, bool> mc_detectors;
+      mc_detectors = GetMCDetectors(*mc_event_iter);
+      for (int i = 0; i < 27; i++) {
+        std::cerr << mc_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] << " ";
+      }
+      //~ SciFiHitArray* scifi_hits = (*mc_event_iter)->GetSciFiHits();
+      //~ SciFiHitArray::iterator scifi_hits_iter;
+      //~ for (scifi_hits_iter = scifi_hits->begin();
+           //~ scifi_hits_iter != scifi_hits->end();
+           //~ ++scifi_hits_iter) {
+        //~ std::cerr << scifi_hits_iter->GetPosition().Z() << " "
+                  //~ << scifi_hits_iter->GetChannelId()->GetTrackerNumber() << " "
+                  //~ << scifi_hits_iter->GetChannelId()->GetStationNumber() << "\n";
+      //~ }
+    }
+  }
+
   //~ bool read_success = read_in_json(aDocument);
   //~ if (read_success) {
-    try {
-      if ( ReconEventPArray* recon_events = _spill->GetReconEvents() ) {
-        ReconEventPArray::iterator recon_event_iter;
-        bool tof0_hit = false;
-        bool tof1_hit = false;
-        bool tracker0_hit = false;
-        bool tracker1_hit = false;
-        bool tof2_hit = false;
-        bool kl_hit = false;
-        bool tof0_match = false;
-        bool tof1_match = false;
-        bool tof2_match = false;
-        bool kl_match = false;
-        for (recon_event_iter = recon_events->begin();
-             recon_event_iter != recon_events->end();
-             ++recon_event_iter) {
-          GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
-          // Check for each detector whether hits exist in the event
-          std::vector<MAUS::DataStructure::Global::TrackPoint*>*
-              global_track_points = global_event->get_track_points();
-          std::vector<MAUS::DataStructure::Global::TrackPoint*>::iterator
-              global_track_point_iter;
-          for (global_track_point_iter = global_track_points->begin();
-               global_track_point_iter != global_track_points->end();
-               ++global_track_point_iter) {
-            if (checkDetector(*global_track_point_iter, 2, 4)) {
-              tof0_hit = true;
-            }
-            if (checkDetector(*global_track_point_iter, 7, 9)) {
-              tof1_hit = true;
-            }
-            if (checkDetector(*global_track_point_iter, 10, 15)) {
-              tracker0_hit = true;
-            }
-            if (checkDetector(*global_track_point_iter, 16, 21)) {
-              tracker1_hit = true;
-            }
-            if (checkDetector(*global_track_point_iter, 22, 24)) {
-              tof2_hit = true;
-            }
-            if (checkDetector(*global_track_point_iter, 25, 25)) {
-              kl_hit = true;
-            }
-          }
-          std::vector<MAUS::DataStructure::Global::SpacePoint*>*
-              global_space_points = global_event->get_space_points();
-          std::vector<MAUS::DataStructure::Global::SpacePoint*>::iterator
-              global_space_point_iter;
-          for (global_space_point_iter = global_space_points->begin();
-               global_space_point_iter != global_space_points->end();
-               ++global_space_point_iter) {
-            if (checkDetector(*global_space_point_iter, 2, 4)) {
-              tof0_hit = true;
-            }
-            if (checkDetector(*global_space_point_iter, 7, 9)) {
-              tof1_hit = true;
-            }
-            if (checkDetector(*global_space_point_iter, 10, 15)) {
-              tracker0_hit = true;
-            }
-            if (checkDetector(*global_space_point_iter, 16, 21)) {
-              tracker1_hit = true;
-            }
-            if (checkDetector(*global_space_point_iter, 22, 24)) {
-              tof2_hit = true;
-            }
-            if (checkDetector(*global_space_point_iter, 25, 25)) {
-              kl_hit = true;
-            }
-          }
-          // Check if each non-Tracker detector has been added to a track, i.e.
-          // matched
-          std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
-              global_event->get_tracks();
-          std::vector<MAUS::DataStructure::Global::Track*>::iterator
-              global_track_iter;
-          for (global_track_iter = global_tracks->begin();
-               global_track_iter != global_tracks->end();
-               ++global_track_iter) {
-            MAUS::DataStructure::Global::Track* muplus_us_track = NULL;
-            MAUS::DataStructure::Global::Track* muplus_ds_track = NULL;
-
-            std::vector<const MAUS::DataStructure::Global::TrackPoint*>::iterator
-                track_point_iter;
-            if ((*global_track_iter)->get_pid() ==
-                MAUS::DataStructure::Global::kMuPlus) {
-              if ((*global_track_iter)->get_mapper_name() ==
-                  "MapCppGlobalTrackMatching-US") {
-                muplus_us_track = *global_track_iter;
-                std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-                    track_points = muplus_us_track->GetTrackPoints();
-                for (track_point_iter = track_points.begin();
-                     track_point_iter != track_points.end();
-                     ++track_point_iter) {
-                  if (checkDetector(*track_point_iter, 2, 4)) {
-                    tof0_match = true;
-                  }
-                  if (checkDetector(*track_point_iter, 7, 9)) {
-                    tof1_match = true;
-                  }
-                }
-              } else if ((*global_track_iter)->get_mapper_name() ==
-                  "MapCppGlobalTrackMatching-DS") {
-                muplus_ds_track = *global_track_iter;
-                std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-                    track_points = muplus_ds_track->GetTrackPoints();
-                for (track_point_iter = track_points.begin();
-                     track_point_iter != track_points.end();
-                     ++track_point_iter) {
-                  if (checkDetector(*track_point_iter, 22, 24)) {
-                    tof2_match = true;
-                  }
-                  if (checkDetector(*track_point_iter, 25, 25)) {
-                    kl_match = true;
-                  }
-                }
-              }
-            }
-          }
-        }
-        ofstream outfile;
-        outfile.open("test.txt", std::ios::out | std::ios::app);
-        outfile << tof0_hit << " " << tof1_hit << " " << tracker0_hit << " " << tracker1_hit << " " << tof2_hit << " " << kl_hit << "\n";
-        outfile.close();
-        if (tracker0_hit and tof0_hit) {
-          tof0_matches_expected++;
-        }
-        if (tracker0_hit and tof1_hit) {
-          tof1_matches_expected++;
-        }
-        if (tracker1_hit and tof2_hit) {
-          tof2_matches_expected++;
-        }
-        if (tracker1_hit and kl_hit) {
-          kl_matches_expected++;
-        }
-        if (tof0_match) {
-          tof0_matches++;
-        }
-        if (tof1_match) {
-          tof1_matches++;
-        }
-        if (tof2_match) {
-          tof2_matches++;
-        }
-        if (kl_match) {
-          kl_matches++;
-        }
-      }
-    } catch (Exception exc) {
-      Squeak::mout(Squeak::error) << exc.GetMessage() << std::endl;
-      //~ mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exc, mClassname);
-    } catch (std::exception exc) {
-      Squeak::mout(Squeak::error) << exc.what() << std::endl;
-      //~ mRoot = MAUS::CppErrorHandler::getInstance()->HandleStdExc(mRoot, exc, mClassname);
-    }
+    //~ try {
+      //~ if ( ReconEventPArray* recon_events = _spill->GetReconEvents() ) {
+        //~ ReconEventPArray::iterator recon_event_iter;
+        //~ bool tof0_hit = false;
+        //~ bool tof1_hit = false;
+        //~ bool tracker0_hit = false;
+        //~ bool tracker1_hit = false;
+        //~ bool tof2_hit = false;
+        //~ bool kl_hit = false;
+        //~ bool tof0_match = false;
+        //~ bool tof1_match = false;
+        //~ bool tof2_match = false;
+        //~ bool kl_match = false;
+        //~ for (recon_event_iter = recon_events->begin();
+             //~ recon_event_iter != recon_events->end();
+             //~ ++recon_event_iter) {
+          //~ GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
+          //~ // Check for each detector whether hits exist in the event
+          //~ std::vector<MAUS::DataStructure::Global::TrackPoint*>*
+              //~ global_track_points = global_event->get_track_points();
+          //~ std::vector<MAUS::DataStructure::Global::TrackPoint*>::iterator
+              //~ global_track_point_iter;
+          //~ for (global_track_point_iter = global_track_points->begin();
+               //~ global_track_point_iter != global_track_points->end();
+               //~ ++global_track_point_iter) {
+            //~ if (checkDetector(*global_track_point_iter, 2, 4)) {
+              //~ tof0_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_track_point_iter, 7, 9)) {
+              //~ tof1_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_track_point_iter, 10, 15)) {
+              //~ tracker0_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_track_point_iter, 16, 21)) {
+              //~ tracker1_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_track_point_iter, 22, 24)) {
+              //~ tof2_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_track_point_iter, 25, 25)) {
+              //~ kl_hit = true;
+            //~ }
+          //~ }
+          //~ std::vector<MAUS::DataStructure::Global::SpacePoint*>*
+              //~ global_space_points = global_event->get_space_points();
+          //~ std::vector<MAUS::DataStructure::Global::SpacePoint*>::iterator
+              //~ global_space_point_iter;
+          //~ for (global_space_point_iter = global_space_points->begin();
+               //~ global_space_point_iter != global_space_points->end();
+               //~ ++global_space_point_iter) {
+            //~ if (checkDetector(*global_space_point_iter, 2, 4)) {
+              //~ tof0_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_space_point_iter, 7, 9)) {
+              //~ tof1_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_space_point_iter, 10, 15)) {
+              //~ tracker0_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_space_point_iter, 16, 21)) {
+              //~ tracker1_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_space_point_iter, 22, 24)) {
+              //~ tof2_hit = true;
+            //~ }
+            //~ if (checkDetector(*global_space_point_iter, 25, 25)) {
+              //~ kl_hit = true;
+            //~ }
+          //~ }
+          //~ // Check if each non-Tracker detector has been added to a track, i.e.
+          //~ // matched
+          //~ std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
+              //~ global_event->get_tracks();
+          //~ std::vector<MAUS::DataStructure::Global::Track*>::iterator
+              //~ global_track_iter;
+          //~ for (global_track_iter = global_tracks->begin();
+               //~ global_track_iter != global_tracks->end();
+               //~ ++global_track_iter) {
+            //~ MAUS::DataStructure::Global::Track* muplus_us_track = NULL;
+            //~ MAUS::DataStructure::Global::Track* muplus_ds_track = NULL;
+//~ 
+            //~ std::vector<const MAUS::DataStructure::Global::TrackPoint*>::iterator
+                //~ track_point_iter;
+            //~ if ((*global_track_iter)->get_pid() ==
+                //~ MAUS::DataStructure::Global::kMuPlus) {
+              //~ if ((*global_track_iter)->get_mapper_name() ==
+                  //~ "MapCppGlobalTrackMatching-US") {
+                //~ muplus_us_track = *global_track_iter;
+                //~ std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+                    //~ track_points = muplus_us_track->GetTrackPoints();
+                //~ for (track_point_iter = track_points.begin();
+                     //~ track_point_iter != track_points.end();
+                     //~ ++track_point_iter) {
+                  //~ if (checkDetector(*track_point_iter, 2, 4)) {
+                    //~ tof0_match = true;
+                  //~ }
+                  //~ if (checkDetector(*track_point_iter, 7, 9)) {
+                    //~ tof1_match = true;
+                  //~ }
+                //~ }
+              //~ } else if ((*global_track_iter)->get_mapper_name() ==
+                  //~ "MapCppGlobalTrackMatching-DS") {
+                //~ muplus_ds_track = *global_track_iter;
+                //~ std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+                    //~ track_points = muplus_ds_track->GetTrackPoints();
+                //~ for (track_point_iter = track_points.begin();
+                     //~ track_point_iter != track_points.end();
+                     //~ ++track_point_iter) {
+                  //~ if (checkDetector(*track_point_iter, 22, 24)) {
+                    //~ tof2_match = true;
+                  //~ }
+                  //~ if (checkDetector(*track_point_iter, 25, 25)) {
+                    //~ kl_match = true;
+                  //~ }
+                //~ }
+              //~ }
+            //~ }
+          //~ }
+        //~ }
+        //~ ofstream outfile;
+        //~ outfile.open("test.txt", std::ios::out | std::ios::app);
+        //~ outfile << tof0_hit << " " << tof1_hit << " " << tracker0_hit << " " << tracker1_hit << " " << tof2_hit << " " << kl_hit << "\n";
+        //~ outfile.close();
+        //~ if (tracker0_hit and tof0_hit) {
+          //~ tof0_matches_expected++;
+        //~ }
+        //~ if (tracker0_hit and tof1_hit) {
+          //~ tof1_matches_expected++;
+        //~ }
+        //~ if (tracker1_hit and tof2_hit) {
+          //~ tof2_matches_expected++;
+        //~ }
+        //~ if (tracker1_hit and kl_hit) {
+          //~ kl_matches_expected++;
+        //~ }
+        //~ if (tof0_match) {
+          //~ tof0_matches++;
+        //~ }
+        //~ if (tof1_match) {
+          //~ tof1_matches++;
+        //~ }
+        //~ if (tof2_match) {
+          //~ tof2_matches++;
+        //~ }
+        //~ if (kl_match) {
+          //~ kl_matches++;
+        //~ }
+      //~ }
+    //~ } catch (Exception exc) {
+      //~ Squeak::mout(Squeak::error) << exc.GetMessage() << std::endl;
+      //~ //mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exc, mClassname);
+    //~ } catch (std::exception exc) {
+      //~ Squeak::mout(Squeak::error) << exc.what() << std::endl;
+      //~ // mRoot = MAUS::CppErrorHandler::getInstance()->HandleStdExc(mRoot, exc, mClassname);
+    //~ }
   //~ } else {
     //~ std::cerr << mClassname << ": Failed to import json to spill\n";
   //~ }
@@ -270,6 +292,88 @@ bool ReduceCppGlobalReconEfficiency::death()  {
       << "TOF2: " << tof2_eff*100 << "% " << tof2_matches << "/" << tof2_matches_expected << "\n"
       << "KL: " << kl_eff*100 << "% " << kl_matches << "/" << kl_matches_expected << "\n";
   return true;
+}
+
+std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
+    GetMCDetectors(MAUS::MCEvent* mc_event) {
+  std::map<MAUS::DataStructure::Global::DetectorPoint, bool> mc_detectors;
+  for (int i = 0; i < 27; i++) {
+    mc_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] =
+      false;
+  }
+
+  // TOFS
+  TOFHitArray* tof_hits = mc_event->GetTOFHits();
+  if (tof_hits) {
+    TOFHitArray::iterator tof_hits_iter;
+    for (tof_hits_iter = tof_hits->begin();
+         tof_hits_iter != tof_hits->end();
+         ++tof_hits_iter) {
+      int station_number = tof_hits_iter->GetChannelId()->GetStation();
+      int plane_number = tof_hits_iter->GetChannelId()->GetPlane();
+      if (station_number == 0) {
+        mc_detectors[MAUS::DataStructure::Global::kTOF0] = true;
+        if (plane_number == 0) {
+          mc_detectors[MAUS::DataStructure::Global::kTOF0_1] = true;
+        } else if (plane_number == 1) {
+          mc_detectors[MAUS::DataStructure::Global::kTOF0_2] = true;
+        }
+      } else if (station_number == 1) {
+        mc_detectors[MAUS::DataStructure::Global::kTOF1] = true;
+        if (plane_number == 0) {
+          mc_detectors[MAUS::DataStructure::Global::kTOF1_1] = true;
+        } else if (plane_number == 1) {
+          mc_detectors[MAUS::DataStructure::Global::kTOF1_2] = true;
+        }
+      } else if (station_number == 2) {
+        mc_detectors[MAUS::DataStructure::Global::kTOF2] = true;
+        if (plane_number == 0) {
+          mc_detectors[MAUS::DataStructure::Global::kTOF2_1] = true;
+        } else if (plane_number == 1) {
+          mc_detectors[MAUS::DataStructure::Global::kTOF2_2] = true;
+        }
+      }
+    }
+  }
+
+  // Trackers
+  SciFiHitArray* scifi_hits = mc_event->GetSciFiHits();
+  if (scifi_hits) {
+    SciFiHitArray::iterator scifi_hits_iter;
+    for (scifi_hits_iter = scifi_hits->begin();
+         scifi_hits_iter != scifi_hits->end();
+         ++scifi_hits_iter) {
+      int tracker_number = scifi_hits_iter->GetChannelId()->GetTrackerNumber();
+      int station_number = scifi_hits_iter->GetChannelId()->GetStationNumber();
+      // Since they are all consecutive we can make things easier with some casting
+      int detector_enum_int = 10 + tracker_number*6 + station_number;
+      if (tracker_number == 0) {
+        mc_detectors[MAUS::DataStructure::Global::kTracker0] = true;
+      } else if (tracker_number == 1) {
+        mc_detectors[MAUS::DataStructure::Global::kTracker1] = true;
+      }
+      mc_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>
+          (detector_enum_int)] = true;
+    }
+  }
+
+  // KL
+  KLHitArray* kl_hits = mc_event->GetKLHits();
+  if (kl_hits) {
+    if (kl_hits->size() > 0) {
+      mc_detectors[MAUS::DataStructure::Global::kCalorimeter] = true;
+    }
+  }
+
+  // EMR
+  EMRHitArray* emr_hits = mc_event->GetEMRHits();
+  if (emr_hits) {
+    if (emr_hits->size() > 0) {
+      mc_detectors[MAUS::DataStructure::Global::kEMR] = true;
+    }
+  }
+  
+  return mc_detectors;
 }
 
 bool ReduceCppGlobalReconEfficiency::checkDetector(const
