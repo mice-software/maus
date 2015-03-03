@@ -607,19 +607,18 @@ void MapCppEMRRecon::fill(Spill *spill,
 			  EMRfADCEventVector& emr_fadc_events,
 			  EMRTrackEventVector& emr_track_events) const {
 
-  int nTotalPartEvents = emr_fadc_events.size();
   int recPartEvents = spill->GetReconEventSize();
   int xRun = spill->GetRunNumber();
   int xSpill = spill->GetSpillNumber();
 
   ReconEventPArray *recEvts =  spill->GetReconEvents();
 
-  if (recPartEvents < nTotalPartEvents) {
-    for (int iPe = recPartEvents; iPe < nTotalPartEvents; iPe++)
-      recEvts->push_back(new ReconEvent);
+  // Only save the primary triggers with their primary and seconday arrays (n - 2)
+  if (recPartEvents > nPartEvents - 2) {
+    recEvts->resize(nPartEvents - 2);
   }
 
-  for (int iPe = 0; iPe < nTotalPartEvents; iPe++) {
+  for (int iPe = 0; iPe < nPartEvents - 2; iPe++) {
     EMREvent *evt = new EMREvent;
     EMRPlaneHitArray plArray;
 
