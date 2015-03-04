@@ -40,6 +40,8 @@ Track::Track()
       _pid(MAUS::DataStructure::Global::kNoPID),
       _charge(0),
       _detectorpoints(0),
+      _emr_range_primary(0.),
+      _emr_range_secondary(0.),
       _goodness_of_fit(0.) {
   _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
@@ -54,6 +56,8 @@ Track::Track(const Track &track)
       _detectorpoints(track.get_detectorpoints()),
       _geometry_paths(track.get_geometry_paths()),
       _constituent_tracks(track.get_constituent_tracks()),
+      _emr_range_primary(track.get_emr_range_primary()),
+      _emr_range_secondary(track.get_emr_range_secondary()),
       _goodness_of_fit(track.get_goodness_of_fit()) {
   _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
@@ -70,14 +74,16 @@ Track& Track::operator=(const Track &track) {
   if (this == &track) {
     return *this;
   }
-  _mapper_name        = track.get_mapper_name();
-  _pid                = track.get_pid();
-  _charge             = track.get_charge();
+  _mapper_name         = track.get_mapper_name();
+  _pid                 = track.get_pid();
+  _charge              = track.get_charge();
   _track_points = new TRefArray(*track.get_track_points());
-  _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
-  _detectorpoints     = track.get_detectorpoints();
-  _geometry_paths     = track.get_geometry_paths();
-  _goodness_of_fit    = track.get_goodness_of_fit();
+  _constituent_tracks  = new TRefArray(*track.get_constituent_tracks());
+  _detectorpoints      = track.get_detectorpoints();
+  _geometry_paths      = track.get_geometry_paths();
+  _emr_range_primary   = track.get_emr_range_primary();
+  _emr_range_secondary = track.get_emr_range_secondary();
+  _goodness_of_fit     = track.get_goodness_of_fit();
 
   return *this;
 }
@@ -91,6 +97,8 @@ Track* Track::Clone() const {
   trackNew->set_mapper_name(get_mapper_name());
   trackNew->set_pid(get_pid());
   trackNew->set_charge(get_charge());
+  trackNew->set_emr_range_primary(get_emr_range_primary());
+  trackNew->set_emr_range_secondary(get_emr_range_secondary());
 
   // Track points may be edited, so we clone the original points
   MAUS::DataStructure::Global::TrackPoint* tp = NULL;
@@ -138,6 +146,22 @@ void Track::set_charge(int charge) {
 
 int Track::get_charge() const {
   return _charge;
+}
+
+void Track::set_emr_range_primary(double range) {
+  _emr_range_primary = range;
+}
+
+double Track::get_emr_range_primary() const {
+  return _emr_range_primary;
+}
+
+void Track::set_emr_range_secondary(double range) {
+  _emr_range_secondary = range;
+}
+
+double Track::get_emr_range_secondary() const {
+  return _emr_range_secondary;
 }
 
 // Trackpoint methods

@@ -45,7 +45,7 @@ namespace global {
 	new MAUS::DataStructure::Global::Track();
 	MAUS::DataStructure::Global::Track* SecondaryEMRTrack =
 	  new MAUS::DataStructure::Global::Track();
-	//PrimaryEMRTrack->set_emr_range_primary(emr_event.GetRangePrimary());
+	PrimaryEMRTrack->set_emr_range_primary(emr_event.GetRangePrimary());
       // Plane hit array
       MAUS::EMRPlaneHitArray plane_hit_array = emr_event.GetEMRPlaneHitArray();
       if (plane_hit_array.size() > 0) {
@@ -93,7 +93,7 @@ namespace global {
 	  }
 	  // Secondary Bar array
 	  if (emr_event.GetHasSecondary()) {
-	    //SecondaryEMRTrack->set_emr_range_secondary(emr_event.GetRangeSecondary());
+	    SecondaryEMRTrack->set_emr_range_secondary(emr_event.GetRangeSecondary());
 	    MAUS::EMRBarArray secondary_bar_array =  plane_hit->GetEMRBarArraySecondary();
 	    MAUS::EMRBarArray::iterator secondary_bar_iter;
 	    for (secondary_bar_iter = secondary_bar_array.begin();
