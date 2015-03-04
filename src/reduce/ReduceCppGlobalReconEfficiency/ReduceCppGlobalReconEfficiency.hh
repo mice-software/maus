@@ -79,9 +79,6 @@ class ReduceCppGlobalReconEfficiency {
   //~ Json::Value mRoot;
   Spill* _spill;
 };
-
-  std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
-      GetMCDetectors(MAUS::MCEvent* mc_event);
       
 } // ~namespace MAUS
 
