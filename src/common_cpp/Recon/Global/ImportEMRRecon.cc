@@ -41,6 +41,11 @@ namespace global {
 
     // Check that EMR event has a primary track
     if (emr_event.GetHasPrimary()) {
+      MAUS::DataStructure::Global::Track* PrimaryEMRTrack =
+	new MAUS::DataStructure::Global::Track();
+	MAUS::DataStructure::Global::Track* SecondaryEMRTrack =
+	  new MAUS::DataStructure::Global::Track();
+	//PrimaryEMRTrack->set_emr_range_primary(emr_event.GetRangePrimary());
       // Plane hit array
       MAUS::EMRPlaneHitArray plane_hit_array = emr_event.GetEMRPlaneHitArray();
       if (plane_hit_array.size() > 0) {
@@ -72,15 +77,23 @@ namespace global {
 	      TLorentzVector pos(x, y, z, t);
 	      MAUS::DataStructure::Global::TrackPoint* tpoint =
 		new MAUS::DataStructure::Global::TrackPoint();
+	      MAUS::DataStructure::Global::SpacePoint* spoint =
+		new MAUS::DataStructure::Global::SpacePoint();
+	      spoint->set_detector(MAUS::DataStructure::Global::kEMR);
 	      tpoint->set_detector(MAUS::DataStructure::Global::kEMR);
+	      spoint->set_position(pos);
 	      tpoint->set_position(pos);
+	      spoint->set_position_error(pos_err);
 	      tpoint->set_position_error(pos_err);
+	      tpoint->set_space_point(spoint);
 	      tpoint->set_mapper_name("MapCppGlobalReconImport-EMR-Primary");
-	      global_event->add_track_point(tpoint);
+	      PrimaryEMRTrack->AddTrackPoint(tpoint);
+	      PrimaryEMRTrack->set_mapper_name("MapCppGlobalReconImport-EMR-Primary");
 	    }
 	  }
 	  // Secondary Bar array
-	  if (emr_event.GetHasSecondary()) { 
+	  if (emr_event.GetHasSecondary()) {
+	    //SecondaryEMRTrack->set_emr_range_secondary(emr_event.GetRangeSecondary());
 	    MAUS::EMRBarArray secondary_bar_array =  plane_hit->GetEMRBarArraySecondary();
 	    MAUS::EMRBarArray::iterator secondary_bar_iter;
 	    for (secondary_bar_iter = secondary_bar_array.begin();
@@ -102,14 +115,27 @@ namespace global {
 		TLorentzVector pos(x, y, z, t);
 		MAUS::DataStructure::Global::TrackPoint* tpoint =
 		  new MAUS::DataStructure::Global::TrackPoint();
+		MAUS::DataStructure::Global::SpacePoint* spoint =
+		  new MAUS::DataStructure::Global::SpacePoint();
+		spoint->set_detector(MAUS::DataStructure::Global::kEMR);
 		tpoint->set_detector(MAUS::DataStructure::Global::kEMR);
+		spoint->set_position(pos);
 		tpoint->set_position(pos);
+		spoint->set_position_error(pos_err);
 		tpoint->set_position_error(pos_err);
-		tpoint->set_mapper_name("MapCppGlobalReconImport-EMR-Secondary");
-		global_event->add_track_point(tpoint);
+		tpoint->set_space_point(spoint);
+		SecondaryEMRTrack->AddTrackPoint(tpoint);
+		SecondaryEMRTrack->set_mapper_name("MapCppGlobalReconImport-EMR-Secondary");
 	      }
 	    }
+	  } else {
+	    delete SecondaryEMRTrack;
+	    SecondaryEMRTrack = NULL;
 	  }
+	}
+	global_event->add_track_recursive(PrimaryEMRTrack);
+	if (SecondaryEMRTrack != NULL) {
+	  global_event->add_track_recursive(SecondaryEMRTrack);
 	}
       }
     }
