@@ -74,7 +74,7 @@ TrackPoint& TrackPoint::operator=(const TrackPoint &track_point) {
 }
 
 // Create a new TrackPoint, identical to the original, but separate.
-TrackPoint* TrackPoint::Clone() {
+TrackPoint* TrackPoint::Clone() const {
   MAUS::DataStructure::Global::TrackPoint* tpNew =
       new MAUS::DataStructure::Global::TrackPoint();
 

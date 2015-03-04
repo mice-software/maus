@@ -52,6 +52,7 @@
 
 #include "Recon/Global/ImportCkovRecon.hh"
 #include "Recon/Global/ImportKLRecon.hh"
+#include "Recon/Global/ImportEMRRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportSciFiRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportTOFRecon.hh"
 #include "src/common_cpp/API/MapBase.hh"
