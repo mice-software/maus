@@ -96,8 +96,8 @@ namespace global {
     new MAUS::DataStructure::Global::SpacePoint();
 
   // TODO(Pidcott) need to change slab # to a global position
-  //~ double x = tofarray[i].GetSlaby();
-  //~ double y = tofarray[i].GetSlabx();
+  // double x = tofarray[i].GetSlaby();
+  // double y = tofarray[i].GetSlabx();
   double t = tofarray[i].GetTime();
   TLorentzVector pos(x, y, z, t);
 

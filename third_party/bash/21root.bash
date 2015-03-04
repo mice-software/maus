@@ -3,6 +3,24 @@ directory=root_v5.34.07
 filename=${directory}.source.tar.gz 
 url=ftp://root.cern.ch/root/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -44,7 +62,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # weird and wonderful library locations to support multiple architectures.
     # Sticks them in ${x11} directory
     python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
-    ./configure --disable-xrootd --enable-gsl-shared \
+    ./configure --disable-xrootd --enable-gsl-shared --enable-minuit2 \
               --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
               --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
               --with-x11-libdir=${x11} \
@@ -61,7 +79,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo "INFO: Making:"
     echo
     sleep 1
-    make LDFLAGS="-Wl,--no-as-needed" || { echo "FAIL: Failed to configure/make"; exit 1; }
+    make -j$MAUS_NUM_THREADS LDFLAGS="-Wl,--no-as-needed" || { echo "FAIL: Failed to configure/make"; exit 1; }
 
 	            ################################################## 
 	echo

@@ -105,7 +105,7 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
       }
     }
   }
-std::cerr << "#1#\n";
+
   bool tof0_match = false;
   bool tof1_match = false;
   bool tof2_match = false;

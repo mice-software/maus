@@ -4,6 +4,28 @@ directory=G4beamline-2.12-source
 filename=${directory}.tgz
 url=http://www.muonsinternal.com/muons3/g4beamline/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+    -t|--third-party-dir)
+    MAUS_THIRD_PARTY="$2"
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -71,7 +93,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Make:"
 	echo
         sleep 1
-	make
+	make -j$MAUS_NUM_THREADS
 
         cat ${MAUS_ROOT_DIR}/src//map/MapPyBeamlineSimulation/G4bl/maps/x* > ${MAUS_ROOT_DIR}/src//map/MapPyBeamlineSimulation/G4bl/maps/TypeIBend_6InchGap_tapered.map
 	            ################################################## 
