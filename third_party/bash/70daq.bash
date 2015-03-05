@@ -51,7 +51,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/libMDMonitor.a" "${MAUS_ROOT_DIR}/third_party/install/lib"
 	#cat MDmonitoring.hh |sed "s;#include \"monitor.h\";//#include \"monitor.h\";" | sed "s;#include \"event.h\";//#include \"event.h\";" > tmp.hh
 	#mv tmp.hh MDmonitoring.hh
-	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+	#cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+        echo "INFO: Copying event header from unpacking.."
+	cp "${MAUS_ROOT_DIR}/third_party/install/include/unpacking/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
 	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/monitor.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
 	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/MDmonitoring.hh" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
 	#cd -

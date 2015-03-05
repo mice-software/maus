@@ -14,6 +14,9 @@ Import('env', 'project', 'conf')
 local_env = env.Clone()
 local_env.Append(LIBS=['MDMonitor'])
 
+# do not built online if MAUS_UNPACKER_VERSION is StepI
+unpacker_version = os.environ.get('MAUS_UNPACKER_VERSION')
+
 # Return("my_variable") should return a value - but doesn't appear to work
 # instead I set a flag in .sconf_temp/ to indicate a subproject failed
 if (not conf.CheckCXXHeader('daq/monitor.h')):
@@ -26,6 +29,12 @@ elif (not conf.CheckLib('MDMonitor')):
     print """
 I could not link against MDMonitor library required for online operation. Module
 to read online socket will not be built.
+"""
+    fail(project)
+elif unpacker_version == 'StepI':
+    print """
+MAUS_UNPACKER_VERSION set to StepI.
+I will not build InputCppDAQOnline.
 """
     fail(project)
 else:

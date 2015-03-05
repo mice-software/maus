@@ -47,11 +47,31 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
 #         scons install
 
+# build Step I unpacking
+        echo "INFO: Building StepI unpacker..."
         cd build
         cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install \
                ..
         make
         make install
+
+# rename libMDUnpack to a StepI name 
+        mv ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so
+
+# clean up build area
+        rm -rf *
+        echo "INFO: Done..."
+
+# build Step IV unpacking with -DSTEPIV_DATA flag on
+        echo "INFO: Building StepIV unpacker..."
+        cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install -DSTEPIV_DATA=1 \
+               ..
+        make
+        make install
+
+# rename libMDUnpack to a StepIV name 
+        mv ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepIV.so
+        echo "INFO: Done..."
 
         echo
         echo "INFO: The package should be locally build now in your"
