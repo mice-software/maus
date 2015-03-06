@@ -20,9 +20,10 @@ for beam generation.
 
 import math
 import numpy
-import xboa #pylint: disable=F0401
-import xboa.Bunch #pylint: disable=F0401
-import xboa.Common #pylint: disable=F0401
+import xboa
+import xboa.bunch
+import xboa.common
+import xboa.hit
 
 # 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
 # goes to 4294967295 in both 32 bit and 64 bit.
@@ -132,7 +133,7 @@ class Beam(): # pylint: disable=R0902
         self.transverse_mode = "pencil"
         self.longitudinal_mode = "pencil"
         self.coupling_mode = "none"
-        self.reference = xboa.Hit.Hit()
+        self.reference = xboa.hit.Hit()
         self.n_particles_per_spill = 0
         self.weight = 0.
         self.t_dist = ""
@@ -196,9 +197,13 @@ class Beam(): # pylint: disable=R0902
                   str(self.seed_keys))
 
     def __birth_reference_particle(self, beam_definition):
-        """Setup the reference particle - of type maus_primary"""
-        self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary',
-                                                beam_definition['reference'], 0)
+        """Setup the reference particle - of type primary"""
+        self.reference = xboa.hit.factory.MausJsonHitFactory.\
+                                      hit_from_maus_object(
+                                                   'primary',
+                                                   beam_definition['reference'],
+                                                   0
+                                      )
 
     def __birth_transverse_ellipse(self, beam_def):
         """
@@ -211,7 +216,7 @@ class Beam(): # pylint: disable=R0902
             pass # ones is fine then
         elif self.transverse_mode == 'penn':
             #emittance_t, mass, beta_t, alpha_t, p, Ltwiddle_t, bz, q
-            trans_matrix = xboa.Bunch.Bunch.build_penn_ellipse(
+            trans_matrix = xboa.bunch.Bunch.build_penn_ellipse(
                 beam_def['emittance_4d'], ref['mass'], beam_def['beta_4d'],
                 beam_def['alpha_4d'], ref['p'],
                 beam_def['normalised_angular_momentum'],
@@ -220,7 +225,7 @@ class Beam(): # pylint: disable=R0902
             trans_matrix = self.__birth_twiss_ellipse(beam_def)
         elif self.transverse_mode == "constant_solenoid":
             # k_s is solenoid focussing strength: cite Penn MUCOOL note 71
-            k_s = abs(ref['charge']*xboa.Common.constants['c_light']/\
+            k_s = abs(ref['charge']*xboa.common.constants['c_light']/\
                                                      2.*beam_def['bz']/ref['p'])
             if abs(beam_def['bz']) < 1e-9:
                 raise ZeroDivisionError("Cannot define constant_solenoid "+\
@@ -233,7 +238,7 @@ class Beam(): # pylint: disable=R0902
                                         "beam for reference with 0. momentum")
             beta_4d = (1.+beam_def['normalised_angular_momentum'])**0.5/k_s
             alpha_4d = 0.
-            trans_matrix = xboa.Bunch.Bunch.build_penn_ellipse(
+            trans_matrix = xboa.bunch.Bunch.build_penn_ellipse(
               beam_def['emittance_4d'], ref['mass'], beta_4d, alpha_4d,
               ref['p'], beam_def['normalised_angular_momentum'], beam_def['bz'],
               ref['charge'])
@@ -252,10 +257,10 @@ class Beam(): # pylint: disable=R0902
         ref = self.reference
         trans_matrix = numpy.diag([1.]*4)
         geometric = False # define like x,x' (True) or x,px (False)
-        trans_matrix_x = xboa.Bunch.Bunch.build_ellipse_2d(beam_def['beta_x'],
+        trans_matrix_x = xboa.bunch.Bunch.build_ellipse_2d(beam_def['beta_x'],
             beam_def['alpha_x'], beam_def['emittance_x'], ref['p'], ref['mass'],
             geometric)
-        trans_matrix_y = xboa.Bunch.Bunch.build_ellipse_2d(beam_def['beta_y'],
+        trans_matrix_y = xboa.bunch.Bunch.build_ellipse_2d(beam_def['beta_y'],
             beam_def['alpha_y'], beam_def['emittance_y'], ref['p'], ref['mass'],
             geometric)
         for i in range(2):
@@ -278,7 +283,7 @@ class Beam(): # pylint: disable=R0902
         if self.longitudinal_mode == 'pencil':
             pass
         elif self.longitudinal_mode == 'twiss':
-            long_matrix = xboa.Bunch.Bunch.build_ellipse_2d(
+            long_matrix = xboa.bunch.Bunch.build_ellipse_2d(
                           beam_def['beta_l'],
                           beam_def['alpha_l'], beam_def['emittance_l'],
                           ref['p'], ref['mass'], False)
@@ -383,7 +388,7 @@ class Beam(): # pylint: disable=R0902
         Note that if the dice give us a particle that has "negative" total
         momentum we throw again.
         """
-        hit = xboa.Hit.Hit.new_from_dict({'pid':-13, "energy":float('nan')})
+        hit = xboa.hit.Hit.new_from_dict({'pid':-13, "energy":float('nan')})
         while math.isnan(hit["energy"]) or math.isnan(hit["pz"]) or \
               hit["energy"] < hit["mass"]:
             particle_array = self.__process_get_particle_array()
@@ -446,11 +451,11 @@ class Beam(): # pylint: disable=R0902
         Convert from an array like x,px,y,py,time,<p> to a primary dict that can
         be included in json data tree
         """
-        hit = xboa.Hit.Hit()
+        hit = xboa.hit.Hit()
         for i, key in enumerate(Beam.array_keys):
             hit[key] = particle_array[i]
         hit["pid"] = pid
-        hit["mass"] = xboa.Common.pdg_pid_to_mass[abs(pid)]
+        hit["mass"] = xboa.common.pdg_pid_to_mass[abs(pid)]
         if longitudinal_variable == "p":
             hit["pz"] = (particle_array[5]**2-\
                         particle_array[1]**2-particle_array[3]**2)**0.5
@@ -469,7 +474,7 @@ class Beam(): # pylint: disable=R0902
         """
         Convert an xboa hit into a MAUS primary
         """
-        primary = hit.get_maus_dict('maus_primary')[0]
+        primary = hit.get_maus_dict('maus_json_primary')[0]
         primary["position"]["z"] = self.reference["z"]
         primary["random_seed"] = self.__process_get_seed()
         if math.isnan(primary["energy"]) or math.isinf(primary["energy"]):
