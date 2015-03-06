@@ -328,6 +328,7 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
             spill = json.loads(spill_string)
             self.assertEqual(len(spill["mc_events"]), 5)
         test_primary = spill["mc_events"][4]["primary"]
+        print test_primary
         self.assertLess(abs(test_primary["position"]["x"]-7.88914), 1e-6)
         self.assertLess(abs(test_primary["time"]-913.768), 1e-6)
         self.assertLess(abs(test_primary["spin"]["x"]), 1e-6)
@@ -345,7 +346,9 @@ class TestMapPyBeamMaker(unittest.TestCase): # pylint: disable = R0904
         primary_list = \
                     [particle["primary"] for particle in spill_out["mc_events"]]
         for primary in primary_list:
-            hit = xboa.Hit.Hit.new_from_maus_object("maus_primary", primary, 0)
+            print "TEST", primary
+            hit = xboa.hit.factory.MausJsonHitFactory.\
+                                     hit_from_maus_object("primary", primary, 0)
             self.assertTrue(hit.check())
         spill_out = \
                json.loads(self.beam_maker.process(json.dumps({"mc_events":""})))

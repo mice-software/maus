@@ -24,12 +24,12 @@ Tests the Beam class
 
 import unittest
 import beam
-import xboa.Hit #pylint: disable=F0401
-from xboa.Hit import Hit
+import xboa.hit
+from xboa.hit import Hit
 import copy
 import numpy
 
-MU_MASS = xboa.Common.pdg_pid_to_mass[13]
+MU_MASS = xboa.common.pdg_pid_to_mass[13]
 
 TEST_PRIM_P = {
     "position":{"x":1.0, "y":2.0, "z":3.0},
@@ -294,7 +294,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         """Test __birth_reference_particle"""
         self._beam_no_ref._Beam__birth_reference_particle \
                                                      ({"reference":TEST_PRIM_P})
-        ref = xboa.Hit.Hit.new_from_dict(TEST_REF)
+        ref = xboa.hit.Hit.new_from_dict(TEST_REF)
         self.assertEqual(
                 self._beam_no_ref.reference,
                 ref)
@@ -517,7 +517,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
     def test_process_array_to_primary(self):
         """Check function that converts from an array to a primary particle"""
         mean = numpy.array([10., 20., 30., 40., 50., 600.])
-        mass = xboa.Common.pdg_pid_to_mass[13]
+        mass = xboa.common.pdg_pid_to_mass[13]
         self._beam.beam_seed = 10
         self._beam.particle_seed_algorithm = "beam_seed"
         primary_hit = self._beam._Beam__process_array_to_hit(mean, 13, 'p')
@@ -548,7 +548,7 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         self.assertAlmostEqual(primary["momentum"]["x"], 20.)
         self.assertAlmostEqual(primary["momentum"]["y"], 40.)
         self.assertAlmostEqual(primary["momentum"]["z"],
-              (600.**2.-xboa.Common.pdg_pid_to_mass[13]**2.-20.**2-40.**2)**0.5)
+              (600.**2.-xboa.common.pdg_pid_to_mass[13]**2.-20.**2-40.**2)**0.5)
         self.assertAlmostEqual(primary["energy"], 600.)
 
     def test_process_array_to_primary_sign(self): # pylint: disable = C0103
@@ -575,7 +575,8 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         a_beam.birth(TEST_BIRTH, "binomial", 2)
         for i in range(1000): # pylint: disable = W0612
             primary = a_beam.make_one_primary()
-            hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
+            hit = xboa.hit.factory.MausJsonHitFactory.\
+                                     hit_from_maus_object('primary', primary, 0)
             self.assertTrue(hit.check())
 
     def test_make_one_primary_pencil(self):
@@ -594,7 +595,8 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         for i in range(10): #pylint: disable = W0612
             primary = a_beam.make_one_primary()
             self.assertEqual(a_beam.reference,
-                  xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0))
+                  xboa.hit.factory.MausJsonHitFactory.
+                               hit_from_maus_object('primary', primary, 0))
 
     def test_make_one_primary_sawtooth(self):
         """Check function that throws a particle - for sawtooth time dist"""
@@ -611,10 +613,11 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         a_beam.birth(test_birth, "binomial", 2)
         for i in range(1000): #pylint: disable = W0612
             primary = a_beam.make_one_primary()
-            hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
+            hit = xboa.hit.factory.MausJsonHitFactory.\
+                                hit_from_maus_object('primary', primary, 0)
             self.assertGreater(hit['t'], TEST_SAWTOOTH_T["t_start"])
             self.assertLess(hit['t'], TEST_SAWTOOTH_T["t_end"])
-            self.assertGreater(hit['energy'], xboa.Common.pdg_pid_to_mass[13])
+            self.assertGreater(hit['energy'], xboa.common.pdg_pid_to_mass[13])
             self.assertTrue(hit.check())
                   
     def test_make_one_primary_uniform(self):
@@ -633,10 +636,11 @@ class TestBeam(unittest.TestCase):  #pylint: disable = R0904
         a_beam.birth(test_birth, "binomial", 2)
         for i in range(1000): #pylint: disable = W0612
             primary = a_beam.make_one_primary()
-            hit = xboa.Hit.Hit.new_from_maus_object('maus_primary', primary, 0)
+            hit = xboa.hit.factory.MausJsonHitFactory.\
+                                hit_from_maus_object('primary', primary, 0)
             self.assertGreater(hit['t'], TEST_UNIFORM_T["t_start"])
             self.assertLess(hit['t'], TEST_UNIFORM_T["t_end"])
-            self.assertGreater(hit['energy'], xboa.Common.pdg_pid_to_mass[13])
+            self.assertGreater(hit['energy'], xboa.common.pdg_pid_to_mass[13])
             self.assertTrue(hit.check())
 
     def test_process_get_seed(self):
