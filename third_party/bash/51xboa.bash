@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-directory=xboa-0.15.3
+directory=xboa-0.16.2
 filename=${directory}.tar.gz
-url=http://sourceforge.net/projects/xboa/files/${filename}/download
+url=http://micewww.pp.rl.ac.uk/analysis/xboa/${directory}/${filename}
 
 my_prefix=/install
 my_destdir=${MAUS_ROOT_DIR}/third_party
@@ -16,6 +16,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo "INFO: Source archive doesn't exist.  Downloading..."
 
 	wget ${url} -O "${MAUS_ROOT_DIR}/third_party/source/${filename}"
+	wget ${url}.md5 -O "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5"
     fi
 	
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
