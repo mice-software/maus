@@ -3,7 +3,7 @@
 # require python extras for scons
 
 directory=unpacking-mice
-filename=${directory}_1.tarz
+filename=${directory}_2.tarz
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -39,13 +39,19 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-        cp SConstruct_unpacking ${MAUS_ROOT_DIR}/third_party/build/${directory}/SConstruct
+#         cp SConstruct_unpacking ${MAUS_ROOT_DIR}/third_party/build/${directory}/SConstruct
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo
         echo "INFO: Making and installing"
         echo
         sleep 1
-        scons install
+#         scons install
+
+        cd build
+        cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install \
+               ..
+        make
+        make install
 
         echo
         echo "INFO: The package should be locally build now in your"

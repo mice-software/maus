@@ -132,12 +132,12 @@ int main(int argc, char *argv[]) {
       std::vector<MAUS::SciFiTrack*> trks = sfevt->scifitracks();
       std::vector<MAUS::SciFiTrack*>::iterator trk;
       for ( trk = trks.begin(); trk != trks.end(); ++trk ) {
-        std::cout << "  SciFi Track filtered chi_sq: " << (*trk)->f_chi2() << std::endl;
+        std::cout << "  SciFi Track chi_sq: " << (*trk)->chi2() << std::endl;
         std::vector<MAUS::SciFiTrackPoint*> tpnts = (*trk)->scifitrackpoints();
         std::vector<MAUS::SciFiTrackPoint*>::iterator tpnt;
         // Loop over associated trackpoints
         for ( tpnt = tpnts.begin(); tpnt != tpnts.end(); ++tpnt ) {
-          std::cout << "    SciFi TrackPoint filtered chi_sq: " << (*tpnt)->f_chi2() << std::endl;
+          std::cout << "    SciFi TrackPoint chi_sq: " << (*tpnt)->chi2() << std::endl;
           // Pull out the associated cluster
           MAUS::SciFiCluster* clus = (*tpnt)->get_cluster_pointer();
           if (!clus) {

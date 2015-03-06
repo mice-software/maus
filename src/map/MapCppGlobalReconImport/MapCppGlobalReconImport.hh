@@ -86,15 +86,6 @@ namespace MAUS {
      */
     void _process(MAUS::Data* data) const;
 
-    /** Import the existing MAUS::ReconEvent, creating a new
-     * MAUS::GlobalEvent and populating a
-     * MAUS::recon::global::Track object. 
-     * @param recon_event The ReconEvent to obtain the GlobalEvent from
-     *                  
-     * @return global_event The GlobalEvent with spacepoints and track(s)
-     */
-    MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
-
   private:
     /// Check that a valid configuration is passed to the process
     bool _configCheck;

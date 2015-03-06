@@ -69,3 +69,4 @@ bin/user/poly_patch/*.png
 bin/user/poly_patch/*.root
 bin/user/poly_patch/poly_patch
 
+src/map/MapPyBeamlineSimulation/G4bl/maps/TypeIBend_6InchGap_tapered.map

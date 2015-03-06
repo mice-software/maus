@@ -7,6 +7,24 @@
 # when using environmental variables
 # set -u
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # try to get the third_party tarball - if that fails try to download
     # normally
@@ -36,16 +54,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # python and python site-packages are now built; still missing ROOT from the
     # python environment, that will come later. Now HEP libraries
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/21root.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/21root.bash -j $MAUS_NUM_THREADS
     # removed geant 4.9.2
     #${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
     # added for geant 4.9.6
     ${MAUS_ROOT_DIR}/third_party/bash/29expat.bash
     ${MAUS_ROOT_DIR}/third_party/bash/32clhep2.1.1.0.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/35geant4.9.6.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/35geant4.9.6.bash -j $MAUS_NUM_THREADS
     # resource environment so that g4bl picks up our ROOT env
     source ${MAUS_ROOT_DIR}/env.sh >& /dev/null
-    ${MAUS_ROOT_DIR}/third_party/bash/81G4beamline.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/81G4beamline.bash -j $MAUS_NUM_THREADS
     # removed geant 4.9.2
     #${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash

@@ -34,6 +34,7 @@
 #include "DataStructure/ReconEvent.hh"
 #include "Recon/Global/ImportTOFRecon.hh"
 #include "Recon/Global/ImportSciFiRecon.hh"
+#include "Recon/Global/ImportKLRecon.hh"
 
 namespace MAUS {
 namespace recon {
@@ -49,9 +50,7 @@ namespace global {
     ~TrackMatching() {}
 
     /**  @brief Main process, constructing global tracks from space points
-     *   
-     *  
-     *  @param global_event The Global Event, which will be changed
+     *   @param global_event The Global Event, which will be changed
      */
     void FormTracks(MAUS::GlobalEvent* global_event, std::string mapper_name);
 
@@ -66,9 +65,15 @@ namespace global {
 		       std::vector<MAUS::DataStructure::Global::SpacePoint*>
 		       *GlobalSpacePointArray,
 		       MAUS::DataStructure::Global::TrackPArray& TOFTrackArray);
+
+    void MakeKLTracks(MAUS::GlobalEvent* global_event,
+		      std::vector<MAUS::DataStructure::Global::SpacePoint*>
+		      *GlobalSpacePointArray,
+		      MAUS::DataStructure::Global::Track* KLTrack);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon
 } // ~namespace MAUS
 
 #endif
+

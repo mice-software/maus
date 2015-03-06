@@ -544,7 +544,7 @@ def set_unpacker(conf, env):
     """
     Setup unpacker
     """
-    if (not conf.CheckLib('MDunpack', language='c++') or \
+    if (not conf.CheckLib('MDUnpack', language='c++') or \
         not  conf.CheckCXXHeader('unpacking/MDevent.h')):
         print
         print "!! Unpacker module not found, you will not be able to use the "+\
