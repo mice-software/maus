@@ -49,7 +49,7 @@ class Lattice:
           - z_start: start position for tracking/beam propagation
         """
         self.config["simulation_reference_particle"] = \
-                              self.ref_list[0].get_maus_dict('maus_primary')[0]
+                          self.ref_list[0].get_maus_dict('maus_json_primary')[0]
         self.config["simulation_reference_particle"]["random_seed"] = 0
         self.config["physics_processes"] = "mean_energy_loss"
         config_str = json.dumps(self.config)
@@ -165,7 +165,7 @@ class Lattice:
     def _tracking(self):
         """Do the tracking - push reference trajectory and beam ellipse"""
         mc_event = [{
-                  "primary":self.ref_list[0].get_maus_dict('maus_primary')[0]}]
+              "primary":self.ref_list[0].get_maus_dict('maus_json_primary')[0]}]
         mc_event[0]["primary"]["random_seed"] = 0
         mc_event = maus_cpp.simulation.track_particles(json.dumps(mc_event))
         mc_event = json.loads(mc_event)
