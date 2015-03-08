@@ -26,7 +26,7 @@ import numpy
 import bisect
 import beam
 import os
-from xboa.Hit import Hit #pylint: disable=F0401
+from xboa.hit import Hit #pylint: disable=F0401
 
 class MapPyBeamMaker: #pylint: disable=R0902
     """
@@ -223,7 +223,7 @@ class MapPyBeamMaker: #pylint: disable=R0902
                 if (self.use_beam_file):
                     spill_hit = Hit.new_from_read_builtin(self.beam_file_format,
                                                         self.bm_fh)
-                    primary = spill_hit.get_maus_dict('maus_primary')[0]
+                    primary = spill_hit.get_maus_dict('maus_json_primary')[0]
                     self.beam_seed = self.beam_seed + 1
                     primary["random_seed"] = self.beam_seed
                     particle["primary"] = primary
