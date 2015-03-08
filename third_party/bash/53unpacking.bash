@@ -56,6 +56,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         make install
 
 # rename libMDUnpack to a StepI name 
+        echo "INFO: renaming to StepI library..."
         mv ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so
 
 # clean up build area
@@ -70,8 +71,20 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         make install
 
 # rename libMDUnpack to a StepIV name 
+        echo "INFO: renaming to StepIV library..."
         mv ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepIV.so
+        rm -rf *
         echo "INFO: Done..."
+        echo $LIBS
+#       gtest creates soft link from libMDUnpack.so
+#       so, ensure that the link exists and points to the correct unpacker version
+        if [ "$MAUS_UNPACKER_VERSION" == "StepI" ]; then
+           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
+        elif [ "$MAUS_UNPACKER_VERSION" == "StepIV" ]; then
+           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
+        else
+           echo "FATAL: !! Unsupported Unpacker Version !! "
+        fi
 
         echo
         echo "INFO: The package should be locally build now in your"
