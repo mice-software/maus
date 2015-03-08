@@ -81,7 +81,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         if [ "$MAUS_UNPACKER_VERSION" == "StepI" ]; then
            ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
         elif [ "$MAUS_UNPACKER_VERSION" == "StepIV" ]; then
-           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
+           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepIV.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
         else
            echo "FATAL: !! Unsupported Unpacker Version !! "
         fi
