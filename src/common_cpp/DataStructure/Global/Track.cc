@@ -359,16 +359,16 @@ std::vector<std::string> Track::get_geometry_paths() const {
 
 // Object to hold pid hypotheses and the log-likelihood that they are the
 // correct hypothesis
-void Track::set_pid_logL_values(std::vector<std::pair<int,double> > pid_logL_values) {
+void Track::set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_logL_values) {
   _pid_logL_values = pid_logL_values;
 }
 
-std::vector<std::pair<int,double> > Track::get_pid_logL_values() const {
+std::vector<MAUS::DataStructure::Global::PIDLogLPair> Track::get_pid_logL_values() const {
   return _pid_logL_values;
 }
 
 // Method to fill pid_logL_values
-void Track::AddPIDLogLValues(std::pair<int,double> pid_logL) {
+void Track::AddPIDLogLValues(MAUS::DataStructure::Global::PIDLogLPair pid_logL) {
   _pid_logL_values.push_back(pid_logL);
 }
 

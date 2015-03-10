@@ -149,17 +149,17 @@ namespace MAUS {
 	      }
 	    }
 	    //make pid_ll_values
-	    std::pair<int,double> mu_plus_LL = std::make_pair(-13,logL_200MeV_mu_plus);
-	    std::pair<int,double> e_plus_LL = std::make_pair(-11,logL_200MeV_e_plus);
-	    std::pair<int,double> pi_plus_LL = std::make_pair(-211,logL_200MeV_pi_plus);
+	    MAUS::DataStructure::Global::PIDLogLPair mu_plus_LL(-13,logL_200MeV_mu_plus);
+	    MAUS::DataStructure::Global::PIDLogLPair e_plus_LL(-11,logL_200MeV_e_plus);
+	    MAUS::DataStructure::Global::PIDLogLPair pi_plus_LL(-211,logL_200MeV_pi_plus);
 	    pidtrack->AddPIDLogLValues(mu_plus_LL);
 	    pidtrack->AddPIDLogLValues(pi_plus_LL);
 	    pidtrack->AddPIDLogLValues(e_plus_LL);
 	    //std::cerr << pidtrack->get_pid_logL_values() << std::endl;
-	    std::vector<std::pair<int,double> > pid_ll_values = pidtrack->get_pid_logL_values();
+	    /*std::vector<std::pair<int,double> > pid_ll_values = pidtrack->get_pid_logL_values();
 	    for( std::vector<std::pair<int,double> >::const_iterator i = pid_ll_values.begin(); i != pid_ll_values.end(); ++i) {
 	      std::cerr << i->first << "\t" << i->second << std::endl;
-	    }
+	      }*/
 	    //calculate CLs
 	    double sum_exp_LLs = exp(logL_200MeV_mu_plus) + exp(logL_200MeV_e_plus) + exp(logL_200MeV_pi_plus);
 	    std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;

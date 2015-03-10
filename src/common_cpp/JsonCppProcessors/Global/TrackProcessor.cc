@@ -21,7 +21,9 @@ namespace Processor {
 namespace Global {
 
 TrackProcessor::TrackProcessor()
-    : _geometry_paths_proc(new StringProcessor) {
+  : _geometry_paths_proc(new StringProcessor),
+    _pid_logL_values_proc(
+        new MAUS::Processor::Global::PIDLogLPairProcessor()) {
 
     RegisterValueBranch(
         "mapper_name", &_string_proc,
@@ -56,11 +58,11 @@ TrackProcessor::TrackProcessor()
         &MAUS::DataStructure::Global::Track::set_geometry_paths,
         true);
 
-    /*RegisterValueBranch(
+    RegisterValueBranch(
         "pid_logL_values", &_pid_logL_values_proc,
         &MAUS::DataStructure::Global::Track::get_pid_logL_values,
         &MAUS::DataStructure::Global::Track::set_pid_logL_values,
-        true);*/
+        true);
 
     RegisterTRefArray(
         "constituent_tracks",

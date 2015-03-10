@@ -45,6 +45,7 @@
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "DataStructure/Global/ReconEnums.hh"
 #include "DataStructure/Global/TrackPoint.hh"
+#include "DataStructure/Global/PIDLogLPair.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -180,13 +181,13 @@ class Track : public TObject {
   std::vector<std::string> get_geometry_paths() const;
 
   /// Set the #_pid_logL_values vector.
-  void set_pid_logL_values(std::vector<std::pair<int,double> > pid_logL_values);
+  void set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_logL_values);
 
   /// Direct access to the #_pid_logL_values vector.
-  std::vector<std::pair<int,double> > get_pid_logL_values() const;
+  std::vector<MAUS::DataStructure::Global::PIDLogLPair> get_pid_logL_values() const;
 
   /// Add a pid/log-likelihood pair to the _pid_logL_values vector.
-  void AddPIDLogLValues(std::pair<int,double> pid_logL);
+  void AddPIDLogLValues(MAUS::DataStructure::Global::PIDLogLPair pid_logL);
 
   /// Add a constituent track (for book-keeping purposes), stored in
   /// the #_constituent_tracks vector.
@@ -261,7 +262,7 @@ class Track : public TObject {
   /// code, as an int) and the log-likelihood of the track being that pid.
   /// Can be used during analysis to view the likelihoods assigned to all
   /// possible pids, not just the final one assigned to the track.
-  std::vector<std::pair<int,double> > _pid_logL_values;
+  std::vector<MAUS::DataStructure::Global::PIDLogLPair> _pid_logL_values;
 
   /// These tracks aren't owned by this track, they are just for
   /// book-keeping.  Therefore, we use a TRefArray.

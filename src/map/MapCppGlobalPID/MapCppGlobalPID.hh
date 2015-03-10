@@ -48,6 +48,7 @@
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 #include "DataStructure/Global/Track.hh"
+#include "src/common_cpp/DataStructure/Global/PIDLogLPair.hh"
 
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
 #include "src/common_cpp/Recon/Global/PIDVarB.hh"
