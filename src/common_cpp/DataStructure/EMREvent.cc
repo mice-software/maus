@@ -62,6 +62,10 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
 }
 
 EMREvent::~EMREvent() {
+  int nph = _emrplanehitarray.size();
+  for (int i = 0; i < nph; i++)
+    delete _emrplanehitarray[i];
+
   _emrplanehitarray.resize(0);
 }
 
