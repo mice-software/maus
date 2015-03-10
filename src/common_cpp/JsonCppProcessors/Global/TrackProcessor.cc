@@ -56,6 +56,12 @@ TrackProcessor::TrackProcessor()
         &MAUS::DataStructure::Global::Track::set_geometry_paths,
         true);
 
+    /*RegisterValueBranch(
+        "pid_logL_values", &_pid_logL_values_proc,
+        &MAUS::DataStructure::Global::Track::get_pid_logL_values,
+        &MAUS::DataStructure::Global::Track::set_pid_logL_values,
+        true);*/
+
     RegisterTRefArray(
         "constituent_tracks",
         &_track_trefarray_proc,

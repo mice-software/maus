@@ -83,6 +83,13 @@ namespace MAUS {
      */
     void _process(MAUS::Data* data) const;
 
+    /** @brief calculate Confidence Level
+     *
+     *  Calculate the confidence of a track having a given pid from the log likelihoods.
+     *  @param LL_x log-likelihood of pid x
+     *  @param sum_L sum of likelihoods for all pids
+     */
+    double ConfidenceLevel(double LL_x, double sum_L) const;
 
     bool _configCheck;
     /// This will contain the configuration

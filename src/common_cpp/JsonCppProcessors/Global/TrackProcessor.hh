@@ -49,6 +49,7 @@ class TrackProcessor
   IntProcessor _int_proc;
   UIntProcessor _uint_proc;
   ValueArrayProcessor<std::string> _geometry_paths_proc;
+  //ValueArrayProcessor<std::pair> _pid_logL_values_proc;
   TRefArrayProcessor _track_trefarray_proc;
   TRefArrayProcessor _track_point_trefarray_proc;
 };
