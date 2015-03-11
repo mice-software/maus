@@ -65,6 +65,18 @@ EMRPlaneHit::~EMRPlaneHit() {
     delete _emrbararray[i];
 
   _emrbararray.resize(0);
+
+  nbars = _emrbararray_primary.size();
+  for (int i = 0; i < nbars; i++)
+    delete _emrbararray_primary[i];
+
+  _emrbararray_primary.resize(0);
+
+  nbars = _emrbararray_secondary.size();
+  for (int i = 0; i < nbars; i++)
+    delete _emrbararray_secondary[i];
+
+  _emrbararray_secondary.resize(0);
 }
 
 int EMRPlaneHit::GetPlane() const {

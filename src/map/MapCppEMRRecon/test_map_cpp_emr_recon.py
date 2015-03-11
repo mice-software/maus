@@ -68,34 +68,30 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
         self.assertFalse("MapCppEMRRecon" in spill_out["errors"])
 
 	# consistent amount of reconEvents (2 = empty + muon and its decay)
-        n_ev = len(spill_out['recon_events'])
-        self.assertEqual(2, n_ev)
+        self.assertEqual(2, len(spill_out['recon_events']))
 
 	# check that the first event is empty, second contains 33 plane hits
-        n_planes = len(spill_out['recon_events'][0]\
-				  ['emr_event']['emr_plane_hits'])
-        self.assertEqual(0, n_planes)
+        self.assertEqual(0, len(spill_out['recon_events'][0]\
+				         ['emr_event']['emr_plane_hits']))
 
         n_planes = len(spill_out['recon_events'][1]\
-				  ['emr_event']['emr_plane_hits'])
+				['emr_event']['emr_plane_hits'])
         self.assertEqual(33, n_planes)
 
 	# consistent amount of primary bars (i.e. DBB hits close to trigger, 
 	# 3 planes only contain fADC information without a bar hit)
-        has_primary = spill_out['recon_events'][1]['emr_event']\
-			       ['has_primary']
-
-        self.assertEqual(True, has_primary)
+        self.assertEqual(True, spill_out['recon_events'][1]['emr_event']\
+			                ['has_primary'])
 
         for i in range(0, n_planes): 
-            n_primaries = len(spill_out['recon_events'][1]\
-				       ['emr_event']['emr_plane_hits'][i]\
-				       ['emr_bars_primary'])
-
             if (i < n_planes - 3):
-                self.assertTrue(n_primaries == 1)
+                self.assertEqual(1, len(spill_out['recon_events'][1]\
+				                 ['emr_event']['emr_plane_hits'][i]\
+				                 ['emr_bars_primary']))
             else:
-                self.assertTrue(n_primaries == 0)
+                self.assertEqual(0, len(spill_out['recon_events'][1]\
+				                 ['emr_event']['emr_plane_hits'][i]\
+				                 ['emr_bars_primary']))
 
 	# make sure that the primary's ToT is the highest one of the plane
         for i in range(0, n_planes - 3):
@@ -118,17 +114,14 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 
 
         # check that the e+ is associated with its mu+, 4 secondary plane hits
-        has_secondary = spill_out['recon_events'][1]['emr_event']\
-				 ['has_secondary']
-
-        self.assertEqual(True, has_secondary)
+        self.assertEqual(True, spill_out['recon_events'][1]['emr_event']\
+				        ['has_secondary'])
 
         n_secondary_planes = 0
         for i in range(0, n_planes):
-            n_hits = len(spill_out['recon_events'][1]\
-				   ['emr_event']['emr_plane_hits'][i]\
-				   ['emr_bars_secondary'])
-            if (n_hits > 0):
+            if (len(spill_out['recon_events'][1]\
+		             ['emr_event']['emr_plane_hits'][i]\
+			     ['emr_bars_secondary']) > 0):
                 n_secondary_planes += 1
 
         self.assertEqual(4, n_secondary_planes)
@@ -142,42 +135,39 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 			      ['emr_event']['emr_plane_hits'][i]\
                               ['emr_bars_primary'][0]['bar']
 
-            x_i = spill_out['recon_events'][1]['emr_event']\
-		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-			  ['emr_bar_hits'][0]['x']
-            y_i = spill_out['recon_events'][1]['emr_event']\
-		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-			  ['emr_bar_hits'][0]['y']
-            z_i = spill_out['recon_events'][1]['emr_event']\
-		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-			  ['emr_bar_hits'][0]['z']
-
-            self.assertTrue(z_i > plane_id*17.5)
-            self.assertTrue(z_i < (plane_id+1)*17.5)
+            self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			   ['emr_bar_hits'][0]['z'] > plane_id*17.5)
+            self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			   ['emr_bar_hits'][0]['z'] < (plane_id+1)*17.5)
 
             if (plane_id % 2 == 0):
-                self.assertTrue(x_i > (bar_id - 30 - 1)*17)
-                self.assertTrue(x_i < (bar_id - 30 + 1)*17)
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['x'] > (bar_id - 30 - 1)*17)
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['x'] < (bar_id - 30 + 1)*17)
             else:
-                self.assertTrue(y_i > (bar_id - 30 - 1)*17)
-                self.assertTrue(y_i < (bar_id - 30 + 1)*17)
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['y'] > (bar_id - 30 - 1)*17)
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['y'] < (bar_id - 30 + 1)*17)
 
         # consistency of the ranges and the distance between the two tracks
-        range_primary = spill_out['recon_events'][1]['emr_event']\
-				 ['range_primary']
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['range_primary'] > plane_id*17.5)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['range_primary'] < (plane_id+1)*17.5)
 
-        self.assertTrue(range_primary > plane_id*17.5)
-        self.assertTrue(range_primary < (plane_id+1)*17.5)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['range_secondary'] > 0)
 
-        range_secondary = spill_out['recon_events'][1]['emr_event']\
-				   ['range_secondary']
-
-        self.assertTrue(range_secondary > 0)
-
-        track_distance = spill_out['recon_events'][1]['emr_event']\
-				   ['secondary_to_primary_track_distance']
-
-        self.assertTrue(track_distance < 80)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['secondary_to_primary_track_distance'] < 80)
 
 		
 if __name__ == "__main__":

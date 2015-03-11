@@ -78,11 +78,24 @@ void MapCppEMRRecon::_death() {
 
 void MapCppEMRRecon::_process(Data *data) const {
 
-  // Get spill, break if there's no recon data
+  // Get spill, look into reconEvents, break if there's no EMR data
   Spill *spill = data->GetSpill();
 
   int nPartEvents = spill->GetReconEventSize();
   if (!nPartEvents)
+      return;
+
+  bool emrdata = false;
+  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+    EMREvent *evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
+    int nPlHits = evt->GetEMRPlaneHitArray().size();
+
+    if (nPlHits) {
+      emrdata = true;
+      break;
+    }
+  }
+  if (!emrdata)
       return;
 
   // Create DBB and fADC arrays with n+2 events (1 per trigger + noise + decays)
@@ -614,9 +627,7 @@ void MapCppEMRRecon::fill(Spill *spill,
   ReconEventPArray *recEvts =  spill->GetReconEvents();
 
   // Only save the primary triggers with their primary and seconday arrays (n - 2)
-  if (recPartEvents > nPartEvents - 2) {
-    recEvts->resize(nPartEvents - 2);
-  }
+  recEvts->resize(nPartEvents - 2);
 
   for (int iPe = 0; iPe < nPartEvents - 2; iPe++) {
     EMREvent *evt = new EMREvent;
@@ -662,6 +673,8 @@ void MapCppEMRRecon::fill(Spill *spill,
       plHit->SetEMRBarArraySecondary(barArraySecondary);
       if (barArray.size() || barArrayPrimary.size() || barArraySecondary.size() || xCharge) {
 	plArray.push_back(plHit);
+      } else {
+        delete plHit;
       }
     }
     evt->SetEMRPlaneHitArray(plArray);
