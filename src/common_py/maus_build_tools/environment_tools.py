@@ -323,7 +323,8 @@ def get_root_libs():
                 'Tree', \
                 'dl', \
                 'm', \
-                'pthread']
+                'pthread',
+                'rt']
 
 def set_root(conf, env): # pylint: disable=W0613
     """
@@ -544,7 +545,18 @@ def set_unpacker(conf, env):
     """
     Setup unpacker
     """
-    if (not conf.CheckLib('MDUnpack', language='c++') or \
+    maus_unpacker_version = os.environ.get('MAUS_UNPACKER_VERSION')
+    if not maus_unpacker_version:
+        print('!! Could not find the $MAUS_UNPACKER_VERSION environmental variable')
+        print('!! Did you try running: "source env.sh"?')
+        my_exit(1)
+    if maus_unpacker_version != 'StepI' and maus_unpacker_version != 'StepIV':
+        print('!! Unknown $MAUS_UNPACKER_VERSION %s' % maus_unpacker_version)
+        my_exit(1)
+    if maus_unpacker_version == 'StepIV':
+        env.Append(CCFLAGS=["""-D_STEPIV_DATA"""])
+    maus_unpack_lib = 'MDUnpack_'+maus_unpacker_version
+    if (not conf.CheckLib(maus_unpack_lib, language='c++') or \
         not  conf.CheckCXXHeader('unpacking/MDevent.h')):
         print
         print "!! Unpacker module not found, you will not be able to use the "+\
