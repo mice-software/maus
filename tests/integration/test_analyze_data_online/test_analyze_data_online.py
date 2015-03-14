@@ -94,7 +94,7 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     print '\n'
     return proc.returncode
 
-@unittest.skipIf(os.environ['MAUS_UNPACKER_VERSION'] == "StepIV", "No StepIV reference data available")
+@unittest.skipIf(os.environ['MAUS_UNPACKER_VERSION'], "No step1 lib or step4 reference")
 class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
     """Execute analyze_data_online"""
     def setUp(self): # pylint: disable=C0103
