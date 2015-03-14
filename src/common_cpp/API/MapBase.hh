@@ -60,6 +60,10 @@ class MapBase : public virtual IMap<TYPE>, public ModuleBase {
   // ! Destructor
   virtual ~MapBase();
 
+  void process(TYPE* data) {
+    this->_process(data);
+  }
+
   /*!\brief Process data
    *
    *  Uses PyObjectWrapper to convert py_input to TYPE; calls user defined 
@@ -75,6 +79,7 @@ class MapBase : public virtual IMap<TYPE>, public ModuleBase {
   /*!\brief Process data
    *
    * Pure virtual private function to be implemented in the child map to process
+
    * the input data
    * \param data The input data to be processed; this is a borrowed reference -
    *        MapBase retains ownership of memory allocated by data.
