@@ -547,7 +547,7 @@ def set_unpacker(conf, env):
     """
     maus_unpacker_version = os.environ.get('MAUS_UNPACKER_VERSION')
     if not maus_unpacker_version:
-        print('!! Could not find the $MAUS_UNPACKER_VERSION environmental variable')
+        print('!! Could not find $MAUS_UNPACKER_VERSION environment')
         print('!! Did you try running: "source env.sh"?')
         my_exit(1)
     if maus_unpacker_version != 'StepI' and maus_unpacker_version != 'StepIV':
