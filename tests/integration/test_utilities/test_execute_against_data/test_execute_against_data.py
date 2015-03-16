@@ -37,6 +37,13 @@ TEST_OUT  = RUN_NUMBER+"_offline.tar"
 TEST_DIR = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
                         "test_execute_against_data")
 TEST_FILE_EXISTS = False
+# set a different test file for stepIV
+if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
+    RUN_NUMBER = "06008"
+    TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step4/06000/"
+    TEST_FILE = RUN_NUMBER+".tar"
+    TEST_OUT  = RUN_NUMBER+"_offline.tar"
+    UNPACK_STEP4 = True
 
 def get_data():
     """
@@ -125,7 +132,10 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         tree.GetEntry(3)
         self.assertEqual(data.GetSpill().GetDaqEventType(), "physics_event")
         self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
-        self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTOFEvent().\
+        # not yet ready to test detector hits in the step4 test file
+        # this will have to wait for meaningful data to come out of step4
+        if not UNPACK_STEP4:
+            self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTOFEvent().\
                                   GetTOFEventDigit().GetTOF1DigitArraySize(), 0)
         root_file.Close()
 
