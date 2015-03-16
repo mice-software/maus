@@ -26,7 +26,7 @@ import cdb
 
 MONITOR = os.path.expandvars("${MAUS_ROOT_DIR}/tests/integration/test_load")
 sys.path.append(MONITOR) 
-import process_monitor
+import process_monitor #pylint: disable=F0401
 
 def validate_geometry(geometry_id = None):
     """Download a geometry and run the geometry_validation script"""
