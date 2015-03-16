@@ -120,8 +120,7 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 
   void coordinates_reconstruction(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
-				  EMRfADCEventVector& emr_fadc_events,
-				  EMRTrackEventVector& emr_track_events) const;
+				  EMRfADCEventVector& emr_fadc_events) const;
 
   void track_matching(int nPartEvents,
 		      EMRDBBEventVector *emr_dbb_events,
@@ -143,6 +142,9 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   // Detector parameters
   int _number_of_planes;
   int _number_of_bars;
+  double _bar_width;
+  double _bar_height;
+  double _gap;
 
   // Configuration variables
   int _secondary_hits_bunching_distance;

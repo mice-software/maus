@@ -77,27 +77,33 @@ namespace MAUS {
 	 ++recon_event_iter) {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
-      MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
-      MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
-      MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
-      MAUS::CkovEvent* ckov_event = recon_event->GetCkovEvent();
-      MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
-
-      if (tof_event) {
-        MAUS::recon::global::ImportTOFRecon tofrecon_importer;
-        tofrecon_importer.process((*tof_event), global_event, _classname);
-      }
-      if (scifi_event) {
-        MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
-        scifirecon_importer.process((*scifi_event), global_event, _classname);
-      }
-      if (ckov_event) {
-        MAUS::recon::global::ImportCkovRecon ckovrecon_importer;
-        ckovrecon_importer.process((*ckov_event), global_event, _classname);
-      }
-      if (kl_event) {
-        MAUS::recon::global::ImportKLRecon klrecon_importer;
-        klrecon_importer.process((*kl_event), global_event, _classname);
+      if (recon_event->GetGlobalEvent()) {
+	MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+	if (recon_event->GetTOFEvent()) {
+	  MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
+	  MAUS::recon::global::ImportTOFRecon tofrecon_importer;
+	  tofrecon_importer.process((*tof_event), global_event, _classname);
+	}
+	if (recon_event->GetSciFiEvent()) {
+	  MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
+	  MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
+	  scifirecon_importer.process((*scifi_event), global_event, _classname);
+	}
+	if (recon_event->GetCkovEvent()) {
+	  MAUS::CkovEvent* ckov_event = recon_event->GetCkovEvent();
+	  MAUS::recon::global::ImportCkovRecon ckovrecon_importer;
+	  ckovrecon_importer.process((*ckov_event), global_event, _classname);
+	}
+	if (recon_event->GetKLEvent()) {
+	  MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
+	  MAUS::recon::global::ImportKLRecon klrecon_importer;
+	  klrecon_importer.process((*kl_event), global_event, _classname);
+	}
+	if (recon_event->GetEMREvent()) {
+	  MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
+	  MAUS::recon::global::ImportEMRRecon emrrecon_importer;
+	  emrrecon_importer.process((*emr_event), global_event, _classname);
+	}
       }
     }
   }

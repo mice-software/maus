@@ -42,6 +42,11 @@ def run():
     my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
     my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
 
+    # EMR
+    my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
+    my_map.append(MAUS.MapCppEMRPlaneHits())
+    my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
+
     # Global
     my_map.append(MAUS.MapCppGlobalReconImport())
     my_map.append(MAUS.MapCppGlobalTrackMatching())
@@ -58,5 +63,6 @@ def run():
     # (default simulation.out) for output
     MAUS.Go(my_input, my_map, my_reduce, my_output, datacards)
 
+#MAUS.ReducePyDoNothing()
 if __name__ == '__main__':
     run()

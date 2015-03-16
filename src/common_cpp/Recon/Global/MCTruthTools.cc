@@ -99,6 +99,8 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
   if (emr_hits) {
     if (emr_hits->size() > 0) {
       mc_detectors[MAUS::DataStructure::Global::kEMR] = true;
+      std::cerr << "### " << emr_hits->at(0).GetPosition().z()
+                << " "    << emr_hits->at(emr_hits->size() -1).GetPosition().z() << "\n";
     }
   }
   

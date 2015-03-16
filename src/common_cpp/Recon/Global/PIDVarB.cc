@@ -28,12 +28,12 @@ namespace global {
 
   PIDVarB::PIDVarB(std::string hypothesis, std::string unique_identifier)
     : PIDBase2D(VARIABLE, hypothesis, unique_identifier,
-                 XminBin, XmaxBin, XnumBins, YminBin, YmaxBin, YnumBins) {
+                 XminBinB, XmaxBinB, XnumBins, YminBinB, YmaxBinB, YnumBins) {
     _nonZeroHistEntries = true;
   }
 
   PIDVarB::PIDVarB(TFile* file, std::string hypothesis)
-    : PIDBase2D(file, VARIABLE, hypothesis) {
+    : PIDBase2D(file, VARIABLE, hypothesis, XminBinB, XmaxBinB, YminBinB, YmaxBinB) {
   }
 
   PIDVarB::~PIDVarB() {}
@@ -90,7 +90,7 @@ namespace global {
       tof0_track_points.clear();
       TOF1_t = (tof1_track_points[0])->get_position().T();
           tof1_track_points.clear();
-      if ( YminBin > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > YmaxBin ) {
+      if ( YminBinB > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > YmaxBinB ) {
 	Squeak::mout(Squeak::debug) << "Difference between TOF0 and TOF1 " <<
 	  "times outside of range, Recon::Global::PIDVarB::Calc_Var()" <<
 	  std::endl;
@@ -115,7 +115,7 @@ namespace global {
 	}
 	tracker0_track_points.clear();
 	tracker0_momentum = tracker0_trackpoint_mom/tracker0_tp_count;
-	if ( XminBin > tracker0_momentum || tracker0_momentum > XmaxBin ) {
+	if ( XminBinB > tracker0_momentum || tracker0_momentum > XmaxBinB ) {
 	  Squeak::mout(Squeak::debug) << "Momentum for tracker 0 is outside " <<
 	    "of range, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
 	  return std::make_pair(0, -1);

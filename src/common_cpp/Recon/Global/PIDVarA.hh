@@ -64,9 +64,9 @@ namespace global {
     /// Number of bins in PDF
     static const int numBins = 200;
     /// Minimum value of range of PDF
-    static const int minBin = 20;
+    static const int minBinA = 20;
     /// Maximum value of range of PDF
-    static const int maxBin = 40;
+    static const int maxBinA = 40;
   };
 }
 }

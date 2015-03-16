@@ -81,10 +81,13 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
          ++mc_event_iter) {
       std::map<MAUS::DataStructure::Global::DetectorPoint, bool> mc_detectors;
       //~ mc_detectors = GetMCDetectors(*mc_event_iter);
+      //~ EMRHitArray* emr_hits = (*mc_event_iter)->GetEMRHits();
+      //~ std::cerr << "###MC: " << emr_hits[0][0].GetPosition().x() << " " << emr_hits[0][0].GetPosition().y() << "\n";
       mc_detectors = MAUS::MCTruthTools::GetMCDetectors(*mc_event_iter);
       for (int i = 0; i < 27; i++) {
         std::cerr << mc_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] << " ";
       }
+      std::cerr << "\n";
       if (mc_detectors[MAUS::DataStructure::Global::kTracker0] and
           mc_detectors[MAUS::DataStructure::Global::kTOF0]) {
         tof0_matches_expected++;
@@ -120,6 +123,7 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
          recon_event_iter != recon_events->end();
          ++recon_event_iter) {
       GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
+      if (!global_event) continue;
       // Check if each non-Tracker detector has been added to a track, i.e.
       // matched
       std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =

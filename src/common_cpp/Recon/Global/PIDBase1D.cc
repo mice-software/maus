@@ -34,8 +34,9 @@ namespace global {
   };
 
   PIDBase1D::PIDBase1D(TFile* file, std::string variable,
-		   std::string hypothesis)
-    : PIDBase(file, variable, hypothesis) {
+		   std::string hypothesis, int XminBin, int XmaxBin)
+    : PIDBase(file, variable, hypothesis, XminBin, XmaxBin,
+       YminBin, YmaxBin) {
     std::string histname = variable + "_" + hypothesis;
     if (!file || file->IsZombie()) {
       throw(Exception(Exception::recoverable,
@@ -48,8 +49,6 @@ namespace global {
 		      "Histogram not found in file.",
 		      "Recon::Global::PIDBase1D::PIDBase1D()"));
     }
-    _XminBin = _hist->GetXaxis()->GetXmin();
-    _XmaxBin = _hist->GetXaxis()->GetXmax();
   };
 
   PIDBase1D::~PIDBase1D() {

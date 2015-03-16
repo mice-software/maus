@@ -446,6 +446,9 @@ EMRnumberOfPlanes = 48
 EMRnumberOfBars = 60 # number of bars in one plane (+ test channel 0)
 EMRnBars = 2832 # total number of bars in the EMR
 EMRbarLength = 110 # cm, length of a scintillating bar
+EMRbarWidth = 33 # mm, base of the triangle
+EMRbarHeight = 17 # mm, height of the triangle
+EMRgap = 0.5 # mm, gap between two adjacent bars
 
 # EMR event pre-selection
 EMRtotNoiseLow = 0
@@ -507,7 +510,7 @@ EMRsecondaryTriggerMinYhits = 1
 EMRsecondaryTriggerMinNhits = 2
 EMRsecondaryTriggerMinTot = 4
 
-EMRmaxSecondaryToPrimaryTrackDistance = 5
+EMRmaxSecondaryToPrimaryTrackDistance = 80
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -615,6 +618,22 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+# Bounds set on values of PID variables, should probably only be varied when running PID,
+# although can also be used to set new limits for PDFs
+# Bounds for PIDVarA
+minBinA = 20
+maxBinA = 40
+# PIDVarB
+XminBinB = 10
+XmaxBinB = 250
+YminBinB = 20
+YmaxBinB = 40
+# PIDVarC
+XminBinC = 50
+XmaxBinC = 350
+YminBinC = 0
+YmaxBinC = 8000
+
 
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),

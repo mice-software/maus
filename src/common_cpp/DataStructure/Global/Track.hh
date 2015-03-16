@@ -91,6 +91,18 @@ class Track : public TObject {
   /// Get the particle charge hypothesis, #_charge.
   int get_charge() const;
 
+  /// Set the range of the particles primary track in the emr, #_emr_range_primary
+  void set_emr_range_primary(double range);
+
+  /// Get the range of the particles primary track in the emr, #_emr_range_primary
+  double get_emr_range_primary() const;
+
+  /// Set the range of the particles secondary track in the emr, #_emr_range_secondary
+  void set_emr_range_secondary(double range);
+
+  /// Get the range of the particles secondary track in the emr, #_emr_range_secondary
+  double get_emr_range_secondary() const;
+
   /// Add a MAUS::DataStructure::Global::TrackPoint, filling #_geometry_paths
   /// and #_detectorpoints as required.
   void AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point);
@@ -239,6 +251,12 @@ class Track : public TObject {
   /// These tracks aren't owned by this track, they are just for
   /// book-keeping.  Therefore, we use a TRefArray.
   TRefArray* _constituent_tracks;
+
+  /// The range of a primary track from the EMR
+  double _emr_range_primary;
+
+  /// The range of a secondary track from the EMR
+  double _emr_range_secondary;
 
   /// A currently undefined 'Goodness of Fit' variable. This will be
   /// used to help analysers in interpreting the results, and will

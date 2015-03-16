@@ -104,34 +104,51 @@ namespace MAUS {
       return;
     }
 
-    MAUS::GlobalEvent* global_event;
     MAUS::ReconEventPArray::iterator recon_event_iter;
     for (recon_event_iter = recon_events->begin();
    recon_event_iter != recon_events->end();
    ++recon_event_iter) {
       // Load the ReconEvent, and import it into the GlobalEvent
+      std::cerr << "#1#\n";
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
-      global_event = MakeTracks(recon_event);
-
+      EMREvent* emr_event = recon_event->GetEMREvent();
+      std::cerr << "#2#\n";
+      //~ if (emr_event) {
+        //~ std::cerr << emr_event->GetRangePrimary() << " EMR Event Primary Range\n";
+      //~ }
+      //~ MAUS::GlobalEvent* global_event = MakeTracks(recon_event);
+      MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+      if (global_event) {
+        std::cerr << "#3#\n";
+        MAUS::recon::global::TrackMatching track_matching;
+        std::cerr << "#4#\n";
+        track_matching.USTrack(global_event, _classname);
+        std::cerr << "#5#\n";
+        track_matching.DSTrack(global_event, _classname);
+        std::cerr << "#6#\n";
+        //~ track_matching.throughTrack(global_event, _classname);
+      }
     }
   }
 
-  MAUS::GlobalEvent*
-  MapCppGlobalTrackMatching::MakeTracks(MAUS::ReconEvent* recon_event) const {
-    if (!recon_event) {
-      throw(Exception(Exception::recoverable,
-          "Trying to use an empty recon event.",
-          "MapCppGlobalTrackMatching::MakeTracks"));
-    }
-
-    MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+  //~ MAUS::GlobalEvent*
+  //~ MapCppGlobalTrackMatching::MakeTracks(MAUS::ReconEvent* recon_event) const {
+    //~ if (!recon_event) {
+      //~ throw(Exception(Exception::recoverable,
+          //~ "Trying to use an empty recon event.",
+          //~ "MapCppGlobalTrackMatching::MakeTracks"));
+    //~ }
+//~ 
+    //~ MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
     //~ Squeak::mout(Squeak::error) << global_event << " GE\n";
-
-    MAUS::recon::global::TrackMatching track_matching;
+//~ 
+    //~ MAUS::recon::global::TrackMatching track_matching;
     //~ Squeak::mout(Squeak::error) << "###FormTracks###\n";
-    track_matching.USTrack(global_event, _classname);
-    track_matching.DSTrack(global_event, _classname);
-    track_matching.throughTrack(global_event, _classname);
-    return global_event;
-  }
+    //~ track_matching.USTrack(global_event, _classname);
+    //~ track_matching.DSTrack(global_event, _classname);
+    //~ track_matching.throughTrack(global_event, _classname);
+    //~ std::cerr << "#1#\n";
+    //~ return global_event;
+    //~ std::cerr << "#2#\n";
+  //~ }
 } // ~MAUS
