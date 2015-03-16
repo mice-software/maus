@@ -21,6 +21,7 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/legacy/Interface/STLUtils.hh"
+#include "Geant4/G4PVPlacement.hh"
 
 namespace MAUS {
 
@@ -88,6 +89,10 @@ MiceModule* Globals::GetMonteCarloMiceModules() {
 
 MiceModule* Globals::GetReconstructionMiceModules() {
     return GetInstance()->_recon_mods;
+}
+
+GeometryNavigator* Globals::GetMCGeometryNavigator() {
+    return GetInstance()->_mc_geometry_navigator;
 }
 
 std::string Globals::GetVersionNumberString() {
