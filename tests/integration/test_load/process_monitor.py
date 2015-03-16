@@ -21,7 +21,7 @@ import sys
 import os
 import time
 import datetime
-import xboa.Common
+import xboa.common
 
 def print_mem_usage(pid):
     """
@@ -45,9 +45,9 @@ def print_mem_usage(pid):
 def make_graphs(pid_list, wait_time, max_time):
     """Make ROOT image stuff"""
     graph_dict = {}
-    canvas = xboa.Common.make_root_canvas("memory usage")
+    canvas = xboa.common.make_root_canvas("memory usage")
     for pid in pid_list:
-        hist, graph = xboa.Common.make_root_graph(
+        hist, graph = xboa.common.make_root_graph(
                            "pid "+str(pid),
                            [0.], "time [s]", 
                            [0.], "memory usage %", 
@@ -55,7 +55,7 @@ def make_graphs(pid_list, wait_time, max_time):
                            ymin=-5, ymax=105)
         graph_dict[pid] = graph
     hist.Draw()
-    xboa.Common.make_root_legend(canvas, graph_dict.values())
+    xboa.common.make_root_legend(canvas, graph_dict.values())
     return canvas, graph_dict
 
 def monitor_step(delta_t, mem_list, graph_dict):

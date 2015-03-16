@@ -20,8 +20,13 @@ import shutil
 import os 
 import subprocess
 import time
+import sys
 
 import cdb
+
+MONITOR = os.path.expandvars("${MAUS_ROOT_DIR}/tests/integration/test_load")
+sys.path.append(MONITOR) 
+import process_monitor
 
 def validate_geometry(geometry_id = None):
     """Download a geometry and run the geometry_validation script"""
@@ -38,6 +43,7 @@ def validate_geometry(geometry_id = None):
     path = mtd+"/test_latest_geometry_"+str(geometry_id)
     shutil.rmtree(path, True)
     os.makedirs(path+"/geometry")
+    fout = open(path+"/test_latest_geometry.log", "w")
     os.chdir(path)
     proc = subprocess.Popen(["python", download,
                              "--geometry_download_by", "id",
@@ -51,13 +57,20 @@ def validate_geometry(geometry_id = None):
     proc.wait()
     testpass = proc.returncode == 0
     for conf in ["conf1", "conf2", "conf3"]:
+        print >> fout, "# Running configuration", conf
         proc = subprocess.Popen(["python", validate,
                                  "--configuration_file", test_path+conf],
                                  stdin=subprocess.PIPE)
         while proc.poll() == None:
-            proc.communicate('\n')
+            mem_usage = process_monitor.print_mem_usage(proc.pid)
+            print >> fout, process_monitor.print_mem_usage(proc.pid)
+            if int(mem_usage['rsz']) > 1.5e6:
+                testpass = False
+            fout.flush()
+            proc.stdin.write('\n')
+            fout.flush()
             time.sleep(10)
-        proc.wait()
+        proc.communicate('\n')
         testpass &= proc.returncode == 0
     return testpass
 
