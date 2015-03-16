@@ -37,6 +37,8 @@ TEST_OUT  = RUN_NUMBER+"_offline.tar"
 TEST_DIR = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
                         "test_execute_against_data")
 TEST_FILE_EXISTS = False
+UNPACK_STEP4 = False
+
 # set a different test file for stepIV
 if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
     RUN_NUMBER = "06008"
