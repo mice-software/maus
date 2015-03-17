@@ -56,7 +56,7 @@ def validate_geometry(geometry_id = None):
         time.sleep(10)
     proc.wait()
     testpass = proc.returncode == 0
-    for conf in ["conf1", "conf2", "conf3"]:
+    for conf in ["conf1", "conf2"]:
         print >> fout, "# Running configuration", conf
         proc = subprocess.Popen(["python", validate,
                                  "--configuration_file", test_path+conf],
