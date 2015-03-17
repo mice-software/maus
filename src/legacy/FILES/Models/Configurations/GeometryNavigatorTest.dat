@@ -1,0 +1,61 @@
+
+Configuration geometry_nav_test
+{
+  Dimensions 1.0 1.0 1.0 m
+  PropertyString Material AIR
+
+  Module Copper
+  {
+    Position 0.0 0.0 -50.0 mm
+    Rotation 0.0 0.0 0.0 mm
+    Volume Box
+    Dimensions 10.0 10.0 10.0
+    PropertyString Material Cu
+  }
+
+  Module Aluminium
+  {
+    Position 0.0 0.0 -40.0 mm
+    Rotation 0.0 0.0 0.0 mm
+    Volume Box
+    Dimensions 10.0 10.0 10.0
+    PropertyString Material Al
+  }
+
+  Module Lead
+  {
+    Position 0.0 0.0 -10.0 mm
+    Rotation 0.0 0.0 0.0 mm
+    Volume Box
+    Dimensions 10.0 10.0 10.0
+    PropertyString Material Pb
+  }
+
+  Module Helium
+  {
+    Position 0.0 0.0 10.0 mm
+    Rotation 0.0 0.0 0.0 mm
+    Volume Box
+    Dimensions 10.0 10.0 10.0
+    PropertyString Material He
+  }
+
+  Module LiH
+  {
+    Position 0.0 0.0 30.0 mm
+    Rotation 0.0 0.0 0.0 mm
+    Volume Box
+    Dimensions 10.0 10.0 10.0
+    PropertyString Material MICE_LITHIUM_HYDRIDE
+  }
+
+  Module Tungsten
+  {
+    Position 0.0 0.0 50.0 mm
+    Rotation 0.0 0.0 0.0 mm
+    Volume Box
+    Dimensions 10.0 10.0 10.0
+    PropertyString Material W
+  }
+}
+

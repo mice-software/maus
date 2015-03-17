@@ -26,8 +26,8 @@ import os
 import unittest
 import ROOT
 
-from xboa.Hit import Hit
-import xboa.Common as Common
+from xboa.hit import Hit
+import xboa.common as common
 import maus_cpp.covariance_matrix
 from maus_cpp.covariance_matrix import CovarianceMatrix
 
@@ -74,9 +74,10 @@ class EnvelopeToolTest(unittest.TestCase):
                                  stdin=subprocess.PIPE, stdout=open(log, "w"),
                                  stderr=subprocess.STDOUT)
         # I don't check passing arguments from the command line      
-        time.sleep(2)
+        time.sleep(5)
         proc.send_signal(signal.SIGINT)
-        time.sleep(2)
+        while proc.poll() == None:
+            time.sleep(1)
         self.assertEqual(proc.poll(), 0)
 
     def test_envelope_tool(self):
@@ -114,8 +115,8 @@ class BeamSetupTest(unittest.TestCase): # pylint: disable=R0904
         self.hit_red = Hit.new_from_dict(self.red_dict)
         self.hit_full = Hit.new_from_dict({'pid':13, 'px':1., 'py':2., 'pz':3.,
                                     'x':-1, 'y':-2, 'z':-3,
-                                    'mass':Common.pdg_pid_to_mass[13],
-                                    'charge':Common.pdg_pid_to_charge[13]},
+                                    'mass':common.pdg_pid_to_mass[13],
+                                    'charge':common.pdg_pid_to_charge[13]},
                                     'energy')
         self.main_window = envelope_tool.MainWindow()
         self.main_window.window.get_frame("&Beam Setup", "button").Clicked()

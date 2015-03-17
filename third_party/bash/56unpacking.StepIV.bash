@@ -39,7 +39,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-#         cp SConstruct_unpacking ${MAUS_ROOT_DIR}/third_party/build/${directory}/SConstruct
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         echo
         echo "INFO: Making and installing"
@@ -47,44 +46,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
 #         scons install
 
-# build Step I unpacking
-        echo "INFO: Building StepI unpacker..."
         cd build
         cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install \
+               -DSTEPIV_DATA=1 \
                ..
         make
         make install
-
-# rename libMDUnpack to a StepI name 
-        echo "INFO: renaming to StepI library..."
-        mv ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so
-
-# clean up build area
-        rm -rf *
-        echo "INFO: Done..."
-
-# build Step IV unpacking with -DSTEPIV_DATA flag on
-        echo "INFO: Building StepIV unpacker..."
-        cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install -DSTEPIV_DATA=1 \
-               ..
-        make
-        make install
-
-# rename libMDUnpack to a StepIV name 
-        echo "INFO: renaming to StepIV library..."
-        mv ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepIV.so
-        rm -rf *
-        echo "INFO: Done..."
-        echo $LIBS
-#       gtest creates soft link from libMDUnpack.so
-#       so, ensure that the link exists and points to the correct unpacker version
-        if [ "$MAUS_UNPACKER_VERSION" == "StepI" ]; then
-           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
-        elif [ "$MAUS_UNPACKER_VERSION" == "StepIV" ]; then
-           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepIV.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
-        else
-           echo "FATAL: !! Unsupported Unpacker Version !! "
-        fi
 
         echo
         echo "INFO: The package should be locally build now in your"

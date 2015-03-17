@@ -91,7 +91,7 @@ import os
 import sys
 import json
 import ROOT
-import xboa.Common as common
+import xboa.common as common
 
 import Configuration
 
@@ -230,7 +230,7 @@ class Plotting(object): # pylint: disable=R0902
         canvas = common.make_root_canvas("Material vs z")
         hist = ROOT.TH2D("name", "Material vs z", 30000, z_range[0], z_range[1],
                          len(draw_list)+1, -0.5, len(draw_list)+0.5)
-        common._hist_persistent.append(hist) #pylint: disable=W0212
+        common._common._hist_persistent.append(hist) #pylint: disable=W0212
         for material in draw_list:
             hist.Fill(z_range[0], material, 1.)
         hist.SetBit(ROOT.TH1.kCanRebin)
@@ -272,7 +272,7 @@ class Plotting(object): # pylint: disable=R0902
         hist = ROOT.TH2D("name", "Volume Name vs z", 30000,
                          z_range[0], z_range[1],
                          len(draw_list)+1, -0.5, len(draw_list)+0.5)
-        common._hist_persistent.append(hist) #pylint: disable=W0212
+        common._common._hist_persistent.append(hist) #pylint: disable=W0212
         for material in draw_list:
             hist.Fill(z_range[0], material, 1.)
         hist.SetBit(ROOT.TH1.kCanRebin)
