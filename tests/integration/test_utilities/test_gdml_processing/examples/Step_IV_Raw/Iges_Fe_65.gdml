@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gdml [
+	<!ENTITY materials SYSTEM "./TD-1189-3401_Fe_09-07-13_materials.xml">
+]>
+
+<!--   GDML translation of the component "Step 65" from the Fastrad file : "TD-1189-3401_Iron.ray"
+	Processed the 2014/05/13 at 13h11 by the GDML module of Fastrad 3.3.0.9
+	Result file : "\\te9files.te.rl.ac.uk\MDG-public\_Projects\143 MICE Intergration Engineering - J Tarrant\_Tasks\001 MAUS Geometry\000 GDML_FastradModel\012 Step IV Updates\GDML_TD-1189-3401_Iron\Step_65.gdml"
+-->
+
+<gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+<define>
+	<position name="v0" x="-307.1870" y="-319.8569" z="-60.0000" unit="mm"/>
+	<position name="v1" x="-307.1870" y="-319.8569" z="60.0000" unit="mm"/>
+	<position name="v2" x="-319.8569" y="-285.0466" z="60.0000" unit="mm"/>
+	<position name="v3" x="-319.8569" y="-285.0466" z="-60.0000" unit="mm"/>
+	<position name="v4" x="285.0466" y="319.8569" z="-60.0000" unit="mm"/>
+	<position name="v5" x="319.8569" y="307.1870" z="-60.0000" unit="mm"/>
+	<position name="v6" x="-319.8569" y="-225.0466" z="-60.0000" unit="mm"/>
+	<position name="v7" x="225.0466" y="319.8569" z="-60.0000" unit="mm"/>
+	<position name="v8" x="285.0466" y="319.8569" z="60.0000" unit="mm"/>
+	<position name="v9" x="225.0466" y="319.8569" z="60.0000" unit="mm"/>
+	<position name="v10" x="-319.8569" y="-225.0466" z="60.0000" unit="mm"/>
+	<position name="v11" x="319.8569" y="307.1870" z="60.0000" unit="mm"/>
+	<position name="v12" x="0.0000" y="0.0000" z="-60.0000" unit="mm"/>
+	<position name="v13" x="0.0000" y="0.0000" z="60.0000" unit="mm"/>
+</define>
+
+<!-- Materials definition CallBack -->
+
+<materials>
+<element name="iron" formula="FE" Z="26">
+<atom value="55.845"/>
+</element>
+<material name="IRON" formula="IRON">
+<D value="7.874" unit="g/cm3"/>
+<fraction n="1.0000" ref="iron"/>
+</material>
+</materials>
+
+<solids>
+	<tessellated name="Step_65_solid">
+	<!-- Face 0 -->
+		<triangular vertex1="v0" vertex2="v1" vertex3="v2" type="ABSOLUTE"/>
+		<triangular vertex1="v2" vertex2="v3" vertex3="v0" type="ABSOLUTE"/>
+	<!-- Face 1 -->
+		<triangular vertex1="v6" vertex2="v0" vertex3="v3" type="ABSOLUTE"/>
+		<triangular vertex1="v12" vertex2="v0" vertex3="v6" type="ABSOLUTE"/>
+		<triangular vertex1="v7" vertex2="v5" vertex3="v12" type="ABSOLUTE"/>
+		<triangular vertex1="v0" vertex2="v12" vertex3="v5" type="ABSOLUTE"/>
+		<triangular vertex1="v5" vertex2="v7" vertex3="v4" type="ABSOLUTE"/>
+		<triangular vertex1="v6" vertex2="v7" vertex3="v12" type="ABSOLUTE"/>
+	<!-- Face 2 -->
+		<triangular vertex1="v8" vertex2="v4" vertex3="v7" type="ABSOLUTE"/>
+		<triangular vertex1="v7" vertex2="v9" vertex3="v8" type="ABSOLUTE"/>
+	<!-- Face 3 -->
+		<triangular vertex1="v2" vertex2="v10" vertex3="v6" type="ABSOLUTE"/>
+		<triangular vertex1="v6" vertex2="v3" vertex3="v2" type="ABSOLUTE"/>
+	<!-- Face 4 -->
+		<triangular vertex1="v2" vertex2="v1" vertex3="v10" type="ABSOLUTE"/>
+		<triangular vertex1="v10" vertex2="v1" vertex3="v13" type="ABSOLUTE"/>
+		<triangular vertex1="v13" vertex2="v11" vertex3="v9" type="ABSOLUTE"/>
+		<triangular vertex1="v11" vertex2="v13" vertex3="v1" type="ABSOLUTE"/>
+		<triangular vertex1="v8" vertex2="v9" vertex3="v11" type="ABSOLUTE"/>
+		<triangular vertex1="v13" vertex2="v9" vertex3="v10" type="ABSOLUTE"/>
+	<!-- Face 5 -->
+		<triangular vertex1="v5" vertex2="v1" vertex3="v0" type="ABSOLUTE"/>
+		<triangular vertex1="v1" vertex2="v5" vertex3="v11" type="ABSOLUTE"/>
+	<!-- Face 6 -->
+		<triangular vertex1="v4" vertex2="v8" vertex3="v11" type="ABSOLUTE"/>
+		<triangular vertex1="v11" vertex2="v5" vertex3="v4" type="ABSOLUTE"/>
+	<!-- Face 7 -->
+		<triangular vertex1="v10" vertex2="v9" vertex3="v7" type="ABSOLUTE"/>
+		<triangular vertex1="v7" vertex2="v6" vertex3="v10" type="ABSOLUTE"/>
+	</tessellated>
+</solids>
+
+<structure>
+
+	<volume name="Step_65">
+		<materialref ref="IRON"/>
+		<solidref ref="Step_65_solid"/>
+	</volume>
+</structure>
+
+<setup name="Default" version="1.0">
+	<world ref="Step_65"/>
+</setup>
+
+</gdml>
