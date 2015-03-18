@@ -9,7 +9,7 @@
 	    <GDMLElem name="Element_Step_26"/>
             <Position x="99.94" y="0.0" z="26.21"/>
             <Rotation x="0" y="15.0" z="0.0" units="deg"/>
-            <ScaleFactor value="0.6711756"/>
+            <ScaleFactor value="0.71415"/>
             <Volume name="None"/>
             <FieldType name="MagneticFieldMap"/>
             <FieldMapMode name="Read"/>

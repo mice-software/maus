@@ -42,7 +42,7 @@ SOURCEINFO = os.path.join(ROOT_DIR,\
                           "test_gdml_processing/examples/"+\
                           "Step_IV_Raw/Maus_Information.gdml") 
 DSTNTN_DIR = os.path.join(TMP_DIR,"test_gdml_extraction")
-OUT_PARENT_GDML = "Step_IV_gdml"
+OUT_PARENT_GDML = "Step_IV"
 FORMAT_GDML_DIR = os.path.join(TMP_DIR,"test_gdml_formatted")
 PARENT_MODULE_FILE = os.path.join(FORMAT_GDML_DIR,\
                                   "ParentGeometryFile.dat")
