@@ -20,7 +20,7 @@ Class for managing the lattice, tracking envelopes, etc
 import json
 import numpy
 
-from xboa.Hit import Hit
+from xboa.hit.factory import MausJsonHitFactory
 
 import Configuration
 import maus_cpp.field
@@ -49,7 +49,7 @@ class Lattice:
           - z_start: start position for tracking/beam propagation
         """
         self.config["simulation_reference_particle"] = \
-                              self.ref_list[0].get_maus_dict('maus_primary')[0]
+                          self.ref_list[0].get_maus_dict('maus_json_primary')[0]
         self.config["simulation_reference_particle"]["random_seed"] = 0
         self.config["physics_processes"] = "mean_energy_loss"
         config_str = json.dumps(self.config)
@@ -105,7 +105,9 @@ class Lattice:
                                                         command_line_args=True)
         self.config = json.loads(config_str)
         ref_json = self.config["simulation_reference_particle"]
-        self.ref_list = [Hit.new_from_maus_object("maus_primary", ref_json, 0)]
+        self.ref_list = [
+                MausJsonHitFactory.hit_from_maus_object("primary", ref_json, 0)
+        ]
         ell_data = [[float(i == j) for i in range(6)] for j in range(6)]
         np_diag = numpy.array(ell_data)
         self.ellipse_list = [
@@ -163,13 +165,13 @@ class Lattice:
     def _tracking(self):
         """Do the tracking - push reference trajectory and beam ellipse"""
         mc_event = [{
-                  "primary":self.ref_list[0].get_maus_dict('maus_primary')[0]}]
+              "primary":self.ref_list[0].get_maus_dict('maus_json_primary')[0]}]
         mc_event[0]["primary"]["random_seed"] = 0
         mc_event = maus_cpp.simulation.track_particles(json.dumps(mc_event))
         mc_event = json.loads(mc_event)
         virtual_list = mc_event[0]["virtual_hits"]
         self.ref_list = [self.ref_list[0]]+[
-                      Hit.new_from_maus_object('maus_virtual_hit', virtual, 0) \
+            MausJsonHitFactory.hit_from_maus_object('virtual_hit', virtual, 0) \
                                                    for virtual in virtual_list]
         ellipse = self.ellipse_list[0]
         try:

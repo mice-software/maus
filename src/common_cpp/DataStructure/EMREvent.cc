@@ -47,7 +47,11 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
   if (this == &_emrevent) {
         return *this;
   }
-  SetEMRPlaneHitArray(_emrevent._emrplanehitarray);
+
+  this->_emrplanehitarray = _emrevent._emrplanehitarray;
+  for (size_t i = 0; i < this->_emrplanehitarray.size(); i++)
+    this->_emrplanehitarray[i] = new EMRPlaneHit(*(this->_emrplanehitarray[i]));
+
   SetInitialTrigger(_emrevent._initial_trigger);
   SetHasPrimary(_emrevent._has_primary);
   SetRangePrimary(_emrevent._range_primary);
@@ -62,6 +66,10 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
 }
 
 EMREvent::~EMREvent() {
+  int nph = _emrplanehitarray.size();
+  for (int i = 0; i < nph; i++)
+    delete _emrplanehitarray[i];
+
   _emrplanehitarray.resize(0);
 }
 

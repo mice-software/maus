@@ -67,8 +67,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # removed geant 4.9.2
     #${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
-    # DAQ unpacking library
-    ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
     # The used version of doxygen requires a recent version of flex
     ${MAUS_ROOT_DIR}/third_party/bash/54flex.bash
     # Doxygen to make sure the same version is used everywhere
@@ -76,6 +74,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     # MAUS should now build okay - now for the test and execution environment
     ${MAUS_ROOT_DIR}/third_party/bash/11gtest.bash
+    # DAQ unpacking library
+    ${MAUS_ROOT_DIR}/third_party/bash/53unpacking.bash
     ${MAUS_ROOT_DIR}/third_party/bash/41cpplint.bash
     ${MAUS_ROOT_DIR}/third_party/bash/45beamline_fieldmaps.bash
     ${MAUS_ROOT_DIR}/third_party/bash/71test_data.bash
