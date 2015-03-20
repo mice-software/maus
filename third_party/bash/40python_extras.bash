@@ -16,7 +16,7 @@
 egg_source=${MAUS_THIRD_PARTY}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 download_package_list="\
- anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 \
+ anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 six>=1.4.0 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
  pymongo==2.3 readline matplotlib==1.1.0 scons==2.2.0\
@@ -31,7 +31,7 @@ scons_url="http://sourceforge.net/projects/scons/files/scons/${scons_version}/sc
 
 # these are the packages to install - note the version dependencies
 package_list="\
- anyjson python-dateutil amqplib kombu \
+ anyjson python-dateutil amqplib six kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
  pymongo scons readline matplotlib \
