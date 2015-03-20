@@ -518,7 +518,7 @@ TOF_trigger_station = "tof1"
 # if you set file, then uncomment the calib files below
 TOF_calib_source = "CDB"
 
-#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
