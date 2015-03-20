@@ -24,7 +24,6 @@
 
 #include "json/json.h"
 
-#include "unpacking/event.h"
 #include "unpacking/MDdateFile.h"
 #include "unpacking/MDevent.h"
 #include "unpacking/MDfileManager.h"

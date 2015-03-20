@@ -134,6 +134,12 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    */
   std::vector<std::string> GetRegions() {return _regions;}
 
+  /** Get the world volume pointer.
+   *
+   *  Allows access to the geometry outside of Geant4.
+   */
+  G4VPhysicalVolume* GetWorldVolume() const {return _rootPhysicalVolume;}
+
  private:
   void ResetGeometry();
   void ResetFields();

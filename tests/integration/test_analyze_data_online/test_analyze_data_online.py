@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-# pylint: disable=E1101
+# pylint: disable=E1101, R0904
 
 """
 test_analyze_online.py - Note that I never ran this test successfully! Always
@@ -94,6 +94,8 @@ def run_process(data_file_name, dir_suffix, send_signal=None):
     print '\n'
     return proc.returncode
 
+@unittest.skipIf(os.environ['MAUS_UNPACKER_VERSION'],
+                 "No step1 lib or step4 reference")
 class TestAnalyzeOnline(unittest.TestCase):#pylint: disable =R0904
     """Execute analyze_data_online"""
     def setUp(self): # pylint: disable=C0103
