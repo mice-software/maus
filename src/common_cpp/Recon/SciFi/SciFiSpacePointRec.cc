@@ -193,6 +193,7 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   ThreeVector p3 = crossing_pos(ucluster, wcluster);
   ThreeVector position = (p1+p2+p3)/3.;
   triplet->set_position(position);
+//  std::cerr << "Spacepoint Pos = " << position.x() << ", " << position.y() << ", " << position.z() << std::endl;
 
   // Vector p stores the crossing position of views v and w.
   ThreeVector p(p2);
@@ -245,6 +246,7 @@ void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
   // This is the position of the space-point.
   ThreeVector position(p1);
   duplet->set_position(position);
+//  std::cerr << "Spacepoint Pos = " << position.x() << ", " << position.y() << ", " << position.z() << std::endl;
 
   // Determine time
   double time_A = clusterA->get_time();

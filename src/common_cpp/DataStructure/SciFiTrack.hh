@@ -108,6 +108,14 @@ class SciFiTrack {
 
   void SetAlgorithmUsed(int algorithm) { _algorithm_used = (AlgorithmUsed) algorithm; }
 
+  void SetSeedState( std::vector<double> seed ) { this->_seed_state_vector = seed; }
+
+  std::vector<double> GetSeedState() const { return _seed_state_vector; }
+
+  void SetSeedCovariance( std::vector<double> seed ) { this->_seed_covariance_matrix = seed; }
+
+  std::vector<double> GetSeedCovariance() const { return _seed_covariance_matrix; }
+
  private:
   int _tracker;
 
@@ -122,6 +130,10 @@ class SciFiTrack {
   AlgorithmUsed _algorithm_used;
 
   SciFiTrackPointPArray _trackpoints;
+
+  std::vector<double> _seed_state_vector;
+
+  std::vector<double> _seed_covariance_matrix;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };

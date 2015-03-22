@@ -52,6 +52,12 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
                         double point_spread, DoubleArray phi, SciFiSpacePointPArray spoints,
                         const DoubleArray& covariance);
 
+    /** Constructor from SimpleCircle and SimpleLine Without explicit chi squared setting */
+    SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
+                        SimpleCircle circle, SimpleLine line_sz, double point_spread,
+                        DoubleArray phi, SciFiSpacePointPArray spoints,
+                        const DoubleArray& covariance);
+
     /** Copy constructor - any pointers are deep copied */
     SciFiHelicalPRTrack(const SciFiHelicalPRTrack &_htrk);
 

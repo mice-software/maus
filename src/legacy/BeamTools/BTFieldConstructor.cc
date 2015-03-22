@@ -71,7 +71,7 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
 	try {
   	int ignoredAmalgamated = 0;
   	_needsPhases = false;
-  	BTSolenoid::ClearStaticMaps();
+//  	BTSolenoid::ClearStaticMaps();
   	std::vector<const MiceModule*> daughterModules;
   	for(int fields = 0; fields < _numberOfFieldTypes; fields++) {
   		daughterModules = rootModule->findModulesByPropertyString( "FieldType", _fieldTypes[fields] );

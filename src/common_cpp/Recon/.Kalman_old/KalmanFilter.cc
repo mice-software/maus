@@ -129,6 +129,10 @@ void KalmanFilter::UpdateH(const KalmanState *a_site) {
   // _S(1, 0) = -perp_y/pitch;
   // _S(1, 1) =  perp_x/pitch;
   // _S.Zero();
+
+  std::cerr << "\n\nPosition = " << a_site->z() << "\n";
+//  std::cerr << "Measurement : S = " << _S(0,0) << "  " << _S(0,1) << "  " << _S(1,0) << "  " << _S(1,1) << '\n';
+  std::cerr << "Measurement : H = " << _H(0,0) << "  " << _H(0,1)  << "  " << _H(0,2) << '\n';
 }
 
 // W = [ V + H C_k-1 Ht + S cov_S_k-1 St ]-1
@@ -175,6 +179,9 @@ void KalmanFilter::ComputePull(KalmanState *a_site) {
   TMatrixD pull(_measurement_dim, 1);
   pull = measurement - HA;
 
+  std::cerr << "PULL FOUND : Meas = " << HA(0,0) << " Pull = " << pull(0,0)  << "\n";
+  std::cerr << "State = " << a(0,0) << ", " << a(1,0) << ", " << a(2,0) << ", " << a(3,0) << ", " << a(4,0) << '\n';
+
   a_site->set_residual(pull, KalmanState::Projected);
 }
 
@@ -189,6 +196,7 @@ TMatrixD KalmanFilter::SolveMeasurementEquation(const TMatrixD &a,
   TMatrixD result(_measurement_dim, 1);
   // TMatrixD result(1, 1);
   result = ha + Ss;
+
   return result;
 }
 

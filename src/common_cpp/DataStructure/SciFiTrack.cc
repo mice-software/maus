@@ -23,7 +23,9 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _ndf(-1),
                           _P_value(-1),
                           _charge(0),
-                          _trackpoints(0) {
+                          _trackpoints(0),
+                          _seed_state_vector(0),
+                          _seed_covariance_matrix(0) {
 }
 
 SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
@@ -31,7 +33,9 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _ndf(-1),
                                                    _P_value(-1),
                                                    _charge(0),
-                                                   _trackpoints(0) {
+                                                   _trackpoints(0),
+                                                   _seed_state_vector(0),
+                                                   _seed_covariance_matrix(0) {
   _tracker   = a_track.tracker();
   _chi2    = a_track.chi2();
   _ndf       = a_track.ndf();
@@ -43,6 +47,9 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
+
+  _seed_state_vector = a_track._seed_state_vector;
+  _seed_covariance_matrix = a_track._seed_covariance_matrix;
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
@@ -60,6 +67,9 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
+
+  _seed_state_vector = a_track._seed_state_vector;
+  _seed_covariance_matrix = a_track._seed_covariance_matrix;
 
   return *this;
 }

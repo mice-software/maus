@@ -144,7 +144,7 @@ private:
 	int myNumberOfSheets;
 	static int StaticNumberOfRCoords, StaticNumberOfZCoords, StaticNumberOfSheets;
 	static double StaticZExtentFactor, StaticRExtentFactor;
-	static const double mySheetTolerance;
+  static const double mySheetTolerance;
 
 	std::string interpolation;
 	bool isAnalytic;
@@ -152,6 +152,7 @@ private:
 	std::vector<double*> GetSheetInformation();
 	//Static vector of field maps
 	static std::vector<MagFieldMap*> StaticFieldMaps;
+	std::vector<MagFieldMap*> FieldMaps;
 
 }; // class BTSolenoid
 

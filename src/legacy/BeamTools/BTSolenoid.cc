@@ -15,7 +15,7 @@ using CLHEP::tesla;
 
 int BTSolenoid::StaticNumberOfRCoords=0, BTSolenoid::StaticNumberOfZCoords=0,
     BTSolenoid::StaticNumberOfSheets=0;
-double BTSolenoid::StaticZExtentFactor=0, BTSolenoid::StaticRExtentFactor=0;
+ double BTSolenoid::StaticZExtentFactor=0, BTSolenoid::StaticRExtentFactor=0;
 std::vector<MagFieldMap*> BTSolenoid::StaticFieldMaps = std::vector<MagFieldMap*>();
 const double BTSolenoid::mySheetTolerance = 1e-3*CLHEP::mm;
 

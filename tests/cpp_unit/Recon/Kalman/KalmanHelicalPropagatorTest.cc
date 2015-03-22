@@ -80,25 +80,32 @@ TEST_F(KalmanHelicalPropagatorTest, test_propagation_using_MC_tracker1) {
   state_0.Initialise(5);
   state_15.Initialise(5);
 
-  double x0  = 19.4509;
-  double y0  = 6.86145;
-  double z0  = 16021.6;
-  double px0 = 5.04953;
+  double x0  =  19.4509;
+  double y0  =  6.86145;
+  double z0  =  16021.6;
+  double px0 =  5.04953;
   double py0 = -50.4535;
-  double pz0 = 212.641;
+  double pz0 =  212.641;
   // double mx0 = px0/pz0;
   // double my0 = py0/pz0;
   double charge = 1.;
   double kappa  = charge/pz0;
 
-  double x15  = 98.65861;
-  double y15  = -9.12456;
-  double z15  = 16472.6;
-  double px15 = 24.22264;
-  double py15 = 44.54567;
+  // double x15  = 98.65861;
+  // double y15  = -9.12456;
+  // double z15  = 16472.6;
+  // double px15 = 24.22264;
+  // double py15 = 44.54567;
   // double pz15 = 212.686;
   // double mx15 = px15/pz15;
   // double my15 = py15/pz15;
+
+  double x15  = -55.0176;
+  double y15  = -24.5049;
+  double z15  =  16472.6;
+  double px15 = -32.57029;
+  double py15 =  38.86167;
+//  double pz15 =  212.641;
 
   state_0.set_z(z0);
   state_15.set_z(z15);

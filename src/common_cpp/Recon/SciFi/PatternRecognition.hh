@@ -274,6 +274,12 @@ class PatternRecognition {
     /** @brief A function to set all the internal parameters to their default values (for tests) */
     void set_parameters_to_default();
 
+    void get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
+       double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut);
+
+    void set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
+       double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut);
+
   private:
     bool _straight_pr_on;       /** Straight pattern recogntion on or off */
     bool _helical_pr_on;        /** Helical pattern recogntion on or off */

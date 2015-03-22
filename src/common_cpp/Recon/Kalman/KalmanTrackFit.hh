@@ -16,78 +16,94 @@
  */
 
 
-#ifndef KALMANTRACKFIT_HH
-#define KALMANTRACKFIT_HH
+#ifndef KALMAN_TRACKFIT_HH
+#define KALMAN_TRACKFIT_HH
 
-// C headers
-#include <assert.h>
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanPropgator_base.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanMeasurement_base.hh"
 
-// C++ headers
-#include <string>
-#include <vector>
-#include "TMath.h"
-#include "TMatrixD.h"
+#include "TMatrix.h"
 
-#include "Utils/Exception.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/DataStructure/SciFiEvent.hh"
-#include "src/common_cpp/DataStructure/SciFiTrack.hh"
-#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanFilter.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanStraightPropagator.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanHelicalPropagator.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
 
 namespace MAUS {
+namespace Kalman {
 
-/** @class KalmanTrackFit
- *
- *  @brief KalmanTrackFit manages the workflow of the fitting.
- *
- */
-class KalmanTrackFit {
- public:
-  KalmanTrackFit();
+  TMatrixD ComputeKalmanGainMatrix(Measurement_base* measurement, State state);
 
-  virtual ~KalmanTrackFit();
+  TMatrixD ComputeSmootherGainMatrix(Propagator_base* prop, State pred, State filt);
 
-  void SaveGeometry(std::vector<ThreeVector> positions,
-                    std::vector<HepRotation> rotations);
-
-  /** @brief The main worker. All Kalman Filtering lives within.
+  /** @class TrackFit
+   *
+   *  @brief TrackFit manages the workflow of the fitting.
+   *
    */
-  void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
+  class TrackFit {
+  public:
+    enum Status { Error, Intialised, Predicted, Filtered, Smoothed };
 
-  /** @brief Loops over the track points in the finished track calculating the chi2.
-   */
-  void ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites);
+    /** @brief Intialise with the required measurement and propagator classes.
+     */
+    KalmanTrackFit(Propagator_base* propagator, Measurement_base* measurement);
 
-  /** @brief Saves the track into the SciFiEvent for data structure output.
-   */
-  void Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArray sites);
+    /** @brief Destructor
+     */
+    virtual ~KalmanTrackFit();
 
-  /** @brief Prints some info about the fitting evolution.
-   */
-  void DumpInfo(KalmanStatesPArray sites);
 
- private:
-  bool _use_MCS;
+    void AppendFilter(State state);
 
-  bool _use_Eloss;
+    void Filter();
 
-  bool _verbose;
+    void Smooth();
 
-  std::vector<ThreeVector> _RefPos;
 
-  std::vector<HepRotation> _Rot;
+    State GetSeed() const { return _seed; }
 
-  KalmanPropagator *_propagator;
+    void SetSeed(State state);
 
-  KalmanFilter     *_filter;
-};
+    Status GetStatus() const { return _fitter_status; }
 
-} // ~namespace MAUS
+    void SetData(Track data_track);
 
-#endif
+    Track GetData() const { return _data; }
+    
+    Track GetPredicted() const { return _predicted; }
+
+    Track GetFiltered() const { return _filtered; }
+
+    Track GetSmoothed() const { return _smoothed; }
+
+
+    unsigned int GetDimension() const { return _dimension; }
+
+  protected:
+
+//    State Filter(State filtered, State predicted);
+
+  private:
+    // Private copy constructor => No copying!
+    TrackFit(const TrackFit& tf) {} 
+    TrackFit& operator=(const TrackFit& tf) { return *this; }
+
+    Status _fitter_status;
+
+    unsigned int _dimension;
+
+    Propagator_base* _propgator;
+    Measurement_base* _measurement;
+
+    State _seed;
+
+    Track _data;
+    Track _predicted;
+    Track _filtered;
+    Track _smoothed;
+
+    TMatrixD _unit_matrix;
+  };
+
+} // namespace Kalman
+} // namespace MAUS
+
+#endif // KALMAN_TRACKFIT_HH

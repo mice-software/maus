@@ -27,7 +27,7 @@ public:
 
 	// retrieve the field at cartesian Point[4]
 	inline void GetFieldValue( const  double Point[4], double *Bfield ) const
-	{	myInterpolator->F(Point, Bfield);}
+	{	myInterpolator->F(Point, Bfield); }
 
 	//read a map file with file name mapFile and type fileType
 	void ReadMap(const std::string& mapFile, const std::string& fileType, std::string interpolation);

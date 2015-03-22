@@ -36,6 +36,7 @@ class SciFiTrackProcessor : public ObjectProcessor<SciFiTrack> {
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
     PointerArrayProcessor<SciFiTrackPoint> _scifi_trackpoint_array_proc;
+    ValueArrayProcessor<double> _vector_proc;
 };
 } // ~namespace MAUS
 

@@ -17,186 +17,161 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 
+#include "src/common_cpp/Utils/Exception.hh"
+
+
 namespace MAUS {
+namespace Kalman {
 
-KalmanTrackFit::KalmanTrackFit() : _propagator(NULL),
-                                   _filter(NULL) {
-  //
-  // Get Configuration values.
-  //
-  Json::Value *json = Globals::GetConfigurationCards();
-  _use_MCS          = (*json)["SciFiKalman_use_MCS"].asBool();
-  _use_Eloss        = (*json)["SciFiKalman_use_Eloss"].asBool();
-  _verbose          = (*json)["SciFiKalmanVerbose"].asBool();
-}
-
-KalmanTrackFit::~KalmanTrackFit() {}
-
-void KalmanTrackFit::SaveGeometry(std::vector<ThreeVector> positions,
-                                  std::vector<HepRotation> rotations) {
-  _RefPos = positions;
-  _Rot    = rotations;
-}
-
-void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
-                             SciFiEvent &event) {
-  // Prepare to loop over seeds. 1 seed = 1 track hypothesis
-  //
-  for ( size_t i = 0; i < seeds.size(); ++i ) {
-    // Current seed.
-    KalmanSeed* seed = seeds[i];
-    KalmanStatesPArray sites = seed->GetKalmanStates();
-    SciFiTrack *track = new SciFiTrack();
-    if ( seed->is_straight() ) {
-      track->SetAlgorithmUsed(SciFiTrack::kalman_straight);
-      _propagator = new KalmanStraightPropagator();
-    } else if ( seed->is_helical() ) {
-      track->SetAlgorithmUsed(SciFiTrack::kalman_helical);
-      double Bz   = seed->GetField();
-      _propagator = new KalmanHelicalPropagator(Bz);
+  TrackFit::TrackFit(Propagator_base* prop, Measurement_base meas) :
+    _fitter_status(TrackFit::Initialised),
+    _dimension(prop.GetDimension()),
+    _propagator(prop),
+    _measurement(meas),
+    _seed(_dimension),
+    _data(_dimension),
+    _predicted(_dimension),
+    _filtered(_dimension),
+    _smoothed(_dimension),
+    _identity_matrix(_dimension, _dimension) {
+    if (_measurement.GetDimension() != _propagator.GetDimension()) {
+      throw Exception(Exception::Recoverable,
+          "Propagators and Measurements have conflicting dimension."
+          "Kalman::TrackFit::TrackFit()");
     }
-    // The Filter needs to know the dimension of its matrices.
-    // The seed has that information.
-    int n_parameters = seed->n_parameters();
-    _filter = new KalmanFilter(n_parameters);
-
-    // Filter the first state.
-    _filter->Process(sites.front());
-    // int first_site_id = abs(sites.front()->id());
-
-    int measurements = 0;
-    for ( size_t j = 1; j < sites.size(); ++j ) { measurements += ( sites.at(j)->contains_measurement() ? 1 : 0 ); }
-
-    // Run the extrapolation & filter chain.
-    size_t numb_sites = sites.size();
-    // Loop over all 15 planes
-    for ( size_t j = 1; j < sites.size(); ++j ) {
-      // Predict the state vector at site i...
-      _propagator->Extrapolate(sites, j);
-
-      // ... Filter...
-      _filter->Process(sites.at(j));
-    }
-    // std::cerr << "Prepare For Smoothing... " << std::endl;
-    _propagator->PrepareForSmoothing(sites.back());
-    // ...and Smooth back all sites.
-    for ( int k = static_cast<int> (sites.size()-2); k >= 0; --k ) {
-      _propagator->Smooth(sites, k);
-      _filter->UpdateH(sites.at(k));
-      _filter->ComputeResidual(sites.at(k), KalmanState::Smoothed);
-    }
-
-    track->set_tracker(seed->tracker());
-    track->set_charge(seed->charge());
-
-    // Calculate the chi2 of this track.
-    ComputeChi2(track, sites);
-    // Optional printing.
-    if ( _verbose )
-      DumpInfo(sites);
-    Save(event, track, sites);
-    // Free memory allocated and reset pointers to NULL.
-    delete _propagator;
-    delete _filter;
-    _propagator = NULL;
-    _filter     = NULL;
+    _identity_matrix.Zero();
+    for (unsigned int i = 0; i < _dimension; ++i)
+      _identity_matrix(i, i) = 1.0;
   }
-}
 
-void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites) {
-  // Prepare to loop over all Kalman sites...
-  size_t n_sites = sites.size();
-  // ... summing chi2...
-  double chi2 = 0.;
-  // .. and counting the numb. of measurements...
-  int n_measurements = 0;
-  for ( size_t i = 0; i < n_sites; ++i ) {
-    KalmanState *site = sites.at(i);
-    if  ( site->contains_measurement() ) {
-      n_measurements++;
-      chi2 += site->chi2();
+  TrackFit::~Trackfit() {
+    if (_propagator) {
+      delete _propagator;
+      _propagator = NULL;
+    }
+    if (_measurement) {
+      delete _measurement;
+      _measurement = NULL;
     }
   }
-  // Find the ndf for this track: numb measurements - numb parameters to be estimated
-  int n_parameters = sites.at(0)->a(KalmanState::Filtered).GetNrows();
-  int ndf = n_measurements - n_parameters;
-  track->set_chi2(chi2);
-  track->set_ndf(ndf);
-  double P_value = TMath::Prob(chi2, ndf);
-  track->set_P_value(P_value);
-}
 
-void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArray sites) {
-  double pvalue = track->P_value();
-  int tracker = track->tracker();
-  if ( pvalue != pvalue ) return;
-  for ( size_t i = 0; i < sites.size(); ++i ) {
-    if ( sites.at(i)->contains_measurement() ) {
-      sites.at(i)->MoveToGlobalFrame(_RefPos[tracker]);
-      SciFiTrackPoint *track_point = new SciFiTrackPoint(sites.at(i));
-      track->add_scifitrackpoint(track_point);
+
+  void TrackFit::AppendFilter(State state) {
+    throw Exception(Exception::Recoverable,
+        "Functionality Not Implemented!",
+        "Kalman::TrackFit::AppendFilter()")
+
+    if (state.GetDimension() != _measurement->GetMeasurementDimension()) {
+      throw Exception(Exception::Recoverable,
+          "State dimension does not match the measurement dimension",
+          "Kalman::TrackFit::AppendFilter()");
     }
+
+
+    // The good stuff goes here!
+
+    _fitter_status = TrackFit::Filtered;
   }
-  (*sites.rbegin())->covariance_matrix( KalmanState::Smoothed ).Print();
-  event.add_scifitrack(track);
-}
 
-void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
-  size_t numb_sites = sites.size();
 
-  for ( size_t i = 0; i < numb_sites; ++i ) {
-    KalmanState* site = sites.at(i);
-    TMatrix covariance_pre = site->covariance_matrix(KalmanState::Projected);
-    TMatrix covariance_fil = site->covariance_matrix(KalmanState::Filtered);
-    TMatrix covariance_smo = site->covariance_matrix(KalmanState::Smoothed);
-    // Squeak::mout(Squeak::info)
-    std::cerr
-    << "=========================================="  << "\n"
-    << "SITE ID: " << site->id() << "\n"
-    << "SITE Z: " << site->z()   << "\n"
-    << "Measurement: " << (site->measurement())(0, 0) << "\n"
-    << "Projection: " << (site->a(KalmanState::Projected))(0, 0) << " "
-                      << (site->a(KalmanState::Projected))(1, 0) << " "
-                      << (site->a(KalmanState::Projected))(2, 0) << " "
-                      << (site->a(KalmanState::Projected))(3, 0) << "\n"
-    << "Filtered: "   << (site->a(KalmanState::Filtered))(0, 0) << " "
-                      << (site->a(KalmanState::Filtered))(1, 0) << " "
-                      << (site->a(KalmanState::Filtered))(2, 0) << " "
-                      << (site->a(KalmanState::Filtered))(3, 0) << "\n"
-    << "Smoothed: "   << (site->a(KalmanState::Smoothed))(0, 0) << " "
-                      << (site->a(KalmanState::Smoothed))(1, 0) << " "
-                      << (site->a(KalmanState::Smoothed))(2, 0) << " "
-                      << (site->a(KalmanState::Smoothed))(3, 0) << "\n"
-    << "================Residuals================"   << "\n"
-    << (site->residual(KalmanState::Projected))(0, 0)  << "\n"
-    << (site->residual(KalmanState::Filtered))(0, 0)   << "\n"
-    << (site->residual(KalmanState::Smoothed))(0, 0)   << "\n"
-    << "=========================================="
-    << "\nPredicted Covariance:\n";
-    int nrows = covariance_pre.GetNrows();
-    int ncols = covariance_pre.GetNcols();
-    for ( size_t j = 0; j < nrows; ++j ) {
-      for ( size_t k = 0; k < ncols; ++k ) {
-        std::cerr << covariance_pre( j, k ) << "   ";
+  void TrackFit::Filter() {
+    _predicted.Reset(_data);
+    _filtered.Reset(_data);
+
+    _predicted[0] = _seed;
+    _filtered[0] = _seed;
+
+    for (unsigned int i = 1; i < _data.Length(); ++i) {
+      _propagator.Propagate(_filtered[i-1], _predicted[i]);
+
+      if (_data[i].HasValue()) {
+
+        TMatrixD H = measurement.GetMeasurementMatrix(_predicted[index]);
+        TMatrixD HT; HT.Transpose(H);
+
+        State measured = measurement->Measure(_predicted[index]);
+        TMatrixD temp = measured.GetCovariance();
+        temp.Invert();
+
+        TMatrixD K = _predicted[i].GetCovariance() * HT * temp;
+
+        TMatrixD pull = _data[i].GetVector - measured.GetVector();
+
+        _filtered[i].SetVector( _predicted[i].GetState() + K * pull );
+        _filtered[i].SetCovariance( ( _identity_matrix - H * K ) * _predicted[i].getCovariance() );
+      } else {
+        _filtered[i] = _predicted[i];
       }
-      std::cerr << '\n';
     }
-    std::cerr << "\nFiltered Covariance:\n";
-    for ( size_t j = 0; j < nrows; ++j ) {
-      for ( size_t k = 0; k < ncols; ++k ) {
-        std::cerr << covariance_fil( j, k ) << "   ";
-      }
-      std::cerr << '\n';
-    }
-    std::cerr << "\nSmoothed Covariance:\n";
-    for ( size_t j = 0; j < nrows; ++j ) {
-      for ( size_t k = 0; k < ncols; ++k ) {
-        std::cerr << covariance_smo( j, k ) << "   ";
-      }
-      std::cerr << '\n';
-    }
-    std::cerr << "==========================================" << std::endl;
-  }
-}
 
-} // ~namespace MAUS
+    _fitter_status = TrackFit::Filtered;
+  }
+
+
+  void TrackFit::Smooth() {
+    _smoothed.Reset(_filtered);
+
+    unsigned int last_state = _smoothed.Length() - 1;
+    _smoothed[last_state] = _filtered[last_state];
+
+    for (unsigned int i = (last_state - 1); i >= 0; --i ) {
+
+      TMatrixD prop = _propagator->GetPropagator(_filtered[i], _filtered[i+1]);
+      TMatrixD protT; propT.Transpose(prop);
+      TMatrixD A = _filtered[i].GetCovariance() * propT _predicted[i+1].GetCovariance().Invert();
+      TMatrixD AT; AT.Transpose(A);
+
+      _smoothed[i].SetVector( _filtered[i].GetCovaraince() + A * ( _smoothed[i+1].GetVector() - _predicted[i+1].GetVector() ) );
+      smoothed[i].SetCovariance( _filtered[i].GetCovariance() + A * ( _smoothed[i+1].GetCovariance() - _predicted[i+1].GetCovariance() ) * AT );
+    }
+
+    _fitter_status = TrackFit::Smoothed;
+  }
+
+
+  void TrackFit::SetSeed(State seed) {
+    if (seed.GetDimension() != _dimension) {
+      throw Exception(Exception::Recoverable,
+          "Seed dimension does not match the track fitter",
+          "Kalman::TrackFit::SetSeed()");
+    }
+    _seed = seed;
+  }
+
+  void TrackFit::SetData(Track data_track) {
+    if (data_track.GetDimension() != _measurement->GetMeasurementDimension()) {
+      throw Exception(Exception::nonRecoverable,
+          "Data track dimension does not match the measurement dimension",
+          "Kalman::TrackFit::SetData()");
+    }
+    _data = data_track;
+    _predicted = Track(_dimension);
+    _filtered = Track(_dimension);
+    _smoothed = Track(_dimension);
+  }
+
+
+
+//  void TrackFit::Filter(unsigned int index) {
+//    TMatrixD I = TMatrix::kUnit;
+//    TMatrixD pred_cov = _predicted[index].GetCovariance();
+//    TMatrixD H = measurement.GetMeasurementMatrix();
+//    TMatrixD HT; HT.Transpose(H);
+//
+//    State measured = measurement->Measure(_predicted[index]);
+//    TMatrixD temp = measured.GetCovariance();
+//    temp.Invert();
+//
+//    TMatrixD K = pred_cov * HT * temp;
+//
+//    TMatrixD new_vec = _predicted[index].GetVector() + K * ( _data[index].GetVector() - measured.GetVector() );
+//    TMatrixD new_cov = ( I - K * H ) * pred_cov;
+//
+//    _filtered[index].SetVector(new_vec);
+//    _filtered[index].SetCovariance(new_cov);
+//  }
+
+
+
+} // namespace Kalman
+} // namespace MAUS

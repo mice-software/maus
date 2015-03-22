@@ -34,7 +34,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   if (!Globals::HasInstance()) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
-  Json::Value *json = Globals::GetConfigurationCards();
+  Json::Value* json = Globals::GetConfigurationCards();
   _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
   _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
   _kalman_on      = (*json)["SciFiKalmanOn"].asBool();
@@ -168,6 +168,7 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
   std::cerr << std::endl;
   */
 
+  std::cerr << "\nSciFi Event Details:\n\n";
 
   SciFiTrackPArray tracks = event.scifitracks();
   for ( unsigned int i = 0; i < tracks.size(); ++i )
@@ -176,8 +177,28 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
     for ( unsigned int j = 0; j < trackpoints.size(); ++j )
     {
 //      std::cerr << "Plane, Station, Tracker = " << trackpoints[j]->plane() << ", " << trackpoints[j]->station() << ", " << trackpoints[j]->tracker() << '\n';
-      std::cerr << "Track Point = " << trackpoints[j]->pos()[0] << ", " << trackpoints[j]->pos()[1] << ", " << trackpoints[j]->pos()[2] << '\n';
+      SciFiCluster* cluster = trackpoints[j]->get_cluster_pointer();
+
+      std::cerr << "Track Point = " << trackpoints[j]->pos()[0] << ", " << trackpoints[j]->pos()[1] << ", " << trackpoints[j]->pos()[2] << " | "
+                                    << trackpoints[j]->mom()[0] << ", " << trackpoints[j]->mom()[1] << ", " << trackpoints[j]->mom()[2] << " | "
+                                    << "DATA = " << ( cluster ? cluster->get_alpha() : 0 ) << '\n';
     }
+    std::cerr << "Tracker : " << tracks[i]->tracker() << ", Chi2 = " << tracks[i]->chi2() << ", P_Value = " << tracks[i]->P_value() << '\n';
+
+    std::vector<double> seed_sta = tracks[i]->GetSeedState();
+    std::vector<double> seed_cov = tracks[i]->GetSeedCovariance();
+
+    std::cerr << "Seed State = ";
+    for ( int j = 0; j < seed_sta.size(); ++j ) {
+      std::cerr << seed_sta[j] << ", ";
+    }
+    std::cerr << '\n';
+
+    std::cerr << "Seed Covariance = ";
+    for ( int j = 0; j < seed_cov.size(); ++j ) {
+      std::cerr << seed_cov[j] << ", ";
+    }
+    std::cerr << '\n';
   }
   std::cerr << std::endl;
 

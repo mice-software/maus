@@ -37,8 +37,36 @@ namespace MAUS {
 struct SciFiPlaneGeometry {
   ThreeVector Direction;
   ThreeVector Position;
+  ThreeVector GlobalPosition;
   double CentralFibre;
   double Pitch;
+};
+
+/** @brief Structure for storing parameters relating to scifi materials
+ */
+struct MaterialParams {
+  /// Polystyrene's atomic number.
+  double Z;
+  /// Width of the fibre plane in mm.
+  double Plane_Width;
+  /// Fibre radiation lenght in mm
+  double Radiation_Length;
+  /// Fractional Radiation Length
+  double L(double length) { return length/Radiation_Length; }
+  /// Density in g.cm-3
+  double Density;
+  /// Mean excitation energy in eV.
+  double Mean_Excitation_Energy;
+  /// Atomic number in g.mol-1 per styrene monomer
+  double A;
+  /// Channel width in mm
+  double Pitch;
+  /// Station Radius in mm
+  double Station_Radius;
+  /// Density correction.
+  double Density_Correction;
+  /// RMS per channel measurement (um).
+  double RMS;
 };
 
 /** @typedef SciFiGeometryMap
@@ -46,6 +74,8 @@ struct SciFiPlaneGeometry {
  *  @brief type definition of a map of SciFiPlaneGeometry structs indexed by plane id (-15 to 15).
  */
 typedef std::map<int, SciFiPlaneGeometry> SciFiGeometryMap;
+
+typedef std::vector< std::pair<MaterialParams, double> > SciFiMaterialsList;
 
 /** @class SciFiGeometryHelper
  *
@@ -99,6 +129,18 @@ class SciFiGeometryHelper {
 
   std::vector<HepRotation> Rot()     const { return _Rot;    }
 
+  double GetChannelWidth() const { return w_channel; }
+
+  const MaterialParams& GetFibreParameters() const { return FibreParameters; }
+  const MaterialParams& GetGasParameters() const { return GasParameters; }
+  const MaterialParams& GetMylarParameters() const { return MylarParameters; }
+
+  static double HighlandFormula(double L, double beta, double p);
+
+  static double BetheBlochStoppingPower(double p, MaterialParams& material);
+
+  void FillMaterialsList(int start_id, int end_id, SciFiMaterialsList& materials_list);
+
  private:
   std::vector<const MiceModule*> _modules;
 
@@ -109,6 +151,17 @@ class SciFiGeometryHelper {
   std::vector<ThreeVector> _RefPos;
 
   std::vector<HepRotation> _Rot;
+
+  MaterialParams FibreParameters;
+
+  MaterialParams GasParameters;
+
+  MaterialParams MylarParameters;
+
+  double w_fibre;
+  double w_mylar;
+  double w_channel;
+
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS
 

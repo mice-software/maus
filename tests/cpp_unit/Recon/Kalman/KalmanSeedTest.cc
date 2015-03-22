@@ -49,7 +49,21 @@ class KalmanSeedTest : public ::testing::Test {
     int station_3 = 3;
     int station_4 = 4;
     int station_5 = 5;
-    int tracker = 1;
+    int tracker = 0;
+
+    charge = -1;
+    field = 0.004;
+
+    z_positions[0] = 0.0;
+    z_positions[1] = 350.0;
+    z_positions[2] = 650.0;
+    z_positions[3] = 900.0;
+    z_positions[4] = 1100.0;
+
+    ThreeVector pos;
+    double x, y, z;
+
+    // SET UP STRSIGHT TRACK
 
     SciFiCluster * c0 = new SciFiCluster();
     c0->set_id(id_0);
@@ -71,22 +85,29 @@ class KalmanSeedTest : public ::testing::Test {
     c12->set_id(id_12);
     SciFiCluster * c13 = new SciFiCluster();
     c13->set_id(id_13);
-    _clusters.push_back(c0);
-    _clusters.push_back(c1);
-    _clusters.push_back(c3);
-    _clusters.push_back(c4);
-    _clusters.push_back(c6);
-    _clusters.push_back(c7);
-    _clusters.push_back(c9);
-    _clusters.push_back(c10);
-    _clusters.push_back(c12);
-    _clusters.push_back(c13);
+    _straight_clusters.push_back(c0);
+    _straight_clusters.push_back(c1);
+    _straight_clusters.push_back(c3);
+    _straight_clusters.push_back(c4);
+    _straight_clusters.push_back(c6);
+    _straight_clusters.push_back(c7);
+    _straight_clusters.push_back(c9);
+    _straight_clusters.push_back(c10);
+    _straight_clusters.push_back(c12);
+    _straight_clusters.push_back(c13);
 
-    x = 7.0;
-    y = 8.0;
-    z = 9.0;
-    ThreeVector pos(x, y, z);
+    // Straight tracks
+    x_0 = 10.0;
+    y_0 = 0.0;
+    mx = 20.0 / 1100.0;
+    my = 0.0;
 
+    x = x_0;
+    y = 0.0;
+    z = z_positions[0];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
     SciFiSpacePoint *sp_1 = new SciFiSpacePoint();
     sp_1->set_tracker(tracker);
     sp_1->add_channel(c0);
@@ -94,6 +115,12 @@ class KalmanSeedTest : public ::testing::Test {
     sp_1->set_position(pos);
     sp_1->set_station(station_1);
 
+    x = x_0 + mx * z_positions[1];
+    y = 0.0;
+    z = z_positions[1];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
     SciFiSpacePoint *sp_2 = new SciFiSpacePoint();
     sp_2->set_tracker(tracker);
     sp_2->add_channel(c3);
@@ -101,6 +128,12 @@ class KalmanSeedTest : public ::testing::Test {
     sp_2->set_position(pos);
     sp_2->set_station(station_2);
 
+    x = x_0 + mx * z_positions[2];
+    y = 0.0;
+    z = z_positions[2];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
     SciFiSpacePoint *sp_3 = new SciFiSpacePoint();
     sp_3->set_tracker(tracker);
     sp_3->add_channel(c6);
@@ -108,6 +141,12 @@ class KalmanSeedTest : public ::testing::Test {
     sp_3->set_position(pos);
     sp_3->set_station(station_3);
 
+    x = x_0 + mx * z_positions[3];
+    y = 0.0;
+    z = z_positions[3];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
     SciFiSpacePoint *sp_4 = new SciFiSpacePoint();
     sp_4->set_tracker(tracker);
     sp_4->add_channel(c9);
@@ -115,6 +154,12 @@ class KalmanSeedTest : public ::testing::Test {
     sp_4->set_position(pos);
     sp_4->set_station(station_4);
 
+    x = x_0 + mx * z_positions[4];
+    y = 0.0;
+    z = z_positions[4];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
     SciFiSpacePoint *sp_5 = new SciFiSpacePoint();
     sp_5->set_tracker(tracker);
     sp_5->add_channel(c12);
@@ -122,57 +167,193 @@ class KalmanSeedTest : public ::testing::Test {
     sp_5->set_position(pos);
     sp_5->set_station(station_5);
 
-    _spacepoints.push_back(sp_1);
-    _spacepoints.push_back(sp_2);
-    _spacepoints.push_back(sp_3);
-    _spacepoints.push_back(sp_4);
-    _spacepoints.push_back(sp_5);
+    _straight_spacepoints.push_back(sp_1);
+    _straight_spacepoints.push_back(sp_2);
+    _straight_spacepoints.push_back(sp_3);
+    _straight_spacepoints.push_back(sp_4);
+    _straight_spacepoints.push_back(sp_5);
+
+    // SET UP HELICAL TRACKS
+
+    c0 = new SciFiCluster();
+    c0->set_id(id_0);
+    c1 = new SciFiCluster();
+    c1->set_id(id_1);
+    c3 = new SciFiCluster();
+    c3->set_id(id_3);
+    c4 = new SciFiCluster();
+    c4->set_id(id_4);
+    c6 = new SciFiCluster();
+    c6->set_id(id_6);
+    c7 = new SciFiCluster();
+    c7->set_id(id_7);
+    c9 = new SciFiCluster();
+    c9->set_id(id_9);
+    c10 = new SciFiCluster();
+    c10->set_id(id_10);
+    c12 = new SciFiCluster();
+    c12->set_id(id_12);
+    c13 = new SciFiCluster();
+    c13->set_id(id_13);
+    _helical_clusters.push_back(c0);
+    _helical_clusters.push_back(c1);
+    _helical_clusters.push_back(c3);
+    _helical_clusters.push_back(c4);
+    _helical_clusters.push_back(c6);
+    _helical_clusters.push_back(c7);
+    _helical_clusters.push_back(c9);
+    _helical_clusters.push_back(c10);
+    _helical_clusters.push_back(c12);
+    _helical_clusters.push_back(c13);
+
+    // Helix Parameters:
+    x_c = 0.0;
+    y_c = 0.0;
+    r = 10.0;
+    s_0 = 0.0;
+    dsdz = 0.005;
+
+    x = x_c + r*cos( ( s_0 - charge*z_positions[0]*dsdz ) / r );
+    y = y_c + r*sin( ( s_0 - charge*z_positions[0]*dsdz ) / r );
+    z = z_positions[0];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
+    sp_1 = new SciFiSpacePoint();
+    sp_1->set_tracker(tracker);
+    sp_1->add_channel(c0);
+    sp_1->add_channel(c1);
+    sp_1->set_position(pos);
+    sp_1->set_station(station_1);
+
+    x = x_c + r*cos( ( s_0 - charge*z_positions[1]*dsdz ) / r );
+    y = y_c + r*sin( ( s_0 - charge*z_positions[1]*dsdz ) / r );
+    z = z_positions[1];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
+    sp_2 = new SciFiSpacePoint();
+    sp_2->set_tracker(tracker);
+    sp_2->add_channel(c3);
+    sp_2->add_channel(c4);
+    sp_2->set_position(pos);
+    sp_2->set_station(station_2);
+
+    x = x_c + r*cos( ( s_0 - charge*z_positions[2]*dsdz ) / r );
+    y = y_c + r*sin( ( s_0 - charge*z_positions[2]*dsdz ) / r );
+    z = z_positions[2];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
+    sp_3 = new SciFiSpacePoint();
+    sp_3->set_tracker(tracker);
+    sp_3->add_channel(c6);
+    sp_3->add_channel(c7);
+    sp_3->set_position(pos);
+    sp_3->set_station(station_3);
+
+    x = x_c + r*cos( ( s_0 - charge*z_positions[3]*dsdz ) / r );
+    y = y_c + r*sin( ( s_0 - charge*z_positions[3]*dsdz ) / r );
+    z = z_positions[3];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
+    sp_4 = new SciFiSpacePoint();
+    sp_4->set_tracker(tracker);
+    sp_4->add_channel(c9);
+    sp_4->add_channel(c10);
+    sp_4->set_position(pos);
+    sp_4->set_station(station_4);
+
+    x = x_c + r*cos( ( s_0 - charge*z_positions[4]*dsdz ) / r );
+    y = y_c + r*sin( ( s_0 - charge*z_positions[4]*dsdz ) / r );
+    z = z_positions[4];
+    pos.setX( x );
+    pos.setY( y );
+    pos.setZ( z );
+    sp_5 = new SciFiSpacePoint();
+    sp_5->set_tracker(tracker);
+    sp_5->add_channel(c12);
+    sp_5->add_channel(c13);
+    sp_5->set_position(pos);
+    sp_5->set_station(station_5);
+
+    _helical_spacepoints.push_back(sp_1);
+    _helical_spacepoints.push_back(sp_2);
+    _helical_spacepoints.push_back(sp_3);
+    _helical_spacepoints.push_back(sp_4);
+    _helical_spacepoints.push_back(sp_5);
   }
   virtual void TearDown() {
-    // delete spacepoints ------------------------
     std::vector<SciFiSpacePoint*>::iterator spoint;
-    for (spoint = _spacepoints.begin(); spoint!= _spacepoints.end(); ++spoint) {
+    std::vector<SciFiCluster*>::iterator cluster;
+    // delete spacepoints ------------------------
+    for (spoint = _helical_spacepoints.begin(); spoint!= _helical_spacepoints.end(); ++spoint) {
       delete (*spoint);
     }
-    _spacepoints.resize(0);
+    _helical_spacepoints.resize(0);
     // delete clusters ------------------------
-    std::vector<SciFiCluster*>::iterator cluster;
-    for (cluster = _clusters.begin(); cluster!= _clusters.end(); ++cluster) {
+    for (cluster = _helical_clusters.begin(); cluster!= _helical_clusters.end(); ++cluster) {
       delete (*cluster);
     }
-    _clusters.resize(0);
+    // delete spacepoints ------------------------
+    _helical_clusters.resize(0);
+    for (spoint = _straight_spacepoints.begin(); spoint!= _straight_spacepoints.end(); ++spoint) {
+      delete (*spoint);
+    }
+    _straight_spacepoints.resize(0);
+    // delete clusters ------------------------
+    for (cluster = _straight_clusters.begin(); cluster!= _straight_clusters.end(); ++cluster) {
+      delete (*cluster);
+    }
+    _straight_clusters.resize(0);
   }
-  double x;
-  double y;
-  double z;
+
+  double z_positions[5];
+  double charge;
+  double field;
+  // Straight track example
+  double x_0;
+  double y_0;
+  double mx;
+  double my;
+  std::vector<SciFiCluster*>    _straight_clusters;
+  std::vector<SciFiSpacePoint*> _straight_spacepoints;
+  // Helical track example
+  double dsdz;
+  double x_c;
+  double y_c;
+  double r;
+  double s_0;
+  std::vector<SciFiCluster*>    _helical_clusters;
+  std::vector<SciFiSpacePoint*> _helical_spacepoints;
+
   static const double err = 1.e-6;
-  std::vector<SciFiSpacePoint*> _spacepoints;
-  std::vector<SciFiCluster*>    _clusters;
 };
 
 TEST_F(KalmanSeedTest, test_ordering) {
   MAUS::KalmanSeed seed;
   // This will load the clusters stored in the _spacepoints
-  seed.RetrieveClusters(_spacepoints);
+  seed.RetrieveClusters(_helical_spacepoints);
   std::vector<SciFiCluster*> seed_clusters = seed.GetClusters();
 
   // Now, let's check that they are ordered.
-  int temp = -1;
+  int temp_id = -1;
   for ( size_t i = 0; i < seed_clusters.size(); ++i ) {
     int id = seed_clusters[i]->get_id();
-    EXPECT_TRUE(temp < id);
-    temp = id;
+    EXPECT_TRUE(temp_id < id);
+    temp_id = id;
   }
   // Check order of spacepoints.
-  temp = -1;
-  for ( size_t j = 0; j < _spacepoints.size(); ++j ) {
-    int station_number = _spacepoints[j]->get_station();
+  double temp_z = 100000.0;
+  for ( size_t j = 0; j < _helical_spacepoints.size(); ++j ) {
+    double z_pos = _helical_spacepoints[j]->get_position().z();
     // Check that they are stored in increasing order.
-    EXPECT_TRUE(temp < station_number);
-    temp = station_number;
+    EXPECT_TRUE(temp_z > z_pos);
+    temp_z = z_pos;
   }
   // Check if any clusters were lost.
-  EXPECT_EQ(_clusters.size(), seed_clusters.size());
+  EXPECT_EQ(_helical_clusters.size(), seed_clusters.size());
 }
 
 TEST_F(KalmanSeedTest, test_straight_state_vector) {
@@ -184,12 +365,21 @@ TEST_F(KalmanSeedTest, test_straight_state_vector) {
   // Now set up a Straight Pattern Recognition Track
   //
   MAUS::SciFiStraightPRTrack straight_track;
-  double mx = 1.;
-  double my = 2.;
+  // Make a fake covariance matrix.
+  // Should be makde by pattern recognition
+  std::vector<double> seed_covariance( 16, 0.0 );
+  seed_covariance[0] = 1000.0;
+  seed_covariance[5] = 1000.0;
+  seed_covariance[10] = 1000.0;
+  seed_covariance[15] = 1000.0;
+  straight_track.set_covariance( seed_covariance );
+
+  straight_track.set_x0(x_0);
+  straight_track.set_y0(y_0);
   straight_track.set_my(my);
   straight_track.set_mx(mx);
   straight_track.set_tracker(0);
-  straight_track.set_spacepoints_pointers(_spacepoints);
+  straight_track.set_spacepoints_pointers(_straight_spacepoints);
   // Set up stuff for posterior use.
   seed.Build(&straight_track);
   //
@@ -199,6 +389,9 @@ TEST_F(KalmanSeedTest, test_straight_state_vector) {
   //
   // Check the result is the expected.
   //
+
+  double x = x_0 + 1100.0*mx;
+  double y = y_0 + 1100.0*my;
   EXPECT_EQ(a.GetNrows(), 4);
   EXPECT_NEAR(a(0, 0), x,  err);
   EXPECT_NEAR(a(1, 0), mx, err);
@@ -207,36 +400,36 @@ TEST_F(KalmanSeedTest, test_straight_state_vector) {
 }
 
 TEST_F(KalmanSeedTest, test_helical_state_vector) {
+  int charge = -1.;
+  double c  = CLHEP::c_light;
   //
   // Set up Seed object with spacepoints.
   //
   MAUS::KalmanSeed seed;
-  seed.SetField(-0.004);
+  seed.SetField(0.004);
   //
   // Now set up a Helical Pattern Recognition Track
   //
   MAUS::SciFiHelicalPRTrack helical_track;
-  double r     = 3.; // mm
-  double tan_lambda = 1./200.;
-  double dsdz  = 1./tan_lambda;
-  // Is this Pi really necessary?
-  double PI = acos(-1.);
-  double phi_0 = 0.;
-  int charge = -1.;
-  double field = -0.004;
-  double c  = CLHEP::c_light;
-  double pt = charge*c*fabs(field)*r;
-  double pz = pt*tan_lambda;
+  double pt = fabs(charge*c*field*r);
 
-  DoubleArray phi;
-  phi.push_back(phi_0);
-  helical_track.set_charge(charge);
-  helical_track.set_phi(phi);
-  helical_track.set_tracker(0);
-  helical_track.set_R(r);
   helical_track.set_dsdz(dsdz);
-  helical_track.set_phi0(phi_0);
-  helical_track.set_spacepoints_pointers(_spacepoints);
+  helical_track.set_charge(charge);
+  helical_track.set_R(r);
+  helical_track.set_tracker(0);
+  helical_track.set_circle_x0( x_c );
+  helical_track.set_circle_y0( y_c );
+  helical_track.set_line_sz_c( s_0 );
+  helical_track.set_spacepoints_pointers(_helical_spacepoints);
+  // Make a fake covariance matrix.
+  // Should be makde by pattern recognition
+  std::vector<double> seed_covariance( 25, 0.0 );
+  seed_covariance[0] = 1000.0;
+  seed_covariance[6] = 1000.0;
+  seed_covariance[12] = 1000.0;
+  seed_covariance[18] = 1000.0;
+  seed_covariance[24] = 1000.0;
+  helical_track.set_covariance( seed_covariance );
   // Set up stuff for posterior use.
   seed.Build(&helical_track);
   //
@@ -246,12 +439,20 @@ TEST_F(KalmanSeedTest, test_helical_state_vector) {
   //
   // Check the result is the expected.
   //
+  double phi = ( s_0 - charge*z_positions[4]*dsdz ) / r;
+  double x = x_c + r*cos( phi );
+  double y = y_c + r*sin( phi );
+  double px = pt*cos( phi + TMath::PiOver2() );
+  double py = pt*sin( phi + TMath::PiOver2() );
+  double kappa = ( dsdz*charge ) / pt;
+
+  // Allow less stringent coonstraints on momenutm. Should be tighter!
   EXPECT_EQ(a.GetNrows(), 5);
   EXPECT_NEAR(a(0, 0), x, err);
-  // allow 2 MeV error due to the removal of PR bias.
-  EXPECT_NEAR(a(1, 0), pt*cos(phi_0+PI/2.), 2);
+  EXPECT_NEAR(a(1, 0), px, 1.0);
   EXPECT_NEAR(a(2, 0), y, err);
-  EXPECT_NEAR(a(3, 0), pt*sin(phi_0+PI/2.), 2);
+  EXPECT_NEAR(a(3, 0), py, 1.0);
+  EXPECT_NEAR(a(4, 0), kappa, 2.0);
 }
 
 } // ~namespace MAUS

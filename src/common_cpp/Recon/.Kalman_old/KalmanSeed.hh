@@ -96,6 +96,10 @@ class KalmanSeed {
    */
   TMatrixD initial_state_vector() const { return _a0; }
 
+  /** @brief Getter for the initial covariance matrix.
+   */
+  TMatrixD initial_covariance_matrix() const { return _full_covariance; }
+
   /** @brief Loops over the clusters in the event and makes a KalmanState for each.
    */
   void BuildKalmanStates();
@@ -142,6 +146,8 @@ class KalmanSeed {
   /** @brief Uncertainty on a0's elements - tunable parameter in the datacards.
    */
   double _seed_cov;
+
+  bool _use_patrec_seed;
 
   TMatrixD _full_covariance;
 

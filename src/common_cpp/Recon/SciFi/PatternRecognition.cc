@@ -651,8 +651,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   // Form the track and return it
   SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, n_points, charge, pos_0, phi_0, c_trial,
-                                                       line_sz, -1.0, -1.0, -1.0, phi_i, spnts,
-                                                       covariance);
+                                                       line_sz, -1.0, phi_i, spnts, covariance);
   return track;
 }
 
@@ -757,13 +756,17 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
   std::vector<double> close_phi(phi.size(), 0.0);
 
   // Calculate the separations in phi and z between stations
-  // std::cout << "i\tphi\tdphi\tz\tdz" << std::endl;
+//  std::cout << "i\tphi\tdphi\tz\tdz" << std::endl;
+  bool add_2pi = false;
   for (size_t i = 0; i < phi.size(); ++i) {
     dz.push_back(z[i] - z[0]);
+    if (add_2pi) dphi[i] = dphi[i] + 2*CLHEP::pi;
     dphi.push_back(phi[i] - phi[0]);
-    if ( dphi[i] < 0.0 )
+    if ( dphi[i] < 0.0 ) {
       dphi[i] = dphi[i] + 2*CLHEP::pi;
-    // std::cout << i << "\t" << phi[i] << "\t" << dphi[i] << "\t" << z[i] << "\t" << dz[i] << "\n";
+      add_2pi = true;
+    }
+//    std::cout << i << "\t" << phi[i] << "\t" << dphi[i] << "\t" << z[i] << "\t" << dz[i] << "\n";
   }
 
   // Setup a vector holding the values of n to try
@@ -789,6 +792,8 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       double remainder = SciFiTools::my_mod(close_dphi[j], 2*CLHEP::pi);
       double residual = fabs(remainder) - fabs(dphi[j]);
       if ( fabs(residual) > _n_turns_cut ) pass = false;
+      std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j] << "\t"
+                << remainder << "\t" << residual << std::endl;
     }
 
     // If n was accepted for all the turning angles
@@ -856,6 +861,26 @@ bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoin
     return false;
   else
     return true;
+}
+
+void PatternRecognition::get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
+       double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut) {
+  res_cut = _res_cut;
+  straight_chisq_cut = _straight_chisq_cut;
+  R_res_cut = _R_res_cut;
+  circle_chisq_cut = _circle_chisq_cut;
+  n_turns_cut = _n_turns_cut;
+  sz_chisq_cut = _sz_chisq_cut;
+}
+
+void PatternRecognition::set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
+       double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut) {
+  _res_cut = res_cut;
+  _straight_chisq_cut = straight_chisq_cut;
+  _R_res_cut = R_res_cut;
+  _circle_chisq_cut = circle_chisq_cut;
+  _n_turns_cut = n_turns_cut;
+  _sz_chisq_cut = sz_chisq_cut;
 }
 
 // For linear Pattern Recognition use

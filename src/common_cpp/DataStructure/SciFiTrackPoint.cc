@@ -28,6 +28,8 @@ SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
                                      _chi2(-1),
                                      _pos(ThreeVector(0, 0, 0)),
                                      _mom(ThreeVector(0, 0, 0)),
+                                     _covariance(0),
+                                     _errors(0),
                                      _pull(-1),
                                      _residual(-1),
                                      _smoothed_residual(-1) {
@@ -82,7 +84,10 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   int size = C.GetNrows();
   int num_elements = size*size;
   double* matrix_elements = C.GetMatrixArray();
-  std::vector<double> covariance(matrix_elements, matrix_elements+(num_elements/sizeof(double)));
+  std::vector<double> covariance(num_elements);
+  for ( int i = 0; i < num_elements; ++i ) {
+    covariance[i] = matrix_elements[i];
+  }
   _covariance = covariance;
   std::vector<double> errors(size);
   for ( int i = 0; i < size; ++i ) {
@@ -107,6 +112,9 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _pos = point.pos();
   _mom = point.mom();
 
+  _covariance = point._covariance;
+  _errors = point._errors;
+
   _pull              = point.pull();
   _residual          = point.residual();
   _smoothed_residual = point.smoothed_residual();
@@ -130,6 +138,9 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
 
   _pos = rhs.pos();
   _mom = rhs.mom();
+
+  _covariance = rhs._covariance;
+  _errors = rhs._errors;
 
   _pull              = rhs.pull();
   _residual          = rhs.residual();
