@@ -79,6 +79,9 @@ void ReduceCppTofCalib::processSpill() {
       // Get this particle event in TOF0, TOF1 and TOF2.
       ReconEvent revt = _spill.GetAReconEvent(PartEvent);
       TOFEvent* tof_event = revt.GetTOFEvent();
+     if (!tof_event)
+       continue;
+
       TOFEventSlabHit slbhits = tof_event->GetTOFEventSlabHit();
 
       int ntof0_sh = slbhits.GetTOF0SlabHitArraySize();
@@ -127,8 +130,8 @@ void ReduceCppTofCalib::processSpill() {
           slabB = tslb;
           adc2 = ch0;
           adc3 = ch1;
-          t2 = rt0;
-          t3 = rt1;
+          t2 = rt0*1000;
+          t3 = rt1*1000;
         }
         if (ntof1_sh == 2) {
           TOFSlabHit tof1_sh = slbhits.GetTOF1SlabHitArrayElement(h);
@@ -150,8 +153,8 @@ void ReduceCppTofCalib::processSpill() {
             slabD = tslb;
             adc6 = ch0;
             adc7 = ch1;
-            t6 = rt0;
-            t7 = rt1;
+            t6 = rt0*1000;
+            t7 = rt1*1000;
           }
         }
         if (ntof2_sh == 2) {
@@ -174,8 +177,8 @@ void ReduceCppTofCalib::processSpill() {
             slabF = tslb;
             adc10 = ch0;
             adc11 = ch1;
-            t10 = rt0;
-            t11 = rt1;
+            t10 = rt0*1000;
+            t11 = rt1*1000;
           }
         }
       }
