@@ -35,6 +35,7 @@ EMRBarHit& EMRBarHit::operator=(const EMRBarHit& _emrbarhit) {
     if (this == &_emrbarhit) {
         return *this;
     }
+
     SetTot(_emrbarhit._tot);
     SetDeltaT(_emrbarhit._deltat);
     SetHitTime(_emrbarhit._hittime);

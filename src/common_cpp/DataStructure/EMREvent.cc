@@ -26,11 +26,6 @@ EMREvent::EMREvent()
     _secondary_to_primary_track_distance(0),
     _total_charge_MA(0.0), _charge_ratio_MA(0.0),
     _total_charge_SA(0.0), _charge_ratio_SA(0.0) {
-//    for (int planeid=0; planeid<48; planeid++) {
-//         EMRPlaneHit emrplanehit;
-//         emrplanehit.SetPlane(planeid);
-//         _emrplanehitarray.push_back(emrplanehit);
-//    }
 }
 
 EMREvent::EMREvent(const EMREvent& _emrevent)
@@ -47,7 +42,11 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
   if (this == &_emrevent) {
         return *this;
   }
-  SetEMRPlaneHitArray(_emrevent._emrplanehitarray);
+
+  this->_emrplanehitarray = _emrevent._emrplanehitarray;
+  for (size_t i = 0; i < this->_emrplanehitarray.size(); i++)
+    this->_emrplanehitarray[i] = new EMRPlaneHit(*(this->_emrplanehitarray[i]));
+
   SetInitialTrigger(_emrevent._initial_trigger);
   SetHasPrimary(_emrevent._has_primary);
   SetRangePrimary(_emrevent._range_primary);
@@ -65,7 +64,6 @@ EMREvent::~EMREvent() {
   int nph = _emrplanehitarray.size();
   for (int i = 0; i < nph; i++)
     delete _emrplanehitarray[i];
-
 
   _emrplanehitarray.resize(0);
 }
