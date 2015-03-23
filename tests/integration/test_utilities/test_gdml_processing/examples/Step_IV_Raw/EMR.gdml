@@ -154,16 +154,17 @@
             <loop for="xp" to="48" step="1">
                 <physvol>
                     <volumeref ref="EMRPlane"/>
-                    <position name="Plane_pos" x="0.0" y="0.0" z="xp * (1.7 + 0.5) - 42.0" unit="cm"/>
+                    <position name="Plane_pos" x="0.0" y="0.0" z="xp * (1.7 + 0.05) - 42.0" unit="cm"/>
                     <rotation name="Plane_rot" x="0.0" y="0.0" z="mod2[xp + 1] * 90.0" unit="degree"/>
                 </physvol>
             </loop>                          
             <auxiliary auxtype="SensitiveDetector" auxvalue="EMR"/>
             <auxiliary auxtype="NbOfBars" auxvalue="2832"/>
             <auxiliary auxtype="unit" auxvalue="cm"/>
-            <auxiliary auxtype="BarWidth" auxvalue="1.7"/>
+            <auxiliary auxtype="BarWidth" auxvalue="3.3"/>
             <auxiliary auxtype="BarHeight" auxvalue="1.7"/>
             <auxiliary auxtype="BarLength" auxvalue="110.0"/>
+	    <auxiliary auxtype="Gap" auxvalue="0.05"/>
             <auxiliary auxtype="HoleRad" auxvalue="0.3"/>
             <auxiliary auxtype="FiberCladdingExtRadius" auxvalue="0.12"/>
             <auxiliary auxtype="AddWLSFiber" auxvalue="1"/>
