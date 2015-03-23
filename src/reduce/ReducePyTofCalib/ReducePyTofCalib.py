@@ -22,6 +22,7 @@ ReducePyTofCalib gets slab hits and makes a Tree for calibration.
 #pylint: disable = R0912, R0914, R0915
 #pylint: disable = C0103
 #pylint: disable = W0201, W0612, W0613
+import os
 import json
 import ROOT
 from array import array
@@ -52,6 +53,7 @@ class ReducePyTofCalib: # pylint: disable=R0902
         self.run_ended = False
         self.tdcPico = 1000.0
         self.calib_file = "tofcalibdata_"
+        self.output_dir = ""
         if not self.__make_tree():
             print 'ReducePyTofCalib: Failed to make tree'
             return
@@ -65,6 +67,8 @@ class ReducePyTofCalib: # pylint: disable=R0902
         """
         # setup the root tree
         self.run_ended = False
+        config_doc = json.loads(config_json)
+        self.output_dir = config_doc["end_of_run_output_root_directory"]
         return True
 
 
@@ -315,7 +319,16 @@ class ReducePyTofCalib: # pylint: disable=R0902
         at death.
         @param self Object reference.
         """
-        outfilename = self.calib_file + str(self.rnum) + ".root"
+        
+        outDir = str(self.output_dir) + str(self.rnum)
+        outfilename = outDir + "/" + self.calib_file + str(self.rnum) + ".root"
+        try:
+            if not os.path.exists(outDir):
+                os.makedirs(outDir)
+            if not os.path.isdir(outDir):
+                raise ValueError("image_directory is a file: %s" % outDir)
+        except OSError:
+            pass
         self.calibFile = ROOT.TFile(outfilename,"recreate")
         self.calibFile.cd()
         self.dataTree.Write()

@@ -33,7 +33,10 @@ EMRBar& EMRBar::operator=(const EMRBar& _emrbar) {
     }
 
     SetBar(_emrbar._bar);
+
+    SetBar(_emrbar._bar);
     SetEMRBarHitArray(_emrbar._emrbarhitarray);
+
     return *this;
 }
 

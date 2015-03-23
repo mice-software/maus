@@ -25,6 +25,7 @@
 
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/GeometryNavigator.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
@@ -96,6 +97,10 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
             process->_recon_field_constructor =
                                  new BTFieldConstructor(process->_recon_mods);
         }
+        G4VPhysicalVolume* world = process->_maus_geant4_manager
+                                               ->GetGeometry()->GetWorldVolume();
+        process->_mc_geometry_navigator = new GeometryNavigator();
+        process->_mc_geometry_navigator->Initialise(world);
     } catch (Exception squee) {
         Globals::_process = NULL;
         delete process;

@@ -114,6 +114,10 @@ class OnlineOkayTest(unittest.TestCase): # pylint: disable=R0904, C0301
         """
         _test_online_okay: Check that maus daq online library imports okay
         """
+        # skip InputCppDAQOnlineTest if unpacker version is StepI
+        if (os.environ['MAUS_UNPACKER_VERSION'] == "StepI"):
+            unittest.TestCase.skipTest(self,
+                                       "Skip - Not testing online for StepI")
         from MAUS import InputCppDAQOnlineData # pylint:disable=E0611,W0612
 
 if __name__ == "__main__":

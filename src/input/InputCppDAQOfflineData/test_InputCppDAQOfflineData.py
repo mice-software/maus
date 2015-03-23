@@ -36,7 +36,17 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # It would be nicer to test with a smaller data file!
         self._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
+        # setup data files for StepI and StepIV
+        # set the checksum and event count accordingly
         self._datafile = '05466'
+        self._numevents = 12
+        self._checksum = 'f699f0d81aee1f64a2f1cec7968b9289'
+        # note that the StepIV file is garbage data as of now
+        # this will have to be updated - DR, March 13, 2015
+        if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
+            self._datafile = '06008'
+            self._numevents = 22
+            self._checksum = '155b3b02e36ea80c0b0dcfad3be7027d'
         config = Configuration().getConfigJSON()
         config_json = json.loads(config)
         config_json["daq_data_path"] = self._datapath
@@ -84,7 +94,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         print event_count
         # We should now have processed 26 events
         #self.assertEqual(event_count, 26)
-        self.assertEqual(event_count, 12)
+        self.assertEqual(event_count, self._numevents)
 
         # Check the md5 sum matches the expected value
         # changed checksum to reflect the run_num addition
@@ -95,7 +105,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         #self.assertEqual(digester.hexdigest(), \
         #                 '2ca9328c6bf981fb242b3d985d226125')
         self.assertEqual(digester.hexdigest(), \
-                         'f699f0d81aee1f64a2f1cec7968b9289')
+                         self._checksum)
 
         self.mapper.death()
 

@@ -19,9 +19,9 @@ GUI handler for setting up a beam
 
 import numpy
 import ROOT
-from xboa.Hit import Hit
+from xboa.hit import Hit
 
-import xboa.Common as Common
+import xboa.common as common
 
 import maus_cpp
 import maus_cpp.field
@@ -102,7 +102,7 @@ class PennSetup:
           alpha_l = self.window.get_text_entry("alpha_l", type(1.)),
           charge = ref["charge"],
           # BUG - multiply by -1 to fix BUG in source code
-          bz = -self.window.get_text_entry("B0", type(1.))*Common.units['T'],
+          bz = -self.window.get_text_entry("B0", type(1.))*common.units['T'],
           ltwiddle = self.window.get_text_entry("Lc", type(1.)),
           dispersion_x = self.window.get_text_entry("disp_x", type(1.)),
           dispersion_prime_x = self.window.get_text_entry("disp_prime_x",
@@ -130,7 +130,7 @@ class PennSetup:
         b_vec = maus_cpp.field.get_field_value(ref['x'], ref['y'], ref['z'],
                                                ref['t'])
         _b0 = (b_vec[0]**2+b_vec[1]**2+b_vec[2]**2)**0.5
-        self.window.set_text_entry('B0', _b0*Common.units['T'])
+        self.window.set_text_entry('B0', _b0*common.units['T'])
 
     def constant_beta_action(self):
         """
@@ -147,7 +147,7 @@ class PennSetup:
         _lc = self.window.get_text_entry("Lc", type(1.)) # kT
         mom = self.beam_setup.get_reference()['p'] # MeV/c
         charge = abs(self.beam_setup.get_reference()['charge']) # eplus
-        beta = (1+_lc**2)**0.5 * 2.*charge*mom/Common.constants['c_light']/_b0
+        beta = (1+_lc**2)**0.5 * 2.*charge*mom/common.constants['c_light']/_b0
         self.window.set_text_entry('alpha_trans', 0.0)
         self.window.set_text_entry('beta_trans', beta) # beta in mm
 
@@ -262,8 +262,8 @@ class BeamSetup:
         pid_dict = self.window.get_frame_dict("pid", "named_text_entry")
         try:
             ref_dict["pid"] = int(pid_dict["text_entry"].text_entry.GetText())
-            ref_dict["mass"] = Common.pdg_pid_to_mass[abs(ref_dict["pid"])]
-            ref_dict["charge"] = Common.pdg_pid_to_charge[abs(ref_dict["pid"])]
+            ref_dict["mass"] = common.pdg_pid_to_mass[abs(ref_dict["pid"])]
+            ref_dict["charge"] = common.pdg_pid_to_charge[abs(ref_dict["pid"])]
         except KeyError:
             raise GuiError("Did not recognise reference particle pid")
         try:

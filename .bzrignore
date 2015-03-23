@@ -65,5 +65,8 @@ files/geometry/ConfigUpload.py
 third_party/source/easy_install/*
 tests/integration/test_simulation/test_tof/tof_mc_plotter
 bin/examples/optics_step-4/*.png
+bin/user/poly_patch/*.png
+bin/user/poly_patch/*.root
+bin/user/poly_patch/poly_patch
 
 src/map/MapPyBeamlineSimulation/G4bl/maps/TypeIBend_6InchGap_tapered.map
