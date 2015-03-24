@@ -22,8 +22,8 @@ import math
 import copy
 import numpy
 
-from xboa.Bunch import Bunch
-import xboa.Common as Common
+from xboa.bunch import Bunch
+import xboa.common as common
 
 from plot_setup import PlotSetup # pylint: disable=W0403, F0401
 
@@ -70,7 +70,7 @@ class Plotter:
             self.get_apertures()
         plot_name = self.var_type+":"+self.first_var
         canvas.cd()
-        hist, graph_list = Common.make_root_multigraph(plot_name,
+        hist, graph_list = common.make_root_multigraph(plot_name,
                                     self.x_var, "z [mm]", self.y_var, plot_name)
         hist.Draw()
         for graph in graph_list:

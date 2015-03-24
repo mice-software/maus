@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-vers="1.5.0"
+vers="1.5.1"
 filename="numpy-${vers}.tar.gz"
 directory="numpy-${vers}"
 url="http://sourceforge.net/projects/numpy/files/NumPy/${vers}/${filename}/download"

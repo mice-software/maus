@@ -20,26 +20,50 @@ Run xboa tests as part of MAUS integration tests
 # pylint: disable=E1101
 
 import unittest
-import ROOT
-import xboa.test.XBOATest
+import subprocess
+import os
+import glob
 
 class TestXBOA(unittest.TestCase): # pylint: disable=R0904
     """
     Run the tests and check they return 0
     """
+    def setUp(self): # pylint: disable = C0103
+        """Set up; skip if no xboa installs found"""
+        self.xboa_test = None
+        self._get_test_target()
+        if self.xboa_test == None:
+            raise unittest.SkipTest("No xboa installed in third party")
 
-    def _test_xboa(self):
+    def _get_test_target(self):
+        """
+        Look for xboa versions in third_party/build of *this* MAUS install;
+        if none found, return, else set self.xboa_test to the most recent
+        version (as determined by folder name)
+        """
+        xboa_path = os.path.expandvars(
+                                    "${MAUS_ROOT_DIR}/third_party/build/*xboa*")
+        xboa_installs = glob.glob(xboa_path)
+        if len(xboa_installs) == 0:
+            # we only run tests if xboa is installed in this setup (rather than
+            # installed from somewhere else)
+            return
+        else:
+            # this loop is supposed to test on the most recent version of xboa
+            # installed in case of multiple versions; or a dev version if it
+            # is available
+            xboa_installs = sorted(xboa_installs)
+            for self.xboa_test in xboa_installs:
+                if "dev" in self.xboa_test:
+                    break
+
+    def test_xboa(self):
         """
         Run the xboa test
         """
-        ROOT.gROOT.SetBatch(True) #pylint: disable=E1101
-        # xboa v0.15.3 does not have a test_all
-        # calling test_old() instead to get pylint tests to pass through
-        # -DR Feb 12 2014
-        # passes, fails, warns = xboa.test.XBOATest.test_all()
-        passes, fails, warns = xboa.test.XBOATest.test_old()
-        self.assertEqual(fails, 0, msg = str((passes, fails, warns)))
-        ROOT.gROOT.SetBatch(False) #pylint: disable=E1101
+        os.chdir(self.xboa_test+"/test")
+        subprocess.check_output(["python", "XBOATest.py"])
+
 
 if __name__ == "__main__":
     unittest.main()

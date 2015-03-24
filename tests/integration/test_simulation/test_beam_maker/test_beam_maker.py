@@ -29,8 +29,8 @@ import math
 import ROOT
 import numpy
 
-from xboa.Bunch import Bunch #pylint: disable=F0401
-import xboa.Common as Common #pylint: disable=F0401
+from xboa.bunch import Bunch #pylint: disable=F0401
+import xboa.common as common #pylint: disable=F0401
 
 
 MAUS_ROOT_DIR = os.getenv("MAUS_ROOT_DIR")
@@ -139,7 +139,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         Check that the default beam parameters run and produce some number of
         primary hits > 0
         """
-        bunch = Bunch.new_from_read_builtin('maus_primary', DEF_SIM)
+        bunch = Bunch.new_from_read_builtin('maus_json_primary', DEF_SIM)
         self.assertTrue(len(bunch) > 0)
 
     def test_binomial(self):
@@ -147,13 +147,13 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         Check that we can generate a binomial distribution for event number
         """
         # make a dict of bunches of xboa.Hits separated by event (spill) number
-        bunch_dict = Bunch.new_dict_from_read_builtin('maus_primary', \
-                          BIN_SIM, 'event_number')
+        bunch_dict = Bunch.new_dict_from_read_builtin('maus_json_primary', \
+                          BIN_SIM, 'spill')
         bunch_weights = []
         for bunch in bunch_dict.values():
             bunch_weights.append(bunch.bunch_weight())
-        canvas = Common.make_root_canvas("")
-        hist = Common.make_root_histogram("generated distribution", \
+        canvas = common.make_root_canvas("")
+        hist = common.make_root_histogram("generated distribution", \
              bunch_weights, "bunch weights", BIN_N+1, xmin=-0.5, xmax=BIN_N+0.5)
         hist.Fill(0, 1000-hist.GetSumOfWeights()) # xboa ignores empty spills
         hist.Draw()
@@ -166,17 +166,17 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         test_hist.SetLineStyle(2)
         test_hist.Draw("SAME")
         ks_value = test_hist.KolmogorovTest(hist)
-        print "binomial ks_value", ks_value
-        self.assertGreater(ks_value, 1e-3)
         canvas.Update()
         canvas.Print(PLOT_DIR+"/binomial_distribution_test.png")
+        print "binomial ks_value", ks_value
+        self.assertGreater(ks_value, 1e-3)
 
     def test_weighting(self):
         """
         Check that the weight of each sub-beam is close to the expected weight
         """
         # make a dict of bunches of xboa.Hits separated by event (spill) number
-        bunch_dict = Bunch.new_dict_from_read_builtin('maus_primary', \
+        bunch_dict = Bunch.new_dict_from_read_builtin('maus_json_primary', \
                           BIN_SIM, 'pid')
         test_weights = {}
         sum_weights = 0
@@ -207,7 +207,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         Check that the weight of each sub-beam is close to the expected weight
         """
         # make a dict of bunches of xboa.Hits separated by event (spill) number
-        bunch = Bunch.new_dict_from_read_builtin('maus_primary', \
+        bunch = Bunch.new_dict_from_read_builtin('maus_json_primary', \
                           BIN_SIM, 'pid')[-13]
         for key, value in {'energy':226.0, 'z':3.0, 'x':0., 'y':0., \
                            'px':0., 'py':0.}.iteritems():
@@ -233,7 +233,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         """
         Check that no nans appear
         """
-        bunch = Bunch.new_from_read_builtin('maus_primary', NAN_SIM)
+        bunch = Bunch.new_from_read_builtin('maus_json_primary', NAN_SIM)
         self.assertAlmostEqual(bunch.bunch_weight(), 1000.)
         for hit in bunch:
             self.assertFalse(math.isnan(hit['energy']))
@@ -259,7 +259,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         """
         Check that beam maker generates sawtooth t distribution correctly
         """
-        bunch = Bunch.new_dict_from_read_builtin('maus_primary', \
+        bunch = Bunch.new_dict_from_read_builtin('maus_json_primary', \
                           BIN_SIM, 'pid')[-13]
         canvas, hist = bunch.root_histogram('t', 'ns', xmin=-1e6, xmax=1e6)
         cmp_hist = ROOT.TH1D("test", "test", hist.GetNbinsX(), -1e6, 1e6) # pylint: disable = E1101, C0301
@@ -279,7 +279,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         """
         Check that beam maker generates uniform t distribution correctly
         """
-        bunch = Bunch.new_dict_from_read_builtin('maus_primary', \
+        bunch = Bunch.new_dict_from_read_builtin('maus_json_primary', \
                           BIN_SIM, 'pid')[-11]
         canvas, hist = bunch.root_histogram('t', 'ns', xmin=-2e6, xmax=1e6)
         cmp_hist = ROOT.TH1D("uniform_tst", "test", hist.GetNbinsX(), -2e6, 1e6) # pylint: disable = E1101, C0301
@@ -301,7 +301,7 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         Check that beam maker generates uniform t distribution correctly
         """
         print "loading ap"
-        bunch = Bunch.new_from_read_builtin('maus_primary', AP_SIM)
+        bunch = Bunch.new_from_read_builtin('maus_json_primary', AP_SIM)
         print "doing ap"
         ref_p = 100. # update momentum in datacards as well
         p_list = [hit['pz']-ref_p for hit in bunch]
@@ -313,9 +313,9 @@ class BeamMakerTest(unittest.TestCase): # pylint: disable = R0904
         print "mean ratio:", p_a_mean, "sigma ratio:", p_a_sigma
         self.assertLess(abs(p_a_mean-0.001), 0.0002)
         self.assertLess(abs(p_a_sigma), 1e-5)
-        canvas = Common.make_root_canvas("a-p correlation")
+        canvas = common.make_root_canvas("a-p correlation")
         canvas.Draw()
-        hist, graph = Common.make_root_graph('a-p correlation',
+        hist, graph = common.make_root_graph('a-p correlation',
                                              p_list, "dp_{z} [MeV/c]",
                                              amp_list, "A_{trans} [mm]")
         hist.Draw()

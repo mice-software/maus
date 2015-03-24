@@ -663,6 +663,8 @@ void MapCppEMRRecon::fill(Spill *spill,
       plHit->SetEMRBarArraySecondary(barArraySecondary);
       if (barArray.size() || barArrayPrimary.size() || barArraySecondary.size() || xCharge) {
 	plArray.push_back(plHit);
+      } else {
+        delete plHit;
       }
     }
     evt->SetEMRPlaneHitArray(plArray);

@@ -24,7 +24,7 @@ GUI handler for setting up a plot
 
 import ROOT
 
-from xboa.Hit import Hit
+from xboa.hit import Hit
 
 from gui.window import Window
 from gui.window import GuiError

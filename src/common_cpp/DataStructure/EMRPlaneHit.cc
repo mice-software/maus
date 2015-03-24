@@ -39,24 +39,35 @@ EMRPlaneHit::EMRPlaneHit(const EMRPlaneHit& _emrplanehit)
 }
 
 EMRPlaneHit& EMRPlaneHit::operator=(const EMRPlaneHit& _emrplanehit) {
-    if (this == &_emrplanehit) {
-        return *this;
-    }
-    SetPlane(_emrplanehit._plane);
-    SetOrientation(_emrplanehit._orientation);
-    SetEMRBarArray(_emrplanehit._emrbararray);
-    SetEMRBarArrayPrimary(_emrplanehit._emrbararray_primary);
-    SetEMRBarArraySecondary(_emrplanehit._emrbararray_secondary);
-    SetCharge(_emrplanehit._charge);
-    SetChargeCorrected(_emrplanehit._charge_corrected);
-    SetPedestalArea(_emrplanehit._pedestal_area);
-    SetTime(_emrplanehit._time);
-    SetSpill(_emrplanehit._spill);
-    SetTrigger(_emrplanehit._trigger);
-    SetRun(_emrplanehit._run);
-    SetDeltaT(_emrplanehit._deltat);
-    SetSamples(_emrplanehit._samples);
+  if (this == &_emrplanehit) {
     return *this;
+  }
+  SetPlane(_emrplanehit._plane);
+  SetOrientation(_emrplanehit._orientation);
+
+  this->_emrbararray = _emrplanehit._emrbararray;
+  for (size_t i = 0; i < this->_emrbararray.size(); ++i)
+    this->_emrbararray[i] = new EMRBar(*this->_emrbararray[i]);
+
+  this->_emrbararray_primary = _emrplanehit._emrbararray_primary;
+  for (size_t i = 0; i < this->_emrbararray_primary.size(); ++i)
+    this->_emrbararray_primary[i] = new EMRBar(*this->_emrbararray_primary[i]);
+
+  this->_emrbararray_secondary = _emrplanehit._emrbararray_secondary;
+  for (size_t i = 0; i < this->_emrbararray_secondary.size(); ++i)
+    this->_emrbararray_secondary[i] = new EMRBar(*this->_emrbararray_secondary[i]);
+
+  SetCharge(_emrplanehit._charge);
+  SetChargeCorrected(_emrplanehit._charge_corrected);
+  SetPedestalArea(_emrplanehit._pedestal_area);
+  SetTime(_emrplanehit._time);
+  SetSpill(_emrplanehit._spill);
+  SetTrigger(_emrplanehit._trigger);
+  SetRun(_emrplanehit._run);
+  SetDeltaT(_emrplanehit._deltat);
+  SetSamples(_emrplanehit._samples);
+
+  return *this;
 }
 
 EMRPlaneHit::~EMRPlaneHit() {
@@ -65,6 +76,18 @@ EMRPlaneHit::~EMRPlaneHit() {
     delete _emrbararray[i];
 
   _emrbararray.resize(0);
+
+  nbars = _emrbararray_primary.size();
+  for (int i = 0; i < nbars; i++)
+    delete _emrbararray_primary[i];
+
+  _emrbararray_primary.resize(0);
+
+  nbars = _emrbararray_secondary.size();
+  for (int i = 0; i < nbars; i++)
+    delete _emrbararray_secondary[i];
+
+  _emrbararray_secondary.resize(0);
 }
 
 int EMRPlaneHit::GetPlane() const {
