@@ -487,7 +487,8 @@ class Formatter: #pylint: disable = R0902
                 self.format_gdml_locations(module)
                 self.insert_materials_ref(self.txt_file)
             print "Formatted module files"
-    
+
+        self.stepfiles.extend(self.detmodulefiles)
         noofstepfiles = len(self.stepfiles)
         for num in range(0, noofstepfiles):
             self.format_check(self.stepfiles[num])
