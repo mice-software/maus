@@ -9,7 +9,8 @@ my_destdir=${MAUS_ROOT_DIR}/third_party
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
+    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ] && 
+       [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5" ]
     then
 	echo "INFO: Found source archive in 'source' directory"
     else

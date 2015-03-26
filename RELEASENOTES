@@ -5,7 +5,15 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.4
+  The following changes were made:
+    - StepIV unpacker added, StepI unpacker remains the default
+    - Geometry navigator for GEANT4 added
+    - EMR updates
+  If upgrading from a previous version, please redo the entire installation
 MAUS-v0.9.3
+  The following changes were made:
+    - Documentation - Doxygen fix
   The following changes were made:
     - Documentation - Doxygen fix
     - G4Beamline - a few updates, including to the deck
