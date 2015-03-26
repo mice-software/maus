@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-directory=xerces-c-3.1.1
+directory=xerces-c-3.1.2
 filename=${directory}.tar.gz 
 url=http://apache.mirror.anlx.net//xerces/c/3/sources/${filename}
 
