@@ -23,7 +23,6 @@ Check that the extraction and processing of a set of GDML files will work
 import time
 import unittest
 import subprocess
-import glob
 import os
 import shutil
 
@@ -31,20 +30,23 @@ from geometry.CADModuleExtraction import CADModuleExtraction
 from geometry.GDMLFormatter import Formatter
 from geometry.GDMLtoMAUSModule import GDMLtomaus
 
+
+# pylint: disable = C0103, R0904, R0915, R0912, C0202
+
 TMP_DIR = os.environ.get("MAUS_TMP_DIR")
 ROOT_DIR = os.environ.get("MAUS_ROOT_DIR")
-SOURCEGDML = os.path.join(ROOT_DIR,\
+SOURCEGDML = os.path.join(ROOT_DIR, \
                           "tests/integration/test_utilities/"+\
                           "test_gdml_processing/examples/"+\
                           "Step_IV_Raw/Step_IV.gdml") 
-SOURCEINFO = os.path.join(ROOT_DIR,\
+SOURCEINFO = os.path.join(ROOT_DIR, \
                           "tests/integration/test_utilities/"+\
                           "test_gdml_processing/examples/"+\
                           "Step_IV_Raw/Maus_Information.gdml") 
-DSTNTN_DIR = os.path.join(TMP_DIR,"test_gdml_extraction")
+DSTNTN_DIR = os.path.join(TMP_DIR, "test_gdml_extraction")
 OUT_PARENT_GDML = "Step_IV"
-FORMAT_GDML_DIR = os.path.join(TMP_DIR,"test_gdml_formatted")
-PARENT_MODULE_FILE = os.path.join(FORMAT_GDML_DIR,\
+FORMAT_GDML_DIR = os.path.join(TMP_DIR, "test_gdml_formatted")
+PARENT_MODULE_FILE = os.path.join(FORMAT_GDML_DIR, \
                                   "ParentGeometryFile.dat")
 
 
@@ -56,10 +58,11 @@ def run_extraction():
     if os.path.exists(DSTNTN_DIR):
         shutil.rmtree(DSTNTN_DIR)
     os.mkdir(DSTNTN_DIR)
-    ext = CADModuleExtraction(SOURCEGDML, SOURCEINFO, DSTNTN_DIR, OUT_PARENT_GDML)
+    ext = CADModuleExtraction(SOURCEGDML, SOURCEINFO, \
+                              DSTNTN_DIR, OUT_PARENT_GDML)
 
     ext.EditMaterials()
-    ext.SelectModuleByPosition()
+    ext.select_module_by_position()
     
     gdmls = [x for x in os.listdir(DSTNTN_DIR) \
              if x.find("_ed.gdml") >= 0]
@@ -87,11 +90,14 @@ def run_formatting():
     
     
 def run_test_sim():
+    """
+    Run a short simulation of the channel
+    """
     
     test_dir = os.path.expandvars("${MAUS_ROOT_DIR}/bin/simulate_mice.py")
     print test_dir
     out_file = os.path.join(FORMAT_GDML_DIR, "maus_gdml_test.root")
-    args = [test_dir,\
+    args = [test_dir, \
             '-simulation_geometry_filename', PARENT_MODULE_FILE, \
             '-output_root_file_name', out_file]
     
@@ -110,10 +116,15 @@ class GDMLProcessingTestCase(unittest.TestCase):
     """
     @classmethod
     def test_gdml_processing(self):
+        """
+        @Method test_gdml_processing
+
+        Generate a set of gdml files, format the files, and run a quick simulation with those files.
+        """
         run_extraction()
         run_formatting()
-        retcode = run_test_sim()
+        run_test_sim()
                
 
-if __name__== "__main__":
+if __name__ == "__main__":
     unittest.main()
