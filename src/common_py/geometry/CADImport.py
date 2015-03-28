@@ -550,7 +550,7 @@ class CADImport: #pylint: disable = R0903, C0103
                 # Access the physical volumes defined within the parent
                 physvol = vol.xpathEval("physvol")
                 # print "found Sens Det", foundSensDet
-                if foundSensDet=='SciFi' or foundSensDet == 'KL' \
+                if foundSensDet == 'SciFi' or foundSensDet == 'KL' \
                        or moduleName.find('KLGlue') >= 0:
                     continue
                 for elem in physvol:
@@ -648,6 +648,7 @@ class CADImport: #pylint: disable = R0903, C0103
                         volumenumber += 1
 
     def TrackerPlaneParametrization(self):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103, C0301
         '''
         
         @Method TrackerPlaneParametrization to add plane
@@ -672,7 +673,6 @@ class CADImport: #pylint: disable = R0903, C0103
             auxlist = []
             solid_ref = ''
             mater_ref = ''
-            newfile_name = '' 
             doubletThickness = 0.0
             trackerRadius    = 0.0
             volumefound = 0
@@ -689,14 +689,15 @@ class CADImport: #pylint: disable = R0903, C0103
                     # Get the material reference name
                     mater_ref = instance.xpathEval("materialref")
             if volumefound == 0:
-                print 'Warning: did not find volume ',viewName
+                print 'Warning: did not find volume ', viewName
                 continue
             # solids = structure[0].xpathEval("solid")
             print solid_ref[0].prop('ref')
             for instance in solids[0].xpathEval("tube"):
                 # get the tracker view solid
                 if instance.prop('name') == solid_ref[0].prop('ref'):
-                    print instance.prop('name'), instance.prop('rmax'), instance.prop('z')
+                    print instance.prop('name'), instance.prop('rmax'), \
+                          instance.prop('z')
                     doubletThickness = float(instance.prop('z'))
                     trackerRadius   = float(instance.prop('rmax'))
             material = mater_ref[0].prop("ref")
@@ -721,9 +722,9 @@ class CADImport: #pylint: disable = R0903, C0103
                     coreDiameter = float(elem.prop('auxvalue'))
                 if elem.prop('auxtype') == 'CentralFibre':
                     centralFibre = float(elem.prop('auxvalue'))
-            print "ActiveRadius = ",activeRadius,", Pitch = ",fibrePitch, \
-                  ", FibreDiameter = ",fibreDiameter,", CoreDiameter = ",\
-                  coreDiameter,",CentralFibre = ",centralFibre
+            print "ActiveRadius = ", activeRadius, ", Pitch = ", fibrePitch, \
+                  ", FibreDiameter = ", fibreDiameter, ", CoreDiameter = ",\
+                  coreDiameter, ",CentralFibre = ", centralFibre
             datafile.freeDoc()
             # the important variables are now loaded and the new volumes
             # can be defined. Start by defining the plane solid.
@@ -732,9 +733,9 @@ class CADImport: #pylint: disable = R0903, C0103
             root = libxml2.newNode("gdml")
             doc.setRootElement(root)
             # Register the gdml namespace
-            ns = root.newNs('http://www.w3.org/2001/XMLSchema-instance','xsi')
+            ns = root.newNs('http://www.w3.org/2001/XMLSchema-instance', 'xsi')
             root.setNs(ns)
-            root.setNsProp(ns,'noNamespaceSchemaLocation',\
+            root.setNsProp(ns, 'noNamespaceSchemaLocation', \
                            "http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd")
             defNode = libxml2.newNode('define')
             root.addChild(defNode)
@@ -742,12 +743,12 @@ class CADImport: #pylint: disable = R0903, C0103
             # Hydrogen
             
             H1 = libxml2.newNode("isotope")
-            H1.setProp("name",'H10')
-            H1.setProp('N','1')
-            H1.setProp('Z','1')
+            H1.setProp("name", 'H10')
+            H1.setProp('N', '1')
+            H1.setProp('Z', '1')
             atomH1 = libxml2.newNode("atom")
-            atomH1.setProp("unit","g/mole")
-            atomH1.setProp("value","1.00782503081372")
+            atomH1.setProp("unit", "g/mole")
+            atomH1.setProp("value", "1.00782503081372")
             H1.addChild(atomH1)
             matNode.addChild(H1)
             H2 = libxml2.newNode("isotope")
@@ -755,49 +756,49 @@ class CADImport: #pylint: disable = R0903, C0103
             H2.setProp('N','2')
             H2.setProp('Z','1')
             atomH2 = libxml2.newNode("atom")
-            atomH2.setProp("unit","g/mole")
-            atomH2.setProp("value","2.01410199966617")
+            atomH2.setProp("unit", "g/mole")
+            atomH2.setProp("value", "2.01410199966617")
             H2.addChild(atomH2)
             matNode.addChild(H2)
             H0 = libxml2.newNode("element")
             H0.setProp("name","H0")
             h0frach1 = libxml2.newNode("fraction")
-            h0frach1.setProp("n","0.999885")
-            h0frach1.setProp("ref","H10")
+            h0frach1.setProp("n", "0.999885")
+            h0frach1.setProp("ref", "H10")
             H0.addChild(h0frach1)
             h0frach2 = libxml2.newNode("fraction")
-            h0frach2.setProp("n","0.000115")
-            h0frach2.setProp("ref","H20")
+            h0frach2.setProp("n", "0.000115")
+            h0frach2.setProp("ref", "H20")
             H0.addChild(h0frach2)
             matNode.addChild(H0)
             #Carbon
             C12 = libxml2.newNode("isotope")
-            C12.setProp("name",'C12')
-            C12.setProp('N','12')
-            C12.setProp('Z','6')
+            C12.setProp("name", 'C12')
+            C12.setProp('N', '12')
+            C12.setProp('Z', '6')
             atomC12 = libxml2.newNode("atom")
-            atomC12.setProp("unit","g/mole")
-            atomC12.setProp("value","12")
+            atomC12.setProp("unit", "g/mole")
+            atomC12.setProp("value", "12")
             C12.addChild(atomC12)
             matNode.addChild(C12)
             C13 = libxml2.newNode("isotope")
-            C13.setProp("name",'C13')
-            C13.setProp('N','13')
-            C13.setProp('Z','6')
+            C13.setProp("name", 'C13')
+            C13.setProp('N', '13')
+            C13.setProp('Z', '6')
             atomC13 = libxml2.newNode("atom")
-            atomC13.setProp("unit","g/mole")
-            atomC13.setProp("value","13.0034")
+            atomC13.setProp("unit", "g/mole")
+            atomC13.setProp("value", "13.0034")
             C13.addChild(atomC13)
             matNode.addChild(C13)
             C0 = libxml2.newNode("element")
-            C0.setProp("name","C0")
+            C0.setProp("name", "C0")
             c0frach12 = libxml2.newNode("fraction")
-            c0frach12.setProp("n","0.9893")
-            c0frach12.setProp("ref","C12")
+            c0frach12.setProp("n", "0.9893")
+            c0frach12.setProp("ref", "C12")
             C0.addChild(c0frach12)
             c0frach13 = libxml2.newNode("fraction")
-            c0frach13.setProp("n","0.0107")
-            c0frach13.setProp("ref","C13")
+            c0frach13.setProp("n", "0.0107")
+            c0frach13.setProp("ref", "C13")
             C0.addChild(c0frach13)
             matNode.addChild(C0)
             # now define polystyrene as a material
@@ -805,20 +806,20 @@ class CADImport: #pylint: disable = R0903, C0103
             matpoly.setProp("name", "POLYSTYRENE")
             matpoly.setProp("state", "solid")
             MEE = libxml2.newNode("MEE")
-            MEE.setProp("unit","eV")
-            MEE.setProp('value','68.7')
+            MEE.setProp("unit", "eV")
+            MEE.setProp('value', '68.7')
             matpoly.addChild(MEE)
             dens = libxml2.newNode('D')
-            dens.setProp('unit','g/cm3')
-            dens.setProp('value','1.06')
+            dens.setProp('unit', 'g/cm3')
+            dens.setProp('value', '1.06')
             matpoly.addChild(dens)
             fracH0 = libxml2.newNode('fraction')
-            fracH0.setProp('n','0.077418')
-            fracH0.setProp('ref','H0')
+            fracH0.setProp('n', '0.077418')
+            fracH0.setProp('ref', 'H0')
             matpoly.addChild(fracH0)
             fracC0 = libxml2.newNode('fraction')
-            fracC0.setProp('n','0.922582')
-            fracC0.setProp('ref','C0')
+            fracC0.setProp('n', '0.922582')
+            fracC0.setProp('ref', 'C0')
             matpoly.addChild(fracC0)
             matNode.addChild(matpoly)
             # copy all material nodes to the new document
@@ -830,53 +831,53 @@ class CADImport: #pylint: disable = R0903, C0103
             solidNode = libxml2.newNode('solids')
             # A node to define the solid for the scifi plane
             planeNode = libxml2.newNode("tube")
-            planeNode.setProp("name",viewName + "Doublet_simple")
-            planeNode.setProp("rmax",str(trackerRadius))
-            planeNode.setProp("z",str(doubletThickness))
-            planeNode.setProp("lunit","cm")
-            planeNode.setProp("aunit","degree")
-            planeNode.setProp("deltaphi","360")
+            planeNode.setProp("name", viewName + "Doublet_simple")
+            planeNode.setProp("rmax", str(trackerRadius))
+            planeNode.setProp("z", str(doubletThickness))
+            planeNode.setProp("lunit", "cm")
+            planeNode.setProp("aunit", "degree")
+            planeNode.setProp("deltaphi", "360")
             # add the plane to the set of solid objects
             solidNode.addChild(planeNode)
             # create a dummy volume to facilitate the creation of a rotated solid
             sphereNode = libxml2.newNode("sphere")
-            sphereNode.setProp("name","dummy_solid")
-            sphereNode.setProp("rmax",str(coreDiameter/2.))
-            sphereNode.setProp("lunit","mm")
-            sphereNode.setProp("deltaphi","10.0")
-            sphereNode.setProp("deltatheta","10.0")
-            sphereNode.setProp("aunit","degree")
+            sphereNode.setProp("name", "dummy_solid")
+            sphereNode.setProp("rmax", str(coreDiameter/2.))
+            sphereNode.setProp("lunit", "mm")
+            sphereNode.setProp("deltaphi", "10.0")
+            sphereNode.setProp("deltatheta", "10.0")
+            sphereNode.setProp("aunit", "degree")
             solidNode.addChild(sphereNode)
             # Combine and rotate the tracker plane
             subnode = libxml2.newNode("subtraction")
-            subnode.setProp("name",viewName + "Doublet_solid")
+            subnode.setProp("name", viewName + "Doublet_solid")
             firstnode = libxml2.newNode("first")
-            firstnode.setProp("ref",viewName + "Doublet_simple")
+            firstnode.setProp("ref", viewName + "Doublet_simple")
             subnode.addChild(firstnode)
             secondnode = libxml2.newNode("second")
-            secondnode.setProp("ref","dummy_solid")
+            secondnode.setProp("ref", "dummy_solid")
             subnode.addChild(secondnode)
             firstpos = libxml2.newNode("firstposition")
-            firstpos.setProp("name","firstpos")
-            firstpos.setProp("x","0.0")
-            firstpos.setProp("y","0.0")
-            firstpos.setProp("z","0.0")
-            firstpos.setProp("unit","mm")
+            firstpos.setProp("name", "firstpos")
+            firstpos.setProp("x", "0.0")
+            firstpos.setProp("y", "0.0")
+            firstpos.setProp("z", "0.0")
+            firstpos.setProp("unit", "mm")
             firstrot = libxml2.newNode("firstrotation")
-            firstrot.setProp("name","firstpos")
-            firstrot.setProp("x","-90.0")
-            firstrot.setProp("y","0.0")
-            firstrot.setProp("z","0.0")
+            firstrot.setProp("name", "firstpos")
+            firstrot.setProp("x", "-90.0")
+            firstrot.setProp("y", "0.0")
+            firstrot.setProp("z", "0.0")
             subnode.addChild(firstrot)
             solidNode.addChild(subnode)
             # Now create a temporary scifi object
             sciFibreNode = libxml2.newNode("tube")
             sciFibreNode.setProp("name", viewName + "DoubletCores_solid")
             sciFibreNode.setProp("rmax", str(coreDiameter/2.))
-            sciFibreNode.setProp("z","1.0")
-            sciFibreNode.setProp("lunit","mm")
-            sciFibreNode.setProp("aunit","degree")
-            sciFibreNode.setProp("deltaphi","360")
+            sciFibreNode.setProp("z", "1.0")
+            sciFibreNode.setProp("lunit", "mm")
+            sciFibreNode.setProp("aunit", "degree")
+            sciFibreNode.setProp("deltaphi", "360")
             # add the fibre to the set of solid objects
             solidNode.addChild(sciFibreNode)
             root.addChild(solidNode)
@@ -898,17 +899,17 @@ class CADImport: #pylint: disable = R0903, C0103
             # auxdet1.setProp("auxvalue","SciFi")
             # fibreVol.addChild(auxdet1)
             auxvis1 = libxml2.newNode("auxiliary")
-            auxvis1.setProp("auxtype","Invisible")
-            auxvis1.setProp("auxvalue","1")
+            auxvis1.setProp("auxtype", "Invisible")
+            auxvis1.setProp("auxvalue", "1")
             fibreVol.addChild(auxvis1)
             auxstep1 = libxml2.newNode("auxiliary")
-            auxstep1.setProp("auxtype","G4StepMax")
-            auxstep1.setProp("auxvalue","0.1")
+            auxstep1.setProp("auxtype", "G4StepMax")
+            auxstep1.setProp("auxvalue", "0.1")
             fibreVol.addChild(auxstep1)
             structNode.addChild(fibreVol)
             # define the plane volume
             planeVol = libxml2.newNode("volume")
-            planeVol.setProp("name",viewName + "Doublet")
+            planeVol.setProp("name", viewName + "Doublet")
             matrefpV = libxml2.newNode("materialref")
             matrefpV.setProp("ref", material)
             planeVol.addChild(matrefpV)
@@ -924,9 +925,9 @@ class CADImport: #pylint: disable = R0903, C0103
             ppspV = libxml2.newNode("parameterised_position_size")
             paramNode = []
             posNode   = []
-            rotNode   = []
+            # rotNode   = []
             tubedim   = []
-            for i in range(1,int(numFibres)+1):
+            for i in range(1, int(numFibres)+1):
                 paramNode.append(libxml2.newNode("parameters"))
                 paramNode[-1].setProp("number", str(i))
                 posNode.append(libxml2.newNode("position"))
@@ -938,7 +939,7 @@ class CADImport: #pylint: disable = R0903, C0103
                 posNode[-1].setProp("z", "0.0")
                 spacing = math.sqrt(fibreDiameter*fibreDiameter*(1-fp*fp/4.))
                 zpos = 0.5*spacing
-                if i%2:
+                if i % 2:
                     zpos = -0.5*spacing
                 posNode[-1].setProp("y", str(zpos))
                 #rotNode.append(libxml2.newNode("rotation"))
@@ -949,15 +950,15 @@ class CADImport: #pylint: disable = R0903, C0103
                 paramNode[-1].addChild(posNode[-1])
                 # paramNode[-1].addChild(rotNode[-1])
                 tubedim.append(libxml2.newNode("tube_dimensions"))
-                tubedim[-1].setProp("InR","0.0")
+                tubedim[-1].setProp("InR", "0.0")
                 tubedim[-1].setProp("OutR", str(coreDiameter/2.))
                 if activeRadius > math.fabs(xpos):
                     hz = math.sqrt(activeRadius*activeRadius - xpos*xpos)
                 tubedim[-1].setProp("hz", str(2.0*hz))
-                tubedim[-1].setProp("lunit","mm")
-                tubedim[-1].setProp("StartPhi","0.0")
-                tubedim[-1].setProp("DeltaPhi","360.0")
-                tubedim[-1].setProp("aunit","degree")
+                tubedim[-1].setProp("lunit", "mm")
+                tubedim[-1].setProp("StartPhi", "0.0")
+                tubedim[-1].setProp("DeltaPhi", "360.0")
+                tubedim[-1].setProp("aunit", "degree")
                 paramNode[-1].addChild(tubedim[-1])
                 ppspV.addChild(paramNode[-1])
             paramVol.addChild(ppspV)
@@ -965,21 +966,21 @@ class CADImport: #pylint: disable = R0903, C0103
             # create an auxiliary object to contain the visualization and
             # sensitive detector information
             auxvis2 = libxml2.newNode("auxiliary")
-            auxvis2.setProp("auxtype","Invisible")
-            auxvis2.setProp("auxvalue","1")
+            auxvis2.setProp("auxtype", "Invisible")
+            auxvis2.setProp("auxvalue", "1")
             planeVol.addChild(auxvis2)
             auxstep2 = libxml2.newNode("auxiliary")
-            auxstep2.setProp("auxtype","G4StepMax")
-            auxstep2.setProp("auxvalue","0.1")
+            auxstep2.setProp("auxtype", "G4StepMax")
+            auxstep2.setProp("auxvalue", "0.1")
             planeVol.addChild(auxstep2)
             structNode.addChild(planeVol)
             root.addChild(structNode)
             # Now the setup node needs to be added
             setup = libxml2.newNode("setup")
-            setup.setProp("name","Default")
-            setup.setProp("version","1.0")
+            setup.setProp("name", "Default")
+            setup.setProp("version", "1.0")
             world = libxml2.newNode("world")
-            world.setProp("ref",viewName + "Doublet")
+            world.setProp("ref", viewName + "Doublet")
             setup.addChild(world)
             root.addChild(setup)
             

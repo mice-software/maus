@@ -25,8 +25,7 @@ from geometry.ConfigReader import Configreader
 SCHEMA_PATH = os.environ["MAUS_ROOT_DIR"]+\
               "/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd"
 
-# pylint: disable = C0103, R0915
-class Formatter: #pylint: disable = R0902
+class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
     """
     @Class formatter this class formats the raw outputted fastrad files so their
            schema material file paths are correct
@@ -122,7 +121,8 @@ class Formatter: #pylint: disable = R0902
         else:
             info = libxml2.parseFile(os.path.join(self.path_in,
                                                   self.maus_information_file))
-            if len(info.xpathEval("MICE_Information/Other_Information/Module")) > 0:
+            if len(info.xpathEval(\
+                "MICE_Information/Other_Information/Module")) > 0:
                 self.usegdml = True
                     
     def format_schema_location(self, gdmlfile):
@@ -151,7 +151,7 @@ class Formatter: #pylint: disable = R0902
         of the file names to absolute paths.
         """
         docfile = os.path.join(self.path_in, gdmlfile)
-        print "Reviewing content of ",docfile
+        print "Reviewing content of ", docfile
         xmldoc = libxml2.parseFile(docfile)
         for vol in xmldoc.xpathEval("gdml/structure/volume/physvol"):
             if len(vol.xpathEval("file")) > 0:
@@ -160,11 +160,11 @@ class Formatter: #pylint: disable = R0902
                 if filename.find(self.path_in) == -1:
                     # add the path to the name
                     newname = os.path.join(self.path_in, filename)
-                    print "Replacing ",filename," with ",newname
+                    print "Replacing ", filename, " with ", newname
                     filenode.setProp("name", newname)
-        f = open(os.path.join(self.path_out, gdmlfile),'w')
-        xmldoc.saveTo(f)
-        f.close()
+        gfile = open(os.path.join(self.path_out, gdmlfile),'w')
+        xmldoc.saveTo(gfile)
+        gfile.close()
         xmldoc.freeDoc()
 
     def correct_gdml_locations(self, gdmlfile):
@@ -487,7 +487,8 @@ class Formatter: #pylint: disable = R0902
                 self.format_gdml_locations(module)
                 self.insert_materials_ref(self.txt_file)
             print "Formatted module files"
-    
+
+        self.stepfiles.extend(self.detmodulefiles)
         noofstepfiles = len(self.stepfiles)
         for num in range(0, noofstepfiles):
             self.format_check(self.stepfiles[num])
@@ -509,17 +510,21 @@ class Formatter: #pylint: disable = R0902
         
         mausInfo = libxml2.parseFile(os.path.join(self.path_in, \
                                                   self.maus_information_file))
-        runInfo = mausInfo.xpathEval("MICE_Information/Configuration_Information/run")
+        runInfo = mausInfo.xpathEval(\
+            "MICE_Information/Configuration_Information/run")
         diffuserSetting = []
         if len(runInfo) > 0:
             diffuserSetting.append(runInfo.prop("diffusetThickness"))
         # check the possible keys for suspected
-        modulekeys = mausInfo.xpathEval("MICE_Information/Other_Information/Module")
-        keynode = next(x for x in modulekeys if x.prop('name').find('SolenoidUS') >= 0 \
+        modulekeys = mausInfo.xpathEval(\
+            "MICE_Information/Other_Information/Module")
+        keynode = next(x for x in \
+                       modulekeys if x.prop('name').find('SolenoidUS') >= 0 \
                        or x.prop('name').find('Cooling_Channel') >= 0)
         key = keynode.prop('name')
-        range = [float(keynode.prop('zmin')), float(keynode.prop('zmax'))]
-        diffuser = mausInfo.xpathEval("MICE_Information/Detector_Information/Diffuser")
+        modrange = [float(keynode.prop('zmin')), float(keynode.prop('zmax'))]
+        diffuser = mausInfo.xpathEval(\
+            "MICE_Information/Detector_Information/Diffuser")
 
         targetname = os.path.join(self.path_in, key+".gdml")
         print targetname
@@ -530,61 +535,65 @@ class Formatter: #pylint: disable = R0902
         for iris in diffuser:
             # extract the iris number, position and rotation
             inum = int(iris.xpathEval("Iris")[0].prop("name"))
-            pos =[float(iris.xpathEval("Position")[0].prop("x")),\
-                  float(iris.xpathEval("Position")[0].prop("y")),\
-                  float(iris.xpathEval("Position")[0].prop("z"))]
+            pos = [float(iris.xpathEval("Position")[0].prop("x")), \
+                   float(iris.xpathEval("Position")[0].prop("y")), \
+                   float(iris.xpathEval("Position")[0].prop("z"))]
             
-            print key, pos[2], range
-            pos[2] = pos[2] - (range[1] + range[0])/2.
-            print key, pos[2], range
+            print key, pos[2], modrange
+            pos[2] = pos[2] - (modrange[1] + modrange[0])/2.
+            print key, pos[2], modrange
             posUnit = iris.xpathEval("Position")[0].prop("unit")
-            rot =[float(iris.xpathEval("Rotation")[0].prop("x")),\
-                  float(iris.xpathEval("Rotation")[0].prop("y")),\
-                  float(iris.xpathEval("Rotation")[0].prop("z"))]
+            rot = [float(iris.xpathEval("Rotation")[0].prop("x")), \
+                   float(iris.xpathEval("Rotation")[0].prop("y")), \
+                   float(iris.xpathEval("Rotation")[0].prop("z"))]
             rotUnit = iris.xpathEval("Rotation")[0].prop("unit")
             newNode = libxml2.newNode("physvol")
             fileNode = libxml2.newNode("file")
             if len(diffuserSetting) > 0: # test of whether the statement exists.
                 print "Using diffuser setting ", diffuserSetting[0]
-                if (inum==1 and diffuserSetting[0]%2==0) or \
-                       (inum==2 and (diffuserSetting[0]%4==0 or diffuserSetting[0]%4==1)) or \
-                       (inum==3 and (diffuserSetting[0]<4 or
-                                     (diffuserSetting[0]>=8 and diffuserSetting[0]<12))) or \
-                       (inum==4 and diffuserSetting[0]<8):
-                    newNode.setProp("name", "iris"+str(inum))
-                    fileNode.setProp("name", "iris"+str(inum)+"_open.gdml")
+                if (inum == 1 and diffuserSetting[0] % 2 == 0) or \
+                       (inum == 2 and (diffuserSetting[0] % 4 == 0 or \
+                                     diffuserSetting[0] % 4 == 1)) or \
+                       (inum == 3 and (diffuserSetting[0] < 4 or
+                                     (diffuserSetting[0] >= 8 and \
+                                      diffuserSetting[0] < 12))) or \
+                       (inum == 4 and diffuserSetting[0] < 8):
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + "_open.gdml")
                 else:
-                    newNode.setProp("name", "iris"+str(inum))
-                    fileNode.setProp("name", "iris"+str(inum)+"_closed.gdml")
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + \
+                                     "_closed.gdml")
             else:
-                if inum==2 or inum==3:
-                    print "Iris ",inum," default closed introduced."
-                    newNode.setProp("name", "iris"+str(inum))
-                    fileNode.setProp("name", "iris"+str(inum)+"_closed.gdml")
+                if inum == 2 or inum == 3:
+                    print "Iris ", inum, " default closed introduced."
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + \
+                                     "_closed.gdml")
                 else:
-                    print "Iris ",inum," default open introduced."
-                    newNode.setProp("name", "iris"+str(inum))
-                    fileNode.setProp("name", "iris"+str(inum)+"_open.gdml")
+                    print "Iris ", inum, " default open introduced."
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + "_open.gdml")
             newNode.addChild(fileNode)
             posNode = libxml2.newNode("position")
-            posNode.setProp("name","posRef_iris_"+str(inum))
-            posNode.setProp("x",str(pos[0]))
-            posNode.setProp("y",str(pos[1]))
-            posNode.setProp("z",str(pos[2]))
-            posNode.setProp("unit",posUnit)
+            posNode.setProp("name", "posRef_iris_" + str(inum))
+            posNode.setProp("x", str(pos[0]))
+            posNode.setProp("y", str(pos[1]))
+            posNode.setProp("z", str(pos[2]))
+            posNode.setProp("unit", posUnit)
             newNode.addChild(posNode)
             rotNode = libxml2.newNode("rotation")
-            posNode.setProp("name","rotRef_iris_"+str(inum))
-            rotNode.setProp("x",str(rot[0]))
-            rotNode.setProp("y",str(rot[1]))
-            rotNode.setProp("z",str(rot[2]))
-            rotNode.setProp("unit",rotUnit)
+            posNode.setProp("name", "rotRef_iris_"+str(inum))
+            rotNode.setProp("x", str(rot[0]))
+            rotNode.setProp("y", str(rot[1]))
+            rotNode.setProp("z", str(rot[2]))
+            rotNode.setProp("unit", rotUnit)
             newNode.addChild(rotNode)
             vol.addChild(newNode)
             
-        f = open(targetname, 'w')
-        target.saveTo(f)
-        f.close()
+        tgtfile = open(targetname, 'w')
+        target.saveTo(tgtfile)
+        tgtfile.close()
         target.freeDoc()
         mausInfo.freeDoc()
 

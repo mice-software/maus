@@ -20,10 +20,6 @@ A python class intended to interpret a set of gdml files in terms of a set of
 
 import os
 import libxml2
-import libxslt
-import math
-import numpy
-import subprocess
 import shutil
 
 class CADModuleExtraction:
@@ -40,7 +36,9 @@ class CADModuleExtraction:
     input GDML files.
 
     """
-    def __init__(self, gdmlin1, mausInfo, downloadDir, newfile): #pylint: disable = R0912, R0913, C0103
+    #pylint: disable = R0912, R0913, R0914, R0915, C0103
+    def __init__(self, gdmlin1, mausInfo, downloadDir, newfile):
+        #pylint: disable = R0912, R0913, C0103
         """
         @Method Class constructor
 
@@ -68,9 +66,11 @@ class CADModuleExtraction:
             for entry in physvol:
                 # print entry.xpathEval("file")[0].prop("name")
                 if float(entry.xpathEval("position")[0].prop("z")) == 0.0:
-                    self.gdmllist.append(entry.xpathEval("file")[0].prop("name"))
+                    self.gdmllist.append( \
+                        entry.xpathEval("file")[0].prop("name"))
                 else:
-                    self.physlist.append(entry.xpathEval("file")[0].prop("name"))
+                    self.physlist.append( \
+                        entry.xpathEval("file")[0].prop("name"))
 
         if type(mausInfo) != str:
             raise TypeError(mausInfo + " must be a string(file name/path)")
@@ -92,6 +92,7 @@ class CADModuleExtraction:
         self.outname     = newfile
 
     def EditMaterials(self):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
         """
         @Method EditMaterials
 
@@ -110,7 +111,8 @@ class CADModuleExtraction:
             elif filename.find('Cu') >= 0 or filename.find('COPPER') >= 0:
                 material = 'COPPER'
                 matname  = 'Cu'
-                self.add_fields_to_mice_info(os.path.join(self.sourceDir, filename))
+                self.add_fields_to_mice_info(os.path.join(self.sourceDir, \
+                                                          filename))
             elif filename.find('Pb') >= 0 or filename.find('LEAD') >= 0:
                 material = 'LEAD'
                 matname  = 'Pb'
@@ -176,13 +178,13 @@ class CADModuleExtraction:
             for pos in positions:
                 if pos.prop('name').find(matname) < 0:
                     name = pos.prop('name')
-                    pos.setProp('name',matname + '_' + name)
+                    pos.setProp('name', matname + '_' + name)
                     
             solids  = matfile.xpathEval("gdml/solids/*")
             for solid in solids:
                 if solid.prop('name').find(matname) < 0:
                     name = solid.prop('name')
-                    solid.setProp('name',matname + '_' +  name)
+                    solid.setProp('name', matname + '_' +  name)
                     
             facets = matfile.xpathEval("gdml/solids/tessellated/triangular")
             for facet in facets:
@@ -200,41 +202,44 @@ class CADModuleExtraction:
             for example in matvols:
                 name = example.prop("name")
                 if name.find(matname) < 0:
-                    example.setProp('name',matname+'_'+ name)
+                    example.setProp('name', matname+'_'+ name)
                 matref = example.xpathEval("materialref")[0]
                 if matref.prop('ref').find('ALUMINUM')>=0:
                     matref.setProp('ref', material)
                 solref = example.xpathEval('solidref')[0]
                 if solref.prop('ref').find(matname) < 0:
                     ref = solref.prop('ref')
-                    solref.setProp('ref',matname + '_' +  ref)
+                    solref.setProp('ref', matname + '_' +  ref)
                 for physvol in example.xpathEval("physvol"):
                     physname = physvol.prop('name')
                     if type(physname) is str:
                         if physname.find(matname) < 0:
                             physname = matname + "_" + physname 
-                            physvol.setProp("name",physname)
+                            physvol.setProp("name", physname)
                     volref = physvol.xpathEval('volumeref')
                     if len(volref) > 0:
                         if volref[0].prop("ref").find(matname) < 0:
-                            volref[0].setProp('ref',matname +'_'+ volref[0].prop('ref'))
+                            volref[0].setProp('ref', matname +'_'+ \
+                                              volref[0].prop('ref'))
                     posname = physvol.xpathEval('position')[0].prop('name')
                     if posname.find(matname) < 0:
                         posname = matname + '_' +  posname
-                        physvol.xpathEval('position')[0].setProp('name',posname)
+                        position = physvol.xpathEval('position')[0]
+                        position.setProp('name', posname)
                     if len(physvol.xpathEval('rotation')) == 1:
                         rotname = physvol.xpathEval('rotation')[0].prop('name')
                         if rotname.find(matname) < 0:
                             rotname = matname + '_' + rotname
-                            physvol.xpathEval('rotation')[0].setProp('name',rotname)
+                            physvol.xpathEval(\
+                                'rotation')[0].setProp('name', rotname)
             # write file under a new name
             filedir = filename.split('/')
             specname = filedir[-1]
             edfilename = specname[:-5] + "_ed.gdml"
             edfilename = os.path.join(self.downloadDir, edfilename)
-            f = open(edfilename,'w')
-            matfile.saveTo(f)
-            f.close()
+            edfile = open(edfilename, 'w')
+            matfile.saveTo(edfile)
+            edfile.close()
             matfile.freeDoc()
             #if material.find('NMF')<0:
             edlist.append(edfilename)
@@ -244,8 +249,9 @@ class CADModuleExtraction:
         #update gdmllist
         self.gdmllist = edlist
 
-        # copy all physvols indicated in the source directory to the destination directory.
-        self.copyReferencedFiles(self.physlist)
+        # copy all physvols indicated in the source directory
+        # to the destination directory.
+        self.copy_referenced_files(self.physlist)
         self.add_dets_to_mice_info()
         shutil.copy(os.path.join(self.sourceDir, "iris1_closed.gdml"),
                     os.path.join(self.downloadDir, "iris1_closed.gdml"))
@@ -264,15 +270,22 @@ class CADModuleExtraction:
         shutil.copy(os.path.join(self.sourceDir, "iris4_open.gdml"),
                     os.path.join(self.downloadDir, "iris4_open.gdml"))
 
-    def copyReferencedFiles(self, physlist):
-        for fn in physlist:
-            filename = os.path.join(self.sourceDir, fn)
+    def copy_referenced_files(self, physlist):
+        """
+        @Module copy_referenced_files
+
+        Accesses the files referenced in the list of physical volumes
+        and copy them to the destination directory.
+        """
+        
+        for reffile in physlist:
+            filename = os.path.join(self.sourceDir, reffile)
             # print "Copying "+filename
             # check if the file exists
             if not os.path.isfile(filename):
-                print "copyReferencedFiles::Error -- File missing: "+filename
+                print "copy_referenced_files::Error -- File missing: "+filename
                 continue
-            destination = os.path.join(self.downloadDir, fn)
+            destination = os.path.join(self.downloadDir, reffile)
             # print filename+" copied to "+destination
             if not os.path.isfile(destination): 
                 shutil.copy(filename, destination)
@@ -284,12 +297,13 @@ class CADModuleExtraction:
             for entry in physvol:
                 if len(entry.xpathEval("file")) > 0:
                     newphyslist.append(entry.xpathEval("file")[0].prop("name"))
-            self.copyReferencedFiles(newphyslist)
+            self.copy_referenced_files(newphyslist)
                                        
                 
-    def SelectModuleByPosition(self):
+    def select_module_by_position(self):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
         """
-        @Module SelectModuleByPosition
+        @Module select_module_by_position
 
         Extract subsets of physical volumes from the input files and
         sorts them into physical modules. The positions of each of the
@@ -298,37 +312,42 @@ class CADModuleExtraction:
         are extracted from the Maus_Information file.
 
         """
-        modDef = self.extractModuleRanges()
-        print modDef
+        mod_def = self.extract_module_ranges()
+        print mod_def
         #print self.gdmllist
         selphysname = []
-        for key in modDef:
+        for key in mod_def:
             print key
             # create a new gdml file using the key name
-            self.initializeGDMLDoc(key, modDef[key])
-            keyxml = libxml2.parseFile(os.path.join(self.downloadDir,key + '.gdml'))
+            self.initialize_gdml_doc(key, mod_def[key])
+            keyxml = libxml2.parseFile(os.path.join(self.downloadDir,
+                                                    key + '.gdml'))
             # loop over all of the material gdml files
-            for file in self.gdmllist:
+            for sourcefile in self.gdmllist:
                 # parse the gdml files named
-                matxml = libxml2.parseFile(file)
+                matxml = libxml2.parseFile(sourcefile)
                 # check the positions of all of the physical volumes.
                 structvols = matxml.xpathEval("gdml/structure/volume")
                 keyxmlvol = next(x for x in \
                                  keyxml.xpathEval("gdml/structure/volume") \
                                  if x.prop("name").find(key) >= 0)
-                vol = next(x for x in structvols if x.prop("name").find("Structure") >= 0)
+                vol = next(x for x in structvols \
+                      if x.prop("name").find("Structure") >= 0)
                 # print vol.prop("name")
                 physvols = vol.xpathEval("physvol")
                 selectphys = []
                 for physvol in physvols:
                     zpos = float(physvol.xpathEval("position")[0].prop("z"))
-                    if zpos >= modDef[key][0] and zpos < modDef[key][1] and zpos != 0.0:
+                    if zpos >= mod_def[key][0] and \
+                           zpos < mod_def[key][1] and zpos != 0.0:
                         # correct the position for the module location
-                        corrZpos = zpos - (modDef[key][0] + modDef[key][1])/2.
-                        physvol.xpathEval("position")[0].setProp("z",str(corrZpos))
+                        corrzpos = zpos - (mod_def[key][0] + mod_def[key][1])/2.
+                        physvol.xpathEval("position")[0].setProp("z", \
+                                                                 str(corrzpos))
                         # copy referenced objects to the new gdml file
                         selectphys.append(physvol)
-                        self.collectReferencesFromPhysvol(keyxml, matxml, physvol)
+                        self.collect_references_from_physvol(keyxml, \
+                                                             matxml, physvol)
                         
                 # End the loop over physvols
                 for physvol in selectphys:
@@ -345,13 +364,13 @@ class CADModuleExtraction:
                 
             # No more input files.
             # Create and save the new key gdml file
-            out = open(os.path.join(self.downloadDir, key + ".gdml"),"w+")
+            out = open(os.path.join(self.downloadDir, key + ".gdml"), "w+")
             # outname = os.path.join(self.downloadDir, key + ".gdml")
             keyxml.saveTo(out)
             # keyxml.saveFormatFile(outname, 1)
             # Now I want to make the resulting file look presentable
             data = out.read()
-            changed = data.replace('><','>\n<')
+            changed = data.replace('><', '>\n<')
             
             out.write(changed)
             out.close()
@@ -362,10 +381,11 @@ class CADModuleExtraction:
         src = libxml2.parseFile(self.gdmlin1)
         # Now a new top level file mus be written containing the above
         # files.
-        self.initializeGDMLDoc(self.outname,[0.,70000.]) 
+        self.initialize_gdml_doc(self.outname, [0., 70000.]) 
         # Copy files that are referenced from the old top level file
         # (mostly detectors).
-        new = libxml2.parseFile(os.path.join(self.downloadDir,self.outname+".gdml"))
+        new = libxml2.parseFile(os.path.join(self.downloadDir, \
+                                             self.outname+".gdml"))
         newvol = next(x for x in new.xpathEval("gdml/structure/volume") \
                       if x.prop("name").find(self.outname) >= 0)
         vols = src.xpathEval("gdml/structure/volume")
@@ -373,49 +393,49 @@ class CADModuleExtraction:
                    if x.prop("name").find("Structure") >= 0)
         
         physvols = [x for x in vol.xpathEval("physvol") \
-                   if x.xpathEval("file")[0].prop("name") in self.physlist]                       
+                   if x.xpathEval("file")[0].prop("name") \
+                   in self.physlist]                       
         
         for physvol in physvols:
-            inmod = 0
             name = physvol.xpathEval("file")[0].prop("name")
             if name in selphysname:
                 continue
             newvol.addChildList(physvol.copyNode(1))
-        for key in modDef:
-            modPos = (modDef[key][0] + modDef[key][1])/2.
+        for key in mod_def:
+            modpos = (mod_def[key][0] + mod_def[key][1])/2.
             keynode = libxml2.newNode("physvol")
-            keynode.setProp('name',key+'_phys')
+            keynode.setProp('name', key+'_phys')
             keyfile = libxml2.newNode("file")
-            keyfile.setProp('name',key+'.gdml')
+            keyfile.setProp('name', key+'.gdml')
             keynode.addChild(keyfile)
             keypos = libxml2.newNode("position")
-            keypos.setProp('name',key+'_pos')
-            keypos.setProp('x','0.0')
-            keypos.setProp('y','0.0')
-            keypos.setProp('z',str(modPos))
-            keypos.setProp('unit','mm')
+            keypos.setProp('name', key+'_pos')
+            keypos.setProp('x', '0.0')
+            keypos.setProp('y', '0.0')
+            keypos.setProp('z', str(modpos))
+            keypos.setProp('unit', 'mm')
             keynode.addChild(keypos)
             keyrot = libxml2.newNode("rotation")
-            keyrot.setProp('name',key+'_rot')
-            keyrot.setProp('x','0.0')
-            keyrot.setProp('y','0.0')
-            keyrot.setProp('z','0.0')
-            keyrot.setProp('unit','degree')
+            keyrot.setProp('name', key+'_rot')
+            keyrot.setProp('x', '0.0')
+            keyrot.setProp('y', '0.0')
+            keyrot.setProp('z', '0.0')
+            keyrot.setProp('unit', 'degree')
             keynode.addChild(keyrot)
             newvol.addChild(keynode)
-        # f = open(os.path.join(self.downloadDir, self.outname + ".gdml"),"w")
-        fname = os.path.join(self.downloadDir, self.outname + ".gdml")
-        # new.saveTo(f)
-        new.saveFormatFile(fname, 1)
-        # f.close()
-        new.freeDoc()
 
-        # clean up the space
-        # gdmls = [x for x in os.listdir(self.downloadDir) if x.find("_ed.gdml") >= 0]
-        # for edfile in gdmls: os.remove(edfile)
+        fname = os.path.join(self.downloadDir, self.outname + ".gdml")
+        new.saveFormatFile(fname, 1)
+        new.freeDoc()
         
-    def initializeGDMLDoc(self, key, limits):
-        f = open(os.path.join(self.downloadDir,key + '.gdml'),'w')
+    def initialize_gdml_doc(self, key, limits):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0301
+        """
+        Module @initialize_gdml_doc
+
+        A fast way to define a non-specific gdml file prior to parsing.
+        """
+        newfile = open(os.path.join(self.downloadDir, key + '.gdml'),'w')
         keymat = "AIR"
         if key.find("Solenoid")>=0 or \
                key.find("FC")>=0:
@@ -646,7 +666,9 @@ class CADModuleExtraction:
    </materials>
                 
    <solids>
-       <box name=\""""+str(key)+"""_solid\" lunit=\"mm\" x=\"2000.0\" y=\"2000.0\" z=\""""+str(length)+"""\"/>
+       <box name=\""""+str(key)\
+        +"""_solid\" lunit=\"mm\" x=\"2000.0\" y=\"2000.0\" z=\""""+\
+                     str(length)+"""\"/>
    </solids>
                 
    <structure>
@@ -661,29 +683,30 @@ class CADModuleExtraction:
    </setup>
 </gdml>
 """
-        f.write(keydata)
-        f.close()
+        newfile.write(keydata)
+        newfile.close()
 
-    def extractModuleRanges(self):
+    def extract_module_ranges(self):
         """
-        @Module extractModuleRanges
+        @Module extract_module_ranges
 
         Get the definition of the subset volumes from the Maus_Information file.
         """
-        modDef = {}
-        infoXml = libxml2.parseFile(self.mausInfo)
-        mods = infoXml.xpathEval("MICE_Information/Other_Information/Module")
+        mod_def = {}
+        infoxml = libxml2.parseFile(self.mausInfo)
+        mods = infoxml.xpathEval("MICE_Information/Other_Information/Module")
         for entry in mods:
             key =  entry.prop("name")
             zmin = float(entry.prop("zmin"))
             zmax = float(entry.prop("zmax"))
-            modDef[key] = [zmin, zmax]
-        infoXml.freeDoc()
-        return modDef
+            mod_def[key] = [zmin, zmax]
+        infoxml.freeDoc()
+        return mod_def
         
-    def collectReferencesFromPhysvol(self, keyxml, matxml, physvol):
+    def collect_references_from_physvol(self, keyxml, matxml, physvol):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
         """
-        @Module collectReferencesFromPhysvol
+        @Module collect_references_from_physvol
 
         find and copy objects referenced from a particular physvol
         """
@@ -691,7 +714,6 @@ class CADModuleExtraction:
         volrefs = physvol.xpathEval("volumeref")
         volname = ''
         matvols = matxml.xpathEval("gdml/structure/volume")
-        keystruct = keyxml.xpathEval("gdml/structure")
         keyvols = keyxml.xpathEval("gdml/structure/volume")
         keyvol = next(x for x in keyvols \
                       if x.prop("name").find("structvol") >= 0)
@@ -711,32 +733,33 @@ class CADModuleExtraction:
             solid = next(x for x in matsolids \
                 if solidname == x.prop("name"))
             keysolids[0].addChildList(solid.copyNode(1))
-            # examine solid volume for vertex positions in the case of a tesselated solid
+            # examine solid volume for vertex positions in
+            # the case of a tesselated solid
             if solid.name == "tessellated":
                 matpos = matdefs[0].xpathEval("position")
                 for facet in solid.xpathEval("triangular"):
                     defpos = keydefs[0].xpathEval("position")
                     vert1 = facet.prop("vertex1")
                     pos = next(x for x in matpos if x.prop("name") == vert1)
-                    poscheck =[x for x in defpos if x.prop("name") == vert1]
+                    poscheck = [x for x in defpos if x.prop("name") == vert1]
                     if len(poscheck) == 0:
                         keydefs[0].addChildList(pos.copyNode(1))
                     vert2 = facet.prop("vertex2")
                     poscheck = []
                     pos = next(x for x in matpos if x.prop("name") == vert2)
-                    poscheck =[x for x in defpos if x.prop("name") == vert2]
+                    poscheck = [x for x in defpos if x.prop("name") == vert2]
                     if len(poscheck) == 0:
                         keydefs[0].addChildList(pos.copyNode(1))
                     vert3 = facet.prop("vertex3")
                     poscheck = []
                     pos = next(x for x in matpos if x.prop("name") == vert3)
-                    poscheck =[x for x in defpos if x.prop("name") == vert3]
+                    poscheck = [x for x in defpos if x.prop("name") == vert3]
                     if len(poscheck) == 0:
                         keydefs[0].addChildList(pos.copyNode(1))
                     
             # examine physical volumes for references.
             for physnew in entry.xpathEval("physvol"):
-                self.collectReferencesFromPhysvol(keyxml,matxml,physnew)
+                self.collect_references_from_physvol(keyxml, matxml, physnew)
                     
 
     def add_dets_to_mice_info(self):
@@ -756,7 +779,8 @@ class CADModuleExtraction:
                 # find the position reference in the base file.
                 node = next(x for x in \
                             base.xpathEval("gdml/structure/volume/physvol") \
-                            if x.xpathEval("position")[0].prop("name").find(target)>=0)
+                            if x.xpathEval("position")[0].prop("name").\
+                            find(target)>=0)
                 # add the information to the info file
                 det.addChildList(node.copyNode(1))
             # otherwise we need to go one step deeper
@@ -766,7 +790,8 @@ class CADModuleExtraction:
                 # find the position reference in the base file.
                 node = next(x for x in \
                             base.xpathEval("gdml/structure/volume/physvol") \
-                            if x.xpathEval("position")[0].prop("name").find(target)>=0)
+                            if x.xpathEval("position")[0].prop("name").\
+                            find(target)>=0)
                 # add the information to the info file
                 det.addChildList(node.copyNode(1))
 
@@ -779,6 +804,7 @@ class CADModuleExtraction:
         out.close()
     
     def add_fields_to_mice_info(self, source_file):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103
         """
         @Module add_to_mice_info
 
@@ -806,8 +832,8 @@ class CADModuleExtraction:
                     match = next(x for x in physvol \
                                  if x.prop("name").find(target)>=0)
                     elempos = match.xpathEval("position")[0]
-                    pos.append([float(elempos.prop("x")),\
-                                float(elempos.prop("y")),\
+                    pos.append([float(elempos.prop("x")), \
+                                float(elempos.prop("y")), \
                                 float(elempos.prop("z"))])
                     meanpos[0] += float(elempos.prop("x"))
                     meanpos[1] += float(elempos.prop("y"))
@@ -815,12 +841,14 @@ class CADModuleExtraction:
                 meanpos[0] = meanpos[0]/float(ncoils)
                 meanpos[1] = meanpos[1]/float(ncoils)
                 meanpos[2] = meanpos[2]/float(ncoils)
-                # Now that an average position is defined it needs to be written to the
-                # information file
+                
+                # Now that an average position is defined it needs to
+                # be written to the information file
+
                 position = field.xpathEval("Position")[0]
                 if ncoils == 4: # special treatment for quads
                     centrelength = \
-                                 float(field.xpathEval("CentreLength")[0].prop('value'))
+                       float(field.xpathEval("CentreLength")[0].prop('value'))
                     if field.xpathEval("CentreLength")[0].prop("units")=='m':
                         centrelength *= 1000
                     elif field.xpathEval("CentreLength")[0].prop("units")=='cm':
@@ -828,9 +856,9 @@ class CADModuleExtraction:
                     # subtract the centre length from the z position
                     meanpos[2] -= centrelength
                     
-                position.setProp('x',str(meanpos[0]))
-                position.setProp('y',str(meanpos[1]))
-                position.setProp('z',str(meanpos[2]))
+                position.setProp('x', str(meanpos[0]))
+                position.setProp('y', str(meanpos[1]))
+                position.setProp('z', str(meanpos[2]))
 
 
         out = open(self.mausInfo, "w+")

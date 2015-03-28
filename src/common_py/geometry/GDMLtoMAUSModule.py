@@ -208,7 +208,7 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
 
     def generate_parent(self, output): #pylint: disable = R0914
         """
-        @method convert_to_maus This method generates a parent file
+        @method generate_parent This method generates a parent file
         
         This method applies the necessary XSLT scripts to the GDMLs.
                 
@@ -239,12 +239,13 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
                 file_name = new_string[-1]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
                 module_file = CADImport(xmlin1 = str(self.module_files[fnum]), \
-                                        xsl = str(MODULEXSL), output = str(outputfile))
+                                        xsl = str(MODULEXSL), \
+                                        output = str(outputfile))
                 module_file.parse_xslt()
                 module_file = None
 
             length = len(self.step_files)
-            for num in range(0,length):
+            for num in range(0, length):
                 found_file = str(self.step_files[num])
                 new_string = found_file.split('/')
                 num_of_splits = len(new_string)
@@ -252,8 +253,8 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
                 file_name = new_string[file_name]
                 outputfile = output + '/' + file_name[:-4] + 'dat'
                 step_file = CADImport(xmlin1 = str(self.step_files[num]), \
-                                      xsl = str(MM_XSL), output = str(outputfile))
-                direct_translation = 0
+                                      xsl = str(MM_XSL), \
+                                      output = str(outputfile))
                 for det_file in DET_GDML:
                     if file_name == det_file:
                         step_file.translate_gdml()
