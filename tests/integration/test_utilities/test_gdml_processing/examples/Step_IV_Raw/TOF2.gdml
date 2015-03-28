@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+<define>
+    <matrix name="slab_offsets" coldim="1" values="-27.0 -21.0 -15.0 -9.0 -3.0 3.0 9.0 15.0 21.0 27.0"/>
+    <variable name="xhv" value="0"/>
+    <variable name="xhp" value="0"/>
+    <variable name="xvv" value="0"/>
+    <variable name="xvp" value="0"/>
+</define>
+
+    
+ <materials>
+     <isotope N="54" Z="26" name="Fe540xa12ebb0">
+         <atom unit="g/mole" value="53.9396"/>
+     </isotope>
+     <isotope N="56" Z="26" name="Fe560xa12ec20">
+         <atom unit="g/mole" value="55.9349"/>
+     </isotope>
+     <isotope N="57" Z="26" name="Fe570xa12ec90">
+         <atom unit="g/mole" value="56.9354"/>
+     </isotope>
+     <isotope N="58" Z="26" name="Fe580xa132140">
+         <atom unit="g/mole" value="57.9333"/>
+     </isotope>
+     <element name="iron">
+         <fraction n="0.05845" ref="Fe540xa12ebb0"/>
+         <fraction n="0.91754" ref="Fe560xa12ec20"/>
+         <fraction n="0.02119" ref="Fe570xa12ec90"/>
+         <fraction n="0.00282" ref="Fe580xa132140"/>
+     </element>
+     <material name="Fe" state="solid">
+         <D unit="g/cm3" value="7.874"/>
+         <fraction n="1" ref="iron"/>
+     </material>
+    <isotope N="1" Z="1" name="H10xa133600">
+      <atom unit="g/mole" value="1.00782503081372"/>
+    </isotope>
+    <isotope N="2" Z="1" name="H20xa133d90">
+      <atom unit="g/mole" value="2.01410199966617"/>
+    </isotope>
+    <element name="H0xa133b30">
+      <fraction n="0.999885" ref="H10xa133600"/>
+      <fraction n="0.000115" ref="H20xa133d90"/>
+    </element>  
+    <isotope N="12" Z="6" name="C120xa126a70">
+      <atom unit="g/mole" value="12"/>
+    </isotope>
+    <isotope N="13" Z="6" name="C130xa126b20">
+      <atom unit="g/mole" value="13.0034"/>
+    </isotope>
+    <element name="C0xa126810">
+      <fraction n="0.9893" ref="C120xa126a70"/>
+      <fraction n="0.0107" ref="C130xa126b20"/>
+    </element>
+    <material name="POLYSTYRENE" state="solid">
+      <D unit="g/cm3" value="1.06"/>
+      <fraction n="0.077418" ref="H0xa133b30"/>
+      <fraction n="0.922582" ref="C0xa126810"/>
+    </material>
+     <isotope N="14" Z="7" name="N140xa126de0">
+         <atom unit="g/mole" value="14.0031"/>
+     </isotope>
+     <isotope N="15" Z="7" name="N150xa126e80">
+         <atom unit="g/mole" value="15.0001"/>
+     </isotope>
+     <element name="N0xa126b80">
+         <fraction n="0.99632" ref="N140xa126de0"/>
+         <fraction n="0.00368" ref="N150xa126e80"/>
+     </element>
+     <isotope N="16" Z="8" name="O160xa1270f0">
+         <atom unit="g/mole" value="15.9949"/>
+     </isotope>
+     <isotope N="17" Z="8" name="O170xa127180">
+         <atom unit="g/mole" value="16.9991"/>
+     </isotope>
+     <isotope N="18" Z="8" name="O180xa1271f0">
+         <atom unit="g/mole" value="17.9992"/>
+     </isotope>
+     <element name="O0xa126ec0">
+         <fraction n="0.99757" ref="O160xa1270f0"/>
+         <fraction n="0.00038" ref="O170xa127180"/>
+         <fraction n="0.00205" ref="O180xa1271f0"/>
+     </element>
+     <isotope N="36" Z="18" name="Ar360xa1270a0">
+         <atom unit="g/mole" value="35.9675"/>
+     </isotope>
+     <isotope N="38" Z="18" name="Ar380xa1274b0">
+         <atom unit="g/mole" value="37.9627"/>
+     </isotope>
+     <isotope N="40" Z="18" name="Ar400xa1275a0">
+         <atom unit="g/mole" value="39.9624"/>
+     </isotope>
+     <element name="Ar0xa127230">
+         <fraction n="0.003365" ref="Ar360xa1270a0"/>
+         <fraction n="0.000632" ref="Ar380xa1274b0"/>
+         <fraction n="0.996003" ref="Ar400xa1275a0"/>
+     </element>
+     <material name="AIR" state="gas">
+         <D unit="g/cm3" value="0.00120479"/>
+         <fraction n="0.000124000124000124" ref="C0xa126810"/>
+         <fraction n="0.755267755267755" ref="N0xa126b80"/>
+         <fraction n="0.231781231781232" ref="O0xa126ec0"/>
+         <fraction n="0.0128270128270128" ref="Ar0xa127230"/>
+     </material>
+</materials>
+    
+<solids>
+    <box lunit="cm" name="TOF2VertSlabSci_solid" x="6.0" y="60.0" z="2.5"/>
+    <box lunit="cm" name="TOF2HorizSlabSci_solid" x="60.0" y="6.0" z="2.5"/>
+    <box lunit="cm" name="TOF2Panel_solid" x="60.0" y="60.0" z="2.5"/>
+    <box lunit="cm" name="TOF2Det_solid" x="60.0" y="60.0" z="5.00001"/>
+    <box lunit="cm" name="TOF2_solid" x="150.0" y="150.0" z="25.0"/>
+    <!--
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="TOF2DownstreamShield1_solid" rmin="300.0" rmax="750.0" startphi="0.0" z="100.0"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="TOF2DownstreamShieldLink_solid" rmin="650.0" rmax="750.0" startphi="0.0" z="100.0"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="TOF2DownstreamShield2_solid" rmin="350.0" rmax="750.0" startphi="0.0" z="50.0"/>
+	-->
+</solids>
+    
+<structure>
+    <volume name="TOF2VertSlab0Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab1Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab2Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab3Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab4Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab5Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab6Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab7Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab8Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2VertSlab9Sci">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <!-- Verticle slabs. Repeated for sensitive volumes. Loop not compatible with TOFSD. -->
+    <volume name="TOF2VertSlab0">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab0Sci_phys">
+            <volumeref ref="TOF2VertSlab0Sci"/>
+            <position name="TOF2VertSlab0Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="0"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab1">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab1Sci_phys">
+            <volumeref ref="TOF2VertSlab1Sci"/>
+            <position name="TOF2VertSlab1Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="1"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab2">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab2Sci_phys">
+            <volumeref ref="TOF2VertSlab2Sci"/>
+            <position name="TOF2VertSlab2Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="2"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab3">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab3Sci_phys">
+            <volumeref ref="TOF2VertSlab3Sci"/>
+            <position name="TOF2VertSlab3Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="3"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab4">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab4Sci_phys">
+            <volumeref ref="TOF2VertSlab4Sci"/>
+            <position name="TOF2VertSlab4Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="4"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab5">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab5Sci_phys">
+            <volumeref ref="TOF2VertSlab5Sci"/>
+            <position name="TOF2VertSlab5Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="5"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab6">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab6Sci_phys">
+            <volumeref ref="TOF2VertSlab6Sci"/>
+            <position name="TOF2VertSlab6Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="6"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab7">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab7Sci_phys">
+            <volumeref ref="TOF2VertSlab7Sci"/>
+            <position name="TOF2VertSlab7Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="7"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab8">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab8Sci_phys">
+            <volumeref ref="TOF2VertSlab8Sci"/>
+            <position name="TOF2VertSlab8Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="8"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    <volume name="TOF2VertSlab9">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2VertSlabSci_solid"/>
+        <physvol name="TOF2VertSlab9Sci_phys">
+            <volumeref ref="TOF2VertSlab9Sci"/>
+            <position name="TOF2VertSlab9Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="9"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosY" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosY" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+    
+    
+    <volume name="TOF2VertPlane">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2Panel_solid"/>
+          <physvol name="TOF2VertSlab0_phys">
+              <volumeref ref="TOF2VertSlab0"/>
+              <position name="TOF2VertSlab0_pos" x="-27.0" y="0.0" z="0.0" unit="cm"/>
+          </physvol>
+        <physvol name="TOF2VertSlab1_phys">
+            <volumeref ref="TOF2VertSlab1"/>
+            <position name="TOF2VertSlab1_pos" x="-21.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab2_phys">
+            <volumeref ref="TOF2VertSlab2"/>
+            <position name="TOF2VertSlab2_pos" x="-15.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab3_phys">
+            <volumeref ref="TOF2VertSlab3"/>
+            <position name="TOF2VertSlab3_pos" x="-9.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab4_phys">
+            <volumeref ref="TOF2VertSlab4"/>
+            <position name="TOF2VertSlab4_pos" x="-3.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab5_phys">
+            <volumeref ref="TOF2VertSlab5"/>
+            <position name="TOF2VertSlab5_pos" x="3.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab6_phys">
+            <volumeref ref="TOF2VertSlab6"/>
+            <position name="TOF2VertSlab6_pos" x="9.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab7_phys">
+            <volumeref ref="TOF2VertSlab7"/>
+            <position name="TOF2VertSlab7_pos" x="15.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab8_phys">
+            <volumeref ref="TOF2VertSlab8"/>
+            <position name="TOF2VertSlab8_pos" x="21.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+        <physvol name="TOF2VertSlab9_phys">
+            <volumeref ref="TOF2VertSlab9"/>
+            <position name="TOF2VertSlab9_pos" x="27.0" y="0.0" z="0.0" unit="cm"/>
+        </physvol>
+                
+        <auxiliary auxtype="Plane" auxvalue="1.0"/>
+        <auxiliary auxtype="numSlabs" auxvalue="10"/>
+    </volume>
+    
+    <volume name="TOF2HorizSlab0Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab1Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab2Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab3Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab4Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab5Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab6Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab7Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab8Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="TOF2HorizSlab9Sci">
+        <materialref  ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+    </volume>
+  
+    <volume name="TOF2HorizSlab0">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2HorizSlabSci_solid"/>
+        <physvol name="TOF2HorizSlab0Sci_phys">
+            <volumeref ref="TOF2HorizSlab0Sci"/>
+            <position name="TOF2HorizSlab0Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Slab" auxvalue="0"/>
+        <auxiliary auxtype="numPMTs" auxvalue="2"/>
+        <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+        <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+        <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+    </volume>
+        
+        <volume name="TOF2HorizSlab1">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab1Sci_phys">
+                <volumeref ref="TOF2HorizSlab1Sci"/>
+                <position name="TOF2HorizSlab1Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="1"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab2">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab2Sci_phys">
+                <volumeref ref="TOF2HorizSlab2Sci"/>
+                <position name="TOF2HorizSlab2Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="2"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab3">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab3Sci_phys">
+                <volumeref ref="TOF2HorizSlab3Sci"/>
+                <position name="TOF2HorizSlab3Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="3"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab4">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab4Sci_phys">
+                <volumeref ref="TOF2HorizSlab4Sci"/>
+                <position name="TOF2HorizSlab4Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="4"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab5">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab5Sci_phys">
+                <volumeref ref="TOF2HorizSlab5Sci"/>
+                <position name="TOF2HorizSlab5Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="5"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab6">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSla6bSci_phys">
+                <volumeref ref="TOF2HorizSlab6Sci"/>
+                <position name="TOF2HorizSlab6Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="6"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab7">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab7Sci_phys">
+                <volumeref ref="TOF2HorizSlab7Sci"/>
+                <position name="TOF2HorizSlab7Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="7"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab8">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab8Sci_phys">
+                <volumeref ref="TOF2HorizSlab8Sci"/>
+                <position name="TOF2HorizSlab8Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="8"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+        
+        <volume name="TOF2HorizSlab9">
+            <materialref ref="POLYSTYRENE"/>
+            <solidref ref="TOF2HorizSlabSci_solid"/>
+            <physvol name="TOF2HorizSlab9Sci_phys">
+                <volumeref ref="TOF2HorizSlab9Sci"/>
+                <position name="TOF2HorizSlab9Sci_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
+            </physvol>
+            <auxiliary auxtype="Slab" auxvalue="9"/>
+            <auxiliary auxtype="numPMTs" auxvalue="2"/>
+            <auxiliary auxtype="Pmt1PosX" auxvalue="30.0"/>
+            <auxiliary auxtype="Pmt2PosX" auxvalue="-30.0"/>
+            <auxiliary auxtype="BlueColor" auxvalue="1.0"/>
+        </volume>
+    
+    <volume name="TOF2HorizPlane">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2Panel_solid"/>
+            <physvol name="TOF2HorizSlab0_phys">
+                <volumeref ref="TOF2HorizSlab0"/>
+                <position name="TOF2HorizSlab0_pos" unit="cm" x="0.0" y="-27.0" z="0.0"/>
+            </physvol>        
+        <physvol name="TOF2HorizSlab1_phys">
+            <volumeref ref="TOF2HorizSlab1"/>
+            <position name="TOF2HorizSlab1_pos" unit="cm" x="0.0" y="-21.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab2_phys">
+            <volumeref ref="TOF2HorizSlab2"/>
+            <position name="TOF2HorizSlab2_pos" unit="cm" x="0.0" y="-15.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab3_phys">
+            <volumeref ref="TOF2HorizSlab3"/>
+            <position name="TOF2HorizSlab3_pos" unit="cm" x="0.0" y="-9.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab4_phys">
+            <volumeref ref="TOF2HorizSlab4"/>
+            <position name="TOF2HorizSlab4_pos" unit="cm" x="0.0" y="-3.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab5_phys">
+            <volumeref ref="TOF2HorizSlab5"/>
+            <position name="TOF2HorizSlab5_pos" unit="cm" x="0.0" y="3.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab6_phys">
+            <volumeref ref="TOF2HorizSlab6"/>
+            <position name="TOF2HorizSlab6_pos" unit="cm" x="0.0" y="9.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab7_phys">
+            <volumeref ref="TOF2HorizSlab7"/>
+            <position name="TOF2HorizSlab7_pos" unit="cm" x="0.0" y="15.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab8_phys">
+            <volumeref ref="TOF2HorizSlab8"/>
+            <position name="TOF2HorizSlab8_pos" unit="cm" x="0.0" y="21.0" z="0.0"/>
+        </physvol>        
+        <physvol name="TOF2HorizSlab9_phys">
+            <volumeref ref="TOF2HorizSlab9"/>
+            <position name="TOF2HorizSlab9_pos" unit="cm" x="0.0" y="27.0" z="0.0"/>
+        </physvol>
+        
+        <auxiliary auxtype="Plane" auxvalue="0"/>
+        <auxiliary auxtype="numSlabs" auxvalue="10"/>
+    </volume>
+        
+    <volume name="TOF2Detector">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TOF2Det_solid"/>
+        <physvol name="TOF2VertPlane_phys">
+            <volumeref ref="TOF2VertPlane"/>
+            <position name="TOF2VertPlane_pos" unit="cm" x="0.0" y="0.0" z="1.25"/>
+        </physvol>
+        <physvol name="TOF2HorizPlane_phys">
+            <volumeref ref="TOF2HorizPlane"/>
+            <position name="TOF2HorizPlane_pos" unit="cm" x="0.0" y="0.0" z="-1.25"/>
+        </physvol>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="UseDaughtersInOptics" auxvalue="0"/>
+        <auxiliary auxtype="Detector" auxvalue="TOF"/>
+        <auxiliary auxtype="Station" auxvalue="2"/>
+        <auxiliary auxtype="numPlanes" auxvalue="2"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SpecialVirtual"/>
+    </volume>
+    <!--    
+    <volume name="TOF2DownstreamShield1">
+        <materialref ref="Fe"/>
+        <solidref ref="TOF2DownstreamShield1_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+    </volume>
+    <volume name="TOF2DownstreamShieldLink">
+        <materialref ref="Fe"/>
+        <solidref ref="TOF2DownstreamShieldLink_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+    </volume>
+    <volume name="TOF2DownstreamShield2">
+        <materialref ref="Fe"/>
+        <solidref ref="TOF2DownstreamShield2_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+    </volume>
+    -->
+    <volume name="TOF2">
+        <materialref ref="AIR"/>
+        <solidref ref="TOF2_solid"/>
+	<!--
+        <physvol name="TOF2DownstreamShield1_phys">
+            <volumeref ref="TOF2DownstreamShield1"/>
+            <position name="TOF2DownstreamShield1_pos" unit="mm" x="0.0" y="0.0" z="-75.0"/>
+        </physvol>
+        
+        <physvol name="TOF2DownstreamShieldLink_phys">
+            <volumeref ref="TOF2DownstreamShieldLink"/>
+            <position name="TOF2DownstreamShieldLink_pos" unit="mm" x="0.0" y="0.0" z="25.0"/>
+        </physvol>
+        
+        <physvol name="TOF2DownstreamShield2_phys">
+            <volumeref ref="TOF2DownstreamShield2"/>
+            <position name="TOF2DownstreamShield2_pos" unit="mm" x="0.0" y="0.0" z="100.0"/>
+        </physvol>
+	-->
+        <physvol name="TOF2Detector_phys">
+            <volumeref ref="TOF2Detector"/>
+            <position name="TOF2Detector_pos" unit="mm" x="0.0" y="0.0" z="25.0"/>
+        </physvol>
+    </volume>
+</structure>
+    
+<setup name="Default" version="1.0">
+    <world ref="TOF2"/>
+</setup>
+    
+</gdml>

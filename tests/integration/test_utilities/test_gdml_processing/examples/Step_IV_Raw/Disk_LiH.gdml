@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define/>
+  <materials>
+      <isotope name="Li6" Z="3" N="6" formula="6Li">
+          <MEE value="6.015122" unit="eV"/>
+          <D value="0.534" unit="g/cm3"/>
+          <atom value="6.00" unit="g/mole"/>
+      </isotope>
+      <isotope name="Li7" Z="3" N="7" formula="7Li">
+          <MEE value="7.016004" unit="eV"/>
+          <D value="0.534" unit="g/cm3"/>
+          <atom value="7.00" unit="g/mole"/>
+      </isotope>
+      <element name="Li">
+          <fraction n="0.075" ref="Li6"/>
+          <fraction n="0.925" ref="Li7"/>
+      </element>
+      <element name="H" N="1" Z="1" formula="H">
+          <atom value="1.008" unit="g/mole"/>
+      </element>
+      <material name="LITHIUM_HYDRIDE">
+          <D value="0.78" unit="g/cm3"/>
+          <composite n="1" ref="Li"/>
+          <composite n="1" ref="H"/>
+      </material>
+  </materials>
+  <solids>
+      <tube rmax="225.0" z="65" lunit="mm" deltaphi="360" aunit="degree" name="disk_solid"/>
+  </solids>
+  <structure>
+      <volume name="Disk_LiH">
+          <materialref ref="LITHIUM_HYDRIDE"/>
+          <solidref ref="disk_solid"/>
+          <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
+          <auxiliary auxtype="SensitiveDetector" auxvalue="SpecialVirtual"/>
+      </volume>
+  </structure>
+  <setup name="Default" version="1.0">
+      <world ref="Disk_LiH"/>
+  </setup>
+</gdml>
