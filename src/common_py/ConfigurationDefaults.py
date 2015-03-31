@@ -99,6 +99,7 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
+simulation_geometry_debug    = False
 check_volume_overlaps = False
 maximum_number_of_steps = 50000000 # particles are killed after this number of
                                  # steps (assumed to be stuck in the fields)
