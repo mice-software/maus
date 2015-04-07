@@ -17,6 +17,7 @@
 
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
+#include "src/common_cpp/Recon/Kalman/MAUSTrackWrapper.hh"
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
@@ -46,6 +47,9 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     module->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
+
+  _helical_track_fitter = new Kalman::TrackFit(HelicalPropagator(_geometry_helper), SciFiMeasurements(_geometry_helper));
+  _straight_track_fitter = new Kalman::TrackFit(StraightPropagator(_geometry_helper), SciFiMeasurements(_geometry_helper));
 }
 
 void MapCppTrackerRecon::_death() {
@@ -108,29 +112,40 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) const {
 }
 
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
-  std::vector<KalmanSeed*> seeds;
-  size_t number_helical_tracks  = evt.helicalprtracks().size();
+  size_t number_helical_tracks = evt.helicalprtracks().size();
   size_t number_straight_tracks = evt.straightprtracks().size();
 
   for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
-    int tracker = evt.helicalprtracks()[track_i]->get_tracker();
-    double Bz = _geometry_helper.GetFieldValue(tracker);
-    KalmanSeed *seed = new KalmanSeed(_geometry_helper.GeometryMap());
-    seed->SetField(Bz);
-    seed->Build<SciFiHelicalPRTrack>(evt.helicalprtracks()[track_i]);
-    seeds.push_back(seed);
-  }
+    SciFiHelicalPRTrack* helical = evt.helicalprtracks()->at(track_i);
+    Kalman::Track data_track = BuildTrack(helical, _geometry_helper);
 
-  for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
-    KalmanSeed *seed = new KalmanSeed(_geometry_helper.GeometryMap());
-    seed->Build<SciFiStraightPRTrack>(evt.straightprtracks()[track_i]);
-    seeds.push_back(seed);
-  }
+    Kalman::State seed = ComputeSeed(helical, _geometry_helper);
 
-  if ( seeds.size() ) {
-    KalmanTrackFit fit;
-    fit.SaveGeometry(_geometry_helper.RefPos(), _geometry_helper.Rot());
-    fit.Process(seeds, evt);
+    _helical_track_fitter->SetData(data_track);
+    _helical_track_fitter->SetSeed(seed);
+
+    _helical_track_fitter->Filter();
+    _helical_track_fitter->Smooth();
+
+    SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter->GetSmoothed(),
+                                                             _geometry_helper);
+    evt.add_scifitrack(track);
+  }
+  for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
+    SciFiStraightPRTrack* straight = evt.straightprtracks()->at(track_i);
+    Kalman::Track data_track = BuildTrack(straight, _geometry_helper);
+
+    Kalman::State seed = ComputeSeed(straight, _geometry_helper);
+
+    _straight_track_fitter->SetData(data_track);
+    _straight_track_fitter->SetSeed(seed);
+
+    _straight_track_fitter->Filter();
+    _straight_track_fitter->Smooth();
+
+    SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter->GetSmoothed(),
+                                                             _geometry_helper);
+    evt.add_scifitrack(track);
   }
 }
 

@@ -44,6 +44,7 @@ namespace Kalman {
       _identity_matrix(i, i) = 1.0;
   }
 
+
   TrackFit::~Trackfit() {
     if (_propagator) {
       delete _propagator;

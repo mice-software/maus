@@ -35,7 +35,6 @@
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
@@ -50,9 +49,9 @@ class SciFiTrackPoint : public TObject {
    */
   virtual ~SciFiTrackPoint();
 
-  /** @brief  Constructs a SciFiTrackPoint from a KalmanState.
-   */
-  explicit SciFiTrackPoint(const KalmanState *kalman_site);
+//  /** @brief  Constructs a SciFiTrackPoint from a KalmanState.
+//   */
+//  explicit SciFiTrackPoint(const KalmanState *kalman_site);
 
   /** @brief  Copy constructor.
    */

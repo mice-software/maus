@@ -18,6 +18,9 @@
 
 import math
 import xboa
+import xboa.bunch
+import xboa.hit
+import xboa.common
 
 
 class track_point() :

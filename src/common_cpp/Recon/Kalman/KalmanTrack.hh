@@ -59,28 +59,58 @@ namespace Kalman {
       virtual ~State() {}
 
 
+      /** @brief Get ID of state
+       */
       int GetId() const { return _id; }
 
+      /** @brief Set ID of state. Should be unique!
+       */
       void SetId(int new_id) { _id = new_id; }
 
+      /** @brief Return the position of the state
+       */
       double GetPosition() const { return _position; }
 
+      /** @brief Set the position of the state
+       */
       void SetPosition(double new_pos) { _position = new_pos; }
 
+      /** @brief Return the state vector
+       */
       TMatrixD& GetVector() { return _vector; }
 
-      void SetVetor(TMatrixD vec);
+      /** @brief Set the state vector
+       */
+      void SetVector(TMatrixD vec);
 
+      /** @brief Return a reference to the covariance matrix
+       */
       TMatrixD& GetCovariance() { return _covariance; }
 
-      void SetVector(TMatrixD cov);
+      /** @brief Set the covariance matrix
+       */
+      void SetCovariance(TMatrixD cov);
 
+      /** @brief Returns true if there is a stored value.
+       */
       bool HasValue() const { return _has_value; }
 
+      /** @brief Set whether or not there is a stored value.
+       *
+       *  This is useful in track fitting if a measurement plane has not 
+       *  actually recorded a measurement. With this option set to false 
+       *  the track fit will continue as expected and return an estimate
+       *  of the state vector for this state, without using any of the 
+       *  stored information.
+       */
       void SetHasValue(bool HV) { _has_value = HV; }
 
+      /** @brief Return the dimension of the state vector
+       */
       unsigned int GetDimension() const { return _dimension; }
 
+      /** @brief Boolean operator, copies HasValue() function
+       */
       operator bool() const { return _has_value; }
 
     protected:
@@ -105,25 +135,43 @@ namespace Kalman {
     public:
       /** @brief Initialise track with required dimension
        */
-      explicit Track(unsigned int dimension);
+      Track(unsigned int dimension, unsigned int length = 0);
 
+      /** @brief Return the state found at specified index in state array
+       */
       State GetState(unsigned int index) const { return _track_vector[index]; }
 
+      /** @brief Set the state at the specified index in the state array
+       */
       void SetState(unsigned int index, State state);
 
+      /** @brief Get a reference to the state at the specified index 
+       */
       State& operator[] (unsigned int index) { return _track_vector[index]; }
 
+      /** @brief Get a const reference to the state at the specified index 
+       */
       const State& operator[] (unsigned int index) const { return _track_vector[index]; }
 
+      /** @brief Return the number of states in the state array
+       */
       unsigned int Length() const { return _track_vector.size(); }
 
+      /** @brief Append a state to the state array
+       */
       void Append(State state);
 
+      /** @brief Remove a state from the specified index in the state array
+       */
       void DeleteState(unsigned int index);
       
 
+      /** @brief (Re)initialise the track using the structure of a similar track
+       */
       void Reset(const Track& similar_track);
 
+      /** @brief Return the dimension of the state vectors
+       */
       unsigned int GetDimension() const { return _dimension; }
 
     protected:
@@ -133,8 +181,6 @@ namespace Kalman {
 
       StateArray _track_vector;
   };
-
-
 } // namespace Kalman
 } // namespace MAUS
 

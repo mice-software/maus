@@ -104,6 +104,10 @@ class SciFiGeometryHelper {
    */
   const MiceModule* FindPlane(int tracker, int station, int plane);
 
+  /** @brief Finds the MiceModule corresponding to a tracker plane.
+   */
+  double GetPlanePosition(int tracker, int station, int plane);
+
   /** @brief Finds the MiceModule corresponding to plane 0 of station 1 of a tracker -
    *  the origin of the local reference frame.
    */
@@ -121,7 +125,7 @@ class SciFiGeometryHelper {
    */
   double FieldValue(const MiceModule* trackerModule);
 
-  SciFiGeometryMap GeometryMap() const { return _geometry_map; }
+  SciFiGeometryMap& GeometryMap() const { return _geometry_map; }
 
   double GetFieldValue(int tracker) const { return _field_value[tracker]; }
 

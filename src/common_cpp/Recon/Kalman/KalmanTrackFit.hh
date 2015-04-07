@@ -29,9 +29,9 @@
 namespace MAUS {
 namespace Kalman {
 
-  TMatrixD ComputeKalmanGainMatrix(Measurement_base* measurement, State state);
-
-  TMatrixD ComputeSmootherGainMatrix(Propagator_base* prop, State pred, State filt);
+//  TMatrixD ComputeKalmanGainMatrix(Measurement_base* measurement, State state);
+//
+//  TMatrixD ComputeSmootherGainMatrix(Propagator_base* prop, State pred, State filt);
 
   /** @class TrackFit
    *
@@ -40,6 +40,12 @@ namespace Kalman {
    */
   class TrackFit {
   public:
+
+    /** @enum Status
+     *
+     *  @brief Used to save the current state of the track fitter
+     *
+     */
     enum Status { Error, Intialised, Predicted, Filtered, Smoothed };
 
     /** @brief Intialise with the required measurement and propagator classes.
@@ -50,31 +56,57 @@ namespace Kalman {
      */
     virtual ~KalmanTrackFit();
 
-
+    /** @brief Append a new data state and filter up to it
+     *
+     *  A short cut function to save computations. 
+     *  Useful if using this class to stream data through it
+     */
     void AppendFilter(State state);
 
+    /** @brief Filter all states using supplied propagator and measurement classes
+     */
     void Filter();
 
+    /** @brief Smooth all states using supplied propagator and measurement classes
+     */
     void Smooth();
 
 
+    /** @brief Returns the current start seed
+     */
     State GetSeed() const { return _seed; }
 
+    /** @brief Sets the current starting seed
+     */
     void SetSeed(State state);
 
+    /** @brief Check the status of the current track
+     */
     Status GetStatus() const { return _fitter_status; }
 
+    /** @brief Set the data track - used to provide the measurments
+     */
     void SetData(Track data_track);
 
+    /** @brief Returns a copy of the current data track
+     */
     Track GetData() const { return _data; }
     
+    /** @brief Return a copy of the predicted track
+     */
     Track GetPredicted() const { return _predicted; }
 
+    /** @brief Return a copy of the filtered track
+     */
     Track GetFiltered() const { return _filtered; }
 
+    /** @brief Return a copy of the smoothed track
+     */
     Track GetSmoothed() const { return _smoothed; }
 
 
+    /** @brief Return the dimension of the measurement state vector
+     */
     unsigned int GetDimension() const { return _dimension; }
 
   protected:
@@ -102,7 +134,6 @@ namespace Kalman {
 
     TMatrixD _unit_matrix;
   };
-
 } // namespace Kalman
 } // namespace MAUS
 

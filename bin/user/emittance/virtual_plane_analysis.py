@@ -17,8 +17,8 @@
 #
 
 
-import xboa.Bunch
-from xboa.Bunch import Bunch
+import xboa.bunch
+from xboa.bunch import Bunch
 
 import ROOT
 import math
@@ -96,7 +96,7 @@ def main():
       xboa_hit = make_xboa_hit( virt, counter )
       if len( bunch_list_tmp ) <= plane :
         for i in range( len( bunch_list_tmp ), plane ) :
-          bunch_list_tmp.append( xboa.Bunch.Bunch() )
+          bunch_list_tmp.append( Bunch() )
 
       bunch_list_tmp[ plane - 1 ].append( xboa_hit )
 

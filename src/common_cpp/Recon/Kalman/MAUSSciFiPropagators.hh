@@ -51,7 +51,7 @@ namespace MAUS {
 
   class HelicalPropagator : public Kalman::Propagator_base {
     public :
-      HelicalPropagator(SciFiGeometryHelper* helper, double magneticField);
+      HelicalPropagator(SciFiGeometryHelper* helper);
 
       virtual void Propagate(const State& start, State& end);
 

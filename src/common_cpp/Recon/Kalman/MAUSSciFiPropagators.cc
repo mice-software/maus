@@ -107,9 +107,9 @@ namespace MAUS {
   // HELICAL
 ////////////////////////////////////////////////////////////////////////////////
 
-  HelicalPropagator::HelicalPropagator(SciFiGeometryHelper* helper, double magnetic_field) :
+  HelicalPropagator::HelicalPropagator(SciFiGeometryHelper* helper) :
     Kalman::Propagator_base(5),
-    _Bz(magnetic_field),
+    _Bz(0.0),
     _geometry_helper(helper),
     _subtract_eloss(true),
     _include_mcs(true) {
@@ -124,6 +124,7 @@ namespace MAUS {
     double old_py     = old_vec(3, 0);
     double old_kappa  = old_vec(4, 0);
     double charge = old_kappa/fabs(old_kappa);
+    _Bz = _geometry_helper->GetFieldValue((start->GetId() > 0 ? 1 : 0));
 
     double c      = CLHEP::c_light;
     double u      = charge*c*_Bz;

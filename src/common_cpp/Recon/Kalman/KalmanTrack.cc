@@ -72,8 +72,11 @@ namespace Kalman {
   // TRACK MEMBER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-  Track::Track(unsigned int dim) :
+  Track::Track(unsigned int dim, unsigned int length) :
     _dimension(dim) {
+    for ( unsigned int i = 0; i < length; ++i ) {
+      _track_vector.push_back(State(_dimension));
+    }
   }
 
   void Track::SetState(unsigned int index, State state) {

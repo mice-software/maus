@@ -52,7 +52,9 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/Kalman/MAUSSciFiPropagators.hh"
+#include "src/common_cpp/Recon/Kalman/MAUSSciFiMeasurements.hh"
 #include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
@@ -134,6 +136,10 @@ class MapCppTrackerRecon : public MapBase<Data> {
   bool _straight_pr_on;
   bool _helical_pr_on;
   bool _kalman_on;
+
+  /// Kalman Track Fitter Object
+  Kalman::TrackFit* _helical_track_fitter;
+  Kalman::TrackFit* _straight_track_fitter;
 
   ///  Map of the planes geometry.
   SciFiGeometryHelper _geometry_helper;
