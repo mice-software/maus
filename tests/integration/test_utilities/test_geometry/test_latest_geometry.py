@@ -38,7 +38,7 @@ def validate_geometry(geometry_id = None):
     mrd = os.path.expandvars("${MAUS_ROOT_DIR}")
     mtd = os.path.expandvars("${MAUS_TMP_DIR}")
     test_path =  mrd+"/tests/integration/test_utilities/test_geometry/"
-    download = mrd+"/bin/utqilities/download_geometry.py"
+    download = mrd+"/bin/utilities/download_geometry.py"
     validate = mrd+"/bin/utilities/geometry_validation.py"
     path = mtd+"/test_latest_geometry_"+str(geometry_id)
     shutil.rmtree(path, True)
