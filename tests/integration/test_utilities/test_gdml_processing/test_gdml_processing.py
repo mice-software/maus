@@ -115,7 +115,7 @@ class GDMLProcessingTestCase(unittest.TestCase):
     Test that GDML extraction and processing operates properly
     """
     @classmethod
-    def test_gdml_processing(self):
+    def test_gdml_processing(cls):
         """
         @Method test_gdml_processing
 

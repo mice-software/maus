@@ -605,7 +605,7 @@ LIBS = {
     'numpy':set_numpy,
     'root':set_root,
     'clhep':set_clhep,
-    'xerces-c':set_xercesc,
+    'xercesc':set_xercesc,
     'geant4':set_geant4,
     'gtest':set_gtest,
     'unpacker':set_unpacker,
