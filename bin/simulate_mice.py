@@ -45,6 +45,10 @@ def run():
     my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
     my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
+    # EMR
+    my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
+    my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
+
     # Global Digits - post detector digitisation
 
     # Then construct a MAUS output component - filename comes from datacards
