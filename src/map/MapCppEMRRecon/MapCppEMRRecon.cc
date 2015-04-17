@@ -81,6 +81,7 @@ void MapCppEMRRecon::_process(Data *data) const {
   // Get spill, look into reconEvents, break if there's no EMR data
   Spill *spill = data->GetSpill();
 
+  // At this stage, the tree needs to contain 1 event per trigger + noise + decays
   int nPartEvents = spill->GetReconEventSize();
   if (!nPartEvents)
       return;
@@ -123,8 +124,8 @@ void MapCppEMRRecon::_process(Data *data) const {
   // Match the primary tracks with their decay
   track_matching(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 
-  // Fill the Recon event array with Spill information (1 per trigger + noise + decays)
-  fill(spill, nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
+  // Fill the Recon event array with Spill information (/!\ only 1 per trigger /!\)
+  fill(spill, nPartEvents - 2, emr_dbb_events, emr_fadc_events, emr_track_events);
 }
 
 void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
@@ -485,21 +486,36 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
       if (iPlane % 2 == 0) {
 	double x = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
 	double y = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
+	double ex = _bar_width/(2*sqrt(6));
+	double ey = _bar_width/(4*sqrt(3));
+
 	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
+	emr_dbb_events[1][iPe][x0][barid][0].SetErrorX(ex);
 	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
+	emr_dbb_events[1][iPe][x0][barid][0].SetErrorY(ey);
       } else {
 	double x = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
 	double y = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
+	double ex = _bar_width/(4*sqrt(3));
+	double ey = _bar_width/(2*sqrt(6));
+
 	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
+	emr_dbb_events[1][iPe][x0][barid][0].SetErrorX(ex);
 	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
+	emr_dbb_events[1][iPe][x0][barid][0].SetErrorY(ey);
       }
 
+      // Set the depth and the error on it
       double z(-1);
       if (barid % 2 == 0)
 	z = x0 * (_bar_height + _gap) + 1./3 * _bar_height;
       else
 	z = x0 * (_bar_height + _gap) + 2./3 * _bar_height;
+
+      double ez = _bar_height/(3*sqrt(2));
+
       emr_dbb_events[1][iPe][x0][barid][0].SetZ(z);
+      emr_dbb_events[1][iPe][x0][barid][0].SetErrorZ(ez);
     }
   }
 }
@@ -620,16 +636,14 @@ void MapCppEMRRecon::fill(Spill *spill,
 			  EMRfADCEventVector& emr_fadc_events,
 			  EMRTrackEventVector& emr_track_events) const {
 
-  int recPartEvents = spill->GetReconEventSize();
   int xRun = spill->GetRunNumber();
   int xSpill = spill->GetSpillNumber();
 
-  ReconEventPArray *recEvts =  spill->GetReconEvents();
-
   // Only save the primary triggers with their primary and seconday arrays (n - 2)
-  recEvts->resize(nPartEvents - 2);
+  ReconEventPArray *recEvts =  spill->GetReconEvents();
+  recEvts->resize(nPartEvents);
 
-  for (int iPe = 0; iPe < nPartEvents - 2; iPe++) {
+  for (int iPe = 0; iPe < nPartEvents; iPe++) {
     EMREvent *evt = new EMREvent;
     EMRPlaneHitArray plArray;
 
