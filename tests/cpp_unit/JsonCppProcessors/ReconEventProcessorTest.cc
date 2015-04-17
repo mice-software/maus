@@ -30,8 +30,8 @@ namespace ReconEventProcessorTest {
 
 std::string EMR_BAR_HIT =
     std::string("{\"tot\":-1, \"delta_t\":-2, \"hittime\":-3, ")+
-    std::string("\"x\":-4., \"y\":-5., \"z\":-6., ")+
-    std::string("\"charge_corrected\":-7., \"total_charge_corrected\":-8.}");
+    std::string("\"x\":-4., \"ex\":-5., \"y\":-6., \"ey\":-7., \"z\":-8., \"ez\":-9., ")+
+    std::string("\"charge_corrected\":-10., \"total_charge_corrected\":-11.}");
 
 std::string EMR_BAR = "{\"bar\":-1, \"emr_bar_hits\":["+EMR_BAR_HIT+","+EMR_BAR_HIT+"]}";
 
