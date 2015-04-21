@@ -37,6 +37,8 @@
 
 // MAUS
 #include "Utils/EMRChannelMap.hh"
+#include "Utils/EMRCalibrationMap.hh"
+#include "Utils/EMRAttenuationMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
@@ -59,6 +61,7 @@ typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
 struct fADCdata {
   int    _orientation;
   double _charge;
+  double _charge_corrected;
   double _pedestal_area;
   int    _time;
   std::vector<int> _samples;
@@ -73,6 +76,10 @@ struct TrackData {
   double _secondary_to_primary_track_distance;
   bool _has_primary;
   bool _has_secondary;
+  double _total_charge_ma;
+  double _total_charge_sa;
+  double _charge_ratio_ma;
+  double _charge_ratio_sa;
 };
 
 typedef std::vector<TrackData> EMRTrackEventVector;
@@ -122,10 +129,19 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 				  EMRDBBEventVector *emr_dbb_events,
 				  EMRfADCEventVector& emr_fadc_events) const;
 
+  void energy_correction(int nPartEvents,
+			 EMRDBBEventVector *emr_dbb_events,
+			 EMRfADCEventVector& emr_fadc_events) const;
+
   void track_matching(int nPartEvents,
 		      EMRDBBEventVector *emr_dbb_events,
 		      EMRfADCEventVector& emr_fadc_events,
 		      EMRTrackEventVector& emr_track_events) const;
+
+  void event_charge_calculation(int nPartEvents,
+				EMRDBBEventVector *emr_dbb_events,
+				EMRfADCEventVector& emr_fadc_events,
+				EMRTrackEventVector& emr_track_events) const;
 
   void fill(Spill *spill,
 	    int nPartEvents,
@@ -133,11 +149,13 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 	    EMRfADCEventVector& emr_fadc_events,
 	    EMRTrackEventVector& emr_track_events) const;
 
-//  void event_charge_calculation()
-
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
   EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
   EMRTrackEventVector get_track_data_tmp(int nPartEvts) const;
+
+  // Maps
+  EMRCalibrationMap _calibMap;
+  EMRAttenuationMap _attenMap;
 
   // Detector parameters
   int _number_of_planes;
@@ -157,6 +175,12 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   int _secondary_trigger_minNhits;
   int _secondary_trigger_minTot;
   int _max_secondary_to_primary_track_distance;
+
+  // Charge reconstruction variables
+  double _tot_func_p1;
+  double _tot_func_p2;
+  double _tot_func_p3;
+  double _tot_func_p4;
 };
 }
 
