@@ -29,6 +29,9 @@ MAUS contains several applications to perform various tasks. Two main applicatio
  > ${MAUS_ROOT_DIR}/bin/analyze_data_offline.py
 \end{verbatim}
 
+\section{Choosing the Unpacker Version}
+The unpacker is the third party library shipped with MAUS used to unpack the MICE DAQ binary data.  It comes in two versions, for Step I data and Step IV data.  The current default unpacker version is Step I.  In order to switch unpacker versions, the file env.sh in the MAUS root directory must be edited, so that the variable \texttt{MAUS\_UNPACKER\_VERSION} reads either ``StepI'' or ``StepIV'' as desired. After the variable has been changed, a clean shell must be launched, the env.sh script must be sourced, and the MAUS build cleaned and rebuilt with the command \texttt{scons -c; scons -j8}.
+
 \subsection{Run Control}
 The routines can be controlled by a number of settings that enable users to specify run configurations, as specified in this document. Most control variables can be controlled directly from the comamnd line, for example doing
 \begin{verbatim}
