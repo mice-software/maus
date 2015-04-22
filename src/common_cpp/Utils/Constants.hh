@@ -15,6 +15,9 @@
  *
  */
 
+#ifndef MAUS_RECON_CONSTANTS_HH
+#define MAUS_RECON_CONSTANTS_HH
+
 namespace MAUS {
 namespace Recon {
 namespace Constants {
@@ -40,3 +43,5 @@ const double ElectronMass = 0.510998910;
 } // ~namespace Constants
 } // ~namespace Recon
 } // ~namespace MAUS
+
+#endif // MAUS_RECON_CONSTANTS_HH

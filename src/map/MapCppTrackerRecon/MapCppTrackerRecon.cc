@@ -19,7 +19,16 @@
 #include "src/map/MapCppTrackerRecon/MapCppTrackerRecon.hh"
 #include "src/common_cpp/Recon/Kalman/MAUSTrackWrapper.hh"
 
+#include <sstream>
+
 namespace MAUS {
+
+//void print_state( Kalman::State& state );
+
+void print_helical( SciFiHelicalPRTrack* helical );
+void print_straight( SciFiStraightPRTrack* straight );
+
+
 PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
   PyWrapMapBase<MapCppTrackerRecon>::PyWrapMapBaseModInit
                                         ("MapCppTrackerRecon", "", "", "", "");
@@ -36,11 +45,18 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
   Json::Value* json = Globals::GetConfigurationCards();
-  _helical_pr_on  = (*json)["SciFiPRHelicalOn"].asBool();
-  _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
-  _kalman_on      = (*json)["SciFiKalmanOn"].asBool();
-  _size_exception = (*json)["SciFiClustExcept"].asInt();
-  _min_npe        = (*json)["SciFiNPECut"].asDouble();
+  _helical_pr_on   = (*json)["SciFiPRHelicalOn"].asBool();
+  _straight_pr_on  = (*json)["SciFiPRStraightOn"].asBool();
+  _kalman_on       = (*json)["SciFiKalmanOn"].asBool();
+  _size_exception  = (*json)["SciFiClustExcept"].asInt();
+  _min_npe         = (*json)["SciFiNPECut"].asDouble();
+  _use_mcs         = (*json)["SciFiKalman_use_MCS"].asBool();
+  _use_eloss       = (*json)["SciFiKalman_use_Eloss"].asBool();
+  _use_patrec_seed = (*json)["SciFiKalman_use_seed_PatRec"].asBool();
+
+  _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
+
+  _spacepoint_recon = SciFiSpacePointRec();
 
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
@@ -48,8 +64,35 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
 
-  _helical_track_fitter = new Kalman::TrackFit(HelicalPropagator(_geometry_helper), SciFiMeasurements(_geometry_helper));
-  _straight_track_fitter = new Kalman::TrackFit(StraightPropagator(_geometry_helper), SciFiMeasurements(_geometry_helper));
+  _pattern_recognition.set_helical_pr_on(_helical_pr_on);
+  _pattern_recognition.set_straight_pr_on(_straight_pr_on);
+  _pattern_recognition.set_bz_t1(fabs(_geometry_helper.GetFieldValue(0)));
+  _pattern_recognition.set_bz_t2(fabs(_geometry_helper.GetFieldValue(1)));
+
+#ifdef KALMAN_TEST
+  HelicalPropagator* spacepoint_helical_prop = new HelicalPropagator(&_geometry_helper);
+  spacepoint_helical_prop->SetIncludeMCS( _use_mcs );
+  spacepoint_helical_prop->SetSubtractELoss( _use_eloss );
+  _spacepoint_helical_track_fitter = new Kalman::TrackFit(spacepoint_helical_prop,
+      new SciFiSpacepointMeasurements<5>(1.0));
+
+  StraightPropagator* spacepoint_straight_prop = new StraightPropagator(&_geometry_helper);
+  spacepoint_straight_prop->SetIncludeMCS( _use_mcs );
+  _spacepoint_straight_track_fitter = new Kalman::TrackFit(spacepoint_straight_prop,
+      new SciFiSpacepointMeasurements<4>(1.0));
+#else
+  HelicalPropagator* helical_prop = new HelicalPropagator(&_geometry_helper);
+  helical_prop->SetIncludeMCS( _use_mcs );
+  helical_prop->SetSubtractELoss( _use_eloss );
+  _helical_track_fitter = new Kalman::TrackFit( helical_prop, new SciFiHelicalMeasurements(&_geometry_helper));
+
+  StraightPropagator* straight_prop = new StraightPropagator(&_geometry_helper);
+  straight_prop->SetIncludeMCS( _use_mcs );
+  _straight_track_fitter = new Kalman::TrackFit(straight_prop, new SciFiStraightMeasurements(&_geometry_helper));
+#endif
+
+  std::cerr << "Tracker 0 Field = " << _geometry_helper.GetFieldValue(0) << "\n"
+            << "Tracker 1 Field = " << _geometry_helper.GetFieldValue(1) << "\n\n";
 }
 
 void MapCppTrackerRecon::_death() {
@@ -64,15 +107,15 @@ void MapCppTrackerRecon::_process(Data* data) const {
 
       // Build Clusters.
       if ( event->digits().size() ) {
-        cluster_recon(*event);
+        _cluster_recon.process(*event);
       }
       // Build SpacePoints.
       if ( event->clusters().size() ) {
-        spacepoint_recon(*event);
+        _spacepoint_recon.process(*event);
       }
       // Pattern Recognition.
       if ( event->spacepoints().size() ) {
-        pattern_recognition(*event);
+        _pattern_recognition.process(*event);
       }
       // Kalman Track Fit.
       if ( _kalman_on ) {
@@ -87,55 +130,114 @@ void MapCppTrackerRecon::_process(Data* data) const {
   }
 }
 
-void MapCppTrackerRecon::cluster_recon(SciFiEvent &evt) const {
-  SciFiClusterRec clustering(_size_exception, _min_npe, _geometry_helper.GeometryMap());
-  clustering.process(evt);
-}
-
-void MapCppTrackerRecon::spacepoint_recon(SciFiEvent &evt) const {
-  SciFiSpacePointRec spacepoints;
-  spacepoints.process(evt);
-}
-
-void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) const {
-  PatternRecognition pr1; // Pat rec constructor calls Globals again
-  // We let the Map's helical and straight flags overide the interal pat rec variables for these,
-  // (pulled by pat rec from Globals) as this way we can customise which type runs for
-  // testing purposes.
-  pr1.set_helical_pr_on(_helical_pr_on);
-  pr1.set_straight_pr_on(_straight_pr_on);
-  // std::cerr << "Bz T1 = " << _geometry_helper.GetFieldValue(0) << std::endl;
-  // std::cerr << "Bz T2 = " << _geometry_helper.GetFieldValue(1) << std::endl;
-  pr1.set_bz_t1(_geometry_helper.GetFieldValue(0));
-  pr1.set_bz_t2(_geometry_helper.GetFieldValue(1));
-  pr1.process(evt);
-}
-
 void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
+#ifdef KALMAN_TEST
   size_t number_helical_tracks = evt.helicalprtracks().size();
   size_t number_straight_tracks = evt.straightprtracks().size();
 
   for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
-    SciFiHelicalPRTrack* helical = evt.helicalprtracks()->at(track_i);
-    Kalman::Track data_track = BuildTrack(helical, _geometry_helper);
+    SciFiHelicalPRTrack* helical = evt.helicalprtracks().at(track_i);
+    SciFiSpacePointPArray spacepoints = helical->get_spacepoints_pointers();
 
-    Kalman::State seed = ComputeSeed(helical, _geometry_helper);
+    Kalman::Track data_track = BuildSpacepointTrack(spacepoints, &_geometry_helper);
+
+//    std::cerr << "Data Track\n";
+//    std::cerr << Kalman::print_track(data_track);
+
+    Kalman::State seed = ComputeSeed(helical, &_geometry_helper);
+
+    std::cerr << Kalman::print_state(seed, "Helical Seed" );
+
+    std::cerr << "Helical Track\n";
+    print_helical( helical );
+
+    _spacepoint_helical_track_fitter->SetData(data_track);
+    _spacepoint_helical_track_fitter->SetSeed(seed);
+
+    _spacepoint_helical_track_fitter->Filter(false);
+    _spacepoint_helical_track_fitter->Smooth(false);
+
+    Kalman::Track predicted = _spacepoint_helical_track_fitter->GetPredicted();
+    Kalman::Track filtered = _spacepoint_helical_track_fitter->GetFiltered();
+    Kalman::Track smoothed = _spacepoint_helical_track_fitter->GetSmoothed();
+    std::cerr << "Data Track\n";
+    std::cerr << Kalman::print_track(data_track);
+    std::cerr << "Predicted Track\n";
+    std::cerr << Kalman::print_track(predicted);
+    std::cerr << "Filtered Track\n";
+    std::cerr << Kalman::print_track(filtered);
+    std::cerr << "Smoothed Track\n";
+    std::cerr << Kalman::print_track(smoothed);
+    std::cerr << "Measured Filtered\n";
+    SciFiSpacepointMeasurements<5>* temp_measurement = new SciFiSpacepointMeasurements<5>(1.0);
+    for ( unsigned int k = 0; k < filtered.GetLength(); ++k )
+    {
+      Kalman::State temp_state = temp_measurement->Measure(filtered[k]);
+      std::cerr << Kalman::print_state( temp_state );
+    }
+
+    SciFiTrack* track = ConvertToSciFiTrack(smoothed, &_geometry_helper);
+//    SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter->GetFiltered(),
+//                                                             &_geometry_helper);
+    evt.add_scifitrack(track);
+  }
+  for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
+    SciFiStraightPRTrack* straight = evt.straightprtracks().at(track_i);
+    SciFiSpacePointPArray spacepoints = straight->get_spacepoints_pointers();
+
+    Kalman::Track data_track = BuildSpacepointTrack(spacepoints, &_geometry_helper);
+    std::cerr << "Data Track\n";
+    std::cerr << Kalman::print_track(data_track);
+
+    Kalman::State seed = ComputeSeed(straight, &_geometry_helper, 100.0);
+    std::cerr << "Straight Track\n";
+    print_straight( straight );
+
+    _spacepoint_straight_track_fitter->SetData(data_track);
+    _spacepoint_straight_track_fitter->SetSeed(seed);
+
+    _spacepoint_straight_track_fitter->Filter(false);
+    _spacepoint_straight_track_fitter->Smooth(false);
+
+    Kalman::Track filtered = _spacepoint_straight_track_fitter->GetFiltered();
+    Kalman::Track smoothed = _spacepoint_straight_track_fitter->GetSmoothed();
+    std::cerr << "Filtered Track\n";
+    std::cerr << Kalman::print_track(filtered);
+    std::cerr << "\nSmoothed Track\n";
+    std::cerr << Kalman::print_track(smoothed);
+
+    SciFiTrack* track = ConvertToSciFiTrack(smoothed, &_geometry_helper);
+    evt.add_scifitrack(track);
+  }
+#else
+  size_t number_helical_tracks = evt.helicalprtracks().size();
+  size_t number_straight_tracks = evt.straightprtracks().size();
+  for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
+    SciFiHelicalPRTrack* helical = evt.helicalprtracks().at(track_i);
+
+    Kalman::Track data_track = BuildTrack(helical, &_geometry_helper);
+
+    Kalman::State seed = ComputeSeed(helical, &_geometry_helper, 100.0);
 
     _helical_track_fitter->SetData(data_track);
     _helical_track_fitter->SetSeed(seed);
 
-    _helical_track_fitter->Filter();
-    _helical_track_fitter->Smooth();
+    _helical_track_fitter->Filter(false);
+    _helical_track_fitter->Smooth(false);
 
     SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter->GetSmoothed(),
-                                                             _geometry_helper);
+                                                             &_geometry_helper);
     evt.add_scifitrack(track);
   }
-  for ( size_t track_i = 0; track_i < number_helical_tracks; track_i++ ) {
-    SciFiStraightPRTrack* straight = evt.straightprtracks()->at(track_i);
-    Kalman::Track data_track = BuildTrack(straight, _geometry_helper);
+  for ( size_t track_i = 0; track_i < number_straight_tracks; track_i++ ) {
+    SciFiStraightPRTrack* straight = evt.straightprtracks().at(track_i);
+    Kalman::Track data_track = BuildTrack(straight, &_geometry_helper);
 
-    Kalman::State seed = ComputeSeed(straight, _geometry_helper);
+    Kalman::State seed = ComputeSeed(straight, &_geometry_helper);
+
+    continue;
+
+    std::cerr << Kalman::print_track( data_track);
 
     _straight_track_fitter->SetData(data_track);
     _straight_track_fitter->SetSeed(seed);
@@ -144,9 +246,10 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
     _straight_track_fitter->Smooth();
 
     SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter->GetSmoothed(),
-                                                             _geometry_helper);
+                                                             &_geometry_helper);
     evt.add_scifitrack(track);
   }
+#endif
 }
 
 void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
@@ -192,25 +295,26 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
     for ( unsigned int j = 0; j < trackpoints.size(); ++j )
     {
 //      std::cerr << "Plane, Station, Tracker = " << trackpoints[j]->plane() << ", " << trackpoints[j]->station() << ", " << trackpoints[j]->tracker() << '\n';
-      SciFiCluster* cluster = trackpoints[j]->get_cluster_pointer();
+//      SciFiCluster* cluster = trackpoints[j]->get_cluster_pointer();
 
       std::cerr << "Track Point = " << trackpoints[j]->pos()[0] << ", " << trackpoints[j]->pos()[1] << ", " << trackpoints[j]->pos()[2] << " | "
-                                    << trackpoints[j]->mom()[0] << ", " << trackpoints[j]->mom()[1] << ", " << trackpoints[j]->mom()[2] << " | "
-                                    << "DATA = " << ( cluster ? cluster->get_alpha() : 0 ) << '\n';
+                                    << trackpoints[j]->mom()[0] << ", " << trackpoints[j]->mom()[1] << ", " << trackpoints[j]->mom()[2] << "\n";// << " | "
+//                                    << "DATA = " << ( cluster ? cluster->get_alpha() : 0 ) << '\n';
     }
-    std::cerr << "Tracker : " << tracks[i]->tracker() << ", Chi2 = " << tracks[i]->chi2() << ", P_Value = " << tracks[i]->P_value() << '\n';
+    std::cerr << "Tracker : " << tracks[i]->tracker() << ", Chi2 = " << tracks[i]->chi2()
+              << ", P_Value = " << tracks[i]->P_value() << ", Charge = " << tracks[i]->charge() <<  '\n';
 
     std::vector<double> seed_sta = tracks[i]->GetSeedState();
     std::vector<double> seed_cov = tracks[i]->GetSeedCovariance();
 
     std::cerr << "Seed State = ";
-    for ( int j = 0; j < seed_sta.size(); ++j ) {
+    for ( unsigned int j = 0; j < seed_sta.size(); ++j ) {
       std::cerr << seed_sta[j] << ", ";
     }
     std::cerr << '\n';
 
     std::cerr << "Seed Covariance = ";
-    for ( int j = 0; j < seed_cov.size(); ++j ) {
+    for ( unsigned int j = 0; j < seed_cov.size(); ++j ) {
       std::cerr << seed_cov[j] << ", ";
     }
     std::cerr << '\n';
@@ -263,4 +367,45 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
   */
 }
 
+void print_helical( SciFiHelicalPRTrack* helical ) {
+  SciFiSpacePointPArray spacepoints = helical->get_spacepoints_pointers();
+  size_t numb_spacepoints = spacepoints.size();
+
+  std::cerr << "HELICAL TRACK:\n";
+
+  double r = helical->get_R();
+  double sz = helical->get_line_sz_c();
+  double charge = helical->get_charge();
+  std::cerr << "Radius = " << r << " Sz = " << sz << " Charge = " << charge << " Phi_0 = " << sz/r << "\n";
+
+  for ( size_t i = 0; i < numb_spacepoints; ++i ) {
+    SciFiSpacePoint *spacepoint = spacepoints[i];
+
+    std::cerr << spacepoint->get_tracker() << ", " 
+              << spacepoint->get_station() << "  -  "
+              << spacepoint->get_position().x() << ", "
+              << spacepoint->get_position().y() << ", "
+              << spacepoint->get_position().z() << "\n";
+  }
+
+  std::cerr << std::endl;
+}
+
+void print_straight( SciFiStraightPRTrack* straight ) {
+  SciFiSpacePointPArray spacepoints = straight->get_spacepoints_pointers();
+  size_t numb_spacepoints = spacepoints.size();
+
+  std::cerr << "STRAIGHT TRACK:\n";
+  for ( size_t i = 0; i < numb_spacepoints; ++i ) {
+    SciFiSpacePoint *spacepoint = spacepoints[i];
+
+    std::cerr << spacepoint->get_tracker() << ", " 
+              << spacepoint->get_station() << "  -  "
+              << spacepoint->get_position().x() << ", "
+              << spacepoint->get_position().y() << ", "
+              << spacepoint->get_position().z() << "\n";
+  }
+
+  std::cerr << std::endl;
+}
 } // ~namespace MAUS

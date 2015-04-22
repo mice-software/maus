@@ -20,6 +20,8 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
+#include "TMatrixD.h"
+
 namespace MAUS {
 namespace Kalman {
 
@@ -43,7 +45,7 @@ namespace Kalman {
 
       /** @brief Returns the last propagator matrix
        */
-      virtual TMatrixD GetPropagator() const { return TMatrix(PropagatorMatrix()); }
+      virtual TMatrixD GetPropagator() const { return TMatrixD(PropagatorMatrix()); }
 
       /** @brief Returns the process noise covariance matrix
        */
@@ -51,8 +53,11 @@ namespace Kalman {
 
       /** @brief Returns the last process noise covariance matrix
        */
-      virtual TMatrixD GetProcessNoise() const { return TMatrixD(ProcessNoise()); }
+      virtual TMatrixD GetProcessNoise() const { return TMatrixD(NoiseMatrix()); }
 
+      /** @brief Return the dimension of the state vector
+       */
+      unsigned int GetDimension() const { return _dimension; }
 
       /** @brief Destructor
        */

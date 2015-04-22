@@ -20,14 +20,19 @@
 #define KALMAN_TRACKFIT_HH
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanPropgator_base.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanMeasurement_base.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanPropagatorBase.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanMeasurementBase.hh"
 
 #include "TMatrix.h"
 
+#include <string>
 
 namespace MAUS {
 namespace Kalman {
+
+  std::string print_state( const State& state, const char* detail = 0 );
+
+  std::string print_track( const Track& track, const char* name = 0 );
 
 //  TMatrixD ComputeKalmanGainMatrix(Measurement_base* measurement, State state);
 //
@@ -46,15 +51,15 @@ namespace Kalman {
      *  @brief Used to save the current state of the track fitter
      *
      */
-    enum Status { Error, Intialised, Predicted, Filtered, Smoothed };
+    enum Status { Error, Initialised, Predicted, Filtered, Smoothed };
 
     /** @brief Intialise with the required measurement and propagator classes.
      */
-    KalmanTrackFit(Propagator_base* propagator, Measurement_base* measurement);
+    TrackFit(Propagator_base* propagator, Measurement_base* measurement);
 
     /** @brief Destructor
      */
-    virtual ~KalmanTrackFit();
+    virtual ~TrackFit();
 
     /** @brief Append a new data state and filter up to it
      *
@@ -65,11 +70,11 @@ namespace Kalman {
 
     /** @brief Filter all states using supplied propagator and measurement classes
      */
-    void Filter();
+    void Filter(bool forward = true);
 
     /** @brief Smooth all states using supplied propagator and measurement classes
      */
-    void Smooth();
+    void Smooth(bool forward = true);
 
 
     /** @brief Returns the current start seed
@@ -109,20 +114,25 @@ namespace Kalman {
      */
     unsigned int GetDimension() const { return _dimension; }
 
+    /** @brief Return the dimension of the measurement state vector
+     */
+    unsigned int GetMeasurementDimension() const { return _measurement_dimension; }
+
   protected:
 
 //    State Filter(State filtered, State predicted);
 
   private:
     // Private copy constructor => No copying!
-    TrackFit(const TrackFit& tf) {} 
+    TrackFit(const TrackFit& tf); 
     TrackFit& operator=(const TrackFit& tf) { return *this; }
 
     Status _fitter_status;
 
     unsigned int _dimension;
+    unsigned int _measurement_dimension;
 
-    Propagator_base* _propgator;
+    Propagator_base* _propagator;
     Measurement_base* _measurement;
 
     State _seed;
@@ -132,7 +142,7 @@ namespace Kalman {
     Track _filtered;
     Track _smoothed;
 
-    TMatrixD _unit_matrix;
+    TMatrixD _identity_matrix;
   };
 } // namespace Kalman
 } // namespace MAUS

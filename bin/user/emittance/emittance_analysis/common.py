@@ -144,6 +144,7 @@ def fit_gaussian( hist, fit_min = 0, fit_max = 0 ) :
   """
   fit_result = hist.Fit( "gaus", "Q0S", "", fit_min, fit_max )
   func = hist.GetFunction( "gaus" )
+  if not func : return 0.0, -1.0
   mean = func.GetParameter(1)
   stddev = func.GetParameter(2)
   return mean, stddev

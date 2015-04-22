@@ -24,6 +24,7 @@
 
 #include "json/json.h"
 
+#define _STEPIV_DATA
 #include "unpacking/event.h"
 #include "unpacking/MDdateFile.h"
 #include "unpacking/MDevent.h"

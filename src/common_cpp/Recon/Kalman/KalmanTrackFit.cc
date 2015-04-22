@@ -19,13 +19,52 @@
 
 #include "src/common_cpp/Utils/Exception.hh"
 
+#include <iostream>
+#include <sstream>
+
+#include "TDecompLU.h"
+
 
 namespace MAUS {
 namespace Kalman {
 
-  TrackFit::TrackFit(Propagator_base* prop, Measurement_base meas) :
+
+  std::string print_state( const State& state, const char* detail ) { 
+    std::ostringstream converter("");
+    TMatrixD vec = state.GetVector();
+
+    if ( detail )
+      converter << detail;
+    converter << " @ " << state.GetPosition() << ", " << state.GetId() << "  |  ";
+    for ( unsigned int i = 0; i < state.GetDimension(); ++i ) {
+      converter << vec(i, 0) << "    ";
+    }
+    converter << 1.0/vec(vec.GetNrows()-1, 0);
+    converter << "\n";
+    return converter.str();
+  }
+
+
+  std::string print_track( const Track& track, const char* name) { 
+    unsigned int num = track.GetLength();
+    std::ostringstream converter("");
+    if ( name )
+      converter << "Printing " << name << "\n";
+    else
+      converter << "TRACK:\n";
+
+    for ( unsigned int i = 0; i < num; ++i ) {
+      State state = track[i];
+      converter << print_state(state);
+    }
+    converter << "\n";
+    return converter.str();
+  }
+
+  TrackFit::TrackFit(Propagator_base* prop, Measurement_base* meas) :
     _fitter_status(TrackFit::Initialised),
-    _dimension(prop.GetDimension()),
+    _dimension(prop->GetDimension()),
+    _measurement_dimension(meas->GetMeasurementDimension()),
     _propagator(prop),
     _measurement(meas),
     _seed(_dimension),
@@ -34,9 +73,9 @@ namespace Kalman {
     _filtered(_dimension),
     _smoothed(_dimension),
     _identity_matrix(_dimension, _dimension) {
-    if (_measurement.GetDimension() != _propagator.GetDimension()) {
-      throw Exception(Exception::Recoverable,
-          "Propagators and Measurements have conflicting dimension."
+    if (_measurement->GetDimension() != _propagator->GetDimension()) {
+      throw Exception(Exception::recoverable,
+          "Propagators and Measurements have conflicting dimension.",
           "Kalman::TrackFit::TrackFit()");
     }
     _identity_matrix.Zero();
@@ -45,7 +84,7 @@ namespace Kalman {
   }
 
 
-  TrackFit::~Trackfit() {
+  TrackFit::~TrackFit() {
     if (_propagator) {
       delete _propagator;
       _propagator = NULL;
@@ -58,12 +97,12 @@ namespace Kalman {
 
 
   void TrackFit::AppendFilter(State state) {
-    throw Exception(Exception::Recoverable,
+    throw Exception(Exception::recoverable,
         "Functionality Not Implemented!",
-        "Kalman::TrackFit::AppendFilter()")
+        "Kalman::TrackFit::AppendFilter()");
 
     if (state.GetDimension() != _measurement->GetMeasurementDimension()) {
-      throw Exception(Exception::Recoverable,
+      throw Exception(Exception::recoverable,
           "State dimension does not match the measurement dimension",
           "Kalman::TrackFit::AppendFilter()");
     }
@@ -75,55 +114,93 @@ namespace Kalman {
   }
 
 
-  void TrackFit::Filter() {
+  void TrackFit::Filter(bool forward) {
     _predicted.Reset(_data);
     _filtered.Reset(_data);
 
-    _predicted[0] = _seed;
-    _filtered[0] = _seed;
+    int increment = ( forward ? 1 : -1 );
+    int track_start = ( forward ? 1 : _data.GetLength() - 2 );
+    int track_end = ( forward ? _data.GetLength() : -1 );
 
-    for (unsigned int i = 1; i < _data.Length(); ++i) {
-      _propagator.Propagate(_filtered[i-1], _predicted[i]);
+    _predicted[track_start-increment] = _seed;
+    _filtered[track_start-increment] = _seed;
+
+    for (int i = track_start; i != track_end; i += increment) {
+      _propagator->Propagate(_filtered[i-increment], _predicted[i]);
 
       if (_data[i].HasValue()) {
 
-        TMatrixD H = measurement.GetMeasurementMatrix(_predicted[index]);
-        TMatrixD HT; HT.Transpose(H);
+        State measured = _measurement->Measure(_predicted[i]);
 
-        State measured = measurement->Measure(_predicted[index]);
-        TMatrixD temp = measured.GetCovariance();
-        temp.Invert();
+        TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
+//        temp = measured.GetCovariance();
+        TDecompLU lu(measured.GetCovariance());
+        if (!lu.Decompose()) {
+          std::cerr << "Covariance too small, skipping...\n";
+          _filtered[i] = _predicted[i];
+          continue;
+        }
+        lu.Invert(temp);
+//        temp.Invert();
 
-        TMatrixD K = _predicted[i].GetCovariance() * HT * temp;
+        TMatrixD H(GetMeasurementDimension(), GetDimension());
+        TMatrixD HT(GetDimension(), GetMeasurementDimension());
+        TMatrixD K(GetDimension(), GetMeasurementDimension());
+        TMatrixD pull(GetMeasurementDimension(), 1);
 
-        TMatrixD pull = _data[i].GetVector - measured.GetVector();
+        H = _measurement->GetMeasurementMatrix();
+        HT.Transpose(H);
 
-        _filtered[i].SetVector( _predicted[i].GetState() + K * pull );
-        _filtered[i].SetCovariance( ( _identity_matrix - H * K ) * _predicted[i].getCovariance() );
+        K = _predicted[i].GetCovariance() * HT * temp;
+
+        pull = _data[i].GetVector() - measured.GetVector();
+
+        TMatrixD temp_vec( GetDimension(), 1 );
+        TMatrixD temp_cov( GetDimension(), GetDimension() );
+
+        temp_vec = _predicted[i].GetVector() + K * pull;
+        temp_cov = ( _identity_matrix - K * H ) * _predicted[i].GetCovariance();
+
+        _filtered[i].SetVector( temp_vec );
+        _filtered[i].SetCovariance( temp_cov );
       } else {
+        std::cerr << "NO DATA FOUND IN STATE\n";
         _filtered[i] = _predicted[i];
       }
     }
-
     _fitter_status = TrackFit::Filtered;
   }
 
 
-  void TrackFit::Smooth() {
+  void TrackFit::Smooth(bool forward) {
     _smoothed.Reset(_filtered);
 
-    unsigned int last_state = _smoothed.Length() - 1;
-    _smoothed[last_state] = _filtered[last_state];
+    int increment = ( forward ? -1 : 1 );
+    int track_start = ( forward ? (_smoothed.GetLength() - 2) : 1 );
+    int track_end = ( forward ? -1 : (_smoothed.GetLength()) );
 
-    for (unsigned int i = (last_state - 1); i >= 0; --i ) {
+    _smoothed[track_start-increment] = _filtered[track_start-increment];
 
-      TMatrixD prop = _propagator->GetPropagator(_filtered[i], _filtered[i+1]);
-      TMatrixD protT; propT.Transpose(prop);
-      TMatrixD A = _filtered[i].GetCovariance() * propT _predicted[i+1].GetCovariance().Invert();
-      TMatrixD AT; AT.Transpose(A);
+    for (int i = track_start; i != track_end; i += increment ) {
+      TMatrixD temp(GetDimension(), GetDimension());
+      TDecompLU lu(_predicted[i - increment].GetCovariance());
+      if (!lu.Decompose() || !lu.Invert(temp)) {
+        std::cerr << "Covariance too small, skipping...\n";
+        _smoothed[i] = _filtered[i];
+        continue;
+      }
 
-      _smoothed[i].SetVector( _filtered[i].GetCovaraince() + A * ( _smoothed[i+1].GetVector() - _predicted[i+1].GetVector() ) );
-      smoothed[i].SetCovariance( _filtered[i].GetCovariance() + A * ( _smoothed[i+1].GetCovariance() - _predicted[i+1].GetCovariance() ) * AT );
+      TMatrixD prop = _propagator->CalculatePropagator(_filtered[i], _filtered[i - increment]);
+      TMatrixD propT(GetDimension(), GetDimension()); propT.Transpose(prop);
+
+      TMatrixD A = _filtered[i].GetCovariance() * propT * temp;
+      TMatrixD AT(GetDimension(), GetDimension()); AT.Transpose(A);
+
+      TMatrixD vec = _filtered[i].GetVector() + A * ( _smoothed[i-increment].GetVector() - _predicted[i-increment].GetVector() );
+      TMatrixD cov = _filtered[i].GetCovariance() + A * ( _smoothed[i-increment].GetCovariance() - _predicted[i-increment].GetCovariance() ) * AT;
+
+      _smoothed[i].SetVector( vec );
+      _smoothed[i].SetCovariance( cov );
     }
 
     _fitter_status = TrackFit::Smoothed;
@@ -132,7 +209,7 @@ namespace Kalman {
 
   void TrackFit::SetSeed(State seed) {
     if (seed.GetDimension() != _dimension) {
-      throw Exception(Exception::Recoverable,
+      throw Exception(Exception::recoverable,
           "Seed dimension does not match the track fitter",
           "Kalman::TrackFit::SetSeed()");
     }
@@ -172,6 +249,18 @@ namespace Kalman {
 //    _filtered[index].SetCovariance(new_cov);
 //  }
 
+  TrackFit::TrackFit(const TrackFit& tf) :
+    _fitter_status(TrackFit::Initialised),
+    _dimension(tf.GetDimension()),
+    _propagator(0),
+    _measurement(0),
+    _seed(_dimension),
+    _data(_dimension),
+    _predicted(_dimension),
+    _filtered(_dimension),
+    _smoothed(_dimension),
+    _identity_matrix(_measurement_dimension, _measurement_dimension) {
+  }
 
 
 } // namespace Kalman

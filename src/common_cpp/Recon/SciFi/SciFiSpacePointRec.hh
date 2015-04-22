@@ -55,34 +55,34 @@ class SciFiSpacePointRec {
 
   ~SciFiSpacePointRec();
 
-  void process(SciFiEvent &evt);
+  void process(SciFiEvent &evt) const;
 
-  void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+  void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
-  void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+  void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
-  void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+  void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
-  void build_duplet(SciFiSpacePoint* duplet);
+  void build_duplet(SciFiSpacePoint* duplet) const;
 
-  void build_triplet(SciFiSpacePoint* triplet);
+  void build_triplet(SciFiSpacePoint* triplet) const;
 
-  ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
+  ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2) const;
 
   bool kuno_accepts(SciFiCluster* cluster1,
                     SciFiCluster* cluster2,
-                    SciFiCluster* cluster3);
+                    SciFiCluster* cluster3) const;
 
 
   bool clusters_are_not_used(SciFiCluster* candidate_A,
-                             SciFiCluster* candidate_B);
+                             SciFiCluster* candidate_B) const;
 
   bool clusters_are_not_used(SciFiCluster* candidate_A,
                              SciFiCluster* candidate_B,
-                             SciFiCluster* candidate_C);
+                             SciFiCluster* candidate_C) const;
 
   bool duplet_within_radius(SciFiCluster* candidate_A,
-                            SciFiCluster* candidate_B);
+                            SciFiCluster* candidate_B) const;
  private:
   /// This is the acceptable radius for any duplet.
   static const int _acceptable_radius = 160; // mm

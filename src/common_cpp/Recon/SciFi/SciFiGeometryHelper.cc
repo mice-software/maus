@@ -21,11 +21,8 @@ namespace MAUS {
 
 SciFiGeometryHelper::SciFiGeometryHelper() {}
 
-SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*> &modules)
+SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& modules)
                                         : _modules(modules) {
-  _RefPos.resize(2);
-  _Rot.resize(2);
-
   Json::Value *json = Globals::GetConfigurationCards();
   w_mylar                        = (*json)["MylarParams_Plane_Width"].asDouble();
   w_fibre                        = (*json)["FibreParams_Plane_Width"].asDouble();
@@ -55,14 +52,10 @@ SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*> &m
   GasParameters.Mean_Excitation_Energy  = (*json)["GasParams_Mean_Excitation_Energy"].asDouble();
   GasParameters.A                       = (*json)["GasParams_A"].asDouble();
   GasParameters.Density_Correction      = (*json)["GasParams_Density_Correction"].asDouble();
-
-  _w_scifi = FibreParameters.Plane_Width; // mm
-  _w_mylar = MylarParameters.Plane_Width;  // mm
-  _mm_to_cm = 0.1;
-
 }
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}
+
 
 void SciFiGeometryHelper::Build() {
   // Iterate over existing modules, adding planes to the map.
@@ -94,35 +87,33 @@ void SciFiGeometryHelper::Build() {
                                                               ->mother()));    // solenoid
 
       ThreeVector position  = clhep_to_root(module->globalPosition());
-      ThreeVector reference = GetReferenceFramePosition(tracker_n);
-
-      _RefPos[tracker_n] = reference;
-      _Rot[tracker_n]    = plane_rotation;
+      ThreeVector reference = FindReferenceFramePosition(tracker_n);
 
       ThreeVector tracker_ref_frame_pos = position-reference;
       tracker_ref_frame_pos *= plane_rotation;
 
-      SciFiPlaneGeometry this_plane;
-      this_plane.Direction      = direction;
-      this_plane.Position       = tracker_ref_frame_pos;
-      this_plane.GlobalPosition = position;
-      this_plane.CentralFibre   = centralfibre;
-      this_plane.Pitch          = pitch;
       int plane_id =  3*(station_n-1) + (plane_n+1);
-      plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
-      _geometry_map.insert(std::make_pair(plane_id, this_plane));
+//      plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
 
       const MiceModule* trackerModule = plane->mother(); // tracker
       ThreeVector trackerPos = clhep_to_root(trackerModule->globalPosition());
 
-//      _field_value[tracker_n] = FieldValue(reference, plane_rotation);
-      // Assume field value at center of the tracker - not the tracker reference plane.
-      // Rotation requred as PattRec runs in the reference frame of the tracker.
-//      _field_value[tracker_n] = FieldValue( trackerPos, plane_rotation );
 
-      _field_value[tracker_n] = FieldValue(trackerModule);
+      SciFiPlaneGeometry this_plane;
+      this_plane.Direction      = direction.Unit();
+      this_plane.Position       = tracker_ref_frame_pos;
+      this_plane.GlobalPosition = position;
+      this_plane.CentralFibre   = centralfibre;
+      this_plane.Pitch          = pitch;
 
+      SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
+      trackerGeo.Position = reference;
+      trackerGeo.Rotation = trackerModule->globalRotation();
+      trackerGeo.Field = FieldValue(trackerModule);
+      trackerGeo.Planes[plane_id] = this_plane;
 //      std::cerr << "Tracker = " << tracker_n << ". Field = " << _field_value[tracker_n] << '\n';
+
+      _geometry_map[tracker_n] = trackerGeo;
     }
   }
 }
@@ -165,9 +156,9 @@ double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
     field->GetElectroMagneticField()->GetFieldValue(position, EMfield);
 
     ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
-//    B_field *= trackerRotation;
-//    sumBz += B_field[2];
-    sumBz += EMfield[2];
+    B_field *= trackerRotation;
+    sumBz += B_field[2];
+//    sumBz += EMfield[2];
 
     z_pos += stepSize;
   } while (z_pos < halfLength);
@@ -175,7 +166,7 @@ double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
   return sumBz / numSteps;
 }
 
-const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int plane) {
+const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int plane) const {
   const MiceModule* this_plane = NULL;
   for ( unsigned int j = 0; !this_plane && j < _modules.size(); ++j ) {
     // Find the right module
@@ -200,8 +191,21 @@ const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int p
   return this_plane;
 }
 
-ThreeVector SciFiGeometryHelper::GetReferenceFramePosition(int tracker) {
-  // Reference plane is plane 0, station 1 of current tracker.
+double SciFiGeometryHelper::GetPlanePosition(int tracker, int station, int plane) const {
+  int id = ( ((station-1)*3) + plane + 1 );
+  return _geometry_map.find(tracker)->second.Planes.find(id)->second.Position.z();
+
+//  int id = ( ((station-1)*3) + plane + 1 ) * ( tracker == 0 ? -1.0 : 1.0 );
+//  SciFiGeometryMap::const_iterator it = _geometry_map.find( id );
+//
+//  if (it == _geometry_map.end()) {
+//    std::cerr << "COULD NOT FIND PLANE! ID = " << id << "\n";
+//    return 0.0;
+//  }
+//  else return it->second.Position.z();
+}
+
+ThreeVector SciFiGeometryHelper::FindReferenceFramePosition(int tracker) const {
   int station = 1;
   int plane   = 0;
   const MiceModule* reference_plane = NULL;
@@ -212,16 +216,17 @@ ThreeVector SciFiGeometryHelper::GetReferenceFramePosition(int tracker) {
   return reference_pos;
 }
 
-void SciFiGeometryHelper::DumpPlanesInfo() {
-  std::map<int, SciFiPlaneGeometry>::iterator plane;
-  for ( plane = _geometry_map.begin(); plane != _geometry_map.end(); ++plane ) {
-    Squeak::mout(Squeak::info) << "Plane ID: " << plane->first << "\n"
-                               << "Direction: "<< plane->second.Direction << "\n"
-                               << "Position: " << plane->second.Position << "\n"
-                               << "CentralFibre: "<< plane->second.CentralFibre << "\n"
-                               << "Pitch: "       << plane->second.Pitch << "\n";
-  }
-}
+
+//void SciFiGeometryHelper::DumpPlanesInfo() {
+//  std::map<int, SciFiPlaneGeometry>::iterator plane;
+//  for ( plane = _geometry_map.begin(); plane != _geometry_map.end(); ++plane ) {
+//    Squeak::mout(Squeak::info) << "Plane ID: " << plane->first << "\n"
+//                               << "Direction: "<< plane->second.Direction << "\n"
+//                               << "Position: " << plane->second.Position << "\n"
+//                               << "CentralFibre: "<< plane->second.CentralFibre << "\n"
+//                               << "Pitch: "       << plane->second.Pitch << "\n";
+//  }
+//}
 
 double SciFiGeometryHelper::HighlandFormula(double L, double beta, double p) {
   static double HighlandConstant = Recon::Constants::HighlandConstant;
@@ -232,7 +237,7 @@ double SciFiGeometryHelper::HighlandFormula(double L, double beta, double p) {
   return result;
 }
 
-double SciFiGeometryHelper::BetheBlochStoppingPower(double p, MaterialParams& material) {
+double SciFiGeometryHelper::BetheBlochStoppingPower(double p, const SciFiMaterialParams* material) {
   double muon_mass      = Recon::Constants::MuonMass;
   double electron_mass  = Recon::Constants::ElectronMass;
   double muon_mass2     = muon_mass*muon_mass;
@@ -245,12 +250,12 @@ double SciFiGeometryHelper::BetheBlochStoppingPower(double p, MaterialParams& ma
   double gamma2 = gamma*gamma;
 
   double K = Recon::Constants::BetheBlochParameters::K();
-  double A = material.A;
-  double I = material.Mean_Excitation_Energy;
+  double A = material->A;
+  double I = material->Mean_Excitation_Energy;
   double I2= I*I;
-  double Z = material.Z;
-  double density = material.Density;
-  double density_correction = material.Density_Correction;
+  double Z = material->Z;
+  double density = material->Density;
+  double density_correction = material->Density_Correction;
 
   double outer_term = K*Z/(A*beta2);
   double Tmax = 2.*electron_mass*beta2*gamma2/(1.+(2.*gamma*electron_mass/muon_mass) +
@@ -265,17 +270,24 @@ double SciFiGeometryHelper::BetheBlochStoppingPower(double p, MaterialParams& ma
 void SciFiGeometryHelper::FillMaterialsList(int start_id, int end_id, SciFiMaterialsList& materials_list) {
 
   for (int current_id = abs(start_id); current_id < abs(end_id); ++current_id) {
-    materials.push_back(std::make_pair(FibreParameters, w_fibre));
-    materials.push_back(std::make_pair(MylarParameters, w_mylar));
+    materials_list.push_back(std::make_pair(&FibreParameters, w_fibre));
+    materials_list.push_back(std::make_pair(&MylarParameters, w_mylar));
 
-    // If we are extrapolating between stations, there's gas.
-    if ( current_id == 12 || current_id == 9 || current_id == 6 || current_id == 3 ) {
-      double w_gas;
-      if ( current_id == 3  ) w_gas = 200.0;
-      if ( current_id == 6  ) w_gas = 250.0;
-      if ( current_id == 9  ) w_gas = 300.0;
-      if ( current_id == 12 ) w_gas = 350.0;
-      materials.push_back(std::make_pair(GasParameters, w_gas));
+    switch( current_id ) {
+      case 3:
+        materials_list.push_back(std::make_pair(&GasParameters, 200.0));
+        break;
+      case 6:
+        materials_list.push_back(std::make_pair(&GasParameters, 250.0));
+        break;
+      case 9:
+        materials_list.push_back(std::make_pair(&GasParameters, 300.0));
+        break;
+      case 12:
+        materials_list.push_back(std::make_pair(&GasParameters, 350.0));
+        break;
+      default:
+        break;
     }
   }
 }

@@ -49,10 +49,6 @@ class SciFiTrackPoint : public TObject {
    */
   virtual ~SciFiTrackPoint();
 
-//  /** @brief  Constructs a SciFiTrackPoint from a KalmanState.
-//   */
-//  explicit SciFiTrackPoint(const KalmanState *kalman_site);
-
   /** @brief  Copy constructor.
    */
   SciFiTrackPoint(const SciFiTrackPoint &site);

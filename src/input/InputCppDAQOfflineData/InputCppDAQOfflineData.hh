@@ -20,6 +20,8 @@
 
 #include <string>
 
+#define _STEPIV_DATA
+
 #include "unpacking/MDfileManager.h"
 
 #include "src/input/InputCppDAQData/InputCppDAQData.hh"

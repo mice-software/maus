@@ -1,5 +1,5 @@
 
-#include "src/common_cpp/Recon/Kalman/MAUSPropagators.hh"
+#include "src/common_cpp/Recon/Kalman/MAUSSciFiPropagators.hh"
 
 
 namespace MAUS {
@@ -7,7 +7,6 @@ namespace MAUS {
 ////////////////////////////////////////////////////////////////////////////////
   // USEFUL FUCNTIONS
 ////////////////////////////////////////////////////////////////////////////////
-
 
 
 
@@ -22,7 +21,8 @@ namespace MAUS {
   }
 
 
-  TMatrixD StraightPropagator::CalculatePropagator(const State& start, const State& end) {
+  TMatrixD StraightPropagator::CalculatePropagator(const Kalman::State& start, const Kalman::State& end) {
+    std::cerr << "Calculating Straight Propagator\n";
     static TMatrixD prop(4, 4);
 
     // Find dz between sites.
@@ -39,33 +39,40 @@ namespace MAUS {
   }
 
 
-  TMatrixD StraightPropagator::CalculateProcessNoise(const State& start, const State& end) {
+  TMatrixD StraightPropagator::CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end) {
+    std::cerr << "Calculating Straight Process Noise\n";
     static TMatrixD new_noise(GetDimension(), GetDimension());
+    new_noise.Zero();
 
     if ( _include_mcs ) {
+      return new_noise;
 
+      // TODO : Should probably finish this one...
 
     } else {
-      new_noise.Zero();
       return new_noise;
     }
   }
 
 
-  TMatrixD StraightPropagator::BuildQ(const State& state, double radLen, double width) {
+  TMatrixD StraightPropagator::BuildQ(const Kalman::State& state, double radLen, double width) {
+    double deltaZ = width;
     double deltaZ_squared = deltaZ*deltaZ;
 
-    double mx    = a(1, 0);
-    double my    = a(3, 0);
-    double p   = GetTrackMomentum();
-    double p2  = p*p;
+    TMatrixD state_vector(4, 1);
+    state_vector = state.GetVector();
+
+    double mx    = state_vector(1, 0);
+    double my    = state_vector(3, 0);
+    double p     = 200.0; //TODO: Extract a more accurate value, somehow...
+    double p2    = p*p;
 
     double muon_mass = Recon::Constants::MuonMass;
     double muon_mass2 = muon_mass*muon_mass;
     double E = TMath::Sqrt(muon_mass2+p2);
     double beta = p/E;
 
-    double C = HighlandFormula(L0, beta, p);
+    double C = _geometry_helper->HighlandFormula(radLen, beta, p);
 
     double C2 = C*C;
 
@@ -77,7 +84,7 @@ namespace MAUS {
 
     double c_mx_my = C2 * mx*my * (1.+ mx*mx + my*my);
 
-    TMatrixD Q(_n_parameters, _n_parameters);
+    TMatrixD Q(4, 4);
     Q(0, 0) = deltaZ_squared*c_mx_mx;
     Q(0, 1) = -deltaZ*c_mx_mx;
     Q(0, 2) = deltaZ_squared*c_mx_my;
@@ -116,21 +123,30 @@ namespace MAUS {
   }
 
 
-  void HelicalPropagator::Propagate(const State& start, State& end) {
-    TMatrixD old_vec  = start.GetVector();
-    double old_x      = old_vec(0, 0);
-    double old_px     = old_vec(1, 0);
-    double old_y      = old_vec(2, 0);
-    double old_py     = old_vec(3, 0);
-    double old_kappa  = old_vec(4, 0);
-    double charge = old_kappa/fabs(old_kappa);
-    _Bz = _geometry_helper->GetFieldValue((start->GetId() > 0 ? 1 : 0));
+  void HelicalPropagator::Propagate(const Kalman::State& start, Kalman::State& end) {
+    TMatrixD old_vec(5, 1);
+    old_vec             = start.GetVector();
+    double old_x        = old_vec(0, 0);
+    double old_px       = old_vec(1, 0);
+    double old_y        = old_vec(2, 0);
+    double old_py       = old_vec(3, 0);
+    double old_kappa    = old_vec(4, 0);
+    double old_pz       = fabs( 1.0 / old_kappa );
+    double charge       = old_kappa*old_pz;
+    double old_momentum = sqrt(old_px*old_px + old_py*old_py + old_pz*old_pz);
 
-    double c      = CLHEP::c_light;
-    double u      = charge*c*_Bz;
-    double delta_theta = u*delta_z*fabs(old_kappa);
-    double sine   = sin(delta_theta);
-    double cosine = cos(delta_theta);
+//    _Bz = -1.0*_geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0));
+//    _Bz = fabs(_geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0)));
+    _Bz = _geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0));
+
+    double c       = CLHEP::c_light;
+    double u       = fabs(charge*c*_Bz);
+    double delta_z = end.GetPosition() - start.GetPosition();
+    double delta_theta = fabs(c*_Bz*delta_z)*old_kappa;
+    double sine    = sin(delta_theta);
+    double cosine  = cos(delta_theta);
+
+    std::cerr << "PROP : " << "Q = " << charge << " - pz = " << old_pz << " - u = " << u << " - dZ = " << delta_z << " - Bz = " << _Bz << "\n";
 
     // Calculate the new track parameters.
     double new_x  = old_x + old_px*sine/u
@@ -143,15 +159,15 @@ namespace MAUS {
 
     double new_py = old_py*cosine + old_px*sine;
 
-    double new_kapp = old_kappa;
+    double new_kappa = old_kappa;
 
     if ( _subtract_eloss ) {
       SciFiMaterialsList materials;
-      _geometry_helper->FillMaterialsList(old_state.GetId(), new_state.GetId(), materials);
+      _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
 
       // Reduce/increase momentum vector accordingly.
       double e_loss_sign = 1.;
-      if ( new_site->id() > 0 ) {
+      if ( end.GetId() > 0 ) {
         e_loss_sign = -1.;
       }
 
@@ -164,10 +180,9 @@ namespace MAUS {
       }
 
       double reduction_factor = momentum/old_momentum;
-      TMatrixD a = new_site->a(KalmanState::Projected);
-      new_px *= reduction_factor
-      new_py *= reduction_factor
-      new_kappa /= reduction_factor
+      new_px *= reduction_factor;
+      new_py *= reduction_factor;
+      new_kappa /= reduction_factor;
     }
 
     TMatrixD end_vec(5, 1);
@@ -176,28 +191,34 @@ namespace MAUS {
     end_vec(2, 0) = new_y;
     end_vec(3, 0) = new_py;
     end_vec(4, 0) = new_kappa;
-    end.SetVector(end_vec);
 
     PropagatorMatrix() = CalculatePropagator(start, end);
-    ProcessNoise() = CalculateProcessNoise(start, end);
+    NoiseMatrix() = CalculateProcessNoise(start, end);
 
     TMatrixD propT(5, 5); propT.Transpose(PropagatorMatrix());
-    TMatrixD end_cov = PropagatorMatrix * end.GetCovariance() * proptT + ProcessNoise();
+    TMatrixD end_cov = PropagatorMatrix() * start.GetCovariance() * propT + NoiseMatrix();
+
+    end.SetVector(end_vec);
     end.SetCovariance(end_cov);
   }
 
-  TMatrixD HelicalPropagator::CalculatePropagator(const State& start, const State& end) {
-    TMatrixD old_vec  = start.GetVector();
-    double old_x      = old_vec(0, 0);
+
+  TMatrixD HelicalPropagator::CalculatePropagator(const Kalman::State& start, const Kalman::State& end) {
+    TMatrixD old_vec(5, 1);
+    old_vec           = start.GetVector();
+//  double old_x      = old_vec(0, 0);
     double old_px     = old_vec(1, 0);
-    double old_y      = old_vec(2, 0);
+//  double old_y      = old_vec(2, 0);
     double old_py     = old_vec(3, 0);
     double old_kappa  = old_vec(4, 0);
 
+    _Bz = fabs(_geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0)));
+
     double charge = old_kappa/fabs(old_kappa);
     double c      = CLHEP::c_light;
-    double u      = charge*c*_Bz;
-    double delta_theta = u*delta_z*fabs(old_kappa);
+    double u      = fabs(charge*c*_Bz);
+    double delta_z = end.GetPosition() - start.GetPosition();
+    double delta_theta = fabs(_Bz*c*delta_z)*old_kappa;
     double sine   = sin(delta_theta);
     double cosine = cos(delta_theta);
 
@@ -237,43 +258,48 @@ namespace MAUS {
   }
 
 
-  TMatrixD HelicalPropagator::CalculateProcessNoise(const State& start, const State& end) {
-    static TMatrixD new_noise(GetDimension(), GetDimension());
+  TMatrixD HelicalPropagator::CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end) {
+    static TMatrixD new_noise(5, 5);
+    new_noise.Zero();
 
     if ( _include_mcs ) {
       // TODO : Correct this for new system
+
+      Kalman::State temp_start(start);
+      Kalman::State temp_end(start);
+
       SciFiMaterialsList materials;
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
-
       int n_steps = materials.size();
-
-      TMatrixD C = C_old;
-      double delta_z = 0;
       for ( int i = 0; i < n_steps; i++ ) {
-        delta_z += widths.at(i);
 
-        TMatrixD F;
-        TMatrixD a = GetIntermediateState(old_site, delta_z, F);
+        double width = materials.at(i).second;
 
-        double L = GetL(materials.at(i), widths.at(i));
-        TMatrixD Q = BuildQ(a, L, widths.at(i));
+        temp_end.SetPosition(temp_end.GetPosition() + width);
 
-        TMatrixD F_transposed(_n_parameters, _n_parameters);
+        Propagate(temp_start, temp_end);
+
+        TMatrixD F = GetPropagator();
+
+        double L = materials.at(i).first->L(width);
+        TMatrixD Q = BuildQ(temp_end, L, width);
+
+        TMatrixD F_transposed(GetDimension(), GetDimension());
         F_transposed.Transpose(F);
 
-        C = F*C*F_transposed + Q;
+        new_noise = F*new_noise*F_transposed + Q;
+        temp_start = temp_end;
       }
-      return C;
+      return new_noise;
 
     } else {
-      new_noise.Zero();
       return new_noise;
     }
   }
 
 
-  TMatrixD KalmanHelicalPropagator::BuildQ(const State& state, double L, double material_w) {
-    TMatrixD vec = state.GetVector()
+  TMatrixD HelicalPropagator::BuildQ(const Kalman::State& state, double L, double material_w) {
+    TMatrixD vec = state.GetVector();
     double px    = vec(1, 0);
     double py    = vec(3, 0);
     double kappa = vec(4, 0);
@@ -286,7 +312,7 @@ namespace MAUS {
     double E    = TMath::Sqrt(muon_mass2+p2);
     double beta = p/E;
 
-    double theta_mcs  = HighlandFormula(L, beta, p);
+    double theta_mcs  = _geometry_helper->HighlandFormula(L, beta, p);
     double theta_mcs2 = theta_mcs*theta_mcs;
 
     double charge = kappa/fabs(kappa);
@@ -298,7 +324,7 @@ namespace MAUS {
 
     double dtheta_dpz = -delta_theta/pz;
     // ------------------------------------------------------------
-    TMatrixD dalpha_dp(_n_parameters, 3);
+    TMatrixD dalpha_dp(GetDimension(), 3);
     // dx, dpx
     dalpha_dp(0, 0) = sine/u;
     // dx, dpy
@@ -334,16 +360,16 @@ namespace MAUS {
     // dkappa, dpz
     dalpha_dp(4, 2) = -charge/(pz*pz);
 
-    TMatrixD dalpha_dp_transposed(3, _n_parameters);
+    TMatrixD dalpha_dp_transposed(3, GetDimension());
     dalpha_dp_transposed.Transpose(dalpha_dp);
 
     // ------------------------------------------------------------
-    TMatrixD dalpha_dx(_n_parameters, 3);
+    TMatrixD dalpha_dx(GetDimension(), 3);
     dalpha_dx.Zero();
     dalpha_dx(0, 0) = 1.;
     dalpha_dx(2, 1) = 1.;
 
-    TMatrixD dalpha_dx_transposed(3, _n_parameters);
+    TMatrixD dalpha_dx_transposed(3, GetDimension());
     dalpha_dx_transposed.Transpose(dalpha_dx);
 
     // ------------------------------------------------------------
@@ -361,23 +387,23 @@ namespace MAUS {
     P(2, 1) = py*pz/p2;
 
 
-    TMatrixD term_1(_n_parameters, _n_parameters);
+    TMatrixD term_1(GetDimension(), GetDimension());
     term_1 = dalpha_dp*P*dalpha_dp_transposed;
     term_1 = p2*term_1;
 
-    TMatrixD term_2(_n_parameters, _n_parameters);
+    TMatrixD term_2(GetDimension(), GetDimension());
     term_2 = dalpha_dp*P*dalpha_dx_transposed;
     term_2 = p*material_w*0.5*term_2;
 
-    TMatrixD term_3(_n_parameters, _n_parameters);
+    TMatrixD term_3(GetDimension(), GetDimension());
     term_3 = dalpha_dx*P*dalpha_dp_transposed;
     term_3 = p*material_w*0.5*term_3;
 
-    TMatrixD term_4(_n_parameters, _n_parameters);
+    TMatrixD term_4(GetDimension(), GetDimension());
     term_4 = dalpha_dx*P*dalpha_dx_transposed;
     term_4 = (1./3.)*material_w*material_w*term_4;
 
-    TMatrixD Q(_n_parameters, _n_parameters);
+    TMatrixD Q(GetDimension(), GetDimension());
     Q = theta_mcs2*(term_1 + term_2 + term_3 + term_4);
 
     return Q;

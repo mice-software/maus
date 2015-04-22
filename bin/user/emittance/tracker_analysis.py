@@ -47,7 +47,7 @@ associate_max_attempts = 1000
 associate_tolerance = 0.001
 
 z_pairing_tolerance = 0.02 # Required this large due to lack of patrec z info!
-r_pairing_tolerance = 10.0
+r_pairing_tolerance = 200.0
 
 virtual_plane_events = 10
 
@@ -214,6 +214,9 @@ def main( maus_root_files ) :
     if analyse_kalman :
       scifi_extractor.load_tracks( scifi_event )
       kalman_paired_trackpoints = em_ana.common.make_virt_recon_pairs( scifi_extractor.get_raw_trackpoints(), virtual_extractor.get_raw_trackpoints(), check_length=False, max_z_separation=z_pairing_tolerance, max_separation=r_pairing_tolerance )
+
+#      print "Found", len( virtual_extractor.get_raw_trackpoints() ), "Virtual Hits                                         "
+#      print "Found", len( scifi_extractor.get_raw_trackpoints() ), "Trackpoints, Matched", len( kalman_paired_trackpoints ), "                           "
 
       for mc_hit, recon_hit in kalman_paired_trackpoints :
         plane_num = mc_hit.get_reference()

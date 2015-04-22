@@ -21,7 +21,9 @@
 #include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-#include "src/common_cpp/DataStructure/ScFiTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
+#include "src/common_cpp/DataStructure/SciFiEvent.hh" // Includes everything!
+#include "src/common_cpp/DataStructure/SciFiTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 
@@ -36,20 +38,23 @@ namespace MAUS {
 
   /** @brief Create a seed from a helical track
    */
-  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, SciFiGeometryHelper* geom);
+  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom, double seed_cov = -1.0);
 
   /** @brief Create a seed from a straight track
    */
-  Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, SciFiGeometryHelper* geom);
+  Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, const SciFiGeometryHelper* geom, double seed_cov = -1.0);
 
   /** @brief Convert a KalmanTrack to a SciFiTrack for the data structure
    */
-  SciFiTrack* CovertToSciFiTrack(Kalman::Track& k_track, SciFiGeometryHelper* geom);
+  SciFiTrack* ConvertToSciFiTrack(Kalman::Track k_track, const SciFiGeometryHelper* geom);
 
   /** @brief Builds a data track using a PR track
    */
-  template<class PR_TYPE> Kalman::Track BuildTrack(PR_TYPE* pr_track, SciFiGeometryHelper* geom);
+  template<class PR_TYPE> Kalman::Track BuildTrack(PR_TYPE* pr_track, const SciFiGeometryHelper* geom);
 
+  /** @brief Builds a data track using an array of spacepoints
+   */
+  Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints, const SciFiGeometryHelper* geom);
 
 
 
@@ -60,21 +65,22 @@ namespace MAUS {
 ////////////////////////////////////////////////////////////////////////////////
 
   template<class PR_TYPE>
-  Kalman::Track BuildTrack(PR_TYPE* pr_track, SciFiGeometryHelper* geom) {
+  Kalman::Track BuildTrack(PR_TYPE* pr_track, const SciFiGeometryHelper* geom) {
 
     SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints_pointers();
 
     Kalman::Track new_track(1);
 
-    if ( pr_track->tracker() == 0 ) {
-      for ( unsigned int i = 0; i < 15; ++i ) {
-        new_track.Append( Kalman::State(1, geom->GeometryMap()[-1*i].Position));
-      }
-    } else {
-      for ( unsigned int i = 0; i < 15; ++i ) {
-        new_track.Append( Kalman::State(1, geom->GeometryMap()[i].Position));
-      }
+    const SciFiPlaneMap& geom_map = geom->GeometryMap().find(pr_track->get_tracker())->second.Planes;
+    int tracker_const = ( pr_track->get_tracker() == 0 ? -1 : 1 );
+
+    for ( SciFiPlaneMap::const_iterator iter = geom_map.begin(); iter != geom_map.end(); ++iter ) {
+      int id = iter->first * tracker_const;
+      Kalman::State new_state = Kalman::State(1, iter->second.Position.z());
+      new_state.SetId(id);
+      new_track.Append(new_state);
     }
+//    std::cerr << "New Empty Track Intialised\nFilling...\n" << std::endl;
 
     size_t numb_spacepoints = spacepoints.size();
     for ( size_t i = 0; i < numb_spacepoints; ++i ) {
@@ -83,7 +89,9 @@ namespace MAUS {
       for ( size_t j = 0; j < numbclusters; ++j ) {
         SciFiCluster* cluster = static_cast<SciFiCluster*>(spacepoint->get_channels()->At(j));
         
-        int id = cluster->get_station()*3 + cluster->get_plane();
+        int id = (cluster->get_station() - 1)*3 + cluster->get_plane() + 1;
+
+        //std::cerr << id << ", " << new_track[id].GetPosition() << ", " << cluster->get_alpha() << ", " << i << ", " << j << std::endl;
 //        SciFiPlaneGeometry = geom->GeometryMap()[id];
 
         // TODO : 
@@ -93,12 +101,13 @@ namespace MAUS {
         TMatrixD covariance(1, 1);
 
         state_vector(0, 0) = cluster->get_alpha();
-        covariance(0, 0) = 0.427 / sqrt(12.0);
+        covariance(0, 0) = 0.427*0.427 / 12.0;
 
         new_track[id].SetVector(state_vector);
         new_track[id].SetCovariance(covariance);
       }
     }
+//    std::cerr << std::endl;
     return new_track;
   }
 } // namespace MAUS

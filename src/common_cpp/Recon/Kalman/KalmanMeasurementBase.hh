@@ -40,7 +40,7 @@ namespace Kalman {
 
       /** @brief Returns the last Kalman Measurement Matrix at the current state
        */
-      TMatrixD GetMeasurementMatrix() { return TMatrix(MeasurementMatrix()); }
+      TMatrixD GetMeasurementMatrix() const { return TMatrixD(MeasurementMatrix()); }
 
       /** @brief Returns the covariance matrix of measurement noise
        */
@@ -48,7 +48,7 @@ namespace Kalman {
 
       /** @brief Returns the covariance matrix of measurement noise
        */
-      TMatrixD GetMeasurementNoise() { return TMatrix(MeasurementNoise()); }
+      TMatrixD GetMeasurementNoise() const { return TMatrixD(MeasurementNoise()); }
 
       /** @brief Return dimension of state vector
        */
@@ -79,6 +79,7 @@ namespace Kalman {
       unsigned int _measurement_dimension;
 
       TMatrixD _measurement_matrix;
+      TMatrixD _measurement_matrix_transpose;
       TMatrixD _measurement_noise;
   };
 

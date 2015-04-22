@@ -1,5 +1,0 @@
-bash - scripts that download, configure, then locally install dependencies
-build - where the source archives are expanded to and where code is built/compiled from
-install - where dependencies are installed
-README - this file (duh)
-source - the source archives in, for example, .tar.gz format with md5 checksums

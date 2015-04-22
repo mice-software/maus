@@ -19,6 +19,7 @@
 #define MAUS_PROPAGATORS_HH
 
 #include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
+#include "src/common_cpp/Utils/Constants.hh"
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanPropagatorBase.hh"
@@ -26,16 +27,15 @@
 namespace MAUS {
 
 
-
   class StraightPropagator : public Kalman::Propagator_base {
     public :
-      StraightPropagator();
+      StraightPropagator(SciFiGeometryHelper* helper);
 
-      virtual TMatrixD CalculatePropagator(const State& start, const State& end);
+      virtual TMatrixD CalculatePropagator(const Kalman::State& start, const Kalman::State& end);
 
-      virtual TMatrixD CalculateProcessNoise(const State& start, const State& end);
+      virtual TMatrixD CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end);
 
-      TMatrixD BuildQ(const State& state, double radLen, double width);
+      TMatrixD BuildQ(const Kalman::State& state, double radLen, double width);
 
       void SetIncludeMCS(bool inc) { _include_mcs = inc; }
 
@@ -53,13 +53,13 @@ namespace MAUS {
     public :
       HelicalPropagator(SciFiGeometryHelper* helper);
 
-      virtual void Propagate(const State& start, State& end);
+      virtual void Propagate(const Kalman::State& start, Kalman::State& end);
 
-      virtual TMatrixD CalculatePropagator(const State& start, const State& end);
+      virtual TMatrixD CalculatePropagator(const Kalman::State& start, const Kalman::State& end);
 
-      virtual TMatrixD CalculateProcessNoise(const State& start, const State& end);
+      virtual TMatrixD CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end);
 
-      TMatrixD BuildQ(const State& state, double radLen, double width);
+      TMatrixD BuildQ(const Kalman::State& state, double radLen, double width);
 
       void SetSubtractELoss(bool sub) { _subtract_eloss = sub; }
 

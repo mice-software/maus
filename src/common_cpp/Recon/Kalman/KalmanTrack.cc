@@ -25,7 +25,7 @@ namespace Kalman {
 ////////////////////////////////////////////////////////////////////////////////
   // STATE MEMBER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
-  State::State(unsigned int dim, unsigned int pos) :
+  State::State(unsigned int dim, double pos) :
     _dimension(dim),
     _id(0),
     _position(pos),
@@ -34,23 +34,23 @@ namespace Kalman {
     _has_value(false) {
     }
 
-  State::State(TMatrixD vec, TMatrixD cov, unsigned int pos) :
+  State::State(TMatrixD vec, TMatrixD cov, double pos) :
     _dimension(vec.GetNrows()),
     _id(0),
     _position(pos),
     _vector(vec),
     _covariance(cov),
     _has_value(true) {
-      if ( (_vector.GetNcols() != 1) || (_covariance.GetNrows() != _dimension) || (_covariance.GetNcols() != _dimension) ) {
-        throw Exception(Exception::Recoverable,
+      if ( (_vector.GetNcols() != 1) || (_covariance.GetNrows() != (int)_dimension) || (_covariance.GetNcols() != (int)_dimension) ) {
+        throw Exception(Exception::recoverable,
             "Vector and covariance matrix have inconsistent dimensions",
             "Kalman::State::State()");
       }
     }
 
   void State::SetVector(TMatrixD vec) {
-    if ( (vec.GetNrows() != _dim) || (vec.GetNcols() != 1) ) {
-      throw Exception(Exception::Recoverable,
+    if ( (vec.GetNrows() != (int)_dimension) || (vec.GetNcols() != 1) ) {
+      throw Exception(Exception::recoverable,
           "State vector has wrong dimensions",
           "Kalman::State::SetVector()");
     }
@@ -59,8 +59,8 @@ namespace Kalman {
   }
 
   void State::SetCovariance(TMatrixD cov) {
-    if ( (cov.GetNrows() != _dim) || (cov.GetNcols() != _dim) ) {
-      throw Exception(Exception::Recoverable,
+    if ( (cov.GetNrows() != (int)_dimension) || (cov.GetNcols() != (int)_dimension) ) {
+      throw Exception(Exception::recoverable,
           "Covariance matrix has wrong dimensions",
           "Kalman::State::SetCovariance()");
     }
@@ -81,12 +81,12 @@ namespace Kalman {
 
   void Track::SetState(unsigned int index, State state) {
     if (state._dimension != this->_dimension) {
-      throw Exception(Exception::Recoverable,
+      throw Exception(Exception::recoverable,
           "State has wrong dimensions",
           "Kalman::Track::SetState()");
     }
-    if (index >= _track_vector) {
-      throw Exception(Exception::Recoverable,
+    if (index >= _track_vector.size()) {
+      throw Exception(Exception::recoverable,
           "Index out of bounds of track",
           "Kalman::Track::SetState()");
     }
@@ -95,7 +95,7 @@ namespace Kalman {
 
   void Track::Append(State state) {
     if (state._dimension != this->_dimension) {
-      throw Exception(Exception::Recoverable,
+      throw Exception(Exception::recoverable,
           "State has wrong dimensions",
           "Kalman::Track::Append()");
     }
@@ -103,8 +103,8 @@ namespace Kalman {
   }
 
   void Track::DeleteState(unsigned int index) {
-    if (index >= _track_vector) {
-      throw Exception(Exception::Recoverable,
+    if (index >= _track_vector.size()) {
+      throw Exception(Exception::recoverable,
           "Index out of bounds of track",
           "Kalman::Track::SetState()");
     }
@@ -112,10 +112,10 @@ namespace Kalman {
   }
 
 
-  void Reset(const Track& similar_track) {
+  void Track::Reset(const Track& similar_track) {
     _track_vector.clear();
 
-    for (unsigned int i = 0; i < similar_track.Length(); ++i ) {
+    for (unsigned int i = 0; i < similar_track.GetLength(); ++i ) {
       State new_state(_dimension, similar_track[i].GetPosition());
       new_state.SetId(similar_track[i].GetId());
 

@@ -22,29 +22,32 @@
 #include <map>
 
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Utils/Constants.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "CLHEP/Vector/Rotation.h"
 #include "src/common_cpp/Utils/ThreeVectorUtils.hh"
 
+#include "TMath.h"
+
 namespace MAUS {
 
-/** @struct SciFiPlaneGeometry
- *
- *  @brief A simple struct for bookkeeping of plane info.
- *
- */
-struct SciFiPlaneGeometry {
-  ThreeVector Direction;
-  ThreeVector Position;
-  ThreeVector GlobalPosition;
-  double CentralFibre;
-  double Pitch;
-};
+
+  // Some Forward declarations.
+struct SciFiPlaneGeometry;
+struct SciFiTrackerGeometry;
+struct SciFiMaterialParams;
+
+  // Some useful typdefs.
+typedef std::map<int, SciFiTrackerGeometry> SciFiTrackerMap;
+typedef std::map<int, SciFiPlaneGeometry> SciFiPlaneMap;
+typedef std::vector< std::pair<const SciFiMaterialParams*, double> > SciFiMaterialsList;
+
+
 
 /** @brief Structure for storing parameters relating to scifi materials
  */
-struct MaterialParams {
+struct SciFiMaterialParams {
   /// Polystyrene's atomic number.
   double Z;
   /// Width of the fibre plane in mm.
@@ -52,7 +55,7 @@ struct MaterialParams {
   /// Fibre radiation lenght in mm
   double Radiation_Length;
   /// Fractional Radiation Length
-  double L(double length) { return length/Radiation_Length; }
+  double L(double length) const { return length/Radiation_Length; }
   /// Density in g.cm-3
   double Density;
   /// Mean excitation energy in eV.
@@ -69,13 +72,36 @@ struct MaterialParams {
   double RMS;
 };
 
-/** @typedef SciFiGeometryMap
- *
- *  @brief type definition of a map of SciFiPlaneGeometry structs indexed by plane id (-15 to 15).
- */
-typedef std::map<int, SciFiPlaneGeometry> SciFiGeometryMap;
 
-typedef std::vector< std::pair<MaterialParams, double> > SciFiMaterialsList;
+
+/** @struct SciFiPlaneGeometry
+ *
+ *  @brief A simple struct for bookkeeping of plane info.
+ *
+ */
+struct SciFiPlaneGeometry {
+  ThreeVector Direction;
+  ThreeVector Position;
+  ThreeVector GlobalPosition;
+  double CentralFibre;
+  double Pitch;
+};
+
+
+
+/** @struct SciFiTrackerGeometry
+ *
+ *  @brief A simple struct for bookkeeping of tracker info.
+ *
+ */
+struct SciFiTrackerGeometry {
+  HepRotation Rotation;
+  ThreeVector Position;
+  double Field;
+  SciFiPlaneMap Planes;
+};
+
+
 
 /** @class SciFiGeometryHelper
  *
@@ -102,20 +128,15 @@ class SciFiGeometryHelper {
 
   /** @brief Finds the MiceModule corresponding to a tracker plane.
    */
-  const MiceModule* FindPlane(int tracker, int station, int plane);
+  const MiceModule* FindPlane(int tracker, int station, int plane) const;
 
-  /** @brief Finds the MiceModule corresponding to a tracker plane.
+  /** @brief Returns the Z position of the specified plane
    */
-  double GetPlanePosition(int tracker, int station, int plane);
-
-  /** @brief Finds the MiceModule corresponding to plane 0 of station 1 of a tracker -
-   *  the origin of the local reference frame.
-   */
-  ThreeVector GetReferenceFramePosition(int tracker);
+  double GetPlanePosition(int tracker, int station, int plane) const;
 
   /** @brief Writes plane info to screen.
    */
-  void DumpPlanesInfo();
+//  void DumpPlanesInfo();
 
   /** @brief Finds the field value at a given position by calling the BTFieldConstructor.
    */
@@ -125,42 +146,41 @@ class SciFiGeometryHelper {
    */
   double FieldValue(const MiceModule* trackerModule);
 
-  SciFiGeometryMap& GeometryMap() const { return _geometry_map; }
+  SciFiTrackerMap& GeometryMap() { return _geometry_map; }
+  const SciFiTrackerMap& GeometryMap() const { return _geometry_map; }
 
-  double GetFieldValue(int tracker) const { return _field_value[tracker]; }
+  double GetFieldValue(int tracker) const { return _geometry_map.find(tracker)->second.Field; }
 
-  std::vector<ThreeVector> RefPos()  const { return _RefPos; }
+  ThreeVector GetReferencePosition(int tracker) const { return _geometry_map.find(tracker)->second.Position; }
 
-  std::vector<HepRotation> Rot()     const { return _Rot;    }
+  HepRotation GetReferenceRotation(int tracker) const { return _geometry_map.find(tracker)->second.Rotation; }
+
+  ThreeVector FindReferenceFramePosition(int tracker) const;
 
   double GetChannelWidth() const { return w_channel; }
 
-  const MaterialParams& GetFibreParameters() const { return FibreParameters; }
-  const MaterialParams& GetGasParameters() const { return GasParameters; }
-  const MaterialParams& GetMylarParameters() const { return MylarParameters; }
+  const SciFiMaterialParams& GetFibreParameters() const { return FibreParameters; }
+  const SciFiMaterialParams& GetGasParameters() const { return GasParameters; }
+  const SciFiMaterialParams& GetMylarParameters() const { return MylarParameters; }
 
   static double HighlandFormula(double L, double beta, double p);
 
-  static double BetheBlochStoppingPower(double p, MaterialParams& material);
+  static double BetheBlochStoppingPower(double p, const SciFiMaterialParams* material);
 
   void FillMaterialsList(int start_id, int end_id, SciFiMaterialsList& materials_list);
 
  private:
   std::vector<const MiceModule*> _modules;
 
-  SciFiGeometryMap _geometry_map;
+  const MiceModule* _module;
 
-  double _field_value[2];
+  SciFiTrackerMap _geometry_map;
 
-  std::vector<ThreeVector> _RefPos;
+  SciFiMaterialParams FibreParameters;
 
-  std::vector<HepRotation> _Rot;
+  SciFiMaterialParams GasParameters;
 
-  MaterialParams FibreParameters;
-
-  MaterialParams GasParameters;
-
-  MaterialParams MylarParameters;
+  SciFiMaterialParams MylarParameters;
 
   double w_fibre;
   double w_mylar;

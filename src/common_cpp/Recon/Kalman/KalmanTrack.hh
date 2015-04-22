@@ -78,6 +78,7 @@ namespace Kalman {
       /** @brief Return the state vector
        */
       TMatrixD& GetVector() { return _vector; }
+      const TMatrixD& GetVector() const { return _vector; }
 
       /** @brief Set the state vector
        */
@@ -86,6 +87,7 @@ namespace Kalman {
       /** @brief Return a reference to the covariance matrix
        */
       TMatrixD& GetCovariance() { return _covariance; }
+      const TMatrixD& GetCovariance() const { return _covariance; }
 
       /** @brief Set the covariance matrix
        */
@@ -155,7 +157,7 @@ namespace Kalman {
 
       /** @brief Return the number of states in the state array
        */
-      unsigned int Length() const { return _track_vector.size(); }
+      unsigned int GetLength() const { return _track_vector.size(); }
 
       /** @brief Append a state to the state array
        */
