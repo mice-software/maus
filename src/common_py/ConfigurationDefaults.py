@@ -569,8 +569,11 @@ EMR_clear_fiber_length_map = "/files/cabling/EMRClearFiberLengthMap.txt"
 # this sets the source of the EMR connector attenuation map
 EMR_connector_attenuation_map = "/files/cabling/EMRConnectorAttenuationMap.txt"
 
-# this sets the source of the calibrations for the EMR detectors
-EMR_calibration_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
+# this sets the source of the calibrations for the EMR detector
+EMR_calib_source = "CDB"
+EMR_calib_date_from = 'current'
+# uncomment the EMR_calibration_file card below if you set EMR_calib_source=file
+#EMR_calib_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space

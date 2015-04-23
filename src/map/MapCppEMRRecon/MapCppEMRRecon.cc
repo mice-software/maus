@@ -420,127 +420,114 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
 
-      EMRBarHit Hit0;
       bool Hit0Found = false;
       bool Hit1Found = false;
       bool Hit2Found = false;
 
-      int barid = -1;
+      double x0(-1.0), y0(-1.0), z0(-1.0), x1(-1.0), x2(-1.0), y1(-1.0), y2(-1.0);
+      double a(-1.0), b(-1.0), xi(-1.0);
 
-      int x0(-1), x1(-1), x2(-1), y1(-1), y2(-1);
-      double y0(-1.0), a(-1.0), b(-1.0);
-
-      // Find Primary hit
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-	if (Hit0Found) break;
+      // Find Primary hit, carry on if there's none
+      int iBar;
+      for (iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
   	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-  	  Hit0 = emr_dbb_events[1][iPe][iPlane][iBar][0];
+	  x0 = iPlane * (_bar_height + _gap) + (1. + iBar%2) * _bar_height * 1./3;
+	  z0 = (iBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	  Hit0Found = true;
-	  x0 = iPlane;
-	  barid = iBar;
+	  break;
 	}
       }
-
       if (!Hit0Found) continue;
 
       // Look backwards for hits
       for (int aPlane = iPlane-1; aPlane >= 0; aPlane = aPlane-2) {
-	if (Hit1Found) break;
 	for (int aBar = 1; aBar < _number_of_bars; aBar++) { // Skip test channel
 	  if (emr_dbb_events[1][iPe][aPlane][aBar].size()) {
-	    if (!Hit1Found) {
-	      Hit1Found = true;
-	      x1 = aPlane;
-	      y1 = aBar;
-	    }
+	    x1 = aPlane * (_bar_height + _gap) + (1. + aBar%2) * _bar_height * 1./3;
+	    y1 = (aBar - _number_of_bars/2) * (_bar_width/2 + _gap);
+	    Hit1Found = true;
+	    break;
 	  }
 	}
+	if (Hit1Found) break;
       }
 
       // Look forward for hits
       for (int bPlane = iPlane+1; bPlane < _number_of_planes; bPlane = bPlane+2) {
-	if (Hit1Found && Hit2Found) break;
 	for (int bBar = 1; bBar < _number_of_bars; bBar++) { // Skip test channel
 	  if (emr_dbb_events[1][iPe][bPlane][bBar].size()) {
 	    if (Hit2Found && !Hit1Found) {
+	      x1 = bPlane * (_bar_height + _gap) + (1. + bBar%2) * _bar_height * 1./3;
+	      y1 = (bBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	      Hit1Found = true;
-	      x1 = bPlane;
-	      y1 = bBar;
+	      break;
 	    }
 	    if (!Hit2Found) {
+	      x2 = bPlane * (_bar_height + _gap) + (1. + bBar%2) * _bar_height * 1./3;
+	      y2 = (bBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	      Hit2Found = true;
-	      x2 = bPlane;
-	      y2 = bBar;
 	    }
 	  }
 	}
+	if (Hit1Found && Hit2Found) break;
       }
 
       // Look backwards for the second hit if nothing found in the forward direction
       for (int aPlane = iPlane-1; aPlane >= 0; aPlane = aPlane-2) {
-	if (Hit1Found && Hit2Found) break;
-	if (aPlane == x1) continue;
+	if ((aPlane + 1) * (_bar_height + _gap) > x1) continue;
 	for (int aBar = 1; aBar < _number_of_bars; aBar++) { // Skip test channel
 	  if (emr_dbb_events[1][iPe][aPlane][aBar].size()) {
 	    if (Hit1Found && !Hit2Found) {
+	      x2 = aPlane * (_bar_height + _gap) + (1. + aBar%2) * _bar_height * 1./3;
+	      y2 = (aBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	      Hit2Found = true;
-	      x2 = aPlane;
-	      y2 = aBar;
+	      break;
 	    }
 	  }
 	}
+	if (Hit1Found && Hit2Found) break;
       }
 
-      // Calculate the coordinates of the hit in each plane
+      // Calculate the missing coordinate (y0) of the primary hit in this plane
       if (Hit1Found && Hit2Found) {
-	a = (static_cast<double>(y2)-static_cast<double>(y1))
-	    / (static_cast<double>(x2)-static_cast<double>(x1));
-	b = static_cast<double>(y1) - a*static_cast<double>(x1);
-	y0 = a*static_cast<double>(x0) + b;
+	a = (y2 - y1)/(x2 - x1);
+	b = y1 - a * x1;
+	y0 = a * x0 + b;
+	xi = (x0 - x1)/(x2 - x1);
       }
 
       if (Hit1Found && !Hit2Found) {
 	y0 = y1;
+	a = 0.0;
+	xi = 0.0;
       }
 
       if (!Hit1Found && Hit2Found) {
 	y0 = y2;
+	a = 0.0;
+	xi = 0.0;
       }
 
       // Return the coordinates in metric, see EMR.dat for geometry
+      double etrans = _bar_width/(2*sqrt(6)); // Transverse uncertainty
+      double elong =  _bar_height/(3*sqrt(2)); // Longitudinal uncertainty
+      double erecon = sqrt((pow(xi, 2) + pow(1-xi, 2)) * pow(etrans, 2)
+		  + pow(a, 2) * (pow(xi, 2) + pow(1-xi, 2)) * pow(elong, 2)); // Recon uncertainty
+
       if (iPlane % 2 == 0) {
-	double x = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
-	double y = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
-	double ex = _bar_width/(2*sqrt(6));
-	double ey = _bar_width/(4*sqrt(3));
-
-	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
-	emr_dbb_events[1][iPe][x0][barid][0].SetErrorX(ex);
-	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
-	emr_dbb_events[1][iPe][x0][barid][0].SetErrorY(ey);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetX(z0);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(etrans);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetY(y0);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorY(erecon);
       } else {
-	double x = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
-	double y = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
-	double ex = _bar_width/(4*sqrt(3));
-	double ey = _bar_width/(2*sqrt(6));
-
-	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
-	emr_dbb_events[1][iPe][x0][barid][0].SetErrorX(ex);
-	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
-	emr_dbb_events[1][iPe][x0][barid][0].SetErrorY(ey);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetX(y0);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(erecon);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetY(z0);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorY(etrans);
       }
 
-      // Set the depth and the error on it
-      double z(-1);
-      if (barid % 2 == 0)
-	z = x0 * (_bar_height + _gap) + 1./3 * _bar_height;
-      else
-	z = x0 * (_bar_height + _gap) + 2./3 * _bar_height;
-
-      double ez = _bar_height/(3*sqrt(2));
-
-      emr_dbb_events[1][iPe][x0][barid][0].SetZ(z);
-      emr_dbb_events[1][iPe][x0][barid][0].SetErrorZ(ez);
+      emr_dbb_events[1][iPe][iPlane][iBar][0].SetZ(x0);
+      emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorZ(elong);
     }
   }
 }
