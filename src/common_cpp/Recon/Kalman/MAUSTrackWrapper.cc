@@ -27,7 +27,7 @@ namespace MAUS {
   }
 
 
-  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom, double seed_cov) {
+  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom, bool correct_energy_loss, double seed_cov) {
     TMatrixD vector(5, 1);
     TMatrixD covariance(5, 5);
 
@@ -39,18 +39,13 @@ namespace MAUS {
     double particle_charge = h_track->get_charge();
     double Bz = geom->GetFieldValue(tracker);
 
-    // Tracker 0 has opposite handedness...
-//    if ( tracker == 0 ) particle_charge = - particle_charge;
-    double phi_dir = ( ( particle_charge*Bz > 0) ? -1.0 : 1.0 );
-
     // Get h_track values.
     double r  = h_track->get_R();
-    double pt = fabs(c*Bz*r*particle_charge);
-//    double pt_signed = particle_charge*c*Bz*r;
-    double dsdz = h_track->get_dsdz();
+    double pt = - c*Bz*r*particle_charge;
+    double dsdz = - h_track->get_dsdz();
     double x0 = h_track->get_circle_x0(); // Circle Center x
     double y0 = h_track->get_circle_y0(); // Circle Center y
-    double s = h_track->get_line_sz_c() + length*dsdz; // Path length at start plane
+    double s = (h_track->get_line_sz_c() - length*dsdz); // Path length at start plane
     double phi_0 = s / r; // Phi at start plane
     double phi = phi_0 + TMath::PiOver2(); // Direction of momentum
 
@@ -58,16 +53,18 @@ namespace MAUS {
 
     // TODO: Actually propagate the track parrameters and covariance matrix back to start plane.
     //       This is an approximation.
-    ThreeVector patrec_momentum(phi_dir*pt*cos(phi), phi_dir*pt*sin(phi), fabs(pt/dsdz));
-//    ThreeVector patrec_momentum(phi_dir*pt*cos(phi), phi_dir*pt*sin(phi), phi_dir*pt/dsdz);
-  //  double P = patrec_momentum.mag();
-  //  double patrec_bias; // Account for two planes of energy loss
-  //  if ( _tracker == 0 ) {
-  //    patrec_bias = (P + 1.4) / P;
-  //  } else {
-  //    patrec_bias = (P - 1.4) / P;
-  //  }
-  //  patrec_momentum = patrec_bias * patrec_momentum;
+    ThreeVector patrec_momentum(-pt*sin(phi_0), pt*cos(phi_0), - pt/dsdz);
+
+    if ( correct_energy_loss ) {
+      double P = patrec_momentum.mag();
+      double patrec_bias; // Account for two planes of energy loss
+      if ( tracker == 0 ) {
+        patrec_bias = (P + 1.4) / P;
+      } else {
+        patrec_bias = (P - 1.4) / P;
+      }
+      patrec_momentum = patrec_bias * patrec_momentum;
+    }
 
     double x = x0 + r*cos(phi_0);
     double px = patrec_momentum.x();

@@ -38,7 +38,7 @@ namespace MAUS {
 
   /** @brief Create a seed from a helical track
    */
-  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom, double seed_cov = -1.0);
+  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom, bool correct_energy_loss = true, double seed_cov = -1.0);
 
   /** @brief Create a seed from a straight track
    */

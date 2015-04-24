@@ -66,8 +66,8 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
 
   _pattern_recognition.set_helical_pr_on(_helical_pr_on);
   _pattern_recognition.set_straight_pr_on(_straight_pr_on);
-  _pattern_recognition.set_bz_t1(fabs(_geometry_helper.GetFieldValue(0)));
-  _pattern_recognition.set_bz_t2(fabs(_geometry_helper.GetFieldValue(1)));
+  _pattern_recognition.set_bz_t1(_geometry_helper.GetFieldValue(0));
+  _pattern_recognition.set_bz_t2(_geometry_helper.GetFieldValue(1));
 
 #ifdef KALMAN_TEST
   HelicalPropagator* spacepoint_helical_prop = new HelicalPropagator(&_geometry_helper);
@@ -144,15 +144,15 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
 //    std::cerr << "Data Track\n";
 //    std::cerr << Kalman::print_track(data_track);
 
-    Kalman::State seed = ComputeSeed(helical, &_geometry_helper);
+    Kalman::State seed = ComputeSeed(helical, &_geometry_helper, false, 100.0);
 
     std::cerr << Kalman::print_state(seed, "Helical Seed" );
 
     std::cerr << "Helical Track\n";
     print_helical( helical );
 
-    _spacepoint_helical_track_fitter->SetData(data_track);
     _spacepoint_helical_track_fitter->SetSeed(seed);
+    _spacepoint_helical_track_fitter->SetData(data_track);
 
     _spacepoint_helical_track_fitter->Filter(false);
     _spacepoint_helical_track_fitter->Smooth(false);
@@ -193,8 +193,8 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
     std::cerr << "Straight Track\n";
     print_straight( straight );
 
-    _spacepoint_straight_track_fitter->SetData(data_track);
     _spacepoint_straight_track_fitter->SetSeed(seed);
+    _spacepoint_straight_track_fitter->SetData(data_track);
 
     _spacepoint_straight_track_fitter->Filter(false);
     _spacepoint_straight_track_fitter->Smooth(false);

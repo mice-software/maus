@@ -135,18 +135,18 @@ namespace MAUS {
     double charge       = old_kappa*old_pz;
     double old_momentum = sqrt(old_px*old_px + old_py*old_py + old_pz*old_pz);
 
-//    _Bz = -1.0*_geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0));
-//    _Bz = fabs(_geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0)));
     _Bz = _geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0));
 
     double c       = CLHEP::c_light;
-    double u       = fabs(charge*c*_Bz);
+    double u       = - charge*c*_Bz;
     double delta_z = end.GetPosition() - start.GetPosition();
-    double delta_theta = fabs(c*_Bz*delta_z)*old_kappa;
+    double delta_theta = - c*_Bz*delta_z*old_kappa;
     double sine    = sin(delta_theta);
     double cosine  = cos(delta_theta);
 
-    std::cerr << "PROP : " << "Q = " << charge << " - pz = " << old_pz << " - u = " << u << " - dZ = " << delta_z << " - Bz = " << _Bz << "\n";
+    std::cerr << "PROP : " << "Q = " << charge << " - pz = " << old_pz << " - u = " << u << " - dZ = " << delta_z << " - Bz = " << _Bz  << "\n";
+
+    if ( start.GetId() < 0 ) u = - u;
 
     // Calculate the new track parameters.
     double new_x  = old_x + old_px*sine/u
@@ -211,16 +211,18 @@ namespace MAUS {
 //  double old_y      = old_vec(2, 0);
     double old_py     = old_vec(3, 0);
     double old_kappa  = old_vec(4, 0);
-
-    _Bz = fabs(_geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0)));
-
     double charge = old_kappa/fabs(old_kappa);
+
+    _Bz = _geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0));
+
     double c      = CLHEP::c_light;
-    double u      = fabs(charge*c*_Bz);
+    double u      = - charge*c*_Bz;
     double delta_z = end.GetPosition() - start.GetPosition();
-    double delta_theta = fabs(_Bz*c*delta_z)*old_kappa;
+    double delta_theta = _Bz*c*delta_z*old_kappa;
     double sine   = sin(delta_theta);
     double cosine = cos(delta_theta);
+
+    if ( start.GetId() < 0 ) u = - u;
 
     TMatrixD new_prop(5, 5);
 

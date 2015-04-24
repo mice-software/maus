@@ -628,20 +628,21 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   }
 
   // Set the charge
-  int charge = - handedness;
-//  if (spnts[0]->get_tracker() == 0) {
-//    if ( _bz_t1 > 0 ) {
-//      charge = handedness;
-//    } else {
-//      charge = - handedness;
-//    }
-//  } else {
-//    if ( _bz_t2 > 0 ) {
-//      charge = - handedness;
-//    } else {
-//      charge = handedness;
-//    }
-//  }
+//  int charge = - handedness;
+  int charge;
+  if (spnts[0]->get_tracker() == 0) {
+    if ( _bz_t1 > 0 ) {
+      charge = handedness;
+    } else {
+      charge = - handedness;
+    }
+  } else {
+    if ( _bz_t2 > 0 ) {
+      charge = - handedness;
+    } else {
+      charge = handedness;
+    }
+  }
 
   // Set the remaining track parameters
   double phi_0 = phi_i[0];
@@ -666,6 +667,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
 //    std::sort(spnts.begin(), spnts.end(), compare_spoints_descending_z);
 //  else if (spnts[0]->get_tracker() == 1)
     std::sort(spnts.begin(), spnts.end(), compare_spoints_ascending_z);
+//    std::sort(spnts.begin(), spnts.end(), compare_spoints_ascending_z);
 
   // Find each z_i and phi_i value for each spacepoint relative to the first spacepoint
   std::vector<double> z_i;         // Vector of the z coord of each successive spacepoint
