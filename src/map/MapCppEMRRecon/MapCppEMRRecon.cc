@@ -120,11 +120,11 @@ void MapCppEMRRecon::_process(Data *data) const {
 
   // Create DBB and fADC arrays with n+2 events (1 per trigger + noise + decays)
   EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents);
-  EMRfADCEventVector emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents);
+  EMRfADCEventVector_er emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents);
 
   // Create DBB and fADC arrays to future host n+1+n' events (1 per trigger + noise + 1 per decay)
   EMRDBBEventVector emr_dbb_events[3]; // preselected, primary, secondary
-  EMRfADCEventVector emr_fadc_events;
+  EMRfADCEventVector_er emr_fadc_events;
   EMRTrackEventVector emr_track_events;
 
   // Fill temporary array with preselected events
@@ -155,7 +155,7 @@ void MapCppEMRRecon::_process(Data *data) const {
 
 void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 						EMRDBBEventVector& emr_dbb_events_tmp,
-						EMRfADCEventVector& emr_fadc_events_tmp) const {
+						EMRfADCEventVector_er& emr_fadc_events_tmp) const {
 
   int nPartEvents = spill->GetReconEvents()->size();
 
@@ -219,7 +219,7 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
       double xPedestalArea = plHit->GetPedestalArea();
       std::vector<int> xSamples = plHit->GetSamples();
 
-      fADCdata data;
+      fADCdata_er data;
       data._orientation = xOri;
       data._charge = xCharge;
       data._pedestal_area = xPedestalArea;
@@ -231,9 +231,9 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 }
 
 void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_tmp,
-					     EMRfADCEventVector emr_fadc_events_tmp,
+					     EMRfADCEventVector_er emr_fadc_events_tmp,
 					     EMRDBBEventVector *emr_dbb_events,
-					     EMRfADCEventVector& emr_fadc_events,
+					     EMRfADCEventVector_er& emr_fadc_events,
 					     EMRTrackEventVector& emr_track_events) const {
 
   int nPartEvents = emr_fadc_events_tmp.size();
@@ -301,7 +301,7 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
       }
 
       if (iPe < nPartEvents-2) { // All triggers except the noise and secondary
-	fADCdata data;
+	fADCdata_er data;
 	data._orientation = emr_fadc_events_tmp[iPe][iPlane]._orientation;
 	data._charge = emr_fadc_events_tmp[iPe][iPlane]._charge;
 	data._pedestal_area = emr_fadc_events_tmp[iPe][iPlane]._pedestal_area;
@@ -335,7 +335,7 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
 
 void MapCppEMRRecon::tot_cleaning(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
-				  EMRfADCEventVector& emr_fadc_events,
+				  EMRfADCEventVector_er& emr_fadc_events,
 				  EMRTrackEventVector& emr_track_events) const {
 
   int nTotalPartEvents = emr_fadc_events.size();
@@ -409,7 +409,7 @@ void MapCppEMRRecon::tot_cleaning(int nPartEvents,
 
 void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 						EMRDBBEventVector *emr_dbb_events,
-						EMRfADCEventVector& emr_fadc_events) const {
+						EMRfADCEventVector_er& emr_fadc_events) const {
 
   int nTotalPartEvents = emr_fadc_events.size();
 
@@ -534,7 +534,7 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 
 void MapCppEMRRecon::energy_correction(int nPartEvents,
 				       EMRDBBEventVector *emr_dbb_events,
-				       EMRfADCEventVector& emr_fadc_events) const {
+				       EMRfADCEventVector_er& emr_fadc_events) const {
 
   int nTotalPartEvents = emr_fadc_events.size();
 
@@ -656,7 +656,7 @@ void MapCppEMRRecon::energy_correction(int nPartEvents,
 
 void MapCppEMRRecon::track_matching(int nPartEvents,
 				    EMRDBBEventVector *emr_dbb_events,
-				    EMRfADCEventVector& emr_fadc_events,
+				    EMRfADCEventVector_er& emr_fadc_events,
 				    EMRTrackEventVector& emr_track_events) const {
 
   int nTotalPartEvents = emr_fadc_events.size();
@@ -766,7 +766,7 @@ void MapCppEMRRecon::track_matching(int nPartEvents,
 
 void MapCppEMRRecon::event_charge_calculation(int nPartEvents,
 					      EMRDBBEventVector *emr_dbb_events,
-					      EMRfADCEventVector& emr_fadc_events,
+					      EMRfADCEventVector_er& emr_fadc_events,
 					      EMRTrackEventVector& emr_track_events) const {
 
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
@@ -865,7 +865,7 @@ void MapCppEMRRecon::event_charge_calculation(int nPartEvents,
 void MapCppEMRRecon::fill(Spill *spill,
 			  int nPartEvents,
 			  EMRDBBEventVector *emr_dbb_events,
-			  EMRfADCEventVector& emr_fadc_events,
+			  EMRfADCEventVector_er& emr_fadc_events,
 			  EMRTrackEventVector& emr_track_events) const {
 
   int xRun = spill->GetRunNumber();
@@ -968,13 +968,13 @@ EMRDBBEventVector MapCppEMRRecon::get_dbb_data_tmp(int nPartEvts) const {
   return emr_dbb_events_tmp;
 }
 
-EMRfADCEventVector MapCppEMRRecon::get_fadc_data_tmp(int nPartEvts) const {
-  EMRfADCEventVector emr_fadc_events_tmp;
+EMRfADCEventVector_er MapCppEMRRecon::get_fadc_data_tmp(int nPartEvts) const {
+  EMRfADCEventVector_er emr_fadc_events_tmp;
   emr_fadc_events_tmp.resize(nPartEvts);
   for (int iPe = 0; iPe < nPartEvts ;iPe++) {
     emr_fadc_events_tmp[iPe].resize(_number_of_planes);
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      fADCdata data;
+      fADCdata_er data;
       data._orientation = iPlane%2;
       data._charge = 0.0;
       data._charge_corrected = 0.0;

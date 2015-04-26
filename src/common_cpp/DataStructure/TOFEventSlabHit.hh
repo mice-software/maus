@@ -54,6 +54,9 @@ class TOFEventSlabHit {
     /** Returns TOF1SlabHitArray */
     TOF1SlabHitArray GetTOF1SlabHitArray() const;
 
+    /** Returns TOF1SlabHitArray pointer*/
+    TOF1SlabHitArray* GetTOF1SlabHitArrayPtr();
+
     /** Get an element from TOF1SlabHitArray (needed for PyROOT) */
     TOFSlabHit GetTOF1SlabHitArrayElement(size_t index) const;
 
@@ -66,6 +69,9 @@ class TOFEventSlabHit {
     /** Returns TOF0SlabHitArray */
     TOF0SlabHitArray GetTOF0SlabHitArray() const;
 
+    /** Returns TOF0SlabHitArray pointer*/
+    TOF0SlabHitArray* GetTOF0SlabHitArrayPtr();
+
     /** Get an element from TOF0SlabHitArray (needed for PyROOT) */
     TOFSlabHit GetTOF0SlabHitArrayElement(size_t index) const;
 
@@ -77,6 +83,9 @@ class TOFEventSlabHit {
 
     /** Returns TOF2SlabHitArray */
     TOF2SlabHitArray GetTOF2SlabHitArray() const;
+
+    /** Returns TOF2SlabHitArray pointer*/
+    TOF2SlabHitArray* GetTOF2SlabHitArrayPtr();
 
     /** Get an element from TOF2SlabHitArray (needed for PyROOT) */
     TOFSlabHit GetTOF2SlabHitArrayElement(size_t index) const;
