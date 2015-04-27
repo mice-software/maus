@@ -361,6 +361,15 @@ def set_clhep(conf, env): # pylint: disable=W0613
 
     conf.env.Append(LIBS = ['CLHEP'])
 
+def set_xercesc(conf, env): # pylint: disable=W0613
+    """
+    Setup numpy
+    """
+    conf.env.Append(LIBS = ['xerces-c'])
+    if not conf.CheckLib('xerces-c'):
+        print "ERROR: Cound't find Xerces-c library"
+        my_exit(1)
+
 def get_g4_libs(): # pylint: disable=W0511
     """
     List of geant4 libraries
@@ -596,6 +605,7 @@ LIBS = {
     'numpy':set_numpy,
     'root':set_root,
     'clhep':set_clhep,
+    'xercesc':set_xercesc,
     'geant4':set_geant4,
     'gtest':set_gtest,
     'unpacker':set_unpacker,

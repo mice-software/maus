@@ -16,6 +16,7 @@
  */
 
 #include <vector>
+#include <string>
 
 #include "Geant4/G4StateManager.hh"
 #include "Geant4/G4ApplicationState.hh"
@@ -57,8 +58,30 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     SetVisManager();
     _runManager = new G4RunManager;
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
-    // just set up a dummy geometry
-    _detector   = new Simulation::DetectorConstruction(*cards);
+    // Create the gdml parser object
+
+    std::string gdmlGeometry = "";
+    bool usegdml = Globals::GetInstance()
+      ->GetMonteCarloMiceModules()->propertyExistsThis("GDMLFile", "string");
+    bool gdmldebug = JsonWrapper::GetProperty
+       (*cards, "simulation_geometry_debug", JsonWrapper::booleanValue).asBool();
+    // bool gdmldebug = false;
+
+    if (usegdml && !gdmldebug) {
+
+      gdmlGeometry =
+	Globals::GetInstance()->GetMonteCarloMiceModules()->propertyString("GDMLFile");
+      usegdml = true;
+
+      Squeak::mout(Squeak::info) << "Using " << gdmlGeometry << std::endl;
+      _parser.Read(gdmlGeometry.c_str());
+      // Squeak::activateCout(true);
+      // _paser.SetOverlapCheck(true);
+      _detector = new Simulation::DetectorConstruction(_parser.GetWorldVolume(), *cards);
+    } else {
+      // just set up a dummy geometry
+      _detector   = new Simulation::DetectorConstruction(*cards);
+    }
     _runManager->SetUserInitialization(_detector);
 
     _physList = MAUSPhysicsList::GetMAUSPhysicsList();
@@ -77,6 +100,9 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     _runManager->Initialize();
     // now set up full geometry
     SetMiceModules(*Globals::GetInstance()->GetMonteCarloMiceModules());
+    if (usegdml) {
+      SetAuxInformation(*Globals::GetInstance()->GetMonteCarloMiceModules());
+    }
 }
 
 MAUSGeant4Manager::~MAUSGeant4Manager() {
@@ -165,6 +191,66 @@ void MAUSGeant4Manager::SetVisManager() {
 
 BTFieldConstructor* MAUSGeant4Manager::GetField() {
   return _detector->GetField();
+}
+
+void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
+  // Establish sensitive detectors using the SDmanager
+  // Get the map of the auxiliary information from the parser
+  const G4GDMLAuxMapType* auxmap = _parser.GetAuxMap();
+    Squeak::mout(Squeak::info) << "Found " << auxmap->size()
+			     << " volume(s) with auxiliary information.\n\n";
+
+  for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
+      iter != auxmap->end(); iter++) {
+    // Construct a mice module containing the auxilliary information
+    G4LogicalVolume* myvol = (*iter).first;
+    // Want to know, specifically if there is a sensitive detector in this object
+    for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
+	 vit != (*iter).second.end(); vit++) {
+      if ((*vit).type.contains("SensitiveDetector")) {
+	// Find the module corresponding to the volume name
+	std::vector<const MiceModule*> mods =
+	  module.findModulesByPropertyString((*vit).type, (*vit).value);
+	// Squeak::mout(Squeak::info)<<"Search for detector "<<(*vit).value
+	// 			  <<" with name "<<myvol->GetName()<<": "
+	// 			  <<mods.size()<<" candidates\n";
+	for (unsigned i = 0; i < mods.size(); i++) {
+	  // This is kind of a double check now to make
+	  // sure that this is the same object.
+
+	  if (mods.at(i)->name() == myvol->GetName()) {
+	     // propertyExists("SensitiveDetector","PropertyString")){
+	    // Make a copy of the module to remove the const cast
+	    MiceModule* tempmod = MiceModule::deepCopy(*mods[i], false);
+	    // tempmod->printThis(Squeak::mout(Squeak::info));
+	    _detector->SetUserLimits(myvol, tempmod);
+	    _detector->SetVisAttributes(myvol, tempmod);
+	    _detector->BuildSensitiveDetector(myvol, tempmod);
+	    _detector->AddToRegion(myvol, tempmod);
+	    // Now loop over all daughters to add them to the sensitive volumes
+	    if ((*vit).value == "SciFi" || (*vit).value == "KL") {
+	      if (myvol->GetNoDaughters() > 0) {
+		SetDaughterSensitiveDetectors(myvol);
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
+
+void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
+  // std::cout << "Adding " << logic->GetNoDaughters()
+  // << " to sensitive detector in " << logic->GetName() << std::endl;
+
+  for (G4int i = 0; i < logic->GetNoDaughters(); i++) {
+    logic->GetDaughter(i)->GetLogicalVolume()->
+      SetSensitiveDetector(logic->GetSensitiveDetector());
+    if (logic->GetDaughter(i)->GetLogicalVolume()->GetNoDaughters() > 0) {
+      SetDaughterSensitiveDetectors(logic->GetDaughter(i)->GetLogicalVolume());
+    }
+  }
 }
 
 // should be const MiceModule

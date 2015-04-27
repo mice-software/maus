@@ -26,11 +26,6 @@ EMREvent::EMREvent()
     _secondary_to_primary_track_distance(0),
     _total_charge_MA(0.0), _charge_ratio_MA(0.0),
     _total_charge_SA(0.0), _charge_ratio_SA(0.0) {
-//    for (int planeid=0; planeid<48; planeid++) {
-//         EMRPlaneHit emrplanehit;
-//         emrplanehit.SetPlane(planeid);
-//         _emrplanehitarray.push_back(emrplanehit);
-//    }
 }
 
 EMREvent::EMREvent(const EMREvent& _emrevent)

@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+    
+<define/>
+    
+<materials>
+    <isotope N="1" Z="1" name="H10xa133600">
+        <atom unit="g/mole" value="1.00782503081372"/>
+    </isotope>
+    <isotope N="2" Z="1" name="H20xa133d90">
+        <atom unit="g/mole" value="2.01410199966617"/>
+    </isotope>
+    <element name="H0xa133b30">
+        <fraction n="0.999885" ref="H10xa133600"/>
+        <fraction n="0.000115" ref="H20xa133d90"/>
+    </element>  
+    <isotope N="4" Z="2" name="He4">
+        <atom  unit="g/mole" value="4.002602"/>
+    </isotope>
+    <element name="elemHe">
+        <fraction n="1.0" ref="He4"/>
+    </element>
+    <isotope N="12" Z="6" name="C120xa126a70">
+        <atom unit="g/mole" value="12"/>
+    </isotope>
+    <isotope N="13" Z="6" name="C130xa126b20">
+        <atom unit="g/mole" value="13.0034"/>
+    </isotope>
+    <element name="C0xa126810">
+        <fraction n="0.9893" ref="C120xa126a70"/>
+        <fraction n="0.0107" ref="C130xa126b20"/>
+    </element>
+    <material name="POLYSTYRENE" state="solid">
+        <D unit="g/cm3" value="1.06"/>
+        <fraction n="0.077418" ref="H0xa133b30"/>
+        <fraction n="0.922582" ref="C0xa126810"/>
+    </material>
+    <isotope N="14" Z="7" name="N140xa126de0">
+        <atom unit="g/mole" value="14.0031"/>
+    </isotope>
+    <isotope N="15" Z="7" name="N150xa126e80">
+        <atom unit="g/mole" value="15.0001"/>
+    </isotope>
+    <element name="N0xa126b80">
+        <fraction n="0.99632" ref="N140xa126de0"/>
+        <fraction n="0.00368" ref="N150xa126e80"/>
+    </element>
+    <isotope N="16" Z="8" name="O160xa1270f0">
+        <atom unit="g/mole" value="15.9949"/>
+    </isotope>
+    <isotope N="17" Z="8" name="O170xa127180">
+        <atom unit="g/mole" value="16.9991"/>
+    </isotope>
+    <isotope N="18" Z="8" name="O180xa1271f0">
+        <atom unit="g/mole" value="17.9992"/>
+    </isotope>
+    <element name="O0xa126ec0">
+        <fraction n="0.99757" ref="O160xa1270f0"/>
+        <fraction n="0.00038" ref="O170xa127180"/>
+        <fraction n="0.00205" ref="O180xa1271f0"/>
+    </element>
+    <isotope N="36" Z="18" name="Ar360xa1270a0">
+        <atom unit="g/mole" value="35.9675"/>
+    </isotope>
+    <isotope N="38" Z="18" name="Ar380xa1274b0">
+        <atom unit="g/mole" value="37.9627"/>
+    </isotope>
+    <isotope N="40" Z="18" name="Ar400xa1275a0">
+        <atom unit="g/mole" value="39.9624"/>
+    </isotope>
+    <element name="Ar0xa127230">
+        <fraction n="0.003365" ref="Ar360xa1270a0"/>
+        <fraction n="0.000632" ref="Ar380xa1274b0"/>
+        <fraction n="0.996003" ref="Ar400xa1275a0"/>
+    </element>
+    <material name="He" state="gas">
+        <D value="0.0001785"/>
+        <fraction n="1" ref="elemHe"/>
+    </material>
+    <material name="AIR" state="gas">
+        <D unit="g/cm3" value="0.00120479"/>
+        <fraction n="0.000124000124000124" ref="C0xa126810"/>
+        <fraction n="0.755267755267755" ref="N0xa126b80"/>
+        <fraction n="0.231781231781232" ref="O0xa126ec0"/>
+        <fraction n="0.0128270128270128" ref="Ar0xa127230"/>
+    </material>
+</materials>
+
+<solids>
+    <tube lunit="cm" aunit="degree" rmax="19.5" deltaphi="360" name="Tracker1_solid" z="113.0"/>
+    <tube lunit="cm" aunit="degree" rmax="19.5" deltaphi="360" name="TrackerRef_solid" z="0.1"/>
+    <tube lunit="cm" aunit="degree" rmax="19.0" deltaphi="360" name="TrackerStation_solid" z="0.2"/>
+    <tube lunit="cm" aunit="degree" rmax="18.9" deltaphi="360" name="Tracker1ViewW_solid" z="0.06273"/>   
+</solids>
+    
+<structure>
+    <volume name="TrackerRef1">
+        <materialref ref="He"/>
+        <solidref ref="TrackerRef_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="Station" auxvalue="9002"/>
+        <auxiliary auxtype="Plane" auxvalue="9002"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SpecialVirtual"/>
+    </volume>
+    
+    <volume name="Tracker1ViewWStation1">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        
+        <physvol>
+            <file name="Tracker1ViewWStation1_Doublet.gdml"/>
+            <position name="Tracker1ViewWStation1_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewWStation1_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewVStation1">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewVStation1_Doublet.gdml"/>
+            <position name="Tracker1ViewVStation1_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewVStation1_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="2"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewUStation1">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewUStation1_Doublet.gdml"/>
+            <position name="Tracker1ViewUStation1_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewUStation1_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="0"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="158.5"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="105.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewWStation2">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewWStation2_Doublet.gdml"/>
+            <position name="Tracker1ViewWStation2_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewWStation2_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewVStation2">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewVStation2_Doublet.gdml"/>
+            <position name="Tracker1ViewVStation2_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewVStation2_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="2"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewUStation2">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewUStation2_Doublet.gdml"/>
+            <position name="Tracker1ViewUStation2_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewUStation2_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="0"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="158.5"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="105.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewWStation3">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewWStation3_Doublet.gdml"/>
+            <position name="Tracker1ViewWStation3_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewWStation3_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewVStation3">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewVStation3_Doublet.gdml"/>
+            <position name="Tracker1ViewVStation3_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewVStation3_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="2"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewUStation3">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewUStation3_Doublet.gdml"/>
+            <position name="Tracker1ViewUStation3_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewUStation3_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="0"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="158.5"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="105.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewWStation4">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewWStation4_Doublet.gdml"/>
+            <position name="Tracker1ViewWStation4_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewWStation4_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewVStation4">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewVStation4_Doublet.gdml"/>
+            <position name="Tracker1ViewVStation4_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewVStation4_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="2"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewUStation4">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewUStation4_Doublet.gdml"/>
+            <position name="Tracker1ViewUStation4_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewUStation4_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="0"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="158.5"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="105.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewWStation5">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewWStation5_Doublet.gdml"/>
+            <position name="Tracker1ViewWStation5_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewWStation5_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1ViewVStation5">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewVStation5_Doublet.gdml"/>
+            <position name="Tracker1ViewVStation5_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewVStation5_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="2"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="160.0"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="106.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>    
+    <volume name="Tracker1ViewUStation5">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Tracker1ViewW_solid"/>
+        <physvol>
+            <file name="Tracker1ViewUStation5_Doublet.gdml"/>
+            <position name="Tracker1ViewUStation5_Doublet_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Tracker1ViewUStation5_Doublet_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SciFi"/>
+        <auxiliary auxtype="Plane" auxvalue="0"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="ActiveRadius" auxvalue="158.5"/>
+        <auxiliary auxtype="Pitch" auxvalue="0.427"/>
+        <auxiliary auxtype="FibreDiameter" auxvalue="0.350"/>
+        <auxiliary auxtype="CoreDiameter" auxvalue="0.308"/>
+        <auxiliary auxtype="CentralFibre" auxvalue="105.5"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+
+        <auxiliary auxtype="G4StepMax" auxvalue="0.1"/>
+    </volume>
+    <volume name="Tracker1Station1">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TrackerStation_solid"/>
+        <physvol name="Tracker1View1V_phys">
+            <volumeref ref="Tracker1ViewVStation1"/>
+            <position name="Tracker1View1V_pos" unit="mm" x="0.0" y="0.0" z="0.6398"/>
+            <rotation name="Tracker1View1V_rot" unit="degree" x="0.0" y="0.0" z="-120.0"/>
+        </physvol>
+        <physvol name="Tracker1View1W_phys">
+            <volumeref ref="Tracker1ViewWStation1"/>
+            <position name="Tracker1View1W_pos" unit="cm" x="0.0" y="0.0" z="-0.00125"/>
+            <rotation name="Tracker1View1W_rot" unit="degree" x="0.0" y="0.0" z="120.0"/>
+        </physvol>
+        <physvol name="Tracker1View1U_phys">
+            <volumeref ref="Tracker1ViewUStation1"/>
+            <position name="Tracker1View1U_pos" unit="mm" x="0.0" y="0.0" z="-0.6648"/>
+            <rotation name="Tracker1View1U_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="Station" auxvalue="1"/>
+        <auxiliary auxtype="OpticsMaterialLength" auxvalue="0"/>
+    </volume>
+    <volume name="Tracker1Station2">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TrackerStation_solid"/>
+        <physvol name="Tracker1View2V_phys">
+            <volumeref ref="Tracker1ViewVStation2"/>
+            <position name="Tracker1View2V_pos" unit="mm" x="0.0" y="0.0" z="0.6398"/>
+            <rotation name="Tracker1View2V_rot" unit="degree" x="0.0" y="0.0" z="-120.0"/>
+        </physvol>
+        <physvol name="Tracker1View2W_phys">
+            <volumeref ref="Tracker1ViewWStation2"/>
+            <position name="Tracker1View2W_pos" unit="cm" x="0.0" y="0.0" z="-0.00125"/>
+            <rotation name="Tracker1View2W_rot" unit="degree" x="0.0" y="0.0" z="120.0"/>
+        </physvol>
+        <physvol name="Tracker1View2U_phys">
+            <volumeref ref="Tracker1ViewUStation2"/>
+            <position name="Tracker1View2U_pos" unit="mm" x="0.0" y="0.0" z="-0.6648"/>
+            <rotation name="Tracker1View2U_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="Station" auxvalue="2"/>
+        <auxiliary auxtype="OpticsMaterialLength" auxvalue="0"/>
+    </volume>
+    <volume name="Tracker1Station3">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TrackerStation_solid"/>
+        <physvol name="Tracker1View3V_phys">
+            <volumeref ref="Tracker1ViewVStation3"/>
+            <position name="Tracker1View3V_pos" unit="mm" x="0.0" y="0.0" z="0.6398"/>
+            <rotation name="Tracker1View3V_rot" unit="degree" x="0.0" y="0.0" z="-120.0"/>
+        </physvol>
+        <physvol name="Tracker1View3W_phys">
+            <volumeref ref="Tracker1ViewWStation3"/>
+            <position name="Tracker1View3W_pos" unit="cm" x="0.0" y="0.0" z="-0.00125"/>
+            <rotation name="Tracker1View3W_rot" unit="degree" x="0.0" y="0.0" z="120.0"/>
+        </physvol>
+        <physvol name="Tracker1View3U_phys">
+            <volumeref ref="Tracker1ViewUStation3"/>
+            <position name="Tracker1View3U_pos" unit="mm" x="0.0" y="0.0" z="-0.6648"/>
+            <rotation name="Tracker1View3U_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="Station" auxvalue="3"/>
+        <auxiliary auxtype="OpticsMaterialLength" auxvalue="0"/>
+    </volume>
+    <volume name="Tracker1Station4">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TrackerStation_solid"/>
+        <physvol name="Tracker1View4V_phys">
+            <volumeref ref="Tracker1ViewVStation4"/>
+            <position name="Tracker1View4V_pos" unit="mm" x="0.0" y="0.0" z="0.6398"/>
+            <rotation name="Tracker1View4V_rot" unit="degree" x="0.0" y="0.0" z="-120.0"/>
+        </physvol>
+        <physvol name="Tracker1View4W_phys">
+            <volumeref ref="Tracker1ViewWStation4"/>
+            <position name="Tracker1View4W_pos" unit="cm" x="0.0" y="0.0" z="-0.00125"/>
+            <rotation name="Tracker1View4W_rot" unit="degree" x="0.0" y="0.0" z="120.0"/>
+        </physvol>
+        <physvol name="Tracker1View4U_phys">
+            <volumeref ref="Tracker1ViewUStation4"/>
+            <position name="Tracker1View4U_pos" unit="mm" x="0.0" y="0.0" z="-0.6648"/>
+            <rotation name="Tracker1View4U_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="Station" auxvalue="4"/>
+        <auxiliary auxtype="OpticsMaterialLength" auxvalue="0"/>
+    </volume>
+    <volume name="Tracker1Station5">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="TrackerStation_solid"/>
+        <physvol name="Tracker1View5V_phys">
+            <volumeref ref="Tracker1ViewVStation5"/>
+            <position name="Tracker1View5V_pos" unit="mm" x="0.0" y="0.0" z="0.6398"/>
+            <rotation name="Tracker1View5V_rot" unit="degree" x="0.0" y="0.0" z="-120.0"/>
+        </physvol>
+        <physvol name="Tracker1View5W_phys">
+            <volumeref ref="Tracker1ViewWStation5"/>
+            <position name="Tracker1View5W_pos" unit="cm" x="0.0" y="0.0" z="-0.00125"/>
+            <rotation name="Tracker1View5W_rot" unit="degree" x="0.0" y="0.0" z="120.0"/>
+        </physvol>
+        <physvol name="Tracker1View5U_phys">
+            <volumeref ref="Tracker1ViewUStation5"/>
+            <position name="Tracker1View5U_pos" unit="mm" x="0.0" y="0.0" z="-0.6648"/>
+            <rotation name="Tracker1View5U_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="Station" auxvalue="5"/>
+        <auxiliary auxtype="OpticsMaterialLength" auxvalue="0"/>
+    </volume>
+    <volume name="Tracker1">
+        <materialref ref="He"/>
+        <solidref ref="Tracker1_solid"/>
+        <physvol name="TrackerRef0_phys">
+            <volumeref ref="TrackerRef1"/>
+            <position name="TrackerRef1_pos" unit="cm" x="0.0" y="0.0" z="-56.0"/>
+            <rotation name="TrackerRef1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <physvol name="Tracker1Station1_phys">
+            <volumeref ref="Tracker1Station1"/>
+            <position name="TrackerStation1_pos" unit="cm" x="0.0" y="0.0" z="-55"/>
+            <rotation name="TrackerStation1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <physvol name="Tracker1Station2_phys">
+            <volumeref ref="Tracker1Station2"/>
+            <position name="TrackerStation2_pos" unit="cm" x="0.0" y="0.0" z="-35.0"/>
+            <rotation name="TrackerStation2_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <physvol name="Tracker1Station3_phys">
+            <volumeref ref="Tracker1Station3"/>
+            <position name="TrackerStation3_pos" unit="mm" x="0.0" y="0.0" z="-100.0"/>
+            <rotation name="TrackerStation3_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <physvol name="Tracker1Station4_phys">
+            <volumeref ref="Tracker1Station4"/>
+            <position name="TrackerStation4_pos" unit="mm" x="0.0" y="0.0" z="200.0"/>
+            <rotation name="TrackerStation4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <physvol name="Tracker1Station5_phys">
+            <volumeref ref="Tracker1Station5"/>
+            <position name="TrackerStation5_pos" unit="cm" x="0.0" y="0.0" z="55.0"/>
+            <rotation name="TrackerStation5_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <auxiliary auxtype="Tracker" auxvalue="1"/>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+    </volume>
+    
+</structure>
+    
+<setup name="Default" version="1.0">
+    <world ref="Tracker1"/>
+</setup>
+</gdml>

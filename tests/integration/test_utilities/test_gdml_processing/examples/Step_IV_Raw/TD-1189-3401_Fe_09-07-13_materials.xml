@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--   GDML materials definition from the Fastrad file : "Fe.ray"
+	Processed the 10/05/2013 at 11h06 by the GDML module of Fastrad 3.3.0.0 -->
+
+<materials>
+	<element name="iron" formula="FE" Z="26">
+	        <atom value="55.845"/>
+	</element>
+	<material name="IRON" formula="IRON">
+		<D value ="7.874" unit="g/cm3"/>
+		<fraction n="1.0000" ref="iron"/>
+	</material>
+     </material>
+</materials>
+

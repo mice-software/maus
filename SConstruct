@@ -64,8 +64,8 @@ def setup_environment():
                                                                           conf)
     Export('conf') # pylint: disable=E0602
     # check libraries exist; add them into the environment
-    for lib in ['compiler', 'python', 'gsl', 'numpy', 'root', 'clhep', 'geant4',
-                'gtest', 'unpacker']:
+    for lib in ['compiler', 'python', 'gsl', 'numpy', 'root', 'clhep',
+		'xercesc', 'geant4', 'gtest', 'unpacker']:
         maus_build_tools.environment_tools.set_lib(conf, env, lib)
     return _maus_root_dir, env
 

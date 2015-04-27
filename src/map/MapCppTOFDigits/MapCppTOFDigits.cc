@@ -31,14 +31,11 @@ PyMODINIT_FUNC init_MapCppTOFDigits(void) {
                                             ("MapCppTOFDigits", "", "", "", "");
 }
 
-MapCppTOFDigits::MapCppTOFDigits() : MapBase<Json::Value>("MapCppTOFDigits") {
+MapCppTOFDigits::MapCppTOFDigits()
+  : MapBase<MAUS::Data>("MapCppTOFDigits") {
 }
 
 void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
-  _stationKeys.push_back("tof0");
-  _stationKeys.push_back("tof1");
-  _stationKeys.push_back("tof2");
-
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR)
@@ -84,204 +81,157 @@ void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
 
 void MapCppTOFDigits::_death()  {}
 
-void MapCppTOFDigits::_process(Json::Value* document) const {
-  Json::Value& root = *document;
-  Json::Value xEventType;
-  // don't try to process if we have not initialized the channel map
-  // this could be because of an invalid map
-  // or because the CDB is down
-  if (!map_init)
-      throw MAUS::Exception(Exception::recoverable,
-                            "Failed to intialize channel map",
-                            "MapCppTOFDigits::_process");
-  // Check if the JSON document can be parsed, else return error only
-  xEventType = JsonWrapper::GetProperty(root,
-                                        "daq_event_type",
-                                        JsonWrapper::stringValue);
-  if (xEventType == "physics_event" || xEventType == "calibration_event") {
-    Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
-    Json::Value xDocTrig, xDocTrigReq;
-    if (xDaqData.isMember("trigger") &&
-        xDaqData.isMember("trigger_request")) {
+void MapCppTOFDigits::_process(MAUS::Data *data) const {
+  // Get spill, break if there's no DAQ data
+  Spill *spill = data->GetSpill();
 
-      xDocTrigReq = JsonWrapper::GetProperty(xDaqData,
-                                             "trigger_request",
-                                             JsonWrapper::arrayValue);
+  if (spill->GetDAQData() == NULL)
+    return;
 
-      xDocTrig = JsonWrapper::GetProperty(xDaqData,
-                                          "trigger",
-                                          JsonWrapper::arrayValue);
+  if (spill->GetDaqEventType() != "physics_event")
+    return;
 
-      Json::Value xDocAllDigits; // list by station then by event
-      unsigned int n_events = 0;
-      for (unsigned int n_station = 0; n_station < _stationKeys.size(); n_station++) {
-        if (xDaqData.isMember(_stationKeys[n_station])) {
-          Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
-                                                                  _stationKeys[n_station],
-                                                                  JsonWrapper::arrayValue);
-          // list of events for station n_station
-          xDocAllDigits[n_station] = makeDigits
-                                  (xDocDetectorData, xDocTrigReq, xDocTrig);
-          n_events = xDocAllDigits[n_station].size();
-        }
+  TriggerRequestArray *tr_req_data = spill->GetDAQData()->GetTriggerRequestArrayPtr();
+  TriggerArray        *tr_data     = spill->GetDAQData()->GetTriggerArrayPtr();
+
+  TOF0DaqArray *tof0_data = spill->GetDAQData()->GetTOF0DaqArrayPtr();
+  TOF1DaqArray *tof1_data = spill->GetDAQData()->GetTOF1DaqArrayPtr();
+  TOF2DaqArray *tof2_data = spill->GetDAQData()->GetTOF2DaqArrayPtr();
+
+  int nPartEvents = tof0_data->size();
+  int recPartEvents = spill->GetReconEventSize();
+  ReconEventPArray *recEvts =  spill->GetReconEvents();
+
+  // Resize the recon event to harbour all the EMR noise+decays
+  if (recPartEvents == 0) { // No recEvts yet
+      for (int iPe = 0; iPe < nPartEvents; iPe++) {
+        recEvts->push_back(new ReconEvent);
+    }
+  }
+
+//   std::cerr << "nPartEvts: " << nPartEvents << std::endl;
+  for (int xPE = 0; xPE < nPartEvents; xPE++) {
+    TOFEvent *evt = new TOFEvent();
+    (*recEvts)[xPE]->SetTOFEvent(evt);
+    TOF0DigitArray *tof0_digits = evt->GetTOFEventDigitPtr()->GetTOF0DigitArrayPtr();
+    TOF1DigitArray *tof1_digits = evt->GetTOFEventDigitPtr()->GetTOF1DigitArrayPtr();
+    TOF2DigitArray *tof2_digits = evt->GetTOFEventDigitPtr()->GetTOF2DigitArrayPtr();
+
+    // Get the trigger and the trigger requests.
+    V1290Array tr_hits     = (*tr_data)[xPE]->GetV1290Array();
+    V1290Array tr_req_hits = (*tr_req_data)[xPE]->GetV1290Array();
+
+    /** Create the digits in TOF0;
+     */
+    V1724Array tof0_adc_hits = (*tof0_data)[xPE]->GetV1724Array();
+    V1290Array tof0_tdc_hits = (*tof0_data)[xPE]->GetV1290Array();
+
+    // Loop over the tdc hits in TOF0.
+    int nHits = tof0_tdc_hits.size();
+    if (tof0_adc_hits.size())
+    for (int xHit = 0; xHit < nHits; xHit++) {
+      TOFDigit the_digit;
+      this->setTdc(&the_digit, tof0_tdc_hits[xHit]);
+      if (!this->findAdc(&the_digit, tof0_adc_hits)) {
+        the_digit.SetChargeMm(0);
+        the_digit.SetChargePm(0);
       }
-      for (unsigned int ev = 0; ev < n_events; ev++) {
-        Json::Value xDocTofDigits(Json::objectValue);
-        for (unsigned int stat = 0; stat < _stationKeys.size(); stat++) {
-          if (xDocAllDigits[stat][ev].type() == Json::arrayValue) {
-            xDocTofDigits[_stationKeys[stat]] = xDocAllDigits[stat][ev];
-          } else {
-            xDocTofDigits[_stationKeys[stat]] = Json::Value(Json::arrayValue);
-          }
-        }
-        root["recon_events"][ev]["tof_event"]["tof_digits"] = xDocTofDigits;
+      if (this->findTrigger(&the_digit, tof0_tdc_hits[xHit], tr_hits) &&
+          this->findTriggerReq(&the_digit, tof0_tdc_hits[xHit], tr_req_hits))
+        tof0_digits->push_back(the_digit);
+    }
+
+    /** Create the digits in TOF1;
+     */
+    V1724Array tof1_adc_hits = (*tof1_data)[xPE]->GetV1724Array();
+    V1290Array tof1_tdc_hits = (*tof1_data)[xPE]->GetV1290Array();
+
+    // Loop over the tdc hits in TOF1.
+    nHits = tof1_tdc_hits.size();
+    if (tof1_adc_hits.size())
+    for (int xHit = 0; xHit < nHits; xHit++) {
+      TOFDigit the_digit;
+      this->setTdc(&the_digit, tof1_tdc_hits[xHit]);
+      if (!this->findAdc(&the_digit, tof1_adc_hits)) {
+        the_digit.SetChargeMm(0);
+        the_digit.SetChargePm(0);
       }
+      if (this->findTrigger(&the_digit, tof1_tdc_hits[xHit], tr_hits) &&
+          this->findTriggerReq(&the_digit, tof1_tdc_hits[xHit], tr_req_hits))
+        tof1_digits->push_back(the_digit);
+    }
+
+    /** Create the digits in TOF2;
+     */
+    V1724Array tof2_adc_hits = (*tof2_data)[xPE]->GetV1724Array();
+    V1290Array tof2_tdc_hits = (*tof2_data)[xPE]->GetV1290Array();
+
+    // Loop over the tdc hits in TOF2.
+    nHits = tof2_tdc_hits.size();
+    if (tof2_adc_hits.size())
+    for (int xHit = 0; xHit < nHits; xHit++) {
+      TOFDigit the_digit;
+      this->setTdc(&the_digit, tof2_tdc_hits[xHit]);
+      if (!this->findAdc(&the_digit, tof2_adc_hits)) {
+        the_digit.SetChargeMm(0);
+        the_digit.SetChargePm(0);
+      }
+      if (this->findTrigger(&the_digit, tof2_tdc_hits[xHit], tr_hits) &&
+          this->findTriggerReq(&the_digit, tof2_tdc_hits[xHit], tr_req_hits))
+        tof2_digits->push_back(the_digit);
     }
   }
 }
 
-bool MapCppTOFDigits::SetConfiguration(std::string json_configuration) {
-
-  return true;
-}
-
-Json::Value MapCppTOFDigits::makeDigits(Json::Value xDocDetData,
-                                        Json::Value xDocTrigReq,
-                                        Json::Value xDocTrig) const {
-  Json::Value xDocDigits;
-  // Get number of Particle trigger.
-  int n_part_event_triggers = xDocTrig.size();
-  xDocDigits.resize(n_part_event_triggers);
-
-  if ( xDocDetData.isArray() ) {
-    // Get number of digits in the detector record. It can be different from
-    // the number of Particle triggers because of the Zero Suppression.
-    int n_part_events = xDocDetData.size();
-    for ( int PartEvent = 0; PartEvent < n_part_events; PartEvent++ ) {
-      // Get the data, trigger and trigger request for this particle event.
-      Json::Value xDocPartEvent_data = JsonWrapper::GetItem(xDocDetData,
-                                                            PartEvent,
-                                                            JsonWrapper::anyValue);
-
-      Json::Value xDocPartEvent_trigger = JsonWrapper::GetItem(xDocTrig,
-                                                               PartEvent,
-                                                               JsonWrapper::anyValue );
-
-      Json::Value xDocPartEvent_triggerReq = JsonWrapper::GetItem(xDocTrigReq,
-                                                                  PartEvent,
-                                                                  JsonWrapper::anyValue);
-
-      if (xDocPartEvent_data.isMember("V1290") && xDocPartEvent_data.isMember("V1724")) {
-        Json::Value xDocTdc = JsonWrapper::GetProperty(xDocPartEvent_data,
-                                                       "V1290",
-                                                       JsonWrapper::arrayValue);
-
-        Json::Value xDocfAdc = JsonWrapper::GetProperty(xDocPartEvent_data,
-                                                        "V1724",
-                                                        JsonWrapper::arrayValue);
-
-        int n_tdc_hits = xDocTdc.size();
-        Json::Value xDocPmtHits;
-        for ( int TdcHitCount = 0; TdcHitCount < n_tdc_hits; TdcHitCount++ ) {
-          // Get the Tdc info from the particle event. This must be done before getting
-          // info from any other equipment.
-          Json::Value xDocTheDigit = getTdc(xDocTdc[TdcHitCount]);
-
-          // Get flash ADC info and appent it to the digit. The info from the Tdc is
-          // passed as well in order to find the ascosiated adc values.
-          if (!getAdc(xDocfAdc, xDocTdc[TdcHitCount], xDocTheDigit)) {
-             xDocTheDigit["charge_mm"] = 0;
-             xDocTheDigit["charge_pm"] = 0;
-          };
-
-          // Get the trigger leading and trailing times and add them to the digit.
-          getTrig(xDocPartEvent_trigger, xDocTdc[TdcHitCount], xDocTheDigit);
-
-          // Get the trigger request leading and trailing times and add them to the digit.
-          getTrigReq(xDocPartEvent_triggerReq, xDocTdc[TdcHitCount], xDocTheDigit);
-
-          xDocPmtHits.append(xDocTheDigit);
-        }
-        xDocDigits[PartEvent] = xDocPmtHits;
-      }
-    }
-  }
-  return xDocDigits;
-}
-
-Json::Value MapCppTOFDigits::getTdc(Json::Value xDocTdcHit) const {
+void MapCppTOFDigits::setTdc(MAUS::TOFDigit *digit, MAUS::V1290 &tdc) const {
   std::stringstream xConv;
-  Json::Value xDocInfo;
-
   DAQChannelKey xTdcDaqKey;
-
-  std::string xDaqKey_tdc_str = JsonWrapper::GetProperty(xDocTdcHit,
-                                                         "channel_key",
-                                                         JsonWrapper::stringValue).asString();
-
+  std::string xDaqKey_tdc_str = tdc.GetChannelKey();
   xConv << xDaqKey_tdc_str;
   xConv >> xTdcDaqKey;
-
   TOFChannelKey* xTofTdcKey = _map.find(&xTdcDaqKey);
 
-  if (xTofTdcKey) {
-    xDocInfo["tof_key"]           = xTofTdcKey->str();
-    xDocInfo["station"]           = xTofTdcKey->station();
-    xDocInfo["plane"]             = xTofTdcKey->plane();
-    xDocInfo["slab"]              = xTofTdcKey->slab();
-    xDocInfo["pmt"]               = xTofTdcKey->pmt();
+  digit->SetPmt(xTofTdcKey->pmt());
+  digit->SetSlab(xTofTdcKey->slab());
+  digit->SetPlane(xTofTdcKey->plane());
+  digit->SetStation(xTofTdcKey->station());
+  digit->SetTofKey(xTofTdcKey->str());
 
-    xDocInfo["part_event_number"] = xDocTdcHit["part_event_number"];
-    xDocInfo["phys_event_number"] = xDocTdcHit["phys_event_number"];
-    xDocInfo["leading_time"]      = xDocTdcHit["leading_time"];
-    xDocInfo["trailing_time"]     = xDocTdcHit["trailing_time"];
-    xDocInfo["trigger_time_tag"]  = xDocTdcHit["trigger_time_tag"];
-    xDocInfo["time_stamp"]        = xDocTdcHit["time_stamp"];
-  }
+  digit->SetLeadingTime(tdc.GetLeadingTime());
+  digit->SetTrailingTime(tdc.GetTrailingTime());
+  digit->SetTimeStamp(tdc.GetTimeStamp());
+  digit->SetTriggerTimeTag(tdc.GetTriggerTimeTag());
 
-  return xDocInfo;
+  digit->SetPhysEventNumber(tdc.GetPhysEventNumber());
+  digit->SetPartEventNumber(tdc.GetPartEventNumber());
 }
 
-bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
-                             Json::Value xDocTdcHit,
-                             Json::Value &xDocDigit) const throw(Exception) {
+bool MapCppTOFDigits::findAdc(MAUS::TOFDigit *digit,
+                              MAUS::V1724Array &adc_hits) const throw(Exception) {
+  int n_Adc_hits = adc_hits.size();
 
-  int n_Adc_hits = xDocfAdc.size();
-  std::string xTofKey_str = JsonWrapper::GetProperty(xDocDigit,
-                                                     "tof_key",
-                                                     JsonWrapper::stringValue).asString();
-
+  std::string xTofKey_str = digit->GetTofKey();
   TOFChannelKey xTdcTofKey(xTofKey_str);
 
   for (int AdcHitCount = 0; AdcHitCount < n_Adc_hits; AdcHitCount++) {
-    std::string xDaqKey_adc_str = JsonWrapper::GetProperty(xDocfAdc[AdcHitCount],
-                                                           "channel_key",
-                                                           JsonWrapper::stringValue).asString();
+    std::string xDaqKey_adc_str = adc_hits[AdcHitCount].GetChannelKey();
 
     DAQChannelKey xAdcDaqKey(xDaqKey_adc_str);
     TOFChannelKey* xAdcTofKey = _map.find(&xAdcDaqKey);
 
     if (xTdcTofKey == *xAdcTofKey) {
-      xDocDigit["charge_mm"] = JsonWrapper::GetProperty(xDocfAdc[AdcHitCount],
-                                                        "charge_mm",
-                                                        JsonWrapper::intValue );
-      xDocDigit["charge_pm"] = JsonWrapper::GetProperty(xDocfAdc[AdcHitCount],
-                                                        "charge_pm",
-                                                        JsonWrapper::intValue );
+      digit->SetChargeMm(adc_hits[AdcHitCount].GetChargeMm());
+      digit->SetChargePm(adc_hits[AdcHitCount].GetChargePm());
 
-      if (!xDocfAdc[AdcHitCount].isMember("charge_mm"))
-          xDocDigit["charge_mm"] = 0;
-      if (!xDocfAdc[AdcHitCount].isMember("charge_pm"))
-          xDocDigit["charge_pm"] = 0;
-      if (xDocDigit["part_event_number"] != xDocfAdc[AdcHitCount]["part_event_number"]) {
+      if (digit->GetPartEventNumber() != adc_hits[AdcHitCount].GetPartEventNumber()) {
         throw(Exception(Exception::recoverable,
               std::string("Wrong part_event_number!"),
-              "MapCppTOFDigits::getAdc"));
+              "MapCppTOFDigits::findAdc"));
       }
-      if (xDocDigit["phys_event_number"] != xDocfAdc[AdcHitCount]["phys_event_number"]) {
+      if (digit->GetPhysEventNumber() != adc_hits[AdcHitCount].GetPhysEventNumber()) {
         throw(Exception(Exception::recoverable,
               std::string("Wrong phys_event_number!"),
-              "MapCppTOFDigits::getAdc"));
+              "MapCppTOFDigits::findAdc"));
       }
 
       return true;
@@ -291,80 +241,60 @@ bool MapCppTOFDigits::getAdc(Json::Value xDocfAdc,
   return false;
 }
 
-bool MapCppTOFDigits::getTrig(Json::Value xDocTrig,
-                              Json::Value xDocTdcHit,
-                              Json::Value &xDocDigit ) const throw(Exception) {
-  Json::Value xDocT = JsonWrapper::GetProperty(xDocTrig, "V1290", JsonWrapper::arrayValue);
-  int HitGeo = JsonWrapper::GetProperty(xDocTdcHit , "geo", JsonWrapper::intValue).asInt();
-  int n_count = xDocT.size();
-  // Loop over all of the triggers for this particle event.
-  for (int TrigCount = 0; TrigCount < n_count; TrigCount++) {
-    Json::Value Trig = JsonWrapper::GetItem(xDocT, TrigCount, JsonWrapper::objectValue);
+bool MapCppTOFDigits::findTrigger(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
+                                  MAUS::V1290Array &tr_hits) const  throw(Exception) {
+  int n_tr_hits = tr_hits.size();
 
-    int TrGeo = JsonWrapper::GetProperty(Trig, "geo", JsonWrapper::intValue).asInt();
-    // If the Geo number of the trigger request matches the Geo number for the TDC then add the
-    // trigger information to the digit.
-    if ( TrGeo == HitGeo ) {
-      xDocDigit["trigger_leading_time"]  = JsonWrapper::GetProperty(Trig,
-                                                                    "leading_time",
-                                                                    JsonWrapper::intValue);
-      xDocDigit["trigger_trailing_time"] = JsonWrapper::GetProperty(Trig,
-                                                                    "trailing_time",
-                                                                    JsonWrapper::intValue);
+  int xGeo = tdc.GetGeo();
 
-      if (xDocDigit["part_event_number"] != Trig["part_event_number"]) {
+  for (int TrHitCount = 0; TrHitCount < n_tr_hits; TrHitCount++) {
+    int tr_Geo = tr_hits[TrHitCount].GetGeo();
+    if (xGeo == tr_Geo) {
+      digit->SetTriggerLeadingTime(tr_hits[TrHitCount].GetLeadingTime());
+      digit->SetTriggerTrailingTime(tr_hits[TrHitCount].GetTrailingTime());
+
+      if (digit->GetPartEventNumber() != tr_hits[TrHitCount].GetPartEventNumber()) {
         throw(Exception(Exception::recoverable,
               std::string("Wrong part_event_number!"),
-              "MapCppTOFDigits::getTrig"));
+              "MapCppTOFDigits::findTrigger"));
       }
-      if (xDocDigit["phys_event_number"] != Trig["phys_event_number"]) {
+      if (digit->GetPhysEventNumber() != tr_hits[TrHitCount].GetPhysEventNumber()) {
         throw(Exception(Exception::recoverable,
               std::string("Wrong phys_event_number!"),
-              "MapCppTOFDigits::getTrig"));
+              "MapCppTOFDigits::findTrigger"));
       }
 
-      return true;  // will break the loop and return true it finds the first trigger that matches.
+      return true;
     }
   }
 
   return false;
 }
 
-bool MapCppTOFDigits::getTrigReq(Json::Value xDocTrigReq,
-                                 Json::Value xDocTdcHit,
-                                 Json::Value &xDocDigit ) const throw(Exception) {
-  Json::Value xDocTR = JsonWrapper::GetProperty(xDocTrigReq, "V1290", JsonWrapper::arrayValue);
-  int HitGeo = JsonWrapper::GetProperty(xDocTdcHit, "geo", JsonWrapper::intValue).asInt();
-  int n_req_count = xDocTR.size();
+bool MapCppTOFDigits::findTriggerReq(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
+                                  MAUS::V1290Array &tr_req_hits) const  throw(Exception) {
+  int n_tr_hits = tr_req_hits.size();
 
-  // Loop over all of the trigger requests for this particle event.
-  for (int TrigReqCount = 0; TrigReqCount < n_req_count; TrigReqCount++) {
-    Json::Value TrigReq = JsonWrapper::GetItem(xDocTR, TrigReqCount, JsonWrapper::objectValue);
+  int xGeo = tdc.GetGeo();
 
-    int TrReqGeo = JsonWrapper::GetProperty(TrigReq, "geo", JsonWrapper::intValue).asInt();
-    // If the Geo number of the trigger request matches the Geo number for the TDC then add the
-    // trigger request information to the digit.
-    if (TrReqGeo == HitGeo) {
-      xDocDigit["trigger_request_leading_time"]  = JsonWrapper::GetProperty(TrigReq,
-                                                                            "leading_time",
-                                                                            JsonWrapper::intValue);
+  for (int TrReqHitCount = 0; TrReqHitCount < n_tr_hits; TrReqHitCount++) {
+    int tr_Geo = tr_req_hits[TrReqHitCount].GetGeo();
+    if (xGeo == tr_Geo) {
+      digit->SetTriggerRequestLeadingTime(tr_req_hits[TrReqHitCount].GetLeadingTime());
+      digit->SetTriggerRequestTrailingTime(tr_req_hits[TrReqHitCount].GetTrailingTime());
 
-      xDocDigit["trigger_request_trailing_time"] = JsonWrapper::GetProperty(TrigReq,
-                                                                            "trailing_time",
-                                                                            JsonWrapper::intValue);
-
-      if (xDocDigit["part_event_number"] != TrigReq["part_event_number"]) {
+      if (digit->GetPartEventNumber() != tr_req_hits[TrReqHitCount].GetPartEventNumber()) {
         throw(Exception(Exception::recoverable,
               std::string("Wrong part_event_number!"),
-              "MapCppTOFDigits::getTrigReq"));
+              "MapCppTOFDigits::findTriggerReq"));
       }
-      if (xDocDigit["phys_event_number"] != TrigReq["phys_event_number"]) {
+      if (digit->GetPhysEventNumber() != tr_req_hits[TrReqHitCount].GetPhysEventNumber()) {
         throw(Exception(Exception::recoverable,
               std::string("Wrong phys_event_number!"),
-              "MapCppTOFDigits::getTrigReq"));
+              "MapCppTOFDigits::findTriggerReq"));
       }
-      return true;  // will break the loop when it finds the first request that matches.
-      // There may be multiple requests per board but for now we only get the first one.
+
+      return true;
     }
   }
 
