@@ -4,12 +4,23 @@ if [ -z "$MAUS_ROOT_DIR" ]; then
    echo "FATAL: \$MAUS_ROOT_DIR not set. Please source env.sh"
    exit 1;
 fi
+if [ -z "$MAUS_THIRD_PARTY" ]; then
+   echo "FATAL: \$MAUS_THIRD_PARTY not set. Please source env.sh"
+   exit 1;
+fi
+
 if [ -z "$1" ]; then
    echo "FATAL: No argument supplied. Please supply either StepI or StepIV"
    exit 1;
 fi
 
+if [ ! "$MAUS_ROOT_DIR" = "$MAUS_THIRD_PARTY" ]; then
+   echo "FATAL: MAUS_ROOT_DIR != MAUS_THIRD_PARTY - rebuild the unpacker manually"
+   exit 1;
+fi
+
 echo "INFO: Current unpacker version is set as: " $MAUS_UNPACKER_VERSION
+echo "INFO: Current unpacker is located in: " $MAUS_THIRD_PARTY
 
 if [ "$1" = "StepI" ]; then
   echo "INFO: Setting up StepI unpacker"
@@ -28,7 +39,7 @@ echo
 echo "INFO: Rebuilding the unpacker"
 echo
 
-if ./third_party/bash/53unpacking.bash; then
+if $MAUS_THIRD_PARTY/third_party/bash/53unpacking.bash; then
   echo
   echo "INFO: Unpacker rebuilt"
   echo

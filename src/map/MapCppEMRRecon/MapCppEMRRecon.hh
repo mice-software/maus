@@ -58,7 +58,7 @@ typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
 typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
 typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
 
-struct fADCdata {
+struct fADCdata_er {
   int    _orientation;
   double _charge;
   double _charge_corrected;
@@ -67,8 +67,8 @@ struct fADCdata {
   std::vector<int> _samples;
 };
 
-typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
-typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
+typedef std::vector<fADCdata_er>                EMRfADCPlaneHitsVector_er;/* 48 elements */
+typedef std::vector<EMRfADCPlaneHitsVector_er>  EMRfADCEventVector_er;/* nTr elements */
 
 struct TrackData {
   double _range_primary;
@@ -112,45 +112,45 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 
   void process_preselected_events(MAUS::Spill *spill,
 				  EMRDBBEventVector& emr_dbb_events_tmp,
-				  EMRfADCEventVector& emr_fadc_events_tmp) const;
+				  EMRfADCEventVector_er& emr_fadc_events_tmp) const;
 
   void process_secondary_events(EMRDBBEventVector emr_dbb_events_tmp,
-			        EMRfADCEventVector emr_fadc_events_tmp,
+			        EMRfADCEventVector_er emr_fadc_events_tmp,
 			        EMRDBBEventVector *emr_dbb_events,
-			        EMRfADCEventVector& emr_fadc_events,
+			        EMRfADCEventVector_er& emr_fadc_events,
 			        EMRTrackEventVector& emr_track_events) const;
 
   void tot_cleaning(int nPartEvents,
 		    EMRDBBEventVector *emr_dbb_events,
-		    EMRfADCEventVector& emr_fadc_events,
+		    EMRfADCEventVector_er& emr_fadc_events,
 		    EMRTrackEventVector& emr_track_events) const;
 
   void coordinates_reconstruction(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
-				  EMRfADCEventVector& emr_fadc_events) const;
+				  EMRfADCEventVector_er& emr_fadc_events) const;
 
   void energy_correction(int nPartEvents,
 			 EMRDBBEventVector *emr_dbb_events,
-			 EMRfADCEventVector& emr_fadc_events) const;
+			 EMRfADCEventVector_er& emr_fadc_events) const;
 
   void track_matching(int nPartEvents,
 		      EMRDBBEventVector *emr_dbb_events,
-		      EMRfADCEventVector& emr_fadc_events,
+		      EMRfADCEventVector_er& emr_fadc_events,
 		      EMRTrackEventVector& emr_track_events) const;
 
   void event_charge_calculation(int nPartEvents,
 				EMRDBBEventVector *emr_dbb_events,
-				EMRfADCEventVector& emr_fadc_events,
+				EMRfADCEventVector_er& emr_fadc_events,
 				EMRTrackEventVector& emr_track_events) const;
 
   void fill(Spill *spill,
 	    int nPartEvents,
 	    EMRDBBEventVector *emr_dbb_events,
-	    EMRfADCEventVector& emr_fadc_events,
+	    EMRfADCEventVector_er& emr_fadc_events,
 	    EMRTrackEventVector& emr_track_events) const;
 
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
-  EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
+  EMRfADCEventVector_er get_fadc_data_tmp(int nPartEvts) const;
   EMRTrackEventVector get_track_data_tmp(int nPartEvts) const;
 
   // Maps
