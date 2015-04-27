@@ -36,6 +36,7 @@ MapCppEMRRecon::MapCppEMRRecon()
     : MapBase<MAUS::Data>("MapCppEMRRecon") {
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   _classname = "MapCppEMRRecon";
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
@@ -54,9 +55,6 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   // Fetch variables
   _number_of_planes = configJSON["EMRnumberOfPlanes"].asInt();
   _number_of_bars = configJSON["EMRnumberOfBars"].asInt();
-  _bar_width = configJSON["EMRbarWidth"].asDouble();
-  _bar_height = configJSON["EMRbarHeight"].asDouble();
-  _gap = configJSON["EMRgap"].asDouble();
 
   _secondary_hits_bunching_distance = configJSON["EMRsecondaryHitsBunchingDistance"].asInt();
   _secondary_hits_bunching_width = configJSON["EMRsecondaryHitsBunchingWidth"].asInt();
@@ -73,9 +71,11 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
 	= configJSON["EMRmaxSecondaryToPrimaryTrackDistance"].asInt();
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::_death() {
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::_process(Data *data) const {
 
   // Get spill, break if there's no recon data
@@ -105,7 +105,7 @@ void MapCppEMRRecon::_process(Data *data) const {
   tot_cleaning(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 
   // Reconstruct the coordinates of each Hit
-  coordinates_reconstruction(nPartEvents, emr_dbb_events, emr_fadc_events);
+  coordinates_reconstruction(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 
   // Match the primary tracks with their decay
   track_matching(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
@@ -114,6 +114,7 @@ void MapCppEMRRecon::_process(Data *data) const {
   fill(spill, nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 						EMRDBBEventVector& emr_dbb_events_tmp,
 						EMRfADCEventVector& emr_fadc_events_tmp) const {
@@ -191,6 +192,7 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
   }
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_tmp,
 					     EMRfADCEventVector emr_fadc_events_tmp,
 					     EMRDBBEventVector *emr_dbb_events,
@@ -294,6 +296,7 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
   }
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::tot_cleaning(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
 				  EMRfADCEventVector& emr_fadc_events,
@@ -368,9 +371,11 @@ void MapCppEMRRecon::tot_cleaning(int nPartEvents,
   }
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 						EMRDBBEventVector *emr_dbb_events,
-						EMRfADCEventVector& emr_fadc_events) const {
+						EMRfADCEventVector& emr_fadc_events,
+						EMRTrackEventVector& emr_track_events) const {
 
   int nTotalPartEvents = emr_fadc_events.size();
 
@@ -468,29 +473,20 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 	y0 = y2;
       }
 
-      // Return the coordinates in metric, see EMR.dat for geometry
       if (iPlane % 2 == 0) {
-	double x = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
-	double y = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
-	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
-	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
-      } else {
-	double x = (y0 - _number_of_bars/2) * (_bar_width/2 + _gap);
-	double y = (barid - _number_of_bars/2) * (_bar_width/2 + _gap);
-	emr_dbb_events[1][iPe][x0][barid][0].SetX(x);
-	emr_dbb_events[1][iPe][x0][barid][0].SetY(y);
+	emr_dbb_events[1][iPe][x0][barid][0].SetX(barid);
+	emr_dbb_events[1][iPe][x0][barid][0].SetY(y0);
       }
-
-      double z(-1);
-      if (barid % 2 == 0)
-	z = x0 * (_bar_height + _gap) + 1./3 * _bar_height;
-      else
-	z = x0 * (_bar_height + _gap) + 2./3 * _bar_height;
-      emr_dbb_events[1][iPe][x0][barid][0].SetZ(z);
+      if (iPlane % 2 == 1) {
+	emr_dbb_events[1][iPe][x0][barid][0].SetX(y0);
+	emr_dbb_events[1][iPe][x0][barid][0].SetY(barid);
+      }
+      emr_dbb_events[1][iPe][x0][barid][0].SetZ(x0);
     }
   }
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::track_matching(int nPartEvents,
 				    EMRDBBEventVector *emr_dbb_events,
 				    EMRfADCEventVector& emr_fadc_events,
@@ -601,6 +597,7 @@ void MapCppEMRRecon::track_matching(int nPartEvents,
   }
 }
 
+////////////////////////////////////////////////////////////////////////////
 void MapCppEMRRecon::fill(Spill *spill,
 			  int nPartEvents,
 			  EMRDBBEventVector *emr_dbb_events,
