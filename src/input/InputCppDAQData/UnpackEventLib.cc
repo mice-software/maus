@@ -863,17 +863,20 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
   // Get the number of data words.
   uint32_t nDataWords = xVLSBFragment->GetPayLoadWordCount();
 
+//   std::cerr << "PhysEvNum: " << xPhysEvNum << " nDataWords: " << nDataWords << endl;
   // Loop over the data.
   uint32_t xWordCount(0);
   while (xWordCount < nDataWords) {
     xPartEv = xVLSBFragment->GetEventNum(xWordCount)-1;
-    if (xPartEv > _tracker1_spill.size()) {
-      _tracker1_spill.resize(xPartEv);
-      _tracker0_spill.resize(xPartEv);
-      _single_st_spill.resize(xPartEv);
+//     std::cerr << xWordCount << " PartEv:" << xPartEv << "  LDC: " << xLdc << endl;
+    if (xPartEv+1 > _tracker1_spill.size()) {
+      _tracker1_spill.resize(xPartEv+1);
+      _tracker0_spill.resize(xPartEv+1);
+      _single_st_spill.resize(xPartEv+1);
     }
 
     xAdc = xVLSBFragment->GetAdc(xWordCount);
+//     std::cerr << xWordCount << " adc: " << xAdc << endl;
     if (!_zero_suppression ||
         (_zero_suppression && xAdc > _zs_threshold) ) {
       xVLSBhit.SetLdcId(xLdc);
@@ -886,7 +889,6 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
       xVLSBhit.SetChannel(xVLSBFragment->GetChannel(xWordCount));
       xVLSBhit.SetTDC(xVLSBFragment->GetTdc(xWordCount));
       xVLSBhit.SetDiscriminator(xVLSBFragment->GetDiscriBit(xWordCount));
-
       if (xLdc == 0) {
         xDetector = "tracker0";
         xVLSBhit.SetDetector(xDetector);
@@ -897,11 +899,11 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
         xVLSBhit.SetDetector(xDetector);
         _tracker1_spill[xPartEv].push_back(xVLSBhit);
       }
-      /* else if (xLdc == 3) {
-        xDetector = "single_station";
-        xVLSBhit.SetDetector(xDetector);
-        _single_st_spill[xPartEv].push_back(xVLSBhit);
-      }*/
+//        else if (xLdc == 3) {
+//         xDetector = "single_station";
+//         xVLSBhit.SetDetector(xDetector);
+//         _single_st_spill[xPartEv].push_back(xVLSBhit);
+//       }
     }
     xWordCount++;
   }
