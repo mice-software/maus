@@ -328,6 +328,8 @@ geometry_download_by = 'id' # choose 'run_number' to download by run number, 'cu
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
+geometry_download_beamline_tag = ''
+geometry_download_coolingchannel_tag = ''
 geometry_download_run_number = 0
 geometry_download_id = 3
 geometry_download_cleanup = True # set to True to clean up after download

@@ -55,6 +55,14 @@ def main(): # pylint: disable = C0103
     elif configuration.geometry_download_by == "current":
         geometry_downloader.download_current(gdml_cache)
     elif configuration.geometry_download_by == "id":
+        if configuration.download_beamline_tag != "":
+            geometry_downloader.download_beamline_for_tag\
+                                       (configuration.download_beamline_tag,
+                                        gdml_cache)
+        if configuration.download_coolingchannel_tag != "":
+            geometry_downloader.download_coolingchannel_for_tag\
+                                       (configuration.download_coolingchannel_tag,
+                                        gdml_cache)
         geometry_downloader.download_geometry_by_id \
                                 (configuration.geometry_download_id, gdml_cache)
     else:
