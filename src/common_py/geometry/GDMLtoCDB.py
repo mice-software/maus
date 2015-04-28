@@ -206,6 +206,7 @@ class Downloader: #pylint: disable = R0902
         self.listofgeometries = filelist
         self.wsdlurl = ""
         self.geometry_cdb = None
+        self.ccurl = ""
         self.set_up_server()
 
     def set_up_server(self):
@@ -219,6 +220,7 @@ class Downloader: #pylint: disable = R0902
         self.wsdlurl = config.cdb_download_url+config.geometry_download_wsdl
         self.geometry_cdb = cdb.Geometry()
         self.geometry_cdb.set_url(self.wsdlurl)
+        self.ccurl = config.cdb_cc_download_url
         server_status = self.geometry_cdb.get_status()
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status 
@@ -321,7 +323,8 @@ class Downloader: #pylint: disable = R0902
         if os.path.exists(downloadpath) == False:
             raise OSError('Path '+downloadpath+' does not exist')
         else:        
-            beamline_cdb = cdb.Beamline()
+            beamline_cdb = cdb.Beamline(self.)
+            beamline_cdb.set_url(self.wsdlurl)
             downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
             path = downloadpath + '/Beamline.gdml'
             fout = open(path, 'w')
@@ -410,8 +413,8 @@ class Downloader: #pylint: disable = R0902
         if os.path.exists(downloadpath) == False:
             raise OSError('Path '+downloadpath+' does not exist')
         else:        
-            coolingchannel_cdb = cdb.CoolingChannel()
-            tag_list = beamline_cdb.list_tags()
+            coolingchannel_cdb = cdb.CoolingChannel(self.ccurl)
+            tag_list = coolingchannel_cdb.list_tags()
             tag_found = [i for i, j in enumerate(tag_list) if j == tag]
             if len(tag_found) > 0:
                 try:

@@ -320,6 +320,7 @@ SciFiKalmanVerbose  = False # Dump information per fitted track
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
 cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
+cdb_cc_download_url = "http://preprodcdb.mice.rl.ac.uk" # target URL for cooling channel configuration database downloads.
 
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
@@ -328,6 +329,7 @@ geometry_download_by = 'id' # choose 'run_number' to download by run number, 'cu
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
+geometry_download_beamline_for_run = 0
 geometry_download_beamline_tag = ''
 geometry_download_coolingchannel_tag = ''
 geometry_download_run_number = 0
