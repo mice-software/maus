@@ -323,7 +323,7 @@ class Downloader: #pylint: disable = R0902
         if os.path.exists(downloadpath) == False:
             raise OSError('Path '+downloadpath+' does not exist')
         else:        
-            beamline_cdb = cdb.Beamline(self.)
+            beamline_cdb = cdb.Beamline()
             beamline_cdb.set_url(self.wsdlurl)
             downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
             path = downloadpath + '/Beamline.gdml'
