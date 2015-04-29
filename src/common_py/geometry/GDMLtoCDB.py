@@ -556,7 +556,7 @@ class Downloader: #pylint: disable = R0902
         borrowed from cdb._cooling_channel_supermouse.set_coolingchannel(data)
         """
         try:
-            xml = ("<coolingchannel>")
+            xml = ("<coolingchannels><coolingchannel>")
             
             for magnet in data:
                 if (str(magnet['polarity']) != "-1"
@@ -583,7 +583,7 @@ class Downloader: #pylint: disable = R0902
                     xml = xml + "vlim='" + str(coil['vlim']) + "'/>"
                     
                 xml = xml + "</magnet>"
-            xml = xml + "</coolingchannel>"
+            xml = xml + "</coolingchannel></coolingchannels>"
         except KeyError, exception:
             raise CdbPermanentError("Missing value for " + str(exception))
         return xml
