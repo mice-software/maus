@@ -277,7 +277,7 @@ class Downloader: #pylint: disable = R0902
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
         self.download_beamline_for_run(run_num, download_path)
-        # To be included with an update to the cdb application
+        # To be included with n update to the cdb application
         # self.download_coolingchannel_for_run(run_num, download_path)
         self.__write_zip_file(download_path, downloaded_file)
         
@@ -324,7 +324,6 @@ class Downloader: #pylint: disable = R0902
             raise OSError('Path '+downloadpath+' does not exist')
         else:        
             beamline_cdb = cdb.Beamline()
-            beamline_cdb.set_url(self.wsdlurl)
             downloadedfile = beamline_cdb.get_beamline_for_run_xml(run_id)
             path = downloadpath + '/Beamline.gdml'
             fout = open(path, 'w')
