@@ -65,17 +65,35 @@ class EMRBarHit {
     /** Sets X coordinate */
     void SetX(double x);
 
+    /** Returns the error on the X coordinate */
+    double GetErrorX() const;
+
+    /** Sets the error on the X coordinate */
+    void SetErrorX(double ex);
+
     /** Returns Y coordinate */
     double GetY() const;
 
     /** Sets Y coordinate */
     void SetY(double y);
 
+    /** Returns the error on the Y coordinate */
+    double GetErrorY() const;
+
+    /** Sets the error on the Y coordinate */
+    void SetErrorY(double ey);
+
     /** Returns Z coordinate */
     double GetZ() const;
 
     /** Sets Z coordinate */
     void SetZ(double z);
+
+    /** Returns the error on the Z coordinate */
+    double GetErrorZ() const;
+
+    /** Sets the error on the Z coordinate */
+    void SetErrorZ(double ez);
 
     /** Returns charge corrected by calibration */
     double GetChargeCorrected() const;
@@ -93,9 +111,12 @@ class EMRBarHit {
     int _tot;/* dbb counts */
     int _deltat;/* dbb counts */
     int _hittime;/* dbb counts */
-    double _x;/* bar units: 0 to 60 */
-    double _y;/* bar units: 0 to 60 */
-    double _z;/* plane units: 0 to 49 */
+    double _x; /* mm */
+    double _ex; /* mm */
+    double _y; /* mm */
+    double _ey; /* mm */
+    double _z; /* mm */
+    double _ez; /* mm */
     double _charge_corrected;
     double _total_charge_corrected;
 

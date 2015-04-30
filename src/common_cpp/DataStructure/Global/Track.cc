@@ -40,6 +40,7 @@ Track::Track()
       _pid(MAUS::DataStructure::Global::kNoPID),
       _charge(0),
       _detectorpoints(0),
+      _pid_logL_values(0),
       _emr_range_primary(0.),
       _emr_range_secondary(0.),
       _goodness_of_fit(0.) {
@@ -55,6 +56,7 @@ Track::Track(const Track &track)
       _track_points(track.get_track_points()),
       _detectorpoints(track.get_detectorpoints()),
       _geometry_paths(track.get_geometry_paths()),
+      _pid_logL_values(track.get_pid_logL_values()),
       _constituent_tracks(track.get_constituent_tracks()),
       _emr_range_primary(track.get_emr_range_primary()),
       _emr_range_secondary(track.get_emr_range_secondary()),
@@ -81,6 +83,7 @@ Track& Track::operator=(const Track &track) {
   _constituent_tracks  = new TRefArray(*track.get_constituent_tracks());
   _detectorpoints      = track.get_detectorpoints();
   _geometry_paths      = track.get_geometry_paths();
+  _pid_logL_values     = track.get_pid_logL_values();
   _emr_range_primary   = track.get_emr_range_primary();
   _emr_range_secondary = track.get_emr_range_secondary();
   _goodness_of_fit     = track.get_goodness_of_fit();
@@ -97,6 +100,7 @@ Track* Track::Clone() const {
   trackNew->set_mapper_name(get_mapper_name());
   trackNew->set_pid(get_pid());
   trackNew->set_charge(get_charge());
+  trackNew->set_pid_logL_values(get_pid_logL_values());
   trackNew->set_emr_range_primary(get_emr_range_primary());
   trackNew->set_emr_range_secondary(get_emr_range_secondary());
 
@@ -388,6 +392,21 @@ void Track::set_geometry_paths(std::vector<std::string> geometry_paths) {
 
 std::vector<std::string> Track::get_geometry_paths() const {
   return _geometry_paths;
+}
+
+// Object to hold pid hypotheses and the log-likelihood that they are the
+// correct hypothesis
+void Track::set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_logL_values) {
+  _pid_logL_values = pid_logL_values;
+}
+
+std::vector<MAUS::DataStructure::Global::PIDLogLPair> Track::get_pid_logL_values() const {
+  return _pid_logL_values;
+}
+
+// Method to fill pid_logL_values
+void Track::AddPIDLogLValues(MAUS::DataStructure::Global::PIDLogLPair pid_logL) {
+  _pid_logL_values.push_back(pid_logL);
 }
 
 // Constituent Tracks methods

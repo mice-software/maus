@@ -45,6 +45,10 @@ TOFEventSlabHit TOFEvent::GetTOFEventSlabHit() const {
     return _tof_slab_hits;
 }
 
+TOFEventSlabHit* TOFEvent::GetTOFEventSlabHitPtr() {
+    return &_tof_slab_hits;
+}
+
 void TOFEvent::SetTOFEventSlabHit(TOFEventSlabHit tof_slab_hits) {
     _tof_slab_hits = tof_slab_hits;
 }
@@ -53,12 +57,20 @@ TOFEventSpacePoint TOFEvent::GetTOFEventSpacePoint() const {
     return _tof_space_points;
 }
 
+TOFEventSpacePoint* TOFEvent::GetTOFEventSpacePointPtr() {
+    return &_tof_space_points;
+}
+
 void TOFEvent::SetTOFEventSpacePoint(TOFEventSpacePoint tof_space_points) {
     _tof_space_points = tof_space_points;
 }
 
 TOFEventDigit TOFEvent::GetTOFEventDigit() const {
     return _tof_digits;
+}
+
+TOFEventDigit* TOFEvent::GetTOFEventDigitPtr() {
+    return &_tof_digits;
 }
 
 void TOFEvent::SetTOFEventDigit(TOFEventDigit tof_digits) {

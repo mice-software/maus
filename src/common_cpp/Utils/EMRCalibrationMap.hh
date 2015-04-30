@@ -1,4 +1,4 @@
- 	/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,9 @@ class EMRCalibrationMap {
   */
   bool InitializeFromCards(Json::Value configJSON);
 
+  /// Get calibrations from CDB
+  bool InitializeFromCDB();
+
  /** Initialize the map by using the provided text files.
   * \param[in] calibFile name of the text file containing the energy calibration constants.
   * \returns true if the text file is loaded successfully.
@@ -76,6 +79,10 @@ class EMRCalibrationMap {
   * To be used only for debugging.
   */
   void Print();
+
+ /** Import the get_emr_calib module which accesses and gets calibrations from the CDB
+  */
+  bool InitializePyMod();
 
   enum {
    /** This value is returned when the correction can not be calculated.
@@ -98,6 +105,14 @@ class EMRCalibrationMap {
   */
   bool Load(std::string calibFile);
 
+ /** Load calibration constants from the CDB.
+  */
+  bool LoadFromCDB();
+
+ /** Fetch the calibration string in the CDB
+  */
+  void GetCalib(std::string devname, std::string caltype, std::string fromdate);
+
  /** This vector holds one EMRChannelKey for each channel of the detector.
   */
   std::vector<EMRChannelKey> _Ckey;
@@ -118,6 +133,19 @@ class EMRCalibrationMap {
  /** Choice of 'figure of merit'
   */
   std::string _fom;
+
+ /** CDB calibration validity start data
+  */
+  std::string _calibDate;
+
+ /** CDB string that harbours the calibration constants
+  */
+  std::stringstream epsstr;
+
+ /** Python function to fetch the calibration string
+  */
+  bool pymod_ok;
+  PyObject* _get_calib_func;
 };
 }
 

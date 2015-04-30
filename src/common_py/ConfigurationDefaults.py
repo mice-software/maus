@@ -99,6 +99,7 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
+simulation_geometry_debug    = False
 check_volume_overlaps = False
 maximum_number_of_steps = 50000000 # particles are killed after this number of
                                  # steps (assumed to be stuck in the fields)
@@ -521,7 +522,7 @@ TOF_trigger_station = "tof1"
 # if you set file, then uncomment the calib files below
 TOF_calib_source = "CDB"
 
-#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
@@ -568,8 +569,11 @@ EMR_clear_fiber_length_map = "/files/cabling/EMRClearFiberLengthMap.txt"
 # this sets the source of the EMR connector attenuation map
 EMR_connector_attenuation_map = "/files/cabling/EMRConnectorAttenuationMap.txt"
 
-# this sets the source of the calibrations for the EMR detectors
-EMR_calibration_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
+# this sets the source of the calibrations for the EMR detector
+EMR_calib_source = "CDB"
+EMR_calib_date_from = 'current'
+# uncomment the EMR_calibration_file card below if you set EMR_calib_source=file
+#EMR_calib_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
