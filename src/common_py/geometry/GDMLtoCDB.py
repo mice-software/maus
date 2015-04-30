@@ -105,8 +105,8 @@ class Uploader: #pylint: disable = R0902
             print 'Warning, server status is '+server_status
         return self.wsdlurl
 
-    def select_files(root, files, suffix=[]):
-        
+    def select_files(self, root, files, suffix=[]): 
+        # pylint: disable = R0201, W0102, W0612
         """
         @method select_files Filter out interesting files within
         the directory "root". 
@@ -115,11 +115,10 @@ class Uploader: #pylint: disable = R0902
         """
         selected_files = []
 
-        for file in files:
+        for fname in files:
             # do concatenation her to get full path
-            full_path = os.join(root, file)
-            ext = os.splitext(file)[1]
-
+            full_path = os.path.join(root, fname)
+            
             if len(suffix)==0:
                 selected_files.append(full_path)
             elif is_filetype(fname, suffix):
@@ -127,6 +126,7 @@ class Uploader: #pylint: disable = R0902
         return selected_files
         
     def create_file_list(self):
+        # pylint: disable = R0201, W0102, W0612
         """
         @method create_file_list Creates a text file containing a list of
                                  geometry files.
@@ -138,9 +138,9 @@ class Uploader: #pylint: disable = R0902
         files_on_disk = []
         for root, dirs, files in os.walk(self.filepath):
             if root == self.filepath:
-                files_on_disk += select_files(root, files, ['xml', 'gdml'])
+                files_on_disk += self.select_files(root, files, ['xml', 'gdml'])
             else:
-                files_on_disk += select_files(root, files)
+                files_on_disk += self.select_files(root, files)
 
         filelist_path = os.path.join(self.filepath, FILELIST)
         fout = open(filelist_path, 'w')
@@ -464,7 +464,8 @@ class Downloader: #pylint: disable = R0902
         else:
             parent.text = str(dictitem)
 
-    def generate_beamline_xml_from_string(self, xmldict):
+    def generate_beamline_xml_from_string(self, xmldict): 
+        #pylint: disable = R0201, C0301, C0103
         """
         @Method converts xmldict to an xml format in pieces following methods used in CDB
 
@@ -476,7 +477,7 @@ class Downloader: #pylint: disable = R0902
         print xml
         return xml
         
-    def run_settings_for_beamline(self, run_data):
+    def run_settings_for_beamline(self, run_data): #pylint: disable = R0201
         """
         @Method converts useful information from the dictionary to xml suitable for formatting.
 
@@ -532,13 +533,14 @@ class Downloader: #pylint: disable = R0902
                                 and str(magnet['polarity']) != "0"
                                 and str(magnet['polarity']) != "1"
                                 and str(magnet['polarity']) != "+1"):
-                                raise CdbPermanentError("Polarity for "
-                                                        + magnet['name'] + " is "
-                                                        + str(magnet['polarity'])
-                                                        + ", it must be -1, 0 or +1")
-                            run_xml = (run_xml + "<magnet name='" + str(magnet['name'])
-                                       + "' setCurrent='" + str(magnet['current'])
-                                       + "' polarity='" + str(magnet['polarity'])
+                                raise OSError("Polarity for "
+                                              + magnet['name'] + " is "
+                                              + str(magnet['polarity'])
+                                              + ", it must be -1, 0 or +1")
+                            run_xml = (run_xml +
+                                       "<magnet name='" + str(magnet['name']) +
+                                       "' setCurrent='" + str(magnet['current'])
+                                      + "' polarity='" + str(magnet['polarity'])
                                        + "'/>")
             
             except KeyError, exception:
@@ -550,6 +552,7 @@ class Downloader: #pylint: disable = R0902
         return run_xml
 
     def generate_coolingchannel_xml_from_string(self, data):
+        #pylint: disable = R0201, C0301, C0103
         """
         @Method convert string to formatable xml format
 
@@ -563,7 +566,7 @@ class Downloader: #pylint: disable = R0902
                     and str(magnet['polarity']) != "0"
                     and str(magnet['polarity']) != "1"
                     and str(magnet['polarity']) != "+1"):
-                    raise CdbPermanentError("Polarity for " + magnet['name']
+                    raise OSError("Polarity for " + magnet['name']
                                             + " is " + str(magnet['polarity'])
                                             + ", it must be -1, 0 or +1")
                 xml = xml + "<magnet name='" + str(magnet['name']) + "' "
@@ -585,5 +588,5 @@ class Downloader: #pylint: disable = R0902
                 xml = xml + "</magnet>"
             xml = xml + "</coolingchannel></coolingchannels>"
         except KeyError, exception:
-            raise CdbPermanentError("Missing value for " + str(exception))
+            raise OSError("Missing value for " + str(exception))
         return xml
