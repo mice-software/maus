@@ -21,7 +21,6 @@ import os
 import md5
 import unittest
 import json
-import MAUS
 from Configuration import Configuration
 from _InputCppDAQOfflineData import InputCppDAQOfflineData
 
@@ -73,7 +72,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
                                        self._datafile)
         self.mapper.birth(self._config)
         # Get a single event and check it's the right size
-        data = self.mapper.emitter().next()
+        data = self.mapper.emitter().next() # pylint:disable=W0612
         # Data should be 108 (first event is start of burst)
         # self.assertEqual(len(data), 108)
         self.mapper.death()
@@ -86,10 +85,10 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         event_count = 0
 
         # We can try md5'ing the whole dataset
-        digester = md5.new()
+        digester = md5.new() #pylint: disable=W0612
 
-        for i in self.mapper.emitter():
-            # digester.update(i) #pylint: disable=E1101
+        for i in self.mapper.emitter(): #pylint: disable=W0612
+            # digester.update(i) #pylint: disable=E1101, W0612
             event_count = event_count + 1
 
         print event_count
