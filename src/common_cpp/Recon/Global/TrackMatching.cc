@@ -109,6 +109,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
       pids.push_back(MAUS::DataStructure::Global::kMuMinus);
       pids.push_back(MAUS::DataStructure::Global::kPiMinus);
     }
+    std::cerr << pids.size() << "PIDS\n";
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
       double mass = Particle::GetInstance().GetMass(pids[i]);
@@ -172,6 +173,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
         hypothesis_track->AddTrackPoint(tracker0_tp);
       }
       //~ upstream_primary_chain->AddTrack(hypothesis_track, tracker0_track);
+      //~ std::cerr << "Mapper: " << hypothesis_track->get_mapper_name() << " " << hypothesis_track->get_pid() << "\n";
       global_event->add_track_recursive(hypothesis_track);
     }
     //~ global_event->add_primary_chain(upstream_primary_chain);
@@ -330,35 +332,35 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
       }
 
       // EMR
-      //~ std::cerr << emr_track_array->size() << "# of EMR Tracks\n";
-      MAUS::DataStructure::Global::TrackPArray::iterator emr_track_iter;
-      for (emr_track_iter = emr_track_array->begin();
-           emr_track_iter != emr_track_array->end();
-           ++emr_track_iter) {
-        std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-            emr_trackpoints = (*emr_track_iter)->GetTrackPoints();
-        //~ std::cerr << emr_trackpoints.size() << "# of EMR Hits\n";
-        double x_in_EMR[] = {0., position.X(), position.Y(), position.Z(),
-                            energy, momentum.X(), momentum.Y(), momentum.Z()};
-        TLorentzVector first_hit_pos = emr_trackpoints[0]->get_position();
-        double z = first_hit_pos.Z();
-        BTTracker::integrate(z, x_in_EMR, field, BTTracker::z, 10.0, charge);
-        //~ Squeak::mout(Squeak::error) << "EMR\n" << x_in_EMR[1] << " " << first_hit_pos.X() << "\n"
-                                    //~ << x_in_EMR[2] << " " << first_hit_pos.Y() << "\n";
-        if (almostEquals(x_in_EMR[1], first_hit_pos.X(), 19) and
-            almostEquals(x_in_EMR[2], first_hit_pos.Y(), 19)) {
-          Squeak::mout(Squeak::error) << "EMR Match\n";
-          for (size_t j = 0; j < emr_trackpoints.size(); j++) {
-            MAUS::DataStructure::Global::TrackPoint* emr_tp =
-                emr_trackpoints[j]->Clone();
-            TLorentzVector momentum = emr_tp->get_momentum();
-            double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
-            momentum.SetE(energy);
-            emr_tp->set_momentum(momentum);
-            hypothesis_track->AddTrackPoint(emr_tp);
-          }
-        }
-      }
+      //~ ////~ std::cerr << emr_track_array->size() << "# of EMR Tracks\n";
+      //~ MAUS::DataStructure::Global::TrackPArray::iterator emr_track_iter;
+      //~ for (emr_track_iter = emr_track_array->begin();
+           //~ emr_track_iter != emr_track_array->end();
+           //~ ++emr_track_iter) {
+        //~ std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+            //~ emr_trackpoints = (*emr_track_iter)->GetTrackPoints();
+        //~ ////~ std::cerr << emr_trackpoints.size() << "# of EMR Hits\n";
+        //~ double x_in_EMR[] = {0., position.X(), position.Y(), position.Z(),
+                            //~ energy, momentum.X(), momentum.Y(), momentum.Z()};
+        //~ TLorentzVector first_hit_pos = emr_trackpoints[0]->get_position();
+        //~ double z = first_hit_pos.Z();
+        //~ BTTracker::integrate(z, x_in_EMR, field, BTTracker::z, 10.0, charge);
+        //~ ////~ Squeak::mout(Squeak::error) << "EMR\n" << x_in_EMR[1] << " " << first_hit_pos.X() << "\n"
+                                    //~ ////~ << x_in_EMR[2] << " " << first_hit_pos.Y() << "\n";
+        //~ if (almostEquals(x_in_EMR[1], first_hit_pos.X(), 19) and
+            //~ almostEquals(x_in_EMR[2], first_hit_pos.Y(), 19)) {
+          //~ Squeak::mout(Squeak::error) << "EMR Match\n";
+          //~ for (size_t j = 0; j < emr_trackpoints.size(); j++) {
+            //~ MAUS::DataStructure::Global::TrackPoint* emr_tp =
+                //~ emr_trackpoints[j]->Clone();
+            //~ TLorentzVector momentum = emr_tp->get_momentum();
+            //~ double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
+            //~ momentum.SetE(energy);
+            //~ emr_tp->set_momentum(momentum);
+            //~ hypothesis_track->AddTrackPoint(emr_tp);
+          //~ }
+        //~ }
+      //~ }
       //~ downstream_primary_chain->AddTrack(hypothesis_track, tracker1_track);
       global_event->add_track_recursive(hypothesis_track);
     }

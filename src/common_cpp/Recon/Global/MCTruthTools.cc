@@ -17,6 +17,7 @@
 
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
+#include "Utils/Exception.hh"
 
 #include "src/common_cpp/Recon/Global/MCTruthTools.hh"
 
@@ -99,12 +100,142 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
   if (emr_hits) {
     if (emr_hits->size() > 0) {
       mc_detectors[MAUS::DataStructure::Global::kEMR] = true;
-      std::cerr << "### " << emr_hits->at(0).GetPosition().z()
-                << " "    << emr_hits->at(emr_hits->size() -1).GetPosition().z() << "\n";
+      //~ std::cerr << "### " << emr_hits->at(0).GetPosition().z()
+                //~ << " "    << emr_hits->at(emr_hits->size() -1).GetPosition().z() << "\n";
     }
   }
   
   return mc_detectors;
+}
+
+TOFHitArray* GetTOFHits(MAUS::MCEvent* mc_event,
+    DataStructure::Global::DetectorPoint detector) {
+  if (not (detector == DataStructure::Global::kTOF0 or
+           detector == DataStructure::Global::kTOF0_1 or
+           detector == DataStructure::Global::kTOF0_2 or
+           detector == DataStructure::Global::kTOF1 or
+           detector == DataStructure::Global::kTOF1_1 or
+           detector == DataStructure::Global::kTOF1_2 or
+           detector == DataStructure::Global::kTOF2 or
+           detector == DataStructure::Global::kTOF2_1 or
+           detector == DataStructure::Global::kTOF2_2)) {
+    throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
+        "Detector Enum not a TOF", "MAUS::MCTruthTools::GetTOFHits()"));
+  }
+  TOFHitArray* tof_hits = mc_event->GetTOFHits();
+  TOFHitArray* selected_tof_hits = new TOFHitArray;
+  if (tof_hits) {
+    TOFHitArray::iterator tof_hits_iter;
+    for (tof_hits_iter = tof_hits->begin();
+         tof_hits_iter != tof_hits->end();
+         ++tof_hits_iter) {
+      int station_number = tof_hits_iter->GetChannelId()->GetStation();
+      int plane_number = tof_hits_iter->GetChannelId()->GetPlane();
+      if (detector == DataStructure::Global::kTOF0) {
+        if (station_number == 0) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF0_1) {
+        if (station_number == 0 and plane_number == 0) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF0_2) {
+        if (station_number == 0 and plane_number == 1) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF1) {
+        if (station_number == 1) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF1_1) {
+        if (station_number == 1 and plane_number == 0) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF1_2) {
+        if (station_number == 1 and plane_number == 1) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF2) {
+        if (station_number == 2) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF2_1) {
+        if (station_number == 2 and plane_number == 0) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTOF2_2) {
+        if (station_number == 2 and plane_number == 1) {
+          selected_tof_hits->push_back(*tof_hits_iter);
+        }
+      }
+    }
+  }
+  return selected_tof_hits;
+}
+
+SciFiHitArray* GetTrackerHits(MAUS::MCEvent* mc_event,
+    DataStructure::Global::DetectorPoint detector) {
+  if (not (detector == DataStructure::Global::kTracker0 or
+           detector == DataStructure::Global::kTracker0_1 or
+           detector == DataStructure::Global::kTracker0_2 or
+           detector == DataStructure::Global::kTracker0_3 or
+           detector == DataStructure::Global::kTracker0_4 or
+           detector == DataStructure::Global::kTracker0_5 or
+           detector == DataStructure::Global::kTracker1 or
+           detector == DataStructure::Global::kTracker1_1 or
+           detector == DataStructure::Global::kTracker1_2 or
+           detector == DataStructure::Global::kTracker1_3 or
+           detector == DataStructure::Global::kTracker1_4 or
+           detector == DataStructure::Global::kTracker1_5)) {
+    throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
+        "Detector Enum not a Tracker", "MAUS::MCTruthTools::GetTrackerHits()"));
+  }
+  SciFiHitArray* tracker_hits = mc_event->GetSciFiHits();
+  SciFiHitArray* selected_tracker_hits = new SciFiHitArray;
+  if (tracker_hits) {
+    SciFiHitArray::iterator tracker_hits_iter;
+    for (tracker_hits_iter = tracker_hits->begin();
+         tracker_hits_iter != tracker_hits->end();
+         ++tracker_hits_iter) {
+      int tracker_number = tracker_hits_iter->GetChannelId()->GetTrackerNumber();
+      int station_number = tracker_hits_iter->GetChannelId()->GetStationNumber();
+      if (detector == DataStructure::Global::kTracker0) {
+        if (tracker_number == 0) {
+          selected_tracker_hits->push_back(*tracker_hits_iter);
+        }
+      } else if (detector == DataStructure::Global::kTracker1) {
+        if (tracker_number == 1) {
+          selected_tracker_hits->push_back(*tracker_hits_iter);
+        }
+      } else {
+        int detector_enum_int = 10 + tracker_number*6 + station_number;
+        if (static_cast<int>(detector) == detector_enum_int) {
+          selected_tracker_hits->push_back(*tracker_hits_iter);
+        }
+      }
+    }
+  }
+  return selected_tracker_hits;
+}
+
+SciFiHit* GetTrackerPlaneHit(MAUS::MCEvent* mc_event,
+                             int tracker, int station, int plane) {
+  SciFiHitArray* tracker_hits = mc_event->GetSciFiHits();
+  if (tracker_hits) {
+    SciFiHitArray::iterator tracker_hits_iter;
+    for (tracker_hits_iter = tracker_hits->begin();
+         tracker_hits_iter != tracker_hits->end();
+         ++tracker_hits_iter) {
+      int tracker_number = tracker_hits_iter->GetChannelId()->GetTrackerNumber();
+      int station_number = tracker_hits_iter->GetChannelId()->GetStationNumber();
+      int plane_number = tracker_hits_iter->GetChannelId()->GetPlaneNumber();
+      if ((tracker_number == tracker) and (station_number == station)
+          and (plane_number == plane)) {
+        return &(*tracker_hits_iter);
+      }
+    }
+  }
+  return 0;
 }
 
 } // ~namespace MCTruthTools

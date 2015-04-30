@@ -22,6 +22,7 @@
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
+#include "TProcessID.h"
 
 
 namespace MAUS {
@@ -114,7 +115,6 @@ namespace MAUS {
       //~ if (emr_event) {
         //~ std::cerr << emr_event->GetRangePrimary() << " EMR Event Primary Range\n";
       //~ }
-      //~ MAUS::GlobalEvent* global_event = MakeTracks(recon_event);
       MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
       if (global_event) {
         MAUS::recon::global::TrackMatching track_matching;
@@ -122,6 +122,9 @@ namespace MAUS {
         track_matching.DSTrack(global_event, _classname);
         //~ track_matching.throughTrack(global_event, _classname);
       }
+      //~ int TPID_count = TProcessID::GetObjectCount();
+      //~ double TPID_percent = (TPID_count / 16777215.0)*100;
+      //~ std::cerr << "###########\nTProcessID Count: " << TProcessID::GetObjectCount()  << " (" << TPID_percent << "%)\n#############\n";
     }
   }
 
