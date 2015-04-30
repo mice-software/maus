@@ -38,6 +38,11 @@
 namespace MAUS {
 
 class ImageData;
+class JobHeaderData;
+class JobFooterData;
+class RunHeaderData;
+class RunFooterData;
+class Data;
 
 /** @class OutputCppSocket
  *  
@@ -84,10 +89,11 @@ class OutputCppSocket : public OutputBase<ImageData*> {
    *  @returns true if successful
    */
   void _save(ImageData* image);
-  void _save(JobHeaderData* image);
-  void _save(JobFooterData* image);
-  void _save(RunHeaderData* image);
-  void _save(RunFooterData* image);
+  void _save(JobHeaderData* jh);
+  void _save(JobFooterData* jf);
+  void _save(RunHeaderData* rh);
+  void _save(RunFooterData* rf);
+  void _save(Data* spill);
 
   bool _save_py_object(PyObject* object);
 
