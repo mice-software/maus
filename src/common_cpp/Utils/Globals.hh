@@ -34,6 +34,7 @@ namespace MAUS {
 typedef Squeak Logging;
 class RunActionManager;
 class CppErrorHandler;
+class GeometryNavigator;
 
 class MAUSGeant4Manager;
 
@@ -162,6 +163,18 @@ class Globals {
      */
     static MiceModule* GetReconstructionMiceModules();
 
+    /** Get the G4 World Volume
+     *  
+     *  Returns the pointer to the physical volume of the current MC geometry,
+     *  as loaded into memory.
+     *
+     *  This pointer can be used with a G4Navigator to allow the user to inspect
+     *  the current geometry.
+     *
+     *  Globals retains ownership of this memory
+     */
+    static GeometryNavigator* GetMCGeometryNavigator();
+
     /** Get the version number like x.y.z
      *
      *  Return the version number x.y.z
@@ -185,6 +198,7 @@ class Globals {
     BTFieldConstructor* _mc_field_constructor;
     BTFieldConstructor* _recon_field_constructor;
     MAUSGeant4Manager* _maus_geant4_manager;
+    GeometryNavigator* _mc_geometry_navigator;
     static Globals* _process;
     // responsible for construction etc
     friend class GlobalsManager;

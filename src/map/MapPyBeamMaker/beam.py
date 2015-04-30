@@ -20,9 +20,10 @@ for beam generation.
 
 import math
 import numpy
-import xboa #pylint: disable=F0401
-import xboa.Bunch #pylint: disable=F0401
-import xboa.Common #pylint: disable=F0401
+import xboa
+import xboa.bunch
+import xboa.common
+import xboa.hit
 
 # 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
 # goes to 4294967295 in both 32 bit and 64 bit.
@@ -132,7 +133,7 @@ class Beam(): # pylint: disable=R0902
         self.transverse_mode = "pencil"
         self.longitudinal_mode = "pencil"
         self.coupling_mode = "none"
-        self.reference = xboa.Hit.Hit()
+        self.reference = xboa.hit.Hit()
         self.n_particles_per_spill = 0
         self.weight = 0.
         self.t_dist = ""
@@ -150,8 +151,7 @@ class Beam(): # pylint: disable=R0902
         self.beam_sigma_y = 5.0
         self.beam_sigma_z = 6.0
         #############################################
-
-
+        self.a_p_correlation = {}
 
     def birth(self, beam_def, particle_generator, random_seed):
         """
@@ -173,6 +173,7 @@ class Beam(): # pylint: disable=R0902
         self.__birth_trans_long_coupling(beam_def["coupling"])
         self.__birth_beam_mean()
         self.__birth_beam_polarisation(beam_def)
+        self.__birth_a_p_correlation(beam_def)
  
     def __birth_particle_generator(self, beam_def, particle_generator):
         """
@@ -196,9 +197,13 @@ class Beam(): # pylint: disable=R0902
                   str(self.seed_keys))
 
     def __birth_reference_particle(self, beam_definition):
-        """Setup the reference particle - of type maus_primary"""
-        self.reference = xboa.Hit.Hit.new_from_maus_object('maus_primary',
-                                                beam_definition['reference'], 0)
+        """Setup the reference particle - of type primary"""
+        self.reference = xboa.hit.factory.MausJsonHitFactory.\
+                                      hit_from_maus_object(
+                                                   'primary',
+                                                   beam_definition['reference'],
+                                                   0
+                                      )
 
     def __birth_transverse_ellipse(self, beam_def):
         """
@@ -211,7 +216,7 @@ class Beam(): # pylint: disable=R0902
             pass # ones is fine then
         elif self.transverse_mode == 'penn':
             #emittance_t, mass, beta_t, alpha_t, p, Ltwiddle_t, bz, q
-            trans_matrix = xboa.Bunch.Bunch.build_penn_ellipse(
+            trans_matrix = xboa.bunch.Bunch.build_penn_ellipse(
                 beam_def['emittance_4d'], ref['mass'], beam_def['beta_4d'],
                 beam_def['alpha_4d'], ref['p'],
                 beam_def['normalised_angular_momentum'],
@@ -220,7 +225,7 @@ class Beam(): # pylint: disable=R0902
             trans_matrix = self.__birth_twiss_ellipse(beam_def)
         elif self.transverse_mode == "constant_solenoid":
             # k_s is solenoid focussing strength: cite Penn MUCOOL note 71
-            k_s = abs(ref['charge']*xboa.Common.constants['c_light']/\
+            k_s = abs(ref['charge']*xboa.common.constants['c_light']/\
                                                      2.*beam_def['bz']/ref['p'])
             if abs(beam_def['bz']) < 1e-9:
                 raise ZeroDivisionError("Cannot define constant_solenoid "+\
@@ -233,7 +238,7 @@ class Beam(): # pylint: disable=R0902
                                         "beam for reference with 0. momentum")
             beta_4d = (1.+beam_def['normalised_angular_momentum'])**0.5/k_s
             alpha_4d = 0.
-            trans_matrix = xboa.Bunch.Bunch.build_penn_ellipse(
+            trans_matrix = xboa.bunch.Bunch.build_penn_ellipse(
               beam_def['emittance_4d'], ref['mass'], beta_4d, alpha_4d,
               ref['p'], beam_def['normalised_angular_momentum'], beam_def['bz'],
               ref['charge'])
@@ -252,10 +257,10 @@ class Beam(): # pylint: disable=R0902
         ref = self.reference
         trans_matrix = numpy.diag([1.]*4)
         geometric = False # define like x,x' (True) or x,px (False)
-        trans_matrix_x = xboa.Bunch.Bunch.build_ellipse_2d(beam_def['beta_x'],
+        trans_matrix_x = xboa.bunch.Bunch.build_ellipse_2d(beam_def['beta_x'],
             beam_def['alpha_x'], beam_def['emittance_x'], ref['p'], ref['mass'],
             geometric)
-        trans_matrix_y = xboa.Bunch.Bunch.build_ellipse_2d(beam_def['beta_y'],
+        trans_matrix_y = xboa.bunch.Bunch.build_ellipse_2d(beam_def['beta_y'],
             beam_def['alpha_y'], beam_def['emittance_y'], ref['p'], ref['mass'],
             geometric)
         for i in range(2):
@@ -278,19 +283,20 @@ class Beam(): # pylint: disable=R0902
         if self.longitudinal_mode == 'pencil':
             pass
         elif self.longitudinal_mode == 'twiss':
-            long_matrix = xboa.Bunch.Bunch.build_ellipse_2d(
+            long_matrix = xboa.bunch.Bunch.build_ellipse_2d(
                           beam_def['beta_l'],
                           beam_def['alpha_l'], beam_def['emittance_l'],
                           ref['p'], ref['mass'], False)
         elif self.longitudinal_mode == 'gaussian':
             long_matrix[0, 0] = beam_def['sigma_t']**2.
             long_matrix[1, 1] = beam_def['sigma_'+self.momentum_defined_by]**2.
-            if beam_def['sigma_t'] <= 0.:
-                raise ValueError("sigma_t "+str(long_matrix[0, 0])+
-                                 " must be > 0")
-            if beam_def['sigma_'+self.momentum_defined_by] <= 0.:
-                raise ValueError('sigma_'+self.momentum_defined_by+ \
-                                 " "+str(long_matrix[0, 0])+" must be > 0")
+            corr_key = 'cov(t,'+self.momentum_defined_by+')'
+            if corr_key in beam_def:
+                long_matrix[0, 1] = beam_def[corr_key]
+                long_matrix[1, 0] = long_matrix[0, 1]
+            if numpy.linalg.det(long_matrix) <= 0:
+                raise ValueError('longitudinal matrix\n'+str(long_matrix)+\
+                                 'must be positive definite.')
         elif self.longitudinal_mode == 'uniform_time' or \
              self.longitudinal_mode == 'sawtooth_time':
             self.t_dist = self.longitudinal_mode
@@ -303,7 +309,6 @@ class Beam(): # pylint: disable=R0902
         else:
             raise ValueError("Did not recognise beam longitudinal_mode "+\
                              str(self.longitudinal_mode))
-
         for i in range(2):
             for j in range(2):
                 self.beam_matrix[i+4, j+4] = long_matrix[i, j]
@@ -316,6 +321,27 @@ class Beam(): # pylint: disable=R0902
             raise NotImplementedError\
                            ("No transverse - longitudinal coupling implemented")
 
+    def __birth_a_p_correlation(self, beam_def):
+        """
+        Setup amplitude momentum correlation
+        """
+        self.a_p_correlation = {}
+        if "a-p_correlation" not in beam_def.keys():
+            return
+        self.a_p_correlation = beam_def["a-p_correlation"]
+        if 'momentum_variable' not in self.a_p_correlation:
+            self.a_p_correlation['momentum_variable'] = self.momentum_defined_by
+        mom_var = self.a_p_correlation['momentum_variable']
+        if mom_var not in self.momentum_keys:
+            raise KeyError("Did not recognise a-p_correlation "+\
+                                       "momentum_variable '"+str(mom_var)+"'")
+        if 'magnitude' not in self.a_p_correlation:
+            raise KeyError("Need to define 'magnitude' in beam definition "+\
+                  "amplitude momentum correlation")
+        # check we can convert to a float
+        self.a_p_correlation['magnitude'] = \
+                                        float(self.a_p_correlation['magnitude'])
+
     def __birth_beam_mean(self):
         """
         Setup the beam mean from reference coordinates
@@ -323,7 +349,6 @@ class Beam(): # pylint: disable=R0902
         for i, key in enumerate(Beam.array_keys):
             self.beam_mean[i] = self.reference[key]
         self.beam_mean[5] = self.reference[self.momentum_defined_by]
-
     
     def __birth_beam_polarisation(self, beam_def):
         """
@@ -363,20 +388,16 @@ class Beam(): # pylint: disable=R0902
         Note that if the dice give us a particle that has "negative" total
         momentum we throw again.
         """
-        hit = xboa.Hit.Hit.new_from_dict({'pid':-13, "energy":float('nan')})
+        hit = xboa.hit.Hit.new_from_dict({'pid':-13, "energy":float('nan')})
         while math.isnan(hit["energy"]) or math.isnan(hit["pz"]) or \
               hit["energy"] < hit["mass"]:
             particle_array = self.__process_get_particle_array()
             hit = self.__process_array_to_hit(particle_array,
                                 self.reference["pid"], self.momentum_defined_by)
-        spin_array = self.__process_beam_polarisation()
-        hit["sx"] = spin_array[0]
-        hit["sy"] = spin_array[1]
-        hit["sz"] = spin_array[2]
+            hit = self.__process_a_p_correlation(hit)
+        spin = self.__process_beam_polarisation()
         primary = self.__process_hit_to_primary(hit)
-        primary["spin"] = {"x": hit["sx"] , "y":hit["sy"], "z":hit["sz"]}
-        
-        
+        primary["spin"] = {"x":spin[0], "y":spin[1], "z":spin[2]}
         return primary
 
     def __process_beam_polarisation(self):
@@ -430,11 +451,11 @@ class Beam(): # pylint: disable=R0902
         Convert from an array like x,px,y,py,time,<p> to a primary dict that can
         be included in json data tree
         """
-        hit = xboa.Hit.Hit()
+        hit = xboa.hit.Hit()
         for i, key in enumerate(Beam.array_keys):
             hit[key] = particle_array[i]
         hit["pid"] = pid
-        hit["mass"] = xboa.Common.pdg_pid_to_mass[abs(pid)]
+        hit["mass"] = xboa.common.pdg_pid_to_mass[abs(pid)]
         if longitudinal_variable == "p":
             hit["pz"] = (particle_array[5]**2-\
                         particle_array[1]**2-particle_array[3]**2)**0.5
@@ -453,7 +474,7 @@ class Beam(): # pylint: disable=R0902
         """
         Convert an xboa hit into a MAUS primary
         """
-        primary = hit.get_maus_dict('maus_primary')[0]
+        primary = hit.get_maus_dict('maus_json_primary')[0]
         primary["position"]["z"] = self.reference["z"]
         primary["random_seed"] = self.__process_get_seed()
         if math.isnan(primary["energy"]) or math.isinf(primary["energy"]):
@@ -481,6 +502,39 @@ class Beam(): # pylint: disable=R0902
             return random_seed
         #raise NotImplementedError("Did not recognise seed algorithm "+\
                   #                str(self.particle_seed_algorithm))
+
+    def __process_a_p_correlation(self, hit):
+        """
+        Introduce a correlation between particle amplitude and momentum
+        (or energy)
+
+        Calculate the particle amplitude A based on the transverse matrix
+        defined in "transverse", like
+                            A = U V^{-1} U^{T}
+        Add to "momentum_variable" V an amount given by
+                            V = V+M*V*A
+        where M is self.a_p_corr["magnitude"]. See the MAUS user docs for
+        latexed version of this.
+        """
+        if self.a_p_correlation == {}:
+            return hit
+        space = ["x", "px", "y", "py"]
+        cov_inv = numpy.linalg.inv(self.beam_matrix[0:4, 0:4])
+        cov_det = numpy.linalg.det(self.beam_matrix[0:4, 0:4])
+        ps_vec = numpy.matrix([hit[var] for var in space])-self.beam_mean[0:4]
+        amplitude = (ps_vec*cov_inv*ps_vec.transpose())[0, 0]
+        amplitude *= cov_det**0.25*hit['mass']**2
+        mom_var = self.a_p_correlation["momentum_variable"]
+        mom = hit[mom_var]
+        mom = mom + self.a_p_correlation["magnitude"]*mom*amplitude
+        hit[mom_var] = mom
+        if mom_var == 'p':
+            hit.mass_shell_condition('energy')
+        elif mom_var == 'pz':
+            hit.mass_shell_condition('energy')
+        elif mom_var == 'energy':
+            hit.mass_shell_condition('p')
+        return hit
 
     array_keys = ["x", "px", "y", "py", "t"]
     momentum_keys = ['p', 'pz', 'energy']

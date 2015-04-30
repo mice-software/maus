@@ -16,6 +16,7 @@
  */
 
 /** @class MapCppGlobalReconImport
+ *  @author Celeste Pidcott, University of Warwick
  *  Import detector events from Recon Event into a Global Event and create
  *  global tracks.
  *
@@ -48,9 +49,11 @@
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+
+#include "Recon/Global/ImportCkovRecon.hh"
+#include "Recon/Global/ImportKLRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportSciFiRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportTOFRecon.hh"
-#include "src/common_cpp/Recon/Global/TrackMatching.hh"
 #include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
@@ -83,15 +86,6 @@ namespace MAUS {
      */
     void _process(MAUS::Data* data) const;
 
-    /** Import the existing MAUS::ReconEvent, creating a new
-     * MAUS::GlobalEvent and populating a
-     * MAUS::recon::global::Track object. 
-     * @param recon_event The ReconEvent to obtain the GlobalEvent from
-     *                  
-     * @return global_event The GlobalEvent with spacepoints and track(s)
-     */
-    MAUS::GlobalEvent* Import(MAUS::ReconEvent* recon_event) const;
-
   private:
     /// Check that a valid configuration is passed to the process
     bool _configCheck;
@@ -99,6 +93,8 @@ namespace MAUS {
     Json::Value _configJSON;
     ///  JsonCpp setup
     Json::Reader _reader;
+    // Mapper name, useful for tracking results...
+    std::string _classname;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

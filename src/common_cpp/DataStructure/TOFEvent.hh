@@ -49,17 +49,26 @@ class TOFEvent {
     /** Returns TOFEventSlabHit */
     TOFEventSlabHit GetTOFEventSlabHit() const;
 
+    /** Returns TOFEventSlabHit pointer*/
+    TOFEventSlabHit* GetTOFEventSlabHitPtr();
+
     /** Sets TOFEventSlabHit */
     void SetTOFEventSlabHit(TOFEventSlabHit tof_slab_hits);
 
     /** Returns TOFEventSpacePoint */
     TOFEventSpacePoint GetTOFEventSpacePoint() const;
 
+    /** Returns TOFEventSpacePoint pointer*/
+    TOFEventSpacePoint* GetTOFEventSpacePointPtr();
+
     /** Sets TOFEventSpacePoint */
     void SetTOFEventSpacePoint(TOFEventSpacePoint tof_space_points);
 
     /** Returns TOFEventDigit */
     TOFEventDigit GetTOFEventDigit() const;
+
+    /** Returns TOFEventDigit pointer*/
+    TOFEventDigit* GetTOFEventDigitPtr();
 
     /** Sets TOFEventDigit */
     void SetTOFEventDigit(TOFEventDigit tof_digits);

@@ -16,6 +16,7 @@
  */
 
 /** @class MapCppGlobalPID
+ *  @author Celeste Pidcott, University of Warwick
  *  Perform PID on incoming global tracks.
  *
  */
@@ -50,6 +51,7 @@
 
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
 #include "src/common_cpp/Recon/Global/PIDVarB.hh"
+#include "src/common_cpp/Recon/Global/PIDVarC.hh"
 
 
 namespace MAUS {

@@ -105,20 +105,7 @@ class SciFiDigit : public TObject {
     /** Get the used flag */
     bool is_used()     const { return _used; }
 
-    /** Set the MC truth momentum (temporary) */
-    void set_true_momentum(ThreeVector p) { _p = p; }
-
-    /** Get the MC truth momentum (temporary) */
-    ThreeVector get_true_momentum() const { return _p; }
-
-    /** Set the MC truth position (temporary) */
-    void set_true_position(ThreeVector position) { _position = position; }
-
-    /** Get the MC truth position (temporary) */
-    ThreeVector get_true_position() const { return _position; }
-
   private:
-    ThreeVector _position, _p;
 
     int _spill, _event;
 

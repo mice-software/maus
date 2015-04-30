@@ -88,6 +88,7 @@ EMRBar::EMRBar(MiceModule* mod,
   G4double fBarLength = mod->propertyDouble("BarLength");
   G4double fHoleRad = mod->propertyDouble("HoleRad");
   G4double fFiberCladdingExtRadius = mod->propertyDouble("FiberCladdingExtRadius");
+  G4double fGap = mod->propertyDouble("Gap");
 
   G4double fFiberCoreRadius = 0.95*fFiberCladdingExtRadius;
   G4Material* BarMater = Polystyrene;
@@ -155,7 +156,7 @@ EMRBar::EMRBar(MiceModule* mod,
   barParam = new BarParameterisation(fBarWidth,
                                      fBarHeight,
                                      fNbOfBars,
-                                     0.05*cm);
+                                     fGap);
 
   // dummy value : kZAxis -- modified by parameterised volume
   physiBar = new G4PVParameterised("Bar",            // their name

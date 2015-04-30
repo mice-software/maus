@@ -34,6 +34,16 @@ where parameters can be controlled in datacards as described below. Note that us
 \subsection{Beam Polarisation}
 It is also possible to pass a polarised beam through MAUS. A polarised beam can be generated using the \verb|beam_polarisation| variable on an individual beam parameter. Currently only one polarisation model has been implemented, \verb|gaussian_unit_vectors|. This throws a Gaussian in each of the x, y and z directions and uses this to generate a spin vector. The spin vector is then normalised to 1. Correlations are not implemented.
 
+\subsection{Amplitude Momentum Correlation}
+It is possible to introduce artificially a correlation between transverse amplitude (action) and momentum. This can be of use for high emittance beams, such as those in MICE, where the time of flight of high amplitude particles is significantly different to the time of flight of low amplitude particles. The optional \verb|a-p_correlation| dict enables one to specify a correlation $C$ (see table \ref{tab:apcorr}). In this case, the \verb|momentum_variable| $W_o$ is modified according to
+\begin{equation}
+W_o = W_i(1+CA).
+\end{equation}
+$W_i$ is the \verb|momentum_variable| as calculated by the longitudinal routines above, $C$ is the correlation magnitude and amplitude $A$ is calculated using
+\begin{equation}
+A = \mathbf{|V|}^{1/4}m^2(\vec{u^T} \mathbf{V^{-1}} \vec{u}) 
+\end{equation}
+where $\vec{u}$ is the particle phase space vector, $m$ is the particle mass and $\mathbf{V}$ is the ideal beam matrix defined by the \verb|transverse| dict.
 
 \begin{table*}
 \begin{center}
@@ -93,7 +103,8 @@ Name & Meaning \\
 \verb|transverse| & Dict defining the longitudinal phase space distribution. \\
 \verb|longitudinal| & Dict defining the longitudinal phase space distribution. \\
 \verb|coupling| & Dict defining any correlations between transverse and longitudinal. \\
-\verb|beam_polarisation| & Dict defining the polarisation of the beam. If this dict is not included, the beam is taken to be unpolarised. \\
+\verb|beam_polarisation| & Optional dict defining the polarisation of the beam. If this dict is not included, the beam is taken to be unpolarised. \\
+\verb|a-p_correlation| & Optional dict that defines a correlation between transverse amplitude and longitudinal momentum. If this dict is not included, no such correlation is introduced. \\
 \begin{makeimage} % force latex2html to render as an html table 
 \end{makeimage} 
 \end{tabularx}
@@ -179,7 +190,10 @@ Name & Meaning \\
 \verb|emittance_l| & In Twiss mode, set $\epsilon_l$\\
 \hline
 \verb|sigma_t| & In \verb|gaussian| mode, set the RMS time. \\
+\hline
 \begin{tabular}{l} \verb|sigma_p| \\ \verb|sigma_energy| \\ \verb|sigma_pz| \end{tabular} & In \verb|gaussian|, \verb|uniform_time|, \verb|sawtooth_time| mode, set the RMS energy/p/pz. \\
+\hline
+\begin{tabular}{l} \verb|cov(t,p)| \\ \verb|cov(t,energy)| \\ \verb|cov(t,pz)| \end{tabular} & In \verb|gaussian| mode, set the covariance between p/energy/pz and time and energy. It is an error if this results in a matrix that is not positive definite (eigenvalues positive).\\
 \hline
 \verb|t_start| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the start time of the parent distribution \\
 \verb|t_end| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the end time of the parent distribution \\
@@ -224,6 +238,61 @@ Name & Meaning \\
 \end{tabularx}
 \end{center}
 \end{table*}
+
+\begin{table*}
+\begin{center}
+\caption{Beam definition amplitude-momentum correlation.}
+\label{tab:apcorr}
+\begin{tabularx}{\linewidth}{lX}
+Name & Meaning \\
+\hline
+\multicolumn{2}{l}{\emph{The following cards should be defined in each beam definition \verb|a-p_correlation| dict.}} \\
+\hline
+\verb|magnitude| & The magnitude of the amplitude-momentum correlation. \\
+\verb|momentum_variable| & Optional parameter to specify the momentum variable W. Options are \verb|energy|, \verb|p|, \verb|pz|. If not specified, defaults to \verb|momentum_variable| from \verb|longitudinal| dict.\\
+\begin{makeimage} % force latex2html to render as an html table 
+\end{makeimage}
+\end{tabularx}
+\end{center}
+\end{table*}
+
+\section{Getting the Right Answer}
+In MICE, the code is required to get the right answer for a number of difference use cases. MICE needs accurate stepping through the complex field maps, correct energy loss and scattering in the emittance absorbers and diffuser and accurate energy deposition in the sensitive detectors and correct showering especially in the downstream detectors. The \emph{Right Answer} in this case is the one that agrees with experiment.
+
+\subsection{Geometry}
+There are copious comments on setting up your own geometry in the relevant chapter. I only remark here that you should
+\begin{itemize}
+\item Visualise the geometry.
+\item Set \verb|verbose_level| to 1 so that MAUS reports the field configuration in it's output file.
+\item Check the field maps using e.g. \verb|bin/examples/make_field_map.py|.
+\item Set \verb|check_volume_overlaps| to \verb|True| to call Geant4 internal checks for geometry consistency.
+\end{itemize}
+Otherwise it is highly unlikely that you will get the correct geometry.
+
+\subsection{Tracking}
+The principle tool that can be used to ensure a correct answer from tracking through the field maps is the step size. This is controlled either from MiceModules by setting the G4StepMax parameter per volume; or from
+data cards by setting the \verb|max_step_length| parameter. Setting this parameter to a small value increases the tracking time; setting it to a large value decreases the accuracy. Numerically, 100 mm is found to be a reasonable value for sufficiently accurate stepping through the fields [citation: C Rogers thesis]. No one has ever studied effect of miss distance on e.g. some of the MICE apertures.
+
+It is also wise to avoid hard field edge boundaries in the cooling channel. MAUS uses by default 4th order Runge Kutta for numerical integration (RK4, \verb|stepping_algorithm = "ClassicalRK4"|). For each tracking step, RK4 calls the MAUS field map routines 4 times. Geant4/RK4 only knows about the field value at these four points, and makes some smoothing approximation at intermediate points. If the geometry presents a field inhomogeneity i.e. a hard edged boundary, it will severely degrade the stability of the tracking. The way to fix this is to implement Geant4 volume boundaries on either side of the edge of any field maps. This forces Geant4 to stop tracking, step over the field boundary, and then start tracking again.
+
+\subsection{Energy Deposition and Showering}
+There are a couple of other considerations for handling energy deposition, decays and so forth. \verb|physics_model| is the master control variable, which tells Geant4 which physics model to use. The Geant4 mindset is that Geant4 provides a library of physics processes, and that the defaults are not necessarily correct for all use cases. This is different to e.g. \verb|MARS| or equivalent tools. Rogers has selected \verb|QGSP_BERT| as a reasonable default, following recommendation from G4Beamline developers.
+
+The MICE beam is quite highly polarised. Polarised decay is possible to do in MAUS (\verb|polarised_decay| and \verb|spin_tracking|), but it is poorly understood experimentally so it is not active by default. Be aware that probably electron background estimation is wrong in MICE/MAUS.
+
+If the physics you wish to study includes showering effects, check that you are happy with the \verb|kinetic_energy_threshold|, \verb|production_threshold| and \verb|fine_grained_production_threshold| parameters. The \verb|kinetic_energy_threshold| sets the minimum energy of particles that will be tracked and the \verb|production_threshold| parameters control the minimum range of particles that will be produced. 
+
+The \verb|fine_grained_production_threshold| sets the geant4 production threshold per particle and per region. Regions are defined using the MiceModule \verb|Region| string property, which can map several volumes to the same region. \verb|fine_grained_production_threshold| should be a dictionary that maps the string name of a region to another dictionary. This dictionary should map the string name or pdg encoded integer id in string format to the production threshold. For example, the entry in the datacards file might look like
+\begin{verbatim}
+fine_grained_production_threshold = {
+    "my_region":{
+       "e+":0.1,
+       "11":0.01,
+       "22":-1
+    }
+}
+\end{verbatim}
+which would set production thresholds for all MiceModules in \verb|my_region| to 0.1 mm for positrons, 0.01 mm for electrons, and use the Geant4 defaults for gammas. All other particles would take their production threshold defaults from \verb|production_threshold| datacard.
 
 \section{GEANT4 Bindings}
 The GEANT4 bindings are encoded in the Simulation module. GEANT4 groups particles by run, event and track. A GEANT4 run maps to a MICE spill; a GEANT4 event maps to a single inbound particle from the beamline; and a GEANT4 track corresponds to a single particle in the experiment.
@@ -316,7 +385,8 @@ Name & Meaning \\
 \verb|polarised_decay| & Set to boolean true to make muons decay according to standard physics for a polarised muon; set to boolean false to make muons decay as if unpolarised. If polarised decay is true, then spin tracking is automatically enabled, regardless of the value of the \verb|spin_tracking| datacard.\\
 \verb|charged_pion_half_life| & Set the half life for charged pions.\\
 \verb|muon_half_life| & Set the half life for muons.\\
-\verb|production_threshold| & Set the geant4 production threshold.\\
+\verb|production_threshold| & Set the geant4 production threshold. Uses geant4 defaults if negative. Ignored if \verb|physics_processes| are not \verb|normal|. \\
+\verb|fine_grained_production_threshold| & Set the geant4 production threshold per particle and per region. See text. \\
 \verb|kinetic_energy_threshold| & Threshold for kinetic energy of new particles at production. Particles with kinetic energy below this value will not be tracked.\\
 \verb|default_keep_or_kill| & If set to \verb|true|, keep particles with type not listed in \verb|keep_or_kill_particles|. If set to \verb|false|, kill particles with type not listed in \verb|keep_or_kill_particles|\\
 \verb|keep_or_kill_particles| & Maps string particle type name to boolean flag. If set to true, always keep particles of this type. If set to false, always kill particles of this type. If not set, apply \verb|default_keep_or_kill|\\

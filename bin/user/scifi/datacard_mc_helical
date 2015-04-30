@@ -5,7 +5,7 @@ import os
 #------------------------------------------
 type_of_dataflow = 'pipeline_single_thread'
 verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings # 3 = errors (and std::cerr), 4 = fatal, >4 = silent
-# output_root_file_name = "maus_output_muplus_2014-03-21_sz_testing.root"
+# output_root_file_name = "maus_output_helical_tests.root"
 
 #------------------------------------------
 # Used by InputCppRoot
@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 10
+spill_generator_number_of_spills = 1000
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
@@ -46,7 +46,7 @@ spill_generator_number_of_spills = 10
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10
+    "particle_id":13, "energy":200.0, "time":0.0, "random_seed":10
 }
 # This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
 beam = {
@@ -89,8 +89,8 @@ SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
 SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
-SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
-SciFiPatRecSZChi2Cut = 8.0 # Chi^2 cut on pat rec s-z fit
+SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
+SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 

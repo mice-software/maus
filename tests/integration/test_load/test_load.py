@@ -64,8 +64,9 @@ def get_rec_proc(run_number, valgrind):
                    "--daq_data_file", run_number]
     if valgrind:
         rec_options = ['valgrind', '--leak-check=yes', 'python']+rec_options
-    rec_log = TMP_DIR+"/test_load_analyze_data_offline_"+run_number+".log"
-    proc = subprocess.Popen(rec_options, stdout=open(rec_log, "w"),
+    rec_log = open(TMP_DIR+"/test_load_analyze_data_offline_"+run_number+".log",
+                   "w")
+    proc = subprocess.Popen(rec_options, stdout=rec_log,
                                          stderr=subprocess.STDOUT)
     return proc
 

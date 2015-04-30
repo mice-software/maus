@@ -133,7 +133,7 @@ inline void TRefArrayResolver::ResolveReferences() {
                  STLUtils::ToString(_index),
                  "ReferenceResolver::TRefArrayResolver::ResolveReferences"));
   _tref_array->AddAt(data_address, _index);
-  data_address->ls();
+  // data_address->ls();
 }
 
 //////////////////////////////////////////////////////////////////

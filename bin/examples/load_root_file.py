@@ -23,7 +23,8 @@ def generate_some_data(outfile):
     """
     analysis = os.path.join\
                  (os.environ["MAUS_ROOT_DIR"], "bin", "analyze_data_offline.py")
-    proc = subprocess.Popen([analysis, "-output_root_file_name", outfile])
+    proc = subprocess.Popen(['python', analysis,
+                             '--output_root_file_name', outfile])
     proc.wait() #pylint: disable = E1101
 
 def main():
@@ -71,6 +72,8 @@ def main():
             # vector directly
             for j in range(spill.GetReconEvents().size()):
                 tof_event = spill.GetReconEvents()[j].GetTOFEvent()
+                if not tof_event:
+                    continue
                 digits = tof_event.GetTOFEventDigit()
                 for k in range(digits.GetTOF1DigitArray().size()):
                     tof1_digit = digits.GetTOF1DigitArray()[k]

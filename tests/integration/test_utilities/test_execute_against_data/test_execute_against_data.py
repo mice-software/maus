@@ -27,14 +27,25 @@ import subprocess
 import tarfile
 import time
 import ROOT
+import cdb
 import libMausCpp # pylint: disable=W0611
 
 RUN_NUMBER = "03541"
 TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/03500/"
 TEST_FILE = RUN_NUMBER+".tar"
 TEST_OUT  = RUN_NUMBER+"_offline.tar"
-TEST_DIR = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp", "test_batch")
+TEST_DIR = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
+                        "test_execute_against_data")
 TEST_FILE_EXISTS = False
+UNPACK_STEP4 = False
+
+# set a different test file for stepIV
+if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
+    RUN_NUMBER = "06008"
+    TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step4/06000/"
+    TEST_FILE = RUN_NUMBER+".tar"
+    TEST_OUT  = RUN_NUMBER+"_offline.tar"
+    UNPACK_STEP4 = True
 
 def get_data():
     """
@@ -123,7 +134,10 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         tree.GetEntry(3)
         self.assertEqual(data.GetSpill().GetDaqEventType(), "physics_event")
         self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
-        self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTOFEvent().\
+        # not yet ready to test detector hits in the step4 test file
+        # this will have to wait for meaningful data to come out of step4
+        if not UNPACK_STEP4:
+            self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTOFEvent().\
                                   GetTOFEventDigit().GetTOF1DigitArraySize(), 0)
         root_file.Close()
 
@@ -136,30 +150,53 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         Test script runs, the correct files are put in the tarball and the
         simulation and reconstruction have some data in them
         """
+        bi_super = cdb.BatchIterationSuperMouse(
+                                              "http://preprodcdb.mice.rl.ac.uk")
+        bi_index = 0
+        for bi_index in range(10000):
+            if bi_super.get_mc_datacards(bi_index)['mc'] == 'null':
+                break # the bi number does not exist - we can set it
+        print 'Found free row with batch iteration number', bi_index
+        bi_super.set_datacards(bi_index, "test data", "", "")
+
         if not get_data():
-            print 'Error downloading file - abort test'
-            return
+            raise RuntimeError('Error downloading file - abort test')
         here = os.getcwd()
         os.chdir(TEST_DIR)
-        args = [
-            os.path.join(os.environ["MAUS_ROOT_DIR"], "bin", "utilities",
-                                                     "execute_against_data.py"),
-            "--input-file", TEST_FILE,
-            "--test",]
-        proc = subprocess.Popen(args)
-        proc.wait()
-        self.assertEqual(proc.returncode, 0)
-        clean_dir()
-        print 'Unpacking for testing'
-        tar_out = tarfile.open(TEST_OUT, 'r:*')
-        tar_out.extractall()
-        for file_name in [TEST_OUT, TEST_FILE, 'batch.log', 'download.log', \
-                   'reco.log', 'sim.log', RUN_NUMBER+'_recon.root', \
-                   RUN_NUMBER+'_sim.root']:
-            self.assertTrue(os.path.isfile(file_name), file_name)
-        self.__check_sim_file()
-        self.__check_recon_file()
+        self.test_args.append(str(bi_index))
+        # prod_args tries to call the production server and run with bi index 1
+        # (default cards) - disabled for now as default cards are not yet loaded
+        for args in [self.test_args]:#, self.prod_args]:
+            print "Running arguments\n    "+str(args)
+            proc = subprocess.Popen(args)
+            proc.wait()
+            self.assertEqual(proc.returncode, 0)
+            clean_dir()
+            print '  Unpacking for testing'
+            tar_out = tarfile.open(TEST_OUT, 'r:*')
+            tar_out.extractall()
+            for file_name in [TEST_OUT, TEST_FILE, 'batch.log', 'download.log',
+                       'reco.log', 'sim.log', RUN_NUMBER+'_recon.root',
+                       RUN_NUMBER+'_sim.root']:
+                self.assertTrue(os.path.isfile(file_name), file_name)
+            self.__check_sim_file()
+            self.__check_recon_file()
+
         os.chdir(here)
+
+    test_args = [
+        os.path.join(os.environ["MAUS_ROOT_DIR"], "bin", "utilities",
+                                                 "execute_against_data.py"),
+        "--input-file", TEST_FILE,
+        "--test",
+        "--batch-iteration"
+    ]
+
+    prod_args = [
+        os.path.join(os.environ["MAUS_ROOT_DIR"], "bin", "utilities",
+                                                 "execute_against_data.py"),
+        "--input-file", TEST_FILE,
+        "--batch-iteration", "1"]
 
 if __name__ == "__main__":
     unittest.main()

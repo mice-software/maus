@@ -66,6 +66,14 @@ namespace Simulation {
  */
 class DetectorConstruction : public G4VUserDetectorConstruction {
  public:
+  /** Constructor - initialises some variables and accepts a pre-generated volume
+   *
+   *   @param worldvol - description of the geometry. DetectorConstruction makes a
+   *          deepcopy of model (caller owns memory)
+   *   @param cards (borrowed reference) - the control variables. Caller still
+   *          owns memory allocated to cards
+   */
+  explicit DetectorConstruction(G4VPhysicalVolume* worldvol, const Json::Value& cards);
   /** Constructor - initialises some variables but does not construct
    *
    *   @param model - description of the geometry. DetectorConstruction makes a
@@ -104,6 +112,11 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    */
   int GetSDSize() { return _SDs.size(); }
 
+  /** Get the last element of the SD array added. For the purpose of adding daughters
+   * to sensitive detectors
+   */
+  // std::vector<MAUS::MAUSSD*> GetSDList(){ return _SDs; }
+
   /** Get the field maps
    *
    *  Access the field maps that are seen by Geant4.
@@ -126,6 +139,25 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    */
   void SetMiceModules(const MiceModule& mods);
 
+  /** Get the MAUS internal list of regions
+   *
+   *  MAUS needs to keep this internal list so that MAUS defaults can be 
+   *  applied to regions that are not listed in the datacards. It would be nice
+   *  if G4RegionStore let me access it's list of regions but not possible...
+   */
+  std::vector<std::string> GetRegions() {return _regions;}
+
+  void BuildSensitiveDetector(G4LogicalVolume* logic, MiceModule* module);
+  void SetUserLimits(G4LogicalVolume* logic, MiceModule* module);
+  void SetVisAttributes(G4LogicalVolume* logic, MiceModule* mod);
+  // Add to a G4Region if required
+  void AddToRegion(G4LogicalVolume* logic, MiceModule* mod);
+  /** Get the world volume pointer.
+   *
+   *  Allows access to the geometry outside of Geant4.
+   */
+  G4VPhysicalVolume* GetWorldVolume() const {return _rootPhysicalVolume;}
+
  private:
   void ResetGeometry();
   void ResetFields();
@@ -141,10 +173,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
                              G4LogicalVolume** logic,
                              G4VPhysicalVolume* moth,
                              MiceModule* mod);
-  void BuildSensitiveDetector(G4LogicalVolume* logic, MiceModule* module);
-  void SetUserLimits(G4LogicalVolume* logic, MiceModule* module);
+
   void SetMagneticField(G4LogicalVolume* logic, MiceModule* module);
-  void SetVisAttributes(G4LogicalVolume* logic, MiceModule* mod);
 
   void SetBTMagneticField();
 
@@ -193,6 +223,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   bool _checkVolumes;
   bool _everythingSpecialVirtual;
   bool _polarisedTracking;
+  bool _useGDML;
   G4double _deltaOneStep;
   G4double _deltaIntersection;
   G4double _epsilonMin;
@@ -202,6 +233,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   G4double _trackMax;
   G4double _timeMax;
   G4double _stepMax;
+
+  std::vector<std::string> _regions;
 
   #ifdef TESTS_CPP_UNIT_SIMULATION_DETECTORCONSTRUCTORTEST_CC
     FRIEND_TEST(DetectorConstructionTest, SetDatacardVariablesTest);

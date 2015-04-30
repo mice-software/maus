@@ -324,7 +324,8 @@ def get_root_libs():
                 'Tree', \
                 'dl', \
                 'm', \
-                'pthread']
+                'pthread',
+                'rt']
 
 def set_root(conf, env): # pylint: disable=W0613
     """
@@ -360,6 +361,15 @@ def set_clhep(conf, env): # pylint: disable=W0613
         my_exit(1)
 
     conf.env.Append(LIBS = ['CLHEP'])
+
+def set_xercesc(conf, env): # pylint: disable=W0613
+    """
+    Setup numpy
+    """
+    conf.env.Append(LIBS = ['xerces-c'])
+    if not conf.CheckLib('xerces-c'):
+        print "ERROR: Cound't find Xerces-c library"
+        my_exit(1)
 
 def get_g4_libs(): # pylint: disable=W0511
     """
@@ -545,7 +555,18 @@ def set_unpacker(conf, env):
     """
     Setup unpacker
     """
-    if (not conf.CheckLib('MDunpack', language='c++') or \
+    maus_unpacker_version = os.environ.get('MAUS_UNPACKER_VERSION')
+    if not maus_unpacker_version:
+        print('!! Could not find $MAUS_UNPACKER_VERSION environment')
+        print('!! Did you try running: "source env.sh"?')
+        my_exit(1)
+    if maus_unpacker_version != 'StepI' and maus_unpacker_version != 'StepIV':
+        print('!! Unknown $MAUS_UNPACKER_VERSION %s' % maus_unpacker_version)
+        my_exit(1)
+    if maus_unpacker_version == 'StepIV':
+        env.Append(CCFLAGS=["""-D_STEPIV_DATA"""])
+    maus_unpack_lib = 'MDUnpack_'+maus_unpacker_version
+    if (not conf.CheckLib(maus_unpack_lib, language='c++') or \
         not  conf.CheckCXXHeader('unpacking/MDevent.h')):
         print
         print "!! Unpacker module not found, you will not be able to use the "+\
@@ -585,6 +606,7 @@ LIBS = {
     'numpy':set_numpy,
     'root':set_root,
     'clhep':set_clhep,
+    'xercesc':set_xercesc,
     'geant4':set_geant4,
     'gtest':set_gtest,
     'unpacker':set_unpacker,

@@ -25,18 +25,12 @@ SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
                                      _station(-1),
                                      _plane(-1),
                                      _channel(666),
-                                     _f_chi2(-1),
-                                     _s_chi2(-1),
+                                     _chi2(-1),
                                      _pos(ThreeVector(0, 0, 0)),
                                      _mom(ThreeVector(0, 0, 0)),
                                      _pull(-1),
                                      _residual(-1),
-                                     _smoothed_residual(-1),
-                                     _mc_x(0.),
-                                     _mc_px(0.),
-                                     _mc_y(0.),
-                                     _mc_py(0.),
-                                     _mc_pz(0.) {
+                                     _smoothed_residual(-1) {
   _cluster = new TRef();
 }
 
@@ -59,8 +53,7 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   _plane   = (id-1)%3;
   _channel = kalman_site->measurement()(0, 0);
 
-  _f_chi2 = kalman_site->chi2(KalmanState::Filtered);
-  _s_chi2 = kalman_site->chi2(KalmanState::Smoothed);
+  _chi2 = kalman_site->chi2();
 
   TMatrixD state_vector = kalman_site->a(KalmanState::Smoothed);
   int dimension = state_vector.GetNrows();
@@ -74,20 +67,12 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
     _mom.setY(state_vector(3, 0));
   } else if ( dimension == 5 ) {
     _pos.setX(state_vector(0, 0));
-    _mom.setX(state_vector(1, 0)/fabs(state_vector(4, 0)));
+    _mom.setX(state_vector(1, 0));
     _pos.setY(state_vector(2, 0));
-    _mom.setY(state_vector(3, 0)/fabs(state_vector(4, 0)));
+    _mom.setY(state_vector(3, 0));
     _pos.setZ(kalman_site->z());
     _mom.setZ(1./fabs(state_vector(4, 0)));
   }
-
-  ThreeVector mc_mom = kalman_site->true_momentum();
-  ThreeVector mc_pos = kalman_site->true_position();
-  _mc_x  = mc_pos.x();
-  _mc_px = mc_mom.x();
-  _mc_y  = mc_pos.y();
-  _mc_py = mc_mom.y();
-  _mc_pz = mc_mom.z();
 
   _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
   _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
@@ -100,7 +85,6 @@ SciFiTrackPoint::SciFiTrackPoint(const KalmanState *kalman_site) {
   std::vector<double> covariance(matrix_elements, matrix_elements+num_elements);
   _covariance = covariance;
 
-  // std::cerr << "Adding cluster with address " << kalman_site->cluster() << " to track point\n";
   _cluster = new TRef(kalman_site->cluster());
 }
 
@@ -113,17 +97,10 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
   _plane   = point.plane();
   _channel = point.channel();
 
-  _f_chi2 = point.f_chi2();
-  _s_chi2 = point.s_chi2();
+  _chi2 = point.chi2();
 
   _pos = point.pos();
   _mom = point.mom();
-
-  _mc_x  = point.mc_x();
-  _mc_px = point.mc_px();
-  _mc_y  = point.mc_y();
-  _mc_py = point.mc_py();
-  _mc_pz = point.mc_pz();
 
   _pull              = point.pull();
   _residual          = point.residual();
@@ -144,17 +121,10 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
   _plane   = rhs.plane();
   _channel = rhs.channel();
 
-  _f_chi2 = rhs.f_chi2();
-  _s_chi2 = rhs.s_chi2();
+  _chi2 = rhs.chi2();
 
   _pos = rhs.pos();
   _mom = rhs.mom();
-
-  _mc_x  = rhs.mc_x();
-  _mc_px = rhs.mc_px();
-  _mc_y  = rhs.mc_y();
-  _mc_py = rhs.mc_py();
-  _mc_pz = rhs.mc_pz();
 
   _pull              = rhs.pull();
   _residual          = rhs.residual();

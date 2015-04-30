@@ -43,6 +43,8 @@ class BasePointProcessor
   EnumDetectorPointProcessor _detector_enum_proc;
   TLorentzVectorProcessor _tlorentz_vec_proc;
   StringProcessor _string_proc;
+  IntProcessor _int_proc;
+  DoubleProcessor _double_proc;
 };
 } // ~namespace Global
 } // ~namespace Processor

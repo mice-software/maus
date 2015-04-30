@@ -1,0 +1,6 @@
+Module HeWindowOuterCylinder
+{
+Volume Tube
+Dimensions 106.0 182.5 185.0 mm
+PropertyString Material GALACTIC
+}

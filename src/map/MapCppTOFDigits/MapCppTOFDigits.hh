@@ -43,7 +43,7 @@
 
 namespace MAUS {
 
-class MapCppTOFDigits : public MapBase<Json::Value> {
+class MapCppTOFDigits : public MapBase<MAUS::Data> {
 
  public:
   MapCppTOFDigits();
@@ -60,18 +60,14 @@ class MapCppTOFDigits : public MapBase<Json::Value> {
   */
   void _death();
 
- /** @brief process JSON document
-  *  @param document Receive a document with raw data and return
-  *  a document with digits
-  */
-  void _process(Json::Value* value) const;
+  /** @brief process the data object
+ *
+ *  @param
+ */
+  void _process(MAUS::Data *data) const;
 
  private:
   TOFChannelMap _map;
-
-  // Vector to hold the names of all detectors to be included
-  // in the digits.
-  std::vector<std::string> _stationKeys;
 
   bool SetConfiguration(std::string json_configuration);
 
@@ -89,31 +85,26 @@ class MapCppTOFDigits : public MapBase<Json::Value> {
   /** @brief Gets the information from the TDC branch and appends it to the digit
    *  @param xDocPartEvent One particle event from raw detector data
    */
-  Json::Value getTdc(Json::Value xDocPartEvent) const;
+  void setTdc(MAUS::TOFDigit *digit, MAUS::V1290 &tdc) const;
 
   /** @brief Gets the information from the ADC data ascosiated with the current TDC data
-   *  @param xDocPartEvent One particle event from raw detector data
-   *  @param xDocInfo Json document with the TDC digit information. This is needed
-   *  so ascosiate the proper ADC data to corresponding TDC data.
    */
-  bool getAdc(Json::Value xDocAdc,
-              Json::Value xDocTdcHit,
-              Json::Value &xDocDigit) const throw(Exception);
+  bool findAdc(MAUS::TOFDigit *digit,
+               MAUS::V1724Array &adc_hits) const throw(Exception);
 
-  /** @brief process JSON document
-   *  @param xDocTrigReq Json document with the trigger request for a specific particle event
-   *  @param xDocInfo 
+  /** @brief  Gets the Trigger Request information from the TDC data
+   * ascosiated with the current TDC data
    */
-  bool getTrigReq(Json::Value xDocTrigReq, Json::Value xDocTdcHit,
-                  Json::Value &xDocDigit) const throw(Exception);
+  bool findTriggerReq(MAUS::TOFDigit *digit,
+                      MAUS::V1290 &tdc,
+                      MAUS::V1290Array &tr_req_hits) const  throw(Exception);
 
-  /** @brief process JSON document
-   *  @param document Receive a document with raw data and return
-   *  a document with digits
+  /** @brief  Gets the Trigger information from the TDC data
+   * ascosiated with the current TDC data
    */
-  bool getTrig(Json::Value xDocTrig,
-               Json::Value xDocTdcHit,
-               Json::Value &xDocDigit) const throw(Exception);
+  bool findTrigger(MAUS::TOFDigit *digit,
+                   MAUS::V1290 &tdc,
+                   MAUS::V1290Array &tr_hits) const throw(Exception);
   bool map_init;
 };
 }

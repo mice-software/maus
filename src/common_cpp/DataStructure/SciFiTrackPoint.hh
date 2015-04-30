@@ -88,11 +88,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Sets the filtered chi2 for this track point.
    */
-  void set_f_chi2(double f_chi2)                { _f_chi2 = f_chi2;     }
-
-  /** @brief  Sets the smoothed chi2 for this track point.
-   */
-  void set_s_chi2(double s_chi2)                { _s_chi2 = s_chi2;     }
+  void set_chi2(double chi2)                    { _chi2 = chi2;     }
 
   /** @brief  Sets the x coordinate.
    */
@@ -118,12 +114,6 @@ class SciFiTrackPoint : public TObject {
    */
   void set_smoothed_residual(double s_residual) { _smoothed_residual = s_residual; }
 
-  void set_mc_x(double mc_x)                    { _mc_x   = mc_x;       }
-  void set_mc_px(double mc_px)                  { _mc_px  = mc_px;      }
-  void set_mc_y(double mc_y)                    { _mc_y   = mc_y;       }
-  void set_mc_py(double mc_py)                  { _mc_py  = mc_py;      }
-  void set_mc_pz(double mc_pz)                  { _mc_pz  = mc_pz;      }
-
   /** @brief  Returns the tracker number.
    */
   int tracker()              const { return _tracker;  }
@@ -142,11 +132,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Returns filtered chi2 value.
    */
-  double f_chi2()            const { return _f_chi2;   }
-
-  /** @brief  Returns the smoothed chi2 value.
-   */
-  double s_chi2()            const { return _s_chi2;   }
+  double chi2()            const { return _chi2;   }
 
   /** @brief  Returns the x position.
    */
@@ -172,14 +158,12 @@ class SciFiTrackPoint : public TObject {
    */
   double smoothed_residual() const { return _smoothed_residual; }
 
-  double mc_x()              const { return _mc_x;     }
-  double mc_px()             const { return _mc_px;    }
-  double mc_y()              const { return _mc_y;     }
-  double mc_py()             const { return _mc_py;    }
-  double mc_pz()             const { return _mc_pz;    }
-
+  /** @brief  Returns the spill number.
+   */
   int spill()                const { return _spill; }
 
+  /** @brief  Returns the event number.
+   */
   int event()                const { return _event; }
 
   /** @brief  Returns the mother clusters as a TRef*.
@@ -209,11 +193,11 @@ class SciFiTrackPoint : public TObject {
                 { return static_cast<SciFiCluster*>(_cluster->GetObject()); }
 
  private:
-  /** @brief The tracker the trackpoint belongs to.
+  /** @brief The number of the spill the trackpoint belongs to.
    */
   int _spill;
 
-  /** @brief The tracker the trackpoint belongs to.
+  /** @brief The number of the event the trackpoint belongs to.
    */
   int _event;
 
@@ -235,11 +219,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief filtered chi2
    */
-  double _f_chi2;
-
-  /** @brief smoothed chi2
-   */
-  double _s_chi2;
+  double _chi2;
 
   /** @brief position
    */
@@ -264,13 +244,6 @@ class SciFiTrackPoint : public TObject {
   /** @brief smoothed residual
    */
   double _smoothed_residual;
-
-  /// The TRUTH state vector.
-  double _mc_x;
-  double _mc_px;
-  double _mc_y;
-  double _mc_py;
-  double _mc_pz;
 
   /** @brief A pointer to the cluster used to form the state - does not assume control of memory
    */

@@ -198,7 +198,9 @@
 #pragma link C++ class MAUS::EMRBarHit+;
 #pragma link C++ class MAUS::EMRPlaneHit+;
 #pragma link C++ class std::vector<EMRPlaneHit*>+;
-// #pragma link C++ class std::vector<EMRBarHit>+;
+#pragma link C++ class std::vector<EMRBar*>;
+#pragma link C++ class std::vector<EMRBarHit>+;
+
 
 #pragma link C++ global gROOT;
 #pragma link C++ global gEnv;

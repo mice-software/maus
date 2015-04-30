@@ -4,16 +4,16 @@
 Module Cherenkov
 {
   Volume Box
-  Dimensions 800.0 800.0 693.0 mm
+  Dimensions 800.0 800.0 900.0 mm
   PropertyString Material AIR
   Module Ckov/Vessel1.dat
   {
-    Position 0.0 0.0 -173.25 mm
+    Position 0.0 0.0 -237.0 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module Ckov/Vessel2.dat
   {
-    Position 0.0 0.0 173.25 mm
+    Position 0.0 0.0 237.0 mm
     Rotation 0.0 0.0 0.0 degree
   }
 }

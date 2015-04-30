@@ -1,11 +1,11 @@
 box TargetBox length=440 width=440 height=440 material=SS304 color=.6,.6,.6
 box TargetBoxVacuum length=420 width=420 height=420 material=Vacuum color=0,0,0
 # optional momentum cut
-param -unset momentumCut=-1
-if $momentumCut>0
-	particlefilter MomentumCut height=420 width=420 length=1 require="sqrt(Px*Px+Py*Py+Pz*Pz)>$piMomentumRef-$momentumCut&&sqrt(Px*Px+Py*Py+Pz*Pz)<$piMomentumRef+$momentumCut"
-	place MomentumCut parent=TargetBoxVacuum z=10
-endif
+#param -unset momentumCut=-1
+#if $momentumCut>0
+#	particlefilter MomentumCut height=420 width=420 length=1 require="sqrt(Px*Px+Py*Py+Pz*Pz)>$piMomentumRef-$momentumCut&&sqrt(Px*Px+Py*Py+Pz*Pz)<$piMomentumRef+$momentumCut"
+#	place MomentumCut parent=TargetBoxVacuum z=10
+#endif
 
 //particlefilter  KillProton length=1. height=300 width=300 kill=proton
 //place           KillProton parent=TargetBoxVacuum z=12

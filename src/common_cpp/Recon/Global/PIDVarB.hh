@@ -15,6 +15,9 @@
  */
 
  /** @class PIDVarB
+ *  @author Celeste Pidcott, University of Warwick
+ *  PID variable class using the relation between the momentum measured
+ *  in the upstream tracker and the time of flight between TOF1 and TOF0.
  * 
  */
 

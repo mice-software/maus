@@ -56,7 +56,7 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
         out_name += str(value)+"_"
     out_name += str(prod)
     log_file = open(out_name+".log", "w")
-    print "Running", out_name,
+    print "\nRunning", out_name,
     sys.stdout.flush()
     config = os.path.join(TEST_DIR, 'physics_model_config.py')
     proc = subprocess.Popen([SIM_PATH, '-configuration_file', config, 
@@ -69,7 +69,8 @@ def run_simulation(ref_phys, phys, dec, pi_half, mu_half, prod): #pylint: disabl
       "-output_root_file_name", str(out_name)+".root",
     ], stdout=log_file, stderr=subprocess.STDOUT)
     proc.wait()
-    print "...done"
+    print " ...done ",
+    sys.stdout.flush()
     return out_name+".root"
 
 

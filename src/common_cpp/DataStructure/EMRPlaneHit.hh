@@ -65,10 +65,34 @@ class EMRPlaneHit {
     void SetEMRBarArray(EMRBarArray emrbararray);
 
     /** Returns  */
-    int GetCharge() const;
+    EMRBarArray GetEMRBarArrayPrimary() const;
 
     /** Sets  */
-    void SetCharge(int charge);
+    void SetEMRBarArrayPrimary(EMRBarArray emrbararray);
+
+    /** Returns  */
+    EMRBarArray GetEMRBarArraySecondary() const;
+
+    /** Sets  */
+    void SetEMRBarArraySecondary(EMRBarArray emrbararray);
+
+    /** Returns  */
+    double GetCharge() const;
+
+    /** Sets  */
+    void SetCharge(double charge);
+
+    /** Returns  */
+    double GetChargeCorrected() const;
+
+    /** Sets  */
+    void SetChargeCorrected(double charge_corrected);
+
+    /** Returns  */
+    double GetPedestalArea() const;
+
+    /** Sets  */
+    void SetPedestalArea(double pedestal_area);
 
     /** Returns  */
     int GetTime() const;
@@ -89,6 +113,12 @@ class EMRPlaneHit {
     void SetTrigger(int trigger);
 
     /** Returns  */
+    int GetRun() const;
+
+    /** Sets  */
+    void SetRun(int trigger);
+
+    /** Returns  */
     int GetDeltaT() const;
 
     /** Sets  */
@@ -100,15 +130,28 @@ class EMRPlaneHit {
     /** Sets  */
     void SetOrientation(int orient);
 
+    /** Returns  */
+    std::vector<int> GetSamples() const;
+
+    /** Sets  */
+    void SetSamples(std::vector<int> samples);
+
+
   private:
     int _plane;
     int _orientation;
     EMRBarArray _emrbararray;
-    int _charge;
+    EMRBarArray _emrbararray_primary;
+    EMRBarArray _emrbararray_secondary;
+    double _charge;
+    double _charge_corrected;
+    double _pedestal_area;
     int _time;
     int _spill;
     int _trigger;
+    int _run;
     int _deltat;
+    std::vector<int> _samples;
 
     MAUS_VERSIONED_CLASS_DEF(EMRPlaneHit)
 };

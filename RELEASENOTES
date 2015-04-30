@@ -5,6 +5,52 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.4
+  The following changes were made:
+    - StepIV unpacker added, StepI unpacker remains the default
+    - Geometry navigator for GEANT4 added
+    - EMR updates
+  If upgrading from a previous version, please redo the entire installation
+MAUS-v0.9.3
+  The following changes were made:
+    - Documentation - Doxygen fix
+  The following changes were made:
+    - Documentation - Doxygen fix
+    - G4Beamline - a few updates, including to the deck
+    - Global - PIDVarC added
+    - Grid - updates to Grid execution scripts
+    - ROOT - MINUIT2 support added
+    - Tracker - a few miscellaneous updates
+    - install_build_test.bash updated to allow multi-core builds (use -j N)
+  If upgrading from a previous version, please redo the entire installation
+MAUS-v0.9.2
+  The following changes were made:
+    - EMR - extensive updates
+    - G4Beamline - changes to the deck for Grid running
+    - Geometry - Tracker He window added to legacy
+    - Grid - added script for MC running on the Grid (bin/utilities/execute_MC.py)
+    - Tracker - various updates, including to Kalman filter and final track datastructure
+MAUS-v0.9.1
+  The following changes were made:
+    - Memory leak fixes #1489
+    - KL - MC tuning, calibrations in CDB
+    - TOF - calibrations by run-number
+    - MC - fine grained production thresholds by volume and particle type
+    - MC - add LiH material definition
+    - Geometry - updates, Ckov added
+    - Bug fixes
+MAUS-v0.9.0
+  The following changes were made:
+    - Data handling API changes propagated to inputers and mappers
+    - Memory leak fix #1489
+    - KL - tuning and calibration update
+    - Geometry - added diffuser irises, updated MiceModule translation
+    - Tracker - improvements, bug fixes, and additional tests
+    - Global PID framework - added Ckov, KL
+    - Updated documentation
+    - Bug fixes in build system
+    - JsonCpp version upgraded to 0.6.0-rc2
+  If upgrading from a previous version, please redo the entire installation
 MAUS-v0.8.5
   The following changes were made:
     - Bug fix - pi/mu decays in physics list (1470)

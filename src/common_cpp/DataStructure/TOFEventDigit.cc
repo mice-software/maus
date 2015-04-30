@@ -45,6 +45,10 @@ TOF1DigitArray TOFEventDigit::GetTOF1DigitArray() const {
     return _tof1;
 }
 
+TOF1DigitArray* TOFEventDigit::GetTOF1DigitArrayPtr() {
+    return &_tof1;
+}
+
 TOFDigit TOFEventDigit::GetTOF1DigitArrayElement(size_t index) const {
     return _tof1[index];
 }
@@ -61,6 +65,10 @@ TOF0DigitArray TOFEventDigit::GetTOF0DigitArray() const {
     return _tof0;
 }
 
+TOF0DigitArray* TOFEventDigit::GetTOF0DigitArrayPtr() {
+    return &_tof0;
+}
+
 TOFDigit TOFEventDigit::GetTOF0DigitArrayElement(size_t index) const {
     return _tof0[index];
 }
@@ -75,6 +83,10 @@ void TOFEventDigit::SetTOF0DigitArray(TOF0DigitArray tof0) {
 
 TOF2DigitArray TOFEventDigit::GetTOF2DigitArray() const {
     return _tof2;
+}
+
+TOF2DigitArray* TOFEventDigit::GetTOF2DigitArrayPtr() {
+    return &_tof2;
 }
 
 TOFDigit TOFEventDigit::GetTOF2DigitArrayElement(size_t index) const {

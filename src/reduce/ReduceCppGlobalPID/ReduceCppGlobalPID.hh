@@ -16,6 +16,7 @@
  */
 
 /** @class ReduceCppGlobalPID
+ *  @author Celeste Pidcott, University of Warwick
  *  Produce PDFs from MC data for use in global PID
  *
  */
@@ -38,6 +39,7 @@
 #include "src/common_cpp/Recon/Global/PIDBase2D.hh"
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
 #include "src/common_cpp/Recon/Global/PIDVarB.hh"
+#include "src/common_cpp/Recon/Global/PIDVarC.hh"
 
 
 namespace MAUS {

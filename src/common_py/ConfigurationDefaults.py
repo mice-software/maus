@@ -87,8 +87,9 @@ header_and_footer_mode = "append" #append or dont_append
 # thickness will be retrieved from the CDB for the run_number specified
 g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2":-0.396,\
         "d_s":3.837,"particles_per_spill":0,"rotation_angle":30,"translation_z":680.31,\
-        "proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,"particle_charge":'all',\
-        "file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',"get_magnet_currents_pa_cdb":False}
+        "protonabsorberin":1,"proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,\
+        "particle_charge":'all',"file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',\
+        "get_magnet_currents_pa_cdb":False}
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
@@ -98,6 +99,7 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
+simulation_geometry_debug    = False
 check_volume_overlaps = False
 maximum_number_of_steps = 50000000 # particles are killed after this number of
                                  # steps (assumed to be stuck in the fields)
@@ -119,7 +121,10 @@ polarised_decay = False # set to true to make muons decay with the correct distr
 charged_pion_half_life = -1. # set the pi+, pi- half life [ns]. Negative value means use geant4 default
 muon_half_life = -1. # set the mu+, mu- half life [ns]. Negative value means use geant4 default
 production_threshold = 0.5 # set the threshold for delta ray production [mm]
-kinetic_cutoff=1.0 # set minimum kinetic energy of a track at birth [MeV/c]
+fine_grained_production_threshold = { # set the production threshold per pid and per Geant4 region; regions are defined in MiceModules
+# "region_name":{"11":0.5, "-11":100.}
+# "another_region_name":{"11":0.5, "-11":100.}
+}
 default_keep_or_kill = True
 # map of string pdg pids; always keep particles on creation if their pdg maps to True; always kill particles on creation if their pdg maps to False. Default comes from default_keep_or_kill
 keep_or_kill_particles = {"mu+":True, "mu-":True,
@@ -282,25 +287,34 @@ SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
-SciFiParams_Z = 5.61291
-SciFiParams_Plane_Width = 0.6523 # mm
-SciFiParams_Radiation_Length = 413.124 # mm
-SciFiParams_Density = 1.06
-SciFiParams_Mean_Excitation_Energy = 68.7 # eV
-SciFiParams_A = 104.15
 SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160.
 SciFiParams_RMS = 370.
-AirParams_Z = 7.2
-AirParams_Radiation_Length = 308554.817276 # mm. This is 37.15 g cm/2 / 0.001204 g/cm3
-AirParams_Density = 0.001205 # g/cm3
-AirParams_Mean_Excitation_Energy = 85.7 # eV
-AirParams_A = 28.96
+# Parameters used for MCS and E loss correction
+SciFiParams_Z = 5.61291
+SciFiParams_Plane_Width = 0.6523 # mm
+SciFiParams_Radiation_Length = 413.124 # mm
+SciFiParams_Density = 1.06 #g/cm3, 0.00106 g/mm3
+SciFiParams_Mean_Excitation_Energy = 68.7 # eV
+SciFiParams_Density_Correction = 0.164541
+SciFiParams_A = 104.15 # g/mol
+MylarParams_Z = 5.
+MylarParams_Plane_Width = 0.025# mm
+MylarParams_Radiation_Length = 285.364  # mm
+MylarParams_Density = 1.4 #g/cm3, 0.0014 g/mm3
+MylarParams_Mean_Excitation_Energy = 78.7 # eV
+MylarParams_Density_Correction = 0.126782
+MylarParams_A = 192.2 # g/mol
+GasParams_Z = 2.
+GasParams_Radiation_Length = 5671130. # mm
+GasParams_Density = 0.000166322 # 1.66322e-04 g/cm3
+GasParams_Mean_Excitation_Energy = 41.8 # eV
+GasParams_Density_Correction  = 0.13443
+GasParams_A = 4. # g/mol
 SciFiSeedCovariance = 1000 # Error estimate for Seed values of the Kalman Fit
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
 SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
 SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
-SciFiUpdateMisalignments = False # Do Misalignment Search & Update
 SciFiKalmanVerbose  = False # Dump information per fitted track
 
 # configuration database
@@ -418,15 +432,86 @@ TOFscintLightSpeed =  170.0 # mm/ns
 KLconversionFactor = 0.000125 # MeV
 KLlightCollectionEff = 0.031
 KLlightGuideEff  = 0.85
-KLquantumEff = 0.18
+KLquantumEff = 0.26
 KLlightSpeed =  170.0 # mm/ns
 KLattLengthLong  = 2400.0 # mm
 KLattLengthShort =  200.0 # mm
 KLattLengthLongNorm  = 0.655 # mm
 KLattLengthShortNorm   = 0.345 # mm
-KLhardCodedTrigger = True
-KLsamplingTimeStart = 0.0 # ns
-KLadcConversionFactor = 0.125
+KLadcConversionFactor = 250000 # nphe/adc
+KLpmtGain = 2000000
+KLpmtSigmaGain = 1000000
+
+# EMR characteristics
+EMRnumberOfPlanes = 48
+EMRnumberOfBars = 60 # number of bars in one plane (+ test channel 0)
+EMRnBars = 2832 # total number of bars in the EMR
+EMRbarLength = 110 # cm, length of a scintillating bar
+EMRbarWidth = 33 # mm, base of the triangle
+EMRbarHeight = 17 # mm, height of the triangle
+EMRgap = 0.5 # mm, gap between two adjacent bars
+
+# EMR event pre-selection
+EMRtotNoiseLow = 0
+EMRtotNoiseUp = 7 # noise time over threshold window
+
+EMRdeltatSignalLow = -240 # Step I
+EMRdeltatSignalUp = -220 # Step I
+EMRdeltatNoiseLow = -220 # Step I
+EMRdeltatNoiseUp = -175 # Step I
+
+# EMR digitization
+EMRdoSampling = 1 # sample number of scintillating photons as a Poisson distribution
+EMRnphPerMeV = 2000 # number of photons per MeV
+EMRtrapEff = 0.04 # photon trapping efficiency
+EMRseed = 2 # seed state of the pseudorandom number generator, change equivalent to a power cycle of fADC
+EMRattenWLSf = 2.0 # dB/m, attentuation factor of the WLS fibres
+EMRattenCLRf = 0.35 # dB/m, attentuation factor of the clear fibres
+EMRspillWidth = 4000000 # DBB counts
+EMRbirksConstant = 0.126 # mm/MeV
+EMRaveragePathLength = 17 # mm
+EMRsignalEnergyThreshold = 0.8 # Me
+EMRfom = "median" # figure_Of-Merit for signal calibration
+
+EMRdbbCount = 2.5 # ns, duration of a DBB cycle (f=400MHz)
+EMRqeMAPMT = 0.25 # MAPMT quantum efficiency
+EMRnadcPerPeMAPMT = 6 # number of ADC counts per photoelectron in the MAPMT
+EMRelectronicsResponseSpreadMAPMT = 8 # ADC counts
+EMRtimeResponseSpread = 1 # ADC counts
+EMRtotFuncP1 = -60.5 
+EMRtotFuncP2 = 15.0
+EMRtotFuncP3 = 70.0
+EMRtotFuncP4 = 2.0 # time over threshold vs charge logarithmic fit parameters
+EMRdeltatShift = 12 # ADC counts, distance from the trigger
+
+EMRfadcCount = 2.0 # ns, duration of an fADC cycle (f=500MHz)
+EMRqeSAPMT = 0.11 # SAPMT quantum efficiency
+EMRnadcPerPeSAPMT = 2 # number of ADC counts per photoelectron in the SAPMT
+EMRelectronicsResponseSpreadSAPMT = 1 # ADC count
+EMRbaselinePosition = 123 # SAPMT signal baseline
+EMRbaselineSpread = 10 # SAPMT signal baseline spread
+EMRmaximumNoiseLevel = 50 # SAPMT noise maximum value
+EMRacquisitionWindow = 302 # ADC counts
+EMRsignalIntegrationWindow = 40
+EMRarrivalTimeShift = 40
+EMRarrivalTimeSpread = 33
+EMRarrivalTimeGausWidth = 3
+EMRarrivalTimeUniformWidth = 12.5
+EMRpulseShapeLandauWidth = 2
+
+# EMR reconstruction
+EMRsecondaryHitsBunchingDistance = 1000 # ns
+EMRsecondaryHitsBunchingWidth = 200 # ns
+
+EMRprimaryTriggerMinXhits = 1
+EMRprimaryTriggerMinYhits = 1
+EMRprimaryTriggerMinNhits = 4
+EMRsecondaryTriggerMinXhits = 1
+EMRsecondaryTriggerMinYhits = 1
+EMRsecondaryTriggerMinNhits = 2
+EMRsecondaryTriggerMinTot = 4
+
+EMRmaxSecondaryToPrimaryTrackDistance = 80
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -437,7 +522,7 @@ TOF_trigger_station = "tof1"
 # if you set file, then uncomment the calib files below
 TOF_calib_source = "CDB"
 
-#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
@@ -446,6 +531,11 @@ TOF_calib_source = "CDB"
 
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePointCut = 0.5 # nanosecond
+
+# get calibrations by either a) run_number or b) date
+# default is by run_number
+# if set to "date" then set the appropriate TOF_calib_date_from flag below
+TOF_calib_by = "run_number"
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
@@ -457,13 +547,36 @@ Enable_triggerDelay_correction = True
 Enable_t0_correction = True
 
 # this is used by the reconstuction of the KL detectors
+# this sets the source for the calibrations
+# by default it is from CDB
+# set it to 'file' if you want to load local files
+# if you set file, then uncomment the calib files below
+KL_calib_source = "CDB"
+KL_calib_date_from = 'current'
+# uncomment the KL_calibration_file card below if you set KL_calib_source=file
+#KL_calibration_file = "/files/calibration/klcalib.txt"
+
 KL_cabling_file = "/files/cabling/KLChannelMap.txt"
+
+Enable_klgain_correction = True
 
 # this is used by the reconstuction of the EMR detectors
 EMR_cabling_file = "/files/cabling/EMRChannelMap.txt"
 
+# this sets the source of the EMR clear fiber length map
+EMR_clear_fiber_length_map = "/files/cabling/EMRClearFiberLengthMap.txt"
+
+# this sets the source of the EMR connector attenuation map
+EMR_connector_attenuation_map = "/files/cabling/EMRConnectorAttenuationMap.txt"
+
+# this sets the source of the calibrations for the EMR detector
+EMR_calib_source = "CDB"
+EMR_calib_date_from = 'current'
+# uncomment the EMR_calibration_file card below if you set EMR_calib_source=file
+#EMR_calib_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
+
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
-daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
+daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
@@ -498,17 +611,6 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
                                  "y":0.1, "Py":0.01}
 
-# timeout for accessing the root_document_store over network
-root_document_store_timeout = 1.
-# frequency for polling the root_document_store when waiting to get data
-root_document_store_poll_time = 0.1
-# hostname for the root_document_store
-online_gui_host = "localhost"
-# port number to get the root document store
-online_gui_port = 41000
-# default list of canvases to select at startup
-online_gui_default_canvases = []
-
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
 # Particle hypothesis used in Global PID when creating PDFs from MC data.
@@ -521,3 +623,21 @@ global_pid_hypothesis = ""
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
 
+geometry_validation = { # see bin/utilities/geometry_validation.py for docs
+    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
+    "will_plot":True,
+    "will_track":True,
+    "z_start":-6000.,
+    "z_end":6000.,
+    "x_start":0.,
+    "x_step":1.,
+    "y_start":0.,
+    "y_step":0.,
+    "n_steps":301,
+    "plot_formats":["root", "png"],
+    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
+    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
+    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
+    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
+    "2d_volume_plot_label_size":0.25,
+}

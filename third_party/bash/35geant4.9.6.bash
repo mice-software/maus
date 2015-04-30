@@ -5,17 +5,35 @@ directory=geant4.9.6.p02
 filename=${directory}.tar.gz
 url=http://www.geant4.org/geant4/support/source/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
         echo "INFO: Found source archive in 'source' directory"
-        else  
+        else
         echo "INFO: Source archive doesn't exist.  Downloading..."
 
         wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
     fi
-   
+
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
         echo "INFO: Source archive exists."
@@ -38,20 +56,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         tar xfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/source/
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
-        echo
-        echo "INFO: Unpacking geant4 data:"
-        echo
-        tar xfz ${MAUS_ROOT_DIR}/third_party/source/geant4.9.6_data.tar.gz
 
         echo
         echo "INFO: Generating make files:"
         echo
         sleep 1
-        cmake -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install/ -DEXPAT_INCLUDE_DIR=${MAUS_ROOT_DIR}/third_party/install/include -DEXPAT_LIBRARY=${MAUS_ROOT_DIR}/third_party/install/lib/libexpat.so -DGEANT4_INSTALL_DATA=ON ${MAUS_ROOT_DIR}/third_party/source/${directory}
+        cmake -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install/ -DEXPAT_INCLUDE_DIR=${MAUS_ROOT_DIR}/third_party/install/include -DEXPAT_LIBRARY=${MAUS_ROOT_DIR}/third_party/install/lib/libexpat.so -DXERCESC_ROOT_DIR=${MAUS_ROOT_DIR}/third_party/install -DGEANT4_INSTALL_DATA=ON ${MAUS_ROOT_DIR}/third_party/source/${directory}
         echo
         echo "INFO: Running make:"
         echo
-        make
+        make -j$MAUS_NUM_THREADS
 
         echo
         echo "INFO: Installing:"

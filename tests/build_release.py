@@ -85,7 +85,7 @@ def build_user_guide():
         if latexproc.returncode != 0: # pylint: disable=E1101
             print "ERROR - latex failed"
         latexproc = subprocess.Popen(['latex2html', 'maus_user_guide.tex',
-                                         "-split", "3", "-html_version", "3.2"],
+                                         "-split", "4", "-html_version", "3.2"],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
         latexproc.wait() # pylint: disable=E1101
         if latexproc.returncode != 0: # pylint: disable=E1101
@@ -133,14 +133,16 @@ def copy_targets():
     version = Configuration.Configuration().handler_maus_version(
                                                             {'maus_version':''})
     version = version.replace(' ', '_')
-    out_dir = os.path.join(TEMP_DST, version)
-    os.mkdir(out_dir)
+    tmp_out_dir = os.path.join(TEMP_DST, version)
+    os.mkdir(tmp_out_dir)
     doc_out_dir = os.path.join(TEMP_DST, version, 'doc')
     os.mkdir(doc_out_dir)
     print COPY_TARGETS
     for target in COPY_TARGETS:
         if 'doxygen' in target:
             out_dir = doc_out_dir
+        else:
+            out_dir = tmp_out_dir
         print 'Copying target', target
         if os.path.isdir(target):
             last = target.split('/')[-1]

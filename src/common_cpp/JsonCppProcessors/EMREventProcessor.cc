@@ -20,11 +20,41 @@
 namespace MAUS {
 
 EMREventProcessor::EMREventProcessor()
-      : _plane_hit_proc(new EMRPlaneHitProcessor) {
-    RegisterValueBranch("emr_plane_hits", &_plane_hit_proc,
-                        &EMREvent::GetEMRPlaneHitArray,
-                        &EMREvent::SetEMRPlaneHitArray, false);
+      : _plane_hit_array_proc(new EMRPlaneHitProcessor) {
+    RegisterValueBranch
+	  ("emr_plane_hits", &_plane_hit_array_proc, &EMREvent::GetEMRPlaneHitArray,
+           &EMREvent::SetEMRPlaneHitArray, false );
+    RegisterValueBranch
+          ("initial_trigger", &_bool_proc, &EMREvent::GetInitialTrigger,
+          &EMREvent::SetInitialTrigger, false);
+    RegisterValueBranch
+          ("has_primary", &_bool_proc, &EMREvent::GetHasPrimary,
+          &EMREvent::SetHasPrimary, false);
+    RegisterValueBranch
+          ("range_primary", &_double_proc, &EMREvent::GetRangePrimary,
+          &EMREvent::SetRangePrimary, false);
+    RegisterValueBranch
+          ("has_secondary", &_bool_proc, &EMREvent::GetHasSecondary,
+          &EMREvent::SetHasSecondary, false);
+    RegisterValueBranch
+          ("range_secondary", &_double_proc, &EMREvent::GetRangeSecondary,
+          &EMREvent::SetRangeSecondary, false);
+    RegisterValueBranch
+          ("secondary_to_primary_track_distance", &_double_proc,
+	  &EMREvent::GetSecondaryToPrimaryTrackDistance,
+          &EMREvent::SetSecondaryToPrimaryTrackDistance, false);
+    RegisterValueBranch
+          ("total_charge_MA", &_double_proc, &EMREvent::GetTotalChargeMA,
+          &EMREvent::SetTotalChargeMA, false);
+    RegisterValueBranch
+          ("charge_ratio_MA", &_double_proc, &EMREvent::GetChargeRatioMA,
+          &EMREvent::SetChargeRatioMA, false);
+    RegisterValueBranch
+          ("total_charge_SA", &_double_proc, &EMREvent::GetTotalChargeSA,
+          &EMREvent::SetTotalChargeSA, false);
+    RegisterValueBranch
+          ("charge_ratio_SA", &_double_proc, &EMREvent::GetChargeRatioSA,
+          &EMREvent::SetChargeRatioSA, false);
 }
 }  // namespace MAUS
-
 

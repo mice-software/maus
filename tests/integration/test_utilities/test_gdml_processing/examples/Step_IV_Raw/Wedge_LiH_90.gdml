@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define/>
+    
+ <materials>
+     <isotope name="Li6" Z="3" N="6" formula="6Li">
+          <MEE value="6.015122" unit="eV"/>
+          <D value="0.534" unit="g/cm3"/>
+          <atom value="6.00" unit="g/mole"/>
+     </isotope>
+     <isotope name="Li7" Z="3" N="7" formula="7Li">
+          <MEE value="7.016004" unit="eV"/>
+          <D value="0.534" unit="g/cm3"/>
+          <atom value="7.00" unit="g/mole"/>
+     </isotope>
+     <element name="Li">
+          <fraction n="0.075" ref="Li6"/>
+          <fraction n="0.925" ref="Li7"/>
+     </element>
+     <element name="H" N="1" Z="1" formula="H">
+          <atom value="1.008" unit="g/mole"/>
+     </element>
+     <material name="LITHIUM_HYDRIDE">
+          <D value="0.78" unit="g/cm3"/>
+          <composite n="1" ref="Li"/>
+          <composite n="1" ref="H"/>
+     </material>
+ </materials>
+ <solids>
+    <tube rmax="160." z="400." lunit="mm" deltaphi="360" aunit="degree" name="Cylinder"/>
+    <trd x1="160.0" x2="160.0" y1="320.0" y2="0" z="160.0" name="Prism"/>
+    <intersection name="Wedge_solid">
+        <first ref="Prism"/>
+        <second ref="Cylinder"/>
+        <position name="BooleanModule1Pos" x="0.0" y="-122.3" z="0.0" unit="mm"/>
+        <rotation name="BooleanModule1Rot" x="90.0" y="0.0" z="0.0" unit="degree"/>
+    </intersection>
+ </solids>
+<structure>
+    <volume name="Wedge_LiH_90">
+        <materialref ref="LITHIUM_HYDRIDE"/>
+        <solidref ref="Wedge_solid"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BaseModule" auxvalue="Absorbers/Cylinder.dat"/>
+        <auxiliary auxtype="BooleanModule1" auxvalue="Absorbers/Prism.dat"/>
+        <auxiliary auxtype="BooleanModule1Type" auxvalue="Intersection"/>
+        <auxiliary auxtype="BooleanModule1Pos" auxvalue="0.0 -122.3 0.0 mm"/>
+        <auxiliary auxtype="BooleanModule1Rot" auxvalue="90. 0. 0. degree"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SpecialVirtual"/>
+    </volume>
+</structure>    
+
+<setup name="Default" version="1.0">
+    <world ref="Wedge_LiH_90"/>
+</setup>
+    
+    
+    
+</gdml>
