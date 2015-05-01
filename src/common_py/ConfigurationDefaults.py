@@ -285,7 +285,6 @@ SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker 
 SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
-SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160.
 SciFiParams_RMS = 370.
@@ -315,6 +314,16 @@ SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
 SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
 SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
 SciFiKalmanVerbose  = False # Dump information per fitted track
+SciFi_BG_VLPCRate = 0.015 #Percent noise channel
+SciFi_BG_RFAct = 10.0 # Mean number of activated channels per plane
+SciFiadcBits = 8.0 # Place holder for MC, will need to be replaced with calibration value
+SciFivlpcRes = 0.2  # Resolution of VLPC in NPE
+SciFi_BG_RFMag = 10.5 # Mean signal from RF noise in PE
+SciFi_BG_RFSDev = 1.0 # SDev in signal from RF in PE
+SciFiDisCut  = 1.5 
+SciFi_DiscOn = 0; # flag to turn on running with only discriminators
+SciFi_BG_VLPCOn = 1 # Sci Fi noise flag for VLPC thermal background simulation
+SciFi_BG_RFOn = 0 # Sci Fi noise flag for RF X-ray background simulation (experimental)
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
