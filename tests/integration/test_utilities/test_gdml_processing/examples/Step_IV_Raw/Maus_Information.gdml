@@ -1,0 +1,374 @@
+<?xml version="1.0"?>
+<MICE_Information xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:something">
+    <Configuration_Information>
+    </Configuration_Information>
+    <G4Field_Information>
+        <Dipole>
+            <FieldName name="D2"/>
+	    <GDMLElem name="Element_Step_25"/>
+	    <GDMLElem name="Element_Step_26"/>
+            <Position x="99.94" y="0.0" z="26.21"/>
+            <Rotation x="0" y="15.0" z="0.0" units="deg"/>
+            <ScaleFactor value="0.71415"/>
+            <Volume name="None"/>
+            <FieldType name="MagneticFieldMap"/>
+            <FieldMapMode name="Read"/>
+            <FileType name="g4bl3dGrid"/>
+            <FileName name="${MAUS_ROOT_DIR}/src/legacy/FILES/Models/Modules/BeamLine/B2_6inch.table"/>
+            <Symmetry name="Dipole"/>
+        </Dipole>
+        <Quadrupole>
+            <FieldName name="Q4"/>
+	    <GDMLElem name="Element_Step_1"/>
+	    <GDMLElem name="Element_Step_2"/>
+	    <GDMLElem name="Element_Step_3"/>
+	    <GDMLElem name="Element_Step_4"/>
+            <Position units="mm" x="0.0" y="4.99999998738e-07" z="1355.56"/>
+            <Rotation units="deg" x="0" y="0" z="0"/>
+            <ScaleFactor value="1"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" length="2.0" units="m" width="0.5"/>
+            <FieldStrength units="T/m" value="0.908"/>
+            <Pole value="2"/>
+            <MaxEndPole value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength units="m" value="0.12528"/>
+            <CentreLength units="m" value="0.523"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q5"/>
+	    <GDMLElem name="Element_Step_9"/>
+	    <GDMLElem name="Element_Step_10"/>
+	    <GDMLElem name="Element_Step_11"/>
+	    <GDMLElem name="Element_Step_12"/>
+            <Position units="mm" x="0.0" y="4.99999998738e-07" z="2515.56"/>
+            <Rotation units="deg" x="0" y="0" z="90"/>
+            <ScaleFactor value="1"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" length="2.0" units="m" width="0.5"/>
+            <FieldStrength units="T/m" value="1.218"/>
+            <Pole value="2"/>
+            <MaxEndPole value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength units="m" value="0.12528"/>
+            <CentreLength units="m" value="0.523"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q6"/>
+	    <GDMLElem name="Element_Step_5"/>
+	    <GDMLElem name="Element_Step_6"/>
+	    <GDMLElem name="Element_Step_7"/>
+	    <GDMLElem name="Element_Step_8"/>
+            <Position units="mm" x="0.0" y="4.99999998738e-07" z="3675.56"/>
+            <Rotation units="deg" x="0" y="0" z="0"/>
+            <ScaleFactor value="1"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" length="2.0" units="m" width="0.5"/>
+            <FieldStrength units="T/m" value="0.807"/>
+            <Pole value="2"/>
+            <MaxEndPole value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength units="m" value="0.12528"/>
+            <CentreLength units="m" value="0.523"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q7"/>
+	    <GDMLElem name="Element_Step_13"/>
+	    <GDMLElem name="Element_Step_14"/>
+	    <GDMLElem name="Element_Step_15"/>
+	    <GDMLElem name="Element_Step_16"/>
+            <Position units="mm" x="0.0" y="4.99999998738e-07" z="8987.66"/>
+            <Rotation units="deg" x="0" y="0" z="0"/>
+            <ScaleFactor value="1"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" length="2.0" units="m" width="0.5"/>
+            <FieldStrength units="T/m" value="0.797"/>
+            <Pole value="2"/>
+            <MaxEndPole value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength units="m" value="0.12528"/>
+            <CentreLength units="m" value="0.523"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q8"/>
+	    <GDMLElem name="Element_Step_17"/>
+	    <GDMLElem name="Element_Step_18"/>
+	    <GDMLElem name="Element_Step_19"/>
+	    <GDMLElem name="Element_Step_20"/>
+            <Position units="mm" x="0.0" y="4.99999998738e-07" z="10147.66"/>
+            <Rotation units="deg" x="0" y="0" z="90.0"/>
+            <ScaleFactor value="1"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" length="2.0" units="m" width="0.5"/>
+            <FieldStrength units="T/m" value="1.205"/>
+            <Pole value="2"/>
+            <MaxEndPole value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength units="m" value="0.12528"/>
+            <CentreLength units="m" value="0.523"/>
+        </Quadrupole>
+        <Quadrupole>
+            <FieldName name="Q9"/>
+	    <GDMLElem name="Element_Step_21"/>
+	    <GDMLElem name="Element_Step_22"/>
+	    <GDMLElem name="Element_Step_23"/>
+	    <GDMLElem name="Element_Step_24"/>
+            <Position units="mm" x="0.0" y="4.99999998738e-07" z="11307.66"/>
+            <Rotation units="deg" x="0" y="0" z="0"/>
+            <ScaleFactor value="1"/>
+            <Volume name="None"/>
+            <FieldType name="Multipole"/>
+            <Dimensions height="0.5" length="2.0" units="m" width="0.5"/>
+            <FieldStrength units="T/m" value="1.029"/>
+            <Pole value="2"/>
+            <MaxEndPole value="4"/>
+            <EndFieldType name="Tanh"/>
+            <EndLength units="m" value="0.12528"/>
+            <CentreLength units="m" value="0.523"/>
+        </Quadrupole>
+	<Solenoid>
+	    <FieldName name="MatchCoil2_0"/>
+	    <GDMLElem name="Element_Step_29"/>
+	    <Position units="mm" x="0.0" y="0.0" z="15655.45"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/match2.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="197."/>
+            <Thickness value="26.4"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="132."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="CenterCoil_0"/>
+	    <GDMLElem name="Element_Step_27"/>
+	    <Position units="mm" x="0.0" y="0.0" z="14505.465"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/center.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="1294."/>
+            <Thickness value="22."/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="148."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="EndCoil1_0"/>
+	    <GDMLElem name="Element_Step_28"/>
+	    <Position units="mm" x="0.0" y="0.0" z="15255.45"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/end1.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="110."/>
+            <Thickness value="61.6"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="126."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="EndCoil2_0"/>
+	    <GDMLElem name="Element_Step_31"/>
+	    <Position units="mm" x="0.0" y="0.0" z="13755.46"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/end2.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="110."/>
+            <Thickness value="68.2"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="133."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="MatchCoil1_0"/>
+	    <GDMLElem name="Element_Step_30"/>
+	    <Position units="mm" x="0.0" y="0.0" z="16095.095"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/match1.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="198."/>
+            <Thickness value="52.8"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="113."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="MatchCoil2_1"/>
+	    <GDMLElem name="Element_Step_34"/>
+	    <Position units="mm" x="0.0" y="0.0" z="18256.03"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/match2.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="197."/>
+            <Thickness value="26.4"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="-132."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="CenterCoil_1"/>
+	    <GDMLElem name="Element_Step_32"/>
+	    <Position units="mm" x="0.0" y="0.0" z="19406.015"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/center.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="1294."/>
+            <Thickness value="22."/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="-148."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="EndCoil1_1"/>
+	    <GDMLElem name="Element_Step_33"/>
+	    <Position units="mm" x="0.0" y="0.0" z="18656.03"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/end1.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="110."/>
+            <Thickness value="61.6"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="-126."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="EndCoil2_1"/>
+	    <GDMLElem name="Element_Step_36"/>
+	    <Position units="mm" x="0.0" y="0.0" z="20156.02"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/end2.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="110."/>
+            <Thickness value="68.2"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="-133."/>
+        </Solenoid>
+	<Solenoid>
+	    <FieldName name="MatchCoil1_1"/>
+	    <GDMLElem name="Element_Step_35"/>
+	    <Position units="mm" x="0.0" y="0.0" z="17816.385"/>
+	    <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+	    <FileName name="${MAUS_ROOT_DIR}/tmp/match1.fld"/>
+	    <CurrentDensity value="1."/>
+            <Length value="198."/>
+            <Thickness value="52.8"/>
+            <InnerRadius value="258."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+	    <ScaleFactor name="-113."/>
+        </Solenoid>
+        <Solenoid>
+            <FieldName name="FCoil_0"/>
+	    <GDMLElem name="Element_Step_37"/>
+            <Position units="mm" x="0.0" y="0.0" z="16753.54"/>
+            <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+            <FileName name="${MAUS_ROOT_DIR}/tmp/focus.fld"/>
+            <CurrentDensity value="1."/>
+            <Length value="210."/>
+            <Thickness value="84."/>
+            <InnerRadius value="263."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+            <ScaleFactor name="104."/>
+        </Solenoid>
+        <Solenoid>
+            <FieldName name="FCoil_1"/>
+	    <GDMLElem name="Element_Step_38"/>
+            <Position units="mm" x="0.0" y="0.0" z="17157.94"/>
+            <Rotation units="mm" x="0" y="0" z="0"/>
+            <Volume name="None"/>
+            <FieldType name="Solenoid"/>
+            <FileName name="${MAUS_ROOT_DIR}/tmp/focus.fld"/>
+            <CurrentDensity value="1."/>
+            <Length value="210."/>
+            <Thickness value="84."/>
+            <InnerRadius value="263."/>
+            <FieldTolerance units="tesla" value="1e-4"/>
+            <ScaleFactor name="-104."/>
+        </Solenoid>
+    </G4Field_Information>
+    <Detector_Information>
+        <TOF>
+          <TOF0 gdml_posref="posRef_1"/>
+          <TOF1 gdml_posref="posRef_2"/>
+          <TOF2 gdml_posref="posRef_4"/>
+	</TOF>
+        <KL gdml_posref="posRef_5"/>
+    <Cherenkov>
+	  <Ckov1 gdml_posref="posRef_10"/>
+	  <Ckov2 gdml_posref="posRef_12"/>
+	</Cherenkov>
+        <Tracker>
+            <Tracker0 gdml_posref="posRef_8"/>
+            <Tracker1 gdml_posref="posRef_9"/>
+        </Tracker>
+	<Disk_LiH gdml_posref="posRef_7"/>
+	<EMR gdml_posref="posRef_6"/>
+	<Diffuser>
+	    <Iris name="1"/>
+	    <Position units="mm" x="0.0" y="0.0" z="13689.74"/>
+	    <Rotation units="degree" x="0.0" y="0.0" z="0.0"/>
+	</Diffuser>
+	<Diffuser>
+	    <Iris name="2"/>
+	    <Position units="mm" x="0.0" y="0.0" z="13721.14"/>
+	    <Rotation units="degree" x="0.0" y="0.0" z="0.0"/>
+	</Diffuser>
+	<Diffuser>
+	    <Iris name="3"/>
+	    <Position units="mm" x="0.0" y="0.0" z="13746.44"/>
+	    <Rotation units="degree" x="0.0" y="0.0" z="0.0"/>
+	</Diffuser>
+	<Diffuser>
+	    <Iris name="4"/>
+	    <Position units="mm" x="0.0" y="0.0" z="13766.74"/>
+	    <Rotation units="degree" x="0.0" y="0.0" z="0.0"/>
+	</Diffuser>
+    </Detector_Information>
+    <Other_Information><GDML_Files location="/afs/phas.gla.ac.uk/user/r/rbayes/MICE/maus-g4.9.6/files/geometry/download"/><G4StepMax Value="5.0"/>
+        <Module name="Dipole2" zmin="-100.0" zmax="141.0" unit="mm"/>
+        <Module name="Quad456" zmin="1342.0" zmax="4711.0" unit="mm"/>
+        <Module name="Quad789" zmin="8975" zmax="12342.8" unit="mm"/>        
+        <Module name="SolenoidUS" zmin="13402.74" zmax="16477.74" unit="mm"/>
+        <Module name="AFC" zmin="16477.74" zmax="17433.74" unit="mm"/>
+        <Module name="SolenoidDS" zmin="17433.74" zmax="20451.74" unit="mm"/>
+	<FileNumbers>
+            <Tof0FileNumber number="Iges_10" replacement="TOF0.dat"/>
+            <Tof1FileNumber number="Iges_11" replacement="TOF1.dat"/>
+            <Tof2FileNumber number="Iges_13" replacement="TOF2.dat"/>
+            <Ckov1FileNumber number="Iges_19" replacement="Ckov1.dat"/>
+            <Ckov2FileNumber number="Iges_21" replacement="Ckov2.dat"/>
+            <KLFileNumber number="Iges_14" replacement="KL.dat"/>
+            <Tracker0FileNumber number="Iges_17" replacement="Tracker0.dat"/>
+            <Tracker1FileNumber number="Iges_18" replacement="Tracker1.dat"/>
+            <EMRFileNumber number="Iges_15"/>
+            <Absorber0FileNumber number="9999"/>
+            <Absorber1FileNumber number="Iges_16" replacement="Disk_LiH.dat"/>
+            <Absorber2FileNumber number="9999"/>
+        </FileNumbers></Other_Information>
+</MICE_Information>

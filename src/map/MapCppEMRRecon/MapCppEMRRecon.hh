@@ -37,6 +37,8 @@
 
 // MAUS
 #include "Utils/EMRChannelMap.hh"
+#include "Utils/EMRCalibrationMap.hh"
+#include "Utils/EMRAttenuationMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
@@ -56,16 +58,17 @@ typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
 typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
 typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
 
-struct fADCdata {
+struct fADCdata_er {
   int    _orientation;
   double _charge;
+  double _charge_corrected;
   double _pedestal_area;
   int    _time;
   std::vector<int> _samples;
 };
 
-typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
-typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
+typedef std::vector<fADCdata_er>                EMRfADCPlaneHitsVector_er;/* 48 elements */
+typedef std::vector<EMRfADCPlaneHitsVector_er>  EMRfADCEventVector_er;/* nTr elements */
 
 struct TrackData {
   double _range_primary;
@@ -73,6 +76,10 @@ struct TrackData {
   double _secondary_to_primary_track_distance;
   bool _has_primary;
   bool _has_secondary;
+  double _total_charge_ma;
+  double _total_charge_sa;
+  double _charge_ratio_ma;
+  double _charge_ratio_sa;
 };
 
 typedef std::vector<TrackData> EMRTrackEventVector;
@@ -105,44 +112,57 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 
   void process_preselected_events(MAUS::Spill *spill,
 				  EMRDBBEventVector& emr_dbb_events_tmp,
-				  EMRfADCEventVector& emr_fadc_events_tmp) const;
+				  EMRfADCEventVector_er& emr_fadc_events_tmp) const;
 
   void process_secondary_events(EMRDBBEventVector emr_dbb_events_tmp,
-			        EMRfADCEventVector emr_fadc_events_tmp,
+			        EMRfADCEventVector_er emr_fadc_events_tmp,
 			        EMRDBBEventVector *emr_dbb_events,
-			        EMRfADCEventVector& emr_fadc_events,
+			        EMRfADCEventVector_er& emr_fadc_events,
 			        EMRTrackEventVector& emr_track_events) const;
 
   void tot_cleaning(int nPartEvents,
 		    EMRDBBEventVector *emr_dbb_events,
-		    EMRfADCEventVector& emr_fadc_events,
+		    EMRfADCEventVector_er& emr_fadc_events,
 		    EMRTrackEventVector& emr_track_events) const;
 
   void coordinates_reconstruction(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
-				  EMRfADCEventVector& emr_fadc_events,
-				  EMRTrackEventVector& emr_track_events) const;
+				  EMRfADCEventVector_er& emr_fadc_events) const;
+
+  void energy_correction(int nPartEvents,
+			 EMRDBBEventVector *emr_dbb_events,
+			 EMRfADCEventVector_er& emr_fadc_events) const;
 
   void track_matching(int nPartEvents,
 		      EMRDBBEventVector *emr_dbb_events,
-		      EMRfADCEventVector& emr_fadc_events,
+		      EMRfADCEventVector_er& emr_fadc_events,
 		      EMRTrackEventVector& emr_track_events) const;
+
+  void event_charge_calculation(int nPartEvents,
+				EMRDBBEventVector *emr_dbb_events,
+				EMRfADCEventVector_er& emr_fadc_events,
+				EMRTrackEventVector& emr_track_events) const;
 
   void fill(Spill *spill,
 	    int nPartEvents,
 	    EMRDBBEventVector *emr_dbb_events,
-	    EMRfADCEventVector& emr_fadc_events,
+	    EMRfADCEventVector_er& emr_fadc_events,
 	    EMRTrackEventVector& emr_track_events) const;
 
-//  void event_charge_calculation()
-
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
-  EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
+  EMRfADCEventVector_er get_fadc_data_tmp(int nPartEvts) const;
   EMRTrackEventVector get_track_data_tmp(int nPartEvts) const;
+
+  // Maps
+  EMRCalibrationMap _calibMap;
+  EMRAttenuationMap _attenMap;
 
   // Detector parameters
   int _number_of_planes;
   int _number_of_bars;
+  double _bar_width;
+  double _bar_height;
+  double _gap;
 
   // Configuration variables
   int _secondary_hits_bunching_distance;
@@ -155,6 +175,12 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   int _secondary_trigger_minNhits;
   int _secondary_trigger_minTot;
   int _max_secondary_to_primary_track_distance;
+
+  // Charge reconstruction variables
+  double _tot_func_p1;
+  double _tot_func_p2;
+  double _tot_func_p3;
+  double _tot_func_p4;
 };
 }
 

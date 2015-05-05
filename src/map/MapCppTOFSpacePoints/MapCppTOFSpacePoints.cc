@@ -241,6 +241,15 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
                                        Json::Value xDocPartEvent,
                                        std::vector<int> xPlane0Hits,
                                        std::vector<int> xPlane1Hits) const {
+  // set the station numbering
+  int tStn = -1;
+  if (_triggerStation == "tof0")
+      tStn = 0;
+  else if (_triggerStation == "tof1")
+      tStn = 1;
+  else if (_triggerStation == "tof2")
+      tStn = 2;
+
   // Loop over all possible combinations of slab hits in the trigger station.
   for (unsigned int nX = 0; nX < xPlane0Hits.size(); nX++) {
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {
@@ -255,7 +264,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
 
       int slabX = xSlabHit_X["slab"].asInt();
       int slabY = xSlabHit_Y["slab"].asInt();
-      TOFPixelKey xTriggerPixelKey(1, slabX, slabY, _triggerStation);
+      TOFPixelKey xTriggerPixelKey(tStn, slabX, slabY, _triggerStation);
       // Apply the calibration corrections assuming that this pixel gives the
       // trigger. If this assumption is correct the value of the time after the
       // corrections has to be approximately 0.

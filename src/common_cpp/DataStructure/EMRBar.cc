@@ -31,6 +31,7 @@ EMRBar& EMRBar::operator=(const EMRBar& _emrbar) {
     if (this == &_emrbar) {
         return *this;
     }
+
     SetBar(_emrbar._bar);
 
     SetBar(_emrbar._bar);

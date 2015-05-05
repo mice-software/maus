@@ -90,7 +90,7 @@ class InputCppDAQData : public InputBase<std::string> {
   *
   * \return JSON document containing the unpacked DAQ data.
   */
-  void getCurEvent(MAUS::Data *data);
+  int getCurEvent(MAUS::Data *data);
 
   /** Disable one equipment type.
   * This disables the unpacking of the data produced by all equipment

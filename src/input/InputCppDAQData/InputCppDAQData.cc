@@ -82,19 +82,8 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   // Comfigure the DBB Chain (chain of 6 EMR boards) data processor.
   initProcessor(_DBBChainFragmentProc_cpp, configJSON);
 
-
-  assert(configJSON.isMember("DAQ_cabling_file"));
-  std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
-  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  if (!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable."
-    << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
-  }
-
-  // Initialize the map by using text file.
-  bool loaded = _map.InitFromFile(std::string(pMAUS_ROOT_DIR) + map_file_name);
+  // Initialize the map from data cards
+  bool loaded = _map.InitFromCards(configJSON);
   if (!loaded) {
     throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }
@@ -113,11 +102,12 @@ bool InputCppDAQData::readNextEvent() {
   return false;
 }
 
-void InputCppDAQData::getCurEvent(MAUS::Data *data) {
+int InputCppDAQData::getCurEvent(MAUS::Data *data) {
   MAUS::Spill* spill = data->GetSpill();
+  int nPartEvts(0);
   try {
     // Do the loop over the binary DAQ data.
-    _dataProcessManager.Process(_eventPtr);
+    nPartEvts = _dataProcessManager.Process(_eventPtr);
     // The data is now processed and is ready to be filled.
     unsigned int event_type = _dataProcessManager.GetEventType();
     spill->SetDaqEventType(event_type_to_str(event_type));
@@ -169,11 +159,13 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     MAUS::ErrorsMap errors = spill->GetErrors();
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
+
+    return 0;
   }
   catch (Exception exc) {
     Squeak::mout(Squeak::error) << exc.GetLocation() << ": "
     << exc.GetMessage() << std::endl
-    << "*** MAUS exception in void  "
+    << "*** MAUS exception in "
     << "InputCppDAQData::getCurEvent(MAUS::Data *data) : " << std::endl;
     Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
 
@@ -187,7 +179,7 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
   catch (std::exception & lExc) {
     Squeak::mout(Squeak::error) << lExc.what() << std::endl
     << "*** Standard exception in "
-    << "void InputCppDAQData::getCurEvent(MAUS::Data *data) : " << std::endl;
+    << "InputCppDAQData::getCurEvent(MAUS::Data *data) : " << std::endl;
     Squeak::mout(Squeak::error) <<"DAQ Event skipped!" << std::endl << std::endl;
 
     std::stringstream ss;
@@ -198,7 +190,7 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     spill->SetErrors(errors);
   }
   catch (...) {
-    Squeak::mout(Squeak::error) << "*** void InputCppDAQData::getCurEvent(MAUS::Data *data) : "
+    Squeak::mout(Squeak::error) << "*** InputCppDAQData::getCurEvent(MAUS::Data *data) : "
     << "Unknown exception occurred." << std::endl;
     Squeak::mout(Squeak::error) << "DAQ Event skipped!" << std::endl << std::endl;
 
@@ -210,6 +202,8 @@ void InputCppDAQData::getCurEvent(MAUS::Data *data) {
     spill->SetErrors(errors);
   }
   this->resetAllProcessors();
+
+  return nPartEvts;
 }
 
 std::string InputCppDAQData::getCurEvent() {

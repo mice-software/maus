@@ -36,6 +36,7 @@
 #include <algorithm>
 
 // MAUS
+#include "Utils/EMRChannelMap.hh"
 #include "Utils/EMRCalibrationMap.hh"
 #include "Utils/EMRAttenuationMap.hh"
 #include "DataStructure/Data.hh"
@@ -58,7 +59,6 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TSystem.h"
-#include "TString.h"
 #include "TRandom3.h"
 #include "TH1F.h"
 

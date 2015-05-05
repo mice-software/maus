@@ -23,6 +23,8 @@ CONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileTranlsation.xsl"
 CONFIGXSL2 = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileTranslation.xsl"
+MINCONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
+        "/src/common_py/geometry/xsltScripts/ParentFileCreation.xsl"
 TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
          "/src/common_py/geometry/xsltScripts/CoolingChannelTranslation.xsl"
 MODULEXSL = os.environ["MAUS_ROOT_DIR"] + \
@@ -107,8 +109,8 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
                and fname.find('CoolingChannelInfo') < 0 \
                and fname[-5:] == '.gdml' \
                and fname.find('Step_IV') < 0 \
-               and fname.find('TrackerSolenoidUS') < 0\
-               and fname.find('TrackerSolenoidDS') < 0\
+               and fname.find('SolenoidUS') < 0\
+               and fname.find('SolenoidDS') < 0\
                and fname.find('Cooling_Channel') < 0\
                and fname.find('Quad456') < 0\
                and fname.find('Quad789') < 0\
@@ -193,6 +195,8 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
                     step_file.translate_gdml()
                 else:
                     step_file.parse_xslt()
+                # if file_name.find('Tracker') >= 0:
+                #     step_file.TrackerPlaneParametrization()
                 step_file = None
                 os.remove(self.step_files[num])
                 print "Converting " + str(num+1) + \
@@ -200,6 +204,62 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
             
             
             os.remove(self.config_file)
+            print "Files saved to " + str(output)
+
+    def generate_parent(self, output): #pylint: disable = R0914
+        """
+        @method generate_parent This method generates a parent file
+        
+        This method applies the necessary XSLT scripts to the GDMLs.
+                
+        @param Output This is the path to the directory where you wish the MAUS 
+                      Modules to be placed. 
+        """
+        if os.path.exists(output) == False:
+            raise IOError('Output path doesnt exist '+str(output))
+        else:
+            outputfile1 = os.path.join(output, "ParentGeometryFile.dat")
+            # outputfile3 = os.path.join(output, "RotatedGeometryFile.dat")
+            
+            config_file = CADImport(xmlin1 = str(self.maus_information_file), \
+                                    xsl = str(MINCONFIGXSL), \
+                                    output = str(outputfile1))
+            config_file.parse_xslt()
+            print "Applying minimal config file translation"
+            # rotated_file = CADImport(xmlin1 = str(self.config_file), \
+            #         xsl = str(ROTATEDXSL), output = str(outputfile3))
+            # rotated_file.parse_xslt()
+            
+            print "Configuration File Converted"
+            length = len(self.module_files)
+            for fnum in range(0, length):
+                found_file = str(self.module_files[fnum])
+                print found_file
+                new_string = found_file.split('/')
+                file_name = new_string[-1]
+                outputfile = output + '/' + file_name[:-4] + 'dat'
+                module_file = CADImport(xmlin1 = str(self.module_files[fnum]), \
+                                        xsl = str(MODULEXSL), \
+                                        output = str(outputfile))
+                module_file.parse_xslt()
+                module_file = None
+
+            length = len(self.step_files)
+            for num in range(0, length):
+                found_file = str(self.step_files[num])
+                new_string = found_file.split('/')
+                num_of_splits = len(new_string)
+                file_name = num_of_splits - 1
+                file_name = new_string[file_name]
+                outputfile = output + '/' + file_name[:-4] + 'dat'
+                step_file = CADImport(xmlin1 = str(self.step_files[num]), \
+                                      xsl = str(MM_XSL), \
+                                      output = str(outputfile))
+                for det_file in DET_GDML:
+                    if file_name == det_file:
+                        step_file.translate_gdml()
+                # ignore all other step files.
+                        
             print "Files saved to " + str(output)
 
 def main():

@@ -58,6 +58,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # removed geant 4.9.2
     #${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
     # added for geant 4.9.6
+    ${MAUS_ROOT_DIR}/third_party/bash/28xercesc.bash
     ${MAUS_ROOT_DIR}/third_party/bash/29expat.bash
     ${MAUS_ROOT_DIR}/third_party/bash/32clhep2.1.1.0.bash
     ${MAUS_ROOT_DIR}/third_party/bash/35geant4.9.6.bash -j $MAUS_NUM_THREADS
