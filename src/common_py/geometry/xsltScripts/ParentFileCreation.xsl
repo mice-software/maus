@@ -35,7 +35,7 @@
                             //Substitutions
                             <xsl:variable name="run_number" select="MICE_Information/Configuration_Information/run/@runNumber"/>
 		            <xsl:variable name="diffuserThickness" select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
-			    <xsl:variable name="mcmode" select="MICE_Information/Configuration_Information/coolingchannel/magnets/magnet/@mode"/>
+			    <xsl:variable name="mcmode" select="MICE_Information/Configuration_Information/coolingchannel/magnets"/>
                             <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run/@beamStop, 'false') or contains(MICE_Information/Configuration_Information/run/@beamStop, 'true')">
                             Substitution $beamStop <xsl:value-of select="MICE_Information/Configuration_Information/run/@beamStop"/>
                             
@@ -293,7 +293,7 @@
                                 <xsl:when test="contains(FieldName/@name, 'CenterCoil_1') and boolean($mcmode)">$SSDCPolarity * $FCMMode * $SSDC</xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'EndCoil1_1') and boolean($mcmode)">$SSDT1Polarity * $FCMMode * $SSDT1</xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'EndCoil2_1') and boolean($mcmode)">$SSDT2Polarity * $FCMMode * $SSDT2</xsl:when>
-				<xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
+				<xsl:otherwise><xsl:value-of select="ScaleFactor/@name"/></xsl:otherwise>
                             </xsl:choose>
                             }
                 </xsl:for-each>
