@@ -30,7 +30,7 @@ from geometry.GDMLPacker import Unpacker
 GDML_CACHE = 'gdml'
 TMP_CACHE = 'tmp'
 
-def main(): # pylint: disable = C0103
+def main(): # pylint: disable = C0103, R0912
     """
     This is the code for the executable file which downloads the current valid
     geometry. It takes the arguments of the download directory. It will download
@@ -55,6 +55,22 @@ def main(): # pylint: disable = C0103
     elif configuration.geometry_download_by == "current":
         geometry_downloader.download_current(gdml_cache)
     elif configuration.geometry_download_by == "id":
+        if configuration.download_beamline_for_run != 0:
+            geometry_downloader.download_beamline_for_run\
+                                (configuration.download_beamline_for_run,\
+                                 gdml_cache)
+        elif configuration.download_beamline_tag != "":
+            geometry_downloader.download_beamline_for_tag\
+                                (configuration.download_beamline_tag,
+                                 gdml_cache)
+        else:
+            print "Default beamline currents will be used."
+        if configuration.download_coolingchannel_tag != "":
+            geometry_downloader.download_coolingchannel_for_tag\
+                                (configuration.download_coolingchannel_tag,
+                                 gdml_cache)
+        else:
+            print "Default MICE Channel currents will be used."
         geometry_downloader.download_geometry_by_id \
                                 (configuration.geometry_download_id, gdml_cache)
     else:

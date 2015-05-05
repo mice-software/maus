@@ -29,7 +29,10 @@
 #include <algorithm>
 #include <fstream>
 
+#include "json/json.h"
+#include "unpacking/MDfileManager.h"
 #include "Utils/Exception.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 
@@ -108,9 +111,15 @@ class DAQChannelMap {
  * \returns true if the map is initialized successfully.
  */
   bool InitFromFile(std::string filename);
+  bool InitFromCards(Json::Value configJSON);
 
   /// Not implemented.
   bool InitFromCDB();
+
+  // date file manager
+  MDfileManager _dataFileManager;
+  std::string _datafiles;
+  bool is_number(const std::string& s);
 
  /** Return pointer to the key.
  * This function returns pointer to the key for the required DAQ channel.
