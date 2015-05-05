@@ -160,7 +160,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 if filename.find(self.path_in) == -1:
                     # add the path to the name
                     newname = os.path.join(self.path_in, filename)
-                    print "Replacing ", filename, " with ", newname
+                    # print "Replacing ", filename, " with ", newname
                     filenode.setProp("name", newname)
         gfile = open(os.path.join(self.path_out, gdmlfile),'w')
         xmldoc.saveTo(gfile)
@@ -287,9 +287,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         """
         self.add_other_info()
         config = minidom.parse(os.path.join(self.path_out, gdmlfile))
-        print "config file ", os.path.join(self.path_out, gdmlfile)
-        print "information file ", os.path.join(self.path_out, \
-                                                self.maus_information_file)
+        # print "config file ", os.path.join(self.path_out, gdmlfile)
+        # print "information file ", os.path.join(self.path_out, \
+        #                                         self.maus_information_file)
         maus_information = minidom.parse(os.path.join(self.path_out, \
                                                     self.maus_information_file))
         for node in maus_information.getElementsByTagName("MICE_Information"):
