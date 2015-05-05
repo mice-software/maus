@@ -289,7 +289,7 @@
                                 <xsl:when test="contains($QuadName, 'Q7') and boolean($run_number)">$Q7Polarity*$Q7Current/174.0</xsl:when>
                                 <xsl:when test="contains($QuadName, 'Q8') and boolean($run_number)">$Q8Polarity*$Q8Current/174.0</xsl:when>
                                 <xsl:when test="contains($QuadName, 'Q9') and boolean($run_number)">$Q9Polarity*$Q9Current/174.0</xsl:when>
-                                <xsl:otherwise><xsl:value-of select="FieldStrength/@value"/></xsl:otherwise>
+                                <xsl:otherwise><xsl:value-of select="FieldStrength/@name"/></xsl:otherwise>
                             </xsl:choose><xsl:text> </xsl:text><xsl:value-of select="FieldStrength/@units"/>
                             PropertyInt Pole <xsl:value-of select="Pole/@value"/>
                             PropertyInt MaxEndPole <xsl:value-of select="MaxEndPole/@value"/>
