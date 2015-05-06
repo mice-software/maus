@@ -71,10 +71,10 @@ namespace MAUS {
 
     for (unsigned int i =0; i < _hypotheses.size(); ++i) {
       // vector of pid vars
-      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
+      /*_pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
         						   _hypotheses[i]));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
-                                                         _hypotheses[i]));
+      _hypotheses[i]));*/
       _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
                                                            _hypotheses[i]));
       // etc.
@@ -112,7 +112,9 @@ namespace MAUS {
 	       ++track_i) {
 	    MAUS::DataStructure::Global::Track* track =
 	      GlobalTrackArray->at(track_i);
-	    if (track->get_mapper_name() != "MapCppGlobalTrackMatching") continue;
+	    if (track->get_mapper_name() != "MapCppGlobalTrackMatching-US" ||
+		track->get_mapper_name() != "MapCppGlobalTrackMatching-DS")
+	      continue;
 	    //int recon_track_pid = track->get_pid();
 	    MAUS::DataStructure::Global::Track* pidtrack = track->Clone();
 	    global_event->add_track_recursive(pidtrack);
