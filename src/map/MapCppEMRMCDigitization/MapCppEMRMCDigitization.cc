@@ -151,10 +151,10 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
       for (int iHit = 0; iHit < nHits; iHit++) {
 	EMRHit hit = hits->at(iHit);
 
-	int time = static_cast<int>(hit.GetTime()); // ns
+	double time = hit.GetTime(); // ns
 	double delta_t = time - pTime;
 
-        delta_t_array.push_back(delta_t);
+        if (delta_t > 0) delta_t_array.push_back(delta_t);
       }
     }
   }

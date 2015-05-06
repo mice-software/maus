@@ -352,7 +352,7 @@ void MapCppEMRRecon::tot_cleaning(int nPartEvents,
       int nHits = 0;
 
       for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-  	nHits = nHits + emr_dbb_events[0][iPe][iPlane][iBar].size();
+  	nHits += emr_dbb_events[0][iPe][iPlane][iBar].size();
       }
       if (nHits && iPlane % 2 == 0) xPlaneHits++;
       if (nHits && iPlane % 2 == 1) yPlaneHits++;
@@ -880,7 +880,7 @@ void MapCppEMRRecon::fill(Spill *spill,
     EMRPlaneHitArray plArray;
 
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      int xOri  = emr_fadc_events[iPe][iPlane]._orientation;
+      int xOri = emr_fadc_events[iPe][iPlane]._orientation;
       double xCharge = emr_fadc_events[iPe][iPlane]._charge;
       double xChargeCorrected = emr_fadc_events[iPe][iPlane]._charge_corrected;
       int xArrivalTime = emr_fadc_events[iPe][iPlane]._time;
@@ -937,9 +937,8 @@ void MapCppEMRRecon::fill(Spill *spill,
     evt->SetChargeRatioMA(emr_track_events[iPe]._charge_ratio_ma);
     evt->SetChargeRatioSA(emr_track_events[iPe]._charge_ratio_sa);
 
-    if (iPe < nPartEvents-2) evt->SetInitialTrigger(true);
-    else
-      evt->SetInitialTrigger(false);
+    // All the noise and unmatched secondaries are dumped, only initial triggers are kept
+    evt->SetInitialTrigger(true);
 
     // std::cerr << "************************************************" << std::endl;
     // std::cerr << "range_primary = " << emr_track_events[iPe]._range_primary << std::endl;
