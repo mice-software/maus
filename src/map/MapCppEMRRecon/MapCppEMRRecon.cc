@@ -661,7 +661,11 @@ void MapCppEMRRecon::track_matching(int nPartEvents,
 
   int nTotalPartEvents = emr_fadc_events.size();
 
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+  for (int iPe = 0; iPe < nPartEvents-2; iPe++) {
+
+    // Skip the events without a primary track
+    if (!emr_track_events[iPe]._has_primary) continue;
+
     // Range calculation of primary tracks
     double x1(-1.0), y1(-1.0), z1(-1.0);
     double x2(-1.0), y2(-1.0), z2(-1.0);
@@ -770,6 +774,9 @@ void MapCppEMRRecon::event_charge_calculation(int nPartEvents,
 					      EMRTrackEventVector& emr_track_events) const {
 
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
+
+    // Skip the events without a primary track
+    if (!emr_track_events[iPe]._has_primary) continue;
 
     // Reconstrcut total charge deposited by the primary particle
     double total_charge_ma = 0.0;
