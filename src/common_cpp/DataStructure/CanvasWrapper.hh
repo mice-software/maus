@@ -38,7 +38,7 @@ class CanvasWrapper {
     CanvasWrapper& operator=(const CanvasWrapper& data);
 
     /** Deletes the canvas */
-    ~CanvasWrapper();
+    virtual ~CanvasWrapper();
 
     /** Set the canvas description */
     void SetDescription(std::string description) {_description = description;}

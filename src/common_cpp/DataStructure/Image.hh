@@ -45,7 +45,7 @@ class Image {
     Image& operator=(const Image& data);
 
     /** Deletes the image data */
-    ~Image();
+    virtual ~Image();
 
     /** Set the run number */
     void SetRunNumber(int run_number) {_run_number = run_number;}
