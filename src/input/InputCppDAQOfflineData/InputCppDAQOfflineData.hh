@@ -39,6 +39,15 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   */
   InputCppDAQOfflineData();
 
+  /** Read the next event from the file into memory.
+  *
+  * This function simply reads an event into memory,
+  * it doesn't unpack the event anymore than required to read it.
+  *
+  * \return True if an event was read ready for unpacking.
+  */
+  bool readNextEvent();
+
  private:
 
   /** Initialise the Unpacker.
@@ -48,15 +57,6 @@ class InputCppDAQOfflineData : public InputCppDAQData {
   * \return True if at least one file was opened sucessfully.
   */
   void _birth(const std::string& pJSONConfig);
-
-  /** Read the next event from the file into memory.
-  *
-  * This function simply reads an event into memory,
-  * it doesn't unpack the event anymore than required to read it.
-  *
-  * \return True if an event was read ready for unpacking.
-  */
-  bool readNextEvent();
 
   /** File manager object. */
   MDfileManager _dataFileManager;

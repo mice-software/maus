@@ -118,6 +118,7 @@ class CADImport: #pylint: disable = R0903, C0103
         This method will execute an XSLT stylesheet and produce either a text
         or another XML(GDML) according to the request.
         """
+        print self.xml_in_1, self.xsl, self.output
         styledoc = libxml2.parseFile(self.xsl)
         style = libxslt.parseStylesheetDoc(styledoc)
         doc = libxml2.parseFile(self.xml_in_1)
@@ -411,6 +412,7 @@ class CADImport: #pylint: disable = R0903, C0103
         # loop over all volumes in the datafile to find the target volume
         system = datafile.xpathEval("gdml/structure/volume")
         for vol in system:
+            foundSensDet = ''
             if vol.prop('name') == moduleName:
                 # find the reference to the solid used to generate the volume
                 solid      = vol.xpathEval("solidref")[0].prop('ref')
@@ -430,6 +432,7 @@ class CADImport: #pylint: disable = R0903, C0103
                 
                 unit = "cm"
                 # Get the auxilary elements of the volume
+                
                 for elem in aux:
                     elemtype, value = \
                               elem.prop('auxtype'), elem.prop('auxvalue')
@@ -468,6 +471,7 @@ class CADImport: #pylint: disable = R0903, C0103
                            or elemtype == 'BarHeight'\
                            or elemtype == 'BarLength'\
                            or elemtype == 'HoleRad'\
+                           or elemtype == 'Gap'\
                            or elemtype == 'FiberCladdingExtRadius':
                         result.append('PropertyDouble '+elemtype+' '\
                                       +value+' '+unit+'\n')
@@ -476,6 +480,7 @@ class CADImport: #pylint: disable = R0903, C0103
                              or elemtype == 'Station' or elemtype == 'numPMTs' \
                              or elemtype == 'Plane' or elemtype == 'Tracker' \
                              or elemtype == 'Cell' \
+                             or elemtype == 'Slab'\
                              or elemtype == 'CkovPmtNum':
                         result.append('PropertyInt '+elemtype+' '+value+"\n")
                     # Extract string typed elements
@@ -493,6 +498,9 @@ class CADImport: #pylint: disable = R0903, C0103
                         if value == "PolyconeProfile":
                             value = self.output[:-4]+'_'+vol.prop('name')+\
                                     '.txt'
+                        if elemtype == 'SensitiveDetector':
+                            foundSensDet = value
+                            
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements
                     elif elemtype == ' Invisible'\
@@ -541,6 +549,10 @@ class CADImport: #pylint: disable = R0903, C0103
                               material[0].prop("ref")+"\n")
                 # Access the physical volumes defined within the parent
                 physvol = vol.xpathEval("physvol")
+                # print "found Sens Det", foundSensDet
+                if foundSensDet == 'SciFi' or foundSensDet == 'KL' \
+                       or moduleName.find('KLGlue') >= 0:
+                    continue
                 for elem in physvol:
                     vol_path = elem.xpathEval("volumeref")
                     file_path = elem.xpathEval("file")
@@ -555,6 +567,7 @@ class CADImport: #pylint: disable = R0903, C0103
                         newfile = file_path[0].prop("name")
                         newfile = os.path.join(self.geodir, newfile[:-5])
                         result.append("Module "+newfile+".dat\n")
+                        result.append("{\n")
                     # get the postion of the daughter
                     position = elem.xpathEval("position")[0]
                     result.append("Position "+\
@@ -633,3 +646,346 @@ class CADImport: #pylint: disable = R0903, C0103
                         result.append("} // End"+basename+\
                                       str(volumenumber)+"\n\n")
                         volumenumber += 1
+
+    def TrackerPlaneParametrization(self):
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103, C0301
+        '''
+        
+        @Method TrackerPlaneParametrization to add plane
+        parametrization elements to the Tracker GDML files
+
+        '''
+        viewNames = ['TrackerViewU',
+                     'TrackerViewV',
+                     'TrackerViewW',
+                     'trackerViewUStation5Tracker0']
+        print self.xml_in_1
+        for viewName in viewNames:
+            # Parse the target gdml file
+            datafile = libxml2.parseFile(self.xml_in_1)
+            # extract the path to the solid definitions
+            solids    = datafile.xpathEval("gdml/solids")
+            # extract the path to the structure definitions
+            structure = datafile.xpathEval("gdml/structure")
+            # extract the information for the SciFiPlane Module
+            # from the tracker view (W)
+            volumes = structure[0].xpathEval("volume")
+            auxlist = []
+            solid_ref = ''
+            mater_ref = ''
+            doubletThickness = 0.0
+            trackerRadius    = 0.0
+            volumefound = 0
+            print viewName
+            for instance in volumes:
+                print instance.prop('name')
+                # find the tracker view (W)
+                if instance.prop('name').find(viewName) >= 0:
+                    volumefound = 1
+                    # extract the auxiliary list
+                    auxlist = instance.xpathEval("auxiliary")
+                    # Get the solid reference name
+                    solid_ref = instance.xpathEval("solidref")
+                    # Get the material reference name
+                    mater_ref = instance.xpathEval("materialref")
+            if volumefound == 0:
+                print 'Warning: did not find volume ', viewName
+                continue
+            # solids = structure[0].xpathEval("solid")
+            print solid_ref[0].prop('ref')
+            for instance in solids[0].xpathEval("tube"):
+                # get the tracker view solid
+                if instance.prop('name') == solid_ref[0].prop('ref'):
+                    print instance.prop('name'), instance.prop('rmax'), \
+                          instance.prop('z')
+                    doubletThickness = float(instance.prop('z'))
+                    trackerRadius   = float(instance.prop('rmax'))
+            material = mater_ref[0].prop("ref")
+            if len(auxlist)==0:
+                print 'Failure in extraction of auxiliary data list'
+                return 
+            # Now that the list has been captured the contents can be sorted
+            # into useful variables
+            activeRadius  = 0.0
+            fibrePitch    = 0.0
+            fibreDiameter = 0.0
+            coreDiameter  = 0.0
+            centralFibre  = 0.0
+            for elem in auxlist:
+                if elem.prop('auxtype') == 'ActiveRadius':
+                    activeRadius = float(elem.prop('auxvalue'))
+                if elem.prop('auxtype') == 'Pitch':
+                    fibrePitch = float(elem.prop('auxvalue'))
+                if elem.prop('auxtype') == 'FibreDiameter':
+                    fibreDiameter = float(elem.prop('auxvalue'))
+                if elem.prop('auxtype') == 'CoreDiameter':
+                    coreDiameter = float(elem.prop('auxvalue'))
+                if elem.prop('auxtype') == 'CentralFibre':
+                    centralFibre = float(elem.prop('auxvalue'))
+            print "ActiveRadius = ", activeRadius, ", Pitch = ", fibrePitch, \
+                  ", FibreDiameter = ", fibreDiameter, ", CoreDiameter = ",\
+                  coreDiameter, ",CentralFibre = ", centralFibre
+            datafile.freeDoc()
+            # the important variables are now loaded and the new volumes
+            # can be defined. Start by defining the plane solid.
+            # Define a new volume
+            doc = libxml2.newDoc("1.0")
+            root = libxml2.newNode("gdml")
+            doc.setRootElement(root)
+            # Register the gdml namespace
+            ns = root.newNs('http://www.w3.org/2001/XMLSchema-instance', 'xsi')
+            root.setNs(ns)
+            root.setNsProp(ns, 'noNamespaceSchemaLocation', \
+                           "http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd")
+            defNode = libxml2.newNode('define')
+            root.addChild(defNode)
+            matNode = libxml2.newNode('materials')
+            # Hydrogen
+            
+            H1 = libxml2.newNode("isotope")
+            H1.setProp("name", 'H10')
+            H1.setProp('N', '1')
+            H1.setProp('Z', '1')
+            atomH1 = libxml2.newNode("atom")
+            atomH1.setProp("unit", "g/mole")
+            atomH1.setProp("value", "1.00782503081372")
+            H1.addChild(atomH1)
+            matNode.addChild(H1)
+            H2 = libxml2.newNode("isotope")
+            H2.setProp("name",'H20')
+            H2.setProp('N','2')
+            H2.setProp('Z','1')
+            atomH2 = libxml2.newNode("atom")
+            atomH2.setProp("unit", "g/mole")
+            atomH2.setProp("value", "2.01410199966617")
+            H2.addChild(atomH2)
+            matNode.addChild(H2)
+            H0 = libxml2.newNode("element")
+            H0.setProp("name","H0")
+            h0frach1 = libxml2.newNode("fraction")
+            h0frach1.setProp("n", "0.999885")
+            h0frach1.setProp("ref", "H10")
+            H0.addChild(h0frach1)
+            h0frach2 = libxml2.newNode("fraction")
+            h0frach2.setProp("n", "0.000115")
+            h0frach2.setProp("ref", "H20")
+            H0.addChild(h0frach2)
+            matNode.addChild(H0)
+            #Carbon
+            C12 = libxml2.newNode("isotope")
+            C12.setProp("name", 'C12')
+            C12.setProp('N', '12')
+            C12.setProp('Z', '6')
+            atomC12 = libxml2.newNode("atom")
+            atomC12.setProp("unit", "g/mole")
+            atomC12.setProp("value", "12")
+            C12.addChild(atomC12)
+            matNode.addChild(C12)
+            C13 = libxml2.newNode("isotope")
+            C13.setProp("name", 'C13')
+            C13.setProp('N', '13')
+            C13.setProp('Z', '6')
+            atomC13 = libxml2.newNode("atom")
+            atomC13.setProp("unit", "g/mole")
+            atomC13.setProp("value", "13.0034")
+            C13.addChild(atomC13)
+            matNode.addChild(C13)
+            C0 = libxml2.newNode("element")
+            C0.setProp("name", "C0")
+            c0frach12 = libxml2.newNode("fraction")
+            c0frach12.setProp("n", "0.9893")
+            c0frach12.setProp("ref", "C12")
+            C0.addChild(c0frach12)
+            c0frach13 = libxml2.newNode("fraction")
+            c0frach13.setProp("n", "0.0107")
+            c0frach13.setProp("ref", "C13")
+            C0.addChild(c0frach13)
+            matNode.addChild(C0)
+            # now define polystyrene as a material
+            matpoly = libxml2.newNode("material")
+            matpoly.setProp("name", "POLYSTYRENE")
+            matpoly.setProp("state", "solid")
+            MEE = libxml2.newNode("MEE")
+            MEE.setProp("unit", "eV")
+            MEE.setProp('value', '68.7')
+            matpoly.addChild(MEE)
+            dens = libxml2.newNode('D')
+            dens.setProp('unit', 'g/cm3')
+            dens.setProp('value', '1.06')
+            matpoly.addChild(dens)
+            fracH0 = libxml2.newNode('fraction')
+            fracH0.setProp('n', '0.077418')
+            fracH0.setProp('ref', 'H0')
+            matpoly.addChild(fracH0)
+            fracC0 = libxml2.newNode('fraction')
+            fracC0.setProp('n', '0.922582')
+            fracC0.setProp('ref', 'C0')
+            matpoly.addChild(fracC0)
+            matNode.addChild(matpoly)
+            # copy all material nodes to the new document
+            # for oldnode in datafile.xpathEval('gdml/materials'):
+            #      matNode.addChild(oldnode)
+            root.addChild(matNode)
+            # datafile.freeDoc()
+            # Now create a solid node based on the above data
+            solidNode = libxml2.newNode('solids')
+            # A node to define the solid for the scifi plane
+            planeNode = libxml2.newNode("tube")
+            planeNode.setProp("name", viewName + "Doublet_simple")
+            planeNode.setProp("rmax", str(trackerRadius))
+            planeNode.setProp("z", str(doubletThickness))
+            planeNode.setProp("lunit", "cm")
+            planeNode.setProp("aunit", "degree")
+            planeNode.setProp("deltaphi", "360")
+            # add the plane to the set of solid objects
+            solidNode.addChild(planeNode)
+            # create a dummy volume to facilitate the creation of a rotated solid
+            sphereNode = libxml2.newNode("sphere")
+            sphereNode.setProp("name", "dummy_solid")
+            sphereNode.setProp("rmax", str(coreDiameter/2.))
+            sphereNode.setProp("lunit", "mm")
+            sphereNode.setProp("deltaphi", "10.0")
+            sphereNode.setProp("deltatheta", "10.0")
+            sphereNode.setProp("aunit", "degree")
+            solidNode.addChild(sphereNode)
+            # Combine and rotate the tracker plane
+            subnode = libxml2.newNode("subtraction")
+            subnode.setProp("name", viewName + "Doublet_solid")
+            firstnode = libxml2.newNode("first")
+            firstnode.setProp("ref", viewName + "Doublet_simple")
+            subnode.addChild(firstnode)
+            secondnode = libxml2.newNode("second")
+            secondnode.setProp("ref", "dummy_solid")
+            subnode.addChild(secondnode)
+            firstpos = libxml2.newNode("firstposition")
+            firstpos.setProp("name", "firstpos")
+            firstpos.setProp("x", "0.0")
+            firstpos.setProp("y", "0.0")
+            firstpos.setProp("z", "0.0")
+            firstpos.setProp("unit", "mm")
+            firstrot = libxml2.newNode("firstrotation")
+            firstrot.setProp("name", "firstpos")
+            firstrot.setProp("x", "-90.0")
+            firstrot.setProp("y", "0.0")
+            firstrot.setProp("z", "0.0")
+            subnode.addChild(firstrot)
+            solidNode.addChild(subnode)
+            # Now create a temporary scifi object
+            sciFibreNode = libxml2.newNode("tube")
+            sciFibreNode.setProp("name", viewName + "DoubletCores_solid")
+            sciFibreNode.setProp("rmax", str(coreDiameter/2.))
+            sciFibreNode.setProp("z", "1.0")
+            sciFibreNode.setProp("lunit", "mm")
+            sciFibreNode.setProp("aunit", "degree")
+            sciFibreNode.setProp("deltaphi", "360")
+            # add the fibre to the set of solid objects
+            solidNode.addChild(sciFibreNode)
+            root.addChild(solidNode)
+            # now to define the detector structure
+            structNode = libxml2.newNode("structure")
+            # define the fibre volume
+            fibreVol = libxml2.newNode("volume")
+            fibreVol.setProp("name", viewName + "DoubletCores")
+            matreffV = libxml2.newNode("materialref")
+            matreffV.setProp("ref", material)
+            fibreVol.addChild(matreffV)
+            solreffV = libxml2.newNode("solidref")
+            solreffV.setProp("ref", viewName + "DoubletCores_solid")
+            fibreVol.addChild(solreffV)
+            # create an auxiliary object to contain the visualization and
+            # sensitive detector information
+            # auxdet1 = libxml2.newNode("auxiliary")
+            # auxdet1.setProp("auxtype","SensitiveDetector")
+            # auxdet1.setProp("auxvalue","SciFi")
+            # fibreVol.addChild(auxdet1)
+            auxvis1 = libxml2.newNode("auxiliary")
+            auxvis1.setProp("auxtype", "Invisible")
+            auxvis1.setProp("auxvalue", "1")
+            fibreVol.addChild(auxvis1)
+            auxstep1 = libxml2.newNode("auxiliary")
+            auxstep1.setProp("auxtype", "G4StepMax")
+            auxstep1.setProp("auxvalue", "0.1")
+            fibreVol.addChild(auxstep1)
+            structNode.addChild(fibreVol)
+            # define the plane volume
+            planeVol = libxml2.newNode("volume")
+            planeVol.setProp("name", viewName + "Doublet")
+            matrefpV = libxml2.newNode("materialref")
+            matrefpV.setProp("ref", material)
+            planeVol.addChild(matrefpV)
+            solrefpV = libxml2.newNode("solidref")
+            solrefpV.setProp("ref", viewName + "Doublet_solid")
+            planeVol.addChild(solrefpV)
+            paramVol = libxml2.newNode("paramvol")
+            numFibres = math.floor(2.0 * activeRadius / (0.5 * fibrePitch))
+            paramVol.setProp("ncopies", str(int(numFibres)))
+            volrefpV = libxml2.newNode("volumeref")
+            volrefpV.setProp("ref", viewName + "DoubletCores")
+            paramVol.addChild(volrefpV)
+            ppspV = libxml2.newNode("parameterised_position_size")
+            paramNode = []
+            posNode   = []
+            # rotNode   = []
+            tubedim   = []
+            for i in range(1, int(numFibres)+1):
+                paramNode.append(libxml2.newNode("parameters"))
+                paramNode[-1].setProp("number", str(i))
+                posNode.append(libxml2.newNode("position"))
+                posNode[-1].setProp("name", "fibrePos" + str(i))
+                fp = fibrePitch/fibreDiameter
+                xpos = i * (fibreDiameter*fp/2.) \
+                       - (activeRadius-fibreDiameter/2.)
+                posNode[-1].setProp("x", str(xpos))
+                posNode[-1].setProp("z", "0.0")
+                spacing = math.sqrt(fibreDiameter*fibreDiameter*(1-fp*fp/4.))
+                zpos = 0.5*spacing
+                if i % 2:
+                    zpos = -0.5*spacing
+                posNode[-1].setProp("y", str(zpos))
+                #rotNode.append(libxml2.newNode("rotation"))
+                #rotNode[-1].setProp("x", str(90.0))
+                #rotNode[-1].setProp("y", str(0))
+                #rotNode[-1].setProp("z", str(0))
+                #rotNode[-1].setProp("unit","degree")
+                paramNode[-1].addChild(posNode[-1])
+                # paramNode[-1].addChild(rotNode[-1])
+                tubedim.append(libxml2.newNode("tube_dimensions"))
+                tubedim[-1].setProp("InR", "0.0")
+                tubedim[-1].setProp("OutR", str(coreDiameter/2.))
+                if activeRadius > math.fabs(xpos):
+                    hz = math.sqrt(activeRadius*activeRadius - xpos*xpos)
+                tubedim[-1].setProp("hz", str(2.0*hz))
+                tubedim[-1].setProp("lunit", "mm")
+                tubedim[-1].setProp("StartPhi", "0.0")
+                tubedim[-1].setProp("DeltaPhi", "360.0")
+                tubedim[-1].setProp("aunit", "degree")
+                paramNode[-1].addChild(tubedim[-1])
+                ppspV.addChild(paramNode[-1])
+            paramVol.addChild(ppspV)
+            planeVol.addChild(paramVol)
+            # create an auxiliary object to contain the visualization and
+            # sensitive detector information
+            auxvis2 = libxml2.newNode("auxiliary")
+            auxvis2.setProp("auxtype", "Invisible")
+            auxvis2.setProp("auxvalue", "1")
+            planeVol.addChild(auxvis2)
+            auxstep2 = libxml2.newNode("auxiliary")
+            auxstep2.setProp("auxtype", "G4StepMax")
+            auxstep2.setProp("auxvalue", "0.1")
+            planeVol.addChild(auxstep2)
+            structNode.addChild(planeVol)
+            root.addChild(structNode)
+            # Now the setup node needs to be added
+            setup = libxml2.newNode("setup")
+            setup.setProp("name", "Default")
+            setup.setProp("version", "1.0")
+            world = libxml2.newNode("world")
+            world.setProp("ref", viewName + "Doublet")
+            setup.addChild(world)
+            root.addChild(setup)
+            
+            ofile = open(viewName + "_Doublet.gdml","w")
+            doc.saveTo(ofile)
+            ofile.close()
+            doc.freeDoc()
+        

@@ -1,11 +1,7 @@
-Q_MA_i_median_mean 134.209
-Q_SA_i_median_mean 19.367
-Q_MA_median_mean 134.723
-Q_SA_median_mean 19.561
-Q_MA_i_mean_mean 134.215
-Q_SA_i_mean_mean 20.378
-Q_MA_mean_mean 135.903
-Q_SA_mean_mean 20.576
+MA median -1 -1 134.723
+SA median -1 -1 19.367
+MA mean -1 -1 135.903
+SA mean -1 -1 20.576
 
 MA median 0 -1 1.000
 MA median 1 -1 1.013

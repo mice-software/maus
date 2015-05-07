@@ -18,14 +18,14 @@ M. Littlefield
 
 import shutil
 import os
+import libxml2
 from xml.dom import minidom
 from geometry.ConfigReader import Configreader
 
 SCHEMA_PATH = os.environ["MAUS_ROOT_DIR"]+\
               "/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd"
 
-# pylint: disable = C0103, R0915
-class Formatter: #pylint: disable = R0902
+class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
     """
     @Class formatter this class formats the raw outputted fastrad files so their
            schema material file paths are correct
@@ -63,16 +63,18 @@ class Formatter: #pylint: disable = R0902
         self.configuration_file = None
         self.material_file = None
         self.tracker_file = None
+        self.detmodulefiles = []
         self.modulefiles = []
         self.stepfiles = []
         self.formatted = False
         self.txt_file = ""
         self.schema = SCHEMA_PATH
+        self.usegdml = False
         gdmls = os.listdir(self.path_in)
         #if self.path_in == self.path_out:
         #    paths_equal = True
         for fname in gdmls:
-            # print fname
+            print fname
             if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
                 print fname+' not a gdml or xml file - ignored'
             elif fname.find('materials') >= 0:
@@ -85,9 +87,10 @@ class Formatter: #pylint: disable = R0902
                 self.configuration_file = fname
             elif fname.find('Cooling_Channel') >= 0:
                 self.tracker_file = fname
-            elif fname.find('Maus_Information') >= 0 or \
-                                            fname.find('maus_information') >= 0\
-                        or fname.find('Field') >= 0 or fname.find('field') >= 0:
+            elif fname.find('Maus_Information') >= 0 \
+                     or fname.find('maus_information') >= 0 \
+                     or fname.find('Field') >= 0 \
+                     or fname.find('field') >= 0:
                 print 'Found ', fname
                 self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
@@ -95,8 +98,14 @@ class Formatter: #pylint: disable = R0902
             elif fname.find('CoolingChannelInfo') >= 0:
                 self.coolingChannel_file = fname
                 print 'Found ', fname
-            elif fname.find('Quad') >= 0 or fname.find('Dipole') >=0:
+            elif fname.find('Quad') >= 0 \
+                     or fname.find('Dipole') >= 0 \
+                     or fname.find('Solenoid') >= 0 \
+                     or fname.find('AFC') >= 0:
                 self.modulefiles.append(fname)
+            elif fname.find('KL') >= 0 \
+                     or fname.find('Tracker') >= 0:
+                self.detmodulefiles.append(fname)
             else:
                 self.stepfiles.append(fname)
         if self.maus_information_file == None:
@@ -109,6 +118,12 @@ class Formatter: #pylint: disable = R0902
             print 'Maus_Information file not found' + \
                   'Maus_Information.gdml has been copied from ' + \
                   maus_information_location
+        else:
+            info = libxml2.parseFile(os.path.join(self.path_in,
+                                                  self.maus_information_file))
+            if len(info.xpathEval(\
+                "MICE_Information/Other_Information/Module")) > 0:
+                self.usegdml = True
                     
     def format_schema_location(self, gdmlfile):
         """
@@ -127,7 +142,56 @@ class Formatter: #pylint: disable = R0902
         fout = open(os.path.join(self.path_out, gdmlfile), 'w')
         xmldoc.writexml(fout)
         fout.close()
-        
+
+    def format_gdml_locations(self, gdmlfile):
+        """
+        @method format_gdml_locations
+
+        This method parses the GDML file into memoty and alters the location
+        of the file names to absolute paths.
+        """
+        docfile = os.path.join(self.path_in, gdmlfile)
+        print "Reviewing content of ", docfile
+        xmldoc = libxml2.parseFile(docfile)
+        for vol in xmldoc.xpathEval("gdml/structure/volume/physvol"):
+            if len(vol.xpathEval("file")) > 0:
+                filenode = vol.xpathEval("file")[0]
+                filename = filenode.prop("name")
+                if filename.find(self.path_in) == -1:
+                    # add the path to the name
+                    newname = os.path.join(self.path_in, filename)
+                    # print "Replacing ", filename, " with ", newname
+                    filenode.setProp("name", newname)
+        gfile = open(os.path.join(self.path_out, gdmlfile),'w')
+        xmldoc.saveTo(gfile)
+        gfile.close()
+        xmldoc.freeDoc()
+
+    def correct_gdml_locations(self, gdmlfile):
+        """
+        @method format_gdml_locations
+
+        This method parses the GDML file into memoty and alters the location
+        of the file names to absolute paths.
+        """
+        docfile = os.path.join(self.path_in, gdmlfile)
+        # print "Reviewing content of ",docfile
+        xmldoc = libxml2.parseFile(docfile)
+        for vol in xmldoc.xpathEval("gdml/structure/volume/physvol"):
+            if len(vol.xpathEval("file")) > 0:
+                filenode = vol.xpathEval("file")[0]
+                filename = filenode.prop("name")
+                if filename.find(self.path_in) == -1:
+                    # add the path to the name
+                    newname = os.path.join(self.path_out, filename)
+                    # print "Replacing ",filename," with ",newname
+                    filenode.setProp("name", newname)
+        # print "Saving to ",os.path.join(self.path_out, gdmlfile)
+        f = open(os.path.join(self.path_out, gdmlfile),'w')
+        xmldoc.saveTo(f)
+        f.close()
+        xmldoc.freeDoc()
+                
     def add_other_info(self): #pylint: disable = R0914, R0915, C0301
         """
         @method add_other_information
@@ -147,6 +211,7 @@ class Formatter: #pylint: disable = R0902
         maus_dir = doc.createElement("GDML_Files")
         path = self.path_out
         maus_dir.setAttribute("location", path)
+        maus_dir.setAttribute("basefile", self.configuration_file)
         top_node.appendChild(maus_dir)
         g4_step = doc.createElement("G4StepMax")
         g4_step.setAttribute("Value", str(self.g4_step_max))
@@ -222,13 +287,15 @@ class Formatter: #pylint: disable = R0902
         """
         self.add_other_info()
         config = minidom.parse(os.path.join(self.path_out, gdmlfile))
-        print "config file ", os.path.join(self.path_out, gdmlfile)
-        print "information file ", os.path.join(self.path_out, \
-                                                    self.maus_information_file)
+        # print "config file ", os.path.join(self.path_out, gdmlfile)
+        # print "information file ", os.path.join(self.path_out, \
+        #                                         self.maus_information_file)
         maus_information = minidom.parse(os.path.join(self.path_out, \
                                                     self.maus_information_file))
         for node in maus_information.getElementsByTagName("MICE_Information"):
             maus_info = node
+        #     print str(node)
+        # print str(config)
         root_node = config.childNodes[2]
         root_node.insertBefore(maus_info, root_node.childNodes[9])
         fout = open(os.path.join(self.path_out, gdmlfile), 'w')
@@ -285,13 +352,13 @@ class Formatter: #pylint: disable = R0902
                                                self.coolingChannel_file)
             # print coolingChannel_path
             coolingChannel = minidom.parse(coolingChannel_path)
-            for node in coolingChannel.getElementsByTagName("run"):
-                run_info = node
-            if type(run_info) == bool:
+            for node in coolingChannel.getElementsByTagName("coolingchannel"):
+                cc_info = node
+            if type(cc_info) == bool:
                 raise IOError("Run number you have selected is not on the CDB")
             else:
                 root_node = maus_information.childNodes[0].childNodes[1]
-                root_node.insertBefore(run_info, root_node.childNodes[0])
+                root_node.insertBefore(cc_info, root_node.childNodes[0])
                 fout = open(os.path.join(self.path_out, gdmlfile), 'w')
                 maus_information.writexml(fout)
                 fout.close()
@@ -388,15 +455,17 @@ class Formatter: #pylint: disable = R0902
         else:
             shutil.copy(os.path.join(self.path_in, self.maus_information_file), 
                        os.path.join(self.path_out, self.maus_information_file))
-
+        
         if self.coolingChannel_file != None:
             self.merge_cooling_channel_info(self.maus_information_file)
+
 
         if self.formatted == False:
             print self.configuration_file
             self.format_schema_location(self.configuration_file)
             self.merge_maus_info(self.configuration_file)
             self.format_materials(self.configuration_file)
+            self.format_gdml_locations(self.configuration_file)
             self.insert_materials_ref(self.txt_file)
         print "Formatted Configuration File"
 
@@ -407,6 +476,7 @@ class Formatter: #pylint: disable = R0902
                 self.format_schema_location(self.tracker_file)
                 self.merge_maus_info(self.tracker_file)
                 self.format_materials(self.tracker_file)
+                self.format_gdml_locations(self.tracker_file)
                 self.insert_materials_ref(self.txt_file)
             print "Formatted cooling channel and trackers"
         for module in self.modulefiles:
@@ -415,9 +485,11 @@ class Formatter: #pylint: disable = R0902
                 self.format_schema_location(module)
                 self.merge_maus_info(module)
                 self.format_materials(module)
+                self.format_gdml_locations(module)
                 self.insert_materials_ref(self.txt_file)
             print "Formatted module files"
-    
+
+        self.stepfiles.extend(self.detmodulefiles)
         noofstepfiles = len(self.stepfiles)
         for num in range(0, noofstepfiles):
             self.format_check(self.stepfiles[num])
@@ -428,7 +500,183 @@ class Formatter: #pylint: disable = R0902
             print "Formatted " + str(num+1) + \
                   " of " + str(noofstepfiles) + " Geometry Files"
         print "Format Complete"
+
         
+    def addDiffuserIrises(self):
+        """
+        @ Module addDiffuserIrises
+
+        Add the irises to the output gdml file
+        """
+        
+        mausInfo = libxml2.parseFile(os.path.join(self.path_in, \
+                                                  self.maus_information_file))
+        runInfo = mausInfo.xpathEval(\
+            "MICE_Information/Configuration_Information/run")
+        diffuserSetting = []
+        if len(runInfo) > 0:
+            diffuserSetting.append(runInfo.prop("diffusetThickness"))
+        # check the possible keys for suspected
+        modulekeys = mausInfo.xpathEval(\
+            "MICE_Information/Other_Information/Module")
+        keynode = next(x for x in \
+                       modulekeys if x.prop('name').find('SolenoidUS') >= 0 \
+                       or x.prop('name').find('Cooling_Channel') >= 0)
+        key = keynode.prop('name')
+        modrange = [float(keynode.prop('zmin')), float(keynode.prop('zmax'))]
+        diffuser = mausInfo.xpathEval(\
+            "MICE_Information/Detector_Information/Diffuser")
+
+        targetname = os.path.join(self.path_in, key+".gdml")
+        print targetname
+        target = libxml2.parseFile(targetname)
+        vol = next(x for x in target.xpathEval("gdml/structure/volume") 
+                   if x.prop("name").find(key + "_structvol") >= 0)
+
+        for iris in diffuser:
+            # extract the iris number, position and rotation
+            inum = int(iris.xpathEval("Iris")[0].prop("name"))
+            pos = [float(iris.xpathEval("Position")[0].prop("x")), \
+                   float(iris.xpathEval("Position")[0].prop("y")), \
+                   float(iris.xpathEval("Position")[0].prop("z"))]
+            
+            print key, pos[2], modrange
+            pos[2] = pos[2] - (modrange[1] + modrange[0])/2.
+            print key, pos[2], modrange
+            posUnit = iris.xpathEval("Position")[0].prop("unit")
+            rot = [float(iris.xpathEval("Rotation")[0].prop("x")), \
+                   float(iris.xpathEval("Rotation")[0].prop("y")), \
+                   float(iris.xpathEval("Rotation")[0].prop("z"))]
+            rotUnit = iris.xpathEval("Rotation")[0].prop("unit")
+            newNode = libxml2.newNode("physvol")
+            fileNode = libxml2.newNode("file")
+            if len(diffuserSetting) > 0: # test of whether the statement exists.
+                print "Using diffuser setting ", diffuserSetting[0]
+                if (inum == 1 and diffuserSetting[0] % 2 == 0) or \
+                       (inum == 2 and (diffuserSetting[0] % 4 == 0 or \
+                                     diffuserSetting[0] % 4 == 1)) or \
+                       (inum == 3 and (diffuserSetting[0] < 4 or
+                                     (diffuserSetting[0] >= 8 and \
+                                      diffuserSetting[0] < 12))) or \
+                       (inum == 4 and diffuserSetting[0] < 8):
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + "_open.gdml")
+                else:
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + \
+                                     "_closed.gdml")
+            else:
+                if inum == 2 or inum == 3:
+                    print "Iris ", inum, " default closed introduced."
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + \
+                                     "_closed.gdml")
+                else:
+                    print "Iris ", inum, " default open introduced."
+                    newNode.setProp("name", "iris" + str(inum))
+                    fileNode.setProp("name", "iris" + str(inum) + "_open.gdml")
+            newNode.addChild(fileNode)
+            posNode = libxml2.newNode("position")
+            posNode.setProp("name", "posRef_iris_" + str(inum))
+            posNode.setProp("x", str(pos[0]))
+            posNode.setProp("y", str(pos[1]))
+            posNode.setProp("z", str(pos[2]))
+            posNode.setProp("unit", posUnit)
+            newNode.addChild(posNode)
+            rotNode = libxml2.newNode("rotation")
+            posNode.setProp("name", "rotRef_iris_"+str(inum))
+            rotNode.setProp("x", str(rot[0]))
+            rotNode.setProp("y", str(rot[1]))
+            rotNode.setProp("z", str(rot[2]))
+            rotNode.setProp("unit", rotUnit)
+            newNode.addChild(rotNode)
+            vol.addChild(newNode)
+            
+        tgtfile = open(targetname, 'w')
+        target.saveTo(tgtfile)
+        tgtfile.close()
+        target.freeDoc()
+        mausInfo.freeDoc()
+
+    def maus_info_to_gdml(self):
+        """
+        To be used when synthesising the gdml files for direct use to
+        define the geometry. Reformats the information file to use gdml
+        headers.
+        """
+        self.add_other_info()
+        infofile = os.path.join(self.path_out, self.maus_information_file)
+        info = libxml2.parseFile(infofile)
+        doc = libxml2.parseDoc("""<?xml version="1.0"?>
+        <gdml>
+        <define/>
+        <materials/>
+        <solids/>
+        <structure/>
+        <setup/>
+        </gdml>""")
+        root = doc.xpathEval("gdml")[0]
+        root.addChildList(info.xpathEval("MICE_Information")[0].copyNode(1))
+
+        f = open(infofile,"w")
+        doc.saveTo(f)
+        f.close()
+
+        doc.freeDoc()
+        info.freeDoc()
+
+    def formatForGDML(self):
+        """
+        @method FormatForGDML
+        
+        This method calls all the other methods to format the 
+        necessary parts of the file. It will run through all of the
+        fastRad outputted files within the folder location given to
+        the class constructor.
+        """
+        # self.format_check(self.configuration_file)
+        
+        if self.beamline_file != None:
+            self.merge_run_info(self.maus_information_file)
+        else:
+            shutil.copy(os.path.join(self.path_in, self.maus_information_file), 
+                       os.path.join(self.path_out, self.maus_information_file))
+        self.add_other_info()
+        if self.coolingChannel_file != None:
+            self.merge_cooling_channel_info(self.maus_information_file)
+            
+            
+        # if self.formatted == False:
+        print self.configuration_file
+        # self.format_schema_location(self.configuration_file)
+        self.correct_gdml_locations(self.configuration_file)
+        self.addDiffuserIrises()
+        # self.merge_maus_info(self.configuration_file)
+        print "Formatted Configuration File"
+        self.maus_info_to_gdml()
+        if self.tracker_file != None:
+            # self.format_check(self.tracker_file)
+            if self.formatted == False:
+                print self.tracker_file
+                self.correct_gdml_locations(self.tracker_file)
+            print "Formatted cooling channel and trackers"
+        for module in self.modulefiles:
+            # self.format_check(module)
+            if self.formatted == False:
+                self.correct_gdml_locations(module)
+            # print "Formatted module files"
+        for module in self.detmodulefiles:
+            # self.format_check(module)
+            if self.formatted == False:
+                self.correct_gdml_locations(module)
+            # print "Formatted module files"
+        noofstepfiles = len(self.stepfiles)
+        for num in range(0, noofstepfiles):
+            self.format_schema_location(self.stepfiles[num])
+            # self.correct_gdml_locations(self.stepfiles[num])
+            
+        
+        print "Format Complete"
 
 def main():
     """

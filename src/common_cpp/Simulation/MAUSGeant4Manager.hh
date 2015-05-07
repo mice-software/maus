@@ -20,6 +20,7 @@
 
 #include "Geant4/G4RunManager.hh"
 #include "Geant4/G4SDManager.hh"
+#include "Geant4/G4GDMLParser.hh"
 
 // should all be forward declarations? yes - but be careful about namespace
 #include "src/legacy/Simulation/FillMaterials.hh"
@@ -156,6 +157,21 @@ class MAUSGeant4Manager {
      */
     ~MAUSGeant4Manager();
 
+
+    /** Set the auxiliary information for the GDML objects 
+     *  
+     * Right now this is almost exclusively sensitive detector information
+     * but it may be expanded to include visualization information if 
+     * necessary.
+     */
+    void SetAuxInformation(MiceModule& module);
+
+    /** Set the sensitive detector information 
+     *
+     *  Recursively examine logical volumes for
+     */
+    void SetDaughterSensitiveDetectors(G4LogicalVolume* logic);
+
     /** Reset the simulation with a new geometry set
      *
      *  @param module root module of the new geometry set. Field definitions and
@@ -178,6 +194,7 @@ class MAUSGeant4Manager {
     MAUSTrackingAction*         _trackAct;
     MAUSEventAction*            _eventAct;
     Simulation::DetectorConstruction*  _detector;
+    G4GDMLParser                _parser;
     VirtualPlaneManager*        _virtPlanes;
     MAUSVisManager*             _visManager;
 

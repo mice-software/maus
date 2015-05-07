@@ -1,0 +1,1106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gdml [
+<!ENTITY materials SYSTEM "./TD-1189-3401_Fe_09-07-13_materials.xml">
+]>
+<!--   GDML translation from the Fastrad file : "TD-1189-3401_Fe_09-07-13.ray"
+	Processed the 2013/07/09 at 15h46 by the GDML module of Fastrad 3.3.0.9
+	Result file : "TD-1189-3401_Fe_09-07-13.gdml"
+-->
+<gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+<define>
+    <constant name="HALFPI" value="pi/2."/>
+	<constant name="PI" value="1.*pi"/>
+	<constant name="TWOPI" value="2.*pi"/>
+	<position name="center"/>
+	<rotation name="identity"/>
+	<rotation name="aligneSurX" y="HALFPI"/>
+	<rotation name="aligneSurY" x="HALFPI"/>
+</define>
+
+<materials>
+  <element name="videRef" formula="VACUUM" Z="1">
+		<atom value="1"/>
+	</element>
+  <material name="Galactic" formula="VACUUM">
+		<D value ="1E-25" unit="g/cm3"/>
+		<fraction n="1.0" ref="videRef"/>
+  </material>
+</materials>
+
+<solids>
+    <sphere name="WorldSphereRef" rmin="0." rmax="17320522534.2641" startphi="0.0000" deltaphi="6.2832" starttheta="0.0000" deltatheta="3.1416"/>
+</solids>
+    
+<structure>
+    <volume name="Structure_0">
+        <materialref ref="Galactic"/>
+        <solidref ref="WorldSphereRef"/>	
+        <physvol>
+            <file name="TOF0.gdml"/>
+            <position name="posRef_1" x="-0.0000" y="0.0000" z="5292.3100"/>
+            <rotation name="rotRef_1" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="TOF1.gdml"/>
+            <position name="posRef_2" x="-0.0000" y="0.0000" z="13154.0000"/>
+            <rotation name="rotRef_2" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="TOF2.gdml"/>
+            <position name="posRef_4" x="-0.0000" y="0.0000" z="20767.1400"/>
+            <rotation name="rotRef_4" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="KL.gdml"/>
+            <position name="posRef_5" x="-0.0000" y="0.0000" z="20914.0200"/>
+            <rotation name="rotRef_5" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="EMR.gdml"/>
+            <position name="posRef_6" x="-0.0000" y="0.0000" z="21521.6400"/>
+            <rotation name="rotRef_6" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="LH2.gdml"/>
+            <position name="posRef_7" x="-0.0000" y="0.0000" z="16955.7400"/>
+            <rotation name="rotRef_7" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="Tracker0.gdml"/>
+            <position name="posRef_8" x="-0.0000" y="0.0000" z="14504.7400"/>
+            <rotation name="rotRef_8" x="0.0" y="180.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="Tracker1.gdml"/>
+            <position name="posRef_9" x="-0.0000" y="0.0000" z="19406.7400"/>
+            <rotation name="rotRef_9" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="Ckov1.gdml"/>
+            <position name="posRef_10" x="-0.0000" y="0.0000" z="5734.8600"/>
+            <rotation name="rotRef_10" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol>
+            <file name="Ckov2.gdml"/>
+            <position name="posRef_12" x="-0.0000" y="0.0000" z="5979.1100"/>
+            <rotation name="rotRef_12" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+		<physvol>
+	    	<file name="Iges_Fe_1.gdml"/>
+	    	<position name="posRef_Fe_2" x="0.0000" y="0.0000" z="13254.7400"/>
+	    	<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_2.gdml"/>
+			<position name="posRef_Fe_3" x="0.0000" y="0.0000" z="20656.7400"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_3.gdml"/>
+			<position name="posRef_Fe_4" x="-0.0000" y="0.0000" z="2360.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_4.gdml"/>
+			<position name="posRef_Fe_5" x="0.0000" y="-0.0000" z="1374.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_5.gdml"/>
+			<position name="posRef_Fe_6" x="-405.1416" y="405.1416" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_6.gdml"/>
+			<position name="posRef_Fe_7" x="405.1416" y="405.1416" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_7.gdml"/>
+			<position name="posRef_Fe_8" x="405.1416" y="-405.1416" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_8.gdml"/>
+			<position name="posRef_Fe_9" x="-405.1416" y="-405.1416" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_9.gdml"/>
+			<position name="posRef_Fe_10" x="-0.0000" y="-702.5000" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_10.gdml"/>
+			<position name="posRef_Fe_11" x="-0.0000" y="702.5000" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_11.gdml"/>
+			<position name="posRef_Fe_12" x="-702.5000" y="-0.0000" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_12.gdml"/>
+			<position name="posRef_Fe_13" x="702.5000" y="-0.0000" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_13.gdml"/>
+			<position name="posRef_Fe_14" x="-362.5000" y="362.5000" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_14.gdml"/>
+			<position name="posRef_Fe_15" x="362.5000" y="-362.5000" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_15.gdml"/>
+			<position name="posRef_Fe_16" x="-362.5000" y="-362.5000" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_16.gdml"/>
+			<position name="posRef_Fe_17" x="362.5000" y="362.5000" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_17.gdml"/>
+			<position name="posRef_Fe_18" x="-0.0000" y="482.8123" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_18.gdml"/>
+			<position name="posRef_Fe_19" x="-0.0000" y="-482.8123" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_19.gdml"/>
+			<position name="posRef_Fe_20" x="482.8123" y="-0.0000" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_20.gdml"/>
+			<position name="posRef_Fe_21" x="-482.8123" y="-0.0000" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_21.gdml"/>
+			<position name="posRef_Fe_22" x="482.8123" y="0.0000" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_22.gdml"/>
+			<position name="posRef_Fe_23" x="-482.8123" y="-0.0000" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_23.gdml"/>
+			<position name="posRef_Fe_24" x="-0.0000" y="482.8123" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_24.gdml"/>
+			<position name="posRef_Fe_25" x="-0.0000" y="-482.8123" z="1464.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_25.gdml"/>
+			<position name="posRef_Fe_26" x="-479.0474" y="-0.0000" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_26.gdml"/>
+			<position name="posRef_Fe_27" x="-0.0000" y="479.0474" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_27.gdml"/>
+			<position name="posRef_Fe_28" x="479.0474" y="-0.0000" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_28.gdml"/>
+			<position name="posRef_Fe_29" x="-0.0000" y="-479.0474" z="1867.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_29.gdml"/>
+			<position name="posRef_Fe_30" x="-455.0232" y="-455.0232" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_30.gdml"/>
+			<position name="posRef_Fe_31" x="455.0232" y="455.0232" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_31.gdml"/>
+			<position name="posRef_Fe_32" x="-455.0232" y="455.0232" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_32.gdml"/>
+			<position name="posRef_Fe_33" x="455.0232" y="-455.0232" z="2270.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_33.gdml"/>
+			<position name="posRef_Fe_34" x="-0.0000" y="0.0000" z="4680.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_34.gdml"/>
+			<position name="posRef_Fe_35" x="-0.0000" y="-0.0000" z="3694.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_35.gdml"/>
+			<position name="posRef_Fe_36" x="-405.1416" y="405.1416" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_36.gdml"/>
+			<position name="posRef_Fe_37" x="405.1416" y="405.1416" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_37.gdml"/>
+			<position name="posRef_Fe_38" x="405.1416" y="-405.1416" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_38.gdml"/>
+			<position name="posRef_Fe_39" x="-405.1416" y="-405.1416" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_39.gdml"/>
+			<position name="posRef_Fe_40" x="-0.0000" y="-702.5000" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_40.gdml"/>
+			<position name="posRef_Fe_41" x="-0.0000" y="702.5000" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_41.gdml"/>
+			<position name="posRef_Fe_42" x="-702.5000" y="-0.0000" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_42.gdml"/>
+			<position name="posRef_Fe_43" x="702.5000" y="-0.0000" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_43.gdml"/>
+			<position name="posRef_Fe_44" x="-362.5000" y="362.5000" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_44.gdml"/>
+			<position name="posRef_Fe_45" x="362.5000" y="-362.5000" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_45.gdml"/>
+			<position name="posRef_Fe_46" x="-362.5000" y="-362.5000" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_46.gdml"/>
+			<position name="posRef_Fe_47" x="362.5000" y="362.5000" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_47.gdml"/>
+			<position name="posRef_Fe_48" x="-0.0000" y="482.8123" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_48.gdml"/>
+			<position name="posRef_Fe_49" x="-0.0000" y="-482.8123" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_49.gdml"/>
+			<position name="posRef_Fe_50" x="482.8123" y="-0.0000" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_50.gdml"/>
+			<position name="posRef_Fe_51" x="-482.8123" y="-0.0000" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_51.gdml"/>
+			<position name="posRef_Fe_52" x="482.8123" y="-0.0000" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_52.gdml"/>
+			<position name="posRef_Fe_53" x="-482.8123" y="-0.0000" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_53.gdml"/>
+			<position name="posRef_Fe_54" x="-0.0000" y="482.8123" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_54.gdml"/>
+			<position name="posRef_Fe_55" x="-0.0000" y="-482.8123" z="3784.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_55.gdml"/>
+			<position name="posRef_Fe_56" x="-479.0474" y="-0.0000" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_56.gdml"/>
+			<position name="posRef_Fe_57" x="-0.0000" y="479.0474" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_57.gdml"/>
+			<position name="posRef_Fe_58" x="479.0474" y="-0.0000" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_58.gdml"/>
+			<position name="posRef_Fe_59" x="-0.0000" y="-479.0474" z="4187.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_59.gdml"/>
+			<position name="posRef_Fe_60" x="-455.0232" y="-455.0232" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_60.gdml"/>
+			<position name="posRef_Fe_61" x="455.0232" y="455.0232" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_61.gdml"/>
+			<position name="posRef_Fe_62" x="-455.0232" y="455.0232" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_62.gdml"/>
+			<position name="posRef_Fe_63" x="455.0232" y="-455.0232" z="4590.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_63.gdml"/>
+			<position name="posRef_Fe_64" x="-0.0000" y="0.0000" z="3520.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_64.gdml"/>
+			<position name="posRef_Fe_65" x="-0.0000" y="-0.0000" z="2534.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_65.gdml"/>
+			<position name="posRef_Fe_66" x="-405.1416" y="405.1416" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_66.gdml"/>
+			<position name="posRef_Fe_67" x="405.1416" y="405.1416" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_67.gdml"/>
+			<position name="posRef_Fe_68" x="405.1416" y="-405.1416" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_68.gdml"/>
+			<position name="posRef_Fe_69" x="-405.1416" y="-405.1416" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_69.gdml"/>
+			<position name="posRef_Fe_70" x="-0.0000" y="-702.5000" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_70.gdml"/>
+			<position name="posRef_Fe_71" x="-0.0000" y="702.5000" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_71.gdml"/>
+			<position name="posRef_Fe_72" x="-702.5000" y="-0.0000" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_72.gdml"/>
+			<position name="posRef_Fe_73" x="702.5000" y="-0.0000" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_73.gdml"/>
+			<position name="posRef_Fe_74" x="-362.5000" y="362.5000" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_74.gdml"/>
+			<position name="posRef_Fe_75" x="362.5000" y="-362.5000" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_75.gdml"/>
+			<position name="posRef_Fe_76" x="-362.5000" y="-362.5000" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_76.gdml"/>
+			<position name="posRef_Fe_77" x="362.5000" y="362.5000" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_77.gdml"/>
+			<position name="posRef_Fe_78" x="-0.0000" y="482.8123" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_78.gdml"/>
+			<position name="posRef_Fe_79" x="-0.0000" y="-482.8123" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_79.gdml"/>
+			<position name="posRef_Fe_80" x="482.8123" y="-0.0000" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_80.gdml"/>
+			<position name="posRef_Fe_81" x="-482.8123" y="-0.0000" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_81.gdml"/>
+			<position name="posRef_Fe_82" x="482.8123" y="-0.0000" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_82.gdml"/>
+			<position name="posRef_Fe_83" x="-482.8123" y="-0.0000" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_83.gdml"/>
+			<position name="posRef_Fe_84" x="-0.0000" y="482.8123" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_84.gdml"/>
+			<position name="posRef_Fe_85" x="-0.0000" y="-482.8123" z="2624.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_85.gdml"/>
+			<position name="posRef_Fe_86" x="-479.0474" y="-0.0000" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_86.gdml"/>
+			<position name="posRef_Fe_87" x="-0.0000" y="479.0474" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_87.gdml"/>
+			<position name="posRef_Fe_88" x="479.0474" y="-0.0000" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_88.gdml"/>
+			<position name="posRef_Fe_89" x="-0.0000" y="-479.0474" z="3027.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_89.gdml"/>
+			<position name="posRef_Fe_90" x="-455.0232" y="-455.0232" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_90.gdml"/>
+			<position name="posRef_Fe_91" x="455.0232" y="455.0232" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_91.gdml"/>
+			<position name="posRef_Fe_92" x="-455.0232" y="455.0232" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_92.gdml"/>
+			<position name="posRef_Fe_93" x="455.0232" y="-455.0232" z="3430.3100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_93.gdml"/>
+			<position name="posRef_Fe_94" x="-0.0000" y="0.0000" z="9992.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_94.gdml"/>
+			<position name="posRef_Fe_95" x="-0.0000" y="-0.0000" z="9006.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_95.gdml"/>
+			<position name="posRef_Fe_96" x="-405.1416" y="405.1416" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_96.gdml"/>
+			<position name="posRef_Fe_97" x="405.1416" y="405.1416" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_97.gdml"/>
+			<position name="posRef_Fe_98" x="405.1416" y="-405.1416" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_98.gdml"/>
+			<position name="posRef_Fe_99" x="-405.1416" y="-405.1416" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_99.gdml"/>
+			<position name="posRef_Fe_100" x="-0.0000" y="-702.5000" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_100.gdml"/>
+			<position name="posRef_Fe_101" x="-0.0000" y="702.5000" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_101.gdml"/>
+			<position name="posRef_Fe_102" x="-702.5000" y="-0.0000" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_102.gdml"/>
+			<position name="posRef_Fe_103" x="702.5000" y="-0.0000" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_103.gdml"/>
+			<position name="posRef_Fe_104" x="-362.5000" y="362.5000" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_104.gdml"/>
+			<position name="posRef_Fe_105" x="362.5000" y="-362.5000" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_105.gdml"/>
+			<position name="posRef_Fe_106" x="-362.5000" y="-362.5000" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_106.gdml"/>
+			<position name="posRef_Fe_107" x="362.5000" y="362.5000" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_107.gdml"/>
+			<position name="posRef_Fe_108" x="-0.0000" y="482.8123" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_108.gdml"/>
+			<position name="posRef_Fe_109" x="-0.0000" y="-482.8123" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_109.gdml"/>
+			<position name="posRef_Fe_110" x="482.8123" y="-0.0000" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_110.gdml"/>
+			<position name="posRef_Fe_111" x="-482.8123" y="-0.0000" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_111.gdml"/>
+			<position name="posRef_Fe_112" x="482.8123" y="-0.0000" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_112.gdml"/>
+			<position name="posRef_Fe_113" x="-482.8123" y="-0.0000" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_113.gdml"/>
+			<position name="posRef_Fe_114" x="-0.0000" y="482.8123" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_114.gdml"/>
+			<position name="posRef_Fe_115" x="-0.0000" y="-482.8123" z="9096.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_115.gdml"/>
+			<position name="posRef_Fe_116" x="-479.0474" y="-0.0000" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_116.gdml"/>
+			<position name="posRef_Fe_117" x="-0.0000" y="479.0474" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_117.gdml"/>
+			<position name="posRef_Fe_118" x="479.0474" y="-0.0000" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_118.gdml"/>
+			<position name="posRef_Fe_119" x="-0.0000" y="-479.0474" z="9499.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_119.gdml"/>
+			<position name="posRef_Fe_120" x="-455.0232" y="-455.0232" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_120.gdml"/>
+			<position name="posRef_Fe_121" x="455.0232" y="455.0232" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_121.gdml"/>
+			<position name="posRef_Fe_122" x="-455.0232" y="455.0232" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_122.gdml"/>
+			<position name="posRef_Fe_123" x="455.0232" y="-455.0232" z="9902.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_123.gdml"/>
+			<position name="posRef_Fe_124" x="-0.0000" y="0.0000" z="11152.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_124.gdml"/>
+			<position name="posRef_Fe_125" x="-0.0000" y="-0.0000" z="10166.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_125.gdml"/>
+			<position name="posRef_Fe_126" x="-405.1416" y="405.1416" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_126.gdml"/>
+			<position name="posRef_Fe_127" x="405.1416" y="405.1416" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_127.gdml"/>
+			<position name="posRef_Fe_128" x="405.1416" y="-405.1416" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_128.gdml"/>
+			<position name="posRef_Fe_129" x="-405.1416" y="-405.1416" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_129.gdml"/>
+			<position name="posRef_Fe_130" x="-0.0000" y="-702.5000" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_130.gdml"/>
+			<position name="posRef_Fe_131" x="-0.0000" y="702.5000" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_131.gdml"/>
+			<position name="posRef_Fe_132" x="-702.5000" y="-0.0000" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_132.gdml"/>
+			<position name="posRef_Fe_133" x="702.5000" y="-0.0000" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_133.gdml"/>
+			<position name="posRef_Fe_134" x="-362.5000" y="362.5000" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_134.gdml"/>
+			<position name="posRef_Fe_135" x="362.5000" y="-362.5000" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_135.gdml"/>
+			<position name="posRef_Fe_136" x="-362.5000" y="-362.5000" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_136.gdml"/>
+			<position name="posRef_Fe_137" x="362.5000" y="362.5000" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_137.gdml"/>
+			<position name="posRef_Fe_138" x="-0.0000" y="482.8123" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_138.gdml"/>
+			<position name="posRef_Fe_139" x="-0.0000" y="-482.8123" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_139.gdml"/>
+			<position name="posRef_Fe_140" x="482.8123" y="-0.0000" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_140.gdml"/>
+			<position name="posRef_Fe_141" x="-482.8123" y="-0.0000" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_141.gdml"/>
+			<position name="posRef_Fe_142" x="482.8123" y="-0.0000" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_142.gdml"/>
+			<position name="posRef_Fe_143" x="-482.8123" y="-0.0000" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_143.gdml"/>
+			<position name="posRef_Fe_144" x="-0.0000" y="482.8123" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_144.gdml"/>
+			<position name="posRef_Fe_145" x="-0.0000" y="-482.8123" z="10256.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_145.gdml"/>
+			<position name="posRef_Fe_146" x="-479.0474" y="-0.0000" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_146.gdml"/>
+			<position name="posRef_Fe_147" x="-0.0000" y="479.0474" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_147.gdml"/>
+			<position name="posRef_Fe_148" x="479.0474" y="-0.0000" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_148.gdml"/>
+			<position name="posRef_Fe_149" x="-0.0000" y="-479.0474" z="10659.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_149.gdml"/>
+			<position name="posRef_Fe_150" x="-455.0232" y="-455.0232" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_150.gdml"/>
+			<position name="posRef_Fe_151" x="455.0232" y="455.0232" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_151.gdml"/>
+			<position name="posRef_Fe_152" x="-455.0232" y="455.0232" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_152.gdml"/>
+			<position name="posRef_Fe_153" x="455.0232" y="-455.0232" z="11062.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_153.gdml"/>
+			<position name="posRef_Fe_154" x="-0.0000" y="0.0000" z="12312.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_154.gdml"/>
+			<position name="posRef_Fe_155" x="-0.0000" y="-0.0000" z="11326.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_155.gdml"/>
+			<position name="posRef_Fe_156" x="-405.1416" y="405.1416" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_156.gdml"/>
+			<position name="posRef_Fe_157" x="405.1416" y="405.1416" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_157.gdml"/>
+			<position name="posRef_Fe_158" x="405.1416" y="-405.1416" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_158.gdml"/>
+			<position name="posRef_Fe_159" x="-405.1416" y="-405.1416" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_159.gdml"/>
+			<position name="posRef_Fe_160" x="-0.0000" y="-702.5000" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_160.gdml"/>
+			<position name="posRef_Fe_161" x="-0.0000" y="702.5000" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_161.gdml"/>
+			<position name="posRef_Fe_162" x="-702.5000" y="-0.0000" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_162.gdml"/>
+			<position name="posRef_Fe_163" x="702.5000" y="-0.0000" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_163.gdml"/>
+			<position name="posRef_Fe_164" x="-362.5000" y="362.5000" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_164.gdml"/>
+			<position name="posRef_Fe_165" x="362.5000" y="-362.5000" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_165.gdml"/>
+			<position name="posRef_Fe_166" x="-362.5000" y="-362.5000" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_166.gdml"/>
+			<position name="posRef_Fe_167" x="362.5000" y="362.5000" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_167.gdml"/>
+			<position name="posRef_Fe_168" x="-0.0000" y="482.8123" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_168.gdml"/>
+			<position name="posRef_Fe_169" x="-0.0000" y="-482.8123" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_169.gdml"/>
+			<position name="posRef_Fe_170" x="482.8123" y="-0.0000" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_170.gdml"/>
+			<position name="posRef_Fe_171" x="-482.8123" y="-0.0000" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_171.gdml"/>
+			<position name="posRef_Fe_172" x="482.8123" y="-0.0000" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_172.gdml"/>
+			<position name="posRef_Fe_173" x="-482.8123" y="-0.0000" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_173.gdml"/>
+			<position name="posRef_Fe_174" x="-0.0000" y="482.8123" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_174.gdml"/>
+			<position name="posRef_Fe_175" x="-0.0000" y="-482.8123" z="11416.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_175.gdml"/>
+			<position name="posRef_Fe_176" x="-479.0474" y="-0.0000" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_176.gdml"/>
+			<position name="posRef_Fe_177" x="-0.0000" y="479.0474" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_177.gdml"/>
+			<position name="posRef_Fe_178" x="479.0474" y="-0.0000" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_178.gdml"/>
+			<position name="posRef_Fe_179" x="-0.0000" y="-479.0474" z="11819.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_179.gdml"/>
+			<position name="posRef_Fe_180" x="-455.0232" y="-455.0232" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_180.gdml"/>
+			<position name="posRef_Fe_181" x="455.0232" y="455.0232" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_181.gdml"/>
+			<position name="posRef_Fe_182" x="-455.0232" y="455.0232" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_182.gdml"/>
+			<position name="posRef_Fe_183" x="455.0232" y="-455.0232" z="12222.4100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_183.gdml"/>
+			<position name="posRef_Fe_184" x="99.9400" y="-0.0000" z="26.2100"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_184.gdml"/>
+			<position name="posRef_Fe_185" x="-326.3472" y="174.5097" z="-88.0133"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_185.gdml"/>
+			<position name="posRef_Fe_186" x="526.2272" y="174.5097" z="140.4333"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_186.gdml"/>
+			<position name="posRef_Fe_187" x="-326.3472" y="-174.5097" z="-88.0133"/>
+			<rotationref ref="identity"/>
+		</physvol>
+		<physvol>
+			<file name="Iges_Fe_187.gdml"/>
+			<position name="posRef_Fe_188" x="526.2272" y="-174.5097" z="140.4333"/>
+			<rotationref ref="identity"/>
+		</physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3405_Cu_Resin_06_10_14/TD-1189-3405_Cu-Resin_06-10-14.gdml"/>
+            <position name="Cu_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Cu_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3434_G10_06_10_14/TD-1189-3434_G10_06-10-14.gdml"/>
+            <position name="G10_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="G10_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3440_StainSt304_06_10_14/TD-1189-3440_StainSt304_06-10-14.gdml"/>
+            <position name="StSt304_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="StSt204_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3441_StainSt316_06_10_14/TD-1189-3441_StainSt316_06-10-14.gdml"/>
+            <position name="StSt316_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="StSt316_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3442_AlAlloy6061_06_10_14/TD-1189-3442_AlAlloy6061_06-10-14.gdml"/>
+            <position name="AlAl6061_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="AlAl6061_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3443_PureAl_06_10_14/TD-1189-3443_PureAl_06-10-14.gdml"/>
+            <position name="Al_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="Al_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3461_AlAlloy5083_06_10_14/TD-1189-3461_AlAlloy5083_06-10-14.gdml"/>
+            <position name="AlAl5083_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="AlAl5083_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3473_AlAlloy6082_06_10_14/TD-1189-3473_AlAlloy6082_06-10-14.gdml"/>
+            <position name="AlAl6082_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="AlAl6082_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3497_AlAlloy5251_06_10_14/TD-1189-3497_AlAlloy5251_06-10-14.gdml"/>
+            <position name="AlAl5251_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="AlAl5251_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3461_al_alloy5083_24_09_14/TD-1189-3461-al-alloy5083_24-09-14.gdml"/>
+            <position name="alal5083_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="alal5083_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3462_tufnol_24_09_14/TD-1189-3462-tufnol_24-09-14.gdml"/>
+            <position name="tufnol_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="tufnol_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3463_tufset_polyeurethane_24_09_14/TD-1189-3463-tufset-polyeurethane_24-09-14.gdml"/>
+            <position name="PU_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="PU_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3465_brass_cz121_24_09_14/TD-1189-3465-brass-cz121_24-09-14.gdml"/>
+            <position name="CuZn_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="CuZn_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3466_polycarbonate_24_09_14/TD-1189-3466-polycarbonate_24-09-14.gdml"/>
+            <position name="PC_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="PC_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+        <physvol>
+            <file name="GDML_TD_1189_3467_al_alloy2017_24_09_14/TD-1189-3467-al-alloy2017_24-09-14.gdml"/>
+            <position name="alal2017_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="alal2017_rot" x="0.0" y="0.0" z="0.0" unit="radian"/>
+        </physvol>
+    </volume>
+</structure>
+
+<setup name="Default" version="1.0">
+    <world ref="Structure_0"/>
+</setup>
+
+</gdml>

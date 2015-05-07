@@ -45,6 +45,10 @@ TOF1SlabHitArray TOFEventSlabHit::GetTOF1SlabHitArray() const {
     return _tof1;
 }
 
+TOF1SlabHitArray* TOFEventSlabHit::GetTOF1SlabHitArrayPtr() {
+    return &_tof1;
+}
+
 TOFSlabHit TOFEventSlabHit::GetTOF1SlabHitArrayElement(size_t index) const {
     return _tof1[index];
 }
@@ -61,6 +65,10 @@ TOF0SlabHitArray TOFEventSlabHit::GetTOF0SlabHitArray() const {
     return _tof0;
 }
 
+TOF0SlabHitArray* TOFEventSlabHit::GetTOF0SlabHitArrayPtr() {
+    return &_tof0;
+}
+
 TOFSlabHit TOFEventSlabHit::GetTOF0SlabHitArrayElement(size_t index) const {
     return _tof0[index];
 }
@@ -75,6 +83,10 @@ void TOFEventSlabHit::SetTOF0SlabHitArray(TOF0SlabHitArray tof0) {
 
 TOF2SlabHitArray TOFEventSlabHit::GetTOF2SlabHitArray() const {
     return _tof2;
+}
+
+TOF2SlabHitArray* TOFEventSlabHit::GetTOF2SlabHitArrayPtr() {
+    return &_tof2;
 }
 
 TOFSlabHit TOFEventSlabHit::GetTOF2SlabHitArrayElement(size_t index) const {

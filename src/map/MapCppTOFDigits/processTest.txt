@@ -1,4 +1,10 @@
 {
+	"run_number": 2873, 
+	"maus_event_type": "Spill", 
+	"recon_events": [], 
+	"spill_number": 0, 
+	"errors": {}, 
+	"daq_event_type": "physics_event", 
 	"daq_data" :
 	{
 		"tof0" : 
@@ -337,9 +343,18 @@
 		],
 		"tof2" : 
 		[
-			null,
-			
-			null
+			{
+				"V1290" : 
+				[],
+				"V1724" : 
+				[]
+			},
+			{
+				"V1290" : 
+				[],
+				"V1724" : 
+				[]
+			}
 		],
 		"trigger" : 
 		[
@@ -691,6 +706,5 @@
 				]
 			}
 		]
-	},
-	"daq_event_type" : "physics_event"
+	}
 }

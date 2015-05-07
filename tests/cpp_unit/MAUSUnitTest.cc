@@ -65,6 +65,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["check_volume_overlaps"] = true;
   config["reconstruction_geometry_filename"] = "Test.dat";
   config["simulation_geometry_filename"] = "Test.dat";
+  config["simulation_geometry_debug"] = false;
   config["maximum_number_of_steps"] = 10000;
   config["will_do_stack_trace"] = true;
   config["keep_tracks"] = true;

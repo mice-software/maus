@@ -17,6 +17,7 @@
 
 
 #include "Utils/TOFChannelMap.hh"
+#include "Globals/PyLibMausCpp.hh"
 
 namespace MAUS {
 
@@ -51,12 +52,18 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON) {
   _tof_cablingdate = JsonWrapper::GetProperty(configJSON,
                                                "TOF_cabling_date_from",
                                                JsonWrapper::stringValue).asString();
-  // std::cout << "cabling date: " << _tof_cablingdate << std::endl;
-
+//   std::cout << "TOF cabling date: " << _tof_cablingdate << std::endl;
   if (!pymod_ok) return false;
   bool loaded = this->InitFromCDB();
   if (!loaded)
     return false;
+
+//   std::string tof_cabling_file = JsonWrapper::GetProperty(configJSON,
+//                                                "TOF_cabling_file",
+//                                                JsonWrapper::stringValue).asString();
+//   bool loaded = this->InitFromFile(tof_cabling_file);
+//   if (!loaded)
+//     return false;
 
   return true;
 }
@@ -313,6 +320,7 @@ string TOFChannelKey::str() {
 bool TOFChannelMap::InitializePyMod() {
   // import the get_tof_cabling module
   // this python module access and gets cabling from the DB
+  PyLibMausCpp::initlibMausCpp();
   _cabling_mod = PyImport_ImportModule("calibration.get_tof_cabling");
   if (_cabling_mod == NULL) {
     std::cerr << "Failed to import get_tof_cabling module" << std::endl;

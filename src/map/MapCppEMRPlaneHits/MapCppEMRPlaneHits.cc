@@ -258,16 +258,9 @@ void MapCppEMRPlaneHits::fill(MAUS::Spill *spill,
   ReconEventPArray *recEvts =  spill->GetReconEvents();
 
   // Resize the recon event to harbour all the EMR noise+decays
-  if (recPartEvents == 0) { // No recEvts yet
-      for (int iPe = 0; iPe < nPartEvents; iPe++) {
-        recEvts->push_back(new ReconEvent);
-    }
-  }
-
-  if (nPartEvents == recPartEvents+2) { // Regular sized recEvts already created
-    for (int iPe = 0; iPe < 2; iPe++) {
-      recEvts->push_back(new ReconEvent);
-    }
+  while (recPartEvents < nPartEvents) {
+    recEvts->push_back(new ReconEvent);
+    recPartEvents++;
   }
 
 //  std::cerr << spill->GetReconEventSize() << std::endl;

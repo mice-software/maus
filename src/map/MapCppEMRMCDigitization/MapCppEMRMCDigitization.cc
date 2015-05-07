@@ -159,7 +159,9 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
     }
   }
 
-  if (!delta_t_array.size()) return;
+  // Break if there's no EMR data
+  if (!delta_t_array.size())
+      return;
 
   int lt = static_cast<int>(*std::min_element(delta_t_array.begin(), delta_t_array.end())
 			    /_dbb_count);
@@ -550,16 +552,9 @@ void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
   int xSpill = spill->GetSpillNumber();
 
   // Resize the recon event to harbour all the EMR noise+decays
-  if (recPartEvents == 0) { // No recEvts yet
-      for (int iPe = 0; iPe < nPartEvents; iPe++) {
-        recEvts->push_back(new ReconEvent);
-    }
-  }
-
-  if (nPartEvents == recPartEvents+2) { // Regular sized recEvts already created
-    for (int iPe = 0; iPe < 2; iPe++) {
-      recEvts->push_back(new ReconEvent);
-    }
+  while (recPartEvents < nPartEvents) {
+    recEvts->push_back(new ReconEvent);
+    recPartEvents++;
   }
 
   // Fill it with DBB and fADC arrays

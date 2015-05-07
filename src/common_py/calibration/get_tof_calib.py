@@ -127,7 +127,11 @@ class GetCalib:
             fromdate = '2011-11-24 12:00:00'
         if run_num >= 4956 and run_num < 5790:
             fromdate = '2013-08-01 12:00:00'
-        if run_num >= 5790 or run_num == 0:
+        if run_num >= 5790 and run_num < 6155:
+            fromdate = '2014-06-29 12:00:00'
+        if run_num >= 6155 and run_num < 6288:
+            fromdate = '2015-03-21 00:00:00'
+        if run_num >= 6288 or run_num == 0:
             fromdate = 'current'
         return fromdate
     

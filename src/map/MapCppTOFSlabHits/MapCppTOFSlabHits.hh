@@ -34,7 +34,7 @@
 
 namespace MAUS {
 
-class MapCppTOFSlabHits : public MapBase<Json::Value> {
+class MapCppTOFSlabHits : public MapBase<MAUS::Data> {
 
  public:
   MapCppTOFSlabHits();
@@ -53,25 +53,24 @@ class MapCppTOFSlabHits : public MapBase<Json::Value> {
  */
   void _death();
 
-  /** @brief process JSON document
+  /** @brief process Data object
  *
- *  @param document Receive a document with digits and return
- *  a document with slab hits.
+ *  @param document Receive a digits and return slab hits.
  */
-  void _process(Json::Value* document) const;
+  void _process(MAUS::Data *data) const;
 
  private:
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
-  Json::Value fillSlabHit(Json::Value xDocDigit0, Json::Value xDocDigit1) const;
+  void fillSlabHit(MAUS::TOFSlabHit &slHit,
+                   MAUS::TOFDigit &xDocDigit0,
+                   MAUS::TOFDigit &xDocDigit1) const;
 
   /** @brief makes slab hits
    *
-   *  @param xDocDetectorData Json document containing digits from 
-   * one particle event in one individual detector.
    */
-  Json::Value makeSlabHits(Json::Value xDocPartEvent) const;
+  void makeSlabHits(TOF0SlabHitArray *slhits, TOF0DigitArray *digits) const;
 
   double _tdcV1290_conversion_factor;
 };

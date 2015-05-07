@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+    
+<define/>
+    
+<materials>
+    <element name="H" N="1" Z="1" formula="H">
+        <T value="20.39" unit="K"/>
+        <D value="0.0708" unit="g/cm3"/>
+        <atom value="1.008" unit="g/mole"/>
+    </element>
+    <material name="lH2" state="liquid">
+        <D value="0.0708" unit="g/cm3"/>
+        <composite n="1" ref="H"/>
+    </material>
+     <element name="aluminum" formula="Al" Z="13">
+           <atom value="26.9815"/>
+     </element>
+     <material name="Al" formula="Al">
+          <D value ="2.7000" unit="g/cm3"/>
+          <fraction n="1.0000" ref="aluminum"/>
+     </material>
+    <material name="Galactic" Z="1" state="gas">
+        <T value="2.73" unit="K"/>
+        <P value="3e-18" unit="pascal"/>
+        <D value="1e-25" unit="g/cm3"/>
+        <atom value="1.01" unit="g/mole"/>
+    </material>
+</materials>
+
+<solids>
+    <tube rmax="76.0" deltaphi="360" z="84.4" aunit="degree"  lunit="cm" name="LH2_solid"/>
+    <tube rmin="150" rmax="155" z="230" lunit="mm" deltaphi="360" aunit="degree" name="AlVessel_solid"/>
+    <tube rmin="150" rmax="235" z="40" lunit="mm" deltaphi="360" aunit="degree" name="AlWindowAbsFlange_solid"/>
+    <polycone deltaphi="360" name="AlWindowAbsPolycone_solid" lunit="mm" aunit="degree">
+        <zplane z="0" rmin="0.0" rmax="0.0"/>
+        <zplane z="0.149999999997" rmin="0.0" rmax="6.53479150394203"/>
+        <zplane z="0.249999999999972" rmin="5.29055762656435" rmax="8.43489774686043"/>
+        <zplane z="0.549999999999983" rmin="10.5754432531219" rmax="12.5043792328926"/>
+        <zplane z="1.14999999999998" rmin="16.70329308849" rmax="18.062211935419"/>
+        <zplane z="1.536" rmin="19.6509288330095" rmax="20.8603677819927"/>
+        <zplane z="3.072" rmin="28.4538559074163" rmax="29.4209329559754"/>
+        <zplane z="4.608" rmin="35.0480560944542" rmax="35.9347889377411"/>
+        <zplane z="6.14400000000001" rmin="40.5264353724826" rmax="41.3800462058708"/>
+        <zplane z="7.68000000000001" rmin="45.2956852249749" rmax="46.1366318666632"/>
+        <zplane z="9.21600000000001" rmin="49.5609487802646" rmax="50.3999085713456"/>
+        <zplane z="10.752" rmin="53.4430313137271" rmax="54.2862245509853"/>
+        <zplane z="12.288" rmin="57.0202504028175" rmax="57.8715731253264"/>
+        <zplane z="13.824" rmin="60.3468451868033" rmax="61.2088652402575"/>
+        <zplane z="15.36" rmin="63.4622399541649" rmax="64.3367142462219"/>
+        <zplane z="16.896" rmin="66.396170702835" rmax="67.2843356510266"/>
+        <zplane z="18.432" rmin="69.1717317695604" rmax="70.0744764946554"/>
+        <zplane z="19.968" rmin="71.807289852772" rmax="72.7252644959096"/>
+        <zplane z="21.504" rmin="74.3177413811804" rmax="75.2514275213435"/>
+        <zplane z="23.04" rmin="76.7153693858018" rmax="77.6651273094946"/>
+        <zplane z="24.576" rmin="79.0104456638489" rmax="79.9765469622189"/>
+        <zplane z="26.112" rmin="81.2116651473174" rmax="82.1943157158694"/>
+        <zplane z="27.648" rmin="83.3264663597348" rmax="84.3258229488453"/>
+        <zplane z="29.184" rmin="85.3612725069162" rmax="86.3774548363172"/>
+        <zplane z="30.72" rmin="87.32961962777" rmax="88.3830559371981"/>
+        <zplane z="32.256" rmin="89.3559051514495" rmax="90.480400108059"/>
+        <zplane z="33.792" rmin="91.492587546534" rmax="92.6976497514282"/>
+        <zplane z="35.328" rmin="93.7522463381871" rmax="95.0495864379813"/>
+        <zplane z="36.864" rmin="96.1503604468889" rmax="97.5546794012045"/>
+        <zplane z="38.4" rmin="98.7063456556273" rmax="100.236526912936"/>
+        <zplane z="39.936" rmin="101.445127124047" rmax="103.126118416763"/>
+        <zplane z="41.472" rmin="104.39962947519" rmax="106.265574491836"/>
+        <zplane z="43.008" rmin="107.614939990605" rmax="109.714752851575"/>
+        <zplane z="44.544" rmin="111.155769540381" rmax="113.563979180601"/>
+        <zplane z="46.08" rmin="115.121115614172" rmax="117.961734785706"/>
+        <zplane z="47.616" rmin="119.677066105009" rmax="123.186870559484"/>
+        <zplane z="49.152" rmin="125.146318743494" rmax="129.906995953678"/>
+        <zplane z="50.6880000000001" rmin="132.358797319911" rmax="141.380986710023"/>
+        <zplane z="50.971" rmin="134.055488875478" rmax="150"/>
+        <zplane z="52.2240000000001" rmin="150" rmax="150"/>
+    </polycone>
+    <polycone deltaphi="360" name="LH2End_solid" lunit="mm" aunit="degree">
+        <zplane z="0" rmin="0.0" rmax="0.0"/>
+        <zplane z="0.149999999997" rmin="0.0" rmax="6.53479150394203"/>
+        <zplane z="0.249999999999972" rmin="5.29055762656435" rmax="8.43489774686043"/>
+        <zplane z="0.549999999999983" rmin="10.5754432531219" rmax="12.5043792328926"/>
+        <zplane z="1.14999999999998" rmin="16.70329308849" rmax="18.062211935419"/>
+        <zplane z="1.536" rmin="19.6509288330095" rmax="20.8603677819927"/>
+        <zplane z="3.072" rmin="28.4538559074163" rmax="29.4209329559754"/>
+        <zplane z="4.608" rmin="35.0480560944542" rmax="35.9347889377411"/>
+        <zplane z="6.14400000000001" rmin="40.5264353724826" rmax="41.3800462058708"/>
+        <zplane z="7.68000000000001" rmin="45.2956852249749" rmax="46.1366318666632"/>
+        <zplane z="9.21600000000001" rmin="49.5609487802646" rmax="50.3999085713456"/>
+        <zplane z="10.752" rmin="53.4430313137271" rmax="54.2862245509853"/>
+        <zplane z="12.288" rmin="57.0202504028175" rmax="57.8715731253264"/>
+        <zplane z="13.824" rmin="60.3468451868033" rmax="61.2088652402575"/>
+        <zplane z="15.36" rmin="63.4622399541649" rmax="64.3367142462219"/>
+        <zplane z="16.896" rmin="66.396170702835" rmax="67.2843356510266"/>
+        <zplane z="18.432" rmin="69.1717317695604" rmax="70.0744764946554"/>
+        <zplane z="19.968" rmin="71.807289852772" rmax="72.7252644959096"/>
+        <zplane z="21.504" rmin="74.3177413811804" rmax="75.2514275213435"/>
+        <zplane z="23.04" rmin="76.7153693858018" rmax="77.6651273094946"/>
+        <zplane z="24.576" rmin="79.0104456638489" rmax="79.9765469622189"/>
+        <zplane z="26.112" rmin="81.2116651473174" rmax="82.1943157158694"/>
+        <zplane z="27.648" rmin="83.3264663597348" rmax="84.3258229488453"/>
+        <zplane z="29.184" rmin="85.3612725069162" rmax="86.3774548363172"/>
+        <zplane z="30.72" rmin="87.32961962777" rmax="88.3830559371981"/>
+        <zplane z="32.256" rmin="89.3559051514495" rmax="90.480400108059"/>
+        <zplane z="33.792" rmin="91.492587546534" rmax="92.6976497514282"/>
+        <zplane z="35.328" rmin="93.7522463381871" rmax="95.0495864379813"/>
+        <zplane z="36.864" rmin="96.1503604468889" rmax="97.5546794012045"/>
+        <zplane z="38.4" rmin="98.7063456556273" rmax="100.236526912936"/>
+        <zplane z="39.936" rmin="101.445127124047" rmax="103.126118416763"/>
+        <zplane z="41.472" rmin="104.39962947519" rmax="106.265574491836"/>
+        <zplane z="43.008" rmin="107.614939990605" rmax="109.714752851575"/>
+        <zplane z="44.544" rmin="111.155769540381" rmax="113.563979180601"/>
+        <zplane z="46.08" rmin="115.121115614172" rmax="117.961734785706"/>
+        <zplane z="47.616" rmin="119.677066105009" rmax="123.186870559484"/>
+        <zplane z="49.152" rmin="125.146318743494" rmax="129.906995953678"/>
+        <zplane z="50.6880000000001" rmin="132.358797319911" rmax="141.380986710023"/>
+        <zplane z="50.971" rmin="134.055488875478" rmax="150"/>
+        <zplane z="52.2240000000001" rmin="150" rmax="150"/>
+    </polycone>
+    <polycone deltaphi="360" name="WindowVacPolycone_solid" lunit="mm" aunit="degree">
+        <zplane z="0" rmin="0.0" rmax="0.0"/>
+	<zplane z="0.107142857142861" rmin="0" rmax="5.52249111934686"/>
+	<zplane z="0.207142857142856" rmin="5.29055762656435" rmax="7.67736336011679"/>
+	<zplane z="0.507142857142867" rmin="10.5754432531219" rmax="12.0064111275297"/>
+	<zplane z="1.10714285714286"  rmin="16.70329308849"   rmax="17.7211147550956"/>
+	<zplane z="1.53473949579831"  rmin="19.9421419777522" rmax="20.8486983661712"/>
+	<zplane z="3.06947899159661"  rmin="28.6474899820833" rmax="29.4045166001287"/>
+	<zplane z="4.60421848739492"  rmin="35.1988279243268" rmax="35.9147896940937"/>
+	<zplane z="6.13895798319322"  rmin="40.6512661743672" rmax="41.3570766666938"/>
+	<zplane z="7.67369747899153"  rmin="45.4024508729673" rmax="46.111089896235"/>
+	<zplane z="9.20843697478983"  rmin="49.6540914560446" rmax="50.3720813723497"/>
+	<zplane z="10.7431764705881"  rmin="53.525360351317" rmax="54.2563332847572"/>
+        <zplane z="12.2779159663865"  rmin="57.0936839984207" rmax="57.839795734345"/>
+        <zplane z="13.8126554621848"  rmin="60.412767306628" rmax="61.1753495211505"/>
+        <zplane z="15.3473949579831"  rmin="63.5216916032477" rmax="64.3015859589729"/>
+        <zplane z="16.8821344537814"  rmin="66.4499609028591" rmax="67.2477038567378"/>
+        <zplane z="18.4168739495797"  rmin="69.2205060166781" rmax="70.0364372346846"/>
+        <zplane z="19.9516134453781"  rmin="71.851574455808" rmax="72.6859034229635"/>
+        <zplane z="21.4863529411764"  rmin="74.3579733432276" rmax="75.2108218387283"/>
+        <zplane z="23.0210924369747"  rmin="76.7519172203915" rmax="77.6233472369077"/>
+        <zplane z="24.555831932773"  rmin="79.0436243074646" rmax="79.9336568675939"/>
+        <zplane z="26.0905714285713"  rmin="81.2417469019066" rmax="82.1503750055409"/>
+        <zplane z="27.6253109243697"  rmin="83.3536890908097" rmax="84.2808867788886"/>
+        <zplane z="29.160050420168"  rmin="85.3858458983768" rmax="86.3315746889906"/>
+        <zplane z="30.6947899159663"  rmin="87.3523135501198" rmax="88.3352323142109"/>
+        <zplane z="32.2295294117646"  rmin="89.3780971712923" rmax="90.4295593031644"/>
+        <zplane z="33.7642689075629"  rmin="91.5142176509186" rmax="92.6433840810825"/>
+        <zplane z="35.2990084033613"  rmin="93.7732490645685" rmax="94.9913993737729"/>
+        <zplane z="36.8337478991596"  rmin="96.1706636313799" rmax="97.4919533011171"/>
+        <zplane z="38.3684873949579"  rmin="98.7258687408835" rmax="100.168473736475"/>
+        <zplane z="39.9032268907562"  rmin="101.463778801515" rmax="103.051700912041"/>
+        <zplane z="41.4379663865545"  rmin="104.4173042763" rmax="106.183372735727"/>
+        <zplane z="42.9727058823529"  rmin="107.631513125782" rmax="109.622721007426"/>
+        <zplane z="44.5074453781512"  rmin="111.1710886073" rmax="113.458956391372"/>
+        <zplane z="46.0421848739495"  rmin="115.134986171901" rmax="117.838315031408"/>
+        <zplane z="47.5769243697478"  rmin="119.689223568423" rmax="123.034164971384"/>
+        <zplane z="49.1116638655461"  rmin="125.156363070262" rmax="129.694878484068"/>
+        <zplane z="50.6464033613445"  rmin="132.365982497789" rmax="140.848926811975"/>
+        <zplane z="50.9281428571429"  rmin="134.055488875478" rmax="150"/>
+        <zplane z="52.1811428571428"  rmin="150" rmax="150"/>
+    </polycone>
+    <tube rmax="150" z="244.88" lunit="mm" deltaphi="360" aunit="degree" name="LH2Center_solid"/>
+    <tube rmax="150" z="122.426" lunit="mm" deltaphi="360" aunit="degree" name="LH2CenterHalf_solid"/>
+    <tube rmax="150" z="1e-6" lunit="mm" deltaphi="360" aunit="degree" name="LH2CenterSpecVirt_solid"/>
+    <tube rmin="150" rmax="235" z="36" lunit="mm" deltaphi="360" aunit="degree" name="AlWindowVacFlange_solid"/>
+</solids>
+    
+<structure>
+    <volume name="AlVessel">
+        <materialref ref="Al"/>
+        <solidref ref="AlVessel_solid"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.87"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.77"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.69"/>
+    </volume>
+    <volume name="AlWindowAbsFlange">
+        <materialref ref="Al"/>
+        <solidref ref="AlWindowAbsFlange_solid"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.87"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.77"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.69"/>
+    </volume>
+    <volume name="AlWindowAbsPolycone">
+        <materialref ref="Al"/>
+        <solidref ref="AlWindowAbsPolycone_solid"/>
+	<auxiliary auxtype="BlueColour" auxvalue="0.87"/>
+	<auxiliary auxtype="GreenColour" auxvalue="0.77"/>
+	<auxiliary auxtype="RedColour" auxvalue="0.69"/>
+        <auxiliary auxtype="FileName" auxvalue="PolyconeProfile"/>
+        <auxiliary auxtype="PolyconeType" auxvalue="Shell"/>
+    </volume>
+    <volume name="LH2End">
+        <materialref ref="lH2"/>
+        <solidref ref="LH2End_solid"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.75"/>
+        <auxiliary auxtype="FileName" auxvalue="PolyconeProfile"/>
+        <auxiliary auxtype="PolyconeType" auxvalue="Fill"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="OpticalMaterialsLength" auxvalue="0"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SpecialVirtual"/>
+    </volume>
+    <volume name="LH2CenterHalf">
+        <materialref ref="lH2"/>
+        <solidref ref="LH2CenterHalf_solid"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.75"/>
+        <auxiliary auxtype="OpticsMaterialLength" auxvalue="0.0"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SpecialVirtual"/>
+    </volume>
+    <volume name="LH2CenterSpecVirt">
+        <materialref ref="lH2"/>
+        <solidref ref="LH2CenterSpecVirt_solid"/>
+        <auxiliary auxtype="OpticsMaterialLength" auxvalue="0.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.75"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="SpecialVirtual"/>
+        <auxiliary auxtype="SteppingInto" auxvalue="0"/>
+        <auxiliary auxtype="SteppingThrough" auxvalue="0"/>
+    </volume>
+    <volume name="LH2Center">
+        <materialref ref="Galactic"/>
+        <solidref ref="LH2Center_solid"/>
+        <physvol name="LH2CenterHalf1_phys">
+            <volumeref ref="LH2CenterHalf"/>
+            <position name="LH2CenterHalf1_pos" x="0.0" y="0.0" z="-61.218" unit="mm"/>
+            <rotation name="LH2CenterHalf1_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="LH2CenterSpecVirt_phys">
+            <volumeref ref="LH2CenterSpecVirt"/>
+            <position name="LH2CenterSpecVirt_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="LH2CenterSpecVirt_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>        
+        <physvol name="LH2CenterHalf2_phys">
+            <volumeref ref="LH2CenterHalf"/>
+            <position name="LH2CenterHalf2_pos" x="0.0" y="0.0" z="61.218" unit="mm"/>
+            <rotation name="LH2CenterHalf2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+    </volume>
+    <volume name="AlWindowVacFlange">
+        <materialref ref="Al"/>
+        <solidref ref="AlWindowVacFlange_solid"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.87"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.77"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.69"/>
+    </volume>
+    <volume name="AlWindowVacPolycone">
+        <materialref ref="Al"/>
+        <solidref ref="WindowVacPolycone_solid"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.87"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.77"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.69"/>
+        <auxiliary auxtype="FileName" auxvalue="PolyconeProfile"/>
+        <auxiliary auxtype="PolyconeType" auxvalue="Shell"/>
+    </volume>
+    
+    <volume name="LH2">
+        <materialref ref="Galactic"/>
+        <solidref ref="LH2_solid"/>
+        <physvol name="AlVessel_phys">
+            <volumeref ref="AlVessel"/>
+            <position name="AlVessel_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="AlVessel_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AlWindowAbsFlange1_phys">
+            <volumeref ref="AlWindowAbsFlange"/>
+            <position name="AlWindowAbsFlange1_pos" x="0.0" y="0.0" z="-136" unit="mm"/>
+            <rotation name="AlWindowAbsFlange1_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AlWindowAbsFlange2_phys">
+            <volumeref ref="AlWindowAbsFlange"/>
+            <position name="AlWindowAbsFlange2_pos" x="0.0" y="0.0" z="136" unit="mm"/>
+            <rotation name="AlWindowAbsFlange2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AlWindowAbsPolycone1_phys">
+            <volumeref ref="AlWindowAbsPolycone"/>
+            <position name="AlWindowAbsPolycone1_pos" x="0.0" y="0.0" z="-175.15" unit="mm"/>
+            <rotation name="AlWindowAbsPolycone1_rot" x="0.0" y="180.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AlWindowAbsPolycone2_phys">
+            <volumeref ref="AlWindowAbsPolycone"/>
+            <position name="AlWindowAbsPolycone2_pos" x="0.0" y="0.0" z="175.15" unit="mm"/>
+            <rotation name="AlWindowAbsPolycone2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="LH2End1_phys">
+            <volumeref ref="LH2End"/>
+            <position name="LH2End1_pos" x="0.0" y="0.0" z="-175.15" unit="mm"/>
+            <rotation name="LH2End1_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="LH2Center_phys">
+            <volumeref ref="LH2Center"/>
+            <position name="LH2Center_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="LH2Center_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="LH2End2_phys">
+            <volumeref ref="LH2End"/>
+            <position name="LH2End2_pos" x="0.0" y="0.0" z="175.15" unit="mm"/>
+            <rotation name="LH2End2_rot" x="0.0" y="180.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AlWindowVacFlange1_phys">
+            <volumeref ref="AlWindowVacFlange"/>
+            <position name="AlWindowVacFlange1_pos" x="0.0" y="0.0" z="-263" unit="mm"/>
+            <rotation name="AlWindowVacFlange1_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>        
+        <physvol name="AlWindowVacFlange2_phys">
+            <volumeref ref="AlWindowVacFlange"/>
+            <position name="AlWindowVacFlange2_pos" x="0.0" y="0.0" z="263" unit="mm"/>
+            <rotation name="AlWindowVacFlange2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AlWindowVacPolycone1_phys">
+            <volumeref ref="AlWindowVacPolycone"/>
+            <position name="AlWindowVacPolycone1_pos" x="0.0" y="0.0" z="-308.0" unit="mm"/>
+            <rotation name="AlWindowVacPolycone1_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AlWindowVacPolycone2_phys">
+            <volumeref ref="AlWindowVacPolycone"/>
+            <position name="AlWindowVacPolycone2_pos" x="0.0" y="0.0" z="308.0" unit="mm"/>
+            <rotation name="AlWindowVacPolycone2_rot" x="0.0" y="180.0" z="0.0" unit="degree"/>
+        </physvol>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+    </volume>
+</structure>
+    
+<setup name="Default" version="1.0">
+    <world ref="LH2"/>
+</setup>
+    
+</gdml>

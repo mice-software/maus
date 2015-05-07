@@ -34,8 +34,8 @@
 
                             //Substitutions
                             <xsl:variable name="run_number" select="MICE_Information/Configuration_Information/run/@runNumber"/>
-		            <xsl:variable name="diffuserThickness" select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
-			    <xsl:variable name="coolingChanneltime" select="MICE_Information/Configuration_Information/coolingchannel/@validfromtime"/>
+		                    <xsl:variable name="diffuserThickness" select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
+                            <xsl:variable name="mcmode" select="MICE_Information/Configuration_Information/coolingchannel/magnets/magnet/@mode"/>
                             <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run/@beamStop, 'false') or contains(MICE_Information/Configuration_Information/run/@beamStop, 'true')">
                             Substitution $beamStop <xsl:value-of select="MICE_Information/Configuration_Information/run/@beamStop"/>
                             
@@ -96,65 +96,98 @@
 
 			    </xsl:text></xsl:when></xsl:choose>
                             </xsl:for-each></xsl:when><xsl:otherwise> </xsl:otherwise></xsl:choose>
-                <xsl:for-each select="MICE_Information/Configuration_Information/coolingchannel/magnets/magnet/coil">
-                            <xsl:choose>
-                            <xsl:when test="contains(@name, 'SSU-M1')">Substitution $SSU_M1Current <xsl:value-of select="@iset"/>
-                            Substitution $SSU_M1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSU-M2')">Substitution $SSU_M2Current <xsl:value-of select="@iset"/>
-                            Substitution $SSU_M2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSU-T1')">Substitution $SSU_E1Current <xsl:value-of select="@iset"/>
-                            Substitution $SSU_E1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSU-T2')">Substitution $SSU_E2Current <xsl:value-of select="@iset"/>
-                            Substitution $SSU_E2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSU-C')">Substitution $SSU_CCurrent <xsl:value-of select="@iset"/>
-                            Substitution $SSU_CPolarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSD-M1')">Substitution $SSD_M1Current <xsl:value-of select="@iset"/>
-                            Substitution $SSD_M1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSD-M2')">Substitution $SSD_M2Current <xsl:value-of select="@iset"/>
-                            Substitution $SSD_M2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSD-T1')">Substitution $SSD_E1Current <xsl:value-of select="@iset"/>
-                            Substitution $SSD_E1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSD-T2')">Substitution $SSD_E2Current <xsl:value-of select="@iset"/>
-                            Substitution $SSD_E2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'SSD-C')">Substitution $SSD_CCurrent <xsl:value-of select="@iset"/>
-	                    Substitution $SSD_CPolarity <xsl:value-of select="../@polarity"/><xsl:text>
-                                    
-			    </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'FCU')">Substitution $FCUCurrent <xsl:value-of select="@iset"/>
-			    Substitution $FCUPolarity <xsl:value-of select="../@polarity"/>
-                Substitution $FCUMode <xsl:value-of select="../@mode"/><xsl:text>
-                                                    
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'FCM')">Substitution $FCMCurrent <xsl:value-of select="@iset"/>
-                                Substitution $FCMPolarity <xsl:value-of select="../@polarity"/>
-                                Substitution $FCMMode <xsl:value-of select="../@mode"/><xsl:text>
-                                
-                            </xsl:text></xsl:when>
-                            <xsl:when test="contains(@name, 'FCD')">Substitution $FCDCurrent <xsl:value-of select="@iset"/>
-                                Substitution $FCDPolarity <xsl:value-of select="../@polarity"/>
-                                Substitution $FCDMode <xsl:value-of select="../@mode"/><xsl:text>
-                                
-                            </xsl:text></xsl:when>
-                     </xsl:choose>
-                 </xsl:for-each>    
+                <xsl:for-each select="MICE_Information/Configuration_Information/coolingchannel/magnets/magnet">
+                    <xsl:choose>
+                        <xsl:when test="contains(@name, 'SSU')">
+                            <xsl:for-each select="coil">
+                                <xsl:choose>
+                                    <xsl:when test="contains(@name, 'SSU-T2')">Substitution $SSUT2 <xsl:value-of select="@iset"/>
+                                        Substitution $SSUT2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSU-T1')">Substitution $SSUT1 <xsl:value-of select="@iset"/>
+                                        Substitution $SSUT2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSU-C')">Substitution $SSUC <xsl:value-of select="@iset"/>
+                                        Substitution $SSUCPolarity <xsl:value-of select="../@polarity"/><xsl:text> 
+                        
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSU-M1')">Substitution $SSUM1 <xsl:value-of select="@iset"/>
+                                        Substitution $SSUM1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSU-M2')">Substitution $SSUM2 <xsl:value-of select="@iset"/>
+                                        Substitution $SSUM2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>            
+                                </xsl:choose>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="contains(@name, 'FCM') and contains(@mode, 'Solenoid')">
+                            Substitution $FCMMode +1<xsl:text>
+                                        
+                        </xsl:text>
+                            <xsl:for-each select="coil">
+                                <xsl:choose>
+                                    <xsl:when test="contains(@name, 'FCM-U')">Substitution $FCMU <xsl:value-of select="@iset"/>
+                                        Substitution $FCMUPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                                        
+                        </xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="contains(@name, 'FCM-D')">Substitution $FCMD <xsl:value-of select="@iset"/>
+                                        Substitution $FCMDPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>                   
+                                </xsl:choose>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="contains(@name, 'FCM') and contains(@mode, 'Flip')">
+                            Substitution $FCMMode +1<xsl:text>
+                                        
+                        </xsl:text>
+                            <xsl:for-each select="coil">
+                                <xsl:choose>
+                                    <xsl:when test="contains(@name, 'FCM-U')">Substitution $FCMU <xsl:value-of select="@iset"/>
+                                        Substitution $FCMUPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                                        
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'FCM-D')">Substitution $FCMD <xsl:value-of select="@iset"/>
+                                        Substitution $FCMDPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>    
+                                </xsl:choose>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="contains(@name, 'SSD')">
+                            <xsl:for-each select="coil">
+                                <xsl:choose>
+                                    <xsl:when test="contains(@name, 'SSD-T2')">Substitution $SSDT2 <xsl:value-of select="@iset"/>
+                                        Substitution $SSDT2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSD-T1')">Substitution $SSDT1 <xsl:value-of select="@iset"/>
+                                        Substitution $SSDT2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSD-C')">Substitution $SSDC <xsl:value-of select="@iset"/>
+                                        Substitution $SSDCPolarity <xsl:value-of select="../@polarity"/><xsl:text> 
+                        
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSD-M1')">Substitution $SSDM1 <xsl:value-of select="@iset"/>
+                                        Substitution $SSDM1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>
+                                    <xsl:when test="contains(@name, 'SSD-M2')">Substitution $SSDM2 <xsl:value-of select="@iset"/>
+                                        Substitution $SSDM2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                            
+                        </xsl:text></xsl:when>    
+                                </xsl:choose>
+                            </xsl:for-each>
+                        </xsl:when>
+                    </xsl:choose>
+                </xsl:for-each>
+                
                             
                             
 	            Module Virtuals
@@ -222,8 +255,8 @@
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">0.71415*(8.648/1000.0+$D1Polarity*$D1Current*9.36614/1000.0+$D1Current*$D1Current*6.3209/1000.0/1000.0-$D1Polarity*$D1Current*$D1Current*$D1Current*3.7394/1000.0/1000.0/1000.0)</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">0.71415*(8.648/1000.0+$D2Polarity*$D2Current*9.36614/1000.0+$D2Current*$D2Current*6.3209/1000.0/1000.0-$D2Polarity*$D2Current*$D2Current*$D2Current*3.7394/1000.0/1000.0/1000.0)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">0.71415/0.391*(3.58/1000.0+$D1Polarity*$D1Current*3.88/1000.0+$D1Current*$D1Current*2.619/1000.0/1000.0-$D1Polarity*$D1Current*$D1Current*$D1Current*1.55/1000.0/1000.0/1000.0)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">0.71415/0.391*(3.58/1000.0+$D1Polarity*$D1Current*3.88/1000.0+$D1Current*$D1Current*2.619/1000.0/1000.0-$D1Polarity*$D1Current*$D1Current*$D1Current*1.55/1000.0/1000.0/1000.0)</xsl:when>
                                 <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
                             </xsl:choose>
                             Volume <xsl:value-of select="Volume/@name"/>
@@ -256,7 +289,7 @@
                                 <xsl:when test="contains($QuadName, 'Q7') and boolean($run_number)">$Q7Polarity*$Q7Current/174.0</xsl:when>
                                 <xsl:when test="contains($QuadName, 'Q8') and boolean($run_number)">$Q8Polarity*$Q8Current/174.0</xsl:when>
                                 <xsl:when test="contains($QuadName, 'Q9') and boolean($run_number)">$Q9Polarity*$Q9Current/174.0</xsl:when>
-                                <xsl:otherwise><xsl:value-of select="FieldStrength/@value"/></xsl:otherwise>
+                                <xsl:otherwise><xsl:value-of select="FieldStrength/@name"/></xsl:otherwise>
                             </xsl:choose><xsl:text> </xsl:text><xsl:value-of select="FieldStrength/@units"/>
                             PropertyInt Pole <xsl:value-of select="Pole/@value"/>
                             PropertyInt MaxEndPole <xsl:value-of select="MaxEndPole/@value"/>
@@ -278,19 +311,19 @@
                             PropertyDouble Thickness <xsl:value-of select="Thickness/@value"/>
                             PropertyDouble InnerRadius <xsl:value-of select="InnerRadius/@value"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M2Polarity*$SSU_M2Current/140*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M1Polarity*$SSU_M1Current/112*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil2') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_E2Polarity*$SSU_E2Current/134*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_CPolarity*$SSU_CCurrent/147*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil1') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_E1Polarity*$SSU_E1Current/131*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_0') and boolean($coolingChanneltime)">$SSU_M2Polarity*$FCMCurrent/104*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_M2Polarity*$FCMCurrent/104*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_M2Polarity*$SSD_M2Current/140*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_M1Polarity*$SSD_M1Current/112*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil2') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_E2Polarity*$SSD_E2Current/134*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'Center') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_CPolarity*$SSD_CCurrent/147*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil1') and contains(FieldName/@name, '_1') and boolean($coolingChanneltime)">$SSD_E1Polarity*$SSD_E1Current/131*<xsl:value-of select="translate(ScaleFactor/@name,'-','')"/></xsl:when>
-                                <xsl:otherwise><xsl:value-of select="ScaleFactor/@name"/></xsl:otherwise>
+                            <xsl:when test="contains(FieldName/@name, 'MatchCoil1_0') and boolean($mcmode)">$SSUM1Polarity * $SSUM1</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'MatchCoil2_0') and boolean($mcmode)">$SSUM2Polarity * $SSUM2</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'CenterCoil_0') and boolean($mcmode)">$SSUCPolarity * $SSUC</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'EndCoil1_0') and boolean($mcmode)">$SSUT1Polarity * $SSUT1</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'EndCoil2_0') and boolean($mcmode)">$SSUT2Polarity * $SSUT2</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'FCoil_0') and boolean($mcmode)">$FCMUPolarity * $FCMU</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'FCoil_1') and boolean($mcmode)">$FCMUPolarity * $FCMMode * $FCMD</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'MatchCoil1_1') and boolean($mcmode)">$SSDM1Polarity * $FCMMode * $SSDM1</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'MatchCoil2_1') and boolean($mcmode)">$SSDM2Polarity * $FCMMode * $SSDM2</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'CenterCoil_1') and boolean($mcmode)">$SSDCPolarity * $FCMMode * $SSDC</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'EndCoil1_1') and boolean($mcmode)">$SSDT1Polarity * $FCMMode * $SSDT1</xsl:when>
+                            <xsl:when test="contains(FieldName/@name, 'EndCoil2_1') and boolean($mcmode)">$SSDT2Polarity * $FCMMode * $SSDT2</xsl:when>
+                            <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
                             </xsl:choose>
                             }
                 </xsl:for-each>

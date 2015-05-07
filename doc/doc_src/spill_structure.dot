@@ -72,15 +72,9 @@ digraph G {
   daq_data -> daq_data_unknown
   daq_data -> daq_data_emr_daq
    daq_data_V830 -> daq_data_V830_channels
-   daq_data_emr_daq -> daq_data_emr_daq_V1731 -> \
-    daq_data_emr_daq_V1731_array_item -> \
-     daq_data_emr_daq_V1731_array_item_array_item -> \
-      daq_data_emr_daq_V1731_array_item_array_item_samples
-   daq_data_emr_daq -> daq_data_emr_daq_dbb -> \
-     daq_data_emr_daq_dbb_array_item -> daq_data_emr_daq_dbb_array_item_dbb_hits -> \
-       daq_data_emr_daq_dbb_array_item_dbb_hits_array_item
-     daq_data_emr_daq_dbb_array_item -> daq_data_emr_daq_dbb_array_item_dbb_triggers -> \
-       daq_data_emr_daq_dbb_array_item_dbb_triggers_array_item
+   daq_data_emr_daq -> daq_data_emr_daq_V1731 -> daq_data_emr_daq_V1731_array_item -> daq_data_emr_daq_V1731_array_item_array_item -> daq_data_emr_daq_V1731_array_item_array_item_samples
+   daq_data_emr_daq -> daq_data_emr_daq_dbb -> daq_data_emr_daq_dbb_array_item -> daq_data_emr_daq_dbb_array_item_dbb_hits -> daq_data_emr_daq_dbb_array_item_dbb_hits_array_item
+     daq_data_emr_daq_dbb_array_item -> daq_data_emr_daq_dbb_array_item_dbb_triggers -> daq_data_emr_daq_dbb_array_item_dbb_triggers_array_item
    daq_data_ckov -> daq_data_ckov_array_item
     daq_data_ckov_array_item -> daq_data_ckov_array_item_V1731
      daq_data_ckov_array_item_V1731 -> daq_data_ckov_array_item_V1731_array_item
@@ -123,11 +117,11 @@ digraph G {
     mc_events_array_item_primary [shape=record, label="{Primary|primary}"]
      mc_events_array_item_primary_momentum [shape=record, label="{ThreeVector|momentum}"]
      mc_events_array_item_primary_position [shape=record, label="{ThreeVector|position}"]
-    mc_events_array_item_sci_fi_hits [shape=record, label="{SciFiHitArray|sci_fi_hits}"]
-     mc_events_array_item_sci_fi_hits_array_item [shape=record, label="{SciFiHit|[]}"]
-      mc_events_array_item_sci_fi_hits_array_item_channel_id [shape=record, label="{SciFiChannelID|channel_id}"]
-      mc_events_array_item_sci_fi_hits_array_item_momentum [shape=record, label="{ThreeVector|momentum}"]
-      mc_events_array_item_sci_fi_hits_array_item_position [shape=record, label="{ThreeVector|position}"]
+    mc_events_array_item_scifi_hits [shape=record, label="{SciFiHitArray|scifi_hits}"]
+     mc_events_array_item_scifi_hits_array_item [shape=record, label="{SciFiHit|[]}"]
+      mc_events_array_item_scifi_hits_array_item_channel_id [shape=record, label="{SciFiChannelID|channel_id}"]
+      mc_events_array_item_scifi_hits_array_item_momentum [shape=record, label="{ThreeVector|momentum}"]
+      mc_events_array_item_scifi_hits_array_item_position [shape=record, label="{ThreeVector|position}"]
     mc_events_array_item_special_virtual_hits [shape=record, label="{SpecialVirtualHitArray|special_virtual_hits}"]
      mc_events_array_item_special_virtual_hits_array_item [shape=record, label="{SpecialVirtualHit|[]}"]
       mc_events_array_item_special_virtual_hits_array_item_channel_id [shape=record, label="{SpecialVirtualChannelID|channel_id}"]
@@ -159,14 +153,14 @@ digraph G {
    mc_events_array_item -> mc_events_array_item_special_virtual_hits
    mc_events_array_item -> mc_events_array_item_tof_hits
    mc_events_array_item -> mc_events_array_item_virtual_hits
-   mc_events_array_item -> mc_events_array_item_sci_fi_hits
+   mc_events_array_item -> mc_events_array_item_scifi_hits
    mc_events_array_item -> mc_events_array_item_tracks
     mc_events_array_item_primary -> mc_events_array_item_primary_momentum
     mc_events_array_item_primary -> mc_events_array_item_primary_position
-    mc_events_array_item_sci_fi_hits -> mc_events_array_item_sci_fi_hits_array_item
-     mc_events_array_item_sci_fi_hits_array_item -> mc_events_array_item_sci_fi_hits_array_item_channel_id
-     mc_events_array_item_sci_fi_hits_array_item -> mc_events_array_item_sci_fi_hits_array_item_momentum
-     mc_events_array_item_sci_fi_hits_array_item -> mc_events_array_item_sci_fi_hits_array_item_position
+    mc_events_array_item_scifi_hits -> mc_events_array_item_scifi_hits_array_item
+     mc_events_array_item_scifi_hits_array_item -> mc_events_array_item_scifi_hits_array_item_channel_id
+     mc_events_array_item_scifi_hits_array_item -> mc_events_array_item_scifi_hits_array_item_momentum
+     mc_events_array_item_scifi_hits_array_item -> mc_events_array_item_scifi_hits_array_item_position
     mc_events_array_item_special_virtual_hits -> mc_events_array_item_special_virtual_hits_array_item
      mc_events_array_item_special_virtual_hits_array_item -> mc_events_array_item_special_virtual_hits_array_item_channel_id
      mc_events_array_item_special_virtual_hits_array_item -> mc_events_array_item_special_virtual_hits_array_item_momentum
@@ -242,7 +236,19 @@ digraph G {
      recon_events_array_item_kl_event_kl_cell_hits [shape=record, label="{KLEventCellHit|kl_cell_hits}"]
       recon_events_array_item_kl_event_kl_cell_hits_kl [shape=record, label="{KLCellHitArray|kl}"]
        recon_events_array_item_kl_event_kl_cell_hits_kl_array_item [shape=record, label="{KLCellHit|[]}"]
-    recon_events_array_item_sci_fi_event [shape=record, label="{SciFiEvent|sci_fi_event}"]
+    recon_events_array_item_scifi_event [shape=record, label="{SciFiEvent|scifi_event}"]
+     recon_events_array_item_scifi_event_scifidigits [shape=record, label="{SciFiDigitPArray|scifidigits}"]
+     recon_events_array_item_scifi_event_scificlusters [shape=record, label="{SciFiClusterPArray|scificlusters}"]
+      recon_events_array_item_scifi_event_scificlusters_digits [shape=record, label="{TRefArray|digits}"]
+     recon_events_array_item_scifi_event_scifispacepoints [shape=record, label="{SciFiSpacePointPArray|scifispacepoints}"]
+      recon_events_array_item_scifi_event_scifispacepoints_channels [shape=record, label="{TRefArray|channels}"]
+     recon_events_array_item_scifi_event_scifihelicalprtracks [shape=record, label="{SciFiHelicalPRTrackPArray|scifihelicalprtracks}"]
+      recon_events_array_item_scifi_event_scifihelicalprtracks_spoints [shape=record, label="{TRefArray|spoints}"]
+     recon_events_array_item_scifi_event_scifistraightprtracks [shape=record, label="{SciFiStraightPRTrackPArray|scifistraightprtracks}"]
+      recon_events_array_item_scifi_event_scifistraightprtracks_spoints [shape=record, label="{TRefArray|spoints}"]
+     recon_events_array_item_scifi_event_scifitracks [shape=record, label="{SciFiTrackPArray|scifitracks}"]
+      recon_events_array_item_scifi_event_scifitracks_trackpoints [shape=record, label="{SciFiTrackPoint|trackpoints}"]
+       recon_events_array_item_scifi_event_scifitracks_trackpoints_cluster [shape=record, label="{TRef|cluster}"]
     recon_events_array_item_tof_event [shape=record, label="{TOFEvent|tof_event}"]
      recon_events_array_item_tof_event_tof_digits [shape=record, label="{TOFEventDigit|tof_digits}"]
       recon_events_array_item_tof_event_tof_digits_tof0 [shape=record, label="{TOF0DigitArray|tof0}"]
@@ -274,14 +280,7 @@ digraph G {
     recon_events_array_item_trigger_event [shape=record, label="{TriggerEvent|trigger_event}"]
   recon_events -> recon_events_array_item
    recon_events_array_item -> recon_events_array_item_ckov_event
-   recon_events_array_item -> \
-    recon_events_array_item_emr_event -> \
-     recon_events_array_item_emr_event_emr_plane_hits -> \
-      recon_events_array_item_emr_event_emr_plane_hits_array_item -> \
-       recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar -> \
-        recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar_array_item -> \
-         recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar_array_item_emr_bar_hit -> \
-          recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar_array_item_emr_bar_hit_array_item
+   recon_events_array_item -> recon_events_array_item_emr_event -> recon_events_array_item_emr_event_emr_plane_hits ->       recon_events_array_item_emr_event_emr_plane_hits_array_item -> recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar ->         recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar_array_item -> recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar_array_item_emr_bar_hit -> recon_events_array_item_emr_event_emr_plane_hits_array_item_emr_bar_array_item_emr_bar_hit_array_item
    recon_events_array_item -> recon_events_array_item_global_event
     recon_events_array_item_global_event -> recon_events_array_item_global_event_spacepoints
      recon_events_array_item_global_event_spacepoints -> recon_events_array_item_global_event_spacepoints_array_item
@@ -318,7 +317,24 @@ digraph G {
     recon_events_array_item_kl_event -> recon_events_array_item_kl_event_kl_cell_hits
      recon_events_array_item_kl_event_kl_cell_hits -> recon_events_array_item_kl_event_kl_cell_hits_kl
       recon_events_array_item_kl_event_kl_cell_hits_kl -> recon_events_array_item_kl_event_kl_cell_hits_kl_array_item
-   recon_events_array_item -> recon_events_array_item_sci_fi_event
+   recon_events_array_item -> recon_events_array_item_scifi_event
+    recon_events_array_item_scifi_event -> recon_events_array_item_scifi_event_scifidigits
+    recon_events_array_item_scifi_event -> recon_events_array_item_scifi_event_scificlusters
+     recon_events_array_item_scifi_event_scificlusters -> recon_events_array_item_scifi_event_scificlusters_digits
+      recon_events_array_item_scifi_event_scificlusters_digits -> recon_events_array_item_scifi_event_scifidigits [style=dotted]
+    recon_events_array_item_scifi_event -> recon_events_array_item_scifi_event_scifispacepoints
+     recon_events_array_item_scifi_event_scifispacepoints -> recon_events_array_item_scifi_event_scifispacepoints_channels
+      recon_events_array_item_scifi_event_scifispacepoints_channels -> recon_events_array_item_scifi_event_scificlusters [style=dotted]
+    recon_events_array_item_scifi_event -> recon_events_array_item_scifi_event_scifihelicalprtracks
+     recon_events_array_item_scifi_event_scifihelicalprtracks -> recon_events_array_item_scifi_event_scifihelicalprtracks_spoints
+      recon_events_array_item_scifi_event_scifihelicalprtracks_spoints -> recon_events_array_item_scifi_event_scifispacepoints [style=dotted]
+    recon_events_array_item_scifi_event -> recon_events_array_item_scifi_event_scifistraightprtracks
+     recon_events_array_item_scifi_event_scifistraightprtracks -> recon_events_array_item_scifi_event_scifistraightprtracks_spoints
+      recon_events_array_item_scifi_event_scifistraightprtracks_spoints -> recon_events_array_item_scifi_event_scifispacepoints [style=dotted]
+    recon_events_array_item_scifi_event -> recon_events_array_item_scifi_event_scifitracks
+     recon_events_array_item_scifi_event_scifitracks -> recon_events_array_item_scifi_event_scifitracks_trackpoints
+      recon_events_array_item_scifi_event_scifitracks_trackpoints-> recon_events_array_item_scifi_event_scifitracks_trackpoints_cluster
+       recon_events_array_item_scifi_event_scifitracks_trackpoints_cluster -> recon_events_array_item_scifi_event_scificlusters [style=dotted]
    recon_events_array_item -> recon_events_array_item_tof_event
    recon_events_array_item -> recon_events_array_item_trigger_event
     recon_events_array_item_ckov_event -> recon_events_array_item_ckov_event_ckov_digits

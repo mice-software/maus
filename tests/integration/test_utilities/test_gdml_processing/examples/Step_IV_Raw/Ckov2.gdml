@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+    
+<define>
+    <position name="fZero" x="0.0" y="0.0" z="0.0" unit="mm"/>
+</define>
+
+<materials>
+    <isotope N="1" Z="1" name="H10xa133600">
+        <atom unit="g/mole" value="1.00782503081372"/>
+    </isotope>
+    <isotope N="2" Z="1" name="H20xa133d90">
+        <atom unit="g/mole" value="2.01410199966617"/>
+    </isotope>
+    <element name="H0xa133b30">
+        <fraction n="0.999885" ref="H10xa133600"/>
+        <fraction n="0.000115" ref="H20xa133d90"/>
+    </element>  
+    <isotope N="12" Z="6" name="C120xa126a70">
+        <atom unit="g/mole" value="12"/>
+    </isotope>
+    <isotope N="13" Z="6" name="C130xa126b20">
+        <atom unit="g/mole" value="13.0034"/>
+    </isotope>
+    <element name="C0xa126810">
+        <fraction n="0.9893" ref="C120xa126a70"/>
+        <fraction n="0.0107" ref="C130xa126b20"/>
+    </element>
+    <material name="POLYSTYRENE" state="solid">
+        <D unit="g/cm3" value="1.06"/>
+        <fraction n="0.077418" ref="H0xa133b30"/>
+        <fraction n="0.922582" ref="C0xa126810"/>
+    </material>
+    <isotope N="14" Z="7" name="N140xa126de0">
+        <atom unit="g/mole" value="14.0031"/>
+    </isotope>
+    <isotope N="15" Z="7" name="N150xa126e80">
+        <atom unit="g/mole" value="15.0001"/>
+    </isotope>
+    <element name="N0xa126b80">
+        <fraction n="0.99632" ref="N140xa126de0"/>
+        <fraction n="0.00368" ref="N150xa126e80"/>
+    </element>
+    <isotope N="16" Z="8" name="O160xa1270f0">
+        <atom unit="g/mole" value="15.9949"/>
+    </isotope>
+    <isotope N="17" Z="8" name="O170xa127180">
+        <atom unit="g/mole" value="16.9991"/>
+    </isotope>
+    <isotope N="18" Z="8" name="O180xa1271f0">
+        <atom unit="g/mole" value="17.9992"/>
+    </isotope>
+    <element name="O0xa126ec0">
+        <fraction n="0.99757" ref="O160xa1270f0"/>
+        <fraction n="0.00038" ref="O170xa127180"/>
+        <fraction n="0.00205" ref="O180xa1271f0"/>
+    </element>
+    <isotope N="36" Z="18" name="Ar360xa1270a0">
+        <atom unit="g/mole" value="35.9675"/>
+    </isotope>
+    <isotope N="38" Z="18" name="Ar380xa1274b0">
+        <atom unit="g/mole" value="37.9627"/>
+    </isotope>
+    <isotope N="40" Z="18" name="Ar400xa1275a0">
+        <atom unit="g/mole" value="39.9624"/>
+    </isotope>
+    <element name="Ar0xa127230">
+        <fraction n="0.003365" ref="Ar360xa1270a0"/>
+        <fraction n="0.000632" ref="Ar380xa1274b0"/>
+        <fraction n="0.996003" ref="Ar400xa1275a0"/>
+    </element>
+    <element name="Si" N="28" Z="14">
+        <D value="2.57" unit="g/cm3"/>
+        <atom unit="g/mole" value="28.085"/>
+    </element>
+    <element name="B" Z="5" N="10">
+        <D value="2.08" unit="g/cm3"/>
+        <atom value="10.81" unit="g/mole"/>
+    </element>
+    <element name="Na" N="23" Z="11">
+        <D value="0.968" unit="g/cm3"/>
+        <atom value="22.9898" unit="g/mole"/>
+    </element>
+    <element name="Al" N="27" Z="13">
+        <D value="2.699" unit="g/cm3"/>
+        <atom value="26.9815" unit="g/mole"/>
+    </element>
+    <element name="Ca" N="40" Z="20">
+        <D value="1.55" unit="g/cm3"/>
+        <atom value="40.078" unit="g/mole"/>
+    </element>
+    <element name="Cl" N="35" Z="17">
+        <D value="0.00299473" unit="g/cm3"/>
+        <atom value="35.453" unit="g/mole"/>
+    </element>
+    <element name="K" N="39" Z="19">
+        <D value="0.892" unit="g/cm3"/>
+        <atom value="39.0983" unit="g/mole"/>
+    </element>
+    <material name="AIR" state="gas">
+        <D unit="g/cm3" value="0.00120479"/>
+        <fraction n="0.000124000124000124" ref="C0xa126810"/>
+        <fraction n="0.755267755267755" ref="N0xa126b80"/>
+        <fraction n="0.231781231781232" ref="O0xa126ec0"/>
+        <fraction n="0.0128270128270128" ref="Ar0xa127230"/>
+    </material>    
+    <material name="AEROGEL_107a" state="solid">
+        <D value="0.261" unit="g/cm3"/>
+        <fraction n="0.467" ref="Si"/>
+        <fraction n="0.533" ref="O0xa126ec0"/>
+    </material>
+    <material name="CELLULOSE_CELLOPHANE">
+        <D value="1.42" unit="g/cm3"/>
+        <fraction n="0.062162" ref="H0xa133b30"/>
+        <fraction n="0.444462" ref="C0xa126810"/>
+        <fraction n="0.493376" ref="O0xa126ec0"/>
+    </material>
+    <material name="POLYVINYL_ACETATE">
+        <D value="1.19" unit="g/cm3"/>
+        <fraction n="0.070245" ref="H0xa133b30"/>
+        <fraction n="0.558066" ref="C0xa126810"/>
+        <fraction n="0.371689" ref="O0xa126ec0"/>
+    </material>
+    <material name="POLYVINYL_CHLORIDE">
+        <D value="1.3" unit="g/cm3"/>
+        <fraction n="0.04838" ref="H0xa133b30"/>
+        <fraction n="0.38436" ref="C0xa126810"/>
+        <fraction n="0.56726" ref="Cl"/>
+    </material>
+    <material name="Pyrex_Glass">
+        <D value="2.23" unit="g/cm3"/>
+        <fraction n="0.0400639" ref="B"/>
+        <fraction n="0.539561" ref="O0xa126ec0"/>
+        <fraction n="0.0281909" ref="Na"/>
+        <fraction n="0.011644" ref="Al"/>
+        <fraction n="0.377219" ref="Si"/>
+        <fraction n="0.00332099" ref="K"/>
+    </material>
+</materials>
+    
+<solids>
+    <!--<box lunit="mm" x="800.0" y="800.0" z="400.0" name="Cherenkov_solid"/>-->
+    <box lunit="mm" x="800.0" y="800.0" z="400.0" name="Vessel_solid"/>
+    <box lunit="mm" x="450.0" y="450.0" z="2.0" name="Window_solid"/>
+    <box lunit="mm" x="450.0" y="450.0" z="2.0" name="Mirrorbase_solid"/>
+    <box lunit="mm" x="450.0" y="450.0" z="2.0" name="Mirror_solid"/>
+    <box lunit="mm" x="450.0" y="450.0" z="23.0" name="Acc2_solid"/>
+    <box lunit="mm" x="450.0" y="450.0" z="0.1" name="AcetateWindow_solid"/>
+    <trd lunit="mm" x1="1.0" x2="321.69" y1="1.0" y2="321.69" z="70.64" name="Reflector_solid"/>
+    <box lunit="mm" x="643.4" y="643.4" z="6.4" name="Reflector_base_solid"/>
+    <box lunit="mm" x="786.0" y="786.0" z="3.2" name="Window_rear_solid"/>    
+    <sphere lunit="mm" aunit="degree" rmin="100.0" rmax="110.0" startphi="0.0" deltaphi="360" starttheta="0.0" deltatheta="45" name="PMT_solid"/>
+</solids>
+    
+<structure> 
+    <volume name="PMT0">
+        <materialref ref="Pyrex_Glass"/>
+        <solidref ref="PMT_solid"/>
+        <auxiliary auxtype="Phi" auxvalue="0.0 360.0 -1.0 deg"/>
+        <auxiliary auxtype="Theta" auxvalue="0.0 90.0 -1.0 deg"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="CKOV"/>
+        <auxiliary auxtype="CkovPmtNum" auxvalue="0"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+    </volume>
+    <volume name="PMT1">
+        <materialref ref="Pyrex_Glass"/>
+        <solidref ref="PMT_solid"/>
+        <auxiliary auxtype="Phi" auxvalue="0.0 360.0 -1.0 deg"/>
+        <auxiliary auxtype="Theta" auxvalue="0.0 90.0 -1.0 deg"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="CKOV"/>
+        <auxiliary auxtype="CkovPmtNum" auxvalue="1"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+    </volume>  
+    <volume name="PMT2">
+        <materialref ref="Pyrex_Glass"/>
+        <solidref ref="PMT_solid"/>
+        <auxiliary auxtype="Phi" auxvalue="0.0 360.0 -1.0 deg"/>
+        <auxiliary auxtype="Theta" auxvalue="0.0 90.0 -1.0 deg"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="CKOV"/>
+        <auxiliary auxtype="CkovPmtNum" auxvalue="2"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+    </volume> 
+    <volume name="PMT3">
+        <materialref ref="Pyrex_Glass"/>
+        <solidref ref="PMT_solid"/>
+        <auxiliary auxtype="Phi" auxvalue="0.0 360.0 -1.0 deg"/>
+        <auxiliary auxtype="Theta" auxvalue="0.0 90.0 -1.0 deg"/>
+        <auxiliary auxtype="SensitiveDetector" auxvalue="CKOV"/>
+        <auxiliary auxtype="CkovPmtNum" auxvalue="3"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+    </volume> 
+    <volume name="Window">
+        <materialref ref="CELLULOSE_CELLOPHANE"/>
+        <solidref ref="Window_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.0"/>
+    </volume>
+    <volume name="Mirrorbase">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Mirrorbase_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="1.0"/>
+    </volume>
+    <volume name="Mirror">
+        <materialref ref="AIR"/>
+        <solidref ref="Mirror_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.0"/>
+    </volume>
+    <volume name="Acc2">
+        <materialref ref="AEROGEL_107a"/>
+        <solidref ref="Acc2_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="1.0"/>
+        <auxiliary auxtype="PlaceModule" auxvalue="Virtual"/>
+    </volume>
+    <volume name="AcetateWindow">
+        <materialref ref="POLYVINYL_ACETATE"/>
+        <solidref ref="AcetateWindow_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.0"/>
+    </volume>
+    <volume name="Reflector">
+        <materialref ref="AIR"/>
+        <solidref ref="Reflector_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.0"/>
+    </volume>
+    <volume name="Reflector_base">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="Reflector_base_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.0"/>
+    </volume>
+    <volume name="Window_rear">
+        <materialref ref="POLYVINYL_CHLORIDE"/>
+        <solidref ref="Window_rear_solid"/>
+        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="BlueColour" auxvalue="1.0"/>
+    </volume>    
+
+    <volume name="Cherenkov2">
+        <materialref ref="AIR"/>
+        <solidref ref="Vessel_solid"/>
+        <physvol name="Window_phys">
+            <volumeref ref="Window"/>
+            <position name="Window_pos" x="0.0" y="0.0" z="-189.25" unit="mm"/>
+            <rotation name="Window_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Mirrorbase_phys">
+            <volumeref ref="Mirrorbase"/>
+            <position name="Mirrorbase_pos" x="0.0" y="0.0" z="-187.25" unit="mm"/>
+            <rotation name="Mirrorbase_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Mirror_phys">
+            <volumeref ref="Mirror"/>
+            <position name="Mirror_pos" x="0.0" y="0.0" z="-185.25" unit="mm"/>
+            <rotation name="Mirror_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Acc2_phys">
+            <volumeref ref="Acc2"/>
+            <position name="Acc2_pos" x="0.0" y="0.0" z="-172.75" unit="mm"/>
+            <rotation name="Acc2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="AcetateWindow_phys">
+            <volumeref ref="AcetateWindow"/>
+            <position name="AcetateWindow_pos" x="0.0" y="0.0" z="-161.20" unit="mm"/>
+            <rotation name="AcetateWindow_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Reflector_phys">
+            <volumeref ref="Reflector"/>
+            <position name="Reflector_pos" x="0.0" y="0.0" z="70.64" unit="mm"/>
+            <rotation name="Reflector_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Reflector_base_phys1">
+            <volumeref ref="Reflector_base"/>
+            <position name="Reflector_base_pos1" x="0.0" y="0.0" z="148.05" unit="mm"/>
+            <rotation name="Reflector_base_rot1" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Reflector_base_phys2">
+            <volumeref ref="Reflector_base"/>
+            <position name="Reflector_base_pos2" x="0.0" y="0.0" z="154.45" unit="mm"/>
+            <rotation name="Reflector_base_rot2" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Reflector_base_phys3">
+            <volumeref ref="Reflector_base"/>
+            <position name="Reflector_base_pos3" x="0.0" y="0.0" z="160.85" unit="mm"/>
+            <rotation name="Reflector_base_rot3" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="Window_rear_phys">
+            <volumeref ref="Window_rear"/>
+            <position name="Window_rear_pos" x="0.0" y="0.0" z="170.75" unit="mm"/>
+            <rotation name="Window_rear_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="PMT0_phys">
+            <volumeref ref="PMT0"/>
+            <position name="PMT0_pos" x="375.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="PMT0_rot" x="0.0" y="90.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="PMT1_phys">
+            <volumeref ref="PMT1"/>
+            <position name="PMT1_pos" x="0.0" y="375.0" z="0.0" unit="mm"/>
+            <rotation name="PMT1_rot" x="-90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="PMT2_phys">
+            <volumeref ref="PMT2"/>
+            <position name="PMT2_pos" x="-375.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="PMT2_rot" x="0.0" y="-90.0" z="0.0" unit="degree"/>
+        </physvol>
+        <physvol name="PMT3_phys">
+            <volumeref ref="PMT3"/>
+            <position name="PMT3_pos" x="0.0" y="-375.0" z="0.0" unit="mm"/>
+            <rotation name="PMT3_rot" x="90.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+        <auxiliary auxtype="Plane" auxvalue="2"/>
+        <auxiliary auxtype="BlueColour" auxvalue="0.6"/>
+        <auxiliary auxtype="RedColour" auxvalue="0.6"/>
+        <auxiliary auxtype="GreenColour" auxvalue="0.6"/>
+    </volume>    
+</structure>
+    
+<setup name="Default" version="1.0">
+    <world ref="Cherenkov2"/>
+</setup>
+    
+</gdml>

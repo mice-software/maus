@@ -61,66 +61,130 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test2,'r')
         data = fin.read()
-        # test with a mu+, its decay product e+ and a noise hit (e-)
+        # test with a mu+ and its decay product e+
         result = self.mapper.process(data)
         spill_out = maus_cpp.converter.json_repr(result)
 
         self.assertFalse("MapCppEMRRecon" in spill_out["errors"])
 
-	# consistent amount of reconEvents (4 = 1primary+1noise+1decay+1secondary)
-        n_ev = len(spill_out['recon_events'])
-        self.assertEqual(4, n_ev)
+	# consistent amount of reconEvents (2 = empty + muon and its decay)
+        self.assertEqual(2, len(spill_out['recon_events']))
 
-	# unchanged amount of primary plane hits, charge and ToTs
-        n_hits_0 = len(spill_out['recon_events'][0]['emr_event']\
-				['emr_plane_hits'])
-        self.assertEqual(24, n_hits_0)
-        for i in range(0, n_hits_0):
-            self.assertTrue(spill_out['recon_events'][0]['emr_event']\
-				     ['emr_plane_hits'][i]['charge'] > 0)
-            self.assertTrue(spill_out['recon_events'][0]['emr_event']\
-				     ['emr_plane_hits'][i]['emr_bars'][0]\
-				     ['emr_bar_hits'][0]['tot'] > 5)
-	# unchanged amount of noise and time from the primary
-        n_hits_1 = len(spill_out['recon_events'][1]['emr_event']\
-				['emr_plane_hits'])
-        self.assertEqual(1, n_hits_1)
+	# check that the first event is empty, second contains 33 plane hits
+        self.assertEqual(0, len(spill_out['recon_events'][0]\
+				         ['emr_event']['emr_plane_hits']))
+
+        n_planes = len(spill_out['recon_events'][1]\
+				['emr_event']['emr_plane_hits'])
+        self.assertEqual(33, n_planes)
+
+	# consistent amount of primary bars (i.e. DBB hits close to trigger, 
+	# 3 planes only contain fADC information without a bar hit)
+        self.assertEqual(True, spill_out['recon_events'][1]['emr_event']\
+			                ['has_primary'])
+
+        for i in range(0, n_planes): 
+            if (i < n_planes - 3):
+                self.assertEqual(1, len(spill_out['recon_events'][1]\
+				                 ['emr_event']['emr_plane_hits'][i]\
+				                 ['emr_bars_primary']))
+            else:
+                self.assertEqual(0, len(spill_out['recon_events'][1]\
+				                 ['emr_event']['emr_plane_hits'][i]\
+				                 ['emr_bars_primary']))
+
+	# make sure that the primary's ToT is the highest one of the plane
+        for i in range(0, n_planes - 3):
+            tot_primary = spill_out['recon_events'][1]\
+				   ['emr_event']['emr_plane_hits'][i]\
+				   ['emr_bars_primary'][0]['emr_bar_hits'][0]\
+				   ['tot']
+
+            n_bars = len(spill_out['recon_events'][1]\
+				  ['emr_event']['emr_plane_hits'][i]\
+				  ['emr_bars'])
+
+            for j in range(0, n_bars):
+                tot_i = spill_out['recon_events'][1]\
+				['emr_event']['emr_plane_hits'][i]\
+				['emr_bars'][j]['emr_bar_hits'][0]\
+				['tot']
+
+                self.assertTrue(tot_primary >= tot_i)
+
+
+        # check that the e+ is associated with its mu+, 4 secondary plane hits
+        self.assertEqual(True, spill_out['recon_events'][1]['emr_event']\
+				        ['has_secondary'])
+
+        n_secondary_planes = 0
+        for i in range(0, n_planes):
+            if (len(spill_out['recon_events'][1]\
+		             ['emr_event']['emr_plane_hits'][i]\
+			     ['emr_bars_secondary']) > 0):
+                n_secondary_planes += 1
+
+        self.assertEqual(4, n_secondary_planes)
+
+        # check that the primary coordinates are well reconstructed
+        for i in range(0, n_planes - 3):
+            plane_id = spill_out['recon_events'][1]['emr_event']\
+				['emr_plane_hits'][i]['plane']
+				
+            bar_id = spill_out['recon_events'][1]\
+			      ['emr_event']['emr_plane_hits'][i]\
+                              ['emr_bars_primary'][0]['bar']
+
+            self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			   ['emr_bar_hits'][0]['z'] > plane_id*17.5)
+            self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			   ['emr_bar_hits'][0]['z'] < (plane_id+1)*17.5)
+
+            if (plane_id % 2 == 0):
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['x'] > (bar_id - 30 - 1)*17)
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['x'] < (bar_id - 30 + 1)*17)
+            else:
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['y'] > (bar_id - 30 - 1)*17)
+                self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		          ['emr_plane_hits'][i]['emr_bars_primary'][0]\
+			  ['emr_bar_hits'][0]['y'] < (bar_id - 30 + 1)*17)
+
+        # consistency of the ranges and the distance between the two tracks
         self.assertTrue(spill_out['recon_events'][1]['emr_event']\
-				 ['emr_plane_hits'][0]['emr_bars'][0]\
-				 ['emr_bar_hits'][0]['delta_t'] - spill_out\
-				 ['recon_events'][0]['emr_event']\
-				 ['emr_plane_hits'][0]['emr_bars'][0]\
-				 ['emr_bar_hits'][0]['delta_t'] > 20)
-	# unchanged amount of decay plane hits and bar hits in each plane 
-        n_hits_2 = len(spill_out['recon_events'][2]['emr_event']\
-				['emr_plane_hits'])
-        self.assertEqual(8, n_hits_2)
-        for i in range(0, n_hits_2):
-            n_bars = len(spill_out['recon_events'][2]['emr_event']\
-				  ['emr_plane_hits'][i]['emr_bars'])
-            self.assertTrue(2, n_bars)
+				 ['range_primary'] > plane_id*17.5)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['range_primary'] < (plane_id+1)*17.5)
 
-	# correct number of planes hit in the secondary event (1 track, 8 planes)
-        n_hits_3 = len(spill_out['recon_events'][3]['emr_event']\
-				['emr_plane_hits'])
-        self.assertEqual(8, n_hits_3)
-        # only one hit in each plane in cleaned array
-        for i in range(0, n_hits_3):
-            self.assertEqual(len(spill_out['recon_events'][3]['emr_event']\
-				 ['emr_plane_hits'][i]['emr_bars_primary']\
-				 [0]['emr_bar_hits']), 1)
-        # coordinate reconstructed and consistent
-        for i in range(0, n_hits_3 - 1):
-            x_1 =  spill_out['recon_events'][3]['emr_event']\
-			    ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-		            ['emr_bar_hits'][0]['x']
-            x_2 =  spill_out['recon_events'][3]['emr_event']\
-			    ['emr_plane_hits'][i+1]['emr_bars_primary'][0]\
-		            ['emr_bar_hits'][0]['x']
-            self.assertTrue(x_1 > 0)
-            self.assertTrue(x_2 > 0)
-            self.assertTrue(x_2 - x_1 < 2)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['range_secondary'] > 0)
 
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['secondary_to_primary_track_distance'] < 80)
+
+        # Total charge in the MAPMTs consistent with the SAPMTs
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['total_charge_MA'] > 1000)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['total_charge_SA'] > 1000)
+
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+		        ['total_charge_MA'] - spill_out['recon_events'][1]\
+		        ['emr_event']['total_charge_SA'] < 1000)
+
+        # The charge ratio should be way below 1 (muon Bragg peak)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['charge_ratio_MA'] < 0.75)
+        self.assertTrue(spill_out['recon_events'][1]['emr_event']\
+				 ['charge_ratio_SA'] < 0.75)
+		
 if __name__ == "__main__":
     unittest.main()
 

@@ -23,11 +23,6 @@ EMRPlaneHit::EMRPlaneHit()
     _emrbararray_primary(), _emrbararray_secondary(),
     _charge(0.0), _charge_corrected(0.0), _pedestal_area(0.0),
     _time(0), _spill(0), _trigger(0), _run(0), _deltat(0), _samples() {
-//     for (int barid=0; barid<59; barid++) {
-//         EMRBar emrbar;
-//         emrbar.SetBar(barid);
-//         _emrbararray.push_back(emrbar);
-//     }
 }
 
 EMRPlaneHit::EMRPlaneHit(const EMRPlaneHit& _emrplanehit)
@@ -40,8 +35,9 @@ EMRPlaneHit::EMRPlaneHit(const EMRPlaneHit& _emrplanehit)
 
 EMRPlaneHit& EMRPlaneHit::operator=(const EMRPlaneHit& _emrplanehit) {
   if (this == &_emrplanehit) {
-    return *this;
+      return *this;
   }
+
   SetPlane(_emrplanehit._plane);
   SetOrientation(_emrplanehit._orientation);
 

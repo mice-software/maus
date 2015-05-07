@@ -27,10 +27,8 @@ bool ReduceCppTofCalib::birth(std::string argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   _classname = "ReduceCppTofCalib";
   _filename = "tofcalibdata.root";
+  _filepath = ".";
 
-  _stationKeys.push_back("tof0");
-  _stationKeys.push_back("tof1");
-  _stationKeys.push_back("tof2");
   if (!MakeTree())
       std::cerr << "Failed to make TTree" << std::endl;
 
@@ -48,119 +46,18 @@ bool ReduceCppTofCalib::birth(std::string argJsonConfigDocument) {
   return false;
 }
 
+void ReduceCppTofCalib::process(Data *data) {
+  Spill *spillPtr = data->GetSpill();
+  _spill = *spillPtr;
+  this->processSpill();
+}
+
 std::string  ReduceCppTofCalib::process(std::string document) {
   //  JsonCpp setup
 
   // make sure we can load the json document
   if (loadSpill(document)) {
-    if (_spill.GetDaqEventType() == "physics_event") {
-      int n_part_events = _spill.GetReconEventSize();
-      for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
-        // Get this particle event in TOF0, TOF1 and TOF2.
-        ReconEvent revt = _spill.GetAReconEvent(PartEvent);
-        TOFEvent* tof_event = revt.GetTOFEvent();
-        TOFEventSlabHit slbhits = tof_event->GetTOFEventSlabHit();
-
-        int ntof0_sh = slbhits.GetTOF0SlabHitArraySize();
-        int ntof1_sh = slbhits.GetTOF1SlabHitArraySize();
-        int ntof2_sh = slbhits.GetTOF2SlabHitArraySize();
-        if (!(ntof0_sh == 2 && (ntof1_sh == 2 || ntof2_sh == 2)))
-            continue;
-
-        // Make sure that all times and charges are set to zero and
-        // that all slab numbers are set to -99.
-        slabA = -99;
-        slabB = -99;
-        slabC = -99;
-        slabD = -99;
-        slabE = -99;
-        slabF = -99;
-        adc0 = adc1 = adc2 =adc3 = 0;
-        adc4 = adc5 = adc6 = adc7 = 0;
-        adc8 = adc9 = adc10 = adc11 =0;
-        t0 = t1 = t2 = t3 = 0.;
-        t4 = t5 = t6 = t7 = 0.;
-        t8 = t9 = t10 = t11 = 0.;
-
-        int tpln, tslb, ch0, ch1;
-        double rt0, rt1;
-        Pmt0 pm0;
-        Pmt1 pm1;
-        for (int h = 0; h < ntof0_sh; ++h) {
-            TOFSlabHit tof0_sh = slbhits.GetTOF0SlabHitArrayElement(h);
-            tpln = tof0_sh.GetPlane();
-            tslb = tof0_sh.GetSlab();
-            pm0 = tof0_sh.GetPmt0();
-            pm1 = tof0_sh.GetPmt1();
-            rt0 = pm0.GetRawTime();
-            ch0 = pm0.GetCharge();
-            rt1 = pm1.GetRawTime();
-            ch1 = pm1.GetCharge();
-            if (tpln == 0) {
-                slabA = tslb;
-                adc0 = ch0;
-                adc1 = ch1;
-                t0 = rt0;
-                t1 = rt1;
-            } else if (tpln == 1) {
-                slabB = tslb;
-                adc2 = ch0;
-                adc3 = ch1;
-                t2 = rt0;
-                t3 = rt1;
-            }
-            if (ntof1_sh == 2) {
-                TOFSlabHit tof1_sh = slbhits.GetTOF1SlabHitArrayElement(h);
-                tpln = tof1_sh.GetPlane();
-                tslb = tof1_sh.GetSlab();
-                pm0 = tof1_sh.GetPmt0();
-                pm1 = tof1_sh.GetPmt1();
-                rt0 = pm0.GetRawTime();
-                ch0 = pm0.GetCharge();
-                rt1 = pm1.GetRawTime();
-                ch1 = pm1.GetCharge();
-                if (tpln == 0) {
-                    slabC = tslb;
-                    adc4 = ch0;
-                    adc5 = ch1;
-                    t4 = rt0;
-                    t5 = rt1;
-                } else if (tpln == 1) {
-                    slabD = tslb;
-                    adc6 = ch0;
-                    adc7 = ch1;
-                    t6 = rt0;
-                    t7 = rt1;
-                }
-            }
-            if (ntof2_sh == 2) {
-                TOFSlabHit tof2_sh = slbhits.GetTOF2SlabHitArrayElement(h);
-                tpln = tof2_sh.GetPlane();
-                tslb = tof2_sh.GetSlab();
-                pm0 = tof2_sh.GetPmt0();
-                pm1 = tof2_sh.GetPmt1();
-                rt0 = pm0.GetRawTime();
-                ch0 = pm0.GetCharge();
-                rt1 = pm1.GetRawTime();
-                ch1 = pm1.GetCharge();
-                if (tpln == 0) {
-                    slabE = tslb;
-                    adc8 = ch0;
-                    adc9 = ch1;
-                    t8 = rt0;
-                    t9 = rt1;
-                } else if (tpln == 1) {
-                    slabF = tslb;
-                    adc10 = ch0;
-                    adc11 = ch1;
-                    t10 = rt0;
-                    t11 = rt1;
-                }
-            }
-        }
-        dataTree.Fill();
-      }
-    }
+    this->processSpill();
   } else {
     std::cerr << "Failed to load JSON\n";
   }
@@ -168,20 +65,151 @@ std::string  ReduceCppTofCalib::process(std::string document) {
   return JsonWrapper::JsonToString(root);
 }
 
+void ReduceCppTofCalib::processSpill() {
+  if (_spill.GetDaqEventType() == "physics_event") {
+    int runNum = _spill.GetRunNumber();
+    std::stringstream fname;
+    fname << "TofCalibRun" << runNum << ".root";
+    _filename = fname.str();
+
+    int n_part_events = _spill.GetReconEventSize();
+//       std::cerr << n_part_events << std::endl;
+    for (int PartEvent = 0; PartEvent < n_part_events; PartEvent++) {
+//       std::cerr << PartEvent << std::endl;
+      // Get this particle event in TOF0, TOF1 and TOF2.
+      ReconEvent revt = _spill.GetAReconEvent(PartEvent);
+      TOFEvent* tof_event = revt.GetTOFEvent();
+     if (!tof_event)
+       continue;
+
+      TOFEventSlabHit slbhits = tof_event->GetTOFEventSlabHit();
+
+      int ntof0_sh = slbhits.GetTOF0SlabHitArraySize();
+      int ntof1_sh = slbhits.GetTOF1SlabHitArraySize();
+      int ntof2_sh = slbhits.GetTOF2SlabHitArraySize();
+
+      if (!(ntof0_sh == 2 && (ntof1_sh == 2 || ntof2_sh == 2)))
+        continue;
+
+      // Make sure that all times and charges are set to zero and
+      // that all slab numbers are set to -99.
+      slabA = -99;
+      slabB = -99;
+      slabC = -99;
+      slabD = -99;
+      slabE = -99;
+      slabF = -99;
+      adc0 = adc1 = adc2 =adc3 = 0;
+      adc4 = adc5 = adc6 = adc7 = 0;
+      adc8 = adc9 = adc10 = adc11 =0;
+      t0 = t1 = t2 = t3 = 0.;
+      t4 = t5 = t6 = t7 = 0.;
+      t8 = t9 = t10 = t11 = 0.;
+
+      int tpln, tslb, ch0, ch1;
+      double rt0, rt1;
+      Pmt0 pm0;
+      Pmt1 pm1;
+      for (int h = 0; h < ntof0_sh; ++h) {
+        TOFSlabHit tof0_sh = slbhits.GetTOF0SlabHitArrayElement(h);
+        tpln = tof0_sh.GetPlane();
+        tslb = tof0_sh.GetSlab();
+        pm0 = tof0_sh.GetPmt0();
+        pm1 = tof0_sh.GetPmt1();
+        rt0 = pm0.GetRawTime();
+        ch0 = pm0.GetCharge();
+        rt1 = pm1.GetRawTime();
+        ch1 = pm1.GetCharge();
+        if (tpln == 0) {
+          slabA = tslb;
+          adc0 = ch0;
+          adc1 = ch1;
+          t0 = rt0;
+          t1 = rt1;
+        } else if (tpln == 1) {
+          slabB = tslb;
+          adc2 = ch0;
+          adc3 = ch1;
+          t2 = rt0*1000;
+          t3 = rt1*1000;
+        }
+        if (ntof1_sh == 2) {
+          TOFSlabHit tof1_sh = slbhits.GetTOF1SlabHitArrayElement(h);
+          tpln = tof1_sh.GetPlane();
+          tslb = tof1_sh.GetSlab();
+          pm0 = tof1_sh.GetPmt0();
+          pm1 = tof1_sh.GetPmt1();
+          rt0 = pm0.GetRawTime();
+          ch0 = pm0.GetCharge();
+          rt1 = pm1.GetRawTime();
+          ch1 = pm1.GetCharge();
+          if (tpln == 0) {
+            slabC = tslb;
+            adc4 = ch0;
+            adc5 = ch1;
+            t4 = rt0;
+            t5 = rt1;
+          } else if (tpln == 1) {
+            slabD = tslb;
+            adc6 = ch0;
+            adc7 = ch1;
+            t6 = rt0*1000;
+            t7 = rt1*1000;
+          }
+        }
+        if (ntof2_sh == 2) {
+          TOFSlabHit tof2_sh = slbhits.GetTOF2SlabHitArrayElement(h);
+          tpln = tof2_sh.GetPlane();
+          tslb = tof2_sh.GetSlab();
+          pm0 = tof2_sh.GetPmt0();
+          pm1 = tof2_sh.GetPmt1();
+          rt0 = pm0.GetRawTime();
+          ch0 = pm0.GetCharge();
+          rt1 = pm1.GetRawTime();
+          ch1 = pm1.GetCharge();
+          if (tpln == 0) {
+            slabE = tslb;
+            adc8 = ch0;
+            adc9 = ch1;
+            t8 = rt0;
+            t9 = rt1;
+          } else if (tpln == 1) {
+            slabF = tslb;
+            adc10 = ch0;
+            adc11 = ch1;
+            t10 = rt0*1000;
+            t11 = rt1*1000;
+          }
+        }
+      }
+      dataTree.Fill();
+    }
+  }
+}
+
+
 bool ReduceCppTofCalib::death()  {
   // Open a ROOT file to store the data.
   Save();
   return true;
 }
 
+
 void ReduceCppTofCalib::Save() {
-  TFile datafile(_filename.c_str(), "recreate" );
+  this->Save(_filepath + _filename);
+}
+
+void ReduceCppTofCalib::Save(std::string fname) {
+  if (!dataTree.GetEntries())
+    return;
+
+  TFile datafile(fname.c_str(), "recreate" );
   datafile.cd();
 
   // Get the data tree.
   dataTree.Write();
 
-  datafile.ls();
+//   datafile.ls();
   datafile.Close();
   Squeak::mout(Squeak::info) << _filename << " is updated." << std::endl;
 }
@@ -219,6 +247,7 @@ bool ReduceCppTofCalib::MakeTree() {
   dataTree.Branch("adc9", &adc9, "adc9/I");
   dataTree.Branch("adc10", &adc10, "adc10/I");
   dataTree.Branch("adc11", &adc11, "adc11/I");
+
   return true;
 }
 

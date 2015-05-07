@@ -46,50 +46,46 @@ void BarParameterisation::ComputeTransformation(const G4int copyNo,
 
   rotation->setRows(rowX, rowY, rowZ);
 
-  G4int plainID = copyNo/59;
-  G4int barIDinPlain = copyNo - 59*plainID;
-  G4int Nplains = fNbOfBars/59 + 1;
+  G4int planeID = copyNo/59;
+  G4int barIDinPlane = copyNo - 59*planeID;
+  G4int Nplanes = fNbOfBars/59 + 1;
 
-  G4int NbarsInPlain;
+  G4int NbarsInPlane;
   if (fNbOfBars < 59)
-    NbarsInPlain = fNbOfBars;
-  else if (plainID < (fNbOfBars/59))
-    NbarsInPlain = 59;
+    NbarsInPlane = fNbOfBars;
+  else if (planeID < (fNbOfBars/59))
+    NbarsInPlane = 59;
   else
-    NbarsInPlain = 59-fNbOfBars%59;
+    NbarsInPlane = 59-fNbOfBars%59;
 
 
-  G4double StartX = -(NbarsInPlain/2)*(0.5*fBarWidth+fGap);
+  G4double StartX = - (NbarsInPlane/2)*(0.5*fBarWidth+fGap);
   G4double StartY = StartX;
-  G4double StartZ = - (Nplains/2)*(fBarHeight + fGap);
+  G4double StartZ = - (Nplanes/2)*(fBarHeight + fGap);
 
-  placement.setZ(StartZ + plainID*(fBarHeight + fGap));
+  placement.setZ(StartZ + planeID*(fBarHeight + fGap));
   rotation->rotateY(0.0*deg);
 
-  if (plainID%2 == 0) {
-    if (copyNo%2 == 0)
-      rotation->rotateX(0.0*deg);
-    else
+  if (planeID%2 == 0) {
+    if (barIDinPlane%2 == 0)
       rotation->rotateX(180.0*deg);
+    else
+      rotation->rotateX(0.0*deg);
+
+    rotation->rotateZ(90.0*deg);
+    placement.setX(StartX + barIDinPlane*(0.5*fBarWidth + fGap));
+    placement.setY(0.0*cm);
+  } else {
+    if (barIDinPlane%2 == 0)
+      rotation->rotateX(180.0*deg);
+    else
+      rotation->rotateX(0.0*deg);
 
     rotation->rotateZ(0.0*deg);
     placement.setX(0.0*cm);
-    placement.setY(StartY+barIDinPlain*(0.5*fBarWidth + fGap));
-  } else {
-    if (copyNo%2 == 0)
-      rotation->rotateX(0.0*deg);
-    else
-      rotation->rotateX(180.0*deg);
-
-    rotation->rotateZ(90.0*deg);
-    placement.setX(StartX + barIDinPlain*(0.5*fBarWidth + fGap));
-    placement.setY(0.0*cm);
+    placement.setY(StartY + barIDinPlane*(0.5*fBarWidth + fGap));
   }
 
   physVol->SetTranslation(placement);
   physVol->SetRotation(rotation);
 }
-
-
-
-

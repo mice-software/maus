@@ -116,18 +116,18 @@ G4bool EMRSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   G4TouchableHandle theTouchable = aStep->GetPreStepPoint()->GetTouchableHandle();
   G4int barNumber = theTouchable->GetCopyNumber();  // get the bar copy number
   G4int hitTime =  aStep->GetPreStepPoint()->GetGlobalTime();  // get the hit time
-//   std::cerr << "ProcessHits   BarId: " << barNumber << std::endl;
+  // std::cerr << "ProcessHits   BarId: " << barNumber << std::endl;
   int xHitNum = this->findBarHit(barNumber);
   if (xHitNum < 0) {
-//     std::cerr << "ProcessHits:   Make new hist for bar " << barNumber << std::endl;
+  // std::cerr << "ProcessHits:   Make new hit for bar " << barNumber << std::endl;
     xHitNum = this->AddBarHit(aStep, barNumber);
   } else if (fabs(_hits_cppdata[xHitNum].GetTime() - hitTime) > 10*ns) {
-//     std::cerr << "ProcessHits:   Make second hist for bar " << barNumber << std::endl;
-//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime()-hitTime) << std::endl;
+  // std::cerr << "ProcessHits:   Make second hit for bar " << barNumber << std::endl;
+  // std::cerr << "DeltaT =  " << fabs(_hits_cppdata[xHitNum].GetTime()-hitTime) << std::endl;
     xHitNum = this->AddBarHit(aStep, barNumber);
   } else {
-//     std::cerr << "Delts T =  " << fabs(_hits_cppdata[xHitNum].GetTime()-hitTime)*ns
-//     << std::endl;
+  // std::cerr << "DeltaT =  " << fabs(_hits_cppdata[xHitNum].GetTime()-hitTime)*ns
+  // << std::endl;
   }
 
   double Edep = aStep->GetTotalEnergyDeposit();

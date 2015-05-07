@@ -24,6 +24,7 @@ import os
 import cdb
 
 from geometry.ConfigReader import Configreader
+from xml.etree import ElementTree
 
 GEOMETRY_ZIPFILE = 'geometry.zip'
 FILELIST = 'FileList.txt'
@@ -103,8 +104,29 @@ class Uploader: #pylint: disable = R0902
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status
         return self.wsdlurl
-    
+
+    def select_files(self, root, files, suffix=[]): 
+        # pylint: disable = R0201, W0102, W0612
+        """
+        @method select_files Filter out interesting files within
+        the directory "root". 
+        The files of interest are given by suffix. If blank then all
+        files will be assumed to be of interest.
+        """
+        selected_files = []
+
+        for fname in files:
+            # do concatenation her to get full path
+            full_path = os.path.join(root, fname)
+            
+            if len(suffix)==0:
+                selected_files.append(full_path)
+            elif is_filetype(fname, suffix):
+                selected_files.append(full_path)
+        return selected_files
+        
     def create_file_list(self):
+        # pylint: disable = R0201, W0102, W0612
         """
         @method create_file_list Creates a text file containing a list of
                                  geometry files.
@@ -114,9 +136,11 @@ class Uploader: #pylint: disable = R0902
         """
         # if there is no text file create one and fill it with the geometries.
         files_on_disk = []
-        for fname in sorted(os.listdir(self.filepath)):
-            if is_filetype(fname, ['xml', 'gdml']):
-                files_on_disk.append(os.path.join(self.filepath, fname))
+        for root, dirs, files in os.walk(self.filepath):
+            if root == self.filepath:
+                files_on_disk += self.select_files(root, files, ['xml', 'gdml'])
+            else:
+                files_on_disk += self.select_files(root, files)
 
         filelist_path = os.path.join(self.filepath, FILELIST)
         fout = open(filelist_path, 'w')
@@ -182,6 +206,7 @@ class Downloader: #pylint: disable = R0902
         self.listofgeometries = filelist
         self.wsdlurl = ""
         self.geometry_cdb = None
+        self.ccurl = ""
         self.set_up_server()
 
     def set_up_server(self):
@@ -195,6 +220,7 @@ class Downloader: #pylint: disable = R0902
         self.wsdlurl = config.cdb_download_url+config.geometry_download_wsdl
         self.geometry_cdb = cdb.Geometry()
         self.geometry_cdb.set_url(self.wsdlurl)
+        self.ccurl = config.cdb_cc_download_url
         server_status = self.geometry_cdb.get_status()
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status 
@@ -251,9 +277,10 @@ class Downloader: #pylint: disable = R0902
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
         self.download_beamline_for_run(run_num, download_path)
-        # To be included with an update to the cdb application
+        # To be included with n update to the cdb application
         # self.download_coolingchannel_for_run(run_num, download_path)
         self.__write_zip_file(download_path, downloaded_file)
+        
 
     def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
         """
@@ -304,26 +331,261 @@ class Downloader: #pylint: disable = R0902
             fout.close()
 
   
-    # def download_coolingchannel_for_run(self, run_id, downloadpath): 
-    #                                  #pylint: disable = R0201, C0301
-    #    """
-    #    @Method download geometry for run 
+    def download_coolingchannel_for_run(self, run_id, downloadpath): 
+        #pylint: disable = R0201, C0301
+        """
+        @Method download geometry for run 
+        
+        This method gets the geometry, for the given run number, from the 
+        database then passes the string to the unpack method which unpacks it.
+        
+        @param  id The long ID run number for the desired geometry.
+        @param  downloadedpath The path location where the files will be 
+        unpacked to.
+        """
+        if os.path.exists(downloadpath) == False:
+            raise OSError('Path '+downloadpath+' does not exist')
+        else:        
+            coolingchannel_cdb = cdb.CoolingChannel()
+            try:
+                downloaded = \
+                           coolingchannel_cdb.get_coolingchannel_for_run(run_id)
+                
+                path = downloadpath + '/CoolingChannelInfo.gdml'
+                
+                downloadedfile = \
+                     self.generate_coolingchannel_xml_from_string(downloaded)
+                fout = open(path, 'w')
+                fout.write(str(downloadedfile))
+                fout.close()
+                
+            except RuntimeError:
+                exit(1)
+                #fout = open(path, 'w')
+                #fout.write(str(downloaded))
+                #fout.close()
+            
 
-    #    This method gets the geometry, for the given run number, from the 
-    #    database then passes the string to the unpack method which unpacks it.
-    #    
-    #    @param  id The long ID run number for the desired geometry.
-    #    @param  downloadedpath The path location where the files will be 
-    #                           unpacked to.
-    #    """
-    #    if os.path.exists(downloadpath) == False:
-    #        raise OSError('Path '+downloadpath+' does not exist')
-    #    else:        
-    #        coolingchannel_cdb = cdb.CoolingChannel()
-    #        downloadedfile = \
-    #                     coolingchannel_cdb.get_coolingchannel_for_run(run_id)
-    #        path = downloadpath + '/CoolingChannelInfo.gdml'
-    #        fout = open(path, 'w')
-    #        fout.write(str(downloadedfile))
-    #        fout.close()
+    def download_beamline_for_tag(self, tag, downloadpath):  #pylint: disable = R0201, C0301
+        """
+        @Method download geometry for run 
 
+        This method gets the geometry, for the given run number, from the 
+        database then passes the string to the unpack method which unpacks it.
+        
+        @param  id The long ID run number for the desired geometry.
+        @param  downloadedpath The path location where the files will be 
+                               unpacked to.
+        """
+        if os.path.exists(downloadpath) == False:
+            raise OSError('Path '+downloadpath+' does not exist')
+        else:        
+            beamline_cdb = cdb.Beamline()
+            tag_list = beamline_cdb.list_tags()
+            tag_found = [i for i, j in enumerate(tag_list) if j == tag]
+            if len(tag_found) > 0:
+                try:
+                    downloaded = beamline_cdb.get_beamline_for_tag(tag)
+                    path = downloadpath + '/Beamline.gdml'
+                    downloadedfile = self.generate_beamline_xml_from_string(\
+                    downloaded[tag])
+                    fout = open(path, 'w')
+                    fout.write(downloadedfile)
+                    fout.close()
+                except RuntimeError:
+                    exit(1)
+            else:
+                print "Beamline tag does not exist. Ignoring Beamline tag."
+                
+    def download_coolingchannel_for_tag(self, tag, downloadpath): 
+        #pylint: disable = R0201, C0301
+        """
+        @Method download geometry for run 
+        
+        This method gets the geometry, for the given run number, from the 
+        database then passes the string to the unpack method which unpacks it.
+        
+        @param  id The long ID run number for the desired geometry.
+        @param  downloadedpath The path location where the files will be 
+        unpacked to.
+        """
+        if os.path.exists(downloadpath) == False:
+            raise OSError('Path '+downloadpath+' does not exist')
+        else:        
+            coolingchannel_cdb = cdb.CoolingChannel(self.ccurl)
+            tag_list = coolingchannel_cdb.list_tags()
+            tag_found = [i for i, j in enumerate(tag_list) if j == tag]
+            if len(tag_found) > 0:
+                try:
+                    downloaded = \
+                               coolingchannel_cdb.get_coolingchannel_for_tag(tag)
+                    path = downloadpath + '/CoolingChannelInfo.gdml'
+                    downloadedfile = \
+                                   self.generate_coolingchannel_xml_from_string(downloaded[tag])
+                    fout = open(path, 'w')
+                    fout.write(str(downloadedfile))
+                    fout.close()
+                except RuntimeError:
+                    exit(1)
+            else:
+                print "CoolingChannel tag does not exist. Ignoring CoolingChannel tag." 
+                
+
+    def convert_dict_to_xml(self, xmldict):
+        """
+        @Method convert a python dictionary to an xml string
+        """
+        roottag = xmldict.keys()[0]
+        root = ElementTree.Element(roottag)
+        self.recursive_convert_dict_to_xml(root, xmldict[roottag])
+        return root
+
+    def recursive_convert_dict_to_xml(self, parent, dictitem):
+        """
+        @Method recursive conversion of a dictionary item to xml
+        """
+        assert type(dictitem) is not type([])
+        
+        if isinstance(dictitem, dict):
+            for (tag, child) in dictitem.iteritems():
+                if str(tag) == '_text':
+                    parent.text = str(child)
+                elif type(child) is type([]):
+                    # iterate through the array and convert
+                    for listchild in child:
+                        elem = ElementTree.Element(tag)
+                        parent.append(elem)
+                        self.recursive_convert_dict_to_xml(elem, listchild)
+                else:
+                    elem = ElementTree.Element(tag)
+                    parent.append(elem)
+                    self.recursive_convert_dict_to_xml(elem, child)
+        else:
+            parent.text = str(dictitem)
+
+    def generate_beamline_xml_from_string(self, xmldict): 
+        #pylint: disable = R0201, C0301, C0103
+        """
+        @Method converts xmldict to an xml format in pieces following methods used in CDB
+
+        This is required in absence of xml output from the CDB
+        """
+        xml = '<runs>'
+        beam_xml  = self.run_settings_for_beamline(xmldict)
+        xml = (xml + beam_xml + '</runs>')
+        
+        return xml
+        
+    def run_settings_for_beamline(self, run_data): #pylint: disable = R0201
+        """
+        @Method converts useful information from the dictionary to xml suitable for formatting.
+
+        Borrowed from CDB methods.
+        """
+        
+        run_xml = ''
+        try:
+            if str(run_data['beam_stop']).upper() == 'OPEN':
+                beam_stop = 'true'
+            elif str(run_data['beam_stop']).upper() == 'CLOSED':
+                beam_stop = 'false'
+            else:
+                raise OSError(
+                    "Value for beam_stop must be 'OPEN' or 'CLOSED' not "
+                    + str(run_data['beam_stop']))
+            try:
+                run_xml = \
+                        ("<run runNumber='" + str(run_data['run_number'])
+                         + "' beamStop='" + beam_stop
+                         + "' diffuserThickness='"
+                         + str(run_data['diffuser_thickness'])
+                         + "' protonAbsorberThickness='"
+                         + str(run_data['proton_absorber_thickness'])
+                         + "' ")
+            except KeyError, exception:
+                run_xml = ("<run runNumber='1'"
+                           + " beamStop='" + beam_stop
+                           + "' diffuserThickness='"
+                           + str(run_data['diffuser_thickness'])
+                           + "' protonAbsorberThickness='"
+                           + str(run_data['proton_absorber_thickness'])
+                           + "' ")
+            try:
+                run_xml = (run_xml + "overwrite='"
+                           + str(int(run_data['overwrite'])) + "' >")
+            except KeyError, exception:
+                run_xml = (run_xml + "overwrite='" + str(False)
+                           + "' >")
+            try:
+                magnets = run_data['magnets']
+                
+                if magnets != None:
+                    for magnet in magnets:
+                        if type(magnet) == type("string"):
+                            # then only the set current is given.
+                            # the polarity will need to be guessed at.
+                            run_xml = (run_xml + "<magnet name='" + str(magnet)
+                                   + "' setCurrent='" + str(magnets[magnet])
+                                   + "' polarity='+1'/>")
+                        else:
+                            if (str(magnet['polarity']) != "-1"
+                                and str(magnet['polarity']) != "0"
+                                and str(magnet['polarity']) != "1"
+                                and str(magnet['polarity']) != "+1"):
+                                raise OSError("Polarity for "
+                                              + magnet['name'] + " is "
+                                              + str(magnet['polarity'])
+                                              + ", it must be -1, 0 or +1")
+                            run_xml = (run_xml +
+                                       "<magnet name='" + str(magnet['name']) +
+                                       "' setCurrent='" + str(magnet['current'])
+                                      + "' polarity='" + str(magnet['polarity'])
+                                       + "'/>")
+            
+            except KeyError, exception:
+                print "No magnet values defined in tag."
+            run_xml = (run_xml + "</run>")
+        except KeyError, exception:
+            print "Missing value for " + str(exception)
+        
+        return run_xml
+
+    def generate_coolingchannel_xml_from_string(self, data):
+        #pylint: disable = R0201, C0301, C0103
+        """
+        @Method convert string to formatable xml format
+
+        borrowed from cdb._cooling_channel_supermouse.set_coolingchannel(data)
+        """
+        try:
+            xml = ("<coolingchannels><coolingchannel>")
+            
+            for magnet in data:
+                if (str(magnet['polarity']) != "-1"
+                    and str(magnet['polarity']) != "0"
+                    and str(magnet['polarity']) != "1"
+                    and str(magnet['polarity']) != "+1"):
+                    raise OSError("Polarity for " + magnet['name']
+                                            + " is " + str(magnet['polarity'])
+                                            + ", it must be -1, 0 or +1")
+                xml = xml + "<magnet name='" + str(magnet['name']) + "' "
+                xml = xml + "mode='" + str(magnet['mode']) + "' "
+                xml = xml + "polarity='" + str(magnet['polarity']) + "'>"
+                
+                coils = magnet['coils']
+                for coil in coils:
+                    xml = xml + "<coil name='" + str(coil['name']) + "' "
+                    xml = (xml + "calibration='"
+                           + str(coil['calibration']) + "' ")
+                    xml = xml + "ilim='" + str(coil['ilim']) + "' "
+                    xml = xml + "iset='" + str(coil['iset']) + "' "
+                    xml = xml + "rate='" + str(coil['rate']) + "' "
+                    xml = (xml + "stability='" + str(coil['stability'])
+                           + "' ")
+                    xml = xml + "vlim='" + str(coil['vlim']) + "'/>"
+                    
+                xml = xml + "</magnet>"
+            xml = xml + "</coolingchannel></coolingchannels>"
+        except KeyError, exception:
+            raise OSError("Missing value for " + str(exception))
+        return xml

@@ -61,7 +61,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Generating make files:"
         echo
         sleep 1
-        cmake -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install/ -DEXPAT_INCLUDE_DIR=${MAUS_ROOT_DIR}/third_party/install/include -DEXPAT_LIBRARY=${MAUS_ROOT_DIR}/third_party/install/lib/libexpat.so -DGEANT4_INSTALL_DATA=ON ${MAUS_ROOT_DIR}/third_party/source/${directory}
+        cmake -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install/ -DEXPAT_INCLUDE_DIR=${MAUS_ROOT_DIR}/third_party/install/include -DEXPAT_LIBRARY=${MAUS_ROOT_DIR}/third_party/install/lib/libexpat.so -DXERCESC_ROOT_DIR=${MAUS_ROOT_DIR}/third_party/install -DGEANT4_INSTALL_DATA=ON ${MAUS_ROOT_DIR}/third_party/source/${directory}
         echo
         echo "INFO: Running make:"
         echo

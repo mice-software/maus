@@ -120,11 +120,17 @@ class TOFSlabHit {
     /** Returns Pmt1 */
     Pmt1 GetPmt1() const;
 
+    /** Returns Pmt1 */
+    Pmt1* GetPmt1Ptr();
+
     /** Sets Pmt1 */
     void SetPmt1(Pmt1 pmt1);
 
     /** Returns Pmt0 */
     Pmt0 GetPmt0() const;
+
+    /** Returns Pmt0 */
+    Pmt0* GetPmt0Ptr();
 
     /** Sets Pmt0 */
     void SetPmt0(Pmt0 pmt0);

@@ -25,6 +25,7 @@
 #include "Geant4/G4UserLimits.hh"
 #include "Geant4/G4GeometryManager.hh"
 // Geant4 physical model
+#include "Geant4/G4GDMLParser.hh"
 #include "Geant4/G4VSolid.hh"
 #include "Geant4/G4Material.hh"
 #include "Geant4/G4Element.hh"
@@ -89,11 +90,29 @@
 
 namespace MAUS {
 namespace Simulation {
+
+DetectorConstruction::DetectorConstruction(G4VPhysicalVolume* worldvol,
+					   const Json::Value& cards)
+  : _model(), _btField(NULL), _miceMagneticField(NULL),
+    _miceElectroMagneticField(NULL), _stepper(NULL), _chordFinder(NULL),
+    _rootVisAtts(NULL), _equation(NULL), _useGDML(true) {
+  _event = new MICEEvent();
+  _rootPhysicalVolume = worldvol;
+  _rootLogicalVolume  = worldvol->GetLogicalVolume();
+  SetDatacardVariables(cards);
+  SetBTMagneticField();
+  _materials = fillMaterials(NULL);
+  if (_materials == NULL)
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
+			  "Failed to acquire MiceMaterials",
+			  "DetectorConstruction::DetectorConstruction()"));
+}
+
 DetectorConstruction::DetectorConstruction(const Json::Value& cards)
   : _model(), _btField(NULL), _miceMagneticField(NULL),
     _miceElectroMagneticField(NULL), _rootLogicalVolume(NULL),
     _rootPhysicalVolume(NULL), _stepper(NULL), _chordFinder(NULL),
-    _rootVisAtts(NULL), _equation(NULL) {
+    _rootVisAtts(NULL), _equation(NULL), _useGDML(false) {
   _event = new MICEEvent();
   SetDatacardVariables(cards);
   SetBTMagneticField();
@@ -103,6 +122,7 @@ DetectorConstruction::DetectorConstruction(const Json::Value& cards)
                  "Failed to acquire MiceMaterials",
                  "DetectorConstruction::DetectorConstruction()"));
 }
+
 
 DetectorConstruction::~DetectorConstruction() {
     if (_miceElectroMagneticField != NULL) {
@@ -192,18 +212,20 @@ void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
 }
 
 G4VPhysicalVolume* DetectorConstruction::Construct() {
-  // Set up the logical volume
-  G4Box* rootBox = new G4Box("Default", 1, 1, 1);
-  G4Material* rootMat = _materials->materialByName("Galactic");
-  _rootLogicalVolume = new G4LogicalVolume(rootBox, rootMat, "Dummy", 0, 0, 0);
-  _rootPhysicalVolume = new G4PVPlacement(0, G4ThreeVector(),
-                   "DummyPV", _rootLogicalVolume, 0, false, 0, _checkVolumes);
-  // we never visualise the root LV
-  _rootVisAtts = new G4VisAttributes(false);
-  _rootLogicalVolume->SetVisAttributes(_rootVisAtts);
-  G4RegionStore* regionStore = G4RegionStore::GetInstance();
-  G4Region* rootRegion = regionStore->FindOrCreateRegion("DefaultRegionForTheWorld");
-  rootRegion->AddRootLogicalVolume(_rootLogicalVolume);
+  if (!_useGDML) {
+    // Set up the logical volume
+    G4Box* rootBox = new G4Box("Default", 1, 1, 1);
+    G4Material* rootMat = _materials->materialByName("Galactic");
+    _rootLogicalVolume = new G4LogicalVolume(rootBox, rootMat, "Dummy", 0, 0, 0);
+    _rootPhysicalVolume = new G4PVPlacement(0, G4ThreeVector(),
+					    "DummyPV", _rootLogicalVolume, 0, false, 0, _checkVolumes);
+    // we never visualise the root LV
+    _rootVisAtts = new G4VisAttributes(false);
+    _rootLogicalVolume->SetVisAttributes(_rootVisAtts);
+    G4RegionStore* regionStore = G4RegionStore::GetInstance();
+    G4Region* rootRegion = regionStore->FindOrCreateRegion("DefaultRegionForTheWorld");
+    rootRegion->AddRootLogicalVolume(_rootLogicalVolume);
+  } // Otherwise the physical volume is already constructed from the GDML.
   return _rootPhysicalVolume;
 }
 
@@ -211,7 +233,8 @@ void DetectorConstruction::SetMiceModules(const MiceModule& mods) {
     if (_model != NULL)
         delete _model;
     _model = MiceModule::deepCopy(mods, false);
-    ResetGeometry();
+    if (!_useGDML)
+      ResetGeometry();
     ResetFields();
 }
 

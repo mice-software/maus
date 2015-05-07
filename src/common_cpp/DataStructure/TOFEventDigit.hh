@@ -54,6 +54,9 @@ class TOFEventDigit {
     /** Returns TOF1DigitArray */
     TOF1DigitArray GetTOF1DigitArray() const;
 
+    /** Returns TOF1DigitArray pointer*/
+    TOF1DigitArray* GetTOF1DigitArrayPtr();
+
     /** Get an element from TOF1DigitArray (needed for PyROOT) */
     TOFDigit GetTOF1DigitArrayElement(size_t index) const;
 
@@ -66,6 +69,9 @@ class TOFEventDigit {
     /** Returns TOF0DigitArray */
     TOF0DigitArray GetTOF0DigitArray() const;
 
+    /** Returns TOF0DigitArray pointer*/
+    TOF0DigitArray* GetTOF0DigitArrayPtr();
+
     /** Get an element from TOF0DigitArray (needed for PyROOT) */
     TOFDigit GetTOF0DigitArrayElement(size_t index) const;
 
@@ -77,6 +83,9 @@ class TOFEventDigit {
 
     /** Returns TOF2DigitArray */
     TOF2DigitArray GetTOF2DigitArray() const;
+
+    /** Returns TOF2DigitArray pointer*/
+    TOF2DigitArray* GetTOF2DigitArrayPtr();
 
     /** Get an element from TOF2DigitArray (needed for PyROOT) */
     TOFDigit GetTOF2DigitArrayElement(size_t index) const;

@@ -72,10 +72,16 @@ def main(): # pylint: disable = C0103
     
     # format files
     gdmls = Formatter(gdml_cache, dl_dir)
-    gdmls.format()
+    if gdmls.usegdml:
+        gdmls.formatForGDML()
+    else:
+        gdmls.format()
     # convert to MAUS Modules
     maus_modules = GDMLtomaus(dl_dir)
-    maus_modules.convert_to_maus(dl_dir)
+    if gdmls.usegdml:
+        maus_modules.generate_parent(dl_dir)
+    else:
+        maus_modules.convert_to_maus(dl_dir)
     # clean up if required
     if configuration.geometry_download_cleanup:
         shutil.rmtree(gdml_cache)

@@ -138,12 +138,20 @@ Pmt1 TOFSlabHit::GetPmt1() const {
     return _pmt1;
 }
 
+Pmt1* TOFSlabHit::GetPmt1Ptr() {
+    return &_pmt1;
+}
+
 void TOFSlabHit::SetPmt1(Pmt1 pmt1) {
     _pmt1 = pmt1;
 }
 
 Pmt0 TOFSlabHit::GetPmt0() const {
     return _pmt0;
+}
+
+Pmt0* TOFSlabHit::GetPmt0Ptr() {
+    return &_pmt0;
 }
 
 void TOFSlabHit::SetPmt0(Pmt0 pmt0) {

@@ -32,11 +32,20 @@ EMRBarHitProcessor::EMRBarHitProcessor() {
           ("x", &_double_proc, &EMRBarHit::GetX,
           &EMRBarHit::SetX, true);
     RegisterValueBranch
+          ("ex", &_double_proc, &EMRBarHit::GetErrorX,
+          &EMRBarHit::SetErrorX, true);
+    RegisterValueBranch
           ("y", &_double_proc, &EMRBarHit::GetY,
           &EMRBarHit::SetY, true);
     RegisterValueBranch
+          ("ey", &_double_proc, &EMRBarHit::GetErrorY,
+          &EMRBarHit::SetErrorY, true);
+    RegisterValueBranch
           ("z", &_double_proc, &EMRBarHit::GetZ,
           &EMRBarHit::SetZ, true);
+    RegisterValueBranch
+          ("ez", &_double_proc, &EMRBarHit::GetErrorZ,
+          &EMRBarHit::SetErrorZ, true);
     RegisterValueBranch
           ("charge_corrected", &_double_proc, &EMRBarHit::GetChargeCorrected,
           &EMRBarHit::SetChargeCorrected, true);

@@ -1,0 +1,379 @@
+{
+        "daq_event_type" : "physics_event",
+        "maus_event_type" : "Spill",
+        "recon_events" : 
+        [
+
+                {
+                        "tof_event" : 
+                        {
+                                "tof_digits" : 
+                                {
+                                        "tof0" : 
+                                        [
+
+                                                {
+                                                        "charge_mm" : 1255,
+                                                        "charge_pm" : 1115,
+                                                        "leading_time" : 416572,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 0,
+                                                        "slab" : 6,
+                                                        "station" : 0,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 0 0 6 0 tof0",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 421973,
+                                                        "trigger_request_leading_time" : 420998,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 93666646,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1255,
+                                                        "charge_pm" : 1115,
+                                                        "leading_time" : 418522,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 0,
+                                                        "slab" : 6,
+                                                        "station" : 0,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 0 0 6 0 tof0",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 421973,
+                                                        "trigger_request_leading_time" : 420998,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 93666646,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1265,
+                                                        "charge_pm" : 1143,
+                                                        "leading_time" : 1727593,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 1,
+                                                        "slab" : 6,
+                                                        "station" : 0,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 0 0 6 1 tof0",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 1732991,
+                                                        "trigger_request_leading_time" : 1731992,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 84183169,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1265,
+                                                        "charge_pm" : 1143,
+                                                        "leading_time" : 1732569,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 1,
+                                                        "slab" : 6,
+                                                        "station" : 0,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 0 0 6 1 tof0",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 1732991,
+                                                        "trigger_request_leading_time" : 1731992,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 84183169,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1265,
+                                                        "charge_pm" : 1143,
+                                                        "leading_time" : 1741167,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 1,
+                                                        "slab" : 6,
+                                                        "station" : 0,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 0 0 6 1 tof0",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 1732991,
+                                                        "trigger_request_leading_time" : 1731992,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 84183169,
+                                                        "trigger_trailing_time" : -99
+                                                }
+                                        ],
+                                        "tof1" : 
+                                        [
+
+                                                {
+                                                        "charge_mm" : 1840,
+                                                        "charge_pm" : 1633,
+                                                        "leading_time" : 417933,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 0,
+                                                        "slab" : 4,
+                                                        "station" : 1,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 1 0 4 0 tof1",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 421973,
+                                                        "trigger_request_leading_time" : 420998,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 93666646,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1463,
+                                                        "charge_pm" : 1217,
+                                                        "leading_time" : 417986,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 1,
+                                                        "pmt" : 0,
+                                                        "slab" : 3,
+                                                        "station" : 1,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 1 1 3 0 tof1",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 421973,
+                                                        "trigger_request_leading_time" : 420998,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 93666646,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1780,
+                                                        "charge_pm" : 1445,
+                                                        "leading_time" : 1730122,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 1,
+                                                        "slab" : 4,
+                                                        "station" : 1,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 1 0 4 1 tof1",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 1732991,
+                                                        "trigger_request_leading_time" : 1731992,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 84183169,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1520,
+                                                        "charge_pm" : 1117,
+                                                        "leading_time" : 1730138,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 1,
+                                                        "pmt" : 1,
+                                                        "slab" : 3,
+                                                        "station" : 1,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 1 1 3 1 tof1",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 1732991,
+                                                        "trigger_request_leading_time" : 1731992,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 84183169,
+                                                        "trigger_trailing_time" : -99
+                                                }
+                                        ],
+                                        "tof2" : 
+                                        [
+
+                                                {
+                                                        "charge_mm" : 1948,
+                                                        "charge_pm" : 1733,
+                                                        "leading_time" : 184766,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 1,
+                                                        "slab" : 4,
+                                                        "station" : 2,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 2 0 4 1 tof2",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 188481,
+                                                        "trigger_request_leading_time" : 187510,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 93557636,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 3238,
+                                                        "charge_pm" : 2780,
+                                                        "leading_time" : 184833,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 1,
+                                                        "pmt" : 0,
+                                                        "slab" : 5,
+                                                        "station" : 2,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 2 1 5 0 tof2",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 188481,
+                                                        "trigger_request_leading_time" : 187510,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 93557636,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 2204,
+                                                        "charge_pm" : 1626,
+                                                        "leading_time" : 456908,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 0,
+                                                        "pmt" : 0,
+                                                        "slab" : 4,
+                                                        "station" : 2,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 2 0 4 0 tof2",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 460562,
+                                                        "trigger_request_leading_time" : 459586,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 109368779,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 3059,
+                                                        "charge_pm" : 1952,
+                                                        "leading_time" : 456955,
+                                                        "part_event_number" : 0,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 1,
+                                                        "pmt" : 1,
+                                                        "slab" : 5,
+                                                        "station" : 2,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 2 1 5 1 tof2",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 460562,
+                                                        "trigger_request_leading_time" : 459586,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 109368779,
+                                                        "trigger_trailing_time" : -99
+                                                }
+                                        ]
+                                }
+                        },
+                        "part_event_number":0
+                },
+
+                {
+                        "tof_event" : 
+                        {
+                                "tof_digits" : 
+                                {
+                                        "tof0" : null,
+                                        "tof1" : 
+                                        [
+
+                                                {
+                                                        "charge_mm" : 1237,
+                                                        "charge_pm" : 1057,
+                                                        "leading_time" : 1498856,
+                                                        "part_event_number" : 35,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 1,
+                                                        "pmt" : 0,
+                                                        "slab" : 2,
+                                                        "station" : 1,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 1 1 2 0 tof1",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 1502909,
+                                                        "trigger_request_leading_time" : 1501931,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 93669751,
+                                                        "trigger_trailing_time" : -99
+                                                },
+
+                                                {
+                                                        "charge_mm" : 1150,
+                                                        "charge_pm" : 784,
+                                                        "leading_time" : 713541,
+                                                        "part_event_number" : 35,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 1,
+                                                        "pmt" : 1,
+                                                        "slab" : 2,
+                                                        "station" : 1,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 1 1 2 1 tof1",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 716341,
+                                                        "trigger_request_leading_time" : 715339,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 84186274,
+                                                        "trigger_trailing_time" : -99
+                                                }
+                                        ],
+                                        "tof2" : 
+                                        [
+
+                                                {
+                                                        "charge_mm" : 1639,
+                                                        "charge_pm" : 1042,
+                                                        "leading_time" : 1905729,
+                                                        "part_event_number" : 9,
+                                                        "phys_event_number" : 0,
+                                                        "plane" : 1,
+                                                        "pmt" : 1,
+                                                        "slab" : 7,
+                                                        "station" : 2,
+                                                        "time_stamp" : 1281804484,
+                                                        "tof_key" : "TOFChannelKey 2 1 7 1 tof2",
+                                                        "trailing_time" : -99,
+                                                        "trigger_leading_time" : 1909338,
+                                                        "trigger_request_leading_time" : 1908361,
+                                                        "trigger_request_trailing_time" : -99,
+                                                        "trigger_time_tag" : 109370167,
+                                                        "trigger_trailing_time" : -99
+                                                }
+                                        ]
+                                }
+                        },
+                        "part_event_number":1
+                },
+
+                {
+                        "tof_event" : 
+                        {
+                                "tof_digits" : 
+                                {
+                                        "tof0" : null,
+                                        "tof1" : null,
+                                        "tof2" : null
+                                }
+                        },
+                        "part_event_number":2
+                }
+        ],
+        "run_number":1234,
+        "spill_number":1
+}
+

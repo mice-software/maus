@@ -33,6 +33,7 @@
 #include "TStyle.h"
 #include "TROOT.h"
 
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "Utils/TOFChannelMap.hh"
 
@@ -60,7 +61,17 @@ class ReduceCppTofCalib {
   *  a document with space points.
   */
   std::string process(std::string document);
+
+  void process(MAUS::Data *data);
+
   MAUS::Spill get_spill() { return _spill; }
+
+  void setFilePath(std::string p) {_filepath = p;}
+  void setFileName(std::string n) {_filename = n;}
+
+  // save the output root tree
+  void Save();
+  void Save(std::string n);
 
  private:
 
@@ -71,14 +82,16 @@ class ReduceCppTofCalib {
   Json::Value root;
   // initialize the root tree for storing slab hits
   bool MakeTree();
-  // save the output root tree
-  void Save();
+
   // load json
   bool loadSpill(std::string jsonDoc);
+
+  void processSpill();
 
   std::string _classname;
   // output root file name
   std::string _filename;
+  std::string _filepath;
 
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;

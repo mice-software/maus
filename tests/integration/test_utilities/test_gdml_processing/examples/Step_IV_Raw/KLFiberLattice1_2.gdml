@@ -1,0 +1,457 @@
+<?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/data/neutrino02/rbayes/MICE/maus-1432/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd">
+    
+    <define/>
+    
+    <materials>
+        <isotope N="1" Z="1" name="H10xa133600">
+            <atom unit="g/mole" value="1.00782503081372"/>
+        </isotope>
+        <isotope N="2" Z="1" name="H20xa133d90">
+            <atom unit="g/mole" value="2.01410199966617"/>
+        </isotope>
+        <element name="H0xa133b30">
+            <fraction n="0.999885" ref="H10xa133600"/>
+            <fraction n="0.000115" ref="H20xa133d90"/>
+        </element>  
+        <isotope N="12" Z="6" name="C120xa126a70">
+            <atom unit="g/mole" value="12"/>
+        </isotope>
+        <isotope N="13" Z="6" name="C130xa126b20">
+            <atom unit="g/mole" value="13.0034"/>
+        </isotope>
+        <element name="C0xa126810">
+            <fraction n="0.9893" ref="C120xa126a70"/>
+            <fraction n="0.0107" ref="C130xa126b20"/>
+        </element>
+        <material name="POLYSTYRENE" state="solid">
+            <D unit="g/cm3" value="1.06"/>
+            <fraction n="0.077418" ref="H0xa133b30"/>
+            <fraction n="0.922582" ref="C0xa126810"/>
+        </material>       <isotope N="14" Z="7" name="N140xa126de0">
+            <atom unit="g/mole" value="14.0031"/>
+        </isotope>
+        <isotope N="15" Z="7" name="N150xa126e80">
+            <atom unit="g/mole" value="15.0001"/>
+        </isotope>
+        <element name="N0xa126b80">
+            <fraction n="0.99632" ref="N140xa126de0"/>
+            <fraction n="0.00368" ref="N150xa126e80"/>
+        </element>
+        <isotope N="16" Z="8" name="O160xa1270f0">
+            <atom unit="g/mole" value="15.9949"/>
+        </isotope>
+        <isotope N="17" Z="8" name="O170xa127180">
+            <atom unit="g/mole" value="16.9991"/>
+        </isotope>
+        <isotope N="18" Z="8" name="O180xa1271f0">
+            <atom unit="g/mole" value="17.9992"/>
+        </isotope>
+        <element name="O0xa126ec0">
+            <fraction n="0.99757" ref="O160xa1270f0"/>
+            <fraction n="0.00038" ref="O170xa127180"/>
+            <fraction n="0.00205" ref="O180xa1271f0"/>
+        </element>
+        <isotope N="36" Z="18" name="Ar360xa1270a0">
+            <atom unit="g/mole" value="35.9675"/>
+        </isotope>
+        <isotope N="38" Z="18" name="Ar380xa1274b0">
+            <atom unit="g/mole" value="37.9627"/>
+        </isotope>
+        <isotope N="40" Z="18" name="Ar400xa1275a0">
+            <atom unit="g/mole" value="39.9624"/>
+        </isotope>
+        <element name="Ar0xa127230">
+            <fraction n="0.003365" ref="Ar360xa1270a0"/>
+            <fraction n="0.000632" ref="Ar380xa1274b0"/>
+            <fraction n="0.996003" ref="Ar400xa1275a0"/>
+        </element>
+        <material name="AIR" state="gas">
+            <D unit="g/cm3" value="0.00120479"/>
+            <fraction n="0.000124000124000124" ref="C0xa126810"/>
+            <fraction n="0.755267755267755" ref="N0xa126b80"/>
+            <fraction n="0.231781231781232" ref="O0xa126ec0"/>
+            <fraction n="0.0128270128270128" ref="Ar0xa127230"/>
+        </material>
+    </materials>
+    
+    <solids>
+        <box lunit="mm" name="KLFiber_solid" x="932" y="44" z="40"/>
+        <tube aunit="degree" deltaphi="360" lunit="mm" name="KLFibre_unitsolid" rmax="0.5" z="1000"/>
+    </solids>
+    
+    <structure>
+    <volume name="KLFiber_unit">
+        <materialref ref="POLYSTYRENE"/>
+        <solidref ref="KLFibre_unitsolid"/>
+    </volume>
+
+    <assembly name="KLFiberPlane2">        
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_2" unit="mm" x="0.0" y="-20.10" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_3" unit="mm" x="0.0" y="-18.76" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_4" unit="mm" x="0.0" y="-17.42" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_5" unit="mm" x="0.0" y="-16.08" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_6" unit="mm" x="0.0" y="-14.74" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_7" unit="mm" x="0.0" y="-13.14" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_8" unit="mm" x="0.0" y="-12.06" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_9" unit="mm" x="0.0" y="-10.72" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_10" unit="mm" x="0.0" y="-9.38" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_11" unit="mm" x="0.0" y="-8.04" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_12" unit="mm" x="0.0" y="-6.70" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_13" unit="mm" x="0.0" y="-5.36" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_14" unit="mm" x="0.0" y="-4.02" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_15" unit="mm" x="0.0" y="-2.68" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_16" unit="mm" x="0.0" y="-1.34" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_17" unit="mm" x="0.0" y="0" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_18" unit="mm" x="0.0" y="1.34" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_19" unit="mm" x="0.0" y="2.68" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_20" unit="mm" x="0.0" y="4.02" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_21" unit="mm" x="0.0" y="5.36" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_22" unit="mm" x="0.0" y="6.70" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_23" unit="mm" x="0.0" y="8.04" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_24" unit="mm" x="0.0" y="9.38" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_25" unit="mm" x="0.0" y="10.72" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_26" unit="mm" x="0.0" y="12.06" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_27" unit="mm" x="0.0" y="13.40" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_28" unit="mm" x="0.0" y="14.74" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_29" unit="mm" x="0.0" y="16.08" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_30" unit="mm" x="0.0" y="17.42" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_31" unit="mm" x="0.0" y="18.76" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos_32" unit="mm" x="0.0" y="20.01" z="0.0"/>
+        </physvol>        
+    </assembly>
+    <assembly name="KLFiberPlane1"> 
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_1" unit="mm" x="0.0" y="-20.77" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_2" unit="mm" x="0.0" y="-19.43" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_3" unit="mm" x="0.0" y="-18.09" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_4" unit="mm" x="0.0" y="-16.75" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_5" unit="mm" x="0.0" y="-15.41" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_6" unit="mm" x="0.0" y="-14.07" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_7" unit="mm" x="0.0" y="-12.73" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_8" unit="mm" x="0.0" y="-11.39" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_9" unit="mm" x="0.0" y="-10.05" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_10" unit="mm" x="0.0" y="-8.71" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_11" unit="mm" x="0.0" y="-7.37" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_12" unit="mm" x="0.0" y="-6.03" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_13" unit="mm" x="0.0" y="-4.69" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_14" unit="mm" x="0.0" y="-3.35" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_15" unit="mm" x="0.0" y="-2.01" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_16" unit="mm" x="0.0" y="-0.67" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_17" unit="mm" x="0.0" y="0.67" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_18" unit="mm" x="0.0" y="2.01" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_19" unit="mm" x="0.0" y="3.35" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_20" unit="mm" x="0.0" y="4.69" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_21" unit="mm" x="0.0" y="6.03" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_22" unit="mm" x="0.0" y="7.37" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_23" unit="mm" x="0.0" y="8.71" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_24" unit="mm" x="0.0" y="10.05" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_25" unit="mm" x="0.0" y="11.39" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_26" unit="mm" x="0.0" y="12.73" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_27" unit="mm" x="0.0" y="14.07" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_28" unit="mm" x="0.0" y="15.41" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_29" unit="mm" x="0.0" y="16.75" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_30" unit="mm" x="0.0" y="18.09" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_31" unit="mm" x="0.0" y="19.43" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiber_unit"/>
+            <position name="KLFpos2_32" unit="mm" x="0.0" y="20.77" z="0.0"/>
+        </physvol>
+    </assembly>
+    
+
+    
+    <assembly name="KLFiberPlanePair">
+        <physvol>
+            <volumeref ref="KLFiberPlane1"/>
+            <position name="KLFiberPlane1_pos" unit="mm" x="0.0" y="0.0" z="-0.49"/>
+            <rotation name="KLFiberPlane1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlane2"/>
+            <position name="KLFiberPlane2_pos" unit="mm" x="0.0" y="0.0" z="0.49"/>
+            <rotation name="KLFiberPlane2_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
+        </physvol>
+    </assembly>
+    <assembly name="KLFiberLattice1_2">
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_0" unit="mm" x="0.0" y="0.0" z="-9.31"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_1" unit="mm" x="0.0" y="0.0" z="-8.33"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_2" unit="mm" x="0.0" y="0.0" z="-7.35"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_3" unit="mm" x="0.0" y="0.0" z="-6.37"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_4" unit="mm" x="0.0" y="0.0" z="-5.39"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_5" unit="mm" x="0.0" y="0.0" z="-4.41"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_6" unit="mm" x="0.0" y="0.0" z="-3.43"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_7" unit="mm" x="0.0" y="0.0" z="-2.45"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_8" unit="mm" x="0.0" y="0.0" z="-1.47"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_9" unit="mm" x="0.0" y="0.0" z="-0.49"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_10" unit="mm" x="0.0" y="0.0" z="0.49"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_11" unit="mm" x="0.0" y="0.0" z="1.47"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_12" unit="mm" x="0.0" y="0.0" z="2.45"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_13" unit="mm" x="0.0" y="0.0" z="3.43"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_14" unit="mm" x="0.0" y="0.0" z="4.41"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_15" unit="mm" x="0.0" y="0.0" z="5.39"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_16" unit="mm" x="0.0" y="0.0" z="6.37"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_17" unit="mm" x="0.0" y="0.0" z="7.35"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_18" unit="mm" x="0.0" y="0.0" z="8.33"/>
+        </physvol>
+        <physvol>
+            <volumeref ref="KLFiberPlanePair"/>
+            <position name="KLFPpos_19" unit="mm" x="0.0" y="0.0" z="9.31"/>
+        </physvol>        
+    </assembly>
+    <volume name="KLFiberBlock1_2">
+        <materialref ref="AIR"/>
+        <solidref ref="KLFiber_solid"/>
+        <physvol name="KLFiberLattice1_2_phys">
+            <volumeref ref="KLFiberLattice1_2"/>
+            <position name="KLFiberLattice1_2_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
+            <rotation name="KLFiberLattice1_2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
+        </physvol>
+    </volume>
+        
+    </structure>    
+    
+    <setup name="Default" version="1.0">
+        <world ref="KLFiberBlock1_2"/>
+    </setup>
+    
+</gdml>
