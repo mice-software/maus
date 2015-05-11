@@ -45,6 +45,22 @@ PyObject* py_wrap_data(PyObject* self, PyObject* args) {
     return py_wrap<Data>(self, args);
 }
 
+PyObject* py_wrap_job_header(PyObject* self, PyObject* args) {
+    return py_wrap<JobHeaderData>(self, args);
+}
+
+PyObject* py_wrap_job_footer(PyObject* self, PyObject* args) {
+    return py_wrap<JobFooterData>(self, args);
+}
+
+PyObject* py_wrap_run_header(PyObject* self, PyObject* args) {
+    return py_wrap<RunHeaderData>(self, args);
+}
+
+PyObject* py_wrap_run_footer(PyObject* self, PyObject* args) {
+    return py_wrap<RunFooterData>(self, args);
+}
+
 PyObject* py_wrap_string(PyObject* self, PyObject* args) {
     return py_wrap<std::string>(self, args);
 }
@@ -96,7 +112,15 @@ PyMethodDef methods[] = {
     {"json_repr", (PyCFunction)py_wrap_pyobject, METH_VARARGS,
      "Represent data as a (py)json object\n - data: MICE data in any representation."},
     {"data_repr", (PyCFunction)py_wrap_data, METH_VARARGS,
-     "Represent data as a MAUS.Data object\n - data: MICE data in any representation."},
+     "Represent data as a MAUS.Data object\n - data: MICE spill data in any representation."},
+    {"job_header_repr", (PyCFunction)py_wrap_job_header, METH_VARARGS,
+     "Represent data as a MAUS.JobHeaderData object\n - data: MICE job_header data in any representation."},
+    {"job_footer_repr", (PyCFunction)py_wrap_job_footer, METH_VARARGS,
+     "Represent data as a MAUS.JobFooterData object\n - data: MICE job_footer data in any representation."},
+    {"run_header_repr", (PyCFunction)py_wrap_run_header, METH_VARARGS,
+     "Represent data as a MAUS.RunHeaderData object\n - data: MICE run_header data in any representation."},
+    {"run_footer_repr", (PyCFunction)py_wrap_run_footer, METH_VARARGS,
+     "Represent data as a MAUS.RunHeaderData object\n - data: MICE run_footer data in any representation."},
     {"string_repr", (PyCFunction)py_wrap_string, METH_VARARGS,
      "Represent data as a string object\n - data: MICE data in any representation."},
     {"del_data_repr", (PyCFunction)py_del_data_repr, METH_VARARGS,
