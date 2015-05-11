@@ -49,6 +49,10 @@
 #include "src/common_cpp/Converter/IConverter.hh"
 #include "src/common_cpp/Converter/ConverterExceptions.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/JobHeaderData.hh"
+#include "src/common_cpp/DataStructure/RunHeaderData.hh"
+#include "src/common_cpp/DataStructure/JobFooterData.hh"
+#include "src/common_cpp/DataStructure/RunFooterData.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
 
 
@@ -73,18 +77,46 @@ namespace MAUS {
    *    - string -> string
    *    - string -> json
    *    - string -> MAUS::Data
+   *    - string -> MAUS::JobHeader  ==============
+   *    - string -> MAUS::JobFooter  ==============
+   *    - string -> MAUS::RunHeader  ==============
+   *    - string -> MAUS::RunFooter  ==============
    *    - string -> PyObject* (py json)
    *    - json -> string
    *    - json -> json
    *    - json -> MAUS::Data
+   *    - json -> MAUS::JobHeader  ==============
+   *    - json -> MAUS::JobFooter  ==============
+   *    - json -> MAUS::RunHeader  ==============
+   *    - json -> MAUS::RunFooter  ==============
    *    - json -> PyObject* (py json)
    *    - MAUS::Data -> string
    *    - MAUS::Data -> json
    *    - MAUS::Data -> MAUS::Data
    *    - MAUS::Data -> PyObject* (py json)
+   *    - MAUS::JobHeader -> string              =================
+   *    - MAUS::JobHeader -> json                =================
+   *    - MAUS::JobHeader -> MAUS::JobHeader     =================
+   *    - MAUS::JobHeader -> PyObject* (py json) =================
+   *    - MAUS::JobFooter -> string              =================
+   *    - MAUS::JobFooter -> json                =================
+   *    - MAUS::JobFooter -> MAUS::JobFooter     =================
+   *    - MAUS::JobFooter -> PyObject* (py json) =================
+   *    - MAUS::RunHeader -> string              =================
+   *    - MAUS::RunHeader -> json                =================
+   *    - MAUS::RunHeader -> MAUS::RunHeader     =================
+   *    - MAUS::RunHeader -> PyObject* (py json) =================
+   *    - MAUS::RunFooter -> string              =================
+   *    - MAUS::RunFooter -> json                =================
+   *    - MAUS::RunFooter -> MAUS::RunFooter     =================
+   *    - MAUS::RunFooter -> PyObject* (py json) =================
    *    - PyObject* -> string
    *    - PyObject* -> json
    *    - PyObject* -> MAUS::Data
+   *    - PyObject* -> MAUS::JobHeader  ==============
+   *    - PyObject* -> MAUS::JobFooter  ==============
+   *    - PyObject* -> MAUS::RunHeader  ==============
+   *    - PyObject* -> MAUS::RunFooter  ==============
    *    - PyObject* -> PyObject* (py json)
    * logic is only non-trivial for MAUS -> json and PyObject* -> json (all
    * other conversions are based around this)
@@ -102,6 +134,18 @@ namespace MAUS {
 
     /** Overloaded function to  delete value */
     static void delete_type(MAUS::Data* value) {delete value;}
+
+    /** Overloaded function to  delete value */
+    static void delete_type(MAUS::JobHeaderData* value) {delete value;}
+
+    /** Overloaded function to  delete value */
+    static void delete_type(MAUS::JobFooterData* value) {delete value;}
+
+    /** Overloaded function to  delete value */
+    static void delete_type(MAUS::RunHeaderData* value) {delete value;}
+
+    /** Overloaded function to  delete value */
+    static void delete_type(MAUS::RunFooterData* value) {delete value;}
 
     /** Overloaded function to  delete value */
     static void delete_type(std::string* value) {delete value;}

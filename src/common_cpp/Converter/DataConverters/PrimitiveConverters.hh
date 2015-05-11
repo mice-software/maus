@@ -22,14 +22,12 @@
 #include "json/json.h"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/Converter/ConverterBase.hh"
 
 // Tested in ConverterFactoryTest
 
 namespace MAUS {
-class Data;
+
 /////////////////////////// STRING TO X ////////////////////////////
 
 class StringJsonConverter : public ConverterBase<std::string, Json::Value> {
@@ -40,20 +38,6 @@ class StringJsonConverter : public ConverterBase<std::string, Json::Value> {
   private:
     Json::Value* _convert(const std::string* json) const {
         return new Json::Value(JsonWrapper::StringToJson(*json));
-    }
-};
-
-class StringDataConverter : public ConverterBase<std::string, MAUS::Data> {
-  public:
-    StringDataConverter()
-      : ConverterBase<std::string, MAUS::Data>("StringDataConverter") {}
-
-  private:
-    MAUS::Data* _convert(const std::string* str) const {
-        Json::Value* json = StringJsonConverter().convert(str);
-        MAUS::Data* data = JsonCppSpillConverter().convert(json);
-        delete json;
-        return data;
     }
 };
 
@@ -115,47 +99,6 @@ class JsonPyDictConverter : public ConverterBase<Json::Value, PyObject> {
     }
 };
 
-/////////////////////////// DATA TO X ////////////////////////////
-
-class DataStringConverter : public ConverterBase<MAUS::Data, std::string> {
-  public:
-    DataStringConverter()
-      : ConverterBase<MAUS::Data, std::string>("DataStringConverter") {}
-
-  private:
-    std::string* _convert(const MAUS::Data* data) const {
-        Json::Value* json = CppJsonSpillConverter().convert(data);
-        std::string* str = JsonStringConverter().convert(json);
-        delete json;
-        return str;
-    }
-};
-
-class DataDataConverter : public ConverterBase<Data, Data> {
-  public:
-    DataDataConverter()
-      : ConverterBase<MAUS::Data, MAUS::Data>("DataDataConverter") {}
-
-  private:
-    MAUS::Data* _convert(const MAUS::Data* data) const {
-        return new Data(*data);
-    }
-};
-
-class DataPyDictConverter : public ConverterBase<Data, PyObject> {
-  public:
-    DataPyDictConverter()
-      : ConverterBase<Data, PyObject>("DataPyDictConverter") {}
-
-  private:
-    PyObject* _convert(const Data* data) const {
-        std::string* str = DataStringConverter().convert(data);
-        PyObject* obj = StringPyDictConverter().convert(str);
-        delete str;
-        return obj;
-    }
-};
-
 /////////////////////////// PYDICT TO X ////////////////////////////
 
 class PyDictStringConverter : public ConverterBase<PyObject, std::string> {
@@ -165,20 +108,6 @@ class PyDictStringConverter : public ConverterBase<PyObject, std::string> {
 
   private:
     inline std::string* _convert(const PyObject* obj) const;
-};
-
-class PyDictDataConverter : public ConverterBase<PyObject, Data> {
-  public:
-    PyDictDataConverter()
-      : ConverterBase<PyObject, MAUS::Data>("PyDictDataConverter") {}
-
-  private:
-    MAUS::Data* _convert(const PyObject* obj) const {
-        std::string* str = PyDictStringConverter().convert(obj);
-        MAUS::Data* data = StringDataConverter().convert(str);
-        delete str;
-        return data;
-    }
 };
 
 class PyDictJsonConverter : public ConverterBase<PyObject, Json::Value> {
@@ -207,8 +136,6 @@ class PyDictPyDictConverter : public ConverterBase<PyObject, PyObject> {
         return PyDict_Copy(obj_non_const);
     }
 };
-
-
 
 PyObject* StringPyDictConverter::_convert(const std::string* str) const {
         if (!str)
