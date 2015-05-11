@@ -92,10 +92,14 @@ class OutputCppRoot : public OutputBase<std::string> {
    *  put one Event type per TTree in MAUS, open() required to change the name
    *  of _outfile).
    */
-  template <class ConverterT, class DataT>
-  bool write_event(MAUSEvent<DataT>* data_cpp,
-                   const Json::Value& data_json,
-                   std::string branch_name);
+  template <class DataT>
+  bool _save(MAUSEvent<DataT>* data_cpp);
+
+  template <class DataT>
+  bool write_event(MAUSEvent<DataT>* data_cpp);
+  template <class DataT>
+  std::string branch_name(MAUSEvent<DataT>* data_cpp);
+
 
   event_type get_event_type(const Json::Value& data_json);
 
@@ -109,7 +113,7 @@ class OutputCppRoot : public OutputBase<std::string> {
   template <class DataT>
   int run_number(DataT* data_cpp);
 
-  bool _save(std::string json_document);
+
 
   orstream* _outfile;
 
