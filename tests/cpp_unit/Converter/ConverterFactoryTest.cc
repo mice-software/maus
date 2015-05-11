@@ -75,7 +75,7 @@ std::string rf_test_str =
 class ConverterFactoryTest : public ::testing::Test {
  protected:
   ConverterFactoryTest()
-    : _data(NULL), _jh(NULL), _jf(NULL), _rh(NULL), _rf(NULL), 
+    : _data(NULL), _jh(NULL), _jf(NULL), _rh(NULL), _rf(NULL),
       _json(new std::string("{}")), _nothing(new std::string("abc")) {
       _data = new std::string(data_test_str);
       _jh = new std::string(jh_test_str);
@@ -491,7 +491,6 @@ TEST_F(ConverterFactoryTest, TestJobHeaderToX) {
         ConverterFactory().convert<JobHeaderData, JobHeaderData>(NULL);
         EXPECT_TRUE(false) << "SHOULD HAVE THROWN";
     } catch (std::exception& exc) {}
-
 }
 
 TEST_F(ConverterFactoryTest, TestJobFooterToX) {
@@ -584,7 +583,6 @@ TEST_F(ConverterFactoryTest, TestRunHeaderToX) {
         ConverterFactory().convert<RunHeaderData, RunHeaderData>(NULL);
         EXPECT_TRUE(false) << "SHOULD HAVE THROWN";
     } catch (std::exception& exc) {}
-
 }
 
 TEST_F(ConverterFactoryTest, TestRunFooterToX) {
@@ -631,7 +629,6 @@ TEST_F(ConverterFactoryTest, TestRunFooterToX) {
         ConverterFactory().convert<RunFooterData, RunFooterData>(NULL);
         EXPECT_TRUE(false) << "SHOULD HAVE THROWN";
     } catch (std::exception& exc) {}
-
 }
 
 /////////////// PyDict TO X /////////////////////////////

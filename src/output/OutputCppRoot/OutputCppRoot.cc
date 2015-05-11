@@ -125,9 +125,16 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
   }
 }
 
-template <class DataT>
-bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp) {
-    std::string branch_name = branch_name(data_cpp);
+template <class ConverterT, class DataT>
+bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
+                                const Json::Value& data_json,
+                                std::string branch_name) {
+    // watch for double frees (does close() delete data_cpp?)
+    if (branch_name == "")
+        return false;
+
+    ConverterT conv;
+    data_cpp = conv.convert(&data_json);
     check_file_exists(data_cpp);
     if (_outfile == NULL) {
         throw(Exception(
@@ -136,6 +143,7 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp) {
           "OutputCppRoot::write_event"
         ));
     }
+
     std::string data_type = data_cpp->GetEventType();
     if (_outfile_branch != data_type) {
         if (_outfile->is_open())
@@ -166,9 +174,48 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp) {
     return true;
 }
 
-template <class DataT>
-bool OutputCppRoot::_save(MAUSEvent<DataT>* data_cpp) {
-    return write_event<>(data_cpp);
+bool OutputCppRoot::_save(std::string data_str) {
+    Json::Value data_json = JsonWrapper::StringToJson(data_str);
+    event_type my_tp = get_event_type(data_json);
+    switch (my_tp) {
+        case _job_header_tp:
+            return write_event<JsonCppJobHeaderConverter, JobHeader>
+                                    (_job_header_cpp, data_json, "job_header");
+        case _run_header_tp:
+            return write_event<JsonCppRunHeaderConverter, RunHeader>
+                                    (_run_header_cpp, data_json, "run_header");
+        case _spill_tp:
+            return write_event<JsonCppSpillConverter, Spill>
+                                               (_spill_cpp, data_json, "data");
+        case _run_footer_tp:
+            return write_event<JsonCppRunFooterConverter, RunFooter>
+                                    (_run_footer_cpp, data_json, "run_footer");
+        case _job_footer_tp:
+            return write_event<JsonCppJobFooterConverter, JobFooter>
+                                    (_job_footer_cpp, data_json, "job_footer");
+    }
+    return false;
+}
+
+OutputCppRoot::event_type OutputCppRoot::get_event_type
+                                                (const Json::Value& data_json) {
+    std::string type = JsonWrapper::GetProperty
+             (data_json, "maus_event_type", JsonWrapper::stringValue).asString();
+    if (type == "Spill") {
+        return _spill_tp;
+    } else if (type == "JobHeader") {
+        return _job_header_tp;
+    } else if (type == "JobFooter") {
+        return _job_footer_tp;
+    } else if (type == "RunHeader") {
+        return _run_header_tp;
+    } else if (type == "RunFooter") {
+        return _run_footer_tp;
+    } else {
+        throw MAUS::Exception(Exception::recoverable,
+                     "Failed to recognise maus_event_type "+type,
+                     "OutputCppRoot::get_event_type");
+    }
 }
 
 std::string OutputCppRoot::file_name(int run_number) {
