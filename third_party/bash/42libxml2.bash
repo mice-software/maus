@@ -54,7 +54,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         # .pyc file, then add the xml2 library again
         rm ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
         python -m libxml2
-        ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so.${version} ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
+        cd ${MAUS_ROOT_DIR}/third_party/install/lib
+        ln -s libxml2.so.${version} libxml2.so
+        cd -
 
             ################################################## 
         echo
