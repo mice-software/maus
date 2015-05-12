@@ -170,7 +170,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export CELERY_CONFIG_MODULE="mauscelery.celeryconfig"
 
      # Unpacking version can be StepI or StepIV
-     export MAUS_UNPACKER_VERSION="StepI"
+     export MAUS_UNPACKER_VERSION="StepIV"
 
 
      export G4DEBUG=1

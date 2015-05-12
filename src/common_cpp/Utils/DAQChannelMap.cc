@@ -94,6 +94,48 @@ DAQChannelMap::~DAQChannelMap() {
   _chKey.resize(0);
 }
 
+// load channel map based on data cards
+bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
+  _datafiles = JsonWrapper::GetProperty(configJSON,
+                                               "daq_data_file",
+                                               JsonWrapper::stringValue).asString();
+
+  int runNum = -1;
+  // check if daa_data_file is a number, if it is get run-number from it
+  // else parse it and extract the run number
+  if (is_number(_datafiles)) {
+      runNum = atoi(_datafiles.c_str());
+  } else {
+      std::string delimiter = " ";
+      std::string token = _datafiles.substr(0, _datafiles.find(delimiter));
+      runNum = atoi(token.c_str());
+  }
+
+  // load the appropriate cabling file depending on runNum being > or < 6541
+  // DR -- this is a hack which should go away once the maps are in the CDB
+  std::string map_file_name = "";
+  if (runNum < 6541) {
+      assert(configJSON.isMember("DAQ_cabling_file_StepI"));
+      map_file_name = configJSON["DAQ_cabling_file_StepI"].asString();
+     // load old file
+  } else {
+      assert(configJSON.isMember("DAQ_cabling_file"));
+      map_file_name = configJSON["DAQ_cabling_file"].asString();
+  }
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  if (!pMAUS_ROOT_DIR) {
+        Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable."
+        << std::endl;
+        Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
+        throw(MAUS::Exception(Exception::recoverable, "STRING", "DAQChannelMap::_InitFromCards"));
+  }
+
+  // Initialize the map by using text file.
+  bool loaded = InitFromFile(std::string(pMAUS_ROOT_DIR) + map_file_name);
+
+  return loaded;
+}
+
 bool DAQChannelMap::InitFromFile(std::string filename) {
   std::ifstream stream(filename.c_str());
   if ( !stream ) {
@@ -166,6 +208,12 @@ std::string DAQChannelMap::detector(int ldc, int geo, int ch, int eqType) {
     return key->detector();
 
   return "unknown";
+}
+
+bool DAQChannelMap::is_number(const std::string& s) {
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && std::isdigit(*it)) ++it;
+    return !s.empty() && it == s.end();
 }
 
 }  // namespace MAUS

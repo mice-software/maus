@@ -56,6 +56,8 @@ def build_doxygen():
     """Build doxygen add to copy targets"""
     global COPY_TARGETS # pylint: disable=W0603
     print "Building doxygen"
+    here = os.getcwd()
+    os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'doc_tools'))
     doxy_log = open(DOXY_LOG, 'w')
     for doxy_script in ['generate_third_party_doc.py', 'generate_maus_doc.py']:
         doxy_cmd = os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', \
@@ -71,6 +73,7 @@ def build_doxygen():
                                                        'doxygen_*'))
     COPY_TARGETS.append(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc',
                                                        'index.html'))
+    os.chdir(here)
 
 def build_user_guide():
     """Build user guide (html and pdf) add to copy targets"""
