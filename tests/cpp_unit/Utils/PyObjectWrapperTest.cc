@@ -41,6 +41,10 @@ PyObject* null = NULL;
 TEST(PyObjectWrapperTest, TestUnwrapNullObject) {
   PyObject* args = NULL;
   EXPECT_THROW(PyObjectWrapper::unwrap<Data>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobHeaderData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
@@ -50,6 +54,10 @@ TEST(PyObjectWrapperTest, TestUnwrapNullObject) {
 TEST(PyObjectWrapperTest, TestUnwrapBadObject) {
   PyObject* args = PyLong_FromLong(0);
   EXPECT_THROW(PyObjectWrapper::unwrap<Data>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobHeaderData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
@@ -57,10 +65,10 @@ TEST(PyObjectWrapperTest, TestUnwrapBadObject) {
   EXPECT_EQ(PyErr_Occurred(), null);
 }
 
-
+template <class TEMP>
 void test_unwrap(PyObject* py_data) {
   // Unwrap as data
-  Data* data_out = PyObjectWrapper::unwrap<Data>(py_data);
+  TEMP* data_out = PyObjectWrapper::unwrap<TEMP>(py_data);
   EXPECT_EQ(data_out->GetSpill()->GetRunNumber(), 99);
   delete data_out;
 
@@ -97,14 +105,14 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   Data* data_in = ConverterFactory().convert<std::string, Data>(&test);
   PyObject* py_data = PyObjectWrapper::wrap(data_in);
   EXPECT_EQ(py_data->ob_refcnt, 1);
-  test_unwrap(py_data);
+  test_unwrap<Data>(py_data);
   EXPECT_EQ(py_data->ob_refcnt, 1);
   Py_DECREF(py_data);
 
   std::cerr << "String " << std::flush;
   PyObject* py_str = PyObjectWrapper::wrap(new std::string(test));
   EXPECT_EQ(py_str->ob_refcnt, 1);
-  test_unwrap(py_str);
+  test_unwrap<Data>(py_str);
   Py_DECREF(py_str);
 
   std::cerr << "Json " << std::flush;
@@ -112,7 +120,7 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
                                                         (new std::string(test));
   PyObject* py_json = PyObjectWrapper::wrap(json_value);
   EXPECT_EQ(py_json->ob_refcnt, 1);
-  test_unwrap(py_json);
+  test_unwrap<Data>(py_json);
   Py_DECREF(py_json);
 
   std::cerr << "PyObject" << std::endl;
@@ -126,7 +134,7 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
   PyObject* py_py_dict = PyObjectWrapper::wrap(py_dict);
   EXPECT_EQ(py_py_dict->ob_refcnt, 1);
   EXPECT_EQ(py_py_dict, py_dict);  // it was a null op
-  test_unwrap(py_dict);
+  test_unwrap<Data>(py_dict);
   Py_DECREF(py_dict);
   EXPECT_EQ(PyErr_Occurred(), null);
 }
