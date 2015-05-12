@@ -773,7 +773,7 @@ void MapCppEMRRecon::event_charge_calculation(int nPartEvents,
 					      EMRfADCEventVector_er& emr_fadc_events,
 					      EMRTrackEventVector& emr_track_events) const {
 
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+  for (int iPe = 0; iPe < nPartEvents-2; iPe++) {
 
     // Skip the events without a primary track
     if (!emr_track_events[iPe]._has_primary) continue;
