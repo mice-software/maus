@@ -134,7 +134,7 @@ bool OutputCppRoot::write_event(PyObject* py_data) {
         data_cpp = PyObjectWrapper::unwrap<DataT>(py_data);
         if (data_cpp == NULL)
             return false;
-    } catch (Exception) {
+    } catch (std::exception) {
         return false;
     }
     check_file_exists(data_cpp);
