@@ -60,6 +60,17 @@ reconstruction_geometry_filename = "Test.dat"
                 self.assertAlmostEqual(field_value[i], 0., 1e-12)
         maus_cpp.globals.death()
 
+    def test_str(self):
+        """Test maus_cpp.Field.get_field_value(...)"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        maus_cpp.globals.birth(self.config)
+        field_string = maus_cpp.field.str(True)
+        self.assertGreater(field_string.find("name: Test_Field"), -1) 
+        field_string = maus_cpp.field.str(False)
+        self.assertGreater(field_string.find("name: Test_Field"), -1) 
+        maus_cpp.globals.death()
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -48,7 +48,7 @@ def run():
     # Set up the input that reads from DAQ
 #    my_input = MAUS.InputCppDAQData()
 #    my_input = MAUS.InputCppDAQOnlineData()
-    my_input = MAUS.InputCppDAQOnlineData() # pylint: disable = E1101
+    my_input = MAUS.InputCppDAQOfflineData() # pylint: disable = E1101
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
