@@ -17,5 +17,17 @@ Configuration Test
     PropertyString Material lH2
     PropertyString SensitiveDetector SpecialVirtual
   }
+  Module TestField
+  {
+    Volume None
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    PropertyDouble ScaleFactor 0
+    PropertyString FieldType CylindricalField
+    PropertyDouble Length 1.
+    PropertyDouble FieldRadius 1.      
+    PropertyHep3Vector ConstantField 0. 0. 0. T
+    PropertyString FieldName Test_Field
+  }
 }
 
