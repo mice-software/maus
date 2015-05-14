@@ -34,6 +34,7 @@ namespace global {
 		      "Recon::Global::TrackMatching"));
     }
 
+    
     MAUS::DataStructure::Global::TrackPArray *ImportedTracks = global_event->get_tracks();
     MAUS::DataStructure::Global::TrackPArray::iterator ImportedTrackIterator;
     MAUS::DataStructure::Global::Track* ImportedSciFiTrack =
@@ -69,7 +70,8 @@ namespace global {
 	EMRTrack->set_emr_range_primary(ImportedTrack->get_emr_range_primary());
 	EMRTrack->set_emr_range_secondary(ImportedTrack->get_emr_range_secondary());
       }
-      if (ImportedSciFiTrack->GetTrackPoints().size() == 0) {
+    }
+    if (ImportedSciFiTrack->GetTrackPoints().size() == 0) {
 	delete ImportedSciFiTrack;
 	ImportedSciFiTrack = NULL;
       }
@@ -77,24 +79,6 @@ namespace global {
 	delete EMRTrack;
 	EMRTrack = NULL;
       }
-    }
-
-    /*// Get EMR trackpoints
-    MAUS::DataStructure::Global::Track* EMRTrack =
-      new MAUS::DataStructure::Global::Track();
-    if (global_event->get_track_points()) {
-      std::vector<MAUS::DataStructure::Global::TrackPoint*>*
-	tempTrackPointArray = global_event->get_track_points();
-      for (unsigned int i = 0; i < tempTrackPointArray->size(); i++) {
-	if (tempTrackPointArray->at(i)->get_detector() == MAUS::DataStructure::Global::kCalorimeter) {
-	  EMRTrack->AddTrackPoint(tempTrackPointArray->at(i));
-	}
-      }
-      if (EMRTrack->GetTrackPoints().size() == 0) {
-	delete EMRTrack;
-	EMRTrack = NULL;
-      }
-      }*/
 
     std::vector<MAUS::DataStructure::Global::SpacePoint*>
       *GlobalSpacePointArray = global_event->get_space_points();
@@ -144,6 +128,8 @@ namespace global {
 	    tempEMRTrackPoint->set_mapper_name(mapper_name);
 	    GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	  }
+	  GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	  GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	}
 	global_event->add_track_recursive(GlobalTrack);
       }
@@ -176,6 +162,8 @@ namespace global {
 	    tempEMRTrackPoint->set_mapper_name(mapper_name);
 	    GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	  }
+	  GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	  GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	}
 	global_event->add_track_recursive(GlobalTrack);
       }
@@ -207,6 +195,8 @@ namespace global {
 	  tempEMRTrackPoint->set_mapper_name(mapper_name);
 	  GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	}
+	GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
       }
       global_event->add_track_recursive(GlobalTrack);
     }
@@ -222,6 +212,8 @@ namespace global {
       else if (KLTrack == NULL && EMRTrack != NULL) {
 	MAUS::DataStructure::Global::Track* GlobalTrack = EMRTrack->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
+	GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	global_event->add_track_recursive(GlobalTrack);
       } else {
 	MAUS::DataStructure::Global::Track* GlobalTrack = KLTrack->Clone();
@@ -234,6 +226,8 @@ namespace global {
 	  tempEMRTrackPoint->set_mapper_name(mapper_name);
 	  GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	}
+	GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	GlobalTrack->set_mapper_name(mapper_name);
 	global_event->add_track_recursive(GlobalTrack);
       }
