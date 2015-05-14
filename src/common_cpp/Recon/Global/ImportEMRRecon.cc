@@ -37,7 +37,10 @@ namespace global {
     double y;
     double z;
     double t = -1000000;
-    TLorentzVector pos_err(1.65, 1.65, 8.5, 0.0);
+    double x_err;
+    double y_err;
+    double z_err;
+    double t_err = -1000000;
 
     // Check that EMR event has a primary track
     if (emr_event.GetHasPrimary()) {
@@ -75,6 +78,10 @@ namespace global {
 	      y = bar_hit.GetY();
 	      z = bar_hit.GetZ() + z_ref;
 	      TLorentzVector pos(x, y, z, t);
+	      x_err = bar_hit.GetErrorX();
+	      y_err = bar_hit.GetErrorY();
+	      z_err = bar_hit.GetErrorZ();
+	      TLorentzVector pos_err(x_err, y_err, z_err, t_err);
 	      MAUS::DataStructure::Global::TrackPoint* tpoint =
 		new MAUS::DataStructure::Global::TrackPoint();
 	      MAUS::DataStructure::Global::SpacePoint* spoint =
@@ -86,9 +93,9 @@ namespace global {
 	      spoint->set_position_error(pos_err);
 	      tpoint->set_position_error(pos_err);
 	      tpoint->set_space_point(spoint);
-	      tpoint->set_mapper_name("MapCppGlobalReconImport-EMR-Primary");
+	      tpoint->set_mapper_name("MapCppGlobalReconImport");
 	      PrimaryEMRTrack->AddTrackPoint(tpoint);
-	      PrimaryEMRTrack->set_mapper_name("MapCppGlobalReconImport-EMR-Primary");
+	      PrimaryEMRTrack->set_mapper_name("MapCppGlobalReconImport");
 	    }
 	  }
 	  // Secondary Bar array
@@ -113,6 +120,10 @@ namespace global {
 		y = bar_hit.GetY();
 		z = bar_hit.GetZ() + z_ref;
 		TLorentzVector pos(x, y, z, t);
+		x_err = bar_hit.GetErrorX();
+		y_err = bar_hit.GetErrorY();
+		z_err = bar_hit.GetErrorZ();
+		TLorentzVector pos_err(x_err, y_err, z_err, t_err);
 		MAUS::DataStructure::Global::TrackPoint* tpoint =
 		  new MAUS::DataStructure::Global::TrackPoint();
 		MAUS::DataStructure::Global::SpacePoint* spoint =
@@ -124,8 +135,9 @@ namespace global {
 		spoint->set_position_error(pos_err);
 		tpoint->set_position_error(pos_err);
 		tpoint->set_space_point(spoint);
+		tpoint->set_mapper_name("MapCppGlobalReconImport");
 		SecondaryEMRTrack->AddTrackPoint(tpoint);
-		SecondaryEMRTrack->set_mapper_name("MapCppGlobalReconImport-EMR-Secondary");
+		SecondaryEMRTrack->set_mapper_name("MapCppGlobalReconImport");
 	      }
 	    }
 	  } else {
