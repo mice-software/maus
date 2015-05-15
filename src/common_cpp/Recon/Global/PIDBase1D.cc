@@ -34,9 +34,11 @@ namespace global {
   };
 
   PIDBase1D::PIDBase1D(TFile* file, std::string variable,
-		   std::string hypothesis, int XminBin, int XmaxBin)
-    : PIDBase(file, variable, hypothesis, XminBin, XmaxBin,
-       YminBin, YmaxBin) {
+		   std::string hypothesis, int Xmin, int Xmax)
+    : PIDBase(file, variable, hypothesis, Xmin, Xmax,
+       Ymin, Ymax) {
+    std::cerr << "PIDBase1D min max " << Xmin << "\t" << Xmax << std::endl;
+
     std::string histname = variable + "_" + hypothesis;
     if (!file || file->IsZombie()) {
       throw(Exception(Exception::recoverable,
@@ -82,10 +84,16 @@ namespace global {
 
   double PIDBase1D::logL(MAUS::DataStructure::Global::Track* track) {
     double var = (Calc_Var(track)).first;
-    if (var < _XminBin || var > _XmaxBin) {
+    std::cerr << "PIDBase1D " << var << " limits " << _Xmin << "\t" << _Xmax << std::endl;
+    if (var < _Xmin || var > _Xmax) {
       Squeak::mout(Squeak::debug) << "Missing/invalid measurements for  " <<
-	"TOF0/TOF1 times, Recon::Global::PIDBase1D::logL()" << std::endl;
+	"variable, Recon::Global::PIDBase1D::logL()" << std::endl;
       return 1;
+    } else if (var < _Xmin || var > _Xmax) {
+      Squeak::mout(Squeak::debug) << "Value of variable is outside of cut " <<
+	"range used for PID, Recon::Global::PIDBase1D::logL()" << std::endl;
+      return 2; // return value of 2 is chosen to be picked up when performing
+      // efficiency and purity on PID, do not change.
     }
     int bin = _hist->FindBin(var);
     double entries = _hist->GetBinContent(bin);

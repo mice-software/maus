@@ -54,7 +54,7 @@ namespace global {
            int XnumBins, int YminBin, int YmaxBin, int YnumBins);
     /// Constructor to use a PDF to perform PID analysis
     PIDBase2D(TFile* file, std::string variable, std::string hypothesis,
-	      int XminBin, int XmaxBin, int YminBin, int YmaxBin);
+	      int Xmin, int Xmax, int Ymin, int Ymax);
     /// Destructor
     virtual ~PIDBase2D();
 

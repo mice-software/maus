@@ -120,6 +120,9 @@ namespace global {
     /// set in derived PID classes
     int _XminBin, _XmaxBin, _XnumBins, _YminBin, _YmaxBin, _YnumBins;
 
+    /// Range to look within when performing PID
+    int _Xmin, _Xmax, _Ymin, _Ymax;
+
     /// Check if we want to add one event spread over the entire histogram, to
     /// avoid bins with zero entries
     bool _nonZeroHistEntries;

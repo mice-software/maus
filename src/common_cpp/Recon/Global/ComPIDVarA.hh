@@ -14,14 +14,14 @@
  * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
  */
 
- /** @class PIDVarA
+ /** @class ComPIDVarA
  *  @author Celeste Pidcott, University of Warwick
- *  Example PID variable class, for TOF1 time - TOF0 time, derived
- *  from PIDBase
+ *  Commissioning PID variable class, for TOF2 time - TOF1 time, derived
+ *  from PIDBase1D
  */
 
-#ifndef PIDVARA_HH
-#define PIDVARA_HH
+#ifndef COMPIDVARA_HH
+#define COMPIDVARA_HH
 
 #include <string>
 #include <utility>
@@ -40,14 +40,14 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-  class PIDVarA : public PIDBase1D {
+  class ComPIDVarA : public PIDBase1D {
   public:
     /// Constructor to create a PDF
-    explicit PIDVarA(std::string hypothesis, std::string unique_identifier);
+    explicit ComPIDVarA(std::string hypothesis, std::string unique_identifier);
     /// Constructor to use a PDF to perform PID analysis
-    PIDVarA(TFile* file, std::string hypothesis);
+    ComPIDVarA(TFile* file, std::string hypothesis, int minComA, int maxComA);
     /// Destructor
-    ~PIDVarA();
+    ~ComPIDVarA();
 
   private:
 
@@ -62,15 +62,15 @@ namespace global {
     /// Name of PID variable
     static const std::string VARIABLE;
     /// Number of bins in PDF
-    static const int numBins = 200;
+    static const int numBins = 100;
     /// Minimum value of range of PDF
-    static const int minBinA = 20;
+    static const int minBinComA = 25;
     /// Maximum value of range of PDF
-    static const int maxBinA = 40;
-    /// Minimum value of PID cut
-    static const int minA = 20;
-    /// Maximum value of PID cut
-    static const int maxA = 40;
+    static const int maxBinComA = 45;
+    /// Minimum value of cut for PID
+    static const int minComA = 20;
+    /// Maximum value of cur for PID
+    static const int maxComA = 40;
   };
 }
 }

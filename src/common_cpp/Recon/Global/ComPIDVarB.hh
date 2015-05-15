@@ -14,15 +14,15 @@
  * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
  */
 
- /** @class PIDVarB
+ /** @class ComPIDVarB
  *  @author Celeste Pidcott, University of Warwick
- *  PID variable class using the relation between the momentum measured
- *  in the upstream tracker and the time of flight between TOF1 and TOF0.
+ *  Commissioning PID variable class using the relation between the TOF1-2
+ *  time of flight and the ADC charge product in the KL.
  * 
  */
 
-#ifndef PIDVARB_HH
-#define PIDVARB_HH
+#ifndef COMPIDVARC_HH
+#define COMPIDVARC_HH
 
 #include <string>
 #include <utility>
@@ -43,14 +43,14 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-  class PIDVarB : public PIDBase2D {
+  class ComPIDVarB : public PIDBase2D {
   public:
     /// Constructor to create a PDF
-    explicit PIDVarB(std::string hypothesis, std::string unique_identifier);
+    explicit ComPIDVarB(std::string hypothesis, std::string unique_identifier);
     /// Constructor to use a PDF to perform PID analysis
-    PIDVarB(TFile* file, std::string hypothesis);
+    ComPIDVarB(TFile* file, std::string hypothesis, int XminComB, int XmaxComB, int YminComB, int YmaxComB);
     /// Destructor
-    ~PIDVarB();
+    ~ComPIDVarB();
 
   private:
 
@@ -65,38 +65,38 @@ namespace global {
     /// Track Points from global track
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
     global_track_points;
-    /// TOF0 track points from global track
+    /// KL track points from global track
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-    tof0_track_points;
+    kl_track_points;
     /// TOF1 track points from global track
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
     tof1_track_points;
-    /// Tracker 0 track points from global track
+    /// TOF2 track points from global track
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-    tracker0_track_points;
+    tof2_track_points;
 
     /// Name of PID variable
     static const std::string VARIABLE;
     /// Number of X bins in PDF
-    static const int XnumBins = 240;
+    static const int XnumBins = 40;
     /// Minimum value of X range of PDF
-    static const int XminBinB = 10;
+    static const int XminBinComB = 25;
     /// Maximum value of X range of PDF
-    static const int XmaxBinB = 250;
+    static const int XmaxBinComB = 45;
     /// Number of Y bins in PDF
-    static const int YnumBins = 40;
+    static const int YnumBins = 200;
     /// Minimum value of Y range of PDF
-    static const int YminBinB = 20;
+    static const int YminBinComB = 0;
     /// Maximum value of Y range of PDF
-    static const int YmaxBinB = 40;
+    static const int YmaxBinComB = 8000;
     /// Minimum value of X cut for PID
-    static const int XminB = 10;
+    static const int XminComB = 20;
     /// Maximum value of X cut for PID
-    static const int XmaxB = 250;
+    static const int XmaxComB = 40;
     /// Minimum value of Y cut for PID
-    static const int YminB = 20;
+    static const int YminComB = 0;
     /// Maximum value of Y cut for PID
-    static const int YmaxB = 40;
+    static const int YmaxComB = 8000;
   };
 }
 }

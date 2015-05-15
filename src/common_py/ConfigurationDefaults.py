@@ -320,7 +320,6 @@ SciFiKalmanVerbose  = False # Dump information per fitted track
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
 cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
-cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for cooling channel configuration database downloads.
 
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
@@ -329,11 +328,8 @@ geometry_download_by = 'id' # choose 'run_number' to download by run number, 'cu
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
-geometry_download_beamline_for_run = 0
-geometry_download_beamline_tag = ''
-geometry_download_coolingchannel_tag = ''
 geometry_download_run_number = 0
-geometry_download_id = 49
+geometry_download_id = 3
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
@@ -415,7 +411,6 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
-DAQ_cabling_file_StepI = "/files/cabling/DAQChannelMap_preRun6541.txt"
 DAQ_hostname = 'miceraid1a'
 DAQ_monitor_name = 'MICE_Online_Monitor'
 daq_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
@@ -617,7 +612,8 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "y":0.1, "Py":0.01}
 
 # Default location of root file containing PDF histograms used for Global PID
-PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
 # Particle hypothesis used in Global PID when creating PDFs from MC data.
 # For PDFs to be produced, this must be set, preferably as the type of simulated particle
 # i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
@@ -627,21 +623,37 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
-# Bounds set on values of PID variables, should probably only be varied when running PID,
-# although can also be used to set new limits for PDFs
+# Bounds set on values of PID variables when running PID
 # Bounds for PIDVarA
-minBinA = 20
-maxBinA = 40
+minA = 20
+maxA = 40
 # PIDVarB
-XminBinB = 10
-XmaxBinB = 250
-YminBinB = 20
-YmaxBinB = 40
+XminB = 10
+XmaxB = 250
+YminB = 20
+YmaxB = 40
 # PIDVarC
-XminBinC = 50
-XmaxBinC = 350
-YminBinC = 0
-YmaxBinC = 8000
+XminC = 50
+XmaxC = 350
+YminC = 0
+YmaxC = 8000
+# PIDVarD
+minD = 0
+maxD = 8000
+# PIDVarE
+minE = 0
+maxE = 8000
+# ComPIDVarA
+minComA = 25
+maxComA = 45
+# ComPIDVarB
+XminComB = 25
+XmaxComB = 45
+YminComB = 0
+YmaxComB = 8000
+# ComPIDVarC
+minComC = 0
+maxComC = 8000
 
 
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs

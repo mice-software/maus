@@ -32,7 +32,7 @@ namespace global {
   }
 
   PIDVarA::PIDVarA(TFile* file, std::string hypothesis)
-    : PIDBase1D(file, VARIABLE, hypothesis, minBinA, maxBinA) {
+    : PIDBase1D(file, VARIABLE, hypothesis, minA, maxA) {
   }
 
   PIDVarA::~PIDVarA() {}
@@ -78,7 +78,7 @@ namespace global {
     } else if ( minBinA > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > maxBinA ) {
       Squeak::mout(Squeak::debug) << "Difference between TOF0 and TOF1 times" <<
 	" outside of range, Recon::Global::PIDVarA::Calc_Var()" << std::endl;
-      return std::make_pair(-1, 0);
+      return std::make_pair((TOF1_t - TOF0_t), 0);
     } else {
       return std::make_pair((TOF1_t - TOF0_t), 0);
     }
