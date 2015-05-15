@@ -63,6 +63,23 @@ namespace MAUS {
 
     _histFile = new TFile(PDF_file.c_str(), "READ");
 
+    _minA = _configJSON["minA"].asInt();
+    _maxA = _configJSON["maxA"].asInt();
+    _XminB = _configJSON["XminB"].asInt();
+    _XmaxB = _configJSON["XmaxB"].asInt();
+    _YminB = _configJSON["YminB"].asInt();
+    _YmaxB = _configJSON["YmaxB"].asInt();
+    _XminC = _configJSON["XminC"].asInt();
+    _XmaxC = _configJSON["XmaxC"].asInt();
+    _YminC = _configJSON["YminC"].asInt();
+    _YmaxC = _configJSON["YmaxC"].asInt();
+    _minD = _configJSON["minD"].asInt();
+    _maxD = _configJSON["maxD"].asInt();
+    _minE = _configJSON["minE"].asInt();
+    _maxE = _configJSON["maxE"].asInt();
+    _minComA = _configJSON["minComA"].asInt();
+    _maxComA = _configJSON["maxComA"].asInt();
+
     // vector of hypotheses
     // TODO(Pidcott) find a more elegant way of accessing hypotheses
     _hypotheses.push_back("200MeV_mu_plus");
@@ -71,12 +88,12 @@ namespace MAUS {
 
     for (unsigned int i =0; i < _hypotheses.size(); ++i) {
       // vector of pid vars
-      /*_pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
-        						   _hypotheses[i]));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
+        						   _hypotheses[i], _minA, _maxA));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
-      _hypotheses[i]));*/
+      _hypotheses[i], _XminB, _XmaxB, _YminB, _YmaxB));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
-                                                           _hypotheses[i]));
+                                                           _hypotheses[i], _XminC, _XmaxC, _YminC, _YmaxC));
       // etc.
       }
     _configCheck = true;

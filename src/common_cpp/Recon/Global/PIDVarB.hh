@@ -48,7 +48,7 @@ namespace global {
     /// Constructor to create a PDF
     explicit PIDVarB(std::string hypothesis, std::string unique_identifier);
     /// Constructor to use a PDF to perform PID analysis
-    PIDVarB(TFile* file, std::string hypothesis);
+    PIDVarB(TFile* file, std::string hypothesis, int XminB, int XmaxB, int YminB, int YmaxB);
     /// Destructor
     ~PIDVarB();
 

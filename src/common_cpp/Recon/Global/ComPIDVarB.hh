@@ -90,9 +90,9 @@ namespace global {
     /// Maximum value of Y range of PDF
     static const int YmaxBinComB = 8000;
     /// Minimum value of X cut for PID
-    static const int XminComB = 20;
+    static const int XminComB = 25;
     /// Maximum value of X cut for PID
-    static const int XmaxComB = 40;
+    static const int XmaxComB = 45;
     /// Minimum value of Y cut for PID
     static const int YminComB = 0;
     /// Maximum value of Y cut for PID

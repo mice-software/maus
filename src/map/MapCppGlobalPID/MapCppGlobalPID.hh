@@ -111,6 +111,30 @@ namespace MAUS {
     /// The current spill
     Spill* _spill;
 
+    /// PID cut limits from datacard
+    int _minA;
+    int _maxA;
+    int _XminB;
+    int _XmaxB;
+    int _YminB;
+    int _YmaxB;
+    int _XminC;
+    int _XmaxC;
+    int _YminC;
+    int _YmaxC;
+    int _minD;
+    int _maxD;
+    int _minE;
+    int _maxE;
+    int _minComA;
+    int _maxComA;
+    int _XminComB;
+    int _XmaxComB;
+    int _YminComB;
+    int _YmaxComB;
+    int _minComC;
+    int _maxComC;
+
     /// File containing PDFs for use in PID
     std::string PDF_file;
   }; // Don't forget this trailing colon!!!!

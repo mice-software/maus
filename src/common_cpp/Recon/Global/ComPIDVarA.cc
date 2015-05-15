@@ -33,13 +33,11 @@ namespace global {
 
   ComPIDVarA::ComPIDVarA(TFile* file, std::string hypothesis, int minComA,int maxComA)
     : PIDBase1D(file, VARIABLE, hypothesis, minComA, maxComA) {
-    std::cerr << "ComPIDVarA min max " << minComA << "\t" << maxComA << std::endl;
   }
 
   ComPIDVarA::~ComPIDVarA() {}
 
   std::pair<double, double> ComPIDVarA::Calc_Var(MAUS::DataStructure::Global::Track* track) {
-    std::cerr << "In Calc_Var of ComPIDVarA" << std::endl;
     double TOF2_t = 0;
     double TOF1_t = 0;
     int checkCount2 = 0;
@@ -54,18 +52,13 @@ namespace global {
       ::iterator eachTP;
     for (eachTP = track_points.begin(); eachTP != track_points.end();
 	 ++eachTP) {
-      std::cerr << "iterating through trackpoints CPVA" << std::endl;
       if (!(*eachTP)) continue;
       if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching") {
 	if ((*eachTP)->get_detector() == TOF2_DP) {
-	  std::cerr << "Have a TOF2 trackpoint" << std::endl;
 	  TOF2_t = (*eachTP)->get_position().T();
-	  std::cerr << "TOF2 time: " << TOF2_t << std::endl;
 	  ++checkCount2;
 	} else if ((*eachTP)->get_detector() == TOF1_DP) {
-	  std::cerr << "Have a TOF1 trackpoint" << std::endl;
 	  TOF1_t = (*eachTP)->get_position().T();
-	  std::cerr << "TOF1 time: " << TOF1_t << std::endl;
 	  ++checkCount1;
 	}
       } else {
@@ -85,9 +78,8 @@ namespace global {
               (TOF2_t - TOF1_t) > maxBinComA ) {
       Squeak::mout(Squeak::debug) << "Difference between TOF1 & TOF2 times" <<
 	" out of PDF range, Recon::Global::ComPIDVarA::Calc_Var()" << std::endl;
-      return std::make_pair((TOF2_t - TOF1_t), 0);
+      return std::make_pair(-1, 0);
     } else {
-      std::cerr << "got a good TOF" << std::endl;
       return std::make_pair((TOF2_t - TOF1_t), 0);
     }
   }

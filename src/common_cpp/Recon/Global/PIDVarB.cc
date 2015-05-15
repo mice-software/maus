@@ -32,7 +32,7 @@ namespace global {
     _nonZeroHistEntries = true;
   }
 
-  PIDVarB::PIDVarB(TFile* file, std::string hypothesis)
+  PIDVarB::PIDVarB(TFile* file, std::string hypothesis, int XminB, int XmaxB, int YminB, int YmaxB)
     : PIDBase2D(file, VARIABLE, hypothesis, XminB, XmaxB, YminB, YmaxB) {
   }
 

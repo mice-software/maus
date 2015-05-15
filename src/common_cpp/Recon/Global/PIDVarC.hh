@@ -48,7 +48,7 @@ namespace global {
     /// Constructor to create a PDF
     explicit PIDVarC(std::string hypothesis, std::string unique_identifier);
     /// Constructor to use a PDF to perform PID analysis
-    PIDVarC(TFile* file, std::string hypothesis);
+    PIDVarC(TFile* file, std::string hypothesis, int XminC, int XmaxC, int YminC, int YmaxC);
     /// Destructor
     ~PIDVarC();
 
@@ -75,7 +75,7 @@ namespace global {
     /// Name of PID variable
     static const std::string VARIABLE;
     /// Number of X bins in PDF
-    static const int XnumBins = 100;
+    static const int XnumBins = 150;
     /// Minimum value of X range of PDF
     static const int XminBinC = 50;
     /// Maximum value of X range of PDF
@@ -86,6 +86,14 @@ namespace global {
     static const int YminBinC =0;
     /// Maximum value of Y range of PDF
     static const int YmaxBinC = 8000;
+    /// Minimum value of X cut for PID
+    static const int XminC = 50;
+    /// Maximum value of X cut for PID
+    static const int XmaxC = 350;
+    /// Minimum value of Y cut for PID
+    static const int YminC = 0;
+    /// Maximum value of Y cut for PID
+    static const int YmaxC = 8000;
   };
 }
 }

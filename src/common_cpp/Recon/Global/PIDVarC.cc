@@ -32,8 +32,8 @@ namespace global {
     _nonZeroHistEntries = true;
   }
 
-  PIDVarC::PIDVarC(TFile* file, std::string hypothesis)
-    : PIDBase2D(file, VARIABLE, hypothesis, XminBinC, XmaxBinC, YminBinC, YmaxBinC) {
+  PIDVarC::PIDVarC(TFile* file, std::string hypothesis, int XminC, int XmaxC, int YminC, int YmaxC)
+    : PIDBase2D(file, VARIABLE, hypothesis, XminC, XmaxC, YminC, YmaxC) {
   }
 
   PIDVarC::~PIDVarC() {}
@@ -66,7 +66,7 @@ namespace global {
       Squeak::mout(Squeak::debug) << "Global track contained no KL" <<
 	" trackpoints, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
       kl_track_points.clear();
-      return std::make_pair(-1, 0);
+      return std::make_pair(0, -1);
     } else if (tracker1_track_points.size() < 1) {
       Squeak::mout(Squeak::debug) << "Global track contained no downstream" <<
 	" tracker trackpoints, Recon::Global::PIDVarC::Calc_Var()" << std::endl;
@@ -83,7 +83,7 @@ namespace global {
 	  std::endl;
 	kl_track_points.clear();
 	tracker1_track_points.clear();
-	return std::make_pair(-1, 0);
+	return std::make_pair(0, -1);
       } else {
 	double tracker1_trackpoint_mom = 0;
 	int tracker1_tp_count = 0;

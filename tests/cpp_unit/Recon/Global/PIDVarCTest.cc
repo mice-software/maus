@@ -122,11 +122,11 @@ TEST_F(PIDVarCTest, ReadFileConstructor) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "test", 50, 350, 0, 8000));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(NULL, "test"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(NULL, "test", 50, 350, 0, 8000));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "sasquatch"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "sasquatch", 50, 350, 0, 8000));
 }
 
 /* N.B. if either FillHist or LogL are failing, check the values of min and max
@@ -192,9 +192,9 @@ TEST_F(PIDVarCTest, LogL) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test", 50, 350, 0, 8000));
 
-	MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test");
+	MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test", 50, 350, 0, 8000);
 
 	hist = readtestPIDVarC.Get_hist();
 	ASSERT_TRUE(hist);

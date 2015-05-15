@@ -23,7 +23,7 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-  const std::string ComPIDVarC::VARIABLE = "KLADCChargeProduct";
+  const std::string ComPIDVarC::VARIABLE = "CommissioningKLADCChargeProduct";
 
   ComPIDVarC::ComPIDVarC(std::string hypothesis, std::string unique_identifier)
     : PIDBase1D(VARIABLE, hypothesis, unique_identifier, minBinComC, maxBinComC,

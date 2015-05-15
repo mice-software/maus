@@ -31,7 +31,7 @@ namespace global {
     _nonZeroHistEntries = true;
   }
 
-  PIDVarA::PIDVarA(TFile* file, std::string hypothesis)
+  PIDVarA::PIDVarA(TFile* file, std::string hypothesis, int minA, int maxA)
     : PIDBase1D(file, VARIABLE, hypothesis, minA, maxA) {
   }
 
