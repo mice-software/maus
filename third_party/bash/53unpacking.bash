@@ -3,7 +3,7 @@
 # require python extras for scons
 
 directory=unpacking-mice
-filename=${directory}_2.tarz
+filename=${directory}-current.tarz
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
