@@ -62,6 +62,10 @@ case $key in
     MAUS_THIRD_PARTY="$2"
     shift
     ;;
+    -u|--unpacker)
+    MAUS_UNPACKER_VERSION="$2"
+    shift
+    ;;
 esac
 shift
 done
@@ -86,16 +90,28 @@ else
     echo
 fi
 
+if [ -z "$MAUS_UNPACKER_VERSION" ]; then
+  MAUS_UNPACKER_VERSION="StepIV"
+fi
+if [ "$MAUS_UNPACKER_VERSION" = "StepI" ] || [ "$MAUS_UNPACKER_VERSION" = "StepIV" ];  then
+  echo "MAUS Unpacker version to use:" "${MAUS_UNPACKER_VERSION}"
+  echo
+else
+  echo "FATAL: Bad MAUS_UNPACKER_VERSION supplied"
+  echo "FATAL: Please use either StepI or StepIV or leave unset"
+  exit 1
+fi
+
 uname -a 2>>$FILE_STD 1>>$FILE_STD 
 echo "Configuring..."
 if [ "$MAUS_THIRD_PARTY" ]; then
-    ./configure -t $MAUS_THIRD_PARTY 2>> $FILE_STD 1>> $FILE_STD
+    ./configure -t $MAUS_THIRD_PARTY -u $MAUS_UNPACKER_VERSION 2>> $FILE_STD 1>> $FILE_STD
     echo "Sourcing the environment..."
     source env.sh 2>>$FILE_STD 1>>$FILE_STD
     echo "Installing field maps in MAUS_ROOT_DIR..."
     ./third_party/bash/45beamline_fieldmaps.bash 2>>$FILE_STD 1>>$FILE_STD
 else
-    ./configure 2>>$FILE_STD 1>>$FILE_STD
+    ./configure -u $MAUS_UNPACKER_VERSION 2>>$FILE_STD 1>>$FILE_STD
     echo "Sourcing the environment..."
     source env.sh 2>>$FILE_STD 1>>$FILE_STD
     echo "Building third party libraries (takes a while...)"

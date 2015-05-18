@@ -3,7 +3,7 @@
 # require python extras for scons
 
 directory=unpacking-mice
-filename=${directory}_2.tarz
+filename=${directory}-current.tarz
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -19,8 +19,10 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
       rm ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5
     fi
 
-    wget http://dpnc.unige.ch/~yordan/${filename}
-    wget http://dpnc.unige.ch/~yordan/${filename}.md5
+    # wget http://dpnc.unige.ch/~yordan/${filename}
+    # wget http://dpnc.unige.ch/~yordan/${filename}.md5
+    wget http://micewww.pp.rl.ac.uk/maus/${filename}
+    wget http://micewww.pp.rl.ac.uk/maus/${filename}.md5
 
     if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename} ] &&
        [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5 ]

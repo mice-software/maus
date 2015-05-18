@@ -8,7 +8,7 @@ root_version=root_v5.34.07
 maus_root_dir=`pwd -P`
 maus_third_party=""
 
-while getopts ":r:t:" opt; do
+while getopts ":r:t:u:" opt; do
   case $opt in
     r)
       if [ -d "$OPTARG" ]; then
@@ -29,6 +29,15 @@ while getopts ":r:t:" opt; do
           exit 1
       fi
       ;;
+    u)
+      if [ $OPTARG = "StepI" ] || [ $OPTARG = "StepIV" ]; then
+          maus_unpacker_version=$OPTARG;
+      else
+          echo "FATAL: Bad MAUS_UNPACKER_VERSION supplied"
+          echo "FATAL: Please use either StepI or StepIV or leave unset"
+          exit 1
+      fi
+      ;;
     \?)
       echo "FATAL: Invalid option: -$OPTARG" >&2
       exit 1
@@ -41,6 +50,9 @@ while getopts ":r:t:" opt; do
 done
 if [ "${maus_third_party}" == "" ]; then
     maus_third_party="${maus_root_dir}"
+fi
+if [ "${maus_unpacker_version}" == "" ]; then
+    maus_unpacker_version="StepIV"
 fi
 
 
@@ -170,7 +182,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export CELERY_CONFIG_MODULE="mauscelery.celeryconfig"
 
      # Unpacking version can be StepI or StepIV
-     export MAUS_UNPACKER_VERSION="StepIV"
+     export MAUS_UNPACKER_VERSION=${maus_unpacker_version}
 
 
      export G4DEBUG=1
