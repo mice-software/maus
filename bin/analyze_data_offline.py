@@ -34,6 +34,7 @@ def run():
     my_map.append(MAUS.MapCppKLCellHits())
 
     my_map.append(MAUS.MapCppEMRPlaneHits())
+    my_map.append(MAUS.MapCppEMRRecon())
 
     # Tracker (commented out as no tracker installed in MICE hall)
     #my_map.append(MAUS.MapCppTrackerRecon())

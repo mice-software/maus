@@ -547,15 +547,8 @@ void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
 				   EMRDBBEventVector emr_dbb_events_tmp,
 				   EMRfADCEventVector emr_fadc_events_tmp) const {
 
-  int recPartEvents = spill->GetReconEventSize();
   ReconEventPArray *recEvts =  spill->GetReconEvents();
   int xSpill = spill->GetSpillNumber();
-
-  // Resize the recon event to harbour all the EMR noise+decays
-  while (recPartEvents < nPartEvents) {
-    recEvts->push_back(new ReconEvent);
-    recPartEvents++;
-  }
 
   // Fill it with DBB and fADC arrays
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
@@ -601,8 +594,16 @@ void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
     } else {evt->SetInitialTrigger(false);}
 
     evt->SetEMRPlaneHitArray(plArray);
-    recEvts->at(iPe)->SetEMREvent(evt);
-    recEvts->at(iPe)->SetPartEventNumber(iPe);
+
+    int nRecEvents = spill->GetReconEventSize();
+    if (nRecEvents > iPe) {
+      recEvts->at(iPe)->SetEMREvent(evt);
+    } else {
+      ReconEvent *recEvt = new ReconEvent;
+      recEvt->SetPartEventNumber(iPe);
+      recEvt->SetEMREvent(evt);
+      recEvts->push_back(recEvt);
+    }
   }
 
   spill->SetReconEvents(recEvts);

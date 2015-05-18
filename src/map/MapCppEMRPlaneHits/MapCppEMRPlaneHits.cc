@@ -113,7 +113,12 @@ void MapCppEMRPlaneHits::_process(Data *data) const {
 
   EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
   int nPartEvents = emr_data.GetV1731NumPartEvents();
-//  std::cerr << "nPartEvts: " << nPartEvents << std::endl;
+
+  // Check the Recon event array is initialised, and if not make it so
+  if (!spill->GetReconEvents()) {
+    ReconEventPArray* recEvts = new ReconEventPArray();
+    spill->SetReconEvents(recEvts);
+  }
 
   // Create DBB and fADC arrays with n+2 events (1 per trigger + noise + decays)
   EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents+2);
@@ -254,16 +259,7 @@ void MapCppEMRPlaneHits::fill(MAUS::Spill *spill,
 			      EMRDBBEventVector emr_dbb_events_tmp,
 			      EMRfADCEventVector emr_fadc_events_tmp) const {
 
-  int recPartEvents = spill->GetReconEventSize();
   ReconEventPArray *recEvts =  spill->GetReconEvents();
-
-  // Resize the recon event to harbour all the EMR noise+decays
-  while (recPartEvents < nPartEvents) {
-    recEvts->push_back(new ReconEvent);
-    recPartEvents++;
-  }
-
-//  std::cerr << spill->GetReconEventSize() << std::endl;
 
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
     EMREvent *evt = new EMREvent;
@@ -312,9 +308,18 @@ void MapCppEMRPlaneHits::fill(MAUS::Spill *spill,
     }
 
     evt->SetEMRPlaneHitArray(plArray);
-    recEvts->at(iPe)->SetEMREvent(evt);
-    recEvts->at(iPe)->SetPartEventNumber(iPe);
+
+    int nRecEvents = spill->GetReconEventSize();
+    if (nRecEvents > iPe) {
+      recEvts->at(iPe)->SetEMREvent(evt);
+    } else {
+      ReconEvent *recEvt = new ReconEvent;
+      recEvt->SetPartEventNumber(iPe);
+      recEvt->SetEMREvent(evt);
+      recEvts->push_back(recEvt);
+    }
   }
+
   spill->SetReconEvents(recEvts);
 }
 

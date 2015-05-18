@@ -55,6 +55,12 @@ EMREventProcessor::EMREventProcessor()
     RegisterValueBranch
           ("charge_ratio_SA", &_double_proc, &EMREvent::GetChargeRatioSA,
           &EMREvent::SetChargeRatioSA, false);
+    RegisterValueBranch
+          ("plane_density", &_double_proc, &EMREvent::GetPlaneDensity,
+          &EMREvent::SetPlaneDensity, false);
+    RegisterValueBranch
+          ("chi2", &_double_proc, &EMREvent::GetChi2,
+          &EMREvent::SetChi2, false);
 }
 }  // namespace MAUS
 

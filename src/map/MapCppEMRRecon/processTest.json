@@ -1350,7 +1350,9 @@
             "range_secondary":0.0,
             "secondary_to_primary_track_distance":0.0,
             "total_charge_MA":0.0,
-            "total_charge_SA":0.0
+            "total_charge_SA":0.0,
+            "plane_density":0.0,
+            "chi2":0.0
          },
          "part_event_number":0
       },
@@ -12728,7 +12730,9 @@
             "range_secondary":0.0,
             "secondary_to_primary_track_distance":0.0,
             "total_charge_MA":0.0,
-            "total_charge_SA":0.0
+            "total_charge_SA":0.0,
+            "plane_density":0.0,
+            "chi2":0.0
          },
          "part_event_number":1
       },
@@ -12746,7 +12750,9 @@
             "range_secondary":0.0,
             "secondary_to_primary_track_distance":0.0,
             "total_charge_MA":0.0,
-            "total_charge_SA":0.0
+            "total_charge_SA":0.0,
+            "plane_density":0.0,
+            "chi2":0.0
          },
          "part_event_number":2
       },
@@ -12963,7 +12969,9 @@
             "range_secondary":0.0,
             "secondary_to_primary_track_distance":0.0,
             "total_charge_MA":0.0,
-            "total_charge_SA":0.0
+            "total_charge_SA":0.0,
+            "plane_density":0.0,
+            "chi2":0.0
          },
          "part_event_number":3
       }

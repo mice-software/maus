@@ -137,6 +137,9 @@ void MapCppEMRRecon::_process(Data *data) const {
   // Fill primary and secondary events array with the most significant bar of each plane
   tot_cleaning(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 
+  // Reconstruct the main PID variables for muon tagging
+  pid_variables(nPartEvents, emr_dbb_events, emr_track_events);
+
   // Reconstruct the coordinates of each Hit
   coordinates_reconstruction(nPartEvents, emr_dbb_events, emr_fadc_events);
 
@@ -197,9 +200,9 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 	  int xTot  = barHit.GetTot();
 	  int xDeltaT = barHit.GetDeltaT();
 	  int xHitTime = barHit.GetHitTime();
-	  double x = 0.0;
-	  double y = 0.0;
-	  double z = 0.0;
+	  double x = -1.0;
+	  double y = -1.0;
+	  double z = -1.0;
 
 	  EMRBarHit bHit;
 	  bHit.SetTot(xTot);
@@ -403,6 +406,85 @@ void MapCppEMRRecon::tot_cleaning(int nPartEvents,
       	  }
       	}
       }
+    }
+  }
+}
+
+void MapCppEMRRecon::pid_variables(int nPartEvents,
+				  EMRDBBEventVector *emr_dbb_events,
+				  EMRTrackEventVector& emr_track_events) const {
+
+  // Loop over the primary events only
+  for (int iPe = 0; iPe < nPartEvents - 2; iPe++) {
+
+    // Skip the events without a primary track
+    if ( !emr_track_events[iPe]._has_primary ) continue;
+
+    int nPlane(0), lPlaneX(0), lPlaneY(0);
+    vector<double> x[2], y[2];
+
+    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+      for (int iBar = 1; iBar < _number_of_bars; iBar++) {
+	if ( emr_dbb_events[0][iPe][iPlane][iBar].size() ) {
+	  if (iPlane%2 == 0 && iPlane/2+1 > lPlaneX) lPlaneX = iPlane/2+1;
+	  else if (iPlane%2 != 0 && iPlane/2+1 > lPlaneY) lPlaneY = iPlane/2+1;
+	}
+	if ( emr_dbb_events[1][iPe][iPlane][iBar].size() ) {
+	  nPlane++;
+	  if (iPlane%2 == 0) {
+	    if (iBar%2 == 0) {
+  	      x[0].push_back(iPlane + 1./3);
+	      y[0].push_back(iBar);
+	    } else {
+  	      x[0].push_back(iPlane + 2./3);
+	      y[0].push_back(iBar);
+	    }
+	  } else {
+	    if (iBar%2 == 0) {
+  	      x[1].push_back(iPlane + 1./3);
+	      y[1].push_back(iBar);
+	    } else {
+  	      x[1].push_back(iPlane + 2./3);
+	      y[1].push_back(iBar);
+	    }
+	  }
+	}
+      }
+    }
+
+    // Definition of the plane density, lPlaneX+lPlaneY > 0 as _has_primary = true
+    emr_track_events[iPe]._plane_density = static_cast<double>(nPlane/(lPlaneX+lPlaneY));
+
+    // Compute the normalised chi^2 in the two projections
+    for (int iArray = 0; iArray < 2; iArray++) {
+      int n = x[iArray].size();
+      double xmean(0.0), ymean(0.0);
+      for (int i = 0; i < n; i++) {
+        xmean += x[iArray][i]/n;
+        ymean += y[iArray][i]/n;
+      }
+
+      double xymean(0.0), x2mean(0.0), y2mean(0.0);
+      for (int i = 0; i < n; i++) {
+        xymean += x[iArray][i]*y[iArray][i]/n;
+        x2mean += x[iArray][i]*x[iArray][i]/n;
+        y2mean += y[iArray][i]*y[iArray][i]/n;
+      }
+
+      double xvar = x2mean - xmean*xmean;
+      double yvar = y2mean - ymean*ymean;
+      double xyvar = xymean - xmean*ymean;
+      double xycorr(0);
+      if (xvar > 0 && yvar > 0) xycorr = xyvar/sqrt(xvar*yvar);
+      else
+	xycorr = 1;
+
+      double chi2 = yvar*(1-pow(xycorr, 2));
+      if (chi2 < 0) chi2 = 0.;
+
+      if (iArray == 0) emr_track_events[iPe]._chi2_x = chi2;
+      else
+	emr_track_events[iPe]._chi2_y = chi2;
     }
   }
 }
@@ -879,7 +961,7 @@ void MapCppEMRRecon::fill(Spill *spill,
   int xSpill = spill->GetSpillNumber();
 
   // Only save the primary triggers with their primary and seconday arrays (n - 2)
-  ReconEventPArray *recEvts =  spill->GetReconEvents();
+  ReconEventPArray *recEvts = spill->GetReconEvents();
   recEvts->resize(nPartEvents);
 
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
@@ -943,6 +1025,8 @@ void MapCppEMRRecon::fill(Spill *spill,
     evt->SetTotalChargeSA(emr_track_events[iPe]._total_charge_sa);
     evt->SetChargeRatioMA(emr_track_events[iPe]._charge_ratio_ma);
     evt->SetChargeRatioSA(emr_track_events[iPe]._charge_ratio_sa);
+    evt->SetPlaneDensity(emr_track_events[iPe]._plane_density);
+    evt->SetChi2(emr_track_events[iPe]._chi2_x + emr_track_events[iPe]._chi2_y);
 
     // All the noise and unmatched secondaries are dumped, only initial triggers are kept
     evt->SetInitialTrigger(true);
@@ -999,15 +1083,18 @@ EMRTrackEventVector MapCppEMRRecon::get_track_data_tmp(int nPartEvts) const {
   emr_track_events_tmp.resize(nPartEvts);
   for (int iPe = 0; iPe < nPartEvts ;iPe++) {
     TrackData data;
-    data._range_primary = 0.0;
-    data._range_secondary = 0.0;
-    data._secondary_to_primary_track_distance = 0.0;
+    data._range_primary = -1.0;
+    data._range_secondary = -1.0;
+    data._secondary_to_primary_track_distance = -1.0;
     data._has_primary = false;
     data._has_secondary = false;
-    data._total_charge_ma = 0.0;
-    data._total_charge_sa = 0.0;
-    data._charge_ratio_ma = 0.0;
-    data._charge_ratio_sa = 0.0;
+    data._total_charge_ma = -1.0;
+    data._total_charge_sa = -1.0;
+    data._charge_ratio_ma = -1.0;
+    data._charge_ratio_sa = -1.0;
+    data._plane_density = -1.0;
+    data._chi2_x = -1.0;
+    data._chi2_y = -1.0;
     emr_track_events_tmp[iPe] = data;
   }
   return emr_track_events_tmp;
