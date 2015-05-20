@@ -40,7 +40,8 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         # set the checksum and event count accordingly
         self._datafile = '05466'
         self._numevents = 12
-        self._checksum = 'f699f0d81aee1f64a2f1cec7968b9289'
+        self._checksum = 'f226ea9b823996f653a73fd9e969b2f2'
+        # self._checksum = 'f699f0d81aee1f64a2f1cec7968b9289'
         # note that the StepIV file is garbage data as of now
         # this will have to be updated - DR, March 13, 2015
         if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
