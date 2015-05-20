@@ -63,6 +63,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # Sticks them in ${x11} directory
     python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
     ./configure --disable-xrootd --enable-gsl-shared --enable-minuit2 \
+              --enable-builtin-freetype \
               --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
               --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
               --with-x11-libdir=${x11} \
