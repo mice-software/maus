@@ -8,9 +8,6 @@ import json
 import io
 import os
 import MAUS
-import time
-import libMausCpp
-import ROOT
 from Configuration import Configuration
 from _InputCppDAQOfflineData import InputCppDAQOfflineData
 
