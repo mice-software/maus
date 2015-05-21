@@ -42,15 +42,10 @@ void MapCppTrackerDigits::_death() {
 }
 
 void MapCppTrackerDigits::_process(Data* data) const {
-  Json::Value& json_root = *(ConverterFactory().convert<Data, Json::Value>(data));
-  if ( json_root.isMember("daq_data") && !(json_root["daq_data"].isNull()) ) {
-    // Get daq data.
-    Json::Value daq = json_root.get("daq_data", 0);
-    // Fill spill object with
-    RealDataDigitization real;
-    real.initialise();
-    real.process(data->GetSpill(), daq);
-  }
-  delete &json_root;
+  RealDataDigitization real;
+  real.initialise();
+  real.process(data->GetSpill());
 }
+
 } // ~namespace MAUS
+

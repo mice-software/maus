@@ -66,9 +66,8 @@ class RealDataDigitization {
 
   /** @brief Processes a spill from DAQ
    *  @params spill A SciFiSpill to be filled
-   *  @params input_event The DAQ JSON Tracker Event
    */
-  void process(Spill *spill, Json::Value const &input_event);
+  void process(Spill *spill);
 
   /** @brief Reads the VLSB data
    *  @params input_event The JSON input vlsb event to be processed.
@@ -76,10 +75,7 @@ class RealDataDigitization {
    *  @params TrackerDaq The TrackerDaq object to be created for T0.
    *  @params TrackerDaq The TrackerDaq object to be created for T1.
    */
-  void process_VLSB(Json::Value input_event,
-                      SciFiEvent* event,
-                      TrackerDaq *tracker0daq_event,
-                      TrackerDaq *tracker1daq_event);
+  std::vector<SciFiDigit*> process_VLSB(int SpillNum, TrackerDaq* td);
 
   /** @brief Reads the VLSB data in the cosmic run format
    *  @params input_event The JSON input vlsb event to be processed.

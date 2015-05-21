@@ -6,53 +6,55 @@ Simple example showing use of ReducePyScalersTable and OutputPyJSON.
 
 import json
 import io
+import os
 import MAUS
 import time
+import libMausCpp
+import ROOT
+from Configuration import Configuration
+from _InputCppDAQOfflineData import InputCppDAQOfflineData
 
 def run():
     """
     Create a JSON document and create a histogram.
     """
-    # Create sample JSON documents with spills containing data 
-    # expected by ReducePyScalersTable.
-    input_docs = []
-    for i in range(0, 4):
-        json_doc = {}
-        json_doc["daq_data"] = {}
-        json_doc["daq_data"]["V830"] = {}
-        scalers = json_doc["daq_data"]["V830"]
-        scalers["phys_event_number"] = "Sample event %d" % i
-        scalers["time_stamp"] = time.time()
-        hits = {}
-        hits["ch0"] = i
-        hits["ch1"] = i
-        hits["ch2"] = i
-        hits["ch3"] = i
-        hits["ch4"] = i
-        hits["ch12"] = i
-        scalers["channels"] = hits
-        input_docs.append(json.dumps(json_doc))
-        input_docs.append("\n")
-    input_file = io.StringIO(unicode("".join(input_docs)))
+    if not os.environ.get("MAUS_ROOT_DIR"):
+        raise Exception('InitializeFail', 'MAUS_ROOT_DIR unset!')
+    config = Configuration().getConfigJSON()
+    config_json = json.loads(config)
+    datapath = '%s/src/input/InputCppDAQData' % \
+                            os.environ.get("MAUS_ROOT_DIR")
+
+    # Set up a run configuration
+    datafile = '05466'
+    if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
+        datafile = '06008'
+    config_json["daq_data_path"] = datapath
+    config_json["daq_data_file"] = datafile
 
     # Set up data cards.
     data_cards_list = []
     data_cards_list.append("output_file_name='%s'\n" % "scalers")
     data_cards_list.append("output_file_auto_number=%s\n" % True)
+    data_cards_list.append("daq_data_path='%s'\n" % datapath)
+    data_cards_list.append("daq_data_file='%s'\n" % datafile)
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
+    print data_cards
 
     # Create workers.
-    input_worker = MAUS.InputPyJSON(input_file)
+    # inputter = InputCppDAQOfflineData(datapath, datafile)
+    # inputter.birth(json.dumps(config_json))
+    inputter = InputCppDAQOfflineData()
 
     mappers = MAUS.MapPyGroup()
     mappers.append(MAUS.MapPyDoNothing())  
 
     reducer = MAUS.ReducePyScalersTable()
 
-    output_worker = MAUS.OutputPyFile()
+    outputter = MAUS.OutputPyFile()
 
     # Execute the workers.
-    MAUS.Go(input_worker, mappers, reducer, output_worker, data_cards)
+    MAUS.Go(inputter, mappers, reducer, outputter, data_cards)
 
 if __name__ == "__main__":
     run()
