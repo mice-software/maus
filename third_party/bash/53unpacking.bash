@@ -19,8 +19,10 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
       rm ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5
     fi
 
-    wget http://dpnc.unige.ch/~yordan/${filename}
-    wget http://dpnc.unige.ch/~yordan/${filename}.md5
+    # wget http://dpnc.unige.ch/~yordan/${filename}
+    # wget http://dpnc.unige.ch/~yordan/${filename}.md5
+    wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_0.9.6/${filename}
+    wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_0.9.6/${filename}.md5
 
     if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename} ] &&
        [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5 ]
@@ -78,10 +80,11 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo $LIBS
 #       gtest creates soft link from libMDUnpack.so
 #       so, ensure that the link exists and points to the correct unpacker version
+        cd ${MAUS_THIRD_PARTY}/third_party/install/lib
         if [ "$MAUS_UNPACKER_VERSION" == "StepI" ]; then
-           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepI.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
+           ln -sfn libMDUnpack_StepI.so libMDUnpack.so
         elif [ "$MAUS_UNPACKER_VERSION" == "StepIV" ]; then
-           ln -sfn ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack_StepIV.so ${MAUS_ROOT_DIR}/third_party/install/lib/libMDUnpack.so
+           ln -sfn libMDUnpack_StepIV.so libMDUnpack.so
         else
            echo "FATAL: !! Unsupported Unpacker Version !! "
         fi

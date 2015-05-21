@@ -26,6 +26,9 @@
  */
 #ifndef _SRC_COMMON_CPP_API_OUTPUTBASE_
 #define _SRC_COMMON_CPP_API_OUTPUTBASE_
+
+#include <Python.h>
+
 #include <string>
 #include "src/common_cpp/API/IOutput.hh"
 #include "src/common_cpp/API/ModuleBase.hh"
@@ -36,13 +39,8 @@ namespace MAUS {
  * \class OutputBase
  *
  * \brief Abstract base class for all outputters
- *
- * \author Alexander Richards, Imperial College London
- * \date 06/06/2012
  */
-template <typename T>
-class OutputBase : public virtual IOutput<T>, public ModuleBase {
-
+class OutputBase : public ModuleBase {
   public:
     /*!\brief Constructor
      * \param std::string& The name of the outputter.
@@ -56,24 +54,22 @@ class OutputBase : public virtual IOutput<T>, public ModuleBase {
     virtual ~OutputBase();
 
   public:
-    /*!\brief Save spill data
-     *
-     * Implementation of the interface. Wraps the _save function
-     * providing additional control/checking.
-     * \param T* Pointer to the input data
-     * \return boolean save status
-     */
-    bool save(T t);
+    /** Save PyObject data */
+    PyObject* save_pyobj(PyObject* data_in);
 
   private:
-    /*!\brief Save spill data
+    /*!\brief Save data
      *
      * Pure virtual private function to be implemented by the
      * derived outputter author to correctly save the input spill data type.
-     * \param T* Pointer to the input data
+     * \param PyObject* data_in to the input data
+     * As we don't know the type of data_in, we have to unwrap the PyObject in
+     * the derived object. Makes it a bit more complicated for user, compared to
+     * other modules; but we need to handle e.g. JobHeader, Spill, Run Header, 
+     * etc ... 
      * \return boolean save status
      */
-    virtual bool _save(T t) = 0;
+    virtual bool _save(PyObject* data_in) = 0;
 };
 }// end of namespace
 

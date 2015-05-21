@@ -160,7 +160,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 if filename.find(self.path_in) == -1:
                     # add the path to the name
                     newname = os.path.join(self.path_in, filename)
-                    print "Replacing ", filename, " with ", newname
+                    # print "Replacing ", filename, " with ", newname
                     filenode.setProp("name", newname)
         gfile = open(os.path.join(self.path_out, gdmlfile),'w')
         xmldoc.saveTo(gfile)
@@ -287,9 +287,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         """
         self.add_other_info()
         config = minidom.parse(os.path.join(self.path_out, gdmlfile))
-        print "config file ", os.path.join(self.path_out, gdmlfile)
-        print "information file ", os.path.join(self.path_out, \
-                                                self.maus_information_file)
+        # print "config file ", os.path.join(self.path_out, gdmlfile)
+        # print "information file ", os.path.join(self.path_out, \
+        #                                         self.maus_information_file)
         maus_information = minidom.parse(os.path.join(self.path_out, \
                                                     self.maus_information_file))
         for node in maus_information.getElementsByTagName("MICE_Information"):
@@ -352,13 +352,13 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                                                self.coolingChannel_file)
             # print coolingChannel_path
             coolingChannel = minidom.parse(coolingChannel_path)
-            for node in coolingChannel.getElementsByTagName("run"):
-                run_info = node
-            if type(run_info) == bool:
+            for node in coolingChannel.getElementsByTagName("coolingchannel"):
+                cc_info = node
+            if type(cc_info) == bool:
                 raise IOError("Run number you have selected is not on the CDB")
             else:
                 root_node = maus_information.childNodes[0].childNodes[1]
-                root_node.insertBefore(run_info, root_node.childNodes[0])
+                root_node.insertBefore(cc_info, root_node.childNodes[0])
                 fout = open(os.path.join(self.path_out, gdmlfile), 'w')
                 maus_information.writexml(fout)
                 fout.close()
@@ -455,9 +455,10 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         else:
             shutil.copy(os.path.join(self.path_in, self.maus_information_file), 
                        os.path.join(self.path_out, self.maus_information_file))
-
+        
         if self.coolingChannel_file != None:
             self.merge_cooling_channel_info(self.maus_information_file)
+
 
         if self.formatted == False:
             print self.configuration_file

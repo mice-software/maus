@@ -52,7 +52,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         # .pyc file, then add the xslt library again
         rm ${MAUS_ROOT_DIR}/third_party/install/lib/libxslt.so
         python -m libxslt
-        ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/libslt.so.${version} ${MAUS_ROOT_DIR}/third_party/install/lib/lixslt.so
+        cd ${MAUS_ROOT_DIR}/third_party/install/lib/
+        ln -s libxslt.so.${version} libxslt.so
+        cd -
 
 	            ################################################## 
 	echo

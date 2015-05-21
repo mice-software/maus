@@ -43,6 +43,10 @@
 namespace MAUS {
 
 class Data;
+class JobHeaderData;
+class JobFooterData;
+class RunHeaderData;
+class RunFooterData;
 
 /* @brief PyObjectWrapper handles wrapping and unwrapping of python objects
  *
@@ -97,6 +101,54 @@ class PyObjectWrapper {
      */
     static inline PyObject* wrap(MAUS::Data* data);
 
+    /* @brief Wrap a MAUS::JobHeaderData into a PyObject*
+     *
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by data.
+     *
+     * @returns a block of memory that is now owned by Python (Py_INCREF is
+     *  called).
+     *
+     * @throws MAUS::Exception if output is NULL
+     */
+    static inline PyObject* wrap(MAUS::JobHeaderData* data);
+
+    /* @brief Wrap a MAUS::JobFooterData into a PyObject*
+     *
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by data.
+     *
+     * @returns a block of memory that is now owned by Python (Py_INCREF is
+     *  called).
+     *
+     * @throws MAUS::Exception if output is NULL
+     */
+    static inline PyObject* wrap(MAUS::JobFooterData* data);
+
+    /* @brief Wrap a MAUS::RunHeaderData into a PyObject*
+     *
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by data.
+     *
+     * @returns a block of memory that is now owned by Python (Py_INCREF is
+     *  called).
+     *
+     * @throws MAUS::Exception if output is NULL
+     */
+    static inline PyObject* wrap(MAUS::RunHeaderData* data);
+
+    /* @brief Wrap a MAUS::RunFooterData into a PyObject*
+     *
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by data.
+     *
+     * @returns a block of memory that is now owned by Python (Py_INCREF is
+     *  called).
+     *
+     * @throws MAUS::Exception if output is NULL
+     */
+    static inline PyObject* wrap(MAUS::RunFooterData* data);
+
     /* @brief Wrap a Json::Value into a PyObject*
      *
      * @param data - the input value to be wrapped. Python takes ownership of
@@ -143,10 +195,14 @@ class PyObjectWrapper {
     // lazy_unwrap will only fill one of <blah>_ret; lazy_unwrap will allocate
     // new memory (possibly unnecessary)
     static inline void lazy_unwrap(PyObject* args,
+                            PyObject** py_ret,
                             std::string** string_ret,
                             Json::Value** json_ret,
                             MAUS::Data** data_ret,
-                            PyObject** py_ret);
+                            JobHeaderData** jh_ret,
+                            JobFooterData** jf_ret,
+                            RunHeaderData** rh_ret,
+                            RunFooterData** rf_ret);
 
     // parse a PyROOT ObjectProxy into a C++ Event object
     //
@@ -154,8 +210,14 @@ class PyObjectWrapper {
     // TPython::ObjectProxy_Check
     // data_ret should be a pointer to a NULL pointer (which we fill with
     // MAUS::Data data)
-    static inline void parse_root_object_proxy(PyObject* py_object_proxy,
-                                        MAUS::Data** data_ret);
+    template <class TEMP>
+    static inline void unwrap_root_object_proxy(
+                                        PyObject* py_object_proxy,
+                                        TEMP** data_ret,
+                                        std::string name);
+
+    template <class TEMP>
+    static inline PyObject* wrap_root_object_proxy(TEMP* data, std::string name);
 };
 }  // namespace MAUS
 
