@@ -140,6 +140,7 @@ else
     fi
     echo "Resource the environment (catches the new ROOT version)"
     source env.sh 2>>$FILE_STD 1>>$FILE_STD
+    source ${MAUS_ROOT_DIR}/thisroot.sh
         #./third_party/bash third_party/bash/29expat.bash
         #./third_party/bash third_party/bash/32clhep2.1.1.0.bash
         #./third_party/bash third_party/bash/35geant4.9.6.bash

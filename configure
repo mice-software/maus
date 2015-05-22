@@ -183,6 +183,11 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      # Unpacking version can be StepI or StepIV
      export MAUS_UNPACKER_VERSION=${maus_unpacker_version}
+     
+     # Make sure use the correct ROOT version
+     if [ -f $MAUS_ROOT_DIR/thisroot.sh ]; then
+         source $MAUS_ROOT_DIR/thisroot.sh
+     fi
 
 
      export G4DEBUG=1
