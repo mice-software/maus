@@ -3,7 +3,7 @@
 
 # Setup env.sh environment for MAUS installation
 
-root_version=root_v5.34.07
+root_version=root_v5.34.30
 
 maus_root_dir=`pwd -P`
 maus_third_party=""
@@ -185,8 +185,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export MAUS_UNPACKER_VERSION=${maus_unpacker_version}
      
      # Make sure use the correct ROOT version
-     if [ -f $MAUS_ROOT_DIR/thisroot.sh ]; then
-         source $MAUS_ROOT_DIR/thisroot.sh
+     if [ -f thisroot.sh ]; then
+         source thisroot.sh
      fi
 
 
@@ -239,10 +239,10 @@ else
 fi
 
 # setup ROOT
-if [ -f \${MAUS_THIRD_PARTY}/third_party/build/$root_version/bin/thisroot.sh ]
-then
-     source \${MAUS_THIRD_PARTY}/third_party/build/$root_version/bin/thisroot.sh
-fi
+# if [ -f \${MAUS_THIRD_PARTY}/third_party/build/$root_version/bin/thisroot.sh ]
+# then
+#      source \${MAUS_THIRD_PARTY}/third_party/build/$root_version/bin/thisroot.sh
+# fi
 
 EOF
 
