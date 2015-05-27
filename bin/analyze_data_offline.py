@@ -24,18 +24,18 @@ def run():
     # Trigger
     my_map.append(MAUS.MapPyReconSetup())
 
-    my_map.append(MAUS.MapCppTOFDigits())
-    my_map.append(MAUS.MapCppTOFSlabHits())
-    my_map.append(MAUS.MapCppTOFSpacePoints())
+    #my_map.append(MAUS.MapCppTOFDigits())
+    #my_map.append(MAUS.MapCppTOFSlabHits())
+    #my_map.append(MAUS.MapCppTOFSpacePoints())
 
-    my_map.append(MAUS.MapPyCkov())
+    #my_map.append(MAUS.MapPyCkov())
 
-    my_map.append(MAUS.MapCppKLDigits())
-    my_map.append(MAUS.MapCppKLCellHits())
+    #my_map.append(MAUS.MapCppKLDigits())
+    #my_map.append(MAUS.MapCppKLCellHits())
 
-    my_map.append(MAUS.MapCppEMRPlaneHits())
+    #my_map.append(MAUS.MapCppEMRPlaneHits())
 
-    # Tracker (commented out as no tracker installed in MICE hall)
+    #my_map.append(MAUS.MapCppTrackerDigits())
     #my_map.append(MAUS.MapCppTrackerRecon())
 
     #  The Go() drives all the components you pass in then put all the output

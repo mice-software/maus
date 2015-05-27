@@ -105,6 +105,7 @@ bool InputCppDAQData::readNextEvent() {
 int InputCppDAQData::getCurEvent(MAUS::Data *data) {
   MAUS::Spill* spill = data->GetSpill();
   int nPartEvts(0);
+  std::cerr << "INFO: InputCppDAQData::getCurEvent Looking at data with address = " << data << "\n";
   try {
     // Do the loop over the binary DAQ data.
     nPartEvts = _dataProcessManager.Process(_eventPtr);
@@ -140,6 +141,7 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
         _v830FragmentProc_cpp->fill_daq_data();
 
       if (_vLSBFragmentProc_cpp)
+        std::cerr << "INFO: InputCppDAQData::getCurEvent Processing VLSB data\n";
         _vLSBFragmentProc_cpp->fill_daq_data();
 
       // Set the DAQData object of the spill.
@@ -255,6 +257,8 @@ bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON
   xName = processor->get_equipment_name();
   xDataCard = "Enable_" + xName + "_Unpacking";
 
+  std::cerr << "INFO:InputCppDAQData::initProcessor Initialising processor " << xName << "\n";
+  
   // Enable or disable this equipment.
   assert(configJSON.isMember(xDataCard));
   bool enableThis = configJSON[xDataCard].asBool();
@@ -281,6 +285,7 @@ bool InputCppDAQData::initProcessor(procType* &processor, Json::Value configJSON
     }
     return true;
   } else {
+    std::cerr << "INFO:InputCppDAQData::initProcessor: " << xName << "is disabled\n";
     this->disableEquipment(xName);
     return false;
   }
