@@ -26,6 +26,7 @@
 #define _SRC_COMMON_CPP_RECON_GLOBALTOOLS_HH_
 
 #include <vector>
+#include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
 #include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
@@ -34,23 +35,67 @@
 namespace MAUS {
 namespace GlobalTools {
 
+/**
+ * @brief Returns a vector of all Tracks in the Spill (i.e. across recon events
+ * if applicable) that have the given mapper name and include TrackPoints in
+ * the given detector
+ * 
+ * @param spill The spill
+ * @param detector Detector enum for the selection
+ * @param mapper_name Mapper name for the selection
+ */
+std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
+    MAUS::Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector,
+     std::string mapper_name);
+
+/**
+ * @brief Returns a vector of all Tracks in in the global event with the given
+ * mapper name
+ * 
+ * @param global_even The global event
+ * @param mapper_name Mapper name for the selection
+ */
+std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
+    MAUS::GlobalEvent* global_event,
+    std::string mapper_name);
+
+/**
+ * @brief Returns a vector of all Tracks in in the global event with the given
+ * mapper name and the given PID
+ * 
+ * @param global_even The global event
+ * @param mapper_name Mapper name for the selection
+ * @param pid PID for the selection
+ */
 std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
     MAUS::GlobalEvent* global_event,
     std::string mapper_name,
     MAUS::DataStructure::Global::PID pid);
 
+/**
+ * @brief Returns a vector of ints denoting the tracker plane of a TrackPoint.
+ * The first number indicates the tracker, the second the tracker station, the
+ * third the tracker plane
+ * 
+ * @param track_point The trackpoint for which to determine the tracker plane
+ */
 std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
     track_point);
 
-bool approx(double a, double b, double tolerance);
+/**
+ * @brief Returns a vector of all SpacePoints in a spill (i.e. across recon
+ * events) for a given detector
+ * 
+ * @param spill The spill
+ * @param detector Detector enum for the selection
+ */
+std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
+    Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector);
 
 /**
- * @brief Returns a map of all DetectorPoint enums with a boolean flag
- * indicating whether the MC event contains a hit in the corresponding
- * detector.
- * 
- * @param mc_event The MC event that should be checked
+ * @brief Checks whether two numbers are the same to within a given tolerance
  */
+bool approx(double a, double b, double tolerance);
 
 
 } // namespace GlobalTools

@@ -27,6 +27,7 @@
 
 #include <map>
 #include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/DataStructure/Global/BasePoint.hh"
 
 namespace MAUS {
 namespace MCTruthTools {
@@ -41,14 +42,64 @@ namespace MCTruthTools {
 std::map<DataStructure::Global::DetectorPoint, bool>
     GetMCDetectors(MAUS::MCEvent* mc_event);
 
+/**
+ * @brief Returns array of all TOF hits in a given TOF from the MC event
+ * 
+ * @param mc_event The MC event
+ * @param detector The detector for the selection, must correspond to a TOF
+ */
 TOFHitArray* GetTOFHits(MAUS::MCEvent* mc_event,
     DataStructure::Global::DetectorPoint detector);
 
+/**
+ * @brief Returns array of all Tracker hits in a given Tracker or Tracker
+ * station from the MC event
+ * 
+ * @param mc_event The MC event
+ * @param detector The detector for the selection, must correspond to a Tracker
+ *        or Tracker station
+ */
 SciFiHitArray* GetTrackerHits(MAUS::MCEvent* mc_event,
     DataStructure::Global::DetectorPoint detector);
 
+/**
+ * @brief Returns the first mc hit found for a tracker station as determined
+ * by 3 integers
+ * 
+ * @param mc_event The MC event
+ * @param tracker number of the tracker, 0 or 1
+ * @param station tracker station number, 0 to 4 counting outward from the
+ *        cooling channel
+ * @param plane tracker plane number within a station, 0 to 2 counting outward
+ *        from the cooling channel
+ */
 SciFiHit* GetTrackerPlaneHit(MAUS::MCEvent* mc_event,
     int tracker, int station, int plane);
+
+/**
+ * @brief Returns the TOF mc hit nearest to the position TLorentzVector provided
+ * 
+ * @param hits Array of TOF hits
+ * @param position TLorentzVector of the position at which to find a hit
+ */
+TOFHit GetNearestZHit(TOFHitArray* hits, TLorentzVector position);
+
+/**
+ * @brief Returns the KL mc hit nearest to the position TLorentzVector provided
+ * 
+ * @param hits Array of KL hits
+ * @param position TLorentzVector of the position at which to find a hit
+ */
+KLHit GetNearestZHit(KLHitArray* hits, TLorentzVector position);
+
+/**
+ * @brief Returns the Tracker mc hit nearest to the position TLorentzVector
+ * provided
+ * 
+ * @param hits Array of Tracker hits
+ * @param position TLorentzVector of the position at which to find a hit
+ */
+EMRHit GetNearestZHit(EMRHitArray* hits, TLorentzVector position);
 
 } // namespace MCTruthTools
 } // namespace MAUS

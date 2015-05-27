@@ -20,11 +20,40 @@
 namespace MAUS {
 namespace GlobalTools {
 
+std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
+    MAUS::Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector,
+    std::string mapper_name) {
+  std::vector<MAUS::DataStructure::Global::Track*>* detector_tracks = new
+      std::vector<MAUS::DataStructure::Global::Track*>;
+  ReconEventPArray* recon_events = spill->GetReconEvents();
+  if (recon_events) {
+    ReconEventPArray::iterator recon_event_iter;
+    for (recon_event_iter = recon_events->begin();
+         recon_event_iter != recon_events->end();
+         ++recon_event_iter) {
+      GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
+      std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
+          global_event->get_tracks();
+      std::vector<MAUS::DataStructure::Global::Track*>::iterator track_iter;
+      for (track_iter = global_tracks->begin();
+           track_iter != global_tracks->end();
+           ++track_iter) {
+        // The third condition is a bit of a dirty hack here to make sure that
+        // if we select for EMR tracks, we only get primaries.
+        if (((*track_iter)->HasDetector(detector)) and
+            ((*track_iter)->get_mapper_name() == mapper_name) and
+            ((*track_iter)->get_emr_range_secondary() < 0.001)) {
+          detector_tracks->push_back((*track_iter));
+        }
+      }
+    }
+  }
+  return detector_tracks;
+}
+
 std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
     MAUS::GlobalEvent* global_event,
-    std::string mapper_name,
-    MAUS::DataStructure::Global::PID pid =
-        MAUS::DataStructure::Global::kTritium) {
+    std::string mapper_name) {
   std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
           global_event->get_tracks();
   std::vector<MAUS::DataStructure::Global::Track*>* selected_tracks = new
@@ -35,9 +64,27 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if ((*global_track_iter)->get_mapper_name() == mapper_name) {
-      if (pid == MAUS::DataStructure::Global::kTritium) {
-        selected_tracks->push_back(*global_track_iter);
-      } else if ((*global_track_iter)->get_pid() == pid) {
+      selected_tracks->push_back(*global_track_iter);
+    }
+  }
+  return selected_tracks;
+}
+
+std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
+    MAUS::GlobalEvent* global_event,
+    std::string mapper_name,
+    MAUS::DataStructure::Global::PID pid) {
+  std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
+          global_event->get_tracks();
+  std::vector<MAUS::DataStructure::Global::Track*>* selected_tracks = new
+      std::vector<MAUS::DataStructure::Global::Track*>;
+  std::vector<MAUS::DataStructure::Global::Track*>::iterator
+      global_track_iter;
+  for (global_track_iter = global_tracks->begin();
+       global_track_iter != global_tracks->end();
+       ++global_track_iter) {
+    if ((*global_track_iter)->get_mapper_name() == mapper_name) {
+      if ((*global_track_iter)->get_pid() == pid) {
         selected_tracks->push_back(*global_track_iter);
       }
     }
@@ -147,6 +194,35 @@ std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
     }
   }
   return tracker_plane;
+}
+
+std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
+    Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector) {
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>* spill_spacepoints =
+      new std::vector<MAUS::DataStructure::Global::SpacePoint*>;
+  MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
+  MAUS::ReconEventPArray::iterator recon_event_iter;
+  for (recon_event_iter = recon_events->begin();
+       recon_event_iter != recon_events->end();
+       ++recon_event_iter) {
+    MAUS::GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
+    if (global_event) {
+      std::vector<MAUS::DataStructure::Global::SpacePoint*>*
+          spacepoints = global_event->get_space_points();
+      std::vector<MAUS::DataStructure::Global::SpacePoint*>::iterator sp_iter;
+      for (sp_iter = spacepoints->begin(); sp_iter != spacepoints->end();
+           ++sp_iter) {
+        if ((*sp_iter)->get_detector() == detector) {
+          spill_spacepoints->push_back(*sp_iter);
+        }
+      }
+    }
+  }
+  if (spill_spacepoints->size() > 0) {
+    return spill_spacepoints;
+  } else {
+    return 0;
+  }
 }
 
 bool approx(double a, double b, double tolerance) {

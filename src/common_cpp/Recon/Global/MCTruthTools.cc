@@ -15,6 +15,8 @@
  *
  */
 
+#include <cmath>
+
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "Utils/Exception.hh"
@@ -100,8 +102,6 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
   if (emr_hits) {
     if (emr_hits->size() > 0) {
       mc_detectors[MAUS::DataStructure::Global::kEMR] = true;
-      //~ std::cerr << "### " << emr_hits->at(0).GetPosition().z()
-                //~ << " "    << emr_hits->at(emr_hits->size() -1).GetPosition().z() << "\n";
     }
   }
   
@@ -236,6 +236,51 @@ SciFiHit* GetTrackerPlaneHit(MAUS::MCEvent* mc_event,
     }
   }
   return 0;
+}
+
+TOFHit GetNearestZHit(TOFHitArray* hits, TLorentzVector position) {
+  // Find the closest (by z) hit in the corresponding mc event
+  size_t nearest_index = 0;
+  double z_distance = 100000;
+  for (size_t i = 0; i < hits->size(); i++) {
+    if (std::abs(position.Z() - hits->at(i).GetPosition().Z())
+        < z_distance) {
+      nearest_index = i;
+      z_distance =
+          std::abs(position.Z() - hits->at(i).GetPosition().Z());
+    }
+  }
+  return hits->at(nearest_index);
+}
+
+KLHit GetNearestZHit(KLHitArray* hits, TLorentzVector position) {
+  // Find the closest (by z) hit in the corresponding mc event
+  size_t nearest_index = 0;
+  double z_distance = 100000;
+  for (size_t i = 0; i < hits->size(); i++) {
+    if (std::abs(position.Z() - hits->at(i).GetPosition().Z())
+        < z_distance) {
+      nearest_index = i;
+      z_distance =
+          std::abs(position.Z() - hits->at(i).GetPosition().Z());
+    }
+  }
+  return hits->at(nearest_index);
+}
+
+EMRHit GetNearestZHit(EMRHitArray* hits, TLorentzVector position) {
+  // Find the closest (by z) hit in the corresponding mc event
+  size_t nearest_index = 0;
+  double z_distance = 100000;
+  for (size_t i = 0; i < hits->size(); i++) {
+    if (std::abs(position.Z() - hits->at(i).GetPosition().Z())
+        < z_distance) {
+      nearest_index = i;
+      z_distance =
+          std::abs(position.Z() - hits->at(i).GetPosition().Z());
+    }
+  }
+  return hits->at(nearest_index);
 }
 
 } // ~namespace MCTruthTools

@@ -66,10 +66,12 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
     if (sp->get_detector() == MAUS::DataStructure::Global::kTOF0) {
       //~ Squeak::mout(Squeak::error) << "Position: " << sp->get_position().T() << ", " << sp->get_position().X() << ", " << sp->get_position().Y() << ", " << sp->get_position().Z() << std::endl;
       tp0 = new MAUS::DataStructure::Global::TrackPoint(sp);
+      tp0->set_mapper_name(mapper_name);
       TOF0_tp.push_back(tp0);
     } else if (sp->get_detector() == MAUS::DataStructure::Global::kTOF1) {
       //~ Squeak::mout(Squeak::error) << "Position: " << sp->get_position().T() << ", " << sp->get_position().X() << ", " << sp->get_position().Y() << ", " << sp->get_position().Z() << std::endl;
       tp1 = new MAUS::DataStructure::Global::TrackPoint(sp);
+      tp1->set_mapper_name(mapper_name);
       TOF1_tp.push_back(tp1);
     } else {
       continue;
@@ -109,7 +111,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
       pids.push_back(MAUS::DataStructure::Global::kMuMinus);
       pids.push_back(MAUS::DataStructure::Global::kPiMinus);
     }
-    std::cerr << pids.size() << "PIDS\n";
+    //~ std::cerr << pids.size() << "PIDS\n";
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
       double mass = Particle::GetInstance().GetMass(pids[i]);
@@ -138,7 +140,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
         if (almostEquals(x_in_TOF0[1], TOF0_tp[j]->get_position().X(), 30) and
             almostEquals(x_in_TOF0[2], TOF0_tp[j]->get_position().Y(), 30)) {
           hypothesis_track->AddTrackPoint(TOF0_tp[j]);
-          Squeak::mout(Squeak::error) << "TOF0 Match\n";
+          //~ Squeak::mout(Squeak::error) << "TOF0 Match\n";
         }
       }
       // TOF1
@@ -155,7 +157,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
         if (almostEquals(x_in_TOF1[1], TOF1_tp[j]->get_position().X(), 40) and
             almostEquals(x_in_TOF1[2], TOF1_tp[j]->get_position().Y(), 40)) {
           hypothesis_track->AddTrackPoint(TOF1_tp[j]);
-          Squeak::mout(Squeak::error) << "TOF1 Match\n";
+          //~ Squeak::mout(Squeak::error) << "TOF1 Match\n";
         }
       }
       // Now we fill the track with trackpoints from the tracker with energy
@@ -166,6 +168,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
       for (size_t j = 0; j < tracker0_trackpoints.size(); j++) {
         MAUS::DataStructure::Global::TrackPoint* tracker0_tp =
             tracker0_trackpoints[j]->Clone();
+        tracker0_tp->set_mapper_name(mapper_name);
         TLorentzVector momentum = tracker0_tp->get_momentum();
         double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
         momentum.SetE(energy);
@@ -201,7 +204,8 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
     if (imported_track->HasDetector(MAUS::DataStructure::Global::kTracker1)) {
       scifi_track_array->push_back(imported_track);
     }
-    if (imported_track->HasDetector(MAUS::DataStructure::Global::kEMR)) {
+    if (imported_track->HasDetector(MAUS::DataStructure::Global::kEMR) and
+        imported_track->get_emr_range_secondary() < 0.001) {
       emr_track_array->push_back(imported_track);
       //~ std::vector<const MAUS::DataStructure::Global::TrackPoint*> EMR_tp =
           //~ imported_track->GetTrackPoints();
@@ -227,11 +231,13 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
     MAUS::DataStructure::Global::TrackPoint* tp_kl;
     if (sp->get_detector() == MAUS::DataStructure::Global::kTOF2) {
       tp2 = new MAUS::DataStructure::Global::TrackPoint(sp);
+      tp2->set_mapper_name(mapper_name);
       TOF2_tp.push_back(tp2);
     } else if (sp->get_detector() ==
           MAUS::DataStructure::Global::kCalorimeter) {
       //~ Squeak::mout(Squeak::error) << "Position: " << sp->get_position().T() << ", " << sp->get_position().X() << ", " << sp->get_position().Y() << ", " << sp->get_position().Z() << std::endl;
       tp_kl = new MAUS::DataStructure::Global::TrackPoint(sp);
+      tp_kl->set_mapper_name(mapper_name);
       KL_tp.push_back(tp_kl);
  
     } else {
@@ -290,6 +296,7 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
       for (size_t j = 0; j < tracker1_trackpoints.size(); j++) {
         MAUS::DataStructure::Global::TrackPoint* tracker1_tp =
             tracker1_trackpoints[j]->Clone();
+        tracker1_tp->set_mapper_name(mapper_name);
         TLorentzVector momentum = tracker1_tp->get_momentum();
         double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
         momentum.SetE(energy);
@@ -311,7 +318,7 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
         if (almostEquals(x_in_TOF2[1], TOF2_tp[j]->get_position().X(), 40) and
             almostEquals(x_in_TOF2[2], TOF2_tp[j]->get_position().Y(), 40)) {
           hypothesis_track->AddTrackPoint(TOF2_tp[j]);
-          Squeak::mout(Squeak::error) << "TOF2 Match\n";
+          //~ Squeak::mout(Squeak::error) << "TOF2 Match\n";
         }
       }
 
@@ -327,40 +334,41 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
         // For KL we can only match one dimension as no x info is given
         if (almostEquals(x_in_KL[2], KL_tp[j]->get_position().Y(), 32)) {
           hypothesis_track->AddTrackPoint(KL_tp[j]);
-          Squeak::mout(Squeak::error) << "KL Match\n";
+          //~ Squeak::mout(Squeak::error) << "KL Match\n";
         }
       }
 
       // EMR
-      //~ ////~ std::cerr << emr_track_array->size() << "# of EMR Tracks\n";
-      //~ MAUS::DataStructure::Global::TrackPArray::iterator emr_track_iter;
-      //~ for (emr_track_iter = emr_track_array->begin();
-           //~ emr_track_iter != emr_track_array->end();
-           //~ ++emr_track_iter) {
-        //~ std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-            //~ emr_trackpoints = (*emr_track_iter)->GetTrackPoints();
-        //~ ////~ std::cerr << emr_trackpoints.size() << "# of EMR Hits\n";
-        //~ double x_in_EMR[] = {0., position.X(), position.Y(), position.Z(),
-                            //~ energy, momentum.X(), momentum.Y(), momentum.Z()};
-        //~ TLorentzVector first_hit_pos = emr_trackpoints[0]->get_position();
-        //~ double z = first_hit_pos.Z();
-        //~ BTTracker::integrate(z, x_in_EMR, field, BTTracker::z, 10.0, charge);
-        //~ ////~ Squeak::mout(Squeak::error) << "EMR\n" << x_in_EMR[1] << " " << first_hit_pos.X() << "\n"
-                                    //~ ////~ << x_in_EMR[2] << " " << first_hit_pos.Y() << "\n";
-        //~ if (almostEquals(x_in_EMR[1], first_hit_pos.X(), 19) and
-            //~ almostEquals(x_in_EMR[2], first_hit_pos.Y(), 19)) {
+      ////~ std::cerr << emr_track_array->size() << "# of EMR Tracks\n";
+      MAUS::DataStructure::Global::TrackPArray::iterator emr_track_iter;
+      for (emr_track_iter = emr_track_array->begin();
+           emr_track_iter != emr_track_array->end();
+           ++emr_track_iter) {
+        std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+            emr_trackpoints = (*emr_track_iter)->GetTrackPoints();
+        ////~ std::cerr << emr_trackpoints.size() << "# of EMR Hits\n";
+        double x_in_EMR[] = {0., position.X(), position.Y(), position.Z(),
+                            energy, momentum.X(), momentum.Y(), momentum.Z()};
+        TLorentzVector first_hit_pos = emr_trackpoints[0]->get_position();
+        double z = first_hit_pos.Z();
+        BTTracker::integrate(z, x_in_EMR, field, BTTracker::z, 10.0, charge);
+        //~ Squeak::mout(Squeak::error) << "EMR\n" << x_in_EMR[1] << " " << first_hit_pos.X() << "\n"
+                                    //~ << x_in_EMR[2] << " " << first_hit_pos.Y() << "\n";
+        if (almostEquals(x_in_EMR[1], first_hit_pos.X(), 25) and
+            almostEquals(x_in_EMR[2], first_hit_pos.Y(), 25)) {
           //~ Squeak::mout(Squeak::error) << "EMR Match\n";
-          //~ for (size_t j = 0; j < emr_trackpoints.size(); j++) {
-            //~ MAUS::DataStructure::Global::TrackPoint* emr_tp =
-                //~ emr_trackpoints[j]->Clone();
-            //~ TLorentzVector momentum = emr_tp->get_momentum();
-            //~ double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
-            //~ momentum.SetE(energy);
-            //~ emr_tp->set_momentum(momentum);
-            //~ hypothesis_track->AddTrackPoint(emr_tp);
-          //~ }
-        //~ }
-      //~ }
+          for (size_t j = 0; j < emr_trackpoints.size(); j++) {
+            MAUS::DataStructure::Global::TrackPoint* emr_tp =
+                emr_trackpoints[j]->Clone();
+            emr_tp->set_mapper_name(mapper_name);
+            TLorentzVector momentum = emr_tp->get_momentum();
+            double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
+            momentum.SetE(energy);
+            emr_tp->set_momentum(momentum);
+            hypothesis_track->AddTrackPoint(emr_tp);
+          }
+        }
+      }
       //~ downstream_primary_chain->AddTrack(hypothesis_track, tracker1_track);
       global_event->add_track_recursive(hypothesis_track);
     }
@@ -452,7 +460,26 @@ void TrackMatching::throughTrack(MAUS::GlobalEvent* global_event,
               through_track->set_mapper_name("MapCppGlobalTrackMatching-Through");
               through_track->set_pid(pids[i]);
               std::cerr << "US & DS Matched\n";
-              global_event->add_track_recursive(through_track);
+              for (us_trackpoint_iter = us_trackpoints.begin();
+                   us_trackpoint_iter != us_trackpoints.end();
+                   ++us_trackpoint_iter) {
+                through_track->AddTrackPoint(
+                    const_cast<MAUS::DataStructure::Global::TrackPoint*>
+                    (*us_trackpoint_iter));
+              }
+              for (ds_trackpoint_iter = ds_trackpoints.begin();
+                   ds_trackpoint_iter != ds_trackpoints.end();
+                   ++ds_trackpoint_iter) {
+                through_track->AddTrackPoint(
+                    const_cast<MAUS::DataStructure::Global::TrackPoint*>
+                    (*ds_trackpoint_iter));
+              }
+              //~ through_track->AddTrack(*us_track_iter);
+              //~ through_track->AddTrack(*ds_track_iter);
+              //~ std::cerr << through_track << " " << *us_track_iter << " " << *ds_track_iter << "\n";
+              //~ global_event->add_track_recursive(*us_track_iter);
+              //~ global_event->add_track_recursive(*ds_track_iter);
+              global_event->add_track(through_track);
             } else {
               std::cerr << "###" << TOFdT << "\n";
             }
