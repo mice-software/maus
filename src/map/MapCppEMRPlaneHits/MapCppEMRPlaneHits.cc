@@ -194,6 +194,7 @@ void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq,
 	  // Set bar hit
           EMRBarHit bHit;
           bHit.SetTot(tot);
+	  bHit.SetHitTime(lt);
 
 	  // Discriminate noise and decays from events signal
           if (delta_t > _deltat_signal_low && delta_t < _deltat_signal_up) {

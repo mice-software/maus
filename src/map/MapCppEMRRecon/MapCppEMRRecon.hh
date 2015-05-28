@@ -172,7 +172,6 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   double _gap;
 
   // Configuration variables
-  int _secondary_hits_bunching_distance;
   int _secondary_hits_bunching_width;
   int _primary_trigger_minXhits;
   int _primary_trigger_minYhits;

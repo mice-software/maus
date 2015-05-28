@@ -58,7 +58,6 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   _bar_height = configJSON["EMRbarHeight"].asDouble();
   _gap = configJSON["EMRgap"].asDouble();
 
-  _secondary_hits_bunching_distance = configJSON["EMRsecondaryHitsBunchingDistance"].asInt();
   _secondary_hits_bunching_width = configJSON["EMRsecondaryHitsBunchingWidth"].asInt();
 
   _primary_trigger_minXhits = configJSON["EMRprimaryTriggerMinXhits"].asInt();
@@ -244,17 +243,17 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
   // The last trigger corresponds to the secondary events
   int secondaryEventId = nPartEvents-1;
 
-  // Save hit time of each secondary trigger in a vector
+  // Save hit time of each secondary hit in a vector
   std::vector<int> hitTimeVector;
   for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
     for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
       int nHits = emr_dbb_events_tmp[secondaryEventId][iPlane][iBar].size();
 
       for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-  	EMRBarHit bHit = emr_dbb_events_tmp[secondaryEventId][iPlane][iBar][iBarHit];
+	EMRBarHit bHit = emr_dbb_events_tmp[secondaryEventId][iPlane][iBar][iBarHit];
 	int xTot = bHit.GetTot(); // DBB counts
-  	int hitTime = bHit.GetHitTime(); // DBB counts
-	if (xTot > _secondary_trigger_minTot) hitTimeVector.push_back(hitTime);
+  	int xHitTime = bHit.GetHitTime(); // DBB counts
+	if (xTot > _secondary_trigger_minTot) hitTimeVector.push_back(xHitTime);
       }
     }
   }
@@ -265,19 +264,22 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
 
   // Find groups of hits defined by _secondary_hits_bunching_width
   std::vector<int> hitTimeGroup;
-  int nHitsInGroup = 0;
+  int nHitsInGroup = 1;
+  int iHitTime = 0;
 
-  for (int iHit = 1; iHit < hitTimeVectorSize+1; iHit++) {
-    int deltat;
-    if (iHit == hitTimeVectorSize) deltat = _secondary_hits_bunching_distance+1;
-    else
-      deltat = hitTimeVector.at(iHit) - hitTimeVector.at(iHit-1);
+  for (int iHit = 1; iHit < hitTimeVectorSize + 1; iHit++) {
 
-    if (nHitsInGroup >= _secondary_trigger_minNhits &&
-	deltat > _secondary_hits_bunching_distance ) {
-      hitTimeGroup.push_back(hitTimeVector.at(iHit-1));
-      nHitsInGroup = 0;
-    } else if (deltat <= _secondary_hits_bunching_width) {
+    int deltat = _secondary_hits_bunching_width + 1;
+    if ( !iHitTime ) iHitTime = hitTimeVector.at(iHit - 1);
+    if (iHit < hitTimeVectorSize) deltat = hitTimeVector.at(iHit) - iHitTime;
+
+    if (deltat > _secondary_hits_bunching_width) {
+      if (nHitsInGroup >= _secondary_trigger_minNhits) {
+        hitTimeGroup.push_back(hitTimeVector.at(iHit-1));
+      }
+      nHitsInGroup = 1;
+      iHitTime = 0;
+    } else {
       nHitsInGroup++;
     }
   }
@@ -287,9 +289,9 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
 
   // Resize the event arrays to accomodate one extra event per secondary track (n')
   for (int iArray = 0; iArray < 3; iArray++)
-    emr_dbb_events[iArray] = get_dbb_data_tmp(nPartEvents+nSeconPartEvents);
-  emr_fadc_events = get_fadc_data_tmp(nPartEvents+nSeconPartEvents);
-  emr_track_events = get_track_data_tmp(nPartEvents+nSeconPartEvents);
+    emr_dbb_events[iArray] = get_dbb_data_tmp(nPartEvents + nSeconPartEvents);
+  emr_fadc_events = get_fadc_data_tmp(nPartEvents + nSeconPartEvents);
+  emr_track_events = get_track_data_tmp(nPartEvents + nSeconPartEvents);
 
   // Fill collection of events (pre-selected)
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
@@ -327,7 +329,7 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
 	  int deltat = hitTimeGroup.at(iHitTimeGroup) - hitTime;
 
 	  if (deltat >= 0 && deltat < _secondary_hits_bunching_width) {
-	    emr_dbb_events[0][secondaryEventId+1+iHitTimeGroup]
+	    emr_dbb_events[0][secondaryEventId + 1 + iHitTimeGroup]
 			  [iPlane][iBar].push_back(bHit);
 	  }
 	}
@@ -453,7 +455,7 @@ void MapCppEMRRecon::pid_variables(int nPartEvents,
     }
 
     // Definition of the plane density, lPlaneX+lPlaneY > 0 as _has_primary = true
-    emr_track_events[iPe]._plane_density = static_cast<double>(nPlane/(lPlaneX+lPlaneY));
+    emr_track_events[iPe]._plane_density = static_cast<double>(nPlane)/(lPlaneX+lPlaneY);
 
     // Compute the normalised chi^2 in the two projections
     for (int iArray = 0; iArray < 2; iArray++) {
@@ -780,6 +782,7 @@ void MapCppEMRRecon::track_matching(int nPartEvents,
     double seconEventRange = -1.0;
 
     for (int iiPe = nPartEvents; iiPe < nTotalPartEvents; iiPe++) {
+
       double x3(-1.0), y3(-1.0), z3(-1.0);
       double x4(-1.0), y4(-1.0), z4(-1.0);
       double x5(-1.0), y5(-1.0), z5(-1.0);
@@ -802,10 +805,9 @@ void MapCppEMRRecon::track_matching(int nPartEvents,
 	      y3 = y5;
 	      z3 = z5;
 	    }
-	    if (seconHitsFound) {
-	      seconEventRangeTmp = seconEventRangeTmp
-				 + sqrt(pow(x5-x4, 2)+pow(y5-y4, 2)+pow(z5-z4, 2));
-	    }
+	    if (seconHitsFound)
+	      seconEventRangeTmp += sqrt(pow(x5-x4, 2)+pow(y5-y4, 2)+pow(z5-z4, 2));
+
 	    // Previous point
 	    x4 = bHit.GetX();
 	    y4 = bHit.GetY();
