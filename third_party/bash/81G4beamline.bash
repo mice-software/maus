@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-directory=G4beamline-2.12-source 
+directory=G4beamline-2.12-source
 filename=${directory}.tgz
 url=http://www.muonsinternal.com/muons3/g4beamline/${filename}
 
@@ -37,7 +37,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
 
     fi
-   
+
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
 	echo "INFO: Source archive exists."
@@ -56,11 +56,11 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-	ls ${MAUS_ROOT_DIR}/third_party/build/${directory}/source
+        ls ${MAUS_ROOT_DIR}/third_party/build/${directory}/source
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}/source/bin
 
 	var1="LIBS=\"\$LIBS -lSoXt -lCoin -L/usr/lib -L/usr/X11R6/lib -lGLU -lGL -lXm -lXpm -lXmu -lXt -lXext -lX11 -lXi -lSM -lICE\""
-	var2="LIBS=\"\$LIBS -L/usr/include/root/ -lSoXt -lCoin -L/usr/lib -L/usr/X11R6/lib -lGLU -lGL -lXm -lXpm -lXmu -lXt -lXext -lX11 -lXi -lSM -lICE\""
+	var2="LIBS=\"\$LIBS -L${ROOTSYS} -lSoXt -lCoin -L/usr/lib -L/usr/X11R6/lib -lGLU -lGL -lXm -lXpm -lXmu -lXt -lXext -lX11 -lXi -lSM -lICE\""
 	var3="LIBS=\"\$LIBS -lexpat -ldl\""
 	var4="LIBS=\"\$LIBS -L/\$G4BL_DIR/../../install/lib -lexpat -ldl\""
 	var5='cd \.\./\.\.; rm -f lib/libCLHEP-\[A-Z]\*\.a bin/\[A-Z]\*-config; \\'
@@ -83,7 +83,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
 	echo $LD_LIBRARY_PATH
 
-	./configure --disable-visual
+	./configure --disable-visual --with-root=${ROOTSYS}
 
 	cd ${MAUS_ROOT_DIR}/third_party/build/${directory}/source/bin
 	mv g4bl-config ${MAUS_ROOT_DIR}/third_party/build/${directory}/bin/g4bl-config
