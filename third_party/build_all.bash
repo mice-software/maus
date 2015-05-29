@@ -52,9 +52,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/44cdb.bash
  
     # python and python site-packages are now built; still missing ROOT from the
-    # python environment, that will come later. Now HEP libraries
+    # python environment, that will come later. Now JSON and HEP libraries
+    ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash -j $MAUS_NUM_THREADS
+    source ${MAUS_THIRD_PARTY}/third_party/install/bin/thisroot.sh
+    echo "Using ROOT:" `which root`
     # removed geant 4.9.2
     #${MAUS_ROOT_DIR}/third_party/bash/30clhep.bash
     # added for geant 4.9.6
@@ -67,7 +70,6 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/81G4beamline.bash -j $MAUS_NUM_THREADS
     # removed geant 4.9.2
     #${MAUS_ROOT_DIR}/third_party/bash/31geant4.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     # The used version of doxygen requires a recent version of flex
     ${MAUS_ROOT_DIR}/third_party/bash/54flex.bash
     # Doxygen to make sure the same version is used everywhere
