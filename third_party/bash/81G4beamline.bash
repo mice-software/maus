@@ -58,9 +58,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
         ls ${MAUS_ROOT_DIR}/third_party/build/${directory}/source
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}/source/bin
-
 	var1="LIBS=\"\$LIBS -lSoXt -lCoin -L/usr/lib -L/usr/X11R6/lib -lGLU -lGL -lXm -lXpm -lXmu -lXt -lXext -lX11 -lXi -lSM -lICE\""
-	var2="LIBS=\"\$LIBS -L${ROOTSYS} -lSoXt -lCoin -L/usr/lib -L/usr/X11R6/lib -lGLU -lGL -lXm -lXpm -lXmu -lXt -lXext -lX11 -lXi -lSM -lICE\""
+	var2="LIBS=\"\$LIBS -L${MAUS_ROOT_DIR}/third_party/build/root/lib -lSoXt -lCoin -L/usr/lib -L/usr/X11R6/lib -lGLU -lGL -lXm -lXpm -lXmu -lXt -lXext -lX11 -lXi -lSM -lICE\""
 	var3="LIBS=\"\$LIBS -lexpat -ldl\""
 	var4="LIBS=\"\$LIBS -L/\$G4BL_DIR/../../install/lib -lexpat -ldl\""
 	var5='cd \.\./\.\.; rm -f lib/libCLHEP-\[A-Z]\*\.a bin/\[A-Z]\*-config; \\'
@@ -81,9 +80,10 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo
         sleep 1
 
+	source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
 	echo $LD_LIBRARY_PATH
 
-	./configure --disable-visual --with-root=${ROOTSYS}
+	./configure --disable-visual --with-root=${MAUS_ROOT_DIR}/third_party/build/root/
 
 	cd ${MAUS_ROOT_DIR}/third_party/build/${directory}/source/bin
 	mv g4bl-config ${MAUS_ROOT_DIR}/third_party/build/${directory}/bin/g4bl-config

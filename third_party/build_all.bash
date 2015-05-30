@@ -55,7 +55,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash -j $MAUS_NUM_THREADS
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash -j $MAUS_NUM_THREADS
-    source ${MAUS_ROOT_DIR}/thisroot.sh
+    source ${MAUS_ROOT_DIR}/third_party/build/root/thisroot.sh
     echo "Using ROOT:" `which root`
     ${MAUS_ROOT_DIR}/third_party/bash/28xercesc.bash -j $MAUS_NUM_THREADS
     ${MAUS_ROOT_DIR}/third_party/bash/29expat.bash -j $MAUS_NUM_THREADS
