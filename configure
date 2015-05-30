@@ -183,8 +183,8 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export MAUS_UNPACKER_VERSION=${maus_unpacker_version}
 
      # Make sure use the correct ROOT version
-     if [ -f \$MAUS_ROOT_DIR/third_party/build/root/thisroot.sh ]; then
-         source \$MAUS_ROOT_DIR/third_party/build/root/thisroot.sh
+     if [ -f \$MAUS_ROOT_DIR/third_party/build/root/bin/thisroot.sh ]; then
+         source \$MAUS_ROOT_DIR/third_party/build/root/bin/thisroot.sh
      fi
 
      export G4DEBUG=1
