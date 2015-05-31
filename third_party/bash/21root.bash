@@ -83,7 +83,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo
     sleep 1
     make -j$MAUS_NUM_THREADS LDFLAGS="-Wl,--no-as-needed" || { echo "FAIL: Failed to configure/make"; exit 1; }
-    make install
+    # make install
     # Create a link to the ROOT directory not based on version number
     ln -fs ${MAUS_ROOT_DIR}/third_party/build/${directory}/ ${MAUS_ROOT_DIR}/third_party/build/root
 	            ################################################## 
