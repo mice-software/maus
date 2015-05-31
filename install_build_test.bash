@@ -142,6 +142,9 @@ else
     source env.sh 2>>$FILE_STD 1>>$FILE_STD
 fi
 
+# Check new ROOT version alone is used
+source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
+
 echo "Cleaning the MAUS build state"
 if [ $MAUS_BUILD_VERBOSITY -eq 0 ]; then
     scons -c 2>>$FILE_STD 1>>$FILE_STD
