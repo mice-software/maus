@@ -858,12 +858,13 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
   string xDetector;
 
   xLdc = this->GetLdcId();
+  // std::cerr << "INFO: VLSBCppDataProcessor::Process: Found xLdc = " << xLdc << std::endl;
   xTimeStamp = this->GetTimeStamp();
   xPhysEvNum = this->GetPhysEventNumber();
   // Get the number of data words.
   uint32_t nDataWords = xVLSBFragment->GetPayLoadWordCount();
 
-//   std::cerr << "PhysEvNum: " << xPhysEvNum << " nDataWords: " << nDataWords << endl;
+  // std::cerr << "PhysEvNum: " << xPhysEvNum << " nDataWords: " << nDataWords << endl;
   // Loop over the data.
   uint32_t xWordCount(0);
   while (xWordCount < nDataWords) {
@@ -889,12 +890,12 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
       xVLSBhit.SetChannel(xVLSBFragment->GetChannel(xWordCount));
       xVLSBhit.SetTDC(xVLSBFragment->GetTdc(xWordCount));
       xVLSBhit.SetDiscriminator(xVLSBFragment->GetDiscriBit(xWordCount));
-      if (xLdc == 0) {
+      if (xLdc == 3) {
         xDetector = "tracker0";
         xVLSBhit.SetDetector(xDetector);
         _tracker0_spill[xPartEv].push_back(xVLSBhit);
 
-      } else if (xLdc == 2) {
+      } else if (xLdc == 4) {
         xDetector = "tracker1";
         xVLSBhit.SetDetector(xDetector);
         _tracker1_spill[xPartEv].push_back(xVLSBhit);
@@ -913,7 +914,9 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
 
 
 void VLSBCppDataProcessor::fill_daq_data() {
+
   unsigned int npe = _tracker1_spill.size();
+  // std::cerr << "INFO: VLSBCppDataProcessor::fill_daq_data: Tracker 1 npe = " << npe << std::endl;
 
   if (_daq_data->GetTracker0DaqArraySize() != npe)
     _daq_data->GetTracker0DaqArrayPtr()->resize(npe);

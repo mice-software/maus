@@ -5,6 +5,24 @@
 directory=unpacking-mice
 filename=${directory}_2.tarz
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     cd ${MAUS_ROOT_DIR}/third_party/source
@@ -54,7 +72,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd build
         cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install \
                ..
-        make
+        make -j$MAUS_NUM_THREADS
         make install
 
 # rename libMDUnpack to a StepI name 

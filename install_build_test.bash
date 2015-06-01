@@ -140,11 +140,10 @@ else
     fi
     echo "Resource the environment (catches the new ROOT version)"
     source env.sh 2>>$FILE_STD 1>>$FILE_STD
-        #./third_party/bash third_party/bash/29expat.bash
-        #./third_party/bash third_party/bash/32clhep2.1.1.0.bash
-        #./third_party/bash third_party/bash/35geant4.9.6.bash
-        # source env_geant4.9.6.p02.sh 2>>$FILE_STD 1>>$FILE_STD
 fi
+
+# Check new ROOT version alone is used
+source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
 
 echo "Cleaning the MAUS build state"
 if [ $MAUS_BUILD_VERBOSITY -eq 0 ]; then
