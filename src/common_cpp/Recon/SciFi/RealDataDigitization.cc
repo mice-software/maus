@@ -47,7 +47,7 @@ void RealDataDigitization::initialise() {
 void RealDataDigitization::process(Spill *spill) {
   // Check for DAQData
   if ( spill->GetDAQData() == NULL ) {
-    std::cerr << "RealDataDigitization::process No DAQ data found, aborting" << std::endl;
+    // std::cerr << "RealDataDigitization::process No DAQ data found, aborting" << std::endl;
     return;
   }
 
