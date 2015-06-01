@@ -55,6 +55,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/52jsoncpp.bash
     ${MAUS_ROOT_DIR}/third_party/bash/20gsl.bash -j $MAUS_NUM_THREADS
     ${MAUS_ROOT_DIR}/third_party/bash/21root.bash -j $MAUS_NUM_THREADS
+    echo "Sourcing ROOT..."
     source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
     echo "Using ROOT:" `which root`
     ${MAUS_ROOT_DIR}/third_party/bash/28xercesc.bash -j $MAUS_NUM_THREADS
@@ -63,6 +64,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/35geant4.9.6.bash -j $MAUS_NUM_THREADS
     # resource environment so that g4bl picks up our ROOT env
     source ${MAUS_ROOT_DIR}/env.sh >& /dev/null
+    source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
     echo "ROOTSYS: " $ROOTSYS
     ${MAUS_ROOT_DIR}/third_party/bash/81G4beamline.bash -j $MAUS_NUM_THREADS
 
