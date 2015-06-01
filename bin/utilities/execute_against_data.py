@@ -303,14 +303,6 @@ class RunManager:
             raise MausError("MAUS simulation returned "+str(proc.returncode))
         self.logs.tar_queue.append(self.run_setup.recon_file_name)
 
-    def death(self):
-        """
-        Explicit call to close File Manager's log files
-        """
-        if not self.run_setup == None:
-            self.logs.close_log()
-
-
     def __del__(self):
         """
         If not in test mode, calls cleanup to clean current working directory
@@ -386,7 +378,7 @@ class RunSettings: #pylint: disable = R0902
             '-will_do_stack_trace', 'False',
             '-configuration_file', self.sim_cards,
         ]
-
+    
     def get_reconstruction_parameters(self):
         """
         Get the parameters for the reconstruction exe
@@ -492,7 +484,7 @@ class FileManager: # pylint: disable = R0902
                 if os.path.isfile(item):       
                     pass # cleanup does something weird...
         self._is_open = False
-
+        
     def __del__(self):
         """
         Close the logs
@@ -533,7 +525,6 @@ def main(argv):
         my_return_value = 3
         sys.excepthook(*sys.exc_info())
     finally:
-        my_run.death() # Make sure logs are closed and tar file generated
         del my_run
     return my_return_value
         
