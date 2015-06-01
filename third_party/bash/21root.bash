@@ -63,7 +63,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # weird and wonderful library locations to support multiple architectures.
     # Sticks them in ${x11} directory
     python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
-    ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
+    ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install \
               --etcdir=${MAUS_ROOT_DIR}/third_party/install/etc \
               --disable-xrootd --enable-gsl-shared --enable-minuit2 \
               --enable-builtin-freetype \
