@@ -65,7 +65,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
     ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
               --etcdir=${MAUS_ROOT_DIR}/third_party/install/etc \
-              --disable-xrootd \ --enable-gsl-shared --enable-minuit2 \
+              --disable-xrootd --enable-gsl-shared --enable-minuit2 \
               --enable-builtin-freetype \
               --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
               --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
