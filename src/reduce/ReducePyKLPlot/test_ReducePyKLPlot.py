@@ -113,10 +113,9 @@ class ReducePyKLPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Invoke "death".
         @param self Object reference.
         """
-        success = self.__reducer.death()
-        if success != None:
-            print 'WARNING: KL reducer death failed'
-            # raise Exception('Test tearDown failed', 'reducer.death() failed')
-        
+        #success = self.__reducer.death()
+        #if success != None:
+            #raise Exception('Test tearDown failed', 'reducer.death() failed')
+
 if __name__ == '__main__':
     unittest.main()
