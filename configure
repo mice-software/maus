@@ -169,6 +169,13 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      export $DYLIB_VAR="\$MAUS_THIRD_PARTY/build:\$$DYLIB_VAR"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
 
+     # Setup ROOT
+     export PYTHONPATH="\$MAUS_THIRD_PARTY/third_party/build/root/lib:\$PYTHONPATH"
+     export $DYLIB_VAR="\$MAUS_THIRD_PARTY/third_party/build/root/lib:\$$DYLIB_VAR"
+     if [ -f \$MAUS_THIRD_PARTY/third_party/build/root/bin/thisroot.sh ]; then
+         source \$MAUS_THIRD_PARTY/third_party/build/root/bin/thisroot.sh
+     fi
+     
      # maus common
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
@@ -181,11 +188,6 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      # Unpacking version can be StepI or StepIV
      export MAUS_UNPACKER_VERSION=${maus_unpacker_version}
-
-     # Make sure use the correct ROOT version
-     if [ -f \$MAUS_ROOT_DIR/third_party/build/root/bin/thisroot.sh ]; then
-         source \$MAUS_ROOT_DIR/third_party/build/root/bin/thisroot.sh
-     fi
 
      export G4DEBUG=1
      export G4VERS=geant4.9.6.p02
