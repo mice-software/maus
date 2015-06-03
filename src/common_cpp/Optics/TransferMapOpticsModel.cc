@@ -160,7 +160,7 @@ void TransferMapOpticsModel::Build() {
        virtual_track != virtual_tracks.end();
        ++virtual_track) {
     const Json::Value hits = (*virtual_track)["virtual_hits"];
-    for (int hit_index = 0; hit_index < int(hits.size()); ++hit_index) {
+    for (int hit_index = 0; hit_index < static_cast<int>(hits.size()); ++hit_index) {
       Squeak::mout(Squeak::debug) << setprecision(12)
             << "(" << hits[hit_index]["position"]["x"].asDouble() << ", "
             << hits[hit_index]["position"]["y"].asDouble() << ", "
@@ -335,7 +335,7 @@ std::cout << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
     double z = hit["position"]["z"].asDouble();
     // Round to the nearest mm
     int64_t z_key = (z >= 0?static_cast<int64_t>(z+.5):static_cast<int64_t>(z-.5));
-    Squeak::mout(Squeak::debug) 
+    Squeak::mout(Squeak::debug)
           << "DEBUG TransferMapOpticsModel::MapStationsToHits: "
           << setprecision(8) << "z = " << z << "\tz_key = " << z_key
           << std::endl;
