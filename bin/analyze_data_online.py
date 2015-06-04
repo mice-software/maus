@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
 #
 #  MAUS is free software: you can redistribute it and/or modify
@@ -64,6 +66,7 @@ REDUCER_LIST = [
   'reconstruct_daq_ckov_reducer.py',
   'reconstruct_daq_kl_reducer.py',
   'reconstruct_monitor_reducer.py',
+  'reconstruct_daq_sci_fi_reducer.py',
 ]
 
 class OnlineProcess:
