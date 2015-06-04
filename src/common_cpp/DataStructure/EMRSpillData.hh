@@ -17,23 +17,43 @@
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_
 
+#include <vector>
+
 #include "Utils/VersionNumber.hh"
+#include "DataStructure/EMRPlaneHit.hh"
 
 namespace MAUS {
-/** Stub class for EMR data on the spill level
+
+typedef std::vector<EMRPlaneHit*> EMRPlaneHitArray;
+
+/** @class EMREvent comment
+ *  Class for EMR digits on the spill level
  */
+
 class EMRSpillData {
- public:
-  EMRSpillData();
+  public:
+    /** Default constructor - initialises to 0/NULL */
+    EMRSpillData();
 
-  EMRSpillData(const EMRSpillData& md);
+    /** Copy constructor - any pointers are deep copied */
+    EMRSpillData(const EMRSpillData& emrspilldata);
 
-  EMRSpillData& operator=(const EMRSpillData& md);
+    /** Equality operator - any pointers are deep copied */
+    EMRSpillData& operator=(const EMRSpillData& emrspilldata);
 
-  virtual ~EMRSpillData();
+    /** Destructor - any member pointers are deleted */
+    virtual ~EMRSpillData();
 
- private:
-  MAUS_VERSIONED_CLASS_DEF(EMRSpillData)
+    /** Returns  */
+    EMRPlaneHitArray GetEMRPlaneHitArray() const;
+
+    /** Sets  */
+    void SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray);
+
+  private:
+    EMRPlaneHitArray _emrplanehitarray;
+
+    MAUS_VERSIONED_CLASS_DEF(EMRSpillData)
 };
 }
 

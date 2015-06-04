@@ -48,6 +48,7 @@
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
+#include "DataStructure/EMRSpillData.hh"
 #include "DataStructure/V1731.hh"
 #include "DataStructure/Primary.hh"
 #include "Utils/Globals.hh"
@@ -109,6 +110,7 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
   void processDBB(MAUS::EMRHitArray *EMRhits,
 		  int xPe,
 		  double pTime,
+		  EMRPlaneVector& emr_spill_tmp,
 		  EMRDBBEventVector& emr_dbb_events_tmp,
 		  EMRfADCEventVector& emr_fadc_events_tmp) const;
 
@@ -125,9 +127,11 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
 
   void fill(MAUS::Spill *spill,
 	    int nPartEvents,
+	    EMRPlaneVector& emr_spill_tmp,
 	    EMRDBBEventVector emr_dbb_events_tmp,
 	    EMRfADCEventVector emr_fadc_events_tmp) const;
 
+  EMRPlaneVector get_spill_data_tmp() const;
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
   EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
 

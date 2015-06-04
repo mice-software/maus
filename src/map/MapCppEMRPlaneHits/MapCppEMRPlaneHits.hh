@@ -45,14 +45,15 @@
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
+#include "DataStructure/EMRSpillData.hh"
 #include "API/MapBase.hh"
 
 namespace MAUS {
 
-typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; /* nHits elements */
-typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
-typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
-typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
+typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; // nHits elements
+typedef std::vector<EMRBarHitsVector>   EMRBarVector; // 60 elements
+typedef std::vector<EMRBarVector>       EMRPlaneVector; // 48 elements
+typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; // nTr elements
 
 struct fADCdata {
   int _orientation;
@@ -62,8 +63,8 @@ struct fADCdata {
   int _deltat;
 };
 
-typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
-typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
+typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector; // 48 elements
+typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector; // nTr elements
 
 class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
  public:
@@ -92,6 +93,7 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
 
   void processDBB(MAUS::EMRDaq EMRdaq,
 		  int nPartEvents,
+		  EMRPlaneVector& emr_spill_tmp,
 		  EMRDBBEventVector& emr_dbb_events_tmp,
 		  EMRfADCEventVector& emr_fadc_events_tmp) const;
 
@@ -101,9 +103,11 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
 
   void fill(MAUS::Spill *spill,
 	    int nPartEvents,
+	    EMRPlaneVector emr_spill_tmp,
 	    EMRDBBEventVector emr_dbb_events_tmp,
 	    EMRfADCEventVector emr_fadc_events_tmp) const;
 
+  EMRPlaneVector get_spill_data_tmp() const;
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
   EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
 

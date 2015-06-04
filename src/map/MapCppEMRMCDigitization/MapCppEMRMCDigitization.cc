@@ -135,6 +135,12 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
     spill->SetReconEvents(revts);
   }
 
+  // Check the EMR spill data is initialised, and if not make it so
+  if (!spill->GetEMRSpillData()) {
+    EMRSpillData* emrData = new EMRSpillData();
+    spill->SetEMRSpillData(emrData);
+  }
+
   // Set primary hits/noise time windows
   std::vector<double> delta_t_array;
   delta_t_array.resize(0);
@@ -168,6 +174,7 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
   int deltat_limits[4] = {lt, lt+20, lt+20, lt+40};
 
   // Create the DBB and fADC arrays with n events (1 per trigger)
+  EMRPlaneVector emr_spill_tmp = get_spill_data_tmp();
   EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents);
   EMRfADCEventVector emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents);
 
@@ -179,12 +186,12 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
       Primary *primary = spill->GetAnMCEvent(iPe).GetPrimary();
       double pTime = primary->GetTime(); // ns
 
-      processDBB(EMRhits, iPe, pTime, emr_dbb_events_tmp, emr_fadc_events_tmp);
+      processDBB(EMRhits, iPe, pTime, emr_spill_tmp, emr_dbb_events_tmp, emr_fadc_events_tmp);
       processFADC(EMRhits, iPe, emr_fadc_events_tmp);
     }
   }
 
-  fill(spill, nPartEvents, emr_dbb_events_tmp, emr_fadc_events_tmp);
+  fill(spill, nPartEvents, emr_spill_tmp, emr_dbb_events_tmp, emr_fadc_events_tmp);
 
   // Reset/Resize DBB and fADC arrays with n+2 events (1 per trigger + noise + decays)
   emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents+2);
@@ -199,12 +206,13 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
     }
   }
 
-  fill(spill, nPartEvents+2, emr_dbb_events_tmp, emr_fadc_events_tmp);
+  fill(spill, nPartEvents+2, emr_spill_tmp, emr_dbb_events_tmp, emr_fadc_events_tmp);
 }
 
 void MapCppEMRMCDigitization::processDBB(MAUS::EMRHitArray *EMRhits,
 					 int xPe,
 					 double pTime,
+		  			 EMRPlaneVector& emr_spill_tmp,
 					 EMRDBBEventVector& emr_dbb_events_tmp,
 					 EMRfADCEventVector& emr_fadc_events_tmp) const {
 
@@ -249,6 +257,9 @@ void MapCppEMRMCDigitization::processDBB(MAUS::EMRHitArray *EMRhits,
     bHit.SetHitTime(lt);
     bHit.SetDeltaT(delta_t);
     emr_dbb_events_tmp[xPe][xPlane][xBar].push_back(bHit);
+
+    // Store every hit at the spill level in a general container
+    emr_spill_tmp[xPlane][xBar].push_back(bHit);
   }
 }
 
@@ -322,7 +333,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 	/*--------- MAPMT signal simulation -------*/
 
 	// simulate electronics noise and PMT dark current
-	// !!! TO DO !!!
+	// !!! TODO !!!
 
 	// set g4 information
 	double energy = xTot/1000000.0;/*MeV*/
@@ -369,7 +380,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 	if (_do_sampling) naph_MAPMT = _rand->Poisson(naph_MAPMT);
 
 	// simulate cross-talk and misalignment
-	// !!! TO DO !!!
+	// !!! TODO !!!
 
 	// convert naph to the number of photoelectrons (npe)
 	int npe = static_cast<int>(static_cast<double>(naph_MAPMT)*_QE_MAPMT);
@@ -378,7 +389,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 	if (_do_sampling) npe = _rand->Poisson(npe);
 
 	// correct npe for the photocathode non-uniformity
-	// !!! TO DO !!!
+	// !!! TODO !!!
 
 	// correct npe for pmt gain difference
 	npe = static_cast<int>(static_cast<double>(npe)*epsilon_MA);
@@ -441,7 +452,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
     /*------------ SAPMT signal simulation -------*/
 
     // simulate PMT dark current
-    // !!! TO DO !!!
+    // !!! TODO !!!
 
     // sample naph with Poisson
     if (_do_sampling) naph_SAPMT = _rand->Poisson(naph_SAPMT);
@@ -523,7 +534,7 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
     int xArrivalTimeDigi = arrival_time;
 
     // simulate time delay in cables
-    // !!! TO DO !!!
+    // !!! TODO !!!
 
     // set pulse shape
     std::vector<int> xSamplesDigi;
@@ -544,13 +555,14 @@ void MapCppEMRMCDigitization::digitize(MAUS::EMREvent *EMRevt,
 
 void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
 				   int nPartEvents,
+				   EMRPlaneVector& emr_spill_tmp,
 				   EMRDBBEventVector emr_dbb_events_tmp,
 				   EMRfADCEventVector emr_fadc_events_tmp) const {
 
   ReconEventPArray *recEvts =  spill->GetReconEvents();
   int xSpill = spill->GetSpillNumber();
 
-  // Fill it with DBB and fADC arrays
+  // Fill the recon events with DBB and fADC arrays
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
     EMREvent *evt = new EMREvent;
     EMRPlaneHitArray plArray;
@@ -607,6 +619,46 @@ void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
   }
 
   spill->SetReconEvents(recEvts);
+
+  // Set the global EMR spill data
+  EMRSpillData *emrData = spill->GetEMRSpillData();
+  EMRPlaneHitArray globalPlaneArray;
+
+  for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+    EMRPlaneHit *plHit = new EMRPlaneHit;
+    plHit->SetPlane(iPlane);
+
+    EMRBarArray barArray;
+
+    for (int iBar = 0; iBar < _number_of_bars; iBar++) {
+      int nHits = emr_spill_tmp[iPlane][iBar].size();
+      if ( nHits ) {
+        EMRBar *bar = new EMRBar;
+        bar->SetBar(iBar);
+        bar->SetEMRBarHitArray(emr_spill_tmp[iPlane][iBar]);
+        barArray.push_back(bar);
+      }
+    }
+
+    plHit->SetEMRBarArray(barArray);
+    if ( barArray.size() ) {
+      globalPlaneArray.push_back(plHit);
+    } else {
+      delete plHit;
+    }
+  }
+
+  emrData->SetEMRPlaneHitArray(globalPlaneArray);
+  spill->SetEMRSpillData(emrData);
+}
+
+EMRPlaneVector MapCppEMRMCDigitization::get_spill_data_tmp() const {
+  EMRPlaneVector emr_spill_tmp;
+  emr_spill_tmp.resize(_number_of_planes);  // number of planes
+  for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+    emr_spill_tmp[iPlane].resize(_number_of_bars); // number of bars in a plane
+  }
+  return emr_spill_tmp;
 }
 
 EMRDBBEventVector MapCppEMRMCDigitization::get_dbb_data_tmp(int nPartEvts) const {

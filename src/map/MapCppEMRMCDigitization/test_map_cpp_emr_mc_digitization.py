@@ -99,6 +99,19 @@ class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
 				  ['emr_plane_hits'][i]['emr_bars'])
             self.assertTrue(2, n_bars)
 
+        # hits stored at the spill level (62 hits)
+        self.assertTrue(spill_out['emr_spill_data']['emr_plane_hits'])
+        spill_hits = 0
+        for i in range(0, len(spill_out['emr_spill_data']\
+				       ['emr_plane_hits'])):
+            for j in range(0, len(spill_out['emr_spill_data']\
+					   ['emr_plane_hits'][i]\
+					   ['emr_bars'])):
+                spill_hits += len(spill_out['emr_spill_data']\
+					   ['emr_plane_hits'][i]\
+					   ['emr_bars'][j]['emr_bar_hits'])
+        self.assertEqual(62, spill_hits)
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -23,7 +23,7 @@ EMREventProcessor::EMREventProcessor()
       : _plane_hit_array_proc(new EMRPlaneHitProcessor) {
     RegisterValueBranch
 	  ("emr_plane_hits", &_plane_hit_array_proc, &EMREvent::GetEMRPlaneHitArray,
-           &EMREvent::SetEMRPlaneHitArray, false );
+           &EMREvent::SetEMRPlaneHitArray, false);
     RegisterValueBranch
           ("initial_trigger", &_bool_proc, &EMREvent::GetInitialTrigger,
           &EMREvent::SetInitialTrigger, false);
