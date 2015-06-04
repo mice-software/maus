@@ -3,7 +3,8 @@
 # require python extras for scons
 
 directory=unpacking-mice
-filename=${directory}_2.tarz
+# filename=${directory}_2.tarz
+filename=${directory}_3.tarz
 
 while [[ $# > 1 ]]
 do
