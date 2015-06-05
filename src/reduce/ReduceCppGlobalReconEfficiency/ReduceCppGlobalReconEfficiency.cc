@@ -83,9 +83,9 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
     MAUS::MCEvent* mc_event = us_track_mc_pairs[i].second;
     double p_time = mc_event->GetPrimary()->GetTime();
     TOFEfficiency(0, MAUS::DataStructure::Global::kTOF0, track, mc_event,
-                  p_time, 22, 22, 2);
+                  p_time, 30, 30, 2);
     TOFEfficiency(1, MAUS::DataStructure::Global::kTOF1, track, mc_event,
-                  p_time, 32, 32, 2);
+                  p_time, 40, 40, 2);
     //~ std::map<MAUS::DataStructure::Global::DetectorPoint, bool> mc_detectors = MCTruthTools::GetMCDetectors(mc_event);
     //~ std::cerr << "U|V|TOF0 |Chk|TOF1 |Tracker0   |Tracker1   |TOF2 |K|E\n";
     //~ for (int i = 0; i < 27; i++) {
@@ -103,7 +103,7 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
     double p_time = mc_event->GetPrimary()->GetTime();
     TOFEfficiency(2, MAUS::DataStructure::Global::kTOF2, track, mc_event,
                   p_time, 40, 40, 2);
-    KLEfficiency(track, mc_event, 27);
+    KLEfficiency(track, mc_event, 30);
     EMREfficiency(track, mc_event, 19, 19);
   }
   
@@ -282,7 +282,7 @@ void ReduceCppGlobalReconEfficiency::TOFEfficiency(size_t detector_number,
       }
     } else {
       //~ std::cerr << "No TOF SPs\n";
-      //~ _detector_lr_failed[detector_number]++;
+      _detector_lr_failed[detector_number]++;
     }
     MAUS::DataStructure::Global::TrackPointCPArray tof_tps =
         track->GetTrackPoints(detector);
@@ -337,7 +337,7 @@ void ReduceCppGlobalReconEfficiency::KLEfficiency(
       }
     } else {
       //~ std::cerr "KL: " << detector number << "\n";
-      //~ _detector_lr_failed[detector_number]++;
+      _detector_lr_failed[detector_number]++;
     }
     MAUS::DataStructure::Global::TrackPointCPArray kl_tps =
         track->GetTrackPoints(detector);
@@ -393,7 +393,7 @@ void ReduceCppGlobalReconEfficiency::EMREfficiency(
         //~ std::cerr << "EMR FAILED" << _detector_lr_failed[detector_number] << "\n";
       }
     } else {
-      //~ _detector_lr_failed[detector_number]++;
+      _detector_lr_failed[detector_number]++;
       //~ std::cerr << "EMR NO SPs" << _detector_lr_failed[detector_number] << "\n";
     }
     MAUS::DataStructure::Global::TrackPointCPArray emr_tps =

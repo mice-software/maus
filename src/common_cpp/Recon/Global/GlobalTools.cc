@@ -32,18 +32,20 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
          recon_event_iter != recon_events->end();
          ++recon_event_iter) {
       GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
-      std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
-          global_event->get_tracks();
-      std::vector<MAUS::DataStructure::Global::Track*>::iterator track_iter;
-      for (track_iter = global_tracks->begin();
-           track_iter != global_tracks->end();
-           ++track_iter) {
-        // The third condition is a bit of a dirty hack here to make sure that
-        // if we select for EMR tracks, we only get primaries.
-        if (((*track_iter)->HasDetector(detector)) and
-            ((*track_iter)->get_mapper_name() == mapper_name) and
-            ((*track_iter)->get_emr_range_secondary() < 0.001)) {
-          detector_tracks->push_back((*track_iter));
+      if (global_event) {
+        std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
+            global_event->get_tracks();
+        std::vector<MAUS::DataStructure::Global::Track*>::iterator track_iter;
+        for (track_iter = global_tracks->begin();
+             track_iter != global_tracks->end();
+             ++track_iter) {
+          // The third condition is a bit of a dirty hack here to make sure that
+          // if we select for EMR tracks, we only get primaries.
+          if (((*track_iter)->HasDetector(detector)) and
+              ((*track_iter)->get_mapper_name() == mapper_name) and
+              ((*track_iter)->get_emr_range_secondary() < 0.001)) {
+            detector_tracks->push_back((*track_iter));
+          }
         }
       }
     }

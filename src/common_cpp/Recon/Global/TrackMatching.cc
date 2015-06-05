@@ -263,8 +263,8 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
     // Extract four-position and momentum from last track point (i.e. most
     // downstream
     // TODO Will need to do this in a cleaner way later, check by station or sth.
-    TLorentzVector position = tracker1_track->GetTrackPoints()[tracker1_track->GetTrackPoints().size()-1]->get_position();
-    TLorentzVector momentum = tracker1_track->GetTrackPoints()[tracker1_track->GetTrackPoints().size()-1]->get_momentum();
+    TLorentzVector position = tracker1_track->GetTrackPoints()[4]->get_position();
+    TLorentzVector momentum = tracker1_track->GetTrackPoints()[4]->get_momentum();
     int charge_hypothesis = tracker1_track->get_charge();
     // Create the list of PIDs for which we want to create hypothesis tracks
     std::vector<MAUS::DataStructure::Global::PID> pids;
@@ -350,12 +350,16 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
         double x_in_EMR[] = {0., position.X(), position.Y(), position.Z(),
                             energy, momentum.X(), momentum.Y(), momentum.Z()};
         TLorentzVector first_hit_pos = emr_trackpoints[0]->get_position();
+        TLorentzVector first_hit_pos_error =
+            emr_trackpoints[0]->get_position_error();
         double z = first_hit_pos.Z();
         BTTracker::integrate(z, x_in_EMR, field, BTTracker::z, 10.0, charge);
         //~ Squeak::mout(Squeak::error) << "EMR\n" << x_in_EMR[1] << " " << first_hit_pos.X() << "\n"
                                     //~ << x_in_EMR[2] << " " << first_hit_pos.Y() << "\n";
-        if (almostEquals(x_in_EMR[1], first_hit_pos.X(), 25) and
-            almostEquals(x_in_EMR[2], first_hit_pos.Y(), 25)) {
+        if (almostEquals(x_in_EMR[1], first_hit_pos.X(),
+                first_hit_pos_error.X()*3) and
+            almostEquals(x_in_EMR[2], first_hit_pos.Y(),
+                first_hit_pos_error.Y()*3)) {
           //~ Squeak::mout(Squeak::error) << "EMR Match\n";
           for (size_t j = 0; j < emr_trackpoints.size(); j++) {
             MAUS::DataStructure::Global::TrackPoint* emr_tp =
