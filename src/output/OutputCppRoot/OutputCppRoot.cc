@@ -22,6 +22,7 @@
 
 #include "Utils/Exception.hh"
 
+#include "src/common_cpp/Utils/PyObjectWrapper.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/JsonCppStreamer/ORStream.hh"
 
@@ -40,10 +41,11 @@
 #include "src/common_cpp/DataStructure/JobFooter.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppJobFooterConverter.hh"
 
+#include "src/common_cpp/API/PyWrapOutputBase.hh"
 #include "src/output/OutputCppRoot/OutputCppRoot.hh"
 
 namespace MAUS {
-OutputCppRoot::OutputCppRoot() : OutputBase<std::string>("OutputCppRoot"),
+OutputCppRoot::OutputCppRoot() : OutputBase("OutputCppRoot"),
      _outfile(NULL), _fname(""), _end_of_run_dir("./"), _outfile_branch(""),
      _job_header_cpp(NULL), _run_header_cpp(NULL), _spill_cpp(NULL),
      _run_footer_cpp(NULL), _job_footer_cpp(NULL), _run_numbers(),
@@ -125,16 +127,16 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
   }
 }
 
-template <class ConverterT, class DataT>
-bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
-                                const Json::Value& data_json,
-                                std::string branch_name) {
-    // watch for double frees (does close() delete data_cpp?)
-    if (branch_name == "")
+template <class DataT>
+bool OutputCppRoot::write_event(PyObject* py_data) {
+    DataT* data_cpp = NULL;
+    try {
+        data_cpp = PyObjectWrapper::unwrap<DataT>(py_data);
+        if (data_cpp == NULL)
+            return false;
+    } catch (std::exception) {
         return false;
-
-    ConverterT conv;
-    data_cpp = conv.convert(&data_json);
+    }
     check_file_exists(data_cpp);
     if (_outfile == NULL) {
         throw(Exception(
@@ -144,6 +146,7 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
         ));
     }
 
+    std::string branch_name = get_branch_name(data_cpp);
     std::string data_type = data_cpp->GetEventType();
     if (_outfile_branch != data_type) {
         if (_outfile->is_open())
@@ -174,48 +177,18 @@ bool OutputCppRoot::write_event(MAUSEvent<DataT>* data_cpp,
     return true;
 }
 
-bool OutputCppRoot::_save(std::string data_str) {
-    Json::Value data_json = JsonWrapper::StringToJson(data_str);
-    event_type my_tp = get_event_type(data_json);
-    switch (my_tp) {
-        case _job_header_tp:
-            return write_event<JsonCppJobHeaderConverter, JobHeader>
-                                    (_job_header_cpp, data_json, "job_header");
-        case _run_header_tp:
-            return write_event<JsonCppRunHeaderConverter, RunHeader>
-                                    (_run_header_cpp, data_json, "run_header");
-        case _spill_tp:
-            return write_event<JsonCppSpillConverter, Spill>
-                                               (_spill_cpp, data_json, "data");
-        case _run_footer_tp:
-            return write_event<JsonCppRunFooterConverter, RunFooter>
-                                    (_run_footer_cpp, data_json, "run_footer");
-        case _job_footer_tp:
-            return write_event<JsonCppJobFooterConverter, JobFooter>
-                                    (_job_footer_cpp, data_json, "job_footer");
-    }
+bool OutputCppRoot::_save(PyObject* py_data) {
+    if (write_event<Data>(py_data))
+        return true;
+    if (write_event<RunHeaderData>(py_data))
+        return true;
+    if (write_event<RunFooterData>(py_data))
+        return true;
+    if (write_event<JobHeaderData>(py_data))
+        return true;
+    if (write_event<JobFooterData>(py_data))
+        return true;
     return false;
-}
-
-OutputCppRoot::event_type OutputCppRoot::get_event_type
-                                                (const Json::Value& data_json) {
-    std::string type = JsonWrapper::GetProperty
-             (data_json, "maus_event_type", JsonWrapper::stringValue).asString();
-    if (type == "Spill") {
-        return _spill_tp;
-    } else if (type == "JobHeader") {
-        return _job_header_tp;
-    } else if (type == "JobFooter") {
-        return _job_footer_tp;
-    } else if (type == "RunHeader") {
-        return _run_header_tp;
-    } else if (type == "RunFooter") {
-        return _run_footer_tp;
-    } else {
-        throw MAUS::Exception(Exception::recoverable,
-                     "Failed to recognise maus_event_type "+type,
-                     "OutputCppRoot::get_event_type");
-    }
 }
 
 std::string OutputCppRoot::file_name(int run_number) {
@@ -250,7 +223,7 @@ std::string OutputCppRoot::dir_name(int run_number) {
 }
 
 template <class DataT>
-void OutputCppRoot::check_file_exists(DataT data_cpp) {
+void OutputCppRoot::check_file_exists(DataT* data_cpp) {
     std::string event = data_cpp->GetEventType();
     int run = run_number(data_cpp);
     switch (_mode) {
@@ -286,28 +259,32 @@ void OutputCppRoot::check_file_exists(DataT data_cpp) {
 }
 
 template <>
-int OutputCppRoot::run_number(MAUSEvent<Spill>* data_cpp) {
+int OutputCppRoot::run_number(Data* data_cpp) {
     return data_cpp->GetEvent()->GetRunNumber();
 }
 
 template <>
-int OutputCppRoot::run_number(MAUSEvent<RunHeader>* data_cpp) {
+int OutputCppRoot::run_number(RunHeaderData* data_cpp) {
     return data_cpp->GetEvent()->GetRunNumber();
 }
 
 template <>
-int OutputCppRoot::run_number(MAUSEvent<RunFooter>* data_cpp) {
+int OutputCppRoot::run_number(RunFooterData* data_cpp) {
     return data_cpp->GetEvent()->GetRunNumber();
 }
 
 template <>
-int OutputCppRoot::run_number(MAUSEvent<JobHeader>* data_cpp) {
+int OutputCppRoot::run_number(JobHeaderData* data_cpp) {
     return 0;
 }
 
 template <>
-int OutputCppRoot::run_number(MAUSEvent<JobFooter>* data_cpp) {
+int OutputCppRoot::run_number(JobFooterData* data_cpp) {
     return 0;
+}
+
+PyMODINIT_FUNC init_OutputCppRoot(void) {
+    PyWrapOutputBase<OutputCppRoot>::PyWrapOutputBaseModInit("OutputCppRoot", "", "", "", "");
 }
 }
 
