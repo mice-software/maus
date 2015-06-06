@@ -93,7 +93,6 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
 
   void processDBB(MAUS::EMRDaq EMRdaq,
 		  int nPartEvents,
-		  EMRPlaneVector& emr_spill_tmp,
 		  EMRDBBEventVector& emr_dbb_events_tmp,
 		  EMRfADCEventVector& emr_fadc_events_tmp) const;
 
@@ -103,11 +102,9 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
 
   void fill(MAUS::Spill *spill,
 	    int nPartEvents,
-	    EMRPlaneVector emr_spill_tmp,
 	    EMRDBBEventVector emr_dbb_events_tmp,
 	    EMRfADCEventVector emr_fadc_events_tmp) const;
 
-  EMRPlaneVector get_spill_data_tmp() const;
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
   EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
 
@@ -118,12 +115,8 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
   int _number_of_bars;
 
   // Hit pre-selection cuts
-  int _tot_noise_low;
-  int _tot_noise_up;
   int _deltat_signal_low;
   int _deltat_signal_up;
-  int _deltat_noise_low;
-  int _deltat_noise_up;
 };
 }
 

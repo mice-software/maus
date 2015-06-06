@@ -96,33 +96,34 @@ void MapCppEMRRecon::_death() {
 
 void MapCppEMRRecon::_process(Data *data) const {
 
-  // Get spill, look into reconEvents, break if there's no EMR data
+  // Get spill, at this stage, the tree needs to contain 1 event per trigger + spill data
   Spill *spill = data->GetSpill();
-
-  // At this stage, the tree needs to contain 1 event per trigger + noise + decays
   int nPartEvents = spill->GetReconEventSize();
-  if (!nPartEvents)
+  if ( !nPartEvents )
+      return;
+  if (!spill->GetEMRSpillData())
       return;
 
+  // Return if there's no EMR data
   bool emrdata = false;
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
     EMREvent *evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
     int nPlHits = evt->GetEMRPlaneHitArray().size();
 
-    if (nPlHits) {
+    if ( nPlHits ) {
       emrdata = true;
       break;
     }
   }
-  if (!emrdata)
+  if ( !emrdata )
       return;
 
-  // Create DBB and fADC arrays with n+2 events (1 per trigger + noise + decays)
-  EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents);
-  EMRfADCEventVector_er emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents);
+  // Create DBB and fADC arrays with n+1 events (1 per trigger + spill data)
+  EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents + 1);
+  EMRfADCEventVector_er emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents + 1);
 
-  // Create DBB and fADC arrays to future host n+1+n' events (1 per trigger + noise + 1 per decay)
-  EMRDBBEventVector emr_dbb_events[3]; // preselected, primary, secondary
+  // Initialize DBB and fADC arrays to future host n+n' events (1 per trigger + 1 per decay)
+  EMRDBBEventVector emr_dbb_events[3];
   EMRfADCEventVector_er emr_fadc_events;
   EMRTrackEventVector emr_track_events;
 
@@ -152,7 +153,7 @@ void MapCppEMRRecon::_process(Data *data) const {
   event_charge_calculation(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 
   // Fill the Recon event array with Spill information (/!\ only 1 per trigger /!\)
-  fill(spill, nPartEvents - 2, emr_dbb_events, emr_fadc_events, emr_track_events);
+  fill(spill, nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 }
 
 void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
@@ -161,25 +162,29 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 
   int nPartEvents = spill->GetReconEvents()->size();
 
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+  for (int iPe = 0; iPe < nPartEvents+1; iPe++) {
 
-    EMREvent *evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
-
-    int nPlHits = evt->GetEMRPlaneHitArray().size();
-
-    if ( !nPlHits ) continue;
-
-    // Total amount of bars hit in one trigger
-    int nBarsTotal = 0;
-    for (int iPlane = 0; iPlane < nPlHits; iPlane++) {
-      EMRPlaneHit *plHit = evt->GetEMRPlaneHitArray().at(iPlane);
-      nBarsTotal += plHit->GetEMRBarArray().size();
+    EMREvent *evt = new EMREvent();
+    int nPlHits(-1);
+    if (iPe < nPartEvents) {
+      evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
+      nPlHits = evt->GetEMRPlaneHitArray().size();
+    } else  {
+      nPlHits = spill->GetEMRSpillData()->GetEMRPlaneHitArray().size();
     }
+    if ( !nPlHits )
+	continue;
 
     // Fill collection of pre-selected events
     for (int iPlane = 0; iPlane < nPlHits; iPlane++) {
 
-      EMRPlaneHit *plHit = evt->GetEMRPlaneHitArray().at(iPlane);
+      EMRPlaneHit *plHit = new EMRPlaneHit();
+      if (iPe < nPartEvents) {
+        plHit = evt->GetEMRPlaneHitArray().at(iPlane);
+      } else {
+	plHit = spill->GetEMRSpillData()->GetEMRPlaneHitArray().at(iPlane);
+      }
+
       int xPlane = plHit->GetPlane();
       int nBars = plHit->GetEMRBarArray().size();
 
@@ -215,42 +220,42 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 	}
       }
 
-      int xOri = plHit->GetOrientation();
-      int xArrivalTime = plHit->GetDeltaT();
-      double xCharge = plHit->GetCharge();
-      double xPedestalArea = plHit->GetPedestalArea();
-      std::vector<int> xSamples = plHit->GetSamples();
+      if (iPe < nPartEvents) {
+        int xOri = plHit->GetOrientation();
+        int xArrivalTime = plHit->GetDeltaT();
+        double xCharge = plHit->GetCharge();
+        double xPedestalArea = plHit->GetPedestalArea();
+        std::vector<int> xSamples = plHit->GetSamples();
 
-      fADCdata_er data;
-      data._orientation = xOri;
-      data._charge = xCharge;
-      data._pedestal_area = xPedestalArea;
-      data._time = xArrivalTime;
-      data._samples = xSamples;
-      emr_fadc_events_tmp[iPe][xPlane] = data;
+        fADCdata_er data;
+        data._orientation = xOri;
+        data._charge = xCharge;
+        data._pedestal_area = xPedestalArea;
+        data._time = xArrivalTime;
+        data._samples = xSamples;
+        emr_fadc_events_tmp[iPe][xPlane] = data;
+      }
     }
   }
 }
 
 void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_tmp,
-					     EMRfADCEventVector_er emr_fadc_events_tmp,
-					     EMRDBBEventVector *emr_dbb_events,
-					     EMRfADCEventVector_er& emr_fadc_events,
-					     EMRTrackEventVector& emr_track_events) const {
+					      EMRfADCEventVector_er emr_fadc_events_tmp,
+					      EMRDBBEventVector *emr_dbb_events,
+					      EMRfADCEventVector_er& emr_fadc_events,
+					      EMRTrackEventVector& emr_track_events) const {
 
-  int nPartEvents = emr_fadc_events_tmp.size();
-
-  // The last trigger corresponds to the secondary events
-  int secondaryEventId = nPartEvents-1;
+  // The last element of the array contains the EMR spill data
+  int nPartEvents = emr_fadc_events_tmp.size() - 1;
 
   // Save hit time of each secondary hit in a vector
   std::vector<int> hitTimeVector;
   for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
     for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-      int nHits = emr_dbb_events_tmp[secondaryEventId][iPlane][iBar].size();
+      int nHits = emr_dbb_events_tmp[nPartEvents][iPlane][iBar].size();
 
       for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-	EMRBarHit bHit = emr_dbb_events_tmp[secondaryEventId][iPlane][iBar][iBarHit];
+	EMRBarHit bHit = emr_dbb_events_tmp[nPartEvents][iPlane][iBar][iBarHit];
 	int xTot = bHit.GetTot(); // DBB counts
   	int xHitTime = bHit.GetHitTime(); // DBB counts
 	if (xTot > _secondary_trigger_minTot) hitTimeVector.push_back(xHitTime);
@@ -305,15 +310,13 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
 	}
       }
 
-      if (iPe < nPartEvents-2) { // All triggers except the noise and secondary
-	fADCdata_er data;
-	data._orientation = emr_fadc_events_tmp[iPe][iPlane]._orientation;
-	data._charge = emr_fadc_events_tmp[iPe][iPlane]._charge;
-	data._pedestal_area = emr_fadc_events_tmp[iPe][iPlane]._pedestal_area;
-	data._time = emr_fadc_events_tmp[iPe][iPlane]._time;
-	data._samples = emr_fadc_events_tmp[iPe][iPlane]._samples;
-	emr_fadc_events[iPe][iPlane] = data;
-      }
+      fADCdata_er data;
+      data._orientation = emr_fadc_events_tmp[iPe][iPlane]._orientation;
+      data._charge = emr_fadc_events_tmp[iPe][iPlane]._charge;
+      data._pedestal_area = emr_fadc_events_tmp[iPe][iPlane]._pedestal_area;
+      data._time = emr_fadc_events_tmp[iPe][iPlane]._time;
+      data._samples = emr_fadc_events_tmp[iPe][iPlane]._samples;
+      emr_fadc_events[iPe][iPlane] = data;
     }
   }
 
@@ -321,15 +324,15 @@ void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_t
   for (int iHitTimeGroup = 0; iHitTimeGroup < nSeconPartEvents; iHitTimeGroup++) {
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
       for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-	int nHits = emr_dbb_events_tmp[secondaryEventId][iPlane][iBar].size();
+	int nHits = emr_dbb_events_tmp[nPartEvents][iPlane][iBar].size();
 
 	for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-	  EMRBarHit bHit = emr_dbb_events_tmp[secondaryEventId][iPlane][iBar][iBarHit];
+	  EMRBarHit bHit = emr_dbb_events_tmp[nPartEvents][iPlane][iBar][iBarHit];
 	  int hitTime = bHit.GetHitTime(); // DBB counts
 	  int deltat = hitTimeGroup.at(iHitTimeGroup) - hitTime;
 
 	  if (deltat >= 0 && deltat < _secondary_hits_bunching_width) {
-	    emr_dbb_events[0][secondaryEventId + 1 + iHitTimeGroup]
+	    emr_dbb_events[0][nPartEvents + iHitTimeGroup]
 			  [iPlane][iBar].push_back(bHit);
 	  }
 	}
@@ -346,9 +349,6 @@ void MapCppEMRRecon::tot_cleaning(int nPartEvents,
   int nTotalPartEvents = emr_fadc_events.size();
 
   for (int iPe = 0; iPe < nTotalPartEvents; iPe++) {
-    // Skip noise and secondary triggers
-    if (iPe == nPartEvents-2 || iPe == nPartEvents-1) continue;
-
     // Count number of X and Y planes hit
     int xPlaneHits = 0;
     int yPlaneHits = 0;
@@ -364,7 +364,7 @@ void MapCppEMRRecon::tot_cleaning(int nPartEvents,
     }
 
     // Reject triggers with too small amount of hits
-    if (iPe < nPartEvents-2 &&
+    if (iPe < nPartEvents &&
 	(xPlaneHits < _primary_trigger_minXhits ||
 	 yPlaneHits < _primary_trigger_minYhits ||
 	 (xPlaneHits + yPlaneHits) < _primary_trigger_minNhits)) continue;
@@ -417,10 +417,11 @@ void MapCppEMRRecon::pid_variables(int nPartEvents,
 				  EMRTrackEventVector& emr_track_events) const {
 
   // Loop over the primary events only
-  for (int iPe = 0; iPe < nPartEvents - 2; iPe++) {
+  for (int iPe = 0; iPe < nPartEvents; iPe++) {
 
     // Skip the events without a primary track
-    if ( !emr_track_events[iPe]._has_primary ) continue;
+    if ( !emr_track_events[iPe]._has_primary )
+	continue;
 
     int nPlane(0), lPlaneX(0), lPlaneY(0);
     vector<double> x[2], y[2];
@@ -498,10 +499,6 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
   int nTotalPartEvents = emr_fadc_events.size();
 
   for (int iPe = 0; iPe < nTotalPartEvents; iPe++) {
-
-    // Skip noise and secondary triggers
-    if (iPe == nPartEvents-1 || iPe == nPartEvents-2) continue;
-
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
 
       bool Hit0Found = false;
@@ -623,11 +620,7 @@ void MapCppEMRRecon::energy_correction(int nPartEvents,
   int nTotalPartEvents = emr_fadc_events.size();
 
   for (int iPe = 0; iPe < nTotalPartEvents; iPe++) {
-
     int nPrimPartEvents = 0;
-
-    // Skip noise and secondary triggers
-    if (iPe == nPartEvents-1 || iPe == nPartEvents-2) continue;
 
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
       // Fetch the attenuation parameters from the map
@@ -745,10 +738,11 @@ void MapCppEMRRecon::track_matching(int nPartEvents,
 
   int nTotalPartEvents = emr_fadc_events.size();
 
-  for (int iPe = 0; iPe < nPartEvents-2; iPe++) {
-
+  // Loop over the primary events
+  for (int iPe = 0; iPe < nPartEvents; iPe++) {
     // Skip the events without a primary track
-    if (!emr_track_events[iPe]._has_primary) continue;
+    if (!emr_track_events[iPe]._has_primary)
+	continue;
 
     // Range calculation of primary tracks
     double x1(-1.0), y1(-1.0), z1(-1.0);
@@ -781,6 +775,7 @@ void MapCppEMRRecon::track_matching(int nPartEvents,
     int seconEventId = -1;
     double seconEventRange = -1.0;
 
+    // Loop over all the possible secondary events
     for (int iiPe = nPartEvents; iiPe < nTotalPartEvents; iiPe++) {
 
       double x3(-1.0), y3(-1.0), z3(-1.0);
@@ -857,10 +852,11 @@ void MapCppEMRRecon::event_charge_calculation(int nPartEvents,
 					      EMRfADCEventVector_er& emr_fadc_events,
 					      EMRTrackEventVector& emr_track_events) const {
 
-  for (int iPe = 0; iPe < nPartEvents-2; iPe++) {
-
+  // The charge is reconstructed only for primary triggers
+  for (int iPe = 0; iPe < nPartEvents; iPe++) {
     // Skip the events without a primary track
-    if (!emr_track_events[iPe]._has_primary) continue;
+    if (!emr_track_events[iPe]._has_primary)
+	continue;
 
     // Reconstrcut total charge deposited by the primary particle
     double total_charge_ma = 0.0;
@@ -962,9 +958,8 @@ void MapCppEMRRecon::fill(Spill *spill,
   int xRun = spill->GetRunNumber();
   int xSpill = spill->GetSpillNumber();
 
-  // Only save the primary triggers with their primary and seconday arrays (n - 2)
+  // Only save the primary triggers with their primary and seconday arrays (n)
   ReconEventPArray *recEvts = spill->GetReconEvents();
-  recEvts->resize(nPartEvents);
 
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
     EMREvent *evt = new EMREvent;

@@ -66,9 +66,9 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
         spill_out = maus_cpp.converter.json_repr(result)
         self.assertFalse("MapCppEMRPlaneHits" in spill_out["errors"])
 
-	# consistent amount of reconEvents (5 = 3primary+1noise+1decay)
+	# consistent amount of reconEvents (1DBB+fADC, 2 fADC only)
         n_ev = len(spill_out['recon_events'])
-        self.assertEqual(5, n_ev)
+        self.assertEqual(3, n_ev)
 
 	# consitent amount of plane hit in each event (1 per event)
         for i in range(0, n_ev):
@@ -76,7 +76,7 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
 				  ['emr_plane_hits'])
             self.assertEqual(1, n_hits)
 
-        # hits stored at the spill level (3 hits)
+        # secondary hits stored at the spill level (1 triggerless hit)
         self.assertTrue(spill_out['emr_spill_data']['emr_plane_hits'])
         spill_hits = 0
         for i in range(0, len(spill_out['emr_spill_data']\
@@ -87,7 +87,7 @@ class TestMapCppEMRPlaneHits(unittest.TestCase): #pylint: disable=R0904
                 spill_hits += len(spill_out['emr_spill_data']\
 					   ['emr_plane_hits'][i]\
 					   ['emr_bars'][j]['emr_bar_hits'])
-        self.assertEqual(3, spill_hits)
+        self.assertEqual(1, spill_hits)
 
 if __name__ == "__main__":
     unittest.main()
