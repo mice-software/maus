@@ -407,6 +407,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
 
         self.canvas_SciFiDigit.Update()
+	self.canvas_SciFiPEperChannel.Update()
         self.canvas_SciFiSpacepoints.Update()
 
     def get_histogram_images(self):       
@@ -414,10 +415,12 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         Get histograms as JSON documents.
         @returns list of 1 JSON document containing the images.
         """
-        #digits per station
+
         image_list = []
-        tag = "SciFi"
-        keywords = ["SciFi"]
+
+        #digits per station
+        tag = "SciFi_Digits"
+        keywords = ["SciFi", "Digits"]
         description = "SciFi"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_SciFiDigit)
@@ -425,16 +428,16 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         #pe per channel
         image_list = []
-        tag = "SciFi"
-        keywords = ["SciFi"]
+        tag = "SciFi_PEperChannel"
+        keywords = ["SciFi", "PE", "Channel"]
         description = "SciFi"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_SciFiPEperChannel)
         image_list.append(doc)
 
         # Spacepoints per station
-        tag = "SciFi"
-        keywords = ["SciFi"]
+        tag = "SciFi_Spacepoints"
+        keywords = ["SciFi", "Spacepoints"]
         description = "SciFi"
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_SciFiSpacepoints)
