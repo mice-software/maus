@@ -418,6 +418,14 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         image_list = []
 
+        # ROOT
+        # file label = PTM1-8.eps
+        histos = self.SciFiDigitT1, self.SciFiDigitT2, self.SciFiPEperChannelT1S1,	self.SciFiPEperChannelT1S2, self.SciFiPEperChannelT1S3,	self.SciFiPEperChannelT1S4,	self.SciFiPEperChannelT1S5, self.SciFiPEperChannelT2S1,	self.SciFiPEperChannelT2S2,	self.SciFiPEperChannelT2S3, self.SciFiPEperChannelT2S4, self.SciFiPEperChannelT2S5, self.SciFiSpacepointsT1, self.SciFiSpacepointsT2
+        tag = __name__
+        content = __name__
+        doc = ReducePyROOTHistogram.get_root_doc(self, [], content, tag, histos)
+        image_list.append(doc)
+
         #digits per station
         tag = "SciFi_Digits"
         keywords = ["SciFi", "Digits"]
