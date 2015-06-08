@@ -26,6 +26,8 @@
 
 namespace MAUS {
 
+#define MIN_ADC 0.000000001
+
 RealDataDigitization::RealDataDigitization() {}
 
 RealDataDigitization::~RealDataDigitization() {}
@@ -117,7 +119,7 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
 
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _min && adc_gain > _min ) {
+    if ( adc_pedestal > MIN_ADC && adc_gain > MIN_ADC ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -211,7 +213,7 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     double tdc_gain     = _calibration[new_bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _min && adc_gain > _min ) {
+    if ( adc_pedestal > MIN_ADC && adc_gain > MIN_ADC ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
