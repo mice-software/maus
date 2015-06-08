@@ -854,26 +854,41 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
 
   MAUS::VLSB xVLSBhit;
   int xLdc, xAdc, xTimeStamp, xPhysEvNum;
-  unsigned int xPartEv;
+  int xPartEv;
   string xDetector;
 
   xLdc = this->GetLdcId();
-  // std::cerr << "INFO: VLSBCppDataProcessor::Process: Found xLdc = " << xLdc << std::endl;
   xTimeStamp = this->GetTimeStamp();
   xPhysEvNum = this->GetPhysEventNumber();
   // Get the number of data words.
   uint32_t nDataWords = xVLSBFragment->GetPayLoadWordCount();
 
-  // std::cerr << "PhysEvNum: " << xPhysEvNum << " nDataWords: " << nDataWords << endl;
+//   std::cout << "PhysEvNum: " << xPhysEvNum << " nDataWords: " << nDataWords << endl;
   // Loop over the data.
   uint32_t xWordCount(0);
   while (xWordCount < nDataWords) {
     xPartEv = xVLSBFragment->GetEventNum(xWordCount)-1;
-//     std::cerr << xWordCount << " PartEv:" << xPartEv << "  LDC: " << xLdc << endl;
-    if (xPartEv+1 > _tracker1_spill.size()) {
-      _tracker1_spill.resize(xPartEv+1);
-      _tracker0_spill.resize(xPartEv+1);
-      _single_st_spill.resize(xPartEv+1);
+    int xGeo = xVLSBFragment->GetBoardID();
+//     std::cout << *xVLSBFragment->Get32bWordPtr(xWordCount) << std::endl;
+//     std::cout << xWordCount << " PartEv:" << xPartEv << "  LDC: " << xLdc
+//               << " Geo: " << xGeo << endl;
+    if ( xPartEv == _current_pEvent+1 ||
+         (xPartEv == 0 && xPartEv != _current_pEvent) ) {
+      _current_pEvent = xPartEv;
+      if (xGeo == 0) {
+//         cout << "Resizeing " << _current_pEvent+1 << endl;
+        _n_pEvent = xPartEv+1;
+        _tracker1_spill.resize(xPartEv+1);
+        _tracker0_spill.resize(xPartEv+1);
+//         _single_st_spill.resize(xPartEv+1);
+      }
+    } else if (xPartEv != _current_pEvent) {
+        stringstream ss;
+        ss << "ERORR in VLSBCppDataProcessor::Process : "<< endl;
+        ss << "in LDC " << xLdc << "  Bank " << xGeo;
+        ss << "  Inconsistent Particle event number (" << xPartEv << ") ";
+        throw MDexception(ss.str());
+//         cout << ss.str() << endl;
     }
 
     xAdc = xVLSBFragment->GetAdc(xWordCount);
@@ -884,23 +899,42 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
       xVLSBhit.SetEquipType(this->GetEquipmentType());
       xVLSBhit.SetTimeStamp(xTimeStamp);
       xVLSBhit.SetPhysEventNumber(xPhysEvNum);
-      xVLSBhit.SetBankID(xVLSBFragment->GetBoardID());
+      xVLSBhit.SetBankID(xGeo);
       xVLSBhit.SetADC(xAdc);
       xVLSBhit.SetPartEventNumber(xPartEv);
       xVLSBhit.SetChannel(xVLSBFragment->GetChannel(xWordCount));
       xVLSBhit.SetTDC(xVLSBFragment->GetTdc(xWordCount));
       xVLSBhit.SetDiscriminator(xVLSBFragment->GetDiscriBit(xWordCount));
-      if (xLdc == 3) {
+      if (xLdc == 3 || xLdc == 0) {
         xDetector = "tracker0";
         xVLSBhit.SetDetector(xDetector);
-        _tracker0_spill[xPartEv].push_back(xVLSBhit);
-
+        if (_n_pEvent <= xPartEv) {
+          stringstream ss;
+          ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
+          ss << "in LDC " << xLdc << "  Bank " << xGeo;
+          ss << "  Particle event number exceeds the limit ("
+             << xPartEv << ">" << _n_pEvent << ")";
+          throw MDexception(ss.str());
+//           cout << ss.str() << endl;
+        } else {
+          _tracker0_spill[xPartEv].push_back(xVLSBhit);
+	}
       } else if (xLdc == 4) {
         xDetector = "tracker1";
         xVLSBhit.SetDetector(xDetector);
+        if (_n_pEvent <= xPartEv) {
+          stringstream ss;
+          ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
+          ss << "in LDC " << xLdc << "  Bank " << xGeo;
+          ss << "  Particle event number exceeds the limit ("
+             << xPartEv << ">" << _n_pEvent << ")";
+          throw MDexception(ss.str());
+//           cout << ss.str() << endl;
+        } else {
         _tracker1_spill[xPartEv].push_back(xVLSBhit);
+        }
       }
-//        else if (xLdc == 3) {
+//        else if (xLdc == 0) {
 //         xDetector = "single_station";
 //         xVLSBhit.SetDetector(xDetector);
 //         _single_st_spill[xPartEv].push_back(xVLSBhit);
@@ -914,9 +948,7 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
 
 
 void VLSBCppDataProcessor::fill_daq_data() {
-
   unsigned int npe = _tracker1_spill.size();
-  // std::cerr << "INFO: VLSBCppDataProcessor::fill_daq_data: Tracker 1 npe = " << npe << std::endl;
 
   if (_daq_data->GetTracker0DaqArraySize() != npe)
     _daq_data->GetTracker0DaqArrayPtr()->resize(npe);
@@ -939,9 +971,11 @@ void VLSBCppDataProcessor::fill_daq_data() {
 }
 
 void VLSBCppDataProcessor::reset() {
+  _current_pEvent = -1;
+  _n_pEvent = 0;
   _tracker1_spill.clear();
   _tracker0_spill.clear();
-  _single_st_spill.clear();
+//   _single_st_spill.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -301,7 +301,8 @@ typedef std::vector<TrackerHitArray>      TtackerPartEventArray;
 
 class VLSBCppDataProcessor : public ZeroSupressionFilter {
  public:
-  VLSBCppDataProcessor() :ZeroSupressionFilter() {_equipment="VLSB";}
+  VLSBCppDataProcessor()
+  : ZeroSupressionFilter(), _current_pEvent(-1), _n_pEvent(0) {_equipment="VLSB";}
   virtual ~VLSBCppDataProcessor() {}
 
  /** Unpack a single event part to JSON.
@@ -325,9 +326,12 @@ class VLSBCppDataProcessor : public ZeroSupressionFilter {
 
   private:
 
+  int _current_pEvent;
+  int _n_pEvent;
+
   TtackerPartEventArray _tracker1_spill;
   TtackerPartEventArray _tracker0_spill;
-  TtackerPartEventArray _single_st_spill;
+//   TtackerPartEventArray _single_st_spill;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
