@@ -100,24 +100,24 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Histogram initializations. they are defined explicitly in
         # init_histos.
 
-	self.SciFiDigitT1 = None
-	self.SciFiDigitT2 = None
-	self.SciFiPEperChannelT1S1 = None
-	self.SciFiPEperChannelT1S2 = None
-	self.SciFiPEperChannelT1S3 = None
-	self.SciFiPEperChannelT1S4 = None
-	self.SciFiPEperChannelT1S5 = None
-	self.SciFiPEperChannelT2S1 = None
-	self.SciFiPEperChannelT2S2 = None
-	self.SciFiPEperChannelT2S3 = None
-	self.SciFiPEperChannelT2S4 = None
-	self.SciFiPEperChannelT2S5 = None
-	self.SciFiSpacepointsT1 = None
-	self.SciFiSpacepointsT2 = None
+        self.ScifiDigitT1 = None
+        self.SciFiDigitT2 = None
+        self.SciFiPEperChannelT1S1 = None
+        self.SciFiPEperChannelT1S2 = None
+        self.SciFiPEperChannelT1S3 = None
+        self.SciFiPEperChannelT1S4 = None
+        self.SciFiPEperChannelT1S5 = None
+        self.SciFiPEperChannelT2S1 = None
+        self.SciFiPEperChannelT2S2 = None
+        self.SciFiPEperChannelT2S3 = None
+        self.SciFiPEperChannelT2S4 = None
+        self.SciFiPEperChannelT2S5 = None
+        self.SciFiSpacepointsT1 = None
+        self.SciFiSpacepointsT2 = None
 
-	self.canvas_SciFiDigit = None	
- 	self.canvas_SciFiPEperChannel = None      
-	self.canvas_SciFiSpacepoints = None
+        self.canvas_SciFiDigit = None	
+        self.canvas_SciFiPEperChannel = None      
+        self.canvas_SciFiSpacepoints = None
 
         # Has an end_of_run been processed?
         self.run_ended = False
@@ -152,7 +152,6 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 return []
 
         # do not try to get data from start/end spill markers
-        data_spill = True
         if spill["daq_event_type"] == "start_of_run" \
               or spill["daq_event_type"] == "start_of_burst" \
               or spill["daq_event_type"] == "end_of_burst":
@@ -176,7 +175,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
     def get_SciFiDigits(self, spill):
         
-	""" 
+        """ 
         Get the SciFiDigits and update the histograms.
 
         @param self Object reference.
@@ -197,16 +196,16 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 spill['recon_events'][event]['sci_fi_event']:
                 return False
 
-            '''
-            If the tracker number = 0 fill SciFiDigitT1 with station Number
+            """
+            If the tracker number = 0 fill ScifiDigitT1 with station Number
             and likewise for tracker 2.
-            '''
+            """
             # Gives information on cabling efficiency
             SciFiDigits = spill['recon_events'][event]['sci_fi_event']['digits']
             for i in range(len(SciFiDigits)):
                 #print SciFiDigits[i]['tracker']
                 if (SciFiDigits[i]['tracker'] == 0):
-                    self.SciFiDigitT1.Fill(SciFiDigits[i]['station'])
+                    self.ScifiDigitT1.Fill(SciFiDigits[i]['station'])
                 if (SciFiDigits[i]['tracker'] == 1):
                     self.SciFiDigitT2.Fill(SciFiDigits[i]['station'])
 
@@ -217,33 +216,43 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     #print SciFiDigits[i]['npe']
                     #print SciFiDigits[i]['channel']
                     if (SciFiDigits[i]['station'] == 1):
-                        self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                       self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i]['channel'], \
+                       SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 2):
-                        self.SciFiPEperChannelT1S2.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT1S2.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 3):
-                        self.SciFiPEperChannelT1S3.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT1S3.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 4):
-                        self.SciFiPEperChannelT1S4.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT1S4.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 5):
-                        self.SciFiPEperChannelT1S5.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT1S5.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                 if (SciFiDigits[i]['tracker'] == 1):
                     if (SciFiDigits[i]['station'] == 1):
-                        self.SciFiPEperChannelT2S1.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT2S1.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 2):
-                        self.SciFiPEperChannelT2S2.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT2S2.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 3):
-                        self.SciFiPEperChannelT2S3.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT2S3.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 4):
-                        self.SciFiPEperChannelT2S4.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT2S4.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 5):
-                        self.SciFiPEperChannelT2S5.Fill(SciFiDigits[i]['channel'], SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT2S5.Fill(SciFiDigits[i]['channel'], \
+                        SciFiDigits[i]['npe'])
 
         return True
 
     # Gives information on reconstruction efficiency
     def get_SciFiSpacepoints(self, spill):
         
-	""" 
+        """ 
         Get the SciFiDigits and update the histograms.
 
         @param self Object reference.
@@ -293,10 +302,10 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.style = ROOT.gStyle.SetPalette(1)
  
         # define histograms
-        self.SciFiDigitT1 = ROOT.TH1F("h1", "SciFi Digits in Tracker 1", 100, 0, 6)
-        self.SciFiDigitT1.SetTitle("SciFi Digits Tracker 1")
-        self.SciFiDigitT1.GetXaxis().SetTitle("Stations")
-        self.SciFiDigitT1.GetYaxis().SetTitle("Number of digits")
+        self.ScifiDigitT1 = ROOT.TH1F("h1", "SciFi Digits in Tracker 1", 100, 0, 6)
+        self.ScifiDigitT1.SetTitle("SciFi Digits Tracker 1")
+        self.ScifiDigitT1.GetXaxis().SetTitle("Stations")
+        self.ScifiDigitT1.GetYaxis().SetTitle("Number of digits")
         self.SciFiDigitT2 = ROOT.TH1F("h1", "SciFi Digits in Tracker 2", 100, 0, 6)
         self.SciFiDigitT2.SetTitle("SciFi Digits Tracker 2")
         self.SciFiDigitT2.GetXaxis().SetTitle("Stations")
@@ -363,7 +372,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_SciFiDigit = ROOT.TCanvas("SciFiDigit", "SciFiDigit")
         self.canvas_SciFiDigit.Divide(2, 1)
         self.canvas_SciFiDigit.cd(1)
-        self.SciFiDigitT1.Draw()
+        self.ScifiDigitT1.Draw()
         self.canvas_SciFiDigit.cd(2)
         self.SciFiDigitT2.Draw()
          
@@ -407,7 +416,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
 
         self.canvas_SciFiDigit.Update()
-	self.canvas_SciFiPEperChannel.Update()
+        self.canvas_SciFiPEperChannel.Update()
         self.canvas_SciFiSpacepoints.Update()
 
     def get_histogram_images(self):       
@@ -418,13 +427,13 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         image_list = []
 
-        # ROOT
+        '''# ROOT
         # file label = PTM1-8.eps
-        histos = self.SciFiDigitT1, self.SciFiDigitT2, self.SciFiPEperChannelT1S1,	self.SciFiPEperChannelT1S2, self.SciFiPEperChannelT1S3,	self.SciFiPEperChannelT1S4,	self.SciFiPEperChannelT1S5, self.SciFiPEperChannelT2S1,	self.SciFiPEperChannelT2S2,	self.SciFiPEperChannelT2S3, self.SciFiPEperChannelT2S4, self.SciFiPEperChannelT2S5, self.SciFiSpacepointsT1, self.SciFiSpacepointsT2
+        histos = self.ScifiDigitT1, self.SciFiDigitT2, self.SciFiPEperChannelT1S1, \	    self.SciFiPEperChannelT1S2, self.SciFiPEperChannelT1S3,	self.SciFiPEperChannelT1S4, \	self.SciFiPEperChannelT1S5, self.SciFiPEperChannelT2S1,	self.SciFiPEperChannelT2S2, \	self.SciFiPEperChannelT2S3, self.SciFiPEperChannelT2S4, self.SciFiPEperChannelT2S5, \ self.SciFiSpacepointsT1, self.SciFiSpacepointsT2
         tag = __name__
         content = __name__
         doc = ReducePyROOTHistogram.get_root_doc(self, [], content, tag, histos)
-        image_list.append(doc)
+        image_list.append(doc)'''
 
         #digits per station
         tag = "SciFi_Digits"
