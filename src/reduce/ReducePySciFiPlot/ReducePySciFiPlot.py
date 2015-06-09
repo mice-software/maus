@@ -31,7 +31,9 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     """gedit 
     ReducePySciFiPlot plots several Tracker histograms.
     Currently the following histograms are filled:
-    - XXXXXX  DESCRIBE PLOTS HERE
+    Digits per tracker and station, 
+    pe per channel and
+    Spacepoints per station
     
     Histograms are drawn on different canvases.
     The canvases are refreshed every N spills where N = refresh_rate
@@ -53,7 +55,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                "data": "...base 64 encoded image..."}}
     @endverbatim
 
-	DESCRIBE NAMES of TAGS HERE!!!!
+	SciFi, Digits, PE Channel, Spacepoints
 
     If "histogram_auto_number" (see below) is "true" then the TAG will
     have a number N appended where N means that the histogram was
@@ -217,7 +219,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     #print SciFiDigits[i]['channel']
                     if (SciFiDigits[i]['station'] == 1):
                        self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i]['channel'], \
-                       SciFiDigits[i]['npe'])
+                        SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 2):
                         self.SciFiPEperChannelT1S2.Fill(SciFiDigits[i]['channel'], \
                         SciFiDigits[i]['npe'])
@@ -273,10 +275,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 spill['recon_events'][event]['sci_fi_event']:
                 return False
 
-            '''
-            If the tracker number =0 fill SciFiSpacepointsT1 with station Number
-            and likewise for tracker 2.
-            '''
+            '''If the tracker number =0 fill SciFiSpacepointsT1 with station Number
+            and likewise for tracker 2.'''
             SciFiSpacepoints = spill['recon_events'][event]['sci_fi_event']['spacepoints']
             for i in range(len(SciFiSpacepoints)):
                 print SciFiSpacepoints[i]['tracker']
@@ -426,14 +426,6 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
 
         image_list = []
-
-        '''# ROOT
-        # file label = PTM1-8.eps
-        histos = self.ScifiDigitT1, self.SciFiDigitT2, self.SciFiPEperChannelT1S1, \	    self.SciFiPEperChannelT1S2, self.SciFiPEperChannelT1S3,	self.SciFiPEperChannelT1S4, \	self.SciFiPEperChannelT1S5, self.SciFiPEperChannelT2S1,	self.SciFiPEperChannelT2S2, \	self.SciFiPEperChannelT2S3, self.SciFiPEperChannelT2S4, self.SciFiPEperChannelT2S5, \ self.SciFiSpacepointsT1, self.SciFiSpacepointsT2
-        tag = __name__
-        content = __name__
-        doc = ReducePyROOTHistogram.get_root_doc(self, [], content, tag, histos)
-        image_list.append(doc)'''
 
         #digits per station
         tag = "SciFi_Digits"
