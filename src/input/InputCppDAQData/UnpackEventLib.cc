@@ -909,12 +909,12 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
         xDetector = "tracker0";
         xVLSBhit.SetDetector(xDetector);
         if (_n_pEvent <= xPartEv) {
-          stringstream ss;
-          ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
-          ss << "in LDC " << xLdc << "  Bank " << xGeo;
-          ss << "  Particle event number exceeds the limit ("
-             << xPartEv << ">" << _n_pEvent << ")";
-          throw MDexception(ss.str());
+//           stringstream ss;
+//           ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
+//           ss << "in LDC " << xLdc << "  Bank " << xGeo;
+//           ss << "  Particle event number exceeds the limit ("
+//              << xPartEv << ">" << _n_pEvent << ")";
+//           throw MDexception(ss.str());
 //           cout << ss.str() << endl;
         } else {
           _tracker0_spill[xPartEv].push_back(xVLSBhit);
@@ -923,22 +923,17 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
         xDetector = "tracker1";
         xVLSBhit.SetDetector(xDetector);
         if (_n_pEvent <= xPartEv) {
-          stringstream ss;
-          ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
-          ss << "in LDC " << xLdc << "  Bank " << xGeo;
-          ss << "  Particle event number exceeds the limit ("
-             << xPartEv << ">" << _n_pEvent << ")";
-          throw MDexception(ss.str());
+//           stringstream ss;
+//           ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
+//           ss << "in LDC " << xLdc << "  Bank " << xGeo;
+//           ss << "  Particle event number exceeds the limit ("
+//              << xPartEv << ">" << _n_pEvent << ")";
+//           throw MDexception(ss.str());
 //           cout << ss.str() << endl;
         } else {
         _tracker1_spill[xPartEv].push_back(xVLSBhit);
         }
       }
-//        else if (xLdc == 0) {
-//         xDetector = "single_station";
-//         xVLSBhit.SetDetector(xDetector);
-//         _single_st_spill[xPartEv].push_back(xVLSBhit);
-//       }
     }
     xWordCount++;
   }

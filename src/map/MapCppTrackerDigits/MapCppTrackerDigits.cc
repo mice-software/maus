@@ -30,21 +30,25 @@ PyMODINIT_FUNC init_MapCppTrackerDigits(void) {
 }
 
 MapCppTrackerDigits::MapCppTrackerDigits()
-    : MapBase<Data>("MapCppTrackerDigits") {}
+    : MapBase<Data>("MapCppTrackerDigits"), real(0) {}
 
 MapCppTrackerDigits::~MapCppTrackerDigits() {
 }
 
 void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
+  real = new RealDataDigitization();
+  real->initialise();
 }
 
 void MapCppTrackerDigits::_death() {
+  if (real) delete real;
 }
 
 void MapCppTrackerDigits::_process(Data* data) const {
-  RealDataDigitization real;
-  real.initialise();
-  real.process(data->GetSpill());
+//   RealDataDigitization real;
+//   real.initialise();
+  Spill *spill = data->GetSpill();
+  real->process(spill);
 }
 
 } // ~namespace MAUS

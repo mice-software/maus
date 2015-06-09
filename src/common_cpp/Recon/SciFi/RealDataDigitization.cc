@@ -93,8 +93,9 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
   std::vector<SciFiDigit*> digits;
 
   // Loop over the VLSB channels of this event.
-  for ( unsigned int i = 0; i < td->GetVLSBArray().size(); ++i ) {
-    VLSB vlsb1 = td->GetVLSBArray()[i];
+  unsigned int xVLSBArraySize = td->GetVLSBArraySize();
+  for ( unsigned int i = 0; i < xVLSBArraySize; ++i ) {
+    VLSB vlsb1 = td->GetVLSBArrayElement(i);
 
 
 //    if ( bank < 32 ) {
