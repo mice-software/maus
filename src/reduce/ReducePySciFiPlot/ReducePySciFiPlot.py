@@ -23,6 +23,8 @@ run.
 # Disable messages about too many branches and too many lines.
 #pylint: disable = R0912
 #pylint: disable = R0915
+pylint: disable = E0001, C0103, C0301
+pylint: disable = W0105, W0612, W0201
 
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
@@ -45,7 +47,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     
     At the end of the run, the canvases are printed to eps files
 
-    A sequence of XXX histogram is output as JSON documents of form:
+    A sequence of 3 histograms are output as JSON documents of form:
 
     @verbatim
     {"image": {"keywords": [...list of image keywords...],
@@ -218,7 +220,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     #print SciFiDigits[i]['npe']
                     #print SciFiDigits[i]['channel']
                     if (SciFiDigits[i]['station'] == 1):
-                       self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i]['channel'], \
+                        self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i]['channel'], \
                         SciFiDigits[i]['npe'])
                     if (SciFiDigits[i]['station'] == 2):
                         self.SciFiPEperChannelT1S2.Fill(SciFiDigits[i]['channel'], \
