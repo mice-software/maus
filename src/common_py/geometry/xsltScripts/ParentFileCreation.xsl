@@ -35,7 +35,7 @@
                             //Substitutions
                             <xsl:variable name="run_number" select="MICE_Information/Configuration_Information/run/@runNumber"/>
 		            <xsl:variable name="diffuserThickness" select="MICE_Information/Configuration_Information/run/@diffuserThickness"/>
-			    <xsl:variable name="mcmode" select="MICE_Information/Configuration_Information/coolingchannel/magnets"/>
+			    <xsl:variable name="mcmode" select="MICE_Information/Configuration_Information/coolingchannel"/>
                             <xsl:choose><xsl:when test="contains(MICE_Information/Configuration_Information/run/@beamStop, 'false') or contains(MICE_Information/Configuration_Information/run/@beamStop, 'true')">
                             Substitution $beamStop <xsl:value-of select="MICE_Information/Configuration_Information/run/@beamStop"/>
                             
@@ -97,7 +97,7 @@
                                 
 			    </xsl:text></xsl:when></xsl:choose>
                             </xsl:for-each></xsl:when></xsl:choose>
-                <xsl:for-each select="MICE_Information/Configuration_Information/coolingchannel/magnets/magnet">
+                <xsl:for-each select="MICE_Information/Configuration_Information/coolingchannel/magnet">
                         <xsl:choose>
                             <xsl:when test="contains(@name, 'SSU')">
                                 <xsl:for-each select="coil">
@@ -125,7 +125,7 @@
                                     </xsl:choose>
                                 </xsl:for-each>
                             </xsl:when>
-                            <xsl:when test="contains(@name, 'FCM') and contains(@mode, 'Solenoid')">
+                            <xsl:when test="contains(@name, 'FCM') and ( contains(@mode, 'Solenoid') or contains(@mode, 'solenoid'))">
                         Substitution $FCMMode +1<xsl:text>
                                         
                         </xsl:text>
@@ -143,8 +143,8 @@
                                     </xsl:choose>
                                 </xsl:for-each>
                             </xsl:when>
-                                <xsl:when test="contains(@name, 'FCM') and contains(@mode, 'Flip')">
-                        Substitution $FCMMode +1<xsl:text>
+                                <xsl:when test="contains(@name, 'FCM') and ( contains(@mode, 'Flip') or contains(@mode, 'flip') )">
+                        Substitution $FCMMode -1<xsl:text>
                                         
                         </xsl:text>
                                     <xsl:for-each select="coil">

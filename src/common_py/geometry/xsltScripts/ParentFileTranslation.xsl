@@ -96,7 +96,7 @@
 
 			    </xsl:text></xsl:when></xsl:choose>
                             </xsl:for-each></xsl:when><xsl:otherwise> </xsl:otherwise></xsl:choose>
-                <xsl:for-each select="MICE_Information/Configuration_Information/coolingchannel/magnets/magnet">
+                <xsl:for-each select="MICE_Information/Configuration_Information/coolingchannel/magnet">
                     <xsl:choose>
                         <xsl:when test="contains(@name, 'SSU')">
                             <xsl:for-each select="coil">
@@ -124,7 +124,7 @@
                                 </xsl:choose>
                             </xsl:for-each>
                         </xsl:when>
-                        <xsl:when test="contains(@name, 'FCM') and contains(@mode, 'Solenoid')">
+                        <xsl:when test="contains(@name, 'FCM') and ( contains(@mode, 'Solenoid') or contains(@mode, 'solenoid') )">
                             Substitution $FCMMode +1<xsl:text>
                                         
                         </xsl:text>
@@ -142,8 +142,8 @@
                                 </xsl:choose>
                             </xsl:for-each>
                         </xsl:when>
-                        <xsl:when test="contains(@name, 'FCM') and contains(@mode, 'Flip')">
-                            Substitution $FCMMode +1<xsl:text>
+                        <xsl:when test="contains(@name, 'FCM') and ( contains(@mode, 'Flip') or contains(@mode, 'flip') )">
+                            Substitution $FCMMode -1<xsl:text>
                                         
                         </xsl:text>
                             <xsl:for-each select="coil">
