@@ -860,6 +860,8 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
   xLdc = this->GetLdcId();
   xTimeStamp = this->GetTimeStamp();
   xPhysEvNum = this->GetPhysEventNumber();
+  int xGeo = xVLSBFragment->GetBoardID();
+
   // Get the number of data words.
   uint32_t nDataWords = xVLSBFragment->GetPayLoadWordCount();
 
@@ -868,27 +870,33 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
   uint32_t xWordCount(0);
   while (xWordCount < nDataWords) {
     xPartEv = xVLSBFragment->GetEventNum(xWordCount)-1;
-    int xGeo = xVLSBFragment->GetBoardID();
 //     std::cout << *xVLSBFragment->Get32bWordPtr(xWordCount) << std::endl;
 //     std::cout << xWordCount << " PartEv:" << xPartEv << "  LDC: " << xLdc
 //               << " Geo: " << xGeo << endl;
     if ( xPartEv == _current_pEvent+1 ||
          (xPartEv == 0 && xPartEv != _current_pEvent) ) {
       _current_pEvent = xPartEv;
-      if (xGeo == 0) {
-//         cout << "Resizeing " << _current_pEvent+1 << endl;
+      if ( _is_first ) {
         _n_pEvent = xPartEv+1;
         _tracker1_spill.resize(xPartEv+1);
         _tracker0_spill.resize(xPartEv+1);
-//         _single_st_spill.resize(xPartEv+1);
       }
     } else if (xPartEv != _current_pEvent) {
-        stringstream ss;
-        ss << "ERORR in VLSBCppDataProcessor::Process : "<< endl;
-        ss << "in LDC " << xLdc << "  Bank " << xGeo;
-        ss << "  Inconsistent Particle event number (" << xPartEv << ") ";
-        throw MDexception(ss.str());
+      stringstream ss;
+      ss << "ERORR in VLSBCppDataProcessor::Process : "<< endl;
+      ss << "in LDC " << xLdc << "  Bank " << xGeo;
+      ss << "  Inconsistent Particle event number (" << xPartEv << ") ";
+      throw MDexception(ss.str());
 //         cout << ss.str() << endl;
+    }
+
+    if (_n_pEvent <= xPartEv) {
+      stringstream ss;
+      ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
+      ss << "in LDC " << xLdc << "  Bank " << xGeo;
+      ss << "  Particle event number exceeds the limit (";
+      ss << xPartEv << ">" << _n_pEvent-1 << ")";
+      throw MDexception(ss.str());
     }
 
     xAdc = xVLSBFragment->GetAdc(xWordCount);
@@ -908,33 +916,17 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
       if (xLdc == 3 || xLdc == 0) {
         xDetector = "tracker0";
         xVLSBhit.SetDetector(xDetector);
-        if (_n_pEvent <= xPartEv) {
-          stringstream ss;
-          ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
-          ss << "in LDC " << xLdc << "  Bank " << xGeo;
-          ss << "  Particle event number exceeds the limit ("
-             << xPartEv << ">" << _n_pEvent << ")";
-          throw MDexception(ss.str());
-        } else {
-          _tracker0_spill[xPartEv].push_back(xVLSBhit);
-	}
+        _tracker0_spill[xPartEv].push_back(xVLSBhit);
       } else if (xLdc == 4) {
         xDetector = "tracker1";
         xVLSBhit.SetDetector(xDetector);
-        if (_n_pEvent <= xPartEv) {
-          stringstream ss;
-          ss << "ERROR in VLSBCppDataProcessor::Process : " << endl;
-          ss << "in LDC " << xLdc << "  Bank " << xGeo;
-          ss << "  Particle event number exceeds the limit ("
-             << xPartEv << ">" << _n_pEvent << ")";
-          throw MDexception(ss.str());
-        } else {
         _tracker1_spill[xPartEv].push_back(xVLSBhit);
-        }
       }
     }
     xWordCount++;
   }
+
+  _is_first = false;
 
   return OK;
 }
@@ -966,6 +958,7 @@ void VLSBCppDataProcessor::fill_daq_data() {
 void VLSBCppDataProcessor::reset() {
   _current_pEvent = -1;
   _n_pEvent = 0;
+  _is_first = true;
   _tracker1_spill.clear();
   _tracker0_spill.clear();
 //   _single_st_spill.clear();

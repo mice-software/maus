@@ -64,7 +64,7 @@ void RealDataDigitization::process(Spill *spill) {
     digits.insert(digits.end(), new_digits.begin(), new_digits.end());
   }
   for (size_t i = 0; i < tracker1.size(); ++i) {
-    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
+    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
     digits.insert(digits.end(), new_digits.begin(), new_digits.end());
   }
 
