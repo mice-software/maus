@@ -88,11 +88,7 @@ class Data : public MAUSEvent<Spill> {
      */
     void SetEvent(Spill* spill) {SetSpill(spill);}
 
-    std::string getRecordName() const {return name_;}
-
-  protected:
-
-    std::string name_;
+    std::string getRecordName() const {return std::string("data");}
 
   private:
     // Count number of references to data and make a stack trace at construction
