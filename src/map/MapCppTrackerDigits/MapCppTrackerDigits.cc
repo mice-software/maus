@@ -30,9 +30,11 @@ PyMODINIT_FUNC init_MapCppTrackerDigits(void) {
 }
 
 MapCppTrackerDigits::MapCppTrackerDigits()
-    : MapBase<Data>("MapCppTrackerDigits"), real(0) {}
+    : MapBase<Data>("MapCppTrackerDigits"), real(0) {
+}
 
 MapCppTrackerDigits::~MapCppTrackerDigits() {
+  if (real) delete real;
 }
 
 void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
@@ -40,9 +42,7 @@ void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
   real->initialise();
 }
 
-void MapCppTrackerDigits::_death() {
-  if (real) delete real;
-}
+void MapCppTrackerDigits::_death() {}
 
 void MapCppTrackerDigits::_process(Data* data) const {
 //   RealDataDigitization real;
