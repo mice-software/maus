@@ -82,14 +82,14 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   if (!loaded)
     throw(Exception(Exception::recoverable,
           "Could not find EMR calibration map",
-          "MapCppEMRMCDigitizer::birth"));
+          "MapCppEMRRecon::birth"));
 
   // Load the EMR attenuation map
   loaded = _attenMap.InitializeFromCards(configJSON);
   if (!loaded)
     throw(Exception(Exception::recoverable,
           "Could not find EMR attenuation map",
-          "MapCppEMRMCDigitizer::birth"));
+          "MapCppEMRRecon::birth"));
 }
 
 void MapCppEMRRecon::_death() {
@@ -873,6 +873,10 @@ void MapCppEMRRecon::fill(Spill *spill,
 
   // Only save the primary triggers with their primary and seconday arrays (n - 2)
   ReconEventPArray *recEvts =  spill->GetReconEvents();
+
+  int nRecEvts = recEvts->size();
+  for (int i = nRecEvts; i > nPartEvents; i--)
+    delete (*recEvts)[i-1];
   recEvts->resize(nPartEvents);
 
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
