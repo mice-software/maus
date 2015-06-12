@@ -72,5 +72,14 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("phi", &_double_array_proc,
                         &SciFiHelicalPRTrack::get_phi,
                         &SciFiHelicalPRTrack::set_phi, false);
+    RegisterValueBranch<ThreeVector>("reference_position",
+                        &_threevector_proc,
+                        &SciFiHelicalPRTrack::get_reference_position,
+                        &SciFiHelicalPRTrack::set_reference_position, true);
+    RegisterValueBranch<ThreeVector>("reference_momentum",
+                        &_threevector_proc,
+                        &SciFiHelicalPRTrack::get_reference_momentum,
+                        &SciFiHelicalPRTrack::set_reference_momentum, true);
+
 }
 } // ~namespace MAUS

@@ -145,6 +145,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
 
       a_hit->GetChannelId()->SetID(lookup.get_digit_id(a_digit));
 
+      std::cerr << "DIGIT CREATED : " << tracker << " - " << station << " - " << plane << " : " << a_hit->GetPosition().x() << ", " << a_hit->GetPosition().y() << ", " << a_hit->GetPosition().z() << ", " << a_hit->GetMomentum().x() << ", " << a_hit->GetMomentum().y() << ", " << a_hit->GetMomentum().z() << " - "  << chanNo << "\n";
       // Loop over all the other hits.
       for ( unsigned int hit_j = hit_i+1; hit_j < hits->size(); hit_j++ ) {
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {

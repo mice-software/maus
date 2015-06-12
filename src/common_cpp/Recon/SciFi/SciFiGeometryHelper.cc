@@ -24,8 +24,6 @@ SciFiGeometryHelper::SciFiGeometryHelper() {}
 SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& modules)
                                         : _modules(modules) {
   Json::Value *json = Globals::GetConfigurationCards();
-  w_mylar                        = (*json)["MylarParams_Plane_Width"].asDouble();
-  w_fibre                        = (*json)["FibreParams_Plane_Width"].asDouble();
 
   // Set Fibre Parameters.
   FibreParameters.Z                     = (*json)["SciFiParams_Z"].asDouble();
@@ -111,7 +109,6 @@ void SciFiGeometryHelper::Build() {
       trackerGeo.Rotation = trackerModule->globalRotation();
       trackerGeo.Field = FieldValue(trackerModule);
       trackerGeo.Planes[plane_id] = this_plane;
-//      std::cerr << "Tracker = " << tracker_n << ". Field = " << _field_value[tracker_n] << '\n';
 
       _geometry_map[tracker_n] = trackerGeo;
     }
@@ -194,15 +191,6 @@ const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int p
 double SciFiGeometryHelper::GetPlanePosition(int tracker, int station, int plane) const {
   int id = ( ((station-1)*3) + plane + 1 );
   return _geometry_map.find(tracker)->second.Planes.find(id)->second.Position.z();
-
-//  int id = ( ((station-1)*3) + plane + 1 ) * ( tracker == 0 ? -1.0 : 1.0 );
-//  SciFiGeometryMap::const_iterator it = _geometry_map.find( id );
-//
-//  if (it == _geometry_map.end()) {
-//    std::cerr << "COULD NOT FIND PLANE! ID = " << id << "\n";
-//    return 0.0;
-//  }
-//  else return it->second.Position.z();
 }
 
 ThreeVector SciFiGeometryHelper::FindReferenceFramePosition(int tracker) const {
@@ -216,24 +204,11 @@ ThreeVector SciFiGeometryHelper::FindReferenceFramePosition(int tracker) const {
   return reference_pos;
 }
 
-
-//void SciFiGeometryHelper::DumpPlanesInfo() {
-//  std::map<int, SciFiPlaneGeometry>::iterator plane;
-//  for ( plane = _geometry_map.begin(); plane != _geometry_map.end(); ++plane ) {
-//    Squeak::mout(Squeak::info) << "Plane ID: " << plane->first << "\n"
-//                               << "Direction: "<< plane->second.Direction << "\n"
-//                               << "Position: " << plane->second.Position << "\n"
-//                               << "CentralFibre: "<< plane->second.CentralFibre << "\n"
-//                               << "Pitch: "       << plane->second.Pitch << "\n";
-//  }
-//}
-
 double SciFiGeometryHelper::HighlandFormula(double L, double beta, double p) {
   static double HighlandConstant = Recon::Constants::HighlandConstant;
   // Note that the z factor (charge of the incoming particle) is omitted.
   // We don't need to consider |z| > 1.
   double result = HighlandConstant*TMath::Sqrt(L)*(1.+0.038*TMath::Log(L))/(beta*p);
-  // std::cerr << "Highland: " << result << std::endl;
   return result;
 }
 
@@ -262,28 +237,32 @@ double SciFiGeometryHelper::BetheBlochStoppingPower(double p, const SciFiMateria
                 (electron_mass*electron_mass/(muon_mass*muon_mass)));
   double log_term = TMath::Log(2.*electron_mass*beta2*gamma2*Tmax/(I2));
   double dEdx = outer_term*(0.5*log_term-beta2-density_correction/2.);
-  // std::cerr << material << " " << p << " " << dEdx << std::endl;
-  return beta*dEdx*density;
+  return density*dEdx;
 }
 
 
 void SciFiGeometryHelper::FillMaterialsList(int start_id, int end_id, SciFiMaterialsList& materials_list) {
+  int increment;
+  start_id = abs(start_id);
+  end_id = abs(end_id);
+  if (start_id < end_id) increment = 1;
+  else                   increment = -1;
 
-  for (int current_id = abs(start_id); current_id < abs(end_id); ++current_id) {
-    materials_list.push_back(std::make_pair(&FibreParameters, w_fibre));
-    materials_list.push_back(std::make_pair(&MylarParameters, w_mylar));
+  for (int current_id = start_id; current_id != end_id; current_id += increment) {
+    materials_list.push_back(std::make_pair(&MylarParameters, MylarParameters.Plane_Width));
+    materials_list.push_back(std::make_pair(&FibreParameters, FibreParameters.Plane_Width));
 
     switch( current_id ) {
-      case 3:
+      case 4:
         materials_list.push_back(std::make_pair(&GasParameters, 200.0));
         break;
-      case 6:
+      case 7:
         materials_list.push_back(std::make_pair(&GasParameters, 250.0));
         break;
-      case 9:
+      case 10:
         materials_list.push_back(std::make_pair(&GasParameters, 300.0));
         break;
-      case 12:
+      case 13:
         materials_list.push_back(std::make_pair(&GasParameters, 350.0));
         break;
       default:

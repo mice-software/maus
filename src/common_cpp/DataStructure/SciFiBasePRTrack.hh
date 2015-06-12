@@ -39,8 +39,20 @@ class SciFiBasePRTrack {
     /** Default constructor */
     SciFiBasePRTrack();
 
+    /** Construct some variables */
+    SciFiBasePRTrack(DoubleArray cov);
+
+    /** Construct some variables */
+    SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoints);
+
+    /** Copy constructor */
+    SciFiBasePRTrack(const SciFiBasePRTrack& track);
+
     /** Default destructor */
     virtual ~SciFiBasePRTrack();
+
+    /** Assignment operator */
+    SciFiBasePRTrack& operator=(const SciFiBasePRTrack& track);
 
     /** Get the covariance matrix elements of the least square fit parameters */
     std::vector<double> get_covariance() const { return _covariance; }
@@ -64,7 +76,21 @@ class SciFiBasePRTrack {
      *  used by the track from a vector  of spacepoint pointers */
     void set_spacepoints_pointers(const SciFiSpacePointPArray &spoints);
 
-  protected:
+
+    /** Set the reconstructed reference frame position */
+    void set_reference_position(ThreeVector pos) { _position = pos; }
+
+    /** Get the reconstructed reference frame position */
+    ThreeVector get_reference_position() const { return _position; }
+
+    /** Set the reconstructed reference frame momentum */
+    void set_reference_momentum(ThreeVector mom) { _momentum = mom; }
+
+    /** Get the reconstructed reference frame momentum */
+    ThreeVector get_reference_momentum() const { return _momentum; }
+
+
+  private:
     TRefArray* _spoints;
 
     /**
@@ -76,6 +102,8 @@ class SciFiBasePRTrack {
      *  c_x-c_x, c_x-m_x, m_x-c_x, m_x-m_x, c_y-c_y, c_y-m_y, m_y-c_y, m_y-m_y.
      */
     DoubleArray _covariance; // The covariance matrix derived from the fit
+    ThreeVector _position; // Reconstructed reference plane position
+    ThreeVector _momentum; // Reconstructed reference plane momentum
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };

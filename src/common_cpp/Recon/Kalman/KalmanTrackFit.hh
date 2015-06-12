@@ -34,9 +34,12 @@ namespace Kalman {
 
   std::string print_track( const Track& track, const char* name = 0 );
 
-//  TMatrixD ComputeKalmanGainMatrix(Measurement_base* measurement, State state);
-//
-//  TMatrixD ComputeSmootherGainMatrix(Propagator_base* prop, State pred, State filt);
+  /** @brief Calculates the residual between two states */
+  State CalculateResidual(const State& st1, const State& st2);
+
+  /** @brief Fast was to calculate the chis-sq update */
+  double CalculteChiSquaredUpdate(const State st);
+
 
   /** @class TrackFit
    *
@@ -45,13 +48,6 @@ namespace Kalman {
    */
   class TrackFit {
   public:
-
-    /** @enum Status
-     *
-     *  @brief Used to save the current state of the track fitter
-     *
-     */
-    enum Status { Error, Initialised, Predicted, Filtered, Smoothed };
 
     /** @brief Intialise with the required measurement and propagator classes.
      */
@@ -85,10 +81,6 @@ namespace Kalman {
      */
     void SetSeed(State state);
 
-    /** @brief Check the status of the current track
-     */
-    Status GetStatus() const { return _fitter_status; }
-
     /** @brief Set the data track - used to provide the measurments
      */
     void SetData(Track data_track);
@@ -96,19 +88,41 @@ namespace Kalman {
     /** @brief Returns a copy of the current data track
      */
     Track GetData() const { return _data; }
+    const Track& Data() const { return _data; }
     
     /** @brief Return a copy of the predicted track
      */
     Track GetPredicted() const { return _predicted; }
+    const Track& Predicted() const { return _predicted; }
 
     /** @brief Return a copy of the filtered track
      */
     Track GetFiltered() const { return _filtered; }
+    const Track& Filtered() const { return _filtered; }
 
     /** @brief Return a copy of the smoothed track
      */
     Track GetSmoothed() const { return _smoothed; }
+    const Track& Smoothed() const { return _smoothed; }
 
+
+    /** @brief Claculate the Chi-Squared value for the track
+     */
+    double CalculateChiSquared(const Track&) const;
+
+    /** @brief Return the Number of Degrees of Freedom
+     */
+    int GetNDF() const;
+
+    /** @brief Helper function to calculate predicted residual/pull */
+    State CalculatePull(unsigned int i) const { return this->CalculatePredictedResidual(i); }
+    State CalculatePredictedResidual(unsigned int i) const;
+
+    /** @brief Helper function to calculate filtered residual */
+    State CalculateFilteredResidual(unsigned int i) const;
+
+    /** @brief Helper function to calculate smoothed residual */
+    State CalculateSmoothedResidual(unsigned int i) const;
 
     /** @brief Return the dimension of the measurement state vector
      */
@@ -120,14 +134,14 @@ namespace Kalman {
 
   protected:
 
-//    State Filter(State filtered, State predicted);
+    void _propagate(State& first, State& second) const;
+    void _filter(const State& data, State& predicted, State& filtered) const;
+    void _smooth(State& first, State& second) const;
 
   private:
     // Private copy constructor => No copying!
     TrackFit(const TrackFit& tf); 
     TrackFit& operator=(const TrackFit& tf) { return *this; }
-
-    Status _fitter_status;
 
     unsigned int _dimension;
     unsigned int _measurement_dimension;

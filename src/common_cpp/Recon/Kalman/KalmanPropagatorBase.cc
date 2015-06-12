@@ -12,7 +12,7 @@ namespace Kalman {
 
   void Propagator_base::Propagate(const State& start_state, State& end_state) {
     _propagator_matrix = this->CalculatePropagator(start_state, end_state);
-    TMatrixD propT(GetDimension(), GetDimension()); propT.Transpose(_propagator_matrix);
+    TMatrixD propT(TMatrixD::kTransposed, _propagator_matrix);
     _noise_matrix = this->CalculateProcessNoise(start_state, end_state);
 
     TMatrixD new_vec(GetDimension(), 1);

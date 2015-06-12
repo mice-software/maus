@@ -1,7 +1,6 @@
 
 #include "src/common_cpp/Recon/Kalman/MAUSSciFiPropagators.hh"
 
-
 namespace MAUS {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +21,6 @@ namespace MAUS {
 
 
   TMatrixD StraightPropagator::CalculatePropagator(const Kalman::State& start, const Kalman::State& end) {
-    std::cerr << "Calculating Straight Propagator\n";
     static TMatrixD prop(4, 4);
 
     // Find dz between sites.
@@ -40,18 +38,40 @@ namespace MAUS {
 
 
   TMatrixD StraightPropagator::CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end) {
-    std::cerr << "Calculating Straight Process Noise\n";
     static TMatrixD new_noise(GetDimension(), GetDimension());
     new_noise.Zero();
 
     if ( _include_mcs ) {
-      return new_noise;
-
       // TODO : Should probably finish this one...
+      Kalman::State temp_start(start);
+      Kalman::State temp_end(start);
 
+      SciFiMaterialsList materials;
+      _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
+      int n_steps = materials.size();
+
+      for ( int i = 0; i < n_steps; i++ ) {
+
+        double width = materials.at(i).second;
+
+        temp_end.SetPosition(temp_end.GetPosition() + width);
+
+        TMatrixD F = CalculatePropagator(temp_start, temp_end);
+        temp_end.SetVector( F * temp_start.GetVector() );
+
+        double L = materials.at(i).first->L(width);
+        TMatrixD Q = BuildQ(temp_end, L, width);
+
+        TMatrixD F_transposed(GetDimension(), GetDimension());
+        F_transposed.Transpose(F);
+
+        new_noise = F*new_noise*F_transposed + Q;
+        temp_start = temp_end;
+      }
     } else {
-      return new_noise;
+      // Pass
     }
+    return new_noise;
   }
 
 
@@ -119,7 +139,8 @@ namespace MAUS {
     _Bz(0.0),
     _geometry_helper(helper),
     _subtract_eloss(true),
-    _include_mcs(true) {
+    _include_mcs(true),
+    _correct_Pz(true) {
   }
 
 
@@ -131,7 +152,7 @@ namespace MAUS {
     double old_y        = old_vec(2, 0);
     double old_py       = old_vec(3, 0);
     double old_kappa    = old_vec(4, 0);
-    double old_pz       = fabs( 1.0 / old_kappa );
+    double old_pz       = fabs(1.0 / old_kappa);
     double charge       = old_kappa*old_pz;
     double old_momentum = sqrt(old_px*old_px + old_py*old_py + old_pz*old_pz);
 
@@ -143,8 +164,6 @@ namespace MAUS {
     double delta_theta = - c*_Bz*delta_z*old_kappa;
     double sine    = sin(delta_theta);
     double cosine  = cos(delta_theta);
-
-    std::cerr << "PROP : " << "Q = " << charge << " - pz = " << old_pz << " - u = " << u << " - dZ = " << delta_z << " - Bz = " << _Bz  << "\n";
 
     if ( start.GetId() < 0 ) u = - u;
 
@@ -166,16 +185,18 @@ namespace MAUS {
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
 
       // Reduce/increase momentum vector accordingly.
-      double e_loss_sign = 1.;
+      double e_loss_sign = 1.0;
       if ( end.GetId() > 0 ) {
-        e_loss_sign = -1.;
+        e_loss_sign = -1.0;
       }
 
-      double delta_p = 0;
-      int n_steps = materials.size();
+      double delta_p = 0.0;
       double momentum = old_momentum;
+      int n_steps = materials.size();
       for ( int i = 0; i < n_steps; i++ ) {  // In mm => times by 0.1;
-        delta_p  += _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first)*materials.at(i).second*0.1;
+//        delta_p = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first)*materials.at(i).second*0.1;
+        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+        delta_p = SP*materials.at(i).second*0.1;
         momentum += e_loss_sign*delta_p;
       }
 
@@ -218,7 +239,7 @@ namespace MAUS {
     double c      = CLHEP::c_light;
     double u      = - charge*c*_Bz;
     double delta_z = end.GetPosition() - start.GetPosition();
-    double delta_theta = _Bz*c*delta_z*old_kappa;
+    double delta_theta = - _Bz*c*delta_z*old_kappa;
     double sine   = sin(delta_theta);
     double cosine = cos(delta_theta);
 
@@ -230,31 +251,47 @@ namespace MAUS {
     new_prop(0, 1) = sine/u;
     new_prop(0, 2) = 0.;
     new_prop(0, 3) = (cosine-1.)/u;
-    new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
 
     new_prop(1, 0) = 0.;
     new_prop(1, 1) = cosine;
     new_prop(1, 2) = 0.;
     new_prop(1, 3) = -sine;
-    new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine);
 
     new_prop(2, 0) = 0.;
     new_prop(2, 1) = (1.-cosine)/u;
     new_prop(2, 2) = 1.;
     new_prop(2, 3) = sine/u;
-    new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
 
     new_prop(3, 0) = 0.;
     new_prop(3, 1) = sine;
     new_prop(3, 2) = 0.;
     new_prop(3, 3) = cosine;
-    new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine);
 
     new_prop(4, 0) = 0.;
     new_prop(4, 1) = 0.;
     new_prop(4, 2) = 0.;
     new_prop(4, 3) = 0.;
     new_prop(4, 4) = 1.;
+
+    if (_correct_Pz) { 
+      if ( start.GetId() < 0 ) {
+        new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
+        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine);
+        new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
+        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine);
+      } else {
+        new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
+        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine);
+        new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
+        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine);
+      }
+    } else {
+      new_prop(0, 4) = 0.0;
+      new_prop(1, 4) = 0.0;
+      new_prop(2, 4) = 0.0;
+      new_prop(3, 4) = 0.0;
+    }
+//    new_prop.Print();
 
     return new_prop;
   }
@@ -266,22 +303,21 @@ namespace MAUS {
 
     if ( _include_mcs ) {
       // TODO : Correct this for new system
-
       Kalman::State temp_start(start);
       Kalman::State temp_end(start);
 
       SciFiMaterialsList materials;
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
       int n_steps = materials.size();
+
       for ( int i = 0; i < n_steps; i++ ) {
 
         double width = materials.at(i).second;
 
         temp_end.SetPosition(temp_end.GetPosition() + width);
 
-        Propagate(temp_start, temp_end);
-
-        TMatrixD F = GetPropagator();
+        TMatrixD F = CalculatePropagator(temp_start, temp_end);
+        temp_end.SetVector( F * temp_start.GetVector() );
 
         double L = materials.at(i).first->L(width);
         TMatrixD Q = BuildQ(temp_end, L, width);
@@ -292,11 +328,10 @@ namespace MAUS {
         new_noise = F*new_noise*F_transposed + Q;
         temp_start = temp_end;
       }
-      return new_noise;
-
     } else {
-      return new_noise;
+      // Pass...
     }
+    return new_noise;
   }
 
 

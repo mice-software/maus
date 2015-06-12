@@ -24,7 +24,8 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _P_value(-1),
                           _charge(0),
                           _trackpoints(0),
-                          _seed_state_vector(0),
+                          _seed_position(),
+                          _seed_momentum(),
                           _seed_covariance_matrix(0) {
 }
 
@@ -34,7 +35,8 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _P_value(-1),
                                                    _charge(0),
                                                    _trackpoints(0),
-                                                   _seed_state_vector(0),
+                                                   _seed_position(),
+                                                   _seed_momentum(),
                                                    _seed_covariance_matrix(0) {
   _tracker   = a_track.tracker();
   _chi2    = a_track.chi2();
@@ -42,14 +44,22 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
   _P_value   = a_track.P_value();
   _charge    = a_track.charge();
   _algorithm_used = a_track._algorithm_used;
+  _seed_position = a_track._seed_position;
+  _seed_momentum = a_track._seed_momentum;
 
   _trackpoints.resize(a_track._trackpoints.size());
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
 
-  _seed_state_vector = a_track._seed_state_vector;
-  _seed_covariance_matrix = a_track._seed_covariance_matrix;
+//  _seed_state_vector.resize(a_track._seed_state_vector.size());
+//  for (size_t i = 0; i < a_track._seed_state_vector.size(); ++i) {
+//    _seed_state_vector[i] = a_track._seed_state_vector[i];
+//  }
+  _seed_covariance_matrix.resize(a_track._seed_covariance_matrix.size());
+  for (size_t i = 0; i < a_track._seed_covariance_matrix.size(); ++i) {
+    _seed_covariance_matrix[i] = a_track._seed_covariance_matrix[i];
+  }
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
@@ -62,14 +72,22 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
   _P_value = a_track.P_value();
   _charge  = a_track.charge();
   _algorithm_used = a_track._algorithm_used;
+  _seed_position = a_track._seed_position;
+  _seed_momentum = a_track._seed_momentum;
 
   _trackpoints.resize(a_track._trackpoints.size());
   for (size_t i = 0; i < a_track._trackpoints.size(); ++i) {
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
 
-  _seed_state_vector = a_track._seed_state_vector;
-  _seed_covariance_matrix = a_track._seed_covariance_matrix;
+//  _seed_state_vector.resize(a_track._seed_state_vector.size());
+//  for (size_t i = 0; i < a_track._seed_state_vector.size(); ++i) {
+//    _seed_state_vector[i] = a_track._seed_state_vector[i];
+//  }
+  _seed_covariance_matrix.resize(a_track._seed_covariance_matrix.size());
+  for (size_t i = 0; i < a_track._seed_covariance_matrix.size(); ++i) {
+    _seed_covariance_matrix[i] = a_track._seed_covariance_matrix[i];
+  }
 
   return *this;
 }
@@ -95,6 +113,20 @@ SciFiTrack::~SciFiTrack() {
   for (track_point = _trackpoints.begin();
        track_point!= _trackpoints.end(); ++track_point) {
     delete (*track_point);
+  }
+}
+
+//void SciFiTrack::SetSeedState(double* state, unsigned int size) {
+//  _seed_state_vector.resize(size);
+//  for ( unsigned int i = 0; i < size; ++i ) {
+//    _seed_state_vector[i] = state[i];
+//  }
+//}
+
+void SciFiTrack::SetSeedCovariance(double* covariance, unsigned int size) {
+  _seed_covariance_matrix.resize(size);
+  for ( unsigned int i = 0; i < size; ++i ) {
+    _seed_covariance_matrix[i] = covariance[i];
   }
 }
 

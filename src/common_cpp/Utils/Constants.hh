@@ -32,8 +32,7 @@ typedef struct BetheBloch {
 /// Bethe Bloch constant in MeV g-1 cm2 (for A=1gmol-1)
 const double BetheBlochConstant = 0.307075;
 /// For multiple scattering calculations. Unit: MeV
-//const double HighlandConstant = 13.6;
-const double HighlandConstant = 17.5;
+const double HighlandConstant = 13.6;
 /// Muon mass in MeV/c2
 const double MuonMass = 105.6583715;
 /// Electron mass in MeV/c2

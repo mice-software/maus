@@ -25,22 +25,22 @@ namespace Kalman {
   Measurement_base::Measurement_base(unsigned int dim, unsigned int meas_dim) :
     _dimension(dim),
     _measurement_dimension(meas_dim),
-    _measurement_matrix(meas_dim, dim),
-    _measurement_matrix_transpose(dim, meas_dim),
-    _measurement_noise(meas_dim, meas_dim) {
+    _base_measurement_matrix(meas_dim, dim),
+    _base_measurement_matrix_transpose(dim, meas_dim),
+    _base_measurement_noise(meas_dim, meas_dim) {
   }
 
   State Measurement_base::Measure(const State& state) {
-    _measurement_matrix = this->CalculateMeasurementMatrix(state);
-    _measurement_noise = this->CalculateMeasurementNoise(state);
+    _base_measurement_matrix = this->CalculateMeasurementMatrix(state);
+    _base_measurement_noise = this->CalculateMeasurementNoise(state);
 
-    _measurement_matrix_transpose.Transpose(_measurement_matrix);
+    _base_measurement_matrix_transpose.Transpose(_base_measurement_matrix);
 
     TMatrixD new_vec(_measurement_dimension, 1);
     TMatrixD new_cov(_measurement_dimension, _measurement_dimension);
 
-    new_vec = _measurement_matrix * state.GetVector();
-    new_cov = _measurement_matrix * state.GetCovariance() * _measurement_matrix_transpose + _measurement_noise;
+    new_vec = _base_measurement_matrix * state.GetVector();
+    new_cov = _base_measurement_matrix * state.GetCovariance() * _base_measurement_matrix_transpose + _base_measurement_noise;
 
     State measured_state(new_vec, new_cov, state.GetPosition());
     measured_state.SetId(state.GetId());

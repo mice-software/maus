@@ -27,7 +27,8 @@
 namespace MAUS {
 namespace Kalman {
 
-  // Class Declarations
+  // Class and Function Declarations
+  class State;
   class Track;
   class TrackFit;
 
@@ -45,6 +46,9 @@ namespace Kalman {
     friend class Track;
     friend class TrackFit;
 
+    friend State CalculateResidual(const State& st1, const State& st2);
+    friend double CalculateChiSquaredUpdate(const State& st);
+
     public:
       /** @brief Initialise an empty state of the requred dimension and position
        */
@@ -53,6 +57,16 @@ namespace Kalman {
       /** @brief Initialise state with vector and covariance matrix
        */
       State(TMatrixD vector, TMatrixD covariance, double position = 0.0);
+
+      /** @brief Copy Constructor */
+      State(const State& st);
+
+      /** @brief Assignment Operator */
+      State& operator=(const State& st);
+
+      /** @brief Shallow Copy function. Maintains previous ID and Position
+       */
+      State& copy(State state);
 
       /** @brief Destructor
        */
@@ -92,6 +106,7 @@ namespace Kalman {
       /** @brief Set the covariance matrix
        */
       void SetCovariance(TMatrixD cov);
+
 
       /** @brief Returns true if there is a stored value.
        */

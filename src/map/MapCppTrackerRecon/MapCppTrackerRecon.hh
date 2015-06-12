@@ -23,7 +23,7 @@
 #ifndef _SRC_MAP_MAPCPPTrackerRecon_H_
 #define _SRC_MAP_MAPCPPTrackerRecon_H_
 
-#define KALMAN_TEST
+//#define KALMAN_TEST
 
 // C headers
 #include <assert.h>
@@ -104,6 +104,17 @@ class MapCppTrackerRecon : public MapBase<Data> {
    */
   void track_fit(MAUS::SciFiEvent &evt) const;
 
+  /** Deduce and fill the reference plane position and momentum for
+    * helical tracks
+    */
+  void extrapolate_helical_reference(SciFiEvent& event) const;
+
+  /** Deduce and fill the reference plane position and momentum for
+    * straight tracks
+    */
+  void extrapolate_straight_reference(SciFiEvent& event) const;
+
+
   void print_event_info(MAUS::SciFiEvent &event) const;
 
  private:
@@ -117,10 +128,14 @@ class MapCppTrackerRecon : public MapBase<Data> {
   bool _straight_pr_on;
   bool _helical_pr_on;
   bool _kalman_on;
+  bool _patrec_on;
 
   bool _use_mcs;
   bool _use_eloss;
   bool _use_patrec_seed;
+  bool _correct_pz;
+
+  double _seed_value;
 
   /// Reconstruction Classes
   SciFiClusterRec _cluster_recon;
@@ -133,9 +148,14 @@ class MapCppTrackerRecon : public MapBase<Data> {
 #ifdef KALMAN_TEST
   Kalman::TrackFit* _spacepoint_helical_track_fitter;
   Kalman::TrackFit* _spacepoint_straight_track_fitter;
+
+  int _spacepoint_recon_plane;
 #else
   Kalman::TrackFit* _helical_track_fitter;
   Kalman::TrackFit* _straight_track_fitter;
+
+  SciFiHelicalMeasurements* _helical_measurement;
+  SciFiStraightMeasurements* _straight_measurement;
 #endif
 
   ///  Map of the planes geometry.

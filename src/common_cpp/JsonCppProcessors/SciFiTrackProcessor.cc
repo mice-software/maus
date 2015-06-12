@@ -43,9 +43,12 @@ SciFiTrackProcessor::SciFiTrackProcessor()
     RegisterValueBranch("trackpoints", &_scifi_trackpoint_array_proc,
                         &SciFiTrack::scifitrackpoints,
                         &SciFiTrack::set_scifitrackpoints, true);
-    RegisterValueBranch("seed_state", &_vector_proc,
-                        &SciFiTrack::GetSeedState,
-                        &SciFiTrack::SetSeedState, true);
+    RegisterValueBranch("seed_position", &_threevector_proc,
+                        &SciFiTrack::GetSeedPosition,
+                        &SciFiTrack::SetSeedPosition, true);
+    RegisterValueBranch("seed_momentum", &_threevector_proc,
+                        &SciFiTrack::GetSeedMomentum,
+                        &SciFiTrack::SetSeedMomentum, true);
     RegisterValueBranch("seed_covariance", &_vector_proc,
                         &SciFiTrack::GetSeedCovariance,
                         &SciFiTrack::SetSeedCovariance, true);

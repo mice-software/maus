@@ -65,6 +65,8 @@ namespace MAUS {
 
       void SetIncludeMCS(bool inc) { _include_mcs = inc; }
 
+      void SetCorrectPz(bool cor) { _correct_Pz = cor; }
+
       virtual ~HelicalPropagator() {}
 
     protected :
@@ -74,6 +76,7 @@ namespace MAUS {
       SciFiGeometryHelper* _geometry_helper;
       bool _subtract_eloss;
       bool _include_mcs;
+      bool _correct_Pz;
   };
 }
 

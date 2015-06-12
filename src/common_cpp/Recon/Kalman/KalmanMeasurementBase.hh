@@ -68,19 +68,19 @@ namespace Kalman {
        */
       Measurement_base(unsigned int dimension, unsigned int measurement_dimension);
 
-      virtual TMatrixD& MeasurementMatrix() { return _measurement_matrix; }
-      virtual const TMatrixD& MeasurementMatrix() const { return _measurement_matrix; }
+      virtual TMatrixD& MeasurementMatrix() { return _base_measurement_matrix; }
+      virtual const TMatrixD& MeasurementMatrix() const { return _base_measurement_matrix; }
 
-      virtual TMatrixD& MeasurementNoise() { return _measurement_noise; }
-      virtual const TMatrixD& MeasurementNoise() const { return _measurement_noise; }
+      virtual TMatrixD& MeasurementNoise() { return _base_measurement_noise; }
+      virtual const TMatrixD& MeasurementNoise() const { return _base_measurement_noise; }
     private :
 
       unsigned int _dimension;
       unsigned int _measurement_dimension;
 
-      TMatrixD _measurement_matrix;
-      TMatrixD _measurement_matrix_transpose;
-      TMatrixD _measurement_noise;
+      TMatrixD _base_measurement_matrix;
+      TMatrixD _base_measurement_matrix_transpose;
+      TMatrixD _base_measurement_noise;
   };
 
 } // namespace Kalman

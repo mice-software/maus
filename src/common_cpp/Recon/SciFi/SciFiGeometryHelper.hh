@@ -48,9 +48,9 @@ typedef std::vector< std::pair<const SciFiMaterialParams*, double> > SciFiMateri
 /** @brief Structure for storing parameters relating to scifi materials
  */
 struct SciFiMaterialParams {
-  /// Polystyrene's atomic number.
+  /// Atomic number.
   double Z;
-  /// Width of the fibre plane in mm.
+  /// Width of the material
   double Plane_Width;
   /// Fibre radiation lenght in mm
   double Radiation_Length;
@@ -60,7 +60,7 @@ struct SciFiMaterialParams {
   double Density;
   /// Mean excitation energy in eV.
   double Mean_Excitation_Energy;
-  /// Atomic number in g.mol-1 per styrene monomer
+  /// Atomic number in g.mol-1
   double A;
   /// Channel width in mm
   double Pitch;
@@ -157,7 +157,7 @@ class SciFiGeometryHelper {
 
   ThreeVector FindReferenceFramePosition(int tracker) const;
 
-  double GetChannelWidth() const { return w_channel; }
+  double GetChannelWidth() const { return FibreParameters.Pitch; }
 
   const SciFiMaterialParams& GetFibreParameters() const { return FibreParameters; }
   const SciFiMaterialParams& GetGasParameters() const { return GasParameters; }
@@ -181,10 +181,6 @@ class SciFiGeometryHelper {
   SciFiMaterialParams GasParameters;
 
   SciFiMaterialParams MylarParameters;
-
-  double w_fibre;
-  double w_mylar;
-  double w_channel;
 
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS

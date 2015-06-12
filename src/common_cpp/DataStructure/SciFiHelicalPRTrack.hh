@@ -166,6 +166,7 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
+
   private:
     int _tracker;
     int _num_points;

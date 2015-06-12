@@ -85,10 +85,10 @@ class SciFiSpacePointRec {
                             SciFiCluster* candidate_B) const;
  private:
   /// This is the acceptable radius for any duplet.
-  static const int _acceptable_radius = 160; // mm
-  static const int _kuno_0_5   = 320;
-  static const int _kuno_else  = 318;
-  static const int _kuno_toler = 3;
+  static const double _acceptable_radius = 160; // mm
+  static const double _kuno_1_5   = 320.0;
+  static const double _kuno_else  = 318.5;
+  static const double _kuno_toler = 3.0;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

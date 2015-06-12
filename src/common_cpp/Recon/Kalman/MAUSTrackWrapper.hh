@@ -46,7 +46,7 @@ namespace MAUS {
 
   /** @brief Convert a KalmanTrack to a SciFiTrack for the data structure
    */
-  SciFiTrack* ConvertToSciFiTrack(Kalman::Track k_track, const SciFiGeometryHelper* geom);
+  SciFiTrack* ConvertToSciFiTrack(const Kalman::TrackFit* fitter, const SciFiGeometryHelper* geom);
 
   /** @brief Builds a data track using a PR track
    */
@@ -54,8 +54,7 @@ namespace MAUS {
 
   /** @brief Builds a data track using an array of spacepoints
    */
-  Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints, const SciFiGeometryHelper* geom);
-
+  Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints, const SciFiGeometryHelper* geom, int plane_num = 0, double smear = 0.2);
 
 
 
@@ -80,7 +79,6 @@ namespace MAUS {
       new_state.SetId(id);
       new_track.Append(new_state);
     }
-//    std::cerr << "New Empty Track Intialised\nFilling...\n" << std::endl;
 
     size_t numb_spacepoints = spacepoints.size();
     for ( size_t i = 0; i < numb_spacepoints; ++i ) {
@@ -89,10 +87,7 @@ namespace MAUS {
       for ( size_t j = 0; j < numbclusters; ++j ) {
         SciFiCluster* cluster = static_cast<SciFiCluster*>(spacepoint->get_channels()->At(j));
         
-        int id = (cluster->get_station() - 1)*3 + cluster->get_plane() + 1;
-
-        //std::cerr << id << ", " << new_track[id].GetPosition() << ", " << cluster->get_alpha() << ", " << i << ", " << j << std::endl;
-//        SciFiPlaneGeometry = geom->GeometryMap()[id];
+        int id = (cluster->get_station() - 1)*3 + cluster->get_plane(); // Actually (id - 1)
 
         // TODO : 
         // - APPLY GEOMETRY CORRECTIONS!
@@ -101,15 +96,18 @@ namespace MAUS {
         TMatrixD covariance(1, 1);
 
         state_vector(0, 0) = cluster->get_alpha();
-        covariance(0, 0) = 0.427*0.427 / 12.0;
+//        covariance(0, 0) = 0.427*0.427 / 12.0;
+//        covariance(0, 0) = 1.4925*1.4945 / 12.0;
+        covariance(0, 0) = 0.0;
 
         new_track[id].SetVector(state_vector);
         new_track[id].SetCovariance(covariance);
       }
     }
-//    std::cerr << std::endl;
     return new_track;
   }
+
+  Kalman::Track BuildTrack(SciFiClusterPArray pr_track, const SciFiGeometryHelper* geom);
 } // namespace MAUS
 
 #endif // MAUS_TRACK_WRAPPER_HH

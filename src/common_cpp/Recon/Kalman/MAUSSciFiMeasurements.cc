@@ -24,7 +24,8 @@ namespace MAUS {
     _geometry_helper(geo),
     _measurement_noise(1, 1),
     _matrix_map() {
-    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth()*_geometry_helper->GetChannelWidth()/12.0;
+//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() * _geometry_helper->GetChannelWidth() / 12.0;
+    _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
 
     SciFiTrackerMap geo_map = _geometry_helper->GeometryMap();
 
@@ -32,7 +33,7 @@ namespace MAUS {
       int tracker_const = ( track_it->first == 0 ? -1 : 1 );
 
       for (SciFiPlaneMap::iterator plane_it = track_it->second.Planes.begin(); plane_it != track_it->second.Planes.end(); ++plane_it) {
-        TMatrix H(1, 5);
+        TMatrix H(1, 4);
         H.Zero();
 
         int id = plane_it->first * tracker_const;
@@ -70,7 +71,8 @@ namespace MAUS {
     _geometry_helper(geo),
     _measurement_noise(1, 1),
     _matrix_map() {
-    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth()/sqrt(12.0);
+//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() * _geometry_helper->GetChannelWidth() / 12.0;
+    _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
 
     SciFiTrackerMap geo_map = _geometry_helper->GeometryMap();
 

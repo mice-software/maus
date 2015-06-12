@@ -27,6 +27,47 @@ namespace MAUS {
   }
 
 
+
+  Kalman::Track BuildTrack(SciFiClusterPArray cluster_array, const SciFiGeometryHelper* geom) {
+    Kalman::Track new_track(1);
+    size_t numbclusters = cluster_array.size();
+
+    if ( numbclusters < 1 ) return new_track;
+    int tracker = cluster_array[0]->get_tracker();
+
+    const SciFiPlaneMap& geom_map = geom->GeometryMap().find(tracker)->second.Planes;
+    int tracker_const = ( tracker == 0 ? -1 : 1 );
+
+    for ( SciFiPlaneMap::const_iterator iter = geom_map.begin(); iter != geom_map.end(); ++iter ) {
+      int id = iter->first * tracker_const;
+      Kalman::State new_state = Kalman::State(1, iter->second.Position.z());
+      new_state.SetId(id);
+      new_track.Append(new_state);
+    }
+
+    for ( size_t j = 0; j < numbclusters; ++j ) {
+      SciFiCluster* cluster = cluster_array[j];
+      
+      int id = (cluster->get_station() - 1)*3 + cluster->get_plane(); // Actually (id - 1)
+
+      // TODO : 
+      // - APPLY GEOMETRY CORRECTIONS!
+      // - Fill covariance matrix correctly!
+      TMatrixD state_vector(1, 1);
+      TMatrixD covariance(1, 1);
+
+      state_vector(0, 0) = cluster->get_alpha();
+      covariance(0, 0) = 0.0;
+
+      new_track[id].SetVector(state_vector);
+      new_track[id].SetCovariance(covariance);
+    }
+    return new_track;
+  }
+
+
+
+
   Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom, bool correct_energy_loss, double seed_cov) {
     TMatrixD vector(5, 1);
     TMatrixD covariance(5, 5);
@@ -49,8 +90,6 @@ namespace MAUS {
     double phi_0 = s / r; // Phi at start plane
     double phi = phi_0 + TMath::PiOver2(); // Direction of momentum
 
-    std::cerr << "Helical Seed Init : " << particle_charge << ", " << Bz << ", " << h_track->get_line_sz_c() << ", " << dsdz << ", " << pt << ", " << length << "\n";
-
     // TODO: Actually propagate the track parrameters and covariance matrix back to start plane.
     //       This is an approximation.
     ThreeVector patrec_momentum(-pt*sin(phi_0), pt*cos(phi_0), - pt/dsdz);
@@ -61,7 +100,7 @@ namespace MAUS {
       if ( tracker == 0 ) {
         patrec_bias = (P + 1.4) / P;
       } else {
-        patrec_bias = (P - 1.4) / P;
+        patrec_bias = (P + 1.4) / P;
       }
       patrec_momentum = patrec_bias * patrec_momentum;
     }
@@ -135,16 +174,6 @@ namespace MAUS {
 
     Kalman::State seed_state(vector, covariance, seed_pos);
     seed_state.SetId(seed_id);
-
-//    std::cerr << "Seed Calculated:"
-//              << "\nPATREC pt = " << 1.2 * h_track->get_R()
-//              << "\nKALMAN pt = " << sqrt( px*px + py*py ) << "\n\n"
-//              << "ERRORS : ";
-//    for ( unsigned int i = 0; i < 5; ++i ) {
-//      std::cerr << covariance(i, i) << "   ";
-//    }
-
-//    std::cerr << "\n" << std::endl;
 
     return seed_state;
   }
@@ -220,24 +249,33 @@ namespace MAUS {
   }
 
 
-  SciFiTrack* ConvertToSciFiTrack(Kalman::Track k_track, const SciFiGeometryHelper* geom) {
-//    std::cerr << "Saving Kalman Track!\n";
+  SciFiTrack* ConvertToSciFiTrack( const Kalman::TrackFit* fitter, const SciFiGeometryHelper* geom) {
     SciFiTrack* new_track = new SciFiTrack();
+    const Kalman::Track& smoothed = fitter->Smoothed();
+//    const Kalman::Track& smoothed = fitter->Filtered();
+//    const Kalman::Track& filtered = fitter->Filtered();
+//    const Kalman::Track& predicted = fitter->Predicted();
+    const Kalman::Track& data = fitter->Data();
+    Kalman::State seed = fitter->GetSeed();
 
-    if (k_track.GetLength() < 1)
+    if (smoothed.GetLength() < 1)
       throw MAUS::Exception(MAUS::Exception::recoverable, 
                             "Not enough points in Kalman Track",
                             "ConvertToSciFiTrack()");
+
+    double chi_squared = fitter->CalculateChiSquared(smoothed);
+    int NDF = fitter->GetNDF();
+    double p_value = TMath::Prob(chi_squared, NDF);
     
     int tracker;
-    if ( k_track[0].GetId() > 0 ) {
+    if ( smoothed[0].GetId() > 0 ) {
       tracker = 1;
     } else {
       tracker = 0;
     }
     new_track->set_tracker(tracker);
 
-    int dimension = k_track.GetDimension();
+    int dimension = smoothed.GetDimension();
     if (dimension == 4) {
       new_track->SetAlgorithmUsed(SciFiTrack::kalman_straight);
     } else if (dimension == 5) {
@@ -252,46 +290,54 @@ namespace MAUS {
 
     ThreeVector reference_pos = geom->GetReferencePosition(tracker);
     HepRotation reference_rot = geom->GetReferenceRotation(tracker);
-    double charge = 1.0;
+    double charge = 0.0;
 
-    for ( unsigned int i = 0; i < k_track.GetLength(); ++i ) {
-      Kalman::State& current_state = k_track[i];
+    for ( unsigned int i = 0; i < smoothed.GetLength(); ++i ) {
+      const Kalman::State& smoothed_state = smoothed[i];
+//      const Kalman::State& filtered_state = filtered[i];
+//      const Kalman::State& predicted_state = predicted[i];
+      const Kalman::State& data_state = data[i];
+
       SciFiTrackPoint* new_point = new SciFiTrackPoint();
 
       new_point->set_tracker(tracker);
 
-      int id = abs(current_state.GetId());
+      int id = abs(smoothed_state.GetId());
       new_point->set_station(((id-1)/3)+1);
       new_point->set_plane((id-1)%3);
 
       ThreeVector pos;
       ThreeVector mom;
 
-      TMatrixD state_vector = current_state.GetVector();
+      TMatrixD state_vector = smoothed_state.GetVector();
+      int charge = 0;
 
       if ( dimension == 4 ) {
-        pos.setZ(current_state.GetPosition());
-//        mom.setZ(200.0); // MeV/c
+        pos.setZ(smoothed_state.GetPosition());
         pos.setX(state_vector(0, 0));
         mom.setX(state_vector(1, 0)*200.0);
         pos.setY(state_vector(2, 0));
         mom.setY(state_vector(3, 0)*200.0);
+
+        pos *= reference_rot;
+        pos += reference_pos;
+
+        mom *= reference_rot;
+        if (tracker == 0) mom *= -1.0;
+        mom.setZ(200.0); // MeV/c
       } else if ( dimension == 5 ) {
         pos.setX(state_vector(0, 0));
         mom.setX(state_vector(1, 0));
         pos.setY(state_vector(2, 0));
         mom.setY(state_vector(3, 0));
-        pos.setZ(current_state.GetPosition());
-//        mom.setZ(fabs(1.0/state_vector(4, 0)));
-      }
-      pos *= reference_rot;
-      pos += reference_pos;
+        pos.setZ(smoothed_state.GetPosition());
 
-      mom *= reference_rot;
+        pos *= reference_rot;
+        pos += reference_pos;
 
-      if ( dimension == 4 ) {
-        mom.setZ(200.0); // MeV/c
-      } else if ( dimension == 5 ) {
+        mom *= reference_rot;
+        if (state_vector(4, 0) < 0.0) charge = -1.0;
+        else charge = 1.0;
         mom.setZ(fabs(1.0/state_vector(4, 0)));
       }
 
@@ -310,11 +356,22 @@ namespace MAUS {
     //  _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
     //  _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
     //  _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);
-      new_point->set_pull(0.0);
-      new_point->set_residual(0.0);
-      new_point->set_smoothed_residual(0.0);
+    //  AND CHARGE!
+      if (data_state) {
+//        new_point->set_pull(sqrt(fitter->CalculatePredictedResidual(i).GetVector().E2Norm()));
+//        new_point->set_residual(sqrt(fitter->CalculateFilteredResidual(i).GetVector().E2Norm()));
+//        new_point->set_smoothed_residual(sqrt(fitter->CalculateSmoothedResidual(i).GetVector().E2Norm()));
+        new_point->set_pull(fitter->CalculatePredictedResidual(i).GetVector()(0, 0));
+        new_point->set_residual(fitter->CalculateFilteredResidual(i).GetVector()(0, 0));
+        new_point->set_smoothed_residual(fitter->CalculateSmoothedResidual(i).GetVector()(0, 0));
+      } else {
+        new_point->set_pull(0.0);
+        new_point->set_residual(0.0);
+        new_point->set_smoothed_residual(0.0);
+      }
 
-      TMatrixD C = current_state.GetCovariance();
+
+      TMatrixD C = smoothed_state.GetCovariance();
       int size = C.GetNrows();
       int num_elements = size*size;
 
@@ -337,10 +394,43 @@ namespace MAUS {
     }
 
     new_track->set_charge(charge);
+    new_track->set_chi2(chi_squared);
+    new_track->set_ndf(NDF);
+    new_track->set_P_value(p_value);
+
+    TMatrixD seed_vector = seed.GetVector();
+    ThreeVector seed_pos;
+    ThreeVector seed_mom;
+    if ( dimension == 4 ) {
+      seed_pos.setZ(seed.GetPosition());
+      seed_pos.setX(seed_vector(0, 0));
+      seed_mom.setX(seed_vector(1, 0)*200.0);
+      seed_pos.setY(seed_vector(2, 0));
+      seed_mom.setY(seed_vector(3, 0)*200.0);
+    } else if ( dimension == 5 ) {
+      seed_pos.setX(seed_vector(0, 0));
+      seed_mom.setX(seed_vector(1, 0));
+      seed_pos.setY(seed_vector(2, 0));
+      seed_mom.setY(seed_vector(3, 0));
+      seed_pos.setZ(seed.GetPosition());
+    }
+    seed_pos *= reference_rot;
+    seed_pos += reference_pos;
+
+    seed_mom *= reference_rot;
+
+    if ( dimension == 4 ) {
+      seed_mom.setZ(200.0);
+    } else if ( dimension == 5 ) {
+      seed_mom.setZ(fabs(1.0/seed_vector(4, 0)));
+    }
+
+    new_track->SetSeedPosition(seed_pos);
+    new_track->SetSeedMomentum(seed_mom);
+    new_track->SetSeedCovariance(seed.GetCovariance().GetMatrixArray(), dimension*dimension);
 
 // TODO:
 // - Set Cluster
-// - Calculate ChiSquared
 // - Calculate p-value
 // - Set Algorithm used
 // - Set Seed Info
@@ -350,26 +440,29 @@ namespace MAUS {
   }
 
 
-  Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints, const SciFiGeometryHelper* geom) {
+  Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints, const SciFiGeometryHelper* geom, int plane_num, double smear) {
+//    TRandom3 rand;
 
     Kalman::Track new_track(2);
     int tracker = (*spacepoints.begin())->get_tracker();
 
     for (unsigned int i = 0; i < 5; ++i) {
-      Kalman::State new_state(2, geom->GetPlanePosition(tracker, i+1, 1));
-      new_state.SetId((i*3 + 1)*(tracker == 0 ? -1 : 1 ));
+      Kalman::State new_state(2, geom->GetPlanePosition(tracker, i+1, plane_num));
+      new_state.SetId((1 + i*3 + plane_num)*(tracker == 0 ? -1 : 1 ));
       new_track.Append(new_state);
     }
 
     for (SciFiSpacePointPArray::iterator it = spacepoints.begin(); it != spacepoints.end(); ++it ) {
       int station = (*it)->get_station();
       TMatrixD vec(2, 1);
-      TMatrixD cov(2, 2);
-      vec(0, 0) = (*it)->get_position().x();
-      vec(1, 0) = (*it)->get_position().y();
-      cov(0, 0) = 0.2;
-      cov(1, 1) = 0.2;
+      TMatrixD cov(2, 2); cov.Zero();
+      vec(0, 0) = (*it)->get_position().x();// * (1.0 + rand.Gaus(0.0, smear));
+      vec(1, 0) = (*it)->get_position().y();// * (1.0 + rand.Gaus(0.0, smear));
+      cov(0, 0) = 0.0;
+      cov(1, 1) = 0.0;
       new_track[station-1].SetVector(vec);
+      new_track[station-1].SetCovariance(cov);
+      new_track[station-1].SetPosition((*it)->get_position().z());
     }
 
     return new_track;
