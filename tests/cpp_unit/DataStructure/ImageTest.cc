@@ -16,6 +16,9 @@
 
 #include "gtest/gtest.h"
 
+#include "TApplication.h"
+#include "TROOT.h"
+#include "TGFrame.h"
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
 
@@ -27,27 +30,20 @@
 namespace MAUS {
 
 TEST(ImageTest, ImageTest) {
-    std::cerr << 1 << std::endl;
     Image image;
     EXPECT_EQ(image.GetRunNumber(), 0);
     EXPECT_EQ(image.GetSpillNumber(), 0);
     EXPECT_EQ(image.GetInputTime().GetDateTime(), DateTime().GetDateTime());
     EXPECT_EQ(image.GetOutputTime().GetDateTime(), DateTime().GetDateTime());
     EXPECT_EQ(image.GetCanvasWrappers().size(), size_t(0));
-    std::cerr << 2 << std::endl;
     image.CanvasWrappersPushBack(new MAUS::CanvasWrapper());
-    std::cerr << 3 << std::endl;
     EXPECT_EQ(image.GetCanvasWrappers().size(), size_t(1));
-    std::cerr << 4 << std::endl;
+
     CanvasWrapper* wrap = new CanvasWrapper();
     wrap->SetCanvas(new TCanvas("name", "title"));
-    std::cerr << 5 << std::endl;
     image.CanvasWrappersPushBack(wrap);
-    std::cerr << 6 << std::endl;
     EXPECT_EQ(image.GetCanvasWrappers().size(), size_t(2));
-    std::cerr << 7 << std::endl;
     CanvasWrapper* wrap_copy = image.GetCanvasWrappers()[1];
-    std::cerr << 8 << wrap_copy->GetCanvas() << std::endl;
     EXPECT_EQ(std::string(wrap_copy->GetCanvas()->GetTitle()),
               std::string("title"));
 }
@@ -84,9 +80,26 @@ TEST(ImageTest, CanvasWrapperTest) {
               std::string(cwrap_copy_vals.GetCanvas()->GetTitle()));
 }
 
+class TestMainFrame : public TGMainFrame {
+public:
+   TestMainFrame(const TGWindow *p, UInt_t w, UInt_t h) {}
+   virtual ~TestMainFrame() {}
+};
+
+
 TEST(ImageTest, EmbedCanvasWrapperTest) {
+    // This fails due to ROOT segmentation fault, because window is not
+    // sufficiently well defined...
+    bool batch = gROOT->IsBatch();
+    gROOT->SetBatch(false);
     std::cerr << "A" << std::endl;
-    TRootEmbeddedCanvas embed(0, 0, 100, 100);
+    int argc = 1;
+    char* argv[] = {const_cast<char*>("")};
+    TApplication theApp("App", &argc, argv);
+    std::cerr << "A1" << std::endl;
+    TestMainFrame window(gClient->GetRoot(), 100, 100);
+    std::cerr << "B" << std::endl;
+    TRootEmbeddedCanvas embed("embed", &window, 100, 100);
     std::cerr << "1" << std::endl;
     CanvasWrapper cwrap_def;
     std::cerr << "2" << std::endl;
@@ -103,5 +116,6 @@ TEST(ImageTest, EmbedCanvasWrapperTest) {
     cwrap_values.EmbedCanvas(&embed);
     std::cerr << "C" << std::endl;
     EXPECT_EQ(embed.GetCanvas(), canv);
+    gROOT->SetBatch(batch);
 }
 }

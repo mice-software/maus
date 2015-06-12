@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include <Python.h>
+
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
 #include "src/common_cpp/API/ReduceBase.hh"
@@ -21,18 +23,18 @@
 namespace MAUS {
 
 
-  class MyReducer : public ReduceBase<int> {
+  class MyReducer : public ReduceBase<int, size_t> {
   public:
-    MyReducer() : ReduceBase<int>("TestClass") {}
-    MyReducer(const MyReducer& mr) : ReduceBase<int>(mr) {}
+    MyReducer() : ReduceBase<int, size_t>("TestClass") {}
+    MyReducer(const MyReducer& mr) : ReduceBase<int, size_t>(mr) {}
     virtual ~MyReducer() {}
 
   private:
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual int* _process(int* t) {
-      return new int(*t);
+    virtual size_t* _process(int* t) {
+      return new size_t(abs(*t));
   }
 
   private:
@@ -45,7 +47,7 @@ namespace MAUS {
     MyReducer_maus_exception() : MyReducer() {}
 
   private:
-    virtual int* _process(int* t) {
+    virtual size_t* _process(int* t) {
       throw MAUS::Exception(MAUS::Exception::recoverable,
 		   "Expected Test MAUS::Exception in _process",
 		   "int* _process(int* t) const");
@@ -57,7 +59,7 @@ namespace MAUS {
     MyReducer_exception() : MyReducer() {}
 
   private:
-    virtual int* _process(int* t) {
+    virtual size_t* _process(int* t) {
       throw std::exception();
     }
   };
@@ -67,7 +69,7 @@ namespace MAUS {
     MyReducer_otherexcept() : MyReducer() {}
 
   private:
-    virtual int* _process(int* t) {throw 17;}
+    virtual size_t* _process(int* t) {throw 17;}
   };
 
 
@@ -115,13 +117,13 @@ namespace MAUS {
   TEST(ReduceBaseTest, TestProcess) {
     MyReducer mm;
 
-    int* i = new int(27);
+    int* i = new int(-27);
 
-    int* i2 = mm.process(i);
+    size_t* i2 = mm.process(i);
 
     ASSERT_TRUE(*i2 == 27)
       <<"Fail: _process method not called properly"
-      <<std::endl;
+      << *i2 << std::endl;
 
 
     /////////////////////////////////////////////////////
