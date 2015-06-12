@@ -120,11 +120,6 @@ class SciFiCluster : public TObject {
 
   void set_digits_pointers(SciFiDigitPArray const &digits);
 
-  ThreeVector get_true_position() const { return _true_position; }
-  void set_true_position( ThreeVector pos ) { _true_position = pos; }
-  ThreeVector get_true_momentum() const { return _true_momentum; }
-  void set_true_momentum( ThreeVector mom ) { _true_momentum = mom; }
-
  private:
   bool _used;
 
@@ -135,9 +130,6 @@ class SciFiCluster : public TObject {
   ThreeVector _direction, _position;
 
   TRefArray* _digits;
-
-  ThreeVector _true_position;
-  ThreeVector _true_momentum;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiCluster)
 }; // Don't forget this trailing colon!!!!

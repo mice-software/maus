@@ -230,14 +230,8 @@ namespace MAUS {
             a_cluster->set_id(id);
             a_cluster->set_used(false);
 
-
-            a_cluster->set_true_position( position );
-            a_cluster->set_true_momentum( momentum );
-
-
 //            delete a_cluster;
             clusters.push_back(a_cluster);
-
 
             TMatrixD vector(5, 1);
             vector(0, 0) = position.x();
@@ -302,9 +296,6 @@ namespace MAUS {
             spoint->set_station(station);
             spoint->set_npe(10);
             spoint->set_position(position);
-
-            spoint->set_true_position(position);
-            spoint->set_true_momentum(momentum);
 
             spacepoints.push_back(spoint);
 

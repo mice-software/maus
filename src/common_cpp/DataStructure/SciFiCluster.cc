@@ -44,8 +44,6 @@ SciFiCluster::SciFiCluster(const SciFiCluster &clus): _used(clus.is_used()),
                                                       _alpha(clus.get_alpha()) {
   _direction = clus.get_direction();
   _position = clus.get_position();
-  _true_position = clus.get_true_position();
-  _true_momentum = clus.get_true_momentum();
   _digits = new TRefArray(*(clus.get_digits()));
 }
 
@@ -86,8 +84,6 @@ SciFiCluster& SciFiCluster::operator=(const SciFiCluster &scificluster) {
   _alpha     = scificluster.get_alpha();
   _direction = scificluster.get_direction();
   _position  = scificluster.get_position();
-  _true_position = scificluster.get_true_position();
-  _true_momentum = scificluster.get_true_momentum();
   if (_digits) delete _digits;
   _digits    = new TRefArray(*(scificluster.get_digits()));
   return *this;

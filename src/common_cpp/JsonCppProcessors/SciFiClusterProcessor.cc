@@ -62,14 +62,6 @@ SciFiClusterProcessor::SciFiClusterProcessor() {
                         &SciFiCluster::get_position,
                         &SciFiCluster::set_position, true);
 
-    RegisterValueBranch("true_pos", &_three_vec_proc,
-                        &SciFiCluster::get_true_position,
-                        &SciFiCluster::set_true_position, true);
-
-    RegisterValueBranch("true_mom", &_three_vec_proc,
-                        &SciFiCluster::get_true_momentum,
-                        &SciFiCluster::set_true_momentum, true);
-
     RegisterTRefArray("digits", &_digit_tref_proc,
                       &SciFiCluster::get_digits,
                       &SciFiCluster::set_digits, true);

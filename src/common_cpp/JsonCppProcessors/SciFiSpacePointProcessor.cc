@@ -64,12 +64,5 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor() {
                         &SciFiSpacePoint::set_position, true);
     RegisterTRefArray("clusters", &_cluster_tref_proc,
                       &SciFiSpacePoint::get_channels, &SciFiSpacePoint::set_channels, true);
-
-    RegisterValueBranch("true_position", &_three_vec_proc,
-                        &SciFiSpacePoint::get_true_position,
-                        &SciFiSpacePoint::set_true_position, true);
-    RegisterValueBranch("true_momentum", &_three_vec_proc,
-                        &SciFiSpacePoint::get_true_momentum,
-                        &SciFiSpacePoint::set_true_momentum, true);
 }
 } // ~namespace MAUS

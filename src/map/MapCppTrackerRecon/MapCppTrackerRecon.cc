@@ -349,6 +349,11 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       evt.add_scifitrack(track);
     }
   } else { // PatRec Not Switched on. => Assume EVERYTHING is a single track.
+    throw Exception(Exception::nonRecoverable,
+        "No pattern recognition, required to seed Kalman",
+        "MapCppTrackerRecon::track_fit()" );
+
+    /*
     SciFiClusterPArray event_clusters = evt.clusters();
     for ( int tracker = 0; tracker < 2; ++tracker ) {
 
@@ -398,6 +403,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
 
       evt.add_scifitrack(track);
     }
+    */
   }
 #endif
 }
