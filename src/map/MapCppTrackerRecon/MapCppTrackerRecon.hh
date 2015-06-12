@@ -23,6 +23,8 @@
 #ifndef _SRC_MAP_MAPCPPTrackerRecon_H_
 #define _SRC_MAP_MAPCPPTrackerRecon_H_
 
+//#define KALMAN_TEST
+
 // C headers
 #include <assert.h>
 #include <json/json.h>
@@ -52,7 +54,9 @@
 #include "src/common_cpp/Recon/SciFi/SciFiSpacePointRec.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/Kalman/MAUSSciFiPropagators.hh"
+#include "src/common_cpp/Recon/Kalman/MAUSSciFiMeasurements.hh"
 #include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
@@ -91,27 +95,6 @@ class MapCppTrackerRecon : public MapBase<Data> {
    */
   void _process(Data* data) const;
 
-  /** Performs the cluster reconstruction
-   *
-   *  \param evt the current SciFiEvent
-   */
-  void cluster_recon(MAUS::SciFiEvent &evt) const;
-
-  /** Performs the spacepoint reconstruction
-   *
-   *  \param evt the current SciFiEvent
-   */
-  void spacepoint_recon(MAUS::SciFiEvent &evt) const;
-
-  /** Performs the pattern recogniton
-   *
-   *  Pattern Recogntion identifies which spacepoints are associate with particle tracks,
-   *  then fits functions to the tracks using simple least squared fitting 
-   *
-   *  \param evt the current SciFiEvent
-   */
-  void pattern_recognition(MAUS::SciFiEvent &evt) const;
-
   /** Performs the final track fit
    *
    *  Track fit takes the spacepoints from Pattern Recognition and, going back to the clusters
@@ -121,7 +104,18 @@ class MapCppTrackerRecon : public MapBase<Data> {
    */
   void track_fit(MAUS::SciFiEvent &evt) const;
 
-  // void print_event_info(MAUS::SciFiEvent &event) const;
+  /** Deduce and fill the reference plane position and momentum for
+    * helical tracks
+    */
+  void extrapolate_helical_reference(SciFiEvent& event) const;
+
+  /** Deduce and fill the reference plane position and momentum for
+    * straight tracks
+    */
+  void extrapolate_straight_reference(SciFiEvent& event) const;
+
+
+  void print_event_info(MAUS::SciFiEvent &event) const;
 
  private:
   /// This will contain the configuration
@@ -134,6 +128,35 @@ class MapCppTrackerRecon : public MapBase<Data> {
   bool _straight_pr_on;
   bool _helical_pr_on;
   bool _kalman_on;
+  bool _patrec_on;
+
+  bool _use_mcs;
+  bool _use_eloss;
+  bool _use_patrec_seed;
+  bool _correct_pz;
+
+  double _seed_value;
+
+  /// Reconstruction Classes
+  SciFiClusterRec _cluster_recon;
+  SciFiSpacePointRec _spacepoint_recon;
+
+  /// Pattern Recognitin Class
+  PatternRecognition _pattern_recognition;
+
+  /// Kalman Track Fitter Object
+#ifdef KALMAN_TEST
+  Kalman::TrackFit* _spacepoint_helical_track_fitter;
+  Kalman::TrackFit* _spacepoint_straight_track_fitter;
+
+  int _spacepoint_recon_plane;
+#else
+  Kalman::TrackFit* _helical_track_fitter;
+  Kalman::TrackFit* _straight_track_fitter;
+
+  SciFiHelicalMeasurements* _helical_measurement;
+  SciFiStraightMeasurements* _straight_measurement;
+#endif
 
   ///  Map of the planes geometry.
   SciFiGeometryHelper _geometry_helper;

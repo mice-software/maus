@@ -132,6 +132,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       // Compute tdc count.
       double time1   = a_hit->GetTime();
       // int tdcCounts = compute_tdc_counts(time1);
+//      std::cerr << "DIGIT : " << a_hit->GetPosition().x() << ", " << a_hit->GetPosition().y() << ", " << a_hit->GetPosition().z();
 
       // Pull tracker/station/plane information from geometry
       int tracker = a_hit->GetChannelId()->GetTrackerNumber();
@@ -144,6 +145,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
 
       a_hit->GetChannelId()->SetID(lookup.get_digit_id(a_digit));
 
+      std::cerr << "DIGIT CREATED : " << tracker << " - " << station << " - " << plane << " : " << a_hit->GetPosition().x() << ", " << a_hit->GetPosition().y() << ", " << a_hit->GetPosition().z() << ", " << a_hit->GetMomentum().x() << ", " << a_hit->GetMomentum().y() << ", " << a_hit->GetMomentum().z() << " - "  << chanNo << "\n";
       // Loop over all the other hits.
       for ( unsigned int hit_j = hit_i+1; hit_j < hits->size(); hit_j++ ) {
         if ( check_param(&(*hits)[hit_i], &(*hits)[hit_j]) ) {
@@ -156,6 +158,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       } // ends loop over all the array
 
       a_digit->set_npe(nPE);
+//      std::cerr << " - " << tracker << ", " << station << ", " << plane << ", " << chanNo << ", " << a_hit->GetChannelId()->GetFibreNumber() << std::endl;
       digits.push_back(a_digit);
     }
   } // ends 'for' loop over hits

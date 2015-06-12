@@ -80,6 +80,14 @@ class KalmanSeed {
   TMatrixD ComputeInitialStateVector(const SciFiStraightPRTrack* seed,
                                      const SciFiSpacePointPArray &spacepoints);
 
+  /** @brief Computes the initial covariance matrix for helical track.
+   */
+  TMatrixD ComputeInitialCovariance(const SciFiHelicalPRTrack* seed);
+
+  /** @brief Computes the initial covariance matrix for straight track.
+   */
+  TMatrixD ComputeInitialCovariance(const SciFiStraightPRTrack* seed);
+
   /** @brief Fills the _clusters member.
    */
   void RetrieveClusters(SciFiSpacePointPArray &spacepoints);
@@ -87,6 +95,10 @@ class KalmanSeed {
   /** @brief Getter for the initial state vector.
    */
   TMatrixD initial_state_vector() const { return _a0; }
+
+  /** @brief Getter for the initial covariance matrix.
+   */
+  TMatrixD initial_covariance_matrix() const { return _full_covariance; }
 
   /** @brief Loops over the clusters in the event and makes a KalmanState for each.
    */
@@ -106,7 +118,7 @@ class KalmanSeed {
 
   void SetKalmanStates(KalmanStatesPArray sites) { _kalman_sites = sites; }
 
-  void SetField(double bz) { _Bz = fabs(bz); }
+  void SetField(double bz) { _Bz = bz; }
 
   double GetField() const { return _Bz; }
 
@@ -134,6 +146,10 @@ class KalmanSeed {
   /** @brief Uncertainty on a0's elements - tunable parameter in the datacards.
    */
   double _seed_cov;
+
+  bool _use_patrec_seed;
+
+  TMatrixD _full_covariance;
 
   double _pos_resolution;
 
@@ -167,10 +183,12 @@ void KalmanSeed::Build(const PRTrack* pr_track) {
   _tracker = pr_track->get_tracker();
 
   _a0.ResizeTo(_n_parameters, 1);
+  _full_covariance.ResizeTo(_n_parameters, _n_parameters);
 
   SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints_pointers();
   RetrieveClusters(spacepoints);
   _a0 = ComputeInitialStateVector(pr_track, spacepoints);
+  _full_covariance = ComputeInitialCovariance(pr_track);
   BuildKalmanStates();
 }
 

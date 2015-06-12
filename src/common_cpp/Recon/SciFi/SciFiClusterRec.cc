@@ -23,7 +23,7 @@ SciFiClusterRec::SciFiClusterRec():_size_exception(0),
 
 SciFiClusterRec::SciFiClusterRec(int cluster_exception,
                                  double min_npe,
-                                 const std::map<int, SciFiPlaneGeometry> &geometry_map):
+                                 const SciFiTrackerMap& geometry_map):
                                    _size_exception(cluster_exception),
                                    _min_npe(min_npe),
                                    _geometry_map(geometry_map) {}
@@ -34,7 +34,7 @@ bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
   return ( a->get_npe() > b->get_npe() );
 }
 
-void SciFiClusterRec::process(SciFiEvent &evt) {
+void SciFiClusterRec::process(SciFiEvent &evt) const {
   // Create and fill the seeds vector.
   std::vector<SciFiDigit*> seeds = get_seeds(evt);
 
@@ -50,7 +50,7 @@ void SciFiClusterRec::process(SciFiEvent &evt) {
   make_clusters(evt, seeds);
 }
 
-std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
+std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) const {
   std::vector<SciFiDigit*> seeds_in_event;
   for ( size_t dig = 0; dig < evt.digits().size(); ++dig ) {
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
@@ -59,7 +59,7 @@ std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) {
   return seeds_in_event;
 }
 
-void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds) {
+void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds) const {
   size_t seeds_size = seeds.size();
   for ( size_t i = 0; i < seeds_size; i++ ) {
     if ( !(seeds[i]->is_used()) ) {
@@ -90,41 +90,41 @@ void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &s
   } // ends loop over seeds
 }
 
-void SciFiClusterRec::process_cluster(SciFiCluster *clust) {
+void SciFiClusterRec::process_cluster(SciFiCluster *clust) const {
   int tracker = clust->get_tracker();
   int station = clust->get_station();
   int plane   = clust->get_plane();
 
   int id =  3*(station-1) + (plane+1);
-  id = ( tracker == 0 ? -id : id );
-  clust->set_id(id);
-
-  std::map<int, SciFiPlaneGeometry>::iterator iterator;
-  iterator = _geometry_map.find(id);
+  SciFiPlaneMap::const_iterator iterator = _geometry_map.find(tracker)->second.Planes.find(id);
+//  iterator = _geometry_map.find(id);
   // Throw if the plane isn't found.
-  if ( iterator == _geometry_map.end() ) {
+//  if ( iterator == _geometry_map.end() ) {
+  if ( iterator == _geometry_map.find(tracker)->second.Planes.end() ) {
     throw(Exception(Exception::nonRecoverable,
     "Failed to find SciFi plane in _geometry_map.",
     "SciFiClusterRec::process_cluster"));
   }
+  id = ( tracker == 0 ? -id : id );
+  clust->set_id(id);
   SciFiPlaneGeometry this_plane = (*iterator).second;
   ThreeVector plane_direction   = this_plane.Direction;
   ThreeVector plane_position    = this_plane.Position;
   double Pitch                  = this_plane.Pitch;
   double CentralFibre           = this_plane.CentralFibre;
   // alpha is the distance to the central fibre.
-  double alpha   = clust->get_channel()-CentralFibre;
-  double dist_mm = Pitch * 7.0 / 2.0 * alpha;
+  double alpha   = clust->get_channel() - CentralFibre;
+  double dist_mm = Pitch * (7.0 / 2.0) * alpha;
 
   ThreeVector perp = plane_direction.Orthogonal();
   ThreeVector position = dist_mm * perp + plane_position;
 
   clust->set_direction(plane_direction);
   clust->set_position(position);
-  clust->set_alpha(alpha);
+  clust->set_alpha(dist_mm);
 }
 
-bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) {
+bool SciFiClusterRec::are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) const {
   bool neigh = false;
 
   if ( !(seed_j->is_used()) && // seed is unused

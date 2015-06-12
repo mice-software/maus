@@ -55,40 +55,40 @@ class SciFiSpacePointRec {
 
   ~SciFiSpacePointRec();
 
-  void process(SciFiEvent &evt);
+  void process(SciFiEvent &evt) const;
 
-  void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+  void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
-  void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+  void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
-  void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]);
+  void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
-  void build_duplet(SciFiSpacePoint* duplet);
+  void build_duplet(SciFiSpacePoint* duplet) const;
 
-  void build_triplet(SciFiSpacePoint* triplet);
+  void build_triplet(SciFiSpacePoint* triplet) const;
 
-  ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2);
+  ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2) const;
 
   bool kuno_accepts(SciFiCluster* cluster1,
                     SciFiCluster* cluster2,
-                    SciFiCluster* cluster3);
+                    SciFiCluster* cluster3) const;
 
 
   bool clusters_are_not_used(SciFiCluster* candidate_A,
-                             SciFiCluster* candidate_B);
+                             SciFiCluster* candidate_B) const;
 
   bool clusters_are_not_used(SciFiCluster* candidate_A,
                              SciFiCluster* candidate_B,
-                             SciFiCluster* candidate_C);
+                             SciFiCluster* candidate_C) const;
 
   bool duplet_within_radius(SciFiCluster* candidate_A,
-                            SciFiCluster* candidate_B);
+                            SciFiCluster* candidate_B) const;
  private:
   /// This is the acceptable radius for any duplet.
-  static const int _acceptable_radius = 160; // mm
-  static const int _kuno_0_5   = 320;
-  static const int _kuno_else  = 318;
-  static const int _kuno_toler = 3;
+  static const double _acceptable_radius = 160; // mm
+  static const double _kuno_1_5   = 320.0;
+  static const double _kuno_else  = 318.5;
+  static const double _kuno_toler = 3.0;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

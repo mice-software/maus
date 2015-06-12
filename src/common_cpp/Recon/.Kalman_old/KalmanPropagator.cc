@@ -84,6 +84,8 @@ void KalmanPropagator::Extrapolate(KalmanStatesPArray sites, int i) {
 
   CalculateCovariance(old_site, new_site);
 
+  _F.Print();
+
   new_site->set_current_state(KalmanState::Projected);
 }
 
@@ -95,15 +97,20 @@ TMatrixD KalmanPropagator::AddSystemNoise(const KalmanState *old_site, TMatrixD 
   std::vector<std::string> materials;
   materials.push_back("scifi");
   materials.push_back("mylar");
+//  TMatrixD old_state = old_site->a(KalmanState::Projected);
+//  double temp_pt = sqrt(old_state(1, 0)*old_state(1, 0) + old_state(3, 0)*old_state(3, 0));
+//  double temp_pz = fabs(1.0/old_state(4, 0));
+//  double temp_p = sqrt(temp_pt*temp_pt + temp_pz*temp_pz);
+//  double circle_factor = sqrt( 1 + (temp_pt*temp_pt / (temp_pz*temp_pz)) );
 
   int id = abs(old_site->id());
   // If we are extrapolating between stations, there's gas.
   if ( id == 13 || id == 10 || id == 7 || id == 4 ) {
     double w_gas;
-    if ( id == 4  ) w_gas = 200;
-    if ( id == 7  ) w_gas = 250;
-    if ( id == 10 ) w_gas = 300;
-    if ( id == 13 ) w_gas = 350;
+    if ( id == 4  ) w_gas = 200.0;
+    if ( id == 7  ) w_gas = 250.0;
+    if ( id == 10 ) w_gas = 300.0;
+    if ( id == 13 ) w_gas = 350.0;
     widths.push_back(w_gas);
     materials.push_back("gas");
   }
@@ -199,15 +206,20 @@ void KalmanPropagator::SubtractEnergyLoss(KalmanState *new_site) {
   std::vector<std::string> materials;
   materials.push_back("scifi");
   materials.push_back("mylar");
+//  TMatrixD new_state = new_site->a(KalmanState::Projected);
+//  double temp_pt = sqrt(new_state(1, 0)*new_state(1, 0) + new_state(3, 0)*new_state(3, 0));
+//  double temp_pz = fabs(1.0/new_state(4, 0));
+//  double temp_p = sqrt(temp_pt*temp_pt + temp_pz*temp_pz);
+//  double circle_factor = sqrt( 1 + (temp_pt*temp_pt / (temp_pz*temp_pz)) );
 
   int id = abs(new_site->id());
   // If we are extrapolating between stations, there's gas.
   if ( id == 12 || id == 9 || id == 6 || id == 3 ) {
     double w_gas;
-    if ( id == 3  ) w_gas = 200;
-    if ( id == 6  ) w_gas = 250;
-    if ( id == 9 ) w_gas = 300;
-    if ( id == 12 ) w_gas = 350;
+    if ( id == 3  ) w_gas = 200.0;
+    if ( id == 6  ) w_gas = 250.0;
+    if ( id == 9  ) w_gas = 300.0;
+    if ( id == 12 ) w_gas = 350.0;
     widths.push_back(w_gas);
     materials.push_back("gas");
   }

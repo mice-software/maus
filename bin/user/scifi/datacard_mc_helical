@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 1000
+spill_generator_number_of_spills = 10
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
@@ -46,7 +46,7 @@ spill_generator_number_of_spills = 1000
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":13, "energy":200.0, "time":0.0, "random_seed":10
+    "particle_id":-13, "energy":200.0, "time":0.0, "random_seed":10
 }
 # This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
 beam = {

@@ -31,7 +31,9 @@ SciFiSpacePoint::SciFiSpacePoint(): _used(false),
                                     _npe(0.),
                                     _chi2(0.),
                                     _type(""),
-                                    _position(ThreeVector(0, 0, 0)) {
+                                    _position(ThreeVector(0, 0, 0)),
+                                    _true_position(ThreeVector(0, 0, 0)),
+                                    _true_momentum(ThreeVector(0, 0, 0)) {
   _channels = new TRefArray();
 }
 
@@ -48,7 +50,9 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &sp)
       _npe(0.),
       _chi2(0.),
       _type(""),
-      _position(ThreeVector(0, 0, 0)) {
+      _position(ThreeVector(0, 0, 0)),
+      _true_position(ThreeVector(0, 0, 0)),
+      _true_momentum(ThreeVector(0, 0, 0)) {
   _used      = sp.is_used();
   _spill     = sp.get_spill();
   _event     = sp.get_event();
@@ -61,6 +65,8 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &sp)
   _chi2      = sp.get_chi2();
   _type      = sp.get_type();
   _position  = sp.get_position();
+  _true_position = sp.get_true_position();
+  _true_momentum = sp.get_true_momentum();
   _channels = new TRefArray(*(sp.get_channels()));
 }
 
@@ -126,6 +132,8 @@ SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &sp) {
   _chi2      = sp.get_chi2();
   _type      = sp.get_type();
   _position  = sp.get_position();
+  _true_position = sp.get_true_position();
+  _true_momentum = sp.get_true_momentum();
 
   if (_channels) delete _channels;
   _channels = new TRefArray(*(sp.get_channels()));

@@ -19,28 +19,38 @@
 namespace MAUS {
 
 SciFiTrackProcessor::SciFiTrackProcessor()
-                         : _scifi_trackpoint_array_proc(new SciFiTrackPointProcessor) {
+                         : _scifi_trackpoint_array_proc(new SciFiTrackPointProcessor),
+                           _vector_proc(new DoubleProcessor) {
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiTrack::tracker,
-                        &SciFiTrack::set_tracker, false);
+                        &SciFiTrack::set_tracker, true);
     RegisterValueBranch("algorithm", &_int_proc,
                         &SciFiTrack::GetAlgorithmUsed,
-                        &SciFiTrack::SetAlgorithmUsed, false);
+                        &SciFiTrack::SetAlgorithmUsed, true);
     RegisterValueBranch("charge", &_int_proc,
                         &SciFiTrack::charge,
-                        &SciFiTrack::set_charge, false);
+                        &SciFiTrack::set_charge, true);
     RegisterValueBranch("chi2", &_double_proc,
                         &SciFiTrack::chi2,
-                        &SciFiTrack::set_chi2, false);
+                        &SciFiTrack::set_chi2, true);
     RegisterValueBranch("ndf", &_int_proc,
                         &SciFiTrack::ndf,
-                        &SciFiTrack::set_ndf, false);
+                        &SciFiTrack::set_ndf, true);
     RegisterValueBranch("P_value", &_double_proc,
                         &SciFiTrack::P_value,
-                        &SciFiTrack::set_P_value, false);
+                        &SciFiTrack::set_P_value, true);
     RegisterIgnoredBranch("trackpoints", false);
     RegisterValueBranch("trackpoints", &_scifi_trackpoint_array_proc,
                         &SciFiTrack::scifitrackpoints,
-                        &SciFiTrack::set_scifitrackpoints, false);
+                        &SciFiTrack::set_scifitrackpoints, true);
+    RegisterValueBranch("seed_position", &_threevector_proc,
+                        &SciFiTrack::GetSeedPosition,
+                        &SciFiTrack::SetSeedPosition, true);
+    RegisterValueBranch("seed_momentum", &_threevector_proc,
+                        &SciFiTrack::GetSeedMomentum,
+                        &SciFiTrack::SetSeedMomentum, true);
+    RegisterValueBranch("seed_covariance", &_vector_proc,
+                        &SciFiTrack::GetSeedCovariance,
+                        &SciFiTrack::SetSeedCovariance, true);
 }
 } // ~namespace MAUS

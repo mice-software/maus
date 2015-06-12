@@ -21,7 +21,7 @@ namespace MAUS {
 KalmanHelicalPropagator::KalmanHelicalPropagator() : KalmanPropagator() {}
 
 KalmanHelicalPropagator::KalmanHelicalPropagator(double Bz) : KalmanPropagator() {
-  _Bz = fabs(Bz);
+  _Bz = Bz;
   _n_parameters = 5;
   // Propagator matrix.
   _F.ResizeTo(_n_parameters, _n_parameters);
@@ -76,7 +76,8 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   a_projected(3, 0) = new_py;
   a_projected(4, 0) = old_kappa;
 
-  double dtheta = c*_Bz*delta_z;
+//  double dtheta = c*_Bz*delta_z//
+
   // Setup F.
   F.ResizeTo(_n_parameters, _n_parameters);
   // @x/@x
@@ -89,6 +90,8 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(0, 3) = (cosine-1.)/u;
   // @x/@kappa
   // F(0, 4) = new_px*cosine*dtheta/u - new_py*sine*dtheta/u;
+  // F(0, 4) = 0.;
+  F(0, 4) = delta_z*(old_px*cosine - old_py*sine);
 
   // @px/@x
   F(1, 0) = 0.;
@@ -100,6 +103,8 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(1, 3) = -sine;
   // @px/@kappa
   // F(1, 4) = -new_px*sine*dtheta - new_py*cosine*dtheta;
+  // F(1, 4) = 0.;
+  F(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine);
 
   // @y/@x
   F(2, 0) = 0.;
@@ -111,6 +116,8 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(2, 3) = sine/u;
   // @y/@kappa
   // F(2, 4) = new_py*cosine*dtheta/u + new_px*sine*dtheta/u;
+  // F(2, 4) = 0.;
+  F(2, 4) = delta_z*(old_px*sine + old_py*cosine);
 
   // @py/@x
   F(3, 0) = 0.;
@@ -122,6 +129,8 @@ TMatrixD KalmanHelicalPropagator::GetIntermediateState(const KalmanState *site,
   F(3, 3) = cosine;
   // @py/@kappa
   // F(3, 4) = -new_py*sine*dtheta + new_px*cosine*dtheta;
+  // F(3, 4) = 0.;
+  F(3, 4) = u*delta_z*(old_px*cosine - old_py*sine);
 
   // @kappa/@x
   F(4, 0) = 0.;
@@ -204,21 +213,29 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
     deltaZ = -deltaZ;
   }
 
+  // Get previous state vector...
+  TMatrixD old_state = old_site->a(KalmanState::Projected);
+  double old_px    = old_state(1, 0);
+  double old_py    = old_state(3, 0);
+  double old_kappa = old_state(4, 0);
+
   // Get current state vector...
   TMatrixD site = new_site->a(KalmanState::Projected);
-  // double px    = site(1, 0);
-  // double py    = site(3, 0);
+  double px    = site(1, 0);
+  double py    = site(3, 0);
   double kappa  = site(4, 0);
   double charge = kappa/fabs(kappa);
 
   // Define factors to be used in the matrix.
   double c      = CLHEP::c_light;
   double u      = charge*c*_Bz;
-  double delta_theta = u*deltaZ*fabs(kappa);
+  double delta_theta = u*deltaZ*fabs(old_kappa);
   double sine   = sin(delta_theta);
   double cosine = cos(delta_theta);
 
   // double dtheta = c*_Bz*deltaZ;
+
+  std::cerr << "Building Propagator: Sine = " << sine << ", Cosine = " << cosine << ", u = " << u << ", delta_theta = " << delta_theta << ", delta_z = " << deltaZ << '\n';
 
   // @x/@x
   _F(0, 0) = 1.;
@@ -230,6 +247,9 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(0, 3) = (cosine-1.)/u;
   // @x/@kappa
   // _F(0, 4) = px*cosine*dtheta/u - py*sine*dtheta/u;
+  // _F(0, 4) = 0.;
+  // _F(0, 4) = deltaZ*( px*cosine - py*sine );
+  _F(0, 4) = deltaZ*(old_px*cosine - old_py*sine);
 
   // @px/@x
   _F(1, 0) = 0.;
@@ -241,6 +261,9 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(1, 3) = -sine;
   // @px/@kappa
   // _F(1, 4) = -px*sine*dtheta - py*cosine*dtheta;
+  // _F(1, 4) = 0.;
+  // _F(1, 4) = -u*deltaZ*( px*sine + py*cosine );
+  _F(1, 4) = -u*deltaZ*(old_px*sine + old_py*cosine);
 
   // @y/@x
   _F(2, 0) = 0.;
@@ -252,6 +275,9 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(2, 3) = sine/u;
   // @y/@kappa
   // _F(2, 4) = py*cosine*dtheta/u + px*sine*dtheta/u;
+  // _F(2, 4) = 0.;
+  // _F(2, 4) = deltaZ*( px*sine + py*cosine );
+  _F(2, 4) = deltaZ*(old_px*sine + old_py*cosine);
 
   // @py/@x
   _F(3, 0) = 0.;
@@ -263,6 +289,9 @@ void KalmanHelicalPropagator::UpdatePropagator(const KalmanState *old_site,
   _F(3, 3) = cosine;
   // @py/@kappa
   // _F(3, 4) = -py*sine*dtheta + px*cosine*dtheta;
+  // _F(3, 4) = 0.;
+  // _F(3, 4) = u*deltaZ*( px*cosine - py*sine );
+  _F(3, 4) = u*deltaZ*(old_px*cosine - old_py*sine);
 
   // @kappa/@x
   _F(4, 0) = 0.;
