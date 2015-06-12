@@ -19,10 +19,11 @@
 #include "src/common_cpp/DataStructure/ImageData.hh"
 
 namespace MAUS {
-ImageData::ImageData() : _image(NULL) {
+ImageData::ImageData() : MAUSEvent<Image>("ImageData"), _image(NULL) {
 }
 
-ImageData::ImageData(const ImageData& data) : _image(NULL) {
+ImageData::ImageData(const ImageData& data)
+      : MAUSEvent<Image>("ImageData"), _image(NULL) {
     *this = data;
 }
 

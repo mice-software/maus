@@ -23,6 +23,8 @@
 #include "gtest/gtest.h"
 
 #include "json/value.h"
+#include "TApplication.h"
+#include "TROOT.h"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -34,7 +36,6 @@ extern char *optarg;
 int parse_flags(int argc, char **argv) {
     int _verbose_level = 1;
     int _help = 2;
-    int _gtest = 3;
     option long_options[] = {
               {"verbose_level", required_argument, NULL, _verbose_level},
               {"help", no_argument, NULL, _help},
@@ -125,6 +126,11 @@ int main(int argc, char **argv) {
       );
       ::testing::InitGoogleTest(&argc, argv);
       std::cout << "Running tests" << std::endl;
+      // Required for ImageTest, otherwise we get a segv; we get a segv from
+      // ORStreamTest if TApplication is instantiated then deleted, so best
+      // instantiate at this level.
+      TApplication theApp("App", &argc, argv);
+      gROOT->SetBatch(true);
       test_out = RUN_ALL_TESTS();
   } catch (MAUS::Exception exc) {
       std::cerr << exc.GetMessage() << "\n" << exc.GetLocation() << "\n"

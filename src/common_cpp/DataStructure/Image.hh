@@ -71,15 +71,21 @@ class Image {
     /** Get the output time */
     DateTime GetOutputTime() const {return _output_time;}
 
-    /** Set the std::vector of canvas wrappers */
+    /** Set the std::vector of canvas wrappers
+     *
+     *  Image takes ownership of the memory pointed to by the vector
+     */
     void SetCanvasWrappers(std::vector<MAUS::CanvasWrapper*> wrappers);
 
-    /** Get the std::vector of canvas wrappers */
+    /** Get the std::vector of canvas wrappers
+     *
+     *  Image owns the memory pointed to by the vector
+     */
     std::vector<CanvasWrapper*> GetCanvasWrappers() const;
 
     /** Push back new member of canvas wrappers 
      *
-     *  Helper function for PyRoot morons
+     *  Helper function for PyRoot
      */
     void CanvasWrappersPushBack(MAUS::CanvasWrapper* wrap) {
         _canvas_wrappers.push_back(wrap);

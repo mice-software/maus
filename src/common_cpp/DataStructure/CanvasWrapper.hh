@@ -64,6 +64,10 @@ class CanvasWrapper {
      *  implemented here because there is no other way to manage the python
      *  reference counting (can't notify python that we no longer own TCanvas
      *  memory from python interpreter)
+     *
+     *  WARNING: This will make a segmentation violation if ROOT TApplication
+     *  has not been initialised. I (Rogers) don't know how to fix this, it
+     *  seems to be a ROOT bug.
      */
     void EmbedCanvas(TRootEmbeddedCanvas* target);
 
