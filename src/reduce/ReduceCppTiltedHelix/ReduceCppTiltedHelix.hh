@@ -1,8 +1,22 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef SRC_REDUCE_REDUCECPPTILTEDHELIX_HH
 #define SRC_REDUCE_REDUCECPPTILTEDHELIX_HH
-
-#include <Python.h>
 
 #include <string>
 
@@ -10,10 +24,10 @@
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
 
 namespace MAUS {
-class Image;
+class ImageData;
 class Data;
 
-class ReduceCppTiltedHelix : public ReduceBase<Data, Image> {
+class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
   public:
     ReduceCppTiltedHelix();
     ~ReduceCppTiltedHelix();
@@ -24,7 +38,7 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, Image> {
 
     void _death();
 
-    Image* _process(Data* data);    
+    ImageData* _process(Data* data);    
 };
 
 PyMODINIT_FUNC init_ReduceCppTiltedHelix(void) {

@@ -45,6 +45,7 @@ TEST(PyObjectWrapperTest, TestUnwrapNullObject) {
   EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
@@ -58,6 +59,7 @@ TEST(PyObjectWrapperTest, TestUnwrapBadObject) {
   EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);

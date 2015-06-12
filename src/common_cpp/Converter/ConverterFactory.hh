@@ -53,6 +53,7 @@
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
 #include "src/common_cpp/DataStructure/JobFooterData.hh"
 #include "src/common_cpp/DataStructure/RunFooterData.hh"
+#include "src/common_cpp/DataStructure/ImageData.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
 
 
@@ -146,6 +147,9 @@ namespace MAUS {
 
     /** Overloaded function to  delete value */
     static void delete_type(MAUS::RunFooterData* value) {delete value;}
+
+    /** Overloaded function to  delete value */
+    static void delete_type(MAUS::ImageData* value) {delete value;}
 
     /** Overloaded function to  delete value */
     static void delete_type(std::string* value) {delete value;}

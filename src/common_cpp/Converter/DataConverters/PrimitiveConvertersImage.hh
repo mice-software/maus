@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,23 @@
  *
  */
 
-#include "gtest/gtest.h"
-
-#include "src/map/MapCppSimulation/MapCppSimulation.hh"
+#ifndef SRC_COMMON_CPP_CONVERTERS_DATACONVERTERS_PRIMITIVECONVERTERSIMAGE_H
+#define SRC_COMMON_CPP_CONVERTERS_DATACONVERTERS_PRIMITIVECONVERTERSIMAGE_H
 
 namespace MAUS {
-// Just check we link properly to MapCppSimulation
-TEST(MapCppSimulationTest, DoesNothingTest) {
-    EXPECT_TRUE(true); // disable to get the flippnig thing to link
-    // MapCppSimulation();
-}
+class ImageData;
+
+class ImageImageConverter : public ConverterBase<ImageData, ImageData> {
+  public:
+    ImageImageConverter()
+      : ConverterBase<ImageData, ImageData>("ImageImageConverter") {}
+
+  private:
+    ImageData* _convert(const ImageData* image) const {
+        return new ImageData(*image);
+    }
+};
+
 }
 
+#endif
