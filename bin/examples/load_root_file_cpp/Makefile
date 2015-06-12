@@ -6,6 +6,7 @@ load_root_file :
 	                      -I${MAUS_ROOT_DIR}/src/common_cpp \
 	                      -I${MAUS_ROOT_DIR}/src/legacy \
 	                      -I${MAUS_THIRD_PARTY}/third_party/install/include \
+	                      -I${MAUS_THIRD_PARTY}/third_party/install/include/root \
 	                      -I${ROOTSYS}/include \
 	                      -L${MAUS_ROOT_DIR}/build/ \
 	                      `root-config --ldflags` \

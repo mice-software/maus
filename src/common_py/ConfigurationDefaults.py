@@ -320,6 +320,7 @@ SciFiKalmanVerbose  = False # Dump information per fitted track
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
 cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
+cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for cooling channel configuration database downloads.
 
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
@@ -328,8 +329,11 @@ geometry_download_by = 'id' # choose 'run_number' to download by run number, 'cu
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
+geometry_download_beamline_for_run = 0
+geometry_download_beamline_tag = ''
+geometry_download_coolingchannel_tag = ''
 geometry_download_run_number = 0
-geometry_download_id = 3
+geometry_download_id = 49
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
@@ -411,7 +415,8 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
-DAQ_hostname = 'miceraid1a'
+DAQ_cabling_file_StepI = "/files/cabling/DAQChannelMap_preRun6541.txt"
+DAQ_hostname = 'miceraid5'
 DAQ_monitor_name = 'MICE_Online_Monitor'
 daq_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
                      # data from a file - mock-up of online for testing, not for

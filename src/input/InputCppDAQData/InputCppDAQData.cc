@@ -29,7 +29,7 @@ PyMODINIT_FUNC init_InputCppDAQData(void) {
                   "InputCppDAQData", "", "", "", "");
 }
 
-InputCppDAQData::InputCppDAQData() : InputBase<std::string>("InputCppDAQData") {
+InputCppDAQData::InputCppDAQData() : InputBase<MAUS::Data>("InputCppDAQData") {
   _eventPtr = NULL;
   _eventsCount = 0;
 
@@ -82,19 +82,8 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   // Comfigure the DBB Chain (chain of 6 EMR boards) data processor.
   initProcessor(_DBBChainFragmentProc_cpp, configJSON);
 
-
-  assert(configJSON.isMember("DAQ_cabling_file"));
-  std::string map_file_name = configJSON["DAQ_cabling_file"].asString();
-  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  if (!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error) << "Could not find the $MAUS_ROOT_DIR environmental variable."
-    << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
-  }
-
-  // Initialize the map by using text file.
-  bool loaded = _map.InitFromFile(std::string(pMAUS_ROOT_DIR) + map_file_name);
+  // Initialize the map from data cards
+  bool loaded = _map.InitFromCards(configJSON);
   if (!loaded) {
     throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }

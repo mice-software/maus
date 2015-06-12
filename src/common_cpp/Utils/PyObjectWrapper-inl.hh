@@ -33,9 +33,13 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
   // Input should be a single PyStringObject
   std::string** string_ret = new std::string*(NULL);
   Json::Value** json_ret = new Json::Value*(NULL);
-  MAUS::Data** data_ret = new MAUS::Data*(NULL);
+  Data** data_ret = new Data*(NULL);
+  JobHeaderData** jh_ret = new JobHeaderData*(NULL);
+  JobFooterData** jf_ret = new JobFooterData*(NULL);
+  RunHeaderData** rh_ret = new RunHeaderData*(NULL);
+  RunFooterData** rf_ret = new RunFooterData*(NULL);
   PyObject** py_ret = new PyObject*(NULL);
-  lazy_unwrap(args, string_ret, json_ret, data_ret, py_ret);
+  lazy_unwrap(args, py_ret, string_ret, json_ret, data_ret, jh_ret, jf_ret, rh_ret, rf_ret);
   TEMP* cpp_ret = NULL;
   if (*string_ret != NULL) {
       cpp_ret = ConverterFactory().convert<std::string, TEMP>(*string_ret);
@@ -44,8 +48,20 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
       cpp_ret = ConverterFactory().convert<Json::Value, TEMP>(*json_ret);
       delete *json_ret;
   } else if (*data_ret != NULL) {
-      cpp_ret = ConverterFactory().convert<MAUS::Data, TEMP>(*data_ret);
+      cpp_ret = ConverterFactory().convert<Data, TEMP>(*data_ret);
       delete *data_ret;
+  } else if (*jh_ret != NULL) {
+      cpp_ret = ConverterFactory().convert<JobHeaderData, TEMP>(*jh_ret);
+      delete *jh_ret;
+  } else if (*jf_ret != NULL) {
+      cpp_ret = ConverterFactory().convert<JobFooterData, TEMP>(*jf_ret);
+      delete *jf_ret;
+  } else if (*rh_ret != NULL) {
+      cpp_ret = ConverterFactory().convert<RunHeaderData, TEMP>(*rh_ret);
+      delete *rh_ret;
+  } else if (*rf_ret != NULL) {
+      cpp_ret = ConverterFactory().convert<RunFooterData, TEMP>(*rf_ret);
+      delete *rf_ret;
   } else if (*py_ret != NULL) {
       cpp_ret = ConverterFactory().convert<PyObject, TEMP>(*py_ret);
       Py_DECREF(*py_ret);
@@ -57,37 +73,33 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
   // note here we delete the pointer, not the allocated memory it points to
   delete py_ret;
   delete data_ret;
+  delete jh_ret;
+  delete jf_ret;
+  delete rh_ret;
+  delete rf_ret;
   delete json_ret;
   delete string_ret;
   return cpp_ret;
 }
 
 PyObject* PyObjectWrapper::wrap(MAUS::Data* cpp_data) {
-  // Confirm the object exists.
-  if (!cpp_data) {
-      throw Exception(Exception::recoverable,
-                      "Cpp data was NULL",
-                      "PyObjectWrapper::wrap_pyobject<MAUS::Data>");
-  }
-  // Require root_module to be imported for this to work (don't ask me why)
-  static PyObject* root_module = PyImport_ImportModule("ROOT");
-  if (!root_module)
-      throw Exception(Exception::recoverable,
-                      "Failed to import ROOT",
-                      "PyObjectWrapper::wrap_pyobject<MAUS::Data>");
+  return wrap_root_object_proxy(cpp_data, "MAUS::Data");
+}
 
-  // Place the MAUS::MAUSEvent* inside a ROOT Object Proxy
-  void* void_data = static_cast<void*>(cpp_data);
-  // cpp_data is now owned by python
-  PyObject* py_data = TPython::ObjectProxy_FromVoidPtr(void_data,
-                                                       "MAUS::Data",
-                                                       true);
-  if (!py_data) {
-      throw Exception(Exception::recoverable,
-                      "Could not convert MAUS::Data to PyRoot",
-                      "PyObjectWrapper::wrap_pyobject<MAUS::Data>");
-  }
-  return py_data;
+PyObject* PyObjectWrapper::wrap(MAUS::JobHeaderData* cpp_data) {
+  return wrap_root_object_proxy(cpp_data, "MAUS::JobHeaderData");
+}
+
+PyObject* PyObjectWrapper::wrap(MAUS::JobFooterData* cpp_data) {
+  return wrap_root_object_proxy(cpp_data, "MAUS::JobFooterData");
+}
+
+PyObject* PyObjectWrapper::wrap(MAUS::RunHeaderData* cpp_data) {
+  return wrap_root_object_proxy(cpp_data, "MAUS::RunHeaderData");
+}
+
+PyObject* PyObjectWrapper::wrap(MAUS::RunFooterData* cpp_data) {
+  return wrap_root_object_proxy(cpp_data, "MAUS::RunFooterData");
 }
 
 PyObject* PyObjectWrapper::wrap(Json::Value* json_value) {
@@ -127,10 +139,14 @@ PyObject* PyObjectWrapper::wrap(PyObject* py_object) {
 }
 
 void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
+                            PyObject** py_ret,
                             std::string** string_ret,
                             Json::Value** json_ret,
                             MAUS::Data** data_ret,
-                            PyObject** py_ret) {
+                            JobHeaderData** jh_ret,
+                            JobFooterData** jf_ret,
+                            RunHeaderData** rh_ret,
+                            RunFooterData** rf_ret) {
     if (*string_ret != NULL || *json_ret != NULL || *data_ret != NULL || *py_ret != NULL) {
       throw Exception(Exception::recoverable,
                       "return values not initialised to NULL",
@@ -144,7 +160,31 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
     }
 
     if (TPython::ObjectProxy_Check(py_cpp)) {
-        parse_root_object_proxy(py_cpp, data_ret);
+        try {
+            unwrap_root_object_proxy(py_cpp, data_ret, "MAUS::Data");
+            if (data_ret != NULL)
+                return;
+        } catch (MAUS::Exception &exc) {}
+        try {
+            unwrap_root_object_proxy(py_cpp, jh_ret, "MAUS::JobHeaderData");
+            if (jh_ret != NULL)
+                return;
+        } catch (MAUS::Exception &exc) {}
+        try {
+            unwrap_root_object_proxy(py_cpp, jf_ret, "MAUS::JobFooterData");
+            if (jf_ret != NULL)
+                return;
+        } catch (MAUS::Exception &exc) {}
+        try {
+            unwrap_root_object_proxy(py_cpp, rh_ret, "MAUS::RunHeaderData");
+            if (rh_ret != NULL)
+                return;
+        } catch (MAUS::Exception &exc) {}
+        try {
+            unwrap_root_object_proxy(py_cpp, rf_ret, "MAUS::RunFooterData");
+            if (rf_ret != NULL)
+                return;
+        } catch (MAUS::Exception &exc) {}
     } else if (PyCapsule_IsValid(py_cpp, "JsonCpp")) {
         void* vptr = PyCapsule_GetPointer(py_cpp, "JsonCpp");
         Json::Value *json_ptr = static_cast<Json::Value*>(vptr);
@@ -165,8 +205,10 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
     }
 }
 
-void PyObjectWrapper::parse_root_object_proxy(PyObject* py_cpp,
-                                              MAUS::Data** data_ret) {
+template <class TEMP>
+void PyObjectWrapper::unwrap_root_object_proxy(PyObject* py_cpp,
+                                              TEMP** data_ret,
+                                              std::string class_name) {
     PyObject* name = PyObject_CallMethod(py_cpp,
                                          const_cast<char*>("Class_Name"),
                                          NULL);
@@ -181,14 +223,14 @@ void PyObjectWrapper::parse_root_object_proxy(PyObject* py_cpp,
                         "Class_Name method did not return a string",
                         "PyObjectWrapper::lazy_unwrap");
     }
-    if (strcmp(c_string, "MAUS::Data") == 0) {
+    if (strcmp(c_string, class_name.c_str()) == 0) {
         Py_INCREF(py_cpp);  // TPyReturn decrefs py_cpp; we want to keep it
         void * vptr = static_cast<void*>(TPyReturn(py_cpp));
-        Data* data = static_cast<Data*>(vptr); // caller owns this memory
-        *data_ret = new Data(*data); // we own this memory
+        TEMP* data = static_cast<TEMP*>(vptr); // caller owns this memory
+        *data_ret = new TEMP(*data); // we own this memory
         if (!data_ret) {
             throw Exception(Exception::recoverable,
-                        "Failed to cast py_cpp as a MAUS::Data",
+                        "Failed to cast py_cpp as a "+class_name,
                         "PyObjectWrapper::lazy_unwrap");
         }
     } else {
@@ -209,6 +251,36 @@ void PyObjectWrapper::delete_jsoncpp_pycapsule(PyObject* py_capsule) {
                     "PyObjectWrapper::delete_jsoncpp_pycapsule");
     }
     delete json;
+}
+
+template <class TEMP>
+PyObject* PyObjectWrapper::wrap_root_object_proxy(TEMP* cpp_data,
+                                                  std::string name) {
+  // Confirm the object exists.
+  if (!cpp_data) {
+      throw Exception(Exception::recoverable,
+                      "Cpp data was NULL",
+                      "PyObjectWrapper::wrap_root_object_proxy<"+name+">");
+  }
+  // Require root_module to be imported for this to work (don't ask me why)
+  static PyObject* root_module = PyImport_ImportModule("ROOT");
+  if (!root_module)
+      throw Exception(Exception::recoverable,
+                      "Failed to import ROOT",
+                      "PyObjectWrapper::wrap_root_object_proxy<"+name+">");
+
+  // Place the MAUS::MAUSEvent* inside a ROOT Object Proxy
+  void* void_data = static_cast<void*>(cpp_data);
+  // cpp_data is now owned by python
+  PyObject* py_data = TPython::ObjectProxy_FromVoidPtr(void_data,
+                                                       name.c_str(),
+                                                       true);
+  if (!py_data) {
+      throw Exception(Exception::recoverable,
+                      "Could not convert MAUS::Data to PyRoot",
+                      "PyObjectWrapper::wrap_root_object_proxy<"+name+">");
+  }
+  return py_data;
 }
 }  // namespace MAUS
 

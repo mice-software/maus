@@ -864,5 +864,5 @@ class CADModuleExtraction:
         out = open(self.mausInfo, "w+")
         info.saveTo(out)
         out.close()
-                
-                
+        
+

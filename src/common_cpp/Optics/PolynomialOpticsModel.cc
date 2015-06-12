@@ -30,17 +30,18 @@
 #include <sstream>
 #include <vector>
 
-#include "Utils/Exception.hh"
-#include "Maths/PolynomialMap.hh"
+#include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Exception.hh"
+#include "src/common_cpp/Maths/PolynomialMap.hh"
 #include "src/common_cpp/DataStructure/Primary.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
 #include "src/common_cpp/Optics/PhaseSpaceVector.hh"
 #include "src/common_cpp/Optics/PolynomialTransferMap.hh"
-#include "Recon/Global/DataStructureHelper.hh"
-#include "Recon/Global/ParticleOpticalVector.hh"
-#include "Simulation/MAUSGeant4Manager.hh"
-#include "Simulation/MAUSPhysicsList.hh"
+#include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
+#include "src/common_cpp/Recon/Global/ParticleOpticalVector.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
 
 namespace MAUS {
 
@@ -66,8 +67,8 @@ PolynomialOpticsModel::PolynomialOpticsModel(
 void PolynomialOpticsModel::Build() {
   // Create some test hits at the desired First plane
   const std::vector<PhaseSpaceVector> primary_vectors = PrimaryVectors();
-std::cout << "DEBUG PolynomialOpticsModel::Build: "
-          << "# primaries: " << primary_vectors.size() << std::endl;
+  std::cout << "DEBUG PolynomialOpticsModel::Build: "
+            << "# primaries: " << primary_vectors.size() << std::endl;
   Json::Value primaries_json;
   for (std::vector<PhaseSpaceVector>::const_iterator primary_vector
         = primary_vectors.begin();
@@ -99,8 +100,8 @@ std::cout << "DEBUG PolynomialOpticsModel::Build: "
 
   // Simulate on the primaries, generating virtual detector tracks for each
   const Json::Value virtual_tracks
-      = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries_json);
-std::cout << "DEBUG PolynomialOpticsModel::Build: "
+          = MAUSGeant4Manager::GetInstance()->RunManyParticles(primaries_json);
+  std::cout << "DEBUG PolynomialOpticsModel::Build: "
           << "# virtual tracks: " << virtual_tracks.size() << std::endl;
   if (virtual_tracks.size() == 0) {
     throw(Exception(Exception::nonRecoverable,
@@ -110,14 +111,14 @@ std::cout << "DEBUG PolynomialOpticsModel::Build: "
 
   // Map stations to hits in each virtual track
   std::map<int64_t, std::vector<PhaseSpaceVector> > station_hits_map;
-size_t count = 0;
+  size_t count = 0;
   for (Json::Value::const_iterator virtual_track = virtual_tracks.begin();
        virtual_track != virtual_tracks.end();
        ++virtual_track) {
     MapStationsToHits(station_hits_map, *virtual_track);
     ++count;
   }
-std::cout << "DEBUG PolynomialOpticsModel::Build:" << std::endl
+  std::cout << "DEBUG PolynomialOpticsModel::Build:" << std::endl
           << "\t# virtual tracks mapped: " << count << std::endl
           << "\t# station Zs: " << station_hits_map.size() << std::endl;
 
@@ -127,11 +128,16 @@ std::cout << "DEBUG PolynomialOpticsModel::Build:" << std::endl
        station_hits != station_hits_map.end();
        ++station_hits) {
     // calculate transfer map and index it by the station z-plane
-std::cout << "DEBUG PolynomialOpticsModel::Build: "
+    std::cout << "DEBUG PolynomialOpticsModel::Build: "
           << "# virtual track hits for z = " << station_hits->first
           << ": " << station_hits->second.size() << std::endl;
-    transfer_maps_[station_hits->first]
-      = CalculateTransferMap(primary_vectors, station_hits->second);
+    try {
+        const TransferMap* tm
+                  = CalculateTransferMap(primary_vectors, station_hits->second);
+        transfer_maps_[station_hits->first] = tm;
+    } catch (Exception& exc) {
+        Squeak::mout(Squeak::warning) << "Warning: " << exc.what() << std::endl;
+    }
   }
 
   built_ = true;
@@ -207,7 +213,7 @@ const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
   // The (0,0,0,0,0,0) case produces a polynomial vector (1,0,0,...,0)
   // primaries.push_back(reference_trajectory_);
 
-  std::cerr << "Primaries:" << std::endl;
+  Squeak::mout(Squeak::debug) << "Primaries:" << std::endl;
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = i; j < 6; ++j) {
       PhaseSpaceVector primary;
@@ -217,8 +223,8 @@ const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
       }
       primary[j] = deltas_[j];  // diagonal element
 
-      // std::cerr << (primary + reference_trajectory_) << std::endl;
-      std::cerr << primary << std::endl;
+      // Squeak::mout(Squeak::debug) << (primary + reference_trajectory_) << std::endl;
+      Squeak::mout(Squeak::debug) << primary << std::endl;
       primaries.push_back(primary + reference_trajectory_);
     }
   }
@@ -235,14 +241,15 @@ const std::vector<PhaseSpaceVector> PolynomialOpticsModel::PrimaryVectors() {
     PhaseSpaceVector primary
       = primaries[row % base_block_length] - reference_trajectory_ + deltas;
 
-    // std::cerr << (primary + reference_trajectory_) << std::endl;
-    std::cerr << primary << std::endl;
+    // Squeak::mout(Squeak::debug) << (primary + reference_trajectory_) << std::endl;
+    Squeak::mout(Squeak::debug) << primary << std::endl;
     primaries.push_back(primary + reference_trajectory_);
   }
   return primaries;
 }
 
 /* Calculate a transfer matrix from an equal number of inputs and output.
+ * BUG: leaks memory on exception
  */
 const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     const std::vector<PhaseSpaceVector> & start_plane_hits,

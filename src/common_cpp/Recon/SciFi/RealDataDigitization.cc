@@ -26,6 +26,8 @@
 
 namespace MAUS {
 
+#define MIN_ADC 0.000000001
+
 RealDataDigitization::RealDataDigitization() {}
 
 RealDataDigitization::~RealDataDigitization() {}
@@ -44,100 +46,67 @@ void RealDataDigitization::initialise() {
   }
 }
 
-void RealDataDigitization::process(Spill *spill, Json::Value const &daq) {
-  // Check for existant pointers to ReconEvents and DAQData
-  if ( spill->GetDAQData() == NULL )
-    spill->SetDAQData(new DAQData());
+void RealDataDigitization::process(Spill *spill) {
+  // Check for DAQData
+  if ( spill->GetDAQData() == NULL ) {
+    // std::cerr << "RealDataDigitization::process No DAQ data found, aborting" << std::endl;
+    return;
+  }
 
-  if (spill->GetReconEvents() == NULL)
-    spill->SetReconEvents(new ReconEventPArray());
+  // Pull out the tracker daq objects
+  Tracker0DaqArray tracker0 = spill->GetDAQData()->GetTracker0DaqArray();
+  Tracker1DaqArray tracker1 = spill->GetDAQData()->GetTracker1DaqArray();
 
-  // Pick up JSON daq events.
-  Json::Value tracker_event = daq["tracker1"];
+  // Process the VLSB data to produce SciFiDigits
+  std::vector<SciFiDigit*> digits;
+  for (size_t i = 0; i < tracker0.size(); ++i) {
+    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
+    digits.insert(digits.end(), new_digits.begin(), new_digits.end());
+  }
+  for (size_t i = 0; i < tracker1.size(); ++i) {
+    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
+    digits.insert(digits.end(), new_digits.begin(), new_digits.end());
+  }
 
-  Tracker0DaqArray tracker0;
-  Tracker1DaqArray tracker1;
-  for ( unsigned int i = 0; i < tracker_event.size(); ++i ) { // loop over events
-    SciFiEvent* event = new SciFiEvent();
-    TrackerDaq *tracker0daq_event = new TrackerDaq();
-    TrackerDaq *tracker1daq_event = new TrackerDaq();
+  // Create a SciFiEvent and add the digits
+  SciFiEvent* sfevt = new SciFiEvent();
+  sfevt->set_digits(digits);
 
-    if ( tracker_event[i].isMember("VLSB_C") ) {
-      Json::Value input_event = tracker_event[i]["VLSB_C"];
-      // Merge tracker events.
-      int ievent_size = input_event.size();
-      int vlsb_c_size = daq["tracker2"][i]["VLSB_C"].size();
-      for ( int idig = 0; idig < vlsb_c_size; ++idig ) {
-        input_event[ievent_size] = daq["tracker2"][i]["VLSB_C"][idig];
-      }
-      process_VLSB_c(input_event, event, tracker0daq_event, tracker1daq_event);
-    } else if ( tracker_event[i].isMember("VLSB") ) {
-      Json::Value input_event = tracker_event[i]["VLSB"];
-      // Merge tracker events.
-      int ievent_size = input_event.size();
-      int vlsb_size = daq["tracker2"][i]["VLSB"].size();
-      for ( int idig = 0; idig < vlsb_size; ++idig ) {
-        input_event[ievent_size] = daq["tracker2"][i]["VLSB"][idig];
-      }
-      process_VLSB(input_event, event, tracker0daq_event, tracker1daq_event);
-    } else {
-      continue;
-    }
+  // Add the SciFiEvent to the latest recon event in the spill
+  // Check recon event array in spill is initialised, if not do so
+  if (!spill->GetReconEvents()) spill->SetReconEvents(new std::vector<ReconEvent*>());
+  // If the recon array is empty, push back a new recon event with into the array,
+  // otherwise just pull out the last recon event
+  ReconEvent* revt;
+  if (spill->GetReconEvents()->size() == 0) {
+      revt = new ReconEvent();
+      spill->GetReconEvents()->push_back(revt);
+  } else {
+    revt = spill->GetReconEvents()->back();
+  }
 
-    tracker0.push_back(tracker0daq_event); // end of event. push back.
-    tracker1.push_back(tracker1daq_event); // end of event. push back.
-
-    ReconEvent * revt = new ReconEvent();
-    // revt->SetSciFiEvent(new SciFiEvent(*event));
-    revt->SetSciFiEvent(event);
-    spill->GetReconEvents()->push_back(revt);
-    // delete event;
-  } // ends loop over events (i)
-  spill->GetDAQData()->SetTracker0DaqArray(tracker0);
-  spill->GetDAQData()->SetTracker1DaqArray(tracker1);
+  // Associate the scifi event created with the recon event
+  revt->SetSciFiEvent(sfevt);
 }
 
-void RealDataDigitization::process_VLSB(Json::Value input_event,
-                                          SciFiEvent* event,
-                                          TrackerDaq *tracker0daq_event,
-                                          TrackerDaq *tracker1daq_event) {
-  VLSBArray vlsb_tracker0_array;
-  VLSBArray vlsb_tracker1_array;
+std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, TrackerDaq* td) {
+  std::vector<SciFiDigit*> digits;
 
   // Loop over the VLSB channels of this event.
-  for ( unsigned int j = 0; j < input_event.size(); ++j ) {
-    Json::Value channel_in = input_event[j];
-    int ldc = channel_in["ldc_id"].asInt();
-    std::string detector = channel_in["detector"].asString();
-    int discriminator = channel_in["discriminator"].asInt();
-    int equip_type = channel_in["equip_type"].asInt();
-    int time_stamp = channel_in["time_stamp"].asInt();
-    int spill = channel_in["phys_event_number"].asInt();
-    int eventNo = channel_in["part_event_number"].asInt();
-    int bank = channel_in["bank"].asInt();
-    int channel_ro = channel_in["channel"].asInt();
-    int adc = channel_in["adc"].asInt();
-    int tdc = channel_in["tdc"].asInt();
+  unsigned int xVLSBArraySize = td->GetVLSBArraySize();
+  for ( unsigned int i = 0; i < xVLSBArraySize; ++i ) {
+    VLSB vlsb1 = td->GetVLSBArrayElement(i);
 
-    VLSB vlsb;
-    vlsb.SetEquipType(equip_type);
-    vlsb.SetPhysEventNumber(spill);
-    vlsb.SetTimeStamp(time_stamp);
-    vlsb.SetDetector(detector);
-    vlsb.SetPartEventNumber(eventNo);
-    vlsb.SetChannel(channel_ro);
-    vlsb.SetBankID(bank);
-    vlsb.SetADC(adc);
-    vlsb.SetTDC(tdc);
-    vlsb.SetDiscriminator(discriminator);
-    vlsb.SetLdcId(ldc);
 
-    if ( bank < 32 ) {
-      vlsb_tracker0_array.push_back(vlsb);
-    } else {
-      vlsb_tracker1_array.push_back(vlsb);
-    }
+//    if ( bank < 32 ) {
+//      vlsb_tracker0_array.push_back(vlsb);
+//    } else {
+//      vlsb_tracker1_array.push_back(vlsb);
+//    }
 
+    int bank = vlsb1.GetBankID();
+    int channel_ro = vlsb1.GetChannel();
+    double adc = vlsb1.GetADC();
     if ( !is_good_channel(bank, channel_ro) ) {
       continue;
     }
@@ -146,38 +115,48 @@ void RealDataDigitization::process_VLSB(Json::Value input_event,
     // int new_bank = bank + 4*board;
     double adc_pedestal = _calibration[bank][channel_ro]["adc_pedestal"].asDouble();
     double adc_gain     = _calibration[bank][channel_ro]["adc_gain"].asDouble();
-    double tdc_pedestal = _calibration[bank][channel_ro]["tdc_pedestal"].asDouble();
-    double tdc_gain     = _calibration[bank][channel_ro]["tdc_gain"].asDouble();
+    // double tdc_pedestal = _calibration[bank][channel_ro]["tdc_pedestal"].asDouble();
+    // double tdc_gain     = _calibration[bank][channel_ro]["tdc_gain"].asDouble();
+
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _min && adc_gain > _min ) {
+    if ( adc_pedestal > MIN_ADC && adc_gain > MIN_ADC ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
     }
+
+    // Get the time
     double time = -10.0;
-    /* No TDC calibration yet.
+    /* No TDC calibration yet
     if ( tdc_pedestal > tdc_pedestal_min && tdc_gain > 0 ) {
       time = (tdc-tdc_pedestal)/tdc_gain;
     } else {
       time = -10.0;
     }
     */
+
     // Find tracker, station, plane, channel.
     int board = floor(bank/4);
     int old_bank = bank%4;
-    int tracker, station, plane, channel;
-    bool found = false; // get_StatPlaneChannel(board, old_bank, channel_ro,
-                        //                      tracker, station, plane, channel);
+    int tracker(-1);
+    int station(-1);
+    int plane(-1);
+    int channel(-1);
+    int extWG(-1);
+    int inWG(-1);
+    int WGfib(-1);
+    bool found = get_StatPlaneChannel(board, old_bank, channel_ro,
+                                      tracker, station, plane, channel,
+                                      extWG, inWG, WGfib);
      // Exclude missing modules.
     if ( found ) { // pe > 1.0 &&
-      SciFiDigit *digit = new SciFiDigit(spill, eventNo,
+      SciFiDigit *digit = new SciFiDigit(SpillNum, vlsb1.GetPartEventNumber(),
                                          tracker, station, plane, channel, pe, time);
-      event->add_digit(digit);
+      digits.push_back(digit);
     }
-  }  // ends loop over channels (j)
-  tracker0daq_event->SetVLSBArray(vlsb_tracker0_array); // fill event with all vlsb digits
-  tracker1daq_event->SetVLSBArray(vlsb_tracker1_array); // fill event with all vlsb digits
+  }  // ends loop over channels
+  return digits;
 }
 
 void RealDataDigitization::process_VLSB_c(Json::Value input_event,
@@ -235,7 +214,7 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     double tdc_gain     = _calibration[new_bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _min && adc_gain > _min ) {
+    if ( adc_pedestal > MIN_ADC && adc_gain > MIN_ADC ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
