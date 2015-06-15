@@ -70,6 +70,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
 
   _spacepoint_recon = SciFiSpacePointRec();
 
+  _pattern_recognition.LoadGlobals();
   _pattern_recognition.set_helical_pr_on(_helical_pr_on);
   _pattern_recognition.set_straight_pr_on(_straight_pr_on);
   _pattern_recognition.set_bz_t1(_geometry_helper.GetFieldValue(0));

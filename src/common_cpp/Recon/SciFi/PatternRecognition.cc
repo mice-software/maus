@@ -71,10 +71,6 @@ PatternRecognition::PatternRecognition(): _straight_pr_on(true),
                                           _sz_chisq_cut(4.0),
                                           _Pt_max(180.0),
                                           _Pz_min(50.0) {
-  bool success = LoadGlobals();
-  if (!success) {
-    std::cerr << "WARNING: Pattern Recognition failed to load Globals, using default values\n";
-  }
 }
 
 void PatternRecognition::set_parameters_to_default() {
