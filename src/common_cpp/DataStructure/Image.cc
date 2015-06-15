@@ -36,7 +36,7 @@ Image& Image::operator=(const Image& rhs) {
     for (size_t i = 0; i < _canvas_wrappers.size(); ++i)
         delete _canvas_wrappers[i];
     _canvas_wrappers = std::vector<MAUS::CanvasWrapper*>(rhs._canvas_wrappers.size(), NULL);
-    for (size_t i = 0; i < rhs._canvas_wrappers.size(); ++i)       
+    for (size_t i = 0; i < rhs._canvas_wrappers.size(); ++i)
         _canvas_wrappers[i] = new CanvasWrapper(*rhs._canvas_wrappers[i]);
     return *this;
 }

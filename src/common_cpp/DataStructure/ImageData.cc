@@ -54,6 +54,5 @@ int ImageData::GetSizeOf() const {
   ImageData data;
   return sizeof(data);
 }
-
 }
 

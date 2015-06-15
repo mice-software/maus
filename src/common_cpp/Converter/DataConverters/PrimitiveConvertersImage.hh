@@ -31,7 +31,6 @@ class ImageImageConverter : public ConverterBase<ImageData, ImageData> {
         return new ImageData(*image);
     }
 };
-
 }
 
 #endif

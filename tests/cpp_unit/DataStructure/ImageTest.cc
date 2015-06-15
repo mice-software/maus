@@ -109,7 +109,6 @@ TEST(ImageTest, ImageDataTest) {
               image_data_copy_ctor.GetImage()->GetRunNumber());
     EXPECT_NE(image_data.GetImage(),
               image_data_copy_ctor.GetImage());
-    
 }
 
 TEST(ImageTest, CanvasWrapperTest) {
@@ -136,14 +135,14 @@ TEST(ImageTest, CanvasWrapperTest) {
 
     CanvasWrapper cwrap_copy_vals(cwrap_values);
     EXPECT_EQ(cwrap_values.GetDescription(), cwrap_copy_vals.GetDescription());
-    EXPECT_EQ(std::string("title"), 
+    EXPECT_EQ(std::string("title"),
               std::string(cwrap_copy_vals.GetCanvas()->GetTitle()));
 }
 
 class TestMainFrame : public TGMainFrame {
-public:
-   TestMainFrame(const TGWindow *p, UInt_t w, UInt_t h) {}
-   virtual ~TestMainFrame() {}
+  public:
+    TestMainFrame(const TGWindow *p, UInt_t w, UInt_t h) {}
+    virtual ~TestMainFrame() {}
 };
 
 

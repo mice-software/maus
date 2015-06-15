@@ -46,6 +46,12 @@ class CanvasWrapper {
     /** Get the canvas description */
     std::string GetDescription() const {return _description;}
 
+    /** Set the file tag - file is dir/prefix+tag+"."+file_type */
+    void SetFileTag(std::string file_tag) {_file_tag = file_tag;}
+
+    /** Get the file tag - file is dir/prefix+tag+"."+file_type */
+    std::string GetFileTag() const {return _file_tag;}
+
     /** Set the ROOT canvas
      *
      *  Image takes ownership of memory allocated to the TCanvas object
@@ -73,6 +79,7 @@ class CanvasWrapper {
 
   private:
     std::string _description;
+    std::string _file_tag;
     TCanvas* _canvas;
 
     MAUS_VERSIONED_CLASS_DEF(CanvasWrapper);

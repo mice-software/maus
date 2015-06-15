@@ -119,7 +119,7 @@ namespace MAUS {
 
   TEST(ReduceBaseTest, TestProcess) {
     MyReducer mm;
-    
+
     std::string* str1 = new std::string("-27");
     PyObject* py_str1 = PyObjectWrapper::wrap(str1); // python owns str1
     PyObject* py_str2 = mm.process_pyobj(py_str1);

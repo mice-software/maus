@@ -38,10 +38,7 @@ CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
     if (_canvas != NULL)
         delete _canvas;
     if (rhs._canvas != NULL) {
-        _canvas = dynamic_cast<TCanvas*>(rhs._canvas->Clone());
-        //_canvas->cd();
-        //dynamic_cast<TCanvas*>(rhs._canvas->DrawClone());
-        //_canvas->SetTitle(rhs._canvas->GetTitle());
+        _canvas = static_cast<TCanvas*>(rhs._canvas->Clone());
     } else {
         _canvas = NULL;
     }

@@ -56,7 +56,8 @@ namespace MAUS {
         cpp_out = _process(cpp_in);
         delete cpp_in;
     } catch (std::exception& e) {
-      CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
+      PyErr_SetString(PyExc_RuntimeError, e.what());
+      return NULL; // let the python error handler do its thing
     } catch (...) {
       throw UnhandledException(_classname);
     }

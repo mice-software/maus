@@ -40,7 +40,8 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
   RunHeaderData** rh_ret = new RunHeaderData*(NULL);
   RunFooterData** rf_ret = new RunFooterData*(NULL);
   PyObject** py_ret = new PyObject*(NULL);
-  lazy_unwrap(args, py_ret, string_ret, json_ret, data_ret, jh_ret, jf_ret, rh_ret, rf_ret, image_ret);
+  lazy_unwrap(args, py_ret, string_ret, json_ret,
+              data_ret, jh_ret, jf_ret, rh_ret, rf_ret, image_ret);
   TEMP* cpp_ret = NULL;
   if (*py_ret != NULL) {
       cpp_ret = ConverterFactory().convert<PyObject, TEMP>(*py_ret);

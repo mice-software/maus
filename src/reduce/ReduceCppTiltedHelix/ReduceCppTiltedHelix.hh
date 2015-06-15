@@ -38,14 +38,21 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     void _death();
 
-    ImageData* _process(Data* data);    
+    ImageData* _process(Data* data);
+
+    bool will_cut(std::vector<SciFiSpacePoint*> space_points);
+
+    void do_fit(std::vector<SciFiSpacePoint*> space_points);
+
+    ImageData* get_image_data();
+
+    std::vector<TH1D> hist_vector_;
 };
 
 PyMODINIT_FUNC init_ReduceCppTiltedHelix(void) {
-   PyWrapReduceBase<ReduceCppTiltedHelix>::PyWrapReduceBaseModInit(
+    PyWrapReduceBase<ReduceCppTiltedHelix>::PyWrapReduceBaseModInit(
                                   "ReduceCppTiltedHelix", "", "", "", "");
 }
-
 }
 
 #endif // SRC_REDUCE_REDUCECPPTILTEDHELIX_HH
