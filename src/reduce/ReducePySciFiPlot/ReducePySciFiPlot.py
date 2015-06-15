@@ -23,8 +23,8 @@ run.
 # Disable messages about too many branches and too many lines.
 #pylint: disable = R0912
 #pylint: disable = R0915
-pylint: disable = E0001, C0103, C0301
-pylint: disable = W0105, W0612, W0201
+#pylint: disable = C0103, C0301
+#pylint: disable = W0105, W0612, W0201
 
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
@@ -372,6 +372,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # the update/refresh is done in update_histos()
         
         self.canvas_SciFiDigit = ROOT.TCanvas("SciFiDigit", "SciFiDigit")
+        self.canvas_SciFiDigit.SetTitle("x")
         self.canvas_SciFiDigit.Divide(2, 1)
         self.canvas_SciFiDigit.cd(1)
         self.ScifiDigitT1.Draw()
