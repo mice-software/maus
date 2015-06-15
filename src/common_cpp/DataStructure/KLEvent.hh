@@ -56,6 +56,9 @@ class KLEvent {
     /** Returns KLEventCellHit */
     KLEventCellHit GetKLEventCellHit() const;
 
+    /** Returns KLEventCellHit */
+    KLEventCellHit* GetKLEventCellHitPtr();
+
     /** Sets KLEventCellHit */
     void SetKLEventCellHit(KLEventCellHit kl_cell_hits);
 

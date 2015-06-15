@@ -56,6 +56,10 @@ KLEventCellHit KLEvent::GetKLEventCellHit() const {
     return _kl_cell_hits;
 }
 
+KLEventCellHit* KLEvent::GetKLEventCellHitPtr() {
+    return &_kl_cell_hits;
+}
+
 void KLEvent::SetKLEventCellHit(KLEventCellHit kl_cell_hits) {
     _kl_cell_hits = kl_cell_hits;
 }
