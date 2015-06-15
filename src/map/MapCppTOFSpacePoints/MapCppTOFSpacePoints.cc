@@ -81,7 +81,6 @@ void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
 
 void MapCppTOFSpacePoints::_death() {}
 
-//void MapCppTOFSpacePoints::_process(MAUS::Data* document) const {
 void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
   Spill *spill = data->GetSpill();
 
@@ -97,13 +96,12 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
   if (!_map_init || runNumber != runNumberSave) {
       const_cast<MapCppTOFSpacePoints*>(this)->getTofCalib(runNumber);
   }
-    std::map<int, std::string> triggerhit_pixels;
+  std::map<int, std::string> triggerhit_pixels;
   ReconEventPArray *events = spill->GetReconEvents();
-  //int nPartEvents = spill->GetReconEventSize();
   int nPartEvents = events->size();
-  std::cerr << "evsize = " << nPartEvents << std::endl;
+  // std::cerr << "evsize = " << nPartEvents << std::endl;
   for (unsigned int n_event = 0; n_event < nPartEvents; n_event++) {
-      std::cerr << "evt: " << n_event << std::endl;
+      // std::cerr << "evt: " << n_event << std::endl;
       TOFEventSlabHit* tSlabHits = (*events)[n_event]->GetTOFEvent()->GetTOFEventSlabHitPtr();
         // NOTE: DR March15
         // Cheating -- until I figure out how to handle trig-req-time in MC:
@@ -121,29 +119,34 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
         // For now I have chosen option a) with option b) commented out below
         // need to be sure to change ConfigDefaults for switching between
         // data<->mc
-        if (spill->GetMCEventSize() > 0)
-            const_cast<MapCppTOFSpacePoints*>(this)->_findTriggerPixelCut = 50.0;
+      if (spill->GetMCEventSize() > 0)
+          const_cast<MapCppTOFSpacePoints*>(this)->_findTriggerPixelCut = 50.0;
 
-          std::cerr << tSlabHits->GetTOF0SlabHitArraySize() << " " << tSlabHits->GetTOF1SlabHitArraySize() << " " << tSlabHits->GetTOF2SlabHitArraySize() << std::endl;
-          TOF0SpacePointArray* tof0_sp  = (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF0SpacePointArrayPtr();
-          TOF1SpacePointArray* tof1_sp  = (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF1SpacePointArrayPtr();
-          TOF2SpacePointArray* tof2_sp  = (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF2SpacePointArrayPtr();
-          if (tSlabHits->GetTOF1SlabHitArraySize() != 0) {
-              std::cerr << "processing tof1" << std::endl;
-              TOF1SlabHitArray* t1slh = tSlabHits->GetTOF1SlabHitArrayPtr();
-              processTOFStation(t1slh, tof1_sp, "tof1",n_event,triggerhit_pixels);
-          }
-          if (tSlabHits->GetTOF0SlabHitArraySize() != 0) { 
-              std::cerr << "processing tof0" << std::endl;
-              TOF0SlabHitArray* t0slh = tSlabHits->GetTOF0SlabHitArrayPtr();
-              processTOFStation(t0slh, tof0_sp, "tof0",n_event,triggerhit_pixels);
-          }
-          if (tSlabHits->GetTOF2SlabHitArraySize() != 0) {
-              std::cerr << "processing tof2" << std::endl;
-              TOF2SlabHitArray* t2slh = tSlabHits->GetTOF2SlabHitArrayPtr();
-              processTOFStation(t2slh, tof2_sp, "tof2",n_event,triggerhit_pixels);
-          }
+      // std::cerr << tSlabHits->GetTOF0SlabHitArraySize() << " "
+      //           << tSlabHits->GetTOF1SlabHitArraySize() << " "
+      //           << tSlabHits->GetTOF2SlabHitArraySize() << std::endl;
+      TOF0SpacePointArray* tof0_sp  =
+        (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF0SpacePointArrayPtr();
+      TOF1SpacePointArray* tof1_sp  =
+        (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF1SpacePointArrayPtr();
+      TOF2SpacePointArray* tof2_sp  =
+        (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF2SpacePointArrayPtr();
+      if (tSlabHits->GetTOF1SlabHitArraySize() != 0) {
+          std::cerr << "processing tof1" << std::endl;
+          TOF1SlabHitArray* t1slh = tSlabHits->GetTOF1SlabHitArrayPtr();
+          processTOFStation(t1slh, tof1_sp, "tof1", n_event, triggerhit_pixels);
       }
+      if (tSlabHits->GetTOF0SlabHitArraySize() != 0) {
+          std::cerr << "processing tof0" << std::endl;
+          TOF0SlabHitArray* t0slh = tSlabHits->GetTOF0SlabHitArrayPtr();
+          processTOFStation(t0slh, tof0_sp, "tof0", n_event, triggerhit_pixels);
+      }
+      if (tSlabHits->GetTOF2SlabHitArraySize() != 0) {
+          std::cerr << "processing tof2" << std::endl;
+          TOF2SlabHitArray* t2slh = tSlabHits->GetTOF2SlabHitArrayPtr();
+          processTOFStation(t2slh, tof2_sp, "tof2", n_event, triggerhit_pixels);
+      }
+  }
 }
 
 void MapCppTOFSpacePoints::processTOFStation(
@@ -155,21 +158,10 @@ void MapCppTOFSpacePoints::processTOFStation(
   // std::cout << "DEBUG MapCppTOFSpacePoints::processTOFStation| "
   //          << "Entry Checkpoint" << std::endl;
   // Get the slab hits document for this TOF station.
-  //Json::Value xDocPartEvent = JsonWrapper::GetProperty(xSlabHits,
-  //                                                     detector,
-  //                                                     JsonWrapper::anyValue);
-  // xDocPartEvent = spill[re][te][t-s-h][det] 
-  // xDocPartEvent = spill[re][te][t-s-h][det] === tof0/1/2/slabhits arg
-  //Json::Value xDocPartEventSpacePoints(Json::arrayValue);
-  //if (xDocPartEvent.isArray()) {
-  // do each detector
-  // problem is xPlane0Hits etc get overwritten for each det
-  // either separate vectors for each
-  // or do this det business in the calling function & pass the slab hits for that detector
   std::vector<int> xPlane0Hits;
   std::vector<int> xPlane1Hits;
-  if (tof0slabhits->size() != 0) { 
-      for (int nslh=0; nslh < tof0slabhits->size(); ++ nslh) {
+  if (tof0slabhits->size() != 0) {
+      for (int nslh = 0; nslh < tof0slabhits->size(); ++nslh) {
           TOFSlabHit tof0_slh = tof0slabhits->at(nslh);
           int xPlane = tof0_slh.GetPlane();
           std::cerr << "xPlane: " << xPlane << std::endl;
@@ -183,33 +175,27 @@ void MapCppTOFSpacePoints::processTOFStation(
           }
       }
   }
-  // set the station numbering
   std::cerr << "--------- " << detector << " " << _triggerStation << std::endl;
-      if (_triggerStation == detector) {
-          std::cerr << "finding tp" << std::endl;
-          triggerhit_pixels[part_event] = findTriggerPixel(tof0slabhits,
+  if (_triggerStation == detector) {
+      std::cerr << "finding tp" << std::endl;
+      triggerhit_pixels[part_event] = findTriggerPixel(tof0slabhits,
                                                        xPlane0Hits,
                                                        xPlane1Hits);
-      }
-      // std::cout << "DEBUG MapCppTOFSpacePoints::processTOFStation| "
-      //           << "Trigger Pixel: " << triggerhit_pixels[part_event]
-      //           << std::endl;
-    // If we do not know the trigger pixel there is no way to reconstruct the
-    // time.
-    if (triggerhit_pixels[part_event] != "unknown") {
+  }
+  // std::cout << "DEBUG MapCppTOFSpacePoints::processTOFStation| "
+  //           << "Trigger Pixel: " << triggerhit_pixels[part_event]
+  //           << std::endl;
+  // If we do not know the trigger pixel there is no way to reconstruct the
+  // time.
+  if (triggerhit_pixels[part_event] != "unknown") {
       // Create the space point. Add the calibrated value of the time to the
       // slab hits.
-      //xDocPartEventSpacePoints = makeSpacePoints(xDocPartEvent,
-      //xDocPartEventSpacePoints = makeSpacePoints(tofslabhits,
       std::cerr << "Making space points..." << std::endl;
       makeSpacePoints(tof0slabhits, tof0sp, xPlane0Hits, xPlane1Hits, triggerhit_pixels);
-    }
-
+  }
 }
 
 std::string MapCppTOFSpacePoints::findTriggerPixel(
-//                                       Json::Value xDocPartEvent,
-//                                       TOFEventSlabHit* tofslabhit,
                                        TOF0SlabHitArray* tof0slabhitptr,
                                        std::vector<int> xPlane0Hits,
                                        std::vector<int> xPlane1Hits) const {
@@ -218,36 +204,19 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
   int tStn = -1;
   if (_triggerStation == "tof0") {
       tStn = 0;
-      //TOF0SlabHitArray* tSlh = tofslabhit->GetTOF0SlabHitArrayPtr();
-  }
-  else if (_triggerStation == "tof1") {
+  } else if (_triggerStation == "tof1") {
       tStn = 1;
-      //TOF0SlabHitArray* tSlh = tofslabhit->GetTOF1SlabHitArrayPtr();
-  }
-  else if (_triggerStation == "tof2") {
+  } else if (_triggerStation == "tof2") {
       tStn = 2;
-      //TOF0SlabHitArray* tSlh = tofslabhit->GetTOF2SlabHitArrayPtr();
   }
   //
-  std::cerr << "nx, ny" << xPlane0Hits.size() << " " << xPlane1Hits.size() << std::endl;
+  // std::cerr << "nx, ny" << xPlane0Hits.size() << " " << xPlane1Hits.size() << std::endl;
   // Loop over all possible combinations of slab hits in the trigger station.
   for (unsigned int nX = 0; nX < xPlane0Hits.size(); nX++) {
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {
       // Get the two slab hits.
-      //TOFSlabHit tof_slh = tofslabhit->GetTOF2SlabHitArrayElement(nX);
       TOFSlabHit tof_slh_X = tof0slabhitptr->at(nX);
       TOFSlabHit tof_slh_Y = tof0slabhitptr->at(nY);
-      /*
-      Json::Value xSlabHit_X = JsonWrapper::GetItem(xDocPartEvent,
-                                                    xPlane0Hits[nX],
-                                                    JsonWrapper::objectValue);
-
-      Json::Value xSlabHit_Y = JsonWrapper::GetItem(xDocPartEvent,
-                                                    xPlane1Hits[nY],
-                                                    JsonWrapper::objectValue);
-      int slabX = xSlabHit_X["slab"].asInt();
-      int slabY = xSlabHit_Y["slab"].asInt();
-      */
       int slabX = tof_slh_X.GetSlab();
       int slabY = tof_slh_Y.GetSlab();
       std::cerr << "ftp: " << slabX << " " << slabY << std::endl;
@@ -256,8 +225,6 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
       // trigger. If this assumption is correct the value of the time after the
       // corrections has to be approximately 0.
       double t_x, t_y;
-      //if (calibrateSlabHit(xTriggerPixelKey, xSlabHit_X, t_x) &&
-      //    calibrateSlabHit(xTriggerPixelKey, xSlabHit_Y, t_y)) {
       if (calibrateSlabHit(xTriggerPixelKey, tof_slh_X, t_x) &&
           calibrateSlabHit(xTriggerPixelKey, tof_slh_Y, t_y)) {
         // std::cout << "DEBUG MapCppTOFSpacePoints::findTriggerPixel| "
@@ -267,7 +234,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
         if (fabs(t_x/2. + t_y/2.) < _findTriggerPixelCut) {
           // The trigger pixel has been found.
           // std::cout << xTriggerPixelKey << std::endl;
-          std::cerr << "found tp: " << xTriggerPixelKey << std::endl;
+          // std::cerr << "found tp: " << xTriggerPixelKey << std::endl;
           return xTriggerPixelKey.str();
         }
       }
@@ -276,11 +243,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
   return "unknown";
 }
 
-//Json::Value MapCppTOFSpacePoints::makeSpacePoints(
-//              Json::Value &xDocPartEvent,
 void MapCppTOFSpacePoints::makeSpacePoints(
-              //Json::Value &xDocPartEvent,
-              //TOFEventSlabHit* tevslabhit,
               TOF0SlabHitArray* slhitPtr,
               TOF0SpacePointArray* spPtr,
               std::vector<int> xPlane0Hits,
@@ -291,64 +254,50 @@ void MapCppTOFSpacePoints::makeSpacePoints(
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {
       Json::Value xDocSpacePoint;
       TOFSpacePoint xTheSpacePoint;
-      //int xPartEvent = JsonWrapper::GetProperty(xDocPartEvent[xPlane0Hits[0]],
-      //                                         "part_event_number",
-      //                                         JsonWrapper::intValue).asInt();
       int xPartEvent = (slhitPtr->at(xPlane0Hits[0])).GetPartEventNumber();
       TOFSlabHit slh_x = slhitPtr->at(nX);
       TOFSlabHit slh_y = slhitPtr->at(nY);
       TOFPixelKey xTriggerPixelKey(triggerhit_pixels[xPartEvent]);
       double t_x, t_y;
-      std::cerr << "calibrating Slab Hit" << std::endl;
+      // std::cerr << "calibrating Slab Hit" << std::endl;
       if (calibrateSlabHit(xTriggerPixelKey,
-                           //xDocPartEvent[xPlane0Hits[nX]],
                            slh_x,
                            t_x) &&
           calibrateSlabHit(xTriggerPixelKey,
-                           //xDocPartEvent[xPlane1Hits[nY]],
                            slh_y,
                            t_y)) {
         // The first argument should be the hit in the horizontal slab and the
         // second should be the hit in the vertical slab. This is mandatory!!!
-        //Json::Value xDocSpacePoint
-        //  = fillSpacePoint(xDocPartEvent[xPlane0Hits[nX]],
-        //                                 xDocPartEvent[xPlane1Hits[nY]]);
-        std::cerr << "filling sp" << std::endl;
+        // std::cerr << "filling sp" << std::endl;
         fillSpacePoint(xTheSpacePoint, slh_x, slh_y);
         double deltaT = xDocSpacePoint["dt"].asInt();
         if (fabs(deltaT) < _makeSpacePointCut) {
-          //xDocSpacePoints.append(xDocSpacePoint);
-          std::cerr << "pushing back" << std::endl;
+          // std::cerr << "storing sp" << std::endl;
           spPtr->push_back(xTheSpacePoint);
         }
       }
     }
   }
-
-  ////return xDocSpacePoints;
 }
 
-//Json::Value MapCppTOFSpacePoints::fillSpacePoint(Json::Value &xDocSlabHit_X,
-//                                                 Json::Value &xDocSlabHit_Y) const {
 void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit &xDocSlabHit_X,
                                                  TOFSlabHit &xDocSlabHit_Y) const {
 
   Json::Value xDocSpacePoint;
   // First get the two channel keys and make the pixel key.
-  //std::string keyStr_SlabX_digit0
-  //  = JsonWrapper::GetProperty(xDocSlabHit_X["pmt0"],
-  //                             "tof_key",
-  //                             JsonWrapper::stringValue).asString();
   std::string keyStr_SlabX_digit0 = (xDocSlabHit_X.GetPmt0Ptr())->GetTofKey();
   TOFChannelKey xKey_SlabX_digit0(keyStr_SlabX_digit0);
 
-  //std::string keyStr_SlabY_digit0
-  //  = JsonWrapper::GetProperty(xDocSlabHit_Y["pmt0"],
-  //                             "tof_key",
-  //                             JsonWrapper::stringValue).asString();
   std::string keyStr_SlabY_digit0 = (xDocSlabHit_Y.GetPmt0Ptr())->GetTofKey();
   TOFChannelKey xKey_SlabY_digit0(keyStr_SlabY_digit0);
 
+///////////////////
+  // ATTENTION : according to the convention used in the cabling file the
+  // horizontal slabs are always in plane 0 and the vertical slabs are always in
+  // plane 1.
+  // The second argument in the constructor has to be the number of the
+  // horizontal slab, and the third argument has to be the vertical slab.
+  // This is mandatory!!!
   TOFPixelKey xSPKey(xKey_SlabX_digit0.station(),
                      xKey_SlabX_digit0.slab(),
                      xKey_SlabY_digit0.slab(),
@@ -376,105 +325,21 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
   xSpacePoint.SetPixelKey(xSPKey.str());
   xSpacePoint.SetCharge(charge_SlabX + charge_SlabY);
   xSpacePoint.SetChargeProduct(chargeProduct_SlabX + chargeProduct_SlabY);
-/*
-///////////////////
-  // ATTENTION : according to the convention used in the cabling file the
-  // horizontal slabs are always in plane 0 and the vertical slabs are always in
-  // plane 1.
-  // The second argument in the constructor has to be the number of the
-  // horizontal slab, and the third argument has to be the vertical slab.
-  // This is mandatory!!!
-  TOFPixelKey xSPKey(xKey_SlabX_digit0.station(),
-                     xKey_SlabX_digit0.slab(),
-                     xKey_SlabY_digit0.slab(),
-                     xKey_SlabY_digit0.detector());
-
-  // Get the corrected time from the two slab hits.
-  double time_SlabX
-    = JsonWrapper::GetProperty(xDocSlabHit_X,
-                               "time",
-                               JsonWrapper::realValue).asDouble();
-
-  double time_SlabY
-    = JsonWrapper::GetProperty(xDocSlabHit_Y,
-                               "time",
-                               JsonWrapper::realValue).asDouble();
-
-  // Get the charge and the charge product.
-  int charge_SlabX = JsonWrapper::GetProperty(xDocSlabHit_X,
-                                              "charge",
-                                              JsonWrapper::intValue).asInt();
-  int chargeProduct_SlabX
-    = JsonWrapper::GetProperty(xDocSlabHit_X,
-                               "charge_product",
-                               JsonWrapper::intValue).asInt();
-
-  int charge_SlabY = JsonWrapper::GetProperty(xDocSlabHit_Y,
-                                              "charge",
-                                              JsonWrapper::intValue).asInt();
-  int chargeProduct_SlabY
-    = JsonWrapper::GetProperty(xDocSlabHit_Y,
-                               "charge_product",
-                               JsonWrapper::intValue).asInt();
-
-  // Now calculate the time of the space point.
-  double time = (time_SlabX + time_SlabY)/2.;
-  double dt = time_SlabX - time_SlabY;
-  xDocSpacePoint["time"] = time;
-  xDocSpacePoint["dt"] = dt;
-
-  // Fill all other necessary information in the Space point.
-  xDocSpacePoint["part_event_number"] = xDocSlabHit_X["part_event_number"];
-  xDocSpacePoint["phys_event_number"] = xDocSlabHit_X["phys_event_number"];
-  xDocSpacePoint["slabX"]     = xKey_SlabX_digit0.slab();
-  xDocSpacePoint["station"]   = xKey_SlabX_digit0.station();
-  xDocSpacePoint["detector"]  = xKey_SlabX_digit0.detector();
-  xDocSpacePoint["slabY"]     = xKey_SlabY_digit0.slab();
-  xDocSpacePoint["pixel_key"] = xSPKey.str();
-  xDocSpacePoint["charge"] = charge_SlabX + charge_SlabY;
-  xDocSpacePoint["charge_product"] = chargeProduct_SlabX + chargeProduct_SlabY;
-
   // std::cout << xSPKey << "  t = " << time << " dt = " << dt << std::endl;
   // std::cout << xDocSpacePoint << std::endl;
-  return xDocSpacePoint;
-///////////////////
-*/
 }
 
 template<typename T>
 bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
-//                                           Json::Value &xPmtHit,
-                                           //Pmt0* xPmtHit,
                                            T xPmtHit,
                                            double &time) const {
   int charge;
   // Charge of the digit can be unset because of the Zero suppresion of the
   // fADCs.
-  /*
-  if (xPmtHit.isMember("charge")) {
-    charge= JsonWrapper::GetProperty(xPmtHit,
-                                     "charge",
-                                     JsonWrapper::intValue).asInt();
-  } else {
-    // std::cout << "DEBUG MapCppTOFSpacePoints::calibratePmtHit: "
-    //           << "!xPmtHit.isMember(\"charge\")" << std::endl;
-    return false;
-  }
-  std::string keyStr
-    = JsonWrapper::GetProperty(xPmtHit,
-                               "tof_key",
-                               JsonWrapper::stringValue).asString();
- */
   charge = xPmtHit->GetCharge();
   std::string keyStr = xPmtHit->GetTofKey();
   TOFChannelKey xChannelKey(keyStr);
 
-  /*
-  double raw_time
-    = JsonWrapper::GetProperty(xPmtHit,
-                               "raw_time",
-                               JsonWrapper::realValue).asDouble();
-  */
   double raw_time = xPmtHit->GetRawTime();
   // Get the calibration correction.
   double dT = _map.dT(xChannelKey, xTriggerPixelKey, charge);
@@ -483,7 +348,6 @@ bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
     return  false;
 
   time = raw_time - dT;
-  //xPmtHit["time"] = time;
   xPmtHit->SetTime(time);
   // std::cout << "calibratePmtHit " << xChannelKey << " " << xTriggerPixelKey
   //           << " t = " << raw_time << " - " << dT << " = " << time << std::endl;
@@ -491,19 +355,15 @@ bool MapCppTOFSpacePoints::calibratePmtHit(TOFPixelKey xTriggerPixelKey,
 }
 
 bool MapCppTOFSpacePoints::calibrateSlabHit(TOFPixelKey xTriggerPixelKey,
-                                            //Json::Value &xSlabHit,
                                             TOFSlabHit &xSlabHit,
                                             double &time) const {
 
   double time_digit0, time_digit1;
 
   // Calibrate the digit measurements.
-  //if (calibratePmtHit(xTriggerPixelKey, xSlabHit["pmt0"], time_digit0) &&
-  //    calibratePmtHit(xTriggerPixelKey, xSlabHit["pmt1"], time_digit1)) {
   if (calibratePmtHit(xTriggerPixelKey, xSlabHit.GetPmt0Ptr(), time_digit0) &&
       calibratePmtHit(xTriggerPixelKey, xSlabHit.GetPmt1Ptr(), time_digit1)) {
     time = (time_digit0 + time_digit1)/2.;
-    //xSlabHit["time"] = time;
     xSlabHit.SetTime(time);
     return true;
   }
