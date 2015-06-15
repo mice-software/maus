@@ -92,7 +92,7 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
 
   int runNumber = 0;
   runNumber = spill->GetRunNumber();
-  std::cerr << "RunNum = " << runNumber << std::endl;
+  // std::cerr << "RunNum = " << runNumber << std::endl;
   if (!_map_init || runNumber != runNumberSave) {
       const_cast<MapCppTOFSpacePoints*>(this)->getTofCalib(runNumber);
   }
@@ -132,17 +132,17 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
       TOF2SpacePointArray* tof2_sp  =
         (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF2SpacePointArrayPtr();
       if (tSlabHits->GetTOF1SlabHitArraySize() != 0) {
-          std::cerr << "processing tof1" << std::endl;
+          // std::cerr << "processing tof1" << std::endl;
           TOF1SlabHitArray* t1slh = tSlabHits->GetTOF1SlabHitArrayPtr();
           processTOFStation(t1slh, tof1_sp, "tof1", n_event, triggerhit_pixels);
       }
       if (tSlabHits->GetTOF0SlabHitArraySize() != 0) {
-          std::cerr << "processing tof0" << std::endl;
+          // std::cerr << "processing tof0" << std::endl;
           TOF0SlabHitArray* t0slh = tSlabHits->GetTOF0SlabHitArrayPtr();
           processTOFStation(t0slh, tof0_sp, "tof0", n_event, triggerhit_pixels);
       }
       if (tSlabHits->GetTOF2SlabHitArraySize() != 0) {
-          std::cerr << "processing tof2" << std::endl;
+          // std::cerr << "processing tof2" << std::endl;
           TOF2SlabHitArray* t2slh = tSlabHits->GetTOF2SlabHitArrayPtr();
           processTOFStation(t2slh, tof2_sp, "tof2", n_event, triggerhit_pixels);
       }
@@ -164,7 +164,7 @@ void MapCppTOFSpacePoints::processTOFStation(
       for (int nslh = 0; nslh < tof0slabhits->size(); ++nslh) {
           TOFSlabHit tof0_slh = tof0slabhits->at(nslh);
           int xPlane = tof0_slh.GetPlane();
-          std::cerr << "xPlane: " << xPlane << std::endl;
+          // std::cerr << "xPlane: " << xPlane << std::endl;
           switch (xPlane) {
             case 0 :
               xPlane0Hits.push_back(nslh);
@@ -175,9 +175,9 @@ void MapCppTOFSpacePoints::processTOFStation(
           }
       }
   }
-  std::cerr << "--------- " << detector << " " << _triggerStation << std::endl;
+  // std::cerr << "--------- " << detector << " " << _triggerStation << std::endl;
   if (_triggerStation == detector) {
-      std::cerr << "finding tp" << std::endl;
+      // std::cerr << "finding tp" << std::endl;
       triggerhit_pixels[part_event] = findTriggerPixel(tof0slabhits,
                                                        xPlane0Hits,
                                                        xPlane1Hits);
@@ -190,7 +190,7 @@ void MapCppTOFSpacePoints::processTOFStation(
   if (triggerhit_pixels[part_event] != "unknown") {
       // Create the space point. Add the calibrated value of the time to the
       // slab hits.
-      std::cerr << "Making space points..." << std::endl;
+      // std::cerr << "Making space points..." << std::endl;
       makeSpacePoints(tof0slabhits, tof0sp, xPlane0Hits, xPlane1Hits, triggerhit_pixels);
   }
 }
@@ -219,7 +219,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
       TOFSlabHit tof_slh_Y = tof0slabhitptr->at(nY);
       int slabX = tof_slh_X.GetSlab();
       int slabY = tof_slh_Y.GetSlab();
-      std::cerr << "ftp: " << slabX << " " << slabY << std::endl;
+      // std::cerr << "ftp: " << slabX << " " << slabY << std::endl;
       TOFPixelKey xTriggerPixelKey(tStn, slabX, slabY, _triggerStation);
       // Apply the calibration corrections assuming that this pixel gives the
       // trigger. If this assumption is correct the value of the time after the
@@ -234,7 +234,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
         if (fabs(t_x/2. + t_y/2.) < _findTriggerPixelCut) {
           // The trigger pixel has been found.
           // std::cout << xTriggerPixelKey << std::endl;
-          // std::cerr << "found tp: " << xTriggerPixelKey << std::endl;
+           // std::cerr << "found tp: " << xTriggerPixelKey << std::endl;
           return xTriggerPixelKey.str();
         }
       }
@@ -304,7 +304,6 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
                      xKey_SlabY_digit0.detector());
   double time_SlabX = xDocSlabHit_X.GetTime();
   double time_SlabY = xDocSlabHit_Y.GetTime();
-  std::cerr << "tsx: " << time_SlabX << std::endl;
   double charge_SlabX = xDocSlabHit_X.GetCharge();
   double charge_SlabY = xDocSlabHit_Y.GetCharge();
   double chargeProduct_SlabX = xDocSlabHit_X.GetChargeProduct();
@@ -315,7 +314,6 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
   xSpacePoint.SetDt(dt);
   xDocSpacePoint["time"] = time;
   xDocSpacePoint["dt"] = dt;
-  std::cerr << "xdsp: " << xSpacePoint.GetDt() << " " << xSpacePoint.GetTime() << std::endl;
   xSpacePoint.SetPartEventNumber(xDocSlabHit_X.GetPartEventNumber());
   xSpacePoint.SetPhysEventNumber(xDocSlabHit_X.GetPhysEventNumber());
   xSpacePoint.SetSlabx(xKey_SlabX_digit0.slab());
