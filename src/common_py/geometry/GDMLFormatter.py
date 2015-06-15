@@ -516,7 +516,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         diffuserSetting = []
         if len(runInfo) > 0:
             diffuserSetting.append(runInfo.prop("diffuserThickness"))
-            print "Will use diffuser setting ",diffuserSetting[0]
+            print "Will use diffuser setting ", diffuserSetting[0]
         # check the possible keys for suspected
         modulekeys = mausInfo.xpathEval(\
             "MICE_Information/Other_Information/Module")
