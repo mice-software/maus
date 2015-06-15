@@ -23,6 +23,8 @@
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "TProcessID.h"
+#include "src/common_cpp/Recon/Global/MCTruthTools.hh"
+#include "src/common_cpp/Recon/Global/GlobalTools.hh"
 
 
 namespace MAUS {
@@ -66,6 +68,20 @@ namespace MAUS {
     }
     const MAUS::Spill* spill = data_cpp->GetSpill();
 
+    
+    std::map<MAUS::DataStructure::Global::DetectorPoint, bool> mc_detectors = MCTruthTools::GetMCDetectors(spill->GetMCEvents()->at(0));
+    std::map<MAUS::DataStructure::Global::DetectorPoint, bool> recon_detectors = GlobalTools::GetMCDetectors(spill->GetReconEvents()->at(0)->GetGlobalEvent());
+    std::cerr << "U|V|TOF0 |Chk|TOF1 |Tracker0   |Tracker1   |TOF2 |K|E\n";
+    for (int i = 0; i < 27; i++) {
+      std::cerr << mc_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] << " ";
+    }
+    std::cerr << "\n";
+    for (int i = 0; i < 27; i++) {
+      std::cerr << recon_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] << " ";
+    }
+    std::cerr << "\n";
+
+    
     MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
     if (!recon_events) {
       return;
@@ -78,6 +94,7 @@ namespace MAUS {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+
       if (global_event) {
         MAUS::recon::global::TrackMatching track_matching;
         track_matching.USTrack(global_event, _classname);

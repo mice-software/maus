@@ -41,12 +41,12 @@ beam = {
        "n_particles_per_spill":1, # probability of generating a particle
        "transverse":{
           "transverse_mode":"twiss",
-          "beta_x":1000.,
-          "alpha_x":0.,
-          "emittance_x":0.0001, # 4d emittance
+          "beta_x":8000.,
+          "alpha_x":1.,
+          "emittance_x":1.0, # 4d emittance
           "beta_y":8000.,
-          "alpha_y":0.5,
-          "emittance_y":0.0001,
+          "alpha_y":1.0,
+          "emittance_y":1.0,
           },
        "longitudinal":{"longitudinal_mode":"sawtooth_time",
                    "momentum_variable":"p",
@@ -61,3 +61,4 @@ particle_decay = True
 physics_processes = "mean_energy_loss";
 TOF_calib_by = "date";
 TOF_calib_date_from = "2013-10-01 00:00:00";
+SciFiPRHelicalOn = False;

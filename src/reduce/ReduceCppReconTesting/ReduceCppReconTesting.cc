@@ -33,7 +33,7 @@
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-#include "src/reduce/ReduceCppGlobalReconEfficiency/ReduceCppGlobalReconEfficiency.hh"
+#include "src/reduce/ReduceCppReconTesting/ReduceCppReconTesting.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
@@ -42,9 +42,9 @@
 
 namespace MAUS {
 
-bool ReduceCppGlobalReconEfficiency::birth(std::string aJsonConfigDocument) {
+bool ReduceCppReconTesting::birth(std::string aJsonConfigDocument) {
 
-  mClassname = "ReduceCppGlobalReconEfficiency";
+  mClassname = "ReduceCppReconTesting";
 
   // JsonCpp setup - check file parses correctly, if not return false
   Json::Value configJSON;
@@ -65,7 +65,7 @@ bool ReduceCppGlobalReconEfficiency::birth(std::string aJsonConfigDocument) {
   return false;
 }
 
-std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
+std::string ReduceCppReconTesting::process(std::string document) {
   JsonCppSpillConverter json2cppconverter;
   Json::Value *data_json = NULL;
   MAUS::Data *data_cpp = NULL;
@@ -73,40 +73,56 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
   data_json = new Json::Value(imported_json);
   data_cpp = json2cppconverter(data_json);
   _spill = data_cpp->GetSpill();
+  ReconEvent* recon_event = _spill->GetReconEvents()->at(0);
+  GlobalEvent* global_event = recon_event->GetGlobalEvent();
+  MCEvent* mc_event = _spill->GetMCEvents()->at(0);
+  // We make the assumption that there is exactly one track or spacepoint per detector
+  MAUS::DataStructure::Global::Track* tracker0_track = new MAUS::DataStructure::Global::Track;
+  MAUS::DataStructure::Global::Track* tracker1_track = new MAUS::DataStructure::Global::Track;
+  MAUS::DataStructure::Global::Track* emr_track = new MAUS::DataStructure::Global::Track;
+  MAUS::DataStructure::Global::SpacePoint* tof0_sp = new MAUS::DataStructure::Global::SpacePoint;
+  MAUS::DataStructure::Global::SpacePoint* tof1_sp = new MAUS::DataStructure::Global::SpacePoint;
+  MAUS::DataStructure::Global::SpacePoint* tof2_sp = new MAUS::DataStructure::Global::SpacePoint;
+  MAUS::DataStructure::Global::SpacePoint* kl_sp = new MAUS::DataStructure::Global::SpacePoint;
 
 
-  //~ std::cerr << "EMR FAIL: " << _detector_lr_failed[4] << "\n";
-  // Upstream
-  std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
-      us_track_mc_pairs = matchTrackerReconWithMC(
-      "MapCppGlobalTrackMatching-US", MAUS::DataStructure::Global::kMuPlus);
-  for (size_t i = 0; i < us_track_mc_pairs.size(); i++) {
-    MAUS::DataStructure::Global::Track* track = us_track_mc_pairs[i].first;
-    MAUS::MCEvent* mc_event = us_track_mc_pairs[i].second;
-    double p_time = mc_event->GetPrimary()->GetTime();
-    TOFEfficiency(0, MAUS::DataStructure::Global::kTOF0, track, mc_event,
-                  p_time, 30, 30, 2);
-    TOFEfficiency(1, MAUS::DataStructure::Global::kTOF1, track, mc_event,
-                  p_time, 40, 40, 2);
+  MAUS::DataStructure::Global::TrackPArray* imported_tracks = global_event->get_tracks();
+  MAUS::DataStructure::Global::TrackPArray::iterator imported_track_iter;
+  for (imported_track_iter = imported_tracks->begin();
+       imported_track_iter != imported_tracks->end();
+       ++imported_track_iter) {
+    if ((*imported_track_iter)->HasDetector(MAUS::DataStructure::Global::kTracker0)) {
+      tracker0_track = (*imported_track_iter);
+    }
+    if ((*imported_track_iter)->HasDetector(MAUS::DataStructure::Global::kTracker1)) {
+      tracker1_track = (*imported_track_iter);
+    }
+    if ((*imported_track_iter)->HasDetector(MAUS::DataStructure::Global::kEMR)) {
+      emr_track = (*imported_track_iter);
+    }
   }
-  // Downstream
-  std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
-      ds_track_mc_pairs = matchTrackerReconWithMC(
-      "MapCppGlobalTrackMatching-DS", MAUS::DataStructure::Global::kMuPlus);
-  for (size_t i = 0; i < ds_track_mc_pairs.size(); i++) {
-    MAUS::DataStructure::Global::Track* track = ds_track_mc_pairs[i].first;
-    MAUS::MCEvent* mc_event = ds_track_mc_pairs[i].second;
-    double p_time = mc_event->GetPrimary()->GetTime();
-    TOFEfficiency(2, MAUS::DataStructure::Global::kTOF2, track, mc_event,
-                  p_time, 40, 40, 2);
-    KLEfficiency(track, mc_event, 30);
-    EMREfficiency(track, mc_event, 19, 19);
+
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>* imported_spacepoints = global_event->get_space_points();
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>::iterator imported_sp_iter;
+  for (imported_sp_iter = imported_spacepoints->begin();
+       imported_sp_iter != imported_spacepoints->end();
+       ++imported_sp_iter) {
+    if ((*imported_sp_iter)->get_detector() == MAUS::DataStructure::Global::kTOF0) {
+      tof0_sp = (*imported_sp_iter);
+    }
+    if ((*imported_sp_iter)->get_detector() == MAUS::DataStructure::Global::kTOF0) {
+      tof0_sp = (*imported_sp_iter);
+    }
+    if ((*imported_sp_iter)->get_detector() == MAUS::DataStructure::Global::kTOF0) {
+      tof0_sp = (*imported_sp_iter);
+    }
+    if ((*imported_sp_iter)->get_detector() == MAUS::DataStructure::Global::kTOF0) {
+      tof0_sp = (*imported_sp_iter);
+    }
   }
 
-  // Through-Tracks
-  std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
-      through_track_mc_pairs = matchTrackerReconWithMC(
-      "MapCppGlobalTrackMatching-Through", MAUS::DataStructure::Global::kMuPlus);
+
+  
       
   std::string output_document = JsonWrapper::JsonToString(*data_json);
   delete data_json;
@@ -114,80 +130,11 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
   return output_document;
 }
 
-bool ReduceCppGlobalReconEfficiency::death()  {
-  // US Aggregate
-  _detector_matches[5] = _detector_matches[0] + _detector_matches[1];
-  _detector_matches_expected[5] = _detector_matches_expected[0] +
-      _detector_matches_expected[1];
-  _detector_false_matches[5] = _detector_false_matches[0] +
-      _detector_false_matches[1];
-  _detector_lr_failed[5] = _detector_lr_failed[0] + _detector_lr_failed[1];
-
-  // DS Aggregate
-  _detector_matches[6] = _detector_matches[2] + _detector_matches[3] +
-      _detector_matches[4];
-  _detector_matches_expected[6] = _detector_matches_expected[2] +
-      _detector_matches_expected[3] + _detector_matches_expected[4];
-  _detector_false_matches[6] = _detector_false_matches[2] +
-      _detector_false_matches[3] + _detector_false_matches[4];
-  _detector_lr_failed[6] = _detector_lr_failed[2] + _detector_lr_failed[3] +
-      _detector_lr_failed[4];
-
-  // Total Aggregate
-  _detector_matches[7] = _detector_matches[5] + _detector_matches[6];
-  _detector_matches_expected[7] = _detector_matches_expected[5] +
-      _detector_matches_expected[6];
-  _detector_false_matches[7] = _detector_false_matches[5] +
-      _detector_false_matches[6];
-  _detector_lr_failed[7] = _detector_lr_failed[5] + _detector_lr_failed[6];
-
-  double detector_efficiency[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  double detector_total_efficiency[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  double detector_purity[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  
-  std::vector<std::string> detector_labels;
-  detector_labels.push_back("TOF0");
-  detector_labels.push_back("TOF1");
-  detector_labels.push_back("TOF2");
-  detector_labels.push_back("KL  ");
-  detector_labels.push_back("EMR ");
-  detector_labels.push_back("US  ");
-  detector_labels.push_back("DS  ");
-  detector_labels.push_back("Tot.");
-  std::cerr
-      << "     ┏━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┓\n"
-      << "     ┃Matches┃Expect ┃False  ┃LR Fail┃Efficie┃Effici*┃Purity ┃\n"
-      << "┏━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━┫\n";
-  for (size_t i = 0; i < 8; i++) {
-    if (_detector_matches_expected[i] > 0) {
-      detector_efficiency[i] = (_detector_matches[i] + 0.0)*100 /
-          _detector_matches_expected[i];
-    }
-    if (_detector_matches_expected[i] > 0 or _detector_lr_failed[i] > 0) {
-      detector_total_efficiency[i] = ((_detector_matches[i] + 0.0)*100) /
-          (_detector_matches_expected[i] + _detector_lr_failed[i]);
-    }
-    if (_detector_matches[i] > 0) {
-      detector_purity[i] = 100 - ((_detector_false_matches[i] + 0.0)*100 /
-          _detector_matches[i]);
-    }
-    std::cerr << "┃" << detector_labels[i];
-    printf("┃%7u┃%7u┃%7u┃%7u┃%6.2f%%┃%6.2f%%┃%6.2f%%┃\n",
-           _detector_matches[i], _detector_matches_expected[i],
-           _detector_false_matches[i], _detector_lr_failed[i],
-           detector_efficiency[i], detector_total_efficiency[i],
-           detector_purity[i]);
-    if (i == 1 or i == 4 or i == 6) {
-      std::cerr
-          << "┣━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━┫\n";
-    }
-  }
-  std::cerr
-    << "┗━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┛\n";
+bool ReduceCppReconTesting::death()  {
   return true;
 }
 
-bool ReduceCppGlobalReconEfficiency::checkDetector(const
+bool ReduceCppReconTesting::checkDetector(const
     MAUS::DataStructure::Global::TrackPoint* track_point, int min, int max) {
   int enum_key = static_cast<int>(track_point->get_detector());
   if ((enum_key >= min) and (enum_key <= max)) {
@@ -197,7 +144,7 @@ bool ReduceCppGlobalReconEfficiency::checkDetector(const
   }
 }
 
-bool ReduceCppGlobalReconEfficiency::checkDetector(const
+bool ReduceCppReconTesting::checkDetector(const
     MAUS::DataStructure::Global::SpacePoint* space_point, int min, int max) {
   int enum_key = static_cast<int>(space_point->get_detector());
   if ((enum_key >= min) and (enum_key <= max)) {
@@ -207,7 +154,7 @@ bool ReduceCppGlobalReconEfficiency::checkDetector(const
   }
 }
 
-bool ReduceCppGlobalReconEfficiency::TOFReconMatchesMC(
+bool ReduceCppReconTesting::TOFReconMatchesMC(
     TLorentzVector recon_position, TOFHit tof_hit, double primary_time,
     double dX_max, double dY_max, double dT_max) {
   ThreeVector mc_position = tof_hit.GetPosition();
@@ -223,7 +170,7 @@ bool ReduceCppGlobalReconEfficiency::TOFReconMatchesMC(
   }
 }
 
-bool ReduceCppGlobalReconEfficiency::KLReconMatchesMC(
+bool ReduceCppReconTesting::KLReconMatchesMC(
     TLorentzVector recon_position, KLHit kl_hit, double dY_max) {
   ThreeVector mc_position = kl_hit.GetPosition();
   double dY = std::abs(mc_position.Y() - recon_position.Y());
@@ -235,7 +182,7 @@ bool ReduceCppGlobalReconEfficiency::KLReconMatchesMC(
   }
 }
 
-bool ReduceCppGlobalReconEfficiency::EMRReconMatchesMC(
+bool ReduceCppReconTesting::EMRReconMatchesMC(
     TLorentzVector recon_position, EMRHit emr_hit,
     double dX_max, double dY_max) {
   ThreeVector mc_position = emr_hit.GetPosition();
@@ -249,7 +196,7 @@ bool ReduceCppGlobalReconEfficiency::EMRReconMatchesMC(
   }
 }
 
-void ReduceCppGlobalReconEfficiency::TOFEfficiency(size_t detector_number,
+void ReduceCppReconTesting::TOFEfficiency(size_t detector_number,
     MAUS::DataStructure::Global::DetectorPoint detector,
     MAUS::DataStructure::Global::Track* track, MAUS::MCEvent* mc_event,
     double p_time, double dX_max, double dY_max, double dT_max) {
@@ -305,7 +252,7 @@ void ReduceCppGlobalReconEfficiency::TOFEfficiency(size_t detector_number,
   }
 }
 
-void ReduceCppGlobalReconEfficiency::KLEfficiency(
+void ReduceCppReconTesting::KLEfficiency(
     MAUS::DataStructure::Global::Track* track, MAUS::MCEvent* mc_event,
     double dY_max) {
   TLorentzVector tp_position;
@@ -359,7 +306,7 @@ void ReduceCppGlobalReconEfficiency::KLEfficiency(
 }
 
 
-void ReduceCppGlobalReconEfficiency::EMREfficiency(
+void ReduceCppReconTesting::EMREfficiency(
     MAUS::DataStructure::Global::Track* track, MAUS::MCEvent* mc_event,
     double dX_max, double dY_max) {
   TLorentzVector tp_position;
@@ -420,7 +367,7 @@ void ReduceCppGlobalReconEfficiency::EMREfficiency(
 
 
 std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
-    ReduceCppGlobalReconEfficiency::matchTrackerReconWithMC(
+    ReduceCppReconTesting::matchTrackerReconWithMC(
     std::string mapper_name, MAUS::DataStructure::Global::PID pid) {
   std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
       track_mc_pairs;
@@ -470,7 +417,7 @@ std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
               double dPx = std::abs(tracker_mc_hit->GetMomentum().X() - momentum.X());
               double dPy = std::abs(tracker_mc_hit->GetMomentum().Y() - momentum.Y());
               double dPz = std::abs(tracker_mc_hit->GetMomentum().Z() - momentum.Z());
-              if ((dX < 1.0) and (dY < 1.0) and (dZ < 0.3) and (dPx < 3.0) and (dPy < 3.0)) {
+              if ((dX < 10.0) and (dY < 10.0) and (dZ < 0.3) and (dPx < 30.0) and (dPy < 30.0)) {
                 matched_tps++;
               } else {
                 //~ std::cerr << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";

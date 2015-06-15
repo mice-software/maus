@@ -140,7 +140,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
         if (almostEquals(x_in_TOF0[1], TOF0_tp[j]->get_position().X(), 30) and
             almostEquals(x_in_TOF0[2], TOF0_tp[j]->get_position().Y(), 30)) {
           hypothesis_track->AddTrackPoint(TOF0_tp[j]);
-          //~ Squeak::mout(Squeak::error) << "TOF0 Match\n";
+          Squeak::mout(Squeak::error) << "TOF0 Match\n";
         }
       }
       // TOF1
@@ -157,7 +157,7 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
         if (almostEquals(x_in_TOF1[1], TOF1_tp[j]->get_position().X(), 40) and
             almostEquals(x_in_TOF1[2], TOF1_tp[j]->get_position().Y(), 40)) {
           hypothesis_track->AddTrackPoint(TOF1_tp[j]);
-          //~ Squeak::mout(Squeak::error) << "TOF1 Match\n";
+          Squeak::mout(Squeak::error) << "TOF1 Match\n";
         }
       }
       // Now we fill the track with trackpoints from the tracker with energy
@@ -318,7 +318,7 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
         if (almostEquals(x_in_TOF2[1], TOF2_tp[j]->get_position().X(), 40) and
             almostEquals(x_in_TOF2[2], TOF2_tp[j]->get_position().Y(), 40)) {
           hypothesis_track->AddTrackPoint(TOF2_tp[j]);
-          //~ Squeak::mout(Squeak::error) << "TOF2 Match\n";
+          Squeak::mout(Squeak::error) << "TOF2 Match\n";
         }
       }
 
@@ -334,7 +334,7 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
         // For KL we can only match one dimension as no x info is given
         if (almostEquals(x_in_KL[2], KL_tp[j]->get_position().Y(), 32)) {
           hypothesis_track->AddTrackPoint(KL_tp[j]);
-          //~ Squeak::mout(Squeak::error) << "KL Match\n";
+          Squeak::mout(Squeak::error) << "KL Match\n";
         }
       }
 
@@ -360,7 +360,9 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
                 first_hit_pos_error.X()*3) and
             almostEquals(x_in_EMR[2], first_hit_pos.Y(),
                 first_hit_pos_error.Y()*3)) {
-          //~ Squeak::mout(Squeak::error) << "EMR Match\n";
+          Squeak::mout(Squeak::error) << "EMR Match\n";
+          std::cerr << (*emr_track_iter)->get_emr_range_primary() << "EMR RANGE\n";
+          hypothesis_track->set_emr_range_primary((*emr_track_iter)->get_emr_range_primary());
           for (size_t j = 0; j < emr_trackpoints.size(); j++) {
             MAUS::DataStructure::Global::TrackPoint* emr_tp =
                 emr_trackpoints[j]->Clone();

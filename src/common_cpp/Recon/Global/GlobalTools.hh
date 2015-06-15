@@ -35,6 +35,10 @@
 namespace MAUS {
 namespace GlobalTools {
 
+std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
+    GetMCDetectors(MAUS::GlobalEvent* global_event);
+
+
 /**
  * @brief Returns a vector of all Tracks in the Spill (i.e. across recon events
  * if applicable) that have the given mapper name and include TrackPoints in
