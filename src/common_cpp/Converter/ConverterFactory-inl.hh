@@ -322,6 +322,12 @@ namespace MAUS {
   ConverterFactory::getConverter<PyObject, std::string>() const {
     return new PyDictStringConverter();
   }
+
+  // DEFAULT - just throw an exception
+  template <typename INPUT, typename OUTPUT>
+  IConverter<INPUT, OUTPUT>* ConverterFactory::getConverter() const {
+    return new DisallowedConverter<INPUT, OUTPUT>();
+  }
 } // end of namespace
 
 #endif

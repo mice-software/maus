@@ -4,6 +4,24 @@ directory=swig-2.0.4
 filename=${directory}.tar.gz
 url=http://prdownloads.sourceforge.net/swig/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -38,7 +56,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         ./configure --without-pcre --prefix="${MAUS_ROOT_DIR}/third_party/install"  # without pcre disables regex, but is needed for older SL versions
         echo "INFO: Making:"
         sleep 1
-        make
+        make -j$MAUS_NUM_THREADS
         make install
 	echo
         echo "INFO: The package should be locally build now in your"

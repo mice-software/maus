@@ -27,7 +27,7 @@ import ROOT
 
 import ErrorHandler
 import Configuration
-import OutputCppRoot
+import MAUS
 import maus_cpp.globals 
 
 class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
@@ -42,7 +42,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         """
         Define cards and initialise Output
         """
-        self.output = OutputCppRoot.OutputCppRoot()
+        self.output = MAUS.OutputCppRoot()
         self.outdir = os.environ["MAUS_ROOT_DIR"]+"/tmp/test_output_cpp_root/"
         self.outfile = self.outdir+"test_outputCppRoot.root"
         try:
@@ -130,7 +130,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         """
         Check that we can birth and death properly
         """
-        an_output = OutputCppRoot.OutputCppRoot()
+        an_output = MAUS.OutputCppRoot()
         # for now this does NOT return an exception... looks like it is caught
         # by the API... set ErrorHandler.on_error to 'raise' and we raise a
         # std::exception killing the tests (oops)
@@ -303,7 +303,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         """
         test_OutputCppRoot.test_one_file_per_run: one_file_per_run option
         """
-        my_output = OutputCppRoot.OutputCppRoot()
+        my_output = MAUS.OutputCppRoot()
         cards_py = json.loads(self.cards)
         cards_py["output_root_file_mode"] = "one_file_per_run"
         self.cards = json.dumps(cards_py)
@@ -343,7 +343,7 @@ class TestOutputCppRoot(unittest.TestCase): # pylint: disable=R0904, R0902
         """
         test_OutputCppRoot.test_one_file_per_run: end_of_run_file_per_run option
         """
-        my_output = OutputCppRoot.OutputCppRoot()
+        my_output = MAUS.OutputCppRoot()
         cards_py = json.loads(self.cards)
         cards_py["output_root_file_mode"] = "end_of_run_file_per_run"
         cards_py["output_root_file_name"] = "test_outputCppRoot.root"

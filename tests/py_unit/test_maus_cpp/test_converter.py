@@ -34,14 +34,46 @@ def make_test_data():
     data.SetSpill(spill)
     return data 
 
+def make_test_job_header():
+    """ Generate a test MAUS.JobHeader"""
+    data = ROOT.MAUS.JobHeaderData() # pylint: disable=E1101
+    job_header = ROOT.MAUS.JobHeader() # pylint: disable=E1101
+    job_header.SetMausVersionNumber("version")
+    data.SetJobHeader(job_header)
+    return data 
+
+def make_test_job_footer():
+    """ Generate a test MAUS.JobFooter"""
+    data = ROOT.MAUS.JobFooterData() # pylint: disable=E1101
+    job_footer = ROOT.MAUS.JobFooter() # pylint: disable=E1101
+    data.SetJobFooter(job_footer)
+    return data 
+
+def make_test_run_header():
+    """ Generate a test MAUS.RunHeader"""
+    data = ROOT.MAUS.RunHeaderData() # pylint: disable=E1101
+    run_header = ROOT.MAUS.RunHeader() # pylint: disable=E1101
+    data.SetRunHeader(run_header)
+    return data 
+
+def make_test_run_footer():
+    """ Generate a test MAUS.RunFooter"""
+    data = ROOT.MAUS.RunFooterData() # pylint: disable=E1101
+    run_footer = ROOT.MAUS.RunFooter() # pylint: disable=E1101
+    data.SetRunFooter(run_footer)
+    return data 
+
 class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
     """Tests for maus_cpp.converter"""
-    def test_convert(self):
-        """Tests for maus_cpp.converter.X_repr()"""
+    def test_convert_bad(self):
+        """Tests for maus_cpp.converter.X_repr() from bad"""
         self.assertRaises(ValueError, converter.json_repr, ())
         self.assertRaises(ValueError, converter.json_repr, ("",))
         dummy_tree = ROOT.TTree() # pylint: disable=E1101
         self.assertRaises(ValueError, converter.json_repr, dummy_tree)
+
+    def test_convert_data(self):
+        """Tests for maus_cpp.converter.X_repr() to/from MAUS.Data"""
         maus_data = make_test_data()
         self.assertRaises(ValueError, converter.json_repr, (maus_data, ""))
         json_dict = converter.json_repr(maus_data)
@@ -49,8 +81,44 @@ class ConverterTestCase(unittest.TestCase): #pylint: disable=R0904
         converter.json_repr(json_dict)
         converter.json_repr(json_dict)
         self.assertEqual(json_dict["spill_number"], 999)
-        converter.data_repr(maus_data)
+        converter.data_repr(json_dict)
         converter.string_repr(maus_data)
+
+    def test_convert_job_header(self):
+        """Tests for maus_cpp.converter.X_repr() from MAUS.JobHeader"""
+        maus_jh = make_test_job_header()
+        self.assertRaises(ValueError, converter.data_repr, (maus_jh,))
+        json_dict = converter.json_repr(maus_jh)
+        self.assertEqual(json_dict["maus_version"], "version")
+        converter.job_header_repr(json_dict)
+        converter.string_repr(maus_jh)
+
+    def test_convert_job_footer(self):
+        """Tests for maus_cpp.converter.X_repr() from MAUS.JobFooter"""
+        maus_jf = make_test_job_footer()
+        self.assertRaises(ValueError, converter.data_repr, (maus_jf,))
+        json_dict = converter.json_repr(maus_jf)
+        self.assertEqual(json_dict["maus_event_type"], "JobFooter")
+        converter.job_footer_repr(json_dict)
+        converter.string_repr(maus_jf)
+
+    def test_convert_run_header(self):
+        """Tests for maus_cpp.converter.X_repr() from MAUS.RunHeader"""
+        maus_rh = make_test_run_header()
+        self.assertRaises(ValueError, converter.data_repr, (maus_rh,))
+        json_dict = converter.json_repr(maus_rh)
+        self.assertEqual(json_dict["maus_event_type"], "RunHeader")
+        converter.run_header_repr(json_dict)
+        converter.string_repr(maus_rh)
+
+    def test_convert_run_footer(self):
+        """Tests for maus_cpp.converter.X_repr() from MAUS.RunFooter"""
+        maus_rf = make_test_run_footer()
+        self.assertRaises(ValueError, converter.data_repr, (maus_rf,))
+        json_dict = converter.json_repr(maus_rf)
+        self.assertEqual(json_dict["maus_event_type"], "RunFooter")
+        converter.run_footer_repr(json_dict)
+        converter.string_repr(maus_rf)
 
     def test_data(self): # pylint: disable = R0201
         """Regression - memory issue in datastructure #1466"""

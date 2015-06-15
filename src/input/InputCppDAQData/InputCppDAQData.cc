@@ -29,7 +29,7 @@ PyMODINIT_FUNC init_InputCppDAQData(void) {
                   "InputCppDAQData", "", "", "", "");
 }
 
-InputCppDAQData::InputCppDAQData() : InputBase<std::string>("InputCppDAQData") {
+InputCppDAQData::InputCppDAQData() : InputBase<MAUS::Data>("InputCppDAQData") {
   _eventPtr = NULL;
   _eventsCount = 0;
 

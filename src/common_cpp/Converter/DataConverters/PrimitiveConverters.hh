@@ -28,6 +28,23 @@
 
 namespace MAUS {
 
+////////////////////////// DISALLOWED //////////////////////////////////////
+template <class TEMP1, class TEMP2>
+class DisallowedConverter : public ConverterBase<TEMP1, TEMP2> {
+  public:
+    DisallowedConverter()
+      : ConverterBase<TEMP1, TEMP2>("DisallowedConverter") {}
+
+  private:
+    TEMP2* _convert(const TEMP1* input) const {
+        throw MAUS::Exception(MAUS::Exception::recoverable,
+                          "Attempt to make disallowed conversion between types "
+                          +input->GetEventType()+" and "+TEMP2().GetEventType(),
+                          "DisallowedConverter::convert");
+    }
+};
+
+
 /////////////////////////// STRING TO X ////////////////////////////
 
 class StringJsonConverter : public ConverterBase<std::string, Json::Value> {
@@ -98,6 +115,8 @@ class JsonPyDictConverter : public ConverterBase<Json::Value, PyObject> {
         return py_dict;
     }
 };
+
+
 
 /////////////////////////// PYDICT TO X ////////////////////////////
 
