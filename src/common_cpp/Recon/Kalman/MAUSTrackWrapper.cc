@@ -290,7 +290,7 @@ namespace MAUS {
 
     ThreeVector reference_pos = geom->GetReferencePosition(tracker);
     HepRotation reference_rot = geom->GetReferenceRotation(tracker);
-    double charge = 0.0;
+    int charge = 0;
 
     for ( unsigned int i = 0; i < smoothed.GetLength(); ++i ) {
       const Kalman::State& smoothed_state = smoothed[i];
@@ -310,7 +310,6 @@ namespace MAUS {
       ThreeVector mom;
 
       TMatrixD state_vector = smoothed_state.GetVector();
-      int charge = 0;
 
       if ( dimension == 4 ) {
         pos.setZ(smoothed_state.GetPosition());
@@ -336,8 +335,8 @@ namespace MAUS {
         pos += reference_pos;
 
         mom *= reference_rot;
-        if (state_vector(4, 0) < 0.0) charge = -1.0;
-        else charge = 1.0;
+        if (mom.z() < 0.0) charge = -1;
+        else charge = 1;
         mom.setZ(fabs(1.0/state_vector(4, 0)));
       }
 

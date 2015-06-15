@@ -137,8 +137,6 @@ void MapCppTrackerRecon::_process(Data* data) const {
       // Kalman Track Fit.
       if ( _kalman_on ) {
         track_fit(*event);
-//        if ( event->straightprtracks().size() || event->helicalprtracks().size() ) {
-//        }
       }
 //      print_event_info(*event);
     }
@@ -320,7 +318,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       SciFiHelicalPRTrack* helical = evt.helicalprtracks().at(track_i);
 
       Kalman::Track data_track = BuildTrack(helical, &_geometry_helper);
-      Kalman::State seed = ComputeSeed(helical, &_geometry_helper, false, _seed_value);
+      Kalman::State seed = ComputeSeed(helical, &_geometry_helper, _use_eloss, _seed_value);
 
       _helical_track_fitter->SetData(data_track);
       _helical_track_fitter->SetSeed(seed);
@@ -518,11 +516,6 @@ void MapCppTrackerRecon::print_event_info(SciFiEvent &event) const {
       std::cerr << seed_cov[j] << ", ";
     }
     std::cerr << '\n';
-
-
-    if ( (tracks[i]->P_value() < 0.1) || (abs(seed_pos[0] - trackpoints[14]->pos()[0]) > 1.0) || (abs(seed_mom[0] - trackpoints[14]->mom()[0]) > 1.0) ) {
-      std::cerr << "FOUND ONE!\n";
-    }
   }
   std::cerr << std::endl;
 

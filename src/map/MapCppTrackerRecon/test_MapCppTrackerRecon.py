@@ -29,8 +29,10 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppTrackerRecon"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
-    geom = os.getenv("MAUS_ROOT_DIR")+"/src/map/"+\
-           "MapCppTrackerMCDigitization/MapCppTrackerMCDigitizationTest.dat"
+#    geom = os.getenv("MAUS_ROOT_DIR")+"/src/map/"+\
+#           "MapCppTrackerMCDigitization/MapCppTrackerMCDigitizationTest.dat"
+    geom = "TrackerTest.dat"
+    cfg['simulation_geometry_filename'] = geom
     cfg['reconstruction_geometry_filename'] = geom
     cfg['SciFiPRHelicalOn'] = 0
     cfg['SciFiStraightOn'] = 0
@@ -60,14 +62,13 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         # print "Flags passed: "
         # print self.cfg['SciFiPRHelicalOn']
         # print self.cfg['SciFiPRStraightOn']
+        maus_cpp.globals.birth(json.dumps(self.cfg))
         self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (straights)
-        fin.readline()
-        fin.readline()
         fin.readline()
         fin.readline()
         fin.readline()
@@ -80,7 +81,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         revt = spill_out['recon_events'][0]
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
-        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(31, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
         self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
         self.assertTrue('spacepoints' in revt['sci_fi_event'])
@@ -89,6 +90,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(2, len(revt['sci_fi_event']['straight_pr_tracks']))
         self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
         self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
+        maus_cpp.globals.death()
 
     def testGoodHelicalProcess(self):
         """Check that tracker recon  process produces expected
@@ -99,6 +101,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
         # self.cfg['SciFiPatRecVerbosity'] = 1
+        maus_cpp.globals.birth(json.dumps(self.cfg))
         self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         # test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
@@ -117,7 +120,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         # Check the first event
         revt = spill_out['recon_events'][0]
         self.assertTrue('digits' in revt['sci_fi_event'])
-        self.assertEqual(32, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(34, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
         self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
         self.assertTrue('spacepoints' in revt['sci_fi_event'])
@@ -126,6 +129,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(0, len(revt['sci_fi_event']['straight_pr_tracks']))
         self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
         self.assertEqual(2, len(revt['sci_fi_event']['helical_pr_tracks']))
+        maus_cpp.globals.death()
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
