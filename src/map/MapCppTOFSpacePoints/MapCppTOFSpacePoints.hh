@@ -35,7 +35,7 @@
 
 namespace MAUS {
 
-class MapCppTOFSpacePoints : public MapBase<Json::Value> {
+class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
 
  public:
   MapCppTOFSpacePoints();
@@ -59,7 +59,7 @@ class MapCppTOFSpacePoints : public MapBase<Json::Value> {
  *  @param document Receive a document with slab hits and return
  *  a document with space points.
  */
-  void _process(Json::Value* document) const;
+  void _process(MAUS::Data *data) const;
 
  private:
 
@@ -72,29 +72,52 @@ class MapCppTOFSpacePoints : public MapBase<Json::Value> {
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
-  Json::Value fillSpacePoint
-                   (Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1) const;
-  Json::Value processTOFStation(
-                          Json::Value &xSlabHits,
+  //Json::Value fillSpacePoint
+  //                 (Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1) const;
+  void fillSpacePoint
+                   (TOFSpacePoint &theSpacePoint, MAUS::TOFSlabHit &xDocSlabHit0, MAUS::TOFSlabHit &xDocSlabHit1) const;
+  //Json::Value processTOFStation(
+  //                        Json::Value &xSlabHits,
+  //                        std::string detector,
+  //                        unsigned int part_event,
+  //                        std::map<int, std::string>& _triggerhit_pixels) const;
+  void processTOFStation(
+                          MAUS::TOF0SlabHitArray* tof0slabhits,
+                          MAUS::TOF0SpacePointArray* tof0sp,
+//                          MAUS::TOFEventSlabHit* tofslabhit,
                           std::string detector,
                           unsigned int part_event,
                           std::map<int, std::string>& _triggerhit_pixels) const;
 
-  std::string findTriggerPixel(Json::Value xDocPartEvent,
+  //std::string findTriggerPixel(Json::Value xDocPartEvent,
+  //std::string findTriggerPixel(TOFEventSlabHit* toflslabhit,
+  std::string findTriggerPixel(TOF0SlabHitArray* tof0lslabhitptr,
                                std::vector<int> xPlane0Hits,
                                std::vector<int> xPlane1Hits) const;
+  //bool calibratePmtHit
+  //            //(TOFPixelKey xPixelKey, MAUS::Data &xPmtHit, double &time) const;
+  //            //(TOFPixelKey xPixelKey, Pmt0 &xPmtHit, double &time) const;
+  //            (TOFPixelKey xPixelKey, Pmt0* xPmtHit, double &time) const;
+  template<typename T>
   bool calibratePmtHit
-              (TOFPixelKey xPixelKey, Json::Value &xPmtHit, double &time) const;
+              //(TOFPixelKey xPixelKey, MAUS::Data &xPmtHit, double &time) const;
+              //(TOFPixelKey xPixelKey, Pmt0 &xPmtHit, double &time) const;
+              (TOFPixelKey xPixelKey, T xPmtHit, double &time) const;
   bool calibrateSlabHit
-             (TOFPixelKey xPixelKey, Json::Value &xSlabHit, double &time) const;
+             //(TOFPixelKey xPixelKey, MAUS::Data &xSlabHit, double &time) const;
+             (TOFPixelKey xPixelKey, TOFSlabHit &tslh, double &time) const;
 
   /** @brief makes space points
    *
    *  @param xDocDetectorData Json document containing slab hits from 
    * one particle event in one individual detector.
    */
-  Json::Value makeSpacePoints(
-                          Json::Value &xDocPartEvent,
+  //Json::Value makeSpacePoints(
+  //                        MAUS::Data &xDocPartEvent,
+  void makeSpacePoints(
+                          //MAUS::TOFEventSlabHit* tofslabhit,
+                          MAUS::TOF0SlabHitArray* slHitArrayPtr,
+                          MAUS::TOF0SpacePointArray* spArrayPtr,
                           std::vector<int> xPlane0Hits,
                           std::vector<int> xPlane1Hits,
                           std::map<int, std::string>& triggerhit_pixels) const;
