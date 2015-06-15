@@ -44,6 +44,9 @@ KLEventDigit KLEvent::GetKLEventDigit() const {
     return _kl_digits;
 }
 
+KLEventDigit* KLEvent::GetKLEventDigitPtr() {
+    return &_kl_digits;
+}
 void KLEvent::SetKLEventDigit(KLEventDigit kl_digits) {
     _kl_digits = kl_digits;
 }

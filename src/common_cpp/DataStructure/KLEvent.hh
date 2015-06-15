@@ -47,6 +47,9 @@ class KLEvent {
      /** Returns KLEventDigit */
     KLEventDigit GetKLEventDigit() const;
 
+     /** Returns KLEventDigit */
+    KLEventDigit* GetKLEventDigitPtr();
+
     /** Sets KLEventDigit */
     void SetKLEventDigit(KLEventDigit kl_digits);
 
