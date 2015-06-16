@@ -32,7 +32,7 @@ namespace global {
   }
 
   PIDVarA::PIDVarA(TFile* file, std::string hypothesis, int minA, int maxA)
-    : PIDBase1D(file, VARIABLE, hypothesis, minA, maxA) {
+    : PIDBase1D(file, VARIABLE, hypothesis, minA, maxA, minBinA, maxBinA) {
   }
 
   PIDVarA::~PIDVarA() {}

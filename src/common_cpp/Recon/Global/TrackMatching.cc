@@ -83,10 +83,10 @@ namespace global {
     std::vector<MAUS::DataStructure::Global::SpacePoint*>
       *GlobalSpacePointArray = global_event->get_space_points();
     MAUS::DataStructure::Global::TrackPArray TOFTrackArray;
-    MakeTOFTracks(global_event, GlobalSpacePointArray, TOFTrackArray);
+    MakeTOFTracks(global_event, GlobalSpacePointArray, TOFTrackArray, mapper_name);
     MAUS::DataStructure::Global::Track* KLTrack =
       new MAUS::DataStructure::Global::Track();
-    MakeKLTracks(global_event, GlobalSpacePointArray, KLTrack);
+    MakeKLTracks(global_event, GlobalSpacePointArray, KLTrack, mapper_name);
     if (KLTrack->GetTrackPoints().size() == 0) {
       delete KLTrack;
       KLTrack = NULL;
@@ -237,9 +237,8 @@ namespace global {
     void TrackMatching::MakeTOFTracks(MAUS::GlobalEvent* global_event,
 				      std::vector<MAUS::DataStructure::Global::SpacePoint*>
 				      *GlobalSpacePointArray,
-				      MAUS::DataStructure::Global::TrackPArray& TOFTrackArray) {
-
-      std::string local_mapper_name = "GlobalTOFTrack";
+				      MAUS::DataStructure::Global::TrackPArray& TOFTrackArray,
+				      std::string mapper_name) {
 
       std::vector<MAUS::DataStructure::Global::TrackPoint*> TOF0tp;
       std::vector<MAUS::DataStructure::Global::TrackPoint*> TOF1tp;
@@ -275,7 +274,7 @@ namespace global {
       for (unsigned int i = 0; i < TOF1tp.size(); ++i) {
 	MAUS::DataStructure::Global::Track* TOFtrack =
 	  new MAUS::DataStructure::Global::Track();
-	TOFtrack->set_mapper_name(local_mapper_name);
+	TOFtrack->set_mapper_name(mapper_name);
 	for (unsigned int j = 0; j < TOF0tp.size(); ++j) {
 	  if ((TOF1tp[i]->get_position().T() - TOF0tp[j]->get_position().T()) <=
 	      (TOF01offset + allowance) &&
@@ -293,16 +292,16 @@ namespace global {
 	  }
 	}
 	if (tempTOF0tp.size() < 2 && tempTOF2tp.size() < 2) {
-	  TOF1tp[i]->set_mapper_name(local_mapper_name);
+	  TOF1tp[i]->set_mapper_name(mapper_name);
 	  TOFtrack->AddTrackPoint(TOF1tp[i]);
 	  global_event->add_track_point_recursive(TOF1tp[i]);
 	  if (tempTOF0tp.size() == 1) {
-	    tempTOF0tp[0]->set_mapper_name(local_mapper_name);
+	    tempTOF0tp[0]->set_mapper_name(mapper_name);
 	    TOFtrack->AddTrackPoint(tempTOF0tp[0]);
 	    global_event->add_track_point_recursive(tempTOF0tp[0]);
 	  }
 	  if (tempTOF2tp.size() == 1) {
-	    tempTOF2tp[0]->set_mapper_name(local_mapper_name);
+	    tempTOF2tp[0]->set_mapper_name(mapper_name);
 	    TOFtrack->AddTrackPoint(tempTOF2tp[0]);
 	    global_event->add_track_point_recursive(tempTOF2tp[0]);
 	  }
@@ -319,15 +318,13 @@ namespace global {
       }
     }
 
-    void TrackMatching::MakeKLTracks(MAUS::GlobalEvent* global_event,
-				     std::vector<MAUS::DataStructure::Global::SpacePoint*>
-				     *GlobalSpacePointArray,
-				     MAUS::DataStructure::Global::Track* KLTrack) {
+  void TrackMatching::MakeKLTracks(MAUS::GlobalEvent* global_event,
+				   std::vector<MAUS::DataStructure::Global::SpacePoint*>
+				   *GlobalSpacePointArray,
+				   MAUS::DataStructure::Global::Track* KLTrack,
+				   std::string mapper_name) {
 
-
-      std::string local_mapper_name = "GlobalKLTrack";
-
-      std::vector<MAUS::DataStructure::Global::TrackPoint*> KLtp;
+    std::vector<MAUS::DataStructure::Global::TrackPoint*> KLtp;
 
       for (unsigned int i = 0; i < GlobalSpacePointArray->size(); ++i) {
 	MAUS::DataStructure::Global::SpacePoint* sp = GlobalSpacePointArray->at(i);
@@ -344,8 +341,8 @@ namespace global {
       }
 
       for (unsigned int i = 0; i < KLtp.size(); ++i) {
-        KLTrack->set_mapper_name(local_mapper_name);
-	KLtp[i]->set_mapper_name(local_mapper_name);
+        KLTrack->set_mapper_name(mapper_name);
+	KLtp[i]->set_mapper_name(mapper_name);
 	KLTrack->AddTrackPoint(KLtp[i]);
 	global_event->add_track_point_recursive(KLtp[i]);
       }

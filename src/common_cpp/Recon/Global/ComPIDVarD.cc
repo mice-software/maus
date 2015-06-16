@@ -31,8 +31,10 @@ namespace global {
     _nonZeroHistEntries = true;
   }
 
-  ComPIDVarD::ComPIDVarD(TFile* file, std::string hypothesis, int minComD, int maxComD)
-    : PIDBase1D(file, VARIABLE, hypothesis, minComD, maxComD) {
+  ComPIDVarD::ComPIDVarD(TFile* file, std::string hypothesis, int minComD,
+			 int maxComD)
+    : PIDBase1D(file, VARIABLE, hypothesis, minComD, maxComD, minBinComD,
+		maxBinComD) {
   }
 
   ComPIDVarD::~ComPIDVarD() {}

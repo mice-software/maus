@@ -53,6 +53,14 @@
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
 #include "src/common_cpp/Recon/Global/PIDVarB.hh"
 #include "src/common_cpp/Recon/Global/PIDVarC.hh"
+#include "src/common_cpp/Recon/Global/PIDVarD.hh"
+#include "src/common_cpp/Recon/Global/PIDVarE.hh"
+#include "src/common_cpp/Recon/Global/PIDVarF.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarA.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarB.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarC.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarD.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarE.hh"
 
 
 namespace MAUS {
@@ -126,6 +134,10 @@ namespace MAUS {
     int _maxD;
     int _minE;
     int _maxE;
+    int _XminF;
+    int _XmaxF;
+    int _YminF;
+    int _YmaxF;
     int _minComA;
     int _maxComA;
     int _XminComB;
@@ -134,9 +146,16 @@ namespace MAUS {
     int _YmaxComB;
     int _minComC;
     int _maxComC;
+    int _minComD;
+    int _maxComD;
+    int _XminComE;
+    int _XmaxComE;
+    int _YminComE;
+    int _YmaxComE;
 
     /// File containing PDFs for use in PID
     std::string PDF_file;
+    
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

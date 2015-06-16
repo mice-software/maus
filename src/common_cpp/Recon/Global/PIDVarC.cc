@@ -32,8 +32,10 @@ namespace global {
     _nonZeroHistEntries = true;
   }
 
-  PIDVarC::PIDVarC(TFile* file, std::string hypothesis, int XminC, int XmaxC, int YminC, int YmaxC)
-    : PIDBase2D(file, VARIABLE, hypothesis, XminC, XmaxC, YminC, YmaxC) {
+  PIDVarC::PIDVarC(TFile* file, std::string hypothesis, int XminC, int XmaxC,
+		   int YminC, int YmaxC)
+    : PIDBase2D(file, VARIABLE, hypothesis, XminC, XmaxC, YminC, YmaxC,
+		XminBinC, XmaxBinC, YminBinC, YmaxBinC) {
   }
 
   PIDVarC::~PIDVarC() {}

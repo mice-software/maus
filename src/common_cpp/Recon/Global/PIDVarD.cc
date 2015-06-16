@@ -32,7 +32,7 @@ namespace global {
   }
 
   PIDVarD::PIDVarD(TFile* file, std::string hypothesis, int minD, int maxD)
-    : PIDBase1D(file, VARIABLE, hypothesis, minD, maxD) {
+    : PIDBase1D(file, VARIABLE, hypothesis, minD, maxD, minBinD, maxBinD) {
   }
 
   PIDVarD::~PIDVarD() {}

@@ -26,13 +26,15 @@ namespace global {
   const std::string ComPIDVarE::VARIABLE = "CommissioningEMRrangevsDiffTOF1TOF2";
 
   ComPIDVarE::ComPIDVarE(std::string hypothesis, std::string unique_identifier)
-    : PIDBase2D(VARIABLE, hypothesis, unique_identifier,
-                 XminBinComE, XmaxBinComE, XnumBins, YminBinComE, YmaxBinComE, YnumBins) {
+    : PIDBase2D(VARIABLE, hypothesis, unique_identifier, XminBinComE,
+		XmaxBinComE, XnumBins, YminBinComE, YmaxBinComE, YnumBins) {
     _nonZeroHistEntries = true;
   }
 
-  ComPIDVarE::ComPIDVarE(TFile* file, std::string hypothesis, int XminComE, int XmaxComE, int YminComE, int YmaxComE)
-    : PIDBase2D(file, VARIABLE, hypothesis, XminComE, XmaxComE, YminComE, YmaxComE) {
+  ComPIDVarE::ComPIDVarE(TFile* file, std::string hypothesis, int XminComE,
+			 int XmaxComE, int YminComE, int YmaxComE)
+    : PIDBase2D(file, VARIABLE, hypothesis, XminComE, XmaxComE, YminComE,
+		YmaxComE, XminBinComE, XmaxBinComE, YminBinComE, YmaxBinComE) {
   }
 
   ComPIDVarE::~ComPIDVarE() {}

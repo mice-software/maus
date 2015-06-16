@@ -535,11 +535,11 @@ TOF_makeSpacePointCut = 0.5 # nanosecond
 # get calibrations by either a) run_number or b) date
 # default is by run_number
 # if set to "date" then set the appropriate TOF_calib_date_from flag below
-TOF_calib_by = "run_number"
+TOF_calib_by = "date"
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
-TOF_calib_date_from = 'current'
+TOF_calib_date_from = '2013-10-01 00:00:00'
 TOF_cabling_date_from = 'current'
 
 Enable_timeWalk_correction = True
@@ -643,6 +643,11 @@ maxD = 8000
 # PIDVarE
 minE = 0
 maxE = 8000
+# PIDVarF
+XminF = 50
+XmaxF = 350
+YminF = 0
+YmaxF = 1000
 # ComPIDVarA
 minComA = 25
 maxComA = 45

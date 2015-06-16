@@ -64,12 +64,14 @@ namespace global {
     void MakeTOFTracks(MAUS::GlobalEvent* global_event,
 		       std::vector<MAUS::DataStructure::Global::SpacePoint*>
 		       *GlobalSpacePointArray,
-		       MAUS::DataStructure::Global::TrackPArray& TOFTrackArray);
+		       MAUS::DataStructure::Global::TrackPArray& TOFTrackArray,
+		       std::string mapper_name);
 
     void MakeKLTracks(MAUS::GlobalEvent* global_event,
 		      std::vector<MAUS::DataStructure::Global::SpacePoint*>
 		      *GlobalSpacePointArray,
-		      MAUS::DataStructure::Global::Track* KLTrack);
+		      MAUS::DataStructure::Global::Track* KLTrack,
+		      std::string mapper_name);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon

@@ -22,22 +22,25 @@ namespace recon {
 namespace global {
 
   PIDBase2D::PIDBase2D(std::string variable, std::string hypothesis,
-		   std::string unique_identifier, int XminBin, int XmaxBin,
-		   int XnumBins, int YminBin, int YmaxBin, int YnumBins)
-       : PIDBase(variable, hypothesis, unique_identifier,
-                 XminBin, XmaxBin, XnumBins, YminBin, YmaxBin, YnumBins) {
+		       std::string unique_identifier, int XminBin, int XmaxBin,
+		       int XnumBins, int YminBin, int YmaxBin, int YnumBins)
+    : PIDBase(variable, hypothesis, unique_identifier,
+	      XminBin, XmaxBin, XnumBins, YminBin, YmaxBin, YnumBins) {
 
-        _varhyp = variable + "_" + hypothesis;
+    _varhyp = variable + "_" + hypothesis;
 
-        _hist = new TH2F(_varhyp.c_str(),
-			 _varhyp.c_str(),
-			 _XnumBins, _XminBin, _XmaxBin,
-			 _YnumBins, _YminBin, _YmaxBin);
+    _hist = new TH2F(_varhyp.c_str(),
+		     _varhyp.c_str(),
+		     _XnumBins, _XminBin, _XmaxBin,
+		     _YnumBins, _YminBin, _YmaxBin);
   };
 
   PIDBase2D::PIDBase2D(TFile* file, std::string variable,
-		   std::string hypothesis, int Xmin, int Xmax, int Ymin, int Ymax)
-    : PIDBase(file, variable, hypothesis, Xmin, Xmax, Ymin, Ymax) {
+		       std::string hypothesis, int Xmin, int Xmax, int Ymin,
+		       int Ymax, int XminBin, int XmaxBin, int YminBin,
+		       int YmaxBin)
+    : PIDBase(file, variable, hypothesis, Xmin, Xmax, Ymin, Ymax, XminBin,
+	      XmaxBin, YminBin, YmaxBin) {
     std::string histname = variable + "_" + hypothesis;
 
     if (!file || file->IsZombie()) {

@@ -55,7 +55,6 @@ namespace MAUS {
     }
 
 
-
     _hypotheses.clear();
     _pid_vars.clear();
 
@@ -77,8 +76,25 @@ namespace MAUS {
     _maxD = _configJSON["maxD"].asInt();
     _minE = _configJSON["minE"].asInt();
     _maxE = _configJSON["maxE"].asInt();
+    _XminF = _configJSON["XminF"].asInt();
+    _XmaxF = _configJSON["XmaxF"].asInt();
+    _YminF = _configJSON["YminF"].asInt();
+    _YmaxF = _configJSON["YmaxF"].asInt();
     _minComA = _configJSON["minComA"].asInt();
     _maxComA = _configJSON["maxComA"].asInt();
+    _XminComB = _configJSON["XminComB"].asInt();
+    _XmaxComB = _configJSON["XmaxComB"].asInt();
+    _YminComB = _configJSON["YminComB"].asInt();
+    _YmaxComB = _configJSON["YmaxComB"].asInt();
+    _minComC = _configJSON["minComC"].asInt();
+    _maxComC = _configJSON["maxComC"].asInt();
+    _minComD = _configJSON["minComD"].asInt();
+    _maxComD = _configJSON["maxComD"].asInt();
+    _XminComE = _configJSON["XminComE"].asInt();
+    _XmaxComE = _configJSON["XmaxComE"].asInt();
+    _YminComE = _configJSON["YminComE"].asInt();
+    _YmaxComE = _configJSON["YmaxComE"].asInt();
+    
 
     // vector of hypotheses
     // TODO(Pidcott) find a more elegant way of accessing hypotheses
@@ -89,11 +105,26 @@ namespace MAUS {
     for (unsigned int i =0; i < _hypotheses.size(); ++i) {
       // vector of pid vars
       _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
-        						   _hypotheses[i], _minA, _maxA));
+        						   _hypotheses[i],
+							   _minA, _maxA));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
-      _hypotheses[i], _XminB, _XmaxB, _YminB, _YmaxB));
+							   _hypotheses[i],
+							   _XminB, _XmaxB,
+							   _YminB, _YmaxB));
       _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
-                                                           _hypotheses[i], _XminC, _XmaxC, _YminC, _YmaxC));
+                                                           _hypotheses[i],
+							   _XminC, _XmaxC,
+							   _YminC, _YmaxC));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarD(_histFile,
+        						   _hypotheses[i],
+							   _minD, _maxD));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarE(_histFile,
+        						   _hypotheses[i],
+							   _minE, _maxE));
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarF(_histFile,
+                                                           _hypotheses[i],
+							   _XminF, _XmaxF,
+							   _YminF, _YmaxF));
       // etc.
       }
     _configCheck = true;
@@ -129,93 +160,134 @@ namespace MAUS {
 	       ++track_i) {
 	    MAUS::DataStructure::Global::Track* track =
 	      GlobalTrackArray->at(track_i);
-	    if (track->get_mapper_name() != "MapCppGlobalTrackMatching-US" ||
-		track->get_mapper_name() != "MapCppGlobalTrackMatching-DS")
-	      continue;
-	    //int recon_track_pid = track->get_pid();
-	    MAUS::DataStructure::Global::Track* pidtrack = track->Clone();
-	    global_event->add_track_recursive(pidtrack);
-	    pidtrack->set_mapper_name("MapCppGlobalPID-Candidate");
-	    pidtrack->set_pid(MAUS::DataStructure::Global::kNoPID);
-	    // doubles to hold cumulative log likelihoods for each hypothesis
-	    double logL_200MeV_mu_plus = 0;
-	    double logL_200MeV_e_plus = 0;
-	    double logL_200MeV_pi_plus = 0;
-	    for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
-		 ++pid_var_count) {
-	      std::string hyp = _pid_vars[pid_var_count]->Get_hyp();
-	      if (hyp == "200MeV_mu_plus") {
-		if (_pid_vars[pid_var_count]->logL(track) == 1) {
-		  continue;
+	    if (track->get_mapper_name() == "MapCppGlobalTrackMatching-US" ||
+		track->get_mapper_name() == "MapCppGlobalTrackMatching-DS") {
+	      //int recon_track_pid = track->get_pid();
+	      MAUS::DataStructure::Global::Track* pidtrack = track->Clone();
+	      global_event->add_track_recursive(pidtrack);
+	      pidtrack->set_mapper_name("MapCppGlobalPID-Candidate");
+	      pidtrack->set_pid(MAUS::DataStructure::Global::kNoPID);
+	      // doubles to hold cumulative log likelihoods for each hypothesis
+	      double logL_200MeV_mu_plus = 0;
+	      double logL_200MeV_e_plus = 0;
+	      double logL_200MeV_pi_plus = 0;
+	      /// Bools to check if log likelihood for PID variable returned an
+	      /// "error value" logL, 1 for an unsuitable track, 2 for a track
+	      /// that fails the PID due to a user defined cut on the variable
+	      /// value. Only used for the purposes of efficiency calculations,
+	      /// does not affect PID performance
+	      bool logL_1 = false;
+	      bool logL_2 = false;
+	      for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
+		   ++pid_var_count) {
+		logL_1 = false;
+		logL_2 = false;
+		std::string hyp = _pid_vars[pid_var_count]->Get_hyp();
+		if (hyp == "200MeV_mu_plus") {
+		  if (_pid_vars[pid_var_count]->logL(track) == 1) {
+		    logL_1 = true;
+		    continue;
+		  } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
+		    logL_2 = true;
+		    continue;
+		  } else {
+		    logL_200MeV_mu_plus += _pid_vars[pid_var_count]->logL(track);
+		    logL_1 = false;
+		    logL_2 = false;
+		  }
+		} else if (hyp == "200MeV_e_plus") {
+		  if (_pid_vars[pid_var_count]->logL(track) == 1) {
+		    logL_1 = true;
+		    continue;
+		  } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
+		    logL_2 = true;
+		    continue;
+		  } else {
+		    logL_200MeV_e_plus += _pid_vars[pid_var_count]->logL(track);
+		    logL_1 = false;
+		    logL_2 = false;
+		  }
+		} else if (hyp == "200MeV_pi_plus") {
+		  if (_pid_vars[pid_var_count]->logL(track) == 1) {
+		    logL_1 = true;
+		    continue;
+		  } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
+		    logL_2 = true;
+		    continue;
+		  } else {
+		    logL_200MeV_pi_plus += _pid_vars[pid_var_count]->logL(track);
+		    logL_1 = false;
+		    logL_2 = false;
+		  }
 		} else {
-		  logL_200MeV_mu_plus += _pid_vars[pid_var_count]->logL(track);
+		  Squeak::mout(Squeak::debug) << "Unrecognised particle hypothesis,"
+					      << " MapCppGlobalPID::process" << std::endl;
 		}
-	      } else if (hyp == "200MeV_e_plus") {
-		if (_pid_vars[pid_var_count]->logL(track) == 1) {
-		  continue;
+	      }
+	      if ((logL_200MeV_mu_plus == 0 || logL_200MeV_pi_plus == 0 ||
+		   logL_200MeV_e_plus == 0) && logL_1 == true) {
+		logL_200MeV_mu_plus = 1;
+		logL_200MeV_pi_plus = 1;
+		logL_200MeV_e_plus = 1;
+	      } else if ((logL_200MeV_mu_plus == 0 || logL_200MeV_pi_plus == 0 ||
+			  logL_200MeV_e_plus == 0) && logL_2 == true) {
+		logL_200MeV_mu_plus = 2;
+		logL_200MeV_pi_plus = 2;
+		logL_200MeV_e_plus = 2;
+	      }	      
+	      //make pid_ll_values
+	      MAUS::DataStructure::Global::PIDLogLPair mu_plus_LL(-13,logL_200MeV_mu_plus);
+	      MAUS::DataStructure::Global::PIDLogLPair e_plus_LL(-11,logL_200MeV_e_plus);
+	      MAUS::DataStructure::Global::PIDLogLPair pi_plus_LL(-211,logL_200MeV_pi_plus);
+	      pidtrack->AddPIDLogLValues(mu_plus_LL);
+	      pidtrack->AddPIDLogLValues(pi_plus_LL);
+	      pidtrack->AddPIDLogLValues(e_plus_LL);
+	      std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_ll_values = pidtrack->get_pid_logL_values();
+	      for( std::vector<MAUS::DataStructure::Global::PIDLogLPair>::const_iterator i = pid_ll_values.begin(); i != pid_ll_values.end(); ++i) {
+		std::cerr << i->first << "\t" << i->second << std::endl;
+	      }
+	      if (logL_200MeV_mu_plus < 0 || logL_200MeV_pi_plus < 0 ||
+		  logL_200MeV_e_plus < 0) {
+		//calculate CLs
+		double sum_exp_LLs = exp(logL_200MeV_mu_plus) + exp(logL_200MeV_e_plus) + exp(logL_200MeV_pi_plus);
+		std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;
+		double CL_mu_plus = ConfidenceLevel(logL_200MeV_mu_plus, sum_exp_LLs);
+		double CL_e_plus = ConfidenceLevel(logL_200MeV_e_plus, sum_exp_LLs);
+		double CL_pi_plus = ConfidenceLevel(logL_200MeV_pi_plus, sum_exp_LLs);
+		std::cerr << "CL_mu " << CL_mu_plus << std::endl;
+		std::cerr << "CL_e " << CL_e_plus << std::endl;
+		std::cerr << "CL_pi " << CL_pi_plus << std::endl;
+		//compare CLs and select winning hypothesis. set g.o.f. of track to CL
+		if (CL_mu_plus - CL_e_plus > 5 && CL_mu_plus - CL_pi_plus > 5) {
+		  pidtrack->set_pid(MAUS::DataStructure::Global::kMuPlus);
+		  pidtrack->set_goodness_of_fit(CL_mu_plus);
+		  if (track->get_pid() == MAUS::DataStructure::Global::kMuPlus) {
+		    MAUS::DataStructure::Global::Track* final_pidtrack = pidtrack->Clone();
+		    global_event->add_track_recursive(final_pidtrack);
+		    final_pidtrack->set_mapper_name("MapCppGlobalPID-Final");
+		  }
+		} else if (CL_pi_plus - CL_e_plus > 5 && CL_pi_plus - CL_mu_plus > 5) {
+		  pidtrack->set_pid(MAUS::DataStructure::Global::kPiPlus);
+		  pidtrack->set_goodness_of_fit(CL_pi_plus);
+		  if (track->get_pid() == MAUS::DataStructure::Global::kPiPlus) {
+		    MAUS::DataStructure::Global::Track* final_pidtrack = pidtrack->Clone();
+		    global_event->add_track_recursive(final_pidtrack);
+		    final_pidtrack->set_mapper_name("MapCppGlobalPID-Final");
+		  }
+		} else if (CL_e_plus - CL_mu_plus > 5 && CL_e_plus - CL_pi_plus > 5) {
+		  pidtrack->set_pid(MAUS::DataStructure::Global::kEPlus);
+		  pidtrack->set_goodness_of_fit(CL_e_plus);
+		  if (track->get_pid() == MAUS::DataStructure::Global::kEPlus) {
+		    MAUS::DataStructure::Global::Track* final_pidtrack = pidtrack->Clone();
+		    global_event->add_track_recursive(final_pidtrack);
+		    final_pidtrack->set_mapper_name("MapCppGlobalPID-Final");
+		  }
 		} else {
-		  logL_200MeV_e_plus += _pid_vars[pid_var_count]->logL(track);
-		}
-	      } else if (hyp == "200MeV_pi_plus") {
-		if (_pid_vars[pid_var_count]->logL(track) == 1) {
+		  Squeak::mout(Squeak::debug) << "PID for track could not be" <<
+		    " determined." << std::endl;
 		  continue;
-		} else {
-		  logL_200MeV_pi_plus += _pid_vars[pid_var_count]->logL(track);
 		}
-	      } else {
-		Squeak::mout(Squeak::debug) << "Unrecognised particle hypothesis,"
-					    << " MapCppGlobalPID::process" << std::endl;
 	      }
-	    }
-	    //make pid_ll_values
-	    MAUS::DataStructure::Global::PIDLogLPair mu_plus_LL(-13,logL_200MeV_mu_plus);
-	    MAUS::DataStructure::Global::PIDLogLPair e_plus_LL(-11,logL_200MeV_e_plus);
-	    MAUS::DataStructure::Global::PIDLogLPair pi_plus_LL(-211,logL_200MeV_pi_plus);
-	    pidtrack->AddPIDLogLValues(mu_plus_LL);
-	    pidtrack->AddPIDLogLValues(pi_plus_LL);
-	    pidtrack->AddPIDLogLValues(e_plus_LL);
-	    std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_ll_values = pidtrack->get_pid_logL_values();
-	    for( std::vector<MAUS::DataStructure::Global::PIDLogLPair>::const_iterator i = pid_ll_values.begin(); i != pid_ll_values.end(); ++i) {
-	      std::cerr << i->first << "\t" << i->second << std::endl;
-	      }
-	    //calculate CLs
-	    double sum_exp_LLs = exp(logL_200MeV_mu_plus) + exp(logL_200MeV_e_plus) + exp(logL_200MeV_pi_plus);
-	    std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;
-	    double CL_mu_plus = ConfidenceLevel(logL_200MeV_mu_plus, sum_exp_LLs);
-	    double CL_e_plus = ConfidenceLevel(logL_200MeV_e_plus, sum_exp_LLs);
-	    double CL_pi_plus = ConfidenceLevel(logL_200MeV_pi_plus, sum_exp_LLs);
-	    std::cerr << "CL_mu " << CL_mu_plus << std::endl;
-	    std::cerr << "CL_e " << CL_e_plus << std::endl;
-	    std::cerr << "CL_pi " << CL_pi_plus << std::endl;
-	    //compare CLs and select winning hypothesis. set g.o.f. of track to CL
-	    if (CL_mu_plus - CL_e_plus > 5 && CL_mu_plus - CL_pi_plus > 5) {
-	      pidtrack->set_pid(MAUS::DataStructure::Global::kMuPlus);
-	      pidtrack->set_goodness_of_fit(CL_mu_plus);
-	      if (track->get_pid() == MAUS::DataStructure::Global::kMuPlus) {
-		MAUS::DataStructure::Global::Track* final_pidtrack = pidtrack->Clone();
-		global_event->add_track_recursive(final_pidtrack);
-		final_pidtrack->set_mapper_name("MapCppGlobalPID-Final");
-	      }
-	    } else if (CL_pi_plus - CL_e_plus > 5 && CL_pi_plus - CL_mu_plus > 5) {
-	      pidtrack->set_pid(MAUS::DataStructure::Global::kPiPlus);
-	      pidtrack->set_goodness_of_fit(CL_pi_plus);
-	      if (track->get_pid() == MAUS::DataStructure::Global::kPiPlus) {
-		MAUS::DataStructure::Global::Track* final_pidtrack = pidtrack->Clone();
-		global_event->add_track_recursive(final_pidtrack);
-		final_pidtrack->set_mapper_name("MapCppGlobalPID-Final");
-	      }
-	    } else if (CL_e_plus - CL_mu_plus > 5 && CL_e_plus - CL_pi_plus > 5) {
-	      pidtrack->set_pid(MAUS::DataStructure::Global::kEPlus);
-	      pidtrack->set_goodness_of_fit(CL_e_plus);
-	      if (track->get_pid() == MAUS::DataStructure::Global::kEPlus) {
-		MAUS::DataStructure::Global::Track* final_pidtrack = pidtrack->Clone();
-		global_event->add_track_recursive(final_pidtrack);
-		final_pidtrack->set_mapper_name("MapCppGlobalPID-Final");
-	      }
-	    } else {
-	      Squeak::mout(Squeak::debug) << "PID for track could not be" <<
-		" determined." << std::endl;
-	      continue;
 	    }
 	  }
 	}

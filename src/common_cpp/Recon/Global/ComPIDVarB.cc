@@ -27,13 +27,15 @@ namespace global {
   const std::string ComPIDVarB::VARIABLE = "KLChargeProdvsDiffTOF1TOF2";
 
   ComPIDVarB::ComPIDVarB(std::string hypothesis, std::string unique_identifier)
-    : PIDBase2D(VARIABLE, hypothesis, unique_identifier,
-                 XminBinComB, XmaxBinComB, XnumBins, YminBinComB, YmaxBinComB, YnumBins) {
+    : PIDBase2D(VARIABLE, hypothesis, unique_identifier, XminBinComB,
+		XmaxBinComB, XnumBins, YminBinComB, YmaxBinComB, YnumBins) {
     _nonZeroHistEntries = true;
   }
 
-  ComPIDVarB::ComPIDVarB(TFile* file, std::string hypothesis, int XminComB, int XmaxComB, int YminComB, int YmaxComB)
-    : PIDBase2D(file, VARIABLE, hypothesis, XminComB, XmaxComB, YminComB, YmaxComB) {
+  ComPIDVarB::ComPIDVarB(TFile* file, std::string hypothesis, int XminComB,
+			 int XmaxComB, int YminComB, int YmaxComB)
+    : PIDBase2D(file, VARIABLE, hypothesis, XminComB, XmaxComB, YminComB,
+		YmaxComB, XminBinComB, XmaxBinComB, YminBinComB, YmaxBinComB) {
   }
 
   ComPIDVarB::~ComPIDVarB() {}
@@ -93,7 +95,6 @@ namespace global {
       for (size_t i = 0; i < kl_track_points.size(); i++) {
 	total_ADC_charge_product += kl_track_points[i]->get_ADC_charge_product();
       }
-      std::cerr << "ADC CP " << total_ADC_charge_product << std::endl;
       kl_track_points.clear();
       if ( YminBinComB > (total_ADC_charge_product) || (total_ADC_charge_product) > YmaxBinComB ) {
 	Squeak::mout(Squeak::debug) << "KL ADC charge product " <<
