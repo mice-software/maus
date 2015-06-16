@@ -19,16 +19,16 @@ run.
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Turn off false positives related to ROOT
-#pylint: disable = E1101
+# pylint: disable = E1101
 # Disable messages about too many branches and too many lines.
-#pylint: disable = R0912
-#pylint: disable = R0915
-pylint: disable=E0001
-pylint: disable=C0103
-pylint: disable=C0301
-pylint: disable=W0105
-pylint: disable=W0612
-pylint: disable=W0201
+# pylint: disable = R0912
+# pylint: disable = R0915
+# pylint: disable=E0001
+# pylint: disable=C0103
+# pylint: disable=C0301
+# pylint: disable=W0105
+# pylint: disable=W0612
+# pylint: disable=W0201
 
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
