@@ -68,6 +68,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
   double _makeSpacePointCut; // nanoseconds
   double _findTriggerPixelCut; // nanoseconds
   std::string _triggerStation;
+  int _trigStn;
 
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
