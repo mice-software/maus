@@ -4,17 +4,17 @@ It draws them, refreshes the canvases and prints to eps at the end of
 run.
 """
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
-# 
+#
 #  MAUS is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-# 
+#
 #  MAUS is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -23,32 +23,28 @@ run.
 # Disable messages about too many branches and too many lines.
 # pylint: disable = R0912
 # pylint: disable = R0915
-# pylint: disable=E0001
-# pylint: disable=C0103
-# pylint: disable=C0301
-# pylint: disable=W0105
-# pylint: disable=W0612
-# pylint: disable=W0201
+# pylint: disable = C0103, C0301
+# pylint: disable = W0105, W0612, W0201
 
 import ROOT
 from ReducePyROOTHistogram import ReducePyROOTHistogram
 
 class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
-    """gedit 
+    """
     ReducePySciFiPlot plots several Tracker histograms.
     Currently the following histograms are filled:
-    Digits per tracker and station, 
+    Digits per tracker and station,
     pe per channel and
     Spacepoints per station
-    
+
     Histograms are drawn on different canvases.
     The canvases are refreshed every N spills where N = refresh_rate
     set via refresh_rate data card value (see below).
-   
+
     The default is to run ROOT in batch mode
     To run in interactive mode, set root_batch_mode = 0 in the data card
-    (see below). 
-    
+    (see below).
+
     At the end of the run, the canvases are printed to eps files
 
     A sequence of 3 histograms are output as JSON documents of form:
@@ -61,14 +57,14 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                "data": "...base 64 encoded image..."}}
     @endverbatim
 
-	SciFi, Digits, PE Channel, Spacepoints
+    SciFi, Digits, PE Channel, Spacepoints
 
     If "histogram_auto_number" (see below) is "true" then the TAG will
     have a number N appended where N means that the histogram was
     produced as a consequence of the (N + 1)th spill processed  by the
     worker. The number will be zero-padded to form a six digit string
     e.g. "00000N". If "histogram_auto_number" is false then no such
-    number is appended 
+    number is appended
 
     In cases where a spill is input that contains errors (e.g. is
     badly formatted or is missing the data needed to update a
@@ -123,8 +119,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.SciFiSpacepointsT1 = None
         self.SciFiSpacepointsT2 = None
 
-        self.canvas_SciFiDigit = None	
-        self.canvas_SciFiPEperChannel = None      
+        self.canvas_SciFiDigit = None
+        self.canvas_SciFiPEperChannel = None
         self.canvas_SciFiSpacepoints = None
 
         # Has an end_of_run been processed?
@@ -132,7 +128,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
     def _configure_at_birth(self, config_doc):
         """
-        Configure worker from data cards. Overrides super-class method. 
+        Configure worker from data cards. Overrides super-class method.
         @param self Object reference.
         @param config_doc JSON document.
         @returns True if configuration succeeded.
@@ -182,8 +178,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             return []
 
     def get_SciFiDigits(self, spill):
-        
-        """ 
+
+        """
         Get the SciFiDigits and update the histograms.
 
         @param self Object reference.
@@ -259,8 +255,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
     # Gives information on reconstruction efficiency
     def get_SciFiSpacepoints(self, spill):
-        
-        """ 
+
+        """
         Get the SciFiDigits and update the histograms.
 
         @param self Object reference.
@@ -300,13 +296,13 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """ 
         # white canvas
         self.cnv = ROOT.gROOT.SetStyle("Plain")
-        
+
         #turn off stat box
         self.style = ROOT.gStyle.SetOptStat(0)
-        
+
         #sensible color palette
         self.style = ROOT.gStyle.SetPalette(1)
- 
+
         # define histograms
         self.ScifiDigitT1 = ROOT.TH1F("h1", "SciFi Digits in Tracker 1", 100, 0, 6)
         self.ScifiDigitT1.SetTitle("SciFi Digits Tracker 1")
@@ -374,20 +370,21 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Draw() of histos has to be done only once
         # for updating the histograms, just Modified() and Update() on canvases
         # the update/refresh is done in update_histos()
-        
+
         self.canvas_SciFiDigit = ROOT.TCanvas("SciFiDigit", "SciFiDigit")
+        self.canvas_SciFiDigit.SetTitle("x")
         self.canvas_SciFiDigit.Divide(2, 1)
         self.canvas_SciFiDigit.cd(1)
         self.ScifiDigitT1.Draw()
         self.canvas_SciFiDigit.cd(2)
         self.SciFiDigitT2.Draw()
-         
+
         self.canvas_SciFiPEperChannel = ROOT.TCanvas("SciFiPEperChannel", "SciFiPEperChannel")
         self.canvas_SciFiPEperChannel.Divide(5, 2)
         self.canvas_SciFiPEperChannel.cd(1)
         self.SciFiPEperChannelT1S1.Draw()
         self.canvas_SciFiPEperChannel.cd(2)
-        self.SciFiPEperChannelT1S2.Draw()       
+        self.SciFiPEperChannelT1S2.Draw()
         self.canvas_SciFiPEperChannel.cd(3)
         self.SciFiPEperChannelT1S3.Draw()
         self.canvas_SciFiPEperChannel.cd(4)
@@ -397,7 +394,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_SciFiPEperChannel.cd(6)
         self.SciFiPEperChannelT2S1.Draw()
         self.canvas_SciFiPEperChannel.cd(7)
-        self.SciFiPEperChannelT2S2.Draw()       
+        self.SciFiPEperChannelT2S2.Draw()
         self.canvas_SciFiPEperChannel.cd(8)
         self.SciFiPEperChannelT2S3.Draw()
         self.canvas_SciFiPEperChannel.cd(9)
@@ -411,10 +408,10 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.SciFiSpacepointsT1.Draw()
         self.canvas_SciFiSpacepoints.cd(2)
         self.SciFiSpacepointsT2.Draw() 
-       
+
         return True
 
-    def update_histos(self):       
+    def update_histos(self):
         """
         Updates histogram canvases. This is called only when the
         number of spills is divisible by the refresh rate.
@@ -425,7 +422,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_SciFiPEperChannel.Update()
         self.canvas_SciFiSpacepoints.Update()
 
-    def get_histogram_images(self):       
+    def get_histogram_images(self):
         """
         Get histograms as JSON documents.
         @returns list of 1 JSON document containing the images.
@@ -457,7 +454,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_SciFiSpacepoints)
         image_list.append(doc)
- 
+
         return image_list
 
     def _cleanup_at_death(self):
@@ -466,9 +463,4 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
         self.__init_histos()
         self.get_histogram_images()
-
-
-
-
-
 
