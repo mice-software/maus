@@ -32,8 +32,7 @@
 #include "src/common_cpp/DataStructure/Image.hh"
 #include "src/common_cpp/DataStructure/CanvasWrapper.hh"
 
-#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
-#include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 
 #include "src/legacy/Interface/STLUtils.hh"
 
@@ -41,11 +40,14 @@
 
 namespace MAUS {
 
+const size_t ReduceCppTiltedHelix::n_stations = 5;
+const size_t ReduceCppTiltedHelix::n_trackers = 2;
+
 ReduceCppTiltedHelix::ReduceCppTiltedHelix()
   : ReduceBase<Data, ImageData>("ReduceCppTiltedHelix") {
-    for (size_t i = 0; i < 2; ++i) {
+    for (size_t i = 0; i < n_trackers; ++i) {
         std::string i_str = STLUtils::ToString(i);
-        for (size_t j = 0; j < 5; ++j) {
+        for (size_t j = 0; j < n_stations; ++j) {
             std::string j_str = STLUtils::ToString(j);
             hist_vector_.push_back(
                 TH1D(("station_"+i_str+"_plane_"+j_str).c_str(),
@@ -60,9 +62,17 @@ void ReduceCppTiltedHelix::_birth(const std::string& config) {}
 
 void ReduceCppTiltedHelix::_death() {}
 
-bool ReduceCppTiltedHelix::will_cut(std::vector<SciFiSpacePoint*> space_points) {
-    if (space_points.size() != 5)
-        return true;
+bool ReduceCppTiltedHelix::will_cut(std::vector<SciFiSpacePoint*> space_points, size_t tracker) {
+    std::vector<size_t> n_space_points_per_station(n_stations, 0);
+    for (size_t i = 0; i < space_points.size(); ++i) {
+        if (space_points[i]->get_tracker() == int(tracker)) {
+            n_space_points_per_station[space_points[i]->get_station()] += 1;
+        }
+    }
+    // cut if we don't have exactly one space point per station
+    for (size_t i = 0; i < n_stations; ++i)
+        if (n_space_points_per_station[i] != 1)
+            return true;
     for (size_t i = 0; i < space_points.size(); ++i) {
           if (space_points[i] == NULL)
               throw(Exception(Exception::recoverable,
@@ -93,18 +103,27 @@ ImageData* ReduceCppTiltedHelix::get_image_data() {
     return image_data;
 }
 
-void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points) {
-    for (int tracker = 0; tracker < 2; ++tracker) {
-        std::vector<SciFiSpacePoint*> space_points_tracker(5, NULL);
+void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
+                                  std::vector<bool> will_cut_tracker) {
+    for (size_t tracker = 0; tracker < n_trackers; ++tracker) {
+        if (will_cut_tracker[tracker])
+            continue;
+        std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station(n_stations, std::vector<SciFiSpacePoint*>());
+        std::cerr << "Do fit tracker " << tracker << std::endl;
+        std::cerr << "    Will cut " << tracker << " " <<will_cut_tracker[tracker] << std::endl;
         for (size_t j = 0; j < space_points.size(); ++j) {
-            if (space_points[j]->get_tracker() == tracker) {
+            if (space_points[j]->get_tracker() == int(tracker)) {
                int station = space_points[j]->get_station();
-                space_points_tracker[station] = space_points[j];
+               space_points_by_station[station].push_back(space_points[j]);
             }
         }
-        SimpleCircle circle;
-        LeastSquaresFitter::circle_fit(0.5, 0.5, 1000., space_points_tracker, circle);
-        NOW CALCULATE CHI2 FOR EACH STATION AND ADD TO HISTS
+        std::vector<SciFiStraightPRTrack*> strks;
+        std::vector<SciFiHelicalPRTrack*> htrks;
+        std::cerr << "    htracks 1 " << htrks.size() << " " << tracker << std::endl;
+        PatternRecognition().make_5tracks(true, tracker, space_points_by_station, strks, htrks);
+        std::cerr << "    htracks 2 " << htrks.size() << " " << tracker << std::endl;
+        if (htrks.size() == 1) {
+        }
     }
 }
 
@@ -128,9 +147,10 @@ MAUS::ImageData* ReduceCppTiltedHelix::_process(MAUS::Data* data) {
         std::vector<SciFiSpacePoint*> space_points =
                             recon_events->at(i)->GetSciFiEvent()->spacepoints();
         // cut space points if they don't conform to criteria
-        if (will_cut(space_points))  
-            continue;
-        do_fit(space_points);
+        std::vector<bool> will_cut_tracker(n_trackers, false);
+        for (size_t i = 0; i < n_trackers; ++i)
+            will_cut_tracker[i] = will_cut(space_points, i);
+        do_fit(space_points, will_cut_tracker);
     }
     return get_image_data();
 }

@@ -40,13 +40,16 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     ImageData* _process(Data* data);
 
-    bool will_cut(std::vector<SciFiSpacePoint*> space_points);
+    bool will_cut(std::vector<SciFiSpacePoint*> space_points, size_t tracker);
 
-    void do_fit(std::vector<SciFiSpacePoint*> space_points);
+    void do_fit(std::vector<SciFiSpacePoint*> space_points, std::vector<bool> will_cut_tracker);
 
     ImageData* get_image_data();
 
     std::vector<TH1D> hist_vector_;
+
+    static const size_t n_stations;
+    static const size_t n_trackers;
 };
 
 PyMODINIT_FUNC init_ReduceCppTiltedHelix(void) {

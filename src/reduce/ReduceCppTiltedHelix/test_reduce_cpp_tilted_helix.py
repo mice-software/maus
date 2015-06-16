@@ -10,9 +10,14 @@ def generate_scifi_data():
     recon_events = ROOT.MAUS.ReconEventPArray()        
     recon_events.push_back(ROOT.MAUS.ReconEvent())
     scifi_space_points = ROOT.MAUS.SciFiSpacePointPArray()
-    for i in range(5):
-        sp = ROOT.MAUS.SciFiSpacePoint()
-        scifi_space_points.push_back(sp)
+    for tracker in range(2):
+        for station in range(5):
+            sp = ROOT.MAUS.SciFiSpacePoint()
+            sp.set_tracker(tracker)
+            sp.set_station(station)
+            pos = ROOT.MAUS.ThreeVector()
+            sp.set_position(pos)
+            scifi_space_points.push_back(sp)
     scifi_event = ROOT.MAUS.SciFiEvent()
     scifi_event.set_spacepoints(scifi_space_points)
     recon_events[0].SetSciFiEvent(scifi_event)        

@@ -506,7 +506,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack*> &htrks) {
   // if (_verb > 0) std::cout << "make_helix: # of current spnts: " << current_spnts.size() << "\n";
-
+  std::cerr << "MAKE HELIX 1" << std::endl;
   // Set variables to hold which stations are to be ignored
   int ignore_st_1 = -1, ignore_st_2 = -1;
   set_ignore_stations(ignore_stations, ignore_st_1, ignore_st_2);
@@ -516,7 +516,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
       return;
   }
-
+  std::cerr << "MAKE HELIX 2" << std::endl;
   // Set the minimum station number to 0, unless that is an ignore station
   int stat_num_min = 0;
   if ( ignore_st_1 == 0 || ignore_st_2 == 0 ) stat_num_min = 1;
@@ -524,37 +524,45 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
   // Set the maximum station number to 4, unless that is an ignore station
   int stat_num_max = 4;
   if ( ignore_st_1 == 4 || ignore_st_2 == 4 ) stat_num_max = 3;
-
+  std::cerr << "MAKE HELIX 3" << std::endl;
   // Loop over spacepoints in current station
   for ( size_t sp_num = 0; sp_num < spnts_by_station[stat_num].size(); ++sp_num ) {
+    std::cerr << "MAKE HELIX 3a " << stat_num << " " << sp_num << std::endl;
+    std::cerr << spnts_by_station.size() << std::endl;
+    std::cerr << spnts_by_station[stat_num].size() << std::endl;
+    std::cerr << spnts_by_station[stat_num][sp_num] << std::endl;
     // If the current sp is used, skip it
     if ( spnts_by_station[stat_num][sp_num]->get_used() ) {
       // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipin\n";
       continue;
     }
-
+    std::cerr << "MAKE HELIX 3a+ " << sp_num << std::endl;
     // Add the current spnt to the list being tried at present
     // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding ";
     current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
     // if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
 
     // If we are on the last station, attempt to form a track using the spacepoints collected
+    std::cerr << "MAKE HELIX 3B " << sp_num << std::endl;
     if (stat_num == stat_num_max) {
       SciFiHelicalPRTrack* trk = form_track(n_points, current_spnts);
 
       // If we found a track, clear current spacepoints to trigger break out to outer most station
       if ( trk != NULL ) {
+        std::cerr << "MAKE HELIX 3C " << sp_num << std::endl;
         if (_verb > 0) std::cout << "Found track, adding" << std::endl;
         htrks.push_back(trk);
         current_spnts.clear();
         current_spnts.resize(0);
         return;
       } else {
+        std::cerr << "MAKE HELIX 3D " << sp_num << std::endl;
         current_spnts.pop_back();
       }
 
     // If not on the final station, move on to next
     } else {
+      std::cerr << "MAKE HELIX 3E " << sp_num << std::endl;
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
 
       // If we are not on the first station and current_spnts is empty, break out as track was found
@@ -563,8 +571,10 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
       // If we we have current spnts, remove the last tried, before trying another
       else if ( current_spnts.size() != 0 )
         current_spnts.pop_back();
+      std::cerr << "MAKE HELIX 3F " << sp_num << std::endl;
     }
   }
+  std::cerr << "MAKE HELIX 4" << std::endl;
   return;
 }
 
