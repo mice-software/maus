@@ -10,8 +10,8 @@ verbose_level = 0 # 0 = debug info (and std::cout), 1 = run info, 2 = warnings #
 #------------------------------------------
 # Used by InputCppRoot
 #------------------------------------------
-data_dir = '/home/adobbs/maus/output/'
-input_root_file_name = data_dir + 'maus_output_10kspills_muplus_norecon_2014-02-25.root'
+data_dir = '/vols/mice3/mageorge/MAUSDirectories/TrackerOMPlotsTrunk/output'
+input_root_file_name = data_dir + 'maus_output_100spills_muplus_norecon_June15_OMtest.root'
 selected_spills = [1, 176, 7778] # e.g. [27, 52, 75] to use those spills only
 
 #------------------------------------------
@@ -38,7 +38,7 @@ accumulate_tracks = 1 # this accumulates the tracks into one vrml file 1 = yes, 
 #------------------------------------------
 # Used by InputPySpillGenerator
 #------------------------------------------
-spill_generator_number_of_spills = 1000
+spill_generator_number_of_spills = 100
 
 #------------------------------------------
 # Used by MapPyBeamMaker to generate input particle data
