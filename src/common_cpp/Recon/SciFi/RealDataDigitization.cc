@@ -28,16 +28,25 @@ namespace MAUS {
 
 #define MIN_ADC 0.000000001
 
-RealDataDigitization::RealDataDigitization() {}
+RealDataDigitization::RealDataDigitization() : _npe_cut(0.0) {
+  // Do nothing
+}
 
-RealDataDigitization::~RealDataDigitization() {}
+RealDataDigitization::~RealDataDigitization() {
+  // Do nothing
+}
 
-void RealDataDigitization::initialise() {
+void RealDataDigitization::initialise(double npe_cut,
+                                      const std::string& map_file,
+                                      const std::string& calib_file) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface.
-  bool map = load_mapping("scifi_mapping_2015-06-16.txt");
-  bool calib = load_calibration("scifi_calibration_2015-06-16.txt");
+  _npe_cut = npe_cut;
+  // bool map = load_mapping("scifi_mapping_2015-06-16.txt");
+  // bool calib = load_calibration("scifi_calibration_2015-06-16.txt";
+  bool map = load_mapping(map_file.c_str());
+  bool calib = load_calibration(calib_file.c_str());
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
     throw(Exception(Exception::recoverable,
@@ -150,7 +159,7 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
                                       tracker, station, plane, channel,
                                       extWG, inWG, WGfib);
      // Exclude missing modules.
-    if ( found ) { // pe > 1.0 &&
+    if ( found && (pe > _npe_cut ) ) {
       SciFiDigit *digit = new SciFiDigit(SpillNum, vlsb1.GetPartEventNumber(),
                                          tracker, station, plane, channel, pe, time);
       digits.push_back(digit);

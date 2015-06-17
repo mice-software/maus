@@ -98,7 +98,8 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
+# simulation_geometry_filename = "Stage4.dat" # geometry used by simulation - should be replaced by CDB version
+simulation_geometry_filename = "Test.dat" # geometry used by simulation - should be replaced by CDB version
 simulation_geometry_debug    = False
 check_volume_overlaps = False
 maximum_number_of_steps = 50000000 # particles are killed after this number of
@@ -251,6 +252,9 @@ reconstruction_geometry_filename = ""
 
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
+SciFiDigitizationNPECut = 1.0
+SciFiMappingFileName = "scifi_mapping_2015-06-16.txt"
+SciFiCalibrationFileName = "scifi_calibration_2015-06-16.txt"
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1
@@ -406,8 +410,8 @@ Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
-Do_VLSB_Zero_Suppression = False
-VLSB_Zero_Suppression_Threshold = 60
+Do_VLSB_Zero_Suppression = True
+VLSB_Zero_Suppression_Threshold = 40
 Do_VLSB_C_Zero_Suppression = False
 VLSB_C_Zero_Suppression_Threshold = 30
 Enable_TOF = True

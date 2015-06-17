@@ -15,6 +15,10 @@
  *
  */
 
+#include <string>
+
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
@@ -38,8 +42,18 @@ MapCppTrackerDigits::~MapCppTrackerDigits() {
 }
 
 void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
+  if (!Globals::HasInstance()) {
+    GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+  }
+  Json::Value *json = Globals::GetConfigurationCards();
+  double npe_cut = (*json)["SciFiDigitizationNPECut"].asDouble();
+  std::string map_file = (*json)["SciFiMappingFileName"].asString();
+  std::string calib_file = (*json)["SciFiCalibrationFileName"].asString();
+  std::cerr << "INFO: MapCppTrackerDigits: Map file: " << map_file
+            << ". Calib file: " << calib_file << ". NPE cut: " << npe_cut
+            << "\n";
   real = new RealDataDigitization();
-  real->initialise();
+  real->initialise(npe_cut, map_file.c_str(), calib_file.c_str());
 }
 
 void MapCppTrackerDigits::_death() {}
