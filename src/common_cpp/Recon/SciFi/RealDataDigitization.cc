@@ -36,8 +36,8 @@ void RealDataDigitization::initialise() {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface.
-  bool map = load_mapping("mapping_7.txt");
-  bool calib = load_calibration("scifi_calibration_jan2013.txt");
+  bool map = load_mapping("scifi_mapping_2015-06-16.txt");
+  bool calib = load_calibration("scifi_calibration_2015-06-16.txt");
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
     throw(Exception(Exception::recoverable,
