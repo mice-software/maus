@@ -44,7 +44,7 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     void do_fit(std::vector<SciFiSpacePoint*> space_points, std::vector<bool> will_cut_tracker);
 
-    double calculate_chi2(SciFiSpacePoint* space_point, SciFiHelicalPRTrack* pr_track);
+    std::vector<double> calculate_residual(size_t i, SciFiSpacePoint* space_point, SciFiHelicalPRTrack* pr_track);
 
     ImageData* get_image_data();
 

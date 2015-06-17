@@ -50,8 +50,11 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
         for (size_t j = 0; j < n_stations; ++j) {
             std::string j_str = STLUtils::ToString(j);
             hist_vector_.push_back(
-                TH1D(("station_"+i_str+"_plane_"+j_str).c_str(),
-                      ";#chi^{2}", 1000, -10, 10));
+                TH1D(("station_"+i_str+"_plane_"+j_str+"_x").c_str(),
+                      ";x_{meas} - x_{fit} [mm]", 1000, -10, 10));
+            hist_vector_.push_back(
+                TH1D(("station_"+i_str+"_plane_"+j_str+"_y").c_str(),
+                      ";y_{meas} - y_{fit} [mm]", 1000, -10, 10));
         }
     }
 }
@@ -104,8 +107,31 @@ ImageData* ReduceCppTiltedHelix::get_image_data() {
     return image_data;
 }
 
-double ReduceCppTiltedHelix::calculate_chi2(SciFiSpacePoint* space_point, SciFiHelicalPRTrack* pr_track) {
-    SOMETHING HERE PLEASE
+std::vector<double> ReduceCppTiltedHelix::calculate_residual(
+                                        size_t i,
+                                        SciFiSpacePoint* space_point,
+                                        SciFiHelicalPRTrack* pr_track) {
+    if (space_point == NULL or pr_track == NULL)
+        throw Exception(Exception::recoverable,
+                        "Bad input to calculate_chi2",
+                        "ReduceCppTiltedHelix::calculate_chi2");
+    double phi = pr_track->get_phi()[i];
+    double phi0 = pr_track->get_phi0();
+    double rad = pr_track->get_R();
+    double x0 = pr_track->get_circle_x0();
+    double y0 = pr_track->get_circle_y0();
+
+    double z_pos = space_point->get_position().z();
+    double x_meas = space_point->get_position().x();
+    double y_meas = space_point->get_position().y();
+
+    double x_fit = sin(phi0+phi)*rad+x0;
+    double y_fit = cos(phi0+phi)*rad+y0;
+
+    std::vector<double> residual(2, 0);
+    residual[0] = x_meas - x_fit;
+    residual[1] = y_meas - y_fit;
+    return residual;
 }
 
 void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
@@ -130,8 +156,9 @@ void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
         if (htrks.size() != 1)
             continue; // not possible?
         for (size_t i = 0; i < space_points_by_station.size(); ++i) {
-            double chi2 = calculate_chi2(space_points_by_station[i][0], htrks[0]);
-            hist_vector_[i+tracker*n_stations].Fill(chi2);
+            std::vector<double> res = calculate_residual(i, space_points_by_station[i][0], htrks[0]);
+            hist_vector_[2*(i+tracker*n_stations)].Fill(res[0]);
+            hist_vector_[2*(i+tracker*n_stations)+1].Fill(res[1]);
         }
     }
 }
