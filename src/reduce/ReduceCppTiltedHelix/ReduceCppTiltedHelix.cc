@@ -90,9 +90,10 @@ ImageData* ReduceCppTiltedHelix::get_image_data() {
         std::string i_str = STLUtils::ToString(i);
         CanvasWrapper* wrap = new CanvasWrapper();
         wrap->SetDescription("Space point residuals station "+i_str);
-        wrap->SetFileTag("ReduceCppHelixStation_"+
-                         std::string(hist_vector_[i].GetName()));
-        TCanvas* canvas = new TCanvas();
+        std::string name = "ReduceCppHelixStation_"+
+                           std::string(hist_vector_[i].GetName());
+        wrap->SetFileTag(name);
+        TCanvas* canvas = new TCanvas(name.c_str(), name.c_str());
         hist_vector_[i].Draw();
         canvas->Update();
         wrap->SetCanvas(canvas);
@@ -101,6 +102,10 @@ ImageData* ReduceCppTiltedHelix::get_image_data() {
     image->SetCanvasWrappers(canvas_wrappers);
     image_data->SetImage(image);
     return image_data;
+}
+
+double ReduceCppTiltedHelix::calculate_chi2(SciFiSpacePoint* space_point, SciFiHelicalPRTrack* pr_track) {
+    SOMETHING HERE PLEASE
 }
 
 void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
@@ -122,7 +127,11 @@ void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
         std::cerr << "    htracks 1 " << htrks.size() << " " << tracker << std::endl;
         PatternRecognition().make_5tracks(true, tracker, space_points_by_station, strks, htrks);
         std::cerr << "    htracks 2 " << htrks.size() << " " << tracker << std::endl;
-        if (htrks.size() == 1) {
+        if (htrks.size() != 1)
+            continue; // not possible?
+        for (size_t i = 0; i < space_points_by_station.size(); ++i) {
+            double chi2 = calculate_chi2(space_points_by_station[i][0], htrks[0]);
+            hist_vector_[i+tracker*n_stations].Fill(chi2);
         }
     }
 }
