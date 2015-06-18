@@ -50,6 +50,8 @@ SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& m
   GasParameters.Mean_Excitation_Energy  = (*json)["GasParams_Mean_Excitation_Energy"].asDouble();
   GasParameters.A                       = (*json)["GasParams_A"].asDouble();
   GasParameters.Density_Correction      = (*json)["GasParams_Density_Correction"].asDouble();
+
+  _default_momentum  = (*json)["SciFiDefaultMomentum"].asDouble();
 }
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}
@@ -119,7 +121,7 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
                                        HepRotation plane_rotation) {
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {global_position.x(), global_position.y(), global_position.z(), 0.};
-  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
+  BTFieldConstructor* field = Globals::GetReconFieldConstructor();
   field->GetElectroMagneticField()->GetFieldValue(position, EMfield);
   ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
   B_field *= plane_rotation;
@@ -129,12 +131,18 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
 
 double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
 //  Hep3Vector hepGlobalPos = trackerModule->globalPosition();
+  if (trackerModule == NULL) {
+    std::cerr << "No tracker module inited!\n";
+    throw Exception(Exception::nonRecoverable,
+                    "Invalid MiceModule provided",
+                    "SciFiGeometryHelper::FieldValue()");
+  }
   Hep3Vector globalPos = trackerModule->globalPosition();
   Hep3Vector relativePos(0., 0., 0.);
   HepRotation trackerRotation = trackerModule->globalRotation();
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {0., 0., 0., 0.};
-  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
+  BTFieldConstructor* field = Globals::GetReconFieldConstructor();
 
   Hep3Vector dims = trackerModule->dimensions();
   double stepSize = 0.1; // mm

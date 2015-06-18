@@ -169,6 +169,10 @@ class SciFiGeometryHelper {
 
   void FillMaterialsList(int start_id, int end_id, SciFiMaterialsList& materials_list);
 
+  double GetDefaultMomentum() const { return _default_momentum; }
+
+  void SetDefaultMomentum(double mom) { _default_momentum = mom; }
+
  private:
   std::vector<const MiceModule*> _modules;
 
@@ -181,6 +185,8 @@ class SciFiGeometryHelper {
   SciFiMaterialParams GasParameters;
 
   SciFiMaterialParams MylarParameters;
+
+  double _default_momentum;
 
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS

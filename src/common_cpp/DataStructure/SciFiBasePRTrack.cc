@@ -49,7 +49,7 @@ SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoint
 
 SciFiBasePRTrack::SciFiBasePRTrack(const SciFiBasePRTrack& track) :
     _spoints(NULL),
-    _covariance(0),
+    _covariance(track._covariance),
     _position(track._position),
     _momentum(track._momentum) {
   _spoints = new TRefArray(*track._spoints);

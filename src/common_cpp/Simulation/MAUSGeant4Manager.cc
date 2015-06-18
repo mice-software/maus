@@ -38,6 +38,13 @@ namespace MAUS {
 MAUSGeant4Manager* MAUSGeant4Manager::_instance = NULL;
 bool MAUSGeant4Manager::_isClosed = false;
 
+bool MAUSGeant4Manager::HasInstance() {
+  if (_instance == NULL && !_isClosed) {
+    return false;
+  }
+  return true;
+}
+
 MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
   if (_instance == NULL && !_isClosed) {
       _instance = new MAUSGeant4Manager();
