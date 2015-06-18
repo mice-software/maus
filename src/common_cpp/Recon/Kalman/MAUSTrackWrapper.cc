@@ -258,7 +258,6 @@ namespace MAUS {
     const Kalman::Track& data = fitter->Data();
     Kalman::State seed = fitter->GetSeed();
     double default_mom = geom->GetDefaultMomentum();
-    std::cerr << "Default track momentum = " << default_mom << "\n";
 
     if (smoothed.GetLength() < 1)
       throw MAUS::Exception(MAUS::Exception::recoverable, 
