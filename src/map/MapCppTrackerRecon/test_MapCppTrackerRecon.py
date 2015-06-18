@@ -17,6 +17,7 @@
 
 # pylint: disable = C0103
 
+import sys
 import os
 import json
 import unittest
@@ -24,6 +25,7 @@ import Configuration
 import MAUS
 import maus_cpp.globals
 import maus_cpp.converter
+import maus_cpp.mice_module
 
 class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppTrackerRecon"""
@@ -31,9 +33,10 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
 #    geom = os.getenv("MAUS_ROOT_DIR")+"/src/map/"+\
 #           "MapCppTrackerMCDigitization/MapCppTrackerMCDigitizationTest.dat"
-    geom = "TrackerTest.dat"
-    cfg['simulation_geometry_filename'] = geom
-    cfg['reconstruction_geometry_filename'] = geom
+    helical_geom = "TrackerTest.dat"
+    straight_geom = "TrackerTest_NoField.dat"
+    cfg['simulation_geometry_filename'] = helical_geom
+    cfg['reconstruction_geometry_filename'] = helical_geom
     cfg['SciFiPRHelicalOn'] = 0
     cfg['SciFiStraightOn'] = 0
 
@@ -44,6 +47,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         cls.test_config = ""
         if maus_cpp.globals.has_instance():
             cls.test_config = maus_cpp.globals.get_configuration_cards()
+            maus_cpp.globals.death()
 
     def testInit(self):
         """Check birth"""
@@ -55,7 +59,8 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
            output with good straight track data"""
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
-        self.cfg['reconstruction_geometry_filename'] = self.geom
+        self.cfg['simulation_geometry_filename'] = self.straight_geom
+        self.cfg['reconstruction_geometry_filename'] = self.straight_geom
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiPRStraightOn'] = 1
         # self.cfg['SciFiPatRecVerbosity'] = 1
@@ -63,6 +68,8 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         # print self.cfg['SciFiPRHelicalOn']
         # print self.cfg['SciFiPRStraightOn']
         maus_cpp.globals.birth(json.dumps(self.cfg))
+        maus_cpp.globals.set_reconstruction_mice_modules(
+            maus_cpp.mice_module.MiceModule(self.straight_geom))
         self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
@@ -97,11 +104,14 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         output with good helical track data"""
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
-        self.cfg['reconstruction_geometry_filename'] = self.geom
+        self.cfg['simulation_geometry_filename'] = self.helical_geom
+        self.cfg['reconstruction_geometry_filename'] = self.helical_geom
         self.cfg['SciFiPRHelicalOn'] = 1
         self.cfg['SciFiStraightOn'] = 0
         # self.cfg['SciFiPatRecVerbosity'] = 1
         maus_cpp.globals.birth(json.dumps(self.cfg))
+        maus_cpp.globals.set_reconstruction_mice_modules(
+            maus_cpp.mice_module.MiceModule(self.helical_geom))
         self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
         # test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %

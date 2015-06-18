@@ -175,13 +175,23 @@ void GlobalsManager::Finally() {
 */
 }
 
-void GlobalsManager::SetReconstructionMiceModules
-                                                      (MiceModule* recon_mods) {
+void GlobalsManager::SetReconstructionMiceModules(MiceModule* recon_mods) {
     if (Globals::GetInstance()->_recon_mods != NULL &&
       Globals::GetInstance()->_mc_mods != Globals::GetInstance()->_recon_mods) {
         delete Globals::_process->_recon_mods;
     }
     Globals:: _process->_recon_mods = recon_mods;
+    if (Globals::GetInstance()->_recon_field_constructor != NULL &&
+                             Globals::GetInstance()->_recon_field_constructor !=
+                             Globals::GetInstance()->_mc_field_constructor) {
+      delete Globals::GetInstance()->_recon_field_constructor;
+    }
+    if (recon_mods == NULL) {
+    Globals::GetInstance()->_recon_field_constructor = NULL;
+    } else {
+      Globals::GetInstance()->_recon_field_constructor =
+                                             new BTFieldConstructor(recon_mods);
+    }
 }
 
 void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {

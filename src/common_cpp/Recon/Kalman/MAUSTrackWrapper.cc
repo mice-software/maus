@@ -257,6 +257,8 @@ namespace MAUS {
 //    const Kalman::Track& predicted = fitter->Predicted();
     const Kalman::Track& data = fitter->Data();
     Kalman::State seed = fitter->GetSeed();
+    double default_mom = geom->GetDefaultMomentum();
+    std::cerr << "Default track momentum = " << default_mom << "\n";
 
     if (smoothed.GetLength() < 1)
       throw MAUS::Exception(MAUS::Exception::recoverable, 
@@ -314,16 +316,16 @@ namespace MAUS {
       if ( dimension == 4 ) {
         pos.setZ(smoothed_state.GetPosition());
         pos.setX(state_vector(0, 0));
-        mom.setX(state_vector(1, 0)*200.0);
+        mom.setX(state_vector(1, 0)*default_mom);
         pos.setY(state_vector(2, 0));
-        mom.setY(state_vector(3, 0)*200.0);
+        mom.setY(state_vector(3, 0)*default_mom);
 
         pos *= reference_rot;
         pos += reference_pos;
 
         mom *= reference_rot;
         if (tracker == 0) mom *= -1.0;
-        mom.setZ(200.0); // MeV/c
+        mom.setZ(default_mom); // MeV/c
       } else if ( dimension == 5 ) {
         pos.setX(state_vector(0, 0));
         mom.setX(state_vector(1, 0));
@@ -403,9 +405,9 @@ namespace MAUS {
     if ( dimension == 4 ) {
       seed_pos.setZ(seed.GetPosition());
       seed_pos.setX(seed_vector(0, 0));
-      seed_mom.setX(seed_vector(1, 0)*200.0);
+      seed_mom.setX(seed_vector(1, 0)*default_mom);
       seed_pos.setY(seed_vector(2, 0));
-      seed_mom.setY(seed_vector(3, 0)*200.0);
+      seed_mom.setY(seed_vector(3, 0)*default_mom);
     } else if ( dimension == 5 ) {
       seed_pos.setX(seed_vector(0, 0));
       seed_mom.setX(seed_vector(1, 0));
@@ -419,7 +421,7 @@ namespace MAUS {
     seed_mom *= reference_rot;
 
     if ( dimension == 4 ) {
-      seed_mom.setZ(200.0);
+      seed_mom.setZ(default_mom);
     } else if ( dimension == 5 ) {
       seed_mom.setZ(fabs(1.0/seed_vector(4, 0)));
     }
