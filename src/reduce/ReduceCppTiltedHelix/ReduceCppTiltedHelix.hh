@@ -27,6 +27,8 @@ namespace MAUS {
 class ImageData;
 class Data;
 
+void reduce_cpp_tilted_helix_minuit_function(int& n_pars, double* pars, double& score, double* buff, int err);
+
 class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
   public:
     ReduceCppTiltedHelix();
@@ -44,16 +46,23 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     void do_fit(std::vector<SciFiSpacePoint*> space_points, std::vector<bool> will_cut_tracker);
 
+    void do_fit_pattern_recognition(size_t tracker, std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station);
+
+    void do_fit_minuit(size_t tracker, std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station);
+
     std::vector<double> calculate_residual(size_t i, SciFiSpacePoint* space_point, SciFiHelicalPRTrack* pr_track);
 
     ImageData* get_image_data();
 
-    std::vector<TH1D> hist_vector_;
-
     size_t get_hist_index(size_t tracker, size_t station, size_t x_or_y);
 
+    std::vector<TH1D> hist_vector_;
+    static std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station_;
+    static TMinuit* minimiser;
     static const size_t n_stations;
     static const size_t n_trackers;
+
+    friend void reduce_cpp_tilted_helix_minuit_function(int& n_pars, double* pars, double& score, double* buff, int err);
 };
 
 PyMODINIT_FUNC init_ReduceCppTiltedHelix(void) {

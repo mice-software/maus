@@ -163,6 +163,7 @@ def build_data_structure(env):
     os.chdir(maus_root_dir)
     data_items = glob.glob(data_struct+'*.hh')
     data_items.extend(glob.glob(data_struct+'Global/*.hh'))
+    data_items.extend(glob.glob(data_struct+'ImageData/*.hh'))
     data_items = [item for item in data_items if item[-7:] != '-inl.hh']
     # LinkDef.hh must be last
     data_items.sort(key = lambda x: x.find('LinkDef.hh')) 

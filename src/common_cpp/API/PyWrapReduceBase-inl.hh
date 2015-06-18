@@ -264,7 +264,7 @@ void PyWrapReduceBase<REDUCECLASS>::PyWrapReduceBaseModInit(
                       "Please import the class directly from the MAUS module.");
 
     if (module == NULL)
-      return;
+        return;
     PyTypeObject* obj_class_type = &_class_type;
     Py_INCREF(obj_class_type);
     PyModule_AddObject(module,

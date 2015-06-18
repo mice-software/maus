@@ -11,7 +11,7 @@ from MAUS import ReduceCppTiltedHelix
 
 def generate_scifi_data(n_recon_events, radius, wave_number, centre, noise, dxdz, dydz):
     print "generate scifi data"
-    z_positions = [0., 200., 500., 800., 1000.] # not right
+    z_positions = [0., 200., 450., 750., 1100.]
     data = ROOT.MAUS.Data()
     spill = ROOT.MAUS.Spill()
     recon_events = ROOT.MAUS.ReconEventPArray()        
@@ -54,11 +54,9 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
         config["SciFiMinPz"] = 1e6
         maus_cpp.globals.birth(json.dumps(config))
 
-
     def tearDown(self):
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
-
 
     def test_init(self):
         reducer = ReduceCppTiltedHelix()
@@ -78,8 +76,8 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
     def test_reduce_perfect_helix(self):
         reducer = ReduceCppTiltedHelix()
         reducer.birth("")
-        for i in range(10):
-            data = generate_scifi_data(20, 20., 800., [30., 40., 200.], 0.5, 3e-3, 1e-3)
+        for i in range(1):
+            data = generate_scifi_data(1, 20., 800., [30., 40., 200.], 0.5, 0.003, 0.)
             image = reducer.process(data)
         canvas_wrappers = image.GetImage().GetCanvasWrappers()
         for wrap in canvas_wrappers:

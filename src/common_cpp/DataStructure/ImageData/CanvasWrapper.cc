@@ -21,7 +21,7 @@
 #include "TCanvas.h"
 
 #include "src/common_cpp/Utils/Exception.hh"
-#include "src/common_cpp/DataStructure/CanvasWrapper.hh"
+#include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
 
 namespace MAUS {
 CanvasWrapper::CanvasWrapper() : _description(""), _canvas(NULL) {

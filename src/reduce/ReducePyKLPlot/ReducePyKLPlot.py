@@ -220,12 +220,12 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             kl_digit = \
                   spill['recon_events'][evn]['kl_event']['kl_digits']
             if 'kl' not in kl_digit:
-                continue         
+                continue   
 
             digit = kl_digit['kl']
             if digit == None:
                 continue
-            #print digit 
+            #print digit
              
             for i in range(len(digit)):
                 if (digit[i]):
@@ -235,7 +235,6 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     self.hadc.Fill(charge)
                     self.hprofile.Fill(cell)
                     self.digitkl.Fill(cell, side)
- 
         return True
 
     def __init_histos(self): #pylint: disable=R0201, R0914

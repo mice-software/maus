@@ -15,8 +15,8 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/Image.hh"
-#include "src/common_cpp/DataStructure/ImageData.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
+#include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
 
 namespace MAUS {
 ImageData::ImageData() : MAUSEvent<Image>("ImageData"), _image(NULL) {

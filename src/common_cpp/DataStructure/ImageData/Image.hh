@@ -23,7 +23,7 @@
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/DateTime.hh"
-#include "src/common_cpp/DataStructure/CanvasWrapper.hh"
+#include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
 
 namespace MAUS {
 

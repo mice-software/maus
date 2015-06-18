@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/common_cpp/DataStructure/Image.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
 
 namespace MAUS {
 Image::Image() : _run_number(0), _spill_number(0),

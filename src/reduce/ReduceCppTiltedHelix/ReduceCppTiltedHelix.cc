@@ -22,15 +22,16 @@
 
 #include "TCanvas.h"
 #include "TH1D.h"
+#include "TMinuit.h"
 
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
-#include "src/common_cpp/DataStructure/ImageData.hh"
-#include "src/common_cpp/DataStructure/Image.hh"
-#include "src/common_cpp/DataStructure/CanvasWrapper.hh"
+#include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
+#include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
 
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 
@@ -42,6 +43,8 @@ namespace MAUS {
 
 const size_t ReduceCppTiltedHelix::n_stations = 5;
 const size_t ReduceCppTiltedHelix::n_trackers = 2;
+TMinuit* ReduceCppTiltedHelix::minimiser = NULL;
+std::vector<std::vector<SciFiSpacePoint*> > ReduceCppTiltedHelix::space_points_by_station_;
 
 ReduceCppTiltedHelix::ReduceCppTiltedHelix()
   : ReduceBase<Data, ImageData>("ReduceCppTiltedHelix") {
@@ -55,7 +58,7 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
                         TH1D(name_x.c_str(), title_x.c_str(), 1000, -3, 3)
             );
             std::string name_y = "station_"+i_str+"_plane_"+j_str+"_y";
-            std::string title_y = name_x+";y_{meas} - y_{fit} [mm]";
+            std::string title_y = name_y+";y_{meas} - y_{fit} [mm]";
             hist_vector_.push_back(
                         TH1D(name_y.c_str(), title_y.c_str(), 1000, -3, 3)
             );
@@ -130,12 +133,10 @@ std::vector<double> ReduceCppTiltedHelix::calculate_residual(
                         "Bad input to calculate_chi2",
                         "ReduceCppTiltedHelix::calculate_chi2");
     double phi = pr_track->get_phi()[i];
-    double phi0 = pr_track->get_phi0();
     double rad = pr_track->get_R();
     double x0 = pr_track->get_circle_x0();
     double y0 = pr_track->get_circle_y0();
 
-    double z_pos = space_point->get_position().z();
     double x_meas = space_point->get_position().x();
     double y_meas = space_point->get_position().y();
 
@@ -145,7 +146,6 @@ std::vector<double> ReduceCppTiltedHelix::calculate_residual(
     std::vector<double> residual(2, 0);
     residual[0] = x_meas - x_fit;
     residual[1] = y_meas - y_fit;
-    std::cerr << i << " X " << x_meas << " " << x_fit << " Y " << y_meas << " " << y_fit << std::endl;
     return residual;
 }
 
@@ -155,37 +155,104 @@ void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
         if (will_cut_tracker[tracker])
             continue;
         std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station(n_stations, std::vector<SciFiSpacePoint*>());
-        std::cerr << "Do fit tracker " << tracker << std::endl;
-        std::cerr << "    Will cut " << tracker << " " << will_cut_tracker[tracker] << std::endl;
         for (size_t j = 0; j < space_points.size(); ++j) {
             if (space_points[j]->get_tracker() == int(tracker)) {
                int station = space_points[j]->get_station();
                space_points_by_station[station].push_back(space_points[j]);
             }
         }
-        std::vector<SciFiStraightPRTrack*> strks;
-        std::vector<SciFiHelicalPRTrack*> htrks;
-        std::cerr << "    htracks 1 " << htrks.size() << " " << tracker << std::endl;
-        PatternRecognition().make_5tracks(true, tracker, space_points_by_station, strks, htrks);
-        std::cerr << "    htracks 2 " << htrks.size() << " " << tracker << std::endl;
-        if (htrks.size() != 1)
-            continue; // not possible?
-        std::cerr << "F0 " << htrks[0]->get_phi0() << " R " << htrks[0]->get_R() << " X0 " << htrks[0]->get_circle_x0() << " Y0 " << htrks[0]->get_circle_y0();
-        for (size_t i = 0; i < 5; ++i) std::cerr << " phi" << i << " " << htrks[0]->get_phi()[i] << " ";
-        std::cerr << std::endl;
-        for (size_t i = 0; i < space_points_by_station.size(); ++i) {
-            size_t station = space_points_by_station[i][0]->get_station();
-            size_t index = 0;
-            if (tracker == 1)
-                index = i;
-            else
-                index = space_points_by_station.size() - i - 1;
-            std::vector<double> res = calculate_residual(index, space_points_by_station[i][0], htrks[0]);
-            hist_vector_[get_hist_index(tracker, station, 0)].Fill(res[0]);
-            hist_vector_[get_hist_index(tracker, station, 1)].Fill(res[1]);
-        }
+        // do_fit_pattern_recognition(tracker, space_points_by_station);
+        do_fit_minuit(tracker, space_points_by_station);
     }
 }
+
+void ReduceCppTiltedHelix::do_fit_pattern_recognition(size_t tracker, std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station) {
+    std::vector<SciFiStraightPRTrack*> strks;
+    std::vector<SciFiHelicalPRTrack*> htrks;
+    PatternRecognition().make_5tracks(true, tracker, space_points_by_station, strks, htrks);
+    for (size_t i = 0; i < space_points_by_station.size(); ++i) {
+        size_t station = space_points_by_station[i][0]->get_station();
+        size_t index = 0;
+        if (tracker == 1)
+            index = i;
+        else
+            index = space_points_by_station.size() - i - 1;
+        std::vector<double> res = calculate_residual(index, space_points_by_station[i][0], htrks[0]);
+        hist_vector_[get_hist_index(tracker, station, 0)].Fill(res[0]);
+        hist_vector_[get_hist_index(tracker, station, 1)].Fill(res[1]);
+    }
+}
+
+double get_residual_x(SciFiSpacePoint* space_point, double radius, double phi0, double dphidz, double x0) {
+    double x_fit = radius*sin(phi0+space_point->get_position().z()*dphidz) + x0;
+    return x_fit - space_point->get_position().x();
+}
+
+double get_residual_y(SciFiSpacePoint* space_point, double radius, double phi0, double dphidz, double y0) {
+    double y_fit = radius*cos(phi0+space_point->get_position().z()*dphidz) + y0;
+    return y_fit - space_point->get_position().y();
+}
+
+void reduce_cpp_tilted_helix_minuit_function(int& n_pars, double* pars, double& score, double* buff, int err) {
+    score = 0.;
+    double par_error, radius, phi0, dphidz, x0, y0;
+    ReduceCppTiltedHelix::minimiser->GetParameter(0, radius, par_error);
+    ReduceCppTiltedHelix::minimiser->GetParameter(1, phi0, par_error);
+    ReduceCppTiltedHelix::minimiser->GetParameter(2, dphidz, par_error);
+    ReduceCppTiltedHelix::minimiser->GetParameter(3, x0, par_error);
+    ReduceCppTiltedHelix::minimiser->GetParameter(4, y0, par_error);
+    std::cerr << "Minuit iteration r: " << radius << " phi0: " << phi0 << " dphidz: " << dphidz << " x0: " << x0 << " y0: " << y0 << std::endl;
+    for (size_t i = 0; i < ReduceCppTiltedHelix::space_points_by_station_.size(); ++i) {
+        SciFiSpacePoint* space_point = ReduceCppTiltedHelix::space_points_by_station_[i][0];
+        double x_residual = get_residual_x(space_point, radius, phi0, dphidz, x0);
+        double y_residual = get_residual_y(space_point, radius, phi0, dphidz, y0);
+        score += x_residual*x_residual + y_residual*y_residual;
+        std::cerr << "    dx: " << x_residual << " dy: " << y_residual << " score: " << score << std::endl;
+    }
+    std::cerr << "Score " << score << std::endl;
+}
+
+void ReduceCppTiltedHelix::do_fit_minuit(size_t tracker, std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station) {
+    double PI = 3.1415;
+    TMinuit* minuit = new TMinuit(5);
+    double mean_x = space_points_by_station[0][0]->get_position().x()/n_stations;
+    double min_x = space_points_by_station[0][0]->get_position().x();
+    double max_x = space_points_by_station[0][0]->get_position().x();
+
+    double mean_y = space_points_by_station[0][0]->get_position().y();
+    double min_y = space_points_by_station[0][0]->get_position().y();
+    double max_y = space_points_by_station[0][0]->get_position().y();
+    for (size_t i = 1; i < space_points_by_station.size(); ++i) {
+        double x = space_points_by_station[i][0]->get_position().x();
+        mean_x += x/n_stations;
+        if (x < min_x)
+            min_x = x;
+        if (x > max_x)
+            max_x = x;
+
+        double y = space_points_by_station[i][0]->get_position().y();
+        mean_y += y/n_stations;
+        if (y < min_y)
+            min_y = y;
+        if (y < max_y)
+            max_y = y;
+    }
+    double radius = ((max_x - min_x)*(max_x - min_x) + (max_y-min_y)*(max_y-min_y));
+    radius = sqrt(radius)/2;
+    minuit->DefineParameter(0, "radius", radius, 10., 0., 150.);
+    minuit->DefineParameter(1, "phi0", 0., 1., -PI, PI);
+    minuit->DefineParameter(2, "dphidz", PI/1100., PI/1100., 0., 0.);
+    minuit->DefineParameter(3, "x0", mean_x, 10., -150., 150.);
+    minuit->DefineParameter(4, "y0", mean_y, 10., -150., 150.);
+    space_points_by_station_ = space_points_by_station;
+    minuit->SetFCN(reduce_cpp_tilted_helix_minuit_function);
+    minimiser = minuit;
+    minuit->SetMaxIterations(500);
+    minuit->mnsimp();
+    delete minuit;
+    minimiser = NULL;
+}
+
 
 MAUS::ImageData* ReduceCppTiltedHelix::_process(MAUS::Data* data) {
     if (data == NULL)
@@ -213,6 +280,10 @@ MAUS::ImageData* ReduceCppTiltedHelix::_process(MAUS::Data* data) {
         do_fit(space_points, will_cut_tracker);
     }
     return get_image_data();
+}
+
+void do_fit_minuit(std::vector<SciFiSpacePoint*> space_points, std::vector<bool> will_cut_tracker) {
+
 }
 }
 

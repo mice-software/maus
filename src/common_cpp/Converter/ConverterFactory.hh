@@ -53,7 +53,7 @@
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
 #include "src/common_cpp/DataStructure/JobFooterData.hh"
 #include "src/common_cpp/DataStructure/RunFooterData.hh"
-#include "src/common_cpp/DataStructure/ImageData.hh"
+#include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
 
 

@@ -36,7 +36,7 @@
 #include "src/common_cpp/DataStructure/JobFooter.hh"
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
-#include "src/common_cpp/DataStructure/Image.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
 
 namespace MAUS {
 std::string data_test_str =

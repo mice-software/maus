@@ -22,8 +22,8 @@
 #include "TCanvas.h"
 
 #include "src/common_cpp/Utils/Exception.hh"
-#include "src/common_cpp/DataStructure/ImageData.hh"
-#include "src/common_cpp/DataStructure/Image.hh"
+#include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
 #include "src/common_cpp/DataStructure/DateTime.hh"
 
 namespace MAUS {
