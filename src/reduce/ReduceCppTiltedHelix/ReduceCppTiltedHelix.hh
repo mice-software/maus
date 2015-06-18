@@ -50,6 +50,8 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     std::vector<TH1D> hist_vector_;
 
+    size_t get_hist_index(size_t tracker, size_t station, size_t x_or_y);
+
     static const size_t n_stations;
     static const size_t n_trackers;
 };

@@ -9,7 +9,7 @@ import maus_cpp.globals
 import Configuration
 from MAUS import ReduceCppTiltedHelix
 
-def generate_scifi_data(n_recon_events, radius, wave_number, centre, noise):
+def generate_scifi_data(n_recon_events, radius, wave_number, centre, noise, dxdz, dydz):
     print "generate scifi data"
     z_positions = [0., 200., 500., 800., 1000.] # not right
     data = ROOT.MAUS.Data()
@@ -24,9 +24,9 @@ def generate_scifi_data(n_recon_events, radius, wave_number, centre, noise):
                 sp.set_tracker(tracker)
                 sp.set_station(station)
                 pos = ROOT.MAUS.ThreeVector()
-                x_pos = radius*math.cos((z_pos+centre[2])*wave_number)+centre[1]
+                x_pos = radius*math.cos((z_pos+centre[2])*wave_number)+centre[1] + dxdz*z_pos
                 x_pos += numpy.random.normal(0., noise)
-                y_pos = radius*math.sin((z_pos+centre[2])*wave_number)+centre[0]
+                y_pos = radius*math.sin((z_pos+centre[2])*wave_number)+centre[0] + dydz*z_pos
                 y_pos += numpy.random.normal(0., noise)
                 pos.setX(x_pos)
                 pos.setY(y_pos)
@@ -79,7 +79,7 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
         reducer = ReduceCppTiltedHelix()
         reducer.birth("")
         for i in range(10):
-            data = generate_scifi_data(20, 50., 800., [50., 50., 300.], 5)
+            data = generate_scifi_data(20, 20., 800., [30., 40., 200.], 0.5, 3e-3, 1e-3)
             image = reducer.process(data)
         canvas_wrappers = image.GetImage().GetCanvasWrappers()
         for wrap in canvas_wrappers:
