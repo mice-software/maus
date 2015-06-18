@@ -36,6 +36,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 // Other headers
 #include "Interface/Squeak.hh"
@@ -153,8 +154,20 @@ namespace MAUS {
     int _YminComE;
     int _YmaxComE;
 
+    /// MICE configuration for PID
+    std::string _pid_config;
+
+    /// PID running mode
+    std::string _pid_mode;
+
+    /// list of PID variables to be used when mode is custom
+    std::string _custom_pid_set;
+
     /// File containing PDFs for use in PID
     std::string PDF_file;
+
+    /// Confidence level
+    int _pid_confidence_level;
     
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS

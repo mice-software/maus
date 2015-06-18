@@ -41,6 +41,7 @@ namespace global {
   PIDVarB::~PIDVarB() {}
 
   std::pair<double, double> PIDVarB::Calc_Var(MAUS::DataStructure::Global::Track* track) {
+    std::cerr << "IN PIDVARB" << std::endl;
     double TOF0_t = 0;
     double TOF1_t = 0;
     MAUS::DataStructure::Global::DetectorPoint TOF0_DP =
@@ -69,6 +70,18 @@ namespace global {
 	}
       }
     }
+    if (tof0_track_points.size() > 1) {
+      std::cerr << "too many tof0 tp" << std::endl;
+    }
+    if (tof1_track_points.size() > 1) {
+      std::cerr << "too many tof1 tp" << std::endl;
+    }
+    if (tof0_track_points.size() == 0) {
+      std::cerr << "no tof0 tp" << std::endl;
+    }
+    if (tof1_track_points.size() > 1) {
+      std::cerr << "no tof1 tp" << std::endl;
+    }
     if (tof0_track_points.size() > 1 || tof1_track_points.size() > 1) {
       Squeak::mout(Squeak::debug) << "Multiple measurements for TOF0/TOF1" <<
 	" times, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
@@ -92,6 +105,7 @@ namespace global {
       tof0_track_points.clear();
       TOF1_t = (tof1_track_points[0])->get_position().T();
       tof1_track_points.clear();
+      std::cerr << "TOF1_t - TOF0_t : " << (TOF1_t - TOF0_t) << std::endl;
       if ( YminBinB > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > YmaxBinB ) {
 	Squeak::mout(Squeak::debug) << "Difference between TOF0 and TOF1 " <<
 	  "times outside of range, Recon::Global::PIDVarB::Calc_Var()" <<
@@ -101,6 +115,9 @@ namespace global {
       int tracker0_tp_count = 0;
       double tracker0_momentum = 0;
       const MAUS::DataStructure::Global::TrackPoint* tracker0_trackpoint;
+      if (tracker0_track_points.size() < 1) {
+	std::cerr << "not tracker0 tp " << std::endl;
+      }
       for (size_t i = 0; i < tracker0_track_points.size(); i++) {
 	tracker0_trackpoint = tracker0_track_points[i];
 	if (tracker0_trackpoint) {
@@ -116,6 +133,7 @@ namespace global {
       }
       tracker0_track_points.clear();
       tracker0_momentum = tracker0_trackpoint_mom/tracker0_tp_count;
+      std::cerr << "tracker0_momentum : " << tracker0_momentum << std::endl;
       if ( XminBinB > tracker0_momentum || tracker0_momentum > XmaxBinB ) {
 	Squeak::mout(Squeak::debug) << "Momentum for tracker 0 is outside " <<
 	  "of range, Recon::Global::PIDVarB::Calc_Var()" << std::endl;

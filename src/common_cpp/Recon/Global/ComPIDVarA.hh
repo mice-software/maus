@@ -64,9 +64,9 @@ namespace global {
     /// Number of bins in PDF
     static const int numBins = 100;
     /// Minimum value of range of PDF
-    static const int minBinComA = 25;
+    static const int minBinComA = 20;
     /// Maximum value of range of PDF
-    static const int maxBinComA = 45;
+    static const int maxBinComA = 40;
     /// Minimum value of cut for PID
     static const int minComA = 20;
     /// Maximum value of cur for PID

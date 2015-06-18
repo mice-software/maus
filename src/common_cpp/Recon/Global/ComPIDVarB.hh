@@ -21,8 +21,8 @@
  * 
  */
 
-#ifndef COMPIDVARC_HH
-#define COMPIDVARC_HH
+#ifndef COMPIDVARB_HH
+#define COMPIDVARB_HH
 
 #include <string>
 #include <utility>
@@ -80,9 +80,9 @@ namespace global {
     /// Number of X bins in PDF
     static const int XnumBins = 40;
     /// Minimum value of X range of PDF
-    static const int XminBinComB = 25;
+    static const int XminBinComB = 20;
     /// Maximum value of X range of PDF
-    static const int XmaxBinComB = 45;
+    static const int XmaxBinComB = 40;
     /// Number of Y bins in PDF
     static const int YnumBins = 200;
     /// Minimum value of Y range of PDF
@@ -90,9 +90,9 @@ namespace global {
     /// Maximum value of Y range of PDF
     static const int YmaxBinComB = 8000;
     /// Minimum value of X cut for PID
-    static const int XminComB = 25;
+    static const int XminComB = 20;
     /// Maximum value of X cut for PID
-    static const int XmaxComB = 45;
+    static const int XmaxComB = 40;
     /// Minimum value of Y cut for PID
     static const int YminComB = 0;
     /// Maximum value of Y cut for PID

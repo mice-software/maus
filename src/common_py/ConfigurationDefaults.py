@@ -612,8 +612,8 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "y":0.1, "Py":0.01}
 
 # Default location of root file containing PDF histograms used for Global PID
-#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
-PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
+PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
 # Particle hypothesis used in Global PID when creating PDFs from MC data.
 # For PDFs to be produced, this must be set, preferably as the type of simulated particle
 # i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
@@ -649,17 +649,39 @@ XmaxF = 350
 YminF = 0
 YmaxF = 1000
 # ComPIDVarA
-minComA = 25
-maxComA = 45
+minComA = 20
+maxComA = 40
 # ComPIDVarB
-XminComB = 25
-XmaxComB = 45
+XminComB = 20
+XmaxComB = 40
 YminComB = 0
 YmaxComB = 8000
 # ComPIDVarC
 minComC = 0
 maxComC = 8000
+# ComPIDVarD
+minComC = 0
+maxComC = 1000
+# ComPIDVarE
+XminComE = 20
+XmaxComE = 40
+YminComE = 0
+YmaxComE = 1000
 
+# PID MICE configuration, 'step_4' for Step IV running, 'commisioning' for field free commissioning data
+pid_config = "step_4"
+# PID running mode - selects which PID variables are used. 'online' corresponds to less beam (momentum)
+# dependent variables, 'offline' uses all variables and requires that specific PDFs for the beam already
+# exist. 'custom' allows user to choose which variables to use, and these should then be set as datacards.
+# However it is not recommended to use the custom setting unless you are the person currently developing
+# the Global PID.
+pid_mode = "online"
+# If pid_mode = "custom", variables to use should be set here as a space separated list, i.e.
+# custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
+custom_pid_set = "PIDVarB"
+# PID confidence level- set the margin (in %) between the confidence levels of competing pid hypotheses before they
+# are selected as the correct hypothesis
+pid_confidence_level = 5
 
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),

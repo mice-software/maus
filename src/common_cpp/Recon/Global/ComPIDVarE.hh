@@ -67,9 +67,9 @@ namespace global {
     /// Number of X bins in PDF
     static const int XnumBins = 40;
     /// Minimum value of X range of PDF
-    static const int XminBinComE = 25;
+    static const int XminBinComE = 20;
     /// Maximum value of X range of PDF
-    static const int XmaxBinComE = 45;
+    static const int XmaxBinComE = 40;
     /// Number of Y bins in PDF
     static const int YnumBins = 100;
     /// Minimum value of Y range of PDF
@@ -77,9 +77,9 @@ namespace global {
     /// Maximum value of Y range of PDF
     static const int YmaxBinComE = 1000;
     /// Minimum value of X cut for PID
-    static const int XminComE = 25;
+    static const int XminComE = 20;
     /// Maximum value of X cut for PID
-    static const int XmaxComE = 45;
+    static const int XmaxComE = 40;
     /// Minimum value of Y cut for PID
     static const int YminComE = 0;
     /// Maximum value of Y cut for PID
