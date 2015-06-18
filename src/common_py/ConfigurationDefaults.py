@@ -424,7 +424,7 @@ Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_cabling_file_StepI = "/files/cabling/DAQChannelMap_preRun6541.txt"
-DAQ_hostname = 'miceraid1a'
+DAQ_hostname = 'miceraid5'
 DAQ_monitor_name = 'MICE_Online_Monitor'
 daq_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
                      # data from a file - mock-up of online for testing, not for

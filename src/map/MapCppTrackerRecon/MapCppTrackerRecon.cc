@@ -120,6 +120,10 @@ void MapCppTrackerRecon::_process(Data* data) const {
   if ( spill.GetReconEvents() ) {
     for ( unsigned int k = 0; k < spill.GetReconEvents()->size(); k++ ) {
       SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
+      if (!event) {
+        std::cerr << "INFO: MapCppTrackerRecon:Process Empty SciFi event\n";
+        continue;
+      }
 
       // Build Clusters.
       if ( event->digits().size() ) {

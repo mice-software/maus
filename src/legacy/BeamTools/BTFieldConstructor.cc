@@ -218,7 +218,19 @@ BTField * BTFieldConstructor::GetSolenoid(const MiceModule * theModule)
 	double length=(theModule->propertyDoubleThis("Length"));
 	double thickness=(theModule->propertyDoubleThis("Thickness"));
 	double innerRadius=(theModule->propertyDoubleThis("InnerRadius"));
-	double currentDensity=(theModule->propertyDoubleThis("CurrentDensity"));
+  double currentDensity = 0.;
+  if (theModule->propertyExistsThis("CurrentDensity", "double")) {
+    	currentDensity = theModule->propertyDoubleThis("CurrentDensity");
+  } else if (theModule->propertyExistsThis("Current", "double") &&
+             theModule->propertyExistsThis("NumberOfTurns", "int")) {
+      double current = theModule->propertyDoubleThis("Current");
+      current *= theModule->propertyIntThis("NumberOfTurns");
+      currentDensity = current/length/thickness;
+  } else {
+      throw(MAUS::Exception(MAUS::Exception::recoverable,
+            "Either (Current and NumberOfTurns) or CurrentDensity should be defined in module "+theModule->name(),
+            "BTFieldConstructor::GetSolenoid"));
+  }
 	if(solenoidMode == "Analytic")
 	{
 		newSolenoid->SetIsAnalytic(true);

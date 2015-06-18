@@ -515,7 +515,8 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             "MICE_Information/Configuration_Information/run")
         diffuserSetting = []
         if len(runInfo) > 0:
-            diffuserSetting.append(runInfo.prop("diffusetThickness"))
+            diffuserSetting.append(runInfo.prop("diffuserThickness"))
+            print "Will use diffuser setting ", diffuserSetting[0]
         # check the possible keys for suspected
         modulekeys = mausInfo.xpathEval(\
             "MICE_Information/Other_Information/Module")
@@ -584,7 +585,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             posNode.setProp("unit", posUnit)
             newNode.addChild(posNode)
             rotNode = libxml2.newNode("rotation")
-            posNode.setProp("name", "rotRef_iris_"+str(inum))
+            rotNode.setProp("name", "rotRef_iris_"+str(inum))
             rotNode.setProp("x", str(rot[0]))
             rotNode.setProp("y", str(rot[1]))
             rotNode.setProp("z", str(rot[2]))

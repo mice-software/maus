@@ -4,6 +4,23 @@ directory=gsl-1.15
 filename=${directory}.tar.gz 
 url=http://ftp.gnu.org/pub/gnu/gsl/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -39,7 +56,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         CFLAGS="-g -O2 -fPIC" ./configure --with-pic --prefix=/install
         echo "INFO: Making:"
         sleep 1
-        make
+        make -j$MAUS_NUM_THREADS
 	make install DESTDIR=${MAUS_ROOT_DIR}/third_party
 	echo
         echo "INFO: The package should be locally build now in your"

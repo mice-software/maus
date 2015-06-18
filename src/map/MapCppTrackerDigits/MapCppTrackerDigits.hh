@@ -91,6 +91,8 @@ class MapCppTrackerDigits : public MapBase<Data> {
   std::vector<const MiceModule*> modules;
 
   int SciFiRunRecon;
+
+  RealDataDigitization *real;
 }; // Don't forget this trailing colon!!!!
 #endif
 
