@@ -45,12 +45,12 @@ SciFiTrackProcessor::SciFiTrackProcessor()
                         &SciFiTrack::set_scifitrackpoints, true);
     RegisterValueBranch("seed_position", &_threevector_proc,
                         &SciFiTrack::GetSeedPosition,
-                        &SciFiTrack::SetSeedPosition, true);
+                        &SciFiTrack::SetSeedPosition, false);
     RegisterValueBranch("seed_momentum", &_threevector_proc,
                         &SciFiTrack::GetSeedMomentum,
-                        &SciFiTrack::SetSeedMomentum, true);
+                        &SciFiTrack::SetSeedMomentum, false);
     RegisterValueBranch("seed_covariance", &_vector_proc,
                         &SciFiTrack::GetSeedCovariance,
-                        &SciFiTrack::SetSeedCovariance, true);
+                        &SciFiTrack::SetSeedCovariance, false);
 }
 } // ~namespace MAUS
