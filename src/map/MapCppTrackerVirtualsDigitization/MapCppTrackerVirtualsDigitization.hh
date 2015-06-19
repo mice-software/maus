@@ -117,7 +117,7 @@ namespace MAUS {
     // Store Geometry Information
     SciFiGeometryHelper _geometry_helper;
     SciFiTrackerMap _geometry_map;
-    
+
     /// The ratio of deposited eV to NPE
     double _default_npe;
 
@@ -129,7 +129,7 @@ namespace MAUS {
     bool _make_perfect_clusters;
     bool _make_spacepoints;
     bool _make_perfect_spacepoints;
-    
+
     int _spacepoint_plane_num;
 
     SciFiHelicalMeasurements* _helix_measure;

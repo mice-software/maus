@@ -1,5 +1,24 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+
+#include <string>
 
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "src/common_cpp/Utils/Exception.hh"
@@ -9,7 +28,7 @@ namespace MAUS {
   GeometryNavigator::GeometryNavigator() :
     _global_volume(NULL),
     _navigator(NULL),
-    _touchable_history(NULL), 
+    _touchable_history(NULL),
     _current_position(),
     _current_volume(NULL),
     _current_material(NULL) {
@@ -32,7 +51,7 @@ namespace MAUS {
 
 
   void GeometryNavigator::Initialise(G4VPhysicalVolume* phys_vol) {
-    if (! phys_vol) { 
+    if (!phys_vol) {
       throw(Exception(Exception::recoverable,
                  std::string("No physical volume could be found "),
                  "GeometryNavigator::GeometryNavigator()"));
@@ -61,7 +80,7 @@ namespace MAUS {
 
 
   void GeometryNavigator::_setPoint(G4ThreeVector pos) {
-    if (! _navigator) {
+    if (!_navigator) {
       throw(Exception(Exception::recoverable,
                  std::string("Navigator not correctly set up. ")+
                  std::string("Physical volume required"),
@@ -73,7 +92,7 @@ namespace MAUS {
       delete _touchable_history;
       _touchable_history = NULL;
     }
-    _touchable_history = _navigator->CreateTouchableHistory(); 
+    _touchable_history = _navigator->CreateTouchableHistory();
     _current_volume = _touchable_history->GetVolume();
     _current_material = _current_volume->GetLogicalVolume()->GetMaterial();
   }
@@ -127,7 +146,5 @@ namespace MAUS {
   double GeometryNavigator::GetDensity() const {
     return _current_material->GetDensity()/(g/(cm*cm*cm));
   }
-
-
 }
 

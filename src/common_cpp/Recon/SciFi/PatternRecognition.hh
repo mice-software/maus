@@ -149,8 +149,8 @@ class PatternRecognition {
      *
      */
     void make_helix(const int n_points, const int stat_num, const std::vector<int> ignore_stations,
-               std::vector<SciFiSpacePoint*> &current_spnts,
-               SpacePoint2dPArray &spnts_by_station, std::vector<SciFiHelicalPRTrack*> &htrks) const;
+             std::vector<SciFiSpacePoint*> &current_spnts,
+             SpacePoint2dPArray &spnts_by_station, std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Attempt to fit a helical track to given spacepoints
      * 
@@ -214,7 +214,8 @@ class PatternRecognition {
      *  @param i_stat_num - The innermost station number used for a given track fit
      *
      */
-    bool set_end_stations(const std::vector<int> ignore_stations, int &o_stat_num, int &i_stat_num) const;
+    bool set_end_stations(const std::vector<int> ignore_stations, int &o_stat_num,
+                                                                            int &i_stat_num) const;
 
     /** @brief Determine which three stations the initial circle should be fit to
      *

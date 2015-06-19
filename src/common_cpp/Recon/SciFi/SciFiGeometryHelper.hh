@@ -151,9 +151,11 @@ class SciFiGeometryHelper {
 
   double GetFieldValue(int tracker) const { return _geometry_map.find(tracker)->second.Field; }
 
-  ThreeVector GetReferencePosition(int tracker) const { return _geometry_map.find(tracker)->second.Position; }
+  ThreeVector GetReferencePosition(int tracker) const
+                                           { return _geometry_map.find(tracker)->second.Position; }
 
-  HepRotation GetReferenceRotation(int tracker) const { return _geometry_map.find(tracker)->second.Rotation; }
+  HepRotation GetReferenceRotation(int tracker) const
+                                           { return _geometry_map.find(tracker)->second.Rotation; }
 
   ThreeVector FindReferenceFramePosition(int tracker) const;
 
@@ -187,7 +189,6 @@ class SciFiGeometryHelper {
   SciFiMaterialParams MylarParameters;
 
   double _default_momentum;
-
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS
 

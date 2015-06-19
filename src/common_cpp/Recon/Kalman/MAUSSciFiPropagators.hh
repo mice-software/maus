@@ -29,7 +29,7 @@ namespace MAUS {
 
   class StraightPropagator : public Kalman::Propagator_base {
     public :
-      StraightPropagator(SciFiGeometryHelper* helper);
+      explicit StraightPropagator(SciFiGeometryHelper* helper);
 
       virtual TMatrixD CalculatePropagator(const Kalman::State& start, const Kalman::State& end);
 
@@ -51,7 +51,7 @@ namespace MAUS {
 
   class HelicalPropagator : public Kalman::Propagator_base {
     public :
-      HelicalPropagator(SciFiGeometryHelper* helper);
+      explicit HelicalPropagator(SciFiGeometryHelper* helper);
 
       virtual void Propagate(const Kalman::State& start, Kalman::State& end);
 

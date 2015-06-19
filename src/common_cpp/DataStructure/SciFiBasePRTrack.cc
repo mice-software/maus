@@ -20,24 +20,24 @@
 
 namespace MAUS {
 
-SciFiBasePRTrack::SciFiBasePRTrack() :
-    _spoints(NULL),
+SciFiBasePRTrack::SciFiBasePRTrack()
+  : _spoints(NULL),
     _covariance(0),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0) {
   _spoints = new TRefArray();
 }
 
-SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov) :
-    _spoints(NULL),
+SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov)
+  : _spoints(NULL),
     _covariance(cov),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0) {
   _spoints = new TRefArray();
 }
 
-SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoints) :
-    _spoints(NULL),
+SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoints)
+  : _spoints(NULL),
     _covariance(cov),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0) {
@@ -47,8 +47,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoint
   }
 }
 
-SciFiBasePRTrack::SciFiBasePRTrack(const SciFiBasePRTrack& track) :
-    _spoints(NULL),
+SciFiBasePRTrack::SciFiBasePRTrack(const SciFiBasePRTrack& track)
+  : _spoints(NULL),
     _covariance(track._covariance),
     _position(track._position),
     _momentum(track._momentum) {

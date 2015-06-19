@@ -38,11 +38,13 @@ namespace MAUS {
 
   /** @brief Create a seed from a helical track
    */
-  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom, bool correct_energy_loss = true, double seed_cov = -1.0);
+  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom,
+                                          bool correct_energy_loss = true, double seed_cov = -1.0);
 
   /** @brief Create a seed from a straight track
    */
-  Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, const SciFiGeometryHelper* geom, double seed_cov = -1.0);
+  Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, const SciFiGeometryHelper* geom,
+      ]                                                                    double seed_cov = -1.0);
 
   /** @brief Convert a KalmanTrack to a SciFiTrack for the data structure
    */
@@ -50,11 +52,13 @@ namespace MAUS {
 
   /** @brief Builds a data track using a PR track
    */
-  template<class PR_TYPE> Kalman::Track BuildTrack(PR_TYPE* pr_track, const SciFiGeometryHelper* geom);
+  template<class PR_TYPE> Kalman::Track BuildTrack(PR_TYPE* pr_track,
+                                                                  const SciFiGeometryHelper* geom);
 
   /** @brief Builds a data track using an array of spacepoints
    */
-  Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints, const SciFiGeometryHelper* geom, int plane_num = 0, double smear = 0.2);
+  Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints,
+                           const SciFiGeometryHelper* geom, int plane_num = 0, double smear = 0.2);
 
 
 
@@ -70,10 +74,11 @@ namespace MAUS {
 
     Kalman::Track new_track(1);
 
-    const SciFiPlaneMap& geom_map = geom->GeometryMap().find(pr_track->get_tracker())->second.Planes;
-    int tracker_const = ( pr_track->get_tracker() == 0 ? -1 : 1 );
+    const SciFiPlaneMap& geom_map = geom->GeometryMap().find(
+                                                           pr_track->get_tracker())->second.Planes;
+    int tracker_const = (pr_track->get_tracker() == 0 ? -1 : 1);
 
-    for ( SciFiPlaneMap::const_iterator iter = geom_map.begin(); iter != geom_map.end(); ++iter ) {
+    for (SciFiPlaneMap::const_iterator iter = geom_map.begin(); iter != geom_map.end(); ++iter) {
       int id = iter->first * tracker_const;
       Kalman::State new_state = Kalman::State(1, iter->second.Position.z());
       new_state.SetId(id);
@@ -81,15 +86,15 @@ namespace MAUS {
     }
 
     size_t numb_spacepoints = spacepoints.size();
-    for ( size_t i = 0; i < numb_spacepoints; ++i ) {
+    for (size_t i = 0; i < numb_spacepoints; ++i) {
       SciFiSpacePoint *spacepoint = spacepoints[i];
       size_t numbclusters = spacepoint->get_channels()->GetLast() + 1;
-      for ( size_t j = 0; j < numbclusters; ++j ) {
+      for (size_t j = 0; j < numbclusters; ++j) {
         SciFiCluster* cluster = static_cast<SciFiCluster*>(spacepoint->get_channels()->At(j));
-        
+
         int id = (cluster->get_station() - 1)*3 + cluster->get_plane(); // Actually (id - 1)
 
-        // TODO : 
+        // TODO :
         // - APPLY GEOMETRY CORRECTIONS!
         // - Fill covariance matrix correctly!
         TMatrixD state_vector(1, 1);

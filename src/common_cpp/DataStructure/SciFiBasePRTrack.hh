@@ -40,7 +40,7 @@ class SciFiBasePRTrack {
     SciFiBasePRTrack();
 
     /** Construct some variables */
-    SciFiBasePRTrack(DoubleArray cov);
+    explicit SciFiBasePRTrack(DoubleArray cov);
 
     /** Construct some variables */
     SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoints);

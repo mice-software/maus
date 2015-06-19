@@ -31,7 +31,7 @@ namespace MAUS {
       std::string("Get a python dict containing data on the material found at the")+
       std::string("current position. The dict has the entries: \"name\", \"A\", \"Z\", ")+
       std::string("\"radlen\", \"interlen\" and \"density\". Note that if the material ")+
-      std::string( "is a mixture of elements, Z and A are not properly defined, hence t")+
+      std::string("is a mixture of elements, Z and A are not properly defined, hence t")+
       std::string("hey are set to 0.0 by default.");
     PyObject* GetMaterialData(PyObject *dummy, PyObject *args) {
       std::string name;
@@ -60,13 +60,12 @@ namespace MAUS {
         radlen = nav->GetRadiationLength();
         interlen = nav->GetNuclearInteractionLength();
         density = nav->GetDensity();
-
       } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
       }
-      PyObject* py_dict = Py_BuildValue("{s:s,s:d,s:d,s:d,s:d,s:d}", "name", name.c_str(), "A", A, 
-          "Z", Z, "radlen", radlen, "interlen", interlen, "density", density );
+      PyObject* py_dict = Py_BuildValue("{s:s,s:d,s:d,s:d,s:d,s:d}", "name", name.c_str(), "A", A,
+                              "Z", Z, "radlen", radlen, "interlen", interlen, "density", density );
 //      PyObject* py_dict = Py_BuildValue("{s:s,s:d,s:d,s:d}", "name", name.c_str(),
 //          "radlen", radlen, "interlen", interlen, "density", density );
       return py_dict;
@@ -89,7 +88,6 @@ namespace MAUS {
         ThreeVector pos(point[0], point[1], point[2]);
         GeometryNavigator* nav = Globals::GetInstance()->GetMCGeometryNavigator();
         nav->SetPoint(pos);
-
       } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
@@ -110,13 +108,11 @@ namespace MAUS {
         return NULL;
       }
       try {
-
         GeometryNavigator* nav = Globals::GetInstance()->GetMCGeometryNavigator();
         ThreeVector pos = nav->GetCurrentPoint();
         point[0] = pos.x();
         point[1] = pos.y();
         point[2] = pos.z();
-
       } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
@@ -139,11 +135,9 @@ namespace MAUS {
         return NULL;
       }
       try {
-
         ThreeVector disp(point[0], point[1], point[2]);
         GeometryNavigator* nav = Globals::GetInstance()->GetMCGeometryNavigator();
         nav->Step(disp);
-
       } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
@@ -171,7 +165,6 @@ namespace MAUS {
       PyObject* maus_module = Py_InitModule("material", methods);
       if (maus_module == NULL) return;
     }
-
   }
 }
 

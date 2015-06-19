@@ -125,9 +125,9 @@ class SciFiSpacePoint : public TObject {
   SciFiClusterPArray get_channels_pointers() const;
 
   ThreeVector get_true_position() const { return _true_position; }
-  void set_true_position( ThreeVector pos ) { _true_position = pos; }
+  void set_true_position(ThreeVector pos) { _true_position = pos; }
   ThreeVector get_true_momentum() const { return _true_momentum; }
-  void set_true_momentum( ThreeVector mom ) { _true_momentum = mom; }
+  void set_true_momentum(ThreeVector mom) { _true_momentum = mom; }
 
  private:
   bool _used;

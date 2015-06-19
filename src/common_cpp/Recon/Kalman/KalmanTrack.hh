@@ -18,10 +18,11 @@
 #ifndef KALMAN_TRACK_HH
 #define KALMAN_TRACK_HH
 
+#include <vector>
+#include <algorithm>
+
 #include "TMath.h"
 #include "TMatrixD.h"
-
-#include <vector>
 
 
 namespace MAUS {
@@ -181,7 +182,6 @@ namespace Kalman {
       /** @brief Remove a state from the specified index in the state array
        */
       void DeleteState(unsigned int index);
-      
 
       /** @brief (Re)initialise the track using the structure of a similar track
        */

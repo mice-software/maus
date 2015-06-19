@@ -18,6 +18,8 @@
 #ifndef _SRC_COMMON_CPP_UTILS_MAUSGEOMETRYNAVIGATOR_HH_
 #define _SRC_COMMON_CPP_UTILS_MAUSGEOMETRYNAVIGATOR_HH_
 
+#include <string>
+
 #include "Geant4/G4PVPlacement.hh"
 #include "Geant4/G4Navigator.hh"
 #include "Geant4/G4Material.hh"
@@ -54,11 +56,11 @@ namespace MAUS {
 
       /** @brief Initialise navigator with a different geometry
        */
-      void Initialise(G4VPhysicalVolume*);
+      void Initialise(G4VPhysicalVolume* g4_pv);
 
       /** @brief Set the current global position
        */
-      void SetPoint(ThreeVector);
+      void SetPoint(ThreeVector point);
 
       /** @brief Increment the current position by the supplied displacement
        * 
@@ -134,7 +136,7 @@ namespace MAUS {
       static G4ThreeVector ToG4Vec(ThreeVector v)
                                    {return G4ThreeVector(v.x(), v.y(), v.z());}
       static ThreeVector ToMAUSVec(G4ThreeVector v)
-                                     {return ThreeVector(v.x(), v.y(), v.z());} 
+                                     {return ThreeVector(v.x(), v.y(), v.z());}
 
 
       G4VPhysicalVolume* _global_volume;
@@ -148,9 +150,7 @@ namespace MAUS {
       G4VPhysicalVolume* _current_volume;
 
       G4Material* _current_material;
-
   };
-
 }
 
 #endif // _SRC_COMMON_CPP_UTILS_MAUSGEOMETRYNAVIGATOR_HH_
