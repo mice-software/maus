@@ -103,23 +103,23 @@
                                 <xsl:for-each select="coil">
                                     <xsl:choose>
                                         <xsl:when test="contains(@name, 'SSU-T2')">Substitution $SSUT2Current <xsl:value-of select="@iset"/>
-                        Substitution $SSUT2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $SSUT2Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>
                                         <xsl:when test="contains(@name, 'SSU-T1')">Substitution $SSUT1Current <xsl:value-of select="@iset"/>
-                        Substitution $SSUT1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $SSUT1Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>
                                         <xsl:when test="contains(@name, 'SSU-C')">Substitution $SSUCCurrent <xsl:value-of select="@iset"/>
-                        Substitution $SSUCPolarity <xsl:value-of select="../@polarity"/><xsl:text> 
+                        Substitution $SSUCPolarity +1<xsl:text> 
                         
                         </xsl:text></xsl:when>
                                         <xsl:when test="contains(@name, 'SSU-M1')">Substitution $SSUM1Current <xsl:value-of select="@iset"/>
-                        Substitution $SSUM1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $SSUM1Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>
                                         <xsl:when test="contains(@name, 'SSU-M2')">Substitution $SSUM2Current <xsl:value-of select="@iset"/>
-                                Substitution $SSUM2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                                Substitution $SSUM2Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>            
                                     </xsl:choose>
@@ -132,12 +132,12 @@
                                 <xsl:for-each select="coil">
                                     <xsl:choose>
                                         <xsl:when test="contains(@name, 'FCM-U')">Substitution $FCMUCurrent <xsl:value-of select="@iset"/>
-                        Substitution $FCMUPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $FCMUPolarity +1<xsl:text>
                                         
                         </xsl:text>
                                         </xsl:when>
                                         <xsl:when test="contains(@name, 'FCM-D')">Substitution $FCMDCurrent <xsl:value-of select="@iset"/>
-                        Substitution $FCMDPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $FCMDPolarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>                   
                                     </xsl:choose>
@@ -150,11 +150,11 @@
                                     <xsl:for-each select="coil">
                                         <xsl:choose>
                                         <xsl:when test="contains(@name, 'FCM-U')">Substitution $FCMUCurrent <xsl:value-of select="@iset"/>
-                        Substitution $FCMUPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $FCMUPolarity +1<xsl:text>
                                         
                         </xsl:text></xsl:when>
                                         <xsl:when test="contains(@name, 'FCM-D')">Substitution $FCMDCurrent <xsl:value-of select="@iset"/>
-                        Substitution $FCMDPolarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $FCMDPolarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>    
                                         </xsl:choose>
@@ -164,23 +164,23 @@
                                     <xsl:for-each select="coil">
                                         <xsl:choose>
                                             <xsl:when test="contains(@name, 'SSD-T2')">Substitution $SSDT2Current <xsl:value-of select="@iset"/>
-                        Substitution $SSDT2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $SSDT2Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>
                                             <xsl:when test="contains(@name, 'SSD-T1')">Substitution $SSDT1Current <xsl:value-of select="@iset"/>
-                        Substitution $SSDT1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $SSDT1Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>
                                             <xsl:when test="contains(@name, 'SSD-C')">Substitution $SSDCCurrent <xsl:value-of select="@iset"/>
-                        Substitution $SSDCPolarity <xsl:value-of select="../@polarity"/><xsl:text> 
+                        Substitution $SSDCPolarity +1<xsl:text> 
                         
                         </xsl:text></xsl:when>
                                             <xsl:when test="contains(@name, 'SSD-M1')">Substitution $SSDM1Current <xsl:value-of select="@iset"/>
-                        Substitution $SSDM1Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $SSDM1Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>
                                             <xsl:when test="contains(@name, 'SSD-M2')">Substitution $SSDM2Current <xsl:value-of select="@iset"/>
-                        Substitution $SSDM2Polarity <xsl:value-of select="../@polarity"/><xsl:text>
+                        Substitution $SSDM2Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>    
                                         </xsl:choose>
@@ -226,7 +226,7 @@
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
                                 <xsl:when test="contains(FieldName/@name, 'D1') and boolean($run_number)">0.71415/0.391*(3.58/1000.0+$D1Polarity*$D1Current*3.88/1000.0+$D1Current*$D1Current*2.619/1000.0/1000.0-$D1Polarity*$D1Current*$D1Current*$D1Current*1.55/1000.0/1000.0/1000.0)</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">0.71415/0.391*(3.58/1000.0+$D1Polarity*$D1Current*3.88/1000.0+$D1Current*$D1Current*2.619/1000.0/1000.0-$D1Polarity*$D1Current*$D1Current*$D1Current*1.55/1000.0/1000.0/1000.0)</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'D2') and boolean($run_number)">0.71415/0.391*(3.58/1000.0+$D2Polarity*$D2Current*3.88/1000.0+$D2Current*$D2Current*2.619/1000.0/1000.0-$D2Polarity*$D2Current*$D2Current*$D2Current*1.55/1000.0/1000.0/1000.0)</xsl:when>
                                 <xsl:otherwise><xsl:value-of select="ScaleFactor/@value"/></xsl:otherwise>
                             </xsl:choose>
                             Volume <xsl:value-of select="Volume/@name"/>
