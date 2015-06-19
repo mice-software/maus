@@ -17,7 +17,6 @@
 
 # pylint: disable = C0103
 
-import sys
 import os
 import json
 import unittest

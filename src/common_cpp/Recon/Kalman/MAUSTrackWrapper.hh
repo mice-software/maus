@@ -44,7 +44,7 @@ namespace MAUS {
   /** @brief Create a seed from a straight track
    */
   Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, const SciFiGeometryHelper* geom,
-      ]                                                                    double seed_cov = -1.0);
+                                                                           double seed_cov = -1.0);
 
   /** @brief Convert a KalmanTrack to a SciFiTrack for the data structure
    */
