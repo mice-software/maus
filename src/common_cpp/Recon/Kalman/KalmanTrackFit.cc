@@ -17,10 +17,11 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 
-#include "src/common_cpp/Utils/Exception.hh"
 
 #include <iostream>
 #include <sstream>
+
+#include "src/common_cpp/Utils/Exception.hh"
 
 #include "TDecompLU.h"
 
@@ -29,16 +30,16 @@ namespace MAUS {
 namespace Kalman {
 
 
-  std::string print_state( const State& state, const char* detail ) { 
+  std::string print_state(const State& state, const char* detail) {
     std::ostringstream converter("");
     TMatrixD vec = state.GetVector();
     TMatrixD cov = state.GetCovariance();
 
-    if ( detail )
+    if (detail)
       converter << detail;
     converter << " @ " << state.GetPosition() << ", " << state.GetId() << "  |  ";
-    if ( state.HasValue() ) {
-      for ( unsigned int i = 0; i < state.GetDimension(); ++i ) {
+    if (state.HasValue()) {
+      for (unsigned int i = 0; i < state.GetDimension(); ++i) {
         converter << "(" << vec(i, 0) << " +/- " << sqrt(cov(i, i)) << "), ";
       }
       converter << 1.0/vec(vec.GetNrows()-1, 0);
@@ -50,15 +51,15 @@ namespace Kalman {
   }
 
 
-  std::string print_track( const Track& track, const char* name) { 
+  std::string print_track(const Track& track, const char* name) {
     unsigned int num = track.GetLength();
     std::ostringstream converter("");
-    if ( name )
+    if (name)
       converter << "Printing " << name << "\n";
     else
       converter << "TRACK:\n";
 
-    for ( unsigned int i = 0; i < num; ++i ) {
+    for (unsigned int i = 0; i < num; ++i) {
       State state = track[i];
       converter << print_state(state);
     }
@@ -67,7 +68,7 @@ namespace Kalman {
   }
 
   State CalculateResidual(const State& st1, const State& st2) {
-    if ( st1._dimension != st2._dimension ) {
+    if (st1._dimension != st2._dimension) {
       throw Exception(Exception::recoverable,
           "States have different dimensions",
           "Kalman::CalculateResidual()");
@@ -134,8 +135,6 @@ namespace Kalman {
           "State dimension does not match the measurement dimension",
           "Kalman::TrackFit::AppendFilter()");
     }
-
-
     // The good stuff goes here!
   }
 
@@ -144,9 +143,9 @@ namespace Kalman {
     _predicted.Reset(_data);
     _filtered.Reset(_data);
 
-    int increment = ( forward ? 1 : -1 );
-    int track_start = ( forward ? 1 : _data.GetLength() - 2 );
-    int track_end = ( forward ? _data.GetLength() : -1 );
+    int increment = (forward ? 1 : -1);
+    int track_start = (forward ? 1 : _data.GetLength() - 2);
+    int track_end = (forward ? _data.GetLength() : -1);
 
     _predicted[track_start-increment].copy(_seed);
 //    _filtered[track_start-increment].copy(_seed);
@@ -169,13 +168,13 @@ namespace Kalman {
   void TrackFit::Smooth(bool forward) {
     _smoothed.Reset(_data);
 
-    int increment = ( forward ? -1 : 1 );
-    int track_start = ( forward ? (_smoothed.GetLength() - 2) : 1 );
-    int track_end = ( forward ? -1 : (_smoothed.GetLength()) );
+    int increment = (forward ? -1 : 1);
+    int track_start = (forward ? (_smoothed.GetLength() - 2) : 1);
+    int track_end = (forward ? -1 : (_smoothed.GetLength()));
 
     _smoothed[track_start-increment] = _filtered[track_start-increment];
 
-    for (int i = track_start; i != track_end; i += increment ) {
+    for (int i = track_start; i != track_end; i += increment) {
       TMatrixD temp(GetDimension(), GetDimension());
       TDecompLU lu(_predicted[i - increment].GetCovariance());
       if (!lu.Decompose() || !lu.Invert(temp)) {
@@ -188,11 +187,13 @@ namespace Kalman {
         TMatrixD A = _filtered[i].GetCovariance() * propT * temp;
         TMatrixD AT(TMatrixD::kTransposed, A);
 
-        TMatrixD vec = _filtered[i].GetVector() + A * ( _smoothed[i-increment].GetVector() - _predicted[i-increment].GetVector() );
-        TMatrixD cov = _filtered[i].GetCovariance() + A * ( _smoothed[i-increment].GetCovariance() - _predicted[i-increment].GetCovariance() ) * AT;
+        TMatrixD vec = _filtered[i].GetVector() + A * (_smoothed[i-increment].GetVector() -
+                                                              _predicted[i-increment].GetVector());
+        TMatrixD cov = _filtered[i].GetCovariance() + A * (_smoothed[i-increment].GetCovariance() -
+                                                     _predicted[i-increment].GetCovariance()) * AT;
 
-        _smoothed[i].SetVector( vec );
-        _smoothed[i].SetCovariance( cov );
+        _smoothed[i].SetVector(vec);
+        _smoothed[i].SetCovariance(cov);
 
         Kalman::State measured = _measurement->Measure(_smoothed[i]);
       }
@@ -235,7 +236,6 @@ namespace Kalman {
     if (!lu.Decompose() || !lu.Invert(temp)) {
       filtered = predicted;
     } else {
-
       TMatrixD H = _measurement->GetMeasurementMatrix();
       TMatrixD HT(TMatrixD::kTransposed, H);// HT.Transpose(H);
 
@@ -254,8 +254,8 @@ namespace Kalman {
       TMatrixD temp_vec = predicted.GetVector() + K * pull;
       TMatrixD temp_cov = gain * predicted.GetCovariance() * gainT + gain_constant;
 
-      filtered.SetVector( temp_vec );
-      filtered.SetCovariance( temp_cov );
+      filtered.SetVector(temp_vec);
+      filtered.SetCovariance(temp_cov);
     }
   }
 
@@ -264,15 +264,15 @@ namespace Kalman {
 
 
   double TrackFit::CalculateChiSquared(const Track& track) const {
-    if (track.GetLength() != _data.GetLength()) 
+    if (track.GetLength() != _data.GetLength())
       throw Exception(Exception::recoverable,
           "Supplied Track length is different to data track",
           "Kalman::TrackFit::CalculateChiSquared()");
 
     double chi_squared = 0.0;
 
-    for (unsigned int i = 0; i < track.GetLength(); ++i ) {
-      State measured = _measurement->Measure( track[i] );
+    for (unsigned int i = 0; i < track.GetLength(); ++i) {
+      State measured = _measurement->Measure(track[i]);
       State residual = CalculateResidual(_data[i], measured);
       chi_squared += CalculateChiSquaredUpdate(residual);
     }
@@ -283,8 +283,8 @@ namespace Kalman {
   int TrackFit::GetNDF() const {
     int no_parameters = GetDimension();
     int no_measurements = 0;
-    for ( unsigned int i = 0; i < _data.GetLength(); ++i ) {
-      if ( _data[i] ) no_measurements += GetMeasurementDimension();
+    for (unsigned int i = 0; i < _data.GetLength(); ++i) {
+      if (_data[i]) no_measurements += GetMeasurementDimension();
     }
 
     return no_measurements - no_parameters;

@@ -40,14 +40,14 @@ namespace Kalman {
     TMatrixD new_cov(_measurement_dimension, _measurement_dimension);
 
     new_vec = _base_measurement_matrix * state.GetVector();
-    new_cov = _base_measurement_matrix * state.GetCovariance() * _base_measurement_matrix_transpose + _base_measurement_noise;
+    new_cov = (_base_measurement_matrix*state.GetCovariance()*
+                                     _base_measurement_matrix_transpose) + _base_measurement_noise;
 
     State measured_state(new_vec, new_cov, state.GetPosition());
     measured_state.SetId(state.GetId());
 
     return measured_state;
   }
-
 }
 }
 

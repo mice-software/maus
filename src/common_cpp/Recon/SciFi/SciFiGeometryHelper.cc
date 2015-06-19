@@ -249,7 +249,8 @@ double SciFiGeometryHelper::BetheBlochStoppingPower(double p, const SciFiMateria
 }
 
 
-void SciFiGeometryHelper::FillMaterialsList(int start_id, int end_id, SciFiMaterialsList& materials_list) {
+void SciFiGeometryHelper::FillMaterialsList(int start_id, int end_id,
+                                                              SciFiMaterialsList& materials_list) {
   int increment;
   start_id = abs(start_id);
   end_id = abs(end_id);
@@ -260,7 +261,7 @@ void SciFiGeometryHelper::FillMaterialsList(int start_id, int end_id, SciFiMater
     materials_list.push_back(std::make_pair(&MylarParameters, MylarParameters.Plane_Width));
     materials_list.push_back(std::make_pair(&FibreParameters, FibreParameters.Plane_Width));
 
-    switch( current_id ) {
+    switch (current_id) {
       case 4:
         materials_list.push_back(std::make_pair(&GasParameters, 200.0));
         break;

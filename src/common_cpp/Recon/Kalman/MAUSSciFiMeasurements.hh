@@ -18,6 +18,8 @@
 #ifndef MAUS_MEASUREMENTS_HH
 #define MAUS_MEASUREMENTS_HH
 
+#include <map>
+
 #include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
@@ -27,7 +29,7 @@ namespace MAUS {
 
   class SciFiStraightMeasurements : public Kalman::Measurement_base {
     public :
-      SciFiStraightMeasurements(SciFiGeometryHelper* geometry_helper);
+      explicit SciFiStraightMeasurements(SciFiGeometryHelper* geometry_helper);
 
 //      virtual Kalman::State Measure(const State& state);
 
@@ -48,7 +50,7 @@ namespace MAUS {
 
   class SciFiHelicalMeasurements : public Kalman::Measurement_base {
     public :
-      SciFiHelicalMeasurements(SciFiGeometryHelper* geometry_helper);
+      explicit SciFiHelicalMeasurements(SciFiGeometryHelper* geometry_helper);
 
 //      virtual Kalman::State Measure(const State& state);
 
@@ -71,7 +73,7 @@ namespace MAUS {
   template<unsigned int DIM>
   class SciFiSpacepointMeasurements : public Kalman::Measurement_base {
     public :
-      SciFiSpacepointMeasurements(double noise = 0.0);
+      explicit SciFiSpacepointMeasurements(double noise = 0.0);
 
       virtual TMatrixD CalculateMeasurementMatrix(const Kalman::State& state);
 
@@ -110,13 +112,15 @@ namespace MAUS {
 
 
   template<unsigned int DIM>
-  TMatrixD SciFiSpacepointMeasurements<DIM>::CalculateMeasurementMatrix(const Kalman::State& state) {
+  TMatrixD SciFiSpacepointMeasurements<DIM>::CalculateMeasurementMatrix(
+                                                                      const Kalman::State& state) {
     return _measurement_matrix;
   }
 
 
   template<unsigned int DIM>
-  TMatrixD SciFiSpacepointMeasurements<DIM>::CalculateMeasurementNoise(const Kalman::State& state) {
+  TMatrixD SciFiSpacepointMeasurements<DIM>::CalculateMeasurementNoise(
+                                                                      const Kalman::State& state) {
     return _measurement_noise; // Can cache the constant value
   }
 }

@@ -24,15 +24,18 @@ namespace MAUS {
     _geometry_helper(geo),
     _measurement_noise(1, 1),
     _matrix_map() {
-//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() * _geometry_helper->GetChannelWidth() / 12.0;
+//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() *
+//                                                      _geometry_helper->GetChannelWidth() / 12.0;
     _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
 
     SciFiTrackerMap geo_map = _geometry_helper->GeometryMap();
 
-    for (SciFiTrackerMap::iterator track_it = geo_map.begin(); track_it != geo_map.end(); ++track_it) {
-      int tracker_const = ( track_it->first == 0 ? -1 : 1 );
+    for (SciFiTrackerMap::iterator track_it = geo_map.begin();
+                                                           track_it != geo_map.end(); ++track_it) {
+      int tracker_const = (track_it->first == 0 ? -1 : 1);
 
-      for (SciFiPlaneMap::iterator plane_it = track_it->second.Planes.begin(); plane_it != track_it->second.Planes.end(); ++plane_it) {
+      for (SciFiPlaneMap::iterator plane_it = track_it->second.Planes.begin();
+                                           plane_it != track_it->second.Planes.end(); ++plane_it) {
         TMatrix H(1, 4);
         H.Zero();
 
@@ -42,8 +45,8 @@ namespace MAUS {
         double dx = dir.x();
         double dy = dir.y();
 //        double channel_width = _geometry_helper->GetFibreParameters().Pitch;
-        H(0, 0) =  dy; ///channel_width;
-        H(0, 2) = -dx; ///channel_width;
+        H(0, 0) =  dy; // / channel_width;
+        H(0, 2) = -dx; // / channel_width;
 
         _matrix_map.insert(std::make_pair(id, H));
   //      _matrix_map[id] = H;
@@ -71,15 +74,18 @@ namespace MAUS {
     _geometry_helper(geo),
     _measurement_noise(1, 1),
     _matrix_map() {
-//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() * _geometry_helper->GetChannelWidth() / 12.0;
+//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() *
+//                                                      _geometry_helper->GetChannelWidth() / 12.0;
     _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
 
     SciFiTrackerMap geo_map = _geometry_helper->GeometryMap();
 
-    for (SciFiTrackerMap::iterator track_it = geo_map.begin(); track_it != geo_map.end(); ++track_it) {
-      int tracker_const = ( track_it->first == 0 ? -1 : 1 );
+    for (SciFiTrackerMap::iterator track_it = geo_map.begin();
+                                                           track_it != geo_map.end(); ++track_it) {
+      int tracker_const = (track_it->first == 0 ? -1 : 1);
 
-      for (SciFiPlaneMap::iterator plane_it = track_it->second.Planes.begin(); plane_it != track_it->second.Planes.end(); ++plane_it) {
+      for (SciFiPlaneMap::iterator plane_it = track_it->second.Planes.begin();
+                                           plane_it != track_it->second.Planes.end(); ++plane_it) {
         TMatrix H(1, 5);
         H.Zero();
 
@@ -89,8 +95,8 @@ namespace MAUS {
         double dx = dir.x();
         double dy = dir.y();
 //        double channel_width = _geometry_helper->GetFibreParameters().Pitch;
-        H(0, 0) =  dy; ///channel_width;
-        H(0, 2) = -dx; ///channel_width;
+        H(0, 0) =  dy; // / channel_width;
+        H(0, 2) = -dx; // / channel_width;
 
         _matrix_map.insert(std::make_pair(id, H));
   //      _matrix_map[id] = H;

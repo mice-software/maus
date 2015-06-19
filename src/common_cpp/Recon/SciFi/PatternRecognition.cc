@@ -164,7 +164,7 @@ void PatternRecognition::process(SciFiEvent &evt) const {
 };
 
 void PatternRecognition::make_all_tracks(const bool track_type, const int trker_no,
-                                         SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt) const {
+                                     SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt) const {
 
   // Count how many stations have at least one *unused* spacepoint
   int num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
@@ -193,7 +193,7 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
 }
 
 void PatternRecognition::add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
-                                    std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt ) const {
+                                std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt ) const {
   for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
     strks[i]->set_tracker(trker_no);
     evt.add_straightprtrack(strks[i]);
@@ -471,7 +471,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
         LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
 
         // Squash the covariances of each fit into one matrix
-        cov_x.ResizeTo(4,4);
+        cov_x.ResizeTo(4, 4);
         for ( int i = 0; i < 2; ++i ) {
           for ( int j = 0; j < 2; ++j ) {
             cov_x(i+2, j+2) = cov_y(i, j);
@@ -518,7 +518,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
                                     std::vector<SciFiSpacePoint*> &current_spnts,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack*> &htrks) const {
-  // if (_verb > 0) std::cout << "make_helix: # of current spnts: " << current_spnts.size() << "\n";
+// if (_verb > 0) std::cout << "make_helix: # of current spnts: " << current_spnts.size() << "\n";
 
   // Set variables to hold which stations are to be ignored
   int ignore_st_1 = -1, ignore_st_2 = -1;
@@ -542,14 +542,14 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
   for ( size_t sp_num = 0; sp_num < spnts_by_station[stat_num].size(); ++sp_num ) {
     // If the current sp is used, skip it
     if ( spnts_by_station[stat_num][sp_num]->get_used() ) {
-      // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipin\n";
+    // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipin\n";
       continue;
     }
 
-    // Add the current spnt to the list being tried at present
-    // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding ";
+  // Add the current spnt to the list being tried at present
+  // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding ";
     current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
-    // if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
+  // if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
 
     // If we are on the last station, attempt to form a track using the spacepoints collected
     if (stat_num == stat_num_max) {
@@ -570,7 +570,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
     } else {
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
 
-      // If we are not on the first station and current_spnts is empty, break out as track was found
+// If we are not on the first station and current_spnts is empty, break out as track was found
       if ( stat_num != stat_num_min && current_spnts.size() == 0 )
         return;
       // If we we have current spnts, remove the last tried, before trying another
@@ -609,7 +609,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   }
 
   // Squash the covariances of each fit into one matrix
-  cov_circle.ResizeTo(5,5);
+  cov_circle.ResizeTo(5, 5);
   for ( int i = 0; i < 2; ++i ) {
     for ( int j = 0; j < 2; ++j ) {
       cov_circle(i+3, j+3) = cov_sz(i, j);
@@ -837,7 +837,8 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
   }
 };
 
-bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoint*> good_spnts) const {
+bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoint*> good_spnts)
+                                                                                            const {
 
   double dT_first = 0.0;
   double dT_last = 0.0;

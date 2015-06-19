@@ -39,7 +39,7 @@ void SciFiSpacePointRec::process(SciFiEvent &event) const {
 }
 
 void SciFiSpacePointRec::make_cluster_container(SciFiEvent &evt,
-                                                std::vector<SciFiCluster*> (&clusters)[2][6][3]) const {
+                                           std::vector<SciFiCluster*> (&clusters)[2][6][3]) const {
   for ( size_t cl = 0; cl < evt.clusters().size(); ++cl ) {
     SciFiCluster* a_cluster = evt.clusters()[cl];
     int tracker = a_cluster->get_tracker();

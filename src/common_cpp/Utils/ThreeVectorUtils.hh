@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#ifndef _UTILS_THREEVECTOR_UTILS_
-//#define _UTILS_THREEVECTOR_UTILS_
+// #ifndef _UTILS_THREEVECTOR_UTILS_
+// #define _UTILS_THREEVECTOR_UTILS_
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/Rotation.h"
@@ -44,6 +44,6 @@ inline ThreeVector clhep_to_root(CLHEP::Hep3Vector vec) {
 }
 }
 
-//#endif // _UTILS_THREEVECTOR_UTILS_
+// #endif // _UTILS_THREEVECTOR_UTILS_
 
 

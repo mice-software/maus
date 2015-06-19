@@ -57,7 +57,8 @@ class SciFiSpacePointRec {
 
   void process(SciFiEvent &evt) const;
 
-  void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
+  void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*>
+                                                                       (&clusters)[2][6][3]) const;
 
   void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 

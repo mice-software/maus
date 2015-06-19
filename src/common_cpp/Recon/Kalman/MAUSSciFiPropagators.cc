@@ -1,3 +1,20 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 
 #include "src/common_cpp/Recon/Kalman/MAUSSciFiPropagators.hh"
 
@@ -13,14 +30,15 @@ namespace MAUS {
   // STRAIGHT
 ////////////////////////////////////////////////////////////////////////////////
 
-  StraightPropagator::StraightPropagator( SciFiGeometryHelper* geo) :
+  StraightPropagator::StraightPropagator(SciFiGeometryHelper* geo) :
     Kalman::Propagator_base(4),
     _geometry_helper(geo),
     _include_mcs(true) {
   }
 
 
-  TMatrixD StraightPropagator::CalculatePropagator(const Kalman::State& start, const Kalman::State& end) {
+  TMatrixD StraightPropagator::CalculatePropagator(const Kalman::State& start,
+                                                                        const Kalman::State& end) {
     static TMatrixD prop(4, 4);
 
     // Find dz between sites.
@@ -37,11 +55,12 @@ namespace MAUS {
   }
 
 
-  TMatrixD StraightPropagator::CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end) {
+  TMatrixD StraightPropagator::CalculateProcessNoise(const Kalman::State& start,
+                                                                        const Kalman::State& end) {
     static TMatrixD new_noise(GetDimension(), GetDimension());
     new_noise.Zero();
 
-    if ( _include_mcs ) {
+    if (_include_mcs) {
       // TODO : Should probably finish this one...
       Kalman::State temp_start(start);
       Kalman::State temp_end(start);
@@ -50,14 +69,14 @@ namespace MAUS {
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
       int n_steps = materials.size();
 
-      for ( int i = 0; i < n_steps; i++ ) {
+      for (int i = 0; i < n_steps; i++) {
 
         double width = materials.at(i).second;
 
         temp_end.SetPosition(temp_end.GetPosition() + width);
 
         TMatrixD F = CalculatePropagator(temp_start, temp_end);
-        temp_end.SetVector( F * temp_start.GetVector() );
+        temp_end.SetVector(F * temp_start.GetVector());
 
         double L = materials.at(i).first->L(width);
         TMatrixD Q = BuildQ(temp_end, L, width);
@@ -84,7 +103,7 @@ namespace MAUS {
 
     double mx    = state_vector(1, 0);
     double my    = state_vector(3, 0);
-    double p     = 200.0; //TODO: Extract a more accurate value, somehow...
+    double p     = 200.0; // TODO: Extract a more accurate value, somehow...
     double p2    = p*p;
 
     double muon_mass = Recon::Constants::MuonMass;
@@ -126,7 +145,6 @@ namespace MAUS {
     Q(3, 3) = c_my_my;
 
     return Q;
-
   }
 
 
@@ -165,7 +183,7 @@ namespace MAUS {
     double sine    = sin(delta_theta);
     double cosine  = cos(delta_theta);
 
-    if ( start.GetId() < 0 ) u = - u;
+    if (start.GetId() < 0) u = - u;
 
     // Calculate the new track parameters.
     double new_x  = old_x + old_px*sine/u
@@ -180,21 +198,22 @@ namespace MAUS {
 
     double new_kappa = old_kappa;
 
-    if ( _subtract_eloss ) {
+    if (_subtract_eloss) {
       SciFiMaterialsList materials;
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
 
       // Reduce/increase momentum vector accordingly.
       double e_loss_sign = 1.0;
-      if ( end.GetId() > 0 ) {
+      if (end.GetId() > 0) {
         e_loss_sign = -1.0;
       }
 
       double delta_p = 0.0;
       double momentum = old_momentum;
       int n_steps = materials.size();
-      for ( int i = 0; i < n_steps; i++ ) {  // In mm => times by 0.1;
-//        delta_p = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first)*materials.at(i).second*0.1;
+      for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
+//        delta_p = _geometry_helper->BetheBlochStoppingPower(momentum,
+//                                               materials.at(i).first)*materials.at(i).second*0.1;
         double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
         delta_p = SP*materials.at(i).second*0.1;
         momentum += e_loss_sign*delta_p;
@@ -216,7 +235,7 @@ namespace MAUS {
     PropagatorMatrix() = CalculatePropagator(start, end);
     NoiseMatrix() = CalculateProcessNoise(start, end);
 
-    TMatrixD propT(5, 5); propT.Transpose(PropagatorMatrix());
+    TMatrixD propT(TMatrixD::kTransposed, PropagatorMatrix());
     TMatrixD end_cov = PropagatorMatrix() * start.GetCovariance() * propT + NoiseMatrix();
 
     end.SetVector(end_vec);
@@ -224,7 +243,8 @@ namespace MAUS {
   }
 
 
-  TMatrixD HelicalPropagator::CalculatePropagator(const Kalman::State& start, const Kalman::State& end) {
+  TMatrixD HelicalPropagator::CalculatePropagator(const Kalman::State& start,
+                                                                        const Kalman::State& end) {
     TMatrixD old_vec(5, 1);
     old_vec           = start.GetVector();
 //  double old_x      = old_vec(0, 0);
@@ -243,7 +263,7 @@ namespace MAUS {
     double sine   = sin(delta_theta);
     double cosine = cos(delta_theta);
 
-    if ( start.GetId() < 0 ) u = - u;
+    if (start.GetId() < 0) u = - u;
 
     TMatrixD new_prop(5, 5);
 
@@ -273,8 +293,8 @@ namespace MAUS {
     new_prop(4, 3) = 0.;
     new_prop(4, 4) = 1.;
 
-    if (_correct_Pz) { 
-      if ( start.GetId() < 0 ) {
+    if (_correct_Pz) {
+      if (start.GetId() < 0) {
         new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
         new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine);
         new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
@@ -297,11 +317,12 @@ namespace MAUS {
   }
 
 
-  TMatrixD HelicalPropagator::CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end) {
+  TMatrixD HelicalPropagator::CalculateProcessNoise(const Kalman::State& start,
+                                                                        const Kalman::State& end) {
     static TMatrixD new_noise(5, 5);
     new_noise.Zero();
 
-    if ( _include_mcs ) {
+    if (_include_mcs) {
       // TODO : Correct this for new system
       Kalman::State temp_start(start);
       Kalman::State temp_end(start);
@@ -310,14 +331,14 @@ namespace MAUS {
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
       int n_steps = materials.size();
 
-      for ( int i = 0; i < n_steps; i++ ) {
+      for (int i = 0; i < n_steps; i++) {
 
         double width = materials.at(i).second;
 
         temp_end.SetPosition(temp_end.GetPosition() + width);
 
         TMatrixD F = CalculatePropagator(temp_start, temp_end);
-        temp_end.SetVector( F * temp_start.GetVector() );
+        temp_end.SetVector(F * temp_start.GetVector());
 
         double L = materials.at(i).first->L(width);
         TMatrixD Q = BuildQ(temp_end, L, width);
@@ -445,7 +466,5 @@ namespace MAUS {
 
     return Q;
   }
-
-
 } // namespace MAUS
 

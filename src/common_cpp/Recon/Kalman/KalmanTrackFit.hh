@@ -19,20 +19,20 @@
 #ifndef KALMAN_TRACKFIT_HH
 #define KALMAN_TRACKFIT_HH
 
+#include <string>
+
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanPropagatorBase.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanMeasurementBase.hh"
 
 #include "TMatrix.h"
 
-#include <string>
-
 namespace MAUS {
 namespace Kalman {
 
-  std::string print_state( const State& state, const char* detail = 0 );
+  std::string print_state(const State& state, const char* detail = 0);
 
-  std::string print_track( const Track& track, const char* name = 0 );
+  std::string print_track(const Track& track, const char* name = 0);
 
   /** @brief Calculates the residual between two states */
   State CalculateResidual(const State& st1, const State& st2);
@@ -89,7 +89,7 @@ namespace Kalman {
      */
     Track GetData() const { return _data; }
     const Track& Data() const { return _data; }
-    
+
     /** @brief Return a copy of the predicted track
      */
     Track GetPredicted() const { return _predicted; }
@@ -140,7 +140,7 @@ namespace Kalman {
 
   private:
     // Private copy constructor => No copying!
-    TrackFit(const TrackFit& tf); 
+    TrackFit(const TrackFit& tf);
     TrackFit& operator=(const TrackFit& tf) { return *this; }
 
     unsigned int _dimension;

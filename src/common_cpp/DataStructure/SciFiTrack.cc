@@ -116,12 +116,12 @@ SciFiTrack::~SciFiTrack() {
   }
 }
 
-//void SciFiTrack::SetSeedState(double* state, unsigned int size) {
-//  _seed_state_vector.resize(size);
-//  for ( unsigned int i = 0; i < size; ++i ) {
-//    _seed_state_vector[i] = state[i];
-//  }
-//}
+// void SciFiTrack::SetSeedState(double* state, unsigned int size) {
+//   _seed_state_vector.resize(size);
+//   for ( unsigned int i = 0; i < size; ++i ) {
+//     _seed_state_vector[i] = state[i];
+//   }
+// }
 
 void SciFiTrack::SetSeedCovariance(double* covariance, unsigned int size) {
   _seed_covariance_matrix.resize(size);

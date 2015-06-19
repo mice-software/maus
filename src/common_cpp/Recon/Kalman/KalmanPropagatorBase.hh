@@ -66,7 +66,7 @@ namespace Kalman {
     protected:
       /** @brief Initialise the base class with the expected dimensions
        */
-      Propagator_base(unsigned int dimension);
+      explicit Propagator_base(unsigned int dimension);
 
       /** @brief Derived class have controllable access to this variable
        */
@@ -84,7 +84,6 @@ namespace Kalman {
 
       TMatrixD _noise_matrix;
   };
-
 } // namespace Kalman
 } // namespace MAUS
 

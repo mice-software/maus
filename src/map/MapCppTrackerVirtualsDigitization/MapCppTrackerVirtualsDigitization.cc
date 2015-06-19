@@ -81,12 +81,12 @@ namespace MAUS {
     // ================= Reconstruction =========================
 
     // Check the Recon event array is initialised, and if not make it so
-    if ( !spill.GetReconEvents() ) {
+    if (!spill.GetReconEvents()) {
       ReconEventPArray* revts = new ReconEventPArray();
       spill.SetReconEvents(revts);
     }
     // Construct digits from virtual plane hits for each MC event
-    for ( size_t event_i = 0; event_i < spill.GetMCEventSize(); event_i++ ) {
+    for (size_t event_i = 0; event_i < spill.GetMCEventSize(); event_i++) {
       MCEvent *mc_evt = spill.GetMCEvents()->at(event_i);
       SciFiEvent *sf_evt = new SciFiEvent();
 
@@ -104,7 +104,8 @@ namespace MAUS {
 
       if (_make_spacepoints) {
         SciFiSpacePointPArray spacepoints;
-        construct_spacepoints(mc_evt->GetVirtualHits(), spill.GetSpillNumber(), event_i, spacepoints);
+        construct_spacepoints(mc_evt->GetVirtualHits(), spill.GetSpillNumber(), event_i,
+                                                                                      spacepoints);
         sf_evt->set_spacepoints(spacepoints);
       }
 
@@ -116,7 +117,7 @@ namespace MAUS {
 
       // If there is already a Recon event associated with this MC event, add the SciFiEvent to it,
       // otherwise make a new Recon event to hold the SciFiEvent
-      if ( spill.GetReconEvents()->size() > event_i ) {
+      if (spill.GetReconEvents()->size() > event_i) {
         spill.GetReconEvents()->at(event_i)->SetSciFiEvent(sf_evt);
       } else {
         ReconEvent *revt = new ReconEvent();
@@ -129,7 +130,7 @@ namespace MAUS {
 
   void MapCppTrackerVirtualsDigitization::construct_digits(VirtualHitArray* hits, int spill_num,
                                                    int event_num, SciFiDigitPArray& digits) const {
-    for ( unsigned int hit_i = 0; hit_i < hits->size(); hit_i++ ) {
+    for (unsigned int hit_i = 0; hit_i < hits->size(); hit_i++) {
       bool found = false;
       VirtualHit* a_hit    = &hits->at(hit_i);
       double time          = a_hit->GetTime();
@@ -155,10 +156,11 @@ namespace MAUS {
             plane = (abs(id) - 1) % 3;
 
             alpha = _compute_alpha(a_hit, geo, tracker);
-            channelNumber = floor(0.5 + ((7.0 * geo.CentralFibre) + (2.0 * alpha / geo.Pitch)) / 7.0);
+            channelNumber = floor(0.5 + ((7.0 * geo.CentralFibre) +
+                                                                 (2.0 * alpha / geo.Pitch)) / 7.0);
 
             SciFiDigit* a_digit = new SciFiDigit(spill_num, event_num,
-                                        tracker, station, plane, channelNumber, _default_npe, time);
+                                       tracker, station, plane, channelNumber, _default_npe, time);
             digits.push_back(a_digit);
             found = true;
             break;
@@ -172,7 +174,7 @@ namespace MAUS {
 
   void MapCppTrackerVirtualsDigitization::construct_clusters(VirtualHitArray* hits, int spill_num,
                                                int event_num, SciFiClusterPArray& clusters) const {
-    for ( unsigned int hit_i = 0; hit_i < hits->size(); hit_i++ ) {
+    for (unsigned int hit_i = 0; hit_i < hits->size(); hit_i++) {
       bool found = false;
       VirtualHit* a_hit    = &hits->at(hit_i);
       ThreeVector position = a_hit->GetPosition();
@@ -206,11 +208,13 @@ namespace MAUS {
 
             momentum *= rotation;
 
-            int channelNumber = floor(0.5 + ((7.0 * geo.CentralFibre) + (2.0 * alpha / geo.Pitch)) / 7.0);
+            int channelNumber = floor(0.5 + ((7.0 * geo.CentralFibre) +
+                                                                 (2.0 * alpha / geo.Pitch)) / 7.0);
 
             // Change alpha to be quantised by the fibres!
 #ifdef QUANTISE_ALPHA
-            double new_alpha = 3.5 * geo.Pitch * double(channelNumber - geo.CentralFibre);
+            double new_alpha = 3.5 * geo.Pitch *
+                                             static_cast<double>(channelNumber - geo.CentralFibre);
 #else
             double new_alpha = alpha;
 #endif
@@ -242,8 +246,8 @@ namespace MAUS {
 
             TMatrix covariance(5, 5);
 
-            Kalman::State temp_state( vector, covariance, position.z() );
-            temp_state.SetId( id );
+            Kalman::State temp_state(vector, covariance, position.z());
+            temp_state.SetId(id);
             Kalman::State temp_measurement = _helix_measure->Measure(temp_state);
 
             found = true;
@@ -255,9 +259,9 @@ namespace MAUS {
     }
   }
 
-  void MapCppTrackerVirtualsDigitization::construct_spacepoints(VirtualHitArray* hits, int spill_num,
-                                               int event_num, SciFiSpacePointPArray& spacepoints) const {
-    for ( unsigned int hit_i = 0; hit_i < hits->size(); hit_i++ ) {
+  void MapCppTrackerVirtualsDigitization::construct_spacepoints(VirtualHitArray* hits,
+                          int spill_num, int event_num, SciFiSpacePointPArray& spacepoints) const {
+    for (unsigned int hit_i = 0; hit_i < hits->size(); hit_i++) {
       bool found = false;
       VirtualHit* a_hit    = &hits->at(hit_i);
       ThreeVector position = a_hit->GetPosition();
@@ -281,7 +285,7 @@ namespace MAUS {
           station = ((abs(id)-1) / 3) + 1;
           plane = (abs(id) - 1) % 3;
 
-          if ( plane != _spacepoint_plane_num ) continue;
+          if (plane != _spacepoint_plane_num) continue;
 
           if (fabs(geo.GlobalPosition.z() - position.z()) < _assignment_tolerance) {
 
@@ -309,16 +313,12 @@ namespace MAUS {
   }
 
   void MapCppTrackerVirtualsDigitization::construct_perfect_spacepoints(int spill_num,
-                                               int event_num, SciFiSpacePointPArray& spacepoints) const {
-
-    //TODO : Maybe later...
-
-
-
+                                         int event_num, SciFiSpacePointPArray& spacepoints) const {
+    // TODO : Maybe later...
   }
 
   double MapCppTrackerVirtualsDigitization::_compute_alpha(VirtualHit* ahit,
-                                                SciFiPlaneGeometry& geometry, int tracker ) const {
+                                                SciFiPlaneGeometry& geometry, int tracker) const {
     HepRotation rot = _geometry_helper.GetReferenceRotation(tracker);
     ThreeVector globalPos = ahit->GetPosition();
 //    ThreeVector pos = globalPos - geometry.GlobalPosition;
@@ -329,10 +329,9 @@ namespace MAUS {
 
     double alpha = pos.Dot(vec);
     return alpha;
-
     // The old method alpha = fibre num - central fibre
-//    int fibreNumber = ( 2.0 * dist / geometry.Pitch ) + (7.0*geometry.CentralFibre);
-//    int alpha = floor( fibreNumber / 7.0 );
+//    int fibreNumber = (2.0 * dist / geometry.Pitch) + (7.0*geometry.CentralFibre);
+//    int alpha = floor(fibreNumber / 7.0);
 //    int channelNumber = alpha;// + geometry.CentralFibre;
   }
 } // ~namespace MAUS

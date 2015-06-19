@@ -34,10 +34,10 @@ void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
   TMatrixD V_m(n_points, n_points);            // Covariance matrix of measurements
   TMatrixD Y(n_points, 1);                     // Measurements
 
-  for ( int i = 0; i < static_cast<int>(_x.size()); ++i ) {
+  for (int i = 0; i < static_cast<int>(_x.size()); ++i) {
     A[i][0] = 1;
     A[i][1] = _x[i];
-    V_m[i][i] = ( _y_err[i] * _y_err[i] );
+    V_m[i][i] = (_y_err[i] * _y_err[i]);
     Y[i][0] = _y[i];
   }
 
@@ -76,10 +76,10 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
   TMatrixD V_m(n_points, n_points);              // Covariance matrix of measurements
   TMatrixD K(n_points, 1);                       // Vector of 1s, represents kappa in circle formula
 
-  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+  for (int i = 0; i < static_cast<int>(spnts.size()); ++i) {
     // This part will change once I figure out proper errors
     double sd = -1.0;
-    if ( spnts[i]->get_station() == 5 )
+    if (spnts[i]->get_station() == 5)
       sd = sd_5;
     else
       sd = sd_1to4;
@@ -87,11 +87,11 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
     double x_i = spnts[i]->get_position().x();
     double y_i = spnts[i]->get_position().y();
 
-    A[i][0] = ( x_i * x_i ) + ( y_i * y_i );
+    A[i][0] = (x_i * x_i) + (y_i * y_i);
     A[i][1] = x_i;
     A[i][2] = y_i;
 
-    V_m[i][i] = ( sd * sd );
+    V_m[i][i] = (sd * sd);
     K[i][0] = 1.;
   }
 
@@ -114,29 +114,29 @@ bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
   double x0, y0, R;
   x0 = (-1*beta) / (2 * alpha);
   y0 = (-1*gamma) / (2 * alpha);
-  if ( ((4 * alpha) + (beta * beta) + (gamma * gamma)) < 0 )
+  if (((4 * alpha) + (beta * beta) + (gamma * gamma)) < 0)
     R = 0;
   else
     R = sqrt((4 * alpha) + (beta * beta) + (gamma * gamma)) / (2 * alpha);
 
   // Transform the covariance matrix to the same basis
-  TMatrixD jacobian( 3, 3 );
-  jacobian(0,0) = beta / (2.0*alpha*alpha);
-  jacobian(0,1) = -1.0 / (2.0*alpha);
-  jacobian(1,0) = gamma / (2.0*alpha*alpha);
-  jacobian(1,2) = -1.0 / (2.0*alpha);
-  jacobian(2,0) = ( -1.0/(2.0*alpha) ) * ( ( (beta*beta + gamma*gamma) / (2.0*alpha) ) + 1 ) /
-                                                sqrt( ( (beta*beta + gamma*gamma) / 4.0 ) + alpha );
-  jacobian(2,1) = ( beta/(4.0*alpha*alpha) ) /
-                            sqrt( ( (beta*beta + gamma*gamma)/(4.0*alpha*alpha) ) + ( 1.0/alpha ) );
-  jacobian(2,2) = ( gamma/(4.0*alpha*alpha) ) /
-                            sqrt( ( (beta*beta + gamma*gamma)/(4.0*alpha*alpha) ) + ( 1.0/alpha ) );
-  TMatrixD jacobianT(3,3);
-  jacobianT.Transpose( jacobian );
+  TMatrixD jacobian(3, 3);
+  jacobian(0, 0) = beta / (2.0*alpha*alpha);
+  jacobian(0, 1) = -1.0 / (2.0*alpha);
+  jacobian(1, 0) = gamma / (2.0*alpha*alpha);
+  jacobian(1, 2) = -1.0 / (2.0*alpha);
+  jacobian(2, 0) = (-1.0/(2.0*alpha)) * (((beta*beta + gamma*gamma) / (2.0*alpha)) + 1) /
+                                                 sqrt(((beta*beta + gamma*gamma) / 4.0) + alpha);
+  jacobian(2, 1) = (beta/(4.0*alpha*alpha)) /
+                             sqrt(((beta*beta + gamma*gamma)/(4.0*alpha*alpha)) + (1.0/alpha));
+  jacobian(2, 2) = (gamma/(4.0*alpha*alpha)) /
+                            sqrt(((beta*beta + gamma*gamma)/(4.0*alpha*alpha)) + (1.0/alpha));
+  TMatrixD jacobianT(3, 3);
+  jacobianT.Transpose(jacobian);
 
   covariance = jacobian * V_p * jacobianT;
 
-  // if ( R < 0. )
+  // if (R < 0.)
   //  std::cout << "R was < 0 but taking abs_val for physical correctness\n";
   R = fabs(R);
 

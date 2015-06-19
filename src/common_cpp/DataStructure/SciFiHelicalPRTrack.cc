@@ -23,8 +23,8 @@
 namespace MAUS {
 
 // Constructors
-SciFiHelicalPRTrack::SciFiHelicalPRTrack() : 
-    SciFiBasePRTrack(),
+SciFiHelicalPRTrack::SciFiHelicalPRTrack()
+  : SciFiBasePRTrack(),
     _tracker(-1),
     _num_points(-1),
     _charge(0),
@@ -90,8 +90,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge
     _pos0(pos0),
     _phi(phi) {
 
-  _chisq = std::sqrt( _circle_chisq*_circle_chisq + _line_sz_chisq*_line_sz_chisq );
-  _chisq_dof = _chisq / ( _num_points - 2 );
+  _chisq = std::sqrt(_circle_chisq*_circle_chisq + _line_sz_chisq*_line_sz_chisq);
+  _chisq_dof = _chisq / (_num_points - 2);
 }
 
 // Destructor
@@ -125,8 +125,8 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   return *this;
 }
 
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk) :
-    SciFiBasePRTrack(htrk),
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
+  : SciFiBasePRTrack(htrk),
     _tracker(htrk.get_tracker()),
     _num_points(htrk.get_num_points()),
     _charge(htrk.get_charge()),
@@ -144,6 +144,4 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk) :
     _pos0(htrk.get_pos0()),
     _phi(htrk.get_phi()) {
 }
-
-
 } // ~namespace MAUS

@@ -108,16 +108,16 @@ class SciFiTrack {
 
   void SetAlgorithmUsed(int algorithm) { _algorithm_used = (AlgorithmUsed) algorithm; }
 
-  void SetSeedPosition( ThreeVector pos ) { this->_seed_position = pos; }
+  void SetSeedPosition(ThreeVector pos) { this->_seed_position = pos; }
 
   ThreeVector GetSeedPosition() const { return _seed_position; }
 
-  void SetSeedMomentum( ThreeVector mom ) { this->_seed_momentum = mom; }
+  void SetSeedMomentum(ThreeVector mom) { this->_seed_momentum = mom; }
 
   ThreeVector GetSeedMomentum() const { return _seed_momentum; }
 
-  void SetSeedCovariance( std::vector<double> seed ) { this->_seed_covariance_matrix = seed; }
-  void SetSeedCovariance( double* cov, unsigned int size );
+  void SetSeedCovariance(std::vector<double> seed) { this->_seed_covariance_matrix = seed; }
+  void SetSeedCovariance(double* cov, unsigned int size);
 
   std::vector<double> GetSeedCovariance() const { return _seed_covariance_matrix; }
 

@@ -17,8 +17,9 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
-#include "src/common_cpp/Utils/Exception.hh"
 #include <iostream>
+
+#include "src/common_cpp/Utils/Exception.hh"
 
 namespace MAUS {
 namespace Kalman {
@@ -42,7 +43,9 @@ namespace Kalman {
     _vector(vec),
     _covariance(cov),
     _has_value(true) {
-      if ( (_vector.GetNcols() != 1) || (_covariance.GetNrows() != (int)_dimension) || (_covariance.GetNcols() != (int)_dimension) ) {
+      if ((_vector.GetNcols() != 1) ||
+          (_covariance.GetNrows() != static_cast<int>(_dimension)) ||
+          (_covariance.GetNcols() != static_cast<int>(_dimension))) {
         throw Exception(Exception::nonRecoverable,
             "Vector and covariance matrix have inconsistent dimensions",
             "Kalman::State::State()");
@@ -87,7 +90,7 @@ namespace Kalman {
   }
 
   void State::SetVector(TMatrixD vec) {
-    if ( (vec.GetNrows() != (int)_dimension) || (vec.GetNcols() != 1) ) {
+    if ((vec.GetNrows() != static_cast<int>(_dimension)) || (vec.GetNcols() != 1)) {
       throw Exception(Exception::nonRecoverable,
           "State vector has wrong dimensions",
           "Kalman::State::SetVector()");
@@ -97,7 +100,8 @@ namespace Kalman {
   }
 
   void State::SetCovariance(TMatrixD cov) {
-    if ( (cov.GetNrows() != (int)_dimension) || (cov.GetNcols() != (int)_dimension) ) {
+    if ((cov.GetNrows() != static_cast<int>(_dimension)) ||
+        (cov.GetNcols() != static_cast<int>(_dimension))) {
       throw Exception(Exception::nonRecoverable,
           "Covariance matrix has wrong dimensions",
           "Kalman::State::SetCovariance()");
@@ -112,7 +116,7 @@ namespace Kalman {
 
   Track::Track(unsigned int dim, unsigned int length) :
     _dimension(dim) {
-    for ( unsigned int i = 0; i < length; ++i ) {
+    for (unsigned int i = 0; i < length; ++i) {
       _track_vector.push_back(State(_dimension));
     }
   }
@@ -153,14 +157,12 @@ namespace Kalman {
   void Track::Reset(const Track& similar_track) {
     _track_vector.clear();
 
-    for (unsigned int i = 0; i < similar_track.GetLength(); ++i ) {
+    for (unsigned int i = 0; i < similar_track.GetLength(); ++i) {
       State new_state(_dimension, similar_track[i].GetPosition());
       new_state.SetId(similar_track[i].GetId());
-
       _track_vector.push_back(new_state);
     }
   }
-
 }
 } // namespace MAUS
 
