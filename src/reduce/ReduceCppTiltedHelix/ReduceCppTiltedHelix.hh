@@ -50,6 +50,8 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     void do_fit_minuit(size_t tracker, std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station);
 
+    void fill_residuals_minuit(size_t tracker, std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station);
+
     std::vector<double> calculate_residual(size_t i, SciFiSpacePoint* space_point, SciFiHelicalPRTrack* pr_track);
 
     ImageData* get_image_data();
@@ -61,7 +63,8 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
     static TMinuit* minimiser;
     static const size_t n_stations;
     static const size_t n_trackers;
-
+    static const double residuals_cut;
+    static const size_t error_level;
     friend void reduce_cpp_tilted_helix_minuit_function(int& n_pars, double* pars, double& score, double* buff, int err);
 };
 
