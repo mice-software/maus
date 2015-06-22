@@ -69,6 +69,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
       if ( event->clusters().size() ) {
         spacepoint_recon(*event);
       }
+      std::cerr << "DEBUG: MapCppTrackerRecon: Spacepoints found: " << event->spacepoints().size() << "\n";
       // Pattern Recognition.
       if ( event->spacepoints().size() ) {
         pattern_recognition(*event);
@@ -103,6 +104,7 @@ void MapCppTrackerRecon::pattern_recognition(SciFiEvent &evt) const {
   // testing purposes.
   pr1.set_helical_pr_on(_helical_pr_on);
   pr1.set_straight_pr_on(_straight_pr_on);
+  pr1.set_verbosity(1);
   pr1.process(evt);
 }
 

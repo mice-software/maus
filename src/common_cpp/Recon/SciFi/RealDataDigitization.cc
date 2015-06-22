@@ -66,36 +66,23 @@ void RealDataDigitization::process(Spill *spill) {
   Tracker0DaqArray tracker0 = spill->GetDAQData()->GetTracker0DaqArray();
   Tracker1DaqArray tracker1 = spill->GetDAQData()->GetTracker1DaqArray();
 
+  if (!spill->GetReconEvents()) spill->SetReconEvents(new std::vector<ReconEvent*>());
+  std::vector<ReconEvent*>* revts = spill->GetReconEvents();
+
   // Process the VLSB data to produce SciFiDigits
-  std::vector<SciFiDigit*> digits;
   for (size_t i = 0; i < tracker0.size(); ++i) {
-    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
-    digits.insert(digits.end(), new_digits.begin(), new_digits.end());
+    if (!revts->at(i)) revts->push_back(new ReconEvent());
+    if (!revts->at(i)->GetSciFiEvent()) revts->at(i)->SetSciFiEvent(new SciFiEvent());
+    std::vector<SciFiDigit*> digits = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
+    revts->at(i)->GetSciFiEvent()->set_digits(digits);
+    // digits.insert(digits.end(), new_digits.begin(), new_digits.end());
   }
   for (size_t i = 0; i < tracker1.size(); ++i) {
-    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
-    digits.insert(digits.end(), new_digits.begin(), new_digits.end());
+    if (!revts->at(i)) revts->push_back(new ReconEvent());
+    if (!revts->at(i)->GetSciFiEvent()) revts->at(i)->SetSciFiEvent(new SciFiEvent());
+    std::vector<SciFiDigit*> digits = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
+    revts->at(i)->GetSciFiEvent()->set_digits(digits);
   }
-
-  // Create a SciFiEvent and add the digits
-  SciFiEvent* sfevt = new SciFiEvent();
-  sfevt->set_digits(digits);
-
-  // Add the SciFiEvent to the latest recon event in the spill
-  // Check recon event array in spill is initialised, if not do so
-  if (!spill->GetReconEvents()) spill->SetReconEvents(new std::vector<ReconEvent*>());
-  // If the recon array is empty, push back a new recon event with into the array,
-  // otherwise just pull out the last recon event
-  ReconEvent* revt;
-  if (spill->GetReconEvents()->size() == 0) {
-      revt = new ReconEvent();
-      spill->GetReconEvents()->push_back(revt);
-  } else {
-    revt = spill->GetReconEvents()->back();
-  }
-
-  // Associate the scifi event created with the recon event
-  revt->SetSciFiEvent(sfevt);
 }
 
 std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, TrackerDaq* td) {

@@ -128,16 +128,16 @@ void PatternRecognition::process(SciFiEvent &evt) {
 
   if ( evt.spacepoints().size() > 0 ) {
     if ( _verb > 0 )
-      std::cout << "Number of spoints in event: " << evt.spacepoints().size() << std::endl;
+      std::cerr << "Number of spoints in event: " << evt.spacepoints().size() << std::endl;
 
     // Some setup
     evt.set_spacepoints_used_flag(false);
     SpacePoint2dPArray spnts_by_tracker(_n_trackers);
     spnts_by_tracker = SciFiTools::sort_by_tracker(evt.spacepoints());
     if (_verb > 0) {
-      std::cout << "Number of spoints in event in T1: " << spnts_by_tracker[0].size() << std::endl;
+      std::cerr << "Number of spoints in event in T1: " << spnts_by_tracker[0].size() << std::endl;
       SciFiTools::print_spacepoint_xyz(spnts_by_tracker[0]);
-      std::cout << "Number of spoints in event in T2: " << spnts_by_tracker[1].size() << std::endl;
+      std::cerr << "Number of spoints in event in T2: " << spnts_by_tracker[1].size() << std::endl;
       SciFiTools::print_spacepoint_xyz(spnts_by_tracker[1]);
     }
 
@@ -207,7 +207,7 @@ void PatternRecognition::make_5tracks(const bool track_type, const int trker_no,
                                       SpacePoint2dPArray &spnts_by_station,
                                       std::vector<SciFiStraightPRTrack*> &strks,
                                       std::vector<SciFiHelicalPRTrack*> &htrks) {
-  if ( _verb > 0 ) std::cout << "Making 5 point tracks" << std::endl;
+  if ( _verb > 0 ) std::cerr << "Making 5 point tracks" << std::endl;
   int n_points = 5;
   std::vector<int> ignore_stations; // A zero size vector sets that all stations are to be used
   if ( track_type == 0 )
@@ -216,7 +216,7 @@ void PatternRecognition::make_5tracks(const bool track_type, const int trker_no,
     std::vector<SciFiSpacePoint*> current_spnts;
     make_helix(n_points, 0, ignore_stations, current_spnts, spnts_by_station, htrks);
   }
-  if ( _verb > 0 ) std::cout << "Finished making 5 pt tracks" << std::endl;
+  if ( _verb > 0 ) std::cerr << "Finished making 5 pt tracks" << std::endl;
 } // ~make_spr_5pt(...)
 
 void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
@@ -231,7 +231,7 @@ void PatternRecognition::make_4tracks(const bool track_type, const int trker_no,
   // Call make_tracks with parameters depending on how many stations have unused spacepoints
   if ( num_stations_hit == 5 ) {
 
-    if ( _verb > 0 ) std::cout << "Making 4 point track: 5 stations with unused spacepoints\n";
+    if ( _verb > 0 ) std::cerr << "Making 4 point track: 5 stations with unused spacepoints\n";
 
     for (int i = 0; i < 5; ++i) { // Loop of stations, ignoring each one in turn
       // Recount how many stations have at least one unused spacepoint
@@ -370,6 +370,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
                                      const std::vector<int> ignore_stations,
                                      SpacePoint2dPArray &spnts_by_station,
                                      std::vector<SciFiStraightPRTrack*> &strks) {
+  std::cerr << "DEBUG: PatternRecognition: Searching for straight tracks\n";
   // Set inner and outer stations
   int o_st_num = -1, i_st_num = -1;
   set_end_stations(ignore_stations, o_st_num, i_st_num);
@@ -381,6 +382,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
   }
 
   // Loop over spacepoints in outer station
+  std::cerr << "DEBUG: PatternRecognition: Spoints in outer station: " << spnts_by_station[o_st_num].size() << "\n";
   for ( size_t outer_sp = 0; outer_sp < spnts_by_station[o_st_num].size(); ++outer_sp ) {
 
     // Check the outer spacepoint is unused and enough stations are left with unused sp
@@ -443,6 +445,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
       // Check we have at least 1 good spacepoint in each of the intermediate stations
       if ( static_cast<int>(good_spnts.size()) > (n_points - 3) ) {
+        std::cerr << "DEBUG: PatternRecognition: Found trial track\n";
 
         good_spnts.insert(good_spnts.begin(), spnts_by_station[i_st_num][inner_sp]);
         good_spnts.push_back(spnts_by_station[o_st_num][outer_sp]);
@@ -464,6 +467,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
         }
 
         // Fit track
+        std::cerr << "DEBUG: PatternRecognition: Spoints attemting straight track LSQ fit\n";
         SimpleLine line_x, line_y;
         LeastSquaresFitter::linear_fit(z, x, x_err, line_x);
         LeastSquaresFitter::linear_fit(z, y, y_err, line_y);
@@ -495,7 +499,9 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
             std::cout << "chisq test failed, " << n_points << "pt track rejected\n";
           }
         } // ~Check track passes chisq test
-      } // ~ if ( good_spnts.size() > 1 )
+      } else {
+        std::cerr << "DEBUG: PatternRecognition: No good trial track found\n";
+      }// ~ if ( good_spnts.size() > 1 )
     } // ~Loop over sp in station 1
   } // ~Loop over sp in station 5
 } // ~make_straight_tracks(...)
