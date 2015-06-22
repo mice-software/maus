@@ -68,20 +68,27 @@ void RealDataDigitization::process(Spill *spill) {
 
   if (!spill->GetReconEvents()) spill->SetReconEvents(new std::vector<ReconEvent*>());
   std::vector<ReconEvent*>* revts = spill->GetReconEvents();
+  std::cerr << "DEBUG:: RealDataDigitization: ReconEvents size at start: " << revts->size() << "\n";
+  std::cerr << "DEBUG:: RealDataDigitization: Tracker0DaqArray size at start: " << tracker0.size() << "\n";
+  std::cerr << "DEBUG:: RealDataDigitization: Tracker1DaqArray size at start: " << tracker1.size() << "\n";
+
+  if ( (tracker0.size() != revts->size()) || (tracker1.size() != revts->size()) ) {
+    std::cerr << "WARNING: Tracker RealDataDigitization: "
+              << "DAQ data size does not match Recon data size, aborting\n";
+    return;
+  }
 
   // Process the VLSB data to produce SciFiDigits
   for (size_t i = 0; i < tracker0.size(); ++i) {
-    if (!revts->at(i)) revts->push_back(new ReconEvent());
-    if (!revts->at(i)->GetSciFiEvent()) revts->at(i)->SetSciFiEvent(new SciFiEvent());
-    std::vector<SciFiDigit*> digits = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
-    revts->at(i)->GetSciFiEvent()->set_digits(digits);
+    if (!revts->at(i)->GetSciFiEvent()) {
+      revts->at(i)->SetSciFiEvent(new SciFiEvent());
+      std::cerr << "DEBUG: RealDataDigitization: Creating SciFi Event\n";
+    }
+    std::vector<SciFiDigit*> digits0 = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
+    std::vector<SciFiDigit*> digits1 = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
+    digits0.insert(digits0.end(), digits1.begin(), digits1.end());
+    revts->at(i)->GetSciFiEvent()->set_digits(digits0);
     // digits.insert(digits.end(), new_digits.begin(), new_digits.end());
-  }
-  for (size_t i = 0; i < tracker1.size(); ++i) {
-    if (!revts->at(i)) revts->push_back(new ReconEvent());
-    if (!revts->at(i)->GetSciFiEvent()) revts->at(i)->SetSciFiEvent(new SciFiEvent());
-    std::vector<SciFiDigit*> digits = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
-    revts->at(i)->GetSciFiEvent()->set_digits(digits);
   }
 }
 
@@ -150,6 +157,7 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
       SciFiDigit *digit = new SciFiDigit(SpillNum, vlsb1.GetPartEventNumber(),
                                          tracker, station, plane, channel, pe, time);
       digits.push_back(digit);
+      std::cerr << "DEBUG:: RealDataDigitization: Found digit with event number: " << vlsb1.GetPartEventNumber() << "\n";
     }
   }  // ends loop over channels
   return digits;
