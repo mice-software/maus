@@ -36,6 +36,7 @@ class SciFiStraightPRTrackProcessor : public ObjectProcessor<SciFiStraightPRTrac
 
  private:
     IntProcessor _int_proc;
+    ThreeVectorProcessor _threevector_proc;
     DoubleProcessor _double_proc;
     TRefArrayProcessor _spoint_tref_proc;
 };
