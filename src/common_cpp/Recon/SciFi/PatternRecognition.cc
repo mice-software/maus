@@ -370,7 +370,6 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
                                      const std::vector<int> ignore_stations,
                                      SpacePoint2dPArray &spnts_by_station,
                                      std::vector<SciFiStraightPRTrack*> &strks) {
-  std::cerr << "DEBUG: PatternRecognition: Searching for straight tracks\n";
   // Set inner and outer stations
   int o_st_num = -1, i_st_num = -1;
   set_end_stations(ignore_stations, o_st_num, i_st_num);
@@ -382,7 +381,6 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
   }
 
   // Loop over spacepoints in outer station
-  std::cerr << "DEBUG: PatternRecognition: Spoints in outer station: " << spnts_by_station[o_st_num].size() << "\n";
   for ( size_t outer_sp = 0; outer_sp < spnts_by_station[o_st_num].size(); ++outer_sp ) {
 
     // Check the outer spacepoint is unused and enough stations are left with unused sp
@@ -445,8 +443,6 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
       // Check we have at least 1 good spacepoint in each of the intermediate stations
       if ( static_cast<int>(good_spnts.size()) > (n_points - 3) ) {
-        std::cerr << "DEBUG: PatternRecognition: Found trial track\n";
-
         good_spnts.insert(good_spnts.begin(), spnts_by_station[i_st_num][inner_sp]);
         good_spnts.push_back(spnts_by_station[o_st_num][outer_sp]);
         std::vector<double> x, x_err, y, y_err, z;
@@ -467,7 +463,6 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
         }
 
         // Fit track
-        std::cerr << "DEBUG: PatternRecognition: Spoints attemting straight track LSQ fit\n";
         SimpleLine line_x, line_y;
         LeastSquaresFitter::linear_fit(z, x, x_err, line_x);
         LeastSquaresFitter::linear_fit(z, y, y_err, line_y);
@@ -500,7 +495,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
           }
         } // ~Check track passes chisq test
       } else {
-        std::cerr << "DEBUG: PatternRecognition: No good trial track found\n";
+        // std::cerr << "DEBUG: PatternRecognition: No good trial track found\n";
       }// ~ if ( good_spnts.size() > 1 )
     } // ~Loop over sp in station 1
   } // ~Loop over sp in station 5

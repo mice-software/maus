@@ -49,9 +49,9 @@ void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
   double npe_cut = (*json)["SciFiDigitizationNPECut"].asDouble();
   std::string map_file = (*json)["SciFiMappingFileName"].asString();
   std::string calib_file = (*json)["SciFiCalibrationFileName"].asString();
-  std::cerr << "INFO: MapCppTrackerDigits: Map file: " << map_file
-            << ". Calib file: " << calib_file << ". NPE cut: " << npe_cut
-            << "\n";
+  // std::cout << "INFO: MapCppTrackerDigits: Map file: " << map_file
+  //          << ". Calib file: " << calib_file << ". NPE cut: " << npe_cut
+  //          << "\n";
   real = new RealDataDigitization();
   real->initialise(npe_cut, map_file.c_str(), calib_file.c_str());
 }

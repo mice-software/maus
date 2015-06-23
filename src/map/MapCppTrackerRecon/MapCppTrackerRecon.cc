@@ -69,7 +69,6 @@ void MapCppTrackerRecon::_process(Data* data) const {
       if ( event->clusters().size() ) {
         spacepoint_recon(*event);
       }
-      std::cerr << "DEBUG: MapCppTrackerRecon: Spacepoints found: " << event->spacepoints().size() << "\n";
       // Pattern Recognition.
       if ( event->spacepoints().size() ) {
         pattern_recognition(*event);
