@@ -421,7 +421,7 @@ class Downloader: #pylint: disable = R0902
                                coolingchannel_cdb.get_coolingchannel_for_tag(tag)
                     path = downloadpath + '/CoolingChannelInfo.gdml'
                     downloadedfile = \
-                                   self.generate_coolingchannel_xml_from_string(downloaded[tag])
+                                   self.generate_coolingchannel_xml_from_string(downloaded)
                     fout = open(path, 'w')
                     fout.write(str(downloadedfile))
                     fout.close()

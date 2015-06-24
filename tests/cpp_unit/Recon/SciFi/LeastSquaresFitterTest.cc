@@ -17,6 +17,8 @@
 
 #include "gtest/gtest.h"
 
+#include "TMatrixD.h"
+
 #include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -65,7 +67,8 @@ TEST_F(LeastSquaresFitterTest, test_circle_fit) {
   spnts.push_back(sp4);
 
   SimpleCircle circle;
-  bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle);
+  TMatrixD cov;
+  bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle, cov);
 
   double epsilon = 0.01;
 
@@ -91,7 +94,8 @@ TEST_F(LeastSquaresFitterTest, test_linear_fit) {
   y_err.push_back(0.05);
 
   SimpleLine line;
-  LeastSquaresFitter::linear_fit(x, y, y_err, line);
+  TMatrixD cov;
+  LeastSquaresFitter::linear_fit(x, y, y_err, line, cov);
 
   double epsilon = 0.00001;
 

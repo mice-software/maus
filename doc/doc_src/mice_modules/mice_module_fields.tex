@@ -128,11 +128,19 @@ double\\\hline
 double\\\hline
 {\itshape InnerRadius} &
 double\\\hline
-{\itshape CurrentDensity} &
-double\\\hline
 \end{tabular}\hspace*{-\tabcolsep}
 } &
-Coil physical parameters. Only used in Write/Analytic mode where they are mandatory.\\\hhline{~~-}
+Coil physical parameters. Only used in Write/Analytic mode where they are mandatory. \\\hhline{~~-}
+CurrentDensity &
+double &
+The current density of the solenoid, in $A/mm^2$. \\\hline
+Current &
+double &
+The current in the solenoid coil; the CurrentDensity is calculated from current $I$, number of turns $n$, length $l$ 
+and thickness $t$ using $J = nI/(lt)$. If CurrentDensity is also defined, it overrides any Current setting.  \\\hline
+NumberOfTurns &
+int &
+The total number of turns in the coil (see Current for more information). \\\hline
 ZExtentFactor &
 double &
 Field map extends to length + ZExtentFactor*innerRadius in Write mode. Takes default from datacard SolzMapExtendFactor

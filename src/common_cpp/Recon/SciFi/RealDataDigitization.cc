@@ -26,16 +26,27 @@
 
 namespace MAUS {
 
-RealDataDigitization::RealDataDigitization() {}
+#define MIN_ADC 0.000000001
 
-RealDataDigitization::~RealDataDigitization() {}
+RealDataDigitization::RealDataDigitization() : _npe_cut(0.0) {
+  // Do nothing
+}
 
-void RealDataDigitization::initialise() {
+RealDataDigitization::~RealDataDigitization() {
+  // Do nothing
+}
+
+void RealDataDigitization::initialise(double npe_cut,
+                                      const std::string& map_file,
+                                      const std::string& calib_file) {
   // -------------------------------------------------
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface.
-  bool map = load_mapping("mapping_7.txt");
-  bool calib = load_calibration("scifi_calibration_jan2013.txt");
+  _npe_cut = npe_cut;
+  // bool map = load_mapping("scifi_mapping_2015-06-16.txt");
+  // bool calib = load_calibration("scifi_calibration_2015-06-16.txt";
+  bool map = load_mapping(map_file.c_str());
+  bool calib = load_calibration(calib_file.c_str());
   bool bad_channels = load_bad_channels();
   if ( !calib || !map || !bad_channels ) {
     throw(Exception(Exception::recoverable,
@@ -47,7 +58,7 @@ void RealDataDigitization::initialise() {
 void RealDataDigitization::process(Spill *spill) {
   // Check for DAQData
   if ( spill->GetDAQData() == NULL ) {
-    std::cerr << "RealDataDigitization::process No DAQ data found, aborting" << std::endl;
+    // std::cerr << "RealDataDigitization::process No DAQ data found, aborting" << std::endl;
     return;
   }
 
@@ -55,44 +66,33 @@ void RealDataDigitization::process(Spill *spill) {
   Tracker0DaqArray tracker0 = spill->GetDAQData()->GetTracker0DaqArray();
   Tracker1DaqArray tracker1 = spill->GetDAQData()->GetTracker1DaqArray();
 
-  // Process the VLSB data to produce SciFiDigits
-  std::vector<SciFiDigit*> digits;
-  for (size_t i = 0; i < tracker0.size(); ++i) {
-    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
-    digits.insert(digits.end(), new_digits.begin(), new_digits.end());
-  }
-  for (size_t i = 0; i < tracker1.size(); ++i) {
-    std::vector<SciFiDigit*> new_digits = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
-    digits.insert(digits.end(), new_digits.begin(), new_digits.end());
-  }
-
-  // Create a SciFiEvent and add the digits
-  SciFiEvent* sfevt = new SciFiEvent();
-  sfevt->set_digits(digits);
-
-  // Add the SciFiEvent to the latest recon event in the spill
-  // Check recon event array in spill is initialised, if not do so
   if (!spill->GetReconEvents()) spill->SetReconEvents(new std::vector<ReconEvent*>());
-  // If the recon array is empty, push back a new recon event with into the array,
-  // otherwise just pull out the last recon event
-  ReconEvent* revt;
-  if (spill->GetReconEvents()->size() == 0) {
-      revt = new ReconEvent();
-      spill->GetReconEvents()->push_back(revt);
-  } else {
-    revt = spill->GetReconEvents()->back();
+  std::vector<ReconEvent*>* revts = spill->GetReconEvents();
+
+  if ( (tracker0.size() != revts->size()) || (tracker1.size() != revts->size()) ) {
+    std::cout << "WARNING: Tracker RealDataDigitization: "
+              << "DAQ data size does not match Recon data size, aborting\n";
+    return;
   }
 
-  // Associate the scifi event created with the recon event
-  revt->SetSciFiEvent(sfevt);
+  // Process the VLSB data to produce SciFiDigits
+  for (size_t i = 0; i < tracker0.size(); ++i) {
+    if (!revts->at(i)->GetSciFiEvent()) revts->at(i)->SetSciFiEvent(new SciFiEvent());
+    std::vector<SciFiDigit*> digits0 = process_VLSB(spill->GetSpillNumber(), tracker0[i]);
+    std::vector<SciFiDigit*> digits1 = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
+    digits0.insert(digits0.end(), digits1.begin(), digits1.end());
+    revts->at(i)->GetSciFiEvent()->set_digits(digits0);
+    // digits.insert(digits.end(), new_digits.begin(), new_digits.end());
+  }
 }
 
 std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, TrackerDaq* td) {
   std::vector<SciFiDigit*> digits;
 
   // Loop over the VLSB channels of this event.
-  for ( unsigned int i = 0; i < td->GetVLSBArray().size(); ++i ) {
-    VLSB vlsb1 = td->GetVLSBArray()[i];
+  unsigned int xVLSBArraySize = td->GetVLSBArraySize();
+  for ( unsigned int i = 0; i < xVLSBArraySize; ++i ) {
+    VLSB vlsb1 = td->GetVLSBArrayElement(i);
 
 
 //    if ( bank < 32 ) {
@@ -117,7 +117,7 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
 
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _min && adc_gain > _min ) {
+    if ( adc_pedestal > MIN_ADC && adc_gain > MIN_ADC ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;
@@ -147,7 +147,7 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
                                       tracker, station, plane, channel,
                                       extWG, inWG, WGfib);
      // Exclude missing modules.
-    if ( found ) { // pe > 1.0 &&
+    if ( found && (pe > _npe_cut ) ) {
       SciFiDigit *digit = new SciFiDigit(SpillNum, vlsb1.GetPartEventNumber(),
                                          tracker, station, plane, channel, pe, time);
       digits.push_back(digit);
@@ -211,7 +211,7 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     double tdc_gain     = _calibration[new_bank][channel_ro]["tdc_gain"].asDouble();
     // Calculate the number of photoelectrons.
     double pe;
-    if ( adc_pedestal > _min && adc_gain > _min ) {
+    if ( adc_pedestal > MIN_ADC && adc_gain > MIN_ADC ) {
       pe = (adc-adc_pedestal)/adc_gain;
     } else {
       pe = -10.0;

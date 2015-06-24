@@ -124,6 +124,8 @@ if [ "$MAUS_THIRD_PARTY" ]; then
     else
         ./third_party/bash/45beamline_fieldmaps.bash 2>&1 | tee -a $FILE_STD
     fi
+    # Check new ROOT version alone is used
+    source ${MAUS_THIRD_PARTY}/third_party/build/root/bin/thisroot.sh
 else
     if [ $MAUS_BUILD_VERBOSITY -eq 0 ]; then
         ./configure -u $MAUS_UNPACKER_VERSION 2>>$FILE_STD 1>>$FILE_STD
@@ -140,11 +142,16 @@ else
     fi
     echo "Resource the environment (catches the new ROOT version)"
     source env.sh 2>>$FILE_STD 1>>$FILE_STD
-        #./third_party/bash third_party/bash/29expat.bash
-        #./third_party/bash third_party/bash/32clhep2.1.1.0.bash
-        #./third_party/bash third_party/bash/35geant4.9.6.bash
-        # source env_geant4.9.6.p02.sh 2>>$FILE_STD 1>>$FILE_STD
+    # Check new ROOT version alone is used
+    source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
 fi
+
+if [ -z "$MAUS_THIRD_PARTY" ]; then
+    export MAUS_THIRD_PARTY=$MAUS_ROOT_DIR
+fi
+
+# Check new ROOT version alone is used
+source ${MAUS_THIRD_PARTY}/third_party/build/root/bin/thisroot.sh
 
 echo "Cleaning the MAUS build state"
 if [ $MAUS_BUILD_VERBOSITY -eq 0 ]; then

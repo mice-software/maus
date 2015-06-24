@@ -45,6 +45,14 @@ SciFiStraightPRTrackProcessor::SciFiStraightPRTrackProcessor() {
     RegisterValueBranch("y_chisq", &_double_proc,
                         &SciFiStraightPRTrack::get_y_chisq,
                         &SciFiStraightPRTrack::set_y_chisq, true);
+    RegisterValueBranch<ThreeVector>("reference_position",
+                        &_threevector_proc,
+                        &SciFiStraightPRTrack::get_reference_position,
+                        &SciFiStraightPRTrack::set_reference_position, true);
+    RegisterValueBranch<ThreeVector>("reference_momentum",
+                        &_threevector_proc,
+                        &SciFiStraightPRTrack::get_reference_momentum,
+                        &SciFiStraightPRTrack::set_reference_momentum, true);
 
     RegisterTRefArray("spacepoints", &_spoint_tref_proc,
                         &SciFiStraightPRTrack::get_spacepoints,

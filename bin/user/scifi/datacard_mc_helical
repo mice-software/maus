@@ -46,7 +46,7 @@ spill_generator_number_of_spills = 100
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":13, "energy":200.0, "time":0.0, "random_seed":10
+    "particle_id":-13, "energy":200.0, "time":0.0, "random_seed":10
 }
 # This is a sample beam disto based on guesses by C. Rogers of what an optimised beam might be like
 beam = {
