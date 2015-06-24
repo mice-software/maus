@@ -40,7 +40,8 @@ def run():
 
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), MAUS.OutputCppRoot())
+    #MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), MAUS.OutputCppRoot())
+    MAUS.Go(my_input, my_map, MAUS.ReducePySciFiPlot(), MAUS.OutputPyImage())
 
 if __name__ == '__main__':
     run()
