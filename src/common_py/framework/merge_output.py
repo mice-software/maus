@@ -225,7 +225,6 @@ class MergeOutputExecutor: # pylint: disable=R0903, R0902
             spill_run_number = DataflowUtilities.get_run_number(spill_doc)
             if (DataflowUtilities.is_end_of_run(spill_doc)):
                 self.end_of_run_spill = spill_doc
-            print self.run_number, spill_run_number
             if (spill_run_number != self.run_number):
                 if (self.run_number != None):
                     # Death workers only if birthed.
