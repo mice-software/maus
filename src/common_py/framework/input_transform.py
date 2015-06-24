@@ -312,7 +312,8 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
         event_json = maus_cpp.converter.json_repr(event)
         if DataflowUtilities.get_event_type(event_json) == "Spill":
             current_run_number = DataflowUtilities.get_run_number(event_json)
-            if current_run_number != self.run_number:
+            if "bad_data_input" not in event_json["errors"]\
+               and current_run_number != self.run_number:
                 if self.run_number != "first":
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
