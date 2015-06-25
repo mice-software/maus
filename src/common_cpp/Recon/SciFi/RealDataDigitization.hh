@@ -35,6 +35,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
@@ -53,6 +54,22 @@
 #include "src/common_cpp/DataStructure/Spill.hh"
 
 namespace MAUS {
+
+struct ChanMap {
+  int UId;
+  int tracker;
+  int station;
+  int plane;
+  int channel;
+  int board;
+  int bank;
+  int chan_ro;
+  int extWG;
+  int inWG;
+  int WGfib;
+};
+
+typedef std::map<int, ChanMap> ChanMapLookup;
 
 class RealDataDigitization {
  public:
@@ -94,6 +111,10 @@ class RealDataDigitization {
    */
   bool load_calibration(std::string filename);
 
+  /** @brief Make a unique channel number across all banks and boards.
+   */
+  int calc_uid(int chan_ro, int bank, int board) const;
+
   /** @brief Loads the mapping.
    */
   bool load_mapping(std::string file);
@@ -102,7 +123,7 @@ class RealDataDigitization {
    */
   bool get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
                             int &tracker, int &station, int &plane, int &channel,
-                            int &extWG, int &inWG, int &WGfib) const;
+                            int &extWG, int &inWG, int &WGfib);
 
   /** @brief Reads the bad channel list from file.
    */
@@ -117,6 +138,8 @@ class RealDataDigitization {
   static const int _number_banks          = 64;
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
+  static const int _banks_per_board       = 4;
+  static const int _n_map_entries         = 8320;
   double _npe_cut;
 //   static const double _min       = 0.000000001;
 
@@ -126,16 +149,7 @@ class RealDataDigitization {
   bool _good_chan[_number_banks][_number_channels];
 
   /// This is for the mapping storage.
-  IntChannelArray _board;
-  IntChannelArray _bank;
-  IntChannelArray _chan_ro;
-  IntChannelArray _tracker;
-  IntChannelArray _station;
-  IntChannelArray _view;
-  IntChannelArray _fibre;
-  IntChannelArray _extWG;
-  IntChannelArray _inWG;
-  IntChannelArray _WGfib;
+  ChanMapLookup _chan_map;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

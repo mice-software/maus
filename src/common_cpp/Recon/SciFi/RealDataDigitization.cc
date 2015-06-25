@@ -281,6 +281,10 @@ bool RealDataDigitization::load_calibration(std::string file) {
   return true;
 }
 
+int RealDataDigitization::calc_uid(int chan_ro, int bank, int board) const {
+  return (chan_ro + (bank*_number_channels) + (board*_banks_per_board*_number_channels));
+}
+
 bool RealDataDigitization::load_mapping(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
@@ -293,48 +297,49 @@ bool RealDataDigitization::load_mapping(std::string file) {
   }
 
   std::string line;
-  for ( int i = 1; i < _total_number_channels; ++i ) {
-    getline(inf, line);
+  // for ( int i = 1; i < _total_number_channels; ++i ) {
+    // getline(inf, line);
+  while ( getline(inf, line) ) {
     std::istringstream ist1(line.c_str());
-
-    int board, bank, chan_ro, tracker, station, view, fibre, extWG, inWG, WGfib;
-    ist1 >> board >> bank >> chan_ro >> tracker >> station >>
-            view >> fibre >> extWG >> inWG >> WGfib;
-
-    _board.push_back(board);
-    _bank.push_back(bank);
-    _chan_ro.push_back(chan_ro);
-    _tracker.push_back(tracker);
-    _station.push_back(station);
-    _view.push_back(view);
-    _fibre.push_back(fibre);
-    _extWG.push_back(extWG);
-    _inWG.push_back(inWG);
-    _WGfib.push_back(WGfib);
+    ChanMap cmap;
+    ist1 >> cmap.board >> cmap.bank >> cmap.chan_ro >> cmap.tracker >> cmap.station
+         >> cmap.plane >> cmap.channel >> cmap.extWG >> cmap.inWG >> cmap.WGfib;
+    int UId = calc_uid(cmap.chan_ro, cmap.bank, cmap.board);
+    if (_chan_map.count(UId) != 0) {
+      // std::cerr << "WARNING: UId " << UId << " not unique! ";
+      // std::cerr << "chan_ro: " << cmap.chan_ro << ", bank: " << cmap.bank
+      //          << ", board: " << cmap.board << "\n";
+    }
+    _chan_map[UId] = cmap;
   }
   return true;
 }
 
 bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
                            int& tracker, int& station, int& plane, int& channel,
-                           int &extWG, int &inWG, int &WGfib) const {
+                           int &extWG, int &inWG, int &WGfib) {
   bool found = false;
   tracker = station = plane = channel = -1;
+  int UId = calc_uid(chan_ro, bank, board);
 
-  for ( size_t i = 0; !found && i < _board.size(); ++i ) {
-    if ( (board == _board[i]) && (bank == _bank[i]) && (chan_ro == _chan_ro[i]) ) {
-      station = _station[i];
-      plane = _view[i];
-      channel = _fibre[i];
-      tracker = _tracker[i];
-      extWG   = _extWG[i];
-      inWG    = _inWG[i];
-      WGfib   = _WGfib[i];
-      found = true;
-    }
+  if (_chan_map.count(UId) != 1) {
+      // std::cerr << "WARNING: UId " << UId << " not present! ";
+      // std::cerr << "chan_ro: " << chan_ro << ", bank: " << bank << ", board: " <<  board << "\n";
+      return false;
   }
+
+  tracker = _chan_map[UId].tracker;
+  station = _chan_map[UId].station;
+  plane = _chan_map[UId].plane;
+  channel = _chan_map[UId].channel;
+  extWG   = _chan_map[UId].extWG;
+  inWG    = _chan_map[UId].inWG;
+  WGfib   = _chan_map[UId].WGfib;
+  found = true;
+
   return found;
 }
+
 
 bool RealDataDigitization::is_good_channel(const int bank,
                                            const int chan_ro) const {
