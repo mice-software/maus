@@ -6,11 +6,11 @@ which are based on the latest surveys and technical drawings
 available. The CAD drawings are translated to a geometry specific
 subset of XML, the Geometry Description Markup Language (GDML) prior
 to being recorded in the configuration database. Translation of the CAD
-drawings is accomplished through the use of a commercial software
-package known as Fast-RAD. In principle this may be done using a
+drawings was accomplished through the use of a commercial software
+package known as Fast-RAD. This can be done using a
 combination of the open source software packages FreeCAD and
-CADMesh to translate the CAD drawings into a GEANT4 readable format,
-but such an avenue has not yet been fully explored. 
+CADMesh to translate the CAD drawings into a GEANT4 readable format;
+generation of an open source solution for MAUS is in progress.
 
 The CAD drawings contain the beam-line elements and the positions of
 the detector survey points. These objects are described in the GDML
@@ -40,11 +40,11 @@ files.
 The following section shall describe how to use the available
 executable to access and use these models.
 
-\section{Geometry Download}
+\section{Geometry Access Scripts}
 
 There are three executable files available to users which reside in
 the directory /bin/utilities found within your copy of MAUS. The three
-files of interest are upload\_geometry.py, download\_fit\_geometry.py
+files of interest are upload\_geometry.py, download\_geometry.py
 and get\_geometry\_ids.py. These files do the following.
 
 \begin{description}
@@ -72,17 +72,6 @@ only the zip file.
 the current, time specified or run number zipped geometry to a
 temporary cache location.
    \item The zip file is then unzipped in this location.
-   \item The Location Fit is called which extracts the expected
-   positions of the detector elements, the measured position of the
-   survey points, and the anticipated positions of the survey points
-   with respect to the detector center from the GDML files. The fit
-   completes a fit with a chi-square statistic to match the position
-   of the survey nest in the detector coordinate system to its
-   position in the hall coordinate system using a change in the
-   position and the rotation of the detector. The result is written to
-   the GDML file. If the detector description is present in the
-   download from CDB, that detector file name is also written to the
-   main GDML file in place of the place-holder element.
    \item The Formatter class is called which formats the GDML
 files. The formatting alters the schema location of these files and
 points them to the correct local locations of the Materials GDML
@@ -93,7 +82,8 @@ by the configuration file.
 formatted files as its argument. This class converts the CAD GDMLs to
 the MICE Module text files using the XSLT stylesheets previously
 described and the Detector GDMLs to MICE modules using a python driven
-routine.
+routine. Note that this step is used even when the geometry is
+designed for use with the GDMLParser.
    \item[Optional] If specified in the configuration file the
    temporary cache location is removed along with the zip file and
    unzipped files.
@@ -115,12 +105,11 @@ screen or to file as specified in the configuration file.
 
 Two other python files are also present in the utilities directory;
 process\_geometry.py which fits, formats, and processes the GDML files
-assuming the download is complete, and download\_geometry.py which
-downloads, formats, and processes the GDML files without applying the
-location fit--- legacy MICE module files will be used in the
-simulation rather than the downloaded detector geometry files because
-the Location fit makes this replacement. To use these files the user
-must use the arguments in the ``ConfigurationDefaults.py'' file. The
+assuming the download is complete, and download\_fit\_geometry.py
+which downloads, formats, and processes the GDML files while applying
+the location fit--- the GDML files generated for Step IV running will
+have the fit applied prior to upload. To use these files the user must
+use the arguments in the ``ConfigurationDefaults.py'' file. The
 arguments relating to these executables are as follows.
 
 \begin{table*}
@@ -130,14 +119,18 @@ arguments relating to these executables are as follows.
 \hline
 \multicolumn{2}{l}{\emph{Geometry controls.}} \\
 \hline
-\verb|cdb_upload_url| & Sets the upload url relating the the Configuration Database.\\
-\verb|cdb_download_url| & Sets the download url relating the the Configuration Database.\\
+\verb|cdb_upload_url| & Sets the upload url relating to the Configuration Database.\\
+\verb|cdb_download_url| & Sets the download url relating to the Configuration Database.\\
+\verb|cdb_cc_download_url| & Sets the download url relating to the Configuration Database for the super-conducting channels only.\\
 \verb|geometry_download_wsdl| & Name of the web service used for downloads.\\
 \verb|geometry_download_directory| & Set the directory where you wish the geometry to be downloaded to.\\
 \verb|geometry_download_by| & This can be set to either \textit{current, id or run\_number}. Current will download the current valid geometry stored
 on the CDB. ID will download the geometry for the ID specified N.B ID numbers can be found using the get geometry ids executable. Run\_number will
 download the geometry along with control room information for specified run including the beam-line currents. \\ 
 \verb|geometry_download_run_number| & Set the number of the run to be downloaded.\\
+\verb|geometry_download_beamline_for_run| & Set the beamline information to match a run independent of the geometry download. To be used when 
+geometry is downloaded by ID.\\
+\verb|geometry_download_coolingchannel_tag| & Download the cooling channel data matching a specific tag.\\
 \verb|geometry_download_id| & Set the number of the geometry ID to be downloaded.\\
 \verb|geometry_download_cleanup| & Set to True in order to cleanup the temporary files created during the download process. These are the zip file
 downloaded and the original GDML files from this zip file.\\
@@ -182,75 +175,68 @@ in the geometry database a user should run the command (from the maus
 root directory)
 \begin{verbatim}
 > python /bin/utilities/get_geometry_ids.py 
-      --get_ids_start_time ``1974-01-01 00:00:00'' --get_ids_stop_time ``2015-01-01 00:00:00''
+      --get_ids_start_time ``1999-01-01 00:00:00'' --get_ids_stop_time ``2035-01-01 00:00:00''
 \end{verbatim}
 By default, the output file is saved to
 \$MAUS\_ROOT\_DIR/tmp/geometry\_ids.txt. The typical output looks like
 the following:
 \begin{verbatim}
 [...]
+Geometry Number = 46
+Geometry Note   = Step I geometry consistent with the October 2011 data run. All detector descriptions consistent and up to date.
+ValidFrom       = 2011-12-01 19:17:00
+Date Created    = 2015-01-07 14:19:51.055000
 
-Geometry Number = 22
-Geometry Note = Step IV geometry consisting of the detectors only for
-debugging purposes. Includes the TOFs, Ckov, EMR, Tracker, and KL as
-GDML files. EMR gdml file present, but not in use. Beamline elements
-not included, but fields are present for quads, dipole, and
-solenoid. Ckov files recreate MICE modules to generate incorrect
-conical mirror object. A 180 degree rotation is applied to Tracker0
-with respect to Tracker1. Survey information not included. Default
-tracker Solenoid magnetic fields implemented with scaling to match
-legacy files.
-ValidFrom       = 1974-02-04 19:00:00
-Date Created    = 2014-04-30 14:23:18.880000
+Geometry Number = 47
+Geometry Note   = Step I geometry consistent with the October 2013 EMR comissioning run. All detector descriptions consistent and up to date.
+ValidFrom       = 2013-10-06 19:17:00
+Date Created    = 2015-01-07 14:30:32.987000
 
-Geometry Number = 23
-Geometry Note = Step IV geometry with detectors including the TOFs,
-Ckov, EMR, Tracker, and KL included as GDML files. EMR gdml file
-present, but not in use. Downstream solenoid bore gdml file has been
-edited to remove an appearent piece of material blocking the
-beam. Ckov files recreate MICE modules to generate incorrect conical
-mirror object. A 180 degree rotation is applied to Tracker0 with
-respect to Tracker1. Survey information not included. Default tracker
-Solenoid magnetic fields implemented with scaling as in legacy
-files. Removed redundant objects from geometry description.
-ValidFrom       = 1974-02-04 18:00:00
-Date Created    = 2014-04-30 14:44:10.774000
+Geometry Number = 49
+Geometry Note   = Step IV geometry with detectors including the TOFs, Ckov, EMR, Tracker, and KL included as GDML files. Update to the EMR geometry.
+ValidFrom       = 2034-01-03 19:17:00
+Date Created    = 2015-03-23 17:24:23.079000
 
-
-Geometry Number = 24
-Geometry Note = Step I geometry with detectors including the TOFs,
-Ckov, EMR, Tracker, and KL included as GDML files. EMR gdml file
-present, but not in use. Ckov files recreate MICE modules to generate
-incorrect conical mirror object. Survey information included.
-ValidFrom       = 1974-02-03 18:00:00
-Date Created    = 2014-04-30 16:05:43.553000
-
+Geometry Number = 50
+Geometry Note   = Step IV geometry with detectors including the TOFs, Ckov, EMR, Tracker, and KL included as GDML files. Written for GDMLParser. Diffuser corrected to match design specification.
+ValidFrom       = 2034-05-13 19:17:00
+Date Created    = 2015-05-14 16:29:01.124000
 \end{verbatim}
-Three different flavors of geometry are represented here. The first
-example is a geometry with no beamline elements included but with all
-Step IV detectors and fields in place. This type of geometry has been
-made available to test changes in the software while avoiding the
-processing time necessary to load the tessellated solids used to
-describe the beamline. The second is an idealized version of the Step
-IV geometry based entirely on the CAD geometry. The idealized
-geometries are labeled with a year of 197n for the ``Date Valid
-From'' where n is the step number. The third example is a real version
-of the Step I geometry with the survey information included for all
-detectors.
+
+Three different flavors of geometry are represented here. The first is
+the geometry of the Step I geometry as it existed in the hall during
+data collection in Autumn 2013 (id 47). This description includes the
+survey information taken prior to data collection although the
+positions of the detectors have not been adjusted to match that
+information in the upload; a fit mut be done at download time. The
+second is a prospective Step IV geometry based on the CAD geometry (id
+49). This geometry was intended to be used after the MICE module
+translation. In contrast the third type of geometry is meant to be
+used with the GDMLParser (id 50). This geometry should load in a much
+shorter time than the MICE module translation due to the optimized
+treatment of the tesselated solid objects. Both of these last two
+cases do not contain survey information and are therefore dated to be
+valid from a date far in the future (2034).
 
 The CAD-based geometry can be downloaded via a number of different
 modes. The simplest way is to download the geometry by its id
 number. From the MAUS root directory the debug geometry as described
 above can be downloaded with the command
 \begin{verbatim}
-> python bin/utilities/download_fit_geometry.py --geometry_download_id 22
+> python bin/utilities/download_geometry.py --geometry_download_id 50
 \end{verbatim}
-By default the GDML files will be removed with this command. If the
-user wishes to download the full geometry without removing the GDML
-files because that user wants to run a systematic study requiring
-reprocessing the geometry then the following command should be used:
+By default the unformatted GDML files will be removed with this
+command. If the user wishes to download the full geometry without
+removing the unformatted GDML files because that user wants to run a systematic
+study requiring reprocessing the geometry then the following command
+should be used:
 \begin{verbatim}
-> python bin/utilities/download_fit_geometry.py --geometry_download_id 24 --geometry_download_clenaup False
+> python bin/utilities/download_geometry.py --geometry_download_id 50 --geometry_download_cleanup False
+\end{verbatim}
+A more complicated use is to test a prospective geometry with a
+predefined beamline setting as defined using a ``tagged'' beamline:
+\begin{verbatim}
+> python bin/utilities/download_geometry.py --geometry_download_id 50 --geometry_download_beamline_tag '6-200+M0'
 \end{verbatim}
 
 A common usage for the geometry download is to reproduce a given
@@ -273,3 +259,97 @@ directory may be changed using the
 \verb+--geometry_download_directory+ flag. To use the downloaded
 geometry in the simulation, the \verb+--simulation_geometry_filename+
 flag must be set to the download directory. 
+
+\usepackage{listings}
+
+\section{A Little GDML}
+While the detectors are already defined and the beam line elements are
+defined from the CAD information, it is potentially useful for users
+and developers to understand these data structures. The overall
+structure of a GDML file is always the same; the lithium hydride disk
+absorber is described using the following lines
+\lstinputlisting[breaklines]{Disk_LiH.gdml}
+
+More fundamental definitions appear at the top while more derived
+objects appear at the bottom culminating in the ``world'' definition
+as the last object. Variables are defined in the ``define'' section,
+material definitions appear in the ``materials'' section, solid
+objects used in the definition of the structure appear in the
+``solids'' section, and the volumes making up the simulated geometry
+appear in the ``structure'' section.  A little more detail and MICE
+specific examples are given below, but it is highly suggested that an
+interested user refer to the ``GDML Users
+Guide''\footnote{\url{http://gdml.web.cern.ch/GDML/doc/GDMLmanual.pdf}}.
+
+\subsection{Define}
+This is where constants, matrices, and variables are defined. The
+obvious benefit is that any variables defined here may be referenced
+multiple times throughout the GDML document. Trivial examples include
+the definition of pi or the identity rotation. A slightly more
+interesting example is the use of a matrix in \verb+EMR.gdml+ to
+indicate whether a 90$^{\circ}$ rotation needs to be applied to a
+scintillator bar or a plane at a given location.
+
+\subsection{Materials}
+All materials are defined internally to the GDML file. Each detector
+has only the materials used in its construction defined in the source
+file, while a stock summary of all materials used are written to the
+files derived from the MICE engineering drawings. Materials are
+composed of elements or mixtures of elements defined by the mass
+fraction or the atom count.
+
+\subsection{Solids}
+The definition of solid objects parallels the definition of solids in
+Geant. Primitive solids such as spheres, tubes, cones, and boxes, may
+be explicitly defined. All of the detectors are defined entirely using
+primitive volumes. More complicated, tessellated solids may also be
+defined, with the vertices written to the ``define'' section of the
+code. The MICE engineering drawings are defined entirely using
+tessellated solids using the FastRAD package.
+
+\subsection{Structure}
+Definition of the geometry volume is contained in the structure
+section of the file. Volumes are defined based on references to
+predefined solids and materials. Daughter volumes to objects may be
+defined through the use of \verb+physvol+ and
+\verb+paramvol+. Relative positions and rotations of daughter objects
+are defined as part of these definitions. Loops and ensembles may also
+be used to define multiple copies of objects displaced in position or
+rotations.
+
+\subsection{Additional Features and Sensitive Detectors}
+When defining a volume it is possible to define auxiliary
+properties. These properties do not affect the structural behaviour of
+the detector within the simulation but may be used to alter the
+properties of the simulation. An example is the sensitive detector
+definition. For every volume with a auxiliary property
+\verb+SensitiveDetector+ a matching sensitive detector object is
+constructed and linked to the source volume. The requirements of the
+MICE sensitive detector objects to use detector identity information
+explicitly written to the MICE module files have forced the GDML files
+to avoid the use of loops for the definition of repeated objects
+within the TOFs and the Trackers. No such requirement exists for the
+definition of sensitive detectors in the EMR because the sensitive
+detectors are defined using GEANT's native touchable volume
+definitions.
+
+\section{Creation of New Geometries in MAUS}
+
+A python class, CADModuleExtraction, is available that automatically
+generates a set of geometry files suitable for upload to CDB. It is
+run during the course of the standard installation tests to provide a
+native version of the Step IV geometry but this class should not be
+run by the casual user. To use this class the user must provide a GDML
+file containing references to all of the GDML files generated from the
+CAD and the detector GDML files positioned in their approximate
+locations (which should be furnished by a subset of the CAD drawings)
+as well as the location of a MAUS information file, which need not be
+in the same directory as the source GDML file. A destination directory
+and file name must also be provided. The script then runs through the
+referenced GDML files and copies the objects contained therein to a
+new set of defined by location, instead of by material which is the
+arrangement required by the CAD model. This processing is required to
+make a single set of files that can be read into GEANT4
+efficiently. The output of this script may be uploaded to CDB after
+applying corrections to the detector locations based on the fits to
+the survey information and passing the validation tests.
