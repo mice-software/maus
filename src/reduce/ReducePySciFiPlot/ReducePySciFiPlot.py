@@ -27,6 +27,7 @@ run.
 # pylint: disable = W0105, W0612, W0201
 
 import ROOT
+import maus_cpp.converter
 from ReducePyROOTHistogram import ReducePyROOTHistogram
 
 class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
@@ -104,8 +105,12 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # Histogram initializations. they are defined explicitly in
         # init_histos.
 
-        self.ScifiDigitT1 = None
+        #2D histos
+        self.SciFiSpacepointsTwoDH = {}
+        #Digit histos
+        self.SciFiDigitT1 = None
         self.SciFiDigitT2 = None
+        #PEperChannel histos
         self.SciFiPEperChannelT1S1 = None
         self.SciFiPEperChannelT1S2 = None
         self.SciFiPEperChannelT1S3 = None
@@ -116,12 +121,50 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.SciFiPEperChannelT2S3 = None
         self.SciFiPEperChannelT2S4 = None
         self.SciFiPEperChannelT2S5 = None
+        #SP histos
         self.SciFiSpacepointsT1 = None
         self.SciFiSpacepointsT2 = None
 
+        #Digits per channel Histos
+        self.SciFiDigitsPerChannelT1S1P1 = None
+        self.SciFiDigitsPerChannelT1S1P2 = None
+        self.SciFiDigitsPerChannelT1S1P3 = None
+        self.SciFiDigitsPerChannelT1S2P1 = None
+        self.SciFiDigitsPerChannelT1S2P2 = None
+        self.SciFiDigitsPerChannelT1S2P3 = None
+        self.SciFiDigitsPerChannelT1S3P1 = None
+        self.SciFiDigitsPerChannelT1S3P2 = None
+        self.SciFiDigitsPerChannelT1S3P3 = None
+        self.SciFiDigitsPerChannelT1S4P1 = None
+        self.SciFiDigitsPerChannelT1S4P2 = None
+        self.SciFiDigitsPerChannelT1S4P3 = None
+        self.SciFiDigitsPerChannelT1S5P1 = None
+        self.SciFiDigitsPerChannelT1S5P2 = None
+        self.SciFiDigitsPerChannelT1S5P3 = None
+        self.SciFiDigitsPerChannelT2S1P1 = None
+        self.SciFiDigitsPerChannelT2S1P2 = None
+        self.SciFiDigitsPerChannelT2S1P3 = None
+        self.SciFiDigitsPerChannelT2S2P1 = None
+        self.SciFiDigitsPerChannelT2S2P2 = None
+        self.SciFiDigitsPerChannelT2S2P3 = None
+        self.SciFiDigitsPerChannelT2S3P1 = None
+        self.SciFiDigitsPerChannelT2S3P2 = None
+        self.SciFiDigitsPerChannelT2S3P3 = None
+        self.SciFiDigitsPerChannelT2S4P1 = None
+        self.SciFiDigitsPerChannelT2S4P2 = None
+        self.SciFiDigitsPerChannelT2S4P3 = None
+        self.SciFiDigitsPerChannelT2S5P1 = None
+        self.SciFiDigitsPerChannelT2S5P2 = None
+        self.SciFiDigitsPerChannelT2S5P3 = None
+
+        self.SciFiSpacepointsTwoDC = {}
         self.canvas_SciFiDigit = None
-        self.canvas_SciFiPEperChannel = None
+        self.canvas_SciFiPEperChannelT1 = None
+        self.canvas_SciFiPEperChannelT2 = None
         self.canvas_SciFiSpacepoints = None
+        self.canvas_SciFiDigitsPerChannelT1 = None
+        self.canvas_SciFiDigitsPerChannelT2 = None
+        #self.canvas_SciFiKunoPlot = None
 
         # Has an end_of_run been processed?
         self.run_ended = False
@@ -169,6 +212,10 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         if not self.get_SciFiSpacepoints(spill): 
             raise ValueError("SciFi spacepoints not in spill")
 
+        if not self.get_SciFiSpacepointsTwoD(spill): 
+            raise ValueError("SciFi spacepoints not in spill")
+
+
         # Refresh canvases at requested frequency.
         #print self.refresh_rate
         if self.spill_count % self.refresh_rate == 0:
@@ -181,7 +228,6 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         """
         Get the SciFiDigits and update the histograms.
-
         @param self Object reference.
         @param spill Current spill.
         @return True if no errors or False if no "digits" in
@@ -202,26 +248,30 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
             """
             If the tracker number = 0 fill ScifiDigitT1 with station Number
-            and likewise for tracker 2.
+            and likewise for DS Tracker.
             """
             # Gives information on cabling efficiency
             SciFiDigits = spill['recon_events'][event]['sci_fi_event']['digits']
+            spill_data = maus_cpp.converter.data_repr(spill)
+            spill = spill_data.GetSpill()
+            title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
             for i in range(len(SciFiDigits)):
                 #print SciFiDigits[i]['tracker']
                 if (SciFiDigits[i]['tracker'] == 0):
-                    self.ScifiDigitT1.Fill(SciFiDigits[i]['station'])
+                    self.SciFiDigitT1.Fill(SciFiDigits[i]['station'])
+                    self.SciFiDigitT1.SetTitle("Spacepoints In US Tracker "+title+" (stn 1 is innermost)")
                 if (SciFiDigits[i]['tracker'] == 1):
                     self.SciFiDigitT2.Fill(SciFiDigits[i]['station'])
+                    self.SciFiDigitT2.SetTitle("Spacepoints In DS Tracker "+title+" (stn 1 is innermost)")
 
             # Gives information on fibre performance
             for i in range(len(SciFiDigits)):
                 #print SciFiDigits[i]['tracker']
                 if (SciFiDigits[i]['tracker'] == 0):               
-                    #print SciFiDigits[i]['npe']
-                    #print SciFiDigits[i]['channel']
                     if (SciFiDigits[i]['station'] == 1):
                         self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i]['channel'], \
                         SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT1S1.SetTitle("npe per Channel In US Tracker, Stations 1-5 "+title+" (stn 1 is innermost)")
                     if (SciFiDigits[i]['station'] == 2):
                         self.SciFiPEperChannelT1S2.Fill(SciFiDigits[i]['channel'], \
                         SciFiDigits[i]['npe'])
@@ -238,6 +288,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     if (SciFiDigits[i]['station'] == 1):
                         self.SciFiPEperChannelT2S1.Fill(SciFiDigits[i]['channel'], \
                         SciFiDigits[i]['npe'])
+                        self.SciFiPEperChannelT2S1.SetTitle("npe per Channel In DS Tracker, Stations 1-5 "+title+" (stn 1 is innermost)")
                     if (SciFiDigits[i]['station'] == 2):
                         self.SciFiPEperChannelT2S2.Fill(SciFiDigits[i]['channel'], \
                         SciFiDigits[i]['npe'])
@@ -250,6 +301,83 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     if (SciFiDigits[i]['station'] == 5):
                         self.SciFiPEperChannelT2S5.Fill(SciFiDigits[i]['channel'], \
                         SciFiDigits[i]['npe'])
+
+            # Gives information on Mapping
+            for i in range(len(SciFiDigits)):
+                if (SciFiDigits[i]['tracker'] == 0):               
+                    if (SciFiDigits[i]['station'] == 1):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT1S1P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT1S1P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT1S1P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 2):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT1S2P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT1S2P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT1S2P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 3):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT1S3P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT1S3P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT1S3P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 4):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT1S4P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT1S4P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT1S4P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 5):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT1S5P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT1S5P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT1S5P3.Fill(SciFiDigits[i]['channel'])
+                if (SciFiDigits[i]['tracker'] == 1):               
+                    #print SciFiDigits[i]['digits']
+                    #print SciFiDigits[i]['channel']
+                    if (SciFiDigits[i]['station'] == 1):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT2S1P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT2S1P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT2S1P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 2):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT2S2P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT2S2P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT2S2P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 3):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT2S3P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT2S3P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT2S3P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 4):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT2S4P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT2S4P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT2S4P3.Fill(SciFiDigits[i]['channel'])
+                    if (SciFiDigits[i]['station'] == 5):
+                        if (SciFiDigits[i]['plane'] == 0):
+                            self.SciFiDigitsPerChannelT2S5P1.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 1):
+                            self.SciFiDigitsPerChannelT2S5P2.Fill(SciFiDigits[i]['channel'])
+                        if (SciFiDigits[i]['plane'] == 2):
+                            self.SciFiDigitsPerChannelT2S5P3.Fill(SciFiDigits[i]['channel'])
 
         return True
 
@@ -278,14 +406,43 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 return False
 
             '''If the tracker number =0 fill SciFiSpacepointsT1 with station Number
-            and likewise for tracker 2.'''
+            and likewise for DS Tracker.'''
             SciFiSpacepoints = spill['recon_events'][event]['sci_fi_event']['spacepoints']
+            spill_data = maus_cpp.converter.data_repr(spill)
+            spill = spill_data.GetSpill()
+            title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
             for i in range(len(SciFiSpacepoints)):
                 print SciFiSpacepoints[i]['tracker']
                 if (SciFiSpacepoints[i]['tracker'] == 0):
                     self.SciFiSpacepointsT1.Fill(SciFiSpacepoints[i]['station'])
+                    self.SciFiSpacepointsT1.SetTitle("Spacepoints In US Tracker "+title+" (station 1 is innermost)")
                 if (SciFiSpacepoints[i]['tracker'] == 1):
                     self.SciFiSpacepointsT2.Fill(SciFiSpacepoints[i]['station'])
+                    self.SciFiSpacepointsT2.SetTitle("Spacepoints In DS Tracker "+title+" (station 1 is innermost)")
+
+
+    def two_d_hist_name(self, tracker, station): # pylint: disable = R0201
+        """Define 2D histogram."""
+        return "tracker_"+str(tracker)+"_station_"+str(station)
+
+    def get_SciFiSpacepointsTwoD(self, spill):
+        """Get the 2D spacepoints for each tracker and station and fill histos."""
+
+        spill_data = maus_cpp.converter.data_repr(spill)
+        spill = spill_data.GetSpill()
+        title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
+        for key in self.SciFiSpacepointsTwoDH:
+            local_name = key.replace("_", " ")
+            self.SciFiSpacepointsTwoDH[key].SetTitle(title+" "+local_name+" (station 1 is innermost)")
+        for recon_event in spill.GetReconEvents():
+            scifi_event = recon_event.GetSciFiEvent()
+            for space_point in scifi_event.spacepoints():
+                station = space_point.get_station()
+                tracker = space_point.get_tracker()
+                name = self.two_d_hist_name(tracker, station)
+                pos = space_point.get_position()
+                self.SciFiSpacepointsTwoDH[name].Fill(pos.x(), pos.y())
+                self.SciFiSpacepointsTwoDH[name].Fill(pos.x(), pos.y())
 
         return True
 
@@ -303,68 +460,193 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         #sensible color palette
         self.style = ROOT.gStyle.SetPalette(1)
 
-        # define histograms
-        self.ScifiDigitT1 = ROOT.TH1F("h1", "SciFi Digits in Tracker 1", 100, 0, 6)
-        self.ScifiDigitT1.SetTitle("SciFi Digits Tracker 1")
-        self.ScifiDigitT1.GetXaxis().SetTitle("Stations")
-        self.ScifiDigitT1.GetYaxis().SetTitle("Number of digits")
-        self.SciFiDigitT2 = ROOT.TH1F("h1", "SciFi Digits in Tracker 2", 100, 0, 6)
-        self.SciFiDigitT2.SetTitle("SciFi Digits Tracker 2")
+        #Digits
+        self.SciFiDigitT1 = ROOT.TH1F("h1", "SciFi Digits in US Tracker", 100, 0, 6)
+        self.SciFiDigitT1.GetXaxis().SetTitle("Stations")
+        self.SciFiDigitT1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitT2 = ROOT.TH1F("h1", "SciFi Digits in DS Tracker", 100, 0, 6)
         self.SciFiDigitT2.GetXaxis().SetTitle("Stations")
         self.SciFiDigitT2.GetYaxis().SetTitle("Number of digits")
 
-        self.SciFiPEperChannelT1S1 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 1 Tracker 1", 215, 0, 215)
-        self.SciFiPEperChannelT1S1.SetTitle("SciFi Digits: pe per channel in Station 1 in Tracker 1")
+        #PEperChannel 
+        self.SciFiPEperChannelT1S1 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 1 US Tracker", 215, 0, 215)
         self.SciFiPEperChannelT1S1.GetXaxis().SetTitle("Channel number")
-        #self.SciFiPEperChannelT1S1.GetYaxis().SetTitleOffset(0.0)
         self.SciFiPEperChannelT1S1.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT1S2 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 2 Tracker 1", 215, 0, 215)
-        self.SciFiPEperChannelT1S2.SetTitle("SciFi Digits: pe per channel in Station 2 in Tracker 1")
+        self.SciFiPEperChannelT1S2 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 2 US Tracker", 215, 0, 215)
         self.SciFiPEperChannelT1S2.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT1S2.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT1S3 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 3 Tracker 1", 215, 0, 215)
-        self.SciFiPEperChannelT1S3.SetTitle("SciFi Digits: pe per channel in Station 3 in Tracker 1")
+        self.SciFiPEperChannelT1S3 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 3 US Tracker", 215, 0, 215)
         self.SciFiPEperChannelT1S3.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT1S3.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT1S4 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 4 Tracker 1", 215, 0, 215)
-        self.SciFiPEperChannelT1S4.SetTitle("SciFi Digits: pe per channel in Station 4 in Tracker 1")
+        self.SciFiPEperChannelT1S4 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 4 US Tracker", 215, 0, 215)
         self.SciFiPEperChannelT1S4.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT1S4.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT1S5 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 5 Tracker 1", 215, 0, 215)
-        self.SciFiPEperChannelT1S5.SetTitle("SciFi Digits: pe per channel in Station 5 in Tracker 1")
+        self.SciFiPEperChannelT1S5 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 5 US Tracker", 215, 0, 215)
         self.SciFiPEperChannelT1S5.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT1S5.GetYaxis().SetTitle("Number of pe")
 
-        self.SciFiPEperChannelT2S1 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 1 Tracker 2", 215, 0, 215)
-        self.SciFiPEperChannelT2S1.SetTitle("SciFi Digits: pe per channel in Station 1 in Tracker 2")
+        self.SciFiPEperChannelT2S1 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 1 DS Tracker", 215, 0, 215)
         self.SciFiPEperChannelT2S1.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT2S1.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT2S2 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 2 Tracker 2", 215, 0, 215)
-        self.SciFiPEperChannelT2S2.SetTitle("SciFi Digits: pe per channel in Station 2 in Tracker 2")
+        self.SciFiPEperChannelT2S2 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 2 DS Tracker", 215, 0, 215)
         self.SciFiPEperChannelT2S2.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT2S2.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT2S3 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 3 Tracker 2", 215, 0, 215)
-        self.SciFiPEperChannelT2S3.SetTitle("SciFi Digits: pe per channel in Station 3 in Tracker 2")
+        self.SciFiPEperChannelT2S3 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 3 DS Tracker", 215, 0, 215)
         self.SciFiPEperChannelT2S3.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT2S3.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT2S4 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 4 Tracker 2", 215, 0, 215)
-        self.SciFiPEperChannelT2S4.SetTitle("SciFi Digits: pe per channel in Station 4 in Tracker 2")
+        self.SciFiPEperChannelT2S4 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 4 DS Tracker", 215, 0, 215)
         self.SciFiPEperChannelT2S4.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT2S4.GetYaxis().SetTitle("Number of pe")
-        self.SciFiPEperChannelT2S5 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 5 Tracker 2", 215, 0, 215)
-        self.SciFiPEperChannelT2S5.SetTitle("SciFi Digits: pe per channel in Station 5 in Tracker 2")
+        self.SciFiPEperChannelT2S5 = ROOT.TH1F("h1", "SciFi Digits: pe per channel in Station 5 DS Tracker", 215, 0, 215)
         self.SciFiPEperChannelT2S5.GetXaxis().SetTitle("Channel number")
         self.SciFiPEperChannelT2S5.GetYaxis().SetTitle("Number of pe")
 
+        #DigitsperChannel histos
+        self.SciFiDigitsPerChannelT1S1P1 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 1, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S1P1.SetTitle("SciFi Digits per channel in US Tracker, Station 1, Plane 1")
+        self.SciFiDigitsPerChannelT1S1P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S1P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S1P2 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 1, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S1P2.SetTitle("SciFi Digits per channel in US Tracker, Station 1, Plane 2")
+        self.SciFiDigitsPerChannelT1S1P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S1P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S1P3 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 1, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S1P3.SetTitle("SciFi Digits per channel in US Tracker, Station 1, Plane 3")
+        self.SciFiDigitsPerChannelT1S1P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S1P3.GetYaxis().SetTitle("Number of digits")
 
-        self.SciFiSpacepointsT1 = ROOT.TH1F("h1", "SciFi Spacepoints in Tracker 1", 100, 0, 6)
-        self.SciFiSpacepointsT1.SetTitle("SciFi Spacepoints Tracker 1")
+        self.SciFiDigitsPerChannelT1S2P1 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 2, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S2P1.SetTitle("SciFi Digits per channel in US Tracker, Station 2, Plane 1")
+        self.SciFiDigitsPerChannelT1S2P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S2P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S2P2 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 2, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S2P2.SetTitle("SciFi Digits per channel in US Tracker, Station 2, Plane 2")
+        self.SciFiDigitsPerChannelT1S2P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S2P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S2P3 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 2, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S2P3.SetTitle("SciFi Digits per channel in US Tracker, Station 2, Plane 3")
+        self.SciFiDigitsPerChannelT1S2P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S2P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT1S3P1 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 3, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S3P1.SetTitle("SciFi Digits per channel in US Tracker, Station 3, Plane 1")
+        self.SciFiDigitsPerChannelT1S3P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S3P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S3P2 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 3, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S3P2.SetTitle("SciFi Digits per channel in US Tracker, Station 3, Plane 2")
+        self.SciFiDigitsPerChannelT1S3P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S3P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S3P3 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 3, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S3P3.SetTitle("SciFi Digits per channel in US Tracker, Station 3, Plane 3")
+        self.SciFiDigitsPerChannelT1S3P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S3P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT1S4P1 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 4, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S4P1.SetTitle("SciFi Digits per channel in US Tracker, Station 4, Plane 1")
+        self.SciFiDigitsPerChannelT1S4P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S4P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S4P2 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 4, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S4P2.SetTitle("SciFi Digits per channel in US Tracker, Station 4, Plane 2")
+        self.SciFiDigitsPerChannelT1S4P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S4P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S4P3 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 4, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S4P3.SetTitle("SciFi Digits per channel in US Tracker, Station 4, Plane 3")
+        self.SciFiDigitsPerChannelT1S4P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S4P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT1S5P1 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 5, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S5P1.SetTitle("SciFi Digits per channel in US Tracker, Station 5, Plane 1")
+        self.SciFiDigitsPerChannelT1S5P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S5P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S5P2 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 5, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S5P2.SetTitle("SciFi Digits per channel in US Tracker, Station 5, Plane 2")
+        self.SciFiDigitsPerChannelT1S5P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S5P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT1S5P3 = ROOT.TH1F("h1", "SciFi Digits per channel in US Tracker, Station 5, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT1S5P3.SetTitle("SciFi Digits per channel in US Tracker, Station 5, Plane 3")
+        self.SciFiDigitsPerChannelT1S5P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT1S5P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT2S1P1 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 1, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S1P1.SetTitle("SciFi Digits per channel in DS Tracker, Station 1, Plane 1")
+        self.SciFiDigitsPerChannelT2S1P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S1P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S1P2 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 1, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S1P2.SetTitle("SciFi Digits per channel in DS Tracker, Station 1, Plane 2")
+        self.SciFiDigitsPerChannelT2S1P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S1P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S1P3 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 1, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S1P3.SetTitle("SciFi Digits per channel in DS Tracker, Station 1, Plane 3")
+        self.SciFiDigitsPerChannelT2S1P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S1P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT2S2P1 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 2, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S2P1.SetTitle("SciFi Digits per channel in DS Tracker, Station 2, Plane 1")
+        self.SciFiDigitsPerChannelT2S2P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S2P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S2P2 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 2, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S2P2.SetTitle("SciFi Digits per channel in DS Tracker, Station 2, Plane 2")
+        self.SciFiDigitsPerChannelT2S2P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S2P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S2P3 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 2, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S2P3.SetTitle("SciFi Digits per channel in DS Tracker, Station 2, Plane 3")
+        self.SciFiDigitsPerChannelT2S2P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S2P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT2S3P1 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 3, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S3P1.SetTitle("SciFi Digits per channel in DS Tracker, Station 3, Plane 1")
+        self.SciFiDigitsPerChannelT2S3P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S3P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S3P2 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 3, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S3P2.SetTitle("SciFi Digits per channel in DS Tracker, Station 3, Plane 2")
+        self.SciFiDigitsPerChannelT2S3P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S3P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S3P3 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 3, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S3P3.SetTitle("SciFi Digits per channel in DS Tracker, Station 3, Plane 3")
+        self.SciFiDigitsPerChannelT2S3P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S3P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT2S4P1 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 4, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S4P1.SetTitle("SciFi Digits per channel in DS Tracker, Station 4, Plane 1")
+        self.SciFiDigitsPerChannelT2S4P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S4P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S4P2 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 4, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S4P2.SetTitle("SciFi Digits per channel in DS Tracker, Station 4, Plane 2")
+        self.SciFiDigitsPerChannelT2S4P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S4P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S4P3 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 4, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S4P3.SetTitle("SciFi Digits per channel in DS Tracker, Station 4, Plane 3")
+        self.SciFiDigitsPerChannelT2S4P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S4P3.GetYaxis().SetTitle("Number of digits")
+
+        self.SciFiDigitsPerChannelT2S5P1 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 5, Plane 1", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S5P1.SetTitle("SciFi Digits per channel in DS Tracker, Station 5, Plane 1")
+        self.SciFiDigitsPerChannelT2S5P1.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S5P1.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S5P2 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 5, Plane 2", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S5P2.SetTitle("SciFi Digits per channel in DS Tracker, Station 5, Plane 2")
+        self.SciFiDigitsPerChannelT2S5P2.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S5P2.GetYaxis().SetTitle("Number of digits")
+        self.SciFiDigitsPerChannelT2S5P3 = ROOT.TH1F("h1", "SciFi Digits per channel in DS Tracker, Station 5, Plane 3", 215, 0, 215)
+        self.SciFiDigitsPerChannelT2S5P3.SetTitle("SciFi Digits per channel in DS Tracker, Station 5, Plane 3")
+        self.SciFiDigitsPerChannelT2S5P3.GetXaxis().SetTitle("Channel number")
+        self.SciFiDigitsPerChannelT2S5P3.GetYaxis().SetTitle("Number of digits")
+
+        #Spacepoints histos
+        self.SciFiSpacepointsT1 = ROOT.TH1F("h1", "SciFi Spacepoints in US Tracker", 100, 0, 6)
         self.SciFiSpacepointsT1.GetXaxis().SetTitle("Stations")
         self.SciFiSpacepointsT1.GetYaxis().SetTitle("Number of spacepoints")
-        self.SciFiSpacepointsT2 = ROOT.TH1F("h1", "SciFi Spacepoints in Tracker 2", 100, 0, 6)
-        self.SciFiSpacepointsT2.SetTitle("SciFi Spacepoints Tracker 2")
+        self.SciFiSpacepointsT2 = ROOT.TH1F("h1", "SciFi Spacepoints in DS Tracker", 100, 0, 6)
         self.SciFiSpacepointsT2.GetXaxis().SetTitle("Stations")
         self.SciFiSpacepointsT2.GetYaxis().SetTitle("Number of spacepoints")
+
+        # 2D SP histos
+        for tracker in range(2):
+            for station in range(1, 6):
+                name = self.two_d_hist_name(tracker, station)
+                self.SciFiSpacepointsTwoDC[name] = ROOT.TCanvas(name, name)
+                self.SciFiSpacepointsTwoDH[name] = ROOT.TH2D(name, name+";x [mm];y[ mm]", 100, -200., 200., 100, -200., 200.)
+                self.SciFiSpacepointsTwoDH[name].Draw("COLZ")
 
         # Create canvases
         # Draw() of histos has to be done only once
@@ -372,35 +654,104 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # the update/refresh is done in update_histos()
 
         self.canvas_SciFiDigit = ROOT.TCanvas("SciFiDigit", "SciFiDigit")
-        self.canvas_SciFiDigit.SetTitle("x")
+        #self.canvas_SciFiDigit.SetTitle("x")
         self.canvas_SciFiDigit.Divide(2, 1)
         self.canvas_SciFiDigit.cd(1)
-        self.ScifiDigitT1.Draw()
+        self.SciFiDigitT1.Draw()
         self.canvas_SciFiDigit.cd(2)
         self.SciFiDigitT2.Draw()
 
-        self.canvas_SciFiPEperChannel = ROOT.TCanvas("SciFiPEperChannel", "SciFiPEperChannel")
-        self.canvas_SciFiPEperChannel.Divide(5, 2)
-        self.canvas_SciFiPEperChannel.cd(1)
+        self.canvas_SciFiPEperChannelT1 = ROOT.TCanvas("SciFiPEperChannelUS", "SciFiPEperChannelUS")
+        self.canvas_SciFiPEperChannelT1.Divide(5, 1)
+        self.canvas_SciFiPEperChannelT1.cd(1)
         self.SciFiPEperChannelT1S1.Draw()
-        self.canvas_SciFiPEperChannel.cd(2)
+        self.canvas_SciFiPEperChannelT1.cd(2)
         self.SciFiPEperChannelT1S2.Draw()
-        self.canvas_SciFiPEperChannel.cd(3)
+        self.canvas_SciFiPEperChannelT1.cd(3)
         self.SciFiPEperChannelT1S3.Draw()
-        self.canvas_SciFiPEperChannel.cd(4)
+        self.canvas_SciFiPEperChannelT1.cd(4)
         self.SciFiPEperChannelT1S4.Draw()
-        self.canvas_SciFiPEperChannel.cd(5)
+        self.canvas_SciFiPEperChannelT1.cd(5)
         self.SciFiPEperChannelT1S5.Draw()
-        self.canvas_SciFiPEperChannel.cd(6)
+        self.canvas_SciFiPEperChannelT2 = ROOT.TCanvas("SciFiPEperChannelDS", "SciFiPEperChannelDS")
+        self.canvas_SciFiPEperChannelT2.Divide(5, 1)
+        self.canvas_SciFiPEperChannelT2.cd(1)
         self.SciFiPEperChannelT2S1.Draw()
-        self.canvas_SciFiPEperChannel.cd(7)
+        self.canvas_SciFiPEperChannelT2.cd(2)
         self.SciFiPEperChannelT2S2.Draw()
-        self.canvas_SciFiPEperChannel.cd(8)
+        self.canvas_SciFiPEperChannelT2.cd(3)
         self.SciFiPEperChannelT2S3.Draw()
-        self.canvas_SciFiPEperChannel.cd(9)
+        self.canvas_SciFiPEperChannelT2.cd(4)
         self.SciFiPEperChannelT2S4.Draw()
-        self.canvas_SciFiPEperChannel.cd(10)
+        self.canvas_SciFiPEperChannelT2.cd(5)
         self.SciFiPEperChannelT2S5.Draw()
+
+
+        self.canvas_SciFiDigitsPerChannelT1 = ROOT.TCanvas("SciFiDigitsPerChannelUS", "SciFiDigitsPerChannelUS")
+        self.canvas_SciFiDigitsPerChannelT1.Divide(5, 3)
+        self.canvas_SciFiDigitsPerChannelT1.cd(1)
+        self.SciFiDigitsPerChannelT1S1P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(2)
+        self.SciFiDigitsPerChannelT1S2P1.Draw()       
+        self.canvas_SciFiDigitsPerChannelT1.cd(3)
+        self.SciFiDigitsPerChannelT1S3P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(4)
+        self.SciFiDigitsPerChannelT1S4P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(5)
+        self.SciFiDigitsPerChannelT1S5P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(6)
+        self.SciFiDigitsPerChannelT1S1P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(7)
+        self.SciFiDigitsPerChannelT1S2P2.Draw()       
+        self.canvas_SciFiDigitsPerChannelT1.cd(8)
+        self.SciFiDigitsPerChannelT1S3P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(9)
+        self.SciFiDigitsPerChannelT1S4P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(10)
+        self.SciFiDigitsPerChannelT1S5P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(11)
+        self.SciFiDigitsPerChannelT1S1P3.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(12)
+        self.SciFiDigitsPerChannelT1S2P3.Draw()       
+        self.canvas_SciFiDigitsPerChannelT1.cd(13)
+        self.SciFiDigitsPerChannelT1S3P3.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(14)
+        self.SciFiDigitsPerChannelT1S4P3.Draw()
+        self.canvas_SciFiDigitsPerChannelT1.cd(15)
+        self.SciFiDigitsPerChannelT1S5P3.Draw()
+
+        self.canvas_SciFiDigitsPerChannelT2 = ROOT.TCanvas("SciFiDigitsPerChannelDS", "SciFiDigitsPerChannelDS")
+        self.canvas_SciFiDigitsPerChannelT2.Divide(5, 3)
+        self.canvas_SciFiDigitsPerChannelT2.cd(1)
+        self.SciFiDigitsPerChannelT2S1P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(2)
+        self.SciFiDigitsPerChannelT2S2P1.Draw()       
+        self.canvas_SciFiDigitsPerChannelT2.cd(3)
+        self.SciFiDigitsPerChannelT2S3P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(4)
+        self.SciFiDigitsPerChannelT2S4P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(5)
+        self.SciFiDigitsPerChannelT2S5P1.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(6)
+        self.SciFiDigitsPerChannelT2S1P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(7)
+        self.SciFiDigitsPerChannelT2S2P2.Draw()       
+        self.canvas_SciFiDigitsPerChannelT2.cd(8)
+        self.SciFiDigitsPerChannelT2S3P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(9)
+        self.SciFiDigitsPerChannelT2S4P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(10)
+        self.SciFiDigitsPerChannelT2S5P2.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(11)
+        self.SciFiDigitsPerChannelT2S1P3.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(12)
+        self.SciFiDigitsPerChannelT2S2P3.Draw()       
+        self.canvas_SciFiDigitsPerChannelT2.cd(13)
+        self.SciFiDigitsPerChannelT2S3P3.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(14)
+        self.SciFiDigitsPerChannelT2S4P3.Draw()
+        self.canvas_SciFiDigitsPerChannelT2.cd(15)
+        self.SciFiDigitsPerChannelT2S5P3.Draw()
 
         self.canvas_SciFiSpacepoints = ROOT.TCanvas("SciFiSpacepoints", "SciFiSpacepoints")
         self.canvas_SciFiSpacepoints.Divide(2, 1)
@@ -419,8 +770,13 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
 
         self.canvas_SciFiDigit.Update()
-        self.canvas_SciFiPEperChannel.Update()
         self.canvas_SciFiSpacepoints.Update()
+        self.canvas_SciFiPEperChannelT1.Update()
+        self.canvas_SciFiPEperChannelT2.Update()
+        self.canvas_SciFiDigitsPerChannelT1.Update()
+        self.canvas_SciFiDigitsPerChannelT2.Update()
+        for key in self.SciFiSpacepointsTwoDC:
+            self.SciFiSpacepointsTwoDC[key].Update()
 
     def get_histogram_images(self):
         """
@@ -439,12 +795,35 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         image_list.append(doc)
 
         #pe per channel
-        image_list = []
-        tag = "SciFi_PEperChannel"
-        keywords = ["SciFi", "PE", "Channel"]
+        tag = "SciFi_PEperChannelT1"
+        keywords = ["SciFi", "PE", "Channel", "US"]
         description = "SciFi"
         doc = ReducePyROOTHistogram.get_image_doc( \
-            self, keywords, description, tag, self.canvas_SciFiPEperChannel)
+            self, keywords, description, tag, self.canvas_SciFiPEperChannelT1)
+        image_list.append(doc)
+
+        #pe per channel
+        tag = "SciFi_PEperChannelT2"
+        keywords = ["SciFi", "PE", "Channel", "DS"]
+        description = "SciFi"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, keywords, description, tag, self.canvas_SciFiPEperChannelT2)
+        image_list.append(doc)
+
+        #Digits per channel 
+        tag = "SciFi_DigitsPerChannelT1"
+        keywords = ["SciFi", "Digits", "Plane", "Channel", "US"]
+        description = "SciFi"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, keywords, description, tag, self.canvas_SciFiDigitsPerChannelT1)
+        image_list.append(doc)
+
+        #Digits per channel 
+        tag = "SciFi_DigitsPerChannelT2"
+        keywords = ["SciFi", "Digits", "Plane", "Channel", "DS"]
+        description = "SciFi"
+        doc = ReducePyROOTHistogram.get_image_doc( \
+            self, keywords, description, tag, self.canvas_SciFiDigitsPerChannelT2)
         image_list.append(doc)
 
         # Spacepoints per station
@@ -454,6 +833,15 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         doc = ReducePyROOTHistogram.get_image_doc( \
             self, keywords, description, tag, self.canvas_SciFiSpacepoints)
         image_list.append(doc)
+
+        # 2D Spacepoints per station
+        tag_pref = "SciFi_SpacePointsTwoD_"
+        keywords = ["SciFi", "Spacepoints", "2D"]
+        description = "SciFi"
+        for key in self.SciFiSpacepointsTwoDC:
+            doc = ReducePyROOTHistogram.get_image_doc( \
+                self, keywords, description, tag_pref+key, self.SciFiSpacepointsTwoDC[key])
+            image_list.append(doc)
 
         return image_list
 
