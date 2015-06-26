@@ -51,40 +51,40 @@ class SciFiClusterRec {
    */
   SciFiClusterRec(int cluster_exception,
                   double min_npe,
-                  const std::map<int, SciFiPlaneGeometry> &geometry_map);
+                  const SciFiTrackerMap& geometry_map);
 
   /** @brief Clustering main worker.
    * @arg evt a SciFiEvent to be filled with SciFiClusters
    * @arg modules the SciFi MICE modules
    */
-  void process(SciFiEvent &evt);
+  void process(SciFiEvent &evt) const;
 
   /** @brief Finds the position and direction of the clusters.
    * @arg clust a SciFiCluster
    */
-  void process_cluster(SciFiCluster *clust);
+  void process_cluster(SciFiCluster *clust) const;
 
   /** @brief Evaluates if two digits belong to neighbouring channels.
    * @arg Digits for comparison.
    */
-  bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j);
+  bool are_neighbours(SciFiDigit *seed_i, SciFiDigit *seed_j) const;
 
   /** @brief Loops over digits and accepts those above npe cut as seeds.
    * @arg The particle event.
    */
-  std::vector<SciFiDigit*> get_seeds(SciFiEvent &evt);
+  std::vector<SciFiDigit*> get_seeds(SciFiEvent &evt) const;
 
   /** @brief
    * @arg
    */
-  void make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds);
+  void make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds) const;
 
  private:
   int _size_exception;
 
   double _min_npe;
 
-  std::map<int, SciFiPlaneGeometry> _geometry_map;
+  SciFiTrackerMap _geometry_map;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS
