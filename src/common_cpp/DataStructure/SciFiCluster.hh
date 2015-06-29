@@ -29,6 +29,7 @@
 // ROOT headers
 #include "TObject.h"
 #include "TRefArray.h"
+#include "TMatrixD.h"
 
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"

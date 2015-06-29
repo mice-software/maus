@@ -6,6 +6,23 @@ directory=libxml2-${version}
 filename=${directory}.tar.gz
 url=http://xmlsoft.org/sources/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -47,14 +64,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Making:"
         echo
         sleep 1
-        make
+        make -j$MAUS_NUM_THREADS
         make install
         # workaround for bug in libxml2; that there is a libxml2.so and a libxml2.py
         # and python gets confused... rm the libxml2 library, then import to build the
         # .pyc file, then add the xml2 library again
         rm ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
         python -m libxml2
-        ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so.${version} ${MAUS_ROOT_DIR}/third_party/install/lib/libxml2.so
+        cd ${MAUS_ROOT_DIR}/third_party/install/lib
+        ln -s libxml2.so.${version} libxml2.so
+        cd -
 
             ################################################## 
         echo

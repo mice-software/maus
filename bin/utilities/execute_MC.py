@@ -93,8 +93,8 @@ def arg_parser():
                         help='MC Serial number for configuration DB',\
                         default=0)
     parser.add_argument('--geometry-id', dest='geoid', \
-                        help='The simulation geometry ID number',\
-                        required=True)
+                        help='The simulation geometry ID number') # ,\
+                        # required=True)
     return parser
 
 class DownloadError(Exception):
@@ -230,7 +230,7 @@ class RunManager:
                     else:
                         mcs_service = cdb.MCSerialNumber()
                     print "    Found, accessing cards"
-                    mc_cards = mcs_service.get_datacards(bi_number)['mc']
+                    mc_cards = mcs_service.get_datacards(bi_number)['data']
                     if mc_cards == 'null':
                         raise DownloadError(
                             "No MC cards for batch iteration number "+str(bi_number))
@@ -264,7 +264,7 @@ class RunManager:
         """
         print 'Getting geometry'
         download = [os.path.join(self.run_setup.maus_root_dir, 'bin', \
-                                 'utilities', 'download_fit_geometry.py')]
+                                 'utilities', 'download_geometry.py')]
         # check that there is a selection for the geometry in the datacards
         download += self.run_setup.get_download_parameters()
         proc = subprocess.Popen(download, stdout=self.logs.download_log, \
@@ -276,7 +276,7 @@ class RunManager:
             test_path_out = os.path.join(self.run_setup.download_target, \
                                                        'ParentGeometryFile.dat')
             shutil.copy(test_path_in, test_path_out)
-        elif proc.returncode != 0:
+        if proc.returncode != 0:
             raise DownloadError("Failed to download geometry successfully")
 
 
@@ -479,6 +479,7 @@ class RunSettings: #pylint: disable = R0902
                 '-configuration_file','sim.cards'
                 ]
         # otherwise, use the default download parameters.
+        #                 '-cdb_download_url', 'http://preprodcdb.mice.rl.ac.uk/cdb/',
         else:
             params = [
                 '-geometry_download_id', str(self.geometry_id),

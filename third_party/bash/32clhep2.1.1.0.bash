@@ -5,6 +5,23 @@ directory=clhep-${version}
 filename=${directory}.tgz
 url=http://proj-clhep.web.cern.ch/proj-clhep/DISTRIBUTION/tarFiles/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -46,7 +63,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Making:"
         echo
         sleep 1
-        make
+        make -j$MAUS_NUM_THREADS
         make install
                     ################################################## 
         if [ $? == 0 ]

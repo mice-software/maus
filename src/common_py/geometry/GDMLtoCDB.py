@@ -421,7 +421,7 @@ class Downloader: #pylint: disable = R0902
                                coolingchannel_cdb.get_coolingchannel_for_tag(tag)
                     path = downloadpath + '/CoolingChannelInfo.gdml'
                     downloadedfile = \
-                                   self.generate_coolingchannel_xml_from_string(downloaded[tag])
+                                   self.generate_coolingchannel_xml_from_string(downloaded)
                     fout = open(path, 'w')
                     fout.write(str(downloadedfile))
                     fout.close()
@@ -473,7 +473,7 @@ class Downloader: #pylint: disable = R0902
         xml = '<runs>'
         beam_xml  = self.run_settings_for_beamline(xmldict)
         xml = (xml + beam_xml + '</runs>')
-        print xml
+        
         return xml
         
     def run_settings_for_beamline(self, run_data): #pylint: disable = R0201
@@ -482,7 +482,7 @@ class Downloader: #pylint: disable = R0902
 
         Borrowed from CDB methods.
         """
-        print run_data
+        
         run_xml = ''
         try:
             if str(run_data['beam_stop']).upper() == 'OPEN':
@@ -547,7 +547,7 @@ class Downloader: #pylint: disable = R0902
             run_xml = (run_xml + "</run>")
         except KeyError, exception:
             print "Missing value for " + str(exception)
-        print run_xml
+        
         return run_xml
 
     def generate_coolingchannel_xml_from_string(self, data):

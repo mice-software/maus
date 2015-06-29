@@ -34,7 +34,7 @@ from mauscelery.state import MausTransform
 # (see https://github.com/celery/celery/issues/802) but appears to require
 # celery > 3.0 or so. I believe decorators are resolved when they are first
 # encountered by the parser (but others may know more) - Rogers
-@task(name="mauscelery.maustasks.MausGenericTransformTask", time_limit=10)
+@task(name="mauscelery.maustasks.MausGenericTransformTask", time_limit=100)
 def execute_transform(spill, client_id = "Unknown"):
     """
     MAUS Celery transform task used by sub-processes to execute jobs

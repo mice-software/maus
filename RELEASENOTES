@@ -5,6 +5,26 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.6
+  The following changes were made:
+    - Unpacker and associated libraries updated
+    - Tracker Kalman fit extensively updated
+    - Tracker real data digitization updated
+    - Tracker online plots added
+    - Geometry bug fixes
+    - Online reconstruction bug fixes
+    - Speed up work: some JSON removed in favour of Data* data passing
+    - Build system improvements
+    - ROOT upgraded to version 5.34.30
+  If upgrading from a previous version, please redo the entire installation
+MAUS-v0.9.5
+  The following changes were made:
+    - StepIV unpacker now used by default
+    - Script for switching unpacker easily added
+    - Fast Geometry GDML parser added
+    - Extensive EMR updates
+    - DAQ channel map update
+  If upgrading from a previous version, please redo the entire installation
 MAUS-v0.9.4
   The following changes were made:
     - StepIV unpacker added, StepI unpacker remains the default

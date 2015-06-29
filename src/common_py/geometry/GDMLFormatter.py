@@ -160,7 +160,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 if filename.find(self.path_in) == -1:
                     # add the path to the name
                     newname = os.path.join(self.path_in, filename)
-                    print "Replacing ", filename, " with ", newname
+                    # print "Replacing ", filename, " with ", newname
                     filenode.setProp("name", newname)
         gfile = open(os.path.join(self.path_out, gdmlfile),'w')
         xmldoc.saveTo(gfile)
@@ -287,9 +287,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         """
         self.add_other_info()
         config = minidom.parse(os.path.join(self.path_out, gdmlfile))
-        print "config file ", os.path.join(self.path_out, gdmlfile)
-        print "information file ", os.path.join(self.path_out, \
-                                                self.maus_information_file)
+        # print "config file ", os.path.join(self.path_out, gdmlfile)
+        # print "information file ", os.path.join(self.path_out, \
+        #                                         self.maus_information_file)
         maus_information = minidom.parse(os.path.join(self.path_out, \
                                                     self.maus_information_file))
         for node in maus_information.getElementsByTagName("MICE_Information"):
@@ -509,15 +509,22 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         Add the irises to the output gdml file
         """
         
-        mausInfo = libxml2.parseFile(os.path.join(self.path_in, \
+        mausInfo = libxml2.parseFile(os.path.join(self.path_out, \
+                                                  self.maus_information_file))
+        
+        mausInfoIn = libxml2.parseFile(os.path.join(self.path_in, \
                                                   self.maus_information_file))
         runInfo = mausInfo.xpathEval(\
             "MICE_Information/Configuration_Information/run")
+        print runInfo
         diffuserSetting = []
-        if len(runInfo) > 0:
-            diffuserSetting.append(runInfo.prop("diffusetThickness"))
+        if len(runInfo) > 0: 
+            diffuserSetting.append(runInfo[0].prop("diffuserThickness"))
+            print "Will use diffuser setting ", diffuserSetting[0]
+        else:
+            print "Will use the default diffuser."
         # check the possible keys for suspected
-        modulekeys = mausInfo.xpathEval(\
+        modulekeys = mausInfoIn.xpathEval(\
             "MICE_Information/Other_Information/Module")
         keynode = next(x for x in \
                        modulekeys if x.prop('name').find('SolenoidUS') >= 0 \
@@ -551,14 +558,14 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             newNode = libxml2.newNode("physvol")
             fileNode = libxml2.newNode("file")
             if len(diffuserSetting) > 0: # test of whether the statement exists.
-                print "Using diffuser setting ", diffuserSetting[0]
-                if (inum == 1 and diffuserSetting[0] % 2 == 0) or \
-                       (inum == 2 and (diffuserSetting[0] % 4 == 0 or \
-                                     diffuserSetting[0] % 4 == 1)) or \
-                       (inum == 3 and (diffuserSetting[0] < 4 or
-                                     (diffuserSetting[0] >= 8 and \
-                                      diffuserSetting[0] < 12))) or \
-                       (inum == 4 and diffuserSetting[0] < 8):
+                print "Using diffuser setting ", int(diffuserSetting[0])
+                if (inum == 1 and int(diffuserSetting[0]) % 2 == 0) or \
+                       (inum == 2 and (int(diffuserSetting[0]) % 4 == 0 or \
+                                     int(diffuserSetting[0]) % 4 == 1)) or \
+                       (inum == 3 and (int(diffuserSetting[0]) < 4 or
+                                     (int(diffuserSetting[0]) >= 8 and \
+                                      int(diffuserSetting[0]) < 12))) or \
+                       (inum == 4 and int(diffuserSetting[0]) < 8):
                     newNode.setProp("name", "iris" + str(inum))
                     fileNode.setProp("name", "iris" + str(inum) + "_open.gdml")
                 else:
@@ -584,7 +591,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             posNode.setProp("unit", posUnit)
             newNode.addChild(posNode)
             rotNode = libxml2.newNode("rotation")
-            posNode.setProp("name", "rotRef_iris_"+str(inum))
+            rotNode.setProp("name", "rotRef_iris_"+str(inum))
             rotNode.setProp("x", str(rot[0]))
             rotNode.setProp("y", str(rot[1]))
             rotNode.setProp("z", str(rot[2]))

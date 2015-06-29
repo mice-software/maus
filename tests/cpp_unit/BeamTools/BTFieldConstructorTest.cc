@@ -275,5 +275,36 @@ TEST_F(BTFieldConstructorTest, GetDerivativesSolenoidTest) {
   EXPECT_EQ(map->GetHighestOrder(), 3);
   EXPECT_NEAR(map->GetEndFieldModel()->Function(5.0, 0), 0.5, 1e-6);
 }
+
+TEST_F(BTFieldConstructorTest, GetSolenoidTest) {
+  _mod[0]->addPropertyString("FieldType", "Solenoid");
+  _mod[0]->addPropertyString("FileName",
+                             "${MAUS_TMP_DIR}/BTFieldConstructorTest1.fld");
+  _mod[0]->addPropertyString("FieldMapMode", "Analytic");
+  _mod[0]->addPropertyInt("NumberOfZCoords", 10);
+  _mod[0]->addPropertyInt("NumberOfRCoords", 10);
+  _mod[0]->addPropertyDouble("Length", 2.);
+  _mod[0]->addPropertyDouble("Thickness", 3.);
+  _mod[0]->addPropertyDouble("InnerRadius", 4.);
+
+  EXPECT_THROW(_field->GetField(_mod[0]), MAUS::Exception);
+  _mod[0]->setProperty("FileName",
+                             "${MAUS_TMP_DIR}/BTFieldConstructorTest2.fld");
+  _mod[0]->addPropertyDouble("Current", 5.);
+  _mod[0]->addPropertyInt("NumberOfTurns", 6);
+  double point[4] = {0., 0., 0., 0.};
+  double field1[6] = {0., 0., 0., 0., 0., 0.};
+  BTSolenoid* map1 = static_cast<BTSolenoid*>(_field->GetField(_mod[0]));
+  map1->GetAnalyticFieldValue(point, field1);
+  _mod[0]->setProperty("FileName",
+                             "${MAUS_TMP_DIR}/BTFieldConstructorTest3.fld");
+  _mod[0]->addPropertyDouble("CurrentDensity", 5.*6./3./2.); // A/mm^2
+  double field2[6] = {0., 0., 0., 0., 0., 0.};
+  BTSolenoid* map2 = static_cast<BTSolenoid*>(_field->GetField(_mod[0]));
+  map2->GetAnalyticFieldValue(point, field2);
+  for (size_t i = 0; i < 6; ++i) {
+      EXPECT_NEAR(field1[i], field2[i], 1e-12);
+  }
+}
 }
 

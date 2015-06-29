@@ -10,7 +10,7 @@ then
     echo "FATAL: running from the maus root directory"
 fi
 echo "INFO: Found install_build_test.bash - now building"
-./install_build_test.bash
+./install_build_test.bash "$@"
 
 echo "INFO: Now building DAQ extras"
 echo "INFO: Now building DAQ extras" 2>>$log_file 1>>$log_file

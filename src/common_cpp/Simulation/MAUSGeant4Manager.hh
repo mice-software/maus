@@ -66,6 +66,10 @@ class MAUSGeant4Manager {
      */
     static MAUSGeant4Manager* GetInstance();
 
+    /** @brief Return true if the MAUSGeant4Manager is already initialised
+     */
+    static bool HasInstance();
+
     /** @brief Get the G4RunManager
      */
     G4RunManager* GetRunManager() const {return _runManager;}

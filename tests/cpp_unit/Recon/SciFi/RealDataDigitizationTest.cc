@@ -112,25 +112,25 @@ TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
   EXPECT_FALSE(test_case.is_good_channel(out_of_range[0], out_of_range[1]));
 }
 
-TEST_F(RealDataDigitizationTest, test_process) {
-  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string file="lab7_unpacked";
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
-  std::ifstream inf(fname.c_str());
-
-  Spill spill;
-
-  std::string line;
-  getline(inf, line);
-  getline(inf, line);
-
-  Json::Value root = JsonWrapper::StringToJson(line);
-  Json::Value daq = root.get("daq_data", 0);
-
-  RealDataDigitization test_case;
-  test_case.process(&spill, daq);
-  ASSERT_TRUE(spill.GetReconEvents()->size() > 0);
-  // Needs more...
-}
+// TEST_F(RealDataDigitizationTest, test_process) {
+//   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+//   std::string file="lab7_unpacked";
+//   std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+//   std::ifstream inf(fname.c_str());
+//
+//   Spill spill;
+//
+//   std::string line;
+//   getline(inf, line);
+//   getline(inf, line);
+//
+//   Json::Value root = JsonWrapper::StringToJson(line);
+//   Json::Value daq = root.get("daq_data", 0);
+//
+//   RealDataDigitization test_case;
+//   test_case.process(&spill, daq);
+//   ASSERT_TRUE(spill.GetReconEvents()->size() > 0);
+//   // Needs more...
+// }
 
 } // ~namespace MAUS

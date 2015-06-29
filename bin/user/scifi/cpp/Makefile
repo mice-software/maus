@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -DDEBUG -ggdb -Wall
+CFLAGS = -m64 -DDEBUG -ggdb -Wall
 
 all : scifi_offline_viewer scifi_analysis
 
@@ -30,7 +30,6 @@ scifi_analysis : scifi_analysis.cc
 	                      `${ROOTSYS}/bin/root-config --glibs` \
 	                      -lMausCpp \
 	                       -Wl,--no-as-needed
-
 clean:
 	rm scifi_offline_viewer scifi_analysis
 
