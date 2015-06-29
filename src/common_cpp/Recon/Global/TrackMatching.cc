@@ -361,7 +361,6 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
             almostEquals(x_in_EMR[2], first_hit_pos.Y(),
                 first_hit_pos_error.Y()*3)) {
           Squeak::mout(Squeak::error) << "EMR Match\n";
-          std::cerr << (*emr_track_iter)->get_emr_range_primary() << "EMR RANGE\n";
           hypothesis_track->set_emr_range_primary((*emr_track_iter)->get_emr_range_primary());
           for (size_t j = 0; j < emr_trackpoints.size(); j++) {
             MAUS::DataStructure::Global::TrackPoint* emr_tp =
@@ -480,6 +479,7 @@ void TrackMatching::throughTrack(MAUS::GlobalEvent* global_event,
                     const_cast<MAUS::DataStructure::Global::TrackPoint*>
                     (*ds_trackpoint_iter));
               }
+              through_track->set_emr_range_primary((*ds_track_iter)->get_emr_range_primary());
               //~ through_track->AddTrack(*us_track_iter);
               //~ through_track->AddTrack(*ds_track_iter);
               //~ std::cerr << through_track << " " << *us_track_iter << " " << *ds_track_iter << "\n";

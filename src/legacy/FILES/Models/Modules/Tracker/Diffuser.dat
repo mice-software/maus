@@ -10,11 +10,11 @@ Module Diffuser
   Volume Cylinder
   Dimensions 129.0 15.5011 mm
   PropertyString Material AIR
-  Module Tracker/Diffuser_Disc3.dat
-  {
-    Position 0.0 0.0 0.00055 mm
-    Rotation 0.0 0.0 0.0 degree 
-  } 
+//  Module Tracker/Diffuser_Disc3.dat
+//  {
+//    Position 0.0 0.0 0.00055 mm
+//    Rotation 0.0 0.0 0.0 degree 
+//  } 
   Module Tracker/Diffuser_UpstreamPlane.dat
   {
     Position 0.0 0.0 -7.7506 mm

@@ -473,17 +473,20 @@ std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
               if ((dX < 1.0) and (dY < 1.0) and (dZ < 0.3) and (dPx < 3.0) and (dPy < 3.0)) {
                 matched_tps++;
               } else {
+                if ((dX > 1.0) or (dY > 1.0)) {
+                std::cerr << dX << " " << dY << " " << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";
                 //~ std::cerr << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";
                 //~ std::cerr << dX << " " << dY << " " << dZ << " " << dPx << " " << dPy << " " << dPz << " " << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";
+                }
               }
               total_tps++;
             }
             //~ //std::cerr << "Pos: " << tracker_mc_hit->GetPosition().X() << " " << tracker_mc_hit->GetPosition().Y() << " " << tracker_mc_hit->GetPosition().Z() << " " << tracker_mc_hit->GetMomentum().X() << " " << tracker_mc_hit->GetMomentum().Y() << " " << tracker_mc_hit->GetMomentum().Z() <<  "\n";
             //~ std::cerr << tracker_mc_hit->GetPosition().Z() << " " << tracker_mc_hit->GetChannelId()->GetTrackerNumber() << " " << tracker_mc_hit->GetChannelId()->GetStationNumber() << " " << tracker_mc_hit->GetChannelId()->GetPlaneNumber() << "\n";
           }
-          //~ std::cerr << matched_tps << "/" << total_tps << "\n";
+          std::cerr << matched_tps << "/" << total_tps << "\n";
           if (matched_tps > 10) {
-            std::cerr << "###" << matched_tps << "/" << total_tps << "\n";
+            //~ std::cerr << "###" << matched_tps << "/" << total_tps << "\n";
             track_mc_pairs.push_back(std::make_pair(*track_iter,*mc_event_iter));
           }
           //~ std::cerr << "Pos: " << position.Z() <<  " " << tracker_plane[0] << " " << tracker_plane[1] << " " << tracker_plane[2] << "\n#\n";

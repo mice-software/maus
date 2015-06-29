@@ -78,8 +78,9 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
 
 /**
  * @brief Returns a vector of ints denoting the tracker plane of a TrackPoint.
- * The first number indicates the tracker, the second the tracker station, the
- * third the tracker plane
+ * The first number indicates the tracker (0-1), the second the tracker station
+ * (1-5), the third the tracker plane (0-2). For the latter two, numbers increase
+ * away from the absorber
  * 
  * @param track_point The trackpoint for which to determine the tracker plane
  */

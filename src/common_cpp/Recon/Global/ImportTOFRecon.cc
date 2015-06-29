@@ -78,7 +78,6 @@ namespace global {
         detector = MAUS::DataStructure::Global::kTOF2;
         break;
       }
-
       for (unsigned int i = 0; i < max_i; ++i) {
         if (z == 2773.0) {
           x = tofarray[i].GetSlaby()*40.0 - 180.0;
