@@ -14,6 +14,7 @@ def generate_scifi_data(n_recon_events, radius, wave_length, centre, noise, dxdz
     z_positions = [0., 200., 450., 750., 1100.]
     data = ROOT.MAUS.Data()
     spill = ROOT.MAUS.Spill()
+    spill.SetDaqEventType("physics_event")
     recon_events = ROOT.MAUS.ReconEventPArray()        
     for i in range(n_recon_events):
         recon_events.push_back(ROOT.MAUS.ReconEvent())
@@ -24,7 +25,8 @@ def generate_scifi_data(n_recon_events, radius, wave_length, centre, noise, dxdz
             x0 = numpy.random.normal(0., centre[0])
             y0 = numpy.random.normal(0., centre[1])
             z0 = numpy.random.uniform(0., 2.*math.pi) # centre[2]/wave_length*2.*math.pi
-            for station, z_pos in enumerate(z_positions):
+            for station_index, z_pos in enumerate(z_positions):
+                station = station_index+1 # station indexes from 1
                 sp = ROOT.MAUS.SciFiSpacePoint()
                 sp.set_tracker(tracker)
                 sp.set_station(station)
@@ -47,10 +49,11 @@ def generate_scifi_data(n_recon_events, radius, wave_length, centre, noise, dxdz
 
 class TestReduceCppTiltedHelix(unittest.TestCase):
     def setUp(self):
-        self.image_path = "${MAUS_TMP_DIR}/test_reduce_cpp_tilted_helix.png"
+        self.image_path = "${MAUS_TMP_DIR}/"
         self.image_path = os.path.expandvars(self.image_path)
         config = Configuration.Configuration().getConfigJSON()
         config = json.loads(config)
+        config["VerboseLevel"] = 0
         config["SciFiRadiusResCut"] = 1e6
         config["SciFiPatRecCircleChi2Cut"] = 1e6
         config["SciFiNTurnsCut"] = 1e6
@@ -79,16 +82,19 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
             pass
 
     def test_reduce_perfect_helix(self):
-        reducer = ReduceCppTiltedHelix()
-        reducer.birth("")
-        for i in range(10):
-            data = generate_scifi_data(1000, 20., 800., [30., 40., 200.], 0.5, 3.e-3, 0.)
-            image = reducer.process(data)
-        canvas_wrappers = image.GetImage().GetCanvasWrappers()
-        for wrap in canvas_wrappers:
-            print wrap.GetFileTag()
-            wrap.GetCanvas().Print(self.image_path)
-        raw_input()
+        for dq in [1, 3, 10]:
+            reducer = ReduceCppTiltedHelix()
+            reducer.birth("")
+            for i in range(10):
+                data = generate_scifi_data(1000, 20., 800., [30., 40., 200.], 0.5, dq*1.e-3, 0.)
+                image = reducer.process(data)
+            canvas_wrappers = image.GetImage().GetCanvasWrappers()
+            for wrap in canvas_wrappers:
+                print wrap.GetFileTag()
+                wrap.GetCanvas().SetCanvasSize(1840, 1000)
+                wrap.GetCanvas().Update()
+                wrap.GetCanvas().Print(self.image_path+wrap.GetFileTag()+"_dq="+str(dq)+".png")
+            raw_input()
 
 if __name__ == "__main__":
     unittest.main()

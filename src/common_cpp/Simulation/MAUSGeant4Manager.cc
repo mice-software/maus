@@ -21,12 +21,13 @@
 #include "Geant4/G4StateManager.hh"
 #include "Geant4/G4ApplicationState.hh"
 
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-
-#include "src/common_cpp/Simulation/FieldPhaser.hh"
-
 #include "src/legacy/Interface/Squeak.hh"
+
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/FieldPhaser.hh"
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
@@ -131,20 +132,17 @@ MAUSPrimaryGeneratorAction::PGParticle
     return p;
 }
 
-Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
-    _eventAct->SetEvents(particle_array);  // checks type
-    for (size_t i = 0; i < particle_array.size(); ++i) {
+std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>* event) {
+    _eventAct->SetEvents(event);  // checks type
+    for (size_t i = 0; i < event->size(); ++i) {
         MAUSPrimaryGeneratorAction::PGParticle primary;
-        Json::Value event = JsonWrapper::GetItem
-                                  (particle_array, i, JsonWrapper::objectValue);
-        Json::Value primary_json = JsonWrapper::GetProperty
-                                  (event, "primary", JsonWrapper::objectValue);
-        primary.ReadJson(primary_json);
+        primary.ReadCpp(event->at(i)->GetPrimary());
         GetPrimaryGenerator()->Push(primary);
     }
-    BeamOn(particle_array.size());
+    BeamOn(event->size());
     return _eventAct->GetEvents();
 }
+
 
 Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
     MAUSPrimaryGeneratorAction::PGParticle p;

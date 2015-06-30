@@ -63,6 +63,8 @@ class MAUSPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
     explicit PGParticle(VirtualHit hit);
     /// Re-initialise from Json
     void ReadJson(Json::Value pg_particle);
+    /// Re-initialise from Json
+    void ReadCpp(MAUS::Primary primary);
     /// Change momentum to set the mass shell condition (E^2 = p^2+m^2)
     void MassShellCondition();
     /// Represent as a Json object

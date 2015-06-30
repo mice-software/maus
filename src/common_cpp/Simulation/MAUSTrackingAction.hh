@@ -26,6 +26,8 @@
 #include "Geant4/G4Track.hh"  //  arg to tracking action
 #include "Geant4/G4UserTrackingAction.hh"  //  inherit from
 
+#include "src/common_cpp/DataStructure/Track.hh"
+
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 
 namespace MAUS {
@@ -53,11 +55,11 @@ class MAUSTrackingAction : public G4UserTrackingAction {
 
     /** @brief Set the tracks; must be a json array, else throws a Exception
      */
-    void SetTracks(Json::Value tracks);
+    void SetTracks(std::vector<Track>* tracks);
 
     /** @brief Get the tracks
      */
-    Json::Value GetTracks() {return _tracks;}
+    std::vector<Track>* GetTracks() {return _tracks;}
 
     /** @brief Choose whether to store tracks
      *
@@ -77,7 +79,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
     void SetKillReason(const G4Track* aTrack, std::string reason);
 
  private:
-    Json::Value _tracks;
+    std::vector<Track>* _tracks;
     bool _keepTracks;
     MAUSSteppingAction* _stepping;
 };

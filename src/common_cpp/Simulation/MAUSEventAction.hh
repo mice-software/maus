@@ -29,6 +29,7 @@ class MAUSGeant4Manager;
 class VirtualPlaneManager;
 class MAUSTrackingAction;
 class MAUSSteppingAction;
+class MCEvent;
 namespace Simulation {
 class DetectorConstruction;
 }
@@ -73,23 +74,23 @@ class MAUSEventAction : public G4UserEventAction {
     void EndOfEventAction(const G4Event *anEvent);
 
     /** Set event buffer, set _primary counter to 0 and reassign pointers
-     *  @param particle_array: array of events in the spill. Will append
-     *                         hits, virtual_hits, tracks to each event after
-     *                         geant4 is done tracking
+     *  @param events: array of events in the spill. Will append
+     *                 hits, virtual_hits, tracks to each event after
+     *                 geant4 is done tracking
      *  Also refreshes pointers to objects holding per-event buffers from the
      *  geant4 manager. We support dynamic reallocation of these pointers (even
      *  if geant4 doesnt in some instances). This means, for example, one can
      *  dynamically change the VirtualPlane setup per spill (e.g. to run
      *  reference particles). 
      */
-    void SetEvents(Json::Value particle_array);
+    void SetEvents(std::vector<MCEvent*>* events);
 
     /** Returns the event buffer. 
      */
-    Json::Value GetEvents() {return _events;}
+    std::vector<MCEvent*>* GetEvents() {return _events;}
 
  private:
-    Json::Value _events;
+    std::vector<MCEvent*>* _events;
     unsigned int _primary;
     // All borrowed references owned by _g4manager (don't delete!)
     MAUSGeant4Manager* _g4manager;

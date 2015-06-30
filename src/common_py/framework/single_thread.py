@@ -141,11 +141,11 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 self.run_number = current_run_number
             event = self.transformer.process(event)
             old_event = event
-            event = maus_cpp.converter.string_repr(old_event)
-            try:
-                maus_cpp.converter.del_data_repr(old_event)
-            except TypeError:
-                pass
+            #event = maus_cpp.converter.string_repr(old_event)
+            #try:
+            #    maus_cpp.converter.del_data_repr(old_event)
+            #except TypeError:
+            #    pass
             event = self.merger.process(event)
         self.outputer.save(event)
 

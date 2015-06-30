@@ -283,8 +283,6 @@ class VirtualPlaneManager {
    *          side of one (or more) virtual planes; try to find the VirtualHit
    *          if this is the case
    *  @params track puts tracks into the "Virtual" branch of the track
-   *
-   *  @returns Json::Value with VirtualPlanes hits appended
    */
   void VirtualPlanesSteppingAction(const G4Step * aStep);
 
@@ -355,14 +353,14 @@ class VirtualPlaneManager {
 
   /** @brief Get Json array of all recorded virtual hits since StartOfEvent()
    */
-  Json::Value GetVirtualHits() {return _hits;}
+  std::vector<VirtualHit>* GetVirtualHits() {return _hits;}
 
   /** @brief Set Json array of virtual hits
    *
    *  @params hits array of virtual hits; if hits is not a Json::arrayValue,
    *          throws an exception
    */
-  void SetVirtualHits(Json::Value hits);
+  void SetVirtualHits(std::vector<VirtualHit>* hits);
 
   /** @brief Get flag to tell whether VirtualPlanes are active
    *
@@ -385,7 +383,7 @@ class VirtualPlaneManager {
   // associate MiceModule with each plane in _planes
   std::map<VirtualPlane*, const MiceModule*>  _mods;
   std::vector<int>          _nHits;  // numberOfHits in each plane
-  Json::Value               _hits;
+  std::vector<VirtualHit>*  _hits;
 };
 }
 #endif

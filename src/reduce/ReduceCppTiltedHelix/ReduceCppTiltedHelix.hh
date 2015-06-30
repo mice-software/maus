@@ -58,7 +58,7 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     size_t get_hist_index(size_t tracker, size_t station, size_t x_or_y);
 
-    std::vector<TH1D> hist_vector_;
+    std::vector<TH1D*> hist_vector_;
     static std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station_;
     static TMinuit* minimiser;
     static const size_t n_stations;

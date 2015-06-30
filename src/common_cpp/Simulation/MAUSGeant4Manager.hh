@@ -37,6 +37,7 @@ namespace MAUS {
 
 class MAUSVisManager;
 class MAUSPhysicsList;
+class MCEvent;
 
 namespace Simulation {
 class DetectorConstruction;
@@ -140,6 +141,16 @@ class MAUSGeant4Manager {
      *  appended
      */
     Json::Value RunManyParticles(Json::Value particle_array);
+
+    /** @brief Run a vector of particles through the simulation
+     *
+     *  @param mc_events to run; MAUSGeant4Manager takes ownership of the memory
+     *                   assigned to mc_events
+     *
+     *  @returns a vector of particles with any new hits, virtual_hits or tracks
+     *  appended
+     */
+    std::vector<MCEvent*>* RunManyParticles(std::vector<MCEvent*>* mc_events);
 
     /** @brief Get the visualisation manager or return NULL if vis is inactive
      *

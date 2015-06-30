@@ -56,15 +56,15 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
         std::string i_str = STLUtils::ToString(i);
         for (size_t j = 0; j < n_stations; ++j) {
             std::string j_str = STLUtils::ToString(j);
-            std::string name_x = "station_"+i_str+"_plane_"+j_str+"_x";
+            std::string name_x = "tracker_"+i_str+"_station_"+j_str+"_x";
             std::string title_x = name_x+";x_{meas} - x_{fit} [mm]";
             hist_vector_.push_back(
-                        TH1D(name_x.c_str(), title_x.c_str(), 1000, -3, 3)
+                    new TH1D(name_x.c_str(), title_x.c_str(), 100, -3, 3)
             );
-            std::string name_y = "station_"+i_str+"_plane_"+j_str+"_y";
+            std::string name_y = "tracker_"+i_str+"_station_"+j_str+"_y";
             std::string title_y = name_y+";y_{meas} - y_{fit} [mm]";
             hist_vector_.push_back(
-                        TH1D(name_y.c_str(), title_y.c_str(), 1000, -3, 3)
+                    new TH1D(name_y.c_str(), title_y.c_str(), 100, -3, 3)
             );
         }
     }
@@ -79,14 +79,18 @@ void ReduceCppTiltedHelix::_death() {}
 bool ReduceCppTiltedHelix::will_cut(std::vector<SciFiSpacePoint*> space_points, size_t tracker) {
     std::vector<size_t> n_space_points_per_station(n_stations, 0);
     for (size_t i = 0; i < space_points.size(); ++i) {
+        size_t station = space_points[i]->get_station();
+        ThreeVector pos = space_points[i]->get_position();
         if (space_points[i]->get_tracker() == int(tracker)) {
-            n_space_points_per_station[space_points[i]->get_station()] += 1;
+            n_space_points_per_station[space_points[i]->get_station()-1] += 1;
         }
     }
     // cut if we don't have exactly one space point per station
-    for (size_t i = 0; i < n_stations; ++i)
-        if (n_space_points_per_station[i] != 1)
+    for (size_t i = 0; i < n_stations; ++i) {
+        if (n_space_points_per_station[i] != 1) {
             return true;
+        }
+    }
     for (size_t i = 0; i < space_points.size(); ++i) {
           if (space_points[i] == NULL)
               throw(Exception(Exception::recoverable,
@@ -97,7 +101,7 @@ bool ReduceCppTiltedHelix::will_cut(std::vector<SciFiSpacePoint*> space_points, 
 }
 
 size_t ReduceCppTiltedHelix::get_hist_index(size_t tracker, size_t station, size_t x_or_y) {
-    return (tracker*n_stations + station)*2 + x_or_y;
+    return (tracker*n_stations + station-1)*2 + x_or_y;
 }
 
 ImageData* ReduceCppTiltedHelix::get_image_data() {
@@ -110,11 +114,11 @@ ImageData* ReduceCppTiltedHelix::get_image_data() {
         TCanvas* canvas = new TCanvas(name.c_str(), name.c_str());
         int n_verticals = hist_vector_.size()/n_stations/n_trackers;
         canvas->Divide(n_stations, n_verticals);
-        for (size_t station = 0; station < n_stations; ++station) {
-            canvas->cd(station+1);
-            hist_vector_[get_hist_index(tracker, station, 0)].Draw();
-            canvas->cd(station+n_stations+1);
-            hist_vector_[get_hist_index(tracker, station, 1)].Draw();
+        for (size_t station = 1; station <= n_stations; ++station) {
+            canvas->cd(station);
+            hist_vector_[get_hist_index(tracker, station, 0)]->Draw();
+            canvas->cd(station+n_stations);
+            hist_vector_[get_hist_index(tracker, station, 1)]->Draw();
         }
         CanvasWrapper* wrap = new CanvasWrapper();
         wrap->SetDescription("Fitted residuals for tracker "+tracker_str);
@@ -162,7 +166,7 @@ void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
         for (size_t j = 0; j < space_points.size(); ++j) {
             if (space_points[j]->get_tracker() == int(tracker)) {
                int station = space_points[j]->get_station();
-               space_points_by_station[station].push_back(space_points[j]);
+               space_points_by_station[station-1].push_back(space_points[j]);
             }
         }
         do_fit_pattern_recognition(tracker, space_points_by_station);
@@ -171,9 +175,14 @@ void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
 }
 
 void ReduceCppTiltedHelix::do_fit_pattern_recognition(size_t tracker, std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station) {
+    std::cerr << "Do pattern recognition fit tracker " << tracker << std::endl;
     std::vector<SciFiStraightPRTrack*> strks;
     std::vector<SciFiHelicalPRTrack*> htrks;
     PatternRecognition().make_5tracks(true, tracker, space_points_by_station, strks, htrks);
+    if (htrks.size() != 1) {
+        std::cerr << "Failed on htrks size of " << htrks.size() << std::endl;
+        return;
+    }
     for (size_t i = 0; i < space_points_by_station.size(); ++i) {
         size_t station = space_points_by_station[i][0]->get_station();
         size_t index = 0;
@@ -182,8 +191,9 @@ void ReduceCppTiltedHelix::do_fit_pattern_recognition(size_t tracker, std::vecto
         else
             index = space_points_by_station.size() - i - 1;
         std::vector<double> res = calculate_residual(index, space_points_by_station[i][0], htrks[0]);
-        hist_vector_[get_hist_index(tracker, station, 0)].Fill(res[0]);
-        hist_vector_[get_hist_index(tracker, station, 1)].Fill(res[1]);
+        std::cerr << "Calculate residual " << index << res[0] << " " << res[1] << std::endl;
+        hist_vector_[get_hist_index(tracker, station, 0)]->Fill(res[0]);
+        hist_vector_[get_hist_index(tracker, station, 1)]->Fill(res[1]);
     }
 }
 
@@ -283,9 +293,23 @@ void ReduceCppTiltedHelix::fill_residuals_minuit(size_t tracker, std::vector<std
             return;
     }
     for (size_t station = 0; station < space_points_by_station.size(); ++station) {
-        hist_vector_[get_hist_index(tracker, station, 0)].Fill(x_residuals[station]);
-        hist_vector_[get_hist_index(tracker, station, 1)].Fill(y_residuals[station]);
+        hist_vector_[get_hist_index(tracker, station, 0)]->Fill(x_residuals[station]);
+        hist_vector_[get_hist_index(tracker, station, 1)]->Fill(y_residuals[station]);
     }
+}
+
+void PrintEventData(MAUS::Data* data) {
+    if (data->GetSpill()->GetDaqEventType() != "physics_event") {
+        std::cerr << "Not physics event" << std::endl;
+        return;
+    }
+    std::vector<MCEvent*>* mc_events = data->GetSpill()->GetMCEvents();
+    for (size_t i = 0; mc_events != NULL && i < mc_events->size(); ++i) {
+    }
+    std::vector<ReconEvent*>* recon_events = data->GetSpill()->GetReconEvents();
+    for (size_t i = 0; recon_events != NULL && i < recon_events->size(); ++i) {
+        SciFiEvent* sci_fi_event = (*recon_events)[i]->GetSciFiEvent();
+    }  
 }
 
 
@@ -296,6 +320,9 @@ MAUS::ImageData* ReduceCppTiltedHelix::_process(MAUS::Data* data) {
     if (data->GetSpill() == NULL)
         throw Exception(Exception::recoverable, "Spill was NULL",
                         "ReduceCppTiltedHelix::_process");
+    if (data->GetSpill()->GetDaqEventType() != "physics_event")
+        return get_image_data();
+    PrintEventData(data);
     if (data->GetSpill()->GetReconEvents() == NULL)
         throw Exception(Exception::recoverable, "ReconEvents were NULL",
                         "ReduceCppTiltedHelix::_process");
@@ -303,7 +330,7 @@ MAUS::ImageData* ReduceCppTiltedHelix::_process(MAUS::Data* data) {
     for (size_t i = 0; i < recon_events->size(); ++i) {
         if (recon_events->at(i)->GetSciFiEvent() == NULL) {
             throw Exception(Exception::recoverable,
-                            "ReconEvents were NULL",
+                            "SciFiEvent was NULL",
                             "ReduceCppTiltedHelix::_process");
         }
         std::vector<SciFiSpacePoint*> space_points =
