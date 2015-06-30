@@ -84,7 +84,8 @@ struct ChanMap {
   };
 };
 
-typedef std::map<int, ChanMap> ChanMapLookup;
+// typedef std::map<int, ChanMap> ChanMapLookup;
+typedef std::vector<ChanMap> ChanMapLookup;
 
 class RealDataDigitization {
  public:
@@ -154,17 +155,16 @@ class RealDataDigitization {
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
   static const int _banks_per_board       = 4;
-  static const int _n_map_entries         = 8320;
+  static const int _n_entries         = 8192;
   double _npe_cut;
-//   static const double _min       = 0.000000001;
+  //static const double _min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
   Json::Value _calibration[_number_banks][_number_channels];
   /// This is an array storing the goodness of each channel.
   bool _good_chan[_number_banks][_number_channels];
 
-  /// This is for the mapping storage.
-  ChanMapLookup _chan_map;
+  ChanMapLookup _chan_map; /// Mapping data storage
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS
