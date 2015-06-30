@@ -56,6 +56,7 @@
 namespace MAUS {
 
 struct ChanMap {
+  /* \struct ChanMap A struct to hold scifi channel map data */
   int UId;
   int tracker;
   int station;
@@ -67,6 +68,20 @@ struct ChanMap {
   int extWG;
   int inWG;
   int WGfib;
+  /* Default Constructor */
+  ChanMap() : UId(-1),
+              tracker(-1),
+              station(-1),
+              plane(-1),
+              channel(-1),
+              board(-1),
+              bank(-1),
+              chan_ro(-1),
+              extWG(-1),
+              inWG(-1),
+              WGfib(-1) {
+    // Do nothing
+  };
 };
 
 typedef std::map<int, ChanMap> ChanMapLookup;

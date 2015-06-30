@@ -253,8 +253,8 @@ reconstruction_geometry_filename = ""
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
 SciFiDigitizationNPECut = 1.0
-SciFiMappingFileName = "scifi_mapping_2015-06-16.txt"
-SciFiCalibrationFileName = "scifi_calibration_2015-06-16.txt"
+SciFiMappingFileName = "scifi_mapping_2015-06-18.txt"
+SciFiCalibrationFileName = "scifi_calibration_2015-06-18.txt"
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1

@@ -287,7 +287,8 @@ int RealDataDigitization::calc_uid(int chan_ro, int bank, int board) const {
 
 bool RealDataDigitization::load_mapping(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/cabling/"+file;
+  std::cerr << "Filename: " << fname << "\n";
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
@@ -306,9 +307,9 @@ bool RealDataDigitization::load_mapping(std::string file) {
          >> cmap.plane >> cmap.channel >> cmap.extWG >> cmap.inWG >> cmap.WGfib;
     int UId = calc_uid(cmap.chan_ro, cmap.bank, cmap.board);
     if (_chan_map.count(UId) != 0) {
-      // std::cerr << "WARNING: UId " << UId << " not unique! ";
-      // std::cerr << "chan_ro: " << cmap.chan_ro << ", bank: " << cmap.bank
-      //          << ", board: " << cmap.board << "\n";
+      std::cerr << "WARNING: UId " << UId << " not unique! ";
+      std::cerr << "chan_ro: " << cmap.chan_ro << ", bank: " << cmap.bank
+                << ", board: " << cmap.board << "\n";
     }
     _chan_map[UId] = cmap;
   }
@@ -323,9 +324,9 @@ bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan
   int UId = calc_uid(chan_ro, bank, board);
 
   if (_chan_map.count(UId) != 1) {
-      // std::cerr << "WARNING: UId " << UId << " not present! ";
-      // std::cerr << "chan_ro: " << chan_ro << ", bank: " << bank << ", board: " <<  board << "\n";
-      return false;
+    std::cerr << "WARNING: UId " << UId << " not present! ";
+    std::cerr << "chan_ro: " << chan_ro << ", bank: " << bank << ", board: " <<  board << "\n";
+    return false;
   }
 
   tracker = _chan_map[UId].tracker;
