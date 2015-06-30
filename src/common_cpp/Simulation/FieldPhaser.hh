@@ -20,6 +20,7 @@
 
 #include "src/common_cpp/Simulation/MAUSPrimaryGeneratorAction.hh"
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
+#include "src/common_cpp/DataStructure/VirtualHit.hh"
 #include "src/legacy/BeamTools/BTPhaser.hh"
 
 // Exceptionally, this class is tested at integration test level only. Really
@@ -69,9 +70,9 @@ class FieldPhaser {
 
   void MakeVirtualPlanes(BTPhaser::FieldForPhasing* cavity);
 
-  MAUSPrimaryGeneratorAction::PGParticle TryToPhase(Json::Value virtual_hit);
+  MAUSPrimaryGeneratorAction::PGParticle TryToPhase(std::vector<MAUS::VirtualHit>* v_hits);
 
-  MAUSPrimaryGeneratorAction::PGParticle VirtualHitToPGParticle(VirtualHit hit);
+  MAUSPrimaryGeneratorAction::PGParticle VirtualHitToPGParticle(MAUS::VirtualHit hit);
 
   VirtualPlaneManager* _phaserVirtualPlanes;
   VirtualPlaneManager* _g4managerVirtualPlanes;

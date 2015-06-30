@@ -120,7 +120,7 @@ class MAUSGeant4Manager {
      *
      *  @returns a json object with tracking, virtual hits and real hits
      */
-    Json::Value RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
+    MCEvent RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
 
     /** @brief Run a particle through the simulation
      *
@@ -129,7 +129,7 @@ class MAUSGeant4Manager {
      *           tracking output from this event:\n
      *             "tracks", "virtual_hits", "hits"
      */
-    Json::Value RunParticle(Json::Value particle);
+    MCEvent RunParticle(Json::Value particle);
 
     /** @brief Run an array of particles through the simulation
      *
@@ -167,7 +167,6 @@ class MAUSGeant4Manager {
      *  Note that it is a feature of Geant4 that the geometry cannot be reopened
      */
     ~MAUSGeant4Manager();
-
 
     /** Set the auxiliary information for the GDML objects 
      *  
@@ -212,7 +211,7 @@ class MAUSGeant4Manager {
     void SetVisManager();
     void BeamOn(int number_of_particles);
 
-    Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
+    MCEvent Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 
     static MAUSGeant4Manager* _instance;
     static bool _isClosed;

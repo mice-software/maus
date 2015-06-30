@@ -575,17 +575,15 @@ void DetectorConstruction::SetSteppingAccuracy() {
     fieldPropagator->SetMaximumEpsilonStep(_epsilonMax);
 }
 
-Json::Value DetectorConstruction::GetSDHits(size_t i) {
+void DetectorConstruction::GetSDHits(size_t i, MCEvent* event) {
   if (i >= _SDs.size()) {
     throw Exception(Exception::recoverable,
                     "Attempt to get SD for out-of-range detector",
                     "DetectorConstruction::GetSDHits(...)");
   }
   if (_SDs[i] and _SDs[i]->isHit()) {
-    return _SDs[i]->GetHits();
+    return _SDs[i]->GetHits(event);
   }
-  Json::Value empty(Json::objectValue);
-  return empty;
 }
 
 void DetectorConstruction::ClearSDHits() {

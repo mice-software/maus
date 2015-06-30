@@ -30,7 +30,7 @@
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "src/legacy/Interface/VirtualHit.hh"
+#include "src/common_cpp/DataStructure/VirtualHit.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 #include "src/legacy/BeamTools/BTFieldGroup.hh"
 
@@ -147,7 +147,7 @@ class VirtualPlane {
    *  If _radialExtent is positive checks radius of particles (cylindrical
    *  type radius, in coordinate system of the Virtual Plane).
    */
-  VirtualHit BuildNewHit(const G4Step * aStep, int station) const;
+  MAUS::VirtualHit BuildNewHit(const G4Step * aStep, int station) const;
 
   /** @brief Comparator for sorting by independent variable
    */
@@ -203,14 +203,17 @@ class VirtualPlane {
 
  private:
   // Build a new hit and send it to the MICEEvent
-  void FillBField(VirtualHit * aHit, const G4Step * aStep) const;
-  void FillStaticData(VirtualHit * aHit, const G4Step * aStep) const;
-  void FillKinematics(VirtualHit * aHit, const G4Step * aStep) const;
+  void FillBField(MAUS::VirtualHit * aHit, const G4Step * aStep) const;
+  void FillStaticData(MAUS::VirtualHit * aHit, const G4Step * aStep) const;
+  void FillKinematics(MAUS::VirtualHit * aHit, const G4Step * aStep) const;
 
-  void TransformToLocalCoordinates(VirtualHit* aHit) const;
+  void TransformToLocalCoordinates(MAUS::VirtualHit* aHit) const;
 
   double*   Integrate(G4StepPoint* aPoint) const;
   double*   ExtractPointData(G4StepPoint* aPoint) const;
+
+  static ::CLHEP::Hep3Vector MAUSToCLHEP(MAUS::ThreeVector value);
+  static MAUS::ThreeVector CLHEPToMAUS(::CLHEP::Hep3Vector value);
 
   BTTracker::var     _planeType;
   double             _independentVariable;
@@ -321,7 +324,7 @@ class VirtualPlaneManager {
 
   /** @brief Read the hit from the Json::Value
    */
-  VirtualHit ReadHit(Json::Value value);
+  //VirtualHit ReadHit(Json::Value value);
 
   /** @brief Add plane to the manager
    *
@@ -375,8 +378,6 @@ class VirtualPlaneManager {
  private:
   VirtualPlane ConstructFromModule(const MiceModule* mod);
   VirtualPlane* PlaneFromStation(int station);  // get plane from station number
-
-  ::CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
 
   bool                      _useVirtualPlanes;
   std::vector<VirtualPlane*> _planes;

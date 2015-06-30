@@ -144,35 +144,38 @@ std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>
 }
 
 
-Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
+MCEvent MAUSGeant4Manager::RunParticle(Json::Value particle) {
     MAUSPrimaryGeneratorAction::PGParticle p;
     p.ReadJson(particle["primary"]);
     return Tracking(p);
 }
 
-Json::Value MAUSGeant4Manager::RunParticle
+MCEvent MAUSGeant4Manager::RunParticle
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     return Tracking(p);
 }
 
 
-Json::Value MAUSGeant4Manager::Tracking
+MCEvent MAUSGeant4Manager::Tracking
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
     Squeak::mout(Squeak::debug) << std::endl;
 
     GetPrimaryGenerator()->Push(p);
+    
     Json::Value event_array = Json::Value(Json::arrayValue);
     Json::Value event(Json::objectValue);
-    event["primary"] = p.WriteJson();
-    event_array.append(event);
-    _eventAct->SetEvents(event_array);
+    std::vector<MCEvent*>* event_vector;
+    event_vector->push_back(new MCEvent());
+    event_vector->at(0)->SetPrimary(p.WriteCpp());
+    _eventAct->SetEvents(event_vector); // EventAction now owns this memory
     Squeak::mout(Squeak::debug) << "Beam On" << std::endl;
     GetField()->Print(Squeak::mout(Squeak::debug));
     BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
-    return _eventAct->GetEvents()[Json::Value::UInt(0)];
+    event_vector = _eventAct->GetEvents(); // EventAction still owns this memory
+    return *event_vector->at(0);
 }
 
 void MAUSGeant4Manager::SetVisManager() {

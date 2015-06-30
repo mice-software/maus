@@ -51,10 +51,24 @@ class SciFiSD : public MAUS::MAUSSD {
      */
     G4bool ProcessHits(G4Step*, G4TouchableHistory*);
 
+    /** True if the SD has at least one hit in its _hits array */
+    bool isHit() {return _hits == NULL || _hits->size() == 0;}
+
+    /** Returns the number of hits in the Sensitive Detector */
+    int GetNHits();
+
+    /** Clears all hits in the sensitive detector */
+    void ClearHits();
+
+    /** Return the detector hits */
+    void GetHits(MCEvent* event) = 0;
+
     /** @brief Code that is called at the end of processing of an event
      *   Does nothing.
      */
     void EndOfEvent(G4HCofThisEvent* HCE);
+  private:
+    std::vector<SciFiHit>* _hits;
 };
 
 #endif

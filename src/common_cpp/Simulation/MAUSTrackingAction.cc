@@ -55,7 +55,7 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         track.SetParentTrackId(aTrack->GetParentID());
         track.SetKillReason("");
         if (_stepping->GetWillKeepSteps())
-            _stepping->SetSteps(Json::Value(Json::arrayValue));
+            _stepping->SetSteps(new std::vector<Step>());
         _tracks->push_back(track);
     }
 }
@@ -72,14 +72,14 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
         ThreeVector pos(aTrack->GetPosition().x(),
                         aTrack->GetPosition().y(),
                         aTrack->GetPosition().z());
-        track.SetFinalPosition(pos);
+        cpp_track.SetFinalPosition(pos);
         ThreeVector mom(aTrack->GetMomentum().x(),
                         aTrack->GetMomentum().y(),
                         aTrack->GetMomentum().z());
-        track.SetFinalMomentum(mom);
+        cpp_track.SetFinalMomentum(mom);
 
         if (_stepping->GetWillKeepSteps())
-            track.SetSteps(_stepping->GetSteps());
+            cpp_track.SetSteps(_stepping->GetSteps());
         (*_tracks)[_tracks->size()-1] = cpp_track;
     }
 }
@@ -90,7 +90,7 @@ void MAUSTrackingAction::SetTracks(std::vector<Track>* tracks) {
 
 void MAUSTrackingAction::SetKillReason
                                   (const G4Track* aTrack, std::string reason) {
-    for (size_t i = 0; i < _tracks.size(); ++i) {
+    for (size_t i = 0; i < _tracks->size(); ++i) {
         if ((*_tracks)[i].GetTrackId() == aTrack->GetTrackID()) {
             (*_tracks)[i].SetKillReason(reason);
         }

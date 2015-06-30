@@ -28,6 +28,8 @@
 #include "Geant4/G4Track.hh"
 #include "Geant4/G4UserSteppingAction.hh"
 
+#include "src/common_cpp/DataStructure/Step.hh"
+
 namespace MAUS {
 
 /** @class  MAUSSteppingAction
@@ -57,13 +59,14 @@ class MAUSSteppingAction : public G4UserSteppingAction {
    *
    *  @returns the track data for the entire spill
    */
-  Json::Value GetSteps() const {return _steps;}
+  std::vector<Step>* GetSteps() const {return _steps;}
 
   /** @brief Set the steps for this spill
    *
-   *  @params steps Json value of array type
+   *  @params steps vector of steps, usually empty; MAUSSteppingAction takes
+   *  ownership of this memory
    */
-  void SetSteps(Json::Value steps);
+  void SetSteps(std::vector<Step>* steps);
 
   /** @brief Set to true to store every step (rather verbose)
    */
@@ -73,17 +76,17 @@ class MAUSSteppingAction : public G4UserSteppingAction {
    */
   bool GetWillKeepSteps() const {return _keepSteps;}
 
-  /** @brief Convert from G4StepPoint to Json
+  /** @brief Convert from G4StepPoint to MAUS datastructure
    *
    *  @brief point Convert either the prestep or poststep of point
    *  @brief prestep Set to true to convert the PreStepPoint; set to false to
    *         convert the PostStepPoint
    */
-  Json::Value StepToJson(const G4Step* point, bool prestep) const;
+  Step StepToMaus(const G4Step* point, bool prestep) const;
 
 
  private:
-  Json::Value _steps;
+  std::vector<Step>* _steps;
   bool _keepSteps;
   int _maxNSteps;
 };

@@ -24,12 +24,13 @@
 
 #include "json/json.h"
 
-#include "src/legacy/Interface/VirtualHit.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "Utils/Exception.hh"
 
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
+
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 #include "src/common_cpp/Simulation/VirtualPlanes.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -96,22 +97,22 @@ bool VirtualPlane::SteppingOver(const G4Step* aStep) const {
 }
 
 void VirtualPlane::FillStaticData
-                               (VirtualHit * aHit, const G4Step * aStep) const {
+                         (MAUS::VirtualHit * aHit, const G4Step * aStep) const {
   G4Track * theTrack = aStep->GetTrack();
-  aHit->SetTrackID(theTrack->GetTrackID());
-  aHit->SetPID(theTrack->GetDynamicParticle()
+  aHit->SetTrackId(theTrack->GetTrackID());
+  aHit->SetParticleId(theTrack->GetDynamicParticle()
                                           ->GetDefinition()->GetPDGEncoding());
   aHit->SetMass(theTrack->GetDynamicParticle()->GetMass());
   aHit->SetCharge(theTrack->GetDynamicParticle()->GetCharge());
 }
 
-void VirtualPlane::FillBField(VirtualHit * aHit, const G4Step * aStep) const {
+void VirtualPlane::FillBField(MAUS::VirtualHit * aHit, const G4Step * aStep) const {
   double point[4] =
-     {aHit->GetPos()[0], aHit->GetPos()[1], aHit->GetPos()[2], aHit->GetTime()};
+     {aHit->GetPosition()[0], aHit->GetPosition()[1], aHit->GetPosition()[2], aHit->GetTime()};
   double field[6] = {0., 0., 0., 0., 0., 0.};
   GetField()->GetFieldValue(point, field);
-  aHit->SetBField(CLHEP::Hep3Vector(field[0], field[1], field[2]));
-  aHit->SetEField(CLHEP::Hep3Vector(field[3], field[4], field[5]));
+  aHit->SetBField(MAUS::ThreeVector(field[0], field[1], field[2]));
+  aHit->SetEField(MAUS::ThreeVector(field[3], field[4], field[5]));
 }
 
 bool VirtualPlane::InRadialCut(CLHEP::Hep3Vector position) const {
@@ -123,7 +124,7 @@ bool VirtualPlane::InRadialCut(CLHEP::Hep3Vector position) const {
 }
 
 void VirtualPlane::FillKinematics
-                               (VirtualHit * aHit, const G4Step * aStep) const {
+                         (MAUS::VirtualHit * aHit, const G4Step * aStep) const {
   double  x[12];
   double* x_from_beginning = NULL;
   double* x_from_end = NULL;
@@ -146,13 +147,12 @@ void VirtualPlane::FillKinematics
     x[i] = (x_from_end[i]-x_from_beginning[i])/(indep_end-indep_beg)
           *(_independentVariable-indep_beg)+x_from_beginning[i];
 
-  aHit->SetPos(CLHEP::Hep3Vector(x[1], x[2], x[3]));
-  aHit->SetMomentum(CLHEP::Hep3Vector(x[5], x[6], x[7]));
-  aHit->SetSpin(CLHEP::Hep3Vector(x[8], x[9], x[10]));
+  aHit->SetPosition(MAUS::ThreeVector(x[1], x[2], x[3]));
+  aHit->SetMomentum(MAUS::ThreeVector(x[5], x[6], x[7]));
+  aHit->SetSpin(MAUS::ThreeVector(x[8], x[9], x[10]));
   double mass = aStep->GetPostStepPoint()->GetMass();
   // FORCE mass shell condition
   x[4] = ::sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]+mass*mass);
-  aHit->SetEnergy(x[4]);
   aHit->SetTime(x[0]);
   aHit->SetProperTime(0.);
   aHit->SetPathLength(0.);
@@ -164,10 +164,21 @@ void VirtualPlane::FillKinematics
 }
 
 void VirtualPlane::TransformToLocalCoordinates(VirtualHit* aHit) const {
-  aHit->SetPos(_rotation*(aHit->GetPos() - _position));
-  aHit->SetMomentum(_rotation*aHit->GetMomentum());
-  aHit->SetBField(_rotation*aHit->GetBField());
-  aHit->SetEField(_rotation*aHit->GetEField());
+  ::CLHEP::Hep3Vector pos = MAUSToCLHEP(aHit->GetPosition());
+  ::CLHEP::Hep3Vector pos_rot = _rotation*(pos - _position);
+  aHit->SetPosition(CLHEPToMAUS(pos_rot));
+
+  ::CLHEP::Hep3Vector mom = MAUSToCLHEP(aHit->GetMomentum());
+  ::CLHEP::Hep3Vector mom_rot = _rotation*mom;
+  aHit->SetMomentum(CLHEPToMAUS(mom_rot));
+
+  ::CLHEP::Hep3Vector bfield = MAUSToCLHEP(aHit->GetBField());
+  ::CLHEP::Hep3Vector bfield_rot = _rotation*bfield;
+  aHit->SetBField(CLHEPToMAUS(bfield_rot));
+
+  ::CLHEP::Hep3Vector efield = MAUSToCLHEP(aHit->GetEField());
+  ::CLHEP::Hep3Vector efield_rot = _rotation*efield;
+  aHit->SetEField(CLHEPToMAUS(efield_rot));
 }
 
 double   VirtualPlane::GetIndependentVariable(G4StepPoint* aPoint) const {
@@ -207,7 +218,7 @@ VirtualHit VirtualPlane::BuildNewHit(const G4Step * aStep, int station) const {
   FillStaticData(&aHit, aStep);
   FillKinematics(&aHit, aStep);
   FillBField(&aHit, aStep);
-  aHit.SetStationNumber(station);
+  aHit.SetStationId(station);
   if (!_globalCoordinates) TransformToLocalCoordinates(&aHit);
   return aHit;
 }
@@ -217,11 +228,21 @@ const BTField* VirtualPlane::GetField() const {
                                  (MAUSGeant4Manager::GetInstance()->GetField());
 }
 
+::CLHEP::Hep3Vector VirtualPlane::MAUSToCLHEP(MAUS::ThreeVector value) {
+    return ::CLHEP::Hep3Vector(value[0], value[1], value[2]);
+}
+
+
+MAUS::ThreeVector VirtualPlane::CLHEPToMAUS(::CLHEP::Hep3Vector value) {
+    return MAUS::ThreeVector(value[0], value[1], value[2]);
+}
+
+
 //////////////////////// VirtualPlaneManager //////////////////////////
 
 VirtualPlaneManager::VirtualPlaneManager()
     : _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
-      _hits(Json::arrayValue) {
+      _hits(NULL) {
 }
 
 VirtualPlaneManager::~VirtualPlaneManager() {
@@ -253,32 +274,31 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
                                             _planes[i]->GetMultipassAlgorithm();
         if (_nHits[i]>0) {
           if (mp == VirtualPlane::new_station) {
-            _hits.append(WriteHit(_planes[i]->BuildNewHit(aStep,
-                                         _planes.size()*_nHits[i]+i+1)));
+            _hits->push_back(_planes[i]->BuildNewHit(aStep,
+                                         _planes.size()*_nHits[i]+i+1));
             _nHits[i]++;
           }
           if (mp == VirtualPlane::same_station) {
-            _hits.append(WriteHit(_planes[i]->BuildNewHit(aStep, i+1)));
+            _hits->push_back(_planes[i]->BuildNewHit(aStep, i+1));
             _nHits[i]++;
           }
         } else {
-          _hits.append(WriteHit(_planes[i]->BuildNewHit(aStep, i+1)));
+          _hits->push_back(_planes[i]->BuildNewHit(aStep, i+1));
           _nHits[i]++;
         }
       }
     } catch (Exception exc) {}  // do nothing - just dont make a hit
 }
 
-void VirtualPlaneManager::SetVirtualHits(Json::Value hits) {
-  if (!hits.isArray())
-    throw(Exception(Exception::recoverable, "Virtual hits must be of array type",
-          "VirtualPlaneManager::SetVirtualHits()"));
+void VirtualPlaneManager::SetVirtualHits(std::vector<MAUS::VirtualHit>* hits) {
+  if (_hits != NULL)
+      delete _hits;
   _hits = hits;
 }
 
 void VirtualPlaneManager::StartOfEvent() {
   _nHits = std::vector<int>(_planes.size(), 0);
-  SetVirtualHits(Json::Value(Json::arrayValue));
+  SetVirtualHits(new std::vector<MAUS::VirtualHit>());
 }
 
 void VirtualPlaneManager::ConstructVirtualPlanes
@@ -389,88 +409,6 @@ int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
               "Station number out of range",
               "VirtualPlaneManager::GetNumberOfHits"));
     return _nHits[stationNumber-1];
-}
-
-Json::Value VirtualPlaneManager::WriteHit(VirtualHit hit) {
-    Json::Value hit_v = Json::Value(Json::objectValue);
-    hit_v["station_id"] = hit.GetStationNumber();
-    hit_v["time"] = hit.GetTime();
-    hit_v["particle_id"] = hit.GetPID();
-    hit_v["track_id"] = hit.GetTrackID();
-    hit_v["mass"] = hit.GetMass();
-    hit_v["charge"] = hit.GetCharge();
-    hit_v["position"] = Json::Value(Json::objectValue);
-    hit_v["position"]["x"] = hit.GetPos().x();
-    hit_v["position"]["y"] = hit.GetPos().y();
-    hit_v["position"]["z"] = hit.GetPos().z();
-    hit_v["momentum"] = Json::Value(Json::objectValue);
-    hit_v["momentum"]["x"] = hit.GetMomentum().x();
-    hit_v["momentum"]["y"] = hit.GetMomentum().y();
-    hit_v["momentum"]["z"] = hit.GetMomentum().z();
-    hit_v["spin"] = Json::Value(Json::objectValue);
-    hit_v["spin"]["x"] = hit.GetSpin().x();
-    hit_v["spin"]["y"] = hit.GetSpin().y();
-    hit_v["spin"]["z"] = hit.GetSpin().z();
-    hit_v["proper_time"] = hit.GetProperTime();
-    hit_v["path_length"] = hit.GetPathLength();
-    hit_v["b_field"] = Json::Value(Json::objectValue);
-    hit_v["b_field"]["x"] = hit.GetBField().x();
-    hit_v["b_field"]["y"] = hit.GetBField().y();
-    hit_v["b_field"]["z"] = hit.GetBField().z();
-    hit_v["e_field"] = Json::Value(Json::objectValue);
-    hit_v["e_field"]["x"] = hit.GetEField().x();
-    hit_v["e_field"]["y"] = hit.GetEField().y();
-    hit_v["e_field"]["z"] = hit.GetEField().z();
-    return hit_v;
-}
-
-VirtualHit VirtualPlaneManager::ReadHit(Json::Value v_hit) {
-    Json::Value stationId =
-         JsonWrapper::GetProperty(v_hit, "station_id", JsonWrapper::intValue);
-    Json::Value trackId =
-         JsonWrapper::GetProperty(v_hit, "track_id", JsonWrapper::intValue);
-    Json::Value pid =
-         JsonWrapper::GetProperty(v_hit, "particle_id", JsonWrapper::intValue);
-
-    Json::Value time =
-         JsonWrapper::GetProperty(v_hit, "time", JsonWrapper::realValue);
-    Json::Value mass =
-         JsonWrapper::GetProperty(v_hit, "mass", JsonWrapper::realValue);
-    Json::Value charge =
-         JsonWrapper::GetProperty(v_hit, "charge", JsonWrapper::realValue);
-    Json::Value tau =
-         JsonWrapper::GetProperty(v_hit, "proper_time", JsonWrapper::realValue);
-    Json::Value len =
-         JsonWrapper::GetProperty(v_hit, "path_length", JsonWrapper::realValue);
-    Json::Value pos_v =
-         JsonWrapper::GetProperty(v_hit, "position", JsonWrapper::objectValue);
-    Json::Value mom_v =
-         JsonWrapper::GetProperty(v_hit, "momentum", JsonWrapper::objectValue);
-    Json::Value spin_v =
-         JsonWrapper::GetProperty(v_hit, "spin", JsonWrapper::objectValue);
-    Json::Value b_v =
-         JsonWrapper::GetProperty(v_hit, "b_field", JsonWrapper::objectValue);
-    Json::Value e_v =
-         JsonWrapper::GetProperty(v_hit, "e_field", JsonWrapper::objectValue);
-
-    VirtualHit hit;
-    hit.SetStationNumber(stationId.asInt());
-    hit.SetTrackID(trackId.asInt());
-    hit.SetPID(pid.asInt());
-
-    hit.SetTime(time.asDouble());
-    hit.SetMass(mass.asDouble());
-    hit.SetCharge(charge.asDouble());
-    hit.SetProperTime(tau.asDouble());
-    hit.SetPathLength(len.asDouble());
-
-    hit.SetPos(JsonWrapper::JsonToThreeVector(pos_v));
-    hit.SetMomentum(JsonWrapper::JsonToThreeVector(mom_v));
-    hit.SetSpin(JsonWrapper::JsonToThreeVector(spin_v));
-    hit.SetBField(JsonWrapper::JsonToThreeVector(b_v));
-    hit.SetEField(JsonWrapper::JsonToThreeVector(e_v));
-    hit.SetEnergy(::sqrt(hit.GetMomentum().mag2()+hit.GetMass()*hit.GetMass()));
-    return hit;
 }
 
 VirtualPlane* VirtualPlaneManager::PlaneFromStation(int stationNumber) {

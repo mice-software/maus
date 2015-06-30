@@ -204,9 +204,9 @@ void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
 
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
-    x = hit.GetPos().x();
-    y = hit.GetPos().y();
-    z = hit.GetPos().z();
+    x = hit.GetPosition().x();
+    y = hit.GetPosition().y();
+    z = hit.GetPosition().z();
     time = hit.GetTime();
     px = hit.GetMomentum().x();
     py = hit.GetMomentum().y();
@@ -214,8 +214,8 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     sx = hit.GetSpin().x();
     sy = hit.GetSpin().y();
     sz = hit.GetSpin().z();
-    energy = hit.GetEnergy();
-    pid = hit.GetPID();
+    energy = sqrt(px*px+py*py+pz*pz+hit.GetMass()*hit.GetMass());
+    pid = hit.GetParticleId();
     seed = 0;
 }
 

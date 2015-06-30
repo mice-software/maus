@@ -25,7 +25,9 @@
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
-#include "src/legacy/Interface/VirtualHit.hh"  // ACK! conflict in DataStructure
+
+#include "src/common_cpp/DataStructure/VirtualHit.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 
 namespace MAUS {
 
@@ -80,10 +82,9 @@ void FieldPhaser::SetPhases() {
                n_attempts < BTPhaser::GetInstance()->NumberOfCavities()*5) {
             ++n_attempts;
             Squeak::mout(Squeak::info) << "." << std::flush;
-            Json::Value tracks = mgm->RunParticle(ref);
-            Json::Value v_hits = JsonWrapper::GetProperty
-                              (tracks, "virtual_hits", JsonWrapper::arrayValue);
-            if (v_hits.size() == 0)
+            MCEvent event = mgm->RunParticle(ref);
+            std::vector<VirtualHit>* v_hits = event.GetVirtualHits();
+            if (v_hits == NULL || v_hits->size() == 0)
                 break;
             else
                 ref = TryToPhase(v_hits);
@@ -108,20 +109,24 @@ void FieldPhaser::SetPhases() {
 }
 
 MAUSPrimaryGeneratorAction::PGParticle FieldPhaser::TryToPhase
-                                                          (Json::Value v_hits) {
+                                            (std::vector<MAUS::VirtualHit>* v_hits) {
     MAUSGeant4Manager* mgm = MAUSGeant4Manager::GetInstance();
     std::set<int> phased_stations;
     std::vector<std::pair<VirtualHit, bool> > phased_hits;
 
     MAUSPrimaryGeneratorAction::PGParticle ref = mgm->GetReferenceParticle();
-    for (unsigned int j = 0; j < v_hits.size(); ++j) {
-        VirtualHit hit = _phaserVirtualPlanes->ReadHit(v_hits[j]);
-        bool is_phased = BTPhaser::GetInstance()->
-                                       SetThePhase(hit.GetPos(), hit.GetTime());
+    for (unsigned int j = 0; j < v_hits->size(); ++j) {
+        VirtualHit hit = v_hits->at(j);
+        CLHEP::Hep3Vector pos(hit.GetPosition().x(),
+                              hit.GetPosition().y(),
+                              hit.GetPosition().z());
+        bool is_phased = BTPhaser::GetInstance()->SetThePhase(
+                                                          pos,
+                                                          hit.GetTime());
         std::pair<VirtualHit, bool> phase_pair(hit, is_phased);
         phased_hits.push_back(phase_pair);
         if (is_phased)
-            phased_stations.insert(hit.GetStationNumber());
+            phased_stations.insert(hit.GetStationId());
     }
     _phaserVirtualPlanes->RemovePlanes(phased_stations);
 

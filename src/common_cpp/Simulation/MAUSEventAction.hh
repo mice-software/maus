@@ -74,9 +74,10 @@ class MAUSEventAction : public G4UserEventAction {
     void EndOfEventAction(const G4Event *anEvent);
 
     /** Set event buffer, set _primary counter to 0 and reassign pointers
-     *  @param events: array of events in the spill. Will append
+     *  @param events: vector of events in the spill. Will append
      *                 hits, virtual_hits, tracks to each event after
-     *                 geant4 is done tracking
+     *                 geant4 is done tracking. MAUSEventAction takes ownership
+     *                 of this memory.
      *  Also refreshes pointers to objects holding per-event buffers from the
      *  geant4 manager. We support dynamic reallocation of these pointers (even
      *  if geant4 doesnt in some instances). This means, for example, one can
