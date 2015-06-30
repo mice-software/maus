@@ -8,7 +8,7 @@
 #include <iostream>
 
 TofSD::TofSD( MiceModule* mod)
-    : MAUSSD(mod)
+    : MAUSSD(mod), _hits(NULL)
 {
 }
 
@@ -22,48 +22,48 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   G4double edep = aStep->GetTotalEnergyDeposit();
 
   if( edep == 0. ) return false;
-  if (!_hits.isMember("tof_hits")) {
-    _hits["tof_hits"] = Json::Value(Json::arrayValue);
-  }
-  int hit_i = _hits["tof_hits"].size();
-  _hits["tof_hits"].append(Json::Value());
 
-  Json::Value channel_id;
+  MAUS::TOFHit hit;
+  MAUS::TOFChannelId* channel_id = new MAUS::TOFChannelId();
 
-  channel_id["slab"] =  _module->propertyInt( "Slab" ) ;
-  channel_id["plane"] =  _module->propertyInt( "Plane" ) ;
-  channel_id["station_number"] = _module->propertyInt( "Station" ) ;
+  channel_id->SetSlab(_module->propertyInt( "Slab" ));
+  channel_id->SetPlane(_module->propertyInt( "Plane" ));
+  channel_id->SetStation(_module->propertyInt( "Station" ));
 
-  _hits["tof_hits"][hit_i]["channel_id"] = channel_id;
+  hit.SetChannelId(channel_id);
+  hit.SetTrackId(aStep->GetTrack()->GetTrackID());
+  hit.SetEnergyDeposited(aStep->GetTotalEnergyDeposit());
+  hit.SetTime(aStep->GetPostStepPoint()->GetGlobalTime());
+  hit.SetEnergy(aStep->GetTrack()->GetTotalEnergy());
+  hit.SetParticleId(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
+  hit.SetCharge(aStep->GetTrack()->GetDefinition()->GetPDGCharge());
 
-  _hits["tof_hits"][hit_i]["energy_deposited"] = 0.0;
+  hit.SetMomentum(MAUS::ThreeVector(
+    aStep->GetPostStepPoint()->GetPosition().x(),
+    aStep->GetPostStepPoint()->GetPosition().y(),
+    aStep->GetPostStepPoint()->GetPosition().z()
+  )); 
+  hit.SetMomentum(MAUS::ThreeVector(
+    aStep->GetPostStepPoint()->GetMomentum().x(),
+    aStep->GetPostStepPoint()->GetMomentum().y(),
+    aStep->GetPostStepPoint()->GetMomentum().z()
+  )); 
 
-  G4Track* track = aStep->GetTrack();
-
-  Json::Value threeVectorValue;
-  
-  threeVectorValue["x"] = aStep->GetPreStepPoint()->GetPosition().x();
-  threeVectorValue["y"] = aStep->GetPreStepPoint()->GetPosition().y();
-  threeVectorValue["z"] = aStep->GetPreStepPoint()->GetPosition().z(); 
-        
-  _hits["tof_hits"][hit_i]["position"] = threeVectorValue;
-
-  threeVectorValue["x"] = track->GetMomentum().x();
-  threeVectorValue["y"] = track->GetMomentum().y();
-  threeVectorValue["z"] = track->GetMomentum().z();
-
-  _hits["tof_hits"][hit_i]["momentum"] = threeVectorValue;
-  
-  _hits["tof_hits"][hit_i]["time"] = aStep->GetPreStepPoint()->GetGlobalTime();
-  
-  _hits["tof_hits"][hit_i]["charge"] = track->GetDefinition()->GetPDGCharge();
-  _hits["tof_hits"][hit_i]["particle_id"] = track->GetDefinition()->GetPDGEncoding();
-  _hits["tof_hits"][hit_i]["energy"] = track->GetTotalEnergy();
-  _hits["tof_hits"][hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();
-  _hits["tof_hits"][hit_i]["energy_deposited"] = aStep->GetTotalEnergyDeposit();
-
+  _hits->push_back(hit);
   return true;
 }
+
+void TofSD::ClearHits() {
+  if (_hits != NULL)
+      delete _hits;
+  _hits = new std::vector<MAUS::TOFHit>();
+}
+
+void TofSD::GetHits(MAUS::MCEvent* event) {
+  event->SetTOFHits(_hits);
+  ClearHits();
+}
+
 
 void TofSD::EndOfEvent(G4HCofThisEvent* HCE)
 {

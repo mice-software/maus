@@ -35,6 +35,7 @@
 #include "Interface/MICEEvent.hh"
 #include "src/legacy/Config/MiceModule.hh"
 #include "DetModel/MAUSSD.hh"
+#include "src/common_cpp/DataStructure/Hit.hh"
 
 /** @brief The Scintilating Fibre Sensitive Detector
  *   SciFiSD is the sensitive detector for GEANT4 that handles the Scintillating
@@ -61,14 +62,14 @@ class SciFiSD : public MAUS::MAUSSD {
     void ClearHits();
 
     /** Return the detector hits */
-    void GetHits(MCEvent* event) = 0;
+    void GetHits(MAUS::MCEvent* event);
 
     /** @brief Code that is called at the end of processing of an event
      *   Does nothing.
      */
     void EndOfEvent(G4HCofThisEvent* HCE);
   private:
-    std::vector<SciFiHit>* _hits;
+    std::vector<MAUS::SciFiHit>* _hits;
 };
 
 #endif
