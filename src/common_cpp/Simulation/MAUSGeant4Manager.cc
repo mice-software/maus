@@ -132,6 +132,11 @@ MAUSPrimaryGeneratorAction::PGParticle
     return p;
 }
 
+Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
+    PointerArrayProcessor<MCEvent> proc(new MCEventProcessor());
+    std::vector<MCEvent>* events = new std::vector<MCEvent>(proc.convert(particle_array));
+}
+
 std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>* event) {
     _eventAct->SetEvents(event);  // checks type
     for (size_t i = 0; i < event->size(); ++i) {
@@ -144,9 +149,9 @@ std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>
 }
 
 
-MCEvent MAUSGeant4Manager::RunParticle(Json::Value particle) {
+MCEvent MAUSGeant4Manager::RunParticle(MAUS::Primary particle) {
     MAUSPrimaryGeneratorAction::PGParticle p;
-    p.ReadJson(particle["primary"]);
+    p.ReadCpp(&particle);
     return Tracking(p);
 }
 

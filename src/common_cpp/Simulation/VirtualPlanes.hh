@@ -201,6 +201,9 @@ class VirtualPlane {
    */
   bool GetAllowBackwards() {return _allowBackwards;}
 
+  static ::CLHEP::Hep3Vector MAUSToCLHEP(MAUS::ThreeVector value);
+  static MAUS::ThreeVector CLHEPToMAUS(::CLHEP::Hep3Vector value);
+
  private:
   // Build a new hit and send it to the MICEEvent
   void FillBField(MAUS::VirtualHit * aHit, const G4Step * aStep) const;
@@ -211,9 +214,6 @@ class VirtualPlane {
 
   double*   Integrate(G4StepPoint* aPoint) const;
   double*   ExtractPointData(G4StepPoint* aPoint) const;
-
-  static ::CLHEP::Hep3Vector MAUSToCLHEP(MAUS::ThreeVector value);
-  static MAUS::ThreeVector CLHEPToMAUS(::CLHEP::Hep3Vector value);
 
   BTTracker::var     _planeType;
   double             _independentVariable;

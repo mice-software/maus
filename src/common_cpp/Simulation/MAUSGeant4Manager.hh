@@ -129,7 +129,7 @@ class MAUSGeant4Manager {
      *           tracking output from this event:\n
      *             "tracks", "virtual_hits", "hits"
      */
-    MCEvent RunParticle(Json::Value particle);
+    MCEvent RunParticle(MAUS::Primary particle);
 
     /** @brief Run an array of particles through the simulation
      *

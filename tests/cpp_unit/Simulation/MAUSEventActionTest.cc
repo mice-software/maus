@@ -23,55 +23,48 @@
 
 using MAUS::MAUSEventAction;
 using MAUS::MAUSGeant4Manager;
+using MAUS::MCEvent;
+using MAUS::Track;
+using MAUS::VirtualHit;
 
 TEST(MAUSEventActionTest, SetGetEventsTest) {
     MAUSEventAction* _eventAct
                            = MAUSGeant4Manager::GetInstance()->GetEventAction();
-    EXPECT_THROW(_eventAct->SetEvents(Json::Value(Json::objectValue)), MAUS::Exception);
-    Json::Value event_array = Json::Value(Json::arrayValue);
-    event_array.append(Json::Value(Json::objectValue));
-    event_array.append(Json::Value(Json::arrayValue));
-    EXPECT_THROW(_eventAct->SetEvents(event_array), MAUS::Exception);
-    event_array[1] = Json::Value(Json::objectValue);
-    EXPECT_NO_THROW(_eventAct->SetEvents(event_array));
-    EXPECT_EQ(event_array, _eventAct->GetEvents());
+    std::vector<MCEvent*>* events = new std::vector<MCEvent*>();
+    EXPECT_NO_THROW(_eventAct->SetEvents(events));
+    EXPECT_EQ(events, _eventAct->GetEvents());
 }
 
 TEST(MAUSEventActionTest, BeginOfEventActionTest) {
+    // check that we clear the hits at BeginOfEventAction
     MAUSGeant4Manager* _g4 = MAUSGeant4Manager::GetInstance();
-    Json::Value tracks(Json::arrayValue);
-    _g4->GetEventAction()->SetEvents(Json::Value(Json::arrayValue));
-    tracks[Json::Value::UInt(0)] = Json::Value(1);
-    Json::Value virtual_hits;
-    virtual_hits[1] = Json::Value(0);
-    _g4->GetTracking()->SetTracks(Json::Value(tracks));
-    _g4->GetVirtualPlanes()->SetVirtualHits(Json::Value(virtual_hits));
+    _g4->GetEventAction()->SetEvents(new std::vector<MCEvent*>());
+    std::vector<Track>* tracks = new std::vector<Track>(1, Track());
+    std::vector<VirtualHit>* vhits = new std::vector<VirtualHit>(1, VirtualHit());
+    _g4->GetTracking()->SetTracks(tracks);
+    _g4->GetVirtualPlanes()->SetVirtualHits(vhits);
     // can't set MICEDetectorConstruction/SDHits
     _g4->GetEventAction()->BeginOfEventAction(NULL);
-    EXPECT_EQ(_g4->GetTracking()->GetTracks().size(), (unsigned int) 0);
-    EXPECT_EQ(_g4->GetVirtualPlanes()->GetVirtualHits().size(),
-              (unsigned int) 0);
+    EXPECT_EQ(_g4->GetTracking()->GetTracks()->size(), 0);
+    EXPECT_EQ(_g4->GetVirtualPlanes()->GetVirtualHits()->size(), 0);
 }
 
 TEST(MAUSEventActionTest, EndOfEventActionTest) {
     MAUSGeant4Manager* _g4 = MAUSGeant4Manager::GetInstance();
     // _events out of range
-    Json::Value events = Json::Value(Json::arrayValue);
+    std::vector<MCEvent*>* events = new std::vector<MCEvent*>();
     _g4->GetEventAction()->SetEvents(events);
     EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), MAUS::Exception);
 
-    Json::Value::UInt zero(0);
-    events.append(Json::Value(Json::objectValue));
-    events.append(Json::Value(Json::objectValue));
+    events->push_back(new MCEvent());
+    events->push_back(new MCEvent());
     _g4->GetEventAction()->SetEvents(events);
 
     // put some data into tracking, virtual planes
-    Json::Value tracks(Json::arrayValue);
-    tracks[Json::Value::UInt(0)] = Json::Value(1);
-    Json::Value virtual_hits;
-    virtual_hits[1] = Json::Value(zero);
-    _g4->GetTracking()->SetTracks(Json::Value(tracks));
-    _g4->GetVirtualPlanes()->SetVirtualHits(Json::Value(virtual_hits));
+    std::vector<Track>* tracks = new std::vector<Track>(1);
+    std::vector<VirtualHit>* vhits = new std::vector<VirtualHit>(2);
+    _g4->GetTracking()->SetTracks(tracks);
+    _g4->GetVirtualPlanes()->SetVirtualHits(vhits);
 
     // check if virtual planes, tracking off we don't get any data through
     _g4->GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
@@ -80,6 +73,8 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     _g4->GetEventAction()->EndOfEventAction(NULL);
 
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
+    EXPECT_EQ(events->at(0)->GetVirtualHits()->size(), 0);
+    EXPECT_EQ(events->at(0)->GetTracks()->size(), 0);
     // _events out of range
     EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), MAUS::Exception);
 
@@ -93,10 +88,12 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     _g4->GetEventAction()->EndOfEventAction(NULL);
 
     // check that this time we do get virtuals/track data through
-    events[zero]["tracks"] = tracks;
-    events[zero]["virtual_hits"] = virtual_hits;
-    events[1]["tracks"] = tracks;
-    events[1]["virtual_hits"] = virtual_hits;
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
+    EXPECT_EQ(events->at(0)->GetVirtualHits()->size(), 1);
+    EXPECT_EQ(events->at(0)->GetTracks()->size(), 2);
+    // we never called begin of event action so the buffers weren't cleared
+    // so we should get the same data in second event
+    EXPECT_EQ(events->at(1)->GetVirtualHits()->size(), 1);
+    EXPECT_EQ(events->at(1)->GetTracks()->size(), 2);
 }
 

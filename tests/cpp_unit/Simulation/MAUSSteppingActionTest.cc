@@ -88,85 +88,80 @@ TEST_F(MAUSSteppingActionTest, GetSetTest) {
   EXPECT_EQ(stepping->GetWillKeepSteps(), true);
   stepping->SetWillKeepSteps(false);
   EXPECT_EQ(stepping->GetWillKeepSteps(), false);
-
-  EXPECT_THROW(stepping->SetSteps(Json::Value(Json::objectValue)), MAUS::Exception);
-  Json::Value array(Json::arrayValue);
-  array.append(Json::Value("Hello"));
-  EXPECT_NO_THROW(stepping->SetSteps(array));
-  EXPECT_EQ(array, stepping->GetSteps());
+  std::vector<Step>* steps = new std::vector<Step>();
+  EXPECT_NO_THROW(stepping->SetSteps(steps));
+  EXPECT_EQ(steps, stepping->GetSteps());
 }
 
 // test that we set stop and kill if stepping goes more than max n steps
+// check that the kill reason is filled with something
 TEST_F(MAUSSteppingActionTest, UserSteppingActionMaxNStepsTest) {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
   int maxNSteps = JsonWrapper::GetProperty
                (conf, "maximum_number_of_steps", JsonWrapper::intValue).asInt();
   MAUSTrackingAction* tracking = MAUSGeant4Manager::GetInstance()->GetTracking();
   tracking->SetWillKeepTracks(true);
-  tracking->SetTracks(Json::Value(Json::arrayValue));
+  tracking->SetTracks(new std::vector<Track>());
   tracking->PreUserTrackingAction(step->GetTrack());
-  stepping->SetSteps(Json::Value(Json::arrayValue));
+  stepping->SetSteps(new std::vector<Step>());
   stepping->UserSteppingAction(step);
 
-  ASSERT_TRUE(tracking->GetTracks()[Json::Value::UInt(0)].isObject());
-  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["kill_reason"].type(),
-                                                             Json::stringValue);
+  ASSERT_EQ(tracking->GetTracks()->size(), 1);
+  EXPECT_EQ(tracking->GetTracks()->at(0).GetKillReason().size(), 0);
   for (int i = 0; i < maxNSteps+1; ++i)
     track->IncrementCurrentStepNumber();
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(tracking->GetTracks()[Json::Value::UInt(0)]["kill_reason"].type(),
-                                                             Json::stringValue);
+  EXPECT_GT(tracking->GetTracks()->at(0).GetKillReason().size(), 0);
   EXPECT_EQ(track->GetTrackStatus(), fStopAndKill);
 
 }
 
 // test that we write steps correctly on each step (or not if flag is false)
 TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
-  stepping->SetSteps(Json::Value(Json::arrayValue));
+  stepping->SetSteps(new std::vector<Step>());
   stepping->SetWillKeepSteps(false);
-  stepping->SetSteps(Json::Value(Json::arrayValue));
+  stepping->SetSteps(new std::vector<Step>());
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(stepping->GetSteps()[Json::UInt(0)].type(), Json::nullValue);
+  ASSERT_TRUE(stepping->GetSteps() != NULL);
+  EXPECT_EQ(stepping->GetSteps()->size(), 0);
   stepping->SetWillKeepSteps(true);
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  ASSERT_EQ(stepping->GetSteps().type(), Json::arrayValue);
-  // we want 3 steps - 2 post steps plus the first one
-  EXPECT_EQ(stepping->GetSteps().size(), static_cast<unsigned int>(3));
+  EXPECT_EQ(stepping->GetSteps()->size(), 2);
 }
 // test that we write to json correctly
-TEST_F(MAUSSteppingActionTest, StepToJsonTest) {
+TEST_F(MAUSSteppingActionTest, StepToMausTest) {
   G4Material material("material_test", 1, 1, 1.);
   post->SetMaterial(&material);
 
-  Json::Value out = stepping->StepToJson(step, true);
-  EXPECT_DOUBLE_EQ(out["position"]["x"].asDouble(), point->GetPosition().x());
-  EXPECT_DOUBLE_EQ(out["position"]["y"].asDouble(), point->GetPosition().y());
-  EXPECT_DOUBLE_EQ(out["position"]["z"].asDouble(), point->GetPosition().z());
-  EXPECT_DOUBLE_EQ(out["momentum"]["x"].asDouble(), point->GetMomentum().x());
-  EXPECT_DOUBLE_EQ(out["momentum"]["y"].asDouble(), point->GetMomentum().y());
-  EXPECT_DOUBLE_EQ(out["momentum"]["z"].asDouble(), point->GetMomentum().z());
-  EXPECT_DOUBLE_EQ(out["spin"]["x"].asDouble(), point->GetPolarization().x());
-  EXPECT_DOUBLE_EQ(out["spin"]["y"].asDouble(), point->GetPolarization().y());
-  EXPECT_DOUBLE_EQ(out["spin"]["z"].asDouble(), point->GetPolarization().z());
-  EXPECT_DOUBLE_EQ(out["b_field"]["x"].asDouble(), 0.);
-  EXPECT_DOUBLE_EQ(out["b_field"]["y"].asDouble(), 0.);
-  EXPECT_DOUBLE_EQ(out["b_field"]["z"].asDouble(), 0.);
-  EXPECT_DOUBLE_EQ(out["e_field"]["x"].asDouble(), 0.);
-  EXPECT_DOUBLE_EQ(out["e_field"]["y"].asDouble(), 0.);
-  EXPECT_DOUBLE_EQ(out["e_field"]["z"].asDouble(), 0.);
-  EXPECT_DOUBLE_EQ(out["energy_deposited"].asDouble(), 8.);
-  EXPECT_DOUBLE_EQ(out["energy"].asDouble(), point->GetTotalEnergy());
-  EXPECT_DOUBLE_EQ(out["time"].asDouble(), point->GetGlobalTime());
-  EXPECT_DOUBLE_EQ(out["proper_time"].asDouble(), point->GetProperTime());
-  EXPECT_DOUBLE_EQ(out["path_length"].asDouble(), track->GetTrackLength());
+  Step out = stepping->StepToMaus(step, true);
+  EXPECT_DOUBLE_EQ(out.GetPosition().x(), point->GetPosition().x());
+  EXPECT_DOUBLE_EQ(out.GetPosition().y(), point->GetPosition().y());
+  EXPECT_DOUBLE_EQ(out.GetPosition().z(), point->GetPosition().z());
+  EXPECT_DOUBLE_EQ(out.GetMomentum().x(), point->GetMomentum().x());
+  EXPECT_DOUBLE_EQ(out.GetMomentum().y(), point->GetMomentum().y());
+  EXPECT_DOUBLE_EQ(out.GetMomentum().z(), point->GetMomentum().z());
+  EXPECT_DOUBLE_EQ(out.GetSpin().x(), point->GetPolarization().x());
+  EXPECT_DOUBLE_EQ(out.GetSpin().y(), point->GetPolarization().y());
+  EXPECT_DOUBLE_EQ(out.GetSpin().z(), point->GetPolarization().z());
+  EXPECT_DOUBLE_EQ(out.GetBField().x(), 0.);
+  EXPECT_DOUBLE_EQ(out.GetBField().y(), 0.);
+  EXPECT_DOUBLE_EQ(out.GetBField().z(), 0.);
+  EXPECT_DOUBLE_EQ(out.GetEField().x(), 0.);
+  EXPECT_DOUBLE_EQ(out.GetEField().y(), 0.);
+  EXPECT_DOUBLE_EQ(out.GetEField().z(), 0.);
+  EXPECT_DOUBLE_EQ(out.GetEnergyDeposited(), 8.);
+  EXPECT_DOUBLE_EQ(out.GetEnergy(), point->GetTotalEnergy());
+  EXPECT_DOUBLE_EQ(out.GetTime(), point->GetGlobalTime());
+  EXPECT_DOUBLE_EQ(out.GetProperTime(), point->GetProperTime());
+  EXPECT_DOUBLE_EQ(out.GetPathLength(), track->GetTrackLength());
 
-  EXPECT_EQ(out["material"].asString(), "");
-  EXPECT_EQ(out["volume"].asString(), "");
+  EXPECT_EQ(out.GetMaterial(), "");
+  EXPECT_EQ(out.GetVolume(), "");
 
-  out = stepping->StepToJson(step, false);
-  EXPECT_DOUBLE_EQ(out["time"].asDouble(), post->GetGlobalTime());
-  EXPECT_EQ(out["material"].asString(), "material_test");
+  out = stepping->StepToMaus(step, false);
+  EXPECT_DOUBLE_EQ(out.GetTime(), post->GetGlobalTime());
+  EXPECT_EQ(out.GetMaterial(), "material_test");
 }
 
 // test that we write volume to json correctly; disabled because it throws a
@@ -223,7 +218,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
   mod.setProperty<std::string>("MultiplePasses", "NewStation");
 
   VirtualPlaneManager* vpm = MAUSGeant4Manager::GetInstance()->GetVirtualPlanes();
-  vpm->SetVirtualHits(Json::Value(Json::arrayValue));
+  vpm->SetVirtualHits(new std::vector<VirtualHit>());
   vpm->ConstructVirtualPlanes(&mod);
   vpm->ConstructVirtualPlanes(&mod);
 
@@ -233,7 +228,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
 
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(vpm->GetVirtualHits().size(), static_cast<unsigned int>(4));
+  EXPECT_EQ(vpm->GetVirtualHits()->size(), 4);
 }
 
 } //namespace end
