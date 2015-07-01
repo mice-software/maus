@@ -184,6 +184,20 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
   return particle;
 }
 
+MAUS::Primary* MAUSPrimaryGeneratorAction::PGParticle::WriteCpp() {
+    throw Exception(Exception::recoverable,
+          "Not implemented",
+          "MAUSPrimaryGeneratorAction::PGParticle::WriteCpp()");
+
+}
+
+void MAUSPrimaryGeneratorAction::PGParticle::ReadCpp(MAUS::Primary* primt) {
+    throw Exception(Exception::recoverable,
+          "Not implemented",
+          "MAUSPrimaryGeneratorAction::PGParticle::ReadCpp()");
+
+}
+
 void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
   G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->
                                                               FindParticle(pid);

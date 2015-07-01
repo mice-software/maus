@@ -24,6 +24,8 @@
 #include "src/legacy/Interface/Squeak.hh"
 
 #include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -134,7 +136,14 @@ MAUSPrimaryGeneratorAction::PGParticle
 
 Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
     PointerArrayProcessor<MCEvent> proc(new MCEventProcessor());
-    std::vector<MCEvent>* events = new std::vector<MCEvent>(proc.convert(particle_array));
+    std::vector<MCEvent*>* events = proc.JsonToCpp(particle_array);
+    events = RunManyParticles(events);
+    Json::Value* events_json = proc.CppToJson(*events);
+    Json::Value events_json_val(*events_json);
+    delete events_json;
+    for (size_t i = 0; i < events->size(); ++i)
+        delete events->at(i);
+    delete events;
 }
 
 std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>* event) {
