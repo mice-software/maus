@@ -20,6 +20,7 @@
 #include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/ThreeVectorProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiTrackPointProcessor.hh"
 
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
@@ -35,7 +36,9 @@ class SciFiTrackProcessor : public ObjectProcessor<SciFiTrack> {
  private:
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
+    ThreeVectorProcessor _threevector_proc;
     PointerArrayProcessor<SciFiTrackPoint> _scifi_trackpoint_array_proc;
+    ValueArrayProcessor<double> _vector_proc;
 };
 } // ~namespace MAUS
 

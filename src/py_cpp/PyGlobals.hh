@@ -74,6 +74,20 @@ static PyObject* GetMonteCarloMiceModules
 static PyObject* SetMonteCarloMiceModules
                               (PyObject* dummy, PyObject* args, PyObject *kwds);
 
+/* @brief Get Reconstruction MiceModules
+ *
+ * Returns NULL if Globals were not initialised
+ */
+static PyObject* GetReconstructionMiceModules
+                              (PyObject* dummy, PyObject* args, PyObject *kwds);
+
+/* @brief Get Reconstruction MiceModules
+ *
+ * Returns NULL if Globals were not initialised
+ */
+static PyObject* SetReconstructionMiceModules
+                              (PyObject* dummy, PyObject* args, PyObject *kwds);
+
 /* @brief Get the MAUS version number as a Python string like x.y.z
  */
 static PyObject* GetVersionNumber(PyObject *dummy, PyObject *args);

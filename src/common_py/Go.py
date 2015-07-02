@@ -99,6 +99,7 @@ class Go: # pylint: disable=R0921, R0903
         print(("\tProcess ID (PID): %d" % os.getpid()))
         print(("\tProgram Arguments: %s" % str(sys.argv)))
         print ("\tVersion: %s" % version)
+        print ("\tUnpacker: %s" % os.getenv("MAUS_UNPACKER_VERSION"))
         if json_config_dictionary["verbose_level"] == 0:
             print "Configuration: ", \
                 json.dumps(json_config_dictionary, indent=2)

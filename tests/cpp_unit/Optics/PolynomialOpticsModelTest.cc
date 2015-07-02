@@ -333,14 +333,7 @@ TEST_F(PolynomialOpticsModelTest, UnsupportedAlgorithms) {
        ++iter) {
     (*config)["PolynomialOpticsModel_algorithm"] = Json::Value(*iter);
     PolynomialOpticsModel optics_model(config);
-    bool algorithm_failed = false;
-    try {
-      optics_model.Build();
-    } catch (MAUS::Exception exc) {
-      algorithm_failed = true;
-      std::cout << "DEBUG PolynomialOpticsModelTest_UnsupportedAlgorithms: "
-                << "Algorithm \"" << *iter << "\" failed." << std::endl;
-    }
-    EXPECT_TRUE(algorithm_failed);
+    optics_model.Build();
+    EXPECT_EQ(optics_model.GetAvailableMapPositions().size(), 0);
   }
 }
