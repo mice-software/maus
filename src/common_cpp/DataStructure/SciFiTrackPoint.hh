@@ -35,7 +35,6 @@
 
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiCluster.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanState.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 
 namespace MAUS {
@@ -50,10 +49,6 @@ class SciFiTrackPoint : public TObject {
    */
   virtual ~SciFiTrackPoint();
 
-  /** @brief  Constructs a SciFiTrackPoint from a KalmanState.
-   */
-  explicit SciFiTrackPoint(const KalmanState *kalman_site);
-
   /** @brief  Copy constructor.
    */
   SciFiTrackPoint(const SciFiTrackPoint &site);
@@ -64,11 +59,11 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Sets spill number.
    */
-  void set_spill(int spill)                     { _spill   = spill;   }
+  void set_spill(int spill)                     { _spill = spill; }
 
   /** @brief  Sets event number.
    */
-  void set_event(int event)                     { _event   = event;   }
+  void set_event(int event)                     { _event = event; }
 
   /** @brief  Sets tracker number.
    */
@@ -80,7 +75,7 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Sets plane number.
    */
-  void set_plane(int plane)                     { _plane   = plane;   }
+  void set_plane(int plane)                     { _plane = plane; }
 
   /** @brief  Sets channel number.
    */
@@ -88,23 +83,27 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Sets the filtered chi2 for this track point.
    */
-  void set_chi2(double chi2)                    { _chi2 = chi2;     }
+  void set_chi2(double chi2)                    { _chi2 = chi2; }
 
   /** @brief  Sets the x coordinate.
    */
-  void set_pos(ThreeVector pos)                 { _pos   = pos;      }
+  void set_pos(ThreeVector pos)                 { _pos = pos; }
 
   /** @brief  Sets the x momentum component.
    */
-  void set_mom(ThreeVector mom)                 { _mom  = mom;         }
+  void set_mom(ThreeVector mom)                 { _mom  = mom; }
 
   /** @brief  Sets the covariance matrix.
    */
   void set_covariance(std::vector<double> covariance)     { _covariance = covariance; }
 
+  /** @brief  Sets the errors vector.
+   */
+  void set_errors(std::vector<double> errors)   { _errors = errors; }
+
   /** @brief  Sets pull (residual of the projected state).
    */
-  void set_pull(double pull)                    { _pull   = pull;       }
+  void set_pull(double pull)                    { _pull = pull; }
 
   /** @brief  Sets residual for the filtered state.
    */
@@ -114,25 +113,38 @@ class SciFiTrackPoint : public TObject {
    */
   void set_smoothed_residual(double s_residual) { _smoothed_residual = s_residual; }
 
+   /** @brief Set the mother cluster using a TRef*.
+   */
+  void set_cluster(TRef* const cluster)         { _cluster = cluster; }
+
+  /** @brief Set the mother cluster using a SciFiCluster*.
+   */
+  void set_cluster_tobject(TObject* const cluster)         { *_cluster = cluster; }
+
+  /** @brief Set the mother cluster using a SciFiCluster*.
+   */
+  void set_cluster_pointer(SciFiCluster* const cluster)    { *_cluster = cluster; }
+
+
   /** @brief  Returns the tracker number.
    */
-  int tracker()              const { return _tracker;  }
+  int tracker()                    const { return _tracker; }
 
   /** @brief  Returns the station number.
    */
-  int station()              const { return _station;  }
+  int station()                     const { return _station; }
 
   /** @brief  Returns the plane number.
    */
-  int plane()                const { return _plane;    }
+  int plane()                       const { return _plane; }
 
   /** @brief  Returns the channel number.
    */
-  double channel()           const { return _channel;  }
+  double channel()                  const { return _channel; }
 
   /** @brief  Returns filtered chi2 value.
    */
-  double chi2()            const { return _chi2;   }
+  double chi2()                     const { return _chi2; }
 
   /** @brief  Returns the x position.
    */
@@ -140,52 +152,43 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Returns the x momentum component.
    */
-  ThreeVector mom()                const { return _mom;       }
+  ThreeVector mom()                 const { return _mom; }
 
   /** @brief  Returns the covariance matrix.
    */
-  std::vector<double> covariance()        const { return _covariance; }
+  std::vector<double> covariance()   const { return _covariance; }
+
+  /** @brief  Returns the covariance matrix.
+   */
+  std::vector<double> errors()       const { return _errors; }
 
   /** @brief  Returns the residual of the projected state.
    */
-  double pull()              const { return _pull;     }
+  double pull()                      const { return _pull; }
 
   /** @brief  Returns the residual of the filtered state.
    */
-  double residual()          const { return _residual; }
+  double residual()                  const { return _residual; }
 
   /** @brief  Returns the residual of the smoothed state.
    */
-  double smoothed_residual() const { return _smoothed_residual; }
+  double smoothed_residual()         const { return _smoothed_residual; }
 
   /** @brief  Returns the spill number.
    */
-  int spill()                const { return _spill; }
+  int spill()                        const { return _spill; }
 
   /** @brief  Returns the event number.
    */
-  int event()                const { return _event; }
+  int event()                        const { return _event; }
 
   /** @brief  Returns the mother clusters as a TRef*.
    */
-  TRef* get_cluster() const { return _cluster; }
-
-   /** @brief Set the mother cluster using a TRef*.
-   */
-  void set_cluster(TRef* const cluster) { _cluster = cluster; }
-
+  TRef* get_cluster()                const { return _cluster; }
 
   /** @brief  Returns the mother cluster as a TObject pointer
    */
-  TObject* get_cluster_tobject() const { return _cluster->GetObject(); }
-
-  /** @brief Set the mother cluster using a SciFiCluster*.
-   */
-  void set_cluster_tobject(TObject* const cluster) { *_cluster = cluster; }
-
-  /** @brief Set the mother cluster using a SciFiCluster*.
-   */
-  void set_cluster_pointer(SciFiCluster* const cluster) { *_cluster = cluster; }
+  TObject* get_cluster_tobject()     const { return _cluster->GetObject(); }
 
   /** @brief  Returns the mother clusters as an array of pointers.
    */
@@ -232,6 +235,10 @@ class SciFiTrackPoint : public TObject {
   /** @brief Covariance matrix for the state vector [x, px, y, py, pz]
    */
   std::vector<double> _covariance;
+
+  /** @brief Errors vector for the state vector [x, px, y, py, pz]
+   */
+  std::vector<double> _errors;
 
   /** @brief projected residual
    */

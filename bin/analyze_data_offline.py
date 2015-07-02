@@ -34,14 +34,17 @@ def run():
     my_map.append(MAUS.MapCppKLDigits())
     my_map.append(MAUS.MapCppKLCellHits())
 
-    my_map.append(MAUS.MapCppEMRPlaneHits())
-
     my_map.append(MAUS.MapCppTrackerDigits())
     my_map.append(MAUS.MapCppTrackerRecon())
 
+    my_map.append(MAUS.MapCppEMRPlaneHits())
+    my_map.append(MAUS.MapCppEMRRecon())
+
+    my_reduce = MAUS.ReducePyDoNothing()
+
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), MAUS.OutputCppRoot())
+    MAUS.Go(my_input, my_map, my_reduce, MAUS.OutputCppRoot())
 
 if __name__ == '__main__':
     run()

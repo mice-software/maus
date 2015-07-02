@@ -15,55 +15,83 @@
  *
  */
 
+#include <cmath>
+
 // MAUS headers
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 
 namespace MAUS {
 
 // Constructors
-SciFiHelicalPRTrack::SciFiHelicalPRTrack() :  _tracker(-1),
-                                              _num_points(-1),
-                                              _charge(0),
-                                              _R(-1.0),
-                                              _phi0(-1.0),
-                                              _dsdz(-1.0),
-                                              _line_sz_c(-1.0),
-                                              _line_sz_chisq(-1.0),
-                                              _circle_x0(-1.0),
-                                              _circle_y0(-1.0),
-                                              _circle_chisq(-1.0),
-                                              _chisq(-1.0),
-                                              _chisq_dof(-1.0),
-                                              _point_spread(-1.0),
-                                              _pos0(-1.0, -1.0, -1.0),
-                                              _phi(0) {
-  _spoints = new TRefArray();
+SciFiHelicalPRTrack::SciFiHelicalPRTrack()
+  : SciFiBasePRTrack(),
+    _tracker(-1),
+    _num_points(-1),
+    _charge(0),
+    _R(-1.0),
+    _phi0(-1.0),
+    _dsdz(-1.0),
+    _line_sz_c(-1.0),
+    _line_sz_chisq(-1.0),
+    _circle_x0(-1.0),
+    _circle_y0(-1.0),
+    _circle_chisq(-1.0),
+    _chisq(-1.0),
+    _chisq_dof(-1.0),
+    _point_spread(-1.0),
+    _pos0(-1.0, -1.0, -1.0),
+    _phi(0) {
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
                                          double phi0, SimpleCircle circle, SimpleLine line_sz,
                                          double chisq, double chisq_dof, double point_spread,
-                                         DoubleArray phi, SciFiSpacePointPArray spoints) {
-  _tracker = tracker;
-  _num_points = num_points;
-  _charge = charge;
-  _R  = circle.get_R();
-  _phi0 = phi0;
-  _dsdz = line_sz.get_m();
-  _line_sz_c = line_sz.get_c();
-  _line_sz_chisq = line_sz.get_chisq();
-  _circle_x0 = circle.get_x0();
-  _circle_y0 = circle.get_y0();
-  _circle_chisq = circle.get_chisq();
-  _chisq = chisq;
-  _chisq_dof = chisq_dof;
-  _point_spread = point_spread;
-  _pos0 = pos0;
-  _spoints = new TRefArray();
-  for (std::vector<SciFiSpacePoint*>::iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
-    _spoints->Add(*sp);
-  }
-  _phi = phi;
+                                         DoubleArray phi, SciFiSpacePointPArray spoints,
+                                         const DoubleArray& covariance) :
+    SciFiBasePRTrack(covariance, spoints),
+    _tracker(tracker),
+    _num_points(num_points),
+    _charge(charge),
+    _R(circle.get_R()),
+    _phi0(phi0),
+    _dsdz(line_sz.get_m()),
+    _line_sz_c(line_sz.get_c()),
+    _line_sz_chisq(line_sz.get_chisq()),
+    _circle_x0(circle.get_x0()),
+    _circle_y0(circle.get_y0()),
+    _circle_chisq(circle.get_chisq()),
+    _chisq(chisq),
+    _chisq_dof(chisq_dof),
+    _point_spread(point_spread),
+    _pos0(pos0),
+    _phi(phi) {
+}
+
+SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
+                                         double phi0, SimpleCircle circle, SimpleLine line_sz,
+                                         double point_spread, DoubleArray phi,
+                                         SciFiSpacePointPArray spoints,
+                                         const DoubleArray& covariance) :
+    SciFiBasePRTrack(covariance, spoints),
+    _tracker(tracker),
+    _num_points(num_points),
+    _charge(charge),
+    _R(circle.get_R()),
+    _phi0(phi0),
+    _dsdz(line_sz.get_m()),
+    _line_sz_c(line_sz.get_c()),
+    _line_sz_chisq(line_sz.get_chisq()),
+    _circle_x0(circle.get_x0()),
+    _circle_y0(circle.get_y0()),
+    _circle_chisq(circle.get_chisq()),
+    _chisq(0.0),
+    _chisq_dof(0.0),
+    _point_spread(point_spread),
+    _pos0(pos0),
+    _phi(phi) {
+
+  _chisq = std::sqrt(_circle_chisq*_circle_chisq + _line_sz_chisq*_line_sz_chisq);
+  _chisq_dof = _chisq / (_num_points - 2);
 }
 
 // Destructor
@@ -76,6 +104,8 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   if (this == &htrk) {
       return *this;
   }
+  SciFiBasePRTrack::operator=(htrk);
+
   _R = htrk.get_R();
   _phi0 = htrk.get_phi0();
   _dsdz = htrk.get_dsdz();
@@ -91,14 +121,13 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _tracker = htrk.get_tracker();
   _point_spread = htrk.get_point_spread();
   _pos0 = htrk.get_pos0();
-  if (_spoints) delete _spoints;
-  _spoints = new TRefArray(*(htrk.get_spacepoints()));
   _phi = htrk.get_phi();
   return *this;
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
-  : _tracker(htrk.get_tracker()),
+  : SciFiBasePRTrack(htrk),
+    _tracker(htrk.get_tracker()),
     _num_points(htrk.get_num_points()),
     _charge(htrk.get_charge()),
     _R(htrk.get_R()),
@@ -114,10 +143,5 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _point_spread(htrk.get_point_spread()),
     _pos0(htrk.get_pos0()),
     _phi(htrk.get_phi()) {
-
-    // Shallow copy the SpacePoints
-    _spoints = new TRefArray(*(htrk.get_spacepoints()));
 }
-
-
 } // ~namespace MAUS

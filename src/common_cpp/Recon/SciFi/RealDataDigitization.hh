@@ -62,7 +62,9 @@ class RealDataDigitization {
 
   ~RealDataDigitization();
 
-  void initialise();
+  void initialise(double npe_cut,
+                  const std::string& map_file,
+                  const std::string& calib_file);
 
   /** @brief Processes a spill from DAQ
    *  @params spill A SciFiSpill to be filled
@@ -115,6 +117,7 @@ class RealDataDigitization {
   static const int _number_banks          = 64;
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
+  double _npe_cut;
 //   static const double _min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.

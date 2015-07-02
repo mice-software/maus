@@ -69,7 +69,7 @@ class PatternRecognition {
     /** @brief Top level function to begin Pattern Recognition
       * @param evt - The SciFi event
       */
-    void process(SciFiEvent &evt);
+    void process(SciFiEvent &evt) const;
 
      /** @brief Small function to add trks to a SciFiEvent & to set the tracker number for them
       *  @param strks - The straight tracks vector
@@ -78,11 +78,11 @@ class PatternRecognition {
       *  @param evt - The SciFi event
       */
     void add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
-                    std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt);
+                    std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt) const;
 
 
     void make_all_tracks(const bool track_type, const int trker_no,
-                         SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt);
+                         SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt) const;
 
 
     /** @brief Make Pattern Recognition tracks with 5 spacepoints
@@ -94,7 +94,7 @@ class PatternRecognition {
     void make_5tracks(const bool track_type, const int trker_no,
                       SpacePoint2dPArray &spnts_by_station,
                       std::vector<SciFiStraightPRTrack*> &strks,
-                      std::vector<SciFiHelicalPRTrack*> &htrks);
+                      std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
      *  @param track_type - boolean, 0 for straight tracks, 1 for helical tracks
@@ -105,7 +105,7 @@ class PatternRecognition {
     void make_4tracks(const bool track_type, const int trker_no,
                       SpacePoint2dPArray &spnts_by_station,
                       std::vector<SciFiStraightPRTrack*> &strks,
-                      std::vector<SciFiHelicalPRTrack*> &htrks);
+                      std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints (straight only)
      *  @param trker_no - the tracker number (0 or 1)
@@ -113,7 +113,7 @@ class PatternRecognition {
      *  @param strks - A vector of the output Pattern Recognition straight tracks
      */
     void make_3tracks(const int trker_no, SpacePoint2dPArray &spnts_by_station,
-                      std::vector<SciFiStraightPRTrack*> &strks);
+                      std::vector<SciFiStraightPRTrack*> &strks) const;
 
     /** @brief Fits a straight track for a given set of stations
      * 
@@ -128,7 +128,7 @@ class PatternRecognition {
     void make_straight_tracks(const int num_points, const int trker_no,
                               const std::vector<int> ignore_stations,
                               SpacePoint2dPArray &spnts_by_station,
-                              std::vector<SciFiStraightPRTrack*> &strks);
+                              std::vector<SciFiStraightPRTrack*> &strks) const;
 
     /** @brief Make a helical track from spacepoints
      *
@@ -149,8 +149,8 @@ class PatternRecognition {
      *
      */
     void make_helix(const int n_points, const int stat_num, const std::vector<int> ignore_stations,
-                    std::vector<SciFiSpacePoint*> &current_spnts,
-                    SpacePoint2dPArray &spnts_by_station, std::vector<SciFiHelicalPRTrack*> &htrks);
+             std::vector<SciFiSpacePoint*> &current_spnts,
+             SpacePoint2dPArray &spnts_by_station, std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Attempt to fit a helical track to given spacepoints
      * 
@@ -162,7 +162,7 @@ class PatternRecognition {
      *  @param spnts - vector holding pointers to the spacepoints
      * 
      * */
-    SciFiHelicalPRTrack* form_track(const int n_points, std::vector<SciFiSpacePoint*> spnts );
+    SciFiHelicalPRTrack* form_track(const int n_points, std::vector<SciFiSpacePoint*> spnts ) const;
 
     /** @brief Find the ds/dz of a helical track
      *
@@ -175,7 +175,7 @@ class PatternRecognition {
      * @param line_sz - The output fitted line in s-z projection.
      */
     bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-                   std::vector<double> &phi_i, SimpleLine &line_sz, int &charge);
+          std::vector<double> &phi_i, SimpleLine &line_sz, TMatrixD& cov_sz, int &handedness) const;
 
     /** @brief Find the number of 2pi rotations that occured between each station
      *
@@ -187,7 +187,7 @@ class PatternRecognition {
      * @param true_phi - the corrected turing angles
      */
     bool find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
-                      std::vector<double> &true_phi, int &charge);
+                      std::vector<double> &true_phi, int &handedness) const;
 
     /** @brief Checks that the spacepoints in trial track fall within longest acceptable time range
      *
@@ -195,7 +195,7 @@ class PatternRecognition {
      *  was calculated offline for straight and helical tracks
      *
      */
-    bool check_time_consistency(const std::vector<SciFiSpacePoint*>);
+    bool check_time_consistency(const std::vector<SciFiSpacePoint*>) const;
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -214,7 +214,8 @@ class PatternRecognition {
      *  @param i_stat_num - The innermost station number used for a given track fit
      *
      */
-    bool set_end_stations(const std::vector<int> ignore_stations, int &o_stat_num, int &i_stat_num);
+    bool set_end_stations(const std::vector<int> ignore_stations, int &o_stat_num,
+                                                                            int &i_stat_num) const;
 
     /** @brief Determine which three stations the initial circle should be fit to
      *
@@ -235,11 +236,23 @@ class PatternRecognition {
      *
      */
     bool set_seed_stations(const std::vector<int> ignore_stations, int &o_stat_num,
-                           int &i_stat_num, int &mid_stat_num);
+                           int &i_stat_num, int &mid_stat_num) const;
 
 
     bool set_ignore_stations(const std::vector<int> &ignore_stations,
-                             int &ignore_station_1, int &ignore_station_2);
+                             int &ignore_station_1, int &ignore_station_2) const;
+
+    /** @brief Return the value for the Bz field in the upstream tracker, in tracker coords */
+    double get_bz_t1() const { return _bz_t2; }
+
+    /** @brief Set the value for the Bz field in the upstream tracker, in tracker coords */
+    void set_bz_t1(double bz_t1) { _bz_t1 = bz_t1; }
+
+    /** @brief Return the value for the Bz field in the downstream tracker, in tracker coords */
+    double get_bz_t2() const { return _bz_t2; }
+
+    /** @brief Set the value for the Bz field in the downstream tracker, in tracker coords */
+    void set_bz_t2(double bz_t2) { _bz_t2 = bz_t2; }
 
     /** @brief Return the whether straight pat rec is on */
     bool get_straight_pr_on() { return _straight_pr_on; }
@@ -262,24 +275,32 @@ class PatternRecognition {
     /** @brief A function to set all the internal parameters to their default values (for tests) */
     void set_parameters_to_default();
 
+    void get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
+       double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut);
+
+    void set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
+       double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut);
+
   private:
-    bool _straight_pr_on;      /** Straight pattern recogntion on or off */
-    bool _helical_pr_on;      /** Helical pattern recogntion on or off */
-    int _verb;                /** Verbosity: 0=little, 1=more couts */
-    int _n_trackers;          /** Number of trackers */
-    int _n_stations;          /** Number of stations per tracker */
-    double _sd_1to4;          /** Position error associated with stations 1 t0 4 */
-    double _sd_5;             /** Position error associated with station 5 */
-    double _sd_phi_1to4;      /** Rotation error associated with stations 1 t0 4 */
-    double _sd_phi_5;         /** Rotation error associated with station 5 */
-    double _res_cut;          /** Road cut for linear fit in mm */
+    bool _straight_pr_on;       /** Straight pattern recogntion on or off */
+    bool _helical_pr_on;        /** Helical pattern recogntion on or off */
+    int _verb;                  /** Verbosity: 0=little, 1=more couts */
+    int _n_trackers;            /** Number of trackers */
+    int _n_stations;            /** Number of stations per tracker */
+    double _bz_t1;              /** Bz field in upstream tracker */
+    double _bz_t2;              /** Bz field in downstream tracker */
+    double _sd_1to4;            /** Position error associated with stations 1 t0 4 */
+    double _sd_5;               /** Position error associated with station 5 */
+    double _sd_phi_1to4;        /** Rotation error associated with stations 1 t0 4 */
+    double _sd_phi_5;           /** Rotation error associated with station 5 */
+    double _res_cut;            /** Road cut for linear fit in mm */
     double _straight_chisq_cut; /** Cut on the chi^2 of the least sqs fit in mm */
-    double _R_res_cut;        /** Cut on the radius of the track helix in mm */
-    double _circle_chisq_cut; /** Cut on the chi^2 of the circle least sqs fit in mm */
-    double _n_turns_cut;      /** Cut to decide if a given n turns value is good */
-    double _sz_chisq_cut;     /** Cut on the sz chi^2 from least sqs fit in mm */
-    double _Pt_max;           /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
-    double _Pz_min;           /** MeV/c min Pz for helical tracks (this is a guess) */
+    double _R_res_cut;          /** Cut on the radius of the track helix in mm */
+    double _circle_chisq_cut;   /** Cut on the chi^2 of the circle least sqs fit in mm */
+    double _n_turns_cut;        /** Cut to decide if a given n turns value is good */
+    double _sz_chisq_cut;       /** Cut on the sz chi^2 from least sqs fit in mm */
+    double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
+    double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
 };
 
