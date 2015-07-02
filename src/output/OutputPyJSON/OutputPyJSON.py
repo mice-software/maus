@@ -84,7 +84,12 @@ class OutputPyJSON:
 
         \param document JSON document to be saved
         """
-        doc_str = maus_cpp.converter.string_repr(document)
+        try:
+            doc_str = maus_cpp.converter.string_repr(document)
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
+
         try:
             self.file.write(doc_str.rstrip() + '\n')
             return True
