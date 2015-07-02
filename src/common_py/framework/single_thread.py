@@ -19,6 +19,7 @@ Single-threaded dataflows module.
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
+import ROOT
 
 from framework.utilities import DataflowUtilities
 
@@ -129,29 +130,28 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
         """
         if event == "":
             raise StopIteration("End of event")
-        event_json = maus_cpp.converter.json_repr(event)
-        if DataflowUtilities.get_event_type(event_json) == "Spill":
-            current_run_number = DataflowUtilities.get_run_number(event_json)
-            if (DataflowUtilities.is_end_of_run(event_json)):
-                self.end_of_run_spill = event_json
-            # protect against run number change due to bad (empty) spills
-            bad_input = False
-            if "errors" in event_json\
-               and "bad_data_input" in event_json["errors"]:
-                bad_input = True
-            if not bad_input and current_run_number != self.run_number:
+        #event_json = maus_cpp.converter.json_repr(event)
+        #if DataflowUtilities.get_event_type(event_json) == "Spill":
+        if event.GetEventType() == "Spill":
+            #current_run_number = DataflowUtilities.get_run_number(event_json)
+            current_run_number = event.GetSpill().GetRunNumber()
+            #if (DataflowUtilities.is_end_of_run(event_json)):
+            if (event.GetEventType() == "end_of_run"):
+                #self.end_of_run_spill = event_json
+                self.end_of_run_spill = event
+            if current_run_number != self.run_number:
                 if self.run_number != "first":
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
             event = self.transformer.process(event)
             old_event = event
-            event = maus_cpp.converter.string_repr(old_event)
-            try:
-                maus_cpp.converter.del_data_repr(old_event)
-            except TypeError:
-                pass
-            event = self.merger.process(event)
+            #event = maus_cpp.converter.string_repr(old_event)
+            #try:
+            #    maus_cpp.converter.del_data_repr(old_event)
+            #except TypeError:
+            #    pass
+            event = self.merger.process(old_event)
         self.outputer.save(event)
 
     def start_of_run(self, new_run_number):
@@ -188,10 +188,27 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                                      "maus_event_type":"Spill",
                                      "run_number":self.run_number,
                                      "spill_number":-1}
-            end_of_run_spill_str = json.dumps(self.end_of_run_spill)
-            end_of_run_spill_str = self.merger.process(end_of_run_spill_str)
+            #end_of_run_spill_str = json.dumps(self.end_of_run_spill)
+            #end_of_run_spill_str = self.merger.process(end_of_run_spill_str)
+
+            data = ROOT.MAUS.Data() # pylint: disable=E1101
+            spill = ROOT.MAUS.Spill() # pylint: disable=E1101
+            spill.SetRunNumber(self.run_number)
+            spill.SetDaqEventType("end_of_run")
+            spill.SetSpillNumber(-1)
+            data.SetSpill(spill)
+
+            end_of_run_spill_str = self.merger.process(data)
             if self.write_headers: # write to disk only if write_headers is set
                 self.outputer.save(end_of_run_spill_str)
+            try:
+                maus_cpp.converter.del_data_repr(data)
+            except TypeError:
+                pass
+        try:
+            maus_cpp.converter.del_data_repr(self.end_of_run_spill)
+        except TypeError:
+            pass
         self.end_of_run_spill = None
 
         print("TRANSFORM: Shutting down transformer")
