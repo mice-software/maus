@@ -185,17 +185,31 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
 }
 
 MAUS::Primary* MAUSPrimaryGeneratorAction::PGParticle::WriteCpp() {
-    throw Exception(Exception::recoverable,
-          "Not implemented",
-          "MAUSPrimaryGeneratorAction::PGParticle::WriteCpp()");
-
+    MAUS::Primary* prim = new MAUS::Primary();
+    prim->SetPosition(MAUS::ThreeVector(x, y, z));
+    prim->SetSpin(MAUS::ThreeVector(sx, sy, sz));
+    prim->SetMomentum(MAUS::ThreeVector(px, py, pz));
+    prim->SetEnergy(energy);
+    prim->SetEnergy(time);
+    prim->SetParticleId(pid);
+    prim->SetRandomSeed(seed);
+    return prim;
 }
 
-void MAUSPrimaryGeneratorAction::PGParticle::ReadCpp(MAUS::Primary* primt) {
-    throw Exception(Exception::recoverable,
-          "Not implemented",
-          "MAUSPrimaryGeneratorAction::PGParticle::ReadCpp()");
-
+void MAUSPrimaryGeneratorAction::PGParticle::ReadCpp(MAUS::Primary* prim) {
+    x = prim->GetPosition().x();
+    y = prim->GetPosition().y();
+    z = prim->GetPosition().z();
+    sx = prim->GetSpin().x();
+    sy = prim->GetSpin().y();
+    sz = prim->GetSpin().z();
+    energy = prim->GetEnergy();
+    px = prim->GetMomentum().x();
+    py = prim->GetMomentum().y();
+    pz = prim->GetMomentum().z();
+    time = prim->GetTime();
+    pid = prim->GetParticleId();
+    seed = prim->GetRandomSeed();
 }
 
 void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
