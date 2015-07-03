@@ -35,6 +35,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
@@ -54,6 +55,38 @@
 
 namespace MAUS {
 
+struct ChanMap {
+  /* \struct ChanMap A struct to hold scifi channel map data */
+  int UId;
+  int tracker;
+  int station;
+  int plane;
+  int channel;
+  int board;
+  int bank;
+  int chan_ro;
+  int extWG;
+  int inWG;
+  int WGfib;
+  /* Default Constructor */
+  ChanMap() : UId(-1),
+              tracker(-1),
+              station(-1),
+              plane(-1),
+              channel(-1),
+              board(-1),
+              bank(-1),
+              chan_ro(-1),
+              extWG(-1),
+              inWG(-1),
+              WGfib(-1) {
+    // Do nothing
+  };
+};
+
+// typedef std::map<int, ChanMap> ChanMapLookup;
+typedef std::vector<ChanMap> ChanMapLookup;
+
 class RealDataDigitization {
  public:
   typedef std::vector<int> IntChannelArray;
@@ -64,7 +97,8 @@ class RealDataDigitization {
 
   void initialise(double npe_cut,
                   const std::string& map_file,
-                  const std::string& calib_file);
+                  const std::string& calib_file,
+                  const std::string& bad_channels_file);
 
   /** @brief Processes a spill from DAQ
    *  @params spill A SciFiSpill to be filled
@@ -94,6 +128,10 @@ class RealDataDigitization {
    */
   bool load_calibration(std::string filename);
 
+  /** @brief Make a unique channel number across all banks and boards.
+   */
+  int calc_uid(int chan_ro, int bank, int board) const;
+
   /** @brief Loads the mapping.
    */
   bool load_mapping(std::string file);
@@ -102,11 +140,11 @@ class RealDataDigitization {
    */
   bool get_StatPlaneChannel(int &board, int &bank, int &chan_ro,
                             int &tracker, int &station, int &plane, int &channel,
-                            int &extWG, int &inWG, int &WGfib) const;
+                            int &extWG, int &inWG, int &WGfib);
 
   /** @brief Reads the bad channel list from file.
    */
-  bool load_bad_channels();
+  bool load_bad_channels(std::string file);
 
   /** @brief Returns value depends on the goodness of the channel.
    */
@@ -117,25 +155,17 @@ class RealDataDigitization {
   static const int _number_banks          = 64;
   static const int _number_boards         = 16;
   static const int _total_number_channels = 6403;
+  static const int _banks_per_board       = 4;
+  static const int _n_entries         = 8192;
   double _npe_cut;
-//   static const double _min       = 0.000000001;
+  // static const double _min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
   Json::Value _calibration[_number_banks][_number_channels];
   /// This is an array storing the goodness of each channel.
   bool _good_chan[_number_banks][_number_channels];
 
-  /// This is for the mapping storage.
-  IntChannelArray _board;
-  IntChannelArray _bank;
-  IntChannelArray _chan_ro;
-  IntChannelArray _tracker;
-  IntChannelArray _station;
-  IntChannelArray _view;
-  IntChannelArray _fibre;
-  IntChannelArray _extWG;
-  IntChannelArray _inWG;
-  IntChannelArray _WGfib;
+  ChanMapLookup _chan_map; /// Mapping data storage
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS
