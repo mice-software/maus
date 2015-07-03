@@ -54,37 +54,37 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         track.SetTrackId(aTrack->GetTrackID());
         track.SetParentTrackId(aTrack->GetParentID());
         track.SetKillReason("");
-        if (_stepping->GetWillKeepSteps())
-            _stepping->SetSteps(new std::vector<Step>());
         _tracks->push_back(track);
     }
 }
 
 void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
     if (_keepTracks && aTrack) {
-        Track cpp_track = (*_tracks)[_tracks->size()-1];
-        if (cpp_track.GetTrackId() != aTrack->GetTrackID()) {
+        if (_tracks->back().GetTrackId() != aTrack->GetTrackID()) {
             throw MAUS::Exception(Exception::recoverable,
                          "Track ID misalignment",
                          "MAUSTrackingAction::PostUserTrackingAction");
         }
 
+        std::cerr << "MAUSTrackingAction PostUser1 " << aTrack->GetPosition() << " " << aTrack->GetMomentum() << std::endl;
         ThreeVector pos(aTrack->GetPosition().x(),
                         aTrack->GetPosition().y(),
                         aTrack->GetPosition().z());
-        cpp_track.SetFinalPosition(pos);
+        _tracks->back().SetFinalPosition(pos);
         ThreeVector mom(aTrack->GetMomentum().x(),
                         aTrack->GetMomentum().y(),
                         aTrack->GetMomentum().z());
-        cpp_track.SetFinalMomentum(mom);
+        _tracks->back().SetFinalMomentum(mom);
 
-        if (_stepping->GetWillKeepSteps())
-            cpp_track.SetSteps(_stepping->GetSteps());
-        (*_tracks)[_tracks->size()-1] = cpp_track;
+        if (_stepping->GetWillKeepSteps()) {
+            _tracks->back().SetSteps(_stepping->TakeSteps());
+        }
     }
 }
 
 void MAUSTrackingAction::SetTracks(std::vector<Track>* tracks) {
+    if (_tracks != NULL)
+        delete _tracks;
     _tracks = tracks;
 }
 

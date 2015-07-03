@@ -243,6 +243,7 @@ MAUS::ThreeVector VirtualPlane::CLHEPToMAUS(::CLHEP::Hep3Vector value) {
 VirtualPlaneManager::VirtualPlaneManager()
     : _useVirtualPlanes(false), _planes(), _mods(), _nHits(0),
       _hits(NULL) {
+    StartOfEvent();
 }
 
 VirtualPlaneManager::~VirtualPlaneManager() {

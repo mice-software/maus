@@ -55,11 +55,17 @@ class MAUSSteppingAction : public G4UserSteppingAction {
 
   /** @brief Return the steps for this spill
    *
-   *  The track data for each spill are stored on the stepping action.
-   *
-   *  @returns the track data for the entire spill
+   *  @returns the stepping data for the entire spill. MAUSSteppingAction still
+   *  owns the memory for Steps
    */
   std::vector<Step>* GetSteps() const {return _steps;}
+
+  /** @brief Return the steps for this spill
+   *
+   *  @returns the stepping data for the entire spill. Caller takes
+   *  ownership of the memory for Steps
+   */
+  std::vector<Step>* TakeSteps();
 
   /** @brief Set the steps for this spill
    *
@@ -89,6 +95,10 @@ class MAUSSteppingAction : public G4UserSteppingAction {
   std::vector<Step>* _steps;
   bool _keepSteps;
   int _maxNSteps;
+
+  // disallow...
+  MAUSSteppingAction& operator=(const MAUSSteppingAction&);
+  MAUSSteppingAction(const MAUSSteppingAction&);
 };
 
 }  //  ends MAUS namespace

@@ -68,6 +68,13 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
                          GetVirtualPlanes()->VirtualPlanesSteppingAction(aStep);
 }
 
+std::vector<Step>* MAUSSteppingAction::TakeSteps() {
+    std::vector<Step>* steps_tmp = _steps;
+    _steps = NULL;
+    return steps_tmp;
+}
+
+
 Step MAUSSteppingAction::StepToMaus(const G4Step* aStep, bool prestep) const {
     G4Track* aTrack = aStep->GetTrack();
     G4StepPoint* point = aStep->GetPostStepPoint();
@@ -123,8 +130,9 @@ Step MAUSSteppingAction::StepToMaus(const G4Step* aStep, bool prestep) const {
 }
 
 void  MAUSSteppingAction::SetSteps(std::vector<Step>* steps) {
-    if (_steps != NULL)
+    if (_steps != NULL) {
         delete _steps;
+    }
     _steps = steps;
 }
 

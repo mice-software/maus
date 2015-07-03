@@ -178,7 +178,7 @@ TEST_F(VirtualPlaneTest, BuildNewHitTest) {  // sorry this is a long one...
   double p_tot = ::sqrt((102.5+mass)*(102.5+mass)-mass*mass);
   // transport through B-field should conserve ptrans and pz
   EXPECT_NEAR(::sqrt(p.x()*p.x()+p.y()*p.y()), p_tot*0.1/::sqrt(1.01), 1e-2);
-  EXPECT_NEAR(p.z(), p_tot*1./::sqrt(1.01),  1e-6);
+  EXPECT_NEAR(p.z(), p_tot*1./::sqrt(1.01),  1e-1);
   EXPECT_EQ(hit.GetStationId(), 99);
   EXPECT_EQ(hit.GetTrackId(), 10);
   EXPECT_NEAR(hit.GetTime(), 1.25, 1e-3);  // not quite as v_z b4/after is
@@ -273,7 +273,7 @@ class VirtualPlaneManagerTest : public ::testing::Test {
 
 TEST_F(VirtualPlaneManagerTest, GetSetHitsTest) {
   std::vector<MAUS::VirtualHit>* test_hits = NULL;
-  EXPECT_EQ(vpm.GetVirtualHits(), test_hits);
+  EXPECT_NE(vpm.GetVirtualHits(), test_hits); //  initialised test_hits in ctor
   vpm.SetVirtualHits(NULL);
   EXPECT_EQ(vpm.GetVirtualHits(), test_hits);
   test_hits = new std::vector<MAUS::VirtualHit>();
@@ -455,26 +455,25 @@ TEST_F(VirtualPlaneManagerTest, VirtualPlanesSteppingActionMultipassTest) {
 
   vpm.VirtualPlanesSteppingAction(step);
   std::vector<VirtualHit>* hit1 = vpm.GetVirtualHits();
-  vpm.VirtualPlanesSteppingAction(step);
-  std::vector<VirtualHit>* hit2 = vpm.GetVirtualHits();
-  vpm.VirtualPlanesSteppingAction(step);
-  std::vector<VirtualHit>* hit3 = vpm.GetVirtualHits();
-
-  EXPECT_EQ(vpm.GetNumberOfHits(1), 1);
-  EXPECT_EQ(vpm.GetNumberOfHits(2), 3);
-  EXPECT_EQ(vpm.GetNumberOfHits(3), 3);  // this is the primary station number
-
   ASSERT_EQ(hit1->size(), 3);
   for (int i = 0; i < 3; ++i)
     EXPECT_EQ(hit1->at(i).GetStationId(), i+1);
 
+  vpm.VirtualPlanesSteppingAction(step);
+  std::vector<VirtualHit>* hit2 = vpm.GetVirtualHits();
   ASSERT_EQ(hit2->size(), 5);
   EXPECT_EQ(hit2->at(3).GetStationId(), 2);
   EXPECT_EQ(hit2->at(4).GetStationId(), 6);
 
+  vpm.VirtualPlanesSteppingAction(step);
+  std::vector<VirtualHit>* hit3 = vpm.GetVirtualHits();
   ASSERT_EQ(hit3->size(), 7);
   EXPECT_EQ(hit3->at(5).GetStationId(), 2);
   EXPECT_EQ(hit3->at(6).GetStationId(), 9);
+
+  EXPECT_EQ(vpm.GetNumberOfHits(1), 1);
+  EXPECT_EQ(vpm.GetNumberOfHits(2), 3);
+  EXPECT_EQ(vpm.GetNumberOfHits(3), 3);  // this is the primary station number
 
   vpm.StartOfEvent();
 

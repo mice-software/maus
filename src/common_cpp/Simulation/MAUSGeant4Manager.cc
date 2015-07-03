@@ -144,6 +144,7 @@ Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
     for (size_t i = 0; i < events->size(); ++i)
         delete events->at(i);
     delete events;
+    return events_json_val;
 }
 
 std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>* event) {
@@ -180,7 +181,7 @@ MCEvent MAUSGeant4Manager::Tracking
     
     Json::Value event_array = Json::Value(Json::arrayValue);
     Json::Value event(Json::objectValue);
-    std::vector<MCEvent*>* event_vector;
+    std::vector<MCEvent*>* event_vector = new std::vector<MCEvent*>();
     event_vector->push_back(new MCEvent());
     event_vector->at(0)->SetPrimary(p.WriteCpp());
     _eventAct->SetEvents(event_vector); // EventAction now owns this memory

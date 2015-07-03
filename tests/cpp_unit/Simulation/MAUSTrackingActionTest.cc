@@ -79,13 +79,14 @@ TEST_F(MAUSTrackingActionTest, PreUserTrackingActionTest) {
 
 TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
     std::vector<Track>* tracks = new std::vector<Track>();
+    MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(tracks);
     tracking->PreUserTrackingAction(end);
     tracking->PostUserTrackingAction(end);
     Track track = MAUSGeant4Manager::GetInstance()->GetTracking()
                                                            ->GetTracks()->at(0);
-    EXPECT_DOUBLE_EQ(track.GetFinalPosition().x(), 9.);
-    EXPECT_DOUBLE_EQ(track.GetFinalPosition().y(), 10.);
-    EXPECT_DOUBLE_EQ(track.GetFinalPosition().z(), 11.);
+    EXPECT_NEAR(track.GetFinalPosition().x(),  9., 1e-6);
+    EXPECT_NEAR(track.GetFinalPosition().y(), 10., 1e-6);
+    EXPECT_NEAR(track.GetFinalPosition().z(), 11., 1e-6);
     EXPECT_NEAR(track.GetFinalMomentum().x(), 12., 1e-6);
     EXPECT_NEAR(track.GetFinalMomentum().y(), 13., 1e-6);
     EXPECT_NEAR(track.GetFinalMomentum().z(), 14., 1e-6);
