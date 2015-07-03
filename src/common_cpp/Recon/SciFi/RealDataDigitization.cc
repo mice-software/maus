@@ -28,7 +28,7 @@ namespace MAUS {
 
 #define MIN_ADC 0.000000001
 
-RealDataDigitization::RealDataDigitization() : _npe_cut(0.0) {
+RealDataDigitization::RealDataDigitization() : _npe_cut(0.0), _chan_map(_n_entries) {
   // Do nothing
 }
 
@@ -38,16 +38,14 @@ RealDataDigitization::~RealDataDigitization() {
 
 void RealDataDigitization::initialise(double npe_cut,
                                       const std::string& map_file,
-                                      const std::string& calib_file) {
-  // -------------------------------------------------
+                                      const std::string& calib_file,
+                                      const std::string& bad_channels_file) {
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface.
   _npe_cut = npe_cut;
-  // bool map = load_mapping("scifi_mapping_2015-06-16.txt");
-  // bool calib = load_calibration("scifi_calibration_2015-06-16.txt";
   bool map = load_mapping(map_file.c_str());
   bool calib = load_calibration(calib_file.c_str());
-  bool bad_channels = load_bad_channels();
+  bool bad_channels = load_bad_channels(bad_channels_file.c_str());
   if ( !calib || !map || !bad_channels ) {
     throw(Exception(Exception::recoverable,
           "Could not load Tracker calibration, mapping or bad channel list.",
@@ -82,7 +80,6 @@ void RealDataDigitization::process(Spill *spill) {
     std::vector<SciFiDigit*> digits1 = process_VLSB(spill->GetSpillNumber(), tracker1[i]);
     digits0.insert(digits0.end(), digits1.begin(), digits1.end());
     revts->at(i)->GetSciFiEvent()->set_digits(digits0);
-    // digits.insert(digits.end(), new_digits.begin(), new_digits.end());
   }
 }
 
@@ -93,17 +90,10 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
   unsigned int xVLSBArraySize = td->GetVLSBArraySize();
   for ( unsigned int i = 0; i < xVLSBArraySize; ++i ) {
     VLSB vlsb1 = td->GetVLSBArrayElement(i);
-
-
-//    if ( bank < 32 ) {
-//      vlsb_tracker0_array.push_back(vlsb);
-//    } else {
-//      vlsb_tracker1_array.push_back(vlsb);
-//    }
-
     int bank = vlsb1.GetBankID();
     int channel_ro = vlsb1.GetChannel();
     double adc = vlsb1.GetADC();
+
     if ( !is_good_channel(bank, channel_ro) ) {
       continue;
     }
@@ -246,7 +236,6 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
 bool RealDataDigitization::load_calibration(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
-
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
@@ -281,9 +270,13 @@ bool RealDataDigitization::load_calibration(std::string file) {
   return true;
 }
 
+int RealDataDigitization::calc_uid(int chan_ro, int bank, int board) const {
+  return chan_ro + (bank*_number_channels) + (board*_banks_per_board*_number_channels);
+}
+
 bool RealDataDigitization::load_mapping(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/cabling/"+file;
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
@@ -293,48 +286,68 @@ bool RealDataDigitization::load_mapping(std::string file) {
   }
 
   std::string line;
-  for ( int i = 1; i < _total_number_channels; ++i ) {
-    getline(inf, line);
+  int line_count = 0;
+  while ( getline(inf, line) ) {
+    ++line_count;
     std::istringstream ist1(line.c_str());
+    ChanMap cmap;
+    ist1 >> cmap.board >> cmap.bank >> cmap.chan_ro >> cmap.tracker >> cmap.station
+         >> cmap.plane >> cmap.channel >> cmap.extWG >> cmap.inWG >> cmap.WGfib;
+    int UId = calc_uid(cmap.chan_ro, cmap.bank, cmap.board);
 
-    int board, bank, chan_ro, tracker, station, view, fibre, extWG, inWG, WGfib;
-    ist1 >> board >> bank >> chan_ro >> tracker >> station >>
-            view >> fibre >> extWG >> inWG >> WGfib;
+    // Check the UId does not exceed the bounds of the vector holding the channel map data
+    if (static_cast<size_t>(UId) > (_chan_map.size() - 1)) {
+      std::cerr << "WARNING:: RealDataDigitisation: Channel ID found outside bounds of map\n";
+      std::cerr << "line number: " << line_count << ", UId: " << UId << ", size: "
+                << _chan_map.size() << ", chan_ro: " << cmap.chan_ro << ", bank: "
+                << cmap.bank << ", board: " << cmap.board << "\n";
+      continue;
+    }
+    // Check the channel map entry for this UId is not uninitialised
+     if (_chan_map[UId].tracker != -1) {
+       std::cerr << "WARNING: UId " << UId << " not unique! ";
+       std::cerr << "chan_ro: " << cmap.chan_ro << ", bank: " << cmap.bank
+                 << ", board: " << cmap.board << "\n";
+     }
 
-    _board.push_back(board);
-    _bank.push_back(bank);
-    _chan_ro.push_back(chan_ro);
-    _tracker.push_back(tracker);
-    _station.push_back(station);
-    _view.push_back(view);
-    _fibre.push_back(fibre);
-    _extWG.push_back(extWG);
-    _inWG.push_back(inWG);
-    _WGfib.push_back(WGfib);
+    _chan_map[UId] = cmap;
   }
   return true;
 }
 
 bool RealDataDigitization::get_StatPlaneChannel(int& board, int& bank, int& chan_ro,
                            int& tracker, int& station, int& plane, int& channel,
-                           int &extWG, int &inWG, int &WGfib) const {
+                           int &extWG, int &inWG, int &WGfib) {
   bool found = false;
   tracker = station = plane = channel = -1;
+  int UId = calc_uid(chan_ro, bank, board);
 
-  for ( size_t i = 0; !found && i < _board.size(); ++i ) {
-    if ( (board == _board[i]) && (bank == _bank[i]) && (chan_ro == _chan_ro[i]) ) {
-      station = _station[i];
-      plane = _view[i];
-      channel = _fibre[i];
-      tracker = _tracker[i];
-      extWG   = _extWG[i];
-      inWG    = _inWG[i];
-      WGfib   = _WGfib[i];
-      found = true;
-    }
+  // Check the UId does not exceed the bounds of the vector holding the channel map data
+  if (static_cast<size_t>(UId) > (_chan_map.size() - 1)) {
+    std::cerr << "WARNING:: RealDataDigitisation: Channel ID found outside bounds of channel map\n";
+    std::cerr << "chan_ro: " << chan_ro << ", bank: " << bank << ", board: " << board << "\n";
+    return false;
   }
+
+  // Check the channel map entry for this UId is not uninitialised
+  if (_chan_map[UId].tracker == -1) {
+  //   std::cerr << "WARNING: UId " << UId << " not present! ";
+  //   std::cerr << "chan_ro: " << chan_ro << ", bank: " << bank << ", board: " <<  board << "\n";
+     return false;
+  }
+
+  tracker = _chan_map[UId].tracker;
+  station = _chan_map[UId].station;
+  plane = _chan_map[UId].plane;
+  channel = _chan_map[UId].channel;
+  extWG   = _chan_map[UId].extWG;
+  inWG    = _chan_map[UId].inWG;
+  WGfib   = _chan_map[UId].WGfib;
+  found = true;
+
   return found;
 }
+
 
 bool RealDataDigitization::is_good_channel(const int bank,
                                            const int chan_ro) const {
@@ -345,11 +358,11 @@ bool RealDataDigitization::is_good_channel(const int bank,
   }
 }
 
-bool RealDataDigitization::load_bad_channels() {
+bool RealDataDigitization::load_bad_channels(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/bad_chan_list.txt";
-
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
   std::ifstream inf(fname.c_str());
+
   if (!inf) {
     throw(Exception(Exception::recoverable,
           "Could not load Tracker bad channel list.",
