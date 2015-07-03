@@ -49,11 +49,12 @@ void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
   double npe_cut = (*json)["SciFiDigitizationNPECut"].asDouble();
   std::string map_file = (*json)["SciFiMappingFileName"].asString();
   std::string calib_file = (*json)["SciFiCalibrationFileName"].asString();
-  // std::cout << "INFO: MapCppTrackerDigits: Map file: " << map_file
-  //          << ". Calib file: " << calib_file << ". NPE cut: " << npe_cut
-  //          << "\n";
+  std::string bad_channels_file = (*json)["SciFiBadChannelsFileName"].asString();
+  std::cout << "INFO: MapCppTrackerDigits: Map file: " << map_file
+            << ". Calib file: " << calib_file << ". NPE cut: " << npe_cut
+            << ". Bad Chan file: " << bad_channels_file << "\n";
   real = new RealDataDigitization();
-  real->initialise(npe_cut, map_file.c_str(), calib_file.c_str());
+  real->initialise(npe_cut, map_file.c_str(), calib_file.c_str(), bad_channels_file.c_str());
 }
 
 void MapCppTrackerDigits::_death() {}
