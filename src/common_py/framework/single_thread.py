@@ -16,6 +16,7 @@ Single-threaded dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
@@ -83,8 +84,9 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             assert(birth == True or birth == None)
 
             print("PIPELINE: Get event, TRANSFORM, MERGE, OUTPUT, repeat")
-
+            sys.stdout.flush()
             emitter = self.inputer.emitter()
+            sys.stdout.flush()
             # This helps us time how long the setup that sometimes happens
             # in the first event takes
             print("HINT: MAUS will process 1 event only at first...")
@@ -93,7 +95,11 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             i = 0
             while len(map_buffer) != 0:
                 for event in map_buffer:
+                    print "emitted"
+                    sys.stdout.flush()
                     self.process_event(event)
+                    print "emitting"
+                    sys.stdout.flush()
                 i += len(map_buffer)
                 map_buffer = DataflowUtilities.buffer_input(emitter, 1)
 
@@ -144,15 +150,27 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
+            print "transforming"
+            sys.stdout.flush()
             event = self.transformer.process(event)
+            print "transformed"
+            sys.stdout.flush()
             old_event = event
             event = maus_cpp.converter.string_repr(old_event)
             try:
                 maus_cpp.converter.del_data_repr(old_event)
             except TypeError:
                 pass
+            print "merging"
+            sys.stdout.flush()
             event = self.merger.process(event)
+            print "merged"
+            sys.stdout.flush()
+        print "saving"
+        sys.stdout.flush()
         self.outputer.save(event)
+        print "saved"
+        sys.stdout.flush()
 
     def start_of_run(self, new_run_number):
         """
