@@ -97,7 +97,8 @@ class RealDataDigitization {
 
   void initialise(double npe_cut,
                   const std::string& map_file,
-                  const std::string& calib_file);
+                  const std::string& calib_file,
+                  const std::string& bad_channels_file);
 
   /** @brief Processes a spill from DAQ
    *  @params spill A SciFiSpill to be filled
@@ -143,7 +144,7 @@ class RealDataDigitization {
 
   /** @brief Reads the bad channel list from file.
    */
-  bool load_bad_channels();
+  bool load_bad_channels(std::string file);
 
   /** @brief Returns value depends on the goodness of the channel.
    */

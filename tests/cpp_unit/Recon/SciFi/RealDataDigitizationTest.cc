@@ -102,7 +102,7 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
 
 TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
   RealDataDigitization test_case;
-  bool bad_channels = test_case.load_bad_channels();
+  bool bad_channels = test_case.load_bad_channels("scifi_bad_channels_2015-06-18.txt");
   EXPECT_TRUE(bad_channels);
   int bad_channel[3] = {5, 17};
   int good_channel[3]= {6, 3};

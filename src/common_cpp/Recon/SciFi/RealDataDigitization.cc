@@ -38,13 +38,14 @@ RealDataDigitization::~RealDataDigitization() {
 
 void RealDataDigitization::initialise(double npe_cut,
                                       const std::string& map_file,
-                                      const std::string& calib_file) {
+                                      const std::string& calib_file,
+                                      const std::string& bad_channels_file) {
   // Load calibration, mapping and bad channel list.
   // These calls are to be replaced by CDB interface.
   _npe_cut = npe_cut;
   bool map = load_mapping(map_file.c_str());
   bool calib = load_calibration(calib_file.c_str());
-  bool bad_channels = load_bad_channels();
+  bool bad_channels = load_bad_channels(bad_channels_file.c_str());
   if ( !calib || !map || !bad_channels ) {
     throw(Exception(Exception::recoverable,
           "Could not load Tracker calibration, mapping or bad channel list.",
@@ -235,7 +236,6 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
 bool RealDataDigitization::load_calibration(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
-
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
@@ -358,11 +358,12 @@ bool RealDataDigitization::is_good_channel(const int bank,
   }
 }
 
-bool RealDataDigitization::load_bad_channels() {
+bool RealDataDigitization::load_bad_channels(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/bad_chan_list.txt";
-
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
+  std::cerr << "Load bad chan file: " << fname << "\n";
   std::ifstream inf(fname.c_str());
+
   if (!inf) {
     throw(Exception(Exception::recoverable,
           "Could not load Tracker bad channel list.",
