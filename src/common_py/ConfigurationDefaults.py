@@ -410,8 +410,8 @@ Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
-Enable_VLSB_Unpacking = True
-Enable_VLSB_C_Unpacking = True
+Enable_VLSB_Unpacking = False
+Enable_VLSB_C_Unpacking = False
 Enable_DBB_Unpacking = True
 Enable_DBBChain_Unpacking = True
 Do_V1731_Zero_Suppression = False
@@ -592,7 +592,7 @@ EMR_calib_date_from = 'current'
 #EMR_calib_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
-daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
+daq_data_file = '07010.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
