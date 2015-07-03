@@ -157,7 +157,7 @@ class RealDataDigitization {
   static const int _banks_per_board       = 4;
   static const int _n_entries         = 8192;
   double _npe_cut;
-  //static const double _min       = 0.000000001;
+  // static const double _min       = 0.000000001;
 
   /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
   Json::Value _calibration[_number_banks][_number_channels];

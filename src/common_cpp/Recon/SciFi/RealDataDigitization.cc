@@ -299,7 +299,7 @@ bool RealDataDigitization::load_mapping(std::string file) {
     if (static_cast<size_t>(UId) > (_chan_map.size() - 1)) {
       std::cerr << "WARNING:: RealDataDigitisation: Channel ID found outside bounds of map\n";
       std::cerr << "line number: " << line_count << ", UId: " << UId << ", size: "
-                << _chan_map.size() << ", chan_ro: " << cmap.chan_ro << ", bank: " 
+                << _chan_map.size() << ", chan_ro: " << cmap.chan_ro << ", bank: "
                 << cmap.bank << ", board: " << cmap.board << "\n";
       continue;
     }
