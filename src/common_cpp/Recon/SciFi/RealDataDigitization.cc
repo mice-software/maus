@@ -361,7 +361,6 @@ bool RealDataDigitization::is_good_channel(const int bank,
 bool RealDataDigitization::load_bad_channels(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
-  std::cerr << "Load bad chan file: " << fname << "\n";
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
