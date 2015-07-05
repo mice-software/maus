@@ -92,12 +92,19 @@ class Data : public MAUSEvent<Spill> {
 
     static int GetReferenceCount() {return _reference_count;}
 
+    static void SetMaxReferenceCount(int max_ref_count) {
+        _max_reference_count = max_ref_count;
+    }
+
+    static int GetMaxReferenceCount() {return _max_reference_count;}
+
   private:
     // Count number of references to data and make a stack trace at construction
     // time so we know who built it
     void IncreaseRefCount();
     void DecreaseRefCount();
     static int _reference_count;
+    static int _max_reference_count;
     Spill* _spill;
     std::string _event_type;
     MAUS_VERSIONED_CLASS_DEF(Data)

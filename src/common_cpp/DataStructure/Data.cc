@@ -19,13 +19,10 @@
 #include "src/common_cpp/DataStructure/MAUSEvent.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 
-#ifndef MAUS_DATA_MAX_REF_COUNT
-#define MAUS_DATA_MAX_REF_COUNT 20
-#endif
-
 namespace MAUS {
 
 int Data::_reference_count = 0;
+int Data::_max_reference_count = 0;
 
 Data::Data() : MAUSEvent<Spill>("Spill"), _spill(NULL) {
     IncreaseRefCount();
@@ -76,7 +73,7 @@ int Data::GetSizeOf() const {
 
 void Data::IncreaseRefCount() {
     _reference_count++;
-    if (_reference_count > MAUS_DATA_MAX_REF_COUNT) {
+    if (_reference_count > _max_reference_count) {
         throw Exception(Exception::recoverable,
                         "Too many data references",
                         "Data::IncreaseRefCount");
