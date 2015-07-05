@@ -44,6 +44,7 @@ output_root_file_name = "maus_output.root"
 # (Note present version emits selected spills for all input run numbers)
 # e.g. selected_spills = [ 2, 34, 432, 3464 ]
 selected_spills = []
+data_maximum_reference_count = 100
 
 # one_big_file - puts everything in output_root_file_name
 # one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like

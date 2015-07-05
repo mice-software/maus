@@ -22,7 +22,7 @@
 namespace MAUS {
 
 int Data::_reference_count = 0;
-int Data::_max_reference_count = 0;
+int Data::_max_reference_count = 100;
 
 Data::Data() : MAUSEvent<Spill>("Spill"), _spill(NULL) {
     IncreaseRefCount();
