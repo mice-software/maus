@@ -95,10 +95,8 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             i = 0
             while len(map_buffer) != 0:
                 for event in map_buffer:
-                    print "emitted"
                     sys.stdout.flush()
                     self.process_event(event)
-                    print "emitting"
                     sys.stdout.flush()
                 i += len(map_buffer)
                 map_buffer = DataflowUtilities.buffer_input(emitter, 1)
@@ -150,27 +148,15 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
-            print "transforming"
-            sys.stdout.flush()
-            event = self.transformer.process(event)
-            print "transformed"
-            sys.stdout.flush()
-            old_event = event
-            event = maus_cpp.converter.string_repr(old_event)
+            new_event = self.transformer.process(event)
+            event = maus_cpp.converter.string_repr(new_event)
             try:
-                maus_cpp.converter.del_data_repr(old_event)
+                maus_cpp.converter.del_data_repr(event)
             except TypeError:
                 pass
-            print "merging"
-            sys.stdout.flush()
             event = self.merger.process(event)
-            print "merged"
-            sys.stdout.flush()
-        print "saving"
-        sys.stdout.flush()
         self.outputer.save(event)
-        print "saved"
-        sys.stdout.flush()
+        del event
 
     def start_of_run(self, new_run_number):
         """

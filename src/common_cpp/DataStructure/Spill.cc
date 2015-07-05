@@ -22,14 +22,12 @@ Spill::Spill()
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
-    std::cerr << "Spill Default Constructor " << this << std::endl;
 }
 
 Spill::Spill(const Spill& md)
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
-  std::cerr << "Spill Copy Constructor " << this << std::endl;
   *this = md;
 }
 
@@ -96,7 +94,6 @@ Spill& Spill::operator=(const Spill& md) {
 }
 
 Spill::~Spill() {
-    std::cerr << "Spill Destructor " << this << std::endl;
     if (_daq != NULL) {
         delete _daq;
     }

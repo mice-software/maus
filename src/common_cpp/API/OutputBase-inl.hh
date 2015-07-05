@@ -33,6 +33,7 @@ namespace MAUS {
     bool ret = false;
     try {
       ret = _save(data_in);
+      std::cerr << "REF COUNT " << data_in << " " << data_in->ob_refcnt << std::endl;
     }
     catch (std::exception& e) {
       std::cerr << e.what() << std::endl;

@@ -131,7 +131,6 @@ template <class DataT>
 bool OutputCppRoot::write_event(PyObject* py_data) {
     static int i = 0;
     ++i;
-    std::cerr << "OutputCppRoot::write_event a " << i << std::endl;
     DataT* data_cpp = NULL;
     try {
         data_cpp = PyObjectWrapper::unwrap<DataT>(py_data);
@@ -140,7 +139,6 @@ bool OutputCppRoot::write_event(PyObject* py_data) {
     } catch (std::exception) {
         return false;
     }
-    std::cerr << "OutputCppRoot::write_event b " << i << std::endl;
     check_file_exists(data_cpp);
     if (_outfile == NULL) {
         throw(Exception(
@@ -150,7 +148,6 @@ bool OutputCppRoot::write_event(PyObject* py_data) {
         ));
     }
 
-    std::cerr << "OutputCppRoot::write_event c " << i << std::endl;
     std::string branch_name = get_branch_name(data_cpp);
     std::string data_type = data_cpp->GetEventType();
     if (_outfile_branch != data_type) {
@@ -161,31 +158,23 @@ bool OutputCppRoot::write_event(PyObject* py_data) {
                        "MAUS output data", "UPDATE");
         _outfile_branch = data_type;
     }
-    std::cerr << "OutputCppRoot::write_event d " << i << std::endl;
     (*_outfile) << branchName(branch_name.c_str()) << data_cpp;
-    std::cerr << "OutputCppRoot::write_event e " << i << std::endl;
     if (data_cpp->GetEvent() == NULL) {  // failed on conversion
         return false;
     }
     // delete data_cpp;
     // data_cpp = NULL;
-    std::cerr << "OutputCppRoot::write_event f " << i << std::endl;
     try {
         (*_outfile) << fillEvent;
     } catch (...) {
-        std::cerr << "OutputCppRoot::write_event g " << i << std::endl;
         if (data_cpp != NULL)
             data_cpp->SetEvent(NULL);  // double free?
         throw; // raise the exception
     }
-    std::cerr << "OutputCppRoot::write_event h " << i << std::endl;
     if (data_cpp) {
-        std::cerr << "OutputCppRoot::write_event i " << i << " (destructing)" << std::endl;
         delete data_cpp;
         data_cpp = NULL;
-        std::cerr << "OutputCppRoot::write_event j " << i << " (destructed)" << std::endl;
     }
-    std::cerr << "OutputCppRoot::write_event k " << i << std::endl;
     return true;
 }
 
