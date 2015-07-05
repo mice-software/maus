@@ -72,11 +72,11 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
   }
   // note here we delete the pointer, not the allocated memory it points to
   delete py_ret;
-  delete data_ret;
-  delete jh_ret;
-  delete jf_ret;
-  delete rh_ret;
   delete rf_ret;
+  delete rh_ret;
+  delete jf_ret;
+  delete jh_ret;
+  delete data_ret;
   delete json_ret;
   delete string_ret;
   return cpp_ret;

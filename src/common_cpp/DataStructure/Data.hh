@@ -90,6 +90,8 @@ class Data : public MAUSEvent<Spill> {
 
     std::string getRecordName() const {return std::string("data");}
 
+    static int GetReferenceCount() {return _reference_count;}
+
   private:
     // Count number of references to data and make a stack trace at construction
     // time so we know who built it
@@ -98,7 +100,6 @@ class Data : public MAUSEvent<Spill> {
     static int _reference_count;
     Spill* _spill;
     std::string _event_type;
-
     MAUS_VERSIONED_CLASS_DEF(Data)
 };
 }
