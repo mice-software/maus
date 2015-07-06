@@ -39,8 +39,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_default_constructor) {
   EXPECT_EQ(prtrack.get_phi0(), -1.0);
   EXPECT_EQ(prtrack.get_dsdz(), -1.0);
   EXPECT_EQ(prtrack.get_R(), -1.0);
-  EXPECT_EQ(prtrack.get_chisq(), -1.0);
-  EXPECT_EQ(prtrack.get_chisq_dof(), -1.0);
+  EXPECT_EQ(prtrack.get_chi_squared(), -1.0);
+  EXPECT_EQ(prtrack.get_ndf(), -1.0);
   EXPECT_EQ(prtrack.get_point_spread(), -1.0);
   EXPECT_EQ(prtrack.get_line_sz_chisq(), -1.0);
   EXPECT_EQ(prtrack.get_circle_x0(), -1.0);
@@ -80,7 +80,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   double R = 13.0;
   double circ_chisq = 6.0;
   double chisq = 1.0;
-  double chisq_dof = 2.0;
+  int ndf = 5.0;
   double point_spread = 10.0;
   std::vector<double> cov(0);
   cov.push_back(10.0);
@@ -100,7 +100,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   spnts.push_back(spoint);
 
   SciFiHelicalPRTrack trk(tracker, num_points, charge, pos0, phi0, circle, line_sz,
-                          chisq, chisq_dof, point_spread, phi, spnts, cov);
+                          point_spread, phi, spnts, cov);
 
   EXPECT_EQ(trk.get_pos0().x(), x);
   EXPECT_EQ(trk.get_pos0().y(), y);
@@ -113,8 +113,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   EXPECT_EQ(trk.get_tracker(), tracker);
   EXPECT_EQ(trk.get_num_points(), num_points);
   EXPECT_EQ(trk.get_charge(), charge);
-  EXPECT_EQ(trk.get_chisq(), chisq);
-  EXPECT_EQ(trk.get_chisq_dof(), chisq_dof);
+  EXPECT_EQ(trk.get_chi_squared(), chisq);
+  EXPECT_EQ(trk.get_ndf(), ndf);
   EXPECT_EQ(trk.get_point_spread(), point_spread);
   size_t size = 1;
   EXPECT_EQ(trk.get_spacepoints()->GetEntries(), size);
@@ -136,7 +136,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   double dsdz = 0.02;
   double R = 15.0;
   double chisq = 30.0;
-  double chisq_dof = 10.0;
+  int ndf = 1.0;
   double point_spread = 50.0;
   double line_sz_chisq = 5.0;
   double circle_x0 = 6.0;
@@ -153,8 +153,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   trk1->set_phi0(phi0);
   trk1->set_dsdz(dsdz);
   trk1->set_R(R);
-  trk1->set_chisq(chisq);
-  trk1->set_chisq_dof(chisq_dof);
+  trk1->set_chi_squared(chisq);
+  trk1->set_ndf(ndf);
   trk1->set_point_spread(point_spread);
   trk1->set_line_sz_chisq(line_sz_chisq);
   trk1->set_circle_x0(circle_x0);
@@ -181,8 +181,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_phi0(), phi0);
   EXPECT_EQ(trk2.get_dsdz(), dsdz);
   EXPECT_EQ(trk2.get_R(), R);
-  EXPECT_EQ(trk2.get_chisq(), chisq);
-  EXPECT_EQ(trk2.get_chisq_dof(), chisq_dof);
+  EXPECT_EQ(trk2.get_chi_squared(), chisq);
+  EXPECT_EQ(trk2.get_ndf(), ndf);
   EXPECT_EQ(trk2.get_point_spread(), point_spread);
   EXPECT_EQ(trk2.get_line_sz_chisq(), line_sz_chisq);
   EXPECT_EQ(trk2.get_circle_x0(), circle_x0);
@@ -251,7 +251,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   double dsdz = 0.02;
   double R = 15.0;
   double chisq = 30.0;
-  double chisq_dof = 10.0;
+  int ndf = 10.0;
   double point_spread = 50.0;
   double line_sz_chisq = 5.0;
   double circle_x0 = 6.0;
@@ -268,8 +268,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   trk1->set_phi0(phi0);
   trk1->set_dsdz(dsdz);
   trk1->set_R(R);
-  trk1->set_chisq(chisq);
-  trk1->set_chisq_dof(chisq_dof);
+  trk1->set_chi_squared(chisq);
+  trk1->set_ndf(ndf);
   trk1->set_point_spread(point_spread);
   trk1->set_line_sz_chisq(line_sz_chisq);
   trk1->set_circle_x0(circle_x0);
@@ -292,8 +292,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   EXPECT_EQ(trk2.get_phi0(), phi0);
   EXPECT_EQ(trk2.get_dsdz(), dsdz);
   EXPECT_EQ(trk2.get_R(), R);
-  EXPECT_EQ(trk2.get_chisq(), chisq);
-  EXPECT_EQ(trk2.get_chisq_dof(), chisq_dof);
+  EXPECT_EQ(trk2.get_chi_squared(), chisq);
+  EXPECT_EQ(trk2.get_ndf(), ndf);
   EXPECT_EQ(trk2.get_point_spread(), point_spread);
   EXPECT_EQ(trk2.get_line_sz_chisq(), line_sz_chisq);
   EXPECT_EQ(trk2.get_circle_x0(), circle_x0);
@@ -318,7 +318,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   double dsdz = 0.02;
   double R = 15.0;
   double chisq = 30.0;
-  double chisq_dof = 10.0;
+  int ndf = 5;
   double point_spread = 50.0;
   double line_sz_chisq = 5.0;
   double circle_x0 = 6.0;
@@ -340,8 +340,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   trk.set_phi0(phi0);
   trk.set_dsdz(dsdz);
   trk.set_R(R);
-  trk.set_chisq(chisq);
-  trk.set_chisq_dof(chisq_dof);
+  trk.set_chi_squared(chisq);
+  trk.set_ndf(ndf);
   trk.set_point_spread(point_spread);
   trk.set_line_sz_chisq(line_sz_chisq);
   trk.set_circle_x0(circle_x0);
@@ -357,8 +357,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   EXPECT_EQ(trk.get_phi0(), phi0);
   EXPECT_EQ(trk.get_dsdz(), dsdz);
   EXPECT_EQ(trk.get_R(), R);
-  EXPECT_EQ(trk.get_chisq(), chisq);
-  EXPECT_EQ(trk.get_chisq_dof(), chisq_dof);
+  EXPECT_EQ(trk.get_chi_squared(), chisq);
+  EXPECT_EQ(trk.get_ndf(), ndf);
   EXPECT_EQ(trk.get_point_spread(), point_spread);
   EXPECT_EQ(trk.get_line_sz_chisq(), line_sz_chisq);
   EXPECT_EQ(trk.get_circle_x0(), circle_x0);

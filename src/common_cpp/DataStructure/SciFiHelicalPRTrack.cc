@@ -36,35 +36,9 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack()
     _circle_x0(-1.0),
     _circle_y0(-1.0),
     _circle_chisq(-1.0),
-    _chisq(-1.0),
-    _chisq_dof(-1.0),
     _point_spread(-1.0),
     _pos0(-1.0, -1.0, -1.0),
     _phi(0) {
-}
-
-SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
-                                         double phi0, SimpleCircle circle, SimpleLine line_sz,
-                                         double chisq, double chisq_dof, double point_spread,
-                                         DoubleArray phi, SciFiSpacePointPArray spoints,
-                                         const DoubleArray& covariance) :
-    SciFiBasePRTrack(covariance, spoints),
-    _tracker(tracker),
-    _num_points(num_points),
-    _charge(charge),
-    _R(circle.get_R()),
-    _phi0(phi0),
-    _dsdz(line_sz.get_m()),
-    _line_sz_c(line_sz.get_c()),
-    _line_sz_chisq(line_sz.get_chisq()),
-    _circle_x0(circle.get_x0()),
-    _circle_y0(circle.get_y0()),
-    _circle_chisq(circle.get_chisq()),
-    _chisq(chisq),
-    _chisq_dof(chisq_dof),
-    _point_spread(point_spread),
-    _pos0(pos0),
-    _phi(phi) {
 }
 
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0,
@@ -84,14 +58,11 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge
     _circle_x0(circle.get_x0()),
     _circle_y0(circle.get_y0()),
     _circle_chisq(circle.get_chisq()),
-    _chisq(0.0),
-    _chisq_dof(0.0),
     _point_spread(point_spread),
     _pos0(pos0),
     _phi(phi) {
-
-  _chisq = std::sqrt(_circle_chisq*_circle_chisq + _line_sz_chisq*_line_sz_chisq);
-  _chisq_dof = _chisq / (_num_points - 2);
+  this->set_chi_squared(_circle_chisq*_circle_chisq + _line_sz_chisq*_line_sz_chisq);
+  this->set_ndf((2*_num_points) - 5);
 }
 
 // Destructor
@@ -114,8 +85,6 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _circle_chisq = htrk.get_circle_chisq();
   _circle_x0 = htrk.get_circle_x0();
   _circle_y0 = htrk.get_circle_y0();
-  _chisq = htrk.get_chisq();
-  _chisq_dof = htrk.get_chisq_dof();
   _num_points = htrk.get_num_points();
   _charge = htrk.get_charge();
   _tracker = htrk.get_tracker();
@@ -138,8 +107,6 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _circle_x0(htrk.get_circle_x0()),
     _circle_y0(htrk.get_circle_y0()),
     _circle_chisq(htrk.get_circle_chisq()),
-    _chisq(htrk.get_chisq()),
-    _chisq_dof(htrk.get_chisq_dof()),
     _point_spread(htrk.get_point_spread()),
     _pos0(htrk.get_pos0()),
     _phi(htrk.get_phi()) {
