@@ -28,7 +28,10 @@ for run in ${run_list}
 do
     filename=${run}.tar
     century="${run:0:3}00"
-    url=http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/${century}/${filename}
+    # lazy approach to choosing between Step1 and Step4, we could use
+    # the approach run >= 5889 is Step4
+    url1=http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/${century}/${filename}
+    url2=http://www.hep.ph.ic.ac.uk/micedata/MICE/Step4/${century}/${filename}
 
     stagefile=${stagedir}/${filename}
 
@@ -42,7 +45,21 @@ do
         echo "INFO: Found source archive"
     else
         echo "INFO: Source archive doesn't exist.  Downloading..."
-        wget ${url} -O "${stagefile}" 
+        wget ${url1} -O "${stagefile}" 
+        if [ $? -ne 0 ]
+        then
+            # download returned e.g. 404 and put this in ${stagefile}, let's
+            # clean up
+            rm ${stagefile}
+            echo "INFO: Failed to download from Step1 area; try Step4 area"
+            wget ${url2} -O "${stagefile}"
+            if [ $? -ne 0 ]
+            then
+                echo "FATAL: Failed to download from Step4 area"
+                rm ${stagefile}
+                exit 1
+            fi
+        fi
     fi
     if [ -d "$destdir" ]
     then
