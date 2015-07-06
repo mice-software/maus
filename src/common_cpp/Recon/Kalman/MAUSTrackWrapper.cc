@@ -254,7 +254,7 @@ namespace MAUS {
 
 
   SciFiTrack* ConvertToSciFiTrack(const Kalman::TrackFit* fitter,
-                                                                 const SciFiGeometryHelper* geom) {
+                                     const SciFiGeometryHelper* geom, SciFiBasePRTrack* pr_track) {
     SciFiTrack* new_track = new SciFiTrack();
     const Kalman::Track& smoothed = fitter->Smoothed();
 //    const Kalman::Track& smoothed = fitter->Filtered();
@@ -307,6 +307,7 @@ namespace MAUS {
       SciFiTrackPoint* new_point = new SciFiTrackPoint();
 
       new_point->set_tracker(tracker);
+      new_point->set_has_data(data_state.HasValue());
 
       int id = abs(smoothed_state.GetId());
       new_point->set_station(((id-1)/3)+1);
@@ -396,9 +397,6 @@ namespace MAUS {
       }
       new_point->set_errors(errors);
 
-// TODO
-//    _cluster = new TRef(kalman_site->cluster());
-      new_point->set_cluster(new TRef());
       new_track->add_scifitrackpoint(new_point);
     }
 
@@ -406,6 +404,7 @@ namespace MAUS {
     new_track->set_chi2(chi_squared);
     new_track->set_ndf(NDF);
     new_track->set_P_value(p_value);
+    new_track->set_pr_track_pointer(pr_track);
 
     TMatrixD seed_vector = seed.GetVector();
     ThreeVector seed_pos;

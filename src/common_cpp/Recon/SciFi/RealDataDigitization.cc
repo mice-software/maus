@@ -104,7 +104,7 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
     int bank = vlsb1.GetBankID();
     int channel_ro = vlsb1.GetChannel();
     double adc = vlsb1.GetADC();
-    if ( !is_good_channel(bank, channel_ro) ) {
+    if (!is_good_channel(bank, channel_ro)) {
       continue;
     }
 
@@ -150,6 +150,7 @@ std::vector<SciFiDigit*> RealDataDigitization::process_VLSB(int SpillNum, Tracke
     if ( found && (pe > _npe_cut ) ) {
       SciFiDigit *digit = new SciFiDigit(SpillNum, vlsb1.GetPartEventNumber(),
                                          tracker, station, plane, channel, pe, time);
+      digit->set_adc(adc);
       digits.push_back(digit);
     }
   }  // ends loop over channels
@@ -235,6 +236,7 @@ void RealDataDigitization::process_VLSB_c(Json::Value input_event,
     if ( found ) { // pe > 1.0 &&
       SciFiDigit *digit = new SciFiDigit(spill, eventNo,
                                          tracker, station, plane, channel, pe, time);
+      digit->set_adc(adc);
       event->add_digit(digit);
     }
   }  // ends loop over channels (j)

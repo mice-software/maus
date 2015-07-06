@@ -66,6 +66,8 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
 
+  std::cerr << "CLUSTERING NPE CUT = " << _min_npe << std::endl;
+
 
   _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
 
@@ -198,7 +200,8 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       std::cerr << Kalman::print_track(smoothed);
       delete temp_measurement;
 
-      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter,
+                                                                       &_geometry_helper, helical);
   //    SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter->GetFiltered(),
   //                                                             &_geometry_helper);
       evt.add_scifitrack(track);
@@ -235,7 +238,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       std::cerr << Kalman::print_track(smoothed);
 
       SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_straight_track_fitter,
-                                                                                &_geometry_helper);
+                                                                      &_geometry_helper, straight);
       evt.add_scifitrack(track);
     }
   } else { // PATREC Not Active
@@ -315,7 +318,8 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       std::cerr << Kalman::print_track(smoothed);
       delete temp_measurement;
 
-      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter,
+                                                                       &_geometry_helper, helical);
   //    SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter->GetFiltered(),
   //                                                             &_geometry_helper);
       evt.add_scifitrack(track);
@@ -337,7 +341,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _helical_track_fitter->Filter(false);
       _helical_track_fitter->Smooth(false);
 
-      SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
 
       evt.add_scifitrack(track);
     }
@@ -353,7 +357,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _straight_track_fitter->Filter(false);
       _straight_track_fitter->Smooth(false);
 
-      SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
 
       evt.add_scifitrack(track);
     }
