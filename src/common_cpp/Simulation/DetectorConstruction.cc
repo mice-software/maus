@@ -582,7 +582,7 @@ void DetectorConstruction::GetSDHits(size_t i, MCEvent* event) {
                     "DetectorConstruction::GetSDHits(...)");
   }
   if (_SDs[i] and _SDs[i]->isHit()) {
-    return _SDs[i]->GetHits(event);
+    return _SDs[i]->TakeHits(event);
   }
 }
 

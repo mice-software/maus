@@ -49,6 +49,15 @@ TEST(MAUSEventActionTest, BeginOfEventActionTest) {
     EXPECT_EQ(_g4->GetVirtualPlanes()->GetVirtualHits()->size(), 0);
 }
 
+void SetVirtualsAndTracks() {
+    MAUSGeant4Manager* _g4 = MAUSGeant4Manager::GetInstance();
+    // put some data into tracking, virtual planes
+    std::vector<Track>* tracks = new std::vector<Track>(2);
+    std::vector<VirtualHit>* vhits = new std::vector<VirtualHit>(1);
+    _g4->GetTracking()->SetTracks(tracks);
+    _g4->GetVirtualPlanes()->SetVirtualHits(vhits);
+}
+
 TEST(MAUSEventActionTest, EndOfEventActionTest) {
     MAUSGeant4Manager* _g4 = MAUSGeant4Manager::GetInstance();
     // _events out of range
@@ -60,16 +69,15 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     events->push_back(new MCEvent());
     _g4->GetEventAction()->SetEvents(events);
 
-    // put some data into tracking, virtual planes
-    std::vector<Track>* tracks = new std::vector<Track>(1);
-    std::vector<VirtualHit>* vhits = new std::vector<VirtualHit>(2);
-    _g4->GetTracking()->SetTracks(tracks);
-    _g4->GetVirtualPlanes()->SetVirtualHits(vhits);
 
     // check if virtual planes, tracking off we don't get any data through
     _g4->GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
     _g4->GetTracking()->SetWillKeepTracks(false);
+    _g4->GetEventAction()->BeginOfEventAction(NULL);
+    SetVirtualsAndTracks();
     _g4->GetEventAction()->EndOfEventAction(NULL);
+    _g4->GetEventAction()->BeginOfEventAction(NULL);
+    SetVirtualsAndTracks();
     _g4->GetEventAction()->EndOfEventAction(NULL);
 
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
@@ -79,16 +87,24 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), MAUS::Exception);
 
     // reset _primary index
+    events = new std::vector<MCEvent*>();
+    events->push_back(new MCEvent());
+    events->push_back(new MCEvent());
     _g4->GetEventAction()->SetEvents(events);
 
     // now try with tracking, virtualplanes switched on
     _g4->GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
     _g4->GetTracking()->SetWillKeepTracks(true);
-    _g4->GetEventAction()->EndOfEventAction(NULL);
+    _g4->GetEventAction()->BeginOfEventAction(NULL);
+    SetVirtualsAndTracks();
+    _g4->GetEventAction()->EndOfEventAction(NULL);    
+    _g4->GetEventAction()->BeginOfEventAction(NULL);
+    SetVirtualsAndTracks();
     _g4->GetEventAction()->EndOfEventAction(NULL);
 
     // check that this time we do get virtuals/track data through
     EXPECT_EQ(_g4->GetEventAction()->GetEvents(), events);
+    EXPECT_EQ(events->size(), 2);
     EXPECT_EQ(events->at(0)->GetVirtualHits()->size(), 1);
     EXPECT_EQ(events->at(0)->GetTracks()->size(), 2);
     // we never called begin of event action so the buffers weren't cleared

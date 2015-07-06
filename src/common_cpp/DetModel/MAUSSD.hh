@@ -60,8 +60,8 @@ class MAUSSD : public G4VSensitiveDetector {
   /** Clears all hits in the sensitive detector */
   virtual void ClearHits() = 0;
 
-  /** Return the detector hits */
-  virtual void GetHits(MCEvent* event) = 0;
+  /** Hand ownership of the detector hits to MCEvent */
+  virtual void TakeHits(MCEvent* event) = 0;
 
   /** Reset the SD list
    *

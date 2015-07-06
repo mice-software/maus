@@ -104,9 +104,9 @@ void SpecialVirtualSD::Initialize(G4HCofThisEvent* HCE)
 
 }
 
-void SpecialVirtualSD::GetHits(MAUS::MCEvent* event) {
+void SpecialVirtualSD::TakeHits(MAUS::MCEvent* event) {
   event->SetSpecialVirtualHits(_hits);
-  ClearHits();
+  _hits = new std::vector<MAUS::SpecialVirtualHit>();
 }
 
 

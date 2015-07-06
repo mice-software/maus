@@ -354,9 +354,16 @@ class VirtualPlaneManager {
    */
   void RemovePlane(VirtualPlane* plane);
 
-  /** @brief Get Json array of all recorded virtual hits since StartOfEvent()
+  /** @brief Get all recorded virtual hits since StartOfEvent().
+   *  VirtualPlaneManager still owns memory assigned to _hits.
    */
   std::vector<VirtualHit>* GetVirtualHits() {return _hits;}
+
+  /** @brief Get all recorded virtual hits since StartOfEvent(). Caller owns
+   *  memory assigned to hits.
+   */
+  std::vector<VirtualHit>* TakeVirtualHits();
+
 
   /** @brief Set Json array of virtual hits
    *

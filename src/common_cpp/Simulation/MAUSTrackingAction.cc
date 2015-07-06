@@ -40,6 +40,9 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         if (_stepping == NULL) {
            _stepping = MAUSGeant4Manager::GetInstance()->GetStepping();
         }
+        if (_stepping->GetWillKeepSteps()) {
+            _stepping->SetSteps(new std::vector<Step>());
+        }
 
         Track track;
         ThreeVector pos(aTrack->GetPosition().x(),
@@ -66,7 +69,6 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
                          "MAUSTrackingAction::PostUserTrackingAction");
         }
 
-        std::cerr << "MAUSTrackingAction PostUser1 " << aTrack->GetPosition() << " " << aTrack->GetMomentum() << std::endl;
         ThreeVector pos(aTrack->GetPosition().x(),
                         aTrack->GetPosition().y(),
                         aTrack->GetPosition().z());
@@ -80,6 +82,12 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
             _tracks->back().SetSteps(_stepping->TakeSteps());
         }
     }
+}
+
+std::vector<Track>* MAUSTrackingAction::TakeTracks() {
+    std::vector<Track>* track_tmp = _tracks;
+    _tracks = NULL;
+    return track_tmp;
 }
 
 void MAUSTrackingAction::SetTracks(std::vector<Track>* tracks) {

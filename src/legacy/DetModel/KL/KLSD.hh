@@ -27,7 +27,7 @@ class KLSD : public MAUS::MAUSSD {
   bool isHit() {return _hits != NULL && _hits->size() > 0;}
   int GetNHits() {return _hits->size();}
   void ClearHits();
-  void GetHits(MAUS::MCEvent* event) {event->SetKLHits(_hits);}
+  void TakeHits(MAUS::MCEvent* event) {event->SetKLHits(_hits); _hits = new std::vector<MAUS::KLHit>();}
  private:
   std::vector<MAUS::KLHit>* _hits;
 };

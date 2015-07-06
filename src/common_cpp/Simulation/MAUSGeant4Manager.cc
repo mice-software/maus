@@ -148,14 +148,14 @@ Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
 }
 
 std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>* event) {
-    _eventAct->SetEvents(event);  // checks type
+    _eventAct->SetEvents(event);
     for (size_t i = 0; i < event->size(); ++i) {
         MAUSPrimaryGeneratorAction::PGParticle primary;
         primary.ReadCpp(event->at(i)->GetPrimary());
         GetPrimaryGenerator()->Push(primary);
     }
     BeamOn(event->size());
-    return _eventAct->GetEvents();
+    return _eventAct->TakeEvents();
 }
 
 
@@ -179,8 +179,6 @@ MCEvent MAUSGeant4Manager::Tracking
 
     GetPrimaryGenerator()->Push(p);
     
-    Json::Value event_array = Json::Value(Json::arrayValue);
-    Json::Value event(Json::objectValue);
     std::vector<MCEvent*>* event_vector = new std::vector<MCEvent*>();
     event_vector->push_back(new MCEvent());
     event_vector->at(0)->SetPrimary(p.WriteCpp());
@@ -190,7 +188,7 @@ MCEvent MAUSGeant4Manager::Tracking
     BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
     event_vector = _eventAct->GetEvents(); // EventAction still owns this memory
-    return *event_vector->at(0);
+    return *event_vector->at(0); // this is a deep copy
 }
 
 void MAUSGeant4Manager::SetVisManager() {

@@ -45,11 +45,10 @@ void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
         throw(Exception(Exception::recoverable,
                         "EventAction::SetEvents not called",
                         "EventAction::BeginOfEventAction"));
+    std::cerr << "MAUSEVenetActuoin::BeginPOfEventAction" << std::endl;
     _virtPlanes->StartOfEvent();
     if (_tracking->GetWillKeepTracks())
         _tracking->SetTracks(new std::vector<Track>());
-    if (_stepping->GetWillKeepSteps())
-        _stepping->SetSteps(new std::vector<Step>());
     _geometry->ClearSDHits();
 }
 
@@ -63,10 +62,16 @@ void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
       //  Retrieve detector i's hits
       _geometry->GetSDHits(i, (*_events)[_primary]);
     }
-    if (_tracking->GetWillKeepTracks())
-        (*_events)[_primary]->SetTracks(_tracking->GetTracks());
-    if (_virtPlanes->GetWillUseVirtualPlanes())
-        (*_events)[_primary]->SetVirtualHits(_virtPlanes->GetVirtualHits());
+    if (_tracking->GetWillKeepTracks()) {
+        (*_events)[_primary]->SetTracks(_tracking->TakeTracks());
+    } else {
+        (*_events)[_primary]->SetTracks(new std::vector<Track>());
+    }
+    if (_virtPlanes->GetWillUseVirtualPlanes()) {
+        (*_events)[_primary]->SetVirtualHits(_virtPlanes->TakeVirtualHits());
+    } else {
+        (*_events)[_primary]->SetVirtualHits(new std::vector<VirtualHit>());
+    }
     _primary++;
 }
 
@@ -81,6 +86,12 @@ void MAUSEventAction::SetEvents(std::vector<MCEvent*>* events) {
     _tracking = _g4manager->GetTracking();
     _geometry = _g4manager->GetGeometry();
     _stepping = _g4manager->GetStepping();
+}
+
+std::vector<MCEvent*>* MAUSEventAction::TakeEvents() {
+  std::vector<MCEvent*>* event_tmp = _events;
+  _events = NULL;
+  return event_tmp;
 }
 }
 

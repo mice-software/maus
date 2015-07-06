@@ -148,7 +148,7 @@ class MAUSGeant4Manager {
      *                   assigned to mc_events
      *
      *  @returns a vector of particles with any new hits, virtual_hits or tracks
-     *  appended
+     *  appended; caller owns the memory
      */
     std::vector<MCEvent*>* RunManyParticles(std::vector<MCEvent*>* mc_events);
 

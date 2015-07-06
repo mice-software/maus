@@ -59,9 +59,9 @@ void TofSD::ClearHits() {
   _hits = new std::vector<MAUS::TOFHit>();
 }
 
-void TofSD::GetHits(MAUS::MCEvent* event) {
+void TofSD::TakeHits(MAUS::MCEvent* event) {
   event->SetTOFHits(_hits);
-  ClearHits();
+  _hits = new std::vector<MAUS::TOFHit>();
 }
 
 

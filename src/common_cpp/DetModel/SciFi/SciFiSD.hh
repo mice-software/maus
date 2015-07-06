@@ -61,8 +61,8 @@ class SciFiSD : public MAUS::MAUSSD {
     /** Clears all hits in the sensitive detector */
     void ClearHits();
 
-    /** Return the detector hits */
-    void GetHits(MAUS::MCEvent* event);
+    /** Hand ownership of the detector hits to MCEvent */
+    void TakeHits(MAUS::MCEvent* event);
 
     /** @brief Code that is called at the end of processing of an event
      *   Does nothing.

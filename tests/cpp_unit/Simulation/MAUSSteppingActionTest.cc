@@ -37,6 +37,7 @@ namespace {
 class MAUSSteppingActionTest : public ::testing::Test {
  protected:
   MAUSSteppingActionTest() : stepping(MAUSGeant4Manager::GetInstance()->GetStepping()) {
+    stepping->SetSteps(new std::vector<Step>());
     G4ParticleDefinition* pd =
                          G4ParticleTable::GetParticleTable()->FindParticle(-13);
     G4DynamicParticle* dyn =

@@ -86,9 +86,13 @@ class MAUSEventAction : public G4UserEventAction {
      */
     void SetEvents(std::vector<MCEvent*>* events);
 
-    /** Returns the event buffer. 
+    /** Returns the event buffer; MAUSEventAction still owns this memory
      */
     std::vector<MCEvent*>* GetEvents() {return _events;}
+
+    /** Returns the event buffer; caller owns returned memory
+     */
+    std::vector<MCEvent*>* TakeEvents();
 
  private:
     std::vector<MCEvent*>* _events;

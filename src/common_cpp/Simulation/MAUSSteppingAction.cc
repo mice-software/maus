@@ -41,7 +41,7 @@ MAUSSteppingAction::MAUSSteppingAction() : _steps(NULL), _keepSteps(false),
 
 void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
     // record all step points if keep steps flag is set
-    if (_steps == NULL)
+    if (_keepSteps && _steps == NULL)
         throw Exception(Exception::recoverable,
                         "Attempt to do stepping action when steps were NULL",
                         "MAUSSteppingAction::UserSteppingAction");

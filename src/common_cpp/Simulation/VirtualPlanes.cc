@@ -297,6 +297,12 @@ void VirtualPlaneManager::SetVirtualHits(std::vector<MAUS::VirtualHit>* hits) {
   _hits = hits;
 }
 
+std::vector<VirtualHit>* VirtualPlaneManager::TakeVirtualHits() {
+  std::vector<VirtualHit>* hits_tmp = _hits;
+  _hits = NULL;
+  return hits_tmp;
+}
+
 void VirtualPlaneManager::StartOfEvent() {
   _nHits = std::vector<int>(_planes.size(), 0);
   SetVirtualHits(new std::vector<MAUS::VirtualHit>());

@@ -77,9 +77,9 @@ void SciFiSD::ClearHits() {
     _hits = new std::vector<MAUS::SciFiHit>();
 }
 
-void SciFiSD::GetHits(MAUS::MCEvent* event) {
+void SciFiSD::TakeHits(MAUS::MCEvent* event) {
     event->SetSciFiHits(_hits);
-    ClearHits(); 
+    _hits = new std::vector<MAUS::SciFiHit>();
 }
 
 void SciFiSD::EndOfEvent(G4HCofThisEvent* HCE) {

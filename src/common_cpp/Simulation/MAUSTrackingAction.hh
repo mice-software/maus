@@ -53,13 +53,17 @@ class MAUSTrackingAction : public G4UserTrackingAction {
      */
     void PostUserTrackingAction(const G4Track*);
 
-    /** @brief Set the tracks; must be a json array, else throws a Exception
+    /** @brief Set the tracks; MAUSTrackingAction takes ownership of the memory
      */
     void SetTracks(std::vector<Track>* tracks);
 
-    /** @brief Get the tracks
+    /** @brief Get the tracks; MAUSTrackingAction still owns the memory
      */
-    std::vector<Track>* GetTracks() {return _tracks;}
+    std::vector<Track>* GetTracks() const {return _tracks;}
+
+    /** @brief Get the tracks; caller takes ownership of the memory
+     */
+    std::vector<Track>* TakeTracks();
 
     /** @brief Choose whether to store tracks
      *

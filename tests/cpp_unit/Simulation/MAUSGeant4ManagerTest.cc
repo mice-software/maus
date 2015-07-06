@@ -232,6 +232,7 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 2000.), -1, true,
         2000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
     virtual_planes->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
+    virtual_planes->SetWillUseVirtualPlanes(true);
     simulator->SetVirtualPlanes(virtual_planes);
     simulator->GetStepping()->SetWillKeepSteps(false);
 
@@ -243,6 +244,7 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
         std::vector<VirtualHit>* vhits;
         // full physics and vacuum
         vhits = simulator->RunParticle(part_in).GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 2);
         EXPECT_NEAR(0., vhits->at(0).GetMomentum().x(), 1.0e-3)
           << "Failed with pid " << part_in.pid;
         EXPECT_NEAR(0., vhits->at(0).GetMomentum().y(), 1.0e-3)

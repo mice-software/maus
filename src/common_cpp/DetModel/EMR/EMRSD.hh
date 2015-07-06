@@ -92,8 +92,8 @@ class EMRSD : public MAUS::MAUSSD {
   /// Clears all hits in the sensitive detector
   void ClearHits() {_hits_cppdata = MAUS::EMRHitArray();}
 
-  /// Return the detector hits
-  void GetHits(MAUS::MCEvent* event);
+  /// Hand ownership of the detector hits to MCEvent
+  void TakeHits(MAUS::MCEvent* event);
 
  private:
   int findBarHit(int copyNumber);

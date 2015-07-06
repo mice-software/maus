@@ -181,7 +181,7 @@ int EMRSD::AddBarHit(G4Step* aStep, int barNumber) {
   return _hits_cppdata.size() - 1;
 }
 
-void EMRSD::GetHits(MAUS::MCEvent* event) {
+void EMRSD::TakeHits(MAUS::MCEvent* event) {
   event->SetEMRHits(new MAUS::EMRHitArray(_hits_cppdata));
 }
 

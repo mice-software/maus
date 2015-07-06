@@ -26,7 +26,7 @@ class TofSD : public MAUS::MAUSSD {
   bool isHit() {return _hits != NULL && _hits->size() > 0;}
   int GetNHits() {return _hits->size();}
   void ClearHits();
-  void GetHits(MAUS::MCEvent* event);
+  void TakeHits(MAUS::MCEvent* event);
  private:
   std::vector<MAUS::TOFHit>* _hits;
   
