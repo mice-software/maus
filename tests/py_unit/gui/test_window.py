@@ -80,6 +80,7 @@ class TestAncillaries(unittest.TestCase):
             self.assertEqual(entry.name, "c")
             self.assertEqual(entry.label.GetText(), "a"*4)
             self.assertEqual(entry.text_entry.GetText(), "b")
+            self.assertEqual(entry.text_entry.GetToolTip().GetText(), "a")
         test_dict_2 = {"name":"c", "type":"named_text_entry",
                        "default_text":"a"}
         gui.window.NamedTextEntry.new_from_dict(test_dict_2, self.frame)
@@ -163,6 +164,7 @@ class TestWindow(unittest.TestCase):
             "test_7":"check_button",
             "test_8":"label",
             "test_9":"text_entry",
+            "test_10":"list_box",
         }
         for name in frame_names:
             self.window_2.get_frame(name, frame_types[name])
@@ -172,8 +174,14 @@ class TestWindow(unittest.TestCase):
         named_dict = self.window_2.get_frame_dict("test_4", "named_text_entry")
         label_text = named_dict["text_entry"].label.GetText()
         self.assertEqual(label_text, "test_4") # check the labels updated
+        button_frame = self.window_2.get_frame("test_5", "button")
+        self.assertEqual(button_frame.GetToolTip().GetText(), "tool")
         text_entered = self.window_2.get_frame("test_9", "text_entry").GetText()
         self.assertEqual(text_entered, "text")
+        selected = ROOT.TList()
+        lbox = self.window_2.get_frame("test_10", "list_box")
+        selected = [i for i in range(lbox.GetNumberOfEntries()) if lbox.GetSelection(i)]
+        self.assertEqual(selected, [0, 2])
 
     def test_init_exceptions(self):
         """gui.window.Window initialisation - exceptions"""
@@ -201,6 +209,7 @@ class TestWindow(unittest.TestCase):
             self.assertTrue(False, msg="Should have thrown ValueError")
         except ValueError:
             pass
+
     def test_close_window(self):
         """gui.window.Window close_window"""
         self.window_1.close_window()
@@ -234,6 +243,8 @@ class TestWindow(unittest.TestCase):
         self.window_2.set_action("test_5", "button", "Clicked()", self._click)
         button.Clicked()
         self.assertEqual(self._clicked, 6)
+        # test named_text_entry action sets to the text_entry frame, not the
+        # parent composite
 
     def test_get_set_text_entry(self):
         """gui.window.Window get_text_entry, set_text_entry"""

@@ -306,6 +306,7 @@ EXCLUDE_DIRS = [
 'third_party',
 'build',
 'doc',
+'tmp',
 '.sconf_temp',
 os.path.join('src', 'map', 'MapCppPrint'),
 os.path.join('tests', 'style'),

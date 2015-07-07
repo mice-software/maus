@@ -642,6 +642,9 @@ global_pid_hypothesis = ""
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
 
+root_document_store_timeout = 10
+root_document_store_poll_time = 1
+
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
     "will_plot":True,

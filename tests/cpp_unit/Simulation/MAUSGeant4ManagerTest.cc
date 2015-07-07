@@ -81,64 +81,84 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     part_in.energy = 200.;
     part_in.seed = 10;
     part_in.pid = -11; // e- so no decays etc
-
+    MAUSGeant4Manager* g4manager = MAUSGeant4Manager::GetInstance();
+    g4manager->GetPhysicsList()->BeginOfReferenceParticleAction();
     // test that track is set ok
-    Json::Value val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_TRUE(val["tracks"].isArray());
-    ASSERT_TRUE(val["tracks"][Json::Value::UInt(0)].isObject());
-    Json::Value track = val["tracks"][Json::Value::UInt(0)];
-    EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
-    EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
-    EXPECT_NEAR(track["initial_position"]["z"].asDouble(), 3., 1e-9);
+    std::cerr << "RunParticlePGTest 0 " << std::endl;
+    MCEvent* event = g4manager->RunParticle(part_in);
+    ASSERT_EQ(event->GetTracks()->size(), 1);
+    Track track = event->GetTracks()->at(0);
+    EXPECT_NEAR(track.GetInitialPosition().x(), 1., 1e-9);
+    EXPECT_NEAR(track.GetInitialPosition().y(), 2., 1e-9);
+    EXPECT_NEAR(track.GetInitialPosition().z(), 3., 1e-9);
+    delete event;
 
     // test that tracks can be switched on and off
-    MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(false);
-    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val["tracks"].isNull());
+    std::cerr << "RunParticlePGTest 1a" << std::endl;
+    g4manager->GetTracking()->SetWillKeepTracks(false);
+    g4manager->GetStepping()->SetWillKeepSteps(false);
+    event = g4manager->RunParticle(part_in);
+    ASSERT_FALSE(event->GetTracks() == NULL);
+    EXPECT_EQ(event->GetTracks()->size(), 0);
+    std::cerr << "RunParticlePGTest 1b" << std::endl;
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
-    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_EQ(val["tracks"].type(), Json::arrayValue);
+    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    ASSERT_FALSE(event->GetTracks() == NULL);
+    ASSERT_EQ(event->GetTracks()->size(), 1);
+    ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
+    EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
+    delete event;
 
     // test that steps can be switched on and off
+    std::cerr << "RunParticlePGTest 2 " << std::endl;
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
-    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val["tracks"][Json::Value::UInt(0)]["steps"].isNull());
+    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
+    EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
+    delete event;
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(true);
-    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_EQ(val["tracks"][Json::Value::UInt(0)]["steps"].type(), Json::arrayValue);
+    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    ASSERT_TRUE(event->GetTracks()->at(0).GetSteps() != NULL);
+    EXPECT_GT(event->GetTracks()->at(0).GetSteps()->size(), 0);
+    delete event;
 
+    // Not such a good test as we don't have any virtual planes in the geometry
     // test that virtuals can be switched on and off
-    MAUSGeant4Manager::GetInstance()->
-                             GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
-    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(val["virtual_hits"].isNull());
-    MAUSGeant4Manager::GetInstance()->
-                             GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
-    val = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_EQ(val["virtual_hits"].type(), Json::arrayValue);
+    g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
+    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_EQ(event->GetVirtualHits()->size(), 0);
+    delete event;
+    g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
+    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    EXPECT_EQ(event->GetVirtualHits()->size(), 0);
+    delete event;
+    g4manager->GetPhysicsList()->BeginOfRunAction();
+    std::cerr << "RunParticlePGTest 4 " << std::endl;
 }
 
-TEST(MAUSGeant4ManagerTest, RunParticleJsonTest) {
-    std::string pg_string = 
-      std::string("{\"primary\":{")+
-      std::string("\"position\":{\"x\":1.0, \"y\":2.0, \"z\":3.0}, ")+
-      std::string("\"momentum\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, ")+
-      std::string("\"spin\":{\"x\":0.0, \"y\":0.0, \"z\":1.0}, ")+
-      std::string("\"particle_id\":-13, \"energy\":226.0, ")+
-      std::string("\"time\":0.0, \"random_seed\":10}}");
-    Json::Value pg = JsonWrapper::StringToJson(pg_string);
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
-    Json::Value out = MAUSGeant4Manager::GetInstance()->RunParticle(pg);
-    Json::Value track = out["tracks"][Json::Value::UInt(0)];
-    ASSERT_TRUE(track["initial_position"]["x"].isDouble());
-    EXPECT_NEAR(track["initial_position"]["x"].asDouble(), 1., 1e-9);
-    EXPECT_NEAR(track["initial_position"]["y"].asDouble(), 2., 1e-9);
-    EXPECT_NEAR(track["initial_position"]["z"].asDouble(), 3., 1e-9);
+TEST(MAUSGeant4ManagerTest, RunParticleCppTest) {
+    MAUSGeant4Manager* g4manager = MAUSGeant4Manager::GetInstance();
 
-    ASSERT_TRUE(out["primary"]["position"]["x"].isDouble());
-    EXPECT_NEAR(out["primary"]["position"]["x"].asDouble(), 1., 1e-9);
-    EXPECT_NEAR(out["primary"]["position"]["y"].asDouble(), 2., 1e-9);
-    EXPECT_NEAR(out["primary"]["position"]["z"].asDouble(), 3., 1e-9);
+    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
+    part_in.x = 1.;
+    part_in.y = 2.;
+    part_in.z = 3.;
+    part_in.time = 4.;
+    part_in.px = 5.;
+    part_in.py = 6.;
+    part_in.pz = 100.;
+    part_in.energy = 200.;
+    part_in.seed = 10;
+    part_in.pid = -11; // e- so no decays etc
+
+    MAUS::Primary* prim = part_in.WriteCpp();
+    g4manager->GetStepping()->SetWillKeepSteps(false);
+    MCEvent* event = g4manager->RunParticle(*prim);
+    EXPECT_NEAR(event->GetPrimary()->GetPosition().x(), 1., 1e-9);
+    EXPECT_NEAR(event->GetPrimary()->GetPosition().y(), 2., 1e-9);
+    EXPECT_NEAR(event->GetPrimary()->GetPosition().z(), 3., 1e-9);
+    delete event;
+    delete prim;
 }
 
 TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
@@ -172,18 +192,41 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesTest) {
     }
 }
 
+TEST(MAUSGeant4ManagerTest, RunManyParticlesCppTest) {
+    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
+    part_in.x = 1.;
+    part_in.y = 2.;
+    part_in.z = 3.;
+    part_in.time = 4.;
+    part_in.px = 5.;
+    part_in.py = 6.;
+    part_in.pz = 100.;
+    part_in.energy = 200.;
+    part_in.seed = 10;
+    part_in.pid = -11; // e- so no decays etc
+    MAUS::Primary* prim = part_in.WriteCpp();
+    MCEvent* an_event = new MCEvent();
+    an_event->SetPrimary(prim);
+    std::vector<MCEvent*>* events = new std::vector<MCEvent*>();
+    events->push_back(an_event);
+    std::vector<MCEvent*>* out = MAUSGeant4Manager::GetInstance()->
+                                                       RunManyParticles(events);
+    ASSERT_EQ(out->size(), 1);
+    ASSERT_EQ(out, events);
+    delete events->at(0);
+    delete events;
+}
+
 #include "src/legacy/Interface/Squeak.hh"
-double get_energy(Json::Value virtual_hit) {
-    double m =virtual_hit["mass"].asDouble();
-    double px =virtual_hit["momentum"]["x"].asDouble();
-    double py =virtual_hit["momentum"]["y"].asDouble();
-    double pz =virtual_hit["momentum"]["z"].asDouble();
-    return sqrt(m*m+px*px+py*py+pz*pz);
+double get_energy(VirtualHit virtual_hit) {
+    double m =virtual_hit.GetMass();
+    double p =virtual_hit.GetMomentum().mag();
+    return sqrt(m*m+p*p);
 }
 
 /*
 Rogers - this test fails for Geant4 knows what reason... works locally... humm
-
+*/
 TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 0.;
@@ -199,14 +242,16 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
 
     MAUS::MAUSGeant4Manager * const simulator
                                        = MAUS::MAUSGeant4Manager::GetInstance();
-    MAUS::VirtualPlaneManager const * const old_virtual_planes
-                                                = simulator->GetVirtualPlanes();
+    simulator->GetPhysicsList()->BeginOfRunAction(); // force physics list
+    MAUS::VirtualPlaneManager*  old_virtual_planes
+                = new MAUS::VirtualPlaneManager(*simulator->GetVirtualPlanes());
     MAUS::VirtualPlaneManager * const virtual_planes
                                                 = new MAUS::VirtualPlaneManager;
     MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
         CLHEP::HepRotation(), CLHEP::Hep3Vector(0., 0., 2000.), -1, true,
         2000., BTTracker::z, MAUS::VirtualPlane::ignore, false);
     virtual_planes->AddPlane(new MAUS::VirtualPlane(end_plane), NULL);
+    virtual_planes->SetWillUseVirtualPlanes(true);
     simulator->SetVirtualPlanes(virtual_planes);
     simulator->GetStepping()->SetWillKeepSteps(false);
 
@@ -214,55 +259,61 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     int pid_list[] = {-13, 13, -11, 11, -211, 211, 2212, 1000020040, 321, -321};
     // could add neutrons, antiprotons (though not for MICE)
     for (size_t pid_index = 0; pid_index < 10; ++pid_index) {
+        part_in.z = 1000.;
         part_in.pid = pid_list[pid_index];
-        Json::Value hits(Json::arrayValue);
-        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
+        std::vector<VirtualHit>* vhits;
+        // full physics and vacuum
+        MCEvent* event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
+        EXPECT_NEAR(0., vhits->at(0).GetMomentum().x(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(0., vhits->at(0).GetMomentum().y(), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        EXPECT_NEAR(5000., get_energy(vhits->at(0)), 1.0e-3)
+          << "Failed with pid " << part_in.pid;
+        delete event;
+
         // move now into lH2
         part_in.z = 0.;
-        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
-        simulator->GetPhysicsList()->BeginOfReferenceParticleAction();
-        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
-        simulator->GetPhysicsList()->BeginOfRunAction();
-        hits.append(simulator->RunParticle(part_in)["virtual_hits"]);
-        part_in.z = 1000.;
-        for (size_t i = 0; i < 4; ++i)
-            ASSERT_EQ(1u, hits[i].size());
-
-        // full physics and vacuum
-        EXPECT_NEAR(0., hits[0u][0u]["momentum"]["x"].asDouble(), 1.0e-3)
+        event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().x()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_NEAR(0., hits[0u][0u]["momentum"]["y"].asDouble(), 1.0e-3)
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().y()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_NEAR(5000., get_energy(hits[0u][0u]), 1.0e-3)
+        EXPECT_GE(fabs(5000.-get_energy(vhits->at(0))), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-
-        // full physics and lh2
-        EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["x"].asDouble()), 1.0e-3)
-          << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(0.-hits[1u][0u]["momentum"]["y"].asDouble()), 1.0e-3)
-          << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(5000.-get_energy(hits[1u][0u])), 1.0e-3)
-          << "Failed with pid " << part_in.pid;
+        delete event;
 
         // reference physics (mean dedx and no stochastics)
-        EXPECT_NEAR(0., hits[2u][0u]["momentum"]["x"].asDouble(), 1.0e-3)
+        simulator->GetPhysicsList()->BeginOfReferenceParticleAction();
+        event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
+        EXPECT_NEAR(0., vhits->at(0).GetMomentum().x(), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_NEAR(0., hits[2u][0u]["momentum"]["y"].asDouble(), 1.0e-3)
+        EXPECT_NEAR(0., vhits->at(0).GetMomentum().y(), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(5000.-get_energy(hits[2u][0u])), 1.0e-3)
+        EXPECT_GE(fabs(5000.-get_energy(vhits->at(0))), 1.0e-3)
           << "Failed with pid " << part_in.pid;
+        delete event;
 
         // full physics and lh2
-        EXPECT_GE(fabs(0.-hits[3u][0u]["momentum"]["x"].asDouble()), 1.0e-3)
+        simulator->GetPhysicsList()->BeginOfRunAction();
+        event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().x()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(0.-hits[3u][0u]["momentum"]["y"].asDouble()), 1.0e-3)
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().y()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(5000.-get_energy(hits[3u][0u])), 1.0e-3)
+        EXPECT_GE(fabs(5000.-get_energy(vhits->at(0))), 1.0e-3)
           << "Failed with pid " << part_in.pid;
+        delete event;
     }
-    simulator->SetVirtualPlanes(
-        const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));
-    delete virtual_planes;
+    simulator->SetVirtualPlanes(old_virtual_planes);
 }
-*/
+
 }
