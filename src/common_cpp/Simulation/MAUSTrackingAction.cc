@@ -80,6 +80,8 @@ void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
 
         if (_stepping->GetWillKeepSteps()) {
             _tracks->back().SetSteps(_stepping->TakeSteps());
+        } else {
+            _tracks->back().SetSteps(new std::vector<Step>());
         }
     }
 }

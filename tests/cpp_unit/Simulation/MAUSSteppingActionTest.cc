@@ -128,7 +128,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionWriteStepsTest) {
   stepping->SetWillKeepSteps(true);
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
-  EXPECT_EQ(stepping->GetSteps()->size(), 2);
+  EXPECT_EQ(stepping->GetSteps()->size(), 3); //  take 2 from the first step
 }
 // test that we write to json correctly
 TEST_F(MAUSSteppingActionTest, StepToMausTest) {

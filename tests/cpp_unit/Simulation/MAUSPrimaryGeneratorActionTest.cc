@@ -165,6 +165,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {
     hit.SetSpin(MAUS::ThreeVector(8.,9.,10.));
     hit.SetParticleId(-13);
     MAUSPrimaryGeneratorAction::PGParticle part_virt(hit);
+    double test_energy = sqrt(5*5+6*6+7*7+hit.GetMass()*hit.GetMass());
     EXPECT_NEAR(part_virt.x, 1., 1e-6);
     EXPECT_NEAR(part_virt.y, 2., 1e-6);
     EXPECT_NEAR(part_virt.z, 3., 1e-6);
@@ -175,7 +176,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleFromVirtualHitTest) {
     EXPECT_NEAR(part_virt.sy, 9., 1e-6);
     EXPECT_NEAR(part_virt.sz, 10., 1e-6);
     EXPECT_NEAR(part_virt.time, 4., 1e-6);
-    EXPECT_NEAR(part_virt.energy, 200., 1e-6); // SHOULD FAIL
+    EXPECT_NEAR(part_virt.energy, test_energy, 1e-6); // SHOULD FAIL
     EXPECT_EQ(part_virt.pid, -13);
     EXPECT_EQ(part_virt.seed, size_t(0));
 

@@ -61,9 +61,8 @@ void MapCppSimulation::_process(MAUS::Data* data) const {
   }
   Spill* spill = data->GetSpill();
   std::vector<MCEvent*>* mc = spill->GetMCEvents();
-  mc = MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
-  spill->SetMCEvents(mc);
-  data->SetSpill(spill);  
+  // note that MAUS::Data still owns all this memory...
+  MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
   if (_doVis)
       MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
 }

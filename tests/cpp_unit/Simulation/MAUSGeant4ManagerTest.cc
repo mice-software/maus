@@ -81,9 +81,11 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     part_in.energy = 200.;
     part_in.seed = 10;
     part_in.pid = -11; // e- so no decays etc
-
+    MAUSGeant4Manager* g4manager = MAUSGeant4Manager::GetInstance();
+    g4manager->GetPhysicsList()->BeginOfReferenceParticleAction();
     // test that track is set ok
-    MCEvent* event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    std::cerr << "RunParticlePGTest 0 " << std::endl;
+    MCEvent* event = g4manager->RunParticle(part_in);
     ASSERT_EQ(event->GetTracks()->size(), 1);
     Track track = event->GetTracks()->at(0);
     EXPECT_NEAR(track.GetInitialPosition().x(), 1., 1e-9);
@@ -92,39 +94,51 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     delete event;
 
     // test that tracks can be switched on and off
-    MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(false);
-    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event->GetTracks() == NULL);
+    std::cerr << "RunParticlePGTest 1a" << std::endl;
+    g4manager->GetTracking()->SetWillKeepTracks(false);
+    g4manager->GetStepping()->SetWillKeepSteps(false);
+    event = g4manager->RunParticle(part_in);
+    ASSERT_FALSE(event->GetTracks() == NULL);
+    EXPECT_EQ(event->GetTracks()->size(), 0);
+    std::cerr << "RunParticlePGTest 1b" << std::endl;
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_TRUE(event->GetTracks() != NULL);
-    EXPECT_EQ(event->GetTracks()->size(), 1);
+    ASSERT_FALSE(event->GetTracks() == NULL);
+    ASSERT_EQ(event->GetTracks()->size(), 1);
+    ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
+    EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
     delete event;
 
     // test that steps can be switched on and off
+    std::cerr << "RunParticlePGTest 2 " << std::endl;
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event->GetTracks()->at(0).GetSteps() == NULL);
+    ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
+    EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
     delete event;
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(true);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     ASSERT_TRUE(event->GetTracks()->at(0).GetSteps() != NULL);
+    EXPECT_GT(event->GetTracks()->at(0).GetSteps()->size(), 0);
     delete event;
 
+    // Not such a good test as we don't have any virtual planes in the geometry
     // test that virtuals can be switched on and off
-    MAUSGeant4Manager::GetInstance()->
-                             GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
+    g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event->GetVirtualHits() == NULL);
+    EXPECT_EQ(event->GetVirtualHits()->size(), 0);
     delete event;
-    MAUSGeant4Manager::GetInstance()->
-                             GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
+    g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event->GetVirtualHits() != NULL);
+    EXPECT_EQ(event->GetVirtualHits()->size(), 0);
     delete event;
+    g4manager->GetPhysicsList()->BeginOfRunAction();
+    std::cerr << "RunParticlePGTest 4 " << std::endl;
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleCppTest) {
+    MAUSGeant4Manager* g4manager = MAUSGeant4Manager::GetInstance();
+
     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
     part_in.x = 1.;
     part_in.y = 2.;
@@ -136,9 +150,10 @@ TEST(MAUSGeant4ManagerTest, RunParticleCppTest) {
     part_in.energy = 200.;
     part_in.seed = 10;
     part_in.pid = -11; // e- so no decays etc
+
     MAUS::Primary* prim = part_in.WriteCpp();
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
-    MCEvent* event = MAUSGeant4Manager::GetInstance()->RunParticle(*prim);
+    g4manager->GetStepping()->SetWillKeepSteps(false);
+    MCEvent* event = g4manager->RunParticle(*prim);
     EXPECT_NEAR(event->GetPrimary()->GetPosition().x(), 1., 1e-9);
     EXPECT_NEAR(event->GetPrimary()->GetPosition().y(), 2., 1e-9);
     EXPECT_NEAR(event->GetPrimary()->GetPosition().z(), 3., 1e-9);
@@ -197,13 +212,9 @@ TEST(MAUSGeant4ManagerTest, RunManyParticlesCppTest) {
     std::vector<MCEvent*>* out = MAUSGeant4Manager::GetInstance()->
                                                        RunManyParticles(events);
     ASSERT_EQ(out->size(), 1);
-    ASSERT_NE(out, events);
-    ASSERT_NE(out->at(0), events->at(0));
-    ASSERT_NE(out->at(0)->GetPrimary(), events->at(0)->GetPrimary());
+    ASSERT_EQ(out, events);
     delete events->at(0);
     delete events;
-    delete out->at(0);
-    delete out;
 }
 
 #include "src/legacy/Interface/Squeak.hh"
@@ -229,11 +240,11 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     part_in.seed = 10;
     part_in.pid = -13;
 
-    BUG - SetVirtualPlanes deletes the memory!
     MAUS::MAUSGeant4Manager * const simulator
                                        = MAUS::MAUSGeant4Manager::GetInstance();
-    MAUS::VirtualPlaneManager * const old_virtual_planes
-                                                = simulator->GetVirtualPlanes();
+    simulator->GetPhysicsList()->BeginOfRunAction(); // force physics list
+    MAUS::VirtualPlaneManager*  old_virtual_planes
+                = new MAUS::VirtualPlaneManager(*simulator->GetVirtualPlanes());
     MAUS::VirtualPlaneManager * const virtual_planes
                                                 = new MAUS::VirtualPlaneManager;
     MAUS::VirtualPlane end_plane = MAUS::VirtualPlane::BuildVirtualPlane(
@@ -248,6 +259,7 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     int pid_list[] = {-13, 13, -11, 11, -211, 211, 2212, 1000020040, 321, -321};
     // could add neutrons, antiprotons (though not for MICE)
     for (size_t pid_index = 0; pid_index < 10; ++pid_index) {
+        part_in.z = 1000.;
         part_in.pid = pid_list[pid_index];
         std::vector<VirtualHit>* vhits;
         // full physics and vacuum
@@ -301,9 +313,7 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
           << "Failed with pid " << part_in.pid;
         delete event;
     }
-    simulator->SetVirtualPlanes(
-        const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));
-    delete virtual_planes;
+    simulator->SetVirtualPlanes(old_virtual_planes);
 }
 
 }

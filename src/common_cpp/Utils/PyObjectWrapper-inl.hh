@@ -249,6 +249,7 @@ void PyObjectWrapper::unwrap_root_object_proxy(PyObject* py_cpp,
                         "PyObjectWrapper::lazy_unwrap");
     }
     if (strcmp(c_string, class_name.c_str()) == 0) {
+        std::cerr << "Unwrapping " << c_string << " " << class_name.c_str() << std::endl;
         Py_INCREF(py_cpp);  // TPyReturn decrefs py_cpp; we want to keep it
         void * vptr = static_cast<void*>(TPyReturn(py_cpp));
         TEMP* data = static_cast<TEMP*>(vptr); // caller owns this memory

@@ -134,19 +134,11 @@ namespace MAUS {
 
   TEST(ReduceBaseTest, TestProcessNULL) {
     MyReducer mm;
-    try {
-      PyObject* py_str1 = NULL;
-      mm.process_pyobj(py_str1);
-      EXPECT_TRUE(false)
-        << "Fail: No exception thrown"
-        << std::endl;
-    }
-    catch (MAUS::Exception& e) {}
-    catch (...) {
-      EXPECT_TRUE(false)
-        << "Fail: Expected exception of type MAUS::Exception to be thrown"
-        << std::endl;
-    }
+    PyObject* py_str1 = NULL;
+    PyObject* py_out = mm.process_pyobj(py_str1);
+    EXPECT_TRUE(py_out == NULL)
+      << "Fail: Python return object not NULL"
+      << std::endl;
   }
 
   TEST(ReduceBaseTest, TestProcessMAUSException) {

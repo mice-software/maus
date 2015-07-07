@@ -44,11 +44,11 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         self.particle = {"primary":{
                 "position":{"x":1.,"y":2.,"z":3.},
                 "momentum":{"x":4.,"y":5.,"z":6.},
+                "spin":{"x":4.,"y":5.,"z":6.},
                 "particle_id":-13,
                 "random_seed":1,
                 "energy":110.,
                 "time":7.,
-                "statistical_weight":1.
             }}
 
     @classmethod
@@ -66,12 +66,16 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         for filename in glob.glob('g4_*.wrl'):
             os.rename(filename, os.environ['MAUS_ROOT_DIR']+'/tmp/'+filename) 
         good_event = {
-            "mc_events":[]
+            "mc_events":[self.particle,self.particle],
+            "daq_event_type":"physics_event",
+            "maus_event_type":"Spill",
+            "run_number":0,
+            "spill_number":0,
         }
         result = self.mapper.process(good_event)
         result = maus_cpp.converter.json_repr(result)
-        if "errors" in result:
-            raise Exception('test_mc_vis made an error')
+        if "errors" in result and result["errors"] != {}:
+            raise Exception('test_mc_vis made an error '+str(result["errors"]))
         if len(glob.glob('g4_*.wrl')) < 1:
             raise Exception('test_mc_vis_no_event failed to make a VRML file')
         for filename in glob.glob('g4_*.wrl'):
