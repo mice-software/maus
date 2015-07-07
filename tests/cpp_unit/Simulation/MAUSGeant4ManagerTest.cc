@@ -83,39 +83,45 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     part_in.pid = -11; // e- so no decays etc
 
     // test that track is set ok
-    MCEvent event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_EQ(event.GetTracks()->size(), 1);
-    Track track = event.GetTracks()->at(0);
+    MCEvent* event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+    ASSERT_EQ(event->GetTracks()->size(), 1);
+    Track track = event->GetTracks()->at(0);
     EXPECT_NEAR(track.GetInitialPosition().x(), 1., 1e-9);
     EXPECT_NEAR(track.GetInitialPosition().y(), 2., 1e-9);
     EXPECT_NEAR(track.GetInitialPosition().z(), 3., 1e-9);
+    delete event;
 
     // test that tracks can be switched on and off
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(false);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event.GetTracks() == NULL);
+    EXPECT_TRUE(event->GetTracks() == NULL);
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_TRUE(event.GetTracks() != NULL);
-    EXPECT_EQ(event.GetTracks()->size(), 1);
+    ASSERT_TRUE(event->GetTracks() != NULL);
+    EXPECT_EQ(event->GetTracks()->size(), 1);
+    delete event;
 
     // test that steps can be switched on and off
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event.GetTracks()->at(0).GetSteps() == NULL);
+    EXPECT_TRUE(event->GetTracks()->at(0).GetSteps() == NULL);
+    delete event;
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(true);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_TRUE(event.GetTracks()->at(0).GetSteps() != NULL);
+    ASSERT_TRUE(event->GetTracks()->at(0).GetSteps() != NULL);
+    delete event;
 
     // test that virtuals can be switched on and off
     MAUSGeant4Manager::GetInstance()->
                              GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event.GetVirtualHits() == NULL);
+    EXPECT_TRUE(event->GetVirtualHits() == NULL);
+    delete event;
     MAUSGeant4Manager::GetInstance()->
                              GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_TRUE(event.GetVirtualHits() != NULL);
+    EXPECT_TRUE(event->GetVirtualHits() != NULL);
+    delete event;
 }
 
 TEST(MAUSGeant4ManagerTest, RunParticleCppTest) {
@@ -132,10 +138,11 @@ TEST(MAUSGeant4ManagerTest, RunParticleCppTest) {
     part_in.pid = -11; // e- so no decays etc
     MAUS::Primary* prim = part_in.WriteCpp();
     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
-    MCEvent out = MAUSGeant4Manager::GetInstance()->RunParticle(*prim);
-    EXPECT_NEAR(out.GetPrimary()->GetPosition().x(), 1., 1e-9);
-    EXPECT_NEAR(out.GetPrimary()->GetPosition().y(), 2., 1e-9);
-    EXPECT_NEAR(out.GetPrimary()->GetPosition().z(), 3., 1e-9);
+    MCEvent* event = MAUSGeant4Manager::GetInstance()->RunParticle(*prim);
+    EXPECT_NEAR(event->GetPrimary()->GetPosition().x(), 1., 1e-9);
+    EXPECT_NEAR(event->GetPrimary()->GetPosition().y(), 2., 1e-9);
+    EXPECT_NEAR(event->GetPrimary()->GetPosition().z(), 3., 1e-9);
+    delete event;
     delete prim;
 }
 
@@ -222,9 +229,10 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     part_in.seed = 10;
     part_in.pid = -13;
 
+    BUG - SetVirtualPlanes deletes the memory!
     MAUS::MAUSGeant4Manager * const simulator
                                        = MAUS::MAUSGeant4Manager::GetInstance();
-    MAUS::VirtualPlaneManager const * const old_virtual_planes
+    MAUS::VirtualPlaneManager * const old_virtual_planes
                                                 = simulator->GetVirtualPlanes();
     MAUS::VirtualPlaneManager * const virtual_planes
                                                 = new MAUS::VirtualPlaneManager;
@@ -243,44 +251,55 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
         part_in.pid = pid_list[pid_index];
         std::vector<VirtualHit>* vhits;
         // full physics and vacuum
-        vhits = simulator->RunParticle(part_in).GetVirtualHits();
-        ASSERT_EQ(vhits->size(), 2);
+        MCEvent* event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
         EXPECT_NEAR(0., vhits->at(0).GetMomentum().x(), 1.0e-3)
           << "Failed with pid " << part_in.pid;
         EXPECT_NEAR(0., vhits->at(0).GetMomentum().y(), 1.0e-3)
           << "Failed with pid " << part_in.pid;
         EXPECT_NEAR(5000., get_energy(vhits->at(0)), 1.0e-3)
           << "Failed with pid " << part_in.pid;
+        delete event;
 
         // move now into lH2
         part_in.z = 0.;
-        vhits = simulator->RunParticle(part_in).GetVirtualHits();
-        EXPECT_GE(fabs(vhits->at(1).GetMomentum().x()), 1.0e-3)
+        event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().x()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(vhits->at(1).GetMomentum().y()), 1.0e-3)
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().y()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(5000.-get_energy(vhits->at(1))), 1.0e-3)
+        EXPECT_GE(fabs(5000.-get_energy(vhits->at(0))), 1.0e-3)
           << "Failed with pid " << part_in.pid;
+        delete event;
 
         // reference physics (mean dedx and no stochastics)
         simulator->GetPhysicsList()->BeginOfReferenceParticleAction();
-        vhits = simulator->RunParticle(part_in).GetVirtualHits();
-        EXPECT_NEAR(0., vhits->at(1).GetMomentum().x(), 1.0e-3)
+        event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
+        EXPECT_NEAR(0., vhits->at(0).GetMomentum().x(), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_NEAR(0., vhits->at(1).GetMomentum().y(), 1.0e-3)
+        EXPECT_NEAR(0., vhits->at(0).GetMomentum().y(), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(5000.-get_energy(vhits->at(1))), 1.0e-3)
+        EXPECT_GE(fabs(5000.-get_energy(vhits->at(0))), 1.0e-3)
           << "Failed with pid " << part_in.pid;
+        delete event;
 
         // full physics and lh2
         simulator->GetPhysicsList()->BeginOfRunAction();
-        vhits = simulator->RunParticle(part_in).GetVirtualHits();
-        EXPECT_GE(fabs(vhits->at(1).GetMomentum().x()), 1.0e-3)
+        event = simulator->RunParticle(part_in);
+        vhits = event->GetVirtualHits();
+        ASSERT_EQ(vhits->size(), 1);
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().x()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(vhits->at(1).GetMomentum().y()), 1.0e-3)
+        EXPECT_GE(fabs(vhits->at(0).GetMomentum().y()), 1.0e-3)
           << "Failed with pid " << part_in.pid;
-        EXPECT_GE(fabs(5000.-get_energy(vhits->at(1))), 1.0e-3)
+        EXPECT_GE(fabs(5000.-get_energy(vhits->at(0))), 1.0e-3)
           << "Failed with pid " << part_in.pid;
+        delete event;
     }
     simulator->SetVirtualPlanes(
         const_cast<MAUS::VirtualPlaneManager *>(old_virtual_planes));

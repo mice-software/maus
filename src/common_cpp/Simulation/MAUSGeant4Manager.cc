@@ -159,19 +159,19 @@ std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>
 }
 
 
-MCEvent MAUSGeant4Manager::RunParticle(MAUS::Primary particle) {
+MCEvent* MAUSGeant4Manager::RunParticle(MAUS::Primary particle) {
     MAUSPrimaryGeneratorAction::PGParticle p;
     p.ReadCpp(&particle);
     return Tracking(p);
 }
 
-MCEvent MAUSGeant4Manager::RunParticle
+MCEvent* MAUSGeant4Manager::RunParticle
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     return Tracking(p);
 }
 
 
-MCEvent MAUSGeant4Manager::Tracking
+MCEvent* MAUSGeant4Manager::Tracking
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
@@ -187,8 +187,19 @@ MCEvent MAUSGeant4Manager::Tracking
     GetField()->Print(Squeak::mout(Squeak::debug));
     BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
-    event_vector = _eventAct->GetEvents(); // EventAction still owns this memory
-    return *event_vector->at(0); // this is a deep copy
+    event_vector = _eventAct->TakeEvents(); // EventAction still owns this memory
+    if (event_vector->size() > 1) {
+        for (size_t i = 0; i < event_vector->size(); ++i)
+            delete event_vector->at(i);
+        delete event_vector;
+        throw(Exception(Exception::recoverable,
+                        "More than one event in return",
+                        "MAUSGeant4Manager::Tracking"));
+    }
+    std::cerr << "MAUSGeant3Manger::Trackuibng " << event_vector->at(0)->GetVirtualHits()->size() << std::endl;
+    MCEvent* ev_return = event_vector->at(0);
+    delete event_vector;
+    return ev_return; // this is a deep copy
 }
 
 void MAUSGeant4Manager::SetVisManager() {

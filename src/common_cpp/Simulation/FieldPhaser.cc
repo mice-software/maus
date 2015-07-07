@@ -82,12 +82,13 @@ void FieldPhaser::SetPhases() {
                n_attempts < BTPhaser::GetInstance()->NumberOfCavities()*5) {
             ++n_attempts;
             Squeak::mout(Squeak::info) << "." << std::flush;
-            MCEvent event = mgm->RunParticle(ref);
-            std::vector<VirtualHit>* v_hits = event.GetVirtualHits();
+            MCEvent* event = mgm->RunParticle(ref);
+            std::vector<VirtualHit>* v_hits = event->GetVirtualHits();
             if (v_hits == NULL || v_hits->size() == 0)
                 break;
             else
                 ref = TryToPhase(v_hits);
+            delete event;
        }
     }
     catch (...) {}

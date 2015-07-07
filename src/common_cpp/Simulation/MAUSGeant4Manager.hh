@@ -120,7 +120,7 @@ class MAUSGeant4Manager {
      *
      *  @returns a json object with tracking, virtual hits and real hits
      */
-    MCEvent RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
+    MCEvent* RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
 
     /** @brief Run a particle through the simulation
      *
@@ -129,7 +129,7 @@ class MAUSGeant4Manager {
      *           tracking output from this event:\n
      *             "tracks", "virtual_hits", "hits"
      */
-    MCEvent RunParticle(MAUS::Primary particle);
+    MCEvent* RunParticle(MAUS::Primary particle);
 
     /** @brief Run an array of particles through the simulation
      *
@@ -211,7 +211,7 @@ class MAUSGeant4Manager {
     void SetVisManager();
     void BeamOn(int number_of_particles);
 
-    MCEvent Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
+    MCEvent* Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 
     static MAUSGeant4Manager* _instance;
     static bool _isClosed;
