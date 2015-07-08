@@ -17,6 +17,7 @@
 Tests for control message
 """
 
+import json
 import unittest
 
 from docstore.root_document_store import ControlMessage
@@ -65,7 +66,8 @@ class ControlMessageTest(unittest.TestCase): # pylint: disable=R0904
         """
         ctrl = ControlMessage.new_from_json_repr(self.json_doc, ["a", "b"])
         json_test = ctrl.json_repr()
-        self.assertEqual(json_test, self.json_doc)
+        err = json.dumps(json_test, indent=2)+"\n\n"+json.dumps(self.json_doc, indent=2)
+        self.assertEqual(json_test, self.json_doc, msg=err)
 
     def test_new_from_root(self):
         """

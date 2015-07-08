@@ -112,7 +112,7 @@ class ControlMessage:
         ctrl.return_value = json_repr["return_value"]
         ctrl.errors = json_repr["errors"]
         ctrl.acknowledge = json_repr["acknowledge"]
-        ctrl.uuid = json_repr["uuid"]
+        ctrl.uuid = json_repr["id"]
         if data == None:
             data = []
         ctrl.data = data
@@ -164,7 +164,7 @@ class ControlMessage:
           "return_value":self.return_value,
           "errors":self.errors,
           "acknowledge":self.acknowledge,
-          "uuid":self.uuid
+          "id":self.uuid
         }
         return json_repr
 

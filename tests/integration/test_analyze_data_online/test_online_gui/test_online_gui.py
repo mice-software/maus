@@ -30,7 +30,7 @@ import time
 import os
 
 import ROOT
-import libMausCpp
+import libMausCpp # pylint: disable=W0611
 
 from docstore.DocumentStore import DocumentStoreException
 from docstore.root_document_store import RootDocumentDB

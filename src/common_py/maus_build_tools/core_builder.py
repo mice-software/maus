@@ -40,6 +40,12 @@ def install_python_tests(maus_root_dir, env):
     env.Install(build, files)
 
     test_subdirs = glob.glob(target+"*")
+    for dirpath, dirnames, filenames in os.walk(target):
+        test_files = glob.glob(dirpath+"/*.py")                   
+        relative_path = dirpath[len(target):]
+        env.Install(build+relative_path, test_files)
+
+
     for subdir in test_subdirs:
         if os.path.isdir(subdir):
             pos = len(target)
