@@ -22,17 +22,9 @@ Tests for socket manager
 import Queue
 import copy
 import unittest
-import signal
 import sys
-import subprocess
 import time
-import os
-import threading
-import atexit
 import json
-
-import ROOT
-import xboa.Common as Common
 
 from docstore.root_document_store import SocketManager
 from docstore.root_document_store import SocketError
@@ -42,15 +34,15 @@ NEXT_PORT = 49050
 
 sys.setcheckinterval(10)
 
-class SocketManagerTest(unittest.TestCase):
+class SocketManagerTest(unittest.TestCase): #pylint: disable=R0904
     """
     Test the socket manager
     """
-    def setUp(self):
+    def setUp(self): #pylint: disable=C0103
         """
         Assign a port
         """
-        global NEXT_PORT
+        global NEXT_PORT #pylint: disable=W0603
         NEXT_PORT += 10
         self.port = NEXT_PORT
         self.retry = 0.1
@@ -75,7 +67,7 @@ class SocketManagerTest(unittest.TestCase):
             msg_out = client.recv_message_queue.get(True, 5.)[1]
         except Queue.Empty:
             server.check_error_queue()
-        self.assertEqual(msg_in[0].id, msg_out.id)
+        self.assertEqual(msg_in[0].uuid, msg_out.uuid)
 
         # check max port is okay
         server = SocketManager([65535], -1., self.retry, 100)
@@ -92,8 +84,7 @@ class SocketManagerTest(unittest.TestCase):
         except SocketError:
             pass
 
-
-    def test_server_socket_close_connection(self):
+    def test_server_socket_close(self):
         """
         Test SocketManager.close_connection and SocketManager.close_all
         """
@@ -128,7 +119,8 @@ class SocketManagerTest(unittest.TestCase):
         """
         # send good message, over correct port (of many)
         # send good message with good data
-        server = SocketManager(range(self.port, self.port+10), -1., self.retry, 10000)
+        server = SocketManager(range(self.port, self.port+10),
+                               -1., self.retry, 10000)
         client = SocketManager([], -1., self.retry, 10000)
         client.connect("localhost", self.port, 2., self.retry)
         client.connect("localhost", self.port+1, 2., self.retry)
@@ -159,7 +151,7 @@ class SocketManagerTest(unittest.TestCase):
             try:
                 message_out = server.recv_message_queue.get(True, 0.1)
                 sock_count[message_out[0]] += 1
-                if message_out[1].id == message_in.id:
+                if message_out[1].uuid == message_in.uuid:
                     sock_count["id"] += 1
                 if message_out[1].data == message_in.data:
                     sock_count["data"] += 1
@@ -170,7 +162,7 @@ class SocketManagerTest(unittest.TestCase):
                     break # all the sheep are in the field
             except Queue.Empty:
                 pass
-        for key, value in sock_count.iteritems():
+        for value in sock_count.values():
             self.assertTrue(value > 0)
         self.assertEqual(sock_count["data"], sock_count["id"])
 
@@ -178,6 +170,7 @@ class SocketManagerTest(unittest.TestCase):
         client.close_all(True)
 
     def __check_raises_socket_error(self, sock_man, message, port):
+        """Check if we raise a socket error"""
         try:
             sock_man.send_message(port, message)
             time.sleep(0.1)
@@ -187,7 +180,7 @@ class SocketManagerTest(unittest.TestCase):
             #sys.excepthook(*sys.exc_info())
             pass
 
-    def test_server_socket_send_bad_message(self):
+    def test_server_socket_send_bad(self):
         """
         Test SocketManager.send_message with bad data
         """

@@ -25,7 +25,7 @@ from threading_utils import ThreadedValue
 from threading_utils import generate_fifo_queue
 from threading_utils import go_back_fifo_queue
 
-class ThreadedBoolTest(unittest.TestCase):
+class ThreadedBoolTest(unittest.TestCase): # pylint: disable=R0904
     """
     Test threaded bool
     """
@@ -50,7 +50,7 @@ class ThreadedBoolTest(unittest.TestCase):
         _test.set_true()
         self.assertTrue(_test)
 
-class ThreadedValueTest(unittest.TestCase):
+class ThreadedValueTest(unittest.TestCase): # pylint: disable=R0904
     """
     Test threaded value
     """
@@ -69,8 +69,10 @@ class ThreadedValueTest(unittest.TestCase):
         self.assertEqual(_value.get_value(), 3)
         self.assertEqual(_value.get_value(), 3)
 
-class QueueUtilsTest(unittest.TestCase):
-
+class QueueUtilsTest(unittest.TestCase): # pylint: disable=R0904
+    """
+    Test Queueutils
+    """
     def test_generate_fifo_queue(self):
         """
         Test threaded bool

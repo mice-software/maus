@@ -13,21 +13,20 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+# ROOT crap
+# pylint: disable = E1101
+
 """
 Tests ROOT document store and document queue
 """
 
 import unittest
-import os
-import threading
-import time
 import sys
 
 import ROOT
-import libMausCpp
+import libMausCpp #pylint: disable=W0611
 
 from docstore.DocumentStore import DocumentStoreException
-from docstore.root_document_store import SocketError
 from docstore.root_document_store import RootDocumentDB
 from docstore.root_document_store import RootDocumentStore
 
@@ -37,17 +36,16 @@ def ttree_data(spill_number):
     """
     Generate a data tree for testing
     """
-    spill = ROOT.MAUS.Spill() # pylint: disable = E1101
-    data = ROOT.MAUS.Data() # pylint: disable = E1101
-    tree = ROOT.TTree("Spill", "TTree") # pylint: disable = E1101
+    spill = ROOT.MAUS.Spill()
+    data = ROOT.MAUS.Data()
+    tree = ROOT.TTree("Spill", "TTree")
     tree.Branch("data", data, data.GetSizeOf(), 1)
-    spill.SetScalars(ROOT.MAUS.Scalars()) # pylint: disable = E1101
-    spill.SetEMRSpillData(ROOT.MAUS.EMRSpillData()) # pylint: disable = E1101, C0301
-    spill.SetDAQData(ROOT.MAUS.DAQData()) # pylint: disable = E1101
-    spill.SetMCEvents(ROOT.MAUS.MCEventArray()) # pylint: disable = E1101
-    spill.SetReconEvents(ROOT.MAUS.ReconEventArray()) # pylint: disable = E1101, C0301
+    spill.SetScalars(ROOT.MAUS.Scalars())
+    spill.SetDAQData(ROOT.MAUS.DAQData())
+    spill.SetMCEvents(ROOT.MAUS.MCEventPArray())
+    spill.SetReconEvents(ROOT.MAUS.ReconEventPArray())
     # test branch makes segmentation fault... from ROOT side
-    # spill.SetTestBranch(ROOT.MAUS.TestBranch()) # pylint: disable = E1101
+    # spill.SetTestBranch(ROOT.MAUS.TestBranch())
     spill.SetSpillNumber(spill_number)
     spill.SetRunNumber(10)
     data.SetSpill(spill)
@@ -63,7 +61,7 @@ def get_spill_number(data_tree):
     data_tree.GetEntry()
     return data.GetSpill().GetSpillNumber()
 
-PORT = 49110
+PORT = 48110
 
 class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pylint: disable=R0904, C0301
     """
@@ -71,7 +69,7 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
     defined in the DocumentStoreTests mix-in.
     """
 
-    def setUp(self):
+    def setUp(self): # pylint: disable=C0103
         """ 
         Create ROOTDBDocumentStore with test-specific database.
         @param self Object reference.
@@ -90,12 +88,12 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
         self._data_store.connect(parameters)
         self._data_store.create_collection(self._collection, self._max_size)
 
-    def tearDown(self):
+    def tearDown(self): # pylint: disable=C0103
         """
         Delete test-specific database.
         @param self Object reference.
         """
-        global PORT
+        global PORT #pylint: disable=W0603
         unittest.TestCase.tearDown(self)
         self._data_store.disconnect()
         PORT += 5
@@ -148,7 +146,6 @@ class ROOTDBDocumentStoreTestCase(unittest.TestCase, DocumentStoreTests): # pyli
         self._data_store.put(self._collection, 0, data_in)
         data_out = self._data_store.get(self._collection, 0)
         self.assertEqual(data_in, data_out)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -307,7 +307,7 @@ class RootDocumentDB:
         @return copy of message
         """
         if len(message.args) != 2:
-            raise KeyError("Bad argument to put")
+            raise KeyError("Bad argument to delete_document")
         collection_name = message.args[0]
         if collection_name not in self.collections:
             raise KeyError(str(collection_name)+" is not a known collection")

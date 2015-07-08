@@ -180,7 +180,8 @@ class TestWindow(unittest.TestCase):
         self.assertEqual(text_entered, "text")
         selected = ROOT.TList()
         lbox = self.window_2.get_frame("test_10", "list_box")
-        selected = [i for i in range(lbox.GetNumberOfEntries()) if lbox.GetSelection(i)]
+        selected = [i for i in range(lbox.GetNumberOfEntries()) \
+                                                        if lbox.GetSelection(i)]
         self.assertEqual(selected, [0, 2])
 
     def test_init_exceptions(self):

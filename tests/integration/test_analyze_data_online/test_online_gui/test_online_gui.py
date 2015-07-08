@@ -15,6 +15,8 @@
 
 # pylint does not import ROOT
 # pylint: disable=E1101
+# This is a test so we can access "privates"
+# pylint: disable=W0212
 
 """
 Tests for online_gui
@@ -39,10 +41,9 @@ import threading_utils
 ONLINE_DIR = os.path.expandvars("${MAUS_ROOT_DIR}/bin/online/online_gui/")
 sys.path.append(ONLINE_DIR)
 
-import online_gui
-from online_gui import CanvasRewrapped
-from online_gui import OnlineGui
-import gui  
+import online_gui # pylint: disable=F0401
+from online_gui import CanvasRewrapped # pylint: disable=F0401
+from online_gui import OnlineGui # pylint: disable=F0401
 
 THIS = "${MAUS_ROOT_DIR}/tests/integration/test_analyze_data_online/"+\
        "test_online_gui/"
@@ -90,7 +91,7 @@ def generate_image_data(collection_name):
             yield image_data
             spill += 1
 
-class OnlineGUIClient(object):
+class OnlineGUIClient(object): #pylint: disable=R0903
     """Mockup of a reducer"""
 
     def __init__(self, collection_name, port):
@@ -114,15 +115,18 @@ class OnlineGUIClient(object):
             tree.Fill()
             try:
                 rds.put(collection_name, i, tree)
+                print "ok",
             except (DocumentStoreException, SocketError):
-                sys.excepthook(*sys.exc_info())
-                print "REDUCER Failed on port "+str(port)
+                #sys.excepthook(*sys.exc_info())
+                #print "REDUCER Failed on port "+str(port)
+                print "fail",
+            sys.stdout.flush()
             time.sleep(1)
 
     def __del__(self):
         pass
 
-class CanvasRewrappedTest(unittest.TestCase):
+class CanvasRewrappedTest(unittest.TestCase): #pylint: disable=R0904
     """Test CanvasRewrapped"""
 
     def test_canvas_rewrapped(self):
@@ -148,9 +152,12 @@ class CanvasRewrappedTest(unittest.TestCase):
                 self.assertEqual(item.canvas_wrapper.GetCanvas().GetTitle(),
                                  ref_wrapper.GetCanvas().GetTitle())
 
-class OnlineGUITest(unittest.TestCase):
+class OnlineGUITest(unittest.TestCase): #pylint: disable=R0904
+    """
+    Test the online gui
+    """
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls): #pylint: disable=C0103
         for port in OnlineGUITest.db_input_ports:
             exe = os.path.expandvars(THIS+"test_online_gui.py")
             proc = subprocess.Popen(["python", exe, "outputter", str(port)],
@@ -162,19 +169,22 @@ class OnlineGUITest(unittest.TestCase):
             time.sleep(0.1)
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls): #pylint: disable=C0103
         for proc in cls.subprocs:
             proc.send_signal(signal.SIGKILL)
 
-    def setUp(self):
+    def setUp(self): #pylint: disable=C0103
         pass
 
-    def _get_canvas_list(self, queue):
+    @classmethod
+    def _get_canvas_list(cls, queue):
+        """get a list of canvases in the queue"""
         gen = threading_utils.generate_fifo_queue(queue)
         threading_utils.go_back_fifo_queue(queue)
         return sorted([wrap.sort_key() for wrap in gen])
 
-    def _test_online_gui_pause(self):
+    def test_online_gui_pause(self):
+        """Check that the pause button works"""
         # wait until the gui draws first hist, then click pause
         pause_button = self.ol_gui.window.get_frame("&Pause", "button")
         pause_button.Clicked()
@@ -199,7 +209,8 @@ class OnlineGUITest(unittest.TestCase):
         self.assertNotEqual(spill_list,
                          self._get_canvas_list(self.ol_gui._canvases_read))
 
-    def _test_online_gui_reload(self):
+    def test_online_gui_reload(self):
+        """Check that the reload button works"""
         # pause
         pause_button = self.ol_gui.window.get_frame("&Pause", "button")
         pause_button.Clicked()
@@ -221,7 +232,8 @@ class OnlineGUITest(unittest.TestCase):
         # unpause 
         pause_button.Clicked()
 
-    def _test_online_gui_reconnect(self):
+    def test_online_gui_reconnect(self):
+        """Check that the reconnect button works"""
         # disconnect, then force a reload (clear any messages)
         self.ol_gui._docstore.disconnect()
         reload_button = self.ol_gui.window.get_frame("Re&load", "button")
@@ -238,7 +250,8 @@ class OnlineGUITest(unittest.TestCase):
         self.assertNotEqual(spill_list,
                          self._get_canvas_list(self.ol_gui._canvases_read))
 
-    def _test_forward_backward_button(self):
+    def test_forward_backward_button(self):
+        """Check that the forwards and backwards buttons work"""
         pause_button = self.ol_gui.window.get_frame("&Pause", "button")
         pause_button.Clicked()
         draw_list = self.dc["online_gui_default_canvases"]
@@ -246,8 +259,9 @@ class OnlineGUITest(unittest.TestCase):
         redraw_name = self.ol_gui._redraw_target.canvas_title()
         index_start = draw_list.index(redraw_name)
         fwd_button = self.ol_gui.window.get_frame("&>", "button")
+        i = index_start
         for i in range(index_start, len(draw_list)*3):
-            test_index = i%len(draw_list)
+            test_index = i % len(draw_list)
             test_collection = draw_list[test_index].split(' ')[0]
             if test_collection in self.ol_gui._collections.get_value():
                 redraw_name = self.ol_gui._redraw_target.canvas_title()
@@ -258,7 +272,7 @@ class OnlineGUITest(unittest.TestCase):
         index_start = i
         bkwd_button = self.ol_gui.window.get_frame("&<", "button")
         for i in range(index_start+1, 0, -1):
-            test_index = i%len(draw_list)
+            test_index = i % len(draw_list)
             test_collection = draw_list[test_index].split(' ')[0]
             if test_collection in self.ol_gui._collections.get_value():
                 redraw_name = self.ol_gui._redraw_target.canvas_title()
@@ -266,30 +280,34 @@ class OnlineGUITest(unittest.TestCase):
             bkwd_button.Clicked()
         pause_button.Clicked()
         
-    def _test_canvas_select(self):
+    def test_canvas_select(self):
+        """Check that different canvases can be selected in the rotation"""
         select = self.ol_gui.window.get_frame("canvas_select", "list_box")
         target = select.GetEntry(6).GetText()
         # simulate GUI click (to select)
         select.Select(6, True)
         select.SelectionChanged() # emit the signal (happens in GUI click)
         # check draw_titles were updated
-        draw_titles = [x for x in threading_utils.generate_fifo_queue(self.ol_gui._draw_titles)]
+        draw_titles = [x for x in \
+                  threading_utils.generate_fifo_queue(self.ol_gui._draw_titles)]
         self.assertTrue(target in draw_titles)
         # simulate GUI click (to unselect)
         select.Select(6, False)
         select.SelectionChanged()
         # check draw_titles were updated
-        draw_titles = [x for x in threading_utils.generate_fifo_queue(self.ol_gui._draw_titles)]
+        draw_titles = [x for x in \
+                  threading_utils.generate_fifo_queue(self.ol_gui._draw_titles)]
         self.assertFalse(target in draw_titles)
 
     def test_rotate_period_action(self):
-        rotate_text = self.ol_gui.window.set_text_entry("Rotate period", 2.1)
+        """Check that the rotate period can be updated"""
+        self.ol_gui.window.set_text_entry("Rotate period", 2.1)
         self.ol_gui.window._find_text_entry("Rotate period")[0].ReturnPressed()
         self.assertEqual(self.ol_gui._rotate_period.get_value(), 2.1)
-        raw_input()
 
     def test_reload_period_action(self):
-        reload_text = self.ol_gui.window.set_text_entry("Reload period", 2.1)
+        """Check that the reload period can be updated"""
+        self.ol_gui.window.set_text_entry("Reload period", 2.1)
         self.ol_gui.window._find_text_entry("Reload period")[0].ReturnPressed()
         self.assertEqual(self.ol_gui._reload_period.get_value(), 2.1)
 
@@ -297,35 +315,41 @@ class OnlineGUITest(unittest.TestCase):
     subprocs = []
 
 def get_dc():
+    """Return some datacards"""
     if len(sys.argv) > 1:
         return None
-    dc = online_gui.get_datacards()
-    dc["online_gui_host"] = "localhost"
-    dc["online_gui_default_canvases"] = \
+    datacards = online_gui.get_datacards()
+    datacards["online_gui_host"] = "localhost"
+    datacards["online_gui_default_canvases"] = \
                                    ["test_9091 0", "test_9092 1", "test_9093 2",
                                     "no_such_coll 0"]
-    return dc
+    return datacards
 
 def get_gui():
-    dc = DC
-    gui_ports = [9101]
+    """Make a gui object"""
+    datacards = DC
+    gui_ports = [9101, 9102]
     if len(sys.argv) > 1:
         return None
     rdb = RootDocumentDB(OnlineGUITest.db_input_ports+gui_ports, 0.01)
+    print rdb 
     my_gui = []
     for port in gui_ports:
-        dc["online_gui_port"] = port
-        my_gui.append(OnlineGui(dc))
+        datacards["online_gui_port"] = port
+        my_gui.append(OnlineGui(datacards))
     #gui.gui_exception_handler.set_error_level("exceptions")
     return my_gui
 
 DC = get_dc()
 GUI = get_gui()
 
-if __name__ == "__main__":
+def main():
+    """Run the unittests or set up a histogram generator"""
     if len(sys.argv) > 1 and sys.argv[1] == "outputter":
         port = int(sys.argv[2])
         OnlineGUIClient("test_"+str(port), port)
     else:
         unittest.main() #submain(10)
 
+if __name__ == "__main__":
+    main()

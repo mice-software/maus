@@ -17,17 +17,15 @@
 Tests for control message
 """
 
-import json
 import unittest
-import ROOT
 
 from docstore.root_document_store import ControlMessage
 
-class ControlMessageTest(unittest.TestCase):
+class ControlMessageTest(unittest.TestCase): # pylint: disable=R0904
     """
     Tests for the ControlMessage
     """
-    def setUp(self):
+    def setUp(self): # pylint: disable=C0103
         """
         Setup the ControlMessage
         """
@@ -35,7 +33,6 @@ class ControlMessageTest(unittest.TestCase):
                     "args":[1, 2, 3],
                     "keywd_args":{"1":1, "2":2}, "return_value":True, 
                     "errors":{"error":"test"}, "acknowledge":True, "id":1}
-
 
     def test_init(self):
         """
@@ -80,7 +77,7 @@ class ControlMessageTest(unittest.TestCase):
         safely without sending the message. 
         """
         ctrl_ref = ControlMessage.new_from_json_repr(self.json_doc, [])
-        my_message = ctrl_ref.root_repr()
+        ctrl_ref.root_repr()
 
 
 if __name__ == "__main__":

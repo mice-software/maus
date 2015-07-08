@@ -240,9 +240,9 @@ TEST(MAUSGeant4ManagerTest, ScatteringOffMaterialTest) {
     part_in.seed = 10;
     part_in.pid = -13;
 
+    simulator->GetPhysicsList()->BeginOfRunAction(); // force physics list
     MAUS::MAUSGeant4Manager * const simulator
                                        = MAUS::MAUSGeant4Manager::GetInstance();
-    simulator->GetPhysicsList()->BeginOfRunAction(); // force physics list
     MAUS::VirtualPlaneManager*  old_virtual_planes
                 = new MAUS::VirtualPlaneManager(*simulator->GetVirtualPlanes());
     MAUS::VirtualPlaneManager * const virtual_planes
