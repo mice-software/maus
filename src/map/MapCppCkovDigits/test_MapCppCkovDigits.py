@@ -17,7 +17,6 @@
 """Tests for MapCppCkovDigits"""
 # pylint: disable = C0103
 import os
-import json
 import unittest
 from Configuration import Configuration
 import MAUS
@@ -31,7 +30,7 @@ class MapCppCkovDigitsTestCase(unittest.TestCase):# pylint: disable = R0904
         cls.mapper = MAUS.MapCppCkovDigits()
         cls.c = Configuration()
         print '== done setup =='
-        
+
     def test_empty(self):
         """Check against empty configuration"""
         self.assertRaises(ValueError, self.mapper.birth, "")
@@ -43,7 +42,7 @@ class MapCppCkovDigitsTestCase(unittest.TestCase):# pylint: disable = R0904
 
     def test_init(self):
         """Check that birth works properly"""
-        success = self.mapper.birth(self.c.getConfigJSON())
+        self.mapper.birth(self.c.getConfigJSON())
 
     def test_no_data(self):
         """Check that against data stream is empty"""
@@ -57,7 +56,7 @@ class MapCppCkovDigitsTestCase(unittest.TestCase):# pylint: disable = R0904
         if 'ckov' in spill:
             no_ckov = False
         self.assertTrue(no_ckov)
-        
+
     def test_process(self):
         """Check MapCppCkovDigits process function"""
         test2 = ('%s/src/map/MapCppCkovDigits/goodmap2.txt' %
@@ -77,6 +76,7 @@ class MapCppCkovDigitsTestCase(unittest.TestCase):# pylint: disable = R0904
                                    ['ckov_digits'][-1]['A']['part_event_number']
         self.assertEqual(last_part_event_number, n_part_events)
 
+    #pylint: disable = E0213
     def tearDown(cls): #pylint: disable = C0103
         """Check death works"""
         cls.mapper.death()

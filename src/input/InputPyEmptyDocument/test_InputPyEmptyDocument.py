@@ -2,7 +2,6 @@
 """test_InputPyEmptyDocument.py"""
 import json
 import unittest
-import ROOT
 import maus_cpp.converter
 
 from InputPyEmptyDocument import InputPyEmptyDocument

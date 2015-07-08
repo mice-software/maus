@@ -29,6 +29,7 @@
 #include <assert.h>
 
 // C++ headers
+#include <string>
 #include <iostream>
 #include <sstream>
 #include "API/MapBase.hh"
