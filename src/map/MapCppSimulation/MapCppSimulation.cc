@@ -57,6 +57,7 @@ void MapCppSimulation::_birth(const std::string& argJsonConfigDocument) {
 }
 
 void MapCppSimulation::_process(MAUS::Data* data) const {
+  std::cerr << "Tracking event" << std::endl;
   if (_doVis) {
       MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
   }
@@ -64,6 +65,26 @@ void MapCppSimulation::_process(MAUS::Data* data) const {
   std::vector<MCEvent*>* mc = spill->GetMCEvents();
   // note that MAUS::Data still owns all this memory...
   MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
+  std::vector<SciFiHit>* hits = mc->at(0)->GetSciFiHits();
+  std::cerr << "Done Tracking event" << std::endl;
+  for (size_t i = 0; i < hits->size(); ++i)
+      std::cerr << "MapCppSimulation " << i << " " << std::flush << hits->at(i).GetChannelId()->GetStationNumber() << std::endl;
+  std::cerr << "Return" << std::endl;
+
+  data->SetSpill(new Spill());
+  spill->SetMCEvents(new std::vector<MCEvent*>());
+  mc = spill->GetMCEvents();
+  mc->push_back(new MCEvent());
+  mc->at(0)->SetTracks(new std::vector<Track>());
+  mc->at(0)->SetVirtualHits(new std::vector<VirtualHit>());
+  mc->at(0)->SetSciFiHits(new std::vector<SciFiHit>());
+  mc->at(0)->SetSciFiNoiseHits(new std::vector<SciFiNoiseHit>());
+  mc->at(0)->SetTOFHits(new std::vector<TOFHit>());
+  mc->at(0)->SetKLHits(new std::vector<KLHit>());
+  mc->at(0)->SetEMRHits(new std::vector<EMRHit>());
+  mc->at(0)->SetSpecialVirtualHits(new std::vector<SpecialVirtualHit>());
+  mc->at(0)->SetPrimary(new Primary());
+
   if (_doVis)
       MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
 }

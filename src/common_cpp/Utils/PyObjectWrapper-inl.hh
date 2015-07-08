@@ -259,10 +259,13 @@ void PyObjectWrapper::unwrap_root_object_proxy(PyObject* py_cpp,
                         "PyObjectWrapper::lazy_unwrap");
         }
     } else {
-            throw Exception(Exception::recoverable,
-                        "Did not recognise ObjectProxy type "+\
-                        std::string(c_string),
-                        "PyObjectWrapper::lazy_unwrap");
+        return;
+/*
+        throw Exception(Exception::recoverable,
+                    "Did not recognise ObjectProxy type "+\
+                    std::string(c_string),
+                    "PyObjectWrapper::lazy_unwrap");
+*/
     }
 }
 

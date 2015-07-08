@@ -55,7 +55,7 @@ class SciFiSD : public MAUS::MAUSSD {
     G4bool ProcessHits(G4Step*, G4TouchableHistory*);
 
     /** True if the SD has at least one hit in its _hits array */
-    bool isHit() {return _hits == NULL || _hits->size() == 0;}
+    bool isHit();
 
     /** Returns the number of hits in the Sensitive Detector */
     int GetNHits();

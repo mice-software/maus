@@ -162,7 +162,7 @@ class Spill {
   std::string _daq_event_type;
   std::map<std::string, std::string> _errors;
   TestBranch* _test;
-
+  static int reference_count;
   MAUS_VERSIONED_CLASS_DEF(Spill)
 };
 }

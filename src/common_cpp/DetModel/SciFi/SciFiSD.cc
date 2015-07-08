@@ -47,8 +47,8 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   hit.SetEnergyDeposited(edep);
   hit.SetPosition(MAUS::ThreeVector(Pos.x(), Pos.y(), Pos.z()));
   hit.SetMomentum(MAUS::ThreeVector(Mom.x(), Mom.y(), Mom.z()));
-
   _hits->push_back(hit);
+  std::cerr << "SciFiSD::ProcessHits() " << _hits->back().GetChannelId()->GetStationNumber() << " " << _hits->back().GetPosition().z() << std::endl;
   // this is the rotation of the fibre array
   /*
   // From tracker 0 to tracker 1, the modules global rotation IS different.
@@ -66,6 +66,10 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   return true;
 }
 
+bool SciFiSD::isHit() {
+    return _hits != NULL && _hits->size() > 0;
+}
+
 int SciFiSD::GetNHits() {
     if (_hits == NULL)
         return 0;
@@ -81,6 +85,10 @@ void SciFiSD::ClearHits() {
 
 void SciFiSD::TakeHits(MAUS::MCEvent* event) {
     event->SetSciFiHits(_hits);
+    std::cerr << "SciFiSD::Taking Hits" << std::endl;
+    for (size_t i = 0; i < _hits->size(); ++i)
+        std::cerr << "  SciFiSD::TakeHits() " << _hits->at(i).GetChannelId()->GetStationNumber() << " " << _hits->at(i).GetPosition().z() << std::endl;
+    std::cerr << "SciFiSD::Taken Hits" << std::endl;
     _hits = new std::vector<MAUS::SciFiHit>();
 }
 

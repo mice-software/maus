@@ -101,7 +101,7 @@ void MAUSTrackingAction::SetTracks(std::vector<Track>* tracks) {
 
 void MAUSTrackingAction::SetKillReason
                                   (const G4Track* aTrack, std::string reason) {
-    for (size_t i = 0; i < _tracks->size(); ++i) {
+    for (size_t i = 0; _tracks != NULL && i < _tracks->size(); ++i) {
         if ((*_tracks)[i].GetTrackId() == aTrack->GetTrackID()) {
             (*_tracks)[i].SetKillReason(reason);
         }

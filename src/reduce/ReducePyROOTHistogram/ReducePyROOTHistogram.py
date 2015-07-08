@@ -26,6 +26,7 @@ import ErrorHandler
 import ROOT
 
 import framework.utilities
+import maus_cpp.converter
 
 class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
     """
@@ -138,8 +139,9 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         @param config_json JSON document.
         @returns True if configuration succeeded. 
         """
+        raise NotImplementedError("Should be overloaded to configure")
 
-    def process(self, json_string):
+    def process(self, event):
         """
         Update the histogram with data from the current spill
         and output the histogram.        
@@ -148,12 +150,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         @returns JSON document containing current histogram.
         """
         # Load and validate the JSON document.
-        def_doc = {"maus_event_type":"Image", "image_list":[]}
-        try:
-            json_doc = json.loads(json_string.rstrip())
-        except Exception: # pylint:disable=W0703
-            def_doc = ErrorHandler.HandleException(def_doc, self)
-            return unicode(json.dumps(def_doc))
+        json_doc = maus_cpp.converter.json_repr(event)
 
         self.spill_count = self.spill_count + 1
 
@@ -163,7 +160,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         except Exception: # pylint:disable=W0703
             def_doc = ErrorHandler.HandleException(def_doc, self)
             return unicode(json.dumps(def_doc))
-        image_list = [image['image'] for image in result]
+        image_list = [image['image'] for image in result]   
         # Convert results to strings.
         return json.dumps({"maus_event_type":"Image", "image_list":image_list})
 
@@ -205,17 +202,16 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         """
         raise NotImplementedError("Should be overloaded to clean out histos")
 
-    def get_image_doc(self, keywords, description, tag, canvas):
+    def get_image_event(self, keywords, description, tag, canvas_list):
         """
-        Build a JSON document holding image data. This saves the
-        canvas to a temporary file and then reloads it.
+        Build a MAUS event holding image data.
 
         @param self Object reference.
         @param keywords List of image keywords.
         @param description String describing the image.
         @param tag Image tag.
         @param canvas ROOT canvas.
-        @returns JSON document.
+        @returns ROOT.MAUS.ImageData object.
         """
         if (self.auto_number):
             image_tag = "%s%06d" % (tag, self.spill_count)
@@ -226,15 +222,24 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         canvas.Print(file_name)
         encoded_data = framework.utilities.convert_binary_to_string(file_name,
                                                                     True)
-        # Build JSON document.
-        json_doc = {}
-        json_doc["image"] = {}
-        json_doc["image"]["keywords"] = keywords
-        json_doc["image"]["description"] = description
-        json_doc["image"]["tag"] = image_tag
-        json_doc["image"]["image_type"] = self.image_type
-        json_doc["image"]["data"] = encoded_data
-        return json_doc
+        # Build ROOT image event.
+        image = ROOT.MAUS.Image()
+        image.SetRunNumber(0) # BUG
+        image.SetSpillNumber(0) # BUG
+        for canvas in canvas_list:
+            canvas_wrapper = ROOT.MAUS.CanvasWrapper()
+            canvas_wrapper.SetCanvas(canvas)
+            canvas_wrapper.SetFileTag(image_tag)
+            canvas_wrapper.SetDescription(description)
+            image.CanvasWrappersPushBack(canvas_wrapper)
+        now = ROOT.MAUS.DateTime()
+        now.SetDateTime(datetime.datetime.now().isoformat(' '))
+        image.SetInputTime(now) # BUG, should come from DAQ time stamp?
+        image.SetOutputTime(now)
+
+        image_data = ROOT.MAUS.ImageData()
+        image_data.SetImage(image)
+        return image_data
  
     def get_root_doc(self, keywords, description, tag, histos):
         """

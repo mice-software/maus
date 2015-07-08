@@ -84,7 +84,7 @@ class EMRSD : public MAUS::MAUSSD {
   void EndOfEvent(G4HCofThisEvent* HCE);
 
   /// True if the SD has at least one hit in its _hits array
-  virtual bool isHit() {return _hits_cppdata.size() == 0;}
+  virtual bool isHit() {return _hits_cppdata.size() != 0;}
 
   /// Returns the number of hits in the Sensitive Detector
   int GetNHits() {return _hits_cppdata.size();}

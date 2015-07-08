@@ -23,6 +23,8 @@ import datetime
 import Queue
 import dateutil.parser
 
+import libMausCpp
+
 from docstore.DocumentStore import DocumentStoreException
 from docstore.DocumentStore import DocumentStore
 from docstore.root_document_store._socket_manager import SocketManager
@@ -71,7 +73,7 @@ class RootDocumentStore(DocumentStore):
         self._socket_manager = SocketManager([], self.timeout, poll_time,
                                              n_socket_retries)
         self.n_retries = n_docstore_retries
-        self.retry_time = 1
+        self.retry_time = retry_time
 
     def connect(self, parameters = None):
         """
@@ -295,6 +297,22 @@ class RootDocumentStore(DocumentStore):
             time.sleep(self.poll_time)
         raise DocumentStoreException("Call to "+function_name+\
                                      " failed to return")
+
+    @classmethod
+    def default_tree_types(cls):
+        """
+        Return a dictionary that maps a ROOT TTree to the default type that it
+        contains
+        """
+        # note this is also done in OutputCppRoot - should resolve the two lists
+        return {
+            "data":ROOT.MAUS.Data,
+            "job_header":ROOT.MAUS.JobHeaderData,
+            "job_footer":ROOT.MAUS.JobFooterData,
+            "run_header":ROOT.MAUS.RunHeaderData,
+            "run_footer":ROOT.MAUS.RunFooterData,
+            "image":ROOT.MAUS.ImageData,
+        }
 
 def _initialise_from_c(timeout, poll_time):
     """
