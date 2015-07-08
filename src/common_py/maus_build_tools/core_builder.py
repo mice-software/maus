@@ -40,7 +40,7 @@ def install_python_tests(maus_root_dir, env):
     env.Install(build, files)
 
     test_subdirs = glob.glob(target+"*")
-    for dirpath, dirnames, filenames in os.walk(target):
+    for dirpath, dirnames, filenames in os.walk(target): # pylint: disable=W0612
         test_files = glob.glob(dirpath+"/*.py")                   
         relative_path = dirpath[len(target):]
         env.Install(build+relative_path, test_files)

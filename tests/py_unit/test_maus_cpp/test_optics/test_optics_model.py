@@ -25,7 +25,7 @@ import unittest
 
 class OpticsModelTestCase(unittest.TestCase): # pylint: disable=R0904
     """Test maus_cpp.optics_model"""
-    def test_optics_model(self):
+    def test_optics_model(self): #pylint: disable=R0201
         """
         Test optics model runs in a subprocess to prevent pollution of globals
         """
