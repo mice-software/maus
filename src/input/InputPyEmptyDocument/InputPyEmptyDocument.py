@@ -16,7 +16,6 @@
 
 import ROOT
 import libMausCpp # pylint: disable=W0611
-import maus_cpp.converter
 
 class InputPyEmptyDocument:
     """Lets MAUS start with empty spills

@@ -118,7 +118,7 @@ void MapCppCkovDigits::_process(MAUS::Data* data) const {
 
 ///////////////////////////////////////////////////////////
 CkovTmpDigs MapCppCkovDigits::getAdc(V1731Array &adcHits) const {
-      double _one_pe[8] = {23.,23.,23.,23.,23.,23.,23.,23.};
+      double _one_pe[8] = {23., 23., 23., 23., 23., 23., 23., 23.};
       int ckovid, pindex;
 
       CkovTmpDigs ckov_digs_tmp;
@@ -139,7 +139,7 @@ CkovTmpDigs MapCppCkovDigits::getAdc(V1731Array &adcHits) const {
           if (ckd.pulse[pindex] >= _pulse_area_threshold &&
               ckd.posmin[pindex] > _window_min && ckd.posmin[pindex] <= _window_max) {
             ckd.totpulse[pindex] = ckd.pulse[pindex];
-            ckd.pes[pindex] = ((double)ckd.pulse[pindex]/_one_pe[iPmt]);
+            ckd.pes[pindex] = (static_cast<double>(ckd.pulse[pindex])/_one_pe[iPmt]);
             ckd.position[pindex] = ckd.posmin[pindex];
           } else {
             ckd.totpulse[pindex] = 0;
@@ -160,7 +160,8 @@ CkovTmpDigs MapCppCkovDigits::getAdc(V1731Array &adcHits) const {
 void MapCppCkovDigits::getSignal(CkovAdcHits* ckdigs) const {
     int nzeros = std::count(ckdigs->totpulse, ckdigs->totpulse + 4, 0);
     ckdigs->ncoin = _maxCoincidences - nzeros;
-    int max_index = std::distance(ckdigs->totpulse, std::max_element(ckdigs->totpulse, ckdigs->totpulse + 4));
+    int max_index = std::distance(ckdigs->totpulse,
+                                  std::max_element(ckdigs->totpulse, ckdigs->totpulse + 4));
     int dist;
     /* debug
     for (int kk=0; kk<4; ++kk) {
@@ -174,8 +175,8 @@ void MapCppCkovDigits::getSignal(CkovAdcHits* ckdigs) const {
         ckdigs->totnpe = 0.0;
         ckdigs->ncoin = 0;
     } else if (nzeros == 3) {
-        ckdigs->totcharge = std::accumulate(ckdigs->totpulse, ckdigs->totpulse + 4, 0); 
-        ckdigs->totnpe = std::accumulate(ckdigs->pes, ckdigs->pes + 4, 0.0); 
+        ckdigs->totcharge = std::accumulate(ckdigs->totpulse, ckdigs->totpulse + 4, 0);
+        ckdigs->totnpe = std::accumulate(ckdigs->pes, ckdigs->pes + 4, 0.0);
     } else if (nzeros < 3) {
         for (int k = 0; k < 4; ++k) {
             dist = abs(ckdigs->position[k] - ckdigs->position[max_index]);
@@ -184,8 +185,8 @@ void MapCppCkovDigits::getSignal(CkovAdcHits* ckdigs) const {
                 ckdigs->pes[k] = 0;
             }
         }
-        ckdigs->totcharge = std::accumulate(ckdigs->totpulse, ckdigs->totpulse + 4, 0); 
-        ckdigs->totnpe = std::accumulate(ckdigs->pes, ckdigs->pes + 4, 0.0); 
+        ckdigs->totcharge = std::accumulate(ckdigs->totpulse, ckdigs->totpulse + 4, 0);
+        ckdigs->totnpe = std::accumulate(ckdigs->pes, ckdigs->pes + 4, 0.0);
     }
 }
 
@@ -213,12 +214,12 @@ void MapCppCkovDigits::setDigits(CkovTmpDigs &digs, CkovDigitArray* theDigits) c
       ckov_a.SetPulse1(digs[0].pulse[1]);
       ckov_a.SetPulse2(digs[0].pulse[2]);
       ckov_a.SetPulse3(digs[0].pulse[3]);
-          
+
       ckov_a.SetPulse0(digs[0].pulse[0]);
       ckov_a.SetPulse1(digs[0].pulse[1]);
       ckov_a.SetPulse2(digs[0].pulse[2]);
       ckov_a.SetPulse3(digs[0].pulse[3]);
-          
+
       ckov_a.SetTotalCharge(digs[0].totcharge);
       ckov_a.SetNumberOfPes(digs[0].totnpe);
       ckov_a.SetCoincidences(digs[0].ncoin);

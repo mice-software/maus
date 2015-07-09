@@ -59,7 +59,7 @@ void MapCppReconSetup::_process(MAUS::Data *data) const {
   for (int iPe = 0; iPe < nTrigs; iPe++)
     recEvts->push_back(new ReconEvent);
 
-  //std::cerr << "nTriggers = " << nTrigs << std::endl;
+  // std::cerr << "nTriggers = " << nTrigs << std::endl;
   for (int xPE = 0; xPE < nTrigs; xPE++) {
     int evNumber = (tr_data->at(xPE))->GetV1290Array()[0].GetPartEventNumber();
     recEvts->at(xPE)->SetPartEventNumber(evNumber);
@@ -71,7 +71,6 @@ void MapCppReconSetup::_process(MAUS::Data *data) const {
     recEvts->at(xPE)->SetKLEvent(new KLEvent());
     recEvts->at(xPE)->SetEMREvent(new EMREvent());
     recEvts->at(xPE)->SetGlobalEvent(new GlobalEvent());
-
   }
   spill->SetReconEvents(recEvts);
 }
