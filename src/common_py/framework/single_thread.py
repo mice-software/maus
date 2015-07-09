@@ -121,7 +121,7 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             print("OUTPUT: Shutting down outputer")
             assert(death == True or death == None)
 
-    def process_event(self, event):
+    def process_event(self, event): # pylint: disable=R0912
         """
         Process a single event
         
@@ -131,18 +131,32 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
         if event == "":
             raise StopIteration("End of event")
         event_json = None
+        bad_input = False
+        # try to treat as root data and extract an event type
+        # if it fails try a json conversion
+        # if that fails it's a bad spill
         try:
             evtype = event.GetEventType()
+            daq_errors = event.GetSpill().GetErrors()["bad_data_input"]
+            if "InputCppDAQOfflineData" in daq_errors:
+                bad_input = True
         except AttributeError:
             try:
                 event_json = maus_cpp.converter.json_repr(event)
                 evtype = DataflowUtilities.get_event_type(event_json)
+                # protect against run number change due to bad (empty) spills
+                bad_input = False
+                if "errors" in event_json\
+                   and "bad_data_input" in event_json["errors"]:
+                    bad_input = True
             except ValueError:
                 print 'could not determine type'
                 return
         except:
             raise
 
+        # process spills
+        # check for run number change and process an end-of-run spill if changed
         if evtype == "Spill":
             if event_json is not None:
                 current_run_number = DataflowUtilities.get_run_number(event_json) # pylint: disable=C0301
@@ -152,7 +166,9 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 current_run_number = event.GetSpill().GetRunNumber()
                 if (event.GetEventType() == "end_of_run"):
                     self.end_of_run_spill = event
-            if current_run_number != self.run_number:
+            # check for bad inputs where the daq run number is not set
+            # if that's the case do not treat it as an end of run
+            if not bad_input and current_run_number != self.run_number:
                 if self.run_number != "first":
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
