@@ -134,8 +134,12 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
         try:
             evtype = event.GetEventType()
         except AttributeError:
-            event_json = maus_cpp.converter.json_repr(event)
-            evtype = DataflowUtilities.get_event_type(event_json)
+            try:
+                event_json = maus_cpp.converter.json_repr(event)
+                evtype = DataflowUtilities.get_event_type(event_json)
+            except ValueError:
+                print 'could not determine type'
+                return
         except:
             raise
 
@@ -156,6 +160,10 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             event = self.transformer.process(event)
             event = self.merger.process(event)
         self.outputer.save(event)
+        try:
+            maus_cpp.converter.del_data_repr(event)
+        except: # pylint: disable = W0702
+            pass
 
     def start_of_run(self, new_run_number):
         """
