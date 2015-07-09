@@ -19,6 +19,7 @@ OutputPyImage saves image files held in a set of JSON documents.
 import base64
 import json
 import os
+import maus_cpp.converter
 
 class OutputPyImage:
     """
@@ -98,7 +99,8 @@ class OutputPyImage:
         that has missing "data", "tag" or "image_type" entries.
         @param document List of JSON documents separated by newline.
         """
-        json_doc = json.loads(document)
+        #json_doc = json.loads(document)
+        json_doc = maus_cpp.converter.json_repr(document)
         if "maus_event_type" not in json_doc.keys():
             raise KeyError("Expected maus_event_type in json_doc")
         if json_doc["maus_event_type"] == "Image":

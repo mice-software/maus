@@ -130,28 +130,31 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
         """
         if event == "":
             raise StopIteration("End of event")
-        #event_json = maus_cpp.converter.json_repr(event)
-        #if DataflowUtilities.get_event_type(event_json) == "Spill":
-        if event.GetEventType() == "Spill":
-            #current_run_number = DataflowUtilities.get_run_number(event_json)
-            current_run_number = event.GetSpill().GetRunNumber()
-            #if (DataflowUtilities.is_end_of_run(event_json)):
-            if (event.GetEventType() == "end_of_run"):
-                #self.end_of_run_spill = event_json
-                self.end_of_run_spill = event
+        event_json = None
+        try:
+            evtype = event.GetEventType()
+        except AttributeError:
+            event_json = maus_cpp.converter.json_repr(event)
+            evtype = DataflowUtilities.get_event_type(event_json)
+        except:
+            raise
+
+        if evtype == "Spill":
+            if event_json is not None:
+                current_run_number = DataflowUtilities.get_run_number(event_json) # pylint: disable=C0301
+                if (DataflowUtilities.is_end_of_run(event_json)):
+                    self.end_of_run_spill = event_json
+            else:
+                current_run_number = event.GetSpill().GetRunNumber()
+                if (event.GetEventType() == "end_of_run"):
+                    self.end_of_run_spill = event
             if current_run_number != self.run_number:
                 if self.run_number != "first":
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
             event = self.transformer.process(event)
-            old_event = event
-            #event = maus_cpp.converter.string_repr(old_event)
-            #try:
-            #    maus_cpp.converter.del_data_repr(old_event)
-            #except TypeError:
-            #    pass
-            event = self.merger.process(old_event)
+            event = self.merger.process(event)
         self.outputer.save(event)
 
     def start_of_run(self, new_run_number):

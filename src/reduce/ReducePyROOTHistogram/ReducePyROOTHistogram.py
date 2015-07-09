@@ -24,6 +24,7 @@ import json
 
 import ErrorHandler
 import ROOT
+import maus_cpp.converter
 
 import framework.utilities
 
@@ -139,7 +140,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         @returns True if configuration succeeded. 
         """
 
-    def process(self, json_string):
+    def process(self, data):
         """
         Update the histogram with data from the current spill
         and output the histogram.        
@@ -150,7 +151,8 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         # Load and validate the JSON document.
         def_doc = {"maus_event_type":"Image", "image_list":[]}
         try:
-            json_doc = json.loads(json_string.rstrip())
+            #json_doc = json.loads(data.rstrip())
+            json_doc = maus_cpp.converter.json_repr(data)
         except Exception: # pylint:disable=W0703
             def_doc = ErrorHandler.HandleException(def_doc, self)
             return unicode(json.dumps(def_doc))
