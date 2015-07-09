@@ -23,6 +23,7 @@
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
+#include "Config/MiceModule.hh"
 
 #include "src/map/MapCppKLCellHits/MapCppKLCellHits.hh"
 
@@ -43,6 +44,18 @@ void MapCppKLCellHits::_birth(const std::string& argJsonConfigDocument) {
   //  JsonCpp setup
   Json::Value configJSON;
   configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+
+  // get the geometry
+  if (!configJSON.isMember("reconstruction_geometry_filename"))
+      throw(Exception(Exception::recoverable,
+                   "Could not find geometry file",
+                   "MapCppKLCellHits::birth"));
+  std::string filename;
+  filename = configJSON["reconstruction_geometry_filename"].asString();
+  // get the kl geometry modules
+  geo_module = new MiceModule(filename);
+  kl_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "KL");
+  kl_mother_modules = geo_module->findModulesByPropertyString("Region", "KLregion");
 }
 
 void MapCppKLCellHits::_death()  {}
@@ -175,7 +188,56 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
   xDocCellHit["part_event_number"] = xDocDigit0["part_event_number"];
   xDocCellHit["phys_event_number"] = xDocDigit0["phys_event_number"];
 
+  // cell global position
+  // find the geo module corresponding to this hit
+  const MiceModule* hit_module = NULL;
+  Hep3Vector cellGlobalPos;
+  Hep3Vector cellErrorPos;
 
+  for ( unsigned int jj = 0; !hit_module && jj < kl_modules.size(); ++jj ) {
+      if ( kl_modules[jj]->propertyExists("Cell", "int") &&
+         kl_modules[jj]->propertyInt("Cell") == xKey.cell()) {
+             // got it
+             hit_module = kl_modules[jj];
+      } // end check on module
+  } // end loop over kl_modules
+
+  if (hit_module) {
+      cellGlobalPos = hit_module->globalPosition();
+      cellErrorPos = hit_module->dimensions()/sqrt(12);
+  } else {
+      cellGlobalPos.setX(-9999999.);
+      cellGlobalPos.setY(-9999999.);
+      cellGlobalPos.setZ(-9999999.);
+      cellErrorPos.setX(-9999999.);
+      cellErrorPos.setY(-9999999.);
+      cellErrorPos.setZ(-9999999.);
+  }
+
+  // get the local (relative to KL) cell positions from the geometry
+  const MiceModule* mother_module = NULL;
+  Hep3Vector cellLocalPos;
+
+  if (kl_mother_modules.size()) {
+    for ( unsigned int jj = 0; !mother_module &&  jj < kl_mother_modules.size(); ++jj ) {
+      mother_module= kl_mother_modules[jj];
+    }
+    cellLocalPos = hit_module->relativePosition(mother_module);
+  } else {
+    cellLocalPos.setX(-9999999.);
+    cellLocalPos.setY(-9999999.);
+    cellLocalPos.setZ(-9999999.);
+  }
+
+  xDocCellHit["global_pos_x"] = cellGlobalPos.x();
+  xDocCellHit["global_pos_y"] = cellGlobalPos.y();
+  xDocCellHit["global_pos_z"] = cellGlobalPos.z();
+  xDocCellHit["local_pos_x"] = cellLocalPos.x();
+  xDocCellHit["local_pos_y"] = cellLocalPos.y();
+  xDocCellHit["local_pos_z"] = cellLocalPos.z();
+  xDocCellHit["err_x"] = cellErrorPos.x();
+  xDocCellHit["err_y"] = cellErrorPos.y();
+  xDocCellHit["err_z"] = cellErrorPos.z();
 
   // Charge of the digit can be unset because of the Zero suppresion of the fADCs.
   if (xDocDigit0.isMember("charge_mm") && xDocDigit1.isMember("charge_mm")) {
@@ -190,11 +252,14 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
     xDocPMT0["charge"] = xChargeDigit0;
     xDocPMT1["charge"] = xChargeDigit1;
     xDocCellHit["charge"] = (xChargeDigit0 + xChargeDigit1)/2;
-    if (xDocCellHit["charge"] == 0)
+    if (xDocCellHit["charge"] == 0) {
         xDocCellHit["charge_product"] = 0;
-    else
+        xDocCellHit["flag"] = false;
+    } else {
         xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
                                         (xChargeDigit0 + xChargeDigit1);
+        xDocCellHit["flag"] = true;
+    }
   }
 
 //  xDocCellHit["pmt0"] = xDocPMT0;

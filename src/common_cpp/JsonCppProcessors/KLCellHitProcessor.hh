@@ -25,12 +25,16 @@ namespace MAUS {
 
 /** @class KLCellHitProcessor Conversions for KLCellHit between C++ and Json 
  *
- *  @var _cell_proc_proc Processor for _cell
- *  @var _phys_event_number_proc_proc Processor for _phys_event_number
- *  @var _charge_proc_proc Processor for _charge
- *  @var _charge_product_proc_proc Processor for _charge_product
- *  @var _detector_proc_proc Processor for _detector
- *  @var _part_event_number_proc_proc Processor for _part_event_number
+ *  @var _cell_proc Processor for _cell
+ *  @var _phys_event_number_proc Processor for _phys_event_number
+ *  @var _charge_proc Processor for _charge
+ *  @var _charge_product_proc Processor for _charge_product
+ *  @var _detector_proc Processor for _detector
+ *  @var _part_event_number_proc Processor for _part_event_number
+ *  @var _global_pos_proc Processor for _global_pos
+ *  @var _local_pos_proc Processor for _local_pos
+ *  @var _error_proc Processor for _error
+ *  @var _flag_proc Processor for _flag
  */
 
 class KLCellHitProcessor : public ObjectProcessor<KLCellHit> {
@@ -48,6 +52,16 @@ class KLCellHitProcessor : public ObjectProcessor<KLCellHit> {
     IntProcessor _charge_product_proc;
     StringProcessor _detector_proc;
     IntProcessor _part_event_number_proc;
+    DoubleProcessor _global_pos_x_proc;
+    DoubleProcessor _global_pos_y_proc;
+    DoubleProcessor _global_pos_z_proc;
+    DoubleProcessor _local_pos_x_proc;
+    DoubleProcessor _local_pos_y_proc;
+    DoubleProcessor _local_pos_z_proc;
+    DoubleProcessor _error_x_proc;
+    DoubleProcessor _error_y_proc;
+    DoubleProcessor _error_z_proc;
+    BoolProcessor _flag_proc;
 };
 }  // namespace MAUS
 

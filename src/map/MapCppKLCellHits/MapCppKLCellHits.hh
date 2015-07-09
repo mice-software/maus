@@ -69,7 +69,11 @@ class MapCppKLCellHits : public MapBase<Json::Value> {
    *  @param xDocDetectorData Json document containing digits from 
    * one particle event in one individual detector.
    */
+
   Json::Value makeCellHits(Json::Value xDocPartEvent) const;
+  MiceModule* geo_module;
+  std::vector<const MiceModule*> kl_modules;
+  std::vector<const MiceModule*> kl_mother_modules;
 };
 }
 #endif
