@@ -193,9 +193,9 @@ TEST_F(KLCellHitTestDS, test_setters_getters) {
   cellhit->SetLocalPosX(local_pos_x);
   cellhit->SetLocalPosY(local_pos_y);
   cellhit->SetLocalPosZ(local_pos_z);
-  cellhit->SetErrorX(local_pos_x);
-  cellhit->SetErrorY(local_pos_y);
-  cellhit->SetErrorZ(local_pos_z);
+  cellhit->SetErrorX(error_x);
+  cellhit->SetErrorY(error_y);
+  cellhit->SetErrorZ(error_z);
   cellhit->SetFlag(flag);
 
   EXPECT_EQ(cellhit->GetCell(), cell);
