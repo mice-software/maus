@@ -46,7 +46,7 @@ namespace global {
       double z_err = KLCellHit.GetErrorZ();
       double t = -1000000;
       double t_err = 1000000;
-      TLorentzVector pos(x,y,z,t);
+      TLorentzVector pos(x, y, z, t);
       TLorentzVector pos_err(x_err, y_err, z_err, t_err);
       GlobalKLSpacePoint->set_position(pos);
       GlobalKLSpacePoint->set_position_error(pos_err);
