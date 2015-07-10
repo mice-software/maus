@@ -24,18 +24,12 @@ Spill::Spill()
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
-    reference_count++;
-    std::cerr << "Spill Constructor " << reference_count << std::endl;
-    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
 }
 
 Spill::Spill(const Spill& md)
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
-    reference_count++;
-    std::cerr << "Spill Copy Constructor " << reference_count << std::endl;
-    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
     *this = md;
 }
 
@@ -102,10 +96,6 @@ Spill& Spill::operator=(const Spill& md) {
 }
 
 Spill::~Spill() {
-    reference_count--;
-    std::cerr << "Spill Destructor " << reference_count << std::endl;
-    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
-
     if (_daq != NULL) {
         delete _daq;
     }

@@ -29,8 +29,8 @@ Data::Data() : MAUSEvent<Spill>("Spill"), _spill(NULL) {
 }
 
 Data::Data(const Data& data) : MAUSEvent<Spill>(), _spill(NULL) {
-    *this = data;
     IncreaseRefCount();
+    *this = data;
 }
 
 Data::~Data() {
@@ -78,14 +78,14 @@ void Data::IncreaseRefCount() {
                         "Too many data references",
                         "Data::IncreaseRefCount");
     }
-    std::cerr << "Data " << this << " ref: " << _reference_count << std::endl;
-    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
+//    std::cerr << "Data " << this << " ref: " << _reference_count << std::endl;
+//    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
 }
 
 void Data::DecreaseRefCount() {
     _reference_count--;
-    std::cerr << "~Data " << this << " ref: " << _reference_count << std::endl;
-    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
+//    std::cerr << "~Data " << this << " ref: " << _reference_count << std::endl;
+//    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
 }
 }
 
