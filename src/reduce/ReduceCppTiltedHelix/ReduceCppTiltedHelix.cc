@@ -59,12 +59,12 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
             std::string name_x = "tracker_"+i_str+"_station_"+j_str+"_x";
             std::string title_x = name_x+";x_{meas} - x_{fit} [mm]";
             hist_vector_.push_back(
-                    new TH1D(name_x.c_str(), title_x.c_str(), 100, -3, 3)
+                    new TH1D(name_x.c_str(), title_x.c_str(), 100, -20., 20.)
             );
             std::string name_y = "tracker_"+i_str+"_station_"+j_str+"_y";
             std::string title_y = name_y+";y_{meas} - y_{fit} [mm]";
             hist_vector_.push_back(
-                    new TH1D(name_y.c_str(), title_y.c_str(), 100, -3, 3)
+                    new TH1D(name_y.c_str(), title_y.c_str(), 100, -20., 20.)
             );
         }
     }
@@ -79,7 +79,6 @@ void ReduceCppTiltedHelix::_death() {}
 bool ReduceCppTiltedHelix::will_cut(std::vector<SciFiSpacePoint*> space_points, size_t tracker) {
     std::vector<size_t> n_space_points_per_station(n_stations, 0);
     for (size_t i = 0; i < space_points.size(); ++i) {
-        size_t station = space_points[i]->get_station();
         ThreeVector pos = space_points[i]->get_position();
         if (space_points[i]->get_tracker() == int(tracker)) {
             n_space_points_per_station[space_points[i]->get_station()-1] += 1;
@@ -111,7 +110,7 @@ ImageData* ReduceCppTiltedHelix::get_image_data() {
     for (size_t tracker = 0; tracker < n_trackers; tracker++) {
         std::string tracker_str = STLUtils::ToString(tracker);
         std::string name = "ReduceCppHelixStation_tracker_"+tracker_str;
-        TCanvas* canvas = new TCanvas(name.c_str(), name.c_str());
+        TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1600, 1200);
         int n_verticals = hist_vector_.size()/n_stations/n_trackers;
         canvas->Divide(n_stations, n_verticals);
         for (size_t station = 1; station <= n_stations; ++station) {

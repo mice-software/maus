@@ -57,7 +57,6 @@ void MapCppSimulation::_birth(const std::string& argJsonConfigDocument) {
 }
 
 void MapCppSimulation::_process(MAUS::Data* data) const {
-  std::cerr << "Tracking event" << std::endl;
   if (_doVis) {
       MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->SetupRun();
   }
@@ -65,11 +64,6 @@ void MapCppSimulation::_process(MAUS::Data* data) const {
   std::vector<MCEvent*>* mc = spill->GetMCEvents();
   // note that MAUS::Data still owns all this memory...
   MAUS::MAUSGeant4Manager::GetInstance()->RunManyParticles(mc);
-  for (size_t ev = 0; mc != NULL && ev < mc->size(); ++ev) {
-      std::vector<SciFiHit>* hits = mc->at(ev)->GetSciFiHits();
-      for (size_t i = 0; i < hits->size(); ++i)
-          std::cerr << "MapCppSimulation " << "ev " << ev << " hit " << i << " " << std::flush << hits->at(i).GetChannelId()->GetStationNumber() << " " << hits->at(i).GetChannelId() << std::endl;
-  }
   if (_doVis)
       MAUS::MAUSGeant4Manager::GetInstance()->GetVisManager()->TearDownRun();
 }
