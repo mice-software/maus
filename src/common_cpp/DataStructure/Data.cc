@@ -22,15 +22,19 @@
 namespace MAUS {
 
 int Data::_reference_count = 0;
+int Data::_max_reference_count = 100;
 
 Data::Data() : MAUSEvent<Spill>("Spill"), _spill(NULL) {
+    IncreaseRefCount();
 }
 
 Data::Data(const Data& data) : MAUSEvent<Spill>(), _spill(NULL) {
     *this = data;
+    IncreaseRefCount();
 }
 
 Data::~Data() {
+    DecreaseRefCount();
     if (_spill != NULL) {
         delete _spill;
         _spill = NULL;
@@ -69,14 +73,19 @@ int Data::GetSizeOf() const {
 
 void Data::IncreaseRefCount() {
     _reference_count++;
-    std::cerr << "CONSTRUCT " << this << " " << _reference_count << std::endl;
-    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
+    if (_reference_count > _max_reference_count) {
+        throw Exception(Exception::recoverable,
+                        "Too many data references",
+                        "Data::IncreaseRefCount");
+    }
+    // std::cerr << "Data " << this << " ref: " << _reference_count << std::endl;
+    // std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
 }
 
 void Data::DecreaseRefCount() {
     _reference_count--;
-    std::cerr << "DESTRUCT " << this << " " << _reference_count << std::endl;
-    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
+    // std::cerr << "~Data " << this << " ref: " << _reference_count << std::endl;
+    // std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
 }
 }
 

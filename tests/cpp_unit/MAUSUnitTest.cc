@@ -104,7 +104,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["everything_special_virtual"] = false;
   config["field_tracker_absolute_error"] = 1.e-4;
   config["field_tracker_relative_error"] = 1.e-4;
-
+  config["data_maximum_reference_count"] = 200;
   return config;
 }
 
