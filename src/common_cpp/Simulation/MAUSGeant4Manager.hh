@@ -207,8 +207,16 @@ class MAUSGeant4Manager {
 
     Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 
+  
+    // std::vector<G4UserLimits*> _userLims;
+  
+
     static MAUSGeant4Manager* _instance;
     static bool _isClosed;
+    G4double _keThreshold;
+    G4double _trackMax;
+    G4double _timeMax;
+    G4double _stepMax;
 };
 
 inline void MAUSGeant4Manager::SetVirtualPlanes(VirtualPlaneManager* virt) {

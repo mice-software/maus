@@ -21,6 +21,11 @@
 #include "Geant4/G4StateManager.hh"
 #include "Geant4/G4ApplicationState.hh"
 
+#include "Geant4/G4Region.hh"
+#include "Geant4/G4RegionStore.hh"
+#include "Geant4/G4UserLimits.hh"
+
+
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
 #include "src/common_cpp/Simulation/FieldPhaser.hh"
@@ -65,7 +70,17 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     SetVisManager();
     _runManager = new G4RunManager;
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
+    _keThreshold = JsonWrapper::GetProperty(*cards, "kinetic_energy_threshold",
+					    JsonWrapper::realValue).asDouble();
+    _trackMax = JsonWrapper::GetProperty(*cards, "max_track_length",
+					 JsonWrapper::realValue).asDouble();
+    _timeMax = JsonWrapper::GetProperty(*cards, "max_track_time",
+					JsonWrapper::realValue).asDouble();
+    _stepMax = JsonWrapper::GetProperty(*cards, "max_step_length",
+					JsonWrapper::realValue).asDouble();
+
     // Create the gdml parser object
+    
 
     std::string gdmlGeometry = "";
     bool usegdml = Globals::GetInstance()
@@ -204,8 +219,13 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
   // Establish sensitive detectors using the SDmanager
   // Get the map of the auxiliary information from the parser
   const G4GDMLAuxMapType* auxmap = _parser.GetAuxMap();
-    Squeak::mout(Squeak::info) << "Found " << auxmap->size()
+  Squeak::mout(Squeak::info) << "Found " << auxmap->size()
 			     << " volume(s) with auxiliary information.\n\n";
+  
+  double stepMax = _stepMax;
+  double timeMax = _timeMax;
+  double trackMax = _trackMax;
+  double keThreshold = _keThreshold;
 
   for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
       iter != auxmap->end(); iter++) {
@@ -218,7 +238,7 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	// Find the module corresponding to the volume name
 	std::vector<const MiceModule*> mods =
 	  module.findModulesByPropertyString((*vit).type, (*vit).value);
-	// Squeak::mout(Squeak::info)<<"Search for detector "<<(*vit).value
+	//  Squeak::mout(Squeak::info)<<"Search for detector "<<(*vit).value
 	// 			  <<" with name "<<myvol->GetName()<<": "
 	// 			  <<mods.size()<<" candidates\n";
 	for (unsigned i = 0; i < mods.size(); i++) {
@@ -243,10 +263,45 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	  }
 	}
       }
+      
+      else if((*vit).type.contains("G4StepMax")){
+	stepMax  = double(atof((*vit).value.c_str()));
+	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
+				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
+      }
+      else if((*vit).type.contains("G4TrackMax")){
+	trackMax = double(atof((*vit).value.c_str()));
+	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
+				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
+      }
+      else if((*vit).type.contains("G4TimeMax"))
+	timeMax  = double(atof((*vit).value.c_str()));
+      else if((*vit).type.contains("G4KinMin"))
+	keThreshold = double(atof((*vit).value.c_str()));
+      
+      _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax, 
+							    timeMax, keThreshold));
+      myvol->SetUserLimits(_detector->GetUserLimits().back());
+      
+      if((*vit).type.contains("Region")){
+	std::string name = (*vit).value;
+	G4RegionStore* store = G4RegionStore::GetInstance();
+	if (store->GetRegion(name) == NULL) { 
+	  new G4Region(name);
+	  _detector->GetRegions().push_back(name);
+	}
+	G4Region* region = store->GetRegion(name);
+	if(region == NULL){
+	  throw MAUS::Exception(Exception::recoverable,
+				"Failed to make region",
+				"MAUSgeant4Manager::SetAuxInformation");
+	}
+	region->AddRootLogicalVolume(myvol);
+      }
     }
   }
 }
-
+  
 void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
   // std::cout << "Adding " << logic->GetNoDaughters()
   // << " to sensitive detector in " << logic->GetName() << std::endl;

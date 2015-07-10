@@ -146,6 +146,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    *  if G4RegionStore let me access it's list of regions but not possible...
    */
   std::vector<std::string> GetRegions() {return _regions;}
+  std::vector<G4UserLimits*> GetUserLimits() {return _userLims;}
 
   void BuildSensitiveDetector(G4LogicalVolume* logic, MiceModule* module);
   void SetUserLimits(G4LogicalVolume* logic, MiceModule* module);
