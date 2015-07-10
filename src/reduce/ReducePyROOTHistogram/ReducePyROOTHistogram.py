@@ -151,8 +151,10 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         # Load and validate the JSON document.
         def_doc = {"maus_event_type":"Image", "image_list":[]}
         try:
-            #json_doc = json.loads(data.rstrip())
             json_doc = maus_cpp.converter.json_repr(data)
+        except ValueError:
+            # in multi-processing, the output from mongo/celery is json string
+            json_doc = json.loads(data.rstrip())
         except Exception: # pylint:disable=W0703
             def_doc = ErrorHandler.HandleException(def_doc, self)
             return unicode(json.dumps(def_doc))
