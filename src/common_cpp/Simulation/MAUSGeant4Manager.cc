@@ -226,6 +226,10 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
   double timeMax = _timeMax;
   double trackMax = _trackMax;
   double keThreshold = _keThreshold;
+  double red = 1.;
+  double green = 1.;
+  double blue = 1.;
+  bool vis = true;
 
   for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
       iter != auxmap->end(); iter++) {
@@ -274,16 +278,17 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
 				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
       }
-      else if((*vit).type.contains("G4TimeMax"))
+      else if((*vit).type.contains("G4TimeMax")){
 	timeMax  = double(atof((*vit).value.c_str()));
-      else if((*vit).type.contains("G4KinMin"))
+	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
+				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
+      }
+      else if((*vit).type.contains("G4KinMin")){
+	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
+				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
 	keThreshold = double(atof((*vit).value.c_str()));
-      
-      _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax, 
-							    timeMax, keThreshold));
-      myvol->SetUserLimits(_detector->GetUserLimits().back());
-      
-      if((*vit).type.contains("Region")){
+      }
+      else if((*vit).type.contains("Region")){
 	std::string name = (*vit).value;
 	G4RegionStore* store = G4RegionStore::GetInstance();
 	if (store->GetRegion(name) == NULL) { 
@@ -298,7 +303,25 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	}
 	region->AddRootLogicalVolume(myvol);
       }
+      else if((*vit).type.contains("Invisible"))
+	vis = false;
+      else if((*vit).type.contains("RedColour"))
+	red = double(atof((*vit).value.c_str()));
+      else if((*vit).type.contains("GreenColour"))
+	green = double(atof((*vit).value.c_str()));
+      else if((*vit).type.contains("BlueColour"))
+	blue = double(atof((*vit).value.c_str()));
+
     }
+  
+    _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax, 
+							  timeMax, keThreshold));
+    myvol->SetUserLimits(_detector->GetUserLimits().back());
+    if(vis)
+      _detector->GetVisAttributes().push_back(new G4VisAttributes(G4Color(red,green,blue)));
+    else 
+      _detector->GetVisAttributes().push_back(new G4VisAttributes(false));
+    myvol->SetVisAttributes(_detector->GetVisAttributes().back());
   }
 }
   

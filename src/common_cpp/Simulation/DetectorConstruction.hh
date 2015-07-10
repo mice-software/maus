@@ -147,6 +147,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    */
   std::vector<std::string> GetRegions() {return _regions;}
   std::vector<G4UserLimits*> GetUserLimits() {return _userLims;}
+  std::vector<G4VisAttributes*> GetVisAttributes() {return _visAtts;}
 
   void BuildSensitiveDetector(G4LogicalVolume* logic, MiceModule* module);
   void SetUserLimits(G4LogicalVolume* logic, MiceModule* module);
