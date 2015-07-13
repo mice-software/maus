@@ -26,9 +26,9 @@ def run():
     # setting it to false/0 will cause canvases to pop up on screen and 
     # will get refreshed every N spills set by the refresh_rate data
     # card. 
-    data_cards_list.append("root_batch_mode='%d'\n" % 0)
+    data_cards_list.append("root_batch_mode='%d'\n" % 1)
     # refresh_rate = once in how many spills should canvases be updated
-    data_cards_list.append("refresh_rate='%d'\n" % 1)
+    data_cards_list.append("refresh_rate='%d'\n" % 5)
     # Add auto-numbering to the image tags. If False then each
     # histogram output for successive spills will have the same tag
     # so there are no spill-specific histograms. This is the
@@ -54,12 +54,14 @@ def run():
     my_map.append(MAUS.MapPyReconSetup())
     my_map.append(MAUS.MapCppEMRPlaneHits())
     my_map.append(MAUS.MapCppEMRRecon())
+
     # Histogram reducer.
-    reducer = MAUS.ReducePyEMRPlot()
     #reducer = MAUS.ReducePyDoNothing()
+    reducer = MAUS.ReducePyEMRPlot()
+
     # Save images as EPS and meta-data as JSON.
     #output_worker = MAUS.OutputPyDoNothing()
-    output_worker = MAUS.OutputPyDoNothing()
+    output_worker = MAUS.OutputPyImage()
 
     # Run the workflow.
     MAUS.Go(my_input, my_map, reducer, output_worker, data_cards) 
