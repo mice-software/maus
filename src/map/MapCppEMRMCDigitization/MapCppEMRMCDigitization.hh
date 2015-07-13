@@ -48,6 +48,7 @@
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
+#include "DataStructure/EMRSpillData.hh"
 #include "DataStructure/V1731.hh"
 #include "DataStructure/Primary.hh"
 #include "Utils/Globals.hh"
@@ -106,27 +107,25 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
   void _process(MAUS::Data *data) const;
 
 
-  void processDBB(MAUS::EMRHitArray *EMRhits,
-		  int xPe,
-		  double pTime,
-		  EMRDBBEventVector& emr_dbb_events_tmp,
-		  EMRfADCEventVector& emr_fadc_events_tmp) const;
+  void processDBB(MAUS::MCEventPArray *mcEvts,
+		  int nPartEvents,
+		  EMRDBBEventVector& emr_dbb_events_tmp) const;
 
-  void processFADC(MAUS::EMRHitArray *EMRhits,
-		   int xPe,
+  void processFADC(MAUS::MCEventPArray *mcEvts,
+		   int nPartEvents,
 		   EMRfADCEventVector& emr_fadc_events_tmp) const;
 
-  void digitize(MAUS::EMREvent *EMRevt,
-		int xPe,
-		int nPartEvents,
+  void digitize(int nPartEvents,
 		int *deltat_limits,
-		EMRDBBEventVector& emr_dbb_events_tmp,
-		EMRfADCEventVector& emr_fadc_events_tmp) const;
+		EMRDBBEventVector emr_dbb_events_tmp,
+		EMRfADCEventVector emr_fadc_events_tmp,
+		EMRDBBEventVector& emr_dbb_events,
+		EMRfADCEventVector& emr_fadc_events) const;
 
   void fill(MAUS::Spill *spill,
 	    int nPartEvents,
-	    EMRDBBEventVector emr_dbb_events_tmp,
-	    EMRfADCEventVector emr_fadc_events_tmp) const;
+	    EMRDBBEventVector emr_dbb_events,
+	    EMRfADCEventVector emr_fadc_events) const;
 
   EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
   EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
