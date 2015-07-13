@@ -187,9 +187,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @throws ValueError if "slab_hits" and "space_points" information
         is missing from the spill.
         """
-        if not spill.has_key("daq_event_type"):
-            raise ValueError("No event type")
-        if spill["daq_event_type"] == "end_of_run":
+        daq_evtype = spill.GetSpill().GetDaqEventType()
+        if daq_evtype == "end_of_run":
             if (not self.run_ended):
                 self.update_histos()
                 self.run_ended = True
@@ -199,9 +198,9 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # do not try to get data from start/end spill markers
         data_spill = True
-        if spill["daq_event_type"] == "start_of_run" \
-              or spill["daq_event_type"] == "start_of_burst" \
-              or spill["daq_event_type"] == "end_of_burst":
+        if daq_evtype == "start_of_run" \
+              or daq_evtype == "start_of_burst" \
+              or daq_evtype == "end_of_burst":
             data_spill = False
 
         # Get TOF slab hits & fill the relevant histograms.
@@ -230,50 +229,42 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "slab_hits" in
         the spill.
         """
-        if 'recon_events' not in spill:
+        if spill.GetSpill().GetReconEventSize() == 0:
             raise ValueError("recon_events not in spill")
         # print 'nevt = ', len(spill['recon_events']), spill['recon_events']
-        for evn in range(len(spill['recon_events'])):
-            if 'tof_event' not in spill['recon_events'][evn]:
+        reconevents = spill.GetSpill().GetReconEvents()
+        # print '# recon events = ',reconevents[0].GetPartEventNumber()
+        for evn in range(spill.GetSpill().GetReconEventSize()):
+            tof_event = reconevents[evn].GetTOFEvent()
+            if tof_event is None:
                 # print 'no tof event'
                 raise ValueError("tof_event not in recon_events")
             # Return if we cannot find slab_hits in the event.
-            if 'tof_slab_hits' not in spill['recon_events'][evn]['tof_event']:
+            tof_slab_hits = tof_event.GetTOFEventSlabHit()
+            #if 'tof_slab_hits' not in spill['recon_events'][evn]['tof_event']:
+            if tof_slab_hits is None:
                 return False
 
-            slabhits = spill['recon_events'][evn]['tof_event']['tof_slab_hits']
-
-            # setup the detectors for which we want to look at hits
-            dets = ['tof0', 'tof1', 'tof2']
-                   
-            # loop over detector stations ie tof0,tof1,tof2
-            for index, station in enumerate(dets):
-                # leave if we cannot find slab hits for this detector
-                if station not in slabhits:
-                    continue
-                dethits = slabhits[station]
-                # print 'idx,stn: ',index,station,len(dethits),dethits
-                # loop over all slab hits for this detector station
-                if dethits == None:
-                    continue
-                for i in range(len(dethits)):
-                    # make sure it is not null
-                    if (dethits[i]):
-                        # wrong. no further loop. ie no j
-                        # for j in range(len(dethits[i])): #loop over planes
-                        pos = dethits[i]['slab']
-                        plane_num = dethits[i]["plane"]
-                        # make sure the plane number is valid so 
-                        # we don't overflow bounds
-                        if plane_num < 0 or plane_num > 1:
-                            return False
-                        self.hslabhits[index][plane_num].Fill(pos)
-                        # plane 0, pmt0 hit for this slab
-                        if ("pmt0" in dethits[i]):
-                            self.hpmthits[index][plane_num][0].Fill(pos)
-                        # plane 0, pmt1 hit for this slab
-                        if ("pmt1" in dethits[i]):
-                            self.hpmthits[index][plane_num][1].Fill(pos)
+            tof0_sh = tof_slab_hits.GetTOF0SlabHitArray()
+            tof1_sh = tof_slab_hits.GetTOF1SlabHitArray()
+            tof2_sh = tof_slab_hits.GetTOF2SlabHitArray()
+            sh_list = [tof0_sh, tof1_sh, tof2_sh ]
+            for index, dethits in enumerate(sh_list):
+                # print 'index, size >> ',index, dethits.size()
+                for i in range(dethits.size()):
+                    pos = dethits[i].GetSlab()
+                    # print '>> hit#, slab ',i,pos
+                    plane_num = dethits[i].GetPlane()
+                    # print '>> hit#, plane ',i,plane_num
+                    if plane_num < 0 or plane_num > 1:
+                        return False
+                    self.hslabhits[index][plane_num].Fill(pos)
+                    # plane 0, pmt0 hit for this slab
+                    if (dethits[i].GetPmt0() is not None):
+                        self.hpmthits[index][plane_num][0].Fill(pos)
+                    # plane 0, pmt1 hit for this slab
+                    if (dethits[i].GetPmt1() is not None):
+                        self.hpmthits[index][plane_num][1].Fill(pos)
         return True
 
     def get_space_points(self, spill):
@@ -293,115 +284,95 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         the spill.
         """
         self.spillnum = self.spillnum + 1
-        if 'recon_events' not in spill:
-            # print 'no reco'
-            return False
 
         nsp_spill = []
         nsp_spill = [0] * 3
 
-        for evn in range(len(spill['recon_events'])):
-            if 'tof_event' not in spill['recon_events'][evn]:
-                # print 'no tof event'
+        if spill.GetSpill().GetReconEventSize() == 0:
+            raise ValueError("recon_events not in spill")
+        reconevents = spill.GetSpill().GetReconEvents()
+        # print '# recon events = ',reconevents[0].GetPartEventNumber()
+        for evn in range(spill.GetSpill().GetReconEventSize()):
+            tof_event = reconevents[evn].GetTOFEvent()
+            if tof_event is None:
+                raise ValueError("tof_event not in recon_events")
+            # Return if we cannot find slab_hits in the event.
+            tof_spoints = tof_event.GetTOFEventSpacePoint()
+            if tof_spoints is None:
                 return False
-                # print spill['recon_events'][evn]['tof_event']
-                # Return if we cannot find slab_hits in the spill.
-            if 'tof_space_points' not in \
-                  spill['recon_events'][evn]['tof_event']:
-                return False
-            space_points = \
-                  spill['recon_events'][evn]['tof_event']['tof_space_points']
+            sp_tof0 = tof_spoints.GetTOF0SpacePointArray()
+            sp_tof1 = tof_spoints.GetTOF1SpacePointArray()
+            sp_tof2 = tof_spoints.GetTOF2SpacePointArray()
 
-            # print 'evt: ', evn, ' nsp: ',len(space_points)
-            # if there are no TOF0,1,2 space point objects, return false
-            sp_tof0 = None
-            sp_tof1 = None
-            sp_tof2 = None
-
-            if 'tof0' in space_points:
-                sp_tof0 = space_points['tof0']
-
-            if 'tof1' in space_points:
-                sp_tof1 = space_points['tof1']
-
-            if 'tof2' in space_points:
-                sp_tof2 = space_points['tof2']
-
-            # print 'nsp012= ', evn, len(sp_tof0), len(sp_tof1), len(sp_tof2)
-            self.have_sp = True
-         
             # TOF0
-            if sp_tof0:
-                # print '..evt ',evn,' nsp0: ',len(sp_tof0)
-                self.hnsp_0.Fill(len(sp_tof0))
-                nsp_spill[0] = nsp_spill[0] + len(sp_tof0)
-                for i in range(len(sp_tof0)):
-                    if sp_tof0[i]:
-                        # print 'nsp0: ',i,sp_tof0[i]
-                        spnt_x = sp_tof0[i]["slabX"]
-                        spnt_y = sp_tof0[i]["slabY"]
-                        self.hspxy[0].Fill(spnt_y, spnt_x)
-                        self.hspslabx_0.Fill(spnt_x)
-                        self.hspslaby_0.Fill(spnt_y)
-                        # print '... ', i
-                        if sp_tof1 is not None :
-                            if len(sp_tof0)==1 and len(sp_tof1)==1:
-                                t_0 = sp_tof0[i]["time"]
-                                t_1 = sp_tof1[i]["time"]
+            if sp_tof0 is not None:
+                self.hnsp_0.Fill(sp_tof0.size())
+                nsp_spill[0] = nsp_spill[0] + sp_tof0.size()
+
+                for i in range(sp_tof0.size()):
+                    # print 'nsp0: ',i,sp_tof0[i]
+                    spnt_x = sp_tof0[i].GetSlabx()
+                    spnt_y = sp_tof0[i].GetSlaby()
+                    self.hspxy[0].Fill(spnt_y, spnt_x)
+                    self.hspslabx_0.Fill(spnt_x)
+                    self.hspslaby_0.Fill(spnt_y)
+                    if sp_tof1 is not None :
+                        if sp_tof0.size() == 1 and sp_tof1.size() == 1:
+                            t_0 = sp_tof0[i].GetTime()
+                            t_1 = sp_tof1[i].GetTime()
             else:
                 self.hnsp_0.Fill(0)           
 
-            # TOF 2
-            if sp_tof2:
-                # print '..evt ', evn, ' nsp2: ', len(sp_tof2)
-                self.hnsp_2.Fill(len(sp_tof2))
-                nsp_spill[2] = nsp_spill[2] + len(sp_tof2)
-                for i in range(len(sp_tof2)):
-                    if sp_tof2[i]:
-                        spnt_x = sp_tof2[i]["slabX"]
-                        spnt_y = sp_tof2[i]["slabY"]
-                        self.hspxy[2].Fill(spnt_y, spnt_x)
-                        self.hspslabx_2.Fill(spnt_x)
-                        self.hspslaby_2.Fill(spnt_y)
-                        if sp_tof1 is not None :
-                            # print '2&1: ', len(sp_tof1)
-                            if len(sp_tof2)==1 and len(sp_tof1)==1:
-                                t_2 = sp_tof2[i]["time"]
-                                t_1 = sp_tof1[i]["time"]
-                                self._ht12.Fill(t_2-t_1)
-                                # print 'tof: ', t_2-t_1
+            # TOF2
+            if sp_tof2 is not None:
+                self.hnsp_2.Fill(sp_tof2.size())
+                nsp_spill[2] = nsp_spill[2] + sp_tof2.size()
 
-                        if sp_tof0 is not None :
-                            if len(sp_tof2)==1 and len(sp_tof0)==1:
-                                t_2 = sp_tof2[i]["time"]
-                                t_0 = sp_tof0[i]["time"]
-                                self._ht02.Fill(t_2-t_0)
+                for i in range(sp_tof2.size()):
+                    # print 'nsp0: ',i,sp_tof0[i]
+                    spnt_x = sp_tof2[i].GetSlabx()
+                    spnt_y = sp_tof2[i].GetSlaby()
+                    self.hspxy[2].Fill(spnt_y, spnt_x)
+                    self.hspslabx_2.Fill(spnt_x)
+                    self.hspslaby_2.Fill(spnt_y)
+                    if sp_tof1 is not None :
+                        if sp_tof2.size() == 1 and sp_tof1.size() == 1:
+                            t_2 = sp_tof2[i].GetTime()
+                            t_1 = sp_tof1[i].GetTime()
+                            self._ht12.Fill(t_2-t_1)
+                    if sp_tof0 is not None :
+                        if sp_tof2.size() == 1 and sp_tof0.size() == 1:
+                            t_2 = sp_tof2[i].GetTime()
+                            t_0 = sp_tof0[i].GetTime()
+                            self._ht02.Fill(t_2-t_0)
             else:
-                self.hnsp_2.Fill(0)
-            # TOF 1
-            if sp_tof1:
-                # print '..evt ',evn,' nsp1: ',len(sp_tof1)
-                self.hnsp_1.Fill(len(sp_tof1))
-                nsp_spill[1] = nsp_spill[1] + len(sp_tof1)
-                for i in range(len(sp_tof1)):
-                    if sp_tof1[i]:
-                        # print 'nsp1: ', i, sp_tof1[i]
-                        spnt_x = sp_tof1[i]["slabX"]
-                        spnt_y = sp_tof1[i]["slabY"]
-                        self.hspxy[1].Fill(spnt_y, spnt_x)
-                        self.hspslabx_1.Fill(spnt_x)
-                        self.hspslaby_1.Fill(spnt_y)
-                        # print '... ', i
-                        if sp_tof0 is not None :
-                            if len(sp_tof1)==1 and len(sp_tof0)==1:
-                                # print '>>>> ok'
-                                t_0 = sp_tof0[i]["time"]
-                                t_1 = sp_tof1[i]["time"]
-                                self._ht01.Fill(t_1-t_0)
-                                # print 'tof01: ', t_1-t_0
+                self.hnsp_2.Fill(0)           
+
+            # TOF1
+            if sp_tof1 is not None:
+                self.hnsp_1.Fill(sp_tof1.size())
+                nsp_spill[1] = nsp_spill[1] + sp_tof1.size()
+
+                for i in range(sp_tof1.size()):
+                    # print 'nsp0: ',i,sp_tof0[i]
+                    spnt_x = sp_tof1[i].GetSlabx()
+                    spnt_y = sp_tof1[i].GetSlaby()
+                    self.hspxy[1].Fill(spnt_y, spnt_x)
+                    self.hspslabx_1.Fill(spnt_x)
+                    self.hspslaby_1.Fill(spnt_y)
+                    if sp_tof1 is not None :
+                        if sp_tof2.size() == 1 and sp_tof1.size() == 1:
+                            t_2 = sp_tof2[i].GetTime()
+                            t_1 = sp_tof1[i].GetTime()
+                            self._ht12.Fill(t_2-t_1)
+                    if sp_tof0 is not None :
+                        if sp_tof1.size() == 1 and sp_tof0.size() == 1:
+                            t_1 = sp_tof1[i].GetTime()
+                            t_0 = sp_tof0[i].GetTime()
+                            self._ht01.Fill(t_1-t_0)
             else:
-                self.hnsp_1.Fill(0)
-               
+                self.hnsp_2.Fill(0)           
+
         for j in range (3): 
             if nsp_spill[j] > 0:
                 self.hnsp_spill[j].Fill(nsp_spill[j])

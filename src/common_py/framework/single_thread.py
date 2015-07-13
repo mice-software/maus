@@ -215,23 +215,12 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                                      "maus_event_type":"Spill",
                                      "run_number":self.run_number,
                                      "spill_number":-1}
-            #end_of_run_spill_str = json.dumps(self.end_of_run_spill)
-            #end_of_run_spill_str = self.merger.process(end_of_run_spill_str)
+            end_of_run_spill_str = json.dumps(self.end_of_run_spill)
+            spill_data = maus_cpp.converter.data_repr(end_of_run_spill_str)
+            end_of_run_spill_str = self.merger.process(spill_data)
 
-            data = ROOT.MAUS.Data() # pylint: disable=E1101
-            spill = ROOT.MAUS.Spill() # pylint: disable=E1101
-            spill.SetRunNumber(self.run_number)
-            spill.SetDaqEventType("end_of_run")
-            spill.SetSpillNumber(-1)
-            data.SetSpill(spill)
-
-            end_of_run_spill_str = self.merger.process(data)
             if self.write_headers: # write to disk only if write_headers is set
                 self.outputer.save(end_of_run_spill_str)
-            try:
-                maus_cpp.converter.del_data_repr(data)
-            except TypeError:
-                pass
         try:
             maus_cpp.converter.del_data_repr(self.end_of_run_spill)
         except TypeError:
