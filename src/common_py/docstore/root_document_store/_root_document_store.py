@@ -17,13 +17,16 @@
 Client side RootDocumentStore
 """
 
+#pylint: disable=E1101
+
 import inspect
 import time
 import datetime
 import Queue
 import dateutil.parser
 
-import libMausCpp
+import ROOT
+import libMausCpp # pylint: disable=W0611
 
 from docstore.DocumentStore import DocumentStoreException
 from docstore.DocumentStore import DocumentStore
@@ -58,8 +61,12 @@ class RootDocumentStore(DocumentStore):
     (handled by _parse_function and _return function respectively).
     """
 
-    def __init__(self, timeout, poll_time, n_socket_retries=3,
-                 n_docstore_retries=3, retry_time=1.):
+    def __init__(self, # pylint: disable=R0913
+                 timeout,
+                 poll_time,
+                 n_socket_retries=3,
+                 n_docstore_retries=3,
+                 retry_time=1.):
         """
         Initialise the document store
         @param timeout: maximum time to attempt a given communication with the

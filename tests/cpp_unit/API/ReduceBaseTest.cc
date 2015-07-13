@@ -139,6 +139,7 @@ namespace MAUS {
     EXPECT_TRUE(py_out == NULL)
       << "Fail: Python return object not NULL"
       << std::endl;
+    PyErr_Clear();
   }
 
   TEST(ReduceBaseTest, TestProcessMAUSException) {
