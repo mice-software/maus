@@ -342,8 +342,11 @@ class SocketManager:
             while accepted_socket_index < 0 and \
                   (timeout < 0 or time.time()-start_time < timeout):
                 sys.stdout.flush()
-                accepted_socket_index = \
+                try:
+                    accepted_socket_index = \
                                  ROOT.gSystem.AcceptConnection(tcp_socket_index)
+                except AttributeError:
+                    accepted_socket_index = -1
                 sys.stdout.flush()
                 if accepted_socket_index < 0:
                     time.sleep(retry_time)
