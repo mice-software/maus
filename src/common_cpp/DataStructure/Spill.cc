@@ -18,6 +18,8 @@
 
 namespace MAUS {
 
+int Spill::reference_count = 0;
+
 Spill::Spill()
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
@@ -28,7 +30,7 @@ Spill::Spill(const Spill& md)
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
-  *this = md;
+    *this = md;
 }
 
 Spill& Spill::operator=(const Spill& md) {

@@ -47,7 +47,6 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   hit.SetEnergyDeposited(edep);
   hit.SetPosition(MAUS::ThreeVector(Pos.x(), Pos.y(), Pos.z()));
   hit.SetMomentum(MAUS::ThreeVector(Mom.x(), Mom.y(), Mom.z()));
-
   _hits->push_back(hit);
   // this is the rotation of the fibre array
   /*
@@ -66,6 +65,10 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   return true;
 }
 
+bool SciFiSD::isHit() {
+    return _hits != NULL && _hits->size() > 0;
+}
+
 int SciFiSD::GetNHits() {
     if (_hits == NULL)
         return 0;
@@ -80,8 +83,12 @@ void SciFiSD::ClearHits() {
 }
 
 void SciFiSD::TakeHits(MAUS::MCEvent* event) {
-    event->SetSciFiHits(_hits);
-    _hits = new std::vector<MAUS::SciFiHit>();
+    if (event->GetSciFiHits() == NULL)
+        event->SetSciFiHits(new std::vector<MAUS::Hit<MAUS::SciFiChannelId> >());
+    std::vector<MAUS::Hit<MAUS::SciFiChannelId> >* ev_hits = event->GetSciFiHits();
+    ev_hits->insert(ev_hits->end(), _hits->begin(), _hits->end());
+    delete _hits;
+    _hits = new std::vector<MAUS::Hit<MAUS::SciFiChannelId> >();
 }
 
 void SciFiSD::EndOfEvent(G4HCofThisEvent* HCE) {

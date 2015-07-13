@@ -178,38 +178,38 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
                       "py_cpp was NULL",
                       "PyObjectWrapper::lazy_unwrap");
     }
-
     if (TPython::ObjectProxy_Check(py_cpp)) {
         try {
             unwrap_root_object_proxy(py_cpp, data_ret, "MAUS::Data");
-            if (data_ret != NULL)
+            if (*data_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, jh_ret, "MAUS::JobHeaderData");
-            if (jh_ret != NULL)
+            if (*jh_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, jf_ret, "MAUS::JobFooterData");
-            if (jf_ret != NULL)
+            if (*jf_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, rh_ret, "MAUS::RunHeaderData");
-            if (rh_ret != NULL)
+            if (*rh_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, rf_ret, "MAUS::RunFooterData");
-            if (rf_ret != NULL)
+            if (*rf_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, image_ret, "MAUS::ImageData");
-            if (image_ret != NULL)
+            if (*image_ret != NULL)
                 return;
-        } catch (MAUS::Exception &exc) {}
+        } catch (MAUS::Exception &exc) {
+        }
     } else if (PyCapsule_IsValid(py_cpp, "JsonCpp")) {
         void* vptr = PyCapsule_GetPointer(py_cpp, "JsonCpp");
         Json::Value *json_ptr = static_cast<Json::Value*>(vptr);
@@ -259,10 +259,13 @@ void PyObjectWrapper::unwrap_root_object_proxy(PyObject* py_cpp,
                         "PyObjectWrapper::lazy_unwrap");
         }
     } else {
-            throw Exception(Exception::recoverable,
-                        "Did not recognise ObjectProxy type "+\
-                        std::string(c_string),
-                        "PyObjectWrapper::lazy_unwrap");
+        return;
+/*
+        throw Exception(Exception::recoverable,
+                    "Did not recognise ObjectProxy type "+\
+                    std::string(c_string),
+                    "PyObjectWrapper::lazy_unwrap");
+*/
     }
 }
 
