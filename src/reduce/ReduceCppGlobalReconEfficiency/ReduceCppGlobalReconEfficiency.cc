@@ -40,6 +40,9 @@
 #include "src/common_cpp/Recon/Global/MCTruthTools.hh"
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
 
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+
 namespace MAUS {
 
 bool ReduceCppGlobalReconEfficiency::birth(std::string aJsonConfigDocument) {
@@ -48,7 +51,7 @@ bool ReduceCppGlobalReconEfficiency::birth(std::string aJsonConfigDocument) {
 
   // JsonCpp setup - check file parses correctly, if not return false
   Json::Value configJSON;
-  for (size_t i = 0; i < 8; i++) {
+  for (size_t i = 0; i < 9; i++) {
     _detector_matches[i] = 0;
     _detector_matches_expected[i] = 0;
     _detector_false_matches[i] = 0;
@@ -100,14 +103,20 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
     TOFEfficiency(2, MAUS::DataStructure::Global::kTOF2, track, mc_event,
                   p_time, 40, 40, 2);
     KLEfficiency(track, mc_event, 30);
-    EMREfficiency(track, mc_event, 19, 19);
+    EMREfficiency(track, mc_event);
   }
 
   // Through-Tracks
   std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
       through_track_mc_pairs = matchTrackerReconWithMC(
       "MapCppGlobalTrackMatching-Through", MAUS::DataStructure::Global::kMuPlus);
-      
+  for (size_t i = 0; i < through_track_mc_pairs.size(); i++) {
+    MAUS::DataStructure::Global::Track* track = through_track_mc_pairs[i].first;
+    MAUS::MCEvent* mc_event = through_track_mc_pairs[i].second;
+    double p_time = mc_event->GetPrimary()->GetTime();
+    throughEfficiency(track, mc_event, p_time, 40, 40, 40, 40, 2, 2);
+  }
+
   std::string output_document = JsonWrapper::JsonToString(*data_json);
   delete data_json;
   delete data_cpp;
@@ -141,9 +150,9 @@ bool ReduceCppGlobalReconEfficiency::death()  {
       _detector_false_matches[6];
   _detector_lr_failed[7] = _detector_lr_failed[5] + _detector_lr_failed[6];
 
-  double detector_efficiency[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  double detector_total_efficiency[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  double detector_purity[8] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  double detector_efficiency[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  double detector_total_efficiency[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  double detector_purity[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
   
   std::vector<std::string> detector_labels;
   detector_labels.push_back("TOF0");
@@ -154,11 +163,12 @@ bool ReduceCppGlobalReconEfficiency::death()  {
   detector_labels.push_back("US  ");
   detector_labels.push_back("DS  ");
   detector_labels.push_back("Tot.");
+  detector_labels.push_back("Thru");
   std::cerr
       << "     ┏━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┓\n"
       << "     ┃Matches┃Expect ┃False  ┃LR Fail┃Efficie┃Effici*┃Purity ┃\n"
       << "┏━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━┫\n";
-  for (size_t i = 0; i < 8; i++) {
+  for (size_t i = 0; i < 9; i++) {
     if (_detector_matches_expected[i] > 0) {
       detector_efficiency[i] = (_detector_matches[i] + 0.0)*100 /
           _detector_matches_expected[i];
@@ -177,13 +187,27 @@ bool ReduceCppGlobalReconEfficiency::death()  {
            _detector_false_matches[i], _detector_lr_failed[i],
            detector_efficiency[i], detector_total_efficiency[i],
            detector_purity[i]);
-    if (i == 1 or i == 4 or i == 6) {
+    if (i == 1 or i == 4 or i == 6 or i == 7) {
       std::cerr
           << "┣━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━╋━━━━━━━┫\n";
     }
   }
   std::cerr
     << "┗━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┛\n";
+
+  Json::Value *json = Globals::GetConfigurationCards();
+  const char* eff_filename = (*json)["efficiency_filename"].asString().c_str();
+  ofstream eff_file;
+  eff_file.open(eff_filename);
+  for (size_t i = 0; i < 5; i++) {
+  eff_file << _detector_matches[i] << "\t" << _detector_matches_expected[i]
+      << "\t" << _detector_false_matches[i] << "\t" << _detector_lr_failed[i]
+      << "\n";
+  }
+  eff_file << _detector_matches[8] << "\t" << _detector_matches_expected[8]
+      << "\t" << _detector_false_matches[8] << "\t" << _detector_lr_failed[8]
+      << "\n";
+  eff_file.close();
   return true;
 }
 
@@ -360,8 +384,7 @@ void ReduceCppGlobalReconEfficiency::KLEfficiency(
 
 
 void ReduceCppGlobalReconEfficiency::EMREfficiency(
-    MAUS::DataStructure::Global::Track* track, MAUS::MCEvent* mc_event,
-    double dX_max, double dY_max) {
+    MAUS::DataStructure::Global::Track* track, MAUS::MCEvent* mc_event) {
   TLorentzVector tp_position;
   MAUS::DataStructure::Global::DetectorPoint detector =
       MAUS::DataStructure::Global::kEMR;
@@ -417,6 +440,74 @@ void ReduceCppGlobalReconEfficiency::EMREfficiency(
   }
 }
 
+void ReduceCppGlobalReconEfficiency::throughEfficiency(
+    MAUS::DataStructure::Global::Track* track, MAUS::MCEvent* mc_event,
+    double p_time, double dX_max1, double dX_max2,
+    double dY_max1, double dY_max2, double dT_max1, double dT_max2) {
+  TLorentzVector tp1_position;
+  TLorentzVector tp2_position;
+  MAUS::TOFHitArray* tof1_hits =
+      MCTruthTools::GetTOFHits(mc_event, MAUS::DataStructure::Global::kTOF1);
+  MAUS::TOFHitArray* tof2_hits =
+      MCTruthTools::GetTOFHits(mc_event, MAUS::DataStructure::Global::kTOF2);
+  // Do we have MC hits for the TOF
+  if (tof1_hits and tof2_hits) {
+    // First check if there are corresponding spacepoints in the spill i.e. if
+    // we would expect a match to occur
+    std::vector<MAUS::DataStructure::Global::SpacePoint*>* tof1_sps =
+        GlobalTools::GetSpillSpacePoints(_spill,
+                                         MAUS::DataStructure::Global::kTOF1);
+    std::vector<MAUS::DataStructure::Global::SpacePoint*>* tof2_sps =
+        GlobalTools::GetSpillSpacePoints(_spill,
+                                         MAUS::DataStructure::Global::kTOF2);
+    if (tof1_sps and tof2_sps) {
+      for (size_t i = 0; i < tof1_sps->size(); i++) {
+        for (size_t j = 0; j < tof2_sps->size(); j++) {
+          TLorentzVector tof1_position = tof1_sps->at(i)->get_position();
+          TLorentzVector tof2_position = tof2_sps->at(j)->get_position();
+          TOFHit tof1_hit =
+              MCTruthTools::GetNearestZHit(tof1_hits, tof1_position);
+          TOFHit tof2_hit =
+              MCTruthTools::GetNearestZHit(tof2_hits, tof2_position);
+          if (TOFReconMatchesMC(tof1_position, tof1_hit, p_time,
+                                dX_max1, dY_max1, dT_max1) and
+              TOFReconMatchesMC(tof2_position, tof2_hit, p_time,
+                                dX_max2, dY_max2, dT_max2)) {
+            _detector_matches_expected[8]++;
+            // It's possible that multiple matches occur depending on the data
+            // meaning we might get false positives, but definitely shouldn't
+            // count twice
+            break;
+          }
+          // We haven't found any matches
+          _detector_lr_failed[8]++;
+        }
+      }
+    } else {
+      _detector_lr_failed[8]++;
+    }
+    MAUS::DataStructure::Global::TrackPointCPArray tof1_tps =
+        track->GetTrackPoints(MAUS::DataStructure::Global::kTOF1);
+    MAUS::DataStructure::Global::TrackPointCPArray tof2_tps =
+        track->GetTrackPoints(MAUS::DataStructure::Global::kTOF2);
+    if (tof1_tps.size() > 0 and tof2_tps.size() > 0) {
+      // Usually there will be only one hit, if not, pick out the last one
+      tp1_position = tof1_tps[tof1_tps.size() -1]->get_position();
+      tp2_position = tof2_tps[tof2_tps.size() -1]->get_position();
+      TOFHit tof1_hit = MCTruthTools::GetNearestZHit(tof1_hits, tp1_position);
+      TOFHit tof2_hit = MCTruthTools::GetNearestZHit(tof2_hits, tp2_position);
+      // Check if hits agree, if yes, that's one point for efficiency
+      if (TOFReconMatchesMC(tp1_position, tof1_hit, p_time,
+                            dX_max1, dY_max1, dT_max1) and
+          TOFReconMatchesMC(tp2_position, tof2_hit, p_time,
+                            dX_max2, dY_max2, dT_max2)) {
+        _detector_matches[8]++;
+      } else {
+        _detector_false_matches[8]++;
+      }
+    }
+  }
+}
 
 
 std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
@@ -474,7 +565,7 @@ std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
                 matched_tps++;
               } else {
                 if ((dX > 1.0) or (dY > 1.0)) {
-                std::cerr << dX << " " << dY << " " << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";
+                //~ std::cerr << dX << " " << dY << " " << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";
                 //~ std::cerr << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";
                 //~ std::cerr << dX << " " << dY << " " << dZ << " " << dPx << " " << dPy << " " << dPz << " " << tracker_plane[0] << tracker_plane[1] << tracker_plane[2] << "\n";
                 }

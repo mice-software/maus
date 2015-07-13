@@ -167,7 +167,12 @@ class ReduceCppGlobalReconEfficiency {
    * @param dY_max the maximum allowed disagreement in y for a match
    */
   void EMREfficiency(MAUS::DataStructure::Global::Track* track,
-      MAUS::MCEvent* mc_event, double dX_max, double dY_max);
+      MAUS::MCEvent* mc_event);
+
+
+  void throughEfficiency(MAUS::DataStructure::Global::Track* track,
+      MAUS::MCEvent* mc_event, double p_time, double dX_max1, double dX_max2,
+      double dY_max1, double dY_max2, double dT_max1, double dT_max2);
 
   /**
    * @brief Pairs tracks with mc events in a spill based on a matching between
@@ -182,10 +187,10 @@ class ReduceCppGlobalReconEfficiency {
       matchTrackerReconWithMC(std::string mapper_name,
                               MAUS::DataStructure::Global::PID pid);
 
-  size_t _detector_matches[8];
-  size_t _detector_matches_expected[8];
-  size_t _detector_false_matches[8];
-  size_t _detector_lr_failed[8];
+  size_t _detector_matches[9];
+  size_t _detector_matches_expected[9];
+  size_t _detector_false_matches[9];
+  size_t _detector_lr_failed[9];
   std::string mClassname;
   //~ Json::Value mRoot;
   Spill* _spill;
