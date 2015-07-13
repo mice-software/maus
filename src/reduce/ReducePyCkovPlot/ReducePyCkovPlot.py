@@ -68,22 +68,30 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.run_ended = False
         return True
     
-    def _update_histograms(self, spill):
+    def _update_histograms(self, data):
         """Update the Histograms """
-        if (spill.has_key("daq_event_type") and
-            spill["daq_event_type"] == "end_of_run"):
+
+        daq_evtype = data.GetSpill().GetDaqEventType()
+        if daq_evtype == "end_of_run":
             if (not self.run_ended):
                 self.update_histos()
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
                 return []
-        
-        if not self.get_space_points(spill):
+
+        # do not try to get data from start/end spill markers
+        data_spill = True
+        if daq_evtype == "start_of_run" \
+              or daq_evtype == "start_of_burst" \
+              or daq_evtype == "end_of_burst":
+            data_spill = False
+
+        if data_spill and not self.get_space_points(data):
             raise ValueError("space points not in spill")
 
         # Get charge points & fill histograms.
-        if not self.get_charge(spill):
+        if data_spill and not self.get_charge(data):
             raise ValueError("charge not in spill")
         
         # Refresh canvases at requested frequency.
@@ -93,102 +101,124 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         else:
             return []
 
-    def get_space_points(self, spill):#pylint: disable=R0911,R0912,R0914
-        """Get space points from JSON"""
-        
-        if 'recon_events' not in spill:
-            return False
-        recon = spill['recon_events']
-
-        for event in range(len(recon)):
-            if 'tof_event' not in recon[event]:
+    def get_space_points(self, data):#pylint: disable=R0911,R0912,R0914
+        """Get space points from Data"""
+       
+        if data.GetSpill().GetReconEventSize() == 0:
+            raise ValueError("recon_events not in spill")
+        reconevents = data.GetSpill().GetReconEvents()
+        # print '# recon events = ',reconevents[0].GetPartEventNumber()
+        for evn in range(data.GetSpill().GetReconEventSize()):
+            # Get the tof event and tof0/tof1 spacepoints
+            tof_event = reconevents[evn].GetTOFEvent()
+            if tof_event is None:
+                raise ValueError("tof_event not in recon_events")
+            # Return if we cannot find slab_hits in the event.
+            tof_spoints = tof_event.GetTOFEventSpacePoint()
+            if tof_spoints is None:
                 return False
-            tof_event = recon[event]['tof_event']
+            sp_tof0 = tof_spoints.GetTOF0SpacePointArray()
+            sp_tof1 = tof_spoints.GetTOF1SpacePointArray()
 
-            if 'tof_space_points' not in tof_event:
-                return False
+            # Get ckov event
+            ckov_event = reconevents[evn].GetCkovEvent()
+            if ckov_event is None:
+                raise ValueError("ckov event not in recon events")
 
-            # check for NoneType --there are events with no reconstructed SP
-            space_points = tof_event['tof_space_points']
-            
-            if 'tof0' not in space_points:
-                return False
-            sp_tof0 = space_points['tof0']
+            # Get the ckov digits
+            ckov_digs = ckov_event.GetCkovDigitArray()
 
-            if 'tof1' not in space_points:
-                return False
-            sp_tof1 = space_points['tof1']
+            # Number of photoelectrons in CKOVa and CKOVb
+            PE_B = ckov_digs[0].GetCkovB().GetNumberOfPes()
+            PE_A = ckov_digs[0].GetCkovA().GetNumberOfPes()
+            # npe vs tof-time
+            if sp_tof0 is None or sp_tof1 is None:
+                continue
+            if sp_tof0.size() == 1 and sp_tof1.size() == 1:
+                t_0 = sp_tof0[0].GetTime()
+                t_1 = sp_tof1[0].GetTime()
+                TOF = t_1 - t_0
+                self._htof.Fill(TOF)
+                #fill Histos
+                if PE_B > 0:
+                    self._htof_B.Fill(PE_B, TOF)
+                if PE_A > 0:
+                    self._htof_A.Fill(PE_A, TOF)
 
-            #CKOV RECON
-            if 'ckov_event' not in recon[event]:
-                return False
-            ckov_event = recon[event]['ckov_event']
-            
-            if 'ckov_digits' not in ckov_event:
-                return False
-            digits = ckov_event['ckov_digits']
-            
-            #Number of photoelectrons in CKOVa and CKOVb
-            PE_B = digits[0]["B"]["number_of_pes"]
-            PE_A = digits[0]["A"]["number_of_pes"]
-            
-            #TOF vs. Total Charge
-
-            # check that sp_tof1 exists for this event
-            if sp_tof1:
-                # loop over tof1 space points in this event
-                for i in range(len(sp_tof1)):
-                    # check that sp_tof0 exists for this event
-                    if sp_tof0 is not None:
-                        # check that there is exactly one tof0 sp & 1 tof1 sp
-                        if len(sp_tof0) == 1 and len(sp_tof1) == 1:
-                            t_0 = sp_tof0[i]["time"]
-                            t_1 = sp_tof1[i]["time"]
-                            TOF = t_1 - t_0
-                            self._htof.Fill(TOF)
-                            #fill Histos
-                            if PE_B > 0:
-                                self._htof_B.Fill(PE_B, TOF)
-                                
-                            if PE_A > 0:
-                                self._htof_A.Fill(PE_A, TOF)
         return True
 
-    def get_charge(self, spill):
+    def get_charge(self, data):
         """Get Ckov digits """
 
-        if 'recon_events' not in spill:
-            return False
-        recon = spill['recon_events']
+        if data.GetSpill().GetReconEventSize() == 0:
+            raise ValueError("recon_events not in spill")
+        reconevents = data.GetSpill().GetReconEvents()
+        # print '# recon events = ',reconevents[0].GetPartEventNumber()
+        for evn in range(data.GetSpill().GetReconEventSize()):
+            # Get ckov event
+            ckov_event = reconevents[evn].GetCkovEvent()
+            if ckov_event is None:
+                raise ValueError("ckov event not in recon events")
 
-        for event in range(len(recon)):
-            if 'ckov_event' not in recon[event]:
-                return False
-            ckov_event = recon[event]['ckov_event']
-        
-            if 'ckov_digits' not in ckov_event:
-                return False
-            digits = ckov_event['ckov_digits']
+            # Get the ckov digits
+            ckov_digs = ckov_event.GetCkovDigitArray()
 
-            for pmt in range(0, 8):
-                pulse = "pulse_%d" % (pmt)
-                arrival_time = "arrival_time_%d" % (pmt)
+            charge = ckov_digs[0].GetCkovA().GetPulse0()
+            time = ckov_digs[0].GetCkovA().GetArrivalTime0()
+            if charge > -1000:
+                self._hcharge[0].Fill(charge)
+            if time < 255:
+                self._htime[0].Fill(time)
                 
-                #Fill Charge and Arrival Time Histograms for CKOVa and CKOVb
-                if pmt <= 3:
-                    ckov_sta = 'A'
-                if pmt >= 4:
-                    ckov_sta = 'B'
-
-                charge = digits[0][ckov_sta][pulse]
-                        
-                if charge > -1000:
-                    self._hcharge[pmt].Fill(charge)
-
-                    time = digits[0][ckov_sta][arrival_time]
-                if time < 255:
-                    self._htime[pmt].Fill(time)
-        
+            charge = ckov_digs[0].GetCkovA().GetPulse1()
+            time = ckov_digs[0].GetCkovA().GetArrivalTime1()
+            if charge > -1000:
+                self._hcharge[1].Fill(charge)
+            if time < 255:
+                self._htime[1].Fill(time)
+                
+            charge = ckov_digs[0].GetCkovA().GetPulse2()
+            time = ckov_digs[0].GetCkovA().GetArrivalTime2()
+            if charge > -1000:
+                self._hcharge[2].Fill(charge)
+            if time < 255:
+                self._htime[2].Fill(time)
+                
+            charge = ckov_digs[0].GetCkovA().GetPulse3()
+            time = ckov_digs[0].GetCkovA().GetArrivalTime3()
+            if charge > -1000:
+                self._hcharge[3].Fill(charge)
+            if time < 255:
+                self._htime[3].Fill(time)
+                
+            charge = ckov_digs[0].GetCkovB().GetPulse4()
+            time = ckov_digs[0].GetCkovB().GetArrivalTime4()
+            if charge > -1000:
+                self._hcharge[4].Fill(charge)
+            if time < 255:
+                self._htime[4].Fill(time)
+                
+            charge = ckov_digs[0].GetCkovB().GetPulse5()
+            time = ckov_digs[0].GetCkovB().GetArrivalTime5()
+            if charge > -1000:
+                self._hcharge[5].Fill(charge)
+            if time < 255:
+                self._htime[5].Fill(time)
+                
+            charge = ckov_digs[0].GetCkovB().GetPulse6()
+            time = ckov_digs[0].GetCkovB().GetArrivalTime6()
+            if charge > -1000:
+                self._hcharge[6].Fill(charge)
+            if time < 255:
+                self._htime[6].Fill(time)
+                
+            charge = ckov_digs[0].GetCkovB().GetPulse7()
+            time = ckov_digs[0].GetCkovB().GetArrivalTime7()
+            if charge > -1000:
+                self._hcharge[7].Fill(charge)
+            if time < 255:
+                self._htime[7].Fill(time)
+                
         return True
     
     def __init_histos(self): #pylint: disable=R0201,R0914,R0915
