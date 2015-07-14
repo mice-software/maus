@@ -151,13 +151,17 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         # Load and validate the JSON document.
         def_doc = {"maus_event_type":"Image", "image_list":[]}
 
-        # check if input is MAUS::Data, if it's not do a json conversion
-        # online celery/mongo returns json string
+        # the mergers now process MAUS::Data
+        # the output are images in json strings
+        # check if input is Data, if it's not do conversion to data
+        #                         online celery/mongo returns json string
         if data.__class__.__name__ == 'MAUS::Data':
-            json_doc = maus_cpp.converter.json_repr(data)
+            spill_data = data
+            del data
         else:
             try:
-                json_doc = json.loads(data.rstrip())
+                spill_data = maus_cpp.converter.data_repr(data)
+                del data
             except Exception: # pylint:disable=W0703
                 def_doc = ErrorHandler.HandleException(def_doc, self)
                 print def_doc
@@ -167,7 +171,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
 
         # Process spill and update histograms.
         try:
-            result = self._update_histograms(json_doc)
+            result = self._update_histograms(spill_data)
         except Exception: # pylint:disable=W0703
             def_doc = ErrorHandler.HandleException(def_doc, self)
             return unicode(json.dumps(def_doc))
