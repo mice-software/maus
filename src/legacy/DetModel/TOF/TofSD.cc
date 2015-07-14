@@ -60,8 +60,14 @@ void TofSD::ClearHits() {
 }
 
 void TofSD::TakeHits(MAUS::MCEvent* event) {
-  event->SetTOFHits(_hits);
-  _hits = new std::vector<MAUS::TOFHit>();
+    if (event->GetTOFHits() == NULL)
+        event->SetTOFHits(new std::vector<MAUS::Hit<MAUS::TOFChannelId> >());
+    std::vector<MAUS::Hit<MAUS::TOFChannelId> >* ev_hits = event->GetTOFHits();
+    std::cerr << "TAKE HITS add " << _hits->size() << " to " << ev_hits->size() << std::endl;
+    ev_hits->insert(ev_hits->end(), _hits->begin(), _hits->end());
+    std::cerr << "TAKE HITS total " << event->GetTOFHits()->size() << std::endl;
+    delete _hits;
+    _hits = new std::vector<MAUS::Hit<MAUS::TOFChannelId> >();
 }
 
 
