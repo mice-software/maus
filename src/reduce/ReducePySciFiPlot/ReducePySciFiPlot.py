@@ -27,7 +27,6 @@ run.
 # pylint: disable = W0105, W0612, W0201
 
 import ROOT
-import maus_cpp.converter
 from ReducePyROOTHistogram import ReducePyROOTHistogram
 
 class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902

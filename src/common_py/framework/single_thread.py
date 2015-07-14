@@ -19,7 +19,6 @@ Single-threaded dataflows module.
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
-import ROOT
 
 from framework.utilities import DataflowUtilities
 

@@ -267,7 +267,7 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                         self.hpmthits[index][plane_num][1].Fill(pos)
         return True
 
-    def get_space_points(self, spill):
+    def get_space_points(self, spill): # pylint: disable = R0914
         """ 
         Get the TOF space points and update the histograms.
 

@@ -147,7 +147,7 @@ class ReducePyCkovPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         return True
 
-    def get_charge(self, data):
+    def get_charge(self, data): # pylint: disable = R0912, R0915
         """Get Ckov digits """
 
         if data.GetSpill().GetReconEventSize() == 0:
