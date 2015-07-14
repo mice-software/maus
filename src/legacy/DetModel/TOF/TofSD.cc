@@ -38,24 +38,24 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   hit.SetParticleId(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
   hit.SetCharge(aStep->GetTrack()->GetDefinition()->GetPDGCharge());
 
-  hit.SetMomentum(MAUS::ThreeVector(
+  hit.SetPosition(MAUS::ThreeVector(
     aStep->GetPostStepPoint()->GetPosition().x(),
     aStep->GetPostStepPoint()->GetPosition().y(),
     aStep->GetPostStepPoint()->GetPosition().z()
-  )); 
+  ));
   hit.SetMomentum(MAUS::ThreeVector(
     aStep->GetPostStepPoint()->GetMomentum().x(),
     aStep->GetPostStepPoint()->GetMomentum().y(),
     aStep->GetPostStepPoint()->GetMomentum().z()
-  )); 
-
+  ));
   _hits->push_back(hit);
   return true;
 }
 
 void TofSD::ClearHits() {
-  if (_hits != NULL)
+  if (_hits != NULL) {
       delete _hits;
+  }
   _hits = new std::vector<MAUS::TOFHit>();
 }
 
@@ -63,9 +63,7 @@ void TofSD::TakeHits(MAUS::MCEvent* event) {
     if (event->GetTOFHits() == NULL)
         event->SetTOFHits(new std::vector<MAUS::Hit<MAUS::TOFChannelId> >());
     std::vector<MAUS::Hit<MAUS::TOFChannelId> >* ev_hits = event->GetTOFHits();
-    std::cerr << "TAKE HITS add " << _hits->size() << " to " << ev_hits->size() << std::endl;
     ev_hits->insert(ev_hits->end(), _hits->begin(), _hits->end());
-    std::cerr << "TAKE HITS total " << event->GetTOFHits()->size() << std::endl;
     delete _hits;
     _hits = new std::vector<MAUS::Hit<MAUS::TOFChannelId> >();
 }
