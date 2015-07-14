@@ -61,7 +61,7 @@ void BarParameterisation::ComputeTransformation(const G4int copyNo,
 
   G4double StartX = - (NbarsInPlane/2)*(0.5*fBarWidth+fGap);
   G4double StartY = StartX;
-  G4double StartZ = - (Nplanes/2)*(fBarHeight + fGap);
+  G4double StartZ = - (Nplanes/2 - .5)*(fBarHeight + fGap);
 
   placement.setX(((planeID+1)%2)*(StartX + barIDinPlane*(0.5*fBarWidth + fGap)));
   placement.setY((planeID%2)*(StartY + barIDinPlane*(0.5*fBarWidth + fGap)));

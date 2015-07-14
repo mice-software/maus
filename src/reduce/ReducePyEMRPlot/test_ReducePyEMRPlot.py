@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for ReducePyEMRPlot
 """
@@ -36,6 +35,7 @@ class ReducePyEMRPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         @param self Object reference.
         """
         self.__reducer = ReducePyEMRPlot()
+
     def setUp(self):
         """ 
         Invoke "birth" and check for success.
@@ -60,8 +60,7 @@ class ReducePyEMRPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
    
     def test_birth_file_type(self):
         """
-        Test configuration when "birth" is called with a supported
-        file type. 
+        Test configuration when "birth" is called with a supported file type.
         @param self Object reference.
         """
         self.__reducer = ReducePyEMRPlot()
@@ -106,7 +105,6 @@ class ReducePyEMRPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         result_str = self.__reducer.process(json_str)
         json.loads(result_str)
         return json.loads(result_str)
-         
      
     def tearDown(self):
         """
@@ -116,6 +114,7 @@ class ReducePyEMRPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         success = self.__reducer.death()
         if success != None:
             raise Exception('Test tearDown failed', 'reducer.death() failed')
+        self.__reducer = None
         
 if __name__ == '__main__':
     unittest.main()

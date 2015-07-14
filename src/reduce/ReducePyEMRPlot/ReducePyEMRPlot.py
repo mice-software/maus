@@ -174,7 +174,6 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             return self.get_histogram_images()
         else:
             return []
-        
 
     def get_events(self, spill):
         """ 
