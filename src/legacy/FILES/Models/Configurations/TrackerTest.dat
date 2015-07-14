@@ -1,0 +1,17 @@
+Configuration TrackerTest
+{
+  Dimensions 6. 6. 15. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 100.0 mm
+  Module Tracker/TrackerSolenoid0.dat
+  {
+    Position 0. 0. 1.5 m
+    Rotation 0. 0. 0. degree
+  }
+  Module Tracker/TrackerSolenoid1.dat
+  {
+    Position 0. 0. 4.5 m
+    Rotation 0. 0. 0. degree
+  } 
+}
+

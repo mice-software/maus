@@ -26,6 +26,8 @@
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
+
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
@@ -55,6 +57,9 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                  process->_configuration_cards;
         int verbose_level = JsonWrapper::GetProperty
                        (config, "verbose_level", JsonWrapper::intValue).asInt();
+        int max_data_ref = JsonWrapper::GetProperty
+               (config, "data_maximum_reference_count", JsonWrapper::intValue).asInt();
+        Data::SetMaxReferenceCount(max_data_ref);
         bool stack = JsonWrapper::GetProperty
                (config, "will_do_stack_trace", JsonWrapper::booleanValue).asBool();
         Exception::SetWillDoStackTrace(stack);
@@ -175,13 +180,23 @@ void GlobalsManager::Finally() {
 */
 }
 
-void GlobalsManager::SetReconstructionMiceModules
-                                                      (MiceModule* recon_mods) {
+void GlobalsManager::SetReconstructionMiceModules(MiceModule* recon_mods) {
     if (Globals::GetInstance()->_recon_mods != NULL &&
       Globals::GetInstance()->_mc_mods != Globals::GetInstance()->_recon_mods) {
         delete Globals::_process->_recon_mods;
     }
     Globals:: _process->_recon_mods = recon_mods;
+    if (Globals::GetInstance()->_recon_field_constructor != NULL &&
+                             Globals::GetInstance()->_recon_field_constructor !=
+                             Globals::GetInstance()->_mc_field_constructor) {
+      delete Globals::GetInstance()->_recon_field_constructor;
+    }
+    if (recon_mods == NULL) {
+    Globals::GetInstance()->_recon_field_constructor = NULL;
+    } else {
+      Globals::GetInstance()->_recon_field_constructor =
+                                             new BTFieldConstructor(recon_mods);
+    }
 }
 
 void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {

@@ -40,7 +40,7 @@ namespace MAUS {
  *  OutputCppRoot writes the data structure out as a ROOT tree
  */
 
-class OutputCppRoot : public OutputBase<std::string> {
+class OutputCppRoot : public OutputBase {
  public:
   /** OutputCppRoot constructor - initialise to NULL
    */
@@ -92,24 +92,26 @@ class OutputCppRoot : public OutputBase<std::string> {
    *  put one Event type per TTree in MAUS, open() required to change the name
    *  of _outfile).
    */
-  template <class ConverterT, class DataT>
-  bool write_event(MAUSEvent<DataT>* data_cpp,
-                   const Json::Value& data_json,
-                   std::string branch_name);
-
-  event_type get_event_type(const Json::Value& data_json);
+  template <class TEMP>
+  bool write_event(PyObject* py_data);
 
   std::string file_name(int run_number);
 
   std::string dir_name(int run_number);
 
+  std::string get_branch_name(Data* data_cpp) {return "data";}
+  std::string get_branch_name(JobHeaderData* data_cpp) {return "job_header";}
+  std::string get_branch_name(RunHeaderData* data_cpp) {return "run_header";}
+  std::string get_branch_name(JobFooterData* data_cpp) {return "job_footer";}
+  std::string get_branch_name(RunFooterData* data_cpp) {return "run_footer";}
+
   template <class DataT>
-  void check_file_exists(DataT data_cpp);
+  void check_file_exists(DataT* data_cpp);
 
   template <class DataT>
   int run_number(DataT* data_cpp);
 
-  bool _save(std::string json_document);
+  bool _save(PyObject* data);
 
   orstream* _outfile;
 

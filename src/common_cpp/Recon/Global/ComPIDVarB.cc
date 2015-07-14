@@ -113,7 +113,6 @@ namespace global {
       return std::make_pair((TOF2_t - TOF1_t), (total_ADC_charge_product));
     }
   }
-
 }
 }
 }

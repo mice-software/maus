@@ -23,30 +23,33 @@
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 
 namespace MAUS {
+  OutputBase::OutputBase(const std::string& s) : ModuleBase(s) {}
 
+  OutputBase::OutputBase(const OutputBase& ob) : ModuleBase(ob._classname) {}
 
-  template <typename T>
-  OutputBase<T>::OutputBase(const std::string& s) : IOutput<T>(), ModuleBase(s) {}
+  OutputBase::~OutputBase() {}
 
-  template <typename T>
-  OutputBase<T>::OutputBase(const OutputBase& ob) : IOutput<T>(), ModuleBase(ob._classname) {}
-
-  template <typename T>
-  OutputBase<T>::~OutputBase() {}
-
-  template <typename T>
-  bool OutputBase<T>::save(T t) {
+  PyObject* OutputBase::save_pyobj(PyObject* data_in) {
     bool ret = false;
     try {
-      ret = _save(t);
+      ret = _save(data_in);
     }
     catch (std::exception& e) {
+      std::cerr << e.what() << std::endl;
       CppErrorHandler::getInstance()->HandleStdExcNoJson(e, _classname);
     }
     catch (...) {
       throw UnhandledException(_classname);
     }
-    return ret;
+    if (ret) {
+        PyObject* py_true_ = reinterpret_cast<PyObject*>(Py_True);
+        Py_INCREF(py_true_);
+        return py_true_;
+    } else {
+        PyObject* py_false_ = reinterpret_cast<PyObject*>(Py_False);
+        Py_INCREF(py_false_);
+        return py_false_;
+    }
   }
 
 }// end of namespace

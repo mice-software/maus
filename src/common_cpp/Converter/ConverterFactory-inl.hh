@@ -20,17 +20,18 @@
 
 #include "Utils/Exception.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/PrimitiveConverters.hh"
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersData.hh"
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersJobHeader.hh"
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersJobFooter.hh"
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersRunHeader.hh"
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersRunFooter.hh"
 
 namespace Json {
   class Value;
 }
 
 namespace MAUS {
-  class Spill;
-
   // Template implementation
   // /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
   template <typename INPUT, typename OUTPUT>
@@ -64,6 +65,30 @@ namespace MAUS {
   }
 
   template <>
+  inline IConverter<std::string, JobHeaderData>*
+  ConverterFactory::getConverter<std::string, JobHeaderData>() const {
+    return new StringJobHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<std::string, JobFooterData>*
+  ConverterFactory::getConverter<std::string, JobFooterData>() const {
+    return new StringJobFooterConverter();
+  }
+
+  template <>
+  inline IConverter<std::string, RunHeaderData>*
+  ConverterFactory::getConverter<std::string, RunHeaderData>() const {
+    return new StringRunHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<std::string, RunFooterData>*
+  ConverterFactory::getConverter<std::string, RunFooterData>() const {
+    return new StringRunFooterConverter();
+  }
+
+  template <>
   inline IConverter<std::string, PyObject>*
   ConverterFactory::getConverter<std::string, PyObject>() const {
     return new StringPyDictConverter();
@@ -86,6 +111,30 @@ namespace MAUS {
   inline IConverter<Json::Value, Data>*
   ConverterFactory::getConverter<Json::Value, Data>() const {
     return new JsonCppSpillConverter();
+  }
+
+  template <>
+  inline IConverter<Json::Value, JobHeaderData>*
+  ConverterFactory::getConverter<Json::Value, JobHeaderData>() const {
+    return new JsonCppJobHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<Json::Value, JobFooterData>*
+  ConverterFactory::getConverter<Json::Value, JobFooterData>() const {
+    return new JsonCppJobFooterConverter();
+  }
+
+  template <>
+  inline IConverter<Json::Value, RunHeaderData>*
+  ConverterFactory::getConverter<Json::Value, RunHeaderData>() const {
+    return new JsonCppRunHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<Json::Value, RunFooterData>*
+  ConverterFactory::getConverter<Json::Value, RunFooterData>() const {
+    return new JsonCppRunFooterConverter();
   }
 
   template <>
@@ -125,6 +174,106 @@ namespace MAUS {
     return new DataStringConverter();
   }
 
+  /// JobHeaderData
+  template <>
+  inline IConverter<JobHeaderData, Json::Value>*
+  ConverterFactory::getConverter<JobHeaderData, Json::Value>() const {
+    return new CppJsonJobHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<JobHeaderData, JobHeaderData>*
+  ConverterFactory::getConverter<JobHeaderData, JobHeaderData>() const {
+    return new JobHeaderJobHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<JobHeaderData, PyObject>*
+  ConverterFactory::getConverter<JobHeaderData, PyObject>() const {
+    return new JobHeaderPyDictConverter();
+  }
+
+  template <>
+  inline IConverter<JobHeaderData, std::string>*
+  ConverterFactory::getConverter<JobHeaderData, std::string>() const {
+    return new JobHeaderStringConverter();
+  }
+
+  /// JobFooterData
+  template <>
+  inline IConverter<JobFooterData, Json::Value>*
+  ConverterFactory::getConverter<JobFooterData, Json::Value>() const {
+    return new CppJsonJobFooterConverter();
+  }
+
+  template <>
+  inline IConverter<JobFooterData, JobFooterData>*
+  ConverterFactory::getConverter<JobFooterData, JobFooterData>() const {
+    return new JobFooterJobFooterConverter();
+  }
+
+  template <>
+  inline IConverter<JobFooterData, PyObject>*
+  ConverterFactory::getConverter<JobFooterData, PyObject>() const {
+    return new JobFooterPyDictConverter();
+  }
+
+  template <>
+  inline IConverter<JobFooterData, std::string>*
+  ConverterFactory::getConverter<JobFooterData, std::string>() const {
+    return new JobFooterStringConverter();
+  }
+
+  /// RunHeaderData
+  template <>
+  inline IConverter<RunHeaderData, Json::Value>*
+  ConverterFactory::getConverter<RunHeaderData, Json::Value>() const {
+    return new CppJsonRunHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<RunHeaderData, RunHeaderData>*
+  ConverterFactory::getConverter<RunHeaderData, RunHeaderData>() const {
+    return new RunHeaderRunHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<RunHeaderData, PyObject>*
+  ConverterFactory::getConverter<RunHeaderData, PyObject>() const {
+    return new RunHeaderPyDictConverter();
+  }
+
+  template <>
+  inline IConverter<RunHeaderData, std::string>*
+  ConverterFactory::getConverter<RunHeaderData, std::string>() const {
+    return new RunHeaderStringConverter();
+  }
+
+  /// RunFooterData
+  template <>
+  inline IConverter<RunFooterData, Json::Value>*
+  ConverterFactory::getConverter<RunFooterData, Json::Value>() const {
+    return new CppJsonRunFooterConverter();
+  }
+
+  template <>
+  inline IConverter<RunFooterData, RunFooterData>*
+  ConverterFactory::getConverter<RunFooterData, RunFooterData>() const {
+    return new RunFooterRunFooterConverter();
+  }
+
+  template <>
+  inline IConverter<RunFooterData, PyObject>*
+  ConverterFactory::getConverter<RunFooterData, PyObject>() const {
+    return new RunFooterPyDictConverter();
+  }
+
+  template <>
+  inline IConverter<RunFooterData, std::string>*
+  ConverterFactory::getConverter<RunFooterData, std::string>() const {
+    return new RunFooterStringConverter();
+  }
+
   /// PyDICT to X
   template <>
   inline IConverter<PyObject, Json::Value>*
@@ -139,6 +288,30 @@ namespace MAUS {
   }
 
   template <>
+  inline IConverter<PyObject, JobHeaderData>*
+  ConverterFactory::getConverter<PyObject, JobHeaderData>() const {
+    return new PyDictJobHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<PyObject, JobFooterData>*
+  ConverterFactory::getConverter<PyObject, JobFooterData>() const {
+    return new PyDictJobFooterConverter();
+  }
+
+  template <>
+  inline IConverter<PyObject, RunHeaderData>*
+  ConverterFactory::getConverter<PyObject, RunHeaderData>() const {
+    return new PyDictRunHeaderConverter();
+  }
+
+  template <>
+  inline IConverter<PyObject, RunFooterData>*
+  ConverterFactory::getConverter<PyObject, RunFooterData>() const {
+    return new PyDictRunFooterConverter();
+  }
+
+  template <>
   inline IConverter<PyObject, PyObject>*
   ConverterFactory::getConverter<PyObject, PyObject>() const {
     return new PyDictPyDictConverter();
@@ -148,6 +321,12 @@ namespace MAUS {
   inline IConverter<PyObject, std::string>*
   ConverterFactory::getConverter<PyObject, std::string>() const {
     return new PyDictStringConverter();
+  }
+
+  // DEFAULT - just throw an exception
+  template <typename INPUT, typename OUTPUT>
+  IConverter<INPUT, OUTPUT>* ConverterFactory::getConverter() const {
+    return new DisallowedConverter<INPUT, OUTPUT>();
   }
 } // end of namespace
 

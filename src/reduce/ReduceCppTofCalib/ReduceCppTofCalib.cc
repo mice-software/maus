@@ -124,8 +124,8 @@ void ReduceCppTofCalib::processSpill() {
           slabA = tslb;
           adc0 = ch0;
           adc1 = ch1;
-          t0 = rt0;
-          t1 = rt1;
+          t0 = rt0*1000;
+          t1 = rt1*1000;
         } else if (tpln == 1) {
           slabB = tslb;
           adc2 = ch0;
@@ -147,8 +147,8 @@ void ReduceCppTofCalib::processSpill() {
             slabC = tslb;
             adc4 = ch0;
             adc5 = ch1;
-            t4 = rt0;
-            t5 = rt1;
+            t4 = rt0*1000;
+            t5 = rt1*1000;
           } else if (tpln == 1) {
             slabD = tslb;
             adc6 = ch0;
@@ -171,8 +171,8 @@ void ReduceCppTofCalib::processSpill() {
             slabE = tslb;
             adc8 = ch0;
             adc9 = ch1;
-            t8 = rt0;
-            t9 = rt1;
+            t8 = rt0*1000;
+            t9 = rt1*1000;
           } else if (tpln == 1) {
             slabF = tslb;
             adc10 = ch0;

@@ -25,6 +25,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "TLorentzVector.h"
 #include "TH1.h"
@@ -65,7 +66,7 @@ namespace global {
     /// KL track points from global track
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
     kl_track_points;
-    
+
     /// Name of PID variable
     static const std::string VARIABLE;
     /// Number of bins in PDF

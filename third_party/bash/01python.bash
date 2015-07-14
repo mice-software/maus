@@ -4,6 +4,24 @@ directory=Python-${version}
 filename=${directory}.tgz
 url=http://www.python.org/ftp/python/${version}/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -60,7 +78,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
         echo "INFO: Making:"
         sleep 1
-        make
+        make -j$MAUS_NUM_THREADS
         echo "INFO: Installing within MAUS's third party directory:"
         if [ `uname -s` == "Darwin" ]; then
           make frameworkinstallstructure \

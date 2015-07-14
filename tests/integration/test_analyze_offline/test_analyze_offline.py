@@ -17,6 +17,7 @@
 Tests for the offline analysis exe
 """
 
+import sys
 import os
 import subprocess
 import unittest
@@ -40,7 +41,12 @@ class AnalyzeOfflineTest(unittest.TestCase): # pylint: disable = R0904
             os.remove(OUT_PATH)
         except OSError:
             pass
-        subproc = subprocess.Popen([ANA_PATH, "-output_root_file_name",
+        if "valgrind" in sys.argv:
+            valgrind = ['valgrind', '--leak-check=yes',]
+        else:
+            valgrind = []
+        subproc = subprocess.Popen(valgrind+['python', ANA_PATH,
+                                    "--output_root_file_name",
                                     OUT_PATH+".root"])
         subproc.wait()
         self.assertEqual(subproc.returncode, 0)

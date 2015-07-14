@@ -44,6 +44,7 @@ output_root_file_name = "maus_output.root"
 # (Note present version emits selected spills for all input run numbers)
 # e.g. selected_spills = [ 2, 34, 432, 3464 ]
 selected_spills = []
+data_maximum_reference_count = 100
 
 # one_big_file - puts everything in output_root_file_name
 # one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like
@@ -98,7 +99,8 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Test.dat" # geometry used by simulation - default is a liquid Hydrogen box
+# simulation_geometry_filename = "Stage4.dat" # geometry used by simulation - should be replaced by CDB version
+simulation_geometry_filename = "Test.dat" # geometry used by simulation - should be replaced by CDB version
 simulation_geometry_debug    = False
 check_volume_overlaps = False
 maximum_number_of_steps = 50000000 # particles are killed after this number of
@@ -251,6 +253,10 @@ reconstruction_geometry_filename = ""
 
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
+SciFiDigitizationNPECut = 1.0
+SciFiMappingFileName = "scifi_mapping_2015-06-18.txt"
+SciFiCalibrationFileName = "scifi_calibration_2015-06-18.txt"
+SciFiBadChannelsFileName = "scifi_bad_channels_2015-06-18.txt"
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1
@@ -291,35 +297,44 @@ SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160.
 SciFiParams_RMS = 370.
 # Parameters used for MCS and E loss correction
-SciFiParams_Z = 5.61291
+#SciFiParams_Z = 5.61291
+#SciFiParams_A = 104.15 # g/mol
+SciFiParams_Z = 3.5
+SciFiParams_A = 6.5
 SciFiParams_Plane_Width = 0.6523 # mm
 SciFiParams_Radiation_Length = 413.124 # mm
 SciFiParams_Density = 1.06 #g/cm3, 0.00106 g/mm3
 SciFiParams_Mean_Excitation_Energy = 68.7 # eV
 SciFiParams_Density_Correction = 0.164541
-SciFiParams_A = 104.15 # g/mol
-MylarParams_Z = 5.
+#MylarParams_Z = 5.
+#MylarParams_A = 192.2 # g/mol
+MylarParams_Z = 8.727
+MylarParams_A = 4.545 # g/mol
 MylarParams_Plane_Width = 0.025# mm
 MylarParams_Radiation_Length = 285.364  # mm
 MylarParams_Density = 1.4 #g/cm3, 0.0014 g/mm3
 MylarParams_Mean_Excitation_Energy = 78.7 # eV
 MylarParams_Density_Correction = 0.126782
-MylarParams_A = 192.2 # g/mol
 GasParams_Z = 2.
+GasParams_A = 4. # g/mol
 GasParams_Radiation_Length = 5671130. # mm
 GasParams_Density = 0.000166322 # 1.66322e-04 g/cm3
 GasParams_Mean_Excitation_Energy = 41.8 # eV
 GasParams_Density_Correction  = 0.13443
-GasParams_A = 4. # g/mol
-SciFiSeedCovariance = 1000 # Error estimate for Seed values of the Kalman Fit
+SciFiSeedCovariance = 1000.0 # Error estimate for Seed values of the Kalman Fit
+SciFiSeedPatRec = True
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
+SciFiKalmanCorrectPz = True # Flag to turn on the Kalman Pz correlations
+SciFiPatRecOn = True # Flag to turn on the tracker Pattern Recognition
 SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
 SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
 SciFiKalmanVerbose  = False # Dump information per fitted track
+SciFiDefaultMomentum = 200.0 # Default momentum to assume for straight tracks
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
 cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
+cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for cooling channel configuration database downloads.
 
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
@@ -328,8 +343,11 @@ geometry_download_by = 'id' # choose 'run_number' to download by run number, 'cu
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
+geometry_download_beamline_for_run = 0
+geometry_download_beamline_tag = ''
+geometry_download_coolingchannel_tag = ''
 geometry_download_run_number = 0
-geometry_download_id = 3
+geometry_download_id = 49
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 
@@ -402,8 +420,8 @@ Do_V1731_Zero_Suppression = False
 V1731_Zero_Suppression_Threshold = 100
 Do_V1724_Zero_Suppression = True
 V1724_Zero_Suppression_Threshold = 100
-Do_VLSB_Zero_Suppression = False
-VLSB_Zero_Suppression_Threshold = 60
+Do_VLSB_Zero_Suppression = True
+VLSB_Zero_Suppression_Threshold = 40
 Do_VLSB_C_Zero_Suppression = False
 VLSB_C_Zero_Suppression_Threshold = 30
 Enable_TOF = True
@@ -411,7 +429,8 @@ Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
-DAQ_hostname = 'miceraid1a'
+DAQ_cabling_file_StepI = "/files/cabling/DAQChannelMap_preRun6541.txt"
+DAQ_hostname = 'miceraid5'
 DAQ_monitor_name = 'MICE_Online_Monitor'
 daq_online_file = '' # set to a file name to force InputCppDAQOnlineData to take
                      # data from a file - mock-up of online for testing, not for
@@ -535,11 +554,11 @@ TOF_makeSpacePointCut = 0.5 # nanosecond
 # get calibrations by either a) run_number or b) date
 # default is by run_number
 # if set to "date" then set the appropriate TOF_calib_date_from flag below
-TOF_calib_by = "date"
+TOF_calib_by = "run_number"
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
-TOF_calib_date_from = '2013-10-01 00:00:00'
+TOF_calib_date_from = 'current'
 TOF_cabling_date_from = 'current'
 
 Enable_timeWalk_correction = True

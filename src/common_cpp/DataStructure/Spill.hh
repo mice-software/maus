@@ -26,6 +26,7 @@
 #include "DataStructure/Scalars.hh"
 #include "DataStructure/MCEvent.hh"
 #include "DataStructure/ReconEvent.hh"
+#include "DataStructure/EMRSpillData.hh"
 #include "DataStructure/TestBranch.hh"
 
 namespace MAUS {
@@ -121,6 +122,18 @@ class Spill {
     return _recon->size();
   }
 
+  /** Set the EMR Spill Data
+   *
+   *  Spill takes ownership of the memory assigned to EMRSpillData
+   */
+  void SetEMRSpillData(EMRSpillData* emr);
+
+  /** Get the EMR Spill Data
+   *
+   *  Spill keeps ownership of this memory
+   */
+  EMRSpillData* GetEMRSpillData() const;
+
   /** Set the spill number */
   void SetSpillNumber(int spill);
 
@@ -157,6 +170,7 @@ class Spill {
   Scalars* _scalars;
   MCEventPArray* _mc;
   ReconEventPArray* _recon;
+  EMRSpillData* _emr;
   int _spill_number;
   int _run_number;
   std::string _daq_event_type;

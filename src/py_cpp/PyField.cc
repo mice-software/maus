@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <sstream>
 
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 
@@ -60,9 +61,48 @@ PyObject* GetFieldValue(PyObject *dummy, PyObject *args) {
   return py_field;
 }
 
+std::string Str_DocString =
+  std::string("str(is_mc)\n\n")+
+  std::string("Get a string describing the fields in MAUS.\n\n")+
+  std::string("- is_mc: set to True to print the MC fields; set to False to\n")+
+  std::string("         to print the Recon fields\n")+
+  std::string("Returns a multiline string, each line describing the\n")+
+  std::string("position, rotation, scale factor and field.\n");
+
+PyObject* Str(PyObject *dummy, PyObject *args) {
+  PyObject* py_is_mc;
+  if (!PyArg_ParseTuple(args, "O", &py_is_mc)) {
+        PyErr_SetString(PyExc_TypeError,
+               "Failed to interpret str arguments as bool");
+        return NULL;
+  }
+  int is_mc = PyObject_IsTrue(py_is_mc);
+
+  try {
+    BTFieldConstructor* maus_field = NULL;
+    if (is_mc)
+        maus_field = Globals::GetInstance()->GetMCFieldConstructor();
+    else
+        maus_field = Globals::GetInstance()->GetReconFieldConstructor();
+    if (maus_field == NULL) {
+      PyErr_SetString(PyExc_RuntimeError,
+            "Error - somehow MAUS library was initialised but fields are not.");
+      return NULL;
+    }
+    std::stringstream str_out;
+    maus_field->Print(str_out);
+    PyObject* py_str = PyString_FromString(str_out.str().c_str());
+    return py_str;
+  } catch (std::exception& exc) {
+    PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
+    return NULL;
+  }
+}
+
 static PyMethodDef methods[] = {
+{"str", (PyCFunction)Str, METH_VARARGS, Str_DocString.c_str()},
 {"get_field_value", (PyCFunction)GetFieldValue,
-                         METH_VARARGS, GetFieldValue_DocString.c_str()},
+                          METH_VARARGS, GetFieldValue_DocString.c_str()},
 {NULL, NULL, 0, NULL}
 };
 

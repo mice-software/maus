@@ -28,6 +28,9 @@
 // C++ headers
 #include <vector>
 
+// ROOT headers
+#include "TMatrixD.h"
+
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
@@ -46,7 +49,8 @@ namespace LeastSquaresFitter {
     *
     */
   void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
-                  const std::vector<double> &_y_err, MAUS::SimpleLine &line);
+                  const std::vector<double> &_y_err, MAUS::SimpleLine &line,
+                  TMatrixD& covariance);
 
   /** @brief Fit a circle to spacepoints in x-y projection
     *
@@ -61,7 +65,8 @@ namespace LeastSquaresFitter {
     *
     */
   bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
-                  const std::vector<MAUS::SciFiSpacePoint*> &spnts, MAUS::SimpleCircle &circle);
+                  const std::vector<MAUS::SciFiSpacePoint*> &spnts, MAUS::SimpleCircle &circle,
+                  TMatrixD& covariance);
 
 } // ~namespace LeastSquaresFitter
 

@@ -5,3 +5,15 @@ So PyMyCode.hh and PyMyCode.cc will be built into a shared object like
 mycode.so, and it is assumed that these codes will have a python import function
 somewhere inside, like initmycode(). See the existing examples.
 
+When you do, inside python,
+
+import mycode
+
+Python looks for  a file like mycode.py (python) or mycode.so (C++). If it finds 
+mycode.so it looks for a symbol called initmycode() that will instantiate the 
+module. It is an ImportError exception if Python fails to do this.
+
+The build scripts are set up to build the classes here and make files like
+mycode.so, but it is up to the developer to make sure that the initmycode 
+function exists.
+

@@ -54,6 +54,8 @@ def run():
     my_map.append(MAUS.MapPyCkov())
     my_map.append(MAUS.MapCppKLDigits())
     my_map.append(MAUS.MapCppKLCellHits())
+    my_map.append(MAUS.MapCppTrackerDigits())
+    my_map.append(MAUS.MapCppTrackerRecon())
     #my_map.append(MAUS.MapCppSingleStationRecon())
     # Histogram reducer.
     reducer = MAUS.ReducePyDoNothing()

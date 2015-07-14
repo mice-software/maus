@@ -19,13 +19,13 @@
 namespace MAUS {
 
 Spill::Spill()
-        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
+        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL), _emr(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
 }
 
 Spill::Spill(const Spill& md)
-        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL),
+        : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL), _emr(NULL),
           _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
           _test(NULL) {
   *this = md;
@@ -35,6 +35,7 @@ Spill& Spill::operator=(const Spill& md) {
     if (this == &md) {
         return *this;
     }
+
     if (_daq != NULL) {
         delete _daq;
     }
@@ -81,6 +82,15 @@ Spill& Spill::operator=(const Spill& md) {
             _recon->at(i) = new ReconEvent(*_recon->at(i));
     }
 
+    if (_emr != NULL) {
+        delete _emr;
+    }
+    if (md._emr == NULL) {
+        _emr = NULL;
+    } else {
+        _emr = new EMRSpillData(*md._emr);
+    }
+
     _daq_event_type = md._daq_event_type;
     _spill_number = md._spill_number;
     _run_number = md._run_number;
@@ -112,6 +122,9 @@ Spill::~Spill() {
             delete (*_recon)[i];
         }
         delete _recon;
+    }
+    if (_emr != NULL) {
+        delete _emr;
     }
     if (_test != NULL) {
         delete _test;
@@ -152,6 +165,17 @@ void Spill::SetReconEvents(ReconEventPArray* recon) {
 
 ReconEventPArray* Spill::GetReconEvents() const {
   return _recon;
+}
+
+void Spill::SetEMRSpillData(EMRSpillData* emr) {
+  if (_emr != NULL && emr != _emr) {
+      delete _emr;
+  }
+  _emr = emr;
+}
+
+EMRSpillData* Spill::GetEMRSpillData() const {
+  return _emr;
 }
 
 void Spill::SetDAQData(DAQData *daq) {

@@ -61,7 +61,7 @@ namespace global {
 
     /// (Primary) range of particle in EMR
     double EMR_range;
-    
+
     /// Name of PID variable
     static const std::string VARIABLE;
     /// Number of bins in PDF

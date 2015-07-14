@@ -6,6 +6,23 @@ directory=libxslt-${version}
 filename=${directory}.tar.gz
 url=http://xmlsoft.org/sources/${filename}
 
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
@@ -45,14 +62,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Making:"
 	echo
         sleep 1
-        make
+        make -j$MAUS_NUM_THREADS
 	make install
         # workaround for bug in libxml2; that there is a libxslt.so and a libxslt.py
         # and python gets confused... rm the libxslt library, then import to build the
         # .pyc file, then add the xslt library again
         rm ${MAUS_ROOT_DIR}/third_party/install/lib/libxslt.so
         python -m libxslt
-        ln -s ${MAUS_ROOT_DIR}/third_party/install/lib/libslt.so.${version} ${MAUS_ROOT_DIR}/third_party/install/lib/lixslt.so
+        cd ${MAUS_ROOT_DIR}/third_party/install/lib/
+        ln -s libxslt.so.${version} libxslt.so
+        cd -
 
 	            ################################################## 
 	echo

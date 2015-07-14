@@ -34,7 +34,7 @@ namespace global {
 		      "Recon::Global::TrackMatching"));
     }
 
-    
+
     MAUS::DataStructure::Global::TrackPArray *ImportedTracks = global_event->get_tracks();
     MAUS::DataStructure::Global::TrackPArray::iterator ImportedTrackIterator;
     MAUS::DataStructure::Global::Track* ImportedSciFiTrack =
@@ -208,8 +208,7 @@ namespace global {
 	MAUS::DataStructure::Global::Track* GlobalTrack = KLTrack->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
 	global_event->add_track_recursive(GlobalTrack);
-      }
-      else if (KLTrack == NULL && EMRTrack != NULL) {
+      } else if (KLTrack == NULL && EMRTrack != NULL) {
 	MAUS::DataStructure::Global::Track* GlobalTrack = EMRTrack->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
 	GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());

@@ -63,6 +63,20 @@ std::string("  - modules (MiceModule) the new geometry object.\n")+
 std::string("Returns None. Throws an exception if globals have not been\n")+
 std::string("initialised.");
 
+std::string GetReconstructionMiceModules_DocString =
+std::string("Get the geometry used for the reconstruction.\n\n")+
+std::string("  Ignores all arguments.\n")+
+std::string("Return a deepcopy of the reconstruction geometry as a MiceModule\n")+
+std::string("object. Note that the actual geometry will only be updated by a\n")+
+std::string("call to set_reconstruction_mice_modules(...)\n")+
+std::string("Throws an exception if globals have not been initialised.");
+
+std::string SetReconstructionMiceModules_DocString =
+std::string("Set the reconstruction geometry and fields.\n\n")+
+std::string("  - modules (MiceModule) the new geometry object.\n")+
+std::string("Returns None. Throws an exception if globals have not been\n")+
+std::string("initialised.");
+
 std::string GetVersionNumber_DocString =
 std::string("Return the MAUS version number as a string like x.y.z.\n\n")+
 std::string("Return the MAUS version number as a string like x.y.z where\n")+
@@ -82,6 +96,10 @@ static PyMethodDef methods[] = {
     METH_VARARGS|METH_KEYWORDS, GetMonteCarloMiceModules_DocString.c_str()},
 {"set_monte_carlo_mice_modules", (PyCFunction)SetMonteCarloMiceModules,
     METH_VARARGS|METH_KEYWORDS, SetMonteCarloMiceModules_DocString.c_str()},
+{"get_reconstruction_mice_modules", (PyCFunction)GetReconstructionMiceModules,
+    METH_VARARGS|METH_KEYWORDS, GetReconstructionMiceModules_DocString.c_str()},
+{"set_reconstruction_mice_modules", (PyCFunction)SetReconstructionMiceModules,
+    METH_VARARGS|METH_KEYWORDS, SetReconstructionMiceModules_DocString.c_str()},
 {"get_version_number", (PyCFunction)GetVersionNumber,
     METH_VARARGS, GetVersionNumber_DocString.c_str()},
     {NULL, NULL, 0, NULL}
@@ -205,6 +223,57 @@ PyObject* SetMonteCarloMiceModules
     }
     try {
         GlobalsManager::SetMonteCarloMiceModules(mod);
+    } catch (std::exception& exc) {
+        std::string message = std::string("Failed to set MiceModules\n")+
+                              std::string((&exc)->what());
+        PyErr_SetString(PyExc_ValueError, message.c_str());
+        return NULL;
+    }
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+PyObject* GetReconstructionMiceModules
+                             (PyObject* dummy, PyObject* args, PyObject *kwds) {
+    if (!Globals::HasInstance()) {
+        PyErr_SetString(PyExc_RuntimeError,
+                  "Attempt to get recon mice modules but globals not birthed");
+        return NULL;
+    }
+    PyObject* py_mod = MAUS::PyMiceModule::create_empty_module();
+    if (py_mod == NULL) {
+        return NULL;
+    }
+    MiceModule* mod_orig = Globals::GetReconstructionMiceModules();
+    MiceModule* mod = mod_orig->deepCopy(*mod_orig, false);
+    int success = PyMiceModule::set_mice_module(py_mod, mod);
+    if (success == 0) {
+        delete mod;
+        return NULL;
+    }
+    return py_mod;
+}
+
+PyObject* SetReconstructionMiceModules
+                             (PyObject* self, PyObject* args, PyObject *kwds) {
+    if (!Globals::HasInstance()) {
+        PyErr_SetString(PyExc_RuntimeError,
+                  "Attempt to set recon mice modules but globals not birthed");
+        return NULL;
+    }
+    PyObject* py_mod = NULL;
+    static char *kwlist[] = {const_cast<char*>("module"), NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &py_mod)) {
+        return NULL;
+    }
+
+    MiceModule* mod = MiceModule::deepCopy
+                               (*PyMiceModule::get_mice_module(py_mod), false);
+    if (mod == NULL) {
+        return NULL;
+    }
+    try {
+        GlobalsManager::SetReconstructionMiceModules(mod);
     } catch (std::exception& exc) {
         std::string message = std::string("Failed to set MiceModules\n")+
                               std::string((&exc)->what());

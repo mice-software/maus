@@ -45,7 +45,8 @@ namespace global {
     /// Constructor to create a PDF
     explicit ComPIDVarE(std::string hypothesis, std::string unique_identifier);
     /// Constructor to use a PDF to perform PID analysis
-    ComPIDVarE(TFile* file, std::string hypothesis, int XminComE, int XmaxComE, int YminComE, int YmaxComE);
+    ComPIDVarE(TFile* file, std::string hypothesis, int XminComE,
+	       int XmaxComE, int YminComE, int YmaxComE);
     /// Destructor
     ~ComPIDVarE();
 

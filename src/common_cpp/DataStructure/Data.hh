@@ -88,11 +88,15 @@ class Data : public MAUSEvent<Spill> {
      */
     void SetEvent(Spill* spill) {SetSpill(spill);}
 
-    std::string getRecordName() const {return name_;}
+    std::string getRecordName() const {return std::string("data");}
 
-  protected:
+    static int GetReferenceCount() {return _reference_count;}
 
-    std::string name_;
+    static void SetMaxReferenceCount(int max_ref_count) {
+        _max_reference_count = max_ref_count;
+    }
+
+    static int GetMaxReferenceCount() {return _max_reference_count;}
 
   private:
     // Count number of references to data and make a stack trace at construction
@@ -100,9 +104,9 @@ class Data : public MAUSEvent<Spill> {
     void IncreaseRefCount();
     void DecreaseRefCount();
     static int _reference_count;
+    static int _max_reference_count;
     Spill* _spill;
     std::string _event_type;
-
     MAUS_VERSIONED_CLASS_DEF(Data)
 };
 }

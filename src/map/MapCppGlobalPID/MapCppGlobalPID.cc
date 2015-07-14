@@ -152,8 +152,7 @@ namespace MAUS {
 							       _XminF, _XmaxF,
 							       _YminF, _YmaxF));
 	}
-      }
-      else if (_pid_mode == "custom") {
+      } else if (_pid_mode == "custom") {
 	std::istringstream ss(_custom_pid_set);
 	std::string token;
 	std::vector<std::string> input_pid_vars;
@@ -166,35 +165,35 @@ namespace MAUS {
 	} else {
 	  for (unsigned int i =0; i < _hypotheses.size(); ++i) {
 	    // vector of pid vars
-	    if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 			 "PIDVarA") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
 								   _hypotheses[i],
 								   _minA, _maxA));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"PIDVarB") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
 								   _hypotheses[i],
 								   _XminB, _XmaxB,
 								   _YminB, _YmaxB));
 	      std::cerr << "selected PIDVarB" << std::endl;
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"PIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
 								   _hypotheses[i],
 								   _XminC, _XmaxC,
 								   _YminC, _YmaxC));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"PIDVarD") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarD(_histFile,
 								   _hypotheses[i],
 								   _minD, _maxD));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"PIDVarE") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarE(_histFile,
 								   _hypotheses[i],
 								   _minE, _maxE));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"PIDVarF") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarF(_histFile,
 								   _hypotheses[i],
@@ -245,8 +244,7 @@ namespace MAUS {
 							       _XminComE, _XmaxComE,
 							       _YminComE, _YmaxComE));
 	}
-      }
-      else if (_pid_mode == "custom") {
+      } else if (_pid_mode == "custom") {
 	std::istringstream ss(_custom_pid_set);
 	std::string token;
 	std::vector<std::string> input_pid_vars;
@@ -259,28 +257,28 @@ namespace MAUS {
 	} else {
 	  for (unsigned int i =0; i < _hypotheses.size(); ++i) {
 	    // vector of pid vars
-	    if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 			 "ComPIDVarA") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_histFile,
 								      _hypotheses[i],
 								      _minComA, _maxComA));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarB") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_histFile,
 								      _hypotheses[i],
 								      _XminComB, _XmaxComB,
 								      _YminComB, _YmaxComB));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_histFile,
 								      _hypotheses[i],
 								      _minComC, _maxComC));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarD") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_histFile,
 								      _hypotheses[i],
 								      _minComD, _maxComD));
-	    } else if(std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarE") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_histFile,
 								      _hypotheses[i],
@@ -337,7 +335,7 @@ namespace MAUS {
 	      GlobalTrackArray->at(track_i);
 	    if (track->get_mapper_name() == "MapCppGlobalTrackMatching-US" ||
 		track->get_mapper_name() == "MapCppGlobalTrackMatching-DS") {
-	      //int recon_track_pid = track->get_pid();
+	      // int recon_track_pid = track->get_pid();
 	      MAUS::DataStructure::Global::Track* pidtrack = track->Clone();
 	      global_event->add_track_recursive(pidtrack);
 	      pidtrack->set_mapper_name("MapCppGlobalPID-Candidate");
@@ -410,22 +408,25 @@ namespace MAUS {
 		logL_200MeV_mu_plus = 2;
 		logL_200MeV_pi_plus = 2;
 		logL_200MeV_e_plus = 2;
-	      }	      
-	      //make pid_ll_values
-	      MAUS::DataStructure::Global::PIDLogLPair mu_plus_LL(-13,logL_200MeV_mu_plus);
-	      MAUS::DataStructure::Global::PIDLogLPair e_plus_LL(-11,logL_200MeV_e_plus);
-	      MAUS::DataStructure::Global::PIDLogLPair pi_plus_LL(-211,logL_200MeV_pi_plus);
+	      }
+	      // make pid_ll_values
+	      MAUS::DataStructure::Global::PIDLogLPair mu_plus_LL(-13, logL_200MeV_mu_plus);
+	      MAUS::DataStructure::Global::PIDLogLPair e_plus_LL(-11, logL_200MeV_e_plus);
+	      MAUS::DataStructure::Global::PIDLogLPair pi_plus_LL(-211, logL_200MeV_pi_plus);
 	      pidtrack->AddPIDLogLValues(mu_plus_LL);
 	      pidtrack->AddPIDLogLValues(pi_plus_LL);
 	      pidtrack->AddPIDLogLValues(e_plus_LL);
-	      std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_ll_values = pidtrack->get_pid_logL_values();
-	      for( std::vector<MAUS::DataStructure::Global::PIDLogLPair>::const_iterator i = pid_ll_values.begin(); i != pid_ll_values.end(); ++i) {
+	      std::vector<MAUS::DataStructure::Global::PIDLogLPair>
+		pid_ll_values = pidtrack->get_pid_logL_values();
+	      for (std::vector<MAUS::DataStructure::Global::PIDLogLPair>::const_iterator
+		     i = pid_ll_values.begin(); i != pid_ll_values.end(); ++i) {
 		std::cerr << i->first << "\t" << i->second << std::endl;
 	      }
 	      if (logL_200MeV_mu_plus < 0 || logL_200MeV_pi_plus < 0 ||
 		  logL_200MeV_e_plus < 0) {
-		//calculate CLs
-		double sum_exp_LLs = exp(logL_200MeV_mu_plus) + exp(logL_200MeV_e_plus) + exp(logL_200MeV_pi_plus);
+		// calculate CLs
+		double sum_exp_LLs = exp(logL_200MeV_mu_plus) +
+		  exp(logL_200MeV_e_plus) + exp(logL_200MeV_pi_plus);
 		std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;
 		double CL_mu_plus = ConfidenceLevel(logL_200MeV_mu_plus, sum_exp_LLs);
 		double CL_e_plus = ConfidenceLevel(logL_200MeV_e_plus, sum_exp_LLs);
@@ -433,7 +434,7 @@ namespace MAUS {
 		std::cerr << "CL_mu " << CL_mu_plus << std::endl;
 		std::cerr << "CL_e " << CL_e_plus << std::endl;
 		std::cerr << "CL_pi " << CL_pi_plus << std::endl;
-		//compare CLs and select winning hypothesis. set g.o.f. of track to CL
+		// compare CLs and select winning hypothesis. set g.o.f. of track to CL
 		if (CL_mu_plus - CL_e_plus > _pid_confidence_level &&
 		    CL_mu_plus - CL_pi_plus > _pid_confidence_level) {
 		  pidtrack->set_pid(MAUS::DataStructure::Global::kMuPlus);
@@ -474,8 +475,7 @@ namespace MAUS {
     }
   }
 
-  double MapCppGlobalPID::ConfidenceLevel(double LL_x, double sum_L) const
-  {
+  double MapCppGlobalPID::ConfidenceLevel(double LL_x, double sum_L) const {
     return (exp(LL_x)/sum_L)*100;
   }
 } // ~MAUS

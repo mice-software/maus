@@ -28,7 +28,7 @@ SciFiSpacePointRec::SciFiSpacePointRec() {}
 
 SciFiSpacePointRec::~SciFiSpacePointRec() {}
 
-void SciFiSpacePointRec::process(SciFiEvent &event) {
+void SciFiSpacePointRec::process(SciFiEvent &event) const {
   std::vector<SciFiCluster*> clusters[2][6][3];
 
   make_cluster_container(event, clusters);
@@ -39,7 +39,7 @@ void SciFiSpacePointRec::process(SciFiEvent &event) {
 }
 
 void SciFiSpacePointRec::make_cluster_container(SciFiEvent &evt,
-                                                std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
+                                           std::vector<SciFiCluster*> (&clusters)[2][6][3]) const {
   for ( size_t cl = 0; cl < evt.clusters().size(); ++cl ) {
     SciFiCluster* a_cluster = evt.clusters()[cl];
     int tracker = a_cluster->get_tracker();
@@ -50,7 +50,7 @@ void SciFiSpacePointRec::make_cluster_container(SciFiEvent &evt,
 }
 
 void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt,
-                                           std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
+                                           std::vector<SciFiCluster*> (&clusters)[2][6][3]) const {
   // For each tracker,
   for ( int Tracker = 0; Tracker < 2; Tracker++ ) {
     // For each station,
@@ -86,7 +86,7 @@ void SciFiSpacePointRec::look_for_triplets(SciFiEvent &evt,
 }
 
 void SciFiSpacePointRec::look_for_duplets(SciFiEvent &evt,
-                                          std::vector<SciFiCluster*> (&clusters)[2][6][3]) {
+                                          std::vector<SciFiCluster*> (&clusters)[2][6][3]) const {
   // Run over left-overs and make duplets without any selection criteria
   for ( int a_plane = 0; a_plane < 2; a_plane++ ) {
     for ( int another_plane = a_plane+1; another_plane < 3; another_plane++ ) {
@@ -122,7 +122,7 @@ void SciFiSpacePointRec::look_for_duplets(SciFiEvent &evt,
 }
 
 bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
-                                              SciFiCluster* candidate_B) {
+                                              SciFiCluster* candidate_B) const {
   ThreeVector pos = crossing_pos(candidate_A, candidate_B);
   double radius = pow(pow(pos.x(), 2.0)+pow(pos.y(), 2.0), 0.5);
   if ( radius < _acceptable_radius ) {
@@ -134,7 +134,7 @@ bool SciFiSpacePointRec::duplet_within_radius(SciFiCluster* candidate_A,
 
 bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                                       SciFiCluster* cluster2,
-                                      SciFiCluster* cluster3) {
+                                      SciFiCluster* cluster3) const {
   // The 3 clusters passed to the kuno_accepts function belong
   // to the same station, only the planes are different
   int tracker = cluster1->get_tracker();
@@ -150,9 +150,9 @@ bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
                   cluster2->get_channel() +
                   cluster3->get_channel();
 
-  if ( (tracker == 0 && station == 5 && (uvwSum < (_kuno_0_5+_kuno_toler))
-                                     && (uvwSum > (_kuno_0_5-_kuno_toler))) ||
-     (!(tracker == 0 && station == 5)&& (uvwSum < (_kuno_else+_kuno_toler))
+  if ( (tracker == 1 && station == 5 && (uvwSum < (_kuno_1_5+_kuno_toler))
+                                     && (uvwSum > (_kuno_1_5-_kuno_toler))) ||
+     (!(tracker == 1 && station == 5)&& (uvwSum < (_kuno_else+_kuno_toler))
                                      && (uvwSum > (_kuno_else-_kuno_toler))) ) {
     return true;
   } else {
@@ -161,7 +161,7 @@ bool SciFiSpacePointRec::kuno_accepts(SciFiCluster* cluster1,
 }
 
 bool SciFiSpacePointRec::clusters_are_not_used(SciFiCluster* candidate_A,
-                                               SciFiCluster* candidate_B) {
+                                               SciFiCluster* candidate_B) const {
   if ( candidate_A->is_used() || candidate_B->is_used() ) {
     return false;
   } else {
@@ -171,7 +171,7 @@ bool SciFiSpacePointRec::clusters_are_not_used(SciFiCluster* candidate_A,
 
 bool SciFiSpacePointRec::clusters_are_not_used(SciFiCluster* candidate_A,
                                                SciFiCluster* candidate_B,
-                                               SciFiCluster* candidate_C) {
+                                               SciFiCluster* candidate_C) const {
   if ( candidate_A->is_used() || candidate_B->is_used() || candidate_C->is_used() ) {
     return false;
   } else {
@@ -181,7 +181,7 @@ bool SciFiSpacePointRec::clusters_are_not_used(SciFiCluster* candidate_A,
 
 // Given 3 input clusters, this function computes all the triplet variables,
 // like position and respective standard deviation
-void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
+void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) const {
   std::vector<SciFiCluster*> channels = triplet->get_channels_pointers();
   SciFiCluster *vcluster = channels[0];
   SciFiCluster *wcluster = channels[1];
@@ -235,7 +235,7 @@ void SciFiSpacePointRec::build_triplet(SciFiSpacePoint* triplet) {
   triplet->set_time_res(time_res);
 }
 
-void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
+void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) const {
   std::vector<SciFiCluster*> channels = duplet->get_channels_pointers();
   SciFiCluster *clusterA = channels[0];
   SciFiCluster *clusterB = channels[1];
@@ -266,7 +266,7 @@ void SciFiSpacePointRec::build_duplet(SciFiSpacePoint* duplet) {
 // The position of a space-point will be the mean
 // of all 3 possible intersections.
 ThreeVector SciFiSpacePointRec::crossing_pos(SciFiCluster* c1,
-                                             SciFiCluster* c2) {
+                                             SciFiCluster* c2) const {
   ThreeVector d1 = c1->get_direction();
 
   ThreeVector d2 = c2->get_direction();

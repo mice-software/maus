@@ -48,7 +48,8 @@ namespace global {
     /// Constructor to create a PDF
     explicit ComPIDVarB(std::string hypothesis, std::string unique_identifier);
     /// Constructor to use a PDF to perform PID analysis
-    ComPIDVarB(TFile* file, std::string hypothesis, int XminComB, int XmaxComB, int YminComB, int YmaxComB);
+    ComPIDVarB(TFile* file, std::string hypothesis, int XminComB, int XmaxComB,
+	       int YminComB, int YmaxComB);
     /// Destructor
     ~ComPIDVarB();
 
@@ -60,7 +61,8 @@ namespace global {
      *
      *	@return Returns value of PID variable
      */
-    std::pair<double, double> Calc_Var(MAUS::DataStructure::Global::Track* track);
+    std::pair<double, double> Calc_Var(MAUS::DataStructure::Global::Track*
+				       track);
 
     /// Track Points from global track
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>

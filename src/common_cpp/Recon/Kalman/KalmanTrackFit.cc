@@ -17,155 +17,306 @@
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 
+
+#include <iostream>
+#include <sstream>
+
+#include "src/common_cpp/Utils/Exception.hh"
+
+#include "TDecompLU.h"
+
+
 namespace MAUS {
+namespace Kalman {
 
-KalmanTrackFit::KalmanTrackFit() : _propagator(NULL),
-                                   _filter(NULL) {
-  //
-  // Get Configuration values.
-  //
-  Json::Value *json = Globals::GetConfigurationCards();
-  _use_MCS          = (*json)["SciFiKalman_use_MCS"].asBool();
-  _use_Eloss        = (*json)["SciFiKalman_use_Eloss"].asBool();
-  _verbose          = (*json)["SciFiKalmanVerbose"].asBool();
-}
 
-KalmanTrackFit::~KalmanTrackFit() {}
+  std::string print_state(const State& state, const char* detail) {
+    std::ostringstream converter("");
+    TMatrixD vec = state.GetVector();
+    TMatrixD cov = state.GetCovariance();
 
-void KalmanTrackFit::SaveGeometry(std::vector<ThreeVector> positions,
-                                  std::vector<HepRotation> rotations) {
-  _RefPos = positions;
-  _Rot    = rotations;
-}
-
-void KalmanTrackFit::Process(std::vector<KalmanSeed*> seeds,
-                             SciFiEvent &event) {
-  // Prepare to loop over seeds. 1 seed = 1 track hypothesis
-  //
-  for ( size_t i = 0; i < seeds.size(); ++i ) {
-    // Current seed.
-    KalmanSeed* seed = seeds[i];
-    KalmanStatesPArray sites = seed->GetKalmanStates();
-    SciFiTrack *track = new SciFiTrack();
-    if ( seed->is_straight() ) {
-      track->SetAlgorithmUsed(SciFiTrack::kalman_straight);
-      _propagator = new KalmanStraightPropagator();
-    } else if ( seed->is_helical() ) {
-      track->SetAlgorithmUsed(SciFiTrack::kalman_helical);
-      double Bz   = seed->GetField();
-      _propagator = new KalmanHelicalPropagator(Bz);
+    if (detail)
+      converter << detail;
+    converter << " @ " << state.GetPosition() << ", " << state.GetId() << "  |  ";
+    if (state.HasValue()) {
+      for (unsigned int i = 0; i < state.GetDimension(); ++i) {
+        converter << "(" << vec(i, 0) << " +/- " << sqrt(cov(i, i)) << "), ";
+      }
+      converter << 1.0/vec(vec.GetNrows()-1, 0);
+      converter << "\n";
+    } else {
+      converter << "NO DATA\n";
     }
-    // The Filter needs to know the dimension of its matrices.
-    // The seed has that information.
-    int n_parameters = seed->n_parameters();
-    _filter = new KalmanFilter(n_parameters);
-
-    // Filter the first state.
-    _filter->Process(sites.front());
-    // int first_site_id = abs(sites.front()->id());
-
-    // Run the extrapolation & filter chain.
-    size_t numb_sites = sites.size();
-    // Loop over all 15 planes
-    for ( size_t j = 1; j < sites.size(); ++j ) {
-      // Predict the state vector at site i...
-      _propagator->Extrapolate(sites, j);
-
-      // ... Filter...
-      _filter->Process(sites.at(j));
-    }
-    // std::cerr << "Prepare For Smoothing... " << std::endl;
-    _propagator->PrepareForSmoothing(sites.back());
-    // ...and Smooth back all sites.
-    for ( int k = static_cast<int> (sites.size()-2); k >= 0; --k ) {
-      _propagator->Smooth(sites, k);
-      _filter->UpdateH(sites.at(k));
-      _filter->ComputeResidual(sites.at(k), KalmanState::Smoothed);
-    }
-
-    track->set_tracker(seed->tracker());
-    track->set_charge(seed->charge());
-
-    // Calculate the chi2 of this track.
-    ComputeChi2(track, sites);
-    // Optional printing.
-    if ( _verbose )
-      DumpInfo(sites);
-    Save(event, track, sites);
-    // Free memory allocated and reset pointers to NULL.
-    delete _propagator;
-    delete _filter;
-    _propagator = NULL;
-    _filter     = NULL;
+    return converter.str();
   }
-}
 
-void KalmanTrackFit::ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites) {
-  // Prepare to loop over all Kalman sites...
-  size_t n_sites = sites.size();
-  // ... summing chi2...
-  double chi2 = 0.;
-  // .. and counting the numb. of measurements...
-  int n_measurements = 0;
-  for ( size_t i = 0; i < n_sites; ++i ) {
-    KalmanState *site = sites.at(i);
-    if  ( site->contains_measurement() ) {
-      n_measurements++;
-      chi2 += site->chi2();
+
+  std::string print_track(const Track& track, const char* name) {
+    unsigned int num = track.GetLength();
+    std::ostringstream converter("");
+    if (name)
+      converter << "Printing " << name << "\n";
+    else
+      converter << "TRACK:\n";
+
+    for (unsigned int i = 0; i < num; ++i) {
+      State state = track[i];
+      converter << print_state(state);
     }
+    converter << "\n";
+    return converter.str();
   }
-  // Find the ndf for this track: numb measurements - numb parameters to be estimated
-  int n_parameters = sites.at(0)->a(KalmanState::Filtered).GetNrows();
-  int ndf = n_measurements - n_parameters;
-  track->set_chi2(chi2);
-  track->set_ndf(ndf);
-  double P_value = TMath::Prob(chi2, ndf);
-  track->set_P_value(P_value);
-}
 
-void KalmanTrackFit::Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArray sites) {
-  double pvalue = track->P_value();
-  int tracker = track->tracker();
-  if ( pvalue != pvalue ) return;
-  for ( size_t i = 0; i < sites.size(); ++i ) {
-    if ( sites.at(i)->contains_measurement() ) {
-      sites.at(i)->MoveToGlobalFrame(_RefPos[tracker]);
-      SciFiTrackPoint *track_point = new SciFiTrackPoint(sites.at(i));
-      track->add_scifitrackpoint(track_point);
+  State CalculateResidual(const State& st1, const State& st2) {
+    if (st1._dimension != st2._dimension) {
+      throw Exception(Exception::recoverable,
+          "States have different dimensions",
+          "Kalman::CalculateResidual()");
+    }
+    TMatrixD vector = st1._vector - st2._vector;
+    TMatrixD covariance = st1._covariance + st2._covariance;
+
+    State residual(vector, covariance, st1._position);
+    residual.SetId(st1._id);
+
+    return residual;
+  }
+
+  double CalculateChiSquaredUpdate(const State& st) {
+    TMatrixD rT(TMatrixD::kTransposed, st._vector);// rT.Transpose(r);
+    TMatrixD RI(TMatrixD::kInverted, st._covariance);
+    TMatrixD update = rT * RI * st._vector;
+    return update(0, 0);
+  }
+
+
+
+  TrackFit::TrackFit(Propagator_base* prop, Measurement_base* meas) :
+    _dimension(prop->GetDimension()),
+    _measurement_dimension(meas->GetMeasurementDimension()),
+    _propagator(prop),
+    _measurement(meas),
+    _seed(_dimension, _measurement_dimension),
+    _data(_dimension),
+    _predicted(_dimension),
+    _filtered(_dimension),
+    _smoothed(_dimension),
+    _identity_matrix(_dimension, _dimension) {
+    if (_measurement->GetDimension() != _propagator->GetDimension()) {
+      throw Exception(Exception::recoverable,
+          "Propagators and Measurements have conflicting dimension.",
+          "Kalman::TrackFit::TrackFit()");
+    }
+    _identity_matrix.Zero();
+    for (unsigned int i = 0; i < _dimension; ++i)
+      _identity_matrix(i, i) = 1.0;
+  }
+
+
+  TrackFit::~TrackFit() {
+    if (_propagator) {
+      delete _propagator;
+      _propagator = NULL;
+    }
+    if (_measurement) {
+      delete _measurement;
+      _measurement = NULL;
     }
   }
-  event.add_scifitrack(track);
-}
 
-void KalmanTrackFit::DumpInfo(KalmanStatesPArray sites) {
-  size_t numb_sites = sites.size();
 
-  for ( size_t i = 0; i < numb_sites; ++i ) {
-    KalmanState* site = sites.at(i);
-    // Squeak::mout(Squeak::info)
-    std::cerr
-    << "=========================================="  << "\n"
-    << "SITE ID: " << site->id() << "\n"
-    << "SITE Z: " << site->z()   << "\n"
-    << "Measurement: " << (site->measurement())(0, 0) << "\n"
-    << "Projection: " << (site->a(KalmanState::Projected))(0, 0) << " "
-                      << (site->a(KalmanState::Projected))(1, 0) << " "
-                      << (site->a(KalmanState::Projected))(2, 0) << " "
-                      << (site->a(KalmanState::Projected))(3, 0) << " "
-    << "Filtered: " << (site->a(KalmanState::Filtered))(0, 0) << " "
-                      << (site->a(KalmanState::Filtered))(1, 0) << " "
-                      << (site->a(KalmanState::Filtered))(2, 0) << " "
-                      << (site->a(KalmanState::Filtered))(3, 0) << "\n"
-    << "================Residuals================"   << "\n"
-    << (site->residual(KalmanState::Projected))(0, 0)  << "\n"
-    << (site->residual(KalmanState::Filtered))(0, 0)   << "\n"
-    << (site->residual(KalmanState::Smoothed))(0, 0)   << "\n"
-    << "=========================================="
-    << std::endl;
-    // site->covariance_matrix(KalmanState::Projected).Print();
-    // site->covariance_matrix(KalmanState::Filtered).Print();
-    // site->covariance_matrix(KalmanState::Smoothed).Print();
+  void TrackFit::AppendFilter(State state) {
+    throw Exception(Exception::nonRecoverable,
+        "Functionality Not Implemented!",
+        "Kalman::TrackFit::AppendFilter()");
+
+    if (state.GetDimension() != _measurement->GetMeasurementDimension()) {
+      throw Exception(Exception::recoverable,
+          "State dimension does not match the measurement dimension",
+          "Kalman::TrackFit::AppendFilter()");
+    }
+    // The good stuff goes here!
   }
-}
 
-} // ~namespace MAUS
+
+  void TrackFit::Filter(bool forward) {
+    _predicted.Reset(_data);
+    _filtered.Reset(_data);
+
+    int increment = (forward ? 1 : -1);
+    int track_start = (forward ? 1 : _data.GetLength() - 2);
+    int track_end = (forward ? _data.GetLength() : -1);
+
+    _predicted[track_start-increment].copy(_seed);
+//    _filtered[track_start-increment].copy(_seed);
+    this->_filter(_data[track_start-increment],
+                                        _predicted[track_start-increment],
+                                        _filtered[track_start-increment]);
+
+    for (int i = track_start; i != track_end; i += increment) {
+      this->_propagate(_filtered[i-increment], _predicted[i]);
+
+      if (_data[i].HasValue()) {
+        this->_filter(_data[i], _predicted[i], _filtered[i]);
+      } else {
+        _filtered[i] = _predicted[i];
+      }
+    }
+  }
+
+
+  void TrackFit::Smooth(bool forward) {
+    _smoothed.Reset(_data);
+
+    int increment = (forward ? -1 : 1);
+    int track_start = (forward ? (_smoothed.GetLength() - 2) : 1);
+    int track_end = (forward ? -1 : (_smoothed.GetLength()));
+
+    _smoothed[track_start-increment] = _filtered[track_start-increment];
+
+    for (int i = track_start; i != track_end; i += increment) {
+      TMatrixD temp(GetDimension(), GetDimension());
+      TDecompLU lu(_predicted[i - increment].GetCovariance());
+      if (!lu.Decompose() || !lu.Invert(temp)) {
+        _smoothed[i] = _filtered[i];
+        _propagator->Propagate(_filtered[i - increment], _smoothed[i]);
+      } else {
+        TMatrixD prop = _propagator->CalculatePropagator(_filtered[i], _filtered[i - increment]);
+        TMatrixD propT(TMatrixD::kTransposed, prop);
+
+        TMatrixD A = _filtered[i].GetCovariance() * propT * temp;
+        TMatrixD AT(TMatrixD::kTransposed, A);
+
+        TMatrixD vec = _filtered[i].GetVector() + A * (_smoothed[i-increment].GetVector() -
+                                                              _predicted[i-increment].GetVector());
+        TMatrixD cov = _filtered[i].GetCovariance() + A * (_smoothed[i-increment].GetCovariance() -
+                                                     _predicted[i-increment].GetCovariance()) * AT;
+
+        _smoothed[i].SetVector(vec);
+        _smoothed[i].SetCovariance(cov);
+
+        Kalman::State measured = _measurement->Measure(_smoothed[i]);
+      }
+    }
+  }
+
+
+  void TrackFit::SetSeed(State seed) {
+    if (seed.GetDimension() != _dimension) {
+      throw Exception(Exception::recoverable,
+          "Seed dimension does not match the track fitter",
+          "Kalman::TrackFit::SetSeed()");
+    }
+    _seed = seed;
+  }
+
+  void TrackFit::SetData(Track data_track) {
+    if (data_track.GetDimension() != _measurement->GetMeasurementDimension()) {
+      throw Exception(Exception::nonRecoverable,
+          "Data track dimension does not match the measurement dimension",
+          "Kalman::TrackFit::SetData()");
+    }
+    _data = data_track;
+    _predicted = Track(_dimension);
+    _filtered = Track(_dimension);
+    _smoothed = Track(_dimension);
+  }
+
+
+
+  void TrackFit::_propagate(State& first, State& second) const {
+    _propagator->Propagate(first, second);
+  }
+
+  void TrackFit::_filter(const State& data, State& predicted, State& filtered) const {
+    State measured = _measurement->Measure(predicted);
+
+    TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
+    TDecompLU lu(measured.GetCovariance());
+    if (!lu.Decompose() || !lu.Invert(temp)) {
+      filtered = predicted;
+    } else {
+      TMatrixD H = _measurement->GetMeasurementMatrix();
+      TMatrixD HT(TMatrixD::kTransposed, H);// HT.Transpose(H);
+
+      TMatrixD K = predicted.GetCovariance() * HT * temp;
+      TMatrixD KT(TMatrixD::kTransposed, K);// KT.Transpose(K);
+
+      TMatrixD V = _measurement->GetMeasurementNoise();
+      TMatrixD pull(GetMeasurementDimension(), 1);
+
+      TMatrixD gain = _identity_matrix - K*H;
+      TMatrixD gainT(TMatrixD::kTransposed, gain);// gainT.Transpose(gain);
+      TMatrixD gain_constant = K * V * KT;
+
+      pull = data.GetVector() - measured.GetVector();
+
+      TMatrixD temp_vec = predicted.GetVector() + K * pull;
+      TMatrixD temp_cov = gain * predicted.GetCovariance() * gainT + gain_constant;
+
+      filtered.SetVector(temp_vec);
+      filtered.SetCovariance(temp_cov);
+    }
+  }
+
+  void TrackFit::_smooth(State& first, State& second) const {
+  }
+
+
+  double TrackFit::CalculateChiSquared(const Track& track) const {
+    if (track.GetLength() != _data.GetLength())
+      throw Exception(Exception::recoverable,
+          "Supplied Track length is different to data track",
+          "Kalman::TrackFit::CalculateChiSquared()");
+
+    double chi_squared = 0.0;
+
+    for (unsigned int i = 0; i < track.GetLength(); ++i) {
+      State measured = _measurement->Measure(track[i]);
+      State residual = CalculateResidual(_data[i], measured);
+      chi_squared += CalculateChiSquaredUpdate(residual);
+    }
+
+    return chi_squared;
+  }
+
+  int TrackFit::GetNDF() const {
+    int no_parameters = GetDimension();
+    int no_measurements = 0;
+    for (unsigned int i = 0; i < _data.GetLength(); ++i) {
+      if (_data[i]) no_measurements += GetMeasurementDimension();
+    }
+
+    return no_measurements - no_parameters;
+  }
+
+  State TrackFit::CalculatePredictedResidual(unsigned int i) const {
+    State measured = _measurement->Measure(_predicted[i]);
+    return CalculateResidual(measured, _data[i]);
+  }
+
+  State TrackFit::CalculateFilteredResidual(unsigned int i) const {
+    State measured = _measurement->Measure(_filtered[i]);
+    return CalculateResidual(measured, _data[i]);
+  }
+
+  State TrackFit::CalculateSmoothedResidual(unsigned int i) const {
+    State measured = _measurement->Measure(_smoothed[i]);
+    return CalculateResidual(measured, _data[i]);
+  }
+
+
+  TrackFit::TrackFit(const TrackFit& tf) :
+    _dimension(tf.GetDimension()),
+    _propagator(0),
+    _measurement(0),
+    _seed(_dimension),
+    _data(_dimension),
+    _predicted(_dimension),
+    _filtered(_dimension),
+    _smoothed(_dimension),
+    _identity_matrix(_measurement_dimension, _measurement_dimension) {
+  }
+
+} // namespace Kalman
+} // namespace MAUS

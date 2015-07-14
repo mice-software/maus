@@ -65,7 +65,7 @@ namespace MAUS {
         return NULL;
       }
       PyObject* py_dict = Py_BuildValue("{s:s,s:d,s:d,s:d,s:d,s:d}", "name", name.c_str(), "A", A,
-          "Z", Z, "radlen", radlen, "interlen", interlen, "density", density );
+                              "Z", Z, "radlen", radlen, "interlen", interlen, "density", density );
 //      PyObject* py_dict = Py_BuildValue("{s:s,s:d,s:d,s:d}", "name", name.c_str(),
 //          "radlen", radlen, "interlen", interlen, "density", density );
       return py_dict;
@@ -108,7 +108,6 @@ namespace MAUS {
         return NULL;
       }
       try {
-
         GeometryNavigator* nav = Globals::GetInstance()->GetMCGeometryNavigator();
         ThreeVector pos = nav->GetCurrentPoint();
         point[0] = pos.x();

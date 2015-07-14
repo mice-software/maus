@@ -54,7 +54,7 @@ namespace MAUS {
 * information is low-level.
 */
 
-class InputCppDAQData : public InputBase<std::string> {
+class InputCppDAQData : public InputBase<MAUS::Data> {
 
  public:
 
@@ -111,13 +111,19 @@ class InputCppDAQData : public InputBase<std::string> {
   *
   * \return An event string.
   */
-  std::string _emit_cpp() {
-     if (this->readNextEvent())
-        return this->getCurEvent();
-     else
-        throw(MAUS::Exception(Exception::recoverable,
-                              "Failed to read next event",
-                              "InputCppDAQData::_emit_cpp()"));
+  MAUS::Data _emit_cpp() {
+     if (this->readNextEvent()) {
+       MAUS::Data  data_cpp;
+       MAUS::Spill *spill_cpp = new MAUS::Spill;
+       data_cpp.SetSpill(spill_cpp);
+       this->getCurEvent(&data_cpp);
+       _eventsCount++;
+       return data_cpp;
+     } else {
+       throw(MAUS::Exception(Exception::recoverable,
+                             "Failed to read next event",
+                             "InputCppDAQData::_emit_cpp()"));
+    }
   };
 
   /** Counter of the DAQ events. */

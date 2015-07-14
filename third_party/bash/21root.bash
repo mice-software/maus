@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-directory=root_v5.34.07
+directory=root_v5.34.30
 filename=${directory}.source.tar.gz 
 url=ftp://root.cern.ch/root/${filename}
 
@@ -32,7 +32,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
 
     fi
-   
+
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
 	echo "INFO: Source archive exists."
@@ -63,6 +63,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # Sticks them in ${x11} directory
     python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
     ./configure --disable-xrootd --enable-gsl-shared --enable-minuit2 \
+              --enable-builtin-freetype \
               --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
               --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
               --with-x11-libdir=${x11} \
@@ -80,7 +81,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo
     sleep 1
     make -j$MAUS_NUM_THREADS LDFLAGS="-Wl,--no-as-needed" || { echo "FAIL: Failed to configure/make"; exit 1; }
-
+    # Create a link to the ROOT directory not based on version number
+    cd ${MAUS_ROOT_DIR}/third_party/build/
+    ln -fs ${directory} root
 	            ################################################## 
 	echo
         echo "INFO: The package should be locally build now in your"

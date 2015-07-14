@@ -55,6 +55,30 @@ PyObject* py_wrap_string(PyObject* self, PyObject* args);
  */
 PyObject* py_wrap_data(PyObject* self, PyObject* args);
 
+/** Python function to wrap job header data as a MAUS::JobHeaderData
+ *
+ *  Takes one argument, returns a PyObject* which is the new job header data
+ */
+PyObject* py_wrap_job_header_data(PyObject* self, PyObject* args);
+
+/** Python function to wrap job footer data as a MAUS::JobFooterData
+ *
+ *  Takes one argument, returns a PyObject* which is the new job footer data
+ */
+PyObject* py_wrap_job_footer_data(PyObject* self, PyObject* args);
+
+/** Python function to wrap run header data as a MAUS::RunHeaderData
+ *
+ *  Takes one argument, returns a PyObject* which is the new run header data
+ */
+PyObject* py_wrap_run_header_data(PyObject* self, PyObject* args);
+
+/** Python function to wrap run footer data as a MAUS::RunFooterData
+ *
+ *  Takes one argument, returns a PyObject* which is the new run footer data
+ */
+PyObject* py_wrap_run_footer_data(PyObject* self, PyObject* args);
+
 /** Python function to wrap data as a PyObject
  *
  *  Takes one argument, returns a PyObject* which is the new data

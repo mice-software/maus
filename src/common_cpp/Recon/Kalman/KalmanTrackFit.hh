@@ -16,78 +16,149 @@
  */
 
 
-#ifndef KALMANTRACKFIT_HH
-#define KALMANTRACKFIT_HH
+#ifndef KALMAN_TRACKFIT_HH
+#define KALMAN_TRACKFIT_HH
 
-// C headers
-#include <assert.h>
-
-// C++ headers
 #include <string>
-#include <vector>
-#include "TMath.h"
-#include "TMatrixD.h"
 
-#include "Utils/Exception.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/DataStructure/ThreeVector.hh"
-#include "src/common_cpp/DataStructure/SciFiEvent.hh"
-#include "src/common_cpp/DataStructure/SciFiTrack.hh"
-#include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanFilter.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanStraightPropagator.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanHelicalPropagator.hh"
-#include "src/common_cpp/Recon/Kalman/KalmanSeed.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanPropagatorBase.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanMeasurementBase.hh"
+
+#include "TMatrix.h"
 
 namespace MAUS {
+namespace Kalman {
 
-/** @class KalmanTrackFit
- *
- *  @brief KalmanTrackFit manages the workflow of the fitting.
- *
- */
-class KalmanTrackFit {
- public:
-  KalmanTrackFit();
+  std::string print_state(const State& state, const char* detail = 0);
 
-  virtual ~KalmanTrackFit();
+  std::string print_track(const Track& track, const char* name = 0);
 
-  void SaveGeometry(std::vector<ThreeVector> positions,
-                    std::vector<HepRotation> rotations);
+  /** @brief Calculates the residual between two states */
+  State CalculateResidual(const State& st1, const State& st2);
 
-  /** @brief The main worker. All Kalman Filtering lives within.
+  /** @brief Fast was to calculate the chis-sq update */
+  double CalculteChiSquaredUpdate(const State st);
+
+
+  /** @class TrackFit
+   *
+   *  @brief TrackFit manages the workflow of the fitting.
+   *
    */
-  void Process(std::vector<KalmanSeed*> seeds, SciFiEvent &event);
+  class TrackFit {
+  public:
 
-  /** @brief Loops over the track points in the finished track calculating the chi2.
-   */
-  void ComputeChi2(SciFiTrack *track, KalmanStatesPArray sites);
+    /** @brief Intialise with the required measurement and propagator classes.
+     */
+    TrackFit(Propagator_base* propagator, Measurement_base* measurement);
 
-  /** @brief Saves the track into the SciFiEvent for data structure output.
-   */
-  void Save(SciFiEvent &event, SciFiTrack *track, KalmanStatesPArray sites);
+    /** @brief Destructor
+     */
+    virtual ~TrackFit();
 
-  /** @brief Prints some info about the fitting evolution.
-   */
-  void DumpInfo(KalmanStatesPArray sites);
+    /** @brief Append a new data state and filter up to it
+     *
+     *  A short cut function to save computations. 
+     *  Useful if using this class to stream data through it
+     */
+    void AppendFilter(State state);
 
- private:
-  bool _use_MCS;
+    /** @brief Filter all states using supplied propagator and measurement classes
+     */
+    void Filter(bool forward = true);
 
-  bool _use_Eloss;
+    /** @brief Smooth all states using supplied propagator and measurement classes
+     */
+    void Smooth(bool forward = true);
 
-  bool _verbose;
 
-  std::vector<ThreeVector> _RefPos;
+    /** @brief Returns the current start seed
+     */
+    State GetSeed() const { return _seed; }
 
-  std::vector<HepRotation> _Rot;
+    /** @brief Sets the current starting seed
+     */
+    void SetSeed(State state);
 
-  KalmanPropagator *_propagator;
+    /** @brief Set the data track - used to provide the measurments
+     */
+    void SetData(Track data_track);
 
-  KalmanFilter     *_filter;
-};
+    /** @brief Returns a copy of the current data track
+     */
+    Track GetData() const { return _data; }
+    const Track& Data() const { return _data; }
 
-} // ~namespace MAUS
+    /** @brief Return a copy of the predicted track
+     */
+    Track GetPredicted() const { return _predicted; }
+    const Track& Predicted() const { return _predicted; }
 
-#endif
+    /** @brief Return a copy of the filtered track
+     */
+    Track GetFiltered() const { return _filtered; }
+    const Track& Filtered() const { return _filtered; }
+
+    /** @brief Return a copy of the smoothed track
+     */
+    Track GetSmoothed() const { return _smoothed; }
+    const Track& Smoothed() const { return _smoothed; }
+
+
+    /** @brief Claculate the Chi-Squared value for the track
+     */
+    double CalculateChiSquared(const Track&) const;
+
+    /** @brief Return the Number of Degrees of Freedom
+     */
+    int GetNDF() const;
+
+    /** @brief Helper function to calculate predicted residual/pull */
+    State CalculatePull(unsigned int i) const { return this->CalculatePredictedResidual(i); }
+    State CalculatePredictedResidual(unsigned int i) const;
+
+    /** @brief Helper function to calculate filtered residual */
+    State CalculateFilteredResidual(unsigned int i) const;
+
+    /** @brief Helper function to calculate smoothed residual */
+    State CalculateSmoothedResidual(unsigned int i) const;
+
+    /** @brief Return the dimension of the measurement state vector
+     */
+    unsigned int GetDimension() const { return _dimension; }
+
+    /** @brief Return the dimension of the measurement state vector
+     */
+    unsigned int GetMeasurementDimension() const { return _measurement_dimension; }
+
+  protected:
+
+    void _propagate(State& first, State& second) const;
+    void _filter(const State& data, State& predicted, State& filtered) const;
+    void _smooth(State& first, State& second) const;
+
+  private:
+    // Private copy constructor => No copying!
+    TrackFit(const TrackFit& tf);
+    TrackFit& operator=(const TrackFit& tf) { return *this; }
+
+    unsigned int _dimension;
+    unsigned int _measurement_dimension;
+
+    Propagator_base* _propagator;
+    Measurement_base* _measurement;
+
+    State _seed;
+
+    Track _data;
+    Track _predicted;
+    Track _filtered;
+    Track _smoothed;
+
+    TMatrixD _identity_matrix;
+  };
+} // namespace Kalman
+} // namespace MAUS
+
+#endif // KALMAN_TRACKFIT_HH

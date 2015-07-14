@@ -25,6 +25,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "TLorentzVector.h"
 #include "TH1.h"

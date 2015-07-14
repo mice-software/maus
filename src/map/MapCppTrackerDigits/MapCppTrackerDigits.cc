@@ -15,6 +15,10 @@
  *
  */
 
+#include <string>
+
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/map/MapCppTrackerDigits/MapCppTrackerDigits.hh"
@@ -30,27 +34,37 @@ PyMODINIT_FUNC init_MapCppTrackerDigits(void) {
 }
 
 MapCppTrackerDigits::MapCppTrackerDigits()
-    : MapBase<Data>("MapCppTrackerDigits") {}
+    : MapBase<Data>("MapCppTrackerDigits"), real(0) {
+}
 
 MapCppTrackerDigits::~MapCppTrackerDigits() {
+  if (real) delete real;
 }
 
 void MapCppTrackerDigits::_birth(const std::string& argJsonConfigDocument) {
+  if (!Globals::HasInstance()) {
+    GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+  }
+  Json::Value *json = Globals::GetConfigurationCards();
+  double npe_cut = (*json)["SciFiDigitizationNPECut"].asDouble();
+  std::string map_file = (*json)["SciFiMappingFileName"].asString();
+  std::string calib_file = (*json)["SciFiCalibrationFileName"].asString();
+  std::string bad_channels_file = (*json)["SciFiBadChannelsFileName"].asString();
+  std::cout << "INFO: MapCppTrackerDigits: Map file: " << map_file
+            << ". Calib file: " << calib_file << ". NPE cut: " << npe_cut
+            << ". Bad Chan file: " << bad_channels_file << "\n";
+  real = new RealDataDigitization();
+  real->initialise(npe_cut, map_file.c_str(), calib_file.c_str(), bad_channels_file.c_str());
 }
 
-void MapCppTrackerDigits::_death() {
-}
+void MapCppTrackerDigits::_death() {}
 
 void MapCppTrackerDigits::_process(Data* data) const {
-  Json::Value& json_root = *(ConverterFactory().convert<Data, Json::Value>(data));
-  if ( json_root.isMember("daq_data") && !(json_root["daq_data"].isNull()) ) {
-    // Get daq data.
-    Json::Value daq = json_root.get("daq_data", 0);
-    // Fill spill object with
-    RealDataDigitization real;
-    real.initialise();
-    real.process(data->GetSpill(), daq);
-  }
-  delete &json_root;
+//   RealDataDigitization real;
+//   real.initialise();
+  Spill *spill = data->GetSpill();
+  real->process(spill);
 }
+
 } // ~namespace MAUS
+

@@ -14,6 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+#include <Python.h>
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
 #include "src/common_cpp/API/OutputBase.hh"
@@ -21,19 +23,19 @@
 namespace MAUS {
 
 
-  class MyOutputter : public OutputBase<int*> {
+  class MyOutputter : public OutputBase {
     public:
-      MyOutputter() : OutputBase<int*>("TestClass") {}
-      MyOutputter(const MyOutputter& mr) : OutputBase<int*>(mr) {}
+      MyOutputter() : OutputBase("TestClass") {}
+      MyOutputter(const MyOutputter& mr) : OutputBase(mr) {}
       virtual ~MyOutputter() {}
 
     private:
       virtual void _birth(const std::string&) {}
       virtual void _death() {}
 
-      virtual bool _save(int* i) {
+      virtual bool _save(PyObject* i) {
         if (!i) { throw NullInputException(_classname); }
-        return *i == 27? true : false;
+        return i == Py_True;
       }
 
     private:
@@ -46,7 +48,7 @@ namespace MAUS {
       MyOutputter_maus_exception() : MyOutputter() {}
 
     private:
-      virtual bool _save(int* i) {
+      virtual bool _save(PyObject* i) {
         throw MAUS::Exception(MAUS::Exception::recoverable,
            "Expected Test MAUS::Exception in _save",
            "int* _save(int* t) const");
@@ -58,7 +60,7 @@ namespace MAUS {
       MyOutputter_exception() : MyOutputter() {}
 
     private:
-      virtual bool _save(int* i) {
+      virtual bool _save(PyObject* i) {
         throw std::exception();
       }
   };
@@ -68,7 +70,7 @@ namespace MAUS {
       MyOutputter_otherexcept() : MyOutputter() {}
 
     private:
-      virtual bool _save(int* i) {throw 17;}
+      virtual bool _save(PyObject* i) {throw 17;}
   };
 
   TEST(OutputBaseTest, TestConstructor) {
@@ -115,25 +117,21 @@ namespace MAUS {
   TEST(OutputBaseTest, TestSaveSpill) {
     MyOutputter mm;
 
-    int* i1 = new int(27);
-    int* i2 = new int(19);
-
-    ASSERT_TRUE(mm.save(i1))
+    ASSERT_EQ(Py_True, mm.save_pyobj(Py_True))
       <<"Fail: _save method not called properly didn't return 'true' for save(new int(27))"
       <<std::endl;
 
-    ASSERT_FALSE(mm.save(i2))
+    ASSERT_EQ(Py_False, mm.save_pyobj(Py_False))
       <<"Fail: _save method not called properly didn't return 'false' for save(new int(19))"
       <<std::endl;
 
     /////////////////////////////////////////////////////
     MyOutputter mm2;
-    int* dub = 0;
-    ASSERT_FALSE(mm2.save(dub));
+    ASSERT_EQ(Py_False, mm2.save_pyobj(NULL));
     /////////////////////////////////////////////////////
     MyOutputter_maus_exception mm_s;
     try {
-      mm_s.save(i1);
+      mm_s.save_pyobj(Py_True);
     }
     catch (...) {
       ASSERT_TRUE(false)
@@ -144,7 +142,7 @@ namespace MAUS {
     /////////////////////////////////////////////////////
     MyOutputter_exception mm_e;
     try {
-      mm_e.save(i1);
+      mm_e.save_pyobj(Py_True);
     }
     catch (...) {
       ASSERT_TRUE(false)
@@ -155,7 +153,7 @@ namespace MAUS {
     /////////////////////////////////////////////////////
     MyOutputter_otherexcept mm_oe;
     try {
-      mm_oe.save(i1);
+      mm_oe.save_pyobj(Py_True);
       ASSERT_TRUE(false)
         << "Fail: No exception thrown"
         << std::endl;
@@ -166,8 +164,6 @@ namespace MAUS {
         << "Fail: Expected exception of type UnhandledException to be thrown"
         << std::endl;
     }
-
-    delete i1;
-    delete i2;
   }
 }// end of namespace
+

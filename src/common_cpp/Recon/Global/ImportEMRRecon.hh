@@ -62,7 +62,6 @@ namespace global {
 
     /// Disallow operator= as unnecessary
     void operator=(const ImportEMRRecon);
-
   }; // ~class ImportEMRRecon
 } // ~namespace global
 } // ~namespace recon

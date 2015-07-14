@@ -168,7 +168,6 @@ namespace MAUS {
 
     /// Confidence level
     int _pid_confidence_level;
-    
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 
