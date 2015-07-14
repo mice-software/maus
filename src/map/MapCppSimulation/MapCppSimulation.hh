@@ -42,12 +42,12 @@
 
 namespace MAUS {
 
-class MapCppSimulation : public MapBase<Json::Value> {
+class MapCppSimulation : public MapBase<MAUS::Data> {
  public:
   /** @brief Sets up the worker
    */
   MapCppSimulation()
-    : MapBase<Json::Value>("MapCppSimulation") {
+    : MapBase<MAUS::Data>("MapCppSimulation") {
   }
 
   ~MapCppSimulation() {}
@@ -72,7 +72,7 @@ class MapCppSimulation : public MapBase<Json::Value> {
    *
    * @param document a JSON document for a spill
    */
-  void _process(Json::Value* json_spill_document) const;
+  void _process(MAUS::Data* data) const;
 
   bool _doVis;
 };  // Don't forget this trailing colon!!!!

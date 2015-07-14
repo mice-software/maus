@@ -49,7 +49,6 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
                 "random_seed":1,
                 "energy":110.,
                 "time":7.,
-                "statistical_weight":1.
             }}
 
     @classmethod
@@ -65,12 +64,16 @@ class MapCppSimulationVisualisationTestCase(unittest.TestCase):
         event viewer.
         """
         good_event = {
-            "mc_events":[self.particle,self.particle]
+            "mc_events":[self.particle,self.particle],
+            "daq_event_type":"physics_event",
+            "maus_event_type":"Spill",
+            "run_number":0,
+            "spill_number":0,
         }
         result = self.mapper.process(good_event)
         result = maus_cpp.converter.json_repr(result)
-        if "errors" in result:
-            raise Exception('test_mc_vis made an error')
+        if "errors" in result and result["errors"] != {}:
+            raise Exception('test_mc_vis made an error '+str(result["errors"]))
         if len(glob.glob('g4_*.wrl')) < 1:
             raise Exception('test_mc_vis failed to make a VRML file')
         for filename in glob.glob('g4_*.wrl'):

@@ -59,7 +59,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
         = MAUS::MAUSGeant4Manager::GetInstance();
 
     Json::Value * config = MAUS::Globals::GetConfigurationCards();
-
+    orig_verbose_level = (*config)["verbose_level"].asInt();
     (*config)["verbose_level"] = Json::Value(2);
     (*config)["reference_physics_processes"] = Json::Value("none");
     (*config)["physics_processes"] = Json::Value("none");
@@ -120,7 +120,8 @@ class LinearApproximationOpticsModelTest : public testing::Test {
     MAUS::GlobalsManager::DeleteGlobals();
     // SetupConfig() is defined in MAUSUnitTest.cc
     MAUS::GlobalsManager::InitialiseGlobals(
-        JsonWrapper::JsonToString(SetupConfig(2)));
+        JsonWrapper::JsonToString(SetupConfig(orig_verbose_level)));
+
     MAUS::MAUSGeant4Manager::GetInstance()
         ->SetVirtualPlanes(default_virtual_planes_);
     std::cout << "*** Reset Globals ***" << std::endl;
@@ -143,6 +144,7 @@ class LinearApproximationOpticsModelTest : public testing::Test {
  private:
   MAUS::VirtualPlaneManager * const default_virtual_planes_;
   MAUS::VirtualPlaneManager * const virtual_planes_;
+  int orig_verbose_level;
 };
 
 // *************************************************

@@ -139,17 +139,6 @@ G4bool EMRSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
 }
 
 void EMRSD::EndOfEvent(G4HCofThisEvent* HCE) {
-
-  int nHits = _hits_cppdata.size();
-  if (nHits > 0) {
-    if (!_hits.isMember("emr_hits")) {
-      _hits["emr_hits"] = Json::Value(Json::arrayValue);
-    }
-
-    for (int xHitNum = 0; xHitNum < nHits; xHitNum++) {
-      _hits["emr_hits"].append(*_hit_proc.CppToJson(_hits_cppdata[xHitNum], ""));
-    }
-  }
 }
 
 int EMRSD::findBarHit(int copyNumber) {
@@ -190,6 +179,10 @@ int EMRSD::AddBarHit(G4Step* aStep, int barNumber) {
 
   _hits_cppdata.push_back(hit_cppdata);
   return _hits_cppdata.size() - 1;
+}
+
+void EMRSD::TakeHits(MAUS::MCEvent* event) {
+  event->SetEMRHits(new MAUS::EMRHitArray(_hits_cppdata));
 }
 
 

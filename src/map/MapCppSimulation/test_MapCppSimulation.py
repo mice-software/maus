@@ -54,7 +54,6 @@ class MapCppSimulationTestCase(unittest.TestCase):
                 "random_seed":1,
                 "energy":110.,
                 "time":7.,
-                "statistical_weight":1.
             }}
 
     @classmethod
@@ -65,7 +64,7 @@ class MapCppSimulationTestCase(unittest.TestCase):
         self.mapper.death()
 
     ######## tests on Process #########
-    def _test_birth(self):  # pylint: disable=R0201
+    def test_birth(self):  # pylint: disable=R0201
         """Check we get an error for bad input to birth"""
         test_mapper = MapCppSimulation()
         test_mapper.birth(json.dumps(self.configuration))
@@ -97,11 +96,16 @@ class MapCppSimulationTestCase(unittest.TestCase):
         the initial value of track[0], etc
         """
         good_event = {
-            "mc_events":[self.particle,self.particle]
+            "mc_events":[self.particle,self.particle],
+            "daq_event_type":"physics_event",
+            "daq_data":{},
+            "maus_event_type":"Spill",
+            "run_number":0,
+            "spill_number":0,
         }
-        result = self.mapper.process(json.dumps(good_event))
+        result = self.mapper.process(good_event)
         doc = maus_cpp.converter.json_repr(result)
-        self.assertNotIn("errors", doc)
+        self.assertEqual(doc["errors"], {})
         ev_0 = doc["mc_events"][0]["tracks"][0]
         ev_1 = doc["mc_events"][1]["tracks"][0]
         for event in [ev_0, ev_1]:

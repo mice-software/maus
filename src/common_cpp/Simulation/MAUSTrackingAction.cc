@@ -18,6 +18,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -40,71 +41,69 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
         if (_stepping == NULL) {
            _stepping = MAUSGeant4Manager::GetInstance()->GetStepping();
         }
+        if (_stepping->GetWillKeepSteps()) {
+            _stepping->SetSteps(new std::vector<Step>());
+        }
 
-        Json::Value position(Json::objectValue);
-        position["x"] = aTrack->GetPosition().x();
-        position["y"] = aTrack->GetPosition().y();
-        position["z"] = aTrack->GetPosition().z();
-
-        Json::Value momentum(Json::objectValue);
-        momentum["x"] = aTrack->GetMomentum().x();
-        momentum["y"] = aTrack->GetMomentum().y();
-        momentum["z"] = aTrack->GetMomentum().z();
-
-        Json::Value json_track(Json::objectValue);
-        json_track["initial_position"] = position;
-        json_track["initial_momentum"] = momentum;
-        json_track["particle_id"] = aTrack->GetDefinition()->GetPDGEncoding();
-        json_track["track_id"] = aTrack->GetTrackID();
-        json_track["parent_track_id"] = aTrack->GetParentID();
-        json_track["kill_reason"] = "";
-        if (_stepping->GetWillKeepSteps())
-            _stepping->SetSteps(Json::Value(Json::arrayValue));
-        _tracks.append(json_track);
+        Track track;
+        ThreeVector pos(aTrack->GetPosition().x(),
+                        aTrack->GetPosition().y(),
+                        aTrack->GetPosition().z());
+        track.SetInitialPosition(pos);
+        ThreeVector mom(aTrack->GetMomentum().x(),
+                        aTrack->GetMomentum().y(),
+                        aTrack->GetMomentum().z());
+        track.SetInitialMomentum(mom);
+        track.SetParticleId(aTrack->GetDefinition()->GetPDGEncoding());
+        track.SetTrackId(aTrack->GetTrackID());
+        track.SetParentTrackId(aTrack->GetParentID());
+        track.SetKillReason("");
+        _tracks->push_back(track);
     }
 }
 
 void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
     if (_keepTracks && aTrack) {
-        Json::Value json_track = _tracks[_tracks.size()-1];
-        if (json_track["track_id"] != aTrack->GetTrackID()) {
+        if (_tracks->back().GetTrackId() != aTrack->GetTrackID()) {
             throw MAUS::Exception(Exception::recoverable,
                          "Track ID misalignment",
                          "MAUSTrackingAction::PostUserTrackingAction");
         }
 
-        Json::Value position;
-        position["x"] = aTrack->GetPosition().x();
-        position["y"] = aTrack->GetPosition().y();
-        position["z"] = aTrack->GetPosition().z();
+        ThreeVector pos(aTrack->GetPosition().x(),
+                        aTrack->GetPosition().y(),
+                        aTrack->GetPosition().z());
+        _tracks->back().SetFinalPosition(pos);
+        ThreeVector mom(aTrack->GetMomentum().x(),
+                        aTrack->GetMomentum().y(),
+                        aTrack->GetMomentum().z());
+        _tracks->back().SetFinalMomentum(mom);
 
-        Json::Value momentum;
-        momentum["x"] = aTrack->GetMomentum().x();
-        momentum["y"] = aTrack->GetMomentum().y();
-        momentum["z"] = aTrack->GetMomentum().z();
-
-        json_track["final_position"] = position;
-        json_track["final_momentum"] = momentum;
-        if (_stepping->GetWillKeepSteps())
-            json_track["steps"] = _stepping->GetSteps();
-        _tracks[_tracks.size()-1] = json_track;
+        if (_stepping->GetWillKeepSteps()) {
+            _tracks->back().SetSteps(_stepping->TakeSteps());
+        } else {
+            _tracks->back().SetSteps(new std::vector<Step>());
+        }
     }
 }
 
-void MAUSTrackingAction::SetTracks(Json::Value tracks) {
-    if (!tracks.isArray())
-        throw(Exception(Exception::recoverable,
-              "Attempt to set tracks to non-array of type "
-              +JsonWrapper::ValueTypeToString(tracks.type()),
-              "MAUSTrackingAction::SetTracks()"));
+std::vector<Track>* MAUSTrackingAction::TakeTracks() {
+    std::vector<Track>* track_tmp = _tracks;
+    _tracks = NULL;
+    return track_tmp;
+}
+
+void MAUSTrackingAction::SetTracks(std::vector<Track>* tracks) {
+    if (_tracks != NULL)
+        delete _tracks;
     _tracks = tracks;
 }
 
 void MAUSTrackingAction::SetKillReason
                                   (const G4Track* aTrack, std::string reason) {
-    for (size_t i = 0; i < _tracks.size(); ++i) {
-        if (_tracks[Json::Value::ArrayIndex(i)]["track_id"] == aTrack->GetTrackID()) {
-            _tracks[Json::Value::ArrayIndex(i)]["kill_reason"] = reason;
+    for (size_t i = 0; _tracks != NULL && i < _tracks->size(); ++i) {
+        if ((*_tracks)[i].GetTrackId() == aTrack->GetTrackID()) {
+            (*_tracks)[i].SetKillReason(reason);
         }
     }
 }

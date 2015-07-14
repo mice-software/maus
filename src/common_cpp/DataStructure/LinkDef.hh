@@ -32,6 +32,12 @@
 #pragma link C++ class MAUS::MAUSEvent<MAUS::JobFooter>+;
 #pragma link C++ class MAUS::JobFooterData+;
 
+#pragma link C++ class MAUS::Image+;
+#pragma link C++ class MAUS::CanvasWrapper+;
+#pragma link C++ class MAUS::CanvasWrapperArray+;
+#pragma link C++ class std::vector<MAUS::CanvasWrapper>;
+#pragma link C++ class MAUS::MAUSEvent<MAUS::Image>+;
+#pragma link C++ class MAUS::ImageData+;
 
 #pragma link C++ class MAUS::ThreeVector+;
 #pragma link C++ class std::vector<int>;

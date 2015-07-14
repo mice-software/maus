@@ -38,8 +38,7 @@ class DisallowedConverter : public ConverterBase<TEMP1, TEMP2> {
   private:
     TEMP2* _convert(const TEMP1* input) const {
         throw MAUS::Exception(MAUS::Exception::recoverable,
-                          "Attempt to make disallowed conversion between types "
-                          +input->GetEventType()+" and "+TEMP2().GetEventType(),
+                          "Attempt to make disallowed conversion between types",
                           "DisallowedConverter::convert");
     }
 };

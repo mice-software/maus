@@ -1,0 +1,74 @@
+{
+"type":"main_frame",
+"name":"Online Reconstruction",
+"children":[{
+    "type":"vertical_frame",
+    "children":[{
+        "type":"horizontal_frame",
+        "children":[{
+            "name":"main_canvas",
+            "type":"canvas",
+            "width":1000,
+            "height":500
+        }, {
+            "type":"vertical_frame",
+            "name":"canvas_options",
+            "children":[{
+                "type":"horizontal_frame",
+                "children":[{
+                    "type":"button",
+                    "name":"&<",
+                    "tool_tip":"Rotate back one canvas."
+                }, {
+                    "type":"button",
+                    "name":"&Pause",
+                    "tool_tip":"Block interface from loading or redrawing canvases.\nReconstruction continues in the background."
+                }, {
+                    "type":"button",
+                    "name":"&>",
+                    "tool_tip":"Rotate forwards one canvas."
+                }]
+            }, {
+                "type":"named_text_entry",
+                "default_text":"2.0",
+                "label_length":25,
+                "name":"Rotate period",
+                "tool_tip":"Time between changes of canvas (s).\nPress <CR> to update."
+            }, {
+                "type":"named_text_entry",
+                "default_text":"2.0",
+                "label_length":25,
+                "name":"Reload period",
+                "tool_tip":"Time between canvas reloads (s).\nPress <CR> to update."
+            }, {
+                "type":"horizontal_frame",
+                "children":[{
+                    "type":"button",
+                    "name":"&Redraw",
+                    "tool_tip":"Redraw current canvas with currently loaded data."
+                }, {
+                    "type":"button",
+                    "name":"Re&load",
+                    "tool_tip":"Load and draw new canvases from the socket, even if paused."
+                }]
+            }, {
+                "type":"list_box",
+                "name":"canvas_select",
+                "entries":[],
+                "selected":[]
+            }]
+        }]
+    }, {
+        "type":"horizontal_frame",
+        "children":[{
+                "type":"button",
+                "name":"Re&connect",
+                "tool_tip":"Attempt to disconnect and then reconnect with the reconstruction database"
+            },{
+                "type":"button",
+                "name":"E&xit",
+                "tool_tip":"Exit the GUI. Reconstruction continues in the background."
+            }]
+   }]   
+}]
+}

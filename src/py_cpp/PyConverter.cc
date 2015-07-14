@@ -89,6 +89,7 @@ PyObject* py_del_data_repr(PyObject* self, PyObject* args) {
     if (c_string == NULL || strcmp(c_string, "MAUS::Data") != 0) {
         PyErr_SetString(PyExc_TypeError, "Could not resolve object as a MAUS::Data type");
     }
+    py_data_in->ob_refcnt++;
     void * vptr = static_cast<void*>(TPyReturn(py_data_in));
     Data* data = static_cast<Data*>(vptr);
     delete data;
