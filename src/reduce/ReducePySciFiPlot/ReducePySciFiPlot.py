@@ -188,9 +188,9 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
     def _update_histograms(self, spill):
         """Update the Histograms """
-        if not spill.has_key("daq_event_type"):
-            raise ValueError("No event type")
-        if spill["daq_event_type"] == "end_of_run":
+
+        daq_evtype = spill.GetSpill().GetDaqEventType()
+        if daq_evtype == "end_of_run":
             if (not self.run_ended):
                 self.update_histos()
                 self.run_ended = True
@@ -199,20 +199,21 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 return []
 
         # do not try to get data from start/end spill markers
-        if spill["daq_event_type"] == "start_of_run" \
-              or spill["daq_event_type"] == "start_of_burst" \
-              or spill["daq_event_type"] == "end_of_burst":
+        data_spill = True
+        if daq_evtype == "start_of_run" \
+              or daq_evtype == "start_of_burst" \
+              or daq_evtype == "end_of_burst":
             data_spill = False
 
         # Get SciFi digits & fill the relevant histograms.
-        if not self.get_SciFiDigits(spill): 
+        if data_spill and not self.get_SciFiDigits(spill): 
             raise ValueError("SciFi digits not in spill")
 
         # Get SciFi spacepoints & fill the relevant histograms.
-        if not self.get_SciFiSpacepoints(spill): 
+        if data_spill and not self.get_SciFiSpacepoints(spill): 
             raise ValueError("SciFi spacepoints not in spill")
 
-        if not self.get_SciFiSpacepointsTwoD(spill): 
+        if data_spill and not self.get_SciFiSpacepointsTwoD(spill): 
             raise ValueError("SciFi spacepoints not in spill")
 
 
@@ -224,7 +225,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         else:
             return []
 
-    def get_SciFiDigits(self, spill):
+    def get_SciFiDigits(self, spill_data):
 
         """
         Get the SciFiDigits and update the histograms.
@@ -233,17 +234,19 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "digits" in
         the spill.
         """
-        if 'recon_events' not in spill:
+
+        spill = spill_data.GetSpill()
+        if spill.GetReconEventSize() == 0:
             raise ValueError("recon_events not in spill")
-        # print 'nevt = ', len(spill['recon_events']), spill['recon_events']
-        for event in range(len(spill['recon_events'])):
-            if 'sci_fi_event' not in spill['recon_events'][event]:
-                #print 'no scifi event'
-                return False
-            print 
-                # Return if we cannot find sci fi digits in the spill.
-            if 'digits' not in \
-                spill['recon_events'][event]['sci_fi_event']:
+        reconevents = spill.GetReconEvents()
+        # print '# recon events = ',reconevents[0].GetPartEventNumber()
+        for evn in range(spill.GetReconEventSize()):
+            sci_fi_event = reconevents[evn].GetSciFiEvent()
+            if sci_fi_event is None:
+                raise ValueError("sci_fi_event not in recon_events")
+            # Return if we cannot find sci fi digits
+            SciFiDigits = sci_fi_event.digits()
+            if SciFiDigits is None:
                 return False
 
             """
@@ -251,138 +254,135 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             and likewise for DS Tracker.
             """
             # Gives information on cabling efficiency
-            SciFiDigits = spill['recon_events'][event]['sci_fi_event']['digits']
-            spill_data = maus_cpp.converter.data_repr(spill)
-            spill = spill_data.GetSpill()
             title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
-            for i in range(len(SciFiDigits)):
-                #print SciFiDigits[i]['tracker']
-                if (SciFiDigits[i]['tracker'] == 0):
-                    self.SciFiDigitT1.Fill(SciFiDigits[i]['station'])
+            for i in range(SciFiDigits.size()):
+                # print SciFiDigits[i].get_tracker()
+                if (SciFiDigits[i].get_tracker() == 0):
+                    self.SciFiDigitT1.Fill(SciFiDigits[i].get_station())
                     self.SciFiDigitT1.SetTitle("Spacepoints In US Tracker "+title+" (stn 1 is innermost)")
-                if (SciFiDigits[i]['tracker'] == 1):
-                    self.SciFiDigitT2.Fill(SciFiDigits[i]['station'])
+                if (SciFiDigits[i].get_tracker() == 1):
+                    self.SciFiDigitT2.Fill(SciFiDigits[i].get_station())
                     self.SciFiDigitT2.SetTitle("Spacepoints In DS Tracker "+title+" (stn 1 is innermost)")
 
             # Gives information on fibre performance
-            for i in range(len(SciFiDigits)):
-                #print SciFiDigits[i]['tracker']
-                if (SciFiDigits[i]['tracker'] == 0):               
-                    if (SciFiDigits[i]['station'] == 1):
-                        self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
+            for i in range(SciFiDigits.size()):
+                # print SciFiDigits[i].get_tracker()
+                if (SciFiDigits[i].get_tracker() == 0):               
+                    if (SciFiDigits[i].get_station() == 1):
+                        self.SciFiPEperChannelT1S1.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
                         self.SciFiPEperChannelT1S1.SetTitle("npe per Channel In US Tracker, Stations 1-5 "+title+" (stn 1 is innermost)")
-                    if (SciFiDigits[i]['station'] == 2):
-                        self.SciFiPEperChannelT1S2.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
-                    if (SciFiDigits[i]['station'] == 3):
-                        self.SciFiPEperChannelT1S3.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
-                    if (SciFiDigits[i]['station'] == 4):
-                        self.SciFiPEperChannelT1S4.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
-                    if (SciFiDigits[i]['station'] == 5):
-                        self.SciFiPEperChannelT1S5.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
-                if (SciFiDigits[i]['tracker'] == 1):
-                    if (SciFiDigits[i]['station'] == 1):
-                        self.SciFiPEperChannelT2S1.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
+                    if (SciFiDigits[i].get_station() == 2):
+                        self.SciFiPEperChannelT1S2.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
+                    if (SciFiDigits[i].get_station() == 3):
+                        self.SciFiPEperChannelT1S3.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
+                    if (SciFiDigits[i].get_station() == 4):
+                        self.SciFiPEperChannelT1S4.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
+                    if (SciFiDigits[i].get_station() == 5):
+                        self.SciFiPEperChannelT1S5.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
+                if (SciFiDigits[i].get_tracker() == 1):
+                    if (SciFiDigits[i].get_station() == 1):
+                        self.SciFiPEperChannelT2S1.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
                         self.SciFiPEperChannelT2S1.SetTitle("npe per Channel In DS Tracker, Stations 1-5 "+title+" (stn 1 is innermost)")
-                    if (SciFiDigits[i]['station'] == 2):
-                        self.SciFiPEperChannelT2S2.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
-                    if (SciFiDigits[i]['station'] == 3):
-                        self.SciFiPEperChannelT2S3.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
-                    if (SciFiDigits[i]['station'] == 4):
-                        self.SciFiPEperChannelT2S4.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
-                    if (SciFiDigits[i]['station'] == 5):
-                        self.SciFiPEperChannelT2S5.Fill(SciFiDigits[i]['channel'], \
-                        SciFiDigits[i]['npe'])
+                    if (SciFiDigits[i].get_station() == 2):
+                        self.SciFiPEperChannelT2S2.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
+                    if (SciFiDigits[i].get_station() == 3):
+                        self.SciFiPEperChannelT2S3.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
+                    if (SciFiDigits[i].get_station() == 4):
+                        self.SciFiPEperChannelT2S4.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
+                    if (SciFiDigits[i].get_station() == 5):
+                        self.SciFiPEperChannelT2S5.Fill(SciFiDigits[i].get_channel(), \
+                        SciFiDigits[i].get_npe())
 
             # Gives information on Mapping
-            for i in range(len(SciFiDigits)):
-                if (SciFiDigits[i]['tracker'] == 0):               
-                    if (SciFiDigits[i]['station'] == 1):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT1S1P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT1S1P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT1S1P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 2):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT1S2P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT1S2P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT1S2P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 3):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT1S3P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT1S3P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT1S3P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 4):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT1S4P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT1S4P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT1S4P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 5):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT1S5P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT1S5P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT1S5P3.Fill(SciFiDigits[i]['channel'])
-                if (SciFiDigits[i]['tracker'] == 1):               
-                    #print SciFiDigits[i]['digits']
-                    #print SciFiDigits[i]['channel']
-                    if (SciFiDigits[i]['station'] == 1):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT2S1P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT2S1P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT2S1P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 2):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT2S2P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT2S2P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT2S2P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 3):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT2S3P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT2S3P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT2S3P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 4):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT2S4P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT2S4P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT2S4P3.Fill(SciFiDigits[i]['channel'])
-                    if (SciFiDigits[i]['station'] == 5):
-                        if (SciFiDigits[i]['plane'] == 0):
-                            self.SciFiDigitsPerChannelT2S5P1.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 1):
-                            self.SciFiDigitsPerChannelT2S5P2.Fill(SciFiDigits[i]['channel'])
-                        if (SciFiDigits[i]['plane'] == 2):
-                            self.SciFiDigitsPerChannelT2S5P3.Fill(SciFiDigits[i]['channel'])
+            for i in range(SciFiDigits.size()):
+                if (SciFiDigits[i].get_tracker() == 0):               
+                    if (SciFiDigits[i].get_station() == 1):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT1S1P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT1S1P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT1S1P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 2):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT1S2P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT1S2P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT1S2P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 3):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT1S3P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT1S3P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT1S3P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 4):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT1S4P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT1S4P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT1S4P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 5):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT1S5P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT1S5P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT1S5P3.Fill(SciFiDigits[i].get_channel())
+                if (SciFiDigits[i].get_tracker() == 1):               
+                    # print SciFiDigits[i].digits()
+                    # print SciFiDigits[i].get_channel()
+                    if (SciFiDigits[i].get_station() == 1):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT2S1P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT2S1P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT2S1P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 2):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT2S2P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT2S2P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT2S2P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 3):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT2S3P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT2S3P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT2S3P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 4):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT2S4P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT2S4P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT2S4P3.Fill(SciFiDigits[i].get_channel())
+                    if (SciFiDigits[i].get_station() == 5):
+                        if (SciFiDigits[i].get_plane() == 0):
+                            self.SciFiDigitsPerChannelT2S5P1.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 1):
+                            self.SciFiDigitsPerChannelT2S5P2.Fill(SciFiDigits[i].get_channel())
+                        if (SciFiDigits[i].get_plane() == 2):
+                            self.SciFiDigitsPerChannelT2S5P3.Fill(SciFiDigits[i].get_channel())
 
         return True
 
     # Gives information on reconstruction efficiency
-    def get_SciFiSpacepoints(self, spill):
+    def get_SciFiSpacepoints(self, spill_data):
 
         """
         Get the SciFiDigits and update the histograms.
@@ -392,43 +392,41 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "digits" in
         the spill.
         """
-        if 'recon_events' not in spill:
+
+        if spill_data.GetSpill().GetReconEventSize() == 0:
             raise ValueError("recon_events not in spill")
-        # print 'nevt = ', len(spill['recon_events']), spill['recon_events']
-        for event in range(len(spill['recon_events'])):
-            if 'sci_fi_event' not in spill['recon_events'][event]:
-                #print 'no scifi event'
-                return False
-            print 
-                # Return if we cannot find sci fi digits in the spill.
-            if 'spacepoints' not in \
-                spill['recon_events'][event]['sci_fi_event']:
+        reconevents = spill_data.GetSpill().GetReconEvents()
+        # print '# recon events = ',reconevents[0].GetPartEventNumber()
+        for evn in range(spill_data.GetSpill().GetReconEventSize()):
+            sci_fi_event = reconevents[evn].GetSciFiEvent()
+            if sci_fi_event is None:
+                raise ValueError("sci_fi_event not in recon_events")
+            # Return if we cannot find sci fi spacepionts
+            SciFiSpacepoints = sci_fi_event.spacepoints()
+            if SciFiSpacepoints is None:
                 return False
 
             '''If the tracker number =0 fill SciFiSpacepointsT1 with station Number
             and likewise for DS Tracker.'''
-            SciFiSpacepoints = spill['recon_events'][event]['sci_fi_event']['spacepoints']
-            spill_data = maus_cpp.converter.data_repr(spill)
             spill = spill_data.GetSpill()
             title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
-            for i in range(len(SciFiSpacepoints)):
-                print SciFiSpacepoints[i]['tracker']
-                if (SciFiSpacepoints[i]['tracker'] == 0):
-                    self.SciFiSpacepointsT1.Fill(SciFiSpacepoints[i]['station'])
+            for i in range(SciFiSpacepoints.size()):
+                # print SciFiSpacepoints[i].get_tracker(), SciFiSpacepoints[i].get_station()
+                if (SciFiSpacepoints[i].get_tracker() == 0):
+                    self.SciFiSpacepointsT1.Fill(SciFiSpacepoints[i].get_station())
                     self.SciFiSpacepointsT1.SetTitle("Spacepoints In US Tracker "+title+" (station 1 is innermost)")
-                if (SciFiSpacepoints[i]['tracker'] == 1):
-                    self.SciFiSpacepointsT2.Fill(SciFiSpacepoints[i]['station'])
+                if (SciFiSpacepoints[i].get_tracker() == 1):
+                    self.SciFiSpacepointsT2.Fill(SciFiSpacepoints[i].get_station())
                     self.SciFiSpacepointsT2.SetTitle("Spacepoints In DS Tracker "+title+" (station 1 is innermost)")
-
+        return True
 
     def two_d_hist_name(self, tracker, station): # pylint: disable = R0201
         """Define 2D histogram."""
         return "tracker_"+str(tracker)+"_station_"+str(station)
 
-    def get_SciFiSpacepointsTwoD(self, spill):
+    def get_SciFiSpacepointsTwoD(self, spill_data):
         """Get the 2D spacepoints for each tracker and station and fill histos."""
 
-        spill_data = maus_cpp.converter.data_repr(spill)
         spill = spill_data.GetSpill()
         title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
         for key in self.SciFiSpacepointsTwoDH:

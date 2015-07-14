@@ -93,7 +93,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         self.spill_count = 0 
         self.image_type = "eps"
         self.auto_number = False
-        self.root_batch_mode = 1 # False = Interactive mode.
+        self.root_batch_mode = 0 # False = Interactive mode.
 
     def birth(self, config_json):
         """
