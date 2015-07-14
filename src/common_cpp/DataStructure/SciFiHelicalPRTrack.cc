@@ -61,7 +61,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int num_points, int charge
     _point_spread(point_spread),
     _pos0(pos0),
     _phi(phi) {
-  this->set_chi_squared(_circle_chisq*_circle_chisq + _line_sz_chisq*_line_sz_chisq);
+  this->set_chi_squared(_circle_chisq + _line_sz_chisq);
   this->set_ndf((2*_num_points) - 5);
 }
 

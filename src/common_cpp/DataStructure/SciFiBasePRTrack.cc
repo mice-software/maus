@@ -25,8 +25,8 @@ SciFiBasePRTrack::SciFiBasePRTrack()
     _covariance(0),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0),
-    _chi_sq(0.0),
-    _ndf(0) {
+    _chi_sq(-1.0),
+    _ndf(-1) {
   _spoints = new TRefArray();
 }
 
@@ -35,8 +35,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov)
     _covariance(cov),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0),
-    _chi_sq(0.0),
-    _ndf(0) {
+    _chi_sq(-1.0),
+    _ndf(-1) {
   _spoints = new TRefArray();
 }
 
@@ -45,8 +45,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoint
     _covariance(cov),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0),
-    _chi_sq(0.0),
-    _ndf(0) {
+    _chi_sq(-1.0),
+    _ndf(-1) {
   _spoints = new TRefArray();
   for (std::vector<SciFiSpacePoint*>::iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
     _spoints->Add(*sp);

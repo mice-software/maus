@@ -79,7 +79,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   double sz_chisq = 7.0;
   double R = 13.0;
   double circ_chisq = 6.0;
-  double chisq = 1.0;
+  double chisq = sz_chisq + circ_chisq;
   int ndf = 5.0;
   double point_spread = 10.0;
   std::vector<double> cov(0);
