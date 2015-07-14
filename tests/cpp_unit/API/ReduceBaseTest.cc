@@ -156,6 +156,7 @@ namespace MAUS {
         << std::endl;
     }
     Py_DECREF(py_str1);
+    PyErr_Clear();
   }
 
   TEST(ReduceBaseTest, TestProcessStdException) {
@@ -172,6 +173,7 @@ namespace MAUS {
         << std::endl;
     }
     Py_DECREF(py_str1);
+    PyErr_Clear();
   }
 
   TEST(ReduceBaseTest, TestProcessOtherException) {
@@ -191,6 +193,7 @@ namespace MAUS {
         << std::endl;
     }
     Py_DECREF(py_str1);
+    PyErr_Clear();
   }
 
 }// end of namespace
