@@ -96,7 +96,7 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         spill_out = maus_cpp.converter.json_repr(result)
         self.assertTrue('recon_events' in spill_out)
         revtarray = spill_out['recon_events']
-        self.assertEqual(1, len(revtarray))
+        self.assertEqual(4, len(revtarray))
         revt = revtarray[0]
         self.assertTrue('global_event' in revt)
         self.assertTrue('track_points' in revt['global_event'])
@@ -105,7 +105,7 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue('mapper_name' in i)
             if i['mapper_name'] == 'MapCppGlobalTrackMatching':
                 numTMtrackpoints += 1
-        self.assertEqual(numTMtrackpoints, 30)
+        self.assertEqual(numTMtrackpoints, 37)
         self.assertTrue('tracks' in revt['global_event'])
         self.assertEqual(3, len(revt['global_event']['tracks']))
         numTMtracks = 0
@@ -115,7 +115,7 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
                 numTMtracks += 1
         self.assertEqual(numTMtracks, 1)
         self.assertTrue('space_points' in revt['global_event'])
-        self.assertEqual(33, len(revt['global_event']['space_points']))
+        self.assertEqual(34, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
         self.assertEqual(0, len(revt['global_event']['primary_chains']))
 
