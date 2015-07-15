@@ -202,8 +202,7 @@ void MapCppKLCellHits::fillCellHit(KLCellHit &cellHit, KLDigit &xDigit0, KLDigit
   if ((xChargeDigit0 + xChargeDigit1) == 0) {
      cellHit.SetChargeProduct(0);
      cellHit.SetFlag(false);
-  }
-  else {
+  } else {
      cellHit.SetChargeProduct(2 * xChargeDigit0 * xChargeDigit1 /
                                         (xChargeDigit0 + xChargeDigit1));
      cellHit.SetFlag(true);
