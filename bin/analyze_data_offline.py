@@ -22,14 +22,14 @@ def run():
     my_map = MAUS.MapPyGroup()
 
     # Trigger
-    my_map.append(MAUS.MapPyReconSetup())
+    my_map.append(MAUS.MapCppReconSetup())
 
     # Detectors
     my_map.append(MAUS.MapCppTOFDigits())
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
 
-    my_map.append(MAUS.MapPyCkov())
+    my_map.append(MAUS.MapCppCkovDigits())
 
     my_map.append(MAUS.MapCppKLDigits())
     my_map.append(MAUS.MapCppKLCellHits())

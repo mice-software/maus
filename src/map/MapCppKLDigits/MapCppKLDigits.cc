@@ -32,7 +32,7 @@ PyMODINIT_FUNC init_MapCppKLDigits(void) {
                                             ("MapCppKLDigits", "", "", "", "");
 }
 
-MapCppKLDigits::MapCppKLDigits() : MapBase<Json::Value>("MapCppKLDigits") {
+MapCppKLDigits::MapCppKLDigits() : MapBase<MAUS::Data>("MapCppKLDigits") {
 }
 
 void MapCppKLDigits::_birth(const std::string& argJsonConfigDocument) {
@@ -87,43 +87,58 @@ void MapCppKLDigits::_birth(const std::string& argJsonConfigDocument) {
 
 void MapCppKLDigits::_death()  {}
 
-void MapCppKLDigits::_process(Json::Value* document) const {
+void MapCppKLDigits::_process(MAUS::Data* data) const {
 
-    Json::Value& root = *document;
-    Json::Value xEventType = JsonWrapper::GetProperty(root,
-                                          "daq_event_type",
-                                          JsonWrapper::stringValue);
-    if (xEventType == "physics_event" || xEventType == "calibration_event") {
-      Json::Value xDaqData = JsonWrapper::GetProperty(root, "daq_data", JsonWrapper::objectValue);
-      Json::Value xDocTrig;
-      if (xDaqData.isMember("trigger")) {
+    Spill *spill = data->GetSpill();
 
-	  xDocTrig = JsonWrapper::GetProperty(xDaqData,
-					      "trigger",
-					      JsonWrapper::arrayValue);
+    if (spill->GetDAQData() == NULL)
+      return;
 
+    if (spill->GetDaqEventType() != "physics_event")
+      return;
 
-	  Json::Value xDocAllDigits;
-	  unsigned int n_events = 0;
+    TriggerArray        *tr_data     = spill->GetDAQData()->GetTriggerArrayPtr();
 
-	  if (xDaqData.isMember("kl")) {
-            Json::Value xDocDetectorData = JsonWrapper::GetProperty(xDaqData,
-                                                                    "kl",
-                                                                    JsonWrapper::arrayValue);
-            xDocAllDigits = makeDigits(xDocDetectorData, xDocTrig);
-            n_events = xDocAllDigits.size();
-	  }
+    KLArray *kl_data = spill->GetDAQData()->GetKLArrayPtr();
 
-	  for (unsigned int ev = 0; ev < n_events; ev++) {
-            // Json::Value xDocKLDigits(Json::arrayValue);
-	    Json::Value xDocKLDigits(Json::objectValue);
-	      if (xDocAllDigits[ev].type() == Json::arrayValue) {
-		xDocKLDigits["kl"] = xDocAllDigits[ev];
-	      } else {
-		xDocKLDigits["kl"] = Json::Value(Json::arrayValue);
-	      }
-	      root["recon_events"][ev]["kl_event"]["kl_digits"] = xDocKLDigits;
-	  }
+    // Get number of Particle trigger.
+    int n_part_event_triggers = tr_data->size();
+
+    int n_part_events = kl_data->size();
+
+    int recPartEvents = spill->GetReconEventSize();
+    ReconEventPArray *recEvts =  spill->GetReconEvents();
+
+    // Resize the recon event to harbour all the EMR noise+decays
+    if (recPartEvents == 0) { // No recEvts yet
+      for (int iPe = 0; iPe < n_part_events; iPe++) {
+        recEvts->push_back(new ReconEvent);
+      }
+    }
+
+  //   std::cerr << "nPartEvts: " << nPartEvents << std::endl;
+    for (int xPE = 0; xPE < n_part_events; xPE++) {
+      KLEvent *evt = new KLEvent();
+      (*recEvts)[xPE]->SetKLEvent(evt);
+      KLEventDigit *kl_ev_digit = evt->GetKLEventDigitPtr();
+      if (kl_ev_digit == NULL)
+          continue;
+      KLDigitArray *kl_digits = kl_ev_digit->GetKLDigitArrayPtr();
+
+      /** Create the digits in KL;
+       */
+      if (kl_data->at(xPE) == NULL)
+        continue;
+
+      V1724Array kl_adc_hits = (kl_data->at(xPE))->GetV1724Array();
+      int n_adc_hits = kl_adc_hits.size();
+      for (int xHit = 0; xHit < n_adc_hits; xHit++) {
+        KLDigit the_digit;
+        if (!this->getAdc(&the_digit, kl_adc_hits[xHit])) {
+          the_digit.SetChargeMm(0);
+          the_digit.SetChargePm(0);
+        }
+        kl_digits->push_back(the_digit);
       }
     }
 }
@@ -132,101 +147,51 @@ bool MapCppKLDigits::SetConfiguration(std::string json_configuration) {
   return true;
 }
 
-Json::Value MapCppKLDigits::makeDigits(Json::Value xDocDetData,
-                                       Json::Value xDocTrig) const {
-  Json::Value xDocDigits;
-  // Get number of Particle trigger.
-  int n_part_event_triggers = xDocTrig.size();
-  xDocDigits.resize(n_part_event_triggers);
-
-  if ( xDocDetData.isArray() ) {
-    // Get number of digits in the detector record. It can be different from
-    // the number of Particle triggers because of the Zero Suppression.
-    int n_part_events = xDocDetData.size();
-
-    for ( int PartEvent = 0; PartEvent < n_part_events; PartEvent++ ) {
-
-      // Get the data, trigger and trigger request for this particle event.
-      Json::Value xDocPartEvent_data = JsonWrapper::GetItem(xDocDetData,
-                                                            PartEvent,
-                                                            JsonWrapper::anyValue);
-
-      if (xDocPartEvent_data.isMember("V1724")) {
-
-        Json::Value xDocfAdc = JsonWrapper::GetProperty(xDocPartEvent_data,
-                                                        "V1724",
-                                                        JsonWrapper::arrayValue);
-
-        int n_adc_hits = xDocfAdc.size();
-
-        Json::Value xDocPmtHits;
-        for ( int AdcHitCount = 0; AdcHitCount < n_adc_hits; AdcHitCount++ ) {
-
-          // Get the Adc info from the particle event.
-          Json::Value xDocTheDigit = getAdc(xDocfAdc[AdcHitCount]);
-
-          xDocPmtHits.append(xDocTheDigit);
-        }
-        xDocDigits[PartEvent] = xDocPmtHits;
-      }
-    }
-  }
-  return xDocDigits;
-}
-
-Json::Value MapCppKLDigits::getAdc(Json::Value xDocAdcHit) const {
+bool MapCppKLDigits::getAdc(KLDigit* thisDigit, V1724 &adcHit) const {
   std::stringstream xConv;
   Json::Value xDocInfo;
 
   DAQChannelKey xAdcDaqKey;
 
-  std::string xDaqKey_adc_str = JsonWrapper::GetProperty(xDocAdcHit,
-                                                         "channel_key",
-                                                         JsonWrapper::stringValue).asString();
-
+  std::string xDaqKey_adc_str = adcHit.GetChannelKey();
   xConv << xDaqKey_adc_str;
   xConv >> xAdcDaqKey;
-
   KLChannelKey* xKlAdcKey = _map.find(&xAdcDaqKey);
 
   // Get the gain factors
   double gain = _mapcal.Gain(*xKlAdcKey);
 
   // Get the charge
-  int char_mm = JsonWrapper::GetProperty(xDocAdcHit,
-                                            "charge_mm",
-                                            JsonWrapper::intValue).asInt();
-  int char_pm = JsonWrapper::GetProperty(xDocAdcHit,
-                                            "charge_pm",
-                                            JsonWrapper::intValue).asInt();
-
+  int char_mm = adcHit.GetChargeMm();
+  int char_pm = adcHit.GetChargePm();
   // Equalize charges
   char_mm /= gain;
   char_pm /= gain;
 
   if (xKlAdcKey) {
-    xDocInfo["kl_key"]            = xKlAdcKey->str();
-    xDocInfo["cell"]              = xKlAdcKey->cell();
-    xDocInfo["pmt"]               = xKlAdcKey->pmt();
+    thisDigit->SetKlKey(xKlAdcKey->str());
+    thisDigit->SetCell(xKlAdcKey->cell());
+    thisDigit->SetPmt(xKlAdcKey->pmt());
 
 
-    xDocInfo["charge_mm"] = char_mm;
-    xDocInfo["charge_pm"] = char_pm;
-    xDocInfo["position_max"] = xDocAdcHit["position_max"];
-    xDocInfo["part_event_number"] = xDocAdcHit["part_event_number"];
-    xDocInfo["phys_event_number"] = xDocAdcHit["phys_event_number"];
+    thisDigit->SetChargeMm(char_mm);
+    thisDigit->SetChargePm(char_pm);
+    thisDigit->SetPositionMax(adcHit.GetPositionMax());
+    thisDigit->SetPartEventNumber(adcHit.GetPartEventNumber());
+    thisDigit->SetPhysEventNumber(adcHit.GetPhysEventNumber());
 
 
-     // std::cout << "phys_event_number= " << xDocInfo["phys_event_number"] << std::endl;
-     // std::cout << "part_event_number= " << xDocInfo["part_event_number"] << std::endl;
-     // std::cout << "adc before= " << xDocAdcHit["charge_mm"] << std::endl;
+     // std::cout << "phys_event_number= " << thisDigit->GetPhysEventNumber() << std::endl;
+     // std::cout << "part_event_number= " << thisDigit->GetPartEventNumber() << std::endl;
+     // std::cout << "adc before= " << thisDigit->GetChargeMm() << std::endl;
      // std::cout << "adc after= " << char_mm << std::endl;
      // std::cout << "gain= " << gain << std::endl;
-     // std::cout << "kl_key= " << xDocInfo["kl_key"] << std::endl;
-     // std::cout << "kl_cell= " << xDocInfo["cell"] << std::endl;
-     // std::cout << "kl_pmt= " << xDocInfo["pmt"] << std::endl;
+     // std::cout << "kl_key= " << thisDigit->GetKlKey() << std::endl;
+     // std::cout << "kl_cell= " << thisDigit->GetCell() << std::endl;
+     // std::cout << "kl_pmt= " << thisDigit->GetPmt() << std::endl;
+     return true;
+  } else {
+     return false;
   }
-
-  return xDocInfo;
 }
 }

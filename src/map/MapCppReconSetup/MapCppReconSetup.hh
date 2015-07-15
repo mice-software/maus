@@ -16,36 +16,30 @@
  */
 
 
-/** @class MapCppKLDigits
- *  Reconstruct events by running over KL real data.
+/** @class MapCppReconSetup
+ *  Setup dummy recon events to hold detector recon events
  *
  */
 
-#ifndef _MAP_MAPCPPKLDIGITS_H_
-#define _MAP_MAPCPPKLDIGITS_H_
+#ifndef _MAP_MAPCPPRECONSETUP_H
+#define _MAP_MAPCPPRECONSETUP_H_
 // C headers
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
-#include <json/json.h>
 
 // C++ headers
-#include <cmath>  //  from old file?
-#include <iostream>
 #include <string>
+#include <iostream>
 #include <sstream>
-#include <vector>
-
-// G4MICE from commonCpp
-#include "Utils/KLChannelMap.hh"
-#include "Utils/KLCalibrationMap.hh"
 #include "API/MapBase.hh"
 
 namespace MAUS {
-class MapCppKLDigits : public MapBase<MAUS::Data> {
+
+class MapCppReconSetup : public MapBase<MAUS::Data> {
 
  public:
-  MapCppKLDigits();
+  MapCppReconSetup();
 
  private:
  /** @brief Sets up the worker
@@ -59,27 +53,13 @@ class MapCppKLDigits : public MapBase<MAUS::Data> {
   */
   void _death();
 
- /** @brief process JSON document
-  *  @param document Receive a document with raw data and return
-  *  a document with digits
-  */
-  void _process(MAUS::Data* data) const;
-
- private:
-  KLChannelMap _map;
-  KLCalibrationMap _mapcal;
-
-  // Vector to hold the names of all detectors to be included
-  // in the digits.
-  std::vector<std::string> _stationKeys;
-
-  bool SetConfiguration(std::string json_configuration);
-
-  /** @brief Gets the information from the flash ADC branch and appends it to the digit
-   *  @param xDocPartEvent One particle event from raw detector data
-   */
-  bool getAdc(MAUS::KLDigit* digit, MAUS::V1724 &adc) const;
+  /** @brief process the data object
+ *
+ *  @param
+ */
+  void _process(MAUS::Data *data) const;
 };
 }
+
 #endif
 

@@ -178,8 +178,12 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         Test "process" with multiple JSON documents.
         @param self Object reference.
         """
+        json_in = {"daq_event_type":"start_of_run",
+                   "maus_event_type":"Spill",
+                   "run_number":0,
+                   "spill_number":-1}
         for i in range(0, 4):
-            result = self.__process({})
+            result = self.__process(json_in)
             self.__check_result(i, result)
 
     def test_multiple_spills_auto_number(self):
@@ -193,8 +197,12 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertTrue(success, "reducer.birth() failed")
         self.assertTrue(self.__reducer.auto_number, 
             "Unexpected reducer.auto_number")
+        json_in = {"daq_event_type":"start_of_run",
+                   "maus_event_type":"Spill",
+                   "run_number":0,
+                   "spill_number":-1}
         for i in range(0, 4):
-            result = self.__process({})
+            result = self.__process(json_in)
             self.__check_result(i, result)
 
     def test_error_spill(self):
@@ -210,7 +218,7 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertTrue("ReducePyROOTTester" in errors,
             "No ReducePyROOTTester field")        
         errors = errors["ReducePyROOTTester"]
-        self.assertEquals("<type 'exceptions.Exception'>: error", errors) # pylint: disable=C0301
+        self.assertTrue("Failed to recognise all json properties" in errors) # pylint: disable=C0301
 
     def test_svg(self):
         """

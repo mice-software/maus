@@ -44,6 +44,9 @@ KLEventDigit KLEvent::GetKLEventDigit() const {
     return _kl_digits;
 }
 
+KLEventDigit* KLEvent::GetKLEventDigitPtr() {
+    return &_kl_digits;
+}
 void KLEvent::SetKLEventDigit(KLEventDigit kl_digits) {
     _kl_digits = kl_digits;
 }
@@ -51,6 +54,10 @@ void KLEvent::SetKLEventDigit(KLEventDigit kl_digits) {
 
 KLEventCellHit KLEvent::GetKLEventCellHit() const {
     return _kl_cell_hits;
+}
+
+KLEventCellHit* KLEvent::GetKLEventCellHitPtr() {
+    return &_kl_cell_hits;
 }
 
 void KLEvent::SetKLEventCellHit(KLEventCellHit kl_cell_hits) {
