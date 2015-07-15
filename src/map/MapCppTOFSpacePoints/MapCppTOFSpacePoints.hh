@@ -54,7 +54,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
  */
   void _death();
 
-  /** @brief process JSON document
+  /** @brief process spill taking in MAUS::Data
  *
  *  @param document Receive a document with slab hits and return
  *  a document with space points.
@@ -73,25 +73,39 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
+  /* @brief set the space point once it has been found 
+   */
   void fillSpacePoint(
                       TOFSpacePoint &tofSp,
-                      TOFSlabHit &xDocSlabHit0,
-                      TOFSlabHit &xDocSlabHit1) const;
+                      TOFSlabHit &xSlabHit0,
+                      TOFSlabHit &xSlabHit1) const;
+
+  /* @brief process slab hits for each tof station.
+   * arguments are:
+   * pointer to the array of slab hits for the station
+   * pointer to the array of space points for the station
+   * station name 
+   * event number
+   * pixel hit map which is to be filled
+   */
   void processTOFStation(
-                          MAUS::TOF0SlabHitArray* tof0slabhits,
-                          MAUS::TOF0SpacePointArray* tof0sp,
+                          TOF1SlabHitArray* slHits,
+                          TOF1SpacePointArray* spPoints,
                           std::string detector,
                           unsigned int part_event,
                           std::map<int, std::string>& _triggerhit_pixels) const;
 
-  std::string findTriggerPixel(TOF0SlabHitArray* tof0lslabhitptr,
+  /* @brief go through slab hits and find the pixel which triggered the event
+   */
+  std::string findTriggerPixel(TOF1SlabHitArray* slHits,
                                std::vector<int> xPlane0Hits,
                                std::vector<int> xPlane1Hits) const;
   template<typename T>
   bool calibratePmtHit
               (TOFPixelKey xPixelKey, T xPmtHit, double &time) const;
+
   bool calibrateSlabHit
-             (TOFPixelKey xPixelKey, TOFSlabHit &tslh, double &time) const;
+             (TOFPixelKey xPixelKey, TOFSlabHit &tof_slabHit, double &time) const;
 
   /** @brief makes space points
    *
@@ -99,8 +113,8 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
    * one particle event in one individual detector.
    */
   void makeSpacePoints(
-                          MAUS::TOF0SlabHitArray* slHitArrayPtr,
-                          MAUS::TOF0SpacePointArray* spArrayPtr,
+                          MAUS::TOF1SlabHitArray* slHits,
+                          MAUS::TOF1SpacePointArray* spPoints,
                           std::vector<int> xPlane0Hits,
                           std::vector<int> xPlane1Hits,
                           std::map<int, std::string>& triggerhit_pixels) const;

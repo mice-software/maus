@@ -171,7 +171,7 @@ class ReducePyROOTHistogramTestCase(unittest.TestCase): # pylint: disable=R0904,
         self.assertTrue("ReducePyROOTTester" in errors,
             "No ReducePyROOTTester field")        
         errors = errors["ReducePyROOTTester"]
-        self.assertTrue("Failed to parse Json document" in errors) # pylint: disable=C0301
+        self.assertEquals("<type 'exceptions.ValueError'>: Expecting object: line 1 column 0 (char 0)", errors) # pylint: disable=C0301
 
     def test_process_multiple_spills(self):
         """

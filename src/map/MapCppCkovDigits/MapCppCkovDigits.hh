@@ -96,7 +96,7 @@ class MapCppCkovDigits : public MapBase<MAUS::Data> {
 
   /** @brief Set the digits for the event for CkovA and B 
    */
-  void setDigits(CkovTmpDigs &digs, CkovDigitArray* theDigits) const;
+  void setDigits(CkovTmpDigs &tmpDigs, CkovDigitArray* theDigits) const;
 };
 }
 #endif

@@ -165,9 +165,11 @@ void MapCppCkovDigits::getSignal(CkovAdcHits* ckdigs) const {
     int dist;
     /* debug
     for (int kk=0; kk<4; ++kk) {
-        std::cerr << "pulse: " << kk << " " << ckdigs->pulse[kk] << " totpulse: " << kk << " " << ckdigs->totpulse[kk] << std::endl;
-        std::cerr << "pos: " << kk << " " << ckdigs->position[kk] << std::endl;
-        std::cerr << "pes: " << kk << " " << ckdigs->pes[kk] << std::endl;
+        std::cerr << "pulse: " << kk << " " << ckdigs->pulse[kk]
+                  << " totpulse: " << kk << " " << ckdigs->totpulse[kk]
+                  << "pos: " << kk << " " << ckdigs->position[kk
+                  << "pes: " << kk << " " << ckdigs->pes[kk]
+                  << std::endl;
     }
     */
     if (nzeros == 4) {
@@ -191,7 +193,7 @@ void MapCppCkovDigits::getSignal(CkovAdcHits* ckdigs) const {
 }
 
 ///////////////////////////////////////////////////////////
-void MapCppCkovDigits::setDigits(CkovTmpDigs &digs, CkovDigitArray* theDigits) const {
+void MapCppCkovDigits::setDigits(CkovTmpDigs &tmpDigs, CkovDigitArray* theDigits) const {
       CkovDigit aDigit;
       CkovA ckov_a;
       CkovB ckov_b;
@@ -200,51 +202,51 @@ void MapCppCkovDigits::setDigits(CkovTmpDigs &digs, CkovDigitArray* theDigits) c
       // rather than in noindexable string names
       // datastructure changes will have to wait for another day, DR 6/30/15
       // Set Ckov A
-      ckov_a.SetArrivalTime0(digs[0].arTime[0]);
-      ckov_a.SetArrivalTime1(digs[0].arTime[1]);
-      ckov_a.SetArrivalTime2(digs[0].arTime[2]);
-      ckov_a.SetArrivalTime3(digs[0].arTime[3]);
+      ckov_a.SetArrivalTime0(tmpDigs[0].arTime[0]);
+      ckov_a.SetArrivalTime1(tmpDigs[0].arTime[1]);
+      ckov_a.SetArrivalTime2(tmpDigs[0].arTime[2]);
+      ckov_a.SetArrivalTime3(tmpDigs[0].arTime[3]);
 
-      ckov_a.SetPositionMin0(digs[0].posmin[0]);
-      ckov_a.SetPositionMin1(digs[0].posmin[1]);
-      ckov_a.SetPositionMin2(digs[0].posmin[2]);
-      ckov_a.SetPositionMin3(digs[0].posmin[3]);
+      ckov_a.SetPositionMin0(tmpDigs[0].posmin[0]);
+      ckov_a.SetPositionMin1(tmpDigs[0].posmin[1]);
+      ckov_a.SetPositionMin2(tmpDigs[0].posmin[2]);
+      ckov_a.SetPositionMin3(tmpDigs[0].posmin[3]);
 
-      ckov_a.SetPulse0(digs[0].pulse[0]);
-      ckov_a.SetPulse1(digs[0].pulse[1]);
-      ckov_a.SetPulse2(digs[0].pulse[2]);
-      ckov_a.SetPulse3(digs[0].pulse[3]);
+      ckov_a.SetPulse0(tmpDigs[0].pulse[0]);
+      ckov_a.SetPulse1(tmpDigs[0].pulse[1]);
+      ckov_a.SetPulse2(tmpDigs[0].pulse[2]);
+      ckov_a.SetPulse3(tmpDigs[0].pulse[3]);
 
-      ckov_a.SetPulse0(digs[0].pulse[0]);
-      ckov_a.SetPulse1(digs[0].pulse[1]);
-      ckov_a.SetPulse2(digs[0].pulse[2]);
-      ckov_a.SetPulse3(digs[0].pulse[3]);
+      ckov_a.SetPulse0(tmpDigs[0].pulse[0]);
+      ckov_a.SetPulse1(tmpDigs[0].pulse[1]);
+      ckov_a.SetPulse2(tmpDigs[0].pulse[2]);
+      ckov_a.SetPulse3(tmpDigs[0].pulse[3]);
 
-      ckov_a.SetTotalCharge(digs[0].totcharge);
-      ckov_a.SetNumberOfPes(digs[0].totnpe);
-      ckov_a.SetCoincidences(digs[0].ncoin);
-      ckov_a.SetPartEventNumber(digs[0].partnum);
+      ckov_a.SetTotalCharge(tmpDigs[0].totcharge);
+      ckov_a.SetNumberOfPes(tmpDigs[0].totnpe);
+      ckov_a.SetCoincidences(tmpDigs[0].ncoin);
+      ckov_a.SetPartEventNumber(tmpDigs[0].partnum);
 
       // Set Ckov B
-      ckov_b.SetArrivalTime4(digs[1].arTime[0]);
-      ckov_b.SetArrivalTime5(digs[1].arTime[1]);
-      ckov_b.SetArrivalTime6(digs[1].arTime[2]);
-      ckov_b.SetArrivalTime7(digs[1].arTime[3]);
+      ckov_b.SetArrivalTime4(tmpDigs[1].arTime[0]);
+      ckov_b.SetArrivalTime5(tmpDigs[1].arTime[1]);
+      ckov_b.SetArrivalTime6(tmpDigs[1].arTime[2]);
+      ckov_b.SetArrivalTime7(tmpDigs[1].arTime[3]);
 
-      ckov_b.SetPositionMin4(digs[1].posmin[0]);
-      ckov_b.SetPositionMin5(digs[1].posmin[1]);
-      ckov_b.SetPositionMin6(digs[1].posmin[2]);
-      ckov_b.SetPositionMin7(digs[1].posmin[3]);
+      ckov_b.SetPositionMin4(tmpDigs[1].posmin[0]);
+      ckov_b.SetPositionMin5(tmpDigs[1].posmin[1]);
+      ckov_b.SetPositionMin6(tmpDigs[1].posmin[2]);
+      ckov_b.SetPositionMin7(tmpDigs[1].posmin[3]);
 
-      ckov_b.SetPulse4(digs[1].pulse[0]);
-      ckov_b.SetPulse5(digs[1].pulse[1]);
-      ckov_b.SetPulse6(digs[1].pulse[2]);
-      ckov_b.SetPulse7(digs[1].pulse[3]);
+      ckov_b.SetPulse4(tmpDigs[1].pulse[0]);
+      ckov_b.SetPulse5(tmpDigs[1].pulse[1]);
+      ckov_b.SetPulse6(tmpDigs[1].pulse[2]);
+      ckov_b.SetPulse7(tmpDigs[1].pulse[3]);
 
-      ckov_b.SetTotalCharge(digs[1].totcharge);
-      ckov_b.SetNumberOfPes(digs[1].totnpe);
-      ckov_b.SetCoincidences(digs[1].ncoin);
-      ckov_b.SetPartEventNumber(digs[1].partnum);
+      ckov_b.SetTotalCharge(tmpDigs[1].totcharge);
+      ckov_b.SetNumberOfPes(tmpDigs[1].totnpe);
+      ckov_b.SetCoincidences(tmpDigs[1].ncoin);
+      ckov_b.SetPartEventNumber(tmpDigs[1].partnum);
 
       aDigit.SetCkovA(ckov_a);
       aDigit.SetCkovB(ckov_b);

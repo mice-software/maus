@@ -124,22 +124,30 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
         """
         Process a single event
         
+        event is either of type MAUS::Data or string
+        InputCppDAQ emits MAUS::Data, InputPyJSON and InputCppROOT emit strings
+
+        Raises a TypeError if event is not in one of these formats 
         Process a single event - if it is a Spill, check for run_number change
         and call EndOfEvent/StartOfEvent if run_number has changed.
+
+        If run_number has not changed, transform the event and write it out
         """
+
         if event == "":
             raise StopIteration("End of event")
+
         event_json = None
         bad_input = False
-        # try to treat as root data and extract an event type
-        # if it fails try a json conversion
-        # if that fails it's a bad spill
-        try:
+        
+        # print '>> evtype, class == ',type(event), event.__class__.__name__
+        if event.__class__.__name__ == 'MAUS::Data':
             evtype = event.GetEventType()
             daq_errors = event.GetSpill().GetErrors()["bad_data_input"]
+            # protect against run number change due to bad (empty) spills
             if "InputCppDAQOfflineData" in daq_errors:
                 bad_input = True
-        except AttributeError:
+        elif event.__class__.__name__ == 'str':
             try:
                 event_json = maus_cpp.converter.json_repr(event)
                 evtype = DataflowUtilities.get_event_type(event_json)
@@ -148,23 +156,24 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 if "errors" in event_json\
                    and "bad_data_input" in event_json["errors"]:
                     bad_input = True
-            except ValueError:
-                print 'could not determine type'
+            except: # pylint: disable = W0702
                 return
-        except:
-            raise
+        else:
+            raise TypeError("Event type %s is not supported."\
+                % type(event))
 
         # process spills
         # check for run number change and process an end-of-run spill if changed
         if evtype == "Spill":
-            if event_json is not None:
-                current_run_number = DataflowUtilities.get_run_number(event_json) # pylint: disable=C0301
-                if (DataflowUtilities.is_end_of_run(event_json)):
-                    self.end_of_run_spill = event_json
-            else:
+            if event_json is None:
                 current_run_number = event.GetSpill().GetRunNumber()
                 if (event.GetEventType() == "end_of_run"):
                     self.end_of_run_spill = event
+            else:
+                current_run_number = DataflowUtilities.get_run_number(event_json) # pylint: disable=C0301
+                if (DataflowUtilities.is_end_of_run(event_json)):
+                    self.end_of_run_spill = event_json
+
             # check for bad inputs where the daq run number is not set
             # if that's the case do not treat it as an end of run
             if not bad_input and current_run_number != self.run_number:
@@ -172,9 +181,12 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                     self.end_of_run(self.run_number)
                 self.start_of_run(current_run_number)
                 self.run_number = current_run_number
+            # now transform the event and reduce it
             event = self.transformer.process(event)
             event = self.merger.process(event)
+        # done with tranform-merge, now write it out
         self.outputer.save(event)
+        # if we converted to a different representation, delete the old one
         try:
             maus_cpp.converter.del_data_repr(event)
         except: # pylint: disable = W0702
