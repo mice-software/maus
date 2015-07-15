@@ -97,6 +97,12 @@ class OutputPyJSON:
             ErrorHandler.HandleException({}, self)
             return False
 
+        # remove references to data if any
+        try:
+            maus_cpp.converter.del_data_repr(document)
+        except: #pylint: disable=W0702
+            pass
+
     def death(self):
         """Closes down OutputPyJSON
         

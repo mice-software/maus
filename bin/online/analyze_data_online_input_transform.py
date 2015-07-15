@@ -47,11 +47,11 @@ def run():
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
     # add ReconSetup map -- analyze_data_offline seems to have it already
-    my_map.append(MAUS.MapPyReconSetup())
+    my_map.append(MAUS.MapCppReconSetup())
     my_map.append(MAUS.MapCppTOFDigits())
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
-    my_map.append(MAUS.MapPyCkov())
+    my_map.append(MAUS.MapCppCkovDigits())
     my_map.append(MAUS.MapCppKLDigits())
     my_map.append(MAUS.MapCppKLCellHits())
     my_map.append(MAUS.MapCppTrackerDigits())

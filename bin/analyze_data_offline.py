@@ -22,7 +22,6 @@ def run():
     my_map = MAUS.MapPyGroup()
 
     # Trigger
-    #my_map.append(MAUS.MapPyReconSetup())
     my_map.append(MAUS.MapCppReconSetup())
 
     # Detectors
