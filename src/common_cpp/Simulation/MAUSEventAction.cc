@@ -57,6 +57,12 @@ void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
         throw(Exception(Exception::recoverable,
                      "Ran out of space in event array",
                      "MAUSEventAction::EndOfEventAction"));
+    _events->at(_primary)->SetSciFiHits(new std::vector<SciFiHit>());
+    _events->at(_primary)->SetSciFiNoiseHits(new std::vector<SciFiNoiseHit>());
+    _events->at(_primary)->SetTOFHits(new std::vector<TOFHit>());
+    _events->at(_primary)->SetKLHits(new std::vector<KLHit>());
+    _events->at(_primary)->SetEMRHits(new std::vector<EMRHit>());
+    _events->at(_primary)->SetSpecialVirtualHits(new std::vector<SpecialVirtualHit>());
     for (int i = 0; i < _geometry->GetSDSize(); i++) {
       //  Retrieve detector i's hits
       _geometry->GetSDHits(i, (*_events)[_primary]);
