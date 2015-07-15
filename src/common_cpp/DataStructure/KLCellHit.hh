@@ -18,7 +18,6 @@
 #define _SRC_COMMON_CPP_DATASTRUCTURE_KLCELLHIT_
 
 #include <string>
-
 #include "src/common_cpp/Utils/VersionNumber.hh"
 
 namespace MAUS {
@@ -31,6 +30,10 @@ namespace MAUS {
  *  @var charge_product  <2*leftcharge*rightcharge/(leftcharge+rightcharge)>
  *  @var detector  <kl>
  *  @var part_event_number  <number of particle in the phys_event>
+ *  @var global_pos  <position of the fired cell within MICE setup>
+ *  @var local_pos  <position of the fired cell within KL detector>
+ *  @var err_pos  <error of position of the fired cell>
+ *  @var flag  <quality flag (0/1) of cell hit>
  */
 
 class KLCellHit {
@@ -40,7 +43,10 @@ class KLCellHit {
 
     /** Constructor - initialises member variables from arguments */
   KLCellHit(int cell, int phys_event_number, int charge,  int charge_product,
-            std::string detector, int part_event_number);
+            std::string detector, int part_event_number,
+	    double global_pos_x, double global_pos_y, double global_pos_z,
+	    double local_pos_x, double local_pos_y, double local_pos_z,
+	    double err_x, double err_y, double err_z, bool flag);
 
     /** Copy constructor - any pointers are deep copied */
     KLCellHit(const KLCellHit& _klcellhit);
@@ -88,6 +94,65 @@ class KLCellHit {
     /** Sets PartEventNumber */
     void SetPartEventNumber(int part_event_number);
 
+    /** Returns GlobalPosX */
+    double GetGlobalPosX() const;
+
+    /** Returns GlobalPosY */
+    double GetGlobalPosY() const;
+
+    /** Returns GlobalPosZ */
+    double GetGlobalPosZ() const;
+
+    /** Sets GlobalPosX */
+    void SetGlobalPosX(double global_pos_x);
+
+    /** Sets GlobalPosY */
+    void SetGlobalPosY(double global_pos_y);
+
+    /** Sets GlobalPosZ */
+    void SetGlobalPosZ(double global_pos_z);
+
+    /** Returns LocalPosX */
+    double GetLocalPosX() const;
+
+    /** Returns LocalPosY */
+    double GetLocalPosY() const;
+
+    /** Returns LocalPosZ */
+    double GetLocalPosZ() const;
+
+    /** Sets LocalPosX */
+    void SetLocalPosX(double local_pos_x);
+
+    /** Sets LocalPosY */
+    void SetLocalPosY(double local_pos_y);
+
+    /** Sets LocalPosZ */
+    void SetLocalPosZ(double local_pos_z);
+
+    /** Returns ErrorPosX */
+    double GetErrorX() const;
+
+    /** Returns ErrorPosY */
+    double GetErrorY() const;
+
+    /** Returns ErrorPosZ */
+    double GetErrorZ() const;
+
+     /** Sets ErrorX */
+    void SetErrorX(double error_x);
+
+    /** Sets ErrorY */
+    void SetErrorY(double error_y);
+
+     /** Sets ErrorZ */
+    void SetErrorZ(double error_z);
+
+    /** Returns quality Flag */
+    bool GetFlag() const;
+
+     /** Sets quality Flag */
+    void SetFlag(bool flag);
 
   private:
     int _cell;
@@ -96,6 +161,16 @@ class KLCellHit {
     int _charge_product;
     std::string _detector;
     int _part_event_number;
+    double _global_pos_x;
+    double _global_pos_y;
+    double _global_pos_z;
+    double _local_pos_x;
+    double _local_pos_y;
+    double _local_pos_z;
+    double _error_x;
+    double _error_y;
+    double _error_z;
+    bool _flag;
 
     MAUS_VERSIONED_CLASS_DEF(KLCellHit)
 };

@@ -14,25 +14,30 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include <Python.h>
+
+#include <string>
+
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
+#include "src/common_cpp/Utils/PyObjectWrapper.hh"
 #include "src/common_cpp/API/ReduceBase.hh"
 
 namespace MAUS {
 
 
-  class MyReducer : public ReduceBase<int> {
+  class MyReducer : public ReduceBase<std::string, std::string> {
   public:
-    MyReducer() : ReduceBase<int>("TestClass") {}
-    MyReducer(const MyReducer& mr) : ReduceBase<int>(mr) {}
+    MyReducer() : ReduceBase<std::string, std::string>("TestClass") {}
+    MyReducer(const MyReducer& mr) : ReduceBase<std::string, std::string>(mr) {}
     virtual ~MyReducer() {}
 
   private:
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual int* _process(int* t) {
-      return new int(*t);
+    virtual std::string* _process(std::string* t) {
+      return new std::string(*t);
   }
 
   private:
@@ -45,10 +50,10 @@ namespace MAUS {
     MyReducer_maus_exception() : MyReducer() {}
 
   private:
-    virtual int* _process(int* t) {
+    virtual std::string* _process(std::string* t) {
       throw MAUS::Exception(MAUS::Exception::recoverable,
-		   "Expected Test MAUS::Exception in _process",
-		   "int* _process(int* t) const");
+           "Expected Test MAUS::Exception in _process",
+           "std::string* _process(std::string* t) const");
     }
   };
 
@@ -57,7 +62,7 @@ namespace MAUS {
     MyReducer_exception() : MyReducer() {}
 
   private:
-    virtual int* _process(int* t) {
+    virtual std::string* _process(std::string* t) {
       throw std::exception();
     }
   };
@@ -67,7 +72,7 @@ namespace MAUS {
     MyReducer_otherexcept() : MyReducer() {}
 
   private:
-    virtual int* _process(int* t) {throw 17;}
+    virtual std::string* _process(std::string* t) {throw 17;}
   };
 
 
@@ -95,8 +100,8 @@ namespace MAUS {
     }
     catch (...) {
       ASSERT_TRUE(false)
-	<<"Fail: Birth function failed. Check ModuleBaseTest"
-	<< std::endl;
+        <<"Fail: Birth function failed. Check ModuleBaseTest"
+        << std::endl;
     }
   }
 
@@ -107,77 +112,88 @@ namespace MAUS {
     }
     catch (...) {
       ASSERT_TRUE(false)
-	<<"Fail: Death function failed. Check ModuleBaseTest"
-	<< std::endl;
+        <<"Fail: Death function failed. Check ModuleBaseTest"
+        << std::endl;
     }
   }
 
   TEST(ReduceBaseTest, TestProcess) {
     MyReducer mm;
 
-    int* i = new int(27);
+    std::string* str1 = new std::string("-27");
+    PyObject* py_str1 = PyObjectWrapper::wrap(str1); // python owns str1
+    PyObject* py_str2 = mm.process_pyobj(py_str1);
+    std::string* str2 = PyObjectWrapper::unwrap<std::string>(py_str2);
+    EXPECT_EQ(*str2, std::string("-27"))
+          <<"Fail: _process method not called properly"
+          << *str2 << std::endl;
+    delete str2;
+    Py_DECREF(py_str2);
+    Py_DECREF(py_str1);
+  }
 
-    int* i2 = mm.process(i);
+  TEST(ReduceBaseTest, TestProcessNULL) {
+    MyReducer mm;
+    PyObject* py_str1 = NULL;
+    PyObject* py_out = mm.process_pyobj(py_str1);
+    EXPECT_TRUE(py_out == NULL)
+      << "Fail: Python return object not NULL"
+      << std::endl;
+    PyErr_Clear();
+  }
 
-    ASSERT_TRUE(*i2 == 27)
-      <<"Fail: _process method not called properly"
-      <<std::endl;
-
-
-    /////////////////////////////////////////////////////
-    MyReducer mm2;
+  TEST(ReduceBaseTest, TestProcessMAUSException) {
+    std::string* str1 = new std::string("-27");
+    PyObject* py_str1 = PyObjectWrapper::wrap(str1); // python owns str1
+    MyReducer_maus_exception mm_e;
     try {
-      int* dub = 0;
-      mm2.process(dub);
-      ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
+      mm_e.process_pyobj(py_str1);
     }
-    catch (NullInputException& e) {}
+    catch (MAUS::Exception& e) {}
     catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type NullInputException to be thrown"
-	<< std::endl;
+      EXPECT_TRUE(false)
+        << "Fail: Expected exception of type MAUS::Exception to be thrown"
+        << std::endl;
     }
-    /////////////////////////////////////////////////////
-    MyReducer_maus_exception mm_s;
-    try {
-      mm_s.process(i);
-    }
-    catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: MAUS::Exception should have been handled"
-	<< std::endl;
-    }
+    Py_DECREF(py_str1);
+    PyErr_Clear();
+  }
 
-    /////////////////////////////////////////////////////
+  TEST(ReduceBaseTest, TestProcessStdException) {
+    std::string* str1 = new std::string("-27");
+    PyObject* py_str1 = PyObjectWrapper::wrap(str1); // python owns str1
     MyReducer_exception mm_e;
     try {
-      mm_e.process(i);
+      mm_e.process_pyobj(py_str1);
     }
+    catch (MAUS::Exception& e) {}
     catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: MAUS::Exception should have been handled"
-	<< std::endl;
+      EXPECT_TRUE(false)
+        << "Fail: Expected exception of type MAUS::Exception to be thrown"
+        << std::endl;
     }
+    Py_DECREF(py_str1);
+    PyErr_Clear();
+  }
 
-    /////////////////////////////////////////////////////
+  TEST(ReduceBaseTest, TestProcessOtherException) {
+    std::string* str1 = new std::string("-27");
+    PyObject* py_str1 = PyObjectWrapper::wrap(str1); // python owns str1
     MyReducer_otherexcept mm_oe;
     try {
-      mm_oe.process(i);
-      ASSERT_TRUE(false)
-	<< "Fail: No exception thrown"
-	<< std::endl;
+      mm_oe.process_pyobj(py_str1);
+      EXPECT_TRUE(false)
+        << "Fail: No exception thrown"
+        << std::endl;
     }
     catch (UnhandledException& e) {}
     catch (...) {
-      ASSERT_TRUE(false)
-	<< "Fail: Expected exception of type UnhandledException to be thrown"
-	<< std::endl;
+      EXPECT_TRUE(false)
+        << "Fail: Expected exception of type UnhandledException to be thrown"
+        << std::endl;
     }
-
-    delete i;
-    delete i2;
+    Py_DECREF(py_str1);
+    PyErr_Clear();
   }
 
 }// end of namespace

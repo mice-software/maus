@@ -18,6 +18,8 @@
 #ifndef _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 
+#include <vector>
+
 #include "Geant4/G4RunManager.hh"
 #include "Geant4/G4SDManager.hh"
 #include "Geant4/G4GDMLParser.hh"
@@ -37,6 +39,7 @@ namespace MAUS {
 
 class MAUSVisManager;
 class MAUSPhysicsList;
+class MCEvent;
 
 namespace Simulation {
 class DetectorConstruction;
@@ -123,7 +126,7 @@ class MAUSGeant4Manager {
      *
      *  @returns a json object with tracking, virtual hits and real hits
      */
-    Json::Value RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
+    MCEvent* RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
 
     /** @brief Run a particle through the simulation
      *
@@ -132,7 +135,7 @@ class MAUSGeant4Manager {
      *           tracking output from this event:\n
      *             "tracks", "virtual_hits", "hits"
      */
-    Json::Value RunParticle(Json::Value particle);
+    MCEvent* RunParticle(MAUS::Primary particle);
 
     /** @brief Run an array of particles through the simulation
      *
@@ -144,6 +147,16 @@ class MAUSGeant4Manager {
      *  appended
      */
     Json::Value RunManyParticles(Json::Value particle_array);
+
+    /** @brief Run a vector of particles through the simulation
+     *
+     *  @param mc_events to run; MAUSGeant4Manager takes ownership of the memory
+     *                   assigned to mc_events
+     *
+     *  @returns a vector of particles with any new hits, virtual_hits or tracks
+     *  appended; caller owns the memory
+     */
+    std::vector<MCEvent*>* RunManyParticles(std::vector<MCEvent*>* mc_events);
 
     /** @brief Get the visualisation manager or return NULL if vis is inactive
      *
@@ -160,7 +173,6 @@ class MAUSGeant4Manager {
      *  Note that it is a feature of Geant4 that the geometry cannot be reopened
      */
     ~MAUSGeant4Manager();
-
 
     /** Set the auxiliary information for the GDML objects 
      *  
@@ -205,7 +217,7 @@ class MAUSGeant4Manager {
     void SetVisManager();
     void BeamOn(int number_of_particles);
 
-    Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
+    MCEvent* Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 
     static MAUSGeant4Manager* _instance;
     static bool _isClosed;

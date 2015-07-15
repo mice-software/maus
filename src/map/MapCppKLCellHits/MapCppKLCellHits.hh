@@ -73,6 +73,9 @@ class MapCppKLCellHits : public MapBase<MAUS::Data> {
    * one particle event in one individual detector.
    */
   void makeCellHits(KLCellHitArray* kl_cellHits, KLDigitArray* kl_digits) const;
+  MiceModule* geo_module;
+  std::vector<const MiceModule*> kl_modules;
+  std::vector<const MiceModule*> kl_mother_modules;
 };
 }
 #endif

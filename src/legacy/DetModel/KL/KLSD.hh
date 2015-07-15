@@ -6,10 +6,11 @@
 #ifndef _KLSD_HH_
 #define _KLSD_HH_ 1
 
-#include "DetModel/MAUSSD.hh"
-#include "Geant4/G4VSensitiveDetector.hh"
-#include <json/json.h>
 #include <string>
+#include "Geant4/G4VSensitiveDetector.hh"
+#include "src/common_cpp/DetModel/MAUSSD.hh"
+#include "src/common_cpp/DataStructure/Hit.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 
 class G4Step;
 class G4HCofThisEvent;
@@ -23,7 +24,12 @@ class KLSD : public MAUS::MAUSSD {
   void Initialize(G4HCofThisEvent*);
   G4bool ProcessHits(G4Step*, G4TouchableHistory*);
   void EndOfEvent(G4HCofThisEvent*);
-  
+  bool isHit() {return _hits != NULL && _hits->size() > 0;}
+  int GetNHits() {return _hits->size();}
+  void ClearHits();
+  void TakeHits(MAUS::MCEvent* event) {event->SetKLHits(_hits); _hits = new std::vector<MAUS::KLHit>();}
+ private:
+  std::vector<MAUS::KLHit>* _hits;
 };
 
 #endif

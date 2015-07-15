@@ -9,5 +9,4 @@ Module KLFiber
   PropertyDouble FibreSpacingY 1.34 mm
   PropertyDouble FibreSpacingZ 0.98 mm
   PropertyString Material POLYSTYRENE
-  PropertyDouble GreenColour 1
 }

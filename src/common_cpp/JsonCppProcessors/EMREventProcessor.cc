@@ -23,7 +23,7 @@ EMREventProcessor::EMREventProcessor()
       : _plane_hit_array_proc(new EMRPlaneHitProcessor) {
     RegisterValueBranch
 	  ("emr_plane_hits", &_plane_hit_array_proc, &EMREvent::GetEMRPlaneHitArray,
-           &EMREvent::SetEMRPlaneHitArray, false );
+           &EMREvent::SetEMRPlaneHitArray, false);
     RegisterValueBranch
           ("initial_trigger", &_bool_proc, &EMREvent::GetInitialTrigger,
           &EMREvent::SetInitialTrigger, false);
@@ -55,6 +55,12 @@ EMREventProcessor::EMREventProcessor()
     RegisterValueBranch
           ("charge_ratio_SA", &_double_proc, &EMREvent::GetChargeRatioSA,
           &EMREvent::SetChargeRatioSA, false);
+    RegisterValueBranch
+          ("plane_density", &_double_proc, &EMREvent::GetPlaneDensity,
+          &EMREvent::SetPlaneDensity, false);
+    RegisterValueBranch
+          ("chi2", &_double_proc, &EMREvent::GetChi2,
+          &EMREvent::SetChi2, false);
 }
 }  // namespace MAUS
 

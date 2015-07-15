@@ -509,6 +509,7 @@ class Tracking(object): # pylint: disable=R0902
           {
             'position':{'x':x_pos, 'y':y_pos, 'z':self.z_start},
             'momentum':{'x':0., 'y':0., 'z':1.},
+            'spin':{'x':0., 'y':0., 'z':1.},
             'particle_id':22,
             'energy':1e9,
             'time':0.,

@@ -519,8 +519,7 @@ EMRarrivalTimeUniformWidth = 12.5
 EMRpulseShapeLandauWidth = 2
 
 # EMR reconstruction
-EMRsecondaryHitsBunchingDistance = 1000 # ns
-EMRsecondaryHitsBunchingWidth = 200 # ns
+EMRsecondaryHitsBunchingWidth = 10 # ADC
 
 EMRprimaryTriggerMinXhits = 1
 EMRprimaryTriggerMinYhits = 1
@@ -530,7 +529,7 @@ EMRsecondaryTriggerMinYhits = 1
 EMRsecondaryTriggerMinNhits = 2
 EMRsecondaryTriggerMinTot = 4
 
-EMRmaxSecondaryToPrimaryTrackDistance = 80
+EMRmaxSecondaryToPrimaryTrackDistance = 100
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -641,6 +640,9 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+
+root_document_store_timeout = 10
+root_document_store_poll_time = 1
 
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),

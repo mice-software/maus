@@ -34,14 +34,19 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
   std::string** string_ret = new std::string*(NULL);
   Json::Value** json_ret = new Json::Value*(NULL);
   Data** data_ret = new Data*(NULL);
+  ImageData** image_ret = new ImageData*(NULL);
   JobHeaderData** jh_ret = new JobHeaderData*(NULL);
   JobFooterData** jf_ret = new JobFooterData*(NULL);
   RunHeaderData** rh_ret = new RunHeaderData*(NULL);
   RunFooterData** rf_ret = new RunFooterData*(NULL);
   PyObject** py_ret = new PyObject*(NULL);
-  lazy_unwrap(args, py_ret, string_ret, json_ret, data_ret, jh_ret, jf_ret, rh_ret, rf_ret);
+  lazy_unwrap(args, py_ret, string_ret, json_ret,
+              data_ret, jh_ret, jf_ret, rh_ret, rf_ret, image_ret);
   TEMP* cpp_ret = NULL;
-  if (*string_ret != NULL) {
+  if (*py_ret != NULL) {
+      cpp_ret = ConverterFactory().convert<PyObject, TEMP>(*py_ret);
+      Py_DECREF(*py_ret);
+  } else if (*string_ret != NULL) {
       cpp_ret = ConverterFactory().convert<std::string, TEMP>(*string_ret);
       delete *string_ret;
   } else if (*json_ret != NULL) {
@@ -62,8 +67,8 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
   } else if (*rf_ret != NULL) {
       cpp_ret = ConverterFactory().convert<RunFooterData, TEMP>(*rf_ret);
       delete *rf_ret;
-  } else if (*py_ret != NULL) {
-      cpp_ret = ConverterFactory().convert<PyObject, TEMP>(*py_ret);
+  } else if (*image_ret != NULL) {
+      cpp_ret = ConverterFactory().convert<ImageData, TEMP>(*image_ret);
       Py_DECREF(*py_ret);
   } else {
     throw Exception(Exception::recoverable,
@@ -71,6 +76,7 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
                     "PyObjectWrapper::unwrap_pyobject");
   }
   // note here we delete the pointer, not the allocated memory it points to
+  delete image_ret;
   delete py_ret;
   delete rf_ret;
   delete rh_ret;
@@ -101,6 +107,11 @@ PyObject* PyObjectWrapper::wrap(MAUS::RunHeaderData* cpp_data) {
 PyObject* PyObjectWrapper::wrap(MAUS::RunFooterData* cpp_data) {
   return wrap_root_object_proxy(cpp_data, "MAUS::RunFooterData");
 }
+
+PyObject* PyObjectWrapper::wrap(MAUS::ImageData* cpp_data) {
+  return wrap_root_object_proxy(cpp_data, "MAUS::ImageData");
+}
+
 
 PyObject* PyObjectWrapper::wrap(Json::Value* json_value) {
   // Confirm the object exists.
@@ -146,8 +157,17 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
                             JobHeaderData** jh_ret,
                             JobFooterData** jf_ret,
                             RunHeaderData** rh_ret,
-                            RunFooterData** rf_ret) {
-    if (*string_ret != NULL || *json_ret != NULL || *data_ret != NULL || *py_ret != NULL) {
+                            RunFooterData** rf_ret,
+                            ImageData** image_ret) {
+    if (*string_ret != NULL ||
+        *json_ret != NULL ||
+        *data_ret != NULL ||
+        *py_ret != NULL ||
+        *jh_ret != NULL ||
+        *jf_ret != NULL ||
+        *rh_ret != NULL ||
+        *rf_ret != NULL ||
+        *image_ret != NULL) {
       throw Exception(Exception::recoverable,
                       "return values not initialised to NULL",
                       "PyObjectWrapper::lazy_unwrap");
@@ -158,33 +178,38 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
                       "py_cpp was NULL",
                       "PyObjectWrapper::lazy_unwrap");
     }
-
     if (TPython::ObjectProxy_Check(py_cpp)) {
         try {
             unwrap_root_object_proxy(py_cpp, data_ret, "MAUS::Data");
-            if (data_ret != NULL)
+            if (*data_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, jh_ret, "MAUS::JobHeaderData");
-            if (jh_ret != NULL)
+            if (*jh_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, jf_ret, "MAUS::JobFooterData");
-            if (jf_ret != NULL)
+            if (*jf_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, rh_ret, "MAUS::RunHeaderData");
-            if (rh_ret != NULL)
+            if (*rh_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, rf_ret, "MAUS::RunFooterData");
-            if (rf_ret != NULL)
+            if (*rf_ret != NULL)
                 return;
         } catch (MAUS::Exception &exc) {}
+        try {
+            unwrap_root_object_proxy(py_cpp, image_ret, "MAUS::ImageData");
+            if (*image_ret != NULL)
+                return;
+        } catch (MAUS::Exception &exc) {
+        }
     } else if (PyCapsule_IsValid(py_cpp, "JsonCpp")) {
         void* vptr = PyCapsule_GetPointer(py_cpp, "JsonCpp");
         Json::Value *json_ptr = static_cast<Json::Value*>(vptr);
@@ -234,10 +259,13 @@ void PyObjectWrapper::unwrap_root_object_proxy(PyObject* py_cpp,
                         "PyObjectWrapper::lazy_unwrap");
         }
     } else {
-            throw Exception(Exception::recoverable,
-                        "Did not recognise ObjectProxy type "+\
-                        std::string(c_string),
-                        "PyObjectWrapper::lazy_unwrap");
+        return;
+/*
+        throw Exception(Exception::recoverable,
+                    "Did not recognise ObjectProxy type "+\
+                    std::string(c_string),
+                    "PyObjectWrapper::lazy_unwrap");
+*/
     }
 }
 

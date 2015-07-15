@@ -50,7 +50,8 @@ std::string EMR_EVENT =
     std::string("\"range_primary\":-1., \"has_secondary\":true, ")+
     std::string("\"range_secondary\":-2., \"secondary_to_primary_track_distance\":-3., ")+
     std::string("\"total_charge_MA\":-4., \"charge_ratio_MA\":-5., ")+
-    std::string("\"total_charge_SA\":-6., \"charge_ratio_SA\":-7.}");
+    std::string("\"total_charge_SA\":-6., \"charge_ratio_SA\":-7., ")+
+    std::string("\"plane_density\":-8., \"chi2\":-9.}");
 
 std::string RECON_EVENT =
     std::string("{\"part_event_number\":1, \"emr_event\":"+EMR_EVENT+"}");

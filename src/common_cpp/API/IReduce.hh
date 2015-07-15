@@ -38,7 +38,7 @@ namespace MAUS {
    * \author Alexander Richards, Imperial College London
    * \date 06/06/2012
    */
-  template<typename T>
+  template<typename T_IN, typename T_OUT>
   class IReduce : public virtual IModule {
   public:
     // ! Destructor
@@ -52,7 +52,7 @@ namespace MAUS {
      * \param T* Pointer to the input data
      * \return T* Pointer to the output data
      */
-    virtual T* process(T* t) = 0;
+    virtual T_OUT* process(T_IN* t) = 0;
   };
 
 }// end of namespace

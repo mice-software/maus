@@ -159,14 +159,16 @@ class MapPyGroup:
                     converter.del_data_repr(nu_spill)
                 except TypeError:
                     pass
+                del nu_spill # should be no references to nu_spill left
             else:
                 old_spill = nu_spill
+                del nu_spill # should be no references to nu_spill left
             nu_spill = worker.process(old_spill)
             try:
                 converter.del_data_repr(old_spill)
             except TypeError:
                 pass
-            old_spill = None
+            del old_spill # should be no references to old_spill left
         return nu_spill
 
     def death(self):

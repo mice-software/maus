@@ -22,6 +22,7 @@
 #include "Interface/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
+#include "Config/MiceModule.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 
 #include "src/map/MapCppKLCellHits/MapCppKLCellHits.hh"
@@ -43,6 +44,18 @@ void MapCppKLCellHits::_birth(const std::string& argJsonConfigDocument) {
   //  JsonCpp setup
   Json::Value configJSON;
   configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+
+  // get the geometry
+  if (!configJSON.isMember("reconstruction_geometry_filename"))
+      throw(Exception(Exception::recoverable,
+                   "Could not find geometry file",
+                   "MapCppKLCellHits::birth"));
+  std::string filename;
+  filename = configJSON["reconstruction_geometry_filename"].asString();
+  // get the kl geometry modules
+  geo_module = new MiceModule(filename);
+  kl_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "KL");
+  kl_mother_modules = geo_module->findModulesByPropertyString("Region", "KLregion");
 }
 
 void MapCppKLCellHits::_death()  {}
@@ -126,13 +139,74 @@ void MapCppKLCellHits::fillCellHit(KLCellHit &cellHit, KLDigit &xDigit0, KLDigit
   cellHit.SetDetector(xKey.detector());
   cellHit.SetPartEventNumber(xDigit0.GetPartEventNumber());
   cellHit.SetPhysEventNumber(xDigit0.GetPhysEventNumber());
+
+
+  // cell global position
+  // find the geo module corresponding to this hit
+  const MiceModule* hit_module = NULL;
+  Hep3Vector cellGlobalPos;
+  Hep3Vector cellErrorPos;
+
+  for ( unsigned int jj = 0; !hit_module && jj < kl_modules.size(); ++jj ) {
+      if ( kl_modules[jj]->propertyExists("Cell", "int") &&
+         kl_modules[jj]->propertyInt("Cell") == xKey.cell()) {
+             // got it
+             hit_module = kl_modules[jj];
+      } // end check on module
+  } // end loop over kl_modules
+
+  if (hit_module) {
+      cellGlobalPos = hit_module->globalPosition();
+      cellErrorPos = hit_module->dimensions()/sqrt(12);
+  } else {
+      cellGlobalPos.setX(-9999999.);
+      cellGlobalPos.setY(-9999999.);
+      cellGlobalPos.setZ(-9999999.);
+      cellErrorPos.setX(-9999999.);
+      cellErrorPos.setY(-9999999.);
+      cellErrorPos.setZ(-9999999.);
+  }
+
+  // get the local (relative to KL) cell positions from the geometry
+  const MiceModule* mother_module = NULL;
+  Hep3Vector cellLocalPos;
+
+  if (kl_mother_modules.size()) {
+    for ( unsigned int jj = 0; !mother_module &&  jj < kl_mother_modules.size(); ++jj ) {
+      mother_module= kl_mother_modules[jj];
+    }
+    cellLocalPos = hit_module->relativePosition(mother_module);
+  } else {
+    cellLocalPos.setX(-9999999.);
+    cellLocalPos.setY(-9999999.);
+    cellLocalPos.setZ(-9999999.);
+  }
+
+
+  cellHit.SetGlobalPosX(cellGlobalPos.x());
+  cellHit.SetGlobalPosY(cellGlobalPos.y());
+  cellHit.SetGlobalPosZ(cellGlobalPos.z());
+  cellHit.SetLocalPosX(cellLocalPos.x());
+  cellHit.SetLocalPosY(cellLocalPos.y());
+  cellHit.SetLocalPosZ(cellLocalPos.z());
+  cellHit.SetErrorX(cellErrorPos.x());
+  cellHit.SetErrorY(cellErrorPos.y());
+  cellHit.SetErrorZ(cellErrorPos.z());
+
+  // Charge of the digit can be unset because of the Zero suppresion of the fADCs.
+
+
   int xChargeDigit0 = xDigit0.GetChargeMm();
   int xChargeDigit1 = xDigit1.GetChargeMm();
   cellHit.SetCharge((xChargeDigit0 + xChargeDigit1)/2);
-  if ((xChargeDigit0 + xChargeDigit1) == 0)
+  if ((xChargeDigit0 + xChargeDigit1) == 0) {
      cellHit.SetChargeProduct(0);
-  else
+     cellHit.SetFlag(false);
+  }
+  else {
      cellHit.SetChargeProduct(2 * xChargeDigit0 * xChargeDigit1 /
                                         (xChargeDigit0 + xChargeDigit1));
+     cellHit.SetFlag(true);
+  }
 }
 }

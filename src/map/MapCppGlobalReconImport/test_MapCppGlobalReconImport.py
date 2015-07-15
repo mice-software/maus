@@ -97,7 +97,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         spill_out = maus_cpp.converter.json_repr(result)
         self.assertTrue('recon_events' in spill_out)
         revtarray = spill_out['recon_events']
-        self.assertEqual(4, len(revtarray))
+        self.assertEqual(1, len(revtarray))
         revt = revtarray[0]
         self.assertTrue('global_event' in revt)
         self.assertTrue('track_points' in revt['global_event'])
