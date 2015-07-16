@@ -61,6 +61,9 @@ PLOT_OPTIONS = { 'npe' : [ 'logy' ], \
                  'adc' : [ 'logy' ], \
                  'adc_channel' : [ 'logy', 'colz' ], \
                  'npe_channel' : [ 'logz', 'colz' ], \
+                 'plane_pulls' : [ 'colz' ], \
+                 'plane_residuals' : [ 'colz' ], \
+                 'plane_s_residuals' : [ 'colz' ], \
                  'xy' : [ 'colz' ], \
                  'xmx' : [ 'colz' ], \
                  'ymy' : [ 'colz' ], \
@@ -77,11 +80,11 @@ def init_plots_data() :
   track_plots = {}
 
   track_plots['plane_pulls'] = ROOT.TH2F("plane_pulls", "Pulls per Plane", \
-                                         31, -15.0, 15.0, 5000, -200.0, 200.0 )
+                                         31, -15.5, 15.5, 5000, -200.0, 200.0 )
   track_plots['plane_residuals'] = ROOT.TH2F("plane_residuals",
-         "Filtered Residuals per Plane", 31, -15.0, 15.0, 5000, -200.0, 200.0 )
+         "Filtered Residuals per Plane", 31, -15.5, 15.5, 5000, -200.0, 200.0 )
   track_plots['plane_s_residuals'] = ROOT.TH2F("plane_s_residuals",
-         "Smoothed Residuals per Plane", 31, -15.0, 15.0, 5000, -200.0, 200.0 )
+         "Smoothed Residuals per Plane", 31, -15.5, 15.5, 5000, -200.0, 200.0 )
 
   track_plots['tracks_event'] = ROOT.TH1F( "tracks_event", \
                                 "Number of Tracks per Event", 100, 0.0, 100.0 )
@@ -91,8 +94,18 @@ def init_plots_data() :
                                   "Number of Tracks per Tracker", 2, 0.0, 2.0 )
   track_plots['chi_squared'] = ROOT.TH1F( 'tracks_chi_squared', \
                                 "Chi Squared Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_up'] = ROOT.TH1F( 'tracks_chi_squared_up', \
+                       "Upstream Chi Squared Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_down'] = ROOT.TH1F( 'tracks_chi_squared_down', \
+                     "Downstream Chi Squared Distribution", 5000, 0.0, 1000.0 )
   track_plots['chi_squared_ndf'] = ROOT.TH1F( 'tracks_chi_squared_ndf', \
           "Chi Squared per Degree of Freedom Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_ndf_up'] = ROOT.TH1F( 'tracks_chi_squared_ndf_up', \
+ "Upstream Chi Squared per Degree of Freedom Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_ndf_down'] = ROOT.TH1F( \
+                                               'tracks_chi_squared_ndf_down', \
+                 "Downstream Chi Squared per Degree of Freedom Distribution", \
+                                                            5000, 0.0, 1000.0 )
   track_plots['p_value'] = ROOT.TH1F( 'tracks_p_value', \
                                     "P-Value Distribution", 1000, 0.0, 1.0 )
 
@@ -243,10 +256,10 @@ def init_plots_data() :
 
         plane_plots[dir_name]['npe_channel'] = ROOT.TH2F(\
                        dir_name+'_npe_channel', "NPE Per Channel: "+dir_name, \
-                                             250, 0.0, 250.0, 75, 0.0, 75.0 )
+                                             250, 0.0, -250.0, 75, 0.0, 75.0 )
         plane_plots[dir_name]['adc_channel'] = ROOT.TH2F(\
                        dir_name+'_adc_channel', "ADC Per Channel: "+dir_name, \
-                                             250, 0.0, 250.0, 256, 0.0, 256.0 )
+                                             250, 0.0, -250.0, 256, 0.0, 256.0 )
 
 
   plot_dict['track_plots'] = track_plots
@@ -263,6 +276,9 @@ def init_plots_data() :
 
   data_dict['counters']['N_zero_clusters'] = 0
   data_dict['counters']['N_fat_clusters'] = 0
+  data_dict['counters']['N_events'] = 0
+  data_dict['counters']['N_tracks'] = 0
+  data_dict['counters']['N_track_pairs'] = 0
 
 
   return plot_dict, data_dict
@@ -483,15 +499,27 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
   comp_plots = plot_dict['comparison_plots']
 
   track_plots['tracks_event'].Fill( len(tracks) )
+  data_dict['counters']['N_tracks'] += len(tracks) 
+  if len( tracks ) == 2 :
+    data_dict['counters']['N_track_pairs'] += 1
+
   for track in tracks :
     trackpoints = track.scifitrackpoints()
-    if track.P_value < P_VALUE_CUT : 
-      continue
+    tracker = track.tracker()
+#    if track.P_value < P_VALUE_CUT : 
+#      continue
 
     track_plots['tracks_tracker'].Fill( track.tracker() )
     track_plots['chi_squared'].Fill( track.chi2() )
     track_plots['chi_squared_ndf'].Fill( track.chi2() / track.ndf() )
     track_plots['p_value'].Fill( track.P_value() )
+
+    if tracker == 0 :
+      track_plots['chi_squared_up'].Fill( track.chi2() )
+      track_plots['chi_squared_ndf_up'].Fill( track.chi2() / track.ndf() )
+    elif tracker == 1 :
+      track_plots['chi_squared_down'].Fill( track.chi2() )
+      track_plots['chi_squared_ndf_down'].Fill( track.chi2() / track.ndf() )
     
     pr_track = None
 
@@ -506,7 +534,6 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
       if tp.has_data() :
         count_trackpoints += 1
 
-      tracker = tp.tracker()
       station = tp.station()
       plane = tp.plane()
       dir_name = str(tracker) + "." + str(station) + "." + str(plane)
@@ -565,24 +592,25 @@ def analyse_plots(plot_dict, data_dict) :
 
   print "Analysing Data"
   print
-  print "No. of Tracks                  = ", \
-                                         track_plots['tracks_event'].Integral()
+  print "No. of Events                  = ", data_dict['counters']['N_events']
+  print
+  print "No. of Tracks                  = ", data_dict['counters']['N_tracks']
+  print "No. of Track Pairs             = ", \
+                                         data_dict['counters']['N_track_pairs']
+  print
   print "Mean No. Tracks per Event      = ", \
                                           track_plots['tracks_event'].GetMean()
   print "Mean No. Trackpoints per Track = ", \
                                      track_plots['trackpoints_track'].GetMean()
   print
-  print "Mean Plane Occupation          = ", \
-     reco_plots['plane_hits'].Integral() / reco_plots['plane_hits'].GetNbinsX()
+  print "No. Events with 0 Tracks       = ", \
+                                   track_plots['tracks_event'].GetBinContent(1)
+  print "No. Events with 1 Tracks       = ", \
+                                   track_plots['tracks_event'].GetBinContent(2)
+  print "No. Events with 2 Tracks       = ", \
+                                   track_plots['tracks_event'].GetBinContent(3)
   print
-  print "Mean Pull                      = ", \
-                                          track_plots['plane_pulls'].GetMean(2)
-  print "RMS  Pull                      = ", \
-                                           track_plots['plane_pulls'].GetRMS(2)
-  print "Mean Residual                  = ", \
-                                      track_plots['plane_residuals'].GetMean(2)
-  print "RMS  Residual                  = ", \
-                                       track_plots['plane_residuals'].GetRMS(2)
+  print
   print "Mean Smoothed Residual         = ", \
                                     track_plots['plane_s_residuals'].GetMean(2)
   print "RMS  Smoothed Residual         = ", \
@@ -710,6 +738,7 @@ if __name__ == "__main__" :
         try :
           scifi_event = file_reader.get_event( 'scifi' )
           tof_event = file_reader.get_event( 'tof' )
+          data_dict['counters']['N_events'] += 1
 
 ##### 3. Fill plots ###########################################################
           if namespace.cut_tof and cut_tof_event( plot_dict, tof_event ) :
