@@ -38,7 +38,14 @@ PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
                                         ("MapCppTrackerRecon", "", "", "", "");
 }
 
-MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon") {
+MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon"),
+#ifdef KALMAN_TEST
+  _spacepoint_helical_track_fitter(NULL),
+  _spacepoint_straight_track_fitter(NULL) {
+#else
+  _helical_track_fitter(NULL),
+  _straight_track_fitter(NULL) {
+#endif
 }
 
 MapCppTrackerRecon::~MapCppTrackerRecon() {
@@ -65,9 +72,6 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     module->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
-
-  std::cerr << "CLUSTERING NPE CUT = " << _min_npe << std::endl;
-
 
   _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
 
@@ -115,6 +119,25 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
 }
 
 void MapCppTrackerRecon::_death() {
+#ifdef KALMAN_TEST
+  if (_spacepoint_helical_track_fitter) {
+    delete _spacepoint_helical_track_fitter;
+    _spacepoint_helical_track_fitter = NULL;
+  }
+  if (_spacepoint_straight_track_fitter) {
+    delete _spacepoint_straight_track_fitter;
+    _spacepoint_straight_track_fitter = NULL;
+  }
+#else
+  if (_helical_track_fitter) {
+    delete _helical_track_fitter;
+    _helical_track_fitter = NULL;
+  }
+  if (_straight_track_fitter) {
+    delete _straight_track_fitter;
+    _straight_track_fitter = NULL;
+  }
+#endif
 }
 
 void MapCppTrackerRecon::_process(Data* data) const {

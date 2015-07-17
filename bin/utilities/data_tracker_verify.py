@@ -16,6 +16,7 @@
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# pylint: disable = W0311, E1101, W0613
 
 # Generic Python imports
 import io 
@@ -242,13 +243,13 @@ def init_plots_data() :
                                "Cluster Occupancy per Plane", 500, 0.0, 250.0 )
         plane_plots[dir_name]['cluster_positions'] = ROOT.TH1F( \
                                                dir_name+'_cluster_positions', \
-                           "Cluster Positions per Plane", 2000, -200.0, 200.0 )
+                           "Cluster Positions per Plane", 400, -200.0, 200.0 )
         plane_plots[dir_name]['single_cluster_positions'] = ROOT.TH1F( \
                                         dir_name+'_single_cluster_positions', \
-                    "Single Cluster Positions per Plane", 2000, -200.0, 200.0 )
+                    "Single Cluster Positions per Plane", 400, -200.0, 200.0 )
         plane_plots[dir_name]['double_cluster_positions'] = ROOT.TH1F( \
                                         dir_name+'_double_cluster_positions', \
-                    "Double Cluster Positions per Plane", 2000, -200.0, 200.0 )
+                    "Double Cluster Positions per Plane", 400, -200.0, 200.0 )
 
         plane_plots[dir_name]['channel_occup'] = ROOT.TH1F( \
                                                    dir_name+'_channel_occup', \
@@ -256,10 +257,10 @@ def init_plots_data() :
 
         plane_plots[dir_name]['npe_channel'] = ROOT.TH2F(\
                        dir_name+'_npe_channel', "NPE Per Channel: "+dir_name, \
-                                             250, 0.0, -250.0, 75, 0.0, 75.0 )
+                                             250, 0.0, 250.0, 75, 0.0, 75.0 )
         plane_plots[dir_name]['adc_channel'] = ROOT.TH2F(\
                        dir_name+'_adc_channel', "ADC Per Channel: "+dir_name, \
-                                             250, 0.0, -250.0, 256, 0.0, 256.0 )
+                                             250, 0.0, 250.0, 256, 0.0, 256.0 )
 
 
   plot_dict['track_plots'] = track_plots
@@ -757,6 +758,9 @@ if __name__ == "__main__" :
 
 ##### 4. Analysis Plots #######################################################
     except KeyboardInterrupt :
+      print
+      print "Keyboard Interrupt"
+      print
       pass
     print "All Spills Loaded                                                  "
     print "\nStarting Analysis"

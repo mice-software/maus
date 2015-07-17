@@ -27,7 +27,7 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _seed_position(),
                           _seed_momentum(),
                           _seed_covariance_matrix(0) {
-  _pr_track = new TRef();                          
+  _pr_track = new TRef();
 }
 
 SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),

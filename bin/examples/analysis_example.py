@@ -16,6 +16,8 @@
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# pylint: disable = W0311, E1101, W0613
+
 
 # Generic Python imports
 import io 
@@ -30,12 +32,7 @@ import argparse
 # Third Party library import statements
 import event_loader
 import ROOT
-import xboa
-import numpy
-import json
 import array
-import operator
-import random
 
 
 """
@@ -59,6 +56,10 @@ MIN_NUMBER_TRACKPOINTS = 12
 
 
 def init_plots() :
+  """
+    Initialised all the plots in a dictionary to pass around to the other 
+    functions.
+  """
   plot_dict = {}
 
   plot_dict['upstream_xy'] = ROOT.TH2F('upstream_xy', \
@@ -82,6 +83,9 @@ def init_plots() :
 
 
 def find_straight_tracks(scifi_event) :
+  """
+    Extract straight tracks from the SciFi Event
+  """
   scifi_tracks = scifi_event.scifitracks()
   upstream_tracks = []
   downstream_tracks = []
@@ -107,6 +111,9 @@ def find_straight_tracks(scifi_event) :
 
 
 def cut_scifi_event( event ) :
+  """
+    Cuts from SciFi Event Data
+  """
   digits = event.digits()
   saturation_counter = 0
 
@@ -114,13 +121,17 @@ def cut_scifi_event( event ) :
     if digit.get_adc() == 255 :
       saturation_counter += 1
 
-  if saturation_counter > 1000 : return True
+  if saturation_counter > 1000 :
+    return True
 
   return False
 
 
 
 def cut_tof_event( plot_dict, event ) :
+  """
+    Cuts from TOF Event data
+  """
   event_spacepoints = event.GetTOFEventSpacePoint()
 
   tof0_sp_size = event_spacepoints.GetTOF0SpacePointArraySize()
@@ -134,6 +145,9 @@ def cut_tof_event( plot_dict, event ) :
 
 
 def cut_tracks(up_trk, down_trk) :
+  """
+    Return true if tracks aren't up to scratch
+  """
   up_counter = 0
   down_counter = 0
 
@@ -152,6 +166,9 @@ def cut_tracks(up_trk, down_trk) :
 
 
 def fill_plots_tof(plot_dict, tof_event) :
+  """
+    Fill TOF Plots from TOF Events
+  """
   event_spacepoints = tof_event.GetTOFEventSpacePoint()
 
   tof0_sp = event_spacepoints.GetTOF0SpacePointArrayElement(0)
@@ -164,6 +181,9 @@ def fill_plots_tof(plot_dict, tof_event) :
 
 
 def fill_plots_track(plot_dict, up_trk, down_trk) :
+  """
+    Fill Tracker Plots with Track Data
+  """
   up_z = None
   down_z = None
 
@@ -203,13 +223,25 @@ def fill_plots_track(plot_dict, up_trk, down_trk) :
 
 
 def analyse_plots(plot_dict) :
+  """
+    Use existing plots to perform some useful analysis
+  """
+# Use this dictionary to store the useful analysis numbers before saving them
+#  somewhere intelligent
+  data_dict = {}
+
   print "Found", plot_dict['tof_1_2'].GetEntries(), "Events"
 
 # MORE ANALYSIS CODE HERE
 
+  return data_dict
+
 
 
 def save_plots(plot_dict, directory, filename, print_plots=False) :
+  """
+    Save all the plots to file
+  """
   filename = os.path.join(directory, filename)
   if print_plots :
     outfile = ROOT.TFile(filename, "RECREATE")
@@ -311,6 +343,9 @@ if __name__ == "__main__" :
 
 ##### 7. Analysis Plots #######################################################
     except KeyboardInterrupt :
+      print
+      print "Keyboard Interrupt"
+      print
       pass
     print "All Spills Loaded                                                  "
     print "\nStarting Analysis"

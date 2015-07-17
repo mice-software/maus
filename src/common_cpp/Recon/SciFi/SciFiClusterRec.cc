@@ -65,7 +65,6 @@ void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>& s
     if (seeds[i]->get_npe() < _min_npe/2.0)
       std::cerr << "ERROR : DIGIT NPE = " << seeds[i]->get_npe()
                 << "(" << _min_npe << ")" << std::endl;
-                              
     if ( !(seeds[i]->is_used()) ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];
