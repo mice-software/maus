@@ -35,6 +35,7 @@ import types
 
 # Third Party library import statements
 import event_loader
+import MAUS
 import ROOT
 
 
@@ -512,15 +513,16 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
   comp_plots = plot_dict['comparison_plots']
 
   track_plots['tracks_event'].Fill( len(tracks) )
-  data_dict['counters']['N_tracks'] += len(tracks) 
-  if len( tracks ) == 2 :
-    data_dict['counters']['N_track_pairs'] += 1
+  upstream_good = 0
+  downstream_good = 0
 
   for track in tracks :
     trackpoints = track.scifitrackpoints()
     tracker = track.tracker()
-    if track.P_value < P_VALUE_CUT : 
+    if track.P_value() < P_VALUE_CUT : 
       continue
+
+    data_dict['counters']['N_tracks'] += 1 
 
     track_plots['tracks_tracker'].Fill( track.tracker() )
     track_plots['chi_squared'].Fill( track.chi2() )
@@ -530,9 +532,11 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
     if tracker == 0 :
       track_plots['chi_squared_up'].Fill( track.chi2() )
       track_plots['chi_squared_ndf_up'].Fill( track.chi2() / track.ndf() )
+      upstream_good += 1
     elif tracker == 1 :
       track_plots['chi_squared_down'].Fill( track.chi2() )
       track_plots['chi_squared_ndf_down'].Fill( track.chi2() / track.ndf() )
+      downstream_good += 1
     
     pr_track = None
 
@@ -596,6 +600,8 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
                                                      diff_mom[0], diff_mom[1] )
 
 
+    if upstream_good == 1 and downstream_good == 1 :
+      data_dict['counters']['N_track_pairs'] += 1
     track_plots['trackpoints_track'].Fill( count_trackpoints )
 
 
@@ -732,12 +738,12 @@ if __name__ == "__main__" :
   parser.add_argument( '-S', '--cut_scifi', action='store_true', \
                                    help='Set flag to enable SciFi Event Cuts' )
 
-  parser.add_argument( '--tof_cut_low', type=float, nargs=1, default=0.0, \
+  parser.add_argument( '--tof_cut_low', type=float, default=0.0, \
                                                 help='Lower limit of TOF cut' )
-  parser.add_argument( '--tof_cut_high', type=float, nargs=1, default=100.0, \
+  parser.add_argument( '--tof_cut_high', type=float, default=100.0, \
                                                 help='Upper limit of TOF cut' )
 
-  parser.add_argument( '--p_value_cut', type=float, nargs=1, default=0.0, \
+  parser.add_argument( '--p_value_cut', type=float, default=0.0, \
                          help='Cut on P-Values less than the specified value' )
 
   try :
