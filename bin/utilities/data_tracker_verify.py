@@ -15,31 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-# pylint: disable = W0311, E1101, W0613
-
-# Generic Python imports
-import io 
-import math
-import sys
-import os
-import itertools
-import gc
-import copy
-import argparse
-import types
-
-# Third Party library import statements
-import event_loader
-import MAUS
-import ROOT
-import numpy
-import json
-import array
-import operator
-import random
-
-
 """
   This analysis script will perform the first offline verification of the 
   tracker data. Simple plots and analysis are made/performed to examine the
@@ -48,6 +23,19 @@ import random
   It is critical to have a fast and simple way to check the data "looks" good
   before we start running more detailed analyses.
 """
+
+# pylint: disable = W0311, E1101, W0613, C0111, W0621, C0103, W0702
+# pylint: disable = R0914, R0915
+
+# Generic Python imports
+import sys
+import os
+import argparse
+import types
+
+# Third Party library import statements
+import event_loader
+import ROOT
 
 
 # Useful Constants and configuration
@@ -76,6 +64,9 @@ PLOT_OPTIONS = { 'npe' : [ 'logy' ], \
 
 
 def init_plots_data() :
+  """
+    Initialise a dictionary of plots to fill with data
+  """
   plot_dict = {}
 
   track_plots = {}
@@ -134,10 +125,10 @@ def init_plots_data() :
                            "Spacepoints Found in Each Station", 11, -5.0, 6.0 )
   reco_plots['clusters_plane'] = ROOT.TH1F( "clusters_plane", \
                               "Clusters Found in Each Plane", 31, -15.0, 16.0 )
-  reco_plots['spacepoints'] = ROOT.TH2F( 'spacepoints', "Spacepoint Positions",\
-                                       200, -200.0, 200.0, 200, -200.0, 200.0 )
+  reco_plots['spacepoints'] = ROOT.TH2F( 'spacepoints', \
+               "Spacepoint Positions", 200, -200.0, 200.0, 200, -200.0, 200.0 )
   reco_plots['saturations_event'] = ROOT.TH1F( 'saturations_event', \
-                     "Numbr of Saturated Digits per Event", 8192, 0.0, 8192.0 )
+                    "Number of Saturated Digits per Event", 8192, 0.0, 8192.0 )
 
 
 
@@ -286,6 +277,9 @@ def init_plots_data() :
 
 
 def cut_tof_event( plot_dict, event ) :
+  """
+    Examine a TOF event to see if it should be vetoed
+  """
   event_spacepoints = event.GetTOFEventSpacePoint()
 
   tof0_sp_size = event_spacepoints.GetTOF0SpacePointArraySize()
@@ -299,10 +293,6 @@ def cut_tof_event( plot_dict, event ) :
   tof1_sp = event_spacepoints.GetTOF1SpacePointArrayElement(0)
   tof2_sp = event_spacepoints.GetTOF2SpacePointArrayElement(0)
 
-  tof0_sp_array = event_spacepoints.GetTOF0SpacePointArray()
-  tof1_sp_array = event_spacepoints.GetTOF1SpacePointArray()
-  tof2_sp_array = event_spacepoints.GetTOF2SpacePointArray()
-
   if tof1_sp_size != 1 or tof2_sp_size != 1 :
     return True
 
@@ -315,13 +305,18 @@ def cut_tof_event( plot_dict, event ) :
   if diff_1_2 < TOF_CUT_LOW or diff_1_2 > TOF_CUT_HIGH :
     return True
 
-  plot_dict['recon_plots']['tof_0_1_cut'].Fill( tof1_sp.GetTime() - tof0_sp.GetTime() )
-  plot_dict['recon_plots']['tof_1_2_cut'].Fill( tof2_sp.GetTime() - tof1_sp.GetTime() )
+  plot_dict['recon_plots']['tof_0_1_cut'].Fill(\
+                                        tof1_sp.GetTime() - tof0_sp.GetTime() )
+  plot_dict['recon_plots']['tof_1_2_cut'].Fill(\
+                                        tof2_sp.GetTime() - tof1_sp.GetTime() )
 
   return False
 
  
 def cut_scifi_event( plot_dict, event ) :
+  """
+    Examine a SciFi Event to see if it should be vetoed
+  """
   digits = event.digits()
   saturation_counter = 0
 
@@ -330,13 +325,19 @@ def cut_scifi_event( plot_dict, event ) :
       saturation_counter += 1
 
   plot_dict['recon_plots']['saturations_event'].Fill( saturation_counter )
-  if saturation_counter > 1000 : return True
-  else : return False
+  if saturation_counter > 1000 :
+    return True
+  else :
+    return False
 
 
 def fill_plots_data(plot_dict, data_dict, event) :
-  result = scifi_digits = event.digits()
-  if not result : return 
+  """
+    Fill the plots in the plot dictionary with data
+  """
+  scifi_digits = event.digits()
+  if not scifi_digits :
+    return 
 
   scifi_clusters = event.clusters()
   scifi_spacepoints = event.spacepoints()
@@ -352,7 +353,9 @@ def fill_plots_data(plot_dict, data_dict, event) :
 
 
 def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
-  track_plots = plot_dict['track_plots']
+  """
+    Fill the Recon specific plots
+  """
   plane_plots = plot_dict['plane_plots']
   station_plots = plot_dict['station_plots']
   reco_plots = plot_dict['recon_plots']
@@ -392,14 +395,16 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     if len( clus_digits ) == 0 :
       data_dict['counters']['N_zero_clusters'] += 1
     elif len( clus_digits ) == 1 :
-      plane_plots[dir_name]['single_cluster_positions'].Fill( cluster.get_alpha() )
+      plane_plots[dir_name]['single_cluster_positions'].Fill(\
+                                                          cluster.get_alpha() )
     elif len( clus_digits ) == 2 :
-      plane_plots[dir_name]['double_cluster_positions'].Fill( cluster.get_alpha() )
+      plane_plots[dir_name]['double_cluster_positions'].Fill(\
+                                                          cluster.get_alpha() )
     else :
       data_dict['counters']['N_fat_clusters'] += 1
 
 
-    for dig in clus_digits :
+    for digit in clus_digits :
       if digit.get_adc() == 255 :
         break
     else :
@@ -425,6 +430,9 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
 
 
 def fill_plots_patrec(plot_dict, data_dict, helicals, straights) :
+  """
+    Fille the Pattern Recognition specific plots
+  """
   patrec_plots = plot_dict['patrec_plots']
 
   for tracklist in [ helicals, straights ] :
@@ -444,10 +452,11 @@ def fill_plots_patrec(plot_dict, data_dict, helicals, straights) :
         patrec_plots['chi_squared_helical_ndf'].Fill( \
                                     track.get_chi_squared() / track.get_ndf() )
 
-
       prefix = ""
-      if tracker == 0 : prefix = 'up_'
-      elif tracker == 1 : prefix = 'down_'
+      if tracker == 0 :
+        prefix = 'up_'
+      elif tracker == 1 :
+        prefix = 'down_'
       pr_pos = track.get_reference_position()
       pr_mom = track.get_reference_momentum()
       if tracker == 0 :
@@ -456,11 +465,14 @@ def fill_plots_patrec(plot_dict, data_dict, helicals, straights) :
 
       patrec_plots[prefix+'patrec_xy'].Fill( pr_pos.x(), pr_pos.y() )
       patrec_plots[prefix+'patrec_mxmy'].Fill( pr_mom.x() / pr_mom.z(), \
-                                                    pr_mom.y() / pr_mom.z() )
+                                                      pr_mom.y() / pr_mom.z() )
       patrec_plots[prefix+'patrec_pxpy'].Fill( pr_mom.x(), pr_mom.y() )
 
 
 def straight_road_plot(plot_dict, track) :
+  """
+    Do the calculation to examine the straight tracks road cut
+  """
   station_plots = plot_dict['station_plots']
 
   spacepoints = track.get_spacepoints_pointers()
@@ -487,16 +499,16 @@ def straight_road_plot(plot_dict, track) :
     diff_x = ex_x - sp_pos.x()
     diff_y = ex_y - sp_pos.y()
 
-#    print tracker, station, diff_z, " : ", pos.x(), pos.y(), ' | ', ex_x, ex_y, ' | ', sp_pos.x(), sp_pos.y()
-
     stat_id = str(tracker)+'.'+str(station)
     station_plots[stat_id]['spacepoint_road'].Fill(diff_x, diff_y)
 
 
 def fill_plots_tracks(plot_dict, data_dict, tracks) :
+  """
+    Fill the track specific plots
+  """
   track_plots = plot_dict['track_plots']
   reco_plots = plot_dict['recon_plots']
-  patrec_plots = plot_dict['patrec_plots']
   comp_plots = plot_dict['comparison_plots']
 
   track_plots['tracks_event'].Fill( len(tracks) )
@@ -564,8 +576,10 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
 
       if station == REFERENCE_STATION and plane == REFERENCE_PLANE :
         prefix = ""
-        if tracker == 0 : prefix = 'up_'
-        elif tracker == 1 : prefix = 'down_'
+        if tracker == 0 :
+          prefix = 'up_'
+        elif tracker == 1 :
+          prefix = 'down_'
         pr_pos = pr_track.get_reference_position()
         pr_mom = pr_track.get_reference_momentum()
         if tracker == 0 :
@@ -587,9 +601,12 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
 
 
 def analyse_plots(plot_dict, data_dict) :
+  """
+    Perform some analysis on the plots and data stored in the repective
+    dictionaries
+  """
 
   track_plots = plot_dict['track_plots']
-  reco_plots = plot_dict['recon_plots']
 
   print "Analysing Data"
   print
@@ -619,6 +636,10 @@ def analyse_plots(plot_dict, data_dict) :
 
 
 def save_plots(plot_dict, filename) :
+  """
+    Save all the plots to file. Assumes a directory like strucutre of plots to
+    recursively save them.
+  """
   outfile = ROOT.TFile(filename, "RECREATE")
 
   for key in sorted(plot_dict) :
@@ -634,6 +655,9 @@ def save_plots(plot_dict, filename) :
 
 
 def save_plot(plot_dict, outfile) :
+  """
+    The recursive saving function for the plot dictionary
+  """
   for key in sorted(plot_dict) :
     if type( plot_dict[key] ) is types.DictType :
       directory = outfile.mkdir( key )
@@ -645,6 +669,10 @@ def save_plot(plot_dict, outfile) :
       
 
 def print_plots(plot_dict, location) :
+  """
+    Print the plots to PDF files rather than a root file. Assumes a recursive
+    structure of directories and plots to save then to file
+  """
   if not os.path.exists( location ) :
     os.makedirs( location )
 
@@ -662,6 +690,9 @@ def print_plots(plot_dict, location) :
 
 
 def apply_options( canvas, hist, options ) :
+  """
+    Change some simple plot options using a dictionary of options.
+  """
   for opt in options :
     if opt == "logy" :
       canvas.SetLogy()
@@ -761,10 +792,9 @@ if __name__ == "__main__" :
       print
       print "Keyboard Interrupt"
       print
-      pass
     print "All Spills Loaded                                                  "
     print "\nStarting Analysis"
-    data_dict = analyse_plots(plot_dict, data_dict)
+    analyse_plots(plot_dict, data_dict)
 
 ##### 5. Save plots and data ##################################################
     print "\nSaving Plots and Data"

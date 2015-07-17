@@ -15,26 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-# pylint: disable = W0311, E1101, W0613
-
-
-# Generic Python imports
-import io 
-import math
-import sys
-import os
-import itertools
-import gc
-import copy
-import argparse
-
-# Third Party library import statements
-import event_loader
-import ROOT
-import array
-
-
 """
   This is an example script to show how to read in some events and setup some
   analysis.
@@ -46,6 +26,18 @@ import array
 
   
 """
+
+# pylint: disable = W0311, E1101, W0613, W0621, C0103, C0111, W0702
+
+
+# Generic Python imports
+import sys
+import os
+import argparse
+
+# Third Party library import statements
+import event_loader
+import ROOT
 
 
 # Useful Constants and configuration
@@ -152,9 +144,11 @@ def cut_tracks(up_trk, down_trk) :
   down_counter = 0
 
   for tp in up_trk.scifitrackpoints() :
-    if tp.has_data() : up_counter += 1
+    if tp.has_data() :
+      up_counter += 1
   for tp in down_trk.scifitrackpoints() :
-    if tp.has_data() : down_counter += 1
+    if tp.has_data() :
+      down_counter += 1
 
   if up_counter < MIN_NUMBER_TRACKPOINTS :
     return True
@@ -346,7 +340,6 @@ if __name__ == "__main__" :
       print
       print "Keyboard Interrupt"
       print
-      pass
     print "All Spills Loaded                                                  "
     print "\nStarting Analysis"
     data_dict = analyse_plots(plot_dict)

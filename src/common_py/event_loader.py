@@ -16,8 +16,8 @@
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# pylint: disable = W0311, E1101, W0613, C0111, R0911, W0621, C0103, R0902
 
-import libMausCpp
 import ROOT
 
 import gc
@@ -27,11 +27,11 @@ class maus_reader() :
     A nice interface for loading MAUS ROOT data.
 
     Can be initialised with one filename, or a list of many filenames.
-    Each file is loaded into memory in turn, with simple functions to extract the 
-    useful class and types from the file.
+    Each file is loaded into memory in turn, with simple functions to extract
+    the useful class and types from the file.
 
-    This class does not offer full coverage of the datastructure, purely a simplified
-    interface to the higher level objects.
+    This class does not offer full coverage of the datastructure, purely a
+    simplified interface to the higher level objects.
   """
   def __init__( self, filename ) :
     """
@@ -96,12 +96,14 @@ class maus_reader() :
     self.__root_file = ROOT.TFile( self.__current_filename, "READ" )
     if self.__root_file.IsZombie() :
       self.__root_file.Close()
-      raise IOError( 'Could not open ROOT File: '+str( self.__current_filename ) )
+      raise IOError( 'Could not open ROOT File: '\
+                                              +str( self.__current_filename ) )
 
     self.__data = ROOT.MAUS.Data()
     self.__tree = self.__root_file.Get("Spill")
     if not self.__tree :
-      raise IOError( 'No tree extracted from ROOT File: '+str( self.__current_filename ) )
+      raise IOError( 'No tree extracted from ROOT File: '+\
+                                               str( self.__current_filename ) )
     self.__tree.SetBranchAddress("data", self.__data)
 
     self.__current_num_spills = self.__tree.GetEntries()
@@ -244,19 +246,26 @@ class maus_reader() :
       Return a specific event type from the current spill.
     """
     if event_type == 'scifi' :
-      return self.__spill.GetReconEvents()[ self.__current_event_num ].GetSciFiEvent()
+      return self.__spill.GetReconEvents()[\
+                                     self.__current_event_num ].GetSciFiEvent()
     elif event_type == 'tof' :
-      return self.__spill.GetReconEvents()[ self.__current_event_num ].GetTOFEvent()
+      return self.__spill.GetReconEvents()[\
+                                       self.__current_event_num ].GetTOFEvent()
     elif event_type == 'ckov' :
-      return self.__spill.GetReconEvents()[ self.__current_event_num ].GetCkovEvent()
+      return self.__spill.GetReconEvents()[\
+                                      self.__current_event_num ].GetCkovEvent()
     elif event_type == 'kl' :
-      return self.__spill.GetReconEvents()[ self.__current_event_num ].GetKLEvent()
+      return self.__spill.GetReconEvents()[\
+                                        self.__current_event_num ].GetKLEvent()
     elif event_type == 'emr' :
-      return self.__spill.GetReconEvents()[ self.__current_event_num ].GetEMREvent()
+      return self.__spill.GetReconEvents()[\
+                                       self.__current_event_num ].GetEMREvent()
     elif event_type == 'trigger' :
-      return self.__spill.GetReconEvents()[ self.__current_event_num ].GetTriggerEvent()
+      return self.__spill.GetReconEvents()[\
+                                   self.__current_event_num ].GetTriggerEvent()
     elif event_type == 'global' :
-      return self.__spill.GetReconEvents()[ self.__current_event_num ].GetGlobalEvent()
+      return self.__spill.GetReconEvents()[\
+                                    self.__current_event_num ].GetGlobalEvent()
     elif event_type == 'mc' :
       return self.__spill.GetMCEvents()[ self.__current_event_num ]
     else :
