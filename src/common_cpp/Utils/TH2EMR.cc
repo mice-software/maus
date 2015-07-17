@@ -62,7 +62,7 @@ void TH2EMR::Fill(int i, int j) {
   if (bin < 0) {
     double px[4] = {i+j%2, i+1-j%2, i+j%2, i+j%2};
     double py[4] = {j-1, j, j+1, j-1};
-  bin = _h->AddBin(4, px, py);
+    bin = _h->AddBin(4, px, py);
   }
 
   // Fill the bin
