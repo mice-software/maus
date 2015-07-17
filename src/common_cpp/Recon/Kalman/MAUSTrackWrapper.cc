@@ -371,7 +371,7 @@ namespace MAUS {
 //        new_point->set_residual(sqrt(fitter->CalculateFilteredResidual(i).GetVector().E2Norm()));
 //        new_point->set_smoothed_residual(
 //                                sqrt(fitter->CalculateSmoothedResidual(i).GetVector().E2Norm()));
-        new_point->set_pull(fitter->CalculatePredictedResidual(i).GetVector()(0, 0));
+        new_point->set_pull(fitter->CalculatePull(i).GetVector()(0, 0));
         new_point->set_residual(fitter->CalculateFilteredResidual(i).GetVector()(0, 0));
         new_point->set_smoothed_residual(fitter->CalculateSmoothedResidual(i).GetVector()(0, 0));
       } else {

@@ -67,7 +67,7 @@ namespace MAUS {
     TMatrixD new_vec(GetMeasurementDimension(), 1);
     TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
 
-    new_vec = MeasurementMatrix() * (state.GetVector() + _alignment_map[state.GetId()]);
+    new_vec = MeasurementMatrix() * (state.GetVector() - _alignment_map[state.GetId()]);
     new_cov = (MeasurementMatrix()*state.GetCovariance()*
                                      measurement_matrix_transpose) + MeasurementNoise();
 
@@ -126,7 +126,6 @@ namespace MAUS {
 
         _matrix_map.insert(std::make_pair(id, H));
         _alignment_map.insert(std::make_pair(id, S));
-
       }
     }
   }
@@ -141,7 +140,7 @@ namespace MAUS {
     TMatrixD new_vec(GetMeasurementDimension(), 1);
     TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
 
-    new_vec = MeasurementMatrix() * (state.GetVector() + _alignment_map[state.GetId()]);
+    new_vec = MeasurementMatrix() * (state.GetVector() - _alignment_map[state.GetId()]);
     new_cov = (MeasurementMatrix()*state.GetCovariance()*
                                      measurement_matrix_transpose) + MeasurementNoise();
 
