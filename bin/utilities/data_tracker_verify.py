@@ -519,8 +519,8 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
   for track in tracks :
     trackpoints = track.scifitrackpoints()
     tracker = track.tracker()
-#    if track.P_value < P_VALUE_CUT : 
-#      continue
+    if track.P_value < P_VALUE_CUT : 
+      continue
 
     track_plots['tracks_tracker'].Fill( track.tracker() )
     track_plots['chi_squared'].Fill( track.chi2() )
@@ -737,7 +737,7 @@ if __name__ == "__main__" :
   parser.add_argument( '--tof_cut_high', type=float, nargs=1, default=100.0, \
                                                 help='Upper limit of TOF cut' )
 
-  parser.add_argument( '--p_value_cut', type=float, nargs=1, default=0.05, \
+  parser.add_argument( '--p_value_cut', type=float, nargs=1, default=0.0, \
                          help='Cut on P-Values less than the specified value' )
 
   try :
