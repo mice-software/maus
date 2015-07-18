@@ -1,0 +1,1395 @@
+// Step_4_def_*.dat
+//
+// Step 4 Geometry File for MAUS
+//
+// Suggested Z Start Position : -2900mm
+//
+//
+
+Configuration Step_4_def
+{
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  //  The World
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  Dimensions 5. 5. 15. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100.0 mm
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  //  Upstream Spectrometer
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  Module TrackerSolenoid0
+  {
+    Position 0. 0. -1939.5 mm
+    Rotation 0. 0. 0. degree
+    Volume Cylinder
+    Dimensions 702.0 2923.0 mm
+    PropertyString Material Galactic
+    PropertyBool Invisible 1
+    PropertyInt KalmanSolenoid 1
+    Module Tracker0
+    {
+      Position 0.0 0.0 -510.5 mm
+      Rotation 0.0 180.0 0.0 degree
+      Volume Cylinder
+      Dimensions 20.0 111.0 cm
+      PropertyInt Tracker 0
+      PropertyBool Invisible 1
+      PropertyString Material AIR
+
+      Module TrackerStation1
+      {
+        Position 0.0 0.0 -549.8789 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 1
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module TrackerStation2
+      {
+        Position -0.5709 -0.7375 -349.9143 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 2
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module TrackerStation3
+      {
+        Position -1.2021 -0.1657 -100.0513 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 3
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module TrackerStation4
+      {
+        Position -0.5694 -0.6040 199.9491 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 4
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module TrackerStation5
+      {
+        Position 0.0 0.0 549.8789 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 5
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+    }
+    Module HeWindow
+    {
+      Position 0.0 0.0 314.35 mm
+      Rotation 0.0 0.0 0.0 degree
+
+      Volume Cylinder
+      Dimensions 187.5 185.0 mm
+      PropertyString Material Galactic
+      Module HeWindowInnerMaterial
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowInnerCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowOuterSphere.dat
+        PropertyString BooleanModule1Type Intersection
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 -171.85 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString BooleanModule2 Tracker/HeWindowInnerSphere.dat
+        PropertyString BooleanModule2Type Subtraction
+        PropertyHep3Vector BooleanModule2Pos 0.0 0.0 -169.09 mm
+        PropertyHep3Vector BooleanModule2Rot 0.0 0.0 0.0 degree
+        PropertyString Material Al
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowInnerMaterial
+
+      Module HeWindowOuterMaterial
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowOuterCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowOuterTorus.dat
+        PropertyString BooleanModule1Type Intersection
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 62.07 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString BooleanModule2 Tracker/HeWindowInnerTorus.dat
+        PropertyString BooleanModule2Type Subtraction
+        PropertyHep3Vector BooleanModule2Pos 0.0 0.0 62.07 mm
+        PropertyHep3Vector BooleanModule2Rot 0.0 0.0 0.0 degree
+        PropertyString Material Al
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowOuterMaterial
+
+      Module HeWindowOuterHe
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowOuterCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowOuterTorus.dat
+        PropertyString BooleanModule1Type Subtraction
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 62.07 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString Material He
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowOuterHe
+
+      Module HeWindowInnerHe
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowInnerCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowInnerSphere.dat
+        PropertyString BooleanModule1Type Intersection
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 -169.09 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString Material He
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowInnerHe
+
+      Module HeWindowCase
+      {
+        Volume Tube
+        Dimensions 182.5 187.5 185.0 mm
+        PropertyString Material Al
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowCase
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  //  Downstream Spectrometer
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  Module TrackerSolenoid1
+  {
+    Position 0. 0. 1939.5 mm
+    Rotation 0. 0. 0. degree
+    Volume Cylinder
+    Dimensions 702.0 2923.0 mm
+    PropertyString Material Galactic
+    PropertyBool Invisible 1
+    PropertyInt KalmanSolenoid 1
+    Module Tracker1
+    {
+      Position 0.0 0.0 510.5 mm
+      Rotation 0.0 0.0 0.0 degree
+      Volume Cylinder
+      Dimensions 20.0 111.0 cm
+      PropertyInt Tracker 1
+      PropertyBool Invisible 1
+      PropertyString Material AIR
+
+      Module Tracker1Station1
+      {
+        Position 0.0 0.0 -549.9513 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 1
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module Tracker1Station2
+      {
+        Position -0.4698 0.0052 -349.0577 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 2
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module Tracker1Station3
+      {
+        Position -0.6717 -0.1759 -100.0523 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 3
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module Tracker1Station4
+      {
+        Position 0.1722 -0.2912 199.8771 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 4
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 105.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+      Module Tracker1Station5
+      {
+        Position 0.0 0.0 549.9513 mm
+        Rotation 0.0 0.0 0.0 degree
+        Volume Cylinder
+        Dimensions 19.0 0.20 cm
+        PropertyDouble GreenColour 1.0
+        PropertyDouble RedColour 1.0
+        PropertyInt Station 5
+        PropertyString Material RenCast6400
+        PropertyDouble OpticsMaterialLength 0 mm
+        Module TrackerViewV
+        {
+          Position 0.0 0.0 -0.6398 mm
+          Rotation 0.0 0.0 -120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 0
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewW
+        {
+          Position 0.0 0.0 0.00125 cm
+          Rotation 0.0 0.0 120.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 1
+          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 106.5
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerViewX
+        {
+          Position 0.0 0.0 0.6648 mm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.06273 cm
+          PropertyString Material POLYSTYRENE
+          PropertyString SensitiveDetector SciFi
+          PropertyInt Plane 2
+          PropertyDouble ActiveRadius 160.7 mm
+          PropertyDouble Pitch 0.427 mm
+          PropertyDouble FibreDiameter 0.350 mm
+          PropertyDouble CoreDiameter 0.308 mm
+          PropertyDouble CentralFibre 107.0
+          PropertyBool Invisible 1
+          PropertyString G4Detector SciFiPlane
+          PropertyDouble G4StepMax .1 mm
+          Module Virtual
+          {
+            Volume None
+            Position 0.0 0.0 0.0 m
+            Rotation 0.0 0.0 0.0 degree
+            PropertyString SensitiveDetector Virtual
+            PropertyString IndependentVariable z
+          }
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.096595 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 0.031365 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+        Module TrackerMylar
+        {
+          Position 0.0 0.0 -0.033865 cm
+          Rotation 0.0 0.0 0.0 degree
+          Volume Cylinder
+          Dimensions 18.9 0.0025 cm
+          PropertyString Material MYLAR
+          PropertyDouble RedColour 1.0
+        }
+      }
+    }
+    Module HeWindow
+    {
+      Position 0.0 0.0 -314.35 mm
+      Rotation 0.0 180 0.0 degree
+
+      Volume Cylinder
+      Dimensions 187.5 185.0 mm
+      PropertyString Material Galactic
+      Module HeWindowInnerMaterial
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowInnerCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowOuterSphere.dat
+        PropertyString BooleanModule1Type Intersection
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 -171.85 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString BooleanModule2 Tracker/HeWindowInnerSphere.dat
+        PropertyString BooleanModule2Type Subtraction
+        PropertyHep3Vector BooleanModule2Pos 0.0 0.0 -169.09 mm
+        PropertyHep3Vector BooleanModule2Rot 0.0 0.0 0.0 degree
+        PropertyString Material Al
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowInnerMaterial
+
+      Module HeWindowOuterMaterial
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowOuterCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowOuterTorus.dat
+        PropertyString BooleanModule1Type Intersection
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 62.07 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString BooleanModule2 Tracker/HeWindowInnerTorus.dat
+        PropertyString BooleanModule2Type Subtraction
+        PropertyHep3Vector BooleanModule2Pos 0.0 0.0 62.07 mm
+        PropertyHep3Vector BooleanModule2Rot 0.0 0.0 0.0 degree
+        PropertyString Material Al
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowOuterMaterial
+
+      Module HeWindowOuterHe
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowOuterCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowOuterTorus.dat
+        PropertyString BooleanModule1Type Subtraction
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 62.07 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString Material He
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowOuterHe
+
+      Module HeWindowInnerHe
+      {
+        Volume Boolean
+        PropertyString BaseModule Tracker/HeWindowInnerCylinder.dat
+        PropertyString BooleanModule1 Tracker/HeWindowInnerSphere.dat
+        PropertyString BooleanModule1Type Intersection
+        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 -169.09 mm
+        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
+        PropertyString Material He
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowInnerHe
+
+      Module HeWindowCase
+      {
+        Volume Tube
+        Dimensions 182.5 187.5 185.0 mm
+        PropertyString Material Al
+        Position 0.0 0.0 0.0 mm
+        Rotation 0.0 0.0 0.0 degree
+      } // EndHeWindowCase
+    }
+  } 
+}
+

@@ -63,7 +63,7 @@ G4Track* MakeTrack() {
     G4Track* track = new G4Track(dyn, 0., G4ThreeVector(0., 0., 0.));
     track->SetTrackID(0);
     MAUSTrackingAction* ta = MAUSGeant4Manager::GetInstance()->GetTracking();
-    ta->SetTracks(Json::Value(Json::arrayValue));
+    ta->SetTracks(new std::vector<Track>());
     ta->PreUserTrackingAction(track);
     return track;
 }

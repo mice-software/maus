@@ -26,6 +26,10 @@
  */
 #ifndef _SRC_COMMON_CPP_API_REDUCEBASE_
 #define _SRC_COMMON_CPP_API_REDUCEBASE_
+
+// Python include statement insists on being first
+#include <Python.h>
+
 #include <string>
 #include "src/common_cpp/API/IReduce.hh"
 #include "src/common_cpp/API/ModuleBase.hh"
@@ -40,8 +44,8 @@ namespace MAUS {
    * \author Alexander Richards, Imperial College London
    * \date 06/06/2012
    */
-  template <typename T>
-  class ReduceBase : public virtual IReduce<T>, public ModuleBase {
+  template <typename T_IN, typename T_OUT>
+  class ReduceBase : public virtual IReduce<T_IN, T_OUT>, public ModuleBase {
 
   public:
     /*!\brief Constructor
@@ -63,7 +67,9 @@ namespace MAUS {
      * \param T* The input data to be reduced
      * \return The reduced data
      */
-    T* process(T* t);
+    T_OUT* process(T_IN* t);
+
+    PyObject* process_pyobj(PyObject* py_input);
 
   private:
     /*!\brief Reduce data
@@ -74,7 +80,7 @@ namespace MAUS {
      * \param T* The input data to be reduced
      * \return The reduced data
      */
-    virtual T* _process(T* t) = 0;
+    virtual T_OUT* _process(T_IN* t) = 0;
   };
 
 }// end of namespace

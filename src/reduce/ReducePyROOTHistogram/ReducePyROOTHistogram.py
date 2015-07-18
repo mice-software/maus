@@ -24,6 +24,7 @@ import json
 
 import ErrorHandler
 import ROOT
+import maus_cpp.converter
 
 import framework.utilities
 
@@ -139,7 +140,7 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         @returns True if configuration succeeded. 
         """
 
-    def process(self, json_string):
+    def process(self, spill):
         """
         Update the histogram with data from the current spill
         and output the histogram.        
@@ -149,21 +150,45 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
         """
         # Load and validate the JSON document.
         def_doc = {"maus_event_type":"Image", "image_list":[]}
-        try:
-            json_doc = json.loads(json_string.rstrip())
-        except Exception: # pylint:disable=W0703
-            def_doc = ErrorHandler.HandleException(def_doc, self)
-            return unicode(json.dumps(def_doc))
+
+        # the mergers now process MAUS::Data
+        # the output are images in json strings
+        # check if input is Data, 
+        # if it's not data, load json and convert to data
+        # note that online celery/mongo returns json string
+        if spill.__class__.__name__ == 'MAUS::Data':
+            spill_data = spill
+            del spill
+        else:
+            try:
+                json_doc = json.loads(spill.rstrip())
+            except Exception: # pylint:disable=W0703
+                def_doc = ErrorHandler.HandleException(def_doc, self)
+                return unicode(json.dumps(def_doc))
+            try:
+                spill_data = maus_cpp.converter.data_repr(json_doc)
+                json_doc = None
+                del spill
+            except Exception: # pylint:disable=W0703
+                def_doc = ErrorHandler.HandleException(def_doc, self)
+                print def_doc
+                return unicode(json.dumps(def_doc))
 
         self.spill_count = self.spill_count + 1
 
         # Process spill and update histograms.
         try:
-            result = self._update_histograms(json_doc)
+            result = self._update_histograms(spill_data)
         except Exception: # pylint:disable=W0703
             def_doc = ErrorHandler.HandleException(def_doc, self)
             return unicode(json.dumps(def_doc))
         image_list = [image['image'] for image in result]
+
+        # delete references to data if any
+        try:
+            maus_cpp.converter.del_data_repr(spill)
+        except: # pylint: disable=W0702
+            pass
         # Convert results to strings.
         return json.dumps({"maus_event_type":"Image", "image_list":image_list})
 

@@ -42,7 +42,7 @@
 #include "API/MapBase.hh"
 
 namespace MAUS {
-class MapCppKLDigits : public MapBase<Json::Value> {
+class MapCppKLDigits : public MapBase<MAUS::Data> {
 
  public:
   MapCppKLDigits();
@@ -63,7 +63,7 @@ class MapCppKLDigits : public MapBase<Json::Value> {
   *  @param document Receive a document with raw data and return
   *  a document with digits
   */
-  void _process(Json::Value* document) const;
+  void _process(MAUS::Data* data) const;
 
  private:
   KLChannelMap _map;
@@ -75,18 +75,10 @@ class MapCppKLDigits : public MapBase<Json::Value> {
 
   bool SetConfiguration(std::string json_configuration);
 
-  /** @brief makes digits
-   *  @param xDocDetectorData Json document containing the individual
-   *  detector data
-   *  @param xDocTrig Json document containing the "trigger" info
-   *  @param xDocPmtInfo A refernence to the Information to be included in a digit
-   */
-  Json::Value makeDigits(Json::Value xDocDetectorData, Json::Value xDocTrig) const;
-
   /** @brief Gets the information from the flash ADC branch and appends it to the digit
    *  @param xDocPartEvent One particle event from raw detector data
    */
-  Json::Value getAdc(Json::Value xDocPartEvent) const;
+  bool getAdc(MAUS::KLDigit* digit, MAUS::V1724 &adc) const;
 };
 }
 #endif

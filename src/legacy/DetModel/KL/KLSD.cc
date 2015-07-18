@@ -7,8 +7,10 @@
 #include "Config/MiceModule.hh"
 #include <iostream>
 
+#include "src/common_cpp/DataStructure/KLChannelId.hh"
+
 KLSD::KLSD( MiceModule* mod)
-    : MAUSSD(mod)
+    : MAUSSD(mod), _hits(NULL)
 {
 }
 
@@ -17,49 +19,42 @@ void KLSD::Initialize(G4HCofThisEvent* HCE)
 
 }
 
+void KLSD::ClearHits() {
+  if (_hits != NULL)
+      delete _hits;
+  _hits = new std::vector<MAUS::KLHit>();
+}
+
 G4bool KLSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 {
   G4double edep = aStep->GetTotalEnergyDeposit();
 
   if( edep == 0. ) return false;
-  if (!_hits.isMember("kl_hits")) {
-    _hits["kl_hits"] = Json::Value(Json::arrayValue);
-  }
-  int hit_i = _hits["kl_hits"].size();
-  _hits["kl_hits"].append(Json::Value());
 
-  Json::Value channel_id;
+  MAUS::KLHit hit;
+  MAUS::KLChannelId* channel_id = new MAUS::KLChannelId();
 
-  channel_id["cell"] =  _module->propertyInt( "Cell" ) ;
-
-  _hits["kl_hits"][hit_i]["channel_id"] = channel_id;
-
-  _hits["kl_hits"][hit_i]["energy_deposited"] = 0.0;
+  channel_id->SetCell(_module->propertyInt( "Cell" ));
+  hit.SetChannelId(channel_id);
+  hit.SetEnergyDeposited(edep);
 
   G4Track* track = aStep->GetTrack();
 
-  Json::Value threeVectorValue;
-  
-  threeVectorValue["x"] = aStep->GetPreStepPoint()->GetPosition().x();
-  threeVectorValue["y"] = aStep->GetPreStepPoint()->GetPosition().y();
-  threeVectorValue["z"] = aStep->GetPreStepPoint()->GetPosition().z(); 
-        
-  _hits["kl_hits"][hit_i]["position"] = threeVectorValue;
+  MAUS::ThreeVector pos(aStep->GetPreStepPoint()->GetPosition().x(),
+                        aStep->GetPreStepPoint()->GetPosition().y(),
+                        aStep->GetPreStepPoint()->GetPosition().z()); 
+  hit.SetPosition(pos);
+  MAUS::ThreeVector mom(aStep->GetPreStepPoint()->GetMomentum().x(),
+                        aStep->GetPreStepPoint()->GetMomentum().y(),
+                        aStep->GetPreStepPoint()->GetMomentum().z()); 
+  hit.SetMomentum(mom);
+  hit.SetTime(aStep->GetPreStepPoint()->GetGlobalTime());
+  hit.SetCharge(track->GetDefinition()->GetPDGCharge());
+  hit.SetParticleId(track->GetDefinition()->GetPDGEncoding());
+  hit.SetEnergy(track->GetTotalEnergy());
+  hit.SetTrackId(aStep->GetTrack()->GetTrackID());
 
-  threeVectorValue["x"] = track->GetMomentum().x();
-  threeVectorValue["y"] = track->GetMomentum().y();
-  threeVectorValue["z"] = track->GetMomentum().z();
-
-  _hits["kl_hits"][hit_i]["momentum"] = threeVectorValue;
-  
-  _hits["kl_hits"][hit_i]["time"] = aStep->GetPreStepPoint()->GetGlobalTime();
-  
-  _hits["kl_hits"][hit_i]["charge"] = track->GetDefinition()->GetPDGCharge();
-  _hits["kl_hits"][hit_i]["particle_id"] = track->GetDefinition()->GetPDGEncoding();
-  _hits["kl_hits"][hit_i]["energy"] = track->GetTotalEnergy();
-  _hits["kl_hits"][hit_i]["track_id"] = aStep->GetTrack()->GetTrackID();
-  _hits["kl_hits"][hit_i]["energy_deposited"] = aStep->GetTotalEnergyDeposit();
-
+  _hits->push_back(hit);
   return true;
 }
 

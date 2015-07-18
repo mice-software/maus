@@ -110,6 +110,18 @@ class EMREvent {
     /** Sets  */
     void SetChargeRatioSA(double charge_SA_ratio);
 
+    /** Returns  */
+    double GetPlaneDensity() const;
+
+    /** Sets  */
+    void SetPlaneDensity(double plane_density);
+
+    /** Returns  */
+    double GetChi2() const;
+
+    /** Sets  */
+    void SetChi2(double chi2);
+
   private:
     EMRPlaneHitArray _emrplanehitarray;
 
@@ -123,6 +135,8 @@ class EMREvent {
     double _charge_ratio_MA;
     double _total_charge_SA;
     double _charge_ratio_SA;
+    double _plane_density;
+    double _chi2;
 
     MAUS_VERSIONED_CLASS_DEF(EMREvent)
 };

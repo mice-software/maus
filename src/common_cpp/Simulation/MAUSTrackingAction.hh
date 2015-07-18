@@ -18,6 +18,7 @@
 #ifndef _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
 #define _SRC_CPP_CORE_SIMULATION_MAUSTRACKINGACTION_HH_
 
+#include <vector>
 #include <string>
 #include <sstream>  //  combining strings and numbers
 
@@ -25,6 +26,8 @@
 
 #include "Geant4/G4Track.hh"  //  arg to tracking action
 #include "Geant4/G4UserTrackingAction.hh"  //  inherit from
+
+#include "src/common_cpp/DataStructure/Track.hh"
 
 #include "src/common_cpp/Simulation/MAUSSteppingAction.hh"
 
@@ -51,13 +54,17 @@ class MAUSTrackingAction : public G4UserTrackingAction {
      */
     void PostUserTrackingAction(const G4Track*);
 
-    /** @brief Set the tracks; must be a json array, else throws a Exception
+    /** @brief Set the tracks; MAUSTrackingAction takes ownership of the memory
      */
-    void SetTracks(Json::Value tracks);
+    void SetTracks(std::vector<Track>* tracks);
 
-    /** @brief Get the tracks
+    /** @brief Get the tracks; MAUSTrackingAction still owns the memory
      */
-    Json::Value GetTracks() {return _tracks;}
+    std::vector<Track>* GetTracks() const {return _tracks;}
+
+    /** @brief Get the tracks; caller takes ownership of the memory
+     */
+    std::vector<Track>* TakeTracks();
 
     /** @brief Choose whether to store tracks
      *
@@ -77,7 +84,7 @@ class MAUSTrackingAction : public G4UserTrackingAction {
     void SetKillReason(const G4Track* aTrack, std::string reason);
 
  private:
-    Json::Value _tracks;
+    std::vector<Track>* _tracks;
     bool _keepTracks;
     MAUSSteppingAction* _stepping;
 };

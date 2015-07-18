@@ -104,6 +104,7 @@ class OutputCppRoot : public OutputBase {
   std::string get_branch_name(RunHeaderData* data_cpp) {return "run_header";}
   std::string get_branch_name(JobFooterData* data_cpp) {return "job_footer";}
   std::string get_branch_name(RunFooterData* data_cpp) {return "run_footer";}
+  std::string get_branch_name(ImageData* data_cpp) {return "image";}
 
   template <class DataT>
   void check_file_exists(DataT* data_cpp);

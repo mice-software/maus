@@ -1,5 +1,6 @@
 {
   "daq_event_type": "physics_event", 
+  "maus_event_type": "Spill", 
   "recon_events": [
     {
       "kl_event": {
@@ -47,7 +48,8 @@
             }
           ]
         }
-      } 
+      },
+      "part_event_number": 0
     }, 
     {
       "kl_event": {
@@ -75,14 +77,18 @@
             }
           ]
         }
-      } 
+      },
+      "part_event_number":1
     }, 
     {
       "kl_event": {
         "kl_digits": {
           "kl": []
         }
-      } 
+      },
+      "part_event_number": 2
     }
-  ]
+  ],
+  "spill_number":1,
+  "run_number": 6890
 }

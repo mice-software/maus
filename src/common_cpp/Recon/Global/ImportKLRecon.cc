@@ -38,8 +38,18 @@ namespace global {
       GlobalKLSpacePoint->set_ADC_charge(KLCellHit.GetCharge());
       GlobalKLSpacePoint->set_ADC_charge_product(KLCellHit.GetChargeProduct());
       GlobalKLSpacePoint->set_detector(MAUS::DataStructure::Global::kCalorimeter);
-      // TODO(Pidcott) See if it is possible to translate a cell in the KL to a
-      // global position
+      double x = KLCellHit.GetGlobalPosX();
+      double x_err = KLCellHit.GetErrorX();
+      double y = KLCellHit.GetGlobalPosY();
+      double y_err = KLCellHit.GetErrorY();
+      double z = KLCellHit.GetGlobalPosZ();
+      double z_err = KLCellHit.GetErrorZ();
+      double t = -1000000;
+      double t_err = 1000000;
+      TLorentzVector pos(x, y, z, t);
+      TLorentzVector pos_err(x_err, y_err, z_err, t_err);
+      GlobalKLSpacePoint->set_position(pos);
+      GlobalKLSpacePoint->set_position_error(pos_err);
       global_event->add_space_point(GlobalKLSpacePoint);
     }
   }

@@ -40,6 +40,12 @@ def install_python_tests(maus_root_dir, env):
     env.Install(build, files)
 
     test_subdirs = glob.glob(target+"*")
+    for dirpath, dirnames, filenames in os.walk(target): # pylint: disable=W0612
+        test_files = glob.glob(dirpath+"/*.py")                   
+        relative_path = dirpath[len(target):]
+        env.Install(build+relative_path, test_files)
+
+
     for subdir in test_subdirs:
         if os.path.isdir(subdir):
             pos = len(target)
@@ -137,7 +143,7 @@ def build_cpp_tests(env, module_list):
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \
-                LIBS= env['LIBS'] + ['MausCpp']+module_list)
+                LIBS= env['LIBS'] + ['MausCpp'])#+module_list)
     env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
 
     test_tof_files = glob.glob\
@@ -163,6 +169,7 @@ def build_data_structure(env):
     os.chdir(maus_root_dir)
     data_items = glob.glob(data_struct+'*.hh')
     data_items.extend(glob.glob(data_struct+'Global/*.hh'))
+    data_items.extend(glob.glob(data_struct+'ImageData/*.hh'))
     data_items = [item for item in data_items if item[-7:] != '-inl.hh']
     # LinkDef.hh must be last
     data_items.sort(key = lambda x: x.find('LinkDef.hh')) 

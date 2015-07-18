@@ -15,16 +15,7 @@
  *
  */
 
-// These ifdefs are required to avoid cpp compiler warning
-#ifdef _POSIX_C_SOURCE
-#undef _POSIX_C_SOURCE
-#endif
-
-#ifdef _XOPEN_SOURCE
-#undef _XOPEN_SOURCE
-#endif
-
-#include "Python.h"
+#include <Python.h>
 
 #include "gtest/gtest.h"
 #include "json/json.h"
@@ -45,6 +36,7 @@ TEST(PyObjectWrapperTest, TestUnwrapNullObject) {
   EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
@@ -58,6 +50,7 @@ TEST(PyObjectWrapperTest, TestUnwrapBadObject) {
   EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
   EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);

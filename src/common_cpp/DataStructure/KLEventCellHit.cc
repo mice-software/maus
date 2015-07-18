@@ -43,6 +43,10 @@ KLCellHitArray KLEventCellHit::GetKLCellHitArray() const {
     return _kl;
 }
 
+KLCellHitArray* KLEventCellHit::GetKLCellHitArrayPtr() {
+    return &_kl;
+}
+
 KLCellHit KLEventCellHit::GetKLCellHitArrayElement(size_t index) const {
     return _kl[index];
 }
