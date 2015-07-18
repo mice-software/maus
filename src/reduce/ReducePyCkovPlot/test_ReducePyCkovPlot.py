@@ -42,7 +42,7 @@ class ReducePyCkovPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         Invoke "birth" and check for success.
         @param self Object reference.
         """
-        success = self.__reducer.birth("{}")
+        success = self.__reducer.birth("""{"root_batch_mode":1}""")
         if not success:
             raise Exception('Test setUp failed '+str(success),
                             'reducer.birth() failed')
@@ -91,7 +91,6 @@ class ReducePyCkovPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C030
         @param self Object reference.#
         """
         result = self.__process({})
-        print result
         self.assertTrue("errors" in result, "No errors field")
         errors = result["errors"]
         
