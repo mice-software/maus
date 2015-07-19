@@ -145,8 +145,9 @@ class TestMainFrame : public TGMainFrame {
     virtual ~TestMainFrame() {}
 };
 
-
-TEST(ImageTest, EmbedCanvasWrapperTest) {
+// Reported unstable; note this requires TApplication to work, so may be a
+// problem there
+TEST(ImageTest, DISABLED_EmbedCanvasWrapperTest) {
     bool batch = gROOT->IsBatch();
     gROOT->SetBatch(false);
     TestMainFrame window(gClient->GetRoot(), 100, 100);
