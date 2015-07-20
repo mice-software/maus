@@ -139,9 +139,37 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
       TOF1SlabHitArray* tof1_slHits = tSlabHits->GetTOF1SlabHitArrayPtr();
       TOF2SlabHitArray* tof2_slHits = tSlabHits->GetTOF2SlabHitArrayPtr();
 
-      processTOFStation(tof1_slHits, tof1_spoints, "tof1", n_event, triggerhit_pixels);
-      processTOFStation(tof0_slHits, tof0_spoints, "tof0", n_event, triggerhit_pixels);
-      processTOFStation(tof2_slHits, tof2_spoints, "tof2", n_event, triggerhit_pixels);
+      keysVec_t station_vec(0);
+
+      // store the pointers to slabhits, spacepoints, and the detector name
+      station_vec.push_back(make_pair(make_pair(tof0_slHits, tof0_spoints),
+                                      "tof0"));
+      station_vec.push_back(make_pair(make_pair(tof1_slHits, tof1_spoints),
+                                      "tof1"));
+      station_vec.push_back(make_pair(make_pair(tof2_slHits, tof2_spoints),
+                                      "tof2"));
+
+      // IMPORTANT: the trigger station MUST be processed first
+      // this is to enable the trigger-pixel-finding necessary for calibrating
+      // -- check the trigger station and reorder the vector of stationKeys
+      //    so that trigger station hits go first
+      switch ( _trigStn ) {
+          case 1:
+             std::swap(station_vec[0], station_vec[1]);
+             break;
+          case 2:
+             std::swap(station_vec[0], station_vec[2]);
+             break;
+      }
+
+      // loop over the stations and process them
+      for (keysVec_t::iterator it = station_vec.begin();
+              it != station_vec.end();
+              ++it) {
+          // std::cerr << "DEBUG: Processing " << it->second << std::endl;
+          processTOFStation((it->first).first, (it->first).second, it->second,
+                            n_event, triggerhit_pixels);
+      }
   }
 }
 ////////////////////////////////////////////////////////////

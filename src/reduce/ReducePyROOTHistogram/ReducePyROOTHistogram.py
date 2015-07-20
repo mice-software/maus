@@ -171,7 +171,6 @@ class ReducePyROOTHistogram: # pylint: disable=R0902, R0921
                 del spill
             except Exception: # pylint:disable=W0703
                 def_doc = ErrorHandler.HandleException(def_doc, self)
-                print def_doc
                 return unicode(json.dumps(def_doc))
 
         self.spill_count = self.spill_count + 1

@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include "json/json.h"
 
 #include "Utils/TOFCalibrationMap.hh"
@@ -122,6 +123,14 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
   int runNumberSave;
   void getTofCalib(int rnum);
   Json::Value configJSON;
+  /* stationKeys store a pointer to the slabhits arry, 
+   *  a pointer to spacepoints array, 
+   *  and the station name
+   *  pair< pair<Hits, SpacePoints>, stationName>
+   */
+  typedef std::pair<std::pair<TOF1SlabHitArray*, TOF1SpacePointArray*>,
+                    std::string > stationKeys;
+  typedef std::vector<stationKeys> keysVec_t;
 };
 }
 
