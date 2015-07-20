@@ -27,6 +27,8 @@
 # pylint: disable = W0311, E1101, W0613, C0111, W0621, C0103, W0702, W0611
 # pylint: disable = R0912, R0914, R0915
 
+import MAUS
+
 # Generic Python imports
 import sys
 import os
@@ -35,7 +37,6 @@ import types
 
 # Third Party library import statements
 import event_loader
-import MAUS
 import ROOT
 
 

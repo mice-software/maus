@@ -27,8 +27,10 @@
   
 """
 
-# pylint: disable = W0311, E1101, W0613, W0621, C0103, C0111, W0702
+# pylint: disable = W0311, E1101, W0613, W0621, C0103, C0111, W0702, W0611
 
+# Import MAUS Framework
+import MAUS
 
 # Generic Python imports
 import sys
