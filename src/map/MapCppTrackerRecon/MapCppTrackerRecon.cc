@@ -77,11 +77,18 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
 
   _spacepoint_recon = SciFiSpacePointRec();
 
+  double up_field = _geometry_helper.GetFieldValue(0);
+  double down_field = _geometry_helper.GetFieldValue(1);
+
+  if (fabs(up_field) < 0.00001 && fabs(down_field) < 0.00001) {
+    _helical_pr_on = false;
+  }
+
   _pattern_recognition.LoadGlobals();
   _pattern_recognition.set_helical_pr_on(_helical_pr_on);
   _pattern_recognition.set_straight_pr_on(_straight_pr_on);
-  _pattern_recognition.set_bz_t1(_geometry_helper.GetFieldValue(0));
-  _pattern_recognition.set_bz_t2(_geometry_helper.GetFieldValue(1));
+  _pattern_recognition.set_bz_t1(up_field);
+  _pattern_recognition.set_bz_t2(down_field);
 
   if (_use_patrec_seed) {
     _seed_value = -1.0;
