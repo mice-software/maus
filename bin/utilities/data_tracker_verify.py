@@ -46,6 +46,7 @@ REFERENCE_STATION = 1
 TOF_CUT_LOW = 0.0
 TOF_CUT_HIGH = 1000.0
 P_VALUE_CUT = 0.05
+MIN_NUM_TRACKPOINTS = 0
 
 PLOT_OPTIONS = { 'npe' : [ 'logy' ], \
                  'npe_cluster' : [ 'logy' ], \
@@ -272,6 +273,8 @@ def init_plots_data() :
   data_dict['counters']['N_fat_clusters'] = 0
   data_dict['counters']['N_events'] = 0
   data_dict['counters']['N_tracks'] = 0
+  data_dict['counters']['N_tracks_up'] = 0
+  data_dict['counters']['N_tracks_down'] = 0
   data_dict['counters']['N_track_pairs'] = 0
 
 
@@ -519,9 +522,18 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
 
   for track in tracks :
     trackpoints = track.scifitrackpoints()
-    tracker = track.tracker()
+
     if track.P_value() < P_VALUE_CUT : 
       continue
+
+    count_trackpoints = 0
+    for tp in trackpoints :
+      if tp.has_data() :
+        count_trackpoints += 1
+    if count_trackpoints < MIN_NUM_TRACKPOINTS :
+      continue
+
+    tracker = track.tracker()
 
     data_dict['counters']['N_tracks'] += 1 
 
@@ -533,10 +545,12 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
     if tracker == 0 :
       track_plots['chi_squared_up'].Fill( track.chi2() )
       track_plots['chi_squared_ndf_up'].Fill( track.chi2() / track.ndf() )
+      data_dict['counters']['N_tracks_up'] += 1 
       upstream_good += 1
     elif tracker == 1 :
       track_plots['chi_squared_down'].Fill( track.chi2() )
       track_plots['chi_squared_ndf_down'].Fill( track.chi2() / track.ndf() )
+      data_dict['counters']['N_tracks_down'] += 1 
       downstream_good += 1
     
     pr_track = None
@@ -546,11 +560,7 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
     elif track.GetAlgorithmUsed() == 1 :
       pr_track = track.pr_track_pointer_helical()
 
-    count_trackpoints = 0
-
     for tp in trackpoints :
-      if tp.has_data() :
-        count_trackpoints += 1
 
       station = tp.station()
       plane = tp.plane()
@@ -587,9 +597,7 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
           prefix = 'down_'
         pr_pos = pr_track.get_reference_position()
         pr_mom = pr_track.get_reference_momentum()
-        if tracker == 0 :
-          pr_mom.setX( -pr_mom.x() )
-          pr_mom.setY( -pr_mom.y() )
+
         diff_pos = [ pos.x() - pr_pos.x(), pos.y() - pr_pos.y() ]
         diff_mom = [ mom.x() - pr_mom.x(), mom.y() - pr_mom.y() ]
  
@@ -620,6 +628,10 @@ def analyse_plots(plot_dict, data_dict) :
   print "No. of Events                  = ", data_dict['counters']['N_events']
   print
   print "No. of Tracks                  = ", data_dict['counters']['N_tracks']
+  print "No. of Upstream Tracks         = ", \
+                                           data_dict['counters']['N_tracks_up']
+  print "No. of Downstream Tracks       = ", \
+                                         data_dict['counters']['N_tracks_down']
   print "No. of Track Pairs             = ", \
                                          data_dict['counters']['N_track_pairs']
   print
@@ -746,6 +758,8 @@ if __name__ == "__main__" :
 
   parser.add_argument( '--p_value_cut', type=float, default=0.0, \
                          help='Cut on P-Values less than the specified value' )
+  parser.add_argument( '--number_trackpoints_cut', type=int, default=0, \
+                         help='Cut on the Number of Trackpoints in the track' )
 
   try :
     namespace = parser.parse_args()
@@ -755,8 +769,10 @@ if __name__ == "__main__" :
 
     P_VALUE_CUT = namespace.p_value_cut
 
+    MIN_NUM_TRACKPOINTS = namespace.number_trackpoints_cut
+
   except :
-    pass
+    raise
   else :
 ##### 1. Intialise plots ######################################################
     print "\nInitialising Plots"

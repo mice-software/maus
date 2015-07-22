@@ -329,7 +329,7 @@ namespace MAUS {
         pos += reference_pos;
 
         mom *= reference_rot;
-        if (tracker == 0) mom *= -1.0;
+//        if (tracker == 0) mom *= -1.0;
         mom.setZ(default_mom); // MeV/c
       } else if (dimension == 5) {
         pos.setX(state_vector(0, 0));
@@ -350,27 +350,12 @@ namespace MAUS {
         mom.setZ(fabs(1.0/state_vector(4, 0)));
       }
 
-//      if (mom.z() < 0.0) {
-//        mom.setZ(- mom.z());
-//      }
-//      if (tracker == 0) {
-//        mom.setZ(fabs(mom.z()));
-//        mom.setY(-1.0*mom.y());
-//      }
-
       new_point->set_pos(pos);
       new_point->set_mom(mom);
 
       // TODO
-    //  _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
-    //  _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
-    //  _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);
-    //  AND CHARGE!
+      // CHARGE!
       if (data_state) {
-//        new_point->set_pull(sqrt(fitter->CalculatePredictedResidual(i).GetVector().E2Norm()));
-//        new_point->set_residual(sqrt(fitter->CalculateFilteredResidual(i).GetVector().E2Norm()));
-//        new_point->set_smoothed_residual(
-//                                sqrt(fitter->CalculateSmoothedResidual(i).GetVector().E2Norm()));
         new_point->set_pull(fitter->CalculatePull(i).GetVector()(0, 0));
         new_point->set_residual(fitter->CalculateFilteredResidual(i).GetVector()(0, 0));
         new_point->set_smoothed_residual(fitter->CalculateSmoothedResidual(i).GetVector()(0, 0));
@@ -438,10 +423,6 @@ namespace MAUS {
     new_track->SetSeedCovariance(seed.GetCovariance().GetMatrixArray(), dimension*dimension);
 
 // TODO:
-// - Set Cluster
-// - Calculate p-value
-// - Set Algorithm used
-// - Set Seed Info
 // - Init track before the fit?
 
     return new_track;
