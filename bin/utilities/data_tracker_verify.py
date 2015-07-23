@@ -821,9 +821,11 @@ if __name__ == "__main__" :
 
 ##### 5. Save plots and data ##################################################
     print "\nSaving Plots and Data"
-    save_plots(plot_dict, namespace.output_filename)
+    outdir = namespace.output_directory
+    outfile = os.path.join( outdir, namespace.output_filename+".root" )
+    save_plots(plot_dict, outfile)
     if namespace.print_plots :
-      print_plots(plot_dict, namespace.output_directory)
+      print_plots(plot_dict, outdir)
 
 
   print 
