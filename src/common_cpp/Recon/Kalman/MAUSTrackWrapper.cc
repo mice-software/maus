@@ -254,7 +254,7 @@ namespace MAUS {
 
 
   SciFiTrack* ConvertToSciFiTrack(const Kalman::TrackFit* fitter,
-                                                                 const SciFiGeometryHelper* geom) {
+                                     const SciFiGeometryHelper* geom, SciFiBasePRTrack* pr_track) {
     SciFiTrack* new_track = new SciFiTrack();
     const Kalman::Track& smoothed = fitter->Smoothed();
 //    const Kalman::Track& smoothed = fitter->Filtered();
@@ -307,6 +307,7 @@ namespace MAUS {
       SciFiTrackPoint* new_point = new SciFiTrackPoint();
 
       new_point->set_tracker(tracker);
+      new_point->set_has_data(data_state.HasValue());
 
       int id = abs(smoothed_state.GetId());
       new_point->set_station(((id-1)/3)+1);
@@ -328,7 +329,7 @@ namespace MAUS {
         pos += reference_pos;
 
         mom *= reference_rot;
-        if (tracker == 0) mom *= -1.0;
+//        if (tracker == 0) mom *= -1.0;
         mom.setZ(default_mom); // MeV/c
       } else if (dimension == 5) {
         pos.setX(state_vector(0, 0));
@@ -349,28 +350,13 @@ namespace MAUS {
         mom.setZ(fabs(1.0/state_vector(4, 0)));
       }
 
-//      if (mom.z() < 0.0) {
-//        mom.setZ(- mom.z());
-//      }
-//      if (tracker == 0) {
-//        mom.setZ(fabs(mom.z()));
-//        mom.setY(-1.0*mom.y());
-//      }
-
       new_point->set_pos(pos);
       new_point->set_mom(mom);
 
       // TODO
-    //  _pull              = kalman_site->residual(KalmanState::Projected)(0, 0);
-    //  _residual          = kalman_site->residual(KalmanState::Filtered)(0, 0);
-    //  _smoothed_residual = kalman_site->residual(KalmanState::Smoothed)(0, 0);
-    //  AND CHARGE!
+      // CHARGE!
       if (data_state) {
-//        new_point->set_pull(sqrt(fitter->CalculatePredictedResidual(i).GetVector().E2Norm()));
-//        new_point->set_residual(sqrt(fitter->CalculateFilteredResidual(i).GetVector().E2Norm()));
-//        new_point->set_smoothed_residual(
-//                                sqrt(fitter->CalculateSmoothedResidual(i).GetVector().E2Norm()));
-        new_point->set_pull(fitter->CalculatePredictedResidual(i).GetVector()(0, 0));
+        new_point->set_pull(fitter->CalculatePull(i).GetVector()(0, 0));
         new_point->set_residual(fitter->CalculateFilteredResidual(i).GetVector()(0, 0));
         new_point->set_smoothed_residual(fitter->CalculateSmoothedResidual(i).GetVector()(0, 0));
       } else {
@@ -396,9 +382,6 @@ namespace MAUS {
       }
       new_point->set_errors(errors);
 
-// TODO
-//    _cluster = new TRef(kalman_site->cluster());
-      new_point->set_cluster(new TRef());
       new_track->add_scifitrackpoint(new_point);
     }
 
@@ -406,6 +389,7 @@ namespace MAUS {
     new_track->set_chi2(chi_squared);
     new_track->set_ndf(NDF);
     new_track->set_P_value(p_value);
+    new_track->set_pr_track_pointer(pr_track);
 
     TMatrixD seed_vector = seed.GetVector();
     ThreeVector seed_pos;
@@ -439,10 +423,6 @@ namespace MAUS {
     new_track->SetSeedCovariance(seed.GetCovariance().GetMatrixArray(), dimension*dimension);
 
 // TODO:
-// - Set Cluster
-// - Calculate p-value
-// - Set Algorithm used
-// - Set Seed Info
 // - Init track before the fit?
 
     return new_track;

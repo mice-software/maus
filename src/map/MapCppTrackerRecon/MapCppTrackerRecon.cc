@@ -38,7 +38,14 @@ PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
                                         ("MapCppTrackerRecon", "", "", "", "");
 }
 
-MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon") {
+MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon"),
+#ifdef KALMAN_TEST
+  _spacepoint_helical_track_fitter(NULL),
+  _spacepoint_straight_track_fitter(NULL) {
+#else
+  _helical_track_fitter(NULL),
+  _straight_track_fitter(NULL) {
+#endif
 }
 
 MapCppTrackerRecon::~MapCppTrackerRecon() {
@@ -66,16 +73,22 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
 
-
   _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
 
   _spacepoint_recon = SciFiSpacePointRec();
 
+  double up_field = _geometry_helper.GetFieldValue(0);
+  double down_field = _geometry_helper.GetFieldValue(1);
+
+  if (fabs(up_field) < 0.00001 && fabs(down_field) < 0.00001) {
+    _helical_pr_on = false;
+  }
+
   _pattern_recognition.LoadGlobals();
   _pattern_recognition.set_helical_pr_on(_helical_pr_on);
   _pattern_recognition.set_straight_pr_on(_straight_pr_on);
-  _pattern_recognition.set_bz_t1(_geometry_helper.GetFieldValue(0));
-  _pattern_recognition.set_bz_t2(_geometry_helper.GetFieldValue(1));
+  _pattern_recognition.set_bz_t1(up_field);
+  _pattern_recognition.set_bz_t2(down_field);
 
   if (_use_patrec_seed) {
     _seed_value = -1.0;
@@ -113,6 +126,25 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
 }
 
 void MapCppTrackerRecon::_death() {
+#ifdef KALMAN_TEST
+  if (_spacepoint_helical_track_fitter) {
+    delete _spacepoint_helical_track_fitter;
+    _spacepoint_helical_track_fitter = NULL;
+  }
+  if (_spacepoint_straight_track_fitter) {
+    delete _spacepoint_straight_track_fitter;
+    _spacepoint_straight_track_fitter = NULL;
+  }
+#else
+  if (_helical_track_fitter) {
+    delete _helical_track_fitter;
+    _helical_track_fitter = NULL;
+  }
+  if (_straight_track_fitter) {
+    delete _straight_track_fitter;
+    _straight_track_fitter = NULL;
+  }
+#endif
 }
 
 void MapCppTrackerRecon::_process(Data* data) const {
@@ -198,7 +230,8 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       std::cerr << Kalman::print_track(smoothed);
       delete temp_measurement;
 
-      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter,
+                                                                       &_geometry_helper, helical);
   //    SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter->GetFiltered(),
   //                                                             &_geometry_helper);
       evt.add_scifitrack(track);
@@ -235,7 +268,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       std::cerr << Kalman::print_track(smoothed);
 
       SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_straight_track_fitter,
-                                                                                &_geometry_helper);
+                                                                      &_geometry_helper, straight);
       evt.add_scifitrack(track);
     }
   } else { // PATREC Not Active
@@ -315,7 +348,8 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       std::cerr << Kalman::print_track(smoothed);
       delete temp_measurement;
 
-      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter,
+                                                                       &_geometry_helper, helical);
   //    SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter->GetFiltered(),
   //                                                             &_geometry_helper);
       evt.add_scifitrack(track);
@@ -337,7 +371,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _helical_track_fitter->Filter(false);
       _helical_track_fitter->Smooth(false);
 
-      SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
 
       evt.add_scifitrack(track);
     }
@@ -353,7 +387,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _straight_track_fitter->Filter(false);
       _straight_track_fitter->Smooth(false);
 
-      SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper);
+      SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
 
       evt.add_scifitrack(track);
     }

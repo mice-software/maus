@@ -24,6 +24,7 @@
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "src/common_cpp/DataStructure/SciFiEvent.hh" // Includes everything!
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiBasePRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 
@@ -48,7 +49,8 @@ namespace MAUS {
 
   /** @brief Convert a KalmanTrack to a SciFiTrack for the data structure
    */
-  SciFiTrack* ConvertToSciFiTrack(const Kalman::TrackFit* fitter, const SciFiGeometryHelper* geom);
+  SciFiTrack* ConvertToSciFiTrack(const Kalman::TrackFit* fitter,
+                                      const SciFiGeometryHelper* geom, SciFiBasePRTrack* pr_track);
 
   /** @brief Builds a data track using a PR track
    */
