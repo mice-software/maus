@@ -207,9 +207,8 @@ class MAUSGeant4Manager {
 
     Json::Value Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 
-  
     // std::vector<G4UserLimits*> _userLims;
-  
+
 
     static MAUSGeant4Manager* _instance;
     static bool _isClosed;

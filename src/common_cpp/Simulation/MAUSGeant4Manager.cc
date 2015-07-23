@@ -80,7 +80,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
 					JsonWrapper::realValue).asDouble();
 
     // Create the gdml parser object
-    
+
 
     std::string gdmlGeometry = "";
     bool usegdml = Globals::GetInstance()
@@ -221,7 +221,7 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
   const G4GDMLAuxMapType* auxmap = _parser.GetAuxMap();
   Squeak::mout(Squeak::info) << "Found " << auxmap->size()
 			     << " volume(s) with auxiliary information.\n\n";
-  
+
   double stepMax = _stepMax;
   double timeMax = _timeMax;
   double trackMax = _trackMax;
@@ -235,6 +235,8 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
       iter != auxmap->end(); iter++) {
     // Construct a mice module containing the auxilliary information
     G4LogicalVolume* myvol = (*iter).first;
+    Squeak::mout(Squeak::info) << "Checking aux map of volume "
+			       << myvol->GetName() << std::endl;
     // Want to know, specifically if there is a sensitive detector in this object
     for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
 	 vit != (*iter).second.end(); vit++) {
@@ -266,65 +268,67 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	    }
 	  }
 	}
-      }
-      
-      else if((*vit).type.contains("G4StepMax")){
-	stepMax  = double(atof((*vit).value.c_str()));
-	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
-				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
-      }
-      else if((*vit).type.contains("G4TrackMax")){
-	trackMax = double(atof((*vit).value.c_str()));
-	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
-				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
-      }
-      else if((*vit).type.contains("G4TimeMax")){
-	timeMax  = double(atof((*vit).value.c_str()));
-	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
-				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
-      }
-      else if((*vit).type.contains("G4KinMin")){
-	Squeak::mout(Squeak::info)<<"Found "<<(*vit).type<<" with value "
-				  <<(*vit).value<<" in object "<<myvol->GetName()<<"\n";
-	keThreshold = double(atof((*vit).value.c_str()));
-      }
-      else if((*vit).type.contains("Region")){
+      } else if ((*vit).type.contains("G4StepMax")) {
+	stepMax  = static_cast<double>(atof((*vit).value.c_str()));
+	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
+				   << (*vit).value << " in object "
+				   << myvol->GetName() << "\n";
+      } else if ((*vit).type.contains("G4TrackMax")) {
+	trackMax = static_cast<double>(atof((*vit).value.c_str()));
+	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
+				   << (*vit).value << " in object "
+				   << myvol->GetName() << "\n";
+      } else if ((*vit).type.contains("G4TimeMax")) {
+	timeMax  = static_cast<double>(atof((*vit).value.c_str()));
+	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
+				   << (*vit).value << " in object "
+				   << myvol->GetName() << "\n";
+      } else if ((*vit).type.contains("G4KinMin")) {
+	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
+				   << (*vit).value << " in object "
+				   << myvol->GetName() << "\n";
+	keThreshold = static_cast<double>(atof((*vit).value.c_str()));
+      } else if ((*vit).type.contains("Region")) {
 	std::string name = (*vit).value;
 	G4RegionStore* store = G4RegionStore::GetInstance();
-	if (store->GetRegion(name) == NULL) { 
+	if (store->GetRegion(name) == NULL) {
 	  new G4Region(name);
 	  _detector->GetRegions().push_back(name);
 	}
 	G4Region* region = store->GetRegion(name);
-	if(region == NULL){
+	if (region == NULL) {
 	  throw MAUS::Exception(Exception::recoverable,
 				"Failed to make region",
 				"MAUSgeant4Manager::SetAuxInformation");
 	}
 	region->AddRootLogicalVolume(myvol);
-      }
-      else if((*vit).type.contains("Invisible"))
+      } else if ((*vit).type.contains("Invisible")) {
 	vis = false;
-      else if((*vit).type.contains("RedColour"))
-	red = double(atof((*vit).value.c_str()));
-      else if((*vit).type.contains("GreenColour"))
-	green = double(atof((*vit).value.c_str()));
-      else if((*vit).type.contains("BlueColour"))
-	blue = double(atof((*vit).value.c_str()));
-
+      } else if ((*vit).type.contains("RedColour")) {
+	red = static_cast<double>(atof((*vit).value.c_str()));
+      } else if ((*vit).type.contains("GreenColour")) {
+	green = static_cast<double>(atof((*vit).value.c_str()));
+      } else if ((*vit).type.contains("BlueColour")) {
+	blue = static_cast<double>(atof((*vit).value.c_str()));
+      } else {
+	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
+				  << (*vit).value << " in object "
+				  << myvol->GetName()
+				  << " with unknown purpose\n";
+      }
     }
-  
-    _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax, 
+
+    _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax,
 							  timeMax, keThreshold));
     myvol->SetUserLimits(_detector->GetUserLimits().back());
-    if(vis)
-      _detector->GetVisAttributes().push_back(new G4VisAttributes(G4Color(red,green,blue)));
-    else 
+    if (vis)
+      _detector->GetVisAttributes().push_back(new G4VisAttributes(G4Color(red, green, blue)));
+    else
       _detector->GetVisAttributes().push_back(new G4VisAttributes(false));
     myvol->SetVisAttributes(_detector->GetVisAttributes().back());
   }
 }
-  
+
 void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
   // std::cout << "Adding " << logic->GetNoDaughters()
   // << " to sensitive detector in " << logic->GetName() << std::endl;
