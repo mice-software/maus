@@ -172,9 +172,17 @@ class MAUSGeant4Manager {
 
     /** Set the sensitive detector information 
      *
-     *  Recursively examine logical volumes for
+     *  Recursively examine logical volumes for daughters and add
+     *  the sensitive detector designation 
      */
     void SetDaughterSensitiveDetectors(G4LogicalVolume* logic);
+  
+    /** Set the user limits on step wise processes
+     *
+     * Recursively examine logical volumes for daughers and add
+     * the user limit information
+     */
+    void SetDaughterUserLimits(G4LogicalVolume* logic);
 
     /** Reset the simulation with a new geometry set
      *

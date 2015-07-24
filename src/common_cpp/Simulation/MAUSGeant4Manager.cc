@@ -269,17 +269,17 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	  }
 	}
       } else if ((*vit).type.contains("G4StepMax")) {
-	stepMax  = static_cast<double>(atof((*vit).value.c_str()));
+	stepMax  = (double)(atof((*vit).value.c_str()));
 	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
 				   << (*vit).value << " in object "
 				   << myvol->GetName() << "\n";
       } else if ((*vit).type.contains("G4TrackMax")) {
-	trackMax = static_cast<double>(atof((*vit).value.c_str()));
+	trackMax = (double)(atof((*vit).value.c_str()));
 	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
 				   << (*vit).value << " in object "
 				   << myvol->GetName() << "\n";
       } else if ((*vit).type.contains("G4TimeMax")) {
-	timeMax  = static_cast<double>(atof((*vit).value.c_str()));
+	timeMax  = (double)(atof((*vit).value.c_str()));
 	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
 				   << (*vit).value << " in object "
 				   << myvol->GetName() << "\n";
@@ -287,7 +287,7 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
 				   << (*vit).value << " in object "
 				   << myvol->GetName() << "\n";
-	keThreshold = static_cast<double>(atof((*vit).value.c_str()));
+	keThreshold = (double)(atof((*vit).value.c_str()));
       } else if ((*vit).type.contains("Region")) {
 	std::string name = (*vit).value;
 	G4RegionStore* store = G4RegionStore::GetInstance();
@@ -304,12 +304,15 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
 	region->AddRootLogicalVolume(myvol);
       } else if ((*vit).type.contains("Invisible")) {
 	vis = false;
-      } else if ((*vit).type.contains("RedColour")) {
-	red = static_cast<double>(atof((*vit).value.c_str()));
-      } else if ((*vit).type.contains("GreenColour")) {
-	green = static_cast<double>(atof((*vit).value.c_str()));
-      } else if ((*vit).type.contains("BlueColour")) {
-	blue = static_cast<double>(atof((*vit).value.c_str()));
+      } else if ((*vit).type.contains("RedColor") || 
+		 (*vit).type.contains("RedColour")) {
+	red = (double)(atof((*vit).value.c_str()));
+      } else if ((*vit).type.contains("GreenColor") || 
+		 (*vit).type.contains("GreenColour")) {
+	green = (double)(atof((*vit).value.c_str()));
+      } else if ((*vit).type.contains("BlueColor") || 
+		 (*vit).type.contains("BlueColour")) {
+	blue = (double)(atof((*vit).value.c_str()));
       } else {
 	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
 				  << (*vit).value << " in object "
@@ -321,6 +324,9 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
     _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax,
 							  timeMax, keThreshold));
     myvol->SetUserLimits(_detector->GetUserLimits().back());
+    // if (myvol->GetNoDaughters() > 0) {
+    //   SetDaughterUserLimits(myvol);
+    // }
     if (vis)
       _detector->GetVisAttributes().push_back(new G4VisAttributes(G4Color(red, green, blue)));
     else
@@ -340,6 +346,17 @@ void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
       SetDaughterSensitiveDetectors(logic->GetDaughter(i)->GetLogicalVolume());
     }
   }
+}
+
+void MAUSGeant4Manager::SetDaughterUserLimits(G4LogicalVolume* logic) {
+
+  for (G4int i=0; i < logic->GetNoDaughters(); i++) {
+    logic->GetDaughter(i)->GetLogicalVolume()->
+      SetUserLimits(_detector->GetUserLimits().back());
+    if (logic->GetDaughter(i)->GetLogicalVolume()->GetNoDaughters() > 0) {
+      SetDaughterUserLimits(logic->GetDaughter(i)->GetLogicalVolume());
+    }
+  }   
 }
 
 // should be const MiceModule
