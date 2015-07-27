@@ -176,7 +176,7 @@ class MAUSGeant4Manager {
      *  the sensitive detector designation 
      */
     void SetDaughterSensitiveDetectors(G4LogicalVolume* logic);
-  
+
     /** Set the user limits on step wise processes
      *
      * Recursively examine logical volumes for daughers and add
