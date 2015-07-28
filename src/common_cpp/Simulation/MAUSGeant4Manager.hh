@@ -18,6 +18,7 @@
 #ifndef _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 
+#include <string>
 #include "Geant4/G4RunManager.hh"
 #include "Geant4/G4SDManager.hh"
 #include "Geant4/G4GDMLParser.hh"
@@ -171,6 +172,12 @@ class MAUSGeant4Manager {
     void SetAuxInformation(MiceModule& module);
 
     /** Set the sensitive detector information 
+     *
+     *  Add the sensitive detector designation to a volume
+     */
+    void DefineSensitiveDetector(MiceModule& module, G4LogicalVolume* myvol,
+				 std::string sensdetname);
+    /** Set the sensitive detector information for daughter volumes 
      *
      *  Recursively examine logical volumes for daughters and add
      *  the sensitive detector designation 

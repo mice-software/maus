@@ -231,96 +231,70 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
   double blue = 1.;
   bool vis = true;
 
+
   for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
       iter != auxmap->end(); iter++) {
     // Construct a mice module containing the auxilliary information
     G4LogicalVolume* myvol = (*iter).first;
     Squeak::mout(Squeak::info) << "Checking aux map of volume "
 			       << myvol->GetName() << std::endl;
+    // Define sensitive detectors etc.
+    bool sensdet = false;
+    std::string sensdetname = "";
+
     // Want to know, specifically if there is a sensitive detector in this object
     for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
 	 vit != (*iter).second.end(); vit++) {
-      if ((*vit).type.contains("SensitiveDetector")) {
-	// Find the module corresponding to the volume name
-	std::vector<const MiceModule*> mods =
-	  module.findModulesByPropertyString((*vit).type, (*vit).value);
-	//  Squeak::mout(Squeak::info)<<"Search for detector "<<(*vit).value
-	// 			  <<" with name "<<myvol->GetName()<<": "
-	// 			  <<mods.size()<<" candidates\n";
-	for (unsigned i = 0; i < mods.size(); i++) {
-	  // This is kind of a double check now to make
-	  // sure that this is the same object.
-
-	  if (mods.at(i)->name() == myvol->GetName()) {
-	     // propertyExists("SensitiveDetector","PropertyString")){
-	    // Make a copy of the module to remove the const cast
-	    MiceModule* tempmod = MiceModule::deepCopy(*mods[i], false);
-	    // tempmod->printThis(Squeak::mout(Squeak::info));
-	    _detector->SetUserLimits(myvol, tempmod);
-	    _detector->SetVisAttributes(myvol, tempmod);
-	    _detector->BuildSensitiveDetector(myvol, tempmod);
-	    _detector->AddToRegion(myvol, tempmod);
-	    // Now loop over all daughters to add them to the sensitive volumes
-	    if ((*vit).value == "SciFi" || (*vit).value == "KL") {
-	      if (myvol->GetNoDaughters() > 0) {
-		SetDaughterSensitiveDetectors(myvol);
-	      }
-	    }
+      try {
+	if ((*vit).type.contains("SensitiveDetector")) {
+	  sensdet = true;
+	  sensdetname = (*vit).value;
+	} else if ((*vit).type.contains("G4StepMax")) {
+	  stepMax  = atof((*vit).value.c_str());
+	  //
+	} else if ((*vit).type.contains("G4TrackMax")) {
+	  trackMax = atof((*vit).value.c_str());
+	} else if ((*vit).type.contains("G4TimeMax")) {
+	  timeMax  = atof((*vit).value.c_str());
+	} else if ((*vit).type.contains("G4KinMin")) {
+	  keThreshold = atof((*vit).value.c_str());
+	} else if ((*vit).type.contains("Region")) {
+	  std::string name = (*vit).value;
+	  G4RegionStore* store = G4RegionStore::GetInstance();
+	  if (store->GetRegion(name) == NULL) {
+	    new G4Region(name);
+	    _detector->GetRegions().push_back(name);
 	  }
+	  G4Region* region = store->GetRegion(name);
+	  if (region == NULL) {
+	    throw MAUS::Exception(Exception::recoverable,
+				  "Failed to make region",
+				  "MAUSgeant4Manager::SetAuxInformation");
+	  }
+	  region->AddRootLogicalVolume(myvol);
+	} else if ((*vit).type.contains("Invisible")) {
+	  vis = false;
+	  /*
+	    } else if ((*vit).type.contains("RedColor")) {
+	    red = atof((*vit).value.c_str());
+	    } else if ((*vit).type.contains("GreenColor")) {
+	    green = atof((*vit).value.c_str());
+	    } else if ((*vit).type.contains("BlueColor")) {
+	    blue = atof((*vit).value.c_str()); */
+	} else {
+	  // Don't really know what to do with this.
+	  // Do nothing if selection is not otherwise known.
 	}
-      } else if ((*vit).type.contains("G4StepMax")) {
-	stepMax  = atof((*vit).value.c_str());
-	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
-				   << (*vit).value << " in object "
-				   << myvol->GetName() << "\n";
-      } else if ((*vit).type.contains("G4TrackMax")) {
-	trackMax = atof((*vit).value.c_str());
-	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
-				   << (*vit).value << " in object "
-				   << myvol->GetName() << "\n";
-      } else if ((*vit).type.contains("G4TimeMax")) {
-	timeMax  = atof((*vit).value.c_str());
-	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
-				   << (*vit).value << " in object "
-				   << myvol->GetName() << "\n";
-      } else if ((*vit).type.contains("G4KinMin")) {
-	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
-				   << (*vit).value << " in object "
-				   << myvol->GetName() << "\n";
-	keThreshold = atof((*vit).value.c_str());
-      } else if ((*vit).type.contains("Region")) {
-	std::string name = (*vit).value;
-	G4RegionStore* store = G4RegionStore::GetInstance();
-	if (store->GetRegion(name) == NULL) {
-	  new G4Region(name);
-	  _detector->GetRegions().push_back(name);
-	}
-	G4Region* region = store->GetRegion(name);
-	if (region == NULL) {
-	  throw MAUS::Exception(Exception::recoverable,
-				"Failed to make region",
-				"MAUSgeant4Manager::SetAuxInformation");
-	}
-	region->AddRootLogicalVolume(myvol);
-      } else if ((*vit).type.contains("Invisible")) {
-	vis = false;
-      } else if ((*vit).type.contains("RedColor") ||
-		 (*vit).type.contains("RedColour")) {
-	red = atof((*vit).value.c_str());
-      } else if ((*vit).type.contains("GreenColor") ||
-		 (*vit).type.contains("GreenColour")) {
-	green = atof((*vit).value.c_str());
-      } else if ((*vit).type.contains("BlueColor") ||
-		 (*vit).type.contains("BlueColour")) {
-	blue = atof((*vit).value.c_str());
-      } else {
-	Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
-				  << (*vit).value << " in object "
-				  << myvol->GetName()
-				  << " with unknown purpose\n";
+	// Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
+	// 			 << (*vit).value << " in object "
+	// 			 << myvol->GetName() << "\n";
+      } catch (...) {
+	continue;
       }
     }
-
+    if (sensdet) {
+      DefineSensitiveDetector(module, myvol, sensdetname);
+    }
     _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax,
 							  timeMax, keThreshold));
     myvol->SetUserLimits(_detector->GetUserLimits().back());
@@ -332,9 +306,42 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
     else
       _detector->GetVisAttributes().push_back(new G4VisAttributes(false));
     myvol->SetVisAttributes(_detector->GetVisAttributes().back());
+
+    Squeak::mout(Squeak::info) << "Attributes set for volume "
+			       << myvol->GetName() << std::endl;
   }
 }
 
+void MAUSGeant4Manager::DefineSensitiveDetector(MiceModule& module, G4LogicalVolume* myvol,
+						std::string sensdetname) {
+  // Find the module corresponding to the volume name
+  std::vector<const MiceModule*> mods =
+    module.findModulesByPropertyString("SensitiveDetector", sensdetname);
+  // Squeak::mout(Squeak::info) << "Search for detector " << sensdetname
+  // 			    << " with name " << myvol->GetName() << ": "
+  // 			    << mods.size() << " candidates\n";
+  for ( unsigned i = 0; i < mods.size(); i++ ) {
+    // This is kind of a double check now to make
+    // sure that this is the same object.
+
+    if (mods.at(i)->name() == myvol->GetName()) {
+      // propertyExists("SensitiveDetector","PropertyString")){
+      // Make a copy of the module to remove the const cast
+      MiceModule* tempmod = MiceModule::deepCopy(*mods[i], false);
+      // tempmod->printThis(Squeak::mout(Squeak::info));
+      _detector->SetUserLimits(myvol, tempmod);
+      _detector->SetVisAttributes(myvol, tempmod);
+      _detector->BuildSensitiveDetector(myvol, tempmod);
+      _detector->AddToRegion(myvol, tempmod);
+      // Now loop over all daughters to add them to the sensitive volumes
+      if (sensdetname == "SciFi" || sensdetname == "KL") {
+	if (myvol->GetNoDaughters() > 0) {
+	  SetDaughterSensitiveDetectors(myvol);
+	}
+      }
+    }
+  }
+}
 void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
   // std::cout << "Adding " << logic->GetNoDaughters()
   // << " to sensitive detector in " << logic->GetName() << std::endl;
