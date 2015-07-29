@@ -7,6 +7,8 @@ Offline analysis to produce reconstructed elements for MICE. TOF is
 reconstructed through to space points; Ckov is reconstructed through to Digits.
 """
 
+# pylint: disable = E1101
+
 import MAUS
 
 def run():
