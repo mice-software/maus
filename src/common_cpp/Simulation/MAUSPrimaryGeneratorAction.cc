@@ -184,6 +184,34 @@ Json::Value MAUSPrimaryGeneratorAction::PGParticle::WriteJson() {
   return particle;
 }
 
+MAUS::Primary* MAUSPrimaryGeneratorAction::PGParticle::WriteCpp() {
+    MAUS::Primary* prim = new MAUS::Primary();
+    prim->SetPosition(MAUS::ThreeVector(x, y, z));
+    prim->SetSpin(MAUS::ThreeVector(sx, sy, sz));
+    prim->SetMomentum(MAUS::ThreeVector(px, py, pz));
+    prim->SetEnergy(energy);
+    prim->SetEnergy(time);
+    prim->SetParticleId(pid);
+    prim->SetRandomSeed(seed);
+    return prim;
+}
+
+void MAUSPrimaryGeneratorAction::PGParticle::ReadCpp(MAUS::Primary* prim) {
+    x = prim->GetPosition().x();
+    y = prim->GetPosition().y();
+    z = prim->GetPosition().z();
+    sx = prim->GetSpin().x();
+    sy = prim->GetSpin().y();
+    sz = prim->GetSpin().z();
+    energy = prim->GetEnergy();
+    px = prim->GetMomentum().x();
+    py = prim->GetMomentum().y();
+    pz = prim->GetMomentum().z();
+    time = prim->GetTime();
+    pid = prim->GetParticleId();
+    seed = prim->GetRandomSeed();
+}
+
 void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
   G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->
                                                               FindParticle(pid);
@@ -204,9 +232,9 @@ void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
 
 
 MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
-    x = hit.GetPos().x();
-    y = hit.GetPos().y();
-    z = hit.GetPos().z();
+    x = hit.GetPosition().x();
+    y = hit.GetPosition().y();
+    z = hit.GetPosition().z();
     time = hit.GetTime();
     px = hit.GetMomentum().x();
     py = hit.GetMomentum().y();
@@ -214,8 +242,8 @@ MAUSPrimaryGeneratorAction::PGParticle::PGParticle(VirtualHit hit) {
     sx = hit.GetSpin().x();
     sy = hit.GetSpin().y();
     sz = hit.GetSpin().z();
-    energy = hit.GetEnergy();
-    pid = hit.GetPID();
+    energy = sqrt(px*px+py*py+pz*pz+hit.GetMass()*hit.GetMass());
+    pid = hit.GetParticleId();
     seed = 0;
 }
 

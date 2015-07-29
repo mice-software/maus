@@ -33,7 +33,7 @@
 #include "src/common_cpp/Utils/KLChannelMap.hh"
 
 namespace MAUS {
-class MapCppKLCellHits : public MapBase<Json::Value> {
+class MapCppKLCellHits : public MapBase<MAUS::Data> {
 
  public:
   MapCppKLCellHits();
@@ -57,19 +57,25 @@ class MapCppKLCellHits : public MapBase<Json::Value> {
   *  @param document Receive a document with digits and return
   *  a document with slab hits.
   */
-  void _process(Json::Value* data) const;
+  void _process(MAUS::Data* data) const;
 
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
-  Json::Value fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1) const;
+  void fillCellHit(MAUS::KLCellHit &slHit,
+                   MAUS::KLDigit &xDocDigit0,
+                   MAUS::KLDigit &xDocDigit1) const;
+
 
   /** @brief makes slab hits
    *
    *  @param xDocDetectorData Json document containing digits from 
    * one particle event in one individual detector.
    */
-  Json::Value makeCellHits(Json::Value xDocPartEvent) const;
+  void makeCellHits(KLCellHitArray* kl_cellHits, KLDigitArray* kl_digits) const;
+  MiceModule* geo_module;
+  std::vector<const MiceModule*> kl_modules;
+  std::vector<const MiceModule*> kl_mother_modules;
 };
 }
 #endif

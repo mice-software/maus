@@ -15,23 +15,49 @@
  */
 
 #include "DataStructure/EMRSpillData.hh"
+#include "DataStructure/EMRPlaneHit.hh"
 
 namespace MAUS {
 
-EMRSpillData::EMRSpillData() {
+EMRSpillData::EMRSpillData()
+  : _emrplanehitarray() {
 }
 
-EMRSpillData::EMRSpillData(const EMRSpillData& md) {
+EMRSpillData::EMRSpillData(const EMRSpillData& _emrspilldata)
+  : _emrplanehitarray() {
+  *this = _emrspilldata;
 }
 
-EMRSpillData& EMRSpillData::operator=(const EMRSpillData& md) {
-  if (&md == this) {
+EMRSpillData& EMRSpillData::operator=(const EMRSpillData& _emrspilldata) {
+  if (this == &_emrspilldata) {
       return *this;
   }
+  this->_emrplanehitarray = _emrspilldata._emrplanehitarray;
+  for (size_t i = 0; i < this->_emrplanehitarray.size(); i++)
+    this->_emrplanehitarray[i] = new EMRPlaneHit(*(this->_emrplanehitarray[i]));
+
   return *this;
 }
 
 EMRSpillData::~EMRSpillData() {
+  int nph = _emrplanehitarray.size();
+  for (int i = 0; i < nph; i++)
+    delete _emrplanehitarray[i];
+
+  _emrplanehitarray.resize(0);
+}
+
+EMRPlaneHitArray EMRSpillData::GetEMRPlaneHitArray() const {
+  return _emrplanehitarray;
+}
+
+void EMRSpillData::SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray) {
+  int nplhits = _emrplanehitarray.size();
+  for (int i = 0; i < nplhits; i++) {
+    if (_emrplanehitarray[i] != NULL)
+        delete _emrplanehitarray[i];
+  }
+  _emrplanehitarray = emrplanehitarray;
 }
 }
 

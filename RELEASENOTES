@@ -5,6 +5,12 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v0.9.7
+  The following changes were made:
+    - ROOT installation modified to support deployment on GRID
+    - Tracker real data digitisation improvements
+    - Tracker mapping and calibration updated
+  If upgrading from a previous version, please redo the entire installation
 MAUS-v0.9.6
   The following changes were made:
     - Unpacker and associated libraries updated

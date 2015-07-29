@@ -38,20 +38,43 @@ namespace MAUS {
                                            plane_it != track_it->second.Planes.end(); ++plane_it) {
         TMatrix H(1, 4);
         H.Zero();
+        TMatrix S(4, 1);
+        S.Zero();
 
         int id = plane_it->first * tracker_const;
+        ThreeVector pos = plane_it->second.Position; // In tracker reference frame!
         ThreeVector dir = plane_it->second.Direction; // In tracker reference frame!
 
-        double dx = dir.x();
-        double dy = dir.y();
-//        double channel_width = _geometry_helper->GetFibreParameters().Pitch;
-        H(0, 0) =  dy; // / channel_width;
-        H(0, 2) = -dx; // / channel_width;
+        H(0, 0) =  dir.y();
+        H(0, 2) = -dir.x();
+
+        S(0, 0) = pos.x();
+        S(2, 0) = pos.y();
 
         _matrix_map.insert(std::make_pair(id, H));
-  //      _matrix_map[id] = H;
+        _alignment_map.insert(std::make_pair(id, S));
       }
     }
+  }
+
+
+  Kalman::State SciFiStraightMeasurements::Measure(const Kalman::State& state) {
+    MeasurementMatrix() = this->CalculateMeasurementMatrix(state);
+    MeasurementNoise() = this->CalculateMeasurementNoise(state);
+
+    TMatrixD measurement_matrix_transpose(TMatrixD::kTransposed, MeasurementMatrix());
+
+    TMatrixD new_vec(GetMeasurementDimension(), 1);
+    TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
+
+    new_vec = MeasurementMatrix() * (state.GetVector() - _alignment_map[state.GetId()]);
+    new_cov = (MeasurementMatrix()*state.GetCovariance()*
+                                     measurement_matrix_transpose) + MeasurementNoise();
+
+    Kalman::State measured_state(new_vec, new_cov, state.GetPosition());
+    measured_state.SetId(state.GetId());
+
+    return measured_state;
   }
 
 
@@ -88,20 +111,43 @@ namespace MAUS {
                                            plane_it != track_it->second.Planes.end(); ++plane_it) {
         TMatrix H(1, 5);
         H.Zero();
+        TMatrix S(5, 1);
+        S.Zero();
 
         int id = plane_it->first * tracker_const;
-        ThreeVector dir = plane_it->second.Direction;
+        ThreeVector pos = plane_it->second.Position; // In tracker reference frame!
+        ThreeVector dir = plane_it->second.Direction; // In tracker reference frame!
 
-        double dx = dir.x();
-        double dy = dir.y();
-//        double channel_width = _geometry_helper->GetFibreParameters().Pitch;
-        H(0, 0) =  dy; // / channel_width;
-        H(0, 2) = -dx; // / channel_width;
+        H(0, 0) =  dir.y();
+        H(0, 2) = -dir.x();
+
+        S(0, 0) = pos.x();
+        S(2, 0) = pos.y();
 
         _matrix_map.insert(std::make_pair(id, H));
-  //      _matrix_map[id] = H;
+        _alignment_map.insert(std::make_pair(id, S));
       }
     }
+  }
+
+
+  Kalman::State SciFiHelicalMeasurements::Measure(const Kalman::State& state) {
+    MeasurementMatrix() = this->CalculateMeasurementMatrix(state);
+    MeasurementNoise() = this->CalculateMeasurementNoise(state);
+
+    TMatrixD measurement_matrix_transpose(TMatrixD::kTransposed, MeasurementMatrix());
+
+    TMatrixD new_vec(GetMeasurementDimension(), 1);
+    TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
+
+    new_vec = MeasurementMatrix() * (state.GetVector() - _alignment_map[state.GetId()]);
+    new_cov = (MeasurementMatrix()*state.GetCovariance()*
+                                     measurement_matrix_transpose) + MeasurementNoise();
+
+    Kalman::State measured_state(new_vec, new_cov, state.GetPosition());
+    measured_state.SetId(state.GetId());
+
+    return measured_state;
   }
 
 

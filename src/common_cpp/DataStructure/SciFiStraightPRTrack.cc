@@ -49,6 +49,8 @@ namespace MAUS {
       _y0(y0),
       _my(my),
       _y_chisq(y_chisq) {
+    this->set_chi_squared(_x_chisq + _y_chisq);
+    this->set_ndf((2.0*_num_points) - 4);
   }
 
   SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
@@ -63,6 +65,8 @@ namespace MAUS {
       _y0(line_y.get_c()),
       _my(line_y.get_m()),
       _y_chisq(line_y.get_chisq()) {
+    this->set_chi_squared(_x_chisq + _y_chisq);
+    this->set_ndf((2.0*_num_points) - 4);
   }
 
   SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &strk)
@@ -75,6 +79,8 @@ namespace MAUS {
       _y0(strk.get_y0()),
       _my(strk.get_my()),
       _y_chisq(strk.get_y_chisq()) {
+    this->set_chi_squared(_x_chisq + _y_chisq);
+    this->set_ndf((2.0*_num_points) - 4);
   }
 
   // Destructor

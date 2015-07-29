@@ -26,6 +26,8 @@
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
+
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
 namespace MAUS {
@@ -55,6 +57,9 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                  process->_configuration_cards;
         int verbose_level = JsonWrapper::GetProperty
                        (config, "verbose_level", JsonWrapper::intValue).asInt();
+        int max_data_ref = JsonWrapper::GetProperty
+               (config, "data_maximum_reference_count", JsonWrapper::intValue).asInt();
+        Data::SetMaxReferenceCount(max_data_ref);
         bool stack = JsonWrapper::GetProperty
                (config, "will_do_stack_trace", JsonWrapper::booleanValue).asBool();
         Exception::SetWillDoStackTrace(stack);

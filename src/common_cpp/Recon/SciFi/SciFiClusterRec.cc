@@ -36,7 +36,8 @@ bool sort_by_npe(SciFiDigit *a, SciFiDigit *b ) {
 
 void SciFiClusterRec::process(SciFiEvent &evt) const {
   // Create and fill the seeds vector.
-  std::vector<SciFiDigit*> seeds = get_seeds(evt);
+  std::vector<SciFiDigit*> seeds;
+  get_seeds(evt, seeds);
 
   // Get the number of clusters. If too large, abort reconstruction.
   int seeds_size = seeds.size();
@@ -50,18 +51,20 @@ void SciFiClusterRec::process(SciFiEvent &evt) const {
   make_clusters(evt, seeds);
 }
 
-std::vector<SciFiDigit*> SciFiClusterRec::get_seeds(SciFiEvent &evt) const {
-  std::vector<SciFiDigit*> seeds_in_event;
-  for ( size_t dig = 0; dig < evt.digits().size(); ++dig ) {
+void SciFiClusterRec::get_seeds(SciFiEvent &evt, std::vector<SciFiDigit*>& seeds) const {
+  size_t num_digits = evt.digits().size();
+  for ( size_t dig = 0; dig < num_digits; ++dig ) {
     if ( evt.digits()[dig]->get_npe() > _min_npe/2.0 )
-      seeds_in_event.push_back(evt.digits()[dig]);
+      seeds.push_back(evt.digits()[dig]);
   }
-  return seeds_in_event;
 }
 
-void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*> &seeds) const {
+void SciFiClusterRec::make_clusters(SciFiEvent &evt, std::vector<SciFiDigit*>& seeds) const {
   size_t seeds_size = seeds.size();
   for ( size_t i = 0; i < seeds_size; i++ ) {
+    if (seeds[i]->get_npe() < _min_npe/2.0)
+      std::cerr << "ERROR : DIGIT NPE = " << seeds[i]->get_npe()
+                << "(" << _min_npe << ")" << std::endl;
     if ( !(seeds[i]->is_used()) ) {
       SciFiDigit* neigh = NULL;
       SciFiDigit* seed = seeds[i];

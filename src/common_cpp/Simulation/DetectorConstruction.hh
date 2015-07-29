@@ -57,6 +57,9 @@ class MICEEvent;
 class TofSD;
 
 namespace MAUS {
+
+class MCEvent;
+
 namespace Simulation {
 
 /** DetectorConstruction handles parsing the MiceModules into Geant4
@@ -102,7 +105,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    *  Returns the sensitive detector hits or an empty object i.e. {} if the
    *  detector was not hit.
    */
-  Json::Value GetSDHits(size_t i);
+  void GetSDHits(size_t i, MCEvent* event);
 
   /** Clear all sensitive detector hits
    */

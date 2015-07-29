@@ -148,15 +148,36 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
       // correct place in the new copy of the datastructure, by searching for the cluster index in
       // rhs event, which matches the pointer address of the cluster in the rhs trackpoint. Use
       // this to set new trackpoint cluster to pointer to the correct cluster in the new event.
-      SciFiCluster* new_cluster = NULL;
-      for (unsigned int iRcl = 0; iRcl < rhs.clusters().size(); ++iRcl) {
-        if (rhs_tpoints[iRtp]->get_cluster_pointer() == rhs._scificlusters[iRcl]) {
-          new_cluster = _scificlusters[iRcl];
+//      SciFiCluster* new_cluster = NULL;
+//      for (unsigned int iRcl = 0; iRcl < rhs.clusters().size(); ++iRcl) {
+//        if (rhs_tpoints[iRtp]->get_cluster_pointer() == rhs._scificlusters[iRcl]) {
+//          new_cluster = _scificlusters[iRcl];
+//          break;
+//        }
+//      }
+//      new_tpoints[iRtp]->set_cluster_pointer(new_cluster);
+    }
+    // Now set the cross-pointer to the PR track within the track so that it points to correct
+    // place in the new copy of the datastructure, by searching for the PR track index in rhs
+    // event, which matches the pointer address of the PR track in the rhs track. Use this to set
+    // new track PR track to pointer to the correct PR track in the new event.
+    SciFiBasePRTrack* new_pr_track = NULL;
+    if (_scifitracks[iTrk]->GetAlgorithmUsed() == 0) {
+      for (unsigned int iRst = 0; iRst < rhs._scifistraightprtracks.size(); ++iRst) {
+        if (rhs._scifitracks[iTrk]->pr_track_pointer() == rhs._scifistraightprtracks[iRst]) {
+          new_pr_track = _scifistraightprtracks[iRst];
           break;
         }
       }
-      new_tpoints[iRtp]->set_cluster_pointer(new_cluster);
+    } else {
+      for (unsigned int iRhe = 0; iRhe < rhs._scifihelicalprtracks.size(); ++iRhe) {
+        if (rhs._scifitracks[iTrk]->pr_track_pointer() == rhs._scifihelicalprtracks[iRhe]) {
+          new_pr_track = _scifihelicalprtracks[iRhe];
+          break;
+        }
+      }
     }
+    _scifitracks[iTrk]->set_pr_track_pointer(new_pr_track);
     _scifitracks[iTrk]->set_scifitrackpoints(new_tpoints);
   }
   return *this;

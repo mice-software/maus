@@ -23,6 +23,8 @@
 #include "gtest/gtest.h"
 
 #include "json/value.h"
+#include "TApplication.h"
+#include "TROOT.h"
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -37,6 +39,12 @@ int parse_flags(int argc, char **argv) {
     option long_options[] = {
               {"verbose_level", required_argument, NULL, _verbose_level},
               {"help", no_argument, NULL, _help},
+              {"gtest_list_tests", no_argument, NULL, 0},
+              {"gtest_filter", required_argument, NULL, 0},
+              {"gtest_also_run_disabled_tests", no_argument, NULL, 0},
+              {"gtest_repeat", required_argument, NULL, 0},
+              {"gtest_shuffle", no_argument, NULL, 0},
+              {"gtest_random_seed", required_argument, NULL, 0},
               {NULL, 0, NULL, 0}
     };
     int option = 0;
@@ -104,7 +112,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["everything_special_virtual"] = false;
   config["field_tracker_absolute_error"] = 1.e-4;
   config["field_tracker_relative_error"] = 1.e-4;
-
+  config["data_maximum_reference_count"] = 200;
   return config;
 }
 
@@ -118,6 +126,11 @@ int main(int argc, char **argv) {
       );
       ::testing::InitGoogleTest(&argc, argv);
       std::cout << "Running tests" << std::endl;
+      // Required for ImageTest, otherwise we get a segv; we get a segv from
+      // ORStreamTest if TApplication is instantiated then deleted, so best
+      // instantiate at this level.
+      TApplication theApp("App", &argc, argv);
+      gROOT->SetBatch(true);
       test_out = RUN_ALL_TESTS();
   } catch (MAUS::Exception exc) {
       std::cerr << exc.GetMessage() << "\n" << exc.GetLocation() << "\n"

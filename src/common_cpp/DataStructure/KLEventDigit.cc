@@ -43,6 +43,9 @@ KLDigitArray KLEventDigit::GetKLDigitArray() const {
     return _kl;
 }
 
+KLDigitArray* KLEventDigit::GetKLDigitArrayPtr() {
+    return &_kl;
+}
 KLDigit KLEventDigit::GetKLDigitArrayElement(size_t index) const {
     return _kl[index];
 }

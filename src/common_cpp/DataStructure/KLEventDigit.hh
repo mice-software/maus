@@ -50,6 +50,9 @@ class KLEventDigit {
     /** Returns KLDigitArray */
     KLDigitArray GetKLDigitArray() const;
 
+    /** Returns KLDigitArray */
+    KLDigitArray* GetKLDigitArrayPtr();
+
     /** Get an element from KLDigitArray (needed for PyROOT) */
     KLDigit GetKLDigitArrayElement(size_t index) const;
 

@@ -31,13 +31,6 @@ MAUSSD::MAUSSD(MiceModule* mod)
   G4SDManager::GetSDMpointer()->AddNewDetector(this);
 }
 
-bool MAUSSD::isHit() {
-  if ( _hits.size() > 0 ) {
-    return true;
-  }
-  return false;
-}
-
 std::string MAUSSD::namePrefix() {
   return "/"+STLUtils::ToString(_uniqueID)+"/";
 }

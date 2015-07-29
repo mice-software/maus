@@ -18,6 +18,7 @@
 
 import gzip
 import json
+import maus_cpp.converter
 
 import ErrorHandler
 
@@ -84,11 +85,23 @@ class OutputPyJSON:
         \param document JSON document to be saved
         """
         try:
-            self.file.write(document.rstrip() + '\n')
+            doc_str = maus_cpp.converter.string_repr(document)
+        except Exception: #pylint: disable=W0703
+            ErrorHandler.HandleException({}, self)
+            return False
+
+        try:
+            self.file.write(doc_str.rstrip() + '\n')
             return True
         except Exception: #pylint: disable=W0703
             ErrorHandler.HandleException({}, self)
             return False
+
+        # remove references to data if any
+        try:
+            maus_cpp.converter.del_data_repr(document)
+        except: #pylint: disable=W0702
+            pass
 
     def death(self):
         """Closes down OutputPyJSON

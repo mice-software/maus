@@ -49,6 +49,9 @@ class CkovEvent {
     /** Returns CkovDigitArray */
     CkovDigitArray GetCkovDigitArray() const;
 
+    /** Returns CkovDigitArray Pointer */
+    CkovDigitArray* GetCkovDigitArrayPtr();
+
     /** Get an element from CkovDigitArray (needed for PyROOT) */
     CkovDigit GetCkovDigitArrayElement(size_t index) const;
 

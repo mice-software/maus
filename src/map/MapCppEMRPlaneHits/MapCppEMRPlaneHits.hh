@@ -45,14 +45,15 @@
 #include "DataStructure/EMRBarHit.hh"
 #include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
+#include "DataStructure/EMRSpillData.hh"
 #include "API/MapBase.hh"
 
 namespace MAUS {
 
-typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; /* nHits elements */
-typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
-typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
-typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
+typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; // nHits elements
+typedef std::vector<EMRBarHitsVector>   EMRBarVector; // 60 elements
+typedef std::vector<EMRBarVector>       EMRPlaneVector; // 48 elements
+typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; // nTr elements
 
 struct fADCdata {
   int _orientation;
@@ -62,8 +63,8 @@ struct fADCdata {
   int _deltat;
 };
 
-typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
-typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
+typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector; // 48 elements
+typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector; // nTr elements
 
 class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
  public:
@@ -114,12 +115,8 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
   int _number_of_bars;
 
   // Hit pre-selection cuts
-  int _tot_noise_low;
-  int _tot_noise_up;
   int _deltat_signal_low;
   int _deltat_signal_up;
-  int _deltat_noise_low;
-  int _deltat_noise_up;
 };
 }
 

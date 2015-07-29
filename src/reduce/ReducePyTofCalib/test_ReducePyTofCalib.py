@@ -37,7 +37,8 @@ class ReducePyTofCalibTestCase(unittest.TestCase):# pylint: disable = R0904
         result = self.reducer.process("")
         doc = json.loads(result)
         self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"])
+        errors = doc["errors"]["ReducePyTofCalib"]
+        self.assertTrue("No JSON object could be decoded" in errors)
 
     def test_init(self):
         """Check that birth works properly"""
@@ -46,21 +47,14 @@ class ReducePyTofCalibTestCase(unittest.TestCase):# pylint: disable = R0904
 
     def test_no_data(self):
         """Check that against data stream is empty"""
-        test1 = ('%s/src/reduce/ReducePyTofCalib/noDataTest.txt' %
-                                                os.environ.get("MAUS_ROOT_DIR"))
-        fin = open(test1,'r')
-        data = fin.read()
-        # test with no data.
-        result = self.reducer.process(data)
+        noDigit_json = {"run_number": 1, "maus_event_type": "Spill", "recon_events": [], "spill_number": 0, "errors": {}, "daq_event_type": "physics_event", "daq_data": {}} # pylint: disable=C0301
+        result = self.reducer.process(json.dumps(noDigit_json))
         spill = json.loads(result)
-        no_slab_hits = True
-        if 'slab_hits' in spill:
-            no_slab_hits = False
-        self.assertTrue(no_slab_hits)
+        self.assertTrue('slab_hits' not in spill)
 
     def test_process(self):
         """Check ReducePyTofCalib process function"""
-        test2 = ('%s/src/reduce/ReducePyTofCalib/processTest.txt' %
+        test2 = ('%s/src/reduce/ReducePyTofCalib/processTest.json' %
                                                 os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test2,'r')
         data = fin.read()
