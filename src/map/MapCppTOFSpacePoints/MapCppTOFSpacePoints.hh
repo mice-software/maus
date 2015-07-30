@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include "json/json.h"
 
 #include "Utils/TOFCalibrationMap.hh"
@@ -35,7 +36,7 @@
 
 namespace MAUS {
 
-class MapCppTOFSpacePoints : public MapBase<Json::Value> {
+class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
 
  public:
   MapCppTOFSpacePoints();
@@ -54,12 +55,12 @@ class MapCppTOFSpacePoints : public MapBase<Json::Value> {
  */
   void _death();
 
-  /** @brief process JSON document
+  /** @brief process spill taking in MAUS::Data
  *
  *  @param document Receive a document with slab hits and return
  *  a document with space points.
  */
-  void _process(Json::Value* document) const;
+  void _process(MAUS::Data *data) const;
 
  private:
 
@@ -68,33 +69,53 @@ class MapCppTOFSpacePoints : public MapBase<Json::Value> {
   double _makeSpacePointCut; // nanoseconds
   double _findTriggerPixelCut; // nanoseconds
   std::string _triggerStation;
+  int _trigStn;
 
   /// Vector to hold the names of all detectors to be processed.
   std::vector<std::string> _stationKeys;
 
-  Json::Value fillSpacePoint
-                   (Json::Value &xDocSlabHit0, Json::Value &xDocSlabHit1) const;
-  Json::Value processTOFStation(
-                          Json::Value &xSlabHits,
+  /* @brief set the space point once it has been found 
+   */
+  void fillSpacePoint(
+                      TOFSpacePoint &tofSp,
+                      TOFSlabHit &xSlabHit0,
+                      TOFSlabHit &xSlabHit1) const;
+
+  /* @brief process slab hits for each tof station.
+   * arguments are:
+   * pointer to the array of slab hits for the station
+   * pointer to the array of space points for the station
+   * station name 
+   * event number
+   * pixel hit map which is to be filled
+   */
+  void processTOFStation(
+                          TOF1SlabHitArray* slHits,
+                          TOF1SpacePointArray* spPoints,
                           std::string detector,
                           unsigned int part_event,
                           std::map<int, std::string>& _triggerhit_pixels) const;
 
-  std::string findTriggerPixel(Json::Value xDocPartEvent,
+  /* @brief go through slab hits and find the pixel which triggered the event
+   */
+  std::string findTriggerPixel(TOF1SlabHitArray* slHits,
                                std::vector<int> xPlane0Hits,
                                std::vector<int> xPlane1Hits) const;
+  template<typename T>
   bool calibratePmtHit
-              (TOFPixelKey xPixelKey, Json::Value &xPmtHit, double &time) const;
+              (TOFPixelKey xPixelKey, T xPmtHit, double &time) const;
+
   bool calibrateSlabHit
-             (TOFPixelKey xPixelKey, Json::Value &xSlabHit, double &time) const;
+             (TOFPixelKey xPixelKey, TOFSlabHit &tof_slabHit, double &time) const;
 
   /** @brief makes space points
    *
    *  @param xDocDetectorData Json document containing slab hits from 
    * one particle event in one individual detector.
    */
-  Json::Value makeSpacePoints(
-                          Json::Value &xDocPartEvent,
+  void makeSpacePoints(
+                          MAUS::TOF1SlabHitArray* slHits,
+                          MAUS::TOF1SpacePointArray* spPoints,
                           std::vector<int> xPlane0Hits,
                           std::vector<int> xPlane1Hits,
                           std::map<int, std::string>& triggerhit_pixels) const;
@@ -102,6 +123,14 @@ class MapCppTOFSpacePoints : public MapBase<Json::Value> {
   int runNumberSave;
   void getTofCalib(int rnum);
   Json::Value configJSON;
+  /* stationKeys store a pointer to the slabhits arry, 
+   *  a pointer to spacepoints array, 
+   *  and the station name
+   *  pair< pair<Hits, SpacePoints>, stationName>
+   */
+  typedef std::pair<std::pair<TOF1SlabHitArray*, TOF1SpacePointArray*>,
+                    std::string > stationKeys;
+  typedef std::vector<stationKeys> keysVec_t;
 };
 }
 

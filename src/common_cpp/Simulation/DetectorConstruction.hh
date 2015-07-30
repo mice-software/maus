@@ -57,6 +57,9 @@ class MICEEvent;
 class TofSD;
 
 namespace MAUS {
+
+class MCEvent;
+
 namespace Simulation {
 
 /** DetectorConstruction handles parsing the MiceModules into Geant4
@@ -102,7 +105,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    *  Returns the sensitive detector hits or an empty object i.e. {} if the
    *  detector was not hit.
    */
-  Json::Value GetSDHits(size_t i);
+  void GetSDHits(size_t i, MCEvent* event);
 
   /** Clear all sensitive detector hits
    */
@@ -146,6 +149,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
    *  if G4RegionStore let me access it's list of regions but not possible...
    */
   std::vector<std::string> GetRegions() {return _regions;}
+  std::vector<G4UserLimits*> GetUserLimits() {return _userLims;}
+  std::vector<G4VisAttributes*> GetVisAttributes() {return _visAtts;}
 
   void BuildSensitiveDetector(G4LogicalVolume* logic, MiceModule* module);
   void SetUserLimits(G4LogicalVolume* logic, MiceModule* module);

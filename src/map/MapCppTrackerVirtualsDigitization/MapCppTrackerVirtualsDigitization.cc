@@ -67,6 +67,7 @@ namespace MAUS {
 
 
   void MapCppTrackerVirtualsDigitization::_death() {
+    delete _helix_measure;
   }
 
   void MapCppTrackerVirtualsDigitization::_process(MAUS::Data* data) const {

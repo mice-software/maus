@@ -30,11 +30,10 @@
 #include <string>
 #include <map>
 
-#include "json/json.h"
-
 #include "Geant4/G4VSensitiveDetector.hh"
 
 #include "Config/MiceModule.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 
 namespace MAUS {
 
@@ -53,16 +52,16 @@ class MAUSSD : public G4VSensitiveDetector {
   explicit MAUSSD(MiceModule* mod);
 
   /** True if the SD has at least one hit in its _hits array */
-  bool isHit();
+  virtual bool isHit() = 0;
 
   /** Returns the number of hits in the Sensitive Detector */
-  int GetNHits() { return _hits.size(); }
+  virtual int GetNHits() = 0;
 
   /** Clears all hits in the sensitive detector */
-  void ClearHits() { _hits.clear(); }
+  virtual void ClearHits() = 0;
 
-  /** Return the detector hits */
-  Json::Value GetHits() { return _hits; }
+  /** Hand ownership of the detector hits to MCEvent */
+  virtual void TakeHits(MCEvent* event) = 0;
 
   /** Reset the SD list
    *
@@ -73,8 +72,6 @@ class MAUSSD : public G4VSensitiveDetector {
   static void ResetSDs();
 
  protected:
-  Json::Value _hits;
-
   MiceModule* _module;
   static std::string namePrefix();
 

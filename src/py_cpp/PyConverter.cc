@@ -37,6 +37,10 @@ PyObject* py_wrap(PyObject* self, PyObject* args) {
       if (data_out != NULL && py_data_out == NULL)
           throw; // memory was lost, raise it up...
       PyErr_SetString(PyExc_ValueError, (&exc)->what());
+  } catch (std::exception& exc) {
+      if (data_out != NULL && py_data_out == NULL)
+          throw; // memory was lost, raise it up...
+      PyErr_SetString(PyExc_ValueError, (&exc)->what());
   }
   return py_data_out;
 }
@@ -89,6 +93,7 @@ PyObject* py_del_data_repr(PyObject* self, PyObject* args) {
     if (c_string == NULL || strcmp(c_string, "MAUS::Data") != 0) {
         PyErr_SetString(PyExc_TypeError, "Could not resolve object as a MAUS::Data type");
     }
+    py_data_in->ob_refcnt++;
     void * vptr = static_cast<void*>(TPyReturn(py_data_in));
     Data* data = static_cast<Data*>(vptr);
     delete data;

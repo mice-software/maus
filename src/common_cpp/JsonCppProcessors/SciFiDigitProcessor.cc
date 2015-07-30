@@ -43,6 +43,9 @@ SciFiDigitProcessor::SciFiDigitProcessor() {
     RegisterValueBranch("time", &_double_proc,
                         &SciFiDigit::get_time,
                         &SciFiDigit::set_time, true);
+    RegisterValueBranch("adc", &_int_proc,
+                        &SciFiDigit::get_adc,
+                        &SciFiDigit::set_adc, false);
     RegisterValueBranch("used", &_bool_proc,
                         &SciFiDigit::is_used,
                         &SciFiDigit::set_used, true);

@@ -58,7 +58,7 @@ TEST_F(RealDataDigitizationTest, test_calibration_load) {
 TEST_F(RealDataDigitizationTest, test_mapping_load) {
   RealDataDigitization test_case;
   EXPECT_THROW(test_case.load_mapping("nonsense.txt"), MAUS::Exception);
-  bool good_map = test_case.load_mapping("mapping_7.txt");
+  bool good_map = test_case.load_mapping("scifi_mapping_7.txt");
   EXPECT_TRUE(good_map);
   int missing_channel_counter = 0;
   for ( int board = 0; board < 16; board++ ) {
@@ -102,7 +102,7 @@ TEST_F(RealDataDigitizationTest, test_mapping_load) {
 
 TEST_F(RealDataDigitizationTest, test_bad_channel_load) {
   RealDataDigitization test_case;
-  bool bad_channels = test_case.load_bad_channels();
+  bool bad_channels = test_case.load_bad_channels("scifi_bad_channels_2015-06-18.txt");
   EXPECT_TRUE(bad_channels);
   int bad_channel[3] = {5, 17};
   int good_channel[3]= {6, 3};

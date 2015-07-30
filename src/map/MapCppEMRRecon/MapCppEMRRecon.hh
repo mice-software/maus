@@ -80,6 +80,9 @@ struct TrackData {
   double _total_charge_sa;
   double _charge_ratio_ma;
   double _charge_ratio_sa;
+  double _plane_density;
+  double _chi2_x;
+  double _chi2_y;
 };
 
 typedef std::vector<TrackData> EMRTrackEventVector;
@@ -125,6 +128,10 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 		    EMRfADCEventVector_er& emr_fadc_events,
 		    EMRTrackEventVector& emr_track_events) const;
 
+  void pid_variables(int nPartEvents,
+		    EMRDBBEventVector *emr_dbb_events,
+		    EMRTrackEventVector& emr_track_events) const;
+
   void coordinates_reconstruction(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
 				  EMRfADCEventVector_er& emr_fadc_events) const;
@@ -165,7 +172,6 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   double _gap;
 
   // Configuration variables
-  int _secondary_hits_bunching_distance;
   int _secondary_hits_bunching_width;
   int _primary_trigger_minXhits;
   int _primary_trigger_minYhits;

@@ -24,7 +24,9 @@
 #include <vector>
 
 // ROOT headers
+#include "TRef.h"
 #include "TRefArray.h"
+#include "TObject.h"
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
@@ -34,7 +36,7 @@ namespace MAUS {
 
 typedef std::vector<double> DoubleArray;
 
-class SciFiBasePRTrack {
+class SciFiBasePRTrack : public TObject {
   public:
     /** Default constructor */
     SciFiBasePRTrack();
@@ -89,6 +91,18 @@ class SciFiBasePRTrack {
     /** Get the reconstructed reference frame momentum */
     ThreeVector get_reference_momentum() const { return _momentum; }
 
+    /** Get the global chi-squared value */
+    double get_chi_squared() const { return _chi_sq; }
+
+    /** Set the global chi-squared value */
+    void set_chi_squared(double chi_sq) { _chi_sq = chi_sq; }
+
+    /** Get the Number of Degrees of Freedom */
+    int get_ndf() const { return _ndf; }
+
+    /** Set the Number of Degrees of Freedom */
+    void set_ndf(int ndf) { _ndf = ndf; }
+
 
   private:
     TRefArray* _spoints;
@@ -104,6 +118,8 @@ class SciFiBasePRTrack {
     DoubleArray _covariance; // The covariance matrix derived from the fit
     ThreeVector _position; // Reconstructed reference plane position
     ThreeVector _momentum; // Reconstructed reference plane momentum
+    double _chi_sq;
+    int _ndf;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };

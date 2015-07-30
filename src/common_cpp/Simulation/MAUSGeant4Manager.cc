@@ -21,12 +21,19 @@
 #include "Geant4/G4StateManager.hh"
 #include "Geant4/G4ApplicationState.hh"
 
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 
-#include "src/common_cpp/Simulation/FieldPhaser.hh"
-
+#include "Geant4/G4Region.hh"
+#include "Geant4/G4RegionStore.hh"
+#include "Geant4/G4UserLimits.hh"
 #include "src/legacy/Interface/Squeak.hh"
+
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/FieldPhaser.hh"
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
@@ -65,7 +72,17 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     SetVisManager();
     _runManager = new G4RunManager;
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
+    _keThreshold = JsonWrapper::GetProperty(*cards, "kinetic_energy_threshold",
+					    JsonWrapper::realValue).asDouble();
+    _trackMax = JsonWrapper::GetProperty(*cards, "max_track_length",
+					 JsonWrapper::realValue).asDouble();
+    _timeMax = JsonWrapper::GetProperty(*cards, "max_track_time",
+					JsonWrapper::realValue).asDouble();
+    _stepMax = JsonWrapper::GetProperty(*cards, "max_step_length",
+					JsonWrapper::realValue).asDouble();
+
     // Create the gdml parser object
+
 
     std::string gdmlGeometry = "";
     bool usegdml = Globals::GetInstance()
@@ -139,49 +156,70 @@ MAUSPrimaryGeneratorAction::PGParticle
 }
 
 Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
-    _eventAct->SetEvents(particle_array);  // checks type
-    for (size_t i = 0; i < particle_array.size(); ++i) {
-        MAUSPrimaryGeneratorAction::PGParticle primary;
-        Json::Value event = JsonWrapper::GetItem
-                                  (particle_array, i, JsonWrapper::objectValue);
-        Json::Value primary_json = JsonWrapper::GetProperty
-                                  (event, "primary", JsonWrapper::objectValue);
-        primary.ReadJson(primary_json);
-        GetPrimaryGenerator()->Push(primary);
-    }
-    BeamOn(particle_array.size());
-    return _eventAct->GetEvents();
+    PointerArrayProcessor<MCEvent> proc(new MCEventProcessor());
+    std::vector<MCEvent*>* events = proc.JsonToCpp(particle_array);
+    events = RunManyParticles(events);
+    Json::Value* events_json = proc.CppToJson(*events);
+    Json::Value events_json_val(*events_json);
+    delete events_json;
+    for (size_t i = 0; i < events->size(); ++i)
+        delete events->at(i);
+    delete events;
+    return events_json_val;
 }
 
-Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
+std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>* event) {
+    _eventAct->SetEvents(event);
+    for (size_t i = 0; i < event->size(); ++i) {
+        MAUSPrimaryGeneratorAction::PGParticle primary;
+        primary.ReadCpp(event->at(i)->GetPrimary());
+        GetPrimaryGenerator()->Push(primary);
+    }
+    BeamOn(event->size());
+    return _eventAct->TakeEvents();
+}
+
+
+MCEvent* MAUSGeant4Manager::RunParticle(MAUS::Primary particle) {
     MAUSPrimaryGeneratorAction::PGParticle p;
-    p.ReadJson(particle["primary"]);
+    p.ReadCpp(&particle);
     return Tracking(p);
 }
 
-Json::Value MAUSGeant4Manager::RunParticle
+MCEvent* MAUSGeant4Manager::RunParticle
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     return Tracking(p);
 }
 
 
-Json::Value MAUSGeant4Manager::Tracking
+MCEvent* MAUSGeant4Manager::Tracking
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
     Squeak::mout(Squeak::debug) << std::endl;
 
     GetPrimaryGenerator()->Push(p);
-    Json::Value event_array = Json::Value(Json::arrayValue);
-    Json::Value event(Json::objectValue);
-    event["primary"] = p.WriteJson();
-    event_array.append(event);
-    _eventAct->SetEvents(event_array);
+
+    std::vector<MCEvent*>* event_vector = new std::vector<MCEvent*>();
+    event_vector->push_back(new MCEvent());
+    event_vector->at(0)->SetPrimary(p.WriteCpp());
+    _eventAct->SetEvents(event_vector); // EventAction now owns this memory
     Squeak::mout(Squeak::debug) << "Beam On" << std::endl;
     GetField()->Print(Squeak::mout(Squeak::debug));
     BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
-    return _eventAct->GetEvents()[Json::Value::UInt(0)];
+    event_vector = _eventAct->TakeEvents(); // EventAction still owns this memory
+    if (event_vector->size() > 1) {
+        for (size_t i = 0; i < event_vector->size(); ++i)
+            delete event_vector->at(i);
+        delete event_vector;
+        throw(Exception(Exception::recoverable,
+                        "More than one event in return",
+                        "MAUSGeant4Manager::Tracking"));
+    }
+    MCEvent* ev_return = event_vector->at(0);
+    delete event_vector;
+    return ev_return; // this is a deep copy
 }
 
 void MAUSGeant4Manager::SetVisManager() {
@@ -204,49 +242,129 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module) {
   // Establish sensitive detectors using the SDmanager
   // Get the map of the auxiliary information from the parser
   const G4GDMLAuxMapType* auxmap = _parser.GetAuxMap();
-    Squeak::mout(Squeak::info) << "Found " << auxmap->size()
+  Squeak::mout(Squeak::info) << "Found " << auxmap->size()
 			     << " volume(s) with auxiliary information.\n\n";
+
+  double stepMax = _stepMax;
+  double timeMax = _timeMax;
+  double trackMax = _trackMax;
+  double keThreshold = _keThreshold;
+  double red = 1.;
+  double green = 1.;
+  double blue = 1.;
+  bool vis = true;
+
 
   for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
       iter != auxmap->end(); iter++) {
     // Construct a mice module containing the auxilliary information
     G4LogicalVolume* myvol = (*iter).first;
+    Squeak::mout(Squeak::info) << "Checking aux map of volume "
+			       << myvol->GetName() << std::endl;
+    // Define sensitive detectors etc.
+    bool sensdet = false;
+    std::string sensdetname = "";
+
     // Want to know, specifically if there is a sensitive detector in this object
     for (G4GDMLAuxListType::const_iterator vit = (*iter).second.begin();
 	 vit != (*iter).second.end(); vit++) {
-      if ((*vit).type.contains("SensitiveDetector")) {
-	// Find the module corresponding to the volume name
-	std::vector<const MiceModule*> mods =
-	  module.findModulesByPropertyString((*vit).type, (*vit).value);
-	// Squeak::mout(Squeak::info)<<"Search for detector "<<(*vit).value
-	// 			  <<" with name "<<myvol->GetName()<<": "
-	// 			  <<mods.size()<<" candidates\n";
-	for (unsigned i = 0; i < mods.size(); i++) {
-	  // This is kind of a double check now to make
-	  // sure that this is the same object.
-
-	  if (mods.at(i)->name() == myvol->GetName()) {
-	     // propertyExists("SensitiveDetector","PropertyString")){
-	    // Make a copy of the module to remove the const cast
-	    MiceModule* tempmod = MiceModule::deepCopy(*mods[i], false);
-	    // tempmod->printThis(Squeak::mout(Squeak::info));
-	    _detector->SetUserLimits(myvol, tempmod);
-	    _detector->SetVisAttributes(myvol, tempmod);
-	    _detector->BuildSensitiveDetector(myvol, tempmod);
-	    _detector->AddToRegion(myvol, tempmod);
-	    // Now loop over all daughters to add them to the sensitive volumes
-	    if ((*vit).value == "SciFi" || (*vit).value == "KL") {
-	      if (myvol->GetNoDaughters() > 0) {
-		SetDaughterSensitiveDetectors(myvol);
-	      }
-	    }
+      try {
+	if ((*vit).type.contains("SensitiveDetector")) {
+	  sensdet = true;
+	  sensdetname = (*vit).value;
+	} else if ((*vit).type.contains("G4StepMax")) {
+	  stepMax  = atof((*vit).value.c_str());
+	  //
+	} else if ((*vit).type.contains("G4TrackMax")) {
+	  trackMax = atof((*vit).value.c_str());
+	} else if ((*vit).type.contains("G4TimeMax")) {
+	  timeMax  = atof((*vit).value.c_str());
+	} else if ((*vit).type.contains("G4KinMin")) {
+	  keThreshold = atof((*vit).value.c_str());
+	} else if ((*vit).type.contains("Region")) {
+	  std::string name = (*vit).value;
+	  G4RegionStore* store = G4RegionStore::GetInstance();
+	  if (store->GetRegion(name) == NULL) {
+	    new G4Region(name);
+	    _detector->GetRegions().push_back(name);
 	  }
+	  G4Region* region = store->GetRegion(name);
+	  if (region == NULL) {
+	    throw MAUS::Exception(Exception::recoverable,
+				  "Failed to make region",
+				  "MAUSgeant4Manager::SetAuxInformation");
+	  }
+	  region->AddRootLogicalVolume(myvol);
+	} else if ((*vit).type.contains("Invisible")) {
+	  vis = false;
+	  /*
+	    } else if ((*vit).type.contains("RedColor")) {
+	    red = atof((*vit).value.c_str());
+	    } else if ((*vit).type.contains("GreenColor")) {
+	    green = atof((*vit).value.c_str());
+	    } else if ((*vit).type.contains("BlueColor")) {
+	    blue = atof((*vit).value.c_str()); */
+	} else {
+	  // Don't really know what to do with this.
+	  // Do nothing if selection is not otherwise known.
+	}
+	// Squeak::mout(Squeak::info) << "Found " << (*vit).type << " with value "
+	// 			 << (*vit).value << " in object "
+	// 			 << myvol->GetName() << "\n";
+      } catch (...) {
+	continue;
+      }
+    }
+    if (sensdet) {
+      DefineSensitiveDetector(module, myvol, sensdetname);
+    }
+    _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax,
+							  timeMax, keThreshold));
+    myvol->SetUserLimits(_detector->GetUserLimits().back());
+    // if (myvol->GetNoDaughters() > 0) {
+    //   SetDaughterUserLimits(myvol);
+    // }
+    if (vis)
+      _detector->GetVisAttributes().push_back(new G4VisAttributes(G4Color(red, green, blue)));
+    else
+      _detector->GetVisAttributes().push_back(new G4VisAttributes(false));
+    myvol->SetVisAttributes(_detector->GetVisAttributes().back());
+
+    Squeak::mout(Squeak::info) << "Attributes set for volume "
+			       << myvol->GetName() << std::endl;
+  }
+}
+
+void MAUSGeant4Manager::DefineSensitiveDetector(MiceModule& module, G4LogicalVolume* myvol,
+						std::string sensdetname) {
+  // Find the module corresponding to the volume name
+  std::vector<const MiceModule*> mods =
+    module.findModulesByPropertyString("SensitiveDetector", sensdetname);
+  // Squeak::mout(Squeak::info) << "Search for detector " << sensdetname
+  // 			    << " with name " << myvol->GetName() << ": "
+  // 			    << mods.size() << " candidates\n";
+  for ( unsigned i = 0; i < mods.size(); i++ ) {
+    // This is kind of a double check now to make
+    // sure that this is the same object.
+
+    if (mods.at(i)->name() == myvol->GetName()) {
+      // propertyExists("SensitiveDetector","PropertyString")){
+      // Make a copy of the module to remove the const cast
+      MiceModule* tempmod = MiceModule::deepCopy(*mods[i], false);
+      // tempmod->printThis(Squeak::mout(Squeak::info));
+      _detector->SetUserLimits(myvol, tempmod);
+      _detector->SetVisAttributes(myvol, tempmod);
+      _detector->BuildSensitiveDetector(myvol, tempmod);
+      _detector->AddToRegion(myvol, tempmod);
+      // Now loop over all daughters to add them to the sensitive volumes
+      if (sensdetname == "SciFi" || sensdetname == "KL") {
+	if (myvol->GetNoDaughters() > 0) {
+	  SetDaughterSensitiveDetectors(myvol);
 	}
       }
     }
   }
 }
-
 void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
   // std::cout << "Adding " << logic->GetNoDaughters()
   // << " to sensitive detector in " << logic->GetName() << std::endl;
@@ -256,6 +374,17 @@ void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
       SetSensitiveDetector(logic->GetSensitiveDetector());
     if (logic->GetDaughter(i)->GetLogicalVolume()->GetNoDaughters() > 0) {
       SetDaughterSensitiveDetectors(logic->GetDaughter(i)->GetLogicalVolume());
+    }
+  }
+}
+
+void MAUSGeant4Manager::SetDaughterUserLimits(G4LogicalVolume* logic) {
+
+  for (G4int i = 0; i < logic->GetNoDaughters(); i++) {
+    logic->GetDaughter(i)->GetLogicalVolume()->
+      SetUserLimits(_detector->GetUserLimits().back());
+    if (logic->GetDaughter(i)->GetLogicalVolume()->GetNoDaughters() > 0) {
+      SetDaughterUserLimits(logic->GetDaughter(i)->GetLogicalVolume());
     }
   }
 }

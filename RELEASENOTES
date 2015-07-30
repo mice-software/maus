@@ -5,9 +5,22 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v1.0.0
+  The following changes were made:
+    - MAUS speedup implemented
+    --- All reconstruction mappers and reducers process MAUS::Data
+    --- MapCppSimulation processes MAUS::Data
+    - Tracker Kalman improvements
+    - Tracker mapping and calibration updated
+    - ROOT document store, Image data type, prototype GUI added for online reconstruction (#1312)
+    - Geometry updates (#1439)
+    - Fixed some memory leaks (#1704, #1712)
+  If upgrading from a previous version, please redo the entire installation
 MAUS-v0.9.7
   The following changes were made:
-    - ROOT installation updated for GRID compatibility
+    - ROOT installation modified to support deployment on GRID
+    - Tracker real data digitisation improvements
+    - Tracker mapping and calibration updated
   If upgrading from a previous version, please redo the entire installation
 MAUS-v0.9.6
   The following changes were made:

@@ -17,8 +17,7 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDATAPROCESSOR_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDATAPROCESSOR_HH_
 
-#include "json/value.h"
-
+#include "src/common_cpp/DataStructure/EMRPlaneHit.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
 #include "src/common_cpp/DataStructure/EMRSpillData.hh"
@@ -28,10 +27,14 @@ namespace MAUS {
 /** @class EMRSpillData processor for converting EMR spill level data */
 class EMRSpillDataProcessor : public ObjectProcessor<EMRSpillData>  {
   public:
-    /** Constructor - registers the branch structure */
+    /** Set up processors and register branches
+     *
+     *  Everything else is handled by the base class
+     */
     EMRSpillDataProcessor();
 
   private:
+    PointerArrayProcessor<EMRPlaneHit> _plane_hit_array_proc;
 };
 }
 

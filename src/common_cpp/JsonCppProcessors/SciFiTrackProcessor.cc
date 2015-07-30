@@ -52,5 +52,7 @@ SciFiTrackProcessor::SciFiTrackProcessor()
     RegisterValueBranch("seed_covariance", &_vector_proc,
                         &SciFiTrack::GetSeedCovariance,
                         &SciFiTrack::SetSeedCovariance, false);
+    ObjectProcessor<SciFiTrack>::RegisterTRef("pr_track",
+        &SciFiTrack::pr_track_tobject, &SciFiTrack::set_pr_track_tobject, false);
 }
 } // ~namespace MAUS
