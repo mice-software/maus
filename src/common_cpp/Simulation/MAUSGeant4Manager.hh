@@ -18,8 +18,6 @@
 #ifndef _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 
-
-#include <string>
 #include <vector>
 
 #include "Geant4/G4RunManager.hh"
@@ -186,23 +184,9 @@ class MAUSGeant4Manager {
 
     /** Set the sensitive detector information 
      *
-     *  Add the sensitive detector designation to a volume
-     */
-    void DefineSensitiveDetector(MiceModule& module, G4LogicalVolume* myvol,
-				 std::string sensdetname);
-    /** Set the sensitive detector information for daughter volumes 
-     *
-     *  Recursively examine logical volumes for daughters and add
-     *  the sensitive detector designation 
+     *  Recursively examine logical volumes for
      */
     void SetDaughterSensitiveDetectors(G4LogicalVolume* logic);
-
-    /** Set the user limits on step wise processes
-     *
-     * Recursively examine logical volumes for daughers and add
-     * the user limit information
-     */
-    void SetDaughterUserLimits(G4LogicalVolume* logic);
 
     /** Reset the simulation with a new geometry set
      *
@@ -235,15 +219,8 @@ class MAUSGeant4Manager {
 
     MCEvent* Tracking(MAUSPrimaryGeneratorAction::PGParticle p);
 
-    // std::vector<G4UserLimits*> _userLims;
-
-
     static MAUSGeant4Manager* _instance;
     static bool _isClosed;
-    G4double _keThreshold;
-    G4double _trackMax;
-    G4double _timeMax;
-    G4double _stepMax;
 };
 
 inline void MAUSGeant4Manager::SetVirtualPlanes(VirtualPlaneManager* virt) {
