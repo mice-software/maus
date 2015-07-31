@@ -175,14 +175,27 @@ class MAUSGeant4Manager {
      *  Note that it is a feature of Geant4 that the geometry cannot be reopened
      */
     ~MAUSGeant4Manager();
-
+  
+    /** Set sensitive detector and user limits for GDML objects
+     *
+     * This considers both the case where there is auxiliary information
+     * present and otherwise
+     */
+    void SetVolumeInformation(MiceModule& module, G4LogicalVolume* base);
+    /** Set user limits and visual properties in the default case
+     *
+     * This is to be used in the bulk case where a volume is not defined with
+     * auxiliary information from the GDML
+     */
+    void SetSteppingLimits(G4LogicalVolume* myvol);
     /** Set the auxiliary information for the GDML objects 
      *  
      * Right now this is almost exclusively sensitive detector information
      * but it may be expanded to include visualization information if 
      * necessary.
      */
-    void SetAuxInformation(MiceModule& module);
+    void SetAuxInformation(MiceModule& module, G4LogicalVolume* myvol, 
+			   const G4GDMLAuxListType auxlist);
 
     /** Set the sensitive detector information 
      *
