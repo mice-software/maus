@@ -13,7 +13,6 @@ MAUS-v1.0.0
     - Tracker Kalman improvements
     - Tracker mapping and calibration updated for 01b data (#1721)
     - ROOT document store, Image data type, prototype GUI added for online reconstruction (#1312)
-    - Updates to geometry handling (#1439)
     - Fixed some memory leaks (#1704, #1712)
     - MAUS version number encoding changed to satisfy ROOT (#1725)
   If upgrading from a previous version, you must redo the entire installation
