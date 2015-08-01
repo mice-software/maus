@@ -26,6 +26,7 @@
 #include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersJobFooter.hh"
 #include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersRunHeader.hh"
 #include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersRunFooter.hh"
+#include "src/common_cpp/Converter/DataConverters/PrimitiveConvertersImage.hh"
 
 namespace Json {
   class Value;
@@ -272,6 +273,13 @@ namespace MAUS {
   inline IConverter<RunFooterData, std::string>*
   ConverterFactory::getConverter<RunFooterData, std::string>() const {
     return new RunFooterStringConverter();
+  }
+
+  /// ImageData
+  template <>
+  inline IConverter<ImageData, ImageData>*
+  ConverterFactory::getConverter<ImageData, ImageData>() const {
+    return new ImageImageConverter();
   }
 
   /// PyDICT to X

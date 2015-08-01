@@ -113,12 +113,12 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
   */
   MAUS::Data _emit_cpp() {
      if (this->readNextEvent()) {
-       MAUS::Data  *data_cpp  = new MAUS::Data;
+       MAUS::Data  data_cpp;
        MAUS::Spill *spill_cpp = new MAUS::Spill;
-       data_cpp->SetSpill(spill_cpp);
-       this->getCurEvent(data_cpp);
+       data_cpp.SetSpill(spill_cpp);
+       this->getCurEvent(&data_cpp);
        _eventsCount++;
-       return *data_cpp;
+       return data_cpp;
      } else {
        throw(MAUS::Exception(Exception::recoverable,
                              "Failed to read next event",

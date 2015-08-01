@@ -53,6 +53,9 @@ class TOFEventSpacePoint {
     /** Returns TOF0SpacePointArray */
     TOF0SpacePointArray GetTOF0SpacePointArray() const;
 
+    /** Returns TOF0SpacePointArray */
+    TOF0SpacePointArray* GetTOF0SpacePointArrayPtr();
+
     /** Get an element from TOF0SpacePointArray (needed for PyROOT) */
     TOFSpacePoint GetTOF0SpacePointArrayElement(size_t index) const;
 
@@ -65,6 +68,9 @@ class TOFEventSpacePoint {
     /** Returns TOF1SpacePointArray */
     TOF1SpacePointArray GetTOF1SpacePointArray() const;
 
+    /** Returns TOF1SpacePointArray */
+    TOF1SpacePointArray* GetTOF1SpacePointArrayPtr();
+
     /** Get an element from TOF1SpacePointArray (needed for PyROOT) */
     TOFSpacePoint GetTOF1SpacePointArrayElement(size_t index) const;
 
@@ -76,6 +82,9 @@ class TOFEventSpacePoint {
 
     /** Returns TOF2SpacePointArray */
     TOF2SpacePointArray GetTOF2SpacePointArray() const;
+
+    /** Returns TOF2SpacePointArray */
+    TOF2SpacePointArray* GetTOF2SpacePointArrayPtr();
 
     /** Get an element from TOF2SpacePointArray (needed for PyROOT) */
     TOFSpacePoint GetTOF2SpacePointArrayElement(size_t index) const;

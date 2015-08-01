@@ -134,24 +134,29 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
     def _update_histograms(self, spill):
         """Update the Histograms """
-        if not spill.has_key("daq_event_type"):
-            raise ValueError("No event type")
-        if spill["daq_event_type"] == "end_of_run":
+
+        daq_evtype = spill.GetSpill().GetDaqEventType()
+        if daq_evtype == "end_of_run":
             if (not self.run_ended):
                 self.update_histos()
                 self.run_ended = True
                 return self.get_histogram_images()
             else:
                 return []
-        # elif spill["daq_event_type"] != "physics_event":
-        #    return spill
+
+        # do not try to get data from start/end spill markers
+        data_spill = True
+        if daq_evtype == "start_of_run" \
+              or daq_evtype == "start_of_burst" \
+              or daq_evtype == "end_of_burst":
+            data_spill = False
 
         # Get KL digits & fill the relevant histograms.
-        if not self.get_digits(spill): 
+        if data_spill and not self.get_digits(spill): 
             raise ValueError("kl digits not in spill")
 
         # Get KL cell hits & fill the relevant histograms.
-        if not self.get_cell_hits(spill): 
+        if data_spill and not self.get_cell_hits(spill): 
             raise ValueError("cell hits not in spill")
 
         # Refresh canvases at requested frequency.
@@ -162,7 +167,7 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         else:
             return []
 
-    def get_cell_hits(self, spill):
+    def get_cell_hits(self, data):
         """ 
         Get the KL cell hits and update the histograms.
 
@@ -171,32 +176,26 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "cell_hits" in
         the spill.
         """
-        if 'recon_events' not in spill:
-            raise ValueError("recon_events not in spill")
-        #print 'nevt = ', len(spill['recon_events']), spill['recon_events']
-        for evn in range(len(spill['recon_events'])):
-            if 'kl_event' not in spill['recon_events'][evn]:
-                #print 'no kl event'
-                raise ValueError("kl_event not in recon_events")
-            # Return if we cannot find cell_hits in the event.
-            if 'kl_cell_hits' not in spill['recon_events'][evn]['kl_event']:
-                return False
 
-            cellhits = spill['recon_events'][evn]['kl_event']['kl_cell_hits']
-            if 'kl' not in cellhits:
-                continue
-            kl_cellhit = cellhits['kl']
-            if kl_cellhit == None:
-                continue
-            #print kl_cellhit 
-            for i in range(len(kl_cellhit)):
-                # make sure it is not null
-                if (kl_cellhit[i]):
-                    prod = kl_cellhit[i]['charge_product']
-                    self.hadc_product.Fill(prod)
+        if data.GetSpill().GetReconEventSize() == 0:
+            raise ValueError("recon_events not in spill")
+        reconevents = data.GetSpill().GetReconEvents()
+        for evn in range(data.GetSpill().GetReconEventSize()):
+            kl_event = reconevents[evn].GetKLEvent()
+            if kl_event is None:
+                raise ValueError("kl_event not in recon_events")
+            cellhit = kl_event.GetKLEventCellHit()
+            if cellhit is None:
+                return False
+            kl_cellhits = cellhit.GetKLCellHitArray()
+            for i in range(kl_cellhits.size()):
+                if kl_cellhits[i] is None:
+                    continue
+                prod = kl_cellhits[i].GetChargeProduct()
+                self.hadc_product.Fill(prod)
         return True
 
-    def get_digits(self, spill):
+    def get_digits(self, data):
         """ 
         Get the KL digits and update the histograms.
 
@@ -205,37 +204,27 @@ class ReducePyKLPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "kl_digits" in
         the spill.
         """
-        if 'recon_events' not in spill:
-            #print 'no reco'
-            return False
 
-        for evn in range(len(spill['recon_events'])):
-            if 'kl_event' not in spill['recon_events'][evn]:
-                #print 'no kl event'
+        if data.GetSpill().GetReconEventSize() == 0:
+            raise ValueError("recon_events not in spill")
+        reconevents = data.GetSpill().GetReconEvents()
+        for evn in range(data.GetSpill().GetReconEventSize()):
+            kl_event = reconevents[evn].GetKLEvent()
+            if kl_event is None:
+                raise ValueError("kl_event not in recon_events")
+            kl_digit = kl_event.GetKLEventDigit()
+            if kl_digit is None:
                 return False
-                # Return if we cannot find kl_digits in the spill.
-            if 'kl_digits' not in \
-                  spill['recon_events'][evn]['kl_event']:
-                return False
-            kl_digit = \
-                  spill['recon_events'][evn]['kl_event']['kl_digits']
-            if 'kl' not in kl_digit:
-                continue         
-
-            digit = kl_digit['kl']
-            if digit == None:
-                continue
-            #print digit 
-             
-            for i in range(len(digit)):
-                if (digit[i]):
-                    charge = digit[i]["charge_mm"]
-                    cell = digit[i]["cell"]
-                    side = digit[i]["pmt"]
-                    self.hadc.Fill(charge)
-                    self.hprofile.Fill(cell)
-                    self.digitkl.Fill(cell, side)
- 
+            kl_digits = kl_digit.GetKLDigitArray()
+            for i in range(kl_digits.size()):
+                if kl_digits[i] is None:
+                    continue
+                charge = kl_digits[i].GetChargeMm()
+                cell = kl_digits[i].GetCell()
+                side = kl_digits[i].GetPmt()
+                self.hadc.Fill(charge)
+                self.hprofile.Fill(cell)
+                self.digitkl.Fill(cell, side)
         return True
 
     def __init_histos(self): #pylint: disable=R0201, R0914

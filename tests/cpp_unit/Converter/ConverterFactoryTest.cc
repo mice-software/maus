@@ -36,6 +36,7 @@
 #include "src/common_cpp/DataStructure/JobFooter.hh"
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 #include "src/common_cpp/DataStructure/RunFooter.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
 
 namespace MAUS {
 std::string data_test_str =
@@ -755,6 +756,21 @@ TEST_F(ConverterFactoryTest, TestPyDictToX) {
     Py_DECREF(py_data);
 }
 
+/////////////// ImageData TO ImageData /////////////////////////////
+TEST_F(ConverterFactoryTest, TestImageData) {
+    ImageData ref;
+    Image* image = new Image();
+    image->SetRunNumber(99);
+    ref.SetImage(image);
+    ImageData* test = ConverterFactory().convert<ImageData, ImageData>(&ref);
+    EXPECT_EQ(ref.GetImage()->GetRunNumber(), test->GetImage()->GetRunNumber());
+    try {
+        ConverterFactory().convert<ImageData, ImageData>(NULL);
+        EXPECT_TRUE(false) << "SHOULD HAVE THROWN";
+    } catch (std::exception& exc) {}
+    delete test;
+}
+
 //////// delete_type //////////////////
 TEST_F(ConverterFactoryTest, TestDeleteType) {
     PyObject* py_val = ConverterFactory().convert<std::string, PyObject>(_data);
@@ -774,6 +790,8 @@ TEST_F(ConverterFactoryTest, TestDeleteType) {
     ConverterFactory::delete_type(maus_rh);
     RunFooterData* maus_rf = ConverterFactory().convert<std::string, RunFooterData>(_rf);
     ConverterFactory::delete_type(maus_rf);
+    ImageData* image_data = new ImageData();
+    ConverterFactory::delete_type(image_data);
     std::string* str_val =
                     ConverterFactory().convert<std::string, std::string>(_data);
     ConverterFactory::delete_type(str_val);

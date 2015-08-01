@@ -129,22 +129,23 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   SciFiCluster *c1 = new SciFiCluster(digit);
   evt1->add_cluster(c1);
 
+  SciFiHelicalPRTrack* hpr_track = new SciFiHelicalPRTrack();
+  evt1->add_helicalprtrack(hpr_track);
+
   SciFiTrack *trk1 = new SciFiTrack();
+  trk1->SetAlgorithmUsed(1);
   SciFiTrackPoint *tp1 = new SciFiTrackPoint();
-  tp1->set_cluster_pointer(c1);
   trk1->add_scifitrackpoint(tp1);
+  trk1->set_pr_track_pointer(hpr_track);
   evt1->add_scifitrack(trk1);
 
-  ASSERT_EQ(evt1->clusters()[0],
-            evt1->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
+  ASSERT_EQ(evt1->helicalprtracks()[0], evt1->scifitracks()[0]->pr_track_pointer());
 
   SciFiEvent* evt2 = new SciFiEvent();
   *evt2 = *evt1;
 
-  ASSERT_EQ(evt2->clusters()[0],
-            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
-  ASSERT_NE(evt1->clusters()[0],
-            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
+  ASSERT_EQ(evt2->helicalprtracks()[0], evt2->scifitracks()[0]->pr_track_pointer());
+  ASSERT_NE(evt1->helicalprtracks()[0], evt2->scifitracks()[0]->pr_track_pointer());
 
   delete evt1;
 
@@ -162,12 +163,7 @@ TEST_F(SciFiEventTestDS, test_assignment_operator) {
   EXPECT_EQ(evt2->digits()[0], evt2->clusters()[0]->get_digits()->At(0));
 
   EXPECT_EQ(-1, evt2->scifitracks()[0]->scifitrackpoints()[0]->tracker());
-  EXPECT_EQ(evt2->clusters()[0],
-            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer());
-  EXPECT_EQ(tracker,
-            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer()->get_tracker());
-  EXPECT_EQ(tracker,
-            evt2->scifitracks()[0]->scifitrackpoints()[0]->get_cluster_pointer()->get_tracker());
+  EXPECT_EQ(evt2->helicalprtracks()[0], evt2->scifitracks()[0]->pr_track_pointer());
 }
 
 TEST_F(SciFiEventTestDS, test_digit_getters_setters) {

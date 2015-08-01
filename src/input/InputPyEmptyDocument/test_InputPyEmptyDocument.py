@@ -2,6 +2,7 @@
 """test_InputPyEmptyDocument.py"""
 import json
 import unittest
+import maus_cpp.converter
 
 from InputPyEmptyDocument import InputPyEmptyDocument
 
@@ -21,8 +22,10 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase): #pylint:disable=R0904
         i = 0
         for doc in my_input.emitter():
             test_doc = json.loads("""{"spill_number" : %d }""" % i)
-            json_doc = json.loads(doc)
-            self.assertEqual(json_doc, test_doc)
+            json_doc = maus_cpp.converter.json_repr(doc)
+            #json_doc = json.loads(doc)
+            #self.assertEqual(json_doc, test_doc)
+            self.assertEqual(json_doc["spill_number"], test_doc["spill_number"])
             i += 1
         self.assertEqual(i, 100)
         self.assertTrue(my_input.death())
@@ -38,8 +41,9 @@ class InputPyEmptyDocumentTestCase(unittest.TestCase): #pylint:disable=R0904
         i = 0
         for doc in my_input.emitter():
             test_doc = json.loads("""{"spill_number" : %d }""" % i)
-            json_doc = json.loads(doc)
-            self.assertEqual(json_doc, test_doc)
+            json_doc = maus_cpp.converter.json_repr(doc)
+            #json_doc = json.loads(json_doc1)
+            self.assertEqual(json_doc["spill_number"], test_doc["spill_number"])
 
             if i == big_number:
                 break

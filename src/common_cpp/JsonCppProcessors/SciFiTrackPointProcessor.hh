@@ -33,6 +33,7 @@ class SciFiTrackPointProcessor : public ObjectProcessor<SciFiTrackPoint> {
     SciFiTrackPointProcessor();
 
  private:
+    BoolProcessor _bool_proc;
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
     ThreeVectorProcessor _threevector_proc;

@@ -30,11 +30,12 @@ DBBHit& DBBHit::operator=(const DBBHit& _dbbhit) {
     return *this;
   }
 
-  this->SetLDC(_dbbhit._ldc);
-  this->SetGEO(_dbbhit._geo);
-  this->SetChannel(_dbbhit._channel);
-  this->SetLTime(_dbbhit._leading_edge_time);
-  this->SetTTime(_dbbhit._trailing_edge_time);
+  SetLDC(_dbbhit._ldc);
+  SetGEO(_dbbhit._geo);
+  SetChannel(_dbbhit._channel);
+  SetLTime(_dbbhit._leading_edge_time);
+  SetTTime(_dbbhit._trailing_edge_time);
+  return *this;
 }
 
 DBBHit::~DBBHit() {

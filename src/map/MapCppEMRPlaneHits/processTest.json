@@ -17,24 +17,31 @@
           "dbb_hits": [
             {
               "ldc": 2, 
-              "leading_edge_time": 784779, 
+              "leading_edge_time": 784769, 
               "geo": 0, 
               "channel": 13, 
-              "trailing_edge_time": 784787
+              "trailing_edge_time": 784777
             }, 
             {
               "ldc": 2, 
-              "leading_edge_time": 109090, 
+              "leading_edge_time": 109060, 
               "geo": 0, 
               "channel": 28, 
-              "trailing_edge_time": 109095
+              "trailing_edge_time": 109065
             }, 
             {
               "ldc": 2, 
-              "leading_edge_time": 179090, 
+              "leading_edge_time": 178870, 
               "geo": 0, 
               "channel": 32, 
-              "trailing_edge_time": 179097
+              "trailing_edge_time": 178797
+            },
+            {
+              "ldc": 2, 
+              "leading_edge_time": 278790, 
+              "geo": 0, 
+              "channel": 37, 
+              "trailing_edge_time": 278797
             }
           ], 
           "spill_number": 123, 
@@ -75,7 +82,7 @@
             "part_event_number": 1, 
             "charge_mm": 10, 
             "equip_type": 121, 
-            "channel_key": "DAQChannelKey 2 0 1 121 emr", 
+            "channel_key": "DAQChannelKey 2 3 0 121 emr", 
             "charge_pm": 9, 
             "arrival_time": 557, 
             "phys_event_number": 0, 
@@ -854,9 +861,9 @@
             "trigger_time_tag": -1745694513, 
             "detector": "emr", 
             "pulse_area": 36, 
-            "geo": 0, 
+            "geo": 3, 
             "pedestal": 141.0, 
-            "channel": 1
+            "channel": 0
           }
         ],
         [

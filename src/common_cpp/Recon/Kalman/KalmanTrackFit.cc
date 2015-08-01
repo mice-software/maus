@@ -228,7 +228,7 @@ namespace Kalman {
     _propagator->Propagate(first, second);
   }
 
-  void TrackFit::_filter(const State& data, State& predicted, State& filtered) const {
+  void TrackFit::_filter(const State& data, const State& predicted, State& filtered) const {
     State measured = _measurement->Measure(predicted);
 
     TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
@@ -263,6 +263,40 @@ namespace Kalman {
   }
 
 
+  void TrackFit::_inverse_filter(const State& data, const State& smoothed, State& cleaned) const {
+    State measured = _measurement->Measure(smoothed);
+
+    TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
+    TDecompLU lu(measured.GetCovariance());
+    if (!lu.Decompose() || !lu.Invert(temp)) {
+      cleaned = smoothed;
+    } else {
+      TMatrixD H = _measurement->GetMeasurementMatrix();
+      TMatrixD HT(TMatrixD::kTransposed, H);
+
+      TMatrixD K = smoothed.GetCovariance() * HT * temp;
+      TMatrixD KT(TMatrixD::kTransposed, K);
+
+      TMatrixD V = _measurement->GetMeasurementNoise();
+      TMatrixD pull(GetMeasurementDimension(), 1);
+      // THIS IS THE INVERSE FILTER LINE!
+      V *= -1.0;
+
+      TMatrixD gain = _identity_matrix - K*H;
+      TMatrixD gainT(TMatrixD::kTransposed, gain);
+      TMatrixD gain_constant = K * V * KT;
+
+      pull = data.GetVector() - measured.GetVector();
+
+      TMatrixD temp_vec = smoothed.GetVector() + K * pull;
+      TMatrixD temp_cov = gain * smoothed.GetCovariance() * gainT + gain_constant;
+
+      cleaned.SetVector(temp_vec);
+      cleaned.SetCovariance(temp_cov);
+    }
+  }
+
+
   double TrackFit::CalculateChiSquared(const Track& track) const {
     if (track.GetLength() != _data.GetLength())
       throw Exception(Exception::recoverable,
@@ -288,6 +322,20 @@ namespace Kalman {
     }
 
     return no_measurements - no_parameters;
+  }
+
+  State TrackFit::CalculateCleanedState(unsigned int i) const {
+    State smoothed = _smoothed[i];
+    const State& data = _data[i];
+    State cleaned(GetDimension());
+
+    this->_inverse_filter(data, smoothed, cleaned);
+    return cleaned;
+  }
+
+  State TrackFit::CalculatePull(unsigned int i) const {
+    State cleaned = this->CalculateCleanedState(i);
+    return CalculateResidual(cleaned, _smoothed[i]);
   }
 
   State TrackFit::CalculatePredictedResidual(unsigned int i) const {

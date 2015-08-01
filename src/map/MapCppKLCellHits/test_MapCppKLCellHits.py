@@ -65,8 +65,8 @@ class MapCppKLCellHitsTestCase(unittest.TestCase):# pylint: disable = R0904
         # test with some crazy events.
         result = self.mapper.process(data)
         spill = maus_cpp.converter.json_repr(result)
-        self.assertTrue( not 'errors' in spill)
-          
+        self.assertFalse("MapCppKLCellHits" in spill["errors"])
+
         # test the kl output
         n_cell_hits_part_ev0_kl = \
              len(spill['recon_events'][0]['kl_event']['kl_cell_hits']['kl'])

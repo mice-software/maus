@@ -54,12 +54,12 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("circle_chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_circle_chisq,
                         &SciFiHelicalPRTrack::set_circle_chisq, true);
-    RegisterValueBranch("chisq", &_double_proc,
-                        &SciFiHelicalPRTrack::get_chisq,
-                        &SciFiHelicalPRTrack::set_chisq, true);
-    RegisterValueBranch("chisq_dof", &_double_proc,
-                        &SciFiHelicalPRTrack::get_chisq_dof,
-                        &SciFiHelicalPRTrack::set_chisq_dof, true);
+    RegisterValueBranch<double>("chi_squared", &_double_proc,
+                        &SciFiHelicalPRTrack::get_chi_squared,
+                        &SciFiHelicalPRTrack::set_chi_squared, false);
+    RegisterValueBranch<int>("ndf", &_int_proc,
+                        &SciFiHelicalPRTrack::get_ndf,
+                        &SciFiHelicalPRTrack::set_ndf, false);
     RegisterValueBranch("point_spread", &_double_proc,
                         &SciFiHelicalPRTrack::get_point_spread,
                         &SciFiHelicalPRTrack::set_point_spread, true);

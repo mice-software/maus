@@ -10,9 +10,9 @@
 #define _SPECIALVIRTUALSD_HH_  1
 
 #include "Geant4/G4VSensitiveDetector.hh"
-#include "Interface/SpecialHit.hh"
 #include "Config/MiceModule.hh"
 #include "Interface/MICEEvent.hh"
+#include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DetModel/MAUSSD.hh"
 
 class G4Step;
@@ -37,7 +37,10 @@ class SpecialVirtualSD : public MAUS::MAUSSD
       std::string getTypeName()  const;
       int  idFromName();
       void SetStepping(bool SteppingThrough, bool SteppingInto, bool SteppingOutOf, bool SteppingAcross);
-
+      bool isHit() {return _hits != NULL && _hits->size() > 0;}
+      int GetNHits() {return _hits->size();}
+      void ClearHits();
+      void TakeHits(MAUS::MCEvent* event);
   private:
 
       MICEEvent * simEvent;
@@ -59,5 +62,7 @@ class SpecialVirtualSD : public MAUS::MAUSSD
       HepRotation _globalRotation;
       Hep3Vector  _localPosition;
       Hep3Vector  _globalPosition;
+
+      std::vector<MAUS::SpecialVirtualHit>* _hits;
 };
 #endif
