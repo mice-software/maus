@@ -114,8 +114,10 @@ namespace Kalman {
      */
     int GetNDF() const;
 
+    State CalculateCleanedState(unsigned int i) const;
+    State CalculatePull(unsigned int i) const;
+
     /** @brief Helper function to calculate predicted residual/pull */
-    State CalculatePull(unsigned int i) const { return this->CalculatePredictedResidual(i); }
     State CalculatePredictedResidual(unsigned int i) const;
 
     /** @brief Helper function to calculate filtered residual */
@@ -135,8 +137,9 @@ namespace Kalman {
   protected:
 
     void _propagate(State& first, State& second) const;
-    void _filter(const State& data, State& predicted, State& filtered) const;
+    void _filter(const State& data, const State& predicted, State& filtered) const;
     void _smooth(State& first, State& second) const;
+    void _inverse_filter(const State& data, const State& smoothed, State& cleaned) const;
 
   private:
     // Private copy constructor => No copying!

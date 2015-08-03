@@ -110,7 +110,7 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
 
     def test_process(self):
         """Check the MapCppTOFSpacePoints process function"""
-        test2 = ('%s/src/map/MapCppTOFSpacePoints/processTest.txt' %
+        test2 = ('%s/src/map/MapCppTOFSpacePoints/processTest.json' %
                                                 os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test2, 'r')
         data = fin.read()

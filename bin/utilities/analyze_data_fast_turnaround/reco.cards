@@ -1,0 +1,4 @@
+simulation_geometry_filename = "Stage4.dat"
+reconstruction_geometry_filename = "Stage4.dat" 
+SciFiDigitizationNPECut = 2.0
+SciFiPRHelicalOn = False 

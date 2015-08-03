@@ -21,12 +21,15 @@
 #include "Geant4/G4StateManager.hh"
 #include "Geant4/G4ApplicationState.hh"
 
-#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
-
-#include "src/common_cpp/Simulation/FieldPhaser.hh"
-
 #include "src/legacy/Interface/Squeak.hh"
+
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/MCEventProcessor.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
+#include "src/common_cpp/Simulation/FieldPhaser.hh"
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSStackingAction.hh"
 #include "src/common_cpp/Simulation/MAUSPhysicsList.hh"
@@ -139,49 +142,70 @@ MAUSPrimaryGeneratorAction::PGParticle
 }
 
 Json::Value MAUSGeant4Manager::RunManyParticles(Json::Value particle_array) {
-    _eventAct->SetEvents(particle_array);  // checks type
-    for (size_t i = 0; i < particle_array.size(); ++i) {
-        MAUSPrimaryGeneratorAction::PGParticle primary;
-        Json::Value event = JsonWrapper::GetItem
-                                  (particle_array, i, JsonWrapper::objectValue);
-        Json::Value primary_json = JsonWrapper::GetProperty
-                                  (event, "primary", JsonWrapper::objectValue);
-        primary.ReadJson(primary_json);
-        GetPrimaryGenerator()->Push(primary);
-    }
-    BeamOn(particle_array.size());
-    return _eventAct->GetEvents();
+    PointerArrayProcessor<MCEvent> proc(new MCEventProcessor());
+    std::vector<MCEvent*>* events = proc.JsonToCpp(particle_array);
+    events = RunManyParticles(events);
+    Json::Value* events_json = proc.CppToJson(*events);
+    Json::Value events_json_val(*events_json);
+    delete events_json;
+    for (size_t i = 0; i < events->size(); ++i)
+        delete events->at(i);
+    delete events;
+    return events_json_val;
 }
 
-Json::Value MAUSGeant4Manager::RunParticle(Json::Value particle) {
+std::vector<MCEvent*>* MAUSGeant4Manager::RunManyParticles(std::vector<MCEvent*>* event) {
+    _eventAct->SetEvents(event);
+    for (size_t i = 0; i < event->size(); ++i) {
+        MAUSPrimaryGeneratorAction::PGParticle primary;
+        primary.ReadCpp(event->at(i)->GetPrimary());
+        GetPrimaryGenerator()->Push(primary);
+    }
+    BeamOn(event->size());
+    return _eventAct->TakeEvents();
+}
+
+
+MCEvent* MAUSGeant4Manager::RunParticle(MAUS::Primary particle) {
     MAUSPrimaryGeneratorAction::PGParticle p;
-    p.ReadJson(particle["primary"]);
+    p.ReadCpp(&particle);
     return Tracking(p);
 }
 
-Json::Value MAUSGeant4Manager::RunParticle
+MCEvent* MAUSGeant4Manager::RunParticle
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     return Tracking(p);
 }
 
 
-Json::Value MAUSGeant4Manager::Tracking
+MCEvent* MAUSGeant4Manager::Tracking
                                     (MAUSPrimaryGeneratorAction::PGParticle p) {
     Squeak::mout(Squeak::debug) << "Firing particle with ";
     JsonWrapper::Print(Squeak::mout(Squeak::debug), p.WriteJson());
     Squeak::mout(Squeak::debug) << std::endl;
 
     GetPrimaryGenerator()->Push(p);
-    Json::Value event_array = Json::Value(Json::arrayValue);
-    Json::Value event(Json::objectValue);
-    event["primary"] = p.WriteJson();
-    event_array.append(event);
-    _eventAct->SetEvents(event_array);
+
+    std::vector<MCEvent*>* event_vector = new std::vector<MCEvent*>();
+    event_vector->push_back(new MCEvent());
+    event_vector->at(0)->SetPrimary(p.WriteCpp());
+    _eventAct->SetEvents(event_vector); // EventAction now owns this memory
     Squeak::mout(Squeak::debug) << "Beam On" << std::endl;
     GetField()->Print(Squeak::mout(Squeak::debug));
     BeamOn(1);
     Squeak::mout(Squeak::debug) << "Beam Off" << std::endl;
-    return _eventAct->GetEvents()[Json::Value::UInt(0)];
+    event_vector = _eventAct->TakeEvents(); // EventAction still owns this memory
+    if (event_vector->size() > 1) {
+        for (size_t i = 0; i < event_vector->size(); ++i)
+            delete event_vector->at(i);
+        delete event_vector;
+        throw(Exception(Exception::recoverable,
+                        "More than one event in return",
+                        "MAUSGeant4Manager::Tracking"));
+    }
+    MCEvent* ev_return = event_vector->at(0);
+    delete event_vector;
+    return ev_return; // this is a deep copy
 }
 
 void MAUSGeant4Manager::SetVisManager() {

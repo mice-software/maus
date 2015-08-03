@@ -56,49 +56,46 @@ class MAUSTrackingActionTest : public ::testing::Test {
 };
 
 TEST_F(MAUSTrackingActionTest, PreUserTrackingActionTest) {
-    MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(Json::Value());
+    std::vector<Track>* tracks = new std::vector<Track>();
+    MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(tracks);
     tracking->PreUserTrackingAction(start);
-    Json::Value json_track = MAUSGeant4Manager::GetInstance()->GetTracking()
-                                            ->GetTracks()[Json::Value::UInt(0)];
-    ASSERT_EQ(json_track.type(), Json::objectValue);
-    EXPECT_DOUBLE_EQ(json_track["initial_position"]["x"].asDouble(), 4.);
-    EXPECT_DOUBLE_EQ(json_track["initial_position"]["y"].asDouble(), 5.);
-    EXPECT_DOUBLE_EQ(json_track["initial_position"]["z"].asDouble(), 6.);
-    EXPECT_NEAR(json_track["initial_momentum"]["x"].asDouble(), 1., 1e-6);
-    EXPECT_NEAR(json_track["initial_momentum"]["y"].asDouble(), 2., 1e-6);
-    EXPECT_NEAR(json_track["initial_momentum"]["z"].asDouble(), 3., 1e-6);
-    EXPECT_EQ(json_track["particle_id"].asInt(), -13);
-    EXPECT_EQ(json_track["track_id"].asInt(), 3);
-    EXPECT_EQ(json_track["parent_track_id"].asInt(), 12);
+    Track track = MAUSGeant4Manager::GetInstance()->GetTracking()
+                                                           ->GetTracks()->at(0);
+    EXPECT_DOUBLE_EQ(track.GetInitialPosition().x(), 4.);
+    EXPECT_DOUBLE_EQ(track.GetInitialPosition().y(), 5.);
+    EXPECT_DOUBLE_EQ(track.GetInitialPosition().z(), 6.);
+    EXPECT_NEAR(track.GetInitialMomentum().x(), 1., 1e-6);
+    EXPECT_NEAR(track.GetInitialMomentum().y(), 2., 1e-6);
+    EXPECT_NEAR(track.GetInitialMomentum().z(), 3., 1e-6);
+    EXPECT_EQ(track.GetParticleId(), -13);
+    EXPECT_EQ(track.GetTrackId(), 3);
+    EXPECT_EQ(track.GetParentTrackId(), 12);
 
     start->SetTrackID(2);
     tracking->PreUserTrackingAction(start);
-    json_track = MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks();
-    ASSERT_EQ(json_track[Json::Value::UInt(0)].type(), Json::objectValue);
-    ASSERT_EQ(json_track[1].type(), Json::objectValue);
+    tracks = MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks();
+    EXPECT_EQ(tracks->size(), 2);
 }
 
 TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
-    tracking->SetTracks(Json::Value());
+    std::vector<Track>* tracks = new std::vector<Track>();
+    MAUSGeant4Manager::GetInstance()->GetTracking()->SetTracks(tracks);
     tracking->PreUserTrackingAction(end);
     tracking->PostUserTrackingAction(end);
-    Json::Value json_track = MAUSGeant4Manager::GetInstance()->GetTracking()
-                                            ->GetTracks()[Json::Value::UInt(0)];
-    ASSERT_EQ(json_track.type(), Json::objectValue);
-    EXPECT_DOUBLE_EQ(json_track["final_position"]["x"].asDouble(), 9.);
-    EXPECT_DOUBLE_EQ(json_track["final_position"]["y"].asDouble(), 10.);
-    EXPECT_DOUBLE_EQ(json_track["final_position"]["z"].asDouble(), 11.);
-    EXPECT_NEAR(json_track["final_momentum"]["x"].asDouble(), 12., 1e-6);
-    EXPECT_NEAR(json_track["final_momentum"]["y"].asDouble(), 13., 1e-6);
-    EXPECT_NEAR(json_track["final_momentum"]["z"].asDouble(), 14., 1e-6);
+    Track track = MAUSGeant4Manager::GetInstance()->GetTracking()
+                                                           ->GetTracks()->at(0);
+    EXPECT_NEAR(track.GetFinalPosition().x(),  9., 1e-6);
+    EXPECT_NEAR(track.GetFinalPosition().y(), 10., 1e-6);
+    EXPECT_NEAR(track.GetFinalPosition().z(), 11., 1e-6);
+    EXPECT_NEAR(track.GetFinalMomentum().x(), 12., 1e-6);
+    EXPECT_NEAR(track.GetFinalMomentum().y(), 13., 1e-6);
+    EXPECT_NEAR(track.GetFinalMomentum().z(), 14., 1e-6);
  
     end->SetTrackID(2);
     tracking->PreUserTrackingAction(end);
     tracking->PostUserTrackingAction(end);
-    json_track = MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks();
-    ASSERT_EQ(json_track[Json::Value::UInt(0)]["final_position"].type(),
-                                                             Json::objectValue);
-    ASSERT_EQ(json_track[1]["final_position"].type(), Json::objectValue);
+    tracks = MAUSGeant4Manager::GetInstance()->GetTracking()->GetTracks();
+    EXPECT_EQ(tracks->size(), 2);
 
     end->SetTrackID(4);
     EXPECT_THROW(tracking->PostUserTrackingAction(end), MAUS::Exception);

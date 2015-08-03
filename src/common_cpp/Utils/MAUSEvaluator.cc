@@ -63,6 +63,7 @@ void MAUSEvaluator::set_variable(std::string name, double value) {
 }
 
 double MAUSEvaluator::evaluate(std::string function) {
+    PyErr_Clear();
     PyObject *py_arg(NULL), *py_value(NULL);
     // argument to evalute
     py_arg = Py_BuildValue("(s)", function.c_str());

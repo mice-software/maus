@@ -1,8 +1,6 @@
 {
    "daq_event_type":"physics_event",
-   "errors":{
-
-   },
+   "errors":{},
    "maus_event_type":"Spill",
    "mc_events":[
       {
@@ -1350,7 +1348,9 @@
             "range_secondary":0.0,
             "secondary_to_primary_track_distance":0.0,
             "total_charge_MA":0.0,
-            "total_charge_SA":0.0
+            "total_charge_SA":0.0,
+            "plane_density":0.0,
+            "chi2":0.0
          },
          "part_event_number":0
       },
@@ -12728,246 +12728,217 @@
             "range_secondary":0.0,
             "secondary_to_primary_track_distance":0.0,
             "total_charge_MA":0.0,
-            "total_charge_SA":0.0
+            "total_charge_SA":0.0,
+            "plane_density":0.0,
+            "chi2":0.0
          },
          "part_event_number":1
-      },
-      {
-         "emr_event":{
-            "charge_ratio_MA":0.0,
-            "charge_ratio_SA":0.0,
-            "emr_plane_hits":[
-
-            ],
-            "has_primary":false,
-            "has_secondary":false,
-            "initial_trigger":false,
-            "range_primary":0.0,
-            "range_secondary":0.0,
-            "secondary_to_primary_track_distance":0.0,
-            "total_charge_MA":0.0,
-            "total_charge_SA":0.0
-         },
-         "part_event_number":2
-      },
-      {
-         "emr_event":{
-            "charge_ratio_MA":0.0,
-            "charge_ratio_SA":0.0,
-            "emr_plane_hits":[
-               {
-                  "charge":0.0,
-                  "charge_corrected":0.0,
-                  "delta_t":0,
-                  "emr_bars":[
-                     {
-                        "bar":3,
-                        "emr_bar_hits":[
-                           {
-                              "charge_corrected":0.0,
-                              "delta_t":0,
-                              "hittime":-28171,
-                              "tot":10,
-                              "total_charge_corrected":0.0,
-                              "x":0.0,
-                              "ex":0.0,
-                              "y":0.0,
-                              "ey":0.0,
-                              "z":0.0,
-                              "ez":0.0
-                           }
-                        ]
-                     }
-                  ],
-                  "emr_bars_primary":[
-
-                  ],
-                  "emr_bars_secondary":[
-
-                  ],
-                  "orientation":0,
-                  "pedestal_area":0.0,
-                  "plane":26,
-                  "run":0,
-                  "samples":[
-
-                  ],
-                  "spill":1,
-                  "time":0,
-                  "trigger":3
-               },
-               {
-                  "charge":0.0,
-                  "charge_corrected":0.0,
-                  "delta_t":0,
-                  "emr_bars":[
-                     {
-                        "bar":32,
-                        "emr_bar_hits":[
-                           {
-                              "charge_corrected":0.0,
-                              "delta_t":0,
-                              "hittime":-28172,
-                              "tot":27,
-                              "total_charge_corrected":0.0,
-                              "x":0.0,
-                              "ex":0.0,
-                              "y":0.0,
-                              "ey":0.0,
-                              "z":0.0,
-                              "ez":0.0
-                           }
-                        ]
-                     },
-                     {
-                        "bar":33,
-                        "emr_bar_hits":[
-                           {
-                              "charge_corrected":0.0,
-                              "delta_t":0,
-                              "hittime":-28172,
-                              "tot":20,
-                              "total_charge_corrected":0.0,
-                              "x":0.0,
-                              "ex":0.0,
-                              "y":0.0,
-                              "ey":0.0,
-                              "z":0.0,
-                              "ez":0.0
-                           }
-                        ]
-                     }
-                  ],
-                  "emr_bars_primary":[
-
-                  ],
-                  "emr_bars_secondary":[
-
-                  ],
-                  "orientation":1,
-                  "pedestal_area":0.0,
-                  "plane":27,
-                  "run":0,
-                  "samples":[
-
-                  ],
-                  "spill":1,
-                  "time":0,
-                  "trigger":3
-               },
-               {
-                  "charge":0.0,
-                  "charge_corrected":0.0,
-                  "delta_t":0,
-                  "emr_bars":[
-                     {
-                        "bar":1,
-                        "emr_bar_hits":[
-                           {
-                              "charge_corrected":0.0,
-                              "delta_t":0,
-                              "hittime":-28171,
-                              "tot":10,
-                              "total_charge_corrected":0.0,
-                              "x":0.0,
-                              "ex":0.0,
-                              "y":0.0,
-                              "ey":0.0,
-                              "z":0.0,
-                              "ez":0.0
-                           }
-                        ]
-                     },
-                     {
-                        "bar":2,
-                        "emr_bar_hits":[
-                           {
-                              "charge_corrected":0.0,
-                              "delta_t":0,
-                              "hittime":-28171,
-                              "tot":15,
-                              "total_charge_corrected":0.0,
-                              "x":0.0,
-                              "ex":0.0,
-                              "y":0.0,
-                              "ey":0.0,
-                              "z":0.0,
-                              "ez":0.0
-                           }
-                        ]
-                     }
-                  ],
-                  "emr_bars_primary":[
-
-                  ],
-                  "emr_bars_secondary":[
-
-                  ],
-                  "orientation":0,
-                  "pedestal_area":0.0,
-                  "plane":28,
-                  "run":0,
-                  "samples":[
-
-                  ],
-                  "spill":1,
-                  "time":0,
-                  "trigger":3
-               },
-               {
-                  "charge":0.0,
-                  "charge_corrected":0.0,
-                  "delta_t":0,
-                  "emr_bars":[
-                     {
-                        "bar":34,
-                        "emr_bar_hits":[
-                           {
-                              "charge_corrected":0.0,
-                              "delta_t":0,
-                              "hittime":-28172,
-                              "tot":20,
-                              "total_charge_corrected":0.0,
-                              "x":0.0,
-                              "ex":0.0,
-                              "y":0.0,
-                              "ey":0.0,
-                              "z":0.0,
-                              "ez":0.0
-                           }
-                        ]
-                     }
-                  ],
-                  "emr_bars_primary":[
-
-                  ],
-                  "emr_bars_secondary":[
-
-                  ],
-                  "orientation":0,
-                  "pedestal_area":0.0,
-                  "plane":29,
-                  "run":0,
-                  "samples":[
-
-                  ],
-                  "spill":1,
-                  "time":0,
-                  "trigger":3
-               }
-            ],
-            "has_primary":false,
-            "has_secondary":false,
-            "initial_trigger":false,
-            "range_primary":0.0,
-            "range_secondary":0.0,
-            "secondary_to_primary_track_distance":0.0,
-            "total_charge_MA":0.0,
-            "total_charge_SA":0.0
-         },
-         "part_event_number":3
       }
    ],
    "run_number":1234,
-   "spill_number":1
+   "spill_number":1,
+   "emr_spill_data":{
+      "emr_plane_hits":[
+         {
+            "charge":0.0,
+            "charge_corrected":0.0,
+            "delta_t":0,
+            "emr_bars":[
+               {
+                  "bar":3,
+                  "emr_bar_hits":[
+                     {
+                        "charge_corrected":0.0,
+                        "delta_t":0,
+                        "hittime":-28171,
+                        "tot":10,
+                        "total_charge_corrected":0.0,
+                        "x":0.0,
+                        "ex":0.0,
+                        "y":0.0,
+                        "ey":0.0,
+                        "z":0.0,
+                        "ez":0.0
+                     }
+                  ]
+               }
+            ],
+            "emr_bars_primary":[
+
+            ],
+            "emr_bars_secondary":[
+
+            ],
+            "orientation":0,
+            "pedestal_area":0.0,
+            "plane":26,
+            "run":0,
+            "samples":[
+
+            ],
+            "spill":1,
+            "time":0,
+            "trigger":3
+         },
+         {
+            "charge":0.0,
+            "charge_corrected":0.0,
+            "delta_t":0,
+            "emr_bars":[
+               {
+                  "bar":32,
+                  "emr_bar_hits":[
+                     {
+                        "charge_corrected":0.0,
+                        "delta_t":0,
+                        "hittime":-28172,
+                        "tot":27,
+                        "total_charge_corrected":0.0,
+                        "x":0.0,
+                        "ex":0.0,
+                        "y":0.0,
+                        "ey":0.0,
+                        "z":0.0,
+                        "ez":0.0
+                     }
+                  ]
+               },
+               {
+                  "bar":33,
+                  "emr_bar_hits":[
+                     {
+                        "charge_corrected":0.0,
+                        "delta_t":0,
+                        "hittime":-28172,
+                        "tot":20,
+                        "total_charge_corrected":0.0,
+                        "x":0.0,
+                        "ex":0.0,
+                        "y":0.0,
+                        "ey":0.0,
+                        "z":0.0,
+                        "ez":0.0
+                     }
+                  ]
+               }
+            ],
+            "emr_bars_primary":[
+
+            ],
+            "emr_bars_secondary":[
+
+            ],
+            "orientation":1,
+            "pedestal_area":0.0,
+            "plane":27,
+            "run":0,
+            "samples":[
+
+            ],
+            "spill":1,
+            "time":0,
+            "trigger":3
+         },
+         {
+            "charge":0.0,
+            "charge_corrected":0.0,
+            "delta_t":0,
+            "emr_bars":[
+               {
+                  "bar":1,
+                  "emr_bar_hits":[
+                     {
+                        "charge_corrected":0.0,
+                        "delta_t":0,
+                        "hittime":-28171,
+                        "tot":10,
+                        "total_charge_corrected":0.0,
+                        "x":0.0,
+                        "ex":0.0,
+                        "y":0.0,
+                        "ey":0.0,
+                        "z":0.0,
+                        "ez":0.0
+                     }
+                  ]
+               },
+               {
+                  "bar":2,
+                  "emr_bar_hits":[
+                     {
+                        "charge_corrected":0.0,
+                        "delta_t":0,
+                        "hittime":-28171,
+                        "tot":15,
+                        "total_charge_corrected":0.0,
+                        "x":0.0,
+                        "ex":0.0,
+                        "y":0.0,
+                        "ey":0.0,
+                        "z":0.0,
+                        "ez":0.0
+                     }
+                  ]
+               }
+            ],
+            "emr_bars_primary":[
+
+            ],
+            "emr_bars_secondary":[
+
+            ],
+            "orientation":0,
+            "pedestal_area":0.0,
+            "plane":28,
+            "run":0,
+            "samples":[
+
+            ],
+            "spill":1,
+            "time":0,
+            "trigger":3
+         },
+         {
+            "charge":0.0,
+            "charge_corrected":0.0,
+            "delta_t":0,
+            "emr_bars":[
+               {
+                  "bar":34,
+                  "emr_bar_hits":[
+                     {
+                        "charge_corrected":0.0,
+                        "delta_t":0,
+                        "hittime":-28172,
+                        "tot":20,
+                        "total_charge_corrected":0.0,
+                        "x":0.0,
+                        "ex":0.0,
+                        "y":0.0,
+                        "ey":0.0,
+                        "z":0.0,
+                        "ez":0.0
+                     }
+                  ]
+               }
+            ],
+            "emr_bars_primary":[
+
+            ],
+            "emr_bars_secondary":[
+
+            ],
+            "orientation":0,
+            "pedestal_area":0.0,
+            "plane":29,
+            "run":0,
+            "samples":[
+
+            ],
+            "spill":1,
+            "time":0,
+            "trigger":3
+         }
+      ]
+   }
 }

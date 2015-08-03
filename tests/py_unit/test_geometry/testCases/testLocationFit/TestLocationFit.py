@@ -70,7 +70,9 @@ def testFittingPulls(): #pylint disable=C0324
                 ";Rotation Pull Z (mm);Entries per 0.02#sigma",
                 300,-10.0,10.0)
     # Initialize the fitting algorithm
-    fittest = ElementRotationTranslation()
+    base = os.path.expandvars("${MAUS_ROOT_DIR}/tests/py_unit/test_geometry"+\
+                              "/testCases/testLocationFit/")
+    fittest = ElementRotationTranslation(base)
     # Get the data from the GDML file as
     # required by the configuration
     fourPoints = 'MICE_Information/Detector_Information/EMR'

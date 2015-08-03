@@ -28,11 +28,8 @@ def run():
     my_map.append(MAUS.MapCppTOFDigits())
     my_map.append(MAUS.MapCppTOFSlabHits())
     my_map.append(MAUS.MapCppTOFSpacePoints())
-    my_map.append(MAUS.MapPyCkov())
-    #my_map.append(MAUS.MapPyCkovTOF())
-    #my_map.append(MAUS.MapPyCkovSecondPeaks())
+    my_map.append(MAUS.MapCppCkovDigits())
     reducer = MAUS.ReducePyCkov()
-    #reducer = MAUS.ReducePyDoNothing()
     #  The Go() drives all the components you pass in then put all the output
     #  into a file called 'mausput'
     MAUS.Go(my_input, my_map, reducer, MAUS.OutputPyImage())
