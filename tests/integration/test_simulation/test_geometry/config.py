@@ -23,7 +23,7 @@ the spill and various distributions for difference particle types
 import os
 mrd = os.environ["MAUS_ROOT_DIR"]
 
-spill_generator_number_of_spills = 1
+spill_generator_number_of_spills = 5
 verbose_level = 0
 beam = {
     "particle_generator":"counter", # routine for generating empty primaries

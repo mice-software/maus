@@ -156,6 +156,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
       } // ends loop over all the array
 
       a_digit->set_npe(nPE);
+      a_digit->set_adc(150); // Just to test it
       digits.push_back(a_digit);
     }
   } // ends 'for' loop over hits
@@ -199,6 +200,7 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noises,
                                            noises->at(noise_j).GetChannel(),
                                            noises->at(noise_j).GetNPE(),
                                            noises->at(noise_j).GetTime());
+      a_digit->set_adc(57);
       digits.push_back(a_digit);
     }
   }

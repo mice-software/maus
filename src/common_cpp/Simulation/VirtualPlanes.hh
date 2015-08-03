@@ -30,7 +30,7 @@
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
-#include "src/legacy/Interface/VirtualHit.hh"
+#include "src/common_cpp/DataStructure/VirtualHit.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 #include "src/legacy/BeamTools/BTFieldGroup.hh"
 
@@ -147,7 +147,7 @@ class VirtualPlane {
    *  If _radialExtent is positive checks radius of particles (cylindrical
    *  type radius, in coordinate system of the Virtual Plane).
    */
-  VirtualHit BuildNewHit(const G4Step * aStep, int station) const;
+  MAUS::VirtualHit BuildNewHit(const G4Step * aStep, int station) const;
 
   /** @brief Comparator for sorting by independent variable
    */
@@ -201,13 +201,16 @@ class VirtualPlane {
    */
   bool GetAllowBackwards() {return _allowBackwards;}
 
+  static ::CLHEP::Hep3Vector MAUSToCLHEP(MAUS::ThreeVector value);
+  static MAUS::ThreeVector CLHEPToMAUS(::CLHEP::Hep3Vector value);
+
  private:
   // Build a new hit and send it to the MICEEvent
-  void FillBField(VirtualHit * aHit, const G4Step * aStep) const;
-  void FillStaticData(VirtualHit * aHit, const G4Step * aStep) const;
-  void FillKinematics(VirtualHit * aHit, const G4Step * aStep) const;
+  void FillBField(MAUS::VirtualHit * aHit, const G4Step * aStep) const;
+  void FillStaticData(MAUS::VirtualHit * aHit, const G4Step * aStep) const;
+  void FillKinematics(MAUS::VirtualHit * aHit, const G4Step * aStep) const;
 
-  void TransformToLocalCoordinates(VirtualHit* aHit) const;
+  void TransformToLocalCoordinates(MAUS::VirtualHit* aHit) const;
 
   double*   Integrate(G4StepPoint* aPoint) const;
   double*   ExtractPointData(G4StepPoint* aPoint) const;
@@ -283,8 +286,6 @@ class VirtualPlaneManager {
    *          side of one (or more) virtual planes; try to find the VirtualHit
    *          if this is the case
    *  @params track puts tracks into the "Virtual" branch of the track
-   *
-   *  @returns Json::Value with VirtualPlanes hits appended
    */
   void VirtualPlanesSteppingAction(const G4Step * aStep);
 
@@ -321,10 +322,6 @@ class VirtualPlaneManager {
    */
   Json::Value WriteHit(VirtualHit hit);
 
-  /** @brief Read the hit from the Json::Value
-   */
-  VirtualHit ReadHit(Json::Value value);
-
   /** @brief Add plane to the manager
    *
    *  @params plane is the plane to be added. Note VirtualPlaneManager now takes
@@ -353,16 +350,23 @@ class VirtualPlaneManager {
    */
   void RemovePlane(VirtualPlane* plane);
 
-  /** @brief Get Json array of all recorded virtual hits since StartOfEvent()
+  /** @brief Get all recorded virtual hits since StartOfEvent().
+   *  VirtualPlaneManager still owns memory assigned to _hits.
    */
-  Json::Value GetVirtualHits() {return _hits;}
+  std::vector<VirtualHit>* GetVirtualHits() {return _hits;}
+
+  /** @brief Get all recorded virtual hits since StartOfEvent(). Caller owns
+   *  memory assigned to hits.
+   */
+  std::vector<VirtualHit>* TakeVirtualHits();
+
 
   /** @brief Set Json array of virtual hits
    *
    *  @params hits array of virtual hits; if hits is not a Json::arrayValue,
    *          throws an exception
    */
-  void SetVirtualHits(Json::Value hits);
+  void SetVirtualHits(std::vector<VirtualHit>* hits);
 
   /** @brief Get flag to tell whether VirtualPlanes are active
    *
@@ -378,14 +382,12 @@ class VirtualPlaneManager {
   VirtualPlane ConstructFromModule(const MiceModule* mod);
   VirtualPlane* PlaneFromStation(int station);  // get plane from station number
 
-  ::CLHEP::Hep3Vector JsonToThreeVector(Json::Value value, std::string name);
-
   bool                      _useVirtualPlanes;
   std::vector<VirtualPlane*> _planes;
   // associate MiceModule with each plane in _planes
   std::map<VirtualPlane*, const MiceModule*>  _mods;
   std::vector<int>          _nHits;  // numberOfHits in each plane
-  Json::Value               _hits;
+  std::vector<VirtualHit>*  _hits;
 };
 }
 #endif

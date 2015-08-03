@@ -22,8 +22,8 @@
 #include "Interface/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
-#include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "Config/MiceModule.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 #include "src/map/MapCppKLCellHits/MapCppKLCellHits.hh"
 
@@ -34,7 +34,7 @@ PyMODINIT_FUNC init_MapCppKLCellHits(void) {
                                           ("MapCppKLCellHits", "", "", "", "");
 }
 
-MapCppKLCellHits::MapCppKLCellHits() : MapBase<Json::Value>("MapCppKLCellHits") {
+MapCppKLCellHits::MapCppKLCellHits() : MapBase<MAUS::Data>("MapCppKLCellHits") {
 }
 
 void MapCppKLCellHits::_birth(const std::string& argJsonConfigDocument) {
@@ -60,133 +60,86 @@ void MapCppKLCellHits::_birth(const std::string& argJsonConfigDocument) {
 
 void MapCppKLCellHits::_death()  {}
 
-void MapCppKLCellHits::_process(Json::Value* data) const {
-  if (!data) {
-      throw MAUS::Exception(Exception::recoverable,
-                            "data was NULL", "MapCppKLCellHits::_process");
+void MapCppKLCellHits::_process(MAUS::Data* data) const {
+
+  // Get spill, break if there's no DAQ data
+  Spill *spill = data->GetSpill();
+
+  if (spill->GetReconEvents() == NULL)
+    return;
+
+  if (spill->GetDaqEventType() != "physics_event")
+    return;
+
+  ReconEventPArray *events = spill->GetReconEvents();
+  int nPartEvents = events->size();
+
+  for (int xPE = 0; xPE < nPartEvents; xPE++) {
+    KLDigitArray *kl_digits = (events->at(xPE))->GetKLEvent()
+                                   ->GetKLEventDigitPtr()->GetKLDigitArrayPtr();
+    KLCellHitArray *kl_cellHits = (events->at(xPE))->GetKLEvent()
+                                     ->GetKLEventCellHitPtr()->GetKLCellHitArrayPtr();
+    this->makeCellHits(kl_cellHits, kl_digits);
   }
-  Json::Value& root = *data;
-  //  JsonCpp setup
-  Json::Value xEventType = JsonWrapper::GetProperty(root,
-                                        "daq_event_type",
-  JsonWrapper::stringValue);
-  if (xEventType== "physics_event" || xEventType == "calibration_event") {
-    Json::Value events = JsonWrapper::GetProperty(root,
-                                                  "recon_events",
-                                                  JsonWrapper::arrayValue);
-    for (unsigned int n_event = 0; n_event < events.size(); n_event++) {
-      Json::Value xDocKlEvent = JsonWrapper::GetItem(events,
-                                                      n_event,
-                                                      JsonWrapper::objectValue);
-      xDocKlEvent = JsonWrapper::GetProperty(xDocKlEvent,
-                                             "kl_event",
-                                             JsonWrapper::objectValue);
-      if (root["recon_events"][n_event]["kl_event"].isMember("kl_digits")) {
+}
 
-          root["recon_events"][n_event]["kl_event"]["kl_cell_hits"] =
-                                                 Json::Value(Json::objectValue);
+void MapCppKLCellHits::makeCellHits(KLCellHitArray* kl_CellHits, KLDigitArray* kl_digits) const {
 
-          Json::Value xDocPartEvent = JsonWrapper::GetProperty(xDocKlEvent,
-                                                        "kl_digits",
-                                                        JsonWrapper::objectValue);
+  int n_digits = kl_digits->size();
+  if (n_digits == 0)
+    return;
 
-          xDocPartEvent = JsonWrapper::GetProperty(xDocPartEvent,
-                                                          "kl",
-                                                          JsonWrapper::anyValue);
+  // Create a map of all hited PMTs.
+  std::map<string, int> xDigitPos;
+  std::map<string, int>::iterator it;
 
+  for (int xDigit = 0; xDigit < n_digits; xDigit++) {
+    std::string xKeyStr = (*kl_digits)[xDigit].GetKlKey();
+    KLChannelKey xKey(xKeyStr);
+    // Add this PMT to the map.
+    xDigitPos[xKeyStr] = xDigit;
+  }
+  while ( xDigitPos.size() > 1 ) {
+    // Get the first element of the map and check if we have a hit
+    // at the opposite side of the slab.
+    it = xDigitPos.begin();
+    KLChannelKey xKey(it->first);
 
-          Json::Value xDocCellHits = makeCellHits(xDocPartEvent);
-
-          root["recon_events"][n_event]["kl_event"]["kl_cell_hits"]["kl"] = xDocCellHits;
+    // Get the opposite PMT coded as string.
+    std::string xOppositPmtKey_str = xKey.GetOppositeSidePMTStr();
+    if (xDigitPos.find(xOppositPmtKey_str) != xDigitPos.end()) {
+      // Create Cell hit.
+      KLCellHit xTheCellHit;
+      if (xKey.pmt() == 0) {
+        this->fillCellHit(xTheCellHit, (*kl_digits)[it->second],
+                                       (*kl_digits)[xDigitPos[xOppositPmtKey_str]]);
       }
+
+      if (xKey.pmt() == 1) {
+        this->fillCellHit(xTheCellHit, (*kl_digits)[xDigitPos[xOppositPmtKey_str]],
+                                       (*kl_digits)[it->second]);
+      }
+
+      kl_CellHits->push_back(xTheCellHit);
+      // Erase both used hits from the map.
+      xDigitPos.erase(it);
+      xDigitPos.erase(xOppositPmtKey_str);
+    } else {
+      // Erese this hit from the map.
+      xDigitPos.erase(it);
     }
   }
 }
 
-Json::Value MapCppKLCellHits::makeCellHits(Json::Value xDocPartEvent) const {
+void MapCppKLCellHits::fillCellHit(KLCellHit &cellHit, KLDigit &xDigit0, KLDigit &xDigit1) const {
 
-  Json::Value xDocCellHits;
-  if (xDocPartEvent.isArray()) {
-    int n_digits = xDocPartEvent.size();
-    // Create a map of all hited PMTs.
-    std::map<string, int> xDigitPos;
-    std::map<string, int>::iterator it;
-
-    // Loop ovew the digits.
-    for (int Digit = 0; Digit < n_digits; Digit++) {
-      // Get the digit.
-      Json::Value xThisDigit =
-      JsonWrapper::GetItem(xDocPartEvent, Digit, JsonWrapper::objectValue);
-
-      std::string xKeyStr =
-      JsonWrapper::GetProperty(xThisDigit,
-                               "kl_key",
-                               JsonWrapper::stringValue).asString();
-
-      KLChannelKey xKey(xKeyStr);
-
-      // Add this PMT to the map.
-      xDigitPos[xKeyStr] = Digit;
-    }
-
-    // Now loop over the map of hited PMTs and create Cell hits.
-    while ( xDigitPos.size() > 1 ) {
-      // Get the first element of the map and check if we have a hit
-      // at the opposite side of the cell.
-      it = xDigitPos.begin();
-      KLChannelKey xKey(it->first);
-
-      // Get the digit.
-      Json::Value xThisDigit =
-      JsonWrapper::GetItem(xDocPartEvent, it->second, JsonWrapper::objectValue);
-
-      // Get the opposite PMT coded as string.
-      std::string xOppositPmtKey_str = xKey.GetOppositeSidePMTStr();
-      if (xDigitPos.find(xOppositPmtKey_str) != xDigitPos.end()) {
-        Json::Value xDocTheCellHit;
-        Json::Value xOtherDigit = JsonWrapper::GetItem(xDocPartEvent,
-                                                       xDigitPos[xOppositPmtKey_str],
-                                                       JsonWrapper::objectValue);
-        // Create Cell hit.
-        if (xKey.pmt() == 0) {
-          xDocTheCellHit = fillCellHit(xThisDigit, xOtherDigit);
-        }
-        if (xKey.pmt() == 1) {
-          xDocTheCellHit = fillCellHit(xOtherDigit, xThisDigit);
-        }
-        xDocCellHits.append(xDocTheCellHit);
-        // Erase both used hits from the map.
-        xDigitPos.erase(it);
-        xDigitPos.erase(xOppositPmtKey_str);
-      } else {
-        // Erese this hit from the map.
-        xDigitPos.erase(it);
-      }
-    }
-  }
-  // std::cout << xDocCellHits <<std::endl;
-  return xDocCellHits;
-}
-
-Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xDocDigit1) const {
-  Json::Value xDocCellHit, xDocPMT0, xDocPMT1;
-
-  // std::cout << "xDocPMT0 " << xDocDigit0["kl_key"] << std::endl;
-  // std::cout << "xDocPMT1 " << xDocDigit1["kl_key"] << std::endl;
-  xDocPMT1["kl_key"] = xDocDigit1["kl_key"];
-  // Use the information from the digits to fill the cell hit.
-  std::string xKeyStr = JsonWrapper::GetProperty(xDocDigit0,
-                                                 "kl_key",
-                                                 JsonWrapper::stringValue).asString();
+  std::string xKeyStr = xDigit0.GetKlKey();
   KLChannelKey xKey(xKeyStr);
-  xDocPMT0["kl_key"] = xDocDigit0["kl_key"];
-  xDocPMT1["kl_key"] = xDocDigit1["kl_key"];
+  cellHit.SetCell(xKey.cell());
+  cellHit.SetDetector(xKey.detector());
+  cellHit.SetPartEventNumber(xDigit0.GetPartEventNumber());
+  cellHit.SetPhysEventNumber(xDigit0.GetPhysEventNumber());
 
-  xDocCellHit["cell"]     = xKey.cell();
-  xDocCellHit["detector"] = xKey.detector();
-
-  xDocCellHit["part_event_number"] = xDocDigit0["part_event_number"];
-  xDocCellHit["phys_event_number"] = xDocDigit0["phys_event_number"];
 
   // cell global position
   // find the geo module corresponding to this hit
@@ -229,43 +182,30 @@ Json::Value MapCppKLCellHits::fillCellHit(Json::Value xDocDigit0, Json::Value xD
     cellLocalPos.setZ(-9999999.);
   }
 
-  xDocCellHit["global_pos_x"] = cellGlobalPos.x();
-  xDocCellHit["global_pos_y"] = cellGlobalPos.y();
-  xDocCellHit["global_pos_z"] = cellGlobalPos.z();
-  xDocCellHit["local_pos_x"] = cellLocalPos.x();
-  xDocCellHit["local_pos_y"] = cellLocalPos.y();
-  xDocCellHit["local_pos_z"] = cellLocalPos.z();
-  xDocCellHit["err_x"] = cellErrorPos.x();
-  xDocCellHit["err_y"] = cellErrorPos.y();
-  xDocCellHit["err_z"] = cellErrorPos.z();
+
+  cellHit.SetGlobalPosX(cellGlobalPos.x());
+  cellHit.SetGlobalPosY(cellGlobalPos.y());
+  cellHit.SetGlobalPosZ(cellGlobalPos.z());
+  cellHit.SetLocalPosX(cellLocalPos.x());
+  cellHit.SetLocalPosY(cellLocalPos.y());
+  cellHit.SetLocalPosZ(cellLocalPos.z());
+  cellHit.SetErrorX(cellErrorPos.x());
+  cellHit.SetErrorY(cellErrorPos.y());
+  cellHit.SetErrorZ(cellErrorPos.z());
 
   // Charge of the digit can be unset because of the Zero suppresion of the fADCs.
-  if (xDocDigit0.isMember("charge_mm") && xDocDigit1.isMember("charge_mm")) {
-    int xChargeDigit0 = JsonWrapper::GetProperty(xDocDigit0,
-                                                 "charge_mm",
-                                                 JsonWrapper::intValue).asInt();
 
-    int xChargeDigit1 = JsonWrapper::GetProperty(xDocDigit1,
-                                                 "charge_mm",
-                                                 JsonWrapper::intValue).asInt();
 
-    xDocPMT0["charge"] = xChargeDigit0;
-    xDocPMT1["charge"] = xChargeDigit1;
-    xDocCellHit["charge"] = (xChargeDigit0 + xChargeDigit1)/2;
-    if (xDocCellHit["charge"] == 0) {
-        xDocCellHit["charge_product"] = 0;
-        xDocCellHit["flag"] = false;
-    } else {
-        xDocCellHit["charge_product"] = 2 * xChargeDigit0 * xChargeDigit1 /
-                                        (xChargeDigit0 + xChargeDigit1);
-        xDocCellHit["flag"] = true;
-    }
+  int xChargeDigit0 = xDigit0.GetChargeMm();
+  int xChargeDigit1 = xDigit1.GetChargeMm();
+  cellHit.SetCharge((xChargeDigit0 + xChargeDigit1)/2);
+  if ((xChargeDigit0 + xChargeDigit1) == 0) {
+     cellHit.SetChargeProduct(0);
+     cellHit.SetFlag(false);
+  } else {
+     cellHit.SetChargeProduct(2 * xChargeDigit0 * xChargeDigit1 /
+                                        (xChargeDigit0 + xChargeDigit1));
+     cellHit.SetFlag(true);
   }
-
-//  xDocCellHit["pmt0"] = xDocPMT0;
-//  xDocCellHit["pmt1"] = xDocPMT1;
-
-
-  return xDocCellHit;
 }
 }

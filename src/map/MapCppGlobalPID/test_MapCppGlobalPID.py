@@ -210,6 +210,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
         for line in fin:
             result = self.mapper.process(line)
             spill_out = maus_cpp.converter.json_repr(result)
+            print spill_out
             self.assertTrue('recon_events' in spill_out)
             revtarray = spill_out['recon_events']
             self.assertEqual(1, len(revtarray))

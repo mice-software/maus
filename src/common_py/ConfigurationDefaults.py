@@ -702,6 +702,9 @@ custom_pid_set = "PIDVarB"
 # are selected as the correct hypothesis
 pid_confidence_level = 5
 
+root_document_store_timeout = 10
+root_document_store_poll_time = 1
+
 geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
     "will_plot":True,

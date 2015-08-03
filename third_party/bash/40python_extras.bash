@@ -20,7 +20,7 @@ download_package_list="\
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
  pymongo==2.3 readline matplotlib==1.1.0 scons==2.2.0\
- pil django==1.5.1 magickwand
+ pil django==1.5.1 magickwand psutil==3.0.1
 "
 # scons v2.2.0 is no longer on pypi
 # temporary hack to specify the download url for scons==2.2.0
@@ -35,7 +35,7 @@ package_list="\
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
  pymongo scons readline matplotlib \
- pil django magickwand
+ pil django magickwand psutil
 "
 # note numpy was installed previously, not in this script. We test it's import
 # here for convenience

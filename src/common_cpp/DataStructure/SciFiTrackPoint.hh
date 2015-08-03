@@ -113,17 +113,9 @@ class SciFiTrackPoint : public TObject {
    */
   void set_smoothed_residual(double s_residual) { _smoothed_residual = s_residual; }
 
-   /** @brief Set the mother cluster using a TRef*.
+  /** @brief Set to true if a cluster was present
    */
-  void set_cluster(TRef* const cluster)         { _cluster = cluster; }
-
-  /** @brief Set the mother cluster using a SciFiCluster*.
-   */
-  void set_cluster_tobject(TObject* const cluster)         { *_cluster = cluster; }
-
-  /** @brief Set the mother cluster using a SciFiCluster*.
-   */
-  void set_cluster_pointer(SciFiCluster* const cluster)    { *_cluster = cluster; }
+  void set_has_data(bool has_data) { _has_data = has_data; }
 
 
   /** @brief  Returns the tracker number.
@@ -182,18 +174,9 @@ class SciFiTrackPoint : public TObject {
    */
   int event()                        const { return _event; }
 
-  /** @brief  Returns the mother clusters as a TRef*.
+  /** @brief Returns true ig a cluster was present
    */
-  TRef* get_cluster()                const { return _cluster; }
-
-  /** @brief  Returns the mother cluster as a TObject pointer
-   */
-  TObject* get_cluster_tobject()     const { return _cluster->GetObject(); }
-
-  /** @brief  Returns the mother clusters as an array of pointers.
-   */
-  SciFiCluster* get_cluster_pointer() const
-                { return static_cast<SciFiCluster*>(_cluster->GetObject()); }
+  bool has_data()                    const { return _has_data; }
 
  private:
   /** @brief The number of the spill the trackpoint belongs to.
@@ -252,9 +235,9 @@ class SciFiTrackPoint : public TObject {
    */
   double _smoothed_residual;
 
-  /** @brief A pointer to the cluster used to form the state - does not assume control of memory
+  /** @brief record if a cluster was present
    */
-  TRef* _cluster;
+  bool _has_data;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrackPoint)
 };

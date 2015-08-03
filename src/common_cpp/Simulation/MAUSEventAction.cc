@@ -19,6 +19,10 @@
 
 #include "src/common_cpp/Utils/Exception.hh"
 
+#include "src/common_cpp/DataStructure/Step.hh"
+#include "src/common_cpp/DataStructure/Track.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
+
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSEventAction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
@@ -43,40 +47,40 @@ void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
                         "EventAction::BeginOfEventAction"));
     _virtPlanes->StartOfEvent();
     if (_tracking->GetWillKeepTracks())
-        _tracking->SetTracks(Json::Value(Json::arrayValue));
-    if (_stepping->GetWillKeepSteps())
-        _stepping->SetSteps(Json::Value(Json::arrayValue));
+        _tracking->SetTracks(new std::vector<Track>());
     _geometry->ClearSDHits();
 }
 
 void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
     //  For each detector i
-    if (_primary >= _events.size())
+    if (_primary >= _events->size())
         throw(Exception(Exception::recoverable,
                      "Ran out of space in event array",
                      "MAUSEventAction::EndOfEventAction"));
+    _events->at(_primary)->SetSciFiHits(new std::vector<SciFiHit>());
+    _events->at(_primary)->SetSciFiNoiseHits(new std::vector<SciFiNoiseHit>());
+    _events->at(_primary)->SetTOFHits(new std::vector<TOFHit>());
+    _events->at(_primary)->SetKLHits(new std::vector<KLHit>());
+    _events->at(_primary)->SetEMRHits(new std::vector<EMRHit>());
+    _events->at(_primary)->SetSpecialVirtualHits(new std::vector<SpecialVirtualHit>());
     for (int i = 0; i < _geometry->GetSDSize(); i++) {
       //  Retrieve detector i's hits
-      Json::Value hits = _geometry->GetSDHits(i);
-      _events[_primary] = JsonWrapper::ObjectMerge(_events[_primary], hits);
+      _geometry->GetSDHits(i, (*_events)[_primary]);
     }
-    if (_tracking->GetWillKeepTracks())
-        _events[_primary]["tracks"] = _tracking->GetTracks();
-    if (_virtPlanes->GetWillUseVirtualPlanes())
-        _events[_primary]["virtual_hits"] = _virtPlanes->GetVirtualHits();
+    if (_tracking->GetWillKeepTracks()) {
+        (*_events)[_primary]->SetTracks(_tracking->TakeTracks());
+    } else {
+        (*_events)[_primary]->SetTracks(new std::vector<Track>());
+    }
+    if (_virtPlanes->GetWillUseVirtualPlanes()) {
+        (*_events)[_primary]->SetVirtualHits(_virtPlanes->TakeVirtualHits());
+    } else {
+        (*_events)[_primary]->SetVirtualHits(new std::vector<VirtualHit>());
+    }
     _primary++;
 }
 
-void MAUSEventAction::SetEvents(Json::Value events) {
-    if (!events.isArray())
-        throw(Exception(Exception::recoverable, "Particles must be an array value",
-                     "MAUSEventAction::SetEvent"));
-    for (size_t i = 0; i < events.size(); ++i) {
-        if (!events[Json::Value::ArrayIndex(i)].isObject())
-            throw(Exception(Exception::recoverable,
-                         "Each Particle must be an object value",
-                         "MAUSEventAction::SetEvent"));
-    }
+void MAUSEventAction::SetEvents(std::vector<MCEvent*>* events) {
     _events = events;
     _primary = 0;
 
@@ -87,6 +91,12 @@ void MAUSEventAction::SetEvents(Json::Value events) {
     _tracking = _g4manager->GetTracking();
     _geometry = _g4manager->GetGeometry();
     _stepping = _g4manager->GetStepping();
+}
+
+std::vector<MCEvent*>* MAUSEventAction::TakeEvents() {
+  std::vector<MCEvent*>* event_tmp = _events;
+  _events = NULL;
+  return event_tmp;
 }
 }
 

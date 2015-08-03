@@ -50,6 +50,9 @@ class KLEventCellHit {
     /** Returns KLCellHitArray */
     KLCellHitArray GetKLCellHitArray() const;
 
+    /** Returns KLCellHitArray */
+    KLCellHitArray* GetKLCellHitArrayPtr();
+
     /** Get an element from KLCellHitArray (needed for PyROOT) */
     KLCellHit GetKLCellHitArrayElement(size_t index) const;
 

@@ -46,12 +46,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Default constructor */
     SciFiHelicalPRTrack();
 
-    /** Constructor from SimpleCircle and SimpleLine */
-    SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
-                        SimpleCircle circle, SimpleLine line_sz, double chisq, double chisq_dof,
-                        double point_spread, DoubleArray phi, SciFiSpacePointPArray spoints,
-                        const DoubleArray& covariance);
-
     /** Constructor from SimpleCircle and SimpleLine Without explicit chi squared setting */
     SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
                         SimpleCircle circle, SimpleLine line_sz, double point_spread,
@@ -145,18 +139,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Set the chi^2 of the circle fit in x-y */
     void set_circle_chisq(double circle_chisq) { _circle_chisq = circle_chisq; }
 
-    /** Get the chi^2 of the final helix fit, if used */
-    double get_chisq() const { return _chisq; }
-
-    /** Set the chi^2 of the final helix fit, if used */
-    void set_chisq(double chisq) { _chisq = chisq; }
-
-    /** Get the chi^2 per degree of freedom of the final helix fit, if used */
-    double get_chisq_dof() const { return _chisq_dof; }
-
-    /** Set the chi^2 per degree of freedom of the final helix fit, if used */
-    void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
-
     /** Get the point spread (summed separations) in x - y of the seed spacepoints */
     double get_point_spread() const { return _point_spread; }
 
@@ -181,8 +163,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     double _circle_x0;
     double _circle_y0;
     double _circle_chisq;
-    double _chisq;
-    double _chisq_dof;
     double _point_spread;
 
     ThreeVector _pos0; // Intercept of helix with tracker reference surface, not used at present

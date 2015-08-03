@@ -72,7 +72,7 @@ class SciFiClusterRec {
   /** @brief Loops over digits and accepts those above npe cut as seeds.
    * @arg The particle event.
    */
-  std::vector<SciFiDigit*> get_seeds(SciFiEvent &evt) const;
+  void get_seeds(SciFiEvent &evt, std::vector<SciFiDigit*>& seeds) const;
 
   /** @brief
    * @arg

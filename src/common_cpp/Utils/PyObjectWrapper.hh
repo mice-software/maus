@@ -47,6 +47,7 @@ class JobHeaderData;
 class JobFooterData;
 class RunHeaderData;
 class RunFooterData;
+class ImageData;
 
 /* @brief PyObjectWrapper handles wrapping and unwrapping of python objects
  *
@@ -56,10 +57,14 @@ class RunFooterData;
  * unwrapping process is not lazy and will perform any required conversions to
  * get the correct C++ data structure.
  *
- * The following C++ objects can be used. A brief description is given of the
- * resultant python object. The C++ object that is used is controlled by the
- * templates, while the Python object is always a PyObject*
+ * The following C++ objects can be used. The C++ object that is used is
+ * controlled by the templates, while the Python object is always a PyObject*
  *   - MAUS::Data -> PyROOT ROOT.MAUS.Data object
+ *   - MAUS::JobHeaderData -> PyROOT ROOT.MAUS.JobHeaderData object
+ *   - MAUS::RunHeaderData -> PyROOT ROOT.MAUS.RunHeaderData object
+ *   - MAUS::RunFooterData -> PyROOT ROOT.MAUS.RunFooterData object
+ *   - MAUS::JobFooterData -> PyROOT ROOT.MAUS.JobFooterData object
+ *   - MAUS::ImageData -> PyROOT ROOT.MAUS.ImageData object
  *   - Json::Value -> PyCapsule* with type string "JsonCpp"
  *   - std::string -> PyObject* string
  *   - PyObject* dict -> PyObject* dict; presumed to be a PyJson structure
@@ -149,6 +154,18 @@ class PyObjectWrapper {
      */
     static inline PyObject* wrap(MAUS::RunFooterData* data);
 
+    /* @brief Wrap a MAUS::ImageData into a PyObject*
+     *
+     * @param data - the input value to be wrapped. Python takes ownership of
+     *     memory pointed to by data.
+     *
+     * @returns a block of memory that is now owned by Python (Py_INCREF is
+     *  called).
+     *
+     * @throws MAUS::Exception if output is NULL
+     */
+    static inline PyObject* wrap(MAUS::ImageData* data);
+
     /* @brief Wrap a Json::Value into a PyObject*
      *
      * @param data - the input value to be wrapped. Python takes ownership of
@@ -202,7 +219,8 @@ class PyObjectWrapper {
                             JobHeaderData** jh_ret,
                             JobFooterData** jf_ret,
                             RunHeaderData** rh_ret,
-                            RunFooterData** rf_ret);
+                            RunFooterData** rf_ret,
+                            ImageData** image_ret);
 
     // parse a PyROOT ObjectProxy into a C++ Event object
     //
