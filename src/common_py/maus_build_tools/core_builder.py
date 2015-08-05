@@ -62,7 +62,7 @@ def build_lib_maus_cpp(env):
     """
     
     # Magic to sort scons quirk when building object files first
-    env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
+    env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
     
     # Find the common_cpp and legacy cpp source files
     legacy_cpp_files = glob.glob("src/legacy/*/*cc") + \
