@@ -206,7 +206,7 @@ def set_cpp(conf, env):
     if not conf.CheckCXXHeader('iostream', '<>'):
         my_exit(1)
 
-    env.Append(CCFLAGS=["""-Wall""",
+    env.Append(CCFLAGS=["""-Wall""", """-fpermissive""",
                         """-Dlong32='int'""",
                         """-DdatePointer='long'"""])
 
