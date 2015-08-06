@@ -90,7 +90,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
    * pixel hit map which is to be filled
    */
   void processTOFStation(
-                          TOF1SlabHitArray* slHits,
+                          TOF1SlabHitArray &slHits,
                           TOF1SpacePointArray* spPoints,
                           std::string detector,
                           unsigned int part_event,
@@ -98,7 +98,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
 
   /* @brief go through slab hits and find the pixel which triggered the event
    */
-  std::string findTriggerPixel(TOF1SlabHitArray* slHits,
+  std::string findTriggerPixel(TOF1SlabHitArray &slHits,
                                std::vector<int> xPlane0Hits,
                                std::vector<int> xPlane1Hits) const;
   template<typename T>
@@ -114,7 +114,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
    * one particle event in one individual detector.
    */
   void makeSpacePoints(
-                          MAUS::TOF1SlabHitArray* slHits,
+                          MAUS::TOF1SlabHitArray &slHits,
                           MAUS::TOF1SpacePointArray* spPoints,
                           std::vector<int> xPlane0Hits,
                           std::vector<int> xPlane1Hits,
@@ -128,7 +128,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
    *  and the station name
    *  pair< pair<Hits, SpacePoints>, stationName>
    */
-  typedef std::pair<std::pair<TOF1SlabHitArray*, TOF1SpacePointArray*>,
+  typedef std::pair<std::pair<TOF1SlabHitArray, TOF1SpacePointArray*>,
                     std::string > stationKeys;
   typedef std::vector<stationKeys> keysVec_t;
 };

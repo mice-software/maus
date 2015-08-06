@@ -135,9 +135,9 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
       TOF2SpacePointArray* tof2_spoints  =
         (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF2SpacePointArrayPtr();
 
-      TOF0SlabHitArray* tof0_slHits = tSlabHits->GetTOF0SlabHitArrayPtr();
-      TOF1SlabHitArray* tof1_slHits = tSlabHits->GetTOF1SlabHitArrayPtr();
-      TOF2SlabHitArray* tof2_slHits = tSlabHits->GetTOF2SlabHitArrayPtr();
+      TOF0SlabHitArray tof0_slHits = tSlabHits->GetTOF0SlabHitArray();
+      TOF1SlabHitArray tof1_slHits = tSlabHits->GetTOF1SlabHitArray();
+      TOF2SlabHitArray tof2_slHits = tSlabHits->GetTOF2SlabHitArray();
 
       keysVec_t station_vec(0);
 
@@ -169,12 +169,26 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
           // std::cerr << "DEBUG: Processing " << it->second << std::endl;
           processTOFStation((it->first).first, (it->first).second, it->second,
                             n_event, triggerhit_pixels);
+          std::string det = it->second;
+          if (det == "tof0")
+              tof0_slHits = (it->first).first;
+          else if (det == "tof1")
+              tof1_slHits = (it->first).first;
+          else if (det == "tof2")
+              tof2_slHits = (it->first).first;
+          for (int j = 0; j < ((it->first).first).size(); ++j) {
+            TOFSlabHit tof_slh = ((it->first).first)[j];
+          }
       }
+      tSlabHits->SetTOF0SlabHitArray(tof0_slHits);
+      tSlabHits->SetTOF1SlabHitArray(tof1_slHits);
+      tSlabHits->SetTOF2SlabHitArray(tof2_slHits);
+      (*events)[n_event]->GetTOFEvent()->SetTOFEventSlabHit(*tSlabHits);
   }
 }
 ////////////////////////////////////////////////////////////
 void MapCppTOFSpacePoints::processTOFStation(
-                          TOF1SlabHitArray* slHits,
+                          TOF1SlabHitArray &slHits,
                           TOF1SpacePointArray* spPoints,
                           std::string detector,
                           unsigned int part_event,
@@ -184,9 +198,9 @@ void MapCppTOFSpacePoints::processTOFStation(
   // Get the slab hits document for this TOF station.
   std::vector<int> xPlane0Hits;
   std::vector<int> xPlane1Hits;
-  if (slHits->size() != 0) {
-      for (unsigned int nslh = 0; nslh < slHits->size(); ++nslh) {
-          TOFSlabHit tof1_slh = slHits->at(nslh);
+  if (slHits.size() != 0) {
+      for (unsigned int nslh = 0; nslh < slHits.size(); ++nslh) {
+          TOFSlabHit tof1_slh = slHits[nslh];
           int xPlane = tof1_slh.GetPlane();
           switch (xPlane) {
             case 0 :
@@ -217,7 +231,7 @@ void MapCppTOFSpacePoints::processTOFStation(
 
 ////////////////////////////////////////////////////////////
 std::string MapCppTOFSpacePoints::findTriggerPixel(
-                                       TOF1SlabHitArray* slHits,
+                                       TOF1SlabHitArray &slHits,
                                        std::vector<int> xPlane0Hits,
                                        std::vector<int> xPlane1Hits) const {
 
@@ -225,8 +239,8 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
   for (unsigned int nX = 0; nX < xPlane0Hits.size(); nX++) {
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {
       // Get the two slab hits.
-      TOFSlabHit tof_slh_X = slHits->at(xPlane0Hits[nX]);
-      TOFSlabHit tof_slh_Y = slHits->at(xPlane1Hits[nY]);
+      TOFSlabHit tof_slh_X = slHits[xPlane0Hits[nX]];
+      TOFSlabHit tof_slh_Y = slHits[xPlane1Hits[nY]];
       int slabX = tof_slh_X.GetSlab();
       int slabY = tof_slh_Y.GetSlab();
       TOFPixelKey xTriggerPixelKey(_trigStn, slabX, slabY, _triggerStation);
@@ -237,10 +251,10 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
       double t_x, t_y;
       if (calibrateSlabHit(xTriggerPixelKey, tof_slh_X, t_x) &&
           calibrateSlabHit(xTriggerPixelKey, tof_slh_Y, t_y)) {
-        // std::cout << "DEBUG MapCppTOFSpacePoints::findTriggerPixel| "
-        //           << "t_x: " << t_x << "\tt_y: " << t_y
-        //           << "\t_findTriggerPixelCut: " << _findTriggerPixelCut
-        //           << std::endl;
+         // std::cerr << "DEBUG MapCppTOFSpacePoints::findTriggerPixel| "
+         //          << "t_x: " << t_x << "\tt_y: " << t_y
+         //          << "\t_findTriggerPixelCut: " << _findTriggerPixelCut
+         //          << std::endl;
         if (fabs(t_x/2. + t_y/2.) < _findTriggerPixelCut) {
           // The trigger pixel has been found.
           // std::cout << xTriggerPixelKey << std::endl;
@@ -254,7 +268,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
 
 ////////////////////////////////////////////////////////////
 void MapCppTOFSpacePoints::makeSpacePoints(
-              TOF1SlabHitArray* slHits,
+              TOF1SlabHitArray &slHits,
               TOF1SpacePointArray* spPoints,
               std::vector<int> xPlane0Hits,
               std::vector<int> xPlane1Hits,
@@ -263,9 +277,9 @@ void MapCppTOFSpacePoints::makeSpacePoints(
   for (unsigned int nX = 0; nX < xPlane0Hits.size(); nX++) {
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {
       TOFSpacePoint xTheSpacePoint;
-      int xPartEvent = (slHits->at(xPlane0Hits[0])).GetPartEventNumber();
-      TOFSlabHit slh_x = slHits->at(xPlane0Hits[nX]);
-      TOFSlabHit slh_y = slHits->at(xPlane1Hits[nY]);
+      int xPartEvent = (slHits[(xPlane0Hits[0])]).GetPartEventNumber();
+      TOFSlabHit slh_x = slHits[(xPlane0Hits[nX])];
+      TOFSlabHit slh_y = slHits[(xPlane1Hits[nY])];
       TOFPixelKey xTriggerPixelKey(triggerhit_pixels[xPartEvent]);
       double t_x, t_y;
       if (calibrateSlabHit(xTriggerPixelKey,
@@ -277,6 +291,8 @@ void MapCppTOFSpacePoints::makeSpacePoints(
         // The first argument should be the hit in the horizontal slab and the
         // second should be the hit in the vertical slab. This is mandatory!!!
         // std::cerr << "filling sp" << std::endl;
+        slHits[(xPlane0Hits[nX])] = slh_x;
+        slHits[(xPlane1Hits[nY])] = slh_y;
         fillSpacePoint(xTheSpacePoint, slh_x, slh_y);
         double deltaT = xTheSpacePoint.GetDt();
         if (fabs(deltaT) < _makeSpacePointCut) {
