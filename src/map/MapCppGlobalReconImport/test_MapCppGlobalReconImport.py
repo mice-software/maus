@@ -21,76 +21,27 @@
 import os
 import json
 import unittest
-from Configuration import Configuration
+import Configuration
 import maus_cpp.converter
 from _MapCppGlobalReconImport import MapCppGlobalReconImport
 
 class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalReconImport"""
+    config = json.loads(Configuration.Configuration().getConfigJSON())
+    
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
         cls.mapper = MapCppGlobalReconImport()
-        cls.c = Configuration()
-
-    def test_empty(self):
-        """Check can handle empty configuration"""
-        self.assertRaises(ValueError, self.mapper.birth, "",)
-        result = self.mapper.process("")
-        doc = maus_cpp.converter.json_repr(result)
-        self.assertTrue("errors" in doc)
-        self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
-
-    def test_init(self):
-        """Check birth with default configuration"""
-        self.mapper.birth(self. c.getConfigJSON())
-
-    def test_no_data(self):
-        """Check that nothing happens in absence of data"""
-        test1 = ('%s/src/map/MapCppGlobalReconImport/noDataTest.txt' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin = open(test1,'r')
-        data = fin.read()
-        # test with no data.
-        self.mapper.birth(self.c.getConfigJSON())
-        result = self.mapper.process(data)
-        spill_out = maus_cpp.converter.json_repr(result)
-        self.assertFalse('global_event' in spill_out)
-
-    def test_invalid_json_birth(self):
-        """Check birth with an invalid json input"""
-        test2 = ('%s/src/map/MapCppGlobalReconImport/invalid.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin1 = open(test2,'r')
-        data = fin1.read()
-        self.assertRaises(ValueError, self.mapper.birth, data)
-        test3 = ('%s/src/map/MapCppGlobalReconImport/Global_Import_test.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin2 = open(test3,'r')
-        fin2.readline()
-        fin2.readline()
-        fin2.readline()
-        line = fin2.readline()
-        result = self.mapper.process(line)
-        doc = maus_cpp.converter.json_repr(result)
-        self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
-
-    def test_invalid_json_process(self):
-        """Check process with an invalid json input"""
-        self.mapper.birth(self. c.getConfigJSON())
-        test4 = ('%s/src/map/MapCppGlobalReconImport/invalid.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin = open(test4,'r')
-        data = fin.read()
-        result = self.mapper.process(data)
-        doc = maus_cpp.converter.json_repr(result)
-        self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
 
     def test_fill_Global_Event(self):
         """Check that process fills global events from detector data"""
+        path_to_geom = ('%s/files/geometry/download/ParentGeometryFile.dat' %
+                 os.environ.get("MAUS_ROOT_DIR"))
+        self.config['simulation_geometry_filename'] = path_to_geom
         test5 = ('%s/src/map/MapCppGlobalReconImport/global_import_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
-        self.mapper.birth(self.c.getConfigJSON())
+        self.mapper.birth(json.dumps(self.config))
         fin = open(test5,'r')
         line = fin.read()
         result = self.mapper.process(line)

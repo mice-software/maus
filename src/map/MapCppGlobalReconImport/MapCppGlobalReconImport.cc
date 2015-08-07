@@ -39,12 +39,22 @@ namespace MAUS {
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "Failed to parse configuration",
-                              "MapCppGlobalReconImport::birth");
+      throw MAUS::Exception(Exception::recoverable,
+			    "Failed to parse configuration",
+			    "MapCppGlobalReconImport::birth");
     }
     _configCheck = true;
     _classname = "MapCppGlobalReconImport";
+    // get the geometry
+    if (!_configJSON.isMember("reconstruction_geometry_filename"))
+      throw(Exception(Exception::recoverable,
+		      "Could not find geometry file",
+		      "MapCppGlobalReconImport::birth"));
+    geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
+    /* get the TOF and EMR geometry modules
+       geo_module = new MiceModule(filename);
+       kl_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "KL");
+       kl_mother_modules = geo_module->findModulesByPropertyString("Region", "KLregion");*/
   }
 
   void MapCppGlobalReconImport::_death() {
@@ -82,7 +92,8 @@ namespace MAUS {
 	if (recon_event->GetTOFEvent()) {
 	  MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
 	  MAUS::recon::global::ImportTOFRecon tofrecon_importer;
-	  tofrecon_importer.process((*tof_event), global_event, _classname);
+	  tofrecon_importer.process((*tof_event), global_event, _classname,
+				    geo_filename);
 	}
 	if (recon_event->GetSciFiEvent()) {
 	  MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
@@ -102,7 +113,8 @@ namespace MAUS {
 	if (recon_event->GetEMREvent()) {
 	  MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
 	  MAUS::recon::global::ImportEMRRecon emrrecon_importer;
-	  emrrecon_importer.process((*emr_event), global_event, _classname);
+	  emrrecon_importer.process((*emr_event), global_event, _classname,
+				    geo_filename);
 	}
       }
     }

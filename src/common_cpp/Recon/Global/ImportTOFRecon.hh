@@ -33,6 +33,7 @@
 
 // MAUS headers
 #include "DataStructure/ReconEvent.hh"
+#include "Config/MiceModule.hh"
 
 namespace MAUS {
 namespace recon {
@@ -54,7 +55,8 @@ namespace global {
      */
     void process(const MAUS::TOFEvent &tof_event,
 		 MAUS::GlobalEvent* global_event,
-		 std::string mapper_name);
+		 std::string mapper_name,
+		 std::string geo_filename);
 
   private:
     /// Disallow copy constructor as unnecessary
@@ -72,7 +74,8 @@ namespace global {
     void ImportTOFSpacePoints(
 			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
 			      MAUS::GlobalEvent* global_event,
-			      std::string mapper_name);
+			      std::string mapper_name,
+			      std::string geo_filename);
   }; // ~class ImportTOFRecon
 } // ~namespace global
 } // ~namespace recon

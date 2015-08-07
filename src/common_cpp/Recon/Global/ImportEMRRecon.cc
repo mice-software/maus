@@ -27,11 +27,17 @@ namespace global {
 
   void ImportEMRRecon::process(const MAUS::EMREvent &emr_event,
 			       MAUS::GlobalEvent* global_event,
-			       std::string mapper_name) {
+			       std::string mapper_name,
+			       std::string geo_filename) {
 
-    // These numbers are based on Stage4.dat and changes will be made when the
-    // system to put detector points into global coordinates is in place
-    double z_ref = 18539.38;
+    // Use these values to adjust the hit positions from local reconstruction
+    // to the global coordinate system
+    MiceModule* geo_module = new MiceModule(geo_filename);
+    std::vector<const MiceModule*> emr_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "EMR");
+    const MiceModule* emr_module = emr_modules[0];
+    double x_ref = emr_module->globalPosition().getX();
+    double y_ref = emr_module->globalPosition().getY();
+    double z_ref = emr_module->globalPosition().getZ() + (1584/2);
 
     double x;
     double y;
@@ -74,8 +80,8 @@ namespace global {
 	      // Bar hit (get x and y)
 	      MAUS::EMRBarHit bar_hit = (*bar_hit_iter);
 	      // EMR coordinate system should now match MICE coordinate system
-	      x = bar_hit.GetX();
-	      y = bar_hit.GetY();
+	      x = bar_hit.GetX() + x_ref;
+	      y = bar_hit.GetY() + y_ref;
 	      z = bar_hit.GetZ() + z_ref;
 	      TLorentzVector pos(x, y, z, t);
 	      x_err = bar_hit.GetErrorX();
@@ -116,8 +122,8 @@ namespace global {
 		// Bar hit (get x and y)
 		MAUS::EMRBarHit bar_hit = (*bar_hit_iter);
 		// EMR coordinate system should now match MICE coordinate system
-		x = bar_hit.GetX();
-		y = bar_hit.GetY();
+		x = bar_hit.GetX() + x_ref;
+		y = bar_hit.GetY() + y_ref;
 		z = bar_hit.GetZ() + z_ref;
 		TLorentzVector pos(x, y, z, t);
 		x_err = bar_hit.GetErrorX();
