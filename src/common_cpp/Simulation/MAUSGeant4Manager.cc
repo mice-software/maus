@@ -283,7 +283,6 @@ void MAUSGeant4Manager::SetSteppingLimits(G4LogicalVolume* myvol) {
 							timeMax, keThreshold));
   // Squeak::mout(Squeak::info) << "Setting user limits for " << myvol->GetName() << std::endl;
   myvol->SetUserLimits(_detector->GetUserLimits().back());
-  // Squeak::mout(Squeak::info) << "User limits set for " << myvol->GetName() << std::endl;
   if (vis)
     _detector->GetVisAttributes().push_back(new G4VisAttributes(G4Color(red, green, blue)));
   else
@@ -379,6 +378,8 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module, G4LogicalVolume* m
   }
   _detector->GetUserLimits().push_back(new G4UserLimits(stepMax, trackMax,
 							timeMax, keThreshold));
+  // Squeak::mout(Squeak::info) << "User limits set for " << myvol->GetName()
+  // 			     << " with max step " << stepMax << std::endl;
   myvol->SetUserLimits(_detector->GetUserLimits().back());
   // if (myvol->GetNoDaughters() > 0) {
   //   SetDaughterUserLimits(myvol);
