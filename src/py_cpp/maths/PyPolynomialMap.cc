@@ -38,78 +38,6 @@
 namespace MAUS {
 namespace PyPolynomialMap {
 
-std::string set_coefficients_docstring =
-std::string("");
-
-// in the end this is not in the public interface; because Matrix<double> does
-// not support assignment very well.
-PyObject* set_coefficients(PyObject *self, PyObject *args, PyObject *kwds) {
-    PyPolynomialMap* py_map = reinterpret_cast<PyPolynomialMap*>(self);
-    // failed to cast or self was not initialised - something horrible happened
-    if (py_map == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                "Failed to resolve self as PolynomialMap");
-        return NULL;
-    }
-    if (py_map->map == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                "PolynomialMap not properly initialised");
-        return NULL;
-    }
-    int point_dim;
-    PyObject* py_coefficients;
-    static char *kwlist[] = {const_cast<char*>("point_dimension"),
-                             const_cast<char*>("coefficients"), NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iO", kwlist,
-                                         &point_dim, &py_coefficients)) {
-        return NULL;
-    }
-    if (!PyList_Check(py_coefficients)) {
-        PyErr_SetString(PyExc_TypeError,
-                        "Failed to resolve coefficients as a list");
-        return NULL;
-    }
-    size_t num_rows = PyList_Size(py_coefficients);
-    if (num_rows == 0) {
-        PyErr_SetString(PyExc_ValueError, "coefficients was empty");
-        return NULL;
-    }
-    size_t num_cols = 0;
-    std::vector<double> data;
-    for (size_t i = 0; i < num_rows; ++i) {
-        PyObject* row = PyList_GetItem(py_coefficients, i);
-        if (!PyList_Check(py_coefficients)) {
-            PyErr_SetString(PyExc_TypeError,
-                            "Failed to resolve coefficients row as a list");
-            return NULL;
-        }
-        if (i == 0) {
-            num_cols = PyList_Size(row);
-            if (num_cols == 0) {
-                PyErr_SetString(PyExc_ValueError, "coefficients row was empty");
-            }
-            data = std::vector<double>(num_rows*num_cols);
-        }
-        if (PyList_Size(row) != int(num_cols)) {
-                PyErr_SetString(PyExc_ValueError,
-                                "coefficients row had wrong number of elements");
-        }
-        for (size_t j = 0; j < num_cols; ++j) {
-            PyObject* py_value = PyList_GetItem(row, j);
-            data.at(i*num_cols+j) = PyFloat_AsDouble(py_value);
-            if (PyErr_Occurred() != NULL) // not a float
-                return NULL;
-        }
-    }
-    std::cerr << "!" << std::endl;
-    Matrix<double> coefficients(num_rows, num_cols, &data[0]);
-    std::cerr << "&" << std::endl;
-    py_map->map->SetCoefficients(point_dim, coefficients);
-    std::cerr << "#" << std::endl;
-    Py_INCREF(Py_None);
-    return Py_None; 
-}
-
 std::string get_coefficients_as_matrix_docstring =
 std::string("");
 
@@ -127,10 +55,10 @@ PyObject* get_coefficients_as_matrix(PyObject *self, PyObject *args, PyObject *k
         return NULL;
     }
     Matrix<double> coefficients = py_map->map->GetCoefficientsAsMatrix();
-    PyObject* py_coefficients = PyList_New(coefficients.number_of_columns());
+    PyObject* py_coefficients = PyList_New(coefficients.number_of_rows());
     // not safe from out of memory errors (etc)
-    for (size_t i = 0; i < coefficients.number_of_columns(); ++i) {
-        PyObject* py_row = PyList_New(coefficients.number_of_rows());
+    for (size_t i = 0; i < coefficients.number_of_rows(); ++i) {
+        PyObject* py_row = PyList_New(coefficients.number_of_columns());
         for (size_t j = 0; j < coefficients.number_of_columns(); ++j) {
             PyObject* py_value = PyFloat_FromDouble(coefficients(i+1, j+1));
             Py_INCREF(py_value);
@@ -176,7 +104,7 @@ PyObject* evaluate(PyObject *self, PyObject *args, PyObject *kwds) {
     std::vector<double> point(py_map->map->PointDimension());
     for (size_t i = 0; i < point.size(); ++i) {
         PyObject* point_i = PyList_GetItem(py_point, i);
-        PyFloat_AsDouble(point_i, point[i]);
+        point[i] = PyFloat_AsDouble(point_i);
     }
     if (PyErr_Occurred()) // probably not a double in the list
         return NULL;
@@ -185,13 +113,114 @@ PyObject* evaluate(PyObject *self, PyObject *args, PyObject *kwds) {
     PyObject* py_value = PyList_New(value.size());
     for (size_t i = 0; i < value.size(); ++i) {
         PyObject* value_i = PyFloat_FromDouble(value[i]);
-        PyList_SetItem(py_value, value_i, i);
+        PyList_SetItem(py_value, i, value_i);
         Py_INCREF(value_i);
     }
     Py_INCREF(py_value);
     return py_value;
 }
 
+std::string least_squares_fit_docstring =
+std::string("");
+
+std::vector<std::vector<double> > get_vectors(PyObject* py_floats) {
+    // convert from list of list of floats to std::vector< std::vector<double> >
+    // first check validity of coefficients
+     std::vector< std::vector<double> > data;
+    if (!PyList_Check(py_floats)) {
+        return std::vector<std::vector<double> >();
+    }
+    size_t num_rows = PyList_Size(py_floats);
+    if (num_rows == 0) {
+        return std::vector<std::vector<double> >();
+    }
+    size_t num_cols = 0;
+    // now loop over the rows
+    for (size_t i = 0; i < num_rows; ++i) {
+        PyObject* row = PyList_GetItem(py_floats, i);
+        if (!PyList_Check(row)) {
+            return std::vector<std::vector<double> >();
+        }
+        // do some initialisation in the first row
+        if (i == 0) {
+            num_cols = PyList_Size(row);
+            if (num_cols == 0) {
+                return std::vector<std::vector<double> >();
+            }
+            data = std::vector< std::vector<double> >(num_rows, std::vector<double>(num_cols));
+        }
+        // now loop over columns
+        if (PyList_Size(row) != int(num_cols)) {
+            return std::vector<std::vector<double> >();
+        }
+        for (size_t j = 0; j < num_cols; ++j) {
+            PyObject* py_value = PyList_GetItem(row, j);
+            data.at(i).at(j) = PyFloat_AsDouble(py_value);
+            if (PyErr_Occurred() != NULL) // not a float
+                return std::vector<std::vector<double> >();
+        }
+    }
+    return data;
+}
+
+PyObject* least_squares_fit(PyObject *py_class, PyObject *args, PyObject *kwds) {
+    PyTypeObject* py_map_type = reinterpret_cast<PyTypeObject*>(py_class);
+    // failed to cast or self was not initialised - something horrible happened
+    if (py_map_type == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                "Failed to resolve self as PolynomialMapType");
+        return NULL;
+    }
+
+    PyObject* py_points = NULL;
+    PyObject* py_values = NULL;
+    int polynomial_order = 0;
+    static char *kwlist[] = {
+        const_cast<char*>("points"),
+        const_cast<char*>("values"),
+        const_cast<char*>("polynomial_order"),
+        NULL
+    };
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOi", kwlist, &py_points,
+            &py_values, &polynomial_order)) {
+        return NULL;
+    }
+    if (polynomial_order < 0) {
+        PyErr_SetString(PyExc_ValueError, "polynomial_order should be >= 0");
+        return NULL;
+    }
+    std::vector<std::vector<double> > points = get_vectors(py_points);
+    if (points.size() == 0) {
+        PyErr_SetString(PyExc_ValueError, "Failed to evaluate points");
+        return NULL;
+    }
+    std::vector<std::vector<double> > values = get_vectors(py_values);
+    if (values.size() == 0) {
+        PyErr_SetString(PyExc_ValueError, "Failed to evaluate values");
+        return NULL;
+    }
+    if (points.size() != values.size()) {
+        PyErr_SetString(PyExc_ValueError, "points misaligned with values");
+        return NULL;
+    }
+    for (size_t i = 0; i < points.size(); ++i)
+        if (points[i].size() != values[i].size()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "points row misaligned with values row");
+            return NULL;
+        }
+    PolynomialMap* test_map = NULL;
+    try {
+        test_map = PolynomialMap::PolynomialLeastSquaresFit(points, values, polynomial_order);
+    } catch (std::exception& exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+    PyObject* py_map_obj = _alloc(py_map_type, 0);
+    PyPolynomialMap* py_map = reinterpret_cast<PyPolynomialMap*>(py_map_obj);
+    py_map->map = test_map;
+    return py_map_obj;
+}
 
 
 int _init(PyObject* self, PyObject *args, PyObject *kwds) {
@@ -208,11 +237,64 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
         delete py_map->map;
         py_map->map = NULL;
     }
+    // read in arguments
+    int point_dim;
+    PyObject* py_coefficients;
+    static char *kwlist[] = {const_cast<char*>("point_dimension"),
+                             const_cast<char*>("coefficients"), NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iO", kwlist,
+                                         &point_dim, &py_coefficients)) {
+        return -1;
+    }
+
+    // convert from list of list of floats to Matrix<double>
+    // first check validity of coefficients
+    if (!PyList_Check(py_coefficients)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to resolve coefficients as a list");
+        return -1;
+    }
+    size_t num_rows = PyList_Size(py_coefficients);
+    if (num_rows == 0) {
+        PyErr_SetString(PyExc_ValueError, "coefficients was empty");
+        return -1;
+    }
+    size_t num_cols = 0;
+    std::vector<double> data;
+    // now loop over the rows
+    for (size_t i = 0; i < num_rows; ++i) {
+        PyObject* row = PyList_GetItem(py_coefficients, i);
+        if (!PyList_Check(py_coefficients)) {
+            PyErr_SetString(PyExc_TypeError,
+                            "Failed to resolve coefficients row as a list");
+            return -1;
+        }
+        // do some initialisation in the first row
+        if (i == 0) {
+            num_cols = PyList_Size(row);
+            if (num_cols == 0) {
+                PyErr_SetString(PyExc_ValueError, "coefficients row was empty");
+                return -1;
+            }
+            data = std::vector<double>(num_rows*num_cols);
+        }
+        // now loop over columns
+        if (PyList_Size(row) != int(num_cols)) {
+                PyErr_SetString(PyExc_ValueError,
+                                "coefficients row had wrong number of elements");
+        }
+        for (size_t j = 0; j < num_cols; ++j) {
+            PyObject* py_value = PyList_GetItem(row, j);
+            data.at(i*num_cols+j) = PyFloat_AsDouble(py_value);
+            if (PyErr_Occurred() != NULL) // not a float
+                return -1;
+        }
+    }
+    Matrix<double> coefficients(num_rows, num_cols, &data[0]);
+
     // now initialise the internal map
     try {
-        Matrix<double> matrix(1, 1, 0.);
-        py_map->map = new MAUS::PolynomialMap(1, matrix);
-        set_coefficients(self, args, kwds);
+        py_map->map = new MAUS::PolynomialMap(point_dim, coefficients);
     } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return -1;
@@ -251,6 +333,10 @@ static PyMemberDef _members[] = {
 static PyMethodDef _methods[] = {
 {"get_coefficients_as_matrix", (PyCFunction)get_coefficients_as_matrix,
   METH_VARARGS|METH_KEYWORDS, get_coefficients_as_matrix_docstring.c_str()},
+{"evaluate", (PyCFunction)evaluate,
+  METH_VARARGS|METH_KEYWORDS, evaluate_docstring.c_str()},
+{"least_squares_fit", (PyCFunction)least_squares_fit,
+  METH_CLASS|METH_VARARGS|METH_KEYWORDS, least_squares_fit_docstring.c_str()},
 {NULL}
 };
 

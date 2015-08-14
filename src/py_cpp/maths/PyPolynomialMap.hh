@@ -82,12 +82,6 @@ static void _free(PyPolynomialMap * self);
  */
 PyMODINIT_FUNC initpolynomial_map(void);
 
-/** Return the C++ polynomial map associated with a PyPolynomialMap 
- *
- *  PyPolynomialMap still owns the memory allocated to PolynomialMap
- */
-static PolynomialMap* get_polynomial_map(PyPolynomialMap* py_map);
-
 /** Get the PolynomialMap coefficients
  *
  *  \param self a PyPolynomialMap
@@ -99,18 +93,6 @@ static PolynomialMap* get_polynomial_map(PyPolynomialMap* py_map);
  */
 static PyObject* get_coefficients_as_matrix(PyObject *self, PyObject *args,
                                                                 PyObject *kwds);
-
-/** Set the PolynomialMap coefficients
- *
- *  \param self a PyPolynomialMap
- *  \param args arguments to the function (not used)
- *  \param kwds keyword arguments to the function - see docstring
- *
- *  \return PyNone
- */
-static PyObject* set_coefficients(PyObject *self, PyObject *args,
-                                                                PyObject *kwds);
-
 
 /** Calculate a polynomial vector
  *
