@@ -138,7 +138,9 @@ class PolynomialMapTestCase(unittest.TestCase):
         
         # this is like - we run the tracking, and extract x, px, y, py data as per the tku_data
         tkd_data = self.mice_mc(tku_data)
+        # now we calculate the transfer matrix, by means of least squares fit...
         transfer_matrix = maus_cpp.polynomial_map.PolynomialMap.least_squares_fit(tku_data, tkd_data, 1)
+        # and then print it out in a pretty way
         print "Calculated transfer matrix"
         for row in transfer_matrix.get_coefficients_as_matrix():
             for element in row:
