@@ -39,7 +39,9 @@ namespace MAUS {
 namespace PyPolynomialMap {
 
 std::string get_coefficients_as_matrix_docstring =
-std::string("");
+std::string("Return the coefficients of the matrix. Takes no arguments\n\n")+
+std::string("Return value is a list of lists, with polynomial coefficients\n")+
+std::string("for y_i = a_{ij}*x_i^j forming the i, j term in the matrix.\n");
 
 PyObject* get_coefficients_as_matrix(PyObject *self, PyObject *args, PyObject *kwds) {
     PyPolynomialMap* py_map = reinterpret_cast<PyPolynomialMap*>(self);
@@ -72,7 +74,11 @@ PyObject* get_coefficients_as_matrix(PyObject *self, PyObject *args, PyObject *k
 }
 
 std::string evaluate_docstring =
-std::string("");
+std::string("Apply the mapping to a point.\n\n")+
+std::string("  - point: list of floats with length equal to the point\n")+
+std::string("    dimension of the mapping, corresponding to the abscissa.\n")+
+std::string("Return value is a list of floats, with length equal to the\n")+
+std::string("value dimension of the mapping; corresponding to the ordinates\n");
 
 PyObject* evaluate(PyObject *self, PyObject *args, PyObject *kwds) {
     PyPolynomialMap* py_map = reinterpret_cast<PyPolynomialMap*>(self);
@@ -121,7 +127,14 @@ PyObject* evaluate(PyObject *self, PyObject *args, PyObject *kwds) {
 }
 
 std::string least_squares_fit_docstring =
-std::string("");
+std::string("Find a mapping by performing a least squares fit.\n\n")+
+std::string("  - points: list, each entry containing a list of floats\n")+
+std::string("  corresponding to abscissa, with length ValueDimension\n")+
+std::string("  - values: list, each entry containing a list of floats\n")+
+std::string("  corresponding to ordinates, with length PointDimension\n")+
+std::string("  - polynomial_order: integer, >= 0, corresponding to the\n")+
+std::string("  polynomial fit.\n")+
+std::string("Returns a polynomial map.\n");
 
 std::vector<std::vector<double> > get_vectors(PyObject* py_floats) {
     // convert from list of list of floats to std::vector< std::vector<double> >
@@ -348,7 +361,9 @@ std::string("    Takes two arguments.\n")+
 std::string("    - point_dim: integer which defines the dimension of the\n")+
 std::string("      points (abscissa)\n")+
 std::string("    - coefficients: list of lists of floats which define the\n")+
-std::string("      polynomial");
+std::string("      polynomial\n")+
+std::string("The value dimension of the PolynomialMap is the number of rows\n")+
+std::string("coefficients matrix\n");
 
 static PyTypeObject PyPolynomialMapType = {
     PyObject_HEAD_INIT(NULL)
