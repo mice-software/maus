@@ -292,7 +292,6 @@ SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker 
 SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
-SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160.
 SciFiParams_RMS = 370.

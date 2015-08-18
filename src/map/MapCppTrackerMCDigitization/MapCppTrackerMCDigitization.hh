@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
-#define _COMPONENTS_MAP_MAPCPPTRACKERMCDIGITIZATION_H_
+#ifndef _COMPONENTS_MAP_MapCppTrackerMCDigitization_H_
+#define _COMPONENTS_MAP_MapCppTrackerMCDigitization_H_
 
 // C headers
 #include <json/json.h>
@@ -49,7 +49,9 @@
 namespace MAUS {
 
 class MapCppTrackerMCDigitization : public MapBase<Data> {
- public:
+  public:
+    typedef std::vector<int> IntChannelArray;
+
   /** Constructor - initialises pointers to NULL */
   MapCppTrackerMCDigitization();
 
@@ -97,17 +99,29 @@ class MapCppTrackerMCDigitization : public MapBase<Data> {
 
   /** @brief computes adc from npe.
    */
-  int compute_adc_counts(double numb_pe) const;
+  double compute_adc_counts(MAUS::SciFiDigit *digit_j) const;
 
   /** @brief checks if hits belong to the same scifi channel.
    */
   bool check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2) const;
 
+  void discriminator(SciFiDigitPArray &digits) const;
+
+  /** @brief load calibration data
+  *
+  *  Used to determine calibrated values
+  *  for pe from simulated adc.
+  *  Identical to data digitization for completeness
+  */
+  bool load_mapping(std::string file);
+  bool load_calibration(std::string file);
+  bool load_bad_channels(std::string file);
+
  private:
   /// The ratio of deposited eV to NPE
   double _eV_to_phe;
   double _SciFiNPECut;
-  double _SciFivlpcEnergyRes;
+  double _SciFivlpcRes;
   double _SciFiadcFactor;
   double _SciFitdcBits;
   double _SciFivlpcTimeRes;
@@ -118,6 +132,27 @@ class MapCppTrackerMCDigitization : public MapBase<Data> {
   double _SciFivlpcQE;
   double _SciFiFiberTransmissionEff;
   double _SciFiMUXTransmissionEff;
+  double _SciFiadcBits;
+  double _SciFiDisCut;
+  int _disc_sim_on;
+
+  static const int _number_channels       = 128;
+  static const int _number_banks          = 64;
+  static const int _number_boards         = 16;
+  static const int _total_number_channels = 6403;
+
+  IntChannelArray _board;
+  IntChannelArray _bank;
+  IntChannelArray _chan_ro;
+  IntChannelArray _tracker;
+  IntChannelArray _station;
+  IntChannelArray _view;
+  IntChannelArray _fibre;
+  IntChannelArray _extWG;
+  IntChannelArray _inWG;
+  IntChannelArray _WGfib;
+  Json::Value _calibration[_number_banks][_number_channels];
+  bool _good_chan[_number_banks][_number_channels];
 
   /// an array contaning all MiceModules
   std::vector<const MiceModule*> modules;
