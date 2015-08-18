@@ -20,6 +20,9 @@
 
 #include "Geant4/G4StateManager.hh"
 #include "Geant4/G4ApplicationState.hh"
+#include "Geant4/G4Region.hh"
+#include "Geant4/G4RegionStore.hh"
+#include "Geant4/G4UserLimits.hh"
 
 #include "src/legacy/Interface/Squeak.hh"
 
@@ -68,6 +71,16 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     SetVisManager();
     _runManager = new G4RunManager;
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
+
+    _keThreshold = JsonWrapper::GetProperty(*cards, "kinetic_energy_threshold",
+					    JsonWrapper::realValue).asDouble();
+    _trackMax = JsonWrapper::GetProperty(*cards, "track_max_length",
+					 JsonWrapper::realValue).asDouble();
+    _timeMax = JsonWrapper::GetProperty(*cards, "max_track_time",
+					JsonWrapper::realValue).asDouble();
+    _stepMax = JsonWrapper::GetProperty(*cards, "max_step_length",
+					JsonWrapper::realValue).asDouble();
+
     // Create the gdml parser object
 
     std::string gdmlGeometry = "";
