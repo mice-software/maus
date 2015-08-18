@@ -64,10 +64,14 @@ void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocumen
                _SciFiFiberTransmissionEff *
                _SciFiMUXTransmissionEff *
                _SciFivlpcQE;
-  bool map = load_mapping("mapping_7.txt");
-  bool calib = load_calibration("scifi_calibration_MC.txt");
+  _mapping_file = (*json)["SciFiMappingFileName"];
+  _calibration_file = (*json)["SciFiCalibrationFileName"];
+  _bad_chan_file = (*json)["SciFiBadChannelsFileName"];
+  
+  bool map = load_mapping(_mapping_file);
+  bool calib = load_calibration(_calibration_file);
 //  bool calib = load_calibration("scifi_calibration_jan2013.txt");
-  bool bad_channels = load_bad_channels("bad_chan_list.txt");
+  bool bad_channels = load_bad_channels(_bad_chan_file);
   if ( !calib || !map || !bad_channels ) {
     throw(Exception(Exception::recoverable,
           "Could not load Tracker calibration, mapping or bad channel list.",
@@ -343,7 +347,7 @@ bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiH
 
 bool MapCppTrackerMCDigitization::load_calibration(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerMCDigitization/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
   // std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
 
   std::ifstream inf(fname.c_str());
@@ -382,7 +386,7 @@ bool MapCppTrackerMCDigitization::load_calibration(std::string file) {
 
 bool MapCppTrackerMCDigitization::load_mapping(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/cabling/"+file;
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
@@ -419,7 +423,7 @@ bool MapCppTrackerMCDigitization::load_mapping(std::string file) {
 
 bool MapCppTrackerMCDigitization::load_bad_channels(std::string file) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  std::string fname = std::string(pMAUS_ROOT_DIR)+"/src/map/MapCppTrackerDigits/"+file;
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
