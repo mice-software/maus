@@ -21,10 +21,6 @@
 #include "Geant4/G4StateManager.hh"
 #include "Geant4/G4ApplicationState.hh"
 
-
-#include "Geant4/G4Region.hh"
-#include "Geant4/G4RegionStore.hh"
-#include "Geant4/G4UserLimits.hh"
 #include "src/legacy/Interface/Squeak.hh"
 
 #include "src/common_cpp/DataStructure/MCEvent.hh"
@@ -72,17 +68,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     SetVisManager();
     _runManager = new G4RunManager;
     Json::Value* cards = Globals::GetInstance()->GetConfigurationCards();
-    _keThreshold = JsonWrapper::GetProperty(*cards, "kinetic_energy_threshold",
-					    JsonWrapper::realValue).asDouble();
-    _trackMax = JsonWrapper::GetProperty(*cards, "max_track_length",
-					 JsonWrapper::realValue).asDouble();
-    _timeMax = JsonWrapper::GetProperty(*cards, "max_track_time",
-					JsonWrapper::realValue).asDouble();
-    _stepMax = JsonWrapper::GetProperty(*cards, "max_step_length",
-					JsonWrapper::realValue).asDouble();
-
     // Create the gdml parser object
-
 
     std::string gdmlGeometry = "";
     bool usegdml = Globals::GetInstance()
@@ -297,7 +283,7 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module, G4LogicalVolume* m
   // Get the map of the auxiliary information from the parser
   /*
   const G4GDMLAuxMapType* auxmap = _parser.GetAuxMap();
-  Squeak::mout(Squeak::info) << "Found " << auxmap->size()
+    Squeak::mout(Squeak::info) << "Found " << auxmap->size()
 			     << " volume(s) with auxiliary information.\n\n";
   */
   double stepMax = _stepMax;
@@ -308,7 +294,6 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module, G4LogicalVolume* m
   double green = 1.;
   double blue = 1.;
   bool vis = true;
-
   /*
   for (G4GDMLAuxMapType::const_iterator iter = auxmap->begin();
       iter != auxmap->end(); iter++) {
@@ -442,17 +427,6 @@ void MAUSGeant4Manager::SetDaughterSensitiveDetectors(G4LogicalVolume* logic) {
       SetSensitiveDetector(logic->GetSensitiveDetector());
     if (logic->GetDaughter(i)->GetLogicalVolume()->GetNoDaughters() > 0) {
       SetDaughterSensitiveDetectors(logic->GetDaughter(i)->GetLogicalVolume());
-    }
-  }
-}
-
-void MAUSGeant4Manager::SetDaughterUserLimits(G4LogicalVolume* logic) {
-
-  for (G4int i = 0; i < logic->GetNoDaughters(); i++) {
-    logic->GetDaughter(i)->GetLogicalVolume()->
-      SetUserLimits(_detector->GetUserLimits().back());
-    if (logic->GetDaughter(i)->GetLogicalVolume()->GetNoDaughters() > 0) {
-      SetDaughterUserLimits(logic->GetDaughter(i)->GetLogicalVolume());
     }
   }
 }
