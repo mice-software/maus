@@ -74,7 +74,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
 
     _keThreshold = JsonWrapper::GetProperty(*cards, "kinetic_energy_threshold",
 					    JsonWrapper::realValue).asDouble();
-    _trackMax = JsonWrapper::GetProperty(*cards, "track_max_length",
+    _trackMax = JsonWrapper::GetProperty(*cards, "max_track_length",
 					 JsonWrapper::realValue).asDouble();
     _timeMax = JsonWrapper::GetProperty(*cards, "max_track_time",
 					JsonWrapper::realValue).asDouble();
