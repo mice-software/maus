@@ -22,12 +22,12 @@
 // version number is x.y.z, encoded as a single int as xxxyyyzzz where each of
 // xxx is 0 padded
 #ifndef MAUS_VERSION_NUMBER
-#define MAUS_VERSION_NUMBER_X 0
-#define MAUS_VERSION_NUMBER_Y 9
-#define MAUS_VERSION_NUMBER_Z 7
+#define MAUS_VERSION_NUMBER_X 1
+#define MAUS_VERSION_NUMBER_Y 0
+#define MAUS_VERSION_NUMBER_Z 0
 #define MAUS_VERSION_NUMBER() \
-        (MAUS_VERSION_NUMBER_X*1000000+\
-        MAUS_VERSION_NUMBER_Y*1000+\
+        (MAUS_VERSION_NUMBER_X*1000+\
+        MAUS_VERSION_NUMBER_Y*100+\
         MAUS_VERSION_NUMBER_Z)
 
 // Macro wrapper for ClassDef

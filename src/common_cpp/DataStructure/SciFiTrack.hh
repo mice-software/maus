@@ -25,6 +25,9 @@
 
 // MAUS headers
 #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
+#include "src/common_cpp/DataStructure/SciFiBasePRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 
 namespace MAUS {
 
@@ -70,6 +73,19 @@ class SciFiTrack {
    */
   void set_scifitrackpoints(SciFiTrackPointPArray points) { _trackpoints = points; }
 
+  /** @brief  Returns the mother pr_tracks as a TRef*.
+   */
+  void set_pr_track(TRef* const pr_track) { _pr_track = pr_track; }
+
+  /** @brief  Returns the mother pr_track as a TObject pointer
+   */
+  void set_pr_track_tobject(TObject* const pr_track) { *_pr_track = pr_track; }
+
+  /** @brief  Returns the mother pr_tracks as an array of pointers.
+   */
+  void set_pr_track_pointer(SciFiBasePRTrack* const pr_track) { *_pr_track = pr_track; }
+
+
   /** @brief Returns the tracker number.
    */
   int tracker() const      { return _tracker; }
@@ -97,6 +113,29 @@ class SciFiTrack {
   /** @brief Adds a SciFiTrackPoint to the member array.
    */
   void add_scifitrackpoint(SciFiTrackPoint* trackpoint) { _trackpoints.push_back(trackpoint); }
+
+  /** @brief  Returns the mother pr_track as a TRef*.
+   */
+  TRef* pr_track()                const { return _pr_track; }
+
+  /** @brief  Returns the mother pr_track as a TObject pointer
+   */
+  TObject* pr_track_tobject()     const { return _pr_track->GetObject(); }
+
+  /** @brief  Returns the mother pr_track as a pointer
+   */
+  SciFiBasePRTrack* pr_track_pointer() const
+                                 { return static_cast<SciFiBasePRTrack*>(_pr_track->GetObject()); }
+
+  /** @brief  Returns the mother pr_trackas a helical pointer
+   */
+  SciFiHelicalPRTrack* pr_track_pointer_helical() const
+                              { return static_cast<SciFiHelicalPRTrack*>(_pr_track->GetObject()); }
+
+  /** @brief  Returns the mother pr_tracks as a straight pointer
+   */
+  SciFiStraightPRTrack* pr_track_pointer_straight() const
+                             { return static_cast<SciFiStraightPRTrack*>(_pr_track->GetObject()); }
 
   /** @brief Enumeration of the possible types of SciFi tracks.
    */
@@ -139,6 +178,9 @@ class SciFiTrack {
   ThreeVector _seed_position;
   ThreeVector _seed_momentum;
   std::vector<double> _seed_covariance_matrix;
+
+  // Pointer to the seed track. This does not assume memory
+  TRef* _pr_track;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };

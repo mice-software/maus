@@ -325,6 +325,10 @@ class InputTransformExecutor: # pylint: disable=R0903, R0902
             self.spill_input_count += 1
             event_str = maus_cpp.converter.string_repr(event_json)
             self.submit_spill_to_celery(event_str)
+        try:
+            maus_cpp.converter.del_data_repr(event)
+        except: # pylint: disable = W0702
+            pass
 
     @staticmethod
     def get_dataflow_description():

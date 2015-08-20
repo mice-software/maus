@@ -37,6 +37,10 @@ PyObject* py_wrap(PyObject* self, PyObject* args) {
       if (data_out != NULL && py_data_out == NULL)
           throw; // memory was lost, raise it up...
       PyErr_SetString(PyExc_ValueError, (&exc)->what());
+  } catch (std::exception& exc) {
+      if (data_out != NULL && py_data_out == NULL)
+          throw; // memory was lost, raise it up...
+      PyErr_SetString(PyExc_ValueError, (&exc)->what());
   }
   return py_data_out;
 }

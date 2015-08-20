@@ -147,6 +147,7 @@ namespace MAUS {
   }
 
   TEST(MapBaseTest, TestPyObjectMapperProcessData) {
+    PyErr_Clear();
     PyObjectMapper map;
     PyObject* py_data_0 = data_as_pyobj();
     PyObject* py_object_0 = PyObjectWrapper::unwrap<PyObject>(py_data_0);

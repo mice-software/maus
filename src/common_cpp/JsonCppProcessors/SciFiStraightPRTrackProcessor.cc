@@ -45,6 +45,12 @@ SciFiStraightPRTrackProcessor::SciFiStraightPRTrackProcessor() {
     RegisterValueBranch("y_chisq", &_double_proc,
                         &SciFiStraightPRTrack::get_y_chisq,
                         &SciFiStraightPRTrack::set_y_chisq, true);
+    RegisterValueBranch<double>("chi_squared", &_double_proc,
+                        &SciFiStraightPRTrack::get_chi_squared,
+                        &SciFiStraightPRTrack::set_chi_squared, true);
+    RegisterValueBranch<int>("ndf", &_int_proc,
+                        &SciFiStraightPRTrack::get_ndf,
+                        &SciFiStraightPRTrack::set_ndf, true);
     RegisterValueBranch<ThreeVector>("reference_position",
                         &_threevector_proc,
                         &SciFiStraightPRTrack::get_reference_position,

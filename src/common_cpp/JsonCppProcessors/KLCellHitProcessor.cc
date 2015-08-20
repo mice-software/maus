@@ -21,7 +21,10 @@ namespace MAUS {
 KLCellHitProcessor::KLCellHitProcessor()
     : _cell_proc(), _phys_event_number_proc(),
       _charge_proc(), _charge_product_proc(),
-      _detector_proc(), _part_event_number_proc() {
+      _detector_proc(), _part_event_number_proc(),
+      _global_pos_x_proc(), _global_pos_y_proc(), _global_pos_z_proc(),
+      _local_pos_x_proc(), _local_pos_y_proc(), _local_pos_z_proc(),
+      _error_x_proc(), _error_y_proc(), _error_z_proc(), _flag_proc() {
     RegisterValueBranch
           ("cell", &_cell_proc, &KLCellHit::GetCell,
           &KLCellHit::SetCell, true);
@@ -40,6 +43,36 @@ KLCellHitProcessor::KLCellHitProcessor()
     RegisterValueBranch
           ("part_event_number", &_part_event_number_proc, &KLCellHit::GetPartEventNumber,
           &KLCellHit::SetPartEventNumber, true);
+    RegisterValueBranch
+          ("global_pos_x", &_global_pos_x_proc, &KLCellHit::GetGlobalPosX,
+          &KLCellHit::SetGlobalPosX, true);
+    RegisterValueBranch
+          ("global_pos_y", &_global_pos_y_proc, &KLCellHit::GetGlobalPosY,
+          &KLCellHit::SetGlobalPosY, true);
+    RegisterValueBranch
+          ("global_pos_z", &_global_pos_z_proc, &KLCellHit::GetGlobalPosZ,
+          &KLCellHit::SetGlobalPosZ, true);
+    RegisterValueBranch
+          ("local_pos_x", &_local_pos_x_proc, &KLCellHit::GetLocalPosX,
+          &KLCellHit::SetLocalPosX, true);
+    RegisterValueBranch
+          ("local_pos_y", &_local_pos_y_proc, &KLCellHit::GetLocalPosY,
+          &KLCellHit::SetLocalPosY, true);
+    RegisterValueBranch
+          ("local_pos_z", &_local_pos_z_proc, &KLCellHit::GetLocalPosZ,
+          &KLCellHit::SetLocalPosZ, true);
+    RegisterValueBranch
+          ("err_x", &_error_x_proc, &KLCellHit::GetErrorX,
+          &KLCellHit::SetErrorX, true);
+    RegisterValueBranch
+          ("err_y", &_error_y_proc, &KLCellHit::GetErrorY,
+          &KLCellHit::SetErrorY, true);
+    RegisterValueBranch
+          ("err_z", &_error_z_proc, &KLCellHit::GetErrorZ,
+          &KLCellHit::SetErrorZ, true);
+    RegisterValueBranch
+          ("flag", &_flag_proc, &KLCellHit::GetFlag,
+          &KLCellHit::SetFlag, true);
 }
 }  // namespace MAUS
 

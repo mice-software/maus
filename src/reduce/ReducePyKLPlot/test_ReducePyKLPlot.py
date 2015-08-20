@@ -41,7 +41,7 @@ class ReducePyKLPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Invoke "birth" and check for success.
         @param self Object reference.
         """
-        success = self.__reducer.birth("{}")
+        success = self.__reducer.birth("""{"root_batch_mode":1}""")
         if not success:
             raise Exception('Test setUp failed '+str(success),
                             'reducer.birth() failed')
@@ -89,7 +89,8 @@ class ReducePyKLPlotTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         Test "process" with a JSON document with no "digits" entry.
         @param self Object reference.#
         """
-        result = self.__process({})
+        noDigit_json = {"run_number": 1, "maus_event_type": "Spill", "recon_events": [], "spill_number": 0, "errors": {}, "daq_event_type": "physics_event", "daq_data": {}} # pylint: disable=C0301
+        result = self.__process(noDigit_json)
         self.assertTrue("errors" in result, "No errors field")
         errors = result["errors"]
         self.assertTrue("ReducePyKLPlot" in errors,

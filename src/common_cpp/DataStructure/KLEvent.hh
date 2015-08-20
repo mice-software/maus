@@ -47,11 +47,17 @@ class KLEvent {
      /** Returns KLEventDigit */
     KLEventDigit GetKLEventDigit() const;
 
+     /** Returns KLEventDigit */
+    KLEventDigit* GetKLEventDigitPtr();
+
     /** Sets KLEventDigit */
     void SetKLEventDigit(KLEventDigit kl_digits);
 
     /** Returns KLEventCellHit */
     KLEventCellHit GetKLEventCellHit() const;
+
+    /** Returns KLEventCellHit */
+    KLEventCellHit* GetKLEventCellHitPtr();
 
     /** Sets KLEventCellHit */
     void SetKLEventCellHit(KLEventCellHit kl_cell_hits);

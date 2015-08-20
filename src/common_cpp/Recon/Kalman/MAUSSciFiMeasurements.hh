@@ -31,7 +31,7 @@ namespace MAUS {
     public :
       explicit SciFiStraightMeasurements(SciFiGeometryHelper* geometry_helper);
 
-//      virtual Kalman::State Measure(const State& state);
+      virtual Kalman::State Measure(const Kalman::State& state);
 
       virtual TMatrixD CalculateMeasurementMatrix(const Kalman::State& state);
 
@@ -46,13 +46,14 @@ namespace MAUS {
       TMatrixD _measurement_noise;
 
       std::map<int, TMatrixD> _matrix_map;
+      std::map<int, TMatrixD> _alignment_map;
   };
 
   class SciFiHelicalMeasurements : public Kalman::Measurement_base {
     public :
       explicit SciFiHelicalMeasurements(SciFiGeometryHelper* geometry_helper);
 
-//      virtual Kalman::State Measure(const State& state);
+      virtual Kalman::State Measure(const Kalman::State& state);
 
       virtual TMatrixD CalculateMeasurementMatrix(const Kalman::State& state);
 
@@ -67,6 +68,7 @@ namespace MAUS {
       TMatrixD _measurement_noise;
 
       std::map<int, TMatrixD> _matrix_map;
+      std::map<int, TMatrixD> _alignment_map;
   };
 
 

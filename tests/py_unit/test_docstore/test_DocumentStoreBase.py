@@ -184,10 +184,10 @@ class DocumentStoreTests(object): # pylint: disable=R0904, C0301
         # intervals too.
         pre_time = datetime.fromtimestamp(time.time())
         docs_pre_mid = self.insert_documents(3, 0.1)
-        sleep(0.1)
+        sleep(1)
         mid_time = datetime.fromtimestamp(time.time())
         docs_post_mid = self.insert_documents(3, 0.1)
-        sleep(0.1)
+        sleep(1)
         post_time = datetime.fromtimestamp(time.time())
         # Expect no documents.
         since = self._data_store.get_since(self._collection, post_time)

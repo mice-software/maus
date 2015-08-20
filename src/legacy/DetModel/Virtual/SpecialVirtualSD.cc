@@ -33,7 +33,7 @@ int SpecialVirtualSD::_uniqueID=0;
 SpecialVirtualSD::SpecialVirtualSD(MICEEvent * _event, MiceModule * mod )
                  : MAUSSD( mod ),
                    _steppingThrough(true), _steppingInto(true), _steppingOutOf(true), _steppingAcross(true),
-                   _localRotation(), _globalRotation(), _localPosition(), _globalPosition()
+                   _localRotation(), _globalRotation(), _localPosition(), _globalPosition(), _hits(NULL)
 {
   _module = mod;
   simEvent = _event;
@@ -90,6 +90,11 @@ void SpecialVirtualSD::SetStepping(bool SteppingThrough, bool SteppingInto, bool
   _steppingAcross  = SteppingAcross;
 }
 
+void SpecialVirtualSD::ClearHits() {
+    if (_hits != NULL)
+        delete _hits;
+    _hits = new std::vector<MAUS::SpecialVirtualHit>();
+}
 
 void SpecialVirtualSD::Initialize(G4HCofThisEvent* HCE)
 {
@@ -99,31 +104,38 @@ void SpecialVirtualSD::Initialize(G4HCofThisEvent* HCE)
 
 }
 
+void SpecialVirtualSD::TakeHits(MAUS::MCEvent* event) {
+  event->SetSpecialVirtualHits(_hits);
+  _hits = new std::vector<MAUS::SpecialVirtualHit>();
+}
+
+
 G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
              History)
 {
-  Json::Value hit_i, channel_id, threeVectorValue;
-  channel_id[ "station" ] = _stationNumber;
+  MAUS::SpecialVirtualHit hit;
+  MAUS::SpecialVirtualChannelId* channel_id = new MAUS::SpecialVirtualChannelId();
+  channel_id->SetStation(_stationNumber);
+  hit.SetChannelId(channel_id);
+  hit.SetTrackId(aStep->GetTrack()->GetTrackID());
+  hit.SetEnergyDeposited(aStep->GetTotalEnergyDeposit());
+  hit.SetTime(aStep->GetPostStepPoint()->GetGlobalTime());
+  hit.SetEnergy(aStep->GetTrack()->GetTotalEnergy());
+  hit.SetParticleId(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
+  hit.SetCharge(aStep->GetTrack()->GetDefinition()->GetPDGCharge());
 
-  hit_i["channel_id"] = channel_id;
-  hit_i["track_id"] = aStep->GetTrack()->GetTrackID();
-  hit_i["energy_deposited"] = aStep->GetTotalEnergyDeposit();
-  hit_i["time"] = aStep->GetPostStepPoint()->GetGlobalTime();
-  hit_i["energy"] = aStep->GetTrack()->GetTotalEnergy();
-  hit_i["particle_id"] = aStep->GetTrack()->GetDefinition()->GetPDGEncoding();
-  hit_i["charge"] =  aStep->GetTrack()->GetDefinition()->GetPDGCharge();
+  hit.SetMomentum(MAUS::ThreeVector(
+    aStep->GetPostStepPoint()->GetPosition().x(),
+    aStep->GetPostStepPoint()->GetPosition().y(),
+    aStep->GetPostStepPoint()->GetPosition().z()
+  )); 
+  hit.SetMomentum(MAUS::ThreeVector(
+    aStep->GetPostStepPoint()->GetMomentum().x(),
+    aStep->GetPostStepPoint()->GetMomentum().y(),
+    aStep->GetPostStepPoint()->GetMomentum().z()
+  )); 
 
-  threeVectorValue["x"] = aStep->GetPostStepPoint()->GetPosition().x();
-  threeVectorValue["y"] = aStep->GetPostStepPoint()->GetPosition().y();
-  threeVectorValue["z"] = aStep->GetPostStepPoint()->GetPosition().z(); 
-  hit_i["position"] = threeVectorValue;
-  threeVectorValue["x"] = aStep->GetPostStepPoint()->GetMomentum().x();
-  threeVectorValue["y"] = aStep->GetPostStepPoint()->GetMomentum().y();
-  threeVectorValue["z"] = aStep->GetPostStepPoint()->GetMomentum().z(); 
-  hit_i["momentum"] = threeVectorValue;
-
-
-  _hits["special_virtual_hits"].append(hit_i);
+  _hits->push_back(hit);
   return true;
 }
 

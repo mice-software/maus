@@ -16,6 +16,7 @@
  */
 
 #include <iostream>
+#include <vector>
 
 #include "Interface/Squeak.hh"
 #include "Utils/Exception.hh"
@@ -29,7 +30,7 @@
 
 namespace MAUS {
 
-MAUSSteppingAction::MAUSSteppingAction() : _steps(), _keepSteps(false),
+MAUSSteppingAction::MAUSSteppingAction() : _steps(NULL), _keepSteps(false),
     _maxNSteps(0) {
   Json::Value& conf = *MICERun::getInstance()->jsonConfiguration;
   _maxNSteps = JsonWrapper::GetProperty
@@ -40,11 +41,15 @@ MAUSSteppingAction::MAUSSteppingAction() : _steps(), _keepSteps(false),
 
 void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
     // record all step points if keep steps flag is set
+    if (_keepSteps && _steps == NULL)
+        throw Exception(Exception::recoverable,
+                        "Attempt to do stepping action when steps were NULL",
+                        "MAUSSteppingAction::UserSteppingAction");
     if (_keepSteps) {
-        if (_steps.size() == 0) {
-            _steps.append(StepToJson(aStep, true));
+        if (_steps->size() == 0) {
+            _steps->push_back(StepToMaus(aStep, true));
         }
-        _steps.append(StepToJson(aStep, false));
+        _steps->push_back(StepToMaus(aStep, false));
     }
 
     // kill particles that are looping
@@ -63,8 +68,14 @@ void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
                          GetVirtualPlanes()->VirtualPlanesSteppingAction(aStep);
 }
 
-Json::Value MAUSSteppingAction::StepToJson
-                                     (const G4Step* aStep, bool prestep) const {
+std::vector<Step>* MAUSSteppingAction::TakeSteps() {
+    std::vector<Step>* steps_tmp = _steps;
+    _steps = NULL;
+    return steps_tmp;
+}
+
+
+Step MAUSSteppingAction::StepToMaus(const G4Step* aStep, bool prestep) const {
     G4Track* aTrack = aStep->GetTrack();
     G4StepPoint* point = aStep->GetPostStepPoint();
     if (prestep) point = aStep->GetPreStepPoint();
@@ -72,67 +83,56 @@ Json::Value MAUSSteppingAction::StepToJson
         throw(Exception(Exception::recoverable,
                      "Failed to resolve step point",
                      "MAUSSteppingAction::StepPointToJson"));
-    Json::Value step;
-    Json::Value position;
-    position["x"] = point->GetPosition().x();
-    position["y"] = point->GetPosition().y();
-    position["z"] = point->GetPosition().z();
-    step["position"] = position;
+    Step step;
+    ThreeVector position(point->GetPosition().x(),
+                         point->GetPosition().y(),
+                         point->GetPosition().z());
+    step.SetPosition(position);
 
-    Json::Value momentum;
-    momentum["x"] = point->GetMomentum().x();
-    momentum["y"] = point->GetMomentum().y();
-    momentum["z"] = point->GetMomentum().z();
-    step["momentum"] = momentum;
+    ThreeVector momentum(point->GetMomentum().x(),
+                         point->GetMomentum().y(),
+                         point->GetMomentum().z());
+    step.SetMomentum(momentum);
 
-    Json::Value spin;
-    spin["x"] = point->GetPolarization().x();
-    spin["y"] = point->GetPolarization().y();
-    spin["z"] = point->GetPolarization().z();
-    step["spin"] = spin;
+    ThreeVector spin(point->GetPolarization().x(),
+                     point->GetPolarization().y(),
+                     point->GetPolarization().z());
+    step.SetSpin(spin);
 
     double f_pos[4] = {point->GetPosition().x(), point->GetPosition().y(),
                        point->GetPosition().z(), point->GetGlobalTime()};
     double field[6] = {0., 0., 0., 0., 0., 0.};
     MAUSGeant4Manager::GetInstance()->GetField()->GetFieldValue(f_pos, field);
-    Json::Value bfield;
-    bfield["x"] = field[0];
-    bfield["y"] = field[1];
-    bfield["z"] = field[2];
-    step["b_field"] = bfield;
+    ThreeVector bfield(field[0], field[1], field[2]);
+    step.SetBField(bfield);
+    ThreeVector efield(field[3], field[4], field[5]);
+    step.SetEField(efield);
 
-    Json::Value efield;
-    efield["x"] = field[3];
-    efield["y"] = field[4];
-    efield["z"] = field[5];
-    step["e_field"] = efield;
-
-    step["energy"] = point->GetTotalEnergy();
-    step["proper_time"] = point->GetProperTime();
-    step["path_length"] = aTrack->GetTrackLength();
-    step["energy_deposited"] = aStep->GetTotalEnergyDeposit();
-    step["time"] = point->GetGlobalTime();
+    step.SetEnergy(point->GetTotalEnergy());
+    step.SetProperTime(point->GetProperTime());
+    step.SetPathLength(aTrack->GetTrackLength());
+    step.SetEnergyDeposited(aStep->GetTotalEnergyDeposit());
+    step.SetTime(point->GetGlobalTime());
     // G4StepPoint GetPhysicalVolume is inlined
     // point->GetTouchable()->GetPhysicalVolume() with no NULL check so we do it
     // here
     if (point->GetTouchable() != NULL && point->GetPhysicalVolume() != NULL) {
-        step["volume"] = point->GetPhysicalVolume()->GetName();
+        step.SetVolume(point->GetPhysicalVolume()->GetName());
     } else {
-        step["volume"] = "";
+        step.SetVolume("");
     }
     if (point->GetMaterial() != NULL) {
-        step["material"] = point->GetMaterial()->GetName();
+        step.SetMaterial(point->GetMaterial()->GetName());
     } else {
-        step["material"] = "";
+        step.SetMaterial("");
     }
     return step;
 }
 
-void  MAUSSteppingAction::SetSteps(Json::Value steps) {
-    if (!steps.isArray())
-        throw(Exception(Exception::recoverable,
-              "Attempting to set steps to non-array type",
-              "MAUSSteppingAction::SetSteps()"));
+void  MAUSSteppingAction::SetSteps(std::vector<Step>* steps) {
+    if (_steps != NULL) {
+        delete _steps;
+    }
     _steps = steps;
 }
 
