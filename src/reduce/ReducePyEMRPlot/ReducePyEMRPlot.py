@@ -32,9 +32,16 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
     """
     ReducePyEMRPlot plots several EMR histograms.
     Currently the following histograms are filled:
-    - EMR primary range
+    - Occupancy in the xz and yz projections
+    - Beam profile at the entrance of the EMR in the xy plane
+    - Beam depth profile from the SAPMT information
+
+    - Range of the primary and secondary particles
+    - Total ADC charge from the MAPMT and the SAPMT
+    - Charge ratio of the first part of the track over the end part
+    - Chi squared ln(1+chi_x^2+chi_y^2) vs plane density rho_P
     
-    Histograms are drawn on different canvases.
+    Histograms are drawn on 2 different canvases.
     The canvases are refreshed every N spills where N = refresh_rate
     set via refresh_rate data card value (see below).
    
@@ -164,9 +171,8 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
     def _update_histograms(self, spill):
         """Update the Histograms """
-        if not spill.has_key("daq_event_type"):
-            raise ValueError("No event type")
-        if spill["daq_event_type"] == "end_of_run":
+        daq_evtype = spill.GetSpill().GetDaqEventType()
+        if daq_evtype == "end_of_run":
             if (not self.run_ended):
                 self.update_histos()
                 self.run_ended = True
@@ -176,15 +182,16 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         # do not try to get data from start/end spill markers
         data_spill = True
-        if spill["daq_event_type"] == "start_of_run" \
-              or spill["daq_event_type"] == "start_of_burst" \
-              or spill["daq_event_type"] == "end_of_burst":
+        if daq_evtype == "start_of_run" \
+              or daq_evtype == "start_of_burst" \
+              or daq_evtype == "end_of_burst":
             data_spill = False
 
         # Get EMR events & fill the relevant histograms.
         if data_spill and not self.get_events(spill): 
             raise ValueError("EMR events not in spill")
 
+        # Get EMR reconstruction variables & fill the relevant histograms.
         if self.enable_pid_recon:
             if data_spill and not self.get_pid_recon(spill): 
                 raise ValueError("EMR pid reconstruction not in spill")
@@ -197,47 +204,43 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         else:
             return []
 
-    def get_events(self, spill):
+    def get_events(self, data):
         """ 
         Get the EMR events and update the occupancy histograms
 
         @param self Object reference.
-        @param spill Current spill.
+        @param data Current spill data.
         @return True if no errors or False if no "emr_digits" in
         the spill.
         """
-        if 'recon_events' not in spill:
+        if data.GetSpill().GetReconEventSize() == 0:
             raise ValueError("recon_events not in spill")
-        for evn in range(len(spill['recon_events'])):
-            if 'emr_event' not in spill['recon_events'][evn]:
+        reconevents = data.GetSpill().GetReconEvents()
+        for evn in range(data.GetSpill().GetReconEventSize()):
+            emr_event = reconevents[evn].GetEMREvent()
+            if emr_event is None:
                 raise ValueError("emr_event not in recon_events")
 
             totmax_x = 0
             totmax_y = 0
             x_pos = -999.0
             y_pos = -999.0
-            for plane in range(len(spill['recon_events'][evn]['emr_event']\
-                                        ['emr_plane_hits'])):
-                plane_id = spill['recon_events'][evn]['emr_event']\
-                                ['emr_plane_hits'][plane]['plane']
-                charge = spill['recon_events'][evn]['emr_event']\
-                                ['emr_plane_hits'][plane]['charge']
+
+            emr_planes = emr_event.GetEMRPlaneHitArray()
+            for plane in range(emr_planes.size()):
+                plane_id = emr_planes[plane].GetPlane()
+                charge = emr_planes[plane].GetCharge()
                 # fill the depth profile of the EMR (plane charge)
                 if charge:
                     self.hdepth_profile.Fill(plane_id)
 
-                for sbar in range(len(spill['recon_events'][evn]['emr_event']\
-                                     ['emr_plane_hits'][plane]['emr_bars'])):
-                    sbar_id = spill['recon_events'][evn]['emr_event']\
-                                  ['emr_plane_hits'][plane]['emr_bars']\
-                                  [sbar]['bar']
-                    for hit in range(len(spill['recon_events'][evn]\
-                                         ['emr_event']['emr_plane_hits']\
-                                         [plane]['emr_bars'][sbar]\
-                                         ['emr_bar_hits'])):
-                        tot = spill['recon_events'][evn]['emr_event']\
-                                   ['emr_plane_hits'][plane]['emr_bars']\
-                                   [sbar]['emr_bar_hits'][hit]['tot']
+                emr_bars = emr_planes[plane].GetEMRBarArray()
+                for sbar in range(emr_bars.size()):
+                    sbar_id = emr_bars[sbar].GetBar()
+
+                    emr_hits = emr_bars[sbar].GetEMRBarHitArray()
+                    for hit in range(emr_hits.size()):
+                        tot = emr_hits[hit].GetTot()
                         # fill the occupancy of the EMR in the two projections
                         if tot:
                             bpx = array.array('d', [plane_id+sbar_id%2, \
@@ -278,7 +281,7 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         return True
 
-    def get_pid_recon(self, spill):
+    def get_pid_recon(self, data):
         """ 
         Get the EMR events and update the histograms.
 
@@ -287,38 +290,33 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         @return True if no errors or False if no "emr_digits" in
         the spill.
         """
-        if 'recon_events' not in spill:
+        if data.GetSpill().GetReconEventSize() == 0:
             raise ValueError("recon_events not in spill")
-        for evn in range(len(spill['recon_events'])):
-            if 'emr_event' not in spill['recon_events'][evn]:
+        reconevents = data.GetSpill().GetReconEvents()
+        for evn in range(data.GetSpill().GetReconEventSize()):
+            emr_event = reconevents[evn].GetEMREvent()
+            if emr_event is None:
                 raise ValueError("emr_event not in recon_events")
 
             # Skip EMR events without a primary
-            if not spill['recon_events'][evn]['emr_event']['has_primary']:
+            if not emr_event.GetHasPrimary():
                 continue
 
             # Fill the range histograms
-            self.hrange_primary.Fill(spill['recon_events'][evn]\
-                                          ['emr_event']['range_primary'])
-            if spill['recon_events'][evn]['emr_event']['has_secondary']:
-                self.hrange_secondary.Fill(spill['recon_events'][evn]\
-                                                ['emr_event']
-                                                ['range_secondary'])
+            self.hrange_primary.Fill(emr_event.GetRangePrimary())
+            if emr_event.GetHasSecondary():
+                self.hrange_secondary.Fill(emr_event.GetRangeSecondary())
 
             # Fill the charge histograms
-            self.htotal_charge_ma.Fill(spill['recon_events'][evn]\
-                                           ['emr_event']['total_charge_MA'])
-            self.htotal_charge_sa.Fill(spill['recon_events'][evn]\
-                                           ['emr_event']['total_charge_SA'])
+            self.htotal_charge_ma.Fill(emr_event.GetTotalChargeMA())
+            self.htotal_charge_sa.Fill(emr_event.GetTotalChargeSA())
 
-            self.hcharge_ratio_ma.Fill(spill['recon_events'][evn]\
-                                            ['emr_event']['charge_ratio_MA'])
-            self.hcharge_ratio_sa.Fill(spill['recon_events'][evn]\
-                                            ['emr_event']['charge_ratio_SA'])
+            self.hcharge_ratio_ma.Fill(emr_event.GetChargeRatioMA())
+            self.hcharge_ratio_sa.Fill(emr_event.GetChargeRatioSA())
 
             # Fill the PID TGraph, the muons are located in the bottom right
-            density = spill['recon_events'][evn]['emr_event']['plane_density']
-            chi2 = spill['recon_events'][evn]['emr_event']['chi2']
+            density = emr_event.GetPlaneDensity()
+            chi2 = emr_event.GetChi2()
             self.hspread_vs_density.Fill(density, math.log1p(chi2))
 
         # Efficiency of the track matching
