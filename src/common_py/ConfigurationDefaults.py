@@ -412,8 +412,8 @@ Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
-Enable_VLSB_Unpacking = True
-Enable_VLSB_C_Unpacking = True
+Enable_VLSB_Unpacking = False
+Enable_VLSB_C_Unpacking = False
 Enable_DBB_Unpacking = True
 Enable_DBBChain_Unpacking = True
 Do_V1731_Zero_Suppression = False
@@ -471,13 +471,10 @@ EMRbarHeight = 17 # mm, height of the triangle
 EMRgap = 0.5 # mm, gap between two adjacent bars
 
 # EMR event pre-selection
-EMRtotNoiseLow = 0
-EMRtotNoiseUp = 7 # noise time over threshold window
-
-EMRdeltatSignalLow = -240 # Step I
-EMRdeltatSignalUp = -220 # Step I
-EMRdeltatNoiseLow = -220 # Step I
-EMRdeltatNoiseUp = -175 # Step I
+# EMRdeltatSignalLow = -240 # Step I
+# EMRdeltatSignalUp = -220 # Step I
+EMRdeltatSignalLow = -240 # Step IV.0
+EMRdeltatSignalUp = -210 # Step IV.0
 
 # EMR digitization
 EMRdoSampling = 1 # sample number of scintillating photons as a Poisson distribution
