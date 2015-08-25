@@ -100,7 +100,7 @@ keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 # simulation_geometry_filename = "Stage4.dat" # geometry used by simulation - should be replaced by CDB version
-simulation_geometry_filename = "Test.dat" # geometry used by simulation - should be replaced by CDB version
+simulation_geometry_filename = "./files/geometry/download/ParentGeometryFile.dat" # geometry used by simulation - should be replaced by CDB version
 simulation_geometry_debug    = False
 check_volume_overlaps = False
 maximum_number_of_steps = 50000000 # particles are killed after this number of
@@ -339,7 +339,7 @@ cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for co
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'id' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'current' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)

@@ -24,6 +24,7 @@
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
 #include "src/common_cpp/DataStructure/TOFChannelId.hh"
+#include "src/common_cpp/DataStructure/CkovChannelId.hh"
 #include "src/common_cpp/DataStructure/KLChannelId.hh"
 #include "src/common_cpp/DataStructure/EMRChannelId.hh"
 #include "src/common_cpp/DataStructure/SciFiChannelId.hh"
@@ -88,6 +89,11 @@ class Hit {
     /** Sets the total energy of the track that made the hit
      */
     virtual void SetEnergy(double energy);
+
+    // Returns the PDG id of the track that made the hit 
+    // (Do I really need to follow the pattern?)
+    virtual double GetMass() const;
+    virtual void SetMass(double mass); 
 
     /** Returns the charge of the track that made the hit
      */
@@ -157,6 +163,7 @@ class Hit {
     int _track_id;
     int _particle_id;
     double _energy;
+    double _mass;
     double _charge;
     double _time;
     double _energy_deposited;
@@ -175,6 +182,7 @@ typedef Hit<TOFChannelId> TOFHit;
 typedef Hit<KLChannelId> KLHit;
 typedef Hit<EMRChannelId> EMRHit;
 typedef Hit<SpecialVirtualChannelId> SpecialVirtualHit;
+typedef Hit<CkovChannelId> CkovHit;
 }
 
 #include "src/common_cpp/DataStructure/Hit-inl.hh"

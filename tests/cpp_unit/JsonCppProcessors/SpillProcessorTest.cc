@@ -26,6 +26,7 @@
 #include "src/common_cpp/JsonCppProcessors/PrimaryProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SciFiChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/CkovChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/HitProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/VirtualHitProcessor.hh"
@@ -84,6 +85,9 @@ std::string SF_CHANNEL_ID =
 std::string TOF_CHANNEL_ID =
     std::string("{\"slab\":1,\"station_number\":2,\"plane\":3}");
 
+std::string CKOV_CHANNEL_ID =
+    std::string("{\"station_number\":1}");
+
 std::string SV_CHANNEL_ID =
     std::string("{\"station\":1}");
 
@@ -97,6 +101,8 @@ std::string HIT_SEED =
 std::string SF_HIT = HIT_SEED+SF_CHANNEL_ID+"}";
 
 std::string TOF_HIT = HIT_SEED+TOF_CHANNEL_ID+"}";
+
+std::string CKOV_HIT = HIT_SEED+CKOV_CHANNEL_ID+"}";
 
 std::string SV_HIT = HIT_SEED+SV_CHANNEL_ID+"}";
 
@@ -122,6 +128,7 @@ std::string MC_EVENT =
     std::string("{\"primary\":")+PRIMARY+","+
     std::string("\"sci_fi_hits\":[")+SF_HIT+","+SF_HIT+"],"+
     std::string("\"tof_hits\":[")+TOF_HIT+","+TOF_HIT+"],"+
+    std::string("\"ckov_hits\":[")+CKOV_HIT+","+CKOV_HIT+"],"+
     std::string("\"special_virtual_hits\":[")+SV_HIT+","+SV_HIT+"],"+
     std::string("\"virtual_hits\":[")+VIRTUAL_HIT+"],"+
     std::string("\"tracks\":[")+TRACK_STEP+","+TRACK_NO_STEP+"]}";
@@ -163,6 +170,11 @@ TEST(SpillProcessorTest, TOFChannelIdProcessorTest) {
     ProcessorTest::test_value(&proc, TOF_CHANNEL_ID);
 }
 
+TEST(SpillProcessorTest, CkovChannelIdProcessorTest) {
+    CkovChannelIdProcessor proc;
+    ProcessorTest::test_value(&proc, CKOV_CHANNEL_ID);
+}
+
 TEST(SpillProcessorTest, SciFiChannelIdProcessorTest) {
     SciFiChannelIdProcessor proc;
     ProcessorTest::test_value(&proc, SF_CHANNEL_ID);
@@ -181,6 +193,11 @@ TEST(SpillProcessorTest, SciFiHitProcessorTest) {
 TEST(SpillProcessorTest, TOFHitProcessorTest) {
     TOFHitProcessor proc;
     ProcessorTest::test_value(&proc, TOF_HIT);
+}
+
+TEST(SpillProcessorTest, CkovHitProcessorTest) {
+    CkovHitProcessor proc;
+    ProcessorTest::test_value(&proc, CKOV_HIT);
 }
 
 TEST(SpillProcessorTest, SpecialVirtualHitProcessorTest) {

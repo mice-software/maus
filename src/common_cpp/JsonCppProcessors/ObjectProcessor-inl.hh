@@ -151,7 +151,7 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
     if (json_object.type() != Json::objectValue) {
         std::string tp = JsonWrapper::ValueTypeToString(json_object.type());
         throw(Exception(Exception::recoverable,
-                     "Attempt to pass a json "+tp+" type as an object",
+                     "Attempt to pass a json "+tp+" type as an object", 
                      "ObjectProcessor<ObjectType>::JsonToCpp"));
     }
     if (_throws_if_unknown_branches && HasUnknownBranches(json_object)) {

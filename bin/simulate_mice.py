@@ -37,6 +37,9 @@ def run():
     my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
+    # Ckov
+    my_map.append(MAUS.MapCppCkovMCDigitizer())
+
     # KL
     my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
     my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
