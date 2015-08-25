@@ -113,8 +113,8 @@ static PyObject* evaluate(PyObject *self, PyObject *args,
  *
  *  \return a PyLong
  */
-static PyObject* point_dimension(PyObject *self, PyObject *args,
-                                                                PyObject *kwds);
+// static PyObject* point_dimension(PyObject *self, PyObject *args,
+//                                                              PyObject *kwds);
 
 /** Get the value dimension
  *
@@ -124,8 +124,8 @@ static PyObject* point_dimension(PyObject *self, PyObject *args,
  *
  *  \return a PyLong
  */
-static PyObject* value_dimension(PyObject *self, PyObject *args,
-                                                                PyObject *kwds);
+// static PyObject* value_dimension(PyObject *self, PyObject *args,
+//                                                              PyObject *kwds);
 
 /** Get the string representation of the PolynomialMap
  *
@@ -135,7 +135,7 @@ static PyObject* value_dimension(PyObject *self, PyObject *args,
  *
  *  \return a PyString
  */
-static PyObject* str(PyObject *self, PyObject *args, PyObject *kwds);
+// static PyObject* str(PyObject *self, PyObject *args, PyObject *kwds);
 
 }  // namespace PyPolynomialMap
 }  // namespace MAUS

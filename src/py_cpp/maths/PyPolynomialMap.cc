@@ -28,6 +28,7 @@
 
 #include <structmember.h>
 
+#include <vector>
 #include <string>
 
 #include "src/common_cpp/Maths/Matrix.hh"
@@ -163,7 +164,7 @@ std::vector<std::vector<double> > get_vectors(PyObject* py_floats) {
             data = std::vector< std::vector<double> >(num_rows, std::vector<double>(num_cols));
         }
         // now loop over columns
-        if (PyList_Size(row) != int(num_cols)) {
+        if (PyList_Size(row) != static_cast<int>(num_cols)) {
             return std::vector<std::vector<double> >();
         }
         for (size_t j = 0; j < num_cols; ++j) {
@@ -292,7 +293,7 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
             data = std::vector<double>(num_rows*num_cols);
         }
         // now loop over columns
-        if (PyList_Size(row) != int(num_cols)) {
+        if (PyList_Size(row) != static_cast<int>(num_cols)) {
                 PyErr_SetString(PyExc_ValueError,
                                 "coefficients row had wrong number of elements");
         }
