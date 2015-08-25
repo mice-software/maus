@@ -72,6 +72,12 @@
             <fraction n="0.231781231781232" ref="O0xa126ec0"/>
             <fraction n="0.0128270128270128" ref="Ar0xa127230"/>
         </material>
+     <material name="BC600">
+         <D unit="g/cm3" value="1.18"/>
+         <composite n="15" ref="C0xa126810"/>
+         <composite n="16" ref="H0xa133b30"/>
+         <composite n="2" ref="O0xa126ec0"/>
+     </material>
     </materials>
     
     <solids>
@@ -83,6 +89,8 @@
     <volume name="KLFiber_unit">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="KLFibre_unitsolid"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
     <assembly name="KLFiberPlane2">        
@@ -439,14 +447,16 @@
         </physvol>        
     </assembly>
     <volume name="KLFiberBlock2_4">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol name="KLFiberLattice2_4_phys">
             <volumeref ref="KLFiberLattice2_4"/>
             <position name="KLFiberLattice2_4_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
             <rotation name="KLFiberLattice2_4_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
         </physvol>
-    </volume>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
+     </volume>
         
     </structure>    
     
