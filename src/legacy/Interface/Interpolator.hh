@@ -72,6 +72,30 @@ private:
 	int    _outSize;
 };
 
+template<class T>
+class MemberFunctionConst : public VectorMap
+{
+public:
+  MemberFunctionConst( T& object, void (T::*function)(const double*, double*) const, int inSize, int outSize)
+                : _function(function), _object(object), _inSize(inSize), _outSize(outSize) {;}
+  ~MemberFunctionConst() {;}
+  //return map value; vectors NOT checked for size
+  void  F    (const double* point, double* value) const { (_object.*_function)(point, value);}
+  //Checks for self-consistency
+  inline bool  CheckPoint(const std::vector<double>& point) const {return (point.size() == PointDimension());}
+  inline bool  CheckValue(const std::vector<double>& value) const {return (value.size() == PointDimension());}
+  //Tell me the required dimension of the input point and output value
+  unsigned int PointDimension() const {return _inSize;}
+  unsigned int ValueDimension() const {return _outSize;}
+  //Pseudo-copy constructor for the VectorMap
+  VectorMap* Clone() const {return new MemberFunctionConst(*this);}
+private:
+  void   (T::*_function)(const double*, double*) const;
+  T&     _object;
+  int    _inSize;
+  int    _outSize;
+};
+
 ///// Interpolator2dGridTo1d /////
 
 class Interpolator2dGridTo1d : public VectorMap

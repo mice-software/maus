@@ -99,6 +99,12 @@ class SciFiDigit : public TObject {
     /** Get the time (ns) */
     double get_time()    const { return _time;    }
 
+    /** Set the ADC Value */
+    void set_adc(int adc) { _adc = adc; }
+
+    /** Get the ADC Value */
+    int get_adc() const { return _adc; }
+
     /** Set the used flag */
     void set_used(bool used)   { _used = used; }
 
@@ -112,6 +118,8 @@ class SciFiDigit : public TObject {
     int _tracker, _station, _plane, _channel;
 
     double _npe, _time;
+
+    int _adc;
 
     bool _used;
 

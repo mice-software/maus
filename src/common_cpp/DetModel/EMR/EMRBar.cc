@@ -125,8 +125,8 @@ EMRBar::EMRBar(MiceModule* mod,
   G4double pTheta = 0.0;            // Polar angle of the line joining
                                     // the centres of the faces at -/+pDz
 
-  G4double pPhi   = 0.0;            // Azimuthal angle of the line joing the centre of the face at
-                                    // -pDz to the centre of the face at +pDz
+  G4double pPhi   = 0.0;            // Azimuthal angle of the line joining
+                                    // the centres of the faces at -/+pDz
 
   G4double pDy1   = 0.5*fBarWidth;  // Half-length along y of the face at -pDz
 

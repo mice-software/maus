@@ -18,6 +18,7 @@
 #ifndef _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 #define _SRC_COMMON_CPP_SIMULATION_MAUSGEANT4MANAGER_HH_
 
+#include <string>
 #include <vector>
 
 #include "Geant4/G4RunManager.hh"
@@ -173,18 +174,36 @@ class MAUSGeant4Manager {
      *  Note that it is a feature of Geant4 that the geometry cannot be reopened
      */
     ~MAUSGeant4Manager();
-
+    /** Set sensitive detector and user limits for GDML objects
+     *
+     * This considers both the case where there is auxiliary information
+     * present and otherwise
+     */
+    void SetVolumeInformation(MiceModule& module, G4LogicalVolume* base);
+    /** Set user limits and visual properties in the default case
+     *
+     * This is to be used in the bulk case where a volume is not defined with
+     * auxiliary information from the GDML
+     */
+    void SetSteppingLimits(G4LogicalVolume* myvol);
     /** Set the auxiliary information for the GDML objects 
      *  
      * Right now this is almost exclusively sensitive detector information
      * but it may be expanded to include visualization information if 
      * necessary.
      */
-    void SetAuxInformation(MiceModule& module);
-
+    void SetAuxInformation(MiceModule& module, G4LogicalVolume* myvol,
+			   const G4GDMLAuxListType auxlist);
     /** Set the sensitive detector information 
      *
-     *  Recursively examine logical volumes for
+     *  Examine auxiliary information for sensitive detectors
+     */
+    void DefineSensitiveDetector(MiceModule& module, G4LogicalVolume* myvol,
+       			         std::string sensdetname);
+    /** Set the sensitive detector information 
+     *
+     *  Recursively examine logical volumes for daughter logical volumes and set 
+     *  them to sensitive detector volumes.
      */
     void SetDaughterSensitiveDetectors(G4LogicalVolume* logic);
 
@@ -221,6 +240,11 @@ class MAUSGeant4Manager {
 
     static MAUSGeant4Manager* _instance;
     static bool _isClosed;
+
+    G4double _stepMax;
+    G4double _timeMax;
+    G4double _trackMax;
+    G4double _keThreshold;
 };
 
 inline void MAUSGeant4Manager::SetVirtualPlanes(VirtualPlaneManager* virt) {
