@@ -182,12 +182,14 @@
 #pragma link C++ class MAUS::DataStructure::Global::Track+;
 #pragma link C++ class MAUS::DataStructure::Global::PrimaryChain+;
 #pragma link C++ class MAUS::DataStructure::Global::TRefTrackPair+;
+#pragma link C++ class MAUS::DataStructure::Global::PIDLogLPair+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::BasePoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::SpacePoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::TrackPoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::Track*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::PrimaryChain*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::TRefTrackPair*>+;
+#pragma link C++ class std::vector<MAUS::DataStructure::Global::PIDLogLPair*>+;
 
 #pragma link C++ class MAUS::EMRDaq+;
 #pragma link C++ class MAUS::DBBHit+;

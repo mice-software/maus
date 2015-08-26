@@ -43,6 +43,15 @@ namespace MAUS {
 			    "Failed to parse configuration",
 			    "MapCppGlobalReconImport::birth");
     }
+
+    char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+    if (!pMAUS_ROOT_DIR) {
+      throw MAUS::Exception(Exception::recoverable,
+	          std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
+            std::string("Did you try running: source env.sh?"),
+            "MapCppGlobalReconImport::_birth");
+    }
+    
     _configCheck = true;
     _classname = "MapCppGlobalReconImport";
     // get the geometry
@@ -51,10 +60,6 @@ namespace MAUS {
 		      "Could not find geometry file",
 		      "MapCppGlobalReconImport::birth"));
     geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
-    /* get the TOF and EMR geometry modules
-       geo_module = new MiceModule(filename);
-       kl_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "KL");
-       kl_mother_modules = geo_module->findModulesByPropertyString("Region", "KLregion");*/
   }
 
   void MapCppGlobalReconImport::_death() {

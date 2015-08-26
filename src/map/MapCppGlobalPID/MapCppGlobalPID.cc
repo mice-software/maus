@@ -304,6 +304,10 @@ namespace MAUS {
   }
 
   void MapCppGlobalPID::_death() {
+    for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
+	   ++pid_var_count) {
+	delete _pid_vars[pid_var_count];
+      }
   }
 
   void MapCppGlobalPID::_process(MAUS::Data* data) const {

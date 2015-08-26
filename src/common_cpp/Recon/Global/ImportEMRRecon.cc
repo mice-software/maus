@@ -157,6 +157,7 @@ namespace global {
 	}
       }
     }
+    delete geo_module;
   }
 } // ~namespace global
 } // ~namespace recon
