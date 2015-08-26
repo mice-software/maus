@@ -521,6 +521,18 @@ class CADImport: #pylint: disable = R0903, C0103
                     elif elemtype == 'Pmt2PosY':
                         result.append('PropertyHep3Vector Pmt2Pos 0.0 '\
                                       +value+' 0.0 cm\n')
+                    elif elemtype == 'PMT0Pos':
+                        result.append('PropertyHep3Vector PMT0Pos '\
+                                      +value+' 0.0 0.0 cm\n')
+                    elif elemtype == 'PMT2Pos':
+                        result.append('PropertyHep3Vector PMT2Pos '\
+                                      +value+' 0.0 0.0 cm\n')
+                    elif elemtype == 'PMT1Pos':
+                        result.append('PropertyHep3Vector PMT1Pos 0.0 '\
+                                      +value+' 0.0 cm\n')
+                    elif elemtype == 'PMT3Pos':
+                        result.append('PropertyHep3Vector PMT3Pos 0.0 '\
+                                      +value+' 0.0 cm\n')
                     # Specialized vector types
                     elif elemtype == 'BooleanModule1Pos' \
                          or elemtype == 'BooleanModule1Rot' \
