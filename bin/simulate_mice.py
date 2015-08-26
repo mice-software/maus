@@ -37,8 +37,6 @@ def run():
     my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
 
-    # Ckov
-    my_map.append(MAUS.MapCppCkovMCDigitizer())
 
     # KL
     my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
@@ -51,6 +49,9 @@ def run():
     # EMR
     my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
     my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
+    
+    # Ckov
+    my_map.append(MAUS.MapCppCkovMCDigitizer())
 
     # Global Digits - post detector digitisation
 
