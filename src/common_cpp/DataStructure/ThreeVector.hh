@@ -54,7 +54,7 @@ class ThreeVector : public TVector3 {
      *  Beware! This is enabled for implicit conversion - in order to provide
      *  the desired cross-compatibility with ROOT
      */
-	  explicit ThreeVector(const TVector3& value) : TVector3(value) {}
+	  ThreeVector(const TVector3& value) : TVector3(value) {}
 
     /** Copy constructor */
 	  explicit ThreeVector(const ThreeVector& value)
