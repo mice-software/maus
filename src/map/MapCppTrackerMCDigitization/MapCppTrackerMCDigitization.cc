@@ -48,7 +48,6 @@ void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocumen
   _SciFiadcBits = (*json)["SciFiadcBits"].asDouble();
   _SciFivlpcRes = (*json)["SciFivlpcRes"].asDouble();
   _SciFiNPECut        = (*json)["SciFiNoiseNPECut"].asDouble();
-  _SciFiadcFactor     = (*json)["SciFiadcFactor"].asDouble();
   _SciFitdcBits       = (*json)["SciFitdcBits"].asDouble();
   _SciFivlpcTimeRes   = (*json)["SciFivlpcTimeRes"].asDouble();
   _SciFitdcFactor     = (*json)["SciFitdcFactor"].asDouble();
@@ -64,10 +63,10 @@ void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocumen
                _SciFiFiberTransmissionEff *
                _SciFiMUXTransmissionEff *
                _SciFivlpcQE;
-  _mapping_file = (*json)["SciFiMappingFileName"];
-  _calibration_file = (*json)["SciFiCalibrationFileName"];
-  _bad_chan_file = (*json)["SciFiBadChannelsFileName"];
-  
+  _mapping_file = (*json)["SciFiMappingFileName"].asString();
+  _calibration_file = (*json)["SciFiCalibrationFileName"].asString();
+  _bad_chan_file = (*json)["SciFiBadChannelsFileName"].asString();
+
   bool map = load_mapping(_mapping_file);
   bool calib = load_calibration(_calibration_file);
 //  bool calib = load_calibration("scifi_calibration_jan2013.txt");
@@ -292,31 +291,23 @@ double MapCppTrackerMCDigitization::compute_adc_counts(MAUS::SciFiDigit *digit) 
 	    _calibration[_bank[cal_i]][_chan_ro[cal_i]]["adc_pedestal"].asDouble();
 	  test_flag = 1;
 	  if (!_good_chan[_bank[cal_i]][_chan_ro[cal_i]]) {
-		// std::cerr << "Bad channel\n";
 		return numb_pe = -10.0;
 	  }
 	  continue;
 	}
   }
   if ( test_flag == 0 ) {
-    // std::cerr << "Not Found: " << digit->get_tracker() << "  " << digit->get_station()
-    //           << "  " << digit->get_plane() << "  " << digit->get_channel() << "\n";
-	return numb_pe = -10.0;
+	  return numb_pe = -10.0;
   }
   if (_SciFiadcGain == 0 || _SciFiadcPed == 0) {
-    // std::cerr << "Gain or Pedestal zero\n";
     return numb_pe = -10.0;
   }
 
-//    std::cerr << "Gain: " << _SciFiadcGain << "   Pedestal: " <<  _SciFiadcPed << "\n";
-//  _SciFiadcGain = 15;
-//  _SciFiadcPed = 40;
   // Check for saturation of ADCs
   double tmpcounts = (numb_pe * _SciFiadcGain) + _SciFiadcPed;
   if ( tmpcounts > pow(2.0, _SciFiadcBits) - 1.0 )
     tmpcounts = pow(2.0, _SciFiadcBits) - 1.0;
   tmpcounts = (floor(tmpcounts));
-
   numb_pe = (tmpcounts - _SciFiadcPed)/_SciFiadcGain;
   return numb_pe;
 }

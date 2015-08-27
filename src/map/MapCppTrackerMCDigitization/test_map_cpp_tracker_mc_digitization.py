@@ -94,7 +94,7 @@ class MapCppTrackerMCDigitizationTestCase(unittest.TestCase):
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
         print revt['sci_fi_event']['digits']
-        self.assertEqual(33, len(revt['sci_fi_event']['digits']))
+        self.assertEqual(34, len(revt['sci_fi_event']['digits']))
         # Close file
         _file.close()
 

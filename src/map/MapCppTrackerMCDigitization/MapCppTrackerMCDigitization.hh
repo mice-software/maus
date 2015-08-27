@@ -122,7 +122,6 @@ class MapCppTrackerMCDigitization : public MapBase<Data> {
   double _eV_to_phe;
   double _SciFiNPECut;
   double _SciFivlpcRes;
-  double _SciFiadcFactor;
   double _SciFitdcBits;
   double _SciFivlpcTimeRes;
   double _SciFitdcFactor;
@@ -151,6 +150,9 @@ class MapCppTrackerMCDigitization : public MapBase<Data> {
   IntChannelArray _extWG;
   IntChannelArray _inWG;
   IntChannelArray _WGfib;
+  std::string _mapping_file;
+  std::string _calibration_file;
+  std::string _bad_chan_file;
   Json::Value _calibration[_number_banks][_number_channels];
   bool _good_chan[_number_banks][_number_channels];
 
