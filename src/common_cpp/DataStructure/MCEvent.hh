@@ -132,7 +132,7 @@ class MCEvent {
   /** Get the Ckov hits pertaining to this event MCEvent still owns HitArray*.
    */
   CkovHitArray* GetCkovHits() const;
-                                                                              
+
   /** Set the Ckov hits pertaining to this event. MCEvent takes ownership of
    *  memory pointed to by hits.
    */

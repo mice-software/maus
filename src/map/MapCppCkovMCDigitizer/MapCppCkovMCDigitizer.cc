@@ -35,7 +35,7 @@ MapCppCkovMCDigitizer::MapCppCkovMCDigitizer()
 
 //////////////////////////////////////////////////////////////////////
 void MapCppCkovMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
-  
+
   // Before we go on we generate a new TRandom3;
   rnd = new TRandom3;
   // print level
@@ -68,7 +68,6 @@ void MapCppCkovMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
 
   _station_index.push_back("A");
   _station_index.push_back("B");
-
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -77,7 +76,7 @@ void MapCppCkovMCDigitizer::_death() {
 
 //////////////////////////////////////////////////////////////////////
 void MapCppCkovMCDigitizer::_process(Json::Value* document) const {
- 
+
   Json::Value& root = *document;
   // check sanity of json input file and mc brach
   Json::Value mc = check_sanity_mc(*document);
@@ -86,7 +85,7 @@ void MapCppCkovMCDigitizer::_process(Json::Value* document) const {
   // all_tof_digits store all the tof hits
   // then we'll weed out multiple hits, add up yields, and store the event
   // ---
-  // For the Ckov, it's similar. Just change TOF to Ckov. 
+  // For the Ckov, it's similar. Just change TOF to Ckov.
   //
   std::vector<Json::Value> all_ckov_digits;
   all_ckov_digits.push_back(Json::Value());
@@ -116,8 +115,7 @@ void MapCppCkovMCDigitizer::_process(Json::Value* document) const {
     // loop over ckov stations
     Json::Value ckov_digitAB(Json::arrayValue);
     ckov_digitAB.clear();
-    for (int snum = 0; snum < 2; ++snum) 
-    {
+    for (int snum = 0; snum < 2; ++snum) {
        for (unsigned int kk = 0; kk < all_ckov_digits.size(); ++kk) {
          // check that this digit belongs to the station we are trying to fill
          if (all_ckov_digits[kk]["station"].asInt() != snum) continue;
@@ -129,18 +127,16 @@ void MapCppCkovMCDigitizer::_process(Json::Value* document) const {
 }
 
 //////////////////////////////////////////////////////////////////////
-std::vector<Json::Value> 
+std::vector<Json::Value>
 MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
-                                        Json::Value& root) const 
-{
+                                        Json::Value& root) const {
   std::vector<Json::Value> ckov_digits;
   ckov_digits.clear();
   if (hits.size() == 0) return ckov_digits;
 
-  for (unsigned int j = 0; j < hits.size(); ++j) 
-  {  //  j-th hit
+  for (unsigned int j = 0; j < hits.size(); ++j) {  //  j-th hit
       Json::Value hit = hits[j];
-      
+
       if (fDebug) std::cout << "=================== hit# " << j << std::endl;
 
       // make sure we can get the station/slab info
@@ -170,10 +166,9 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
 
       // find the geo module corresponding to this hit
       const MiceModule* hit_module = NULL;
-      for ( unsigned int jj = 0; !hit_module && jj < ckov_modules.size(); ++jj ) 
-      {
+      for ( unsigned int jj = 0; !hit_module && jj < ckov_modules.size(); ++jj ) {
         if (ckov_modules[jj]->propertyExists("CkovStation", "int") &&
-            ckov_modules[jj]->propertyInt("CkovStation") == stn) 
+            ckov_modules[jj]->propertyInt("CkovStation") == stn)
           hit_module = ckov_modules[jj];
       } // end loop over tof_modules
 
@@ -220,7 +215,7 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
       double htime = hit["time"].asDouble() - gentime;
       double csp = (stn == 0 ? 3.0e8/1.069 : 3.0e8/1.112);
       double pmt_res = 0.1;
-      
+
       // propagate time to pmt & smear by the resolution
       double time0 = rnd->Gaus((htime + dist0/csp) , pmt_res);
       double time1 = rnd->Gaus((htime + dist1/csp) , pmt_res);
@@ -235,7 +230,7 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
       int tdc2 = static_cast<int>(time2 / tdc_factor);
       int tdc3 = static_cast<int>(time3 / tdc_factor);
       if (fDebug) {
-         std::cout << "tdc: " << tdc0 << " " << tdc1 
+         std::cout << "tdc: " << tdc0 << " " << tdc1
                    << " " << tdc2 << " " << tdc3 << std::endl;
       }
 
@@ -294,9 +289,9 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
   double nphot = 0.;
   double nptmp = 0.;
   double muon_thrhold = 0.;
-  double charge_per_pe = 0. ;
+  double charge_per_pe = 0.;
   // scaling factor to data
-  double scaling = 0.935;   
+  double scaling = 0.935;
   // mass of the hit particle;
   double particle_mass = hit["mass"].asDouble();
   // momentum of the hit particle;
@@ -308,8 +303,7 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
   if (hit["channel_id"]["station_number"].asInt() == 0) {
     muon_thrhold = 275.0;
     charge_per_pe = 17.3;
-  }
-  else if (hit["channel_id"]["station_number"].asInt() == 1) {
+  } else if (hit["channel_id"]["station_number"].asInt() == 1) {
     muon_thrhold = 210.0;
     charge_per_pe = 26;
   }
@@ -319,19 +313,19 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
 
   // smearing constant
   const double smear_const = 0.5;
-                                  
+
   // poisson generator
-  double npssn_sum ;
+  double npssn_sum;
   double npssn;
-  double rms_sum ;
+  double rms_sum;
   double npssn_i;
   double rms_i;
   double rms;
 
   if (p_tot >= pp_threshold) {
-    
+
     // Above threshold;
-    double pred = scaling * charge_per_pe * 
+    double pred = scaling * charge_per_pe *
                   (1.0 - (pp_threshold/p_tot)*(pp_threshold/p_tot)) + 0.5;
     double pred_single = pred/4;
 
@@ -345,34 +339,31 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
       if (hit["channel_id"]["station_number"].asInt() == 0) {
         if (rnd_number <= 0.03)
           pred *= 2;
-        else if (rnd_number<=0.039 && rnd_number>0.03)
+        else if (rnd_number <= 0.039 && rnd_number > 0.03)
           pred *= 3;
-        else if (rnd_number<=0.046 && rnd_number>0.039)
+        else if (rnd_number <= 0.046 && rnd_number > 0.039)
           pred = 0;
         else
           pred *= 1;
-      }
-      else {
+      } else {
         if (rnd_number <= 0.04) {
           pred *= 2;
-        }
-        else if (rnd_number<=0.047 && rnd_number >0.04) {
+        } else if (rnd_number <= 0.047 && rnd_number > 0.04) {
           pred *= 3;
-        }
-        else if (rnd_number<=0.0475 && rnd_number>0.047) {
+        } else if (rnd_number <= 0.0475 && rnd_number > 0.047) {
           pred *= 4;
         }
-      } 
+      }
     }
-    
-    for (unsigned int ii=0; ii<4; ii++){
+
+    for (unsigned int ii = 0; ii < 4; ii++) {
       npssn_i = rnd->Poisson(pred_single);
       rms_i = (smear_const*sqrt(npssn_i)) * (smear_const*sqrt(npssn_i));
       npssn_sum += npssn_i;
       rms_sum += rms_i * rms_i;
     }
     rms = sqrt(rms_sum);
-    rms = (rms<0.2 ? 0.2 : rms);
+    rms = (rms < 0.2 ? 0.2 : rms);
     npssn = npssn_sum;
     if (hit["particle_id"].asInt() == 13 || hit["particle_id"].asInt() == -13 ||
         hit["particle_id"].asInt() == 211 || hit["particle_id"].asInt() == -211) {
@@ -383,9 +374,9 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
   } else {
 
     // below threshold;
-    
+
     double pred = 0.5;
-    double ped0 = (exp(-1*pred)>=0.2298*exp(-0.34344*pred) 
+    double ped0 = (exp(-1*pred) >= 0.2298*exp(-0.34344*pred)
                    ? exp(-1*pred) : 0.2298*exp(-0.34344*pred));
     double ped1 = pred * ped0;
     double ped2 = 0.5*pred*pred*ped0;
@@ -395,27 +386,25 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
     if (rnd_number <= ped0) {
       npssn = 0;
       rms = 0.1;
-    }
-    else if (rnd_number <= ped1+ped0 && rnd_number > ped0) {
+    } else if (rnd_number <= ped1+ped0 && rnd_number > ped0) {
       npssn = 1;
-    }
-    else if (rnd_number <= ped2+ped1+ped0 && rnd_number > ped1+ped0) {
+    } else if (rnd_number <= ped2+ped1+ped0 && rnd_number > ped1+ped0) {
       npssn = 2;
     }
   }
 
   double gaussian = rnd->Gaus();
-  double xnpe = ((npssn+rms*gaussian)>0 ? npssn+rms*gaussian : 0);
+  double xnpe = ((npssn+rms*gaussian) > 0 ? npssn+rms*gaussian : 0);
 
   if (fDebug) {
-    printf("Hit: Momentum %.3e, mass %.3e, generated Gaussian is %.3e, the resulting xnpe is %.3e", 
+    printf("Hit: Momentum %.3e, mass %.3e, generated Gaussian is %.3e, the resulting xnpe is %.3e",
            p_tot, particle_mass, gaussian, xnpe);
   }
   return xnpe;
 }
 
 //////////////////////////////////////////////////////////////////////
-Json::Value MapCppCkovMCDigitizer::fill_ckov_evt(int evnum, 
+Json::Value MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
                                                  int snum,
                                                  std::vector<Json::Value> all_ckov_digits,
                                                  int i)
@@ -442,7 +431,7 @@ const {
     npe = all_ckov_digits[i]["npe"].asDouble();
     // 23 is the ADC factor.
     int adc = static_cast<int>(npe * 23);
-    
+
     // NOTE: needs tweaking/verifying -- DR 3/15
     // NOTE: if tof needs tweaking, Ckov also needs it. -- frankliuao 8/15
     // Initialize digits for both stations:
@@ -462,8 +451,8 @@ const {
     digitA["arrival_time_3"] = 0;
     digitA["part_event_number"] = 0;
     digitA["number_of_pes"] = 0;
-    
-    
+
+
     digitB["position_min_4"] = 0;
     digitB["position_min_5"] = 0;
     digitB["position_min_6"] = 0;

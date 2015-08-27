@@ -11,8 +11,6 @@ import MAUS
 
 from Configuration import Configuration
 
-from _MapCppCkovMCDigitizer import MapCppCkovMCDigitizer
-
 class MapCppCkovMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
     """ basic MapCppCkovMCDigitizer test to check
     if we get digits on good evts and errors on bad
@@ -51,8 +49,6 @@ class MapCppCkovMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         spill = _file.readline().rstrip()
         output = self.mapper.process(spill)
         doc = maus_cpp.converter.json_repr(output)
-        for ii in doc["recon_events"]:
-          print ii
         ckov_event = doc["recon_events"][0]["ckov_event"]
         self.assertTrue("ckov_digits" in ckov_event)
         _file.close()

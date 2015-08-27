@@ -43,14 +43,14 @@ class CkovChannelId {
     /** Set the station that was hit, 1 or 2 */
     void SetStation(int station);
 
-    // Get the PMT id that the light was sent to 
+    // Get the PMT id that the light was sent to
     int GetPMT() const;
 
-    // Set the PMT id that the light was sent to 
+    // Set the PMT id that the light was sent to
     void SetPMT(int PMT);
 
   private:
-    
+
     int _station;
     int _pmt;
 

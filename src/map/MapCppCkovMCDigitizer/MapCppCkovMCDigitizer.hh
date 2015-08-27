@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppCkovMCDigitizer 
+/** @class MapCppCkovMCDigitizer
  *
  */
 
@@ -43,45 +43,44 @@
 
 namespace MAUS {
 
-  class MapCppCkovMCDigitizer : public MapBase<Json::Value> 
-  {
-    
+  class MapCppCkovMCDigitizer : public MapBase<Json::Value> {
+
     public:
       MapCppCkovMCDigitizer();
-  
-    
+
+
     private:
-    
+
       void _birth(const std::string& argJsonConfigDocument);
-  
+
       void _death();
-  
+
       void _process(Json::Value* data) const;
-  
+
       Json::Value check_sanity_mc(Json::Value& document) const;
-  
+
       double get_npe(Json::Value hit) const;
-  
+
       std::vector<Json::Value> make_ckov_digits(Json::Value hits,
                                                 double gentime,
                                                 Json::Value& root) const;
-  
+
       Json::Value fill_ckov_evt(int evnum, int snum,
                                 std::vector<Json::Value> _alldigits,
                                 int i) const;
-  
+
       bool check_param(Json::Value* hit1, Json::Value* hit2) const;
- 
+
    private:
       MiceModule* geo_module;
-    
+
       std::vector<const MiceModule*> ckov_modules;
-  
+
       Json::Value _configJSON;
-  
+
       std::vector<std::string> _station_index;
-  
-      bool fDebug ;
+
+      bool fDebug;
 
       TRandom3* rnd;
   };

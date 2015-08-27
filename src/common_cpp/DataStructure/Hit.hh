@@ -34,9 +34,9 @@ namespace MAUS {
 /** @class Hit contains Monte Carlo sensitive detector hit data
  *
  *  Hit holds information pertaining to a particle step in a sensitive detector
- *  Stores information on the Track number, particle type, energy of the 
+ *  Stores information on the Track number, particle type, energy of the
  *  particle, charge, time, energy deposited by this step, position, momentum
- *  and channel hit (channel id) 
+ *  and channel hit (channel id)
  *
  *  The template is here to tell developers and users that I expect an extra
  *  parameter, channel id, in actual instantiations of this class, that contains
@@ -90,10 +90,10 @@ class Hit {
      */
     virtual void SetEnergy(double energy);
 
-    // Returns the PDG id of the track that made the hit 
+    // Returns the PDG id of the track that made the hit
     // (Do I really need to follow the pattern?)
     virtual double GetMass() const;
-    virtual void SetMass(double mass); 
+    virtual void SetMass(double mass);
 
     /** Returns the charge of the track that made the hit
      */

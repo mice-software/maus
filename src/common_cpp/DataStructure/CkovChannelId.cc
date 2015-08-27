@@ -54,7 +54,4 @@ int CkovChannelId::GetPMT() const {
 void CkovChannelId::SetPMT(int PMT) {
     _pmt = PMT;
 }
-
 }
-
-

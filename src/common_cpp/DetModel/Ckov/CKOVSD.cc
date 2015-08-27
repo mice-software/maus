@@ -1,37 +1,45 @@
-// MAUS WARNING: THIS IS LEGACY CODE.
-/* CKOVSD.cc
-*/
-#include "CKOVSD.hh"
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "src/common_cpp/DetModel/Ckov/CKOVSD.hh"
 
 #include <cstring>
 #include <iostream>
-
+#include <vector>
 #include "Geant4/G4StepStatus.hh"
 
 #include "Interface/dataCards.hh"
 #include "Interface/MICEEvent.hh"
 #include "Config/MiceModule.hh"
 
-CkovSD::CkovSD(MiceModule* md) : 
-    MAUSSD(md), _hits(NULL)
-{
-
+CkovSD::CkovSD(MiceModule* md) : MAUSSD(md), _hits(NULL) {
 }
 
 
-void CkovSD::Initialize(G4HCofThisEvent* HCE)
-{
-
+void CkovSD::Initialize(G4HCofThisEvent* HCE) {
 }
 
-G4bool CkovSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
-{
+G4bool CkovSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History) {
   G4double edep = aStep->GetTotalEnergyDeposit();
 
-  if(edep == 0.) return false;
+  if (edep == 0.) return false;
 
   G4String particleName = aStep->GetTrack()->GetDefinition()->GetParticleName();
-  
+
   /* If the PMTs are defined as the SD, use this, or, use
    * the uncommented block.
   if( particleName != "opticalphoton" ) return false;
@@ -49,7 +57,8 @@ G4bool CkovSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 
   */
   channel_id->SetStation(_module->propertyInt("CkovStation"));
-  //channel_id->SetStation(0);
+
+  // channel_id->SetStation(0);
 
   hit.SetChannelId(channel_id);
   hit.SetTrackId(aStep->GetTrack()->GetTrackID());
@@ -70,13 +79,13 @@ G4bool CkovSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
     aStep->GetPostStepPoint()->GetMomentum().y(),
     aStep->GetPostStepPoint()->GetMomentum().z()
   ));
-  
+
   _hits->push_back(hit);
   return true;
 }
 
-void CkovSD::ClearHits(){
-  if (_hits != NULL){
+void CkovSD::ClearHits() {
+  if (_hits != NULL) {
     delete _hits;
   }
   _hits = new std::vector<MAUS::CkovHit>();
@@ -91,6 +100,7 @@ void CkovSD::TakeHits(MAUS::MCEvent* event) {
   delete _hits;
   _hits = new std::vector<MAUS::Hit<MAUS::CkovChannelId> >();
 }
+
 /*
   // This is for sending the tracks to each PMT.
 
@@ -100,8 +110,8 @@ void CkovSD::TakeHits(MAUS::MCEvent* event) {
 
   ProcessAngles( newHit, Position, Direction, Polarization );
   newHit->SetWavelenght( (c_light*h_Planck)/aStep->GetTrack()->GetTotalEnergy());
-  //newHit->Print();
-  //std::cout<<" Pol "<<newHit->GetPol()<<std::endl;
+  // newHit->Print();
+  // std::cout<<" Pol "<<newHit->GetPol()<<std::endl;
   _event->ckovHits.push_back( newHit );
 
   aStep->GetTrack()->SetTrackStatus(fStopAndKill);
@@ -110,8 +120,7 @@ void CkovSD::TakeHits(MAUS::MCEvent* event) {
 }
 */
 
-void CkovSD::EndOfEvent(G4HCofThisEvent* HCE)
-{
+void CkovSD::EndOfEvent(G4HCofThisEvent* HCE) {
 }
 /*
 void CkovSD::ProcessAngles( CkovHit* ckovHit, Hep3Vector HitPosition, Hep3Vector TrackDirection, Hep3Vector PhotonPol)
