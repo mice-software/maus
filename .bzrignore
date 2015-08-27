@@ -30,6 +30,7 @@ third_party/build/*
 third_party/install/bin/*
 third_party/install/include/*
 third_party/install/lib/*
+third_party/install/lib64/*
 third_party/install/share/*
 third_party/install/share/man/man3
 third_party/install/share/man/man1/*

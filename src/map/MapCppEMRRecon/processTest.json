@@ -29,7 +29,8 @@
       {
          "emr_hits":[
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1
                },
                "charge":1.0,
@@ -50,7 +51,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":0
                },
                "charge":1.0,
@@ -71,7 +73,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":90
                },
                "charge":1.0,
@@ -92,7 +95,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":91
                },
                "charge":1.0,
@@ -113,7 +117,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":119
                },
                "charge":1.0,
@@ -134,7 +139,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":118
                },
                "charge":1.0,
@@ -155,7 +161,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":208
                },
                "charge":1.0,
@@ -176,7 +183,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":209
                },
                "charge":1.0,
@@ -197,7 +205,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":237
                },
                "charge":1.0,
@@ -218,7 +227,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":236
                },
                "charge":1.0,
@@ -239,7 +249,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":326
                },
                "charge":1.0,
@@ -260,7 +271,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":327
                },
                "charge":1.0,
@@ -281,7 +293,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":355
                },
                "charge":1.0,
@@ -302,7 +315,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":354
                },
                "charge":1.0,
@@ -323,7 +337,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":444
                },
                "charge":1.0,
@@ -344,7 +359,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":445
                },
                "charge":1.0,
@@ -365,7 +381,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":473
                },
                "charge":1.0,
@@ -386,7 +403,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":472
                },
                "charge":1.0,
@@ -407,7 +425,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":562
                },
                "charge":1.0,
@@ -428,7 +447,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":563
                },
                "charge":1.0,
@@ -449,7 +469,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":591
                },
                "charge":1.0,
@@ -470,7 +491,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":590
                },
                "charge":1.0,
@@ -491,7 +513,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":682
                },
                "charge":1.0,
@@ -512,7 +535,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":681
                },
                "charge":1.0,
@@ -533,7 +557,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":708
                },
                "charge":1.0,
@@ -554,7 +579,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":800
                },
                "charge":1.0,
@@ -575,7 +601,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":799
                },
                "charge":1.0,
@@ -596,7 +623,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":826
                },
                "charge":1.0,
@@ -617,7 +645,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":918
                },
                "charge":1.0,
@@ -638,7 +667,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":917
                },
                "charge":1.0,
@@ -659,7 +689,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":944
                },
                "charge":1.0,
@@ -680,7 +711,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1036
                },
                "charge":1.0,
@@ -701,7 +733,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1035
                },
                "charge":1.0,
@@ -722,7 +755,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1062
                },
                "charge":1.0,
@@ -743,7 +777,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1154
                },
                "charge":1.0,
@@ -764,7 +799,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1153
                },
                "charge":1.0,
@@ -785,7 +821,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1180
                },
                "charge":1.0,
@@ -806,7 +843,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1272
                },
                "charge":1.0,
@@ -827,7 +865,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1271
                },
                "charge":1.0,
@@ -848,7 +887,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1298
                },
                "charge":1.0,
@@ -869,7 +909,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1390
                },
                "charge":1.0,
@@ -890,7 +931,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1389
                },
                "charge":1.0,
@@ -911,7 +953,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1416
                },
                "charge":1.0,
@@ -932,7 +975,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1508
                },
                "charge":1.0,
@@ -953,7 +997,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1509
                },
                "charge":1.0,
@@ -974,7 +1019,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1534
                },
                "charge":1.0,
@@ -995,7 +1041,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1626
                },
                "charge":1.0,
@@ -1016,7 +1063,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1627
                },
                "charge":1.0,
@@ -1037,7 +1085,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1652
                },
                "charge":1.0,
@@ -1058,7 +1107,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1744
                },
                "charge":1.0,
@@ -1079,7 +1129,8 @@
                "track_id":1
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1744
                },
                "charge":1.0,
@@ -1100,7 +1151,8 @@
                "track_id":75
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1745
                },
                "charge":1.0,
@@ -1121,7 +1173,8 @@
                "track_id":75
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1746
                },
                "charge":1.0,
@@ -1142,7 +1195,8 @@
                "track_id":75
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1747
                },
                "charge":1.0,
@@ -1163,7 +1217,8 @@
                "track_id":75
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1748
                },
                "charge":1.0,
@@ -1184,7 +1239,8 @@
                "track_id":75
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1749
                },
                "charge":1.0,
@@ -1205,7 +1261,8 @@
                "track_id":75
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1775
                },
                "charge":1.0,
@@ -1226,7 +1283,8 @@
                "track_id":75
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1565
                },
                "charge":0.0,
@@ -1247,7 +1305,8 @@
                "track_id":123
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1776
                },
                "charge":0.0,
@@ -1268,7 +1327,8 @@
                "track_id":124
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1777
                },
                "charge":0.0,
@@ -1289,7 +1349,8 @@
                "track_id":124
             },
             {
-               "channel_id":{
+               "mass":105.65840,
+"channel_id":{
                   "bar":1862
                },
                "charge":0.0,

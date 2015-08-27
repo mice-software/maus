@@ -92,9 +92,10 @@ std::string SV_CHANNEL_ID =
     std::string("{\"station\":1}");
 
 std::string HIT_SEED =
-    std::string("{\"particle_id\":1,\"charge\":2.,\"time\":3.,")+
+    std::string("{\"particle_id\":1,\"charge\":2.,\"mass\":105.65840,\"time\":3.,")+
     std::string("\"energy\":4.,\"energy_deposited\":5.,\"track_id\":6,")+
     std::string("\"position\":{\"x\":6.,\"y\":7.,\"z\":8.},")+
+    std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
     std::string("\"momentum\":{\"x\":9.,\"y\":10.,\"z\":11.},")+
     std::string("\"channel_id\":");
 
