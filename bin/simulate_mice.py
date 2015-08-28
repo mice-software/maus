@@ -30,7 +30,8 @@ def run():
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
     # Pre detector set up
-    my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
+    # my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
+    my_map.append(MAUS.MapCppMCReconSetup())  #  geant4 simulation
 
     # TOF
     my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
