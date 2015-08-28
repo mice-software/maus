@@ -13,7 +13,6 @@
 #include "Config/ModuleTextFileIO.hh"
 
 #include "Utils/Exception.hh"
-
 // Constructor takes the name of a file from which information is read in to instantiate this module or sub component
 
 static int _count = 0;
@@ -430,6 +429,7 @@ int                    MiceModule::propertyIntThis( std::string property ) const
 int                  MiceModule::propertyInt( std::string property ) const
 {
   std::string prop_str;
+  static std::string real_name="";
   int      prop_int;
   if( propertyExistsThis( property, "int" ) )
   {
@@ -445,9 +445,14 @@ int                  MiceModule::propertyInt( std::string property ) const
     }
   }
   else if( _mother )
+  {
+    real_name += name()+" that is in ";
     prop_int = _mother->propertyInt( property );
+  }
   else
-    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+fullName(), "MiceModule::propertyInt");
+    {
+    throw MAUS::Exception(MAUS::Exception::recoverable, "Couldn't find property "+property+" in module "+real_name+name(), "MiceModule::propertyInt");
+    }
   return prop_int;
 }
 
