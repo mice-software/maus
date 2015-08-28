@@ -58,11 +58,11 @@ typedef struct fTofDig {
     Hep3Vector fPos;
     double fEdep;
     bool fIsUsed;
-    int fNpe;
+    double fNpe;
     std::string fTofKey;
     int fLeadingTime;
     int fTrailingTime;
-    int fRawTime;
+    double fRawTime;
     int fTriggerRequestLeadingTime;
     int fTriggerTimeTag;
     int fTimeStamp;
