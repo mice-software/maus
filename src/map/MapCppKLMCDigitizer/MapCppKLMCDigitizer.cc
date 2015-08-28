@@ -234,25 +234,6 @@ KLTmpDigits MapCppKLMCDigitizer::make_kl_digits(KLHitArray* hits) const {
 }
 
 //////////////////////////////////////////////////////////////////////
-Json::Value MapCppKLMCDigitizer::check_sanity_mc(const Json::Value& root) const {
-  // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc_events")) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "Missing MC branch from data",
-                          "MapCppKLDigitizer::check_sanity_mc");
-  }
-
-  Json::Value mc = root.get("mc_events", 0);
-  // Check if JSON document is of the right type, else return error
-  if (!mc.isArray()) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "MC branch isn't an array",
-                          "MapCppKLDigitizer::check_sanity_mc");
-  }
-  return mc;
-}
-
-//////////////////////////////////////////////////////////////////////
 int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) const {
   if (fDebug) std::cout << "edep= " << edep << std::endl;
 
