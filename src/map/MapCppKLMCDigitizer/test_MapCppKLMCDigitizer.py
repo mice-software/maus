@@ -47,7 +47,7 @@ class MapCppKLMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         output = self.mapper.process(spill)
         self.assertTrue("errors" in maus_cpp.converter.json_repr(output))
         # a real spill
-        spill = _file.readline().rstrip()
+        spill = _file.read()
         output = self.mapper.process(spill)
         doc = maus_cpp.converter.json_repr(output)
         self.assertTrue("kl_digits" in \
