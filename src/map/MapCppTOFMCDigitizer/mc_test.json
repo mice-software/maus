@@ -7,7 +7,8 @@
           "energy": 225.0541772259639, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 6
@@ -30,7 +31,8 @@
           "energy": 223.0679143560858, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -53,7 +55,8 @@
           "energy": 219.1901423935771, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -96,7 +99,8 @@
           "energy": 225.404077155813, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -119,7 +123,8 @@
           "energy": 222.7561761878684, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -142,7 +147,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -165,7 +171,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -188,7 +195,8 @@
           "energy": 217.507072138368, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -231,7 +239,8 @@
           "energy": 224.4383446605286, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -254,7 +263,8 @@
           "energy": 221.8082014933084, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -277,7 +287,8 @@
           "energy": 0.8249849210076766, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -300,7 +311,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -323,7 +335,8 @@
           "energy": 216.4746395673668, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -366,7 +379,8 @@
           "energy": 216.9490947247518, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -389,7 +403,8 @@
           "energy": 216.4491959037879, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -412,7 +427,8 @@
           "energy": 1.295797829064356, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -435,7 +451,8 @@
           "energy": 1.17687001151254, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -458,7 +475,8 @@
           "energy": 1.045854616345481, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -481,7 +499,8 @@
           "energy": 0.9024865871551113, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -504,7 +523,8 @@
           "energy": 0.7684528135916002, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -527,7 +547,8 @@
           "energy": 0.7403534987395075, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -550,7 +571,8 @@
           "energy": 211.4941453588122, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 2
@@ -573,7 +595,8 @@
           "energy": 214.3551642365911, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -596,7 +619,8 @@
           "energy": 0.7308853193027347, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -619,7 +643,8 @@
           "energy": 0.7221472914086644, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -642,7 +667,8 @@
           "energy": 0.7132671067292122, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -665,7 +691,8 @@
           "energy": 0.6978988256997477, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -688,7 +715,8 @@
           "energy": 0.6889718544221911, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -711,7 +739,8 @@
           "energy": 0.682950844657906, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -734,7 +763,8 @@
           "energy": 0.6741793818545602, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -757,7 +787,8 @@
           "energy": 0.6657779979634021, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -780,7 +811,8 @@
           "energy": 0.6527140009941033, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -803,7 +835,8 @@
           "energy": 0.6474468227636246, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -826,7 +859,8 @@
           "energy": 0.6309591432663199, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -849,7 +883,8 @@
           "energy": 0.6215803797777704, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -872,7 +907,8 @@
           "energy": 0.6109133736012409, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -895,7 +931,8 @@
           "energy": 0.5979266042554288, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -918,7 +955,8 @@
           "energy": 0.5843349698441356, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -941,7 +979,8 @@
           "energy": 0.5673866132433356, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -964,7 +1003,8 @@
           "energy": 0.5492547219527861, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -987,7 +1027,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -1010,7 +1051,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -1053,7 +1095,8 @@
           "energy": 216.9353870150591, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1076,7 +1119,8 @@
           "energy": 211.9026785711431, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -1119,7 +1163,8 @@
           "energy": 197.6589837678629, 
           "particle_id": -11, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -1142,7 +1187,8 @@
           "energy": 195.5073844444224, 
           "particle_id": -11, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -1165,7 +1211,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -1188,7 +1235,8 @@
           "energy": 193.1184755224831, 
           "particle_id": -11, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -1211,7 +1259,8 @@
           "energy": 191.3373103663585, 
           "particle_id": -11, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -1234,7 +1283,8 @@
           "energy": 0.0, 
           "particle_id": 22, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -1257,7 +1307,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 310, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -1280,7 +1331,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 308, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 1, 
             "plane": 0, 
             "slab": 1
@@ -1323,7 +1375,8 @@
           "energy": 217.2728283120931, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1346,7 +1399,8 @@
           "energy": 216.0075420106268, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1369,7 +1423,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1392,7 +1447,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1415,7 +1471,8 @@
           "energy": 210.8200273910143, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -1458,7 +1515,8 @@
           "energy": 226.3470277320033, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -1481,7 +1539,8 @@
           "energy": 223.2140390747944, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -1504,7 +1563,8 @@
           "energy": 0.585297454305872, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -1527,7 +1587,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -1550,7 +1611,8 @@
           "energy": 217.1198489623249, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -1573,7 +1635,8 @@
           "energy": 216.6313751393034, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -1596,7 +1659,8 @@
           "energy": 1.709764285820263, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -1639,7 +1703,8 @@
           "energy": 219.9696082913924, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1662,7 +1727,8 @@
           "energy": 218.6513277838703, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1685,7 +1751,8 @@
           "energy": 0.6014419573571397, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1708,7 +1775,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1731,7 +1799,8 @@
           "energy": 217.2801509563226, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -1754,7 +1823,8 @@
           "energy": 212.3571825005447, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -1777,7 +1847,8 @@
           "energy": 0.7468240358671612, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -1800,7 +1871,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -1843,7 +1915,8 @@
           "energy": 219.1974869783326, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1866,7 +1939,8 @@
           "energy": 219.0980609013156, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1889,7 +1963,8 @@
           "energy": 0.7197099766587789, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1912,7 +1987,8 @@
           "energy": 0.693732900525472, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1935,7 +2011,8 @@
           "energy": 0.6483093964132547, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1958,7 +2035,8 @@
           "energy": 0.6133330035037929, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -1981,7 +2059,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -2004,7 +2083,8 @@
           "energy": 218.7050415766084, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2027,7 +2107,8 @@
           "energy": 216.5100639398317, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2050,7 +2131,8 @@
           "energy": 213.2848239256162, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2073,7 +2155,8 @@
           "energy": 211.8288147850067, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2096,7 +2179,8 @@
           "energy": 210.4395452503941, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2119,7 +2203,8 @@
           "energy": 210.2025359280074, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2142,7 +2227,8 @@
           "energy": 0.8490518184568427, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2165,7 +2251,8 @@
           "energy": 0.7419094871513952, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2188,7 +2275,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2211,7 +2299,8 @@
           "energy": 0.5652746856601717, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2234,7 +2323,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2257,7 +2347,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2280,7 +2371,8 @@
           "energy": 2.25751609730479, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2303,7 +2395,8 @@
           "energy": 1.758564212234131, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2326,7 +2419,8 @@
           "energy": 1.23402421482227, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2349,7 +2443,8 @@
           "energy": 0.7953092839654661, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2372,7 +2467,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2395,7 +2491,8 @@
           "energy": 0.9573069741825906, 
           "particle_id": 11, 
           "track_id": 95, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2418,7 +2515,8 @@
           "energy": 0.6280018085296641, 
           "particle_id": 11, 
           "track_id": 95, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2441,7 +2539,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 95, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2464,7 +2563,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 96, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2487,7 +2587,8 @@
           "energy": 0.6382448735051272, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2510,7 +2611,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 3
@@ -2553,7 +2655,8 @@
           "energy": 215.5539330394776, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -2576,7 +2679,8 @@
           "energy": 209.5622905789212, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2619,7 +2723,8 @@
           "energy": 223.6433665474634, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -2642,7 +2747,8 @@
           "energy": 221.9067127774012, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2665,7 +2771,8 @@
           "energy": 219.8042818571413, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2688,7 +2795,8 @@
           "energy": 217.3715585588396, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2711,7 +2819,8 @@
           "energy": 217.3563928817873, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2734,7 +2843,8 @@
           "energy": 1.008605374584424, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2757,7 +2867,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2780,7 +2891,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -2823,7 +2935,8 @@
           "energy": 276.7887247291162, 
           "particle_id": 211, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -2846,7 +2959,8 @@
           "energy": 275.5170238264257, 
           "particle_id": 211, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -2869,7 +2983,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -2892,7 +3007,8 @@
           "energy": 271.1896776346867, 
           "particle_id": 211, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -2915,7 +3031,8 @@
           "energy": 270.3235825168264, 
           "particle_id": 211, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -2938,7 +3055,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -2961,7 +3079,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -3004,7 +3123,8 @@
           "energy": 226.2971209232406, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3027,7 +3147,8 @@
           "energy": 223.0683739208642, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3050,7 +3171,8 @@
           "energy": 220.4323195696243, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3073,7 +3195,8 @@
           "energy": 0.8278965510060038, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3096,7 +3219,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3119,7 +3243,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3162,7 +3287,8 @@
           "energy": 221.4269644988362, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3185,7 +3311,8 @@
           "energy": 220.8084817251321, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3208,7 +3335,8 @@
           "energy": 215.9700075220726, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3231,7 +3359,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3254,7 +3383,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3297,7 +3427,8 @@
           "energy": 219.3698332367652, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3320,7 +3451,8 @@
           "energy": 217.7256116052275, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3343,7 +3475,8 @@
           "energy": 213.9311191036732, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3366,7 +3499,8 @@
           "energy": 0.9669956215776663, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3389,7 +3523,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3412,7 +3547,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 90, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3455,7 +3591,8 @@
           "energy": 217.3439086619704, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3478,7 +3615,8 @@
           "energy": 211.8848268456543, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3521,7 +3659,8 @@
           "energy": 225.4201905828992, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3544,7 +3683,8 @@
           "energy": 223.3627095159316, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3567,7 +3707,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3590,7 +3731,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3613,7 +3755,8 @@
           "energy": 222.0502401129643, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -3636,7 +3779,8 @@
           "energy": 217.9843738530117, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -3659,7 +3803,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -3682,7 +3827,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -3725,7 +3871,8 @@
           "energy": 219.6395234570693, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3748,7 +3895,8 @@
           "energy": 219.3247735746562, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3771,7 +3919,8 @@
           "energy": 0.5183366012661769, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3794,7 +3943,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3817,7 +3967,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -3840,7 +3991,8 @@
           "energy": 214.2724065130658, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -3883,7 +4035,8 @@
           "energy": 231.8759775404886, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3906,7 +4059,8 @@
           "energy": 231.2194263669135, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3929,7 +4083,8 @@
           "energy": 228.2437167446905, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3952,7 +4107,8 @@
           "energy": 0.5785120623635447, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3975,7 +4131,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -3998,7 +4155,8 @@
           "energy": 0.7503992855755861, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -4021,7 +4179,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -4044,7 +4203,8 @@
           "energy": 226.6953770938981, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4067,7 +4227,8 @@
           "energy": 0.9285844024923112, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4090,7 +4251,8 @@
           "energy": 0.9084697745523465, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4113,7 +4275,8 @@
           "energy": 0.8826386614099027, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4136,7 +4299,8 @@
           "energy": 0.8645693787250099, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4159,7 +4323,8 @@
           "energy": 0.843496317667783, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4182,7 +4347,8 @@
           "energy": 0.8232155838823187, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4205,7 +4371,8 @@
           "energy": 0.7929796045022612, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4228,7 +4395,8 @@
           "energy": 0.7552932052849587, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4251,7 +4419,8 @@
           "energy": 0.7298333375872832, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4274,7 +4443,8 @@
           "energy": 0.6992177206619579, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4297,7 +4467,8 @@
           "energy": 0.6584410376881613, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4320,7 +4491,8 @@
           "energy": 0.6153248817426893, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4343,7 +4515,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -4366,7 +4539,8 @@
           "energy": 224.8481703172507, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4389,7 +4563,8 @@
           "energy": 222.9017641152352, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4412,7 +4587,8 @@
           "energy": 1.149654760586473, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4435,7 +4611,8 @@
           "energy": 1.088412577696104, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4458,7 +4635,8 @@
           "energy": 1.037761736227845, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4481,7 +4659,8 @@
           "energy": 0.9800717562559073, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4504,7 +4683,8 @@
           "energy": 0.9453488629312796, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4547,7 +4727,8 @@
           "energy": 223.1521019662211, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4570,7 +4751,8 @@
           "energy": 220.3303547103898, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4593,7 +4775,8 @@
           "energy": 219.691915647606, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4616,7 +4799,8 @@
           "energy": 217.8095943620862, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4639,7 +4823,8 @@
           "energy": 0.5194611568056529, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4662,7 +4847,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4685,7 +4871,8 @@
           "energy": 1.920060581325148, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4708,7 +4895,8 @@
           "energy": 1.404869523994286, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4731,7 +4919,8 @@
           "energy": 1.060063716423285, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4754,7 +4943,8 @@
           "energy": 0.9625600328406617, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4777,7 +4967,8 @@
           "energy": 0.6630885797959871, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4800,7 +4991,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4823,7 +5015,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4846,7 +5039,8 @@
           "energy": 0.6846601076208613, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4869,7 +5063,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4892,7 +5087,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -4915,7 +5111,8 @@
           "energy": 217.1764206547089, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4938,7 +5135,8 @@
           "energy": 213.6543131255412, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4961,7 +5159,8 @@
           "energy": 210.367705863287, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -4984,7 +5183,8 @@
           "energy": 1.480980051399861, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5007,7 +5207,8 @@
           "energy": 1.099234621190971, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5030,7 +5231,8 @@
           "energy": 0.7688147383736761, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5053,7 +5255,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5076,7 +5279,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 6, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5099,7 +5303,8 @@
           "energy": 0.7464141176173211, 
           "particle_id": 11, 
           "track_id": 75, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5122,7 +5327,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 75, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5145,7 +5351,8 @@
           "energy": 1.024745587719406, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5168,7 +5375,8 @@
           "energy": 0.967855105953831, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5191,7 +5399,8 @@
           "energy": 0.9202240628538207, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5214,7 +5423,8 @@
           "energy": 0.8854308953793093, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5237,7 +5447,8 @@
           "energy": 0.8391509689055607, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5260,7 +5471,8 @@
           "energy": 0.8009525156471222, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5283,7 +5495,8 @@
           "energy": 0.7223176480521991, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5306,7 +5519,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 5, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -5349,7 +5563,8 @@
           "energy": 226.2431534407031, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5372,7 +5587,8 @@
           "energy": 223.1259401005253, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5395,7 +5611,8 @@
           "energy": 0.6634013121474585, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5418,7 +5635,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5441,7 +5659,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5464,7 +5683,8 @@
           "energy": 218.3783323167181, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 5
@@ -5507,7 +5727,8 @@
           "energy": 224.0021884336059, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -5530,7 +5751,8 @@
           "energy": 222.1521055039562, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -5553,7 +5775,8 @@
           "energy": 221.2124035825365, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -5576,7 +5799,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -5599,7 +5823,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -5622,7 +5847,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 3
@@ -5645,7 +5871,8 @@
           "energy": 215.6407399802603, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5668,7 +5895,8 @@
           "energy": 215.1377534534103, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5691,7 +5919,8 @@
           "energy": 1.323929931555801, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5714,7 +5943,8 @@
           "energy": 1.148582071871266, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5737,7 +5967,8 @@
           "energy": 1.027900127701541, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5760,7 +5991,8 @@
           "energy": 0.909096775957839, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5783,7 +6015,8 @@
           "energy": 0.6072995032271971, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5806,7 +6039,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5829,7 +6063,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 4, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5872,7 +6107,8 @@
           "energy": 224.2745474055301, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5895,7 +6131,8 @@
           "energy": 221.3158294134478, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5918,7 +6155,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -5941,7 +6179,8 @@
           "energy": 215.8762894451455, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -5984,7 +6223,8 @@
           "energy": 229.3724270227438, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 2
@@ -6007,7 +6247,8 @@
           "energy": 223.8117762461857, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -6050,7 +6291,8 @@
           "energy": 223.3599636650897, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6073,7 +6315,8 @@
           "energy": 218.4197005245656, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
@@ -6116,7 +6359,8 @@
           "energy": 222.4775977009524, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6139,7 +6383,8 @@
           "energy": 217.9971666825111, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6162,7 +6407,8 @@
           "energy": 217.3065462340898, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6185,7 +6431,8 @@
           "energy": 2.530000788790232, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6208,7 +6455,8 @@
           "energy": 1.635674203000477, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6231,7 +6479,8 @@
           "energy": 1.631654787571843, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6254,7 +6503,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 4
@@ -6277,7 +6527,8 @@
           "energy": 211.4990335790165, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -6300,7 +6551,8 @@
           "energy": 1.408118028751917, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -6323,7 +6575,8 @@
           "energy": 1.224530158613566, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -6346,7 +6599,8 @@
           "energy": 1.0264564795509, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -6369,7 +6623,8 @@
           "energy": 0.7908176612607833, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -6392,7 +6647,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 3, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 4
@@ -6435,7 +6691,8 @@
           "energy": 227.4754096259619, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -6458,7 +6715,8 @@
           "energy": 225.3442510068717, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -6481,7 +6739,8 @@
           "energy": 0.5109989100000001, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -6504,7 +6763,8 @@
           "energy": 0.51099891, 
           "particle_id": 11, 
           "track_id": 2, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 0, 
             "slab": 5
@@ -6527,7 +6787,8 @@
           "energy": 220.1054672519313, 
           "particle_id": -13, 
           "track_id": 1, 
-          "channel_id": {
+          "mass":105.65840,
+"channel_id": {
             "station_number": 0, 
             "plane": 1, 
             "slab": 6
