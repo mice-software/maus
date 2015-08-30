@@ -478,7 +478,8 @@ class CADImport: #pylint: disable = R0903, C0103, C0302
                              or elemtype == 'Plane' or elemtype == 'Tracker' \
                              or elemtype == 'Cell' \
                              or elemtype == 'Slab'\
-                             or elemtype == 'CkovPmtNum':
+                             or elemtype == 'CkovPmtNum'\
+                             or elemtype == 'CkovStation':
                         result.append('PropertyInt '+elemtype+' '+value+"\n")
                     # Extract string typed elements
                     elif elemtype == 'SensitiveDetector' \
