@@ -183,7 +183,7 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
               tof1_slHits = (it->first).first;
           else if (det == "tof2")
               tof2_slHits = (it->first).first;
-          for (int j = 0; j < ((it->first).first).size(); ++j) {
+          for (unsigned int j = 0; j < ((it->first).first).size(); ++j) {
             TOFSlabHit tof_slh = ((it->first).first)[j];
           }
       }
@@ -357,7 +357,8 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
   const MiceModule* hit_module = NULL;
   bool gotXYModules = false, gotXModule = false, gotYModule = false;
   Hep3Vector SlabGlobalPos, SlabErrorPos;
-  double globX, globY, globZx, globZy, globZ, globXErr, globYErr, globZErr;
+  double globX = -99., globY = -99., globZx = -99., globZy = -99., globZ = -99.;
+  double globXErr = -99., globYErr = -99., globZErr = -99.;
 
   for ( unsigned int jj = 0; !gotXYModules && jj < tof_modules.size(); ++jj ) {
       if ( tof_modules[jj]->propertyExists("Slab", "int") ) {
