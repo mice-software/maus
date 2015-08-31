@@ -30,7 +30,7 @@ PyMODINIT_FUNC init_MapCppCkovMCDigitizer(void) {
 }
 
 MapCppCkovMCDigitizer::MapCppCkovMCDigitizer()
-    : MapBase<Json::Value>("MapCppCkovMCDigitizer") {
+    : MapBase<Data>("MapCppCkovMCDigitizer") {
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -66,8 +66,19 @@ void MapCppCkovMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   geo_module = new MiceModule(filename);
   ckov_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "CKOV");
 
-  _station_index.push_back("A");
-  _station_index.push_back("B");
+  // initialize thesholds and conversion factors
+  // Ckov A
+  muon_thrhold[0] = 275.0;
+  charge_per_pe[0] = 17.3;
+  // Ckov B
+  muon_thrhold[1] = 210.0;
+  charge_per_pe[1] = 26;
+
+  // scaling factor to data
+  scaling = 0.935;
+
+  // npe->adc conversion factor
+  ckovNpeToAdc = 23.0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -75,11 +86,8 @@ void MapCppCkovMCDigitizer::_death() {
 }
 
 //////////////////////////////////////////////////////////////////////
-void MapCppCkovMCDigitizer::_process(Json::Value* document) const {
+void MapCppCkovMCDigitizer::_process(MAUS::Data* data) const {
 
-  Json::Value& root = *document;
-  // check sanity of json input file and mc brach
-  Json::Value mc = check_sanity_mc(*document);
 
   // --- Below are from TOF:
   // all_tof_digits store all the tof hits
@@ -87,82 +95,89 @@ void MapCppCkovMCDigitizer::_process(Json::Value* document) const {
   // ---
   // For the Ckov, it's similar. Just change TOF to Ckov.
   //
-  std::vector<Json::Value> all_ckov_digits;
-  all_ckov_digits.push_back(Json::Value());
+
+  // Get spill, break if there's no DAQ data
+  Spill *spill = data->GetSpill();
+  if (spill->GetMCEvents() == NULL)
+      return;
+
+  MCEventPArray *mcEvts = spill->GetMCEvents();
+  int nPartEvents = spill->GetMCEventSize();
+  if (nPartEvents == 0)
+      return;
+
+  ReconEventPArray *recEvts =  spill->GetReconEvents();
+
+  // Resize the recon event to hold mc events
+  if (spill->GetReconEventSize() == 0) { // No recEvts yet
+      for (int iPe = 0; iPe < nPartEvents; iPe++) {
+          recEvts->push_back(new ReconEvent);
+      }
+  }
+
+  if (fDebug) std::cerr << "mc numevt = i" << mcEvts->size() << std::endl;
 
   // loop over events
-  if (fDebug) printf("mc numevt = %i", mc.size());
-  for ( unsigned int i = 0; i < mc.size(); i++ ) {
-    Json::Value particle = mc[i];
-    double gentime = particle["primary"]["time"].asDouble();
-    if (fDebug) std::cout << "evt: " << i << " pcle= " << particle << std::endl;
+  for ( unsigned int i = 0; i < mcEvts->size(); i++ ) {
+    // Get Ckov hits for this event
+    CkovHitArray *hits = spill->GetAnMCEvent(i).GetCkovHits();
 
-    // hits for this event
-    Json::Value _hits = particle["ckov_hits"];
+    double gentime = spill->GetAnMCEvent(i).GetPrimary()->GetTime();
+    CkovEvent *evt = new CkovEvent();
+    (*recEvts)[i]->SetCkovEvent(evt);
+
+    // process only if there are hits
     // if _hits.size() = 0, the make_digits and fill_ckov_evt functions will
     // return null. The Ckov recon expects something - either null or data, can't just skip
-    all_ckov_digits.clear();
+    if (hits) {
 
-    // pick out tof hits, digitize and store
-    all_ckov_digits = make_ckov_digits(_hits, gentime, *document);
+      // pick out ckov hits, digitize and store
+      CkovTmpDigits tmpAllDigits = make_ckov_digits(hits, gentime);
 
-    // Does Ckov need this pixel thing? Maybe not.
-    // std::string strig = findTriggerPixel(all_tof_digits);
+      CkovDigitArray* CkovDigArray = evt->GetCkovDigitArrayPtr();
+      fill_ckov_evt(i, tmpAllDigits, CkovDigArray);
 
-    // ------>NOW,  go through the stations and fill Ckov events
-    // real data tof digits look like so:
-    // "digits":{"tof1":[ [evt0..{pmt0},{pmt1}..],[evt1..]],"tof0":[[evt0]..],tof2..}
-    // loop over ckov stations
-    Json::Value ckov_digitAB(Json::arrayValue);
-    ckov_digitAB.clear();
-    for (int snum = 0; snum < 2; ++snum) {
-       for (unsigned int kk = 0; kk < all_ckov_digits.size(); ++kk) {
-         // check that this digit belongs to the station we are trying to fill
-         if (all_ckov_digits[kk]["station"].asInt() != snum) continue;
-         ckov_digitAB.append(fill_ckov_evt(i, snum, all_ckov_digits, kk));
-       }
-     } // end loop over stations
-     root["recon_events"][i]["ckov_event"]["ckov_digits"] = ckov_digitAB;
+      // DR 2015-08-31 -- the loops below are now done within fill_ckov_evt
+      // ------>NOW,  go through the stations and fill Ckov events
+      // loop over ckov stations
+      /*
+      Json::Value ckov_digitAB(Json::arrayValue);
+      ckov_digitAB.clear();
+      for (int snum = 0; snum < 2; ++snum) {
+         for (unsigned int kk = 0; kk < all_ckov_digits.size(); ++kk) {
+           // check that this digit belongs to the station we are trying to fill
+           if (all_ckov_digits[kk]["station"].asInt() != snum) continue;
+           ckov_digitAB.append(fill_ckov_evt(i, snum, all_ckov_digits, kk));
+         }
+       } // end loop over stations
+       root["recon_events"][i]["ckov_event"]["ckov_digits"] = ckov_digitAB;
+       */
+    } // end check-if-hits
   } // end loop over events
 }
 
 //////////////////////////////////////////////////////////////////////
-std::vector<Json::Value>
-MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
-                                        Json::Value& root) const {
-  std::vector<Json::Value> ckov_digits;
-  ckov_digits.clear();
-  if (hits.size() == 0) return ckov_digits;
+CkovTmpDigits MapCppCkovMCDigitizer::make_ckov_digits(CkovHitArray* hits,
+                                                      double gentime) const {
 
-  for (unsigned int j = 0; j < hits.size(); ++j) {  //  j-th hit
-      Json::Value hit = hits[j];
+  CkovTmpDigits tmpDigits(0);
+  if (hits->size() == 0) return tmpDigits;
 
+  for (unsigned int j = 0; j < hits->size(); ++j) {  //  j-th hit
+      CkovHit hit = hits->at(j);
       if (fDebug) std::cout << "=================== hit# " << j << std::endl;
 
-      // make sure we can get the station/slab info
-      if (!hit.isMember("channel_id"))
+      // make sure we can get the station number
+      if (!hit.GetChannelId())
           throw(Exception(Exception::recoverable,
                        "No channel_id in hit",
                        "MapCppCkovMCDigitizer::make_ckov_digits"));
-      if (!hit.isMember("momentum"))
-          throw(Exception(Exception::recoverable,
-                       "No momentum in hit",
-                       "MapCppCkovMCDigitizer::make_ckov_digits"));
-      if (!hit.isMember("time"))
-          throw(Exception(Exception::recoverable,
-                       "No time in hit",
-                       "MapCppCkovMCDigitizer::make_ckov_digits"));
-      Json::Value channel_id = hit["channel_id"];
 
-      if (!hit.isMember("energy_deposited"))
-          throw(Exception(Exception::recoverable,
-                       "No energy_deposited in hit",
-                       "MapCppCkovMCDigitizer::make_ckov_digits"));
-      double edep = hit["energy_deposited"].asDouble();
+      double edep = hit.GetEnergyDeposited();
 
       // Ckov hits in the CkovChannelIdProcessor of Json Parser registers a property
       // "station_number" in channel_id
-      int stn = hit["channel_id"]["station_number"].asInt();
+      int stn = hit.GetChannelId()->GetStation();
 
       // find the geo module corresponding to this hit
       const MiceModule* hit_module = NULL;
@@ -179,7 +194,8 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
                        "MapCppCkovMCDigitizer::make_ckov_digits"));
 
       // now get the position of the hit
-      Hep3Vector hpos = JsonWrapper::JsonToThreeVector(hit["position"]);
+      ThreeVector tpos = hit.GetPosition();
+      Hep3Vector hpos(tpos.x(), tpos.y(), tpos.z());
 
       // get the pmt positions from the geometry
       // pmt positions
@@ -194,7 +210,7 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
       pmtName = "PMT2Pos";
       Hep3Vector pmt2Pos = hit_module->propertyHep3Vector(pmtName);
       // pmt 3
-      pmtName = "PMT2Pos";
+      pmtName = "PMT3Pos";
       Hep3Vector pmt3Pos = hit_module->propertyHep3Vector(pmtName);
       //
 
@@ -206,13 +222,13 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
 
       // Here we uniformly distribute all the pe to the 4 pmts;
       // The distance is used to calculate the time of the signal.
-      printf("Passing hit number %i", j);
+      if (fDebug) printf("Passing hit number %i", j);
       double npe = get_npe(hit);
       double npe0, npe1, npe2, npe3;
       npe0 = npe1 = npe2 = npe3 = npe/4;
 
       // get the hit time, speed of c in the ckov, and define the pmt resolution;
-      double htime = hit["time"].asDouble() - gentime;
+      double htime = hit.GetTime() - gentime;
       double csp = (stn == 0 ? 3.0e8/1.069 : 3.0e8/1.112);
       double pmt_res = 0.1;
 
@@ -225,6 +241,7 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
       double tdc_factor = 0.025;
 
       // convert to tdc
+      // I believe the ckov only has caen v1731 flash adc's
       int tdc0 = static_cast<int>(time0 / tdc_factor);
       int tdc1 = static_cast<int>(time1 / tdc_factor);
       int tdc2 = static_cast<int>(time2 / tdc_factor);
@@ -234,82 +251,67 @@ MapCppCkovMCDigitizer::make_ckov_digits(Json::Value hits, double gentime,
                    << " " << tdc2 << " " << tdc3 << std::endl;
       }
 
-      Json::Value tmpDigit;
-      tmpDigit.clear();
-      tmpDigit["channel_id"] = hit["channel_id"];
-      tmpDigit["momentum"] = hit["momentum"];
-      tmpDigit["time"] = hit["time"];
-      tmpDigit["position"]=hit["position"];
-      tmpDigit["isUsed"] = 0;
-      tmpDigit["npe"] = npe;
+      aTmpCkovDigit aTmpDigit;
+      aTmpDigit.fChannelId = hit.GetChannelId();
+      aTmpDigit.fMom = hit.GetMomentum();
+      aTmpDigit.fTime = hit.GetTime();
+      aTmpDigit.fPos = hit.GetPosition();
+      aTmpDigit.fIsUsed = 0;
+      aTmpDigit.fNpe = npe;
 
-	  // set the key for this channel
-      tmpDigit["station"] = stn;
-	  tmpDigit["npe0"] = npe0;
-      tmpDigit["leading_time0"] = tdc0;
-      tmpDigit["raw_time0"] = time0;
-	  tmpDigit["npe1"] = npe1;
-      tmpDigit["leading_time1"] = tdc1;
-      tmpDigit["raw_time1"] = time1;
-      tmpDigit["npe2"] = npe2;
-      tmpDigit["leading_time2"] = tdc2;
-      tmpDigit["raw_time2"] = time2;
-      tmpDigit["npe3"] = npe3;
-      tmpDigit["leading_time3"] = tdc3;
-      tmpDigit["raw_time3"] = time3;
-      ckov_digits.push_back(tmpDigit);
+      // set the key for this channel
+      aTmpDigit.fStation = stn;
+      aTmpDigit.fNpe0 = npe0;
+      aTmpDigit.fLeadingTime0 = tdc0;
+      aTmpDigit.fRawTime0 = time0;
+      aTmpDigit.fNpe1 = npe1;
+      aTmpDigit.fLeadingTime1 = tdc1;
+      aTmpDigit.fRawTime1 = time1;
+      aTmpDigit.fNpe2 = npe2;
+      aTmpDigit.fLeadingTime2 = tdc2;
+      aTmpDigit.fRawTime2 = time2;
+      aTmpDigit.fNpe3 = npe3;
+      aTmpDigit.fLeadingTime3 = tdc3;
+      aTmpDigit.fRawTime3 = time3;
+      tmpDigits.push_back(aTmpDigit);
     }  // for (unsigned int j = 0; j < hits.size(); ++j)
 
-    return ckov_digits;
+    return tmpDigits;
 }
-
 //////////////////////////////////////////////////////////////////////
-Json::Value MapCppCkovMCDigitizer::check_sanity_mc(Json::Value& root) const {
-  // Check if the JSON document can be parsed, else return error only
-  // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc_events")) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "Could not find an MC branch to simulate.",
-                          "MapCppCkovMCDigitizer::check_sanity_mc");
-  }
-
-  Json::Value mc = root.get("mc_events", 0);
-  // Check if JSON document is of the right type, else return error
-  if (!mc.isArray()) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "MC branch was not an array.",
-                          "MapCppCkovMCDigitizer::check_sanity_mc");
-  }
-  return mc;
-}
-
-//////////////////////////////////////////////////////////////////////
-double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
+double MapCppCkovMCDigitizer::get_npe(CkovHit& hit) const {
 
   double nphot = 0.;
   double nptmp = 0.;
+  /* these are defined in the header & initialized at birth - DR 2015-08-31
   double muon_thrhold = 0.;
   double charge_per_pe = 0.;
   // scaling factor to data
   double scaling = 0.935;
+  */
   // mass of the hit particle;
-  double particle_mass = hit["mass"].asDouble();
+  double particle_mass = hit.GetMass();
   // momentum of the hit particle;
-  double px = hit["momentum"]["x"].asDouble();
-  double py = hit["momentum"]["y"].asDouble();
-  double pz = hit["momentum"]["z"].asDouble();
+  double px = hit.GetMomentum().x();
+  double py = hit.GetMomentum().y();
+  double pz = hit.GetMomentum().z();
   double p_tot = sqrt(px*px + py*py + pz*pz);
 
-  if (hit["channel_id"]["station_number"].asInt() == 0) {
+  int hitStation = hit.GetChannelId()->GetStation();
+  int hitPid = hit.GetParticleId();
+  /* the initialization of these is now done in birth so as to keep 
+   * all hardcoded values in one place  - DR 2015-08-31
+  if (hitStation == 0) {
     muon_thrhold = 275.0;
     charge_per_pe = 17.3;
-  } else if (hit["channel_id"]["station_number"].asInt() == 1) {
+  } else if (hitStation == 1) {
     muon_thrhold = 210.0;
     charge_per_pe = 26;
   }
+  */
 
   // momentum threshold, see Lucien's Python code.
-  double pp_threshold = muon_thrhold * particle_mass / 105.6;
+  double pp_threshold = muon_thrhold[hitStation] * particle_mass / 105.6;
 
   // smearing constant
   const double smear_const = 0.5;
@@ -325,7 +327,7 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
   if (p_tot >= pp_threshold) {
 
     // Above threshold;
-    double pred = scaling * charge_per_pe *
+    double pred = scaling * charge_per_pe[hitStation] *
                   (1.0 - (pp_threshold/p_tot)*(pp_threshold/p_tot)) + 0.5;
     double pred_single = pred/4;
 
@@ -333,10 +335,10 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
     rms_sum = 0;
 
     // Electron shower:
-    if (hit["particle_id"].asInt() == 11 || hit["particle_id"].asInt() == -11) {
+    if (hitPid == 11 || hitPid == -11) {
 
       double rnd_number = rnd->Rndm();
-      if (hit["channel_id"]["station_number"].asInt() == 0) {
+      if (hitStation == 0) {
         if (rnd_number <= 0.03)
           pred *= 2;
         else if (rnd_number <= 0.039 && rnd_number > 0.03)
@@ -365,8 +367,8 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
     rms = sqrt(rms_sum);
     rms = (rms < 0.2 ? 0.2 : rms);
     npssn = npssn_sum;
-    if (hit["particle_id"].asInt() == 13 || hit["particle_id"].asInt() == -13 ||
-        hit["particle_id"].asInt() == 211 || hit["particle_id"].asInt() == -211) {
+    if (hitPid == 13 || hitPid == -13 ||
+        hitPid == 211 || hitPid == -211) {
       if (rnd->Rndm() < 0.06) {
         npssn -= log(rnd->Rndm())/0.2;
       }
@@ -404,96 +406,79 @@ double MapCppCkovMCDigitizer::get_npe(Json::Value hit) const {
 }
 
 //////////////////////////////////////////////////////////////////////
-Json::Value MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
-                                                 int snum,
-                                                 std::vector<Json::Value> all_ckov_digits,
-                                                 int i)
-const {
-  Json::Value ckov_digits;
-  ckov_digits.clear();
-
+void MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
+                                          CkovTmpDigits& tmpAllDigits,
+                                          CkovDigitArray* CkovDigArray) const {
   // return null if this evt had no ckov hits
-  if (all_ckov_digits.size() == 0) return ckov_digits;
+  if (tmpAllDigits.size() == 0) return;
 
   double npe;
   int ndigs = 0;
 
-  Json::Value digitA;
-  Json::Value digitB;
-  digitA.clear();
-  digitB.clear();
+  for (int snum = 0; snum < 2; ++snum) {
+    for (unsigned int kk = 0; kk < tmpAllDigits.size(); ++kk) {
+      // check that this hit has not already been used/filled
+      if (tmpAllDigits[kk].fStation != snum) continue;
+      CkovDigit aDigit;
+      if (tmpAllDigits[kk].fIsUsed == 0) {
+          ndigs++;
+          npe = tmpAllDigits[kk].fNpe;
+          // 23 is the ADC factor.
+          // the factor - ckovNpeToAdc is set at birth, defined in header
+          // keeping for-now-hardcoded definitions in one place
+          // -- DR 2015-08-31
+          int adc = static_cast<int>(npe * ckovNpeToAdc);
 
-  // check if the digit has been used
-  if (all_ckov_digits[i]["isUsed"].asInt() == 0) {
+          CkovA digitA;
+          CkovB digitB;
+          if (snum == 0) {
+              digitA.SetArrivalTime0(tmpAllDigits[kk].fLeadingTime0);
+              digitA.SetArrivalTime1(tmpAllDigits[kk].fLeadingTime1);
+              digitA.SetArrivalTime2(tmpAllDigits[kk].fLeadingTime2);
+              digitA.SetArrivalTime3(tmpAllDigits[kk].fLeadingTime3);
+              digitA.SetTotalCharge(adc);
+              digitA.SetPartEventNumber(evnum);
+              digitA.SetNumberOfPes(npe);
 
-    ndigs++;
+              // Does not matter too much but..
+              //   I think the pulse0/1/2/3 should be adc/4 -- DR 2015-08-31
+              digitA.SetPositionMin0(0);
+              digitA.SetPositionMin1(0);
+              digitA.SetPositionMin2(0);
+              digitA.SetPositionMin3(0);
+              digitA.SetPulse0(0);
+              digitA.SetPulse1(0);
+              digitA.SetPulse2(0);
+              digitA.SetPulse3(0);
+              digitA.SetCoincidences(0);
+              aDigit.SetCkovA(digitA);
+          } else {
+              digitB.SetArrivalTime4(tmpAllDigits[kk].fLeadingTime0);
+              digitB.SetArrivalTime5(tmpAllDigits[kk].fLeadingTime1);
+              digitB.SetArrivalTime6(tmpAllDigits[kk].fLeadingTime2);
+              digitB.SetArrivalTime7(tmpAllDigits[kk].fLeadingTime3);
+              digitB.SetTotalCharge(adc);
+              digitB.SetPartEventNumber(evnum);
+              digitB.SetNumberOfPes(npe);
 
-    npe = all_ckov_digits[i]["npe"].asDouble();
-    // 23 is the ADC factor.
-    int adc = static_cast<int>(npe * 23);
-
-    // NOTE: needs tweaking/verifying -- DR 3/15
-    // NOTE: if tof needs tweaking, Ckov also needs it. -- frankliuao 8/15
-    // Initialize digits for both stations:
-    digitA["position_min_0"] = 0;
-    digitA["position_min_1"] = 0;
-    digitA["position_min_2"] = 0;
-    digitA["position_min_3"] = 0;
-    digitA["pulse_0"] = 0;
-    digitA["pulse_1"] = 0;
-    digitA["pulse_2"] = 0;
-    digitA["pulse_3"] = 0;
-    digitA["coincidences"] = 0;
-    digitA["total_charge"] = 0;
-    digitA["arrival_time_0"] = 0;
-    digitA["arrival_time_1"] = 0;
-    digitA["arrival_time_2"] = 0;
-    digitA["arrival_time_3"] = 0;
-    digitA["part_event_number"] = 0;
-    digitA["number_of_pes"] = 0;
-
-
-    digitB["position_min_4"] = 0;
-    digitB["position_min_5"] = 0;
-    digitB["position_min_6"] = 0;
-    digitB["position_min_7"] = 0;
-    digitB["pulse_4"] = 0;
-    digitB["pulse_5"] = 0;
-    digitB["pulse_6"] = 0;
-    digitB["pulse_7"] = 0;
-    digitB["total_charge"] = 0;
-    digitB["coincidences"] = 0;
-    digitB["arrival_time_4"] = 0;
-    digitB["arrival_time_5"] = 0;
-    digitB["arrival_time_6"] = 0;
-    digitB["arrival_time_7"] = 0;
-    digitB["part_event_number"] = 0;
-    digitB["number_of_pes"] = 0;
-
-
-    if (snum == 0) {
-      digitA["arrival_time_0"] = all_ckov_digits[i]["leading_time0"];
-      digitA["arrival_time_1"] = all_ckov_digits[i]["leading_time1"];
-      digitA["arrival_time_2"] = all_ckov_digits[i]["leading_time2"];
-      digitA["arrival_time_3"] = all_ckov_digits[i]["leading_time3"];
-      digitA["total_charge"] = adc;
-      digitA["part_event_number"] = evnum;
-      digitA["number_of_pes"] = npe;
-    } else {
-      digitB["arrival_time_4"] = all_ckov_digits[i]["leading_time0"];
-      digitB["arrival_time_5"] = all_ckov_digits[i]["leading_time1"];
-      digitB["arrival_time_6"] = all_ckov_digits[i]["leading_time2"];
-      digitB["arrival_time_7"] = all_ckov_digits[i]["leading_time3"];
-      digitB["total_charge"] = adc;
-      digitB["part_event_number"] = evnum;
-      digitB["number_of_pes"] = npe;
-    }
-
-    all_ckov_digits[i]["isUsed"] = 1;
-  } // #if (all_ckov_digits[i]["isUsed"].asInt() == 0)
-  ckov_digits["A"] = digitA;
-  ckov_digits["B"] = digitB;
-  return ckov_digits;
+              // Does not matter too much but..
+              //   I think the pulse4/5/6/7 should be adc/4 -- DR 2015-08-31
+              digitB.SetPositionMin4(0);
+              digitB.SetPositionMin5(0);
+              digitB.SetPositionMin6(0);
+              digitB.SetPositionMin7(0);
+              digitB.SetPulse4(0);
+              digitB.SetPulse5(0);
+              digitB.SetPulse6(0);
+              digitB.SetPulse7(0);
+              digitB.SetCoincidences(0);
+              aDigit.SetCkovB(digitB);
+          }
+          tmpAllDigits[kk].fIsUsed = true;
+      } // end check if-digit-used
+      CkovDigArray->push_back(aDigit);
+    } // end loop over tmp digits
+  } // end loop over stations
 }
 //=====================================================================
 }

@@ -38,12 +38,35 @@
 #include <map>
 
 #include "TRandom3.h"
+#include "DataStructure/Spill.hh"
+#include "DataStructure/Primary.hh"
 #include "Config/MiceModule.hh"
 #include "API/MapBase.hh"
 
 namespace MAUS {
+  /** @brief structure to hold -a temporary digit-
+   */
+  typedef struct fCkovTmp {
+    CkovChannelId* fChannelId;
+    int fStation;
+    ThreeVector fMom;
+    ThreeVector fPos;
+    double fTime;
+    double fEdep;
+    bool fIsUsed;
+    double fNpe;
+    double fNpe0, fNpe1, fNpe2, fNpe3;
+    double fNpe4, fNpe5, fNpe6, fNpe7;
+    double fLeadingTime0, fLeadingTime1, fLeadingTime2, fLeadingTime3;
+    double fRawTime0, fRawTime1, fRawTime2, fRawTime3;
+  } aTmpCkovDigit;
 
-  class MapCppCkovMCDigitizer : public MapBase<Json::Value> {
+  /** @brief vector storage for -all temporary digits
+   */
+  typedef std::vector<fCkovTmp> CkovTmpDigits;
+
+
+  class MapCppCkovMCDigitizer : public MapBase<Data> {
 
     public:
       MapCppCkovMCDigitizer();
@@ -55,21 +78,24 @@ namespace MAUS {
 
       void _death();
 
-      void _process(Json::Value* data) const;
+      void _process(Data* data) const;
 
-      Json::Value check_sanity_mc(Json::Value& document) const;
+      /* return the number of photoelectrons for this mc hit
+       * argument is a CkovHit
+       */
+      double get_npe(CkovHit& hit) const;
 
-      double get_npe(Json::Value hit) const;
+      /* go through the ckov mc hits 
+       * and store the digitized hits in a temp vector
+       */
+      CkovTmpDigits make_ckov_digits(CkovHitArray* hits, double gentime) const;
 
-      std::vector<Json::Value> make_ckov_digits(Json::Value hits,
-                                                double gentime,
-                                                Json::Value& root) const;
-
-      Json::Value fill_ckov_evt(int evnum, int snum,
-                                std::vector<Json::Value> _alldigits,
-                                int i) const;
-
-      bool check_param(Json::Value* hit1, Json::Value* hit2) const;
+      /* go through all the digitized hits in the temporary vector
+       * and set the actual CkovA, CkovB hits and the CkovDigit for the event
+       */
+      void fill_ckov_evt(int evnum,
+                         CkovTmpDigits& tmpAllDigits,
+                         CkovDigitArray* CkovDigArray) const;
 
    private:
       MiceModule* geo_module;
@@ -78,11 +104,21 @@ namespace MAUS {
 
       Json::Value _configJSON;
 
-      std::vector<std::string> _station_index;
-
+      /* debug flag, set to true for verbose prints */
       bool fDebug;
 
       TRandom3* rnd;
+
+      // the muon threshold and the adc/npe conversion for each counter
+      // these are initialized in birth
+      double muon_thrhold[2];
+      double charge_per_pe[2];
+
+      // scaling factor to data
+      double scaling;
+
+      // #npe to adc conversion - maybe put it in a datacard
+      double ckovNpeToAdc;
   };
 }
 

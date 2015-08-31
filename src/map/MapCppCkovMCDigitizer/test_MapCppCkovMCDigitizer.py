@@ -23,7 +23,10 @@ class MapCppCkovMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         """
         cls.mapper = MAUS.MapCppCkovMCDigitizer()
         conf_json = json.loads(Configuration().getConfigJSON())
-        conf_json["reconstruction_geometry_filename"] = "Stage6.dat"
+        root_dir = os.environ.get("MAUS_ROOT_DIR")
+        geom_file = \
+                   '%s/src/map/MapCppCkovMCDigitizer/ckov_geom.dat' % root_dir
+        conf_json["reconstruction_geometry_filename"] = geom_file
         # Test whether the configuration files were loaded correctly at birth
         cls.mapper.birth(json.dumps(conf_json))
 
