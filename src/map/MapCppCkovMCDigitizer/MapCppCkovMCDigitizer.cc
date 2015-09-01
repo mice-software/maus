@@ -40,7 +40,7 @@ void MapCppCkovMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // Before we go on we generate a new TRandom3;
   rnd = new TRandom3;
   // print level
-  fDebug = true;
+  fDebug = false;
 
   Json::Reader reader;
 
