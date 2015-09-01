@@ -68,6 +68,7 @@ namespace global {
 	  EMRTrack->AddTrackPoint(tempEMRTrackPoint);
 	}
 	EMRTrack->set_emr_range_primary(ImportedTrack->get_emr_range_primary());
+	EMRTrack->set_emr_plane_density(ImportedTrack->get_emr_plane_density());
 	EMRTrack->set_emr_range_secondary(ImportedTrack->get_emr_range_secondary());
       }
     }
@@ -129,6 +130,7 @@ namespace global {
 	    GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	  }
 	  GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	  GlobalTrack->set_emr_plane_density(EMRTrack->get_emr_plane_density());
 	  GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	}
 	global_event->add_track_recursive(GlobalTrack);
@@ -163,6 +165,7 @@ namespace global {
 	    GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	  }
 	  GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	  GlobalTrack->set_emr_plane_density(EMRTrack->get_emr_plane_density());
 	  GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	}
 	global_event->add_track_recursive(GlobalTrack);
@@ -196,6 +199,7 @@ namespace global {
 	  GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	}
 	GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	GlobalTrack->set_emr_plane_density(EMRTrack->get_emr_plane_density());
 	GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
       }
       global_event->add_track_recursive(GlobalTrack);
@@ -212,6 +216,7 @@ namespace global {
 	MAUS::DataStructure::Global::Track* GlobalTrack = EMRTrack->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
 	GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	GlobalTrack->set_emr_plane_density(EMRTrack->get_emr_plane_density());
 	GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	global_event->add_track_recursive(GlobalTrack);
       } else {
@@ -226,6 +231,7 @@ namespace global {
 	  GlobalTrack->AddTrackPoint(tempEMRTrackPoint);
 	}
 	GlobalTrack->set_emr_range_primary(EMRTrack->get_emr_range_primary());
+	GlobalTrack->set_emr_plane_density(EMRTrack->get_emr_plane_density());
 	GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
 	GlobalTrack->set_mapper_name(mapper_name);
 	global_event->add_track_recursive(GlobalTrack);
