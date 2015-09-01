@@ -24,6 +24,7 @@
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 #include "API/PyWrapMapBase.hh"
+#include "Config/MiceModule.hh"
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 
@@ -75,6 +76,12 @@ void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
                           "TOF trigger station invalid. Must be tof0/tof1/tof2",
                           "MapCppTOFSpacePoints::_birth");
   }
+  // get the tof geometry modules
+  std::string filename;
+  filename = configJSON["reconstruction_geometry_filename"].asString();
+  geo_module = new MiceModule(filename);
+  tof_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "TOF");
+  tof_mother_modules = geo_module->findModulesByPropertyString("Region", "KLregion");
 }
 
 ////////////////////////////////////////////////////////////
@@ -345,6 +352,66 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
   xSpacePoint.SetCharge(charge_SlabX + charge_SlabY);
   xSpacePoint.SetChargeProduct(chargeProduct_SlabX + chargeProduct_SlabY);
   // std::cout << xSPKey << "  t = " << time << " dt = " << dt << std::endl;
+
+  // get the global position of the space point and store it
+  const MiceModule* hit_module = NULL;
+  bool gotXYModules = false, gotXModule = false, gotYModule = false;
+  Hep3Vector SlabGlobalPos, SlabErrorPos;
+  double globX, globY, globZx, globZy, globZ, globXErr, globYErr, globZErr;
+
+  for ( unsigned int jj = 0; !gotXYModules && jj < tof_modules.size(); ++jj ) {
+      if ( tof_modules[jj]->propertyExists("Slab", "int") ) {
+         if (tof_modules[jj]->propertyInt("Slab") == xKey_SlabX_digit0.slab()
+            && tof_modules[jj]->propertyInt("Plane") == 0) {
+             // got Y
+             // std::cerr << "SlabX: " << xKey_SlabX_digit0.slab() << std::endl;
+             SlabGlobalPos = tof_modules[jj]->globalPosition();
+             SlabErrorPos = tof_modules[jj]->dimensions()/sqrt(12);
+             globY = tof_modules[jj]->globalPosition().y();
+             globYErr = (tof_modules[jj]->dimensions().y())/sqrt(12);
+             globZErr = (tof_modules[jj]->dimensions().z())/sqrt(12);
+             globZy = tof_modules[jj]->globalPosition().z();
+             gotXModule = true;
+             // std::cerr << "hit Global XYZ(x): " << SlabGlobalPos << std::endl;
+         }
+         if (tof_modules[jj]->propertyInt("Slab") == xKey_SlabY_digit0.slab()
+            && tof_modules[jj]->propertyInt("Plane") == 1) {
+             // got X
+             // std::cerr << "SlabY: " << xKey_SlabY_digit0.slab() << std::endl;
+             hit_module = tof_modules[jj];
+             SlabGlobalPos = hit_module->globalPosition();
+             globX = tof_modules[jj]->globalPosition().x();
+             globZx = tof_modules[jj]->globalPosition().z();
+             globXErr = (tof_modules[jj]->dimensions().x())/sqrt(12);
+             gotYModule = true;
+             // std::cerr << "hit Global XYZ(y): " << SlabGlobalPos << " "
+             //           << tof_modules[jj]->dimensions() << std::endl;
+         }
+         gotXYModules = gotXModule && gotYModule;
+         if (gotXYModules) {
+             globZ = (globZx + globZy)/2.0;
+             // std::cerr << "hit Global XYZ: " << globX
+             //           << " " << globY << " " << globZ << std::endl;
+             // std::cerr << "hit Err in Global XYZ: " << globXErr
+             //          << " " << globYErr << " " << globZErr << std::endl;
+             gotXYModules = true;
+         } else {
+            xSpacePoint.SetGlobalPosX(globX);
+            xSpacePoint.SetGlobalPosY(globY);
+            xSpacePoint.SetGlobalPosZ(globZ);
+            xSpacePoint.SetGlobalPosXErr(globXErr);
+            xSpacePoint.SetGlobalPosYErr(globYErr);
+            xSpacePoint.SetGlobalPosZErr(globZErr);
+         }
+      } // end check on module
+  } // end loop over tof_modules
+
+  xSpacePoint.SetGlobalPosX(globX);
+  xSpacePoint.SetGlobalPosY(globY);
+  xSpacePoint.SetGlobalPosZ(globZ);
+  xSpacePoint.SetGlobalPosXErr(globXErr);
+  xSpacePoint.SetGlobalPosYErr(globYErr);
+  xSpacePoint.SetGlobalPosZErr(globZErr);
 }
 
 ////////////////////////////////////////////////////////////

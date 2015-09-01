@@ -131,6 +131,9 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
   typedef std::pair<std::pair<TOF1SlabHitArray, TOF1SpacePointArray*>,
                     std::string > stationKeys;
   typedef std::vector<stationKeys> keysVec_t;
+  MiceModule* geo_module;
+  std::vector<const MiceModule*> tof_modules;
+  std::vector<const MiceModule*> tof_mother_modules;
 };
 }
 
