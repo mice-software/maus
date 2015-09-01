@@ -14,7 +14,7 @@
  * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
  */
 
- /** @class PIDVarE
+ /** @class ComPIDVarD
  *  @author Celeste Pidcott, University of Warwick
  *  Comissioning PID variable class, for EMR range, derived
  *  from PIDBase

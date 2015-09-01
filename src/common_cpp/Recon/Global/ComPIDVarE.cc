@@ -80,17 +80,17 @@ namespace global {
       }
       if (checkCount2 > 1 || checkCount1 > 1) {
 	Squeak::mout(Squeak::debug) << "Multiple measurements for TOF2/TOF1" <<
-	  " times, Recon::Global::ComPIDVarA::Calc_Var()" << std::endl;
+	  " times, Recon::Global::ComPIDVarE::Calc_Var()" << std::endl;
 	return std::make_pair(-1, EMR_range);
       } else if (checkCount2 == 0 ||
 		 checkCount1 == 0 || (TOF2_t -TOF1_t) <= 0) {
 	Squeak::mout(Squeak::debug) << "Missing/invalid measurements for " <<
-	  "TOF0/TOF1 times, Recon::Global::ComPIDVarA::Calc_Var()" << std::endl;
+	  "TOF0/TOF1 times, Recon::Global::ComPIDVarE::Calc_Var()" << std::endl;
 	return std::make_pair(-1, EMR_range);
       } else if ( XminBinComE > (TOF2_t - TOF1_t) ||
 		  (TOF2_t - TOF1_t) > XmaxBinComE ) {
 	Squeak::mout(Squeak::debug) << "Difference between TOF1 & TOF2 times" <<
-	  " out of PDF range, Recon::Global::ComPIDVarA::Calc_Var()" << std::endl;
+	  " out of PDF range, Recon::Global::ComPIDVarE::Calc_Var()" << std::endl;
 	return std::make_pair(-1, EMR_range);
       } else {
 	return std::make_pair((TOF2_t - TOF1_t), EMR_range);

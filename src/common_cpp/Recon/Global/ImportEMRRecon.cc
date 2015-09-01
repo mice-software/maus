@@ -55,6 +55,7 @@ namespace global {
 	MAUS::DataStructure::Global::Track* SecondaryEMRTrack =
 	  new MAUS::DataStructure::Global::Track();
 	PrimaryEMRTrack->set_emr_range_primary(emr_event.GetRangePrimary());
+	PrimaryEMRTrack->set_emr_plane_density(emr_event.GetPlaneDensity());
       // Plane hit array
       MAUS::EMRPlaneHitArray plane_hit_array = emr_event.GetEMRPlaneHitArray();
       if (plane_hit_array.size() > 0) {

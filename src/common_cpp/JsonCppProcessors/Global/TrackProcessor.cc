@@ -82,6 +82,11 @@ TrackProcessor::TrackProcessor()
         &MAUS::DataStructure::Global::Track::set_emr_range_secondary, true);
 
     RegisterValueBranch(
+        "emr_plane_density", &_double_proc,
+        &MAUS::DataStructure::Global::Track::get_emr_plane_density,
+        &MAUS::DataStructure::Global::Track::set_emr_plane_density, true);
+
+    RegisterValueBranch(
         "goodness_of_fit", &_double_proc,
         &MAUS::DataStructure::Global::Track::get_goodness_of_fit,
         &MAUS::DataStructure::Global::Track::set_goodness_of_fit, true);
