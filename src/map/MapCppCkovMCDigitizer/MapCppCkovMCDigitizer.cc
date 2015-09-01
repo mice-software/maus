@@ -17,12 +17,12 @@
 
 #include "src/map/MapCppCkovMCDigitizer/MapCppCkovMCDigitizer.hh"
 #include <string>
+#include <numeric>
 #include "Config/MiceModule.hh"
 #include "Utils/Exception.hh"
 #include "API/PyWrapMapBase.hh"
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
 #include "src/common_cpp/DataStructure/RunHeader.hh"
-#include <numeric>
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppCkovMCDigitizer(void) {
@@ -136,7 +136,6 @@ void MapCppCkovMCDigitizer::_process(MAUS::Data* data) const {
 
       CkovDigitArray* digit_array = evt->GetCkovDigitArrayPtr();
       fill_ckov_evt(i, all_ckov_dig, digit_array);
-
     } // end check-if-hits
   } // end loop over events
 }
@@ -383,7 +382,7 @@ void MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
 
   /* If there are hits:
    *   For this given event number, there might be multiple hits;
-   *   If the hits belong to 2 stations, they should be filled simultaneously to 
+   *   If the hits belong to 2 stations, they should be filled simultaneously to
    * the digits, but in their respective structure;
    *   Otherwise, we need to integrate the digits together and get an average;
    */
@@ -402,35 +401,35 @@ void MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
   int num_of_hits_a = 0;
   int num_of_hits_b = 0;
 
-  for (int snum = 0; snum < 2; ++snum) {
-    for (unsigned int kk = 0; kk < all_ckov_dig.size(); ++kk) {
-      // check that this hit has not already been used/filled
-      if (all_ckov_dig[kk].fStation != snum) continue;
-      if (all_ckov_dig[kk].fIsUsed == 0) {
-          // 23 is the ADC factor.
-          // the factor - ckovNpeToAdc is set at birth, defined in header
-          // keeping for-now-hardcoded definitions in one place
-          // -- DR 2015-08-31
+  // Station number
+  int snum;
+  for (unsigned int kk = 0; kk < all_ckov_dig.size(); ++kk) {
+    // check that this hit has not already been used/filled
+    snum = all_ckov_dig[kk].fStation;
+    if (all_ckov_dig[kk].fIsUsed == 0) {
+        // 23 is the ADC factor.
+        // the factor - ckovNpeToAdc is set at birth, defined in header
+        // keeping for-now-hardcoded definitions in one place
+        // -- DR 2015-08-31
 
-          if (snum == 0) {
-              arrival_time0_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime0);
-              arrival_time1_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime1);
-              arrival_time2_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime2);
-              arrival_time3_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime3);
-              npe_each_hit_a.push_back(all_ckov_dig[kk].fNpe);
-              num_of_hits_a++;
-          } else {
-              arrival_time4_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime0);
-              arrival_time5_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime1);
-              arrival_time6_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime2);
-              arrival_time7_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime3);
-              npe_each_hit_b.push_back(all_ckov_dig[kk].fNpe);
-              num_of_hits_b++;
-          }
-          all_ckov_dig[kk].fIsUsed = true;
-      } // end check if-digit-used
-    } // end loop over tmp digits
-  } // end loop over stations
+        if (snum == 0) {
+            arrival_time0_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime0);
+            arrival_time1_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime1);
+            arrival_time2_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime2);
+            arrival_time3_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime3);
+            npe_each_hit_a.push_back(all_ckov_dig[kk].fNpe);
+            num_of_hits_a++;
+        } else {
+            arrival_time4_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime0);
+            arrival_time5_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime1);
+            arrival_time6_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime2);
+            arrival_time7_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime3);
+            npe_each_hit_b.push_back(all_ckov_dig[kk].fNpe);
+            num_of_hits_b++;
+        }
+        all_ckov_dig[kk].fIsUsed = true;
+    } // end check if-digit-used
+  } // end loop over tmp digits
 
   // Now, if either num_of_hits_a(b) == 0, write the default values to the station:
   // Can not be 0 at the same time. If there are no hits, it won't reach this far.
@@ -499,7 +498,6 @@ void MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
     digitB.SetPulse6(-999);
     digitB.SetPulse7(-999);
     digitB.SetCoincidences(-999);
-                                                                                    
     digitA.SetArrivalTime0(std::accumulate(arrival_time0_each_hit_a.begin(),
                                            arrival_time0_each_hit_a.end(),
                                            0.0) / arrival_time0_each_hit_a.size());
@@ -583,7 +581,7 @@ void MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
     digitB.SetPulse7(0);
     digitB.SetCoincidences(0);
   }
-  
+
   // Now fill in the digits:
   CkovDigit aDigit;
   aDigit.SetCkovA(digitA);
