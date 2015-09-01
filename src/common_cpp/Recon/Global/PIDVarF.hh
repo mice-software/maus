@@ -14,14 +14,14 @@
  * along with MAUS.  If not, see <http://  www.gnu.org/licenses/>.
  */
 
- /** @class ComPIDVarF
+ /** @class PIDVarF
  *  @author Celeste Pidcott, University of Warwick
- *  Comissioning PID variable class, for EMR range vs TOF1-TOF2 time of flight,
- *  derivedfrom PIDBase
+ *  PID variable class, for EMR range vs momentum measured in the downstream
+ *  tracker, derivedfrom PIDBase
  */
 
-#ifndef COMPIDVARF_HH
-#define COMPIDVARF_HH
+#ifndef PIDVARF_HH
+#define PIDVARF_HH
 
 #include <string>
 #include <utility>
