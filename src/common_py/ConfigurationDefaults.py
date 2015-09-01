@@ -661,12 +661,20 @@ minD = 0
 maxD = 8000
 # PIDVarE
 minE = 0
-maxE = 8000
+maxE = 1000
 # PIDVarF
 XminF = 50
 XmaxF = 350
 YminF = 0
 YmaxF = 1000
+# PIDVarG
+minG = 0
+maxG = 1
+# PIDVarH
+XminH = 50
+XmaxH = 350
+YminH = 0
+YmaxH = 1
 # ComPIDVarA
 minComA = 20
 maxComA = 40
@@ -686,6 +694,14 @@ XminComE = 20
 XmaxComE = 40
 YminComE = 0
 YmaxComE = 1000
+# ComPIDVarF
+minComF = 0
+maxComF = 1
+# ComPIDVarG
+XminComG = 20
+XmaxComG = 40
+YminComG = 0
+YmaxComG = 1
 
 # PID MICE configuration, 'step_4' for Step IV running, 'commisioning' for field free commissioning data
 pid_config = "step_4"
