@@ -46,7 +46,8 @@
 namespace MAUS {
   /** @brief structure to hold -a temporary digit-
    */
-  typedef struct fCkovTmp {
+  // fCkovOneDig is the structure for one digit;
+  typedef struct ckov_digit_holder {
     CkovChannelId* fChannelId;
     int fStation;
     ThreeVector fMom;
@@ -59,18 +60,17 @@ namespace MAUS {
     double fNpe4, fNpe5, fNpe6, fNpe7;
     double fLeadingTime0, fLeadingTime1, fLeadingTime2, fLeadingTime3;
     double fRawTime0, fRawTime1, fRawTime2, fRawTime3;
-  } aTmpCkovDigit;
+  } one_ckov_dig;
 
   /** @brief vector storage for -all temporary digits
    */
-  typedef std::vector<fCkovTmp> CkovTmpDigits;
+  typedef std::vector<ckov_digit_holder> multi_ckov_dig;
 
 
   class MapCppCkovMCDigitizer : public MapBase<Data> {
 
     public:
       MapCppCkovMCDigitizer();
-
 
     private:
 
@@ -88,14 +88,14 @@ namespace MAUS {
       /* go through the ckov mc hits 
        * and store the digitized hits in a temp vector
        */
-      CkovTmpDigits make_ckov_digits(CkovHitArray* hits, double gentime) const;
+      multi_ckov_dig make_ckov_digits(CkovHitArray* hit_array, double gentime) const;
 
       /* go through all the digitized hits in the temporary vector
        * and set the actual CkovA, CkovB hits and the CkovDigit for the event
        */
       void fill_ckov_evt(int evnum,
-                         CkovTmpDigits& tmpAllDigits,
-                         CkovDigitArray* CkovDigArray) const;
+                         multi_ckov_dig& all_ckov_dig,
+                         CkovDigitArray* digit_array) const;
 
    private:
       MiceModule* geo_module;

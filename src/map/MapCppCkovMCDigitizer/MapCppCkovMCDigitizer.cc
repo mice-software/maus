@@ -17,6 +17,7 @@
 
 #include "src/map/MapCppCkovMCDigitizer/MapCppCkovMCDigitizer.hh"
 #include <string>
+#include <numeric>
 #include "Config/MiceModule.hh"
 #include "Utils/Exception.hh"
 #include "API/PyWrapMapBase.hh"
@@ -120,51 +121,34 @@ void MapCppCkovMCDigitizer::_process(MAUS::Data* data) const {
   // loop over events
   for ( unsigned int i = 0; i < mcEvts->size(); i++ ) {
     // Get Ckov hits for this event
-    CkovHitArray *hits = spill->GetAnMCEvent(i).GetCkovHits();
+    CkovHitArray *hit_array = spill->GetAnMCEvent(i).GetCkovHits();
+    if (fDebug) printf("\nNumber of hits: %i\n", hit_array->size());
 
     double gentime = spill->GetAnMCEvent(i).GetPrimary()->GetTime();
     CkovEvent *evt = new CkovEvent();
     (*recEvts)[i]->SetCkovEvent(evt);
 
     // process only if there are hits
-    // if _hits.size() = 0, the make_digits and fill_ckov_evt functions will
-    // return null. The Ckov recon expects something - either null or data, can't just skip
-    if (hits) {
+    if (hit_array) {
 
       // pick out ckov hits, digitize and store
-      CkovTmpDigits tmpAllDigits = make_ckov_digits(hits, gentime);
+      multi_ckov_dig all_ckov_dig = make_ckov_digits(hit_array, gentime);
 
-      CkovDigitArray* CkovDigArray = evt->GetCkovDigitArrayPtr();
-      fill_ckov_evt(i, tmpAllDigits, CkovDigArray);
-
-      // DR 2015-08-31 -- the loops below are now done within fill_ckov_evt
-      // ------>NOW,  go through the stations and fill Ckov events
-      // loop over ckov stations
-      /*
-      Json::Value ckov_digitAB(Json::arrayValue);
-      ckov_digitAB.clear();
-      for (int snum = 0; snum < 2; ++snum) {
-         for (unsigned int kk = 0; kk < all_ckov_digits.size(); ++kk) {
-           // check that this digit belongs to the station we are trying to fill
-           if (all_ckov_digits[kk]["station"].asInt() != snum) continue;
-           ckov_digitAB.append(fill_ckov_evt(i, snum, all_ckov_digits, kk));
-         }
-       } // end loop over stations
-       root["recon_events"][i]["ckov_event"]["ckov_digits"] = ckov_digitAB;
-       */
+      CkovDigitArray* digit_array = evt->GetCkovDigitArrayPtr();
+      fill_ckov_evt(i, all_ckov_dig, digit_array);
     } // end check-if-hits
   } // end loop over events
 }
 
 //////////////////////////////////////////////////////////////////////
-CkovTmpDigits MapCppCkovMCDigitizer::make_ckov_digits(CkovHitArray* hits,
-                                                      double gentime) const {
+multi_ckov_dig MapCppCkovMCDigitizer::make_ckov_digits(CkovHitArray* hit_array,
+                                                       double gentime) const {
 
-  CkovTmpDigits tmpDigits(0);
-  if (hits->size() == 0) return tmpDigits;
+  multi_ckov_dig all_ckov_dig(0);
+  if (hit_array->size() == 0) return all_ckov_dig;
 
-  for (unsigned int j = 0; j < hits->size(); ++j) {  //  j-th hit
-      CkovHit hit = hits->at(j);
+  for (unsigned int j = 0; j < hit_array->size(); ++j) {  //  j-th hit
+      CkovHit hit = hit_array->at(j);
       if (fDebug) std::cout << "=================== hit# " << j << std::endl;
 
       // make sure we can get the station number
@@ -251,44 +235,38 @@ CkovTmpDigits MapCppCkovMCDigitizer::make_ckov_digits(CkovHitArray* hits,
                    << " " << tdc2 << " " << tdc3 << std::endl;
       }
 
-      aTmpCkovDigit aTmpDigit;
-      aTmpDigit.fChannelId = hit.GetChannelId();
-      aTmpDigit.fMom = hit.GetMomentum();
-      aTmpDigit.fTime = hit.GetTime();
-      aTmpDigit.fPos = hit.GetPosition();
-      aTmpDigit.fIsUsed = 0;
-      aTmpDigit.fNpe = npe;
+      one_ckov_dig a_ckov_dig;
+      a_ckov_dig.fChannelId = hit.GetChannelId();
+      a_ckov_dig.fMom = hit.GetMomentum();
+      a_ckov_dig.fTime = hit.GetTime();
+      a_ckov_dig.fPos = hit.GetPosition();
+      a_ckov_dig.fIsUsed = 0;
+      a_ckov_dig.fNpe = npe;
 
       // set the key for this channel
-      aTmpDigit.fStation = stn;
-      aTmpDigit.fNpe0 = npe0;
-      aTmpDigit.fLeadingTime0 = tdc0;
-      aTmpDigit.fRawTime0 = time0;
-      aTmpDigit.fNpe1 = npe1;
-      aTmpDigit.fLeadingTime1 = tdc1;
-      aTmpDigit.fRawTime1 = time1;
-      aTmpDigit.fNpe2 = npe2;
-      aTmpDigit.fLeadingTime2 = tdc2;
-      aTmpDigit.fRawTime2 = time2;
-      aTmpDigit.fNpe3 = npe3;
-      aTmpDigit.fLeadingTime3 = tdc3;
-      aTmpDigit.fRawTime3 = time3;
-      tmpDigits.push_back(aTmpDigit);
-    }  // for (unsigned int j = 0; j < hits.size(); ++j)
+      a_ckov_dig.fStation = stn;
+      a_ckov_dig.fNpe0 = npe0;
+      a_ckov_dig.fLeadingTime0 = tdc0;
+      a_ckov_dig.fRawTime0 = time0;
+      a_ckov_dig.fNpe1 = npe1;
+      a_ckov_dig.fLeadingTime1 = tdc1;
+      a_ckov_dig.fRawTime1 = time1;
+      a_ckov_dig.fNpe2 = npe2;
+      a_ckov_dig.fLeadingTime2 = tdc2;
+      a_ckov_dig.fRawTime2 = time2;
+      a_ckov_dig.fNpe3 = npe3;
+      a_ckov_dig.fLeadingTime3 = tdc3;
+      a_ckov_dig.fRawTime3 = time3;
+      all_ckov_dig.push_back(a_ckov_dig);
+    }  // for (unsigned int j = 0; j < hit_array.size(); ++j)
 
-    return tmpDigits;
+    return all_ckov_dig;
 }
 //////////////////////////////////////////////////////////////////////
 double MapCppCkovMCDigitizer::get_npe(CkovHit& hit) const {
 
   double nphot = 0.;
   double nptmp = 0.;
-  /* these are defined in the header & initialized at birth - DR 2015-08-31
-  double muon_thrhold = 0.;
-  double charge_per_pe = 0.;
-  // scaling factor to data
-  double scaling = 0.935;
-  */
   // mass of the hit particle;
   double particle_mass = hit.GetMass();
   // momentum of the hit particle;
@@ -299,16 +277,6 @@ double MapCppCkovMCDigitizer::get_npe(CkovHit& hit) const {
 
   int hitStation = hit.GetChannelId()->GetStation();
   int hitPid = hit.GetParticleId();
-  /* the initialization of these is now done in birth so as to keep 
-   * all hardcoded values in one place  - DR 2015-08-31
-  if (hitStation == 0) {
-    muon_thrhold = 275.0;
-    charge_per_pe = 17.3;
-  } else if (hitStation == 1) {
-    muon_thrhold = 210.0;
-    charge_per_pe = 26;
-  }
-  */
 
   // momentum threshold, see Lucien's Python code.
   double pp_threshold = muon_thrhold[hitStation] * particle_mass / 105.6;
@@ -407,78 +375,218 @@ double MapCppCkovMCDigitizer::get_npe(CkovHit& hit) const {
 
 //////////////////////////////////////////////////////////////////////
 void MapCppCkovMCDigitizer::fill_ckov_evt(int evnum,
-                                          CkovTmpDigits& tmpAllDigits,
-                                          CkovDigitArray* CkovDigArray) const {
-  // return null if this evt had no ckov hits
-  if (tmpAllDigits.size() == 0) return;
+                                          multi_ckov_dig& all_ckov_dig,
+                                          CkovDigitArray* digit_array) const {
+  // return null if this evt had no ckov hits, no need to go further;
+  if (all_ckov_dig.size() == 0) return;
 
-  double npe;
-  int ndigs = 0;
+  /* If there are hits:
+   *   For this given event number, there might be multiple hits;
+   *   If the hits belong to 2 stations, they should be filled simultaneously to
+   * the digits, but in their respective structure;
+   *   Otherwise, we need to integrate the digits together and get an average;
+   */
+  std::vector<double> npe_each_hit_a;
+  std::vector<double> npe_each_hit_b;
+  std::vector<double> arrival_time0_each_hit_a;
+  std::vector<double> arrival_time1_each_hit_a;
+  std::vector<double> arrival_time2_each_hit_a;
+  std::vector<double> arrival_time3_each_hit_a;
+  std::vector<double> arrival_time4_each_hit_b;
+  std::vector<double> arrival_time5_each_hit_b;
+  std::vector<double> arrival_time6_each_hit_b;
+  std::vector<double> arrival_time7_each_hit_b;
 
-  for (int snum = 0; snum < 2; ++snum) {
-    for (unsigned int kk = 0; kk < tmpAllDigits.size(); ++kk) {
-      // check that this hit has not already been used/filled
-      if (tmpAllDigits[kk].fStation != snum) continue;
-      CkovDigit aDigit;
-      if (tmpAllDigits[kk].fIsUsed == 0) {
-          ndigs++;
-          npe = tmpAllDigits[kk].fNpe;
-          // 23 is the ADC factor.
-          // the factor - ckovNpeToAdc is set at birth, defined in header
-          // keeping for-now-hardcoded definitions in one place
-          // -- DR 2015-08-31
-          int adc = static_cast<int>(npe * ckovNpeToAdc);
+  // Count how many hits each station has
+  int num_of_hits_a = 0;
+  int num_of_hits_b = 0;
 
-          CkovA digitA;
-          CkovB digitB;
-          if (snum == 0) {
-              digitA.SetArrivalTime0(tmpAllDigits[kk].fLeadingTime0);
-              digitA.SetArrivalTime1(tmpAllDigits[kk].fLeadingTime1);
-              digitA.SetArrivalTime2(tmpAllDigits[kk].fLeadingTime2);
-              digitA.SetArrivalTime3(tmpAllDigits[kk].fLeadingTime3);
-              digitA.SetTotalCharge(adc);
-              digitA.SetPartEventNumber(evnum);
-              digitA.SetNumberOfPes(npe);
+  // Station number
+  int snum;
+  for (unsigned int kk = 0; kk < all_ckov_dig.size(); ++kk) {
+    // check that this hit has not already been used/filled
+    snum = all_ckov_dig[kk].fStation;
+    if (all_ckov_dig[kk].fIsUsed == 0) {
+        // 23 is the ADC factor.
+        // the factor - ckovNpeToAdc is set at birth, defined in header
+        // keeping for-now-hardcoded definitions in one place
+        // -- DR 2015-08-31
 
-              // Does not matter too much but..
-              //   I think the pulse0/1/2/3 should be adc/4 -- DR 2015-08-31
-              digitA.SetPositionMin0(0);
-              digitA.SetPositionMin1(0);
-              digitA.SetPositionMin2(0);
-              digitA.SetPositionMin3(0);
-              digitA.SetPulse0(0);
-              digitA.SetPulse1(0);
-              digitA.SetPulse2(0);
-              digitA.SetPulse3(0);
-              digitA.SetCoincidences(0);
-              aDigit.SetCkovA(digitA);
-          } else {
-              digitB.SetArrivalTime4(tmpAllDigits[kk].fLeadingTime0);
-              digitB.SetArrivalTime5(tmpAllDigits[kk].fLeadingTime1);
-              digitB.SetArrivalTime6(tmpAllDigits[kk].fLeadingTime2);
-              digitB.SetArrivalTime7(tmpAllDigits[kk].fLeadingTime3);
-              digitB.SetTotalCharge(adc);
-              digitB.SetPartEventNumber(evnum);
-              digitB.SetNumberOfPes(npe);
+        if (snum == 0) {
+            arrival_time0_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime0);
+            arrival_time1_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime1);
+            arrival_time2_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime2);
+            arrival_time3_each_hit_a.push_back(all_ckov_dig[kk].fLeadingTime3);
+            npe_each_hit_a.push_back(all_ckov_dig[kk].fNpe);
+            num_of_hits_a++;
+        } else {
+            arrival_time4_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime0);
+            arrival_time5_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime1);
+            arrival_time6_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime2);
+            arrival_time7_each_hit_b.push_back(all_ckov_dig[kk].fLeadingTime3);
+            npe_each_hit_b.push_back(all_ckov_dig[kk].fNpe);
+            num_of_hits_b++;
+        }
+        all_ckov_dig[kk].fIsUsed = true;
+    } // end check if-digit-used
+  } // end loop over tmp digits
 
-              // Does not matter too much but..
-              //   I think the pulse4/5/6/7 should be adc/4 -- DR 2015-08-31
-              digitB.SetPositionMin4(0);
-              digitB.SetPositionMin5(0);
-              digitB.SetPositionMin6(0);
-              digitB.SetPositionMin7(0);
-              digitB.SetPulse4(0);
-              digitB.SetPulse5(0);
-              digitB.SetPulse6(0);
-              digitB.SetPulse7(0);
-              digitB.SetCoincidences(0);
-              aDigit.SetCkovB(digitB);
-          }
-          tmpAllDigits[kk].fIsUsed = true;
-      } // end check if-digit-used
-      CkovDigArray->push_back(aDigit);
-    } // end loop over tmp digits
-  } // end loop over stations
+  // Now, if either num_of_hits_a(b) == 0, write the default values to the station:
+  // Can not be 0 at the same time. If there are no hits, it won't reach this far.
+  CkovA digitA;
+  CkovB digitB;
+  if (num_of_hits_a == 0) {
+
+    digitA.SetArrivalTime0(-999);
+    digitA.SetArrivalTime1(-999);
+    digitA.SetArrivalTime2(-999);
+    digitA.SetArrivalTime3(-999);
+    digitA.SetTotalCharge(-999);
+    digitA.SetPartEventNumber(evnum);
+    digitA.SetNumberOfPes(-999);
+    digitA.SetPositionMin0(-999);
+    digitA.SetPositionMin1(-999);
+    digitA.SetPositionMin2(-999);
+    digitA.SetPositionMin3(-999);
+    digitA.SetPulse0(-999);
+    digitA.SetPulse1(-999);
+    digitA.SetPulse2(-999);
+    digitA.SetPulse3(-999);
+    digitA.SetCoincidences(-999);
+
+    digitB.SetArrivalTime4(std::accumulate(arrival_time4_each_hit_b.begin(),
+                                           arrival_time4_each_hit_b.end(),
+                                           0.0) / arrival_time4_each_hit_b.size());
+    digitB.SetArrivalTime5(std::accumulate(arrival_time5_each_hit_b.begin(),
+                                           arrival_time5_each_hit_b.end(),
+                                           0.0) / arrival_time5_each_hit_b.size());
+    digitB.SetArrivalTime6(std::accumulate(arrival_time6_each_hit_b.begin(),
+                                           arrival_time6_each_hit_b.end(),
+                                           0.0) / arrival_time6_each_hit_b.size());
+    digitB.SetArrivalTime7(std::accumulate(arrival_time7_each_hit_b.begin(),
+                                           arrival_time7_each_hit_b.end(),
+                                           0.0) / arrival_time7_each_hit_b.size());
+    double total_npe = std::accumulate(npe_each_hit_b.begin(),
+                                       npe_each_hit_b.end(),
+                                       0.0);
+    digitB.SetTotalCharge(static_cast<int> (total_npe * ckovNpeToAdc));
+    digitB.SetPartEventNumber(evnum);
+    digitB.SetNumberOfPes(total_npe);
+    digitB.SetPositionMin4(0);
+    digitB.SetPositionMin5(0);
+    digitB.SetPositionMin6(0);
+    digitB.SetPositionMin7(0);
+    digitB.SetPulse4(0);
+    digitB.SetPulse5(0);
+    digitB.SetPulse6(0);
+    digitB.SetPulse7(0);
+    digitB.SetCoincidences(0);
+  } else if (num_of_hits_b == 0) {
+    digitB.SetArrivalTime4(-999);
+    digitB.SetArrivalTime5(-999);
+    digitB.SetArrivalTime6(-999);
+    digitB.SetArrivalTime7(-999);
+    digitB.SetTotalCharge(-999);
+    digitB.SetPartEventNumber(evnum);
+    digitB.SetNumberOfPes(-999);
+    digitB.SetPositionMin4(-999);
+    digitB.SetPositionMin5(-999);
+    digitB.SetPositionMin6(-999);
+    digitB.SetPositionMin7(-999);
+    digitB.SetPulse4(-999);
+    digitB.SetPulse5(-999);
+    digitB.SetPulse6(-999);
+    digitB.SetPulse7(-999);
+    digitB.SetCoincidences(-999);
+    digitA.SetArrivalTime0(std::accumulate(arrival_time0_each_hit_a.begin(),
+                                           arrival_time0_each_hit_a.end(),
+                                           0.0) / arrival_time0_each_hit_a.size());
+    digitA.SetArrivalTime1(std::accumulate(arrival_time1_each_hit_a.begin(),
+                                           arrival_time1_each_hit_a.end(),
+                                           0.0) / arrival_time1_each_hit_a.size());
+    digitA.SetArrivalTime2(std::accumulate(arrival_time2_each_hit_a.begin(),
+                                           arrival_time2_each_hit_a.end(),
+                                           0.0) / arrival_time2_each_hit_a.size());
+    digitA.SetArrivalTime3(std::accumulate(arrival_time3_each_hit_a.begin(),
+                                           arrival_time3_each_hit_a.end(),
+                                           0.0) / arrival_time3_each_hit_a.size());
+    double total_npe = std::accumulate(npe_each_hit_a.begin(),
+                                       npe_each_hit_a.end(),
+                                       0.0);
+    digitA.SetTotalCharge(static_cast<int> (total_npe * ckovNpeToAdc));
+    digitA.SetPartEventNumber(evnum);
+    digitA.SetNumberOfPes(total_npe);
+    digitA.SetPositionMin0(0);
+    digitA.SetPositionMin1(0);
+    digitA.SetPositionMin2(0);
+    digitA.SetPositionMin3(0);
+    digitA.SetPulse0(0);
+    digitA.SetPulse1(0);
+    digitA.SetPulse2(0);
+    digitA.SetPulse3(0);
+    digitA.SetCoincidences(0);
+  } else {
+    digitA.SetArrivalTime0(std::accumulate(arrival_time0_each_hit_a.begin(),
+                                           arrival_time0_each_hit_a.end(),
+                                           0.0) / arrival_time0_each_hit_a.size());
+    digitA.SetArrivalTime1(std::accumulate(arrival_time1_each_hit_a.begin(),
+                                           arrival_time1_each_hit_a.end(),
+                                           0.0) / arrival_time1_each_hit_a.size());
+    digitA.SetArrivalTime2(std::accumulate(arrival_time2_each_hit_a.begin(),
+                                           arrival_time2_each_hit_a.end(),
+                                           0.0) / arrival_time2_each_hit_a.size());
+    digitA.SetArrivalTime3(std::accumulate(arrival_time3_each_hit_a.begin(),
+                                           arrival_time3_each_hit_a.end(),
+                                           0.0) / arrival_time3_each_hit_a.size());
+    double total_npe = std::accumulate(npe_each_hit_a.begin(),
+                                       npe_each_hit_a.end(),
+                                       0.0);
+    digitA.SetTotalCharge(static_cast<int> (total_npe * ckovNpeToAdc));
+    digitA.SetPartEventNumber(evnum);
+    digitA.SetNumberOfPes(total_npe);
+    digitA.SetPositionMin0(0);
+    digitA.SetPositionMin1(0);
+    digitA.SetPositionMin2(0);
+    digitA.SetPositionMin3(0);
+    digitA.SetPulse0(0);
+    digitA.SetPulse1(0);
+    digitA.SetPulse2(0);
+    digitA.SetPulse3(0);
+    digitA.SetCoincidences(0);
+    digitB.SetArrivalTime4(std::accumulate(arrival_time4_each_hit_b.begin(),
+                                           arrival_time4_each_hit_b.end(),
+                                           0.0) / arrival_time4_each_hit_b.size());
+    digitB.SetArrivalTime5(std::accumulate(arrival_time5_each_hit_b.begin(),
+                                           arrival_time5_each_hit_b.end(),
+                                           0.0) / arrival_time5_each_hit_b.size());
+    digitB.SetArrivalTime6(std::accumulate(arrival_time6_each_hit_b.begin(),
+                                           arrival_time6_each_hit_b.end(),
+                                           0.0) / arrival_time6_each_hit_b.size());
+    digitB.SetArrivalTime7(std::accumulate(arrival_time7_each_hit_b.begin(),
+                                           arrival_time7_each_hit_b.end(),
+                                           0.0) / arrival_time7_each_hit_b.size());
+    total_npe = std::accumulate(npe_each_hit_b.begin(),
+                                       npe_each_hit_b.end(),
+                                       0.0);
+    digitB.SetTotalCharge(static_cast<int> (total_npe * ckovNpeToAdc));
+    digitB.SetPartEventNumber(evnum);
+    digitB.SetNumberOfPes(total_npe);
+    digitB.SetPositionMin4(0);
+    digitB.SetPositionMin5(0);
+    digitB.SetPositionMin6(0);
+    digitB.SetPositionMin7(0);
+    digitB.SetPulse4(0);
+    digitB.SetPulse5(0);
+    digitB.SetPulse6(0);
+    digitB.SetPulse7(0);
+    digitB.SetCoincidences(0);
+  }
+
+  // Now fill in the digits:
+  CkovDigit aDigit;
+  aDigit.SetCkovA(digitA);
+  aDigit.SetCkovB(digitB);
+  digit_array->push_back(aDigit);
 }
 //=====================================================================
 }
