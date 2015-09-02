@@ -57,6 +57,7 @@ def validate_geometry(geometry_id = None):
     proc.wait()
     testpass = proc.returncode == 0
     for conf in ["conf1", "conf2"]:
+        max_mem = 0
         print >> fout, "# Running configuration", conf
         proc = subprocess.Popen(["python", validate,
                                  "--configuration_file", test_path+conf],
@@ -64,13 +65,16 @@ def validate_geometry(geometry_id = None):
         while proc.poll() == None:
             mem_usage = process_monitor.print_mem_usage(proc.pid)
             print >> fout, process_monitor.print_mem_usage(proc.pid)
-            if int(mem_usage['rsz']) > 1.5e6:
+            if int(mem_usage['rsz']) > 2.5e6:
                 testpass = False
+            if int(mem_usage['rsz']) > max_mem:
+                max_mem = int(mem_usage['rsz'])
             fout.flush()
             proc.stdin.write('\n')
             fout.flush()
             time.sleep(10)
         proc.communicate('\n')
+        print "Maximum memory usage is ",max_mem
         testpass &= proc.returncode == 0
     return testpass
 
