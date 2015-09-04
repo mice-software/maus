@@ -100,6 +100,7 @@ TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
     ASSERT_FALSE(event->GetTracks() == NULL);
     EXPECT_EQ(event->GetTracks()->size(), 0);
     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
+    delete event;
     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
     ASSERT_FALSE(event->GetTracks() == NULL);
     ASSERT_EQ(event->GetTracks()->size(), 1);

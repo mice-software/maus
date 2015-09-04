@@ -125,16 +125,15 @@ class MAUSGeant4Manager {
 
     /** @brief Run a particle through the simulation
      *
-     *  @returns a json object with tracking, virtual hits and real hits
+     *  @returns a new MCEvent containing the tracking data. Caller owns the
+     *           MCEvent memory.
      */
     MCEvent* RunParticle(MAUSPrimaryGeneratorAction::PGParticle p);
 
     /** @brief Run a particle through the simulation
      *
-     *  @returns copy of particle with any tracking output appended
-     *           to the particle. Following branches will be overwritten with
-     *           tracking output from this event:\n
-     *             "tracks", "virtual_hits", "hits"
+     *  @returns a new MC event containing the tracking dataCaller owns the
+     *           MCEvent memory.
      */
     MCEvent* RunParticle(MAUS::Primary particle);
 
