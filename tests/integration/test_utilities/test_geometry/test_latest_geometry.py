@@ -74,7 +74,7 @@ def validate_geometry(geometry_id = None):
             fout.flush()
             time.sleep(10)
         proc.communicate('\n')
-        print "Maximum memory usage is ",max_mem
+        print "Maximum memory usage is ", max_mem
         testpass &= proc.returncode == 0
     return testpass
 
