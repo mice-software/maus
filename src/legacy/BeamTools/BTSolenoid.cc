@@ -8,6 +8,7 @@ using namespace std;
 #include "CLHEP/Vector/LorentzVector.h"
 #include "CLHEP/Units/PhysicalConstants.h"
 
+#include "src/legacy/Interface/STLUtils.hh"
 #include "BTSolenoid.hh"
 
 using CLHEP::m;
@@ -40,7 +41,6 @@ BTSolenoid::BTSolenoid(double length, double thickness, double innerRadius, doub
           : myNumberOfRCoords(0), myNumberOfZCoords(0), zMin(0), zMax(0),
             rMin(0), rMax(0), interpolation("LinearCubic"), isAnalytic(analytic)
 {
-  std::cerr << "BTSolenoid simple constructor" << std::endl;
 	if(!isAnalytic)
 	{
 		SetToDefaults();
@@ -59,7 +59,6 @@ BTSolenoid::BTSolenoid(double length, double thickness, double innerRadius, doub
 // onto a file.
 BTSolenoid::BTSolenoid(char const *fileName, std::string interpolationAlgorithm): interpolation(interpolationAlgorithm), isAnalytic(false)
 {
-  std::cerr << "BTSolenoid ReadFieldMap constructor" << std::endl;
 	ReadFieldMap(fileName, interpolation);
 }
 
@@ -517,6 +516,7 @@ void BTSolenoid::SetStaticVariables(int NumberOfRCoords, int NumberOfZCoords, in
 
 MagFieldMap* BTSolenoid::GetFieldMap(std::string fileName)
 {
+  fileName = STLUtils::ReplaceVariables(fileName);
 	for(unsigned int i=0; i<StaticFieldMaps.size(); i++)
 	{
 		if(StaticFieldMaps[i]->GetFileName()==fileName) return StaticFieldMaps[i];
