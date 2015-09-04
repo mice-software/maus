@@ -260,9 +260,11 @@ VirtualPlaneManager::~VirtualPlaneManager() {
 VirtualPlaneManager::VirtualPlaneManager(VirtualPlaneManager& rhs)
           :  _useVirtualPlanes(rhs._useVirtualPlanes), _planes(), _mods(),
              _nHits(rhs._nHits), _hits(NULL) {
-  _hits = new std::vector<VirtualHit>(rhs._hits->size());
-  for (size_t i = 0; i < rhs._hits->size(); ++i) {
-      _hits[i] = rhs._hits[i];
+  if (rhs._hits != NULL) {
+      _hits = new std::vector<VirtualHit>(rhs._hits->size());
+      for (size_t i = 0; i < rhs._hits->size(); ++i) {
+          _hits[i] = rhs._hits[i];
+      }
   }
   for (size_t i = 0; i < rhs._planes.size(); ++i) {
     _planes.push_back(new VirtualPlane(*rhs._planes[i]));
