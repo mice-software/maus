@@ -53,7 +53,6 @@ G4bool CkovSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History) {
    * the uncommented block.
   channel_id->SetStation(_module->propertyInt("Station"));
   //channel_id->SetPMT(_module->propertyInt("pmt"));
-  hit.SetTime(aStep->GetPostStepPoint()->GetGlobalTime());
 
   */
   channel_id->SetStation(_module->propertyInt("CkovStation"));
