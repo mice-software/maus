@@ -76,12 +76,8 @@ void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
                           "TOF trigger station invalid. Must be tof0/tof1/tof2",
                           "MapCppTOFSpacePoints::_birth");
   }
-  // get the tof geometry modules
-  std::string filename;
-  filename = configJSON["reconstruction_geometry_filename"].asString();
-  geo_module = new MiceModule(filename);
-  tof_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "TOF");
-  tof_mother_modules = geo_module->findModulesByPropertyString("Region", "KLregion");
+  _geo_filename = configJSON["reconstruction_geometry_filename"].asString();
+  build_geom_map();
 }
 
 ////////////////////////////////////////////////////////////
@@ -345,74 +341,35 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
   xSpacePoint.SetPartEventNumber(xDocSlabHit_X.GetPartEventNumber());
   xSpacePoint.SetPhysEventNumber(xDocSlabHit_X.GetPhysEventNumber());
   xSpacePoint.SetSlabx(xKey_SlabX_digit0.slab());
+  xSpacePoint.SetHorizSlab(xKey_SlabX_digit0.slab());
   xSpacePoint.SetStation(xKey_SlabX_digit0.station());
   xSpacePoint.SetDetector(xKey_SlabX_digit0.detector());
   xSpacePoint.SetSlaby(xKey_SlabY_digit0.slab());
+  xSpacePoint.SetVertSlab(xKey_SlabY_digit0.slab());
   xSpacePoint.SetPixelKey(xSPKey.str());
   xSpacePoint.SetCharge(charge_SlabX + charge_SlabY);
   xSpacePoint.SetChargeProduct(chargeProduct_SlabX + chargeProduct_SlabY);
   // std::cout << xSPKey << "  t = " << time << " dt = " << dt << std::endl;
 
   // get the global position of the space point and store it
-  const MiceModule* hit_module = NULL;
-  bool gotXYModules = false, gotXModule = false, gotYModule = false;
-  Hep3Vector SlabGlobalPos, SlabErrorPos;
-  double globX = -99., globY = -99., globZx = -99., globZy = -99., globZ = -99.;
-  double globXErr = -99., globYErr = -99., globZErr = -99.;
 
-  for ( unsigned int jj = 0; !gotXYModules && jj < tof_modules.size(); ++jj ) {
-      if ( tof_modules[jj]->propertyExists("Slab", "int") ) {
-         if (tof_modules[jj]->propertyInt("Slab") == xKey_SlabX_digit0.slab()
-            && tof_modules[jj]->propertyInt("Plane") == 0) {
-             // got Y
-             // std::cerr << "SlabX: " << xKey_SlabX_digit0.slab() << std::endl;
-             SlabGlobalPos = tof_modules[jj]->globalPosition();
-             SlabErrorPos = tof_modules[jj]->dimensions()/sqrt(12);
-             globY = tof_modules[jj]->globalPosition().y();
-             globYErr = (tof_modules[jj]->dimensions().y())/sqrt(12);
-             globZErr = (tof_modules[jj]->dimensions().z())/sqrt(12);
-             globZy = tof_modules[jj]->globalPosition().z();
-             gotXModule = true;
-             // std::cerr << "hit Global XYZ(x): " << SlabGlobalPos << std::endl;
-         }
-         if (tof_modules[jj]->propertyInt("Slab") == xKey_SlabY_digit0.slab()
-            && tof_modules[jj]->propertyInt("Plane") == 1) {
-             // got X
-             // std::cerr << "SlabY: " << xKey_SlabY_digit0.slab() << std::endl;
-             hit_module = tof_modules[jj];
-             SlabGlobalPos = hit_module->globalPosition();
-             globX = tof_modules[jj]->globalPosition().x();
-             globZx = tof_modules[jj]->globalPosition().z();
-             globXErr = (tof_modules[jj]->dimensions().x())/sqrt(12);
-             gotYModule = true;
-             // std::cerr << "hit Global XYZ(y): " << SlabGlobalPos << " "
-             //           << tof_modules[jj]->dimensions() << std::endl;
-         }
-         gotXYModules = gotXModule && gotYModule;
-         if (gotXYModules) {
-             globZ = (globZx + globZy)/2.0;
-             // std::cerr << "hit Global XYZ: " << globX
-             //           << " " << globY << " " << globZ << std::endl;
-             // std::cerr << "hit Err in Global XYZ: " << globXErr
-             //          << " " << globYErr << " " << globZErr << std::endl;
-             gotXYModules = true;
-         } else {
-            xSpacePoint.SetGlobalPosX(globX);
-            xSpacePoint.SetGlobalPosY(globY);
-            xSpacePoint.SetGlobalPosZ(globZ);
-            xSpacePoint.SetGlobalPosXErr(globXErr);
-            xSpacePoint.SetGlobalPosYErr(globYErr);
-            xSpacePoint.SetGlobalPosZErr(globZErr);
-         }
-      } // end check on module
-  } // end loop over tof_modules
+  // encode the Station+SlabX+SlabY in a key string
+  std::stringstream ss;
+  ss << xKey_SlabX_digit0.station() << xKey_SlabX_digit0.slab() << xKey_SlabY_digit0.slab();
 
-  xSpacePoint.SetGlobalPosX(globX);
-  xSpacePoint.SetGlobalPosY(globY);
-  xSpacePoint.SetGlobalPosZ(globZ);
-  xSpacePoint.SetGlobalPosXErr(globXErr);
-  xSpacePoint.SetGlobalPosYErr(globYErr);
-  xSpacePoint.SetGlobalPosZErr(globZErr);
+  // get the position of the station/slab/plane from the geometry
+  std::map<std::string, TOFModuleGeo>::const_iterator _geoIt = _geom_map.find(ss.str());
+
+  // std::cout << "DEBUG: MapCppTOFSpacePoints: Station: "
+  //           << _geoIt->second.station << " SlabX: " << _geoIt->second.slabX
+  //           << " SlabY: " << _geoIt->second.slabY << " " << std::endl;
+
+  xSpacePoint.SetGlobalPosX(_geoIt->second.posX);
+  xSpacePoint.SetGlobalPosY(_geoIt->second.posY);
+  xSpacePoint.SetGlobalPosZ(_geoIt->second.posZ);
+  xSpacePoint.SetGlobalPosXErr(_geoIt->second.posXErr);
+  xSpacePoint.SetGlobalPosYErr(_geoIt->second.posYErr);
+  xSpacePoint.SetGlobalPosZErr(_geoIt->second.posZErr);
 }
 
 ////////////////////////////////////////////////////////////
@@ -469,5 +426,50 @@ void MapCppTOFSpacePoints::getTofCalib(int runNumber) {
                           "MapCppTOFSpacePoints::_process");
   }
   // _map.Print();
+}
+///////////////////////////////////////////////////////////
+void MapCppTOFSpacePoints::build_geom_map() {
+  // get the tof geometry modules
+  geo_module = new MiceModule(_geo_filename);
+  tof_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "TOF");
+  for (unsigned int sx = 0; sx < tof_modules.size(); ++sx) {
+    for (unsigned int sy = 0; sy < tof_modules.size(); ++sy) {
+      std::stringstream ss;
+      int stnX = tof_modules[sx]->propertyInt("Station");
+      int stnY = tof_modules[sy]->propertyInt("Station");
+      if (stnX != stnY) continue;
+
+      int plnX = tof_modules[sx]->propertyInt("Plane");
+      int plnY = tof_modules[sy]->propertyInt("Plane");
+      if (plnX != 0 || plnY != 1) continue;
+
+      int slbX = tof_modules[sx]->propertyInt("Slab");
+      int slbY = tof_modules[sy]->propertyInt("Slab");
+
+      ss << stnX << slbX << slbY;
+
+      // std::cout << "DEBUG: MapCppTOFSpacePoints: Global Position: "
+      //           << tof_modules[sx]->globalPosition()
+      //           << " " << tof_modules[sy]->globalPosition() << std::endl;
+
+      TOFModuleGeo _mod_geo;
+
+      _mod_geo.station = stnX;
+      _mod_geo.slabX = slbX;
+      _mod_geo.slabY = slbY;
+
+      _mod_geo.posX = tof_modules[sy]->globalPosition().x();
+      _mod_geo.posXErr = tof_modules[sy]->dimensions().x()/sqrt(12.);
+      _mod_geo.posY = tof_modules[sx]->globalPosition().y();
+      _mod_geo.posYErr = tof_modules[sx]->dimensions().y()/sqrt(12.);
+
+      double zx = tof_modules[sx]->globalPosition().z();
+      double zy = tof_modules[sy]->globalPosition().z();
+      _mod_geo.posZ = (zx + zy)/2.0;
+      _mod_geo.posZErr = tof_modules[sx]->dimensions().z()/sqrt(12.);
+
+      _geom_map[ss.str()] = _mod_geo;
+    }
+  }
 }
 }

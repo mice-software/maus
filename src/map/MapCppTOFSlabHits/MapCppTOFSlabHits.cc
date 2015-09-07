@@ -20,6 +20,7 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
+#include "Config/MiceModule.hh"
 #include "Interface/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
@@ -47,6 +48,10 @@ void MapCppTOFSlabHits::_birth(const std::string& argJsonConfigDocument) {
   _tdcV1290_conversion_factor = JsonWrapper::GetProperty(configJSON,
                                                          "TOFtdcConversionFactor",
                                                          JsonWrapper::realValue).asDouble();
+
+  // get the tof geometry modules
+  _geo_filename = configJSON["reconstruction_geometry_filename"].asString();
+  build_geom_map();
 }
 
 void MapCppTOFSlabHits::_death()  {}
@@ -165,6 +170,11 @@ void MapCppTOFSlabHits::fillSlabHit(MAUS::TOFSlabHit &slHit,
 
   slHit.SetSlab(xKey.slab());
   slHit.SetPlane(xKey.plane());
+  if (xKey.plane() == 0) {
+    slHit.SetHorizontal(true);
+  } else if (xKey.plane() == 1) {
+    slHit.SetVertical(true);
+  }
   slHit.SetStation(xKey.station());
   slHit.SetDetector(xKey.detector());
 
@@ -209,5 +219,55 @@ void MapCppTOFSlabHits::fillSlabHit(MAUS::TOFSlabHit &slHit,
   slHit.GetPmt1Ptr()->SetLeadingTime(xTimeDigit1);
   slHit.GetPmt1Ptr()->SetTriggerRequestLeadingTime(xTriggerReqDigit1);
   slHit.GetPmt1Ptr()->SetTofKey(xDigit1.GetTofKey());
+
+  // get the global position of the slab hit and store it
+  Hep3Vector SlabGlobalPos, SlabErrorPos;
+  double globX = -99., globY = -99., globZx = -99., globZy = -99., globZ = -99.;
+  double globXErr = -99., globYErr = -99., globZErr = -99.;
+
+  std::stringstream ss;
+  ss << xKey.station() << xKey.slab() << xKey.plane();
+
+  // get the position of the station/slab/plane from the geometry
+  std::map<std::string, TOFModuleGeo>::const_iterator _geoIt = _geom_map.find(ss.str());
+  // std::cout << "DEBUG: MapCppTOFSlabHits: Global Position: "
+  //           << _geoIt->second.position << " Station: "
+  //           << _geoIt->second.station << " Slab: " << _geoIt->second.slab
+  //           << " Plane: " << _geoIt->second.plane << std::endl;
+  SlabGlobalPos = _geoIt->second.position;
+  globX = SlabGlobalPos.x();
+  globY = SlabGlobalPos.y();
+  globZ = SlabGlobalPos.z();
+  SlabErrorPos = _geoIt->second.dimensions;
+  globXErr = SlabErrorPos.x()/sqrt(12);
+  globYErr = SlabErrorPos.y()/sqrt(12);
+  globZErr = SlabErrorPos.z()/sqrt(12);
+
+  slHit.SetGlobalPosX(globX);
+  slHit.SetGlobalPosY(globY);
+  slHit.SetGlobalPosZ(globZ);
+  slHit.SetGlobalPosXErr(globXErr);
+  slHit.SetGlobalPosYErr(globYErr);
+  slHit.SetGlobalPosZErr(globZErr);
+}
+
+///////////////////////////////////////////////////////////
+void MapCppTOFSlabHits::build_geom_map() {
+  geo_module = new MiceModule(_geo_filename);
+  tof_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "TOF");
+  for (unsigned int m = 0; m < tof_modules.size(); ++m) {
+      std::stringstream ss;
+      int stn = tof_modules[m]->propertyInt("Station");
+      int slb = tof_modules[m]->propertyInt("Slab");
+      int pln = tof_modules[m]->propertyInt("Plane");
+      ss << stn << slb << pln;
+      TOFModuleGeo _mod_geo;
+      _mod_geo.station = stn;
+      _mod_geo.slab = slb;
+      _mod_geo.plane = pln;
+      _mod_geo.position = tof_modules[m]->globalPosition();
+      _mod_geo.dimensions = tof_modules[m]->dimensions();
+      _geom_map[ss.str()] = _mod_geo;
+  }
 }
 }

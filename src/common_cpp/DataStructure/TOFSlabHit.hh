@@ -63,6 +63,24 @@ class TOFSlabHit {
     /** Sets Slab */
     void SetSlab(int slab);
 
+    /** Get the Global X, Y, Z positions of the slab hit*/
+    double GetGlobalPosX() const;
+    double GetGlobalPosY() const;
+    double GetGlobalPosZ() const;
+    /** Get the error in the X,Y,Z measurements
+     * these are the sqrt(12) errors in the slab dimension */
+    double GetGlobalPosXErr() const;
+    double GetGlobalPosYErr() const;
+    double GetGlobalPosZErr() const;
+    /** Set the global X,Y,Z of the slab hit */
+    void SetGlobalPosX(double global_x);
+    void SetGlobalPosY(double global_y);
+    void SetGlobalPosZ(double global_z);
+    /** Set the error in the global x,y,z position */
+    void SetGlobalPosXErr(double global_x_err);
+    void SetGlobalPosYErr(double global_y_err);
+    void SetGlobalPosZErr(double global_z_err);
+
     /** Returns PhysEventNumber */
     int GetPhysEventNumber() const;
 
@@ -135,6 +153,21 @@ class TOFSlabHit {
     /** Sets Pmt0 */
     void SetPmt0(Pmt0 pmt0);
 
+    /** the cabling convention is such that
+     * horizontal slabs are in plane 0
+     * vertical slabs are in plane 1
+     * Set true if horizontal slab: plane 0 */
+    void SetHorizontal(bool hSlab);
+
+    /** Set true if vertical slab: plane 1 */
+    void SetVertical(bool vSlab);
+
+    /** True if slab is a vertical slab, else false */
+    bool IsVertical() const {return _vertical_slab;}
+
+    /** True if slab is a horizontal slab, else false */
+    bool IsHorizontal() const {return _horizontal_slab;}
+
   private:
     int _slab;
     int _phys_event_number;
@@ -148,6 +181,16 @@ class TOFSlabHit {
     int _part_event_number;
     Pmt1 _pmt1;
     Pmt0 _pmt0;
+
+    double _global_x;
+    double _global_y;
+    double _global_z;
+    double _global_x_err;
+    double _global_y_err;
+    double _global_z_err;
+
+    bool _vertical_slab;
+    bool _horizontal_slab;
 
     MAUS_VERSIONED_CLASS_DEF(TOFSlabHit)
 };
