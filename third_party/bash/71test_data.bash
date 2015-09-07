@@ -8,7 +8,7 @@ echo "INFO: Getting test scifi cosmic data"
 gdc_file="gdc1901.001"
 wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}
 wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}.md5
-md5sum -c ${gdc_name}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${gdc_file}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
+md5sum -c ${gdc_file}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${gdc_file}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
 
 if [ -d "$destdir" ]
 then
