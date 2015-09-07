@@ -77,17 +77,47 @@ class TOFSpacePoint {
     /** Sets Station */
     void SetStation(int station);
 
-    /** Returns Slaby */
+    /** Returns Slaby -- slabs oriented along Y, measure X*/
     int GetSlaby() const;
 
-    /** Sets Slaby */
+    /** Sets Slaby -- slabs oriented along Y, measure X*/
     void SetSlaby(int slabY);
 
-    /** Returns Slabx */
+    /** Returns Slabx -- slabs oriented along X, measure Y*/
     int GetSlabx() const;
 
-    /** Sets Slabx */
+    /** Sets Slabx -- slabs oriented along X, measure Y*/
     void SetSlabx(int slabX);
+
+    /** Returns Vertical slab, measure X, equiv to GetSlabY*/
+    int GetVertSlab() const;
+
+    /** Sets Vertical slab - same as SetSlabY*/
+    void SetVertSlab(int slabY);
+
+    /** Returns Horizontal slab, measure Y, equiv to GetSlabX*/
+    int GetHorizSlab() const;
+
+    /** Sets Horizontal slab - same as SetSlabX*/
+    void SetHorizSlab(int slabX);
+
+    /** Get the Global X, Y, Z positions of the space point*/
+    double GetGlobalPosX() const;
+    double GetGlobalPosY() const;
+    double GetGlobalPosZ() const;
+    /** Get the error in the X,Y,Z measurements
+     * these are the sqrt(12) errors in the slab dimension */
+    double GetGlobalPosXErr() const;
+    double GetGlobalPosYErr() const;
+    double GetGlobalPosZErr() const;
+    /** Set the global X,Y,Z of the space point */
+    void SetGlobalPosX(double global_x);
+    void SetGlobalPosY(double global_y);
+    void SetGlobalPosZ(double global_z);
+    /** Set the error in the global x,y,z position */
+    void SetGlobalPosXErr(double global_x_err);
+    void SetGlobalPosYErr(double global_y_err);
+    void SetGlobalPosZErr(double global_z_err);
 
     /** Returns ChargeProduct */
     int GetChargeProduct() const;
@@ -131,6 +161,12 @@ class TOFSpacePoint {
     std::string _detector;
     int _part_event_number;
     double _dt;
+    double _global_x;
+    double _global_y;
+    double _global_z;
+    double _global_x_err;
+    double _global_y_err;
+    double _global_z_err;
 
     MAUS_VERSIONED_CLASS_DEF(TOFSpacePoint)
 };

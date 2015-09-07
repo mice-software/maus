@@ -78,7 +78,7 @@
 #include "DetModel/EMR/EMRBar.hh"
 #include "DetModel/TOF/TofSD.hh"
 #include "DetModel/SciFi/SciFiSD.hh"
-#include "DetModel/Ckov/CKOVSD.hh"
+#include "src/common_cpp/DetModel/Ckov/CKOVSD.hh"
 #include "DetModel/EMR/EMRSD.hh"
 #include "DetModel/KL/KLSD.hh"
 #include "DetModel/Virtual/SpecialVirtualSD.hh"
@@ -460,7 +460,9 @@ void DetectorConstruction::BuildSensitiveDetector
       logic->SetSensitiveDetector(klSD);
       _SDs.push_back(klSD);
     } else if (sdName == "CKOV") {
-      // disabled
+      CkovSD* ckovSD = new CkovSD(mod);
+      logic->SetSensitiveDetector(ckovSD);
+      _SDs.push_back(ckovSD);
     } else if (sdName != "Virtual" && sdName != "Envelope") {
       // Virtual and Envelope are special cases
       throw(Exception(Exception::recoverable,

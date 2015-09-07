@@ -51,6 +51,7 @@ G4bool KLSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   hit.SetParticleId(track->GetDefinition()->GetPDGEncoding());
   hit.SetEnergy(track->GetTotalEnergy());
   hit.SetTrackId(aStep->GetTrack()->GetTrackID());
+  hit.SetMass(aStep->GetTrack()->GetDefinition()->GetPDGMass());
 
   _hits->push_back(hit);
   return true;

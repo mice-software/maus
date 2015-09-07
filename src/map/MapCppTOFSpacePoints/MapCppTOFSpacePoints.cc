@@ -24,6 +24,7 @@
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 #include "API/PyWrapMapBase.hh"
+#include "Config/MiceModule.hh"
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 
@@ -75,6 +76,8 @@ void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
                           "TOF trigger station invalid. Must be tof0/tof1/tof2",
                           "MapCppTOFSpacePoints::_birth");
   }
+  _geo_filename = configJSON["reconstruction_geometry_filename"].asString();
+  build_geom_map();
 }
 
 ////////////////////////////////////////////////////////////
@@ -176,7 +179,7 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
               tof1_slHits = (it->first).first;
           else if (det == "tof2")
               tof2_slHits = (it->first).first;
-          for (int j = 0; j < ((it->first).first).size(); ++j) {
+          for (unsigned int j = 0; j < ((it->first).first).size(); ++j) {
             TOFSlabHit tof_slh = ((it->first).first)[j];
           }
       }
@@ -338,13 +341,35 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
   xSpacePoint.SetPartEventNumber(xDocSlabHit_X.GetPartEventNumber());
   xSpacePoint.SetPhysEventNumber(xDocSlabHit_X.GetPhysEventNumber());
   xSpacePoint.SetSlabx(xKey_SlabX_digit0.slab());
+  xSpacePoint.SetHorizSlab(xKey_SlabX_digit0.slab());
   xSpacePoint.SetStation(xKey_SlabX_digit0.station());
   xSpacePoint.SetDetector(xKey_SlabX_digit0.detector());
   xSpacePoint.SetSlaby(xKey_SlabY_digit0.slab());
+  xSpacePoint.SetVertSlab(xKey_SlabY_digit0.slab());
   xSpacePoint.SetPixelKey(xSPKey.str());
   xSpacePoint.SetCharge(charge_SlabX + charge_SlabY);
   xSpacePoint.SetChargeProduct(chargeProduct_SlabX + chargeProduct_SlabY);
   // std::cout << xSPKey << "  t = " << time << " dt = " << dt << std::endl;
+
+  // get the global position of the space point and store it
+
+  // encode the Station+SlabX+SlabY in a key string
+  std::stringstream ss;
+  ss << xKey_SlabX_digit0.station() << xKey_SlabX_digit0.slab() << xKey_SlabY_digit0.slab();
+
+  // get the position of the station/slab/plane from the geometry
+  std::map<std::string, TOFModuleGeo>::const_iterator _geoIt = _geom_map.find(ss.str());
+
+  // std::cout << "DEBUG: MapCppTOFSpacePoints: Station: "
+  //           << _geoIt->second.station << " SlabX: " << _geoIt->second.slabX
+  //           << " SlabY: " << _geoIt->second.slabY << " " << std::endl;
+
+  xSpacePoint.SetGlobalPosX(_geoIt->second.posX);
+  xSpacePoint.SetGlobalPosY(_geoIt->second.posY);
+  xSpacePoint.SetGlobalPosZ(_geoIt->second.posZ);
+  xSpacePoint.SetGlobalPosXErr(_geoIt->second.posXErr);
+  xSpacePoint.SetGlobalPosYErr(_geoIt->second.posYErr);
+  xSpacePoint.SetGlobalPosZErr(_geoIt->second.posZErr);
 }
 
 ////////////////////////////////////////////////////////////
@@ -402,4 +427,53 @@ void MapCppTOFSpacePoints::getTofCalib(int runNumber) {
   }
   // _map.Print();
 }
+
+///////////////////////////////////////////////////////////
+void MapCppTOFSpacePoints::build_geom_map() {
+  // get the tof geometry modules
+  geo_module = new MiceModule(_geo_filename);
+  tof_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "TOF");
+  for (unsigned int sx = 0; sx < tof_modules.size(); ++sx) {
+    for (unsigned int sy = 0; sy < tof_modules.size(); ++sy) {
+      std::stringstream ss;
+      int stnX = tof_modules[sx]->propertyInt("Station");
+      int stnY = tof_modules[sy]->propertyInt("Station");
+      if (stnX != stnY) continue;
+
+      int plnX = tof_modules[sx]->propertyInt("Plane");
+      int plnY = tof_modules[sy]->propertyInt("Plane");
+      if (plnX != 0 || plnY != 1) continue;
+
+      int slbX = tof_modules[sx]->propertyInt("Slab");
+      int slbY = tof_modules[sy]->propertyInt("Slab");
+
+      ss << stnX << slbX << slbY;
+
+      // std::cout << "DEBUG: MapCppTOFSpacePoints: Global Position: "
+      //           << tof_modules[sx]->globalPosition()
+      //           << " " << tof_modules[sy]->globalPosition() << std::endl;
+
+      TOFModuleGeo _mod_geo;
+
+      _mod_geo.station = stnX;
+      _mod_geo.slabX = slbX;
+      _mod_geo.slabY = slbY;
+
+      _mod_geo.posX = tof_modules[sy]->globalPosition().x();
+      _mod_geo.posXErr = tof_modules[sy]->dimensions().x()/sqrt(12.);
+      _mod_geo.posY = tof_modules[sx]->globalPosition().y();
+      _mod_geo.posYErr = tof_modules[sx]->dimensions().y()/sqrt(12.);
+
+      double zx = tof_modules[sx]->globalPosition().z();
+      double zy = tof_modules[sy]->globalPosition().z();
+      _mod_geo.posZ = (zx + zy)/2.0;
+      _mod_geo.posZErr = tof_modules[sx]->dimensions().z()/sqrt(12.);
+
+      _geom_map[ss.str()] = _mod_geo;
+
+    }
+  }
+  delete geo_module;
 }
+///////////////////////////////////////////////////////////
+} // end namespace MAUS

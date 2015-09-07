@@ -1,6 +1,6 @@
 #pylint: disable = C0103
 """ 
-basic test of TOFDigitizer to see if digits come out on real spills
+basic test of CkovDigitizer to see if digits come out on real spills
 and if errors come out on empty
 """ 
 import unittest
@@ -11,10 +11,8 @@ import MAUS
 
 from Configuration import Configuration
 
-#from MapCppTOFMCDigitizer import MapCppTOFMCDigitizer
-
-class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
-    """ basic MapCppTOFMCDigitizer test to check
+class MapCppCkovMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
+    """ basic MapCppCkovMCDigitizer test to check
     if we get digits on good evts and errors on bad
     """
     @classmethod
@@ -23,9 +21,12 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
             The set up is called before each test function
             is called.
         """
-        cls.mapper = MAUS.MapCppTOFMCDigitizer()
+        cls.mapper = MAUS.MapCppCkovMCDigitizer()
         conf_json = json.loads(Configuration().getConfigJSON())
-        conf_json["reconstruction_geometry_filename"] = "Stage6.dat"
+        root_dir = os.environ.get("MAUS_ROOT_DIR")
+        geom_file = \
+                   '%s/src/map/MapCppCkovMCDigitizer/ckov_geom.dat' % root_dir
+        conf_json["reconstruction_geometry_filename"] = geom_file
         # Test whether the configuration files were loaded correctly at birth
         cls.mapper.birth(json.dumps(conf_json))
 
@@ -39,7 +40,7 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         assert root_dir != None
         assert os.path.isdir(root_dir)
         _filename = \
-        '%s/src/map/MapCppTOFMCDigitizer/mc_test.json' % root_dir
+        '%s/src/map/MapCppCkovMCDigitizer/mc_test.dat' % root_dir
         assert os.path.isfile(_filename)
         _file = open(_filename, 'r')
         # File is open.
@@ -48,12 +49,11 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         output = self.mapper.process(spill)
         self.assertTrue("errors" in maus_cpp.converter.json_repr(output))
         # a real spill
-        #spill = _file.readline().rstrip()
-        spill = _file.read()
+        spill = _file.readline().rstrip()
         output = self.mapper.process(spill)
         doc = maus_cpp.converter.json_repr(output)
-        tof_event = doc["recon_events"][0]["tof_event"]
-        self.assertTrue("tof_digits" in tof_event)
+        ckov_event = doc["recon_events"][0]["ckov_event"]
+        self.assertTrue("ckov_digits" in ckov_event)
         _file.close()
 
     @classmethod
