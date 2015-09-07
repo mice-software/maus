@@ -37,6 +37,7 @@ G4bool TofSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   hit.SetEnergy(aStep->GetTrack()->GetTotalEnergy());
   hit.SetParticleId(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
   hit.SetCharge(aStep->GetTrack()->GetDefinition()->GetPDGCharge());
+  hit.SetMass(aStep->GetTrack()->GetDefinition()->GetPDGMass());
 
   hit.SetPosition(MAUS::ThreeVector(
     aStep->GetPostStepPoint()->GetPosition().x(),

@@ -123,6 +123,7 @@ G4bool SpecialVirtualSD::ProcessHits(G4Step* aStep, G4TouchableHistory*
   hit.SetEnergy(aStep->GetTrack()->GetTotalEnergy());
   hit.SetParticleId(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
   hit.SetCharge(aStep->GetTrack()->GetDefinition()->GetPDGCharge());
+  hit.SetMass(aStep->GetTrack()->GetDefinition()->GetPDGMass());
 
   hit.SetMomentum(MAUS::ThreeVector(
     aStep->GetPostStepPoint()->GetPosition().x(),

@@ -90,8 +90,8 @@ class Hit {
      */
     virtual void SetEnergy(double energy);
 
-    // Returns the PDG id of the track that made the hit
-    // (Do I really need to follow the pattern?)
+    // Returns the mass of the track that made the hit
+    // Set the mass of the ...
     virtual double GetMass() const;
     virtual void SetMass(double mass);
 

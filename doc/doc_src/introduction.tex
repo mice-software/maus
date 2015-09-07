@@ -79,7 +79,7 @@ There are several other applications in the \verb|bin| directory and associated 
 \end{itemize}
 
 \subsection{Choosing the Unpacker Version}
-The unpacker is the third party library shipped with MAUS used to unpack the MICE DAQ binary data.  It comes in two versions, one for Step~I data and one for Step~IV data.  The current default unpacker version is Step~I.  In order to switch unpacker versions, set up the MAUS environment, and source (not run) the script switch\_unpacker.bash in the MAUS root directory supplying either StepI or StepIV as an argument, depending on the unpacker needed. This will then build the correct unpacker, clean and rebuild MAUS, modify env.sh and test the new configuration.
+The unpacker is the third party library shipped with MAUS used to unpack the MICE DAQ binary data.  It comes in two versions, one for Step~I data and one for Step~IV data.  The current default unpacker version is Step~IV.  In order to switch unpacker versions, set up the MAUS environment, and source (not run) the script switch\_unpacker.bash in the MAUS root directory supplying either StepI or StepIV as an argument, depending on the unpacker needed. This will then build the correct unpacker, clean and rebuild MAUS, modify env.sh and test the new configuration.
 
 \section{Accessing Data}
 By default, MAUS writes data as a ROOT file. ROOT is a widely available high energy physics data analysis library, available from \url{''http://root.cern.ch''} and prepacked with the MAUS third party libraries. Two techniques are foreseen for accessing the data, either using \verb|PyRoot| python interface or using a compiled C++ binary. Some mention of ROOT cint scripting tools is made below, but this is not supported by MAUS developers beyond the most basic usage.
