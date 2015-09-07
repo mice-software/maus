@@ -269,5 +269,7 @@ void MapCppTOFSlabHits::build_geom_map() {
       _mod_geo.dimensions = tof_modules[m]->dimensions();
       _geom_map[ss.str()] = _mod_geo;
   }
+  delete geo_module;
 }
-}
+///////////////////////////////////////////////////////////
+} // end namespace MAUS
