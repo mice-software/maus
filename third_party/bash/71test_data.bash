@@ -3,6 +3,25 @@
 stagedir=${MAUS_THIRD_PARTY}/third_party/source/
 destdir=${MAUS_THIRD_PARTY}/third_party/install/share/test_data/
 
+# First get the old tracker cosmic gdc data file
+echo "INFO: Getting test scifi cosmic data"
+gdc_file="gdc1901.001"
+wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}
+wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}.md5
+md5sum -c ${gdc_name}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${gdc_file}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
+
+if [ -d "$destdir" ]
+then
+    echo "INFO: $destdir exists"
+else
+    mkdir -p $destdir
+    echo "INFO: making $destdir"
+fi
+
+mv $gdc_file $destdir
+mv ${gdc_file}.md5 $destdir
+
+# Now get the run data
 if [ "$#" -gt 0 ]; then
     # if there are command line arguments it should be a list of run numbers
     # eventually this becomes a load test (but online recon is failing right now)
@@ -61,13 +80,7 @@ do
             fi
         fi
     fi
-    if [ -d "$destdir" ]
-    then
-        echo "INFO: $destdir exists"
-    else
-        mkdir -p $destdir
-        echo "INFO: making $destdir"
-    fi
+
     cp ${stagefile} ${destfile}
 
     if [ -e "${destfile}" ]
