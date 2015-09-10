@@ -428,6 +428,24 @@ Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
+
+# DAQ cabling maps
+# set the source for cabling to either 'CDB' or 'file'
+# if set to 'file' the DAQ_cabling_file card will be used
+DAQ_cabling_source = "CDB"
+
+# set the method for retrieving cabling from CDB
+# options are: 'run_number' or 'date'
+# if DAQ_cabling_by is set to 'date', the DAQ_cabling_date card is used
+# Default is to get the map based on run number
+DAQ_cabling_by = "run_number"
+
+# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
+# e.g. DAQ_cabling_date = '2015-06-30 01:02:03 00:00:00'
+#   or DAQ_cabling_date = 'current'
+DAQ_cabling_date = 'current'
+
+# the DAQ_cabling_file card is used only if DAQ_cabling_source above is set to 'file'
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_cabling_file_StepI = "/files/cabling/DAQChannelMap_preRun6541.txt"
 DAQ_hostname = 'miceraid5'
