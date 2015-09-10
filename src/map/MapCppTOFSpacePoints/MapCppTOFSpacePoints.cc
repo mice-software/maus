@@ -470,7 +470,6 @@ void MapCppTOFSpacePoints::build_geom_map() {
       _mod_geo.posZErr = tof_modules[sx]->dimensions().z()/sqrt(12.);
 
       _geom_map[ss.str()] = _mod_geo;
-
     }
   }
   delete geo_module;
