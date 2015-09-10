@@ -35,8 +35,8 @@ SpecialVirtualSD::SpecialVirtualSD(MICEEvent * _event, MiceModule * mod )
                    _steppingThrough(true), _steppingInto(true), _steppingOutOf(true), _steppingAcross(true),
                    _localRotation(), _globalRotation(), _localPosition(), _globalPosition(), _hits(NULL)
 {
-  _module = mod;
-  simEvent = _event;
+  _module = mod; // borrowed reference
+  simEvent = _event; // borrowed reference
   _tname = _module->fullName() + intToString(_uniqueID);
   if(_module->propertyExistsThis("ZSegmentation","int"))
     _numberCellsInZ = _module->propertyInt("ZSegmentation");
@@ -81,6 +81,11 @@ SpecialVirtualSD::SpecialVirtualSD(MICEEvent * _event, MiceModule * mod )
   if(_module->propertyExistsThis("GlobalRefPosition", "hep3vector"))
     _globalPosition  = _module->propertyHep3Vector("GlobalRefPosition");
 }
+
+SpecialVirtualSD::~SpecialVirtualSD() {
+  delete _hits;
+}
+
 
 void SpecialVirtualSD::SetStepping(bool SteppingThrough, bool SteppingInto, bool SteppingOutOf, bool SteppingAcross)
 {
