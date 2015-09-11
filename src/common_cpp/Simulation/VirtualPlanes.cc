@@ -255,6 +255,7 @@ VirtualPlaneManager::~VirtualPlaneManager() {
   _planes = std::vector<VirtualPlane*>();
   if (_hits != NULL)
       delete _hits;
+  _hits = NULL;
 }
 
 VirtualPlaneManager::VirtualPlaneManager(VirtualPlaneManager& rhs)
