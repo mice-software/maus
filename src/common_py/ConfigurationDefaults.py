@@ -257,6 +257,8 @@ SciFiDigitizationNPECut = 1.0
 SciFiMappingFileName = "scifi_mapping_2015-06-18.txt"
 SciFiCalibrationFileName = "scifi_calibration_2015-06-18.txt"
 SciFiBadChannelsFileName = "scifi_bad_channels_2015-06-18.txt"
+SciFiCalibMethod = "Run" # Date/Current/Run
+SciFiCalibSrc = 7057 # exmple: "Date" - 1984-09-14 00:10:00.0    "Run" - 7057
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1
@@ -334,6 +336,7 @@ SciFiDefaultMomentum = 200.0 # Default momentum to assume for straight tracks
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
 cdb_download_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database downloads
+#cdb_download_url = "http://preprodcdb.mice.rl.ac.uk" # target URL for configuration database downloads
 cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for cooling channel configuration database downloads.
 
 # geometry download
