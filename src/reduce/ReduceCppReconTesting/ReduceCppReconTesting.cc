@@ -198,33 +198,41 @@ std::string ReduceCppReconTesting::process(std::string document) {
       if (tracker112_hit and tracker150_hit) {
         std::cerr << "Station 1 " << tracker112_hit->GetPosition().X() << " " << tracker112_hit->GetPosition().Y() << " " << tracker112_hit->GetPosition().Z() << " "
                   << tracker112_hit->GetEnergy() << " " << tracker112_hit->GetMomentum().X() << " " << tracker112_hit->GetMomentum().Y() << " " << tracker112_hit->GetMomentum().Z() << "\n";
-        //~ std::cerr << "Station 5 " << tracker150_hit->GetPosition().X() << " " << tracker150_hit->GetPosition().Y() << " " << tracker150_hit->GetPosition().Z() << " "
-                  //~ << tracker150_hit->GetEnergy() << " " << tracker150_hit->GetMomentum().X() << " " << tracker150_hit->GetMomentum().Y() << " " << tracker150_hit->GetMomentum().Z() << "\n";
+        std::cerr << "Station 5 " << tracker150_hit->GetPosition().X() << " " << tracker150_hit->GetPosition().Y() << " " << tracker150_hit->GetPosition().Z() << " "
+                  << tracker150_hit->GetEnergy() << " " << tracker150_hit->GetMomentum().X() << " " << tracker150_hit->GetMomentum().Y() << " " << tracker150_hit->GetMomentum().Z() << "\n";
         double x_1[] = {0., tracker112_hit->GetPosition().X(), tracker112_hit->GetPosition().Y(), tracker112_hit->GetPosition().Z(),
                         tracker112_hit->GetEnergy(), tracker112_hit->GetMomentum().X(), tracker112_hit->GetMomentum().Y(), tracker112_hit->GetMomentum().Z()};
-        BTTracker::integrate(tracker150_hit->GetPosition().Z(), x_1, field, BTTracker::z, 10.0, 1);
-        std::cerr << "Station5P " << x_1[1] << " " << x_1[2] << " " << x_1[3] << " " << x_1[4] << " " << x_1[5] << " " << x_1[6] << " " << x_1[7] << "\n";
+        //~ BTTracker::integrate(tracker150_hit->GetPosition().Z(), x_1, field, BTTracker::z, 10.0, 1);
+        GlobalTools::propagate(x_1, tracker150_hit->GetPosition().Z(), field, 10.0, MAUS::DataStructure::Global::kMuPlus);
+        //~ std::cerr << "Station5P " << x_1[1] << " " << x_1[2] << " " << x_1[3] << " " << x_1[4] << " " << x_1[5] << " " << x_1[6] << " " << x_1[7] << "\n";
+        if (std::fabs(x_1[1]-tracker150_hit->GetPosition().X()) > 10 or std::fabs(x_1[2]-tracker150_hit->GetPosition().Y()) > 10
+          or std::fabs(x_1[5]-tracker150_hit->GetMomentum().X()) > 10 or std::fabs(x_1[6]-tracker150_hit->GetMomentum().Y()) > 10) {
+          std::cerr << "MC x: " << x_1[1] << " y: " << x_1[2] << " z: " << x_1[3] << " px: " << x_1[5] << " py: " << x_1[6] << " pz: " << x_1[7] << "\n";
+          std::cerr << "Pr x: " << tracker150_hit->GetPosition().X() << " y: " << tracker150_hit->GetPosition().Y() << " z: " << tracker150_hit->GetPosition().Z() << " px: " << tracker150_hit->GetMomentum().X() << " py: " << tracker150_hit->GetMomentum().Y() << " pz: " << tracker150_hit->GetMomentum().Z() << "\n";
+        }
         _ntuples.at("TrackerPropdxdy")->Fill(std::fabs(x_1[1]-tracker150_hit->GetPosition().X()), std::fabs(x_1[2]-tracker150_hit->GetPosition().Y()));
         _ntuples.at("TrackerPropdpxdpy")->Fill(std::fabs(x_1[5]-tracker150_hit->GetMomentum().X()), std::fabs(x_1[6]-tracker150_hit->GetMomentum().Y()));
       }
 
       SciFiHit* tracker010_hit = MCTruthTools::GetTrackerPlaneHit(mc_event, 0, 1, 0);
       SciFiHit* tracker110_hit = MCTruthTools::GetTrackerPlaneHit(mc_event, 1, 1, 0);
-      std::cerr << "\n\n##########\n\n";
+      //~ std::cerr << "\n\n##########\n\n";
       if (tracker010_hit and tracker110_hit) {
         double x_1[] = {0., tracker010_hit->GetPosition().X(), tracker010_hit->GetPosition().Y(), tracker010_hit->GetPosition().Z(),
             tracker010_hit->GetEnergy(), tracker010_hit->GetMomentum().X(), tracker010_hit->GetMomentum().Y(), tracker010_hit->GetMomentum().Z()};
-        std::cerr << "Tracker0 " << x_1[1] << " " << x_1[2] << " " << x_1[3] << " " << x_1[4] << " " << x_1[5] << " " << x_1[6] << " " << x_1[7] << "\n";
-        BTTracker::integrate(14206, x_1, field, BTTracker::z, 10.0, 1);
-        std::cerr << "Absorber " << x_1[1] << " " << x_1[2] << " " << x_1[3] << " " << x_1[4] << " " << x_1[5] << " " << x_1[6] << " " << x_1[7] << "\n";
+        //~ std::cerr << "Tracker0 " << x_1[1] << " " << x_1[2] << " " << x_1[3] << " " << x_1[4] << " " << x_1[5] << " " << x_1[6] << " " << x_1[7] << "\n";
+        //~ BTTracker::integrate(14206, x_1, field, BTTracker::z, 10.0, 1);
+        GlobalTools::propagate(x_1, 14206, field, 10.0, MAUS::DataStructure::Global::kMuPlus);
+        //~ std::cerr << "Absorber " << x_1[1] << " " << x_1[2] << " " << x_1[3] << " " << x_1[4] << " " << x_1[5] << " " << x_1[6] << " " << x_1[7] << "\n";
 
         double x_2[] = {0., tracker110_hit->GetPosition().X(), tracker110_hit->GetPosition().Y(), tracker110_hit->GetPosition().Z(),
-            -tracker110_hit->GetEnergy(), -tracker110_hit->GetMomentum().X(), -tracker110_hit->GetMomentum().Y(), -tracker110_hit->GetMomentum().Z()};
-        std::cerr << "Tracker1 " << x_2[1] << " " << x_2[2] << " " << x_2[3] << " " << -x_2[4] << " " << -x_2[5] << " " << -x_2[6] << " " << -x_2[7] << "\n";
-        BTTracker::integrate(14206, x_2, field, BTTracker::z, -10.0, -1);
-        std::cerr << "Absorber " << x_2[1] << " " << x_2[2] << " " << x_2[3] << " " << -x_2[4] << " " << -x_2[5] << " " << -x_2[6] << " " << -x_2[7] << "\n";
+            tracker110_hit->GetEnergy(), tracker110_hit->GetMomentum().X(), tracker110_hit->GetMomentum().Y(), tracker110_hit->GetMomentum().Z()};
+        //~ std::cerr << "Tracker1 " << x_2[1] << " " << x_2[2] << " " << x_2[3] << " " << -x_2[4] << " " << -x_2[5] << " " << -x_2[6] << " " << -x_2[7] << "\n";
+        //~ BTTracker::integrate(14206, x_2, field, BTTracker::z, -10.0, -1);
+        GlobalTools::propagate(x_2, 14206, field, 10.0, MAUS::DataStructure::Global::kMuPlus);
+        //~ std::cerr << "Absorber " << x_2[1] << " " << x_2[2] << " " << x_2[3] << " " << -x_2[4] << " " << -x_2[5] << " " << -x_2[6] << " " << -x_2[7] << "\n";
       }
-      std::cerr << "\n\n##########\n\n";
+      //~ std::cerr << "\n\n##########\n\n";
 
       // Tracker 1
       if (tracker1_track) {
@@ -280,7 +288,7 @@ std::string ReduceCppReconTesting::process(std::string document) {
           EMRHit emr_hit = MCTruthTools::GetNearestZHit(emr_hits, emr_pos);
           _ntuples.at("EMRdxerrx")->Fill(emr_pos.X() - emr_hit.GetPosition().X(), emr_tp1->get_position_error().X());
           _ntuples.at("EMRdyerry")->Fill(emr_pos.Y() - emr_hit.GetPosition().Y(), emr_tp1->get_position_error().Y());
-          std::cerr << std::fabs(emr_pos.X() - emr_hit.GetPosition().X()) << " " << emr_tp1->get_position_error().X() << "EMRX\n";
+          //~ std::cerr << std::fabs(emr_pos.X() - emr_hit.GetPosition().X()) << " " << emr_tp1->get_position_error().X() << "EMRX\n";
         }
       }
     }

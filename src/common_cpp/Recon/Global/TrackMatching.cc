@@ -21,6 +21,7 @@
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
+#include "src/common_cpp/Recon/Global/GlobalTools.hh"
 
 #include <algorithm>
 
@@ -82,6 +83,11 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
   BTFieldConstructor* field = MAUS::Globals::GetMCFieldConstructor();
   MAUS::DataStructure::Global::TrackPArray::iterator scifi_track_iter;
   // Iterate over all Tracker0 Tracks (typically 1)
+  if (scifi_track_array->size() == 1 and TOF1_tp.size() == 1) {
+    //~ std::cerr << "US OK\n";
+  }
+  //~ std::cerr << "Number of Tracker0 Tracks: " << scifi_track_array->size() << "\n";
+  //~ std::cerr << "Number of TOF1 Hits: " << TOF1_tp.size() << "\n";
   for (scifi_track_iter = scifi_track_array->begin();
        scifi_track_iter != scifi_track_array->end();
        ++scifi_track_iter) {
@@ -95,22 +101,27 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
     //~ upstream_primary_chain->AddPrimaryTrack(tracker0_track);
     // Extract four-position and momentum from first track point (i.e. most
     // upstream) and get the charge hypothesis
-    TLorentzVector position = tracker0_track->GetTrackPoints()[4]->get_position();
-    TLorentzVector momentum = tracker0_track->GetTrackPoints()[4]->get_momentum();
+    
+    TLorentzVector position = tracker0_track->GetTrackPoints()[13]->get_position();
+    //~ std::cerr << "############### " << position.Z() << "\n";
+    TLorentzVector position_error = tracker0_track->GetTrackPoints()[13]->get_position_error();
+    //~ std::cerr << "Pos: " << position.X() << "\t" << position.Y() << "\t" << position.Z() << "\n";
+    //~ std::cerr << "Per: " << position_error.X() << "\t" << position_error.Y() << "\t" << position_error.Z() << "\n";
+    TLorentzVector momentum = tracker0_track->GetTrackPoints()[13]->get_momentum();
     int charge_hypothesis = tracker0_track->get_charge();
     // Create the list of PIDs for which we want to create hypothesis tracks
     // If charge hypothesis is given by tracker recon, 3, else, 6
     std::vector<MAUS::DataStructure::Global::PID> pids;
-    if (charge_hypothesis != -1) {
-      pids.push_back(MAUS::DataStructure::Global::kEPlus);
+    //~ if (charge_hypothesis != -1) {
+      //~ pids.push_back(MAUS::DataStructure::Global::kEPlus);
       pids.push_back(MAUS::DataStructure::Global::kMuPlus);
-      pids.push_back(MAUS::DataStructure::Global::kPiPlus);
-    }
-    if (charge_hypothesis != 1) {
-      pids.push_back(MAUS::DataStructure::Global::kEMinus);
-      pids.push_back(MAUS::DataStructure::Global::kMuMinus);
-      pids.push_back(MAUS::DataStructure::Global::kPiMinus);
-    }
+      //~ pids.push_back(MAUS::DataStructure::Global::kPiPlus);
+    //~ }
+    //~ if (charge_hypothesis != 1) {
+      //~ pids.push_back(MAUS::DataStructure::Global::kEMinus);
+      //~ pids.push_back(MAUS::DataStructure::Global::kMuMinus);
+      //~ pids.push_back(MAUS::DataStructure::Global::kPiMinus);
+    //~ }
     //~ std::cerr << pids.size() << "PIDS\n";
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
@@ -128,9 +139,13 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
       double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
       double x_in_TOF0[] = {0., position.X(), position.Y(), position.Z(),
                        -energy, -momentum.X(), -momentum.Y(), -momentum.Z()};
+      double x_in_TOF0_new[] = {0., position.X(), position.Y(), position.Z(),
+                       energy, momentum.X(), momentum.Y(), momentum.Z()};
       BTTracker::integrate(2773.0, x_in_TOF0, field, BTTracker::z, -10.0, -charge);
+      GlobalTools::propagate(x_in_TOF0_new, 2773.0, field, 10, pids[i]);
       for (size_t j = 4; j < 8; ++j) x_in_TOF0[j] *= -1;
-      //~ Squeak::mout(Squeak::error) << x_in_TOF0[1] << "\t" <<  x_in_TOF0[2] << "\t" <<  x_in_TOF0[3] << "\t" << x_in_TOF0[5] << "\t" <<  x_in_TOF0[6] << "\t" <<  x_in_TOF0[7] << "\n";
+      Squeak::mout(Squeak::error) << "Reference TOF0: " << x_in_TOF0[1] << "\t" <<  x_in_TOF0[2] << "\t" <<  x_in_TOF0[3] << "\t" <<  x_in_TOF0[4] << "\t" << x_in_TOF0[5] << "\t" <<  x_in_TOF0[6] << "\t" <<  x_in_TOF0[7] << "\n";
+      Squeak::mout(Squeak::error) << "New TOF0:       " << x_in_TOF0_new[1] << "\t" <<  x_in_TOF0_new[2] << "\t" <<  x_in_TOF0_new[3] << "\t" <<  x_in_TOF0_new[4] << "\t" << x_in_TOF0_new[5] << "\t" <<  x_in_TOF0_new[6] << "\t" <<  x_in_TOF0_new[7] << "\n";
       for (size_t j = 0; j < TOF0_tp.size(); j++) {
         // We don't need a whole slab width as tolerance, should never be much
         // more than half a slab out from the center of the slab
@@ -145,9 +160,9 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
       }
       // TOF1
       double x_in_TOF1[] = {0., position.X(), position.Y(), position.Z(),
-                       -energy, -momentum.X(), -momentum.Y(), -momentum.Z()};
+                       -energy, momentum.X(), momentum.Y(), -momentum.Z()};
       //~ Squeak::mout(Squeak::error) << "TR\n" << x_in_TOF1[1] << "\t" <<  x_in_TOF1[2] << "\t" <<  x_in_TOF1[3] << "\t" << x_in_TOF1[5] << "\t" <<  x_in_TOF1[6] << "\t" <<  x_in_TOF1[7] << "\n";
-      BTTracker::integrate(10572.0, x_in_TOF1, field, BTTracker::z, -10.0, -charge);
+      //~ BTTracker::integrate(10572.0, x_in_TOF1, field, BTTracker::z, -10.0, -charge);
       for (size_t j = 4; j < 8; ++j) x_in_TOF1[j] *= -1;
       //~ Squeak::mout(Squeak::error) << "RK\n" << x_in_TOF1[1] << "\t" <<  x_in_TOF1[2] << "\t" <<  x_in_TOF1[3] << "\t" << x_in_TOF1[5] << "\t" <<  x_in_TOF1[6] << "\t" <<  x_in_TOF1[7] << " " << pids[1] << "\n";
       for (size_t j = 0; j < TOF1_tp.size(); j++) {
@@ -158,6 +173,27 @@ void TrackMatching::USTrack(MAUS::GlobalEvent* global_event,
             almostEquals(x_in_TOF1[2], TOF1_tp[j]->get_position().Y(), 40)) {
           hypothesis_track->AddTrackPoint(TOF1_tp[j]);
           Squeak::mout(Squeak::error) << "TOF1 Match\n";
+        } else {
+          //~ if (scifi_track_array->size() == 1 and TOF1_tp.size() == 1) {
+            //~ ofstream slopefile;
+            //~ slopefile.open("slope.txt", ios::out | ios::app);
+            //~ for (size_t k = 0; k < 15; k++) {
+              //~ slopefile << "Tracker-Plane" << 15-k << " "
+                        //~ << tracker0_track->GetTrackPoints()[k]->get_position().Z() << " " << tracker0_track->GetTrackPoints()[k]->get_position().X() << " "
+                        //~ << tracker0_track->GetTrackPoints()[k]->get_position().Y() << " " << tracker0_track->GetTrackPoints()[k]->get_momentum().X() << " "
+                        //~ << tracker0_track->GetTrackPoints()[k]->get_momentum().Y() << "\n";
+            //~ }
+            //~ slopefile << "TOF1Hit " << TOF1_tp[j]->get_position().Z() << " " << TOF1_tp[j]->get_position().X() << " " << TOF1_tp[j]->get_position().Y() << "\n";
+            //~ slopefile << "TOF1Prop Z " << x_in_TOF1[1] << " " << x_in_TOF1[2] << " " << x_in_TOF1[3] << "\n\n\n\n";
+          //~ }
+          //~ std::cerr << "TOF1 " << x_in_TOF1[1] - TOF1_tp[j]->get_position().X() << " " << x_in_TOF1[2] - TOF1_tp[j]->get_position().Y()  << "\n";
+        }
+        if (scifi_track_array->size() == 1 and TOF1_tp.size() == 1) {
+          ofstream tof1file;
+          tof1file.open ("tof1.txt", ios::out | ios::app);
+          //~ tof1file << x_in_TOF1[1] << " " << x_in_TOF1[2] << " " << TOF1_tp[j]->get_position().X() << " " << TOF1_tp[j]->get_position().Y() << " " << x_in_TOF1[1] - TOF1_tp[j]->get_position().X() << " " << x_in_TOF1[2] - TOF1_tp[j]->get_position().Y()  << "\n";
+          tof1file << x_in_TOF1[1] << " " << x_in_TOF1[2] << " " << -TOF1_tp[j]->get_position().Y() << " " << -TOF1_tp[j]->get_position().X() << " " << x_in_TOF1[1] + TOF1_tp[j]->get_position().Y() << " " << x_in_TOF1[2] + TOF1_tp[j]->get_position().X()  << "\n";
+          tof1file.close();
         }
       }
       // Now we fill the track with trackpoints from the tracker with energy
@@ -247,6 +283,9 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
 
   // Load the magnetic field for RK4 propagation
   BTFieldConstructor* field = MAUS::Globals::GetMCFieldConstructor();
+  if (scifi_track_array->size() == 1 and TOF2_tp.size() == 1) {
+    std::cerr << "DS OK\n";
+  }
   MAUS::DataStructure::Global::TrackPArray::iterator scifi_track_iter;
   // Iterate over all Tracker1 Tracks (typically 1)
   for (scifi_track_iter = scifi_track_array->begin();
@@ -263,21 +302,31 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
     // Extract four-position and momentum from last track point (i.e. most
     // downstream
     // TODO Will need to do this in a cleaner way later, check by station or sth.
-    TLorentzVector position = tracker1_track->GetTrackPoints()[4]->get_position();
-    TLorentzVector momentum = tracker1_track->GetTrackPoints()[4]->get_momentum();
+    TLorentzVector position = tracker1_track->GetTrackPoints()[13]->get_position();
+    std::cerr << tracker1_track->GetTrackPoints()[5]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[6]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[7]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[8]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[9]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[10]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[11]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[12]->get_position().X() << " "
+              << tracker1_track->GetTrackPoints()[13]->get_position().X() << "\n";
+    TLorentzVector momentum = tracker1_track->GetTrackPoints()[13]->get_momentum();
+    //~ std::cerr << "############################# " << position.Z() << "\n";
     int charge_hypothesis = tracker1_track->get_charge();
     // Create the list of PIDs for which we want to create hypothesis tracks
     std::vector<MAUS::DataStructure::Global::PID> pids;
-    if (charge_hypothesis != -1) {
-      pids.push_back(MAUS::DataStructure::Global::kEPlus);
+    //~ if (charge_hypothesis != -1) {
+      //~ pids.push_back(MAUS::DataStructure::Global::kEPlus);
       pids.push_back(MAUS::DataStructure::Global::kMuPlus);
-      pids.push_back(MAUS::DataStructure::Global::kPiPlus);
-    }
-    if (charge_hypothesis != 1) {
-      pids.push_back(MAUS::DataStructure::Global::kEMinus);
-      pids.push_back(MAUS::DataStructure::Global::kMuMinus);
-      pids.push_back(MAUS::DataStructure::Global::kPiMinus);
-    }
+      //~ pids.push_back(MAUS::DataStructure::Global::kPiPlus);
+    //~ }
+    //~ if (charge_hypothesis != 1) {
+      //~ pids.push_back(MAUS::DataStructure::Global::kEMinus);
+      //~ pids.push_back(MAUS::DataStructure::Global::kMuMinus);
+      //~ pids.push_back(MAUS::DataStructure::Global::kPiMinus);
+    //~ }
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
       double mass = Particle::GetInstance().GetMass(pids[i]);
@@ -308,7 +357,14 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
       double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
       double x_in_TOF2[] = {0., position.X(), position.Y(), position.Z(),
                             energy, momentum.X(), momentum.Y(), momentum.Z()};
+      double x_in_TOF2_new[] = {0., position.X(), position.Y(), position.Z(),
+                            energy, momentum.X(), momentum.Y(), momentum.Z()};
+      //~ std::cerr << x_in_TOF2[4] << " " << x_in_TOF2[5] << " " << x_in_TOF2[6] << " " << x_in_TOF2[7]
+                //~ << " M: " << std::sqrt(x_in_TOF2[4]*x_in_TOF2[4] - x_in_TOF2[5]*x_in_TOF2[5] - x_in_TOF2[6]*x_in_TOF2[6] - x_in_TOF2[7]*x_in_TOF2[7]) << "\n" ;
       BTTracker::integrate(17931.0, x_in_TOF2, field, BTTracker::z, 10.0, charge);
+      GlobalTools::propagate(x_in_TOF2_new, 17931.0, field, 10, pids[i]);
+      //~ Squeak::mout(Squeak::error) << "Reference TOF2: " << x_in_TOF2[1] << "\t" <<  x_in_TOF2[2] << "\t" <<  x_in_TOF2[3] << "\t" << x_in_TOF2[5] << "\t" <<  x_in_TOF2[6] << "\t" <<  x_in_TOF2[7] << "\n";
+      //~ Squeak::mout(Squeak::error) << "New TOF2:       " << x_in_TOF2_new[1] << "\t" <<  x_in_TOF2_new[2] << "\t" <<  x_in_TOF2_new[3] << "\t" << x_in_TOF2_new[5] << "\t" <<  x_in_TOF2_new[6] << "\t" <<  x_in_TOF2_new[7] << "\n";
       for (size_t j = 0; j < TOF2_tp.size(); j++) {
         // We don't need a whole slab width as tolerance, should never be much
         // more than half a slab out from the center of the slab
@@ -319,6 +375,27 @@ void TrackMatching::DSTrack(MAUS::GlobalEvent* global_event,
             almostEquals(x_in_TOF2[2], TOF2_tp[j]->get_position().Y(), 40)) {
           hypothesis_track->AddTrackPoint(TOF2_tp[j]);
           Squeak::mout(Squeak::error) << "TOF2 Match\n";
+        } else {
+          if (scifi_track_array->size() == 1 and TOF2_tp.size() == 1) {
+            ofstream slopefile;
+            slopefile.open("slope.txt", ios::out | ios::app);
+            for (size_t k = 0; k < 15; k++) {
+              slopefile << "Tracker-Plane" << 15-k << " "
+                        << tracker1_track->GetTrackPoints()[k]->get_position().Z() << " " << tracker1_track->GetTrackPoints()[k]->get_position().X() << " "
+                        << tracker1_track->GetTrackPoints()[k]->get_position().Y() << " " << tracker1_track->GetTrackPoints()[k]->get_momentum().X() << " "
+                        << tracker1_track->GetTrackPoints()[k]->get_momentum().Y() << "\n";
+            }
+            slopefile << "TOF2Hit " << TOF2_tp[j]->get_position().Z() << " " << TOF2_tp[j]->get_position().X() << " " << TOF2_tp[j]->get_position().Y() << "\n";
+            slopefile << "TOF2Prop Z " << x_in_TOF2[1] << " " << x_in_TOF2[2] << " " << x_in_TOF2[3] << "\n\n\n\n";
+          }
+          //~ std::cerr << "TOF2 " << x_in_TOF2[1] - TOF2_tp[j]->get_position().X() << " " << x_in_TOF2[2] - TOF2_tp[j]->get_position().Y()  << "\n";
+        }
+        if (scifi_track_array->size() == 1 and TOF2_tp.size() == 1) {
+          ofstream tof2file;
+          tof2file.open ("tof2.txt", ios::out | ios::app);
+          //~ tof2file << x_in_TOF2[1] << " " << x_in_TOF2[2] << " " << TOF2_tp[j]->get_position().X() << " " << TOF2_tp[j]->get_position().Y() << " " << x_in_TOF2[1] - TOF2_tp[j]->get_position().X() << " " << x_in_TOF2[2] - TOF2_tp[j]->get_position().Y()  << "\n";
+          tof2file << x_in_TOF2[1] << " " << x_in_TOF2[2] << " " << -TOF2_tp[j]->get_position().Y() << " " << -TOF2_tp[j]->get_position().X() << " " << x_in_TOF2[1] + TOF2_tp[j]->get_position().Y() << " " << x_in_TOF2[2] + TOF2_tp[j]->get_position().X()  << "\n";
+          tof2file.close();
         }
       }
 

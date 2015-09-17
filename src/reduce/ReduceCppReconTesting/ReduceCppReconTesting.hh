@@ -37,6 +37,9 @@
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "TNtuple.h"
 
+#include "src/common_cpp/API/ReduceBase.hh" 
+#include "src/common_cpp/API/PyWrapReduceBase.hh"
+
 namespace MAUS {
 
 class ReduceCppReconTesting {

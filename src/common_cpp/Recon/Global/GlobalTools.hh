@@ -31,6 +31,9 @@
 #include "src/common_cpp/DataStructure/Global/Track.hh"
 #include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
+#include "Geant4/G4Material.hh"
+
+class BTField; // Forward declaration
 
 namespace MAUS {
 namespace GlobalTools {
@@ -102,7 +105,29 @@ std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
  */
 bool approx(double a, double b, double tolerance);
 
+/**
+ * @brief Calculates energy loss according to the Bethe-Bloch equation. This is
+ * also implemented in G4hBetheBlochModel but we don't want to have to
+ * instantiate a G4DynamicParticle object every time.
+ */
+double dEdx(const G4Material* material, double energy, double mass);
 
+/**
+ * @brief Reimplementation of BTTracker::Integrate with only z propagation and
+ * the option of energy loss. Reimplemented to avoid changing the interface that
+ * might still be used by other functions and to pull it out of legacy
+ */
+void propagate(double* x, double target_z, const BTField* field,
+               double step_size, MAUS::DataStructure::Global::PID pid,
+               bool energy_loss = true);
+
+/**
+ * @brief Required by GlobalTools::propagate()
+ */
+int z_equations_of_motion (double z, const double x[8], double dxdt[8],
+                                   void* params);
+
+void changeEnergy(double* x, double deltaE, double mass);
 } // namespace GlobalTools
 } // namespace MAUS
 

@@ -51,6 +51,7 @@
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "Recon/Global/TrackMatching.hh"
 #include "src/common_cpp/API/MapBase.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 
 namespace MAUS {
