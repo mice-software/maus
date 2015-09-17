@@ -85,7 +85,7 @@ def arg_parser():
                         default=0, type=int)
     parser.add_argument('--max-mem-size', dest='max_mem_size',
                         help='Fail if more memory is used by a process',
-                        default=300000, type=int)
+                        default=320000, type=int)
     parser.add_argument('--max-time', dest='max_time',
                         help='Kill the process if it takes more time [s]',
                         default=600, type=int)

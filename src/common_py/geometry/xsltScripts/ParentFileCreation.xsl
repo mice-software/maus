@@ -190,14 +190,14 @@
                 </xsl:for-each>
                 
                 
-  	         	            Module Virtuals
-                            {
-                               Volume None
-                               Position 0.0 0.0 0.0+0.1*@RepeatNumber m
-                               PropertyString SensitiveDetector Virtual
-                               PropertyBool RepeatModule2 True
-                               PropertyInt NumberOfRepeats 240
-                            }
+  	        // Module Virtuals
+                //         {
+                // Volume None
+                // Position 0.0 0.0 0.0+0.1*@RepeatNumber m
+                //                PropertyString SensitiveDetector Virtual
+                //               PropertyBool RepeatModule2 True
+                //               PropertyInt NumberOfRepeats 240
+                //            }
                             
                             // Detectors
                             <xsl:for-each select="MICE_Information/Detector_Information/*/*/physvol">
@@ -222,6 +222,7 @@
                 <xsl:for-each select="MICE_Information/G4Field_Information/Dipole">
                             Module <xsl:value-of select="FieldName/@name"/>
                             {
+			    PropertyString FieldName <xsl:value-of select="FieldName/@name"/>
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
@@ -241,6 +242,7 @@
 			    <xsl:variable name="QuadName" select="FieldName/@name"/>
                             Module <xsl:value-of select="$QuadName"/>
                             {
+			    PropertyString FieldName <xsl:value-of select="$QuadName"/>
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:value-of select="ScaleFactor/@value"/>
@@ -271,6 +273,7 @@
                 <xsl:for-each select="MICE_Information/G4Field_Information/Solenoid">
                             Module <xsl:value-of select="FieldName/@name"/>
                             {
+			    PropertyString FieldName <xsl:value-of select="FieldName/@name"/>
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/>
 	                    Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             Volume <xsl:value-of select="Volume/@name"/>

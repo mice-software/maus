@@ -164,7 +164,8 @@ Enable_KL = True
 Enable_CKOV = True
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 
-daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
+# daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
+daq_data_path = '%s/third_party/install/share/test_data/' % os.environ.get("MAUS_THIRD_PARTY")
 #daq_data_file = '02873.003' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
 daq_data_file = 'gdc1901.001'
 

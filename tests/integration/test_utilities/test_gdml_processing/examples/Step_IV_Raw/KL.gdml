@@ -1,4 +1,5 @@
-<?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/data/neutrino02/rbayes/MICE/maus-1432/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
     
 <define/>
     
@@ -110,7 +111,7 @@
 <structure>
     
     <volume name="KLGlue0_0">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice0_0.gdml"/>
@@ -124,9 +125,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber0_0">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice0_0.gdml"/>
@@ -135,15 +138,17 @@
         </physvol>
         <auxiliary auxtype="SensitiveDetector" auxvalue="KL"/>
         <auxiliary auxtype="unit" auxvalue="mm"/>
-	    <auxiliary auxtype="Cell" auxvalue="0"/>
+	<auxiliary auxtype="Cell" auxvalue="0"/>
         <auxiliary auxtype="FibreDiameter" auxvalue="1.0"/>
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue1_0">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice1_0.gdml"/>
@@ -157,9 +162,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber1_0">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice1_0.gdml"/>
@@ -168,15 +175,17 @@
         </physvol>
         <auxiliary auxtype="SensitiveDetector" auxvalue="KL"/>
         <auxiliary auxtype="unit" auxvalue="mm"/>
-	    <auxiliary auxtype="Cell" auxvalue="1"/>
+	<auxiliary auxtype="Cell" auxvalue="1"/>
         <auxiliary auxtype="FibreDiameter" auxvalue="1.0"/>
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue2_0">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice2_0.gdml"/>
@@ -190,9 +199,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber2_0">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice2_0.gdml"/>
@@ -207,15 +218,17 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell0Module0">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue0_0_phys">
+        <!--<physvol name="KLGlue0_0_phys">
             <volumeref ref="KLGlue0_0"/>
             <position name="KLGlue0_0_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue0_0_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber0_0_phys">
             <volumeref ref="KLFiber0_0"/>
             <position name="KLFiber0_0_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -225,19 +238,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell1Module0">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_0_phys">
+        <!--<physvol name="KLGlue1_0_phys">
             <volumeref ref="KLGlue1_0"/>
             <position name="KLGlue1_0_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue1_0_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber1_0_phys">
             <volumeref ref="KLFiber1_0"/>
             <position name="KLFiber1_0_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -247,19 +262,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell2Module0">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue2_0_phys">
+        <!--<physvol name="KLGlue2_0_phys">
             <volumeref ref="KLGlue2_0"/>
             <position name="KLGlue2_0_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue2_0_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber2_0_phys">
             <volumeref ref="KLFiber2_0"/>
             <position name="KLFiber2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -267,12 +284,14 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="2"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLModule0">
         <materialref ref="AIR"/>
@@ -293,6 +312,8 @@
             <rotation name="KLCell2Module0_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFoilModule0">
         <materialref ref="Al"/>
@@ -302,11 +323,13 @@
             <position name="KLModule0_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLModule0_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
 
     <volume name="KLGlue0_1">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice0_1.gdml"/>
@@ -320,9 +343,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber0_1">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice0_1.gdml"/>
@@ -337,9 +362,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue1_1">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice1_1.gdml"/>
@@ -353,9 +380,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber1_1">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice1_1.gdml"/>
@@ -370,9 +399,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue2_1">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice2_1.gdml"/>
@@ -386,9 +417,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber2_1">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice2_1.gdml"/>
@@ -403,15 +436,17 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell0Module1">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_phys">
+        <!--<physvol name="KLGlue1_phys">
             <volumeref ref="KLGlue0_1"/>
             <position name="KLGlue0_1_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue0_1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber0_phys">
             <volumeref ref="KLFiber0_1"/>
             <position name="KLFiber0_1_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -419,21 +454,23 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="0"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell1Module1">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_1_phys">
+        <!--<physvol name="KLGlue1_1_phys">
             <volumeref ref="KLGlue1_1"/>
             <position name="KLGlue1_1_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue1_1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber1_phys">
             <volumeref ref="KLFiber1_1"/>
             <position name="KLFiber1_1_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -441,21 +478,23 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="1"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell2Module1">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue2_phys">
+        <!--<physvol name="KLGlue2_phys">
             <volumeref ref="KLGlue2_1"/>
             <position name="KLGlue2_1_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue2_1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber2_phys">
             <volumeref ref="KLFiber2_1"/>
             <position name="KLFiber2_1_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -465,10 +504,12 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLModule1">
         <materialref ref="AIR"/>
@@ -489,6 +530,8 @@
             <rotation name="KLCell2Module1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFoilModule1">
         <materialref ref="Al"/>
@@ -498,11 +541,13 @@
             <position name="KLModule1_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLModule1_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
 
     <volume name="KLGlue0_2">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice0_2.gdml"/>
@@ -516,9 +561,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber0_2">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice0_2.gdml"/>
@@ -533,9 +580,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue1_2">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice1_2.gdml"/>
@@ -549,9 +598,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber1_2">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice1_2.gdml"/>
@@ -566,9 +617,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue2_2">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice2_2.gdml"/>
@@ -582,9 +635,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber2_2">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice2_2.gdml"/>
@@ -599,15 +654,17 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell0Module2">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue0_2_phys">
+        <!--<physvol name="KLGlue0_2_phys">
             <volumeref ref="KLGlue0_2"/>
             <position name="KLGlue0_2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue0_2_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber0_2_phys">
             <volumeref ref="KLFiber0_2"/>
             <position name="KLFiber0_2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -617,19 +674,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell1Module2">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_2_phys">
+        <!--<physvol name="KLGlue1_2_phys">
             <volumeref ref="KLGlue1_2"/>
             <position name="KLGlue1_2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue1_2_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber1_2_phys">
             <volumeref ref="KLFiber1_2"/>
             <position name="KLFiber1_2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -637,21 +696,23 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="1"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell2Module2">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue2_2_phys">
+        <!--<physvol name="KLGlue2_2_phys">
             <volumeref ref="KLGlue2_2"/>
             <position name="KLGlue2_2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue2_2_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber2_2_phys">
             <volumeref ref="KLFiber2_2"/>
             <position name="KLFiber2_2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -659,12 +720,14 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="2"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLModule2">
         <materialref ref="AIR"/>
@@ -685,6 +748,8 @@
             <rotation name="KLCell2Module2_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFoilModule2">
         <materialref ref="Al"/>
@@ -694,11 +759,13 @@
             <position name="KLModule2_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLModule2_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
 
     <volume name="KLGlue0_3">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice0_3.gdml"/>
@@ -712,9 +779,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber0_3">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice0_3.gdml"/>
@@ -729,9 +798,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue1_3">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice1_3.gdml"/>
@@ -745,9 +816,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber1_3">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice1_3.gdml"/>
@@ -762,9 +835,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue2_3">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice2_3.gdml"/>
@@ -778,9 +853,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber2_3">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice2_3.gdml"/>
@@ -795,15 +872,17 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell0Module3">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue0_3_phys">
+        <!--<physvol name="KLGlue0_3_phys">
             <volumeref ref="KLGlue0_3"/>
             <position name="KLGlue0_3_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue0_3_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber0_3_phys">
             <volumeref ref="KLFiber0_3"/>
             <position name="KLFiber0_3_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -811,21 +890,23 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="0"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell1Module3">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_3_phys">
+        <!--<physvol name="KLGlue1_3_phys">
             <volumeref ref="KLGlue1_3"/>
             <position name="KLGlue1_3_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue1_3_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber1_3_phys">
             <volumeref ref="KLFiber1_3"/>
             <position name="KLFiber1_3_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -833,21 +914,23 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="1"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell2Module3">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue2_3_phys">
+        <!--<physvol name="KLGlue2_3_phys">
             <volumeref ref="KLGlue2_3"/>
             <position name="KLGlue2_3_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue2_3_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber2_3_phys">
             <volumeref ref="KLFiber2_3"/>
             <position name="KLFiber2_3_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -855,12 +938,14 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="2"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLModule3">
         <materialref ref="AIR"/>
@@ -881,6 +966,8 @@
             <rotation name="KLCell2Module3_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFoilModule3">
         <materialref ref="Al"/>
@@ -894,7 +981,7 @@
 
 
     <volume name="KLGlue0_4">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice0_4.gdml"/>
@@ -902,15 +989,17 @@
             <rotation name="KLGlue0Lattice4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="unit" auxvalue="mm"/>
-	    <auxiliary auxtype="Cell" auxvalue="0"/>
+	<auxiliary auxtype="Cell" auxvalue="0"/>
         <auxiliary auxtype="GlueThickness" auxvalue="0.09"/>
         <auxiliary auxtype="FibreDiameter" auxvalue="1.0"/>
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber0_4">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice0_4.gdml"/>
@@ -919,15 +1008,17 @@
         </physvol>
         <auxiliary auxtype="SensitiveDetector" auxvalue="KL"/>
         <auxiliary auxtype="unit" auxvalue="mm"/>
-	    <auxiliary auxtype="Cell" auxvalue="0"/>
+	<auxiliary auxtype="Cell" auxvalue="0"/>
         <auxiliary auxtype="FibreDiameter" auxvalue="1.0"/>
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue1_4">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice1_4.gdml"/>
@@ -935,15 +1026,17 @@
             <rotation name="KLGlue1Lattice4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="unit" auxvalue="mm"/>
-	    <auxiliary auxtype="Cell" auxvalue="1"/>
+	<auxiliary auxtype="Cell" auxvalue="1"/>
         <auxiliary auxtype="GlueThickness" auxvalue="0.09"/>
         <auxiliary auxtype="FibreDiameter" auxvalue="1.0"/>
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber1_4">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice1_4.gdml"/>
@@ -952,15 +1045,17 @@
         </physvol>
         <auxiliary auxtype="SensitiveDetector" auxvalue="KL"/>
         <auxiliary auxtype="unit" auxvalue="mm"/>
-	    <auxiliary auxtype="Cell" auxvalue="1"/>
+	<auxiliary auxtype="Cell" auxvalue="1"/>
         <auxiliary auxtype="FibreDiameter" auxvalue="1.0"/>
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue2_4">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice2_4.gdml"/>
@@ -968,15 +1063,17 @@
             <rotation name="KLGlue2Lattice4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="unit" auxvalue="mm"/>
-	    <auxiliary auxtype="Cell" auxvalue="2"/>
+	<auxiliary auxtype="Cell" auxvalue="2"/>
         <auxiliary auxtype="GlueThickness" auxvalue="0.09"/>
         <auxiliary auxtype="FibreDiameter" auxvalue="1.0"/>
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber2_4">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice2_4.gdml"/>
@@ -991,6 +1088,8 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell0Module4">
         <materialref ref="Pb"/>
@@ -1007,21 +1106,23 @@
         </physvol>
         <auxiliary auxtype="Cell" auxvalue="0"/>
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
-	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
-	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+	<auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
+	<auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell1Module4">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_4_phys">
+        <!--<physvol name="KLGlue1_4_phys">
             <volumeref ref="KLGlue1_4"/>
             <position name="KLGlue1_4_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue1_4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber1_4_phys">
             <volumeref ref="KLFiber1_4"/>
             <position name="KLFiber1_4_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1031,19 +1132,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell2Module4">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue2_4_phys">
+        <!--<physvol name="KLGlue2_4_phys">
             <volumeref ref="KLGlue2_4"/>
             <position name="KLGlue2_4_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue2_4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber2_4_phys">
             <volumeref ref="KLFiber2_4"/>
             <position name="KLFiber2_4_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1053,10 +1156,12 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLModule4">
         <materialref ref="AIR"/>
@@ -1077,6 +1182,8 @@
             <rotation name="KLCell2Module4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFoilModule4">
         <materialref ref="Al"/>
@@ -1086,11 +1193,13 @@
             <position name="KLModule4_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLModule4_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
 
     <volume name="KLGlue0_5">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice0_5.gdml"/>
@@ -1104,9 +1213,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber0_5">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice0_5.gdml"/>
@@ -1121,9 +1232,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue1_5">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice1_5.gdml"/>
@@ -1137,9 +1250,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber1_5">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice1_5.gdml"/>
@@ -1154,9 +1269,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue2_5">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice2_5.gdml"/>
@@ -1170,9 +1287,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber2_5">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice2_5.gdml"/>
@@ -1187,15 +1306,17 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell0Module5">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue0_phys">
-            <volumeref ref="KLGlue0_5"/>
+        <!--<physvol name="KLGlue0_phys">
+          <volumeref ref="KLGlue0_5"/>
             <position name="KLGlue0_5_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue0_5_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber0_5_phys">
             <volumeref ref="KLFiber0_5"/>
             <position name="KLFiber0_5_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1205,19 +1326,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell1Module5">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_5_phys">
+        <!--<physvol name="KLGlue1_5_phys">
             <volumeref ref="KLGlue1_5"/>
             <position name="KLGlue1_5_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue1_5_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber1_5_phys">
             <volumeref ref="KLFiber1_5"/>
             <position name="KLFiber1_5_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1227,19 +1350,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell2Module5">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue2_5_phys">
+        <!--<physvol name="KLGlue2_5_phys">
             <volumeref ref="KLGlue2_5"/>
             <position name="KLGlue2_5_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue2_5_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber2_5_phys">
             <volumeref ref="KLFiber2_5"/>
             <position name="KLFiber2_5_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1249,10 +1374,12 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLModule5">
         <materialref ref="AIR"/>
@@ -1273,6 +1400,8 @@
             <rotation name="KLCell2Module5_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFoilModule5">
         <materialref ref="Al"/>
@@ -1282,11 +1411,13 @@
             <position name="KLModule5_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLModule5_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
 
     <volume name="KLGlue0_6">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice0_6.gdml"/>
@@ -1300,9 +1431,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber0_6">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice0_6.gdml"/>
@@ -1317,9 +1450,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue1_6">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice1_6.gdml"/>
@@ -1333,9 +1468,11 @@
         <auxiliary auxtype="FibreLength" auxvalue="1000.0"/>
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFiber1_6">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice1_6.gdml"/>
@@ -1350,9 +1487,11 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLGlue2_6">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLGlue_solid"/>
         <physvol>
             <file name="KLGlueLattice2_6.gdml"/>
@@ -1368,7 +1507,7 @@
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
     </volume>
     <volume name="KLFiber2_6">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol>
             <file name="KLFiberLattice2_6.gdml"/>
@@ -1383,15 +1522,17 @@
         <auxiliary auxtype="FibreSpacingY" auxvalue="1.34"/>
         <auxiliary auxtype="FibreSpacingZ" auxvalue="0.98"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell0Module6">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue0_6_phys">
+        <!--<physvol name="KLGlue0_6_phys">
             <volumeref ref="KLGlue0_6"/>
             <position name="KLGlue0_6_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue0_6_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber0_6_phys">
             <volumeref ref="KLFiber0_6"/>
             <position name="KLFiber0_6_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1401,19 +1542,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell1Module6">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue1_6_phys">
+        <!--<physvol name="KLGlue1_6_phys">
             <volumeref ref="KLGlue1_6"/>
             <position name="KLGlue1_6_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue1_6_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber1_6_phys">
             <volumeref ref="KLFiber1_6"/>
             <position name="KLFiber1_6_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1423,19 +1566,21 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLCell2Module6">
         <materialref ref="Pb"/>
         <solidref ref="KLCellModule_solid"/>
-        <physvol name="KLGlue2_6_phys">
+        <!--<physvol name="KLGlue2_6_phys">
             <volumeref ref="KLGlue2_6"/>
             <position name="KLGlue2_6_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLGlue2_6_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
-        </physvol>
+        </physvol>-->
         <physvol name="KLFiber2_6_phys">
             <volumeref ref="KLFiber2_6"/>
             <position name="KLFiber2_6_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
@@ -1445,10 +1590,12 @@
         <auxiliary auxtype="numPMTs" auxvalue="2"/>
 	    <auxiliary auxtype="Pmt1PosX" auxvalue="-70"/>
 	    <auxiliary auxtype="Pmt2PosX" auxvalue="70"/>
-        <auxiliary auxtype="BlueColour" auxvalue="0.5"/>
-        <auxiliary auxtype="RedColour" auxvalue="0.5"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="BlueColor" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="0.5"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLModule6">
         <materialref ref="AIR"/>
@@ -1469,6 +1616,8 @@
             <rotation name="KLCell2Module6_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
         <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
     <volume name="KLFoilModule6">
         <materialref ref="Al"/>
@@ -1478,6 +1627,9 @@
             <position name="KLModule6_pos" unit="cm" x="0.0" y="0.0" z="0.0"/>
             <rotation name="KLModule6_rot" unit="degree" x="0.0" y="0.0" z="0.0"/>
         </physvol>
+        <auxiliary auxtype="Invisible" auxvalue="1"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
     <volume name="KL">
@@ -1520,7 +1672,7 @@
         </physvol>
         
         <auxiliary auxtype="Invisible" auxvalue="1"/>
-        <auxiliary auxtype="RedColour" auxvalue="1."/>
+        <auxiliary auxtype="RedColor" auxvalue="1."/>
         <auxiliary auxtype="numPlanes" auxvalue="1"/>
         <auxiliary auxtype="unit" auxvalue="mm"/>
         <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>

@@ -32,6 +32,7 @@ class Primary;
 
 class SciFiChannelId;
 class TOFChannelId;
+class CkovChannelId;
 class KLChannelId;
 class SpecialVirtualChannelId;
 class SciFiNoiseHit;
@@ -42,6 +43,7 @@ typedef std::vector<VirtualHit> VirtualHitArray;
 typedef std::vector<SciFiHit> SciFiHitArray;
 typedef std::vector<SciFiNoiseHit> SciFiNoiseHitArray;
 typedef std::vector<TOFHit> TOFHitArray;
+typedef std::vector<CkovHit> CkovHitArray;
 typedef std::vector<KLHit> KLHitArray;
 typedef std::vector<EMRHit> EMRHitArray;
 typedef std::vector<SpecialVirtualHit> SpecialVirtualHitArray;
@@ -127,6 +129,15 @@ class MCEvent {
    */
   void SetTOFHits(TOFHitArray* hits);
 
+  /** Get the Ckov hits pertaining to this event MCEvent still owns HitArray*.
+   */
+  CkovHitArray* GetCkovHits() const;
+
+  /** Set the Ckov hits pertaining to this event. MCEvent takes ownership of
+   *  memory pointed to by hits.
+   */
+  void SetCkovHits(CkovHitArray* hits);
+
   /** Get the KL hits pertaining to this event MCEvent still owns HitArray*.
    */
   KLHitArray* GetKLHits() const;
@@ -171,6 +182,7 @@ class MCEvent {
   SciFiHitArray*          _sci_fi_hits;
   SciFiNoiseHitArray*     _sci_fi_noise_hits;
   TOFHitArray*            _tof_hits;
+  CkovHitArray*           _ckov_hits;
   KLHitArray*             _kl_hits;
   EMRHitArray*            _emr_hits;
   SpecialVirtualHitArray* _special_virtual_hits;

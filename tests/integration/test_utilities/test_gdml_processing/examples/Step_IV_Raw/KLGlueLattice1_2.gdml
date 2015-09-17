@@ -1,4 +1,5 @@
-<?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/data/neutrino02/rbayes/MICE/maus-1432/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
     
     <define/>
     
@@ -104,6 +105,8 @@
     <volume name="KLGlue_unit">
         <materialref ref="BC600"/>
         <solidref ref="KLGlue_unitsolid"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
         
     
@@ -467,7 +470,9 @@
             <position name="KLGlueLattice1_2_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
             <rotation name="KLGlueLattice1_2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
         </physvol>
-    </volume>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
+     </volume>
         
     </structure>    
     

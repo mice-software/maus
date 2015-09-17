@@ -1,4 +1,5 @@
-<?xml version="1.0" ?><gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/data/neutrino02/rbayes/MICE/maus-1432/src/common_py/geometry/GDML_3_0_0/schema/gdml.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
     
     <define/>
     
@@ -72,6 +73,12 @@
             <fraction n="0.231781231781232" ref="O0xa126ec0"/>
             <fraction n="0.0128270128270128" ref="Ar0xa127230"/>
         </material>
+     <material name="BC600">
+         <D unit="g/cm3" value="1.18"/>
+         <composite n="15" ref="C0xa126810"/>
+         <composite n="16" ref="H0xa133b30"/>
+         <composite n="2" ref="O0xa126ec0"/>
+     </material>
     </materials>
     
     <solids>
@@ -83,6 +90,8 @@
     <volume name="KLFiber_unit">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="KLFibre_unitsolid"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
 
     <assembly name="KLFiberPlane2">        
@@ -439,14 +448,16 @@
         </physvol>        
     </assembly>
     <volume name="KLFiberBlock1_1">
-        <materialref ref="AIR"/>
+        <materialref ref="BC600"/>
         <solidref ref="KLFiber_solid"/>
         <physvol name="KLFiberLattice1_1_phys">
             <volumeref ref="KLFiberLattice1_1"/>
             <position name="KLFiberLattice1_1_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
             <rotation name="KLFiberLattice1_1_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
         </physvol>
-    </volume>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
+     </volume>
         
     </structure>    
     
