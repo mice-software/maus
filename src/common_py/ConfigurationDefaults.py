@@ -253,10 +253,12 @@ reconstruction_geometry_filename = ""
 
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
-SciFiDigitizationNPECut = 1.0
-SciFiMappingFileName = "scifi_mapping_2015-06-18.txt"
-SciFiCalibrationFileName = "scifi_calibration_2015-06-18.txt"
+SciFiDigitizationNPECut = 2.0
+SciFiMappingFileName = "scifi_mapping_2015-09-11.txt"
+SciFiCalibrationFileName = "scifi_calibration_2015-09-12.txt"
 SciFiBadChannelsFileName = "scifi_bad_channels_2015-06-18.txt"
+SciFiCalibMethod = "Run" # Date/Current/Run
+SciFiCalibSrc = 7057 # exmple: "Date" - 1984-09-14 00:10:00.0    "Run" - 7057
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1
@@ -413,7 +415,7 @@ Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
 Enable_VLSB_Unpacking = True
-Enable_VLSB_C_Unpacking = True
+Enable_VLSB_C_Unpacking = False
 Enable_DBB_Unpacking = True
 Enable_DBBChain_Unpacking = True
 Do_V1731_Zero_Suppression = False
@@ -428,6 +430,24 @@ Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
+
+# DAQ cabling maps
+# set the source for cabling to either 'CDB' or 'file'
+# if set to 'file' the DAQ_cabling_file card will be used
+DAQ_cabling_source = "CDB"
+
+# set the method for retrieving cabling from CDB
+# options are: 'run_number' or 'date'
+# if DAQ_cabling_by is set to 'date', the DAQ_cabling_date card is used
+# Default is to get the map based on run number
+DAQ_cabling_by = "run_number"
+
+# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
+# e.g. DAQ_cabling_date = '2015-06-30 01:02:03 00:00:00'
+#   or DAQ_cabling_date = 'current'
+DAQ_cabling_date = 'current'
+
+# the DAQ_cabling_file card is used only if DAQ_cabling_source above is set to 'file'
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_cabling_file_StepI = "/files/cabling/DAQChannelMap_preRun6541.txt"
 DAQ_hostname = 'miceraid5'
@@ -471,13 +491,10 @@ EMRbarHeight = 17 # mm, height of the triangle
 EMRgap = 0.5 # mm, gap between two adjacent bars
 
 # EMR event pre-selection
-EMRtotNoiseLow = 0
-EMRtotNoiseUp = 7 # noise time over threshold window
-
-EMRdeltatSignalLow = -240 # Step I
-EMRdeltatSignalUp = -220 # Step I
-EMRdeltatNoiseLow = -220 # Step I
-EMRdeltatNoiseUp = -175 # Step I
+# EMRdeltatSignalLow = -240 # Step I
+# EMRdeltatSignalUp = -220 # Step I
+EMRdeltatSignalLow = -240 # Step IV.0
+EMRdeltatSignalUp = -210 # Step IV.0
 
 # EMR digitization
 EMRdoSampling = 1 # sample number of scintillating photons as a Poisson distribution

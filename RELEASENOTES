@@ -5,6 +5,24 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v1.1.0
+  The following changes were made:
+    - CKOV MC digitizer added
+    - TOF, KL and CKOV MC digitizers now handle MAUS::Data
+    - MC reconstruction setup now handles MAUS::Data
+    - TOF interface updated, now supplies positions in global coordinates
+    - TOF legacy geometry fix, vertical slabs now upstream for all TOFs
+    - EMR updates, including addition of a reducer
+    - Tracker mapping and calibration updated (fixes plane ordering bug)
+    - Tracker CDB interface added for configuration data
+    - Old tracker cosmic test file now downloads from micewww
+    - DAQ channel maps read from CDB
+    - Various CDB geometry updates
+    - CDB third party lib now on version 1.1.3 (DAQ and tracker added)
+    - libmonitor third party source now downlaods from micewww
+    - MAUS now compatible with GCC 4.9
+    - Workbook added to documentation
+    - Various other bug fixes and improvements
 MAUS-v1.0.0
   The following changes were made:
     - MAUS speedup implemented

@@ -24,6 +24,7 @@
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 #include "API/PyWrapMapBase.hh"
+#include "Config/MiceModule.hh"
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
 #include "src/common_cpp/DataStructure/RunHeader.hh"
 
@@ -75,6 +76,8 @@ void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
                           "TOF trigger station invalid. Must be tof0/tof1/tof2",
                           "MapCppTOFSpacePoints::_birth");
   }
+  _geo_filename = configJSON["reconstruction_geometry_filename"].asString();
+  build_geom_map();
 }
 
 ////////////////////////////////////////////////////////////
@@ -135,9 +138,9 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
       TOF2SpacePointArray* tof2_spoints  =
         (*events)[n_event]->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF2SpacePointArrayPtr();
 
-      TOF0SlabHitArray* tof0_slHits = tSlabHits->GetTOF0SlabHitArrayPtr();
-      TOF1SlabHitArray* tof1_slHits = tSlabHits->GetTOF1SlabHitArrayPtr();
-      TOF2SlabHitArray* tof2_slHits = tSlabHits->GetTOF2SlabHitArrayPtr();
+      TOF0SlabHitArray tof0_slHits = tSlabHits->GetTOF0SlabHitArray();
+      TOF1SlabHitArray tof1_slHits = tSlabHits->GetTOF1SlabHitArray();
+      TOF2SlabHitArray tof2_slHits = tSlabHits->GetTOF2SlabHitArray();
 
       keysVec_t station_vec(0);
 
@@ -169,12 +172,26 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
           // std::cerr << "DEBUG: Processing " << it->second << std::endl;
           processTOFStation((it->first).first, (it->first).second, it->second,
                             n_event, triggerhit_pixels);
+          std::string det = it->second;
+          if (det == "tof0")
+              tof0_slHits = (it->first).first;
+          else if (det == "tof1")
+              tof1_slHits = (it->first).first;
+          else if (det == "tof2")
+              tof2_slHits = (it->first).first;
+          for (unsigned int j = 0; j < ((it->first).first).size(); ++j) {
+            TOFSlabHit tof_slh = ((it->first).first)[j];
+          }
       }
+      tSlabHits->SetTOF0SlabHitArray(tof0_slHits);
+      tSlabHits->SetTOF1SlabHitArray(tof1_slHits);
+      tSlabHits->SetTOF2SlabHitArray(tof2_slHits);
+      (*events)[n_event]->GetTOFEvent()->SetTOFEventSlabHit(*tSlabHits);
   }
 }
 ////////////////////////////////////////////////////////////
 void MapCppTOFSpacePoints::processTOFStation(
-                          TOF1SlabHitArray* slHits,
+                          TOF1SlabHitArray &slHits,
                           TOF1SpacePointArray* spPoints,
                           std::string detector,
                           unsigned int part_event,
@@ -184,9 +201,9 @@ void MapCppTOFSpacePoints::processTOFStation(
   // Get the slab hits document for this TOF station.
   std::vector<int> xPlane0Hits;
   std::vector<int> xPlane1Hits;
-  if (slHits->size() != 0) {
-      for (unsigned int nslh = 0; nslh < slHits->size(); ++nslh) {
-          TOFSlabHit tof1_slh = slHits->at(nslh);
+  if (slHits.size() != 0) {
+      for (unsigned int nslh = 0; nslh < slHits.size(); ++nslh) {
+          TOFSlabHit tof1_slh = slHits[nslh];
           int xPlane = tof1_slh.GetPlane();
           switch (xPlane) {
             case 0 :
@@ -217,7 +234,7 @@ void MapCppTOFSpacePoints::processTOFStation(
 
 ////////////////////////////////////////////////////////////
 std::string MapCppTOFSpacePoints::findTriggerPixel(
-                                       TOF1SlabHitArray* slHits,
+                                       TOF1SlabHitArray &slHits,
                                        std::vector<int> xPlane0Hits,
                                        std::vector<int> xPlane1Hits) const {
 
@@ -225,8 +242,8 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
   for (unsigned int nX = 0; nX < xPlane0Hits.size(); nX++) {
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {
       // Get the two slab hits.
-      TOFSlabHit tof_slh_X = slHits->at(xPlane0Hits[nX]);
-      TOFSlabHit tof_slh_Y = slHits->at(xPlane1Hits[nY]);
+      TOFSlabHit tof_slh_X = slHits[xPlane0Hits[nX]];
+      TOFSlabHit tof_slh_Y = slHits[xPlane1Hits[nY]];
       int slabX = tof_slh_X.GetSlab();
       int slabY = tof_slh_Y.GetSlab();
       TOFPixelKey xTriggerPixelKey(_trigStn, slabX, slabY, _triggerStation);
@@ -237,10 +254,10 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
       double t_x, t_y;
       if (calibrateSlabHit(xTriggerPixelKey, tof_slh_X, t_x) &&
           calibrateSlabHit(xTriggerPixelKey, tof_slh_Y, t_y)) {
-        // std::cout << "DEBUG MapCppTOFSpacePoints::findTriggerPixel| "
-        //           << "t_x: " << t_x << "\tt_y: " << t_y
-        //           << "\t_findTriggerPixelCut: " << _findTriggerPixelCut
-        //           << std::endl;
+         // std::cerr << "DEBUG MapCppTOFSpacePoints::findTriggerPixel| "
+         //          << "t_x: " << t_x << "\tt_y: " << t_y
+         //          << "\t_findTriggerPixelCut: " << _findTriggerPixelCut
+         //          << std::endl;
         if (fabs(t_x/2. + t_y/2.) < _findTriggerPixelCut) {
           // The trigger pixel has been found.
           // std::cout << xTriggerPixelKey << std::endl;
@@ -254,7 +271,7 @@ std::string MapCppTOFSpacePoints::findTriggerPixel(
 
 ////////////////////////////////////////////////////////////
 void MapCppTOFSpacePoints::makeSpacePoints(
-              TOF1SlabHitArray* slHits,
+              TOF1SlabHitArray &slHits,
               TOF1SpacePointArray* spPoints,
               std::vector<int> xPlane0Hits,
               std::vector<int> xPlane1Hits,
@@ -263,9 +280,9 @@ void MapCppTOFSpacePoints::makeSpacePoints(
   for (unsigned int nX = 0; nX < xPlane0Hits.size(); nX++) {
     for (unsigned int nY = 0; nY < xPlane1Hits.size(); nY++) {
       TOFSpacePoint xTheSpacePoint;
-      int xPartEvent = (slHits->at(xPlane0Hits[0])).GetPartEventNumber();
-      TOFSlabHit slh_x = slHits->at(xPlane0Hits[nX]);
-      TOFSlabHit slh_y = slHits->at(xPlane1Hits[nY]);
+      int xPartEvent = (slHits[(xPlane0Hits[0])]).GetPartEventNumber();
+      TOFSlabHit slh_x = slHits[(xPlane0Hits[nX])];
+      TOFSlabHit slh_y = slHits[(xPlane1Hits[nY])];
       TOFPixelKey xTriggerPixelKey(triggerhit_pixels[xPartEvent]);
       double t_x, t_y;
       if (calibrateSlabHit(xTriggerPixelKey,
@@ -277,6 +294,8 @@ void MapCppTOFSpacePoints::makeSpacePoints(
         // The first argument should be the hit in the horizontal slab and the
         // second should be the hit in the vertical slab. This is mandatory!!!
         // std::cerr << "filling sp" << std::endl;
+        slHits[(xPlane0Hits[nX])] = slh_x;
+        slHits[(xPlane1Hits[nY])] = slh_y;
         fillSpacePoint(xTheSpacePoint, slh_x, slh_y);
         double deltaT = xTheSpacePoint.GetDt();
         if (fabs(deltaT) < _makeSpacePointCut) {
@@ -322,13 +341,35 @@ void MapCppTOFSpacePoints::fillSpacePoint(TOFSpacePoint &xSpacePoint, TOFSlabHit
   xSpacePoint.SetPartEventNumber(xDocSlabHit_X.GetPartEventNumber());
   xSpacePoint.SetPhysEventNumber(xDocSlabHit_X.GetPhysEventNumber());
   xSpacePoint.SetSlabx(xKey_SlabX_digit0.slab());
+  xSpacePoint.SetHorizSlab(xKey_SlabX_digit0.slab());
   xSpacePoint.SetStation(xKey_SlabX_digit0.station());
   xSpacePoint.SetDetector(xKey_SlabX_digit0.detector());
   xSpacePoint.SetSlaby(xKey_SlabY_digit0.slab());
+  xSpacePoint.SetVertSlab(xKey_SlabY_digit0.slab());
   xSpacePoint.SetPixelKey(xSPKey.str());
   xSpacePoint.SetCharge(charge_SlabX + charge_SlabY);
   xSpacePoint.SetChargeProduct(chargeProduct_SlabX + chargeProduct_SlabY);
   // std::cout << xSPKey << "  t = " << time << " dt = " << dt << std::endl;
+
+  // get the global position of the space point and store it
+
+  // encode the Station+SlabX+SlabY in a key string
+  std::stringstream ss;
+  ss << xKey_SlabX_digit0.station() << xKey_SlabX_digit0.slab() << xKey_SlabY_digit0.slab();
+
+  // get the position of the station/slab/plane from the geometry
+  std::map<std::string, TOFModuleGeo>::const_iterator _geoIt = _geom_map.find(ss.str());
+
+  // std::cout << "DEBUG: MapCppTOFSpacePoints: Station: "
+  //           << _geoIt->second.station << " SlabX: " << _geoIt->second.slabX
+  //           << " SlabY: " << _geoIt->second.slabY << " " << std::endl;
+
+  xSpacePoint.SetGlobalPosX(_geoIt->second.posX);
+  xSpacePoint.SetGlobalPosY(_geoIt->second.posY);
+  xSpacePoint.SetGlobalPosZ(_geoIt->second.posZ);
+  xSpacePoint.SetGlobalPosXErr(_geoIt->second.posXErr);
+  xSpacePoint.SetGlobalPosYErr(_geoIt->second.posYErr);
+  xSpacePoint.SetGlobalPosZErr(_geoIt->second.posZErr);
 }
 
 ////////////////////////////////////////////////////////////
@@ -386,4 +427,52 @@ void MapCppTOFSpacePoints::getTofCalib(int runNumber) {
   }
   // _map.Print();
 }
+
+///////////////////////////////////////////////////////////
+void MapCppTOFSpacePoints::build_geom_map() {
+  // get the tof geometry modules
+  geo_module = new MiceModule(_geo_filename);
+  tof_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "TOF");
+  for (unsigned int sx = 0; sx < tof_modules.size(); ++sx) {
+    for (unsigned int sy = 0; sy < tof_modules.size(); ++sy) {
+      std::stringstream ss;
+      int stnX = tof_modules[sx]->propertyInt("Station");
+      int stnY = tof_modules[sy]->propertyInt("Station");
+      if (stnX != stnY) continue;
+
+      int plnX = tof_modules[sx]->propertyInt("Plane");
+      int plnY = tof_modules[sy]->propertyInt("Plane");
+      if (plnX != 0 || plnY != 1) continue;
+
+      int slbX = tof_modules[sx]->propertyInt("Slab");
+      int slbY = tof_modules[sy]->propertyInt("Slab");
+
+      ss << stnX << slbX << slbY;
+
+      // std::cout << "DEBUG: MapCppTOFSpacePoints: Global Position: "
+      //           << tof_modules[sx]->globalPosition()
+      //           << " " << tof_modules[sy]->globalPosition() << std::endl;
+
+      TOFModuleGeo _mod_geo;
+
+      _mod_geo.station = stnX;
+      _mod_geo.slabX = slbX;
+      _mod_geo.slabY = slbY;
+
+      _mod_geo.posX = tof_modules[sy]->globalPosition().x();
+      _mod_geo.posXErr = tof_modules[sy]->dimensions().x()/sqrt(12.);
+      _mod_geo.posY = tof_modules[sx]->globalPosition().y();
+      _mod_geo.posYErr = tof_modules[sx]->dimensions().y()/sqrt(12.);
+
+      double zx = tof_modules[sx]->globalPosition().z();
+      double zy = tof_modules[sy]->globalPosition().z();
+      _mod_geo.posZ = (zx + zy)/2.0;
+      _mod_geo.posZErr = tof_modules[sx]->dimensions().z()/sqrt(12.);
+
+      _geom_map[ss.str()] = _mod_geo;
+    }
+  }
+  delete geo_module;
 }
+///////////////////////////////////////////////////////////
+} // end namespace MAUS

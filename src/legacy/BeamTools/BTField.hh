@@ -40,7 +40,7 @@ public:
 	//Returns 0 if outside bound
 	virtual void GetFieldValue( const double Point[4], double *EMfield ) const
 	{std::cout << "This method should be overloaded" << std::endl;}
-	inline virtual std::vector<double> GetFieldValue(double x, double y, double z, double t)
+	inline virtual std::vector<double> GetFieldValue2(double x, double y, double z, double t)
 	{ double point[4] = {x,y,z,t}; std::vector<double> field(6,0); GetFieldValue(point, &field[0]); return field; } 
 	virtual void GetFieldValueNonConst( const double Point[4], double *EMfield ) {;}
 

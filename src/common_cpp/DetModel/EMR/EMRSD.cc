@@ -173,7 +173,7 @@ int EMRSD::AddBarHit(G4Step* aStep, int barNumber) {
   hit_cppdata.SetEnergy(track->GetTotalEnergy());
   hit_cppdata.SetCharge(track->GetDefinition()->GetPDGCharge());
   hit_cppdata.SetTime(aStep->GetPreStepPoint()->GetGlobalTime());
-
+  hit_cppdata.SetMass(aStep->GetTrack()->GetDefinition()->GetPDGMass());
   hit_cppdata.SetEnergyDeposited(0.);
   hit_cppdata.SetPathLength(0.);
 
