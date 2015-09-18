@@ -253,7 +253,7 @@ reconstruction_geometry_filename = ""
 
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
-SciFiDigitizationNPECut = 1.0
+SciFiDigitizationNPECut = 2.0
 SciFiMappingFileName = "scifi_mapping_2015-09-11.txt"
 SciFiCalibrationFileName = "scifi_calibration_2015-09-12.txt"
 SciFiBadChannelsFileName = "scifi_bad_channels_2015-06-18.txt"
