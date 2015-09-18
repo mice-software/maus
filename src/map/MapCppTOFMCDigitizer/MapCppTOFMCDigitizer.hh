@@ -39,36 +39,99 @@
 
 #include "TRandom.h"
 #include "Config/MiceModule.hh"
+#include "DataStructure/Primary.hh"
 #include "Utils/TOFCalibrationMap.hh"
 #include "API/MapBase.hh"
 
 namespace MAUS {
 
-class MapCppTOFMCDigitizer : public MapBase<Json::Value> {
+/** @brief structure to hold -a temporary digit-
+ */
+typedef struct fTofDig {
+    TOFChannelId* fChannelId;
+    int fStation;
+    int fPlane;
+    int fSlab;
+    int fPmt;
+    double fTime;
+    ThreeVector fMom;
+    Hep3Vector fPos;
+    double fEdep;
+    bool fIsUsed;
+    double fNpe;
+    std::string fTofKey;
+    int fLeadingTime;
+    int fTrailingTime;
+    double fRawTime;
+    int fTriggerRequestLeadingTime;
+    int fTriggerTimeTag;
+    int fTimeStamp;
+} tmpThisDigit;
+
+/** @brief vector storage for -all temporary digits
+ */
+typedef std::vector<fTofDig> TofTmpDigits;
+
+class MapCppTOFMCDigitizer : public MapBase<Data> {
  public:
   MapCppTOFMCDigitizer();
 
  private:
+  typedef std::vector<TOF0DigitArray*> fDigsArrayPtr;
+
+  /** @brief birth initialize and read data cards
+   */
   void _birth(const std::string& argJsonConfigDocument);
 
+  /** @brief death does nothing
+   */
   void _death();
 
-  void _process(Json::Value* data) const;
+  /** @brief processes MC TOF hits */
+  void _process(MAUS::Data* data) const;
 
-  Json::Value check_sanity_mc(Json::Value& document) const;
+  /** @brief digitizes tof hits
+   * finds the tof slab corresponding to the hit
+   * propagates hit to PMTs at either end of slab
+   * digitizes the hit time
+   * the digitized hits are stored in a temporary array
+   * @param TofTmpDigits is the temporary vector storage for all digits
+   * @param the vector is of type struct tmpThisDigit 
+   */
+  TofTmpDigits make_tof_digits(TOFHitArray* hits,
+                               double gentime) const;
 
+  /** @brief converts energy deposit to photoelectrons
+   * energy deposit is converted to photoelectrons
+   * the npe yield is poisson-smeared
+   * then attenuated
+   * then an efficiency is applied to yield the final npe
+   */
   double get_npe(double dist, double edep) const;
 
-  std::vector<Json::Value> make_tof_digits(Json::Value hits,
-                                           double gentime,
-                                           Json::Value& root) const;
+  /** @brief sets the pixel that would have triggered this hit
+   */
+  std::string findTriggerPixel(TofTmpDigits& tmpDigits) const;
 
-  std::string findTriggerPixel(std::vector<Json::Value> _alldigits) const;
-  Json::Value fill_tof_evt(int evnum, int snum,
-                           std::vector<Json::Value> _alldigits,
+
+  /** @brief checks for multiple hits in the same slab
+   * there is only digit created per slab, 
+   * photoelectrons from hits in the same slab are added up
+   * the time of the earliest hit is taken as the slab digit time
+   */
+  bool check_param(tmpThisDigit& hit1, tmpThisDigit& hit2) const;
+
+  /** @brief sets the digit for each tof station
+   * goes through all the temporary digits
+   * weed out multiple hits
+   * set the digit data structure corresponding to the station hit
+   * @param TofTmpDigits contains all the digits
+   * @param fDigsArrayPtr: vector of pointers to TOF0/1/2 digit datastructure
+   */
+  void fill_tof_evt(int evnum, int snum,
+                           TofTmpDigits& tmpDigits,
+                           fDigsArrayPtr& digitArrayPtr,
                            std::string strig) const;
-
-  bool check_param(Json::Value* hit1, Json::Value* hit2) const;
 
  private:
   MiceModule* geo_module;
@@ -77,9 +140,6 @@ class MapCppTOFMCDigitizer : public MapBase<Json::Value> {
   Json::Value _configJSON;
 
   TOFCalibrationMap _map;
-  std::map<int, std::string> _triggerhit_pixels;
-
-  std::vector<std::string> _stationKeys;
 
   bool fDebug;
 };

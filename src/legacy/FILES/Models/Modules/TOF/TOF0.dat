@@ -18,12 +18,12 @@ Module TOF0
   PropertyString SensitiveDetector SpecialVirtual
   Module TOF/TOF0Horizontal.dat
   {
-    Position 0.0 0.0 -12.5 mm
+    Position 0.0 0.0 12.5 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module TOF/TOF0Vertical.dat
   {
-    Position 0.0 0.0 12.5 mm
+    Position 0.0 0.0 -12.5 mm
     Rotation 0.0 0.0 0.0 degree
   }
 }

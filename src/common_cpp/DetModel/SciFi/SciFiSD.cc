@@ -44,6 +44,7 @@ G4bool SciFiSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
   hit.SetCharge(aStep->GetTrack()->GetDefinition()->GetPDGCharge());
   hit.SetParticleId(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
   hit.SetTime(aStep->GetPreStepPoint()->GetGlobalTime());
+  hit.SetMass(aStep->GetTrack()->GetDefinition()->GetPDGMass());
   hit.SetEnergyDeposited(edep);
   hit.SetPosition(MAUS::ThreeVector(Pos.x(), Pos.y(), Pos.z()));
   hit.SetMomentum(MAUS::ThreeVector(Mom.x(), Mom.y(), Mom.z()));

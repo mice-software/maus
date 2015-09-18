@@ -192,10 +192,10 @@ void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq,
 	  // Discriminate primary hits (close to the trigger) from the rest
           if (xDeltaT > _deltat_signal_low && xDeltaT < _deltat_signal_up) {
               bHit.SetDeltaT(xDeltaT - _deltat_signal_low);
-//            std::cerr << "*---> " << *emr_key << " --> trigger_Id: " << iPe
-//            	      << "  tot: " << tt-lt
-//            	      << "  delta: " << delta_t - _deltat_signal_low
-//            	      << "(" << delta_t << ")" << std::endl;
+//              std::cerr << "*---> " << *emr_key << " --> trigger_Id: " << iPe
+//            	        << "  xTot: " << xTot
+//            	        << "  xDeltaT: " << xDeltaT - _deltat_signal_low
+//            	        << "(" << xDeltaT << ")" << std::endl;
             emr_dbb_events_tmp[iPe][xPlane][xBar].push_back(bHit);
 	    matched = true;
           } else if (iPe == nPartEvents-1 && !matched) {

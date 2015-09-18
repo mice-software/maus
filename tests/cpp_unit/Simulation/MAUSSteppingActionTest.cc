@@ -230,6 +230,7 @@ TEST_F(MAUSSteppingActionTest, UserSteppingActionVirtualTest) {
   stepping->UserSteppingAction(step);
   stepping->UserSteppingAction(step);
   EXPECT_EQ(vpm->GetVirtualHits()->size(), 4);
+  delete vpm->TakeVirtualHits(); // delete the virtual hits
 }
 
 } //namespace end

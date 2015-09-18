@@ -1,0 +1,17 @@
+// Stage 6 Floor Plan, z=0 at middle H absorber
+Configuration Test
+{
+  Dimensions 6. 6. 31. m
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 1.0 mm
+  Module Ckov/Ckov1.dat
+  {
+    Position 0. 0. 5490.61 mm
+    Rotation 0. 0. 0. degree
+  }
+  Module Ckov/Ckov2.dat
+  {
+    Position 0. 0. 5979.11 mm 
+    Rotation 0. 0. 0. degree
+  }
+}

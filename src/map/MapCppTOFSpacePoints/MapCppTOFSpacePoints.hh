@@ -65,6 +65,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
  private:
 
   TOFCalibrationMap _map;
+  struct TOFModuleGeo;
 
   double _makeSpacePointCut; // nanoseconds
   double _findTriggerPixelCut; // nanoseconds
@@ -90,7 +91,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
    * pixel hit map which is to be filled
    */
   void processTOFStation(
-                          TOF1SlabHitArray* slHits,
+                          TOF1SlabHitArray &slHits,
                           TOF1SpacePointArray* spPoints,
                           std::string detector,
                           unsigned int part_event,
@@ -98,7 +99,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
 
   /* @brief go through slab hits and find the pixel which triggered the event
    */
-  std::string findTriggerPixel(TOF1SlabHitArray* slHits,
+  std::string findTriggerPixel(TOF1SlabHitArray &slHits,
                                std::vector<int> xPlane0Hits,
                                std::vector<int> xPlane1Hits) const;
   template<typename T>
@@ -114,7 +115,7 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
    * one particle event in one individual detector.
    */
   void makeSpacePoints(
-                          MAUS::TOF1SlabHitArray* slHits,
+                          MAUS::TOF1SlabHitArray &slHits,
                           MAUS::TOF1SpacePointArray* spPoints,
                           std::vector<int> xPlane0Hits,
                           std::vector<int> xPlane1Hits,
@@ -123,14 +124,31 @@ class MapCppTOFSpacePoints : public MapBase<MAUS::Data> {
   int runNumberSave;
   void getTofCalib(int rnum);
   Json::Value configJSON;
+
   /* stationKeys store a pointer to the slabhits arry, 
    *  a pointer to spacepoints array, 
    *  and the station name
    *  pair< pair<Hits, SpacePoints>, stationName>
    */
-  typedef std::pair<std::pair<TOF1SlabHitArray*, TOF1SpacePointArray*>,
+  typedef std::pair<std::pair<TOF1SlabHitArray, TOF1SpacePointArray*>,
                     std::string > stationKeys;
   typedef std::vector<stationKeys> keysVec_t;
+
+  // struct to hold global position of the tof modules from geometry
+  struct TOFModuleGeo {
+    int station;
+    int slabX;
+    int slabY;
+    double posX, posY, posZ, posXErr, posYErr, posZErr;
+  };
+
+  // map of pixel:global-position
+  typedef std::map<std::string, TOFModuleGeo> TOFGeometryMap;
+  TOFGeometryMap _geom_map;
+  std::string _geo_filename;
+  MiceModule* geo_module;
+  std::vector<const MiceModule*> tof_modules;
+  void build_geom_map();
 };
 }
 

@@ -8,17 +8,17 @@ Module TOF1Vertical
   PropertyInt numSlabs 7
   Module TOF/TOF1VerticalSlab0.dat
   {
-    Position -18.0 0.0 0.0 cm
+    Position 18.0 0.0 0.0 cm
     Rotation 0.0 0.0 0.0 degree
   }
   Module TOF/TOF1VerticalSlab1.dat
   {
-    Position -12.0 0.0 0.0 cm
+    Position 12.0 0.0 0.0 cm
     Rotation 0.0 0.0 0.0 degree
   }  
   Module TOF/TOF1VerticalSlab2.dat
   {
-    Position -6.0 0.0 0.0 cm
+    Position 6.0 0.0 0.0 cm
     Rotation 0.0 0.0 0.0 degree
   }  
   Module TOF/TOF1VerticalSlab3.dat
@@ -28,17 +28,17 @@ Module TOF1Vertical
   }
   Module TOF/TOF1VerticalSlab4.dat
   {
-    Position 6.0 0.0 0.0 cm
+    Position -6.0 0.0 0.0 cm
     Rotation 0.0 0.0 0.0 degree
   }
   Module TOF/TOF1VerticalSlab5.dat
   {
-    Position 12.0 0.0 0.0 cm
+    Position -12.0 0.0 0.0 cm
     Rotation 0.0 0.0 0.0 degree
   }
   Module TOF/TOF1VerticalSlab6.dat
   {
-    Position 18.0 0.0 0.0 cm
+    Position -18.0 0.0 0.0 cm
     Rotation 0.0 0.0 0.0 degree
   }
 }

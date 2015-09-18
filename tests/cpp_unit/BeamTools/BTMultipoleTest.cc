@@ -266,7 +266,7 @@ TEST_F(BTMultipoleTest, GetFieldValueTest_TanhQuad) {
     double field[6] = {0., 0., 0., 0., 0., 0.};
     _tanh_end_straight_quad->GetFieldValue(pos, field);
     // quadrupole near axis
-    MemberFunction<const BTMultipole>* func = new MemberFunction
+    MemberFunctionConst<const BTMultipole>* func = new MemberFunctionConst
                   <const BTMultipole>(*_tanh_end_straight_quad,
                                       &BTMultipole::GetFieldValue, 4, 6);
     Differentiator* diff = new Differentiator(func,
