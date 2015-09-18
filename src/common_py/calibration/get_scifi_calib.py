@@ -88,8 +88,8 @@ class GetTrackerCalib:
         Outputs calibration files
         """
         path = os.environ["MAUS_ROOT_DIR"]
-        path_calib += "/files/calibration/"
-        path_cable += "/files/cabling/"
+        path_calib = path + "/files/calibration/"
+        path_cable = path + "/files/cabling/"
         print path
         calib_out = open(path_calib+"scifi_calibraion.txt","w")
         badchan_out = open(path_calib+"scifi_bad_channels.txt","w")
