@@ -22,8 +22,10 @@ def run():
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
 
+    # G4beamline
+    my_map.append(MAUS.MapPyBeamlineSimulation())
+
     # GEANT4
-    my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
     # Pre detector set up

@@ -21,6 +21,7 @@ BeamlineSimulation simulates MICE beam from Target to GVA1
 import os
 import json
 import Queue
+import random
 from CallG4bl import CallG4bl
 
 class MapPyBeamlineSimulation: #pylint: disable = R0902 
@@ -64,7 +65,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.q_2 = 0
         self.q_3 = 0
         self.d_1 = 0
-        self.d_2 = 0
+	self.d_2 = 0
         self.d_s = 0
         self.proton_weight = 0
         self.particles_per_spill = 0 
@@ -83,7 +84,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.charge = 3
         self.newline = ''
         self.grid_job = 0 
-        self.protonabsorberin = 1
+	self.protonabsorberin = 1
    
     def birth(self, json_configuration): #pylint: disable=R0912, R0915
         "birth doc string"      
@@ -139,13 +140,13 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             print("Error: d_1 is not found in the config file!")
             good_birth = False             
 
-        try:
+	try:
             self.d_2 = config_doc["g4bl"]["d_2"]
         except Exception: #pylint: disable=W0703
-            print("Error: d_2 is not found in the config file!")
-            good_birth = False
+           print("Error: d_2 is not found in the config file!")
+           good_birth = False
 	
-        try:
+	try:
             self.d_s = config_doc["g4bl"]["d_s"]
         except Exception: #pylint: disable=W0703
             print("Error: d_s current is not found in" +\
@@ -181,7 +182,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
 #            good_birth = False
             
         try:
-            self.path_g4bl = os.path.join(os.environ['MAUS_ROOT_DIR'], \
+            self.path_g4bl = os.path.join(os.environ['MAUS_THIRD_PARTY'], \
             'third_party', 'build', 'G4beamline-2.12-source', 'bin')
         except Exception: #pylint: disable=W0703
             print('Error: Cannot find file path'+\
@@ -235,6 +236,14 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         except Exception: #pylint: disable=W0703
             print("Error: proton_numer is not found in the config file!")
             good_birth = False
+
+	try:
+            self.random_seed = config_doc["g4bl"]["random_seed"]
+	    if self.random_seed == -1:
+		    self.random_seed = random.randint(1,1000000)
+        except Exception: #pylint: disable = W0703
+            print("Error: random_seed is not found in the config file!")
+	    good_birth = False
            
         try:
             self.particle_charge = config_doc["g4bl"]["particle_charge"]
@@ -283,11 +292,6 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
 
         spill = {}
         spill = json.loads(json_spill_doc)
-
-        try:
-            self.random_seed = spill["spill_number"]
-        except Exception: #pylint: disable = W0703
-            print("Error: could not set random_seed")
 
         if self.queue == 0:
             self.queue = Queue.Queue()
