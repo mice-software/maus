@@ -38,6 +38,10 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     set -e
 
     # Now build libraries
+    ${MAUS_ROOT_DIR}/third_party/bash/90mpfr.bash -j $MAUS_NUM_THREADS
+    ${MAUS_ROOT_DIR}/third_party/bash/91gmp.bash -j $MAUS_NUM_THREADS
+    ${MAUS_ROOT_DIR}/third_party/bash/92mpc.bash -j $MAUS_NUM_THREADS
+    ${MAUS_ROOT_DIR}/third_party/bash/93gcc.bash -j $MAUS_NUM_THREADS
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash -j $MAUS_NUM_THREADS
     python ${MAUS_ROOT_DIR}/third_party/check_path.py
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash -j $MAUS_NUM_THREADS
