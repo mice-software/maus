@@ -57,7 +57,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo "INFO: Configuring:"
     echo
     sleep 1
-    ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install/
+    ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install/ --with-gmp-include=${MAUS_ROOT_DIR}/third_party/install/include/ --with-gmp-lib=${MAUS_ROOT_DIR}/third_party/install/lib/
 
     echo
     echo "INFO: Making:"
