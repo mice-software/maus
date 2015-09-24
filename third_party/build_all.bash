@@ -18,9 +18,20 @@ case $key in
     fi
     shift
     ;;
+    -g|--use-system-gcc)
+    if [ $2 -eq 0 ] || [ $2 -eq 1 ]; then
+    USE_SYSTEM_GCC="$2"
+    fi
+    shift
+    ;;
 esac
 shift
 done
+
+if [ -z "$USE_SYSTEM_GCC" ]; then
+  USE_SYSTEM_GCC=0
+fi
+
 if [ -z "$MAUS_NUM_THREADS" ]; then
   MAUS_NUM_THREADS=1
 fi
@@ -38,10 +49,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     set -e
 
     # Now build libraries
-    ${MAUS_ROOT_DIR}/third_party/bash/90gmp.bash -j $MAUS_NUM_THREADS
-    ${MAUS_ROOT_DIR}/third_party/bash/91mpfr.bash -j $MAUS_NUM_THREADS
-    ${MAUS_ROOT_DIR}/third_party/bash/92mpc.bash -j $MAUS_NUM_THREADS
-    ${MAUS_ROOT_DIR}/third_party/bash/93gcc.bash -j $MAUS_NUM_THREADS
+    if [ "$USE_SYSTEM_GCC" -eq 1 ]; then
+        ${MAUS_ROOT_DIR}/third_party/bash/90gmp.bash -j $MAUS_NUM_THREADS
+        ${MAUS_ROOT_DIR}/third_party/bash/91mpfr.bash -j $MAUS_NUM_THREADS
+        ${MAUS_ROOT_DIR}/third_party/bash/92mpc.bash -j $MAUS_NUM_THREADS
+        ${MAUS_ROOT_DIR}/third_party/bash/93gcc.bash -j $MAUS_NUM_THREADS
+    fi
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash -j $MAUS_NUM_THREADS
     python ${MAUS_ROOT_DIR}/third_party/check_path.py
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash -j $MAUS_NUM_THREADS
