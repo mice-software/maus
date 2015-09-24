@@ -23,6 +23,8 @@ fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
+  set -e # Exit the script if ANY command fails
+
   if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
   then
     echo "INFO: Found source archive in 'source' directory"
