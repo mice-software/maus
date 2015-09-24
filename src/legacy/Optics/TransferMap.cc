@@ -102,7 +102,7 @@ PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& aPhaseSpaceVecto
 		MAUS::Vector<double> vec(aPhaseSpaceVector.getSixVector());
 		_polynomial->F(vec, vec);
 		vec += MAUS::Vector<double>(_referenceTrajectoryOut.getSixVector());
-		PhaseSpaceVector out(_referenceTrajectoryOut.z(), _referenceTrajectoryIn.m());
+		// PhaseSpaceVector out(_referenceTrajectoryOut.z(), _referenceTrajectoryIn.m());
 	}
 	
 	CLHEP::HepVector psVec = aPhaseSpaceVector.getCanonicalSixVector();
