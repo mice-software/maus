@@ -62,6 +62,7 @@ void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
     _events->at(_primary)->SetTOFHits(new std::vector<TOFHit>());
     _events->at(_primary)->SetKLHits(new std::vector<KLHit>());
     _events->at(_primary)->SetEMRHits(new std::vector<EMRHit>());
+    _events->at(_primary)->SetCkovHits(new std::vector<CkovHit>());
     _events->at(_primary)->SetSpecialVirtualHits(new std::vector<SpecialVirtualHit>());
     for (int i = 0; i < _geometry->GetSDSize(); i++) {
       //  Retrieve detector i's hits

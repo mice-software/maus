@@ -250,13 +250,23 @@ VirtualPlaneManager::~VirtualPlaneManager() {
   _useVirtualPlanes = false;
   _nHits = std::vector<int>();
   _mods = std::map<VirtualPlane*, const MiceModule*>();
-  for (size_t i = 0; i < _planes.size(); ++i) delete _planes[i];
+  for (size_t i = 0; i < _planes.size(); ++i)
+      delete _planes[i];
   _planes = std::vector<VirtualPlane*>();
+  if (_hits != NULL)
+      delete _hits;
+  _hits = NULL;
 }
 
 VirtualPlaneManager::VirtualPlaneManager(VirtualPlaneManager& rhs)
           :  _useVirtualPlanes(rhs._useVirtualPlanes), _planes(), _mods(),
-             _nHits(rhs._nHits), _hits(rhs._hits) {
+             _nHits(rhs._nHits), _hits(NULL) {
+  if (rhs._hits != NULL) {
+      _hits = new std::vector<VirtualHit>(rhs._hits->size());
+      for (size_t i = 0; i < rhs._hits->size(); ++i) {
+          _hits[i] = rhs._hits[i];
+      }
+  }
   for (size_t i = 0; i < rhs._planes.size(); ++i) {
     _planes.push_back(new VirtualPlane(*rhs._planes[i]));
     _mods[_planes[i]] = rhs._mods[rhs._planes[i]];

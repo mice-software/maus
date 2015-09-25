@@ -104,6 +104,8 @@
     <volume name="KLGlue_unit">
         <materialref ref="BC600"/>
         <solidref ref="KLGlue_unitsolid"/>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
     </volume>
         
     
@@ -467,7 +469,9 @@
             <position name="KLGlueLattice2_2_pos" x="0.0" y="0.0" z="0.0" unit="mm"/>
             <rotation name="KLGlueLattice2_2_rot" x="0.0" y="0.0" z="0.0" unit="degree"/>
         </physvol>
-    </volume>
+        <auxiliary auxtype="unit" auxvalue="mm"/>
+        <auxiliary auxtype="G4StepMax" auxvalue="5.0"/>
+     </volume>
         
     </structure>    
     

@@ -110,7 +110,7 @@
     <box lunit="cm" name="TOF2HorizSlabSci_solid" x="60.0" y="6.0" z="2.5"/>
     <box lunit="cm" name="TOF2Panel_solid" x="60.0" y="60.0" z="2.5"/>
     <box lunit="cm" name="TOF2Det_solid" x="60.0" y="60.0" z="5.00001"/>
-    <box lunit="cm" name="TOF2_solid" x="150.0" y="150.0" z="25.0"/>
+    <box lunit="cm" name="TOF2_solid" x="60.01" y="60.01" z="5.01"/>
     <!--
     <tube aunit="deg" deltaphi="360" lunit="mm" name="TOF2DownstreamShield1_solid" rmin="300.0" rmax="750.0" startphi="0.0" z="100.0"/>
     <tube aunit="deg" deltaphi="360" lunit="mm" name="TOF2DownstreamShieldLink_solid" rmin="650.0" rmax="750.0" startphi="0.0" z="100.0"/>
@@ -123,71 +123,71 @@
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab1Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab2Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab3Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab4Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab5Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab6Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab7Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab8Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2VertSlab9Sci">
         <materialref ref="POLYSTYRENE"/>
         <solidref ref="TOF2VertSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <!-- Verticle slabs. Repeated for sensitive volumes. Loop not compatible with TOFSD. -->
     <volume name="TOF2VertSlab0">
@@ -383,71 +383,71 @@
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab1Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab2Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab3Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab4Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab5Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab6Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab7Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab8Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
     <volume name="TOF2HorizSlab9Sci">
         <materialref  ref="POLYSTYRENE"/>
         <solidref ref="TOF2HorizSlabSci_solid"/>
         <auxiliary auxtype="SensitiveDetector" auxvalue="TOF"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="1.0"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="1.0"/>
     </volume>
   
     <volume name="TOF2HorizSlab0">
@@ -660,20 +660,20 @@
     <volume name="TOF2DownstreamShield1">
         <materialref ref="Fe"/>
         <solidref ref="TOF2DownstreamShield1_solid"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
     </volume>
     <volume name="TOF2DownstreamShieldLink">
         <materialref ref="Fe"/>
         <solidref ref="TOF2DownstreamShieldLink_solid"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
     </volume>
     <volume name="TOF2DownstreamShield2">
         <materialref ref="Fe"/>
         <solidref ref="TOF2DownstreamShield2_solid"/>
-        <auxiliary auxtype="RedColour" auxvalue="1.0"/>
-        <auxiliary auxtype="GreenColour" auxvalue="0.5"/>
+        <auxiliary auxtype="RedColor" auxvalue="1.0"/>
+        <auxiliary auxtype="GreenColor" auxvalue="0.5"/>
     </volume>
     -->
     <volume name="TOF2">
@@ -697,7 +697,7 @@
 	-->
         <physvol name="TOF2Detector_phys">
             <volumeref ref="TOF2Detector"/>
-            <position name="TOF2Detector_pos" unit="mm" x="0.0" y="0.0" z="25.0"/>
+            <position name="TOF2Detector_pos" unit="mm" x="0.0" y="0.0" z="0.0"/>
         </physvol>
     </volume>
 </structure>

@@ -1,0 +1,214 @@
+# coding=ASCII
+"""The basic setups - changing this file will not be pushed to bzr.
+
+The parameters in this file are the most frequently changed ones. The file
+is organized in blocks so it can be easily used.
+
+Parameters from this file will overload those in the
+ConfigurationDefaultFile.py if no user configuration file is provided;
+User specified configuration file will overload this.
+"""
+
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
+# NOTE: please use lower_case_and_underscores for new configuration cards
+
+import os
+
+#==============================
+"""Controls
+Keywords: controls, output, input, format, json, root,
+"""
+
+# used by InputPySpillGenerator to determine the number of empty spills that
+# will be generated when running a MC simulation
+spill_generator_number_of_spills = 100
+
+# used by InputCppDAQData when unpacking real data
+Number_of_DAQ_Events = -1
+
+# Use below to control the input/output json format and file names.
+input_json_file_name = "maus_input.json"
+input_json_file_type = "text"
+output_json_file_name = "maus_output.json"
+output_json_file_type = "text"
+# Use below to control the input/output root file names.
+input_root_file_name = "maus_input.root"
+output_root_file_name = "maus_output.root"
+
+# If set to True, particle decay will be enabled in the tracking.
+particle_decay = True
+# Set the default for whether to keep all particles upon generation in MC.
+default_keep_or_kill = True
+# Overwrite the above default: if set to False, that particle will not be
+# kept in the tracking.
+keep_or_kill_particles = {"mu+":True, "mu-":True,
+                          "nu_e":False, "anti_nu_e":False,
+                          "nu_mu":False, "anti_nu_mu":False,
+                          "nu_tau":False, "anti_nu_tau":False,
+}
+
+# Used, for now, to determine what level of
+# c++ log messages are reported to the user:
+# 0 = debug info (and std::cout)
+# 1 = run info
+# 2 = warnings
+# 3 = errors (and std::cerr)
+# 4 = fatal
+# >4 = silent
+# Doesnt effect python
+verbose_level = 1
+
+# Used by MapPyRemoveTracks. If set to True, only muon tracks will be kept.
+keep_only_muon_tracks = False
+
+# Used by MapCppSimulation
+# set to true to keep start and end point of every track
+keep_tracks = False
+# set to true to keep start and end point of every track and every step point
+keep_steps = False
+
+# geant4 visualisation (not event display)
+geant4_visualisation = False
+
+#==============================
+"""Database download
+Keyword: database, download, geometry, cdb, url,
+"""
+# geometry used by the simulation
+simulation_geometry_filename = "Test.dat" # dummy legacy geometry
+# simulation_geometry_filename = "Stage4.dat" # Stage 4 legacy geometry
+# cdb geometry - needs to be downloaded for specific run needed
+# simulation_geometry_filename = "files/geometry/download/ParentGeometryFile.dat"
+
+# geometry used by reconstruction; if set to an empty string, automatically
+# acquires simulation_geometry_filename
+reconstruction_geometry_filename = ""
+
+geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
+# Set geometry_download_by to
+# 'run_number' to download by run number,
+# 'current' to use the currently valid geometry
+# 'id' to use the cdb internal id
+geometry_download_by = 'current'
+geometry_download_run_number = 0
+geometry_download_id = 59
+geometry_download_cleanup = True # set to True to clean up after download
+
+# For geometry upload setup, please use ConfigurationDefaults.py
+
+#==============================
+"""Proton beam
+Keywords: protons, g4bl, g4beamline, absorber,
+"""
+# Dictionary of variable to be set when using G4BL to generate particles. If
+# "get_magnet_currents_pa_cdb" is set to True magnet currents & proton absorber
+# thickness will be retrieved from the CDB for the run_number specified
+g4bl = {"run_number":2873, "q_1":1.066, "q_2":-1.332, "q_3":0.927,
+        "d_1":-1.302, "d_2":-0.396, "d_s":3.837, "particles_per_spill":0,
+        "rotation_angle":30, "translation_z":680.31,
+        "protonabsorberin":1, "proton_absorber_thickness":93,
+        "proton_number":1E9, "proton_weight":1, "particle_charge":'all',
+        "file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',
+        "get_magnet_currents_pa_cdb":False}
+
+#==============================
+"""Reference beam and secondary beam
+Keyword: start, begin, beam, pions, muons, electrons
+"""
+# used for setting particle phase
+simulation_reference_particle = {
+    "position":{"x":0.0, "y":-0.0, "z":-6400.0},
+    "momentum":{"x":0.0, "y":0.0, "z":1.0},
+    "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10,
+    "spin":{"x":0.0, "y":0.0, "z":1.0}
+   # "beam_polarisation" : "Flat"
+}
+
+# used by MapPyBeamMaker to generate input particle data
+# This is a sample beam distribution based on guesses by Chris Rogers of what
+# an optimised beam might look like
+beam = {
+    "particle_generator":"binomial", # routine for generating empty primaries
+    "binomial_n":50, # number of coin tosses
+    "binomial_p":0.5, # probability of making a particle on each toss
+    "random_seed":5, # random seed for beam generation; controls also how the MC
+                     # seeds are generated
+
+#    "particle_generator":"g4bl", # Uses G4BL as input for MAUS
+#    "g4bl_generator":"True", # Call G4BL each time new spill is created
+#    "random_seed":5,
+    "definitions":[
+    ##### MUONS #######
+    {
+       "reference":simulation_reference_particle, # reference particle
+       "random_seed_algorithm":"incrementing_random", # algorithm for seeding MC
+       "weight":90., # probability of generating a particle
+       "transverse":{
+          "transverse_mode":"constant_solenoid", # transverse distribution matched to constant solenoid field
+          "emittance_4d":6., # 4d emittance
+          "normalised_angular_momentum":0.1, # angular momentum from diffuser
+          "bz":4.e-3 # magnetic field strength for angular momentum calculation
+       },
+       "longitudinal":{"longitudinal_mode":"sawtooth_time", # longitudinal distribution sawtooth in time
+                   "momentum_variable":"p", # Gaussian in total momentum (options energy, pz)
+                   "sigma_p":25., # RMS total momentum
+                   "t_start":-1.e6, # start time of sawtooth
+                   "t_end":+1.e6}, # end time of sawtooth
+       "coupling":{"coupling_mode":"none"} # no dispersion
+       #"spin":{"x":0.0, "y":0.0, "z":1.0}
+    },
+    ##### PIONS #####
+    { # as above...
+       "reference":{
+           "position":{"x":0.0, "y":-0.0, "z":-6400.0},
+           "momentum":{"x":0.0, "y":0.0, "z":1.0},
+           "spin":{"x":0.0, "y":0.0, "z":1.0},
+           "particle_id":211, "energy":285.0, "time":0.0, "random_seed":10
+       },
+       "random_seed_algorithm":"incrementing_random",
+       "weight":2.,
+       "transverse":{"transverse_mode":"constant_solenoid", "emittance_4d":6.,
+            "normalised_angular_momentum":0.1, "bz":4.e-3},
+       "longitudinal":{"longitudinal_mode":"sawtooth_time",
+                   "momentum_variable":"p",
+                   "sigma_p":25.,
+                   "t_start":-1.e6,
+                   "t_end":+1.e6},
+       "coupling":{"coupling_mode":"none"}
+      # "spin":{"x":0.0, "y":0.0, "z":1.0}
+    },
+    ##### ELECTRONS #####
+    { # as above...
+        "reference":{
+            "position":{"x":0.0, "y":-0.0, "z":-6400.0},
+            "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "spin":{"x":0.0, "y":0.0, "z":1.0},
+            "particle_id":-11, "energy":200.0, "time":0.0, "random_seed":10
+        },
+        "random_seed_algorithm":"incrementing_random",
+        "weight":8.,
+       "transverse":{"transverse_mode":"constant_solenoid", "emittance_4d":6.,
+            "normalised_angular_momentum":0.1, "bz":4.e-3},
+       "longitudinal":{"longitudinal_mode":"sawtooth_time",
+                   "momentum_variable":"p",
+                   "sigma_p":25.,
+                   "t_start":-1.e6,
+                   "t_end":+1.e6},
+        "coupling":{"coupling_mode":"none"}
+       # "spin":{"x":0.0, "y":0.0, "z":1.0}
+    }]
+}

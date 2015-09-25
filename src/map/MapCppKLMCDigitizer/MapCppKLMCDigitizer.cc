@@ -30,7 +30,7 @@ PyMODINIT_FUNC init_MapCppKLMCDigitizer(void) {
 }
 
 MapCppKLMCDigitizer::MapCppKLMCDigitizer()
-  : MapBase<Json::Value>("MapCppKLMCDigitizer") {
+  : MapBase<Data>("MapCppKLMCDigitizer") {
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ void MapCppKLMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   if (!parsingSuccessful) {
     throw MAUS::Exception(Exception::recoverable,
                           "Failed to parse Json Configuration",
-                          "MapCppTOFMCDigitizer::_birth");
+                          "MapCppKLMCDigitizer::_birth");
   }
   // get the geometry
   if (!_configJSON.isMember("simulation_geometry_filename"))
@@ -63,89 +63,87 @@ void MapCppKLMCDigitizer::_death() {
 }
 
 //////////////////////////////////////////////////////////////////////
-void MapCppKLMCDigitizer::_process(Json::Value* data) const {
-  Json::Value& root = *data;
-  Json::Value mc = check_sanity_mc(root);
+void MapCppKLMCDigitizer::_process(MAUS::Data* data) const {
+  // Get spill, break if there's no DAQ data
+  Spill *spill = data->GetSpill();
+  if (spill->GetMCEvents() == NULL)
+      return;
+
+  MCEventPArray *mcEvts = spill->GetMCEvents();
+  int nPartEvents = spill->GetMCEventSize();
+  if (nPartEvents == 0)
+      return;
+
+  ReconEventPArray *recEvts =  spill->GetReconEvents();
+
+  // Resize the recon event to hold mc events
+  if (spill->GetReconEventSize() == 0) { // No recEvts yet
+      for (int iPe = 0; iPe < nPartEvents; iPe++) {
+          recEvts->push_back(new ReconEvent);
+      }
+  }
 
   // all_kl_digits store all the kl hits
   // then we'll weed out multiple hits, add up yields, and store the event
-  std::vector<Json::Value> all_kl_digits;
-  all_kl_digits.push_back(Json::Value());
-  Json::Value kl_evt;
 
   // loop over events
-  if (fDebug) std::cout << "mc numevts = " << mc.size() << std::endl;
-  for ( unsigned int i = 0; i < mc.size(); i++ ) {
-    Json::Value particle = mc[i];
-    if (fDebug) std::cout << "evt: " << i << " particle= " << particle << std::endl;
+  if (fDebug) std::cout << "mc numevts = " << mcEvts->size() << std::endl;
+  // Construct digits from hits for each MC event
+  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+    // Get kl hits for this event
+    KLHitArray *hits = spill->GetAnMCEvent(iPe).GetKLHits();
 
-    // hits for this event
-    Json::Value _hits = particle["kl_hits"];
-    // if _hits.size() = 0, the make_digits and fill_kl_evt functions will
-    // return null.
-    all_kl_digits.clear();
+    KLEvent *evt = new KLEvent();
+    (*recEvts)[iPe]->SetKLEvent(evt);
+    // process only if there are kl hits
+    if (hits) {
 
-    // pick out kl hits, digitize and store
-    all_kl_digits = make_kl_digits(_hits, root);
+      // pick out kl hits, digitize and store
+      KLTmpDigits tmpDigits = make_kl_digits(hits);
 
 
-    // fill kl events
-    kl_evt.clear();
-    kl_evt[i] = fill_kl_evt(i, all_kl_digits);
-    if (fDebug) {
-        std::cout << "mcevt: " << i << " kl " << _hits.size()
-                  << " hits, " << all_kl_digits.size() << std::endl;
-    }
-    Json::Value kl_digs = fill_kl_evt(i, all_kl_digits);
-    root["recon_events"][i]["kl_event"]["kl_digits"]["kl"]  = kl_digs;
+      // fill kl events
+      if (fDebug) {
+        std::cout << "mcevt: " << iPe << " kl " << hits->size()
+                  << " hits, " << tmpDigits.size() << std::endl;
+      }
+
+      KLDigitArray* kl_digits = evt->GetKLEventDigitPtr()->GetKLDigitArrayPtr();
+      fill_kl_evt(iPe, tmpDigits, kl_digits);
+    } // end if-hits
   } // end loop over events
 }
 
 //////////////////////////////////////////////////////////////////////
-std::vector<Json::Value> MapCppKLMCDigitizer::make_kl_digits(Json::Value hits,
-                                                             Json::Value& root) const {
-  std::vector<Json::Value> kl_digits;
-  kl_digits.clear();
+KLTmpDigits MapCppKLMCDigitizer::make_kl_digits(KLHitArray* hits) const {
 
-  if (hits.size() == 0) return kl_digits;
+  KLTmpDigits tmpDigits(0);
+  if (hits->size() == 0) return tmpDigits;
 
-  for ( unsigned int j = 0; j < hits.size(); j++ ) {  //  j-th hit
-      Json::Value hit = hits[j];
-      if (fDebug) std::cout << "hit# " << j << hit << std::endl;
+  for ( unsigned int j = 0; j < hits->size(); j++ ) {  //  j-th hit
+      KLHit hit = hits->at(j);
+      // if (fDebug) std::cout << "hit# " << j << hit << std::endl;
 
       // make sure we can get the cell info
-      if (!hit.isMember("channel_id"))
+      if (!hit.GetChannelId())
           throw(Exception(Exception::recoverable,
                        "No channel_id in hit",
                        "MapCppKLMCDigitizer::make_kl_digits"));
-      if (!hit.isMember("momentum"))
-          throw(Exception(Exception::recoverable,
-                       "No momentum in hit",
-                       "MapCppKLMCDigitizer::make_kl_digits"));
-      if (!hit.isMember("time"))
-          throw(Exception(Exception::recoverable,
-                       "No time in hit",
-                       "MapCppKLMCDigitizer::make_kl_digits"));
-      Json::Value channel_id = hit["channel_id"];
-
-      if (!hit.isMember("energy_deposited"))
-          throw(Exception(Exception::recoverable,
-                       "No energy_deposited in hit",
-                       "MapCppKLMCDigitizer::make_kl_digits"));
-      double edep = hit["energy_deposited"].asDouble();
+      double edep = hit.GetEnergyDeposited();
 
       if (fDebug) {
-         std::cout << "klhit: " << hit["channel_id"] << " "
-                   << hit["position"] << " " << hit["momentum"]
-                   << " " << hit["time"] << " " << hit["energy_deposited"] << std::endl;
+         std::cout << "klhit: " << hit.GetChannelId()->GetCell() << " "
+                   << hit.GetPosition().x() << " " << hit.GetMomentum().x()
+                   << " " << hit.GetEnergyDeposited() << std::endl;
       }
 
-      int cll = hit["channel_id"]["cell"].asInt();
+      int cll = hit.GetChannelId()->GetCell();
 
+      /*
       if (!root.isMember("daq_event_type")) {
         root["daq_event_type"] = "physics_event";
       }
-
+      */
       // find the geo module corresponding to this hit
       const MiceModule* hit_module = NULL;
 
@@ -168,7 +166,8 @@ std::vector<Json::Value> MapCppKLMCDigitizer::make_kl_digits(Json::Value hits,
                        "MapCppKLMCDigitizer::make_kl_digits"));
 
       // now get the position of the hit
-      Hep3Vector hpos = JsonWrapper::JsonToThreeVector(hit["position"]);
+      ThreeVector tpos = hit.GetPosition();
+      Hep3Vector hpos(tpos.x(), tpos.y(), tpos.z());
 
       // get the cell and pmt positions from the geometry
       // cell pos
@@ -203,55 +202,35 @@ std::vector<Json::Value> MapCppKLMCDigitizer::make_kl_digits(Json::Value hits,
       if (fDebug) std::cout << "npe1: "<< npe1 << ", npe2: "<< npe2 << std::endl;
 
 
-      Json::Value tmpDigit;
+      tmpThisDigit thisDigit;
       // set the hits for PMTs at both ends
       for (int p = 0; p < 2; ++p) {
-        tmpDigit.clear();
-        tmpDigit["channel_id"] = hit["channel_id"];
-        tmpDigit["mc_mom"] = hit["momentum"];
-        tmpDigit["time"] = hit["time"];
-        tmpDigit["mc_position"]=hit["position"];
-        tmpDigit["isUsed"] = 0;
+        thisDigit.fChannelId = hit.GetChannelId();
+        thisDigit.fMom = hit.GetMomentum();
+        thisDigit.fTime = hit.GetTime();
+        thisDigit.fPos = hpos;
+        thisDigit.fIsUsed = false;
 
 	// set the key for this channel
         std::stringstream ss;
         ss << "KLChannelKey " << cll << " " << p << " kl";
-        tmpDigit["kl_key"] = ss.str();
-        tmpDigit["cell"] = cll;
-        tmpDigit["pmt"] = p;
+        thisDigit.fKLKey = ss.str();
+        thisDigit.fCell = cll;
+        thisDigit.fPmt = p;
         if (p == 0) {
-	  tmpDigit["npe"] = npe1;
+	  thisDigit.fNpe = npe1;
         } else if (p == 1) {
-	  tmpDigit["npe"] = npe2;
+	  thisDigit.fNpe = npe2;
         }
 
 	if (fDebug)
           std::cout << "digit " << j << " key: " << ss.str() << std::endl;
 
-        kl_digits.push_back(tmpDigit);
+        tmpDigits.push_back(thisDigit);
       } // end loop over pmts
     }  //  ends 'for' loop over hits
 
-    return kl_digits;
-}
-
-//////////////////////////////////////////////////////////////////////
-Json::Value MapCppKLMCDigitizer::check_sanity_mc(const Json::Value& root) const {
-  // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc_events")) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "Missing MC branch from data",
-                          "MapCppKLDigitizer::check_sanity_mc");
-  }
-
-  Json::Value mc = root.get("mc_events", 0);
-  // Check if JSON document is of the right type, else return error
-  if (!mc.isArray()) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "MC branch isn't an array",
-                          "MapCppKLDigitizer::check_sanity_mc");
-  }
-  return mc;
+    return tmpDigits;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -343,8 +322,9 @@ int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) const {
 
 
 //////////////////////////////////////////////////////////////////////
-Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
-                                             std::vector<Json::Value> all_kl_digits) const {
+void MapCppKLMCDigitizer::fill_kl_evt(int evnum,
+                                      KLTmpDigits& tmpDigits,
+                                      KLDigitArray* klDigits) const {
   if (!_configJSON.isMember("Do_V1724_Zero_Suppression"))
           throw(Exception(Exception::recoverable,
                 "Could not find Do_V1724_Zero_Suppression",
@@ -365,61 +345,61 @@ Json::Value MapCppKLMCDigitizer::fill_kl_evt(int evnum,
 
   Json::Value kl_digit(Json::arrayValue);
   // return null if this evt had no kl hits
-  if (all_kl_digits.size() == 0) return kl_digit;
+  if (tmpDigits.size() == 0) return;
   int npe;
   int ndigs = 0;
 
   // throw out multihits and add up the light yields from multihits in slabs
-  for (unsigned int i = 0; i < all_kl_digits.size(); ++i) {
+  for (unsigned int i = 0; i < tmpDigits.size(); ++i) {
     // check if the digit has been used
-    if ( all_kl_digits[i]["isUsed"].asInt() == 0 ) {
+    if ( !tmpDigits[i].fIsUsed ) {
       ndigs++;
 
-      npe = all_kl_digits[i]["npe"].asInt();
+      npe = tmpDigits[i].fNpe;
       // loop over all the other digits to find multihit slabs
-      for ( unsigned int j = i+1; j < all_kl_digits.size(); j++ ) {
-        if ( check_param(&(all_kl_digits[i]), &(all_kl_digits[j])) ) {
+      for ( unsigned int j = i+1; j < tmpDigits.size(); j++ ) {
+        if ( check_param(tmpDigits[i], tmpDigits[j]) ) {
             // add up light yields if same bar was hit
-            npe += all_kl_digits[j]["npe"].asInt();
+            npe += tmpDigits[j].fNpe;
             // mark this hit as used so we don't multicount
-            all_kl_digits[j]["isUsed"]=1;
+            tmpDigits[j].fIsUsed = true;
         } // end check for used
       } // end loop over secondary digits
       // convert light yield to adc & set the charge
       int adc = static_cast<int>(npe / (_configJSON["KLadcConversionFactor"].asDouble()));
 
       if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
-      Json::Value digit(Json::objectValue);
+      // now set the digit
+      KLDigit theDigit;
       if (adc > adc_thresh) {
-	digit["charge_pm"] = adc;
-	digit["charge_mm"] = adc;
-	digit["kl_key"] = all_kl_digits[i]["kl_key"].asString();
-	digit["cell"] = all_kl_digits[i]["cell"].asInt();
-	digit["pmt"] = all_kl_digits[i]["pmt"].asInt();
+	theDigit.SetChargePm(adc);
+	theDigit.SetChargeMm(adc);
+	theDigit.SetKlKey(tmpDigits[i].fKLKey);
+	theDigit.SetCell(tmpDigits[i].fCell);
+	theDigit.SetPmt(tmpDigits[i].fPmt);
 
 	// store event number
-	digit["phys_event_number"] = evnum;
-	digit["part_event_number"] = evnum;
+	theDigit.SetPhysEventNumber(evnum);
+	theDigit.SetPartEventNumber(evnum);
 
 	if (fDebug) std::cout << "adc over thresh: "<< adc << std::endl;
 
-	kl_digit.append(digit);
+	klDigits->push_back(theDigit);
       }
       if (fDebug)
-          std::cout << "digit #" << ndigs << " " <<  digit["kl_key"].asString() << std::endl;
-      all_kl_digits[i]["isUsed"]=1;
+          std::cout << "digit #" << ndigs << " " <<  theDigit.GetKlKey() << std::endl;
+      tmpDigits[i].fIsUsed = true;
     } // ends if-statement
   } // ends k-loop
-  return kl_digit;
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppKLMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) const {
-  int cell1 = (*hit1)["cell"].asInt();
-  int cell2 = (*hit2)["cell"].asInt();
-  int pmt1     = (*hit1)["pmt"].asInt();
-  int pmt2     = (*hit2)["pmt"].asInt();
-  int hit_is_used = (*hit2)["isUsed"].asInt();
+bool MapCppKLMCDigitizer::check_param(tmpThisDigit& hit1, tmpThisDigit& hit2) const {
+  int cell1 = hit1.fCell;
+  int cell2 = hit2.fCell;
+  int pmt1     = hit1.fPmt;
+  int pmt2     = hit2.fPmt;
+  int hit_is_used = hit2.fIsUsed;
 
   if ( cell1 == cell2 && pmt1 == pmt2 && !hit_is_used ) {
     return true;

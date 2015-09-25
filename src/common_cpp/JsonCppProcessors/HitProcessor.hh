@@ -47,6 +47,7 @@ class HitProcessor : public ObjectProcessor<Hit<ChannelId> > {
 
 typedef HitProcessor<SciFiChannelId> SciFiHitProcessor;
 typedef HitProcessor<TOFChannelId> TOFHitProcessor;
+typedef HitProcessor<CkovChannelId> CkovHitProcessor;
 typedef HitProcessor<KLChannelId> KLHitProcessor;
 typedef HitProcessor<EMRChannelId> EMRHitProcessor;
 typedef HitProcessor<SpecialVirtualChannelId> SpecialVirtualHitProcessor;
@@ -65,6 +66,9 @@ void HitProcessor<ChannelId>::RegisterBranches() {
     this->RegisterValueBranch("charge", &_double_proc,
                         &Hit<ChannelId>::GetCharge,
                         &Hit<ChannelId>::SetCharge, true);
+    this->RegisterValueBranch("mass", &_double_proc,
+                        &Hit<ChannelId>::GetMass,
+                        &Hit<ChannelId>::SetMass, true);
     this->RegisterValueBranch("time", &_double_proc,
                         &Hit<ChannelId>::GetTime,
                         &Hit<ChannelId>::SetTime, true);

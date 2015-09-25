@@ -44,7 +44,26 @@
 
 namespace MAUS {
 
-class MapCppKLMCDigitizer : public MapBase<Json::Value> {
+/** @brief structure to hold -a temporary digit-
+ */
+typedef struct fKLDig {
+    KLChannelId* fChannelId;
+    std::string fKLKey;
+    int fCell;
+    int fPmt;
+    double fTime;
+    ThreeVector fMom;
+    Hep3Vector fPos;
+    double fEdep;
+    bool fIsUsed;
+    int fNpe;
+} tmpThisDigit;
+
+/** @brief vector storage for -all temporary digits
+ */
+typedef std::vector<fKLDig> KLTmpDigits;
+
+class MapCppKLMCDigitizer : public MapBase<Data> {
  public:
   MapCppKLMCDigitizer();
 
@@ -53,18 +72,34 @@ class MapCppKLMCDigitizer : public MapBase<Json::Value> {
 
   void _death();
 
-  void _process(Json::Value* document) const;
+  /** @brief processes MC KL hits */
+  void _process(MAUS::Data* data) const;
 
   int calculate_nphe_at_pmt(double dist, double edep) const;
 
-  Json::Value check_sanity_mc(const Json::Value& document) const;
+  /** @brief digitizes kl hits
+   * finds the kl slab corresponding to the hit
+   * propagates hit to PMTs at either end of slab
+   * digitizes the hit time
+   * the digitized hits are stored in a temporary array
+   * @param KLTmpDigits is the temporary vector storage for all digits
+   * @param the vector is of type struct tmpThisDigit 
+   */
+  KLTmpDigits make_kl_digits(KLHitArray* hits) const;
 
-  std::vector<Json::Value> make_kl_digits(Json::Value hits, Json::Value& root) const;
+  /** @brief checks for multiple hits and adds up npe yields
+   */
+  bool check_param(tmpThisDigit& hit1, tmpThisDigit& hit2) const;
 
-  Json::Value fill_kl_evt(int evnum,
-                           std::vector<Json::Value> _alldigits) const;
-
-  bool check_param(Json::Value* hit1, Json::Value* hit2) const;
+  /** @brief sets the kl digit
+   * goes through all the temporary digits
+   * weed out multiple hits
+   * set the digit data structure corresponding to the cell hit
+   * @param KLTmpDigits contains all the digits
+   */
+  void fill_kl_evt(int evnum,
+                   KLTmpDigits& tmpDigits,
+                   KLDigitArray* digitArrayPtr) const;
 
  private:
   MiceModule* geo_module;

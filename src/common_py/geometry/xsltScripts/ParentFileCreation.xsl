@@ -190,14 +190,14 @@
                 </xsl:for-each>
                 
                 
-  	         	            Module Virtuals
-                            {
-                               Volume None
-                               Position 0.0 0.0 0.0+0.1*@RepeatNumber m
-                               PropertyString SensitiveDetector Virtual
-                               PropertyBool RepeatModule2 True
-                               PropertyInt NumberOfRepeats 240
-                            }
+  	        Module Virtuals
+                {
+                Volume None
+                Position 0.0 0.0 0.0+0.5*@RepeatNumber m
+                PropertyString SensitiveDetector Virtual
+                PropertyBool RepeatModule2 True
+                PropertyInt NumberOfRepeats 48
+                }
                             
                             // Detectors
                             <xsl:for-each select="MICE_Information/Detector_Information/*/*/physvol">
@@ -222,6 +222,7 @@
                 <xsl:for-each select="MICE_Information/G4Field_Information/Dipole">
                             Module <xsl:value-of select="FieldName/@name"/>
                             {
+			    PropertyString FieldName <xsl:value-of select="FieldName/@name"/>
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:choose>
@@ -241,6 +242,7 @@
 			    <xsl:variable name="QuadName" select="FieldName/@name"/>
                             Module <xsl:value-of select="$QuadName"/>
                             {
+			    PropertyString FieldName <xsl:value-of select="$QuadName"/>
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/> 
                             Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             ScaleFactor <xsl:value-of select="ScaleFactor/@value"/>
@@ -271,6 +273,7 @@
                 <xsl:for-each select="MICE_Information/G4Field_Information/Solenoid">
                             Module <xsl:value-of select="FieldName/@name"/>
                             {
+			    PropertyString FieldName <xsl:value-of select="FieldName/@name"/>
                             Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/>
 	                    Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
                             Volume <xsl:value-of select="Volume/@name"/>
@@ -281,18 +284,18 @@
                             PropertyDouble Thickness <xsl:value-of select="Thickness/@value"/>
                             PropertyDouble InnerRadius <xsl:value-of select="InnerRadius/@value"/>
                             ScaleFactor <xsl:choose>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1_0') and boolean($mcmode)">$SSUM1Polarity*$SSUM1Current</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2_0') and boolean($mcmode)">$SSUM2Polarity*$SSUM2Current</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'CenterCoil_0') and boolean($mcmode)">$SSUCPolarity*$SSUCCurrent</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil1_0') and boolean($mcmode)">$SSUT1Polarity*$SSUT1Current</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil2_0') and boolean($mcmode)">$SSUT2Polarity*$SSUT2Current</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil_0') and boolean($mcmode)">$FCMUPolarity*$FCMUCurrent</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'FCoil_1') and boolean($mcmode)">$FCMUPolarity*$FCMMode*$FCMDCurrent</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1_1') and boolean($mcmode)">$SSDM1Polarity*$FCMMode*$SSDM1Current</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2_1') and boolean($mcmode)">$SSDM2Polarity*$FCMMode*$SSDM2Current</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'CenterCoil_1') and boolean($mcmode)">$SSDCPolarity*$FCMMode*$SSDCCurrent</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil1_1') and boolean($mcmode)">$SSDT1Polarity*$FCMMode*$SSDT1Current</xsl:when>
-                                <xsl:when test="contains(FieldName/@name, 'EndCoil2_1') and boolean($mcmode)">$SSDT2Polarity*$FCMMode*$SSDT2Current</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1_0') and boolean($mcmode)">$SSUM1Polarity*$SSUM1Current*0.52</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2_0') and boolean($mcmode)">$SSUM2Polarity*$SSUM2Current*0.5176</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'CenterCoil_0') and boolean($mcmode)">$SSUCPolarity*$SSUCCurrent*0.528</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil1_0') and boolean($mcmode)">$SSUT1Polarity*$SSUT1Current*0.529</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil2_0') and boolean($mcmode)">$SSUT2Polarity*$SSUT2Current*0.532</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil_0') and boolean($mcmode)">$FCMUPolarity*$FCMUCurrent*0.5565</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'FCoil_1') and boolean($mcmode)">$FCMUPolarity*$FCMMode*$FCMDCurrent*0.5565</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'MatchCoil1_1') and boolean($mcmode)">$SSDM1Polarity*$FCMMode*$SSDM1Current*0.52</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'MatchCoil2_1') and boolean($mcmode)">$SSDM2Polarity*$FCMMode*$SSDM2Current*0.5174</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'CenterCoil_1') and boolean($mcmode)">$SSDCPolarity*$FCMMode*$SSDCCurrent*0.52817</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil1_1') and boolean($mcmode)">$SSDT1Polarity*$FCMMode*$SSDT1Current*0.5316</xsl:when>
+                                <xsl:when test="contains(FieldName/@name, 'EndCoil2_1') and boolean($mcmode)">$SSDT2Polarity*$FCMMode*$SSDT2Current*0.5291</xsl:when>
 				<xsl:otherwise><xsl:value-of select="ScaleFactor/@name"/></xsl:otherwise>
                             </xsl:choose>
                             }

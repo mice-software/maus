@@ -39,7 +39,7 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         assert root_dir != None
         assert os.path.isdir(root_dir)
         _filename = \
-        '%s/src/map/MapCppTOFMCDigitizer/mc_test.dat' % root_dir
+        '%s/src/map/MapCppTOFMCDigitizer/mc_test.json' % root_dir
         assert os.path.isfile(_filename)
         _file = open(_filename, 'r')
         # File is open.
@@ -48,7 +48,8 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         output = self.mapper.process(spill)
         self.assertTrue("errors" in maus_cpp.converter.json_repr(output))
         # a real spill
-        spill = _file.readline().rstrip()
+        #spill = _file.readline().rstrip()
+        spill = _file.read()
         output = self.mapper.process(spill)
         doc = maus_cpp.converter.json_repr(output)
         tof_event = doc["recon_events"][0]["tof_event"]

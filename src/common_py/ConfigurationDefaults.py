@@ -253,10 +253,12 @@ reconstruction_geometry_filename = ""
 
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
-SciFiDigitizationNPECut = 1.0
-SciFiMappingFileName = "scifi_mapping_2015-06-18.txt"
-SciFiCalibrationFileName = "scifi_calibration_2015-06-18.txt"
+SciFiDigitizationNPECut = 2.0
+SciFiMappingFileName = "scifi_mapping_2015-09-11.txt"
+SciFiCalibrationFileName = "scifi_calibration_2015-09-12.txt"
 SciFiBadChannelsFileName = "scifi_bad_channels_2015-06-18.txt"
+SciFiCalibMethod = "Run" # Date/Current/Run
+SciFiCalibSrc = 7057 # exmple: "Date" - 1984-09-14 00:10:00.0    "Run" - 7057
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
 SciFiFiberConvFactor =  3047.1
@@ -412,7 +414,7 @@ Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
 Enable_V830_Unpacking = True
-Enable_VLSB_Unpacking = False
+Enable_VLSB_Unpacking = True
 Enable_VLSB_C_Unpacking = False
 Enable_DBB_Unpacking = True
 Enable_DBBChain_Unpacking = True
@@ -428,6 +430,24 @@ Enable_TOF = True
 Enable_EMR = True
 Enable_KL = True
 Enable_CKOV = True
+
+# DAQ cabling maps
+# set the source for cabling to either 'CDB' or 'file'
+# if set to 'file' the DAQ_cabling_file card will be used
+DAQ_cabling_source = "CDB"
+
+# set the method for retrieving cabling from CDB
+# options are: 'run_number' or 'date'
+# if DAQ_cabling_by is set to 'date', the DAQ_cabling_date card is used
+# Default is to get the map based on run number
+DAQ_cabling_by = "run_number"
+
+# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
+# e.g. DAQ_cabling_date = '2015-06-30 01:02:03 00:00:00'
+#   or DAQ_cabling_date = 'current'
+DAQ_cabling_date = 'current'
+
+# the DAQ_cabling_file card is used only if DAQ_cabling_source above is set to 'file'
 DAQ_cabling_file = "/files/cabling/DAQChannelMap.txt"
 DAQ_cabling_file_StepI = "/files/cabling/DAQChannelMap_preRun6541.txt"
 DAQ_hostname = 'miceraid5'
