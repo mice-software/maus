@@ -45,6 +45,11 @@ InputCppDAQOnlineData::InputCppDAQOnlineData()
 void InputCppDAQOnlineData::_birth(const std::string& jsonDataCards) {
   std::cerr << "Initialising MAUS online input" << std::endl;
   InputCppDAQData::_childbirth(jsonDataCards);
+  // frankliuao: Skip the InitFromCards() method, directly use InitFromCurrentCDB()
+  bool loaded = _map.InitFromCurrentCDB();
+  if (!loaded) {
+    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQOnlineData InitFromCurrentCDB"));
+  }
   //  JsonCpp setup
   Json::Value configJSON;   //  this will contain the configuration
   Json::Reader reader;
