@@ -83,7 +83,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
 
   if (fabs(up_field) < 0.00001) { // 10 Gaus
     _up_helical_pr_on = false;
-  } 
+  }
   if (fabs(down_field) < 0.00001) { // 10 Gaus
     _down_helical_pr_on = false;
   }
