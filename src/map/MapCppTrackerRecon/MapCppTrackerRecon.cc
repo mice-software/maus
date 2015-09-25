@@ -56,16 +56,20 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
   Json::Value* json = Globals::GetConfigurationCards();
-  _helical_pr_on   = (*json)["SciFiPRHelicalOn"].asBool();
-  _straight_pr_on  = (*json)["SciFiPRStraightOn"].asBool();
-  _kalman_on       = (*json)["SciFiKalmanOn"].asBool();
-  _patrec_on       = (*json)["SciFiPatRecOn"].asBool();
-  _size_exception  = (*json)["SciFiClustExcept"].asInt();
-  _min_npe         = (*json)["SciFiNPECut"].asDouble();
-  _use_mcs         = (*json)["SciFiKalman_use_MCS"].asBool();
-  _use_eloss       = (*json)["SciFiKalman_use_Eloss"].asBool();
-  _use_patrec_seed = (*json)["SciFiSeedPatRec"].asBool();
-  _correct_pz      = (*json)["SciFiKalmanCorrectPz"].asBool();
+  _helical_pr_on     = (*json)["SciFiPRHelicalOn"].asBool();
+  _straight_pr_on    = (*json)["SciFiPRStraightOn"].asBool();
+  _kalman_on         = (*json)["SciFiKalmanOn"].asBool();
+  _patrec_on         = (*json)["SciFiPatRecOn"].asBool();
+  _size_exception    = (*json)["SciFiClustExcept"].asInt();
+  _min_npe           = (*json)["SciFiNPECut"].asDouble();
+  _use_mcs           = (*json)["SciFiKalman_use_MCS"].asBool();
+  _use_eloss         = (*json)["SciFiKalman_use_Eloss"].asBool();
+  _use_patrec_seed   = (*json)["SciFiSeedPatRec"].asBool();
+  _correct_pz        = (*json)["SciFiKalmanCorrectPz"].asBool();
+  _acceptable_radius = (*json)["SciFiParams_Station_Radius"].asDouble();
+  _kuno_sum_T1_S5    = (*json)["SciFiKunoSumT1S5"].asDouble();
+  _kuno_sum          = (*json)["SciFiKunoSum"].asDouble();
+  _kuno_tolerance    = (*json)["SciFiKunoTolerance"].asDouble();
 
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
@@ -75,7 +79,8 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
 
   _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
 
-  _spacepoint_recon = SciFiSpacePointRec();
+  _spacepoint_recon = SciFiSpacePointRec(_acceptable_radius, _kuno_sum_T1_S5,
+                                         _kuno_sum, _kuno_tolerance );
 
   double up_field = _geometry_helper.GetFieldValue(0);
   double down_field = _geometry_helper.GetFieldValue(1);

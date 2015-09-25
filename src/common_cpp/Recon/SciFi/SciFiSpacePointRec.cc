@@ -24,9 +24,25 @@
 
 namespace MAUS {
 
-SciFiSpacePointRec::SciFiSpacePointRec() {}
+SciFiSpacePointRec::SciFiSpacePointRec() : _acceptable_radius(160.0),
+                                           _kuno_1_5(320.0),
+                                           _kuno_else(318.5),
+                                           _kuno_toler(3.0) {
+  // Do nothing
+}
 
-SciFiSpacePointRec::~SciFiSpacePointRec() {}
+SciFiSpacePointRec::SciFiSpacePointRec(double aAcceptableRadius, double aKunoSumT1S5,
+                                       double aKunoSum, double aKunoTolerance) :
+                                         _acceptable_radius(aAcceptableRadius),
+                                         _kuno_1_5(aKunoSumT1S5),
+                                         _kuno_else(aKunoSum),
+                                         _kuno_toler(aKunoTolerance) {
+  // Do nothing
+}
+
+SciFiSpacePointRec::~SciFiSpacePointRec() {
+  // Do nothing
+}
 
 void SciFiSpacePointRec::process(SciFiEvent &event) const {
   std::vector<SciFiCluster*> clusters[2][6][3];

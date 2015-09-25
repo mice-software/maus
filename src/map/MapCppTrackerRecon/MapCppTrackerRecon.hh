@@ -124,6 +124,11 @@ class MapCppTrackerRecon : public MapBase<Data> {
   double  _min_npe;
   /// Value above which reconstruction is aborted.
   int _size_exception;
+  /// Spacepoint reconstruction parameters
+  double _acceptable_radius;
+  double _kuno_sum_T1_S5;
+  double _kuno_sum;
+  double _kuno_tolerance;
   /// Pattern recognition flags
   bool _straight_pr_on;
   bool _helical_pr_on;
