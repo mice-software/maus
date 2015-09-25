@@ -18,8 +18,8 @@ case $key in
     fi
     shift
     ;;
-    -g|--use-system-gcc)
-    if [ $2 -eq 0 ] || [ $2 -eq 1 ]; then
+    --use-system-gcc)
+    if [ "$2" = true ] || [ "$2" = false ]; then
     USE_SYSTEM_GCC="$2"
     fi
     shift
@@ -29,7 +29,7 @@ shift
 done
 
 if [ -z "$USE_SYSTEM_GCC" ]; then
-  USE_SYSTEM_GCC=0
+  USE_SYSTEM_GCC=true
 fi
 
 if [ -z "$MAUS_NUM_THREADS" ]; then
@@ -49,7 +49,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     set -e
 
     # Now build libraries
-    if [ "$USE_SYSTEM_GCC" -eq 1 ]; then
+    if [ "$USE_SYSTEM_GCC" = false ]; then
         ${MAUS_ROOT_DIR}/third_party/bash/90gmp.bash -j $MAUS_NUM_THREADS
         ${MAUS_ROOT_DIR}/third_party/bash/91mpfr.bash -j $MAUS_NUM_THREADS
         ${MAUS_ROOT_DIR}/third_party/bash/92mpc.bash -j $MAUS_NUM_THREADS
