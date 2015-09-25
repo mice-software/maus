@@ -126,7 +126,8 @@ class MapCppTrackerRecon : public MapBase<Data> {
   int _size_exception;
   /// Pattern recognition flags
   bool _straight_pr_on;
-  bool _helical_pr_on;
+  bool _up_helical_pr_on;
+  bool _down_helical_pr_on;
   bool _kalman_on;
   bool _patrec_on;
 
