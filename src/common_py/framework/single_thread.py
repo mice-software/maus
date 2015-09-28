@@ -19,7 +19,8 @@ Single-threaded dataflows module.
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
-from ROOT import TProcessID
+
+from ROOT import TProcessID # pylint: disable=E0611
 
 from framework.utilities import DataflowUtilities
 
