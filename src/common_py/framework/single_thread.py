@@ -19,6 +19,7 @@ Single-threaded dataflows module.
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
+from ROOT import TProcessID
 
 from framework.utilities import DataflowUtilities
 
@@ -89,13 +90,17 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             # in the first event takes
             print("HINT: MAUS will process 1 event only at first...")
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
-            
+
             i = 0
             while len(map_buffer) != 0:
+                # Save number of objects before & reset after to stop 
+                # TRefArray overspill
+                object_number = TProcessID.GetObjectCount()
                 for event in map_buffer:
                     self.process_event(event)
                 i += len(map_buffer)
                 map_buffer = DataflowUtilities.buffer_input(emitter, 1)
+                TProcessID.SetObjectCount(object_number)
 
                 # Not Python 3 compatible print() due to backward
                 # compatability. 
