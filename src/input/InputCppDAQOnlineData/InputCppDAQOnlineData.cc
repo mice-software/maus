@@ -48,7 +48,7 @@ void InputCppDAQOnlineData::_birth(const std::string& jsonDataCards) {
   // frankliuao: Skip the InitFromCards() method, directly use InitFromCurrentCDB()
   bool loaded = _map.InitFromCurrentCDB();
   if (!loaded) {
-    throw(MAUS::Exception(Exception::recoverable, "STRING", 
+    throw(MAUS::Exception(Exception::recoverable, "STRING",
                           "InputCppDAQOnlineData InitFromCurrentCDB"));
   }
   //  JsonCpp setup

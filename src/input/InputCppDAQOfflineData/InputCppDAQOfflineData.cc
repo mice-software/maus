@@ -91,7 +91,7 @@ void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   // Initialize the map from data cards
   bool loaded = _map.InitFromCards(configJSON);
   if (!loaded) {
-    throw(MAUS::Exception(Exception::recoverable, "STRING", 
+    throw(MAUS::Exception(Exception::recoverable, "STRING",
                           "InputCppDAQOfflineData InitFromCards"));
   }
 
