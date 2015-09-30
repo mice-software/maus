@@ -53,6 +53,9 @@ class SciFiSpacePointRec {
  public:
   SciFiSpacePointRec();
 
+  SciFiSpacePointRec(double aAcceptableRadius, double aKunoSumT1S5,
+                     double aKunoSum, double aKunoTolerance);
+
   ~SciFiSpacePointRec();
 
   void process(SciFiEvent &evt) const;
@@ -84,12 +87,25 @@ class SciFiSpacePointRec {
 
   bool duplet_within_radius(SciFiCluster* candidate_A,
                             SciFiCluster* candidate_B) const;
+
+  /** Return the radius cut */
+  double get_acceptable_radius() { return _acceptable_radius; }
+
+  /** Return the Kuno conjecture sum for Tracker 1 Station 5 */
+  double get_kuno_1_5() { return _kuno_1_5; }
+
+  /** Return the Kuno conjecture sum for the other tracker stations */
+  double get_kuno_else() { return _kuno_else; }
+
+  /** Return the Kuno conjecture tolerance */
+  double get_kuno_tolerance() { return _kuno_toler; }
+
  private:
   /// This is the acceptable radius for any duplet.
-  static const double _acceptable_radius = 160; // mm
-  static const double _kuno_1_5   = 320.0;
-  static const double _kuno_else  = 318.5;
-  static const double _kuno_toler = 3.0;
+  double _acceptable_radius; // mm
+  double _kuno_1_5;
+  double _kuno_else;
+  double _kuno_toler;
 };  // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

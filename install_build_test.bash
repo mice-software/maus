@@ -72,9 +72,28 @@ case $key in
     fi
     shift
     ;;
+    --use-system-gcc)
+    if [ "$2" = true ] || [ "$2" = false ]; then
+    USE_SYSTEM_GCC="$2"
+    fi
+    shift
+    ;;
 esac
 shift
 done
+
+if [ -z "$USE_SYSTEM_GCC" ]; then
+  USE_SYSTEM_GCC=true
+fi
+if [ "$USE_SYSTEM_GCC" = true ]; then
+  echo
+  echo "Using system GCC"
+  echo
+else
+  echo
+  echo "Will build GCC as a third party"
+  echo
+fi
 
 if [ -z "$MAUS_NUM_THREADS" ]; then
   MAUS_NUM_THREADS=1
@@ -136,9 +155,9 @@ else
     source env.sh 2>>$FILE_STD 1>>$FILE_STD
     echo "Building third party libraries (takes a while...)"
     if [ $MAUS_BUILD_VERBOSITY -eq 0 ]; then
-        ./third_party/build_all.bash -j $MAUS_NUM_THREADS 2>>$FILE_STD 1>>$FILE_STD
+        ./third_party/build_all.bash -j $MAUS_NUM_THREADS --use-system-gcc $USE_SYSTEM_GCC 2>>$FILE_STD 1>>$FILE_STD
     else
-        ./third_party/build_all.bash -j $MAUS_NUM_THREADS 2>&1 | tee -a $FILE_STD
+        ./third_party/build_all.bash -j $MAUS_NUM_THREADS --use-system-gcc $USE_SYSTEM_GCC 2>&1 | tee -a $FILE_STD
     fi
     echo "Resource the environment (catches the new ROOT version)"
     source env.sh 2>>$FILE_STD 1>>$FILE_STD

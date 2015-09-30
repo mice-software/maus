@@ -195,7 +195,8 @@ class PatternRecognition {
      *  was calculated offline for straight and helical tracks
      *
      */
-    bool check_time_consistency(const std::vector<SciFiSpacePoint*>) const;
+    bool check_time_consistency(const std::vector<SciFiSpacePoint*>,
+                                                            int tracker_id) const;
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -260,11 +261,25 @@ class PatternRecognition {
     /** @brief Set whether or not to use straight pat rec */
     void set_straight_pr_on(const bool straight_pr_on) { _straight_pr_on = straight_pr_on; }
 
+//    /** @brief Return the whether helical pat rec is on */
+//    bool get_helical_pr_on() { return _helical_pr_on; }
+//
+//    /** @brief Set whether or not to use helical pat rec */
+//    void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
+
     /** @brief Return the whether helical pat rec is on */
-    bool get_helical_pr_on() { return _helical_pr_on; }
+    bool get_up_helical_pr_on() { return _up_helical_pr_on; }
 
     /** @brief Set whether or not to use helical pat rec */
-    void set_helical_pr_on(const bool helical_pr_on) { _helical_pr_on = helical_pr_on; }
+    void set_up_helical_pr_on(const bool helical_pr_on) { _up_helical_pr_on = helical_pr_on; }
+
+
+    /** @brief Return the whether helical pat rec is on */
+    bool get_down_helical_pr_on() { return _down_helical_pr_on; }
+
+    /** @brief Set whether or not to use helical pat rec */
+    void set_down_helical_pr_on(const bool helical_pr_on) { _down_helical_pr_on = helical_pr_on; }
+
 
     /** @brief Return the verbosity level */
     bool get_verbosity() { return _verb; }
@@ -283,7 +298,9 @@ class PatternRecognition {
 
   private:
     bool _straight_pr_on;       /** Straight pattern recogntion on or off */
-    bool _helical_pr_on;        /** Helical pattern recogntion on or off */
+//    bool _helical_pr_on;        /** Helical pattern recogntion on or off */
+    bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
+    bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
     int _n_trackers;            /** Number of trackers */
     int _n_stations;            /** Number of stations per tracker */

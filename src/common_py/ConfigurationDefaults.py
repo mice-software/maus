@@ -253,6 +253,9 @@ reconstruction_geometry_filename = ""
 
 # scifi tracker digitization
 #SciFiDeadChanFName = ""
+SciFiKunoSum = 318.5  # Sum of channel #s in 3 planes if they form a spoint
+SciFiKunoSumT1S5 = 320.0 # Sum of channel #s in 3 planes if they form a spoint for T1 S5
+SciFiKunoTolerance = 3.0 # Kuno conjecture tolerance
 SciFiDigitizationNPECut = 2.0
 SciFiMappingFileName = "scifi_mapping_2015-09-11.txt"
 SciFiCalibrationFileName = "scifi_calibration_2015-09-12.txt"
@@ -288,7 +291,7 @@ SciFiPRStraightOn = True # Flag to turn on the tracker straight pattern recognit
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
-SciFiRadiusResCut = 150.0 # Helix radius cut (mm)
+SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
 SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
 SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
 SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
@@ -296,7 +299,7 @@ SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recogni
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiDarkCountProababilty = 0.017 #probability of dark count due to thermal electron
 SciFiParams_Pitch = 1.4945
-SciFiParams_Station_Radius = 160.
+SciFiParams_Station_Radius = 160. # Used as cut by SpacePointReconstruction
 SciFiParams_RMS = 370.
 # Parameters used for MCS and E loss correction
 #SciFiParams_Z = 5.61291

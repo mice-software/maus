@@ -82,7 +82,7 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   // Comfigure the DBB Chain (chain of 6 EMR boards) data processor.
   initProcessor(_DBBChainFragmentProc_cpp, configJSON);
 
-  // frankliuao: moved the _map.InitFromCards(configJSON) to InputCppDAQOnlineData, 
+  // frankliuao: moved the _map.InitFromCards(configJSON) to InputCppDAQOnlineData
   // and InputCppDAQOfflineData. There, daq_cabling_source is forced to be "CDB"
 
   // Set the map (a static data member) of all the processors.
