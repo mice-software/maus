@@ -172,6 +172,20 @@ fi
 # Check new ROOT version alone is used
 source ${MAUS_THIRD_PARTY}/third_party/build/root/bin/thisroot.sh
 
+# Check if the needed empty directories are present, if not make them
+if [ ! -d ${MAUS_ROOT_DIR}/build ]; then
+    mkdir ${MAUS_ROOT_DIR}/build
+fi
+if [ ! -d ${MAUS_ROOT_DIR}/tmp ]; then
+    mkdir ${MAUS_ROOT_DIR}/tmp
+fi
+if [ ! -d ${MAUS_ROOT_DIR}/tests/integrations/plots ]; then
+    mkdir ${MAUS_ROOT_DIR}/tests/integration/plots
+fi
+if [ ! -d ${MAUS_ROOT_DIR}/tests/py_unit/test_geometry/testCases/testGDMLtoMAUSModule ]; then
+    mkdir ${MAUS_ROOT_DIR}/tests/py_unit/test_geometry/testCases/testGDMLtoMAUSModule
+fi
+
 echo "Cleaning the MAUS build state"
 if [ $MAUS_BUILD_VERBOSITY -eq 0 ]; then
     scons -c 2>>$FILE_STD 1>>$FILE_STD
