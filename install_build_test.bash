@@ -174,16 +174,16 @@ source ${MAUS_THIRD_PARTY}/third_party/build/root/bin/thisroot.sh
 
 # Check if the needed empty directories are present, if not make them
 if [ ! -d ${MAUS_ROOT_DIR}/build ]; then
-    mkdir ${MAUS_ROOT_DIR}/build
+    mkdir ${MAUS_ROOT_DIR}/build &>/dev/null
 fi
 if [ ! -d ${MAUS_ROOT_DIR}/tmp ]; then
-    mkdir ${MAUS_ROOT_DIR}/tmp
+    mkdir ${MAUS_ROOT_DIR}/tmp &>/dev/null
 fi
 if [ ! -d ${MAUS_ROOT_DIR}/tests/integrations/plots ]; then
-    mkdir ${MAUS_ROOT_DIR}/tests/integration/plots
+    mkdir ${MAUS_ROOT_DIR}/tests/integration/plots &>/dev/null
 fi
 if [ ! -d ${MAUS_ROOT_DIR}/tests/py_unit/test_geometry/testCases/testGDMLtoMAUSModule ]; then
-    mkdir ${MAUS_ROOT_DIR}/tests/py_unit/test_geometry/testCases/testGDMLtoMAUSModule
+    mkdir ${MAUS_ROOT_DIR}/tests/py_unit/test_geometry/testCases/testGDMLtoMAUSModule &>/dev/null
 fi
 
 echo "Cleaning the MAUS build state"
