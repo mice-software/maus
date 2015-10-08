@@ -143,6 +143,10 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
   */
   void _childbirth(const std::string& pJSONConfig);
 
+  /** The DAQ channel map object.
+  * It is used to group all measurements belonging to a given detector.*/
+  DAQChannelMap _map;
+
  private:
 
   void _birth(const std::string& pJSONConfig) {
@@ -168,10 +172,6 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
 
   /** Process manager object. */
   MDprocessManager _dataProcessManager;
-
-  /** The DAQ channel map object.
-  * It is used to group all measurements belonging to a given detector.*/
-  DAQChannelMap _map;
 
   /** Processor for TDC particle event data. */
   V1290CppDataProcessor  *_v1290PartEventProc_cpp;

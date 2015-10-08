@@ -37,6 +37,30 @@ namespace MAUS {
   virtual void TearDown() {}
 };
 
+TEST_F(SciFiSpacePointRecTest, test_default_constructor) {
+  SciFiSpacePointRec test;
+  double acceptable_radius = 160.0;
+  double kuno_1_5 = 320.0;
+  double kuno_else = 318.5;
+  double kuno_tolerance = 3.0;
+  EXPECT_EQ(acceptable_radius, test.get_acceptable_radius());
+  EXPECT_EQ(kuno_1_5, test.get_kuno_1_5());
+  EXPECT_EQ(kuno_else, test.get_kuno_else());
+  EXPECT_EQ(kuno_tolerance, test.get_kuno_tolerance());
+}
+
+TEST_F(SciFiSpacePointRecTest, test_parameter_constructor) {
+  double acceptable_radius = 160.0;
+  double kuno_1_5 = 320.0;
+  double kuno_else = 318.5;
+  double kuno_tolerance = 3.0;
+  SciFiSpacePointRec test(acceptable_radius, kuno_1_5, kuno_else, kuno_tolerance);
+  EXPECT_EQ(acceptable_radius, test.get_acceptable_radius());
+  EXPECT_EQ(kuno_1_5, test.get_kuno_1_5());
+  EXPECT_EQ(kuno_else, test.get_kuno_else());
+  EXPECT_EQ(kuno_tolerance, test.get_kuno_tolerance());
+}
+
 TEST_F(SciFiSpacePointRecTest, test_process) {
   int tracker = 1;
   int station = 2;

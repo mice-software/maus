@@ -139,6 +139,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         for node in xmldoc.getElementsByTagName("gdml"):
             if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
                 node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
+                # print "Schema location corrected for ",gdmlfile
         fout = open(os.path.join(self.path_out, gdmlfile), 'w')
         xmldoc.writexml(fout)
         fout.close()
@@ -150,16 +151,16 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         This method parses the GDML file into memoty and alters the location
         of the file names to absolute paths.
         """
-        docfile = os.path.join(self.path_in, gdmlfile)
+        docfile = os.path.join(self.path_out, gdmlfile)
         print "Reviewing content of ", docfile
         xmldoc = libxml2.parseFile(docfile)
         for vol in xmldoc.xpathEval("gdml/structure/volume/physvol"):
             if len(vol.xpathEval("file")) > 0:
                 filenode = vol.xpathEval("file")[0]
                 filename = filenode.prop("name")
-                if filename.find(self.path_in) == -1:
+                if filename.find(self.path_out) == -1:
                     # add the path to the name
-                    newname = os.path.join(self.path_in, filename)
+                    newname = os.path.join(self.path_out, filename)
                     # print "Replacing ", filename, " with ", newname
                     filenode.setProp("name", newname)
         gfile = open(os.path.join(self.path_out, gdmlfile),'w')
@@ -174,7 +175,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         This method parses the GDML file into memoty and alters the location
         of the file names to absolute paths.
         """
-        docfile = os.path.join(self.path_in, gdmlfile)
+        docfile = os.path.join(self.path_out, gdmlfile)
         # print "Reviewing content of ",docfile
         xmldoc = libxml2.parseFile(docfile)
         for vol in xmldoc.xpathEval("gdml/structure/volume/physvol"):
@@ -186,12 +187,12 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                     newname = os.path.join(self.path_out, filename)
                     # print "Replacing ",filename," with ",newname
                     filenode.setProp("name", newname)
-        # print "Saving to ",os.path.join(self.path_out, gdmlfile)
+        # print "Saving to",os.path.join(self.path_out, gdmlfile)
         f = open(os.path.join(self.path_out, gdmlfile),'w')
         xmldoc.saveTo(f)
         f.close()
         xmldoc.freeDoc()
-                
+                 
     def add_other_info(self): #pylint: disable = R0914, R0915, C0301
         """
         @method add_other_information
@@ -655,31 +656,35 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             
         # if self.formatted == False:
         print self.configuration_file
-        # self.format_schema_location(self.configuration_file)
+        self.format_schema_location(self.configuration_file)
         self.correct_gdml_locations(self.configuration_file)
         self.addDiffuserIrises()
         # self.merge_maus_info(self.configuration_file)
         print "Formatted Configuration File"
         self.maus_info_to_gdml()
         if self.tracker_file != None:
-            # self.format_check(self.tracker_file)
+            self.format_check(self.tracker_file)
             if self.formatted == False:
                 print self.tracker_file
+                self.format_schema_location(self.tracker_file)
                 self.correct_gdml_locations(self.tracker_file)
-            print "Formatted cooling channel and trackers"
+                # print "Formatted cooling channel and trackers"
         for module in self.modulefiles:
-            # self.format_check(module)
+            self.format_check(module)
             if self.formatted == False:
+                self.format_schema_location(module)
                 self.correct_gdml_locations(module)
-            # print "Formatted module files"
+                # print "Formatted module file ",module
         for module in self.detmodulefiles:
             # self.format_check(module)
             if self.formatted == False:
+                self.format_schema_location(module)
                 self.correct_gdml_locations(module)
-            # print "Formatted module files"
+                # print "Formatted detector module file ",module
         noofstepfiles = len(self.stepfiles)
         for num in range(0, noofstepfiles):
             self.format_schema_location(self.stepfiles[num])
+            # print "Formatted step file ",self.stepfiles[num]
             # self.correct_gdml_locations(self.stepfiles[num])
             
         
