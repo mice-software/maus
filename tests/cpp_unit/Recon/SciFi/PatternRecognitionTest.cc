@@ -93,7 +93,8 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   PatternRecognition pr;
   pr.set_parameters_to_default();
   EXPECT_TRUE(pr._straight_pr_on);
-  EXPECT_TRUE(pr._helical_pr_on);
+  EXPECT_TRUE(pr._up_helical_pr_on);
+  EXPECT_TRUE(pr._down_helical_pr_on);
   EXPECT_EQ(0, pr._verb);
   EXPECT_EQ(2, pr._n_trackers);
   EXPECT_EQ(5, pr._n_stations);
@@ -324,7 +325,8 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger) {
   spnts[17] = sp1;
 
   // Perform the recon
-  pr.set_helical_pr_on(true);
+  pr.set_up_helical_pr_on(true);
+  pr.set_down_helical_pr_on(true);
   pr.set_straight_pr_on(false);
   pr.process(evt1);
 

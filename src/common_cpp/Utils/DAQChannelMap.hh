@@ -115,6 +115,7 @@ class DAQChannelMap {
 
   /// Not implemented.
   bool InitFromCDB();
+  bool InitFromCurrentCDB();
 
   /* interface to the python get_tof_cabling module */
   void GetCabling(std::string devname);
