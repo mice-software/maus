@@ -5,6 +5,11 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v1.1.1
+  This is a patch release for MLCR operations
+    - Bug fix in channel map loading for online operation
+    - Bug fixes in geometry parent file creation, gdml schema url handling
+    - SciFi reconstruction distinguishes between fields on/off in either solenoid
 MAUS-v1.1.0
   The following changes were made:
     - CKOV MC digitizer added
