@@ -14,6 +14,11 @@ filename_mash=cdb${version}.tar.gz-${unique_id}/${filename}
 # as of version 1.1.2 the tarballs are in Janusz's branch
 url=http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-python/download/head:/${filename_mash}
 
+echo
+echo 'INFO: Installing third party library CDB' $version
+echo '--------------------------------------------------'
+echo
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then

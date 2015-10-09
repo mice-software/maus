@@ -3,6 +3,11 @@
 stagedir=${MAUS_THIRD_PARTY}/third_party/source/
 destdir=${MAUS_THIRD_PARTY}/third_party/install/share/test_data/
 
+echo
+echo 'INFO: Installing test data'
+echo '--------------------------'
+echo
+
 # First get the old tracker cosmic gdc data file
 echo "INFO: Getting test scifi cosmic data"
 gdc_file="gdc1901.001"

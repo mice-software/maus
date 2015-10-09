@@ -4,6 +4,11 @@ directory=gsl-1.15
 filename=${directory}.tar.gz 
 url=http://ftp.gnu.org/pub/gnu/gsl/${filename}
 
+echo
+echo 'INFO: Installing third party library GSL 1.15'
+echo '---------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

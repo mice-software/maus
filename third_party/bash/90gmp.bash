@@ -3,6 +3,11 @@ directory=gmp-6.0.0
 filename=${directory}a.tar.bz2
 url=https://gmplib.org/download/gmp/${filename}
 
+echo
+echo 'INFO: Installing third party library GMP 6.0.0'
+echo '----------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

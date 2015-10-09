@@ -4,6 +4,11 @@ directory=Python-${version}
 filename=${directory}.tgz
 url=http://www.python.org/ftp/python/${version}/${filename}
 
+echo
+echo 'INFO: Installing third party library Python' $version
+echo '---------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

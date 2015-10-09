@@ -4,6 +4,11 @@ directory=expat-2.1.0
 filename=${directory}.tar.gz 
 url=http://downloads.sourceforge.net/expat/${filename}
 
+echo
+echo 'INFO: Installing third party library Expat 2.1.0'
+echo '------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

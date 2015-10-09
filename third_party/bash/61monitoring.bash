@@ -2,6 +2,11 @@ directory=monitor
 filename=lib${directory}.tarz
 url=http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.1.0/${filename}
 
+echo
+echo 'INFO: Installing third party library libmonitor'
+echo '-----------------------------------------------'
+echo
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     cd ${MAUS_ROOT_DIR}/third_party/source

@@ -3,7 +3,14 @@
 version=1
 filename=beamline_fieldmaps_v$version.tar.gz
 url=http://micewww.pp.rl.ac.uk/maus/$filename
+
+echo
+echo 'INFO: Installing beamline field maps' $version
+echo '----------------------------------------------'
+echo
+
 echo $version $filename $url
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then

@@ -3,6 +3,11 @@ directory=mpfr-3.1.3
 filename=${directory}.tar.gz
 url=http://www.mpfr.org/mpfr-current/${filename}
 
+echo
+echo 'INFO: Installing third party library MPFR 3.1.3'
+echo '-----------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"
