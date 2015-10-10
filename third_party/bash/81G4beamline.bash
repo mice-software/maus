@@ -5,7 +5,7 @@ filename=${directory}.tgz
 url=http://www.muonsinternal.com/muons3/g4beamline/${filename}
 
 echo
-echo 'INFO: Installing third party library G4BeamLine 2.16'
+echo 'INFO: Installing third party library G4BeamLine 2.12'
 echo '----------------------------------------------------'
 echo
 
