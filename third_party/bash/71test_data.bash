@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-stagedir=${MAUS_THIRD_PARTY}/third_party/source/
+stagedir=${MAUS_THIRD_PARTY}/third_party/source
 destdir=${MAUS_THIRD_PARTY}/third_party/install/share/test_data/
 
 echo
@@ -11,20 +11,16 @@ echo
 # First get the old tracker cosmic gdc data file
 echo "INFO: Getting test scifi cosmic data"
 gdc_file="gdc1901.001"
-wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}
-wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}.md5
-md5sum -c ${gdc_file}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${gdc_file}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
-
-if [ -d "$destdir" ]
+if [ -e "${destdir}/${gdc_file}" ]
 then
-    echo "INFO: $destdir exists"
+    echo "INFO: Found tracker cosmic data file in test data directory"
 else
-    mkdir -p $destdir
-    echo "INFO: making $destdir"
+    echo "INFO: Tracker cosmic data file doesn't exist.  Downloading..."
+    wget --directory-prefix=${destdir} http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}
 fi
 
-mv $gdc_file $destdir
-mv ${gdc_file}.md5 $destdir
+cd $destdir
+md5sum -c ${gdc_file}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${gdc_file}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
 
 # Now get the run data
 if [ "$#" -gt 0 ]; then
