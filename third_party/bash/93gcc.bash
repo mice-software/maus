@@ -3,6 +3,11 @@ directory=gcc-4.9.3
 filename=${directory}.tar.gz
 url=ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-4.9.3/${filename}
 
+echo
+echo 'INFO: Installing third party library GCC 4.9.3'
+echo '----------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

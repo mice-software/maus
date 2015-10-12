@@ -13,7 +13,7 @@ captionpos=b% caption at bottom
 
 \chapter{G4beamline-MAUS Integration}
 
-This chapter describes how to run G4beamline as a third-party app with MAUS. G4beamline is used to model the MICE beam line from the target to the Geneva 1 counter which is just upstream of D2. It provides a realistic beam desciption which can be used to seed downstream simulations in MAUS. The user must include the mapper MapPyBeamlineSimulation.py in simulate\_mice.py to use G4beamline to create MAUS primaries. Also the mapper MapPyBeamMaker must be commented out to prevent two beams, one from G4beamline and one gaussian, being created. The beam line settings can be controlled with the dictionary g4bl (table \ref{table}) in the MAUS datacard. 
+This chapter describes how to run G4beamline as a third-party app with MAUS. G4beamline is used to model the MICE beam line from the target to a point upstream of the second quad triplet (upstream of Q4). It provides a realistic beam desciption which can be used to seed downstream simulations in MAUS. To generate MAUS primaries with G4beamline the script \verb+simulate\_mice\_G4BL.py+ is used instead of the usual \verb+simulate\_mice.py+ script. The beam line settings can be controlled with the dictionary g4bl (table \ref{table}) in the MAUS datacard. 
 
 \begin{table}
 \caption{G4BL parameters}
@@ -43,27 +43,23 @@ file\_path & Path to G4BL input \\
 \hline
 get\_magnet\_currents\_pa\_cdb & If set to True all magnet currents and proton absorber thickness will be retrieved from the CDB and written to the G4BL configuration file for the run number given in this dictionary \\
 \hline
+random\_seed & Sets the random seed for G4beamline \\
+\hline 
 \end{tabular}
 \label{table}
 \end{table}
 
 \paragraph{}
 
-The default configuration variables simulate a 6$\pi$ 200 MeV/c positive beam using the Geneva 1 counter as the interface point. This can be used as input for the MAUS Step IV geometry provided by the Geometry group. To generate MAUS primaries for beams of different momenta or at difference interfaces (i.e. for different MAUS geometries) these variables must be changed accordingly. 
+The default configuration variables simulate a 6$\pi$ 200 MeV/c positive beam using a point 1 m downstream of D2 as the interface point. This can be used as input for the MAUS Step IV geometry provided by the Geometry group. To generate MAUS primaries for beams of different momenta or at difference interfaces (i.e. for different MAUS geometries) these variables must be changed accordingly. 
 
 \paragraph{}
 
-The output of this mapper is a json document of MAUS primaries. This is passed directly to MapPyBeamMaker.py and so simulatations of the entire MICE beam line from end-to-end can be run. However given the requisite time required to complete such a simulation this is not recommended. Large scale production jobs will be run on the Grid using this mapper to create beam libraries. These are publically available from (details to be decided).  
+The output of this mapper is a json document of MAUS primaries. This is passed directly to MapCppSimulation and so simulatations of the entire MICE beam line from end-to-end can be run. However given the requisite time required to complete such a simulation this is not recommended. Large scale production jobs will be run on the Grid using this mapper to create beam libraries. These are publically available from \url{http://www.ppe.gla.ac.uk/~jnugent/Grid_Files/}. Download the relevant beam file which will contain a list of Grid addresses for files stored on a Grid storage element (SE). You will be required to either run a Grid job to access these files or pull them from the SE to your local area to work on them. For information on working with the Grid see \url{https://www.gridpp.ac.uk/php/support/otherscihelp.php#3}.  
 
 \paragraph{}
 
-The output json document from this mapper is called G4BLoutput.json and is  written in whichever directory simulate\_mice.py was run. It can be used directly with the inputter InputPyJSON.py. To use this include the inputter in simulate\_mice.py and set the path to G4BLoutput.json in the MAUS datacard using the variable \verb+input_json_file_name+. With the beam description set as shown above a MAUS simulation with an input beam from G4beamline can be run with:
-
-\begin{verbatim}
-./simulate_mice.py --configuration_file MAUS_Datacard.py
-\end{verbatim}
-
-Alternatively the file downloaded from the beam library will be in the same format and can be used similarly with the same inputter.
+The output json document from this mapper is called G4BLoutput.json and is  written in whichever directory \verb+simulate\_mice\_G4BL.py+ was run. To run MAUS using this file as input the script \verb+simulate\_beam.py+ can be used. The path to G4BLoutput.json must be set in the MAUS datacard using the variable \verb+input_json_file_name+. 
 
 
 

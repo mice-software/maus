@@ -157,7 +157,7 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
 
-    return 0;
+    nPartEvts = 0;
   }
   catch (Exception exc) {
     Squeak::mout(Squeak::error) << exc.GetLocation() << ": "

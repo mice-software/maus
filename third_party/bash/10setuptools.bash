@@ -4,6 +4,11 @@ directory=setuptools-0.6c11
 filename=${directory}-py2.7.egg
 url=http://pypi.python.org/packages/2.7/s/setuptools/${filename}
 
+echo
+echo 'INFO: Installing third party library Python Setup Tools 0.6c11'
+echo '--------------------------------------------------------------'
+echo
+
 my_prefix=/install
 my_destdir=${MAUS_ROOT_DIR}/third_party
 

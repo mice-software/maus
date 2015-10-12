@@ -3,6 +3,11 @@ directory=flex-2.5.37
 filename=${directory}.tar.gz
 url=http://sourceforge.net/projects/flex/files/${filename}
 
+echo
+echo 'INFO: Installing third party library Flex 2.5.37'
+echo '------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

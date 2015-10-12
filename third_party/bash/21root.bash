@@ -3,6 +3,11 @@ directory=root_v5.34.30
 filename=${directory}.source.tar.gz 
 url=ftp://root.cern.ch/root/${filename}
 
+echo
+echo 'INFO: Installing third party library ROOT 5.34.30'
+echo '-------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

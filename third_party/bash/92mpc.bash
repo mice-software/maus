@@ -3,6 +3,11 @@ directory=mpc-1.0.3
 filename=${directory}.tar.gz
 url=ftp://ftp.gnu.org/gnu/mpc/${filename}
 
+echo
+echo 'INFO: Installing third party library MPC 1.0.3'
+echo '----------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

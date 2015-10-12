@@ -6,6 +6,11 @@ directory=libxslt-${version}
 filename=${directory}.tar.gz
 url=http://xmlsoft.org/sources/${filename}
 
+echo
+echo 'INFO: Installing third party library libxslt' $version
+echo '------------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

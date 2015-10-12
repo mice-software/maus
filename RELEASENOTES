@@ -5,6 +5,11 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v1.2.0
+  The following changes were made:
+    - TOF Cpp reducer added
+    - Third party libraries cleaned up and build output improved
+    - G4Beamline updates
 MAUS-v1.1.1
   This is a patch release for MLCR operations
     - Bug fix in channel map loading for online operation
