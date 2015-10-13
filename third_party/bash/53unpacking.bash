@@ -4,7 +4,7 @@
 
 directory=unpacking-mice
 filename=${directory}_3.tarz
-url=http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.1.0/${filename}
+url=http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.2.0/${filename}
 
 echo
 echo 'INFO: Installing third party library Unpacking 3'
