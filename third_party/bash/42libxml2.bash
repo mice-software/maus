@@ -6,6 +6,11 @@ directory=libxml2-${version}
 filename=${directory}.tar.gz
 url=http://xmlsoft.org/sources/${filename}
 
+echo
+echo 'INFO: Installing third party library libxml' $version
+echo '--------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

@@ -156,6 +156,10 @@ void MapCppTrackerRecon::_death() {
 void MapCppTrackerRecon::_process(Data* data) const {
   Spill& spill = *(data->GetSpill());
 
+  /* return if not physics spill */
+  if (spill.GetDaqEventType() != "physics_event")
+    return;
+
   if (spill.GetReconEvents()) {
     for (unsigned int k = 0; k < spill.GetReconEvents()->size(); k++) {
       SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();

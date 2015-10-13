@@ -36,8 +36,8 @@ namespace MAUS {
     virtual void _birth(const std::string&) {}
     virtual void _death() {}
 
-    virtual std::string* _process(std::string* t) {
-      return new std::string(*t);
+    virtual void _process(std::string* t) {
+      this->_output = new std::string(*t);
   }
 
   private:
@@ -50,7 +50,7 @@ namespace MAUS {
     MyReducer_maus_exception() : MyReducer() {}
 
   private:
-    virtual std::string* _process(std::string* t) {
+    virtual void _process(std::string* t) {
       throw MAUS::Exception(MAUS::Exception::recoverable,
            "Expected Test MAUS::Exception in _process",
            "std::string* _process(std::string* t) const");
@@ -62,7 +62,7 @@ namespace MAUS {
     MyReducer_exception() : MyReducer() {}
 
   private:
-    virtual std::string* _process(std::string* t) {
+    virtual void _process(std::string* t) {
       throw std::exception();
     }
   };
@@ -72,7 +72,7 @@ namespace MAUS {
     MyReducer_otherexcept() : MyReducer() {}
 
   private:
-    virtual std::string* _process(std::string* t) {throw 17;}
+    virtual void _process(std::string* t) {throw 17;}
   };
 
 

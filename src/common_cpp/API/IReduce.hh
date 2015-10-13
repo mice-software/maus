@@ -52,7 +52,7 @@ namespace MAUS {
      * \param T* Pointer to the input data
      * \return T* Pointer to the output data
      */
-    virtual T_OUT* process(T_IN* t) = 0;
+    virtual void process(T_IN* t) = 0;
   };
 
 }// end of namespace

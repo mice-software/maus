@@ -9,6 +9,11 @@ sourcefile=${sourcedir}/${filename}
 libdir=${MAUS_THIRD_PARTY}/third_party/install/lib/
 destdir=${libdir}/${dirname}
 
+echo
+echo 'INFO: Installing third party library MAUS Apps' $version
+echo '--------------------------------------------------------'
+echo
+
 # the point of staging to third_party/source/ is that then this will get 
 # included in the release tarball (which pulls from third_party/source/)
 

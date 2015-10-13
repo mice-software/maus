@@ -28,22 +28,22 @@ namespace MAUS {
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::ReduceBase(const std::string& s)
-          : IReduce<T_IN, T_OUT>(), ModuleBase(s) {
-  }
+  : IReduce<T_IN, T_OUT>(), ModuleBase(s), _output(NULL) {}
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::ReduceBase(const ReduceBase& rb)
-          : IReduce<T_IN, T_OUT>(), ModuleBase(rb._classname) {
+  : IReduce<T_IN, T_OUT>(), ModuleBase(rb._classname) {
+    if (rb._output)
+      _output = new T_OUT(*(rb._output));
   }
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::~ReduceBase() {}
 
   template <typename T_IN, typename T_OUT>
-  T_OUT* ReduceBase<T_IN, T_OUT>::process(T_IN* t_in) {
+  void ReduceBase<T_IN, T_OUT>::process(T_IN* t_in) {
     if (!t_in) { throw NullInputException(_classname); }
-    T_OUT* t_out = _process(t_in);
-    return t_out;
+    this->_process(t_in);
   }
 
   template <typename T_IN, typename T_OUT>
@@ -53,7 +53,8 @@ namespace MAUS {
         // this function owns cpp_in; py_input is still owned by caller
         // (unwrap performed a deep copy and did any necessary type conversion)
         T_IN* cpp_in = PyObjectWrapper::unwrap<T_IN>(py_input);
-        cpp_out = _process(cpp_in);
+        _process(cpp_in);
+        cpp_out = _output;
         delete cpp_in;
     } catch (std::exception& e) {
       PyErr_SetString(PyExc_RuntimeError, e.what());

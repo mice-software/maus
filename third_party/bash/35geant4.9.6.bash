@@ -5,6 +5,11 @@ directory=geant4.9.6.p02
 filename=${directory}.tar.gz
 url=http://www.geant4.org/geant4/support/source/${filename}
 
+echo
+echo 'INFO: Installing third party library GEANT 4.9.6.p02'
+echo '----------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"
