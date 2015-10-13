@@ -28,12 +28,16 @@ esac
 shift
 done
 
+# Set default to build GCC as a third party
 if [ -z "$USE_SYSTEM_GCC" ]; then
-  USE_SYSTEM_GCC=true
+    USE_SYSTEM_GCC=false
+fi
+if [ "$USE_SYSTEM_GCC" != true ] && [ "$USE_SYSTEM_GCC" != false ]; then
+    USE_SYSTEM_GCC=false
 fi
 
 if [ -z "$MAUS_NUM_THREADS" ]; then
-  MAUS_NUM_THREADS=1
+    MAUS_NUM_THREADS=1
 fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
