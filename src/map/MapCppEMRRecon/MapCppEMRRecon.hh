@@ -39,7 +39,6 @@
 #include "Utils/EMRChannelMap.hh"
 #include "Utils/EMRCalibrationMap.hh"
 #include "Utils/EMRAttenuationMap.hh"
-#include "Utils/EMRGeometryMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
