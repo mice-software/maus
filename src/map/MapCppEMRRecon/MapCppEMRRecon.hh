@@ -39,6 +39,7 @@
 #include "Utils/EMRChannelMap.hh"
 #include "Utils/EMRCalibrationMap.hh"
 #include "Utils/EMRAttenuationMap.hh"
+#include "Utils/EMRGeometryMap.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
@@ -80,7 +81,8 @@ struct TrackData {
   double _total_charge_sa;
   double _charge_ratio_ma;
   double _charge_ratio_sa;
-  double _plane_density;
+  double _plane_density_ma;
+  double _plane_density_sa;
   double _chi2_x;
   double _chi2_y;
 };
@@ -130,6 +132,7 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
 
   void pid_variables(int nPartEvents,
 		    EMRDBBEventVector *emr_dbb_events,
+		    EMRfADCEventVector_er& emr_fadc_events,
 		    EMRTrackEventVector& emr_track_events) const;
 
   void coordinates_reconstruction(int nPartEvents,

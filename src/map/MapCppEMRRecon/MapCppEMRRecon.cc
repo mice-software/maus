@@ -81,14 +81,14 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   if (!loaded)
     throw(Exception(Exception::recoverable,
           "Could not find EMR calibration map",
-          "MapCppEMRMCDigitizer::birth"));
+          "MapCppEMRRecon::birth"));
 
   // Load the EMR attenuation map
   loaded = _attenMap.InitializeFromCards(configJSON);
   if (!loaded)
     throw(Exception(Exception::recoverable,
           "Could not find EMR attenuation map",
-          "MapCppEMRMCDigitizer::birth"));
+          "MapCppEMRReccon::birth"));
 }
 
 void MapCppEMRRecon::_death() {
@@ -138,7 +138,7 @@ void MapCppEMRRecon::_process(Data *data) const {
   tot_cleaning(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 
   // Reconstruct the main PID variables for muon tagging
-  pid_variables(nPartEvents, emr_dbb_events, emr_track_events);
+  pid_variables(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
 
   // Reconstruct the coordinates of each Hit
   coordinates_reconstruction(nPartEvents, emr_dbb_events, emr_fadc_events);
@@ -164,7 +164,7 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 
   for (int iPe = 0; iPe < nPartEvents+1; iPe++) {
 
-    EMREvent *evt = new EMREvent();
+    EMREvent *evt;
     int nPlHits(-1);
     if (iPe < nPartEvents) {
       evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
@@ -178,7 +178,7 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
     // Fill collection of pre-selected events
     for (int iPlane = 0; iPlane < nPlHits; iPlane++) {
 
-      EMRPlaneHit *plHit = new EMRPlaneHit();
+      EMRPlaneHit *plHit;
       if (iPe < nPartEvents) {
         plHit = evt->GetEMRPlaneHitArray().at(iPlane);
       } else {
@@ -414,6 +414,7 @@ void MapCppEMRRecon::tot_cleaning(int nPartEvents,
 
 void MapCppEMRRecon::pid_variables(int nPartEvents,
 				  EMRDBBEventVector *emr_dbb_events,
+		  		  EMRfADCEventVector_er& emr_fadc_events,
 				  EMRTrackEventVector& emr_track_events) const {
 
   // Loop over the primary events only
@@ -423,17 +424,24 @@ void MapCppEMRRecon::pid_variables(int nPartEvents,
     if ( !emr_track_events[iPe]._has_primary )
 	continue;
 
-    int nPlane(0), lPlaneX(0), lPlaneY(0);
+    int nPlane_sa(0), lPlaneX_sa(0), lPlaneY_sa(0);
+    int nPlane_ma(0), lPlaneX_ma(0), lPlaneY_ma(0);
     vector<double> x[2], y[2];
 
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+      if ( emr_fadc_events[iPe][iPlane]._charge ) {
+	nPlane_sa++;
+	if (iPlane%2 == 0 && iPlane/2+1 > lPlaneX_sa) lPlaneX_sa = iPlane/2+1;
+	else if (iPlane%2 != 0 && iPlane/2+1 > lPlaneY_sa) lPlaneY_sa = iPlane/2+1;
+      }
+
       for (int iBar = 1; iBar < _number_of_bars; iBar++) {
 	if ( emr_dbb_events[0][iPe][iPlane][iBar].size() ) {
-	  if (iPlane%2 == 0 && iPlane/2+1 > lPlaneX) lPlaneX = iPlane/2+1;
-	  else if (iPlane%2 != 0 && iPlane/2+1 > lPlaneY) lPlaneY = iPlane/2+1;
+	  if (iPlane%2 == 0 && iPlane/2+1 > lPlaneX_ma) lPlaneX_ma = iPlane/2+1;
+	  else if (iPlane%2 != 0 && iPlane/2+1 > lPlaneY_ma) lPlaneY_ma = iPlane/2+1;
 	}
 	if ( emr_dbb_events[1][iPe][iPlane][iBar].size() ) {
-	  nPlane++;
+	  nPlane_ma++;
 	  if (iPlane%2 == 0) {
 	    if (iBar%2 == 0) {
   	      x[0].push_back(iPlane + 1./3);
@@ -456,22 +464,24 @@ void MapCppEMRRecon::pid_variables(int nPartEvents,
     }
 
     // Definition of the plane density, lPlaneX+lPlaneY > 0 as _has_primary = true
-    emr_track_events[iPe]._plane_density = static_cast<double>(nPlane)/(lPlaneX+lPlaneY);
+    emr_track_events[iPe]._plane_density_sa
+      = static_cast<double>(nPlane_sa)/(lPlaneX_sa+lPlaneY_sa);
+    emr_track_events[iPe]._plane_density_ma
+      = static_cast<double>(nPlane_ma)/(lPlaneX_ma+lPlaneY_ma);
 
     // Compute the normalised chi^2 in the two projections
     for (int iArray = 0; iArray < 2; iArray++) {
       int n = x[iArray].size();
+
       double xmean(0.0), ymean(0.0);
+      double xymean(0.0), x2mean(0.0), y2mean(0.0);
       for (int i = 0; i < n; i++) {
         xmean += x[iArray][i]/n;
         ymean += y[iArray][i]/n;
-      }
 
-      double xymean(0.0), x2mean(0.0), y2mean(0.0);
-      for (int i = 0; i < n; i++) {
         xymean += x[iArray][i]*y[iArray][i]/n;
-        x2mean += x[iArray][i]*x[iArray][i]/n;
-        y2mean += y[iArray][i]*y[iArray][i]/n;
+        x2mean += pow(x[iArray][i], 2)/n;
+        y2mean += pow(y[iArray][i], 2)/n;
       }
 
       double xvar = x2mean - xmean*xmean;
@@ -512,7 +522,8 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
       int iBar;
       for (iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
   	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-	  x0 = iPlane * (_bar_height + _gap) + (1. + iBar%2) * _bar_height * 1./3;
+	  x0 = (iPlane - _number_of_planes/2) * (_bar_height + _gap)
+             + (1. + iBar%2) * _bar_height * 1./3;
 	  z0 = (iBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	  Hit0Found = true;
 	  break;
@@ -524,7 +535,8 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
       for (int aPlane = iPlane-1; aPlane >= 0; aPlane = aPlane-2) {
 	for (int aBar = 1; aBar < _number_of_bars; aBar++) { // Skip test channel
 	  if (emr_dbb_events[1][iPe][aPlane][aBar].size()) {
-	    x1 = aPlane * (_bar_height + _gap) + (1. + aBar%2) * _bar_height * 1./3;
+	    x1 = (aPlane - _number_of_planes/2) * (_bar_height + _gap)
+               + (1. + aBar%2) * _bar_height * 1./3;
 	    y1 = (aBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	    Hit1Found = true;
 	    break;
@@ -538,13 +550,15 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 	for (int bBar = 1; bBar < _number_of_bars; bBar++) { // Skip test channel
 	  if (emr_dbb_events[1][iPe][bPlane][bBar].size()) {
 	    if (Hit2Found && !Hit1Found) {
-	      x1 = bPlane * (_bar_height + _gap) + (1. + bBar%2) * _bar_height * 1./3;
+	      x1 = (bPlane - _number_of_planes/2) * (_bar_height + _gap)
+                 + (1. + bBar%2) * _bar_height * 1./3;
 	      y1 = (bBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	      Hit1Found = true;
 	      break;
 	    }
 	    if (!Hit2Found) {
-	      x2 = bPlane * (_bar_height + _gap) + (1. + bBar%2) * _bar_height * 1./3;
+	      x2 = (bPlane - _number_of_planes/2) * (_bar_height + _gap)
+                 + (1. + bBar%2) * _bar_height * 1./3;
 	      y2 = (bBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	      Hit2Found = true;
 	    }
@@ -559,7 +573,8 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 	for (int aBar = 1; aBar < _number_of_bars; aBar++) { // Skip test channel
 	  if (emr_dbb_events[1][iPe][aPlane][aBar].size()) {
 	    if (Hit1Found && !Hit2Found) {
-	      x2 = aPlane * (_bar_height + _gap) + (1. + aBar%2) * _bar_height * 1./3;
+	      x2 = (aPlane - _number_of_planes/2) * (_bar_height + _gap)
+                 + (1. + aBar%2) * _bar_height * 1./3;
 	      y2 = (aBar - _number_of_bars/2) * (_bar_width/2 + _gap);
 	      Hit2Found = true;
 	      break;
@@ -597,13 +612,13 @@ void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
 
       if (iPlane % 2 == 0) {
 	emr_dbb_events[1][iPe][iPlane][iBar][0].SetX(z0);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(etrans);
 	emr_dbb_events[1][iPe][iPlane][iBar][0].SetY(y0);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(etrans);
 	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorY(erecon);
       } else {
 	emr_dbb_events[1][iPe][iPlane][iBar][0].SetX(y0);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(erecon);
 	emr_dbb_events[1][iPe][iPlane][iBar][0].SetY(z0);
+	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(erecon);
 	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorY(etrans);
       }
 
@@ -1022,7 +1037,8 @@ void MapCppEMRRecon::fill(Spill *spill,
     evt->SetTotalChargeSA(emr_track_events[iPe]._total_charge_sa);
     evt->SetChargeRatioMA(emr_track_events[iPe]._charge_ratio_ma);
     evt->SetChargeRatioSA(emr_track_events[iPe]._charge_ratio_sa);
-    evt->SetPlaneDensity(emr_track_events[iPe]._plane_density);
+    evt->SetPlaneDensityMA(emr_track_events[iPe]._plane_density_ma);
+    evt->SetPlaneDensitySA(emr_track_events[iPe]._plane_density_sa);
     evt->SetChi2(emr_track_events[iPe]._chi2_x + emr_track_events[iPe]._chi2_y);
 
     // All the noise and unmatched secondaries are dumped, only initial triggers are kept
@@ -1089,7 +1105,8 @@ EMRTrackEventVector MapCppEMRRecon::get_track_data_tmp(int nPartEvts) const {
     data._total_charge_sa = -1.0;
     data._charge_ratio_ma = -1.0;
     data._charge_ratio_sa = -1.0;
-    data._plane_density = -1.0;
+    data._plane_density_ma = -1.0;
+    data._plane_density_sa = -1.0;
     data._chi2_x = -1.0;
     data._chi2_y = -1.0;
     emr_track_events_tmp[iPe] = data;

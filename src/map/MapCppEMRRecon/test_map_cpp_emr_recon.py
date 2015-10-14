@@ -137,10 +137,10 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 
             self.assertTrue(spill_out['recon_events'][1]['emr_event']\
 		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-			   ['emr_bar_hits'][0]['z'] > plane_id*17.5)
+			   ['emr_bar_hits'][0]['z'] > (plane_id-24)*17.5)
             self.assertTrue(spill_out['recon_events'][1]['emr_event']\
 		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-			   ['emr_bar_hits'][0]['z'] < (plane_id+1)*17.5)
+			   ['emr_bar_hits'][0]['z'] < (plane_id-23)*17.5)
 
             if (plane_id % 2 == 0):
                 self.assertTrue(spill_out['recon_events'][1]['emr_event']\
@@ -187,7 +187,7 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 
         # The plane density must be 1 for a muon and its chi2 low
         self.assertEqual(spill_out['recon_events'][1]['emr_event']\
-				 ['plane_density'], 1.0)
+				 ['plane_density_MA'], 1.0)
         self.assertTrue(spill_out['recon_events'][1]['emr_event']\
 				 ['chi2'] < 1)
 		
