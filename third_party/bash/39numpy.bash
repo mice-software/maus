@@ -5,6 +5,11 @@ filename="numpy-${vers}.tar.gz"
 directory="numpy-${vers}"
 url="http://sourceforge.net/projects/numpy/files/NumPy/${vers}/${filename}/download"
 
+echo
+echo 'INFO: Installing third party library NumPy' $vers
+echo '-------------------------------------------------'
+echo
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then

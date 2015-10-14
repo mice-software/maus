@@ -4,6 +4,11 @@ directory=swig-2.0.4
 filename=${directory}.tar.gz
 url=http://prdownloads.sourceforge.net/swig/${filename}
 
+echo
+echo 'INFO: Installing third party library SWIG 2.0.4'
+echo '---------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

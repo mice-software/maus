@@ -210,6 +210,36 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
   return true;
 }
 
+bool DAQChannelMap::InitFromCurrentCDB() {
+  _daq_devicename = "DAQ";
+  _daq_cabling_by = "date";
+  _daq_cablingdate = "current";
+  this->GetCabling(_daq_devicename);
+  int lineNum = 0;
+  DAQChannelKey* key;
+  try {
+    while (!cblstr.eof()) {
+      key = new DAQChannelKey();
+      cblstr >> *key;
+      _chKey.push_back(key);
+      lineNum++;
+    }
+  } catch (MAUS::Exception e) {
+    Squeak::mout(Squeak::error)
+    << "Error in DAQChannelMap::InitFromCDB : Error during loading map." << std::endl
+    << e.GetMessage() << std::endl;
+    return false;
+  }
+
+  if (_chKey.size() == 0) {
+    Squeak::mout(Squeak::error)
+    << "Error in DAQChannelMap::InitFromCDB : No DAQ Channel Keys loaded. "
+    << std::endl;
+    return false;
+  }
+  return true;
+}
+
 bool DAQChannelMap::InitFromCDB() {
   this->GetCabling(_daq_devicename);
   int lineNum = 0;

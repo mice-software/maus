@@ -5,6 +5,11 @@ directory=clhep-${version}
 filename=${directory}.tgz
 url=http://proj-clhep.web.cern.ch/proj-clhep/DISTRIBUTION/tarFiles/${filename}
 
+echo
+echo 'INFO: Installing third party library CLHEP' $version
+echo '----------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

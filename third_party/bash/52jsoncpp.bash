@@ -4,6 +4,11 @@ directory=jsoncpp-src-0.6.0-rc2
 filename=${directory}.tar.gz
 url=http://downloads.sourceforge.net/project/jsoncpp/jsoncpp/0.6.0-rc2/${filename}
 
+echo
+echo 'INFO: Installing third party library JSONCpp 0.6.0-rc2'
+echo '------------------------------------------------------'
+echo
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
