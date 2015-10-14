@@ -94,6 +94,10 @@ void ReduceCppTOFPlot::_birth(const std::string& str_config) {
   _h_tof12 = new TH1F("ht12", "TOF1->2;Time (ns);;", 200, 25, 45);
   _h_tof02 = new TH1F("ht02", "TOF0->2;Time (ns);;", 300, 50, 80);
 
+  _histos.push_back(_h_tof01);
+  _histos.push_back(_h_tof12);
+  _histos.push_back(_h_tof02);
+
   _cwrap_tof01 = ReduceCppTools::get_canvas_wrapper(_canv_tof01,
                                                      _h_tof01,
                                                      "",
@@ -118,9 +122,9 @@ void ReduceCppTOFPlot::_birth(const std::string& str_config) {
 }
 
 void ReduceCppTOFPlot::_death() {
-  delete _h_tof01;
-  delete _h_tof12;
-  delete _h_tof02;
+  for (unsigned int i = 0; i < _histos.size(); i++)
+    delete _histos[i];
+  _histos.resize(0);
 }
 
 void ReduceCppTOFPlot::_process(MAUS::Data* data) {
@@ -155,6 +159,11 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
 
     update_tof_plots(tof_event);
   }
+}
+
+void ReduceCppTOFPlot::reset() {
+  for (unsigned int i = 0; i < _histos.size(); i++)
+    _histos[i]->Reset();
 }
 
 void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {

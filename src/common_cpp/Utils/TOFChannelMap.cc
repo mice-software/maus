@@ -22,6 +22,10 @@
 namespace MAUS {
 
 TOFChannelMap::~TOFChannelMap() {
+  this->reset();
+}
+
+void TOFChannelMap::reset() {
   for (unsigned int i = 0;i < _tofKey.size();i++) {
     delete _tofKey[i];
     delete _tdcKey[i];
@@ -30,8 +34,10 @@ TOFChannelMap::~TOFChannelMap() {
   _tdcKey.resize(0);
   _fadcKey.resize(0);
   _tofKey.resize(0);
-}
 
+  cblstr.str("");
+  cblstr.clear();
+}
 
 TOFChannelMap::TOFChannelMap() {
   pymod_ok = true;
@@ -39,6 +45,8 @@ TOFChannelMap::TOFChannelMap() {
 }
 
 bool TOFChannelMap::InitializeCards(Json::Value configJSON) {
+  this->reset();
+
   _tof_station = JsonWrapper::GetProperty(configJSON,
                                                "TOF_trigger_station",
                                                JsonWrapper::stringValue).asString();

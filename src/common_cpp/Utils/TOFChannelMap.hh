@@ -173,6 +173,8 @@ class TOFChannelMap {
   bool InitializePyMod();
 
  private:
+  /** Use this function to reset the map before reloading. */
+  void reset();
 
   std::vector<TOFChannelKey*> _tofKey;
   std::vector<DAQChannelKey*> _tdcKey;

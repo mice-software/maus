@@ -147,6 +147,9 @@ class DAQChannelMap {
   std::string detector(int ldc, int geo, int ch, int eqType);
 
  private:
+  /** Use this function to reset the map before reloading. */
+  void reset();
+
   /// vector holding DAQChannelKeys for all channels of the MICE DAQ system
   std::vector<DAQChannelKey*> _chKey;
 

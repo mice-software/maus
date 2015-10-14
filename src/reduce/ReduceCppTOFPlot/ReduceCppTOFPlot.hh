@@ -20,6 +20,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include "TH1.h"
 #include "TCanvas.h"
@@ -49,7 +50,8 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   ReduceCppTOFPlot();
   ~ReduceCppTOFPlot();
 
-  int GetRefreshRate() {return _refresh_rate;}
+  int  getRefreshRate() {return _refresh_rate;}
+  void reset();
 
  private:
 
@@ -63,6 +65,7 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
 
   int _refresh_rate;
 
+  std::vector<TH1F*> _histos;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
   CanvasWrapper *_cwrap_tof01, *_cwrap_tof02, *_cwrap_tof12;
