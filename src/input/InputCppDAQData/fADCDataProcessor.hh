@@ -109,6 +109,34 @@ class ZeroSupressionFilter : public MDarranger {
   int _zs_threshold;
 };
 
+class ZeroSupressionFilterTK : public MDarranger {
+
+ public:
+
+  ZeroSupressionFilterTK() :_zero_suppression(0), _zs_threshold(0) {}
+  virtual ~ZeroSupressionFilterTK() {}
+
+  void set_zero_supression(bool zs) { _zero_suppression = zs; }
+  void set_zs_threshold(int zst)    { _zs_threshold = zst; }
+  void set_calibration(Json::Value calibration) { _calibration = calibration;}
+
+ protected:
+
+  /// If true - do zero suppression
+  bool _zero_suppression;
+
+  /// Value of the threshold used for zero suppression */
+  int _zs_threshold;
+
+
+  /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
+  static const int _number_channels       = 128;
+  static const int _number_banks          = 64;
+  Json::Value _calibration;
+  // Json::Value _calibration[_number_banks][_number_channels];
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
