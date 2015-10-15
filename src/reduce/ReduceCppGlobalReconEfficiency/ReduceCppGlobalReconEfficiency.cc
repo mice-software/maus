@@ -15,69 +15,35 @@
  *
  */
 
-#include <string>
-#include <sstream>
 #include <iostream>
-#include <fstream>
-#include <bitset>
 
-#include "TCanvas.h"
-//~ #include "src/map/MapCppGlobalTrackMatching/MapCppGlobalTrackMatching.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "Interface/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
-
-#include "src/common_cpp/DataStructure/SciFiEvent.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+#include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
 #include "src/reduce/ReduceCppGlobalReconEfficiency/ReduceCppGlobalReconEfficiency.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
-#include "src/common_cpp/DataStructure/Global/Track.hh"
+
 #include "src/common_cpp/Recon/Global/MCTruthTools.hh"
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
-
-#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/Primary.hh"
 
 namespace MAUS {
 
-bool ReduceCppGlobalReconEfficiency::birth(std::string aJsonConfigDocument) {
-
-  mClassname = "ReduceCppGlobalReconEfficiency";
-
-  // JsonCpp setup - check file parses correctly, if not return false
-  Json::Value configJSON;
+void ReduceCppGlobalReconEfficiency::_birth(const std::string& json_config) {
+  Json::Value config = JsonWrapper::StringToJson(json_config);
   for (size_t i = 0; i < 9; i++) {
     _detector_matches[i] = 0;
     _detector_matches_expected[i] = 0;
     _detector_false_matches[i] = 0;
     _detector_lr_failed[i] = 0;
   }
-  try {
-    configJSON = JsonWrapper::StringToJson(aJsonConfigDocument);
-    return true;
-  } catch (Exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, mClassname);
-  } catch (std::exception exc) {
-    MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, mClassname);
-  }
-  return false;
 }
 
-std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
-  JsonCppSpillConverter json2cppconverter;
-  Json::Value *data_json = NULL;
-  MAUS::Data *data_cpp = NULL;
-  Json::Value imported_json = JsonWrapper::StringToJson(document);
-  data_json = new Json::Value(imported_json);
-  data_cpp = json2cppconverter(data_json);
-  _spill = data_cpp->GetSpill();
-
-
+ImageData* ReduceCppGlobalReconEfficiency::_process(Data* data) {
+  _spill = data->GetSpill();
   //~ std::cerr << "EMR FAIL: " << _detector_lr_failed[4] << "\n";
   // Upstream
   std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
@@ -116,14 +82,12 @@ std::string ReduceCppGlobalReconEfficiency::process(std::string document) {
     double p_time = mc_event->GetPrimary()->GetTime();
     throughEfficiency(track, mc_event, p_time, 40, 40, 40, 40, 2, 2);
   }
-
-  std::string output_document = JsonWrapper::JsonToString(*data_json);
-  delete data_json;
-  delete data_cpp;
-  return output_document;
+  ImageData * image_data = new ImageData();
+  image_data->SetImage(new Image());
+  return image_data; 
 }
 
-bool ReduceCppGlobalReconEfficiency::death()  {
+void ReduceCppGlobalReconEfficiency::_death()  {
   // US Aggregate
   _detector_matches[5] = _detector_matches[0] + _detector_matches[1];
   _detector_matches_expected[5] = _detector_matches_expected[0] +
@@ -208,7 +172,6 @@ bool ReduceCppGlobalReconEfficiency::death()  {
       << "\t" << _detector_false_matches[8] << "\t" << _detector_lr_failed[8]
       << "\n";
   eff_file.close();
-  return true;
 }
 
 bool ReduceCppGlobalReconEfficiency::checkDetector(const
@@ -575,7 +538,7 @@ std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
             //~ //std::cerr << "Pos: " << tracker_mc_hit->GetPosition().X() << " " << tracker_mc_hit->GetPosition().Y() << " " << tracker_mc_hit->GetPosition().Z() << " " << tracker_mc_hit->GetMomentum().X() << " " << tracker_mc_hit->GetMomentum().Y() << " " << tracker_mc_hit->GetMomentum().Z() <<  "\n";
             //~ std::cerr << tracker_mc_hit->GetPosition().Z() << " " << tracker_mc_hit->GetChannelId()->GetTrackerNumber() << " " << tracker_mc_hit->GetChannelId()->GetStationNumber() << " " << tracker_mc_hit->GetChannelId()->GetPlaneNumber() << "\n";
           }
-          std::cerr << matched_tps << "/" << total_tps << "\n";
+          //~ std::cerr << matched_tps << "/" << total_tps << "\n";
           if (matched_tps > 10) {
             //~ std::cerr << "###" << matched_tps << "/" << total_tps << "\n";
             track_mc_pairs.push_back(std::make_pair(*track_iter,*mc_event_iter));
@@ -588,27 +551,12 @@ std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
   }
   return track_mc_pairs;
 }
-//~ bool ReduceCppGlobalReconEfficiency::read_in_json(std::string document) {
-  //~ Json::FastWriter writer;
-  //~ Json::Reader reader;
-  //~ try {
-    //~ mRoot = JsonWrapper::StringToJson(aJsonData);
-    //~ SpillProcessor spill_proc;
-    //~ mSpill = spill_proc.JsonToCpp(mRoot);
-    //~ Json::Value imported_json = JsonWrapper::StringToJson(document);
-    //~ data_json = new Json::Value(imported_json);
-    //~ data_cpp = json2cppconverter(data_json);
-    //~ spill = data_cpp->GetSpill();
-    //~ return true;
-  //~ } catch (...) {
-    //~ Json::Value errors;
-    //~ std::stringstream ss;
-    //~ ss << mClassname << ": Failed when importing JSON to Spill";
-    //~ errors["bad_json_document"] = ss.str();
-    //~ mRoot["errors"] = errors;
-    //~ writer.write(mRoot);
-    //~ return false;
-  //~ }
-//~ }
+
+PyMODINIT_FUNC init_ReduceCppGlobalReconEfficiency(void) {
+  PyWrapReduceBase<ReduceCppGlobalReconEfficiency>::PyWrapReduceBaseModInit
+                              ("ReduceCppGlobalReconEfficiency",
+                               "","","","");
+}
+
 
 } // ~namespace MAUS

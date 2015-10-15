@@ -135,6 +135,7 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
   return selected_tracks;
 }
 
+// TODO Need to get this geometry-independent
 std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
     track_point) {
   std::vector<int> tracker_plane (3,0);
@@ -298,7 +299,6 @@ double dEdx(const G4Material* material, double E, double m) {
   double k = material->GetIonisation()->GetMdensity();
 
   double logterm = std::log(2.0*m_e*bg2*T_max/(I*I));
-  
   double x = std::log(bg)/std::log(10);
 
   // density correction
@@ -319,6 +319,7 @@ static int _charge;
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, MAUS::DataStructure::Global::PID pid,
                bool energy_loss) {
+  int prop_dir = 1;
   _field = field;
   _charge = MAUS::recon::global::Particle::GetInstance().GetCharge(pid);
   double mass = MAUS::recon::global::Particle::GetInstance().GetMass(pid);
@@ -329,12 +330,11 @@ void propagate(double* x, double target_z, const BTField* field,
   if (target_z < x[3]) {
     backwards = true;
     _charge *= -1;
-    step_size *= -1;
+    prop_dir = -1;
     for (size_t i = 4; i < 8; i++) {
       x[i] *= -1;
     }
   }
-
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   double absolute_error = (*MAUS::Globals::GetInstance()
                            ->GetConfigurationCards())
@@ -346,95 +346,90 @@ void propagate(double* x, double target_z, const BTField* field,
   gsl_odeiv_control * control = gsl_odeiv_control_y_new(absolute_error,
                                                         relative_error);
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(8);
-
   int (*FuncEqM)(double z, const double y[], double f[], void *params)=NULL;
   FuncEqM = z_equations_of_motion;
   gsl_odeiv_system system  = {FuncEqM, NULL, 8, NULL};
-
-  double h = step_size;
-  size_t max_steps = 10000;
+  double h = step_size*prop_dir;
+  size_t max_steps = 10000000;
   size_t n_steps = 0;
   double z = x[3];
-    //~ std::cerr << "INITIALNEW\n" 
-          //~ << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
-          //~ << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
   while (fabs(z - target_z) > 1e-6) {
     n_steps++;
-    h = step_size; // revert step size as large step size problematic for dEdx
-    const CLHEP::Hep3Vector posvector(x[1], x[2], x[3]);
-    double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
-    const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
-    G4VPhysicalVolume* volume = g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
-    MAUS::GeometryNavigator geometry_navigator;
-    geometry_navigator.Initialise(g4navigator->GetWorldVolume());
-    double safety = 10;
-    double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
-    if (boundary_dist < h) {
-      h = boundary_dist;
-    }
-    double x_prev[] = {x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7]};
-    //~ std::cerr << "STEP: " << g4navigator->ComputeStep(posvector, momvector, h, safety);
-    //~ std::cerr << " " << safety << "\n";
-    //~ std::cerr << "x-vector before: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << " " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << "\n";
-    int status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
+    h = step_size*prop_dir; // revert step size as large step size problematic for dEdx
+    int status;
+    if (energy_loss) {
+      const CLHEP::Hep3Vector posvector(x[1], x[2], x[3]);
+      double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
+      const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
+      G4VPhysicalVolume* volume = g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
+      MAUS::GeometryNavigator geometry_navigator;
+      geometry_navigator.Initialise(g4navigator->GetWorldVolume());
+      double safety = 10;
+      double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
+      if (boundary_dist > 1e6) {
+        boundary_dist = safety;
+      }
+      double z_dist = boundary_dist*momvector.z();
+      // Check if z distance to next material boundary is smaller than step size
+      // if yes, we reduce step size to at most 1 mm to avoid issues arising from
+      // the track not being straight
+      bool temp = false;
+      if (std::abs(z_dist) < std::abs(h)) {
+        temp = true;
+        
+        if (std::abs(z_dist) > 2.0) {
+          h = 2.0*prop_dir;
+        } else {
+          h = z_dist; // will have proper sign from momvector
+        }
+      }
+      if (std::abs(h) < 0.1) {
+        h = 0.1*prop_dir;
+      }
+      double x_prev[] = {x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7]};
+      status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
                                         target_z, &h, x);
-    //~ std::cerr << "x-vector after: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << " " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << "\n";
-    geometry_navigator.SetPoint(MAUS::ThreeVector((x[1] + x_prev[1])/2,
-                                (x[2] + x_prev[2])/2, (x[3] + x_prev[3])/2));
-    double step_distance = std::sqrt((x[1]-x_prev[1])*(x[1]-x_prev[1]) +
-                                     (x[2]-x_prev[2])*(x[2]-x_prev[2]) +
-                                     (x[3]-x_prev[3])*(x[3]-x_prev[3]));
-    G4Material* material = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName());
-    double step_energy_loss = dEdx(material, x[4], mass)*step_distance;
-    //~ std::cerr << "z: " << x[3] << " " << step_distance << "mm of " << material->GetName() << " dE/dx: " << step_energy_loss << "MeV\n";
-    //~ x[4] += step_energy_loss;
-    // ########## Reduce momentum
-    changeEnergy(x, step_energy_loss, mass);
-    //~ if (boundary_dist < step_size) {
-      //~ std::cerr << x_prev[1] << " " << x_prev[2] << " " << x_prev[3] << "\n"
-                //~ << x[1] << " " << x[2] << " " << x[3] << "\n"
-                //~ << "MATERIAL: " << geometry_navigator.GetMaterialName() << " " << x[3] - x_prev[3] << "mm\n";
-    //~ }
+                                        if (temp) {
+      }
+    // Calculate energy loss for the step
+      geometry_navigator.SetPoint(MAUS::ThreeVector((x[1] + x_prev[1])/2,
+                                  (x[2] + x_prev[2])/2, (x[3] + x_prev[3])/2));
+      double step_distance = std::sqrt((x[1]-x_prev[1])*(x[1]-x_prev[1]) +
+                                       (x[2]-x_prev[2])*(x[2]-x_prev[2]) +
+                                       (x[3]-x_prev[3])*(x[3]-x_prev[3]));
+      G4Material* material = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName());
+      double step_energy_loss = dEdx(material, x[4], mass)*step_distance;
+      changeEnergy(x, step_energy_loss, mass);
+    } else {
+      status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
+                                        target_z, &h, x);
+    } 
     if (status != GSL_SUCCESS) {
       throw(MAUS::Exception(MAUS::Exception::recoverable, "Propagation failed",
                             "GlobalTools::propagate"));
-      break;
     }
+
     if (n_steps > max_steps) {
       std::stringstream ios;
       ios << "Stopping at step " << n_steps << " of " << max_steps << "\n" 
           << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
-          << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
+          << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
       throw(MAUS::Exception(MAUS::Exception::recoverable, ios.str()+
-            " Exceeded maximum number of steps\n", "GlobalTools::propagate"));
+            "Exceeded maximum number of steps", "GlobalTools::propagate"));
       break;
     }
-    //~ if (n_steps == 1) {
-    //~ std::cerr << "NEWStep " << n_steps << " of " << max_steps << "\n" 
-          //~ << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
-          //~ << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-    //~ }
 
     // Need to catch the case where the particle is stopped
     if (std::abs(x[4]) < (mass + 0.01)) {
-      x[0] = 1e6;
-      x[1] = 1e6;
-      x[2] = 1e6;
-      x[3] = target_z;
-      x[4] = mass;
-      x[5] = 0.0;
-      x[6] = 0.0;
-      x[7] = 0.0;
-      std::cerr << "Particle terminated with 0 momentum.\n";
-      break;
+      std::stringstream ios;
+      ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+      throw(MAUS::Exception(MAUS::Exception::recoverable, ios.str()+
+            "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
   }
-    //~ std::cerr << "###deltaM: " << std::sqrt(x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7]) << " " << mass << " " << std::sqrt(x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7]) -mass << "\n";
-
   gsl_odeiv_evolve_free (evolve);
   gsl_odeiv_control_free(control);
   gsl_odeiv_step_free   (step);
-
 
   // If we propagate backwards, reverse momentum 4-vector back to original sign
   if (backwards) {
@@ -447,20 +442,15 @@ void propagate(double* x, double target_z, const BTField* field,
 int z_equations_of_motion (double z, const double x[8], double dxdz[8],
                                    void* params) {
   if (fabs(x[7]) < 1e-9) {
+  // z-momentum is 0
     return GSL_ERANGE;
   }
   const double c_l = 299.792458; //mm*ns^{-1}
-  //~ std::cerr << "#1#\n";
   double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  //~ std::cerr << "#2#\n";
   double xfield[4] = {x[1], x[2], x[3], x[0]};
-  //~ std::cerr << "z_equations x " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << "\n";
   _field->GetFieldValue(xfield, field);
-  //~ std::cerr << "#4#\n";
   double dtdz = x[4]/x[7];
-  //~ std::cerr << "#5#\n";
   double dir = fabs(x[7])/x[7]; // direction of motion
-  //~ std::cerr << "#6#\n";
   dxdz[0] = dtdz/c_l; // dt/dz
   dxdz[1] = x[5]/x[7]; // dx/dz = px/pz
   dxdz[2] = x[6]/x[7]; // dy/dz = py/pz
@@ -476,8 +466,6 @@ int z_equations_of_motion (double z, const double x[8], double dxdz[8],
             + _charge*field[4]*dtdz*dir; // dpy/dz
   dxdz[7] = _charge*c_l*(dxdz[1]*field[1] - dxdz[2]*field[0])
             + _charge*field[5]*dtdz*dir; // dpz/dz
-  //~ std::cerr << dxdz[0] << " " << dxdz[1] << " " << dxdz[2] << " " << dxdz[3] << " "
-            //~ << dxdz[4] << " " << dxdz[5] << " " << dxdz[6] << " " << dxdz[7] << "\n";
   return GSL_SUCCESS;
 }
 

@@ -22,46 +22,36 @@
 #define _REDUCECPPGLOBALRECONEFFICIENCY_H
 
 // C++ includes
-#include <string>
-#include <vector>
-#include <map>
-
-#include "json/json.h"
 
 // MAUS includes
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataManager.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterInfoBox.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterXYZ.hh"
+#include "src/common_cpp/API/ReduceBase.hh" 
+#include "src/common_cpp/API/PyWrapReduceBase.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
-
+#include "src/common_cpp/DataStructure/Spill.hh"
 namespace MAUS {
 
-class ReduceCppGlobalReconEfficiency {
+class Data;
+class ImageData;
+
+class ReduceCppGlobalReconEfficiency : public ReduceBase<Data, ImageData> {
 
  public:
+
+  ReduceCppGlobalReconEfficiency() : ReduceBase<Data, ImageData>("ReduceCppGlobalReconEfficiency") {}
+  ~ReduceCppGlobalReconEfficiency() {}
+
+ private:
 
   /** @brief Sets up the worker
    *  @param argJsonConfigDocument a JSON document with the configuration.
    */
-  bool birth(std::string aJsonConfigDocument);
+  void _birth(const std::string& aJsonConfigDocument);
 
   /** @brief Shutdowns the worker, does nothing */
-  bool death();
+  void _death();
 
   /** @brief Process JSON document */
-  std::string process(std::string document);
-
-  /** @brief Return the spill object */
-  MAUS::Spill* get_spill() { return _spill; }
-
-  //~ /** @brief Takes json data and returns a Spill
-  //~ *   @param json_data a string holding spill's worth of data in json format
-  //~ */
-  //~ bool read_in_json(std::string aJsonData);
-
- private:
+  ImageData* _process(Data* data);
 
   /**
    * @brief Checks whether the given TrackPoint belongs to a detector given by
@@ -191,11 +181,9 @@ class ReduceCppGlobalReconEfficiency {
   size_t _detector_matches_expected[9];
   size_t _detector_false_matches[9];
   size_t _detector_lr_failed[9];
-  std::string mClassname;
-  //~ Json::Value mRoot;
   Spill* _spill;
 };
-      
+
 } // ~namespace MAUS
 
 #endif

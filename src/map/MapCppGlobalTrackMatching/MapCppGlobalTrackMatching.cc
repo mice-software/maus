@@ -89,7 +89,7 @@ namespace MAUS {
     if (!recon_events) {
       return;
     }
-    std::cerr << "Number of Recon Events: " << recon_events->size() << "\n";
+    //~ std::cerr << "Number of Recon Events: " << recon_events->size() << "\n";
     MAUS::ReconEventPArray::iterator recon_event_iter;
     for (recon_event_iter = recon_events->begin();
    recon_event_iter != recon_events->end();

@@ -22,50 +22,36 @@
 #define _REDUCECPPRECONTESTING_H
 
 // C++ includes
-#include <string>
-#include <vector>
-#include <map>
-
-#include "json/json.h"
 
 // MAUS includes
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataManager.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterBase.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterInfoBox.hh"
-#include "src/common_cpp/Plotting/SciFi/TrackerDataPlotterXYZ.hh"
-#include "src/common_cpp/DataStructure/MCEvent.hh"
-#include "TNtuple.h"
-
 #include "src/common_cpp/API/ReduceBase.hh" 
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
+#include "TNtuple.h"
 
 namespace MAUS {
 
-class ReduceCppReconTesting {
+class Data;
+class ImageData;
+
+class ReduceCppReconTesting : public ReduceBase<Data, ImageData> {
 
  public:
+
+  ReduceCppReconTesting() : ReduceBase<Data, ImageData>("ReduceCppReconTesting") {}
+  ~ReduceCppReconTesting() {}
+
+ private:
 
   /** @brief Sets up the worker
    *  @param argJsonConfigDocument a JSON document with the configuration.
    */
-  bool birth(std::string aJsonConfigDocument);
+  void _birth(const std::string& aJsonConfigDocument);
 
   /** @brief Shutdowns the worker, does nothing */
-  bool death();
+  void _death();
 
   /** @brief Process JSON document */
-  std::string process(std::string document);
-
-  /** @brief Return the spill object */
-  MAUS::Spill* get_spill() { return _spill; }
-
-  //~ /** @brief Takes json data and returns a Spill
-  //~ *   @param json_data a string holding spill's worth of data in json format
-  //~ */
-  //~ bool read_in_json(std::string aJsonData);
-
- private:
+  ImageData* _process(Data* data);
 
   /**
    * @brief Checks whether the given TrackPoint belongs to a detector given by
@@ -75,8 +61,8 @@ class ReduceCppReconTesting {
    * @param min the lower end of the range of enum values to check against
    * @param max the higher end of the range of enum values to check against
    */
-  bool checkDetector(const MAUS::DataStructure::Global::TrackPoint* track_point,
-                     int min, int max);
+  //~ bool checkDetector(const MAUS::DataStructure::Global::TrackPoint* track_point,
+                     //~ int min, int max);
 
   /**
    * @brief Checks whether the given SpacePoint belongs to a detector given by
@@ -86,15 +72,14 @@ class ReduceCppReconTesting {
    * @param min the lower end of the range of enum values to check against
    * @param max the higher end of the range of enum values to check against
    */
-  bool checkDetector(const MAUS::DataStructure::Global::SpacePoint* space_point,
-                     int min, int max);
+  //~ bool checkDetector(const MAUS::DataStructure::Global::SpacePoint* space_point,
+                     //~ int min, int max);
 
-  std::map<std::string, TNtuple*> _ntuples;
-  std::string mClassname;
-  //~ Json::Value mRoot;
+  //~ std::map<std::string, TNtuple*> _ntuples;
+  std::map<std::string, std::vector<std::pair<double, double> >* > _pairs;
   Spill* _spill;
 };
-      
+
 } // ~namespace MAUS
 
 #endif

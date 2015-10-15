@@ -127,6 +127,10 @@ void propagate(double* x, double target_z, const BTField* field,
 int z_equations_of_motion (double z, const double x[8], double dxdt[8],
                                    void* params);
 
+/**
+ * @brief Scales the 4-momentum of the 8-vector to decrease the energy by deltaE
+ *
+ */
 void changeEnergy(double* x, double deltaE, double mass);
 } // namespace GlobalTools
 } // namespace MAUS
