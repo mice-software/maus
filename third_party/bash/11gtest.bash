@@ -3,6 +3,11 @@ directory=gtest-1.5.0
 filename=${directory}.tar.gz
 url=http://googletest.googlecode.com/files/${filename}
 
+echo
+echo 'INFO: Installing third party library GTest 1.5.0'
+echo '------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

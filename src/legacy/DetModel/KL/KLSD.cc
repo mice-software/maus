@@ -28,9 +28,7 @@ void KLSD::ClearHits() {
 G4bool KLSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
 {
   G4double edep = aStep->GetTotalEnergyDeposit();
-
   if( edep == 0. ) return false;
-
   MAUS::KLHit hit;
   MAUS::KLChannelId* channel_id = new MAUS::KLChannelId();
 
@@ -53,6 +51,7 @@ G4bool KLSD::ProcessHits(G4Step* aStep, G4TouchableHistory* History)
   hit.SetParticleId(track->GetDefinition()->GetPDGEncoding());
   hit.SetEnergy(track->GetTotalEnergy());
   hit.SetTrackId(aStep->GetTrack()->GetTrackID());
+  hit.SetMass(aStep->GetTrack()->GetDefinition()->GetPDGMass());
 
   _hits->push_back(hit);
   return true;

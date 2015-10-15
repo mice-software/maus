@@ -3,6 +3,11 @@ version=`grep "version" $MAUS_ROOT_DIR/README | sed s/\ /_/g`
 filename=third_party_libraries_incl_python.tar.gz
 url=http://micewww.pp.rl.ac.uk/maus/${version}/${filename}
 
+echo
+echo 'INFO: Downloading third party tarball'
+echo '-------------------------------------'
+echo
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/${filename}" ]

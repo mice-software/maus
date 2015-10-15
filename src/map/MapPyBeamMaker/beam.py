@@ -24,7 +24,6 @@ import xboa
 import xboa.bunch
 import xboa.common
 import xboa.hit
-
 # 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
 # goes to 4294967295 in both 32 bit and 64 bit.
 NUMPY_RAND_MAX = 2147483647 

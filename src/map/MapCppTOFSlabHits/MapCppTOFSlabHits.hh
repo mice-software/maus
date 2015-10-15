@@ -40,6 +40,7 @@ class MapCppTOFSlabHits : public MapBase<MAUS::Data> {
   MapCppTOFSlabHits();
 
  private:
+  struct TOFModuleGeo;
  /** @brief Sets up the worker
  *
  *  @param argJsonConfigDocument a JSON document with
@@ -73,6 +74,22 @@ class MapCppTOFSlabHits : public MapBase<MAUS::Data> {
   void makeSlabHits(TOF0SlabHitArray *slhits, TOF0DigitArray *digits) const;
 
   double _tdcV1290_conversion_factor;
+
+  std::string _geo_filename;
+  MiceModule* geo_module;
+  std::vector<const MiceModule*> tof_modules;
+  std::vector<const MiceModule*> tof_mother_modules;
+
+  struct TOFModuleGeo {
+    int station;
+    int slab;
+    int plane;
+    Hep3Vector position;
+    Hep3Vector dimensions;
+  };
+  typedef std::map<std::string, TOFModuleGeo> TOFGeometryMap;
+  TOFGeometryMap _geom_map;
+  void build_geom_map();
 };
 }
 

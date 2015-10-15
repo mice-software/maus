@@ -4,6 +4,11 @@ directory=xboa-0.16.2
 filename=${directory}.tar.gz
 url=http://micewww.pp.rl.ac.uk/analysis/xboa/${directory}/${filename}
 
+echo
+echo 'INFO: Installing third party library Xboa 0.16.2'
+echo '------------------------------------------------'
+echo
+
 my_prefix=/install
 my_destdir=${MAUS_ROOT_DIR}/third_party
 

@@ -56,16 +56,17 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
   Json::Value* json = Globals::GetConfigurationCards();
-  _helical_pr_on   = (*json)["SciFiPRHelicalOn"].asBool();
-  _straight_pr_on  = (*json)["SciFiPRStraightOn"].asBool();
-  _kalman_on       = (*json)["SciFiKalmanOn"].asBool();
-  _patrec_on       = (*json)["SciFiPatRecOn"].asBool();
-  _size_exception  = (*json)["SciFiClustExcept"].asInt();
-  _min_npe         = (*json)["SciFiNPECut"].asDouble();
-  _use_mcs         = (*json)["SciFiKalman_use_MCS"].asBool();
-  _use_eloss       = (*json)["SciFiKalman_use_Eloss"].asBool();
-  _use_patrec_seed = (*json)["SciFiSeedPatRec"].asBool();
-  _correct_pz      = (*json)["SciFiKalmanCorrectPz"].asBool();
+  _up_helical_pr_on   = (*json)["SciFiPRHelicalOn"].asBool();
+  _down_helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+  _straight_pr_on     = (*json)["SciFiPRStraightOn"].asBool();
+  _kalman_on          = (*json)["SciFiKalmanOn"].asBool();
+  _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
+  _size_exception     = (*json)["SciFiClustExcept"].asInt();
+  _min_npe            = (*json)["SciFiNPECut"].asDouble();
+  _use_mcs            = (*json)["SciFiKalman_use_MCS"].asBool();
+  _use_eloss          = (*json)["SciFiKalman_use_Eloss"].asBool();
+  _use_patrec_seed    = (*json)["SciFiSeedPatRec"].asBool();
+  _correct_pz         = (*json)["SciFiKalmanCorrectPz"].asBool();
 
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
@@ -80,12 +81,17 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   double up_field = _geometry_helper.GetFieldValue(0);
   double down_field = _geometry_helper.GetFieldValue(1);
 
-  if (fabs(up_field) < 0.00001 && fabs(down_field) < 0.00001) {
-    _helical_pr_on = false;
+  if (fabs(up_field) < 0.00001) { // 10 Gaus
+    _up_helical_pr_on = false;
+  }
+  if (fabs(down_field) < 0.00001) { // 10 Gaus
+    _down_helical_pr_on = false;
   }
 
   _pattern_recognition.LoadGlobals();
-  _pattern_recognition.set_helical_pr_on(_helical_pr_on);
+//  _pattern_recognition.set_helical_pr_on(_helical_pr_on);
+  _pattern_recognition.set_up_helical_pr_on(_up_helical_pr_on);
+  _pattern_recognition.set_down_helical_pr_on(_down_helical_pr_on);
   _pattern_recognition.set_straight_pr_on(_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
@@ -149,6 +155,10 @@ void MapCppTrackerRecon::_death() {
 
 void MapCppTrackerRecon::_process(Data* data) const {
   Spill& spill = *(data->GetSpill());
+
+  /* return if not physics spill */
+  if (spill.GetDaqEventType() != "physics_event")
+    return;
 
   if (spill.GetReconEvents()) {
     for (unsigned int k = 0; k < spill.GetReconEvents()->size(); k++) {
@@ -497,11 +507,12 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
     SciFiStraightPRTrack* track = straights[i];
     ThreeVector pos;
     ThreeVector mom;
+    double default_mom = _geometry_helper.GetDefaultMomentum();
 
     int tracker = track->get_tracker();
     ThreeVector reference = _geometry_helper.GetReferencePosition(tracker);
     CLHEP::HepRotation rotation = _geometry_helper.GetReferenceRotation(tracker);
-    rotation.invert();
+//    rotation.invert();
 
     pos.setX(track->get_x0());
     pos.setY(track->get_y0());
@@ -511,10 +522,12 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
 
     double mx = track->get_mx();
     double my = track->get_my();
-    mom.setX(mx*200.0);
-    mom.setY(my*200.0);
+    mom.setX(mx*default_mom);
+    mom.setY(my*default_mom);
     mom *= rotation;
-    mom.setZ(sqrt(40000.0 - mom[0]*mom[0] + mom[1]*mom[1]));
+    if (tracker == 0) mom *= -1.0;
+//    mom.setZ(sqrt(40000.0 - mom[0]*mom[0] + mom[1]*mom[1]));
+    mom.setZ(default_mom);
 
     track->set_reference_position(pos);
     track->set_reference_momentum(mom);

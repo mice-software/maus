@@ -18,6 +18,7 @@
 
 #include "src/common_cpp/JsonCppProcessors/SciFiChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/TOFChannelIdProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/CkovChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/KLChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/EMRChannelIdProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/SpecialVirtualChannelIdProcessor.hh"
@@ -33,6 +34,12 @@ HitProcessor<SciFiChannelId>::HitProcessor()
 template <>
 HitProcessor<TOFChannelId>::HitProcessor()
     : _channel_id_proc(new TOFChannelIdProcessor()) {
+    this->RegisterBranches();
+}
+
+template <>
+HitProcessor<CkovChannelId>::HitProcessor()
+    : _channel_id_proc(new CkovChannelIdProcessor()) {
     this->RegisterBranches();
 }
 

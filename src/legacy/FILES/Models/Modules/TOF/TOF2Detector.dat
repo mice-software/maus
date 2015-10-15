@@ -17,12 +17,12 @@ Module TOF2Detector
   PropertyString SensitiveDetector SpecialVirtual
   Module TOF/TOF2Horizontal.dat
   {
-    Position 0.0 0.0 -12.5 mm
+    Position 0.0 0.0 12.5 mm
     Rotation 0.0 0.0 0.0 degree
   }
   Module TOF/TOF2Vertical.dat
   {
-    Position 0.0 0.0 12.5 mm
+    Position 0.0 0.0 -12.5 mm
     Rotation 0.0 0.0 0.0 degree
   }
 }

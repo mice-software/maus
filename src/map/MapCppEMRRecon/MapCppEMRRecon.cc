@@ -164,7 +164,7 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
 
   for (int iPe = 0; iPe < nPartEvents+1; iPe++) {
 
-    EMREvent *evt = new EMREvent();
+    EMREvent *evt;
     int nPlHits(-1);
     if (iPe < nPartEvents) {
       evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
@@ -178,7 +178,7 @@ void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
     // Fill collection of pre-selected events
     for (int iPlane = 0; iPlane < nPlHits; iPlane++) {
 
-      EMRPlaneHit *plHit = new EMRPlaneHit();
+      EMRPlaneHit *plHit;
       if (iPe < nPartEvents) {
         plHit = evt->GetEMRPlaneHitArray().at(iPlane);
       } else {

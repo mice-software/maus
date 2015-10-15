@@ -6,7 +6,7 @@ from SCons.Script.SConscript import SConsEnvironment
 def fail(project):
     fail_path = os.path.split(project)[-1]
     fail_path = os.path.join('$MAUS_ROOT_DIR', 'tmp', fail_path+'_failed_build')
-    open(os.path.expandvars(fail_path), 'w').close()
+    open(os.path.expandvars(fail_path), 'w+').close()
     time.sleep(1)
 
 # get environment and project

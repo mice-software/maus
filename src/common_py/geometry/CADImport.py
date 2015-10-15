@@ -22,7 +22,7 @@ import libxslt
 import math
 import numpy
 
-class CADImport: #pylint: disable = R0903, C0103
+class CADImport: #pylint: disable = R0903, C0103, C0302
     """
     @Class CADImport, GDML parser class.
     
@@ -399,7 +399,7 @@ class CADImport: #pylint: disable = R0903, C0103
         f.close()
         
     def AccessModule(self, datafile, result, moduleName, volumenumber=-1):
-        #pylint: disable = R0912, R0913, R0914, R0915, C0103
+        #pylint: disable = R0912, R0913, R0914, R0915, C0103, C0302
         '''
         @Method AccessModule to recursively generate a MICE module from a gdml file
         '''
@@ -427,12 +427,9 @@ class CADImport: #pylint: disable = R0903, C0103
                 self.AppendPolyconeSolid(datafile, result, solid, moduleName)
                 self.AppendIntersectionSolid(datafile, result, solid)
                 self.AppendSubtractionSolid(datafile, result, solid)
-
                 aux        = vol.xpathEval('auxiliary')
-                
                 unit = "cm"
                 # Get the auxilary elements of the volume
-                
                 for elem in aux:
                     elemtype, value = \
                               elem.prop('auxtype'), elem.prop('auxvalue')
@@ -481,7 +478,8 @@ class CADImport: #pylint: disable = R0903, C0103
                              or elemtype == 'Plane' or elemtype == 'Tracker' \
                              or elemtype == 'Cell' \
                              or elemtype == 'Slab'\
-                             or elemtype == 'CkovPmtNum':
+                             or elemtype == 'CkovPmtNum'\
+                             or elemtype == 'CkovStation':
                         result.append('PropertyInt '+elemtype+' '+value+"\n")
                     # Extract string typed elements
                     elif elemtype == 'SensitiveDetector' \
@@ -499,8 +497,7 @@ class CADImport: #pylint: disable = R0903, C0103
                             value = self.output[:-4]+'_'+vol.prop('name')+\
                                     '.txt'
                         if elemtype == 'SensitiveDetector':
-                            foundSensDet = value
-                            
+                            foundSensDet = value                            
                         result.append('PropertyString '+elemtype+' '+value+"\n")
                     # Extract boolean elements
                     elif elemtype == ' Invisible'\
@@ -520,6 +517,18 @@ class CADImport: #pylint: disable = R0903, C0103
                                       +value+' 0.0 cm\n')
                     elif elemtype == 'Pmt2PosY':
                         result.append('PropertyHep3Vector Pmt2Pos 0.0 '\
+                                      +value+' 0.0 cm\n')
+                    elif elemtype == 'PMT0Pos':
+                        result.append('PropertyHep3Vector PMT0Pos '\
+                                      +value+' 0.0 0.0 cm\n')
+                    elif elemtype == 'PMT2Pos':
+                        result.append('PropertyHep3Vector PMT2Pos '\
+                                      +value+' 0.0 0.0 cm\n')
+                    elif elemtype == 'PMT1Pos':
+                        result.append('PropertyHep3Vector PMT1Pos 0.0 '\
+                                      +value+' 0.0 cm\n')
+                    elif elemtype == 'PMT3Pos':
+                        result.append('PropertyHep3Vector PMT3Pos 0.0 '\
                                       +value+' 0.0 cm\n')
                     # Specialized vector types
                     elif elemtype == 'BooleanModule1Pos' \

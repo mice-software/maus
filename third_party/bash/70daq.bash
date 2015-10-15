@@ -7,7 +7,13 @@ directory=daq-${version}
 #url=http://micewww.pp.rl.ac.uk/attachments/1187/monitor_test.tar
 
 filename=libmonitor.tarz
-url=http://dpnc.unige.ch/~yordan/libmonitor.tarz
+# url=http://dpnc.unige.ch/~yordan/libmonitor.tarz
+url=http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/libmonitor.tarz
+
+echo
+echo 'INFO: Installing third party library DAQ' $version
+echo '--------------------------------------------------'
+echo
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 

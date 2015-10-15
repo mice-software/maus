@@ -13,6 +13,13 @@
 # -i install packages (will happen after getting packages if -g is set)
 #
 # if no options are set, this does nothing(!)
+
+echo
+echo 'INFO: Installing third party library Python Extras'
+echo '--------------------------------------------------'
+echo
+
+
 egg_source=${MAUS_THIRD_PARTY}/third_party/source/easy_install
 # these are packages in MAUS third party tarball
 download_package_list="\

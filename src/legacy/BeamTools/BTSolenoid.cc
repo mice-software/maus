@@ -8,6 +8,7 @@ using namespace std;
 #include "CLHEP/Vector/LorentzVector.h"
 #include "CLHEP/Units/PhysicalConstants.h"
 
+#include "src/legacy/Interface/STLUtils.hh"
 #include "BTSolenoid.hh"
 
 using CLHEP::m;
@@ -515,6 +516,7 @@ void BTSolenoid::SetStaticVariables(int NumberOfRCoords, int NumberOfZCoords, in
 
 MagFieldMap* BTSolenoid::GetFieldMap(std::string fileName)
 {
+  fileName = STLUtils::ReplaceVariables(fileName);
 	for(unsigned int i=0; i<StaticFieldMaps.size(); i++)
 	{
 		if(StaticFieldMaps[i]->GetFileName()==fileName) return StaticFieldMaps[i];

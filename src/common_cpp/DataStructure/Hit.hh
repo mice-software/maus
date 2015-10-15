@@ -24,6 +24,7 @@
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SpecialVirtualChannelId.hh"
 #include "src/common_cpp/DataStructure/TOFChannelId.hh"
+#include "src/common_cpp/DataStructure/CkovChannelId.hh"
 #include "src/common_cpp/DataStructure/KLChannelId.hh"
 #include "src/common_cpp/DataStructure/EMRChannelId.hh"
 #include "src/common_cpp/DataStructure/SciFiChannelId.hh"
@@ -33,9 +34,9 @@ namespace MAUS {
 /** @class Hit contains Monte Carlo sensitive detector hit data
  *
  *  Hit holds information pertaining to a particle step in a sensitive detector
- *  Stores information on the Track number, particle type, energy of the 
+ *  Stores information on the Track number, particle type, energy of the
  *  particle, charge, time, energy deposited by this step, position, momentum
- *  and channel hit (channel id) 
+ *  and channel hit (channel id)
  *
  *  The template is here to tell developers and users that I expect an extra
  *  parameter, channel id, in actual instantiations of this class, that contains
@@ -88,6 +89,11 @@ class Hit {
     /** Sets the total energy of the track that made the hit
      */
     virtual void SetEnergy(double energy);
+
+    // Returns the mass of the track that made the hit
+    // Set the mass of the ...
+    virtual double GetMass() const;
+    virtual void SetMass(double mass);
 
     /** Returns the charge of the track that made the hit
      */
@@ -157,6 +163,7 @@ class Hit {
     int _track_id;
     int _particle_id;
     double _energy;
+    double _mass;
     double _charge;
     double _time;
     double _energy_deposited;
@@ -175,6 +182,7 @@ typedef Hit<TOFChannelId> TOFHit;
 typedef Hit<KLChannelId> KLHit;
 typedef Hit<EMRChannelId> EMRHit;
 typedef Hit<SpecialVirtualChannelId> SpecialVirtualHit;
+typedef Hit<CkovChannelId> CkovHit;
 }
 
 #include "src/common_cpp/DataStructure/Hit-inl.hh"
