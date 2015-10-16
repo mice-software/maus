@@ -80,6 +80,21 @@ ReduceCppTOFPlot::ReduceCppTOFPlot()
 ReduceCppTOFPlot::~ReduceCppTOFPlot() {}
 
 void ReduceCppTOFPlot::_birth(const std::string& str_config) {
+
+  /** This is just a quick workaround!!! */
+  if (!_output) {
+    _output = new MAUS::ImageData();
+    _output->SetImage(new MAUS::Image());
+  }
+
+/** A better solution.
+  if (!_output) {
+    throw MAUS::Exception(Exception::nonRecoverable,
+                          "The output is disconnected.",
+                          "ReduceCppTOFPlot::_birth");
+  }
+*/
+
   Json::Value config = JsonWrapper::StringToJson(str_config);
   _refresh_rate = JsonWrapper::GetProperty(config,
                                            "reduce_plot_refresh_rate",

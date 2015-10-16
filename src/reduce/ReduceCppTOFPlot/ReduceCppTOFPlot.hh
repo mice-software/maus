@@ -28,13 +28,9 @@
 #include "src/common_cpp/API/ReduceBase.hh"
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
 #include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
-#include "src/common_cpp/DataStructure/ImageData/Image.hh"
-#include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
 
 namespace MAUS {
-
-class ImageData;
-class Data;
 
 class ReduceCppTools {
  public:
