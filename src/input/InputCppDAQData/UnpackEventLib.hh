@@ -299,10 +299,10 @@ class VLSBDataProcessor : public ZeroSupressionFilter {
 typedef std::vector<MAUS::VLSB>           TrackerHitArray;
 typedef std::vector<TrackerHitArray>      TtackerPartEventArray;
 
-class VLSBCppDataProcessor : public ZeroSupressionFilter {
+class VLSBCppDataProcessor : public ZeroSupressionFilterTK {
  public:
   VLSBCppDataProcessor()
-  : ZeroSupressionFilter(), _current_pEvent(-1),
+  : ZeroSupressionFilterTK(), _current_pEvent(-1),
   _n_pEvent(0), _is_first(true) {_equipment="VLSB";}
 
   virtual ~VLSBCppDataProcessor() {}

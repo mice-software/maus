@@ -21,6 +21,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 #include "json/json.h"
 
@@ -169,6 +170,7 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
 
   /** Configure the zero supression filter. */
   void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
+  void configureZeroSupressionTK(ZeroSupressionFilterTK* processor, Json::Value configJSON);
 
   /** Process manager object. */
   MDprocessManager _dataProcessManager;
