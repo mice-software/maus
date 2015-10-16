@@ -17,8 +17,11 @@
 InputPyRoot inputs data from a root file without converting it to json.
 """
 
-import MAUS
+#pylint: disable=E1101
+
+#import MAUS
 import ROOT
+import json
 
 import ErrorHandler
 
@@ -43,6 +46,10 @@ class InputPyRoot:
         self._filename = arg_filename
         self._number_of_events = arg_number_of_events
         self._current_event = 0
+
+        self._file = None
+        self._tree = None
+        self._data = None
 
     def birth(self, config_document = "{}"):
         """
