@@ -80,7 +80,7 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         h6 = ROOT.gDirectory.Get('h6')
         self.assertLess(h6.GetMean(), 1.0)
         self.assertLess(h6.GetRMS(), 2)
-        self.assertGreater(h6.GetEntries(), 195)
+        self.assertGreater(h6.GetEntries(), 190)
 
         print "WARNING: Track Fit still under development."+\
           "Disabling remaining tests for now"
