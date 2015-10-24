@@ -28,6 +28,8 @@
 #include "src/common_cpp/API/ReduceBase.hh"
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
 #include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
+#include "src/common_cpp/DataStructure/ImageData/Image.hh"
+#include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 
 namespace MAUS {
@@ -48,6 +50,7 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
 
   int  getRefreshRate() {return _refresh_rate;}
   void reset();
+  void update();
 
  private:
 
@@ -60,8 +63,10 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   void update_tof_plots(TOFEvent* tof_event);
 
   int _refresh_rate;
+  int _process_count;
 
   std::vector<TH1F*> _histos;
+  std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
   CanvasWrapper *_cwrap_tof01, *_cwrap_tof02, *_cwrap_tof12;

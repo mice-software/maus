@@ -189,9 +189,9 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 self.run_number = current_run_number
             # now transform the event and reduce it
             event = self.transformer.process(event)
-            event = self.merger.process(event)
+            merged_event = self.merger.process(event)
         # done with tranform-merge, now write it out
-        self.outputer.save(event)
+        self.outputer.save(merged_event)
         # if we converted to a different representation, delete the old one
         try:
             maus_cpp.converter.del_data_repr(event)
