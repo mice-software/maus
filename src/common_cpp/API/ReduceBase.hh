@@ -89,6 +89,7 @@ namespace MAUS {
 
   protected:
     T_OUT *_output;
+    bool _own_output;
   };
 
 }// end of namespace

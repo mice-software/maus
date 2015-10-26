@@ -28,7 +28,7 @@ namespace MAUS {
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::ReduceBase(const std::string& s)
-  : IReduce<T_IN, T_OUT>(), ModuleBase(s), _output(new T_OUT) {}
+  : IReduce<T_IN, T_OUT>(), ModuleBase(s), _output(new T_OUT), _own_output(true) {}
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::ReduceBase(const ReduceBase& rb)
@@ -39,7 +39,7 @@ namespace MAUS {
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::~ReduceBase() {
-    if (_output)
+    if (_output && _own_output)
       delete _output;
   }
 
@@ -49,6 +49,7 @@ namespace MAUS {
       delete _output;
 
     _output = out;
+    _own_output = false;
   }
 
   template <typename T_IN, typename T_OUT>
