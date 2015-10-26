@@ -188,7 +188,6 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   double _tot_func_p1;
   double _tot_func_p2;
   double _tot_func_p3;
-  double _tot_func_p4;
 };
 }
 

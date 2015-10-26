@@ -74,7 +74,6 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   _tot_func_p1 = configJSON["EMRtotFuncP1"].asDouble();
   _tot_func_p2 = configJSON["EMRtotFuncP2"].asDouble();
   _tot_func_p3 = configJSON["EMRtotFuncP3"].asDouble();
-  _tot_func_p4 = configJSON["EMRtotFuncP4"].asDouble();
 
   // Load the EMR calibration map
   bool loaded = _calibMap.InitializeFromCards(configJSON);
@@ -682,9 +681,9 @@ void MapCppEMRRecon::energy_correction(int nPartEvents,
 	        // Correct single MAPMT signals
 	        if (nPrimPartEvents) {
 	          double epsilon_MA_i = _calibMap.Eps(xKey, "MA");
-	          double Q_MA_meas_i = _tot_func_p4
-				       * (exp((static_cast<double>(xTot) - _tot_func_p1)
-				   	      / _tot_func_p2) - _tot_func_p3);
+	          double Q_MA_meas_i = (1./_tot_func_p2)
+				       * (exp(static_cast<double>(xTot)/_tot_func_p1)
+					  - _tot_func_p3);
 	          if (Q_MA_meas_i < 0) Q_MA_meas_i = 0.0;
 
 	          double Q_MA_i = Q_MA_meas_i/(alpha_MA*epsilon_MA_i);

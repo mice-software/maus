@@ -517,10 +517,12 @@ EMRqeMAPMT = 0.25 # MAPMT quantum efficiency
 EMRnadcPerPeMAPMT = 6 # number of ADC counts per photoelectron in the MAPMT
 EMRelectronicsResponseSpreadMAPMT = 8 # ADC counts
 EMRtimeResponseSpread = 1 # ADC counts
-EMRtotFuncP1 = -60.5 
-EMRtotFuncP2 = 15.0
-EMRtotFuncP3 = 70.0
-EMRtotFuncP4 = 2.0 # time over threshold vs charge logarithmic fit parameters
+#EMRtotFuncP1 = 15.0 # Step I
+#EMRtotFuncP2 = 0.0089 # Step I
+#EMRtotFuncP3 = 1.24 # Step I
+EMRtotFuncP1 = 13.65 # Step IV
+EMRtotFuncP2 = 0.0127 # Step IV
+EMRtotFuncP3 = 1.38 # Step IV
 EMRdeltatShift = 12 # ADC counts, distance from the trigger
 
 EMRfadcCount = 2.0 # ns, duration of an fADC cycle (f=500MHz)
@@ -550,6 +552,9 @@ EMRsecondaryTriggerMinNhits = 2
 EMRsecondaryTriggerMinTot = 4
 
 EMRmaxSecondaryToPrimaryTrackDistance = 100
+
+EMRdensityCut = 0.9
+EMRchi2Cut = 2
 
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
@@ -611,7 +616,7 @@ EMR_connector_attenuation_map = "/files/cabling/EMRConnectorAttenuationMap.txt"
 EMR_calib_source = "CDB"
 EMR_calib_date_from = 'current'
 # uncomment the EMR_calibration_file card below if you set EMR_calib_source=file
-#EMR_calib_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
+#EMR_calib_file = "/files/calibration/emrcalib_cosmics_july2015.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
