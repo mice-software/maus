@@ -824,8 +824,8 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       double remainder = SciFiTools::my_mod(close_dphi[j], 2*CLHEP::pi);
       double residual = fabs(remainder) - fabs(dphi[j]);
       if ( fabs(residual) > _n_turns_cut ) pass = false;
-      std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j] << "\t"
-                << remainder << "\t" << residual << std::endl;
+//       std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j] << "\t"
+//                 << remainder << "\t" << residual << std::endl;
     }
 
     // If n was accepted for all the turning angles

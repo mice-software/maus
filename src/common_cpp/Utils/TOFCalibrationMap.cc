@@ -41,9 +41,9 @@ void TOFCalibrationMap::reset() {
   t0str.str("");
   t0str.clear();
   twstr.str("");
-  t0str.clear();
+  twstr.clear();
   trigstr.str("");
-  t0str.clear();
+  trigstr.clear();
 }
 
 bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {

@@ -902,8 +902,8 @@ int VLSBCppDataProcessor::Process(MDdataContainer* aFragPtr) {
     xAdc = xVLSBFragment->GetAdc(xWordCount);
 //     std::cerr << xWordCount << " adc: " << xAdc << endl;
     int xChan = xVLSBFragment->GetChannel(xWordCount);
-    double xGain = _calibration[xGeo][xChan]["adc_gain"].asDouble();
-    double xPed = _calibration[xGeo][xChan]["adc_pedestal"].asDouble();
+    double xPed  = _calibration[xGeo][xChan].first;
+    double xGain = _calibration[xGeo][xChan].second;
     double xPE = (xAdc-xPed)/xGain;
 
     if (!_zero_suppression ||

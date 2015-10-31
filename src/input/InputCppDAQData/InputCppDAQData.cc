@@ -335,7 +335,7 @@ void InputCppDAQData::configureZeroSupressionTK(ZeroSupressionFilterTK* processo
     std::string calib((std::istreambuf_iterator<char>(inf)), std::istreambuf_iterator<char>());
     Json::Reader reader;
     Json::Value calibration_data;
-    Json::Value _calibration;
+    TrackerCalibMap *calibration = processor->get_calibration_ptr();
     if (!reader.parse(calib, calibration_data)) {
       throw(Exception(Exception::recoverable,
                       "Could not load Tracker calibration",
@@ -349,12 +349,9 @@ void InputCppDAQData::configureZeroSupressionTK(ZeroSupressionFilterTK* processo
       int channel_n       = calibration_data[i]["channel"].asInt();
       double adc_pedestal = calibration_data[i]["adc_pedestal"].asDouble();
       double adc_gain     = calibration_data[i]["adc_gain"].asDouble();
-      Json::Value channel;
-      channel["adc_pedestal"] = adc_pedestal;
-      channel["adc_gain"]     = adc_gain;
-      _calibration[bank][channel_n] = channel;
+      (*calibration)[bank][channel_n].first  = adc_pedestal;
+      (*calibration)[bank][channel_n].second = adc_gain;
     }
-    processor->set_calibration(_calibration);
   }
 }
 

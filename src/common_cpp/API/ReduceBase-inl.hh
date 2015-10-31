@@ -45,7 +45,7 @@ namespace MAUS {
 
   template <typename T_IN, typename T_OUT>
   void ReduceBase<T_IN, T_OUT>::SetOutput(T_OUT* out) {
-    if (_output)
+    if (_output && _own_output)
       delete _output;
 
     _output = out;

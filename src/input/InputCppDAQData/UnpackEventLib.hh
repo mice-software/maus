@@ -273,7 +273,6 @@ class V830CppDataProcessor : public MDarranger {
 ////////////////////////////////////////////////////////////////////////////////
 
 /** On Fragment Event VLSB
- * This class unpacks a VLSB board hit (tracker cosmic test in Lab7).
  */
 class VLSBDataProcessor : public ZeroSupressionFilter {
  public:

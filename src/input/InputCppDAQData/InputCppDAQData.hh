@@ -196,16 +196,6 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
   /** Processor for DBBChain data. */
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
-  /** Enum of event types */
-  enum {
-    VmeTdc = 102,
-    VmefAdc1724 = 120,
-    VmefAdc1731 = 121,
-    VmeScaler = 111,
-    DBB = 141,
-    VLSB_C = 80
-  };
-
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.
   * \return The type of the event as string.
