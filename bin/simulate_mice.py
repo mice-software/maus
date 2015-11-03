@@ -22,20 +22,19 @@ def run():
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
 
-    # G4beamline
-    # my_map.append(MAUS.MapPyBeamlineSimulation())
-
     # GEANT4
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
     # Pre detector set up
-    my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
+    # my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
+    my_map.append(MAUS.MapCppMCReconSetup())  #  geant4 simulation
 
     # TOF
     my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
     my_map.append(MAUS.MapCppTOFSlabHits()) # TOF MC Slab Hits
     my_map.append(MAUS.MapCppTOFSpacePoints()) # TOF Space Points
+
 
     # KL
     my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
@@ -48,6 +47,9 @@ def run():
     # EMR
     my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
     my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
+
+    # Ckov
+    my_map.append(MAUS.MapCppCkovMCDigitizer())
 
     # Global Digits - post detector digitisation
 

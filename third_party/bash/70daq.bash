@@ -1,34 +1,27 @@
 #!/usr/bin/env bash
+version=1.0.0
+directory=libmonitor_${version}
+filename=${directory}.tarz
+url=http://micewww.pp.rl.ac.uk/maus/third_party/${filename}
 
-version=0.3.2
-directory=daq-${version}
-
-#filename=monitor_test.tar
-#url=http://micewww.pp.rl.ac.uk/attachments/1187/monitor_test.tar
-
-filename=libmonitor.tarz
-url=http://dpnc.unige.ch/~yordan/libmonitor.tarz
+echo
+echo 'INFO: Installing third party library libmonitor 1.0.0'
+echo '-----------------------------------------------------'
+echo
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ] &&
-       [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5" ]
+    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
         echo "INFO: Found source archive in 'source' directory"
     else
         echo "INFO: Source archive doesn't exist.  Downloading..."
-        rm -f "${MAUS_ROOT_DIR}/third_party/source/${filename}"
-        rm -f "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5"
-
-	wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
-	wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}.md5
-
+        wget --directory-prefix="${MAUS_ROOT_DIR}/third_party/source" ${url}
     fi
 
-    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ] &&
-       [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}.md5" ]
+    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
-	echo "INFO: Source archive exists."
+        echo "INFO: Source archive exists."
         echo
         echo "INFO: Checking MD5 checksum (otherwise the file didn't"
         echo "INFO: download properly):"
@@ -36,29 +29,24 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd "${MAUS_ROOT_DIR}/third_party/source"
         md5sum -c ${filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${filename}; exit 1; }
         sleep 1
+
         echo
         echo "INFO: Unpacking:"
         echo
-	rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
+        rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
         mkdir "${MAUS_ROOT_DIR}/third_party/build/${directory}"
+        rm -Rf "${MAUS_ROOT_DIR}/third_party/install/include/daq"
         mkdir "${MAUS_ROOT_DIR}/third_party/install/include/daq"
-	sleep 1
+        sleep 1
         tar xvf "${MAUS_ROOT_DIR}/third_party/source/${filename}" -C "${MAUS_ROOT_DIR}/third_party/build/${directory}" > /dev/null
-        #cd "${MAUS_ROOT_DIR}/third_party/build/${directory}"
-	#sleep 1
-	#scons install
-
         cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/libMDMonitor.a" "${MAUS_ROOT_DIR}/third_party/install/lib"
-	#cat MDmonitoring.hh |sed "s;#include \"monitor.h\";//#include \"monitor.h\";" | sed "s;#include \"event.h\";//#include \"event.h\";" > tmp.hh
-	#mv tmp.hh MDmonitoring.hh
-	#cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+
         echo "INFO: Copying event header from unpacking.."
-	cp "${MAUS_ROOT_DIR}/third_party/install/include/unpacking/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
-	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/monitor.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
-	cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/MDmonitoring.hh" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
-	#cd -
-	#rm -Rf "${MAUS_ROOT_DIR}/third_party/build/${directory}"
-	echo
+        cp "${MAUS_ROOT_DIR}/third_party/install/include/unpacking/event.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+        cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/monitor.h" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+        cp "${MAUS_ROOT_DIR}/third_party/build/${directory}/MDmonitoring.hh" "${MAUS_ROOT_DIR}/third_party/install/include/daq"
+
+        echo
         echo "INFO: The package should be locally installed now in your"
         echo "INFO: third_party directory, which the rest of MAUS will"
         echo "INFO: find."

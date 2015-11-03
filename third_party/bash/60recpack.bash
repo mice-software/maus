@@ -6,6 +6,11 @@ directory=recpack
 filename=${directory}.src.20090424.tgz
 url=http://micewww.pp.rl.ac.uk:8080/attachments/download/34/${filename}
 
+echo
+echo 'INFO: Installing third party library RecPack 20090424'
+echo '-----------------------------------------------------'
+echo
+
 my_prefix=/install
 my_destdir=${MAUS_ROOT_DIR}/third_party
 

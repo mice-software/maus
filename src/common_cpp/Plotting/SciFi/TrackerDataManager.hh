@@ -147,11 +147,11 @@ class TrackerDataManager {
 
   private:
     // Bit of physics, factor translating radius to transverse momentum, pt = _RtoPt * rad
-    static const double _RtoPt = 1.2;
+    static constexpr double _RtoPt = 1.2;
 
     // Some plotting parameters
-    static const double _zmin = 0.0;
-    static const double _zmax = 1200.0;
+    static constexpr double _zmin = 0.0;
+    static constexpr double _zmax = 1200.0;
 };
 
 } // ~namespace MAUS

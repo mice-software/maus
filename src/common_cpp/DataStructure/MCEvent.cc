@@ -25,13 +25,13 @@ namespace MAUS {
 MCEvent::MCEvent()
        : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _sci_fi_noise_hits(NULL),
          _tof_hits(NULL), _kl_hits(NULL), _emr_hits(NULL), _special_virtual_hits(NULL),
-         _tracks(NULL) {
+         _tracks(NULL), _ckov_hits(NULL) {
 }
 
 MCEvent::MCEvent(const MCEvent& md)
        : _primary(NULL), _virtuals(NULL), _sci_fi_hits(NULL), _sci_fi_noise_hits(NULL),
          _tof_hits(NULL), _kl_hits(NULL), _emr_hits(NULL), _special_virtual_hits(NULL),
-         _tracks(NULL) {
+         _tracks(NULL), _ckov_hits(NULL) {
   *this = md;
 }
 
@@ -84,6 +84,15 @@ MCEvent& MCEvent::operator=(const MCEvent& md) {
         _tof_hits = new TOFHitArray(*md._tof_hits);
     }
 
+    if (_ckov_hits != NULL) {
+      delete _ckov_hits;
+    }
+    if (md._ckov_hits == NULL) {
+      _ckov_hits = NULL;
+    } else {
+      _ckov_hits = new CkovHitArray(*md._ckov_hits);
+    }
+
     if (_kl_hits != NULL) {
         delete _kl_hits;
     }
@@ -109,7 +118,7 @@ MCEvent& MCEvent::operator=(const MCEvent& md) {
         _special_virtual_hits = NULL;
     } else {
         _special_virtual_hits =
-                          new SpecialVirtualHitArray(*md._special_virtual_hits);
+         new SpecialVirtualHitArray(*md._special_virtual_hits);
     }
 
     if (_primary != NULL) {
@@ -144,6 +153,10 @@ MCEvent::~MCEvent() {
     if (_tof_hits != NULL) {
         delete _tof_hits;
         _tof_hits = NULL;
+    }
+    if (_ckov_hits != NULL) {
+        delete _ckov_hits;
+	_ckov_hits = NULL;
     }
     if (_kl_hits != NULL) {
         delete _kl_hits;
@@ -224,6 +237,17 @@ void MCEvent::SetTOFHits(TOFHitArray* hits) {
         delete _tof_hits;
     }
     _tof_hits = hits;
+}
+
+CkovHitArray* MCEvent::GetCkovHits() const {
+    return _ckov_hits;
+}
+
+void MCEvent::SetCkovHits(CkovHitArray* hits) {
+    if (_ckov_hits != NULL) {
+        delete _ckov_hits;
+    }
+    _ckov_hits = hits;
 }
 
 KLHitArray* MCEvent::GetKLHits() const {

@@ -19,6 +19,8 @@
 #include <string>
 #include "src/common_cpp/Utils/TOFChannelMap.hh"
 #include "Config/MiceModule.hh"
+#include "DataStructure/MCEvent.hh"
+#include "DataStructure/Spill.hh"
 #include "Utils/Exception.hh"
 #include "API/PyWrapMapBase.hh"
 #include "src/common_cpp/DataStructure/RunHeaderData.hh"
@@ -31,7 +33,7 @@ PyMODINIT_FUNC init_MapCppTOFMCDigitizer(void) {
 }
 
 MapCppTOFMCDigitizer::MapCppTOFMCDigitizer()
-    : MapBase<Json::Value>("MapCppTOFMCDigitizer") {
+    : MapBase<Data>("MapCppTOFMCDigitizer") {
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -60,10 +62,6 @@ void MapCppTOFMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   geo_module = new MiceModule(filename);
   tof_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "TOF");
 
-  _stationKeys.push_back("tof0");
-  _stationKeys.push_back("tof1");
-  _stationKeys.push_back("tof2");
-
   // load the TOF calibration map
   bool loaded = _map.InitializeFromCards(_configJSON, 0);
   if (!loaded)
@@ -77,106 +75,108 @@ void MapCppTOFMCDigitizer::_death() {
 }
 
 //////////////////////////////////////////////////////////////////////
-void MapCppTOFMCDigitizer::_process(Json::Value* document) const {
-  Json::Value& root = *document;
-  // check sanity of json input file and mc brach
-  Json::Value mc = check_sanity_mc(*document);
+void MapCppTOFMCDigitizer::_process(MAUS::Data* data) const {
+
+  // Get spill, break if there's no DAQ data
+  Spill *spill = data->GetSpill();
+  if (spill->GetMCEvents() == NULL)
+      return;
+
+  MCEventPArray *mcEvts = spill->GetMCEvents();
+  int nPartEvents = spill->GetMCEventSize();
+  if (nPartEvents == 0)
+      return;
+
+  ReconEventPArray *recEvts =  spill->GetReconEvents();
+
+  // Resize the recon event to hold mc events
+  if (spill->GetReconEventSize() == 0) { // No recEvts yet
+      for (int iPe = 0; iPe < nPartEvents; iPe++) {
+          recEvts->push_back(new ReconEvent);
+      }
+  }
 
   // all_tof_digits store all the tof hits
   // then we'll weed out multiple hits, add up yields, and store the event
-  std::vector<Json::Value> all_tof_digits;
-  all_tof_digits.push_back(Json::Value());
-  Json::Value tof_evt;
 
   // loop over events
-  if (fDebug) std::cout << "mc numevts = " << mc.size() << std::endl;
-  for ( unsigned int i = 0; i < mc.size(); i++ ) {
-    Json::Value particle = mc[i];
-    double gentime = particle["primary"]["time"].asDouble();
-    if (fDebug) std::cout << "evt: " << i << " pcle= " << particle << std::endl;
+  if (fDebug) std::cout << "mc numevts = " << mcEvts->size() << std::endl;
 
-    // hits for this event
-    Json::Value _hits = particle["tof_hits"];
-    // if _hits.size() = 0, the make_digits and fill_tof_evt functions will
-    // return null. The TOF recon expects something - either null or data, can't just skip
-    all_tof_digits.clear();
+  // Construct digits from hits for each MC event
+  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+    // Get tof hits for this event
+    TOFHitArray *hits = spill->GetAnMCEvent(iPe).GetTOFHits();
 
-    // pick out tof hits, digitize and store
-    all_tof_digits = make_tof_digits(_hits, gentime, *document);
+    // process only if there are tof hits
+    if (hits) {
+      // Get the time of the primary
+      // for digitizing, hit time will be taken as relative to the primary
+      Primary *primary = spill->GetAnMCEvent(iPe).GetPrimary();
+      double gentime = primary->GetTime(); // ns
 
-    // go through tof hits and find the hit in the trig station (TOF1)
-    // if (all_tof_digits.size() != 0) findTriggerPixel(all_tof_digits);
-    std::string strig = findTriggerPixel(all_tof_digits);
+      // pick out tof hits, digitize and store
+      TofTmpDigits tmpDigits = make_tof_digits(hits, gentime);
 
-    // now go through the stations and fill tof events
-    // real data tof digits look like so:
-    // "digits":{"tof1":[ [evt0..{pmt0},{pmt1}..],[evt1..]],"tof0":[[evt0]..],tof2..}
-    // loop over tof stations
-    for (int snum = 0; snum < 3; ++snum) {
-       tof_evt.clear();
-       tof_evt[i] = fill_tof_evt(i, snum, all_tof_digits, strig);
-       if (fDebug) {
-          std::cout << "mcevt: " << i << " tof" << snum << " " << _hits.size()
-                    << " hits, " << all_tof_digits.size() << std::endl;
-       }
-       Json::Value tof_digs = fill_tof_evt(i, snum, all_tof_digits, strig);
-       root["recon_events"][i]["tof_event"]["tof_digits"][_stationKeys[snum]]
-                                                                     = tof_digs;
-     } // end loop over stations
+      // go through tof hits and find the hit in the trig station (TOF1)
+      std::string strig = findTriggerPixel(tmpDigits);
+
+      // now go through the stations and fill tof events
+      // real data tof digits look like so:
+      // "digits":{"tof1":[ [evt0..{pmt0},{pmt1}..],[evt1..]],"tof0":[[evt0]..],tof2..}
+      TOFEvent *evt = new TOFEvent();
+      (*recEvts)[iPe]->SetTOFEvent(evt);
+
+      fDigsArrayPtr digitArrayPtr(0);
+      TOF0DigitArray *tof0_digits = evt->GetTOFEventDigitPtr()->GetTOF0DigitArrayPtr();
+      TOF1DigitArray *tof1_digits = evt->GetTOFEventDigitPtr()->GetTOF1DigitArrayPtr();
+      TOF2DigitArray *tof2_digits = evt->GetTOFEventDigitPtr()->GetTOF2DigitArrayPtr();
+      digitArrayPtr.push_back(tof0_digits);
+      digitArrayPtr.push_back(tof1_digits);
+      digitArrayPtr.push_back(tof2_digits);
+      fill_tof_evt(iPe, 0, tmpDigits, digitArrayPtr, strig);
+    }
   } // end loop over events
 }
 
 //////////////////////////////////////////////////////////////////////
-std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(
-                                                        Json::Value hits,
-                                                        double gentime,
-                                                        Json::Value& root) const {
-  std::vector<Json::Value> tof_digits;
-  tof_digits.clear();
-  if (hits.size() == 0) return tof_digits;
+TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
+                                                   double gentime) const {
+  TofTmpDigits tmpDigits(0);
+  if (hits->size() == 0) return tmpDigits;
 
-  for ( unsigned int j = 0; j < hits.size(); j++ ) {  //  j-th hit
-      Json::Value hit = hits[j];
-      // if (fDebug) std::cout << "hit# " << j << hit << std::endl;
+  for ( unsigned int j = 0; j < hits->size(); j++ ) {  //  j-th hit
+      TOFHit hit = hits->at(j);
       if (fDebug) std::cout << "=================== hit# " << j << std::endl;
 
       // make sure we can get the station/slab info
-      if (!hit.isMember("channel_id"))
+      if (!hit.GetChannelId())
           throw(Exception(Exception::recoverable,
                        "No channel_id in hit",
                        "MapCppTOFMCDigitizer::make_tof_digits"));
-      if (!hit.isMember("momentum"))
-          throw(Exception(Exception::recoverable,
-                       "No momentum in hit",
-                       "MapCppTOFMCDigitizer::make_tof_digits"));
-      if (!hit.isMember("time"))
-          throw(Exception(Exception::recoverable,
-                       "No time in hit",
-                       "MapCppTOFMCDigitizer::make_tof_digits"));
-      Json::Value channel_id = hit["channel_id"];
+      ThreeVector mom = hit.GetMomentum();
+      double hTime = hit.GetTime();
+      TOFChannelId* channel_id = hit.GetChannelId();
 
-      if (!hit.isMember("energy_deposited"))
-          throw(Exception(Exception::recoverable,
-                       "No energy_deposited in hit",
-                       "MapCppTOFMCDigitizer::make_tof_digits"));
-      double edep = hit["energy_deposited"].asDouble();
+      double edep = hit.GetEnergyDeposited();
 
       if (fDebug) {
-         std::cout << "tofhit: " << hit["channel_id"] << " "
-                   << hit["position"] << " " << hit["momentum"]
-                   << " " << hit["time"] << " " << hit["energy_deposited"] << std::endl;
+         std::cout << "tofhit: " << hit.GetChannelId() << " "
+                   << hit.GetPosition() << " " << hit.GetMomentum() << " "
+                   << hit.GetTime() << " " << hit.GetEnergyDeposited()
+                   << std::endl;
       }
 
-      int stn = hit["channel_id"]["station_number"].asInt();
-      int pln = hit["channel_id"]["plane"].asInt();
-      int slb = hit["channel_id"]["slab"].asInt();
+      int stn = channel_id->GetStation();
+      int pln = channel_id->GetPlane();
+      int slb = channel_id->GetSlab();
 
       // set daq_event_type. TofSlabHits expects this.
       // NOTE: In principle, should be done globally
+/*
       if (!root.isMember("daq_event_type")) {
         root["daq_event_type"] = "physics_event";
       }
-
+*/
       // find the geo module corresponding to this hit
       const MiceModule* hit_module = NULL;
       for ( unsigned int jj = 0; !hit_module && jj < tof_modules.size(); ++jj ) {
@@ -203,7 +203,8 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(
                        "MapCppTOFMCDigitizer::make_tof_digits"));
 
       // now get the position of the hit
-      Hep3Vector hpos = JsonWrapper::JsonToThreeVector(hit["position"]);
+      ThreeVector tpos = hit.GetPosition();
+      Hep3Vector hpos(tpos.x(), tpos.y(), tpos.z());
 
       // get the slab and pmt positions from the geometry
       // slab pos
@@ -237,7 +238,7 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(
       // get the hit time
       double csp = _configJSON["TOFscintLightSpeed"].asDouble();
       double tres = _configJSON["TOFpmtTimeResolution"].asDouble();
-      double htime = hit["time"].asDouble() - gentime;
+      double htime = hit.GetTime() - gentime;
 
       // propagate time to pmt & smear by the resolution
       double time1 = CLHEP::RandGauss::shoot((htime + dist1/csp) , tres);
@@ -248,38 +249,37 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(
       int tdc1 = static_cast<int>(time1 / tdc2time);
       int tdc2 = static_cast<int>(time2 / tdc2time);
       if (fDebug) {
-         std::cout << "time: " << hit["time"].asDouble() << " now: " <<
+         std::cout << "time: " << hit.GetTime() << " now: " <<
 	           time1 << " " << time2 << " " << (time1+time2)/2 << std::endl;
          std::cout << "dist: " << dist1 << " " << dist2 << std::endl;
          std::cout << "tdc: " << tdc1 << " " << tdc2 << std::endl;
       }
 
-      Json::Value tmpDigit;
+      tmpThisDigit thisDigit;
       // set the hits for PMTs at both ends
       for (int p = 0; p < 2; ++p) {
-        tmpDigit.clear();
-        tmpDigit["channel_id"] = hit["channel_id"];
-        tmpDigit["mc_mom"] = hit["momentum"];
-        tmpDigit["time"] = hit["time"];
-        tmpDigit["mc_position"]=hit["position"];
-        tmpDigit["isUsed"] = 0;
+        thisDigit.fChannelId = channel_id;
+        thisDigit.fMom = mom;
+        thisDigit.fTime = hTime;
+        thisDigit.fPos = hpos;
+        thisDigit.fIsUsed = 0;
 
 	// set the key for this channel
         std::stringstream ss;
         ss << "TOFChannelKey " << stn << " " << pln << " " << slb << " " << p << " tof" << stn;
-        tmpDigit["tof_key"] = ss.str();
-        tmpDigit["station"] = stn;
-        tmpDigit["plane"] = pln;
-        tmpDigit["slab"] = slb;
-        tmpDigit["pmt"] = p;
+        thisDigit.fTofKey = ss.str();
+        thisDigit.fStation = stn;
+        thisDigit.fPlane = pln;
+        thisDigit.fSlab = slb;
+        thisDigit.fPmt = p;
         if (p == 0) {
-	  tmpDigit["npe"] = npe1;
-          tmpDigit["leading_time"] = tdc1;
-          tmpDigit["raw_time"] = time1;
+          thisDigit.fNpe = npe1;
+          thisDigit.fLeadingTime = tdc1;
+          thisDigit.fRawTime = time1;
         } else if (p == 1) {
-	  tmpDigit["npe"] = npe2;
-          tmpDigit["leading_time"] = tdc2;
-          tmpDigit["raw_time"] = time2;
+          thisDigit.fNpe = npe2;
+          thisDigit.fLeadingTime = tdc2;
+          thisDigit.fRawTime = time2;
         }
 	// this stuff needs tweaking
         // need to make sure the trigger leading time is reasonable
@@ -291,40 +291,18 @@ std::vector<Json::Value> MapCppTOFMCDigitizer::make_tof_digits(
         // but without the correct trigger leading time, this will no
         // longer be the case. hence the pixelcut mod.
         // need a more elegant way to handle this -- DR 3/15
-        tmpDigit["trailing_time"] = 0;
-        tmpDigit["trigger_request_leading_time"] = 0;
-        tmpDigit["trigger_time_tag"] = 0;
-	// can't put a time_t into json???
-	// std::time_t tstamp = std::time(0);
-        tmpDigit["time_stamp"] = 0;
+        thisDigit.fTrailingTime = 0;
+        thisDigit.fTriggerRequestLeadingTime = 0;
+        thisDigit.fTriggerTimeTag = 0;
+        thisDigit.fTimeStamp = 0;
 	if (fDebug)
           std::cout << "digit " << j << " key: " << ss.str() << std::endl;
 
-        tof_digits.push_back(tmpDigit);
+        tmpDigits.push_back(thisDigit);
       } // end loop over pmts
     }  //  ends 'for' loop over hits
 
-    return tof_digits;
-}
-
-//////////////////////////////////////////////////////////////////////
-Json::Value MapCppTOFMCDigitizer::check_sanity_mc(Json::Value& root) const {
-  // Check if the JSON document can be parsed, else return error only
-  // Check if the JSON document has a 'mc' branch, else return error
-  if (!root.isMember("mc_events")) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "Could not find an MC branch to simulate.",
-                          "MapCppTOFMCDigitizer::check_sanity_mc");
-  }
-
-  Json::Value mc = root.get("mc_events", 0);
-  // Check if JSON document is of the right type, else return error
-  if (!mc.isArray()) {
-    throw MAUS::Exception(Exception::recoverable,
-                          "MC branch was not an array.",
-                          "MapCppTOFMCDigitizer::check_sanity_mc");
-  }
-  return mc;
+    return tmpDigits;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -347,6 +325,7 @@ double MapCppTOFMCDigitizer::get_npe(double dist, double edep) const {
                        "MapCppTOFMCDigitizer::birth"));
       if (fDebug)
           printf("nphot0: %3.12f %3.12f\n", edep, _configJSON["TOFconversionFactor"].asDouble());
+
       // convert energy deposited to number of photoelectrons
       nphot = edep / (_configJSON["TOFconversionFactor"].asDouble());
 
@@ -369,20 +348,21 @@ double MapCppTOFMCDigitizer::get_npe(double dist, double edep) const {
 }
 
 //////////////////////////////////////////////////////////////////////
-std::string MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_tof_digits) const {
+std::string MapCppTOFMCDigitizer::findTriggerPixel(TofTmpDigits& tmpDigits) const {
   int tstn = 1;
   int tsx = 99, tsy = 99;
 
-  for (unsigned int digit_i = 0; digit_i < all_tof_digits.size(); digit_i++) {
-    if (all_tof_digits[digit_i]["station"] == tstn) {
+  for (unsigned int digit_i = 0; digit_i < tmpDigits.size(); digit_i++) {
+    if (tmpDigits[digit_i].fStation == tstn) {
       if (tsx == 99 || tsy == 99) {
-        if (all_tof_digits[digit_i]["plane"].asInt() == 0)
-           tsx = all_tof_digits[digit_i]["slab"].asInt();
+        if (tmpDigits[digit_i].fPlane == 0)
+           tsx = tmpDigits[digit_i].fSlab;
         else
-           tsy = all_tof_digits[digit_i]["slab"].asInt();
+           tsy = tmpDigits[digit_i].fSlab;
       }
     }
   }
+
   std::stringstream strig_str("");
   // set trigger to be "unknown" if we could not find the hit in TOF1
   if (tsx == 99 || tsy == 99)
@@ -396,58 +376,59 @@ std::string MapCppTOFMCDigitizer::findTriggerPixel(std::vector<Json::Value> all_
 
 
 //////////////////////////////////////////////////////////////////////
-Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
-                                             std::vector<Json::Value> all_tof_digits,
+void MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
+                                             TofTmpDigits& tmpDigits,
+                                             fDigsArrayPtr& tofDigits,
                                              std::string pixStr) const {
-  Json::Value tof_digit(Json::arrayValue);
   // return null if this evt had no tof hits
-  if (all_tof_digits.size() == 0) return tof_digit;
+  if (tmpDigits.size() == 0) return;
   double npe;
   int ndigs = 0;
 
   // throw out multihits and add up the light yields from multihits in slabs
-  for (unsigned int i = 0; i < all_tof_digits.size(); ++i) {
-    // check that this digit belongs to the station we are trying to fill
-    if (all_tof_digits[i]["station"].asInt() != snum) continue;
-
+  for (unsigned int i = 0; i < tmpDigits.size(); ++i) {
+    int thisStation = tmpDigits[i].fStation;
     // check if the digit has been used
-    if ( all_tof_digits[i]["isUsed"].asInt() == 0 ) {
+    if (!tmpDigits[i].fIsUsed) {
 
       ndigs++;
 
-      npe = all_tof_digits[i]["npe"].asDouble();
+      npe = tmpDigits[i].fNpe;
       // loop over all the other digits to find multihit slabs
-      for ( unsigned int j = i+1; j < all_tof_digits.size(); j++ ) {
-        if ( check_param(&(all_tof_digits[i]), &(all_tof_digits[j])) ) {
+      for ( unsigned int j = i+1; j < tmpDigits.size(); j++ ) {
+        if ( check_param(tmpDigits[i], tmpDigits[j]) ) {
             // add up light yields if same bar was hit
-            npe += all_tof_digits[j]["npe"].asDouble();
+            npe += tmpDigits[j].fNpe;
             // mark this hit as used so we don't multicount
-            all_tof_digits[j]["isUsed"]=1;
+            tmpDigits[j].fIsUsed = true;
         } // end check for used
       } // end loop over secondary digits
+
       // convert light yield to adc & set the charge
       int adc = static_cast<int>(npe / (_configJSON["TOFadcConversionFactor"].asDouble()));
-      /*
+/*    
       double adcs = npe / (_configJSON["TOFadcConversionFactor"].asDouble());
       double adcw = 0.5;
       TRandom* rnd = new TRandom();
       double adcsm = rnd->Landau(adcs,adcw);
       int adc = static_cast<int>(adcsm);
-      */
+*/    
       if (fDebug) std::cout << "npe-adc: " << npe << " " << adc << std::endl;
-      // ROGERS = changed from "charge" to "charge_pm" for data integrity
-      Json::Value digit;
-      digit["charge_pm"] = adc;
+
+      // now set the digit
+      TOFDigit theDigit;
+
+      theDigit.SetChargePm(adc);
       // NOTE: needs tweaking/verifying -- DR 3/15
-      digit["charge_mm"] = adc;
-      digit["tof_key"] = all_tof_digits[i]["tof_key"].asString();
-      digit["station"] = all_tof_digits[i]["station"].asInt();
-      digit["plane"] = all_tof_digits[i]["plane"].asInt();
-      digit["slab"] = all_tof_digits[i]["slab"].asInt();
-      digit["pmt"] = all_tof_digits[i]["pmt"].asInt();
+      theDigit.SetChargeMm(adc);
+      theDigit.SetTofKey(tmpDigits[i].fTofKey);
+      theDigit.SetStation(tmpDigits[i].fStation);
+      theDigit.SetPlane(tmpDigits[i].fPlane);
+      theDigit.SetSlab(tmpDigits[i].fSlab);
+      theDigit.SetPmt(tmpDigits[i].fPmt);
 
       // add the calibration corrections to the time
-      std::string keyStr = all_tof_digits[i]["tof_key"].asString();
+      std::string keyStr = tmpDigits[i].fTofKey;
       TOFChannelKey xChannelKey(keyStr);
       double dT = 0.;
       if (pixStr != "unknown") {
@@ -457,7 +438,7 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       }
       if (fDebug)
          std::cout << "calibCorr: " << dT << std::endl;
-      double raw = all_tof_digits[i]["raw_time"].asDouble();
+      double raw = tmpDigits[i].fRawTime;
       double rt = raw + dT;
 
       // convert to tdc
@@ -469,44 +450,46 @@ Json::Value MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
 
       // store the digitized times
       // NOTE: trigger_req... has to be tweaked -- see earlier note -- DR/march15
-      digit["leading_time"] = tdc;
-      digit["trigger_request_leading_time"] =
-                         all_tof_digits[i]["trigger_request_leading_time"].asInt();
+      theDigit.SetLeadingTime(tdc);
+      theDigit.SetTriggerRequestLeadingTime(tmpDigits[i].fTriggerRequestLeadingTime);
       // ROGERS addition to maintain data integrity 03-May-2012
       //  - trigger_leading_time
       //  - trigger_trailing_time
       //  - trigger_request_trailing_timr
-      digit["trigger_leading_time"] = 0;
-      digit["trigger_trailing_time"] = 0;
-      digit["trigger_request_trailing_time"] = 0;
-      digit["trailing_time"] = 0;
-      digit["time_stamp"] = 0;
-      digit["trigger_time_tag"] = 0;
+      theDigit.SetTriggerLeadingTime(0);
+      theDigit.SetTriggerTrailingTime(0);
+      theDigit.SetTriggerRequestTrailingTime(0);
+      theDigit.SetTrailingTime(0);
+      theDigit.SetTimeStamp(0);
+      theDigit.SetTriggerTimeTag(0);
 
       // store event number
-      digit["phys_event_number"] = evnum;
-      digit["part_event_number"] = evnum;
+      theDigit.SetPhysEventNumber(evnum);
+      theDigit.SetPartEventNumber(evnum);
 
-      tof_digit.append(digit);
+      // store this digit in the digits array for this station
+      tofDigits[thisStation]->push_back(theDigit);
+
       if (fDebug)
-          std::cout << "digit #" << ndigs << " " <<  digit["tof_key"].asString() << std::endl;
-      all_tof_digits[i]["isUsed"]=1;
-    } // ends if-statement
-  } // ends k-loop
-  return tof_digit;
+          std::cout << "digit #" << ndigs << " " <<  theDigit.GetTofKey() << std::endl;
+
+      // done - mark digit as used
+      tmpDigits[i].fIsUsed = true;
+    } // ends check of used hit
+  } // ends loop over all digits
 }
 
 //////////////////////////////////////////////////////////////////////
-bool MapCppTOFMCDigitizer::check_param(Json::Value* hit1, Json::Value* hit2) const {
-  int station1   = (*hit1)["station"].asInt();
-  int station2   = (*hit2)["station"].asInt();
-  int plane1 = (*hit1)["plane"].asInt();
-  int plane2 = (*hit2)["plane"].asInt();
-  int slab1 = (*hit1)["slab"].asInt();
-  int slab2 = (*hit2)["slab"].asInt();
-  int pmt1     = (*hit1)["pmt"].asInt();
-  int pmt2     = (*hit2)["pmt"].asInt();
-  int hit_is_used = (*hit2)["isUsed"].asInt();
+bool MapCppTOFMCDigitizer::check_param(tmpThisDigit& hit1, tmpThisDigit& hit2) const {
+  int station1   = hit1.fStation;
+  int station2   = hit2.fStation;
+  int plane1 = hit1.fPlane;
+  int plane2 = hit2.fPlane;
+  int slab1 = hit1.fSlab;
+  int slab2 = hit2.fSlab;
+  int pmt1     = hit1.fPmt;
+  int pmt2     = hit2.fPmt;
+  bool hit_is_used = hit2.fIsUsed;
 
   if ( station1 == station2 && plane1 == plane2 &&
        slab1 == slab2 && pmt1 == pmt2 && !hit_is_used ) {

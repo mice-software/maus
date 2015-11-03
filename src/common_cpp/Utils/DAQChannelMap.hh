@@ -18,7 +18,7 @@
 #ifndef _MAUS_INPUTCPPREALDATA_CA_HH_
 #define _MAUS_INPUTCPPREALDATA_CA_HH_
 
-
+#include <Python.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -103,7 +103,7 @@ class DAQChannelKey {
 class DAQChannelMap {
  public:
 
-  DAQChannelMap() {}
+  DAQChannelMap();
   virtual ~DAQChannelMap();
 
  /** Initialize the map from text file.
@@ -115,6 +115,11 @@ class DAQChannelMap {
 
   /// Not implemented.
   bool InitFromCDB();
+  bool InitFromCurrentCDB();
+
+  /* interface to the python get_tof_cabling module */
+  void GetCabling(std::string devname);
+  bool InitializePyMod();
 
   // date file manager
   MDfileManager _dataFileManager;
@@ -142,8 +147,21 @@ class DAQChannelMap {
   std::string detector(int ldc, int geo, int ch, int eqType);
 
  private:
+  /** Use this function to reset the map before reloading. */
+  void reset();
+
   /// vector holding DAQChannelKeys for all channels of the MICE DAQ system
   std::vector<DAQChannelKey*> _chKey;
+
+  std::string _name;
+  std::string _daq_devicename;
+  std::stringstream cblstr;
+  std::string _daq_cabling_source, _daq_cabling_by, _daq_cablingdate;
+  PyObject* _cabling_mod;
+  PyObject* _tcabling;
+  PyObject* _get_cabling_func;
+  bool pymod_ok;
+  int runNumber;
 };
 
 }  // namespace MAUS

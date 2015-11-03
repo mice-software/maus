@@ -21,6 +21,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 #include "json/json.h"
 
@@ -143,6 +144,10 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
   */
   void _childbirth(const std::string& pJSONConfig);
 
+  /** The DAQ channel map object.
+  * It is used to group all measurements belonging to a given detector.*/
+  DAQChannelMap _map;
+
  private:
 
   void _birth(const std::string& pJSONConfig) {
@@ -165,13 +170,10 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
 
   /** Configure the zero supression filter. */
   void configureZeroSupression(ZeroSupressionFilter* processor, Json::Value configJSON);
+  void configureZeroSupressionTK(ZeroSupressionFilterTK* processor, Json::Value configJSON);
 
   /** Process manager object. */
   MDprocessManager _dataProcessManager;
-
-  /** The DAQ channel map object.
-  * It is used to group all measurements belonging to a given detector.*/
-  DAQChannelMap _map;
 
   /** Processor for TDC particle event data. */
   V1290CppDataProcessor  *_v1290PartEventProc_cpp;
@@ -193,16 +195,6 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
 
   /** Processor for DBBChain data. */
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
-
-  /** Enum of event types */
-  enum {
-    VmeTdc = 102,
-    VmefAdc1724 = 120,
-    VmefAdc1731 = 121,
-    VmeScaler = 111,
-    DBB = 141,
-    VLSB_C = 80
-  };
 
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.

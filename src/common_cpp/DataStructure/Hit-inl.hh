@@ -20,14 +20,14 @@
 namespace MAUS {
 
 template <class ChannelId>
-Hit<ChannelId>::Hit() : _track_id(0), _particle_id(0), _energy(0), _charge(0), _time(0),
+Hit<ChannelId>::Hit() : _track_id(0), _particle_id(0), _energy(0), _mass(0), _charge(0), _time(0),
              _energy_deposited(0), _path_length(0), _position(0, 0, 0), _momentum(0, 0, 0),
              _channel_id(NULL) {
 }
 
 template <class ChannelId>
 Hit<ChannelId>::Hit(const Hit<ChannelId>& md)
-           : _track_id(0), _particle_id(0), _energy(0), _charge(0), _time(0),
+           : _track_id(0), _particle_id(0), _energy(0), _mass(0), _charge(0), _time(0),
              _energy_deposited(0), _path_length(0), _position(0, 0, 0), _momentum(0, 0, 0),
              _channel_id(NULL) {
     *this = md;
@@ -42,6 +42,7 @@ Hit<ChannelId>& Hit<ChannelId>::operator=(const Hit<ChannelId>& md) {
     _particle_id = md._particle_id;
     _energy = md._energy;
     _charge = md._charge;
+    _mass = md._mass;
     _time = md._time;
     _energy_deposited = md._energy_deposited;
     _path_length = md._path_length;
@@ -104,6 +105,16 @@ double Hit<ChannelId>::GetCharge() const {
 template <class ChannelId>
 void Hit<ChannelId>::SetCharge(double charge) {
     _charge = charge;
+}
+
+template <class ChannelId>
+double Hit<ChannelId>::GetMass() const {
+    return _mass;
+}
+
+template <class ChannelId>
+void Hit<ChannelId>::SetMass(double mass) {
+    _mass = mass;
 }
 
 template <class ChannelId>

@@ -22,13 +22,15 @@ namespace MAUS {
 TOFSpacePoint::TOFSpacePoint()
     : _phys_event_number(0), _pixel_key(""), _charge(0), _station(0),
       _slabY(0), _slabX(0), _charge_product(0), _time(0.), _detector(""),
-      _part_event_number(0), _dt(0.) {
+      _part_event_number(0), _dt(0.), _global_x(0), _global_y(0), _global_z(0),
+      _global_x_err(0), _global_y_err(0), _global_z_err(0) {
 }
 
 TOFSpacePoint::TOFSpacePoint(const TOFSpacePoint& _tofspacepoint)
     : _phys_event_number(0), _pixel_key(""), _charge(0), _station(0),
       _slabY(0), _slabX(0), _charge_product(0), _time(0.), _detector(""),
-      _part_event_number(0), _dt(0.) {
+      _part_event_number(0), _dt(0.), _global_x(0), _global_y(0), _global_z(0),
+      _global_x_err(0), _global_y_err(0), _global_z_err(0) {
     *this = _tofspacepoint;
 }
 
@@ -47,6 +49,12 @@ TOFSpacePoint& TOFSpacePoint::operator=(const TOFSpacePoint& _tofspacepoint) {
     SetDetector(_tofspacepoint._detector);
     SetPartEventNumber(_tofspacepoint._part_event_number);
     SetDt(_tofspacepoint._dt);
+    SetGlobalPosX(_tofspacepoint._global_x);
+    SetGlobalPosY(_tofspacepoint._global_y);
+    SetGlobalPosZ(_tofspacepoint._global_z);
+    SetGlobalPosXErr(_tofspacepoint._global_x_err);
+    SetGlobalPosYErr(_tofspacepoint._global_y_err);
+    SetGlobalPosZErr(_tofspacepoint._global_z_err);
     return *this;
 }
 
@@ -99,6 +107,70 @@ int TOFSpacePoint::GetSlabx() const {
 
 void TOFSpacePoint::SetSlabx(int slabX) {
     _slabX = slabX;
+}
+
+int TOFSpacePoint::GetVertSlab() const {
+    return _slabY;
+}
+
+void TOFSpacePoint::SetVertSlab(int slabY) {
+    _slabY = slabY;
+}
+
+int TOFSpacePoint::GetHorizSlab() const {
+    return _slabX;
+}
+
+void TOFSpacePoint::SetHorizSlab(int slabX) {
+    _slabX = slabX;
+}
+
+double TOFSpacePoint::GetGlobalPosX() const {
+    return _global_x;
+}
+
+double TOFSpacePoint::GetGlobalPosY() const {
+    return _global_y;
+}
+
+double TOFSpacePoint::GetGlobalPosZ() const {
+    return _global_z;
+}
+
+double TOFSpacePoint::GetGlobalPosXErr() const {
+    return _global_x_err;
+}
+
+double TOFSpacePoint::GetGlobalPosYErr() const {
+    return _global_y_err;
+}
+
+double TOFSpacePoint::GetGlobalPosZErr() const {
+    return _global_z_err;
+}
+
+void TOFSpacePoint::SetGlobalPosX(double global_x) {
+    _global_x = global_x;
+}
+
+void TOFSpacePoint::SetGlobalPosY(double global_y) {
+    _global_y = global_y;
+}
+
+void TOFSpacePoint::SetGlobalPosZ(double global_z) {
+    _global_z = global_z;
+}
+
+void TOFSpacePoint::SetGlobalPosXErr(double global_x_err) {
+    _global_x_err = global_x_err;
+}
+
+void TOFSpacePoint::SetGlobalPosYErr(double global_y_err) {
+    _global_y_err = global_y_err;
+}
+
+void TOFSpacePoint::SetGlobalPosZErr(double global_z_err) {
+    _global_z_err = global_z_err;
 }
 
 int TOFSpacePoint::GetChargeProduct() const {

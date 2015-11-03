@@ -2,6 +2,11 @@
 
 filename=cloc-1.52.pl
 
+echo
+echo 'INFO: Installing third party library Cloc 1.52'
+echo '----------------------------------------------'
+echo
+
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     echo "INFO: Fetching from web..."
     dir=${MAUS_ROOT_DIR}/third_party/install/bin

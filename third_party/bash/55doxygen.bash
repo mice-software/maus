@@ -12,6 +12,11 @@ directory=doxygen-1.8.6.1
 filename=${directory}.src.tar.gz 
 url=http://micewww.pp.rl.ac.uk/attachments/1882/${filename}
 
+echo
+echo 'INFO: Installing third party library Doxygen 1.8.6.1'
+echo '----------------------------------------------------'
+echo
+
 while [[ $# > 1 ]]
 do
 key="$1"

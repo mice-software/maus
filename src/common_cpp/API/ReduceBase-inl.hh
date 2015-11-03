@@ -28,32 +28,45 @@ namespace MAUS {
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::ReduceBase(const std::string& s)
-          : IReduce<T_IN, T_OUT>(), ModuleBase(s) {
-  }
+  : IReduce<T_IN, T_OUT>(), ModuleBase(s), _output(new T_OUT), _own_output(true) {}
 
   template <typename T_IN, typename T_OUT>
   ReduceBase<T_IN, T_OUT>::ReduceBase(const ReduceBase& rb)
-          : IReduce<T_IN, T_OUT>(), ModuleBase(rb._classname) {
+  : IReduce<T_IN, T_OUT>(), ModuleBase(rb._classname) {
+    if (rb._output)
+      _output = new T_OUT(*(rb._output));
   }
 
   template <typename T_IN, typename T_OUT>
-  ReduceBase<T_IN, T_OUT>::~ReduceBase() {}
+  ReduceBase<T_IN, T_OUT>::~ReduceBase() {
+    if (_output && _own_output)
+      delete _output;
+  }
 
   template <typename T_IN, typename T_OUT>
-  T_OUT* ReduceBase<T_IN, T_OUT>::process(T_IN* t_in) {
+  void ReduceBase<T_IN, T_OUT>::SetOutput(T_OUT* out) {
+    if (_output && _own_output)
+      delete _output;
+
+    _output = out;
+    _own_output = false;
+  }
+
+  template <typename T_IN, typename T_OUT>
+  void ReduceBase<T_IN, T_OUT>::process(T_IN* t_in) {
     if (!t_in) { throw NullInputException(_classname); }
-    T_OUT* t_out = _process(t_in);
-    return t_out;
+    this->_process(t_in);
   }
 
   template <typename T_IN, typename T_OUT>
   PyObject* ReduceBase<T_IN, T_OUT>::process_pyobj(PyObject* py_input) {
-    T_OUT* cpp_out = NULL;
+    T_OUT* cpp_out;
     try {
         // this function owns cpp_in; py_input is still owned by caller
         // (unwrap performed a deep copy and did any necessary type conversion)
         T_IN* cpp_in = PyObjectWrapper::unwrap<T_IN>(py_input);
-        cpp_out = _process(cpp_in);
+        _process(cpp_in);
+	cpp_out = new T_OUT(*_output);
         delete cpp_in;
     } catch (std::exception& e) {
       PyErr_SetString(PyExc_RuntimeError, e.what());

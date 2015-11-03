@@ -305,7 +305,7 @@ PyObject* PyObjectWrapper::wrap_root_object_proxy(TEMP* cpp_data,
                                                        true);
   if (!py_data) {
       throw Exception(Exception::recoverable,
-                      "Could not convert MAUS::Data to PyRoot",
+                      "Could not convert "+name+" to PyRoot",
                       "PyObjectWrapper::wrap_root_object_proxy<"+name+">");
   }
   return py_data;

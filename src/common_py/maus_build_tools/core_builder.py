@@ -60,15 +60,33 @@ def build_lib_maus_cpp(env):
     Build libMausCpp.so shared object - containing all the code in 
     src/common_cpp/* and src/legacy/*
     """
-    common_cpp_files = glob.glob("src/legacy/*/*cc") + \
-        glob.glob("src/legacy/*/*/*cc") + \
-        glob.glob("src/common_cpp/*/*cc") + \
+    
+    # Magic to sort scons quirk when building object files first
+    env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
+    
+    # Find the common_cpp and legacy cpp source files
+    legacy_cpp_files = glob.glob("src/legacy/*/*cc") + \
+        glob.glob("src/legacy/*/*/*cc")
+    common_cpp_files = glob.glob("src/common_cpp/*/*cc") + \
         glob.glob("src/common_cpp/*/*/*cc")
-
+    
+    # Set up environments for both common_cpp and legacy
+    legacy_obj_env = env.Clone()
+    legacy_obj_env.Append(CCFLAGS=["""-fpermissive""", """-fPIC"""])
+    
+    common_obj_env = env.Clone()
+    common_obj_env.Append(CCFLAGS=["""-fPIC""", """-std=c++11"""])
+    
+    # Build the object files
+    common_cpp_obj = common_obj_env.Object(common_cpp_files)
+    legacy_cpp_obj = legacy_obj_env.Object(legacy_cpp_files)
+   
+    # Build the shared library and install 
+    all_cpp_obj = common_cpp_obj + legacy_cpp_obj
     targetpath = 'src/common_cpp/libMausCpp'
-    maus_cpp = env.SharedLibrary(target = targetpath,
-                                 source = common_cpp_files,
-                                 LIBS=env['LIBS'])
+    maus_cpp = common_obj_env.SharedLibrary(target = targetpath,
+                                            source = all_cpp_obj,
+                                            LIBS=env['LIBS'])
     env.Install("build", maus_cpp)
     #Build an extra copy with the .dylib extension for linking on OS X
     if (os.uname()[0] == 'Darwin'):

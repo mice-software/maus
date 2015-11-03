@@ -53,7 +53,9 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
 }
 
 PatternRecognition::PatternRecognition(): _straight_pr_on(true),
-                                          _helical_pr_on(true),
+//                                          _helical_pr_on(true),
+                                          _up_helical_pr_on(true),
+                                          _down_helical_pr_on(true),
                                           _verb(0),
                                           _n_trackers(2),
                                           _n_stations(5),
@@ -75,7 +77,9 @@ PatternRecognition::PatternRecognition(): _straight_pr_on(true),
 
 void PatternRecognition::set_parameters_to_default() {
   _straight_pr_on = true;
-  _helical_pr_on = true;
+//  _helical_pr_on = true;
+  _up_helical_pr_on = true;
+  _down_helical_pr_on = true;
   _verb = 0;
   _n_trackers = 2;
   _n_stations = 5;
@@ -103,7 +107,9 @@ bool PatternRecognition::LoadGlobals() {
   if (Globals::HasInstance()) {
     Json::Value *json = Globals::GetConfigurationCards();
     _straight_pr_on = (*json)["SciFiPRStraightOn"].asBool();
-    _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+//    _helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+    _up_helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
+    _down_helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
     _verb = (*json)["SciFiPatRecVerbosity"].asInt();
     _n_trackers = (*json)["SciFinTrackers"].asInt();
     _n_stations = (*json)["SciFinStations"].asInt();
@@ -142,22 +148,51 @@ void PatternRecognition::process(SciFiEvent &evt) const {
       SciFiTools::print_spacepoint_xyz(spnts_by_tracker[1]);
     }
 
-    // Loop over trackers
-    for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
-      // Split spacepoints according to which station they occured in
-      SpacePoint2dPArray spnts_by_station(_n_stations);
-      SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+//    // Loop over trackers
+//    for ( int trker_no = 0; trker_no < _n_trackers; ++trker_no ) {
+//      // Split spacepoints according to which station they occured in
+//      SpacePoint2dPArray spnts_by_station(_n_stations);
+//      SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+//
+//      // Make the helical and straight tracks, depending on flags
+//      if ( _helical_pr_on ) {
+//        bool track_type = 1;
+//        make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+//      }
+//      if ( _straight_pr_on ) {
+//        bool track_type = 0;
+//        make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+//      }
+//    }// ~Loop over trackers
 
-      // Make the helical and straight tracks, depending on flags
-      if ( _helical_pr_on ) {
-        bool track_type = 1;
-        make_all_tracks(track_type, trker_no, spnts_by_station, evt);
-      }
-      if ( _straight_pr_on ) {
-        bool track_type = 0;
-        make_all_tracks(track_type, trker_no, spnts_by_station, evt);
-      }
-    }// ~Loop over trackers
+    int trker_no = 0;
+    // Split spacepoints according to which station they occured in
+    SpacePoint2dPArray spnts_by_station(_n_stations);
+    SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+
+    // Make the helical and straight tracks, depending on flags
+    if ( _up_helical_pr_on ) {
+      bool track_type = 1;
+      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+    }
+    if ( _straight_pr_on ) {
+      bool track_type = 0;
+      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+    }
+
+    trker_no = 1;
+    // Split spacepoints according to which station they occured in
+    SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+
+    // Make the helical and straight tracks, depending on flags
+    if ( _down_helical_pr_on ) {
+      bool track_type = 1;
+      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+    }
+    if ( _straight_pr_on ) {
+      bool track_type = 0;
+      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+    }
   } else {
     if (_verb > 0) std::cerr << "No spacepoints in event" << std::endl;
   }
@@ -789,8 +824,8 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
       double remainder = SciFiTools::my_mod(close_dphi[j], 2*CLHEP::pi);
       double residual = fabs(remainder) - fabs(dphi[j]);
       if ( fabs(residual) > _n_turns_cut ) pass = false;
-      std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j] << "\t"
-                << remainder << "\t" << residual << std::endl;
+//       std::cout << n_values[i] << "\t" << j << "\t" << dphi[j] << "\t" << close_dphi[j] << "\t"
+//                 << remainder << "\t" << residual << std::endl;
     }
 
     // If n was accepted for all the turning angles
@@ -836,9 +871,10 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
   }
 };
 
-bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoint*> good_spnts)
-                                                                                            const {
+bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoint*> good_spnts,
+                                                                            int tracker_id) const {
 
+  bool helical_flag = (tracker_id == 0 ? _up_helical_pr_on : _down_helical_pr_on);
   double dT_first = 0.0;
   double dT_last = 0.0;
   /* TODO Waiting for Spacepoints to have time added ****
@@ -848,9 +884,9 @@ bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoin
   double dZ = fabs(good_spnts.back()->get_position().z() - good_spnts.front()->get_position().z());
 
   double dS = 0.0;
-  if ( _straight_pr_on && !_helical_pr_on ) // If you are ONLY looking at straight tracks
+  if ( _straight_pr_on && !helical_flag ) // If you are ONLY looking at straight tracks
     dS = dZ;
-  else if ( _helical_pr_on ) // if you are trying to reconstruc EITHER straight OR helical tracks
+  else if ( helical_flag ) // if you are trying to reconstruc EITHER straight OR helical tracks
     dS = dZ * _Pt_max / _Pz_min; // TODO _Pz_min is a guess right now. (both defined in header)
 
   double longest_allowed_time = dS / CLHEP::c_light;

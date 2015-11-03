@@ -3,8 +3,13 @@
 # require python extras for scons
 
 directory=unpacking-mice
-# filename=${directory}_2.tarz
-filename=${directory}_3.tarz
+filename=${directory}_4.0.0.tarz
+url=http://micewww.pp.rl.ac.uk/maus/third_party/${filename}
+
+echo
+echo 'INFO: Installing third party library Unpacking 4.0.0'
+echo '----------------------------------------------------'
+echo
 
 while [[ $# > 1 ]]
 do
@@ -28,25 +33,17 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     cd ${MAUS_ROOT_DIR}/third_party/source
 
+    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
+    then
+        echo "INFO: Found source archive in 'source' directory"
+    else
+        echo "INFO: Source archive doesn't exist.  Downloading..."
+        wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
+    fi
+
     if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename} ]
     then
-      rm ${MAUS_ROOT_DIR}/third_party/source/${filename}
-    fi
-
-    if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5 ]
-    then
-      rm ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5
-    fi
-
-#    wget http://dpnc.unige.ch/~yordan/${filename}
-#    wget http://dpnc.unige.ch/~yordan/${filename}.md5
-    wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${filename}
-    wget http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${filename}.md5
-
-    if [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename} ] &&
-       [ -f ${MAUS_ROOT_DIR}/third_party/source/${filename}.md5 ]
-    then
-        echo "INFO: Source archive file is download."
+        echo "INFO: Source archive file exists."
         echo
         echo "INFO: Checking MD5 checksum (otherwise the file didn't"
         echo "INFO: download properly):"

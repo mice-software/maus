@@ -24,7 +24,6 @@ import xboa
 import xboa.bunch
 import xboa.common
 import xboa.hit
-
 # 32 bit long; note that CLHEP max for the seed is a 32 bit unsigned int which
 # goes to 4294967295 in both 32 bit and 64 bit.
 NUMPY_RAND_MAX = 2147483647 
@@ -236,7 +235,7 @@ class Beam(): # pylint: disable=R0902
             if abs(ref['p']) < 1e-9:
                 raise ZeroDivisionError("Cannot define constant_solenoid "+\
                                         "beam for reference with 0. momentum")
-            beta_4d = (1.+beam_def['normalised_angular_momentum'])**0.5/k_s
+            beta_4d = (1.+beam_def['normalised_angular_momentum']**2.)**0.5/k_s
             alpha_4d = 0.
             trans_matrix = xboa.bunch.Bunch.build_penn_ellipse(
               beam_def['emittance_4d'], ref['mass'], beta_4d, alpha_4d,

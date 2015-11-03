@@ -114,7 +114,7 @@ void ObjectProcessor<ObjectType>::RegisterBaseClass(
                 std::string branch_name,
                 ProcessorBase<ChildType>* child_processor,
                 void (ChildType::*SetMethod)(ChildType value),
-                bool is_required = true) {
+                bool is_required) {
     using ObjectProcessorNS::BaseItem;
     using ObjectProcessorNS::BaseClassItem;
     BaseItem<ObjectType>* item = new BaseClassItem<ObjectType, ChildType>

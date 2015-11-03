@@ -20,6 +20,8 @@ import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
 
+from ROOT import TProcessID # pylint: disable=E0611
+
 from framework.utilities import DataflowUtilities
 
 class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
@@ -89,13 +91,17 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             # in the first event takes
             print("HINT: MAUS will process 1 event only at first...")
             map_buffer = DataflowUtilities.buffer_input(emitter, 1)
-            
+
             i = 0
             while len(map_buffer) != 0:
+                # Save number of objects before & reset after to stop 
+                # TRefArray overspill
+                object_number = TProcessID.GetObjectCount()
                 for event in map_buffer:
                     self.process_event(event)
                 i += len(map_buffer)
                 map_buffer = DataflowUtilities.buffer_input(emitter, 1)
+                TProcessID.SetObjectCount(object_number)
 
                 # Not Python 3 compatible print() due to backward
                 # compatability. 
@@ -183,7 +189,7 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 self.run_number = current_run_number
             # now transform the event and reduce it
             event = self.transformer.process(event)
-            event = self.merger.process(event)
+            self.merger.process(event)
         # done with tranform-merge, now write it out
         self.outputer.save(event)
         # if we converted to a different representation, delete the old one

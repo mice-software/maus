@@ -74,7 +74,7 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
 
   // Comfigure the VLSB (tracker board) data processor.
   initProcessor(_vLSBFragmentProc_cpp, configJSON);
-  configureZeroSupression(_vLSBFragmentProc_cpp, configJSON);
+  configureZeroSupressionTK(_vLSBFragmentProc_cpp, configJSON);
 
   // Comfigure the DBB (EMR board) data processor.
   initProcessor(_DBBFragmentProc_cpp, configJSON);
@@ -82,11 +82,8 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   // Comfigure the DBB Chain (chain of 6 EMR boards) data processor.
   initProcessor(_DBBChainFragmentProc_cpp, configJSON);
 
-  // Initialize the map from data cards
-  bool loaded = _map.InitFromCards(configJSON);
-  if (!loaded) {
-    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
-  }
+  // frankliuao: moved the _map.InitFromCards(configJSON) to InputCppDAQOnlineData
+  // and InputCppDAQOfflineData. There, daq_cabling_source is forced to be "CDB"
 
   // Set the map (a static data member) of all the processors.
   MDarranger::set_DAQ_map(&_map);
@@ -160,7 +157,7 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
     errors["bad_data_input"] = ss.str();
     spill->SetErrors(errors);
 
-    return 0;
+    nPartEvts = 0;
   }
   catch (Exception exc) {
     Squeak::mout(Squeak::error) << exc.GetLocation() << ": "
@@ -302,6 +299,59 @@ void InputCppDAQData::configureZeroSupression(ZeroSupressionFilter* processor,
     assert(configJSON.isMember(xDataCard));
     int zs_threshold = configJSON[xDataCard].asInt();
     processor->set_zs_threshold(zs_threshold);
+  }
+}
+
+void InputCppDAQData::configureZeroSupressionTK(ZeroSupressionFilterTK* processor,
+                                                Json::Value configJSON) {
+  string xName, xDataCard, calib_file;
+  xName = processor->get_equipment_name();
+  xDataCard = "Do_" + xName + "_Zero_Suppression";
+
+  // Enable or disable zero supression.
+  assert(configJSON.isMember(xDataCard));
+  bool zs = configJSON[xDataCard].asBool();
+  processor->set_zero_supression(zs);
+
+  if (zs) {
+    xDataCard = xName + "_Zero_Suppression_Threshold";
+    assert(configJSON.isMember(xDataCard));
+    int zs_threshold = configJSON[xDataCard].asInt();
+    processor->set_zs_threshold(zs_threshold);
+
+    xDataCard = "SciFiCalibrationFileName";
+    assert(configJSON.isMember(xDataCard));
+    calib_file = configJSON[xDataCard].asString();
+    char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+    std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+calib_file;
+    std::ifstream inf(fname.c_str());
+    if (!inf) {
+      throw(Exception(Exception::recoverable,
+                      "Could not load Tracker calibration",
+                       "InputCppDAQData::configureZeroSupressionTK"));
+    } else {
+      std::cerr << "Tracker calibration file found into DAQ\n";
+    }
+    std::string calib((std::istreambuf_iterator<char>(inf)), std::istreambuf_iterator<char>());
+    Json::Reader reader;
+    Json::Value calibration_data;
+    TrackerCalibMap *calibration = processor->get_calibration_ptr();
+    if (!reader.parse(calib, calibration_data)) {
+      throw(Exception(Exception::recoverable,
+                      "Could not load Tracker calibration",
+                      "InputCppDAQData::configureZeroSupressionTK"));
+    } else {
+      std::cerr << "Tracker calibration parsing into DAQ\n";
+    }
+    size_t n_channels = calibration_data.size();
+    for ( Json::Value::ArrayIndex i = 0; i < n_channels; ++i ) {
+      int bank            = calibration_data[i]["bank"].asInt();
+      int channel_n       = calibration_data[i]["channel"].asInt();
+      double adc_pedestal = calibration_data[i]["adc_pedestal"].asDouble();
+      double adc_gain     = calibration_data[i]["adc_gain"].asDouble();
+      (*calibration)[bank][channel_n].first  = adc_pedestal;
+      (*calibration)[bank][channel_n].second = adc_gain;
+    }
   }
 }
 

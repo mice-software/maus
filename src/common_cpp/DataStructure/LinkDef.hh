@@ -87,6 +87,7 @@
 #pragma link C++ class std::vector<VirtualHit>;
 #pragma link C++ class std::vector<SciFiHit>;
 #pragma link C++ class std::vector<TOFHit>;
+#pragma link C++ class std::vector<CkovHit>;
 #pragma link C++ class std::vector<KLHit>;
 #pragma link C++ class std::vector<EMRHit>;
 #pragma link C++ class std::vector<SpecialVirtualHit>;
@@ -99,8 +100,10 @@
 #pragma link C++ class MAUS::SciFiHit+;
 #pragma link C++ class MAUS::SciFiChannelId+;
 #pragma link C++ class MAUS::TOFHit+;
+#pragma link C++ class MAUS::CkovHit+;
 #pragma link C++ class MAUS::KLHit+;
 #pragma link C++ class MAUS::TOFChannelId+;
+#pragma link C++ class MAUS::CkovChannelId+;
 #pragma link C++ class MAUS::KLChannelId+;
 #pragma link C++ class MAUS::EMRHit+;
 #pragma link C++ class MAUS::EMRChannelId+;

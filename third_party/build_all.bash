@@ -18,11 +18,26 @@ case $key in
     fi
     shift
     ;;
+    --use-system-gcc)
+    if [ "$2" = true ] || [ "$2" = false ]; then
+    USE_SYSTEM_GCC="$2"
+    fi
+    shift
+    ;;
 esac
 shift
 done
+
+# Set default to build GCC as a third party
+if [ -z "$USE_SYSTEM_GCC" ]; then
+    USE_SYSTEM_GCC=false
+fi
+if [ "$USE_SYSTEM_GCC" != true ] && [ "$USE_SYSTEM_GCC" != false ]; then
+    USE_SYSTEM_GCC=false
+fi
+
 if [ -z "$MAUS_NUM_THREADS" ]; then
-  MAUS_NUM_THREADS=1
+    MAUS_NUM_THREADS=1
 fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
@@ -38,6 +53,12 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     set -e
 
     # Now build libraries
+    if [ "$USE_SYSTEM_GCC" = false ]; then
+        ${MAUS_ROOT_DIR}/third_party/bash/90gmp.bash -j $MAUS_NUM_THREADS
+        ${MAUS_ROOT_DIR}/third_party/bash/91mpfr.bash -j $MAUS_NUM_THREADS
+        ${MAUS_ROOT_DIR}/third_party/bash/92mpc.bash -j $MAUS_NUM_THREADS
+        ${MAUS_ROOT_DIR}/third_party/bash/93gcc.bash -j $MAUS_NUM_THREADS
+    fi
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash -j $MAUS_NUM_THREADS
     python ${MAUS_ROOT_DIR}/third_party/check_path.py
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash -j $MAUS_NUM_THREADS

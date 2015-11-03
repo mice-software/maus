@@ -138,25 +138,7 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
   _scifitracks.resize(rhs._scifitracks.size());
   for (unsigned int iTrk = 0; iTrk < rhs._scifitracks.size(); ++iTrk) {
     _scifitracks[iTrk] =  new SciFiTrack(*rhs._scifitracks[iTrk]);
-    // Deep copy the scifi trackpoints
-    SciFiTrackPointPArray rhs_tpoints = rhs._scifitracks[iTrk]->scifitrackpoints();
-    SciFiTrackPointPArray new_tpoints(rhs_tpoints.size());
-    // Loop over the rhs track trackpoints
-    for (unsigned int iRtp = 0; iRtp < rhs_tpoints.size(); ++iRtp) {
-      new_tpoints[iRtp] = new SciFiTrackPoint(*(rhs_tpoints[iRtp]));
-      // Now set the cross-pointer to the cluster within the trackpoint so that it points to
-      // correct place in the new copy of the datastructure, by searching for the cluster index in
-      // rhs event, which matches the pointer address of the cluster in the rhs trackpoint. Use
-      // this to set new trackpoint cluster to pointer to the correct cluster in the new event.
-//      SciFiCluster* new_cluster = NULL;
-//      for (unsigned int iRcl = 0; iRcl < rhs.clusters().size(); ++iRcl) {
-//        if (rhs_tpoints[iRtp]->get_cluster_pointer() == rhs._scificlusters[iRcl]) {
-//          new_cluster = _scificlusters[iRcl];
-//          break;
-//        }
-//      }
-//      new_tpoints[iRtp]->set_cluster_pointer(new_cluster);
-    }
+
     // Now set the cross-pointer to the PR track within the track so that it points to correct
     // place in the new copy of the datastructure, by searching for the PR track index in rhs
     // event, which matches the pointer address of the PR track in the rhs track. Use this to set
@@ -178,7 +160,6 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
       }
     }
     _scifitracks[iTrk]->set_pr_track_pointer(new_pr_track);
-    _scifitracks[iTrk]->set_scifitrackpoints(new_tpoints);
   }
   return *this;
 }

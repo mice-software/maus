@@ -52,6 +52,7 @@ namespace MAUS {
      * \param std::string& The name of the reducer.
      */
     explicit ReduceBase(const std::string&);
+
     /*!\brief Copy Constructor
      * \param ReduceBase& An reducer to copy from.
      */
@@ -67,7 +68,11 @@ namespace MAUS {
      * \param T* The input data to be reduced
      * \return The reduced data
      */
-    T_OUT* process(T_IN* t);
+    void process(T_IN* t);
+
+    T_OUT* GetOutput() {return _output;}
+
+    void SetOutput(T_OUT* out);
 
     PyObject* process_pyobj(PyObject* py_input);
 
@@ -76,11 +81,15 @@ namespace MAUS {
      *
      * Pure virtual private function to be implemented by the
      * derived reducer author to correctly apply the specific reduction 
-     * process.
+     * process. This function has to manipulates (updates) the _output object;
      * \param T* The input data to be reduced
      * \return The reduced data
      */
-    virtual T_OUT* _process(T_IN* t) = 0;
+    virtual void _process(T_IN* t) = 0;
+
+  protected:
+    T_OUT *_output;
+    bool _own_output;
   };
 
 }// end of namespace

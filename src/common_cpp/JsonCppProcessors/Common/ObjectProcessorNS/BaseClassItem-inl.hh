@@ -27,7 +27,7 @@ namespace ObjectProcessorNS {
 template <class ParentType, class ChildType>
 BaseClassItem<ParentType, ChildType>::BaseClassItem
           (std::string branch_name, ProcessorBase<ChildType>* child_processor,
-           SetMethod setter, bool is_required = true)
+           SetMethod setter, bool is_required)
           : BaseItem<ParentType>(), _branch(branch_name),
             _processor(child_processor), _setter(setter),
             _required(is_required) {}

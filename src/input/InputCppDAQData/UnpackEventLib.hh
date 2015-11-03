@@ -273,7 +273,6 @@ class V830CppDataProcessor : public MDarranger {
 ////////////////////////////////////////////////////////////////////////////////
 
 /** On Fragment Event VLSB
- * This class unpacks a VLSB board hit (tracker cosmic test in Lab7).
  */
 class VLSBDataProcessor : public ZeroSupressionFilter {
  public:
@@ -299,10 +298,10 @@ class VLSBDataProcessor : public ZeroSupressionFilter {
 typedef std::vector<MAUS::VLSB>           TrackerHitArray;
 typedef std::vector<TrackerHitArray>      TtackerPartEventArray;
 
-class VLSBCppDataProcessor : public ZeroSupressionFilter {
+class VLSBCppDataProcessor : public ZeroSupressionFilterTK {
  public:
   VLSBCppDataProcessor()
-  : ZeroSupressionFilter(), _current_pEvent(-1),
+  : ZeroSupressionFilterTK(), _current_pEvent(-1),
   _n_pEvent(0), _is_first(true) {_equipment="VLSB";}
 
   virtual ~VLSBCppDataProcessor() {}
