@@ -72,7 +72,7 @@ namespace MAUS {
 
     T_OUT* GetOutput() {return _output;}
 
-    void SetOutput(T_OUT* out) {_output = out;}
+    void SetOutput(T_OUT* out);
 
     PyObject* process_pyobj(PyObject* py_input);
 
@@ -89,6 +89,7 @@ namespace MAUS {
 
   protected:
     T_OUT *_output;
+    bool _own_output;
   };
 
 }// end of namespace

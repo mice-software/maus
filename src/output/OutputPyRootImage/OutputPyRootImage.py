@@ -60,11 +60,14 @@ class OutputPyRootImage:
         @returns True
         """
         config_doc = json.loads(config_json)
-
-        self.file_prefix = config_doc["image_file_prefix"]
-        self.directory = config_doc["image_directory"]
-        self.end_of_run_directory = config_doc["end_of_run_image_directory"]
-        self.image_types = config_doc["image_types"]
+        if 'image_file_prefix' in config_json:
+            self.file_prefix = config_doc["image_file_prefix"]
+        if 'image_directory' in config_json:
+            self.directory = config_doc["image_directory"]
+        if 'end_of_run_image_directory' in config_json:
+            self.end_of_run_directory = config_doc["end_of_run_image_directory"]
+        if 'image_types' in config_json:
+            self.image_types = config_doc["image_types"]
 
     def save(self, image_data):
         """
