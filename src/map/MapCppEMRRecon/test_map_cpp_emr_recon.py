@@ -181,9 +181,9 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 
         # The charge ratio should be way below 1 (muon Bragg peak)
         self.assertTrue(spill_out['recon_events'][1]['emr_event']\
-				 ['charge_ratio_MA'] < 0.9)
+				 ['charge_ratio_MA'] < 0.75)
         self.assertTrue(spill_out['recon_events'][1]['emr_event']\
-				 ['charge_ratio_SA'] < 0.9)
+				 ['charge_ratio_SA'] < 0.75)
 
         # The plane density must be 1 for a muon and its chi2 low
         self.assertEqual(spill_out['recon_events'][1]['emr_event']\

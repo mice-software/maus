@@ -45,10 +45,7 @@ CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
     return *this;
 }
 
-CanvasWrapper::~CanvasWrapper() {
-    if (_canvas != NULL)
-        delete _canvas;
-}
+CanvasWrapper::~CanvasWrapper() {}
 
 void CanvasWrapper::SetCanvas(TCanvas* canvas) {
     if (_canvas != NULL)

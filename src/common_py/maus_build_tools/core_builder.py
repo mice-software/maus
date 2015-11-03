@@ -75,7 +75,7 @@ def build_lib_maus_cpp(env):
     legacy_obj_env.Append(CCFLAGS=["""-fpermissive""", """-fPIC"""])
     
     common_obj_env = env.Clone()
-    common_obj_env.Append(CCFLAGS=["""-fPIC"""])
+    common_obj_env.Append(CCFLAGS=["""-fPIC""", """-std=c++11"""])
     
     # Build the object files
     common_cpp_obj = common_obj_env.Object(common_cpp_files)

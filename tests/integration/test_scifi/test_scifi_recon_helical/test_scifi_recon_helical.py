@@ -73,14 +73,14 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         h5 = ROOT.gDirectory.Get('h5')
         self.assertLess(h5.GetMean(), 5)
         self.assertLess(h5.GetRMS(), 5)
-        self.assertGreater(h5.GetEntries(), 195)
+        self.assertGreater(h5.GetEntries(), 190)
 
         tree.Draw(
           "_spill._recon._scifi_event._scifihelicalprtracks._circle_chisq>>h6")
         h6 = ROOT.gDirectory.Get('h6')
         self.assertLess(h6.GetMean(), 1.0)
         self.assertLess(h6.GetRMS(), 2)
-        self.assertGreater(h6.GetEntries(), 195)
+        self.assertGreater(h6.GetEntries(), 190)
 
         print "WARNING: Track Fit still under development."+\
           "Disabling remaining tests for now"

@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 #include <algorithm>
 
 #include "json/json.h"
@@ -108,6 +109,42 @@ class ZeroSupressionFilter : public MDarranger {
   /// Value of the threshold used for zero suppression */
   int _zs_threshold;
 };
+
+typedef std::vector< std::vector<std::pair<double, double> > > TrackerCalibMap;
+
+class ZeroSupressionFilterTK : public MDarranger {
+
+ public:
+
+  ZeroSupressionFilterTK()
+  :_zero_suppression(0), _zs_threshold(0), _calibration(_number_banks) {
+    for (auto &c:_calibration)
+      c.resize(_number_channels);
+  }
+
+  virtual ~ZeroSupressionFilterTK() {}
+
+  void set_zero_supression(bool zs) { _zero_suppression = zs; }
+  void set_zs_threshold(int zst)    { _zs_threshold = zst; }
+  void set_calibration(TrackerCalibMap calibration) { _calibration = calibration;}
+  TrackerCalibMap* get_calibration_ptr() {return &_calibration;}
+
+ protected:
+
+  /// If true - do zero suppression
+  bool _zero_suppression;
+
+  /// Value of the threshold used for zero suppression */
+  int _zs_threshold;
+
+
+  /// Arrays containing calibration values for every channel in the 4 banks of the 16 boards.
+  static const int _number_channels       = 128;
+  static const int _number_banks          = 64;
+
+  TrackerCalibMap _calibration;
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
