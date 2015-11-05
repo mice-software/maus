@@ -696,4 +696,49 @@ SciFiSpacePointPArray find_spacepoints(SciFiSpacePointPArray spacepoint_array, i
 
   return found_spacepoints;
 }
+
+void MapCppTrackerRecon::set_spacepoint_global_output(SciFiSpacePointPArray spoints) {
+  for (auto sp : spoints) {
+    int tracker_id = sp->get_tracker();
+
+    ThreeVector reference_position = _geometry_helper.GetReferencePosition(tracker_id);
+    CLHEP::HepRotation reference_rotation = _geometry_helper.GetReferenceRotation(tracker_id);
+
+    ThreeVector global_position = sp->get_position();
+    global_position *= reference_rotation;
+    global_position += reference_position;
+
+    sp->set_global_position(global_position);
+  }
+}
+
+/*
+// Find the plane id of the middle plane for this station
+int plane_id = 0;
+switch ( station_id ) {
+  case 1:
+    plane_id = 2;
+    break;
+  case 2:
+    plane_id = 5;
+    break;
+  case 3:
+    plane_id = 8;
+    break;
+  case 4:
+    plane_id = 11;
+    break;
+  case 5:
+    plane_id = 14;
+    break;
+  default:
+    plane_id = 0;
+    std::cerr << "WARNING: MapCppTrackerRecon: Failed to find spacepoint plane_id";
+    break;
+}
+
+// Use the geometry helper to find the global position of this plane
+ThreeVector plane_global_position = _geometry_helper.GeometryMap().find(tracker_id)->second.Planes.find(plane_id)->second.GlobalPosition;
+*/
+
 } // ~namespace MAUS

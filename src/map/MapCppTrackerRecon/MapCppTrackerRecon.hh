@@ -117,6 +117,11 @@ class MapCppTrackerRecon : public MapBase<Data> {
 
   void print_event_info(MAUS::SciFiEvent &event) const;
 
+  /**
+   * @brief Populate global position output for the spacepoints
+   */
+  void set_spacepoint_global_output(SciFiSpacePointPArray spoints);
+
  private:
   /// This will contain the configuration
   Json::Value _configJSON;
