@@ -286,8 +286,10 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
-SciFiPRHelicalOn = True # Flag to turn on the tracker helical pattern recognition
-SciFiPRStraightOn = True # Flag to turn on the tracker straight pattern recognition
+SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit

@@ -38,7 +38,11 @@ PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
                                         ("MapCppTrackerRecon", "", "", "", "");
 }
 
-MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon"),
+MapCppTrackerRecon::MapCppTrackerRecon() : _up_straight_pr_on(true),
+                                           _down_straight_pr_on(true),
+                                           _up_helical_pr_on(true),
+                                           _down_helical_pr_on(true),
+                                           MapBase<Data>("MapCppTrackerRecon"),
 #ifdef KALMAN_TEST
   _spacepoint_helical_track_fitter(NULL),
   _spacepoint_straight_track_fitter(NULL) {
@@ -56,9 +60,10 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
   Json::Value* json = Globals::GetConfigurationCards();
-  _up_helical_pr_on   = (*json)["SciFiPRHelicalOn"].asBool();
-  _down_helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
-  _straight_pr_on     = (*json)["SciFiPRStraightOn"].asBool();
+  int user_up_helical_pr_on    = (*json)["SciFiPRHelicalTkUSOn"].asInt();
+  int user_down_helical_pr_on  = (*json)["SciFiPRHelicalTkDSOn"].asInt();
+  int user_up_straight_pr_on   = (*json)["SciFiPRStraightTkUSOn"].asInt();
+  int user_down_straight_pr_on = (*json)["SciFiPRStraightTkDSOn"].asInt();
   _kalman_on          = (*json)["SciFiKalmanOn"].asBool();
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
   _size_exception     = (*json)["SciFiClustExcept"].asInt();
@@ -81,18 +86,48 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   double up_field = _geometry_helper.GetFieldValue(0);
   double down_field = _geometry_helper.GetFieldValue(1);
 
-  if (fabs(up_field) < 0.00001) { // 10 Gaus
+  if (user_up_helical_pr_on == 2)
+    _up_helical_pr_on = true;
+  else if (user_up_helical_pr_on == 1)
     _up_helical_pr_on = false;
-  }
-  if (fabs(down_field) < 0.00001) { // 10 Gaus
-    _down_helical_pr_on = false;
-  }
+  else if (user_up_helical_pr_on == 0 && fabs(up_field) < 0.00001) // 10 Gaus
+    _up_helical_pr_on = false;
+  else if (user_up_helical_pr_on == 0 && fabs(up_field) >= 0.00001)
+    _up_helical_pr_on = true;
 
+  if (user_down_helical_pr_on == 2)
+    _down_helical_pr_on = true;
+  else if (user_down_helical_pr_on == 1)
+    _down_helical_pr_on = false;
+  else if (user_down_helical_pr_on == 0 && fabs(down_field) < 0.00001)
+    _down_helical_pr_on = false;
+  else if (user_down_helical_pr_on == 0 && fabs(down_field) >= 0.00001)
+    _down_helical_pr_on = true;
+
+  if (user_up_straight_pr_on == 2)
+    _up_straight_pr_on = true;
+  else if (user_up_straight_pr_on == 1)
+    _up_straight_pr_on = false;
+  else if (user_up_straight_pr_on == 0 && fabs(up_field) < 0.00001)
+    _up_straight_pr_on = true;
+  else if (user_up_straight_pr_on == 0 && fabs(up_field) >= 0.00001)
+    _up_straight_pr_on = false;
+
+  if (user_down_straight_pr_on == 2)
+    _down_straight_pr_on = true;
+  else if (user_down_straight_pr_on == 1)
+    _down_straight_pr_on = false;
+  else if (user_down_straight_pr_on == 0 && fabs(down_field) < 0.00001)
+    _down_straight_pr_on = true;
+  else if (user_down_straight_pr_on == 0 && fabs(down_field) >= 0.00001)
+    _down_straight_pr_on = false;
+
+  _pattern_recognition = PatternRecognition();
   _pattern_recognition.LoadGlobals();
-//  _pattern_recognition.set_helical_pr_on(_helical_pr_on);
   _pattern_recognition.set_up_helical_pr_on(_up_helical_pr_on);
   _pattern_recognition.set_down_helical_pr_on(_down_helical_pr_on);
-  _pattern_recognition.set_straight_pr_on(_straight_pr_on);
+  _pattern_recognition.set_up_straight_pr_on(_up_straight_pr_on);
+  _pattern_recognition.set_down_straight_pr_on(_down_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
 
