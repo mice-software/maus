@@ -174,6 +174,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
       // Build SpacePoints.
       if (event->clusters().size()) {
         _spacepoint_recon.process(*event);
+        set_spacepoint_global_output(event->spacepoints());
       }
       // Pattern Recognition.
       if (_patrec_on && event->spacepoints().size()) {
@@ -697,7 +698,7 @@ SciFiSpacePointPArray find_spacepoints(SciFiSpacePointPArray spacepoint_array, i
   return found_spacepoints;
 }
 
-void MapCppTrackerRecon::set_spacepoint_global_output(SciFiSpacePointPArray spoints) {
+void MapCppTrackerRecon::set_spacepoint_global_output(SciFiSpacePointPArray spoints) const {
   for (auto sp : spoints) {
     int tracker_id = sp->get_tracker();
 

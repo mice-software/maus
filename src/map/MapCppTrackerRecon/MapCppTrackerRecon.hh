@@ -90,7 +90,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
    *
    *  Receive a data object with digits (either MC or real) and then call the higher level
    *  reconstruction algorithms
-   * 
+   *
    * \param document a line/spill from the JSON input
    */
   void _process(Data* data) const;
@@ -120,7 +120,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
   /**
    * @brief Populate global position output for the spacepoints
    */
-  void set_spacepoint_global_output(SciFiSpacePointPArray spoints);
+  void set_spacepoint_global_output(SciFiSpacePointPArray spoints) const;
 
  private:
   /// This will contain the configuration
