@@ -31,10 +31,14 @@ PyMODINIT_FUNC init_MapCppTOFDigits(void) {
                                             ("MapCppTOFDigits", "", "", "", "");
 }
 
+////////////////////////////////////////////////////////////
 MapCppTOFDigits::MapCppTOFDigits()
   : MapBase<MAUS::Data>("MapCppTOFDigits") {
+    map_init = false;
+    runNumberSave = -1;
 }
 
+////////////////////////////////////////////////////////////
 void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
@@ -45,17 +49,15 @@ void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
 
   // Check if the JSON document can be parsed, else return error only
   //  JsonCpp setup
-  Json::Value configJSON;
-  Json::Value map_file_name;
   Json::Value xEnable_V1290_Unpacking;
   Json::Value xEnable_V1724_Unpacking;
   configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
   //  this will contain the configuration
 
-  map_init = true;
-  bool loaded = _map.InitializeCards(configJSON);
-  if (!loaded)
-    map_init = false;
+  //map_init = true;
+  //bool loaded = _map.InitializeCards(configJSON);
+  //if (!loaded)
+  //  map_init = false;
 
   xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_V1290_Unpacking",
@@ -79,8 +81,10 @@ void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
 }
 
 
+////////////////////////////////////////////////////////////
 void MapCppTOFDigits::_death()  {}
 
+////////////////////////////////////////////////////////////
 void MapCppTOFDigits::_process(MAUS::Data *data) const {
   // Get spill, break if there's no DAQ data
   Spill *spill = data->GetSpill();
@@ -91,6 +95,13 @@ void MapCppTOFDigits::_process(MAUS::Data *data) const {
   if (spill->GetDaqEventType() != "physics_event")
     return;
 
+  int runNumber = 0;
+  runNumber = spill->GetRunNumber();
+  std::cerr << "RunNum = " << runNumber << std::endl;
+
+  if (!map_init || runNumber != runNumberSave) {
+      const_cast<MapCppTOFDigits*>(this)->getTofCabling(runNumber);
+  }
   TriggerRequestArray *tr_req_data = spill->GetDAQData()->GetTriggerRequestArrayPtr();
   TriggerArray        *tr_data     = spill->GetDAQData()->GetTriggerArrayPtr();
 
@@ -183,6 +194,7 @@ void MapCppTOFDigits::_process(MAUS::Data *data) const {
   }
 }
 
+////////////////////////////////////////////////////////////
 void MapCppTOFDigits::setTdc(MAUS::TOFDigit *digit, MAUS::V1290 &tdc) const {
   std::stringstream xConv;
   DAQChannelKey xTdcDaqKey;
@@ -206,6 +218,7 @@ void MapCppTOFDigits::setTdc(MAUS::TOFDigit *digit, MAUS::V1290 &tdc) const {
   digit->SetPartEventNumber(tdc.GetPartEventNumber());
 }
 
+////////////////////////////////////////////////////////////
 bool MapCppTOFDigits::findAdc(MAUS::TOFDigit *digit,
                               MAUS::V1724Array &adc_hits) const throw(Exception) {
   int n_Adc_hits = adc_hits.size();
@@ -241,6 +254,7 @@ bool MapCppTOFDigits::findAdc(MAUS::TOFDigit *digit,
   return false;
 }
 
+////////////////////////////////////////////////////////////
 bool MapCppTOFDigits::findTrigger(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
                                   MAUS::V1290Array &tr_hits) const  throw(Exception) {
   int n_tr_hits = tr_hits.size();
@@ -271,6 +285,7 @@ bool MapCppTOFDigits::findTrigger(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
   return false;
 }
 
+////////////////////////////////////////////////////////////
 bool MapCppTOFDigits::findTriggerReq(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
                                   MAUS::V1290Array &tr_req_hits) const  throw(Exception) {
   int n_tr_hits = tr_req_hits.size();
@@ -300,4 +315,16 @@ bool MapCppTOFDigits::findTriggerReq(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
 
   return false;
 }
+////////////////////////////////////////////////////////////
+void MapCppTOFDigits::getTofCabling(int runNumber) {
+  // Load the cabling map.
+  runNumberSave = runNumber;
+  map_init = _map.InitializeCards(configJSON, runNumber);
+  if (!map_init) {
+      throw MAUS::Exception(Exception::recoverable,
+                          "Failed to initialize cabling map",
+                          "MapCppTOFDigits::_process");
+  }
 }
+////////////////////////////////////////////////////////////
+} // end namespace MAUS

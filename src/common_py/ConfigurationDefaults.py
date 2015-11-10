@@ -553,13 +553,14 @@ EMRmaxSecondaryToPrimaryTrackDistance = 100
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 
-# this sets the source for the calibrations
+# this sets the source for the calibrations and cabling
 # by default it is from CDB
 # set it to 'file' if you want to load local files
 # if you set file, then uncomment the calib files below
 TOF_calib_source = "CDB"
+TOF_cabling_source = "CDB"
 
-TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
@@ -569,10 +570,11 @@ TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePointCut = 0.5 # nanosecond
 
-# get calibrations by either a) run_number or b) date
+# get cabling and calibrations by either a) run_number or b) date
 # default is by run_number
 # if set to "date" then set the appropriate TOF_calib_date_from flag below
 TOF_calib_by = "run_number"
+TOF_cabling_by = "run_number"
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format

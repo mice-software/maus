@@ -47,6 +47,18 @@ class TestGetCabling(unittest.TestCase): #pylint: disable = R0904
         cablingdate = '2012-05-27 12:00:00.0'
         gtc_.get_cabling(dev, cablingdate)
 
+        # check we can get cabling for valid det and valid run
+        runnumber = 7417
+        gtc_.get_cabling_for_run(dev, runnumber)
+
+        # check we can get cabling for valid det and run=0
+        runnumber = 0
+        gtc_.get_cabling_for_run(dev, runnumber)
+
+        # check we raise exception for valid det and invalid run
+        runnumber = 3
+        self.assertRaises(Exception, gtc_.get_cabling_for_run, dev, runnumber)
+
         # check we error for invalid detector
         dev = "Junk"
         self.assertRaises(Exception, gtc_.get_cabling, dev, cablingdate)
