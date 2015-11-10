@@ -5,7 +5,6 @@ Datacard to run with simulation of 200MeV/c muons
 
 import os
 job_number = int(os.getenv("LSB_JOBINDEX", 100))
-
 input_root_file_name = "200MeV_mu_plus_hypothesis_Global_Recon" + str(job_number) + ".root"
 output_root_file_name = "200MeV_mu_plus_hypothesis_Global_Recon" + str(job_number) + ".root"
 
@@ -21,10 +20,10 @@ keep_only_muon_tracks = False
 keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
+simulation_geometry_filename = os.getenv("MAUS_ROOT_DIR") + "/files/geometry/download/ParentGeometryFile.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":2700.0},
+    "position":{"x":0.0, "y":-0.0, "z":12900.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":244.3, "time":0.0, "random_seed":job_number
 }
@@ -79,3 +78,4 @@ TOF_calib_by = "date";
 TOF_calib_date_from = "2013-10-01 00:00:00";
 #~ header_and_footer_mode = "dont_append"
 verbose_level = 1
+track_matching_pid_hypothesis = "kMuPlus"

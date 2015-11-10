@@ -59,7 +59,7 @@ namespace MAUS {
 
   class MapCppGlobalTrackMatching : public MapBase<Data> {
   public:
-    /** Constructor, setting the internal variable #_classname */
+    /// Constructor
     MapCppGlobalTrackMatching();
 
   private:
@@ -84,16 +84,6 @@ namespace MAUS {
      */
     void _process(MAUS::Data* data) const;
 
-
-    /** Import the existing MAUS::ReconEvent, creating a new
-     * MAUS::GlobalEvent and populating a
-     * MAUS::recon::global::Track object. 
-     * @param recon_event The ReconEvent to obtain the GlobalEvent from
-     *                  
-     * @return global_event The GlobalEvent with spacepoints and track(s)
-     */
-    MAUS::GlobalEvent* MakeTracks(MAUS::ReconEvent* recon_event) const;
-
   private:
     /// Check that a valid configuration is passed to the process
     bool _configCheck;
@@ -102,8 +92,16 @@ namespace MAUS {
     ///  JsonCpp setup
     Json::Reader _reader;
 
+    std::string _pid_hypothesis_string;
+
+    /// Matching tolerances for the various detectors that are matched
+    std::map<std::string, std::pair<double, double> > _matching_tolerances;
+
+    /// Should the RK4 include energy loss
+    bool _energy_loss;
+    
     // Mapper name, useful for tracking results...
-    std::string _classname;
+    std::string _mapper_name;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

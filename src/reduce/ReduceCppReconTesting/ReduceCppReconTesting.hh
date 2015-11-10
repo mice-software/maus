@@ -51,7 +51,7 @@ class ReduceCppReconTesting : public ReduceBase<Data, ImageData> {
   void _death();
 
   /** @brief Process JSON document */
-  ImageData* _process(Data* data);
+  void _process(Data* data);
 
   /**
    * @brief Checks whether the given TrackPoint belongs to a detector given by

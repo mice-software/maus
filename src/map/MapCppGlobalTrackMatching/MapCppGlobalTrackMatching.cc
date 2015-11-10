@@ -49,12 +49,24 @@ namespace MAUS {
                               "MapCppGlobalTrackMatching::birth");
     }
     _configCheck = true;
-    _classname = "MapCppGlobalTrackMatching";
-    std::cerr << "TIME: " << time(0) << "\n";
+    _mapper_name = "MapCppGlobalTrackMatching";
+    _pid_hypothesis_string = _configJSON["track_matching_pid_hypothesis"].asString();
+    Json::Value track_matching_tolerances = _configJSON["track_matching_tolerances"];
+    _matching_tolerances["TOF0"] = std::make_pair(
+        track_matching_tolerances["TOF0x"].asDouble(),
+        track_matching_tolerances["TOF0y"].asDouble());
+    _matching_tolerances["TOF1"] = std::make_pair(
+        track_matching_tolerances["TOF1x"].asDouble(),
+        track_matching_tolerances["TOF1y"].asDouble());
+    _matching_tolerances["TOF2"] = std::make_pair(
+        track_matching_tolerances["TOF2x"].asDouble(),
+        track_matching_tolerances["TOF2y"].asDouble());
+    _matching_tolerances["KL"] = std::make_pair(10000,
+        track_matching_tolerances["KLy"].asDouble());
+    _energy_loss = _configJSON["track_matching_energy_loss"].asBool();
   }
 
   void MapCppGlobalTrackMatching::_death() {
-    std::cerr << "TIME: " << time(0) << "\n";
   }
 
   void MapCppGlobalTrackMatching::_process(MAUS::Data* data_cpp) const {
@@ -71,38 +83,26 @@ namespace MAUS {
     }
     const MAUS::Spill* spill = data_cpp->GetSpill();
 
-    
-    //~ std::map<MAUS::DataStructure::Global::DetectorPoint, bool> mc_detectors = MCTruthTools::GetMCDetectors(spill->GetMCEvents()->at(0));
-    //~ std::map<MAUS::DataStructure::Global::DetectorPoint, bool> recon_detectors = GlobalTools::GetMCDetectors(spill->GetReconEvents()->at(0)->GetGlobalEvent());
-    //~ std::cerr << "U|V|TOF0 |Chk|TOF1 |Tracker0   |Tracker1   |TOF2 |K|E\n";
-    //~ for (int i = 0; i < 27; i++) {
-      //~ std::cerr << mc_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] << " ";
-    //~ }
-    //~ std::cerr << "\n";
-    //~ for (int i = 0; i < 27; i++) {
-      //~ std::cerr << recon_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] << " ";
-    //~ }
-    //~ std::cerr << "\n";
-
-    
     MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
     if (!recon_events) {
       return;
     }
-    //~ std::cerr << "Number of Recon Events: " << recon_events->size() << "\n";
+
     MAUS::ReconEventPArray::iterator recon_event_iter;
     for (recon_event_iter = recon_events->begin();
-   recon_event_iter != recon_events->end();
-   ++recon_event_iter) {
+         recon_event_iter != recon_events->end();
+         ++recon_event_iter) {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
 
       if (global_event) {
-        MAUS::recon::global::TrackMatching track_matching;
-        track_matching.USTrack(global_event, _classname);
-        track_matching.DSTrack(global_event, _classname);
-        track_matching.throughTrack(global_event, _classname);
+        MAUS::recon::global::TrackMatching
+            track_matching(global_event, _mapper_name, _pid_hypothesis_string,
+                           _matching_tolerances, 10.0, _energy_loss);
+        track_matching.USTrack();
+        track_matching.DSTrack();
+        track_matching.throughTrack();
       }
     }
   }

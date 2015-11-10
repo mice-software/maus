@@ -30,10 +30,10 @@ namespace MAUS {
 namespace GlobalTools {
 
 std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
-    GetMCDetectors(MAUS::GlobalEvent* global_event) {
-  std::map<MAUS::DataStructure::Global::DetectorPoint, bool> mc_detectors;
+    GetReconDetectors(MAUS::GlobalEvent* global_event) {
+  std::map<MAUS::DataStructure::Global::DetectorPoint, bool> recon_detectors;
   for (int i = 0; i < 27; i++) {
-    mc_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] =
+    recon_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] =
       false;
   }
   MAUS::DataStructure::Global::TrackPArray* imported_tracks =
@@ -46,7 +46,7 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
     std::vector<MAUS::DataStructure::Global::DetectorPoint> track_detectors =
         (*imported_track_iter)->GetDetectorPoints();
     for (size_t i = 0; i < track_detectors.size(); i++) {
-      mc_detectors[track_detectors[i]] = true;
+      recon_detectors[track_detectors[i]] = true;
     }
   }
 
@@ -56,9 +56,9 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
   for (sp_iter = imported_spacepoints->begin();
        sp_iter != imported_spacepoints->end();
        ++sp_iter) {
-    mc_detectors[(*sp_iter)->get_detector()] = true;
+    recon_detectors[(*sp_iter)->get_detector()] = true;
   }
-  return mc_detectors;
+  return recon_detectors;
 }
 
 std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
@@ -279,6 +279,25 @@ bool approx(double a, double b, double tolerance) {
   }
 }
 
+MAUS::DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
+    const MAUS::DataStructure::Global::Track* track, double z_position) {
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> trackpoints =
+      track->GetTrackPoints();
+  size_t nearest_index = 0;
+  double z_distance = 1.0e20;
+  for (size_t i = 0; i < trackpoints.size(); i++) {
+    double current_distance = std::abs(z_position -
+                                       trackpoints.at(i)->get_position().Z());
+    if (current_distance < z_distance) {
+      nearest_index = i;
+      z_distance = current_distance;
+    }
+  }
+  MAUS::DataStructure::Global::TrackPoint* nearest_track_point = new
+      MAUS::DataStructure::Global::TrackPoint(*trackpoints.at(nearest_index));
+  return nearest_track_point;
+}
+
 double dEdx(const G4Material* material, double E, double m) {
   double constant = 2.54955123375e-23;
   double m_e = 0.510998928;
@@ -313,12 +332,17 @@ double dEdx(const G4Material* material, double E, double m) {
   return dEdx;
 }
 
+// Need some global variables here
 static const BTField* _field;
 static int _charge;
 
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, MAUS::DataStructure::Global::PID pid,
                bool energy_loss) {
+  if (std::abs(target_z) > 100000) {
+    throw(MAUS::Exception(MAUS::Exception::recoverable, "Extreme target z",
+                          "GlobalTools::propagate"));
+  }
   int prop_dir = 1;
   _field = field;
   _charge = MAUS::recon::global::Particle::GetInstance().GetCharge(pid);
@@ -371,8 +395,8 @@ void propagate(double* x, double target_z, const BTField* field,
       }
       double z_dist = boundary_dist*momvector.z();
       // Check if z distance to next material boundary is smaller than step size
-      // if yes, we reduce step size to at most 1 mm to avoid issues arising from
-      // the track not being straight
+      // if yes, we impose a tight limit on the step size to avoid issues
+      // arising from the track not being straight
       bool temp = false;
       if (std::abs(z_dist) < std::abs(h)) {
         temp = true;
@@ -482,6 +506,11 @@ void changeEnergy(double* x, double deltaE, double mass) {
   x[5] *= momentum_ratio;
   x[6] *= momentum_ratio;
   x[7] *= momentum_ratio;
+}
+
+bool TrackPointSort(const MAUS::DataStructure::Global::TrackPoint* tp1,
+                    const MAUS::DataStructure::Global::TrackPoint* tp2) {
+  return (tp1->get_position().Z() < tp2->get_position().Z());
 }
 
 } // ~namespace GlobalTools

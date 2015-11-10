@@ -698,3 +698,24 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
     "2d_volume_plot_label_size":0.25,
 }
+
+# Determines for which pid hypotheses track matching should be attempted. Default is "all"
+# meaning electrons, muons, and pions of both charges (unless tracker recon produces a
+# charge hypothesis). Alternatively, force/limit to either one (never several) of
+# kEPlus, kEMinus, kMuPlus, kMuMinus, kPiPlus, kPiMinus
+track_matching_pid_hypothesis = "all"
+
+# Global track matching tolerances (in mm) for the various subdetectors. KL only provides a
+# y coordinate, hence x does not need to be configurable.
+track_matching_tolerances = {
+  "TOF0x":30.0,
+  "TOF0y":30.0,
+  "TOF1x":40.0,
+  "TOF1y":40.0,
+  "TOF2x":40.0,
+  "TOF2y":40.0,
+  "KLy":32.0,
+}
+
+# Whether to use energy loss calculations for global track matching
+track_matching_energy_loss = True

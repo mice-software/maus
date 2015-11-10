@@ -38,9 +38,15 @@ class BTField; // Forward declaration
 namespace MAUS {
 namespace GlobalTools {
 
+/**
+ * @brief Returns a map of all detector points (as defined by
+ * DataStructure/Global/ReconEnums.hh) with flags for whether a Track or
+ * SpacePoint exists in the reconstructed event for each detector.
+ * 
+ * @param global_event The global event
+ */
 std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
-    GetMCDetectors(MAUS::GlobalEvent* global_event);
-
+    GetReconDetectors(MAUS::GlobalEvent* global_event);
 
 /**
  * @brief Returns a vector of all Tracks in the Spill (i.e. across recon events
@@ -101,6 +107,20 @@ std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector);
 
 /**
+ * @brief Returns the TrackPoint from a Track that is nearest to a given z
+ * position.
+ *
+ * If the most upstream or most downstream TrackPoint should be returned, set
+ * z_positions such as 0.0 or 1000000
+ * 
+ * @param track The Track from which to return the TrackPoint
+ * @param z_position The z position to which the nearest TrackPoint should be
+ * returned
+ */
+MAUS::DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
+    const MAUS::DataStructure::Global::Track* track, double z_position);
+
+/**
  * @brief Checks whether two numbers are the same to within a given tolerance
  */
 bool approx(double a, double b, double tolerance);
@@ -129,9 +149,15 @@ int z_equations_of_motion (double z, const double x[8], double dxdt[8],
 
 /**
  * @brief Scales the 4-momentum of the 8-vector to decrease the energy by deltaE
- *
  */
 void changeEnergy(double* x, double deltaE, double mass);
+
+/**
+ * @brief Returns whether the first TrackPoint has a lower z-position than the
+ * second one. Used to perform an std::sort on a vector of TrackPoints.
+ */
+bool TrackPointSort(const MAUS::DataStructure::Global::TrackPoint* tp1,
+                    const MAUS::DataStructure::Global::TrackPoint* tp2);
 } // namespace GlobalTools
 } // namespace MAUS
 

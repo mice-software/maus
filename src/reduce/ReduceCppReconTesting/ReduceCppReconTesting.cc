@@ -43,7 +43,7 @@ void ReduceCppReconTesting::_birth(const std::string& json_config) {
   _pairs["PropEMR"] = new std::vector<std::pair<double,double> >;
 }
 
-ImageData* ReduceCppReconTesting::_process(Data* data) {
+void ReduceCppReconTesting::_process(Data* data) {
   _spill = data->GetSpill();
   if (_spill) {
     BTFieldConstructor* field = MAUS::Globals::GetMCFieldConstructor();
@@ -130,9 +130,6 @@ std::cerr << x_tof0[1] << " " << x_tof0[2] << " " << x_tof0[3] << " # " << x_tof
       }
     }
   }
-  ImageData * image_data = new ImageData();
-  image_data->SetImage(new Image());
-  return image_data; 
 }
 
 void ReduceCppReconTesting::_death()  {
