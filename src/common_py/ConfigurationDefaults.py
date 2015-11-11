@@ -695,11 +695,11 @@ XmaxH = 350
 YminH = 0
 YmaxH = 1
 # ComPIDVarA
-minComA = 20
-maxComA = 40
+minComA = 30
+maxComA = 50
 # ComPIDVarB
-XminComB = 20
-XmaxComB = 40
+XminComB = 30
+XmaxComB = 50
 YminComB = 0
 YmaxComB = 8000
 # ComPIDVarC
@@ -709,20 +709,20 @@ maxComC = 8000
 minComC = 0
 maxComC = 1000
 # ComPIDVarE
-XminComE = 20
-XmaxComE = 40
+XminComE = 30
+XmaxComE = 50
 YminComE = 0
 YmaxComE = 1000
 # ComPIDVarF
 minComF = 0
 maxComF = 1
 # ComPIDVarG
-XminComG = 20
-XmaxComG = 40
+XminComG = 30
+XmaxComG = 50
 YminComG = 0
 YmaxComG = 1
 
-# PID MICE configuration, 'step_4' for Step IV running, 'commisioning' for field free commissioning data
+# PID MICE configuration, 'step_4' for Step IV running, 'commissioning' for field free commissioning data
 pid_config = "step_4"
 # PID running mode - selects which PID variables are used. 'online' corresponds to less beam (momentum)
 # dependent variables, 'offline' uses all variables and requires that specific PDFs for the beam already

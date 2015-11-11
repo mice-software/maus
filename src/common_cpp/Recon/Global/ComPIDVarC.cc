@@ -67,6 +67,7 @@ namespace global {
       for (size_t i = 0; i < kl_track_points.size(); i++) {
 	total_ADC_charge_product += kl_track_points[i]->get_ADC_charge_product();
       }
+      std::cerr << "ComPIDVarC " << total_ADC_charge_product << std::endl;
       kl_track_points.clear();
       if ( minBinComC > (total_ADC_charge_product) || (total_ADC_charge_product) > maxBinComC ) {
 	Squeak::mout(Squeak::debug) << "KL ADC charge product " <<

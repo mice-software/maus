@@ -95,6 +95,7 @@ namespace global {
       for (size_t i = 0; i < kl_track_points.size(); i++) {
 	total_ADC_charge_product += kl_track_points[i]->get_ADC_charge_product();
       }
+      std::cerr << "ComPIDVarB ADC " << total_ADC_charge_product << std::endl;
       kl_track_points.clear();
       if ( YminBinComB > (total_ADC_charge_product) || (total_ADC_charge_product) > YmaxBinComB ) {
 	Squeak::mout(Squeak::debug) << "KL ADC charge product " <<
@@ -105,6 +106,7 @@ namespace global {
       tof2_track_points.clear();
       TOF1_t = (tof1_track_points[0])->get_position().T();
       tof1_track_points.clear();
+      std::cerr << "ComPIDVarB TOF " << (TOF2_t - TOF1_t) << std::endl;
       if ( XminBinComB > (TOF2_t - TOF1_t) || (TOF2_t - TOF1_t) > XmaxBinComB ) {
 	Squeak::mout(Squeak::debug) << "Difference between TOF2 and TOF1 " <<
 	  "times out of PDF range, Recon::Global::ComPIDVarB::Calc_Var()" <<

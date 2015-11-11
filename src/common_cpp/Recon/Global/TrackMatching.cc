@@ -139,7 +139,7 @@ namespace global {
 
     // Adding global tracks for case where global event contains only TOF tracks
     // (And KL track if applicable)
-    if (ImportedSciFiTrack == NULL && !TOFTrackArray.empty()) {
+    else if (ImportedSciFiTrack == NULL && !TOFTrackArray.empty()) {
       for (unsigned int i = 0; i < TOFTrackArray.size(); i++) {
 	MAUS::DataStructure::Global::Track* GlobalTrack = TOFTrackArray[i]->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
@@ -174,7 +174,7 @@ namespace global {
 
     // Adding global tracks for case where global event contains only SciFi tracks
     // (And KL track if applicable)
-    if (ImportedSciFiTrack != NULL && TOFTrackArray.empty()) {
+    else if (ImportedSciFiTrack != NULL && TOFTrackArray.empty()) {
       MAUS::DataStructure::Global::Track* GlobalTrack = ImportedSciFiTrack->Clone();
       GlobalTrack->set_mapper_name(mapper_name);
       if (KLTrack != NULL) {
@@ -206,7 +206,7 @@ namespace global {
     }
 
     // Adding global tracks for case where global event contains only a KL or EMR track
-    if (ImportedSciFiTrack == NULL && TOFTrackArray.empty() &&
+    else if (ImportedSciFiTrack == NULL && TOFTrackArray.empty() &&
 	(KLTrack != NULL || EMRTrack != NULL)) {
       if (KLTrack != NULL && EMRTrack == NULL) {
 	MAUS::DataStructure::Global::Track* GlobalTrack = KLTrack->Clone();
@@ -253,7 +253,7 @@ namespace global {
       std::vector<MAUS::DataStructure::Global::TrackPoint*> tempTOF2tp;
       double TOF01offset = 30;
       double TOF12offset = 35;
-      double allowance = 8.0;
+      double allowance = 20.0;
       for (unsigned int i = 0; i < GlobalSpacePointArray->size(); ++i) {
 	MAUS::DataStructure::Global::SpacePoint* sp = GlobalSpacePointArray->at(i);
 	if (!sp) {

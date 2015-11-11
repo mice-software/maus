@@ -34,6 +34,10 @@ namespace MAUS {
     : MapBase<Data>("MapCppGlobalReconImport"), _configCheck(false) {
   }
 
+  /*MapCppGlobalReconImport::~MapCppGlobalReconImport() {
+    std::cerr << "are we getting a destructor here?" << std::endl;
+    }*/
+
   void MapCppGlobalReconImport::_birth(const std::string& argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.
     _configCheck = false;
@@ -60,6 +64,18 @@ namespace MAUS {
 		      "Could not find geometry file",
 		      "MapCppGlobalReconImport::birth"));
     geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
+    //get EMR offsets
+    // Use these values to adjust the hit positions from local reconstruction
+    // to the global coordinate system
+    MiceModule* geo_module = new MiceModule(geo_filename);
+    std::vector<const MiceModule*> emr_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "EMR");
+    const MiceModule* emr_module = emr_modules[0];
+    x_ref = emr_module->globalPosition().getX();
+    y_ref = emr_module->globalPosition().getY();
+    z_ref = emr_module->globalPosition().getZ() + (1584/2);
+
+    delete geo_module;
+
   }
 
   void MapCppGlobalReconImport::_death() {
@@ -97,8 +113,7 @@ namespace MAUS {
 	if (recon_event->GetTOFEvent()) {
 	  MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
 	  MAUS::recon::global::ImportTOFRecon tofrecon_importer;
-	  tofrecon_importer.process((*tof_event), global_event, _classname,
-				    geo_filename);
+	  tofrecon_importer.process((*tof_event), global_event, _classname);
 	}
 	if (recon_event->GetSciFiEvent()) {
 	  MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
@@ -119,7 +134,7 @@ namespace MAUS {
 	  MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
 	  MAUS::recon::global::ImportEMRRecon emrrecon_importer;
 	  emrrecon_importer.process((*emr_event), global_event, _classname,
-				    geo_filename);
+				    x_ref, y_ref, z_ref);
 	}
       }
     }

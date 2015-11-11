@@ -62,38 +62,44 @@ namespace MAUS {
 
     _histFile = new TFile(PDF_file.c_str(), "READ");
 
-    _minA = _configJSON["minA"].asInt();
-    _maxA = _configJSON["maxA"].asInt();
-    _XminB = _configJSON["XminB"].asInt();
-    _XmaxB = _configJSON["XmaxB"].asInt();
-    _YminB = _configJSON["YminB"].asInt();
-    _YmaxB = _configJSON["YmaxB"].asInt();
-    _XminC = _configJSON["XminC"].asInt();
-    _XmaxC = _configJSON["XmaxC"].asInt();
-    _YminC = _configJSON["YminC"].asInt();
-    _YmaxC = _configJSON["YmaxC"].asInt();
-    _minD = _configJSON["minD"].asInt();
-    _maxD = _configJSON["maxD"].asInt();
-    _minE = _configJSON["minE"].asInt();
-    _maxE = _configJSON["maxE"].asInt();
-    _XminF = _configJSON["XminF"].asInt();
-    _XmaxF = _configJSON["XmaxF"].asInt();
-    _YminF = _configJSON["YminF"].asInt();
-    _YmaxF = _configJSON["YmaxF"].asInt();
-    _minComA = _configJSON["minComA"].asInt();
-    _maxComA = _configJSON["maxComA"].asInt();
-    _XminComB = _configJSON["XminComB"].asInt();
-    _XmaxComB = _configJSON["XmaxComB"].asInt();
-    _YminComB = _configJSON["YminComB"].asInt();
-    _YmaxComB = _configJSON["YmaxComB"].asInt();
-    _minComC = _configJSON["minComC"].asInt();
-    _maxComC = _configJSON["maxComC"].asInt();
-    _minComD = _configJSON["minComD"].asInt();
-    _maxComD = _configJSON["maxComD"].asInt();
-    _XminComE = _configJSON["XminComE"].asInt();
-    _XmaxComE = _configJSON["XmaxComE"].asInt();
-    _YminComE = _configJSON["YminComE"].asInt();
-    _YmaxComE = _configJSON["YmaxComE"].asInt();
+    _minA = _configJSON["minA"].asDouble();
+    _maxA = _configJSON["maxA"].asDouble();
+    _XminB = _configJSON["XminB"].asDouble();
+    _XmaxB = _configJSON["XmaxB"].asDouble();
+    _YminB = _configJSON["YminB"].asDouble();
+    _YmaxB = _configJSON["YmaxB"].asDouble();
+    _XminC = _configJSON["XminC"].asDouble();
+    _XmaxC = _configJSON["XmaxC"].asDouble();
+    _YminC = _configJSON["YminC"].asDouble();
+    _YmaxC = _configJSON["YmaxC"].asDouble();
+    _minD = _configJSON["minD"].asDouble();
+    _maxD = _configJSON["maxD"].asDouble();
+    _minE = _configJSON["minE"].asDouble();
+    _maxE = _configJSON["maxE"].asDouble();
+    _XminF = _configJSON["XminF"].asDouble();
+    _XmaxF = _configJSON["XmaxF"].asDouble();
+    _YminF = _configJSON["YminF"].asDouble();
+    _YmaxF = _configJSON["YmaxF"].asDouble();
+    _minComA = _configJSON["minComA"].asDouble();
+    _maxComA = _configJSON["maxComA"].asDouble();
+    _XminComB = _configJSON["XminComB"].asDouble();
+    _XmaxComB = _configJSON["XmaxComB"].asDouble();
+    _YminComB = _configJSON["YminComB"].asDouble();
+    _YmaxComB = _configJSON["YmaxComB"].asDouble();
+    _minComC = _configJSON["minComC"].asDouble();
+    _maxComC = _configJSON["maxComC"].asDouble();
+    _minComD = _configJSON["minComD"].asDouble();
+    _maxComD = _configJSON["maxComD"].asDouble();
+    _XminComE = _configJSON["XminComE"].asDouble();
+    _XmaxComE = _configJSON["XmaxComE"].asDouble();
+    _YminComE = _configJSON["YminComE"].asDouble();
+    _YmaxComE = _configJSON["YmaxComE"].asDouble();
+    _minComF = _configJSON["minComF"].asDouble();
+    _maxComF = _configJSON["maxComF"].asDouble();
+    _XminComG = _configJSON["XminComG"].asDouble();
+    _XmaxComG = _configJSON["XmaxComG"].asDouble();
+    _YminComG = _configJSON["YminComG"].asDouble();
+    _YmaxComG = _configJSON["YmaxComG"].asDouble();
 
     _pid_config = _configJSON["pid_config"].asString();
     _pid_mode = _configJSON["pid_mode"].asString();
@@ -222,6 +228,10 @@ namespace MAUS {
 							       _hypotheses[i],
 							       _XminComE, _XmaxComE,
 							       _YminComE, _YmaxComE));
+	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_histFile,
+							       _hypotheses[i],
+							       _XminComG, _XmaxComG,
+							       _YminComG, _YmaxComG));
 	}
       } else if (_pid_mode == "offline") {
 	for (unsigned int i =0; i < _hypotheses.size(); ++i) {
@@ -239,10 +249,17 @@ namespace MAUS {
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_histFile,
 							       _hypotheses[i],
 							       _minComD, _maxComD));
+	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_histFile,
+							       _hypotheses[i],
+							       _minComF, _maxComF));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_histFile,
 							       _hypotheses[i],
 							       _XminComE, _XmaxComE,
 							       _YminComE, _YmaxComE));
+	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_histFile,
+							       _hypotheses[i],
+							       _XminComG, _XmaxComG,
+							       _YminComG, _YmaxComG));
 	}
       } else if (_pid_mode == "custom") {
 	std::istringstream ss(_custom_pid_set);
@@ -284,6 +301,17 @@ namespace MAUS {
 								      _hypotheses[i],
 								      _XminComE, _XmaxComE,
 								      _YminComE, _YmaxComE));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				"ComPIDVarF") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_histFile,
+								      _hypotheses[i],
+								      _minComF, _maxComF));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				"ComPIDVarG") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_histFile,
+								      _hypotheses[i],
+								      _XminComG, _XmaxComG,
+								      _YminComG, _YmaxComG));
 	    } else {
 	      Squeak::mout(Squeak::warning) << "No valid PID variables given in "
 					  << "custom_pid_set, "

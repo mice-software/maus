@@ -58,15 +58,18 @@ namespace global {
       if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching") {
 	if ((*eachTP)->get_detector() == TOF2_DP) {
 	  TOF2_t = (*eachTP)->get_position().T();
+	  std::cerr << "TOF2 time" << TOF2_t << std::endl;
 	  ++checkCount2;
 	} else if ((*eachTP)->get_detector() == TOF1_DP) {
 	  TOF1_t = (*eachTP)->get_position().T();
+	  std::cerr << "TOF1 time" << TOF1_t << std::endl;
 	  ++checkCount1;
 	}
       } else {
 	continue;
       }
     }
+    std::cerr << "ComPIDVarA " << (TOF2_t - TOF1_t) << std::endl;
     if (checkCount2 > 1 || checkCount1 > 1) {
       Squeak::mout(Squeak::debug) << "Multiple measurements for TOF2/TOF1" <<
 	" times, Recon::Global::ComPIDVarA::Calc_Var()" << std::endl;

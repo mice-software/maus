@@ -57,11 +57,15 @@
 #include "src/common_cpp/Recon/Global/PIDVarD.hh"
 #include "src/common_cpp/Recon/Global/PIDVarE.hh"
 #include "src/common_cpp/Recon/Global/PIDVarF.hh"
+#include "src/common_cpp/Recon/Global/PIDVarG.hh"
+#include "src/common_cpp/Recon/Global/PIDVarH.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarA.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarB.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarC.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarD.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarE.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarF.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarG.hh"
 
 
 namespace MAUS {
@@ -121,38 +125,44 @@ namespace MAUS {
     Spill* _spill;
 
     /// PID cut limits from datacard
-    int _minA;
-    int _maxA;
-    int _XminB;
-    int _XmaxB;
-    int _YminB;
-    int _YmaxB;
-    int _XminC;
-    int _XmaxC;
-    int _YminC;
-    int _YmaxC;
-    int _minD;
-    int _maxD;
-    int _minE;
-    int _maxE;
-    int _XminF;
-    int _XmaxF;
-    int _YminF;
-    int _YmaxF;
-    int _minComA;
-    int _maxComA;
-    int _XminComB;
-    int _XmaxComB;
-    int _YminComB;
-    int _YmaxComB;
-    int _minComC;
-    int _maxComC;
-    int _minComD;
-    int _maxComD;
-    int _XminComE;
-    int _XmaxComE;
-    int _YminComE;
-    int _YmaxComE;
+    double _minA;
+    double _maxA;
+    double _XminB;
+    double _XmaxB;
+    double _YminB;
+    double _YmaxB;
+    double _XminC;
+    double _XmaxC;
+    double _YminC;
+    double _YmaxC;
+    double _minD;
+    double _maxD;
+    double _minE;
+    double _maxE;
+    double _XminF;
+    double _XmaxF;
+    double _YminF;
+    double _YmaxF;
+    double _minComA;
+    double _maxComA;
+    double _XminComB;
+    double _XmaxComB;
+    double _YminComB;
+    double _YmaxComB;
+    double _minComC;
+    double _maxComC;
+    double _minComD;
+    double _maxComD;
+    double _XminComE;
+    double _XmaxComE;
+    double _YminComE;
+    double _YmaxComE;
+    double _minComF;
+    double _maxComF;
+    double _XminComG;
+    double _XmaxComG;
+    double _YminComG;
+    double _YmaxComG;
 
     /// MICE configuration for PID
     std::string _pid_config;

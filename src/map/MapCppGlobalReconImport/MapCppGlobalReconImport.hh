@@ -64,6 +64,7 @@ namespace MAUS {
   public:
     /** Constructor, setting the internal variable #_classname */
     MapCppGlobalReconImport();
+    ~MapCppGlobalReconImport();
 
   private:
     /** Sets up the worker
@@ -94,10 +95,14 @@ namespace MAUS {
     Json::Value _configJSON;
     ///  JsonCpp setup
     Json::Reader _reader;
-    // Mapper name, useful for tracking results...
+    /// Mapper name, useful for tracking results...
     std::string _classname;
-    // Geometry file name
+    /// Geometry file name
     std::string geo_filename;
+    /// EMR offsets to go from local to global positions
+    double x_ref;
+    double y_ref;
+    double z_ref;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 
