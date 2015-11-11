@@ -54,11 +54,6 @@ void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
   configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
   //  this will contain the configuration
 
-  //map_init = true;
-  //bool loaded = _map.InitializeCards(configJSON);
-  //if (!loaded)
-  //  map_init = false;
-
   xEnable_V1290_Unpacking = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_V1290_Unpacking",
                                                      JsonWrapper::booleanValue);
