@@ -148,7 +148,7 @@ class MapPyBeamMaker: #pylint: disable=R0902
             self.beam_file_format = beam_def["beam_file_format"]
             self.file_particles_per_spill = beam_def["file_particles_per_spill"]
             if "beam_start_position" in beam_def :
-              self.beam_file_insert_position = beam_def["beam_start_position"]
+                self.beam_file_insert_position = beam_def["beam_start_position"]
             
     def __check_beam_file(self):
         """
@@ -229,9 +229,12 @@ class MapPyBeamMaker: #pylint: disable=R0902
                     primary = spill_hit.get_maus_dict('maus_json_primary')[0]
                     self.beam_seed = self.beam_seed + 1
                     primary["random_seed"] = self.beam_seed
-                    primary['position']['x'] += self.beam_file_insert_position['x']
-                    primary['position']['y'] += self.beam_file_insert_position['y']
-                    primary['position']['z'] += self.beam_file_insert_position['z']
+                    primary['position']['x'] += \
+                                            self.beam_file_insert_position['x']
+                    primary['position']['y'] += \
+                                            self.beam_file_insert_position['y']
+                    primary['position']['z'] += \
+                                            self.beam_file_insert_position['z']
                     particle["primary"] = primary
                 else:
                     a_beam = self.__process_choose_beam(index)
