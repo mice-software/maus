@@ -99,7 +99,7 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-# simulation_geometry_filename = "Stage4.dat" # geometry used by simulation - should be replaced by CDB version
+#simulation_geometry_filename = "Stage4.dat" # geometry used by simulation - should be replaced by CDB version
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - should be replaced by CDB version
 simulation_geometry_debug    = False
 check_volume_overlaps = False
@@ -525,15 +525,16 @@ EMRtotFuncP3 = 1.38 # Step IV
 EMRdeltatShift = 12 # ADC counts, distance from the trigger
 
 EMRfadcCount = 2.0 # ns, duration of an fADC cycle (f=500MHz)
-EMRqeSAPMT = 0.11 # SAPMT quantum efficiency
+#EMRqeSAPMT = 0.11 # SAPMT quantum efficiency
+EMRqeSAPMT = 0.24 # SAPMT quantum efficiency
 #EMRnadcPerPeSAPMT = 2 # number of ADC counts per photoelectron in the SAPMT, Step I
-EMRnadcPerPeSAPMT = 10 # number of ADC counts per photoelectron in the SAPMT, Step IV
+EMRnadcPerPeSAPMT = 4 # number of ADC counts per photoelectron in the SAPMT, Step IV
 EMRelectronicsResponseSpreadSAPMT = 1 # ADC count, Step I
 EMRbaselinePosition = 123 # SAPMT signal baseline
 EMRbaselineSpread = 10 # SAPMT signal baseline spread
 EMRmaximumNoiseLevel = 50 # SAPMT noise maximum value
 EMRacquisitionWindow = 302 # ADC counts
-EMRsignalIntegrationWindow = 40
+EMRsignalIntegrationWindow = 40 # ADC counts
 EMRarrivalTimeShift = 40
 EMRarrivalTimeSpread = 33
 EMRarrivalTimeGausWidth = 3
@@ -615,8 +616,8 @@ EMR_connector_attenuation_map = "/files/cabling/EMRConnectorAttenuationMap.txt"
 # this sets the source of the calibrations for the EMR detector
 EMR_calib_source = "CDB"
 EMR_calib_date_from = 'current'
-# uncomment the EMR_calibration_file card below if you set EMR_calib_source=file
-#EMR_calib_file = "/files/calibration/emrcalib_cosmics_july2015.txt"
+# EMR_calibration_file card below if you set EMR_calib_source=file
+EMR_calib_file = "/files/calibration/emrcalib_cosmics_july2015.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
@@ -635,14 +636,16 @@ mongodb_collection_name = "spills" # Default MongoDB collection name. Only neede
 
 # in multiprocessing mode, the timeout after which reconstruction of an event will be abandonded [s]
 reconstruction_timeout = 10
-# refresh rate for refreshing plots
-reduce_plot_refresh_rate = 5
+# refresh rate for refreshing the plots
+reduce_plot_refresh_rate = 10
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default OutputPyImage image directory for end of run data. Will end up as image_directory+"/end_of_run/"
 end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+# Default image types of OutputCppRootImage
+image_types = ['png'] 
 
 PolynomialOpticsModel_order = 1
 PolynomialOpticsModel_algorithms = ["LeastSquares",

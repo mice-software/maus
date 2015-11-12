@@ -48,7 +48,7 @@ void BarParameterisation::ComputeTransformation(const G4int copyNo,
 
   G4int planeID = copyNo/59;
   G4int barIDinPlane = copyNo - 59*planeID;
-  G4int Nplanes = fNbOfBars/59 + 1;
+  G4int Nplanes = fNbOfBars/59;
 
   G4int NbarsInPlane;
   if (fNbOfBars < 59)

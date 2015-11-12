@@ -1422,7 +1422,7 @@
             "charge_ratio_SA":0.0,
             "emr_plane_hits":[
                {
-                  "charge":95.0,
+                  "charge":19.0,
                   "charge_corrected":0.0,
                   "delta_t":115,
                   "emr_bars":[
@@ -2133,7 +2133,7 @@
                   "trigger":1
                },
                {
-                  "charge":30.0,
+                  "charge":6.0,
                   "charge_corrected":0.0,
                   "delta_t":157,
                   "emr_bars":[
@@ -2499,7 +2499,7 @@
                   "trigger":1
                },
                {
-                  "charge":55.0,
+                  "charge":11.0,
                   "charge_corrected":0.0,
                   "delta_t":149,
                   "emr_bars":[
@@ -2844,7 +2844,7 @@
                   "trigger":1
                },
                {
-                  "charge":80.0,
+                  "charge":16.0,
                   "charge_corrected":0.0,
                   "delta_t":119,
                   "emr_bars":[
@@ -3210,7 +3210,7 @@
                   "trigger":1
                },
                {
-                  "charge":50.0,
+                  "charge":10.0,
                   "charge_corrected":0.0,
                   "delta_t":111,
                   "emr_bars":[
@@ -3576,7 +3576,7 @@
                   "trigger":1
                },
                {
-                  "charge":35.0,
+                  "charge":5.0,
                   "charge_corrected":0.0,
                   "delta_t":128,
                   "emr_bars":[
@@ -3921,7 +3921,7 @@
                   "trigger":1
                },
                {
-                  "charge":35.0,
+                  "charge":7.0,
                   "charge_corrected":0.0,
                   "delta_t":128,
                   "emr_bars":[
@@ -4266,7 +4266,7 @@
                   "trigger":1
                },
                {
-                  "charge":15.0,
+                  "charge":3.0,
                   "charge_corrected":0.0,
                   "delta_t":109,
                   "emr_bars":[
@@ -4611,7 +4611,7 @@
                   "trigger":1
                },
                {
-                  "charge":50.0,
+                  "charge":10.0,
                   "charge_corrected":0.0,
                   "delta_t":155,
                   "emr_bars":[
@@ -4956,7 +4956,7 @@
                   "trigger":1
                },
                {
-                  "charge":140.0,
+                  "charge":28.0,
                   "charge_corrected":0.0,
                   "delta_t":156,
                   "emr_bars":[
@@ -5301,7 +5301,7 @@
                   "trigger":1
                },
                {
-                  "charge":45.0,
+                  "charge":9.0,
                   "charge_corrected":0.0,
                   "delta_t":127,
                   "emr_bars":[
@@ -5646,7 +5646,7 @@
                   "trigger":1
                },
                {
-                  "charge":190.0,
+                  "charge":38.0,
                   "charge_corrected":0.0,
                   "delta_t":151,
                   "emr_bars":[
@@ -5991,7 +5991,7 @@
                   "trigger":1
                },
                {
-                  "charge":25.0,
+                  "charge":5.0,
                   "charge_corrected":0.0,
                   "delta_t":107,
                   "emr_bars":[
@@ -6336,7 +6336,7 @@
                   "trigger":1
                },
                {
-                  "charge":105.0,
+                  "charge":21.0,
                   "charge_corrected":0.0,
                   "delta_t":155,
                   "emr_bars":[
@@ -6681,7 +6681,7 @@
                   "trigger":1
                },
                {
-                  "charge":50.0,
+                  "charge":10.0,
                   "charge_corrected":0.0,
                   "delta_t":128,
                   "emr_bars":[
@@ -7047,7 +7047,7 @@
                   "trigger":1
                },
                {
-                  "charge":30.0,
+                  "charge":6.0,
                   "charge_corrected":0.0,
                   "delta_t":162,
                   "emr_bars":[
@@ -7392,7 +7392,7 @@
                   "trigger":1
                },
                {
-                  "charge":360.0,
+                  "charge":72.0,
                   "charge_corrected":0.0,
                   "delta_t":146,
                   "emr_bars":[
@@ -7758,7 +7758,7 @@
                   "trigger":1
                },
                {
-                  "charge":60.0,
+                  "charge":12.0,
                   "charge_corrected":0.0,
                   "delta_t":131,
                   "emr_bars":[
@@ -8103,7 +8103,7 @@
                   "trigger":1
                },
                {
-                  "charge":95.0,
+                  "charge":19.0,
                   "charge_corrected":0.0,
                   "delta_t":158,
                   "emr_bars":[
@@ -8469,7 +8469,7 @@
                   "trigger":1
                },
                {
-                  "charge":65.0,
+                  "charge":13.0,
                   "charge_corrected":0.0,
                   "delta_t":154,
                   "emr_bars":[
@@ -8814,7 +8814,7 @@
                   "trigger":1
                },
                {
-                  "charge":205.0,
+                  "charge":41.0,
                   "charge_corrected":0.0,
                   "delta_t":154,
                   "emr_bars":[
@@ -9159,7 +9159,7 @@
                   "trigger":1
                },
                {
-                  "charge":80.0,
+                  "charge":16.0,
                   "charge_corrected":0.0,
                   "delta_t":118,
                   "emr_bars":[
@@ -9504,7 +9504,7 @@
                   "trigger":1
                },
                {
-                  "charge":40.0,
+                  "charge":8.0,
                   "charge_corrected":0.0,
                   "delta_t":151,
                   "emr_bars":[
@@ -9849,7 +9849,7 @@
                   "trigger":1
                },
                {
-                  "charge":95.0,
+                  "charge":19.0,
                   "charge_corrected":0.0,
                   "delta_t":155,
                   "emr_bars":[
@@ -10194,7 +10194,7 @@
                   "trigger":1
                },
                {
-                  "charge":70.0,
+                  "charge":14.0,
                   "charge_corrected":0.0,
                   "delta_t":128,
                   "emr_bars":[
@@ -10539,7 +10539,7 @@
                   "trigger":1
                },
                {
-                  "charge":95.0,
+                  "charge":19.0,
                   "charge_corrected":0.0,
                   "delta_t":155,
                   "emr_bars":[
@@ -10884,7 +10884,7 @@
                   "trigger":1
                },
                {
-                  "charge":55.0,
+                  "charge":11.0,
                   "charge_corrected":0.0,
                   "delta_t":149,
                   "emr_bars":[
@@ -11229,7 +11229,7 @@
                   "trigger":1
                },
                {
-                  "charge":150.0,
+                  "charge":30.0,
                   "charge_corrected":0.0,
                   "delta_t":123,
                   "emr_bars":[
@@ -11574,7 +11574,7 @@
                   "trigger":1
                },
                {
-                  "charge":160.0,
+                  "charge":32.0,
                   "charge_corrected":0.0,
                   "delta_t":138,
                   "emr_bars":[
@@ -11919,7 +11919,7 @@
                   "trigger":1
                },
                {
-                  "charge":10.0,
+                  "charge":2.0,
                   "charge_corrected":0.0,
                   "delta_t":121,
                   "emr_bars":[
@@ -12244,7 +12244,7 @@
                   "trigger":1
                },
                {
-                  "charge":10.0,
+                  "charge":2.0,
                   "charge_corrected":0.0,
                   "delta_t":126,
                   "emr_bars":[
@@ -12569,7 +12569,7 @@
                   "trigger":1
                },
                {
-                  "charge":30.0,
+                  "charge":6.0,
                   "charge_corrected":0.0,
                   "delta_t":145,
                   "emr_bars":[

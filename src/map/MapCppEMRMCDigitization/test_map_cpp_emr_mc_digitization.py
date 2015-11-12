@@ -16,6 +16,7 @@
 """Tests for MapCppEMRMCDigitization"""
 
 import os
+import json
 import unittest
 from Configuration import Configuration
 import MAUS
@@ -39,7 +40,26 @@ class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
 
     def test_init(self):
         """Check birth with default configuration"""
-        self.mapper.birth(self. c.getConfigJSON())
+        test_configuration = self.c.getConfigJSON()
+        test_conf_json = json.loads(test_configuration)
+        # Fix the calibration to be always step I (prevents update issues)
+        test_conf_json['EMR_calib_source'] = "file"
+        test_conf_json['EMR_calib_file'] = \
+            "/files/calibration/emrcalib_cosmics_march2014.txt"
+        test_conf_json['EMRtotFuncP1'] = 15.0
+        test_conf_json['EMRtotFuncP2'] = 0.0089
+        test_conf_json['EMRtotFuncP3'] = 1.24
+        # Fix the SAPMT parameters (changed after Step IV onwards)
+        test_conf_json['EMRqeSAPMT'] = 0.11
+        test_conf_json['EMRnadcPerPeSAPMT'] = 2
+        test_conf_json['EMRelectronicsResponseSpreadSAPMT'] = 1
+        test_conf_json['EMRbaselinePosition'] = 123
+        test_conf_json['EMRbaselineSpread'] = 10
+        test_conf_json['EMRmaximumNoiseLevel'] = 50
+        test_conf_json['EMRacquisitionWindow'] = 302
+        test_conf_json['EMRsignalIntegrationWindow'] = 40
+        test_conf = json.dumps(test_conf_json)
+        self.mapper.birth(test_conf)
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""

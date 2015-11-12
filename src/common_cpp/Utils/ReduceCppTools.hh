@@ -54,20 +54,20 @@ class ReduceCppTools {
  public:
   static CanvasWrapper* get_canvas_wrapper(TCanvas *canv,
                                  	   TH1* hist,
-                                 	   std::string name,
-                                 	   std::string description,
-                                 	   std::string text_box_str);
+                                 	   std::string name = "",
+                                 	   std::string description = "",
+					   Option_t *draw_option = "");
 
   static CanvasWrapper* get_canvas_multi_wrapper(TCanvas *canv,
                                  	   	 std::vector<TObject*> objarray,
-					   	 Option_t *draw_option,
-                                 	   	 std::string name,
-                                 	   	 std::string description);
+                                 	   	 std::string name = "",
+                                 	   	 std::string description = "",
+					   	 Option_t *draw_option = "");
 
   static CanvasWrapper* get_canvas_emr_wrapper(TCanvas *canv,
                                  	       TH2EMR *hemr,
-                                               std::string name,
-                                               std::string description);
+                                               std::string name = "",
+                                               std::string description = "");
 };
 } // namespace MAUS
 

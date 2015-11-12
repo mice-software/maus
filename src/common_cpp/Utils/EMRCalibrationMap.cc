@@ -44,7 +44,7 @@ bool EMRCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   // Get the calibration source and convert it to lower cases
   std::string source = JsonWrapper::GetProperty(configJSON,
                                                 "EMR_calib_source",
-                                                 JsonWrapper::stringValue).asString();
+                                                JsonWrapper::stringValue).asString();
   std::transform(source.begin(), source.end(), source.begin(),
 		 std::ptr_fun<int, int>(std::tolower));
 
@@ -116,7 +116,7 @@ int EMRCalibrationMap::MakeEMRChannelKeys() {
 }
 
 bool EMRCalibrationMap::LoadFromCDB() {
-  this->GetCalib("EMR", "epsilon", _calibDate);
+  this->GetCalib("EMR", "eps", _calibDate);
 
   try {
     while (!epsstr.eof()) {
@@ -147,7 +147,7 @@ void EMRCalibrationMap::GetCalib(std::string devname, std::string caltype, std::
   // setup the arguments to get_calib_func
   // the arguments are 3 strings
   // arg1 = device name (EMR) uppercase
-  // arg2 = calibration type (epsilon) lowercase
+  // arg2 = calibration type (eps) lowercase
   // arg3 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
   // default date argument is "current"
   // this is set via EMR_calib_date_from card in ConfigurationDefaults
@@ -161,7 +161,7 @@ void EMRCalibrationMap::GetCalib(std::string devname, std::string caltype, std::
     if (_get_calib_func != NULL && PyCallable_Check(_get_calib_func)) {
         py_value = PyObject_CallObject(_get_calib_func, py_arg);
         // setup the streams to hold the different calibs
-        if (py_value != NULL && strcmp(caltype.c_str(), "epsilon") == 0)
+        if (py_value != NULL && strcmp(caltype.c_str(), "eps") == 0)
             epsstr << PyString_AsString(py_value);
     }
     if (py_value == NULL) {

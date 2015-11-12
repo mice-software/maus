@@ -57,9 +57,7 @@ class ReduceCppEMRPlot : public ReduceBase<Data, ImageData> {
   ReduceCppEMRPlot();
   ~ReduceCppEMRPlot();
 
-  int GetRefreshRate() {return _refresh_rate;}
-  void reset();
-  void update();
+  int GetRefreshRate() const {return _refresh_rate;}
 
  private:
 
@@ -69,13 +67,14 @@ class ReduceCppEMRPlot : public ReduceBase<Data, ImageData> {
 
   void _process(Data* data);
 
+  void reset();
+
+  void update();
+
   void fill_emr_plots(EMREvent* emr_event);
 
-  int _refresh_rate;
-  int _root_batch_mode;
   int _process_count;
-  std::string _image_type;
-
+  int _refresh_rate;
   double _density_cut;
   double _chi2_cut;
 

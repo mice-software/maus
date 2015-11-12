@@ -22,6 +22,7 @@
 #include <iostream>
 #include <vector>
 
+#include "TROOT.h"
 #include "TH1.h"
 #include "TCanvas.h"
 
@@ -41,16 +42,18 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   ~ReduceCppTOFPlot();
 
   int  getRefreshRate() {return _refresh_rate;}
-  void reset();
-  void update();
 
  private:
 
-  void _birth(const std::string& config);
+  void _birth(const std::string& argJsonConfigDocument);
 
   void _death();
 
   void _process(Data* data);
+
+  void reset();
+
+  void update();
 
   void update_tof_plots(TOFEvent* tof_event);
 

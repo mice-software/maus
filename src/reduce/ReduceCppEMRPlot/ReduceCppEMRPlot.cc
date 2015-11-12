@@ -64,14 +64,15 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
 
   // Fetch variables
-  _refresh_rate = configJSON["refresh_rate"].asInt();
-  _root_batch_mode = configJSON["root_batch_mode"].asInt();
-  _image_type = configJSON["histogram_image_type"].asString();
+  _refresh_rate = configJSON["reduce_plot_refresh_rate"].asInt();
   _density_cut = configJSON["EMRdensityCut"].asDouble();
   _chi2_cut = configJSON["EMRchi2Cut"].asDouble();
 
-  // Set root batch mode if requested
-  if ( _root_batch_mode )
+  // Set ROOT to batch mode by default unless specified otherwise
+  int root_batch_mode = 1;
+  if ( configJSON["root_batch_mode"].isInt() )
+      root_batch_mode = configJSON["root_batch_mode"].asInt();
+  if ( root_batch_mode )
     gROOT->SetBatch();
 
   // Define canvases
@@ -186,29 +187,24 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   // Initialize the canvas wrappers
   _cwrap_occ_xz = ReduceCppTools::get_canvas_emr_wrapper(_canv_occ_xz,
                                                          _hoccupancy_xz,
-                                                         "canv_occ_xz",
+                                                         "EMR_occupancy_xz",
                                                          "EMR xz occupancy");
 
   _cwrap_occ_yz = ReduceCppTools::get_canvas_emr_wrapper(_canv_occ_yz,
                                                          _hoccupancy_yz,
-                                                         "canv_occ_yz",
+                                                         "EMR_occupancy_yz",
                                                          "EMR yz occupancy");
 
-  std::vector<TObject*> beam_profile;
-  beam_profile.push_back(_hbeam_profile);
-  _cwrap_beam_profile = ReduceCppTools::get_canvas_multi_wrapper(_canv_beam_profile,
-                                                   	   	 beam_profile,
-						    	   	 "COLZ",
-                                                    	   	 "canv_beam_profile",
-                                                   	   	 "EMR xy beam profile");
+  _cwrap_beam_profile = ReduceCppTools::get_canvas_wrapper(_canv_beam_profile,
+                                                   	   _hbeam_profile,
+                                                    	   "EMR_profile_xy",
+                                                   	   "EMR xy beam profile",
+						    	   "COLZ");
 
-  std::vector<TObject*> depth_profile;
-  depth_profile.push_back(_hdepth_profile);
-  _cwrap_depth_profile = ReduceCppTools::get_canvas_multi_wrapper(_canv_depth_profile,
-                                                  	    	 depth_profile,
-						  	    	 "COLZ",
-                                                  	    	 "canv_depth_profile",
-                                                  	    	 "EMR z depth profile");
+  _cwrap_depth_profile = ReduceCppTools::get_canvas_wrapper(_canv_depth_profile,
+                                                  	    _hdepth_profile,
+                                                  	    "EMR_profile_z",
+                                                  	    "EMR z depth profile");
 
   std::vector<TObject*> range;
   range.push_back(_hrange_primary);
@@ -217,8 +213,7 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   range.push_back(_text_match_eff);
   _cwrap_range = ReduceCppTools::get_canvas_multi_wrapper(_canv_range,
                                                     	  range,
-						    	  "",
-                                                    	  "canv_range",
+                                                    	  "EMR_range",
                                                     	  "EMR range");
 
   std::vector<TObject*> total_charge;
@@ -227,8 +222,7 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   total_charge.push_back(_leg_charge);
   _cwrap_total_charge = ReduceCppTools::get_canvas_multi_wrapper(_canv_total_charge,
                                    	                   	 total_charge,
-						    	   	 "",
-                                               	           	 "canv_total_charge",
+                                               	           	 "EMR_total_charge",
                                                    	   	 "EMR total charge");
 
   std::vector<TObject*> charge_ratio;
@@ -237,8 +231,7 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   charge_ratio.push_back(_leg_charge);
   _cwrap_charge_ratio = ReduceCppTools::get_canvas_multi_wrapper(_canv_charge_ratio,
                                    	                   	 charge_ratio,
-						    	   	 "",
-                                               	           	 "canv_charge_ratio",
+                                               	           	 "EMR_charge_ratio",
                                                    	   	 "EMR charge ratio");
 
   std::vector<TObject*> chi2_density;
@@ -248,9 +241,9 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   chi2_density.push_back(_line_chi2);
   _cwrap_chi2_density = ReduceCppTools::get_canvas_multi_wrapper(_canv_chi2_density,
                                    	                   	 chi2_density,
-						    	  	 "COLZ",
-                                               	           	 "canv_chi2_density",
-                                                   	   	 "EMR chi2 vs density");
+                                               	           	 "EMR_chi2_density",
+                                                   	   	 "EMR chi2 vs density",
+						    	  	 "COLZ");
 
   this->reset();
   _output->GetImage()->CanvasWrappersPushBack(_cwrap_occ_xz);
@@ -293,25 +286,14 @@ void ReduceCppEMRPlot::_process(MAUS::Data* data) {
   for (size_t i = 0;  i < recEvts->size(); ++i) {
 
     MAUS::EMREvent* emr_event = recEvts->at(i)->GetEMREvent();
-    if (emr_event == NULL) continue;
 
-    fill_emr_plots(emr_event);
+    if (emr_event == NULL) continue;
+    this->fill_emr_plots(emr_event);
   }
 
   _process_count++;
-  if ( !(_process_count % _refresh_rate) ) {
+  if ( !(_process_count % _refresh_rate) )
     this->update();
-
-    _canv_occ_xz->SaveAs(std::string("hocc_xz."+_image_type).c_str());
-    _canv_occ_yz->SaveAs(std::string("hocc_yz."+_image_type).c_str());
-    _canv_beam_profile->SaveAs(std::string("hbeam_profile."+_image_type).c_str());
-    _canv_depth_profile->SaveAs(std::string("hdepth_profile."+_image_type).c_str());
-
-    _canv_range->SaveAs(std::string("hrange."+_image_type).c_str());
-    _canv_total_charge->SaveAs(std::string("htotal_charge."+_image_type).c_str());
-    _canv_charge_ratio->SaveAs(std::string("hcharge_ratio."+_image_type).c_str());
-    _canv_chi2_density->SaveAs(std::string("hchi2_density."+_image_type).c_str());
-  }
 }
 
 void ReduceCppEMRPlot::reset() {
@@ -322,15 +304,18 @@ void ReduceCppEMRPlot::reset() {
 }
 
 void ReduceCppEMRPlot::update() {
+
   // Efficiency of the track matching
-  double match_eff = _hrange_secondary->GetEntries()/_hrange_primary->GetEntries();
+  double match_eff(-1);
+  if ( _hrange_primary->GetEntries() )
+      match_eff = _hrange_secondary->GetEntries()/_hrange_primary->GetEntries();
   TString match_eff_string = "Match eff.: "+TString::Format("%.3f", match_eff);
   _text_match_eff->SetText(.95*_hrange_primary->GetXaxis()->GetXmax(),
 			   .65*_hrange_primary->GetMaximum(),
 			   match_eff_string);
 
   // PID statistics
-  int n_entries = _hchi2_density->GetEntries();
+  double mu_fraction(-1);
   int n_mu(0);
   for (int binx = _hchi2_density->GetNbinsX(); binx > 0; binx--) {
     if (_hchi2_density->GetXaxis()->GetBinCenter(binx) < _density_cut) break;
@@ -339,7 +324,8 @@ void ReduceCppEMRPlot::update() {
       n_mu += _hchi2_density->GetBinContent(binx, biny);
     }
   }
-  double mu_fraction = static_cast<double>(n_mu)/n_entries;
+  if ( _hchi2_density->GetEntries() )
+      mu_fraction = static_cast<double>(n_mu)/_hchi2_density->GetEntries();
   TString pid_stats_string = "Muon frac.: "+TString::Format("%.3f", mu_fraction);
   _text_pid_stats->SetText(.95*_hchi2_density->GetXaxis()->GetXmax(),
 			   .95*_hchi2_density->GetYaxis()->GetXmax(),

@@ -47,8 +47,8 @@ def run():
 
     # Set up the input that reads from DAQ
 #    my_input = MAUS.InputCppDAQData()
-#    my_input = MAUS.InputCppDAQOfflineData()
-    my_input = MAUS.InputCppDAQOnlineData() # pylint: disable = E1101
+    my_input = MAUS.InputCppDAQOfflineData()
+#    my_input = MAUS.InputCppDAQOnlineData() # pylint: disable = E1101
  
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
@@ -59,11 +59,11 @@ def run():
 
     # Histogram reducer.
     #reducer = MAUS.ReducePyDoNothing()
-    reducer = MAUS.ReducePyEMRPlot()
+    reducer = MAUS.ReduceCppEMRPlot()
 
-    # Save images as EPS and meta-data as JSON.
+    # Save images as eps and meta-data as JSON.
     #output_worker = MAUS.OutputPyDoNothing()
-    output_worker = MAUS.OutputPyImage()
+    output_worker = MAUS.OutputPyRootImage()
 
     # Run the workflow.
     MAUS.Go(my_input, my_map, reducer, output_worker, data_cards) 

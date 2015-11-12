@@ -88,6 +88,13 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
     throw(Exception(Exception::recoverable,
           "Could not find EMR attenuation map",
           "MapCppEMRReccon::birth"));
+
+  // Load the EMR geometry map
+  loaded = _geoMap.InitializeFromCards(configJSON);
+  if (!loaded)
+    throw(Exception(Exception::recoverable,
+          "Could not find EMR geometry map",
+          "MapCppEMRReccon::birth"));
 }
 
 void MapCppEMRRecon::_death() {

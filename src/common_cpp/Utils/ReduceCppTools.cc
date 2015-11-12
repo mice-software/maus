@@ -23,36 +23,36 @@ CanvasWrapper* ReduceCppTools::get_canvas_wrapper(TCanvas *canv,
                                                   TH1* hist,
                                                   std::string name,
                                                   std::string description,
-                                                  std::string text_box_str) {
+						  Option_t *draw_option) {
 
   CanvasWrapper *wrap = new CanvasWrapper();
   wrap->SetDescription(description);
   wrap->SetFileTag(name);
   wrap->SetCanvas(canv);
 
+  canv->cd()->SetGrid();
   canv->cd();
-  hist->Draw();
+  hist->Draw(draw_option);
   gPad->Update();
-  TPaveStats *st = static_cast<TPaveStats*>(hist->FindObject("stats"));
-  st->SetOptStat(10);
-//   hist->SetStats(false);
-//   TPaveText* text_box = new TPaveText(0.6, 0.5, 1.0, 0.9, "NDC");
-//   text_box->AddText(description.c_str());
+  TPaveStats *pave_stats = static_cast<TPaveStats*>(hist->FindObject("stats"));
+  if ( pave_stats )
+    pave_stats->SetOptStat(10);
 
   return wrap;
 }
 
 CanvasWrapper* ReduceCppTools::get_canvas_multi_wrapper(TCanvas *canv,
                                  	       	        std::vector<TObject*> objarray,
-					          	Option_t *draw_option,
                                                   	std::string name,
-                                                  	std::string description) {
+                                                  	std::string description,
+							Option_t *draw_option) {
 
   CanvasWrapper *wrap = new CanvasWrapper();
   wrap->SetDescription(description);
   wrap->SetFileTag(name);
   wrap->SetCanvas(canv);
 
+  canv->cd()->SetGrid();
   canv->cd();
   objarray[0]->Draw(draw_option);
   for (size_t i = 1; i < objarray.size(); i++)
@@ -71,8 +71,13 @@ CanvasWrapper* ReduceCppTools::get_canvas_emr_wrapper(TCanvas *canv,
   wrap->SetFileTag(name);
   wrap->SetCanvas(canv);
 
+  canv->cd()->SetGrid();
   canv->cd();
   hemr->GetHistogram()->Draw("COLZ L");
+  gPad->Update();
+  TPaveStats *pave_stats = static_cast<TPaveStats*>(hemr->GetHistogram()->FindObject("stats"));
+  if ( pave_stats )
+    pave_stats->SetOptStat(0);
 
   return wrap;
 }
