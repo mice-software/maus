@@ -398,7 +398,8 @@ emr_file_number = "Iges_15"
 tracker0_file_number = "Iges_17"
 tracker1_file_number = "Iges_18"
 absorber0_file_number = "9999"
-absorber1_file_number = "Iges_16"
+# absorber1_file_number = "Iges_16"
+absorber1_file_number = "9999"
 absorber2_file_number = "9999"
 
 # Survey fit information
