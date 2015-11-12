@@ -62,6 +62,9 @@ SciFiSpacePointProcessor::SciFiSpacePointProcessor() {
     RegisterValueBranch("position", &_three_vec_proc,
                         &SciFiSpacePoint::get_position,
                         &SciFiSpacePoint::set_position, true);
+    RegisterValueBranch("global_position", &_three_vec_proc,
+                        &SciFiSpacePoint::get_global_position,
+                        &SciFiSpacePoint::set_global_position, true);
     RegisterTRefArray("clusters", &_cluster_tref_proc,
                       &SciFiSpacePoint::get_channels, &SciFiSpacePoint::set_channels, true);
 }

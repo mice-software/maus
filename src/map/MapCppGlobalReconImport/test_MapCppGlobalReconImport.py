@@ -111,7 +111,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue('mapper_name' in i)
             self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
         self.assertTrue('space_points' in revt['global_event'])
-        self.assertEqual(34, len(revt['global_event']['space_points']))
+        self.assertEqual(36, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
         self.assertEqual(0, len(revt['global_event']['primary_chains']))
 
