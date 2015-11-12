@@ -97,8 +97,8 @@ DetectorConstruction::DetectorConstruction(G4VPhysicalVolume* worldvol,
     _miceElectroMagneticField(NULL), _stepper(NULL), _chordFinder(NULL),
     _rootVisAtts(NULL), _equation(NULL), _useGDML(true) {
   _event = new MICEEvent();
-  _rootPhysicalVolume = worldvol;
-  _rootLogicalVolume  = worldvol->GetLogicalVolume();
+  _rootPhysicalVolume = static_cast<G4PVPlacement*>(worldvol);
+  _rootLogicalVolume  = _rootPhysicalVolume->GetLogicalVolume();
   SetDatacardVariables(cards);
   SetBTMagneticField();
   _materials = fillMaterials(NULL);
