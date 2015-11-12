@@ -85,31 +85,35 @@ TEST_F(TrackerDataManagerTest, TestProcess) {
   spill->SetReconEvents(revts);
 
   // Set up some spacepoints
-  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
-  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
-  sp1->set_tracker(0);
-  sp2->set_tracker(1);
   std::vector<SciFiSpacePoint*> spnts;
-  spnts.push_back(sp1);
-  spnts.push_back(sp2);
+  std::vector<SciFiSpacePoint*> spnts_up;
+  std::vector<SciFiSpacePoint*> spnts_down;
+  for (int i = 0; i < 5; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(0);
+    spnts.push_back(sp);
+    spnts_up.push_back(sp);
+  }
+  for (int i = 0; i < 5; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(1);
+    spnts.push_back(sp);
+    spnts_down.push_back(sp);
+  }
   sfevt->set_spacepoints(spnts);
 
   // Set up some straight and helical Pattern Recogntion tracks
   std::vector<SciFiHelicalPRTrack*> htrks;
   for (int i = 0; i < 6; ++i) {
     SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
-    htrks.push_back(trk);
     if (i < 3) {
       trk->set_tracker(0);
-      if (i == 0) trk->set_num_points(3);
-      if (i == 1) trk->set_num_points(4);
-      if (i == 2) trk->set_num_points(5);
+      trk->set_spacepoints_pointers(spnts_up);
     } else {
       trk->set_tracker(1);
-      if (i == 3) trk->set_num_points(3);
-      if (i == 4) trk->set_num_points(4);
-      if (i == 5) trk->set_num_points(5);
+      trk->set_spacepoints_pointers(spnts_down);
     }
+    htrks.push_back(trk);
   }
   sfevt->set_helicalprtrack(htrks);
 
@@ -119,14 +123,14 @@ TEST_F(TrackerDataManagerTest, TestProcess) {
   // Check some of the data manager internal state is correct
   EXPECT_EQ(1, tdm._t1._spill_num);
   EXPECT_EQ(1, tdm._t2._spill_num);
-  EXPECT_EQ(1, tdm._t1._num_spoints);
-  EXPECT_EQ(1, tdm._t2._num_spoints);
-  EXPECT_EQ(1, tdm._t1._num_htracks_5pt);
-  EXPECT_EQ(1, tdm._t1._num_htracks_4pt);
-  EXPECT_EQ(1, tdm._t1._num_htracks_3pt);
-  EXPECT_EQ(1, tdm._t2._num_htracks_5pt);
-  EXPECT_EQ(1, tdm._t2._num_htracks_4pt);
-  EXPECT_EQ(1, tdm._t2._num_htracks_3pt);
+  EXPECT_EQ(5, tdm._t1._num_spoints);
+  EXPECT_EQ(5, tdm._t2._num_spoints);
+  EXPECT_EQ(3, tdm._t1._num_htracks_5pt);
+  EXPECT_EQ(0, tdm._t1._num_htracks_4pt);
+  EXPECT_EQ(0, tdm._t1._num_htracks_3pt);
+  EXPECT_EQ(3, tdm._t2._num_htracks_5pt);
+  EXPECT_EQ(0, tdm._t2._num_htracks_4pt);
+  EXPECT_EQ(0, tdm._t2._num_htracks_3pt);
 
   // Tidy up. Deleting spill should deallocated all other memory.
   delete spill;
@@ -186,17 +190,6 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   for (int i = 0; i < 6; ++i) {
     SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
     trks.push_back(trk);
-    if (i < 3) {
-      trk->set_tracker(0);
-      if (i == 0) trk->set_num_points(3);
-      if (i == 1) trk->set_num_points(4);
-      if (i == 2) trk->set_num_points(5);
-    } else {
-      trk->set_tracker(1);
-      if (i == 3) trk->set_num_points(3);
-      if (i == 4) trk->set_num_points(4);
-      if (i == 5) trk->set_num_points(5);
-    }
   }
 
   std::vector<double> phi_i;
@@ -232,12 +225,12 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   tdm.process_htrks(trks);
 
   // Check the spill totals
-  EXPECT_EQ(1, tdm._t1._num_htracks_5pt);
-  EXPECT_EQ(1, tdm._t1._num_htracks_4pt);
-  EXPECT_EQ(1, tdm._t1._num_htracks_3pt);
-  EXPECT_EQ(1, tdm._t2._num_htracks_5pt);
-  EXPECT_EQ(1, tdm._t2._num_htracks_4pt);
-  EXPECT_EQ(1, tdm._t2._num_htracks_3pt);
+  EXPECT_EQ(0, tdm._t1._num_htracks_5pt);
+  EXPECT_EQ(0, tdm._t1._num_htracks_4pt);
+  EXPECT_EQ(0, tdm._t1._num_htracks_3pt);
+  EXPECT_EQ(0, tdm._t2._num_htracks_5pt);
+  EXPECT_EQ(0, tdm._t2._num_htracks_4pt);
+  EXPECT_EQ(0, tdm._t2._num_htracks_3pt);
   EXPECT_EQ(phi_i[0], tdm._t1._seeds_phi[0][0]);
   EXPECT_NEAR(phi_i[0]*rad, tdm._t2._seeds_s[0][0], 0.01);
   EXPECT_EQ(phi_i[0], tdm._t2._seeds_phi[0][0]);
@@ -341,17 +334,6 @@ TEST_F(TrackerDataManagerTest, TestProcessStrks) {
   for (int i = 0; i < 6; ++i) {
     SciFiStraightPRTrack* trk = new SciFiStraightPRTrack();
     trks.push_back(trk);
-    if (i < 3) {
-      trk->set_tracker(0);
-      if (i == 0) trk->set_num_points(3);
-      if (i == 1) trk->set_num_points(4);
-      if (i == 2) trk->set_num_points(5);
-    } else {
-      trk->set_tracker(1);
-      if (i == 3) trk->set_num_points(3);
-      if (i == 4) trk->set_num_points(4);
-      if (i == 5) trk->set_num_points(5);
-    }
   }
   // Only bother to more fully initialise the first track in each tracker
   trks[0]->set_x0(x0_1);

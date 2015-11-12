@@ -520,8 +520,7 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
           if ( _verb > 0 )
             std::cout << "** chisq test passed, adding " << n_points << "pt track **\n";
-          SciFiStraightPRTrack* track = new SciFiStraightPRTrack(-1, n_points, line_x, line_y,
-                                                                 covariance);
+          SciFiStraightPRTrack* track = new SciFiStraightPRTrack(-1, line_x, line_y, covariance);
           if ( _verb > 0 ) {
             std::cout << "x0 = " << track->get_x0() << " mx = " << track->get_mx();
             std::cout << " y0 = " << track->get_y0() << " my = " << track->get_my() << "\n";
@@ -683,8 +682,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   ThreeVector pos_0(x0, y0, -1);
 
   // Form the track and return it
-  SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, n_points, charge, pos_0, phi_0, c_trial,
-                                                       line_sz, -1.0, phi_i, spnts, covariance);
+  SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, charge, pos_0, phi_0, c_trial, line_sz,
+                                                                  -1.0, phi_i, spnts, covariance);
   return track;
 }
 

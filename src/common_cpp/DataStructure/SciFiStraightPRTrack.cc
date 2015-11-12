@@ -29,20 +29,17 @@ namespace MAUS {
 
 // Constructors
   SciFiStraightPRTrack::SciFiStraightPRTrack()
-  : SciFiBasePRTrack(),
-    _tracker(-1), _num_points(-1),
+  : SciFiBasePRTrack(), _tracker(-1),
     _x0(-1.0), _mx(-1.0), _x_chisq(-1.0),
     _y0(-1.0), _my(-1.0), _y_chisq(-1.0) {
     // Do nothing
   }
 
-  SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
-                                             double x0, double mx, double x_chisq,
+  SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, double x0, double mx, double x_chisq,
                                              double y0, double my, double y_chisq,
                                              const DoubleArray& covariance)
     : SciFiBasePRTrack(covariance),
       _tracker(tracker),
-      _num_points(num_points),
       _x0(x0),
       _mx(mx),
       _x_chisq(x_chisq),
@@ -50,15 +47,13 @@ namespace MAUS {
       _my(my),
       _y_chisq(y_chisq) {
     this->set_chi_squared(_x_chisq + _y_chisq);
-    this->set_ndf((2.0*_num_points) - 4);
+    this->set_ndf((2.0*this->get_num_points()) - 4);
   }
 
-  SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, int num_points,
-                                             SimpleLine line_x, SimpleLine line_y,
+  SciFiStraightPRTrack::SciFiStraightPRTrack(int tracker, SimpleLine line_x, SimpleLine line_y,
                                              const DoubleArray& covariance)
     : SciFiBasePRTrack(covariance),
       _tracker(tracker),
-      _num_points(num_points),
       _x0(line_x.get_c()),
       _mx(line_x.get_m()),
       _x_chisq(line_x.get_chisq()),
@@ -66,13 +61,12 @@ namespace MAUS {
       _my(line_y.get_m()),
       _y_chisq(line_y.get_chisq()) {
     this->set_chi_squared(_x_chisq + _y_chisq);
-    this->set_ndf((2.0*_num_points) - 4);
+    this->set_ndf((2.0*this->get_num_points()) - 4);
   }
 
   SciFiStraightPRTrack::SciFiStraightPRTrack(const SciFiStraightPRTrack &strk)
     : SciFiBasePRTrack(strk),
       _tracker(strk.get_tracker()),
-      _num_points(strk.get_num_points()),
       _x0(strk.get_x0()),
       _mx(strk.get_mx()),
       _x_chisq(strk.get_x_chisq()),
@@ -80,7 +74,7 @@ namespace MAUS {
       _my(strk.get_my()),
       _y_chisq(strk.get_y_chisq()) {
     this->set_chi_squared(_x_chisq + _y_chisq);
-    this->set_ndf((2.0*_num_points) - 4);
+    this->set_ndf((2.0*this->get_num_points()) - 4);
   }
 
   // Destructor
@@ -94,7 +88,6 @@ namespace MAUS {
       SciFiBasePRTrack::operator=(strk);
 
       _tracker = strk.get_tracker();
-      _num_points = strk.get_num_points();
       _x0 = strk.get_x0();
       _mx = strk.get_mx();
       _x_chisq = strk.get_x_chisq();
