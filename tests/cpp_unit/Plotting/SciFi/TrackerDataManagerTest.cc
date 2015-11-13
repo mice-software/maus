@@ -192,6 +192,66 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
     trks.push_back(trk);
   }
 
+  std::vector<SciFiSpacePoint*> spnts;
+  std::vector<SciFiSpacePoint*> spnts_up_5;
+  std::vector<SciFiSpacePoint*> spnts_up_4;
+  std::vector<SciFiSpacePoint*> spnts_up_3;
+  std::vector<SciFiSpacePoint*> spnts_down_5;
+  std::vector<SciFiSpacePoint*> spnts_down_4;
+  std::vector<SciFiSpacePoint*> spnts_down_3;
+
+  for (int i = 0; i < 5; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(0);
+    spnts.push_back(sp);
+    spnts_up_5.push_back(sp);
+  }
+  for (int i = 0; i < 4; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(0);
+    spnts.push_back(sp);
+    spnts_up_4.push_back(sp);
+  }
+  for (int i = 0; i < 3; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(0);
+    spnts.push_back(sp);
+    spnts_up_3.push_back(sp);
+  }
+
+  for (int i = 0; i < 5; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(1);
+    spnts.push_back(sp);
+    spnts_down_5.push_back(sp);
+  }
+  for (int i = 0; i < 4; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(1);
+    spnts.push_back(sp);
+    spnts_down_4.push_back(sp);
+  }
+  for (int i = 0; i < 3; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(1);
+    spnts.push_back(sp);
+    spnts_down_3.push_back(sp);
+  }
+
+  trks[0]->set_spacepoints_pointers(spnts_up_5);
+  trks[1]->set_spacepoints_pointers(spnts_up_4);
+  trks[2]->set_spacepoints_pointers(spnts_up_3);
+  trks[3]->set_spacepoints_pointers(spnts_down_5);
+  trks[4]->set_spacepoints_pointers(spnts_down_4);
+  trks[5]->set_spacepoints_pointers(spnts_down_3);
+
+  trks[0]->set_tracker(0);
+  trks[1]->set_tracker(0);
+  trks[2]->set_tracker(0);
+  trks[3]->set_tracker(1);
+  trks[4]->set_tracker(1);
+  trks[5]->set_tracker(1);
+
   std::vector<double> phi_i;
   phi_i.push_back(1.0);
   double x0 = 1.0;
@@ -200,43 +260,36 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   double dsdz = 1.0;
   double sz_c = 1.0;
   int handness = -1;
-  SciFiSpacePoint *sp1 = new SciFiSpacePoint();
-  std::vector<SciFiSpacePoint*> spnts1;
-  spnts1.push_back(sp1);
-  SciFiSpacePoint *sp2 = new SciFiSpacePoint();
-  std::vector<SciFiSpacePoint*> spnts2;
-  spnts2.push_back(sp2);
+
   trks[0]->set_phi(phi_i);
   trks[0]->set_R(rad);
   trks[0]->set_circle_x0(x0);
   trks[0]->set_circle_y0(y0);
   trks[0]->set_dsdz(dsdz);
   trks[0]->set_line_sz_c(sz_c);
-  trks[0]->set_spacepoints_pointers(spnts1);
   trks[3]->set_phi(phi_i);
   trks[3]->set_R(rad);
   trks[3]->set_circle_x0(x0);
   trks[3]->set_circle_y0(y0);
   trks[3]->set_dsdz(dsdz);
   trks[3]->set_line_sz_c(sz_c);
-  trks[3]->set_spacepoints_pointers(spnts2);
 
   // Run them through the function and check the output
   tdm.process_htrks(trks);
 
   // Check the spill totals
-  EXPECT_EQ(0, tdm._t1._num_htracks_5pt);
-  EXPECT_EQ(0, tdm._t1._num_htracks_4pt);
-  EXPECT_EQ(0, tdm._t1._num_htracks_3pt);
-  EXPECT_EQ(0, tdm._t2._num_htracks_5pt);
-  EXPECT_EQ(0, tdm._t2._num_htracks_4pt);
-  EXPECT_EQ(0, tdm._t2._num_htracks_3pt);
+  EXPECT_EQ(1, tdm._t1._num_htracks_5pt);
+  EXPECT_EQ(1, tdm._t1._num_htracks_4pt);
+  EXPECT_EQ(1, tdm._t1._num_htracks_3pt);
+  EXPECT_EQ(1, tdm._t2._num_htracks_5pt);
+  EXPECT_EQ(1, tdm._t2._num_htracks_4pt);
+  EXPECT_EQ(1, tdm._t2._num_htracks_3pt);
   EXPECT_EQ(phi_i[0], tdm._t1._seeds_phi[0][0]);
   EXPECT_NEAR(phi_i[0]*rad, tdm._t2._seeds_s[0][0], 0.01);
   EXPECT_EQ(phi_i[0], tdm._t2._seeds_phi[0][0]);
   EXPECT_NEAR(phi_i[0]*rad, tdm._t1._seeds_s[0][0], 0.01);
-  EXPECT_EQ(1, tdm._t1._num_seeds);
-  EXPECT_EQ(1, tdm._t2._num_seeds);
+  EXPECT_EQ(12, tdm._t1._num_seeds);
+  EXPECT_EQ(12, tdm._t2._num_seeds);
 
   // Check the first created x-y projections
   TArc arc1 = tdm._t1._trks_xy[0];
@@ -275,10 +328,9 @@ TEST_F(TrackerDataManagerTest, TestProcessHtrks) {
   EXPECT_EQ(sz_c, yz2.GetParameter(3));
 
   // Tidy up
-  delete sp1;
-  sp1 = NULL;
-  delete sp2;
-  sp2 = NULL;
+  for (int i = 0; i < spnts.size(); ++i) {
+    delete spnts[i];
+  }
   for (int i = 0; i < 6; ++i) {
     delete trks[i];
   }
@@ -322,6 +374,73 @@ TEST_F(TrackerDataManagerTest, TestProcessStrks) {
   TrackerDataManager tdm;
 
   // Set up some tracks
+  std::vector<SciFiStraightPRTrack*> trks;
+  for (int i = 0; i < 6; ++i) {
+    SciFiStraightPRTrack* trk = new SciFiStraightPRTrack();
+    trks.push_back(trk);
+  }
+
+  std::vector<SciFiSpacePoint*> spnts;
+  std::vector<SciFiSpacePoint*> spnts_up_5;
+  std::vector<SciFiSpacePoint*> spnts_up_4;
+  std::vector<SciFiSpacePoint*> spnts_up_3;
+  std::vector<SciFiSpacePoint*> spnts_down_5;
+  std::vector<SciFiSpacePoint*> spnts_down_4;
+  std::vector<SciFiSpacePoint*> spnts_down_3;
+
+  for (int i = 0; i < 5; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(0);
+    spnts.push_back(sp);
+    spnts_up_5.push_back(sp);
+  }
+  for (int i = 0; i < 4; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(0);
+    spnts.push_back(sp);
+    spnts_up_4.push_back(sp);
+  }
+  for (int i = 0; i < 3; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(0);
+    spnts.push_back(sp);
+    spnts_up_3.push_back(sp);
+  }
+
+  for (int i = 0; i < 5; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(1);
+    spnts.push_back(sp);
+    spnts_down_5.push_back(sp);
+  }
+  for (int i = 0; i < 4; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(1);
+    spnts.push_back(sp);
+    spnts_down_4.push_back(sp);
+  }
+  for (int i = 0; i < 3; ++i) {
+    SciFiSpacePoint *sp = new SciFiSpacePoint();
+    sp->set_tracker(1);
+    spnts.push_back(sp);
+    spnts_down_3.push_back(sp);
+  }
+
+  trks[0]->set_spacepoints_pointers(spnts_up_5);
+  trks[1]->set_spacepoints_pointers(spnts_up_4);
+  trks[2]->set_spacepoints_pointers(spnts_up_3);
+  trks[3]->set_spacepoints_pointers(spnts_down_5);
+  trks[4]->set_spacepoints_pointers(spnts_down_4);
+  trks[5]->set_spacepoints_pointers(spnts_down_3);
+
+  trks[0]->set_tracker(0);
+  trks[1]->set_tracker(0);
+  trks[2]->set_tracker(0);
+  trks[3]->set_tracker(1);
+  trks[4]->set_tracker(1);
+  trks[5]->set_tracker(1);
+
+  // Set up some tracks
   double x0_1 = 1.0;
   double mx_1 = 2.0;
   double y0_1 = 3.0;
@@ -330,11 +449,7 @@ TEST_F(TrackerDataManagerTest, TestProcessStrks) {
   double mx_2 = 6.0;
   double y0_2 = 7.0;
   double my_2 = 8.0;
-  std::vector<SciFiStraightPRTrack*> trks;
-  for (int i = 0; i < 6; ++i) {
-    SciFiStraightPRTrack* trk = new SciFiStraightPRTrack();
-    trks.push_back(trk);
-  }
+
   // Only bother to more fully initialise the first track in each tracker
   trks[0]->set_x0(x0_1);
   trks[0]->set_mx(mx_1);
@@ -347,6 +462,13 @@ TEST_F(TrackerDataManagerTest, TestProcessStrks) {
 
   // Run them through the function and check the output
   tdm.process_strks(trks);
+
+  EXPECT_EQ(1, trks[0]->get_num_points());
+  EXPECT_EQ(1, trks[1]->get_num_points());
+  EXPECT_EQ(1, trks[2]->get_num_points());
+  EXPECT_EQ(1, trks[3]->get_num_points());
+  EXPECT_EQ(1, trks[4]->get_num_points());
+  EXPECT_EQ(1, trks[5]->get_num_points());
 
   // Check the spill totals
   EXPECT_EQ(1, tdm._t1._num_stracks_5pt);
@@ -375,6 +497,9 @@ TEST_F(TrackerDataManagerTest, TestProcessStrks) {
   EXPECT_EQ(my_2, yz2.GetParameter(1));
 
   // Tidy up
+  for (int i = 0; i < spnts.size(); ++i) {
+    delete spnts[i];
+  }
   for (int i = 0; i < 6; ++i) {
     delete trks[i];
   }

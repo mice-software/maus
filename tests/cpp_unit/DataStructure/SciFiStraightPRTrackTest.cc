@@ -104,7 +104,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_my(), 5.0);
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
-  EXPECT_EQ(trk2.get_num_points(), 0);
+  EXPECT_EQ(trk2.get_num_points(), 1);
   EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
   EXPECT_EQ(trk2.get_covariance()[0], 10.0);
@@ -131,7 +131,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   EXPECT_EQ(trk2.get_my(), 5.0);
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
-  EXPECT_EQ(trk2.get_num_points(), 0);
+  EXPECT_EQ(trk2.get_num_points(), 1);
   EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
   EXPECT_EQ(trk2.get_covariance()[0], 10.0);

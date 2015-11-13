@@ -121,11 +121,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   EXPECT_EQ(trk.get_chi_squared(), chisq);
   EXPECT_EQ(trk.get_ndf(), ndf);
   EXPECT_EQ(trk.get_point_spread(), point_spread);
-  size_t size = 1;
-  EXPECT_EQ(trk.get_spacepoints()->GetEntries(), size);
+  EXPECT_EQ(trk.get_spacepoints()->GetEntries(), num_points);
   EXPECT_EQ(static_cast<SciFiSpacePoint*>(trk.get_spacepoints()->At(0))->get_tracker(), tracker);
-  size = 0;
-  EXPECT_EQ(trk.get_phi().size(), size);
+  EXPECT_EQ(trk.get_phi().size(), 0);
   ASSERT_EQ(trk.get_covariance().size(), 1);
   EXPECT_EQ(trk.get_covariance()[0], 10.0);
 }
@@ -198,7 +196,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_circle_chisq(), circle_chisq);
   EXPECT_EQ(trk2.get_tracker(), tracker);
   EXPECT_EQ(trk2.get_num_points(), num_points);
-  EXPECT_EQ(trk2.get_num_triplets(), 5);
+  EXPECT_EQ(trk2.get_num_triplets(), num_points);
   EXPECT_EQ(trk2.get_charge(), charge);
   EXPECT_EQ(static_cast<SciFiSpacePoint*>(trk2.get_spacepoints()->At(0))->get_tracker(), tracker);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
@@ -313,7 +311,6 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   EXPECT_EQ(trk2.get_tracker(), tracker);
   EXPECT_EQ(trk2.get_num_points(), num_points);
   EXPECT_EQ(trk2.get_num_triplets(), num_points);
-  EXPECT_EQ(trk2.get_num_triplets(), 0);
   EXPECT_EQ(trk2.get_charge(), charge);
   EXPECT_EQ(static_cast<SciFiSpacePoint*>(trk2.get_spacepoints()->At(0))->get_tracker(), tracker);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
