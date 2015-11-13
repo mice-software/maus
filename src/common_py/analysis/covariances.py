@@ -99,7 +99,7 @@ def get_conjugates( axes ) :
   return new_list
 
 
-class covariance_matrix() :
+class CovarianceMatrix() :
   """
     Performs running calculations of a covariance matrix to allow for larger
     datasets to be analysed with a smaller memory footprint. Running sums and 
@@ -374,7 +374,7 @@ class covariance_matrix() :
 
 
 
-class correction_matrix :
+class CorrectionMatrix :
   """
     Performs a running calculation of the correct matrix to the covariance 
     matrix using in the emittance calculations.
