@@ -463,12 +463,12 @@ TEST_F(TrackerDataManagerTest, TestProcessStrks) {
   // Run them through the function and check the output
   tdm.process_strks(trks);
 
-  EXPECT_EQ(1, trks[0]->get_num_points());
-  EXPECT_EQ(1, trks[1]->get_num_points());
-  EXPECT_EQ(1, trks[2]->get_num_points());
-  EXPECT_EQ(1, trks[3]->get_num_points());
-  EXPECT_EQ(1, trks[4]->get_num_points());
-  EXPECT_EQ(1, trks[5]->get_num_points());
+  EXPECT_EQ(5, trks[0]->get_num_points());
+  EXPECT_EQ(4, trks[1]->get_num_points());
+  EXPECT_EQ(3, trks[2]->get_num_points());
+  EXPECT_EQ(5, trks[3]->get_num_points());
+  EXPECT_EQ(4, trks[4]->get_num_points());
+  EXPECT_EQ(3, trks[5]->get_num_points());
 
   // Check the spill totals
   EXPECT_EQ(1, tdm._t1._num_stracks_5pt);

@@ -285,7 +285,8 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
 
   SciFiSpacePointPArray spoints;
   for (int it_p = 0; it_p < num_points; ++it_p) {
-    SciFiSpacePoint *spoint = new SciFiSpacePoint();
+    SciFiSpacePoint *spoint = new SciFiSpacePoint(new SciFiCluster(), new SciFiCluster(),
+                                                                               new SciFiCluster());
     spoint->set_tracker(tracker);
     spoints.push_back(spoint);
   }
