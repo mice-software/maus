@@ -126,7 +126,7 @@ MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     SetMiceModules(*Globals::GetInstance()->GetMonteCarloMiceModules());
     if (usegdml) {
       SetVolumeInformation(*Globals::GetInstance()->GetMonteCarloMiceModules(),
-			   _detector->GetWorldVolume()->GetLogicalVolume());
+			   _parser.GetWorldVolume()->GetLogicalVolume());
     }
 }
 

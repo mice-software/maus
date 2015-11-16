@@ -1,3 +1,4 @@
+
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
@@ -97,7 +98,7 @@ DetectorConstruction::DetectorConstruction(G4VPhysicalVolume* worldvol,
     _miceElectroMagneticField(NULL), _stepper(NULL), _chordFinder(NULL),
     _rootVisAtts(NULL), _equation(NULL), _useGDML(true) {
   _event = new MICEEvent();
-  _rootPhysicalVolume = static_cast<G4PVPlacement*>(worldvol);
+  _rootPhysicalVolume = worldvol;
   _rootLogicalVolume  = _rootPhysicalVolume->GetLogicalVolume();
   SetDatacardVariables(cards);
   SetBTMagneticField();
