@@ -23,6 +23,7 @@
 #include "Geant4/G4Region.hh"
 #include "Geant4/G4RegionStore.hh"
 #include "Geant4/G4UserLimits.hh"
+#include "Geant4/G4Navigator.hh"
 
 #include "src/legacy/Interface/Squeak.hh"
 
@@ -382,14 +383,14 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module, G4LogicalVolume* m
   // if (myvol->GetNoDaughters() > 0) {
   //   SetDaughterUserLimits(myvol);
   // }
-  /*
+
   if (vis)
     _detector->GetVisAttributes().push_back(new G4VisAttributes(G4Color(red, green, blue)));
   else
     _detector->GetVisAttributes().push_back(new G4VisAttributes(false));
-  
+
   myvol->SetVisAttributes(_detector->GetVisAttributes().back());
-  */
+
   // Squeak::mout(Squeak::info) << "Attributes set for volume "
   // << myvol->GetName() << std::endl;
 }
@@ -420,7 +421,8 @@ void MAUSGeant4Manager::DefineSensitiveDetector(MiceModule& module, G4LogicalVol
       _detector->BuildSensitiveDetector(myvol, tempmod);
       _detector->AddToRegion(myvol, tempmod);
       // Now loop over all daughters to add them to the sensitive volumes
-      if (sensdetname == "SciFi" || sensdetname == "KL") {
+      if (sensdetname == "SciFi" || sensdetname == "KL" ||
+	  sensdetname == "EMR" ) {
 	if (myvol->GetNoDaughters() > 0) {
 	  SetDaughterSensitiveDetectors(myvol);
 	}
