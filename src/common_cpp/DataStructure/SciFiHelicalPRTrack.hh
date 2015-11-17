@@ -47,7 +47,7 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     SciFiHelicalPRTrack();
 
     /** Constructor from SimpleCircle and SimpleLine Without explicit chi squared setting */
-    SciFiHelicalPRTrack(int tracker, int num_points, int charge, ThreeVector pos0, double phi0,
+    SciFiHelicalPRTrack(int tracker, int charge, ThreeVector pos0, double phi0,
                         SimpleCircle circle, SimpleLine line_sz, double point_spread,
                         DoubleArray phi, SciFiSpacePointPArray spoints,
                         const DoubleArray& covariance);
@@ -72,12 +72,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
     /** Set the tracker number */
     void set_tracker(int tracker) { _tracker = tracker; }
-
-    /** Get the number of points in a track (5, 4, or 3) */
-    int get_num_points() const { return _num_points; }
-
-    /** Set the number of points in a track (5, 4, or 3) */
-    void set_num_points(int num_points) { _num_points = num_points; }
 
     /** Get the track charge */
     int get_charge() const { return _charge; }
@@ -151,7 +145,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
   private:
     int _tracker;
-    int _num_points;
     int _charge;
     static const int _type = 1; // 0 for straight, 1 for helical
 
