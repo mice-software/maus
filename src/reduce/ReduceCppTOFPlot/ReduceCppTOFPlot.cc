@@ -48,37 +48,49 @@
 
 namespace MAUS {
 
-CanvasWrapper* ReduceCppTools::get_canvas_wrapper(TCanvas *canv,
-                                               TH1* hist,
-                                               std::string name,
-                                               std::string description,
-                                               std::string text_box_str) {
-
-  CanvasWrapper *wrap = new CanvasWrapper();
-  wrap->SetDescription(description);
-  wrap->SetFileTag(name);
-  wrap->SetCanvas(canv);
-
-  canv->cd();
-  hist->Draw();
-  gPad->Update();
-  TPaveStats *st = static_cast<TPaveStats*>(hist->FindObject("stats"));
-  st->SetOptStat(10);
-//   hist->SetStats(false);
-//   TPaveText* text_box = new TPaveText(0.6, 0.5, 1.0, 0.9, "NDC");
-//   text_box->AddText(description.c_str());
-
-  return wrap;
-}
-
-
 PyMODINIT_FUNC init_ReduceCppTOFPlot(void) {
     PyWrapReduceBase<ReduceCppTOFPlot>::PyWrapReduceBaseModInit(
                                   "ReduceCppTOFPlot", "", "", "", "");
 }
 
 ReduceCppTOFPlot::ReduceCppTOFPlot()
-  : ReduceBase<Data, ImageData>("ReduceCppTOFPlot") {
+  : ReduceBase<Data, ImageData>("ReduceCppTOFPlot") {}
+
+ReduceCppTOFPlot::~ReduceCppTOFPlot() {
+  for (unsigned int i = 0; i < _histos.size(); i++)
+    delete _histos[i];
+  _histos.resize(0);
+
+  for (unsigned int i = 0; i < _canvs.size(); i++)
+    delete _canvs[i];
+  _canvs.resize(0);
+
+  // CanvasWrapper objects will be deleted by the ImageData destructor.
+}
+
+void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
+
+  if (!_output) {
+    throw MAUS::Exception(Exception::nonRecoverable,
+                          "The output is disconnected.",
+                          "ReduceCppTOFPlot::_birth");
+  }
+
+  if (!_output->GetImage())
+    _output->SetImage(new MAUS::Image());
+
+  //  JsonCpp setup
+  Json::Value configJSON;
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+
+  _refresh_rate = configJSON["reduce_plot_refresh_rate"].asInt();
+
+  // Set ROOT to batch mode by default unless specified otherwise
+  int root_batch_mode = 1;
+  if ( configJSON["root_batch_mode"].isInt() )
+      root_batch_mode = configJSON["root_batch_mode"].asInt();
+  if ( root_batch_mode )
+    gROOT->SetBatch();
 
   // define histograms
   _h_tof01 = new TH1F("ht01", "TOF0->1;Time (ns);;", 200, 20, 40);
@@ -97,51 +109,16 @@ ReduceCppTOFPlot::ReduceCppTOFPlot()
   _canvs.push_back(_canv_tof02);
 
   _cwrap_tof01 = ReduceCppTools::get_canvas_wrapper(_canv_tof01,
-                                                     _h_tof01,
-                                                     "",
-                                                     "",
-                                                     "");
+                                                    _h_tof01,
+						    "TOF01");
 
   _cwrap_tof12 = ReduceCppTools::get_canvas_wrapper(_canv_tof12,
-                                                     _h_tof12,
-                                                     "",
-                                                     "",
-                                                     "");
+                                                    _h_tof12,
+						    "TOF12");
 
   _cwrap_tof02 = ReduceCppTools::get_canvas_wrapper(_canv_tof02,
-                                                     _h_tof02,
-                                                     "",
-                                                     "",
-                                                     "");
-}
-
-ReduceCppTOFPlot::~ReduceCppTOFPlot() {
-  for (unsigned int i = 0; i < _histos.size(); i++)
-    delete _histos[i];
-  _histos.resize(0);
-
-  for (unsigned int i = 0; i < _canvs.size(); i++)
-    delete _canvs[i];
-  _canvs.resize(0);
-
-  // CanvasWrapper objects will be deleted by the ImageData destructor.
-}
-
-void ReduceCppTOFPlot::_birth(const std::string& str_config) {
-
-  if (!_output) {
-    throw MAUS::Exception(Exception::nonRecoverable,
-                          "The output is disconnected.",
-                          "ReduceCppTOFPlot::_birth");
-  }
-
-  if (!_output->GetImage())
-    _output->SetImage(new MAUS::Image());
-
-  Json::Value config = JsonWrapper::StringToJson(str_config);
-  _refresh_rate = JsonWrapper::GetProperty(config,
-                                           "reduce_plot_refresh_rate",
-                                           JsonWrapper::intValue).asInt();
+                                                    _h_tof02,
+						    "TOF02");
 
   this->reset();
   _output->GetImage()->CanvasWrappersPushBack(_cwrap_tof01);
@@ -180,15 +157,12 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
     MAUS::TOFEvent* tof_event = recon_events->at(i)->GetTOFEvent();
     if (tof_event == NULL) continue;
 
-    update_tof_plots(tof_event);
+    this->update_tof_plots(tof_event);
   }
 
   _process_count++;
-//   if (!(_process_count%_refresh_rate)) {
-//     _canv_tof01->Print("tof01.png");
-//     _canv_tof12->Print("tof12.png");
-//     _canv_tof02->Print("tof02.png");
-//   }
+  if ( !(_process_count % _refresh_rate) )
+    this->update();
 }
 
 void ReduceCppTOFPlot::reset() {
@@ -228,7 +202,5 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
 
   if (sp_tof1->size() == 1 && sp_tof2->size() == 1)
     _h_tof12->Fill(t2-t1);
-
-  this->update();
 }
 } // MAUS

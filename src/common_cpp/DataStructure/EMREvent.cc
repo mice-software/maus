@@ -24,9 +24,9 @@ EMREvent::EMREvent()
     _has_primary(false), _range_primary(0.0),
     _has_secondary(false), _range_secondary(0.0),
     _secondary_to_primary_track_distance(0),
-    _total_charge_MA(0.0), _charge_ratio_MA(0.0),
-    _total_charge_SA(0.0), _charge_ratio_SA(0.0),
-    _plane_density(0.0), _chi2(0.0) {
+    _total_charge_MA(0.0), _total_charge_SA(0.0),
+    _charge_ratio_MA(0.0), _charge_ratio_SA(0.0),
+    _plane_density_MA(0.0), _plane_density_SA(0.0), _chi2(0.0) {
 }
 
 EMREvent::EMREvent(const EMREvent& _emrevent)
@@ -34,9 +34,9 @@ EMREvent::EMREvent(const EMREvent& _emrevent)
     _has_primary(false), _range_primary(0.0),
     _has_secondary(false), _range_secondary(0.0),
     _secondary_to_primary_track_distance(0),
-    _total_charge_MA(0.0), _charge_ratio_MA(0.0),
-    _total_charge_SA(0.0), _charge_ratio_SA(0.0),
-    _plane_density(0.0), _chi2(0.0) {
+    _total_charge_MA(0.0), _total_charge_SA(0.0),
+    _charge_ratio_MA(0.0), _charge_ratio_SA(0.0),
+    _plane_density_MA(0.0), _plane_density_SA(0.0), _chi2(0.0) {
   *this = _emrevent;
 }
 
@@ -56,10 +56,11 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
   SetRangeSecondary(_emrevent._range_secondary);
   SetSecondaryToPrimaryTrackDistance(_emrevent._secondary_to_primary_track_distance);
   SetTotalChargeMA(_emrevent._total_charge_MA);
-  SetChargeRatioMA(_emrevent._charge_ratio_MA);
   SetTotalChargeSA(_emrevent._total_charge_SA);
+  SetChargeRatioMA(_emrevent._charge_ratio_MA);
   SetChargeRatioSA(_emrevent._charge_ratio_SA);
-  SetPlaneDensity(_emrevent._plane_density);
+  SetPlaneDensityMA(_emrevent._plane_density_MA);
+  SetPlaneDensitySA(_emrevent._plane_density_SA);
   SetChi2(_emrevent._chi2);
   return *this;
 }
@@ -141,6 +142,14 @@ void EMREvent::SetTotalChargeMA(double total_charge_MA) {
   _total_charge_MA = total_charge_MA;
 }
 
+void EMREvent::SetTotalChargeSA(double total_charge_SA) {
+  _total_charge_SA = total_charge_SA;
+}
+
+double EMREvent::GetChargeRatioSA() const {
+  return _charge_ratio_SA;
+}
+
 double EMREvent::GetChargeRatioMA() const {
   return _charge_ratio_MA;
 }
@@ -153,24 +162,24 @@ double EMREvent::GetTotalChargeSA() const {
   return _total_charge_SA;
 }
 
-void EMREvent::SetTotalChargeSA(double total_charge_SA) {
-  _total_charge_SA = total_charge_SA;
-}
-
-double EMREvent::GetChargeRatioSA() const {
-  return _charge_ratio_SA;
-}
-
 void EMREvent::SetChargeRatioSA(double charge_ratio_SA) {
   _charge_ratio_SA = charge_ratio_SA;
 }
 
-double EMREvent::GetPlaneDensity() const {
-  return _plane_density;
+double EMREvent::GetPlaneDensityMA() const {
+  return _plane_density_MA;
 }
 
-void EMREvent::SetPlaneDensity(double plane_density) {
-  _plane_density = plane_density;
+void EMREvent::SetPlaneDensityMA(double plane_density_MA) {
+  _plane_density_MA = plane_density_MA;
+}
+
+double EMREvent::GetPlaneDensitySA() const {
+  return _plane_density_SA;
+}
+
+void EMREvent::SetPlaneDensitySA(double plane_density_SA) {
+  _plane_density_SA = plane_density_SA;
 }
 
 double EMREvent::GetChi2() const {

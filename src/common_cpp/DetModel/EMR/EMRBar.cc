@@ -19,9 +19,11 @@
 #include <iostream>
 
 // CLHEP
+#include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/Rotation.h"
+#include "CLHEP/Geometry/Transform3D.h"
 
-
+// GEANT 4
 #include "Geant4/G4NistManager.hh"
 #include "Geant4/G4Material.hh"
 #include "Geant4/G4Tubs.hh"
@@ -103,6 +105,7 @@ EMRBar::EMRBar(MiceModule* mod,
   // Calorimeter
   // ------------------------------
   G4double HalfCaloLength = 0.5*fCalorimeterLength;
+  G4RotationMatrix *rotation = new G4RotationMatrix(mod->rotation());
 
   solidCalorimeter = new G4Box("calorimeter",
                                HalfCaloLength,
@@ -110,7 +113,7 @@ EMRBar::EMRBar(MiceModule* mod,
                                HalfCaloLength);
 
   logicCalorimeter = new G4LogicalVolume(solidCalorimeter, Air, "Calorimeter", 0, 0, 0);
-  physiCalorimeter = new G4PVPlacement(0,                   // no rotation
+  physiCalorimeter = new G4PVPlacement(rotation,
                                        mod->position(),
                                        logicCalorimeter,    // its logical volume
                                        "Calorimeter",       // its name
@@ -158,8 +161,9 @@ EMRBar::EMRBar(MiceModule* mod,
                                      fNbOfBars,
                                      fGap);
 
+  // Creates all of the bars at this stage
   // dummy value : kZAxis -- modified by parameterised volume
-  physiBar = new G4PVParameterised("Bar",            // their name
+  physiBar = new G4PVParameterised("EMRBar",         // their name
                                    logicBar,         // their logical volume
                                    logicCalorimeter, // Mother logical volume
                                    kZAxis,           // Are placed along this axis

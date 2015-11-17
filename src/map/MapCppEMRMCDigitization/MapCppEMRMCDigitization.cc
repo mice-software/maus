@@ -74,7 +74,6 @@ void MapCppEMRMCDigitization::_birth(const std::string& argJsonConfigDocument) {
   _tot_func_p1 = configJSON["EMRtotFuncP1"].asDouble();
   _tot_func_p2 = configJSON["EMRtotFuncP2"].asDouble();
   _tot_func_p3 = configJSON["EMRtotFuncP3"].asDouble();
-  _tot_func_p4 = configJSON["EMRtotFuncP4"].asDouble();
   _acquisition_window = configJSON["EMRacquisitionWindow"].asInt();
   _signal_integration_window = configJSON["EMRsignalIntegrationWindow"].asInt();
   _arrival_time_shift = configJSON["EMRarrivalTimeShift"].asInt();
@@ -398,9 +397,9 @@ void MapCppEMRMCDigitization::digitize(int nPartEvents,
 	    nADC = static_cast<int>(_rand->Gaus(nADC, _electronics_response_spread_MAPMT));
 
 	  // convert nADC to Tot
-	  int xTotDigi = static_cast<int>(_tot_func_p1+_tot_func_p2
-		         * log(static_cast<double>(nADC)
-		         / _tot_func_p4+_tot_func_p3));
+	  int xTotDigi = static_cast<int>(_tot_func_p1
+		         * log(_tot_func_p2*static_cast<double>(nADC)
+			       + _tot_func_p3));
 	  if (xTotDigi <= 0)
 	      continue;
 

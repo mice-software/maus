@@ -20,15 +20,17 @@ namespace MAUS {
 
 EMRBarHit::EMRBarHit()
   : _tot(0), _deltat(0), _hittime(0),
-    _x(0.0), _ex(0.0), _y(0.0),
-    _ey(0.0), _z(0.0), _ez(0.0),
+    _x(0.0), _y(0.0), _z(0.0),
+    _x_global(0.0), _y_global(0.0), _z_global(0.0),
+    _ex(0.0), _ey(0.0), _ez(0.0),
     _charge_corrected(0.0), _total_charge_corrected(0.0) {
 }
 
 EMRBarHit::EMRBarHit(const EMRBarHit& _emrbarhit)
   : _tot(0), _deltat(0), _hittime(0),
-    _x(0.0), _ex(0.0), _y(0.0),
-    _ey(0.0), _z(0.0), _ez(0.0),
+    _x(0.0), _y(0.0), _z(0.0),
+    _x_global(0.0), _y_global(0.0), _z_global(0.0),
+    _ex(0.0), _ey(0.0), _ez(0.0),
     _charge_corrected(0.0), _total_charge_corrected(0.0) {
   *this = _emrbarhit;
 }
@@ -42,10 +44,13 @@ EMRBarHit& EMRBarHit::operator=(const EMRBarHit& _emrbarhit) {
     SetDeltaT(_emrbarhit._deltat);
     SetHitTime(_emrbarhit._hittime);
     SetX(_emrbarhit._x);
-    SetErrorX(_emrbarhit._ex);
     SetY(_emrbarhit._y);
-    SetErrorY(_emrbarhit._ey);
     SetZ(_emrbarhit._z);
+    SetGlobalX(_emrbarhit._x_global);
+    SetGlobalY(_emrbarhit._y_global);
+    SetGlobalZ(_emrbarhit._z_global);
+    SetErrorX(_emrbarhit._ex);
+    SetErrorY(_emrbarhit._ey);
     SetErrorZ(_emrbarhit._ez);
     SetChargeCorrected(_emrbarhit._charge_corrected);
     SetTotalChargeCorrected(_emrbarhit._total_charge_corrected);
@@ -87,14 +92,6 @@ void EMRBarHit::SetX(double x) {
     _x = x;
 }
 
-double EMRBarHit::GetErrorX() const {
-    return _ex;
-}
-
-void EMRBarHit::SetErrorX(double ex) {
-    _ex = ex;
-}
-
 double EMRBarHit::GetY() const {
     return _y;
 }
@@ -103,20 +100,52 @@ void EMRBarHit::SetY(double y) {
     _y = y;
 }
 
-double EMRBarHit::GetErrorY() const {
-    return _ey;
-}
-
-void EMRBarHit::SetErrorY(double ey) {
-    _ey = ey;
-}
-
 double EMRBarHit::GetZ() const {
     return _z;
 }
 
 void EMRBarHit::SetZ(double z) {
     _z = z;
+}
+
+double EMRBarHit::GetGlobalX() const {
+    return _x_global;
+}
+
+void EMRBarHit::SetGlobalX(double x_global) {
+    _x_global = x_global;
+}
+
+double EMRBarHit::GetGlobalY() const {
+    return _y_global;
+}
+
+void EMRBarHit::SetGlobalY(double y_global) {
+    _y_global = y_global;
+}
+
+double EMRBarHit::GetGlobalZ() const {
+    return _z_global;
+}
+
+void EMRBarHit::SetGlobalZ(double z_global) {
+    _z_global = z_global;
+}
+
+double EMRBarHit::GetErrorX() const {
+    return _ex;
+}
+
+void EMRBarHit::SetErrorX(double ex) {
+    _ex = ex;
+}
+
+double EMRBarHit::GetErrorY() const {
+    return _ey;
+}
+
+void EMRBarHit::SetErrorY(double ey) {
+    _ey = ey;
 }
 
 double EMRBarHit::GetErrorZ() const {

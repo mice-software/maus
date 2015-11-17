@@ -159,7 +159,6 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
   double _tot_func_p1;
   double _tot_func_p2;
   double _tot_func_p3;
-  double _tot_func_p4;
   int _acquisition_window;
   int _signal_integration_window;
   int _arrival_time_shift;
