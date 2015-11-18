@@ -92,7 +92,6 @@ void MapCppTOFDigits::_process(MAUS::Data *data) const {
 
   int runNumber = 0;
   runNumber = spill->GetRunNumber();
-  std::cerr << "RunNum = " << runNumber << std::endl;
 
   if (!map_init || runNumber != runNumberSave) {
       const_cast<MapCppTOFDigits*>(this)->getTofCabling(runNumber);
