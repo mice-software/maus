@@ -116,7 +116,7 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) const {
   double Pitch                  = this_plane.Pitch;
   double CentralFibre           = this_plane.CentralFibre;
   // alpha is the distance to the central fibre.
-  double alpha   = clust->get_channel() - CentralFibre;
+  double alpha   = CentralFibre - clust->get_channel();
   double dist_mm = Pitch * (7.0 / 2.0) * alpha;
 
   ThreeVector perp = plane_direction.Orthogonal();
