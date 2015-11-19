@@ -20,7 +20,7 @@
 namespace MAUS {
 
 EMREvent::EMREvent()
-  : _emrplanehitarray(), _initial_trigger(false),
+  : _emrplanehitarray(),
     _has_primary(false), _range_primary(0.0),
     _has_secondary(false), _range_secondary(0.0),
     _secondary_to_primary_track_distance(0),
@@ -30,7 +30,7 @@ EMREvent::EMREvent()
 }
 
 EMREvent::EMREvent(const EMREvent& _emrevent)
-  : _emrplanehitarray(), _initial_trigger(false),
+  : _emrplanehitarray(),
     _has_primary(false), _range_primary(0.0),
     _has_secondary(false), _range_secondary(0.0),
     _secondary_to_primary_track_distance(0),
@@ -49,7 +49,6 @@ EMREvent& EMREvent::operator=(const EMREvent& _emrevent) {
   for (size_t i = 0; i < this->_emrplanehitarray.size(); i++)
     this->_emrplanehitarray[i] = new EMRPlaneHit(*(this->_emrplanehitarray[i]));
 
-  SetInitialTrigger(_emrevent._initial_trigger);
   SetHasPrimary(_emrevent._has_primary);
   SetRangePrimary(_emrevent._range_primary);
   SetHasSecondary(_emrevent._has_secondary);
@@ -84,14 +83,6 @@ void EMREvent::SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray) {
         delete _emrplanehitarray[i];
   }
   _emrplanehitarray = emrplanehitarray;
-}
-
-bool EMREvent::GetInitialTrigger() const {
-  return _initial_trigger;
-}
-
-void EMREvent::SetInitialTrigger(bool initial_trigger) {
-  _initial_trigger = initial_trigger;
 }
 
 bool EMREvent::GetHasPrimary() const {

@@ -25,9 +25,6 @@ EMREventProcessor::EMREventProcessor()
 	  ("emr_plane_hits", &_plane_hit_array_proc, &EMREvent::GetEMRPlaneHitArray,
            &EMREvent::SetEMRPlaneHitArray, false);
     RegisterValueBranch
-          ("initial_trigger", &_bool_proc, &EMREvent::GetInitialTrigger,
-          &EMREvent::SetInitialTrigger, false);
-    RegisterValueBranch
           ("has_primary", &_bool_proc, &EMREvent::GetHasPrimary,
           &EMREvent::SetHasPrimary, false);
     RegisterValueBranch

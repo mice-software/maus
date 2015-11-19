@@ -125,6 +125,12 @@ class EMRBarHit {
     /** Sets combined charge corrected by calibration */
     void SetTotalChargeCorrected(double total_charge_corrected);
 
+    /** Returns path length of the particle that went through */
+    double GetPathLength() const;
+
+    /** Sets path length of the particle that went through */
+    void SetPathLength(double path_length);
+
   private:
     int _tot;/* dbb counts */
     int _deltat;/* dbb counts */
@@ -140,6 +146,7 @@ class EMRBarHit {
     double _ez; /* mm */
     double _charge_corrected;
     double _total_charge_corrected;
+    double _path_length; /* mm */
 
     MAUS_VERSIONED_CLASS_DEF(EMRBarHit)
 };

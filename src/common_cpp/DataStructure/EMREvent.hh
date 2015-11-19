@@ -51,12 +51,6 @@ class EMREvent {
     void SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray);
 
     /** Returns  */
-    bool GetInitialTrigger() const;
-
-    /** Sets  */
-    void SetInitialTrigger(bool initial_trigger);
-
-    /** Returns  */
     bool GetHasPrimary() const;
 
     /** Sets  */
@@ -131,7 +125,6 @@ class EMREvent {
   private:
     EMRPlaneHitArray _emrplanehitarray;
 
-    bool _initial_trigger;
     bool _has_primary;
     double _range_primary;
     bool _has_secondary;

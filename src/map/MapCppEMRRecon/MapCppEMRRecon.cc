@@ -1047,16 +1047,13 @@ void MapCppEMRRecon::fill(Spill *spill,
     evt->SetPlaneDensitySA(emr_track_events[iPe]._plane_density_sa);
     evt->SetChi2(emr_track_events[iPe]._chi2_x + emr_track_events[iPe]._chi2_y);
 
-    // All the noise and unmatched secondaries are dumped, only initial triggers are kept
-    evt->SetInitialTrigger(true);
-
     // std::cerr << "************************************************" << std::endl;
+    // std::cerr << "has_primary = " << emr_track_events[iPe]._has_primary << std::endl;
+    // std::cerr << "has_secondary = " << emr_track_events[iPe]._has_secondary << std::endl;
     // std::cerr << "range_primary = " << emr_track_events[iPe]._range_primary << std::endl;
     // std::cerr << "range_secondary = " << emr_track_events[iPe]._range_secondary << std::endl;
     // std::cerr << "secondary_to_primary_track_distance = "
     // 		 << emr_track_events[iPe]._secondary_to_primary_track_distance << std::endl;
-    // std::cerr << "has_primary = " << emr_track_events[iPe]._has_primary << std::endl;
-    // std::cerr << "has_secondary = " << emr_track_events[iPe]._has_secondary << std::endl;
     // std::cerr << "================================================" << std::endl;
 
     recEvts->at(iPe)->SetEMREvent(evt);

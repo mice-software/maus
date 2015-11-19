@@ -46,6 +46,7 @@ class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
         test_conf_json['EMR_calib_source'] = "file"
         test_conf_json['EMR_calib_file'] = \
             "/files/calibration/emrcalib_cosmics_march2014.txt"
+        test_conf_json['EMRdoSampling'] = 0
         test_conf_json['EMRtotFuncP1'] = 15.0
         test_conf_json['EMRtotFuncP2'] = 0.0089
         test_conf_json['EMRtotFuncP3'] = 1.24
