@@ -40,9 +40,11 @@ void ReduceCppGlobalReconEfficiency::_birth(const std::string& json_config) {
     _detector_false_matches[i] = 0;
     _detector_lr_failed[i] = 0;
   }
+  std::string geo_filename = config["reconstruction_geometry_filename"].asString();
+  _tracker_z_positions = GlobalTools::GetTrackerPlaneZPositions(geo_filename);
 }
 
-ImageData* ReduceCppGlobalReconEfficiency::_process(Data* data) {
+void ReduceCppGlobalReconEfficiency::_process(Data* data) {
   _spill = data->GetSpill();
   //~ std::cerr << "EMR FAIL: " << _detector_lr_failed[4] << "\n";
   // Upstream
@@ -82,9 +84,9 @@ ImageData* ReduceCppGlobalReconEfficiency::_process(Data* data) {
     double p_time = mc_event->GetPrimary()->GetTime();
     throughEfficiency(track, mc_event, p_time, 40, 40, 40, 40, 2, 2);
   }
-  ImageData * image_data = new ImageData();
-  image_data->SetImage(new Image());
-  return image_data; 
+  //~ ImageData * image_data = new ImageData();
+  //~ image_data->SetImage(new Image());
+  //~ return image_data; 
 }
 
 void ReduceCppGlobalReconEfficiency::_death()  {
@@ -513,7 +515,7 @@ std::vector<std::pair<MAUS::DataStructure::Global::Track*, MAUS::MCEvent*> >
                ++track_point_iter) {
             TLorentzVector position = (*track_point_iter)->get_position();
             TLorentzVector momentum = (*track_point_iter)->get_momentum();
-            std::vector<int> tracker_plane = GlobalTools::GetTrackerPlane(*track_point_iter);
+            std::vector<int> tracker_plane = GlobalTools::GetTrackerPlane(*track_point_iter, _tracker_z_positions);
             SciFiHit* tracker_mc_hit = MCTruthTools::GetTrackerPlaneHit(
                 *mc_event_iter, tracker_plane[0], tracker_plane[1],
                 tracker_plane[2]);

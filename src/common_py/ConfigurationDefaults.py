@@ -715,6 +715,8 @@ track_matching_tolerances = {
   "TOF2x":40.0,
   "TOF2y":40.0,
   "KLy":32.0,
+  "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
+  "TOF12minSpeed":0.5,
 }
 
 # Whether to use energy loss calculations for global track matching

@@ -1,0 +1,147 @@
+
+Configuration PropagationTest
+{
+  Dimensions 2010.0 2010.0 20010.0 mm
+  PropertyString Material AIR
+  PropertyDouble G4StepMax 100.0 mm
+  Module TOF0
+  {
+    Position 0.0 0.0 100.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 50.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module Cherenkov
+  {
+    Position 0.0 0.0 847.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 20.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module TOF1
+  {
+    Position 0.0 0.0 7902.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 50.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T0S5
+  {
+    Position 0.0 0.0 8537.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T0S4
+  {
+    Position 0.0 0.0 8887.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T0S3
+  {
+    Position 0.0 0.0 9187.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T0S2
+  {
+    Position 0.0 0.0 9437.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T0S1
+  {
+    Position 0.0 0.0 9637.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T1S1
+  {
+    Position 0.0 0.0 13352.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T1S2
+  {
+    Position 0.0 0.0 13552.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T1S3
+  {
+    Position 0.0 0.0 13802.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T1S4
+  {
+    Position 0.0 0.0 14102.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module T1S5
+  {
+    Position 0.0 0.0 14452.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 2.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module TOF2
+  {
+    Position 0.0 0.0 15260.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 50.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module KL
+  {
+    Position 0.0 0.0 15383.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 40.0 mm
+    PropertyString Material Al
+  }
+  Module EMR
+  {
+    Position 0.0 0.0 16294.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    Volume Box
+    Dimensions 2000.0 2000.0 408.0 mm
+    PropertyString Material POLYSTYRENE
+  }
+  Module TestField
+  {
+    Volume None
+    Position 0.0 0.0 10000.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    PropertyString FieldType RectangularField
+    PropertyDouble Length 20000.0 mm
+    PropertyDouble Width 2000.0 mm
+    PropertyDouble Height 2000.0 mm
+    PropertyHep3Vector ConstantField 0.0 0.0 3.0 T
+    PropertyString FieldName Test_Field
+  }
+}

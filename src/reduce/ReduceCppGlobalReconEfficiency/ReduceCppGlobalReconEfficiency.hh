@@ -51,7 +51,7 @@ class ReduceCppGlobalReconEfficiency : public ReduceBase<Data, ImageData> {
   void _death();
 
   /** @brief Process JSON document */
-  ImageData* _process(Data* data);
+  void _process(Data* data);
 
   /**
    * @brief Checks whether the given TrackPoint belongs to a detector given by
@@ -182,6 +182,8 @@ class ReduceCppGlobalReconEfficiency : public ReduceBase<Data, ImageData> {
   size_t _detector_false_matches[9];
   size_t _detector_lr_failed[9];
   Spill* _spill;
+
+  std::vector<double> _tracker_z_positions;
 };
 
 } // ~namespace MAUS

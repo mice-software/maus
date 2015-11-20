@@ -21,9 +21,9 @@ keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
 simulation_geometry_filename = os.getenv("MAUS_ROOT_DIR") + "/files/geometry/download/ParentGeometryFile.dat" # geometry used by simulation
-maximum_number_of_steps = 10000
+maximum_number_of_steps = 100000000
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":12900.0},
+    "position":{"x":0.0, "y":-0.0, "z":5200.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":244.3, "time":0.0, "random_seed":job_number
 }

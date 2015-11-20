@@ -43,6 +43,7 @@ Track::Track()
       _pid_logL_values(0),
       _emr_range_primary(0.),
       _emr_range_secondary(0.),
+      _emr_plane_density(0.),
       _goodness_of_fit(0.) {
   _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
@@ -60,6 +61,7 @@ Track::Track(const Track &track)
       _constituent_tracks(track.get_constituent_tracks()),
       _emr_range_primary(track.get_emr_range_primary()),
       _emr_range_secondary(track.get_emr_range_secondary()),
+      _emr_plane_density(track.get_emr_plane_density()),
       _goodness_of_fit(track.get_goodness_of_fit()) {
   _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
@@ -86,6 +88,7 @@ Track& Track::operator=(const Track &track) {
   _pid_logL_values     = track.get_pid_logL_values();
   _emr_range_primary   = track.get_emr_range_primary();
   _emr_range_secondary = track.get_emr_range_secondary();
+  _emr_plane_density   = track.get_emr_plane_density();
   _goodness_of_fit     = track.get_goodness_of_fit();
 
   return *this;
@@ -103,6 +106,7 @@ Track* Track::Clone() const {
   trackNew->set_pid_logL_values(get_pid_logL_values());
   trackNew->set_emr_range_primary(get_emr_range_primary());
   trackNew->set_emr_range_secondary(get_emr_range_secondary());
+  trackNew->set_emr_plane_density(get_emr_plane_density());
 
   // Track points may be edited, so we clone the original points
   MAUS::DataStructure::Global::TrackPoint* tp = NULL;
@@ -166,6 +170,14 @@ void Track::set_emr_range_secondary(double range) {
 
 double Track::get_emr_range_secondary() const {
   return _emr_range_secondary;
+}
+
+void Track::set_emr_plane_density(double density) {
+  _emr_plane_density = density;
+}
+
+double Track::get_emr_plane_density() const {
+  return _emr_plane_density;
 }
 
 // Trackpoint methods
@@ -396,7 +408,8 @@ std::vector<std::string> Track::get_geometry_paths() const {
 
 // Object to hold pid hypotheses and the log-likelihood that they are the
 // correct hypothesis
-void Track::set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_logL_values) {
+void Track::set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair>
+				pid_logL_values) {
   _pid_logL_values = pid_logL_values;
 }
 

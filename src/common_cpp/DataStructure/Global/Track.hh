@@ -104,6 +104,12 @@ class Track : public TObject {
   /// Get the range of the particles secondary track in the emr, #_emr_range_secondary
   double get_emr_range_secondary() const;
 
+  /// Set the plane density of the track in the emr, #_emr_plane_density
+  void set_emr_plane_density(double density);
+
+  /// Get the plane density of the particles secondary track in the emr, #_emr_plane_density
+  double get_emr_plane_density() const;
+
   /// Add a MAUS::DataStructure::Global::TrackPoint, filling #_geometry_paths
   /// and #_detectorpoints as required.
   void AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point);
@@ -277,6 +283,9 @@ class Track : public TObject {
 
   /// The range of a secondary track from the EMR
   double _emr_range_secondary;
+
+  /// The plane density for an event in the EMR
+  double _emr_plane_density;
 
   /// A currently undefined 'Goodness of Fit' variable. This will be
   /// used to help analysers in interpreting the results, and will

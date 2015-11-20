@@ -101,7 +101,6 @@ void TrackMatching::USTrack() {
   }
 }
 
-
 void TrackMatching::DSTrack() {
   // Get all Tracker 1 tracks
   MAUS::DataStructure::Global::TrackPArray *scifi_track_array =
@@ -419,7 +418,8 @@ void TrackMatching::MatchUSDS(
   double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
                                             MAUS::DataStructure::Global::kTOF2);
   double TOFdT = TOF2_time - TOF1_time;
-  if ((TOFdT > 24.0) and (TOFdT < 40.0)) { // TODO: Get this dynamically
+  if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
+      (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
     MAUS::DataStructure::Global::Track* through_track =
         new MAUS::DataStructure::Global::Track();
     through_track->set_mapper_name("MapCppGlobalTrackMatching-Through");

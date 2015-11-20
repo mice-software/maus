@@ -19,6 +19,7 @@
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/legacy/Config/MiceModule.hh"
 #include "Geant4/G4Navigator.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
 #include <Geant4/G4TransportationManager.hh>
@@ -135,109 +136,42 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
   return selected_tracks;
 }
 
-// TODO Need to get this geometry-independent
 std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
-    track_point) {
+    track_point, std::vector<double> z_positions) {
   std::vector<int> tracker_plane (3,0);
   double z = track_point->get_position().Z();
-  if (approx(z, 11755, 555)) {
-    tracker_plane[0] = 0;
-    if (approx(z, 11206, 5)) {
-      tracker_plane[1] = 5;
-      if (approx(z, 11205.7, 0.2)) {
-        tracker_plane[2] = 2;
-      } else if (approx(z, 11206.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 11207.0, 0.2)) {
-        tracker_plane[2] = 0;
-      }
-    } else if (approx(z, 11556, 5)) {
-      tracker_plane[1] = 4;
-      if (approx(z, 11555.6, 0.2)) {
-        tracker_plane[2] = 2;
-      } else if (approx(z, 11556.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 11556.9, 0.2)) {
-        tracker_plane[2] = 0;
-      }
-    } else if (approx(z, 11856, 5)) {
-      tracker_plane[1] = 3;
-      if (approx(z, 11855.6, 0.2)) {
-        tracker_plane[2] = 2;
-      } else if (approx(z, 11856.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 11856.9, 0.2)) {
-        tracker_plane[2] = 0;
-      }
-    } else if (approx(z, 12106, 5)) {
-      tracker_plane[1] = 2;
-      if (approx(z, 12105.5, 0.2)) {
-        tracker_plane[2] = 2;
-      } else if (approx(z, 12106.1, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 12106.8, 0.2)) {
-        tracker_plane[2] = 0;
-      }
-    } else if (approx(z, 12306, 5)) {
-      tracker_plane[1] = 1;
-      if (approx(z, 12305.5, 0.2)) {
-        tracker_plane[2] = 2;
-      } else if (approx(z, 12306.1, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 12306.8, 0.2)) {
-        tracker_plane[2] = 0;
-      }
-    }
-  } else if (approx(z, 16573, 555)) {
-    tracker_plane[0] = 1;
-    if (approx(z, 16022, 5)) {
-      tracker_plane[1] = 1;
-      if (approx(z, 16021.6, 0.2)) {
-        tracker_plane[2] = 0;
-      } else if (approx(z, 16022.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 16022.9, 0.2)) {
-        tracker_plane[2] = 2;
-      }
-    } else if (approx(z, 16222, 5)) {
-      tracker_plane[1] = 2;
-      if (approx(z, 16221.6, 0.2)) {
-        tracker_plane[2] = 0;
-      } else if (approx(z, 16222.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 16222.9, 0.2)) {
-        tracker_plane[2] = 2;
-      }
-    } else if (approx(z, 16472, 5)) {
-      tracker_plane[1] = 3;
-      if (approx(z, 16471.6, 0.2)) {
-        tracker_plane[2] = 0;
-      } else if (approx(z, 16472.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 16472.9, 0.2)) {
-        tracker_plane[2] = 2;
-      }
-    } else if (approx(z, 16772, 5)) {
-      tracker_plane[1] = 4;
-      if (approx(z, 16771.6, 0.2)) {
-        tracker_plane[2] = 0;
-      } else if (approx(z, 16772.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 16772.9, 0.2)) {
-        tracker_plane[2] = 2;
-      }
-    } else if (approx(z, 17122, 5)) {
-      tracker_plane[1] = 5;
-      if (approx(z, 17121.6, 0.2)) {
-        tracker_plane[2] = 0;
-      } else if (approx(z, 17122.3, 0.2)) {
-        tracker_plane[2] = 1;
-      } else if (approx(z, 17122.9, 0.2)) {
-        tracker_plane[2] = 2;
-      }
+  int plane = 100;
+  for (size_t i = 0; i < z_positions.size(); i++) {
+    if (approx(z, z_positions[i], 0.25)) {
+      plane = i;
+      break;
     }
   }
+  if (plane < 15) {
+    tracker_plane[0] = 0;
+    tracker_plane[1] = 5 - plane/3;
+    tracker_plane[2] = 2 - plane%3;
+  } else if (plane < 30) {
+    tracker_plane[0] = 1;
+    tracker_plane[1] = plane/3 - 4;
+    tracker_plane[2] = plane%3;
+  } else {
+    // error output
+    tracker_plane[0] = 99;
+  }
   return tracker_plane;
+}
+
+std::vector<double> GetTrackerPlaneZPositions(std::string geo_filename) {
+  MiceModule* geo_module = new MiceModule(geo_filename);
+  std::vector<const MiceModule*> tracker_planes =
+      geo_module->findModulesByPropertyString("SensitiveDetector", "SciFi");
+  std::vector<double> z_positions;
+  for (size_t i = 0; i < tracker_planes.size(); i++) {
+    z_positions.push_back(tracker_planes.at(i)->globalPosition().getZ());
+  }
+  std::sort(z_positions.begin(), z_positions.end());
+  return z_positions;
 }
 
 std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
@@ -397,10 +331,7 @@ void propagate(double* x, double target_z, const BTField* field,
       // Check if z distance to next material boundary is smaller than step size
       // if yes, we impose a tight limit on the step size to avoid issues
       // arising from the track not being straight
-      bool temp = false;
       if (std::abs(z_dist) < std::abs(h)) {
-        temp = true;
-        
         if (std::abs(z_dist) > 2.0) {
           h = 2.0*prop_dir;
         } else {
@@ -413,9 +344,7 @@ void propagate(double* x, double target_z, const BTField* field,
       double x_prev[] = {x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7]};
       status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
                                         target_z, &h, x);
-                                        if (temp) {
-      }
-    // Calculate energy loss for the step
+      // Calculate energy loss for the step
       geometry_navigator.SetPoint(MAUS::ThreeVector((x[1] + x_prev[1])/2,
                                   (x[2] + x_prev[2])/2, (x[3] + x_prev[3])/2));
       double step_distance = std::sqrt((x[1]-x_prev[1])*(x[1]-x_prev[1]) +
@@ -427,7 +356,7 @@ void propagate(double* x, double target_z, const BTField* field,
     } else {
       status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
                                         target_z, &h, x);
-    } 
+    }
     if (status != GSL_SUCCESS) {
       throw(MAUS::Exception(MAUS::Exception::recoverable, "Propagation failed",
                             "GlobalTools::propagate"));

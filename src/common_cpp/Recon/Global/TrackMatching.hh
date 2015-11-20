@@ -16,8 +16,8 @@
  */
 
 /** @class TrackMatching
- *  @author Celeste Pidcott, University of Warwick
- *  Takes a global event containing space points and creates global tracks.
+ *  @author Jan Greis, University of Warwick
+ *  Creates global tracks from a global event.
  */
 
 #ifndef _SRC_COMMON_CPP_RECON_TRACKMATCHING_HH_
@@ -34,6 +34,8 @@
 #include "DataStructure/ReconEvent.hh"
 #include "Recon/Global/ImportTOFRecon.hh"
 #include "Recon/Global/ImportSciFiRecon.hh"
+
+#include "gtest/gtest_prod.h"
 
 class BTFieldConstructor;
 
@@ -75,6 +77,7 @@ namespace global {
     void throughTrack();
 
   private:
+
     /// Disallow copy constructor as unnecessary
     TrackMatching(const TrackMatching&);
 
@@ -267,6 +270,17 @@ namespace global {
     
     /// The global event to be processed
     MAUS::GlobalEvent* _global_event;
+
+    /// Declarations required for tests to access private member functions
+    FRIEND_TEST(TrackMatchingTest, GetDetectorTrackArray);
+    FRIEND_TEST(TrackMatchingTest, GetDetectorTrackPoints);
+    FRIEND_TEST(TrackMatchingTest, PIDHypotheses);
+    FRIEND_TEST(TrackMatchingTest, MatchTrackPoint);
+    FRIEND_TEST(TrackMatchingTest, MatchEMRTrack);
+    FRIEND_TEST(TrackMatchingTest, AddTrackerTrackPoints);
+    FRIEND_TEST(TrackMatchingTest, USDSTracks);
+    FRIEND_TEST(TrackMatchingTest, MatchUSDS);
+    FRIEND_TEST(TrackMatchingTest, TOFTimeFromTrackPoints);
 
   }; // ~class TrackMatching
 } // ~namespace global

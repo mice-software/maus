@@ -33,6 +33,7 @@
 
 // MAUS headers
 #include "DataStructure/ReconEvent.hh"
+#include "Config/MiceModule.hh"
 
 namespace MAUS {
 namespace recon {
@@ -54,7 +55,8 @@ namespace global {
      */
     void process(const MAUS::EMREvent &emr_event,
 		 MAUS::GlobalEvent* global_event,
-		 std::string mapper_name);
+		 std::string mapper_name,
+		 std::string geo_filename);
 
   private:
     /// Disallow copy constructor as unnecessary
@@ -62,7 +64,6 @@ namespace global {
 
     /// Disallow operator= as unnecessary
     void operator=(const ImportEMRRecon);
-
   }; // ~class ImportEMRRecon
 } // ~namespace global
 } // ~namespace recon

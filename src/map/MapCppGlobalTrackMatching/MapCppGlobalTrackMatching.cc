@@ -64,6 +64,16 @@ namespace MAUS {
     _matching_tolerances["KL"] = std::make_pair(10000,
         track_matching_tolerances["KLy"].asDouble());
     _energy_loss = _configJSON["track_matching_energy_loss"].asBool();
+    std::string geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
+    MiceModule* geo_module = new MiceModule(geo_filename);
+    std::vector<const MiceModule*> tofs =
+        geo_module->findModulesByPropertyString("Detector", "TOF");
+    double tof12_cdt = ((tofs.at(2)->globalPosition().z() -
+        tofs.at(1)->globalPosition().z())/299.791);
+    _matching_tolerances["TOF12dT"] = std::make_pair(
+        tof12_cdt/track_matching_tolerances["TOF12maxSpeed"].asDouble(),
+        tof12_cdt/track_matching_tolerances["TOF12minSpeed"].asDouble());
+    std::cerr << tofs.at(0)->globalPosition().z() << " " << tofs.at(1)->globalPosition().z() << " " << tofs.at(2)->globalPosition().z() << "\n"; 
   }
 
   void MapCppGlobalTrackMatching::_death() {

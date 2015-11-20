@@ -88,13 +88,27 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
 /**
  * @brief Returns a vector of ints denoting the tracker plane of a TrackPoint.
  * The first number indicates the tracker (0-1), the second the tracker station
- * (1-5), the third the tracker plane (0-2). For the latter two, numbers increase
- * away from the absorber
+ * (1-5), the third the tracker plane (0-2). For the latter two, numbers
+ * increase away from the absorber
  * 
  * @param track_point The trackpoint for which to determine the tracker plane
+ * @param z_positions An ascending-sorted vector of the z positions of all
+ * tracker planes from the geometry.
+ *
+ * @see GetTrackerPlaneZPositions()
  */
 std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
-    track_point);
+    track_point, std::vector<double> z_positions);
+
+/**
+ * @brief Returns a vector with the z positions of all tracker planes sorted
+ * by ascending z position.
+ *
+ * @param geo_filename The filename of the used geometry file
+ *
+ * @see GetTrackerPlane()
+ */
+std::vector<double> GetTrackerPlaneZPositions(std::string geo_filename);
 
 /**
  * @brief Returns a vector of all SpacePoints in a spill (i.e. across recon
@@ -129,6 +143,10 @@ bool approx(double a, double b, double tolerance);
  * @brief Calculates energy loss according to the Bethe-Bloch equation. This is
  * also implemented in G4hBetheBlochModel but we don't want to have to
  * instantiate a G4DynamicParticle object every time.
+ *
+ * @param material the material the particle is passing through
+ * @param the total energy of the particle
+ * @param mass the mass of the particle
  */
 double dEdx(const G4Material* material, double energy, double mass);
 
@@ -136,6 +154,13 @@ double dEdx(const G4Material* material, double energy, double mass);
  * @brief Reimplementation of BTTracker::Integrate with only z propagation and
  * the option of energy loss. Reimplemented to avoid changing the interface that
  * might still be used by other functions and to pull it out of legacy
+ *
+ * @param x array of size 8 containing t, x, y, z, E, px, py, pz
+ * @param target_z z coordinate to propagate to
+ * @param field the magnetic field through which the particle is propagated
+ * @param step_size the maximum step size in mm for the propagation
+ * @param pid the PID of the particle being propagated
+ * @param energy_loss whether energy loss should be calculated
  */
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, MAUS::DataStructure::Global::PID pid,
@@ -149,6 +174,10 @@ int z_equations_of_motion (double z, const double x[8], double dxdt[8],
 
 /**
  * @brief Scales the 4-momentum of the 8-vector to decrease the energy by deltaE
+ *
+ * @param x array of size 8 containing t, x, y, z, E, px, py, pz
+ * @param deltaE change in energy applied to the particle
+ * @param mass mass of the particle
  */
 void changeEnergy(double* x, double deltaE, double mass);
 
