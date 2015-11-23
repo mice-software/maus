@@ -23,7 +23,8 @@ EMRBarHit::EMRBarHit()
     _x(0.0), _y(0.0), _z(0.0),
     _x_global(0.0), _y_global(0.0), _z_global(0.0),
     _ex(0.0), _ey(0.0), _ez(0.0),
-    _charge_corrected(0.0), _total_charge_corrected(0.0) {
+    _charge_corrected(0.0), _total_charge_corrected(0.0),
+    _path_length(0.0) {
 }
 
 EMRBarHit::EMRBarHit(const EMRBarHit& _emrbarhit)
@@ -31,7 +32,8 @@ EMRBarHit::EMRBarHit(const EMRBarHit& _emrbarhit)
     _x(0.0), _y(0.0), _z(0.0),
     _x_global(0.0), _y_global(0.0), _z_global(0.0),
     _ex(0.0), _ey(0.0), _ez(0.0),
-    _charge_corrected(0.0), _total_charge_corrected(0.0) {
+    _charge_corrected(0.0), _total_charge_corrected(0.0),
+    _path_length(0.0) {
   *this = _emrbarhit;
 }
 
@@ -54,6 +56,7 @@ EMRBarHit& EMRBarHit::operator=(const EMRBarHit& _emrbarhit) {
     SetErrorZ(_emrbarhit._ez);
     SetChargeCorrected(_emrbarhit._charge_corrected);
     SetTotalChargeCorrected(_emrbarhit._total_charge_corrected);
+    SetPathLength(_emrbarhit._path_length);
     return *this;
 }
 
@@ -171,5 +174,12 @@ double EMRBarHit::GetTotalChargeCorrected() const {
 void EMRBarHit::SetTotalChargeCorrected(double total_charge_corrected) {
     _total_charge_corrected = total_charge_corrected;
 }
+
+double EMRBarHit::GetPathLength() const {
+    return _path_length;
 }
 
+void EMRBarHit::SetPathLength(double path_length) {
+    _path_length = path_length;
+}
+}

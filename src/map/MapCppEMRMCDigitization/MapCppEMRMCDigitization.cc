@@ -82,7 +82,6 @@ void MapCppEMRMCDigitization::_birth(const std::string& argJsonConfigDocument) {
   _pulse_shape_landau_width = configJSON["EMRpulseShapeLandauWidth"].asDouble();
   _fom = configJSON["EMRfom"].asString();
   _birks_constant = configJSON["EMRbirksConstant"].asDouble();
-  _average_path_length = configJSON["EMRaveragePathLength"].asDouble();
   _signal_energy_threshold = configJSON["EMRsignalEnergyThreshold"].asDouble();
   _baseline_spread = configJSON["EMRbaselineSpread"].asInt();
   _maximum_noise_level = configJSON["EMRmaximumNoiseLevel"].asInt();
@@ -90,7 +89,7 @@ void MapCppEMRMCDigitization::_birth(const std::string& argJsonConfigDocument) {
   _baseline_position = configJSON["EMRbaselinePosition"].asDouble();
   _arrival_time_spread = configJSON["EMRarrivalTimeSpread"].asDouble();
 
-  // Generate random noise in each SAPMT
+  // Generate random pedestals and noise in the SAPMTs
   _rand = new TRandom3(_seed);
 
   for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
@@ -122,11 +121,12 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
 
   // Get spill, break if there's no DAQ data
   Spill *spill = data->GetSpill();
-  if (spill->GetMCEvents() == NULL)
-      return;
-
   MCEventPArray *mcEvts = spill->GetMCEvents();
+  if ( mcEvts == NULL )
+      return;
   int nPartEvents = spill->GetMCEventSize();
+  if ( !nPartEvents )
+      return;
 
   // Check the Recon event array and EMR Spill Data are initialised, and if not make it so
   if ( !spill->GetReconEvents() ) {
@@ -138,143 +138,111 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
     spill->SetEMRSpillData(emrData);
   }
 
-  // Set primary hits/noise time windows
+  // Set primary time window
   std::vector<double> delta_t_array;
   delta_t_array.resize(0);
 
   for (int iPe = 0; iPe < nPartEvents; iPe++) {
-    EMRHitArray *hits = spill->GetAnMCEvent(iPe).GetEMRHits();
 
-    if (hits) {
-      int nHits = hits->size();
+    EMRHitArray *hits = spill->GetAnMCEvent(iPe).GetEMRHits();
+    if ( hits ) {
 
       Primary *primary = spill->GetAnMCEvent(iPe).GetPrimary();
       double pTime = primary->GetTime(); // ns
 
-      for (int iHit = 0; iHit < nHits; iHit++) {
+      for (size_t iHit = 0; iHit < hits->size(); iHit++) {
+
 	EMRHit hit = hits->at(iHit);
+	double delta_t = hit.GetTime() - pTime;
 
-	double time = hit.GetTime(); // ns
-	double delta_t = time - pTime;
-
-        if (delta_t > 0) delta_t_array.push_back(delta_t);
+        if (delta_t > 0)
+	    delta_t_array.push_back(delta_t);
       }
     }
   }
 
-  // Break if there's no EMR data
-  if (!delta_t_array.size())
+  // Procede if there's no EMR data
+  if ( !delta_t_array.size() )
       return;
 
-  int lt = static_cast<int>(*std::min_element(delta_t_array.begin(), delta_t_array.end())
-			    /_dbb_count);
-  int deltat_limits[4] = {lt, lt+20, lt+20, lt+40};
+  // Set the window from the leading time to 20 ADC counts later
+  int lt = static_cast<int>
+	     (*std::min_element(delta_t_array.begin(), delta_t_array.end())/_dbb_count);
+  int deltat_min = lt; // ADC counts
+  int deltat_max = lt + 20; // ADC counts, +50 ns
 
   // Reset DBB and fADC arrays with n events (1 per trigger)
   EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents);
   EMRfADCEventVector emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents);
 
   // Fill the fADC and DBB event arrays with G4 Spill information
-  processDBB(mcEvts, nPartEvents, emr_dbb_events_tmp);
-  processFADC(mcEvts, nPartEvents, emr_fadc_events_tmp);
+  processMC(mcEvts, emr_dbb_events_tmp, emr_fadc_events_tmp, deltat_min, deltat_max);
 
   // Reset DBB and fADC arrays with n+1 events (1 per trigger + spill data)
   EMRDBBEventVector emr_dbb_events = get_dbb_data_tmp(nPartEvents + 1);
   EMRfADCEventVector emr_fadc_events = get_fadc_data_tmp(nPartEvents + 1);
 
   // Digitize the G4 spill information
-  digitize(nPartEvents, deltat_limits, emr_dbb_events_tmp,
-	   emr_fadc_events_tmp, emr_dbb_events, emr_fadc_events);
+  digitize(emr_dbb_events_tmp, emr_fadc_events_tmp,
+	   emr_dbb_events, emr_fadc_events,
+	   deltat_min, deltat_max);
 
   // Fill the Recon event array with Spill information (1 per trigger + decays)
-  fill(spill, nPartEvents, emr_dbb_events, emr_fadc_events);
+  fill(spill, emr_dbb_events, emr_fadc_events);
 }
 
-void MapCppEMRMCDigitization::processDBB(MAUS::MCEventPArray *mcEvts,
-					 int nPartEvents,
-					 EMRDBBEventVector& emr_dbb_events_tmp) const {
+void MapCppEMRMCDigitization::processMC(MAUS::MCEventPArray *mcEvts,
+					EMRDBBEventVector& emr_dbb_events_tmp,
+		 			EMRfADCEventVector& emr_fadc_events_tmp,
+		 			int deltat_min,
+		 			int deltat_max) const {
 
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
-    EMRHitArray *EMRhits = mcEvts->at(iPe)->GetEMRHits();
-    int nHits = EMRhits->size();
-    if ( !nHits )
-	continue;
+  for (size_t iPe = 0; iPe < mcEvts->size(); iPe++) {
 
     Primary *primary = mcEvts->at(iPe)->GetPrimary();
     double pTime = primary->GetTime(); // ns
 
-    for (int iHit = 0; iHit < nHits; iHit++) {
+    EMRHitArray *EMRhits = mcEvts->at(iPe)->GetEMRHits();
+    for (size_t iHit = 0; iHit < EMRhits->size(); iHit++) {
 
       EMRHit hit = EMRhits->at(iHit);
 
       // Channel ID
       EMRChannelId *id = hit.GetChannelId();
-
       int g4barid = id->GetBar();
-      int planeid = g4barid / 59;
-      int barid = g4barid % 59 + 1;
-
-      // Energy Deposition
-      double edep = hit.GetEnergyDeposited(); // MeV
+      int xPlane = g4barid / 59;
+      int xBar = g4barid % 59 + 1;
 
       // Position
-      ThreeVector pos = hit.GetPosition();
-      double pozx = pos.x(); // mm
-      double pozy = pos.y(); // mm
-      double pozz = pos.z(); // mm
+      ThreeVector xPos = hit.GetPosition(); // (mm, mm, mm)
+      double xPathLength = hit.GetPathLength(); // mm
 
       // Time
       double time = hit.GetTime(); // ns
+      int xHitTime  = static_cast<int>(time); // ns, leading time
+      int xDeltaT = xHitTime - pTime; // ns
 
-      int lt  = static_cast<int>(time); // ns
-      int tot = static_cast<int>(edep*1000000); // eV
-
-      int xPlane = planeid;
-      int xBar = barid;
-      int delta_t = lt-pTime;
-
-      // Fill EMRDBBEvent
-      EMRBarHit bHit;
-      bHit.SetX(pozx);
-      bHit.SetY(pozy);
-      bHit.SetZ(pozz);
-      bHit.SetTot(tot);
-      bHit.SetHitTime(lt);
-      bHit.SetDeltaT(delta_t);
-      emr_dbb_events_tmp[iPe][xPlane][xBar].push_back(bHit);
-    }
-  }
-}
-
-void MapCppEMRMCDigitization::processFADC(MAUS::MCEventPArray *mcEvts,
-					  int nPartEvents,
-					  EMRfADCEventVector& emr_fadc_events_tmp) const {
-
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
-    EMRHitArray *EMRhits = mcEvts->at(iPe)->GetEMRHits();
-    int nHits = EMRhits->size();
-    if ( !nHits )
-	continue;
-
-    for (int iHit = 0; iHit < nHits; iHit++) {
-      EMRHit hit = EMRhits->at(iHit);
-
-      // Plane ID
-      EMRChannelId *id = hit.GetChannelId();
-      int g4barid = id->GetBar();
-      int planeid = g4barid / 59;
-
-      int xPlane = planeid;
-
-      // Energy Deposition
+      // Energy deposition
       double edep = hit.GetEnergyDeposited(); // MeV
-      double xCharge = edep*1000000; // eV
+      int xTot = static_cast<int>(edep*pow(10, 6)); // eV, non digitized time-over-threshold
+      double xCharge = emr_fadc_events_tmp[iPe][xPlane]._charge;
+      if ( xDeltaT >= deltat_min && xDeltaT < deltat_max )
+          xCharge += edep*pow(10, 6); // eV, non digitized fADC charge
 
-      xCharge += emr_fadc_events_tmp[iPe][xPlane]._charge;
+      // Fill DBB data
+      EMRBarHit bHit;
+      bHit.SetX(xPos.x());
+      bHit.SetY(xPos.y());
+      bHit.SetZ(xPos.z());
+      bHit.SetPathLength(xPathLength);
+      bHit.SetTot(xTot);
+      bHit.SetHitTime(xHitTime);
+      bHit.SetDeltaT(xDeltaT);
+      emr_dbb_events_tmp[iPe][xPlane][xBar].push_back(bHit);
 
-      // Store the plane data
+      // Fill fADC data
       fADCdata data;
-      data._orientation = planeid % 2;
+      data._orientation = xPlane % 2;
       data._charge = xCharge;
       data._time = 0;
       emr_fadc_events_tmp[iPe][xPlane] = data;
@@ -282,19 +250,20 @@ void MapCppEMRMCDigitization::processFADC(MAUS::MCEventPArray *mcEvts,
   }
 }
 
-void MapCppEMRMCDigitization::digitize(int nPartEvents,
-				       int *deltat_limits,
-				       EMRDBBEventVector emr_dbb_events_tmp,
+void MapCppEMRMCDigitization::digitize(EMRDBBEventVector emr_dbb_events_tmp,
 				       EMRfADCEventVector emr_fadc_events_tmp,
 				       EMRDBBEventVector& emr_dbb_events,
-				       EMRfADCEventVector& emr_fadc_events) const {
+				       EMRfADCEventVector& emr_fadc_events,
+				       int deltat_min,
+				       int deltat_max) const {
 
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+  unsigned int nPartEvents = emr_fadc_events_tmp.size();
+  for (size_t iPe = 0; iPe < nPartEvents; iPe++) {
     for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
       // Skip empty planes
-      int nBars = 0;
+      int nBars(0);
       for (int iBar = 0; iBar < _number_of_bars; iBar++)
-	if (emr_dbb_events_tmp[iPe][iPlane][iBar].size())
+	if ( emr_dbb_events_tmp[iPe][iPlane][iBar].size() )
 	  nBars++;
        if ( !nBars )
 	  continue;
@@ -304,12 +273,12 @@ void MapCppEMRMCDigitization::digitize(int nPartEvents,
       double epsilon_MA = _calibMap.Eps(xAverageKey, "MA");
       double epsilon_SA = _calibMap.Eps(xAverageKey, "SA");
 
-      int naph_SAPMT = 0;
-
+      int naph_SAPMT(0); // Number of attenuated PE reaching the SAPMT
       for (int iBar = 0; iBar < _number_of_bars; iBar++) {
-        int nBarHits = emr_dbb_events_tmp[iPe][iPlane][iBar].size();
 
-        for (int iBarHit = 0; iBarHit < nBarHits; iBarHit++) {
+        size_t nBarHits = emr_dbb_events_tmp[iPe][iPlane][iBar].size();
+        for (size_t iBarHit = 0; iBarHit < nBarHits; iBarHit++) {
+
 	  EMRBarHit barHit = emr_dbb_events_tmp[iPe][iPlane][iBar].at(iBarHit);
 	  EMRChannelKey xKey(iPlane, iPlane%2, iBar, "emr");
           double x  = barHit.GetX(); // mm
@@ -317,115 +286,94 @@ void MapCppEMRMCDigitization::digitize(int nPartEvents,
 	  int xTot  = barHit.GetTot(); // eV
 	  int xDeltaT = barHit.GetDeltaT(); // ns
 	  int xHitTime = barHit.GetHitTime(); // ns
+          double xPathLength = barHit.GetPathLength(); // mm
 
 	  //--------- MAPMT signal simulation -------//
-
-	  // simulate electronics noise and PMT dark current
+	  // Simulate electronic noise and MAPMT dark current
 	  // !!! TODO !!!
 
-	  // set g4 information
-	  double energy = xTot/1000000.0; // MeV
+	  // Geant4 information: edep, time and path length
+	  double energy = static_cast<double>(xTot)/pow(10, 6); // MeV
 	  int time = xDeltaT; // ns
+	  if ( energy < _signal_energy_threshold )
+	      continue;
 
-	  if (energy < _signal_energy_threshold) continue;
+	  // Convert energy to the number of scintillation photons (nsph) according to Birks's law
+	  int nsph = static_cast<int>
+		       ((_nph_per_MeV*energy)/(1.0+_birks_constant*energy/xPathLength));
+	  if ( _do_sampling )
+	      nsph = _rand->Poisson(nsph);
 
-	  // convert energy to the number of scintillation photons (nsph) according to Birks's law
-	  // !!! TODO !!! calculate path length
-	  int nsph = static_cast<int>(static_cast<double>(_nph_per_MeV*energy)  // MeV
-		     / (1.0+_birks_constant  // mm/MeV
-		     / _average_path_length*energy));  // MeV
+	  // Convert nsph to the number of trapped photons (ntph)
+	  int ntph = static_cast<int>(nsph*_trap_eff);
+	  if ( _do_sampling )
+	      ntph = _rand->Poisson(ntph);
 
-	  // sample nsph with Poisson
-	  if (_do_sampling)
-	    nsph = _rand->Poisson(nsph);
+	  // Attenuate ntph according to fibre length (naph) and loss in the connectors
+	  // MAPMT (half the PEs)
+	  int naph_MAPMT = static_cast<int>
+			     (static_cast<double>(ntph)/2
+			      *_attenMap.fibreAtten(xKey, x, y, "MA")
+			      *_attenMap.connectorAtten(xKey, "MA"));
+	  if ( _do_sampling )
+	      naph_MAPMT = _rand->Poisson(naph_MAPMT);
 
-	  // covert nsph to the number of trapped photons (ntph)
-	  int ntph = static_cast<int>(static_cast<double>(nsph*_trap_eff));
-
-	  // sample ntph with Poisson
-	  if (_do_sampling)
-	    ntph = _rand->Poisson(ntph);
-
-	  // reduce ntph according to fibre length (naph)
-	  // for MAPMT
-	  int naph_MAPMT = static_cast<int>(static_cast<double>(ntph)
-		           / 2.0*_attenMap.fibreAtten(xKey, x, y, "MA"));
-
-	  // for SAPMT
-	  int naph_SAPMT_hit = static_cast<int>(static_cast<double>(ntph)
-			       / 2.0*_attenMap.fibreAtten(xKey, x, y, "SA"));
-
-	  // apply channel attenuation map
-	  // for MAPMT
-	  naph_MAPMT = static_cast<int>(static_cast<double>(naph_MAPMT)
-		       * _attenMap.connectorAtten(xKey, "MA"));
-
-	  // for SAPMT
-	  naph_SAPMT_hit = static_cast<int>(static_cast<double>(naph_SAPMT_hit)
-		           * _attenMap.connectorAtten(xKey, "SA"));
-
-	  if (time > deltat_limits[0] && time < deltat_limits[1])
+	  // SAPMT (other half of the PEs)
+	  int naph_SAPMT_hit = static_cast<int>
+			     (static_cast<double>(ntph)/2
+			      *_attenMap.fibreAtten(xKey, x, y, "SA")
+			      *_attenMap.connectorAtten(xKey, "SA"));
+	  if ( time >= deltat_min && time < deltat_max )
 	    naph_SAPMT += naph_SAPMT_hit;
 
-	  // sample naph with Poisson
-	  if (_do_sampling) naph_MAPMT = _rand->Poisson(naph_MAPMT);
-
-	  // simulate cross-talk and misalignment
+	  // Simulate crosstalk and misalignment
 	  // !!! TODO !!!
 
-	  // convert naph to the number of photoelectrons (npe)
-	  int npe = static_cast<int>(static_cast<double>(naph_MAPMT)*_QE_MAPMT);
+	  // Convert naph to the number of photoelectrons (npe)
+	  int npe = static_cast<int>(naph_MAPMT*_QE_MAPMT);
+	  if ( _do_sampling )
+	      npe = _rand->Poisson(npe);
 
-	  // sample npe with Poisson
-	  if (_do_sampling) npe = _rand->Poisson(npe);
-
-	  // correct npe for the photocathode non-uniformity
+	  // Correct npe for the photocathode non-uniformity
 	  // !!! TODO !!!
 
-	  // correct npe for pmt gain difference
-	  npe = static_cast<int>(static_cast<double>(npe)*epsilon_MA);
-	  if (npe == 0)
+	  // Correct npe for the gain difference between MAPMTs
+	  npe = static_cast<int>(npe*epsilon_MA);
+	  if ( !npe )
 	      continue;
 
-	  // convert npe to the number of ADC counts
-	  int nADC = static_cast<int>(static_cast<double>(npe)*_nADC_per_pe_MAPMT);
-	  if (nADC == 0)
-	      continue;
+	  // Convert npe to the number of ADC counts
+	  int nADC = static_cast<int>(npe*_nADC_per_pe_MAPMT);
+	  if ( _do_sampling )
+	      nADC = static_cast<int>(_rand->Gaus(nADC, _electronics_response_spread_MAPMT));
 
-	  // simulate electronics response
-	  if (_do_sampling)
-	    nADC = static_cast<int>(_rand->Gaus(nADC, _electronics_response_spread_MAPMT));
-
-	  // convert nADC to Tot
-	  int xTotDigi = static_cast<int>(_tot_func_p1
-		         * log(_tot_func_p2*static_cast<double>(nADC)
-			       + _tot_func_p3));
+	  // Convert nADC to a time-over-threshold
+	  int xTotDigi = static_cast<int>
+			   (_tot_func_p1*log(_tot_func_p2*nADC+_tot_func_p3));
 	  if (xTotDigi <= 0)
 	      continue;
 
-	  // convert g4 time to deltaT time in ADC counts
+	  // Convert Geant4 hit time to deltaT in ADC counts
 	  int xDeltaTDigi = static_cast<int>(static_cast<double>(time)/_dbb_count);
-
-	  // sample deltaT
-	  if (_do_sampling)
-	    xDeltaTDigi = static_cast<int>(_rand->Gaus(xDeltaTDigi, _time_response_spread));
+	  if ( _do_sampling )
+	      xDeltaTDigi = static_cast<int>(_rand->Gaus(xDeltaTDigi, _time_response_spread));
           if (xDeltaTDigi < 0) xDeltaTDigi = 0;
 
-	  // correct deltaT with fibre length
+	  // Correct deltaT with fibre length
 	  xDeltaTDigi += static_cast<int>
-			 (static_cast<double>(_attenMap.fibreDelay(xKey, x, y, "MA"))/_dbb_count);
+			   (_attenMap.fibreDelay(xKey, x, y, "MA")/_dbb_count);
 
-	  // set hit time
+	  // Set hit time
 	  int xHitTimeDigi = static_cast<int>(static_cast<double>(xHitTime)/_dbb_count);
 
-	  // set bar hit
+	  // Set bar hit
 	  EMRBarHit bHit;
 	  bHit.SetTot(xTotDigi);
 	  bHit.SetDeltaT(xDeltaTDigi);
 	  bHit.SetHitTime(xHitTimeDigi);
 
 	  // Discriminate primary hits (close to the trigger) from the rest
-	  if (xDeltaTDigi >= deltat_limits[0] && xDeltaTDigi < deltat_limits[1]) {
+	  if (xDeltaTDigi >= deltat_min && xDeltaTDigi < deltat_max) {
 	    emr_dbb_events[iPe][iPlane][iBar].push_back(bHit);
 	  } else {
             bHit.SetDeltaT(0);
@@ -437,47 +385,43 @@ void MapCppEMRMCDigitization::digitize(int nPartEvents,
       //------------ SAPMT signal simulation -------//
       int xOri = iPlane % 2;
 
-      // simulate PMT dark current
+      // Simulate SAPMT dark current
       // !!! TODO !!!
 
-      // sample naph with Poisson
-      if (_do_sampling)
-	naph_SAPMT = _rand->Poisson(naph_SAPMT);
+      // Sample naph with Poisson
+      if ( _do_sampling )
+	  naph_SAPMT = _rand->Poisson(naph_SAPMT);
 
-      // convert naph to the number of photoelectrons (npe)
-      int npe = static_cast<int>(static_cast<double>(naph_SAPMT)*_QE_SAPMT);
+      // Convert naph to the number of photoelectrons (npe)
+      int npe = static_cast<int>(naph_SAPMT*_QE_SAPMT);
+      if ( _do_sampling )
+	  npe = _rand->Poisson(npe);
 
-      // sample npe with Poisson
-      if (_do_sampling)
-	npe = _rand->Poisson(npe);
+      // Correct npe for the gain difference between SAPMTs
+      npe = static_cast<int>(npe*epsilon_SA);
 
-      // correct npe for pmt gain difference
-      npe = static_cast<int>(static_cast<double>(npe)*epsilon_SA);
-
-      // convert npe to the number of ADC counts
-      int nADC = static_cast<int>(static_cast<double>(npe)*_nADC_per_pe_SAPMT);
-
-      // simulate electronics response
-      if (_do_sampling)
-	nADC = static_cast<int>(_rand->Gaus(nADC, _electronics_response_spread_SAPMT));
+      // Convert npe to the number of ADC counts
+      int nADC = static_cast<int>(npe*_nADC_per_pe_SAPMT);
+      if ( _do_sampling )
+	  nADC = static_cast<int>(_rand->Gaus(nADC, _electronics_response_spread_SAPMT));
       if (nADC < 0) nADC = 0;
 
-      // set signal baseline (8bit ADC)
+      // Set signal baseline (8bit ADC)
       int baseline = _baseline[iPlane];
 
-      // set electronics noise level - number of fluctuations within acquisition window
+      // Set electronics noise level - number of fluctuations within acquisition window
       int noise_level = _noise_level[iPlane];
 
-      // set electronics noise position (upwards/downwards fluctuations)
+      // Set electronics noise position (upwards/downwards fluctuations)
       int noise_position = _noise_position[iPlane];
 
-      // simulate negative voltage pulse with random electronics noise
+      // Generate negative voltage pulse with random electronics noise
       TH1F *pulse_shape = new TH1F("pulse_shape", "pulse_shape",
 				   _acquisition_window, 0, _acquisition_window);
 
       double arrival_time = _signal_integration_window*2 + _arrival_time_shift;
-      if (static_cast<int>(_rand->Uniform(0, 1.9999999)))
-	arrival_time += _arrival_time_spread;
+      if ( static_cast<int>(_rand->Uniform(0, 1.9999999)) )
+	  arrival_time += _arrival_time_spread;
 
       arrival_time += _rand->Gaus(0, _arrival_time_gaus_width)
 		      +_rand->Uniform(-_arrival_time_uniform_width, _arrival_time_uniform_width);
@@ -485,10 +429,10 @@ void MapCppEMRMCDigitization::digitize(int nPartEvents,
       for (int i = 0; i < noise_level; i++) {
         double noise = _rand->Uniform(0, _acquisition_window);
         int bin = static_cast<Int_t>(noise+1);
-        if (pulse_shape->GetBinContent(bin) != 1) pulse_shape->Fill(noise);
+        if ( pulse_shape->GetBinContent(bin) != 1 ) pulse_shape->Fill(noise);
       }
 
-      if (noise_position)
+      if ( noise_position )
 	for (Int_t i = 1; i <= _acquisition_window; i++)
           pulse_shape->SetBinContent(i, -pulse_shape->GetBinContent(i));
 
@@ -499,35 +443,32 @@ void MapCppEMRMCDigitization::digitize(int nPartEvents,
         pulse_shape->SetBinContent(i, baseline-pulse_shape->GetBinContent(i));
 
       double pedestal_baseline = pulse_shape->Integral(1, _signal_integration_window)
-			         / static_cast<double>(_signal_integration_window);
-      double pedestal_area = pedestal_baseline*static_cast<double>(_signal_integration_window)
-			     - pulse_shape->Integral(_signal_integration_window+1,
-			       _signal_integration_window*2);
-      double signal_area = pedestal_baseline*static_cast<double>(_signal_integration_window)
-		           - pulse_shape->Integral(arrival_time-10+1,
-			     arrival_time+_signal_integration_window-10);
+			         /_signal_integration_window;
 
-      // set pulse area
-      double xAreaDigi = signal_area;
+      // Set pedestal area
+      double xPedestalAreaDigi = pedestal_baseline*_signal_integration_window
+			          - pulse_shape->Integral(_signal_integration_window+1,
+			       			          _signal_integration_window*2);
 
-      // correct non physical values
+      // Set pulse area
+      double xAreaDigi = pedestal_baseline*_signal_integration_window
+		         - pulse_shape->Integral(arrival_time-10+1,
+			     			 arrival_time+_signal_integration_window-10);
       if (nADC == 0) xAreaDigi = 0;
       if (xAreaDigi < 0) xAreaDigi = 0;
 
-      // set pedestal area
-      double xPedestalAreaDigi = pedestal_area;
-
-      // set hit arrival time
+      // Set hit arrival time
       int xArrivalTimeDigi = arrival_time;
 
-      // simulate time delay in cables
+      // Simulate time delay in cables
       // !!! TODO !!!
 
-      // set pulse shape
+      // Sample pulse shape every 2ns (500 MHz clock)
       std::vector<int> xSamplesDigi;
-      for (Int_t i = 1; i <= _acquisition_window; i++) {
-        xSamplesDigi.push_back(pulse_shape->GetBinContent(i));}
+      for (int iBin = 0; iBin < _acquisition_window; iBin++)
+        xSamplesDigi.push_back(pulse_shape->GetBinContent(iBin+1));
 
+      // Fill the fADC information
       fADCdata data;
       data._orientation = xOri;
       data._charge = xAreaDigi; // ADC
@@ -542,7 +483,6 @@ void MapCppEMRMCDigitization::digitize(int nPartEvents,
 }
 
 void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
-				   int nPartEvents,
 				   EMRDBBEventVector emr_dbb_events,
 				   EMRfADCEventVector emr_fadc_events) const {
 
@@ -550,7 +490,8 @@ void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
   ReconEventPArray *recEvts =  spill->GetReconEvents();
   EMRSpillData *emrData = spill->GetEMRSpillData();
 
-  for (int iPe = 0; iPe < nPartEvents + 1; iPe++) {
+  unsigned int nPartEvents = emr_fadc_events.size()-1;
+  for (size_t iPe = 0; iPe < nPartEvents + 1; iPe++) {
     EMREvent *evt = new EMREvent;
     EMRPlaneHitArray plArray;
 
@@ -584,14 +525,15 @@ void MapCppEMRMCDigitization::fill(MAUS::Spill *spill,
       plHit->SetEMRBarArray(barArray);
       if (barArray.size() || xCharge) {
         plArray.push_back(plHit);
+      } else {
+        delete plHit;
       }
     }
 
     if (iPe < nPartEvents) {
-      evt->SetInitialTrigger(true);
       evt->SetEMRPlaneHitArray(plArray);
 
-      int nRecEvents = spill->GetReconEventSize();
+      unsigned int nRecEvents = spill->GetReconEventSize();
       if (nRecEvents > iPe) {
         recEvts->at(iPe)->SetEMREvent(evt);
       } else {

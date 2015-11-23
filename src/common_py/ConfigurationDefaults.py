@@ -510,7 +510,6 @@ EMRattenWLSf = 2.0 # dB/m, attentuation factor of the WLS fibres
 EMRattenCLRf = 0.35 # dB/m, attentuation factor of the clear fibres
 EMRspillWidth = 4000000 # DBB counts
 EMRbirksConstant = 0.126 # mm/MeV
-EMRaveragePathLength = 17 # mm
 EMRsignalEnergyThreshold = 0.8 # Me
 EMRfom = "median" # figure_Of-Merit for signal calibration
 

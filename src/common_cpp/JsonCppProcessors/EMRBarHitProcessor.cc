@@ -61,6 +61,9 @@ EMRBarHitProcessor::EMRBarHitProcessor() {
     RegisterValueBranch
           ("total_charge_corrected", &_double_proc, &EMRBarHit::GetTotalChargeCorrected,
           &EMRBarHit::SetTotalChargeCorrected, true);
+    RegisterValueBranch
+          ("path_length", &_double_proc, &EMRBarHit::GetPathLength,
+          &EMRBarHit::SetPathLength, true);
 }
 }  // namespace MAUS
 
