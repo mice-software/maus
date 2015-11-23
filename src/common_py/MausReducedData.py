@@ -162,20 +162,15 @@ class Tracker:
                 # if ( trker_num == 0 ):
                 #    dsdz = -dsdz  # Needed due to the way we plot
                 rad = trk.get_R()
-                self.helix_xy_fits.append(self._make_circle(x0, y0, rad))
+                self.helix_xy_fits.append(self.make_circle(x0, y0, rad))
                 # Pull out the turning angles of each seed spacepoint
                 phi_per_trk = array.array('d')
                 s_per_trk = array.array('d')
                 num_phi = 0
                 for i, phi in enumerate(trk.get_phi()):
-                    if num_phi == 0:
-                        phi_per_trk[0] = phi
-                        s_per_trk[0] = phi * rad
-                        num_phi = num_phi + 1
-                    else:
-                        phi_per_trk.append(phi)
-                        s_per_trk.append(phi*rad)
-                        num_phi = num_phi + 1
+                    phi_per_trk.append(phi)
+                    s_per_trk.append(phi*rad)
+                    num_phi = num_phi + 1
                     pos = trk.get_spacepoints()[i].get_position()
                     gpos = trk.get_spacepoints()[i].get_global_position()
                     print '%.2f' % pos.x() + '\t',
@@ -212,11 +207,11 @@ class Tracker:
                 self.seeds_global_z.append(gz_per_trk)
 
                 sz_c = trk.get_line_sz_c()
-                self.helix_xz_fits.append(self._make_helix_xz(x0, rad, dsdz, \
+                self.helix_xz_fits.append(self.make_helix_xz(x0, rad, dsdz, \
                                           sz_c, 0, 1200))
-                self.helix_yz_fits.append(self._make_helix_yz(y0, rad, dsdz, \
+                self.helix_yz_fits.append(self.make_helix_yz(y0, rad, dsdz, \
                                           sz_c, 0, 1200))
-                self.helix_sz_fits.append(self._make_line(dsdz, sz_c, 0, 1200))
+                self.helix_sz_fits.append(self.make_line(dsdz, sz_c, 0, 1200))
                 self.num_htracks = self.num_htracks + 1
 
     @staticmethod
