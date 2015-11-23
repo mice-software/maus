@@ -168,7 +168,6 @@ void ModuleTextFileIO::newModule(std::string lineIn, std::istream & in)
 		{
 			fin.close(); 
 			_hasFile = " Note: I could not find a file associated with this module."; 
-			Squeak::mout(Squeak::debug) << "Warning - failed to open module "+file+" - I assume it is not required" << std::endl;
 		}
 	}
 	stripFile(modStream1, fin);
@@ -516,4 +515,3 @@ void ModuleTextFileIO::MI_alias(std::string& value) {
     substitute(value, "$$", "MI_"); //evaluator can't do $$ so I alias it to MI_ (for internal variables)
     substitute(value, "@", "MI_"); //evaluator can't do $$ so I alias it to MI_ (for internal variables)
 }
-
