@@ -164,8 +164,8 @@ class ReducePyTOFPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         """
         # Read in configuration flags and parameters - these will
         # overwrite whatever defaults were set in __init__.
-        if 'reduce_plot_refresh_rate' in config_doc:
-            self.refresh_rate = int(config_doc["reduce_plot_refresh_rate"])
+        if 'refresh_rate' in config_doc:
+            self.refresh_rate = int(config_doc["refresh_rate"])
         # Initialize histograms, setup root canvases, and set root
         # styles.
         self.__init_histos()

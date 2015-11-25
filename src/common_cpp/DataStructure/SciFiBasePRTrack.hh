@@ -103,6 +103,12 @@ class SciFiBasePRTrack : public TObject {
     /** Set the Number of Degrees of Freedom */
     void set_ndf(int ndf) { _ndf = ndf; }
 
+    /** Get the number of points in a track (method recommended by ROOT */
+    int get_num_points() const { return (_spoints->GetLast() + 1); }
+
+    /** Get the number of triplet spacepoints */
+    int get_num_triplets() const;
+
 
   private:
     TRefArray* _spoints;

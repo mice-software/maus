@@ -107,23 +107,20 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
   void _process(MAUS::Data *data) const;
 
 
-  void processDBB(MAUS::MCEventPArray *mcEvts,
-		  int nPartEvents,
-		  EMRDBBEventVector& emr_dbb_events_tmp) const;
+  void processMC(MAUS::MCEventPArray *mcEvts,
+		 EMRDBBEventVector& emr_dbb_events_tmp,
+		 EMRfADCEventVector& emr_fadc_events_tmp,
+		 int deltat_min,
+		 int deltat_max) const;
 
-  void processFADC(MAUS::MCEventPArray *mcEvts,
-		   int nPartEvents,
-		   EMRfADCEventVector& emr_fadc_events_tmp) const;
-
-  void digitize(int nPartEvents,
-		int *deltat_limits,
-		EMRDBBEventVector emr_dbb_events_tmp,
+  void digitize(EMRDBBEventVector emr_dbb_events_tmp,
 		EMRfADCEventVector emr_fadc_events_tmp,
 		EMRDBBEventVector& emr_dbb_events,
-		EMRfADCEventVector& emr_fadc_events) const;
+		EMRfADCEventVector& emr_fadc_events,
+		int deltat_min,
+		int deltat_max) const;
 
   void fill(MAUS::Spill *spill,
-	    int nPartEvents,
 	    EMRDBBEventVector emr_dbb_events,
 	    EMRfADCEventVector emr_fadc_events) const;
 
@@ -159,7 +156,6 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
   double _tot_func_p1;
   double _tot_func_p2;
   double _tot_func_p3;
-  double _tot_func_p4;
   int _acquisition_window;
   int _signal_integration_window;
   int _arrival_time_shift;
@@ -168,7 +164,6 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
   double _pulse_shape_landau_width;
   std::string _fom;
   double _birks_constant;
-  double _average_path_length;
   double _signal_energy_threshold;
   int _baseline_spread;
   int _maximum_noise_level;

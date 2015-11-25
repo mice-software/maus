@@ -46,7 +46,7 @@ class JointPDFTest : public ::testing::Test {
   // err can be made smaller by defining a smaller _bin_width
   // That will increase the test time, so I'm keeping things
   // large.
-  static const double err = 0.01;
+  static constexpr double err = 0.01;
   double _shift_min;
   double _shift_max;
   double _bin_width;

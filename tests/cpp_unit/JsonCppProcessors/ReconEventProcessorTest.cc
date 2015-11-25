@@ -30,8 +30,10 @@ namespace ReconEventProcessorTest {
 
 std::string EMR_BAR_HIT =
     std::string("{\"tot\":-1, \"delta_t\":-2, \"hittime\":-3, ")+
-    std::string("\"x\":-4., \"ex\":-5., \"y\":-6., \"ey\":-7., \"z\":-8., \"ez\":-9., ")+
-    std::string("\"charge_corrected\":-10., \"total_charge_corrected\":-11.}");
+    std::string("\"x\":-4., \"y\":-6., \"z\":-8., \"ex\":-5., \"ey\":-7., \"ez\":-9., ")+
+    std::string("\"x_global\":-10., \"y_global\":-11., \"z_global\":-12., ")+
+    std::string("\"charge_corrected\":-13., \"total_charge_corrected\":-14., ")+
+    std::string("\"path_length\":-15.}");
 
 std::string EMR_BAR = "{\"bar\":-1, \"emr_bar_hits\":["+EMR_BAR_HIT+","+EMR_BAR_HIT+"]}";
 
@@ -46,12 +48,12 @@ std::string EMR_PLANE_HIT =
 
 std::string EMR_EVENT =
     std::string("{\"emr_plane_hits\":["+EMR_PLANE_HIT+","+EMR_PLANE_HIT+"], ")+
-    std::string("\"initial_trigger\":true, \"has_primary\":true, ")+
+    std::string("\"has_primary\":true, ")+
     std::string("\"range_primary\":-1., \"has_secondary\":true, ")+
     std::string("\"range_secondary\":-2., \"secondary_to_primary_track_distance\":-3., ")+
     std::string("\"total_charge_MA\":-4., \"charge_ratio_MA\":-5., ")+
     std::string("\"total_charge_SA\":-6., \"charge_ratio_SA\":-7., ")+
-    std::string("\"plane_density\":-8., \"chi2\":-9.}");
+    std::string("\"plane_density_MA\":-8., \"plane_density_SA\":-9., \"chi2\":-10.}");
 
 std::string RECON_EVENT =
     std::string("{\"part_event_number\":1, \"emr_event\":"+EMR_EVENT+"}");

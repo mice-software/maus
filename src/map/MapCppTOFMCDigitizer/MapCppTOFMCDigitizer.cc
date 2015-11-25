@@ -160,10 +160,13 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
       double edep = hit.GetEnergyDeposited();
 
       if (fDebug) {
-         std::cout << "tofhit: " << hit.GetChannelId() << " "
-                   << hit.GetPosition() << " " << hit.GetMomentum() << " "
-                   << hit.GetTime() << " " << hit.GetEnergyDeposited()
-                   << std::endl;
+         std::cout << "tofhit: stn: " << channel_id->GetStation() << " slab: "
+                   << channel_id->GetSlab() << " plane: " << channel_id->GetPlane()
+                   << " xyz: " << hit.GetPosition().x() << " "
+                   << hit.GetPosition().y() << " " << hit.GetPosition().z()
+                   << " px,py,pz: " << hit.GetMomentum().x() << " "
+                   << hit.GetMomentum().y() << " " << hit.GetMomentum().z()
+                   << " time: " << hit.GetTime() << std::endl;
       }
 
       int stn = channel_id->GetStation();
@@ -432,6 +435,7 @@ void MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       TOFChannelKey xChannelKey(keyStr);
       double dT = 0.;
       if (pixStr != "unknown") {
+        if (fDebug) std::cout << "MapCppTOFMCDigitizer::Correcting pixel: " << keyStr << std::endl;
         TOFPixelKey xTriggerPixelKey(pixStr);
         dT = _map.dT(xChannelKey, xTriggerPixelKey, adc);
         if (fDebug) std::cout << "dT= " << dT << std::endl;

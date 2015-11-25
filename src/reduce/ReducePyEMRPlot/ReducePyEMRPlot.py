@@ -315,9 +315,9 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             self.hcharge_ratio_sa.Fill(emr_event.GetChargeRatioSA())
 
             # Fill the PID TGraph, the muons are located in the bottom right
-            density = emr_event.GetPlaneDensity()
+            density = emr_event.GetPlaneDensityMA()
             chi2 = emr_event.GetChi2()
-            self.hspread_vs_density.Fill(density, math.log1p(chi2))
+            self.hspread_vs_density.Fill(density, math.log10(1+chi2))
 
         # Efficiency of the track matching
         match_eff = self.hrange_secondary.GetEntries()\
@@ -335,7 +335,7 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             if (self.hspread_vs_density.GetXaxis().GetBinCenter(i) < 0.9):
                 break
             for j in range(1, self.hspread_vs_density.GetNbinsY()+1):
-                if (self.hspread_vs_density.GetYaxis().GetBinCenter(j) > 1):
+                if (self.hspread_vs_density.GetYaxis().GetBinCenter(j) > 0.5):
                     break
                 n_mu = n_mu + self.hspread_vs_density.GetBinContent(i, j)
         string = 'Muon frac. : %.3f' % (n_mu/n_entries)
@@ -418,12 +418,12 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.hcharge_ratio_sa.SetLineColor(2)
 
         self.hspread_vs_density = ROOT.TH2F("spread_vs_density", \
-                                            "Normalised #chi^{2}\
-					     against plane density", \
-                                            20, 0, 1.0001, 20, 0, 5)
+                                            "Normalised #chi^{2} "
+					    "against plane density #rho_{P}", \
+                                            20, 0, 1.0001, 30, 0, 3)
         self.hspread_vs_density.GetXaxis().SetTitle("#rho_{P}")
         self.hspread_vs_density.GetYaxis()\
-            .SetTitle("ln(1 + #chi_{X}^{2}/N + #chi_{Y}^{2}/N)")
+            .SetTitle("log_{10}(1 + #hat{#chi}_{X}^{2} + #hat{#chi}_{Y}^{2})")
 
         # define legends
         self.leg_range = ROOT.TLegend(0.65, 0.7, 0.88, 0.88)
@@ -439,9 +439,9 @@ class ReducePyEMRPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.leg_charge.AddEntry(self.htotal_charge_sa, "SAPMT", "l")
 
         # define lines
-        self.line_density = ROOT.TLine(.9, 0, .9, 1)
+        self.line_density = ROOT.TLine(.9, 0, .9, .5)
         self.line_density.SetLineWidth(2)
-        self.line_chi2 = ROOT.TLine(.9, 1, 1, 1)
+        self.line_chi2 = ROOT.TLine(.9, .5, 1, .5)
         self.line_chi2.SetLineWidth(2)
 
         # define text comments

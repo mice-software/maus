@@ -82,8 +82,12 @@ esac
 shift
 done
 
+# Set default to build GCC as a third party
 if [ -z "$USE_SYSTEM_GCC" ]; then
-  USE_SYSTEM_GCC=true
+    USE_SYSTEM_GCC=false
+fi
+if [ "$USE_SYSTEM_GCC" != true ] && [ "$USE_SYSTEM_GCC" != false ]; then
+    USE_SYSTEM_GCC=false
 fi
 if [ "$USE_SYSTEM_GCC" = true ]; then
   echo

@@ -25,9 +25,6 @@ EMREventProcessor::EMREventProcessor()
 	  ("emr_plane_hits", &_plane_hit_array_proc, &EMREvent::GetEMRPlaneHitArray,
            &EMREvent::SetEMRPlaneHitArray, false);
     RegisterValueBranch
-          ("initial_trigger", &_bool_proc, &EMREvent::GetInitialTrigger,
-          &EMREvent::SetInitialTrigger, false);
-    RegisterValueBranch
           ("has_primary", &_bool_proc, &EMREvent::GetHasPrimary,
           &EMREvent::SetHasPrimary, false);
     RegisterValueBranch
@@ -47,17 +44,20 @@ EMREventProcessor::EMREventProcessor()
           ("total_charge_MA", &_double_proc, &EMREvent::GetTotalChargeMA,
           &EMREvent::SetTotalChargeMA, false);
     RegisterValueBranch
-          ("charge_ratio_MA", &_double_proc, &EMREvent::GetChargeRatioMA,
-          &EMREvent::SetChargeRatioMA, false);
-    RegisterValueBranch
           ("total_charge_SA", &_double_proc, &EMREvent::GetTotalChargeSA,
           &EMREvent::SetTotalChargeSA, false);
+    RegisterValueBranch
+          ("charge_ratio_MA", &_double_proc, &EMREvent::GetChargeRatioMA,
+          &EMREvent::SetChargeRatioMA, false);
     RegisterValueBranch
           ("charge_ratio_SA", &_double_proc, &EMREvent::GetChargeRatioSA,
           &EMREvent::SetChargeRatioSA, false);
     RegisterValueBranch
-          ("plane_density", &_double_proc, &EMREvent::GetPlaneDensity,
-          &EMREvent::SetPlaneDensity, false);
+          ("plane_density_MA", &_double_proc, &EMREvent::GetPlaneDensityMA,
+          &EMREvent::SetPlaneDensityMA, false);
+    RegisterValueBranch
+          ("plane_density_SA", &_double_proc, &EMREvent::GetPlaneDensitySA,
+          &EMREvent::SetPlaneDensitySA, false);
     RegisterValueBranch
           ("chi2", &_double_proc, &EMREvent::GetChi2,
           &EMREvent::SetChi2, false);

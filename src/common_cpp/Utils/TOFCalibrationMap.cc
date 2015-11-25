@@ -28,15 +28,27 @@ TOFCalibrationMap::TOFCalibrationMap() {
 }
 
 TOFCalibrationMap::~TOFCalibrationMap() {
+  this->reset();
+}
+
+void TOFCalibrationMap::reset() {
   _Pkey.clear();
   _Tkey.clear();
   _twPar.resize(0);
   _t0.resize(0);
   _reff.resize(0);
+
+  t0str.str("");
+  t0str.clear();
+  twstr.str("");
+  twstr.clear();
+  trigstr.str("");
+  trigstr.clear();
 }
 
 bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
   // Fill the vector containing all TOF channel keys.
+  this->reset();
   this->MakeTOFChannelKeys();
 
   // Get the calibration text files from the Json document.
@@ -114,16 +126,19 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
     return false;
   }
   runNumber = rnum;
+//   std::cout << "#### Getting TOF calibration by " << _tof_calib_by
+//             << "  Run " << runNumber << " ####" << std::endl;
+
   bool loaded;
   if (!fromDB) {
-      // std::cout << ">>>>>>> initializing from FILE<<<<<" << std::endl;
+//       std::cout << "#### initializing from FILE ####" << std::endl;
       std::string xMapT0File = std::string(pMAUS_ROOT_DIR) + t0_file.asString();
       std::string xMapTWFile = std::string(pMAUS_ROOT_DIR) + tw_file.asString();
       std::string xMapTriggerFile = std::string(pMAUS_ROOT_DIR) + trigger_file.asString();
       // Load the calibration constants.
       loaded = this->Initialize(xMapT0File, xMapTWFile, xMapTriggerFile);
   } else {
-      // std::cout << ">>>>>>> initializing from CDB<<<<<" << std::endl;
+//       std::cout << "#### initializing from CDB ####" << std::endl;
       // get calib from DB instead of file, the above line is replaced by the one below
       if (!pymod_ok) return false;
       loaded = this->InitializeFromCDB();

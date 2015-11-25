@@ -15,6 +15,7 @@
 
 # ROOT false positives
 # pylint: disable=E1101
+# pylint: disable=R0902
 
 """
 OutputPyRootImage saves image files held as a ROOT.MAUS.ImageData object.
@@ -46,9 +47,14 @@ class OutputPyRootImage:
         self.file_prefix = "image"
         self.directory = os.getcwd()
         self.end_of_run_directory = os.getcwd()+'/end_of_run/'
+        self.process_count = 0
+        self.refresh_rate = None
         self.last_event = None
         self.run_number = None
+        self.spill_number = None
         self.image_types = []
+        self.supported_types = \
+            ["ps", "eps", "gif", "jpg", "jpeg", "pdf", "svg", "png"]
 
     def birth(self, config_json):
         """
@@ -60,11 +66,16 @@ class OutputPyRootImage:
         @returns True
         """
         config_doc = json.loads(config_json)
-
-        self.file_prefix = config_doc["image_file_prefix"]
-        self.directory = config_doc["image_directory"]
-        self.end_of_run_directory = config_doc["end_of_run_image_directory"]
-        self.image_types = config_doc["image_types"]
+        if 'reduce_plot_refresh_rate' in config_json:
+            self.refresh_rate = config_doc["reduce_plot_refresh_rate"]
+        if 'image_file_prefix' in config_json:
+            self.file_prefix = config_doc["image_file_prefix"]
+        if 'image_directory' in config_json:
+            self.directory = config_doc["image_directory"]
+        if 'end_of_run_image_directory' in config_json:
+            self.end_of_run_directory = config_doc["end_of_run_image_directory"]
+        if 'image_types' in config_json:
+            self.image_types = config_doc["image_types"]
 
     def save(self, image_data):
         """
@@ -84,12 +95,21 @@ class OutputPyRootImage:
                                                           str(type(image_data))
             return
         image = self.last_event.GetImage()
+        if image.GetSpillNumber() != self.spill_number:
+            self.spill_number = image.GetSpillNumber()
+            self.process_count += 1
+        if (self.process_count % self.refresh_rate) and not is_end_of_run:
+            return
         for canvas_wrap in image.GetCanvasWrappers():
             canvas = canvas_wrap.GetCanvas()
             file_path = self._get_file_path(canvas_wrap.GetFileTag(),
                                             is_end_of_run)
             for file_type in self.image_types:
-                canvas.Print(file_path+file_type)
+                if file_type not in self.supported_types:
+                    print """OutputPyRootImage ignoring wrong
+                          image type: %s""" % file_type
+                else:
+                    canvas.SaveAs(file_path+file_type)
 
     def death(self): #pylint: disable=R0201
         """
