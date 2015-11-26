@@ -109,7 +109,8 @@ def build_third_party_tarball():
     print "Getting targets for third_party libraries"
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
     glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz",
-                 "source/*.egg", "source/*.tar", "source/*.tarz", "source/*.bz2"]
+                 "source/*.egg", "source/*.tar", "source/*.tarz",
+                 "source/*.bz2"]
     tarball_targets = []
     tarball_name = "third_party_libraries_incl_python.tar.gz"
     for targets in glob_list:
