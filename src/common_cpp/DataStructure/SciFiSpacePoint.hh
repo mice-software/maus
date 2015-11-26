@@ -102,6 +102,10 @@ class SciFiSpacePoint : public TObject {
 
   ThreeVector get_position() const { return _position; }
 
+  void set_global_position(ThreeVector global_position) { _global_position = global_position; }
+
+  ThreeVector get_global_position() const { return _global_position; }
+
   void set_chi2(double chi2) { _chi2 = chi2; }
 
   double get_chi2()    const { return _chi2; }
@@ -136,6 +140,7 @@ class SciFiSpacePoint : public TObject {
   std::string _type;
 
   ThreeVector _position;
+  ThreeVector _global_position;
 
   TRefArray*  _channels;
 

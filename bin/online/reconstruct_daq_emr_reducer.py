@@ -26,12 +26,9 @@ def run():
     # setting it to false/0 will cause canvases to pop up on screen and 
     # will get refreshed every N spills set by the refresh_rate data
     # card. 
-    data_cards_list.append("root_batch_mode='%d'\n" % 1)
+    data_cards_list.append("root_batch_mode=%d\n" % 1)
     # refresh_rate = once in how many spills should canvases be updated
-    data_cards_list.append("refresh_rate='%d'\n" % 5)
-    # enable_pid_recon = should the pid variables be reconstrcuted, slower
-    enable_pid_recon = 1
-    data_cards_list.append("enable_pid_recon='%d'\n" % enable_pid_recon)
+    data_cards_list.append("refresh_rate=%d\n" % 5)
     # Add auto-numbering to the image tags. If False then each
     # histogram output for successive spills will have the same tag
     # so there are no spill-specific histograms. This is the
@@ -50,24 +47,23 @@ def run():
 
     # Set up the input that reads from DAQ
 #    my_input = MAUS.InputCppDAQData()
-#    my_input = MAUS.InputCppDAQOfflineData()
-    my_input = MAUS.InputCppDAQOnlineData() # pylint: disable = E1101
+    my_input = MAUS.InputCppDAQOfflineData()
+#    my_input = MAUS.InputCppDAQOnlineData() # pylint: disable = E1101
  
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
-    my_map.append(MAUS.MapPyReconSetup())
+    my_map.append(MAUS.MapCppReconSetup())
     my_map.append(MAUS.MapCppEMRPlaneHits())
-    if enable_pid_recon:
-        my_map.append(MAUS.MapCppEMRRecon())
+    my_map.append(MAUS.MapCppEMRRecon())
 
     # Histogram reducer.
     #reducer = MAUS.ReducePyDoNothing()
-    reducer = MAUS.ReducePyEMRPlot()
+    reducer = MAUS.ReduceCppEMRPlot()
 
-    # Save images as EPS and meta-data as JSON.
+    # Save images as eps and meta-data as JSON.
     #output_worker = MAUS.OutputPyDoNothing()
-    output_worker = MAUS.OutputPyImage()
+    output_worker = MAUS.OutputPyRootImage()
 
     # Run the workflow.
     MAUS.Go(my_input, my_map, reducer, output_worker, data_cards) 

@@ -3,7 +3,8 @@
 
 Module EMR
 {
-  Volume None
+  Volume Box
+  Dimensions 1200 1200 1000 mm
   PropertyString G4Detector EMR
   PropertyString SensitiveDetector EMR
   PropertyDouble NbOfBars 2832

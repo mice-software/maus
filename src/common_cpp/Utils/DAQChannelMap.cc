@@ -89,12 +89,18 @@ std::string DAQChannelKey::str() {
 ////////////////////////////////////////////////////////////
 
 DAQChannelMap::~DAQChannelMap() {
+  this->reset();
+}
+
+void DAQChannelMap::reset() {
   for (unsigned int i = 0;i < _chKey.size();i++)
     delete _chKey[i];
 
   _chKey.resize(0);
-}
 
+  cblstr.str("");
+  cblstr.clear();
+}
 
 DAQChannelMap::DAQChannelMap() {
   pymod_ok = true;
@@ -103,6 +109,7 @@ DAQChannelMap::DAQChannelMap() {
 
 // load channel map based on data cards
 bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
+  this->reset();
   _daq_devicename = "DAQ";
   std::string _cabling_source = JsonWrapper::GetProperty(configJSON,
                                    "DAQ_cabling_source",
@@ -144,8 +151,12 @@ bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
   }
 
   bool loaded = false;
+//   std::cout << "#### Getting TOF cabling by " << _cabling_source
+//             << "  Run " << runNumber << " ####" << std::endl;
+
   if (_cabling_source == "CDB") {
       if (!pymod_ok) return false;
+//       std::cout << "#### initializing from CDB ####" << std::endl;
       loaded = this->InitFromCDB();
   } else if (_cabling_source == "file") {
       // load the appropriate cabling file depending on runNumber being > or < 6541
@@ -159,6 +170,7 @@ bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
           assert(configJSON.isMember("DAQ_cabling_file"));
           map_file_name = configJSON["DAQ_cabling_file"].asString();
       }
+//       std::cout << "#### initializing from FILE " << map_file_name << " ####" << std::endl;
       char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
       if (!pMAUS_ROOT_DIR) {
             Squeak::mout(Squeak::error) <<

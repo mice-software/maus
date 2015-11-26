@@ -28,6 +28,7 @@
 #include "TF1.h"
 #include "TLatex.h"
 #include "TPaveText.h"
+#include "TPaveStats.h"
 
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -47,81 +48,85 @@
 
 namespace MAUS {
 
-CanvasWrapper* ReduceCppTools::get_canvas_wrapper(TCanvas *canv,
-                                               TH1* hist,
-                                               std::string name,
-                                               std::string description,
-                                               std::string text_box_str) {
-
-  CanvasWrapper *wrap = new CanvasWrapper();
-  wrap->SetDescription(description);
-  wrap->SetFileTag(name);
-  wrap->SetCanvas(canv);
-
-  canv->cd();
-  hist->Draw();
-  hist->SetStats(false);
-//   TPaveText* text_box = new TPaveText(0.6, 0.5, 1.0, 0.9, "NDC");
-//   text_box->AddText(description.c_str());
-
-  return wrap;
-}
-
-
 PyMODINIT_FUNC init_ReduceCppTOFPlot(void) {
     PyWrapReduceBase<ReduceCppTOFPlot>::PyWrapReduceBaseModInit(
                                   "ReduceCppTOFPlot", "", "", "", "");
 }
 
 ReduceCppTOFPlot::ReduceCppTOFPlot()
-  : ReduceBase<Data, ImageData>("ReduceCppTOFPlot") {
+  : ReduceBase<Data, ImageData>("ReduceCppTOFPlot") {}
+
+ReduceCppTOFPlot::~ReduceCppTOFPlot() {
+  for (unsigned int i = 0; i < _histos.size(); i++)
+    delete _histos[i];
+  _histos.resize(0);
+
+  for (unsigned int i = 0; i < _canvs.size(); i++)
+    delete _canvs[i];
+  _canvs.resize(0);
+
+  // CanvasWrapper objects will be deleted by the ImageData destructor.
 }
 
-ReduceCppTOFPlot::~ReduceCppTOFPlot() {}
+void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
 
-void ReduceCppTOFPlot::_birth(const std::string& str_config) {
-  Json::Value config = JsonWrapper::StringToJson(str_config);
-  _refresh_rate = JsonWrapper::GetProperty(config,
-                                           "reduce_plot_refresh_rate",
-                                           JsonWrapper::intValue).asInt();
+  if (!_output) {
+    throw MAUS::Exception(Exception::nonRecoverable,
+                          "The output is disconnected.",
+                          "ReduceCppTOFPlot::_birth");
+  }
 
-  _canv_tof01 = new TCanvas("canv_tof01", "TOF0->1", 1600, 1200);
-  _canv_tof12 = new TCanvas("canv_tof12", "TOF1->2", 1600, 1200);
-  _canv_tof02 = new TCanvas("canv_tof02", "TOF0->2", 1600, 1200);
+  if (!_output->GetImage())
+    _output->SetImage(new MAUS::Image());
+
+  //  JsonCpp setup
+  Json::Value configJSON;
+  configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+
+  _refresh_rate = configJSON["reduce_plot_refresh_rate"].asInt();
+
+  // Set ROOT to batch mode by default unless specified otherwise
+  int root_batch_mode = 1;
+  if ( configJSON["root_batch_mode"].isInt() )
+      root_batch_mode = configJSON["root_batch_mode"].asInt();
+  if ( root_batch_mode )
+    gROOT->SetBatch();
 
   // define histograms
   _h_tof01 = new TH1F("ht01", "TOF0->1;Time (ns);;", 200, 20, 40);
   _h_tof12 = new TH1F("ht12", "TOF1->2;Time (ns);;", 200, 25, 45);
   _h_tof02 = new TH1F("ht02", "TOF0->2;Time (ns);;", 300, 50, 80);
+  _histos.push_back(_h_tof01);
+  _histos.push_back(_h_tof12);
+  _histos.push_back(_h_tof02);
+
+  // define canvases
+  _canv_tof01 = new TCanvas("canv_tof01", "TOF0->1", 1600, 1200);
+  _canv_tof12 = new TCanvas("canv_tof12", "TOF1->2", 1600, 1200);
+  _canv_tof02 = new TCanvas("canv_tof02", "TOF0->2", 1600, 1200);
+  _canvs.push_back(_canv_tof01);
+  _canvs.push_back(_canv_tof12);
+  _canvs.push_back(_canv_tof02);
 
   _cwrap_tof01 = ReduceCppTools::get_canvas_wrapper(_canv_tof01,
-                                                     _h_tof01,
-                                                     "",
-                                                     "",
-                                                     "");
+                                                    _h_tof01,
+						    "TOF01");
 
   _cwrap_tof12 = ReduceCppTools::get_canvas_wrapper(_canv_tof12,
-                                                     _h_tof12,
-                                                     "",
-                                                     "",
-                                                     "");
+                                                    _h_tof12,
+						    "TOF12");
 
   _cwrap_tof02 = ReduceCppTools::get_canvas_wrapper(_canv_tof02,
-                                                     _h_tof02,
-                                                     "",
-                                                     "",
-                                                     "");
+                                                    _h_tof02,
+						    "TOF02");
 
+  this->reset();
   _output->GetImage()->CanvasWrappersPushBack(_cwrap_tof01);
   _output->GetImage()->CanvasWrappersPushBack(_cwrap_tof12);
   _output->GetImage()->CanvasWrappersPushBack(_cwrap_tof02);
 }
 
-void ReduceCppTOFPlot::_death() {
-  delete _h_tof01;
-  delete _h_tof12;
-  delete _h_tof02;
-}
+void ReduceCppTOFPlot::_death() {}
 
 void ReduceCppTOFPlot::_process(MAUS::Data* data) {
   if (data == NULL)
@@ -149,16 +154,30 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
   ReconEventPArray* recon_events = data->GetSpill()->GetReconEvents();
 
   for (size_t i = 0;  i < recon_events->size(); ++i) {
-
     MAUS::TOFEvent* tof_event = recon_events->at(i)->GetTOFEvent();
     if (tof_event == NULL) continue;
 
-    update_tof_plots(tof_event);
+    this->update_tof_plots(tof_event);
   }
+
+  _process_count++;
+  if ( !(_process_count % _refresh_rate) )
+    this->update();
+}
+
+void ReduceCppTOFPlot::reset() {
+  for (unsigned int i = 0; i < _histos.size(); i++)
+    _histos[i]->Reset();
+
+  _process_count = 0;
+}
+
+void ReduceCppTOFPlot::update() {
+  for (unsigned int i = 0; i < _canvs.size(); i++)
+    _canvs[i]->Update();
 }
 
 void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
-
   MAUS::TOFEventSpacePoint *space_points = tof_event->GetTOFEventSpacePointPtr();
 
   TOF0SpacePointArray *sp_tof0 = space_points->GetTOF0SpacePointArrayPtr();
@@ -175,19 +194,13 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
   if (sp_tof2->size())
     t2 = sp_tof2->at(0).GetTime();
 
-  if (sp_tof0->size() == 1 && sp_tof1->size() == 1) {
+  if (sp_tof0->size() == 1 && sp_tof1->size() == 1)
     _h_tof01->Fill(t1-t0);
-    _canv_tof01->Update();
-  }
 
-  if (sp_tof0->size() == 1 && sp_tof2->size() == 1) {
+  if (sp_tof0->size() == 1 && sp_tof2->size() == 1)
     _h_tof02->Fill(t2-t0);
-    _canv_tof02->Update();
-  }
 
-  if (sp_tof1->size() == 1 && sp_tof2->size() == 1) {
+  if (sp_tof1->size() == 1 && sp_tof2->size() == 1)
     _h_tof12->Fill(t2-t1);
-    _canv_tof12->Update();
-  }
 }
 } // MAUS

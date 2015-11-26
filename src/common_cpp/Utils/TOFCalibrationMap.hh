@@ -196,6 +196,9 @@ class TOFCalibrationMap {
   */
   int MakeTOFChannelKeys();
 
+  /** Use this function to reset the map before reloading. */
+  void reset();
+
  /** Load T0 constants from text file.
   */
   bool LoadT0File(std::string t0File);

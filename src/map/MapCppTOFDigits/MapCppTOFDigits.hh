@@ -106,6 +106,9 @@ class MapCppTOFDigits : public MapBase<MAUS::Data> {
                    MAUS::V1290 &tdc,
                    MAUS::V1290Array &tr_hits) const throw(Exception);
   bool map_init;
+  Json::Value configJSON;
+  int runNumberSave;
+  void getTofCabling(int runNumber);
 };
 }
 

@@ -65,29 +65,47 @@ class EMRBarHit {
     /** Sets X coordinate */
     void SetX(double x);
 
-    /** Returns the error on the X coordinate */
-    double GetErrorX() const;
-
-    /** Sets the error on the X coordinate */
-    void SetErrorX(double ex);
-
     /** Returns Y coordinate */
     double GetY() const;
 
     /** Sets Y coordinate */
     void SetY(double y);
 
-    /** Returns the error on the Y coordinate */
-    double GetErrorY() const;
-
-    /** Sets the error on the Y coordinate */
-    void SetErrorY(double ey);
-
     /** Returns Z coordinate */
     double GetZ() const;
 
     /** Sets Z coordinate */
     void SetZ(double z);
+
+    /** Returns global X coordinate */
+    double GetGlobalX() const;
+
+    /** Sets global X coordinate */
+    void SetGlobalX(double x_global);
+
+    /** Returns global Y coordinate */
+    double GetGlobalY() const;
+
+    /** Sets global Y coordinate */
+    void SetGlobalY(double y_global);
+
+    /** Returns global Z coordinate */
+    double GetGlobalZ() const;
+
+    /** Sets global Z coordinate */
+    void SetGlobalZ(double z_global);
+
+    /** Returns the error on the X coordinate */
+    double GetErrorX() const;
+
+    /** Sets the error on the X coordinate */
+    void SetErrorX(double ex);
+
+    /** Returns the error on the Y coordinate */
+    double GetErrorY() const;
+
+    /** Sets the error on the Y coordinate */
+    void SetErrorY(double ey);
 
     /** Returns the error on the Z coordinate */
     double GetErrorZ() const;
@@ -107,18 +125,28 @@ class EMRBarHit {
     /** Sets combined charge corrected by calibration */
     void SetTotalChargeCorrected(double total_charge_corrected);
 
+    /** Returns path length of the particle that went through */
+    double GetPathLength() const;
+
+    /** Sets path length of the particle that went through */
+    void SetPathLength(double path_length);
+
   private:
     int _tot;/* dbb counts */
     int _deltat;/* dbb counts */
     int _hittime;/* dbb counts */
     double _x; /* mm */
-    double _ex; /* mm */
     double _y; /* mm */
-    double _ey; /* mm */
     double _z; /* mm */
+    double _x_global; /* mm */
+    double _y_global; /* mm */
+    double _z_global; /* mm */
+    double _ex; /* mm */
+    double _ey; /* mm */
     double _ez; /* mm */
     double _charge_corrected;
     double _total_charge_corrected;
+    double _path_length; /* mm */
 
     MAUS_VERSIONED_CLASS_DEF(EMRBarHit)
 };

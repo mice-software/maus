@@ -37,12 +37,12 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     SciFiStraightPRTrack();
 
     /** Constructor using explicit parameters */
-    SciFiStraightPRTrack(int tracker, int num_points, double x0, double mx, double x_chisq,
+    SciFiStraightPRTrack(int tracker, double x0, double mx, double x_chisq,
                          double y0, double my, double y_chisq,
                          const DoubleArray& covariance);
 
     /** Constructor using SimpleLines */
-    SciFiStraightPRTrack(int tracker, int num_points, SimpleLine line_x, SimpleLine line_y,
+    SciFiStraightPRTrack(int tracker, SimpleLine line_x, SimpleLine line_y,
                          const DoubleArray& covariance);
 
     /** Copy constructor */
@@ -97,19 +97,12 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     /** Set the tracker number */
     void set_tracker(int tracker) { _tracker = tracker; }
 
-    /** Get the number of points in a track (5, 4, or 3) */
-    int get_num_points() const { return _num_points; }
-
-    /** Set the number of points in a track (5, 4, or 3) */
-    void set_num_points(int num_points) { _num_points = num_points; }
-
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
 
   private:
     int _tracker;
-    int _num_points;
     static const int _type = 0; // 0 for straight, 1 for helical
 
     double _x0;

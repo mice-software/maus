@@ -43,9 +43,11 @@ void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocumen
   modules = mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
   Json::Value *json = Globals::GetConfigurationCards();
   // Load constants.
+  _disc_sim_on = (*json)["SciFi_DiscOn"].asInt();
+  _SciFiDisCut  = (*json)["SciFiDisCut"].asDouble();
+  _SciFiadcBits = (*json)["SciFiadcBits"].asDouble();
+  _SciFivlpcRes = (*json)["SciFivlpcRes"].asDouble();
   _SciFiNPECut        = (*json)["SciFiNoiseNPECut"].asDouble();
-  _SciFivlpcEnergyRes = (*json)["SciFivlpcEnergyRes"].asDouble();
-  _SciFiadcFactor     = (*json)["SciFiadcFactor"].asDouble();
   _SciFitdcBits       = (*json)["SciFitdcBits"].asDouble();
   _SciFivlpcTimeRes   = (*json)["SciFivlpcTimeRes"].asDouble();
   _SciFitdcFactor     = (*json)["SciFitdcFactor"].asDouble();
@@ -61,6 +63,19 @@ void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocumen
                _SciFiFiberTransmissionEff *
                _SciFiMUXTransmissionEff *
                _SciFivlpcQE;
+  _mapping_file = (*json)["SciFiMappingFileName"].asString();
+  _calibration_file = (*json)["SciFiCalibrationFileName"].asString();
+  _bad_chan_file = (*json)["SciFiBadChannelsFileName"].asString();
+
+  bool map = load_mapping(_mapping_file);
+  bool calib = load_calibration(_calibration_file);
+//  bool calib = load_calibration("scifi_calibration_jan2013.txt");
+  bool bad_channels = load_bad_channels(_bad_chan_file);
+  if ( !calib || !map || !bad_channels ) {
+    throw(Exception(Exception::recoverable,
+          "Could not load Tracker calibration, mapping or bad channel list.",
+          "RealDataDigitization::process"));
+  }
 }
 
 void MapCppTrackerMCDigitization::_death() {
@@ -94,13 +109,16 @@ void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
       add_noise(mc_evt->GetSciFiNoiseHits(), digits);
     }
     // Smearing NPE results from ADC resolution
-    // for (size_t digit_j = 0; digit_j < digits.size(); digit_j++ ) {
-    //  digits.at(digit_j)->set_npe(compute_adc_counts(digits.at(digit_j)->get_npe()));
-    // }
+    for (size_t digit_j = 0; digit_j < digits.size(); digit_j++) {
+      digits.at(digit_j)->set_npe(compute_adc_counts(digits.at(digit_j)));
+    }
+	  // For running with discriminators only
+    if (_disc_sim_on == 1) {
+  	  discriminator(digits);
+    }
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
     sf_evt->set_digits(digits);
-
     // If there is already a Recon event associated with this MC event, add the SciFiEvent to it,
     // otherwise make a new Recon event to hold the SciFiEvent
     if ( spill.GetReconEvents()->size() > event_i ) {
@@ -111,6 +129,27 @@ void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
       revt->SetSciFiEvent(sf_evt);
       spill.GetReconEvents()->push_back(revt);
     }
+  }
+}
+
+void MapCppTrackerMCDigitization::discriminator(SciFiDigitPArray &digits) const {
+  std::vector<int> cut_pos;
+  for (unsigned int i = 0; i < digits.size(); i++) {
+    if (_SciFiDisCut < digits.at(i)->get_npe()) {
+	  // std::cerr << "Good Point: " << digits.at(i)->get_npe() << "\n";
+	  digits.at(i)->set_npe(10.0);
+	} else {
+	  // std::cerr << "Bad Point: " << digits.at(i)->get_npe() << "\n";
+    std::cerr << "This shouldn't run.\n";
+	  digits.at(i)->set_npe(-10.0);
+	  cut_pos.push_back(i);
+	}
+  }
+  for (unsigned int j = 0; j < cut_pos.size(); j++) {
+    int pos_j = cut_pos.size() - j - 1;
+	// std::cerr<< pos_j << " of " << cut_pos.size() << "\n";
+	int k = cut_pos.at(pos_j);
+    digits.erase(digits.begin()+k);
   }
 }
 
@@ -155,6 +194,7 @@ void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spil
         }
       } // ends loop over all the array
 
+      nPE = floor(nPE+0.5);
       a_digit->set_npe(nPE);
       a_digit->set_adc(150); // Just to test it
       digits.push_back(a_digit);
@@ -167,7 +207,7 @@ void MapCppTrackerMCDigitization::add_noise(SciFiNoiseHitArray *noises,
 
     /**************************************************************************
     *  Function checks which channel has noise against which channel has a
-    *  digit.  If noise is in the same channel as a digit then the noise is 
+    *  digit.  If noise is in the same channel as a digit then the noise is
     *  added to the digit, else noise is added as a new digit.
     **************************************************************************/
 
@@ -228,22 +268,48 @@ int MapCppTrackerMCDigitization::compute_chan_no(MAUS::SciFiHit *ahit) const {
   return chanNo;
 }
 
-int MapCppTrackerMCDigitization::compute_adc_counts(double numb_pe) const {
-  double tmpcounts;
+double MapCppTrackerMCDigitization::compute_adc_counts(MAUS::SciFiDigit *digit) const {
+  double numb_pe = digit->get_npe();
   if ( numb_pe == 0 ) return 0;
 
-  // Throw the dice and generate the ADC count
-  // value for the energy summed for each channel.
-  tmpcounts = CLHEP::RandGauss::shoot(numb_pe, _SciFivlpcEnergyRes) *
-              _SciFiadcFactor;
+  // Throw the dice and generate VLPC output
+  numb_pe = CLHEP::RandGauss::shoot(numb_pe, _SciFivlpcRes);
+  if (numb_pe <= 0.0) return 0;
 
-  // Check for saturation of ADCs
-  if ( tmpcounts > pow(2.0, _SciFitdcBits) - 1.0 ) {
-    tmpcounts = pow(2.0, _SciFitdcBits) - 1.0;
+  // Gathering calibration information
+  double _SciFiadcGain = 0;
+  double _SciFiadcPed = 0;
+  int test_flag = 0;
+  for (int cal_i = 0; cal_i < _tracker.size(); cal_i++) {
+    if (_tracker[cal_i] == digit->get_tracker() &&
+        _station[cal_i] == digit->get_station() &&
+        _view[cal_i]   == digit->get_plane() &&
+        _fibre[cal_i] == digit->get_channel() ) {
+      _SciFiadcGain =
+	    _calibration[_bank[cal_i]][_chan_ro[cal_i]]["adc_gain"].asDouble();
+      _SciFiadcPed =
+	    _calibration[_bank[cal_i]][_chan_ro[cal_i]]["adc_pedestal"].asDouble();
+	  test_flag = 1;
+	  if (!_good_chan[_bank[cal_i]][_chan_ro[cal_i]]) {
+		return numb_pe = -10.0;
+	  }
+	  continue;
+	}
+  }
+  if ( test_flag == 0 ) {
+	  return numb_pe = -10.0;
+  }
+  if (_SciFiadcGain == 0 || _SciFiadcPed == 0) {
+    return numb_pe = -10.0;
   }
 
-  int adcCounts = static_cast <int> (floor(tmpcounts));
-  return adcCounts;
+  // Check for saturation of ADCs
+  double tmpcounts = (numb_pe * _SciFiadcGain) + _SciFiadcPed;
+  if ( tmpcounts > pow(2.0, _SciFiadcBits) - 1.0 )
+    tmpcounts = pow(2.0, _SciFiadcBits) - 1.0;
+  tmpcounts = (floor(tmpcounts));
+  numb_pe = (tmpcounts - _SciFiadcPed)/_SciFiadcGain;
+  return numb_pe;
 }
 
 bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2) const {
@@ -268,6 +334,110 @@ bool MapCppTrackerMCDigitization::check_param(MAUS::SciFiHit *hit1, MAUS::SciFiH
       return false;
     }
   }
+}
+
+bool MapCppTrackerMCDigitization::load_calibration(std::string file) {
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
+  // std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
+
+  std::ifstream inf(fname.c_str());
+
+  if (!inf) {
+    throw(Exception(Exception::recoverable,
+          "Could not load Tracker Calibration.",
+          "MapCppTrackerMCDigitization::load_calibration"));
+  }
+
+  std::string calib((std::istreambuf_iterator<char>(inf)), std::istreambuf_iterator<char>());
+
+  Json::Reader reader;
+  Json::Value calibration_data;
+  if (!reader.parse(calib, calibration_data))
+    return false;
+
+  size_t n_channels = calibration_data.size();
+  for ( Json::Value::ArrayIndex i = 0; i < n_channels; ++i ) {
+    int bank            = calibration_data[i]["bank"].asInt();
+    int channel_n       = calibration_data[i]["channel"].asInt();
+    double adc_pedestal = calibration_data[i]["adc_pedestal"].asDouble();
+    double adc_gain     = calibration_data[i]["adc_gain"].asDouble();
+    double tdc_pedestal = calibration_data[i]["tdc_pedestal"].asDouble();
+    double tdc_gain     = calibration_data[i]["tdc_gain"].asDouble();
+    Json::Value channel;
+    channel["adc_pedestal"] = adc_pedestal;
+    channel["adc_gain"]     = adc_gain;
+    channel["tdc_pedestal"] = tdc_pedestal;
+    channel["tdc_gain"]     = tdc_gain;
+    _calibration[bank][channel_n] = channel;
+  }
+
+  return true;
+}
+
+bool MapCppTrackerMCDigitization::load_mapping(std::string file) {
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/cabling/"+file;
+
+  std::ifstream inf(fname.c_str());
+  if (!inf) {
+    throw(Exception(Exception::recoverable,
+          "Could not load Tracker Mapping.",
+          "MapCppTrackerMCDigitization::load_mapping"));
+  }
+
+  std::string line;
+  for ( int i = 1; i < _total_number_channels; ++i ) {
+    getline(inf, line);
+    std::istringstream ist1(line.c_str());
+
+    int board, bank, chan_ro, tracker, station, view, fibre, extWG, inWG, WGfib;
+    ist1 >> board >> bank >> chan_ro >> tracker >> station >>
+            view >> fibre >> extWG >> inWG >> WGfib;
+
+// std::cerr<< "tracker: " << tracker << "   station: " << station << "   plane: " <<
+// view << "   channel: " << chan_ro << "\n";
+
+    _board.push_back(board);
+    _bank.push_back(bank);
+    _chan_ro.push_back(chan_ro);
+    _tracker.push_back(tracker);
+    _station.push_back(station);
+    _view.push_back(view);
+    _fibre.push_back(fibre);
+    _extWG.push_back(extWG);
+    _inWG.push_back(inWG);
+    _WGfib.push_back(WGfib);
+  }
+  return true;
+}
+
+bool MapCppTrackerMCDigitization::load_bad_channels(std::string file) {
+  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+  std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
+
+  std::ifstream inf(fname.c_str());
+  if (!inf) {
+    throw(Exception(Exception::recoverable,
+          "Could not load Tracker bad channel list.",
+          "MapCppTrackerMCDigitization::load_bad_channels"));
+  }
+
+  for ( int bank = 0; bank < _number_banks; ++bank ) {
+    for ( int chan_ro = 0; chan_ro < _number_channels; ++chan_ro ) {
+      _good_chan[bank][chan_ro] = true;
+    }
+  }
+
+
+  int bad_bank, bad_chan_ro;
+
+  while ( !inf.eof() ) {
+    inf >> bad_bank >> bad_chan_ro;
+    _good_chan[bad_bank][bad_chan_ro] = false;
+  }
+
+  return true;
 }
 } // ~namespace MAUS
 

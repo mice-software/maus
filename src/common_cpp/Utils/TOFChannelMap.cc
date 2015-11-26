@@ -22,6 +22,10 @@
 namespace MAUS {
 
 TOFChannelMap::~TOFChannelMap() {
+  this->reset();
+}
+
+void TOFChannelMap::reset() {
   for (unsigned int i = 0;i < _tofKey.size();i++) {
     delete _tofKey[i];
     delete _tdcKey[i];
@@ -30,15 +34,20 @@ TOFChannelMap::~TOFChannelMap() {
   _tdcKey.resize(0);
   _fadcKey.resize(0);
   _tofKey.resize(0);
-}
 
+  cblstr.str("");
+  cblstr.clear();
+}
 
 TOFChannelMap::TOFChannelMap() {
   pymod_ok = true;
   if (!this->InitializePyMod()) pymod_ok = false;
+  runNumber = 0;
 }
 
-bool TOFChannelMap::InitializeCards(Json::Value configJSON) {
+bool TOFChannelMap::InitializeCards(Json::Value configJSON, int rnum) {
+  this->reset();
+
   _tof_station = JsonWrapper::GetProperty(configJSON,
                                                "TOF_trigger_station",
                                                JsonWrapper::stringValue).asString();
@@ -52,18 +61,41 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON) {
   _tof_cablingdate = JsonWrapper::GetProperty(configJSON,
                                                "TOF_cabling_date_from",
                                                JsonWrapper::stringValue).asString();
+  std::string _cabling_source = JsonWrapper::GetProperty(configJSON,
+                                               "TOF_cabling_source",
+                                               JsonWrapper::stringValue).asString();
+  try {
+      _tof_cabling_by = JsonWrapper::GetProperty(configJSON,
+                                           "TOF_cabling_by",
+                                           JsonWrapper::stringValue).asString();
+  } catch (MAUS::Exception e) {
+    Squeak::mout(Squeak::error)
+    << "Error getting data card TOF_cabling_by" << std::endl
+    << e.GetMessage() << std::endl;
+    return false;
+  }
 //   std::cout << "TOF cabling date: " << _tof_cablingdate << std::endl;
+//   std::cout << "TOF cabling source: " << _cabling_source << std::endl;
   if (!pymod_ok) return false;
-  bool loaded = this->InitFromCDB();
+  runNumber = rnum;
+
+  bool fromDB = true;
+  if (_cabling_source == "file")
+      fromDB = false;
+
+  std::cerr << ">>> SOURCE: " << fromDB << std::endl;
+  std::cerr << ">>> BY: " << _tof_cabling_by << std::endl;
+  bool loaded;
+  if (!fromDB) {
+      std::string tof_cabling_file = JsonWrapper::GetProperty(configJSON,
+                                         "TOF_cabling_file",
+                                         JsonWrapper::stringValue).asString();
+      loaded = this->InitFromFile(tof_cabling_file);
+  } else {
+      loaded = this->InitFromCDB();
+  }
   if (!loaded)
     return false;
-
-//   std::string tof_cabling_file = JsonWrapper::GetProperty(configJSON,
-//                                                "TOF_cabling_file",
-//                                                JsonWrapper::stringValue).asString();
-//   bool loaded = this->InitFromFile(tof_cabling_file);
-//   if (!loaded)
-//     return false;
 
   return true;
 }
@@ -360,7 +392,13 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
   // arg2 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
   // default date argument is "current"
   // this is set via TOF_cabling_date_from card in ConfigurationDefaults
-  py_arg = Py_BuildValue("(ss)", devname.c_str(), fromdate.c_str());
+  if (_tof_cabling_by == "date") {
+      py_arg = Py_BuildValue("(ss)", devname.c_str(), fromdate.c_str());
+      _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling");
+  } else if (_tof_cabling_by == "run_number") {
+      py_arg = Py_BuildValue("(si)", devname.c_str(), runNumber);
+      _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling_for_run");
+  }
   std::cout << "Building" << std::endl;
   if (py_arg == NULL) {
     PyErr_Clear();
