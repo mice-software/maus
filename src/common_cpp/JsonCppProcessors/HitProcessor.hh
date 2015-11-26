@@ -60,6 +60,9 @@ void HitProcessor<ChannelId>::RegisterBranches() {
     this->RegisterValueBranch("particle_id", &_int_proc,
                         &Hit<ChannelId>::GetParticleId,
                         &Hit<ChannelId>::SetParticleId, true);
+    this->RegisterValueBranch("path_length", &_double_proc,
+                        &Hit<ChannelId>::GetPathLength,
+                        &Hit<ChannelId>::SetPathLength, true);
     this->RegisterValueBranch("energy", &_double_proc,
                         &Hit<ChannelId>::GetEnergy,
                         &Hit<ChannelId>::SetEnergy, true);

@@ -60,7 +60,7 @@ class ComplexTest : public testing::Test {
                   cc(MAUS::Complex::complex(3,  -2))
   { }
  protected:
-  static const double Pi = 3.141592653589793238462643383279502884197169399;
+  static constexpr double Pi = 3.141592653589793238462643383279502884197169399;
   MAUS::complex c1;
   MAUS::complex c2;
   MAUS::complex c3;

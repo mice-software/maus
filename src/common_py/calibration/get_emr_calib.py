@@ -55,7 +55,7 @@ class GetCalib:
         Evaluate a string expression given by formula
         """
         if devname != "" and ctype != "":
-            if devname != "EMR" or ctype != "epsilon":
+            if devname != "EMR" or ctype != "eps":
                 raise Exception('get_emr_calib failed. \
                                  Invalid detector/calib type.')
             # check whether we are asked for the current calibration 

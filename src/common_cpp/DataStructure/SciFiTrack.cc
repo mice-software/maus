@@ -53,10 +53,6 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
 
-//  _seed_state_vector.resize(a_track._seed_state_vector.size());
-//  for (size_t i = 0; i < a_track._seed_state_vector.size(); ++i) {
-//    _seed_state_vector[i] = a_track._seed_state_vector[i];
-//  }
   _seed_covariance_matrix.resize(a_track._seed_covariance_matrix.size());
   for (size_t i = 0; i < a_track._seed_covariance_matrix.size(); ++i) {
     _seed_covariance_matrix[i] = a_track._seed_covariance_matrix[i];
@@ -83,10 +79,6 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     _trackpoints[i] = new SciFiTrackPoint(*a_track._trackpoints[i]);
   }
 
-//  _seed_state_vector.resize(a_track._seed_state_vector.size());
-//  for (size_t i = 0; i < a_track._seed_state_vector.size(); ++i) {
-//    _seed_state_vector[i] = a_track._seed_state_vector[i];
-//  }
   _seed_covariance_matrix.resize(a_track._seed_covariance_matrix.size());
   for (size_t i = 0; i < a_track._seed_covariance_matrix.size(); ++i) {
     _seed_covariance_matrix[i] = a_track._seed_covariance_matrix[i];
@@ -97,20 +89,6 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
   return *this;
 }
 
-// void SciFiTrack::set_scifitrackpoints(SciFiTrackPointPArray points) {
-//   // Delete any existing track points.
-//   std::vector<SciFiTrackPoint*>::iterator track_point;
-//   for (track_point = _trackpoints.begin();
-//        track_point!= _trackpoints.end(); ++track_point) {
-//     delete (*track_point);
-//   }
-//
-//   // Make the deep copy.
-//   _trackpoints.resize(points.size());
-//   for (size_t i = 0; i < points.size(); ++i) {
-//     _trackpoints[i] = new SciFiTrackPoint(*points.at(i));
-//   }
-// }
 
 SciFiTrack::~SciFiTrack() {
   // Delete track points in this track.
@@ -123,18 +101,34 @@ SciFiTrack::~SciFiTrack() {
   delete _pr_track;
 }
 
-// void SciFiTrack::SetSeedState(double* state, unsigned int size) {
-//   _seed_state_vector.resize(size);
-//   for ( unsigned int i = 0; i < size; ++i ) {
-//     _seed_state_vector[i] = state[i];
-//   }
-// }
 
 void SciFiTrack::SetSeedCovariance(double* covariance, unsigned int size) {
   _seed_covariance_matrix.resize(size);
   for ( unsigned int i = 0; i < size; ++i ) {
     _seed_covariance_matrix[i] = covariance[i];
   }
+}
+
+int SciFiTrack::GetRating() const {
+  SciFiStraightPRTrack* pr_track = static_cast<SciFiStraightPRTrack*>(_pr_track->GetObject());
+
+  int number_spacepoints = pr_track->get_num_points();
+
+  bool good_pval = (this->P_value() > 0.05);
+
+
+  int rating = 0;
+
+  if (number_spacepoints == 5 &&
+      good_pval) {
+    rating = 5;
+  } else if (good_pval) {
+    rating = 4;
+  } else {
+    rating = 1;
+  }
+
+  return rating;
 }
 
 } // ~namespace MAUS

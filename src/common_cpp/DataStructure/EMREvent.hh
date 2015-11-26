@@ -51,12 +51,6 @@ class EMREvent {
     void SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray);
 
     /** Returns  */
-    bool GetInitialTrigger() const;
-
-    /** Sets  */
-    void SetInitialTrigger(bool initial_trigger);
-
-    /** Returns  */
     bool GetHasPrimary() const;
 
     /** Sets  */
@@ -93,28 +87,34 @@ class EMREvent {
     void SetTotalChargeMA(double total_charge_MA);
 
     /** Returns  */
-    double GetChargeRatioMA() const;
-
-    /** Sets  */
-    void SetChargeRatioMA(double charge_MA_ratio);
-
-    /** Returns  */
     double GetTotalChargeSA() const;
 
     /** Sets  */
     void SetTotalChargeSA(double total_charge_SA);
 
     /** Returns  */
+    double GetChargeRatioMA() const;
+
+    /** Sets  */
+    void SetChargeRatioMA(double charge_ratio_MA);
+
+    /** Returns  */
     double GetChargeRatioSA() const;
 
     /** Sets  */
-    void SetChargeRatioSA(double charge_SA_ratio);
+    void SetChargeRatioSA(double charge_ratio_SA);
 
     /** Returns  */
-    double GetPlaneDensity() const;
+    double GetPlaneDensityMA() const;
 
     /** Sets  */
-    void SetPlaneDensity(double plane_density);
+    void SetPlaneDensityMA(double plane_density_MA);
+
+    /** Returns  */
+    double GetPlaneDensitySA() const;
+
+    /** Sets  */
+    void SetPlaneDensitySA(double plane_density_SA);
 
     /** Returns  */
     double GetChi2() const;
@@ -125,17 +125,17 @@ class EMREvent {
   private:
     EMRPlaneHitArray _emrplanehitarray;
 
-    bool _initial_trigger;
     bool _has_primary;
     double _range_primary;
     bool _has_secondary;
     double _range_secondary;
     double _secondary_to_primary_track_distance;
     double _total_charge_MA;
-    double _charge_ratio_MA;
     double _total_charge_SA;
+    double _charge_ratio_MA;
     double _charge_ratio_SA;
-    double _plane_density;
+    double _plane_density_MA;
+    double _plane_density_SA;
     double _chi2;
 
     MAUS_VERSIONED_CLASS_DEF(EMREvent)

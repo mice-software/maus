@@ -160,6 +160,15 @@ class SciFiTrack {
 
   std::vector<double> GetSeedCovariance() const { return _seed_covariance_matrix; }
 
+
+  /** @brief Returns an integer rating of the track (1:Excellent, 5:Terrible)
+   */
+  int GetRating() const;
+
+  /** @brief Returns an boolean value if it's a "good" track
+   */
+  int IsGood() const { return (this->GetRating() <= 2); }
+
  private:
   int _tracker;
 

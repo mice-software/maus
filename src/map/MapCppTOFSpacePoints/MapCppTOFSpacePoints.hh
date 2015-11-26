@@ -31,6 +31,7 @@
 #include <algorithm>
 #include "json/json.h"
 
+#include "src/legacy/Config/MiceModule.hh"
 #include "Utils/TOFCalibrationMap.hh"
 #include "API/MapBase.hh"
 

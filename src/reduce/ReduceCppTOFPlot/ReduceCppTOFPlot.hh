@@ -20,7 +20,9 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
+#include "TROOT.h"
 #include "TH1.h"
 #include "TCanvas.h"
 
@@ -29,40 +31,37 @@
 #include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
 #include "src/common_cpp/DataStructure/ImageData/Image.hh"
 #include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
+#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/Utils/ReduceCppTools.hh"
 
 namespace MAUS {
-
-class ImageData;
-class Data;
-
-class ReduceCppTools {
- public:
-  static CanvasWrapper* get_canvas_wrapper(TCanvas *canv,
-                                 TH1* hist,
-                                 std::string name,
-                                 std::string description,
-                                 std::string text_box_str);
-};
 
 class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
  public:
   ReduceCppTOFPlot();
   ~ReduceCppTOFPlot();
 
-  int GetRefreshRate() {return _refresh_rate;}
+  int  getRefreshRate() {return _refresh_rate;}
 
  private:
 
-  void _birth(const std::string& config);
+  void _birth(const std::string& argJsonConfigDocument);
 
   void _death();
 
   void _process(Data* data);
 
+  void reset();
+
+  void update();
+
   void update_tof_plots(TOFEvent* tof_event);
 
   int _refresh_rate;
+  int _process_count;
 
+  std::vector<TH1F*> _histos;
+  std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
   CanvasWrapper *_cwrap_tof01, *_cwrap_tof02, *_cwrap_tof12;

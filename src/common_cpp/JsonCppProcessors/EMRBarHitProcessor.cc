@@ -32,17 +32,26 @@ EMRBarHitProcessor::EMRBarHitProcessor() {
           ("x", &_double_proc, &EMRBarHit::GetX,
           &EMRBarHit::SetX, true);
     RegisterValueBranch
-          ("ex", &_double_proc, &EMRBarHit::GetErrorX,
-          &EMRBarHit::SetErrorX, true);
-    RegisterValueBranch
           ("y", &_double_proc, &EMRBarHit::GetY,
           &EMRBarHit::SetY, true);
     RegisterValueBranch
-          ("ey", &_double_proc, &EMRBarHit::GetErrorY,
-          &EMRBarHit::SetErrorY, true);
-    RegisterValueBranch
           ("z", &_double_proc, &EMRBarHit::GetZ,
           &EMRBarHit::SetZ, true);
+    RegisterValueBranch
+          ("x_global", &_double_proc, &EMRBarHit::GetGlobalX,
+          &EMRBarHit::SetGlobalX, true);
+    RegisterValueBranch
+          ("y_global", &_double_proc, &EMRBarHit::GetGlobalY,
+          &EMRBarHit::SetGlobalY, true);
+    RegisterValueBranch
+          ("z_global", &_double_proc, &EMRBarHit::GetGlobalZ,
+          &EMRBarHit::SetGlobalZ, true);
+    RegisterValueBranch
+          ("ex", &_double_proc, &EMRBarHit::GetErrorX,
+          &EMRBarHit::SetErrorX, true);
+    RegisterValueBranch
+          ("ey", &_double_proc, &EMRBarHit::GetErrorY,
+          &EMRBarHit::SetErrorY, true);
     RegisterValueBranch
           ("ez", &_double_proc, &EMRBarHit::GetErrorZ,
           &EMRBarHit::SetErrorZ, true);
@@ -52,6 +61,9 @@ EMRBarHitProcessor::EMRBarHitProcessor() {
     RegisterValueBranch
           ("total_charge_corrected", &_double_proc, &EMRBarHit::GetTotalChargeCorrected,
           &EMRBarHit::SetTotalChargeCorrected, true);
+    RegisterValueBranch
+          ("path_length", &_double_proc, &EMRBarHit::GetPathLength,
+          &EMRBarHit::SetPathLength, true);
 }
 }  // namespace MAUS
 

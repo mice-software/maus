@@ -34,6 +34,7 @@ class OutputPyRootImageTestCase(unittest.TestCase): # pylint: disable=R0904
         """OutputPyRootImage setup"""
         ROOT.gROOT.SetBatch(True)
         self.test_cards = {
+            "reduce_plot_refresh_rate":1,
             "image_file_prefix":"image",
             "image_directory":os.path.expandvars(
                   "${MAUS_TMP_DIR}/test_output_py_root_image"
@@ -53,6 +54,7 @@ class OutputPyRootImageTestCase(unittest.TestCase): # pylint: disable=R0904
         canvas_wrapper.SetFileTag("TestCanvas")
         image = ROOT.MAUS.Image()
         image.SetRunNumber(555)
+        image.SetSpillNumber(0)
         image.CanvasWrappersPushBack(canvas_wrapper)
         self.test_image.SetImage(image)        
         try:
@@ -86,10 +88,13 @@ class OutputPyRootImageTestCase(unittest.TestCase): # pylint: disable=R0904
         test_path = os.path.join(self.test_cards["image_directory"],
                                  "imageTestCanvas.png")
         self.assertTrue(os.path.exists(test_path))
+        self.test_image.GetImage().SetSpillNumber(1)
         output.save(self.test_image)
+        self.test_image.GetImage().SetSpillNumber(2)
         output.save(self.test_image)
         self.assertTrue(os.path.exists(test_path))
         os.remove(test_path)
+        self.test_image.GetImage().SetSpillNumber(3)
         output.save(self.test_image)
         self.assertTrue(os.path.exists(test_path))
 
@@ -97,6 +102,7 @@ class OutputPyRootImageTestCase(unittest.TestCase): # pylint: disable=R0904
         """OutputPyRootImage test end of run save()"""
         output = OutputPyRootImage()
         output.birth(json.dumps(self.test_cards))
+        self.test_image.GetImage().SetSpillNumber(4)
         output.save(self.test_image)
         output.save(ROOT.MAUS.RunFooterData())
         test_path = os.path.join(self.test_cards["end_of_run_image_directory"],

@@ -11,12 +11,13 @@ echo
 # First get the old tracker cosmic gdc data file
 echo "INFO: Getting test scifi cosmic data"
 gdc_file="gdc1901.001"
+url0=http://heplnv152.pp.rl.ac.uk/maus/test_data/${gdc_file}
 if [ -e "${destdir}/${gdc_file}" ]
 then
     echo "INFO: Found tracker cosmic data file in test data directory"
 else
     echo "INFO: Tracker cosmic data file doesn't exist.  Downloading..."
-    wget --directory-prefix=${destdir} http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.0.0/${gdc_file}
+    wget --directory-prefix=${destdir} ${url0}
 fi
 
 cd $destdir

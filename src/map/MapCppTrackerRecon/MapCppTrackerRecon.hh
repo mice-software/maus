@@ -90,7 +90,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
    *
    *  Receive a data object with digits (either MC or real) and then call the higher level
    *  reconstruction algorithms
-   * 
+   *
    * \param document a line/spill from the JSON input
    */
   void _process(Data* data) const;
@@ -117,6 +117,11 @@ class MapCppTrackerRecon : public MapBase<Data> {
 
   void print_event_info(MAUS::SciFiEvent &event) const;
 
+  /**
+   * @brief Populate global position output for the spacepoints
+   */
+  void set_spacepoint_global_output(SciFiSpacePointPArray spoints) const;
+
  private:
   /// This will contain the configuration
   Json::Value _configJSON;
@@ -130,7 +135,8 @@ class MapCppTrackerRecon : public MapBase<Data> {
   double _kuno_sum;
   double _kuno_tolerance;
   /// Pattern recognition flags
-  bool _straight_pr_on;
+  bool _up_straight_pr_on;
+  bool _down_straight_pr_on;
   bool _up_helical_pr_on;
   bool _down_helical_pr_on;
   bool _kalman_on;

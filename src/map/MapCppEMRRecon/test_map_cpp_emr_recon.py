@@ -16,6 +16,7 @@
 """Tests for MapCppEMRRecon"""
 
 import os
+import json
 import unittest
 from Configuration import Configuration
 import MAUS
@@ -39,7 +40,17 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 
     def test_init(self):
         """Check birth with default configuration"""
-        self.mapper.birth(self. c.getConfigJSON())
+        test_configuration = self.c.getConfigJSON()
+        test_conf_json = json.loads(test_configuration)
+        # Fix the calibration to be always step I (prevents update issues)
+        test_conf_json['EMR_calib_source'] = "file"
+        test_conf_json['EMR_calib_file'] = \
+            "/files/calibration/emrcalib_cosmics_march2014.txt"
+        test_conf_json['EMRtotFuncP1'] = 15.0
+        test_conf_json['EMRtotFuncP2'] = 0.0089
+        test_conf_json['EMRtotFuncP3'] = 1.24
+        test_conf = json.dumps(test_conf_json)
+        self.mapper.birth(test_conf)
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
@@ -137,10 +148,10 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 
             self.assertTrue(spill_out['recon_events'][1]['emr_event']\
 		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-			   ['emr_bar_hits'][0]['z'] > plane_id*17.5)
+			   ['emr_bar_hits'][0]['z'] > (plane_id-24)*17.5)
             self.assertTrue(spill_out['recon_events'][1]['emr_event']\
 		           ['emr_plane_hits'][i]['emr_bars_primary'][0]\
-			   ['emr_bar_hits'][0]['z'] < (plane_id+1)*17.5)
+			   ['emr_bar_hits'][0]['z'] < (plane_id-23)*17.5)
 
             if (plane_id % 2 == 0):
                 self.assertTrue(spill_out['recon_events'][1]['emr_event']\
@@ -187,10 +198,10 @@ class TestMapCppEMRRecon(unittest.TestCase): #pylint: disable=R0904
 
         # The plane density must be 1 for a muon and its chi2 low
         self.assertEqual(spill_out['recon_events'][1]['emr_event']\
-				 ['plane_density'], 1.0)
+				 ['plane_density_MA'], 1.0)
         self.assertTrue(spill_out['recon_events'][1]['emr_event']\
 				 ['chi2'] < 1)
-		
+
 if __name__ == "__main__":
     unittest.main()
 
