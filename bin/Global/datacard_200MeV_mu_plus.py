@@ -49,10 +49,11 @@ beam = {
           "emittance_y":1.0,
           },
        #~ "transverse":{
-          #~ "transverse_mode":"constant_solenoid", # transverse distribution matched to constant solenoid field
+          #~ "transverse_mode":"constant_solenoid",
+          # transverse distribution matched to constant solenoid field
           #~ "emittance_4d":1., # 4d emittance
           #~ "normalised_angular_momentum":0.1, # angular momentum from diffuser
-          #~ "bz":4.e-3 # magnetic field strength for angular momentum calculation
+          #~ "bz":4.e-3 # magnetic field strength for angular mom. calculation
        #~ },
        "longitudinal":{"longitudinal_mode":"sawtooth_time",
                    "momentum_variable":"p",
@@ -64,6 +65,6 @@ beam = {
 }
 
 particle_decay = True
-physics_processes = "mean_energy_loss";
-TOF_calib_by = "date";
-TOF_calib_date_from = "2013-10-01 00:00:00";
+physics_processes = "mean_energy_loss"
+TOF_calib_by = "date"
+TOF_calib_date_from = "2013-10-01 00:00:00"

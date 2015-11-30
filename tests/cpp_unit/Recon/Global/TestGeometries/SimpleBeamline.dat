@@ -8,6 +8,7 @@ Configuration PropagationTest
   {
     Position 0.0 0.0 100.0 mm
     Rotation 0.0 0.0 0.0 degree
+    PropertyString Detector TOF
     Volume Box
     Dimensions 2000.0 2000.0 50.0 mm
     PropertyString Material POLYSTYRENE
@@ -24,6 +25,7 @@ Configuration PropagationTest
   {
     Position 0.0 0.0 7902.0 mm
     Rotation 0.0 0.0 0.0 degree
+    PropertyString Detector TOF
     Volume Box
     Dimensions 2000.0 2000.0 50.0 mm
     PropertyString Material POLYSTYRENE
@@ -112,6 +114,7 @@ Configuration PropagationTest
   {
     Position 0.0 0.0 15260.0 mm
     Rotation 0.0 0.0 0.0 degree
+    PropertyString Detector TOF
     Volume Box
     Dimensions 2000.0 2000.0 50.0 mm
     PropertyString Material POLYSTYRENE

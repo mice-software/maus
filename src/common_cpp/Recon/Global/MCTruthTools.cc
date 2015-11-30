@@ -17,9 +17,8 @@
 
 #include <cmath>
 
-#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
-#include "Utils/Exception.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 
 #include "src/common_cpp/Recon/Global/MCTruthTools.hh"
 
@@ -104,7 +103,7 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
       mc_detectors[MAUS::DataStructure::Global::kEMR] = true;
     }
   }
-  
+
   return mc_detectors;
 }
 
@@ -229,8 +228,8 @@ SciFiHit* GetTrackerPlaneHit(MAUS::MCEvent* mc_event,
       int tracker_number = tracker_hits_iter->GetChannelId()->GetTrackerNumber();
       int station_number = tracker_hits_iter->GetChannelId()->GetStationNumber();
       int plane_number = tracker_hits_iter->GetChannelId()->GetPlaneNumber();
-      if ((tracker_number == tracker) and (station_number == station)
-          and (plane_number == plane)) {
+      if ((tracker_number == tracker) and (station_number == station) and
+          (plane_number == plane)) {
         return &(*tracker_hits_iter);
       }
     }

@@ -16,43 +16,30 @@
  */
 
 /** @class MapCppGlobalReconImport
- *  @author Celeste Pidcott, University of Warwick
+ *  @author Jan Greis, University of Warwick
  *  Import detector events from Recon Event into a Global Event and create
  *  global tracks.
- *
+ *  @date 2015/11/26
  */
 
 #ifndef _SRC_MAP_MAPCPPGLOBALTRACKMATCHING_H_
 #define _SRC_MAP_MAPCPPGLOBALTRACKMATCHING_H_
 
-// Python / C API
-#include <Python.h>
-
 // C headers
-#include <assert.h>
-#include <json/json.h>
+#include <stdlib.h>
 
 // C++ headers
-#include <cmath>
-#include <iostream>
+#include <map>
 #include <string>
-#include <sstream>
-#include <vector>
+#include <utility>
 
-// Other headers
-#include "Interface/Squeak.hh"
-#include "Config/MiceModule.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
+// external libraries
+#include "json/json.h"
 
-#include "src/common_cpp/DataStructure/GlobalEvent.hh"
-#include "src/common_cpp/DataStructure/ReconEvent.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "Recon/Global/TrackMatching.hh"
+//  MAUS code
 #include "src/common_cpp/API/MapBase.hh"
-#include "src/common_cpp/API/PyWrapMapBase.hh"
-
+#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
   class Data;
@@ -89,18 +76,15 @@ namespace MAUS {
     bool _configCheck;
     /// This will contain the configuration
     Json::Value _configJSON;
-    ///  JsonCpp setup
+    /// JsonCpp setup
     Json::Reader _reader;
-
+    /// String denoting what PID hypotheses track matching should run with
     std::string _pid_hypothesis_string;
-
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
-
     /// Should the RK4 include energy loss
     bool _energy_loss;
-    
-    // Mapper name, useful for tracking results...
+    /// Mapper name
     std::string _mapper_name;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS

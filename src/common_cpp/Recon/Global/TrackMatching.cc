@@ -15,18 +15,15 @@
  *
  */
 
-#include "Recon/Global/TrackMatching.hh"
-#include "src/legacy/BeamTools/BTFieldConstructor.hh"
-#include "src/legacy/BeamTools/BTTracker.hh"
-#include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Recon/Global/Particle.hh"
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
+#include "src/common_cpp/Recon/Global/Particle.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Utils/Exception.hh"
 
-#include <algorithm>
+#include "src/legacy/BeamTools/BTFieldConstructor.hh"
+#include "src/legacy/Interface/Squeak.hh"
 
-#include "Interface/Squeak.hh"
-#include "Utils/Exception.hh"
+#include "src/common_cpp/Recon/Global/TrackMatching.hh"
 
 namespace MAUS {
 namespace recon {
@@ -176,11 +173,12 @@ void TrackMatching::throughTrack() {
     // Loop over all global tracks and sort into US and DS tracks by mapper name
     // provided they have the correct PID and hits in TOF1/2 to match by dT
     USDSTracks(global_tracks, pids[i], us_tracks, ds_tracks);
-    
+
     MAUS::DataStructure::Global::TrackPArray::iterator us_track_iter;
     MAUS::DataStructure::Global::TrackPArray::iterator ds_track_iter;
     // Do we have both US and DS tracks in the event?
-    if ((us_tracks->size() > 0) and (ds_tracks->size() > 0)) {
+    if ((us_tracks->size() > 0) and
+        (ds_tracks->size() > 0)) {
       // Iterate over all possible combinations of US and DS tracks
       for (us_track_iter = us_tracks->begin();
            us_track_iter != us_tracks->end();
@@ -195,7 +193,8 @@ void TrackMatching::throughTrack() {
           MAUS::DataStructure::Global::TrackPointCPArray ds_trackpoints =
               (*ds_track_iter)->GetTrackPoints();
           double emr_range_primary = (*ds_track_iter)->get_emr_range_primary();
-          if ((us_trackpoints.size() > 0) and (ds_trackpoints.size() > 0)) {
+          if ((us_trackpoints.size() > 0) and
+              (ds_trackpoints.size() > 0)) {
             MatchUSDS(us_trackpoints, ds_trackpoints, pids[i],
                       emr_range_primary);
           }
@@ -245,7 +244,14 @@ std::vector<MAUS::DataStructure::Global::TrackPoint*>
     if (space_point->get_detector() == detector) {
       MAUS::DataStructure::Global::TrackPoint* track_point =
           new MAUS::DataStructure::Global::TrackPoint(space_point);
-      track_point->set_mapper_name(mapper_name);
+      std::string blsection_mapper_name = mapper_name;
+      if ((detector == MAUS::DataStructure::Global::kTOF0) or
+          (detector == MAUS::DataStructure::Global::kTOF1)) {
+        blsection_mapper_name.append("-US");
+      } else {
+        blsection_mapper_name.append("-DS");
+      }
+      track_point->set_mapper_name(blsection_mapper_name);
       track_points.push_back(track_point);
     }
   }
@@ -305,14 +311,17 @@ void TrackMatching::MatchTrackPoint(
             GlobalTools::approx(x_in[2], trackpoints.at(i)->get_position().Y(),
                 _matching_tolerances.at(detector_name).second)) {
           hypothesis_track->AddTrackPoint(trackpoints.at(i));
-          std::cerr << detector_name << " Match\n";
+          Squeak::mout(Squeak::debug) << "TrackMatching: "
+                                      << detector_name << " Match" << std::endl;
         } else {
-          std::cerr << x_in[1] - trackpoints.at(i)->get_position().X() << " "
-                    << x_in[2] - trackpoints.at(i)->get_position().Y() << "\n";
+          Squeak::mout(Squeak::debug) << "TrackMatching: " << detector_name
+              << " Mismatch, dx, dy are:\n"
+              << x_in[1] - trackpoints.at(i)->get_position().X() << " "
+              << x_in[2] - trackpoints.at(i)->get_position().Y() << std::endl;
         }
       }
     } catch (Exception exc) {
-      std::cerr << exc.what() << std::endl;
+      Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
   }
 }
@@ -344,7 +353,7 @@ void TrackMatching::MatchEMRTrack(
                               first_hit_pos_err.X()*::sqrt(12)) and
           GlobalTools::approx(x_in[2], first_hit_pos.Y(),
                               first_hit_pos_err.Y()*::sqrt(12))) {
-        std::cerr << "EMR Match\n";
+        Squeak::mout(Squeak::debug) << "TrackMatching: EMR Match" << std::endl;
         hypothesis_track->set_emr_range_primary(
             (*emr_track_iter)->get_emr_range_primary());
         for (size_t i = 0; i < emr_trackpoints.size(); i++) {
@@ -357,9 +366,14 @@ void TrackMatching::MatchEMRTrack(
           emr_tp->set_momentum(momentum);
           hypothesis_track->AddTrackPoint(emr_tp);
         }
+      } else {
+        Squeak::mout(Squeak::debug)
+            << "TrackMatching: EMR Mismatch, dx, dy are:\n"
+            << x_in[1] - first_hit_pos.X() << " "
+            << x_in[2] - first_hit_pos.Y() << std::endl;
       }
     } catch (Exception exc) {
-      std::cerr << exc.what() << std::endl;
+      Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
   }
 }
@@ -395,8 +409,9 @@ void TrackMatching::USDSTracks(
        ++global_track_iter) {
     if (((*global_track_iter)->get_mapper_name() ==
             "MapCppGlobalTrackMatching-US") and
-        ((*global_track_iter)->HasDetector(MAUS::DataStructure::Global::kTOF1))
-        and ((*global_track_iter)->get_pid() == pid)) {
+        ((*global_track_iter)->HasDetector(
+            MAUS::DataStructure::Global::kTOF1)) and
+         ((*global_track_iter)->get_pid() == pid)) {
       us_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
                    "MapCppGlobalTrackMatching-DS") and
@@ -424,7 +439,8 @@ void TrackMatching::MatchUSDS(
         new MAUS::DataStructure::Global::Track();
     through_track->set_mapper_name("MapCppGlobalTrackMatching-Through");
     through_track->set_pid(pid);
-    std::cerr << "US & DS Matched\n";
+    Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched"
+                                << std::endl;
     MAUS::DataStructure::Global::TrackPointCPArray::iterator trackpoint_iter;
     for (trackpoint_iter = us_trackpoints.begin();
          trackpoint_iter != us_trackpoints.end();

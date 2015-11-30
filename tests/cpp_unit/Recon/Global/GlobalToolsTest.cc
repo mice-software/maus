@@ -16,7 +16,7 @@
  */
 
 #include <cmath>
-#include <Geant4/G4NistManager.hh> 
+#include "Geant4/G4NistManager.hh"
 #include "gtest/gtest.h"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
@@ -121,7 +121,8 @@ TEST_F(GlobalToolsTest, dEdx) {
 }
 
 TEST_F(GlobalToolsTest, propagate) {
-  MAUS::Simulation::DetectorConstruction* dc = Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
+  MAUS::Simulation::DetectorConstruction* dc =
+      Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
   std::string mod_path = std::string(getenv("MAUS_ROOT_DIR"))+
       "/tests/cpp_unit/Recon/Global/TestGeometries/";
   MiceModule geometry1(mod_path+"PropagationTest.dat");
@@ -136,7 +137,7 @@ TEST_F(GlobalToolsTest, propagate) {
   dc->SetMiceModules(geometry1);
   BTFieldConstructor* field = MAUS::Globals::GetMCFieldConstructor();
   double epsilon = 0.001;
-  
+
   // Energy Loss, Magnetic Field
   try {
     GlobalTools::propagate(x1, 2000.0, field, 10.0, pid);
@@ -165,7 +166,7 @@ TEST_F(GlobalToolsTest, propagate) {
 
   dc->SetMiceModules(geometry2);
   field = MAUS::Globals::GetMCFieldConstructor();
-  
+
   // Energy Loss, No Magnetic Field
   try {
     GlobalTools::propagate(x3, 2000.0, field, 10.0, pid);

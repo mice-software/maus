@@ -16,7 +16,7 @@ keep_only_muon_tracks = False
 keep_tracks = True # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-simulation_geometry_filename = "Stage4_NoField.dat" # geometry used by simulation
+simulation_geometry_filename = "Stage4_NoField.dat"
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
     "position":{"x":0.0, "y":-0.0, "z":10500.0},
@@ -33,8 +33,8 @@ spill_generator_number_of_spills = 100
 # an optimised beam might look like
 beam = {
     "particle_generator":"counter", # routine for generating empty primaries
-    "random_seed":job_number, # random seed for beam generation; controls also how the MC
-                     # seeds are generated
+    "random_seed":job_number, # random seed for beam generation; controls also
+                              # how the MC seeds are generated
     "definitions":[
     {
        "reference":simulation_reference_particle, # reference particle
@@ -59,7 +59,7 @@ beam = {
 }
 
 particle_decay = True
-physics_processes = "mean_energy_loss";
-TOF_calib_by = "date";
-TOF_calib_date_from = "2013-10-01 00:00:00";
-SciFiPRHelicalOn = False;
+physics_processes = "mean_energy_loss"
+TOF_calib_by = "date"
+TOF_calib_date_from = "2013-10-01 00:00:00"
+SciFiPRHelicalOn = False

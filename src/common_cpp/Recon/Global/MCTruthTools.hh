@@ -25,9 +25,15 @@
 #ifndef _SRC_COMMON_CPP_RECON_MCTRUTHTOOLS_HH_
 #define _SRC_COMMON_CPP_RECON_MCTRUTHTOOLS_HH_
 
+// C++ headers
 #include <map>
+
+// ROOT headers
+#include "TLorentzVector.h"
+
+// MAUS headers
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"
-#include "src/common_cpp/DataStructure/Global/BasePoint.hh"
 
 namespace MAUS {
 namespace MCTruthTools {

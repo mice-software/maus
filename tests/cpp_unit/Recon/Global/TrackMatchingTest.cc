@@ -16,9 +16,7 @@
  */
 
 #include <cmath>
-//~ #include <Geant4/G4NistManager.hh> 
 #include "gtest/gtest.h"
-//~ #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Recon/Global/TrackMatching.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -101,7 +99,7 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   tracker0_tp.set_detector(MAUS::DataStructure::Global::kTracker0);
   MAUS::DataStructure::Global::Track tracker0_track;
   tracker0_track.AddTrackPoint(&tracker0_tp);
-  _global_event->add_track(&tracker0_track);
+  _global_event->add_track_recursive(&tracker0_track);
 
   sp.set_position(tracker1_pos);
   MAUS::DataStructure::Global::TrackPoint tracker1_tp(&sp);
@@ -109,7 +107,7 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   tracker1_tp.set_detector(MAUS::DataStructure::Global::kTracker1);
   MAUS::DataStructure::Global::Track tracker1_track;
   tracker1_track.AddTrackPoint(&tracker1_tp);
-  _global_event->add_track(&tracker1_track);
+  _global_event->add_track_recursive(&tracker1_track);
 
   sp.set_position(emr_pos);
   sp.set_position_error(emr_pos_error);
@@ -118,7 +116,7 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   MAUS::DataStructure::Global::Track emr_track;
   emr_track.AddTrackPoint(&emr_tp);
   emr_track.set_emr_range_primary(20.0);
-  _global_event->add_track(&emr_track);
+  _global_event->add_track_recursive(&emr_track);
 
   _track_matching->USTrack();
   _track_matching->DSTrack();
@@ -130,7 +128,7 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
       new MAUS::DataStructure::Global::TrackPArray();
   MAUS::DataStructure::Global::TrackPArray* through_tracks =
       new MAUS::DataStructure::Global::TrackPArray();
-      
+
   MAUS::DataStructure::Global::TrackPArray* global_tracks =
     _global_event->get_tracks();
   MAUS::DataStructure::Global::TrackPArray::iterator global_track_iter;
@@ -138,8 +136,8 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if (((*global_track_iter)->get_mapper_name() ==
-            "MapCppGlobalTrackMatching-US")
-        and ((*global_track_iter)->get_pid() == pid)) {
+            "MapCppGlobalTrackMatching-US") and
+        ((*global_track_iter)->get_pid() == pid)) {
       us_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
                    "MapCppGlobalTrackMatching-DS") and
@@ -179,17 +177,17 @@ TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
   tracker0_track1.SetDetector(MAUS::DataStructure::Global::kTracker0);
   tracker0_track1.set_mapper_name("Tracker0");
   _global_event->add_track(&tracker0_track1);
-  
+
   MAUS::DataStructure::Global::Track tracker0_track2;
   tracker0_track2.SetDetector(MAUS::DataStructure::Global::kTracker0);
   tracker0_track2.set_mapper_name("Tracker0");
   _global_event->add_track(&tracker0_track2);
-  
+
   MAUS::DataStructure::Global::Track tracker1_track;
   tracker1_track.SetDetector(MAUS::DataStructure::Global::kTracker1);
   tracker1_track.set_mapper_name("Tracker1");
   _global_event->add_track(&tracker1_track);
-  
+
   MAUS::DataStructure::Global::Track emr_primary_track;
   emr_primary_track.SetDetector(MAUS::DataStructure::Global::kEMR);
   emr_primary_track.set_mapper_name("EMR Primary");
@@ -201,7 +199,7 @@ TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
   emr_secondary_track.set_mapper_name("EMR Secondary");
   emr_secondary_track.set_emr_range_secondary(10.0);
   _global_event->add_track(&emr_secondary_track);
-  
+
   MAUS::DataStructure::Global::TrackPArray* tracker0_array =
       _track_matching->GetDetectorTrackArray(
           MAUS::DataStructure::Global::kTracker0);
@@ -288,24 +286,24 @@ TEST_F(TrackMatchingTest, GetDetectorTrackPoints) {
 
   if (tof0_tps.size() > 1) {
     EXPECT_EQ(tof0_tps[0]->get_detector(), tof0);
-    EXPECT_EQ(tof0_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest");
+    EXPECT_EQ(tof0_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-US");
     EXPECT_EQ(tof0_tps[1]->get_detector(), tof0);
-    EXPECT_EQ(tof0_tps[1]->get_mapper_name(), "GetDetectorTrackPointsTest");
+    EXPECT_EQ(tof0_tps[1]->get_mapper_name(), "GetDetectorTrackPointsTest-US");
   }
 
   if (tof1_tps.size() > 0) {
     EXPECT_EQ(tof1_tps[0]->get_detector(), tof1);
-    EXPECT_EQ(tof1_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest");
+    EXPECT_EQ(tof1_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-US");
   }
 
   if (tof2_tps.size() > 0) {
     EXPECT_EQ(tof2_tps[0]->get_detector(), tof2);
-    EXPECT_EQ(tof2_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest");
+    EXPECT_EQ(tof2_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-DS");
   }
 
   if (kl_tps.size() > 0) {
     EXPECT_EQ(kl_tps[0]->get_detector(), kl);
-    EXPECT_EQ(kl_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest");
+    EXPECT_EQ(kl_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-DS");
   }
 }
 
@@ -319,13 +317,13 @@ TEST_F(TrackMatchingTest, PIDHypotheses) {
   if (pids.size() > 0) {
     EXPECT_EQ(pids[0], MAUS::DataStructure::Global::kMuPlus);
   }
-  
+
   pids = _track_matching->PIDHypotheses(1, "kPiMinus");
   EXPECT_EQ(pids.size(), 1);
   if (pids.size() > 0) {
     EXPECT_EQ(pids[0], MAUS::DataStructure::Global::kPiMinus);
   }
-  
+
   pids = _track_matching->PIDHypotheses(-1, "all");
   EXPECT_EQ(pids.size(), 3);
   if (pids.size() > 2) {
@@ -484,7 +482,7 @@ TEST_F(TrackMatchingTest, AddTrackerTrackPoints) {
       &target_track);
   std::vector<const MAUS::DataStructure::Global::TrackPoint*> track_points =
       target_track.GetTrackPoints();
-      
+
   EXPECT_EQ(track_points.size(), 3);
   for (size_t i = 0; i < track_points.size(); i++) {
     EXPECT_NEAR(track_points[i]->get_position().Z(), z_positions[i], 0.001);
@@ -520,14 +518,14 @@ TEST_F(TrackMatchingTest, USDSTracks) {
   ds_piminus_track.set_pid(MAUS::DataStructure::Global::kPiMinus);
   us_muplus_track1.SetDetector(MAUS::DataStructure::Global::kTOF1);
   us_muplus_track2.SetDetector(MAUS::DataStructure::Global::kTOF1);
-  ds_muplus_track.SetDetector(MAUS::DataStructure::Global::kTOF2);;
-  ds_piminus_track.SetDetector(MAUS::DataStructure::Global::kTOF2);;
+  ds_muplus_track.SetDetector(MAUS::DataStructure::Global::kTOF2);
+  ds_piminus_track.SetDetector(MAUS::DataStructure::Global::kTOF2);
   global_tracks.push_back(&us_muplus_track1);
   global_tracks.push_back(&us_muplus_track2);
   global_tracks.push_back(&us_muplus_track3);
   global_tracks.push_back(&ds_muplus_track);
   global_tracks.push_back(&ds_piminus_track);
-  
+
   _track_matching->USDSTracks(&global_tracks,
       MAUS::DataStructure::Global::kMuPlus, &us_tracks1, &ds_tracks1);
   _track_matching->USDSTracks(&global_tracks,
@@ -626,7 +624,7 @@ TEST_F(TrackMatchingTest, TOFTimeFromTrackPoints) {
   track.AddTrackPoint(&tp2);
   track_points = track.GetTrackPoints();
   double TOF_time;
-  
+
   TOF_time = _track_matching->TOFTimeFromTrackPoints(track_points,
       MAUS::DataStructure::Global::kTOF1);
   EXPECT_FLOAT_EQ(TOF_time, 10.0);
@@ -634,7 +632,6 @@ TEST_F(TrackMatchingTest, TOFTimeFromTrackPoints) {
       MAUS::DataStructure::Global::kTOF2);
   EXPECT_FLOAT_EQ(TOF_time, 15.7);
 }
-
 }
 }
 } // ~namespace MAUS

@@ -15,17 +15,26 @@
  *
  */
 
-#include "src/common_cpp/Recon/Global/GlobalTools.hh"
-#include "src/legacy/BeamTools/BTField.hh"
-#include "src/common_cpp/Recon/Global/Particle.hh"
-#include "src/common_cpp/Utils/Globals.hh"
-#include "src/legacy/Config/MiceModule.hh"
+#include <algorithm>
+#include <cmath>
+
 #include "Geant4/G4Navigator.hh"
-#include "src/common_cpp/Simulation/GeometryNavigator.hh"
-#include <Geant4/G4TransportationManager.hh>
-#include <Geant4/G4NistManager.hh> 
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4NistManager.hh"
+
 #include "gsl/gsl_odeiv.h"
 #include "gsl/gsl_errno.h"
+
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/Recon/Global/Particle.hh"
+#include "src/common_cpp/Simulation/GeometryNavigator.hh"
+#include "src/common_cpp/Utils/Exception.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/legacy/BeamTools/BTField.hh"
+#include "src/legacy/Config/MiceModule.hh"
+
+#include "src/common_cpp/Recon/Global/GlobalTools.hh"
 
 namespace MAUS {
 namespace GlobalTools {
@@ -138,7 +147,7 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
 
 std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
     track_point, std::vector<double> z_positions) {
-  std::vector<int> tracker_plane (3,0);
+  std::vector<int> tracker_plane(3, 0);
   double z = track_point->get_position().Z();
   int plane = 100;
   for (size_t i = 0; i < z_positions.size(); i++) {
@@ -281,7 +290,8 @@ void propagate(double* x, double target_z, const BTField* field,
   _field = field;
   _charge = MAUS::recon::global::Particle::GetInstance().GetCharge(pid);
   double mass = MAUS::recon::global::Particle::GetInstance().GetMass(pid);
-  G4Navigator* g4navigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+  G4Navigator* g4navigator = G4TransportationManager::GetTransportationManager()
+      ->GetNavigatorForTracking();
   G4NistManager* manager = G4NistManager::Instance();
   bool backwards = false;
   // If we propagate backwards, reverse momentum 4-vector
@@ -296,11 +306,11 @@ void propagate(double* x, double target_z, const BTField* field,
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   double absolute_error = (*MAUS::Globals::GetInstance()
                            ->GetConfigurationCards())
-                           ["field_tracker_absolute_error"].asDouble();;
+                           ["field_tracker_absolute_error"].asDouble();
   double relative_error = (*MAUS::Globals::GetInstance()
                            ->GetConfigurationCards())
-                           ["field_tracker_relative_error"].asDouble();;
-  gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T,8);
+                           ["field_tracker_relative_error"].asDouble();
+  gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 8);
   gsl_odeiv_control * control = gsl_odeiv_control_y_new(absolute_error,
                                                         relative_error);
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(8);
@@ -319,7 +329,7 @@ void propagate(double* x, double target_z, const BTField* field,
       const CLHEP::Hep3Vector posvector(x[1], x[2], x[3]);
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
-      G4VPhysicalVolume* volume = g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
+      g4navigator->LocateGlobalPointAndSetup(posvector, &momvector); // G4VPhysicalVolume* volume = 
       MAUS::GeometryNavigator geometry_navigator;
       geometry_navigator.Initialise(g4navigator->GetWorldVolume());
       double safety = 10;
@@ -364,7 +374,7 @@ void propagate(double* x, double target_z, const BTField* field,
 
     if (n_steps > max_steps) {
       std::stringstream ios;
-      ios << "Stopping at step " << n_steps << " of " << max_steps << "\n" 
+      ios << "Stopping at step " << n_steps << " of " << max_steps << "\n"
           << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
           << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
       throw(MAUS::Exception(MAUS::Exception::recoverable, ios.str()+
@@ -380,9 +390,9 @@ void propagate(double* x, double target_z, const BTField* field,
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
   }
-  gsl_odeiv_evolve_free (evolve);
+  gsl_odeiv_evolve_free(evolve);
   gsl_odeiv_control_free(control);
-  gsl_odeiv_step_free   (step);
+  gsl_odeiv_step_free(step);
 
   // If we propagate backwards, reverse momentum 4-vector back to original sign
   if (backwards) {
@@ -392,13 +402,13 @@ void propagate(double* x, double target_z, const BTField* field,
   }
 }
 
-int z_equations_of_motion (double z, const double x[8], double dxdz[8],
+int z_equations_of_motion(double z, const double x[8], double dxdz[8],
                                    void* params) {
   if (fabs(x[7]) < 1e-9) {
   // z-momentum is 0
     return GSL_ERANGE;
   }
-  const double c_l = 299.792458; //mm*ns^{-1}
+  const double c_l = 299.792458; // mm*ns^{-1}
   double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double xfield[4] = {x[1], x[2], x[3], x[0]};
   _field->GetFieldValue(xfield, field);

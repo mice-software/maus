@@ -18,6 +18,7 @@
 # pylint: disable = C0103
 
 import os
+import json
 import unittest
 from Configuration import Configuration
 import maus_cpp.converter
@@ -39,18 +40,25 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertTrue("errors" in doc)
         self.assertTrue("MapCppGlobalTrackMatching" in doc["errors"])
 
-    def test_init(self):
-        """Check birth with default configuration"""
-        self.mapper.birth(self. c.getConfigJSON())
-    
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
-        test1 = ('%s/src/map/MapCppGlobalTrackMatching/noDataTest.txt' % 
+        test1 = ('%s/src/map/MapCppGlobalTrackMatching/nodata.json' % 
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         data = fin.read()
         # test with no data.
-        self.mapper.birth(self.c.getConfigJSON())
+        ###
+        # self.mapper.birth(self.c.getConfigJSON())
+        test_configuration = self.c.getConfigJSON()
+        test_conf_json = json.loads(test_configuration)
+        test_conf_json['reconstruction_geometry_filename'] = (
+            os.environ.get("MAUS_ROOT_DIR") +
+            "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
+        test_conf_json['simulation_geometry_filename'] = \
+            test_conf_json['reconstruction_geometry_filename']
+        test_configuration = json.dumps(test_conf_json)
+        self.mapper.birth(test_configuration)
+        ###
         result = self.mapper.process(data)
         spill_out = maus_cpp.converter.json_repr(result)
         self.assertFalse('global_event' in spill_out)
@@ -61,14 +69,11 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
                  os.environ.get("MAUS_ROOT_DIR"))
         fin1 = open(test2,'r')
         data = fin1.read()
-        # test with no data.
         self.assertRaises(ValueError, self.mapper.birth, data)
-        test3 = ('%s/src/map/MapCppGlobalTrackMatching/Global_TM_test.json' %
+        # test with valid data but invalid configuration
+        test3 = ('%s/src/map/MapCppGlobalTrackMatching/testdata.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin2 = open(test3,'r')
-        fin2.readline()
-        fin2.readline()
-        fin2.readline()
         line = fin2.readline()
         result = self.mapper.process(line)
         doc = maus_cpp.converter.json_repr(result)
@@ -76,21 +81,44 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_invalid_json_process(self):
         """Check process with an invalid json input"""
-        self.mapper.birth(self. c.getConfigJSON())
-        test4 = ('%s/src/map/MapCppGlobalTrackMatching/invalid.json' % 
+        ###
+        # self.mapper.birth(self.c.getConfigJSON())
+        test_configuration = self.c.getConfigJSON()
+        test_conf_json = json.loads(test_configuration)
+        test_conf_json['reconstruction_geometry_filename'] = (
+            os.environ.get("MAUS_ROOT_DIR") +
+            "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
+        test_conf_json['simulation_geometry_filename'] = \
+            test_conf_json['reconstruction_geometry_filename']
+        test_configuration = json.dumps(test_conf_json)
+        self.mapper.birth(test_configuration)
+        ###
+        test3 = ('%s/src/map/MapCppGlobalTrackMatching/invalid.json' % 
                  os.environ.get("MAUS_ROOT_DIR"))
-        fin = open(test4,'r')
+        fin = open(test3,'r')
         data = fin.read()
         result = self.mapper.process(data)
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalTrackMatching" in doc["errors"])
 
-    def test_fill_Global_Event(self):
+    def test_fill_Global_Event(self): # pylint: disable = R0914
         """Check that process makes global tracks from TOF and tracker data"""
-        test5 = ('%s/src/map/MapCppGlobalTrackMatching/global_tm_test.json' %
+        test4 = ('%s/src/map/MapCppGlobalTrackMatching/testdata.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
-        self.mapper.birth(self. c.getConfigJSON())
-        fin = open(test5,'r')
+        ###
+        # self.mapper.birth(self.c.getConfigJSON())
+        test_configuration = self.c.getConfigJSON()
+        test_conf_json = json.loads(test_configuration)
+        test_conf_json['reconstruction_geometry_filename'] = (
+            os.environ.get("MAUS_ROOT_DIR") +
+            "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
+        test_conf_json['simulation_geometry_filename'] = \
+            test_conf_json['reconstruction_geometry_filename']
+        test_conf_json['track_matching_pid_hypothesis'] = "kMuPlus"
+        test_configuration = json.dumps(test_conf_json)
+        self.mapper.birth(test_configuration)
+        ###
+        fin = open(test4,'r')
         line = fin.read()
         result = self.mapper.process(line)
         spill_out = maus_cpp.converter.json_repr(result)
@@ -100,24 +128,31 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         revt = revtarray[0]
         self.assertTrue('global_event' in revt)
         self.assertTrue('track_points' in revt['global_event'])
-        numTMtrackpoints = 0
+        num_us_trackpoints = 0
+        num_ds_trackpoints = 0
         for i in revt['global_event']['track_points']:
             self.assertTrue('mapper_name' in i)
-            if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                numTMtrackpoints += 1
-        self.assertEqual(numTMtrackpoints, 30)
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching-US':
+                num_us_trackpoints += 1
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching-DS':
+                num_ds_trackpoints += 1
+        self.assertEqual(num_us_trackpoints, 3)
+        self.assertEqual(num_ds_trackpoints, 4)
         self.assertTrue('tracks' in revt['global_event'])
-        self.assertEqual(3, len(revt['global_event']['tracks']))
-        numTMtracks = 0
+        num_us_tracks = 0
+        num_ds_tracks = 0
+        num_through_tracks = 0
         for i in revt['global_event']['tracks']:
             self.assertTrue('mapper_name' in i)
-            if i['mapper_name'] == 'MapCppGlobalTrackMatching':
-                numTMtracks += 1
-        self.assertEqual(numTMtracks, 1)
-        self.assertTrue('space_points' in revt['global_event'])
-        self.assertEqual(33, len(revt['global_event']['space_points']))
-        self.assertTrue('primary_chains' in revt['global_event'])
-        self.assertEqual(0, len(revt['global_event']['primary_chains']))
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching-US':
+                num_us_tracks += 1
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching-DS':
+                num_ds_tracks += 1
+            if i['mapper_name'] == 'MapCppGlobalTrackMatching-Through':
+                num_through_tracks += 1
+        self.assertEqual(num_us_tracks, 1)
+        self.assertEqual(num_ds_tracks, 1)
+        self.assertEqual(num_through_tracks, 1)
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103

@@ -286,11 +286,14 @@ Track::GetTrackPoints(DetectorPoint detector) const {
     // Need to make sure that requests for the main detector (e.g. Tracker0)
     // return points that are tagged with subdetectors as well
     DetectorPoint tp_main_detector = tp->get_detector();
-    if ((tp_main_detector == kTOF0_1) or (tp_main_detector == kTOF0_2)) {
+    if ((tp_main_detector == kTOF0_1) or
+        (tp_main_detector == kTOF0_2)) {
       tp_main_detector = kTOF0;
-    } else if ((tp_main_detector == kTOF1_1) or (tp_main_detector == kTOF1_2)) {
+    } else if ((tp_main_detector == kTOF1_1) or
+               (tp_main_detector == kTOF1_2)) {
       tp_main_detector = kTOF1;
-    } else if ((tp_main_detector == kTOF2_1) or (tp_main_detector == kTOF2_2)) {
+    } else if ((tp_main_detector == kTOF2_1) or
+               (tp_main_detector == kTOF2_2)) {
       tp_main_detector = kTOF2;
     } else if ((tp_main_detector == kTracker0_1) or
                (tp_main_detector == kTracker0_2) or
@@ -409,7 +412,7 @@ std::vector<std::string> Track::get_geometry_paths() const {
 // Object to hold pid hypotheses and the log-likelihood that they are the
 // correct hypothesis
 void Track::set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair>
-				pid_logL_values) {
+    pid_logL_values) {
   _pid_logL_values = pid_logL_values;
 }
 

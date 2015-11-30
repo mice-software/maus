@@ -25,15 +25,23 @@
 #ifndef _SRC_COMMON_CPP_RECON_GLOBALTOOLS_HH_
 #define _SRC_COMMON_CPP_RECON_GLOBALTOOLS_HH_
 
+// C++ headers
+#include <map>
 #include <vector>
+#include <string>
+
+// Geant4 headers
+#include "Geant4/G4Material.hh"
+
+// MAUS headers
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
 #include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
-#include "Geant4/G4Material.hh"
 
-class BTField; // Forward declaration
+// Forward declaration
+class BTField;
 
 namespace MAUS {
 namespace GlobalTools {
@@ -169,7 +177,7 @@ void propagate(double* x, double target_z, const BTField* field,
 /**
  * @brief Required by GlobalTools::propagate()
  */
-int z_equations_of_motion (double z, const double x[8], double dxdt[8],
+int z_equations_of_motion(double z, const double x[8], double dxdt[8],
                                    void* params);
 
 /**

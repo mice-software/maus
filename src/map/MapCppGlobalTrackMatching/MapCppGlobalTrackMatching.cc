@@ -15,18 +15,20 @@
  *
  */
 
-#include "src/map/MapCppGlobalTrackMatching/MapCppGlobalTrackMatching.hh"
+#include "src/common_cpp/API/PyWrapMapBase.hh"
 
 #include "src/common_cpp/DataStructure/Data.hh"
-#include "Interface/Squeak.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
-#include "src/common_cpp/API/PyWrapMapBase.hh"
-#include "TProcessID.h"
-#include "src/common_cpp/Recon/Global/MCTruthTools.hh"
-#include "src/common_cpp/Recon/Global/GlobalTools.hh"
+#include "src/common_cpp/DataStructure/GlobalEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
 
-#include <ctime>
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/Recon/Global/TrackMatching.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/legacy/Config/MiceModule.hh"
+
+#include "src/map/MapCppGlobalTrackMatching/MapCppGlobalTrackMatching.hh"
 
 namespace MAUS {
 
@@ -40,6 +42,9 @@ namespace MAUS {
   }
 
   void MapCppGlobalTrackMatching::_birth(const std::string& argJsonConfigDocument) {
+    if (!Globals::HasInstance()) {
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
     // Check if the JSON document can be parsed, else return error only.
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
@@ -73,7 +78,6 @@ namespace MAUS {
     _matching_tolerances["TOF12dT"] = std::make_pair(
         tof12_cdt/track_matching_tolerances["TOF12maxSpeed"].asDouble(),
         tof12_cdt/track_matching_tolerances["TOF12minSpeed"].asDouble());
-    std::cerr << tofs.at(0)->globalPosition().z() << " " << tofs.at(1)->globalPosition().z() << " " << tofs.at(2)->globalPosition().z() << "\n"; 
   }
 
   void MapCppGlobalTrackMatching::_death() {

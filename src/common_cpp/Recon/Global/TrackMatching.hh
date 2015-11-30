@@ -18,24 +18,29 @@
 /** @class TrackMatching
  *  @author Jan Greis, University of Warwick
  *  Creates global tracks from a global event.
+ *  @date 2015/11/26
  */
 
 #ifndef _SRC_COMMON_CPP_RECON_TRACKMATCHING_HH_
 #define _SRC_COMMON_CPP_RECON_TRACKMATCHING_HH_
 
 // C++ headers
+#include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 // ROOT headers
-#include "Rtypes.h"
+#include "TLorentzVector.h"
+
+// gtest include for friend-testing
+#include "gtest/gtest_prod.h"
 
 // MAUS headers
-#include "DataStructure/ReconEvent.hh"
-#include "Recon/Global/ImportTOFRecon.hh"
-#include "Recon/Global/ImportSciFiRecon.hh"
-
-#include "gtest/gtest_prod.h"
+#include "src/common_cpp/DataStructure/GlobalEvent.hh"
+#include "src/common_cpp/DataStructure/Global/Track.hh"
+#include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 
 class BTFieldConstructor;
 
@@ -267,7 +272,7 @@ namespace global {
 
     /// Should the RK4 include energy loss
     bool _energy_loss;
-    
+
     /// The global event to be processed
     MAUS::GlobalEvent* _global_event;
 
@@ -281,7 +286,6 @@ namespace global {
     FRIEND_TEST(TrackMatchingTest, USDSTracks);
     FRIEND_TEST(TrackMatchingTest, MatchUSDS);
     FRIEND_TEST(TrackMatchingTest, TOFTimeFromTrackPoints);
-
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon
