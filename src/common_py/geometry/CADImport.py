@@ -16,13 +16,15 @@ M. Littlefield
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+#pylint: disable = R0903, C0103, C0302
+
 import os
 import libxml2
 import libxslt
 import math
 import numpy
 
-class CADImport: #pylint: disable = R0903, C0103, C0302
+class CADImport: 
     """
     @Class CADImport, GDML parser class.
     
@@ -590,11 +592,19 @@ class CADImport: #pylint: disable = R0903, C0103, C0302
                     # to the identity rotation.
                     if len(rotlist):
                         rotation = elem.xpathEval("rotation")[0]
-                        result.append("Rotation "+\
-                                      rotation.prop('x')+" "+\
-                                      rotation.prop('y')+' '+\
-                                      rotation.prop('z')+" "+\
-                                      rotation.prop('unit')+'\n')
+                        if "Tracker" in moduleName and "Station" in moduleName \
+                          and "120" in rotation.prop('z'):
+                            result.append("Rotation "+\
+                                          rotation.prop('x')+" "+\
+                                          rotation.prop('y')+' '+\
+                                          str(-1.*float(rotation.prop('z')))\
+                                            +" "+rotation.prop('unit')+'\n')
+                        else:
+                            result.append("Rotation "+\
+                                          rotation.prop('x')+" "+\
+                                          rotation.prop('y')+' '+\
+                                          rotation.prop('z')+" "+\
+                                          rotation.prop('unit')+'\n')
                     else:
                         # If there is no rotation defined use the
                         # null rotation.
