@@ -1,6 +1,7 @@
 directory=monitor
 filename=lib${directory}.tarz
-url=http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.2.0/${filename}
+# url=http://micewww.pp.rl.ac.uk/maus/MAUS_release_version_1.2.0/${filename}
+url=http://heplnv152.pp.rl.ac.uk/maus/third_party/${filename}
 
 echo
 echo 'INFO: Installing third party library libmonitor'

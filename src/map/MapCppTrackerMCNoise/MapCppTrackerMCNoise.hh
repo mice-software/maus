@@ -20,12 +20,13 @@
  *  Simulate noise in the tracker electronics.
  */
 
-#ifndef _COMPONENTS_MAP_MAPCPPTRACKERMCNOISE_H_
-#define _COMPONENTS_MAP_MAPCPPTRACKERMCNOISE_H_
+#ifndef _COMPONENTS_MAP_MapCppTrackerMCNoise_H_
+#define _COMPONENTS_MAP_MapCppTrackerMCNoise_H_
 
 // C headers
 #include <json/json.h>
 #include <CLHEP/Random/RandPoisson.h>
+#include <CLHEP/Random/RandGauss.h>
 
 // C++ headers
 #include <cmath>
@@ -74,9 +75,17 @@ class MapCppTrackerMCNoise : public MapBase<Data> {
    *  Check each SciFi channel for Dark PEs
    *  adds results to SciFiDigits
    */
-  void dark_count(MAUS::Spill &spill) const;
+  void VLPC_Thermal(MAUS::Spill&, MAUS::SciFiNoiseHitArray*,
+                    unsigned int&, int&) const;
+
+  // @brief Simulates RF X-ray production on background
+  void RF_X_Ray(MAUS::Spill&, MAUS::SciFiNoiseHitArray*,
+                unsigned int&, int&) const;
 
   private:
+  void Poisson_Hits(int&, const double&) const;
+  double _vlpc_rate, vlpc_mean_npe, _rf_ave_act, flux, _rf_mag, _rf_sdev;
+  int _vlpc_sim_on, _rf_sim_on;
   // MapCppMCNoise setup containers
   /// This will contain the configuration
   Json::Value* _configJSON;
@@ -84,8 +93,6 @@ class MapCppTrackerMCNoise : public MapBase<Data> {
   std::string argJsonConfigDocument;
   /// This will contain all SciFi elements in MICE
   std::vector<const MiceModule*> SF_modules;
-  /// Mean number of dark count PE
-  double _poisson_mean;
 };
 } // end namespace
 

@@ -5,6 +5,18 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v1.3.0
+  The following changes were made:
+    - Extensive updates to the EMR
+    - TOF calibration code updates
+    - Tracker kalman fit updates
+    - Geometry updates
+    - Building GCC as a third party now the default
+    - C++11 build flag added (developers may now use C++11)
+    - Main memory leak removed
+    - Third party libraries tarball locations updated
+    - Debugging output cleaned up
+    - Documentation updated
 MAUS-v1.2.0
   The following changes were made:
     - TOF Cpp reducer added
