@@ -74,6 +74,7 @@ namespace MAUS {
   public:
     /** Constructor, setting the internal variable #_classname */
     MapCppGlobalPID();
+    ~MapCppGlobalPID();
 
   private:
     /** @brief Sets up the worker

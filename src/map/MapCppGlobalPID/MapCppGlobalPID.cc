@@ -36,6 +36,9 @@ namespace MAUS {
      : MapBase<Data>("MapCppGlobalPID"), _configCheck(false) {
   }
 
+  MapCppGlobalPID::~MapCppGlobalPID() {
+  }
+
   void MapCppGlobalPID::_birth(const std::string& argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.
     _configCheck = false;

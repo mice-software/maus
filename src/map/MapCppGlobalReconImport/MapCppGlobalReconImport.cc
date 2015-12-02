@@ -34,9 +34,8 @@ namespace MAUS {
     : MapBase<Data>("MapCppGlobalReconImport"), _configCheck(false) {
   }
 
-  /*MapCppGlobalReconImport::~MapCppGlobalReconImport() {
-    std::cerr << "are we getting a destructor here?" << std::endl;
-    }*/
+  MapCppGlobalReconImport::~MapCppGlobalReconImport() {
+  }
 
   void MapCppGlobalReconImport::_birth(const std::string& argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.

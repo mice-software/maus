@@ -60,6 +60,7 @@ namespace MAUS {
   public:
     /** Constructor, setting the internal variable #_classname */
     MapCppGlobalTrackMatching();
+    ~MapCppGlobalTrackMatching();
 
   private:
     /** Sets up the worker
