@@ -57,24 +57,6 @@ namespace MAUS {
     
     _configCheck = true;
     _classname = "MapCppGlobalReconImport";
-    // get the geometry
-    if (!_configJSON.isMember("reconstruction_geometry_filename"))
-      throw(Exception(Exception::recoverable,
-		      "Could not find geometry file",
-		      "MapCppGlobalReconImport::birth"));
-    geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
-    //get EMR offsets
-    // Use these values to adjust the hit positions from local reconstruction
-    // to the global coordinate system
-    MiceModule* geo_module = new MiceModule(geo_filename);
-    std::vector<const MiceModule*> emr_modules = geo_module->findModulesByPropertyString("SensitiveDetector", "EMR");
-    const MiceModule* emr_module = emr_modules[0];
-    x_ref = emr_module->globalPosition().getX();
-    y_ref = emr_module->globalPosition().getY();
-    z_ref = emr_module->globalPosition().getZ() + (1584/2);
-
-    delete geo_module;
-
   }
 
   void MapCppGlobalReconImport::_death() {
@@ -132,8 +114,7 @@ namespace MAUS {
 	if (recon_event->GetEMREvent()) {
 	  MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
 	  MAUS::recon::global::ImportEMRRecon emrrecon_importer;
-	  emrrecon_importer.process((*emr_event), global_event, _classname,
-				    x_ref, y_ref, z_ref);
+	  emrrecon_importer.process((*emr_event), global_event, _classname);
 	}
       }
     }

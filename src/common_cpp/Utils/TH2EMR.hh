@@ -66,6 +66,15 @@ class TH2EMR {
     /** Sets the bin content corresponding to bar j of plane i an additional hit */
     void SetBinContent(int i, int j, double w);
 
+    /** Gets the content of the maximum bin */
+    double GetMaximum();
+
+    /** Gets the content of the maximum bin */
+    double GetMinimum();
+
+    /** Returns a pointer to the TH2Poly created by this class */
+    TH2Poly* GetHistogram();
+
     /** Save the two histograms to a root file **/
     void Write();
 

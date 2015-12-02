@@ -24,11 +24,16 @@ Module BeamLine
 		Position 0. 0. -3.89955 m
 		Rotation 0. 0. 0. degree
 	}
-	Module Ckov/Cherenkov.dat
-	{
-		Position 0. 0. -3.15455 m
+        Module Ckov/Ckov1.dat
+        {    
+                Position 0. 0. -3.541201 m
 		Rotation 0. 0. 0. degree
-	}
+        }
+        Module Ckov/Ckov2.dat
+        {
+                Position 0. 0. -3.10874 m
+		Rotation 0. 0. 0. degree
+        }
 	Module BeamLine/DSAWestWall.dat
 	{
 		Position 0. 0. -2.19645 m

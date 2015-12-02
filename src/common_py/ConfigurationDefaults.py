@@ -99,7 +99,7 @@ keep_only_muon_tracks = False
 keep_tracks = False # set to true to keep start and end point of every track
 keep_steps = False # set to true to keep start and end point of every track and
                    # every step point
-# simulation_geometry_filename = "Stage4.dat" # geometry used by simulation - should be replaced by CDB version
+#simulation_geometry_filename = "Stage4.dat" # geometry used by simulation - should be replaced by CDB version
 simulation_geometry_filename = "Test.dat" # geometry used by simulation - should be replaced by CDB version
 simulation_geometry_debug    = False
 check_volume_overlaps = False
@@ -286,8 +286,10 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
-SciFiPRHelicalOn = True # Flag to turn on the tracker helical pattern recognition
-SciFiPRStraightOn = True # Flag to turn on the tracker straight pattern recognition
+SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
@@ -397,6 +399,7 @@ tracker0_file_number = "Iges_17"
 tracker1_file_number = "Iges_18"
 absorber0_file_number = "9999"
 absorber1_file_number = "Iges_16"
+# absorber1_file_number = "9999"
 absorber2_file_number = "9999"
 
 # Survey fit information
@@ -507,7 +510,6 @@ EMRattenWLSf = 2.0 # dB/m, attentuation factor of the WLS fibres
 EMRattenCLRf = 0.35 # dB/m, attentuation factor of the clear fibres
 EMRspillWidth = 4000000 # DBB counts
 EMRbirksConstant = 0.126 # mm/MeV
-EMRaveragePathLength = 17 # mm
 EMRsignalEnergyThreshold = 0.8 # Me
 EMRfom = "median" # figure_Of-Merit for signal calibration
 
@@ -516,21 +518,25 @@ EMRqeMAPMT = 0.25 # MAPMT quantum efficiency
 EMRnadcPerPeMAPMT = 8 # number of ADC counts per photoelectron in the MAPMT
 EMRelectronicsResponseSpreadMAPMT = 8 # ADC counts
 EMRtimeResponseSpread = 1 # ADC counts
-EMRtotFuncP1 = -60.5 
-EMRtotFuncP2 = 15.0
-EMRtotFuncP3 = 70.0
-EMRtotFuncP4 = 2.0 # time over threshold vs charge logarithmic fit parameters
+#EMRtotFuncP1 = 15.0 # Step I
+#EMRtotFuncP2 = 0.0089 # Step I
+#EMRtotFuncP3 = 1.24 # Step I
+EMRtotFuncP1 = 13.65 # Step IV
+EMRtotFuncP2 = 0.0127 # Step IV
+EMRtotFuncP3 = 1.38 # Step IV
 EMRdeltatShift = 12 # ADC counts, distance from the trigger
 
 EMRfadcCount = 2.0 # ns, duration of an fADC cycle (f=500MHz)
-EMRqeSAPMT = 0.11 # SAPMT quantum efficiency
-EMRnadcPerPeSAPMT = 10 # number of ADC counts per photoelectron in the SAPMT
-EMRelectronicsResponseSpreadSAPMT = 1 # ADC count
+#EMRqeSAPMT = 0.11 # SAPMT quantum efficiency
+EMRqeSAPMT = 0.24 # SAPMT quantum efficiency
+#EMRnadcPerPeSAPMT = 2 # number of ADC counts per photoelectron in the SAPMT, Step I
+EMRnadcPerPeSAPMT = 4 # number of ADC counts per photoelectron in the SAPMT, Step IV
+EMRelectronicsResponseSpreadSAPMT = 1 # ADC count, Step I
 EMRbaselinePosition = 123 # SAPMT signal baseline
 EMRbaselineSpread = 10 # SAPMT signal baseline spread
 EMRmaximumNoiseLevel = 50 # SAPMT noise maximum value
 EMRacquisitionWindow = 302 # ADC counts
-EMRsignalIntegrationWindow = 40
+EMRsignalIntegrationWindow = 40 # ADC counts
 EMRarrivalTimeShift = 40
 EMRarrivalTimeSpread = 33
 EMRarrivalTimeGausWidth = 3
@@ -551,16 +557,20 @@ EMRsecondaryTriggerMinTot = 4
 
 EMRmaxSecondaryToPrimaryTrackDistance = 80
 
+EMRdensityCut = 0.9
+EMRchi2Cut = 2
+
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 
-# this sets the source for the calibrations
+# this sets the source for the calibrations and cabling
 # by default it is from CDB
 # set it to 'file' if you want to load local files
 # if you set file, then uncomment the calib files below
 TOF_calib_source = "CDB"
+TOF_cabling_source = "CDB"
 
-TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
@@ -570,10 +580,11 @@ TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePointCut = 0.5 # nanosecond
 
-# get calibrations by either a) run_number or b) date
+# get cabling and calibrations by either a) run_number or b) date
 # default is by run_number
 # if set to "date" then set the appropriate TOF_calib_date_from flag below
 TOF_calib_by = "run_number"
+TOF_cabling_by = "run_number"
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
@@ -610,8 +621,8 @@ EMR_connector_attenuation_map = "/files/cabling/EMRConnectorAttenuationMap.txt"
 # this sets the source of the calibrations for the EMR detector
 EMR_calib_source = "CDB"
 EMR_calib_date_from = 'current'
-# uncomment the EMR_calibration_file card below if you set EMR_calib_source=file
-#EMR_calib_file = "/files/calibration/emrcalib_cosmics_march2014.txt"
+# EMR_calibration_file card below if you set EMR_calib_source=file
+EMR_calib_file = "/files/calibration/emrcalib_cosmics_july2015.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
 daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
@@ -630,14 +641,16 @@ mongodb_collection_name = "spills" # Default MongoDB collection name. Only neede
 
 # in multiprocessing mode, the timeout after which reconstruction of an event will be abandonded [s]
 reconstruction_timeout = 10
-# refresh rate for refreshing plots
-reduce_plot_refresh_rate = 5
+# refresh rate for refreshing the plots
+reduce_plot_refresh_rate = 10
 # Default OutputPyImage image directory. MAUS web application directory.
 image_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default OutputPyImage image directory for end of run data. Will end up as image_directory+"/end_of_run/"
 end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
+# Default image types of OutputCppRootImage
+image_types = ['png'] 
 
 PolynomialOpticsModel_order = 1
 PolynomialOpticsModel_algorithms = ["LeastSquares",

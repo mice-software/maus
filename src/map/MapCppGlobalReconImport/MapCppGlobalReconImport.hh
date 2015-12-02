@@ -97,12 +97,6 @@ namespace MAUS {
     Json::Reader _reader;
     /// Mapper name, useful for tracking results...
     std::string _classname;
-    /// Geometry file name
-    std::string geo_filename;
-    /// EMR offsets to go from local to global positions
-    double x_ref;
-    double y_ref;
-    double z_ref;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

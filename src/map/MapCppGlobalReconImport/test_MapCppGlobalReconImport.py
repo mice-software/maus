@@ -27,7 +27,6 @@ from _MapCppGlobalReconImport import MapCppGlobalReconImport
 
 class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalReconImport"""
-    config = json.loads(Configuration().getConfigJSON())
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
@@ -89,15 +88,9 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_fill_Global_Event(self):
         """Check that process fills global events from detector data"""
-        path_to_geom = ('%s/files/geometry/download/ParentGeometryFile.dat' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        if os.path.isfile(path_to_geom):
-            self.config['reconstruction_geometry_filename'] = path_to_geom
-        else:
-            self.config['reconstruction_geometry_filename'] = "Stage4.dat"
         test5 = ('%s/src/map/MapCppGlobalReconImport/global_import_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
-        self.mapper.birth(json.dumps(self.config))
+        self.mapper.birth(self.c.getConfigJSON())
         fin = open(test5,'r')
         line = fin.read()
         result = self.mapper.process(line)
@@ -108,17 +101,17 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         revt = revtarray[0]
         self.assertTrue('global_event' in revt)
         self.assertTrue('track_points' in revt['global_event'])
-        self.assertEqual(36, len(revt['global_event']['track_points']))
+        self.assertEqual(30, len(revt['global_event']['track_points']))
         for i in revt['global_event']['track_points']:
             self.assertTrue('mapper_name' in i)
             self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
         self.assertTrue('tracks' in revt['global_event'])
-        self.assertEqual(3, len(revt['global_event']['tracks']))
+        self.assertEqual(2, len(revt['global_event']['tracks']))
         for i in revt['global_event']['tracks']:
             self.assertTrue('mapper_name' in i)
             self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
         self.assertTrue('space_points' in revt['global_event'])
-        self.assertEqual(40, len(revt['global_event']['space_points']))
+        self.assertEqual(36, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
         self.assertEqual(0, len(revt['global_event']['primary_chains']))
 

@@ -27,8 +27,7 @@ namespace global {
 
   void ImportEMRRecon::process(const MAUS::EMREvent &emr_event,
 			       MAUS::GlobalEvent* global_event,
-			       std::string mapper_name, double x_ref,
-			       double y_ref, double z_ref) {
+			       std::string mapper_name) {
 
     double x;
     double y;
@@ -43,15 +42,10 @@ namespace global {
     if (emr_event.GetHasPrimary()) {
       MAUS::DataStructure::Global::Track* PrimaryEMRTrack =
 	new MAUS::DataStructure::Global::Track();
-      PrimaryEMRTrack->set_emr_range_primary(emr_event.GetRangePrimary());
-      PrimaryEMRTrack->set_emr_plane_density(emr_event.GetPlaneDensity());
-      PrimaryEMRTrack->SetDetector(MAUS::DataStructure::Global::kEMR);
-      PrimaryEMRTrack->set_mapper_name("MapCppGlobalReconImport");
-      global_event->add_track(PrimaryEMRTrack);
       MAUS::DataStructure::Global::Track* SecondaryEMRTrack =
 	new MAUS::DataStructure::Global::Track();
       PrimaryEMRTrack->set_emr_range_primary(emr_event.GetRangePrimary());
-      PrimaryEMRTrack->set_emr_plane_density(emr_event.GetPlaneDensity());
+      PrimaryEMRTrack->set_emr_plane_density(emr_event.GetPlaneDensityMA());
       // Plane hit array
       MAUS::EMRPlaneHitArray plane_hit_array = emr_event.GetEMRPlaneHitArray();
       if (plane_hit_array.size() > 0) {
@@ -59,27 +53,21 @@ namespace global {
 	for (plane_hit_iter = plane_hit_array.begin();
 	     plane_hit_iter != plane_hit_array.end();
 	     ++plane_hit_iter) {
-	  // Plane hit (sets z)
-	  //MAUS::EMRPlaneHit* plane_hit = (*plane_hit_iter);
 	  // Primary Bar array
 	  MAUS::EMRBarArray primary_bar_array =  (*plane_hit_iter)->GetEMRBarArrayPrimary();
 	  MAUS::EMRBarArray::iterator primary_bar_iter;
 	  for (primary_bar_iter = primary_bar_array.begin();
 	       primary_bar_iter != primary_bar_array.end();
 	       ++primary_bar_iter) {
-	    //MAUS::EMRBar* emr_bar = (*primary_bar_iter);
 	    // Bar hit array
 	    MAUS::EMRBarHitArray bar_hit_array =  (*primary_bar_iter)->GetEMRBarHitArray();
 	    MAUS::EMRBarHitArray::iterator bar_hit_iter;
 	    for (bar_hit_iter = bar_hit_array.begin();
 		 bar_hit_iter != bar_hit_array.end();
 		 ++bar_hit_iter) {
-	      // Bar hit (get x and y)
-	      //MAUS::EMRBarHit bar_hit = (*bar_hit_iter);
-	      // EMR coordinate system should now match MICE coordinate system
-	      x = (*bar_hit_iter).GetX() + x_ref;
-	      y = (*bar_hit_iter).GetY() + y_ref;
-	      z = (*bar_hit_iter).GetZ() + z_ref;
+	      x = (*bar_hit_iter).GetGlobalX();
+	      y = (*bar_hit_iter).GetGlobalY();
+	      z = (*bar_hit_iter).GetGlobalZ();
 	      TLorentzVector pos(x, y, z, t);
 	      x_err = (*bar_hit_iter).GetErrorX();
 	      y_err = (*bar_hit_iter).GetErrorY();
@@ -110,19 +98,15 @@ namespace global {
 	      for (secondary_bar_iter = secondary_bar_array.begin();
 		   secondary_bar_iter != secondary_bar_array.end();
 		   ++secondary_bar_iter) {
-		//MAUS::EMRBar* emr_bar = (*secondary_bar_iter);
 		// Bar hit array
 		MAUS::EMRBarHitArray bar_hit_array =  (*secondary_bar_iter)->GetEMRBarHitArray();
 		MAUS::EMRBarHitArray::iterator bar_hit_iter;
 		for (bar_hit_iter = bar_hit_array.begin();
 		     bar_hit_iter != bar_hit_array.end();
 		     ++bar_hit_iter) {
-		  // Bar hit (get x and y)
-		  //MAUS::EMRBarHit bar_hit = (*bar_hit_iter);
-		  // EMR coordinate system should now match MICE coordinate system
-		  x = (*bar_hit_iter).GetX() + x_ref;
-		  y = (*bar_hit_iter).GetY() + y_ref;
-		  z = (*bar_hit_iter).GetZ() + z_ref;
+		  x = (*bar_hit_iter).GetGlobalX();
+		  y = (*bar_hit_iter).GetGlobalY();
+		  z = (*bar_hit_iter).GetGlobalZ();
 		  TLorentzVector pos(x, y, z, t);
 		  x_err = (*bar_hit_iter).GetErrorX();
 		  y_err = (*bar_hit_iter).GetErrorY();

@@ -24,10 +24,12 @@
 #include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
 
 namespace MAUS {
-CanvasWrapper::CanvasWrapper() : _description(""), _canvas(NULL) {
+CanvasWrapper::CanvasWrapper()
+    : _description(""), _file_tag(""), _canvas(NULL) {
 }
 
-CanvasWrapper::CanvasWrapper(const CanvasWrapper& data) : _canvas(NULL) {
+CanvasWrapper::CanvasWrapper(const CanvasWrapper& data)
+    : _description(""), _file_tag(""), _canvas(NULL) {
     *this = data;
 }
 
@@ -35,6 +37,7 @@ CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
     if (this == &rhs)
         return *this;
     _description = rhs._description;
+    _file_tag = rhs._file_tag;
     if (_canvas != NULL)
         delete _canvas;
     if (rhs._canvas != NULL) {

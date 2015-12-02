@@ -58,11 +58,6 @@ Configuration Stage6
     Position 0. 0. 6.5245 m
     Rotation 0. 0. 0. degree
   }  
-  Module Ckov/Ckov2.dat
-  {
-    Position 0. 0. 6.5245 m
-    Rotation 0. 0. 0. degree
-  }  
   Module KL/KL.dat
   {
     Position 0. 0. 6.5392 m
