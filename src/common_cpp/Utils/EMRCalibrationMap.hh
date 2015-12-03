@@ -92,6 +92,9 @@ class EMRCalibrationMap {
 
  private:
 
+  /** Use this function to reset the map before reloading. */
+  void reset();
+
  /** Make one EMRChannelKey for each channel of the detector.
   * All EMRChannelKeys are held in the data member _Ckey.
   */

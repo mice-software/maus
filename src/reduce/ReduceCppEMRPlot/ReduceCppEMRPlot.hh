@@ -59,6 +59,8 @@ class ReduceCppEMRPlot : public ReduceBase<Data, ImageData> {
 
   int GetRefreshRate() const {return _refresh_rate;}
 
+  void reset();
+
  private:
 
   void _birth(const std::string& argJsonConfigDocument);
@@ -66,8 +68,6 @@ class ReduceCppEMRPlot : public ReduceBase<Data, ImageData> {
   void _death();
 
   void _process(Data* data);
-
-  void reset();
 
   void update();
 
