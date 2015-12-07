@@ -33,7 +33,7 @@
 namespace MAUS {
 
   PyMODINIT_FUNC init_MapCppGlobalTrackMatching(void) {
-    PyWrapMapBase<MAUS::MapCppGlobalTrackMatching>::PyWrapMapBaseModInit
+    PyWrapMapBase<MapCppGlobalTrackMatching>::PyWrapMapBaseModInit
                                     ("MapCppGlobalTrackMatching", "", "", "", "");
   }
 
@@ -49,9 +49,9 @@ namespace MAUS {
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "Failed to parse configuration",
-                              "MapCppGlobalTrackMatching::birth");
+        throw Exception(Exception::recoverable,
+                        "Failed to parse configuration",
+                        "MapCppGlobalTrackMatching::birth");
     }
     _configCheck = true;
     _mapper_name = "MapCppGlobalTrackMatching";
@@ -83,35 +83,34 @@ namespace MAUS {
   void MapCppGlobalTrackMatching::_death() {
   }
 
-  void MapCppGlobalTrackMatching::_process(MAUS::Data* data_cpp) const {
+  void MapCppGlobalTrackMatching::_process(Data* data_cpp) const {
     // Read string and convert to a Json object
     if (!data_cpp) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "data_cpp was NULL",
-                              "MapCppGlobalTrackMatching::_process");
+        throw Exception(Exception::recoverable,
+                        "data_cpp was NULL",
+                        "MapCppGlobalTrackMatching::_process");
     }
     if (!_configCheck) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "Birth has not been successfully called",
-                              "MapCppGlobalTrackMatching::_process");
+        throw Exception(Exception::recoverable,
+                        "Birth has not been successfully called",
+                        "MapCppGlobalTrackMatching::_process");
     }
-    const MAUS::Spill* spill = data_cpp->GetSpill();
+    const Spill* spill = data_cpp->GetSpill();
 
-    MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
+    ReconEventPArray* recon_events = spill->GetReconEvents();
     if (!recon_events) {
       return;
     }
 
-    MAUS::ReconEventPArray::iterator recon_event_iter;
-    for (recon_event_iter = recon_events->begin();
+    for (auto recon_event_iter = recon_events->begin();
          recon_event_iter != recon_events->end();
          ++recon_event_iter) {
       // Load the ReconEvent, and import it into the GlobalEvent
-      MAUS::ReconEvent* recon_event = (*recon_event_iter);
-      MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+      ReconEvent* recon_event = (*recon_event_iter);
+      GlobalEvent* global_event = recon_event->GetGlobalEvent();
 
       if (global_event) {
-        MAUS::recon::global::TrackMatching
+        recon::global::TrackMatching
             track_matching(global_event, _mapper_name, _pid_hypothesis_string,
                            _matching_tolerances, 10.0, _energy_loss);
         track_matching.USTrack();

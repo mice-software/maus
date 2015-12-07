@@ -53,8 +53,8 @@ namespace GlobalTools {
  * 
  * @param global_event The global event
  */
-std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
-    GetReconDetectors(MAUS::GlobalEvent* global_event);
+std::map<DataStructure::Global::DetectorPoint, bool>
+    GetReconDetectors(GlobalEvent* global_event);
 
 /**
  * @brief Returns a vector of all Tracks in the Spill (i.e. across recon events
@@ -65,9 +65,19 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
  * @param detector Detector enum for the selection
  * @param mapper_name Mapper name for the selection
  */
-std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
-    MAUS::Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector,
-     std::string mapper_name);
+std::vector<DataStructure::Global::Track*>* GetSpillDetectorTracks(
+    Spill* spill, DataStructure::Global::DetectorPoint detector,
+    std::string mapper_name);
+
+/**
+ * @brief Returns a vector of all SpacePoints in a spill (i.e. across recon
+ * events) for a given detector
+ * 
+ * @param spill The spill
+ * @param detector Detector enum for the selection
+ */
+std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
+    Spill* spill, DataStructure::Global::DetectorPoint detector);
 
 /**
  * @brief Returns a vector of all Tracks in in the global event with the given
@@ -76,9 +86,8 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
  * @param global_even The global event
  * @param mapper_name Mapper name for the selection
  */
-std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
-    MAUS::GlobalEvent* global_event,
-    std::string mapper_name);
+std::vector<DataStructure::Global::Track*>* GetTracksByMapperName(
+    GlobalEvent* global_event, std::string mapper_name);
 
 /**
  * @brief Returns a vector of all Tracks in in the global event with the given
@@ -88,10 +97,9 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
  * @param mapper_name Mapper name for the selection
  * @param pid PID for the selection
  */
-std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
-    MAUS::GlobalEvent* global_event,
-    std::string mapper_name,
-    MAUS::DataStructure::Global::PID pid);
+std::vector<DataStructure::Global::Track*>* GetTracksByMapperName(
+    GlobalEvent* global_event, std::string mapper_name,
+    DataStructure::Global::PID pid);
 
 /**
  * @brief Returns a vector of ints denoting the tracker plane of a TrackPoint.
@@ -105,7 +113,7 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
  *
  * @see GetTrackerPlaneZPositions()
  */
-std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
+std::vector<int> GetTrackerPlane(const DataStructure::Global::TrackPoint*
     track_point, std::vector<double> z_positions);
 
 /**
@@ -119,16 +127,6 @@ std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
 std::vector<double> GetTrackerPlaneZPositions(std::string geo_filename);
 
 /**
- * @brief Returns a vector of all SpacePoints in a spill (i.e. across recon
- * events) for a given detector
- * 
- * @param spill The spill
- * @param detector Detector enum for the selection
- */
-std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
-    Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector);
-
-/**
  * @brief Returns the TrackPoint from a Track that is nearest to a given z
  * position.
  *
@@ -139,8 +137,8 @@ std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
  * @param z_position The z position to which the nearest TrackPoint should be
  * returned
  */
-MAUS::DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
-    const MAUS::DataStructure::Global::Track* track, double z_position);
+DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
+    const DataStructure::Global::Track* track, double z_position);
 
 /**
  * @brief Checks whether two numbers are the same to within a given tolerance
@@ -171,14 +169,14 @@ double dEdx(const G4Material* material, double energy, double mass);
  * @param energy_loss whether energy loss should be calculated
  */
 void propagate(double* x, double target_z, const BTField* field,
-               double step_size, MAUS::DataStructure::Global::PID pid,
+               double step_size, DataStructure::Global::PID pid,
                bool energy_loss = true);
 
 /**
  * @brief Required by GlobalTools::propagate()
  */
 int z_equations_of_motion(double z, const double x[8], double dxdt[8],
-                                   void* params);
+                          void* params);
 
 /**
  * @brief Scales the 4-momentum of the 8-vector to decrease the energy by deltaE
@@ -193,8 +191,8 @@ void changeEnergy(double* x, double deltaE, double mass);
  * @brief Returns whether the first TrackPoint has a lower z-position than the
  * second one. Used to perform an std::sort on a vector of TrackPoints.
  */
-bool TrackPointSort(const MAUS::DataStructure::Global::TrackPoint* tp1,
-                    const MAUS::DataStructure::Global::TrackPoint* tp2);
+bool TrackPointSort(const DataStructure::Global::TrackPoint* tp1,
+                    const DataStructure::Global::TrackPoint* tp2);
 } // namespace GlobalTools
 } // namespace MAUS
 

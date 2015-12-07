@@ -29,12 +29,10 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-TrackMatching::TrackMatching(MAUS::GlobalEvent* global_event,
-                             std::string mapper_name,
-                             std::string pid_hypothesis_string,
-                             std::map<std::string, std::pair<double, double> >
-                             matching_tolerances, double max_step_size,
-                             bool energy_loss) {
+TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
+    std::string pid_hypothesis_string,
+    std::map<std::string, std::pair<double, double> > matching_tolerances,
+    double max_step_size, bool energy_loss) {
   _global_event = global_event;
   _mapper_name = mapper_name;
   _pid_hypothesis_string = pid_hypothesis_string;
@@ -45,39 +43,37 @@ TrackMatching::TrackMatching(MAUS::GlobalEvent* global_event,
 
 void TrackMatching::USTrack() {
   // Get all Tracker 0 tracks
-  MAUS::DataStructure::Global::TrackPArray *scifi_track_array =
-      GetDetectorTrackArray(MAUS::DataStructure::Global::kTracker0);
+  DataStructure::Global::TrackPArray *scifi_track_array =
+      GetDetectorTrackArray(DataStructure::Global::kTracker0);
   // Get Spacepoints for TOF0/1 and convert them to TrackPoints
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> TOF0_tp =
-      GetDetectorTrackPoints(MAUS::DataStructure::Global::kTOF0, _mapper_name);
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> TOF1_tp =
-      GetDetectorTrackPoints(MAUS::DataStructure::Global::kTOF1, _mapper_name);
+  std::vector<DataStructure::Global::TrackPoint*> TOF0_tp =
+      GetDetectorTrackPoints(DataStructure::Global::kTOF0, _mapper_name);
+  std::vector<DataStructure::Global::TrackPoint*> TOF1_tp =
+      GetDetectorTrackPoints(DataStructure::Global::kTOF1, _mapper_name);
 
   // Load the magnetic field for RK4 propagation
-  BTFieldConstructor* field = MAUS::Globals::GetMCFieldConstructor();
+  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   // Iterate over all Tracker0 Tracks (typically 1)
-  MAUS::DataStructure::Global::TrackPArray::iterator scifi_track_iter;
-  for (scifi_track_iter = scifi_track_array->begin();
+  for (auto scifi_track_iter = scifi_track_array->begin();
        scifi_track_iter != scifi_track_array->end();
        ++scifi_track_iter) {
     // Pull out the track so we're not making a mess with ressources
-    MAUS::DataStructure::Global::Track* tracker0_track =
-        (*scifi_track_iter);
+    DataStructure::Global::Track* tracker0_track = (*scifi_track_iter);
     // Extract four-position and momentum from first track point (i.e. most
     // upstream)
-    MAUS::DataStructure::Global::TrackPoint* first_tracker_tp =
+    DataStructure::Global::TrackPoint* first_tracker_tp =
         GlobalTools::GetNearestZTrackPoint(tracker0_track, 0);
     TLorentzVector position = first_tracker_tp->get_position();
     TLorentzVector momentum = first_tracker_tp->get_momentum();
     delete first_tracker_tp;
     // Create the list of PIDs for which we want to create hypothesis tracks
     int charge_hypothesis = tracker0_track->get_charge();
-    std::vector<MAUS::DataStructure::Global::PID> pids = PIDHypotheses(
+    std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
         charge_hypothesis, _pid_hypothesis_string);
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
-      MAUS::DataStructure::Global::Track* hypothesis_track =
-          new MAUS::DataStructure::Global::Track();
+      DataStructure::Global::Track* hypothesis_track =
+          new DataStructure::Global::Track();
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching-US");
       hypothesis_track->set_pid(pids[i]);
       MatchTrackPoint(position, momentum, TOF0_tp, pids[i], field, "TOF0",
@@ -100,41 +96,38 @@ void TrackMatching::USTrack() {
 
 void TrackMatching::DSTrack() {
   // Get all Tracker 1 tracks
-  MAUS::DataStructure::Global::TrackPArray *scifi_track_array =
-      GetDetectorTrackArray(MAUS::DataStructure::Global::kTracker1);
+  DataStructure::Global::TrackPArray *scifi_track_array =
+      GetDetectorTrackArray(DataStructure::Global::kTracker1);
   // Get all EMR tracks
-  MAUS::DataStructure::Global::TrackPArray *emr_track_array =
-      GetDetectorTrackArray(MAUS::DataStructure::Global::kEMR);
+  DataStructure::Global::TrackPArray *emr_track_array =
+      GetDetectorTrackArray(DataStructure::Global::kEMR);
   // Get Spacepoints for TOF0/1 and convert them to TrackPoints
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> TOF2_tp =
-      GetDetectorTrackPoints(MAUS::DataStructure::Global::kTOF2, _mapper_name);
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> KL_tp =
-      GetDetectorTrackPoints(MAUS::DataStructure::Global::kCalorimeter,
-                             _mapper_name);
+  std::vector<DataStructure::Global::TrackPoint*> TOF2_tp =
+      GetDetectorTrackPoints(DataStructure::Global::kTOF2, _mapper_name);
+  std::vector<DataStructure::Global::TrackPoint*> KL_tp =
+      GetDetectorTrackPoints(DataStructure::Global::kCalorimeter, _mapper_name);
   // Load the magnetic field for RK4 propagation
-  BTFieldConstructor* field = MAUS::Globals::GetMCFieldConstructor();
+  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   // Iterate over all Tracker1 Tracks (typically 1)
-  MAUS::DataStructure::Global::TrackPArray::iterator scifi_track_iter;
-  for (scifi_track_iter = scifi_track_array->begin();
+  for (auto scifi_track_iter = scifi_track_array->begin();
        scifi_track_iter != scifi_track_array->end();
        ++scifi_track_iter) {
     // Pull out the track so we're not making a mess with ressources
-    MAUS::DataStructure::Global::Track* tracker1_track =
-        (*scifi_track_iter);
+    DataStructure::Global::Track* tracker1_track = (*scifi_track_iter);
     // Extract four-position and momentum from last track point (i.e. most
     // downstream
-    MAUS::DataStructure::Global::TrackPoint* last_tracker_tp =
+    DataStructure::Global::TrackPoint* last_tracker_tp =
         GlobalTools::GetNearestZTrackPoint(tracker1_track, 100000);
     TLorentzVector position = last_tracker_tp->get_position();
     TLorentzVector momentum = last_tracker_tp->get_momentum();
     // Create the list of PIDs for which we want to create hypothesis tracks
     int charge_hypothesis = tracker1_track->get_charge();
-    std::vector<MAUS::DataStructure::Global::PID> pids = PIDHypotheses(
+    std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
         charge_hypothesis, _pid_hypothesis_string);
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
-      MAUS::DataStructure::Global::Track* hypothesis_track =
-          new MAUS::DataStructure::Global::Track();
+      DataStructure::Global::Track* hypothesis_track =
+          new DataStructure::Global::Track();
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching-DS");
       hypothesis_track->set_pid(pids[i]);
 
@@ -158,39 +151,37 @@ void TrackMatching::DSTrack() {
 
 void TrackMatching::throughTrack() {
   // import tracks already created by tracker recon
-  MAUS::DataStructure::Global::TrackPArray* global_tracks =
-    _global_event->get_tracks();
+  DataStructure::Global::TrackPArray* global_tracks =
+      _global_event->get_tracks();
   // Typically used for no fields so we can't discriminate by charge hypothesis
-  std::vector<MAUS::DataStructure::Global::PID> pids = PIDHypotheses(
-        0, _pid_hypothesis_string);
+  std::vector<DataStructure::Global::PID> pids = PIDHypotheses(0,
+      _pid_hypothesis_string);
   // Iterate over all PIDs
   for (size_t i = 0; i < pids.size(); i++) {
-    MAUS::DataStructure::Global::TrackPArray* us_tracks =
-        new MAUS::DataStructure::Global::TrackPArray();
-    MAUS::DataStructure::Global::TrackPArray* ds_tracks =
-        new MAUS::DataStructure::Global::TrackPArray();
+    DataStructure::Global::TrackPArray* us_tracks =
+        new DataStructure::Global::TrackPArray();
+    DataStructure::Global::TrackPArray* ds_tracks =
+        new DataStructure::Global::TrackPArray();
 
     // Loop over all global tracks and sort into US and DS tracks by mapper name
     // provided they have the correct PID and hits in TOF1/2 to match by dT
     USDSTracks(global_tracks, pids[i], us_tracks, ds_tracks);
 
-    MAUS::DataStructure::Global::TrackPArray::iterator us_track_iter;
-    MAUS::DataStructure::Global::TrackPArray::iterator ds_track_iter;
     // Do we have both US and DS tracks in the event?
     if ((us_tracks->size() > 0) and
         (ds_tracks->size() > 0)) {
       // Iterate over all possible combinations of US and DS tracks
-      for (us_track_iter = us_tracks->begin();
+      for (auto us_track_iter = us_tracks->begin();
            us_track_iter != us_tracks->end();
            ++us_track_iter) {
-        for (ds_track_iter = ds_tracks->begin();
+        for (auto ds_track_iter = ds_tracks->begin();
              ds_track_iter != ds_tracks->end();
              ++ds_track_iter) {
           // Going to assume that if several TrackPoints for the same TOF are in
           // the track that they have been checked to be sensible (TODO above)
-          MAUS::DataStructure::Global::TrackPointCPArray us_trackpoints =
+          DataStructure::Global::TrackPointCPArray us_trackpoints =
               (*us_track_iter)->GetTrackPoints();
-          MAUS::DataStructure::Global::TrackPointCPArray ds_trackpoints =
+          DataStructure::Global::TrackPointCPArray ds_trackpoints =
               (*ds_track_iter)->GetTrackPoints();
           double emr_range_primary = (*ds_track_iter)->get_emr_range_primary();
           if ((us_trackpoints.size() > 0) and
@@ -204,18 +195,16 @@ void TrackMatching::throughTrack() {
   }
 }
 
-MAUS::DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(
-    MAUS::DataStructure::Global::DetectorPoint detector) {
-  MAUS::DataStructure::Global::TrackPArray *imported_tracks =
-    _global_event->get_tracks();
-  MAUS::DataStructure::Global::TrackPArray::iterator imported_track_iter;
-  MAUS::DataStructure::Global::TrackPArray *track_array =
-      new MAUS::DataStructure::Global::TrackPArray();
-  for (imported_track_iter = imported_tracks->begin();
+DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(
+    DataStructure::Global::DetectorPoint detector) {
+  DataStructure::Global::TrackPArray *imported_tracks =
+      _global_event->get_tracks();
+  DataStructure::Global::TrackPArray *track_array =
+      new DataStructure::Global::TrackPArray();
+  for (auto imported_track_iter = imported_tracks->begin();
        imported_track_iter != imported_tracks->end();
        ++imported_track_iter) {
-    MAUS::DataStructure::Global::Track* imported_track =
-        (*imported_track_iter);
+    DataStructure::Global::Track* imported_track = (*imported_track_iter);
     // Check that track is from correct detector
     if (imported_track->HasDetector(detector)) {
       // Exclude EMR secondary tracks (tracker tracks also have this at 0 by
@@ -228,25 +217,24 @@ MAUS::DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(
   return track_array;
 }
 
-std::vector<MAUS::DataStructure::Global::TrackPoint*>
+std::vector<DataStructure::Global::TrackPoint*>
     TrackMatching::GetDetectorTrackPoints(
-    MAUS::DataStructure::Global::DetectorPoint detector,
-    std::string mapper_name) {
-  std::vector<MAUS::DataStructure::Global::TrackPoint*> track_points;
-  std::vector<MAUS::DataStructure::Global::SpacePoint*>
-      *global_spacepoint_array = _global_event->get_space_points();
+    DataStructure::Global::DetectorPoint detector, std::string mapper_name) {
+  std::vector<DataStructure::Global::TrackPoint*> track_points;
+  std::vector<DataStructure::Global::SpacePoint*> *global_spacepoint_array =
+      _global_event->get_space_points();
   for (size_t i = 0; i < global_spacepoint_array->size(); i++) {
-    MAUS::DataStructure::Global::SpacePoint* space_point =
+    DataStructure::Global::SpacePoint* space_point =
         global_spacepoint_array->at(i);
     if (!space_point) {
       continue;
     }
     if (space_point->get_detector() == detector) {
-      MAUS::DataStructure::Global::TrackPoint* track_point =
-          new MAUS::DataStructure::Global::TrackPoint(space_point);
+      DataStructure::Global::TrackPoint* track_point =
+          new DataStructure::Global::TrackPoint(space_point);
       std::string blsection_mapper_name = mapper_name;
-      if ((detector == MAUS::DataStructure::Global::kTOF0) or
-          (detector == MAUS::DataStructure::Global::kTOF1)) {
+      if ((detector == DataStructure::Global::kTOF0) or
+          (detector == DataStructure::Global::kTOF1)) {
         blsection_mapper_name.append("-US");
       } else {
         blsection_mapper_name.append("-DS");
@@ -258,33 +246,33 @@ std::vector<MAUS::DataStructure::Global::TrackPoint*>
   return track_points;
 }
 
-std::vector<MAUS::DataStructure::Global::PID> TrackMatching::PIDHypotheses(
+std::vector<DataStructure::Global::PID> TrackMatching::PIDHypotheses(
     int charge_hypothesis, std::string pid_hypothesis_string) {
-  std::vector<MAUS::DataStructure::Global::PID> pids;
+  std::vector<DataStructure::Global::PID> pids;
   // First check if a specific PID has been forced by the configuration
   if (pid_hypothesis_string == "kEPlus") {
-      pids.push_back(MAUS::DataStructure::Global::kEPlus);
+      pids.push_back(DataStructure::Global::kEPlus);
   } else if (pid_hypothesis_string == "kEMinus") {
-      pids.push_back(MAUS::DataStructure::Global::kEMinus);
+      pids.push_back(DataStructure::Global::kEMinus);
   } else if (pid_hypothesis_string == "kMuPlus") {
-      pids.push_back(MAUS::DataStructure::Global::kMuPlus);
+      pids.push_back(DataStructure::Global::kMuPlus);
   } else if (pid_hypothesis_string == "kMuMinus") {
-      pids.push_back(MAUS::DataStructure::Global::kMuMinus);
+      pids.push_back(DataStructure::Global::kMuMinus);
   } else if (pid_hypothesis_string == "kPiPlus") {
-      pids.push_back(MAUS::DataStructure::Global::kPiPlus);
+      pids.push_back(DataStructure::Global::kPiPlus);
   } else if (pid_hypothesis_string == "kPiMinus") {
-      pids.push_back(MAUS::DataStructure::Global::kPiMinus);
+      pids.push_back(DataStructure::Global::kPiMinus);
   } else {
     // No specific PID forced, hence we assign by charge hypothesis
     if (charge_hypothesis != -1) {
-      pids.push_back(MAUS::DataStructure::Global::kEPlus);
-      pids.push_back(MAUS::DataStructure::Global::kMuPlus);
-      pids.push_back(MAUS::DataStructure::Global::kPiPlus);
+      pids.push_back(DataStructure::Global::kEPlus);
+      pids.push_back(DataStructure::Global::kMuPlus);
+      pids.push_back(DataStructure::Global::kPiPlus);
     }
     if (charge_hypothesis != 1) {
-      pids.push_back(MAUS::DataStructure::Global::kEMinus);
-      pids.push_back(MAUS::DataStructure::Global::kMuMinus);
-      pids.push_back(MAUS::DataStructure::Global::kPiMinus);
+      pids.push_back(DataStructure::Global::kEMinus);
+      pids.push_back(DataStructure::Global::kMuMinus);
+      pids.push_back(DataStructure::Global::kPiMinus);
     }
   }
   return pids;
@@ -292,10 +280,9 @@ std::vector<MAUS::DataStructure::Global::PID> TrackMatching::PIDHypotheses(
 
 void TrackMatching::MatchTrackPoint(
     const TLorentzVector &position, const TLorentzVector &momentum,
-    const std::vector<MAUS::DataStructure::Global::TrackPoint*> &trackpoints,
-    MAUS::DataStructure::Global::PID pid, BTFieldConstructor* field,
-    std::string detector_name, MAUS::DataStructure::Global::Track*
-    hypothesis_track) {
+    const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+    DataStructure::Global::PID pid, BTFieldConstructor* field,
+    std::string detector_name, DataStructure::Global::Track* hypothesis_track) {
   double mass = Particle::GetInstance().GetMass(pid);
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
   double x_in[] = {0., position.X(), position.Y(), position.Z(),
@@ -328,19 +315,18 @@ void TrackMatching::MatchTrackPoint(
 
 void TrackMatching::MatchEMRTrack(
     const TLorentzVector &position, const TLorentzVector &momentum,
-    MAUS::DataStructure::Global::TrackPArray* emr_track_array,
-    MAUS::DataStructure::Global::PID pid, BTFieldConstructor* field,
-    MAUS::DataStructure::Global::Track* hypothesis_track) {
+    DataStructure::Global::TrackPArray* emr_track_array,
+    DataStructure::Global::PID pid, BTFieldConstructor* field,
+    DataStructure::Global::Track* hypothesis_track) {
   double mass = Particle::GetInstance().GetMass(pid);
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
   // Here we need to iterate over the EMR tracks first, as they might have
   // different starting z
-  MAUS::DataStructure::Global::TrackPArray::iterator emr_track_iter;
-  for (emr_track_iter = emr_track_array->begin();
+  for (auto emr_track_iter = emr_track_array->begin();
        emr_track_iter != emr_track_array->end();
        ++emr_track_iter) {
-    std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-        emr_trackpoints = (*emr_track_iter)->GetTrackPoints();
+    std::vector<const DataStructure::Global::TrackPoint*> emr_trackpoints =
+        (*emr_track_iter)->GetTrackPoints();
     double x_in[] = {0., position.X(), position.Y(), position.Z(),
                      energy, momentum.X(), momentum.Y(), momentum.Z()};
     TLorentzVector first_hit_pos = emr_trackpoints[0]->get_position();
@@ -357,7 +343,7 @@ void TrackMatching::MatchEMRTrack(
         hypothesis_track->set_emr_range_primary(
             (*emr_track_iter)->get_emr_range_primary());
         for (size_t i = 0; i < emr_trackpoints.size(); i++) {
-          MAUS::DataStructure::Global::TrackPoint* emr_tp =
+          DataStructure::Global::TrackPoint* emr_tp =
               emr_trackpoints[i]->Clone();
           emr_tp->set_mapper_name("MapCppGlobalTrackMatching-DS");
           TLorentzVector momentum = emr_tp->get_momentum();
@@ -379,15 +365,14 @@ void TrackMatching::MatchEMRTrack(
 }
 
 void TrackMatching::AddTrackerTrackPoints(
-    MAUS::DataStructure::Global::Track* tracker_track,
-    std::string mapper_name, double mass,
-    MAUS::DataStructure::Global::Track* hypothesis_track) {
-  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
-  tracker_trackpoints = tracker_track->GetTrackPoints();
+    DataStructure::Global::Track* tracker_track, std::string mapper_name,
+    double mass, DataStructure::Global::Track* hypothesis_track) {
+  std::vector<const DataStructure::Global::TrackPoint*> tracker_trackpoints =
+      tracker_track->GetTrackPoints();
   std::sort(tracker_trackpoints.begin(), tracker_trackpoints.end(),
             GlobalTools::TrackPointSort);
   for (size_t i = 0; i < tracker_trackpoints.size(); i++) {
-    MAUS::DataStructure::Global::TrackPoint* tracker_tp =
+    DataStructure::Global::TrackPoint* tracker_tp =
         tracker_trackpoints[i]->Clone();
     tracker_tp->set_mapper_name(mapper_name);
     TLorentzVector momentum = tracker_tp->get_momentum();
@@ -399,24 +384,22 @@ void TrackMatching::AddTrackerTrackPoints(
 }
 
 void TrackMatching::USDSTracks(
-    MAUS::DataStructure::Global::TrackPArray* global_tracks,
-    MAUS::DataStructure::Global::PID pid,
-    MAUS::DataStructure::Global::TrackPArray* us_tracks,
-    MAUS::DataStructure::Global::TrackPArray* ds_tracks) {
-  MAUS::DataStructure::Global::TrackPArray::iterator global_track_iter;
-  for (global_track_iter = global_tracks->begin();
+    DataStructure::Global::TrackPArray* global_tracks,
+    DataStructure::Global::PID pid,
+    DataStructure::Global::TrackPArray* us_tracks,
+    DataStructure::Global::TrackPArray* ds_tracks) {
+  for (auto global_track_iter = global_tracks->begin();
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if (((*global_track_iter)->get_mapper_name() ==
             "MapCppGlobalTrackMatching-US") and
-        ((*global_track_iter)->HasDetector(
-            MAUS::DataStructure::Global::kTOF1)) and
+        ((*global_track_iter)->HasDetector(DataStructure::Global::kTOF1)) and
          ((*global_track_iter)->get_pid() == pid)) {
       us_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
                    "MapCppGlobalTrackMatching-DS") and
                ((*global_track_iter)->HasDetector(
-                  MAUS::DataStructure::Global::kTOF2)) and
+                   DataStructure::Global::kTOF2)) and
                ((*global_track_iter)->get_pid() == pid)) {
       ds_tracks->push_back(*global_track_iter);
     }
@@ -424,37 +407,33 @@ void TrackMatching::USDSTracks(
 }
 
 void TrackMatching::MatchUSDS(
-    MAUS::DataStructure::Global::TrackPointCPArray us_trackpoints,
-    MAUS::DataStructure::Global::TrackPointCPArray ds_trackpoints,
-    MAUS::DataStructure::Global::PID pid,
-    double emr_range_primary) {
+    DataStructure::Global::TrackPointCPArray us_trackpoints,
+    DataStructure::Global::TrackPointCPArray ds_trackpoints,
+    DataStructure::Global::PID pid, double emr_range_primary) {
   double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
-                                            MAUS::DataStructure::Global::kTOF1);
+                                            DataStructure::Global::kTOF1);
   double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
-                                            MAUS::DataStructure::Global::kTOF2);
+                                            DataStructure::Global::kTOF2);
   double TOFdT = TOF2_time - TOF1_time;
   if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
       (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
-    MAUS::DataStructure::Global::Track* through_track =
-        new MAUS::DataStructure::Global::Track();
+    DataStructure::Global::Track* through_track =
+        new DataStructure::Global::Track();
     through_track->set_mapper_name("MapCppGlobalTrackMatching-Through");
     through_track->set_pid(pid);
     Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched"
                                 << std::endl;
-    MAUS::DataStructure::Global::TrackPointCPArray::iterator trackpoint_iter;
-    for (trackpoint_iter = us_trackpoints.begin();
+    for (auto trackpoint_iter = us_trackpoints.begin();
          trackpoint_iter != us_trackpoints.end();
          ++trackpoint_iter) {
       through_track->AddTrackPoint(
-          const_cast<MAUS::DataStructure::Global::TrackPoint*>
-          (*trackpoint_iter));
+          const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
     }
-    for (trackpoint_iter = ds_trackpoints.begin();
+    for (auto trackpoint_iter = ds_trackpoints.begin();
          trackpoint_iter != ds_trackpoints.end();
          ++trackpoint_iter) {
       through_track->AddTrackPoint(
-          const_cast<MAUS::DataStructure::Global::TrackPoint*>
-          (*trackpoint_iter));
+          const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
     }
     through_track->set_emr_range_primary(emr_range_primary);
     _global_event->add_track(through_track);
@@ -462,11 +441,10 @@ void TrackMatching::MatchUSDS(
 }
 
 double TrackMatching::TOFTimeFromTrackPoints(
-    MAUS::DataStructure::Global::TrackPointCPArray trackpoints,
-    MAUS::DataStructure::Global::DetectorPoint detector) {
-  MAUS::DataStructure::Global::TrackPointCPArray::iterator trackpoint_iter;
+    DataStructure::Global::TrackPointCPArray trackpoints,
+    DataStructure::Global::DetectorPoint detector) {
   double TOF_time = 0.0;
-  for (trackpoint_iter = trackpoints.begin();
+  for (auto trackpoint_iter = trackpoints.begin();
        trackpoint_iter != trackpoints.end();
        ++trackpoint_iter) {
     if ((*trackpoint_iter)->get_detector() == detector) {

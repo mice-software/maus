@@ -52,7 +52,7 @@ namespace global {
   public:
 
     /// Constructor
-    TrackMatching(MAUS::GlobalEvent* global_event,
+    TrackMatching(GlobalEvent* global_event,
                   std::string mapper_name,
                   std::string pid_hypothesis_string,
                   std::map<std::string, std::pair<double, double> >
@@ -114,10 +114,8 @@ namespace global {
      *
      * @see GetDetectorTrackArray()
      */
-    std::vector<MAUS::DataStructure::Global::TrackPoint*>
-        GetDetectorTrackPoints(
-        MAUS::DataStructure::Global::DetectorPoint detector,
-        std::string mapper_name);
+    std::vector<DataStructure::Global::TrackPoint*> GetDetectorTrackPoints(
+        DataStructure::Global::DetectorPoint detector, std::string mapper_name);
 
     /**
      * @brief Creates a vector of PIDs that designate the PID hypotheses over
@@ -136,7 +134,7 @@ namespace global {
      * in the configuration (as long as the TrackMatching constructor sets it
      * as such)
      */
-    std::vector<MAUS::DataStructure::Global::PID> PIDHypotheses(
+    std::vector<DataStructure::Global::PID> PIDHypotheses(
         int charge_hypothesis, std::string pid_hypothesis_string);
 
     /**
@@ -161,12 +159,10 @@ namespace global {
      */
     void MatchTrackPoint(
         const TLorentzVector &position, const TLorentzVector &momentum,
-        const std::vector<MAUS::DataStructure::Global::TrackPoint*>
-            &trackpoints,
-        MAUS::DataStructure::Global::PID pid,
-        BTFieldConstructor* field,
+        const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+        DataStructure::Global::PID pid, BTFieldConstructor* field,
         std::string detector_name,
-        MAUS::DataStructure::Global::Track* hypothesis_track);
+        DataStructure::Global::Track* hypothesis_track);
 
     /**
      * @brief As MatchTrackPoint() but matching to the most upstream trackpoint
@@ -184,9 +180,9 @@ namespace global {
      */
     void MatchEMRTrack(
         const TLorentzVector &position, const TLorentzVector &momentum,
-        MAUS::DataStructure::Global::TrackPArray* emr_track_array,
-        MAUS::DataStructure::Global::PID pid, BTFieldConstructor* field,
-        MAUS::DataStructure::Global::Track* hypothesis_track);
+        DataStructure::Global::TrackPArray* emr_track_array,
+        DataStructure::Global::PID pid, BTFieldConstructor* field,
+        DataStructure::Global::Track* hypothesis_track);
 
     /**
      * @brief Adds all TrackPoints from a tracker Track to a different track and
@@ -202,9 +198,8 @@ namespace global {
      * added
      */
     void AddTrackerTrackPoints(
-        MAUS::DataStructure::Global::Track* tracker_track,
-        std::string mapper_name, double mass,
-        MAUS::DataStructure::Global::Track* hypothesis_track);
+        DataStructure::Global::Track* tracker_track, std::string mapper_name,
+        double mass, DataStructure::Global::Track* hypothesis_track);
 
     /**
      * @brief Returns all matched upstream and downstream tracks from the global
@@ -220,10 +215,10 @@ namespace global {
      * @param ds_tracks The container for the downstream tracks to be returned
      */
     void USDSTracks(
-        MAUS::DataStructure::Global::TrackPArray* global_tracks,
-        MAUS::DataStructure::Global::PID pid,
-        MAUS::DataStructure::Global::TrackPArray* us_tracks,
-        MAUS::DataStructure::Global::TrackPArray* ds_tracks);
+        DataStructure::Global::TrackPArray* global_tracks,
+        DataStructure::Global::PID pid,
+        DataStructure::Global::TrackPArray* us_tracks,
+        DataStructure::Global::TrackPArray* ds_tracks);
 
     /**
      * @brief Produces a through-going track from the supplied upstream and
@@ -235,9 +230,9 @@ namespace global {
      * @param emr_range_primary EMR primary Track range to pass to the new track
      */
     void MatchUSDS(
-        MAUS::DataStructure::Global::TrackPointCPArray us_trackpoints,
-        MAUS::DataStructure::Global::TrackPointCPArray ds_trackpoints,
-        MAUS::DataStructure::Global::PID pid, double emr_range_primary);
+        DataStructure::Global::TrackPointCPArray us_trackpoints,
+        DataStructure::Global::TrackPointCPArray ds_trackpoints,
+        DataStructure::Global::PID pid, double emr_range_primary);
 
     /**
      * @brief Returns the time from a TrackPoint in the chosen detector (TOF0,
@@ -254,8 +249,8 @@ namespace global {
      * kTOF2)
      */
     double TOFTimeFromTrackPoints(
-        MAUS::DataStructure::Global::TrackPointCPArray trackpoints,
-        MAUS::DataStructure::Global::DetectorPoint detector);
+        DataStructure::Global::TrackPointCPArray trackpoints,
+        DataStructure::Global::DetectorPoint detector);
 
     /// Mapper name passed by the mapper calling this class
     std::string _mapper_name;
@@ -274,7 +269,7 @@ namespace global {
     bool _energy_loss;
 
     /// The global event to be processed
-    MAUS::GlobalEvent* _global_event;
+    GlobalEvent* _global_event;
 
     /// Declarations required for tests to access private member functions
     FRIEND_TEST(TrackMatchingTest, GetDetectorTrackArray);

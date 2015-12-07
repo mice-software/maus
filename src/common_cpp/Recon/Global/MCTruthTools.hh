@@ -46,7 +46,7 @@ namespace MCTruthTools {
  * @param mc_event The MC event that should be checked
  */
 std::map<DataStructure::Global::DetectorPoint, bool>
-    GetMCDetectors(MAUS::MCEvent* mc_event);
+    GetMCDetectors(MCEvent* mc_event);
 
 /**
  * @brief Returns array of all TOF hits in a given TOF from the MC event
@@ -54,7 +54,7 @@ std::map<DataStructure::Global::DetectorPoint, bool>
  * @param mc_event The MC event
  * @param detector The detector for the selection, must correspond to a TOF
  */
-TOFHitArray* GetTOFHits(MAUS::MCEvent* mc_event,
+TOFHitArray* GetTOFHits(MCEvent* mc_event,
     DataStructure::Global::DetectorPoint detector);
 
 /**
@@ -65,7 +65,7 @@ TOFHitArray* GetTOFHits(MAUS::MCEvent* mc_event,
  * @param detector The detector for the selection, must correspond to a Tracker
  *        or Tracker station
  */
-SciFiHitArray* GetTrackerHits(MAUS::MCEvent* mc_event,
+SciFiHitArray* GetTrackerHits(MCEvent* mc_event,
     DataStructure::Global::DetectorPoint detector);
 
 /**
@@ -79,7 +79,7 @@ SciFiHitArray* GetTrackerHits(MAUS::MCEvent* mc_event,
  * @param plane tracker plane number within a station, 0 to 2 counting outward
  *        from the cooling channel
  */
-SciFiHit* GetTrackerPlaneHit(MAUS::MCEvent* mc_event,
+SciFiHit* GetTrackerPlaneHit(MCEvent* mc_event,
     int tracker, int station, int plane);
 
 /**

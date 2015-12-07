@@ -39,31 +39,29 @@
 namespace MAUS {
 namespace GlobalTools {
 
-std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
-    GetReconDetectors(MAUS::GlobalEvent* global_event) {
-  std::map<MAUS::DataStructure::Global::DetectorPoint, bool> recon_detectors;
+std::map<DataStructure::Global::DetectorPoint, bool>
+    GetReconDetectors(GlobalEvent* global_event) {
+  std::map<DataStructure::Global::DetectorPoint, bool> recon_detectors;
   for (int i = 0; i < 27; i++) {
-    recon_detectors[static_cast<MAUS::DataStructure::Global::DetectorPoint>(i)] =
+    recon_detectors[static_cast<DataStructure::Global::DetectorPoint>(i)] =
       false;
   }
-  MAUS::DataStructure::Global::TrackPArray* imported_tracks =
-    global_event->get_tracks();
+  DataStructure::Global::TrackPArray* imported_tracks =
+      global_event->get_tracks();
 
-  MAUS::DataStructure::Global::TrackPArray::iterator imported_track_iter;
-  for (imported_track_iter = imported_tracks->begin();
+  for (auto imported_track_iter = imported_tracks->begin();
        imported_track_iter != imported_tracks->end();
        ++imported_track_iter) {
-    std::vector<MAUS::DataStructure::Global::DetectorPoint> track_detectors =
+    std::vector<DataStructure::Global::DetectorPoint> track_detectors =
         (*imported_track_iter)->GetDetectorPoints();
     for (size_t i = 0; i < track_detectors.size(); i++) {
       recon_detectors[track_detectors[i]] = true;
     }
   }
 
-  std::vector<MAUS::DataStructure::Global::SpacePoint*>*
+  std::vector<DataStructure::Global::SpacePoint*>*
       imported_spacepoints = global_event->get_space_points();
-  std::vector<MAUS::DataStructure::Global::SpacePoint*>::iterator sp_iter;
-  for (sp_iter = imported_spacepoints->begin();
+  for (auto sp_iter = imported_spacepoints->begin();
        sp_iter != imported_spacepoints->end();
        ++sp_iter) {
     recon_detectors[(*sp_iter)->get_detector()] = true;
@@ -71,23 +69,20 @@ std::map<MAUS::DataStructure::Global::DetectorPoint, bool>
   return recon_detectors;
 }
 
-std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
-    MAUS::Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector,
-    std::string mapper_name) {
-  std::vector<MAUS::DataStructure::Global::Track*>* detector_tracks = new
-      std::vector<MAUS::DataStructure::Global::Track*>;
+std::vector<DataStructure::Global::Track*>* GetSpillDetectorTracks(Spill* spill,
+    DataStructure::Global::DetectorPoint detector, std::string mapper_name) {
+  std::vector<DataStructure::Global::Track*>* detector_tracks = new
+      std::vector<DataStructure::Global::Track*>;
   ReconEventPArray* recon_events = spill->GetReconEvents();
   if (recon_events) {
-    ReconEventPArray::iterator recon_event_iter;
-    for (recon_event_iter = recon_events->begin();
+    for (auto recon_event_iter = recon_events->begin();
          recon_event_iter != recon_events->end();
          ++recon_event_iter) {
       GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
       if (global_event) {
-        std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
+        std::vector<DataStructure::Global::Track*>* global_tracks =
             global_event->get_tracks();
-        std::vector<MAUS::DataStructure::Global::Track*>::iterator track_iter;
-        for (track_iter = global_tracks->begin();
+        for (auto track_iter = global_tracks->begin();
              track_iter != global_tracks->end();
              ++track_iter) {
           // The third condition is a bit of a dirty hack here to make sure that
@@ -104,16 +99,42 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetSpillDetectorTracks(
   return detector_tracks;
 }
 
-std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
-    MAUS::GlobalEvent* global_event,
-    std::string mapper_name) {
-  std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
-          global_event->get_tracks();
-  std::vector<MAUS::DataStructure::Global::Track*>* selected_tracks = new
-      std::vector<MAUS::DataStructure::Global::Track*>;
-  std::vector<MAUS::DataStructure::Global::Track*>::iterator
-      global_track_iter;
-  for (global_track_iter = global_tracks->begin();
+std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
+    Spill* spill, DataStructure::Global::DetectorPoint detector) {
+  std::vector<DataStructure::Global::SpacePoint*>* spill_spacepoints =
+      new std::vector<DataStructure::Global::SpacePoint*>;
+  ReconEventPArray* recon_events = spill->GetReconEvents();
+  if (recon_events) {
+    for (auto recon_event_iter = recon_events->begin();
+         recon_event_iter != recon_events->end();
+         ++recon_event_iter) {
+      GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
+      if (global_event) {
+        std::vector<DataStructure::Global::SpacePoint*>* spacepoints =
+            global_event->get_space_points();
+        for (auto sp_iter = spacepoints->begin(); sp_iter != spacepoints->end();
+             ++sp_iter) {
+          if ((*sp_iter)->get_detector() == detector) {
+            spill_spacepoints->push_back(*sp_iter);
+          }
+        }
+      }
+    }
+  }
+  if (spill_spacepoints->size() > 0) {
+    return spill_spacepoints;
+  } else {
+    return 0;
+  }
+}
+
+std::vector<DataStructure::Global::Track*>* GetTracksByMapperName(
+    GlobalEvent* global_event, std::string mapper_name) {
+  std::vector<DataStructure::Global::Track*>* global_tracks =
+      global_event->get_tracks();
+  std::vector<DataStructure::Global::Track*>* selected_tracks = new
+      std::vector<DataStructure::Global::Track*>;
+  for (auto global_track_iter = global_tracks->begin();
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if ((*global_track_iter)->get_mapper_name() == mapper_name) {
@@ -123,17 +144,14 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
   return selected_tracks;
 }
 
-std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
-    MAUS::GlobalEvent* global_event,
-    std::string mapper_name,
-    MAUS::DataStructure::Global::PID pid) {
-  std::vector<MAUS::DataStructure::Global::Track*>* global_tracks =
+std::vector<DataStructure::Global::Track*>* GetTracksByMapperName(
+    GlobalEvent* global_event, std::string mapper_name,
+    DataStructure::Global::PID pid) {
+  std::vector<DataStructure::Global::Track*>* global_tracks =
           global_event->get_tracks();
-  std::vector<MAUS::DataStructure::Global::Track*>* selected_tracks = new
-      std::vector<MAUS::DataStructure::Global::Track*>;
-  std::vector<MAUS::DataStructure::Global::Track*>::iterator
-      global_track_iter;
-  for (global_track_iter = global_tracks->begin();
+  std::vector<DataStructure::Global::Track*>* selected_tracks = new
+      std::vector<DataStructure::Global::Track*>;
+  for (auto global_track_iter = global_tracks->begin();
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if ((*global_track_iter)->get_mapper_name() == mapper_name) {
@@ -145,7 +163,7 @@ std::vector<MAUS::DataStructure::Global::Track*>* GetTracksByMapperName(
   return selected_tracks;
 }
 
-std::vector<int> GetTrackerPlane(const MAUS::DataStructure::Global::TrackPoint*
+std::vector<int> GetTrackerPlane(const DataStructure::Global::TrackPoint*
     track_point, std::vector<double> z_positions) {
   std::vector<int> tracker_plane(3, 0);
   double z = track_point->get_position().Z();
@@ -183,37 +201,6 @@ std::vector<double> GetTrackerPlaneZPositions(std::string geo_filename) {
   return z_positions;
 }
 
-std::vector<MAUS::DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
-    Spill* spill, MAUS::DataStructure::Global::DetectorPoint detector) {
-  std::vector<MAUS::DataStructure::Global::SpacePoint*>* spill_spacepoints =
-      new std::vector<MAUS::DataStructure::Global::SpacePoint*>;
-  MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
-  MAUS::ReconEventPArray::iterator recon_event_iter;
-  if (recon_events) {
-    for (recon_event_iter = recon_events->begin();
-         recon_event_iter != recon_events->end();
-         ++recon_event_iter) {
-      MAUS::GlobalEvent* global_event = (*recon_event_iter)->GetGlobalEvent();
-      if (global_event) {
-        std::vector<MAUS::DataStructure::Global::SpacePoint*>*
-            spacepoints = global_event->get_space_points();
-        std::vector<MAUS::DataStructure::Global::SpacePoint*>::iterator sp_iter;
-        for (sp_iter = spacepoints->begin(); sp_iter != spacepoints->end();
-             ++sp_iter) {
-          if ((*sp_iter)->get_detector() == detector) {
-            spill_spacepoints->push_back(*sp_iter);
-          }
-        }
-      }
-    }
-  }
-  if (spill_spacepoints->size() > 0) {
-    return spill_spacepoints;
-  } else {
-    return 0;
-  }
-}
-
 bool approx(double a, double b, double tolerance) {
   if (std::abs(a - b) > std::abs(tolerance)) {
     return false;
@@ -222,9 +209,9 @@ bool approx(double a, double b, double tolerance) {
   }
 }
 
-MAUS::DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
-    const MAUS::DataStructure::Global::Track* track, double z_position) {
-  std::vector<const MAUS::DataStructure::Global::TrackPoint*> trackpoints =
+DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
+    const DataStructure::Global::Track* track, double z_position) {
+  std::vector<const DataStructure::Global::TrackPoint*> trackpoints =
       track->GetTrackPoints();
   size_t nearest_index = 0;
   double z_distance = 1.0e20;
@@ -236,8 +223,8 @@ MAUS::DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
       z_distance = current_distance;
     }
   }
-  MAUS::DataStructure::Global::TrackPoint* nearest_track_point = new
-      MAUS::DataStructure::Global::TrackPoint(*trackpoints.at(nearest_index));
+  DataStructure::Global::TrackPoint* nearest_track_point = new
+      DataStructure::Global::TrackPoint(*trackpoints.at(nearest_index));
   return nearest_track_point;
 }
 
@@ -280,16 +267,16 @@ static const BTField* _field;
 static int _charge;
 
 void propagate(double* x, double target_z, const BTField* field,
-               double step_size, MAUS::DataStructure::Global::PID pid,
+               double step_size, DataStructure::Global::PID pid,
                bool energy_loss) {
   if (std::abs(target_z) > 100000) {
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Extreme target z",
-                          "GlobalTools::propagate"));
+    throw(Exception(Exception::recoverable, "Extreme target z",
+                    "GlobalTools::propagate"));
   }
   int prop_dir = 1;
   _field = field;
-  _charge = MAUS::recon::global::Particle::GetInstance().GetCharge(pid);
-  double mass = MAUS::recon::global::Particle::GetInstance().GetMass(pid);
+  _charge = recon::global::Particle::GetInstance().GetCharge(pid);
+  double mass = recon::global::Particle::GetInstance().GetMass(pid);
   G4Navigator* g4navigator = G4TransportationManager::GetTransportationManager()
       ->GetNavigatorForTracking();
   G4NistManager* manager = G4NistManager::Instance();
@@ -304,11 +291,9 @@ void propagate(double* x, double target_z, const BTField* field,
     }
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
-  double absolute_error = (*MAUS::Globals::GetInstance()
-                           ->GetConfigurationCards())
+  double absolute_error = (*Globals::GetInstance()->GetConfigurationCards())
                            ["field_tracker_absolute_error"].asDouble();
-  double relative_error = (*MAUS::Globals::GetInstance()
-                           ->GetConfigurationCards())
+  double relative_error = (*Globals::GetInstance()->GetConfigurationCards())
                            ["field_tracker_relative_error"].asDouble();
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 8);
   gsl_odeiv_control * control = gsl_odeiv_control_y_new(absolute_error,
@@ -330,7 +315,7 @@ void propagate(double* x, double target_z, const BTField* field,
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
       g4navigator->LocateGlobalPointAndSetup(posvector, &momvector); // G4VPhysicalVolume* volume = 
-      MAUS::GeometryNavigator geometry_navigator;
+      GeometryNavigator geometry_navigator;
       geometry_navigator.Initialise(g4navigator->GetWorldVolume());
       double safety = 10;
       double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
@@ -355,7 +340,7 @@ void propagate(double* x, double target_z, const BTField* field,
       status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
                                         target_z, &h, x);
       // Calculate energy loss for the step
-      geometry_navigator.SetPoint(MAUS::ThreeVector((x[1] + x_prev[1])/2,
+      geometry_navigator.SetPoint(ThreeVector((x[1] + x_prev[1])/2,
                                   (x[2] + x_prev[2])/2, (x[3] + x_prev[3])/2));
       double step_distance = std::sqrt((x[1]-x_prev[1])*(x[1]-x_prev[1]) +
                                        (x[2]-x_prev[2])*(x[2]-x_prev[2]) +
@@ -368,7 +353,7 @@ void propagate(double* x, double target_z, const BTField* field,
                                         target_z, &h, x);
     }
     if (status != GSL_SUCCESS) {
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Propagation failed",
+      throw(Exception(Exception::recoverable, "Propagation failed",
                             "GlobalTools::propagate"));
     }
 
@@ -377,7 +362,7 @@ void propagate(double* x, double target_z, const BTField* field,
       ios << "Stopping at step " << n_steps << " of " << max_steps << "\n"
           << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
           << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-      throw(MAUS::Exception(MAUS::Exception::recoverable, ios.str()+
+      throw(Exception(Exception::recoverable, ios.str()+
             "Exceeded maximum number of steps", "GlobalTools::propagate"));
       break;
     }
@@ -386,7 +371,7 @@ void propagate(double* x, double target_z, const BTField* field,
     if (std::abs(x[4]) < (mass + 0.01)) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
-      throw(MAUS::Exception(MAUS::Exception::recoverable, ios.str()+
+      throw(Exception(Exception::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
   }
@@ -447,8 +432,8 @@ void changeEnergy(double* x, double deltaE, double mass) {
   x[7] *= momentum_ratio;
 }
 
-bool TrackPointSort(const MAUS::DataStructure::Global::TrackPoint* tp1,
-                    const MAUS::DataStructure::Global::TrackPoint* tp2) {
+bool TrackPointSort(const DataStructure::Global::TrackPoint* tp1,
+                    const DataStructure::Global::TrackPoint* tp2) {
   return (tp1->get_position().Z() < tp2->get_position().Z());
 }
 

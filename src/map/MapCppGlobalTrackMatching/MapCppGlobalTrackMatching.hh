@@ -69,7 +69,7 @@ namespace MAUS {
      *  structure with populated global events and tracks.
      * @param MAUS data corresponding to a single MICE spill
      */
-    void _process(MAUS::Data* data) const;
+    void _process(Data* data) const;
 
   private:
     /// Check that a valid configuration is passed to the process
