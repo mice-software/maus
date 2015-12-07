@@ -65,14 +65,18 @@ class Tracker:
         self.num_digits = 0
         self.num_clusters = 0
         self.num_spoints = 0
+        self.num_sseeds = 0
+        self.num_hseeds = 0
         self.num_stracks = 0
         self.num_htracks = 0
+        # Spacepoints (All)
         self.spoints_x = array.array('d')
         self.spoints_y = array.array('d')
         self.spoints_z = array.array('d')
         self.spoints_global_x = array.array('d')
         self.spoints_global_y = array.array('d')
         self.spoints_global_z = array.array('d')
+        # Seed spacepoints (choosen by Pattern Recognition)
         self.seeds_x = []
         self.seeds_y = []
         self.seeds_z = []
@@ -81,6 +85,14 @@ class Tracker:
         self.seeds_global_z = []
         self.seeds_phi = []
         self.seeds_s = []
+        # Trackpoints (from Kalman fit)
+        self.tpoints_global_x = array.array('d')
+        self.tpoints_global_y = array.array('d')
+        self.tpoints_global_z = array.array('d')
+        self.tpoints_global_px = array.array('d')
+        self.tpoints_global_py = array.array('d')
+        self.tpoints_global_pz = array.array('d')
+        # Pat Rec track fits
         self.straight_xz_fits = []
         self.straight_yz_fits = []
         self.helix_xy_fits = []
@@ -119,7 +131,7 @@ class Tracker:
                 self.spoints_global_z.append(gz)
                 self.num_spoints = self.num_spoints + 1
 
-        # Loop over straight tracks and pull out data
+        # Loop over pat rec straight tracks and pull out data
         for trk in evt.straightprtracks():
             if trk.get_tracker() == trker_num:
                 self.num_stracks = self.num_stracks + 1
@@ -137,8 +149,29 @@ class Tracker:
                                                                  0, 1200))
                     self.straight_yz_fits.append(self.make_line(my, y0, \
                                                                  0, 1200))
+                # Pull out the coords of each seed spacepoint
+                x_per_trk = array.array('d')
+                y_per_trk = array.array('d')
+                z_per_trk = array.array('d')
+                gx_per_trk = array.array('d')
+                gy_per_trk = array.array('d')
+                gz_per_trk = array.array('d')
+                for seed in trk.get_spacepoints():
+                    x_per_trk.append(seed.get_position().x())
+                    y_per_trk.append(seed.get_position().y())
+                    z_per_trk.append(seed.get_position().z())
+                    gx_per_trk.append(seed.get_global_position().x())
+                    gy_per_trk.append(seed.get_global_position().y())
+                    gz_per_trk.append(seed.get_global_position().z())
+                    self.num_sseeds =self.num_sseeds + 1
+                self.seeds_x.append(x_per_trk)
+                self.seeds_y.append(y_per_trk)
+                self.seeds_z.append(z_per_trk)
+                self.seeds_global_x.append(gx_per_trk)
+                self.seeds_global_y.append(gy_per_trk)
+                self.seeds_global_z.append(gz_per_trk)
 
-        # Loop over helical tracks and pull out data
+        # Loop over pat rec helical tracks and pull out data
         for trk in evt.helicalprtracks():
             if trk.get_tracker() == trker_num:
                 pt = trk.get_R()*1.2
@@ -190,7 +223,6 @@ class Tracker:
                 gx_per_trk = array.array('d')
                 gy_per_trk = array.array('d')
                 gz_per_trk = array.array('d')
-                num_seeds = 0
                 for seed in trk.get_spacepoints():
                     x_per_trk.append(seed.get_position().x())
                     y_per_trk.append(seed.get_position().y())
@@ -198,7 +230,7 @@ class Tracker:
                     gx_per_trk.append(seed.get_global_position().x())
                     gy_per_trk.append(seed.get_global_position().y())
                     gz_per_trk.append(seed.get_global_position().z())
-                    num_seeds = num_seeds + 1
+                    self.num_hseeds =self.num_hseeds + 1
                 self.seeds_x.append(x_per_trk)
                 self.seeds_y.append(y_per_trk)
                 self.seeds_z.append(z_per_trk)
@@ -213,6 +245,22 @@ class Tracker:
                                           sz_c, 0, 1200))
                 self.helix_sz_fits.append(self.make_line(dsdz, sz_c, 0, 1200))
                 self.num_htracks = self.num_htracks + 1
+
+        # Loop over Kalman fit tracks and pull out data
+        # NB: All Kalman position data output in global coorindates by default
+        for trk in evt.scifitracks():
+            if trk.tracker() == trker_num:
+                tpoints = trk.scifitrackpoints()
+                x_per_trk = array.array('d')
+                y_per_trk = array.array('d')
+                z_per_trk = array.array('d')
+                for tp in tpoints:
+                    x_per_trk.append(tp.pos().x())
+                    y_per_trk.append(tp.pos().y())
+                    z_per_trk.append(tp.pos().z())
+                self.tpoints_global_x.extend(x_per_trk)
+                self.tpoints_global_y.extend(y_per_trk)
+                self.tpoints_global_z.extend(z_per_trk)
 
     @staticmethod
     def make_circle(x0, y0, rad):
@@ -296,12 +344,14 @@ class TrackerStation:
         self.num_spoints = 0
         self.num_straight_seeds = 0
         self.num_helical_seeds = 0
+        # Spacepoints (All)
         self.spoints_local_x = array.array('d')
         self.spoints_local_y = array.array('d')
         self.spoints_local_z = array.array('d')
         self.spoints_global_x = array.array('d')
         self.spoints_global_y = array.array('d')
         self.spoints_global_z = array.array('d')
+        # Seed spacepoints (choosen by Pattern Recognition)
         self.straight_seeds_local_x = array.array('d')
         self.straight_seeds_local_y = array.array('d')
         self.straight_seeds_local_z = array.array('d')
