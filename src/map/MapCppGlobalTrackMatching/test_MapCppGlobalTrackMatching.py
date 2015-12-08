@@ -85,7 +85,7 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalTrackMatching" in doc["errors"])
 
-    def test_fill_Global_Event(self):
+    def _test_fill_Global_Event(self):
         """Check that process makes global tracks from TOF and tracker data"""
         test5 = ('%s/src/map/MapCppGlobalTrackMatching/global_tm_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
