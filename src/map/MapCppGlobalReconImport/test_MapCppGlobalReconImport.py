@@ -101,17 +101,17 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         revt = revtarray[0]
         self.assertTrue('global_event' in revt)
         self.assertTrue('track_points' in revt['global_event'])
-        self.assertEqual(30, len(revt['global_event']['track_points']))
+        self.assertEqual(41, len(revt['global_event']['track_points']))
         for i in revt['global_event']['track_points']:
             self.assertTrue('mapper_name' in i)
             self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
         self.assertTrue('tracks' in revt['global_event'])
-        self.assertEqual(2, len(revt['global_event']['tracks']))
+        self.assertEqual(3, len(revt['global_event']['tracks']))
         for i in revt['global_event']['tracks']:
             self.assertTrue('mapper_name' in i)
             self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
         self.assertTrue('space_points' in revt['global_event'])
-        self.assertEqual(36, len(revt['global_event']['space_points']))
+        self.assertEqual(47, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
         self.assertEqual(0, len(revt['global_event']['primary_chains']))
 

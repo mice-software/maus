@@ -82,7 +82,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalPID" in doc["errors"])
 
-    def _test_muon_PID(self):
+    def test_muon_PID(self):
         """Check that process can identify muons"""
         test4 = ('%s/src/map/MapCppGlobalPID/muon_pid_test.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
