@@ -131,7 +131,7 @@
                             
                         </xsl:text></xsl:when>
                                         <xsl:when test="contains(@name, 'SSU-E2')">Substitution $SSUE2Current <xsl:value-of select="@iset"/>
-                        Substitution $SSUE1Polarity +1<xsl:text>
+                        Substitution $SSUE2Polarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>
                                         <xsl:when test="contains(@name, 'SSU-C')">Substitution $SSUCCurrent <xsl:value-of select="@iset"/>
@@ -185,7 +185,7 @@
                                 </xsl:for-each>
                             </xsl:when>    
 
-                            <xsl:when test="contains(@name, 'FCD') and ( contains(@mode, 'Solenoid') or contains(@mode, 'solenoid'))">
+                            <xsl:when test="contains(@name, 'FCU') and ( contains(@mode, 'Solenoid') or contains(@mode, 'solenoid'))">
                         Substitution $FCMMode +1<xsl:text>
                                         
                         </xsl:text>
@@ -194,16 +194,14 @@
                                         <xsl:when test="contains(@name, 'FCU-C')">Substitution $FCMUCurrent <xsl:value-of select="@iset"/>
                         Substitution $FCMUPolarity +1<xsl:text>
                                         
-                        </xsl:text>
-                                        </xsl:when>
-                                        <xsl:when test="contains(@name, 'FCD-C')">Substitution $FCMDCurrent <xsl:value-of select="@iset"/>
+                        </xsl:text>Substitution $FCMDCurrent <xsl:value-of select="@iset"/>
                         Substitution $FCMDPolarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>                   
                                     </xsl:choose>
                                 </xsl:for-each>
                             </xsl:when>
-                                <xsl:when test="contains(@name, 'FCD') and ( contains(@mode, 'Flip') or contains(@mode, 'flip') )">
+                                <xsl:when test="contains(@name, 'FCU') and ( contains(@mode, 'Flip') or contains(@mode, 'flip') )">
                         Substitution $FCMMode -1<xsl:text>
                                         
                         </xsl:text>
@@ -212,8 +210,7 @@
                                         <xsl:when test="contains(@name, 'FCU-C')">Substitution $FCMUCurrent <xsl:value-of select="@iset"/>
                         Substitution $FCMUPolarity +1<xsl:text>
                                         
-                        </xsl:text></xsl:when>
-                                        <xsl:when test="contains(@name, 'FCD-C')">Substitution $FCMDCurrent <xsl:value-of select="@iset"/>
+                        </xsl:text>Substitution $FCMDCurrent <xsl:value-of select="@iset"/>
                         Substitution $FCMDPolarity +1<xsl:text>
                             
                         </xsl:text></xsl:when>    
