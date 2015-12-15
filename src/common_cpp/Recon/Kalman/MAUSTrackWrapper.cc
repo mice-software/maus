@@ -329,7 +329,7 @@ namespace MAUS {
         pos += reference_pos;
 
         mom *= reference_rot;
-//        if (tracker == 0) mom *= -1.0;
+        if (tracker == 0) mom *= -1.0; // Direction of recon is reveresed upstream.
         mom.setZ(default_mom); // MeV/c
       } else if (dimension == 5) {
         pos.setX(state_vector(0, 0));

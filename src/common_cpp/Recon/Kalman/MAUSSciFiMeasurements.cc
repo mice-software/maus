@@ -24,9 +24,9 @@ namespace MAUS {
     _geometry_helper(geo),
     _measurement_noise(1, 1),
     _matrix_map() {
-//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() *
-//                                                      _geometry_helper->GetChannelWidth() / 12.0;
-    _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
+//    _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
+    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() *
+                                                        _geometry_helper->GetChannelWidth() / 12.0;
 
     SciFiTrackerMap geo_map = _geometry_helper->GeometryMap();
 
@@ -68,8 +68,7 @@ namespace MAUS {
     TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
 
     new_vec = MeasurementMatrix() * (state.GetVector() - _alignment_map[state.GetId()]);
-    new_cov = (MeasurementMatrix()*state.GetCovariance()*
-                                     measurement_matrix_transpose) + MeasurementNoise();
+    new_cov = (MeasurementMatrix()*state.GetCovariance()*measurement_matrix_transpose);
 
     Kalman::State measured_state(new_vec, new_cov, state.GetPosition());
     measured_state.SetId(state.GetId());
@@ -97,9 +96,9 @@ namespace MAUS {
     _geometry_helper(geo),
     _measurement_noise(1, 1),
     _matrix_map() {
-//    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() *
-//                                                      _geometry_helper->GetChannelWidth() / 12.0;
-    _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
+    _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() *
+                                                      _geometry_helper->GetChannelWidth() / 12.0;
+//    _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
 
     SciFiTrackerMap geo_map = _geometry_helper->GeometryMap();
 
@@ -141,8 +140,7 @@ namespace MAUS {
     TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
 
     new_vec = MeasurementMatrix() * (state.GetVector() - _alignment_map[state.GetId()]);
-    new_cov = (MeasurementMatrix()*state.GetCovariance()*
-                                     measurement_matrix_transpose) + MeasurementNoise();
+    new_cov = (MeasurementMatrix()*state.GetCovariance()*measurement_matrix_transpose);
 
     Kalman::State measured_state(new_vec, new_cov, state.GetPosition());
     measured_state.SetId(state.GetId());

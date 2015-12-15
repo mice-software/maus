@@ -109,23 +109,40 @@ void SciFiTrack::SetSeedCovariance(double* covariance, unsigned int size) {
   }
 }
 
+int SciFiTrack::GetNumberDataPoints() const {
+  int number_trackpoints = _trackpoints.size();
+  int tp_counter = 0;
+
+  for ( int tp_it = 0; tp_it < number_trackpoints; ++tp_it ) {
+    if ( _trackpoints[tp_it]->has_data() ) {
+      tp_counter += 1;
+    }
+  }
+
+  return tp_counter;
+}
+
+
 int SciFiTrack::GetRating() const {
   SciFiStraightPRTrack* pr_track = static_cast<SciFiStraightPRTrack*>(_pr_track->GetObject());
 
   int number_spacepoints = pr_track->get_num_points();
+  int number_datapoints = this->GetNumberDataPoints();
 
-  bool good_pval = (this->P_value() > 0.05);
+  bool excel_pval = (this->P_value() > 0.05);
+  bool good_pval = (this->P_value() > 0.01);
 
 
   int rating = 0;
 
-  if (number_spacepoints == 5 &&
-      good_pval) {
-    rating = 5;
-  } else if (good_pval) {
-    rating = 4;
-  } else {
+  if (number_datapoints == 15 && excel_pval) {
     rating = 1;
+  } else if (number_spacepoints == 5 && good_pval) {
+    rating = 2;
+  } else if (number_datapoints >= 10 && good_pval) {
+    rating = 3;
+  } else {
+    rating = 5;
   }
 
   return rating;
