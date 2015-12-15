@@ -121,11 +121,11 @@ int SciFiTrack::GetRating() const {
 
   if (number_spacepoints == 5 &&
       good_pval) {
-    rating = 5;
-  } else if (good_pval) {
-    rating = 4;
-  } else {
     rating = 1;
+  } else if (good_pval) {
+    rating = 2;
+  } else {
+    rating = 5;
   }
 
   return rating;
