@@ -26,7 +26,7 @@ download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 six>=1.4.0 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
- pymongo==2.3 readline matplotlib==1.1.0 scons==2.2.0\
+ pymongo==2.3 readline numpy==1.6.0 matplotlib==1.5.0 scons==2.2.0\
  pil django==1.5.1 magickwand psutil==3.0.1
 "
 # scons v2.2.0 is no longer on pypi
@@ -41,7 +41,7 @@ package_list="\
  anyjson python-dateutil amqplib six kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
- pymongo scons readline matplotlib \
+ pymongo scons readline numpy matplotlib \
  pil django magickwand psutil
 "
 # note numpy was installed previously, not in this script. We test it's import
