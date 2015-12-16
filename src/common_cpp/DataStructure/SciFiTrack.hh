@@ -164,7 +164,8 @@ class SciFiTrack {
 
   /** @brief Returns an integer rating of the track (1:Excellent, 5:Terrible)
    */
-  int GetRating() const;
+  int GetRating() const { return this->_rating; }
+  void SetRating(int rating) { this->_rating = rating; }
 
   /** @brief Returns an boolean value if it's a "good" track
    */
@@ -178,6 +179,8 @@ class SciFiTrack {
   int _ndf;
 
   double _P_value;
+
+  int _rating;
 
   int _charge;
 

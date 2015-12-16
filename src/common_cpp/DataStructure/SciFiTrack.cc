@@ -22,6 +22,7 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _chi2(-1),
                           _ndf(-1),
                           _P_value(-1),
+                          _rating(5),
                           _charge(0),
                           _trackpoints(0),
                           _seed_position(),
@@ -34,15 +35,17 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _chi2(-1),
                                                    _ndf(-1),
                                                    _P_value(-1),
+                                                   _rating(5),
                                                    _charge(0),
                                                    _trackpoints(0),
                                                    _seed_position(),
                                                    _seed_momentum(),
                                                    _seed_covariance_matrix(0) {
   _tracker   = a_track.tracker();
-  _chi2    = a_track.chi2();
+  _chi2      = a_track.chi2();
   _ndf       = a_track.ndf();
   _P_value   = a_track.P_value();
+  _rating    = a_track.GetRating();
   _charge    = a_track.charge();
   _algorithm_used = a_track._algorithm_used;
   _seed_position = a_track._seed_position;
@@ -69,6 +72,7 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
   _chi2  = a_track.chi2();
   _ndf     = a_track.ndf();
   _P_value = a_track.P_value();
+  _rating  = a_track.GetRating();
   _charge  = a_track.charge();
   _algorithm_used = a_track._algorithm_used;
   _seed_position = a_track._seed_position;
@@ -120,32 +124,6 @@ int SciFiTrack::GetNumberDataPoints() const {
   }
 
   return tp_counter;
-}
-
-
-int SciFiTrack::GetRating() const {
-  SciFiStraightPRTrack* pr_track = static_cast<SciFiStraightPRTrack*>(_pr_track->GetObject());
-
-  int number_spacepoints = pr_track->get_num_points();
-  int number_datapoints = this->GetNumberDataPoints();
-
-  bool excel_pval = (this->P_value() > 0.05);
-  bool good_pval = (this->P_value() > 0.01);
-
-
-  int rating = 0;
-
-  if (number_datapoints == 15 && excel_pval) {
-    rating = 1;
-  } else if (number_spacepoints == 5 && good_pval) {
-    rating = 2;
-  } else if (number_datapoints >= 10 && good_pval) {
-    rating = 3;
-  } else {
-    rating = 5;
-  }
-
-  return rating;
 }
 
 } // ~namespace MAUS

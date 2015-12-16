@@ -72,6 +72,17 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _use_eloss          = (*json)["SciFiKalman_use_Eloss"].asBool();
   _use_patrec_seed    = (*json)["SciFiSeedPatRec"].asBool();
   _correct_pz         = (*json)["SciFiKalmanCorrectPz"].asBool();
+// Values used to set the track rating:
+  _excellent_num_trackpoints     = (*json)["SciFiExcellentNumTrackpoints"].asInt();
+  _good_num_trackpoints          = (*json)["SciFiGoodNumTrackpoints"].asInt();
+  _poor_num_trackpoints          = (*json)["SciFiPoorNumTrackpoints"].asInt();
+  _excellent_p_value             = (*json)["SciFiExcellentPValue"].asDouble();
+  _good_p_value                  = (*json)["SciFiGoodPValue"].asDouble();
+  _poor_p_value                  = (*json)["SciFiPoorPValue"].asDouble();
+  _excellent_num_spacepoints  = (*json)["SciFiExcellentNumSpacepoints"].asInt();
+  _good_num_spacepoints       = (*json)["SciFiGoodNumSpacepoints"].asInt();
+  _poor_num_spacepoints       = (*json)["SciFiPoorNumSpacepoints"].asInt();
+
 
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
@@ -418,6 +429,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _helical_track_fitter->Smooth(false);
 
       SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
+      calculate_track_rating(track);
 
       evt.add_scifitrack(track);
     }
@@ -434,6 +446,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _straight_track_fitter->Smooth(false);
 
       SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
+      calculate_track_rating(track);
 
       evt.add_scifitrack(track);
     }
@@ -568,6 +581,36 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
     track->set_reference_position(pos);
     track->set_reference_momentum(mom);
   }
+}
+
+void MapCppTrackerRecon::calculate_track_rating(SciFiTrack* track) const {
+  SciFiBasePRTrack* pr_track = track->pr_track_pointer();
+  int number_spacepoints = pr_track->get_num_points();
+  int number_trackpoints = track->GetNumberDataPoints();
+
+  bool excel_numtp = (number_trackpoints >= _excellent_num_trackpoints);
+  bool good_numtp = (number_trackpoints >= _good_num_trackpoints);
+  bool poor_numtp = (number_trackpoints >= _poor_num_trackpoints);
+  bool excel_numsp = (number_spacepoints >= _excellent_num_spacepoints);
+  bool good_numsp = (number_spacepoints >= _good_num_spacepoints);
+  bool poor_numsp = (number_spacepoints >= _poor_num_spacepoints);
+  bool excel_pval = (track->P_value() >= _excellent_p_value);
+  bool good_pval = (track->P_value() >= _good_p_value);
+  bool poor_pval = (track->P_value() >= _poor_p_value);
+
+  int rating = 0;
+
+  if (excel_numtp && excel_numsp && excel_pval ) {
+    rating = 1;
+  } else if ( good_numtp && good_numsp && good_pval ) {
+    rating = 2;
+  } else if (poor_numtp && poor_numsp && poor_pval ) {
+    rating = 3;
+  } else {
+    rating = 5;
+  }
+
+  track->SetRating(rating);
 }
 
 
