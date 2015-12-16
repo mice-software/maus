@@ -600,11 +600,11 @@ void MapCppTrackerRecon::calculate_track_rating(SciFiTrack* track) const {
 
   int rating = 0;
 
-  if (excel_numtp && excel_numsp && excel_pval ) {
+  if (excel_numtp && excel_numsp && excel_pval) {
     rating = 1;
-  } else if ( good_numtp && good_numsp && good_pval ) {
+  } else if (good_numtp && good_numsp && good_pval) {
     rating = 2;
-  } else if (poor_numtp && poor_numsp && poor_pval ) {
+  } else if (poor_numtp && poor_numsp && poor_pval) {
     rating = 3;
   } else {
     rating = 5;
