@@ -31,6 +31,8 @@
 #include <string>
 
 // ROOT headers
+#include "TFile.h"
+#include "TH1D.h"
 #include "TMatrixD.h"
 
 // Third party library headers
@@ -320,6 +322,9 @@ class PatternRecognition {
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
+    TFile* _rfile;
+    TH1D* _hx;
+    TH1D* _hy;
 };
 
 } // ~namespace MAUS

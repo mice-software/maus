@@ -32,6 +32,8 @@
 
 // External libs headers
 #include "TROOT.h"
+#include "TFile.h"
+#include "TH1D.h"
 #include "TMatrixD.h"
 
 // MAUS headers
@@ -72,7 +74,15 @@ PatternRecognition::PatternRecognition(): _up_straight_pr_on(true),
                                           _n_turns_cut(0.75),
                                           _sz_chisq_cut(4.0),
                                           _Pt_max(180.0),
-                                          _Pz_min(50.0) {
+                                          _Pz_min(50.0),
+                                          _rfile(NULL),
+                                          _hx(NULL),
+                                          _hy(NULL) {
+  _rfile = new TFile("pattern_recongition_debug.root", "RECREATE");
+  _hx = new TH1D("hx", "Pattern Recongition Road X Residuals", 200, -150, 150);
+  _hy = new TH1D("hy", "Pattern Recongition Road Y Residuals", 500, -150, 150);
+  _hx->Write();
+  _hy->Write();
 }
 
 void PatternRecognition::set_parameters_to_default() {
@@ -100,7 +110,13 @@ void PatternRecognition::set_parameters_to_default() {
 }
 
 PatternRecognition::~PatternRecognition() {
-  // Do nothing
+  _rfile->cd();
+  _hx->Write();
+  _hy->Write();
+  // if (_rfile) {
+  //  _rfile->Close();
+  //  delete _rfile;
+  // }
 }
 
 bool PatternRecognition::LoadGlobals() {
@@ -396,6 +412,10 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
                                      const std::vector<int> ignore_stations,
                                      SpacePoint2dPArray &spnts_by_station,
                                      std::vector<SciFiStraightPRTrack*> &strks) const {
+
+  // Set up a secondary ROOT file to hold non-standard debug data
+  _rfile->cd();
+
   // Set inner and outer stations
   int o_st_num = -1, i_st_num = -1;
   set_end_stations(ignore_stations, o_st_num, i_st_num);
@@ -445,11 +465,17 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
           // Loop over spacepoints
           for ( size_t sp_no = 0; sp_no < spnts_by_station[st_num].size(); ++sp_no ) {
-
+            SciFiSpacePoint* sp = spnts_by_station[st_num][sp_no];
             // If the spacepoint has not already been used in a track fit
-            if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
+            if ( !sp->get_used() ) {
               // Apply roadcuts & find the spoints with the smallest residuals for the line
               double dx = 0, dy = 0;
+              dx = (line_x.get_m() * sp->get_position().z() + line_x.get_c())
+                - sp->get_position().x();
+              dy = (line_y.get_m() * sp->get_position().z() + line_y.get_c())
+                - sp->get_position().y();
+              if (_hx) _hx->Fill(dx);
+              if (_hy) _hy->Fill(dy);
               if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
                 if ( delta_sq > (dx*dx + dy*dy) ) {
                   delta_sq = dx*dx + dy*dy;
