@@ -39,6 +39,9 @@ SciFiTrackProcessor::SciFiTrackProcessor()
     RegisterValueBranch("P_value", &_double_proc,
                         &SciFiTrack::P_value,
                         &SciFiTrack::set_P_value, true);
+    RegisterValueBranch("rating", &_int_proc,
+                        &SciFiTrack::GetRating,
+                        &SciFiTrack::SetRating, false);
     RegisterIgnoredBranch("trackpoints", false);
     RegisterValueBranch("trackpoints", &_scifi_trackpoint_array_proc,
                         &SciFiTrack::scifitrackpoints,

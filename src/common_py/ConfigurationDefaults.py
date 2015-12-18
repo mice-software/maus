@@ -336,6 +336,16 @@ SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
 SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
 SciFiKalmanVerbose  = False # Dump information per fitted track
 SciFiDefaultMomentum = 200.0 # Default momentum to assume for straight tracks
+# How we determine the track ratings:
+SciFiExcellentNumTrackpoints = 15
+SciFiGoodNumTrackpoints = 10
+SciFiPoorNumTrackpoints = 10
+SciFiExcellentNumSpacepoints = 5
+SciFiGoodNumSpacepoints = 5
+SciFiPoorNumSpacepoints = 4
+SciFiExcellentPValue = 0.05
+SciFiGoodPValue = 0.01
+SciFiPoorPValue = 0.0
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
