@@ -15,12 +15,6 @@
  *
  */
 
-
-/** @class MapCppEMRMCDigitization
- * Digitization of the EMR MC data.
- *
- */
-
 #ifndef _MAP_MAPCPPEMRMCDIGITIZATION_H_
 #define _MAP_MAPCPPEMRMCDIGITIZATION_H_
 
@@ -39,47 +33,55 @@
 #include "Utils/EMRChannelMap.hh"
 #include "Utils/EMRCalibrationMap.hh"
 #include "Utils/EMRAttenuationMap.hh"
+#include "Utils/CppErrorHandler.hh"
+#include "Utils/JsonWrapper.hh"
+#include "Interface/dataCards.hh"
+#include "Converter/DataConverters/CppJsonSpillConverter.hh"
+#include "Converter/DataConverters/JsonCppSpillConverter.hh"
+#include "API/PyWrapMapBase.hh"
+#include "API/MapBase.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
-#include "DataStructure/DAQData.hh"
-#include "DataStructure/DBBSpillData.hh"
-#include "DataStructure/EMRBar.hh"
-#include "DataStructure/EMRBarHit.hh"
-#include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
 #include "DataStructure/EMRSpillData.hh"
 #include "DataStructure/V1731.hh"
 #include "DataStructure/Primary.hh"
+#include "DataStructure/ThreeVector.hh"
 #include "Utils/Globals.hh"
 #include "Globals/GlobalsManager.hh"
-#include "API/MapBase.hh"
 
 // ROOT
-#include "TROOT.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TSystem.h"
 #include "TRandom3.h"
 #include "TH1F.h"
 
 namespace MAUS {
 
-typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; /* nHits elements */
-typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
-typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
-typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
+/** @class MapCppEMRMCDigitization
+ *
+ * Digitization of the EMR MC data.
+ */
 
-struct fADCdata {
+struct EMRBarHitTmp {
+  EMRBarHit _barhit;
+  ThreeVector _pos;	// Position of the hit (attenuation)
+  double _path_length;	// Path length in the bar (Birk's law)
+};
+
+typedef std::vector<EMRBarHitTmp>	EMRBarHitVector;	// nHits elements
+
+struct EMRPlaneHitTmp {
+  EMRBarHitVector _barhits;
   int    _orientation;
+  int    _time;
+  int    _deltat;
   double _charge;
   double _pedestal_area;
-  int    _time;
   std::vector<int> _samples;
 };
 
-typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector;/* 48 elements */
-typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector;/* nTr elements */
+typedef std::vector<EMRPlaneHitTmp>	EMRPlaneHitVector;	// 48 elements
+typedef std::vector<EMRPlaneHitVector> 	EMREventPlaneHitVector; // nTr elements
 
 class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
  public:
@@ -101,43 +103,42 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
 
   /** @brief process JSON document
    *
-   *  Receive a document with MC hits and return
+   *  Receives MAUS::Data with MC hits and return
    *  a document with digitized recEvts
    */
   void _process(MAUS::Data *data) const;
 
-
   void processMC(MAUS::MCEventPArray *mcEvts,
-		 EMRDBBEventVector& emr_dbb_events_tmp,
-		 EMRfADCEventVector& emr_fadc_events_tmp,
+		 EMREventPlaneHitVector& mc_events_tmp,
 		 int deltat_min,
 		 int deltat_max) const;
 
-  void digitize(EMRDBBEventVector emr_dbb_events_tmp,
-		EMRfADCEventVector emr_fadc_events_tmp,
-		EMRDBBEventVector& emr_dbb_events,
-		EMRfADCEventVector& emr_fadc_events,
-		int deltat_min,
-		int deltat_max) const;
+  void digitize(EMREventPlaneHitVector mc_events_tmp,
+		EMREventPlaneHitVector& emr_events_tmp,
+		EMRBarHitArray& emr_bar_hits_tmp,
+		size_t nPartEvents) const;
+
+  void process_candidates(EMRBarHitArray emr_bar_hits_tmp,
+		          EMREventPlaneHitVector& emr_candidates_tmp) const;
 
   void fill(MAUS::Spill *spill,
-	    EMRDBBEventVector emr_dbb_events,
-	    EMRfADCEventVector emr_fadc_events) const;
+	    EMREventPlaneHitVector& emr_events_tmp,
+	    size_t nPartEvents) const;
 
-  EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
-  EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
+  EMREventPlaneHitVector get_emr_events_tmp(size_t nPartEvts) const;
 
   // Maps
   EMRCalibrationMap _calibMap;
   EMRAttenuationMap _attenMap;
 
   // Detector parameters
-  int _number_of_planes;
-  int _number_of_bars;
+  size_t _number_of_planes;
+  size_t _number_of_bars;
 
   // Hit pre-selection cuts
-  int _tot_noise_up;
-  int _tot_noise_low;
+  size_t _secondary_n_low;
+  int _secondary_tot_low;
+  int _secondary_bunching_width;
 
   // Digitization variables
   int _do_sampling;
@@ -176,8 +177,7 @@ class MapCppEMRMCDigitization : public MapBase<MAUS::Data> {
   int _baseline[48];
   int _noise_level[48];
   int _noise_position[48];
-};  // Don't forget this trailing colon!!!!
-} // ~namespace MAUS
+};
+} // namespace MAUS
 
-#endif
-
+#endif // #define _MAP_MAPCPPEMRMCDIGITIZATION_H_

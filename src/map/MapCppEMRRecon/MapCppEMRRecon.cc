@@ -54,26 +54,13 @@ void MapCppEMRRecon::_birth(const std::string& argJsonConfigDocument) {
   // Fetch variables
   _number_of_planes = configJSON["EMRnumberOfPlanes"].asInt();
   _number_of_bars = configJSON["EMRnumberOfBars"].asInt();
-  _bar_width = configJSON["EMRbarWidth"].asDouble();
-  _bar_height = configJSON["EMRbarHeight"].asDouble();
-  _gap = configJSON["EMRgap"].asDouble();
 
-  _secondary_hits_bunching_width = configJSON["EMRsecondaryHitsBunchingWidth"].asInt();
-
-  _primary_trigger_minXhits = configJSON["EMRprimaryTriggerMinXhits"].asInt();
-  _primary_trigger_minYhits = configJSON["EMRprimaryTriggerMinYhits"].asInt();
-  _primary_trigger_minNhits = configJSON["EMRprimaryTriggerMinNhits"].asInt();
-  _secondary_trigger_minXhits = configJSON["EMRsecondaryTriggerMinXhits"].asInt();
-  _secondary_trigger_minYhits = configJSON["EMRsecondaryTriggerMinYhits"].asInt();
-  _secondary_trigger_minNhits = configJSON["EMRsecondaryTriggerMinNhits"].asInt();
-  _secondary_trigger_minTot = configJSON["EMRsecondaryTriggerMinTot"].asInt();
-
-  _max_secondary_to_primary_track_distance
-	= configJSON["EMRmaxSecondaryToPrimaryTrackDistance"].asInt();
-
-  _tot_func_p1 = configJSON["EMRtotFuncP1"].asDouble();
-  _tot_func_p2 = configJSON["EMRtotFuncP2"].asDouble();
-  _tot_func_p3 = configJSON["EMRtotFuncP3"].asDouble();
+  _dbb_count = configJSON["EMRdbbCount"].asDouble();
+  _charge_threshold = configJSON["EMRchargeThreshold"].asDouble();
+  _polynomial_order = configJSON["EMRpolynomialOrder"].asInt();
+  _max_time = configJSON["EMRmaxMotherDaughterTime"].asDouble();
+  _max_distance = configJSON["EMRmaxMotherDaughterDistance"].asDouble();
+  _hole_fraction = configJSON["EMRholeFraction"].asDouble();
 
   // Load the EMR calibration map
   bool loaded = _calibMap.InitializeFromCards(configJSON);
@@ -102,1018 +89,451 @@ void MapCppEMRRecon::_death() {
 
 void MapCppEMRRecon::_process(Data *data) const {
 
-  // Get spill, at this stage, the tree needs to contain 1 event per trigger + spill data
-  Spill *spill = data->GetSpill();
-  int nPartEvents = spill->GetReconEventSize();
+  // Routine data checks before processing it
+  if ( !data )
+      throw Exception(Exception::recoverable, "Data was NULL",
+                     "MapCppEMRRecon::_process");
+
+  Spill* spill = data->GetSpill();
+  if ( !spill )
+      throw Exception(Exception::recoverable, "Spill was NULL",
+                     "MapCppEMRRecon::_process");
+
+  if ( spill->GetDaqEventType() != "physics_event" )
+      return;
+
+  size_t nPartEvents = spill->GetReconEventSize();
   if ( !nPartEvents )
       return;
-  if (!spill->GetEMRSpillData())
+
+  if ( !spill->GetEMRSpillData() )
       return;
 
-  // Return if there's no EMR data
-  bool emrdata = false;
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+  bool emrData = false;
+  for (size_t iPe = 0; iPe < nPartEvents; iPe++) {
     EMREvent *evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
-    int nPlHits = evt->GetEMRPlaneHitArray().size();
-
-    if ( nPlHits ) {
-      emrdata = true;
-      break;
+    if ( evt->GetMotherPtr() ) {
+      if ( evt->GetMotherPtr()->GetEMRPlaneHitArraySize() ) {
+        emrData = true;
+        break;
+      }
     }
   }
-  if ( !emrdata )
+  if ( !emrData )
       return;
 
-  // Create DBB and fADC arrays with n+1 events (1 per trigger + spill data)
-  EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents + 1);
-  EMRfADCEventVector_er emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents + 1);
+  // Reconstruct the plane density from plane hits
+  reconstruct_plane_density(spill, nPartEvents);
 
-  // Initialize DBB and fADC arrays to future host n+n' events (1 per trigger + 1 per decay)
-  EMRDBBEventVector emr_dbb_events[3];
-  EMRfADCEventVector_er emr_fadc_events;
-  EMRTrackEventVector emr_track_events;
+  // Calculate the total corrected charge and the energy loss pattern from space points
+  reconstruct_event_charge(spill, nPartEvents);
 
-  // Fill temporary array with preselected events
-  process_preselected_events(spill, emr_dbb_events_tmp, emr_fadc_events_tmp);
+  // Fit the space points with an EMRTrack
+  reconstruct_tracks(spill, nPartEvents);
 
-  // Bunch secondary hits and place them in new reconEvents
-  process_secondary_events(emr_dbb_events_tmp, emr_fadc_events_tmp,
-			   emr_dbb_events, emr_fadc_events, emr_track_events);
-
-  // Fill primary and secondary events array with the most significant bar of each plane
-  tot_cleaning(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
-
-  // Reconstruct the main PID variables for muon tagging
-  pid_variables(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
-
-  // Reconstruct the coordinates of each Hit
-  coordinates_reconstruction(nPartEvents, emr_dbb_events, emr_fadc_events);
-
-  // Correct the ToT and charge using the calibration constants
-  energy_correction(nPartEvents, emr_dbb_events, emr_fadc_events);
-
-  // Match the primary tracks with their decay
-  track_matching(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
-
-  // Calculate the total corrected charge the energy loss pattern
-  event_charge_calculation(nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
-
-  // Fill the Recon event array with Spill information (/!\ only 1 per trigger /!\)
-  fill(spill, nPartEvents, emr_dbb_events, emr_fadc_events, emr_track_events);
+  // Try to match the mother particles with their decay daughter
+  match_daughters(spill, nPartEvents);
 }
 
-void MapCppEMRRecon::process_preselected_events(MAUS::Spill *spill,
-						EMRDBBEventVector& emr_dbb_events_tmp,
-						EMRfADCEventVector_er& emr_fadc_events_tmp) const {
+void MapCppEMRRecon::reconstruct_plane_density(MAUS::Spill* spill,
+					       size_t nPartEvents) const {
 
-  int nPartEvents = spill->GetReconEvents()->size();
-
-  for (int iPe = 0; iPe < nPartEvents+1; iPe++) {
-
-    EMREvent *evt;
-    int nPlHits(-1);
-    if (iPe < nPartEvents) {
-      evt = spill->GetReconEvents()->at(iPe)->GetEMREvent();
-      nPlHits = evt->GetEMRPlaneHitArray().size();
-    } else  {
-      nPlHits = spill->GetEMRSpillData()->GetEMRPlaneHitArray().size();
-    }
-    if ( !nPlHits )
-	continue;
-
-    // Fill collection of pre-selected events
-    for (int iPlane = 0; iPlane < nPlHits; iPlane++) {
-
-      EMRPlaneHit *plHit;
-      if (iPe < nPartEvents) {
-        plHit = evt->GetEMRPlaneHitArray().at(iPlane);
-      } else {
-	plHit = spill->GetEMRSpillData()->GetEMRPlaneHitArray().at(iPlane);
-      }
-
-      int xPlane = plHit->GetPlane();
-      int nBars = plHit->GetEMRBarArray().size();
-
-      for (int iBar = 0; iBar < nBars; iBar++) {
-
-	EMRBar *bar = plHit->GetEMRBarArray().at(iBar);
-	int xBar = bar->GetBar();
-
-	// Skip calibration channel
-	if (xBar == 0) continue;
-
-	int nBarHits = bar->GetEMRBarHitArray().size();
-
-	for (int iBarHit = 0; iBarHit < nBarHits; iBarHit++) {
-
-	  EMRBarHit barHit = bar->GetEMRBarHitArray().at(iBarHit);
-	  int xTot  = barHit.GetTot();
-	  int xDeltaT = barHit.GetDeltaT();
-	  int xHitTime = barHit.GetHitTime();
-	  double x = -1.0;
-	  double y = -1.0;
-	  double z = -1.0;
-
-	  EMRBarHit bHit;
-	  bHit.SetTot(xTot);
-	  bHit.SetDeltaT(xDeltaT);
-	  bHit.SetHitTime(xHitTime);
-	  bHit.SetX(x);
-	  bHit.SetY(y);
-	  bHit.SetZ(z);
-
-	  emr_dbb_events_tmp[iPe][xPlane][xBar].push_back(bHit);
-	}
-      }
-
-      if (iPe < nPartEvents) {
-        int xOri = plHit->GetOrientation();
-        int xArrivalTime = plHit->GetDeltaT();
-        double xCharge = plHit->GetCharge();
-        double xPedestalArea = plHit->GetPedestalArea();
-        std::vector<int> xSamples = plHit->GetSamples();
-
-        fADCdata_er data;
-        data._orientation = xOri;
-        data._charge = xCharge;
-        data._pedestal_area = xPedestalArea;
-        data._time = xArrivalTime;
-        data._samples = xSamples;
-        emr_fadc_events_tmp[iPe][xPlane] = data;
-      }
-    }
-  }
-}
-
-void MapCppEMRRecon::process_secondary_events(EMRDBBEventVector emr_dbb_events_tmp,
-					      EMRfADCEventVector_er emr_fadc_events_tmp,
-					      EMRDBBEventVector *emr_dbb_events,
-					      EMRfADCEventVector_er& emr_fadc_events,
-					      EMRTrackEventVector& emr_track_events) const {
-
-  // The last element of the array contains the EMR spill data
-  int nPartEvents = emr_fadc_events_tmp.size() - 1;
-
-  // Save hit time of each secondary hit in a vector
-  std::vector<int> hitTimeVector;
-  for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-    for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-      int nHits = emr_dbb_events_tmp[nPartEvents][iPlane][iBar].size();
-
-      for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-	EMRBarHit bHit = emr_dbb_events_tmp[nPartEvents][iPlane][iBar][iBarHit];
-	int xTot = bHit.GetTot(); // DBB counts
-  	int xHitTime = bHit.GetHitTime(); // DBB counts
-	if (xTot > _secondary_trigger_minTot) hitTimeVector.push_back(xHitTime);
-      }
-    }
-  }
-
-  // Sort the vector in ascending order
-  sort(hitTimeVector.begin(), hitTimeVector.end());
-  int hitTimeVectorSize = hitTimeVector.size();
-
-  // Find groups of hits defined by _secondary_hits_bunching_width
-  std::vector<int> hitTimeGroup;
-  int nHitsInGroup = 1;
-  int iHitTime = 0;
-
-  for (int iHit = 1; iHit < hitTimeVectorSize + 1; iHit++) {
-
-    int deltat = _secondary_hits_bunching_width + 1;
-    if ( !iHitTime ) iHitTime = hitTimeVector.at(iHit - 1);
-    if (iHit < hitTimeVectorSize) deltat = hitTimeVector.at(iHit) - iHitTime;
-
-    if (deltat > _secondary_hits_bunching_width) {
-      if (nHitsInGroup >= _secondary_trigger_minNhits) {
-        hitTimeGroup.push_back(hitTimeVector.at(iHit-1));
-      }
-      nHitsInGroup = 1;
-      iHitTime = 0;
+  // Loop over mothers and candidates to reconstruct their plane density
+  size_t nSeconPartEvents = spill->GetEMRSpillData()->GetEMREventTrackArraySize();
+  for (size_t iPe = 0; iPe < nPartEvents+nSeconPartEvents; iPe++) {
+    // Skip events without an EventTrack (mother or candidate)
+    EMREventTrack* evtTrack;
+    if ( iPe < nPartEvents ) {
+      evtTrack = spill->GetReconEvents()->at(iPe)->GetEMREvent()->GetMotherPtr();
     } else {
-      nHitsInGroup++;
+      evtTrack = spill->GetEMRSpillData()->GetEMREventTrackArray()[iPe-nPartEvents];
     }
-  }
-
-  // Number of the secondary trigger
-  int nSeconPartEvents = hitTimeGroup.size();
-
-  // Resize the event arrays to accomodate one extra event per secondary track (n')
-  for (int iArray = 0; iArray < 3; iArray++)
-    emr_dbb_events[iArray] = get_dbb_data_tmp(nPartEvents + nSeconPartEvents);
-  emr_fadc_events = get_fadc_data_tmp(nPartEvents + nSeconPartEvents);
-  emr_track_events = get_track_data_tmp(nPartEvents + nSeconPartEvents);
-
-  // Fill collection of events (pre-selected)
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-	int nHits = emr_dbb_events_tmp[iPe][iPlane][iBar].size();
-
-	for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-	  EMRBarHit bHit = emr_dbb_events_tmp[iPe][iPlane][iBar][iBarHit];
-	  emr_dbb_events[0][iPe][iPlane][iBar].push_back(bHit);
-	}
-      }
-
-      fADCdata_er data;
-      data._orientation = emr_fadc_events_tmp[iPe][iPlane]._orientation;
-      data._charge = emr_fadc_events_tmp[iPe][iPlane]._charge;
-      data._pedestal_area = emr_fadc_events_tmp[iPe][iPlane]._pedestal_area;
-      data._time = emr_fadc_events_tmp[iPe][iPlane]._time;
-      data._samples = emr_fadc_events_tmp[iPe][iPlane]._samples;
-      emr_fadc_events[iPe][iPlane] = data;
-    }
-  }
-
-  // Associate each bunch to a secondary trigger
-  for (int iHitTimeGroup = 0; iHitTimeGroup < nSeconPartEvents; iHitTimeGroup++) {
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-	int nHits = emr_dbb_events_tmp[nPartEvents][iPlane][iBar].size();
-
-	for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-	  EMRBarHit bHit = emr_dbb_events_tmp[nPartEvents][iPlane][iBar][iBarHit];
-	  int hitTime = bHit.GetHitTime(); // DBB counts
-	  int deltat = hitTimeGroup.at(iHitTimeGroup) - hitTime;
-
-	  if (deltat >= 0 && deltat < _secondary_hits_bunching_width) {
-	    emr_dbb_events[0][nPartEvents + iHitTimeGroup]
-			  [iPlane][iBar].push_back(bHit);
-	  }
-	}
-      }
-    }
-  }
-}
-
-void MapCppEMRRecon::tot_cleaning(int nPartEvents,
-				  EMRDBBEventVector *emr_dbb_events,
-				  EMRfADCEventVector_er& emr_fadc_events,
-				  EMRTrackEventVector& emr_track_events) const {
-
-  int nTotalPartEvents = emr_fadc_events.size();
-
-  for (int iPe = 0; iPe < nTotalPartEvents; iPe++) {
-    // Count number of X and Y planes hit
-    int xPlaneHits = 0;
-    int yPlaneHits = 0;
-
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      int nHits = 0;
-
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-  	nHits += emr_dbb_events[0][iPe][iPlane][iBar].size();
-      }
-      if (nHits && iPlane % 2 == 0) xPlaneHits++;
-      if (nHits && iPlane % 2 == 1) yPlaneHits++;
-    }
-
-    // Reject triggers with too small amount of hits
-    if (iPe < nPartEvents &&
-	(xPlaneHits < _primary_trigger_minXhits ||
-	 yPlaneHits < _primary_trigger_minYhits ||
-	 (xPlaneHits + yPlaneHits) < _primary_trigger_minNhits)) continue;
-    if (iPe >= nPartEvents &&
-	(xPlaneHits < _secondary_trigger_minXhits ||
-	 yPlaneHits < _secondary_trigger_minYhits ||
-	 (xPlaneHits + yPlaneHits) < _secondary_trigger_minNhits)) continue;
-
-    emr_track_events[iPe]._has_primary = true;
-
-    // Select the channel with the highest ToT in each plane
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      int xTotMax  = 0;
-      int xBarMax = 0;
-      int xHitMax = 0;
-
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-  	int nHits = emr_dbb_events[0][iPe][iPlane][iBar].size();
-
-  	for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-  	  EMRBarHit bHit = emr_dbb_events[0][iPe][iPlane][iBar][iBarHit];
-  	  int xTot = bHit.GetTot();
-
-  	  if (xTot > xTotMax) {
-  	    xTotMax = xTot;
-  	    xHitMax = iBarHit;
-	    xBarMax = iBar;
-  	  }
-  	}
-      }
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-      	int nHits = emr_dbb_events[0][iPe][iPlane][iBar].size();
-
-	// Fill primary events array
-      	for (int iBarHit = 0; iBarHit < nHits; iBarHit++) {
-      	  EMRBarHit bHit = emr_dbb_events[0][iPe][iPlane][iBar][iBarHit];
-
-      	  if (iBar == xBarMax && iBarHit == xHitMax &&
-	      bHit.GetTot()>_secondary_trigger_minTot) {
-      	    emr_dbb_events[1][iPe][iPlane][iBar].push_back(bHit);
-      	  }
-      	}
-      }
-    }
-  }
-}
-
-void MapCppEMRRecon::pid_variables(int nPartEvents,
-				  EMRDBBEventVector *emr_dbb_events,
-		  		  EMRfADCEventVector_er& emr_fadc_events,
-				  EMRTrackEventVector& emr_track_events) const {
-
-  // Loop over the primary events only
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
-
-    // Skip the events without a primary track
-    if ( !emr_track_events[iPe]._has_primary )
+    if ( !evtTrack )
 	continue;
 
-    int nPlane_sa(0), lPlaneX_sa(0), lPlaneY_sa(0);
-    int nPlane_ma(0), lPlaneX_ma(0), lPlaneY_ma(0);
-    vector<double> x[2], y[2];
+    // Sort the planes by ascending order of plane ID
+    EMRPlaneHitArray planeHitArray = evtTrack->GetEMRPlaneHitArray();
+    sort(planeHitArray.begin(), planeHitArray.end(),
+         [] (const EMRPlaneHit* a, const EMRPlaneHit* b) {
+	     return a->GetPlane() < b->GetPlane();
+         });
 
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      if ( emr_fadc_events[iPe][iPlane]._charge ) {
-	nPlane_sa++;
-	if (iPlane%2 == 0 && iPlane/2+1 > lPlaneX_sa) lPlaneX_sa = iPlane/2+1;
-	else if (iPlane%2 != 0 && iPlane/2+1 > lPlaneY_sa) lPlaneY_sa = iPlane/2+1;
+    // Find the first, last and total amount of plane hit by the particle
+    int fPlaneMA(47), lPlaneMA(0), nPlaneMA(0);
+    int fPlaneSA(47), lPlaneSA(0), nPlaneSA(0);
+    for (size_t iPlane = 0; iPlane < planeHitArray.size(); iPlane++) {
+      int xPlane = planeHitArray[iPlane]->GetPlane();
+      if ( planeHitArray[iPlane]->GetEMRBarHitArraySize() ) {
+	nPlaneMA++;
+	if ( xPlane < fPlaneMA )
+	    fPlaneMA = xPlane;
+        if ( xPlane > lPlaneMA )
+	    lPlaneMA = xPlane;
       }
-
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) {
-	if ( emr_dbb_events[0][iPe][iPlane][iBar].size() ) {
-	  if (iPlane%2 == 0 && iPlane/2+1 > lPlaneX_ma) lPlaneX_ma = iPlane/2+1;
-	  else if (iPlane%2 != 0 && iPlane/2+1 > lPlaneY_ma) lPlaneY_ma = iPlane/2+1;
-	}
-	if ( emr_dbb_events[1][iPe][iPlane][iBar].size() ) {
-	  nPlane_ma++;
-	  if (iPlane%2 == 0) {
-	    if (iBar%2 == 0) {
-  	      x[0].push_back(iPlane + 1./3);
-	      y[0].push_back(iBar);
-	    } else {
-  	      x[0].push_back(iPlane + 2./3);
-	      y[0].push_back(iBar);
-	    }
-	  } else {
-	    if (iBar%2 == 0) {
-  	      x[1].push_back(iPlane + 1./3);
-	      y[1].push_back(iBar);
-	    } else {
-  	      x[1].push_back(iPlane + 2./3);
-	      y[1].push_back(iBar);
-	    }
-	  }
-	}
+      if ( planeHitArray[iPlane]->GetCharge() > _charge_threshold ) {
+	nPlaneSA++;
+	if ( xPlane < fPlaneSA )
+	    fPlaneSA = xPlane;
+        if ( xPlane > lPlaneSA )
+	    lPlaneSA = xPlane;
       }
     }
 
-    // Definition of the plane density, lPlaneX+lPlaneY > 0 as _has_primary = true
-    emr_track_events[iPe]._plane_density_sa
-      = static_cast<double>(nPlane_sa)/(lPlaneX_sa+lPlaneY_sa);
-    emr_track_events[iPe]._plane_density_ma
-      = static_cast<double>(nPlane_ma)/(lPlaneX_ma+lPlaneY_ma);
-
-    // Compute the normalised chi^2 in the two projections
-    for (int iArray = 0; iArray < 2; iArray++) {
-      int n = x[iArray].size();
-
-      double xmean(0.0), ymean(0.0);
-      double xymean(0.0), x2mean(0.0), y2mean(0.0);
-      for (int i = 0; i < n; i++) {
-        xmean += x[iArray][i]/n;
-        ymean += y[iArray][i]/n;
-
-        xymean += x[iArray][i]*y[iArray][i]/n;
-        x2mean += pow(x[iArray][i], 2)/n;
-        y2mean += pow(y[iArray][i], 2)/n;
-      }
-
-      double xvar = x2mean - xmean*xmean;
-      double yvar = y2mean - ymean*ymean;
-      double xyvar = xymean - xmean*ymean;
-      double xycorr(0);
-      if (xvar > 0 && yvar > 0) xycorr = xyvar/sqrt(xvar*yvar);
-      else
-	xycorr = 1;
-
-      double chi2 = yvar*(1-pow(xycorr, 2));
-      if (chi2 < 0) chi2 = 0.;
-
-      if (iArray == 0) emr_track_events[iPe]._chi2_x = chi2;
-      else
-	emr_track_events[iPe]._chi2_y = chi2;
+    // Mothers should alway hit the first plane
+    if ( iPe < nPartEvents ) {
+      fPlaneMA = 0;
+      fPlaneSA = 0;
     }
+
+    if ( nPlaneMA )
+        evtTrack->SetPlaneDensityMA(static_cast<double>
+					(nPlaneMA)/(lPlaneMA-fPlaneMA+1));
+    if ( iPe < nPartEvents && nPlaneSA )
+        evtTrack->SetPlaneDensitySA(static_cast<double>
+					(nPlaneSA)/(lPlaneSA-fPlaneSA+1));
   }
 }
 
-void MapCppEMRRecon::coordinates_reconstruction(int nPartEvents,
-						EMRDBBEventVector *emr_dbb_events,
-						EMRfADCEventVector_er& emr_fadc_events) const {
+void MapCppEMRRecon::reconstruct_event_charge(MAUS::Spill* spill,
+					      size_t nPartEvents) const {
 
-  int nTotalPartEvents = emr_fadc_events.size();
+  // Loop over mothers and candidates to reconstruct their charge
+  size_t nSeconPartEvents = spill->GetEMRSpillData()->GetEMREventTrackArraySize();
+  for (size_t iPe = 0; iPe < nPartEvents+nSeconPartEvents; iPe++) {
+    // Skip events without an EventTrack (mother or candidate)
+    EMREventTrack* evtTrack;
+    if ( iPe < nPartEvents ) {
+      evtTrack = spill->GetReconEvents()->at(iPe)->GetEMREvent()->GetMotherPtr();
+    } else {
+      evtTrack = spill->GetEMRSpillData()->GetEMREventTrackArray()[iPe-nPartEvents];
+    }
+    if ( !evtTrack )
+	continue;
+    if ( !evtTrack->GetEMRSpacePointArraySize() )
+	continue;
 
-  for (int iPe = 0; iPe < nTotalPartEvents; iPe++) {
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+    // Add up the charge from all the spacepoints
+    EMRSpacePointArray spacePointArray = evtTrack->GetEMRSpacePointArray();
+    double xTotalChargeMA(0.), xTotalChargeSA(0.);
+    for (size_t iSP = 0; iSP < spacePointArray.size(); iSP++) {
+      xTotalChargeMA += spacePointArray[iSP]->GetChargeMA();
+      xTotalChargeSA += spacePointArray[iSP]->GetChargeSA();
+    }
+    evtTrack->SetTotalChargeMA(xTotalChargeMA);
+    evtTrack->SetTotalChargeSA(xTotalChargeSA);
 
-      bool Hit0Found = false;
-      bool Hit1Found = false;
-      bool Hit2Found = false;
+    // Only reconstruct the charge ratio for mothers (muon/pion), irrelevant for candidates
+    if ( iPe < nPartEvents ) {
 
-      double x0(-1.0), y0(-1.0), z0(-1.0), x1(-1.0), x2(-1.0), y1(-1.0), y2(-1.0);
-      double a(-1.0), b(-1.0), xi(-1.0);
-
-      // Find Primary hit, carry on if there's none
-      int iBar;
-      for (iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-  	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-	  x0 = (iPlane - _number_of_planes/2) * (_bar_height + _gap)
-             + (1. + iBar%2) * _bar_height * 1./3;
-	  z0 = (iBar - _number_of_bars/2) * (_bar_width/2 + _gap);
-	  Hit0Found = true;
-	  break;
-	}
-      }
-      if (!Hit0Found) continue;
-
-      // Look backwards for hits
-      for (int aPlane = iPlane-1; aPlane >= 0; aPlane = aPlane-2) {
-	for (int aBar = 1; aBar < _number_of_bars; aBar++) { // Skip test channel
-	  if (emr_dbb_events[1][iPe][aPlane][aBar].size()) {
-	    x1 = (aPlane - _number_of_planes/2) * (_bar_height + _gap)
-               + (1. + aBar%2) * _bar_height * 1./3;
-	    y1 = (aBar - _number_of_bars/2) * (_bar_width/2 + _gap);
-	    Hit1Found = true;
-	    break;
-	  }
-	}
-	if (Hit1Found) break;
+      // Calculate the total charge in the last 1/5th of the track
+      size_t nSP = spacePointArray.size();
+      size_t tSP = nSP*4./5; // Threshold space point ID
+      double xTailChargeMA(0.), xTailChargeSA(0.);
+      for (size_t iSP = tSP; iSP < nSP; iSP++) {
+        xTailChargeMA += spacePointArray[iSP]->GetChargeMA();
+        xTailChargeSA += spacePointArray[iSP]->GetChargeSA();
       }
 
-      // Look forward for hits
-      for (int bPlane = iPlane+1; bPlane < _number_of_planes; bPlane = bPlane+2) {
-	for (int bBar = 1; bBar < _number_of_bars; bBar++) { // Skip test channel
-	  if (emr_dbb_events[1][iPe][bPlane][bBar].size()) {
-	    if (Hit2Found && !Hit1Found) {
-	      x1 = (bPlane - _number_of_planes/2) * (_bar_height + _gap)
-                 + (1. + bBar%2) * _bar_height * 1./3;
-	      y1 = (bBar - _number_of_bars/2) * (_bar_width/2 + _gap);
-	      Hit1Found = true;
-	      break;
-	    }
-	    if (!Hit2Found) {
-	      x2 = (bPlane - _number_of_planes/2) * (_bar_height + _gap)
-                 + (1. + bBar%2) * _bar_height * 1./3;
-	      y2 = (bBar - _number_of_bars/2) * (_bar_width/2 + _gap);
-	      Hit2Found = true;
-	    }
-	  }
-	}
-	if (Hit1Found && Hit2Found) break;
-      }
+      double xFraction = static_cast<double>(nSP-tSP)/nSP; // Actual proportion in the tail
+      evtTrack->SetChargeRatioMA(xFraction*(xTotalChargeMA-xTailChargeMA)/xTailChargeMA);
+      evtTrack->SetChargeRatioSA(xFraction*(xTotalChargeSA-xTailChargeSA)/xTailChargeSA);
+    }
 
-      // Look backwards for the second hit if nothing found in the forward direction
-      for (int aPlane = iPlane-1; aPlane >= 0; aPlane = aPlane-2) {
-	if ((aPlane + 1) * (_bar_height + _gap) > x1) continue;
-	for (int aBar = 1; aBar < _number_of_bars; aBar++) { // Skip test channel
-	  if (emr_dbb_events[1][iPe][aPlane][aBar].size()) {
-	    if (Hit1Found && !Hit2Found) {
-	      x2 = (aPlane - _number_of_planes/2) * (_bar_height + _gap)
-                 + (1. + aBar%2) * _bar_height * 1./3;
-	      y2 = (aBar - _number_of_bars/2) * (_bar_width/2 + _gap);
-	      Hit2Found = true;
-	      break;
-	    }
-	  }
-	}
-	if (Hit1Found && Hit2Found) break;
-      }
+    // Reconstruct the global time of the event (end time for mothers, begin time for daughters)
+    std::vector<EMRSpacePoint*>::iterator minIterator =
+	min_element(spacePointArray.begin(), spacePointArray.end(),
+     		    [] (const EMRSpacePoint* a, const EMRSpacePoint* b) {
+			return a->GetTime() < b->GetTime();
+		    });
 
-      // Calculate the missing coordinate (y0) of the primary hit in this plane
-      if (Hit1Found && Hit2Found) {
-	a = (y2 - y1)/(x2 - x1);
-	b = y1 - a * x1;
-	y0 = a * x0 + b;
-	xi = (x0 - x1)/(x2 - x1);
-      }
+    double mTime(0.);
+    if ( iPe < nPartEvents ) {
+      mTime = spacePointArray[distance(spacePointArray.begin(), minIterator)]->GetTime();
+    } else {
+      mTime = spacePointArray[distance(spacePointArray.begin(), minIterator)]->GetTime();
+    }
+    evtTrack->SetTime(mTime*_dbb_count);	// [ns]
+  }
+}
 
-      if (Hit1Found && !Hit2Found) {
-	y0 = y1;
-	a = 0.0;
-	xi = 0.0;
-      }
+void MapCppEMRRecon::reconstruct_tracks(MAUS::Spill* spill,
+					size_t nPartEvents) const {
 
-      if (!Hit1Found && Hit2Found) {
-	y0 = y2;
-	a = 0.0;
-	xi = 0.0;
-      }
+  // Loop over mothers and candidates to reconstruct their tracks
+  size_t nSeconPartEvents = spill->GetEMRSpillData()->GetEMREventTrackArraySize();
+  for (size_t iPe = 0; iPe < nPartEvents+nSeconPartEvents; iPe++) {
+    // Skip events without an EventTrack (mother or candidate)
+    EMREventTrack* evtTrack;
+    if ( iPe < nPartEvents ) {
+      evtTrack = spill->GetReconEvents()->at(iPe)->GetEMREvent()->GetMotherPtr();
+    } else {
+      evtTrack = spill->GetEMRSpillData()->GetEMREventTrackArray()[iPe-nPartEvents];
+    }
+    if ( !evtTrack )
+	continue;
+    if ( !evtTrack->GetEMRSpacePointArraySize() )
+	continue;
 
-      // Return the coordinates in metric, see EMR.dat for geometry
-      double etrans = _bar_width/(2*sqrt(6)); // Transverse uncertainty
-      double elong =  _bar_height/(3*sqrt(2)); // Longitudinal uncertainty
-      double erecon = sqrt((pow(xi, 2) + pow(1-xi, 2)) * pow(etrans, 2)
-		  + pow(a, 2) * (pow(xi, 2) + pow(1-xi, 2)) * pow(elong, 2)); // Recon uncertainty
+    // Fit the space points with a polynomial of order n=1 and get the fit parameters
+    EMRSpacePointArray spacePointArray = evtTrack->GetEMRSpacePointArray();
+    EMRTrack track;
+    TrackFitter::polynomial_fit(spacePointArray, track, 1);
 
-      if (iPlane % 2 == 0) {
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetX(z0);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetY(y0);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(etrans);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorY(erecon);
+    std::vector<double> ax = track.GetParametersX();
+    std::vector<double> ay = track.GetParametersY();
+    std::vector<double> eax = track.GetParametersErrorsX();
+    std::vector<double> eay = track.GetParametersErrorsY();
+
+    // Set the origin, inclination and azimuth of mothers only
+    if ( iPe < nPartEvents ) {
+      double z0 = _geoMap.LocalStart().z();
+      double x0 = TrackFitter::pol(z0, ax);
+      double y0 = TrackFitter::pol(z0, ay);
+
+      ThreeVector xOrigin(x0, y0, z0); // Local origin
+      track.SetOrigin(_geoMap.MakeGlobal(xOrigin));
+
+      // Propagate the error on the origin from the fit parameters
+      double sigma_x = TrackFitter::pol_error(z0, 0., ax, eax);
+      double sigma_y = TrackFitter::pol_error(z0, 0., ay, eay);
+
+      ThreeVector xOriginErrors(sigma_x, sigma_y, 0.);
+      track.SetOriginErrors(xOriginErrors);
+
+      // Add the origin to the list of trackpoints
+      EMRTrackPoint trackPoint;
+      trackPoint.SetPosition(xOrigin);
+      trackPoint.SetGlobalPosition(_geoMap.MakeGlobal(xOrigin));
+      trackPoint.SetPositionErrors(xOriginErrors);
+      trackPoint.SetChannel(-1);
+      trackPoint.SetResiduals(0., 0.);
+      trackPoint.SetChi2(0.);
+
+      track.AddEMRTrackPoint(trackPoint);
+
+      // Reconstruct the inclination and azimuth at the origin
+      double mx = TrackFitter::dnpol(z0, ax, 1);
+      double emx = TrackFitter::dnpol_error(z0, 0, ax, eax, 1);
+      double my = TrackFitter::dnpol(z0, ay, 1);
+      double emy = TrackFitter::dnpol_error(z0, 0, ay, eay, 1);
+      track.SetPolar(TrackFitter::polar(mx, my));
+      track.SetPolarError(TrackFitter::polar_error(mx, my, emx, emy));
+      track.SetAzimuth(TrackFitter::azimuth(mx, my));
+      track.SetAzimuthError(TrackFitter::azimuth_error(mx, my, emx, emy));
+    }
+
+    // For each space point, create a track point on the track
+    for (size_t iSP = 0; iSP < spacePointArray.size(); iSP++) {
+
+      // Find the z of the point on the track closest to the spacepoint in the relevant projection
+      int xPlane = spacePointArray[iSP]->GetChannel()/_number_of_bars;
+      double zstart(_geoMap.LocalStart().z()), zend(_geoMap.LocalEnd().z());
+
+      double z(0.);
+      double zp = spacePointArray[iSP]->GetPosition().z();
+      if ( !xPlane ) {
+        double xp = spacePointArray[iSP]->GetPosition().x();
+	z = TrackFitter::pol_closest(ax, zp, xp, zstart, zend);
       } else {
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetX(y0);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetY(z0);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorX(erecon);
-	emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorY(etrans);
+        double yp = spacePointArray[iSP]->GetPosition().y();
+	z = TrackFitter::pol_closest(ay, zp, yp, zstart, zend);
       }
 
-      emr_dbb_events[1][iPe][iPlane][iBar][0].SetZ(x0);
-      emr_dbb_events[1][iPe][iPlane][iBar][0].SetErrorZ(elong);
+      // Evaluate the function in the two projections in the closest z and set the positon
+      double x = TrackFitter::pol(z, ax);
+      double y = TrackFitter::pol(z, ay);
+      ThreeVector xPos(x, y, z);
+
+      // Propagate the error on the track point position from the fit parameters
+      double sigma_x = TrackFitter::pol_error(z, 0., ax, eax);
+      double sigma_y = TrackFitter::pol_error(z, 0., ay, eay);
+      ThreeVector xErrors(sigma_x, sigma_y, spacePointArray[iSP]->GetPositionErrors().z());
+
+      // Calculate the residuals and chi squared between the corrected and orginial points
+      double xRes = x - spacePointArray[iSP]->GetPosition().x();
+      double yRes = y - spacePointArray[iSP]->GetPosition().y();
+      double xErr = spacePointArray[iSP]->GetPositionErrors().x();
+      double yErr = spacePointArray[iSP]->GetPositionErrors().y();
+      double xChi2 = (pow(xRes, 2)+pow(yRes, 2))/(pow(xErr, 2)+pow(yErr, 2));
+
+      // Set the track point
+      EMRTrackPoint trackPoint;
+      trackPoint.SetPosition(xPos);
+      trackPoint.SetGlobalPosition(_geoMap.MakeGlobal(xPos));
+      trackPoint.SetPositionErrors(xErrors);
+      trackPoint.SetChannel(spacePointArray[iSP]->GetChannel());
+      trackPoint.SetResiduals(xRes, yRes);
+      trackPoint.SetChi2(xChi2);
+
+      track.AddEMRTrackPoint(trackPoint);
     }
+
+    // Sort the newly formed track points by ascending order of z
+    EMRTrackPointArray trackPointArray = track.GetEMRTrackPointArray();
+    sort(trackPointArray.begin(), trackPointArray.end(),
+         [] (const EMRTrackPoint& a, const EMRTrackPoint& b) {
+	     return a.GetPosition().z() < b.GetPosition().z();
+	 });
+    track.SetEMRTrackPointArray(trackPointArray);
+
+    // Reconstruct the range of the particle in the EMR
+    double zstart = track.GetEMRTrackPointArray().front().GetPosition().z();
+    double ezstart = track.GetEMRTrackPointArray().front().GetPositionErrors().z();
+    double zend = track.GetEMRTrackPointArray().back().GetPosition().z();
+    double ezend = track.GetEMRTrackPointArray().back().GetPositionErrors().z();
+
+    double xRange = TrackRange::range_integral(ax, ay, zstart, zend);
+    double xRangeError = TrackRange::range_integral_error(ax, ay, eax, eay,
+							  zstart, zend, ezstart, ezend);
+    track.SetRange(xRange);
+    track.SetRangeError(xRangeError);
+
+    // Estimate the momentum of the mothers from the CSDA range (default=muon)
+    if ( iPe < nPartEvents ) {
+      // Correct the range to account for the holes and gaps (TODO better)
+      int lPlane = track.GetEMRTrackPointArray().back().GetChannel()/_number_of_bars;
+      xRange -= lPlane*_geoMap.Gap();
+      xRange *= (1-_hole_fraction);
+
+      double xMomentum = TrackMomentum::csda_momentum(xRange, "muon");
+      double xMomentumError = TrackMomentum::csda_momentum_error(xMomentum, xRangeError, "muon");
+      track.SetMomentum(xMomentum);
+      track.SetMomentumError(xMomentumError);
+    }
+
+    evtTrack->SetEMRTrack(track);
   }
 }
 
-void MapCppEMRRecon::energy_correction(int nPartEvents,
-				       EMRDBBEventVector *emr_dbb_events,
-				       EMRfADCEventVector_er& emr_fadc_events) const {
+void MapCppEMRRecon::match_daughters(MAUS::Spill* spill,
+				     size_t nPartEvents) const {
 
-  int nTotalPartEvents = emr_fadc_events.size();
+  // Retain the index of the last candidate examinated to not go over them twice
+  size_t cPe = 0;
 
-  for (int iPe = 0; iPe < nTotalPartEvents; iPe++) {
-    int nPrimPartEvents = 0;
+  // Loop over the mothers and try to match them with their daughter
+  size_t nSeconPartEvents = spill->GetEMRSpillData()->GetEMREventTrackArraySize();
+  for (size_t aPe = 0; aPe < nPartEvents; aPe++) {
 
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      // Fetch the attenuation parameters from the map
-      double alpha_MA = 1.0;
-      double alpha_SA = 1.0; // Default parameters, no corrections
-
-      int nBars = 0;
-      for (int iBar = 0; iBar < _number_of_bars; iBar++)
-	if (emr_dbb_events[1][iPe][iPlane][iBar].size())
-	  nBars++;
-
-      if (nBars) {
-        for (int iBar = 0; iBar < _number_of_bars; iBar++) {
-          if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-	    EMRBarHit barHit = emr_dbb_events[1][iPe][iPlane][iBar].at(0);
-	    double x = barHit.GetX(); // mm
-	    double y = barHit.GetY(); // mm
-
-	    EMRChannelKey xKey(iPlane, iPlane%2, iBar, "emr");
-
-	    alpha_MA = _attenMap.fibreAtten(xKey, x, y, "MA");
-	    alpha_SA = _attenMap.fibreAtten(xKey, x, y, "SA");
-
-            nPrimPartEvents++;
-          }
-	}
-
-        // Reconstruct the corrected MAPMT charge
-        double Q_MA = 0.0;
-        int xPrimBar = 0;
-
-        for (int iArray = 0; iArray < 2; iArray++) {
-	  for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-	  int nBarHits = emr_dbb_events[iArray][iPe][iPlane][iBar].size();
-            if (nBarHits) {
-
-	      EMRChannelKey xKey(iPlane, iPlane%2, iBar, "emr");
-
-	      for (int iBarHit = 0; iBarHit < nBarHits; iBarHit++) {
-
-	        EMRBarHit barHit = emr_dbb_events[iArray][iPe][iPlane][iBar].at(iBarHit);
-	        int xTot  = barHit.GetTot();
-
-	        // Correct single MAPMT signals
-	        if (nPrimPartEvents) {
-	          double epsilon_MA_i = _calibMap.Eps(xKey, "MA");
-	          double Q_MA_meas_i = (1./_tot_func_p2)
-				       * (exp(static_cast<double>(xTot)/_tot_func_p1)
-					  - _tot_func_p3);
-	          if (Q_MA_meas_i < 0) Q_MA_meas_i = 0.0;
-
-	          double Q_MA_i = Q_MA_meas_i/(alpha_MA*epsilon_MA_i);
-	          emr_dbb_events[iArray][iPe][iPlane][iBar][iBarHit].SetChargeCorrected(Q_MA_i);
-
-	          if (iArray == 0) Q_MA += Q_MA_i;
-	          else
-		    xPrimBar = iBar;
-	        }
-	      }
-	    }
-	  }
-        }
-
-        // Total MAPMT charge, all bars combined
-        if (nPrimPartEvents)
-	  emr_dbb_events[1][iPe][iPlane][xPrimBar][0].SetTotalChargeCorrected(Q_MA);
-
-        // Reconstruct the corrected SAPMT charge
-        double Q_SA_meas_over_Q_SA = 0.0; // Ratio of the measured SAPMT over the real one
-
-        if (nPrimPartEvents) {
-      	  for (int iBar = 1; iBar < _number_of_bars; iBar++) {
-	  int nBarHits = emr_dbb_events[0][iPe][iPlane][iBar].size();
-
-	  if (nBarHits) {
-
-	      EMRChannelKey xKey(iPlane, iPlane%2, iBar, "emr");
-	      double epsilon_SA_i = _calibMap.Eps(xKey, "SA");
-
-      	      for (int iBarHit = 0; iBarHit < nBarHits; iBarHit++) {
-
-      	        double Q_MA_i = emr_dbb_events[0][iPe][iPlane][iBar][iBarHit].GetChargeCorrected();
-      	        double phi_MA_i = Q_MA_i/Q_MA; // Fraction of the light in hit iBarHit
-      	        double phi_SA_i = phi_MA_i; // Same fraction interpolated for the SAPMT
-      	        Q_SA_meas_over_Q_SA += phi_SA_i*alpha_SA*epsilon_SA_i; // Contribution to the ratio
-      	      }
-	    }
-      	  }
-
-	  if (Q_SA_meas_over_Q_SA) {
-	    double Q_SA_meas = emr_fadc_events[iPe][iPlane]._charge;
-	    // If the charge is lost, assume equivalence on both sides
-	    if (Q_SA_meas == 0) {
-	      emr_fadc_events[iPe][iPlane]._charge_corrected = Q_MA;
-	    } else {
-	      double Q_SA = Q_SA_meas/Q_SA_meas_over_Q_SA;
-	      // Correct for the disparity between the MA charge and the SA charge (fitting)
-	      EMRChannelKey xGlobalAverageKey(-1, -1, -1, "emr");
-	      double global_ma = _calibMap.Eps(xGlobalAverageKey, "MA");
-	      double global_sa = _calibMap.Eps(xGlobalAverageKey, "SA");
-
-	      emr_fadc_events[iPe][iPlane]._charge_corrected = Q_SA*global_ma/global_sa;
-	    }
-	  }
-        }
-      }
-    }
-  }
-}
-
-void MapCppEMRRecon::track_matching(int nPartEvents,
-				    EMRDBBEventVector *emr_dbb_events,
-				    EMRfADCEventVector_er& emr_fadc_events,
-				    EMRTrackEventVector& emr_track_events) const {
-
-  int nTotalPartEvents = emr_fadc_events.size();
-
-  // Loop over the primary events
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
-    // Skip the events without a primary track
-    if (!emr_track_events[iPe]._has_primary)
+    // Skip events that did not reconstruct a track (no trackpoints)
+    EMREvent* evt = spill->GetReconEvents()->at(aPe)->GetEMREvent();
+    EMREventTrack* evtTrackM = evt->GetMotherPtr();
+    if ( !evtTrackM )
+	continue;
+    if ( !evtTrackM->GetEMRTrack().GetEMRTrackPointArraySize() )
 	continue;
 
-    // Range calculation of primary tracks
-    double x1(-1.0), y1(-1.0), z1(-1.0);
-    double x2(-1.0), y2(-1.0), z2(-1.0);
-    double primEventRange = 0.0;
-    bool primHitsFound = false;
+    std::cerr << std::endl;
+    std::cerr << "Mother in the EMR" << std::endl;
 
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-  	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-  	  EMRBarHit bHit = emr_dbb_events[1][iPe][iPlane][iBar][0];
-	  // Last point
-	  x2 = bHit.GetX();
-	  y2 = bHit.GetY();
-	  z2 = bHit.GetZ();
-	  if (primHitsFound)
-	    primEventRange = primEventRange + sqrt(pow(x1-x2, 2)+pow(y1-y2, 2)+pow(z1-z2, 2));
+    double aTime = evtTrackM->GetEMRSpacePointArray().front()->GetTime();
+    EMRTrack aTrack = evtTrackM->GetEMRTrack();
+    ThreeVector xPoint = aTrack.GetEMRTrackPointArray().back().GetPosition();
 
-	  // Previous point
-	  x1 = bHit.GetX();
-	  y1 = bHit.GetY();
-	  z1 = bHit.GetZ();
-	  primHitsFound = true;
-	}
+    int xPe(-1);
+    double xTime(-1.);
+    double xDist(9999);
+    for (size_t bPe = cPe; bPe < nSeconPartEvents; bPe++) {
+
+      // Skip candidates that did not reconstruct a track (no trackpoints)
+      EMREventTrack* evtTrackC = spill->GetEMRSpillData()->GetEMREventTrackArray()[bPe];
+      if ( !evtTrackC->GetEMRTrack().GetEMRTrackPointArraySize() )
+	  continue;
+
+      double bTime = evtTrackC->GetEMRSpacePointArray().front()->GetTime();
+      EMRTrack bTrack = evtTrackC->GetEMRTrack();
+
+      if ( bTime < aTime ) 			// No decay before the mother particle
+          continue;
+      if ( (bTime - aTime) > _max_time )  {	// Skip unreasonable time difference
+	cPe = bPe;
+	break;
+      }
+
+      ThreeVector fPoint = bTrack.GetEMRTrackPointArray().front().GetPosition();
+      ThreeVector lPoint = bTrack.GetEMRTrackPointArray().back().GetPosition();
+
+      double fDist = sqrt(pow(fPoint.x()-xPoint.x(), 2)+
+    			  pow(fPoint.y()-xPoint.y(), 2)+
+			  pow(fPoint.z()-xPoint.z(), 2));
+      double lDist = sqrt(pow(lPoint.x()-xPoint.x(), 2)+
+    			  pow(lPoint.y()-xPoint.y(), 2)+
+			  pow(lPoint.z()-xPoint.z(), 2));
+
+      if ( fDist < xDist || lDist < xDist ) {
+        xPe = bPe;
+	xTime = (bTime - aTime)*_dbb_count;	// [ns]
+        xDist = std::min(fDist, lDist);		// [mm]
       }
     }
 
-    // Range calculation of secondary tracks
-    double minDist = 999.9;
-    int seconEventId = -1;
-    double seconEventRange = -1.0;
+    // If a daughter is found, deep copy the candidate into the EMREvent
+    if ( xDist < _max_distance ) {
+//      std::cerr << "Decay found" << std::endl;
+//      std::cerr << "xPe: " << xPe << std::endl;
+//      std::cerr << "xTime: " << xTime << " ns" << std::endl;
+//      std::cerr << "xDist: " << xDist << " mm" << std::endl;
 
-    // Loop over all the possible secondary events
-    for (int iiPe = nPartEvents; iiPe < nTotalPartEvents; iiPe++) {
+      EMREventTrack* evtTrackX = spill->GetEMRSpillData()->GetEMREventTrackArray()[xPe];
+      EMREventTrack* evtTrackD = new EMREventTrack;
 
-      double x3(-1.0), y3(-1.0), z3(-1.0);
-      double x4(-1.0), y4(-1.0), z4(-1.0);
-      double x5(-1.0), y5(-1.0), z5(-1.0);
-      double seconEventRangeTmp = 0.0;
-      bool seconHitsFound = false;
-
-      for (int iiPlane = 0; iiPlane < _number_of_planes; iiPlane++) {
-	for (int iiBar = 1; iiBar < _number_of_bars; iiBar++) { // Skip test channel
-	  if (emr_dbb_events[1][iiPe][iiPlane][iiBar].size()) {
-	    EMRBarHit bHit = emr_dbb_events[1][iiPe][iiPlane][iiBar][0];
-
-	    // Last point
-	    x5 = bHit.GetX();
-	    y5 = bHit.GetY();
-	    z5 = bHit.GetZ();
-
-	    if (!seconHitsFound) {
-	      // First point
-	      x3 = x5;
-	      y3 = y5;
-	      z3 = z5;
-	    }
-	    if (seconHitsFound)
-	      seconEventRangeTmp += sqrt(pow(x5-x4, 2)+pow(y5-y4, 2)+pow(z5-z4, 2));
-
-	    // Previous point
-	    x4 = bHit.GetX();
-	    y4 = bHit.GetY();
-	    z4 = bHit.GetZ();
-	    seconHitsFound = true;
-	  }
-	}
+      // Deep copy all the plane hits
+      for (size_t i = 0; i < evtTrackX->GetEMRPlaneHitArraySize(); i++) {
+	EMRPlaneHit* planeHit = new EMRPlaneHit;
+        planeHit->SetEMRBarHitArray(evtTrackX->GetEMRPlaneHitArray()[i]->GetEMRBarHitArray());
+        planeHit->SetPlane(evtTrackX->GetEMRPlaneHitArray()[i]->GetPlane());
+        planeHit->SetOrientation(evtTrackX->GetEMRPlaneHitArray()[i]->GetOrientation());
+        planeHit->SetTime(evtTrackX->GetEMRPlaneHitArray()[i]->GetTime());
+        planeHit->SetDeltaT(evtTrackX->GetEMRPlaneHitArray()[i]->GetDeltaT());
+        planeHit->SetCharge(evtTrackX->GetEMRPlaneHitArray()[i]->GetCharge());
+        planeHit->SetPedestalArea(evtTrackX->GetEMRPlaneHitArray()[i]->GetPedestalArea());
+        planeHit->SetSampleArray(evtTrackX->GetEMRPlaneHitArray()[i]->GetSampleArray());
+	evtTrackD->AddEMRPlaneHit(planeHit);
       }
 
-      // Look for a track close enough to the primary to match it
-      if (seconHitsFound) {
-	double dist23 = sqrt(pow(x2-x3, 2)+pow(y2-y3, 2)+pow(z2-z3, 2));
-	double dist25 = sqrt(pow(x2-x5, 2)+pow(y2-y5, 2)+pow(z2-z5, 2));
-	double dist = std::min(dist23, dist25);
-
-	if (dist < minDist && dist < _max_secondary_to_primary_track_distance) {
-	  minDist = dist;
-	  seconEventId = iiPe;
-	  seconEventRange = seconEventRangeTmp;
-	}
-      }
-    }
-
-//    std::cerr << "minDist: " << minDist << " seconEventId: " << seconEventId << std::endl;
-//    std::cerr << "Rp=" << primEventRange << " Rs=" << seconEventRange << "   " << std::endl;
-
-    // If a secondary is found, fill the corresponding secondary array
-    if (seconEventId != -1) {
-      for (int iiPlane = 0; iiPlane < _number_of_planes; iiPlane++) {
-	for (int iiBar = 1; iiBar < _number_of_bars; iiBar++) { // Skip test channel
-	  if (emr_dbb_events[1][seconEventId][iiPlane][iiBar].size()) {
-	    EMRBarHit bHit = emr_dbb_events[1][seconEventId][iiPlane][iiBar][0];
-	    emr_dbb_events[2][iPe][iiPlane][iiBar].push_back(bHit);
-	  }
-	}
-      }
-      emr_track_events[iPe]._range_secondary = seconEventRange;
-      emr_track_events[iPe]._has_secondary = true;
-      emr_track_events[iPe]._secondary_to_primary_track_distance = minDist;
-    }
-    emr_track_events[iPe]._range_primary = primEventRange;
-  }
-}
-
-void MapCppEMRRecon::event_charge_calculation(int nPartEvents,
-					      EMRDBBEventVector *emr_dbb_events,
-					      EMRfADCEventVector_er& emr_fadc_events,
-					      EMRTrackEventVector& emr_track_events) const {
-
-  // The charge is reconstructed only for primary triggers
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
-    // Skip the events without a primary track
-    if (!emr_track_events[iPe]._has_primary)
-	continue;
-
-    // Reconstrcut total charge deposited by the primary particle
-    double total_charge_ma = 0.0;
-    double total_charge_sa = 0.0;
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      total_charge_sa += emr_fadc_events[iPe][iPlane]._charge_corrected;
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) { // Skip test channel
-  	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-  	  EMRBarHit barHit = emr_dbb_events[1][iPe][iPlane][iBar][0];
-	  total_charge_ma += barHit.GetTotalChargeCorrected();
-	  break;
-	}
-      }
-    }
-
-    emr_track_events[iPe]._total_charge_ma = total_charge_ma;
-    emr_track_events[iPe]._total_charge_sa = total_charge_sa;
-
-    // Find the end point of the track (last plane hit)
-    int aPlane = -1;
-    int bPlane = -1;
-    for (int iPlane = _number_of_planes - 1; iPlane >= 0; iPlane--) {
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) {
-  	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-	  bPlane = iPlane + 1;
-	  break;
-	}
-      }
-      if (bPlane > 0) break;
-    }
-
-    // Location of the plane 4/5 along the track round up
-    aPlane = bPlane*4/5;
-
-    // Reconstruct the total charge before the aPlane
-    int nsa1 = 0;
-    int nma1 = 0;
-    double Q_SA_1 = 0.0;
-    double Q_MA_1 = 0.0;
-    for (int iPlane = 0; iPlane < aPlane; iPlane++) {
-      double qsa = emr_fadc_events[iPe][iPlane]._charge_corrected;
-      if (qsa) {
-	Q_SA_1 += qsa;
-	nsa1++;
-      }
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) {
-  	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-  	  EMRBarHit bHit = emr_dbb_events[1][iPe][iPlane][iBar][0];
-	  double qma = bHit.GetTotalChargeCorrected();
-	  if (qma) {
-	    Q_MA_1 += qma;
-	    nma1++;
-	    break;
-	  }
-	}
-      }
-    }
-
-    // Reconstruct the total charge after the aPlane
-    int nsa2 = 0;
-    int nma2 = 0;
-    double Q_SA_2 = 0.0;
-    double Q_MA_2 = 0.0;
-    for (int iPlane = aPlane; iPlane < bPlane; iPlane++) {
-      double qsa = emr_fadc_events[iPe][iPlane]._charge_corrected;
-      if (qsa) {
-	Q_SA_2 += qsa;
-	nsa2++;
-      }
-      for (int iBar = 1; iBar < _number_of_bars; iBar++) {
-  	if (emr_dbb_events[1][iPe][iPlane][iBar].size()) {
-  	  EMRBarHit bHit = emr_dbb_events[1][iPe][iPlane][iBar][0];
-	  double qma = bHit.GetTotalChargeCorrected();
-	  if (qma) {
-	    Q_MA_2 += qma;
-	    nma2++;
-	    break;
-	  }
-	}
-      }
-    }
-
-    // Compute the charge ratio
-    if (Q_SA_2 != 0 && nsa1 != 0)
-      emr_track_events[iPe]._charge_ratio_sa = (Q_SA_1*static_cast<double>(nsa2))
-					     / (Q_SA_2*static_cast<double>(nsa1));
-    if (Q_MA_2 != 0 && nma1 != 0)
-      emr_track_events[iPe]._charge_ratio_ma = (Q_MA_1*static_cast<double>(nma2))
-					     / (Q_MA_2*static_cast<double>(nma1));
-  }
-}
-
-void MapCppEMRRecon::fill(Spill *spill,
-			  int nPartEvents,
-			  EMRDBBEventVector *emr_dbb_events,
-			  EMRfADCEventVector_er& emr_fadc_events,
-			  EMRTrackEventVector& emr_track_events) const {
-
-  int xRun = spill->GetRunNumber();
-  int xSpill = spill->GetSpillNumber();
-
-  // Only save the primary triggers with their primary and seconday arrays (n)
-  ReconEventPArray *recEvts = spill->GetReconEvents();
-
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
-    EMREvent *evt = new EMREvent;
-    EMRPlaneHitArray plArray;
-
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      int xOri = emr_fadc_events[iPe][iPlane]._orientation;
-      double xCharge = emr_fadc_events[iPe][iPlane]._charge;
-      double xChargeCorrected = emr_fadc_events[iPe][iPlane]._charge_corrected;
-      int xArrivalTime = emr_fadc_events[iPe][iPlane]._time;
-      double xPedestalArea = emr_fadc_events[iPe][iPlane]._pedestal_area;
-      std::vector<int> xSamples = emr_fadc_events[iPe][iPlane]._samples;
-
-      EMRPlaneHit *plHit = new EMRPlaneHit;
-      plHit->SetPlane(iPlane);
-      plHit->SetTrigger(iPe);
-      plHit->SetRun(xRun);
-      plHit->SetOrientation(xOri);
-      plHit->SetCharge(xCharge);
-      plHit->SetChargeCorrected(xChargeCorrected);
-      plHit->SetDeltaT(xArrivalTime);
-      plHit->SetSpill(xSpill);
-      plHit->SetPedestalArea(xPedestalArea);
-      plHit->SetSamples(xSamples);
-
-      EMRBarArray barArray;
-      EMRBarArray barArrayPrimary;
-      EMRBarArray barArraySecondary;
-      for (int iArray = 0; iArray < 3; iArray++) {
-	for (int iBar = 1; iBar < _number_of_bars; iBar++) {
-	  int nHits = emr_dbb_events[iArray][iPe][iPlane][iBar].size();
-	  if (nHits) {
-	    EMRBar *bar = new EMRBar;
-	    bar->SetBar(iBar);
-	    bar->SetEMRBarHitArray(emr_dbb_events[iArray][iPe][iPlane][iBar]);
-	    if (iArray == 0) barArray.push_back(bar);
-	    if (iArray == 1) barArrayPrimary.push_back(bar);
-	    if (iArray == 2) barArraySecondary.push_back(bar);
-	  }
-	}
+      // Deep copy all the space points
+      for (size_t i = 0; i < evtTrackX->GetEMRSpacePointArraySize(); i++) {
+	EMRSpacePoint* spacePoint = new EMRSpacePoint;
+	spacePoint->SetPosition(evtTrackX->GetEMRSpacePointArray()[i]->GetPosition());
+	spacePoint->SetGlobalPosition(evtTrackX->GetEMRSpacePointArray()[i]->GetGlobalPosition());
+	spacePoint->SetPositionErrors(evtTrackX->GetEMRSpacePointArray()[i]->GetPositionErrors());
+	spacePoint->SetChannel(evtTrackX->GetEMRSpacePointArray()[i]->GetChannel());
+	spacePoint->SetTime(evtTrackX->GetEMRSpacePointArray()[i]->GetTime());
+	spacePoint->SetDeltaT(evtTrackX->GetEMRSpacePointArray()[i]->GetDeltaT());
+	spacePoint->SetChargeMA(evtTrackX->GetEMRSpacePointArray()[i]->GetChargeMA());
+	spacePoint->SetChargeSA(evtTrackX->GetEMRSpacePointArray()[i]->GetChargeSA());
+	evtTrackD->AddEMRSpacePoint(spacePoint);
       }
 
-      plHit->SetEMRBarArray(barArray);
-      plHit->SetEMRBarArrayPrimary(barArrayPrimary);
-      plHit->SetEMRBarArraySecondary(barArraySecondary);
-      if (barArray.size() || barArrayPrimary.size() || barArraySecondary.size() || xCharge) {
-	plArray.push_back(plHit);
-      } else {
-        delete plHit;
-      }
-    }
-    evt->SetEMRPlaneHitArray(plArray);
-    evt->SetRangePrimary(emr_track_events[iPe]._range_primary);
-    evt->SetRangeSecondary(emr_track_events[iPe]._range_secondary);
-    evt->SetSecondaryToPrimaryTrackDistance
-	 (emr_track_events[iPe]._secondary_to_primary_track_distance);
-    evt->SetHasPrimary(emr_track_events[iPe]._has_primary);
-    evt->SetHasSecondary(emr_track_events[iPe]._has_secondary);
-    evt->SetTotalChargeMA(emr_track_events[iPe]._total_charge_ma);
-    evt->SetTotalChargeSA(emr_track_events[iPe]._total_charge_sa);
-    evt->SetChargeRatioMA(emr_track_events[iPe]._charge_ratio_ma);
-    evt->SetChargeRatioSA(emr_track_events[iPe]._charge_ratio_sa);
-    evt->SetPlaneDensityMA(emr_track_events[iPe]._plane_density_ma);
-    evt->SetPlaneDensitySA(emr_track_events[iPe]._plane_density_sa);
-    evt->SetChi2(emr_track_events[iPe]._chi2_x + emr_track_events[iPe]._chi2_y);
+      // Deep copy all the PID variables
+      evtTrackD->SetType("daughter");
+      evtTrackD->SetTrackId(0);
+      evtTrackD->SetTime(evtTrackX->GetTime());
+      evtTrackD->SetPlaneDensityMA(evtTrackX->GetPlaneDensityMA());
+      evtTrackD->SetPlaneDensitySA(evtTrackX->GetPlaneDensitySA());
+      evtTrackD->SetTotalChargeMA(evtTrackX->GetTotalChargeMA());
+      evtTrackD->SetTotalChargeSA(evtTrackX->GetTotalChargeSA());
+      evtTrackD->SetChargeRatioMA(evtTrackX->GetChargeRatioMA());
+      evtTrackD->SetChargeRatioSA(evtTrackX->GetChargeRatioSA());
 
-    // std::cerr << "************************************************" << std::endl;
-    // std::cerr << "has_primary = " << emr_track_events[iPe]._has_primary << std::endl;
-    // std::cerr << "has_secondary = " << emr_track_events[iPe]._has_secondary << std::endl;
-    // std::cerr << "range_primary = " << emr_track_events[iPe]._range_primary << std::endl;
-    // std::cerr << "range_secondary = " << emr_track_events[iPe]._range_secondary << std::endl;
-    // std::cerr << "secondary_to_primary_track_distance = "
-    // 		 << emr_track_events[iPe]._secondary_to_primary_track_distance << std::endl;
-    // std::cerr << "================================================" << std::endl;
+      // Reconstruct the Michel electron/positron momentum (TODO beam polarity)
+      EMRTrack track = evtTrackX->GetEMRTrack();
+      double xMomentum = TrackMomentum::csda_momentum(track.GetRange(), "electron");
+      double xMomentumError = TrackMomentum::csda_momentum_error(track.GetRange(),
+						  		 track.GetRangeError(),
+						   		 "electron");
+      track.SetMomentum(xMomentum);
+      track.SetMomentumError(xMomentumError);
+      evtTrackD->SetEMRTrack(track);
 
-    recEvts->at(iPe)->SetEMREvent(evt);
-    recEvts->at(iPe)->SetPartEventNumber(iPe);
-  }
-  spill->SetReconEvents(recEvts);
-}
-
-EMRDBBEventVector MapCppEMRRecon::get_dbb_data_tmp(int nPartEvts) const {
-  EMRDBBEventVector emr_dbb_events_tmp;
-  emr_dbb_events_tmp.resize(nPartEvts);
-  for (int iPe = 0; iPe < nPartEvts; iPe++) {
-    emr_dbb_events_tmp[iPe].resize(_number_of_planes);  // number of planes
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      emr_dbb_events_tmp[iPe][iPlane].resize(_number_of_bars); // number of bars in a plane
+      evt->AddEMREventTrack(evtTrackD);
+    } else {
+//      std::cerr << "NO DECAY FOUND" << std::endl;
+//      std::cerr << "Closest candidate" << std::endl;
+//      std::cerr << "xPe: " << xPe << std::endl;
+//      std::cerr << "xTime: " << xTime << " ns" << std::endl;
+//      std::cerr << "xDist: " << xDist << " mm" << std::endl;
     }
   }
-  return emr_dbb_events_tmp;
-}
-
-EMRfADCEventVector_er MapCppEMRRecon::get_fadc_data_tmp(int nPartEvts) const {
-  EMRfADCEventVector_er emr_fadc_events_tmp;
-  emr_fadc_events_tmp.resize(nPartEvts);
-  for (int iPe = 0; iPe < nPartEvts ;iPe++) {
-    emr_fadc_events_tmp[iPe].resize(_number_of_planes);
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      fADCdata_er data;
-      data._orientation = iPlane%2;
-      data._charge = 0.0;
-      data._charge_corrected = 0.0;
-      data._pedestal_area = 0.0;
-      data._time = 0;
-      std::vector<int> xSamples;
-      data._samples = xSamples;
-      emr_fadc_events_tmp[iPe][iPlane] = data;
-    }
-  }
-  return emr_fadc_events_tmp;
-}
-
-EMRTrackEventVector MapCppEMRRecon::get_track_data_tmp(int nPartEvts) const {
-  EMRTrackEventVector emr_track_events_tmp;
-  emr_track_events_tmp.resize(nPartEvts);
-  for (int iPe = 0; iPe < nPartEvts ;iPe++) {
-    TrackData data;
-    data._range_primary = -1.0;
-    data._range_secondary = -1.0;
-    data._secondary_to_primary_track_distance = -1.0;
-    data._has_primary = false;
-    data._has_secondary = false;
-    data._total_charge_ma = -1.0;
-    data._total_charge_sa = -1.0;
-    data._charge_ratio_ma = -1.0;
-    data._charge_ratio_sa = -1.0;
-    data._plane_density_ma = -1.0;
-    data._plane_density_sa = -1.0;
-    data._chi2_x = -1.0;
-    data._chi2_y = -1.0;
-    emr_track_events_tmp[iPe] = data;
-  }
-  return emr_track_events_tmp;
 }
 }

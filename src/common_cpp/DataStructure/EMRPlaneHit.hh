@@ -14,148 +14,115 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRPLANEHIT_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRPLANEHIT_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRPLANEHIT_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRPLANEHIT_HH_
 
+// C++ headers
 #include <vector>
 
+// MAUS headers
 #include "Utils/VersionNumber.hh"
-#include "DataStructure/EMRBar.hh"
+#include "DataStructure/EMRBarHit.hh"
 
 namespace MAUS {
 
-typedef std::vector<EMRBar *> EMRBarArray;
+typedef std::vector<EMRBarHit> EMRBarHitArray;
 
 /** @class EMRPlaneHit comment
  *
- *  @var plane        <-- plane id / DBB id / fADC id -->
- *  @var orientation  <-- plane orientation, can be 0 or 1 -->
- *  @var emrbararray  <-- array of bars in the plane / 59 elements -->
- *  @var charge       <-- fADC charge -->
- *  @var time         <-- trigger time w.r.t. start of the spill recorded by DBB -->
- *  @var spill        <-- spill count recorded by DBB-->
- *  @var trigger      <-- trigger count recorded by DBB-->
- *  @var deltat       <-- time of a hit in fADC minus trigger hit time measured by fADC -->
+ *  @var emrbarhits	<-- array of bar hits in the plane -->
+ *  @var plane		<-- plane id / DBB id / fADC id -->
+ *  @var orientation	<-- plane orientation, can be 0 or 1 -->
+ *  @var time		<-- trigger time w.r.t. the start of the spill recorded by DBB -->
+ *  @var deltat		<-- time of a hit in fADC minus trigger hit time measured by fADC -->
+ *  @var charge		<-- SAPMT fADC charge -->
+ *  @var pedestal_area	<-- integrated charge at the pedestal -->
+ *  @var samples	<-- sampled shape of the digitized SAPMT signal -->
  */
 
 class EMRPlaneHit {
-  public:
-    /** Default constructor - initialises to 0/NULL */
-    EMRPlaneHit();
+ public:
+  /** @brief  Default constructor - initialises to 0/NULL */
+  EMRPlaneHit();
 
-    /** Copy constructor - any pointers are deep copied */
-    EMRPlaneHit(const EMRPlaneHit& _emrbarhit);
+  /** @brief Copy constructor - any pointers are deep copied */
+  EMRPlaneHit(const EMRPlaneHit& emrph);
 
-    /** Equality operator - any pointers are deep copied */
-    EMRPlaneHit& operator=(const EMRPlaneHit& _emrbarhit);
+  /** @brief Equality operator - any pointers are deep copied */
+  EMRPlaneHit& operator=(const EMRPlaneHit& emrph);
 
-    /** Destructor - any member pointers are deleted */
-    virtual ~EMRPlaneHit();
+  /** @brief Destructor - any member pointers are deleted */
+  virtual ~EMRPlaneHit();
 
-    /** Returns  */
-    int GetPlane() const;
+  /** @brief Returns the array of bar hits in the plane */
+  EMRBarHitArray GetEMRBarHitArray() const          { return _emrbarhits; }
 
-    /** Sets  */
-    void SetPlane(int plane);
+  /** @brief Sets the array of bar hits in the plane */
+  void SetEMRBarHitArray(EMRBarHitArray emrbarhits) { _emrbarhits = emrbarhits; }
 
-    /** Returns  */
-    EMRBarArray GetEMRBarArray() const;
+  /** @brief Adds a bar to the plane */
+  void AddEMRBarHit(EMRBarHit barhit)               { _emrbarhits.push_back(barhit); }
 
-    /** Sets  */
-    void SetEMRBarArray(EMRBarArray emrbararray);
+  /** @brief Returns the amount of bar hits in the plane */
+  size_t GetEMRBarHitArraySize()                    { return _emrbarhits.size(); }
 
-    /** Returns  */
-    EMRBarArray GetEMRBarArrayPrimary() const;
+  /** @brief Returns the plane ID (0->47) */
+  int GetPlane() const                              { return _plane; }
 
-    /** Sets  */
-    void SetEMRBarArrayPrimary(EMRBarArray emrbararray);
+  /** @brief Sets the plane ID */
+  void SetPlane(int plane)                          { _plane = plane; }
 
-    /** Returns  */
-    EMRBarArray GetEMRBarArraySecondary() const;
+  /** @brief Returns the plane orientation (0 for x planes, 1 for y planes) */
+  int GetOrientation() const                        { return _orientation; }
 
-    /** Sets  */
-    void SetEMRBarArraySecondary(EMRBarArray emrbararray);
+  /** @brief Sets the plane orientation */
+  void SetOrientation(int orientation)              { _orientation = orientation; }
 
-    /** Returns  */
-    double GetCharge() const;
+  /** @brief Returns the global time with respect to the spill */
+  int GetTime() const                               { return _time; }
 
-    /** Sets  */
-    void SetCharge(double charge);
+  /** @brief Sets the global time with respect to the spill */
+  void SetTime(int time)                            { _time = time; }
 
-    /** Returns  */
-    double GetChargeCorrected() const;
+  /** @brief Returns the time with respect to the trigger time */
+  int GetDeltaT() const                             { return _deltat; }
 
-    /** Sets  */
-    void SetChargeCorrected(double charge_corrected);
+  /** @brief Sets the time with respect to the trigger time */
+  void SetDeltaT(int deltat)                        { _deltat = deltat; }
 
-    /** Returns  */
-    double GetPedestalArea() const;
+  /** @brief Returns the charge in the SAPMT */
+  double GetCharge() const                          { return _charge; }
 
-    /** Sets  */
-    void SetPedestalArea(double pedestal_area);
+  /** @brief Sets the charge in the MAPMT */
+  void SetCharge(double charge)                     { _charge = charge; }
 
-    /** Returns  */
-    int GetTime() const;
+  /** @brief Returns the integrated charge at the pedestal */
+  double GetPedestalArea() const                    { return _pedestal_area; }
 
-    /** Sets  */
-    void SetTime(int time);
+  /** @brief Sets the integrated charge at the pedestal */
+  void SetPedestalArea(double pedestal_area)        { _pedestal_area = pedestal_area; }
 
-    /** Returns  */
-    int GetSpill() const;
+  /** @brief Returns the sampled SAPMT signal */
+  std::vector<int> GetSampleArray() const           { return _samples; }
 
-    /** Sets  */
-    void SetSpill(int spill);
+  /** @brief Sets the sampled SAPMT signal */
+  void SetSampleArray(std::vector<int> samples)     { _samples = samples; }
 
-    /** Returns  */
-    int GetTrigger() const;
+  /** @brief Returns the amount of bar hits in the plane */
+  size_t GetSampleArraySize()                       { return _samples.size(); }
 
-    /** Sets  */
-    void SetTrigger(int trigger);
+ private:
+  EMRBarHitArray	_emrbarhits;
+  int           	_plane;
+  int			_orientation;
+  int			_time;
+  int			_deltat;
+  double		_charge;
+  double		_pedestal_area;
+  std::vector<int>	_samples;
 
-    /** Returns  */
-    int GetRun() const;
-
-    /** Sets  */
-    void SetRun(int trigger);
-
-    /** Returns  */
-    int GetDeltaT() const;
-
-    /** Sets  */
-    void SetDeltaT(int deltat);
-
-    /** Returns  */
-    int GetOrientation() const;
-
-    /** Sets  */
-    void SetOrientation(int orient);
-
-    /** Returns  */
-    std::vector<int> GetSamples() const;
-
-    /** Sets  */
-    void SetSamples(std::vector<int> samples);
-
-
-  private:
-    int _plane;
-    int _orientation;
-    EMRBarArray _emrbararray;
-    EMRBarArray _emrbararray_primary;
-    EMRBarArray _emrbararray_secondary;
-    double _charge;
-    double _charge_corrected;
-    double _pedestal_area;
-    int _time;
-    int _spill;
-    int _trigger;
-    int _run;
-    int _deltat;
-    std::vector<int> _samples;
-
-    MAUS_VERSIONED_CLASS_DEF(EMRPlaneHit)
+  MAUS_VERSIONED_CLASS_DEF(EMRPlaneHit)
 };
-}
+} // namespace MAUS
 
-#endif  // _SRC_COMMON_CPP_DATASTRUCTURE_EMRPLANEHIT_
-
+#endif // #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRPLANEHIT_HH_
