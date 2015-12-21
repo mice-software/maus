@@ -66,14 +66,42 @@ void MapCppDataSelection::_process(MAUS::Data* data) const {
   if (spill->GetDaqEventType() != "physics_event")
     return;
   
-  std::vector<ReconEvent*>* events = spill->GetReconEvents();
-  for (size_t i = 0; i < events->size(); ++i) {
-    ReconEvent* evt = events->at(i);
+  std::vector<ReconEvent*>& events = (*spill->GetReconEvents());
+  std::cerr << "Total # of ReconEvents in spill: " << events.size() << "\n";
+  
+  // Identify the events to be removed
+  std::vector<int> events_to_remove;
+  for (size_t i = 0; i < events.size(); ++i) {
+    ReconEvent* evt = events[i];
     std::vector<TOFSpacePoint> tof1_spoints = 
       evt->GetTOFEvent()->GetTOFEventSpacePoint().GetTOF1SpacePointArray();
     std::vector<TOFSpacePoint> tof2_spoints = 
       evt->GetTOFEvent()->GetTOFEventSpacePoint().GetTOF2SpacePointArray();
+      
+    bool tof1_cut = false;
+    bool tof2_cut = false;
+    if (tof1_spoints.size() == 1) tof1_cut = true;
+    if (tof2_spoints.size() == 1) tof2_cut = true;
+    
+    std::cerr << "Spoints in TOF1 and TOF2: " << tof1_spoints.size()
+              << " " << tof2_spoints.size() << std::endl;
+    if ( (tof1_cut == false) || (tof2_cut == false) ) {
+      events_to_remove.push_back(i);
+    }
   }
+  
+  // Now remove the selected events
+  int nEventsRemoved = 0;
+  for (size_t i = 0; i < events_to_remove.size(); ++i) {
+    events.erase(events.begin() + events_to_remove[i] - nEventsRemoved);
+    std::cerr << "Removed event " << events_to_remove[i] - nEventsRemoved 
+              << std::endl;
+    ++nEventsRemoved;
+  }
+  
+  std::cerr << "# of ReconEvents retained: " << events.size() << std::endl;
+  std::cerr << "# of Spill ReconEvents retained: "
+            << spill->GetReconEvents()->size() << std::endl;
 }
 
 } // ~namespace MAUS
