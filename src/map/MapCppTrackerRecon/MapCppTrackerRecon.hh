@@ -90,7 +90,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
    *
    *  Receive a data object with digits (either MC or real) and then call the higher level
    *  reconstruction algorithms
-   * 
+   *
    * \param document a line/spill from the JSON input
    */
   void _process(Data* data) const;
@@ -117,6 +117,17 @@ class MapCppTrackerRecon : public MapBase<Data> {
 
   void print_event_info(MAUS::SciFiEvent &event) const;
 
+  /**
+   * @brief Populate global position output for the spacepoints
+   */
+  void set_spacepoint_global_output(SciFiSpacePointPArray spoints) const;
+
+
+  /** 
+    * @brief Rates the track based on the outcome of the reconstruction
+    */
+  void calculate_track_rating(SciFiTrack* track) const;
+
  private:
   /// This will contain the configuration
   Json::Value _configJSON;
@@ -130,7 +141,8 @@ class MapCppTrackerRecon : public MapBase<Data> {
   double _kuno_sum;
   double _kuno_tolerance;
   /// Pattern recognition flags
-  bool _straight_pr_on;
+  bool _up_straight_pr_on;
+  bool _down_straight_pr_on;
   bool _up_helical_pr_on;
   bool _down_helical_pr_on;
   bool _kalman_on;
@@ -140,6 +152,16 @@ class MapCppTrackerRecon : public MapBase<Data> {
   bool _use_eloss;
   bool _use_patrec_seed;
   bool _correct_pz;
+
+  int _excellent_num_trackpoints;
+  int _good_num_trackpoints;
+  int _poor_num_trackpoints;
+  double _excellent_p_value;
+  double _good_p_value;
+  double _poor_p_value;
+  int _excellent_num_spacepoints;
+  int _good_num_spacepoints;
+  int _poor_num_spacepoints;
 
   double _seed_value;
 

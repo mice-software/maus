@@ -38,7 +38,11 @@ PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
                                         ("MapCppTrackerRecon", "", "", "", "");
 }
 
-MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon"),
+MapCppTrackerRecon::MapCppTrackerRecon() : _up_straight_pr_on(true),
+                                           _down_straight_pr_on(true),
+                                           _up_helical_pr_on(true),
+                                           _down_helical_pr_on(true),
+                                           MapBase<Data>("MapCppTrackerRecon"),
 #ifdef KALMAN_TEST
   _spacepoint_helical_track_fitter(NULL),
   _spacepoint_straight_track_fitter(NULL) {
@@ -56,9 +60,10 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
   Json::Value* json = Globals::GetConfigurationCards();
-  _up_helical_pr_on   = (*json)["SciFiPRHelicalOn"].asBool();
-  _down_helical_pr_on = (*json)["SciFiPRHelicalOn"].asBool();
-  _straight_pr_on     = (*json)["SciFiPRStraightOn"].asBool();
+  int user_up_helical_pr_on    = (*json)["SciFiPRHelicalTkUSOn"].asInt();
+  int user_down_helical_pr_on  = (*json)["SciFiPRHelicalTkDSOn"].asInt();
+  int user_up_straight_pr_on   = (*json)["SciFiPRStraightTkUSOn"].asInt();
+  int user_down_straight_pr_on = (*json)["SciFiPRStraightTkDSOn"].asInt();
   _kalman_on          = (*json)["SciFiKalmanOn"].asBool();
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
   _size_exception     = (*json)["SciFiClustExcept"].asInt();
@@ -67,6 +72,17 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _use_eloss          = (*json)["SciFiKalman_use_Eloss"].asBool();
   _use_patrec_seed    = (*json)["SciFiSeedPatRec"].asBool();
   _correct_pz         = (*json)["SciFiKalmanCorrectPz"].asBool();
+// Values used to set the track rating:
+  _excellent_num_trackpoints     = (*json)["SciFiExcellentNumTrackpoints"].asInt();
+  _good_num_trackpoints          = (*json)["SciFiGoodNumTrackpoints"].asInt();
+  _poor_num_trackpoints          = (*json)["SciFiPoorNumTrackpoints"].asInt();
+  _excellent_p_value             = (*json)["SciFiExcellentPValue"].asDouble();
+  _good_p_value                  = (*json)["SciFiGoodPValue"].asDouble();
+  _poor_p_value                  = (*json)["SciFiPoorPValue"].asDouble();
+  _excellent_num_spacepoints  = (*json)["SciFiExcellentNumSpacepoints"].asInt();
+  _good_num_spacepoints       = (*json)["SciFiGoodNumSpacepoints"].asInt();
+  _poor_num_spacepoints       = (*json)["SciFiPoorNumSpacepoints"].asInt();
+
 
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
@@ -81,18 +97,48 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   double up_field = _geometry_helper.GetFieldValue(0);
   double down_field = _geometry_helper.GetFieldValue(1);
 
-  if (fabs(up_field) < 0.00001) { // 10 Gaus
+  if (user_up_helical_pr_on == 2)
+    _up_helical_pr_on = true;
+  else if (user_up_helical_pr_on == 1)
     _up_helical_pr_on = false;
-  }
-  if (fabs(down_field) < 0.00001) { // 10 Gaus
-    _down_helical_pr_on = false;
-  }
+  else if (user_up_helical_pr_on == 0 && fabs(up_field) < 0.00001) // 10 Gaus
+    _up_helical_pr_on = false;
+  else if (user_up_helical_pr_on == 0 && fabs(up_field) >= 0.00001)
+    _up_helical_pr_on = true;
 
+  if (user_down_helical_pr_on == 2)
+    _down_helical_pr_on = true;
+  else if (user_down_helical_pr_on == 1)
+    _down_helical_pr_on = false;
+  else if (user_down_helical_pr_on == 0 && fabs(down_field) < 0.00001)
+    _down_helical_pr_on = false;
+  else if (user_down_helical_pr_on == 0 && fabs(down_field) >= 0.00001)
+    _down_helical_pr_on = true;
+
+  if (user_up_straight_pr_on == 2)
+    _up_straight_pr_on = true;
+  else if (user_up_straight_pr_on == 1)
+    _up_straight_pr_on = false;
+  else if (user_up_straight_pr_on == 0 && fabs(up_field) < 0.00001)
+    _up_straight_pr_on = true;
+  else if (user_up_straight_pr_on == 0 && fabs(up_field) >= 0.00001)
+    _up_straight_pr_on = false;
+
+  if (user_down_straight_pr_on == 2)
+    _down_straight_pr_on = true;
+  else if (user_down_straight_pr_on == 1)
+    _down_straight_pr_on = false;
+  else if (user_down_straight_pr_on == 0 && fabs(down_field) < 0.00001)
+    _down_straight_pr_on = true;
+  else if (user_down_straight_pr_on == 0 && fabs(down_field) >= 0.00001)
+    _down_straight_pr_on = false;
+
+  _pattern_recognition = PatternRecognition();
   _pattern_recognition.LoadGlobals();
-//  _pattern_recognition.set_helical_pr_on(_helical_pr_on);
   _pattern_recognition.set_up_helical_pr_on(_up_helical_pr_on);
   _pattern_recognition.set_down_helical_pr_on(_down_helical_pr_on);
-  _pattern_recognition.set_straight_pr_on(_straight_pr_on);
+  _pattern_recognition.set_up_straight_pr_on(_up_straight_pr_on);
+  _pattern_recognition.set_down_straight_pr_on(_down_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
 
@@ -174,6 +220,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
       // Build SpacePoints.
       if (event->clusters().size()) {
         _spacepoint_recon.process(*event);
+        set_spacepoint_global_output(event->spacepoints());
       }
       // Pattern Recognition.
       if (_patrec_on && event->spacepoints().size()) {
@@ -382,6 +429,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _helical_track_fitter->Smooth(false);
 
       SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
+      calculate_track_rating(track);
 
       evt.add_scifitrack(track);
     }
@@ -398,6 +446,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _straight_track_fitter->Smooth(false);
 
       SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
+      calculate_track_rating(track);
 
       evt.add_scifitrack(track);
     }
@@ -532,6 +581,36 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
     track->set_reference_position(pos);
     track->set_reference_momentum(mom);
   }
+}
+
+void MapCppTrackerRecon::calculate_track_rating(SciFiTrack* track) const {
+  SciFiBasePRTrack* pr_track = track->pr_track_pointer();
+  int number_spacepoints = pr_track->get_num_points();
+  int number_trackpoints = track->GetNumberDataPoints();
+
+  bool excel_numtp = (number_trackpoints >= _excellent_num_trackpoints);
+  bool good_numtp = (number_trackpoints >= _good_num_trackpoints);
+  bool poor_numtp = (number_trackpoints >= _poor_num_trackpoints);
+  bool excel_numsp = (number_spacepoints >= _excellent_num_spacepoints);
+  bool good_numsp = (number_spacepoints >= _good_num_spacepoints);
+  bool poor_numsp = (number_spacepoints >= _poor_num_spacepoints);
+  bool excel_pval = (track->P_value() >= _excellent_p_value);
+  bool good_pval = (track->P_value() >= _good_p_value);
+  bool poor_pval = (track->P_value() >= _poor_p_value);
+
+  int rating = 0;
+
+  if (excel_numtp && excel_numsp && excel_pval) {
+    rating = 1;
+  } else if (good_numtp && good_numsp && good_pval) {
+    rating = 2;
+  } else if (poor_numtp && poor_numsp && poor_pval) {
+    rating = 3;
+  } else {
+    rating = 5;
+  }
+
+  track->SetRating(rating);
 }
 
 
@@ -696,4 +775,49 @@ SciFiSpacePointPArray find_spacepoints(SciFiSpacePointPArray spacepoint_array, i
 
   return found_spacepoints;
 }
+
+void MapCppTrackerRecon::set_spacepoint_global_output(SciFiSpacePointPArray spoints) const {
+  for (auto sp : spoints) {
+    int tracker_id = sp->get_tracker();
+
+    ThreeVector reference_position = _geometry_helper.GetReferencePosition(tracker_id);
+    CLHEP::HepRotation reference_rotation = _geometry_helper.GetReferenceRotation(tracker_id);
+
+    ThreeVector global_position = sp->get_position();
+    global_position *= reference_rotation;
+    global_position += reference_position;
+
+    sp->set_global_position(global_position);
+  }
+}
+
+/*
+// Find the plane id of the middle plane for this station
+int plane_id = 0;
+switch ( station_id ) {
+  case 1:
+    plane_id = 2;
+    break;
+  case 2:
+    plane_id = 5;
+    break;
+  case 3:
+    plane_id = 8;
+    break;
+  case 4:
+    plane_id = 11;
+    break;
+  case 5:
+    plane_id = 14;
+    break;
+  default:
+    plane_id = 0;
+    std::cerr << "WARNING: MapCppTrackerRecon: Failed to find spacepoint plane_id";
+    break;
+}
+
+// Use the geometry helper to find the global position of this plane
+ThreeVector plane_global_position = _geometry_helper.GeometryMap().find(tracker_id)->second.Planes.find(plane_id)->second.GlobalPosition;
+*/
+
 } // ~namespace MAUS

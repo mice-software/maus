@@ -91,10 +91,10 @@ class EMRChannelKey {
 
  private:
 
-  int_plane;
-  int _orientation;
-  int _bar;
-  string_detector;
+  int 		_plane;
+  int 		_orientation;
+  int 		_bar;
+  string	_detector;
 };
 
 

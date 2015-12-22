@@ -29,9 +29,17 @@ EMRCalibrationMap::EMRCalibrationMap() {
 
 EMRCalibrationMap::~EMRCalibrationMap() {
 
+  this->reset();
+}
+
+void EMRCalibrationMap::reset() {
+
   _Ckey.clear();
   _eps_MA.resize(0);
   _eps_SA.resize(0);
+
+  epsstr.str("");
+  epsstr.clear();
 }
 
 bool EMRCalibrationMap::InitializeFromCards(Json::Value configJSON) {

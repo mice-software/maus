@@ -41,14 +41,14 @@ TEST_F(SciFiStraightPRTrackTestDS, test_default_constructor) {
   EXPECT_EQ(prtrack.get_my(), -1.0);
   EXPECT_EQ(prtrack.get_y_chisq(), -1.0);
   EXPECT_EQ(prtrack.get_tracker(), -1);
-  EXPECT_EQ(prtrack.get_num_points(), -1);
+  EXPECT_EQ(prtrack.get_num_points(), 0);
   EXPECT_EQ(prtrack.get_covariance().size(), 0);
 }
 
 TEST_F(SciFiStraightPRTrackTestDS, test_parameter_constructor) {
   std::vector<double> cov(0);
   cov.push_back(10.0);
-  SciFiStraightPRTrack prtrack(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, cov);
+  SciFiStraightPRTrack prtrack(0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, cov);
   EXPECT_EQ(prtrack.get_x0(), 1.0);
   EXPECT_EQ(prtrack.get_mx(), 2.0);
   EXPECT_EQ(prtrack.get_x_chisq(), 3.0);
@@ -56,7 +56,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_parameter_constructor) {
   EXPECT_EQ(prtrack.get_my(), 5.0);
   EXPECT_EQ(prtrack.get_y_chisq(), 6.0);
   EXPECT_EQ(prtrack.get_tracker(), 0);
-  EXPECT_EQ(prtrack.get_num_points(), 3);
+  EXPECT_EQ(prtrack.get_num_points(), 0);
   ASSERT_EQ(prtrack.get_covariance().size(), 1);
   EXPECT_EQ(prtrack.get_covariance()[0], 10.0);
 }
@@ -71,7 +71,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_simpleline_constructor) {
   ly.set_c(4.0);
   ly.set_m(5.0);
   ly.set_chisq(6.0);
-  SciFiStraightPRTrack prtrack(0, 3, lx, ly, cov);
+  SciFiStraightPRTrack prtrack(0, lx, ly, cov);
   EXPECT_EQ(prtrack.get_x0(), 1.0);
   EXPECT_EQ(prtrack.get_mx(), 2.0);
   EXPECT_EQ(prtrack.get_x_chisq(), 3.0);
@@ -79,7 +79,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_simpleline_constructor) {
   EXPECT_EQ(prtrack.get_my(), 5.0);
   EXPECT_EQ(prtrack.get_y_chisq(), 6.0);
   EXPECT_EQ(prtrack.get_tracker(), 0);
-  EXPECT_EQ(prtrack.get_num_points(), 3);
+  EXPECT_EQ(prtrack.get_num_points(), 0);
   ASSERT_EQ(prtrack.get_covariance().size(), 1);
   EXPECT_EQ(prtrack.get_covariance()[0], 10.0);
 }
@@ -87,7 +87,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_simpleline_constructor) {
 TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   std::vector<double> cov(0);
   cov.push_back(10.0);
-  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, cov);
+  SciFiStraightPRTrack trk1(0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, cov);
 
   SciFiSpacePoint *spoint = new SciFiSpacePoint();
   spoint->set_tracker(1);
@@ -104,7 +104,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_my(), 5.0);
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
-  EXPECT_EQ(trk2.get_num_points(), 3);
+  EXPECT_EQ(trk2.get_num_points(), 1);
   EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
   EXPECT_EQ(trk2.get_covariance()[0], 10.0);
@@ -113,7 +113,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_copy_constructor) {
 TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   std::vector<double> cov(0);
   cov.push_back(10.0);
-  SciFiStraightPRTrack trk1(0, 3, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, cov);
+  SciFiStraightPRTrack trk1(0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, cov);
 
   SciFiSpacePoint *spoint = new SciFiSpacePoint();
   spoint->set_tracker(1);
@@ -131,7 +131,7 @@ TEST_F(SciFiStraightPRTrackTestDS, test_equality_operator) {
   EXPECT_EQ(trk2.get_my(), 5.0);
   EXPECT_EQ(trk2.get_y_chisq(), 6.0);
   EXPECT_EQ(trk2.get_tracker(), 0);
-  EXPECT_EQ(trk2.get_num_points(), 3);
+  EXPECT_EQ(trk2.get_num_points(), 1);
   EXPECT_EQ(trk2.get_spacepoints_pointers()[0]->get_tracker(), 1);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
   EXPECT_EQ(trk2.get_covariance()[0], 10.0);
@@ -147,10 +147,12 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   int tracker = 1;
   int num_points = 5;
 
-  SciFiSpacePoint *spoint = new SciFiSpacePoint();
-  spoint->set_tracker(tracker);
   SciFiSpacePointPArray spoints;
-  spoints.push_back(spoint);
+  for (int it_p = 0; it_p < num_points; ++it_p) {
+    SciFiSpacePoint *spoint = new SciFiSpacePoint();
+    spoint->set_tracker(tracker);
+    spoints.push_back(spoint);
+  }
 
   std::vector<double> cov(0);
   cov.push_back(10.0);
@@ -164,7 +166,6 @@ TEST_F(SciFiStraightPRTrackTestDS, test_setters_getters) {
   prtrack.set_my(my);
   prtrack.set_y_chisq(y_chisq);
   prtrack.set_tracker(tracker);
-  prtrack.set_num_points(num_points);
   prtrack.set_spacepoints_pointers(spoints);
   prtrack.set_covariance(cov);
 

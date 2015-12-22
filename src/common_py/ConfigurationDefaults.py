@@ -286,8 +286,10 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
-SciFiPRHelicalOn = True # Flag to turn on the tracker helical pattern recognition
-SciFiPRStraightOn = True # Flag to turn on the tracker straight pattern recognition
+SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
@@ -334,6 +336,16 @@ SciFiKalman_use_MCS = True # flag to add MCS to the Kalman Fit
 SciFiKalman_use_Eloss = True # flag to add Eloss to the Kalman Fit
 SciFiKalmanVerbose  = False # Dump information per fitted track
 SciFiDefaultMomentum = 200.0 # Default momentum to assume for straight tracks
+# How we determine the track ratings:
+SciFiExcellentNumTrackpoints = 15
+SciFiGoodNumTrackpoints = 10
+SciFiPoorNumTrackpoints = 10
+SciFiExcellentNumSpacepoints = 5
+SciFiGoodNumSpacepoints = 5
+SciFiPoorNumSpacepoints = 4
+SciFiExcellentPValue = 0.05
+SciFiGoodPValue = 0.01
+SciFiPoorPValue = 0.0
 
 # configuration database
 cdb_upload_url = "http://cdb.mice.rl.ac.uk/cdb/" # target URL for configuration database uploads TestServer::http://rgma19.pp.rl.ac.uk:8080/cdb/
@@ -397,6 +409,7 @@ tracker0_file_number = "Iges_17"
 tracker1_file_number = "Iges_18"
 absorber0_file_number = "9999"
 absorber1_file_number = "Iges_16"
+# absorber1_file_number = "9999"
 absorber2_file_number = "9999"
 
 # Survey fit information
@@ -551,13 +564,14 @@ EMRchi2Cut = 2
 # this is used by the reconstuction of the TOF detectors
 TOF_trigger_station = "tof1"
 
-# this sets the source for the calibrations
+# this sets the source for the calibrations and cabling
 # by default it is from CDB
 # set it to 'file' if you want to load local files
 # if you set file, then uncomment the calib files below
 TOF_calib_source = "CDB"
+TOF_cabling_source = "CDB"
 
-TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 #TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
 #TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
@@ -567,10 +581,11 @@ TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
 TOF_findTriggerPixelCut = 0.5 # nanosecond
 TOF_makeSpacePointCut = 0.5 # nanosecond
 
-# get calibrations by either a) run_number or b) date
+# get cabling and calibrations by either a) run_number or b) date
 # default is by run_number
 # if set to "date" then set the appropriate TOF_calib_date_from flag below
 TOF_calib_by = "run_number"
+TOF_cabling_by = "run_number"
 
 # the date for which we want the cabling and calibration
 # date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format

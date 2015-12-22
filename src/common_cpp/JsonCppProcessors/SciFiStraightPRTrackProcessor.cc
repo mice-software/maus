@@ -23,9 +23,6 @@ SciFiStraightPRTrackProcessor::SciFiStraightPRTrackProcessor() {
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiStraightPRTrack::get_tracker,
                         &SciFiStraightPRTrack::set_tracker, true);
-    RegisterValueBranch("num_points", &_int_proc,
-                        &SciFiStraightPRTrack::get_num_points,
-                        &SciFiStraightPRTrack::set_num_points, true);
 
     RegisterValueBranch("x0", &_double_proc,
                         &SciFiStraightPRTrack::get_x0,

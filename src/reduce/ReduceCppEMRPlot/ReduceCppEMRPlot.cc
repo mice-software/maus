@@ -186,6 +186,10 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   _objects.push_back(_line_density);
   _objects.push_back(_line_chi2);
 
+  // Add grid to all canvases.
+  for (auto &canv:_canvs)
+    canv->SetGrid();
+
   // Initialize the canvas wrappers
   CanvasWrapper* cwrap_occ_xz =
 	ReduceCppTools::get_canvas_emr_wrapper(canv_occ_xz,

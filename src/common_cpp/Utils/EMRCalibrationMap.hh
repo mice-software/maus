@@ -64,8 +64,7 @@ class EMRCalibrationMap {
   *  \param[in] calibFile	name of the text file containing the energy calibration constants.
   *  \returns 			true if the text file is loaded successfully.
   */
-  bool Initialize(std:
-:string calibFile);
+  bool Initialize(std::string calibFile);
 
  /** @brief Returns the energy correction for the channel coded by the key.
   *
@@ -91,6 +90,10 @@ class EMRCalibrationMap {
   };
 
  private:
+
+ /** @brief Use this function to reset the map before reloading.
+  */
+  void reset();
 
  /** @brief Make one EMRChannelKey for each channel of the detector.
   *         All EMRChannelKeys are held in the data member _Ckey.

@@ -111,4 +111,15 @@ void SciFiBasePRTrack::set_spacepoints_pointers(const SciFiSpacePointPArray &spo
   }
 }
 
+int SciFiBasePRTrack::get_num_triplets() const {
+  int triplet_count = 0;
+  for (int i = 0; i < (_spoints->GetLast()+1); ++i) {
+    SciFiSpacePoint* sp = static_cast<SciFiSpacePoint*>(_spoints->At(i));
+    if ((sp->get_channels()->GetLast() + 1) == 3) {
+        triplet_count += 1;
+    }
+  }
+  return triplet_count;
+}
+
 } // ~namespace MAUS

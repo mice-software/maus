@@ -43,6 +43,8 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
 
   int  getRefreshRate() {return _refresh_rate;}
 
+  void reset();
+
  private:
 
   void _birth(const std::string& argJsonConfigDocument);
@@ -50,8 +52,6 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   void _death();
 
   void _process(Data* data);
-
-  void reset();
 
   void update();
 
