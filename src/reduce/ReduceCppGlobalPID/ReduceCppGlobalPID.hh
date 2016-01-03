@@ -40,13 +40,13 @@
 #include "src/common_cpp/Recon/Global/PIDBase.hh"
 #include "src/common_cpp/Recon/Global/PIDBase1D.hh"
 #include "src/common_cpp/Recon/Global/PIDBase2D.hh"
-#include "src/common_cpp/Recon/Global/ComPIDVarA.hh"
-#include "src/common_cpp/Recon/Global/ComPIDVarB.hh"
-#include "src/common_cpp/Recon/Global/ComPIDVarC.hh"
-#include "src/common_cpp/Recon/Global/ComPIDVarD.hh"
-#include "src/common_cpp/Recon/Global/ComPIDVarE.hh"
-#include "src/common_cpp/Recon/Global/ComPIDVarF.hh"
-#include "src/common_cpp/Recon/Global/ComPIDVarG.hh"
+#include "src/common_cpp/Recon/Global/PIDVarA.hh"
+#include "src/common_cpp/Recon/Global/PIDVarB.hh"
+#include "src/common_cpp/Recon/Global/PIDVarC.hh"
+#include "src/common_cpp/Recon/Global/PIDVarD.hh"
+#include "src/common_cpp/Recon/Global/PIDVarE.hh"
+#include "src/common_cpp/Recon/Global/PIDVarF.hh"
+#include "src/common_cpp/Recon/Global/PIDVarG.hh"
 //#include "src/common_cpp/Recon/Global/PIDVarH.hh"
 
 #include "src/common_cpp/API/ReduceBase.hh"
@@ -58,10 +58,10 @@ namespace MAUS {
 class Data;
 class ImageData;
 
-class ReduceCppGlobalPID : public ReduceBase<Data, ImageData> {
+class ReduceCppGlobalPID : public ReduceBase<Data, Data> {
 
   public:
-    ReduceCppGlobalPID() : ReduceBase<Data, ImageData>("ReduceCppGlobalPID"), _configCheck(false) {}
+    ReduceCppGlobalPID() : ReduceBase<Data, Data>("ReduceCppGlobalPID"), _configCheck(false) {}
   ~ReduceCppGlobalPID();
 
   private:

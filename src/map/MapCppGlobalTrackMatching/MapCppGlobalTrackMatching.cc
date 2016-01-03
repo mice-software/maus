@@ -48,7 +48,7 @@ namespace MAUS {
                               "MapCppGlobalTrackMatching::birth");
     }
     _configCheck = true;
-    _classname = "MapCppGlobalTrackMatching";
+    _classname = "MapCppGlobalTrackMatching-Through";
   }
 
   void MapCppGlobalTrackMatching::_death() {

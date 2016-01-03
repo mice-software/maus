@@ -54,7 +54,7 @@ namespace global {
     for (eachTP = track_points.begin(); eachTP != track_points.end();
 	 ++eachTP) {
       if (!(*eachTP)) continue;
-      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching") {
+      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching-Through") {
 	if ((*eachTP)->get_detector() == TOF0_DP) {
 	  TOF0_t = (*eachTP)->get_position().T();
 	  ++checkCount0;

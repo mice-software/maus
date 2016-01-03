@@ -109,9 +109,9 @@ namespace MAUS {
     _custom_pid_set = _configJSON["custom_pid_set"].asString();
     _pid_confidence_level = _configJSON["pid_confidence_level"].asInt();
 
-    std::cerr << _pid_config << std::endl;
-    std::cerr << _pid_mode << std::endl;
-    std::cerr << _custom_pid_set << std::endl;
+    //std::cerr << _pid_config << std::endl;
+    //std::cerr << _pid_mode << std::endl;
+    //std::cerr << _custom_pid_set << std::endl;
 
     // vector of hypotheses
     // TODO(Pidcott) find a more elegant way of accessing hypotheses
@@ -185,7 +185,6 @@ namespace MAUS {
 								   _hypotheses[i],
 								   _XminB, _XmaxB,
 								   _YminB, _YmaxB));
-	      std::cerr << "selected PIDVarB" << std::endl;
 	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"PIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
@@ -335,10 +334,7 @@ namespace MAUS {
   }
 
   void MapCppGlobalPID::_death() {
-    for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
-	   ++pid_var_count) {
-	delete _pid_vars[pid_var_count];
-      }
+    _pid_vars.clear();
   }
 
   void MapCppGlobalPID::_process(MAUS::Data* data) const {
@@ -368,8 +364,9 @@ namespace MAUS {
 	       ++track_i) {
 	    MAUS::DataStructure::Global::Track* track =
 	      GlobalTrackArray->at(track_i);
-	    if (track->get_mapper_name() == "MapCppGlobalTrackMatching-US" ||
-		track->get_mapper_name() == "MapCppGlobalTrackMatching-DS") {
+	    if (track->get_mapper_name() == "MapCppGlobalTrackMatching-Through"
+		/*track->get_mapper_name() == "MapCppGlobalTrackMatching-US" ||
+		  track->get_mapper_name() == "MapCppGlobalTrackMatching-DS"*/) {
 	      // int recon_track_pid = track->get_pid();
 	      MAUS::DataStructure::Global::Track* pidtrack = track->Clone();
 	      global_event->add_track_recursive(pidtrack);
@@ -386,7 +383,7 @@ namespace MAUS {
 	      /// does not affect PID performance
 	      bool logL_1 = false;
 	      bool logL_2 = false;
-	      std::cerr << "_pid_vars.size() : " << _pid_vars.size() << std::endl;
+	      //std::cerr << "_pid_vars.size() : " << _pid_vars.size() << std::endl;
 	      for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
 		   ++pid_var_count) {
 		logL_1 = false;
@@ -453,22 +450,22 @@ namespace MAUS {
 	      pidtrack->AddPIDLogLValues(e_plus_LL);
 	      std::vector<MAUS::DataStructure::Global::PIDLogLPair>
 		pid_ll_values = pidtrack->get_pid_logL_values();
-	      for (std::vector<MAUS::DataStructure::Global::PIDLogLPair>::const_iterator
+	      /*for (std::vector<MAUS::DataStructure::Global::PIDLogLPair>::const_iterator
 		     i = pid_ll_values.begin(); i != pid_ll_values.end(); ++i) {
 		std::cerr << i->first << "\t" << i->second << std::endl;
-	      }
+		}*/
 	      if (logL_200MeV_mu_plus < 0 || logL_200MeV_pi_plus < 0 ||
 		  logL_200MeV_e_plus < 0) {
 		// calculate CLs
 		double sum_exp_LLs = exp(logL_200MeV_mu_plus) +
 		  exp(logL_200MeV_e_plus) + exp(logL_200MeV_pi_plus);
-		std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;
+		//std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;
 		double CL_mu_plus = ConfidenceLevel(logL_200MeV_mu_plus, sum_exp_LLs);
 		double CL_e_plus = ConfidenceLevel(logL_200MeV_e_plus, sum_exp_LLs);
 		double CL_pi_plus = ConfidenceLevel(logL_200MeV_pi_plus, sum_exp_LLs);
-		std::cerr << "CL_mu " << CL_mu_plus << std::endl;
-		std::cerr << "CL_e " << CL_e_plus << std::endl;
-		std::cerr << "CL_pi " << CL_pi_plus << std::endl;
+		//std::cerr << "CL_mu " << CL_mu_plus << std::endl;
+		//std::cerr << "CL_e " << CL_e_plus << std::endl;
+		//std::cerr << "CL_pi " << CL_pi_plus << std::endl;
 		// compare CLs and select winning hypothesis. set g.o.f. of track to CL
 		if (CL_mu_plus - CL_e_plus > _pid_confidence_level &&
 		    CL_mu_plus - CL_pi_plus > _pid_confidence_level) {

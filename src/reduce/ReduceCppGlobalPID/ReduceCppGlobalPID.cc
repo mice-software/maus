@@ -64,19 +64,19 @@ namespace MAUS {
       // TODO(Pidcott) this vector will contain several PID variables, once
       // they have been determined
       _pid_vars.clear();
-      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_hypothesis_name,
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_hypothesis_name,
 							   _unique_identifier));
-      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_hypothesis_name,
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_hypothesis_name,
 							   _unique_identifier));
-      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_hypothesis_name,
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_hypothesis_name,
 							   _unique_identifier));
-      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_hypothesis_name,
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarD(_hypothesis_name,
 							   _unique_identifier));
-      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_hypothesis_name,
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarE(_hypothesis_name,
 							   _unique_identifier));
-      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_hypothesis_name,
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarF(_hypothesis_name,
 							   _unique_identifier));
-      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_hypothesis_name,
+      _pid_vars.push_back(new MAUS::recon::global::PIDVarG(_hypothesis_name,
 							   _unique_identifier));
 
       _configCheck = true;
@@ -95,7 +95,6 @@ namespace MAUS {
       throw Exception(Exception::recoverable, "Spill was NULL",
 		      "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill()->GetDaqEventType() != "physics_event") {
-      std::cerr << "didn't get a physics event" << std::endl;
       /*ImageData * image_data = new ImageData();
       image_data->SetImage(new Image());
       return image_data;*/
@@ -128,7 +127,7 @@ namespace MAUS {
 	      if (tr_count > 0) break;
 	      MAUS::DataStructure::Global::Track* track =
 		GlobalTrackArray->at(track_i);
-	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching") continue;
+	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching-Through") continue;
 	      tr_count++;
 	      for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
 		   ++pid_var_count) {
@@ -148,9 +147,10 @@ namespace MAUS {
 
   void ReduceCppGlobalPID::_death()  {
     if (_configCheck) {
+      //_pid_vars.clear();
       for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
-	   ++pid_var_count) {
-	delete _pid_vars[pid_var_count];
+      	   ++pid_var_count) {
+      	delete _pid_vars[pid_var_count];
       }
     }
   }
