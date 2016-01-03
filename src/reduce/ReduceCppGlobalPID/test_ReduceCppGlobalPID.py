@@ -36,7 +36,7 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         """Initialize a reducer object"""
         cls.reducer = MAUS.ReduceCppGlobalPID()
 
-    def test_process(self): # pylint: disable = R0914
+    def _test_process(self): # pylint: disable = R0914
         """Check ReduceCppGlobalPID process function"""
         self.config0['global_pid_hypothesis'] = 'test_200MeV_mu_plus'
         now = datetime.datetime.now()
@@ -62,10 +62,8 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         # Check birth created PDF file
         PDFdirectory = ('%s/files/PID/%s_%s' 
                     % (os.environ.get("MAUS_ROOT_DIR"), hypothesis, timestamp))
-        print PDFdirectory
         PDFfile1 = ('%s/diffTOF1TOF0_%s.root' 
                     % (PDFdirectory, hypothesis))
-        print PDFfile1
         self.assertTrue(os.path.exists(PDFfile1))
         rootPDFfile1 = ROOT.TFile(PDFfile1)
         PDFfile2 = ('%s/diffTOF0TOF1vsTrackerMom_%s.root' 
