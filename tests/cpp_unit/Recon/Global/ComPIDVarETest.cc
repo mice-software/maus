@@ -82,19 +82,19 @@ class ComPIDVarETest : public ::testing::Test {
 		  double x2 = 0.0;
 		  double y2 = 0.0;
 		  double z2 = 0.0;
-		  double t2 = r.Gaus(75, 2);
+		  double t2 = r.Gaus(85, 2);
 		  TLorentzVector pos2(x2, y2, z2, t2);
 
 		  tp1->set_position(pos1);
 		  tp2->set_position(pos2);
-		  tp1->set_mapper_name("MapCppGlobalTrackMatching");
-		  tp2->set_mapper_name("MapCppGlobalTrackMatching");
+		  tp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
+		  tp2->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTrack->AddTrackPoint(tp1);
 		  testTrack->AddTrackPoint(tp2);
-		  tpEMR->set_mapper_name("MapCppGlobalTrackMatching");
+		  tpEMR->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  tpEMR->set_detector(MAUS::DataStructure::Global::kEMR);
 		  testTrack->AddTrackPoint(tpEMR);
-		  testTrack->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTracks.push_back(testTrack);
 		}
 	}
@@ -192,25 +192,25 @@ TEST_F(ComPIDVarETest, LogL) {
 	double x2 = 0.0;
 	double y2 = 0.0;
 	double z2 = 0.0;
-	double t2 = 45.0;
+	double t2 = 55.0;
 	TLorentzVector cpos2(x2, y2, z2, t2);
 
 	MAUS::DataStructure::Global::TrackPoint* ctpEMR =
 			new MAUS::DataStructure::Global::TrackPoint();
 	ctpEMR->set_detector(MAUS::DataStructure::Global::kCalorimeter);
 
-	double emr_range = 50;
+	double emr_range = 500;
 	checkTrack->set_emr_range_primary(emr_range);
 	ctpEMR->set_detector(MAUS::DataStructure::Global::kEMR);
-	ctpEMR->set_mapper_name("MapCppGlobalTrackMatching");
+	ctpEMR->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctpEMR);
 	ctp1->set_position(cpos1);
 	ctp2->set_position(cpos2);
-	ctp1->set_mapper_name("MapCppGlobalTrackMatching");
-	ctp2->set_mapper_name("MapCppGlobalTrackMatching");
+	ctp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
+	ctp2->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctp1);
 	checkTrack->AddTrackPoint(ctp2);
-	checkTrack->set_mapper_name("MapCppGlobalTrackMatching");
+	checkTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 
 	file = new TFile(testfile.c_str(), "READ");
 
@@ -218,9 +218,9 @@ TEST_F(ComPIDVarETest, LogL) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::ComPIDVarE readtestComPIDVarE(file, "test", 20, 40, 0, 1000));
+	ASSERT_NO_THROW(MAUS::recon::global::ComPIDVarE readtestComPIDVarE(file, "test", 30, 50, 0, 1000));
 
-	MAUS::recon::global::ComPIDVarE readtestComPIDVarE(file, "test", 20, 40, 0, 1000);
+	MAUS::recon::global::ComPIDVarE readtestComPIDVarE(file, "test", 30, 50, 0, 1000);
 
 	hist = readtestComPIDVarE.Get_hist();
 	ASSERT_TRUE(hist);

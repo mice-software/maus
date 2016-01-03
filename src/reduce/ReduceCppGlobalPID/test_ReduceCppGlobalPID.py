@@ -73,9 +73,9 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(PDFfile2))
         rootPDFfile2 = ROOT.TFile(PDFfile2)
         #check histogram exists in file
-        hist1name = "diffTOF1TOF0_test_200MeV_pi_plus"
+        hist1name = "diffTOF1TOF0_test_200MeV_mu_plus"
         hist1 = rootPDFfile1.Get(hist1name)
-        hist2name = "diffTOF0TOF1vsTrackerMom_test_200MeV_pi_plus"
+        hist2name = "diffTOF0TOF1vsTrackerMom_test_200MeV_mu_plus"
         hist2 = rootPDFfile2.Get(hist2name)
         ## Check process has added info from 5 tracks to histograms:
         ## N.B. for PIDVarA the behavior to spread one event over all bins is

@@ -76,12 +76,12 @@ class PIDVarHTest : public ::testing::Test {
 		  TLorentzVector tpTrackerMom(px, py, pz, E);
 
 		  tpTracker->set_momentum(tpTrackerMom);
-		  tpTracker->set_mapper_name("MapCppGlobalTrackMatching");
+		  tpTracker->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTrack->AddTrackPoint(tpTracker);
-		  tpEMR->set_mapper_name("MapCppGlobalTrackMatching");
+		  tpEMR->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  tpEMR->set_detector(MAUS::DataStructure::Global::kEMR);
 		  testTrack->AddTrackPoint(tpEMR);
-		  testTrack->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTracks.push_back(testTrack);
 		}
 	}
@@ -181,11 +181,11 @@ TEST_F(PIDVarHTest, LogL) {
 	double emr_density = 0.5;
 	checkTrack->set_emr_plane_density(emr_density);
 	ctpEMR->set_detector(MAUS::DataStructure::Global::kEMR);
-	ctpEMR->set_mapper_name("MapCppGlobalTrackMatching");
+	ctpEMR->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctpEMR);
-	ctpTracker->set_mapper_name("MapCppGlobalTrackMatching");
+	ctpTracker->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctpTracker);
-	checkTrack->set_mapper_name("MapCppGlobalTrackMatching");
+	checkTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 
 	file = new TFile(testfile.c_str(), "READ");
 

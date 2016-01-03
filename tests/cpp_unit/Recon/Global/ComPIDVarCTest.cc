@@ -66,9 +66,9 @@ class ComPIDVarCTest : public ::testing::Test {
 		  double adc_charge_prod = r.Gaus(1000, 10);
 		  tpKL->set_ADC_charge_product(adc_charge_prod);
 
-		  tpKL->set_mapper_name("MapCppGlobalTrackMatching");
+		  tpKL->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTrack->AddTrackPoint(tpKL);
-		  testTrack->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTracks.push_back(testTrack);
 		}
 	}
@@ -157,9 +157,9 @@ TEST_F(ComPIDVarCTest, LogL) {
 	double adc_charge_prod = 1000;
 	ctpKL->set_ADC_charge_product(adc_charge_prod);
 
-	ctpKL->set_mapper_name("MapCppGlobalTrackMatching");
+	ctpKL->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctpKL);
-	checkTrack->set_mapper_name("MapCppGlobalTrackMatching");
+	checkTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 
 	file = new TFile(testfile.c_str(), "READ");
 
