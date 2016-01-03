@@ -92,7 +92,7 @@ namespace global {
 	      PrimaryEMRTrack->SetDetector(MAUS::DataStructure::Global::kEMR);
 	      PrimaryEMRTrack->set_mapper_name("MapCppGlobalReconImport");
 	    }
-	  }  
+	  }
 	  // Secondary Bar array
 	  if (emr_event.GetHasSecondary()) {
 	    SecondaryEMRTrack->set_emr_range_secondary(emr_event.GetRangeSecondary());

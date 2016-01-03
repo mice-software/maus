@@ -34,7 +34,7 @@ namespace MAUS {
   MapCppGlobalTrackMatching::MapCppGlobalTrackMatching()
     : MapBase<Data>("MapCppGlobalTrackMatching"), _configCheck(false) {
   }
-  
+
   MapCppGlobalTrackMatching::~MapCppGlobalTrackMatching() {
   }
 

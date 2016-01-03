@@ -170,7 +170,7 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
 
         # process spills
         # check for run number change and process an end-of-run spill if changed
-	merged_event = event
+        merged_event = event
         if evtype == "Spill":
             if event_json is None:
                 current_run_number = event.GetSpill().GetRunNumber()

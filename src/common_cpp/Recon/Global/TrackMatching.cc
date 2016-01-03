@@ -135,11 +135,9 @@ namespace global {
 	}
 	global_event->add_track_recursive(GlobalTrack);
       }
-    }
-
-    // Adding global tracks for case where global event contains only TOF tracks
-    // (And KL track if applicable)
-    else if (ImportedSciFiTrack == NULL && !TOFTrackArray.empty()) {
+    } else if (ImportedSciFiTrack == NULL && !TOFTrackArray.empty()) {
+      // Adding global tracks for case where global event contains only
+      // TOF tracks (And KL track if applicable)
       for (unsigned int i = 0; i < TOFTrackArray.size(); i++) {
 	MAUS::DataStructure::Global::Track* GlobalTrack = TOFTrackArray[i]->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
@@ -170,11 +168,7 @@ namespace global {
 	}
 	global_event->add_track_recursive(GlobalTrack);
       }
-    }
-
-    // Adding global tracks for case where global event contains only SciFi tracks
-    // (And KL track if applicable)
-    else if (ImportedSciFiTrack != NULL && TOFTrackArray.empty()) {
+    } else if (ImportedSciFiTrack != NULL && TOFTrackArray.empty()) {
       MAUS::DataStructure::Global::Track* GlobalTrack = ImportedSciFiTrack->Clone();
       GlobalTrack->set_mapper_name(mapper_name);
       if (KLTrack != NULL) {
@@ -203,10 +197,7 @@ namespace global {
 	GlobalTrack->set_emr_range_secondary(EMRTrack->get_emr_range_secondary());
       }
       global_event->add_track_recursive(GlobalTrack);
-    }
-
-    // Adding global tracks for case where global event contains only a KL or EMR track
-    else if (ImportedSciFiTrack == NULL && TOFTrackArray.empty() &&
+    } else if (ImportedSciFiTrack == NULL && TOFTrackArray.empty() &&
 	(KLTrack != NULL || EMRTrack != NULL)) {
       if (KLTrack != NULL && EMRTrack == NULL) {
 	MAUS::DataStructure::Global::Track* GlobalTrack = KLTrack->Clone();

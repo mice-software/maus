@@ -17,14 +17,12 @@
 """Tests for ReduceCppGlobalPID"""
 # pylint: disable = C0103,E1101
 import os
-import libMausCpp
 import json
 import unittest
 import Configuration
 import datetime
 import ROOT
 import MAUS
-from MAUS import *
 
 # pylint: disable = R0904
 class ReduceCppGlobalPIDTestCase(unittest.TestCase):
@@ -36,7 +34,7 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         """Initialize a reducer object"""
         cls.reducer = MAUS.ReduceCppGlobalPID()
 
-    def _test_process(self): # pylint: disable = R0914
+    def test_process(self): # pylint: disable = R0914
         """Check ReduceCppGlobalPID process function"""
         self.config0['global_pid_hypothesis'] = 'test_200MeV_mu_plus'
         now = datetime.datetime.now()

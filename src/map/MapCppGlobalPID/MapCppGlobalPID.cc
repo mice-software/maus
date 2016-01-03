@@ -109,10 +109,6 @@ namespace MAUS {
     _custom_pid_set = _configJSON["custom_pid_set"].asString();
     _pid_confidence_level = _configJSON["pid_confidence_level"].asInt();
 
-    //std::cerr << _pid_config << std::endl;
-    //std::cerr << _pid_mode << std::endl;
-    //std::cerr << _custom_pid_set << std::endl;
-
     // vector of hypotheses
     // TODO(Pidcott) find a more elegant way of accessing hypotheses
     _hypotheses.push_back("200MeV_mu_plus");
@@ -459,13 +455,13 @@ namespace MAUS {
 		// calculate CLs
 		double sum_exp_LLs = exp(logL_200MeV_mu_plus) +
 		  exp(logL_200MeV_e_plus) + exp(logL_200MeV_pi_plus);
-		//std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;
+		// std::cerr << "sum exp LLs: " << sum_exp_LLs << std::endl;
 		double CL_mu_plus = ConfidenceLevel(logL_200MeV_mu_plus, sum_exp_LLs);
 		double CL_e_plus = ConfidenceLevel(logL_200MeV_e_plus, sum_exp_LLs);
 		double CL_pi_plus = ConfidenceLevel(logL_200MeV_pi_plus, sum_exp_LLs);
-		//std::cerr << "CL_mu " << CL_mu_plus << std::endl;
-		//std::cerr << "CL_e " << CL_e_plus << std::endl;
-		//std::cerr << "CL_pi " << CL_pi_plus << std::endl;
+		// std::cerr << "CL_mu " << CL_mu_plus << std::endl;
+		// std::cerr << "CL_e " << CL_e_plus << std::endl;
+		// std::cerr << "CL_pi " << CL_pi_plus << std::endl;
 		// compare CLs and select winning hypothesis. set g.o.f. of track to CL
 		if (CL_mu_plus - CL_e_plus > _pid_confidence_level &&
 		    CL_mu_plus - CL_pi_plus > _pid_confidence_level) {

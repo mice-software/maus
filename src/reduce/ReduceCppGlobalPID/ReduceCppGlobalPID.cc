@@ -44,7 +44,6 @@ namespace MAUS {
     // JsonCpp setup - check file parses correctly, if not return false
     Json::Value configJSON;
     try {
-      //std::cerr << "in the try" << std::endl;
       configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
       _hypothesis_name = configJSON["global_pid_hypothesis"].asString();
       _unique_identifier = configJSON["unique_identifier"].asString();
@@ -95,9 +94,6 @@ namespace MAUS {
       throw Exception(Exception::recoverable, "Spill was NULL",
 		      "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill()->GetDaqEventType() != "physics_event") {
-      /*ImageData * image_data = new ImageData();
-      image_data->SetImage(new Image());
-      return image_data;*/
     }
     if (!_configCheck) {
       throw Exception(Exception::recoverable,
@@ -118,7 +114,7 @@ namespace MAUS {
 	  if (_spill->GetReconEvents()->at(event_i)->GetGlobalEvent()) {
 	    MAUS::GlobalEvent* global_event =
 	      _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
-	    //temp line to be removed, hack whilst waiting for JG TM to work
+	    // temp line to be removed, hack whilst waiting for JG TM to work
 	    int tr_count = 0;
 	    std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
 	      global_event->get_tracks();
@@ -140,14 +136,11 @@ namespace MAUS {
     } else {
       Squeak::mout(Squeak::error) << "Failed to import spill from data\n";
     }
-    /*ImageData * image_data = new ImageData();
-    image_data->SetImage(new Image());
-    return image_data;*/
   }
 
   void ReduceCppGlobalPID::_death()  {
     if (_configCheck) {
-      //_pid_vars.clear();
+      // _pid_vars.clear();
       for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
       	   ++pid_var_count) {
       	delete _pid_vars[pid_var_count];

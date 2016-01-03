@@ -111,7 +111,6 @@ namespace global {
 			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
 			      MAUS::GlobalEvent* global_event,
 			      std::string mapper_name);
-
   }; // ~class ImportTOFRecon
 } // ~namespace global
 } // ~namespace recon

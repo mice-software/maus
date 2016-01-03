@@ -77,7 +77,6 @@ class ComPIDVarFTest : public ::testing::Test {
 	virtual void TearDown() {
 		gSystem->Unlink(testfile.c_str());
 		gSystem->Unlink(testdir.c_str());
-
 	}
 
  public:

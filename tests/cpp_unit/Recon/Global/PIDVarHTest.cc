@@ -68,7 +68,7 @@ class PIDVarHTest : public ::testing::Test {
 
 		  double emr_density = r.Gaus(0.5, 0.001);
 		  testTrack->set_emr_plane_density(emr_density);
-		  
+
 		  double px = 0.0;
 		  double py = 0.0;
 		  double pz = 200.0;

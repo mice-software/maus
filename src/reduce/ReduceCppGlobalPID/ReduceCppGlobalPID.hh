@@ -47,7 +47,7 @@
 #include "src/common_cpp/Recon/Global/PIDVarE.hh"
 #include "src/common_cpp/Recon/Global/PIDVarF.hh"
 #include "src/common_cpp/Recon/Global/PIDVarG.hh"
-//#include "src/common_cpp/Recon/Global/PIDVarH.hh"
+#include "src/common_cpp/Recon/Global/PIDVarH.hh"
 
 #include "src/common_cpp/API/ReduceBase.hh"
 #include "src/common_cpp/API/PyWrapReduceBase.hh"

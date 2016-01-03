@@ -135,11 +135,14 @@ TEST_F(ComPIDVarETest, ReadFileConstructor) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::ComPIDVarE testComPIDVarE(file, "test", 20, 40, 0, 1000));
+	ASSERT_NO_THROW(MAUS::recon::global::ComPIDVarE
+			testComPIDVarE(file, "test", 20, 40, 0, 1000));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::ComPIDVarE testComPIDVarE(NULL, "test", 20, 40, 0, 1000));
+	ASSERT_ANY_THROW(MAUS::recon::global::ComPIDVarE
+			 testComPIDVarE(NULL, "test", 20, 40, 0, 1000));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::ComPIDVarE testComPIDVarE(file, "sasquatch", 20, 40, 0, 1000));
+	ASSERT_ANY_THROW(MAUS::recon::global::ComPIDVarE
+			 testComPIDVarE(file, "sasquatch", 20, 40, 0, 1000));
 }
 
 /* N.B. if either FillHist or LogL are failing, check the values of min and max

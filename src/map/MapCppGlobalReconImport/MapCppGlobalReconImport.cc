@@ -54,7 +54,7 @@ namespace MAUS {
             std::string("Did you try running: source env.sh?"),
             "MapCppGlobalReconImport::_birth");
     }
-    
+
     _configCheck = true;
     _classname = "MapCppGlobalReconImport";
   }
