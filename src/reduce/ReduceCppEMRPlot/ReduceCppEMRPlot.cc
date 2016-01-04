@@ -41,11 +41,8 @@ ReduceCppEMRPlot::~ReduceCppEMRPlot() {
     delete _histos[i];
   _histos.resize(0);
 
-  for (size_t i = 0; i < _canvs.size(); i++)
-    delete _canvs[i];
-  _canvs.resize(0);
-
-  // CanvasWrapper objects will be deleted by the ImageData destructor.
+  // CanvasWrapper objects will be deleted by the ImageData destructor;
+  // they own the canvas that they wrap.
 }
 
 void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {

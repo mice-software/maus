@@ -423,8 +423,8 @@ void MapCppEMRRecon::match_daughters(MAUS::Spill* spill,
     if ( !evtTrackM->GetEMRTrack().GetEMRTrackPointArraySize() )
 	continue;
 
-    std::cerr << std::endl;
-    std::cerr << "Mother in the EMR" << std::endl;
+//    std::cerr << std::endl;
+//    std::cerr << "Mother in the EMR" << std::endl;
 
     double aTime = evtTrackM->GetEMRSpacePointArray().front()->GetTime();
     EMRTrack aTrack = evtTrackM->GetEMRTrack();
