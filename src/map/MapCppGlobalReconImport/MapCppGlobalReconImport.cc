@@ -34,32 +34,29 @@ namespace MAUS {
     : MapBase<Data>("MapCppGlobalReconImport"), _configCheck(false) {
   }
 
+  MapCppGlobalReconImport::~MapCppGlobalReconImport() {
+  }
+
   void MapCppGlobalReconImport::_birth(const std::string& argJsonConfigDocument) {
     // Check if the JSON document can be parsed, else return error only.
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
       throw MAUS::Exception(Exception::recoverable,
-          "Failed to parse configuration",
-          "MapCppGlobalReconImport::birth");
+			    "Failed to parse configuration",
+			    "MapCppGlobalReconImport::birth");
     }
 
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
     if (!pMAUS_ROOT_DIR) {
       throw MAUS::Exception(Exception::recoverable,
-            std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
+	          std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
             std::string("Did you try running: source env.sh?"),
             "MapCppGlobalReconImport::_birth");
     }
-    
+
     _configCheck = true;
     _classname = "MapCppGlobalReconImport";
-    // get the geometry
-    if (!_configJSON.isMember("reconstruction_geometry_filename"))
-      throw(Exception(Exception::recoverable,
-          "Could not find geometry file",
-          "MapCppGlobalReconImport::birth"));
-    geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
   }
 
   void MapCppGlobalReconImport::_death() {
@@ -88,39 +85,37 @@ namespace MAUS {
 
     MAUS::ReconEventPArray::iterator recon_event_iter;
     for (recon_event_iter = recon_events->begin();
-   recon_event_iter != recon_events->end();
-   ++recon_event_iter) {
+	 recon_event_iter != recon_events->end();
+	 ++recon_event_iter) {
       // Load the ReconEvent, and import it into the GlobalEvent
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       if (recon_event->GetGlobalEvent()) {
-  MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
-  if (recon_event->GetTOFEvent()) {
-    MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
-    MAUS::recon::global::ImportTOFRecon tofrecon_importer;
-    tofrecon_importer.process((*tof_event), global_event, _classname,
-            geo_filename);
-  }
-  if (recon_event->GetSciFiEvent()) {
-    MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
-    MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
-    scifirecon_importer.process((*scifi_event), global_event, _classname);
-  }
-  if (recon_event->GetCkovEvent()) {
-    MAUS::CkovEvent* ckov_event = recon_event->GetCkovEvent();
-    MAUS::recon::global::ImportCkovRecon ckovrecon_importer;
-    ckovrecon_importer.process((*ckov_event), global_event, _classname);
-  }
-  if (recon_event->GetKLEvent()) {
-    MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
-    MAUS::recon::global::ImportKLRecon klrecon_importer;
-    klrecon_importer.process((*kl_event), global_event, _classname);
-  }
-  if (recon_event->GetEMREvent()) {
-    MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
-    MAUS::recon::global::ImportEMRRecon emrrecon_importer;
-    emrrecon_importer.process((*emr_event), global_event, _classname,
-            geo_filename);
-  }
+	MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+	if (recon_event->GetTOFEvent()) {
+	  MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
+	  MAUS::recon::global::ImportTOFRecon tofrecon_importer;
+	  tofrecon_importer.process((*tof_event), global_event, _classname);
+	}
+	if (recon_event->GetSciFiEvent()) {
+	  MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
+	  MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
+	  scifirecon_importer.process((*scifi_event), global_event, _classname);
+	}
+	if (recon_event->GetCkovEvent()) {
+	  MAUS::CkovEvent* ckov_event = recon_event->GetCkovEvent();
+	  MAUS::recon::global::ImportCkovRecon ckovrecon_importer;
+	  ckovrecon_importer.process((*ckov_event), global_event, _classname);
+	}
+	if (recon_event->GetKLEvent()) {
+	  MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
+	  MAUS::recon::global::ImportKLRecon klrecon_importer;
+	  klrecon_importer.process((*kl_event), global_event, _classname);
+	}
+	if (recon_event->GetEMREvent()) {
+	  MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
+	  MAUS::recon::global::ImportEMRRecon emrrecon_importer;
+	  emrrecon_importer.process((*emr_event), global_event, _classname);
+	}
       }
     }
   }

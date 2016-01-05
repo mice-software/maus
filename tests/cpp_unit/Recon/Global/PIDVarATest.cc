@@ -81,11 +81,11 @@ class PIDVarATest : public ::testing::Test {
 
 		  tp0->set_position(pos0);
 		  tp1->set_position(pos1);
-		  tp0->set_mapper_name("MapCppGlobalTrackMatching");
-		  tp1->set_mapper_name("MapCppGlobalTrackMatching");
+		  tp0->set_mapper_name("MapCppGlobalTrackMatching-Through");
+		  tp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTrack->AddTrackPoint(tp0);
 		  testTrack->AddTrackPoint(tp1);
-		  testTrack->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTracks.push_back(testTrack);
 		}
 	}
@@ -126,11 +126,11 @@ TEST_F(PIDVarATest, ReadFileConstructor) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarA testPIDVarA(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarA testPIDVarA(file, "test", 20, 40));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarA testPIDVarA(NULL, "test"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarA testPIDVarA(NULL, "test", 20, 40));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarA testPIDVarA(file, "sasquatch"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarA testPIDVarA(file, "sasquatch", 20, 40));
 }
 
 /* N.B. if either FillHist or LogL are failing, check the values of min and max
@@ -188,11 +188,11 @@ TEST_F(PIDVarATest, LogL) {
 
 	ctp0->set_position(cpos0);
 	ctp1->set_position(cpos1);
-	ctp0->set_mapper_name("MapCppGlobalTrackMatching");
-	ctp1->set_mapper_name("MapCppGlobalTrackMatching");
+	ctp0->set_mapper_name("MapCppGlobalTrackMatching-Through");
+	ctp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctp0);
 	checkTrack->AddTrackPoint(ctp1);
-	checkTrack->set_mapper_name("MapCppGlobalTrackMatching");
+	checkTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 
 	file = new TFile(testfile.c_str(), "READ");
 
@@ -200,9 +200,9 @@ TEST_F(PIDVarATest, LogL) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarA readtestPIDVarA(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarA readtestPIDVarA(file, "test", 20, 40));
 
-	MAUS::recon::global::PIDVarA readtestPIDVarA(file, "test");
+	MAUS::recon::global::PIDVarA readtestPIDVarA(file, "test", 20, 40);
 
 	hist = readtestPIDVarA.Get_hist();
 	ASSERT_TRUE(hist);

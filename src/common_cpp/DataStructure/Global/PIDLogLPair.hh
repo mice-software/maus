@@ -58,7 +58,6 @@ class PIDLogLPair : public std::pair<int, double> {
 
   /// Getter for second element, for PIDLogLPairProcessor
   double get_logL() const;
-
 };
 } // ~namespace Global
 } // ~namespace DataStructure

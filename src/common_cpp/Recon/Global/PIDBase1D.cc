@@ -22,21 +22,23 @@ namespace recon {
 namespace global {
 
   PIDBase1D::PIDBase1D(std::string variable, std::string hypothesis,
-		   std::string unique_identifier, int XminBin, int XmaxBin,
-		   int XnumBins) : PIDBase(variable, hypothesis,
-       unique_identifier, XminBin, XmaxBin,
-       XnumBins, YminBin, YmaxBin, YnumBins) {
+		       std::string unique_identifier, int XminBin, int XmaxBin,
+		       int XnumBins)
+    : PIDBase(variable, hypothesis, unique_identifier, XminBin, XmaxBin,
+	      XnumBins, YminBin, YmaxBin, YnumBins) {
 
-        _varhyp = variable + "_" + hypothesis;
+    _varhyp = variable + "_" + hypothesis;
 
         _hist = new TH1F(_varhyp.c_str(), _varhyp.c_str(),
 		     XnumBins, XminBin, XmaxBin);
   };
 
   PIDBase1D::PIDBase1D(TFile* file, std::string variable,
-		   std::string hypothesis, int XminBin, int XmaxBin)
-    : PIDBase(file, variable, hypothesis, XminBin, XmaxBin,
-       YminBin, YmaxBin) {
+		       std::string hypothesis, int Xmin, int Xmax,
+		       int XminBin, int XmaxBin)
+    : PIDBase(file, variable, hypothesis, Xmin, Xmax, Ymin, Ymax, XminBin,
+	      XmaxBin, YminBin, YmaxBin) {
+
     std::string histname = variable + "_" + hypothesis;
     if (!file || file->IsZombie()) {
       throw(Exception(Exception::recoverable,
@@ -82,10 +84,15 @@ namespace global {
 
   double PIDBase1D::logL(MAUS::DataStructure::Global::Track* track) {
     double var = (Calc_Var(track)).first;
-    if (var < _XminBin || var > _XmaxBin) {
+    if (var < _Xmin || var > _Xmax) {
       Squeak::mout(Squeak::debug) << "Missing/invalid measurements for  " <<
-	"TOF0/TOF1 times, Recon::Global::PIDBase1D::logL()" << std::endl;
+	"variable, Recon::Global::PIDBase1D::logL()" << std::endl;
       return 1;
+    } else if (var < _Xmin || var > _Xmax) {
+      Squeak::mout(Squeak::debug) << "Value of variable is outside of cut " <<
+	"range used for PID, Recon::Global::PIDBase1D::logL()" << std::endl;
+      return 2; // return value of 2 is chosen to be picked up when performing
+      // efficiency and purity on PID, do not change.
     }
     int bin = _hist->FindBin(var);
     double entries = _hist->GetBinContent(bin);

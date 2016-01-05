@@ -544,7 +544,8 @@ EMRarrivalTimeUniformWidth = 12.5
 EMRpulseShapeLandauWidth = 2
 
 # EMR reconstruction
-EMRsecondaryHitsBunchingWidth = 10 # ADC
+EMRsecondaryHitsBunchingDistance = 1000 # ns
+EMRsecondaryHitsBunchingWidth = 200 # ns
 
 EMRprimaryTriggerMinXhits = 1
 EMRprimaryTriggerMinYhits = 1
@@ -554,7 +555,7 @@ EMRsecondaryTriggerMinYhits = 1
 EMRsecondaryTriggerMinNhits = 2
 EMRsecondaryTriggerMinTot = 4
 
-EMRmaxSecondaryToPrimaryTrackDistance = 100
+EMRmaxSecondaryToPrimaryTrackDistance = 80
 
 EMRdensityCut = 0.9
 EMRchi2Cut = 2
@@ -663,6 +664,7 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
 
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
 # Particle hypothesis used in Global PID when creating PDFs from MC data.
 # For PDFs to be produced, this must be set, preferably as the type of simulated particle
 # i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
@@ -672,22 +674,81 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
-# Bounds set on values of PID variables, should probably only be varied when running PID,
-# although can also be used to set new limits for PDFs
+# Bounds set on values of PID variables when running PID
 # Bounds for PIDVarA
-minBinA = 20
-maxBinA = 40
+minA = 20
+maxA = 40
 # PIDVarB
-XminBinB = 10
-XmaxBinB = 250
-YminBinB = 20
-YmaxBinB = 40
+XminB = 10
+XmaxB = 250
+YminB = 20
+YmaxB = 40
 # PIDVarC
-XminBinC = 50
-XmaxBinC = 350
-YminBinC = 0
-YmaxBinC = 8000
+XminC = 50
+XmaxC = 350
+YminC = 0
+YmaxC = 8000
+# PIDVarD
+minD = 0
+maxD = 8000
+# PIDVarE
+minE = 0
+maxE = 1000
+# PIDVarF
+XminF = 50
+XmaxF = 350
+YminF = 0
+YmaxF = 1000
+# PIDVarG
+minG = 0
+maxG = 1
+# PIDVarH
+XminH = 50
+XmaxH = 350
+YminH = 0
+YmaxH = 1
+# ComPIDVarA
+minComA = 30
+maxComA = 50
+# ComPIDVarB
+XminComB = 30
+XmaxComB = 50
+YminComB = 0
+YmaxComB = 8000
+# ComPIDVarC
+minComC = 0
+maxComC = 8000
+# ComPIDVarD
+minComC = 0
+maxComC = 1000
+# ComPIDVarE
+XminComE = 30
+XmaxComE = 50
+YminComE = 0
+YmaxComE = 1000
+# ComPIDVarF
+minComF = 0
+maxComF = 1
+# ComPIDVarG
+XminComG = 30
+XmaxComG = 50
+YminComG = 0
+YmaxComG = 1
 
+# PID MICE configuration, 'step_4' for Step IV running, 'commissioning' for field free commissioning data
+pid_config = "step_4"
+# PID running mode - selects which PID variables are used. 'online' corresponds to less beam (momentum)
+# dependent variables, 'offline' uses all variables and requires that specific PDFs for the beam already
+# exist. 'custom' allows user to choose which variables to use, and these should then be set as datacards.
+# However it is not recommended to use the custom setting unless you are the person currently developing
+# the Global PID.
+pid_mode = "online"
+# If pid_mode = "custom", variables to use should be set here as a space separated list, i.e.
+# custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
+custom_pid_set = "PIDVarB"
+# PID confidence level- set the margin (in %) between the confidence levels of competing pid hypotheses before they
+# are selected as the correct hypothesis
+pid_confidence_level = 5
 
 root_document_store_timeout = 10
 root_document_store_poll_time = 1

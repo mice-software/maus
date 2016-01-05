@@ -45,7 +45,7 @@ namespace global {
     /// Constructor to create a PDF
     explicit PIDVarA(std::string hypothesis, std::string unique_identifier);
     /// Constructor to use a PDF to perform PID analysis
-    PIDVarA(TFile* file, std::string hypothesis);
+    PIDVarA(TFile* file, std::string hypothesis, int minA, int maxA);
     /// Destructor
     ~PIDVarA();
 
@@ -67,6 +67,10 @@ namespace global {
     static const int minBinA = 20;
     /// Maximum value of range of PDF
     static const int maxBinA = 40;
+    /// Minimum value of PID cut
+    static const int minA = 20;
+    /// Maximum value of PID cut
+    static const int maxA = 40;
   };
 }
 }

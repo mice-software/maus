@@ -32,8 +32,10 @@ namespace global {
     _nonZeroHistEntries = true;
   }
 
-  PIDVarB::PIDVarB(TFile* file, std::string hypothesis)
-    : PIDBase2D(file, VARIABLE, hypothesis, XminBinB, XmaxBinB, YminBinB, YmaxBinB) {
+  PIDVarB::PIDVarB(TFile* file, std::string hypothesis, int XminB, int XmaxB,
+		   int YminB, int YmaxB)
+    : PIDBase2D(file, VARIABLE, hypothesis, XminB, XmaxB, YminB, YmaxB,
+		XminBinB, XmaxBinB, YminBinB, YmaxBinB) {
   }
 
   PIDVarB::~PIDVarB() {}
@@ -52,7 +54,7 @@ namespace global {
     for (eachTP = global_track_points.begin();
 	 eachTP != global_track_points.end(); ++eachTP) {
       if (!(*eachTP)) continue;
-      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching") {
+      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching-Through") {
 	if ((*eachTP)->get_detector() == TOF0_DP) {
 	  tof0_track_points.push_back(*eachTP);
 	} else if ((*eachTP)->get_detector() == TOF1_DP) {
@@ -89,43 +91,40 @@ namespace global {
       TOF0_t = (tof0_track_points[0])->get_position().T();
       tof0_track_points.clear();
       TOF1_t = (tof1_track_points[0])->get_position().T();
-          tof1_track_points.clear();
+      tof1_track_points.clear();
       if ( YminBinB > (TOF1_t - TOF0_t) || (TOF1_t - TOF0_t) > YmaxBinB ) {
 	Squeak::mout(Squeak::debug) << "Difference between TOF0 and TOF1 " <<
 	  "times outside of range, Recon::Global::PIDVarB::Calc_Var()" <<
 	  std::endl;
-	return std::make_pair(-1, 0);
-      } else {
-	double tracker0_trackpoint_mom = 0;
-	int tracker0_tp_count = 0;
-	double tracker0_momentum = 0;
-	const MAUS::DataStructure::Global::TrackPoint* tracker0_trackpoint;
-	for (size_t i = 0; i < tracker0_track_points.size(); i++) {
-	  tracker0_trackpoint = tracker0_track_points[i];
-	  if (tracker0_trackpoint) {
-	    TLorentzVector trackpoint_4mom = tracker0_trackpoint->get_momentum();
-	    tracker0_trackpoint_mom +=
-	      sqrt(trackpoint_4mom.Px()*trackpoint_4mom.Px() +
-		   trackpoint_4mom.Py()*trackpoint_4mom.Py() +
-		   trackpoint_4mom.Pz()*trackpoint_4mom.Pz());
-	    tracker0_tp_count++;
-	  } else {
-	    continue;
-	  }
-	}
-	tracker0_track_points.clear();
-	tracker0_momentum = tracker0_trackpoint_mom/tracker0_tp_count;
-	if ( XminBinB > tracker0_momentum || tracker0_momentum > XmaxBinB ) {
-	  Squeak::mout(Squeak::debug) << "Momentum for tracker 0 is outside " <<
-	    "of range, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
-	  return std::make_pair(0, -1);
+      }
+      double tracker0_trackpoint_mom = 0;
+      int tracker0_tp_count = 0;
+      double tracker0_momentum = 0;
+      const MAUS::DataStructure::Global::TrackPoint* tracker0_trackpoint;
+      if (tracker0_track_points.size() < 1) {
+      }
+      for (size_t i = 0; i < tracker0_track_points.size(); i++) {
+	tracker0_trackpoint = tracker0_track_points[i];
+	if (tracker0_trackpoint) {
+	  TLorentzVector trackpoint_4mom = tracker0_trackpoint->get_momentum();
+	  tracker0_trackpoint_mom +=
+	    sqrt(trackpoint_4mom.Px()*trackpoint_4mom.Px() +
+		 trackpoint_4mom.Py()*trackpoint_4mom.Py() +
+		 trackpoint_4mom.Pz()*trackpoint_4mom.Pz());
+	  tracker0_tp_count++;
 	} else {
-	  return std::make_pair(tracker0_momentum, (TOF1_t - TOF0_t));
+	  continue;
 	}
       }
+      tracker0_track_points.clear();
+      tracker0_momentum = tracker0_trackpoint_mom/tracker0_tp_count;
+      if ( XminBinB > tracker0_momentum || tracker0_momentum > XmaxBinB ) {
+	Squeak::mout(Squeak::debug) << "Momentum for tracker 0 is outside " <<
+	  "of range, Recon::Global::PIDVarB::Calc_Var()" << std::endl;
+      }
+      return std::make_pair(tracker0_momentum, (TOF1_t - TOF0_t));
     }
   }
 }
 }
 }
-

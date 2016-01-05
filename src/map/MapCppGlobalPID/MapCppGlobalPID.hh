@@ -36,6 +36,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 // Other headers
 #include "Interface/Squeak.hh"
@@ -53,6 +54,18 @@
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
 #include "src/common_cpp/Recon/Global/PIDVarB.hh"
 #include "src/common_cpp/Recon/Global/PIDVarC.hh"
+#include "src/common_cpp/Recon/Global/PIDVarD.hh"
+#include "src/common_cpp/Recon/Global/PIDVarE.hh"
+#include "src/common_cpp/Recon/Global/PIDVarF.hh"
+#include "src/common_cpp/Recon/Global/PIDVarG.hh"
+#include "src/common_cpp/Recon/Global/PIDVarH.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarA.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarB.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarC.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarD.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarE.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarF.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarG.hh"
 
 
 namespace MAUS {
@@ -61,6 +74,7 @@ namespace MAUS {
   public:
     /** Constructor, setting the internal variable #_classname */
     MapCppGlobalPID();
+    ~MapCppGlobalPID();
 
   private:
     /** @brief Sets up the worker
@@ -111,8 +125,60 @@ namespace MAUS {
     /// The current spill
     Spill* _spill;
 
+    /// PID cut limits from datacard
+    double _minA;
+    double _maxA;
+    double _XminB;
+    double _XmaxB;
+    double _YminB;
+    double _YmaxB;
+    double _XminC;
+    double _XmaxC;
+    double _YminC;
+    double _YmaxC;
+    double _minD;
+    double _maxD;
+    double _minE;
+    double _maxE;
+    double _XminF;
+    double _XmaxF;
+    double _YminF;
+    double _YmaxF;
+    double _minComA;
+    double _maxComA;
+    double _XminComB;
+    double _XmaxComB;
+    double _YminComB;
+    double _YmaxComB;
+    double _minComC;
+    double _maxComC;
+    double _minComD;
+    double _maxComD;
+    double _XminComE;
+    double _XmaxComE;
+    double _YminComE;
+    double _YmaxComE;
+    double _minComF;
+    double _maxComF;
+    double _XminComG;
+    double _XmaxComG;
+    double _YminComG;
+    double _YmaxComG;
+
+    /// MICE configuration for PID
+    std::string _pid_config;
+
+    /// PID running mode
+    std::string _pid_mode;
+
+    /// list of PID variables to be used when mode is custom
+    std::string _custom_pid_set;
+
     /// File containing PDFs for use in PID
     std::string PDF_file;
+
+    /// Confidence level
+    int _pid_confidence_level;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

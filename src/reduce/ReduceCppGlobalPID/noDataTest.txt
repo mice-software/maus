@@ -1,6 +1,0 @@
-{
-	"daq_data" : null,
-	"daq_event_type" : "end_of_burst",
-  "maus_event_type" : "Spill",
-	"spill_num" : -1
-}

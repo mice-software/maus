@@ -55,8 +55,7 @@ namespace global {
      */
     void process(const MAUS::TOFEvent &tof_event,
 		 MAUS::GlobalEvent* global_event,
-		 std::string mapper_name,
-		 std::string geo_filename);
+		 std::string mapper_name);
 
   private:
     /// Disallow copy constructor as unnecessary
@@ -75,8 +74,7 @@ namespace global {
     void ImportTOF0SpacePoints(
 			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
 			      MAUS::GlobalEvent* global_event,
-			      std::string mapper_name,
-			      const MiceModule* tof0_geom);
+			      std::string mapper_name);
 
     /**  @brief Add TOF1 space points to global event
      *   
@@ -88,8 +86,7 @@ namespace global {
     void ImportTOF1SpacePoints(
 			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
 			      MAUS::GlobalEvent* global_event,
-			      std::string mapper_name,
-			      const MiceModule* tof1_geom);
+			      std::string mapper_name);
 
     /**  @brief Add TOF2 space points to global event
      *   
@@ -101,8 +98,7 @@ namespace global {
     void ImportTOF2SpacePoints(
 			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
 			      MAUS::GlobalEvent* global_event,
-			      std::string mapper_name,
-			      const MiceModule* tof2_geom);
+			      std::string mapper_name);
 
     /**  @brief Add TOF space points to global event
      *   
@@ -114,9 +110,7 @@ namespace global {
     void ImportTOFSpacePoints(
 			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
 			      MAUS::GlobalEvent* global_event,
-			      std::string mapper_name,
-			      std::string geo_filename);
-
+			      std::string mapper_name);
   }; // ~class ImportTOFRecon
 } // ~namespace global
 } // ~namespace recon

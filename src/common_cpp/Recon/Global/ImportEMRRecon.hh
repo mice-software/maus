@@ -55,8 +55,7 @@ namespace global {
      */
     void process(const MAUS::EMREvent &emr_event,
 		 MAUS::GlobalEvent* global_event,
-		 std::string mapper_name,
-		 std::string geo_filename);
+		 std::string mapper_name);
 
   private:
     /// Disallow copy constructor as unnecessary
