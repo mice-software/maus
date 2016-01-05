@@ -108,6 +108,10 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _canvs.push_back(_canv_tof12);
   _canvs.push_back(_canv_tof02);
 
+  // Add grid to all canvases.
+  for (auto &canv:_canvs)
+    canv->SetGridx();
+
   _cwrap_tof01 = ReduceCppTools::get_canvas_wrapper(_canv_tof01,
                                                     _h_tof01,
 						    "TOF01");

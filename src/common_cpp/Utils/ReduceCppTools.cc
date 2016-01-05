@@ -30,7 +30,6 @@ CanvasWrapper* ReduceCppTools::get_canvas_wrapper(TCanvas *canv,
   wrap->SetFileTag(name);
   wrap->SetCanvas(canv);
 
-  canv->cd()->SetGrid();
   canv->cd();
   hist->Draw(draw_option);
   gPad->Update();
@@ -52,7 +51,6 @@ CanvasWrapper* ReduceCppTools::get_canvas_multi_wrapper(TCanvas *canv,
   wrap->SetFileTag(name);
   wrap->SetCanvas(canv);
 
-  canv->cd()->SetGrid();
   canv->cd();
   objarray[0]->Draw(draw_option);
   for (size_t i = 1; i < objarray.size(); i++)
@@ -71,7 +69,6 @@ CanvasWrapper* ReduceCppTools::get_canvas_emr_wrapper(TCanvas *canv,
   wrap->SetFileTag(name);
   wrap->SetCanvas(canv);
 
-  canv->cd()->SetGrid();
   canv->cd();
   hemr->GetHistogram()->Draw("COLZ L");
   gPad->Update();

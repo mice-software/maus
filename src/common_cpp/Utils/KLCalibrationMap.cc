@@ -26,11 +26,20 @@ KLCalibrationMap::KLCalibrationMap() {
 }
 
 KLCalibrationMap::~KLCalibrationMap() {
-  _Pkey.clear();
+  this->reset();
+}
+
+void KLCalibrationMap::reset() {
+  _Pkey.resize(0);
   _gain.resize(0);
+
+  gainstr.str("");
+  gainstr.clear();
 }
 
 bool KLCalibrationMap::InitializeFromCards(Json::Value configJSON) {
+  this->reset();
+
   // Fill the vector containing all KL channel keys.
   this->MakeKLChannelKeys();
   Json::Value gain_file;
