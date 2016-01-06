@@ -453,12 +453,8 @@ void MapCppEMRRecon::match_daughters(MAUS::Spill* spill,
       ThreeVector fPoint = bTrack.GetEMRTrackPointArray().front().GetPosition();
       ThreeVector lPoint = bTrack.GetEMRTrackPointArray().back().GetPosition();
 
-      double fDist = sqrt(pow(fPoint.x()-xPoint.x(), 2)+
-    			  pow(fPoint.y()-xPoint.y(), 2)+
-			  pow(fPoint.z()-xPoint.z(), 2));
-      double lDist = sqrt(pow(lPoint.x()-xPoint.x(), 2)+
-    			  pow(lPoint.y()-xPoint.y(), 2)+
-			  pow(lPoint.z()-xPoint.z(), 2));
+      double fDist = dist(xPoint, fPoint);
+      double lDist = dist(xPoint, lPoint);
 
       if ( fDist < xDist || lDist < xDist ) {
         xPe = bPe;
@@ -534,6 +530,38 @@ void MapCppEMRRecon::match_daughters(MAUS::Spill* spill,
 //      std::cerr << "xTime: " << xTime << " ns" << std::endl;
 //      std::cerr << "xDist: " << xDist << " mm" << std::endl;
     }
+
+    // If a daughter is found, set the EMREvent parameters
+    // TODO When the daughter track recon is improved, improve vertex recon
+    if ( evt->GetDaughterPtr() ) {
+      EMREventTrack* evtTrackD = evt->GetDaughterPtr();
+      evt->SetVertex(evtTrackD->GetEMRTrack().GetEMRTrackPointArray().back().GetGlobalPosition());
+      evt->SetVertexErrors(ThreeVector(0., 0., 0.));
+      evt->SetDeltaT(evtTrackD->GetTime()-evtTrackM->GetTime());
+
+      ThreeVector e1 = evtTrackD->GetEMRTrack().GetEMRTrackPointArray().back().GetPosition();
+      ThreeVector s2 = evtTrackD->GetEMRTrack().GetEMRTrackPointArray().front().GetPosition();
+      ThreeVector e2 = evtTrackD->GetEMRTrack().GetEMRTrackPointArray().back().GetPosition();
+      evt->SetDistance(std::min(dist(e1, s2), dist(e1, s2)));
+
+      double mx1 = evtTrackM->GetEMRTrack().GetParametersX()[1];
+      double my1 = evtTrackM->GetEMRTrack().GetParametersY()[1];
+      double mx2 = evtTrackM->GetEMRTrack().GetParametersX()[1];
+      double my2 = evtTrackM->GetEMRTrack().GetParametersY()[1];
+      double mx = tan(atan(mx2)-atan(mx1));
+      double my = tan(atan(my2)-atan(my1));
+
+      evt->SetPolar(TrackFitter::polar(mx, my));
+      evt->SetAzimuth(TrackFitter::azimuth(mx, my));
+    }
   }
+}
+
+double MapCppEMRRecon::dist(MAUS::ThreeVector p1,
+			    MAUS::ThreeVector p2) const {
+
+  return sqrt(pow(p2.x()-p1.x(), 2)+
+	      pow(p2.y()-p1.y(), 2)+
+	      pow(p2.z()-p1.z(), 2));
 }
 }

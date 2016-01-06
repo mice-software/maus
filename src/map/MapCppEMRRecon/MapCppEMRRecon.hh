@@ -92,6 +92,9 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   void match_daughters(MAUS::Spill *spill,
 		       size_t nPartEvents) const;
 
+  double dist(MAUS::ThreeVector p1,
+	      MAUS::ThreeVector p2) const;
+
   // Maps
   EMRCalibrationMap _calibMap;
   EMRAttenuationMap _attenMap;
