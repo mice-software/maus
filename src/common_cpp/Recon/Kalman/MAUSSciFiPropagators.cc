@@ -252,7 +252,9 @@ namespace MAUS {
 //  double old_y      = old_vec(2, 0);
     double old_py     = old_vec(3, 0);
     double old_kappa  = old_vec(4, 0);
+    double old_pz     = fabs(1.0 / old_kappa);
     double charge = old_kappa/fabs(old_kappa);
+    double old_momentum = sqrt(old_px*old_px + old_py*old_py + old_pz*old_pz);
 
     _Bz = _geometry_helper->GetFieldValue((start.GetId() > 0 ? 1 : 0));
 
@@ -265,45 +267,71 @@ namespace MAUS {
 
     if (start.GetId() < 0) u = - u;
 
+    double reduction_factor = 1.0;
+
+    if (_subtract_eloss) {
+      SciFiMaterialsList materials;
+      _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
+
+      // Reduce/increase momentum vector accordingly.
+      double e_loss_sign = 1.0;
+      if (end.GetId() > 0) {
+        e_loss_sign = -1.0;
+      }
+
+      double delta_p = 0.0;
+      double momentum = old_momentum;
+      int n_steps = materials.size();
+      for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
+//        delta_p = _geometry_helper->BetheBlochStoppingPower(momentum,
+//                                               materials.at(i).first)*materials.at(i).second*0.1;
+        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+        delta_p = SP*materials.at(i).second*0.1;
+        momentum += e_loss_sign*delta_p;
+      }
+
+      reduction_factor = momentum/old_momentum;
+    }
+
     TMatrixD new_prop(5, 5);
 
     new_prop(0, 0) = 1.;
-    new_prop(0, 1) = sine/u;
+    new_prop(0, 1) = (sine/u);
     new_prop(0, 2) = 0.;
-    new_prop(0, 3) = (cosine-1.)/u;
+    new_prop(0, 3) = ((cosine-1.)/u);
 
     new_prop(1, 0) = 0.;
-    new_prop(1, 1) = cosine;
+    new_prop(1, 1) = cosine*reduction_factor;
     new_prop(1, 2) = 0.;
-    new_prop(1, 3) = -sine;
+    new_prop(1, 3) = -sine*reduction_factor;
 
     new_prop(2, 0) = 0.;
-    new_prop(2, 1) = (1.-cosine)/u;
+    new_prop(2, 1) = ((1.-cosine)/u);
     new_prop(2, 2) = 1.;
-    new_prop(2, 3) = sine/u;
+    new_prop(2, 3) = (sine/u);
 
     new_prop(3, 0) = 0.;
-    new_prop(3, 1) = sine;
+    new_prop(3, 1) = sine*reduction_factor;
     new_prop(3, 2) = 0.;
-    new_prop(3, 3) = cosine;
+    new_prop(3, 3) = cosine*reduction_factor;
 
     new_prop(4, 0) = 0.;
     new_prop(4, 1) = 0.;
     new_prop(4, 2) = 0.;
     new_prop(4, 3) = 0.;
-    new_prop(4, 4) = 1.;
+    new_prop(4, 4) = 1./reduction_factor;
 
     if (_correct_Pz) {
       if (start.GetId() < 0) {
         new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
-        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine);
+        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine)*reduction_factor;
         new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
-        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine);
+        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine)*reduction_factor;
       } else {
         new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
-        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine);
+        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine)*reduction_factor;
         new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
-        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine);
+        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine)*reduction_factor;
       }
     } else {
       new_prop(0, 4) = 0.0;
@@ -311,6 +339,7 @@ namespace MAUS {
       new_prop(2, 4) = 0.0;
       new_prop(3, 4) = 0.0;
     }
+
 //    new_prop.Print();
 
     return new_prop;

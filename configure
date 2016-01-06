@@ -161,9 +161,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
 
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-          export PYTHONPATH="\$MAUS_ROOT_DIR/build" #initialize it
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$MAUS_THIRD_PARTY/third_party/install/lib/scons:" #initialize it
      else
-          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$MAUS_THIRD_PARTY/third_party/install/lib/scons:\$PYTHONPATH" # else add it
      fi
 
      export $DYLIB_VAR="\$MAUS_THIRD_PARTY/build:\$$DYLIB_VAR"

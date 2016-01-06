@@ -25,31 +25,24 @@ egg_source=${MAUS_THIRD_PARTY}/third_party/source/easy_install
 download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 six>=1.4.0 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
- coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
- pymongo==2.3 readline matplotlib==1.1.0 scons==2.2.0\
- pil django==1.5.1 magickwand psutil==3.0.1
+ coverage ipython doxypy pylint==0.25.1 bitarray \
+ celery==2.5.5 pymongo==2.3 readline pyparsing>=1.5.6,!=2.0.0,!=2.0.4 \
+ matplotlib==1.5.0 \
+ scons==2.4.1 pil django==1.5.1 magickwand psutil==3.0.1
 "
-# scons v2.2.0 is no longer on pypi
-# temporary hack to specify the download url for scons==2.2.0
-# pending upgrade to 2.3.0
-# DR March 13, 2014
-scons_version="2.2.0"
-scons_url="http://sourceforge.net/projects/scons/files/scons/${scons_version}/scons-${scons_version}.tar.gz"
 
 # these are the packages to install - note the version dependencies
 package_list="\
  anyjson python-dateutil amqplib six kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
- pymongo scons readline matplotlib \
- pil django magickwand psutil
+ pymongo scons readline pyparsing matplotlib pil django magickwand psutil
 "
 # note numpy was installed previously, not in this script. We test it's import
 # here for convenience
 module_test_list="numpy suds validictory nose coverage \
- pylint bitarray matplotlib celery pymongo \
+ pylint bitarray matplotlib celery pymongo scons \
  Image django magickwand" #Image is pil bottom level
-binary_test_list="scons"
 cleanup="0"
 get_packages="0"
 install_packages="0"
@@ -88,29 +81,23 @@ if [ "$get_packages" == "1" ]; then
     cd $egg_source
     for package in $download_package_list
     do
-        # tmp hack for scons 2.2.0 which has disappeared from pypi
-        if [[ $package =~ .*scons*. ]]
-        then
-            easy_install -zmaxeb . -f$scons_url $package
-        else
-            echo "easy_install -zmaxeb . $package"
-            easy_install -zmaxeb . $package &
-            # kill the command after <timeout> seconds
-            ((timeout = 120))
-            while ((timeout > 0)); do
-                sleep 1
-                kill -0 $! >& /dev/null
-                if [ "$?" == "0" ]; then # pid is running (can be killed)
-                    ((timeout -= 1))
-                else # pid is finished (can't be killed)
-                    ((timeout = 0))
-                fi
-            done
+        echo "easy_install -zmaxeb . $package"
+        easy_install -zmaxeb . $package &
+        # kill the command after <timeout> seconds
+        ((timeout = 120))
+        while ((timeout > 0)); do
+            sleep 1
             kill -0 $! >& /dev/null
             if [ "$?" == "0" ]; then # pid is running (can be killed)
-                echo "easy_install of $package has timed out - killing"
-                kill -9 $!
+                ((timeout -= 1))
+            else # pid is finished (can't be killed)
+                ((timeout = 0))
             fi
+        done
+        kill -0 $! >& /dev/null
+        if [ "$?" == "0" ]; then # pid is running (can be killed)
+            echo "easy_install of $package has timed out - killing"
+            kill -9 $!
         fi
     done
     downloaded_list=`ls --hide=*.tar.gz`
@@ -135,20 +122,35 @@ if [ "$install_packages" == "1" ]; then
     # first try a local install
     for package in $package_list
     do
-        echo "INFO: Installing $package"
+        echo
+        echo "INFO: Installing $package (local package)"
         easy_install -H None -f $egg_source $package
+        echo
+        if [[ $package =~ .*scons*. ]]; then
+            cwd=$(pwd)
+            cd ${MAUS_THIRD_PARTY}/third_party/install/lib
+            ln -sf ${MAUS_THIRD_PARTY}/third_party/install/lib/python2.7/site-packages/scons-2.4.1-py2.7.egg/scons-2.4.1 scons
+            cd ${cwd}
+        fi
     done
+
+    # any packages that failed to install from local sources, now try installing with remote downloads
+    for module in $module_test_list
+    do
+        python -c "import $module" || { echo "INFO: Installing $package (remote package)"; easy_install $module; echo; }
+    done
+
+
     # now check that packages were installed
     for module in $module_test_list
     do
         echo "INFO: Checking import of package $module"
-        python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
-        echo "INFO: ok"
-    done
-    for bin in $binary_test_list
-    do
-        echo "INFO: Checking python script $bin"
-        which $bin || { echo "FATAL: Failed to install python script $bin"; exit 1; }
+        if [[ $module =~ .*scons*. ]]; then
+            python -c "import SCons" || { echo "FATAL: Failed to install python module $module"; exit 1; }
+        else
+            python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
+        fi
+        
         echo "INFO: ok"
     done
 

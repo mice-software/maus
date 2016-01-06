@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-vers="1.5.1"
+vers="1.6.0"
 filename="numpy-${vers}.tar.gz"
 directory="numpy-${vers}"
 url="http://sourceforge.net/projects/numpy/files/NumPy/${vers}/${filename}/download"
-
 echo
 echo 'INFO: Installing third party library NumPy' $vers
 echo '-------------------------------------------------'
@@ -44,7 +43,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cd ${MAUS_ROOT_DIR}/third_party/install/include/
         ln -s ../lib/python2.7/site-packages/numpy/core/include/numpy/
         cd ${MAUS_ROOT_DIR}/third_party/install/lib/
-        ln -s ..//lib/python2.7/site-packages/numpy/core/lib/libnpymath.a
+        ln -s ../lib/python2.7/site-packages/numpy/core/lib/libnpymath.a
         echo "INFO: Listing of numpy includes and libs"
         sleep 1
         cd ${MAUS_ROOT_DIR}
