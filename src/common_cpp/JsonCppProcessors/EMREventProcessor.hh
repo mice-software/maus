@@ -17,9 +17,9 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_
 
-#include "src/common_cpp/DataStructure/EMREvent.hh"
-#include "src/common_cpp/DataStructure/EMRPlaneHit.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "DataStructure/EMREvent.hh"
+#include "JsonCppProcessors/ObjectProcessor.hh"
+#include "JsonCppProcessors/EMREventTrackProcessor.hh"
 
 namespace MAUS {
 
@@ -28,19 +28,18 @@ namespace MAUS {
  */
 
 class EMREventProcessor : public ObjectProcessor<EMREvent> {
-  public:
-    /** Set up processors and register branches
-     *
-     *  Everything else is handled by the base class
-     */
-    EMREventProcessor();
+ public:
+  /** Set up processors and register branches
+   *
+   *  Everything else is handled by the base class
+   */
+  EMREventProcessor();
 
-  private:
-    DoubleProcessor _double_proc;
-    BoolProcessor _bool_proc;
-    PointerArrayProcessor<EMRPlaneHit> _plane_hit_array_proc;
+ private:
+  PointerArrayProcessor<EMREventTrack> _event_track_array_proc;
+  ThreeVectorProcessor _threevector_proc;
+  DoubleProcessor _double_proc;
 };
 }  // namespace MAUS
 
-#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_
-
+#endif // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMREVENTPROCESSOR_

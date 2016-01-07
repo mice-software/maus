@@ -14,14 +14,16 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/EMRBarProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/EMRPlaneHitProcessor.hh"
 
 namespace MAUS {
 
 EMRPlaneHitProcessor::EMRPlaneHitProcessor()
-      : _bar_arr_proc(new EMRBarProcessor()),
-	_int_arr_proc(new IntProcessor()) {
+      : _bar_hit_array_proc(new EMRBarHitProcessor()),
+	_int_array_proc(new IntProcessor()) {
+    RegisterValueBranch
+          ("bar_hits", &_bar_hit_array_proc, &EMRPlaneHit::GetEMRBarHitArray,
+          &EMRPlaneHit::SetEMRBarHitArray, true);
     RegisterValueBranch
           ("plane", &_int_proc, &EMRPlaneHit::GetPlane,
           &EMRPlaneHit::SetPlane, true);
@@ -29,41 +31,19 @@ EMRPlaneHitProcessor::EMRPlaneHitProcessor()
           ("orientation", &_int_proc, &EMRPlaneHit::GetOrientation,
           &EMRPlaneHit::SetOrientation, true);
     RegisterValueBranch
-          ("emr_bars", &_bar_arr_proc, &EMRPlaneHit::GetEMRBarArray,
-          &EMRPlaneHit::SetEMRBarArray, true);
+          ("time", &_int_proc, &EMRPlaneHit::GetTime,
+          &EMRPlaneHit::SetTime, true);
     RegisterValueBranch
-          ("emr_bars_primary", &_bar_arr_proc, &EMRPlaneHit::GetEMRBarArrayPrimary,
-          &EMRPlaneHit::SetEMRBarArrayPrimary, true);
-    RegisterValueBranch
-          ("emr_bars_secondary", &_bar_arr_proc, &EMRPlaneHit::GetEMRBarArraySecondary,
-          &EMRPlaneHit::SetEMRBarArraySecondary, true);
+          ("deltat", &_int_proc, &EMRPlaneHit::GetDeltaT,
+          &EMRPlaneHit::SetDeltaT, true);
     RegisterValueBranch
           ("charge", &_double_proc, &EMRPlaneHit::GetCharge,
           &EMRPlaneHit::SetCharge, true);
     RegisterValueBranch
-          ("charge_corrected", &_double_proc, &EMRPlaneHit::GetChargeCorrected,
-          &EMRPlaneHit::SetChargeCorrected, true);
-    RegisterValueBranch
           ("pedestal_area", &_double_proc, &EMRPlaneHit::GetPedestalArea,
           &EMRPlaneHit::SetPedestalArea, true);
     RegisterValueBranch
-          ("time", &_int_proc, &EMRPlaneHit::GetTime,
-          &EMRPlaneHit::SetTime, true);
-    RegisterValueBranch
-          ("spill", &_int_proc, &EMRPlaneHit::GetSpill,
-          &EMRPlaneHit::SetSpill, true);
-    RegisterValueBranch
-          ("trigger", &_int_proc, &EMRPlaneHit::GetTrigger,
-          &EMRPlaneHit::SetTrigger, true);
-    RegisterValueBranch
-          ("run", &_int_proc, &EMRPlaneHit::GetRun,
-          &EMRPlaneHit::SetRun, true);
-    RegisterValueBranch
-          ("delta_t", &_int_proc, &EMRPlaneHit::GetDeltaT,
-          &EMRPlaneHit::SetDeltaT, true);
-    RegisterValueBranch
-          ("samples", &_int_arr_proc, &EMRPlaneHit::GetSamples,
-          &EMRPlaneHit::SetSamples, true);
+          ("samples", &_int_array_proc, &EMRPlaneHit::GetSampleArray,
+          &EMRPlaneHit::SetSampleArray, true);
 }
 }  // namespace MAUS
-

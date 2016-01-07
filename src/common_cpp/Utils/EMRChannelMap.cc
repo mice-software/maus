@@ -20,95 +20,24 @@
 
 namespace MAUS {
 
-EMRChannelMap::~EMRChannelMap() {
-  for (unsigned int i = 0;i < _emrKey.size();i++) {
-    delete _emrKey[i];
-    delete _dbbKey[i];
-  }
-  _dbbKey.resize(0);
-  _emrKey.resize(0);
+EMRChannelKey::EMRChannelKey()
+  : _plane(-999), _orientation(-999), _bar(-999), _detector("unknown") {
 }
 
-bool EMRChannelMap::InitFromFile(string filename) {
-  ifstream stream(filename.c_str());
-  if ( !stream ) {
-    Squeak::mout(Squeak::error)
-    << "Error in EMRChannelMap::InitFromFile : Can't open EMR cabling file "
-    << filename << std::endl;
-    return false;
-  }
-
-  EMRChannelKey* emrkey;
-  DAQChannelKey* dbbkey;
-  try {
-    while (!stream.eof()) {
-      emrkey = new EMRChannelKey();
-      dbbkey = new DAQChannelKey();
-      stream >> *emrkey >> *dbbkey;
-
-      _emrKey.push_back(emrkey);
-      _dbbKey.push_back(dbbkey);
-    }
-  } catch (Exception e) {
-    Squeak::mout(Squeak::error)
-      << "Error in EMRChannelMap::InitFromFile : Error during loading." << std::endl
-      << e.GetMessage() << std::endl;
-    return false;
-  }
-
-  if (_emrKey.size() == 0) {
-    Squeak::mout(Squeak::error)
-    << "Error in EMRChannelMap::InitFromFile : Nothing is loaded. "  << std::endl;
-    return false;
-  }
-  return true;
+EMRChannelKey::EMRChannelKey(int pl, int o, int b, string d)
+  : _plane(pl), _orientation(o), _bar(b), _detector(d) {
 }
 
-void EMRChannelMap::InitFromCDB() {}
-
-EMRChannelKey* EMRChannelMap::find(DAQChannelKey *daqKey) const {
-    for (unsigned int i = 0;i < _emrKey.size();i++) {
-      if ( _dbbKey[i]->eqType()  == daqKey->eqType() &&
-           _dbbKey[i]->ldc()     == daqKey->ldc() &&
-           _dbbKey[i]->geo()     == daqKey->geo() &&
-           _dbbKey[i]->channel() == daqKey->channel() ) {
-        return _emrKey[i];
-      }
-    }
-  return NULL;
+EMRChannelKey::~EMRChannelKey() {
 }
-
-EMRChannelKey* EMRChannelMap::find(std::string daqKeyStr) {
-  DAQChannelKey xDaqKey;
-  stringstream xConv;
-  try {
-    xConv << daqKeyStr;
-    xConv >> xDaqKey;
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
-                 std::string("corrupted DAQ Channel Key"),
-                 "EMRChannelMap::find(std::string)"));
-  }
-  EMRChannelKey* xKlKey = find(&xDaqKey);
-  return xKlKey;
-}
-
-int EMRChannelMap::getOrientation(int plane) {
-  for (unsigned int i = 0;i < _emrKey.size();i++) {
-    if ( _emrKey[i]->plane() == plane )
-      return _emrKey[i]->orientation();
-  }
-
-  return -999;
-}
-//////////////////////////////////////////////////////////////////////////
 
 EMRChannelKey::EMRChannelKey(string keyStr) throw(Exception) {
+
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Exception e) {
+  } catch (Exception e) {
     throw(Exception(Exception::recoverable,
                  std::string("corrupted EMR Channel Key"),
                  "EMRChannelKey::EMRChannelKey(std::string)"));
@@ -116,10 +45,11 @@ EMRChannelKey::EMRChannelKey(string keyStr) throw(Exception) {
 }
 
 bool EMRChannelKey::operator==( EMRChannelKey const key ) const {
+
   if ( _orientation == key._orientation &&
        _plane == key._plane &&
        _bar == key._bar &&
-       _detector == key._detector) {
+       _detector == key._detector ) {
     return true;
   } else {
     return false;
@@ -127,10 +57,11 @@ bool EMRChannelKey::operator==( EMRChannelKey const key ) const {
 }
 
 bool EMRChannelKey::operator!=( EMRChannelKey const key ) const {
+
   if ( _orientation == key._orientation &&
        _plane == key._plane &&
        _bar == key._bar &&
-       _detector == key._detector) {
+       _detector == key._detector ) {
     return false;
   } else {
     return true;
@@ -138,6 +69,7 @@ bool EMRChannelKey::operator!=( EMRChannelKey const key ) const {
 }
 
 ostream& operator<<( ostream& stream, EMRChannelKey key ) {
+
   stream << "EMRChannelKey " << key._plane;
   stream << " " << key._orientation;
   stream << " " << key._bar;
@@ -146,6 +78,7 @@ ostream& operator<<( ostream& stream, EMRChannelKey key ) {
 }
 
 istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exception) {
+
   string xLabel;
   stream >> xLabel >> key._plane >> key._orientation >> key._bar >> key._detector;
 
@@ -159,8 +92,107 @@ istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exception) {
 }
 
 string EMRChannelKey::str() {
+
   stringstream xConv;
   xConv << (*this);
   return xConv.str();
+}
+
+
+
+EMRChannelMap::EMRChannelMap() {
+}
+
+EMRChannelMap::~EMRChannelMap() {
+  for (size_t i = 0;i < _emrKey.size();i++) {
+
+    delete _emrKey[i];
+    delete _daqKey[i];
+  }
+  _daqKey.resize(0);
+  _emrKey.resize(0);
+}
+
+bool EMRChannelMap::InitializeFromFile(string filename) {
+
+  ifstream stream(filename.c_str());
+  if ( !stream ) {
+    Squeak::mout(Squeak::error)
+    << "Error in EMRChannelMap::InitializeFromFile : Can't open EMR cabling file "
+    << filename << std::endl;
+    return false;
+  }
+
+  EMRChannelKey* emrkey;
+  DAQChannelKey* daqKey;
+  try {
+    while (!stream.eof()) {
+      emrkey = new EMRChannelKey();
+      daqKey = new DAQChannelKey();
+      stream >> *emrkey >> *daqKey;
+
+      _emrKey.push_back(emrkey);
+      _daqKey.push_back(daqKey);
+    }
+  } catch (Exception e) {
+    Squeak::mout(Squeak::error)
+      << "Error in EMRChannelMap::InitializeFromFile : Error during loading." << std::endl
+      << e.GetMessage() << std::endl;
+    return false;
+  }
+
+  if (_emrKey.size() == 0) {
+    Squeak::mout(Squeak::error)
+    << "Error in EMRChannelMap::InitializeFromFile : Nothing is loaded. "  << std::endl;
+    return false;
+  }
+  return true;
+}
+
+void EMRChannelMap::InitializeFromCDB() {}
+
+EMRChannelKey* EMRChannelMap::Find(DAQChannelKey *daqKey) const {
+
+    for (size_t i = 0;i < _emrKey.size();i++) {
+      if ( _daqKey[i]->eqType()  == daqKey->eqType() &&
+           _daqKey[i]->ldc()     == daqKey->ldc() &&
+           _daqKey[i]->geo()     == daqKey->geo() &&
+           _daqKey[i]->channel() == daqKey->channel() ) {
+        return _emrKey[i];
+      }
+    }
+  return NULL;
+}
+
+EMRChannelKey* EMRChannelMap::Find(std::string daqKeyStr) {
+
+  DAQChannelKey xDaqKey;
+  stringstream xConv;
+  try {
+    xConv << daqKeyStr;
+    xConv >> xDaqKey;
+  }catch(Exception e) {
+    throw(Exception(Exception::recoverable,
+                 std::string("corrupted DAQ Channel Key"),
+                 "EMRChannelMap::find(std::string)"));
+  }
+  EMRChannelKey* xKlKey = Find(&xDaqKey);
+  return xKlKey;
+}
+
+int EMRChannelMap::GetOrientation(int plane) {
+
+  for (size_t i = 0;i < _emrKey.size();i++) {
+    if ( _emrKey[i]->GetPlane() == plane )
+      return _emrKey[i]->GetOrientation();
+  }
+
+  return -999;
+}
+
+void EMRChannelMap::Print() {
+
+  for (size_t i = 0; i < _emrKey.size(); i++)
+    std::cerr << *(_emrKey[i]) << " " << *(_daqKey[i]) << std::endl;
 }
 }

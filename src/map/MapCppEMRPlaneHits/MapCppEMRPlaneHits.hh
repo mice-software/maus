@@ -15,12 +15,6 @@
  *
  */
 
-
-/** @class MapCppEMRPlaneHits
- * Reconstruct EMR data and create EMR bar hits
- * by running over the fADC and DBB data
- */
-
 #ifndef _MAP_MAPCPPEMRPLANEHITS_H_
 #define _MAP_MAPCPPEMRPLANEHITS_H_
 
@@ -32,39 +26,47 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 // MAUS
 #include "Utils/EMRChannelMap.hh"
+#include "Utils/CppErrorHandler.hh"
+#include "Utils/JsonWrapper.hh"
+#include "Utils/DAQChannelMap.hh"
+#include "Utils/Exception.hh"
+#include "Interface/dataCards.hh"
+#include "API/PyWrapMapBase.hh"
+#include "API/MapBase.hh"
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
 #include "DataStructure/DAQData.hh"
 #include "DataStructure/EMRDaq.hh"
 #include "DataStructure/DBBSpillData.hh"
-#include "DataStructure/EMRBar.hh"
-#include "DataStructure/EMRBarHit.hh"
-#include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
 #include "DataStructure/EMRSpillData.hh"
-#include "API/MapBase.hh"
 
 namespace MAUS {
 
-typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; // nHits elements
-typedef std::vector<EMRBarHitsVector>   EMRBarVector; // 60 elements
-typedef std::vector<EMRBarVector>       EMRPlaneVector; // 48 elements
-typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; // nTr elements
+/** @class MapCppEMRPlaneHits
+ *
+ * Reconstruct EMR data and create EMR plane hits
+ * by running over the fADC and DBB data
+ */
 
-struct fADCdata {
+typedef std::vector<EMRBarHit>		EMRBarHitVector; 	// nHits elements
+
+struct EMRPlaneHitTmp {
+  EMRBarHitVector _barhits;
   int _orientation;
-  int _charge;
   int _time;
-  int _spill;
   int _deltat;
+  int _charge;
+  std::vector<int> _samples;
 };
 
-typedef std::vector<fADCdata>                EMRfADCPlaneHitsVector; // 48 elements
-typedef std::vector<EMRfADCPlaneHitsVector>  EMRfADCEventVector; // nTr elements
+typedef std::vector<EMRPlaneHitTmp>	EMRPlaneHitVector;	// 48 elements
+typedef std::vector<EMRPlaneHitVector>	EMREventPlaneHitVector;	// nTr elements
 
 class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
  public:
@@ -91,33 +93,39 @@ class MapCppEMRPlaneHits : public MapBase<MAUS::Data> {
  */
   void _process(MAUS::Data *data) const;
 
-  void processDBB(MAUS::EMRDaq EMRdaq,
-		  int nPartEvents,
-		  EMRDBBEventVector& emr_dbb_events_tmp,
-		  EMRfADCEventVector& emr_fadc_events_tmp) const;
+  void process_DBB(MAUS::EMRDaq EMRdaq,
+		   EMREventPlaneHitVector& emr_events_tmp,
+		   EMRBarHitVector& emr_bar_hits_tmp,
+		   size_t nPartEvents) const;
 
-  void processFADC(MAUS::EMRDaq EMRdaq,
-		   int nPartEvents,
-		   EMRfADCEventVector& emr_fadc_events_tmp) const;
+  void process_fADC(MAUS::EMRDaq EMRdaq,
+		    EMREventPlaneHitVector& emr_events_tmp,
+		    size_t nPartEvents) const;
+
+  void process_candidates(EMRBarHitVector emr_bar_hits_tmp,
+		          EMREventPlaneHitVector& emr_candidates_tmp) const;
 
   void fill(MAUS::Spill *spill,
-	    int nPartEvents,
-	    EMRDBBEventVector emr_dbb_events_tmp,
-	    EMRfADCEventVector emr_fadc_events_tmp) const;
+	    EMREventPlaneHitVector emr_events_tmp,
+	    size_t nPartEvents) const;
 
-  EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
-  EMRfADCEventVector get_fadc_data_tmp(int nPartEvts) const;
+  EMREventPlaneHitVector get_emr_events_tmp(size_t nPartEvts) const;
 
+  // Maps
   EMRChannelMap _emrMap;
 
   // Detector parameters
-  int _number_of_planes;
-  int _number_of_bars;
+  size_t _number_of_planes;
+  size_t _number_of_bars;
 
   // Hit pre-selection cuts
-  int _deltat_signal_low;
-  int _deltat_signal_up;
-};
-}
+  int _primary_deltat_low;
+  int _primary_deltat_up;
 
-#endif
+  size_t _secondary_n_low;
+  int _secondary_tot_low;
+  int _secondary_bunching_width;
+};
+} // namespace MAUS
+
+#endif // #define _MAP_MAPCPPEMRPLANEHITS_H_
