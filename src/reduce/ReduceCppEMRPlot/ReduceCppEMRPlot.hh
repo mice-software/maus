@@ -35,8 +35,11 @@
 #include "TLine.h"
 #include "TString.h"
 
+#include "TGraphErrors.h"
+
 #include "API/ReduceBase.hh"
 #include "API/PyWrapReduceBase.hh"
+#include "DataStructure/ThreeVector.hh"
 #include "DataStructure/ImageData/ImageData.hh"
 #include "DataStructure/ImageData/Image.hh"
 #include "DataStructure/ImageData/CanvasWrapper.hh"
@@ -44,9 +47,7 @@
 #include "DataStructure/Spill.hh"
 #include "DataStructure/ReconEvent.hh"
 #include "DataStructure/EMREvent.hh"
-#include "DataStructure/EMRPlaneHit.hh"
-#include "DataStructure/EMRBar.hh"
-#include "DataStructure/EMRBarHit.hh"
+#include "DataStructure/EMRSpillData.hh"
 #include "Utils/ReduceCppTools.hh"
 #include "Utils/TH2EMR.hh"
 
@@ -59,6 +60,8 @@ class ReduceCppEMRPlot : public ReduceBase<Data, ImageData> {
 
   int GetRefreshRate() const {return _refresh_rate;}
 
+  void reset();
+
  private:
 
   void _birth(const std::string& argJsonConfigDocument);
@@ -67,14 +70,14 @@ class ReduceCppEMRPlot : public ReduceBase<Data, ImageData> {
 
   void _process(Data* data);
 
-  void reset();
-
   void update();
 
   void fill_emr_plots(EMREvent* emr_event);
 
+  size_t _number_of_bars;
   int _process_count;
   int _refresh_rate;
+  double _charge_threshold;
   double _density_cut;
   double _chi2_cut;
 
@@ -91,14 +94,6 @@ class ReduceCppEMRPlot : public ReduceBase<Data, ImageData> {
   TLegend *_leg_range, *_leg_charge;
   TText *_text_match_eff, *_text_pid_stats;
   TLine *_line_density, *_line_chi2;
-  TCanvas *_canv_range, *_canv_total_charge,
-	  *_canv_charge_ratio, *_canv_chi2_density,
-	  *_canv_occ_xz, *_canv_occ_yz,
-	  *_canv_beam_profile, *_canv_depth_profile;
-  CanvasWrapper *_cwrap_range, *_cwrap_total_charge,
-		*_cwrap_charge_ratio, *_cwrap_chi2_density,
-		*_cwrap_occ_xz, *_cwrap_occ_yz,
-		*_cwrap_beam_profile, *_cwrap_depth_profile;
 };
 }
 

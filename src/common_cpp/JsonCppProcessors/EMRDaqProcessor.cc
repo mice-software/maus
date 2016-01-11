@@ -29,5 +29,3 @@ EMRDaqProcessor::EMRDaqProcessor()
           &EMRDaq::SetDBBArray, false);
 }
 }  // namespace MAUS
-
-

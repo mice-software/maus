@@ -14,34 +14,32 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRBARPROCESSOR_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRBARPROCESSOR_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRSPACEPOINTPROCESSOR_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRSPACEPOINTPROCESSOR_
 
-#include "src/common_cpp/DataStructure/EMRBar.hh"
-#include "src/common_cpp/DataStructure/EMRBarHit.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "DataStructure/EMRSpacePoint.hh"
+#include "JsonCppProcessors/ObjectProcessor.hh"
+#include "JsonCppProcessors/ThreeVectorProcessor.hh"
 
 namespace MAUS {
 
-/** @class EMRBarProcessor Conversions for EMRBar between C++ and Json 
+/** @class EMRSpacePointProcessor Conversions for EMRPlaneHit between C++ and Json 
  *
  */
 
-class EMRBarProcessor : public ObjectProcessor<EMRBar> {
+class EMRSpacePointProcessor : public ObjectProcessor<EMRSpacePoint> {
   public:
     /** Set up processors and register branches
      *
      *  Everything else is handled by the base class
      */
-    EMRBarProcessor();
+    EMRSpacePointProcessor();
 
   private:
+    ThreeVectorProcessor _threevector_proc;
     IntProcessor _int_proc;
-    ValueArrayProcessor<EMRBarHit> _hit_arr_proc;
+    DoubleProcessor _double_proc;
 };
 }  // namespace MAUS
 
-#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRBARPROCESSOR_
-
+#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRSPACEPOINTPROCESSOR_

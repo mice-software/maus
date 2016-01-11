@@ -55,7 +55,7 @@ class KLCalibrationMap {
   */
   bool InitializeFromCards(Json::Value configJSON);
 
-  /// Not implemented.
+  /// Get cabling from CDB.
   bool InitializeFromCDB();
 
  /** Initialize the map by using the provided text file.
@@ -72,12 +72,6 @@ class KLCalibrationMap {
   double Gain(KLChannelKey key) const;
   bool InitializePyMod();
 
-  /** Name of the calibration as in the CDB.
-  */
-  std::string _name;
-  std::stringstream gainstr;
-  std::string  _kl_calibdate;
-
  /** Print the calibration map;
   * To be used only for debugging.
   */
@@ -91,6 +85,8 @@ class KLCalibrationMap {
   };
 
  private:
+  /** Use this function to reset the map before reloading. */
+  void reset();
 
  /** Make one KLChannelKey for each channel of the detector.
   * All KLChannelKeys are held in the data member _Pkey.
@@ -114,6 +110,12 @@ class KLCalibrationMap {
   * This is used when the constants are read.
   */
   std::vector<double> _gain;
+
+  /** Name of the calibration as in the CDB.
+  */
+  std::string _name;
+  std::stringstream gainstr;
+  std::string  _kl_calibdate;
 
   /** Flags for switching On/Off gain corrections.
   */

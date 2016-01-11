@@ -19,7 +19,7 @@
 namespace MAUS {
 
 EMRChannelId::EMRChannelId(const EMRChannelId& channel)
-    : _bar(channel._bar) /*,  _plane(channel._plane)*/ {
+    : _bar(channel._bar) {
 }
 
 EMRChannelId& EMRChannelId::operator=(const EMRChannelId& channel) {
@@ -27,8 +27,6 @@ EMRChannelId& EMRChannelId::operator=(const EMRChannelId& channel) {
         return *this;
     }
     _bar   = channel._bar;
-//     _plane = channel._plane;
     return *this;
 }
-}
-
+} // namespace MAUS
