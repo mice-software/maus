@@ -61,11 +61,8 @@ ReduceCppTOFPlot::~ReduceCppTOFPlot() {
     delete _histos[i];
   _histos.resize(0);
 
-  for (unsigned int i = 0; i < _canvs.size(); i++)
-    delete _canvs[i];
-  _canvs.resize(0);
-
-  // CanvasWrapper objects will be deleted by the ImageData destructor.
+  // CanvasWrapper objects will be deleted by the ImageData destructor;
+  // they own the canvas that they wrap.
 }
 
 void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
@@ -108,22 +105,26 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _canvs.push_back(_canv_tof12);
   _canvs.push_back(_canv_tof02);
 
-  _cwrap_tof01 = ReduceCppTools::get_canvas_wrapper(_canv_tof01,
-                                                    _h_tof01,
-						    "TOF01");
+  // Add grid to all canvases.
+  for (auto &canv:_canvs)
+    canv->SetGridx();
 
-  _cwrap_tof12 = ReduceCppTools::get_canvas_wrapper(_canv_tof12,
-                                                    _h_tof12,
-						    "TOF12");
+  CanvasWrapper *cwrap_tof01 = ReduceCppTools::get_canvas_wrapper(_canv_tof01,
+                                                    		  _h_tof01,
+						    		  "TOF01");
 
-  _cwrap_tof02 = ReduceCppTools::get_canvas_wrapper(_canv_tof02,
-                                                    _h_tof02,
-						    "TOF02");
+  CanvasWrapper *cwrap_tof12 = ReduceCppTools::get_canvas_wrapper(_canv_tof12,
+                                                    		  _h_tof12,
+						    		  "TOF12");
+
+  CanvasWrapper *cwrap_tof02 = ReduceCppTools::get_canvas_wrapper(_canv_tof02,
+                                                    		  _h_tof02,
+						    		  "TOF02");
 
   this->reset();
-  _output->GetImage()->CanvasWrappersPushBack(_cwrap_tof01);
-  _output->GetImage()->CanvasWrappersPushBack(_cwrap_tof12);
-  _output->GetImage()->CanvasWrappersPushBack(_cwrap_tof02);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof01);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof12);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof02);
 }
 
 void ReduceCppTOFPlot::_death() {}

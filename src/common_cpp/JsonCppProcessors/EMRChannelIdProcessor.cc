@@ -22,8 +22,5 @@ EMRChannelIdProcessor::EMRChannelIdProcessor() {
     RegisterValueBranch("bar", &_int_proc,
                         &EMRChannelId::GetBar,
                         &EMRChannelId::SetBar, true);
-//     RegisterValueBranch("plane", &_int_proc,
-//                         &EMRChannelId::GetPlane,
-//                         &EMRChannelId::SetPlane, true);
 }
-}
+} // namespace MAUS

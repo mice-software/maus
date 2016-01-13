@@ -43,6 +43,8 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
 
   int  getRefreshRate() {return _refresh_rate;}
 
+  void reset();
+
  private:
 
   void _birth(const std::string& argJsonConfigDocument);
@@ -50,8 +52,6 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   void _death();
 
   void _process(Data* data);
-
-  void reset();
 
   void update();
 
@@ -64,7 +64,6 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
-  CanvasWrapper *_cwrap_tof01, *_cwrap_tof02, *_cwrap_tof12;
 };
 }
 

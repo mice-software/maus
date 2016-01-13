@@ -193,10 +193,6 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
             redevent = self.merger.process(event)
         # done with tranform-merge, now write it out
         self.outputer.save(redevent)
-        try:
-            del redevent
-        except: # pylint: disable = W0702
-            pass
         # if we converted to a different representation, delete the old one
         try:
             maus_cpp.converter.del_data_repr(event)

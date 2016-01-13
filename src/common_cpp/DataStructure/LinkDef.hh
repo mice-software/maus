@@ -194,15 +194,19 @@
 
 #pragma link C++ class MAUS::EMRDaq+;
 #pragma link C++ class MAUS::DBBHit+;
-// #pragma link C++ class std::vector<MAUS::DBBHit>+;
 #pragma link C++ class MAUS::DBBHitsArray+;
 #pragma link C++ class MAUS::DBBSpillData+;
-#pragma link C++ class MAUS::EMRBar+;
 #pragma link C++ class MAUS::EMRBarHit+;
 #pragma link C++ class MAUS::EMRPlaneHit+;
+#pragma link C++ class MAUS::EMRSpacePoint+;
+#pragma link C++ class MAUS::EMRTrack+;
+#pragma link C++ class MAUS::EMRTrackPoint+;
+#pragma link C++ class MAUS::EMREventTrack+;
 #pragma link C++ class std::vector<EMRPlaneHit*>+;
-#pragma link C++ class std::vector<EMRBar*>;
 #pragma link C++ class std::vector<EMRBarHit>+;
+#pragma link C++ class std::vector<EMRSpacePoint*>+;
+#pragma link C++ class std::vector<EMRTrackPoint>+;
+#pragma link C++ class std::vector<EMREventTrack*>+;
 
 
 #pragma link C++ global gROOT;

@@ -55,6 +55,7 @@ def run():
     my_map = MAUS.MapPyGroup()
     my_map.append(MAUS.MapCppReconSetup())
     my_map.append(MAUS.MapCppEMRPlaneHits())
+    my_map.append(MAUS.MapCppEMRSpacePoints())
     my_map.append(MAUS.MapCppEMRRecon())
 
     # Histogram reducer.

@@ -54,6 +54,7 @@ class ModuleBuilder:
         """
         Build the Subproject with name project
         """
+        #pylint: disable=E1102
         SConscript(sconscript_path(project),
                    exports=['project', 'env', 'conf']) # pylint: disable=E0602, C0301
 
