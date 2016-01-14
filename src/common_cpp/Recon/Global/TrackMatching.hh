@@ -164,6 +164,12 @@ namespace global {
         std::string detector_name,
         DataStructure::Global::Track* hypothesis_track);
 
+    void MatchTOF0(
+        const TLorentzVector &position, const TLorentzVector &momentum,
+        const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+        DataStructure::Global::PID pid,
+        DataStructure::Global::Track* hypothesis_track);
+
     /**
      * @brief As MatchTrackPoint() but matching to the most upstream trackpoint
      * of an EMR track.
@@ -276,6 +282,7 @@ namespace global {
     FRIEND_TEST(TrackMatchingTest, GetDetectorTrackPoints);
     FRIEND_TEST(TrackMatchingTest, PIDHypotheses);
     FRIEND_TEST(TrackMatchingTest, MatchTrackPoint);
+    FRIEND_TEST(TrackMatchingTest, MatchTOF0);
     FRIEND_TEST(TrackMatchingTest, MatchEMRTrack);
     FRIEND_TEST(TrackMatchingTest, AddTrackerTrackPoints);
     FRIEND_TEST(TrackMatchingTest, USDSTracks);

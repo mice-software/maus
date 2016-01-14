@@ -400,6 +400,49 @@ TEST_F(TrackMatchingTest, MatchTrackPoint) {
   }
 }
 
+TEST_F(TrackMatchingTest, MatchTOF0) {
+  _track_matching = new recon::global::TrackMatching(_global_event,
+      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0);
+
+  Simulation::DetectorConstruction* dc =
+      Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
+  std::string mod_path = std::string(getenv("MAUS_ROOT_DIR"))+
+      "/tests/cpp_unit/Recon/Global/TestGeometries/";
+  MiceModule geometry(mod_path+"SimpleBeamline.dat");
+  dc->SetMiceModules(geometry);
+
+  DataStructure::Global::SpacePoint tof0_sp1;
+  TLorentzVector tof0_position(0.0, 0.0, 100.0, 10.0);
+  tof0_sp1.set_position(tof0_position);
+  tof0_sp1.set_detector(DataStructure::Global::kTOF0);
+  _global_event->add_space_point(&tof0_sp1);
+  DataStructure::Global::SpacePoint tof0_sp2;
+  tof0_position.SetT(13.0);
+  tof0_sp2.set_position(tof0_position);
+  tof0_sp2.set_detector(DataStructure::Global::kTOF0);
+  _global_event->add_space_point(&tof0_sp2);
+
+
+  std::vector<DataStructure::Global::TrackPoint*> TOF0_tp =
+      _track_matching->GetDetectorTrackPoints(
+      DataStructure::Global::kTOF0, "MatchTOF0Test");
+
+  TLorentzVector position(0.0, 0.0, 7902.0, 41.0);
+  TLorentzVector momentum(10.0, 10.0, 150.0, 0.0);
+  DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
+  DataStructure::Global::Track hypothesis_track;
+  _track_matching->MatchTOF0(position, momentum, TOF0_tp, pid,
+                             &hypothesis_track);
+
+  std::vector<const DataStructure::Global::TrackPoint*> track_points =
+      hypothesis_track.GetTrackPoints();
+
+  EXPECT_EQ(track_points.size(), 1);
+  if (track_points.size() > 0) {
+    EXPECT_FLOAT_EQ(track_points.at(0)->get_position().T(), 10.0);
+  }
+}
+
 TEST_F(TrackMatchingTest, MatchEMRTrack) {
   _track_matching = new recon::global::TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0);

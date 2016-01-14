@@ -15,6 +15,8 @@
  *
  */
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
 #include "src/common_cpp/Utils/Globals.hh"
@@ -309,6 +311,34 @@ void TrackMatching::MatchTrackPoint(
       }
     } catch (Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
+    }
+  }
+}
+
+void TrackMatching::MatchTOF0(
+    const TLorentzVector &position, const TLorentzVector &momentum,
+    const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+    DataStructure::Global::PID pid,
+    DataStructure::Global::Track* hypothesis_track) {
+  double mass = Particle::GetInstance().GetMass(pid);
+  double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
+  if (trackpoints.size() > 0) {
+    double z_distance = position.Z() - trackpoints.at(0)->get_position().Z();
+    double velocity = (momentum.Z() / energy) * CLHEP::c_light;
+    // Change later to be set by datacards
+    double deltaTMin = (z_distance/velocity) - 2.0;
+    double deltaTMax = (z_distance/velocity) + 2.0;
+    for (size_t i = 0; i < trackpoints.size(); i++) {
+      double deltaT = position.T() - trackpoints.at(i)->get_position().T();
+      if ((deltaT > deltaTMin) and (deltaT < deltaTMax)) {
+        hypothesis_track->AddTrackPoint(trackpoints.at(i));
+          Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Match"
+                                      << std::endl;
+      } else {
+        Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Mismatch, "
+            << "dT is " << deltaT << " when expected between " << deltaTMin
+            << " and " << deltaTMax << std::endl;
+      }
     }
   }
 }
