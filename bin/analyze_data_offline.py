@@ -38,6 +38,7 @@ def run():
     my_map.append(MAUS.MapCppTrackerRecon())
 
     my_map.append(MAUS.MapCppEMRPlaneHits())
+    my_map.append(MAUS.MapCppEMRSpacePoints())
     my_map.append(MAUS.MapCppEMRRecon())
 
     my_reduce = MAUS.ReducePyDoNothing()

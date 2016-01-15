@@ -27,12 +27,6 @@ ImageData::ImageData(const ImageData& data)
     *this = data;
 }
 
-ImageData::~ImageData() {
-    if (_image != NULL) {
-        delete _image;
-    }
-}
-
 ImageData& ImageData::operator=(const ImageData& data) {
     if (&data == this) {
         return *this;
@@ -41,6 +35,12 @@ ImageData& ImageData::operator=(const ImageData& data) {
         delete _image;
     _image = new Image(*data._image);
     return *this;
+}
+
+ImageData::~ImageData() {
+    if (_image != NULL) {
+        delete _image;
+    }
 }
 
 void ImageData::SetImage(Image* image) {

@@ -19,183 +19,33 @@
 namespace MAUS {
 
 EMRPlaneHit::EMRPlaneHit()
-  : _plane(0), _orientation(0), _emrbararray(),
-    _emrbararray_primary(), _emrbararray_secondary(),
-    _charge(0.0), _charge_corrected(0.0), _pedestal_area(0.0),
-    _time(0), _spill(0), _trigger(0), _run(0), _deltat(0), _samples() {
+  : _emrbarhits(), _plane(-1), _orientation(-1), _time(-1), _deltat(-1),
+    _charge(-1.), _pedestal_area(-1.), _samples() {
 }
 
-EMRPlaneHit::EMRPlaneHit(const EMRPlaneHit& _emrplanehit)
-  : _plane(0), _orientation(0), _emrbararray(),
-    _emrbararray_primary(), _emrbararray_secondary(),
-    _charge(0.0), _charge_corrected(0.0), _pedestal_area(0.0),
-    _time(0), _spill(0), _trigger(0), _run(0), _deltat(0), _samples() {
-  *this = _emrplanehit;
+EMRPlaneHit::EMRPlaneHit(const EMRPlaneHit& emrph)
+  : _emrbarhits(), _plane(-1), _orientation(-1), _time(-1), _deltat(-1),
+    _charge(-1.), _pedestal_area(-1.), _samples() {
+
+  *this = emrph;
 }
 
-EMRPlaneHit& EMRPlaneHit::operator=(const EMRPlaneHit& _emrplanehit) {
-  if (this == &_emrplanehit) {
+EMRPlaneHit& EMRPlaneHit::operator=(const EMRPlaneHit& emrph) {
+  if (this == &emrph)
       return *this;
-  }
 
-  SetPlane(_emrplanehit._plane);
-  SetOrientation(_emrplanehit._orientation);
-
-  this->_emrbararray = _emrplanehit._emrbararray;
-  for (size_t i = 0; i < this->_emrbararray.size(); ++i)
-    this->_emrbararray[i] = new EMRBar(*this->_emrbararray[i]);
-
-  this->_emrbararray_primary = _emrplanehit._emrbararray_primary;
-  for (size_t i = 0; i < this->_emrbararray_primary.size(); ++i)
-    this->_emrbararray_primary[i] = new EMRBar(*this->_emrbararray_primary[i]);
-
-  this->_emrbararray_secondary = _emrplanehit._emrbararray_secondary;
-  for (size_t i = 0; i < this->_emrbararray_secondary.size(); ++i)
-    this->_emrbararray_secondary[i] = new EMRBar(*this->_emrbararray_secondary[i]);
-
-  SetCharge(_emrplanehit._charge);
-  SetChargeCorrected(_emrplanehit._charge_corrected);
-  SetPedestalArea(_emrplanehit._pedestal_area);
-  SetTime(_emrplanehit._time);
-  SetSpill(_emrplanehit._spill);
-  SetTrigger(_emrplanehit._trigger);
-  SetRun(_emrplanehit._run);
-  SetDeltaT(_emrplanehit._deltat);
-  SetSamples(_emrplanehit._samples);
+  this->SetEMRBarHitArray(emrph._emrbarhits);
+  this->SetPlane(emrph._plane);
+  this->SetOrientation(emrph._orientation);
+  this->SetTime(emrph._time);
+  this->SetDeltaT(emrph._deltat);
+  this->SetCharge(emrph._charge);
+  this->SetPedestalArea(emrph._pedestal_area);
+  this->SetSampleArray(emrph._samples);
 
   return *this;
 }
 
 EMRPlaneHit::~EMRPlaneHit() {
-  int nbars = _emrbararray.size();
-  for (int i = 0; i < nbars; i++)
-    delete _emrbararray[i];
-
-  _emrbararray.resize(0);
-
-  nbars = _emrbararray_primary.size();
-  for (int i = 0; i < nbars; i++)
-    delete _emrbararray_primary[i];
-
-  _emrbararray_primary.resize(0);
-
-  nbars = _emrbararray_secondary.size();
-  for (int i = 0; i < nbars; i++)
-    delete _emrbararray_secondary[i];
-
-  _emrbararray_secondary.resize(0);
 }
-
-int EMRPlaneHit::GetPlane() const {
-    return _plane;
-}
-
-void EMRPlaneHit::SetPlane(int plane) {
-    _plane = plane;
-}
-
-int EMRPlaneHit::GetOrientation() const {
-    return _orientation;
-}
-
-void EMRPlaneHit::SetOrientation(int orient) {
-    _orientation = orient;
-}
-
-EMRBarArray EMRPlaneHit::GetEMRBarArray() const {
-    return _emrbararray;
-}
-
-EMRBarArray EMRPlaneHit::GetEMRBarArrayPrimary() const {
-    return _emrbararray_primary;
-}
-
-EMRBarArray EMRPlaneHit::GetEMRBarArraySecondary() const {
-    return _emrbararray_secondary;
-}
-
-void EMRPlaneHit::SetEMRBarArray(EMRBarArray emrbararray) {
-    _emrbararray = emrbararray;
-}
-
-void EMRPlaneHit::SetEMRBarArrayPrimary(EMRBarArray emrbararray_primary) {
-    _emrbararray_primary = emrbararray_primary;
-}
-
-void EMRPlaneHit::SetEMRBarArraySecondary(EMRBarArray emrbararray_secondary) {
-    _emrbararray_secondary = emrbararray_secondary;
-}
-
-double EMRPlaneHit::GetCharge() const {
-    return _charge;
-}
-
-void EMRPlaneHit::SetCharge(double charge) {
-    _charge = charge;
-}
-
-double EMRPlaneHit::GetChargeCorrected() const {
-    return _charge_corrected;
-}
-
-void EMRPlaneHit::SetChargeCorrected(double charge_corrected) {
-    _charge_corrected = charge_corrected;
-}
-
-double EMRPlaneHit::GetPedestalArea() const {
-    return _pedestal_area;
-}
-
-void EMRPlaneHit::SetPedestalArea(double pedestal_area) {
-    _pedestal_area = pedestal_area;
-}
-
-int EMRPlaneHit::GetTime() const {
-    return _time;
-}
-
-void EMRPlaneHit::SetTime(int time) {
-    _time = time;
-}
-
-int EMRPlaneHit::GetSpill() const {
-    return _spill;
-}
-
-void EMRPlaneHit::SetSpill(int spill) {
-    _spill = spill;
-}
-
-int EMRPlaneHit::GetTrigger() const {
-    return _trigger;
-}
-
-void EMRPlaneHit::SetTrigger(int trigger) {
-    _trigger = trigger;
-}
-
-int EMRPlaneHit::GetRun() const {
-    return _run;
-}
-
-void EMRPlaneHit::SetRun(int run) {
-    _run = run;
-}
-
-int EMRPlaneHit::GetDeltaT() const {
-    return _deltat;
-}
-
-void EMRPlaneHit::SetDeltaT(int deltat) {
-    _deltat = deltat;
-}
-
-std::vector<int> EMRPlaneHit::GetSamples() const {
-    return _samples;
-}
-
-void EMRPlaneHit::SetSamples(std::vector<int> samples) {
-    _samples = samples;
-}
-}
-
+} // namespace MAUS

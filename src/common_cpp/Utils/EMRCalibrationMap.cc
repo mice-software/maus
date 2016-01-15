@@ -21,15 +21,19 @@
 namespace MAUS {
 
 EMRCalibrationMap::EMRCalibrationMap() {
+
   pymod_ok = true;
-  if (!this->InitializePyMod()) pymod_ok = false;
+  if ( !this->InitializePyMod() )
+      pymod_ok = false;
 }
 
 EMRCalibrationMap::~EMRCalibrationMap() {
+
   this->reset();
 }
 
 void EMRCalibrationMap::reset() {
+
   _Ckey.clear();
   _eps_MA.resize(0);
   _eps_SA.resize(0);
@@ -39,6 +43,7 @@ void EMRCalibrationMap::reset() {
 }
 
 bool EMRCalibrationMap::InitializeFromCards(Json::Value configJSON) {
+
   // Fetch variables
   _number_of_planes = configJSON["EMRnumberOfPlanes"].asInt();
   _number_of_bars = configJSON["EMRnumberOfBars"].asInt();
@@ -62,19 +67,19 @@ bool EMRCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   }
 
   // Load the calibration file or find the right CDB entry
-  char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
-  if (!pMAUS_ROOT_DIR) {
-    Squeak::mout(Squeak::error)
-    << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
-    Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
-    return false;
-  }
-
   bool fromDB = true;
-  if (source == "file") {
+  if ( source == "file" ) {
+    char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
+    if ( !pMAUS_ROOT_DIR ) {
+      Squeak::mout(Squeak::error)
+      << "Could not find the $MAUS_ROOT_DIR environmental variable." << std::endl;
+      Squeak::mout(Squeak::error) << "Did you try running: source env.sh ?" << std::endl;
+      return false;
+    }
+
     // Get the calibration text files from the Json document.
     calibFile = std::string(pMAUS_ROOT_DIR)
-	      + configJSON["EMR_calib_file"].asString();
+	        + configJSON["EMR_calib_file"].asString();
     fromDB = false;
   } else {
     // Get the CDB calibration validity start date
@@ -83,17 +88,18 @@ bool EMRCalibrationMap::InitializeFromCards(Json::Value configJSON) {
                                           JsonWrapper::stringValue).asString();
   }
 
-  // Load the calibration constants.
+  // Load the calibration constants, return false if it fails
   bool loaded;
-  if (!fromDB) {
+  if ( !fromDB ) {
       loaded = this->Initialize(calibFile);
   } else {
       // Get calib from CDB instead of file
-      if (!pymod_ok) return false;
+      if ( !pymod_ok )
+	  return false;
       loaded = this->InitializeFromCDB();
   }
-  if (!loaded)
-    return false;
+  if ( !loaded )
+      return false;
 
   return true;
 }
@@ -111,6 +117,7 @@ bool EMRCalibrationMap::Initialize(std::string calibFile) {
 }
 
 int EMRCalibrationMap::MakeEMRChannelKeys() {
+
   for (int iPlane = -1; iPlane < _number_of_planes; iPlane++) // NB: global average (-1)
     for (int iBar = -1; iBar < _number_of_bars; iBar++) // NB: average (-1), test channels (0)
       _Ckey.push_back(EMRChannelKey(iPlane, iPlane%2, iBar, "emr"));
@@ -123,10 +130,11 @@ int EMRCalibrationMap::MakeEMRChannelKeys() {
 }
 
 bool EMRCalibrationMap::LoadFromCDB() {
+
   this->GetCalib("EMR", "eps", _calibDate);
 
   try {
-    while (!epsstr.eof()) {
+    while ( !epsstr.eof() ) {
       char pmt[10], fom[10];
       int plane(-9), bar(-9);
       double epsilon(-1.0);
@@ -134,9 +142,12 @@ bool EMRCalibrationMap::LoadFromCDB() {
 
       int n = FindEMRChannelKey(EMRChannelKey(plane, plane%2, bar, "emr"));
 
-      if (strcmp(fom, _fom.c_str()) == 0 && n != NOCALIB) {
-        if (strcmp(pmt, "MA") == 0) _eps_MA[n] = epsilon;
-        if (strcmp(pmt, "SA") == 0) _eps_SA[n] = epsilon;
+      if ( strcmp(fom, _fom.c_str()) == 0 && n != NOCALIB ) {
+        if ( strcmp(pmt, "MA") == 0 ) {
+	  _eps_MA[n] = epsilon;
+        } else if ( strcmp(pmt, "SA") == 0 ) {
+	  _eps_SA[n] = epsilon;
+	}
       }
     }
   } catch (MAUS::Exception e) {
@@ -150,6 +161,7 @@ bool EMRCalibrationMap::LoadFromCDB() {
 }
 
 void EMRCalibrationMap::GetCalib(std::string devname, std::string caltype, std::string fromdate) {
+
   PyObject *py_arg = NULL, *py_value = NULL;
   // setup the arguments to get_calib_func
   // the arguments are 3 strings
@@ -159,19 +171,19 @@ void EMRCalibrationMap::GetCalib(std::string devname, std::string caltype, std::
   // default date argument is "current"
   // this is set via EMR_calib_date_from card in ConfigurationDefaults
   py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), fromdate.c_str());
-  if (py_arg == NULL) {
+  if ( !py_arg ) {
     PyErr_Clear();
     throw(MAUS::Exception(MAUS::Exception::recoverable,
               "Failed to resolve arguments to get_calib",
               "MAUSEvaluator::evaluate"));
     }
-    if (_get_calib_func != NULL && PyCallable_Check(_get_calib_func)) {
+    if ( _get_calib_func && PyCallable_Check(_get_calib_func) ) {
         py_value = PyObject_CallObject(_get_calib_func, py_arg);
         // setup the streams to hold the different calibs
-        if (py_value != NULL && strcmp(caltype.c_str(), "eps") == 0)
+        if ( py_value && strcmp(caltype.c_str(), "eps") == 0 )
             epsstr << PyString_AsString(py_value);
     }
-    if (py_value == NULL) {
+    if ( !py_value ) {
         PyErr_Clear();
         Py_XDECREF(py_arg);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
@@ -188,7 +200,7 @@ bool EMRCalibrationMap::Load(std::string calibFile) {
 
   // Check the calibration file
   std::ifstream stream(calibFile.c_str());
-  if (!stream) {
+  if ( !stream ) {
     Squeak::mout(Squeak::error)
     << "Error in EMRCalibrationMap::Load : Can't open EMR calibration file."
     << calibFile << std::endl;
@@ -197,7 +209,7 @@ bool EMRCalibrationMap::Load(std::string calibFile) {
 
   // Fill the arrays of correction factors
   try {
-    while (!stream.eof()) {
+    while ( !stream.eof() ) {
       char pmt[10], fom[10];
       int plane(-9), bar(-9);
       double epsilon(-1.0);
@@ -205,9 +217,12 @@ bool EMRCalibrationMap::Load(std::string calibFile) {
 
       int n = FindEMRChannelKey(EMRChannelKey(plane, plane%2, bar, "emr"));
 
-      if (strcmp(fom, _fom.c_str()) == 0 && n != NOCALIB) {
-        if (strcmp(pmt, "MA") == 0) _eps_MA[n] = epsilon;
-        if (strcmp(pmt, "SA") == 0) _eps_SA[n] = epsilon;
+      if ( strcmp(fom, _fom.c_str()) == 0 && n != NOCALIB ) {
+        if (strcmp(pmt, "MA") == 0) {
+	  _eps_MA[n] = epsilon;
+        } else if (strcmp(pmt, "SA") == 0) {
+	  _eps_SA[n] = epsilon;
+        }
       }
     }
   } catch (MAUS::Exception e) {
@@ -221,8 +236,9 @@ bool EMRCalibrationMap::Load(std::string calibFile) {
 }
 
 int EMRCalibrationMap::FindEMRChannelKey(EMRChannelKey key) const {
-  for (unsigned int i = 0; i < _Ckey.size(); i++ )
-    if (_Ckey.at(i) == key)
+
+  for (size_t i = 0; i < _Ckey.size(); i++ )
+    if ( _Ckey.at(i) == key )
       return i;
 
   return NOCALIB;
@@ -231,61 +247,59 @@ int EMRCalibrationMap::FindEMRChannelKey(EMRChannelKey key) const {
 double EMRCalibrationMap::Eps(EMRChannelKey key, const char *pmt) const {
 
   int n = FindEMRChannelKey(key);
+  double epsilon(0.);
 
-  double epsilon = 1.0;
-
-  if (n != NOCALIB) {
-    if (strcmp(pmt, "MA") == 0) epsilon = _eps_MA[n];
-    else if (strcmp(pmt, "SA") == 0)
+  if ( n != NOCALIB ) {
+    if ( strcmp(pmt, "MA") == 0 ) {
+      epsilon = _eps_MA[n];
+    } else if ( strcmp(pmt, "SA") == 0 ) {
       epsilon = _eps_SA[n];
-    else
+    } else {
       Squeak::mout(Squeak::error) << "Wrong PMT ID" << std::endl;
-
-    if ( epsilon ) return epsilon;
+    }
+    if ( epsilon )
+	return epsilon;
   }
 
-  // std::cout << "EMRCalibrationMap -> No " << pmt << " calibration for " << key << std::endl;
   return NOCALIB;
 }
 
 void EMRCalibrationMap::Print() {
-  std::cout << "====================== EMRCalibrationMap =========================" << std::endl;
-  std::cout << " Number of channels : " << _Ckey.size() << std::endl;
+  std::cerr << "====================== EMRCalibrationMap =========================" << std::endl;
+  std::cerr << " Number of channels : " << _Ckey.size() << std::endl;
 
-  for (unsigned int i = 0; i < _Ckey.size(); i++) {
-    std::cout << _Ckey[i] << " MA :" << _eps_MA[i] << std::endl;
-    std::cout << _Ckey[i] << " SA :" << _eps_SA[i] << std::endl;
-  }
+  for (unsigned int i = 0; i < _Ckey.size(); i++)
+    std::cerr << _Ckey[i] << " MA :" << _eps_MA[i] << ", SA :" << _eps_SA[i] << std::endl;
 
-  std::cout<< "===================================================================" << std::endl;
+  std::cerr<< "===================================================================" << std::endl;
 }
 
 bool EMRCalibrationMap::InitializePyMod() {
   PyObject* calib_mod = PyImport_ImportModule("calibration.get_emr_calib");
-  if (calib_mod == NULL) {
+  if ( !calib_mod ) {
     std::cerr << "Failed to import get_emr_calib module" << std::endl;
     return false;
   }
 
   PyObject* calib_mod_dict = PyModule_GetDict(calib_mod);
   PyObject* t_calib = NULL;
-  if (calib_mod_dict != NULL) {
+  if ( calib_mod_dict ) {
     PyObject* calib_init = PyDict_GetItemString(calib_mod_dict, "GetCalib");
-    if (PyCallable_Check(calib_init)) {
+    if ( PyCallable_Check(calib_init) ) {
         t_calib = PyObject_Call(calib_init, NULL, NULL);
     }
   }
-  if (t_calib == NULL) {
+  if ( !t_calib ) {
     std::cerr << "Failed to instantiate get_emr_calib" << std::endl;
     return false;
   }
 
   // Get the get_calib_func() function
   _get_calib_func = PyObject_GetAttrString(t_calib, "get_calib");
-  if (_get_calib_func == NULL) {
+  if ( !_get_calib_func ) {
     std::cerr << "Failed to find get_calib function" << std::endl;
     return false;
   }
   return true;
 }
-}
+} // namespace MAUS

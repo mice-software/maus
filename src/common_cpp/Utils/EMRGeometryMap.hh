@@ -15,35 +15,28 @@
  *
  */
 
-#ifndef _MAUS_EMRGEOMETRYMAP_HH_
-#define _MAUS_EMRGEOMETRYMAP_HH_
+#ifndef _SRC_COMMON_CPP_UTILS_EMRGEOMETRYMAP_HH_
+#define _SRC_COMMON_CPP_UTILS_EMRGEOMETRYMAP_HH_
 
-
+// C++ headers
 #include <Python.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <iostream>
-#include <sstream>
-#include <fstream>
-#include <iterator>
-#include <algorithm>
-#include <cctype>
-#include <functional>
 
+// MAUS headers
 #include "json/json.h"
 #include "Utils/EMRChannelMap.hh"
+#include "Utils/JsonWrapper.hh"
 #include "Utils/Exception.hh"
 #include "Interface/Squeak.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "Config/MiceModule.hh"
+#include "DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
-/** Complete map of all calibration constants needed in order to reconstruct the energy
- * measured by the EMR detector. This class is used to hold and manage calibration 
- * constants and to calculate the calibration corrections.
+/** @class Complete map of all bar positions and dimensions in the EMR.
+	   This class is used to hold and manage the EMR geometry.
  */
 
 class EMRGeometryMap {
@@ -52,78 +45,110 @@ class EMRGeometryMap {
   EMRGeometryMap();
   virtual ~EMRGeometryMap();
 
- /** Initialize the geometry map by using the text files provided in 
-  * ConfigurationDefaults.py
-  * \returns true if the text file is loaded successfully.
+ /** @brief Initialize the geometry map by using the text files provided in ConfigurationDefaults.py
+  *
+  *  \returns true if the text file is loaded successfully.
   */
   bool InitializeFromCards(Json::Value configJSON);
 
- /** Initialize the map by using the provided file.
-  * \param[in] geometryFile name of the text file containing the geometry.
-  * \returns true if the text file is loaded successfully.
+ /** @brief Initialize the map by using the provided file.
+  *
+  *  \param[in] geometryFile 	name of the text file containing the geometry.
+  *  \returns 			true if the geometry file is loaded successfully.
   */
   bool Initialize(std::string geometryFile);
 
- /** Returns the local position of the bar coded by the key.
-  * \param[in] key of the bar
-  * \returns the value of the local position for this bar. If no geometry 
-  * for this channel the function returns NOGEO (-99999).
+ /** @brief Returns the local position of the bar coded by the key.
+  *
+  *  \param[in] key	channel of the bar.
+  *  \returns 		the value of the local position for this bar. If no geometry 
+  * 	      		for this channel the function returns NOGEO (-99999).
   */
-  Hep3Vector LocalPosition(EMRChannelKey key) const;
+  ThreeVector LocalPosition(EMRChannelKey key) const;
 
- /** Returns the global position of the bar coded by the key.
-  * \param[in] key of the bar
-  * \returns the value of the global position for this bar. If no geometry 
-  * for this channel the function returns NOGEO (-99999).
+ /** @brief Returns the global position of the bar coded by the key.
+  *
+  *  \param[in] key	channel of the bar.
+  *  \returns 		the value of the global position for this bar. If no geometry 
+  * 	      		for this channel the function returns NOGEO (-99999).
   */
-  Hep3Vector GlobalPosition(EMRChannelKey key) const;
+  ThreeVector GlobalPosition(EMRChannelKey key) const;
 
- /** Returns the dimensions of the an EMR bar w*h*l.
+ /** @brief Returns the global equivalent of the set of local coordinates in the EMR
+  *
+  *  \param[in] pos	local coordinates of a points
+  *  \returns		the value of the global coordinates for this point. If no geometry
+  * 	      		for this channel the function returns the coordinates unchanged.
   */
-  Hep3Vector Dimensions() const;
+  ThreeVector MakeGlobal(ThreeVector pos) const;
 
- /** Print the geometry map;
-  * To be used only for debugging.
+ /** @brief Returns the local start of the fiducial volume in the three axes.
+  */
+  ThreeVector LocalStart() const { return _localStartEMR; }
+
+ /** @brief Returns the local end of the fiducial volume in the three axes.
+  */
+  ThreeVector LocalEnd() const   { return _localEndEMR; }
+
+ /** @brief Returns the dimensions of the an EMR bar l*w*h.
+  */
+  ThreeVector Dimensions() const { return _D; }
+
+ /** @brief Returns the size of the gaps between the bars
+  */
+  double Gap() const             { return _gap; }
+
+ /** @brief Print the geometry map (debugging)
   */
   void Print();
 
+ /** @brief This value is returned when the key is not found.
+   */
   enum {
-   /** This value is returned when the key is not found.
-    */
     NOGEO = -99999
   };
 
  private:
 
- /** Make one EMRChannelKey for each channel of the detector.
-  * All EMRChannelKeys are held in the data member _Ckey.
+ /** @brief Make one EMRChannelKey for each channel of the detector.
+  * 	   All EMRChannelKeys are held in the data member _Ckey.
   */
   int MakeEMRChannelKeys();
 
- /** Find the position of the channel key in the data member _Ckey.
+ /** @brief Find the position of the channel key in the data member _Ckey.
   */
   int FindEMRChannelKey(EMRChannelKey key) const;
 
- /** Load geometry map from file
+ /** @brief Load geometry map from file
   */
   bool LoadGeometryFile(std::string geometryFile);
 
- /** This vector holds one EMRChannelKey for each channel of the detector.
+ /** @brief This vector holds one EMRChannelKey for each channel of the detector.
   */
   std::vector<EMRChannelKey> _Ckey;
 
- /** These vectors hold the position vectors. IMPORTANT - the order 
-  * of the entries here is the same as the order of the entries in _Ckey. 
-  * This is used when the constants are read.
+ /** @brief These vectors hold the position vectors. IMPORTANT - the order 
+  * 	    of the entries here is the same as the order of the entries in _Ckey. 
+  * 	    This is used when the constants are read.
   */
-  std::vector<Hep3Vector> _Plkey; // Local
-  std::vector<Hep3Vector> _Pgkey; // Global
+  std::vector<ThreeVector> _Plkey; // Local
+  std::vector<ThreeVector> _Pgkey; // Global
 
- /** This vector holds the dimensions vector w*h*l.
+ /** @brief Global position and rotation of the EMR sensitive detector
   */
-  Hep3Vector _D;
+  Hep3Vector _globalPosEMR;
+  HepRotation _globalRotEMR;
 
- /** EMR characteristics
+ /** @brief Local limits and end of the scintillating volume in (x,y,z)
+  */
+  ThreeVector _localStartEMR;
+  ThreeVector _localEndEMR;
+
+ /** @brief This vector holds the dimensions vector l*w*h
+  */
+  ThreeVector _D;
+
+ /** @brief EMR characteristics
   */
   int _number_of_planes;
   int _number_of_bars;
@@ -132,8 +157,6 @@ class EMRGeometryMap {
   double _bar_length;
   double _gap;
 };
-}
+} // namespace MAUS
 
-#endif
-
-
+#endif // #define _SRC_COMMON_CPP_UTILS_EMRGEOMETRYMAP_HH_

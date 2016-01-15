@@ -14,13 +14,16 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDATAPROCESSOR_HH_
-#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDATAPROCESSOR_HH_
+#ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRSPILLDATAPROCESSOR_HH_
+#define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRSPILLDATAPROCESSOR_HH_
 
-#include "src/common_cpp/DataStructure/EMRPlaneHit.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 
-#include "src/common_cpp/DataStructure/EMRSpillData.hh"
+
+#include "DataStructure/EMRSpillData.hh"
+#include "JsonCppProcessors/ObjectProcessor.hh"
+#include "JsonCppProcessors/ArrayProcessors.hh"
+#include "JsonCppProcessors/EMRBarHitProcessor.hh"
+#include "JsonCppProcessors/EMREventTrackProcessor.hh"
 
 namespace MAUS {
 
@@ -34,9 +37,9 @@ class EMRSpillDataProcessor : public ObjectProcessor<EMRSpillData>  {
     EMRSpillDataProcessor();
 
   private:
-    PointerArrayProcessor<EMRPlaneHit> _plane_hit_array_proc;
+    ValueArrayProcessor<EMRBarHit> _bar_hit_array_proc;
+    PointerArrayProcessor<EMREventTrack> _event_track_array_proc;
 };
-}
+} // namespace MAUS
 
-#endif
-
+#endif // # define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRSPILLDATAPROCESSOR_HH_

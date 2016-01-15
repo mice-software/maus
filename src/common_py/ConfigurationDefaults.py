@@ -291,8 +291,8 @@ SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
-SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
-SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
+SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
+SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
 SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
 SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
@@ -500,45 +500,42 @@ KLpmtSigmaGain = 1000000
 EMRnumberOfPlanes = 48
 EMRnumberOfBars = 60 # number of bars in one plane (+ test channel 0)
 EMRnBars = 2832 # total number of bars in the EMR
-EMRbarLength = 110 # cm, length of a scintillating bar
+EMRbarLength = 1100 # mm, length of a scintillating bar
 EMRbarWidth = 33 # mm, base of the triangle
 EMRbarHeight = 17 # mm, height of the triangle
 EMRgap = 0.5 # mm, gap between two adjacent bars
 
 # EMR event pre-selection
-# EMRdeltatSignalLow = -240 # Step I
-# EMRdeltatSignalUp = -220 # Step I
-EMRdeltatSignalLow = -240 # Step IV.0
-EMRdeltatSignalUp = -210 # Step IV.0
+EMRprimaryDeltatLow = -240 # DBB counts
+EMRprimaryDeltatUp = -210 # DBB counts
+EMRsecondaryNLow = 2
+EMRsecondaryTotLow = 4 # DBB counts
+EMRsecondaryBunchingWidth = 40 # ADC counts, 100ns
 
 # EMR digitization
-EMRdoSampling = 1 # sample number of scintillating photons as a Poisson distribution
+EMRdoSampling = 1 # sample as a Poisson distribution
 EMRnphPerMeV = 2000 # number of photons per MeV
 EMRtrapEff = 0.04 # photon trapping efficiency
 EMRseed = 2 # seed state of the pseudorandom number generator, change equivalent to a power cycle of fADC
 EMRattenWLSf = 2.0 # dB/m, attentuation factor of the WLS fibres
 EMRattenCLRf = 0.35 # dB/m, attentuation factor of the clear fibres
-EMRspillWidth = 4000000 # DBB counts
 EMRbirksConstant = 0.126 # mm/MeV
 EMRsignalEnergyThreshold = 0.8 # Me
 EMRfom = "median" # figure_Of-Merit for signal calibration
 
 EMRdbbCount = 2.5 # ns, duration of a DBB cycle (f=400MHz)
 EMRqeMAPMT = 0.25 # MAPMT quantum efficiency
-EMRnadcPerPeMAPMT = 8 # number of ADC counts per photoelectron in the MAPMT
+EMRnadcPerPeMAPMT = 6 # number of ADC counts per photoelectron in the MAPMT
 EMRelectronicsResponseSpreadMAPMT = 8 # ADC counts
 EMRtimeResponseSpread = 1 # ADC counts
-#EMRtotFuncP1 = 15.0 # Step I
-#EMRtotFuncP2 = 0.0089 # Step I
-#EMRtotFuncP3 = 1.24 # Step I
-EMRtotFuncP1 = 13.65 # Step IV
-EMRtotFuncP2 = 0.0127 # Step IV
-EMRtotFuncP3 = 1.38 # Step IV
+EMRtotFuncP1 = 12.55 # a in a*log(b*Q+c) (Shaping factor)
+EMRtotFuncP2 = 0.0252 # b in a*log(b*Q+c) (Scaling factor)
+EMRtotFuncP3 = 1.015 # c in a*log(b*Q+c) (Offset factor)
 EMRdeltatShift = 12 # ADC counts, distance from the trigger
 
 EMRfadcCount = 2.0 # ns, duration of an fADC cycle (f=500MHz)
-#EMRqeSAPMT = 0.11 # SAPMT quantum efficiency
-EMRqeSAPMT = 0.24 # SAPMT quantum efficiency
+#EMRqeSAPMT = 0.11 # SAPMT quantum efficiency, Step I
+EMRqeSAPMT = 0.24 # SAPMT quantum efficiency, Step IV
 #EMRnadcPerPeSAPMT = 2 # number of ADC counts per photoelectron in the SAPMT, Step I
 EMRnadcPerPeSAPMT = 4 # number of ADC counts per photoelectron in the SAPMT, Step IV
 EMRelectronicsResponseSpreadSAPMT = 1 # ADC count, Step I
@@ -554,19 +551,13 @@ EMRarrivalTimeUniformWidth = 12.5
 EMRpulseShapeLandauWidth = 2
 
 # EMR reconstruction
-EMRsecondaryHitsBunchingDistance = 1000 # ns
-EMRsecondaryHitsBunchingWidth = 200 # ns
+EMRchargeThreshold = 10 # ADC counts, rejects noise for plane density
+EMRpolynomialOrder = 1 # Order of the polynomial to fit the tracks with
+EMRmaxMotherDaughterTime = 5000 # ADC counts, ~ 6 decay constants, 99.7% of muons
+EMRmaxMotherDaughterDistance = 100 # mm, max distance between mother and daughter
+EMRholeFraction = 0.08467 # percentage of the EMR volume that is not PS
 
-EMRprimaryTriggerMinXhits = 1
-EMRprimaryTriggerMinYhits = 1
-EMRprimaryTriggerMinNhits = 4
-EMRsecondaryTriggerMinXhits = 1
-EMRsecondaryTriggerMinYhits = 1
-EMRsecondaryTriggerMinNhits = 2
-EMRsecondaryTriggerMinTot = 4
-
-EMRmaxSecondaryToPrimaryTrackDistance = 80
-
+# EMR reducer
 EMRdensityCut = 0.9
 EMRchi2Cut = 2
 
@@ -674,7 +665,6 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
 
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
-#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
 # Particle hypothesis used in Global PID when creating PDFs from MC data.
 # For PDFs to be produced, this must be set, preferably as the type of simulated particle
 # i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"

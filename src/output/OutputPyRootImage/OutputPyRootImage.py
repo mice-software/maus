@@ -98,6 +98,8 @@ class OutputPyRootImage:
         if image.GetSpillNumber() != self.spill_number:
             self.spill_number = image.GetSpillNumber()
             self.process_count += 1
+        elif not is_end_of_run:
+            return
         if (self.process_count % self.refresh_rate) and not is_end_of_run:
             return
         for canvas_wrap in image.GetCanvasWrappers():

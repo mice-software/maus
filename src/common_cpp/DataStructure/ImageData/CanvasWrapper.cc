@@ -38,8 +38,10 @@ CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
         return *this;
     _description = rhs._description;
     _file_tag = rhs._file_tag;
-    if (_canvas != NULL)
+    if (_canvas != NULL) {
+        _canvas->GetListOfPrimitives()->Delete();
         delete _canvas;
+    }
     if (rhs._canvas != NULL) {
         _canvas = static_cast<TCanvas*>(rhs._canvas->Clone());
     } else {
@@ -48,11 +50,18 @@ CanvasWrapper& CanvasWrapper::operator=(const CanvasWrapper& rhs) {
     return *this;
 }
 
-CanvasWrapper::~CanvasWrapper() {}
+CanvasWrapper::~CanvasWrapper() {
+    if (_canvas != NULL) {
+        _canvas->GetListOfPrimitives()->Delete();
+        delete _canvas;
+    }
+}
 
 void CanvasWrapper::SetCanvas(TCanvas* canvas) {
-    if (_canvas != NULL)
+    if (_canvas != NULL) {
+        _canvas->GetListOfPrimitives()->Delete();
         delete _canvas;
+    }
     _canvas = canvas;
 }
 

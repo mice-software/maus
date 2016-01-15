@@ -65,8 +65,8 @@ PatternRecognition::PatternRecognition(): _up_straight_pr_on(true),
                                           _sd_5(0.4298),
                                           _sd_phi_1to4(1.0),
                                           _sd_phi_5(1.0),
-                                          _res_cut(2.0),
-                                          _straight_chisq_cut(15.0),
+                                          _res_cut(7.0),
+                                          _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
                                           _circle_chisq_cut(15.0),
                                           _n_turns_cut(0.75),
@@ -89,8 +89,8 @@ void PatternRecognition::set_parameters_to_default() {
   _sd_5 = 0.4298;
   _sd_phi_1to4 = 1.0;
   _sd_phi_5 = 1.0;
-  _res_cut = 2.0;
-  _straight_chisq_cut = 15.0;
+  _res_cut = 7.0;
+  _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
   _circle_chisq_cut = 15.0;
   _n_turns_cut = 0.75;
@@ -445,11 +445,21 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
           // Loop over spacepoints
           for ( size_t sp_no = 0; sp_no < spnts_by_station[st_num].size(); ++sp_no ) {
-
+            SciFiSpacePoint* sp = spnts_by_station[st_num][sp_no];
             // If the spacepoint has not already been used in a track fit
-            if ( !spnts_by_station[st_num][sp_no]->get_used() ) {
-              // Apply roadcuts & find the spoints with the smallest residuals for the line
-              double dx = 0, dy = 0;
+            if ( !sp->get_used() ) {
+              // Apply roadcuts & find spoints with smallest residuals to the line
+              double cx = line_x.get_c();
+              double mx = line_x.get_m();
+              double cy = line_y.get_c();
+              double my = line_y.get_m();
+              ThreeVector pos = sp->get_position();
+              // Vertical residuals
+              double dx = (mx * pos.z() + cx) - pos.x();
+              double dy = (my * pos.z() + cy) - pos.y();
+              // Perpendicular residuals
+              // dx = fabs(pos.x() - (cx + mx*pos.z())) / sqrt(1.0 + mx*mx);
+              // dy = fabs(pos.y() - (cy + my*pos.z())) / sqrt(1.0 + my*my);
               if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
                 if ( delta_sq > (dx*dx + dy*dy) ) {
                   delta_sq = dx*dx + dy*dy;
