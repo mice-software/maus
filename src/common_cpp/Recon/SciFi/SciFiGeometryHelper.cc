@@ -280,6 +280,72 @@ void SciFiGeometryHelper::FillMaterialsList(int start_id, int end_id,
   }
 }
 
+ThreeVector SciFiGeometryHelper::TransformPositionToGlobal(const ThreeVector& pos, 
+                                                           int tracker) const {
+  ThreeVector reference_position = GetReferencePosition(tracker);
+  CLHEP::HepRotation reference_rotation = GetReferenceRotation(tracker);
 
+  ThreeVector global_position = pos;
+  global_position *= reference_rotation;
+  global_position += reference_position;
+  
+  return global_position;
+}
+
+double SciFiGeometryHelper::TransformGradientToGlobal(double gradient, int tracker) const {
+  // Tranform the point (1, m, 0) into global cooridinates, then pull out new gradient (i.e. y comp)
+  ThreeVector output = TransformPositionToGlobal(ThreeVector(0.0, gradient, 1.0), tracker);
+  double gradient_new = output.y() / output.z();
+  std::cerr << "m old: " << gradient << ", m new: " << gradient_new << ", tracker: " << tracker << "\n";
+  return gradient_new;
+}
+
+double SciFiGeometryHelper::TransformInterceptToGlobal(double intercept, int tracker) const {
+  // Tranform the point (0, c, 0) into global cooridinates, then pull out new intercept (i.e. y comp)
+  ThreeVector output = TransformPositionToGlobal(ThreeVector(0.0, intercept, 0.0), tracker);
+  std::cerr << "c old: " << intercept << ", c new: " << output.y() << ", tracker: " << tracker << "\n";
+  return output.y();
+}
+
+std::vector<double> SciFiGeometryHelper::TransformStraightParamsToGlobal(
+    const std::vector<double>& params, int tracker) const {
+  // Paramters of the fit in tracker local coordinates
+  double x0 = params[0];
+  double mzx = params[1];
+  double y0 = params[2];
+  double mzy = params[3];
+
+  // Paramters of the fit in global coordinates
+  double gx0 = 0.0;
+  double gmzx = 0.0;
+  double gy0 = 0.0;
+  double gmzy = 0.0;
+  
+  // Calculate the local coordinates of one point on the line, use z = 0
+  double z = 0.0;
+  double x = mzx*z + x0;
+  double y = mzy*z + y0;
+  ThreeVector pos(x, y, z);
+
+  // Transform the point from local to global cooridinates (used to bring in offsets)
+  ThreeVector global_pos = TransformPositionToGlobal(pos, tracker); 
+
+  // The gradients remain the same, except the dy/dz gradient in TkUS which flips
+  if (tracker == 0) {
+    gmzy = - mzy;
+  } else {
+    gmzy = mzy;
+  }
+
+  // Calculate the rest of the parameters in the global system
+  gmzx = mzx;
+  gx0 = global_pos.x() - gmzx*global_pos.z();
+  gy0 = global_pos.y() - gmzy*global_pos.z();
+
+  // Return the result as a vector
+  std::vector<double> global_params{gx0, gmzx, gy0, gmzy};
+  return global_params;
+  
+}
 
 } // ~namespace MAUS

@@ -97,6 +97,8 @@ class Tracker:
         # Pat Rec track fits
         self.straight_xz_fits = []
         self.straight_yz_fits = []
+        self.straight_global_xz_fits = []
+        self.straight_global_yz_fits = []
         self.helix_xy_fits = []
         self.helix_xz_fits = []
         self.helix_yz_fits = []
@@ -145,16 +147,25 @@ class Tracker:
                 mx = trk.get_mx()
                 y0 = trk.get_y0()
                 my = trk.get_my()
+                gx0 = trk.get_global_x0()
+                gmx = trk.get_global_mx()
+                gy0 = trk.get_global_y0()
+                gmy = trk.get_global_my()
+
+                self.straight_xz_fits.append(self.make_line(mx, x0, 0, 1200))
+                self.straight_yz_fits.append(self.make_line(my, y0, 0, 1200))
+                zmin = 12800
+                zmax = 22000
                 if trker_num == 0:
-                    self.straight_xz_fits.append(self.make_line(mx, x0, \
-                                                                 0, 1200))
-                    self.straight_yz_fits.append(self.make_line(my, y0, \
-                                                                 0, 1200))
+                    zmin = 12800
+                    zmax = 15200
                 else:
-                    self.straight_xz_fits.append(self.make_line(mx, x0, \
-                                                                 0, 1200))
-                    self.straight_yz_fits.append(self.make_line(my, y0, \
-                                                                 0, 1200))
+                    zmin = 18800
+                    zmax = 21200
+                self.straight_global_xz_fits.append(
+                  self.make_line(gmx, gx0, zmin, zmax))
+                self.straight_global_yz_fits.append(
+                  self.make_line(gmy, gy0, zmin, zmax))
                 # Pull out the coords of each seed spacepoint
                 x_per_trk = array.array('d')
                 y_per_trk = array.array('d')

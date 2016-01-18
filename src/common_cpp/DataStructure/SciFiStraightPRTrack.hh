@@ -58,14 +58,26 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     /** Get the x position of the track at z=0 */
     double get_x0() const { return _x0; }
 
+    /** Get the global x position of the track at z=0 */
+    double get_global_x0() const { return _global_x0; }
+
     /** Set the x position of the track at z=0 */
     void set_x0(double x0) { _x0 = x0; }
+
+    /** Set the global x position of the track at z=0 */
+    void set_global_x0(double global_x0) { _global_x0 = global_x0; }
 
     /** Get the gradient of the line in x-z */
     double get_mx() const { return _mx; }
 
+    /** Get the gradient of the line in global x-z */
+    double get_global_mx() const { return _global_mx; }
+
     /** Set the gradient of the line in x-z */
     void set_mx(double mx) { _mx = mx; }
+
+    /** Set the gradient of the line in global x-z */
+    void set_global_mx(double global_mx) { _global_mx = global_mx; }
 
     /** Get the chi_2 of the line fit in x-z */
     double get_x_chisq() const { return _x_chisq; }
@@ -75,15 +87,27 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
 
     /** Get the y position of the track at z=0 */
     double get_y0() const { return _y0; }
+    
+    /** Get the global y position of the track at z=0 */
+    double get_global_y0() const { return _global_y0; }
 
     /** Set the y position of the track at z=0 */
     void set_y0(double y0) { _y0 = y0; }
 
+    /** Set the global y position of the track at z=0 */
+    void set_global_y0(double global_y0) { _global_y0 = global_y0; }
+
     /** Get the gradient of the line in y-z */
     double get_my() const { return _my; }
+    
+    /** Get the gradient of the line in global y-z */
+    double get_global_my() const { return _global_my; }
 
     /** Set the gradient of the line in y-z */
     void set_my(double my) { _my = my; }
+    
+    /** Set the gradient of the line in global y-z */
+    void set_global_my(double global_my) { _global_my = global_my; }
 
     /** Get the chi_2 of the line fit in y-z */
     double get_y_chisq() const { return _y_chisq; }
@@ -111,6 +135,10 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     double _y0;
     double _my;
     double _y_chisq;
+    double _global_x0;
+    double _global_mx;
+    double _global_y0;
+    double _global_my;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiStraightPRTrack)
 };

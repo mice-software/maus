@@ -233,6 +233,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
       // Pattern Recognition.
       if (_patrec_on && event->spacepoints().size()) {
         _pattern_recognition.process(*event);
+        set_straight_prtrack_global_output(event->straightprtracks());
         extrapolate_helical_reference(*event);
         extrapolate_straight_reference(*event);
       }
@@ -784,21 +785,30 @@ SciFiSpacePointPArray find_spacepoints(SciFiSpacePointPArray spacepoint_array, i
   return found_spacepoints;
 }
 
-void MapCppTrackerRecon::set_spacepoint_global_output(SciFiSpacePointPArray spoints) const {
+void MapCppTrackerRecon::set_spacepoint_global_output(const SciFiSpacePointPArray& spoints) const {
   for (auto sp : spoints) {
-    int tracker_id = sp->get_tracker();
-
-    ThreeVector reference_position = _geometry_helper.GetReferencePosition(tracker_id);
-    CLHEP::HepRotation reference_rotation = _geometry_helper.GetReferenceRotation(tracker_id);
-
-    ThreeVector global_position = sp->get_position();
-    global_position *= reference_rotation;
-    global_position += reference_position;
-
-    sp->set_global_position(global_position);
+    sp->set_global_position(
+      _geometry_helper.TransformPositionToGlobal(sp->get_position(), sp->get_tracker()));
   }
 }
 
+void MapCppTrackerRecon::set_straight_prtrack_global_output(
+  const SciFiStraightPRTrackPArray& trks) const {
+  for (auto trk : trks) {
+    ThreeVector pos = trk->get_spacepoints_pointers()[0]->get_position();
+    std::vector<double> params{trk->get_x0(), trk->get_mx(), trk->get_y0(), trk->get_my()};
+    std::vector<double> global_params =
+      _geometry_helper.TransformStraightParamsToGlobal(params, trk->get_tracker());
+
+    // Update the track
+    trk->set_global_x0(global_params[0]);
+    trk->set_global_mx(global_params[1]);
+    trk->set_global_y0(global_params[2]);
+    trk->set_global_my(global_params[3]);
+    std::cerr << "Global params: " << global_params[0] << " " << global_params[1] << " "
+              << global_params[2] << " " << global_params[3] << "\n";
+  }
+}
 /*
 // Find the plane id of the middle plane for this station
 int plane_id = 0;

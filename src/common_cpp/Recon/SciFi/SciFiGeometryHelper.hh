@@ -174,6 +174,12 @@ class SciFiGeometryHelper {
   double GetDefaultMomentum() const { return _default_momentum; }
 
   void SetDefaultMomentum(double mom) { _default_momentum = mom; }
+  
+  ThreeVector TransformPositionToGlobal(const ThreeVector& pos, int tracker) const;
+  double TransformGradientToGlobal(double gradient, int tracker) const;
+  double TransformInterceptToGlobal(double intercept, int tracker) const;
+  std::vector<double> TransformStraightParamsToGlobal(const std::vector<double>& params,
+                                                      int tracker) const;
 
  private:
   std::vector<const MiceModule*> _modules;
