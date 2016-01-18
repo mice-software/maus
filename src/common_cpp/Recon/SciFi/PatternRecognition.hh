@@ -325,6 +325,8 @@ class PatternRecognition {
     TFile* _rfile;
     TH1D* _hx;
     TH1D* _hy;
+    TH1D* _hxchisq;
+    TH1D* _hychisq;
 };
 
 } // ~namespace MAUS

@@ -77,12 +77,20 @@ PatternRecognition::PatternRecognition(): _up_straight_pr_on(true),
                                           _Pz_min(50.0),
                                           _rfile(NULL),
                                           _hx(NULL),
-                                          _hy(NULL) {
+                                          _hy(NULL),
+                                          _hxchisq(NULL),
+                                          _hychisq(NULL) {
   _rfile = new TFile("pattern_recongition_debug.root", "RECREATE");
   _hx = new TH1D("hx", "Pattern Recongition Road X Residuals", 200, -150, 150);
   _hy = new TH1D("hy", "Pattern Recongition Road Y Residuals", 500, -150, 150);
+  _hxchisq = 
+   new TH1D("hxchisq", "Pattern Recongition Straight Fit x ChiSq", 200, 0, 500);
+  _hychisq = 
+   new TH1D("hychisq", "Pattern Recongition Straight Fit y ChiSq", 200, 0, 500);
   _hx->Write();
   _hy->Write();
+  _hxchisq->Write();
+  _hychisq->Write();
 }
 
 void PatternRecognition::set_parameters_to_default() {
@@ -113,6 +121,8 @@ PatternRecognition::~PatternRecognition() {
   _rfile->cd();
   _hx->Write();
   _hy->Write();
+  _hxchisq->Write();
+  _hychisq->Write();
   // if (_rfile) {
   //  _rfile->Close();
   //  delete _rfile;
@@ -470,10 +480,17 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
             if ( !sp->get_used() ) {
               // Apply roadcuts & find the spoints with the smallest residuals for the line
               double dx = 0, dy = 0;
-              dx = (line_x.get_m() * sp->get_position().z() + line_x.get_c())
-                - sp->get_position().x();
-              dy = (line_y.get_m() * sp->get_position().z() + line_y.get_c())
-                - sp->get_position().y();
+              double cx = line_x.get_c();
+              double mx = line_x.get_m();
+              double cy = line_y.get_c();
+              double my = line_y.get_m();
+              ThreeVector pos = sp->get_position();
+              // Vertical residuals
+              // dx = (mx * pos.z() + cx) - pos.x();
+              // dy = (my * pos.z() + cy) - pos.y();
+              // Perpendicular residuals
+              dx = fabs(pos.x() - (cx + mx*pos.z())) / sqrt(1.0 + mx*mx);
+              dy = fabs(pos.y() - (cy + my*pos.z())) / sqrt(1.0 + my*my);
               if (_hx) _hx->Fill(dx);
               if (_hy) _hy->Fill(dy);
               if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
@@ -534,6 +551,8 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
         std::vector<double> covariance(a1, &a1[16]);
 
         // Check track passes chisq test, then create SciFiStraightPRTrack
+        _hxchisq->Fill(( line_x.get_chisq() / ( n_points - 2 )));
+        _hychisq->Fill(( line_y.get_chisq() / ( n_points - 2 )));
         if ( ( line_x.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) &&
             ( line_y.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) ) {
 
