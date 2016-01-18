@@ -15,13 +15,6 @@
  *
  */
 
-#include "Utils/CppErrorHandler.hh"
-#include "Utils/JsonWrapper.hh"
-#include "Utils/DAQChannelMap.hh"
-#include "Utils/Exception.hh"
-#include "Interface/dataCards.hh"
-#include "API/PyWrapMapBase.hh"
-
 #include "src/map/MapCppEMRPlaneHits/MapCppEMRPlaneHits.hh"
 
 namespace MAUS {
@@ -57,17 +50,17 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
   _number_of_planes = configJSON["EMRnumberOfPlanes"].asInt();
   _number_of_bars = configJSON["EMRnumberOfBars"].asInt();
 
-  _deltat_signal_low = configJSON["EMRdeltatSignalLow"].asInt();
-  _deltat_signal_up = configJSON["EMRdeltatSignalUp"].asInt();
+  _primary_deltat_low = configJSON["EMRprimaryDeltatLow"].asInt();
+  _primary_deltat_up = configJSON["EMRprimaryDeltatUp"].asInt();
+  _secondary_n_low = configJSON["EMRsecondaryNLow"].asInt();
+  _secondary_tot_low = configJSON["EMRsecondaryTotLow"].asInt();
+  _secondary_bunching_width = configJSON["EMRsecondaryBunchingWidth"].asInt();
 
   // Load EMR channel map
-  map_file_name = JsonWrapper::GetProperty(configJSON,
-                                           "EMR_cabling_file",
-                                           JsonWrapper::stringValue);
-
-  std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
-  bool loaded = _emrMap.InitFromFile(xMapFile);
-  if (!loaded)
+  std::string xMapFile = std::string(pMAUS_ROOT_DIR)
+			 + configJSON["EMR_cabling_file"].asString();
+  bool loaded = _emrMap.InitializeFromFile(xMapFile);
+  if ( !loaded )
     throw MAUS::Exception(Exception::recoverable,
                           "Failed to load EMR Channel Map File",
                           "MapCppEMRPlaneHits::birth");
@@ -76,10 +69,10 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
   xEnable_V1731_Unpacking = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_V1731_Unpacking",
                                                      JsonWrapper::booleanValue);
-  if (!xEnable_V1731_Unpacking.asBool()) {
+  if ( !xEnable_V1731_Unpacking.asBool() ) {
     Squeak::mout(Squeak::warning)
     << "WARNING in MapCppEMRPlaneHits::birth. The unpacking of the flashADC V1731 is disabled!!!"
-    << " Are you shure you want this?"
+    << " Are you sure you want this?"
     << std::endl;
   }
 
@@ -87,10 +80,10 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
   xEnable_DBB_Unpacking   = JsonWrapper::GetProperty(configJSON,
                                                      "Enable_DBB_Unpacking",
                                                      JsonWrapper::booleanValue);
-  if (!xEnable_DBB_Unpacking.asBool()) {
+  if ( !xEnable_DBB_Unpacking.asBool() ) {
     Squeak::mout(Squeak::warning)
     << "WARNING in MapCppEMRPlaneHits::birth. The unpacking of the VRBs is disabled!!!"
-    << " Are you shure you want this?"
+    << " Are you sure you want this?"
     << std::endl;
   }
 }
@@ -100,205 +93,265 @@ void MapCppEMRPlaneHits::_death() {
 
 void MapCppEMRPlaneHits::_process(Data *data) const {
 
-  // Get spill, break if there's no DAQ data
-  Spill *spill = data->GetSpill();
+  // Routine data checks before processing it
+  if ( !data )
+      throw Exception(Exception::recoverable, "Data was NULL",
+                      "MapCppEMRPlaneHits::_process");
 
-  if (spill->GetDAQData() == NULL)
+  Spill* spill = data->GetSpill();
+  if ( !spill )
+      throw Exception(Exception::recoverable, "Spill was NULL",
+                      "MapCppEMRPlaneHits::_process");
+
+  if ( spill->GetDaqEventType() != "physics_event" )
       return;
 
-  EMRDaq emr_data = spill->GetDAQData()->GetEMRDaq();
-  int nPartEvents = emr_data.GetV1731NumPartEvents();
+  DAQData* daqData = spill->GetDAQData();
+  if ( !daqData )
+      throw Exception(Exception::recoverable, "DAQData was NULL",
+                      "MapCppEMRPlaneHits::_process");
 
-  // Check the Recon event array and EMR Spill Data are initialised, and if not make it so
-  if (!spill->GetReconEvents()) {
-    ReconEventPArray* recEvts = new ReconEventPArray();
-    spill->SetReconEvents(recEvts);
-  }
-  if (!spill->GetEMRSpillData()) {
-    EMRSpillData* emrData = new EMRSpillData();
-    spill->SetEMRSpillData(emrData);
-  }
+  EMRDaq emrDaq = daqData->GetEMRDaq();
+  size_t nPartEvents = emrDaq.GetV1731NumPartEvents();
+  if ( !nPartEvents )
+      return;
 
-  // Create DBB and fADC arrays with n+1 events (1 per trigger + spill data)
-  EMRDBBEventVector emr_dbb_events_tmp = get_dbb_data_tmp(nPartEvents + 1);
-  EMRfADCEventVector emr_fadc_events_tmp = get_fadc_data_tmp(nPartEvents + 1);
+  // Check the Recon event array and EMR Spill Data are initialised. If not, make it so
+  if ( !spill->GetReconEvents() )
+      spill->SetReconEvents(new ReconEventPArray());
 
-  // Fill the fADC, DBB and spill array with DAQ information
-  processDBB(emr_data, nPartEvents, emr_dbb_events_tmp, emr_fadc_events_tmp);
-  processFADC(emr_data, nPartEvents, emr_fadc_events_tmp);
+  if ( !spill->GetEMRSpillData() )
+      spill->SetEMRSpillData(new EMRSpillData());
 
-  // Fill the Recon event array with Spill information (1 per trigger + decays)
-  fill(spill, nPartEvents, emr_dbb_events_tmp, emr_fadc_events_tmp);
+  // Create a temporary array of n plane hit arrays (1 per trigger) and a temporary array of bars
+  EMREventPlaneHitVector emr_events_tmp = get_emr_events_tmp(nPartEvents);	// EMREvents
+  EMRBarHitArray emr_bar_hits_tmp;						// EMRSpillData
+
+  // Fill the temporary arrays with the DAQ information
+  process_DBB(emrDaq, emr_events_tmp, emr_bar_hits_tmp, nPartEvents);
+  process_fADC(emrDaq, emr_events_tmp, nPartEvents);
+
+  // Create a temporary array to harbour n' plane hit arrays (1 per daughter candiate)
+  EMREventPlaneHitVector emr_candidates_tmp;
+
+  // Process the secondary hits and merge them timewise into daughter candidates
+  process_candidates(emr_bar_hits_tmp, emr_candidates_tmp);
+  emr_events_tmp.insert(emr_events_tmp.end(),
+			emr_candidates_tmp.begin(), emr_candidates_tmp.end());
+
+  // Fill the Recon event array with spill information (1 per trigger + daughter candidates)
+  fill(spill, emr_events_tmp, nPartEvents);
 }
 
-void MapCppEMRPlaneHits::processDBB(MAUS::EMRDaq EMRdaq,
-				    int nPartEvents,
-				    EMRDBBEventVector& emr_dbb_events_tmp,
-				    EMRfADCEventVector& emr_fadc_events_tmp) const {
-//  std::cerr << "DBBArraySize: " << EMRdaq.GetDBBArraySize() << std::endl;
-  int nDBBs = EMRdaq.GetDBBArraySize();
-  for (int idbb = 0; idbb < nDBBs; idbb++) {
+void MapCppEMRPlaneHits::process_DBB(MAUS::EMRDaq EMRdaq,
+		  		    EMREventPlaneHitVector& emr_events_tmp,
+				    EMRBarHitArray& emr_bar_hits_tmp,
+		  	 	    size_t nPartEvents) const {
 
-    DBBSpillData dbb = EMRdaq.GetDBBArrayElement(idbb);
-    if ( dbb.GetTriggerCount() != nPartEvents ) {
+//  std::cerr << "DBBArraySize: " << EMRdaq.GetDBBArraySize() << std::endl;
+  for (size_t iDBB = 0; iDBB < EMRdaq.GetDBBArraySize(); iDBB++) {
+    DBBSpillData dbb = EMRdaq.GetDBBArrayElement(iDBB);
+
+    if ( static_cast<size_t>(dbb.GetTriggerCount()) != nPartEvents ) {
       Squeak::mout(Squeak::error)
-      << "ERROR in  MapCppEMRPlaneHits::processDBB: number of triggers mismatch ("
+      << "ERROR in  MapCppEMRPlaneHits::process_DBB: number of triggers mismatch ("
       << dbb.GetTriggerCount() << "!=" << nPartEvents << ")" << std::endl;
       return;
     }
 
     int xLDC    = dbb.GetLdcId();
-    int xSpill  = dbb.GetSpillNumber();
     int xGeo    = dbb.GetDBBId();
-    int nHits   = dbb.GetDBBHitsArraySize();
-//    int nTr     = dbb.GetDBBTriggersArraySize();
+    size_t nHits   = dbb.GetDBBHitsArraySize();
 
-    for (int iHit = 0; iHit < nHits; iHit++) {
+    for (size_t iHit = 0; iHit < nHits; iHit++) {
       DBBHit this_hit = dbb.GetDBBHitsArrayElement(iHit);
       int xCh = this_hit.GetChannel();
-      int lt  = this_hit.GetLTime();
-      int tt  = this_hit.GetTTime();
 
-      DAQChannelKey daq_key(xLDC, xGeo, xCh, 141, "emr");
-//      std::cerr << daq_key << endl;
-      EMRChannelKey *emr_key = _emrMap.find(&daq_key);
-      if (emr_key) {
-        int xPlane = emr_key->plane();
-//        int xOri   = emr_key->orientation();
-        int xBar   = emr_key->bar();
-//        std::cerr << *emr_key << " --> lt: " << lt << "  tt: " << tt << endl;
+      DAQChannelKey daqKey(xLDC, xGeo, xCh, 141, "emr");
+//      std::cerr << daqKey << std::endl;
+
+      EMRChannelKey *emrKey = _emrMap.Find(&daqKey);
+      if ( emrKey ) {
+
+        int xPlane = emrKey->GetPlane();
+        int xBar   = emrKey->GetBar();
+        int xLTime  = this_hit.GetLTime();
+        int xTTime  = this_hit.GetTTime();
+        int xTot = xTTime - xLTime;
+//        std::cerr << *emrKey << " --> xLTime: " << xLTime
+//                             << "  xTTime: " << xTTime << std::endl;
 
 	// Loop over the trigger and try to associate the hit to one of them
 	bool matched = false;
-        for (int iPe = 0; iPe < nPartEvents; iPe++) {
+        for (size_t iPe = 0; iPe < nPartEvents; iPe++) {
           DBBHit this_trigger = dbb.GetDBBTriggersArrayElement(iPe);
           int tr_lt = this_trigger.GetLTime();
-//           int tr_tt = this_trigger.GetTTime();
-//           int xCh   = this_trigger.GetChannel();
+//          int tr_tt = this_trigger.GetTTime();
+//          int xCh   = this_trigger.GetChannel();
 
-          if (iHit == 0) { // Set the spill/trigger only when processing the very first hit
-            emr_fadc_events_tmp[iPe][xPlane]._time  = tr_lt;
-            emr_fadc_events_tmp[iPe][xPlane]._spill = xSpill;
-          }
+          if ( !iHit ) // Set the fADC time only when processing the first hit
+            emr_events_tmp[iPe][xPlane]._time  = tr_lt;
 
-          int xDeltaT = lt - tr_lt;
-          int xTot = tt - lt;
+          int xDeltaT = xLTime - tr_lt;
 
 	  // Set bar hit
           EMRBarHit bHit;
+	  bHit.SetChannel(xPlane*_number_of_bars+xBar);
           bHit.SetTot(xTot);
-	  bHit.SetHitTime(lt);
+	  bHit.SetTime(xLTime);
 
 	  // Discriminate primary hits (close to the trigger) from the rest
-          if (xDeltaT > _deltat_signal_low && xDeltaT < _deltat_signal_up) {
-              bHit.SetDeltaT(xDeltaT - _deltat_signal_low);
-//              std::cerr << "*---> " << *emr_key << " --> trigger_Id: " << iPe
-//            	        << "  xTot: " << xTot
-//            	        << "  xDeltaT: " << xDeltaT - _deltat_signal_low
-//            	        << "(" << xDeltaT << ")" << std::endl;
-            emr_dbb_events_tmp[iPe][xPlane][xBar].push_back(bHit);
+          if ( xDeltaT > _primary_deltat_low && xDeltaT < _primary_deltat_up ) {
+            bHit.SetDeltaT(xDeltaT - _primary_deltat_low);
+            emr_events_tmp[iPe][xPlane]._barhits.push_back(bHit);
 	    matched = true;
-          } else if (iPe == nPartEvents-1 && !matched) {
+//            std::cerr << "*---> " << *emrKey << " --> trigger_Id: " << iPe
+//            	        << "  xTot: " << xTot
+//            	        << "  xDeltaT: " << xDeltaT - _primary_deltat_low
+//            	        << "(" << xDeltaT << ")" << std::endl;
+          } else if ( iPe == nPartEvents-1 && !matched ) {
             bHit.SetDeltaT(0);
-	    emr_dbb_events_tmp[nPartEvents][xPlane][xBar].push_back(bHit);
+	    if ( xTot > _secondary_tot_low )
+	    	emr_bar_hits_tmp.push_back(bHit);
 	  }
         }
-      } // else {std::cerr << "WARNING!!! unknow EMR DBB channel " << daq_key << std::endl;}
+      }
     }
   }
 }
 
-void MapCppEMRPlaneHits::processFADC(MAUS::EMRDaq EMRdaq,
-				     int nPartEvents,
-				     EMRfADCEventVector& emr_fadc_events_tmp) const {
-//  std::cerr << "GetV1731NumPartEvents: " << EMRdaq.GetV1731NumPartEvents() << std::endl;
+void MapCppEMRPlaneHits::process_fADC(MAUS::EMRDaq EMRdaq,
+		  		      EMREventPlaneHitVector& emr_events_tmp,
+		  		      size_t nPartEvents) const {
 
-  for (int iPe = 0; iPe < nPartEvents; iPe++) {
+//  std::cerr << "GetV1731NumPartEvents: " << EMRdaq.GetV1731NumPartEvents() << std::endl;
+  for (size_t iPe = 0; iPe < nPartEvents; iPe++) {
 
     V1731HitArray fADChits = EMRdaq.GetV1731PartEvent(iPe);
-    int nHits = fADChits.size();
+    size_t nHits = fADChits.size();
 //    std::cerr << "PartEvent " << iPe << "  --> " << nHits << " hits\n" << std::endl;
 
-    for (int iHit = 0; iHit < nHits; iHit++) {
+    for (size_t iHit = 0; iHit < nHits; iHit++) {
       V1731 fADChit = fADChits[iHit];
       int xLDC  = fADChit.GetLdcId();
       int xGeo  = fADChit.GetGeo();
       int xCh   = fADChit.GetChannel();
-      int xArea = fADChit.GetPulseArea();
-      int xPos  = fADChit.GetPositionMin();
       int xEqType = fADChit.GetEquipType();
 
-      DAQChannelKey daq_key(xLDC, xGeo, xCh, xEqType, "emr");
-//      std::cerr << daq_key << std::endl;
-      EMRChannelKey *emr_key = _emrMap.find(&daq_key);
-      if (emr_key) {
-        int xPlane = emr_key->plane();
-        int xOri   = emr_key->orientation();
-//        std::cerr << iPe << "  " << *emr_key << " --> pos: "
+      DAQChannelKey daqKey(xLDC, xGeo, xCh, xEqType, "emr");
+//      std::cerr << daqKey << std::endl;
+      EMRChannelKey *emrKey = _emrMap.Find(&daqKey);
+      if ( emrKey ) {
+        int xPlane = emrKey->GetPlane();
+        int xOri   = emrKey->GetOrientation();
+        int xArea = fADChit.GetPulseArea();
+        int xPos  = fADChit.GetPositionMin();
+        std::vector<int> xSamples = fADChit.GetSampleArray();
+//        std::cerr << iPe << "  " << *emrKey << " --> pos: "
 //                  << xPos << "  area: " << xArea << std::endl;
-        emr_fadc_events_tmp[iPe][xPlane]._orientation  = xOri;
-        emr_fadc_events_tmp[iPe][xPlane]._charge       = xArea;
-        emr_fadc_events_tmp[iPe][xPlane]._deltat       = xPos;
-      }// else {std::cerr << "WARNING!!! unknow EMR fADC channel " << daq_key << std::endl;}
+        emr_events_tmp[iPe][xPlane]._orientation  = xOri;
+        emr_events_tmp[iPe][xPlane]._charge       = xArea;
+        emr_events_tmp[iPe][xPlane]._deltat       = xPos;
+        emr_events_tmp[iPe][xPlane]._samples      = xSamples;
+      }
+    }
+  }
+}
+
+void MapCppEMRPlaneHits::process_candidates(EMRBarHitArray emr_bar_hits_tmp,
+					    EMREventPlaneHitVector& emr_candidates_tmp) const {
+
+  // Sort the vector in ascending order of hit time (lambda sorting function)
+  sort(emr_bar_hits_tmp.begin(), emr_bar_hits_tmp.end(),
+       [] (const EMRBarHit& a, const EMRBarHit& b) {
+	   return a.GetTime() < b.GetTime();
+       });
+
+  // Find groups of hits defined by the secondary bunching width
+  std::vector<EMRBarHitArray> barHitGroupVector;
+  EMRBarHitArray barHitGroup;
+  int xHitTime = 0;
+
+  for (size_t iHit = 1; iHit < emr_bar_hits_tmp.size()+1; iHit++) {
+
+    int xDeltaT = _secondary_bunching_width + 1;
+    if ( !xHitTime ) xHitTime = emr_bar_hits_tmp[iHit-1].GetTime();
+    if (iHit < emr_bar_hits_tmp.size()) xDeltaT = emr_bar_hits_tmp[iHit].GetTime() - xHitTime;
+
+    if (xDeltaT > _secondary_bunching_width) {
+      barHitGroup.push_back(emr_bar_hits_tmp[iHit-1]);
+      if (barHitGroup.size() >= _secondary_n_low) {
+        barHitGroupVector.push_back(barHitGroup);
+      }
+      barHitGroup.resize(0);
+      xHitTime = 0;
+    } else {
+      barHitGroup.push_back(emr_bar_hits_tmp[iHit-1]);
+    }
+  }
+  size_t nSeconPartEvents = barHitGroupVector.size();
+
+  // Resize the event array to accomodate one extra event per secondary track (n')
+  emr_candidates_tmp = get_emr_events_tmp(nSeconPartEvents);
+
+  // Associate each barHitGroup to a secondary trigger (daughter candidate)
+  for (size_t iGroup = 0; iGroup < nSeconPartEvents; iGroup++) {
+    EMRBarHitArray barHitArray = barHitGroupVector[iGroup];
+    for (size_t iHit = 0; iHit < barHitArray.size(); iHit++) {
+      int xPlane = barHitArray[iHit].GetChannel()/_number_of_bars;
+      emr_candidates_tmp[iGroup][xPlane]._barhits.push_back(barHitArray[iHit]);
     }
   }
 }
 
 void MapCppEMRPlaneHits::fill(MAUS::Spill *spill,
-			      int nPartEvents,
-			      EMRDBBEventVector emr_dbb_events_tmp,
-			      EMRfADCEventVector emr_fadc_events_tmp) const {
+		  	      EMREventPlaneHitVector emr_events_tmp,
+		  	      size_t nPartEvents) const {
 
-  // Set the EMR recon events and the spill data
+  // Get the EMR recon events and the spill data
   ReconEventPArray *recEvts =  spill->GetReconEvents();
-  EMRSpillData *emrData = spill->GetEMRSpillData();
+  EMRSpillData *emrSpill = spill->GetEMRSpillData();
 
-  for (int iPe = 0; iPe < nPartEvents + 1; iPe++) {
-    EMREvent *evt = new EMREvent;
+  for (size_t iPe = 0; iPe < emr_events_tmp.size(); iPe++) {
+
+    EMREventTrack* evtTrack = new EMREventTrack;
+
     EMRPlaneHitArray plArray;
+    for (size_t iPlane = 0; iPlane < _number_of_planes; iPlane++) {
 
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
       EMRPlaneHit *plHit = new EMRPlaneHit;
+      EMRBarHitArray barHitArray = emr_events_tmp[iPe][iPlane]._barhits;
+
       plHit->SetPlane(iPlane);
-      plHit->SetTrigger(iPe);
-      fADCdata xPlData = emr_fadc_events_tmp[iPe][iPlane];
-      int xOri     = xPlData._orientation;
-      int xCharge  = xPlData._charge;
-      int xTime    = xPlData._time;
-      int xSpill   = xPlData._spill;
-      int xDeltaT  = xPlData._deltat;
-      plHit->SetOrientation(xOri);
-      plHit->SetCharge(xCharge);
-      plHit->SetTime(xTime);
-      plHit->SetSpill(xSpill);
-      plHit->SetDeltaT(xDeltaT);
-      EMRBarArray barArray;
+      plHit->SetEMRBarHitArray(barHitArray);
+      plHit->SetOrientation(emr_events_tmp[iPe][iPlane]._orientation);
+      plHit->SetTime(emr_events_tmp[iPe][iPlane]._time);
+      plHit->SetDeltaT(emr_events_tmp[iPe][iPlane]._deltat);
+      plHit->SetCharge(emr_events_tmp[iPe][iPlane]._charge);
+      plHit->SetSampleArray(emr_events_tmp[iPe][iPlane]._samples);
 
-      for (int iBar = 0; iBar < _number_of_bars; iBar++) {
-        int nHits = emr_dbb_events_tmp[iPe][iPlane][iBar].size();
-        if ( nHits ) {
-          EMRBar *bar = new EMRBar;
-          bar->SetBar(iBar);
-          bar->SetEMRBarHitArray(emr_dbb_events_tmp[iPe][iPlane][iBar]);
-          barArray.push_back(bar);
-//          std::cerr << "Ev: " << iPe << "  Pl: " << iPlane
-//                    << "   Bar: " << iBar << "  Hits: " <<  nHits << std::endl;
-        }
-      }
-
-      plHit->SetEMRBarArray(barArray);
-      if ( barArray.size() || xCharge ) {
+      if ( barHitArray.size() || plHit->GetCharge() > 0 ) {
         plArray.push_back(plHit);
+	for ( size_t iHit = 0; iHit < barHitArray.size(); iHit++ )
+	  emrSpill->AddEMRBarHit(barHitArray[iHit]);
       } else {
         delete plHit;
       }
     }
+    evtTrack->SetEMRPlaneHitArray(plArray);
 
-    if (iPe < nPartEvents) {
-      evt->SetEMRPlaneHitArray(plArray);
+    if ( iPe < nPartEvents ) {
+      evtTrack->SetType("mother");
+      evtTrack->SetTrackId(0);
+      EMREvent* evt = new EMREvent;
+      if ( plArray.size() ) {
+        evt->AddEMREventTrack(evtTrack);
+      } else {
+	delete evtTrack;
+      }
 
-      int nRecEvents = spill->GetReconEventSize();
-      if (nRecEvents > iPe) {
+      size_t nRecEvents = spill->GetReconEventSize();
+      if ( nRecEvents > iPe ) {
         recEvts->at(iPe)->SetEMREvent(evt);
       } else {
         ReconEvent *recEvt = new ReconEvent;
@@ -307,41 +360,34 @@ void MapCppEMRPlaneHits::fill(MAUS::Spill *spill,
         recEvts->push_back(recEvt);
       }
     } else {
-      emrData->SetEMRPlaneHitArray(plArray);
+      evtTrack->SetType("candidate");
+      evtTrack->SetTrackId(iPe-nPartEvents);
+      emrSpill->AddEMREventTrack(evtTrack);
     }
   }
 
   spill->SetReconEvents(recEvts);
-  spill->SetEMRSpillData(emrData);
+  spill->SetEMRSpillData(emrSpill);
 }
 
-EMRDBBEventVector MapCppEMRPlaneHits::get_dbb_data_tmp(int nPartEvts) const {
-  EMRDBBEventVector emr_dbb_events_tmp;
-  emr_dbb_events_tmp.resize(nPartEvts);
-  for (int iPe = 0; iPe < nPartEvts; iPe++) {
-    emr_dbb_events_tmp[iPe].resize(_number_of_planes);  // number of planes
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      emr_dbb_events_tmp[iPe][iPlane].resize(_number_of_bars); // number of bars in a plane
-    }
-  }
-  return emr_dbb_events_tmp;
-}
-
-EMRfADCEventVector MapCppEMRPlaneHits::get_fadc_data_tmp(int nPartEvts) const {
-  EMRfADCEventVector emr_fadc_events_tmp;
-  emr_fadc_events_tmp.resize(nPartEvts);
-  for (int iPe = 0; iPe < nPartEvts ;iPe++) {
-    emr_fadc_events_tmp[iPe].resize(_number_of_planes);  // number of planes
-    for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-      fADCdata data;
+EMREventPlaneHitVector MapCppEMRPlaneHits::get_emr_events_tmp(size_t nPartEvts) const {
+  EMREventPlaneHitVector emr_events_tmp;
+  emr_events_tmp.resize(nPartEvts);
+  for (size_t iPe = 0; iPe < nPartEvts; iPe++) {
+    emr_events_tmp[iPe].resize(_number_of_planes);  // number of planes
+    for (size_t iPlane = 0; iPlane < _number_of_planes; iPlane++) {
+      EMRPlaneHitTmp data;
+      EMRBarHitVector barhits;
+      std::vector<int> xSamples;
+      data._barhits = barhits;
       data._orientation = iPlane%2;
-      data._charge = 0;
-      data._time = 0;
-      data._deltat = 0;
-      data._spill = 0;
-      emr_fadc_events_tmp[iPe][iPlane] = data;
+      data._time = -1;
+      data._deltat = -1;
+      data._charge = -1;
+      data._samples = xSamples;
+      emr_events_tmp[iPe][iPlane] = data;
     }
   }
-  return emr_fadc_events_tmp;
+  return emr_events_tmp;
 }
-}
+} // namespace MAUS

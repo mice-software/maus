@@ -14,10 +14,10 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
+#include "JsonCppProcessors/PrimitivesProcessors.hh"
+#include "JsonCppProcessors/ObjectProcessor.hh"
 
-#include "src/common_cpp/DataStructure/EMRChannelId.hh"
+#include "DataStructure/EMRChannelId.hh"
 
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRCHANNELIDPROCESSOR_HH_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRCHANNELIDPROCESSOR_HH_
@@ -33,8 +33,6 @@ class EMRChannelIdProcessor : public ObjectProcessor<EMRChannelId> {
  private:
     IntProcessor _int_proc;
 };
-}
+} // namespace MAUS
 
-#endif
-
-
+#endif // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRCHANNELIDPROCESSOR_HH_

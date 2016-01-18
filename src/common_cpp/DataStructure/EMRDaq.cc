@@ -81,5 +81,4 @@ size_t EMRDaq::GetDBBArraySize() const {
 void EMRDaq::SetDBBArray(DBBArray s) {
   _dbb = s;
 }
-}
-
+} // namespace MAUS

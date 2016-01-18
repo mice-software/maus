@@ -15,34 +15,29 @@
  *
  */
 
-#ifndef _MAUS_EMRCALIBRATIONMAP_HH_
-#define _MAUS_EMRCALIBRATIONMAP_HH_
+#ifndef _SRC_COMMON_CPP_UTILS_EMRCALIBRATIONMAP_HH_
+#define _SRC_COMMON_CPP_UTILS_EMRCALIBRATIONMAP_HH_
 
-
+// C++ headers
 #include <Python.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <iostream>
-#include <sstream>
-#include <fstream>
-#include <iterator>
 #include <algorithm>
-#include <cctype>
 #include <functional>
 
+// MAUS headers
 #include "json/json.h"
 #include "Utils/EMRChannelMap.hh"
 #include "Utils/Exception.hh"
+#include "Utils/JsonWrapper.hh"
 #include "Interface/Squeak.hh"
-#include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
 
-/** Complete map of all calibration constants needed in order to reconstruct the energy
- * measured by the EMR detector. This class is used to hold and manage calibration 
- * constants and to calculate the calibration corrections.
+/** @class Complete map of all calibration constants needed in order to reconstruct the energy
+ * 	   measured by the EMR detector. This class is used to hold and manage calibration 
+ * 	   constants and to calculate the calibration corrections.
  */
 
 class EMRCalibrationMap {
@@ -51,107 +46,110 @@ class EMRCalibrationMap {
   EMRCalibrationMap();
   virtual ~EMRCalibrationMap();
 
- /** Initialize the calibration map by using the text files provided in 
-  * ConfigurationDefaults.py
-  * \returns true if the text file is loaded successfully.
+ /** @brief Initialize the calibration map by using the text files
+  *         provided in ConfigurationDefaults.py
+  *
+  *  \returns 	true if the text file is loaded successfully.
   */
   bool InitializeFromCards(Json::Value configJSON);
 
-  /// Get calibrations from CDB
+ /** @brief Initialize the calibration map by using the CDB configuration
+  *
+  *  \returns 	true if the text file is loaded successfully.
+  */
   bool InitializeFromCDB();
 
- /** Initialize the map by using the provided text files.
-  * \param[in] calibFile name of the text file containing the energy calibration constants.
-  * \returns true if the text file is loaded successfully.
+ /** @brief Initialize the map by using the provided text files.
+  *
+  *  \param[in] calibFile	name of the text file containing the energy calibration constants.
+  *  \returns 			true if the text file is loaded successfully.
   */
   bool Initialize(std::string calibFile);
 
- /** Returns the energy correction for the channel coded by the key.
-  * \param[in] key the channel of the measurement.
-  * \param[in] pmt the type of photomultiplier in question.
-  * The photomultiplier type can either be "SA" or "MA"
-  * \returns the value of the eps correction for this channel. If no calibration 
-  * for this channel the function returns NOCALIB (-99999).
+ /** @brief Returns the energy correction for the channel coded by the key.
+  *
+  *  \param[in] key 	channel of the measurement.
+  *  \param[in] pmt 	type of photomultiplier in question ("MA", "SA").
+  *  \returns 		the value of the eps correction for this channel. If no calibration
+  * 	      		for this channel the function returns NOCALIB (-99999).
   */
   double Eps(EMRChannelKey key, const char *pmt) const;
 
- /** Print the calibration map;
-  * To be used only for debugging.
+ /** @brief Print the calibration map (debugging)
   */
   void Print();
 
- /** Import the get_emr_calib module which accesses and gets calibrations from the CDB
+ /** @brief Import the get_emr_calib module which accesses and gets calibrations from the CDB
   */
   bool InitializePyMod();
 
+ /** @brief This value is returned when the correction can not be found.
+  */
   enum {
-   /** This value is returned when the correction can not be calculated.
-    */
     NOCALIB = -99999
   };
 
  private:
 
-  /** Use this function to reset the map before reloading. */
+ /** @brief Use this function to reset the map before reloading.
+  */
   void reset();
 
- /** Make one EMRChannelKey for each channel of the detector.
-  * All EMRChannelKeys are held in the data member _Ckey.
+ /** @brief Make one EMRChannelKey for each channel of the detector.
+  *         All EMRChannelKeys are held in the data member _Ckey.
   */
   int MakeEMRChannelKeys();
 
- /** Find the position of the channel key in the data member _Ckey.
+ /** @brief Find the position of the channel key in the data member _Ckey.
   */
   int FindEMRChannelKey(EMRChannelKey key) const;
 
- /** Load calibration constants from text file.
+ /** @brief Load calibration constants from text file.
   */
   bool Load(std::string calibFile);
 
- /** Load calibration constants from the CDB.
+ /** @brief Load calibration constants from the CDB.
   */
   bool LoadFromCDB();
 
- /** Fetch the calibration string in the CDB
+ /** @brief Fetch the calibration string in the CDB
   */
   void GetCalib(std::string devname, std::string caltype, std::string fromdate);
 
- /** This vector holds one EMRChannelKey for each channel of the detector.
+ /** @brief This vector holds one EMRChannelKey for each channel of the detector.
   */
   std::vector<EMRChannelKey> _Ckey;
 
- /** These vectors hold the calibration constants. IMPORTANT - the order of the entries here is
-  * the same as the order of the entries in _Ckey. 
-  * This is used when the constants are read.
-  * MA = Multi-Anode PMT, SA = Single-Anode PMT
+ /** @brief These vectors hold the calibration constants. IMPORTANT - the order of the entries here is
+  * 	    the same as the order of the entries in _Ckey. 
+  * 	    This is used when the constants are read.
+  * 	    MA = Multi-Anode PMT, SA = Single-Anode PMT
   */
   std::vector<double> _eps_MA;
   std::vector<double> _eps_SA;
 
- /** EMR characteristics
+ /** @brief EMR characteristics
   */
   int _number_of_planes;
   int _number_of_bars;
 
- /** Choice of 'figure of merit'
+ /** @brief Choice of 'figure of merit'
   */
   std::string _fom;
 
- /** CDB calibration validity start data
+ /** @brief CDB calibration validity start data
   */
   std::string _calibDate;
 
- /** CDB string that harbours the calibration constants
+ /** @brief CDB string that harbours the calibration constants
   */
   std::stringstream epsstr;
 
- /** Python function to fetch the calibration string
+ /** @brief Python function to fetch the calibration string
   */
   bool pymod_ok;
   PyObject* _get_calib_func;
 };
-}
+} // namespace MAUS
 
-#endif
-
-
+#endif // #define _SRC_COMMON_CPP_UTILS_EMRCALIBRATIONMAP_HH_

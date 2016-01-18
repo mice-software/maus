@@ -35,13 +35,6 @@
 #include "DataStructure/ImageData/ImageData.hh"
 #include "DataStructure/ImageData/Image.hh"
 #include "DataStructure/ImageData/CanvasWrapper.hh"
-#include "DataStructure/Data.hh"
-#include "DataStructure/Spill.hh"
-#include "DataStructure/ReconEvent.hh"
-#include "DataStructure/EMREvent.hh"
-#include "DataStructure/EMRPlaneHit.hh"
-#include "DataStructure/EMRBar.hh"
-#include "DataStructure/EMRBarHit.hh"
 #include "Utils/TH2EMR.hh"
 
 namespace MAUS {

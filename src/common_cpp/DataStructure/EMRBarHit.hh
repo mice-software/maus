@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRBARHIT_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRBARHIT_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRBARHIT_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRBARHIT_HH_
 
 #include "Utils/VersionNumber.hh"
 
@@ -23,134 +23,58 @@ namespace MAUS {
 
 /** @class EMRBarHit comment
  *
- *  @var tot  <-- time over threshold measurement-->
- *  @var deltat  <-- time of a hit minus trigger hit time measured by DBB -->
+ *  @var ch	<-- DBB channel of the hit / 2880 elements (2832 bars, 48 test ch.) -->
+ *  @var tot	<-- time over threshold measurement -->
+ *  @var time	<-- trigger time w.r.t. start of the spill recorded by DBB -->
+ *  @var deltat	<-- time of a hit in the DBB minus trigger hit time measured by fADC -->
  */
 
 class EMRBarHit {
-  public:
-    /** Default constructor - initialises to 0/NULL */
-    EMRBarHit();
+ public:
+  /** @brief Default constructor - initialises to 0/NULL */
+  EMRBarHit();
 
-    /** Copy constructor - any pointers are deep copied */
-    EMRBarHit(const EMRBarHit& _emrbarhit);
+  /** @brief Copy constructor - any pointers are deep copied */
+  EMRBarHit(const EMRBarHit& _emrbh);
 
-    /** Equality operator - any pointers are deep copied */
-    EMRBarHit& operator=(const EMRBarHit& _emrbarhit);
+  /** @brief Equality operator - any pointers are deep copied */
+  EMRBarHit& operator=(const EMRBarHit& _emrbh);
 
-    /** Destructor - any member pointers are deleted */
-    virtual ~EMRBarHit();
+  /** @brief Destructor - any member pointers are deleted */
+  virtual ~EMRBarHit();
 
-    /** Returns Time Over Threshold */
-    int GetTot() const;
+  /** @brief Returns the global bar ID */
+  int GetChannel() const     { return _ch; }
 
-    /** Sets Time Over Threshold */
-    void SetTot(int tot);
+  /** @brief Sets the global bar ID */
+  void SetChannel(int ch)    { _ch = ch; }
 
-    /** Returns time from closest trigger */
-    int GetDeltaT() const;
+  /** @brief Returns the time-over-threshold */
+  int GetTot() const         { return _tot; }
 
-    /** Sets time from closest trigger */
-    void SetDeltaT(int deltat);
+  /** @brief Sets time-over-threshold */
+  void SetTot(int tot)       { _tot = tot; }
 
-    /** Returns hit time */
-    int GetHitTime() const;
+  /** @brief Returns the global time with respect to the spill */
+  int GetTime() const        { return _time; }
 
-    /** Sets hit time */
-    void SetHitTime(int hittime);
+  /** @brief Sets the global time with respect to the spill */
+  void SetTime(int time)     { _time = time; }
 
-    /** Returns X coordinate */
-    double GetX() const;
+  /** @brief Returns the time with respect to the trigger time */
+  int GetDeltaT() const      { return _deltat; }
 
-    /** Sets X coordinate */
-    void SetX(double x);
+  /** @brief Sets the time with respect to the trigger time */
+  void SetDeltaT(int deltat) { _deltat = deltat; }
 
-    /** Returns Y coordinate */
-    double GetY() const;
+ private:
+  int	_ch;
+  int	_tot;
+  int	_time;
+  int	_deltat;
 
-    /** Sets Y coordinate */
-    void SetY(double y);
-
-    /** Returns Z coordinate */
-    double GetZ() const;
-
-    /** Sets Z coordinate */
-    void SetZ(double z);
-
-    /** Returns global X coordinate */
-    double GetGlobalX() const;
-
-    /** Sets global X coordinate */
-    void SetGlobalX(double x_global);
-
-    /** Returns global Y coordinate */
-    double GetGlobalY() const;
-
-    /** Sets global Y coordinate */
-    void SetGlobalY(double y_global);
-
-    /** Returns global Z coordinate */
-    double GetGlobalZ() const;
-
-    /** Sets global Z coordinate */
-    void SetGlobalZ(double z_global);
-
-    /** Returns the error on the X coordinate */
-    double GetErrorX() const;
-
-    /** Sets the error on the X coordinate */
-    void SetErrorX(double ex);
-
-    /** Returns the error on the Y coordinate */
-    double GetErrorY() const;
-
-    /** Sets the error on the Y coordinate */
-    void SetErrorY(double ey);
-
-    /** Returns the error on the Z coordinate */
-    double GetErrorZ() const;
-
-    /** Sets the error on the Z coordinate */
-    void SetErrorZ(double ez);
-
-    /** Returns charge corrected by calibration */
-    double GetChargeCorrected() const;
-
-    /** Sets charge corrected by calibration */
-    void SetChargeCorrected(double charge_corrected);
-
-    /** Returns combined charge corrected by calibration */
-    double GetTotalChargeCorrected() const;
-
-    /** Sets combined charge corrected by calibration */
-    void SetTotalChargeCorrected(double total_charge_corrected);
-
-    /** Returns path length of the particle that went through */
-    double GetPathLength() const;
-
-    /** Sets path length of the particle that went through */
-    void SetPathLength(double path_length);
-
-  private:
-    int _tot;/* dbb counts */
-    int _deltat;/* dbb counts */
-    int _hittime;/* dbb counts */
-    double _x; /* mm */
-    double _y; /* mm */
-    double _z; /* mm */
-    double _x_global; /* mm */
-    double _y_global; /* mm */
-    double _z_global; /* mm */
-    double _ex; /* mm */
-    double _ey; /* mm */
-    double _ez; /* mm */
-    double _charge_corrected;
-    double _total_charge_corrected;
-    double _path_length; /* mm */
-
-    MAUS_VERSIONED_CLASS_DEF(EMRBarHit)
+  MAUS_VERSIONED_CLASS_DEF(EMRBarHit)
 };
-}
+} // namespace MAUS
 
-#endif  // _SRC_COMMON_CPP_DATASTRUCTURE_EMRBARHIT_
-
+#endif  // #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRBARHIT_HH_

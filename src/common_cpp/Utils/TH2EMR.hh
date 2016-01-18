@@ -14,8 +14,8 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _TH2EMR_H_
-#define _TH2EMR_H_
+#ifndef _SRC_COMMON_CPP_UTILS_TH2EMR_HH_
+#define _SRC_COMMON_CPP_UTILS_TH2EMR_HH_
 
 #include <iostream>
 #include <vector>
@@ -23,66 +23,74 @@
 
 #include "TStyle.h"
 #include "TString.h"
-#include "TColor.h"
 #include "TCanvas.h"
 #include "TH2Poly.h"
-#include "TF1.h"
 
 namespace MAUS {
+
+/** @class 	TH2Poly class that knows the geometrical arrangement of the EMR,
+ *         	usefull to plot proper EMR event displays.
+ *
+ *  @var h	<-- TH2Poly histogram fitting the triangular bar geometry of the EMR -->
+ *  @var v	<-- vector of values in the histogram to set the axes correctly -->
+ */
 
 class TH2EMR {
   public:
 
-    /** Default constructor - initialises to 0/NULL */
+    /** @brief Default constructor - initialises to 0/NULL */
     TH2EMR();
 
-    /** Copy constructor - any pointers are deep copied */
+    /** @brief Copy constructor - any pointers are deep copied */
     TH2EMR(const TH2EMR& _th2emr);
 
-    /** Equality operator - any pointers are deep copied */
+    /** @brief Equality operator - any pointers are deep copied */
     TH2EMR& operator=(const TH2EMR& _th2emr);
 
-    /** Constructor with name and title - Define the TH2Poly with the EMR structure */
+    /** @brief Constructor with name and title - Define the TH2Poly with the EMR structure */
     TH2EMR(const char* name, const char* title);
 
-    /** Destructor - any member pointers are deleted */
+    /** @brief Destructor - any member pointers are deleted */
     virtual ~TH2EMR();
 
-    /** Fills the bin corresponding to bar j of plane i an additional hit */
+    /** @brief Fills the bin corresponding to bar j of plane i an additional hit */
     void Fill(int i, int j);
 
-    /** Fills the bin corresponding to bar j of plane i with tot w */
+    /** @brief Fills the bin corresponding to bar j of plane i with tot w */
     void Fill(int i, int j, double w);
 
-    /** Fills the i plane charge with charge w */
+    /** @brief Fills the i plane charge with charge w */
     void FillPlane(int i, double w);
 
-    /** Draws histograms in COLZ by default */
+    /** @brief Draws histograms in COLZ by default */
     void Draw();
 
-    /** Gets the bin content corresponding to bar j of plane i an additional hit */
+    /** @brief Returns the bin content corresponding to bar j of plane i an additional hit */
     double GetBinContent(int i, int j);
 
-    /** Sets the bin content corresponding to bar j of plane i an additional hit */
+    /** @brief Sets the bin content corresponding to bar j of plane i an additional hit */
     void SetBinContent(int i, int j, double w);
 
-    /** Gets the content of the maximum bin */
-    double GetMaximum();
+    /** @brief Returns the content of the maximum bin */
+    double GetMaximum()     { return _h->GetMaximum(); }
 
-    /** Gets the content of the maximum bin */
-    double GetMinimum();
+    /** @brief Returns the content of the maximum bin */
+    double GetMinimum()     { return _h->GetMinimum(); }
 
-    /** Returns a pointer to the TH2Poly created by this class */
-    TH2Poly* GetHistogram();
+    /** @brief Returns the number of entries in the histogram */
+    size_t GetEntries()	    { return _v.size(); }
 
-    /** Save the two histograms to a root file **/
-    void Write();
+    /** @brief Returns a pointer to the TH2Poly created by this class */
+    TH2Poly* GetHistogram() { return _h; }
+
+    /** @brief Save the histogram to the root file **/
+    void Write()            { _h->Write(); }
 
   private:
 
-    TH2Poly *_h;
-    std::vector<int> _v;
+    TH2Poly*		_h;
+    std::vector<int>	_v;
 };
 } // namespace MAUS
 
-#endif
+#endif // #define _SRC_COMMON_CPP_UTILS_TH2EMR_HH_

@@ -17,11 +17,11 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDAQPROCESSOR_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDAQPROCESSOR_
 
-#include "src/common_cpp/DataStructure/EMRDaq.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/V1731Processor.hh"
-#include "src/common_cpp/JsonCppProcessors/DBBSpillDataProcessor.hh"
+#include "DataStructure/EMRDaq.hh"
+#include "JsonCppProcessors/ArrayProcessors.hh"
+#include "JsonCppProcessors/ObjectProcessor.hh"
+#include "JsonCppProcessors/V1731Processor.hh"
+#include "JsonCppProcessors/DBBSpillDataProcessor.hh"
 
 namespace MAUS {
 
@@ -46,4 +46,3 @@ class EMRDaqProcessor : public ObjectProcessor<EMRDaq> {
 }  // namespace MAUS
 
 #endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRDAQPROCESSOR_
-

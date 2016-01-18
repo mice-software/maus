@@ -17,11 +17,11 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRPLANEHITPROCESSOR_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRPLANEHITPROCESSOR_
 
-#include "src/common_cpp/DataStructure/EMRPlaneHit.hh"
-#include "src/common_cpp/DataStructure/EMRBar.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
-#include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
+#include "DataStructure/EMRPlaneHit.hh"
+#include "JsonCppProcessors/ObjectProcessor.hh"
+#include "JsonCppProcessors/PrimitivesProcessors.hh"
+#include "JsonCppProcessors/ArrayProcessors.hh"
+#include "JsonCppProcessors/EMRBarHitProcessor.hh"
 
 namespace MAUS {
 
@@ -38,12 +38,11 @@ class EMRPlaneHitProcessor : public ObjectProcessor<EMRPlaneHit> {
     EMRPlaneHitProcessor();
 
   private:
+    ValueArrayProcessor<EMRBarHit> _bar_hit_array_proc;
     IntProcessor _int_proc;
     DoubleProcessor _double_proc;
-    PointerArrayProcessor<EMRBar> _bar_arr_proc;
-    ValueArrayProcessor<int> _int_arr_proc;
+    ValueArrayProcessor<int> _int_array_proc;
 };
 }  // namespace MAUS
 
 #endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRPLANEHITPROCESSOR_
-

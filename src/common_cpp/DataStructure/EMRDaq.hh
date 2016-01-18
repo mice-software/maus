@@ -30,45 +30,51 @@ typedef std::vector<V1731>           V1731HitArray;
 typedef std::vector<V1731HitArray>   V1731PartEventArray;
 typedef std::vector<DBBSpillData>    DBBArray;
 
+/** @class EMRDaq comment
+ *
+ *  @var V1731		<-- Array of fADC data (ADC charge for triggers) -->
+ *  @var dbb		<-- Array of DBB hits thoughout the spill (ToT, TDC) -->
+ */
+
 class EMRDaq {
   public:
-    /** Default constructor - initialises to 0/NULL */
+    /** @brief Default constructor - initialises to 0/NULL */
     EMRDaq();
 
-    /** Copy constructor - any pointers are deep copied */
+    /** @brief Copy constructor - any pointers are deep copied */
     EMRDaq(const EMRDaq& _emrdaq);
 
-    /** Equality operator - any pointers are deep copied */
+    /** @brief Equality operator - any pointers are deep copied */
     EMRDaq& operator=(const EMRDaq& _emrdaq);
 
-    /** Destructor - any member pointers are deleted */
+    /** @brief Destructor - any member pointers are deleted */
     virtual ~EMRDaq();
 
-    /** Returns V1731PartEventArray */
+    /** @brief Returns V1731PartEventArray */
     V1731PartEventArray GetV1731PartEventArray() const;
 
-    /** Returns V1731PartEventArray size */
+    /** @brief Returns V1731PartEventArray size */
     size_t GetV1731NumPartEvents() const;
 
-    /** Get an element from V1731Array (needed for PyROOT) */
+    /** @brief Get an element from V1731Array (needed for PyROOT) */
     V1731HitArray GetV1731PartEvent(size_t index) const;
 
-    /** Get size of V1731Array (needed for PyROOT) */
+    /** @brief Get size of V1731Array (needed for PyROOT) */
     size_t GetV1731PartEventArraySize(size_t index) const;
 
-    /** Sets V1731Array */
+    /** @brief Sets V1731Array */
     void SetV1731PartEventArray(V1731PartEventArray V1731);
 
-    /** Returns DBB Spill */
+    /** @brief Returns DBB Spill */
     DBBArray GetDBBArray() const;
 
-    /** Get an element from V1731Array (needed for PyROOT) */
+    /** @brief Get an element from V1731Array (needed for PyROOT) */
     DBBSpillData GetDBBArrayElement(size_t index) const;
 
-    /** Get size of V1731Array (needed for PyROOT) */
+    /** @brief Get size of V1731Array (needed for PyROOT) */
     size_t GetDBBArraySize() const;
 
-    /** Sets Dbb Spill */
+    /** @brief Sets Dbb Spill */
     void SetDBBArray(DBBArray s);
 
   private:
@@ -77,6 +83,6 @@ class EMRDaq {
 
     MAUS_VERSIONED_CLASS_DEF(EMRDaq)
 };
-}
-#endif
+} // namespace MAUS
 
+#endif // #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRDAQ_

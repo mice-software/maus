@@ -15,48 +15,44 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRChannelID_HH_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRChannelID_HH_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMRCHANNELID_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_EMRCHANNELID_HH_
 
 #include "Rtypes.h" // ROOT
 
 namespace MAUS {
 
-/** Identifier for the channel where a hit was recorded in the EMR
+/** @class Identifier for the channel where a hit was recorded in the EMR (for MC)
+
+ *  @var bar	<-- Global bar identifier (0->2831: 48 planes, 59 bars per plane) -->
  */
+
 class EMRChannelId {
   public:
-    /** Constructor - allocate to 0 */
+    /** @brief Constructor - allocate to 0 */
     EMRChannelId()
-    :_bar(-1) {}
+      :_bar(-1) {}
 
-    /** Copy Constructor - copies data from channel*/
+    /** @brief Copy Constructor - copies data from channel*/
     EMRChannelId(const EMRChannelId& channel);
 
-    /** Equality operator - copies data from channel */
+    /** @brief Equality operator - copies data from channel */
     EMRChannelId& operator=(const EMRChannelId& channel);
 
-    /** Destructor (does nothing)*/
+    /** @brief Destructor (does nothing)*/
     virtual ~EMRChannelId() {}
 
-    /** Get the bar that was hit */
+    /** @brief Returns the bar that was hit */
     int GetBar() const  {return _bar;}
 
-    /** Set the bar that was hit */
+    /** @brief Sets the bar that was hit */
     void SetBar(int bar) {_bar = bar;}
-
-//     /** Get the bar that was hit */
-//     int GetPlane() const  {return _plane;}
-//
-//     /** Set the bar that was hit */
-//     void SetPlane(int p) {_plane = p;}
 
   private:
     int _bar;
-//     int _plane;
 
     ClassDef(EMRChannelId, 1)
 };
-}
+} // namespace MAUS
 
-#endif
+#endif // #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRCHANNELID_HH_

@@ -14,133 +14,109 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_
-#define _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_
+#ifndef _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_HH_
+#define _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_HH_
 
 #include <vector>
 
 #include "Utils/VersionNumber.hh"
-#include "DataStructure/EMRPlaneHit.hh"
+#include "DataStructure/EMREventTrack.hh"
+#include "DataStructure/ThreeVector.hh"
 
 namespace MAUS {
 
-typedef std::vector<EMRPlaneHit*> EMRPlaneHitArray;
+typedef std::vector<EMREventTrack*> EMREventTrackArray;
 
 /** @class EMREvent comment
  *
+ *  @var emreventtracks	<-- array of event tracks (contains PHs, SPs and track) -->
+ *  @var vertex		<-- coordinates of the decay vertex -->
+ *  @var evertex        <-- errors on the coordinates of the decay vertex -->
+ *  @var deltat		<-- mother decay time -->
+ *  @var distance	<-- distance between the mother and the daughter -->
+ *  @var polar		<-- global polar angle theta (inclination) -->
+ *  @var azimuth	<-- global azimuthal angle phi -->
  */
 
 class EMREvent {
-  public:
-    /** Default constructor - initialises to 0/NULL */
-    EMREvent();
+ public:
+  /** @brief Default constructor - initialises to 0/NULL */
+  EMREvent();
 
-    /** Copy constructor - any pointers are deep copied */
-    EMREvent(const EMREvent& _emrevent);
+  /** @brief Copy constructor - any pointers are deep copied */
+  EMREvent(const EMREvent& emre);
 
-    /** Equality operator - any pointers are deep copied */
-    EMREvent& operator=(const EMREvent& _emrevent);
+  /** @brief Equality operator - any pointers are deep copied */
+  EMREvent& operator=(const EMREvent& emre);
 
-    /** Destructor - any member pointers are deleted */
-    virtual ~EMREvent();
+  /** @brief Destructor - any member pointers are deleted */
+  virtual ~EMREvent();
 
-    /** Returns  */
-    EMRPlaneHitArray GetEMRPlaneHitArray() const;
+  /** @brief Returns the array of event tracks that constitute the event **/
+  EMREventTrackArray GetEMREventTrackArray() const { return _emreventtracks; }
 
-    /** Sets  */
-    void SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray);
+  /** @brief Sets the array of tracks that constitute the event **/
+  void SetEMREventTrackArray(EMREventTrackArray emreventtracks);
 
-    /** Returns  */
-    bool GetHasPrimary() const;
+  /** @brief Adds a track event to the array **/
+  void AddEMREventTrack(EMREventTrack* emrte)      { _emreventtracks.push_back(emrte); }
 
-    /** Sets  */
-    void SetHasPrimary(bool has_primary);
+  /** @brief Sets the amount of event tracks **/
+  size_t GetEMREventTrackArraySize()               { return _emreventtracks.size(); }
 
-    /** Returns  */
-    double GetRangePrimary() const;
+  /** @brief Returns the event track of the mother **/
+  EMREventTrack* GetMotherPtr();
 
-    /** Sets  */
-    void SetRangePrimary(double range_primary);
+  /** @brief Returns the event track of the daughter **/
+  EMREventTrack* GetDaughterPtr();
 
-    /** Returns  */
-    bool GetHasSecondary() const;
+  /** @brief Returns the coordinates of the decay vertex */
+  ThreeVector GetVertex() const                    { return _vertex; }
 
-    /** Sets  */
-    void SetHasSecondary(bool has_secondary);
+  /** @brief Sets the coordinates of the decay vertex */
+  void SetVertex(ThreeVector vertex)               { _vertex = vertex; }
 
-    /** Returns  */
-    double GetRangeSecondary() const;
+  /** @brief Returns the errors on the coordinates of the decay vertex */
+  ThreeVector GetVertexErrors() const              { return _evertex; }
 
-    /** Sets  */
-    void SetRangeSecondary(double range_secondary);
+  /** @brief Sets the errors on the coordinates of the decay vertex */
+  void SetVertexErrors(ThreeVector evertex)        { _evertex = evertex; }
 
-    /** Returns  */
-    double GetSecondaryToPrimaryTrackDistance() const;
+  /** @brief Returns the time difference between the birth and its decay */
+  double GetDeltaT() const                         { return _deltat; }
 
-    /** Sets  */
-    void SetSecondaryToPrimaryTrackDistance(double secondary_to_primary_track_distance);
+  /** @brief Sets the time difference between the birth and its decay */
+  void SetDeltaT(double deltat)                    { _deltat = deltat; }
 
-    /** Returns  */
-    double GetTotalChargeMA() const;
+  /** @brief Returns the distance between the mother and the daughter */
+  double GetDistance() const                       { return _distance; }
 
-    /** Sets  */
-    void SetTotalChargeMA(double total_charge_MA);
+  /** @brief Sets the distance between the mother and the daughter */
+  void SetDistance(double distance)                { _distance = distance; }
 
-    /** Returns  */
-    double GetTotalChargeSA() const;
+  /** @brief Returns the polar angle (inclination) between the mother and the daughter */
+  double GetPolar() const                          { return _polar; }
 
-    /** Sets  */
-    void SetTotalChargeSA(double total_charge_SA);
+  /** @brief Sets the polar angle (inclination) between the mother and the daughter */
+  void SetPolar(double polar)                      { _polar = polar; }
 
-    /** Returns  */
-    double GetChargeRatioMA() const;
+  /** @brief Returns the azimuthal angle between the mother and the daughter */
+  double GetAzimuth() const                        { return _azimuth; }
 
-    /** Sets  */
-    void SetChargeRatioMA(double charge_ratio_MA);
+  /** @brief Sets the azimuthal angle between the mother and the daughter */
+  void SetAzimuth(double azimuth)                  { _azimuth = azimuth; }
 
-    /** Returns  */
-    double GetChargeRatioSA() const;
+ private:
+  EMREventTrackArray	_emreventtracks;
+  ThreeVector		_vertex;
+  ThreeVector		_evertex;
+  double		_deltat;
+  double		_distance;
+  double		_polar;
+  double		_azimuth;
 
-    /** Sets  */
-    void SetChargeRatioSA(double charge_ratio_SA);
-
-    /** Returns  */
-    double GetPlaneDensityMA() const;
-
-    /** Sets  */
-    void SetPlaneDensityMA(double plane_density_MA);
-
-    /** Returns  */
-    double GetPlaneDensitySA() const;
-
-    /** Sets  */
-    void SetPlaneDensitySA(double plane_density_SA);
-
-    /** Returns  */
-    double GetChi2() const;
-
-    /** Sets  */
-    void SetChi2(double chi2);
-
-  private:
-    EMRPlaneHitArray _emrplanehitarray;
-
-    bool _has_primary;
-    double _range_primary;
-    bool _has_secondary;
-    double _range_secondary;
-    double _secondary_to_primary_track_distance;
-    double _total_charge_MA;
-    double _total_charge_SA;
-    double _charge_ratio_MA;
-    double _charge_ratio_SA;
-    double _plane_density_MA;
-    double _plane_density_SA;
-    double _chi2;
-
-    MAUS_VERSIONED_CLASS_DEF(EMREvent)
+  MAUS_VERSIONED_CLASS_DEF(EMREvent)
 };
-}
+} // namespace MAUS
 
-#endif  // _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_
-
+#endif // #define _SRC_COMMON_CPP_DATASTRUCTURE_EMREVENT_HH_

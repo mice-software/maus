@@ -64,7 +64,6 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
-  CanvasWrapper *_cwrap_tof01, *_cwrap_tof02, *_cwrap_tof12;
 };
 }
 

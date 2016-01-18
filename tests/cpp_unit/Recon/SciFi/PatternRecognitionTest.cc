@@ -103,9 +103,9 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(0.4298, pr._sd_5);
   EXPECT_EQ(1.0, pr._sd_phi_1to4);
   EXPECT_EQ(1.0, pr._sd_phi_5);
-  EXPECT_EQ(2.0, pr._res_cut);
+  EXPECT_EQ(7.0, pr._res_cut);
   EXPECT_EQ(150.0, pr._R_res_cut);
-  EXPECT_EQ(15.0, pr._straight_chisq_cut);
+  EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(4.0, pr._sz_chisq_cut);
   EXPECT_EQ(0.75, pr._n_turns_cut);
   EXPECT_EQ(180.0, pr._Pt_max);

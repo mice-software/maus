@@ -14,53 +14,32 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/EMRPlaneHitProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/EMREventProcessor.hh"
+#include "JsonCppProcessors/EMREventProcessor.hh"
 
 namespace MAUS {
 
 EMREventProcessor::EMREventProcessor()
-      : _plane_hit_array_proc(new EMRPlaneHitProcessor) {
+      : _event_track_array_proc(new EMREventTrackProcessor) {
     RegisterValueBranch
-	  ("emr_plane_hits", &_plane_hit_array_proc, &EMREvent::GetEMRPlaneHitArray,
-           &EMREvent::SetEMRPlaneHitArray, false);
+	  ("event_tracks", &_event_track_array_proc, &EMREvent::GetEMREventTrackArray,
+           &EMREvent::SetEMREventTrackArray, false);
     RegisterValueBranch
-          ("has_primary", &_bool_proc, &EMREvent::GetHasPrimary,
-          &EMREvent::SetHasPrimary, false);
+	  ("vertex", &_threevector_proc, &EMREvent::GetVertex,
+           &EMREvent::SetVertex, false);
     RegisterValueBranch
-          ("range_primary", &_double_proc, &EMREvent::GetRangePrimary,
-          &EMREvent::SetRangePrimary, false);
+	  ("vertex_err", &_threevector_proc, &EMREvent::GetVertexErrors,
+           &EMREvent::SetVertexErrors, false);
     RegisterValueBranch
-          ("has_secondary", &_bool_proc, &EMREvent::GetHasSecondary,
-          &EMREvent::SetHasSecondary, false);
+          ("deltat", &_double_proc,
+	   &EMREvent::GetDeltaT, &EMREvent::SetDeltaT, false);
     RegisterValueBranch
-          ("range_secondary", &_double_proc, &EMREvent::GetRangeSecondary,
-          &EMREvent::SetRangeSecondary, false);
+          ("distance", &_double_proc,
+	   &EMREvent::GetDistance, &EMREvent::SetDistance, false);
     RegisterValueBranch
-          ("secondary_to_primary_track_distance", &_double_proc,
-	  &EMREvent::GetSecondaryToPrimaryTrackDistance,
-          &EMREvent::SetSecondaryToPrimaryTrackDistance, false);
+          ("polar", &_double_proc,
+	   &EMREvent::GetPolar, &EMREvent::SetPolar, false);
     RegisterValueBranch
-          ("total_charge_MA", &_double_proc, &EMREvent::GetTotalChargeMA,
-          &EMREvent::SetTotalChargeMA, false);
-    RegisterValueBranch
-          ("total_charge_SA", &_double_proc, &EMREvent::GetTotalChargeSA,
-          &EMREvent::SetTotalChargeSA, false);
-    RegisterValueBranch
-          ("charge_ratio_MA", &_double_proc, &EMREvent::GetChargeRatioMA,
-          &EMREvent::SetChargeRatioMA, false);
-    RegisterValueBranch
-          ("charge_ratio_SA", &_double_proc, &EMREvent::GetChargeRatioSA,
-          &EMREvent::SetChargeRatioSA, false);
-    RegisterValueBranch
-          ("plane_density_MA", &_double_proc, &EMREvent::GetPlaneDensityMA,
-          &EMREvent::SetPlaneDensityMA, false);
-    RegisterValueBranch
-          ("plane_density_SA", &_double_proc, &EMREvent::GetPlaneDensitySA,
-          &EMREvent::SetPlaneDensitySA, false);
-    RegisterValueBranch
-          ("chi2", &_double_proc, &EMREvent::GetChi2,
-          &EMREvent::SetChi2, false);
+          ("azimuth", &_double_proc,
+	   &EMREvent::GetAzimuth, &EMREvent::SetAzimuth, false);
 }
 }  // namespace MAUS
-
