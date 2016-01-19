@@ -53,11 +53,13 @@ class SciFiEvent {
     void add_digit(SciFiDigit* digit) { _scifidigits.push_back(digit); }
     void set_digits(SciFiDigitPArray scifidigits) { _scifidigits = scifidigits; }
     SciFiDigitPArray digits() const { return _scifidigits; }
+    void clear_digits();
 
     /** Clusters */
     void add_cluster(SciFiCluster* cluster) { _scificlusters.push_back(cluster); }
     void set_clusters(SciFiClusterPArray scificlusters) { _scificlusters = scificlusters; }
     SciFiClusterPArray clusters() const { return _scificlusters; }
+    void clear_clusters();
 
     /** Spacepoints */
     void add_spacepoint(SciFiSpacePoint* spacepoint) { _scifispacepoints.push_back(spacepoint); }
@@ -65,26 +67,34 @@ class SciFiEvent {
                         _scifispacepoints = scifispacepoints; }
     SciFiSpacePointPArray spacepoints() const { return _scifispacepoints; }
     void set_spacepoints_used_flag(bool flag);
+    void clear_spacepoints();
 
     /** Seeds */
     void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
     SciFiSpacePointPArray seeds() const { return _scifiseeds; }
+    void clear_seeds();
 
     /** Straight Pattern Recognition tracks */
     void add_straightprtrack(SciFiStraightPRTrack* track) {
                              _scifistraightprtracks.push_back(track); }
     void set_straightprtrack(SciFiStraightPRTrackPArray tracks) { _scifistraightprtracks = tracks; }
     SciFiStraightPRTrackPArray straightprtracks() const { return _scifistraightprtracks; }
+    void clear_stracks();
 
     /** Helical Pattern Recognition tracks */
     void add_helicalprtrack(SciFiHelicalPRTrack* track) { _scifihelicalprtracks.push_back(track); }
     void set_helicalprtrack(SciFiHelicalPRTrackPArray tracks) { _scifihelicalprtracks = tracks; }
     SciFiHelicalPRTrackPArray helicalprtracks() const { return _scifihelicalprtracks; }
+    void clear_htracks();
 
     /** Kalman tracks */
     void add_scifitrack(SciFiTrack *a_track) { _scifitracks.push_back(a_track); }
     void set_scifitracks(SciFiTrackPArray tracks) { _scifitracks = tracks; }
     SciFiTrackPArray scifitracks() const { return _scifitracks; }
+    void clear_scifitracks();
+
+    /** Clear all data containers */
+    void clear_all();
 
   private:
 

@@ -32,6 +32,8 @@
 
 // External libs headers
 #include "TROOT.h"
+#include "TFile.h"
+#include "TH1D.h"
 #include "TMatrixD.h"
 
 // MAUS headers
@@ -52,7 +54,8 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
   return (sp1->get_position().z() > sp2->get_position().z());
 }
 
-PatternRecognition::PatternRecognition(): _up_straight_pr_on(true),
+PatternRecognition::PatternRecognition(): _debug(false),
+                                          _up_straight_pr_on(true),
                                           _down_straight_pr_on(true),
                                           _up_helical_pr_on(true),
                                           _down_helical_pr_on(true),
@@ -72,10 +75,17 @@ PatternRecognition::PatternRecognition(): _up_straight_pr_on(true),
                                           _n_turns_cut(0.75),
                                           _sz_chisq_cut(4.0),
                                           _Pt_max(180.0),
-                                          _Pz_min(50.0) {
+                                          _Pz_min(50.0),
+                                          _rfile(NULL),
+                                          _hx(NULL),
+                                          _hy(NULL),
+                                          _hxchisq(NULL),
+                                          _hychisq(NULL) {
+  // Do nothing
 }
 
 void PatternRecognition::set_parameters_to_default() {
+  _debug = false;
   _up_straight_pr_on = true;
   _down_straight_pr_on = true;
   _up_helical_pr_on = true;
@@ -100,7 +110,26 @@ void PatternRecognition::set_parameters_to_default() {
 }
 
 PatternRecognition::~PatternRecognition() {
-  // Do nothing
+  if (_debug) {
+    if (_rfile) _rfile->cd();
+    if (_hx) _hx->Write();
+    if (_hy) _hy->Write();
+    if (_hxchisq) _hxchisq->Write();
+    if (_hychisq) _hychisq->Write();
+  }
+}
+
+void PatternRecognition::setup_debug() {
+  _debug = true;
+  _rfile = new TFile("pattern_recongition_debug.root", "RECREATE");
+  _hx = new TH1D("hx", "Pattern Recongition Road X Residuals", 200, -150, 150);
+  _hy = new TH1D("hy", "Pattern Recongition Road Y Residuals", 500, -150, 150);
+  _hxchisq = new TH1D("hxchisq", "Pattern Recongition Straight Fit x ChiSq", 200, 0, 500);
+  _hychisq = new TH1D("hychisq", "Pattern Recongition Straight Fit y ChiSq", 200, 0, 500);
+  _hx->Write();
+  _hy->Write();
+  _hxchisq->Write();
+  _hychisq->Write();
 }
 
 bool PatternRecognition::LoadGlobals() {
@@ -396,6 +425,10 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
                                      const std::vector<int> ignore_stations,
                                      SpacePoint2dPArray &spnts_by_station,
                                      std::vector<SciFiStraightPRTrack*> &strks) const {
+
+  // Set up a secondary ROOT file to hold non-standard debug data
+  if (_rfile && _debug) _rfile->cd();
+
   // Set inner and outer stations
   int o_st_num = -1, i_st_num = -1;
   set_end_stations(ignore_stations, o_st_num, i_st_num);
@@ -458,8 +491,10 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
               double dx = (mx * pos.z() + cx) - pos.x();
               double dy = (my * pos.z() + cy) - pos.y();
               // Perpendicular residuals
-              // dx = fabs(pos.x() - (cx + mx*pos.z())) / sqrt(1.0 + mx*mx);
-              // dy = fabs(pos.y() - (cy + my*pos.z())) / sqrt(1.0 + my*my);
+              // double dx = fabs(pos.x() - (cx + mx*pos.z())) / sqrt(1.0 + mx*mx);
+              // double dy = fabs(pos.y() - (cy + my*pos.z())) / sqrt(1.0 + my*my);
+              if (_hx && _debug) _hx->Fill(dx);
+              if (_hy && _debug) _hy->Fill(dy);
               if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
                 if ( delta_sq > (dx*dx + dy*dy) ) {
                   delta_sq = dx*dx + dy*dy;
@@ -518,6 +553,8 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
         std::vector<double> covariance(a1, &a1[16]);
 
         // Check track passes chisq test, then create SciFiStraightPRTrack
+        if (_hxchisq && _debug) _hxchisq->Fill(( line_x.get_chisq() / ( n_points - 2 )));
+        if (_hychisq && _debug) _hychisq->Fill(( line_y.get_chisq() / ( n_points - 2 )));
         if ( ( line_x.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) &&
             ( line_y.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) ) {
 
