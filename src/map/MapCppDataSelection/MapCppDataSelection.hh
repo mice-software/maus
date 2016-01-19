@@ -23,6 +23,8 @@
 #ifndef _SRC_MAP_MAPCPPDATASELECTION_H_
 #define _SRC_MAP_MAPCPPDATASELECTION_H_
 
+#include <string>
+
 #include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -35,7 +37,7 @@ class MapCppDataSelection : public MapBase<Data> {
   public:
     /** Constructor */
     MapCppDataSelection();
-    
+
     /** Destructor */
     ~MapCppDataSelection();
 
@@ -61,7 +63,6 @@ class MapCppDataSelection : public MapBase<Data> {
     * \param document a line/spill from the JSON input
     */
     void _process(Data* data) const;
-      
 }; // ~ class MapCppDataSelection
 } // ~namespace MAUS
 

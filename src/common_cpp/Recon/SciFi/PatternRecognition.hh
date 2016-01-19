@@ -56,6 +56,8 @@ class PatternRecognition {
 
     /** Macro to allow friendship with the gtests */
     FRIEND_TEST(PatternRecognitionTest, test_constructor);
+    FRIEND_TEST(PatternRecognitionTest, test_set_parameters_to_default);
+    FRIEND_TEST(PatternRecognitionTest, test_setup_debug);
 
     /** @brief Default constructor. Initialise variables,
      *         using globals if available, otherwise local defaults 
@@ -293,15 +295,21 @@ class PatternRecognition {
     /** @brief A function to set all the internal parameters to their default values (for tests) */
     void set_parameters_to_default();
 
+    /** @brief Place the different cut value currently being used into the variables supplied */
     void get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
        double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut);
 
+    /** @brief Set the various cuts used in Pattern Recognition */
     void set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
-       double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut);
+        double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut);
+
+    /** @brief Activate debug mode (set up the output ROOT file, histos, etc) */
+    void setup_debug();
 
   private:
+    bool _debug;                /** Run in debug mode */
     bool _up_straight_pr_on;    /** Upstream straight pattern recogntion on or off */
-    bool _down_straight_pr_on;    /** Downstream straight pattern recogntion on or off */
+    bool _down_straight_pr_on;  /** Downstream straight pattern recogntion on or off */
     bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
@@ -322,11 +330,11 @@ class PatternRecognition {
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
-    TFile* _rfile;
-    TH1D* _hx;
-    TH1D* _hy;
-    TH1D* _hxchisq;
-    TH1D* _hychisq;
+    TFile* _rfile;   /** A ROOT file pointer for dumping residuals to in debug mode */
+    TH1D* _hx;       /** histo of x residuals taken during straight road cut stage */
+    TH1D* _hy;       /** histo of y residuals taken during straight road cut stage */
+    TH1D* _hxchisq;  /** histo of chisq of every x-z straight least sq fit tried */
+    TH1D* _hychisq;  /** histo of chisq of every y-z straight least sq fit tried */
 };
 
 } // ~namespace MAUS

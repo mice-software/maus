@@ -87,7 +87,7 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
 
     /** Get the y position of the track at z=0 */
     double get_y0() const { return _y0; }
-    
+
     /** Get the global y position of the track at z=0 */
     double get_global_y0() const { return _global_y0; }
 
@@ -99,13 +99,13 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
 
     /** Get the gradient of the line in y-z */
     double get_my() const { return _my; }
-    
+
     /** Get the gradient of the line in global y-z */
     double get_global_my() const { return _global_my; }
 
     /** Set the gradient of the line in y-z */
     void set_my(double my) { _my = my; }
-    
+
     /** Set the gradient of the line in global y-z */
     void set_global_my(double global_my) { _global_my = global_my; }
 

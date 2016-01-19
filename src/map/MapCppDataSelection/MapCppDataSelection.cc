@@ -15,11 +15,9 @@
  *
  */
 
-#include "json/json.h"
-
-#include <vector>
-
 #include "src/map/MapCppDataSelection/MapCppDataSelection.hh"
+#include <vector>
+#include "json/json.h"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/Globals.hh"
@@ -38,8 +36,7 @@ PyMODINIT_FUNC init_MapCppDataSelection(void) {
                                       ("MapCppDataSelection", "", "", "", "");
 }
 
-MapCppDataSelection::MapCppDataSelection() : 
-  MapBase<Data>("init_MapCppDataSelection") {
+MapCppDataSelection::MapCppDataSelection() : MapBase<Data>("init_MapCppDataSelection") {
   // Do nothing
 }
 
@@ -78,9 +75,9 @@ void MapCppDataSelection::_process(MAUS::Data* data) const {
     ReconEvent* evt = events[i];
 
     // TOF selection
-    std::vector<TOFSpacePoint> tof1_spoints = 
+    std::vector<TOFSpacePoint> tof1_spoints =
       evt->GetTOFEvent()->GetTOFEventSpacePoint().GetTOF1SpacePointArray();
-    std::vector<TOFSpacePoint> tof2_spoints = 
+    std::vector<TOFSpacePoint> tof2_spoints =
       evt->GetTOFEvent()->GetTOFEventSpacePoint().GetTOF2SpacePointArray();
 
     bool tof1_cut = false;
@@ -136,7 +133,7 @@ void MapCppDataSelection::_process(MAUS::Data* data) const {
   int nEventsRemoved = 0;
   for (size_t i = 0; i < events_to_remove.size(); ++i) {
     events.erase(events.begin() + events_to_remove[i] - nEventsRemoved);
-    std::cerr << "Removed event " << events_to_remove[i] - nEventsRemoved 
+    std::cerr << "Removed event " << events_to_remove[i] - nEventsRemoved
               << std::endl;
     ++nEventsRemoved;
   }

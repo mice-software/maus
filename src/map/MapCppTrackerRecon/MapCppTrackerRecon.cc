@@ -42,6 +42,7 @@ MapCppTrackerRecon::MapCppTrackerRecon() : _up_straight_pr_on(true),
                                            _down_straight_pr_on(true),
                                            _up_helical_pr_on(true),
                                            _down_helical_pr_on(true),
+                                           _patrec_debug_on(false),
                                            MapBase<Data>("MapCppTrackerRecon"),
 #ifdef KALMAN_TEST
   _spacepoint_helical_track_fitter(NULL),
@@ -56,6 +57,7 @@ MapCppTrackerRecon::~MapCppTrackerRecon() {
 }
 
 void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
+  // Pull out the global settings
   if (!Globals::HasInstance()) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
@@ -66,13 +68,14 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   int user_down_straight_pr_on = (*json)["SciFiPRStraightTkDSOn"].asInt();
   _kalman_on          = (*json)["SciFiKalmanOn"].asBool();
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
+  _patrec_debug_on    = (*json)["SciFiPatRecDebugOn"].asBool();
   _size_exception     = (*json)["SciFiClustExcept"].asInt();
   _min_npe            = (*json)["SciFiNPECut"].asDouble();
   _use_mcs            = (*json)["SciFiKalman_use_MCS"].asBool();
   _use_eloss          = (*json)["SciFiKalman_use_Eloss"].asBool();
   _use_patrec_seed    = (*json)["SciFiSeedPatRec"].asBool();
   _correct_pz         = (*json)["SciFiKalmanCorrectPz"].asBool();
-// Values used to set the track rating:
+  // Values used to set the track rating:
   _excellent_num_trackpoints     = (*json)["SciFiExcellentNumTrackpoints"].asInt();
   _good_num_trackpoints          = (*json)["SciFiGoodNumTrackpoints"].asInt();
   _poor_num_trackpoints          = (*json)["SciFiPoorNumTrackpoints"].asInt();
@@ -83,20 +86,22 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _good_num_spacepoints       = (*json)["SciFiGoodNumSpacepoints"].asInt();
   _poor_num_spacepoints       = (*json)["SciFiPoorNumSpacepoints"].asInt();
 
-
+  // Build the geometery helper instance
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
     module->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
 
+  // Set up cluster reconstruction
   _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
 
+  // Set up spacepoint reconstruction
   _spacepoint_recon = SciFiSpacePointRec();
 
+  // Setup Pattern Recognition
   double up_field = _geometry_helper.GetFieldValue(0);
   double down_field = _geometry_helper.GetFieldValue(1);
-
   if (user_up_helical_pr_on == 2)
     _up_helical_pr_on = true;
   else if (user_up_helical_pr_on == 1)
@@ -141,6 +146,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _pattern_recognition.set_down_straight_pr_on(_down_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
+  if (_patrec_debug_on) _pattern_recognition.setup_debug();
 
   if (_use_patrec_seed) {
     _seed_value = -1.0;
@@ -148,6 +154,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     _seed_value = (*json)["SciFiSeedCovariance"].asDouble();
   }
 
+  // Set up final track fit (Kalman filter)
 #ifdef KALMAN_TEST
   HelicalPropagator* spacepoint_helical_prop = new HelicalPropagator(&_geometry_helper);
   spacepoint_helical_prop->SetCorrectPz(_correct_pz);
@@ -796,7 +803,7 @@ void MapCppTrackerRecon::set_straight_prtrack_global_output(
   const SciFiStraightPRTrackPArray& trks) const {
   for (auto trk : trks) {
     ThreeVector pos = trk->get_spacepoints_pointers()[0]->get_position();
-    std::vector<double> params{trk->get_x0(), trk->get_mx(), trk->get_y0(), trk->get_my()};
+    std::vector<double> params{ trk->get_x0(), trk->get_mx(), trk->get_y0(), trk->get_my() }; // NOLINT
     std::vector<double> global_params =
       _geometry_helper.TransformStraightParamsToGlobal(params, trk->get_tracker());
 
@@ -805,8 +812,6 @@ void MapCppTrackerRecon::set_straight_prtrack_global_output(
     trk->set_global_mx(global_params[1]);
     trk->set_global_y0(global_params[2]);
     trk->set_global_my(global_params[3]);
-    std::cerr << "Global params: " << global_params[0] << " " << global_params[1] << " "
-              << global_params[2] << " " << global_params[3] << "\n";
   }
 }
 /*

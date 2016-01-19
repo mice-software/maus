@@ -47,7 +47,11 @@ namespace MAUS {
       _x_chisq(x_chisq),
       _y0(y0),
       _my(my),
-      _y_chisq(y_chisq) {
+      _y_chisq(y_chisq),
+      _global_x0(-1.0),
+      _global_mx(-1.0),
+      _global_y0(-1.0),
+      _global_my(-1.0) {
     this->set_chi_squared(_x_chisq + _y_chisq);
     this->set_ndf((2.0*this->get_num_points()) - 4);
   }
@@ -61,7 +65,11 @@ namespace MAUS {
       _x_chisq(line_x.get_chisq()),
       _y0(line_y.get_c()),
       _my(line_y.get_m()),
-      _y_chisq(line_y.get_chisq()) {
+      _y_chisq(line_y.get_chisq()),
+      _global_x0(-1.0),
+      _global_mx(-1.0),
+      _global_y0(-1.0),
+      _global_my(-1.0) {
     this->set_chi_squared(_x_chisq + _y_chisq);
     this->set_ndf((2.0*this->get_num_points()) - 4);
   }
