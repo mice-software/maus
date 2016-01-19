@@ -5,6 +5,14 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v1.4.0
+  The following changes were made:
+    - Further extensive EMR updates
+    - Extensive tracker updates, including real data sign flip fix
+    - Small ROOT based event viewer added
+    - numpy upgraded to 1.6.0
+    - Workbook updated
+    - All updates from patch releases 1.3.1 and 1.3.2 included
 MAUS-v1.3.0
   The following changes were made:
     - Extensive updates to the EMR

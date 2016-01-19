@@ -291,8 +291,8 @@ SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
-SciFiStraightRoadCut = 2.0 # The road cut in pat rec for straights (mm)
-SciFiStraightChi2Cut = 15.0 # Chi^2 on pat rec straight track fit
+SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
+SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
 SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
 SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
