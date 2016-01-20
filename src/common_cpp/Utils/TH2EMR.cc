@@ -32,9 +32,9 @@ TH2EMR& TH2EMR::operator=(const TH2EMR& th2emr) {
   if (this == &th2emr)
     return *this;
 
-  if (_h != NULL)
+  if ( _h )
     delete _h;
-  if (th2emr._h != NULL) {
+  if ( th2emr._h ) {
     _h = static_cast<TH2Poly*>(th2emr._h->Clone());
   } else {
     _h = NULL;
@@ -49,7 +49,8 @@ TH2EMR& TH2EMR::operator=(const TH2EMR& th2emr) {
 }
 
 TH2EMR::~TH2EMR() {
-  if (_h != NULL)
+
+  if ( _h )
     delete _h;
   if ( !_v.size() )
     _v.resize(0);
@@ -72,8 +73,10 @@ void TH2EMR::Fill(int i, int j) {
   // If the hit is in the sea (bin = -5), add a bin
   int bin = _h->FindBin(i+.5, j);
   if (bin < 0) {
-    double px[4] = {i+j%2, i+1-j%2, i+j%2, i+j%2};
-    double py[4] = {j-1, j, j+1, j-1};
+    double I = static_cast<double>(i);
+    double J = static_cast<double>(j);
+    double px[4] = {I+j%2, I+1-j%2, I+j%2, I+j%2};
+    double py[4] = {J-1, J, J+1, J-1};
     bin = _h->AddBin(4, px, py);
   }
 
@@ -85,7 +88,6 @@ void TH2EMR::Fill(int i, int j) {
   _v.push_back(wi + 1);
 }
 
-
 void TH2EMR::Fill(int i, int j, double w) {
 
   // Skip the test channel
@@ -94,8 +96,10 @@ void TH2EMR::Fill(int i, int j, double w) {
   // If the hit is in the sea (bin = -5), add a bar
   int bin = _h->FindBin(i+.5, j);
   if (bin < 0) {
-    double px[4] = {i+j%2, i+1-j%2, i+j%2, i+j%2};
-    double py[4] = {j-1, j, j+1, j-1};
+    double I = static_cast<double>(i);
+    double J = static_cast<double>(j);
+    double px[4] = {I+j%2, I+1-j%2, I+j%2, I+j%2};
+    double py[4] = {J-1, J, J+1, J-1};
     bin = _h->AddBin(4, px, py);
   }
 
@@ -112,8 +116,9 @@ void TH2EMR::FillPlane(int i, double w) {
   // If the hit is in the sea (bin = -5), add a plane
   int bin = _h->FindBin(i+.5, 30);
   if (bin < 0) {
-    double px[5] = {i+1, i, i, i+1, i+1};
-    double py[5] = {0, 1, 59, 60, 0};
+    double I = static_cast<double>(i);
+    double px[5] = {I+1, I, I, I+1, I+1};
+    double py[5] = {0., 1., 59., 60., 0.};
     bin = _h->AddBin(5, px, py);
   }
 
@@ -127,9 +132,11 @@ void TH2EMR::FillPlane(int i, double w) {
 
 void TH2EMR::Draw() {
 
+  if ( !_v.size() )
+    return;
+
   // Identify the optimal limits of the z axis and set them
   std::sort(_v.begin(), _v.end());
-
   _h->SetAxisRange(_v.front() - 1, _v.back(), "Z");
   _h->SetAxisRange(_v.front() - 1, _v.back(), "Z");
 
@@ -148,9 +155,13 @@ void TH2EMR::SetBinContent(int i, int j, double w) {
   // If the hit is in the sea (bin = -5), add a bar
   int bin = _h->FindBin(i+.5, j);
   if (bin < 0) {
-    double px[4] = {i+j%2, i+1-j%2, i+j%2, i+j%2};
-    double py[4] = {j-1, j, j+1, j-1};
+    double I = static_cast<double>(i);
+    double J = static_cast<double>(j);
+    double px[4] = {I+j%2, I+1-j%2, I+j%2, I+j%2};
+    double py[4] = {J-1, J, J+1, J-1};
     bin = _h->AddBin(4, px, py);
+  } else {
+    _v.erase(std::remove(_v.begin(), _v.end(), _h->GetBinContent(bin)), _v.end());
   }
 
   // Set content of the bar
@@ -159,22 +170,4 @@ void TH2EMR::SetBinContent(int i, int j, double w) {
   // Save the values to determine the range of the z axis
   _v.push_back(w);
 }
-
-double TH2EMR::GetMaximum() {
-  return _h->GetMaximum();
-}
-
-double TH2EMR::GetMinimum() {
-  return _h->GetMinimum();
-}
-
-TH2Poly* TH2EMR::GetHistogram() {
-  return _h;
-}
-
-void TH2EMR::Write() {
-
-  _h->Write();
-}
-
 } // namespace MAUS

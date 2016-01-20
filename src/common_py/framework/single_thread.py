@@ -170,7 +170,7 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
 
         # process spills
         # check for run number change and process an end-of-run spill if changed
-        merged_event = event
+        redevent = None
         if evtype == "Spill":
             if event_json is None:
                 current_run_number = event.GetSpill().GetRunNumber()
@@ -190,9 +190,9 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 self.run_number = current_run_number
             # now transform the event and reduce it
             event = self.transformer.process(event)
-            merged_event = self.merger.process(event)
+            redevent = self.merger.process(event)
         # done with tranform-merge, now write it out
-        self.outputer.save(merged_event)
+        self.outputer.save(redevent)
         # if we converted to a different representation, delete the old one
         try:
             maus_cpp.converter.del_data_repr(event)

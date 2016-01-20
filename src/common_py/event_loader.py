@@ -62,6 +62,8 @@ class maus_reader() :
     self.__total_num_spills = 0
     self.__total_num_events = 0
 
+    self.__max_num_events = 0
+
 #    self.next_event()
 
 
@@ -127,6 +129,12 @@ class maus_reader() :
       return False
 
 
+  def set_max_num_events( self, max_num ) :
+    """
+      Set the maximum number of events to load
+    """
+    self.__max_num_events = max_num
+
   def next_event( self ) :
     """
       Load the next event into memory.
@@ -137,7 +145,10 @@ class maus_reader() :
         return False
 
     self.__total_num_events += 1
-    return True
+    if self.__total_num_events == self.__max_num_events :
+      return False
+    else :
+      return True
 
 
   def next_spill( self ) :
@@ -163,6 +174,9 @@ class maus_reader() :
     self.__current_event_num = 0
 
     if self.__spill.GetDaqEventType() != "physics_event" :
+      return self.next_spill()
+
+    if self.__current_num_events == 0 :
       return self.next_spill()
 
     self.__total_num_spills += 1

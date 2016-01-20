@@ -14,16 +14,18 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/common_cpp/JsonCppProcessors/EMRPlaneHitProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/EMRSpillDataProcessor.hh"
+#include "JsonCppProcessors/EMRSpillDataProcessor.hh"
 
 namespace MAUS {
 
 EMRSpillDataProcessor::EMRSpillDataProcessor()
-      : _plane_hit_array_proc(new EMRPlaneHitProcessor) {
+      : _bar_hit_array_proc(new EMRBarHitProcessor),
+	_event_track_array_proc(new EMREventTrackProcessor) {
     RegisterValueBranch
-	  ("emr_plane_hits", &_plane_hit_array_proc, &EMRSpillData::GetEMRPlaneHitArray,
-           &EMRSpillData::SetEMRPlaneHitArray, false);
+	  ("bar_hits", &_bar_hit_array_proc, &EMRSpillData::GetEMRBarHitArray,
+           &EMRSpillData::SetEMRBarHitArray, false);
+    RegisterValueBranch
+	  ("event_tracks", &_event_track_array_proc, &EMRSpillData::GetEMREventTrackArray,
+           &EMRSpillData::SetEMREventTrackArray, false);
 }
-}
-
+} // namespace MAUS

@@ -46,48 +46,13 @@
 #include "DataStructure/DAQData.hh"
 #include "DataStructure/EMRDaq.hh"
 #include "DataStructure/DBBSpillData.hh"
-#include "DataStructure/EMRBar.hh"
-#include "DataStructure/EMRBarHit.hh"
-#include "DataStructure/EMRPlaneHit.hh"
 #include "DataStructure/EMREvent.hh"
+#include "Recon/EMR/TrackFitter.hh"
+#include "Recon/EMR/TrackRange.hh"
+#include "Recon/EMR/TrackMomentum.hh"
 #include "API/MapBase.hh"
 
 namespace MAUS {
-
-typedef std::vector<MAUS::EMRBarHit>    EMRBarHitsVector; /* nHits elements */
-typedef std::vector<EMRBarHitsVector>   EMRBarVector; /* 60 elements */
-typedef std::vector<EMRBarVector>       EMRPlaneVector; /* 48 elements */
-typedef std::vector<EMRPlaneVector>     EMRDBBEventVector; /* nTr elements */
-
-struct fADCdata_er {
-  int    _orientation;
-  double _charge;
-  double _charge_corrected;
-  double _pedestal_area;
-  int    _time;
-  std::vector<int> _samples;
-};
-
-typedef std::vector<fADCdata_er>                EMRfADCPlaneHitsVector_er;/* 48 elements */
-typedef std::vector<EMRfADCPlaneHitsVector_er>  EMRfADCEventVector_er;/* nTr elements */
-
-struct TrackData {
-  double _range_primary;
-  double _range_secondary;
-  double _secondary_to_primary_track_distance;
-  bool _has_primary;
-  bool _has_secondary;
-  double _total_charge_ma;
-  double _total_charge_sa;
-  double _charge_ratio_ma;
-  double _charge_ratio_sa;
-  double _plane_density_ma;
-  double _plane_density_sa;
-  double _chi2_x;
-  double _chi2_y;
-};
-
-typedef std::vector<TrackData> EMRTrackEventVector;
 
 class MapCppEMRRecon : public MapBase<MAUS::Data> {
 
@@ -115,53 +80,20 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
  */
   void _process(MAUS::Data *data) const;
 
-  void process_preselected_events(MAUS::Spill *spill,
-				  EMRDBBEventVector& emr_dbb_events_tmp,
-				  EMRfADCEventVector_er& emr_fadc_events_tmp) const;
+  void reconstruct_plane_density(MAUS::Spill *spill,
+				 size_t nPartEvents) const;
 
-  void process_secondary_events(EMRDBBEventVector emr_dbb_events_tmp,
-			        EMRfADCEventVector_er emr_fadc_events_tmp,
-			        EMRDBBEventVector *emr_dbb_events,
-			        EMRfADCEventVector_er& emr_fadc_events,
-			        EMRTrackEventVector& emr_track_events) const;
+  void reconstruct_event_charge(MAUS::Spill *spill,
+				size_t nPartEvents) const;
 
-  void tot_cleaning(int nPartEvents,
-		    EMRDBBEventVector *emr_dbb_events,
-		    EMRfADCEventVector_er& emr_fadc_events,
-		    EMRTrackEventVector& emr_track_events) const;
+  void reconstruct_tracks(MAUS::Spill *spill,
+			  size_t nPartEvents) const;
 
-  void pid_variables(int nPartEvents,
-		    EMRDBBEventVector *emr_dbb_events,
-		    EMRfADCEventVector_er& emr_fadc_events,
-		    EMRTrackEventVector& emr_track_events) const;
+  void match_daughters(MAUS::Spill *spill,
+		       size_t nPartEvents) const;
 
-  void coordinates_reconstruction(int nPartEvents,
-				  EMRDBBEventVector *emr_dbb_events,
-				  EMRfADCEventVector_er& emr_fadc_events) const;
-
-  void energy_correction(int nPartEvents,
-			 EMRDBBEventVector *emr_dbb_events,
-			 EMRfADCEventVector_er& emr_fadc_events) const;
-
-  void track_matching(int nPartEvents,
-		      EMRDBBEventVector *emr_dbb_events,
-		      EMRfADCEventVector_er& emr_fadc_events,
-		      EMRTrackEventVector& emr_track_events) const;
-
-  void event_charge_calculation(int nPartEvents,
-				EMRDBBEventVector *emr_dbb_events,
-				EMRfADCEventVector_er& emr_fadc_events,
-				EMRTrackEventVector& emr_track_events) const;
-
-  void fill(Spill *spill,
-	    int nPartEvents,
-	    EMRDBBEventVector *emr_dbb_events,
-	    EMRfADCEventVector_er& emr_fadc_events,
-	    EMRTrackEventVector& emr_track_events) const;
-
-  EMRDBBEventVector get_dbb_data_tmp(int nPartEvts) const;
-  EMRfADCEventVector_er get_fadc_data_tmp(int nPartEvts) const;
-  EMRTrackEventVector get_track_data_tmp(int nPartEvts) const;
+  double dist(MAUS::ThreeVector p1,
+	      MAUS::ThreeVector p2) const;
 
   // Maps
   EMRCalibrationMap _calibMap;
@@ -169,28 +101,17 @@ class MapCppEMRRecon : public MapBase<MAUS::Data> {
   EMRGeometryMap _geoMap;
 
   // Detector parameters
-  int _number_of_planes;
-  int _number_of_bars;
-  double _bar_width;
-  double _bar_height;
-  double _gap;
+  size_t _number_of_planes;
+  size_t _number_of_bars;
 
-  // Configuration variables
-  int _secondary_hits_bunching_width;
-  int _primary_trigger_minXhits;
-  int _primary_trigger_minYhits;
-  int _primary_trigger_minNhits;
-  int _secondary_trigger_minXhits;
-  int _secondary_trigger_minYhits;
-  int _secondary_trigger_minNhits;
-  int _secondary_trigger_minTot;
-  int _max_secondary_to_primary_track_distance;
-
-  // Charge reconstruction variables
-  double _tot_func_p1;
-  double _tot_func_p2;
-  double _tot_func_p3;
+  // Max distance for matching
+  double _charge_threshold;
+  int _polynomial_order;
+  double _max_time;
+  double _max_distance;
+  double _dbb_count;
+  double _hole_fraction;
 };
-}
+} // namespace MAUS
 
-#endif
+#endif // #define _MAP_MAPCPPEMRRECON_H_

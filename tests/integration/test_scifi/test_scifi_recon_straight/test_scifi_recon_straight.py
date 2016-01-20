@@ -72,32 +72,32 @@ class TestSciFiReconStraight(unittest.TestCase): # pylint: disable=R0904
           "_spill._recon._scifi_event._scifistraightprtracks._x_chisq>>h1",
           "_spill._recon._scifi_event._scifistraightprtracks._tracker==0")
         h1 = ROOT.gDirectory.Get('h1')
-        self.assertLess(h1.GetMean(), 15)
-        self.assertLess(h1.GetRMS(), 15)
+        self.assertLess(h1.GetMean(), 25.0)
+        self.assertLess(h1.GetRMS(), 25.0)
         self.assertGreater(h1.GetEntries(), 190)
 
         tree.Draw(
           "_spill._recon._scifi_event._scifistraightprtracks._y_chisq>>h2",
           "_spill._recon._scifi_event._scifistraightprtracks._tracker==0")
         h2 = ROOT.gDirectory.Get('h2')
-        self.assertLess(h2.GetMean(), 15)
-        self.assertLess(h2.GetRMS(), 15)
+        self.assertLess(h2.GetMean(), 25.0)
+        self.assertLess(h2.GetRMS(), 25.0)
         self.assertGreater(h2.GetEntries(), 190)
 
         tree.Draw(
           "_spill._recon._scifi_event._scifistraightprtracks._x_chisq>>h3",
           "_spill._recon._scifi_event._scifistraightprtracks._tracker==1")
         h3 = ROOT.gDirectory.Get('h3')
-        self.assertLess(h3.GetMean(), 15)
-        self.assertLess(h3.GetRMS(), 15)
+        self.assertLess(h3.GetMean(), 25.0)
+        self.assertLess(h3.GetRMS(), 25.0)
         self.assertGreater(h3.GetEntries(), 25)
 
         tree.Draw(
           "_spill._recon._scifi_event._scifistraightprtracks._y_chisq>>h4",
           "_spill._recon._scifi_event._scifistraightprtracks._tracker==1")
         h4 = ROOT.gDirectory.Get('h4')
-        self.assertLess(h4.GetMean(), 15)
-        self.assertLess(h4.GetRMS(), 15)
+        self.assertLess(h4.GetMean(), 25.0)
+        self.assertLess(h4.GetRMS(), 25.0)
         self.assertGreater(h4.GetEntries(), 25)
 
         # Check chi^2 average is reasonably low for straight final tracks
@@ -111,7 +111,7 @@ class TestSciFiReconStraight(unittest.TestCase): # pylint: disable=R0904
         #tree.Draw("_spill._recon._scifi_event._scifitracks._chi2>>h6",
                   #"_spill._recon._scifi_event._scifitracks._tracker==1")
         #h6 = ROOT.gDirectory.Get('h6')
-        #self.assertLess(h6.GetMean(), 15)
+        #self.assertLess(h6.GetMean(), 25.0)
         #self.assertLess(h6.GetRMS(), 10)
         #self.assertGreater(h6.GetEntries(), 25)
 

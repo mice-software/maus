@@ -91,7 +91,7 @@ class PatternRecognitionTest : public ::testing::Test {
 
 TEST_F(PatternRecognitionTest, test_constructor) {
   PatternRecognition pr;
-  pr.set_parameters_to_default();
+  EXPECT_FALSE(pr._debug);
   EXPECT_TRUE(pr._up_straight_pr_on);
   EXPECT_TRUE(pr._down_straight_pr_on);
   EXPECT_TRUE(pr._up_helical_pr_on);
@@ -103,9 +103,33 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(0.4298, pr._sd_5);
   EXPECT_EQ(1.0, pr._sd_phi_1to4);
   EXPECT_EQ(1.0, pr._sd_phi_5);
-  EXPECT_EQ(2.0, pr._res_cut);
+  EXPECT_EQ(7.0, pr._res_cut);
   EXPECT_EQ(150.0, pr._R_res_cut);
-  EXPECT_EQ(15.0, pr._straight_chisq_cut);
+  EXPECT_EQ(50.0, pr._straight_chisq_cut);
+  EXPECT_EQ(4.0, pr._sz_chisq_cut);
+  EXPECT_EQ(0.75, pr._n_turns_cut);
+  EXPECT_EQ(180.0, pr._Pt_max);
+  EXPECT_EQ(50.0, pr._Pz_min);
+}
+
+TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
+  PatternRecognition pr;
+  pr.set_parameters_to_default();
+  EXPECT_FALSE(pr._debug);
+  EXPECT_TRUE(pr._up_straight_pr_on);
+  EXPECT_TRUE(pr._down_straight_pr_on);
+  EXPECT_TRUE(pr._up_helical_pr_on);
+  EXPECT_TRUE(pr._down_helical_pr_on);
+  EXPECT_EQ(0, pr._verb);
+  EXPECT_EQ(2, pr._n_trackers);
+  EXPECT_EQ(5, pr._n_stations);
+  EXPECT_EQ(0.3844, pr._sd_1to4);
+  EXPECT_EQ(0.4298, pr._sd_5);
+  EXPECT_EQ(1.0, pr._sd_phi_1to4);
+  EXPECT_EQ(1.0, pr._sd_phi_5);
+  EXPECT_EQ(7.0, pr._res_cut);
+  EXPECT_EQ(150.0, pr._R_res_cut);
+  EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(4.0, pr._sz_chisq_cut);
   EXPECT_EQ(0.75, pr._n_turns_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
@@ -1168,6 +1192,22 @@ TEST_F(PatternRecognitionTest, test_find_n_turns) {
   EXPECT_NEAR(true_phi[2], 5.81611, epsilon);
   EXPECT_NEAR(true_phi[3], 7.44961, epsilon);
   EXPECT_NEAR(true_phi[4], 8.67847, epsilon);
+}
+
+TEST_F(PatternRecognitionTest, test_setup_debug) {
+
+  PatternRecognition* pr = new PatternRecognition();
+  pr->set_parameters_to_default();
+  pr->setup_debug();
+
+  EXPECT_TRUE(pr->_debug);
+  EXPECT_TRUE(pr->_rfile);
+  EXPECT_TRUE(pr->_hx);
+  EXPECT_TRUE(pr->_hy);
+  EXPECT_TRUE(pr->_hxchisq);
+  EXPECT_TRUE(pr->_hychisq);
+
+  delete pr;
 }
 
 } // ~namespace MAUS

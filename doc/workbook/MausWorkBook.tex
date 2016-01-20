@@ -67,7 +67,7 @@
 
 \title{\textcolor{blue}{The MAUS Work Book}}
 \author{Adam Dobbs}
-\date{Version 1.7, August 2015}
+\date{Version 1.8, January 2016}
 
 % \pdfinfo{%
 %   /Title    (MAUS Work Book)
@@ -351,7 +351,7 @@ The CDB is a bitemporal database, that is it stores geometry configurations base
   \end{lstlisting}
   \item By geometry ID  e.g. 
     \begin{lstlisting}
-./bin/utilities/download_geometry.py --geometry_download_id 50
+./bin/utilities/download_geometry.py --geometry_download_id 108
     \end{lstlisting}
   \item By run number e.g.
   \begin{lstlisting}
@@ -361,7 +361,25 @@ The CDB is a bitemporal database, that is it stores geometry configurations base
   \end{lstlisting}
 \end{enumerate}
 
-By default, CDB geometries are stored in \texttt{files/geometry/download}.  A simulation or reconstruction script can be told to use a particular geometry by using the flag \texttt{-{}-simulation\_geometry\_file} followed by the absolute path and the top level geometry file name, \texttt{ParentGeometryFile.dat}. For simulation usage examples see section~\ref{sec:Simulation}, and for reconstruction usage examples see section~\ref{sec:Reconstruction}.
+Additional beamline settings may also be specified, for example to download a geometry by ID for a particular beamline line mometum with all cooling channel magnet currents set to zero:
+
+\begin{lstlisting}
+./bin/utilities/download_geometry.py 
+      --geometry_download_by "id" 
+      --geometry_download_id 108
+      --geometry_download_coolingchannel_tag  "NoField" 
+      --geometry_download_beamline_tag "6-200+M0" 
+\end{lstlisting}
+
+If no beamline options are specified a 200MeV/c beamline setting with 4~T field in the cooling channel is used.
+
+A list of the current geometries and the runs associated with them are available from:
+
+    \medskip
+    \url{http://micewww.pp.rl.ac.uk/projects/maus/wiki/GeometryDescriptions}
+    \medskip
+
+By default, downloaded CDB geometries are stored in \texttt{files/geometry/download}.  A simulation or reconstruction script can be told to use a particular geometry by using the flag \texttt{-{}-simulation\_geometry\_file} followed by the absolute path and the top level geometry file name, \texttt{ParentGeometryFile.dat}. For simulation usage examples see section~\ref{sec:Simulation}, and for reconstruction usage examples see section~\ref{sec:Reconstruction}.
 
 \section{Running a MC Simulation}
 \label{sec:Simulation}
@@ -415,17 +433,24 @@ python ./bin/analyze_data_online.py \
 
   \begin{figure}[tbh]
     \begin{center}
-      \includegraphics[width=0.8\linewidth]{./graphics/WebStoreReco.png}
-      \caption{The MICE data webstore, reconstruction section.}
+      \includegraphics[width=0.34\linewidth]{./graphics/OffRecReconWebStore.png} \hspace{5mm}
+      \includegraphics[width=0.6\linewidth]{./graphics/WebStoreReco.png}
+      \caption{Left:The offrec machine reconstucted data page (for current processed data). Right: The GRID MICE data webstore, reconstruction section (for older processed data).}
       \label{fig:WebStoreReco}
     \end{center}
   \end{figure}
 
-  Data from simulation may be produced by MAUS as described in section~\ref{sec:Simulation}.  For real data, as mentioned in section~\ref{sec:Reconstruction}, the preferred route is for analysts to use MICE data which has been unpacked and reconstructed centrally on the GRID.  This ensures everyone is using the same standard reconstruction parameters from an official release of MAUS, and is especially important if the analysed data is intended for publication. If it is still desirable to reconstruct data locally with MAUS prior to analysis, see section~\ref{sec:Reconstruction}.  Otherwise, centrally processed MICE data is made available from the MICE webstore:
+  Data from simulation may be produced by MAUS as described in section~\ref{sec:Simulation}.  For real data, as mentioned in section~\ref{sec:Reconstruction}, the preferred route is for analysts to use MICE data which has been unpacked and reconstructed centrally, either on the offical MICE offline reconstruction machines or via the GRID for older data.  This ensures everyone is using the same standard reconstruction parameters from an official release of MAUS, and is especially important if the analysed data is intended for publication. If it is still desirable to reconstruct data locally with MAUS prior to analysis, see section~\ref{sec:Reconstruction}.  Otherwise, centrally processed MICE data from the offrec machines is made available from:
+
+  \url{http://reco.mice.rl.ac.uk/}
+
+  Older data processed on the GRID is available from the MICE webstore:
 
   \url{http://www.hep.ph.ic.ac.uk/micedata/RECO/}
 
-  The front page of the reconstruction section of the webstore is shown in figure~\ref{fig:WebStoreReco}. The data in the webstore is organised by MAUS version used to perform the reconstruction, by parameter set used in the reconstruction (assigned a unique number known as the batch iteration number or BIN) and by run number. The data for each run is then stored in a tarball file archive which may be downloaded.  Inside the tar archive there are a number of log files and parameter files. The data itself is stored in a ROOT file following the naming convention \texttt{xxxxx\_recon.root}, where \texttt{xxxxx} is the run number.
+  The web page for the offrec machines processed data is shown in figure~\ref{fig:WebStoreReco} (left). Data is stored by ascending run number in tarball archives which may be downloaded.  Inside each tar archive there are a number of log files and parameter files. The data itself is stored in a ROOT file following the naming convention \texttt{xxxxx\_recon.root}, where \texttt{xxxxx} is the run number. Also on the page is information of the MAUS verison used to perform the reconstruction, together with a link to the geometry used.
+
+  The front page of the reconstruction section of the GRID  webstore is shown in figure~\ref{fig:WebStoreReco} (right). The data in the webstore is organised by MAUS version used to perform the reconstruction, by parameter set used in the reconstruction (assigned a unique number known as the batch iteration number or BIN) and by run number. The data for each run is again stored in a tarball file archive.
 
   A catalogue of MICE runs, including run numbers, run conditions, beamline optics, number of triggers taken, etc. is available via the MICE CDB viewer:
 
@@ -897,7 +922,8 @@ A table of some common parameters is produced below.
     \item The MICE website: \url{http://mice.iit.edu}
     \item The MAUS wiki: \url{http://micewww.pp.rl.ac.uk/projects/maus/wiki}
     \item Download MAUS: \url{http://micewww.pp.rl.ac.uk/maus/}
-    \item The MICE datastore: \url{http://www.hep.ph.ic.ac.uk/micedata/}
+    \item The MICE offrec processed datastore: \url{http://reco.mice.rl.ac.uk/}
+    \item The GRID MICE datastore: \url{http://www.hep.ph.ic.ac.uk/micedata/}
     \item The MICE CDB viewer: \url{http://cdb.mice.rl.ac.uk/cdbviewer/}
     \item Example analysis code: \url{http://micewww.pp.rl.ac.uk/documents/140}
   \end{itemize}

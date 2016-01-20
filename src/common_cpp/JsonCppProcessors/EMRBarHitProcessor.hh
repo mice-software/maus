@@ -17,9 +17,10 @@
 #ifndef _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRBARHITPROCESSOR_
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRBARHITPROCESSOR_
 
-#include "src/common_cpp/DataStructure/EMRBarHit.hh"
-#include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
-#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
+#include "DataStructure/EMRBarHit.hh"
+#include "JsonCppProcessors/ObjectProcessor.hh"
+#include "JsonCppProcessors/PrimitivesProcessors.hh"
+#include "JsonCppProcessors/ThreeVectorProcessor.hh"
 
 namespace MAUS {
 
@@ -28,18 +29,16 @@ namespace MAUS {
  */
 
 class EMRBarHitProcessor : public ObjectProcessor<EMRBarHit> {
-  public:
-    /** Set up processors and register branches
-     *
-     *  Everything else is handled by the base class
-     */
-    EMRBarHitProcessor();
+ public:
+  /** Set up processors and register branches
+   *
+   *  Everything else is handled by the base class
+   */
+  EMRBarHitProcessor();
 
-  private:
-    DoubleProcessor _double_proc;
-    IntProcessor _int_proc;
+ private:
+  IntProcessor _int_proc;
 };
 }  // namespace MAUS
 
-#endif  // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRBARHITPROCESSOR_
-
+#endif // #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_EMRBARHITPROCESSOR_

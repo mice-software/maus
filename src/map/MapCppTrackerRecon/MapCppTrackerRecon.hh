@@ -120,7 +120,17 @@ class MapCppTrackerRecon : public MapBase<Data> {
   /**
    * @brief Populate global position output for the spacepoints
    */
-  void set_spacepoint_global_output(SciFiSpacePointPArray spoints) const;
+  void set_spacepoint_global_output(const SciFiSpacePointPArray& spoints) const;
+
+  /**
+   * @brief Populate global parameter output for the straight pat rec tracks
+   */
+  void set_straight_prtrack_global_output(const SciFiStraightPRTrackPArray& trks) const;
+
+  /** 
+    * @brief Rates the track based on the outcome of the reconstruction
+    */
+  void calculate_track_rating(SciFiTrack* track) const;
 
  private:
   /// This will contain the configuration
@@ -141,11 +151,22 @@ class MapCppTrackerRecon : public MapBase<Data> {
   bool _down_helical_pr_on;
   bool _kalman_on;
   bool _patrec_on;
+  bool _patrec_debug_on;
 
   bool _use_mcs;
   bool _use_eloss;
   bool _use_patrec_seed;
   bool _correct_pz;
+
+  int _excellent_num_trackpoints;
+  int _good_num_trackpoints;
+  int _poor_num_trackpoints;
+  double _excellent_p_value;
+  double _good_p_value;
+  double _poor_p_value;
+  int _excellent_num_spacepoints;
+  int _good_num_spacepoints;
+  int _poor_num_spacepoints;
 
   double _seed_value;
 

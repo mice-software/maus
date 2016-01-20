@@ -42,6 +42,7 @@ MapCppTrackerRecon::MapCppTrackerRecon() : _up_straight_pr_on(true),
                                            _down_straight_pr_on(true),
                                            _up_helical_pr_on(true),
                                            _down_helical_pr_on(true),
+                                           _patrec_debug_on(false),
                                            MapBase<Data>("MapCppTrackerRecon"),
 #ifdef KALMAN_TEST
   _spacepoint_helical_track_fitter(NULL),
@@ -56,6 +57,7 @@ MapCppTrackerRecon::~MapCppTrackerRecon() {
 }
 
 void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
+  // Pull out the global settings
   if (!Globals::HasInstance()) {
     GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
   }
@@ -66,26 +68,40 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   int user_down_straight_pr_on = (*json)["SciFiPRStraightTkDSOn"].asInt();
   _kalman_on          = (*json)["SciFiKalmanOn"].asBool();
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
+  _patrec_debug_on    = (*json)["SciFiPatRecDebugOn"].asBool();
   _size_exception     = (*json)["SciFiClustExcept"].asInt();
   _min_npe            = (*json)["SciFiNPECut"].asDouble();
   _use_mcs            = (*json)["SciFiKalman_use_MCS"].asBool();
   _use_eloss          = (*json)["SciFiKalman_use_Eloss"].asBool();
   _use_patrec_seed    = (*json)["SciFiSeedPatRec"].asBool();
   _correct_pz         = (*json)["SciFiKalmanCorrectPz"].asBool();
+  // Values used to set the track rating:
+  _excellent_num_trackpoints     = (*json)["SciFiExcellentNumTrackpoints"].asInt();
+  _good_num_trackpoints          = (*json)["SciFiGoodNumTrackpoints"].asInt();
+  _poor_num_trackpoints          = (*json)["SciFiPoorNumTrackpoints"].asInt();
+  _excellent_p_value             = (*json)["SciFiExcellentPValue"].asDouble();
+  _good_p_value                  = (*json)["SciFiGoodPValue"].asDouble();
+  _poor_p_value                  = (*json)["SciFiPoorPValue"].asDouble();
+  _excellent_num_spacepoints  = (*json)["SciFiExcellentNumSpacepoints"].asInt();
+  _good_num_spacepoints       = (*json)["SciFiGoodNumSpacepoints"].asInt();
+  _poor_num_spacepoints       = (*json)["SciFiPoorNumSpacepoints"].asInt();
 
+  // Build the geometery helper instance
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
     module->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
 
+  // Set up cluster reconstruction
   _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
 
+  // Set up spacepoint reconstruction
   _spacepoint_recon = SciFiSpacePointRec();
 
+  // Setup Pattern Recognition
   double up_field = _geometry_helper.GetFieldValue(0);
   double down_field = _geometry_helper.GetFieldValue(1);
-
   if (user_up_helical_pr_on == 2)
     _up_helical_pr_on = true;
   else if (user_up_helical_pr_on == 1)
@@ -130,6 +146,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _pattern_recognition.set_down_straight_pr_on(_down_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
+  if (_patrec_debug_on) _pattern_recognition.setup_debug();
 
   if (_use_patrec_seed) {
     _seed_value = -1.0;
@@ -137,6 +154,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     _seed_value = (*json)["SciFiSeedCovariance"].asDouble();
   }
 
+  // Set up final track fit (Kalman filter)
 #ifdef KALMAN_TEST
   HelicalPropagator* spacepoint_helical_prop = new HelicalPropagator(&_geometry_helper);
   spacepoint_helical_prop->SetCorrectPz(_correct_pz);
@@ -202,6 +220,14 @@ void MapCppTrackerRecon::_process(Data* data) const {
         continue;
       }
 
+      // Clear any exising higher level data
+      event->clear_clusters();
+      event->clear_spacepoints();
+      event->clear_seeds();
+      event->clear_stracks();
+      event->clear_htracks();
+      event->clear_scifitracks();
+
       // Build Clusters.
       if (event->digits().size()) {
         _cluster_recon.process(*event);
@@ -214,6 +240,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
       // Pattern Recognition.
       if (_patrec_on && event->spacepoints().size()) {
         _pattern_recognition.process(*event);
+        set_straight_prtrack_global_output(event->straightprtracks());
         extrapolate_helical_reference(*event);
         extrapolate_straight_reference(*event);
       }
@@ -418,6 +445,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _helical_track_fitter->Smooth(false);
 
       SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
+      calculate_track_rating(track);
 
       evt.add_scifitrack(track);
     }
@@ -434,6 +462,7 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
       _straight_track_fitter->Smooth(false);
 
       SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
+      calculate_track_rating(track);
 
       evt.add_scifitrack(track);
     }
@@ -568,6 +597,36 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
     track->set_reference_position(pos);
     track->set_reference_momentum(mom);
   }
+}
+
+void MapCppTrackerRecon::calculate_track_rating(SciFiTrack* track) const {
+  SciFiBasePRTrack* pr_track = track->pr_track_pointer();
+  int number_spacepoints = pr_track->get_num_points();
+  int number_trackpoints = track->GetNumberDataPoints();
+
+  bool excel_numtp = (number_trackpoints >= _excellent_num_trackpoints);
+  bool good_numtp = (number_trackpoints >= _good_num_trackpoints);
+  bool poor_numtp = (number_trackpoints >= _poor_num_trackpoints);
+  bool excel_numsp = (number_spacepoints >= _excellent_num_spacepoints);
+  bool good_numsp = (number_spacepoints >= _good_num_spacepoints);
+  bool poor_numsp = (number_spacepoints >= _poor_num_spacepoints);
+  bool excel_pval = (track->P_value() >= _excellent_p_value);
+  bool good_pval = (track->P_value() >= _good_p_value);
+  bool poor_pval = (track->P_value() >= _poor_p_value);
+
+  int rating = 0;
+
+  if (excel_numtp && excel_numsp && excel_pval) {
+    rating = 1;
+  } else if (good_numtp && good_numsp && good_pval) {
+    rating = 2;
+  } else if (poor_numtp && poor_numsp && poor_pval) {
+    rating = 3;
+  } else {
+    rating = 5;
+  }
+
+  track->SetRating(rating);
 }
 
 
@@ -733,21 +792,28 @@ SciFiSpacePointPArray find_spacepoints(SciFiSpacePointPArray spacepoint_array, i
   return found_spacepoints;
 }
 
-void MapCppTrackerRecon::set_spacepoint_global_output(SciFiSpacePointPArray spoints) const {
+void MapCppTrackerRecon::set_spacepoint_global_output(const SciFiSpacePointPArray& spoints) const {
   for (auto sp : spoints) {
-    int tracker_id = sp->get_tracker();
-
-    ThreeVector reference_position = _geometry_helper.GetReferencePosition(tracker_id);
-    CLHEP::HepRotation reference_rotation = _geometry_helper.GetReferenceRotation(tracker_id);
-
-    ThreeVector global_position = sp->get_position();
-    global_position *= reference_rotation;
-    global_position += reference_position;
-
-    sp->set_global_position(global_position);
+    sp->set_global_position(
+      _geometry_helper.TransformPositionToGlobal(sp->get_position(), sp->get_tracker()));
   }
 }
 
+void MapCppTrackerRecon::set_straight_prtrack_global_output(
+  const SciFiStraightPRTrackPArray& trks) const {
+  for (auto trk : trks) {
+    ThreeVector pos = trk->get_spacepoints_pointers()[0]->get_position();
+    std::vector<double> params{ trk->get_x0(), trk->get_mx(), trk->get_y0(), trk->get_my() }; // NOLINT
+    std::vector<double> global_params =
+      _geometry_helper.TransformStraightParamsToGlobal(params, trk->get_tracker());
+
+    // Update the track
+    trk->set_global_x0(global_params[0]);
+    trk->set_global_mx(global_params[1]);
+    trk->set_global_y0(global_params[2]);
+    trk->set_global_my(global_params[3]);
+  }
+}
 /*
 // Find the plane id of the middle plane for this station
 int plane_id = 0;

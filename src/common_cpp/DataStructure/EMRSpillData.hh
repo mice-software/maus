@@ -20,41 +20,64 @@
 #include <vector>
 
 #include "Utils/VersionNumber.hh"
-#include "DataStructure/EMRPlaneHit.hh"
+#include "DataStructure/EMRBarHit.hh"
+#include "DataStructure/EMREventTrack.hh"
 
 namespace MAUS {
 
-typedef std::vector<EMRPlaneHit*> EMRPlaneHitArray;
+typedef std::vector<EMRBarHit> EMRBarHitArray;
+typedef std::vector<EMREventTrack*> EMREventTrackArray;
 
 /** @class EMREvent comment
- *  Class for EMR digits on the spill level
+ *
+ *  @var emrbarhits	<-- Array of bars hit outside of the trigger windows -->
+ *  @var emreventtracks	<-- Array of event tracks reconstructed from the hits -->
  */
 
 class EMRSpillData {
-  public:
-    /** Default constructor - initialises to 0/NULL */
-    EMRSpillData();
+ public:
+  /** Default constructor - initialises to 0/NULL */
+  EMRSpillData();
 
-    /** Copy constructor - any pointers are deep copied */
-    EMRSpillData(const EMRSpillData& emrspilldata);
+  /** Copy constructor - any pointers are deep copied */
+  EMRSpillData(const EMRSpillData& emrsd);
 
-    /** Equality operator - any pointers are deep copied */
-    EMRSpillData& operator=(const EMRSpillData& emrspilldata);
+  /** Equality operator - any pointers are deep copied */
+  EMRSpillData& operator=(const EMRSpillData& emrsd);
 
-    /** Destructor - any member pointers are deleted */
-    virtual ~EMRSpillData();
+  /** Destructor - any member pointers are deleted */
+  virtual ~EMRSpillData();
 
-    /** Returns  */
-    EMRPlaneHitArray GetEMRPlaneHitArray() const;
+  /** @brief Returns the array of bar hits */
+  EMRBarHitArray GetEMRBarHitArray() const          { return _emrbarhits; }
 
-    /** Sets  */
-    void SetEMRPlaneHitArray(EMRPlaneHitArray emrplanehitarray);
+  /** @brief Sets the array of bar hits */
+  void SetEMRBarHitArray(EMRBarHitArray emrbarhits) { _emrbarhits = emrbarhits; }
 
-  private:
-    EMRPlaneHitArray _emrplanehitarray;
+  /** @brief Adds a bar hit to the array */
+  void AddEMRBarHit(EMRBarHit emrbh)                { _emrbarhits.push_back(emrbh); }
 
-    MAUS_VERSIONED_CLASS_DEF(EMRSpillData)
+  /** @brief Returns the amount of bar hits in the plane */
+  size_t GetEMRBarHitArraySize()                    { return _emrbarhits.size(); }
+
+  /** @brief Returns the array of reconstructed event tracks **/
+  EMREventTrackArray GetEMREventTrackArray() const  { return _emreventtracks; }
+
+  /** @brief Sets the array of reconstructed event tracks **/
+  void SetEMREventTrackArray(EMREventTrackArray emreventtracks);
+
+  /** @brief Adds a track event to the array **/
+  void AddEMREventTrack(EMREventTrack* emrte)       { _emreventtracks.push_back(emrte); }
+
+  /** @brief Returns the amount of event tracks **/
+  size_t GetEMREventTrackArraySize()                { return _emreventtracks.size(); }
+
+ private:
+  EMRBarHitArray	_emrbarhits;
+  EMREventTrackArray	_emreventtracks;
+
+  MAUS_VERSIONED_CLASS_DEF(EMRSpillData)
 };
-}
+} // namespace MAUS
 
-#endif
+#endif // #define _SRC_COMMON_CPP_DATASTRUCTURE_EMRSPILLDATA_HH_

@@ -175,6 +175,18 @@ class SciFiGeometryHelper {
 
   void SetDefaultMomentum(double mom) { _default_momentum = mom; }
 
+  ThreeVector TransformPositionToGlobal(const ThreeVector& pos, int tracker) const;
+
+  /** Transform the straight fit parameters (gradient and intercept in x-z and y-z) in to
+   *  global coordinates and return as a vector. Vector component order is x0, mx, y0, my
+   *  for both the input and output vector.
+   *  @param params The straight fit parameters in tracker local coordinates (x0, mx, y0, my)
+   *  @param tracker The tracker number, 0 = TkUS, 1 = TkDS
+   *  @return The straight fit parameters in global coordinates (x0, mx, y0, my)
+   */
+  std::vector<double> TransformStraightParamsToGlobal(const std::vector<double>& params,
+                                                      int tracker) const;
+
  private:
   std::vector<const MiceModule*> _modules;
 

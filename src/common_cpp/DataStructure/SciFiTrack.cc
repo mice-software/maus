@@ -22,6 +22,7 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _chi2(-1),
                           _ndf(-1),
                           _P_value(-1),
+                          _rating(5),
                           _charge(0),
                           _trackpoints(0),
                           _seed_position(),
@@ -34,15 +35,17 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
                                                    _chi2(-1),
                                                    _ndf(-1),
                                                    _P_value(-1),
+                                                   _rating(5),
                                                    _charge(0),
                                                    _trackpoints(0),
                                                    _seed_position(),
                                                    _seed_momentum(),
                                                    _seed_covariance_matrix(0) {
   _tracker   = a_track.tracker();
-  _chi2    = a_track.chi2();
+  _chi2      = a_track.chi2();
   _ndf       = a_track.ndf();
   _P_value   = a_track.P_value();
+  _rating    = a_track.GetRating();
   _charge    = a_track.charge();
   _algorithm_used = a_track._algorithm_used;
   _seed_position = a_track._seed_position;
@@ -69,6 +72,7 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
   _chi2  = a_track.chi2();
   _ndf     = a_track.ndf();
   _P_value = a_track.P_value();
+  _rating  = a_track.GetRating();
   _charge  = a_track.charge();
   _algorithm_used = a_track._algorithm_used;
   _seed_position = a_track._seed_position;
@@ -109,26 +113,17 @@ void SciFiTrack::SetSeedCovariance(double* covariance, unsigned int size) {
   }
 }
 
-int SciFiTrack::GetRating() const {
-  SciFiStraightPRTrack* pr_track = static_cast<SciFiStraightPRTrack*>(_pr_track->GetObject());
+int SciFiTrack::GetNumberDataPoints() const {
+  int number_trackpoints = _trackpoints.size();
+  int tp_counter = 0;
 
-  int number_spacepoints = pr_track->get_num_points();
-
-  bool good_pval = (this->P_value() > 0.05);
-
-
-  int rating = 0;
-
-  if (number_spacepoints == 5 &&
-      good_pval) {
-    rating = 5;
-  } else if (good_pval) {
-    rating = 4;
-  } else {
-    rating = 1;
+  for ( int tp_it = 0; tp_it < number_trackpoints; ++tp_it ) {
+    if ( _trackpoints[tp_it]->has_data() ) {
+      tp_counter += 1;
+    }
   }
 
-  return rating;
+  return tp_counter;
 }
 
 } // ~namespace MAUS

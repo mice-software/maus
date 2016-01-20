@@ -42,23 +42,10 @@ class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
         """Check birth with default configuration"""
         test_configuration = self.c.getConfigJSON()
         test_conf_json = json.loads(test_configuration)
-        # Fix the calibration to be always step I (prevents update issues)
+        # Fix the calibration to be always step IV (prevents update issues)
         test_conf_json['EMR_calib_source'] = "file"
         test_conf_json['EMR_calib_file'] = \
-            "/files/calibration/emrcalib_cosmics_march2014.txt"
-        test_conf_json['EMRdoSampling'] = 0
-        test_conf_json['EMRtotFuncP1'] = 15.0
-        test_conf_json['EMRtotFuncP2'] = 0.0089
-        test_conf_json['EMRtotFuncP3'] = 1.24
-        # Fix the SAPMT parameters (changed after Step IV onwards)
-        test_conf_json['EMRqeSAPMT'] = 0.11
-        test_conf_json['EMRnadcPerPeSAPMT'] = 2
-        test_conf_json['EMRelectronicsResponseSpreadSAPMT'] = 1
-        test_conf_json['EMRbaselinePosition'] = 123
-        test_conf_json['EMRbaselineSpread'] = 10
-        test_conf_json['EMRmaximumNoiseLevel'] = 50
-        test_conf_json['EMRacquisitionWindow'] = 302
-        test_conf_json['EMRsignalIntegrationWindow'] = 40
+            "/files/calibration/emrcalib_cosmics_july2015.txt"
         test_conf = json.dumps(test_conf_json)
         self.mapper.birth(test_conf)
 
@@ -92,28 +79,37 @@ class TestMapCppEMRMCDigitization(unittest.TestCase): #pylint: disable=R0904
         self.assertEqual(1, n_ev)
 
 	# consistent amount of primary plane hits, charge and ToTs
-        n_hits_0 = len(spill_out['recon_events'][0]['emr_event']\
-				['emr_plane_hits'])
-        self.assertEqual(24, n_hits_0)
-        for i in range(0, n_hits_0):
+        n_planes = len(spill_out['recon_events'][0]['emr_event']\
+				['event_tracks'][0]['plane_hits'])
+        self.assertEqual(24, n_planes)
+        for i in range(0, n_planes):
             self.assertTrue(spill_out['recon_events'][0]['emr_event']\
-				     ['emr_plane_hits'][i]['charge'] > 0)
-            self.assertTrue(spill_out['recon_events'][0]['emr_event']\
-				     ['emr_plane_hits'][i]['emr_bars'][0]\
-				     ['emr_bar_hits'][0]['tot'] > 5)
+				     ['event_tracks'][0]['plane_hits'][i]\
+				     ['charge'] > 0)
+            n_hits = len(spill_out['recon_events'][0]['emr_event']\
+				  ['event_tracks'][0]['plane_hits'][i]\
+				  ['bar_hits'])
+            for j in range(0, n_hits):
+                self.assertTrue(spill_out['recon_events'][0]['emr_event']\
+				         ['event_tracks'][0]['plane_hits'][i]\
+				         ['bar_hits'][j]['tot'] > 0)
 
-        # hits stored at the spill level (12 decay hits + 1 noise hit)
-        self.assertTrue(spill_out['emr_spill_data']['emr_plane_hits'])
-        spill_hits = 0
-        for i in range(0, len(spill_out['emr_spill_data']\
-				       ['emr_plane_hits'])):
-            for j in range(0, len(spill_out['emr_spill_data']\
-					   ['emr_plane_hits'][i]\
-					   ['emr_bars'])):
-                spill_hits += len(spill_out['emr_spill_data']\
-					   ['emr_plane_hits'][i]\
-					   ['emr_bars'][j]['emr_bar_hits'])
-        self.assertEqual(13, spill_hits)
+        # hits stored at the spill level (all of the hits)
+        n_spill_hits = len(spill_out['emr_spill_data']['bar_hits'])
+        self.assertEqual(50, n_spill_hits)
+
+        # the noise hit is rejected as its by itself (no SP possible)
+        self.assertEqual(1, len(spill_out['emr_spill_data']['event_tracks']))
+        for i in range(0, len(spill_out['emr_spill_data']['event_tracks'][0]\
+				       ['plane_hits'])):
+            self.assertEqual(spill_out['emr_spill_data']['event_tracks'][0]\
+				      ['plane_hits'][i]['charge'], -1.0)
+            n_hits = len(spill_out['emr_spill_data']['event_tracks'][0]\
+				  ['plane_hits'][i]['bar_hits'])
+            for j in range(0, n_hits):
+                self.assertTrue(spill_out['emr_spill_data']['event_tracks'][0]\
+				         ['plane_hits'][i]\
+					 ['bar_hits'][j]['tot'] > 0)
 
 if __name__ == "__main__":
     unittest.main()
