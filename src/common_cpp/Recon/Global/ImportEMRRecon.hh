@@ -53,7 +53,7 @@ namespace global {
      *  @param emr_event  The reconstructed EMR Event
      *  @param global_event The Global Event, which will be changed
      */
-    void process(const MAUS::EMREvent &emr_event,
+    void process(MAUS::EMREvent &emr_event,
 		 MAUS::GlobalEvent* global_event,
 		 std::string mapper_name);
 
