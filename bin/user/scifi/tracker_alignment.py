@@ -33,6 +33,10 @@ class Alignment:
         self.histos_x = []
         self.histos_y = []
         self.histos_xy = []
+        self.histos_x0 = []
+        self.histos_mx = []
+        self.histos_y0 = []
+        self.histos_my = []
         for i in range(2):
             for j in range(1, 6):
                 self.stations.append(mrd.TrackerStation(i, j))
@@ -46,6 +50,18 @@ class Alignment:
                     "x-y residuals T" + str(i) + " S" + str(j),
                     self.nbins, self.llimit, self.ulimit,
                     self.nbins, self.llimit, self.ulimit))
+            self.histos_x0.append(ROOT.TH1D("hx0_" + str(i),
+                "x0 residuals T" + str(i),
+                self.nbins, self.llimit, self.ulimit))
+            self.histos_mx.append(ROOT.TH1D("hmx_" + str(i),
+                "mx residuals T" + str(i),
+                self.nbins, -0.2, 0.2))
+            self.histos_y0.append(ROOT.TH1D("hy0_" + str(i),
+                "y0 residuals T" + str(i),
+                self.nbins, -0.2, 0.2))
+            self.histos_my.append(ROOT.TH1D("hmy_" + str(i),
+                "my residuals T" + str(i),
+                self.nbins, -0.2, 0.2))
 
         self.tof0 = mrd.TOF()
         self.tof1 = mrd.TOF()
@@ -60,6 +76,10 @@ class Alignment:
         self.canvas_xy = \
             ROOT.TCanvas("canvas_xy", "Spacepoint xy Residuals", 0, 0, 700, 500)
         self.canvas_xy.Divide(5, 2)
+
+        self.canvas_mxy = \
+            ROOT.TCanvas("canvas_mxy", "Fit Gradient Residuals", 0, 0, 700, 500)
+        self.canvas_mxy.Divide(2, 2)
 
     def process(self, spill):
         """ Accumulate a spill of data into internal containers and process """
@@ -92,7 +112,7 @@ class Alignment:
                         return False
             if good_event:
                 self.num_good_events += 1
-                self.fill_histograms()
+                self.fill_histograms(tk_evt)
 
     def clear_data(self):
         """ Clear internal detector data containers"""
@@ -113,11 +133,18 @@ class Alignment:
         for i in range(len(self.histos_xy)):
             self.canvas_xy.cd(i+1)
             self.histos_xy[i].Draw('col')
+        for i in range(len(self.histos_mx)):
+            self.canvas_mxy.cd(i+1)
+            self.histos_mx[i].Draw()
+        for i in range(len(self.histos_my)):
+            self.canvas_mxy.cd(i+3)
+            self.histos_my[i].Draw()
         self.canvas_x.Update()
         self.canvas_y.Update()
         self.canvas_xy.Update()
+        self.canvas_mxy.Update()
 
-    def fill_histograms(self):
+    def fill_histograms(self, tk_evt):
         """ Select events with spoints in all tracker stations and tof1 and tof2
             Draw a line between tof1 and tof2 and measure
             tracker residuals from it """
@@ -133,6 +160,16 @@ class Alignment:
         t_zy = dy / dz
         c_zy = self.tof1.spoints_global_y[0] - \
                 (t_zy * self.tof1.spoints_global_z[0])
+
+        # Find the residuals of the gradients of the PatRec fits
+        # to the TOF line
+        trks = tk_evt.straightprtracks()
+        for trk in trks:
+            tracker_id = trk.get_tracker()
+            dmx = t_zx - trk.get_global_mx()
+            dmy = t_zy - trk.get_global_my()
+            self.histos_mx[tracker_id].Fill(dmx)
+            self.histos_my[tracker_id].Fill(dmy)
 
         # Now find the seed spacepoint residuals and fill the histos
         for i in range(len(self.stations)):
@@ -166,6 +203,7 @@ class Alignment:
         self.canvas_x.SaveAs('x_residuals.pdf')
         self.canvas_y.SaveAs('y_residuals.pdf')
         self.canvas_xy.SaveAs('xy_residuals.pdf')
+        self.canvas_mxy.SaveAs('mxy_residuals.pdf')
 
 def main(file_name):
     """ Main function which performs analysis & produces the plots """
