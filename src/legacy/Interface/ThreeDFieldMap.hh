@@ -16,7 +16,7 @@ public:
 
 	static void StripG4BLComments(std::ostream& out, std::istream& in);
 
-	enum symmetry{none, dipole, quadrupole};
+	enum symmetry{none, dipole, quadrupole, solenoid};
 
 private:
 	VectorMap*              myInterpolator;
