@@ -299,6 +299,7 @@ SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker 
 SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
+SciFiPatRecDebugOn = False # Set Pattern Recogntition to debug mode
 SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160. # Used as cut by SpacePointReconstruction
 SciFiParams_RMS = 370.
@@ -665,6 +666,7 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
 
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
 # Particle hypothesis used in Global PID when creating PDFs from MC data.
 # For PDFs to be produced, this must be set, preferably as the type of simulated particle
 # i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"

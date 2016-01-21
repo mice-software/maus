@@ -204,6 +204,72 @@ SciFiEvent::~SciFiEvent() {
   }
 }
 
+void SciFiEvent::clear_all() {
+  clear_digits();
+  clear_clusters();
+  clear_spacepoints();
+  clear_seeds();
+  clear_stracks();
+  clear_htracks();
+  clear_scifitracks();
+}
+
+void SciFiEvent::clear_digits() {
+  std::vector<SciFiDigit*>::iterator it;
+  for (it = _scifidigits.begin(); it!= _scifidigits.end(); ++it) {
+    delete (*it);
+  }
+  _scifidigits.resize(0);
+}
+
+void SciFiEvent::clear_clusters() {
+  std::vector<SciFiCluster*>::iterator it;
+  for (it = _scificlusters.begin(); it != _scificlusters.end(); ++it) {
+    delete (*it);
+  }
+  _scificlusters.resize(0);
+}
+
+void SciFiEvent::clear_spacepoints() {
+  std::vector<SciFiSpacePoint*>::iterator it;
+  for (it = _scifispacepoints.begin(); it != _scifispacepoints.end(); ++it) {
+    delete (*it);
+  }
+  _scifispacepoints.resize(0);
+}
+
+void SciFiEvent::clear_seeds() {
+  std::vector<SciFiSpacePoint*>::iterator it;
+  for (it = _scifiseeds.begin(); it != _scifiseeds.end(); ++it) {
+    delete (*it);
+  }
+  _scifiseeds.resize(0);
+}
+
+void SciFiEvent::clear_stracks() {
+  std::vector<SciFiStraightPRTrack*>::iterator it;
+  for (it = _scifistraightprtracks.begin(); it != _scifistraightprtracks.end(); ++it) {
+    delete (*it);
+  }
+  _scifistraightprtracks.resize(0);
+}
+
+void SciFiEvent::clear_htracks() {
+  std::vector<SciFiHelicalPRTrack*>::iterator it;
+  for (it = _scifihelicalprtracks.begin(); it != _scifihelicalprtracks.end(); ++it) {
+    delete (*it);
+  }
+  _scifihelicalprtracks.resize(0);
+}
+
+void SciFiEvent::clear_scifitracks() {
+  std::vector<SciFiTrack*>::iterator it;
+  for (it = _scifitracks.begin(); it != _scifitracks.end(); ++it) {
+    delete (*it);
+  }
+  _scifitracks.resize(0);
+}
+
 void SciFiEvent::set_spacepoints_used_flag(bool flag) {
   for ( unsigned int i = 0; i < _scifispacepoints.size(); ++i ) {
     _scifispacepoints[i]->set_used(flag);

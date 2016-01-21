@@ -105,7 +105,7 @@ namespace MAUS {
         throw Exception(Exception::recoverable, "ReconEvents were NULL",
                         "ReduceCppGlobalPID::_process");
 
-    const MAUS::Spill* _spill = data_cpp->GetSpill();
+    _spill = data_cpp->GetSpill();
 
     if (_spill) {
       if ( _spill->GetReconEvents() ) {

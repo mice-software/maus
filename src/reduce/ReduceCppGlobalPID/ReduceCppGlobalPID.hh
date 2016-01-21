@@ -34,8 +34,6 @@
 #include "json/json.h"
 
 #include "src/common_cpp/DataStructure/Data.hh"
-#include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
-#include "src/common_cpp/DataStructure/ImageData/Image.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/Global/PIDBase.hh"
 #include "src/common_cpp/Recon/Global/PIDBase1D.hh"
@@ -104,7 +102,7 @@ class ReduceCppGlobalPID : public ReduceBase<Data, Data> {
     std::vector<MAUS::recon::global::PIDBase*> _pid_vars;
 
     // The current spill
-    Spill* _spill;
+    const MAUS::Spill* _spill;
 };
 
 } // ~namespace MAUS
