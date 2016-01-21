@@ -139,9 +139,26 @@ if [ "$install_packages" == "1" ]; then
         easy_install -H None -f $egg_source $package
     done
     # now check that packages were installed
+    failed_modules=""
     for module in $module_test_list
     do
         echo "INFO: Checking import of package $module"
+        
+        python -c "import $module" || { echo "WARNING: Failed to install python module $module from local source"; failed_modules="$failed_modules $module"; }
+        echo "INFO: ok"
+    done
+    # try installing any packages that failed previously, by using the PyPI repository
+    for package in $failed_modules
+    do
+        echo "INFO: Installing $package from PyPI"
+        easy_install $package
+    done
+    # check that packages were installed again
+    failed_modules=""
+    for module in $module_test_list
+    do
+        echo "INFO: Checking import of package $module"
+        
         python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
         echo "INFO: ok"
     done
