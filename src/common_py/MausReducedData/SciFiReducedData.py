@@ -14,45 +14,6 @@ import ROOT
 # pylint: disable = R0914
 # pylint: disable = R0915
 
-class TOF:
-    """ Class holding reduced data for one TOF detector
-        Uses arrays to make compatible with ROOT plotting.
-        May accumulate data over many events. """
-
-    def __init__(self):
-        """ Constructor, set everything to empty or zero """
-        self.tof_num = 0
-        self.num_spoints = 0
-        self.spoints_global_x = array.array('d')
-        self.spoints_global_y = array.array('d')
-        self.spoints_global_z = array.array('d')
-
-    def accumulate_data(self, evt, tof_num):
-        """ Add data from an event """
-        self.tof_num = tof_num
-        if self.tof_num == 0:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF0SpacePointArray()
-        elif self.tof_num == 1:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
-        elif self.tof_num == 2:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
-        for sp in spoints:
-            x = sp.GetGlobalPosX()
-            y = sp.GetGlobalPosY()
-            z = sp.GetGlobalPosZ()
-            self.spoints_global_x.append(x)
-            self.spoints_global_y.append(y)
-            self.spoints_global_z.append(z)
-            self.num_spoints += 1
-
-    def clear(self):
-        """ Clear all accumulated data """
-        self.tof_num = 0
-        self.num_spoints = 0
-        self.spoints_global_x = array.array('d')
-        self.spoints_global_y = array.array('d')
-        self.spoints_global_z = array.array('d')
-
 class Tracker:
     """ Class holding data for one tracker.
         Uses arrays to make compatible with ROOT plotting.
@@ -94,6 +55,8 @@ class Tracker:
         self.tpoints_global_px = array.array('d')
         self.tpoints_global_py = array.array('d')
         self.tpoints_global_pz = array.array('d')
+        self.tpoints_plane = array.array('d')
+        self.tpoints_station = array.array('d')
         # Pat Rec track fits
         self.straight_xz_fits = []
         self.straight_yz_fits = []
@@ -280,6 +243,8 @@ class Tracker:
                 px_per_trk = array.array('d')
                 py_per_trk = array.array('d')
                 pz_per_trk = array.array('d')
+                plane_per_trk = array.array('d')
+                station_per_trk = array.array('d')
                 for tp in tpoints:
                     x_per_trk.append(tp.pos().x())
                     y_per_trk.append(tp.pos().y())
@@ -287,12 +252,16 @@ class Tracker:
                     px_per_trk.append(tp.mom().x())
                     py_per_trk.append(tp.mom().y())
                     pz_per_trk.append(tp.mom().z())
+                    plane_per_trk.append(tp.plane())
+                    station_per_trk.append(tp.station())
                 self.tpoints_global_x.extend(x_per_trk)
                 self.tpoints_global_y.extend(y_per_trk)
                 self.tpoints_global_z.extend(z_per_trk)
                 self.tpoints_global_px.extend(px_per_trk)
                 self.tpoints_global_py.extend(py_per_trk)
                 self.tpoints_global_pz.extend(pz_per_trk)
+                self.tpoints_plane.extend(plane_per_trk)
+                self.tpoints_station.extend(station_per_trk)
 
     @staticmethod
     def make_circle(x0, y0, rad):
