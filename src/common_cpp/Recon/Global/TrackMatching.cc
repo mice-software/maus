@@ -93,12 +93,37 @@ namespace global {
       KLTrack = NULL;
     }
 
+    // Including Ckov spacepoints
+
+    MAUS::DataStructure::Global::TrackPoint* CkovATP = NULL;
+      //      new MAUS::DataStructure::Global::TrackPoint();
+    MAUS::DataStructure::Global::TrackPoint* CkovBTP = NULL;
+      //      new MAUS::DataStructure::Global::TrackPoint();
+    for (unsigned int i = 0; i < GlobalSpacePointArray->size(); ++i) {
+      MAUS::DataStructure::Global::SpacePoint* sp = GlobalSpacePointArray->at(i);
+      if (!sp) {
+	continue;
+      }
+      if (sp->get_detector() == MAUS::DataStructure::Global::kCherenkovA) {
+	CkovATP = new MAUS::DataStructure::Global::TrackPoint(sp);
+	CkovATP->set_mapper_name(mapper_name);
+      } else if (sp->get_detector() == MAUS::DataStructure::Global::kCherenkovB) {
+	CkovBTP = new MAUS::DataStructure::Global::TrackPoint(sp);
+	CkovBTP->set_mapper_name(mapper_name);
+      } else {
+	continue;
+      }
+    }
+
     // Adding global tracks for case where global event contains both SciFi and TOF tracks
     // (And KL track if applicable)
     if (ImportedSciFiTrack != NULL && !TOFTrackArray.empty()) {
       for (unsigned int j = 0; j < TOFTrackArray.size(); j++) {
 	MAUS::DataStructure::Global::Track* GlobalTrack = TOFTrackArray[j]->Clone();
 	GlobalTrack->set_mapper_name(mapper_name);
+	// Adding ckov to global track
+	if (CkovATP) GlobalTrack->AddTrackPoint(CkovATP);
+	if (CkovBTP) GlobalTrack->AddTrackPoint(CkovBTP);
 	std::vector<const MAUS::DataStructure::Global::TrackPoint*>
 	  tempSciFiTrackPointArray = ImportedSciFiTrack->GetTrackPoints();
 	for (unsigned int k = 0; k < tempSciFiTrackPointArray.size(); k++) {
