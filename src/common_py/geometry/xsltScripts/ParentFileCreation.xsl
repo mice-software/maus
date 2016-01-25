@@ -383,7 +383,7 @@
 			PropertyString FileType <xsl:value-of select="FileType/@name"/>
                         PropertyString FileName <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="FileName/@name"/>
                         PropertyString Symmetry <xsl:value-of select="Symmetry/@name"/>
-                        <!--ScaleFactor <xsl:choose>
+                        ScaleFactor <xsl:choose>
                                 <xsl:when test="contains(FieldName/@name, 'MatchCoil1_0') and boolean($mcmode)">$SSUM1Polarity*$SSUM1Current*0.52/113.</xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'MatchCoil2_0') and boolean($mcmode)">$SSUM2Polarity*$SSUM2Current*0.5176/132.</xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'CenterCoil_0') and boolean($mcmode)">$SSUCPolarity*$SSUCCurrent*0.528/148.</xsl:when>
@@ -403,7 +403,7 @@
                                 <xsl:when test="contains(FieldName/@name, 'EndCoil1_1') and contains($cctag,'1')">$SSDT1Polarity*$FCMMode*($SSDCCurrent+$SSDT1Current)*0.5316/126.</xsl:when>
                                 <xsl:when test="contains(FieldName/@name, 'EndCoil2_1') and contains($cctag,'1')">$SSDT2Polarity*$FCMMode*($SSDCCurrent+$SSDT2Current)*0.5291/133.</xsl:when>
 				<xsl:otherwise><xsl:value-of select="ScaleFactor/@name"/></xsl:otherwise>
-                            </xsl:choose>-->
+                            </xsl:choose>
 			}
 		</xsl:for-each>
 		}        
