@@ -89,7 +89,7 @@ public:
 	std::vector<int>        GetGridSize   () const                {return _gridSize;}
 	ThreeDGrid*             GetGrid       () const                {return _mesh;}
 
-  bool SetIsClosed(bool is_closed) {_closed = is_closed;}
+  void SetIsClosed(bool is_closed) {_closed = is_closed;}
   bool GetIsClosed() const {return _closed;}
 private:
 	std::vector<BTField*>    _fields;
