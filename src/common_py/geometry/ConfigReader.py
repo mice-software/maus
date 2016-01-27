@@ -63,6 +63,8 @@ class Configreader(): #pylint: disable = R0903, R0902
                                config_dict['geometry_download_beamline_tag']
         self.download_coolingchannel_tag = \
                              config_dict['geometry_download_coolingchannel_tag']
+        self.using_field_map =  \
+            config_dict['geometry_download_using_field_map']
         self.get_ids_start_time = config_dict['get_ids_start_time']
         self.get_ids_stop_time = config_dict['get_ids_stop_time']
         self.get_ids_create_file = config_dict['get_ids_create_file']

@@ -55,6 +55,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         self.absorber0_file_number = Configreader().absorber0_file_number
         self.absorber1_file_number = Configreader().absorber1_file_number
         self.absorber2_file_number = Configreader().absorber2_file_number
+        self.using_field_map = Configreader().using_field_map
         self.path_in = path_in
         self.path_out = path_out.rstrip('/') + '/'
         self.beamline_file = None
