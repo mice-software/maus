@@ -106,6 +106,7 @@ class TestInputCppRootData(unittest.TestCase): # pylint: disable=R0904
         """
         event = inputter.emitter().next()
         json_event = json.loads(maus_cpp.converter.string_repr(event))
+        maus_cpp.converter.del_data_repr(event)
         for key, value in checks.iteritems():
             self.assertEqual(json_event[key], value,
               msg=str(key)+":"+str(value)+"\n"+json.dumps(json_event, indent=2))
