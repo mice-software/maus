@@ -121,8 +121,8 @@ MAUS::Data InputCppRootData::_emit_cpp() {
         if (spillNum > _highest_spill_number) { // ran out of spills
             throw NoInputException();
         }
-   }
-   return spillData;
+    }
+    return spillData;
 }
 
 template <class DataT>

@@ -53,10 +53,17 @@ class InputCppRootData : public InputBase<MAUS::Data> {
      */
     ~InputCppRootData();
 
+    /** Birth function - loads datacards:
+     *  - input_root_file_name: the input root file name
+     *  - selected_spills: list of ints, that defines specific spills that will
+     *    be loaded
+     *  Initialises the ROOT file
+     */
     void birth(const std::string& json_datacards) {
         InputBase<MAUS::Data>::birth(json_datacards);
     }
 
+    /** Death function - deletes the root file*/
     void death() {
         InputBase<MAUS::Data>::death();
     }
@@ -67,9 +74,6 @@ class InputCppRootData : public InputBase<MAUS::Data> {
 
   private:
     /** Initialise the inputter
-     *
-     *  @param json_datacards json formatted string containing the json datacards
-     *  - takes root file from "root_input_filename" parameter
      */
     void _birth(const std::string& json_datacards);
 
@@ -78,26 +82,11 @@ class InputCppRootData : public InputBase<MAUS::Data> {
     void _death();
 
     /** Gets the next event from the root file. If there are no more events,
-     *  returns an empty string ("")
-     *
-     *  This will cycle through different event types as follows:
-     *  First attempts to find all JobHeaders, then RunHeaders until run_number
-     *  changes, then spill until the run_number changes; then RunFooter until
-     *  run_number changes. Then starts back on RunHeader.
-     *
-     *  If there are no events of a particular type left, then that event type
-     *  is skipped and we move on to the next event type until all events have
-     *  been fired and we have no more data.
+     *  raises StopIteration.
      */
     MAUS::Data _emit_cpp();
 
-    /** Gets an event from the root file.
-     *
-     *  If there are no more events of the given type, or the event could not be
-     *  resolved (data inconsistencies?) return ""
-     *
-     *  Note that if we are accessing a different branch from last time, we have
-     *  to reopen _infile with the new branch name (that's how irstream works). 
+    /** Gets an event from the root file; called by _emit_cpp()
      */
     template <class DataT>
     bool load_event(std::string branch_name, DataT&);
