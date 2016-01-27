@@ -1,0 +1,13 @@
+import glob, os
+
+require_root = True
+require_g4 = True
+
+#get environment and project
+Import('env', 'project')
+localenv = env.Clone()
+
+dir = 'Interface'
+srclst = map(lambda x: os.path.join(dir, x), glob.glob(os.path.join(project,dir, '*.cpp')))
+
+env.jDev.build_project(localenv, project)
