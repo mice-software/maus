@@ -48,11 +48,10 @@ def main(): # pylint: disable = C0103, R0912
         pass
     #Download file
     geometry_downloader = Downloader()
-    dlbyrun = False
+
     if configuration.geometry_download_by == "run_number":
         geometry_downloader.download_geometry_by_run \
                         (configuration.geometry_download_run_number, gdml_cache)
-        dlbyrun = True
     elif configuration.geometry_download_by == "current":
         geometry_downloader.download_current(gdml_cache)
     elif configuration.geometry_download_by == "id":
@@ -84,10 +83,6 @@ def main(): # pylint: disable = C0103, R0912
     zipped_geom.unzip_file()
     # format files
     gdmls = Formatter(gdml_cache, dl_dir)
-    if dlbyrun:
-        useCCFM = False
-    else:
-        useCCFM = gdmls.using_field_map
     if gdmls.usegdml:
         gdmls.formatForGDML()
     else:
@@ -95,7 +90,7 @@ def main(): # pylint: disable = C0103, R0912
     # convert to MAUS Modules
     maus_modules = GDMLtomaus(dl_dir)
     if gdmls.usegdml:
-        maus_modules.generate_parent(dl_dir, useCCFM)
+        maus_modules.generate_parent(dl_dir)
     else:
         maus_modules.convert_to_maus(dl_dir)
     

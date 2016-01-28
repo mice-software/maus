@@ -365,7 +365,6 @@ geometry_download_beamline_tag = ''
 geometry_download_coolingchannel_tag = ''
 geometry_download_run_number = 0
 geometry_download_id = 49
-geometry_download_using_field_map = False
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 

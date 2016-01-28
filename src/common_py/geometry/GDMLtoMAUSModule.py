@@ -25,8 +25,6 @@ CONFIGXSL2 = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileTranslation.xsl"
 MINCONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
         "/src/common_py/geometry/xsltScripts/ParentFileCreation.xsl"
-FMAPCONFIGXSL = os.environ["MAUS_ROOT_DIR"] + \
-        "/src/common_py/geometry/xsltScripts/ParentFileCreationCCFM.xsl"
 TRACKERXSL = os.environ["MAUS_ROOT_DIR"] + \
          "/src/common_py/geometry/xsltScripts/CoolingChannelTranslation.xsl"
 MODULEXSL = os.environ["MAUS_ROOT_DIR"] + \
@@ -208,7 +206,7 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
             os.remove(self.config_file)
             print "Files saved to " + str(output)
 
-    def generate_parent(self, output, useCCFM): #pylint: disable = R0914
+    def generate_parent(self, output): #pylint: disable = R0914
         """
         @method generate_parent This method generates a parent file
         
@@ -222,18 +220,12 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
         else:
             outputfile1 = os.path.join(output, "ParentGeometryFile.dat")
             # outputfile3 = os.path.join(output, "RotatedGeometryFile.dat")
-            if useCCFM:
-                config_file = CADImport(xmlin1 = str(self.maus_information_file), \
-                                            xsl = str(FMAPCONFIGXSL), \
-                                            output = str(outputfile1))
-                config_file.parse_xslt()
-                print "Applying minimal config file translation with a locally defined field map."
-            else:
-                config_file = CADImport(xmlin1 = str(self.maus_information_file), \
-                                            xsl = str(MINCONFIGXSL), \
-                                            output = str(outputfile1))
-                config_file.parse_xslt()
-                print "Applying minimal config file translation"
+            
+            config_file = CADImport(xmlin1 = str(self.maus_information_file), \
+                                    xsl = str(MINCONFIGXSL), \
+                                    output = str(outputfile1))
+            config_file.parse_xslt()
+            print "Applying minimal config file translation"
             # rotated_file = CADImport(xmlin1 = str(self.config_file), \
             #         xsl = str(ROTATEDXSL), output = str(outputfile3))
             # rotated_file.parse_xslt()
