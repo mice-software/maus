@@ -6,7 +6,8 @@ import sys
 import array
 import ROOT
 import libMausCpp #pylint: disable = W0611
-import MausReducedData
+import MausReducedData.SciFiReducedData as SciFiReducedData
+import MausReducedData.TofReducedData as TofReducedData
 
 # pylint: disable = C0103
 # pylint: disable = E1101
@@ -157,11 +158,11 @@ def main(file_name):
 
             # Loop over all the particle events in a spill
             for i in range(spill.GetReconEvents().size()):
-                tkus = MausReducedData.Tracker() # TkUS event data
-                tkds = MausReducedData.Tracker() # TkDS event data
-                tof0 = MausReducedData.TOF()   # TOF0 event data
-                tof1 = MausReducedData.TOF()   # TOF1 event data
-                tof2 = MausReducedData.TOF()   # TOF2 event data
+                tkus = SciFiReducedData.Tracker() # TkUS event data
+                tkds = SciFiReducedData.Tracker() # TkDS event data
+                tof0 = TofReducedData.TOF()   # TOF0 event data
+                tof1 = TofReducedData.TOF()   # TOF1 event data
+                tof2 = TofReducedData.TOF()   # TOF2 event data
 
                 tk_evt = spill.GetReconEvents()[i].GetSciFiEvent()
                 tkus.accumulate_data(tk_evt, 0)

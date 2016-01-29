@@ -222,16 +222,16 @@ void MapCppEMRMCDigitization::processMC(MAUS::MCEventPArray *mcEvts,
       int xBar = g4barid % 59 + 1;
 
       // Position
-      ThreeVector xPos = hit.GetPosition(); // (mm, mm, mm)
-      double xPathLength = hit.GetPathLength(); // mm
+      ThreeVector xPos = hit.GetPosition(); 	// (mm, mm, mm)
+      double xPathLength = hit.GetPathLength();	// mm
 
       // Time
-      double time = hit.GetTime(); // ns
-      int xTime  = static_cast<int>(time); // ns, leading time
-      int xDeltaT = xTime - pTime; // ns
+      double time = hit.GetTime(); 		// ns
+      int xTime  = static_cast<int>(time); 	// ns, leading time
+      int xDeltaT = xTime - pTime; 		// ns
 
       // Energy deposition
-      double edep = hit.GetEnergyDeposited(); // MeV
+      double edep = hit.GetEnergyDeposited(); 	// MeV
       int xTot = static_cast<int>(edep*pow(10, 6)); // eV, non digitized time-over-threshold
 
       // Fill the bar hit data (from the EMR sensitive detector)
