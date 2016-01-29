@@ -26,11 +26,21 @@ from _MapCppGlobalTrackMatching import MapCppGlobalTrackMatching
 
 class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalTrackMatching"""
+
+    cfg = json.loads(Configuration.Configuration().getConfigJSON())
+    geom = (os.environ.get("MAUS_ROOT_DIR") +
+            "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
+    cfg['simulation_geometry_filename'] = geom
+    cfg['reconstruction_geometry_filename'] = geom
+
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
         cls.mapper = MapCppGlobalTrackMatching()
-        cls.c = Configuration()
+        cls.test_config = ""
+        if maus_cpp.globals.has_instance():
+            cls.test_config = maus_cpp.globals.get_configuration_cards()
+            maus_cpp.globals.death()
     
     def test_empty(self):
         """Check can handle empty configuration"""
@@ -42,26 +52,22 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        self.cfg['simulation_geometry_filename'] = self.geom
+        self.cfg['reconstruction_geometry_filename'] = self.geom
+        maus_cpp.globals.birth(json.dumps(self.cfg))
+        maus_cpp.globals.set_reconstruction_mice_modules(
+            maus_cpp.mice_module.MiceModule(self.geom))
+        self.mapper.birth(json.dumps(self.cfg))
         test1 = ('%s/src/map/MapCppGlobalTrackMatching/nodata.json' % 
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         data = fin.read()
-        # test with no data.
-        ###
-        # self.mapper.birth(self.c.getConfigJSON())
-        test_configuration = self.c.getConfigJSON()
-        test_conf_json = json.loads(test_configuration)
-        test_conf_json['reconstruction_geometry_filename'] = (
-            os.environ.get("MAUS_ROOT_DIR") +
-            "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
-        test_conf_json['simulation_geometry_filename'] = \
-            test_conf_json['reconstruction_geometry_filename']
-        test_configuration = json.dumps(test_conf_json)
-        self.mapper.birth(test_configuration)
-        ###
         result = self.mapper.process(data)
         spill_out = maus_cpp.converter.json_repr(result)
         self.assertFalse('global_event' in spill_out)
+        maus_cpp.globals.death()
 
     def test_invalid_json_birth(self):
         """Check birth with an invalid json input"""
@@ -81,18 +87,14 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_invalid_json_process(self):
         """Check process with an invalid json input"""
-        ###
-        # self.mapper.birth(self.c.getConfigJSON())
-        test_configuration = self.c.getConfigJSON()
-        test_conf_json = json.loads(test_configuration)
-        test_conf_json['reconstruction_geometry_filename'] = (
-            os.environ.get("MAUS_ROOT_DIR") +
-            "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
-        test_conf_json['simulation_geometry_filename'] = \
-            test_conf_json['reconstruction_geometry_filename']
-        test_configuration = json.dumps(test_conf_json)
-        self.mapper.birth(test_configuration)
-        ###
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        self.cfg['simulation_geometry_filename'] = self.geom
+        self.cfg['reconstruction_geometry_filename'] = self.geom
+        maus_cpp.globals.birth(json.dumps(self.cfg))
+        maus_cpp.globals.set_reconstruction_mice_modules(
+            maus_cpp.mice_module.MiceModule(self.geom))
+        self.mapper.birth(json.dumps(self.cfg))
         test3 = ('%s/src/map/MapCppGlobalTrackMatching/invalid.json' % 
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test3,'r')
@@ -100,24 +102,20 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         result = self.mapper.process(data)
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalTrackMatching" in doc["errors"])
+        maus_cpp.globals.death()
 
     def test_fill_Global_Event(self): # pylint: disable = R0914
         """Check that process makes global tracks from TOF and tracker data"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        self.cfg['simulation_geometry_filename'] = self.geom
+        self.cfg['reconstruction_geometry_filename'] = self.geom
+        maus_cpp.globals.birth(json.dumps(self.cfg))
+        maus_cpp.globals.set_reconstruction_mice_modules(
+            maus_cpp.mice_module.MiceModule(self.geom))
+        self.mapper.birth(json.dumps(self.cfg))
         test4 = ('%s/src/map/MapCppGlobalTrackMatching/testdata.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
-        ###
-        # self.mapper.birth(self.c.getConfigJSON())
-        test_configuration = self.c.getConfigJSON()
-        test_conf_json = json.loads(test_configuration)
-        test_conf_json['reconstruction_geometry_filename'] = (
-            os.environ.get("MAUS_ROOT_DIR") +
-            "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
-        test_conf_json['simulation_geometry_filename'] = \
-            test_conf_json['reconstruction_geometry_filename']
-        test_conf_json['track_matching_pid_hypothesis'] = "kMuPlus"
-        test_configuration = json.dumps(test_conf_json)
-        self.mapper.birth(test_configuration)
-        ###
         fin = open(test4,'r')
         line = fin.read()
         result = self.mapper.process(line)
@@ -153,11 +151,20 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(num_us_tracks, 1)
         self.assertEqual(num_ds_tracks, 1)
         self.assertEqual(num_through_tracks, 1)
+        maus_cpp.globals.death()
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
-        """Check that we can death() MapCppGlobalTrackMatching"""
+        """Sets a mapper and configuration,
+        and checks that we can death() MapCppTrackerRecon"""
+        cls.mapper = MAUS.MapCppTrackerRecon()
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        if cls.test_config != "":
+            maus_cpp.globals.birth(cls.test_config)
+        # Check we death() the mapper
         cls.mapper.death()
+        cls.mapper = None
 
 if __name__ == '__main__':
     unittest.main()
