@@ -20,7 +20,8 @@
 import os
 import json
 import unittest
-from Configuration import Configuration
+import Configuration
+import MAUS
 import maus_cpp.converter
 from _MapCppGlobalTrackMatching import MapCppGlobalTrackMatching
 
@@ -110,6 +111,7 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
             maus_cpp.globals.death()
         self.cfg['simulation_geometry_filename'] = self.geom
         self.cfg['reconstruction_geometry_filename'] = self.geom
+        self.cfg['track_matching_pid_hypothesis'] = "kMuPlus"
         maus_cpp.globals.birth(json.dumps(self.cfg))
         maus_cpp.globals.set_reconstruction_mice_modules(
             maus_cpp.mice_module.MiceModule(self.geom))
@@ -153,15 +155,28 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(num_through_tracks, 1)
         maus_cpp.globals.death()
 
+    def test_reset_geometry(self):
+        """Attempt at a hack to fix issues with geometry not being reset"""
+        if maus_cpp.globals.has_instance():
+            maus_cpp.globals.death()
+        self.cfg['simulation_geometry_filename'] = "Test.dat"
+        self.cfg['reconstruction_geometry_filename'] = "Test.dat"
+        maus_cpp.globals.birth(json.dumps(self.cfg))
+        maus_cpp.globals.set_reconstruction_mice_modules(
+            maus_cpp.mice_module.MiceModule("Test.dat"))
+        maus_cpp.globals.death()
+
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration,
-        and checks that we can death() MapCppTrackerRecon"""
-        cls.mapper = MAUS.MapCppTrackerRecon()
+        and checks that we can death() MapCppGlobalTrackMatching"""
+        cls.mapper = MAUS.MapCppGlobalTrackMatching()
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
         if cls.test_config != "":
             maus_cpp.globals.birth(cls.test_config)
+        else:
+            maus_cpp.globals.birth(json.dumps(MapCppGlobalTMTestCase.cfg))
         # Check we death() the mapper
         cls.mapper.death()
         cls.mapper = None
