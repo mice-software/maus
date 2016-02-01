@@ -15,6 +15,8 @@
  *
  */
 
+#include <vector>
+
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 
 #include "src/common_cpp/DataStructure/Data.hh"

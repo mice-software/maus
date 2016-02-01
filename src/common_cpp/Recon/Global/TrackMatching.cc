@@ -15,6 +15,8 @@
  *
  */
 
+#include <algorithm>
+
 #include "CLHEP/Units/PhysicalConstants.h"
 
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
@@ -330,7 +332,7 @@ void TrackMatching::MatchTOF0(
     double deltaTMax = (z_distance/velocity) + 2.0;
     for (size_t i = 0; i < trackpoints.size(); i++) {
       double deltaT = position.T() - trackpoints.at(i)->get_position().T();
-      if ((deltaT > deltaTMin) and (deltaT < deltaTMax)) {
+      if (deltaT > deltaTMin and deltaT < deltaTMax) {
         hypothesis_track->AddTrackPoint(trackpoints.at(i));
           Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Match"
                                       << std::endl;

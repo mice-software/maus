@@ -314,7 +314,7 @@ void propagate(double* x, double target_z, const BTField* field,
       const CLHEP::Hep3Vector posvector(x[1], x[2], x[3]);
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
-      g4navigator->LocateGlobalPointAndSetup(posvector, &momvector); // G4VPhysicalVolume* volume = 
+      g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
       GeometryNavigator geometry_navigator;
       geometry_navigator.Initialise(g4navigator->GetWorldVolume());
       double safety = 10;

@@ -42,7 +42,7 @@ TEST_F(GlobalToolsTest, GetReconDetectors) {
   TLorentzVector position(0.0, 0.0, 0.0, 0.0);
   sp.set_position(position);
   DataStructure::Global::TrackPoint tp(&sp);
-  
+
   DataStructure::Global::SpacePoint* tof1_sp = sp.Clone();
   tof1_sp->set_detector(DataStructure::Global::kTOF1);
   global_event->add_space_point(tof1_sp);
@@ -52,7 +52,7 @@ TEST_F(GlobalToolsTest, GetReconDetectors) {
   DataStructure::Global::SpacePoint* kl_sp = sp.Clone();
   kl_sp->set_detector(DataStructure::Global::kCalorimeter);
   global_event->add_space_point(kl_sp);
-  
+
   DataStructure::Global::TrackPoint* tr0_tp = tp.Clone();
   tr0_tp->set_detector(DataStructure::Global::kTracker0);
   DataStructure::Global::TrackPoint* tr1_2_tp = tp.Clone();
@@ -73,7 +73,7 @@ TEST_F(GlobalToolsTest, GetReconDetectors) {
        detector_iter != recon_detectors.end(); detector_iter++) {
     if (detector_iter->second) {
       num_exist++;
-    } 
+    }
   }
 
   EXPECT_EQ(num_exist, 6);
@@ -127,8 +127,8 @@ TEST_F(GlobalToolsTest, GetSpillDetectorTracks) {
   recon_event->SetGlobalEvent(global_event);
   std::vector<ReconEvent*>* recon_events = new std::vector<ReconEvent*>;
   recon_events->push_back(recon_event);
-  spill->SetReconEvents(recon_events); 
-  
+  spill->SetReconEvents(recon_events);
+
   auto tracker0_tracks = GlobalTools::GetSpillDetectorTracks(spill,
       DataStructure::Global::kTracker0, "GetSpillDetectorTracksTest");
   EXPECT_EQ(tracker0_tracks->size(), 2);
@@ -186,7 +186,7 @@ TEST_F(GlobalToolsTest, GetSpillSpacePoints) {
   recon_event->SetGlobalEvent(global_event);
   std::vector<ReconEvent*>* recon_events = new std::vector<ReconEvent*>;
   recon_events->push_back(recon_event);
-  spill->SetReconEvents(recon_events); 
+  spill->SetReconEvents(recon_events);
 
   auto tof0_sps = GlobalTools::GetSpillSpacePoints(spill,
       DataStructure::Global::kTOF0);
@@ -367,21 +367,17 @@ TEST_F(GlobalToolsTest, propagate) {
   double x3[] = {0.0, 0.0, 0.0, 0.0, 184.699, 15.0, 15.0, 150.0};
   double x4[] = {0.0, 0.0, 0.0, 0.0, 184.699, 15.0, 15.0, 150.0};
 
-
   dc->SetMiceModules(geometry1);
 
-Json::Value config = (*Globals::GetInstance()->GetConfigurationCards());
+  Json::Value config = (*Globals::GetInstance()->GetConfigurationCards());
   config["reconstruction_geometry_filename"] = mod_path + "PropagationTest.dat";
   config["simulation_geometry_filename"] = mod_path + "PropagationTest.dat";
   if (Globals::HasInstance()) {
     GlobalsManager::DeleteGlobals();
   }
-MAUS::GlobalsManager::InitialiseGlobals(JsonWrapper::JsonToString(config)); 
-  
-  //~ GlobalsManager::SetMonteCarloMiceModules(&geometry1);
+  MAUS::GlobalsManager::InitialiseGlobals(JsonWrapper::JsonToString(config));
+
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
-  //~ std::cerr << field->GetField(&geometry1)->GetName() << "\n";
-  std::cerr << dc->GetRegions()[0] << "\n";
   double epsilon = 0.001;
 
   double field2[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
