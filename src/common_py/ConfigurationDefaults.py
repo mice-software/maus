@@ -676,66 +676,48 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+
 # Bounds set on values of PID variables when running PID
-# Bounds for PIDVarA
-minA = 20
-maxA = 40
-# PIDVarB
-XminB = 10
-XmaxB = 250
-YminB = 20
-YmaxB = 40
-# PIDVarC
-XminC = 50
-XmaxC = 350
-YminC = 0
-YmaxC = 8000
-# PIDVarD
-minD = 0
-maxD = 8000
-# PIDVarE
-minE = 0
-maxE = 1000
-# PIDVarF
-XminF = 50
-XmaxF = 350
-YminF = 0
-YmaxF = 1000
-# PIDVarG
-minG = 0
-maxG = 1
-# PIDVarH
-XminH = 50
-XmaxH = 350
-YminH = 0
-YmaxH = 1
-# ComPIDVarA
-minComA = 30
-maxComA = 50
-# ComPIDVarB
-XminComB = 30
-XmaxComB = 50
-YminComB = 0
-YmaxComB = 8000
-# ComPIDVarC
-minComC = 0
-maxComC = 8000
-# ComPIDVarD
-minComC = 0
-maxComC = 1000
-# ComPIDVarE
-XminComE = 30
-XmaxComE = 50
-YminComE = 0
-YmaxComE = 1000
-# ComPIDVarF
-minComF = 0
-maxComF = 1
-# ComPIDVarG
-XminComG = 30
-XmaxComG = 50
-YminComG = 0
-YmaxComG = 1
+pid_bounds = {
+    # Bounds for PIDVarA
+    "minA":20,"maxA":40,
+    # PIDVarB
+    "XminB":10, "XmaxB":250, "YminB":20, "YmaxB":40,
+    # PIDVarC
+    "XminC":50, "XmaxC":350, "YminC":0, "YmaxC":8000,
+    # PIDVarD
+    "minD":0, "maxD":8000,
+    # PIDVarE
+    "minE":0, "maxE":1000,
+    # PIDVarF
+    "XminF":50, "XmaxF":350, "YminF":0, "YmaxF":1000,
+    # PIDVarG
+    "minG":0, "maxG":1,
+    # PIDVarH
+    "XminH":50, "XmaxH":350, "YminH":0, "YmaxH":1,
+    # PIDVarI
+    "XminI":50, "XmaxI":350, "YminI":0, "YmaxI":140,
+    # PIDVarJ
+    "XminJ":50, "XmaxJ":350, "YminJ":0, "YmaxJ":140,
+    # ComPIDVarA
+    "minComA":30, "maxComA":50,
+    # ComPIDVarB
+    "XminComB":30, "XmaxComB":50, "YminComB":0, "YmaxComB":8000,
+    # ComPIDVarC
+    "minComC":0, "maxComC":8000,
+    # ComPIDVarD
+    "minComD":0, "maxComD":1000,
+    # ComPIDVarE
+    "XminComE":30, "XmaxComE":50, "YminComE":0, "YmaxComE":1000,
+    # ComPIDVarF
+    "minComF":0, "maxComF":1,
+    # ComPIDVarG
+    "XminComG":30, "XmaxComG":50, "YminComG":0, "YmaxComG":1,
+    # ComPIDVarH
+    "XminComH":30, "XmaxComH":50, "YminComH":0, "YmaxComH":40,
+    # ComPIDVarI
+    "XminComI":30, "XmaxComI":50, "YminComI":0, "YmaxComI":140
+}
 
 # PID MICE configuration, 'step_4' for Step IV running, 'commissioning' for field free commissioning data
 pid_config = "step_4"

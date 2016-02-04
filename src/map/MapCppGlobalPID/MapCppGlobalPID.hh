@@ -144,6 +144,20 @@ namespace MAUS {
     double _XmaxF;
     double _YminF;
     double _YmaxF;
+    double _minG;
+    double _maxG;
+    double _XminH;
+    double _XmaxH;
+    double _YminH;
+    double _YmaxH;
+    double _XminI;
+    double _XmaxI;
+    double _YminI;
+    double _YmaxI;
+    double _XminJ;
+    double _XmaxJ;
+    double _YminJ;
+    double _YmaxJ;
     double _minComA;
     double _maxComA;
     double _XminComB;
@@ -164,6 +178,14 @@ namespace MAUS {
     double _XmaxComG;
     double _YminComG;
     double _YmaxComG;
+    double _XminComH;
+    double _XmaxComH;
+    double _YminComH;
+    double _YmaxComH;
+    double _XminComI;
+    double _XmaxComI;
+    double _YminComI;
+    double _YmaxComI;
 
     /// MICE configuration for PID
     std::string _pid_config;
