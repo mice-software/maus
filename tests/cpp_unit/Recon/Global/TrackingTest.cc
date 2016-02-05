@@ -4,10 +4,15 @@
 #include "TRandom.h"
 #include "gtest/gtest.h"
 
+#include "Geant4/G4Navigator.hh"
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4NistManager.hh"
+
 #include "src/legacy/BeamTools/BTMultipole.hh"
 #include "src/legacy/BeamTools/BTConstantField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/legacy/Config/MiceModule.hh"
 
 #include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -30,6 +35,8 @@ TEST(TrackingZTest, GetSetTest) {
     BTConstantField test_field(1000., 1000., 1000., bvec);
     tz.SetField(&test_field);
     ASSERT_EQ(tz.GetField(), &test_field);
+
+    EXPECT_TRUE(false) << "Missing some accessors/mutators";
 }
 
 TEST(TrackingZTest, FieldDerivativeTest) {
@@ -187,24 +194,8 @@ void print_x(double * x_in) {
 
 }
 
-// Propagate beam ellipse through a drift space
-TEST(TrackingZTest, PropagateEllipseDriftTest) {
-    // field
-    CLHEP::Hep3Vector brand(0., 0., 0.); 
-    BTConstantField field(1000., 1000., 1000., brand);
-
-    // trackingZ
-    TrackingZ tz;
-    tz.SetStepSize(100.);
-    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    tz.SetField(&field);
-
+std::vector<double> drift_ellipse(double pz, double mass) {
     // ellipse and psv
-    double mass = 105.658;
-    double pz = 200.;
-    double c_l = 299.792458;
-    double betagamma = pz/mass;
-    double dz = 1000.;
     double x_in[29] = {0., 0., 0., 0.,
                       sqrt(pz*pz+mass*mass), 0., 0., pz,
                       1., 0.,  0.,  0.,  0.,  0.,
@@ -216,7 +207,32 @@ TEST(TrackingZTest, PropagateEllipseDriftTest) {
     };
 
     std::vector<double> x_out(x_in, x_in+sizeof(x_in)/sizeof(double));
-    print_x(x_in);
+    return x_out;
+} 
+
+// Propagate beam ellipse through a drift space
+TEST(TrackingZTest, PropagateEllipseDriftTest) {
+    // field
+    CLHEP::Hep3Vector brand(0., 0., 0.); 
+    BTConstantField field(1000., 1000., 1000., brand);
+
+    // trackingZ
+    TrackingZ tz;
+    tz.SetStepSize(100.);
+    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    tz.SetField(&field);
+    tz.SetEnergyLossModel(TrackingZ::no_eloss);
+    tz.SetMCSModel(TrackingZ::no_mcs);
+
+    double mass = 105.658;
+    double pz = 200.;
+    double c_l = 299.792458;
+    double betagamma = pz/mass;
+    double dz = 1000.;
+
+    std::vector<double> x_in = drift_ellipse(pz, mass);
+    std::vector<double> x_out = x_in;
+    print_x(&x_in[0]);
     // propagate
     try {
         tz.Propagate(&x_out[0], dz);
@@ -261,8 +277,6 @@ TEST(TrackingZTest, PropagateEllipseDriftTest) {
         }
         Squeak::mout(verbose) << std::endl;
     }
-
-
 }
 
 // If we set up our beam ellipse right, then propagation through a constant
@@ -276,6 +290,9 @@ TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
     TrackingZ tz;
     tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
     tz.SetField(&field);
+    tz.SetEnergyLossModel(TrackingZ::no_eloss);
+    tz.SetMCSModel(TrackingZ::no_mcs);
+    tz.SetEStragModel(TrackingZ::no_estrag);
 
     // ellipse and psv
     double norm_trans = 1.+10.*gRandom->Uniform()*105.658;; // 1 - 11 mm emit
@@ -342,5 +359,23 @@ TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
         }
     }
 }
+
+TEST(TrackingZTest, PropagateDriftELossTest) {
+    GlobalsManager::SetMonteCarloMiceModules(new MiceModule("Test.dat"));
+    TrackingZ tz;
+    tz.SetStepSize(10.);
+    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    tz.SetEnergyLossModel(TrackingZ::bethebloch_forwards);
+    tz.SetMCSModel(TrackingZ::no_mcs);
+    tz.SetMCSModel(TrackingZ::no_estrag);
+    std::vector<double> x_out = drift_ellipse(200., 105.658);
+    x_out[3] = -200.;
+    print_x(&x_out[0]); 
+    tz.Propagate(&x_out[0], 200.);
+    print_x(&x_out[0]); 
+
+    EXPECT_TRUE(false);
+}
+
 
 }

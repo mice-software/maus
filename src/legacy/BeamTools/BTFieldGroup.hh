@@ -89,6 +89,8 @@ public:
 	std::vector<int>        GetGridSize   () const                {return _gridSize;}
 	ThreeDGrid*             GetGrid       () const                {return _mesh;}
 
+  void SetIsClosed(bool is_closed) {_closed = is_closed;}
+  bool GetIsClosed() const {return _closed;}
 private:
 	std::vector<BTField*>    _fields;
 	std::vector<bool>        _isRotated;

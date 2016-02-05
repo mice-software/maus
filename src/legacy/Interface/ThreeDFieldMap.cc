@@ -200,6 +200,7 @@ void ThreeDFieldMap::SetSymmetry(std::string symmetry)
 {
 	if(symmetry == "Quadrupole" )      _symmetry = quadrupole;
 	else if(symmetry == "Dipole")      _symmetry = dipole;
+	else if(symmetry == "Solenoid")    _symmetry = solenoid;
 	else                               _symmetry = none;
 }
 
@@ -225,6 +226,12 @@ const double* ThreeDFieldMap::Symmetry(const double Point[4]) const
 		pointAndScale[2] = fabs(Point[2]);
 		if(Point[0] < 0) pointAndScale[4] = -1;
 		if(Point[1] < 0) pointAndScale[6] = -1;
+	}
+	else if(_symmetry == solenoid)
+	{
+		pointAndScale[0] = fabs(Point[0]);	// f(x) = f(-x)
+		pointAndScale[1] = fabs(Point[1]);	// f(y) = f(-y)
+		pointAndScale[2] = Point[2];		// The symetry is radial, not along z
 	}
 
 //	for(int i=0; i<7; i++) std::cout << " @" << pointAndScale[i] << "@ ";

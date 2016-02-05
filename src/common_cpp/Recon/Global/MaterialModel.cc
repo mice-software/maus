@@ -5,6 +5,14 @@
 
 namespace MAUS {
 
+MaterialModel::MaterialModel(const G4Material* material) {
+    SetMaterial(material);
+}
+
+MaterialModel::MaterialModel(const MaterialModel& mat) {
+    SetMaterial(mat._material);
+}
+
 void MaterialModel::SetMaterial(const G4Material* material) {
     _material = material;
     _n_e = _material->GetElectronDensity();
@@ -34,10 +42,19 @@ double MaterialModel::dEdx(double E, double m, double charge) {
 
     double dEdx = -_dedx_constant*_density*charge*charge/beta2*
                                           (logterm/2. - beta2 - delta)/cm;
+    /*
     std::cerr << "const " << _dedx_constant << " dens " << _density 
               << " charge " << charge << " beta2 " << beta2
               << " log " << logterm << " cm " << cm << " dedx " << dEdx << std::endl;
+    */
     return dEdx;
+}
+
+double MaterialModel::d2EdxdE(double E, double m, double charge) {
+    double delta_energy_pos = dEdx(E+_d2EdxdE_delta_const, m, charge);
+    double delta_energy_neg = dEdx(E-_d2EdxdE_delta_const, m, charge);
+    double deriv = (delta_energy_pos-delta_energy_neg)/2./_d2EdxdE_delta_const;
+    return deriv;
 }
 
 double MaterialModel::dtheta2dx(double E, double m, double charge) {

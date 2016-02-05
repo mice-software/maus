@@ -5,15 +5,21 @@
 #include "gsl/gsl_odeiv.h"
 #include "gsl/gsl_errno.h"
 
-#include <iomanip>
+#include "Geant4/G4Navigator.hh"
+#include "Geant4/G4TransportationManager.hh"
+#include "Geant4/G4VPhysicalVolume.hh"
+#include "Geant4/G4LogicalVolume.hh"
+#include "Geant4/G4Material.hh"
+
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Recon/Global/Tracking.hh"
 
 namespace MAUS {
 
 TrackingZ* TrackingZ::_tz_for_propagate = NULL;
 
-TrackingZ::TrackingZ() : _field(NULL),
+TrackingZ::TrackingZ() : _field(Globals::GetMCFieldConstructor()),
                _dx(1.), _dy(1.), _dz(1.), _dt(1.), _charge(1.),
                _matrix(6, std::vector<double>(6, 0.)) {
 }
@@ -81,6 +87,10 @@ int TrackingZ::EquationsOfMotion(double z, const double x[29], double dxdz[29],
   if (em_success != GSL_SUCCESS) {
       return em_success;
   }
+  int material_success = MaterialEquationOfMotion(z, x, dxdz, params);
+  if (material_success != GSL_SUCCESS) {
+      return material_success;
+  }
   return GSL_SUCCESS;
 }
 
@@ -146,8 +156,74 @@ int TrackingZ::EMEquationOfMotion(double z, const double x[29], double dxdz[29],
           x_index++;
       }
   }
-
   return GSL_SUCCESS;
+}
+
+int TrackingZ::MaterialEquationOfMotion(double z, const double x[29], double dxdz[29],
+                                   void* params) {
+    // Must be called after EMEquationOfMotion
+    MaterialModel& material = _tz_for_propagate->_mat_mod;
+    G4ThreeVector pos(x[1], x[2], x[3]);
+    G4ThreeVector mom(x[5], x[6], x[7]);
+    G4Navigator* navigator = G4TransportationManager::
+                          GetTransportationManager()->GetNavigatorForTracking();
+    G4VPhysicalVolume* phys_vol = navigator->LocateGlobalPointAndSetup(pos, &mom);
+    G4LogicalVolume* log_vol = phys_vol->GetLogicalVolume();
+    material.SetMaterial(log_vol->GetMaterial());
+    std::cerr << "TrackingZ::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
+              << " z: " << x[3] << " E: " << x[4] << " pz: " << x[7] << std::endl;
+    double energy = x[4]*x[4];
+    double p = x[5]*x[5]+x[6]*x[6]+x[7]*x[7];
+    double mass = sqrt(energy*energy-p*p);
+    double charge = _tz_for_propagate->_charge;
+    double dEdz;
+    double d2EdzdE;
+    double dtheta2dz;
+    double destragdz;
+    if (_tz_for_propagate->_eloss_model == bethebloch_forwards) {
+        dEdz = material.dEdx(energy, mass, charge); // should be negative
+        d2EdzdE =  material.d2EdxdE(energy, mass, charge);
+    } else if (_tz_for_propagate->_eloss_model == bethebloch_backwards) {
+        dEdz = -material.dEdx(energy, mass, charge); // should be positive
+        d2EdzdE = -material.d2EdxdE(energy, mass, charge);
+    } else {
+        dEdz = 0.; // no eloss
+        d2EdzdE = 0;
+    }
+
+    if (_tz_for_propagate->_eloss_model == estrag_forwards) {
+        destragdz = material.estrag2(energy, mass, charge);
+    } else if (_tz_for_propagate->_eloss_model == estrag_backwards) {
+        destragdz = material.estrag2(energy, mass, charge);
+    } else {
+        destragdz = 0.;
+    } 
+
+    if (_tz_for_propagate->_mcs_model == moliere_forwards) {
+        dtheta2dz = material.dtheta2dx(energy, mass, charge);
+    } else if (_tz_for_propagate->_mcs_model == moliere_backwards) {
+        dtheta2dz = -material.dtheta2dx(energy, mass, charge);
+    } else {
+        dtheta2dz = 0.;
+    }
+
+    // E^2 = p^2+m^2; 2E dE/dz = 2p dp/dz
+    double dpdz = energy/p*dEdz;
+    dxdz[4] = dEdz;
+    dxdz[5] = dpdz*x[5]/p;
+    dxdz[6] = dpdz*x[6]/p;
+    dxdz[7] = dpdz*x[7]/p;
+
+    // d/dz <E^2> = d<estrag2>/dz + 2E d/dE dE/dz
+    dxdz[14] = destragdz+2*x[4]*d2EdzdE;
+
+    // product rule - <p_x^2> = <x'^2> p_z^2
+    // d<px^2>/dz = d<x'^2>/dz p_z^2 + 2 <x'^2> p_z dp_z/dz 
+    //            = d<x'^2>/dz p_z^2 + 2 <p_x^2>/p_z dp_z/dz
+    dxdz[19] = 2*dpdz/x[7]*x[19] + dtheta2dz*x[7]*x[7];
+    dxdz[26] = 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
+
+    return GSL_SUCCESS;
 }
 
 void TrackingZ::UpdateTransferMatrix(const double* x) {
@@ -226,6 +302,14 @@ void TrackingZ::SetDeviations(double dx, double dy, double dz, double dt) {
 
 std::vector<std::vector<double> > TrackingZ::GetMatrix() const {
   return _matrix;
+}
+
+void TrackingZ::SetField(BTField* field) {
+    if (field == NULL) {
+        _field = Globals::GetMCFieldConstructor();
+    } else {
+        _field = field;
+    }
 }
 
 }
