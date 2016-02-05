@@ -43,14 +43,14 @@ public:
     void SetStepSize(double step_size) {_step_size = step_size;}
     double GetStepSize() const {return _step_size;}
 
-    void SetEnergyLossModel(bool eloss_model) {_eloss_model = eloss_model;}
+    void SetEnergyLossModel(ELossModel eloss_model) {_eloss_model = eloss_model;}
     bool GetEnergyLossModel() const {return _eloss_model;}
 
-    void SetMCSModel(bool mcs_model) {_mcs_model = mcs_model;}
+    void SetMCSModel(MCSModel mcs_model) {_mcs_model = mcs_model;}
     bool GetMCSModel() const {return _mcs_model;}
 
-    void SetEStragModel(bool mcs_model) {_mcs_model = mcs_model;}
-    bool GetEStragModel() const {return _mcs_model;}
+    void SetEStragModel(EStragModel estrag_model) {_estrag_model = estrag_model;}
+    bool GetEStragModel() const {return _estrag_model;}
 
 
 private:
@@ -70,9 +70,9 @@ private:
     double _step_size = 1.;
     double _absolute_error = 1e-4;
     double _relative_error = 1e-4;
-    bool _eloss_model = bethebloch_forwards;
-    bool _mcs_model = moliere_forwards;
-    bool _estrag_model = no_estrag;
+    ELossModel _eloss_model = bethebloch_forwards;
+    MCSModel _mcs_model = moliere_forwards;
+    EStragModel _estrag_model = no_estrag;
     int  _max_n_steps = 100000;
     static constexpr double c_l = 299.792458; // mm*ns^{-1}
     // transient...

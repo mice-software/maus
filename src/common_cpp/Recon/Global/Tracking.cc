@@ -170,10 +170,10 @@ int TrackingZ::MaterialEquationOfMotion(double z, const double x[29], double dxd
     G4VPhysicalVolume* phys_vol = navigator->LocateGlobalPointAndSetup(pos, &mom);
     G4LogicalVolume* log_vol = phys_vol->GetLogicalVolume();
     material.SetMaterial(log_vol->GetMaterial());
-    std::cerr << "TrackingZ::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
-              << " z: " << x[3] << " E: " << x[4] << " pz: " << x[7] << std::endl;
-    double energy = x[4]*x[4];
-    double p = x[5]*x[5]+x[6]*x[6]+x[7]*x[7];
+    // std::cerr << "TrackingZ::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
+    //          << " z: " << x[3] << " E: " << x[4] << " pz: " << x[7] << std::endl;
+    double energy = sqrt(x[4]*x[4]);
+    double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
     double mass = sqrt(energy*energy-p*p);
     double charge = _tz_for_propagate->_charge;
     double dEdz;
@@ -191,9 +191,9 @@ int TrackingZ::MaterialEquationOfMotion(double z, const double x[29], double dxd
         d2EdzdE = 0;
     }
 
-    if (_tz_for_propagate->_eloss_model == estrag_forwards) {
+    if (_tz_for_propagate->_estrag_model == estrag_forwards) {
         destragdz = material.estrag2(energy, mass, charge);
-    } else if (_tz_for_propagate->_eloss_model == estrag_backwards) {
+    } else if (_tz_for_propagate->_estrag_model == estrag_backwards) {
         destragdz = material.estrag2(energy, mass, charge);
     } else {
         destragdz = 0.;
@@ -215,13 +215,13 @@ int TrackingZ::MaterialEquationOfMotion(double z, const double x[29], double dxd
     dxdz[7] = dpdz*x[7]/p;
 
     // d/dz <E^2> = d<estrag2>/dz + 2E d/dE dE/dz
-    dxdz[14] = destragdz+2*x[4]*d2EdzdE;
+    dxdz[23] = destragdz+2*x[4]*d2EdzdE;
 
     // product rule - <p_x^2> = <x'^2> p_z^2
     // d<px^2>/dz = d<x'^2>/dz p_z^2 + 2 <x'^2> p_z dp_z/dz 
     //            = d<x'^2>/dz p_z^2 + 2 <p_x^2>/p_z dp_z/dz
-    dxdz[19] = 2*dpdz/x[7]*x[19] + dtheta2dz*x[7]*x[7];
     dxdz[26] = 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
+    dxdz[28] = 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
 
     return GSL_SUCCESS;
 }

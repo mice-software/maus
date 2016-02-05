@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _SRC_PY_CPP_PYSIMULATION_HH_
-#define _SRC_PY_CPP_PYSIMULATION_HH_
+#ifndef _SRC_PY_CPP_PYERRORPROPAGATION_HH_
+#define _SRC_PY_CPP_PYERRORPROPAGATION_HH_
 
 // These ifdefs are required to avoid cpp compiler warning
 #ifdef _POSIX_C_SOURCE
@@ -30,22 +30,24 @@
 #include "Python.h"
 
 namespace MAUS {
-namespace PySimulation {
-/* @brief Track a list of particles through the Geant4 geometry
+namespace PyErrorPropagation {
+/* @brief Track a central trajectory and error through the Geant4 geometry
  *
- * Push a list of particles through the Geant4 geometry. Return a MC event 
- * encoded as a json string.
+ * Track a central trajectory and error through the Geant4 geometry. Return a MC
+ * event encoded as a json string.
  */
-static PyObject* track_particles
+static PyObject* propagate_errors
                                (PyObject *self, PyObject *args, PyObject *kwds);
 
-/** Initialise simulation module
+/** Initialise error_propagation module
  *
- *  This is called by import simulation
+ *  This is called by import error_propagation
  */
-PyMODINIT_FUNC initsimulation(void);
+PyMODINIT_FUNC initerror_propagation(void);
 
 }  // namespace PySimulation
 }  // namespace MAUS
 
-#endif  // _SRC_PY_CPP_PYSIMULATION_HH_
+#endif  // _SRC_PY_CPP_PYERRORPROPAGATION_HH_
+
+

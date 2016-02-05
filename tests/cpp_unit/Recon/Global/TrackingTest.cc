@@ -367,15 +367,51 @@ TEST(TrackingZTest, PropagateDriftELossTest) {
     tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
     tz.SetEnergyLossModel(TrackingZ::bethebloch_forwards);
     tz.SetMCSModel(TrackingZ::no_mcs);
-    tz.SetMCSModel(TrackingZ::no_estrag);
-    std::vector<double> x_out = drift_ellipse(200., 105.658);
-    x_out[3] = -200.;
+    tz.SetEStragModel(TrackingZ::no_estrag);
+    std::vector<double> x_in = drift_ellipse(200., 105.658);
+    x_in[3] = -200.;
+    std::vector<double> x_out = x_in;
+
+    Squeak::mout(verbose) << "BB Forwards" << std::endl;
+    print_x(&x_out[0]);
+    tz.Propagate(&x_out[0], 200.);
     print_x(&x_out[0]); 
+
+    x_out = x_in;
+    Squeak::mout(verbose) << "BB Backwards" << std::endl;
+    print_x(&x_out[0]);
+    tz.SetEnergyLossModel(TrackingZ::bethebloch_backwards);
+    tz.Propagate(&x_out[0], 200.);
+    print_x(&x_out[0]); 
+
+    x_out = x_in;
+    Squeak::mout(verbose) << "No BB" << std::endl;
+    print_x(&x_out[0]);
+    tz.SetEnergyLossModel(TrackingZ::no_eloss);
     tz.Propagate(&x_out[0], 200.);
     print_x(&x_out[0]); 
 
     EXPECT_TRUE(false);
 }
+
+TEST(TrackingZTest, PropagateDriftMCSTest) {
+    GlobalsManager::SetMonteCarloMiceModules(new MiceModule("Test.dat"));
+    TrackingZ tz;
+    tz.SetStepSize(10.);
+    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    tz.SetEnergyLossModel(TrackingZ::no_eloss);
+    tz.SetMCSModel(TrackingZ::moliere_forwards);
+    tz.SetEStragModel(TrackingZ::no_estrag);
+    std::vector<double> x_in = drift_ellipse(200., 105.658);
+    std::vector<double> x_out = x_in;
+    x_out[3] = -200.;
+    print_x(&x_out[0]);
+    tz.Propagate(&x_out[0], 200.);
+    print_x(&x_out[0]); 
+
+    EXPECT_TRUE(false);
+}
+
 
 
 }

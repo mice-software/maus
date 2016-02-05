@@ -60,7 +60,7 @@ double MaterialModel::d2EdxdE(double E, double m, double charge) {
 double MaterialModel::dtheta2dx(double E, double m, double charge) {
     // moliere scattering formula, see PDG particle data book
     // assume log term is 0
-    double one_over_beta_c_p = E/(E*E+m*m)*c_l;
+    double one_over_beta_c_p = E/(E*E-m*m); // E/p^2
     double theta_0_sq = _rad_len_ratio*one_over_beta_c_p*one_over_beta_c_p;
     return theta_0_sq;
 }
