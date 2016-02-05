@@ -97,6 +97,7 @@ PyObject* set_centroid(std::vector<double> x_in) {
     return list;
 }
 
+SOMEHOW BUG HERE?
 PyObject* set_ellipse(std::vector<double> x_in) {
     PyObject* ellipse = PyList_New(6);
     int index = 8;

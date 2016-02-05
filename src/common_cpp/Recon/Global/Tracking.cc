@@ -41,6 +41,13 @@ void TrackingZ::Propagate(double* x, double target_z) {
   double h = _step_size;
   int    nsteps = 0;
   _tz_for_propagate = this;
+  std::cerr << "BEFORE" << std::endl;
+  for (size_t i = 0; i < 8; ++i)
+      std::cerr << x[i] << " ";
+  std::cerr << std::endl;
+  for (size_t i = 8; i < 29; ++i)
+      std::cerr << x[i] << " ";
+  std::cerr << std::endl;
   while(fabs(z-target_z) > 1e-6) {
     std::cerr << "Stepping " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
     nsteps++;
@@ -67,6 +74,13 @@ void TrackingZ::Propagate(double* x, double target_z) {
         break;
     }
   }
+  std::cerr << "AFTER" << std::endl;
+  for (size_t i = 0; i < 8; ++i)
+      std::cerr << x[i] << " ";
+  std::cerr << std::endl;
+  for (size_t i = 8; i < 29; ++i)
+      std::cerr << x[i] << " ";
+  std::cerr << std::endl;
   gsl_odeiv_evolve_free (evolve);
   gsl_odeiv_control_free(control);
   gsl_odeiv_step_free   (step);
