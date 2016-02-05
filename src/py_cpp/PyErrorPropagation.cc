@@ -74,7 +74,7 @@ int get_ellipse(PyObject* py_ellipse,
             return 1;
         }
         for (Py_ssize_t j = i; j < 6; ++j) {
-            PyObject* py_value = PyList_GetItem(py_row, i);
+            PyObject* py_value = PyList_GetItem(py_row, j);
             if (!PyFloat_Check(py_value)) {
                 PyErr_SetString(PyExc_TypeError, "ellipse had non-float");
                 return 1;
@@ -97,7 +97,6 @@ PyObject* set_centroid(std::vector<double> x_in) {
     return list;
 }
 
-SOMEHOW BUG HERE?
 PyObject* set_ellipse(std::vector<double> x_in) {
     PyObject* ellipse = PyList_New(6);
     int index = 8;
