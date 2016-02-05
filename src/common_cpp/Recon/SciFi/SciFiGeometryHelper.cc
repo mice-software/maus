@@ -109,7 +109,6 @@ void SciFiGeometryHelper::Build() {
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = reference;
       trackerGeo.Rotation = trackerModule->globalRotation();
-      trackerGeo.Rotation.invert();
       trackerGeo.Field = FieldValue(trackerModule);
       trackerGeo.Planes[plane_id] = this_plane;
 

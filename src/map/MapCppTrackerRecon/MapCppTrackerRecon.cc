@@ -538,6 +538,7 @@ void MapCppTrackerRecon::extrapolate_helical_reference(SciFiEvent& event) const 
     int tracker = track->get_tracker();
     ThreeVector reference = _geometry_helper.GetReferencePosition(tracker);
     CLHEP::HepRotation rotation = _geometry_helper.GetReferenceRotation(tracker);
+    rotation.invert();
 
     double r  = track->get_R();
     double pt = - track->get_charge()*CLHEP::c_light*_geometry_helper.GetFieldValue(tracker)*r;
@@ -576,6 +577,7 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
     int tracker = track->get_tracker();
     ThreeVector reference = _geometry_helper.GetReferencePosition(tracker);
     CLHEP::HepRotation rotation = _geometry_helper.GetReferenceRotation(tracker);
+//    rotation.invert();
 
     pos.setX(track->get_x0());
     pos.setY(track->get_y0());
