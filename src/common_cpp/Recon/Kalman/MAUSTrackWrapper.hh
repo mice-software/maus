@@ -96,16 +96,12 @@ namespace MAUS {
 
         int id = (cluster->get_station() - 1)*3 + cluster->get_plane(); // Actually (id - 1)
 
-        // TODO :
-        // - APPLY GEOMETRY CORRECTIONS!
-        // - Fill covariance matrix correctly!
         TMatrixD state_vector(1, 1);
         TMatrixD covariance(1, 1);
 
         state_vector(0, 0) = cluster->get_alpha();
-//        covariance(0, 0) = 0.427*0.427 / 12.0;
-//        covariance(0, 0) = 1.4925*1.4945 / 12.0;
-        covariance(0, 0) = 0.0;
+//        covariance(0, 0) = 0.0;
+        covariance(0, 0) = geom->GetChannelWidth() * geom->GetChannelWidth() / 12.0;
 
         new_track[id].SetVector(state_vector);
         new_track[id].SetCovariance(covariance);

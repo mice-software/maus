@@ -15,7 +15,7 @@
  *
  */
 
-/** @class MapCppTrackerRecon
+/** @class MapCppTrackerReconTest
  *  Digitize events by running Tracker electronics simulation.
  *
  */
@@ -63,14 +63,14 @@ namespace MAUS {
 
 struct SciFiPlaneGeometry;
 
-class MapCppTrackerRecon : public MapBase<Data> {
+class MapCppTrackerReconTest : public MapBase<Data> {
 
  public:
   /** Constructor - initialises pointers to NULL */
-  MapCppTrackerRecon();
+  MapCppTrackerReconTest();
 
   /** Constructor - deletes any allocated memory */
-  ~MapCppTrackerRecon();
+  ~MapCppTrackerReconTest();
 
  private:
   /** Sets up the worker
@@ -120,17 +120,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
   /**
    * @brief Populate global position output for the spacepoints
    */
-  void set_spacepoint_global_output(const SciFiSpacePointPArray& spoints) const;
-
-  /**
-   * @brief Populate global parameter output for the straight pat rec tracks
-   */
-  void set_straight_prtrack_global_output(const SciFiStraightPRTrackPArray& trks) const;
-
-  /** 
-    * @brief Rates the track based on the outcome of the reconstruction
-    */
-  void calculate_track_rating(SciFiTrack* track) const;
+  void set_spacepoint_global_output(SciFiSpacePointPArray spoints) const;
 
  private:
   /// This will contain the configuration
@@ -145,7 +135,6 @@ class MapCppTrackerRecon : public MapBase<Data> {
   double _kuno_sum;
   double _kuno_tolerance;
   /// Pattern recognition flags
-  bool _clusters_on;
   bool _spacepoints_on;
   bool _up_straight_pr_on;
   bool _down_straight_pr_on;
@@ -153,22 +142,11 @@ class MapCppTrackerRecon : public MapBase<Data> {
   bool _down_helical_pr_on;
   bool _kalman_on;
   bool _patrec_on;
-  bool _patrec_debug_on;
 
   bool _use_mcs;
   bool _use_eloss;
   bool _use_patrec_seed;
   bool _correct_pz;
-
-  int _excellent_num_trackpoints;
-  int _good_num_trackpoints;
-  int _poor_num_trackpoints;
-  double _excellent_p_value;
-  double _good_p_value;
-  double _poor_p_value;
-  int _excellent_num_spacepoints;
-  int _good_num_spacepoints;
-  int _poor_num_spacepoints;
 
   double _seed_value;
 
@@ -180,11 +158,10 @@ class MapCppTrackerRecon : public MapBase<Data> {
   PatternRecognition _pattern_recognition;
 
   /// Kalman Track Fitter Object
-  Kalman::TrackFit* _helical_track_fitter;
-  Kalman::TrackFit* _straight_track_fitter;
+  Kalman::TrackFit* _spacepoint_helical_track_fitter;
+  Kalman::TrackFit* _spacepoint_straight_track_fitter;
 
-  SciFiHelicalMeasurements* _helical_measurement;
-  SciFiStraightMeasurements* _straight_measurement;
+  int _spacepoint_recon_plane;
 
   ///  Map of the planes geometry.
   SciFiGeometryHelper _geometry_helper;
