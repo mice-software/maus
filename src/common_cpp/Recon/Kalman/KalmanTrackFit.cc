@@ -42,7 +42,6 @@ namespace Kalman {
       for (unsigned int i = 0; i < state.GetDimension(); ++i) {
         converter << "(" << vec(i, 0) << " +/- " << sqrt(cov(i, i)) << "), ";
       }
-      converter << 1.0/vec(vec.GetNrows()-1, 0);
       converter << "\n";
     } else {
       converter << "NO DATA\n";
@@ -54,10 +53,11 @@ namespace Kalman {
   std::string print_track(const Track& track, const char* name) {
     unsigned int num = track.GetLength();
     std::ostringstream converter("");
-    if (name)
-      converter << "Printing " << name << "\n";
-    else
-      converter << "TRACK:\n";
+    if (name) {
+      converter << "Printing " << name << " (" << num << ")\n";
+    } else {
+      converter << "Printing Track (" << num << ")\n";
+    }
 
     for (unsigned int i = 0; i < num; ++i) {
       State state = track[i];
@@ -75,7 +75,6 @@ namespace Kalman {
     }
     TMatrixD vector = st1._vector - st2._vector;
     TMatrixD covariance = st1._covariance + st2._covariance;
-//    TMatrixD covariance = st1._covariance + st2._covariance;
 
     State residual(vector, covariance, st1._position);
     residual.SetId(st1._id);
@@ -195,8 +194,6 @@ namespace Kalman {
 
         _smoothed[i].SetVector(vec);
         _smoothed[i].SetCovariance(cov);
-
-        Kalman::State measured = _measurement->Measure(_smoothed[i]);
       }
     }
   }
@@ -309,12 +306,9 @@ namespace Kalman {
     for (unsigned int i = 0; i < track.GetLength(); ++i) {
       if (_data[i]) {
         State measured = _measurement->Measure(track[i]);
-
-        TMatrixD vector = _data[i]._vector - measured._vector;
-        TMatrixD covariance = _measurement->GetMeasurementNoise() - measured._covariance;
-
-        State chisq(vector, covariance, measured._position);
-        chi_squared += CalculateChiSquaredUpdate(chisq);
+        State chisq = CalculateResidual(measured, _data[i]);
+        double update = CalculateChiSquaredUpdate(chisq);
+        chi_squared += update;
       }
     }
 
@@ -325,10 +319,11 @@ namespace Kalman {
     int no_parameters = GetDimension();
     int no_measurements = 0;
     for (unsigned int i = 0; i < _data.GetLength(); ++i) {
-      if (_data[i]) no_measurements += GetMeasurementDimension();
+      if (_data[i].HasValue()) {
+        no_measurements += GetMeasurementDimension();
+      }
     }
-    return (no_measurements - no_parameters) - 1;
-//    return (no_measurements - no_parameters);
+    return (no_measurements - no_parameters);
   }
 
   State TrackFit::CalculateCleanedState(unsigned int i) const {
