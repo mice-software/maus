@@ -31,6 +31,7 @@ PyMODINIT_FUNC init_MapCppTrackerRecon(void) {
 
 
 MapCppTrackerRecon::MapCppTrackerRecon() : MapBase<Data>("MapCppTrackerRecon"),
+                                           _clusters_on(true),
                                            _spacepoints_on(true),
                                            _up_straight_pr_on(true),
                                            _down_straight_pr_on(true),
@@ -59,6 +60,7 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   int user_up_straight_pr_on   = (*json)["SciFiPRStraightTkUSOn"].asInt();
   int user_down_straight_pr_on = (*json)["SciFiPRStraightTkDSOn"].asInt();
   _kalman_on          = (*json)["SciFiKalmanOn"].asBool();
+  _clusters_on        = (*json)["SciFiClusterReconOn"].asBool();
   _spacepoints_on     = (*json)["SciFiSpacepointReconOn"].asBool();
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
   _patrec_debug_on    = (*json)["SciFiPatRecDebugOn"].asBool();
@@ -188,15 +190,17 @@ void MapCppTrackerRecon::_process(Data* data) const {
         continue;
       }
 
-      if ( _spacepoints_on ) {
+      if ( _clusters_on ) {
       // Clear any exising higher level data
         event->clear_clusters();
-        event->clear_spacepoints();
         // Build Clusters.
         if (event->digits().size()) {
           _cluster_recon.process(*event);
         }
+      }
+      if ( _spacepoints_on ) {
         // Build SpacePoints.
+        event->clear_spacepoints();
         if (event->clusters().size()) {
           _spacepoint_recon.process(*event);
           set_spacepoint_global_output(event->spacepoints());

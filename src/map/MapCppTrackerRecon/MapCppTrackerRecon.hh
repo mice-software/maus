@@ -145,6 +145,7 @@ class MapCppTrackerRecon : public MapBase<Data> {
   double _kuno_sum;
   double _kuno_tolerance;
   /// Pattern recognition flags
+  bool _clusters_on;
   bool _spacepoints_on;
   bool _up_straight_pr_on;
   bool _down_straight_pr_on;

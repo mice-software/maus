@@ -214,14 +214,14 @@ namespace MAUS {
       }
 
       double delta_energy = 0.0;
-      double energy = sqrt( old_momentum*old_momentum + _muon_mass_sq );
+      double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
       double momentum = old_momentum;
       int n_steps = materials.size();
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
         double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
         delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
         energy = energy + delta_energy;
-        momentum = sqrt( energy*energy - _muon_mass_sq );
+        momentum = sqrt(energy*energy - _muon_mass_sq);
       }
 
       double reduction_factor = momentum/old_momentum;
@@ -288,14 +288,14 @@ namespace MAUS {
       }
 
       double delta_energy = 0.0;
-      double energy = sqrt( old_momentum*old_momentum + _muon_mass_sq );
+      double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
       double momentum = old_momentum;
       int n_steps = materials.size();
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
         double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
         delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
         energy = energy + delta_energy;
-        momentum = sqrt( energy*energy - _muon_mass_sq );
+        momentum = sqrt(energy*energy - _muon_mass_sq);
       }
 
       reduction_factor = momentum/old_momentum;
