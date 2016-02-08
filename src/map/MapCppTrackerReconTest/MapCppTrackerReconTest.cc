@@ -36,8 +36,7 @@ PyMODINIT_FUNC init_MapCppTrackerReconTest(void) {
                                         ("MapCppTrackerReconTest", "", "", "", "");
 }
 
-MapCppTrackerReconTest::MapCppTrackerReconTest() :
-  MapBase<Data>("MapCppTrackerReconTest"),
+MapCppTrackerReconTest::MapCppTrackerReconTest() : MapBase<Data>("MapCppTrackerReconTest"),
   _up_straight_pr_on(true),
   _down_straight_pr_on(true),
   _up_helical_pr_on(true),

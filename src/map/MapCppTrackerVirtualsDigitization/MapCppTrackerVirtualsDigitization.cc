@@ -113,30 +113,32 @@ namespace MAUS {
       SciFiEvent *sf_evt = new SciFiEvent();
 
       switch (_test_method) {
-        case 0 : 
+        case 0 :
           _process_straight(sf_evt, spill.GetSpillNumber(), event_i);
           break;
-        case 1 : 
+        case 1 :
           _process_helix(sf_evt, spill.GetSpillNumber(), event_i);
           break;
         case 2 :
         // Construct digits from virtual plane hits for each MC event
         if (_make_digits) {
           SciFiDigitPArray digits;
-          construct_virtual_digits(mc_evt->GetVirtualHits(), spill.GetSpillNumber(), event_i, digits);
+          construct_virtual_digits(mc_evt->GetVirtualHits(),
+                                                          spill.GetSpillNumber(), event_i, digits);
           sf_evt->set_digits(digits);
         }
 
         if (_make_clusters) {
           SciFiClusterPArray clusters;
-          construct_virtual_clusters(mc_evt->GetVirtualHits(), spill.GetSpillNumber(), event_i, clusters);
+          construct_virtual_clusters(mc_evt->GetVirtualHits(),
+                                                        spill.GetSpillNumber(), event_i, clusters);
           sf_evt->set_clusters(clusters);
         }
 
         if (_make_spacepoints) {
           SciFiSpacePointPArray spacepoints;
-          construct_virtual_spacepoints(mc_evt->GetVirtualHits(), spill.GetSpillNumber(), event_i,
-                                                                                        spacepoints);
+          construct_virtual_spacepoints(mc_evt->GetVirtualHits(),
+                                                     spill.GetSpillNumber(), event_i, spacepoints);
           sf_evt->set_spacepoints(spacepoints);
         }
         break;
@@ -155,11 +157,11 @@ namespace MAUS {
         spill.GetReconEvents()->push_back(revt);
       }
     }
-
   }
 
 
-  void MapCppTrackerVirtualsDigitization::_process_straight(MAUS::SciFiEvent* sf_event, int spill_num, int event_num) const {
+  void MapCppTrackerVirtualsDigitization::_process_straight(MAUS::SciFiEvent* sf_event,
+                                                              int spill_num, int event_num) const {
     double x0 = CLHEP::RandGauss::shoot(0.0, _straight_rms_pos);
     double y0 = CLHEP::RandGauss::shoot(0.0, _straight_rms_pos);
     double mx = CLHEP::RandGauss::shoot(0.0, _straight_rms_ang);
@@ -199,7 +201,7 @@ namespace MAUS {
 
           if (_make_digits) {
             SciFiDigit* a_digit = new SciFiDigit(spill_num, event_num,
-                                         tracker, station, plane, channelNumber, _default_npe, time);
+                                       tracker, station, plane, channelNumber, _default_npe, time);
             digits.push_back(a_digit);
           }
 
@@ -244,7 +246,8 @@ namespace MAUS {
 
           if (_make_clusters) {
             for ( int plane = 0; plane < 3; ++plane ) {
-              for ( SciFiClusterPArray::iterator clIt = clusters.begin(); clIt != clusters.end(); ++clIt ) {
+              for ( SciFiClusterPArray::iterator clIt = clusters.begin();
+                                                                 clIt != clusters.end(); ++clIt ) {
                 if ( (*clIt)->get_tracker() == tracker &&
                      (*clIt)->get_station() == station &&
                      (*clIt)->get_plane() == plane ) {
@@ -263,12 +266,14 @@ namespace MAUS {
   }
 
 
-  void MapCppTrackerVirtualsDigitization::_process_helix(MAUS::SciFiEvent* event, int spill_num, int event_num) const {
+  void MapCppTrackerVirtualsDigitization::_process_helix(MAUS::SciFiEvent* event,
+                                                              int spill_num, int event_num) const {
+    // Not Yet Implemented
   }
 
 
-  void MapCppTrackerVirtualsDigitization::construct_virtual_digits(VirtualHitArray* hits, int spill_num,
-                                                   int event_num, SciFiDigitPArray& digits) const {
+  void MapCppTrackerVirtualsDigitization::construct_virtual_digits(VirtualHitArray* hits,
+                                    int spill_num, int event_num, SciFiDigitPArray& digits) const {
     for (unsigned int hit_i = 0; hit_i < hits->size(); hit_i++) {
       bool found = false;
       VirtualHit* a_hit    = &hits->at(hit_i);
@@ -311,8 +316,8 @@ namespace MAUS {
   }
 
 
-  void MapCppTrackerVirtualsDigitization::construct_virtual_clusters(VirtualHitArray* hits, int spill_num,
-                                               int event_num, SciFiClusterPArray& clusters) const {
+  void MapCppTrackerVirtualsDigitization::construct_virtual_clusters(VirtualHitArray* hits,
+                                int spill_num, int event_num, SciFiClusterPArray& clusters) const {
     for (unsigned int hit_i = 0; hit_i < hits->size(); hit_i++) {
       bool found = false;
       VirtualHit* a_hit    = &hits->at(hit_i);
@@ -431,7 +436,8 @@ namespace MAUS {
 
     ThreeVector vec = geometry.Direction.Orthogonal().Unit();
     double alpha = position.Dot(vec);
-    int channelNumber = floor(0.5 + ((7.0 * geometry.CentralFibre) - (2.0 * alpha / geometry.Pitch)) / 7.0);
+    int channelNumber = floor(0.5 + ((7.0 * geometry.CentralFibre) -
+                                                            (2.0 * alpha / geometry.Pitch)) / 7.0);
 
     double new_alpha;
     if (_smear_value < 0.0) {
