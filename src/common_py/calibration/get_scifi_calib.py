@@ -11,6 +11,7 @@ import cdb
 import json
 import os
 from Configuration import Configuration
+from cdb._exceptions import CdbPermanentError
 
 
 class GetTrackerCalib:
@@ -21,7 +22,8 @@ class GetTrackerCalib:
 
     def __init__(self):
         print "Init running"
-        self.config = json.loads(Configuration().getConfigJSON())
+        self.config = json.loads(\
+                      Configuration().getConfigJSON(command_line_args = True))
         calib_cdb_url = self.config['cdb_download_url'] + 'calibration?wsdl'
         self._calib = cdb.Calibration()
         self._calib.set_url(calib_cdb_url)
@@ -41,7 +43,10 @@ class GetTrackerCalib:
         if method == "Date":
             self.Date(_input)
         if method == "Run":
-            self.Date(self.Convert_Run(_input))
+            try:
+                self.Run(_input)
+            except CdbPermanentError:
+                self.Date(self.Convert_Run(_input))
         if method == "Current":
             self.Current()
 
@@ -54,6 +59,23 @@ class GetTrackerCalib:
         cable = self._cable.get_current_cabling("Trackers")
 
         self.Output(calib, badchan, cable)
+
+    def Run(self, run_num):
+        """
+        Collects calibration info by run
+        """
+        try:
+            print "Getting SciFi calibrations and maps for Run ", run_num
+            calib = self._calib.get_calibration_for_run\
+                ("Trackers", run_num, "trackers")
+            badchan = self._calib.get_calibration_for_run\
+                  ("Trackers", run_num, "bad_chan")
+            cable = self._cable.get_cabling_for_run\
+                ("Trackers", run_num)
+            self.Output(calib, badchan, cable)
+        except CdbPermanentError:
+            raise CdbPermanentError\
+                   ("CDB error getting scifi calibration by run")
 
     def Date(self, date):
         """
@@ -91,7 +113,7 @@ class GetTrackerCalib:
         path_calib = path + "/files/calibration/"
         path_cable = path + "/files/cabling/"
         print path
-        calib_out = open(path_calib+"scifi_calibraion.txt","w")
+        calib_out = open(path_calib+"scifi_calibration.txt","w")
         badchan_out = open(path_calib+"scifi_bad_channels.txt","w")
         cable_out = open(path_cable+"scifi_mapping.txt","w")
 
