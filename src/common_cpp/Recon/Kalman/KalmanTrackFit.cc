@@ -175,12 +175,13 @@ namespace Kalman {
     _smoothed[track_start-increment] = _filtered[track_start-increment];
 
     for (int i = track_start; i != track_end; i += increment) {
-      TMatrixD temp(GetDimension(), GetDimension());
-      TDecompLU lu(_predicted[i - increment].GetCovariance());
-      if (!lu.Decompose() || !lu.Invert(temp)) {
-        _smoothed[i] = _filtered[i];
-        _propagator->Propagate(_filtered[i - increment], _smoothed[i]);
-      } else {
+//      TMatrixD temp(GetDimension(), GetDimension());
+//      TDecompLU lu(_predicted[i - increment].GetCovariance());
+//      if (!lu.Decompose() || !lu.Invert(temp)) {
+//        _smoothed[i] = _filtered[i];
+//        _propagator->Propagate(_filtered[i - increment], _smoothed[i]);
+//      } else {
+        TMatrixD temp(TMatrixD::kInverted, _predicted[i - increment].GetCovariance());
         TMatrixD prop = _propagator->CalculatePropagator(_filtered[i], _filtered[i - increment]);
         TMatrixD propT(TMatrixD::kTransposed, prop);
 
@@ -194,7 +195,7 @@ namespace Kalman {
 
         _smoothed[i].SetVector(vec);
         _smoothed[i].SetCovariance(cov);
-      }
+//      }
     }
   }
 
@@ -230,11 +231,12 @@ namespace Kalman {
     State measured = _measurement->Measure(predicted);
     TMatrixD V = _measurement->GetMeasurementNoise();
 
-    TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
-    TDecompLU lu(V + measured.GetCovariance());
-    if (!lu.Decompose() || !lu.Invert(temp)) {
-      filtered = predicted;
-    } else {
+//    TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
+//    TDecompLU lu(V + measured.GetCovariance());
+//    if (!lu.Decompose() || !lu.Invert(temp)) {
+//      filtered = predicted;
+//    } else {
+      TMatrixD temp(TMatrixD::kInverted, measured.GetCovariance());
       TMatrixD H = _measurement->GetMeasurementMatrix();
       TMatrixD HT(TMatrixD::kTransposed, H);// HT.Transpose(H);
 
@@ -254,7 +256,7 @@ namespace Kalman {
 
       filtered.SetVector(temp_vec);
       filtered.SetCovariance(temp_cov);
-    }
+//    }
   }
 
   void TrackFit::_smooth(State& first, State& second) const {

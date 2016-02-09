@@ -451,7 +451,7 @@ def fill_plots_patrec(plot_dict, data_dict, helicals, straights) :
                                     track.get_chi_squared() / track.get_ndf() )
         straight_road_plot(plot_dict, track)
       elif track.get_type() == 1 :
-        patrec_plots['chi_squared_sz'].Fill( track.get_sz_chisq() )
+        patrec_plots['chi_squared_sz'].Fill( track.get_line_sz_chisq() )
         patrec_plots['chi_squared_circle'].Fill( track.get_circle_chisq() )
         patrec_plots['chi_squared_helical'].Fill( track.get_chi_squared() )
         patrec_plots['chi_squared_helical_ndf'].Fill( \
