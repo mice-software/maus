@@ -363,7 +363,33 @@ class Downloader: #pylint: disable = R0902
                 #fout = open(path, 'w')
                 #fout.write(str(downloaded))
                 #fout.close()
-            
+
+    def download_corrections_for_run(self, run_id, downloadpath):
+        #pylint: disable = R0201, C0301
+        """
+        @Method download corrections for run 
+        
+        This method gets the detector alignment corrections, for the given run number, from the 
+        database.
+        
+        @param  id The long ID run number for the desired geometry.
+        @param  downloadedpath The path location where the files will be 
+        unpacked to.
+        """
+        if os.path.exists(downloadpath) == False:
+            raise OSError('Path '+downloadpath+' does not exist')
+        else:
+            correction_cdb = cdb.Corrections()
+            try:
+                downloaded = correction_cdb.get_corrections_for_run_xml(run_id)
+                path = downloadpath + "/AlignmentCorrections.gdml"
+                fout = open(path)
+                fout.write(str(downloaded))
+                fout.close()
+                
+            except RuntimeError:
+                exit(1)
+
 
     def download_beamline_for_tag(self, tag, downloadpath):  #pylint: disable = R0201, C0301
         """
