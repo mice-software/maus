@@ -63,25 +63,39 @@ namespace global {
       int station = scifi_tp->station();
       SetStationEnum(GlobalSciFiTrackPoint, GlobalSciFiTrack, tracker,
 		     station);
+      std::vector<double> errors = scifi_tp->errors();
       double x = scifi_tp->pos().x();
+      double x_err = errors[0];
       double y = scifi_tp->pos().y();
+      double y_err = errors[2];
       double z = scifi_tp->pos().z();
+      double z_err = 0.6273;
       // time not provided by tracker, set to unphysical value
       double t = -1000000.0;
+      double t_err = 1000000.0;
       TLorentzVector pos(x, y, z, t);
+      TLorentzVector pos_err(x_err, y_err, z_err, t_err);
       double px = scifi_tp->mom().x();
+      double px_err = errors[1];
       double py = scifi_tp->mom().y();
+      double py_err = errors[3];
       double pz = scifi_tp->mom().z();
+      double pz_err = errors[4];
       // Energy unknown, set to unphysical value
       double E = -1000000.0;
+      double E_err = 1000000.0;
       TLorentzVector mom(px, py, pz, E);
+      TLorentzVector mom_err(px_err, py_err, pz_err, E_err);
       GlobalSciFiSpacePoint->set_charge(static_cast<double>(charge));
       GlobalSciFiSpacePoint->set_position(pos);
+      GlobalSciFiSpacePoint->set_position_error(pos_err);
       GlobalSciFiSpacePoint->set_detector(GlobalSciFiTrackPoint->get_detector());
       GlobalSciFiTrackPoint->set_space_point(GlobalSciFiSpacePoint);
       GlobalSciFiTrackPoint->set_charge(static_cast<double>(charge));
       GlobalSciFiTrackPoint->set_position(pos);
+      GlobalSciFiTrackPoint->set_position_error(pos_err);
       GlobalSciFiTrackPoint->set_momentum(mom);
+      GlobalSciFiTrackPoint->set_momentum_error(mom_err);
       GlobalSciFiTrackPoint->set_mapper_name(mapper_name);
 
       GlobalSciFiTrack->AddTrackPoint(GlobalSciFiTrackPoint);
