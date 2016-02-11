@@ -286,6 +286,8 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
+SciFiClusterReconOn = True
+SciFiSpacepointReconOn = True
 SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
@@ -328,6 +330,15 @@ GasParams_Radiation_Length = 5671130. # mm
 GasParams_Density = 0.000166322 # 1.66322e-04 g/cm3
 GasParams_Mean_Excitation_Energy = 41.8 # eV
 GasParams_Density_Correction  = 0.13443
+SciFiTestVirtualTracksStraight = {"rms_position" : 70.0, "rms_angle" : 0.19}  # Description of straight tracks to simulate
+SciFiTestVirtualTracksHelix = {"rms_position" : 70.0, "rms_pt" : 30.0, "pz" : 200.0}  # Description of helical tracks to simulate
+SciFiTestVirtualMethod = "virtual" # How to test the scifi recon. Choose from "straight", "helical" or "virtual"
+SciFiTestVirtualMakeDigits = False
+SciFiTestVirtualMakeClusters = True
+SciFiTestVirtualMakeSpacepoints = False
+SciFiTestVirtualSmear = 0.431425 # Simulate measurement error on alpha with Gaussian Smearing this is the Std Dev.
+# Set the smear value to negative to force a quantisation of alpha - like a real measurement
+
 SciFiSeedCovariance = 1000.0 # Error estimate for Seed values of the Kalman Fit
 SciFiSeedPatRec = True
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit

@@ -33,7 +33,9 @@ namespace MAUS {
   StraightPropagator::StraightPropagator(SciFiGeometryHelper* geo) :
     Kalman::Propagator_base(4),
     _geometry_helper(geo),
-    _include_mcs(true) {
+    _include_mcs(true),
+    _muon_mass(Recon::Constants::MuonMass),
+    _muon_mass_sq(_muon_mass * _muon_mass) {
   }
 
 
@@ -106,9 +108,7 @@ namespace MAUS {
     double p     = 200.0; // TODO: Extract a more accurate value, somehow...
     double p2    = p*p;
 
-    double muon_mass = Recon::Constants::MuonMass;
-    double muon_mass2 = muon_mass*muon_mass;
-    double E = TMath::Sqrt(muon_mass2+p2);
+    double E = TMath::Sqrt(_muon_mass_sq+p2);
     double beta = p/E;
 
     double C = _geometry_helper->HighlandFormula(radLen, beta, p);
@@ -158,7 +158,9 @@ namespace MAUS {
     _geometry_helper(helper),
     _subtract_eloss(true),
     _include_mcs(true),
-    _correct_Pz(true) {
+    _correct_Pz(true),
+    _muon_mass(Recon::Constants::MuonMass),
+    _muon_mass_sq(_muon_mass * _muon_mass) {
   }
 
 
@@ -198,6 +200,9 @@ namespace MAUS {
 
     double new_kappa = old_kappa;
 
+    double gradient = sqrt(old_px*old_px + old_py*old_py) / old_pz;
+    double distance_factor = sqrt(1.0 + gradient*gradient );
+
     if (_subtract_eloss) {
       SciFiMaterialsList materials;
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
@@ -208,15 +213,15 @@ namespace MAUS {
         e_loss_sign = -1.0;
       }
 
-      double delta_p = 0.0;
+      double delta_energy = 0.0;
+      double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
       double momentum = old_momentum;
       int n_steps = materials.size();
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
-//        delta_p = _geometry_helper->BetheBlochStoppingPower(momentum,
-//                                               materials.at(i).first)*materials.at(i).second*0.1;
         double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-        delta_p = SP*materials.at(i).second*0.1;
-        momentum += e_loss_sign*delta_p;
+        delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
+        energy = energy + delta_energy;
+        momentum = sqrt(energy*energy - _muon_mass_sq);
       }
 
       double reduction_factor = momentum/old_momentum;
@@ -265,6 +270,9 @@ namespace MAUS {
     double sine   = sin(delta_theta);
     double cosine = cos(delta_theta);
 
+    double gradient = sqrt(old_px*old_px + old_py*old_py) / old_pz;
+    double distance_factor = sqrt(1.0 + gradient*gradient );
+
     if (start.GetId() < 0) u = - u;
 
     double reduction_factor = 1.0;
@@ -279,15 +287,15 @@ namespace MAUS {
         e_loss_sign = -1.0;
       }
 
-      double delta_p = 0.0;
+      double delta_energy = 0.0;
+      double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
       double momentum = old_momentum;
       int n_steps = materials.size();
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
-//        delta_p = _geometry_helper->BetheBlochStoppingPower(momentum,
-//                                               materials.at(i).first)*materials.at(i).second*0.1;
         double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-        delta_p = SP*materials.at(i).second*0.1;
-        momentum += e_loss_sign*delta_p;
+        delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
+        energy = energy + delta_energy;
+        momentum = sqrt(energy*energy - _muon_mass_sq);
       }
 
       reduction_factor = momentum/old_momentum;
@@ -394,9 +402,7 @@ namespace MAUS {
     double p     = sqrt(px*px+py*py+pz*pz);
     double p2    = p*p;
 
-    double muon_mass  = Recon::Constants::MuonMass;
-    double muon_mass2 = muon_mass*muon_mass;
-    double E    = TMath::Sqrt(muon_mass2+p2);
+    double E    = TMath::Sqrt(_muon_mass_sq+p2);
     double beta = p/E;
 
     double theta_mcs  = _geometry_helper->HighlandFormula(L, beta, p);
