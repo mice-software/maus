@@ -75,11 +75,11 @@ def init_plots_data() :
   track_plots = {}
 
   track_plots['plane_pulls'] = ROOT.TH2F("plane_pulls", "Pulls per Plane", \
-                                         31, -15.5, 15.5, 5000, -200.0, 200.0 )
+                                       31, -15.5, 15.5, 5001, -200.04, 200.04 )
   track_plots['plane_residuals'] = ROOT.TH2F("plane_residuals",
-         "Filtered Residuals per Plane", 31, -15.5, 15.5, 5000, -200.0, 200.0 )
+       "Filtered Residuals per Plane", 31, -15.5, 15.5, 5001, -200.04, 200.04 )
   track_plots['plane_s_residuals'] = ROOT.TH2F("plane_s_residuals",
-         "Smoothed Residuals per Plane", 31, -15.5, 15.5, 5000, -200.0, 200.0 )
+       "Smoothed Residuals per Plane", 31, -15.5, 15.5, 5001, -200.04, 200.04 )
 
   track_plots['tracks_event'] = ROOT.TH1F( "tracks_event", \
                                 "Number of Tracks per Event", 100, 0.0, 100.0 )
@@ -103,6 +103,16 @@ def init_plots_data() :
                                                             5000, 0.0, 1000.0 )
   track_plots['p_value'] = ROOT.TH1F( 'tracks_p_value', \
                                     "P-Value Distribution", 1000, 0.0, 1.0 )
+  track_plots['p_value_up'] = ROOT.TH1F( 'tracks_p_value_up', \
+                                    "P-Value Distribution", 1000, 0.0, 1.0 )
+  track_plots['p_value_down'] = ROOT.TH1F( 'tracks_p_value_down', \
+                                    "P-Value Distribution", 1000, 0.0, 1.0 )
+  track_plots['ndf'] = ROOT.TH1F( 'tracks_ndf', \
+                                    "NDF Distribution", 21, -0.5, 20.5 )
+  track_plots['ndf_up'] = ROOT.TH1F( 'tracks_ndf_up', \
+                                    "NDF Distribution", 21, -0.5, 20.5 )
+  track_plots['ndf_down'] = ROOT.TH1F( 'tracks_ndf_down', \
+                                    "NDF Distribution", 21, -0.5, 20.5 )
 
 
   reco_plots = {}
@@ -116,7 +126,7 @@ def init_plots_data() :
                                                              1000, 0.0, 100.0 )
 
   reco_plots['npe'] = ROOT.TH1F( 'npe', "Number of Photo Electrons", \
-                                                            100, 0.0, 100.0 )
+                                                            101, 0.5, 100.5 )
   reco_plots['adc'] = ROOT.TH1F( 'adc', "ADC Count", 260, 0.0, 260.0 )
   reco_plots['plane_hits'] = ROOT.TH1F("plane_hits", "Hits per Plane", 31, \
                                                                   -15.0, 16.0 )
@@ -541,15 +551,20 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
     track_plots['chi_squared'].Fill( track.chi2() )
     track_plots['chi_squared_ndf'].Fill( track.chi2() / track.ndf() )
     track_plots['p_value'].Fill( track.P_value() )
+    track_plots['ndf'].Fill( track.ndf() )
 
     if tracker == 0 :
       track_plots['chi_squared_up'].Fill( track.chi2() )
       track_plots['chi_squared_ndf_up'].Fill( track.chi2() / track.ndf() )
+      track_plots['p_value_up'].Fill( track.P_value() )
+      track_plots['ndf_up'].Fill( track.ndf() )
       data_dict['counters']['N_tracks_up'] += 1 
       upstream_good += 1
     elif tracker == 1 :
       track_plots['chi_squared_down'].Fill( track.chi2() )
       track_plots['chi_squared_ndf_down'].Fill( track.chi2() / track.ndf() )
+      track_plots['p_value_down'].Fill( track.P_value() )
+      track_plots['ndf_down'].Fill( track.ndf() )
       data_dict['counters']['N_tracks_down'] += 1 
       downstream_good += 1
     
