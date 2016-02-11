@@ -33,6 +33,7 @@
 
 // MAUS headers
 #include "DataStructure/ReconEvent.hh"
+#include "Config/MiceModule.hh"
 
 namespace MAUS {
 namespace recon {
@@ -63,11 +64,48 @@ namespace global {
     /// Disallow operator= as unnecessary
     void operator=(const ImportTOFRecon);
 
+    /**  @brief Add TOF0 space points to global event
+     *   
+     *  @param tofEventSpacepoint  The reconstructed TOF Event
+     *  @param global_event The Global Event, which will be changed
+     *  @param mapper_name Mapper name assigned to spacepoints
+     *  @param tof0_geom TOF0 geometry module
+     */
+    void ImportTOF0SpacePoints(
+			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+			      MAUS::GlobalEvent* global_event,
+			      std::string mapper_name);
+
+    /**  @brief Add TOF1 space points to global event
+     *   
+     *  @param tofEventSpacepoint  The reconstructed TOF Event
+     *  @param global_event The Global Event, which will be changed
+     *  @param mapper_name Mapper name assigned to spacepoints
+     *  @param tof1_geom TOF1 geometry module
+     */
+    void ImportTOF1SpacePoints(
+			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+			      MAUS::GlobalEvent* global_event,
+			      std::string mapper_name);
+
+    /**  @brief Add TOF2 space points to global event
+     *   
+     *  @param tofEventSpacepoint  The reconstructed TOF Event
+     *  @param global_event The Global Event, which will be changed
+     *  @param mapper_name Mapper name assigned to spacepoints
+     *  @param tof2_geom TOF2 geometry module
+     */
+    void ImportTOF2SpacePoints(
+			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+			      MAUS::GlobalEvent* global_event,
+			      std::string mapper_name);
+
     /**  @brief Add TOF space points to global event
      *   
      *  @param tofEventSpacepoint  The reconstructed TOF Event
      *  @param global_event The Global Event, which will be changed
-     *  @param mapper_name 
+     *  @param mapper_name Mapper name assigned to spacepoints
+     *  @param geo_filename Geometry file needed to get hit positions
      */
     void ImportTOFSpacePoints(
 			      const MAUS::TOFEventSpacePoint tofEventSpacepoint,

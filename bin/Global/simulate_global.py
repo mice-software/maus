@@ -39,22 +39,34 @@ def run():
     my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
     # KL
-    my_map.append(MAUS.MapCppKLMCDigitizer())
-    my_map.append(MAUS.MapCppKLCellHits())
+    my_map.append(MAUS.MapCppKLMCDigitizer())  # KL MC Digitizer
+    my_map.append(MAUS.MapCppKLCellHits())  # KL CellHit Reco
+
+    # EMR
+    my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
+    my_map.append(MAUS.MapCppEMRPlaneHits())
+    my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
 
     # Global
     my_map.append(MAUS.MapCppGlobalReconImport())
     my_map.append(MAUS.MapCppGlobalTrackMatching())
 
+    my_reduce = MAUS.ReducePyDoNothing()
+    #~ my_reduce = MAUS.ReduceCppGlobalReconEfficiency()
+    #~ my_reduce = MAUS.ReduceCppReconTesting()
+    #~ my_reduce = MAUS.ReduceCppGlobalPID()
+
     # Then construct a MAUS output component - filename comes from datacards
-    my_output = MAUS.OutputPyJSON()
+    my_output = MAUS.OutputCppRoot()
+    #~ my_output = MAUS.OutputPyDoNothing()
 
     # can specify datacards here or by using appropriate command line calls
     datacards = io.StringIO(u"")
 
     # The Go() drives all the components you pass in, then check the file
     # (default simulation.out) for output
-    MAUS.Go(my_input, my_map, MAUS.ReducePyDoNothing(), my_output, datacards)
+    MAUS.Go(my_input, my_map, my_reduce, my_output, datacards)
 
+#MAUS.ReducePyDoNothing()
 if __name__ == '__main__':
     run()

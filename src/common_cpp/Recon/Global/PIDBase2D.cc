@@ -22,22 +22,25 @@ namespace recon {
 namespace global {
 
   PIDBase2D::PIDBase2D(std::string variable, std::string hypothesis,
-		   std::string unique_identifier, int XminBin, int XmaxBin,
-		   int XnumBins, int YminBin, int YmaxBin, int YnumBins)
-       : PIDBase(variable, hypothesis, unique_identifier,
-                 XminBin, XmaxBin, XnumBins, YminBin, YmaxBin, YnumBins) {
+		       std::string unique_identifier, int XminBin, int XmaxBin,
+		       int XnumBins, int YminBin, int YmaxBin, int YnumBins)
+    : PIDBase(variable, hypothesis, unique_identifier,
+	      XminBin, XmaxBin, XnumBins, YminBin, YmaxBin, YnumBins) {
 
-        _varhyp = variable + "_" + hypothesis;
+    _varhyp = variable + "_" + hypothesis;
 
-        _hist = new TH2F(_varhyp.c_str(),
-			 _varhyp.c_str(),
-			 _XnumBins, _XminBin, _XmaxBin,
-			 _YnumBins, _YminBin, _YmaxBin);
+    _hist = new TH2F(_varhyp.c_str(),
+		     _varhyp.c_str(),
+		     _XnumBins, _XminBin, _XmaxBin,
+		     _YnumBins, _YminBin, _YmaxBin);
   };
 
   PIDBase2D::PIDBase2D(TFile* file, std::string variable,
-		   std::string hypothesis)
-    : PIDBase(file, variable, hypothesis) {
+		       std::string hypothesis, int Xmin, int Xmax, int Ymin,
+		       int Ymax, int XminBin, int XmaxBin, int YminBin,
+		       int YmaxBin)
+    : PIDBase(file, variable, hypothesis, Xmin, Xmax, Ymin, Ymax, XminBin,
+	      XmaxBin, YminBin, YmaxBin) {
     std::string histname = variable + "_" + hypothesis;
 
     if (!file || file->IsZombie()) {
@@ -51,10 +54,6 @@ namespace global {
 		      "Histogram not found in file.",
 		      "Recon::Global::PIDBase2D::PIDBase2D()"));
     }
-    _XminBin = _hist->GetXaxis()->GetXmin();
-    _XmaxBin = _hist->GetXaxis()->GetXmax();
-    _YminBin = _hist->GetYaxis()->GetXmin();
-    _YmaxBin = _hist->GetYaxis()->GetXmax();
   };
 
   PIDBase2D::~PIDBase2D() {
@@ -91,10 +90,18 @@ namespace global {
     double Yvar = (Calc_Var(track)).second;
     if ((Xvar < _XminBin || Xvar > _XmaxBin) ||
 	(Yvar < _YminBin || Yvar > _YmaxBin)) {
-      Squeak::mout(Squeak::debug) << "Value of PID variable out of range, "
-				  << "Recon::Global::PIDBase2D::logL()"
+      Squeak::mout(Squeak::debug) << "Value of PID variable out of PDF range, "
+				  << " Recon::Global::PIDBase2D::logL()"
 				  << std::endl;
       return 1;
+    } else if ((Xvar < _Xmin || Xvar > _Xmax) ||
+	       (Yvar < _Ymin || Yvar > _Ymax)) {
+      Squeak::mout(Squeak::debug) << "Value of PID variable out of cut range "
+				  << " used for PID, "
+				  << "Recon::Global::PIDBase2D::logL()"
+				  << std::endl;
+      return 2; // return value of 2 is chosen to be picked up when performing
+      // efficiency and purity on PID, do not change.
     }
     int binx = _hist->GetXaxis()->FindBin(Xvar);
     int biny = _hist->GetYaxis()->FindBin(Yvar);

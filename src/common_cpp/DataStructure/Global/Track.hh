@@ -45,6 +45,7 @@
 #include "src/common_cpp/Utils/VersionNumber.hh"
 #include "DataStructure/Global/ReconEnums.hh"
 #include "DataStructure/Global/TrackPoint.hh"
+#include "DataStructure/Global/PIDLogLPair.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -91,6 +92,24 @@ class Track : public TObject {
   /// Get the particle charge hypothesis, #_charge.
   int get_charge() const;
 
+  /// Set the range of the particles primary track in the emr, #_emr_range_primary
+  void set_emr_range_primary(double range);
+
+  /// Get the range of the particles primary track in the emr, #_emr_range_primary
+  double get_emr_range_primary() const;
+
+  /// Set the range of the particles secondary track in the emr, #_emr_range_secondary
+  void set_emr_range_secondary(double range);
+
+  /// Get the range of the particles secondary track in the emr, #_emr_range_secondary
+  double get_emr_range_secondary() const;
+
+  /// Set the plane density of the track in the emr, #_emr_plane_density
+  void set_emr_plane_density(double density);
+
+  /// Get the plane density of the particles secondary track in the emr, #_emr_plane_density
+  double get_emr_plane_density() const;
+
   /// Add a MAUS::DataStructure::Global::TrackPoint, filling #_geometry_paths
   /// and #_detectorpoints as required.
   void AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point);
@@ -109,6 +128,10 @@ class Track : public TObject {
   /// ensuring they are unchanged.
   std::vector<const MAUS::DataStructure::Global::TrackPoint*> GetTrackPoints()
       const;
+
+  /// Get all associated track points belonging to the given detector.
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+      GetTrackPoints(DetectorPoint detector) const;
 
   /// Set the list of associated TrackPoints, #_track_points, from a
   /// TRefArray.  The Track takes ownership of this pointer, deleting
@@ -166,6 +189,15 @@ class Track : public TObject {
 
   /// Direct access to the #_geometry_paths vector.
   std::vector<std::string> get_geometry_paths() const;
+
+  /// Set the #_pid_logL_values vector.
+  void set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair> pid_logL_values);
+
+  /// Direct access to the #_pid_logL_values vector.
+  std::vector<MAUS::DataStructure::Global::PIDLogLPair> get_pid_logL_values() const;
+
+  /// Add a pid/log-likelihood pair to the _pid_logL_values vector.
+  void AddPIDLogLValues(MAUS::DataStructure::Global::PIDLogLPair pid_logL);
 
   /// Add a constituent track (for book-keeping purposes), stored in
   /// the #_constituent_tracks vector.
@@ -236,9 +268,24 @@ class Track : public TObject {
   /// DetectorPoint.
   std::vector<std::string> _geometry_paths;
 
+  /// A vector of pairs to hold a possible pid hypothesis (given by it's PDG
+  /// code, as an int) and the log-likelihood of the track being that pid.
+  /// Can be used during analysis to view the likelihoods assigned to all
+  /// possible pids, not just the final one assigned to the track.
+  std::vector<MAUS::DataStructure::Global::PIDLogLPair> _pid_logL_values;
+
   /// These tracks aren't owned by this track, they are just for
   /// book-keeping.  Therefore, we use a TRefArray.
   TRefArray* _constituent_tracks;
+
+  /// The range of a primary track from the EMR
+  double _emr_range_primary;
+
+  /// The range of a secondary track from the EMR
+  double _emr_range_secondary;
+
+  /// The plane density for an event in the EMR
+  double _emr_plane_density;
 
   /// A currently undefined 'Goodness of Fit' variable. This will be
   /// used to help analysers in interpreting the results, and will

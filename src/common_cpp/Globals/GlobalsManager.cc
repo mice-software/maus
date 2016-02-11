@@ -248,4 +248,3 @@ void GlobalsManager::SetConfigurationCards(Json::Value* configuration_cards) {
 }
 */
 }
-

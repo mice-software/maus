@@ -440,4 +440,3 @@ bool MapCppTrackerMCDigitization::load_bad_channels(std::string file) {
   return true;
 }
 } // ~namespace MAUS
-
