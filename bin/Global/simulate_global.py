@@ -47,6 +47,9 @@ def run():
     my_map.append(MAUS.MapCppEMRPlaneHits())
     my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
 
+    # Ckov
+    my_map.append(MAUS.MapCppCkovMCDigitizer())
+
     # Global
     my_map.append(MAUS.MapCppGlobalReconImport())
     my_map.append(MAUS.MapCppGlobalTrackMatching())

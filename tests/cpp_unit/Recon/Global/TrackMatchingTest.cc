@@ -609,21 +609,21 @@ TEST_F(TrackMatchingTest, MatchUSDS) {
   TLorentzVector tof1_position(0.0, 0.0, 100.0, 20.0);
   tof1_sp.set_position(tof1_position);
   tof1_sp.set_detector(DataStructure::Global::kTOF1);
-  const DataStructure::Global::TrackPoint tof1_tp(&tof1_sp);
+  DataStructure::Global::TrackPoint tof1_tp(&tof1_sp);
   DataStructure::Global::SpacePoint tof2_sp;
   TLorentzVector tof2_position(0.0, 0.0, 8300.0, 65.0);
   tof2_sp.set_position(tof2_position);
   tof2_sp.set_detector(DataStructure::Global::kTOF2);
-  const DataStructure::Global::TrackPoint tof2_tp(&tof2_sp);
+  DataStructure::Global::TrackPoint tof2_tp(&tof2_sp);
 
-  DataStructure::Global::TrackPointCPArray tof1_cparray;
-  tof1_cparray.push_back(&tof1_tp);
-  DataStructure::Global::TrackPointCPArray tof2_cparray;
-  tof2_cparray.push_back(&tof2_tp);
+  DataStructure::Global::Track* tof1_track = new DataStructure::Global::Track;
+  tof1_track->AddTrackPoint(&tof1_tp);
+  DataStructure::Global::Track* tof2_track = new DataStructure::Global::Track;
+  tof2_track->AddTrackPoint(&tof2_tp);
 
   DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
 
-  _track_matching->MatchUSDS(tof1_cparray, tof2_cparray, pid, 15.0);
+  _track_matching->MatchUSDS(tof1_track, tof2_track, pid, 15.0);
 
   std::vector<DataStructure::Global::Track*>* through_tracks =
       GlobalTools::GetTracksByMapperName(_global_event,
