@@ -33,6 +33,7 @@
 
 #include "json/json.h"
 
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
 #include "src/common_cpp/Recon/Global/PIDBase.hh"
 #include "src/common_cpp/Recon/Global/PIDBase1D.hh"
@@ -40,26 +41,41 @@
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
 #include "src/common_cpp/Recon/Global/PIDVarB.hh"
 #include "src/common_cpp/Recon/Global/PIDVarC.hh"
+#include "src/common_cpp/Recon/Global/PIDVarD.hh"
+#include "src/common_cpp/Recon/Global/PIDVarE.hh"
+#include "src/common_cpp/Recon/Global/PIDVarF.hh"
+#include "src/common_cpp/Recon/Global/PIDVarG.hh"
+#include "src/common_cpp/Recon/Global/PIDVarH.hh"
+
+#include "src/common_cpp/API/ReduceBase.hh"
+#include "src/common_cpp/API/PyWrapReduceBase.hh"
 
 
 namespace MAUS {
 
-  class ReduceCppGlobalPID {
+class Data;
+class ImageData;
+
+class ReduceCppGlobalPID : public ReduceBase<Data, Data> {
 
   public:
+    ReduceCppGlobalPID() : ReduceBase<Data, Data>("ReduceCppGlobalPID"), _configCheck(false) {}
+  ~ReduceCppGlobalPID();
+
+  private:
 
     /** @brief Sets up the worker
      *
      *  @param argJsonConfigDocument a JSON document with
      *         the configuration.
      */
-    bool birth(std::string argJsonConfigDocument);
+    void _birth(const std::string& argJsonConfigDocument);
 
     /** @brief Shutdowns the worker
      *
      *  This takes no arguments.
      */
-    bool death();
+    void _death();
 
     /** @brief process JSON document
      *
@@ -68,14 +84,10 @@ namespace MAUS {
      *  @param document Receive a document with spill data
      *  
      */
-    std::string process(std::string document);
+    void _process(MAUS::Data* data);
 
-  private:
     /// Check that a valid configuration is passed to the process
     bool _configCheck;
-
-    /// This will contain the root value after parsing
-    Json::Value _root;
 
     /// Mapper name, useful for tracking results...
     std::string _classname;
@@ -90,8 +102,8 @@ namespace MAUS {
     std::vector<MAUS::recon::global::PIDBase*> _pid_vars;
 
     // The current spill
-    Spill* _spill;
-  };
+    const MAUS::Spill* _spill;
+};
 
 } // ~namespace MAUS
 

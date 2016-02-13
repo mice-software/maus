@@ -138,13 +138,17 @@ class SciFiTrackPoint : public TObject {
    */
   double chi2()                     const { return _chi2; }
 
-  /** @brief  Returns the x position.
+  /** @brief  Returns the position threevector.
    */
   ThreeVector pos()                 const { return _pos; }
 
-  /** @brief  Returns the x momentum component.
+  /** @brief  Returns the momentum threevector.
    */
   ThreeVector mom()                 const { return _mom; }
+
+  /** @brief  Returns the momentum in a threevector.
+   */
+  ThreeVector gradient()   const { return ThreeVector(_mom.x()/_mom.z(), _mom.y()/_mom.z(), 1.0); }
 
   /** @brief  Returns the covariance matrix.
    */

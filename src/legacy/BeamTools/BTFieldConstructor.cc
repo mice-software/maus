@@ -68,6 +68,9 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
 	SetGridSize( BTFieldGroup::GetGridDefault() );
 	_magneticField       ->SetGridSize( BTFieldGroup::GetGridDefault() );
 	_electroMagneticField->SetGridSize( BTFieldGroup::GetGridDefault() );
+  _magneticField->BTField::SetName("MagneticField");
+  _electroMagneticField->BTField::SetName("ElectroMagneticField");
+  BTField::SetName("FieldConstructor");
 	try {
   	int ignoredAmalgamated = 0;
   	_needsPhases = false;
@@ -109,6 +112,8 @@ void BTFieldConstructor::BuildFields(MiceModule * rootModule)
     		}
   		}
   	}
+    _magneticField->SetIsClosed(false);
+    _electroMagneticField->SetIsClosed(false);
     _magneticField->Close();
     _electroMagneticField->Close();
 

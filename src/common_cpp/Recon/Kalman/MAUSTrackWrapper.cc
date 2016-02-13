@@ -52,17 +52,15 @@ namespace MAUS {
 
       int id = (cluster->get_station() - 1)*3 + cluster->get_plane(); // Actually (id - 1)
 
-      // TODO :
-      // - APPLY GEOMETRY CORRECTIONS!
-      // - Fill covariance matrix correctly!
       TMatrixD state_vector(1, 1);
       TMatrixD covariance(1, 1);
 
-      state_vector(0, 0) = cluster->get_alpha();
+      state_vector(0, 0) = - cluster->get_alpha(); // Alpha is defined backwards.
       covariance(0, 0) = 0.0;
 
       new_track[id].SetVector(state_vector);
       new_track[id].SetCovariance(covariance);
+      new_track[id].SetHasValue(true);
     }
     return new_track;
   }
@@ -257,9 +255,6 @@ namespace MAUS {
                                      const SciFiGeometryHelper* geom, SciFiBasePRTrack* pr_track) {
     SciFiTrack* new_track = new SciFiTrack();
     const Kalman::Track& smoothed = fitter->Smoothed();
-//    const Kalman::Track& smoothed = fitter->Filtered();
-//    const Kalman::Track& filtered = fitter->Filtered();
-//    const Kalman::Track& predicted = fitter->Predicted();
     const Kalman::Track& data = fitter->Data();
     Kalman::State seed = fitter->GetSeed();
     double default_mom = geom->GetDefaultMomentum();
@@ -455,7 +450,6 @@ namespace MAUS {
       new_track[station-1].SetCovariance(cov);
       new_track[station-1].SetPosition((*it)->get_position().z());
     }
-
     return new_track;
   }
 }

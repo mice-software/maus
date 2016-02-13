@@ -46,6 +46,8 @@ namespace MAUS {
     private :
       SciFiGeometryHelper* _geometry_helper;
       bool _include_mcs;
+      double _muon_mass;
+      double _muon_mass_sq;
   };
 
 
@@ -77,6 +79,8 @@ namespace MAUS {
       bool _subtract_eloss;
       bool _include_mcs;
       bool _correct_Pz;
+      double _muon_mass;
+      double _muon_mass_sq;
   };
 }
 

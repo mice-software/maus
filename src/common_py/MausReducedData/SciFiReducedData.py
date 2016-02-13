@@ -14,45 +14,6 @@ import ROOT
 # pylint: disable = R0914
 # pylint: disable = R0915
 
-class TOF:
-    """ Class holding reduced data for one TOF detector
-        Uses arrays to make compatible with ROOT plotting.
-        May accumulate data over many events. """
-
-    def __init__(self):
-        """ Constructor, set everything to empty or zero """
-        self.tof_num = 0
-        self.num_spoints = 0
-        self.spoints_global_x = array.array('d')
-        self.spoints_global_y = array.array('d')
-        self.spoints_global_z = array.array('d')
-
-    def accumulate_data(self, evt, tof_num):
-        """ Add data from an event """
-        self.tof_num = tof_num
-        if self.tof_num == 0:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF0SpacePointArray()
-        elif self.tof_num == 1:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
-        elif self.tof_num == 2:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
-        for sp in spoints:
-            x = sp.GetGlobalPosX()
-            y = sp.GetGlobalPosY()
-            z = sp.GetGlobalPosZ()
-            self.spoints_global_x.append(x)
-            self.spoints_global_y.append(y)
-            self.spoints_global_z.append(z)
-            self.num_spoints += 1
-
-    def clear(self):
-        """ Clear all accumulated data """
-        self.tof_num = 0
-        self.num_spoints = 0
-        self.spoints_global_x = array.array('d')
-        self.spoints_global_y = array.array('d')
-        self.spoints_global_z = array.array('d')
-
 class Tracker:
     """ Class holding data for one tracker.
         Uses arrays to make compatible with ROOT plotting.
@@ -94,9 +55,13 @@ class Tracker:
         self.tpoints_global_px = array.array('d')
         self.tpoints_global_py = array.array('d')
         self.tpoints_global_pz = array.array('d')
+        self.tpoints_plane = array.array('d')
+        self.tpoints_station = array.array('d')
         # Pat Rec track fits
         self.straight_xz_fits = []
         self.straight_yz_fits = []
+        self.straight_global_xz_fits = []
+        self.straight_global_yz_fits = []
         self.helix_xy_fits = []
         self.helix_xz_fits = []
         self.helix_yz_fits = []
@@ -145,16 +110,25 @@ class Tracker:
                 mx = trk.get_mx()
                 y0 = trk.get_y0()
                 my = trk.get_my()
+                gx0 = trk.get_global_x0()
+                gmx = trk.get_global_mx()
+                gy0 = trk.get_global_y0()
+                gmy = trk.get_global_my()
+
+                self.straight_xz_fits.append(self.make_line(mx, x0, 0, 1200))
+                self.straight_yz_fits.append(self.make_line(my, y0, 0, 1200))
+                zmin = 12800
+                zmax = 22000
                 if trker_num == 0:
-                    self.straight_xz_fits.append(self.make_line(mx, x0, \
-                                                                 0, 1200))
-                    self.straight_yz_fits.append(self.make_line(my, y0, \
-                                                                 0, 1200))
+                    zmin = 12800
+                    zmax = 15200
                 else:
-                    self.straight_xz_fits.append(self.make_line(mx, x0, \
-                                                                 0, 1200))
-                    self.straight_yz_fits.append(self.make_line(my, y0, \
-                                                                 0, 1200))
+                    zmin = 18800
+                    zmax = 21200
+                self.straight_global_xz_fits.append(
+                  self.make_line(gmx, gx0, zmin, zmax))
+                self.straight_global_yz_fits.append(
+                  self.make_line(gmy, gy0, zmin, zmax))
                 # Pull out the coords of each seed spacepoint
                 x_per_trk = array.array('d')
                 y_per_trk = array.array('d')
@@ -269,6 +243,8 @@ class Tracker:
                 px_per_trk = array.array('d')
                 py_per_trk = array.array('d')
                 pz_per_trk = array.array('d')
+                plane_per_trk = array.array('d')
+                station_per_trk = array.array('d')
                 for tp in tpoints:
                     x_per_trk.append(tp.pos().x())
                     y_per_trk.append(tp.pos().y())
@@ -276,12 +252,16 @@ class Tracker:
                     px_per_trk.append(tp.mom().x())
                     py_per_trk.append(tp.mom().y())
                     pz_per_trk.append(tp.mom().z())
+                    plane_per_trk.append(tp.plane())
+                    station_per_trk.append(tp.station())
                 self.tpoints_global_x.extend(x_per_trk)
                 self.tpoints_global_y.extend(y_per_trk)
                 self.tpoints_global_z.extend(z_per_trk)
                 self.tpoints_global_px.extend(px_per_trk)
                 self.tpoints_global_py.extend(py_per_trk)
                 self.tpoints_global_pz.extend(pz_per_trk)
+                self.tpoints_plane.extend(plane_per_trk)
+                self.tpoints_station.extend(station_per_trk)
 
     @staticmethod
     def make_circle(x0, y0, rad):

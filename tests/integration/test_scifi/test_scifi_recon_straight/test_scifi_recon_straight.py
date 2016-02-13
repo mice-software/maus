@@ -97,7 +97,7 @@ class TestSciFiReconStraight(unittest.TestCase): # pylint: disable=R0904
           "_spill._recon._scifi_event._scifistraightprtracks._tracker==1")
         h4 = ROOT.gDirectory.Get('h4')
         self.assertLess(h4.GetMean(), 25.0)
-        self.assertLess(h4.GetRMS(), 25.0)
+        self.assertLess(h4.GetRMS(), 27.0)
         self.assertGreater(h4.GetEntries(), 25)
 
         # Check chi^2 average is reasonably low for straight final tracks

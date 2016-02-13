@@ -77,11 +77,11 @@ class PIDVarCTest : public ::testing::Test {
 		  TLorentzVector tpTrackerMom(px, py, pz, E);
 
 		  tpTracker->set_momentum(tpTrackerMom);
-		  tpKL->set_mapper_name("MapCppGlobalTrackMatching");
-		  tpTracker->set_mapper_name("MapCppGlobalTrackMatching");
+		  tpKL->set_mapper_name("MapCppGlobalTrackMatching-Through");
+		  tpTracker->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTrack->AddTrackPoint(tpKL);
 		  testTrack->AddTrackPoint(tpTracker);
-		  testTrack->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTracks.push_back(testTrack);
 		}
 	}
@@ -122,11 +122,11 @@ TEST_F(PIDVarCTest, ReadFileConstructor) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "test", 50, 350, 0, 8000));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(NULL, "test"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(NULL, "test", 50, 350, 0, 8000));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "sasquatch"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarC testPIDVarC(file, "sasquatch", 50, 350, 0, 8000));
 }
 
 /* N.B. if either FillHist or LogL are failing, check the values of min and max
@@ -180,11 +180,11 @@ TEST_F(PIDVarCTest, LogL) {
 	TLorentzVector ctpTrackerMom(px, py, pz, E);
 
 	ctpTracker->set_momentum(ctpTrackerMom);
-	ctpKL->set_mapper_name("MapCppGlobalTrackMatching");
-	ctpTracker->set_mapper_name("MapCppGlobalTrackMatching");
+	ctpKL->set_mapper_name("MapCppGlobalTrackMatching-Through");
+	ctpTracker->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctpKL);
 	checkTrack->AddTrackPoint(ctpTracker);
-	checkTrack->set_mapper_name("MapCppGlobalTrackMatching");
+	checkTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 
 	file = new TFile(testfile.c_str(), "READ");
 
@@ -192,9 +192,9 @@ TEST_F(PIDVarCTest, LogL) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test", 50, 350, 0, 8000));
 
-	MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test");
+	MAUS::recon::global::PIDVarC readtestPIDVarC(file, "test", 50, 350, 0, 8000);
 
 	hist = readtestPIDVarC.Get_hist();
 	ASSERT_TRUE(hist);

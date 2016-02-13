@@ -20,6 +20,7 @@
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/PIDLogLPairProcessor.hh"
 
 #include "src/common_cpp/DataStructure/Global/TrackPoint.hh"
 #include "src/common_cpp/DataStructure/Global/Track.hh"
@@ -49,6 +50,7 @@ class TrackProcessor
   IntProcessor _int_proc;
   UIntProcessor _uint_proc;
   ValueArrayProcessor<std::string> _geometry_paths_proc;
+  ValueArrayProcessor<MAUS::DataStructure::Global::PIDLogLPair> _pid_logL_values_proc;
   TRefArrayProcessor _track_trefarray_proc;
   TRefArrayProcessor _track_point_trefarray_proc;
 };
