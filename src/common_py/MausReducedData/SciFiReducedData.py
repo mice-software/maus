@@ -275,7 +275,7 @@ class Tracker:
     def make_helix_xz(circle_x0, rad, dsdz, sz_c, zmin, zmax):
         """ Make a function for the x-z projection of the helix """
         # The x in the cos term is actually representing z (the indep variable)
-        func = ROOT.TF1("xz_func", "[0]-([1]*cos((1/[1])*([2]*x+[3])))", \
+        func = ROOT.TF1("xz_func", "[0]+([1]*cos((1/[1])*([2]*x+[3])))", \
                         zmin, zmax)
         func.SetParameter(0, circle_x0)
         func.SetParameter(1, rad)
