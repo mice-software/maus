@@ -94,9 +94,62 @@ namespace MAUS {
      *
      *  Receive a Spill data object with global tracks, perform PID functons
      *  and return tracks with PID set
-     * @param document a spill data event
+     *  @param document a spill data event
      */
     void _process(MAUS::Data* data) const;
+
+    /** @brief perform pid on all US tracks
+     *
+     *  Perform pid on upstream TrackMatching tracks.
+     *  @param 
+     */
+    void US_PID(std::vector<MAUS::DataStructure::Global::Track*>*
+		GlobalTrackArray, MAUS::GlobalEvent* global_event) const;
+
+    /** @brief perform pid on all DS tracks
+     *
+     *  Perform pid on downstream TrackMatching tracks.
+     *  @param 
+     */
+    void DS_PID(std::vector<MAUS::DataStructure::Global::Track*>*
+		GlobalTrackArray, MAUS::GlobalEvent* global_event) const;
+
+    /** @brief perform pid on all through tracks
+     *
+     *  Perform pid on through TrackMatching tracks.
+     *  @param 
+     */
+    void Through_PID(std::vector<MAUS::DataStructure::Global::Track*>*
+		     GlobalTrackArray, MAUS::GlobalEvent* global_event) const;
+
+    /** @brief perform pid on US tracks from a through track
+     *
+     *  Perform pid on upstream parts of through TrackMatching tracks.
+     *  @param 
+     */
+    void Through_US_PID(std::vector<MAUS::DataStructure::Global::Track*>*
+			GlobalTrackArray, MAUS::GlobalEvent* global_event) const;
+
+    /** @brief perform pid on DS tracks from a through track
+     *
+     *  Perform pid on downstream parts of through TrackMatching tracks.
+     *  @param 
+     */
+    void Through_DS_PID(std::vector<MAUS::DataStructure::Global::Track*>*
+			GlobalTrackArray, MAUS::GlobalEvent* global_event) const;
+
+    /** @brief function to perform pid
+     *
+     *  
+     *  @param 
+     */
+    void perform_pid(std::string output_track_name,
+		     std::string function_name,
+		     MAUS::DataStructure::Global::Track* track,
+		     std::vector<MAUS::recon::global::PIDBase*> _pid_vars,
+		     std::string _pid_beamline_polarity,
+		     std::string _pid_beam_setting,
+		     MAUS::GlobalEvent* global_event) const;
 
     /** @brief calculate Confidence Level
      *
@@ -195,6 +248,18 @@ namespace MAUS {
 
     /// list of PID variables to be used when mode is custom
     std::string _custom_pid_set;
+
+    /// PID track selection- set in ConfigurationDefaults to select which
+    /// TrackMatching tracks to perform PID on
+    std::string _pid_track_selection;
+
+    /// PID beamline polarity- set in ConfigurationDefaults to select 
+    /// positive or negative particles
+    std::string _pid_beamline_polarity;
+
+    /// PID beam setting- set in ConfigurationDefaults to select 
+    /// beam setting, i.e. emittance and momentum
+    std::string _pid_beam_setting;
 
     /// File containing PDFs for use in PID
     std::string PDF_file;
