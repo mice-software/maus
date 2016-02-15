@@ -75,7 +75,8 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         #    paths_equal = True
         for fname in gdmls:
             print fname
-            if fname[-5:] != '.gdml' and fname[-4:] != '.xml':
+            if fname[-5:] != '.gdml' and fname[-4:] != '.xml' and \
+                    fname.find('.table') < 0:
                 print fname+' not a gdml or xml file - ignored'
             elif fname.find('materials') >= 0:
                 self.material_file = fname
@@ -135,14 +136,20 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         @param gdmlfile absolute path to the file which will have its schema
                         location altered.
         """
-        xmldoc = minidom.parse(os.path.join(self.path_in, gdmlfile))
-        for node in xmldoc.getElementsByTagName("gdml"):
-            if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
-                node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
-                # print "Schema location corrected for ",gdmlfile
-        fout = open(os.path.join(self.path_out, gdmlfile), 'w')
-        xmldoc.writexml(fout)
-        fout.close()
+        # ignore the field maps.
+        if gdmlfile.find('.table') < 0:
+            xmldoc = minidom.parse(os.path.join(self.path_in, gdmlfile))
+            for node in xmldoc.getElementsByTagName("gdml"):
+                if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
+                    node.attributes['xsi:noNamespaceSchemaLocation'] = \
+                        self.schema
+                    # print "Schema location corrected for ",gdmlfile
+            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
+            xmldoc.writexml(fout)
+            fout.close()
+        else:
+            shutil.copy(os.path.join(self.path_in, gdmlfile), \
+                        os.path.join(self.path_out, gdmlfile))
 
     def format_gdml_locations(self, gdmlfile):
         """
@@ -469,7 +476,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             self.format_gdml_locations(self.configuration_file)
             self.insert_materials_ref(self.txt_file)
         print "Formatted Configuration File"
-
+        
         if self.tracker_file != None:
             self.format_check(self.tracker_file)
             if self.formatted == False:

@@ -257,10 +257,10 @@ SciFiKunoSum = 318.5  # Sum of channel #s in 3 planes if they form a spoint
 SciFiKunoSumT1S5 = 320.0 # Sum of channel #s in 3 planes if they form a spoint for T1 S5
 SciFiKunoTolerance = 3.0 # Kuno conjecture tolerance
 SciFiDigitizationNPECut = 2.0
-SciFiMappingFileName = "scifi_mapping_2015-09-11.txt"
-SciFiCalibrationFileName = "scifi_calibration_2015-09-12.txt"
-SciFiBadChannelsFileName = "scifi_bad_channels_2015-06-18.txt"
-SciFiCalibMethod = "Run" # Date/Current/Run
+SciFiMappingFileName = "scifi_mapping.txt"
+SciFiCalibrationFileName = "scifi_calibraion.txt"
+SciFiBadChannelsFileName = "scifi_bad_channels.txt"
+SciFiCalibMethod = "Current" # Date/Current/Run
 SciFiCalibSrc = 7057 # exmple: "Date" - 1984-09-14 00:10:00.0    "Run" - 7057
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
@@ -286,6 +286,8 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
+SciFiClusterReconOn = True
+SciFiSpacepointReconOn = True
 SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
@@ -328,6 +330,15 @@ GasParams_Radiation_Length = 5671130. # mm
 GasParams_Density = 0.000166322 # 1.66322e-04 g/cm3
 GasParams_Mean_Excitation_Energy = 41.8 # eV
 GasParams_Density_Correction  = 0.13443
+SciFiTestVirtualTracksStraight = {"rms_position" : 70.0, "rms_angle" : 0.19}  # Description of straight tracks to simulate
+SciFiTestVirtualTracksHelix = {"rms_position" : 70.0, "rms_pt" : 30.0, "pz" : 200.0}  # Description of helical tracks to simulate
+SciFiTestVirtualMethod = "virtual" # How to test the scifi recon. Choose from "straight", "helical" or "virtual"
+SciFiTestVirtualMakeDigits = False
+SciFiTestVirtualMakeClusters = True
+SciFiTestVirtualMakeSpacepoints = False
+SciFiTestVirtualSmear = 0.431425 # Simulate measurement error on alpha with Gaussian Smearing this is the Std Dev.
+# Set the smear value to negative to force a quantisation of alpha - like a real measurement
+
 SciFiSeedCovariance = 1000.0 # Error estimate for Seed values of the Kalman Fit
 SciFiSeedPatRec = True
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
@@ -676,6 +687,7 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+
 # Bounds set on values of PID variables when running PID
 pid_bounds = {
     # Bounds for PIDVarA
@@ -754,3 +766,26 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
     "2d_volume_plot_label_size":0.25,
 }
+
+# Determines for which pid hypotheses track matching should be attempted. Default is "all"
+# meaning electrons, muons, and pions of both charges (unless tracker recon produces a
+# charge hypothesis). Alternatively, force/limit to either one (never several) of
+# kEPlus, kEMinus, kMuPlus, kMuMinus, kPiPlus, kPiMinus
+track_matching_pid_hypothesis = "all"
+
+# Global track matching tolerances (in mm) for the various subdetectors. KL only provides a
+# y coordinate, hence x does not need to be configurable.
+track_matching_tolerances = {
+  "TOF0x":30.0,
+  "TOF0y":30.0,
+  "TOF1x":40.0,
+  "TOF1y":40.0,
+  "TOF2x":40.0,
+  "TOF2y":40.0,
+  "KLy":32.0,
+  "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
+  "TOF12minSpeed":0.5,
+}
+
+# Whether to use energy loss calculations for global track matching
+track_matching_energy_loss = True

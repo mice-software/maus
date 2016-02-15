@@ -129,6 +129,10 @@ class Track : public TObject {
   std::vector<const MAUS::DataStructure::Global::TrackPoint*> GetTrackPoints()
       const;
 
+  /// Get all associated track points belonging to the given detector.
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+      GetTrackPoints(DetectorPoint detector) const;
+
   /// Set the list of associated TrackPoints, #_track_points, from a
   /// TRefArray.  The Track takes ownership of this pointer, deleting
   /// the current TRefArray if necessary.  This is mostly for the

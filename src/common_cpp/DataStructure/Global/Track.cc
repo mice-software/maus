@@ -275,6 +275,46 @@ Track::GetTrackPoints() const {
   return temp_track_points;
 }
 
+std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+Track::GetTrackPoints(DetectorPoint detector) const {
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
+  if (!_track_points) return temp_track_points;
+  const MAUS::DataStructure::Global::TrackPoint* tp = NULL;
+  for (int i = 0; i < _track_points->GetSize(); ++i) {
+    tp = (const MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
+    if (!tp) continue;
+    // Need to make sure that requests for the main detector (e.g. Tracker0)
+    // return points that are tagged with subdetectors as well
+    DetectorPoint tp_main_detector = tp->get_detector();
+    if ((tp_main_detector == kTOF0_1) or
+        (tp_main_detector == kTOF0_2)) {
+      tp_main_detector = kTOF0;
+    } else if ((tp_main_detector == kTOF1_1) or
+               (tp_main_detector == kTOF1_2)) {
+      tp_main_detector = kTOF1;
+    } else if ((tp_main_detector == kTOF2_1) or
+               (tp_main_detector == kTOF2_2)) {
+      tp_main_detector = kTOF2;
+    } else if ((tp_main_detector == kTracker0_1) or
+               (tp_main_detector == kTracker0_2) or
+               (tp_main_detector == kTracker0_3) or
+               (tp_main_detector == kTracker0_4) or
+               (tp_main_detector == kTracker0_5)) {
+      tp_main_detector = kTracker0;
+    } else if ((tp_main_detector == kTracker1_1) or
+               (tp_main_detector == kTracker1_2) or
+               (tp_main_detector == kTracker1_3) or
+               (tp_main_detector == kTracker1_4) or
+               (tp_main_detector == kTracker1_5)) {
+      tp_main_detector = kTracker1;
+    }
+    if ((tp->get_detector() == detector) or tp_main_detector == detector) {
+      temp_track_points.push_back(tp);
+    }
+  }
+  return temp_track_points;
+}
+
 void Track::set_track_points(TRefArray* track_points) {
   if (_track_points != NULL) {
     delete _track_points;

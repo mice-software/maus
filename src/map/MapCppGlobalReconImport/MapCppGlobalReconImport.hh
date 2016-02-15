@@ -97,6 +97,8 @@ namespace MAUS {
     Json::Reader _reader;
     /// Mapper name, useful for tracking results...
     std::string _classname;
+    // Geometry file name
+    std::string geo_filename;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

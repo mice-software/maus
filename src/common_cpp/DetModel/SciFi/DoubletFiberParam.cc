@@ -46,8 +46,8 @@ void DoubletFiberParam::ComputeTransformation(const G4int copyNo,
 
   // These are the coordinates of the fiber placement
   // channel numbers run from right to left
-  G4double xPos = copyNo*fiberDiameter*fiberPitch/2
-                  - (activeRadius-fiberDiameter/2);
+  G4double xPos = - copyNo*fiberDiameter*fiberPitch/2
+                  + (activeRadius-fiberDiameter/2);
   G4double yPos = 0.0;
   G4double zPos = (copyNo%2) ? -0.5*spacing : 0.5*spacing;
 
@@ -58,8 +58,8 @@ void DoubletFiberParam::ComputeTransformation(const G4int copyNo,
 void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement,
                                           G4int copyNo,
                                     const G4VPhysicalVolume* physVol) const {
-  G4double xPos = copyNo * (fiberDiameter*fiberPitch/2)
-                  - (activeRadius-fiberDiameter/2);
+  G4double xPos = - copyNo * (fiberDiameter*fiberPitch/2)
+                  + (activeRadius-fiberDiameter/2);
 
   G4double fiberHalfLen = 0.;
 

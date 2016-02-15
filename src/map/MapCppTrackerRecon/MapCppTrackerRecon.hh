@@ -145,6 +145,8 @@ class MapCppTrackerRecon : public MapBase<Data> {
   double _kuno_sum;
   double _kuno_tolerance;
   /// Pattern recognition flags
+  bool _clusters_on;
+  bool _spacepoints_on;
   bool _up_straight_pr_on;
   bool _down_straight_pr_on;
   bool _up_helical_pr_on;
@@ -178,18 +180,11 @@ class MapCppTrackerRecon : public MapBase<Data> {
   PatternRecognition _pattern_recognition;
 
   /// Kalman Track Fitter Object
-#ifdef KALMAN_TEST
-  Kalman::TrackFit* _spacepoint_helical_track_fitter;
-  Kalman::TrackFit* _spacepoint_straight_track_fitter;
-
-  int _spacepoint_recon_plane;
-#else
   Kalman::TrackFit* _helical_track_fitter;
   Kalman::TrackFit* _straight_track_fitter;
 
   SciFiHelicalMeasurements* _helical_measurement;
   SciFiStraightMeasurements* _straight_measurement;
-#endif
 
   ///  Map of the planes geometry.
   SciFiGeometryHelper _geometry_helper;
