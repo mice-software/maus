@@ -57,16 +57,14 @@ namespace global {
     for (eachTP = global_track_points.begin();
 	 eachTP != global_track_points.end(); ++eachTP) {
       if (!(*eachTP)) continue;
-      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching-Through") {
-	if ((*eachTP)->get_detector() == KL_DP) {
-	  kl_track_points.push_back(*eachTP);
-	} else if ((*eachTP)->get_detector() == TOF1_DP) {
-	  tof1_track_points.push_back(*eachTP);
-	} else if ((*eachTP)->get_detector() == TOF2_DP) {
-	  tof2_track_points.push_back(*eachTP);
-	} else {
-	  continue;
-	}
+      if ((*eachTP)->get_detector() == KL_DP) {
+	kl_track_points.push_back(*eachTP);
+      } else if ((*eachTP)->get_detector() == TOF1_DP) {
+	tof1_track_points.push_back(*eachTP);
+      } else if ((*eachTP)->get_detector() == TOF2_DP) {
+	tof2_track_points.push_back(*eachTP);
+      } else {
+	continue;
       }
     }
     if (kl_track_points.size() < 1) {

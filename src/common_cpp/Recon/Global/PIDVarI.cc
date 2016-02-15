@@ -50,7 +50,6 @@ namespace global {
     for (eachTP = global_track_points.begin();
 	 eachTP != global_track_points.end(); ++eachTP) {
       if (!(*eachTP)) continue;
-      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching-Through") {
 	if ((*eachTP)->get_detector() == CKOVA_DP) {
 	  CkovA_pes = (*eachTP)->get_num_photoelectrons();
 	} else if ((*eachTP)->get_detector() >=
@@ -61,7 +60,6 @@ namespace global {
 	} else {
 	  continue;
 	}
-      }
     }
     if (CkovA_pes == 0) {
       Squeak::mout(Squeak::debug) << "Global track was passed an Ckov event " <<
