@@ -134,6 +134,7 @@ namespace MAUS {
     _pid_confidence_level = _configJSON["pid_confidence_level"].asInt();
     _pid_beamline_polarity = _configJSON["pid_beamline_polarity"].asString();
     _pid_beam_setting = _configJSON["pid_beam_setting"].asString();
+    _pid_track_selection = _configJSON["pid_track_selection"].asString();
 
     // vector of hypotheses
     if (_pid_beamline_polarity == "positive") {
@@ -166,6 +167,18 @@ namespace MAUS {
 							       _hypotheses[i],
 							       _XminF, _XmaxF,
 							       _YminF, _YmaxF));
+	  _pid_vars.push_back(new MAUS::recon::global::PIDVarH(_histFile,
+							       _hypotheses[i],
+							       _XminH, _XmaxH,
+							       _YminH, _YmaxH));
+	  _pid_vars.push_back(new MAUS::recon::global::PIDVarI(_histFile,
+							       _hypotheses[i],
+							       _XminI, _XmaxI,
+							       _YminI, _YmaxI));
+	  _pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_histFile,
+							       _hypotheses[i],
+							       _XminJ, _XmaxJ,
+							       _YminJ, _YmaxJ));
 	}
       } else if (_pid_mode == "offline") {
 	for (unsigned int i =0; i < _hypotheses.size(); ++i) {
@@ -191,57 +204,95 @@ namespace MAUS {
 							       _hypotheses[i],
 							       _XminF, _XmaxF,
 							       _YminF, _YmaxF));
+	  _pid_vars.push_back(new MAUS::recon::global::PIDVarG(_histFile,
+							       _hypotheses[i],
+							       _minG, _maxG));
+	  _pid_vars.push_back(new MAUS::recon::global::PIDVarH(_histFile,
+							       _hypotheses[i],
+							       _XminH, _XmaxH,
+							       _YminH, _YmaxH));
+	  _pid_vars.push_back(new MAUS::recon::global::PIDVarI(_histFile,
+							       _hypotheses[i],
+							       _XminI, _XmaxI,
+							       _YminI, _YmaxI));
+	  _pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_histFile,
+							       _hypotheses[i],
+							       _XminJ, _XmaxJ,
+							       _YminJ, _YmaxJ));
 	}
       } else if (_pid_mode == "custom") {
 	std::istringstream ss(_custom_pid_set);
 	std::string token;
 	std::vector<std::string> input_pid_vars;
 	while(std::getline(ss, token, ' ')) {
-		input_pid_vars.push_back(token);
+	  input_pid_vars.push_back(token);
 	}
 	if (input_pid_vars.size() == 0) {
 	  Squeak::mout(Squeak::warning) << "No PID variables in custom_pid_set,"
-				      << " MapCppGlobalPID::birth" << std::endl;
+					<< " MapCppGlobalPID::birth" << std::endl;
 	} else {
 	  for (unsigned int i =0; i < _hypotheses.size(); ++i) {
 	    // vector of pid vars
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-			 "PIDVarA") != input_pid_vars.end()) {
+			  "PIDVarA") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
 								   _hypotheses[i],
 								   _minA, _maxA));
 	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"PIDVarB") != input_pid_vars.end()) {
+				 "PIDVarB") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
 								   _hypotheses[i],
 								   _XminB, _XmaxB,
 								   _YminB, _YmaxB));
 	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"PIDVarC") != input_pid_vars.end()) {
+				 "PIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
 								   _hypotheses[i],
 								   _XminC, _XmaxC,
 								   _YminC, _YmaxC));
 	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"PIDVarD") != input_pid_vars.end()) {
+				 "PIDVarD") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarD(_histFile,
 								   _hypotheses[i],
 								   _minD, _maxD));
 	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"PIDVarE") != input_pid_vars.end()) {
+				 "PIDVarE") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarE(_histFile,
 								   _hypotheses[i],
 								   _minE, _maxE));
 	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"PIDVarF") != input_pid_vars.end()) {
+				 "PIDVarF") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarF(_histFile,
 								   _hypotheses[i],
 								   _XminF, _XmaxF,
 								   _YminF, _YmaxF));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				 "PIDVarG") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::PIDVarG(_histFile,
+								   _hypotheses[i],
+								   _minG, _maxG));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				 "PIDVarH") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::PIDVarH(_histFile,
+								   _hypotheses[i],
+								   _XminH, _XmaxH,
+								   _YminH, _YmaxH));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				 "PIDVarI") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::PIDVarI(_histFile,
+								   _hypotheses[i],
+								   _XminI, _XmaxI,
+								   _YminI, _YmaxI));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				 "PIDVarJ") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_histFile,
+								   _hypotheses[i],
+								   _XminJ, _XmaxJ,
+								   _YminJ, _YmaxJ));
 	    } else {
 	      Squeak::mout(Squeak::warning) << "No valid PID variables given in "
-					  << "custom_pid_set, "
-					  << "MapCppGlobalPID::birth" << std::endl;
+					    << "custom_pid_set, "
+					    << "MapCppGlobalPID::birth" << std::endl;
 	    }
 	  }
 	}
@@ -254,17 +305,25 @@ namespace MAUS {
 	for (unsigned int i =0; i < _hypotheses.size(); ++i) {
 	  // vector of pid vars
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_histFile,
-							       _hypotheses[i],
-							       _XminComB, _XmaxComB,
-							       _YminComB, _YmaxComB));
+								  _hypotheses[i],
+								  _XminComB, _XmaxComB,
+								  _YminComB, _YmaxComB));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_histFile,
-							       _hypotheses[i],
-							       _XminComE, _XmaxComE,
-							       _YminComE, _YmaxComE));
+								  _hypotheses[i],
+								  _XminComE, _XmaxComE,
+								  _YminComE, _YmaxComE));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_histFile,
-							       _hypotheses[i],
-							       _XminComG, _XmaxComG,
-							       _YminComG, _YmaxComG));
+								  _hypotheses[i],
+								  _XminComG, _XmaxComG,
+								  _YminComG, _YmaxComG));
+	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_histFile,
+								  _hypotheses[i],
+								  _XminComH, _XmaxComH,
+								  _YminComH, _YmaxComH));
+	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_histFile,
+								  _hypotheses[i],
+								  _XminComI, _XmaxComI,
+								  _YminComI, _YmaxComI));
 	}
       } else if (_pid_mode == "offline") {
 	for (unsigned int i =0; i < _hypotheses.size(); ++i) {
@@ -293,6 +352,14 @@ namespace MAUS {
 							       _hypotheses[i],
 							       _XminComG, _XmaxComG,
 							       _YminComG, _YmaxComG));
+	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_histFile,
+								  _hypotheses[i],
+								  _XminComH, _XmaxComH,
+								  _YminComH, _YmaxComH));
+	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_histFile,
+								  _hypotheses[i],
+								  _XminComI, _XmaxComI,
+								  _YminComI, _YmaxComI));
 	}
       } else if (_pid_mode == "custom") {
 	std::istringstream ss(_custom_pid_set);
@@ -345,6 +412,18 @@ namespace MAUS {
 								      _hypotheses[i],
 								      _XminComG, _XmaxComG,
 								      _YminComG, _YmaxComG));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				"ComPIDVarH") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_histFile,
+								      _hypotheses[i],
+								      _XminComH, _XmaxComH,
+								      _YminComH, _YmaxComH));
+	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+				"ComPIDVarI") != input_pid_vars.end()) {
+	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_histFile,
+								      _hypotheses[i],
+								      _XminComI, _XmaxComI,
+								      _YminComI, _YmaxComI));
 	    } else {
 	      Squeak::mout(Squeak::warning) << "No valid PID variables given in "
 					  << "custom_pid_set, "

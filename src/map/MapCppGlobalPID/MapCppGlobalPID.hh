@@ -59,6 +59,8 @@
 #include "src/common_cpp/Recon/Global/PIDVarF.hh"
 #include "src/common_cpp/Recon/Global/PIDVarG.hh"
 #include "src/common_cpp/Recon/Global/PIDVarH.hh"
+#include "src/common_cpp/Recon/Global/PIDVarI.hh"
+#include "src/common_cpp/Recon/Global/PIDVarJ.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarA.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarB.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarC.hh"
@@ -66,6 +68,8 @@
 #include "src/common_cpp/Recon/Global/ComPIDVarE.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarF.hh"
 #include "src/common_cpp/Recon/Global/ComPIDVarG.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarH.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarI.hh"
 
 
 namespace MAUS {
