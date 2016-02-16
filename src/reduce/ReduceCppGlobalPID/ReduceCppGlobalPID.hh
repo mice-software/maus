@@ -125,11 +125,11 @@ class ReduceCppGlobalPID : public ReduceBase<Data, Data> {
     /// MICE configuration for PID
     std::string _pid_config;
 
-    /// PID beamline polarity- set in ConfigurationDefaults to select 
+    /// PID beamline polarity- set in ConfigurationDefaults to select
     /// positive or negative particles
     std::string _pid_beamline_polarity;
 
-    /// PID beam setting- set in ConfigurationDefaults to select 
+    /// PID beam setting- set in ConfigurationDefaults to select
     /// beam setting, i.e. emittance and momentum
     std::string _pid_beam_setting;
 

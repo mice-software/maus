@@ -257,11 +257,11 @@ namespace MAUS {
     /// TrackMatching tracks to perform PID on
     std::string _pid_track_selection;
 
-    /// PID beamline polarity- set in ConfigurationDefaults to select 
+    /// PID beamline polarity- set in ConfigurationDefaults to select
     /// positive or negative particles
     std::string _pid_beamline_polarity;
 
-    /// PID beam setting- set in ConfigurationDefaults to select 
+    /// PID beam setting- set in ConfigurationDefaults to select
     /// beam setting, i.e. emittance and momentum
     std::string _pid_beam_setting;
 

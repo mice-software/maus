@@ -473,7 +473,7 @@ namespace MAUS {
 	  std::istringstream track_selector(_pid_track_selection);
 	  std::string token;
 	  std::vector<std::string> track_types;
-	  while(std::getline(track_selector, token, ' ')) {
+	  while (std::getline(track_selector, token, ' ')) {
 	    track_types.push_back(token);
 	  }
 	  if (track_types.size() == 0) {
@@ -620,7 +620,7 @@ namespace MAUS {
 				    std::string _pid_beamline_polarity,
 				    std::string _pid_beam_setting,
 				    MAUS::GlobalEvent* global_event) const {
-    
+
     MAUS::DataStructure::Global::Track* pidtrack = track->Clone();
     global_event->add_track_recursive(pidtrack);
     std::string candidate_name = "MapCppGlobalPID-Candidate_" + function_name;
@@ -637,7 +637,7 @@ namespace MAUS {
     /// does not affect PID performance
     bool logL_1 = false;
     bool logL_2 = false;
-    //std::cerr << "_pid_vars.size() : " << _pid_vars.size() << std::endl;
+    // std::cerr << "_pid_vars.size() : " << _pid_vars.size() << std::endl;
     for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
 	 ++pid_var_count) {
       // TODO Pidcott: Need to do this separately for +ve and -ve
@@ -839,5 +839,4 @@ namespace MAUS {
       }
     }
   }
-
 } // ~MAUS

@@ -63,11 +63,14 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         timestamp = self.config0["unique_identifier"]
         # Check birth created PDF file
         mu_PDFdirectory = ('%s/files/PID/%s_%s' 
-                    % (os.environ.get("MAUS_ROOT_DIR"), mu_hypothesis, timestamp))
+                    % (os.environ.get("MAUS_ROOT_DIR"),
+                       mu_hypothesis, timestamp))
         e_PDFdirectory = ('%s/files/PID/%s_%s' 
-                    % (os.environ.get("MAUS_ROOT_DIR"), e_hypothesis, timestamp))
+                    % (os.environ.get("MAUS_ROOT_DIR"),
+                       e_hypothesis, timestamp))
         pi_PDFdirectory = ('%s/files/PID/%s_%s' 
-                    % (os.environ.get("MAUS_ROOT_DIR"), pi_hypothesis, timestamp))
+                    % (os.environ.get("MAUS_ROOT_DIR"),
+                       pi_hypothesis, timestamp))
         PDFfile1 = ('%s/diffTOF1TOF2_%s.root' 
                     % (mu_PDFdirectory, mu_hypothesis))
         self.assertTrue(os.path.exists(PDFfile1))
@@ -76,8 +79,9 @@ class ReduceCppGlobalPIDTestCase(unittest.TestCase):
         hist1name = "diffTOF1TOF2_test_200MeV_mu_plus"
         hist1 = rootPDFfile1.Get(hist1name)
         ## Check process has added info from 3 tracks to histogram:
-        ## N.B. for ComPIDVarA the behavior to spread one event over all bins is
-        ## on, so there should be as many additional entries as there are bins.
+        ## N.B. for ComPIDVarA the behavior to spread one event over
+        ## all bins is on, so there should be as many additional
+        ## entries as there are bins.
         self.assertEqual(hist1.GetEntries(), (hist1.GetSize() + 3))
         os.system('rm -rf %s' % mu_PDFdirectory)
         os.system('rm -rf %s' % e_PDFdirectory)

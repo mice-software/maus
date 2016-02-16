@@ -28,7 +28,8 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalPID"""
     config_file = ('%s/src/map/MapCppGlobalPID/test_config.py' % 
                  os.environ.get("MAUS_ROOT_DIR"))
-    config0 = json.loads(Configuration.Configuration().getConfigJSON(config_file = (open(config_file,'r'))))
+    config0 = json.loads(Configuration.Configuration().getConfigJSON
+                         (config_file = (open(config_file,'r'))))
     
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
@@ -46,7 +47,6 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_init(self):
         """Check birth with default configuration"""
-        #self.config = json.loads(Configuration().getConfigJSON(config_file = "test_config.py"))
         self.mapper.birth(json.dumps(self.config0))
 
     def test_no_data(self):
