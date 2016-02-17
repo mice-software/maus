@@ -107,8 +107,8 @@ void SciFiGeometryHelper::Build() {
       this_plane.Pitch          = pitch;
 
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
-      trackerGeo.Position = position;
-      trackerGeo.Rotation = trackerModule->globalRotation();
+      trackerGeo.Position = reference;
+      trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
       trackerGeo.Field = FieldValue(trackerModule);
       trackerGeo.Planes[plane_id] = this_plane;
 
@@ -139,7 +139,7 @@ double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
   }
   Hep3Vector globalPos = trackerModule->globalPosition();
   Hep3Vector relativePos(0., 0., 0.);
-  HepRotation trackerRotation = trackerModule->globalRotation();
+  HepRotation trackerRotation = (trackerModule->globalRotation()).inverse();
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {0., 0., 0., 0.};
   BTFieldConstructor* field = Globals::GetReconFieldConstructor();
@@ -307,13 +307,11 @@ std::vector<double> SciFiGeometryHelper::TransformStraightParamsToGlobal(
   double gmzy = 0.0;
 
   // Calculate the global coordinates of the point at the ref. plane
-  // Use the distance between the ref. plane and the centre of the tracker as z
   double z = GetPlanePosition(1, 1, 0);
   ThreeVector pos(x0, y0, z);
 
   // Transform the point from local to global cooridinates (used to bring in offsets and rotations)
   ThreeVector global_pos = TransformPositionToGlobal(pos, tracker);
-
   gx0 = global_pos.x();
   gy0 = global_pos.y();
 

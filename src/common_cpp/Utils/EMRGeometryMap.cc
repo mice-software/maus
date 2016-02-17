@@ -84,7 +84,7 @@ bool EMRGeometryMap::LoadGeometryFile(std::string geometryFile) {
 
     // There is only one parent module for the EMR
     _globalPosEMR = emr_modules[0]->globalPosition();
-    _globalRotEMR = emr_modules[0]->globalRotation();
+    _globalRotEMR = (emr_modules[0]->globalRotation()).inverse();
 
     double bar_width = emr_modules[0]->propertyDouble("BarWidth"); // mm
     double bar_height = emr_modules[0]->propertyDouble("BarHeight"); // mm
