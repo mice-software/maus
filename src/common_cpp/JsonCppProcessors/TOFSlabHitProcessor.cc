@@ -59,6 +59,30 @@ TOFSlabHitProcessor::TOFSlabHitProcessor()
     RegisterValueBranch
           ("pmt0", &_pmt0_proc, &TOFSlabHit::GetPmt0,
           &TOFSlabHit::SetPmt0, true);
+    RegisterValueBranch
+          ("global_x", &_global_x_proc, &TOFSlabHit::GetGlobalPosX,
+          &TOFSlabHit::SetGlobalPosX, true);
+    RegisterValueBranch
+          ("global_y", &_global_y_proc, &TOFSlabHit::GetGlobalPosY,
+          &TOFSlabHit::SetGlobalPosY, true);
+    RegisterValueBranch
+          ("global_z", &_global_z_proc, &TOFSlabHit::GetGlobalPosZ,
+          &TOFSlabHit::SetGlobalPosZ, true);
+    RegisterValueBranch
+          ("global_x_err", &_global_x_err_proc, &TOFSlabHit::GetGlobalPosXErr,
+          &TOFSlabHit::SetGlobalPosXErr, true);
+    RegisterValueBranch
+          ("global_y_err", &_global_y_err_proc, &TOFSlabHit::GetGlobalPosYErr,
+          &TOFSlabHit::SetGlobalPosYErr, true);
+    RegisterValueBranch
+          ("global_z_err", &_global_z_err_proc, &TOFSlabHit::GetGlobalPosZErr,
+          &TOFSlabHit::SetGlobalPosZErr, true);
+    RegisterValueBranch
+          ("horizontal_slab", &_horizontal_slab_proc, &TOFSlabHit::IsHorizontal,
+          &TOFSlabHit::SetHorizontal, true);
+    RegisterValueBranch
+          ("vertical_slab", &_vertical_slab_proc, &TOFSlabHit::IsVertical,
+          &TOFSlabHit::SetVertical, true);
 }
 }  // namespace MAUS
 

@@ -55,9 +55,9 @@ void TrackMatching::USTrack() {
   std::vector<DataStructure::Global::TrackPoint*> TOF1_tp =
       GetDetectorTrackPoints(DataStructure::Global::kTOF1, _mapper_name);
   // Ckov Spacepoints
-  std::vector<DataStructure::Global::TrackPoint*> CkovA_tp = 
+  std::vector<DataStructure::Global::TrackPoint*> CkovA_tp =
       GetDetectorTrackPoints(DataStructure::Global::kCherenkovA, _mapper_name);
-  std::vector<DataStructure::Global::TrackPoint*> CkovB_tp = 
+  std::vector<DataStructure::Global::TrackPoint*> CkovB_tp =
       GetDetectorTrackPoints(DataStructure::Global::kCherenkovB, _mapper_name);
 
   // Load the magnetic field for RK4 propagation
@@ -379,9 +379,11 @@ void TrackMatching::MatchEMRTrack(
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
                              _energy_loss);
       if (GlobalTools::approx(x_in[1], first_hit_pos.X(),
-                              first_hit_pos_err.X()*::sqrt(12)) and
+                              first_hit_pos_err.X()*::sqrt(12)*
+                              _matching_tolerances.at("EMR").first) and
           GlobalTools::approx(x_in[2], first_hit_pos.Y(),
-                              first_hit_pos_err.Y()*::sqrt(12))) {
+                              first_hit_pos_err.Y()*::sqrt(12)*
+                              _matching_tolerances.at("EMR").second)) {
         Squeak::mout(Squeak::debug) << "TrackMatching: EMR Match" << std::endl;
         hypothesis_track->set_emr_range_primary(
             (*emr_track_iter)->get_emr_range_primary());

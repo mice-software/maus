@@ -40,6 +40,7 @@ class TrackMatchingTest : public ::testing::Test {
     _matching_tolerances["TOF1"] = std::make_pair(40.0, 40.0);
     _matching_tolerances["TOF2"] = std::make_pair(40.0, 40.0);
     _matching_tolerances["KL"] = std::make_pair(10000, 32.0);
+    _matching_tolerances["EMR"] = std::make_pair(1.0, 1.0);
     _matching_tolerances["TOF12dT"] = std::make_pair(27.0, 54.0);
   }
   virtual void TearDown() {}
