@@ -29,6 +29,7 @@ namespace MAUS {
 void print_helical(SciFiHelicalPRTrack* helical);
 void print_straight(SciFiStraightPRTrack* straight);
 
+
 SciFiClusterPArray find_clusters(SciFiClusterPArray cluster_array, int tracker);
 SciFiSpacePointPArray find_spacepoints(SciFiSpacePointPArray spacepoint_array, int tracker);
 
@@ -83,6 +84,11 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _good_num_spacepoints       = (*json)["SciFiGoodNumSpacepoints"].asInt();
   _poor_num_spacepoints       = (*json)["SciFiPoorNumSpacepoints"].asInt();
 
+  ofstream logfile;
+  std::string root_dir = std::getenv("MAUS_ROOT_DIR");
+  std::string path = root_dir + "/tmp/digit_exception.log";
+  logfile.open(path);
+  logfile.close();
 
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
