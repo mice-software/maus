@@ -40,6 +40,10 @@ Track::Track()
       _pid(MAUS::DataStructure::Global::kNoPID),
       _charge(0),
       _detectorpoints(0),
+      _pid_logL_values(0),
+      _emr_range_primary(0.),
+      _emr_range_secondary(0.),
+      _emr_plane_density(0.),
       _goodness_of_fit(0.) {
   _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
@@ -53,7 +57,11 @@ Track::Track(const Track &track)
       _track_points(track.get_track_points()),
       _detectorpoints(track.get_detectorpoints()),
       _geometry_paths(track.get_geometry_paths()),
+      _pid_logL_values(track.get_pid_logL_values()),
       _constituent_tracks(track.get_constituent_tracks()),
+      _emr_range_primary(track.get_emr_range_primary()),
+      _emr_range_secondary(track.get_emr_range_secondary()),
+      _emr_plane_density(track.get_emr_plane_density()),
       _goodness_of_fit(track.get_goodness_of_fit()) {
   _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
@@ -70,14 +78,18 @@ Track& Track::operator=(const Track &track) {
   if (this == &track) {
     return *this;
   }
-  _mapper_name        = track.get_mapper_name();
-  _pid                = track.get_pid();
-  _charge             = track.get_charge();
+  _mapper_name         = track.get_mapper_name();
+  _pid                 = track.get_pid();
+  _charge              = track.get_charge();
   _track_points = new TRefArray(*track.get_track_points());
-  _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
-  _detectorpoints     = track.get_detectorpoints();
-  _geometry_paths     = track.get_geometry_paths();
-  _goodness_of_fit    = track.get_goodness_of_fit();
+  _constituent_tracks  = new TRefArray(*track.get_constituent_tracks());
+  _detectorpoints      = track.get_detectorpoints();
+  _geometry_paths      = track.get_geometry_paths();
+  _pid_logL_values     = track.get_pid_logL_values();
+  _emr_range_primary   = track.get_emr_range_primary();
+  _emr_range_secondary = track.get_emr_range_secondary();
+  _emr_plane_density   = track.get_emr_plane_density();
+  _goodness_of_fit     = track.get_goodness_of_fit();
 
   return *this;
 }
@@ -91,6 +103,10 @@ Track* Track::Clone() const {
   trackNew->set_mapper_name(get_mapper_name());
   trackNew->set_pid(get_pid());
   trackNew->set_charge(get_charge());
+  trackNew->set_pid_logL_values(get_pid_logL_values());
+  trackNew->set_emr_range_primary(get_emr_range_primary());
+  trackNew->set_emr_range_secondary(get_emr_range_secondary());
+  trackNew->set_emr_plane_density(get_emr_plane_density());
 
   // Track points may be edited, so we clone the original points
   MAUS::DataStructure::Global::TrackPoint* tp = NULL;
@@ -138,6 +154,30 @@ void Track::set_charge(int charge) {
 
 int Track::get_charge() const {
   return _charge;
+}
+
+void Track::set_emr_range_primary(double range) {
+  _emr_range_primary = range;
+}
+
+double Track::get_emr_range_primary() const {
+  return _emr_range_primary;
+}
+
+void Track::set_emr_range_secondary(double range) {
+  _emr_range_secondary = range;
+}
+
+double Track::get_emr_range_secondary() const {
+  return _emr_range_secondary;
+}
+
+void Track::set_emr_plane_density(double density) {
+  _emr_plane_density = density;
+}
+
+double Track::get_emr_plane_density() const {
+  return _emr_plane_density;
 }
 
 // Trackpoint methods
@@ -235,6 +275,46 @@ Track::GetTrackPoints() const {
   return temp_track_points;
 }
 
+std::vector<const MAUS::DataStructure::Global::TrackPoint*>
+Track::GetTrackPoints(DetectorPoint detector) const {
+  std::vector<const MAUS::DataStructure::Global::TrackPoint*> temp_track_points;
+  if (!_track_points) return temp_track_points;
+  const MAUS::DataStructure::Global::TrackPoint* tp = NULL;
+  for (int i = 0; i < _track_points->GetSize(); ++i) {
+    tp = (const MAUS::DataStructure::Global::TrackPoint*) _track_points->At(i);
+    if (!tp) continue;
+    // Need to make sure that requests for the main detector (e.g. Tracker0)
+    // return points that are tagged with subdetectors as well
+    DetectorPoint tp_main_detector = tp->get_detector();
+    if ((tp_main_detector == kTOF0_1) or
+        (tp_main_detector == kTOF0_2)) {
+      tp_main_detector = kTOF0;
+    } else if ((tp_main_detector == kTOF1_1) or
+               (tp_main_detector == kTOF1_2)) {
+      tp_main_detector = kTOF1;
+    } else if ((tp_main_detector == kTOF2_1) or
+               (tp_main_detector == kTOF2_2)) {
+      tp_main_detector = kTOF2;
+    } else if ((tp_main_detector == kTracker0_1) or
+               (tp_main_detector == kTracker0_2) or
+               (tp_main_detector == kTracker0_3) or
+               (tp_main_detector == kTracker0_4) or
+               (tp_main_detector == kTracker0_5)) {
+      tp_main_detector = kTracker0;
+    } else if ((tp_main_detector == kTracker1_1) or
+               (tp_main_detector == kTracker1_2) or
+               (tp_main_detector == kTracker1_3) or
+               (tp_main_detector == kTracker1_4) or
+               (tp_main_detector == kTracker1_5)) {
+      tp_main_detector = kTracker1;
+    }
+    if ((tp->get_detector() == detector) or tp_main_detector == detector) {
+      temp_track_points.push_back(tp);
+    }
+  }
+  return temp_track_points;
+}
+
 void Track::set_track_points(TRefArray* track_points) {
   if (_track_points != NULL) {
     delete _track_points;
@@ -327,6 +407,22 @@ void Track::set_geometry_paths(std::vector<std::string> geometry_paths) {
 
 std::vector<std::string> Track::get_geometry_paths() const {
   return _geometry_paths;
+}
+
+// Object to hold pid hypotheses and the log-likelihood that they are the
+// correct hypothesis
+void Track::set_pid_logL_values(std::vector<MAUS::DataStructure::Global::PIDLogLPair>
+				pid_logL_values) {
+  _pid_logL_values = pid_logL_values;
+}
+
+std::vector<MAUS::DataStructure::Global::PIDLogLPair> Track::get_pid_logL_values() const {
+  return _pid_logL_values;
+}
+
+// Method to fill pid_logL_values
+void Track::AddPIDLogLValues(MAUS::DataStructure::Global::PIDLogLPair pid_logL) {
+  _pid_logL_values.push_back(pid_logL);
 }
 
 // Constituent Tracks methods

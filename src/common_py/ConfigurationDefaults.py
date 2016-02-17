@@ -257,10 +257,10 @@ SciFiKunoSum = 318.5  # Sum of channel #s in 3 planes if they form a spoint
 SciFiKunoSumT1S5 = 320.0 # Sum of channel #s in 3 planes if they form a spoint for T1 S5
 SciFiKunoTolerance = 3.0 # Kuno conjecture tolerance
 SciFiDigitizationNPECut = 2.0
-SciFiMappingFileName = "scifi_mapping_2015-09-11.txt"
-SciFiCalibrationFileName = "scifi_calibration_2015-09-12.txt"
-SciFiBadChannelsFileName = "scifi_bad_channels_2015-06-18.txt"
-SciFiCalibMethod = "Run" # Date/Current/Run
+SciFiMappingFileName = "scifi_mapping.txt"
+SciFiCalibrationFileName = "scifi_calibraion.txt"
+SciFiBadChannelsFileName = "scifi_bad_channels.txt"
+SciFiCalibMethod = "Current" # Date/Current/Run
 SciFiCalibSrc = 7057 # exmple: "Date" - 1984-09-14 00:10:00.0    "Run" - 7057
 SciFiMUXNum = 7
 SciFiFiberDecayConst = 2.7
@@ -286,6 +286,8 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
+SciFiClusterReconOn = True
+SciFiSpacepointReconOn = True
 SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
@@ -299,6 +301,7 @@ SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker 
 SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
+SciFiPatRecDebugOn = False # Set Pattern Recogntition to debug mode
 SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160. # Used as cut by SpacePointReconstruction
 SciFiParams_RMS = 370.
@@ -327,6 +330,15 @@ GasParams_Radiation_Length = 5671130. # mm
 GasParams_Density = 0.000166322 # 1.66322e-04 g/cm3
 GasParams_Mean_Excitation_Energy = 41.8 # eV
 GasParams_Density_Correction  = 0.13443
+SciFiTestVirtualTracksStraight = {"rms_position" : 70.0, "rms_angle" : 0.19}  # Description of straight tracks to simulate
+SciFiTestVirtualTracksHelix = {"rms_position" : 70.0, "rms_pt" : 30.0, "pz" : 200.0}  # Description of helical tracks to simulate
+SciFiTestVirtualMethod = "virtual" # How to test the scifi recon. Choose from "straight", "helical" or "virtual"
+SciFiTestVirtualMakeDigits = False
+SciFiTestVirtualMakeClusters = True
+SciFiTestVirtualMakeSpacepoints = False
+SciFiTestVirtualSmear = 0.431425 # Simulate measurement error on alpha with Gaussian Smearing this is the Std Dev.
+# Set the smear value to negative to force a quantisation of alpha - like a real measurement
+
 SciFiSeedCovariance = 1000.0 # Error estimate for Seed values of the Kalman Fit
 SciFiSeedPatRec = True
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
@@ -665,6 +677,7 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
 
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
+#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
 # Particle hypothesis used in Global PID when creating PDFs from MC data.
 # For PDFs to be produced, this must be set, preferably as the type of simulated particle
 # i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
@@ -674,6 +687,63 @@ global_pid_hypothesis = ""
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+
+# Bounds set on values of PID variables when running PID
+pid_bounds = {
+    # Bounds for PIDVarA
+    "minA":20,"maxA":40,
+    # PIDVarB
+    "XminB":10, "XmaxB":250, "YminB":20, "YmaxB":40,
+    # PIDVarC
+    "XminC":50, "XmaxC":350, "YminC":0, "YmaxC":8000,
+    # PIDVarD
+    "minD":0, "maxD":8000,
+    # PIDVarE
+    "minE":0, "maxE":1000,
+    # PIDVarF
+    "XminF":50, "XmaxF":350, "YminF":0, "YmaxF":1000,
+    # PIDVarG
+    "minG":0, "maxG":1,
+    # PIDVarH
+    "XminH":50, "XmaxH":350, "YminH":0, "YmaxH":1,
+    # PIDVarI
+    "XminI":50, "XmaxI":350, "YminI":0, "YmaxI":140,
+    # PIDVarJ
+    "XminJ":50, "XmaxJ":350, "YminJ":0, "YmaxJ":140,
+    # ComPIDVarA
+    "minComA":30, "maxComA":50,
+    # ComPIDVarB
+    "XminComB":30, "XmaxComB":50, "YminComB":0, "YmaxComB":8000,
+    # ComPIDVarC
+    "minComC":0, "maxComC":8000,
+    # ComPIDVarD
+    "minComD":0, "maxComD":1000,
+    # ComPIDVarE
+    "XminComE":30, "XmaxComE":50, "YminComE":0, "YmaxComE":1000,
+    # ComPIDVarF
+    "minComF":0, "maxComF":1,
+    # ComPIDVarG
+    "XminComG":30, "XmaxComG":50, "YminComG":0, "YmaxComG":1,
+    # ComPIDVarH
+    "XminComH":30, "XmaxComH":50, "YminComH":0, "YmaxComH":40,
+    # ComPIDVarI
+    "XminComI":30, "XmaxComI":50, "YminComI":0, "YmaxComI":140
+}
+
+# PID MICE configuration, 'step_4' for Step IV running, 'commissioning' for field free commissioning data
+pid_config = "step_4"
+# PID running mode - selects which PID variables are used. 'online' corresponds to less beam (momentum)
+# dependent variables, 'offline' uses all variables and requires that specific PDFs for the beam already
+# exist. 'custom' allows user to choose which variables to use, and these should then be set as datacards.
+# However it is not recommended to use the custom setting unless you are the person currently developing
+# the Global PID.
+pid_mode = "online"
+# If pid_mode = "custom", variables to use should be set here as a space separated list, i.e.
+# custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
+custom_pid_set = "PIDVarB"
+# PID confidence level- set the margin (in %) between the confidence levels of competing pid hypotheses before they
+# are selected as the correct hypothesis
+pid_confidence_level = 5
 
 root_document_store_timeout = 10
 root_document_store_poll_time = 1
@@ -696,3 +766,26 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
     "2d_volume_plot_label_size":0.25,
 }
+
+# Determines for which pid hypotheses track matching should be attempted. Default is "all"
+# meaning electrons, muons, and pions of both charges (unless tracker recon produces a
+# charge hypothesis). Alternatively, force/limit to either one (never several) of
+# kEPlus, kEMinus, kMuPlus, kMuMinus, kPiPlus, kPiMinus
+track_matching_pid_hypothesis = "all"
+
+# Global track matching tolerances (in mm) for the various subdetectors. KL only provides a
+# y coordinate, hence x does not need to be configurable.
+track_matching_tolerances = {
+  "TOF0x":30.0,
+  "TOF0y":30.0,
+  "TOF1x":40.0,
+  "TOF1y":40.0,
+  "TOF2x":40.0,
+  "TOF2y":40.0,
+  "KLy":32.0,
+  "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
+  "TOF12minSpeed":0.5,
+}
+
+# Whether to use energy loss calculations for global track matching
+track_matching_energy_loss = True

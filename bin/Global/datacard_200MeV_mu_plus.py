@@ -18,9 +18,9 @@ keep_steps = False # set to true to keep start and end point of every track and
 simulation_geometry_filename = "Stage4.dat" # geometry used by simulation
 maximum_number_of_steps = 10000
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":2770.0},
+    "position":{"x":0.0, "y":-0.0, "z":2700.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
-    "particle_id":-13, "energy":226.2, "time":0.0, "random_seed":10
+    "particle_id":-13, "energy":266.2, "time":0.0, "random_seed":10
 }
 
 muon_half_life = 1.e24
@@ -43,13 +43,20 @@ beam = {
           "transverse_mode":"twiss",
           "beta_x":1000.,
           "alpha_x":0.,
-          "emittance_x":1., # 4d emittance
+          "emittance_x":1.0, # 4d emittance
           "beta_y":8000.,
           "alpha_y":0.5,
-          "emittance_y":1.,
+          "emittance_y":1.0,
           },
+       #~ "transverse":{
+          #~ "transverse_mode":"constant_solenoid",
+          # transverse distribution matched to constant solenoid field
+          #~ "emittance_4d":1., # 4d emittance
+          #~ "normalised_angular_momentum":0.1, # angular momentum from diffuser
+          #~ "bz":4.e-3 # magnetic field strength for angular mom. calculation
+       #~ },
        "longitudinal":{"longitudinal_mode":"sawtooth_time",
-                   "momentum_variable":"p", 
+                   "momentum_variable":"p",
                    "sigma_p":25., # RMS total momentum
                    "t_start":-1.e6, # start time of sawtooth
                    "t_end":+1.e6}, # end time of sawtooth
@@ -58,3 +65,6 @@ beam = {
 }
 
 particle_decay = True
+physics_processes = "mean_energy_loss"
+TOF_calib_by = "date"
+TOF_calib_date_from = "2013-10-01 00:00:00"

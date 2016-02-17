@@ -15,19 +15,27 @@
  *
  */
 
-#include "src/map/MapCppGlobalTrackMatching/MapCppGlobalTrackMatching.hh"
+#include <vector>
 
-#include "src/common_cpp/DataStructure/Data.hh"
-#include "Interface/Squeak.hh"
-#include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
-#include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 
+#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/GlobalEvent.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+
+#include "src/common_cpp/Globals/GlobalsManager.hh"
+#include "src/common_cpp/Recon/Global/TrackMatching.hh"
+#include "src/common_cpp/Utils/Globals.hh"
+
+#include "src/legacy/Config/MiceModule.hh"
+
+#include "src/map/MapCppGlobalTrackMatching/MapCppGlobalTrackMatching.hh"
 
 namespace MAUS {
 
   PyMODINIT_FUNC init_MapCppGlobalTrackMatching(void) {
-    PyWrapMapBase<MAUS::MapCppGlobalTrackMatching>::PyWrapMapBaseModInit
+    PyWrapMapBase<MapCppGlobalTrackMatching>::PyWrapMapBaseModInit
                                     ("MapCppGlobalTrackMatching", "", "", "", "");
   }
 
@@ -36,51 +44,81 @@ namespace MAUS {
   }
 
   void MapCppGlobalTrackMatching::_birth(const std::string& argJsonConfigDocument) {
+    if (!Globals::HasInstance()) {
+      GlobalsManager::InitialiseGlobals(argJsonConfigDocument);
+    }
     // Check if the JSON document can be parsed, else return error only.
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "Failed to parse configuration",
-                              "MapCppGlobalTrackMatching::birth");
+        throw Exception(Exception::recoverable,
+                        "Failed to parse configuration",
+                        "MapCppGlobalTrackMatching::birth");
     }
     _configCheck = true;
-    _classname = "MapCppGlobalTrackMatching";
+    _mapper_name = "MapCppGlobalTrackMatching";
+    _pid_hypothesis_string = _configJSON["track_matching_pid_hypothesis"].asString();
+    Json::Value track_matching_tolerances = _configJSON["track_matching_tolerances"];
+    _matching_tolerances["TOF0"] = std::make_pair(
+        track_matching_tolerances["TOF0x"].asDouble(),
+        track_matching_tolerances["TOF0y"].asDouble());
+    _matching_tolerances["TOF1"] = std::make_pair(
+        track_matching_tolerances["TOF1x"].asDouble(),
+        track_matching_tolerances["TOF1y"].asDouble());
+    _matching_tolerances["TOF2"] = std::make_pair(
+        track_matching_tolerances["TOF2x"].asDouble(),
+        track_matching_tolerances["TOF2y"].asDouble());
+    _matching_tolerances["KL"] = std::make_pair(10000,
+        track_matching_tolerances["KLy"].asDouble());
+    _energy_loss = _configJSON["track_matching_energy_loss"].asBool();
+    std::string geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
+    MiceModule* geo_module = new MiceModule(geo_filename);
+    std::vector<const MiceModule*> tofs =
+        geo_module->findModulesByPropertyString("Detector", "TOF");
+    double tof12_cdt = ((tofs.at(2)->globalPosition().z() -
+        tofs.at(1)->globalPosition().z())/299.791);
+    _matching_tolerances["TOF12dT"] = std::make_pair(
+        tof12_cdt/track_matching_tolerances["TOF12maxSpeed"].asDouble(),
+        tof12_cdt/track_matching_tolerances["TOF12minSpeed"].asDouble());
   }
 
   void MapCppGlobalTrackMatching::_death() {
   }
 
-  void MapCppGlobalTrackMatching::_process(MAUS::Data* data_cpp) const {
+  void MapCppGlobalTrackMatching::_process(Data* data_cpp) const {
     // Read string and convert to a Json object
     if (!data_cpp) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "data_cpp was NULL",
-                              "MapCppGlobalTrackMatching::_process");
+        throw Exception(Exception::recoverable,
+                        "data_cpp was NULL",
+                        "MapCppGlobalTrackMatching::_process");
     }
     if (!_configCheck) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "Birth has not been successfully called",
-                              "MapCppGlobalTrackMatching::_process");
+        throw Exception(Exception::recoverable,
+                        "Birth has not been successfully called",
+                        "MapCppGlobalTrackMatching::_process");
     }
+    const Spill* spill = data_cpp->GetSpill();
 
-    const MAUS::Spill* spill = data_cpp->GetSpill();
-
-    MAUS::ReconEventPArray* recon_events = spill->GetReconEvents();
-
+    ReconEventPArray* recon_events = spill->GetReconEvents();
     if (!recon_events) {
       return;
     }
 
-    MAUS::ReconEventPArray::iterator recon_event_iter;
-    for (recon_event_iter = recon_events->begin();
-	 recon_event_iter != recon_events->end();
-	 ++recon_event_iter) {
+    for (auto recon_event_iter = recon_events->begin();
+         recon_event_iter != recon_events->end();
+         ++recon_event_iter) {
       // Load the ReconEvent, and import it into the GlobalEvent
-      MAUS::ReconEvent* recon_event = (*recon_event_iter);
-      MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
-      MAUS::recon::global::TrackMatching track_matching;
-      track_matching.FormTracks(global_event, _classname);
+      ReconEvent* recon_event = (*recon_event_iter);
+      GlobalEvent* global_event = recon_event->GetGlobalEvent();
+
+      if (global_event) {
+        recon::global::TrackMatching
+            track_matching(global_event, _mapper_name, _pid_hypothesis_string,
+                           _matching_tolerances, 10.0, _energy_loss);
+        track_matching.USTrack();
+        track_matching.DSTrack();
+        track_matching.throughTrack();
+      }
     }
   }
 } // ~MAUS

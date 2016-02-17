@@ -6,7 +6,8 @@ import sys
 import array
 import ROOT
 import libMausCpp #pylint: disable = W0611
-import MausReducedData
+import MausReducedData.SciFiReducedData as SciFiReducedData
+import MausReducedData.TofReducedData as TofReducedData
 
 # pylint: disable = C0103
 # pylint: disable = E1101
@@ -157,11 +158,11 @@ def main(file_name):
 
             # Loop over all the particle events in a spill
             for i in range(spill.GetReconEvents().size()):
-                tkus = MausReducedData.Tracker() # TkUS event data
-                tkds = MausReducedData.Tracker() # TkDS event data
-                tof0 = MausReducedData.TOF()   # TOF0 event data
-                tof1 = MausReducedData.TOF()   # TOF1 event data
-                tof2 = MausReducedData.TOF()   # TOF2 event data
+                tkus = SciFiReducedData.Tracker() # TkUS event data
+                tkds = SciFiReducedData.Tracker() # TkDS event data
+                tof0 = TofReducedData.TOF()   # TOF0 event data
+                tof1 = TofReducedData.TOF()   # TOF1 event data
+                tof2 = TofReducedData.TOF()   # TOF2 event data
 
                 tk_evt = spill.GetReconEvents()[i].GetSciFiEvent()
                 tkus.accumulate_data(tk_evt, 0)
@@ -250,6 +251,8 @@ def main(file_name):
                 all_data.extend(tof_data)
 
                 sp_global_graphs = draw_global_spoints(c_sp_gxyz, all_data)
+                c_sp_gxyz.Update()
+                draw_stracks_global(tkus, tkds, c_sp_gxyz)
                 c_sp_gxyz.Update()
 
                 tkus_pos = [tkus.tpoints_global_x, tkus.tpoints_global_y,
@@ -861,6 +864,33 @@ def draw_stracks(t1, t2, can):
     for line in t2.straight_yz_fits:
         can.cd(6)
         line.SetLineColor(ROOT.kRed)
+        line.Draw("same")
+        can.Update()
+
+def draw_stracks_global(t1, t2, can):
+    """ Draw the straight fits over the spacepoints """
+    print 'Drawing global pr straight track fits'
+    print 'No. of x-z fits: ' + str(len(t1.straight_global_xz_fits))
+    for line in t1.straight_global_xz_fits:
+        print 'Param 0: ' + str(line.GetParameter(0))
+        print 'Param 1: ' + str(line.GetParameter(1))
+        can.cd(2)
+        line.SetLineColor(ROOT.kBlue)
+        line.Draw("same")
+        can.Update()
+    for line in t1.straight_global_yz_fits:
+        can.cd(3)
+        line.SetLineColor(ROOT.kBlue)
+        line.Draw("same")
+        can.Update()
+    for line in t2.straight_global_xz_fits:
+        can.cd(2)
+        line.SetLineColor(ROOT.kBlue)
+        line.Draw("same")
+        can.Update()
+    for line in t2.straight_global_yz_fits:
+        can.cd(3)
+        line.SetLineColor(ROOT.kBlue)
         line.Draw("same")
         can.Update()
 
