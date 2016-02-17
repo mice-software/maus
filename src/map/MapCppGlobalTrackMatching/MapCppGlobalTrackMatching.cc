@@ -70,6 +70,9 @@ namespace MAUS {
         track_matching_tolerances["TOF2y"].asDouble());
     _matching_tolerances["KL"] = std::make_pair(10000,
         track_matching_tolerances["KLy"].asDouble());
+    _matching_tolerances["EMR"] = std::make_pair(
+        track_matching_tolerances["EMRx"].asDouble(),
+        track_matching_tolerances["EMRy"].asDouble());
     _energy_loss = _configJSON["track_matching_energy_loss"].asBool();
     std::string geo_filename = _configJSON["reconstruction_geometry_filename"].asString();
     MiceModule* geo_module = new MiceModule(geo_filename);

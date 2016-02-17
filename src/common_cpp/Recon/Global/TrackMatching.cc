@@ -54,6 +54,11 @@ void TrackMatching::USTrack() {
       GetDetectorTrackPoints(DataStructure::Global::kTOF0, _mapper_name);
   std::vector<DataStructure::Global::TrackPoint*> TOF1_tp =
       GetDetectorTrackPoints(DataStructure::Global::kTOF1, _mapper_name);
+  // Ckov Spacepoints
+  std::vector<DataStructure::Global::TrackPoint*> CkovA_tp =
+      GetDetectorTrackPoints(DataStructure::Global::kCherenkovA, _mapper_name);
+  std::vector<DataStructure::Global::TrackPoint*> CkovB_tp =
+      GetDetectorTrackPoints(DataStructure::Global::kCherenkovB, _mapper_name);
 
   // Load the magnetic field for RK4 propagation
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
@@ -84,6 +89,16 @@ void TrackMatching::USTrack() {
                       hypothesis_track);
       MatchTrackPoint(position, momentum, TOF1_tp, pids[i], field, "TOF1",
                       hypothesis_track);
+
+      // No matching criterion for Cherenkov hits, so if they exist, we add them
+      if (CkovA_tp.size() > 0) {
+        Squeak::mout(Squeak::debug) << "TrackMatching: CkovA Added" << std::endl;
+        hypothesis_track->AddTrackPoint(CkovA_tp.at(0));
+      }
+      if (CkovB_tp.size() > 0) {
+        Squeak::mout(Squeak::debug) << "TrackMatching: CkovB Added" << std::endl;
+        hypothesis_track->AddTrackPoint(CkovB_tp.at(0));
+      }
 
       // Now we fill the track with trackpoints from the tracker with energy
       // calculated from p and m, trackpoints are cloned as we want everything
@@ -183,14 +198,10 @@ void TrackMatching::throughTrack() {
              ++ds_track_iter) {
           // Going to assume that if several TrackPoints for the same TOF are in
           // the track that they have been checked to be sensible (TODO above)
-          DataStructure::Global::TrackPointCPArray us_trackpoints =
-              (*us_track_iter)->GetTrackPoints();
-          DataStructure::Global::TrackPointCPArray ds_trackpoints =
-              (*ds_track_iter)->GetTrackPoints();
           double emr_range_primary = (*ds_track_iter)->get_emr_range_primary();
-          if ((us_trackpoints.size() > 0) and
-              (ds_trackpoints.size() > 0)) {
-            MatchUSDS(us_trackpoints, ds_trackpoints, pids[i],
+          if (((*us_track_iter)->GetTrackPoints().size() > 0) and
+              ((*ds_track_iter)->GetTrackPoints().size() > 0)) {
+            MatchUSDS((*us_track_iter), (*ds_track_iter), pids[i],
                       emr_range_primary);
           }
         }
@@ -237,11 +248,11 @@ std::vector<DataStructure::Global::TrackPoint*>
       DataStructure::Global::TrackPoint* track_point =
           new DataStructure::Global::TrackPoint(space_point);
       std::string blsection_mapper_name = mapper_name;
-      if ((detector == DataStructure::Global::kTOF0) or
-          (detector == DataStructure::Global::kTOF1)) {
-        blsection_mapper_name.append("-US");
-      } else {
+      if ((detector == DataStructure::Global::kTOF2) or
+          (detector == DataStructure::Global::kCalorimeter)) {
         blsection_mapper_name.append("-DS");
+      } else {
+        blsection_mapper_name.append("-US");
       }
       track_point->set_mapper_name(blsection_mapper_name);
       track_points.push_back(track_point);
@@ -368,9 +379,11 @@ void TrackMatching::MatchEMRTrack(
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
                              _energy_loss);
       if (GlobalTools::approx(x_in[1], first_hit_pos.X(),
-                              first_hit_pos_err.X()*::sqrt(12)) and
+                              first_hit_pos_err.X()*::sqrt(12)*
+                              _matching_tolerances.at("EMR").first) and
           GlobalTools::approx(x_in[2], first_hit_pos.Y(),
-                              first_hit_pos_err.Y()*::sqrt(12))) {
+                              first_hit_pos_err.Y()*::sqrt(12)*
+                              _matching_tolerances.at("EMR").second)) {
         Squeak::mout(Squeak::debug) << "TrackMatching: EMR Match" << std::endl;
         hypothesis_track->set_emr_range_primary(
             (*emr_track_iter)->get_emr_range_primary());
@@ -439,9 +452,13 @@ void TrackMatching::USDSTracks(
 }
 
 void TrackMatching::MatchUSDS(
-    DataStructure::Global::TrackPointCPArray us_trackpoints,
-    DataStructure::Global::TrackPointCPArray ds_trackpoints,
+    DataStructure::Global::Track* us_track,
+    DataStructure::Global::Track* ds_track,
     DataStructure::Global::PID pid, double emr_range_primary) {
+  DataStructure::Global::TrackPointCPArray us_trackpoints =
+      us_track->GetTrackPoints();
+  DataStructure::Global::TrackPointCPArray ds_trackpoints =
+      ds_track->GetTrackPoints();
   double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
                                             DataStructure::Global::kTOF1);
   double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
@@ -468,6 +485,8 @@ void TrackMatching::MatchUSDS(
           const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
     }
     through_track->set_emr_range_primary(emr_range_primary);
+    through_track->AddTrack(us_track);
+    through_track->AddTrack(ds_track);
     _global_event->add_track(through_track);
   }
 }

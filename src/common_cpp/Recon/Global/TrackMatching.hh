@@ -236,8 +236,8 @@ namespace global {
      * @param emr_range_primary EMR primary Track range to pass to the new track
      */
     void MatchUSDS(
-        DataStructure::Global::TrackPointCPArray us_trackpoints,
-        DataStructure::Global::TrackPointCPArray ds_trackpoints,
+        DataStructure::Global::Track* us_track,
+        DataStructure::Global::Track* ds_track,
         DataStructure::Global::PID pid, double emr_range_primary);
 
     /**

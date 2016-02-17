@@ -70,6 +70,7 @@ class MapCppTOFSpacePointsTestCase(unittest.TestCase): #pylint: disable = R0904
         return spill['recon_events'][event]['tof_event']\
                                             ['tof_space_points']['tof'+str(tof)]
 
+    @unittest.skip("Disabled pending adjusting for new TOF JSON Processor")
     def __test_process_tof_0(self, spill_out):
         """Check the MapCppTOFSpacePoints process function for tof0"""
         self.assertFalse(self.__get_space_point(spill_out, 0, 0))

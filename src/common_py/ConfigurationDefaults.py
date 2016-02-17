@@ -784,7 +784,8 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
 track_matching_pid_hypothesis = "all"
 
 # Global track matching tolerances (in mm) for the various subdetectors. KL only provides a
-# y coordinate, hence x does not need to be configurable.
+# y coordinate, hence x does not need to be configurable. EMR uses reconstructed error
+# so a multiplier is used.
 track_matching_tolerances = {
   "TOF0x":30.0,
   "TOF0y":30.0,
@@ -793,6 +794,8 @@ track_matching_tolerances = {
   "TOF2x":40.0,
   "TOF2y":40.0,
   "KLy":32.0,
+  "EMRx":1.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
+  "EMRy":1.0,
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
   "TOF12minSpeed":0.5,
 }

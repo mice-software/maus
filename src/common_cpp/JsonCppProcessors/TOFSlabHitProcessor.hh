@@ -62,6 +62,14 @@ class TOFSlabHitProcessor : public ObjectProcessor<TOFSlabHit> {
     IntProcessor _part_event_number_proc;
     Pmt1Processor _pmt1_proc;
     Pmt0Processor _pmt0_proc;
+    DoubleProcessor _global_x_proc;
+    DoubleProcessor _global_y_proc;
+    DoubleProcessor _global_z_proc;
+    DoubleProcessor _global_x_err_proc;
+    DoubleProcessor _global_y_err_proc;
+    DoubleProcessor _global_z_err_proc;
+    BoolProcessor _horizontal_slab_proc;
+    BoolProcessor _vertical_slab_proc;
 };
 }  // namespace MAUS
 
