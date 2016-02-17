@@ -1,12 +1,16 @@
+"""
+Config file for test_MapCppGlobalPID.py
+"""
+
 # pylint: disable=C0103
 
 import os
 
 # Default location of root file containing PDF histograms used for Global PID
-PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' %
-os.environ.get("MAUS_ROOT_DIR")
-#PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' %
-os.environ.get("MAUS_ROOT_DIR")
+PID_PDFs_file = '%s/src/map/MapCppGlobalPID/PIDhists.root'\
+                % os.environ.get("MAUS_ROOT_DIR")
+# PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root'\
+# % os.environ.get("MAUS_ROOT_DIR")
 # Tag used by both MapCppGlobalPID and ReduceCppGlobalPID, determines which
 # PDFs to perform PID against/which PDFs to produce (in this case, set based
 # upon input MC beam). A typical tag here would be the emittance and momentum,

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 """
-Produce the MC probability density functions for the particle hypothesis
-given in the specified datacard.
+Produce the MC probability density functions for MC data that has first been
+processed by MapCppGlobalReconImport and MapCppGlobalTrackMatching. Several
+datacards must be set, an example configuration file is included in
+bin/Global/pdf_example_datacard.py
 """
 
 import io   #  generic python library for I/O
@@ -13,9 +15,8 @@ def run():
     """ Run the macro
     """
 
-    # Take as input spills from pre-existing json document, as defined in
-    # datacard
-    my_input = MAUS.InputPyJSON()
+    # Take as input a maus root file.
+    my_input = MAUS.InputCppRoot()
 
     my_output = MAUS.OutputPyDoNothing()
 
