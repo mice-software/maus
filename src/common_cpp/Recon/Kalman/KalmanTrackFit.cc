@@ -148,7 +148,6 @@ namespace Kalman {
     int track_end = (forward ? _data.GetLength() : -1);
 
     _predicted[track_start-increment].copy(_seed);
-//    _filtered[track_start-increment].copy(_seed);
     this->_filter(_data[track_start-increment],
                                         _predicted[track_start-increment],
                                         _filtered[track_start-increment]);
@@ -175,26 +174,21 @@ namespace Kalman {
     _smoothed[track_start-increment] = _filtered[track_start-increment];
 
     for (int i = track_start; i != track_end; i += increment) {
-      TMatrixD temp(GetDimension(), GetDimension());
-      TDecompLU lu(_predicted[i - increment].GetCovariance());
-      if (!lu.Decompose() || !lu.Invert(temp)) {
-        _smoothed[i] = _filtered[i];
-        _propagator->Propagate(_filtered[i - increment], _smoothed[i]);
-      } else {
-        TMatrixD prop = _propagator->CalculatePropagator(_filtered[i], _filtered[i - increment]);
-        TMatrixD propT(TMatrixD::kTransposed, prop);
+      TMatrixD inv_cov(TMatrixD::kInverted, _predicted[i - increment].GetCovariance());
+      TMatrixD prop = _propagator->CalculatePropagator(_filtered[i], _filtered[i - increment]);
+      TMatrixD propT(TMatrixD::kTransposed, prop);
 
-        TMatrixD A = _filtered[i].GetCovariance() * propT * temp;
-        TMatrixD AT(TMatrixD::kTransposed, A);
+      TMatrixD A = _filtered[i].GetCovariance() * propT * inv_cov;
+      TMatrixD AT(TMatrixD::kTransposed, A);
 
-        TMatrixD vec = _filtered[i].GetVector() + A * (_smoothed[i-increment].GetVector() -
-                                                              _predicted[i-increment].GetVector());
-        TMatrixD cov = _filtered[i].GetCovariance() + A * (_smoothed[i-increment].GetCovariance() -
-                                                     _predicted[i-increment].GetCovariance()) * AT;
+      TMatrixD vec = _filtered[i].GetVector() + A * (_smoothed[i-increment].GetVector() -
+                                                            _predicted[i-increment].GetVector());
+      TMatrixD temp = A * (_smoothed[i-increment].GetCovariance() -
+                                                   _predicted[i-increment].GetCovariance()) * AT;
+      TMatrixD cov = _filtered[i].GetCovariance() + temp;
 
-        _smoothed[i].SetVector(vec);
-        _smoothed[i].SetCovariance(cov);
-      }
+      _smoothed[i].SetVector(vec);
+      _smoothed[i].SetCovariance(cov);
     }
   }
 
@@ -228,33 +222,25 @@ namespace Kalman {
 
   void TrackFit::_filter(const State& data, const State& predicted, State& filtered) const {
     State measured = _measurement->Measure(predicted);
+    State pull = CalculateResidual(data, measured);
     TMatrixD V = _measurement->GetMeasurementNoise();
+    TMatrixD H = _measurement->GetMeasurementMatrix();
+    TMatrixD HT(TMatrixD::kTransposed, H);
 
-    TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
-    TDecompLU lu(V + measured.GetCovariance());
-    if (!lu.Decompose() || !lu.Invert(temp)) {
-      filtered = predicted;
-    } else {
-      TMatrixD H = _measurement->GetMeasurementMatrix();
-      TMatrixD HT(TMatrixD::kTransposed, H);// HT.Transpose(H);
+    TMatrixD cov_inv(TMatrixD::kInverted, pull.GetCovariance());
 
-      TMatrixD K = predicted.GetCovariance() * HT * temp;
-      TMatrixD KT(TMatrixD::kTransposed, K);// KT.Transpose(K);
+    TMatrixD K = predicted.GetCovariance() * HT * cov_inv;
+    TMatrixD KT(TMatrixD::kTransposed, K);
 
-      TMatrixD pull(GetMeasurementDimension(), 1);
+    TMatrixD gain = _identity_matrix - K*H;
+    TMatrixD gainT(TMatrixD::kTransposed, gain);
+    TMatrixD gain_constant = K * V * KT;
 
-      TMatrixD gain = _identity_matrix - K*H;
-      TMatrixD gainT(TMatrixD::kTransposed, gain);// gainT.Transpose(gain);
-      TMatrixD gain_constant = K * V * KT;
+    TMatrixD temp_vec = predicted.GetVector() + K * pull.GetVector();
+    TMatrixD temp_cov = gain * predicted.GetCovariance() * gainT + gain_constant;
 
-      pull = data.GetVector() - measured.GetVector();
-
-      TMatrixD temp_vec = predicted.GetVector() + K * pull;
-      TMatrixD temp_cov = gain * predicted.GetCovariance() * gainT + gain_constant;
-
-      filtered.SetVector(temp_vec);
-      filtered.SetCovariance(temp_cov);
-    }
+    filtered.SetVector(temp_vec);
+    filtered.SetCovariance(temp_cov);
   }
 
   void TrackFit::_smooth(State& first, State& second) const {
@@ -263,35 +249,28 @@ namespace Kalman {
 
   void TrackFit::_inverse_filter(const State& data, const State& smoothed, State& cleaned) const {
     State measured = _measurement->Measure(smoothed);
+    State pull = CalculateResidual(data, measured);
     TMatrixD V = _measurement->GetMeasurementNoise();
+    TMatrixD H = _measurement->GetMeasurementMatrix();
+    TMatrixD HT(TMatrixD::kTransposed, H);
+
+    TMatrixD cov_inv(TMatrixD::kInverted, pull.GetCovariance());
+
     // THIS IS THE INVERSE FILTER LINE!
     V *= -1.0;
 
-    TMatrixD temp(GetMeasurementDimension(), GetMeasurementDimension());
-    TDecompLU lu(measured.GetCovariance());
-    if (!lu.Decompose() || !lu.Invert(temp)) {
-      cleaned = smoothed;
-    } else {
-      TMatrixD H = _measurement->GetMeasurementMatrix();
-      TMatrixD HT(TMatrixD::kTransposed, H);
+    TMatrixD K = smoothed.GetCovariance() * HT * cov_inv;
+    TMatrixD KT(TMatrixD::kTransposed, K);
 
-      TMatrixD K = smoothed.GetCovariance() * HT * temp;
-      TMatrixD KT(TMatrixD::kTransposed, K);
+    TMatrixD gain = _identity_matrix - K*H;
+    TMatrixD gainT(TMatrixD::kTransposed, gain);
+    TMatrixD gain_constant = K * V * KT;
 
-      TMatrixD pull(GetMeasurementDimension(), 1);
+    TMatrixD temp_vec = smoothed.GetVector() + K * pull.GetVector();
+    TMatrixD temp_cov = gain * smoothed.GetCovariance() * gainT + gain_constant;
 
-      TMatrixD gain = _identity_matrix - K*H;
-      TMatrixD gainT(TMatrixD::kTransposed, gain);
-      TMatrixD gain_constant = K * V * KT;
-
-      pull = data.GetVector() - measured.GetVector();
-
-      TMatrixD temp_vec = smoothed.GetVector() + K * pull;
-      TMatrixD temp_cov = gain * smoothed.GetCovariance() * gainT + gain_constant;
-
-      cleaned.SetVector(temp_vec);
-      cleaned.SetCovariance(temp_cov);
-    }
+    cleaned.SetVector(temp_vec);
+    cleaned.SetCovariance(temp_cov);
   }
 
 
