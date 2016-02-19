@@ -63,6 +63,8 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   std::vector<TH1F*> _histos;
   std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
+  TH1F *_hslabx_0, *_hslabx_1, *_hslabx_2;
+  TH1F *_hslaby_0, *_hslaby_1, *_hslaby_2;
   TH1F *_hspslabx_0, *_hspslabx_1, *_hspslabx_2;
   TH1F *_hspslaby_0, *_hspslaby_1, *_hspslaby_2;
   TH1F *_hnsp_0, *_hnsp_1, *_hnsp_2;
@@ -72,6 +74,7 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   TCanvas *_canv_tof_spslabx, *_canv_tof_spslaby;
   TCanvas *_canv_tof0_spxy, *_canv_tof1_spxy, *_canv_tof2_spxy;
   TCanvas *_canv_tof_nsp;
+  TCanvas *_canv_tof_slabx, *_canv_tof_slaby;
 };
 }
 

@@ -94,6 +94,20 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _h_tof12 = new TH1F("ht12", "TOF1->2;Time (ns);;", 200, 25, 45);
   _h_tof02 = new TH1F("ht02", "TOF0->2;Time (ns);;", 300, 50, 80);
 
+  _hslabx_0 = new TH1F("slabx0", "Slab Hits X-plane;SlabX;", 10, -0.5, 9.5);
+  _hslabx_0->SetLineColor(1);
+  _hslabx_1 = new TH1F("slabx1", "Slab Hits X-plane;SlabX;", 10, -0.5, 9.5);
+  _hslabx_1->SetLineColor(2);
+  _hslabx_2 = new TH1F("slabx2", "Slab Hits X-plane;SlabX;", 10, -0.5, 9.5);
+  _hslabx_2->SetLineColor(4);
+
+  _hslaby_0 = new TH1F("slaby0", "Slab Hits Y-plane;SlabY;", 10, -0.5, 9.5);
+  _hslaby_0->SetLineColor(1);
+  _hslaby_1 = new TH1F("slaby1", "Slab Hits Y-plane;SlabY;", 10, -0.5, 9.5);
+  _hslaby_1->SetLineColor(2);
+  _hslaby_2 = new TH1F("slaby2", "Slab Hits Y-plane;SlabY;", 10, -0.5, 9.5);
+  _hslaby_2->SetLineColor(4);
+
   _hspslabx_0 = new TH1F("spx0", "SpacePoints X-plane;SlabX;", 10, -0.5, 9.5);
   _hspslabx_0->SetLineColor(1);
   _hspslabx_1 = new TH1F("spx1", "SpacePoints X-plane;SlabX;", 10, -0.5, 9.5);
@@ -138,6 +152,12 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _histos.push_back(_hnsp_0);
   _histos.push_back(_hnsp_1);
   _histos.push_back(_hnsp_2);
+  _histos.push_back(_hslabx_0);
+  _histos.push_back(_hslabx_1);
+  _histos.push_back(_hslabx_2);
+  _histos.push_back(_hslaby_0);
+  _histos.push_back(_hslaby_1);
+  _histos.push_back(_hslaby_2);
 //  for (int s=0; s<3; ++s)
 //      _histos.push_back(_hspxy[s]);
 
@@ -151,6 +171,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _canv_tof1_spxy = new TCanvas("canv_tof1_spxy", "TOF1 Spacepoint Y:X", 1600, 1200);
   _canv_tof2_spxy = new TCanvas("canv_tof2_spxy", "TOF2 Spacepoint Y:X", 1600, 1200);
   _canv_tof_nsp = new TCanvas("canv_tof_nsp", "TOF #SpacePoints", 1600, 1200);
+  _canv_tof_slabx = new TCanvas("canv_tof_slabx", "TOF Horizontal(X) Slab", 1600, 1200);
+  _canv_tof_slaby = new TCanvas("canv_tof_slaby", "TOF Vertical(Y) Slab", 1600, 1200);
   _canvs.push_back(_canv_tof01);
   _canvs.push_back(_canv_tof12);
   _canvs.push_back(_canv_tof02);
@@ -160,6 +182,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _canvs.push_back(_canv_tof1_spxy);
   _canvs.push_back(_canv_tof2_spxy);
   _canvs.push_back(_canv_tof_nsp);
+  _canvs.push_back(_canv_tof_slabx);
+  _canvs.push_back(_canv_tof_slaby);
 
   // Add grid to all canvases.
   for (auto &canv:_canvs)
@@ -198,8 +222,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   spslabx_objs.push_back(_hspslabx_2);
   CanvasWrapper *cwrap_tof_spslabx = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_spslabx,
                                                     spslabx_objs,
-                                                    "TOF0SpX",
-                                                    "TOF0SpX"); // imageTOF<name> 
+                                                    "TOFSpX",
+                                                    "TOFSpX"); // imageTOF<name> 
 
   std::vector<TObject*> spslaby_objs;
   spslaby_objs.push_back(_hspslaby_0);
@@ -207,8 +231,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   spslaby_objs.push_back(_hspslaby_2);
   CanvasWrapper *cwrap_tof_spslaby = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_spslaby,
                                                     spslaby_objs,
-                                                    "TOF0SpY",
-                                                    "TOF0SpY"); // imageTOF<name> 
+                                                    "TOFSpY",
+                                                    "TOFSpY"); // imageTOF<name> 
   std::vector<TObject*> nsp_objs;
   nsp_objs.push_back(_hnsp_0);
   nsp_objs.push_back(_hnsp_1);
@@ -217,6 +241,22 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
                                                     nsp_objs,
                                                     "TOFnSp",
                                                     "TOFnSp"); // imageTOF<name> 
+  std::vector<TObject*> slabx_objs;
+  slabx_objs.push_back(_hslabx_0);
+  slabx_objs.push_back(_hslabx_1);
+  slabx_objs.push_back(_hslabx_2);
+  CanvasWrapper *cwrap_tof_slabx = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_slabx,
+                                                    slabx_objs,
+                                                    "TOFSlabX",
+                                                    "TOFSlabX"); // imageTOF<name> 
+  std::vector<TObject*> slaby_objs;
+  slaby_objs.push_back(_hslaby_0);
+  slaby_objs.push_back(_hslaby_1);
+  slaby_objs.push_back(_hslaby_2);
+  CanvasWrapper *cwrap_tof_slaby = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_slaby,
+                                                    slaby_objs,
+                                                    "TOFSlabY",
+                                                    "TOFSlabY"); // imageTOF<name> 
   this->reset();
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof01);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof12);
@@ -227,6 +267,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof1_spxy);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof2_spxy);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_nsp);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_slabx);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_slaby);
 }
 
 void ReduceCppTOFPlot::_death() {}
@@ -282,13 +324,46 @@ void ReduceCppTOFPlot::update() {
 
 void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
   MAUS::TOFEventSpacePoint *space_points = tof_event->GetTOFEventSpacePointPtr();
+  MAUS::TOFEventSlabHit *slab_hits = tof_event->GetTOFEventSlabHitPtr();
 
   TOF0SpacePointArray *sp_tof0 = space_points->GetTOF0SpacePointArrayPtr();
   TOF1SpacePointArray *sp_tof1 = space_points->GetTOF1SpacePointArrayPtr();
   TOF2SpacePointArray *sp_tof2 = space_points->GetTOF2SpacePointArrayPtr();
 
+  TOF0SlabHitArray *sh_tof0 = slab_hits->GetTOF0SlabHitArrayPtr();
+  TOF1SlabHitArray *sh_tof1 = slab_hits->GetTOF1SlabHitArrayPtr();
+  TOF2SlabHitArray *sh_tof2 = slab_hits->GetTOF2SlabHitArrayPtr();
+
   float t0(0), t1(0), t2(0);
   float spnt_x(0), spnt_y(0);
+
+  if (sh_tof0->size()) {
+    for (int s=0; s < sh_tof0->size(); ++s) {
+        TOFSlabHit tsh = sh_tof0->at(s);
+        if (tsh.IsVertical())
+            _hslaby_0->Fill(tsh.GetSlab());
+        else if (tsh.IsHorizontal())
+            _hslabx_0->Fill(tsh.GetSlab());
+    }
+  }
+  if (sh_tof1->size()) {
+    for (int s=0; s < sh_tof1->size(); ++s) {
+        TOFSlabHit tsh = sh_tof1->at(s);
+        if (tsh.IsVertical())
+            _hslaby_1->Fill(tsh.GetSlab());
+        else if (tsh.IsHorizontal())
+            _hslabx_1->Fill(tsh.GetSlab());
+    }
+  }
+  if (sh_tof2->size()) {
+    for (int s=0; s < sh_tof2->size(); ++s) {
+        TOFSlabHit tsh = sh_tof2->at(s);
+        if (tsh.IsVertical())
+            _hslaby_2->Fill(tsh.GetSlab());
+        else if (tsh.IsHorizontal())
+            _hslabx_2->Fill(tsh.GetSlab());
+    }
+  }
   if (sp_tof0->size()) {
     t0 = sp_tof0->at(0).GetTime();
     _hnsp_0->Fill(sp_tof0->size());
