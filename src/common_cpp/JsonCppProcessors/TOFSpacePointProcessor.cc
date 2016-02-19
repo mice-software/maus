@@ -55,6 +55,24 @@ TOFSpacePointProcessor::TOFSpacePointProcessor()
     RegisterValueBranch
           ("dt", &_dt_proc, &TOFSpacePoint::GetDt,
           &TOFSpacePoint::SetDt, true);
+    RegisterValueBranch
+          ("global_x", &_global_x_proc, &TOFSpacePoint::GetGlobalPosX,
+          &TOFSpacePoint::SetGlobalPosX, true);
+    RegisterValueBranch
+          ("global_y", &_global_y_proc, &TOFSpacePoint::GetGlobalPosY,
+          &TOFSpacePoint::SetGlobalPosY, true);
+    RegisterValueBranch
+          ("global_z", &_global_z_proc, &TOFSpacePoint::GetGlobalPosZ,
+          &TOFSpacePoint::SetGlobalPosZ, true);
+    RegisterValueBranch
+          ("global_x_err", &_global_x_err_proc, &TOFSpacePoint::GetGlobalPosXErr,
+          &TOFSpacePoint::SetGlobalPosXErr, true);
+    RegisterValueBranch
+          ("global_y_err", &_global_y_err_proc, &TOFSpacePoint::GetGlobalPosYErr,
+          &TOFSpacePoint::SetGlobalPosYErr, true);
+    RegisterValueBranch
+          ("global_z_err", &_global_z_err_proc, &TOFSpacePoint::GetGlobalPosZErr,
+          &TOFSpacePoint::SetGlobalPosZErr, true);
 }
 }  // namespace MAUS
 

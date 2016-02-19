@@ -678,15 +678,18 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
 #PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
-# Particle hypothesis used in Global PID when creating PDFs from MC data.
-# For PDFs to be produced, this must be set, preferably as the type of simulated particle
-# i.e. for a simulation of 200MeV/c muons, set flag to "200MeV_mu_plus"
-global_pid_hypothesis = ""
+# Tag used by both MapCppGlobalPID and ReduceCppGlobalPID, determines which PDFs to perform PID
+# against/which PDFs to produce (in this case, set based upon input MC beam). A typical tag here
+# would be the emittance and momentum, e.g. 3-140, 6-200, etc.
+pid_beam_setting = "6-200"
 # Unique identifier used when creating PDFs in Global PID to distinguish between PDFs for
 # the same hypothesis generated at different times. For PDFs to be produced, this must be set.
 # Any string can be used but date and time is recommended, by using python datetime module and
 # the line unique_identifier = (datetime.datetime.now()).strftime("%Y_%m_%dT%H_%M_%S_%f")
 unique_identifier = ""
+# Polarity of running mode, used by pid to select whether to run pid against positive or
+# negative particles, value can be positive or negative.
+pid_beamline_polarity = "positive"
 
 # Bounds set on values of PID variables when running PID
 pid_bounds = {
@@ -737,13 +740,20 @@ pid_config = "step_4"
 # exist. 'custom' allows user to choose which variables to use, and these should then be set as datacards.
 # However it is not recommended to use the custom setting unless you are the person currently developing
 # the Global PID.
-pid_mode = "online"
+pid_mode = "offline"
 # If pid_mode = "custom", variables to use should be set here as a space separated list, i.e.
 # custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
 custom_pid_set = "PIDVarB"
 # PID confidence level- set the margin (in %) between the confidence levels of competing pid hypotheses before they
 # are selected as the correct hypothesis
-pid_confidence_level = 5
+pid_confidence_level = 10
+# PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
+# setting to "all", or on all downstream tracks (set to "DS"), all upstream (set to "US"), through tracks (set to 
+# "Through"), or the upstream or downstream components of the throught track (set to "Through_US" or "Through_DS"
+# respectively). Or a combination of the above can be used, entered as a space separated list, e.g
+# "Through Through_US Through_DS"
+pid_track_selection = "Through"
+
 
 root_document_store_timeout = 10
 root_document_store_poll_time = 1
@@ -774,7 +784,8 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
 track_matching_pid_hypothesis = "all"
 
 # Global track matching tolerances (in mm) for the various subdetectors. KL only provides a
-# y coordinate, hence x does not need to be configurable.
+# y coordinate, hence x does not need to be configurable. EMR uses reconstructed error
+# so a multiplier is used.
 track_matching_tolerances = {
   "TOF0x":30.0,
   "TOF0y":30.0,
@@ -783,6 +794,8 @@ track_matching_tolerances = {
   "TOF2x":40.0,
   "TOF2y":40.0,
   "KLy":32.0,
+  "EMRx":1.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
+  "EMRy":1.0,
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
   "TOF12minSpeed":0.5,
 }
