@@ -309,11 +309,7 @@ std::vector<double> SciFiGeometryHelper::TransformStraightParamsToGlobal(
   // Calculate the global coordinates of the point at the ref. plane
   double z = GetPlanePosition(1, 1, 0);
   ThreeVector pos(x0, y0, z);
-
-  // Transform the point from local to global cooridinates (used to bring in offsets and rotations)
   ThreeVector global_pos = TransformPositionToGlobal(pos, tracker);
-  gx0 = global_pos.x();
-  gy0 = global_pos.y();
 
   // The gradients are rotated around the tracker centre
   ThreeVector grad(mzx, mzy, 1);
@@ -322,6 +318,10 @@ std::vector<double> SciFiGeometryHelper::TransformStraightParamsToGlobal(
 
   gmzx = grad.x()/grad.z();
   gmzy = grad.y()/grad.z();
+
+  // Calculate the y-intercepts at the z=0 (D2 in global coordinates)
+  gx0 = global_pos.x()-gmzx*global_pos.z();
+  gy0 = global_pos.y()-gmzy*global_pos.z();
 
   // Return the result as a vector
   std::vector<double> global_params{ gx0, gmzx, gy0, gmzy }; // NOLINT
