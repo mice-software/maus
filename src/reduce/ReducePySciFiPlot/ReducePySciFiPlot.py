@@ -106,23 +106,23 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         # init_histos.
 
         # Initializing static objects 
-        self.eff_cont={}
-        self.dig_ison=1   #digit counter
-        self.spp_ison=1   #space point counter
-        self.digitdict={}
+        self.eff_cont = {}
+        self.dig_ison = 1   #digit counter
+        self.spp_ison = 1   #space point counter
+        self.digitdict = {}
 
         #Initializing dynamic objects
-        self.trp_hist={} #triplet in channel
-        self.dig_hist={} #digit in channel
-        self.pos_hist={} #position
-        self.spt_hist={} #spacepoint triplets- position of triplets
-        self.spd_hist={} #spacepoint doublets
-        self.sum_hist={} #digit channel sum
-        self.npe_hist={} #triplet photoeletron-actual eletrons in fibre
-        self.spa_hist={} #spacepoint
-        self.sef_hist={} #number of triplets in an event
-        self.dub_hist={} #number of doublets in an event
-        self.eff_hist={} #space point type
+        self.trp_hist = {} #triplet in channel
+        self.dig_hist = {} #digit in channel
+        self.pos_hist = {} #position
+        self.spt_hist = {} #spacepoint triplets- position of triplets
+        self.spd_hist = {} #spacepoint doublets
+        self.sum_hist = {} #digit channel sum
+        self.npe_hist = {} #triplet photoeletron-actual eletrons in fibre
+        self.spa_hist = {} #spacepoint
+        self.sef_hist = {} #number of triplets in an event
+        self.dub_hist = {} #number of doublets in an event
+        self.eff_hist = {} #space point type
 
 
 
@@ -163,7 +163,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         if daq_evtype == "start_of_run" \
               or daq_evtype == "start_of_burst" \
               or daq_evtype == "end_of_burst":
-           data_spill = False
+            data_spill = False
 
         # Get SciFi digits & fill the relevant histograms.
         if data_spill and not self.get_SciFiDigits(spill): 
@@ -186,7 +186,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             return []
 
 
-    def get_SciFiDigits(self, spill_data):
+    def get_SciFiDigits(self, spill_data): #pylint: disable = R0914
 
         """
         Get the SciFiDigits and update the histograms.
@@ -216,56 +216,56 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             #records the tracker, station, plane, and channel of digit
             for di in range(len(digits)):
                 if True:
-                    tr=digits[di].get_tracker()
-                    st=digits[di].get_station()
-                    pl=digits[di].get_plane()
-                    ch=digits[di].get_channel()
+                    tr = digits[di].get_tracker()
+                    st = digits[di].get_station()
+                    pl = digits[di].get_plane()
+                    ch = digits[di].get_channel()
                     #name = self.digit_hist_name(tr, st, pl)
                     self.dig_hist[tr][st][pl].Fill(ch)
-                    if not tr in digitdict:
-                        digitdict[tr]={}
-                    if not st in digitdict[tr]:
-                        digitdict[tr][st]=[]
-                        digitdict[tr][st].append([pl,ch])
+                    if not tr in self.digitdict:
+                        self.digitdict[tr] = {}
+                    if not st in self.digitdict[tr]:
+                        self.digitdict[tr][st] = []
+                        self.digitdict[tr][st].append([pl, ch])
             #Takes the digit list and looks for channel sums
-            for tra in digitdict:
-                for sta in digitdict[tra]:
-                    dlist=digitdict[tra][sta]
-                    dsize=len(dlist)
-                    fill_flag=0 
-                    if dsize==3 and not dlist[0][0]==dlist[1][0] \
-                                and not dlist[0][0]==dlist[2][0] \
-                                and not dlist[1][0]==dlist[2][0]:
-                        sum=dlist[0][1]+dlist[1][1]+dlist[2][1]
-                        self.sum_hist[tra].Fill(float(sum))
+            for tra in self.digitdict:
+                for sta in self.digitdict[tra]:
+                    dlist = self.digitdict[tra][sta]
+                    dsize = len(dlist)
+                    fill_flag = 0 
+                    if dsize == 3 and not dlist[0][0] == dlist[1][0] \
+                                  and not dlist[0][0] == dlist[2][0] \
+                                  and not dlist[1][0] == dlist[2][0]:
+                        kunsum = dlist[0][1]+dlist[1][1]+dlist[2][1]
+                        self.sum_hist[tra].Fill(float(kunsum))
                         continue
-                    elif dsize==3:
-                        sum=-1
-                        self.sum_hist[tra].Fill(float(sum))
+                    elif dsize == 3:
+                        kunsum = -1
+                        self.sum_hist[tra].Fill(float(kunsum))
                         continue
-                    if dsize<3:
-                        sum=-1
-                        self.sum_hist[tra].Fill(float(sum))
+                    if dsize < 3:
+                        kunsum = -1
+                        self.sum_hist[tra].Fill(float(kunsum))
                         continue
-                    if dsize>3:
+                    if dsize > 3:
                         for a in range(dsize):
                             for b in range(dsize):
                                 for c in range(dsize):
-                                    if a==b or a==c or b==c:
+                                    if a == b or a == c or b == c:
                                         continue
-                                    sum=dlist[a][1]+dlist[b][1]+dlist[c][1]
-                                    if sum > 317 and sum < 320:
-                                        self.sum_hist[tra].Fill(float(sum))
-                                        fill_flag=1
-                                    if fill_flag==0:
-                                        sum=641
-                                        self.sum_hist[tra].Fill(float(sum))
+                                    kunsum = dlist[a][1]+dlist[b][1]+dlist[c][1]
+                                    if kunsum > 317 and kunsum < 320:
+                                        self.sum_hist[tra].Fill(float(kunsum))
+                                        fill_flag = 1
+                                    if fill_flag  == 0:
+                                        kunsum = 641
+                                        self.sum_hist[tra].Fill(float(kunsum))
                                         continue
 
         return True
 
     # Gives information on reconstruction efficiency
-    def get_SciFiSpacepoints(self, spill_data):
+    def get_SciFiSpacepoints(self, spill_data):  #pylint: disable = R0914
 
         """
         Get the SciFiDigits and update the histograms.
@@ -291,8 +291,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
             spill = spill_data.GetSpill()
             title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
-            tkcnt = {0:0,1:0}
-            tkcnd = {0:0,1:0}
+            tkcnt = {0:0, 1:0}
+            tkcnd = {0:0, 1:0}
             sp_pos = {}
             for sp in range(SciFiSpacepoints.size()):
                 tr = SciFiSpacepoints[sp].get_tracker()
@@ -300,7 +300,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 x  = SciFiSpacepoints[sp].get_position().x()
                 y  = SciFiSpacepoints[sp].get_position().y()
                 z  = SciFiSpacepoints[sp].get_position().z()
-                type = SciFiSpacepoints[sp].get_type()
+                sptype = SciFiSpacepoints[sp].get_type()
                 if not tr in sp_pos:
                     sp_pos[tr]      = {}
                     sp_pos[tr]["x"] = []
@@ -312,25 +312,25 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 sp_pos[tr]["y"].append(y)
                 sp_pos[tr]["z"].append(z)
                 sp_pos[tr]["s"].append(st)
-                sp_pos[tr]["t"].append(ty)
-                if type == "triplet":
+                sp_pos[tr]["t"].append(sptype)
+                if sptype == "triplet":
                     n_type = 3
                     pe = SciFiSpacepoints[sp].get_npe()
-                    for ch in range (0,3):
-                        channel=SciFiSpacepoints[sp].get_channels()[ch]
-                        c_pl=channel.get_plane()
-                        c_ch=channel.get_channel()
+                    for ch in range (0, 3):
+                        channel = SciFiSpacepoints[sp].get_channels()[ch]
+                        c_pl = channel.get_plane()
+                        c_ch = channel.get_channel()
                         self.trp_hist[tr][st][c_pl].Fill(c_ch)
                     self.npe_hist[tr].Fill(pe)
-                    tkcnt[tr]+=1
+                    tkcnt[tr] += 1
                 else:
                     n_type = 2
-                    tkcnd[tr]+=1
+                    tkcnd[tr] += 1
                 self.eff_plot.Fill(n_type)
                 self.eff_hist[tr][st].Fill(n_type)
                 self.spa_hist[tr].Fill(st)      
                 if not tr in self.eff_cont:
-                    self.eff_cont[tr]={}
+                    self.eff_cont[tr] = {}
                 if not st in self.eff_cont[tr]:
                     self.eff_cont[tr][st] = []
                 self.eff_cont[tr][st].append(n_type)
@@ -347,32 +347,34 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                         q_flag = 0
                     if sp_pos[tra]["t"][si] == "duplet":
                         q_flag = 0
-                        self.spd_hist[tra][sp_pos[tra]["s"][si]].Fill(sp_pos[tra]["x"][si],sp_pos[tra]["y"][si])
+                        self.spd_hist[tra][sp_pos[tra]["s"][si]].Fill(sp_pos[tra]["x"][si], sp_pos[tra]["y"][si])
                 for ps in range(len(sp_pos[tra]["z"])):
                     if sp_pos[tra]["t"][ps] == "triplet":
-                        self.spt_hist[tra][sp_pos[tra]["s"][ps]].Fill(sp_pos[tra]["x"][ps],sp_pos[tra]["y"][ps])
+                        self.spt_hist[tra][sp_pos[tra]["s"][ps]].Fill(sp_pos[tra]["x"][ps], sp_pos[tra]["y"][ps])
 
         return True
 
     def Spc2(self, DubVsTrip):
-    #Sorts spacepoints into triplets and duplets
+        """
+        Sorts spacepoints into triplets and duplets
+        """
         for sp in range(len(DubVsTrip)):
-            type = DubVsTrip[sp].get_type()
-            if type == "triplet":
+            sptype = DubVsTrip[sp].get_type()
+            if sptype == "triplet":
                 m_type = 3
                 tracker = DubVsTrip[sp].get_tracker()
                 station = DubVsTrip[sp].get_station()
-                if tracker==0:
+                if tracker == 0:
                     self.track1_3Clus.Fill(station)
-                if tracker==1:
+                if tracker == 1:
                     self.track2_3Clus.Fill(station)
             else:
                 m_type = 2
                 tracker = DubVsTrip[sp].get_tracker()
                 station = DubVsTrip[sp].get_station()
-                if tracker==0:
+                if tracker == 0:
                     self.track1_2Clus.Fill(station)
-                if tracker==1:
+                if tracker == 1:
                     self.track2_2Clus.Fill(station)
 
         return True
@@ -391,105 +393,105 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         #sensible colour palette
         self.style = ROOT.gStyle.SetPalette(1)
 
-        self.eff_plot=ROOT.TH1D("SP_Type","Space Point Type Across All Stations", 3, 1, 4)
-        self.sp_tr_up=ROOT.TH1D("Tr1pStSp","Space Points in TkU per Station",7,0,6) #upstream tracker
+        self.eff_plot = ROOT.TH1D("SP_Type", "Space Point Type Across All Stations", 3, 1, 4)
+        self.sp_tr_up = ROOT.TH1D("Tr1pStSp", "Space Points in TkU per Station", 7, 0, 6) #upstream tracker
         self.sp_tr_up.GetXaxis().SetTitle("Station Number ") 
         self.sp_tr_up.GetXaxis().CenterTitle()
-        self.sp_tr_dn=ROOT.TH1D("Tr2pStSp","Space Points in TkD per Station",7,0,6) #downstream tracker
+        self.sp_tr_dn = ROOT.TH1D("Tr2pStSp", "Space Points in TkD per Station", 7, 0, 6) #downstream tracker
         self.sp_tr_dn.GetXaxis().SetTitle("Station Number ") 
         self.sp_tr_dn.GetXaxis().CenterTitle()
                        
-        self.track1_2Clus=ROOT.TH1D("Tr1pStSp","Space Points (2 Clusters) in Tracker1 per Station",7,0,6)
+        self.track1_2Clus = ROOT.TH1D("Tr1pStSp", "Space Points (2 Clusters) in Tracker1 per Station", 7, 0, 6)
         self.track1_2Clus.GetXaxis().SetTitle("Station Number ") 
         self.track1_2Clus.GetXaxis().CenterTitle()
-        self.track2_2Clus=ROOT.TH1D("Tr2pStSp","Space Points (2 Clusters) in Tracker2 per Station",7,0,6)
+        self.track2_2Clus = ROOT.TH1D("Tr2pStSp", "Space Points (2 Clusters) in Tracker2 per Station", 7, 0, 6)
         self.track2_2Clus.GetXaxis().SetTitle("Station Number ") 
         self.track2_2Clus.GetXaxis().CenterTitle()
-        self.track1_3Clus=ROOT.TH1D("Tr1pStSp","Space Points (3 Clusters) in Tracker1 per Station",7,0,6)
+        self.track1_3Clus = ROOT.TH1D("Tr1pStSp", "Space Points (3 Clusters) in Tracker1 per Station", 7, 0, 6)
         self.track1_3Clus.GetXaxis().SetTitle("Station Number ") 
         self.track1_3Clus.GetXaxis().CenterTitle()
-        self.track2_3Clus=ROOT.TH1D("Tr2pStSp","Space Points (3 Clusters) in Tracker2 per Stacdtion",7,0,6)
+        self.track2_3Clus = ROOT.TH1D("Tr2pStSp", "Space Points (3 Clusters) in Tracker2 per Stacdtion", 7, 0, 6)
         self.track2_3Clus.GetXaxis().SetTitle("Station Number ") 
         self.track2_3Clus.GetXaxis().CenterTitle()
    
-        for tr in range(0,2):
-          self.trp_hist[tr]={} #create two empty dict each for tracker up and down
-          self.dig_hist[tr]={} 
-          self.pos_hist[tr]={}
-          self.spt_hist[tr]={}    
-          self.spd_hist[tr]={} 
-          self.eff_hist[tr]={}
-          if tr == 0:
-            trs = "U"
-          if tr == 1:
-            trs = "D"
-          sum_name="Ch_Sum%s" %(trs)
-          sum_titl="Digit Channel Sum Tk%s" %(trs)    
-          self.sum_hist[tr]=ROOT.TH1F(sum_name,sum_titl, 670,-5,642)
-          self.sum_hist[tr].GetXaxis().SetTitle("Channel Number")
-          self.sum_hist[tr].GetXaxis().CenterTitle()
-          npe_name="PE_Trp%s" %(trs)
-          npe_titl="Triplet PE Tk%s" %(trs)
-          self.npe_hist[tr]=ROOT.TH1D(npe_name,npe_titl,25,5,150)
-          spa_name="SP_Tk%s" %(trs)
-          spa_titl="Space Points per Station Tk%s" %(trs)
-          self.spa_hist[tr]=ROOT.TH1D(spa_name,spa_titl,7,0,6)
-          self.spa_hist[tr].GetXaxis().SetTitle("Station Number")
-          self.spa_hist[tr].GetXaxis().CenterTitle()
-          sef_name="SE_Tk%s" %(trs)
-          sef_titl="Number of Triplets in an Event Tk%s" %(trs)
-          self.sef_hist[tr]=ROOT.TH1D(sef_name,sef_titl,7,0,6)
-          self.sef_hist[tr].GetXaxis().SetTitle("Station Number")
-          self.sef_hist[tr].GetXaxis().CenterTitle()
-          sef_name="SE_Tk%s" %(trs)
-          sef_titl="Number of Doublets in an Event Tk%s" %(trs)
-          self.dub_hist[tr]=ROOT.TH1D(sef_name,sef_titl,7,0,6)
-          self.dub_hist[tr].GetXaxis().SetTitle("Station Number")
-          self.dub_hist[tr].GetXaxis().CenterTitle()
+        for tr in range(0, 2):
+            self.trp_hist[tr] = {} #create two empty dict each for tracker up and down
+            self.dig_hist[tr] = {} 
+            self.pos_hist[tr] = {}
+            self.spt_hist[tr] = {}    
+            self.spd_hist[tr] = {} 
+            self.eff_hist[tr] = {}
+            if tr == 0:
+                trs = "U"
+            if tr == 1:
+                trs = "D"
+            sum_name = "Ch_Sum%s" % (trs) 
+            sum_titl = "Digit Channel Sum Tk%s" % (trs)    
+            self.sum_hist[tr] = ROOT.TH1F(sum_name, sum_titl, 670, -5, 642)
+            self.sum_hist[tr].GetXaxis().SetTitle("Channel Number")
+            self.sum_hist[tr].GetXaxis().CenterTitle()
+            npe_name = "PE_Trp%s" % (trs)
+            npe_titl = "Triplet PE Tk%s" % (trs)
+            self.npe_hist[tr] = ROOT.TH1D(npe_name, npe_titl, 25, 5, 150)
+            spa_name = "SP_Tk%s" % (trs)
+            spa_titl = "Space Points per Station Tk%s" % (trs)
+            self.spa_hist[tr] = ROOT.TH1D(spa_name, spa_titl, 7 , 0, 6)
+            self.spa_hist[tr].GetXaxis().SetTitle("Station Number")
+            self.spa_hist[tr].GetXaxis().CenterTitle()
+            sef_name = "SE_Tk%s" % (trs)
+            sef_titl = "Number of Triplets in an Event Tk%s" % (trs)
+            self.sef_hist[tr] = ROOT.TH1D(sef_name, sef_titl, 7, 0, 6)
+            self.sef_hist[tr].GetXaxis().SetTitle("Station Number")
+            self.sef_hist[tr].GetXaxis().CenterTitle()
+            sef_name = "SE_Tk%s" % (trs)
+            sef_titl = "Number of Doublets in an Event Tk%s" % (trs)
+            self.dub_hist[tr] = ROOT.TH1D(sef_name, sef_titl, 7, 0, 6)
+            self.dub_hist[tr].GetXaxis().SetTitle("Station Number")
+            self.dub_hist[tr].GetXaxis().CenterTitle()
 
-          for st in range(1,6): #within each tracker create 5 stations
-              self.trp_hist[tr][st]={} #{{{}}}
-              self.dig_hist[tr][st]={}
-              eff_name="Ef_Tk%s%d" %(trs,st)
-              eff_titl="Space Point Type Tk%s S%d" %(trs,st)
-              self.eff_hist[tr][st]=ROOT.TH1D(eff_name,eff_titl,3,1,4)
-              pos_name="PS_Tk%s%d" %(trs,st)
-              pos_titl="Tracker Offset Tk%s S%d" %(trs,st)
-              self.pos_hist[tr][st]=ROOT.TH1D(pos_name,pos_titl,210,-200,200)
-              spt_name="SP_Pos%s%d" %(trs,st)
-              spt_titl="Space Point Triplets Tk%s S%d" %(trs,st)
-              self.spt_hist[tr][st]=ROOT.TH2D(spt_name,spt_titl,50,-200,200,50,-200,200)
-              self.spt_hist[tr][st].GetYaxis().SetTitle("y Position (mm)") 
-              self.spt_hist[tr][st].GetXaxis().SetTitle("x Position (mm)")    
-              self.spt_hist[tr][st].GetYaxis().CenterTitle()
-              self.spt_hist[tr][st].GetXaxis().CenterTitle()
-              spt_name="SP_Pos%s%d" %(trs,st)
-              spt_titl="Space Point Doublets Tk%s S%d" %(trs,st)
-              self.spd_hist[tr][st]=ROOT.TH2D(spt_name,spt_titl,50,-200,200,50,-200,200)
-              self.spd_hist[tr][st].GetYaxis().SetTitle("y Position (mm)")
-              self.spd_hist[tr][st].GetXaxis().SetTitle("x Position (mm)")
-              self.spd_hist[tr][st].GetYaxis().CenterTitle()
-              self.spd_hist[tr][st].GetXaxis().CenterTitle()
+            for st in range(1, 6): #within each tracker create 5 stations
+                self.trp_hist[tr][st] = {} #{{{}}}
+                self.dig_hist[tr][st] = {}
+                eff_name = "Ef_Tk%s%d" % (trs, st)
+                eff_titl = "Space Point Type Tk%s S%d" % (trs, st)
+                self.eff_hist[tr][st] = ROOT.TH1D(eff_name, eff_titl, 3, 1, 4)
+                pos_name = "PS_Tk%s%d" % (trs, st)
+                pos_titl = "Tracker Offset Tk%s S%d" % (trs, st)
+                self.pos_hist[tr][st] = ROOT.TH1D(pos_name, pos_titl, 210, -200, 200)
+                spt_name = "SP_Pos%s%d" % (trs, st)
+                spt_titl = "Space Point Triplets Tk%s S%d" % (trs, st)
+                self.spt_hist[tr][st] = ROOT.TH2D(spt_name, spt_titl, 50, -200, 200, 50, -200, 200)
+                self.spt_hist[tr][st].GetYaxis().SetTitle("y Position (mm)") 
+                self.spt_hist[tr][st].GetXaxis().SetTitle("x Position (mm)")    
+                self.spt_hist[tr][st].GetYaxis().CenterTitle()
+                self.spt_hist[tr][st].GetXaxis().CenterTitle()
+                spt_name = "SP_Pos%s%d" % (trs, st)
+                spt_titl = "Space Point Doublets Tk%s S%d" % (trs, st)
+                self.spd_hist[tr][st] = ROOT.TH2D(spt_name, spt_titl, 50, -200, 200, 50, -200, 200)
+                self.spd_hist[tr][st].GetYaxis().SetTitle("y Position (mm)")
+                self.spd_hist[tr][st].GetXaxis().SetTitle("x Position (mm)")
+                self.spd_hist[tr][st].GetYaxis().CenterTitle()
+                self.spd_hist[tr][st].GetXaxis().CenterTitle()
 
-              for pl in range(0,3): #create 3 planes in each stations, draw histogram for each of them
-                  trp_name="TC_Tk%s%d%d" %(trs,st,pl)
-                  trp_titl="Triplets in Channel Tk%s S%d P%d" %(trs,st,pl)
-                  self.trp_hist[tr][st][pl]=ROOT.TH1D(trp_name,trp_titl,218,0,215)
-                  self.trp_hist[tr][st][pl].GetXaxis().SetTitle("Channel Number")
-                  self.trp_hist[tr][st][pl].GetXaxis().CenterTitle()  
-                  dig_name="DC_Tk%s%d%d" %(trs,st,pl)
-                  dig_titl="Digits in Channel Tk%s S%d P%d" %(trs,st,pl)
-                  self.dig_hist[tr][st][pl]=ROOT.TH1D(dig_name,dig_titl,215,0,215)
-                  self.dig_hist[tr][st][pl].GetXaxis().SetTitle("Channel Number")
-                  self.dig_hist[tr][st][pl].GetXaxis().CenterTitle()
+                for pl in range(0, 3): #create 3 planes in each stations, draw histogram for each of them
+                    trp_name = "TC_Tk%s%d%d" % (trs, st, pl)
+                    trp_titl = "Triplets in Channel Tk%s S%d P%d" % (trs, st, pl)
+                    self.trp_hist[tr][st][pl] = ROOT.TH1D(trp_name, trp_titl, 218, 0, 215)
+                    self.trp_hist[tr][st][pl].GetXaxis().SetTitle("Channel Number")
+                    self.trp_hist[tr][st][pl].GetXaxis().CenterTitle()  
+                    dig_name = "DC_Tk%s%d%d" % (trs, st, pl)
+                    dig_titl = "Digits in Channel Tk%s S%d P%d" % (trs, st, pl)
+                    self.dig_hist[tr][st][pl] = ROOT.TH1D(dig_name, dig_titl, 215, 0, 215)
+                    self.dig_hist[tr][st][pl].GetXaxis().SetTitle("Channel Number")
+                    self.dig_hist[tr][st][pl].GetXaxis().CenterTitle()
        
         # Create canvases
         # Draw() of histos has to be done only once
         # for updating the histograms, just Modified() and Update() on canvases
         # the update/refresh is done in update_histos()
 
-        self.canvas_SciFiDigitUS = ROOT.TCanvas("Digit_in_Channel_US","Digit_in_Channel_US",900, 900)
-        self.canvas_SciFiDigitUS.Divide(3,5)
+        self.canvas_SciFiDigitUS = ROOT.TCanvas("Digit_in_Channel_US", "Digit_in_Channel_US", 900, 900)
+        self.canvas_SciFiDigitUS.Divide(3, 5)
         self.canvas_SciFiDigitUS.cd(1)
         self.dig_hist[0][1][0].Draw() 
         self.canvas_SciFiDigitUS.cd(2)
@@ -522,8 +524,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.dig_hist[0][5][2].Draw()
     
 
-        self.canvas_SciFiDigitDS = ROOT.TCanvas("Digit_in_Channel_DS","Digit_in_Channel_DS",900, 900)
-        self.canvas_SciFiDigitDS.Divide(3,5)
+        self.canvas_SciFiDigitDS = ROOT.TCanvas("Digit_in_Channel_DS", "Digit_in_Channel_DS", 900, 900)
+        self.canvas_SciFiDigitDS.Divide(3, 5)
         self.canvas_SciFiDigitDS.cd(1)
         self.dig_hist[1][1][0].Draw()
         self.canvas_SciFiDigitDS.cd(2)
@@ -556,8 +558,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.dig_hist[1][5][2].Draw()
       
 
-        self.canvas_SciFiSpacepoints = ROOT.TCanvas("Spacepoint_Types_in_Stations","Spacepoint_Types_in_Stations", 800, 600)
-        self.canvas_SciFiSpacepoints.Divide(3,2)
+        self.canvas_SciFiSpacepoints = ROOT.TCanvas("Spacepoint_Types_in_Stations", "Spacepoint_Types_in_Stations", 800, 600)
+        self.canvas_SciFiSpacepoints.Divide(3, 2)
         self.canvas_SciFiSpacepoints.cd(1)
         self.eff_plot.Draw()
         self.canvas_SciFiSpacepoints.cd(2)
@@ -569,8 +571,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_SciFiSpacepoints.cd(5)
         self.track2_2Clus.Draw()
     
-        self.canvas_US_trip = ROOT.TCanvas("Spacepoint_Triplets_Up","Spacepoint_Triplets_Up",900, 600)
-        self.canvas_US_trip.Divide(3,2)
+        self.canvas_US_trip = ROOT.TCanvas("Spacepoint_Triplets_Up", "Spacepoint_Triplets_Up", 900, 600)
+        self.canvas_US_trip.Divide(3, 2)
         self.canvas_US_trip.cd(1)
         self.spt_hist[0][1].Draw("COL")
         self.canvas_US_trip.cd(2)
@@ -582,8 +584,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_US_trip.cd(5)
         self.spt_hist[0][5].Draw("COL")
       
-        self.canvas_US_doub = ROOT.TCanvas("Spacepoint_Triplets_Down","Spacepoint_Triplets_Down",900, 600)
-        self.canvas_US_doub.Divide(3,2)
+        self.canvas_US_doub = ROOT.TCanvas("Spacepoint_Triplets_Down", "Spacepoint_Triplets_Down", 900, 600)
+        self.canvas_US_doub.Divide(3, 2)
         self.canvas_US_doub.cd(1)
         self.spt_hist[1][1].Draw("COL")
         self.canvas_US_doub.cd(2)
@@ -596,8 +598,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.spt_hist[1][5].Draw("COL")
 
    
-        self.canvas_DS_trip = ROOT.TCanvas("Spacepoint_Doublets_Up","Spacepoint_Doublets_Up",900, 600)
-        self.canvas_DS_trip.Divide(3,2)
+        self.canvas_DS_trip = ROOT.TCanvas("Spacepoint_Doublets_Up", "Spacepoint_Doublets_Up", 900, 600)
+        self.canvas_DS_trip.Divide(3, 2)
         self.canvas_DS_trip.cd(1)
         self.spd_hist[0][1].Draw("COL")
         self.canvas_DS_trip.cd(2)
@@ -609,8 +611,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_DS_trip.cd(5)
         self.spd_hist[0][5].Draw("COL")
       
-        self.canvas_DS_doub = ROOT.TCanvas("Spacepoint_Doublets_Down","Spacepoint_Doublets_Down",900, 600)
-        self.canvas_DS_doub.Divide(3,2)  
+        self.canvas_DS_doub = ROOT.TCanvas("Spacepoint_Doublets_Down", "Spacepoint_Doublets_Down", 900, 600)
+        self.canvas_DS_doub.Divide(3, 2)  
         self.canvas_DS_doub.cd(1)
         self.spd_hist[1][1].Draw("COL")
         self.canvas_DS_doub.cd(2)
@@ -622,8 +624,8 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.canvas_DS_doub.cd(5)
         self.spd_hist[1][5].Draw("COL")
 
-        self.KunoCanv = ROOT.TCanvas("Kuno Plots","Kuno Plots", 800, 600)
-        self.KunoCanv.Divide(2,1)
+        self.KunoCanv = ROOT.TCanvas("Kuno Plots", "Kuno Plots", 800, 600)
+        self.KunoCanv.Divide(2, 1)
         self.KunoCanv.cd(1)
         self.sum_hist[0].Draw()
         self.KunoCanv.cd(2)
