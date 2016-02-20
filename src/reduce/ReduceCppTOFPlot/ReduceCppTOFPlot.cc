@@ -153,6 +153,12 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
       }
     }
   }
+  _htof0_nspVspill = new TH1F("htof0nspVspill", "TOF0 #spacepoints vs spill;Spill;# Spacepoints;", 5000, 1., 0.);
+  _htof0_nspVspill->SetBit(TH1::kCanRebin);
+  _htof1_nspVspill = new TH1F("htof1nspVspill", "TOF0 #spacepoints vs spill;Spill;# Spacepoints;", 5000, 1., 0.);
+  _htof1_nspVspill->SetBit(TH1::kCanRebin);
+  _htof2_nspVspill = new TH1F("htof2nspVspill", "TOF0 #spacepoints vs spill;Spill;# Spacepoints;", 5000, 1., 0.);
+  _htof2_nspVspill->SetBit(TH1::kCanRebin);
   _histos.push_back(_h_tof01);
   _histos.push_back(_h_tof12);
   _histos.push_back(_h_tof02);
@@ -171,6 +177,9 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _histos.push_back(_hslaby_0);
   _histos.push_back(_hslaby_1);
   _histos.push_back(_hslaby_2);
+  _histos.push_back(_htof0_nspVspill);
+  _histos.push_back(_htof1_nspVspill);
+  _histos.push_back(_htof2_nspVspill);
 //  for (int s=0; s<3; ++s)
 //      _histos.push_back(_hspxy[s]);
 
@@ -190,6 +199,9 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _canv_tof_pm0pln1 = new TCanvas("canv_tof_pm0pln1", "TOF Pmt0 Plane1", 1600, 1200);
   _canv_tof_pm1pln0 = new TCanvas("canv_tof_pm1pln0", "TOF Pmt1 Plane0", 1600, 1200);
   _canv_tof_pm1pln1 = new TCanvas("canv_tof_pm1pln1", "TOF Pmt1 Plane1", 1600, 1200);
+  _canv_tof0_nspVspill = new TCanvas("canv_tof0_nspVspill", "TOF0 #spacepoints vs spill", 1600, 1200);
+  _canv_tof1_nspVspill = new TCanvas("canv_tof1_nspVspill", "TOF1 #spacepoints vs spill", 1600, 1200);
+  _canv_tof2_nspVspill = new TCanvas("canv_tof2_nspVspill", "TOF2 #spacepoints vs spill", 1600, 1200);
   _canvs.push_back(_canv_tof01);
   _canvs.push_back(_canv_tof12);
   _canvs.push_back(_canv_tof02);
@@ -320,6 +332,16 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
               sprintf(tistr, "TOFPmt%dPlane%d", pm, pl);
   }
   */
+  CanvasWrapper *cwrap_tof0_nspVspill = ReduceCppTools::get_canvas_wrapper(_canv_tof0_nspVspill,
+                                                    		  _htof0_nspVspill,
+						    		  "TOF0nSpVsSpill");
+
+  CanvasWrapper *cwrap_tof1_nspVspill = ReduceCppTools::get_canvas_wrapper(_canv_tof1_nspVspill,
+                                                    		  _htof1_nspVspill,
+						    		  "TOF1nSpVsSpill");
+  CanvasWrapper *cwrap_tof2_nspVspill = ReduceCppTools::get_canvas_wrapper(_canv_tof2_nspVspill,
+                                                    		  _htof2_nspVspill,
+						    		  "TOF2nSpVsSpill");
   this->reset();
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof01);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof12);
@@ -336,6 +358,9 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_pm0pln1);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_pm1pln0);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_pm1pln1);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof0_nspVspill);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof1_nspVspill);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof2_nspVspill);
   /*
   for (int pm=0; pm < 2; ++pm)
       for (int pl=0; pl < 2; ++pl)
@@ -471,6 +496,8 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
   if (sp_tof0->size()) {
     t0 = sp_tof0->at(0).GetTime();
     _hnsp_0->Fill(sp_tof0->size());
+    int spillnum = sp_tof0->at(0).GetPhysEventNumber();
+    _htof0_nspVspill->Fill(spillnum, sp_tof0->size());
     for (int s=0; s < sp_tof0->size(); ++s) {
         TOFSpacePoint tsp = sp_tof0->at(s);
         spnt_x = tsp.GetSlabx();
@@ -485,6 +512,8 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
   if (sp_tof1->size()) {
     t1 = sp_tof1->at(0).GetTime();
     _hnsp_1->Fill(sp_tof1->size());
+    int spillnum = sp_tof1->at(0).GetPhysEventNumber();
+    _htof1_nspVspill->Fill(spillnum, sp_tof1->size());
     for (int s=0; s < sp_tof1->size(); ++s) {
         TOFSpacePoint tsp = sp_tof1->at(s);
         spnt_x = tsp.GetSlabx();
@@ -498,6 +527,8 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
   if (sp_tof2->size()) {
     t2 = sp_tof2->at(0).GetTime();
     _hnsp_2->Fill(sp_tof2->size());
+    int spillnum = sp_tof2->at(0).GetPhysEventNumber();
+    _htof2_nspVspill->Fill(spillnum, sp_tof2->size());
     for (int s=0; s < sp_tof2->size(); ++s) {
         TOFSpacePoint tsp = sp_tof2->at(s);
         spnt_x = tsp.GetSlabx();

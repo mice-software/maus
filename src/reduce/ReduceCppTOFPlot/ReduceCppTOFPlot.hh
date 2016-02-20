@@ -71,6 +71,7 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   TH1F *_hnsp_0, *_hnsp_1, *_hnsp_2;
   TH2F *_hspxy[3];
   TH2F *_hspxy_0, *_hspxy_1, *_hspxy_2;
+  TH1F *_htof0_nspVspill, *_htof1_nspVspill, *_htof2_nspVspill;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
   TCanvas *_canv_tof_spslabx, *_canv_tof_spslaby;
   TCanvas *_canv_tof0_spxy, *_canv_tof1_spxy, *_canv_tof2_spxy;
@@ -78,6 +79,7 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   TCanvas *_canv_tof_slabx, *_canv_tof_slaby;
   TCanvas *_canv_tof_pm0pln0, *_canv_tof_pm0pln1;
   TCanvas *_canv_tof_pm1pln0, *_canv_tof_pm1pln1;
+  TCanvas *_canv_tof0_nspVspill, *_canv_tof1_nspVspill, *_canv_tof2_nspVspill;
 };
 }
 
