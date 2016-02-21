@@ -82,13 +82,10 @@ namespace MAUS {
     _make_spacepoints = (*json)["SciFiTestVirtualMakeSpacepoints"].asBool();
 
     _spacepoint_plane_num = 0;
-
-//    _helix_measure = new SciFiHelicalMeasurements(&_geometry_helper);
   }
 
 
   void MapCppTrackerVirtualsDigitization::_death() {
-//    delete _helix_measure;
   }
 
   void MapCppTrackerVirtualsDigitization::_process(MAUS::Data* data) const {
@@ -243,6 +240,7 @@ namespace MAUS {
           spoint->set_station(station);
           spoint->set_npe(10);
           spoint->set_position(position);
+          spoint->set_global_position(position);
 
           if (_make_clusters) {
             for ( int plane = 0; plane < 3; ++plane ) {
@@ -401,23 +399,26 @@ namespace MAUS {
           int id = plIt->first;
           station = ((abs(id)-1) / 3) + 1;
           plane = (abs(id) - 1) % 3;
+          if ( plane != 1 ) continue;
 
           if (fabs(geo.GlobalPosition.z() - position.z()) < _assignment_tolerance) {
+            ThreeVector spoint_pos = position;
 
-            position *= tracker_rotation;
-            position.setZ(geo.Position.z());
+            spoint_pos *= tracker_rotation;
+            spoint_pos.setZ(geo.Position.z());
 
             double smear_x = CLHEP::RandGauss::shoot(0.0, _smear_value);
             double smear_y = CLHEP::RandGauss::shoot(0.0, _smear_value);
-            position.SetX(position.x() + smear_x);
-            position.SetY(position.y() + smear_y);
+            spoint_pos.SetX(spoint_pos.x() + smear_x);
+            spoint_pos.SetY(spoint_pos.y() + smear_y);
 
             SciFiSpacePoint* spoint = new SciFiSpacePoint();
 
             spoint->set_tracker(tracker);
             spoint->set_station(station);
             spoint->set_npe(10);
-            spoint->set_position(position);
+            spoint->set_position(spoint_pos);
+            spoint->set_global_position(position);
 
             spacepoints.push_back(spoint);
 

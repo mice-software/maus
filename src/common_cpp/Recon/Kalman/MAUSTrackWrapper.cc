@@ -351,9 +351,10 @@ namespace MAUS {
       // TODO
       // CHARGE!
       if (data_state) {
-        new_point->set_pull(fitter->CalculatePull(i).GetVector()(0, 0));
-        new_point->set_residual(fitter->CalculateFilteredResidual(i).GetVector()(0, 0));
-        new_point->set_smoothed_residual(fitter->CalculateSmoothedResidual(i).GetVector()(0, 0));
+        new_point->set_pull(sqrt(fitter->CalculatePull(i).GetVector().E2Norm()));
+        new_point->set_residual(sqrt(fitter->CalculateFilteredResidual(i).GetVector().E2Norm()));
+        new_point->set_smoothed_residual(
+          sqrt(fitter->CalculateSmoothedResidual(i).GetVector().E2Norm()));
       } else {
         new_point->set_pull(0.0);
         new_point->set_residual(0.0);
@@ -426,8 +427,6 @@ namespace MAUS {
 
   Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints,
                                     const SciFiGeometryHelper* geom, int plane_num, double smear) {
-//    TRandom3 rand;
-
     Kalman::Track new_track(2);
     int tracker = (*spacepoints.begin())->get_tracker();
 
@@ -437,18 +436,21 @@ namespace MAUS {
       new_track.Append(new_state);
     }
 
+    double variance = geom->GetChannelWidth() * geom->GetChannelWidth() / 12.0;
+
     for (SciFiSpacePointPArray::iterator it = spacepoints.begin(); it != spacepoints.end(); ++it) {
       int station = (*it)->get_station();
       TMatrixD vec(2, 1);
       TMatrixD cov(2, 2);
       cov.Zero();
-      vec(0, 0) = (*it)->get_position().x();// * (1.0 + rand.Gaus(0.0, smear));
-      vec(1, 0) = (*it)->get_position().y();// * (1.0 + rand.Gaus(0.0, smear));
-      cov(0, 0) = 0.0;
-      cov(1, 1) = 0.0;
+      vec(0, 0) = (*it)->get_position().x();
+      vec(1, 0) = (*it)->get_position().y();
+      cov(0, 0) = variance;
+      cov(1, 1) = variance;
       new_track[station-1].SetVector(vec);
       new_track[station-1].SetCovariance(cov);
       new_track[station-1].SetPosition((*it)->get_position().z());
+      new_track[station-1].SetHasValue(true);
     }
     return new_track;
   }
