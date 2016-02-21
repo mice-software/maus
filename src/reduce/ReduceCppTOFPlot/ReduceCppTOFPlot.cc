@@ -159,6 +159,16 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _htof1_nspVspill->SetBit(TH1::kCanRebin);
   _htof2_nspVspill = new TH1F("htof2nspVspill", "TOF0 #spacepoints vs spill;Spill;# Spacepoints;", 5000, 1., 0.);
   _htof2_nspVspill->SetBit(TH1::kCanRebin);
+
+  _hstack_spx = new THStack("_hstack_spx", "SpacePoint X");
+  _hstack_spx->Add(_hspslabx_0);
+  _hstack_spx->Add(_hspslabx_1);
+  _hstack_spx->Add(_hspslabx_2);
+  _hstack_spy = new THStack("_hstack_spy", "SpacePoint Y");
+  _hstack_spy->Add(_hspslaby_0);
+  _hstack_spy->Add(_hspslaby_1);
+  _hstack_spy->Add(_hspslaby_2);
+
   _histos.push_back(_h_tof01);
   _histos.push_back(_h_tof12);
   _histos.push_back(_h_tof02);
@@ -187,8 +197,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _canv_tof01 = new TCanvas("canv_tof01", "TOF0->1", 1600, 1200);
   _canv_tof12 = new TCanvas("canv_tof12", "TOF1->2", 1600, 1200);
   _canv_tof02 = new TCanvas("canv_tof02", "TOF0->2", 1600, 1200);
-  _canv_tof_spslabx = new TCanvas("canv_tof_spslabx", "TOF Spacepoint X", 1600, 1200);
-  _canv_tof_spslaby = new TCanvas("canv_tof_spslaby", "TOF Spacepoint Y", 1600, 1200);
+  //_canv_tof_spslabx = new TCanvas("canv_tof_spslabx", "TOF Spacepoint X", 1600, 1200);
+  //_canv_tof_spslaby = new TCanvas("canv_tof_spslaby", "TOF Spacepoint Y", 1600, 1200);
   _canv_tof0_spxy = new TCanvas("canv_tof0_spxy", "TOF0 Spacepoint Y:X", 1600, 1200);
   _canv_tof1_spxy = new TCanvas("canv_tof1_spxy", "TOF1 Spacepoint Y:X", 1600, 1200);
   _canv_tof2_spxy = new TCanvas("canv_tof2_spxy", "TOF2 Spacepoint Y:X", 1600, 1200);
@@ -202,18 +212,28 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _canv_tof0_nspVspill = new TCanvas("canv_tof0_nspVspill", "TOF0 #spacepoints vs spill", 1600, 1200);
   _canv_tof1_nspVspill = new TCanvas("canv_tof1_nspVspill", "TOF1 #spacepoints vs spill", 1600, 1200);
   _canv_tof2_nspVspill = new TCanvas("canv_tof2_nspVspill", "TOF2 #spacepoints vs spill", 1600, 1200);
+  _canv_tof_spx = new TCanvas("canv_tof_spx", "TOF Spacepoint X", 1600, 1200);
+  _canv_tof_spy = new TCanvas("canv_tof_spy", "TOF Spacepoint X", 1600, 1200);
   _canvs.push_back(_canv_tof01);
   _canvs.push_back(_canv_tof12);
   _canvs.push_back(_canv_tof02);
-  _canvs.push_back(_canv_tof_spslabx);
-  _canvs.push_back(_canv_tof_spslaby);
+  //_canvs.push_back(_canv_tof_spslabx);
+  //_canvs.push_back(_canv_tof_spslaby);
   _canvs.push_back(_canv_tof0_spxy);
   _canvs.push_back(_canv_tof1_spxy);
   _canvs.push_back(_canv_tof2_spxy);
   _canvs.push_back(_canv_tof_nsp);
   _canvs.push_back(_canv_tof_slabx);
   _canvs.push_back(_canv_tof_slaby);
+  _canvs.push_back(_canv_tof_spx);
+  _canvs.push_back(_canv_tof_spy);
 
+  TLegend* _leg_012 = new TLegend(.65, .7, .88, .88);
+  _leg_012->SetLineColor(0);
+  _leg_012->SetFillColor(0);
+  _leg_012->AddEntry(_hspslabx_0, "TOF0", "l");
+  _leg_012->AddEntry(_hspslabx_1, "TOF1", "l");
+  _leg_012->AddEntry(_hspslabx_2, "TOF2", "l");
   // Add grid to all canvases.
   for (auto &canv:_canvs)
     canv->SetGridx();
@@ -245,7 +265,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
                                                                "TOF2SpXY",
                                                                "TOF2SpXY",
                                                                "colz&&text"); // imageTOF<name>
-  std::vector<TObject*> spslabx_objs;
+/*
+   std::vector<TObject*> spslabx_objs;
   spslabx_objs.push_back(_hspslabx_0);
   spslabx_objs.push_back(_hspslabx_1);
   spslabx_objs.push_back(_hspslabx_2);
@@ -262,6 +283,7 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
                                                     spslaby_objs,
                                                     "TOFSpY",
                                                     "TOFSpY"); // imageTOF<name> 
+*/
   std::vector<TObject*> nsp_objs;
   nsp_objs.push_back(_hnsp_0);
   nsp_objs.push_back(_hnsp_1);
@@ -342,12 +364,27 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   CanvasWrapper *cwrap_tof2_nspVspill = ReduceCppTools::get_canvas_wrapper(_canv_tof2_nspVspill,
                                                     		  _htof2_nspVspill,
 						    		  "TOF2nSpVsSpill");
+  std::vector<TObject*> spslabx;
+  spslabx.push_back(_hstack_spx);
+  spslabx.push_back(_leg_012);
+  CanvasWrapper *cwrap_tof_spx = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_spx,
+                                                    spslabx,
+                                                    "TOF0SpX",
+                                                    "TOF0SpX"); // imageTOF<name> 
+  std::vector<TObject*> spslaby;
+  spslaby.push_back(_hstack_spy);
+  spslaby.push_back(_leg_012);
+  CanvasWrapper *cwrap_tof_spy = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_spy,
+                                                    spslaby,
+                                                    "TOF0SpY",
+                                                    "TOF0SpY"); // imageTOF<name> 
+
   this->reset();
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof01);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof12);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof02);
-  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_spslabx);
-  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_spslaby);
+  //_output->GetImage()->CanvasWrappersPushBack(cwrap_tof_spslabx);
+  //_output->GetImage()->CanvasWrappersPushBack(cwrap_tof_spslaby);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof0_spxy);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof1_spxy);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof2_spxy);
@@ -361,6 +398,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof0_nspVspill);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof1_nspVspill);
   _output->GetImage()->CanvasWrappersPushBack(cwrap_tof2_nspVspill);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_spx);
+  _output->GetImage()->CanvasWrappersPushBack(cwrap_tof_spy);
   /*
   for (int pm=0; pm < 2; ++pm)
       for (int pl=0; pl < 2; ++pl)

@@ -25,6 +25,8 @@
 #include "TROOT.h"
 #include "TH1.h"
 #include "TCanvas.h"
+#include "THStack.h"
+#include "TLegend.h"
 
 #include "src/common_cpp/API/ReduceBase.hh"
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
@@ -72,8 +74,10 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   TH2F *_hspxy[3];
   TH2F *_hspxy_0, *_hspxy_1, *_hspxy_2;
   TH1F *_htof0_nspVspill, *_htof1_nspVspill, *_htof2_nspVspill;
+  THStack *_hstack_spx, *_hstack_spy;
+  TCanvas *_canv_tof_spx, *_canv_tof_spy;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
-  TCanvas *_canv_tof_spslabx, *_canv_tof_spslaby;
+  //TCanvas *_canv_tof_spslabx, *_canv_tof_spslaby;
   TCanvas *_canv_tof0_spxy, *_canv_tof1_spxy, *_canv_tof2_spxy;
   TCanvas *_canv_tof_nsp;
   TCanvas *_canv_tof_slabx, *_canv_tof_slaby;
