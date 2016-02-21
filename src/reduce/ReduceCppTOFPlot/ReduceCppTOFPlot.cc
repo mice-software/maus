@@ -119,7 +119,7 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _hstack_slaby->Add(_hslaby_1);
   _hstack_slaby->Add(_hslaby_2);
 
-  // Spacepoint X and Y 
+  // Spacepoint X and Y
   _hspx_0 = new TH1F("spx0", "SpacePoints X-view;SlabX;;", 10, -0.5, 9.5);
   _hspx_0->SetLineColor(1);
   _hspx_1 = new TH1F("spx1", "SpacePoints X-view;SlabX;;", 10, -0.5, 9.5);
@@ -156,27 +156,25 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _hstack_nsp->Add(_hnsp_2);
 
   // Spacepoint 2d Y vs X
-  for (unsigned int s=0; s<3; ++s) {
+  for (unsigned int s = 0; s < 3; ++s) {
     int nbins = 10, edgelo = -0.5, edgehi = 9.5;
     char tistr[30], namestr[30];
-    sprintf(tistr, "tof%d: space points;SlabY;SlabX",s);
-    sprintf(namestr, "hspxy_%d",s);
+    snprintf(tistr, sizeof(tistr), "tof%d: space points;SlabY;SlabX", s);
+    snprintf(namestr, sizeof(namestr), "hspxy_%d", s);
     _hspxy[s] = new TH2F(namestr, tistr, nbins, edgelo, edgehi, nbins, edgelo, edgehi);
-    //_histos.push_back(_hspxy[s]);
   }
 
   // PMT hits for each PMT[0->1], Plane[0->1]
-  for (int tof=0; tof<3; ++tof) {
-    for (int pm=0; pm<2; ++pm) {
-      for (int pl=0; pl<2; ++pl) {
+  for (int tof = 0; tof < 3; ++tof) {
+    for (int pm = 0; pm < 2; ++pm) {
+      for (int pl = 0; pl < 2; ++pl) {
           int nbins = 10, edgelo = -0.5, edgehi = 9.5;
           char tistr[30], namestr[30];
-          sprintf(tistr, "TOF: PMT %d Plane %d;Slab;;", pm, pl);
-          sprintf(namestr, "htof%d_pm%dpln%d",tof,pm, pl);
+          snprintf(tistr, sizeof(tistr), "TOF: PMT %d Plane %d;Slab;;", pm, pl);
+          snprintf(namestr, sizeof(namestr), "htof%d_pm%dpln%d", tof, pm, pl);
           _htof_pmt[tof][pm][pl] = new TH1F(namestr, tistr, nbins, edgelo, edgehi);
           _htof_pmt[tof][pm][pl]->SetLineColor(tof+1);
           _histos.push_back(_htof_pmt[tof][pm][pl]);
-          std::cerr << ".................... " << tistr << " n: " << namestr << std::endl;
       }
     }
   }
@@ -201,11 +199,17 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _hstack_pm1pln1->Add(_htof_pmt[2][1][1]);
 
   // Number of spacepoints vs spill
-  _htof0_nspVspill = new TH1F("htof0nspVspill", "TOF0 #spacepoints vs spill;Spill;# Spacepoints;", 5000, 1., 0.);
+  _htof0_nspVspill = new TH1F("htof0nspVspill",
+                              "TOF0 #spacepoints vs spill;Spill;# Spacepoints;",
+                              5000, 1., 0.);
   _htof0_nspVspill->SetBit(TH1::kCanRebin);
-  _htof1_nspVspill = new TH1F("htof1nspVspill", "TOF0 #spacepoints vs spill;Spill;# Spacepoints;", 5000, 1., 0.);
+  _htof1_nspVspill = new TH1F("htof1nspVspill",
+                              "TOF0 #spacepoints vs spill;Spill;# Spacepoints;",
+                              5000, 1., 0.);
   _htof1_nspVspill->SetBit(TH1::kCanRebin);
-  _htof2_nspVspill = new TH1F("htof2nspVspill", "TOF0 #spacepoints vs spill;Spill;# Spacepoints;", 5000, 1., 0.);
+  _htof2_nspVspill = new TH1F("htof2nspVspill",
+                              "TOF0 #spacepoints vs spill;Spill;# Spacepoints;",
+                              5000, 1., 0.);
   _htof2_nspVspill->SetBit(TH1::kCanRebin);
 
 
@@ -245,9 +249,12 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
 
   _canv_tof_nsp = new TCanvas("canv_tof_nsp", "TOF #SpacePoints", 1600, 1200);
 
-  _canv_tof0_nspVspill = new TCanvas("canv_tof0_nspVspill", "TOF0 #spacepoints vs spill", 1600, 1200);
-  _canv_tof1_nspVspill = new TCanvas("canv_tof1_nspVspill", "TOF1 #spacepoints vs spill", 1600, 1200);
-  _canv_tof2_nspVspill = new TCanvas("canv_tof2_nspVspill", "TOF2 #spacepoints vs spill", 1600, 1200);
+  _canv_tof0_nspVspill = new TCanvas("canv_tof0_nspVspill",
+                                     "TOF0 #spacepoints vs spill", 1600, 1200);
+  _canv_tof1_nspVspill = new TCanvas("canv_tof1_nspVspill",
+                                     "TOF1 #spacepoints vs spill", 1600, 1200);
+  _canv_tof2_nspVspill = new TCanvas("canv_tof2_nspVspill",
+                                     "TOF2 #spacepoints vs spill", 1600, 1200);
 
   _canv_tof_slabx = new TCanvas("canv_tof_slabx", "TOF Horizontal(X) Slab", 1600, 1200);
   _canv_tof_slaby = new TCanvas("canv_tof_slaby", "TOF Vertical(Y) Slab", 1600, 1200);
@@ -300,17 +307,17 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
                                                     		  _h_tof02,
 						    		  "TOF02");
 
-   CanvasWrapper *cwrap_tof0_spxy = ReduceCppTools::get_canvas_wrapper(_canv_tof0_spxy,
+  CanvasWrapper *cwrap_tof0_spxy = ReduceCppTools::get_canvas_wrapper(_canv_tof0_spxy,
                                                                _hspxy[0],
                                                                "TOF0SpXY",
                                                                "TOF0SpXY", // imageTOF<name>
                                                                "colz&&text"); // draw option
-   CanvasWrapper *cwrap_tof1_spxy = ReduceCppTools::get_canvas_wrapper(_canv_tof1_spxy,
+  CanvasWrapper *cwrap_tof1_spxy = ReduceCppTools::get_canvas_wrapper(_canv_tof1_spxy,
                                                                _hspxy[1],
                                                                "TOF1SpXY",
                                                                "TOF1SpXY", // imageTOF<name>
                                                                "colz&&text"); // draw option
-   CanvasWrapper *cwrap_tof2_spxy = ReduceCppTools::get_canvas_wrapper(_canv_tof2_spxy,
+  CanvasWrapper *cwrap_tof2_spxy = ReduceCppTools::get_canvas_wrapper(_canv_tof2_spxy,
                                                                _hspxy[2],  // histograms
                                                                "TOF2SpXY", // canvas title
                                                                "TOF2SpXY", // imageTOF<name>
@@ -320,8 +327,8 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   nsp_objs.push_back(_leg_012);
   CanvasWrapper *cwrap_tof_nsp = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_nsp,
                                                     nsp_objs,
-                                                    "TOFnSp", 
-                                                    "TOFnSp", // imageTOF<name> 
+                                                    "TOFnSp",
+                                                    "TOFnSp", // imageTOF<name>
                                                     "nostack"); // draw option
   std::vector<TObject*> slabx_objs;
   slabx_objs.push_back(_hstack_slabx);
@@ -346,18 +353,16 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   CanvasWrapper *cwrap_tof_pm0pln0 = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_pm0pln0,
                                                     pm0pln0_objs,
                                                     "TOFPmt0Plane0",
-                                                    "TOFPmt0Plane0", // imageTOF<name> 
+                                                    "TOFPmt0Plane0", // imageTOF<name>
                                                     "nostack"); // draw option
-  
   std::vector<TObject*> pm0pln1_objs;
   pm0pln1_objs.push_back(_hstack_pm0pln1);
   pm0pln1_objs.push_back(_leg_012);
   CanvasWrapper *cwrap_tof_pm0pln1 = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_pm0pln1,
                                                     pm0pln1_objs,
                                                     "TOFPmt0Plane1",
-                                                    "TOFPmt0Plane1", // imageTOF<name> 
+                                                    "TOFPmt0Plane1", // imageTOF<name>
                                                     "nostack"); // draw option
-  
   std::vector<TObject*> pm1pln0_objs;
   pm1pln0_objs.push_back(_hstack_pm1pln0);
   pm1pln0_objs.push_back(_leg_012);
@@ -366,14 +371,13 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
                                                     "TOFPmt1Plane0",
                                                     "TOFPmt1Plane0", // imageTOF<name>
                                                     "nostack");
-  
   std::vector<TObject*> pm1pln1_objs;
   pm1pln1_objs.push_back(_hstack_pm1pln1);
   pm1pln1_objs.push_back(_leg_012);
   CanvasWrapper *cwrap_tof_pm1pln1 = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_pm1pln1,
                                                     pm1pln1_objs,
                                                     "TOFPmt1Plane1",
-                                                    "TOFPmt1Plane1", // imageTOF<name> 
+                                                    "TOFPmt1Plane1", // imageTOF<name>
                                                     "nostack"); // draw option
 
   CanvasWrapper *cwrap_tof0_nspVspill = ReduceCppTools::get_canvas_wrapper(_canv_tof0_nspVspill,
@@ -392,7 +396,7 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   CanvasWrapper *cwrap_tof_spx = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_spx,
                                                     spslabx,
                                                     "TOFSpX",
-                                                    "TOFSpX", // imageTOF<name> 
+                                                    "TOFSpX", // imageTOF<name>
                                                     "nostack"); // draw option
   std::vector<TObject*> spslaby;
   spslaby.push_back(_hstack_spy);
@@ -400,7 +404,7 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   CanvasWrapper *cwrap_tof_spy = ReduceCppTools::get_canvas_multi_wrapper(_canv_tof_spy,
                                                     spslaby,
                                                     "TOFSpY",
-                                                    "TOFSpY", // imageTOF<name> 
+                                                    "TOFSpY", // imageTOF<name>
                                                     "nostack"); // draw option
 
   this->reset();
@@ -437,7 +441,7 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
   int runNum = data->GetSpill()->GetRunNumber();
-  if (! _got_SOR)
+  if (!_got_SOR)
       setHistosTitle(runNum);
 
   if (ev_type != "physics_event")
@@ -449,7 +453,6 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
 
   int xRun = data->GetSpill()->GetRunNumber();
   int xSpill = data->GetSpill()->GetSpillNumber();
-  //if (data->GetSpill()->GetDaqEventType() == "physics_event")
   _output->SetEventType(ev_type);
   _output->GetImage()->SetRunNumber(xRun);
   _output->GetImage()->SetSpillNumber(xSpill);
@@ -503,7 +506,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
   float spnt_x(0), spnt_y(0);
 
   if (dig_tof0->size()) {
-      for (unsigned int s=0; s < dig_tof0->size(); ++s) {
+      for (unsigned int s = 0; s < dig_tof0->size(); ++s) {
           TOFDigit tdig = dig_tof0->at(s);
           int pmt = tdig.GetPmt();
           unsigned int slb = tdig.GetSlab();
@@ -512,7 +515,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
       }
   }
   if (dig_tof1->size()) {
-      for (unsigned int s=0; s < dig_tof1->size(); ++s) {
+      for (unsigned int s = 0; s < dig_tof1->size(); ++s) {
           TOFDigit tdig = dig_tof1->at(s);
           int pmt = tdig.GetPmt();
           unsigned int slb = tdig.GetSlab();
@@ -521,7 +524,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
       }
   }
   if (dig_tof2->size()) {
-      for (unsigned int s=0; s < dig_tof2->size(); ++s) {
+      for (unsigned int s = 0; s < dig_tof2->size(); ++s) {
           TOFDigit tdig = dig_tof2->at(s);
           int pmt = tdig.GetPmt();
           unsigned int slb = tdig.GetSlab();
@@ -530,7 +533,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
       }
   }
   if (sh_tof0->size()) {
-    for (unsigned int s=0; s < sh_tof0->size(); ++s) {
+    for (unsigned int s = 0; s < sh_tof0->size(); ++s) {
         TOFSlabHit tsh = sh_tof0->at(s);
         if (tsh.IsVertical())
             _hslaby_0->Fill(tsh.GetSlab());
@@ -539,7 +542,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     }
   }
   if (sh_tof1->size()) {
-    for (unsigned int s=0; s < sh_tof1->size(); ++s) {
+    for (unsigned int s = 0; s < sh_tof1->size(); ++s) {
         TOFSlabHit tsh = sh_tof1->at(s);
         if (tsh.IsVertical())
             _hslaby_1->Fill(tsh.GetSlab());
@@ -548,7 +551,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     }
   }
   if (sh_tof2->size()) {
-    for (unsigned int s=0; s < sh_tof2->size(); ++s) {
+    for (unsigned int s = 0; s < sh_tof2->size(); ++s) {
         TOFSlabHit tsh = sh_tof2->at(s);
         if (tsh.IsVertical())
             _hslaby_2->Fill(tsh.GetSlab());
@@ -561,7 +564,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     _hnsp_0->Fill(sp_tof0->size());
     int spillnum = sp_tof0->at(0).GetPhysEventNumber();
     _htof0_nspVspill->Fill(spillnum, sp_tof0->size());
-    for (unsigned int s=0; s < sp_tof0->size(); ++s) {
+    for (unsigned int s = 0; s < sp_tof0->size(); ++s) {
         TOFSpacePoint tsp = sp_tof0->at(s);
         spnt_x = tsp.GetSlabx();
         spnt_y = tsp.GetSlaby();
@@ -576,7 +579,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     _hnsp_1->Fill(sp_tof1->size());
     int spillnum = sp_tof1->at(0).GetPhysEventNumber();
     _htof1_nspVspill->Fill(spillnum, sp_tof1->size());
-    for (unsigned int s=0; s < sp_tof1->size(); ++s) {
+    for (unsigned int s = 0; s < sp_tof1->size(); ++s) {
         TOFSpacePoint tsp = sp_tof1->at(s);
         spnt_x = tsp.GetSlabx();
         spnt_y = tsp.GetSlaby();
@@ -591,7 +594,7 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     _hnsp_2->Fill(sp_tof2->size());
     int spillnum = sp_tof2->at(0).GetPhysEventNumber();
     _htof2_nspVspill->Fill(spillnum, sp_tof2->size());
-    for (unsigned int s=0; s < sp_tof2->size(); ++s) {
+    for (unsigned int s = 0; s < sp_tof2->size(); ++s) {
         TOFSpacePoint tsp = sp_tof2->at(s);
         spnt_x = tsp.GetSlabx();
         spnt_y = tsp.GetSlaby();
@@ -613,17 +616,17 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
 
 void ReduceCppTOFPlot::setHistosTitle(int runNum) {
     std::cerr << ">>>>> SETTING TITLE " << runNum << std::endl;
-    for (int h=0; h<_histos.size(); ++h) {
+    for (unsigned int h = 0; h < _histos.size(); ++h) {
         std::string orig_ti = std::string(_histos[h]->GetTitle(), strlen(_histos[h]->GetTitle()));
         char tistr[40];
-        sprintf(tistr, "Run %d: %s", runNum, orig_ti.c_str());
+        snprintf(tistr, sizeof(tistr), "Run %d: %s", runNum, orig_ti.c_str());
         _histos[h]->SetTitle(tistr);
         std::cerr << "h: " << h << " " << orig_ti << " " << tistr << std::endl;
     }
-    for (int c=0; c<_canvs.size(); ++c) {
+    for (unsigned int c = 0; c < _canvs.size(); ++c) {
         std::string orig_ti = std::string(_canvs[c]->GetTitle(), strlen(_canvs[c]->GetTitle()));
         char tistr[40];
-        sprintf(tistr, "Run %d: %s", runNum, orig_ti.c_str());
+        snprintf(tistr, sizeof(tistr), "Run %d: %s", runNum, orig_ti.c_str());
         _canvs[c]->SetTitle(tistr);
     }
     this->update();
