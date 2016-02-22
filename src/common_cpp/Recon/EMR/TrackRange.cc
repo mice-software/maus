@@ -88,7 +88,7 @@ double range_integral(std::vector<double> parx,
   // Path function of the 3D track, follows the variations in the two projections
   TF1* f_path = new TF1("f_path", fpath, zstart, zend, 2*n+1);
   f_path->SetParameters(par); 			// Tells the function the size of the array
-  double range = f_path->Integral(zstart, zend);
+  double range = f_path->Integral(zstart, zend, f_path->GetParameters(), 1e-3);
   delete f_path;
 
   return range;
@@ -126,11 +126,11 @@ double range_integral_error(std::vector<double> parx,
     par[2*n+1] = k;	    			// Sets the order of the parameter (1->n)
     par[2*n+2] = 0;				// Sets the orientation of the projection
     f_error->SetParameters(par); 		// Tells the function the size of the array
-    double integralx = f_error->Integral(zstart, zend);
+    double integralx = f_error->Integral(zstart, zend, f_error->GetParameters(), 1e-3);
     error2 += pow(k*eparx[k]*integralx, 2); 	// Increment coming from the error on a_k
     par[2*n+2] = 1;				// Sets the orientation of the projection
     f_error->SetParameters(par); 		// Tells the function the size of the array
-    double integraly = f_error->Integral(zstart, zend);
+    double integraly = f_error->Integral(zstart, zend, f_error->GetParameters(), 1e-3);
     error2 += pow(k*epary[k]*integraly, 2); 	// Increment coming from the error on b_k
   }
   delete f_error;

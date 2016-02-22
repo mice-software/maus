@@ -185,7 +185,7 @@ void MapCppEMRSpacePoints::clean_crosstalk(MAUS::Spill* spill,
         for (size_t iHit = 1; iHit < barHitArray.size(); iHit++) {
 	  int aBar = barHitArray[iHit-1].GetChannel()%_number_of_bars;
 	  int bBar = barHitArray[iHit].GetChannel()%_number_of_bars;
-	  if ( (bBar-aBar) < 2 ) {
+	  if ( abs(bBar-aBar) == 1 ) {
 	    barHitGroupVector.back().push_back(barHitArray[iHit]);
 	  } else {
 	    barHitGroupVector.push_back(EMRBarHitArray());

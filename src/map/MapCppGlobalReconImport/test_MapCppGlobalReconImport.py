@@ -86,7 +86,6 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
         doc = maus_cpp.converter.json_repr(result)
         self.assertTrue("MapCppGlobalReconImport" in doc["errors"])
 
-    @unittest.skip("Disabled pending adjusting for new TOF JSON Processor")
     def test_fill_Global_Event(self):
         """Check that process fills global events from detector data"""
         test5 = ('%s/src/map/MapCppGlobalReconImport/global_import_test.json' %
@@ -112,7 +111,7 @@ class MapCppGlobalImportTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue('mapper_name' in i)
             self.assertEqual(i['mapper_name'],'MapCppGlobalReconImport')
         self.assertTrue('space_points' in revt['global_event'])
-        self.assertEqual(39, len(revt['global_event']['space_points']))
+        self.assertEqual(37, len(revt['global_event']['space_points']))
         self.assertTrue('primary_chains' in revt['global_event'])
         self.assertEqual(0, len(revt['global_event']['primary_chains']))
 

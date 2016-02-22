@@ -42,6 +42,19 @@ void SciFiClusterRec::process(SciFiEvent &evt) const {
   // Get the number of clusters. If too large, abort reconstruction.
   int seeds_size = seeds.size();
   if ( seeds_size > _size_exception ) {
+    std::cout << "NUMBER OF SCIFI SEED DIGITS EXCEEDS CUTOFF LIMIT: "
+              << "(" << seeds_size << "/" << _size_exception << ")" << "\n"
+              << "Spill: " << seeds[0]->get_spill() << "  Event: "
+              << seeds[0]->get_event() << "\n";
+    std::cout << "To raise limit enter command line --SciFiClustExcept n\n";
+    ofstream logfile;
+    std::string root_dir = std::getenv("MAUS_ROOT_DIR");
+    std::string path = root_dir + "/tmp/digit_exception.log";
+    logfile.open(path, ios::app);
+    logfile << "spill: " << seeds[0]->get_spill() << "  digit: "
+            << seeds[0]->get_event()
+            << "  total number of seed digits: " << seeds.size() << "\n";
+    logfile.close();
     return;
   }
 
