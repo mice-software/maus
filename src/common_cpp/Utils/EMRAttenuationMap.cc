@@ -168,7 +168,7 @@ int EMRAttenuationMap::FindEMRChannelKey(EMRChannelKey key) const {
   int xPlane = key.GetPlane();
   int xBar = key.GetBar();
   if ( xPlane > -1 && xPlane < _number_of_planes &&
-       xBar > 0 && xBar < _number_of_bars)
+       xBar > 0 && xBar < _number_of_bars )
       return xPlane*(_number_of_bars-1)+(xBar-1);
 
   return NOATTEN;
