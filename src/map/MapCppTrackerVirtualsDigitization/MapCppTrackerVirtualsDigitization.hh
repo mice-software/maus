@@ -81,38 +81,41 @@ namespace MAUS {
      */
     void _process(MAUS::Data* data) const;
 
+    /** @brief Simulate data for straight tracks
+     */
+    void _process_straight(MAUS::SciFiEvent* event, int spill_num, int event_num) const;
+
+    /** @brief Simulate data for helical tracks
+     */
+    void _process_helix(MAUS::SciFiEvent* event, int spill_num, int event_num) const;
+
     /** @brief builds digits
      */
-    void construct_digits(MAUS::VirtualHitArray* hits,
+    void construct_virtual_digits(MAUS::VirtualHitArray* hits,
                           int spill_num,
                           int event_num,
                           MAUS::SciFiDigitPArray& digits) const;
 
     /** @brief builds clusters
      */
-    void construct_clusters(MAUS::VirtualHitArray* hits,
+    void construct_virtual_clusters(MAUS::VirtualHitArray* hits,
                             int spill_num,
                             int event_num,
                             MAUS::SciFiClusterPArray& clusters) const;
 
-
     /** @brief builds spacepoints
      */
-    void construct_spacepoints(MAUS::VirtualHitArray* hits,
+    void construct_virtual_spacepoints(MAUS::VirtualHitArray* hits,
                                int spill_num,
                                int event_num,
                                MAUS::SciFiSpacePointPArray& spoints) const;
 
-    /** @brief builds spacepoints
-     */
-    void construct_perfect_spacepoints(int spill_num,
-                                       int event_num,
-                                       MAUS::SciFiSpacePointPArray& spoints) const;
 
     /** @brief computes alpha from geomeery and virtual hit
      */
 //    int _compute_channel_number(VirtualHit* ahit, SciFiPlaneGeometry, int, int, int ) const;
-    double _compute_alpha(VirtualHit* vhit, SciFiPlaneGeometry& geom, int tracker_num ) const;
+//    double _compute_alpha(VirtualHit* vhit, SciFiPlaneGeometry& geom, int tracker_num ) const;
+    double _compute_alpha(ThreeVector& pos, SciFiPlaneGeometry& geom) const;
 
     // Store Geometry Information
     SciFiGeometryHelper _geometry_helper;
@@ -120,9 +123,21 @@ namespace MAUS {
 
     /// The ratio of deposited eV to NPE
     double _default_npe;
+    /// Std dev of simulated measurement error.
+    double _smear_value;
 
     /// Tolerance on assigning virtual planes to tracker planes
     double _assignment_tolerance;
+
+    /// Type of testing to perform
+    int _test_method;
+
+    double _straight_rms_pos;
+    double _straight_rms_ang;
+
+    double _helix_rms_pos;
+    double _helix_rms_pt;
+    double _helix_pz;
 
     bool _make_digits;
     bool _make_clusters;

@@ -108,7 +108,7 @@ void SciFiGeometryHelper::Build() {
 
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = reference;
-      trackerGeo.Rotation = trackerModule->globalRotation();
+      trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
       trackerGeo.Field = FieldValue(trackerModule);
       trackerGeo.Planes[plane_id] = this_plane;
 
@@ -139,7 +139,7 @@ double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
   }
   Hep3Vector globalPos = trackerModule->globalPosition();
   Hep3Vector relativePos(0., 0., 0.);
-  HepRotation trackerRotation = trackerModule->globalRotation();
+  HepRotation trackerRotation = (trackerModule->globalRotation()).inverse();
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {0., 0., 0., 0.};
   BTFieldConstructor* field = Globals::GetReconFieldConstructor();
@@ -280,6 +280,52 @@ void SciFiGeometryHelper::FillMaterialsList(int start_id, int end_id,
   }
 }
 
+ThreeVector SciFiGeometryHelper::TransformPositionToGlobal(const ThreeVector& pos,
+                                                           int tracker) const {
+  ThreeVector reference_position = GetReferencePosition(tracker);
+  CLHEP::HepRotation reference_rotation = GetReferenceRotation(tracker);
 
+  ThreeVector global_position = pos;
+  global_position *= reference_rotation;
+  global_position += reference_position;
+
+  return global_position;
+}
+
+std::vector<double> SciFiGeometryHelper::TransformStraightParamsToGlobal(
+    const std::vector<double>& params, int tracker) const {
+  // Paramters of the fit in tracker local coordinates
+  double x0 = params[0];
+  double mzx = params[1];
+  double y0 = params[2];
+  double mzy = params[3];
+
+  // Paramters of the fit in global coordinates
+  double gx0 = 0.0;
+  double gmzx = 0.0;
+  double gy0 = 0.0;
+  double gmzy = 0.0;
+
+  // Calculate the global coordinates of the point at the ref. plane
+  double z = GetPlanePosition(1, 1, 0);
+  ThreeVector pos(x0, y0, z);
+  ThreeVector global_pos = TransformPositionToGlobal(pos, tracker);
+
+  // The gradients are rotated around the tracker centre
+  ThreeVector grad(mzx, mzy, 1);
+  CLHEP::HepRotation reference_rotation = GetReferenceRotation(tracker);
+  grad *= reference_rotation;
+
+  gmzx = grad.x()/grad.z();
+  gmzy = grad.y()/grad.z();
+
+  // Calculate the y-intercepts at the z=0 (D2 in global coordinates)
+  gx0 = global_pos.x()-gmzx*global_pos.z();
+  gy0 = global_pos.y()-gmzy*global_pos.z();
+
+  // Return the result as a vector
+  std::vector<double> global_params{ gx0, gmzx, gy0, gmzy }; // NOLINT
+  return global_params;
+}
 
 } // ~namespace MAUS

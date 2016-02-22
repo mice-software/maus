@@ -80,7 +80,7 @@ class TrackPoint : public BasePoint {
   /// Clone method.  This allows us to create a new object and change
   /// that object, without changing the original.  This should be the
   /// standard copy method within a mapper.
-  TrackPoint* Clone();
+  TrackPoint* Clone() const;
 
   // Getters and Setters for the member variables
 

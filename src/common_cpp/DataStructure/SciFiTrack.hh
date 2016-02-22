@@ -139,7 +139,7 @@ class SciFiTrack {
 
   /** @brief Enumeration of the possible types of SciFi tracks.
    */
-  enum AlgorithmUsed { kalman_straight, kalman_helical };
+  enum AlgorithmUsed { kalman_straight = 0, kalman_helical = 1 };
 
   /** @brief Returns the type of algorithm used to reconstruct this track.
    */

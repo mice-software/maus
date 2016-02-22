@@ -26,8 +26,8 @@ namespace recon {
 namespace global {
 
   void ImportTOFRecon::process(const MAUS::TOFEvent &tof_event,
-             MAUS::GlobalEvent* global_event,
-             std::string mapper_name) {
+			       MAUS::GlobalEvent* global_event,
+			       std::string mapper_name) {
 
     MAUS::TOFEventSpacePoint tofEventSpacepoint =
       tof_event.GetTOFEventSpacePoint();
@@ -36,82 +36,112 @@ namespace global {
   }
 
   void ImportTOFRecon::ImportTOFSpacePoints(
-      const MAUS::TOFEventSpacePoint tofEventSpacepoint,
-      MAUS::GlobalEvent* global_event,
-      std::string mapper_name) {
+					    const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+					    MAUS::GlobalEvent* global_event,
+					    std::string mapper_name) {
 
-    size_t max_i;
-    std::vector<TOFSpacePoint> tofarray;
-    double z;
-    double x;
-    double x_err;
-    double y;
-    double y_err;
-    MAUS::DataStructure::Global::DetectorPoint detector;
 
     for (int n = 0; n < 3; n++) {
       switch (n) {
       case 0:
-        max_i = tofEventSpacepoint.GetTOF0SpacePointArraySize();
-        tofarray = tofEventSpacepoint.GetTOF0SpacePointArray();
-        z = 2773.0;
-        x_err = 20.0;
-        y_err = 20.0;
-        detector = MAUS::DataStructure::Global::kTOF0;
-        break;
+	ImportTOF0SpacePoints(tofEventSpacepoint, global_event, mapper_name);
+	break;
 
       case 1:
-        max_i = tofEventSpacepoint.GetTOF1SpacePointArraySize();
-        tofarray = tofEventSpacepoint.GetTOF1SpacePointArray();
-        z = 10572.0;
-        x_err = 30.0;
-        y_err = 30.0;
-        detector = MAUS::DataStructure::Global::kTOF1;
-        break;
+	ImportTOF1SpacePoints(tofEventSpacepoint, global_event, mapper_name);
+	break;
 
       case 2:
-        max_i = tofEventSpacepoint.GetTOF2SpacePointArraySize();
-        tofarray = tofEventSpacepoint.GetTOF2SpacePointArray();
-        z = 17905.74;
-        x_err = 30.0;
-        y_err = 30.0;
-        detector = MAUS::DataStructure::Global::kTOF2;
-        break;
+	ImportTOF2SpacePoints(tofEventSpacepoint, global_event, mapper_name);
+	break;
       }
+    }
+  }
 
-      for (unsigned int i = 0; i < max_i; ++i) {
-        if (z == 2773.0) {
-          x = tofarray[i].GetSlaby()*40.0 - 180.0;
-          y = tofarray[i].GetSlabx()*40.0 - 180.0;
-        } else if (z == 10572.0) {
-          x = tofarray[i].GetSlaby()*60.0 - 180.0;
-          y = tofarray[i].GetSlabx()*60.0 - 180.0;
-        } else if (z == 17905.74) {
-          x = tofarray[i].GetSlaby()*60 - 270;
-          y = tofarray[i].GetSlabx()*60 - 270;
-        }
+  void ImportTOFRecon::ImportTOF0SpacePoints(
+					     const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+					     MAUS::GlobalEvent* global_event,
+					     std::string mapper_name) {
 
+    size_t max_i = tofEventSpacepoint.GetTOF0SpacePointArraySize();
+    std::vector<TOFSpacePoint> tofarray = tofEventSpacepoint.GetTOF0SpacePointArray();
+    MAUS::DataStructure::Global::DetectorPoint detector = MAUS::DataStructure::Global::kTOF0;
+    for (unsigned int i = 0; i < max_i; ++i) {
+      double x = tofarray[i].GetGlobalPosX();
+      double y = tofarray[i].GetGlobalPosY();
+      double z = tofarray[i].GetGlobalPosZ();
+      double x_err = tofarray[i].GetGlobalPosXErr();
+      double y_err = tofarray[i].GetGlobalPosYErr();
+      double z_err = tofarray[i].GetGlobalPosZErr();
+      double t = tofarray[i].GetTime();
+      double t_err = tofarray[i].GetDt();
+      MAUS::DataStructure::Global::SpacePoint* spoint =
+	new MAUS::DataStructure::Global::SpacePoint();
+      TLorentzVector pos(x, y, z, t);
+      TLorentzVector pos_err(x_err, y_err, z_err, t_err);
+      spoint->set_detector(detector);
+      spoint->set_position(pos);
+      spoint->set_position_error(pos_err);
 
-  MAUS::DataStructure::Global::SpacePoint* spoint =
-    new MAUS::DataStructure::Global::SpacePoint();
+      global_event->add_space_point(spoint);
+    }
+  }
 
-  // TODO(Pidcott) need to change slab # to a global position
-  // double x = tofarray[i].GetSlaby();
-  // double y = tofarray[i].GetSlabx();
-  double t = tofarray[i].GetTime();
-  TLorentzVector pos(x, y, z, t);
+  void ImportTOFRecon::ImportTOF1SpacePoints(
+					     const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+					     MAUS::GlobalEvent* global_event,
+					     std::string mapper_name) {
 
-  // TODO(Pidcott) Not sure what z error should actually be, set as 1 for now
-  double z_err = 1.0;
-  double t_err = tofarray[i].GetDt();
-  TLorentzVector pos_err(x_err, y_err, z_err, t_err);
+    size_t max_i = tofEventSpacepoint.GetTOF1SpacePointArraySize();
+    std::vector<TOFSpacePoint> tofarray = tofEventSpacepoint.GetTOF1SpacePointArray();
+    MAUS::DataStructure::Global::DetectorPoint detector = MAUS::DataStructure::Global::kTOF1;
+    for (unsigned int i = 0; i < max_i; ++i) {
+      double x = tofarray[i].GetGlobalPosX();
+      double y = tofarray[i].GetGlobalPosY();
+      double z = tofarray[i].GetGlobalPosZ();
+      double x_err = tofarray[i].GetGlobalPosXErr();
+      double y_err = tofarray[i].GetGlobalPosYErr();
+      double z_err = tofarray[i].GetGlobalPosZErr();
+      double t = tofarray[i].GetTime();
+      double t_err = tofarray[i].GetDt();
+      MAUS::DataStructure::Global::SpacePoint* spoint =
+	new MAUS::DataStructure::Global::SpacePoint();
+      TLorentzVector pos(x, y, z, t);
+      TLorentzVector pos_err(x_err, y_err, z_err, t_err);
+      spoint->set_detector(detector);
+      spoint->set_position(pos);
+      spoint->set_position_error(pos_err);
 
-  spoint->set_detector(detector);
-  spoint->set_position(pos);
-  spoint->set_position_error(pos_err);
+      global_event->add_space_point(spoint);
+    }
+  }
 
-  global_event->add_space_point(spoint);
-      }
+  void ImportTOFRecon::ImportTOF2SpacePoints(
+					     const MAUS::TOFEventSpacePoint tofEventSpacepoint,
+					     MAUS::GlobalEvent* global_event,
+					     std::string mapper_name) {
+
+    size_t max_i = tofEventSpacepoint.GetTOF2SpacePointArraySize();
+    std::vector<TOFSpacePoint> tofarray = tofEventSpacepoint.GetTOF2SpacePointArray();
+    MAUS::DataStructure::Global::DetectorPoint detector = MAUS::DataStructure::Global::kTOF2;
+    for (unsigned int i = 0; i < max_i; ++i) {
+      double x = tofarray[i].GetGlobalPosX();
+      double y = tofarray[i].GetGlobalPosY();
+      double z = tofarray[i].GetGlobalPosZ();
+      double x_err = tofarray[i].GetGlobalPosXErr();
+      double y_err = tofarray[i].GetGlobalPosYErr();
+      double z_err = tofarray[i].GetGlobalPosZErr();
+      double t = tofarray[i].GetTime();
+      double t_err = tofarray[i].GetDt();
+      MAUS::DataStructure::Global::SpacePoint* spoint =
+	new MAUS::DataStructure::Global::SpacePoint();
+      TLorentzVector pos(x, y, z, t);
+      TLorentzVector pos_err(x_err, y_err, z_err, t_err);
+      spoint->set_detector(detector);
+      spoint->set_position(pos);
+      spoint->set_position_error(pos_err);
+
+      global_event->add_space_point(spoint);
     }
   }
 } // ~namespace global

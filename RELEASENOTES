@@ -5,6 +5,18 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.0.0
+  The following changes were made:
+    - Extensive global tracking updates, first full working version
+    - Scifi kalman fit complete
+    - Scifi 'star' and 'slide' bugs fixed
+    - Scifi pattern recognition debug mode added
+    - Scifi straight track pattern recognition optimised
+    - Scifi calibration pull down updated
+    - TOF reducer updates
+    - EMR updates
+    - Geometry updates
+    - All updates from patch release 1.4.1 included
 MAUS-v1.4.0
   The following changes were made:
     - Further extensive EMR updates

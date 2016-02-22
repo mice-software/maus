@@ -53,7 +53,9 @@ namespace global {
 		   std::string unique_identifier, int XminBin, int XmaxBin,
 		   int XnumBins, int YminBin, int YmaxBin, int YnumBins);
     /// Constructor to use a PDF to perform PID analysis
-    PIDBase(TFile* file, std::string variable, std::string hypothesis);
+    PIDBase(TFile* file, std::string variable, std::string hypothesis,
+	    int Xmin, int Xmax, int Ymin, int Ymax, int XminBin,
+	    int XmaxBin, int YminBin, int YmaxBin);
     /// Destructor
     virtual ~PIDBase();
 
@@ -118,6 +120,9 @@ namespace global {
     /// Lower and upper values of range, and number of bins in range, of PDF,
     /// set in derived PID classes
     int _XminBin, _XmaxBin, _XnumBins, _YminBin, _YmaxBin, _YnumBins;
+
+    /// Range to look within when performing PID
+    int _Xmin, _Xmax, _Ymin, _Ymax;
 
     /// Check if we want to add one event spread over the entire histogram, to
     /// avoid bins with zero entries

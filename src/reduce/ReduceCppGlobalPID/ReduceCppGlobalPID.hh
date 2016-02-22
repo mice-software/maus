@@ -33,65 +33,124 @@
 
 #include "json/json.h"
 
+#include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/Recon/Global/PIDBase.hh"
 #include "src/common_cpp/Recon/Global/PIDBase1D.hh"
 #include "src/common_cpp/Recon/Global/PIDBase2D.hh"
 #include "src/common_cpp/Recon/Global/PIDVarA.hh"
 #include "src/common_cpp/Recon/Global/PIDVarB.hh"
 #include "src/common_cpp/Recon/Global/PIDVarC.hh"
+#include "src/common_cpp/Recon/Global/PIDVarD.hh"
+#include "src/common_cpp/Recon/Global/PIDVarE.hh"
+#include "src/common_cpp/Recon/Global/PIDVarF.hh"
+#include "src/common_cpp/Recon/Global/PIDVarG.hh"
+#include "src/common_cpp/Recon/Global/PIDVarH.hh"
+#include "src/common_cpp/Recon/Global/PIDVarI.hh"
+#include "src/common_cpp/Recon/Global/PIDVarJ.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarA.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarB.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarC.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarD.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarE.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarF.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarG.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarH.hh"
+#include "src/common_cpp/Recon/Global/ComPIDVarI.hh"
+
+#include "src/common_cpp/API/ReduceBase.hh"
+#include "src/common_cpp/API/PyWrapReduceBase.hh"
 
 
 namespace MAUS {
 
-  class ReduceCppGlobalPID {
+class Data;
+class ImageData;
+
+class ReduceCppGlobalPID : public ReduceBase<Data, Data> {
 
   public:
+    ReduceCppGlobalPID() : ReduceBase<Data, Data>("ReduceCppGlobalPID"), _configCheck(false) {}
+  ~ReduceCppGlobalPID();
+
+  private:
 
     /** @brief Sets up the worker
      *
      *  @param argJsonConfigDocument a JSON document with
      *         the configuration.
      */
-    bool birth(std::string argJsonConfigDocument);
+    void _birth(const std::string& argJsonConfigDocument);
 
     /** @brief Shutdowns the worker
      *
      *  This takes no arguments.
      */
-    bool death();
+    void _death();
 
-    /** @brief process JSON document
+    /** @brief process Data object
      *
      *   
      *
      *  @param document Receive a document with spill data
      *  
      */
-    std::string process(std::string document);
+    void _process(MAUS::Data* data);
 
-  private:
+    /** @brief find pid of MC particle at US tracker ref. plane
+     *
+     *   
+     *
+     *  @param mc_event MC event
+     *  
+     */
+    int _mc_pid_US_tracker_ref(MAUS::MCEvent* mc_event);
+
+    /** @brief find pid of MC particle at DS tracker ref. plane
+     *
+     *   
+     *
+     *  @param mc_event MC event
+     *  
+     */
+    int _mc_pid_DS_tracker_ref(MAUS::MCEvent* mc_event);
+
     /// Check that a valid configuration is passed to the process
     bool _configCheck;
 
-    /// This will contain the root value after parsing
-    Json::Value _root;
+    /// Hypotheses to create PDFs for
+    std::vector<std::string> _hypotheses;
+
+    /// MICE configuration for PID
+    std::string _pid_config;
+
+    /// PID beamline polarity- set in ConfigurationDefaults to select
+    /// positive or negative particles
+    std::string _pid_beamline_polarity;
+
+    /// PID beam setting- set in ConfigurationDefaults to select
+    /// beam setting, i.e. emittance and momentum
+    std::string _pid_beam_setting;
 
     /// Mapper name, useful for tracking results...
     std::string _classname;
-
-    /// Particle hypothesis for which PDFs will be produced
-    std::string _hypothesis_name;
 
     /// Unique identifier for naming root files holding PDFs when reducer is run
     std::string _unique_identifier;
 
     /// PIDs to perform
-    std::vector<MAUS::recon::global::PIDBase*> _pid_vars;
+    std::vector<MAUS::recon::global::PIDBase*> _mu_pid_vars;
 
-    // The current spill
-    Spill* _spill;
-  };
+    /// PIDs to perform
+    std::vector<MAUS::recon::global::PIDBase*> _e_pid_vars;
+
+    /// PIDs to perform
+    std::vector<MAUS::recon::global::PIDBase*> _pi_pid_vars;
+
+    /// The current spill
+    const MAUS::Spill* _spill;
+};
 
 } // ~namespace MAUS
 

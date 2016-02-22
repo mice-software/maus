@@ -20,3 +20,4 @@ input_json_file_type = "text"
 # global_pid_hypothesis is required by the reducer, and PDF production will
 # fail without one.
 global_pid_hypothesis = "200MeV_pi_plus"
+
