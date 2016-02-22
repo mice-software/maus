@@ -52,6 +52,7 @@
 
 #include "Recon/Global/ImportCkovRecon.hh"
 #include "Recon/Global/ImportKLRecon.hh"
+#include "Recon/Global/ImportEMRRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportSciFiRecon.hh"
 #include "src/common_cpp/Recon/Global/ImportTOFRecon.hh"
 #include "src/common_cpp/API/MapBase.hh"
@@ -63,6 +64,7 @@ namespace MAUS {
   public:
     /** Constructor, setting the internal variable #_classname */
     MapCppGlobalReconImport();
+    ~MapCppGlobalReconImport();
 
   private:
     /** Sets up the worker
@@ -93,8 +95,10 @@ namespace MAUS {
     Json::Value _configJSON;
     ///  JsonCpp setup
     Json::Reader _reader;
-    // Mapper name, useful for tracking results...
+    /// Mapper name, useful for tracking results...
     std::string _classname;
+    // Geometry file name
+    std::string geo_filename;
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

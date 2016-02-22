@@ -21,7 +21,9 @@ namespace Processor {
 namespace Global {
 
 TrackProcessor::TrackProcessor()
-    : _geometry_paths_proc(new StringProcessor) {
+  : _geometry_paths_proc(new StringProcessor),
+    _pid_logL_values_proc(
+        new MAUS::Processor::Global::PIDLogLPairProcessor()) {
 
     RegisterValueBranch(
         "mapper_name", &_string_proc,
@@ -56,12 +58,33 @@ TrackProcessor::TrackProcessor()
         &MAUS::DataStructure::Global::Track::set_geometry_paths,
         true);
 
+    RegisterValueBranch(
+        "pid_logL_values", &_pid_logL_values_proc,
+        &MAUS::DataStructure::Global::Track::get_pid_logL_values,
+        &MAUS::DataStructure::Global::Track::set_pid_logL_values,
+        true);
+
     RegisterTRefArray(
         "constituent_tracks",
         &_track_trefarray_proc,
         &MAUS::DataStructure::Global::Track::get_constituent_tracks,
         &MAUS::DataStructure::Global::Track::set_constituent_tracks,
         true);
+
+    RegisterValueBranch(
+        "emr_range_primary", &_double_proc,
+        &MAUS::DataStructure::Global::Track::get_emr_range_primary,
+        &MAUS::DataStructure::Global::Track::set_emr_range_primary, true);
+
+    RegisterValueBranch(
+        "emr_range_secondary", &_double_proc,
+        &MAUS::DataStructure::Global::Track::get_emr_range_secondary,
+        &MAUS::DataStructure::Global::Track::set_emr_range_secondary, true);
+
+    RegisterValueBranch(
+        "emr_plane_density", &_double_proc,
+        &MAUS::DataStructure::Global::Track::get_emr_plane_density,
+        &MAUS::DataStructure::Global::Track::set_emr_plane_density, true);
 
     RegisterValueBranch(
         "goodness_of_fit", &_double_proc,

@@ -371,6 +371,22 @@
                             </xsl:choose>
                             }
                 </xsl:for-each>
+		<xsl:for-each select="MICE_Information/G4Field_Information/MappedSolenoid">
+
+		        Module <xsl:value-of select="FieldName/@name"/>
+			{
+			PropertyString FieldName <xsl:value-of select="FieldName/@name"/>
+                        Position <xsl:value-of select="Position/@x"/><xsl:text> </xsl:text><xsl:value-of select="Position/@y"/><xsl:text> </xsl:text><xsl:value-of select="Position/@z"/><xsl:text> </xsl:text><xsl:value-of select="Position/@units"/>
+	                Rotation <xsl:value-of select="Rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="Rotation/@units"/>
+                        Volume <xsl:value-of select="Volume/@name"/>
+                        PropertyString FieldType <xsl:value-of select="FieldType/@name"/>
+			PropertyString FieldMapMode <xsl:value-of select="FieldMapMode/@name"/>
+			PropertyString FileType <xsl:value-of select="FileType/@name"/>
+                        PropertyString FileName <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="FileName/@name"/>
+                        PropertyString Symmetry <xsl:value-of select="Symmetry/@name"/>
+			ScaleFactor <xsl:value-of select="ScaleFactor/@name"/>
+			}
+		</xsl:for-each>
 		}        
             </body>
         </html>

@@ -173,7 +173,7 @@ double rangefunction(double *x, double *par) {
 
   TF1 *f = new TF1("f", invbethe_jac, 0.05, 100, 1); // Scope of validity of Bethe-Bloch
   f->SetParameter(0, par[0]);
-  double R = f->Integral(0.05, alpha);
+  double R = f->Integral(0.05, alpha, f->GetParameters(), 1e-3);
   delete f;
 
   return R; // mm

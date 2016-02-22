@@ -1,7 +1,7 @@
 \subsection{Hits and clusters}
 \label{SubSect:SciFiHtsClstrs}
 
-A track passing through a particular doublet layer produces scintillation light in one or at most two fibre channels. For each channel ``hit'', the tracker data acquisition system records the channel number, $n$, and the pulse height. After calibration, the pulse height is recorded in terms of the number of photo-electrons ($n_{\rm pe}$) generated in the Visible Light Photon Counter (VLPC) illuminated by the hit channel. Occasionally, showers of particles or noise can cause three or more neighbouring channels to be hit. The term ``clusters'' is used to refer to an isolated hit, a doublet cluster and a multi-hit cluster.
+A track passing through a particular doublet layer produces scintillation light in one or at most two fibre channels. For each channel ``hit'', the tracker data acquisition system records the channel number, $n$, and the pulse height. After calibration, the pulse height is recorded in terms of the number of photo-electrons ($n_{\rm pe}$) generated in the Visible Light Photon Counter (VLPC) illuminated by the hit channel. Occasionally, showers of particles or noise can cause three or more neighbouring channels to be hit. The term ``clusters'' is used to refer to an isolated hit or a doublet cluster.
 
 The position of a hit in the doublet-layer coordinate system may be determined from the channel number. For isolated hits, the measured coordinate $\alpha \in {u, v, w}$ is given by:
 
@@ -18,14 +18,14 @@ where $f_d$ is the fibre diameter ($f_d = 350\,\mu{\rm m}$) and $f_p = $ is the 
 \begin{equation}
   \alpha = c_p \left[ \frac{( n_1 + n_2)}{2} - n_0 \right]\,;
 \end{equation}
-where $n_1$ and $n_2$ are the channel numbers of the two hit fibres. For a multi-hit cluster (clusters with more than two neighbouring channels), the measured position is determined from the pulse-height weighted mean of the fibre positions:
+where $n_1$ and $n_2$ are the channel numbers of the two hit fibres. 
 
 \begin{equation}
   \alpha = c_p \left[ 
                  \frac{\sum_i n_{{\rm pe}i}n_i}{\sum_i n_{{\rm pe}i}} 
                \right]\,;
 \end{equation}
-where the subscript $i$ indicates the $i^{\rm th}$ channel. The pulse-height for doublet and multi-channel clusters is determined by summing the pulse height of all the hits that make up the cluster.
+where the subscript $i$ indicates the $i^{\rm th}$ channel. The pulse-height for doublet  clusters is determined by summing the pulse height of the hits that make up the cluster.
 
 \begin{figure}
   \begin{center}
@@ -64,11 +64,8 @@ For a doublet-cluster, the variance is given by:
 \begin{equation}
   \sigma^2_m = \frac{\Delta^2_\alpha}{12} \, ;
 \end{equation}
-where $\Delta_\alpha = ?$ is the length of the overlap region between neighbouring fibre channels (see figure~\ref{Fig:Clust}). For multi-hit clusters, the variance is given by:
+where $\Delta_\alpha = ?$ is the length of the overlap region between neighbouring fibre channels (see figure~\ref{Fig:Clust}). 
 
-\begin{equation}
-  \sigma^2_m = \frac{??}{??} \, .
-\end{equation}
 The variance of the perpendicular coordinate, $\beta$, depends on the effective length, $l_{\rm eff}$ of the fibre (see figure ?? and Appendix ??) and is given by:
 
 \begin{equation}

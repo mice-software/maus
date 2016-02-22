@@ -120,8 +120,12 @@ class MapCppTrackerRecon : public MapBase<Data> {
   /**
    * @brief Populate global position output for the spacepoints
    */
-  void set_spacepoint_global_output(SciFiSpacePointPArray spoints) const;
+  void set_spacepoint_global_output(const SciFiSpacePointPArray& spoints) const;
 
+  /**
+   * @brief Populate global parameter output for the straight pat rec tracks
+   */
+  void set_straight_prtrack_global_output(const SciFiStraightPRTrackPArray& trks) const;
 
   /** 
     * @brief Rates the track based on the outcome of the reconstruction
@@ -141,12 +145,15 @@ class MapCppTrackerRecon : public MapBase<Data> {
   double _kuno_sum;
   double _kuno_tolerance;
   /// Pattern recognition flags
+  bool _clusters_on;
+  bool _spacepoints_on;
   bool _up_straight_pr_on;
   bool _down_straight_pr_on;
   bool _up_helical_pr_on;
   bool _down_helical_pr_on;
   bool _kalman_on;
   bool _patrec_on;
+  bool _patrec_debug_on;
 
   bool _use_mcs;
   bool _use_eloss;
@@ -173,18 +180,11 @@ class MapCppTrackerRecon : public MapBase<Data> {
   PatternRecognition _pattern_recognition;
 
   /// Kalman Track Fitter Object
-#ifdef KALMAN_TEST
-  Kalman::TrackFit* _spacepoint_helical_track_fitter;
-  Kalman::TrackFit* _spacepoint_straight_track_fitter;
-
-  int _spacepoint_recon_plane;
-#else
   Kalman::TrackFit* _helical_track_fitter;
   Kalman::TrackFit* _straight_track_fitter;
 
   SciFiHelicalMeasurements* _helical_measurement;
   SciFiStraightMeasurements* _straight_measurement;
-#endif
 
   ///  Map of the planes geometry.
   SciFiGeometryHelper _geometry_helper;
