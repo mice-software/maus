@@ -87,8 +87,6 @@ void TrackMatching::USTrack() {
       hypothesis_track->set_pid(pids[i]);
       MatchTrackPoint(position, momentum, TOF0_tp, pids[i], field, "TOF0",
                       hypothesis_track);
-      MatchTrackPoint(position, momentum, TOF1_tp, pids[i], field, "TOF1",
-                      hypothesis_track);
 
       // No matching criterion for Cherenkov hits, so if they exist, we add them
       if (CkovA_tp.size() > 0) {
@@ -99,6 +97,9 @@ void TrackMatching::USTrack() {
         Squeak::mout(Squeak::debug) << "TrackMatching: CkovB Added" << std::endl;
         hypothesis_track->AddTrackPoint(CkovB_tp.at(0));
       }
+
+      MatchTrackPoint(position, momentum, TOF1_tp, pids[i], field, "TOF1",
+                      hypothesis_track);
 
       // Now we fill the track with trackpoints from the tracker with energy
       // calculated from p and m, trackpoints are cloned as we want everything
