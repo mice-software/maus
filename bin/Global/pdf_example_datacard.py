@@ -6,14 +6,18 @@ PDFs can be produced from MC created using g4bl, or from using
 InputPySpillGenerator in MAUS, however in the latter case, the number
 of particles per spill must be set to 1 when simulating, as
 MapCppGlobalTrackMatching currently can't handle multiple particles
-per spill, due to the MC trigger
+per spill, due to the MC trigger. Also, when running TrackMatching,
+the datacard track_matching_pid_hypothesis should be set to a single
+pid hypothesis (doesn't matter which) and the track_matching_tolerances
+datacards should be increased by a factor of 10 (until optimisations
+have been put in place - 23/02/2016)
 
 Directories will be created in files/PID/ for each particle hypothesis,
 tagged with the unique identifier. These directories will contain the
 root files containing the individual histograms. These histograms should then
 be combined into a single root file, using the hadd command (see hadd man
-page for usage), and this is the root file that will be used by when running
-the global PID
+page for usage), and this is the root file that will be used when running
+the global PID (the file set at by PID_PDFs_file datacard)
 """
 # pylint: disable=C0103, W0611
 
@@ -36,7 +40,8 @@ pid_config = "step_4"
 # Tag used by both MapCppGlobalPID and ReduceCppGlobalPID, determines which
 # PDFs to perform PID against/which PDFs to produce (in this case, set based
 # upon input MC beam). A typical tag here would be the emittance and momentum,
-# e.g. 3-140, 6-200, etc.
+# e.g. 3-140, 6-200, etc. Alternatively, users may choose to enter the run
+# number they are simulating for here.
 # The tag used for the PDFs must match the tag you use when doing PID
 pid_beam_setting = "6-200"
 
