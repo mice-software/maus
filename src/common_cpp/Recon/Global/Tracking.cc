@@ -41,6 +41,7 @@ void TrackingZ::Propagate(double* x, double target_z) {
   double h = _step_size;
   int    nsteps = 0;
   _tz_for_propagate = this;
+  /*
   std::cerr << "BEFORE" << std::endl;
   for (size_t i = 0; i < 8; ++i)
       std::cerr << x[i] << " ";
@@ -48,12 +49,13 @@ void TrackingZ::Propagate(double* x, double target_z) {
   for (size_t i = 8; i < 29; ++i)
       std::cerr << x[i] << " ";
   std::cerr << std::endl;
+  */
   while(fabs(z-target_z) > 1e-6) {
-    std::cerr << "Stepping " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
+    // std::cerr << "Stepping " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
     nsteps++;
     
     int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &z, target_z, &h, x);
-    std::cerr << "Stepped " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
+    // std::cerr << "Stepped " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
     
     if(status != GSL_SUCCESS)
     {
@@ -74,6 +76,7 @@ void TrackingZ::Propagate(double* x, double target_z) {
         break;
     }
   }
+  /*
   std::cerr << "AFTER" << std::endl;
   for (size_t i = 0; i < 8; ++i)
       std::cerr << x[i] << " ";
@@ -81,6 +84,7 @@ void TrackingZ::Propagate(double* x, double target_z) {
   for (size_t i = 8; i < 29; ++i)
       std::cerr << x[i] << " ";
   std::cerr << std::endl;
+  */
   gsl_odeiv_evolve_free (evolve);
   gsl_odeiv_control_free(control);
   gsl_odeiv_step_free   (step);
@@ -101,7 +105,8 @@ int TrackingZ::EquationsOfMotion(double z, const double x[29], double dxdz[29],
   if (em_success != GSL_SUCCESS) {
       return em_success;
   }
-  int material_success = MaterialEquationOfMotion(z, x, dxdz, params);
+  // Commented as it was giving segv...
+  int material_success = GSL_SUCCESS; //MaterialEquationOfMotion(z, x, dxdz, params);
   if (material_success != GSL_SUCCESS) {
       return material_success;
   }

@@ -43,7 +43,7 @@ Configuration Step_3pi_2_alt
   Substitution $UpE1 +124.512
   Substitution $UpM2 +83.2
   Substitution $UpM1 +124.48
-  Substitution $FieldMapMode Write
+  Substitution $FieldMapMode Read
 
   Substitution $LiHUpThickness 32.5
 

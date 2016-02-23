@@ -14,6 +14,7 @@
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/legacy/Config/MiceModule.hh"
 
+#include "src/common_cpp/Maths/Matrix.hh"
 #include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
@@ -31,7 +32,7 @@ TEST(TrackingZTest, GetSetTest) {
         EXPECT_NEAR(dev[i], i+1, 1e-12);
     }
 
-    CLHEP::Hep3Vector bvec(1., 1., 1.); 
+    ::CLHEP::Hep3Vector bvec(1., 1., 1.); 
     BTConstantField test_field(1000., 1000., 1000., bvec);
     tz.SetField(&test_field);
     ASSERT_EQ(tz.GetField(), &test_field);
@@ -68,13 +69,13 @@ std::vector< std::vector<double> > get_tm_numerical(TrackingZ& tz, double* x_in,
         double x_pos[] = {x_in[0], x_in[1], x_in[2], x_in[3],
                       x_in[4], x_in[5], x_in[6], x_in[7]};
         x_pos[i] += delta;
-        x_pos[7] = sqrt(x_pos[4]*x_pos[4]-x_pos[5]*x_pos[5]-x_pos[6]*x_pos[6]-105.658*105.658);
+        x_pos[7] = ::sqrt(x_pos[4]*x_pos[4]-x_pos[5]*x_pos[5]-x_pos[6]*x_pos[6]-105.658*105.658);
         BTTracker::integrate(x_pos[3]+step, x_pos, tz.GetField(), BTTracker::z, step, 1.);
 
         double x_neg[] = {x_in[0], x_in[1], x_in[2], x_in[3],
                       x_in[4], x_in[5], x_in[6], x_in[7]};
         x_neg[i] -= delta;
-        x_neg[7] = sqrt(x_neg[4]*x_neg[4]-x_neg[5]*x_neg[5]-x_neg[6]*x_neg[6]-105.658*105.658);
+        x_neg[7] = ::sqrt(x_neg[4]*x_neg[4]-x_neg[5]*x_neg[5]-x_neg[6]*x_neg[6]-105.658*105.658);
         BTTracker::integrate(x_neg[3]+step, x_neg, tz.GetField(), BTTracker::z, step, 1.);
 
         std::vector<double> dm_row;
@@ -135,23 +136,40 @@ void tm_tracking_check(TrackingZ& tz, double* x_in, double delta, double step) {
             } 
         }
     }
+    MAUS::Matrix<double> matrix(4, 4, 0.);
+    for (size_t i = 1; i < 5; ++i) {
+        // x, px, y, py from t, x, y, E, px, py
+        size_t mat_index[] = {0, 1, 4, 2, 5};
+        for (size_t j = 1; j < 5; ++j) {
+            size_t k = mat_index[i];
+            size_t l = mat_index[j];
+            matrix(i, j) = tm_analytical[k][l]*100.;
+            Squeak::mout(verbose) << i << " " << j << " ** " << k << " " << l << " " << matrix(i, j) << std::endl;
+            if (i == j)
+                matrix(i, j) += 1.;
+        }
+    }
+    Squeak::mout(verbose) << "Matrix\n" << matrix << std::endl;
+    double transverse_determinant = determinant(matrix);
+    Squeak::mout(verbose) << "Determinant: " << transverse_determinant << std::endl;
 }
 
 TEST(TrackingZTest, TransferMatrixConstFieldTest) {
-    for (double mag = 0; mag < 1e-3; mag += 1e-4) {
-        CLHEP::Hep3Vector brand(mag*rand()/RAND_MAX,
-                                mag*rand()/RAND_MAX,
-                                mag*rand()/RAND_MAX); 
-        BTConstantField field(1000., 1000., 1000., brand);
-        TrackingZ tz;
-        tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-        tz.SetField(&field);
+    ::CLHEP::Hep3Vector brand(0., 0., 3.); 
+    BTConstantField field(1000., 1000., 1000., brand);
+    TrackingZ tz;
+    tz.SetField(&field);
+    double x_in[8] = {0., 0., 0., 0., ::sqrt(200.*200.+105.658*105.658), 0., 0., 200.};
+    for (double deviation = 1e-4; deviation < 1.1e-3; deviation *= 10.) {
+        tz.SetDeviations(deviation, deviation, deviation, deviation);
         // t, x, y, z, E, px, py, pz
-        double x_in[8] = {0., 0., 0., 0., sqrt(200.*200.+105.658*105.658), 0., 0., 200.};
         tm_tracking_check(tz, x_in, 0.1, 1.);
     }
 }
 
+// NOTES
+// If px, py = 0, we get good agreement with the numerical transfer matrix
+// If px, py =/= 0, we get bad agreement
 TEST(TrackingZTest, TransferMatrixSolFieldTest) {
     for (double b0 = 0.01; b0 < 0.011; b0 *= 10) {
         BTMultipole::TanhEndField* end = new BTMultipole::TanhEndField(10., 5., 9);
@@ -166,7 +184,7 @@ TEST(TrackingZTest, TransferMatrixSolFieldTest) {
                 tz.SetField(&sol);
                 // t, x, y, z, E, px, py, pz
                 double x_in_1[8] = {0., 1., 2., 5.,
-                                sqrt(200.*200.+105.658*105.658), 0., 0., 200.};
+                                ::sqrt(200.*200.+105.658*105.658), 10., 20., 200.};
                 tm_tracking_check(tz, x_in_1, delta, step);
         }
     }
@@ -197,7 +215,7 @@ void print_x(double * x_in) {
 std::vector<double> drift_ellipse(double pz, double mass) {
     // ellipse and psv
     double x_in[29] = {0., 0., 0., 0.,
-                      sqrt(pz*pz+mass*mass), 0., 0., pz,
+                      ::sqrt(pz*pz+mass*mass), 0., 0., pz,
                       1., 0.,  0.,  0.,  0.,  0.,
                           2.,  0.,  0.,  0.,  0.,
                                3.,  0.,  0.,  0.,
@@ -213,7 +231,7 @@ std::vector<double> drift_ellipse(double pz, double mass) {
 // Propagate beam ellipse through a drift space
 TEST(TrackingZTest, PropagateEllipseDriftTest) {
     // field
-    CLHEP::Hep3Vector brand(0., 0., 0.); 
+    ::CLHEP::Hep3Vector brand(0., 0., 0.); 
     BTConstantField field(1000., 1000., 1000., brand);
 
     // trackingZ
@@ -283,7 +301,7 @@ TEST(TrackingZTest, PropagateEllipseDriftTest) {
 // field should yield a constant beam ellipse... let's check
 TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
     // field
-    CLHEP::Hep3Vector brand(0., 0., 1e-3*gRandom->Uniform()); // 0-1 T 
+    ::CLHEP::Hep3Vector brand(0., 0., 1e-3*gRandom->Uniform()); // 0-1 T 
     BTConstantField field(1000., 1000., 1000., brand);
 
     // trackingZ
@@ -300,7 +318,7 @@ TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
     double ltwiddle = gRandom->Uniform();
     double pz = 200.;
     double kappa = brand.z()*0.15/pz*1e3;
-    double beta = sqrt(1+ltwiddle*ltwiddle)/kappa;
+    double beta = ::sqrt(1+ltwiddle*ltwiddle)/kappa;
     double gamma = (1+(beta*kappa-ltwiddle)*(beta*kappa-ltwiddle))/beta;
     double stt = norm_long*1.;
     double see = norm_long*10.;
@@ -309,7 +327,7 @@ TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
     double sxpy = norm_trans*(beta*kappa-ltwiddle);
     // t, x, y, z, E, px, py, pz
     double x_in[29] = {0., 0., 0., 0.,
-                      sqrt(pz*pz+105.658*105.658), 0., 0., pz,
+                      ::sqrt(pz*pz+105.658*105.658), 0., 0., pz,
                       stt, 0.,  0.,  0.,    0.,   0.,
                           sxx,  0.,  0.,    0., -sxpy,
                                sxx,  0.,  sxpy,   0.,

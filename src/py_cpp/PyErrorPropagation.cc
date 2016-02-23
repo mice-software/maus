@@ -24,8 +24,6 @@
 namespace MAUS {
 namespace PyErrorPropagation {
 
-std::string propagate_errors_docstring = "DOCSTRING";
-
 int get_centroid(PyObject* py_centroid, std::vector<double>& x_in) {
     if (!PyList_Check(py_centroid)) {
         PyErr_SetString(PyExc_TypeError, "centroid was not a list");
@@ -84,9 +82,7 @@ int get_ellipse(PyObject* py_ellipse,
         }
     }
     return 0;
-
 }
-
 
 PyObject* set_centroid(std::vector<double> x_in) {
     PyObject* list = PyList_New(8);
@@ -97,15 +93,8 @@ PyObject* set_centroid(std::vector<double> x_in) {
     return list;
 }
 
-PyObject* set_ellipse(std::vector<double> x_in) {
+PyObject* set_matrix(std::vector< std::vector<double> > matrix) {
     PyObject* ellipse = PyList_New(6);
-    int index = 8;
-    std::vector< std::vector<double> > matrix(6, std::vector<double>(6, 0.));
-    for (size_t i = 0; i < 6; ++i)
-        for (size_t j = i; j < 6; ++j) {
-            matrix[i][j] = matrix[j][i] = x_in[index];
-            index++;
-        }
     for (Py_ssize_t i = 0; i < 6; ++i) {
         PyObject* ellipse_row = PyList_New(6);
         for (Py_ssize_t j = 0; j < 6; ++j) {
@@ -117,17 +106,31 @@ PyObject* set_ellipse(std::vector<double> x_in) {
     return ellipse;
 }
 
+PyObject* set_variance(std::vector<double> x_in) {
+    int index = 8;
+    std::vector< std::vector<double> > matrix(6, std::vector<double>(6, 0.));
+    for (size_t i = 0; i < 6; ++i)
+        for (size_t j = i; j < 6; ++j) {
+            matrix[i][j] = matrix[j][i] = x_in[index];
+            index++;
+        }
+    return set_matrix(matrix);
+}
 
+std::string propagate_errors_docstring = "DOCSTRING";
 
 static PyObject* propagate_errors
                               (PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("centroid"),
                              const_cast<char*>("ellipse"),
-                             const_cast<char*>("target_z"), NULL};
+                             const_cast<char*>("target_z"),
+                             const_cast<char*>("step_size"),
+                             NULL};
     PyObject* py_centroid = NULL;
     PyObject* py_ellipse = NULL;
     double target_z = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOd|", kwlist, &py_centroid, &py_ellipse, &target_z)) {
+    double step_size = 0;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOdd|", kwlist, &py_centroid, &py_ellipse, &target_z, &step_size)) {
         // error message is set in PyArg_Parse...
         return NULL;
     }
@@ -140,7 +143,7 @@ static PyObject* propagate_errors
     }
     try {
         TrackingZ tz;
-        tz.SetStepSize(10.);
+        tz.SetStepSize(step_size);
         tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
         tz.SetEnergyLossModel(TrackingZ::no_eloss);
         tz.SetMCSModel(TrackingZ::no_mcs);
@@ -153,14 +156,51 @@ static PyObject* propagate_errors
     }
     // who owns memory?
     py_centroid = set_centroid(x_in);
-    py_ellipse = set_ellipse(x_in);
+    py_ellipse = set_variance(x_in);
     PyObject* ret_tuple = Py_BuildValue("OO", py_centroid, py_ellipse);
     return ret_tuple;
+}
+
+std::string get_transfer_matrix_docstring = "DOCSTRING";
+
+static PyObject* get_transfer_matrix
+                              (PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {
+        const_cast<char*>("centroid"),
+        NULL};
+    PyObject* py_centroid = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &py_centroid)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    try {
+        std::vector<double> x_in(8, 0.);
+        if (get_centroid(py_centroid, x_in)) {
+            return NULL;
+        }
+        TrackingZ tz;
+        tz.SetStepSize(10.);
+        tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
+        tz.SetField(Globals::GetInstance()->GetMCFieldConstructor());
+        tz.UpdateTransferMatrix(&x_in[0]);
+        std::vector<std::vector<double> > matrix = tz.GetMatrix();
+        PyObject* ellipse = set_matrix(matrix);
+        if (ellipse == NULL) {
+            PyErr_SetString(PyExc_RuntimeError, "Error calculating matrix");
+            return NULL;
+        }
+        return ellipse;
+    } catch (MAUS::Exception exc) {
+        PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
+        return NULL;
+    }
 }
 
 static PyMethodDef _keywdarg_methods[] = {
     {"propagate_errors", (PyCFunction)propagate_errors,
     METH_VARARGS|METH_KEYWORDS, propagate_errors_docstring.c_str()},
+    {"get_transfer_matrix", (PyCFunction)get_transfer_matrix,
+    METH_VARARGS|METH_KEYWORDS, get_transfer_matrix_docstring.c_str()},
     {NULL,  NULL}   /* sentinel */
 };
 
