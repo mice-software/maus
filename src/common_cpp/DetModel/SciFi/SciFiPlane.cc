@@ -52,11 +52,30 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   G4double fp = mod->propertyDouble("Pitch");
   G4double cd = mod->propertyDouble("CoreDiameter");
   G4double ar = mod->propertyDouble("ActiveRadius");
+  G4double cc = mod->propertyDouble("CentralFibre"); // Actually central channel!
+  G4double cf = cc*7.0 + 4; // This is the central fibre!
+  G4double nf = 0.0;
+
+  // If the total number of fibres is not provided, we assume that the central fibre
+  //  is bang in the center.
+  if (mod->propertyExists("NumberFibres", "double")) {
+    nf = mod->propertyDouble("NumberFibres");
+  } else {
+    nf = (cf-0.5) * 2.0;
+  }
+
+  if ((ar < cf*fp/2) || ar < (nf-cf)*fp/2) {
+    throw MAUS::Exception(MAUS::Exception::nonRecoverable,
+        "Tracker Plane active radius not large enough to simulate all fibres. "+mod->fullName(),
+        "SciFiPlane::SciFiPLane(...)");
+  }
 
   G4double doubletThickness = mod->dimensions().y();
 
   G4String doubletName = mod->fullName() + "Doublet";
   G4String coreName    = mod->fullName() + "DoubletCores";
+
+  _numFibres = nf;
 
   // Rotation of the fibre wrt the station body.
   G4RotationMatrix* pRot = new G4RotationMatrix(mod->relativeRotation(mod->mother()));
@@ -70,9 +89,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   // this is the rotation of the fibre array
   (*pRot) = (*pRot)*xflip;
   // This is a fibre
-  solidDoublet = new G4Tubs(doubletName, 0.0,
-                            tr, doubletThickness / 2.0,
-                            0.0 * deg, 360.0 * deg);
+  solidDoublet = new G4Tubs(doubletName, 0.0, tr, doubletThickness / 2.0, 0.0 * deg, 360.0 * deg);
 
   logicDoublet = new G4LogicalVolume(solidDoublet, mater, doubletName, 0, 0, 0);
 
@@ -80,27 +97,26 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   // Initialise a single volume, positioned in a frame which is rotated by
   // "*pRot" and traslated by tlate, relative to the coordinate system of the
   // mother volume "mlv->GetLogicalVolume()".
-  physiDoublet = placeCore = new G4PVPlacement(pRot, mod->position(),
-                                               logicDoublet, doubletName,
-                                               mlv->GetLogicalVolume(),
-                                               false, 0);
+  physiDoublet = placeCore = new G4PVPlacement(pRot, mod->position(), logicDoublet, doubletName,
+                                                                mlv->GetLogicalVolume(), false, 0);
 
   // lenght of the tube of fibre
   G4double tlen = 1.0 * mm;
 
   // the number of fibres to be simulated
-  _numFibres = (G4int)floor(2. * ar / (0.5 * fp));
+//  _numFibres = (G4int)floor(2. * ar / (0.5 * fp));
+//  _numFibres = (G4int)(2.0*(cf+0.5)*7.0);
+//  ar = 0.5*((_numFibres)*(fp/2.0)+fd);
 
   // Beginning of the fiber core definitions
   solidCore = new G4Tubs(coreName, 0.0, cd / 2., tlen, 0.0 * deg, 360.0 * deg);
 
   logicCore = new G4LogicalVolume(solidCore, mater, coreName, 0, 0, 0);
 
-  G4VPVParameterisation* coreParam = new DoubletFiberParam(ar, ar, cd,
-                                                           0.0, fd, fp / fd);
+  G4VPVParameterisation* coreParam = new DoubletFiberParam(cf, ar, cd, 0.0, fd, fp);
 
-  physiCore = new G4PVParameterised(coreName, logicCore, physiDoublet,
-                                    kUndefined, _numFibres, coreParam);
+  physiCore = new G4PVParameterised(coreName, logicCore, physiDoublet, kUndefined,
+                                                                            _numFibres, coreParam);
 }
 
 SciFiPlane::~SciFiPlane() {

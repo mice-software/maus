@@ -21,13 +21,14 @@
 #include "src/common_cpp/DetModel/SciFi/DoubletFiberParam.hh"
 
 // taking the parameters that define a fibre
-DoubletFiberParam::DoubletFiberParam(G4double pSensitiveRadius,
+DoubletFiberParam::DoubletFiberParam(G4double pCentralFiber,
                                      G4double pActiveRadius,
                                      G4double pOuterDiameter,
                                      G4double pInnerDiameter,
                                      G4double pFiberDiameter,
                                      G4double pFiberPitch ) {
-  sensitiveRadius = pSensitiveRadius;
+//  sensitiveRadius = pSensitiveRadius;
+  centralFiber = pCentralFiber;
   activeRadius = pActiveRadius;
   outerDiameter = pOuterDiameter;
   innerDiameter = pInnerDiameter;
@@ -35,36 +36,40 @@ DoubletFiberParam::DoubletFiberParam(G4double pSensitiveRadius,
   fiberPitch = pFiberPitch;
 
   coreRotation = new G4RotationMatrix(CLHEP::HepRotationX(90.0*deg));
+
+  // This is the spacing between fibres in z
+//  zSpacing = sqrt(fiberDiameter*fiberDiameter*(1-fiberPitch*fiberPitch/4));
+  zSpacing = sqrt(fiberDiameter*fiberDiameter - fiberPitch*fiberPitch/4);
 }
 
-void DoubletFiberParam::ComputeTransformation(const G4int copyNo,
-                                              G4VPhysicalVolume* physVol)
+void DoubletFiberParam::ComputeTransformation(const G4int copyNo, G4VPhysicalVolume* physVol)
                                               const {
-  // This is the spacing between fibres
-  G4double spacing = sqrt(fiberDiameter*fiberDiameter*
-                         (1-fiberPitch*fiberPitch/4));
-
   // These are the coordinates of the fiber placement
   // channel numbers run from right to left
-  G4double xPos = - copyNo*fiberDiameter*fiberPitch/2
-                  + (activeRadius-fiberDiameter/2);
+//  G4double xPos = - copyNo*fiberDiameter*fiberPitch/2
+//                  + (activeRadius-fiberDiameter/2);
+  G4double xPos = - (copyNo-centralFiber+1)*(fiberPitch/2);
   G4double yPos = 0.0;
-  G4double zPos = (copyNo%2) ? -0.5*spacing : 0.5*spacing;
+  G4double zPos = (copyNo%2) ? -0.5*zSpacing : 0.5*zSpacing;
 
   physVol->SetRotation(coreRotation);
   physVol->SetTranslation(G4ThreeVector(xPos, yPos, zPos));
 }
 
-void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement,
-                                          G4int copyNo,
-                                    const G4VPhysicalVolume* physVol) const {
-  G4double xPos = - copyNo * (fiberDiameter*fiberPitch/2)
-                  + (activeRadius-fiberDiameter/2);
+void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement, G4int copyNo,
+                                                          const G4VPhysicalVolume* physVol) const {
+//  G4double xPos = - copyNo * (fiberDiameter*fiberPitch/2)
+//                  + (activeRadius-fiberDiameter/2);
 
-  G4double fiberHalfLen = 0.;
+  G4double xPos = - (copyNo-centralFiber+1)*(fiberPitch/2);
+  G4double fiberHalfLen = 0.0;
 
-  if ( sensitiveRadius > fabs( xPos ) )
-    fiberHalfLen = sqrt(sensitiveRadius * sensitiveRadius - xPos * xPos);
+//  if ( sensitiveRadius > fabs( xPos ) ) {
+//    fiberHalfLen = sqrt(sensitiveRadius * sensitiveRadius - xPos * xPos);
+//  }
+  if ( activeRadius > fabs( xPos ) ) {
+    fiberHalfLen = sqrt(activeRadius * activeRadius - xPos * xPos);
+  }
 
   fiberElement.SetInnerRadius(innerDiameter/2);
   fiberElement.SetOuterRadius(outerDiameter/2);
