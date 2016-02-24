@@ -127,7 +127,7 @@ class MinimisePositionResidualFitter(object):
         canvas.Print(os.path.join(self.config.plot_dir, "bz.png"))
         return canvas, hist, graph
 
-    def display_current_event(self, plot_name, detectors = None):
+    def display_current_event(self, plot_name, detectors = None, plot_error = False):
         if detectors == None or len(detectors) == 0:
             detectors = [point["detector"] for point in self.current_space_points]
             detectors += [point["detector"] for point in self.fitted_track_points]
