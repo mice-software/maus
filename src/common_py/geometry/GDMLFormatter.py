@@ -202,6 +202,24 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         f.close()
         xmldoc.freeDoc()
 
+    def apply_rotationsMC(self, pos, rot):
+        npos = pos
+        sumrot = 0
+        for u in rot:
+            sumrot += u 
+        if sumrot > 0:
+            # apply the rotations for the tracker into MC coordinates 
+            k = math.pi()/180.
+            c = [math.cos(k*th) for th in rot]
+            s = [math.sin(k*th) for th in rot]
+            npos[0] = c[1]*c[2]*pos[0] - c[1]*s[2]*pos[1] + s[1]*pos[2]
+            npos[1] = (c[0]*s[2] + s[0]*s[1]*c[2])*pos[0] + \
+                (c[0]*c[2] - s[0]*s[1]*s[2])*pos[1] - s[0]*c[1]*pos[2]
+            npos[2] = (s[0]*s[2] - c[0]*s[1]*c[2])*pos[0] + \
+                (s[0]*c[2] + c[0]*s[1]*s[2])*pos[1] + c[0]*c[1]*pos[2]
+
+        return npos
+
     def apply_alignment_corrections(self, gdmlfile):
         """
         @method apply_alignment_corrections
@@ -253,12 +271,10 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             sol_pos = [0, 0, 0]
             sol_rot = [0, 0, 0]
             if solenoid != 0:
-                sol_pos = [float(solphys.xpathEval("position").prop("x")),
-                           float(solphys.xpathEval("position").prop("y")),
-                           float(solphys.xpathEval("position").prop("z"))]
-                sol_rot = [float(solphys.xpathEval("rotation").prop("x")),
-                           float(solphys.xpathEval("rotation").prop("y")),
-                           float(solphys.xpathEval("rotation").prop("z"))]
+                sol_pos = [float(solphys.xpathEval("position").prop(u)) \
+                               for u in ['x','y','z'] ]
+                sol_rot = [float(solphys.xpathEval("rotation").prop(u)) \
+                               for u in ['x','y','z'] ]
 
             # Everything else is in the base configuration file
             if name.find("TOF") >= 0:
@@ -269,36 +285,29 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 detinfo = maus_information.xpathEval("MICE_Information/Detector_Information/Tracker/" + str(name))
             else:
                 detinfo = maus_information.xpathEval("MICE_Information/Detector_Information/" + str(name))
-            pos = [float(corrphys.xpathEval("position").prop("x")),
-                   float(corrphys.xpathEval("position").prop("y")),
-                   float(corrphys.xpathEval("position").prop("z"))]
-            rot = [float(corrphys.xpathEval("rotation").prop("x")),
-                   float(corrphys.xpathEval("rotation").prop("y")),
-                   float(corrphys.xpathEval("rotation").prop("z"))]
-            rec_rot = rot
+            pos = [float(corrphys.xpathEval("position").prop(u)) for u in ['x','y','z'] ]
+            rot = [float(corrphys.xpathEval("rotation").prop(u)) for u in ['x','y','z'] ]
+            # rec_rot = rot
             d_pos = [0, 0, 0]
             d_rot = [0, 0, 0]
             for vol in corrs.xpathEval("Module"):
                 if vol.prop("name").find(name) >= 0:
-                    # get the corrections
-                    d_pos = [float(vol.prop("dx")),
-                             float(vol.prop("dy")),
-                             float(vol.prop("dz"))]
+                    # get the corrections with respect to the device centre
+                    d_pos = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
                     # rotations are measured in object coordinate system
-                    d_rot = [float(vol.prop("dx_rot")),
-                             float(vol.prop("dy_rot")),
-                             float(vol.prop("dz_rot"))]
+                    d_rot = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
+            d_pos_wrot = apply_rotationMC(d_pos, sol_rot)
             for i in [0,1,2]:
-                pos[i] += d_pos[i]
+                pos[i] += d_pos
                 # rotations in the simulation alter the coordinate system for the object
                 rot[i] -= d_rot[i]
                 # rotations in the reconstruction rotate the object
-                rot_rec[i] += d_rot[i]
+                # rot_rec[i] += d_rot[i]
                 # solenoid positions should be added if necessary
                 pos[i] += sol_pos[i]
                 rot[i] += sol_rot[i]
-                rot_rec[i] += sol_rot[i]
-
+                # rot_rec[i] += sol_rot[i]
+                
             corrphys.xpathEval("position").setProp("x",pos[0])
             corrphys.xpathEval("position").setProp("y",pos[1])
             corrphys.xpathEval("position").setProp("z",pos[2])
@@ -309,9 +318,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             detinfo.xpathEval("position").setProp("x",pos[0])
             detinfo.xpathEval("position").setProp("y",pos[1])
             detinfo.xpathEval("position").setProp("z",pos[2])
-            detinfo.xpathEval("rotation").setProp("x",rot_rec[0])
-            detinfo.xpathEval("rotation").setProp("y",rot_rec[1])
-            detinfo.xpathEval("rotation").setProp("z",rot_rec[2])
+            detinfo.xpathEval("rotation").setProp("x",rec[0])
+            detinfo.xpathEval("rotation").setProp("y",rec[1])
+            detinfo.xpathEval("rotation").setProp("z",rec[2])
             
             if name.find('Tracker0') >= 0:
                 # need to write the results to the solenoid GDML if the corrections are applied to the tracker
@@ -813,9 +822,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         self.add_other_info()
         if self.coolingChannel_file != None:
             self.merge_cooling_channel_info(self.maus_information_file)
-        if self.corrections_file != None:
-            self.merge_alignment_correction_info(self.maus_information_file)
-            self.apply_alignment_corrections()
+        # if self.corrections_file != None:
+        #    self.merge_alignment_correction_info(self.maus_information_file)
+        #    self.apply_alignment_corrections()
             
         # if self.formatted == False:
         print self.configuration_file
