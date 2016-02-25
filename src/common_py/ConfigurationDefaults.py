@@ -537,8 +537,8 @@ EMRfom = "median" # figure_Of-Merit for signal calibration
 
 EMRdbbCount = 2.5 # ns, duration of a DBB cycle (f=400MHz)
 EMRqeMAPMT = 0.25 # MAPMT quantum efficiency
-EMRnadcPerPeMAPMT = 6 # number of ADC counts per photoelectron in the MAPMT
-EMRelectronicsResponseSpreadMAPMT = 8 # ADC counts
+EMRnadcPerPeMAPMT = 3 # number of ADC counts per photoelectron in the MAPMT
+EMRelectronicsResponseSpreadMAPMT = 1 # ADC counts
 EMRtimeResponseSpread = 1 # ADC counts
 EMRtotFuncP1 = 12.55 # a in a*log(b*Q+c) (Shaping factor)
 EMRtotFuncP2 = 0.0252 # b in a*log(b*Q+c) (Scaling factor)
@@ -549,7 +549,7 @@ EMRfadcCount = 2.0 # ns, duration of an fADC cycle (f=500MHz)
 #EMRqeSAPMT = 0.11 # SAPMT quantum efficiency, Step I
 EMRqeSAPMT = 0.24 # SAPMT quantum efficiency, Step IV
 #EMRnadcPerPeSAPMT = 2 # number of ADC counts per photoelectron in the SAPMT, Step I
-EMRnadcPerPeSAPMT = 4 # number of ADC counts per photoelectron in the SAPMT, Step IV
+EMRnadcPerPeSAPMT = 3 # number of ADC counts per photoelectron in the SAPMT, Step IV
 EMRelectronicsResponseSpreadSAPMT = 1 # ADC count, Step I
 EMRbaselinePosition = 123 # SAPMT signal baseline
 EMRbaselineSpread = 10 # SAPMT signal baseline spread
