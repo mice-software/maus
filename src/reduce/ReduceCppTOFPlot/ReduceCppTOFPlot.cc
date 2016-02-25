@@ -58,12 +58,7 @@ ReduceCppTOFPlot::ReduceCppTOFPlot()
   : ReduceBase<Data, ImageData>("ReduceCppTOFPlot") {}
 
 ReduceCppTOFPlot::~ReduceCppTOFPlot() {
-  for (unsigned int i = 0; i < _histos.size(); i++)
-    delete _histos[i];
-  _histos.resize(0);
-
-  // CanvasWrapper objects will be deleted by the ImageData destructor;
-  // they own the canvas that they wrap.
+  // Everything will be deleted by the ImageData destructor.
 }
 
 void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
@@ -236,33 +231,33 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _histos.push_back(_htof2_nspVspill);
 
   // define canvases
-  _canv_tof01 = new TCanvas("canv_tof01", "TOF0->1", 1600, 1200);
-  _canv_tof12 = new TCanvas("canv_tof12", "TOF1->2", 1600, 1200);
-  _canv_tof02 = new TCanvas("canv_tof02", "TOF0->2", 1600, 1200);
+  _canv_tof01 = new TCanvas("TofReduce_tof01", "TOF0->1", 1600, 1200);
+  _canv_tof12 = new TCanvas("TofReduce_tof12", "TOF1->2", 1600, 1200);
+  _canv_tof02 = new TCanvas("TofReduce_tof02", "TOF0->2", 1600, 1200);
 
-  _canv_tof_spx = new TCanvas("canv_tof_spx", "TOF Spacepoint X", 1600, 1200);
-  _canv_tof_spy = new TCanvas("canv_tof_spy", "TOF Spacepoint X", 1600, 1200);
+  _canv_tof_spx = new TCanvas("TofReduce_tof_spx", "TOF Spacepoint X", 1600, 1200);
+  _canv_tof_spy = new TCanvas("TofReduce_tof_spy", "TOF Spacepoint X", 1600, 1200);
 
-  _canv_tof0_spxy = new TCanvas("canv_tof0_spxy", "TOF0 Spacepoint Y:X", 1600, 1200);
-  _canv_tof1_spxy = new TCanvas("canv_tof1_spxy", "TOF1 Spacepoint Y:X", 1600, 1200);
-  _canv_tof2_spxy = new TCanvas("canv_tof2_spxy", "TOF2 Spacepoint Y:X", 1600, 1200);
+  _canv_tof0_spxy = new TCanvas("TofReduce_tof0_spxy", "TOF0 Spacepoint Y:X", 1600, 1200);
+  _canv_tof1_spxy = new TCanvas("TofReduce_tof1_spxy", "TOF1 Spacepoint Y:X", 1600, 1200);
+  _canv_tof2_spxy = new TCanvas("TofReduce_tof2_spxy", "TOF2 Spacepoint Y:X", 1600, 1200);
 
-  _canv_tof_nsp = new TCanvas("canv_tof_nsp", "TOF #SpacePoints", 1600, 1200);
+  _canv_tof_nsp = new TCanvas("TofReduce_tof_nsp", "TOF #SpacePoints", 1600, 1200);
 
-  _canv_tof0_nspVspill = new TCanvas("canv_tof0_nspVspill",
+  _canv_tof0_nspVspill = new TCanvas("TofReduce_tof0_nspVspill",
                                      "TOF0 #spacepoints vs spill", 1600, 1200);
-  _canv_tof1_nspVspill = new TCanvas("canv_tof1_nspVspill",
+  _canv_tof1_nspVspill = new TCanvas("TofReduce_tof1_nspVspill",
                                      "TOF1 #spacepoints vs spill", 1600, 1200);
-  _canv_tof2_nspVspill = new TCanvas("canv_tof2_nspVspill",
+  _canv_tof2_nspVspill = new TCanvas("TofReduce_tof2_nspVspill",
                                      "TOF2 #spacepoints vs spill", 1600, 1200);
 
-  _canv_tof_slabx = new TCanvas("canv_tof_slabx", "TOF Horizontal(X) Slab", 1600, 1200);
-  _canv_tof_slaby = new TCanvas("canv_tof_slaby", "TOF Vertical(Y) Slab", 1600, 1200);
+  _canv_tof_slabx = new TCanvas("TofReduce_tof_slabx", "TOF Horizontal(X) Slab", 1600, 1200);
+  _canv_tof_slaby = new TCanvas("TofReduce_tof_slaby", "TOF Vertical(Y) Slab", 1600, 1200);
 
-  _canv_tof_pm0pln0 = new TCanvas("canv_tof_pm0pln0", "TOF Pmt0 Plane0", 1600, 1200);
-  _canv_tof_pm0pln1 = new TCanvas("canv_tof_pm0pln1", "TOF Pmt0 Plane1", 1600, 1200);
-  _canv_tof_pm1pln0 = new TCanvas("canv_tof_pm1pln0", "TOF Pmt1 Plane0", 1600, 1200);
-  _canv_tof_pm1pln1 = new TCanvas("canv_tof_pm1pln1", "TOF Pmt1 Plane1", 1600, 1200);
+  _canv_tof_pm0pln0 = new TCanvas("TofReduce_tof_pm0pln0", "TOF Pmt0 Plane0", 1600, 1200);
+  _canv_tof_pm0pln1 = new TCanvas("TofReduce_tof_pm0pln1", "TOF Pmt0 Plane1", 1600, 1200);
+  _canv_tof_pm1pln0 = new TCanvas("TofReduce_tof_pm1pln0", "TOF Pmt1 Plane0", 1600, 1200);
+  _canv_tof_pm1pln1 = new TCanvas("TofReduce_tof_pm1pln1", "TOF Pmt1 Plane1", 1600, 1200);
 
   _canvs.push_back(_canv_tof01);
   _canvs.push_back(_canv_tof12);
@@ -289,11 +284,12 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   _leg_012->AddEntry(_hspx_0, "TOF0", "l");
   _leg_012->AddEntry(_hspx_1, "TOF1", "l");
   _leg_012->AddEntry(_hspx_2, "TOF2", "l");
+
   // Add grid to all canvases.
-  for (auto &canv:_canvs) {
-    canv->SetGridx();
-    canv->SetGridy();
-  }
+//   for (auto &canv:_canvs) {
+//     canv->SetGridx();
+//     canv->SetGridy();
+//   }
 
   CanvasWrapper *cwrap_tof01 = ReduceCppTools::get_canvas_wrapper(_canv_tof01,
                                                     		  _h_tof01,

@@ -61,6 +61,11 @@ class ReduceCppTools {
                                  	       TH2EMR *hemr,
                                                std::string name = "",
                                                std::string description = "");
+
+  static CanvasWrapper* get_canvas_divide_wrapper(TCanvas *canv, int div_x, int div_y, bool log,
+                                                  std::vector<TH1F *> histos,
+                                                  std::string name = "",
+                                                  std::string description = "");
 };
 } // namespace MAUS
 

@@ -359,6 +359,9 @@ double dnpol_error(double x, double ex,
   return sqrt(error2);
 }
 
+
+TF1* fdist(0);
+
 double pol_closest(std::vector<double> par, double xp, double yp, double xmin, double xmax) {
 
   double p[par.size()+3];
@@ -368,13 +371,16 @@ double pol_closest(std::vector<double> par, double xp, double yp, double xmin, d
   p[par.size()+1] = xp;
   p[par.size()+2] = yp;
 
-  TF1* fdist = new TF1("fdist", fdistance, xmin, xmax, par.size()+3);
+  if (!fdist)
+    fdist = new TF1("fdist", fdistance, xmin, xmax, par.size()+3);
+
   fdist->SetParameters(p);
   double xopt = fdist->GetMinimumX(xmin, xmax, pow(10, -3));
-  delete fdist;
+//   delete fdist;
 
   return xopt;
 }
+
 
 unsigned int factorial(unsigned int n) {
 
