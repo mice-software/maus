@@ -1,0 +1,26 @@
+
+Configuration FS2A
+{
+  Substitution $FieldMapMode Read
+  Substitution $Current +106.666
+  Dimensions 5. 5. 20. m
+  PropertyString Material Galactic
+
+
+  Module FCoil
+  {
+    Volume None
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+      //field
+    PropertyString FieldType       DerivativesSolenoid
+    PropertyDouble PeakField        1. T
+    PropertyDouble ZMax             20. mm
+    PropertyDouble RMax             10. mm
+    PropertyInt    MaxEndPole       9
+
+    PropertyString EndFieldType     Tanh
+    PropertyDouble EndLength        10.
+    PropertyDouble CentreLength     5.
+  }
+}

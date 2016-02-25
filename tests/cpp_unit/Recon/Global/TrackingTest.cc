@@ -61,19 +61,36 @@ TEST(TrackingZTest, FieldDerivativeTest) {
     }
 }
 
+void tracking_test(TrackingZ& tz, double* x_in, double dz) {
+    Squeak::mout(verbose) << "tracking test" << std::endl;
+    std::vector<double> test_x(29, 0.);
+    std::vector<double> ref_x(8, 0.);
+    for (size_t i = 0; i < 8; ++i) {
+        ref_x[i] = x_in[i];
+        test_x[i] = x_in[i];
+    }
+    BTTracker::integrate(ref_x[3]+dz, &ref_x[0], tz.GetField(), BTTracker::z, 1., 1.);
+    tz.Propagate(&test_x[0], test_x[3]+dz);
+    for (size_t i = 0; i < 8; ++i) {
+        Squeak::mout(verbose) << i << " " << ref_x[i] << " " << test_x[i] << " " << ref_x[i] - test_x[i] << " ** ";
+        EXPECT_NEAR(0., ref_x[i] - test_x[i], 1e-9);
+    }
+    Squeak::mout(verbose) << "Done" << std::endl;
+}
+
 std::vector< std::vector<double> > get_tm_numerical(TrackingZ& tz, double* x_in, double delta, double step) {
     std::vector< std::vector<double> > tm_numerical;
     for (size_t i = 0; i < 7; ++i) { // t, x, y, (z), E, px, py
         if (i == 3) // z is not varied
             ++i;
         double x_pos[] = {x_in[0], x_in[1], x_in[2], x_in[3],
-                      x_in[4], x_in[5], x_in[6], x_in[7]};
+                          x_in[4], x_in[5], x_in[6], x_in[7]};
         x_pos[i] += delta;
         x_pos[7] = ::sqrt(x_pos[4]*x_pos[4]-x_pos[5]*x_pos[5]-x_pos[6]*x_pos[6]-105.658*105.658);
         BTTracker::integrate(x_pos[3]+step, x_pos, tz.GetField(), BTTracker::z, step, 1.);
 
         double x_neg[] = {x_in[0], x_in[1], x_in[2], x_in[3],
-                      x_in[4], x_in[5], x_in[6], x_in[7]};
+                          x_in[4], x_in[5], x_in[6], x_in[7]};
         x_neg[i] -= delta;
         x_neg[7] = ::sqrt(x_neg[4]*x_neg[4]-x_neg[5]*x_neg[5]-x_neg[6]*x_neg[6]-105.658*105.658);
         BTTracker::integrate(x_neg[3]+step, x_neg, tz.GetField(), BTTracker::z, step, 1.);
@@ -123,9 +140,13 @@ void tm_tracking_check(TrackingZ& tz, double* x_in, double delta, double step) {
         Squeak::mout(verbose) << std::endl;
     }
     Squeak::mout(verbose) << "Numerical step " << step << " delta " << delta << std::endl;
+    for (size_t j = 0; j < 8; ++j) {
+        Squeak::mout(verbose) << std::right << std::setw(13) << x_in[j] << " ";
+    }
+    Squeak::mout(verbose) << std::endl << "Matrix" << std::endl;
     for (size_t j = 0; j < 6; ++j) {
         for (size_t k = 0; k < 6; ++k) {
-            Squeak::mout(verbose) << std::right << std::setw(13) << tm_numerical[j][k] << " ";
+            Squeak::mout(verbose) << std::right << std::setw(13) << tm_numerical_fine[j][k] << " ";
         }
         Squeak::mout(verbose) << std::endl;
     }
@@ -177,7 +198,7 @@ TEST(TrackingZTest, TransferMatrixConstFieldTest) {
     TrackingZ tz;
     tz.SetField(&field);
     double x_in[8] = {0., 0., 0., 0., ::sqrt(200.*200.+105.658*105.658), 0., 0., 200.};
-    for (double deviation = 1e-4; deviation < 1.1e-3; deviation *= 10.) {
+    for (double deviation = 1e-3; deviation < 1.1e-3; deviation *= 10.) {
         tz.SetDeviations(deviation, deviation, deviation, deviation);
         // t, x, y, z, E, px, py, pz
         tm_tracking_check(tz, x_in, 0.1, 1.);
@@ -198,7 +219,7 @@ TEST(TrackingZTest, TransferMatrixSolFieldTest) {
         DerivativesSolenoid sol(b0, 10., 20., 9, end);
         for (double delta = 0.01; delta < 0.015; delta *= 10.)
             for (double step = 0.01; step < 0.015; step *= 10.) {
-                Squeak::mout(verbose) << "delta " << delta 
+                Squeak::mout(verbose) << "delta " << delta
                                       << " step " << step
                                       << " b0 " << b0 << std::endl;
                 TrackingZ tz;
@@ -220,6 +241,8 @@ TEST(TrackingZTest, TransferMatrixSolFieldTest) {
                 double x_in_3[8] = {0., 1., 2., 5., 0., 200., 60., 200.};
                 mass_shell_condition(x_in_3, 105.658);
                 tm_tracking_check(tz, x_in_3, delta, step);
+                tracking_test(tz, x_in_3, 10.);
+
         }
     }
 }

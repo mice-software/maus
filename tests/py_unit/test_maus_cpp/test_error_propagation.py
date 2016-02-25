@@ -36,7 +36,60 @@ class TestErrorPropagation(unittest.TestCase):
                     ellipse_out[i][j] = ellipse_in[k][l]
         return ellipse_out
 
-    def _print_output(self, centroid, ellipse, tm):
+    def _get_tm_numerical(self, centroid, delta, dz, err_prop):
+        tm_fine = self._tm_matrix(centroid, delta, dz, err_prop)
+        tm_coarse_1 = self._tm_matrix(centroid, delta*10, dz, err_prop)
+        tm_coarse_2 = self._tm_matrix(centroid, delta, dz*10, err_prop)
+        tm = [[tm_fine[i][j] for j in range(6)] for i in range(6)]
+        for i in range(6):
+            for j in range(6):
+                if abs(tm_coarse_1[i][j]) < 1e-9 or abs(tm_coarse_2[i][j]) < 1e-9:
+                    tm[i][j] = 0;
+                elif abs(tm_fine[i][j]/tm_coarse_1[i][j]) < 0.2:
+                    tm[i][j] = 0;
+                elif abs(tm_fine[i][j]/tm_coarse_2[i][j]) < 0.2:
+                    tm[i][j] = 0;
+        for i in range(8):
+                print str(round(centroid[i], 8)).rjust(12),
+        print
+        for i in range(6):
+            for j in range(6):
+                print str(round(tm_fine[i][j], 8)).rjust(12),
+            print
+        return tm
+
+    def _tm_matrix(self, centroid, delta, dz, err_prop):
+        mass = xboa.common.pdg_pid_to_mass[13]
+        ellipse = [[0. for i in range(6)] for j in range(6)]
+        tm_numerical = [[0. for i in range(6)] for j in range(6)]
+        for i in range(7):
+            if i == 3:
+                continue
+            x_pos = [x for x in centroid]
+            x_pos[i] += delta;
+            x_pos[7] = (x_pos[4]**2-x_pos[5]**2-x_pos[6]**2-mass**2)**0.5
+            x_pos, dummy = err_prop.propagate_errors(x_pos, ellipse, x_pos[3]+dz, 1.)
+
+            x_neg = [x for x in centroid]
+            x_neg[i] -= delta;
+            x_neg[7] = (x_pos[4]**2-x_pos[5]**2-x_pos[6]**2-mass**2)**0.5
+            x_neg, dummy = err_prop.propagate_errors(x_neg, ellipse, x_neg[3]+dz, 1.)
+
+            for j in range(7):
+                if j == 3:
+                    continue
+                k = i
+                if k > 3:
+                    k -= 1
+                l = j
+                if l > 3:
+                    l -= 1
+                tm_numerical[l][k] = (x_pos[j]-x_neg[j])/2./delta/dz
+            tm_numerical[k][k] -= 1/dz
+
+        return tm_numerical
+
+    def _print_output(self, centroid, ellipse):
         for q in centroid[0:4]:
             print str(round(q, 1)).ljust(10),
         print
@@ -61,21 +114,6 @@ class TestErrorPropagation(unittest.TestCase):
             for element in row:
                 print str(round(element, 1)).rjust(10),
             print
-        if tm == None:
-            return
-        dz = 1000.
-        # M = 1+dM/dz*dz
-        # GetTransferMatrix() returns dM/dz
-        print "Transfer Matrix for dz", dz, ":"
-        tm = self._convert_matrix(tm, False)
-        for i, row in enumerate(tm):
-            for j, element in enumerate(row):
-                tm[i][j] *= dz
-            tm[i][i] += 1.
-            for j, element in enumerate(row):
-                print str(round(tm[i][j], 5)).rjust(10),
-            print
-        print "Determinant:", numpy.linalg.det(numpy.array(tm))
 
     def _test_step_demo(self):
         self._new_geometry("tests/py_unit/test_maus_cpp/cd_step_frozen_53_1_140_no-de.dat")
@@ -98,21 +136,21 @@ class TestErrorPropagation(unittest.TestCase):
                 if i > 1 and j > 1:
                     ellipse[i][j] = ellipse_trans[i-2, j-2]
         ellipse = self._convert_matrix(ellipse, True)
-        for z_max in range(-4500, -3699, 100):
-            centroid_out, ellipse_out = err_prop.propagate_errors(centroid, ellipse, z_max)
-            self._print_output(centroid_out, ellipse_out, None)
+        for z_max in range(-4500, 4500, 100):
+            centroid_out, ellipse_out = err_prop.propagate_errors(centroid, ellipse, z_max, 1.)
+            self._print_output(centroid_out, ellipse_out)
 
 
-    def test_step_fs2a(self):
-        self._new_geometry("tests/py_unit/test_maus_cpp/fs2a.dat")
+    def _test_step_fs2a(self):
+        self._new_geometry("tests/py_unit/test_maus_cpp/fs2a_derivatives.dat")
         centroid = [0. for i in range(8)]
         mass = xboa.common.pdg_pid_to_mass[13]
-        mom = 233.
+        mom = 200.
         centroid[3] = 0.
         centroid[4] = (mom**2+mass**2)**0.5
         centroid[7] = mom
-        print maus_cpp.field.str(True)
-        beta = 800.;
+        #print maus_cpp.field.str(True)
+        beta = 942.75;
         dummy, dummy, bz, dummy, dummy, dummy = maus_cpp.field.get_field_value(centroid[1], centroid[2], centroid[3], centroid[0])
         ellipse_trans = Bunch.build_penn_ellipse(6., mass, beta, 0., mom, 0., bz, 1.) 
         ellipse = [[0. for i in range(6)] for j in range(6)]
@@ -123,11 +161,38 @@ class TestErrorPropagation(unittest.TestCase):
                 if i > 1 and j > 1:
                     ellipse[i][j] = ellipse_trans[i-2, j-2]
         ellipse = self._convert_matrix(ellipse, True)
-        for z_max in range(-0, 1501, 50):
-            centroid_out, ellipse_out = err_prop.propagate_errors(centroid, ellipse, z_max)
-            tm = err_prop.get_transfer_matrix(centroid)
-            self._print_output(centroid_out, ellipse_out, tm)
+        for z_max in range(750, 751, 500):
+            print "\nz_max:", z_max, "============"
+            centroid_out, ellipse_out = err_prop.propagate_errors(centroid, ellipse, z_max, 1.)
+            self._print_output(centroid_out, ellipse_out)
 
+
+    def test_tm(self):
+        self._new_geometry("tests/py_unit/test_maus_cpp/fs2a_derivatives.dat")
+        ellipse = [[0. for i in range(6)] for j in range(6)]
+        mass = xboa.common.pdg_pid_to_mass[13]
+        centroid = [0. for i in range(8)]
+        centroid[1] = 1.
+        centroid[2] = 2.
+        centroid[3] = 5.
+        centroid[5] = 200.
+        centroid[6] = 60.
+        centroid[7] = 200.
+        centroid[4] = (sum([p**2 for p in centroid[5:]])+mass**2)**0.5
+        tm_a = err_prop.get_transfer_matrix(centroid)
+        delta = 0.01
+        zstep = 0.01
+        tm_n = self._get_tm_numerical(centroid, delta, zstep, err_prop)
+        for tm in [tm_a, tm_n]:
+            print "Transfer Matrix"
+            #tm = self._convert_matrix(tm, False)
+            for i, row in enumerate(tm):
+                tm[i][i] += 1.
+                for j, element in enumerate(row):
+                    print str(round(tm[i][j], 10)).rjust(12),
+                print
+            print "Determinant:", numpy.linalg.det(numpy.array(tm))
+        
 
 
 if __name__ == "__main__":

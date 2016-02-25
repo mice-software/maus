@@ -257,12 +257,8 @@ void TrackingZ::UpdateTransferMatrix(const double* x) {
   double px = x[5];
   double py = x[6];
   double pz = x[7];
-  // double mass = sqrt(x[4]*x[4]-x[5]*x[5]-x[6]*x[6]-x[7]*x[7]); // (e^2-p^2)^0.5
 
-  double bx = field_value[0];
-  double by = field_value[1];
   double bz = field_value[2];
-  if(bx);
 
   double dbxdx = dbdx[0];
   double dbydx = dbdx[1];
@@ -274,26 +270,28 @@ void TrackingZ::UpdateTransferMatrix(const double* x) {
   double m_0_3 = 1./pz/c_l - energy*energy/pz/pz/pz/c_l; // 1/(beta gamma)^2 /c_l / pz when px, py = 0
   double m_0_4 = energy*px/pz/pz/pz/c_l;
   double m_0_5 = energy*py/pz/pz/pz/c_l;
+
   double m_1_3 = -px*energy/pz/pz/pz; // px d(1/pz)/dE = - px E / pz ^3
   double m_1_4 = 1./pz+px*px/pz/pz/pz;
   double m_1_5 = px*py/pz/pz/pz; // px d(1/pz)/dpy = px py / pz^3
+
   double m_2_3 = -py*energy/pz/pz/pz; // py d(1/pz)/dE = - py E / pz ^3
   double m_2_4 = py*px/pz/pz/pz; // py d(1/pz)/dpx = py px / pz^3
   double m_2_5 = 1./pz+py*py/pz/pz/pz;
+
+  // m_3_x = 0; energy is conserved by magnetic fields
 
   double m_4_1 = _charge*c_l*(py*dbzdx-pz*dbydx)/pz;
   double m_4_2 = _charge*c_l*(py*dbzdy-pz*dbydy)/pz;
   double m_4_3 = -_charge*c_l*py*bz*energy/pz/pz/pz;
   double m_4_4 = _charge*c_l*py*px*bz/pz/pz/pz;
   double m_4_5 = _charge*c_l*bz/pz+_charge*c_l*py*py*bz/pz/pz/pz;
+
   double m_5_1 = _charge*c_l*(pz*dbxdx-px*dbzdx)/pz;
   double m_5_2 = _charge*c_l*(pz*dbxdy-px*dbzdy)/pz;
   double m_5_3 = _charge*c_l*px*bz*energy/pz/pz/pz;
   double m_5_4 = -_charge*c_l*bz/pz-_charge*c_l*px*px*bz/pz/pz/pz;
   double m_5_5 = -_charge*c_l*py*px*bz/pz/pz/pz;
-
-
-  std::cerr << "py " << py << " bz " << bz << " ** by " << by << " pz " << pz << " ** m_4_3 " << m_4_3 << std::endl;
 
   double matrix[36] = {
     0.,    0.,    0., m_0_3, m_0_4, m_0_5,

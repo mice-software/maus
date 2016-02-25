@@ -184,6 +184,13 @@ static PyObject* get_transfer_matrix
         tz.SetField(Globals::GetInstance()->GetMCFieldConstructor());
         tz.UpdateTransferMatrix(&x_in[0]);
         std::vector<std::vector<double> > matrix = tz.GetMatrix();
+        std::cerr << "PyErrorPropagation::get_transfer_matrix" << std::endl;
+        for (size_t i = 0; i < matrix.size(); ++i) {
+            for (size_t j = 0; j < matrix[i].size(); ++j)
+                std::cerr << matrix[i][j] << " ";
+            std::cerr << std::endl;
+        }
+        std::cerr << "End" << std::endl;
         PyObject* ellipse = set_matrix(matrix);
         if (ellipse == NULL) {
             PyErr_SetString(PyExc_RuntimeError, "Error calculating matrix");
