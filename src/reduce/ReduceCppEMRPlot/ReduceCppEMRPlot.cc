@@ -33,16 +33,7 @@ ReduceCppEMRPlot::ReduceCppEMRPlot()
   : ReduceBase<Data, ImageData>("ReduceCppEMRPlot") {}
 
 ReduceCppEMRPlot::~ReduceCppEMRPlot() {
-  for (size_t i = 0; i < _objects.size(); i++)
-    delete _objects[i];
-  _objects.resize(0);
-
-  for (size_t i = 0; i < _histos.size(); i++)
-    delete _histos[i];
-  _histos.resize(0);
-
-  // CanvasWrapper objects will be deleted by the ImageData destructor;
-  // they own the canvas that they wrap.
+  // Everything will be deleted by the ImageData destructor.
 }
 
 void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
@@ -75,15 +66,26 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
     gROOT->SetBatch();
 
   // Define canvases
-  TCanvas* canv_occ_xz = new TCanvas("canv_occ_xz", "EMR xz occupancy", 1000, 1200);
-  TCanvas* canv_occ_yz = new TCanvas("canv_occ_yz", "EMR yz occupancy", 1000, 1200);
-  TCanvas* canv_beam_profile = new TCanvas("canv_beam_profile", "EMR xy beam profile", 1200, 1200);
-  TCanvas* canv_depth_profile = new TCanvas("canv_depth_profile", "EMR depth profile", 1600, 1200);
+  TCanvas* canv_occ_xz = new TCanvas("EMRReduce_occ_xz", "EMR xz occupancy", 1000, 1200);
 
-  TCanvas* canv_range = new TCanvas("canv_range", "EMR range", 1600, 1200);
-  TCanvas* canv_total_charge = new TCanvas("canv_total_charge", "EMR total charge", 1600, 1200);
-  TCanvas* canv_charge_ratio = new TCanvas("canv_charge_ratio", "EMR charge ratio", 1600, 1200);
-  TCanvas* canv_chi2_density = new TCanvas("canv_chi2_density", "EMR chi2 vs density", 1600, 1200);
+  TCanvas* canv_occ_yz = new TCanvas("EMRReduce_occ_yz", "EMR yz occupancy", 1000, 1200);
+
+  TCanvas* canv_beam_profile = new TCanvas("EMRReduce_beam_profile",
+                                           "EMR xy beam profile", 1200, 1200);
+
+  TCanvas* canv_depth_profile = new TCanvas("EMRReduce_depth_profile",
+                                            "EMR depth profile", 1600, 1200);
+
+  TCanvas* canv_range = new TCanvas("EMRReduce_range", "EMR range", 1600, 1200);
+
+  TCanvas* canv_total_charge = new TCanvas("EMRReduce_total_charge",
+                                           "EMR total charge", 1600, 1200);
+
+  TCanvas* canv_charge_ratio = new TCanvas("EMRReduce_charge_ratio",
+                                           "EMR charge ratio", 1600, 1200);
+
+  TCanvas* canv_chi2_density = new TCanvas("EMRReduce_chi2_density",
+                                           "EMR chi2 vs density", 1600, 1200);
 
   // Define occupancy histograms
   _hoccupancy_xz = new TH2EMR("occupancy_xz", "Occupancy in the xz plane");
@@ -184,8 +186,8 @@ void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
   _objects.push_back(_line_chi2);
 
   // Add grid to all canvases.
-  for (auto &canv:_canvs)
-    canv->SetGrid();
+//   for (auto &canv:_canvs)
+//     canv->SetGrid();
 
   // Initialize the canvas wrappers
   CanvasWrapper* cwrap_occ_xz =
