@@ -117,13 +117,11 @@ void ReduceCppCkovPlot::_birth(const std::string& str_config) {
   _canvs.push_back(canvas_charge);
   _canvs.push_back(canvas_time);
 
-  _histos.push_back(_htof);
-  _histos.push_back(_htof);
+  _histos.push_back(_htof_A);
+  _histos.push_back(_htof_B);
   _histos.push_back(_htof);
   _histos.insert(_histos.begin(), _hcharge.begin(), _hcharge.end());
   _histos.insert(_histos.begin(), _htime.begin(),   _htime.end());
-
-  std::cerr << "#########  _histos size: " << _histos.size() << "  ######\n";
 
   // Turn off stat box
   gStyle->SetOptStat(0);
