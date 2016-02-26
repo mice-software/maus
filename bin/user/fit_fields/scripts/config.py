@@ -8,5 +8,6 @@ class Config(object):
     required_trackers = [0, 1]
     fit_detectors = {"tku":["x", "y"], "tof1":["t"], "tof2":["t"], "tkd":[]}
     fitter_max_iterations = 500
-    number_of_events = 5
+    fitter_resolution = 0.1
+    number_of_events = 3
     plot_dir = "plots"

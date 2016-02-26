@@ -19,6 +19,7 @@ class MinimisePositionResidualFitter(object):
         self.current_space_points = [] # list of space points in current event
         self.fitted_track_points = [] # list of fitted space points in current event
         self.best_guess = None
+        self.errors = [[0. for j in range(6)] for i in range(6)]
         self.iteration = 0
         self.setup_maus_config()
         self.setup_minuit()
@@ -47,6 +48,7 @@ class MinimisePositionResidualFitter(object):
           "mass":self.mu_mass, "pid":-13, 
         }
         self.best_guess = Hit.new_from_dict(hit_dict)
+        self.errors = [[0. for j in range(6)] for i in range(6)]
 
     def setup_maus_config(self):
         str_conf = Configuration.Configuration().\
@@ -66,10 +68,9 @@ class MinimisePositionResidualFitter(object):
 
     def to_string(self, value):
           if type(value) != type(1.):
-              return str(value).ljust(10)
+              return str(value).ljust(6)
           else:
-              return str(round(value, 3)).ljust(10)
-
+              return str(round(value, 3)).ljust(6)
 
     def print_fit(self):
         print "detector".ljust(10),
@@ -97,12 +98,26 @@ class MinimisePositionResidualFitter(object):
         self.minuit.mnparm(0, "t",self.best_guess["t"], 1., 0., 50., ierr)
         self.minuit.mnparm(1, "x",self.best_guess["x"], 10., -150., 150., ierr)
         self.minuit.mnparm(2, "y",self.best_guess["y"], 10., -150., 150., ierr)
-        self.minuit.mnparm(3, "px",self.best_guess["px"], 10., 0., 0., ierr)
-        self.minuit.mnparm(4, "py",self.best_guess["py"], 10., 0., 0., ierr)
-        self.minuit.mnparm(5, "pz",self.best_guess["pz"], 10., 0., 0., ierr)
-        args = numpy.array([self.config.fitter_max_iterations, 1e-6], dtype=numpy.float64)
-        print "Running simplex"
-        self.minuit.mnexcm("SIMPLEX", args, 2, ierr)
+        self.minuit.mnparm(3, "pz",self.best_guess["energy"], 10., 0., 0., ierr)
+        self.minuit.mnparm(4, "px",self.best_guess["px"], 10., 0., 0., ierr)
+        self.minuit.mnparm(5, "py",self.best_guess["py"], 10., 0., 0., ierr)
+        args = numpy.array([self.config.fitter_max_iterations, self.config.fitter_resolution], dtype=numpy.float64)
+        #print "Running simplex"
+        #self.minuit.mnexcm("SIMPLEX", args, 2, ierr)
+        print "Running migrad"
+        self.minuit.mnexcm("MIGRAD", args, 2, ierr)
+        for i, key in enumerate(["t", "x", "y", "energy", "px", "py"]):
+            parameter = ROOT.Double()
+            error = ROOT.Double()
+            self.minuit.GetParameter(i, parameter, error)
+            if i < 3:
+                self.errors[i][i] = 0.4 # float(error**2)
+            else:
+                self.errors[i][i] = 2.
+            # ERROR MATRIX fMinuit->mnemat(&fCovar.front(), fDim); fDim is
+            # matrix dimension; fCovar is array of length fDim**2
+            self.best_guess[key] = float(parameter)
+            self.best_guess.mass_shell_condition("pz")
         MinimisePositionResidualFitter.fitter = None
 
     def plot_bz(self, min_z = None, max_z = None):
@@ -144,34 +159,55 @@ class MinimisePositionResidualFitter(object):
 
         z_min_max = common.min_max(sp_z_list)
 
-        keys = ["t", "x", "y", "z", "energy", "px", "py", "pz"]
-        values = [self.best_guess[key] for key in keys]
-        ellipse = [[0. for i in range(6)] for j in range(6)]
-        for i in range(6):
-            ellipse[i][i] = 1.
+        track_keys = ["t", "x", "y", "z", "energy", "px", "py", "pz"]
+        err_keys = ["t", "x", "y", "energy", "px", "py"]
+        self.best_guess.mass_shell_condition("pz")
+        values = [self.best_guess[key] for key in track_keys]
+        ellipse = [[self.errors[i][j] for i in range(6)] for j in range(6)]
 
         track_list = [[values[1], values[2], values[3]]]
-
+        track_pos_list = [[values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[3]]]
+        track_neg_list = [[values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[3]]]
         z = self.best_guess["z"]
+        n_step = 1
+
+        print "Propagating track and errors forwards"
+        print values
+        print numpy.matrix(ellipse)
+        print numpy.linalg.det(numpy.matrix(ellipse))
+        print "..."
         while z < z_min_max[1]:
-            values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, z, 1.)
+            values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, z, 10.)
             z += (z_min_max[1] - z_min_max[0])/1000.
             track_list.append([values[1], values[2], values[3]])
+            track_pos_list.append([values[1]+abs(ellipse[1][1])**0.5, values[2]+abs(ellipse[2][2])**0.5, values[3]])
+            track_neg_list.append([values[1]-abs(ellipse[1][1])**0.5, values[2]-abs(ellipse[2][2])**0.5, values[3]])
+            n_step += 1
 
-        values = [self.best_guess[key] for key in keys]
-        ellipse = [[0. for i in range(6)] for j in range(6)]
-        for i in range(6):
-            ellipse[i][i] = 1.
+        values = [self.best_guess[key] for key in track_keys]
+        ellipse = [[self.errors[i][j] for i in range(6)] for j in range(6)]
 
+        print "Propagating track and errors backwards"
+        print "..."
         z = self.best_guess["z"]-1.
         while z > z_min_max[0]:
-            values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, z, -1.)
+            values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, z, -10.)
             z -= (z_min_max[1] - z_min_max[0])/1000.
             track_list.append([values[1], values[2], values[3]])
+            track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[3]])
+            track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[3]])
+
         track_list = sorted(track_list, key = lambda x: x[2])
+        track_pos_list = sorted(track_pos_list, key = lambda x: x[2])
+        track_neg_list = sorted(track_neg_list, key = lambda x: x[2])
         track_x_list = [track[0] for track in track_list]
         track_y_list = [track[1] for track in track_list]
         track_z_list = [track[2] for track in track_list]
+
+        track_x_pos_list = [track[0] for track in track_pos_list]
+        track_y_pos_list = [track[1] for track in track_pos_list]
+        track_x_neg_list = [track[0] for track in track_neg_list]
+        track_y_neg_list = [track[1] for track in track_neg_list]
 
         x_min_max = common.min_max(sp_x_list+tp_x_list+track_x_list)
         y_min_max = common.min_max(sp_y_list+tp_y_list+track_y_list)
@@ -192,6 +228,16 @@ class MinimisePositionResidualFitter(object):
         hist, graph = common.make_root_graph("Fitted track",
                       track_z_list, "z [mm]", track_x_list, "x [mm]")
         graph.SetLineColor(4)
+        graph.Draw('lsame')
+        hist, graph = common.make_root_graph("Fitted track +",
+                      track_z_list, "z [mm]", track_x_pos_list, "x [mm]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
+        graph.Draw('lsame')
+        hist, graph = common.make_root_graph("Fitted track -",
+                      track_z_list, "z [mm]", track_x_neg_list, "x [mm]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
         graph.Draw('lsame')
         canvas.Update()
         canvas.Print(plot_name+"_x.png")
@@ -215,6 +261,16 @@ class MinimisePositionResidualFitter(object):
                       track_z_list, "z [mm]", track_y_list, "y [mm]")
         graph.SetLineColor(4)
         graph.Draw('lsame')
+        hist, graph = common.make_root_graph("Fitted track +",
+                      track_z_list, "z [mm]", track_y_pos_list, "y [mm]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
+        graph.Draw('lsame')
+        hist, graph = common.make_root_graph("Fitted track -",
+                      track_z_list, "z [mm]", track_y_neg_list, "y [mm]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
+        graph.Draw('lsame')
         canvas.Update()
         canvas.Print(plot_name+"_y.png")
         canvas.Print(plot_name+"_y.root")
@@ -227,14 +283,19 @@ class MinimisePositionResidualFitter(object):
         score[0] = 0.
         parameter = ROOT.Double()
         error = ROOT.Double()
-        for i, key in enumerate(["t", "x", "y", "px", "py", "pz"]):
+        for i, key in enumerate(["t", "x", "y", "energy", "px", "py"]):
             fitter.minuit.GetParameter(i, parameter, error)
             fitter.best_guess[key] = parameter
-        fitter.best_guess.mass_shell_condition('energy')
+            fitter.errors[i][i] = error**2
+        fitter.best_guess.mass_shell_condition('pz')
         keys = ["t", "x", "y", "z", "energy", "px", "py", "pz"]
         print "    ", fitter.iteration,
+        err_index = 0
         for i, key in enumerate(keys):
             print key+":", fitter.to_string(fitter.best_guess[key]),
+            if i != 3 and i != 7:
+                print "+-", fitter.to_string(fitter.errors[err_index][err_index]**0.5),
+                err_index += 1
         for sp_index, sp in enumerate(fitter.current_space_points):
             values = [fitter.best_guess[key] for key in keys]
             ellipse = [[0. for i in range(6)] for j in range(6)]

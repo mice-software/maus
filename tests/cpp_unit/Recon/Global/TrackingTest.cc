@@ -146,7 +146,7 @@ void tm_tracking_check(TrackingZ& tz, double* x_in, double delta, double step) {
     Squeak::mout(verbose) << std::endl << "Matrix" << std::endl;
     for (size_t j = 0; j < 6; ++j) {
         for (size_t k = 0; k < 6; ++k) {
-            Squeak::mout(verbose) << std::right << std::setw(13) << tm_numerical_fine[j][k] << " ";
+            Squeak::mout(verbose) << std::right << std::setw(13) << tm_numerical[j][k] << " ";
         }
         Squeak::mout(verbose) << std::endl;
     }
