@@ -81,6 +81,12 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   _good_num_spacepoints       = (*json)["SciFiGoodNumSpacepoints"].asInt();
   _poor_num_spacepoints       = (*json)["SciFiPoorNumSpacepoints"].asInt();
 
+  ofstream logfile;
+  std::string root_dir = std::getenv("MAUS_ROOT_DIR");
+  std::string path = root_dir + "/tmp/digit_exception.log";
+  logfile.open(path);
+  logfile.close();
+
   // Build the geometery helper instance
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =

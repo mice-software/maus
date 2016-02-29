@@ -29,50 +29,49 @@
 
 #include "gtest/gtest.h"
 
-#include "Recon/Global/PIDVarA.hh"
+#include "Recon/Global/ComPIDVarI.hh"
 
 
 
-TEST(PIDVarATestSetUp, TestSetUpAndTearDown) {
-	MAUS::recon::global::PIDVarA *testPIDVarA = NULL;
-	ASSERT_NO_THROW(testPIDVarA = new MAUS::recon::global::PIDVarA("test",
+TEST(ComPIDVarITestSetUp, TestSetUpAndTearDown) {
+	MAUS::recon::global::ComPIDVarI *testComPIDVarI = NULL;
+	ASSERT_NO_THROW(testComPIDVarI = new MAUS::recon::global::ComPIDVarI("test",
 								       "test"));
-	std::string testfile = testPIDVarA->Get_filename();
-	std::string testdir = testPIDVarA->Get_directory();
-	ASSERT_NO_THROW(delete testPIDVarA);
+	std::string testfile = testComPIDVarI->Get_filename();
+	std::string testdir = testComPIDVarI->Get_directory();
+	ASSERT_NO_THROW(delete testComPIDVarI);
 
 	EXPECT_EQ(gSystem->Unlink(testfile.c_str()), 0);
         // Unlink dir does not seem to work on some systems
         // suspect NFS mounts or stale handles
         // force system removal
-
         // std::string rmdirCmd = "rm -fr ";
         // rmdirCmd += testdir.c_str();
         // EXPECT_EQ(system(rmdirCmd.c_str()), 0);
 }
 
-class PIDVarATest : public ::testing::Test {
+class ComPIDVarITest : public ::testing::Test {
 
 	virtual void SetUp() {
-		MAUS::recon::global::PIDVarA testPIDVarA("test", "test");
-		testfile = testPIDVarA.Get_filename();
-		testdir = testPIDVarA.Get_directory();
+		MAUS::recon::global::ComPIDVarI testComPIDVarI("test", "test");
+		testfile = testComPIDVarI.Get_filename();
+		testdir = testComPIDVarI.Get_directory();
 		TRandom3 r;
 		for (int i = 0; i < 1000; i++) {
 		  MAUS::DataStructure::Global::Track* testTrack =
 		    new MAUS::DataStructure::Global::Track();
-		  MAUS::DataStructure::Global::TrackPoint* tp0 =
-		    new MAUS::DataStructure::Global::TrackPoint();
 		  MAUS::DataStructure::Global::TrackPoint* tp1 =
 		    new MAUS::DataStructure::Global::TrackPoint();
-		  tp0->set_detector(MAUS::DataStructure::Global::kTOF0);
+		  MAUS::DataStructure::Global::TrackPoint* tp2 =
+		    new MAUS::DataStructure::Global::TrackPoint();
 		  tp1->set_detector(MAUS::DataStructure::Global::kTOF1);
+		  tp2->set_detector(MAUS::DataStructure::Global::kTOF2);
 
-		  double x0 = 0.0;
-		  double y0 = 0.0;
-		  double z0 = 0.0;
-		  double t0 = r.Gaus(15, 2);
-		  TLorentzVector pos0(x0, y0, z0, t0);
+		  MAUS::DataStructure::Global::TrackPoint* tpCkovB =
+		    new MAUS::DataStructure::Global::TrackPoint();
+
+		  double num_PES = r.Gaus(30, 2);
+		  tpCkovB->set_num_photoelectrons(num_PES);
 
 		  double x1 = 0.0;
 		  double y1 = 0.0;
@@ -80,12 +79,21 @@ class PIDVarATest : public ::testing::Test {
 		  double t1 = r.Gaus(45, 2);
 		  TLorentzVector pos1(x1, y1, z1, t1);
 
-		  tp0->set_position(pos0);
+		  double x2 = 0.0;
+		  double y2 = 0.0;
+		  double z2 = 0.0;
+		  double t2 = r.Gaus(85, 2);
+		  TLorentzVector pos2(x2, y2, z2, t2);
+
 		  tp1->set_position(pos1);
-		  tp0->set_mapper_name("MapCppGlobalTrackMatching-Through");
+		  tp2->set_position(pos2);
 		  tp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
-		  testTrack->AddTrackPoint(tp0);
+		  tp2->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTrack->AddTrackPoint(tp1);
+		  testTrack->AddTrackPoint(tp2);
+		  tpCkovB->set_mapper_name("MapCppGlobalTrackMatching-Through");
+		  tpCkovB->set_detector(MAUS::DataStructure::Global::kCherenkovB);
+		  testTrack->AddTrackPoint(tpCkovB);
 		  testTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTracks.push_back(testTrack);
 		}
@@ -109,17 +117,17 @@ class PIDVarATest : public ::testing::Test {
 	std::string testfile;
 	std::string testdir;
 	TFile *file;
-	TH1F *hist;
+	TH2F *hist;
 	std::string histname;
 	std::vector<MAUS::DataStructure::Global::Track*> testTracks;
 };
 
-TEST_F(PIDVarATest, CreateFileConstructor) {
+TEST_F(ComPIDVarITest, CreateFileConstructor) {
 
 	ASSERT_TRUE(fileExists(testfile));
 }
 
-TEST_F(PIDVarATest, ReadFileConstructor) {
+TEST_F(ComPIDVarITest, ReadFileConstructor) {
 
 	file = new TFile(testfile.c_str(), "READ");
 
@@ -127,72 +135,82 @@ TEST_F(PIDVarATest, ReadFileConstructor) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarA testPIDVarA(file, "test", 20, 40));
+	ASSERT_NO_THROW(MAUS::recon::global::ComPIDVarI testComPIDVarI(file, "test", 20, 40, 0, 1));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarA testPIDVarA(NULL, "test", 20, 40));
+	ASSERT_ANY_THROW(MAUS::recon::global::ComPIDVarI testComPIDVarI(NULL, "test", 20, 40, 0, 1));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarA testPIDVarA(file, "sasquatch", 20, 40));
+	ASSERT_ANY_THROW(MAUS::recon::global::ComPIDVarI testComPIDVarI(file, "sasquatch", 20, 40, 0, 1));
 }
 
 /* N.B. if either FillHist or LogL are failing, check the values of min and max
-*	 bin in PIDVarA.hh, as if the testTracks fall outside of this range FillHist 
+*	 bin in ComPIDVarI.hh, as if the testTracks fall outside of this range FillHist 
 *  and LogL will fail.
 */
 
-TEST_F(PIDVarATest, FillHist) {
+TEST_F(ComPIDVarITest, FillHist) {
 
-	MAUS::recon::global::PIDVarA testPIDVarA("test", "test");
+	MAUS::recon::global::ComPIDVarI testComPIDVarI("test", "test");
 	for (int i = 0; i < 1000; i++) {
-		testPIDVarA.Fill_Hist(testTracks[i]);
+		testComPIDVarI.Fill_Hist(testTracks[i]);
 	}
-	testfile = testPIDVarA.Get_filename();
-	testdir = testPIDVarA.Get_directory();
+	testfile = testComPIDVarI.Get_filename();
+	testdir = testComPIDVarI.Get_directory();
 	// check histogram exists
-	hist = testPIDVarA.Get_hist();
+	hist = testComPIDVarI.Get_hist();
 	ASSERT_TRUE(hist);
 	// check number of entries
 	ASSERT_EQ(1000, hist->GetEntries());
 }
 
-TEST_F(PIDVarATest, LogL) {
+TEST_F(ComPIDVarITest, LogL) {
 	// Constructor called within parentheses so that destructor will be
 	// called when it goes out of scope
 	 {
-		MAUS::recon::global::PIDVarA writetestPIDVarA("test", "test");
+		MAUS::recon::global::ComPIDVarI writetestComPIDVarI("test", "test");
 		for (int i = 0; i < 1000; i++) {
-			writetestPIDVarA.Fill_Hist(testTracks[i]);
+			writetestComPIDVarI.Fill_Hist(testTracks[i]);
 		}
-		testfile = writetestPIDVarA.Get_filename();
-		testdir = writetestPIDVarA.Get_directory();
+		testfile = writetestComPIDVarI.Get_filename();
+		testdir = writetestComPIDVarI.Get_directory();
 	 }
 
 	MAUS::DataStructure::Global::Track* checkTrack =
 			new MAUS::DataStructure::Global::Track();
-	MAUS::DataStructure::Global::TrackPoint* ctp0 =
-			new MAUS::DataStructure::Global::TrackPoint();
 	MAUS::DataStructure::Global::TrackPoint* ctp1 =
 			new MAUS::DataStructure::Global::TrackPoint();
-	ctp0->set_detector(MAUS::DataStructure::Global::kTOF0);
+	MAUS::DataStructure::Global::TrackPoint* ctp2 =
+			new MAUS::DataStructure::Global::TrackPoint();
 	ctp1->set_detector(MAUS::DataStructure::Global::kTOF1);
-
-	double x0 = 0.0;
-	double y0 = 0.0;
-	double z0 = 0.0;
-	double t0 = 15.0;
-	TLorentzVector cpos0(x0, y0, z0, t0);
+	ctp2->set_detector(MAUS::DataStructure::Global::kTOF2);
 
 	double x1 = 0.0;
 	double y1 = 0.0;
 	double z1 = 0.0;
-	double t1 = 45.0;
+	double t1 = 15.0;
 	TLorentzVector cpos1(x1, y1, z1, t1);
 
-	ctp0->set_position(cpos0);
+	double x2 = 0.0;
+	double y2 = 0.0;
+	double z2 = 0.0;
+	double t2 = 55.0;
+	TLorentzVector cpos2(x2, y2, z2, t2);
+
+	MAUS::DataStructure::Global::TrackPoint* ctpCkovB =
+	  new MAUS::DataStructure::Global::TrackPoint();
+
+	double num_PES = 30;
+	ctpCkovB->set_num_photoelectrons(num_PES);
+
+	ctpCkovB->set_detector(MAUS::DataStructure::Global::kCherenkovB);
+	ctpCkovB->set_mapper_name("MapCppGlobalTrackMatching-Through");
+
+	checkTrack->AddTrackPoint(ctpCkovB);
 	ctp1->set_position(cpos1);
-	ctp0->set_mapper_name("MapCppGlobalTrackMatching-Through");
+	ctp2->set_position(cpos2);
 	ctp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
-	checkTrack->AddTrackPoint(ctp0);
+	ctp2->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctp1);
+	checkTrack->AddTrackPoint(ctp2);
 	checkTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 
 	file = new TFile(testfile.c_str(), "READ");
@@ -201,18 +219,18 @@ TEST_F(PIDVarATest, LogL) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarA readtestPIDVarA(file, "test", 20, 40));
+	ASSERT_NO_THROW(MAUS::recon::global::ComPIDVarI readtestComPIDVarI(file, "test", 30, 50, 0, 140));
 
-	MAUS::recon::global::PIDVarA readtestPIDVarA(file, "test", 20, 40);
+	MAUS::recon::global::ComPIDVarI readtestComPIDVarI(file, "test", 30, 50, 0, 140);
 
-	hist = readtestPIDVarA.Get_hist();
+	hist = readtestComPIDVarI.Get_hist();
 	ASSERT_TRUE(hist);
 	// check number of entries in histogram
 	// NB as destructor was called above, the number of entries in the histogram
 	// will be increased by the number of bins (inc over and underflow) as in
-	// PIDVarA the behaviour to add one event across all bins is turned on.
+	// ComPIDVarI the behaviour to add one event across all bins is turned on.
 	ASSERT_EQ((1000 + hist->GetSize()), hist->GetEntries());
-	double prob = readtestPIDVarA.logL(checkTrack);
+	double prob = readtestComPIDVarI.logL(checkTrack);
 
 	ASSERT_LE(prob, 0);
 	ASSERT_TRUE(IsFiniteNumber(prob));

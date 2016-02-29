@@ -3,7 +3,8 @@
 vers="1.6.0"
 filename="numpy-${vers}.tar.gz"
 directory="numpy-${vers}"
-url="http://sourceforge.net/projects/numpy/files/NumPy/${vers}/${filename}/download"
+# url="http://sourceforge.net/projects/numpy/files/NumPy/${vers}/${filename}/download"
+url="http://heplnv152.pp.rl.ac.uk/maus/third_party/${filename}"
 echo
 echo 'INFO: Installing third party library NumPy' $vers
 echo '-------------------------------------------------'

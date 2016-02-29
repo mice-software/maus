@@ -44,8 +44,11 @@ def run():
 
     # EMR
     my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
-    my_map.append(MAUS.MapCppEMRPlaneHits())
+    my_map.append(MAUS.MapCppEMRSpacePoints())
     my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
+
+    # Ckov
+    my_map.append(MAUS.MapCppCkovMCDigitizer())
 
     # Global
     my_map.append(MAUS.MapCppGlobalReconImport())
