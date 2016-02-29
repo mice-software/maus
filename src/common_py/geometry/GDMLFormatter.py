@@ -60,6 +60,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         self.beamline_file = None
         self.coolingChannel_file = None
         self.maus_information_file = None
+        self.corrections_file = None
         self.configuration_file = None
         self.material_file = None
         self.tracker_file = None
@@ -290,12 +291,13 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             # rec_rot = rot
             d_pos = [0, 0, 0]
             d_rot = [0, 0, 0]
-            for vol in corrs.xpathEval("Module"):
-                if vol.prop("name").find(name) >= 0:
-                    # get the corrections with respect to the device centre
-                    d_pos = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
-                    # rotations are measured in object coordinate system
-                    d_rot = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
+            if len(corrs) > 0:
+                for vol in corrs.xpathEval("Module"):
+                    if vol.prop("name").find(name) >= 0:
+                        # get the corrections with respect to the device centre
+                        d_pos = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
+                        # rotations are measured in object coordinate system
+                        d_rot = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
             d_pos_wrot = apply_rotationMC(d_pos, sol_rot)
             for i in [0,1,2]:
                 pos[i] += d_pos
@@ -822,9 +824,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         self.add_other_info()
         if self.coolingChannel_file != None:
             self.merge_cooling_channel_info(self.maus_information_file)
-        # if self.corrections_file != None:
-        #    self.merge_alignment_correction_info(self.maus_information_file)
-        #    self.apply_alignment_corrections()
+        if self.corrections_file != None:
+            self.merge_alignment_correction_info(self.maus_information_file)
+            self.apply_alignment_corrections()
             
         # if self.formatted == False:
         print self.configuration_file
