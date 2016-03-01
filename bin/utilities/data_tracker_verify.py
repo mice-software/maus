@@ -52,8 +52,10 @@ GRAD_CUT = 1.05
 MIN_NUM_TRACKPOINTS = 0
 IGNORE_PLANES = [ -7, -8, -9 ]
 
-PLOT_OPTIONS = { 'npe' : [ 'logy' ], \
+PLOT_OPTIONS = { 'npe_digit' : [ 'logy' ], \
                  'npe_cluster' : [ 'logy' ], \
+                 'npe_spacepoint' : [ 'logy' ], \
+                 'npe_fit_spacepoint' : [ 'logy' ], \
                  'adc' : [ 'logy' ], \
                  'adc_channel' : [ 'logy', 'colz' ], \
                  'npe_channel' : [ 'logz', 'colz' ], \
@@ -148,15 +150,19 @@ def init_plots_data() :
   reco_plots['tof_1_2_cut'] = ROOT.TH1F( 'tof_1_2_cut', 'Time TOF1 - TOF2', \
                                                              1000, 0.0, 100.0 )
 
-  reco_plots['npe'] = ROOT.TH1F( 'npe', "Number of Photo Electrons", \
-                                                            100, 0.0, 100.0 )
+  reco_plots['npe_digit'] = ROOT.TH1F( 'npe_digit', "Number of Photo Electrons", \
+                                                              100, 0.0, 100.0 )
+  reco_plots['npe_cluster'] = ROOT.TH1F( 'npe_cluster', \
+                                             "NPE per Cluster", 75, 0.0, 75.0 )
+  reco_plots['npe_spacepoint'] = ROOT.TH1F( 'npe_spacepoint', \
+                                       "NPE per Spacepoints", 100, 0.0, 100.0 )
+  reco_plots['npe_fit_spacepoint'] = ROOT.TH1F( 'npe_fit_spacepoint', \
+                                   "NPE per Used Spacepoint", 100, 0.0, 100.0 )
   reco_plots['adc'] = ROOT.TH1F( 'adc', "ADC Count", 260, 0.0, 260.0 )
   reco_plots['plane_hits'] = ROOT.TH1F("plane_hits", "Hits per Plane", 31, \
                                                                   -15.0, 16.0 )
   reco_plots['channels_cluster'] = ROOT.TH1F( 'channels_cluster', \
                                         "Channels per Cluster", 50, 0.0, 50.0 )
-  reco_plots['npe_cluster'] = ROOT.TH1F( 'npe_cluster', \
-                                             "NPE per Cluster", 75, 0.0, 75.0 )
   reco_plots['spacepoints_station'] = ROOT.TH1F( "spacepoints_station", \
                            "Spacepoints Found in Each Station", 11, -5.0, 6.0 )
   reco_plots['2_hit_spacepoints_station'] = ROOT.TH1F( \
@@ -378,7 +384,6 @@ def cut_scifi_event( plot_dict, event ) :
     if digit.get_adc() == 255 :
       saturation_counter += 1
 
-  plot_dict['recon_plots']['saturations_event'].Fill( saturation_counter )
   if saturation_counter > 1000 :
     return True
   else :
@@ -414,6 +419,7 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
   station_plots = plot_dict['station_plots']
   reco_plots = plot_dict['recon_plots']
 
+  saturation_counter = 0
   for digit in digits :
     tracker = digit.get_tracker()
     station = digit.get_station()
@@ -425,9 +431,13 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     plane_plots[dir_name]['adc_channel'].Fill( digit.get_channel(), \
                                                               digit.get_adc() )
     if digit.get_adc() != 255 :
-      reco_plots['npe'].Fill( digit.get_npe() )
+      reco_plots['npe_digit'].Fill( digit.get_npe() )
       plane_plots[dir_name]['npe_channel'].Fill( digit.get_channel(), \
                                                               digit.get_npe() )
+    else :
+      saturation_counter += 1
+
+  plot_dict['recon_plots']['saturations_event'].Fill( saturation_counter )
 
   kuno_sums = {}
   for tracker in [ 0, 1 ] :
@@ -493,17 +503,35 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     station_plots[dir_name]['spacepoints'].Fill( \
                  spacepoint.get_position().x(), spacepoint.get_position().y() )
 
-    if len( spacepoint.get_channels_pointers() ) == 2 :
+    sp_clusters = spacepoint.get_channels_pointers()
+
+    if len( sp_clusters ) == 2 :
       reco_plots['2_hit_spacepoints_station'].Fill( station_id )
       station_plots[dir_name]['2_hit_spacepoints'].Fill( \
                  spacepoint.get_position().x(), spacepoint.get_position().y() )
-    elif len( spacepoint.get_channels_pointers() ) == 3 :
+    elif len( sp_clusters ) == 3 :
       reco_plots['3_hit_spacepoints_station'].Fill( station_id )
       station_plots[dir_name]['3_hit_spacepoints'].Fill( \
                  spacepoint.get_position().x(), spacepoint.get_position().y() )
     else :
       raise ValueError( "Unknown Number of spacepoints: " + \
-                               str( len(spacepoint.get_channels_pointers()) ) )
+                               str( sp_clusters ) )
+
+    npe = 0.0
+    for cluster in sp_clusters :
+      clus_digits = cluster.get_digits_pointers()
+      for digit in clus_digits :
+        if digit.get_adc() == 255 :
+          flag = False
+          break
+      else :
+        npe += cluster.get_npe()
+        continue
+      break
+    else :
+      reco_plots['npe_spacepoint'].Fill( npe )
+      if spacepoint.is_used() :
+        reco_plots['npe_fit_spacepoint'].Fill( npe )
 
 
   return True
