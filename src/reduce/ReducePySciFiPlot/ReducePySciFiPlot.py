@@ -215,7 +215,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
             #Checks for TOF digit hits in TOF1 and TOF2, if found
             #records the tracker, station, plane, and channel of digit
-            for di in range(len(digits)):
+            for di in range(digits.size()):
                 if True:
                     tr=digits[di].get_tracker()
                     st=digits[di].get_station()
