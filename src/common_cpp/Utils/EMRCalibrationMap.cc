@@ -118,7 +118,7 @@ bool EMRCalibrationMap::Initialize(std::string calibFile) {
 
 int EMRCalibrationMap::MakeEMRChannelKeys() {
 
-  for (int iPlane = -1; iPlane < _number_of_planes; iPlane++) // NB: global average (-1)
+  for (int iPlane = 0; iPlane < _number_of_planes; iPlane++)
     for (int iBar = -1; iBar < _number_of_bars; iBar++) // NB: average (-1), test channels (0)
       _Ckey.push_back(EMRChannelKey(iPlane, iPlane%2, iBar, "emr"));
 
@@ -237,9 +237,11 @@ bool EMRCalibrationMap::Load(std::string calibFile) {
 
 int EMRCalibrationMap::FindEMRChannelKey(EMRChannelKey key) const {
 
-  for (size_t i = 0; i < _Ckey.size(); i++ )
-    if ( _Ckey.at(i) == key )
-      return i;
+  int xPlane = key.GetPlane();
+  int xBar = key.GetBar();
+  if ( xPlane > -1 && xPlane < _number_of_planes &&	// Can go from 0 to 47
+       xBar > -2 && xBar < _number_of_bars )		// Can go from -1 to 59
+      return (xPlane)*(_number_of_bars+1)+(xBar+1);
 
   return NOCALIB;
 }

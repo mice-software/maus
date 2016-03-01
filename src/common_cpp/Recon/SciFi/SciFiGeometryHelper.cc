@@ -108,7 +108,7 @@ void SciFiGeometryHelper::Build() {
 
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = reference;
-      trackerGeo.Rotation = trackerModule->globalRotation();
+      trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
       trackerGeo.Field = FieldValue(trackerModule);
       trackerGeo.Planes[plane_id] = this_plane;
 
@@ -139,7 +139,7 @@ double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
   }
   Hep3Vector globalPos = trackerModule->globalPosition();
   Hep3Vector relativePos(0., 0., 0.);
-  HepRotation trackerRotation = trackerModule->globalRotation();
+  HepRotation trackerRotation = (trackerModule->globalRotation()).inverse();
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {0., 0., 0., 0.};
   BTFieldConstructor* field = Globals::GetReconFieldConstructor();
@@ -306,26 +306,22 @@ std::vector<double> SciFiGeometryHelper::TransformStraightParamsToGlobal(
   double gy0 = 0.0;
   double gmzy = 0.0;
 
-  // Calculate the local coordinates of one point on the line, use z = 0
-  double z = 0.0;
-  double x = mzx*z + x0;
-  double y = mzy*z + y0;
-  ThreeVector pos(x, y, z);
-
-  // Transform the point from local to global cooridinates (used to bring in offsets)
+  // Calculate the global coordinates of the point at the ref. plane
+  double z = GetPlanePosition(1, 1, 0);
+  ThreeVector pos(x0, y0, z);
   ThreeVector global_pos = TransformPositionToGlobal(pos, tracker);
 
-  // The gradients remain the same, except the dy/dz gradient in TkUS which flips
-  if (tracker == 0) {
-    gmzy = - mzy;
-  } else {
-    gmzy = mzy;
-  }
+  // The gradients are rotated around the tracker centre
+  ThreeVector grad(mzx, mzy, 1);
+  CLHEP::HepRotation reference_rotation = GetReferenceRotation(tracker);
+  grad *= reference_rotation;
 
-  // Calculate the rest of the parameters in the global system
-  gmzx = mzx;
-  gx0 = global_pos.x() - gmzx*global_pos.z();
-  gy0 = global_pos.y() - gmzy*global_pos.z();
+  gmzx = grad.x()/grad.z();
+  gmzy = grad.y()/grad.z();
+
+  // Calculate the y-intercepts at the z=0 (D2 in global coordinates)
+  gx0 = global_pos.x()-gmzx*global_pos.z();
+  gy0 = global_pos.y()-gmzy*global_pos.z();
 
   // Return the result as a vector
   std::vector<double> global_params{ gx0, gmzx, gy0, gmzy }; // NOLINT

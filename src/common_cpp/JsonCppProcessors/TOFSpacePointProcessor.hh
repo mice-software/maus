@@ -58,6 +58,12 @@ class TOFSpacePointProcessor : public ObjectProcessor<TOFSpacePoint> {
     StringProcessor _detector_proc;
     IntProcessor _part_event_number_proc;
     DoubleProcessor _dt_proc;
+    DoubleProcessor _global_x_proc;
+    DoubleProcessor _global_y_proc;
+    DoubleProcessor _global_z_proc;
+    DoubleProcessor _global_x_err_proc;
+    DoubleProcessor _global_y_err_proc;
+    DoubleProcessor _global_z_err_proc;
 };
 }  // namespace MAUS
 
