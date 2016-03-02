@@ -30,7 +30,12 @@
                 </title>
             </head>
             <body>  
-	
+	                    // A Note on Rotations:
+			    // 
+	                    // This is the geometry configuration to be used with a simulated geometry sourced from GDML. All rotations follow the 
+			    // convention used by GEANT4 which applies CLHEP rotations in a "passive" mode rotating the coordinate systems of the 
+			    // simulated objects rather then the objects themselves. As such the rotations are defined such that positive angles 
+			    // produce a counter-clockwise rotation about the rotation axis when viewed in the direction of the axis of rotation.
 
                             //Substitutions
                             <xsl:variable name="run_number" select="MICE_Information/Configuration_Information/run/@runNumber"/>
