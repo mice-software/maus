@@ -25,7 +25,8 @@ EMRAttenuationMap::EMRAttenuationMap() {
 
 EMRAttenuationMap::~EMRAttenuationMap() {
 
-  _Ckey.clear();
+  _CkeyCA.clear();
+  _CkeyCFL.clear();
   _caf_MA.resize(0);
   _caf_SA.resize(0);
   _cfl_MA.resize(0);
@@ -72,12 +73,16 @@ int EMRAttenuationMap::MakeEMRChannelKeys() {
 
   for (int iPlane = 0; iPlane < _number_of_planes; iPlane++)
     for (int iBar = 1; iBar < _number_of_bars; iBar++)
-      _Ckey.push_back(EMRChannelKey(iPlane, iPlane%2, iBar, "emr"));
+      _CkeyCA.push_back(EMRChannelKey(iPlane, iPlane%2, iBar, "emr"));
 
-  int nChannels = _Ckey.size();
+  for (int iBar = 1; iBar < _number_of_bars; iBar++)
+    _CkeyCFL.push_back(EMRChannelKey(-1, 0, iBar, "emr"));
+
+  int nChannels = _CkeyCA.size();
   _caf_MA.resize(nChannels);
   _caf_SA.resize(nChannels);
 
+  nChannels = _CkeyCFL.size();
   _cfl_MA.resize(nChannels);
   _cfl_SA.resize(nChannels);
 
@@ -87,7 +92,7 @@ int EMRAttenuationMap::MakeEMRChannelKeys() {
 bool EMRAttenuationMap::LoadConnectorAttenFile(std::string connectorAttenFile) {
 
   // Check the calibration file
-  FILE *file = fopen(connectorAttenFile.c_str(), "r");
+  std::ifstream file(connectorAttenFile.c_str());
   if ( !file ) {
     throw(Exception(Exception::recoverable,
           "Could not find EMR connector attenuation map",
@@ -95,22 +100,22 @@ bool EMRAttenuationMap::LoadConnectorAttenFile(std::string connectorAttenFile) {
   }
 
   // Fill the arrays of correction factors
-  char line[100];
   try {
-    while ( fgets(line, 100, file) ) {
-      int pmid(-1), chid(-1);
-      float attenuation(-1.0);
-      sscanf(line, "%d  %d  %f", &pmid, &chid, &attenuation);
-      if ( pmid == 0 ) {
-	int n = FindEMRChannelKey(EMRChannelKey(chid/59, (chid/59)%2, chid%59+1, "emr"));
-        _caf_MA[n] = attenuation;
-      } else if ( pmid == 1 ) {
-	int n = FindEMRChannelKey(EMRChannelKey(chid/59, (chid/59)%2, chid%59+1, "emr"));
-        _caf_SA[n] = attenuation;
+    while ( !file.eof() ) {
+      char pmt[10], fom[10];
+      int plane(-9), bar(-9);
+      double att(-1.0);
+      file >> pmt >> fom >> plane >> bar >> att;
+
+      int n = FindEMRChannelKey(EMRChannelKey(plane, plane%2, bar, "emr"));
+      if ( strcmp(fom, "mean") == 0 && n != NOATTEN ) {
+        if (strcmp(pmt, "MA") == 0) {
+	  _caf_MA[n] = att;
+        } else if (strcmp(pmt, "SA") == 0) {
+	  _caf_SA[n] = att;
+        }
       }
     }
-
-    fclose(file);
   } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in EMRAttenuationMap::LoadConnectorAtten : Error during loading. " << std::endl
@@ -124,7 +129,7 @@ bool EMRAttenuationMap::LoadConnectorAttenFile(std::string connectorAttenFile) {
 bool EMRAttenuationMap::LoadCfLengthFile(std::string cfLengthFile) {
 
   // Check the calibration file
-  FILE *file = fopen(cfLengthFile.c_str(), "r");
+  ifstream file(cfLengthFile.c_str());
   if ( !file ) {
     throw(Exception(Exception::recoverable,
           "Could not find EMR clear fibre length",
@@ -132,24 +137,22 @@ bool EMRAttenuationMap::LoadCfLengthFile(std::string cfLengthFile) {
   }
 
   // Fill the arrays of correction factors
-  char line[100];
   try {
-    while ( fgets(line, 100, file) ) {
-      int pmid(-1), barid(-1);
-      float length(-1.0);
-    sscanf(line, "%d  %d  %f", &pmid, &barid, &length);
-      for (int iPlane = 0; iPlane < _number_of_planes; iPlane++) {
-        if ( pmid == 0 ) {
-	  int n = FindEMRChannelKey(EMRChannelKey(iPlane, iPlane%2, barid, "emr"));
-          _cfl_MA[n] = length;
-        } else if ( pmid == 1 ) {
-	  int n = FindEMRChannelKey(EMRChannelKey(iPlane, iPlane%2, barid, "emr"));
-          _cfl_SA[n] = length;
-	}
+    while ( !file.eof() ) {
+      char pmt[10];
+      int plane(-9), bar(-9);
+      double len(-1.0);
+      file >> pmt  >> plane >> bar >> len;
+
+      int n = FindEMRBarKey(EMRChannelKey(plane, plane%2, bar, "emr"));
+      if ( n != NOATTEN ) {
+        if (strcmp(pmt, "MA") == 0) {
+	  _cfl_MA[n] = len;
+        } else if (strcmp(pmt, "SA") == 0) {
+	  _cfl_SA[n] = len;
+        }
       }
     }
-
-    fclose(file);
   } catch (MAUS::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in EMRAttenuationMap::LoadCfLength : Error during loading. " << std::endl
@@ -162,9 +165,20 @@ bool EMRAttenuationMap::LoadCfLengthFile(std::string cfLengthFile) {
 
 int EMRAttenuationMap::FindEMRChannelKey(EMRChannelKey key) const {
 
-  for (unsigned int i = 0; i < _Ckey.size(); ++i )
-    if ( _Ckey.at(i) == key )
-      return i;
+  int xPlane = key.GetPlane();
+  int xBar = key.GetBar();
+  if ( xPlane > -1 && xPlane < _number_of_planes &&
+       xBar > 0 && xBar < _number_of_bars )
+      return xPlane*(_number_of_bars-1)+(xBar-1);
+
+  return NOATTEN;
+}
+
+int EMRAttenuationMap::FindEMRBarKey(EMRChannelKey key) const {
+
+  int xBar = key.GetBar();
+  if ( xBar > 0 && xBar < _number_of_bars )
+      return xBar - 1;
 
   return NOATTEN;
 }
@@ -172,18 +186,19 @@ int EMRAttenuationMap::FindEMRChannelKey(EMRChannelKey key) const {
 double EMRAttenuationMap::connectorAtten(EMRChannelKey key, const char *pmt) const {
 
   int n = FindEMRChannelKey(key);
-  double attenuation(-1.);
+  double att(-1.);
 
   if ( n != NOATTEN ) {
     if ( strcmp(pmt, "MA") == 0 ) {
-      attenuation = _caf_MA[n] + 1;
+      att = _caf_MA[n];
     } else if ( strcmp(pmt, "SA") == 0 ) {
-      attenuation = _caf_SA[n] + 1;
+      att = _caf_SA[n];
     } else {
-      Squeak::mout(Squeak::error) << "Wrong PMT ID" << std::endl;
+      Squeak::mout(Squeak::error)
+	<< "Wrong PMT ID in EMRAttenuationMap::connectorAtten" << std::endl;
     }
-    if ( attenuation > 0 )
-	return attenuation;
+    if ( att > 0 )
+	return att;
   }
 
   return NOATTEN;
@@ -191,19 +206,20 @@ double EMRAttenuationMap::connectorAtten(EMRChannelKey key, const char *pmt) con
 
 double EMRAttenuationMap::cfLength(EMRChannelKey key, const char *pmt) const {
 
-  int n = FindEMRChannelKey(key);
-  double length(-1.);
+  int n = FindEMRBarKey(key);
+  double len(-1.);
 
   if ( n != NOATTEN ) {
     if ( strcmp(pmt, "MA") == 0 ) {
-      length = _cfl_MA[n];
+      len = _cfl_MA[n];
     } else if (strcmp(pmt, "SA") == 0) {
-      length = _cfl_SA[n];
+      len = _cfl_SA[n];
     } else {
-      Squeak::mout(Squeak::error) << "Wrong PMT ID" << std::endl;
+      Squeak::mout(Squeak::error)
+	<< "Wrong PMT ID in EMRAttenuationMap::cfLength" << std::endl;
     }
-    if ( length > 0 )
-	return length;
+    if ( len > 0 )
+	return len;
   }
 
   return NOATTEN;
@@ -267,12 +283,18 @@ double EMRAttenuationMap::fibreDelay(EMRChannelKey key, double x, double y, cons
 void EMRAttenuationMap::Print() {
 
   std::cerr << "====================== EMRAttenuationMap =========================" << std::endl;
-  std::cerr << " Number of channels : " << _Ckey.size() << std::endl;
+  std::cerr << "Connector attenuation map" << std::endl;
+  std::cerr << "Number of channels : " << _CkeyCA.size() << std::endl;
 
-  for (unsigned int i = 0; i < _Ckey.size(); i++)
-    std::cerr << _Ckey[i] << " CAF (MA): " << _caf_MA[i] << ", CAF (SA): " << _caf_SA[i]
-              << ", CFL (MA): " << _cfl_MA[i] << ", CFL (SA): " << _cfl_SA[i] << std::endl;
+  for (unsigned int i = 0; i < _CkeyCA.size(); i++)
+    std::cerr << _CkeyCA[i] << " CAF (MA): " << _caf_MA[i]
+	      << ", CAF (SA): " << _caf_SA[i] << std::endl;
 
+  std::cerr << "\nClear fibre length map" << std::endl;
+  std::cerr << "Number of fibres : " << _CkeyCFL.size() << std::endl;
+  for (unsigned int i = 0; i < _CkeyCFL.size(); i++)
+    std::cerr << _CkeyCFL[i] << " CFL (MA): " << _cfl_MA[i]
+	      << ", CFL (SA): " << _cfl_SA[i] << std::endl;
   std::cerr<< "===================================================================" << std::endl;
 }
 } // namespace MAUS
