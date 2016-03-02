@@ -98,6 +98,8 @@ struct SciFiTrackerGeometry {
   HepRotation Rotation;
   ThreeVector Position;
   double Field;
+  double FieldVariance;
+  double FieldRange;
   SciFiPlaneMap Planes;
 };
 
@@ -144,12 +146,14 @@ class SciFiGeometryHelper {
 
   /** @brief Finds the average on axis field value of a cylinder by calling the BTFieldConstructor.
    */
-  double FieldValue(const MiceModule* trackerModule);
+  void FieldValue(const MiceModule* trackerModule, SciFiTrackerGeometry& geom);
 
   SciFiTrackerMap& GeometryMap() { return _geometry_map; }
   const SciFiTrackerMap& GeometryMap() const { return _geometry_map; }
 
   double GetFieldValue(int tracker) const { return _geometry_map.find(tracker)->second.Field; }
+  double GetFieldVariance(int tracker) const { return _geometry_map.find(tracker)->second.FieldVariance; }
+  double GetFieldRange(int tracker) const { return _geometry_map.find(tracker)->second.FieldRange; }
 
   ThreeVector GetReferencePosition(int tracker) const
                                            { return _geometry_map.find(tracker)->second.Position; }

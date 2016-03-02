@@ -141,6 +141,26 @@ def init_plots_data() :
 
 
   reco_plots = {}
+  reco_plots['field_mean_up'] = ROOT.TH1F( 'field_mean_up', 
+                        "Mean Field in Upstream Tracker", 1000, -5.0, 5.0 )
+  reco_plots['field_mean_down'] = ROOT.TH1F( 'field_mean_down', 
+                        "Mean Field in Upstream Tracker", 1000, -5.0, 5.0 )
+
+  reco_plots['field_variance_up'] = ROOT.TH1F( 'field_variance_up', 
+                    "Field Variance in Upstream Tracker", 1000, -5.0, 5.0 )
+  reco_plots['field_variance_down'] = ROOT.TH1F( 'field_variance_down', 
+                    "Field Variance in Upstream Tracker", 1000, -5.0, 5.0 )
+
+  reco_plots['field_rms_up'] = ROOT.TH1F( 'field_rms_up', 
+                         "Field RMS in Upstream Tracker", 1000, -5.0, 5.0 )
+  reco_plots['field_rms_down'] = ROOT.TH1F( 'field_rms_down', 
+                         "Field RMS in Upstream Tracker", 1000, -5.0, 5.0 )
+
+  reco_plots['field_range_up'] = ROOT.TH1F( 'field_range_up', 
+                       "Field Range in Upstream Tracker", 1000, -5.0, 5.0 )
+  reco_plots['field_range_down'] = ROOT.TH1F( 'field_range_down', 
+                       "Field Range in Upstream Tracker", 1000, -5.0, 5.0 )
+
   reco_plots['tof_0_1'] = ROOT.TH1F( 'tof_0_1', 'Time TOF0 - TOF1', \
                                                              1000, 0.0, 100.0 )
   reco_plots['tof_1_2'] = ROOT.TH1F( 'tof_1_2', 'Time TOF1 - TOF2', \
@@ -394,6 +414,15 @@ def fill_plots_data(plot_dict, data_dict, event) :
   """
     Fill the plots in the plot dictionary with data
   """
+  plot_dict['recon_plots']['field_mean_up'].Fill(1000.0*event.get_mean_field_up())
+  plot_dict['recon_plots']['field_mean_down'].Fill(1000.0*event.get_mean_field_down())
+  plot_dict['recon_plots']['field_variance_up'].Fill(1.0E+6*event.get_variance_field_up())
+  plot_dict['recon_plots']['field_variance_down'].Fill(1.0E+6*event.get_variance_field_down())
+  plot_dict['recon_plots']['field_rms_up'].Fill(1000.0*math.sqrt(event.get_variance_field_up()))
+  plot_dict['recon_plots']['field_rms_down'].Fill(1000.0*math.sqrt(event.get_variance_field_down()))
+  plot_dict['recon_plots']['field_range_up'].Fill(1000.0*event.get_range_field_up())
+  plot_dict['recon_plots']['field_range_down'].Fill(1000.0*event.get_range_field_down())
+
   scifi_digits = event.digits()
   if not scifi_digits :
     return 
