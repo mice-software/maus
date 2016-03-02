@@ -91,13 +91,13 @@ class PIDVarBTest : public ::testing::Test {
 		  tp0->set_position(pos0);
 		  tp1->set_position(pos1);
 		  tpTracker->set_momentum(tpTrackerMom);
-		  tp0->set_mapper_name("MapCppGlobalTrackMatching");
-		  tp1->set_mapper_name("MapCppGlobalTrackMatching");
-		  tpTracker->set_mapper_name("MapCppGlobalTrackMatching");
+		  tp0->set_mapper_name("MapCppGlobalTrackMatching-Through");
+		  tp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
+		  tpTracker->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTrack->AddTrackPoint(tp0);
 		  testTrack->AddTrackPoint(tp1);
 		  testTrack->AddTrackPoint(tpTracker);
-		  testTrack->set_mapper_name("MapCppGlobalTrackMatching");
+		  testTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 		  testTracks.push_back(testTrack);
 		}
 	}
@@ -138,11 +138,11 @@ TEST_F(PIDVarBTest, ReadFileConstructor) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarB testPIDVarB(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarB testPIDVarB(file, "test", 50, 350, 20, 40));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarB testPIDVarB(NULL, "test"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarB testPIDVarB(NULL, "test", 50, 350, 20, 40));
 
-	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarB testPIDVarB(file, "sasquatch"));
+	ASSERT_ANY_THROW(MAUS::recon::global::PIDVarB testPIDVarB(file, "sasquatch", 50, 350, 20, 40));
 }
 
 /* N.B. if either FillHist or LogL are failing, check the values of min and max
@@ -210,13 +210,13 @@ TEST_F(PIDVarBTest, LogL) {
 	ctp0->set_position(cpos0);
 	ctp1->set_position(cpos1);
 	ctpTracker->set_momentum(ctpTrackerMom);
-	ctp0->set_mapper_name("MapCppGlobalTrackMatching");
-	ctp1->set_mapper_name("MapCppGlobalTrackMatching");
-	ctpTracker->set_mapper_name("MapCppGlobalTrackMatching");
+	ctp0->set_mapper_name("MapCppGlobalTrackMatching-Through");
+	ctp1->set_mapper_name("MapCppGlobalTrackMatching-Through");
+	ctpTracker->set_mapper_name("MapCppGlobalTrackMatching-Through");
 	checkTrack->AddTrackPoint(ctp0);
 	checkTrack->AddTrackPoint(ctp1);
 	checkTrack->AddTrackPoint(ctpTracker);
-	checkTrack->set_mapper_name("MapCppGlobalTrackMatching");
+	checkTrack->set_mapper_name("MapCppGlobalTrackMatching-Through");
 
 	file = new TFile(testfile.c_str(), "READ");
 
@@ -224,9 +224,9 @@ TEST_F(PIDVarBTest, LogL) {
 
 	ASSERT_FALSE(file->IsZombie());
 
-	ASSERT_NO_THROW(MAUS::recon::global::PIDVarB readtestPIDVarB(file, "test"));
+	ASSERT_NO_THROW(MAUS::recon::global::PIDVarB readtestPIDVarB(file, "test", 50, 350, 20, 40));
 
-	MAUS::recon::global::PIDVarB readtestPIDVarB(file, "test");
+	MAUS::recon::global::PIDVarB readtestPIDVarB(file, "test", 50, 350, 20, 40);
 
 	hist = readtestPIDVarB.Get_hist();
 	ASSERT_TRUE(hist);

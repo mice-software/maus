@@ -118,28 +118,6 @@ namespace TrackMomentum {
     *  @param par[0]	- Input mass of the ion (M)
     */
   double rangefunction(double* x, double* par);
-
-
-  // Masses
-  double _m;		// Mass of impinging particle [MeV/c^2]
-  double _z;		// Charge of the impinging particle [e]
-  double _me;		// Electron mass [MeV/c^2]
-
-  // Material properties
-  double _Z;		// Effective atomic number [e]
-  double _A;		// Relative atomic mass [g/mole]
-  double _rau;	 	// Density [g/cm^3]
-  double _I;		// Mean excitation potential [MeV]
-
-  // Empirical parameters of the delta function
-  double _C;
-  double _a;
-  double _k;
-  double _X0;
-  double _X1;
-
-  // Bethe-Bloch constant
-  double _K;		// [MeV*cm^2/g]
 } // namespace TrackMomentum
 
 #endif // #define _SRC_COMMON_CPP_RECON_EMR_TRACKMOMENTUM_HH

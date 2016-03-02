@@ -83,8 +83,8 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON, int rnum) {
   if (_cabling_source == "file")
       fromDB = false;
 
-  std::cerr << ">>> SOURCE: " << fromDB << std::endl;
-  std::cerr << ">>> BY: " << _tof_cabling_by << std::endl;
+//  std::cerr << ">>> SOURCE: " << fromDB << std::endl;
+//  std::cerr << ">>> BY: " << _tof_cabling_by << std::endl;
   bool loaded;
   if (!fromDB) {
       std::string tof_cabling_file = JsonWrapper::GetProperty(configJSON,

@@ -19,6 +19,29 @@
 
 namespace TrackMomentum {
 
+// Masses
+double _m;		// Mass of impinging particle [MeV/c^2]
+double _z;		// Charge of the impinging particle [e]
+double _me;		// Electron mass [MeV/c^2]
+
+// Material properties
+double _Z;		// Effective atomic number [e]
+double _A;		// Relative atomic mass [g/mole]
+double _rau;	 	// Density [g/cm^3]
+double _I;		// Mean excitation potential [MeV]
+
+// Empirical parameters of the delta function
+double _C;
+double _a;
+double _k;
+double _X0;
+double _X1;
+
+// Bethe-Bloch constant
+double _K;		// [MeV*cm^2/g]
+
+TF1* f(0);
+
 double csda_momentum(double range,
 		     std::string particle) {
 
@@ -28,10 +51,12 @@ double csda_momentum(double range,
   if ( !initialize(particle) )
     return -1;
 
-  TF1* f = new TF1("f", rangefunction, .05*_m, 1000, 1);
+  if (!f)
+    f = new TF1("f", rangefunction, .05*_m, 1000, 1);
+
   f->SetParameter(0, _m);
   double p = f->GetX(range, .05*_m, 1000, pow(10, -6));
-  delete f;
+//   delete f;
 
   return p; // Total momentum [MeV/c]
 }
@@ -46,10 +71,12 @@ double csda_momentum_error(double momentum,
   if ( momentum < .05*_m ) // Limit of Bethe-Bloch validity
     return -1;
 
-  TF1* f = new TF1("f", rangefunction, .05*_m, 1000, 1);
+  if (!f)
+    f = new TF1("f", rangefunction, .05*_m, 1000, 1);
+
   f->SetParameter(0, _m);
   double dpdr = 1./(f->Derivative(momentum));
-  delete f;
+//   delete f;
 
   return dpdr*erange; // [MeV/c]
 }
@@ -167,14 +194,18 @@ double invbethe_jac(double *x, double *par) {
   return dxde*beta*par[0];
 }
 
+TF1 *f_bb(0);
+
 double rangefunction(double *x, double *par) {
 
   double alpha = x[0]/par[0];
 
-  TF1 *f = new TF1("f", invbethe_jac, 0.05, 100, 1); // Scope of validity of Bethe-Bloch
-  f->SetParameter(0, par[0]);
-  double R = f->Integral(0.05, alpha);
-  delete f;
+  if (!f_bb)
+    f_bb = new TF1("f", invbethe_jac, 0.05, 100, 1); // Scope of validity of Bethe-Bloch
+
+  f_bb->SetParameter(0, par[0]);
+  double R = f_bb->Integral(0.05, alpha, f->GetParameters(), 1e-3);
+//   delete f_bb;
 
   return R; // mm
 }

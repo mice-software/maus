@@ -25,6 +25,8 @@
 #include "TROOT.h"
 #include "TH1.h"
 #include "TCanvas.h"
+#include "THStack.h"
+#include "TLegend.h"
 
 #include "src/common_cpp/API/ReduceBase.hh"
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
@@ -57,13 +59,37 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
 
   void update_tof_plots(TOFEvent* tof_event);
 
+  void setHistosTitle(int runNum);
+
   int _refresh_rate;
   int _process_count;
+  bool _got_SOR;
 
   std::vector<TH1F*> _histos;
   std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
+  TH1F *_hslabx_0, *_hslabx_1, *_hslabx_2;
+  TH1F *_hslaby_0, *_hslaby_1, *_hslaby_2;
+  TH1F *_htof_pmt[3][2][2];
+  TH1F *_hspx_0, *_hspx_1, *_hspx_2;
+  TH1F *_hspy_0, *_hspy_1, *_hspy_2;
+  TH1F *_hnsp_0, *_hnsp_1, *_hnsp_2;
+  TH2F *_hspxy[3];
+  TH2F *_hspxy_0, *_hspxy_1, *_hspxy_2;
+  TH1F *_htof0_nspVspill, *_htof1_nspVspill, *_htof2_nspVspill;
+  THStack *_hstack_spx, *_hstack_spy;
+  THStack *_hstack_nsp;
+  THStack *_hstack_slabx, *_hstack_slaby;
+  THStack *_hstack_pm0pln0, *_hstack_pm0pln1;
+  THStack *_hstack_pm1pln0, *_hstack_pm1pln1;
+  TCanvas *_canv_tof_spx, *_canv_tof_spy;
   TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
+  TCanvas *_canv_tof0_spxy, *_canv_tof1_spxy, *_canv_tof2_spxy;
+  TCanvas *_canv_tof_nsp;
+  TCanvas *_canv_tof_slabx, *_canv_tof_slaby;
+  TCanvas *_canv_tof_pm0pln0, *_canv_tof_pm0pln1;
+  TCanvas *_canv_tof_pm1pln0, *_canv_tof_pm1pln1;
+  TCanvas *_canv_tof0_nspVspill, *_canv_tof1_nspVspill, *_canv_tof2_nspVspill;
 };
 }
 

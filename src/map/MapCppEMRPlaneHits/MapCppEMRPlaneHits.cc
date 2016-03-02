@@ -177,6 +177,8 @@ void MapCppEMRPlaneHits::process_DBB(MAUS::EMRDaq EMRdaq,
         int xBar   = emrKey->GetBar();
         int xLTime  = this_hit.GetLTime();
         int xTTime  = this_hit.GetTTime();
+	if ( !xLTime || !xTTime )
+	    continue;
         int xTot = xTTime - xLTime;
 //        std::cerr << *emrKey << " --> xLTime: " << xLTime
 //                             << "  xTTime: " << xTTime << std::endl;

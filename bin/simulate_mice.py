@@ -45,8 +45,8 @@ def run():
     my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
 
     # EMR
-    my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
-    my_map.append(MAUS.MapCppEMRSpacePoints())  # EMR MC Digitization
+    my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitizer
+    my_map.append(MAUS.MapCppEMRSpacePoints())  # EMR Space Points
     my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
 
     # Ckov
