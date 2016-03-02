@@ -215,7 +215,7 @@ class PolynomialMapTestCase(unittest.TestCase): # pylint: disable = R0904
         """
         # tku_data is a list of data, each element being a list like
         # [x, px, y, py]
-        n_events = 1000
+        n_events = 4000
         error_matrix = [[0. for i in range(5)] for j in range(5)]
         error_matrix[1][1] = 0.1
         error_matrix[2][2] = 10.
@@ -226,7 +226,8 @@ class PolynomialMapTestCase(unittest.TestCase): # pylint: disable = R0904
         tku_data = [None]*n_events
         tku_data_err = [None]*n_events
         for i in range(n_events):
-            tku_data = [random.uniform(-i, i) for i in [100., 10., 100., 10.]]
+            tku_data[i] = \
+                         [random.uniform(-w, w) for w in [100., 10., 100., 10.]]
             err_vec = numpy.random.multivariate_normal(error_mean, error_matrix)
             tku_data_err[i] = [tku_data[i][j-1]+err_vec[j] for j in range(1, 5)]
         
@@ -238,16 +239,16 @@ class PolynomialMapTestCase(unittest.TestCase): # pylint: disable = R0904
                                         tku_data_err, tkd_data, 1, error_matrix)
         matrix = fitted_map.get_coefficients_as_matrix()
 
-        fitted_map = PolynomialMap.least_squares_fit(tku_data, tkd_data, 1)
-        matrix_no_err = fitted_map.get_coefficients_as_matrix()
+        #fitted_map = PolynomialMap.least_squares_fit(tku_data, tkd_data, 1)
+        #matrix_no_err = fitted_map.get_coefficients_as_matrix()
         fitted_map = PolynomialMap.least_squares_fit(
                                                  tku_data_err, tkd_data, 1)
         matrix_err = fitted_map.get_coefficients_as_matrix()
 
         print "\nError matrix:", self._str_matrix(error_matrix)
         print "\nTruth:", self._str_matrix(self.coefficients_4d)
-        print "\nMatrix fitted without any errors:", \
-              self._str_matrix(matrix_no_err)
+        #print "\nMatrix fitted without any errors:", \
+        #      self._str_matrix(matrix_no_err)
         print "\nMatrix with errors:", self._str_matrix(matrix_err)
         print "\nMatrix with errors but then subtract off systematic:", \
               self._str_matrix(matrix)
