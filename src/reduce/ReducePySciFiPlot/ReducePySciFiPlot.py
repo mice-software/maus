@@ -112,16 +112,11 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.digitdict={}
 
         #Initializing dynamic objects
-        self.trp_hist={} #triplet in channel
         self.dig_hist={} #digit in channel
-        self.pos_hist={} #position
         self.spt_hist={} #spacepoint triplets- position of triplets
         self.spd_hist={} #spacepoint doublets
         self.sum_hist={} #digit channel sum
-        self.npe_hist={} #triplet photoeletron-actual eletrons in fibre
         self.spa_hist={} #spacepoint
-        self.sef_hist={} #number of triplets in an event
-        self.dub_hist={} #number of doublets in an event
         self.eff_hist={} #space point type
 
 
@@ -173,9 +168,6 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         if data_spill and not self.get_SciFiSpacepoints(spill): 
             raise ValueError("SciFi spacepoints not in spill")
 
-        if data_spill and not self.get_Spc2(spill): 
-            raise ValueError("SciFi spacepoints not in spill")
-
 
         # Refresh canvases at requested frequency.
         #print self.refresh_rate
@@ -186,7 +178,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
             return []
 
 
-    def get_SciFiDigits(self, spill):
+    def get_SciFiDigits(self, spill_data):
 
         """
         Get the SciFiDigits and update the histograms.
@@ -196,12 +188,10 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         the spill.
         """
 
-        spill = spill.GetSpill()
+        spill = spill_data.GetSpill()
         if spill.GetReconEventSize() == 0:
             raise ValueError("recon_events not in spill")
         reconevents = spill.GetReconEvents()
-        # print '# recon events = ',reconevents[0].GetPartEventNumber()
-        #for evn in range(spill.GetReconEventSize()):
         for evn in range(reconevents.size()):
             sci_fi_event = reconevents[evn].GetSciFiEvent()
             if sci_fi_event is None:
@@ -213,25 +203,23 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
             # Gives information on cabling efficiency
             title = "Run "+str(spill.GetRunNumber())+" Spill "+str(spill.GetSpillNumber())
-            #Checks for TOF digit hits in TOF1 and TOF2, if found
             #records the tracker, station, plane, and channel of digit
-            for di in range(digits.size()):
+            for di in range(len(digits)):
                 if True:
                     tr=digits[di].get_tracker()
                     st=digits[di].get_station()
                     pl=digits[di].get_plane()
                     ch=digits[di].get_channel()
-                    #name = self.digit_hist_name(tr, st, pl)
                     self.dig_hist[tr][st][pl].Fill(ch)
-                    if not tr in digitdict:
-                        digitdict[tr]={}
-                    if not st in digitdict[tr]:
-                        digitdict[tr][st]=[]
-                        digitdict[tr][st].append([pl,ch])
+                    self.digitdict[tr][st].append([pl,ch])
+                    if not tr in self.digitdict:
+                        self.digitdict[tr]={}
+                    if not st in self.digitdict[tr]:
+                        self.digitdict[tr][st]=[]
             #Takes the digit list and looks for channel sums
-            for tra in digitdict:
-                for sta in digitdict[tra]:
-                    dlist=digitdict[tra][sta]
+            for tra in self.digitdict:
+                for sta in self.digitdict[tra]:
+                    dlist=self.digitdict[tra][sta]
                     dsize=len(dlist)
                     fill_flag=0 
                     if dsize==3 and not dlist[0][0]==dlist[1][0] \
@@ -258,10 +246,10 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                                     if sum > 317 and sum < 320:
                                         self.sum_hist[tra].Fill(float(sum))
                                         fill_flag=1
-                                    if fill_flag==0:
-                                        sum=641
-                                        self.sum_hist[tra].Fill(float(sum))
-                                        continue
+                        if fill_flag==0:
+                            sum=641
+                            self.sum_hist[tra].Fill(float(sum))
+                            continue
 
         return True
 
@@ -277,7 +265,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         the spill.
         """
 
-        if spill_data.GetSpill().GetReconEvent().size() == 0:
+        if spill_data.GetSpill().GetReconEventSize() == 0:
             raise ValueError("recon_events not in spill")
         reconevents = spill_data.GetSpill().GetReconEvents()
         # print '# recon events = ',reconevents[0].GetPartEventNumber()
@@ -313,19 +301,24 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 sp_pos[tr]["y"].append(y)
                 sp_pos[tr]["z"].append(z)
                 sp_pos[tr]["s"].append(st)
-                sp_pos[tr]["t"].append(ty)
+                sp_pos[tr]["t"].append(type)
                 if type == "triplet":
-                    n_type = 3
-                    pe = SciFiSpacepoints[sp].get_npe()
-                    for ch in range (0,3):
-                        channel=SciFiSpacepoints[sp].get_channels()[ch]
-                        c_pl=channel.get_plane()
-                        c_ch=channel.get_channel()
-                        self.trp_hist[tr][st][c_pl].Fill(c_ch)
-                    self.npe_hist[tr].Fill(pe)
                     tkcnt[tr]+=1
+                    n_type = 3
+                    tracker = SciFiSpacepoints[sp].get_tracker()
+                    station = SciFiSpacepoints[sp].get_station()
+                    if tracker==0:
+                        self.track1_3Clus.Fill(station)
+                    if tracker==1:
+                        self.track2_3Clus.Fill(station)
                 else:
                     n_type = 2
+                    tracker = SciFiSpacepoints[sp].get_tracker()
+                    station = SciFiSpacepoints[sp].get_station()
+                    if tracker==0:
+                        self.track1_2Clus.Fill(station)
+                    if tracker==1:
+                        self.track2_2Clus.Fill(station)
                     tkcnd[tr]+=1
                 self.eff_plot.Fill(n_type)
                 self.eff_hist[tr][st].Fill(n_type)
@@ -335,10 +328,6 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                 if not st in self.eff_cont[tr]:
                     self.eff_cont[tr][st] = []
                 self.eff_cont[tr][st].append(n_type)
-            self.sef_hist[0].Fill(tkcnt[0])
-            self.sef_hist[1].Fill(tkcnt[1])
-            self.dub_hist[0].Fill(tkcnd[0])
-            self.dub_hist[1].Fill(tkcnd[1])
             for tra in sp_pos:
                 q_flag = 1
                 if not len(sp_pos[tra]["z"]) > 3 and len(sp_pos[tra]["z"]) < 6:
@@ -355,30 +344,6 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
 
         return True
 
-    def get_Spc2(self, spill_data):
-        reconevents = spill_data.GetSpill().GetReconEvents()
-        SciFiSpacepoints = sci_fi_event.spacepoints()
-    #Sorts spacepoints into triplets and duplets
-        for sp in range(SciFiSpacepoints.size()):
-            type = SciFiSpacepoints[sp].get_type()
-            if type == "triplet":
-                m_type = 3
-                tracker = SciFiSpacepoints[sp].get_tracker()
-                station = SciFiSpacepoints[sp].get_station()
-                if tracker==0:
-                    self.track1_3Clus.Fill(station)
-                if tracker==1:
-                    self.track2_3Clus.Fill(station)
-            else:
-                m_type = 2
-                tracker = SciFiSpacepoints[sp].get_tracker()
-                station = SciFiSpacepoints[sp].get_station()
-                if tracker==0:
-                    self.track1_2Clus.Fill(station)
-                if tracker==1:
-                    self.track2_2Clus.Fill(station)
-
-        return True
 
     def __init_histos(self): #pylint: disable=R0201, R0914
         """
@@ -416,9 +381,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
         self.track2_3Clus.GetXaxis().CenterTitle()
    
         for tr in range(0,2):
-          self.trp_hist[tr]={} #create two empty dict each for tracker up and down
           self.dig_hist[tr]={} 
-          self.pos_hist[tr]={}
           self.spt_hist[tr]={}    
           self.spd_hist[tr]={} 
           self.eff_hist[tr]={}
@@ -431,34 +394,17 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
           self.sum_hist[tr]=ROOT.TH1F(sum_name,sum_titl, 670,-5,642)
           self.sum_hist[tr].GetXaxis().SetTitle("Channel Number")
           self.sum_hist[tr].GetXaxis().CenterTitle()
-          npe_name="PE_Trp%s" %(trs)
-          npe_titl="Triplet PE Tk%s" %(trs)
-          self.npe_hist[tr]=ROOT.TH1D(npe_name,npe_titl,25,5,150)
           spa_name="SP_Tk%s" %(trs)
           spa_titl="Space Points per Station Tk%s" %(trs)
           self.spa_hist[tr]=ROOT.TH1D(spa_name,spa_titl,7,0,6)
           self.spa_hist[tr].GetXaxis().SetTitle("Station Number")
           self.spa_hist[tr].GetXaxis().CenterTitle()
-          sef_name="SE_Tk%s" %(trs)
-          sef_titl="Number of Triplets in an Event Tk%s" %(trs)
-          self.sef_hist[tr]=ROOT.TH1D(sef_name,sef_titl,7,0,6)
-          self.sef_hist[tr].GetXaxis().SetTitle("Station Number")
-          self.sef_hist[tr].GetXaxis().CenterTitle()
-          sef_name="SE_Tk%s" %(trs)
-          sef_titl="Number of Doublets in an Event Tk%s" %(trs)
-          self.dub_hist[tr]=ROOT.TH1D(sef_name,sef_titl,7,0,6)
-          self.dub_hist[tr].GetXaxis().SetTitle("Station Number")
-          self.dub_hist[tr].GetXaxis().CenterTitle()
 
           for st in range(1,6): #within each tracker create 5 stations
-              self.trp_hist[tr][st]={} #{{{}}}
               self.dig_hist[tr][st]={}
               eff_name="Ef_Tk%s%d" %(trs,st)
               eff_titl="Space Point Type Tk%s S%d" %(trs,st)
               self.eff_hist[tr][st]=ROOT.TH1D(eff_name,eff_titl,3,1,4)
-              pos_name="PS_Tk%s%d" %(trs,st)
-              pos_titl="Tracker Offset Tk%s S%d" %(trs,st)
-              self.pos_hist[tr][st]=ROOT.TH1D(pos_name,pos_titl,210,-200,200)
               spt_name="SP_Pos%s%d" %(trs,st)
               spt_titl="Space Point Triplets Tk%s S%d" %(trs,st)
               self.spt_hist[tr][st]=ROOT.TH2D(spt_name,spt_titl,50,-200,200,50,-200,200)
@@ -475,11 +421,6 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
               self.spd_hist[tr][st].GetXaxis().CenterTitle()
 
               for pl in range(0,3): #create 3 planes in each stations, draw histogram for each of them
-                  trp_name="TC_Tk%s%d%d" %(trs,st,pl)
-                  trp_titl="Triplets in Channel Tk%s S%d P%d" %(trs,st,pl)
-                  self.trp_hist[tr][st][pl]=ROOT.TH1D(trp_name,trp_titl,218,0,215)
-                  self.trp_hist[tr][st][pl].GetXaxis().SetTitle("Channel Number")
-                  self.trp_hist[tr][st][pl].GetXaxis().CenterTitle()  
                   dig_name="DC_Tk%s%d%d" %(trs,st,pl)
                   dig_titl="Digits in Channel Tk%s S%d P%d" %(trs,st,pl)
                   self.dig_hist[tr][st][pl]=ROOT.TH1D(dig_name,dig_titl,215,0,215)
