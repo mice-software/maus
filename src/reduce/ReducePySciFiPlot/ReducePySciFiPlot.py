@@ -211,11 +211,11 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
                     pl=digits[di].get_plane()
                     ch=digits[di].get_channel()
                     self.dig_hist[tr][st][pl].Fill(ch)
-                    self.digitdict[tr][st].append([pl,ch])
                     if not tr in self.digitdict:
                         self.digitdict[tr]={}
                     if not st in self.digitdict[tr]:
                         self.digitdict[tr][st]=[]
+                    self.digitdict[tr][st].append([pl,ch])
             #Takes the digit list and looks for channel sums
             for tra in self.digitdict:
                 for sta in self.digitdict[tra]:
@@ -394,6 +394,7 @@ class ReducePySciFiPlot(ReducePyROOTHistogram): # pylint: disable=R0902
           self.sum_hist[tr]=ROOT.TH1F(sum_name,sum_titl, 670,-5,642)
           self.sum_hist[tr].GetXaxis().SetTitle("Channel Number")
           self.sum_hist[tr].GetXaxis().CenterTitle()
+          self.sum_hist[tr].SetStats(1)
           spa_name="SP_Tk%s" %(trs)
           spa_titl="Space Points per Station Tk%s" %(trs)
           self.spa_hist[tr]=ROOT.TH1D(spa_name,spa_titl,7,0,6)
