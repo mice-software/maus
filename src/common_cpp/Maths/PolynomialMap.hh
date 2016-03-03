@@ -246,6 +246,10 @@ class PolynomialMap : public VectorMap {
    *             expansion
    *  @param[in] polynomialOrder the maximum order of the polynomials
    *  @param[in] weightFunction weight as a function of point index
+   *  @param[in] point_errors matrix of the error on the measurement of the
+   *             points; should be a N*N matrix with N the same length as Pol.
+   *             Say x_i has measured error \epsilon_i then the error matrix
+   *             should be filled with elements <Pol_j(\epsilon) Pol_k(\epsilon)>.
    * Nb if w_i not defined, I assume that w_i = 1 i.e. unweighted points and
    * values should be the same length; points[i] should all be the same length;
    * values[i] should all be the same length weight function should be a vector
@@ -254,14 +258,16 @@ class PolynomialMap : public VectorMap {
   static PolynomialMap* PolynomialLeastSquaresFit(
     const std::vector< std::vector<double> >& points,
     const std::vector< std::vector<double> >& values,
-    unsigned int                                        polynomialOrder,
-    const VectorMap*                          weightFunction);
+    unsigned int                              polynomialOrder,
+    const VectorMap*                          weightFunction,
+    Matrix<double>                            point_errors = Matrix<double>());
 
   static PolynomialMap* PolynomialLeastSquaresFit(
     const std::vector< std::vector<double> >& points,
     const std::vector< std::vector<double> >& values,
-    unsigned int                                        polynomialOrder,
-    const std::vector<double>& weights = std::vector<double>());
+    unsigned int                              polynomialOrder,
+    const std::vector<double>&                weights = std::vector<double>(),
+    Matrix<double>                            point_errors = Matrix<double>());
 
   /** Find a polynomial least squares fit given that I know certain coefficients
    *  already (stored in coeffs). For example, say I know the polynomial to 

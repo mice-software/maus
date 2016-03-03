@@ -19,6 +19,8 @@ test for maus_cpp.polynomial_map
 
 import random
 import unittest
+
+import numpy
 import maus_cpp.polynomial_map
 from maus_cpp.polynomial_map import PolynomialMap
 
@@ -196,12 +198,76 @@ class PolynomialMapTestCase(unittest.TestCase): # pylint: disable = R0904
                 self.assertLess(abs(matrix[i][j] - self.coefficients_4d[i][j]),
                                 1e-3)
 
+    @classmethod
+    def _str_matrix(cls, matrix):
+        """Convert matrix into a formatted string"""
+        a_string = "\n"
+        for row in matrix:
+            for element in row:
+                a_string += str(round(element, 5)).ljust(8)+" "
+            a_string += "\n"
+        return a_string
+
+    def test_lsf_four_dim_errors(self):
+        """
+        test for maus_cpp.polynomial_map.PolynomialMap.least_squares_fit with
+        4D input and errors in the point data
+        """
+        # tku_data is a list of data, each element being a list like
+        # [x, px, y, py]
+        n_events = 4000
+        error_matrix = [[0. for i in range(5)] for j in range(5)]
+        error_matrix[1][1] = 0.1
+        error_matrix[2][2] = 10.
+        error_matrix[3][3] = 0.1
+        error_matrix[4][4] = 10.
+        error_mean = [0. for i in range(5)]
+
+        tku_data = [None]*n_events
+        tku_data_err = [None]*n_events
+        for i in range(n_events):
+            tku_data[i] = \
+                         [random.uniform(-w, w) for w in [100., 10., 100., 10.]]
+            err_vec = numpy.random.multivariate_normal(error_mean, error_matrix)
+            tku_data_err[i] = [tku_data[i][j-1]+err_vec[j] for j in range(1, 5)]
+        
+        # this is like - we run the tracking, and extract x, px, y, py data
+        # as per the tku_data
+        tkd_data = self.mice_mc(tku_data)
+
+        fitted_map = PolynomialMap.least_squares_fit(
+                                        tku_data_err, tkd_data, 1, error_matrix)
+        matrix = fitted_map.get_coefficients_as_matrix()
+
+        #fitted_map = PolynomialMap.least_squares_fit(tku_data, tkd_data, 1)
+        #matrix_no_err = fitted_map.get_coefficients_as_matrix()
+        fitted_map = PolynomialMap.least_squares_fit(
+                                                 tku_data_err, tkd_data, 1)
+        matrix_err = fitted_map.get_coefficients_as_matrix()
+
+        print "\nError matrix:", self._str_matrix(error_matrix)
+        print "\nTruth:", self._str_matrix(self.coefficients_4d)
+        #print "\nMatrix fitted without any errors:", \
+        #      self._str_matrix(matrix_no_err)
+        print "\nMatrix with errors:", self._str_matrix(matrix_err)
+        print "\nMatrix with errors but then subtract off systematic:", \
+              self._str_matrix(matrix)
+
+        self.assertEqual(len(matrix), len(self.coefficients_4d))
+        for i in range(len(matrix)):
+            self.assertEqual(len(matrix[i]),
+                             len(self.coefficients_4d[i]))
+            for j in range(len(matrix[i])):
+                coeff = self.coefficients_4d[i][j]
+                if abs(coeff) < 1e-9:
+                    continue
+                self.assertLess(abs((matrix[i][j] - coeff)/coeff), 0.1)
 
     coefficients_4d = [
-            [0.,  2.0, 1.0,  0.,   0.0,],
-            [0., -1.0, 1.0,  0.,   0.0,],
-            [0.,  0.,  0.,   2.0, -1.0,],
-            [0.,  0.,  0.,   1.0,  1.0,],
+            [0.,  1.0, 20.0,  0.,  0.0,],
+            [0.,  0.0, 1.0,   0.,  0.0,],
+            [0.,  0.,  0.,   1.0, 20.0,],
+            [0.,  0.,  0.,   0.0,  1.0,],
     ]
 
 if __name__ == "__main__":
