@@ -144,7 +144,8 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             xmldoc = minidom.parse(os.path.join(self.path_in, gdmlfile))
             for node in xmldoc.getElementsByTagName("gdml"):
                 if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
-                    node.attributes['xsi:noNamespaceSchemaLocation'] = self.schema
+                    node.attributes['xsi:noNamespaceSchemaLocation'] = \
+                        self.schema
         # print "Schema location corrected for ",gdmlfile
             fout = open(os.path.join(self.path_out, gdmlfile), 'w')
             xmldoc.writexml(fout)
@@ -203,7 +204,14 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         f.close()
         xmldoc.freeDoc()
 
-    def apply_rotationsMC(self, pos, rot):
+    def apply_rotationsMC(self, pos, rot): #pylint: disable = R0201
+        """
+        @method apply_rotationsMC
+
+        Application of rotations for the purpose of placing the 
+        trackers in the global coordinate system from the 
+        solenoid coordinate system.
+        """
         npos = [x for x in pos]
         sumrot = 0
         for u in rot:
@@ -224,7 +232,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             
         return npos
 
-    def apply_alignment_corrections(self, gdmlFile):
+    def apply_alignment_corrections(self, gdmlFile): #pylint: disable = R0201
         """
         @method apply_alignment_corrections
         
@@ -235,60 +243,81 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         maus_information = \
             libxml2.parseFile(os.path.join(self.path_out, \
                                            self.maus_information_file))
-        corrs = \
-            maus_information.xpathEval("gdml/MICE_Information/Configuration_Information/Corrections")
-
+        corrpath = "gdml/MICE_Information/Configuration_Information/Corrections"
+        corrs = maus_information.xpathEval(corrpath)
         
-        config = libxml2.parseFile(os.path.join(self.path_out, self.configuration_file))
+        config = libxml2.parseFile(os.path.join(self.path_out, \
+                                                    self.configuration_file))
 
-        step_names = ['TOF0','TOF1','TOF2','KL','EMR','Ckov1','Ckov2','Tracker1','Tracker0']
+        step_names = ['TOF0', 'TOF1', 'TOF2', 'KL', 'EMR', 
+                      'Ckov1', 'Ckov2', 'Tracker1', 'Tracker0']
         for name in step_names:
             print name
             # Find the positions from the configuration file
             # first note that the tracker positions exist in the solenoid GDML
             if name.find("Tracker0") >= 0:
-                solenoid = libxml2.parseFile(os.path.join(self.path_out, 'SolenoidUS.gdml'))
+                solenoid = libxml2.parseFile(os.path.join(self.path_out, \
+                                                            'SolenoidUS.gdml'))
                 tmpphys = [x for x in \
-                               solenoid.xpathEval("gdml/structure/volume/physvol")\
-                               if len(x.xpathEval("file")) > 0]
-                corrphys = next(x for x in tmpphys \
-                                    if x.xpathEval("file")[0].prop("name").find(name) >=0)
-                solphys = next(x for x in \
-                                config.xpathEval("gdml/structure/volume/physvol")\
-                                if x.xpathEval("file")[0].prop('name').find("SolenoidUS") >= 0)
+                           solenoid.xpathEval("gdml/structure/volume/physvol")\
+                           if len(x.xpathEval("file")) > 0]
+                corrphys = \
+                    next(x for x in tmpphys \
+                          if x.xpathEval("file")[0].prop("name").find(name) >=0)
+                solphys = \
+                 next(x for x in \
+                 config.xpathEval("gdml/structure/volume/physvol")\
+                 if x.xpathEval("file")[0].prop('name').find("SolenoidUS") >= 0)
             elif name.find("Tracker1") >= 0:
-                solenoid = libxml2.parseFile(os.path.join(self.path_out, 'SolenoidDS.gdml'))
-                tmpphys = [x for x in solenoid.xpathEval("gdml/structure/volume/physvol") \
-                               if len(x.xpathEval("file")) > 0]
-                corrphys = next(x for x in tmpphys\
-                                    if x.xpathEval("file")[0].prop('name').find(name) >= 0)
-                solphys = next(x for x in \
-                                config.xpathEval("gdml/structure/volume/physvol")\
-                                if x.xpathEval("file")[0].prop('name').find("SolenoidDS") >= 0)
+                solenoid = \
+                    libxml2.parseFile(os.path.join(self.path_out, \
+                                                       'SolenoidDS.gdml'))
+                tmpphys = \
+                    [x for x in \
+                         solenoid.xpathEval("gdml/structure/volume/physvol") \
+                         if len(x.xpathEval("file")) > 0]
+                corrphys = \
+                    next(x for x in tmpphys\
+                         if x.xpathEval("file")[0].prop('name').find(name) >= 0)
+                solphys = \
+                 next(x for x in \
+                 config.xpathEval("gdml/structure/volume/physvol")\
+                 if x.xpathEval("file")[0].prop('name').find("SolenoidDS") >= 0)
             
             else:
-                tmpphys = [x for x in config.xpathEval("gdml/structure/volume/physvol") \
-                               if len(x.xpathEval("file")) > 0]
-                corrphys = next(x for x in tmpphys\
-                                    if x.xpathEval("file")[0].prop('name').find(name) >= 0)
+                tmpphys = [x for x in \
+                           config.xpathEval("gdml/structure/volume/physvol") \
+                           if len(x.xpathEval("file")) > 0]
+                corrphys = \
+                    next(x for x in tmpphys \
+                         if x.xpathEval("file")[0].prop('name').find(name) >= 0)
                 
             # Everything else is in the base configuration file
+            detinfopath = "gdml/MICE_Information/Detector_Information"
             if name.find("TOF") >= 0:
-                detinfo = maus_information.xpathEval("gdml/MICE_Information/Detector_Information/TOF/"\
-                                                         + str(name) + "/physvol")[0]
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/TOF/"\
+                                                   + str(name) + "/physvol")[0]
             elif name.find("Ckov") >= 0:
-                detinfo = maus_information.xpathEval("gdml/MICE_Information/Detector_Information/Cherenkov/"\
-                                                         + str(name) + "/physvol")[0]
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/Cherenkov/"\
+                                                   + str(name) + "/physvol")[0]
             elif name.find("Tracker") >= 0:
-                detinfo = maus_information.xpathEval("gdml/MICE_Information/Detector_Information/Tracker/"\
-                                                         + str(name) + "/physvol")[0]
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/Tracker/"\
+                                                   + str(name) + "/physvol")[0]
             else:
-                detinfo = maus_information.xpathEval("gdml/MICE_Information/Detector_Information/"\
-                                                         + str(name) + "/physvol")[0]
-            pos = [float(corrphys.xpathEval("position")[0].prop(u)) for u in ['x','y','z'] ]
-            rot = [float(corrphys.xpathEval("rotation")[0].prop(u)) for u in ['x','y','z'] ]
-            pos_det = [float(corrphys.xpathEval("position")[0].prop(u)) for u in ['x','y','z'] ]
-            rot_det = [float(corrphys.xpathEval("rotation")[0].prop(u)) for u in ['x','y','z'] ]
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/"\
+                                                   + str(name) + "/physvol")[0]
+            pos = [float(corrphys.xpathEval("position")[0].prop(u)) \
+                       for u in ['x', 'y', 'z'] ]
+            rot = [float(corrphys.xpathEval("rotation")[0].prop(u)) \
+                       for u in ['x', 'y', 'z'] ]
+            pos_det = [float(corrphys.xpathEval("position")[0].prop(u)) \
+                           for u in ['x', 'y', 'z'] ]
+            rot_det = [float(corrphys.xpathEval("rotation")[0].prop(u)) \
+                           for u in ['x', 'y', 'z'] ]
             # rec_rot = rot
             d_pos = [0, 0, 0]
             d_rot = [0, 0, 0]
@@ -296,48 +325,59 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 for vol in corrs.xpathEval("Module"):
                     if vol.prop("name").find(name) >= 0:
                         # get the corrections with respect to the device centre
-                        d_pos = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
+                        d_pos = \
+                            [float(vol.prop(u)) for u in ['dx', 'dy', 'dz'] ]
                         # rotations are measured in object coordinate system
-                        d_rot = [float(vol.prop(u)) for u in ['dx','dy','dz'] ]
+                        d_rot = \
+                            [float(vol.prop(u)) for u in ['dx', 'dy', 'dz'] ]
                         
             sol_pos = [0, 0, 0]
             sol_rot = [0, 0, 0]
             if name.find("Tracker0") >= 0 or name.find("Tracker1") >= 0:
                 sol_pos = [float(solphys.xpathEval("position")[0].prop(u)) \
-                               for u in ['x','y','z'] ]
+                               for u in ['x', 'y', 'z'] ]
                 sol_rot = [float(solphys.xpathEval("rotation")[0].prop(u)) \
-                               for u in ['x','y','z'] ]
+                               for u in ['x', 'y', 'z'] ]
 
-            for i in [0,1,2]:
+            for i in [0, 1, 2]:
                 pos[i] += d_pos[i]
-                # rotations in the simulation alter the coordinate system for the object
+                # rotations in the simulation alter the coordinate system 
+                # for the object
                 rot[i] -= d_rot[i]
             # positions and rotations in the reconstruction rotate the object
             d_pos_wrot = self.apply_rotationsMC(pos, sol_rot)
             pos_det = [x for x in d_pos_wrot]
-            for i in [0,1,2]:
-                # solenoid positions should be added to the reconstruction positions if necessary
+            for i in [0, 1, 2]:
+                # solenoid positions should be added to the reconstruction 
+                # positions if necessary
                 pos_det[i] += sol_pos[i]
                 rot_det[i] += sol_rot[i]
             print pos
             print pos_det
-            u = ['x','y','z']            
-            if name.find('Tracker0') >= 0: rot_det[0] = -rot[0]
-            for i in [0,1,2]:
-                corrphys.xpathEval("position")[0].setProp(u[i],str(pos[i]))
-                detinfo.xpathEval("position")[0].setProp(u[i],str(pos_det[i]))
+            u = ['x', 'y', 'z']            
+            if name.find('Tracker0') >= 0: 
+                rot_det[0] = -rot[0]
+            for i in [0, 1, 2]:
+                corrphys.xpathEval("position")[0].setProp(u[i], \
+                                                          str(pos[i]))
+                detinfo.xpathEval("position")[0].setProp(u[i], \
+                                                         str(pos_det[i]))
                 
-                corrphys.xpathEval("rotation")[0].setProp(u[i],str(rot[i]))            
-                detinfo.xpathEval("rotation")[0].setProp(u[i],str(rot_det[i]))
+                corrphys.xpathEval("rotation")[0].setProp(u[i], \
+                                                       str(rot[i]))            
+                detinfo.xpathEval("rotation")[0].setProp(u[i], \
+                                                         str(rot_det[i]))
             
             if name.find('Tracker0') >= 0:
-                # need to write the results to the solenoid GDML if the corrections are applied to the tracker
+                # need to write the results to the solenoid GDML if the 
+                # corrections are applied to the tracker
                 f = open(os.path.join(self.path_out, 'SolenoidUS.gdml'),'w')
                 solenoid.saveTo(f)
                 f.close()
                 solenoid.freeDoc()
             elif name.find('Tracker1') >= 0:
-                # need to write the results to the solenoid GDML if the corrections are applied to the tracker
+                # need to write the results to the solenoid GDML if the 
+                # corrections are applied to the tracker
                 f = open(os.path.join(self.path_out, 'SolenoidDS.gdml'),'w')
                 solenoid.saveTo(f)
                 f.close()
@@ -517,7 +557,8 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             for node in coolingChannel.getElementsByTagName("coolingchannel"):
                 cc_info = node
             if type(cc_info) == bool:
-                raise IOError("Run number you have selected is not in the coolingchannel CDB")
+                raise IOError(\
+                "Run number you have selected is not in the coolingchannel CDB")
             else:
                 root_node = maus_information.childNodes[0].childNodes[1]
                 root_node.insertBefore(cc_info, root_node.childNodes[0])
@@ -528,19 +569,56 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         print 'Cooling channel information merged!'
      
     def merge_alignment_correction_info(self, gdmlfile):
+        """
+        @method merge_alignment_correction_info
+
+        This method adds the correction information to the maus_information_file GDML
+        """
         #  fin = open(os.path.join(self.path_out, gdmlfile))
         #  for lines in fin.readlines():
         maus_information = minidom.parse(os.path.join(self.path_out, gdmlfile))
-        correction_path = os.path.join(self.path_in, self.correction_file)
+        correction_path = os.path.join(self.path_in, self.corrections_file)
         correction = minidom.parse(correction_path)
             
         corr_info = next(node for node in \
                              correction.getElementsByTagName("correction"))
         if type(corr_info) == bool:
-            raise IOError("Run number you have selected is not in the correction CDB")
+            raise IOError(
+                "Run number you have selected is not in the correction CDB")
         else:
             root_node = maus_information.childNodes[0].childNodes[1]
             root_node.insertBefore(corr_info, root_node.childNodes[0])
+            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
+            maus_information.writexml(fout)
+            fout.close()
+
+    def update_geometry_id_number(self, geoid, gdmlfile):
+        """ 
+        @ method update geometry id number
+        
+        This method updates the geometry id number to the number given
+        in the database rather than trusting the number given to the
+        upload files.
+        """
+        if geoid != 0:
+            maus_information = minidom.parse(os.path.join(self.path_out, \
+                                                             gdmlfile))
+            # check if the geometry id already exists in this file
+            geoid_node =  maus_information.getElementsByTagName("GeometryID")
+            if len(geoid_node) == 1:
+                if geoid_node[0].getAttribute("value") != str(geoid):
+                    # update the geometry id
+                    geoid_node[0].setAttribute("value", str(geoid))
+                # else do nothing
+            else:
+                # create the node if it does not exist
+                config_node = \
+                   maus_information.getElementsByTagName(\
+                    "Configuration_Information")[0]
+                newNode = maus_information.createElement("GeometryID")
+                newNode.setAttribute("value", str(geoid))
+                config_node.appendChild(newNode)
+                    
             fout = open(os.path.join(self.path_out, gdmlfile), 'w')
             maus_information.writexml(fout)
             fout.close()
@@ -812,7 +890,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         doc.freeDoc()
         info.freeDoc()
 
-    def formatForGDML(self):
+    def formatForGDML(self, geoid=0):
         """
         @method FormatForGDML
         
@@ -833,7 +911,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             self.merge_cooling_channel_info(self.maus_information_file)
         if self.corrections_file != None:
             self.merge_alignment_correction_info(self.maus_information_file)
-        
+        self.update_geometry_id_number(geoid, self.maus_information_file)
             
         # if self.formatted == False:
         print self.configuration_file

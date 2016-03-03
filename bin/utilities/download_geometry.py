@@ -48,12 +48,12 @@ def main(): # pylint: disable = C0103, R0912
         pass
     #Download file
     geometry_downloader = Downloader()
-
+    geoid = configuration.geometry_download_id
     if configuration.geometry_download_by == "run_number":
-        geometry_downloader.download_geometry_by_run \
+        geoid = geometry_downloader.download_geometry_by_run \
                         (configuration.geometry_download_run_number, gdml_cache)
     elif configuration.geometry_download_by == "current":
-        geometry_downloader.download_current(gdml_cache)
+        geoid = geometry_downloader.download_current(gdml_cache)
     elif configuration.geometry_download_by == "id":
         if configuration.download_beamline_for_run != 0:
             geometry_downloader.download_beamline_for_run\
@@ -71,8 +71,7 @@ def main(): # pylint: disable = C0103, R0912
                                  gdml_cache)
         else:
             print "Default MICE Channel currents will be used."
-        geometry_downloader.download_geometry_by_id \
-                                (configuration.geometry_download_id, gdml_cache)
+        geometry_downloader.download_geometry_by_id(geoid, gdml_cache)
     else:
         raise KeyError("Didn't recognise 'geometry_download_by' option '"+\
                configuration.geometry_download_by+"'. Should be on of\n"+\
@@ -84,7 +83,7 @@ def main(): # pylint: disable = C0103, R0912
     # format files
     gdmls = Formatter(gdml_cache, dl_dir)
     if gdmls.usegdml:
-        gdmls.formatForGDML()
+        gdmls.formatForGDML(geoid)
     else:
         gdmls.format()
     # convert to MAUS Modules
