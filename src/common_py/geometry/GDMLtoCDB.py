@@ -22,6 +22,7 @@ GDMLtoCDB contains two classes:
 
 import os
 import cdb
+import datetime
 
 from geometry.ConfigReader import Configreader
 from xml.etree import ElementTree
@@ -250,10 +251,12 @@ class Downloader: #pylint: disable = R0902
             if len(ids) == 0:
                 raise OSError('Geometry ID does not exist for '+str(now))
             else:
-                # the latest applicable key uploaded should be the first key appearing
+                # the latest applicable key uploaded should be the
+                # first key appearing
                 geoid = ids.keys()[0]
-                # in case this is not the case run through the other values to see if there 
-                # is a later applicable creation date
+                # in case this is not the case run through the other
+                # values to see if there is a later applicable
+                # creation date
                 sortedids = sorted(ids.items(), \
                                        x=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
@@ -293,10 +296,11 @@ class Downloader: #pylint: disable = R0902
         geoid = self.download_beamline_for_run(run_num, download_path)
         
         self.download_coolingchannel_for_run(run_num, download_path)
+        # self.download_corrections_for_run(run_num, download_path):
         self.__write_zip_file(download_path, downloaded_file)
         
         #return the associated geometry id
-        return id
+        return geoid
         
 
     def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
@@ -348,16 +352,18 @@ class Downloader: #pylint: disable = R0902
             fout.close()
             # also want to get the geometry ID for record keeping
             downloadedmap = beamline_cdb.get_beamline_for_run(run_id)
-            startTime = downloadedmap[run_id]['start_time']
-            stopTime = downloadedmap[run_id]['stop_time']
-            ids = self.geometry_cdb.get_ids(startTime, stopTime)
+            start_time = downloadedmap[run_id]['start_time']
+            stop_time = downloadedmap[run_id]['stop_time']
+            ids = self.geometry_cdb.get_ids(start_time, stop_time)
             if len(ids) == 0:
                 raise OSError('Geometry ID does not exist for run number')
             else:
-                # the latest applicable key uploaded should be the first key appearing
+                # the latest applicable key uploaded should be the
+                # first key appearing
                 geoid = ids.keys()[0]
-                # in case this is not the case run through the other values to see if there 
-                # is a later applicable creation date
+                # in case this is not the case run through the other
+                # values to see if there is a later applicable
+                # creation date
                 sortedids = sorted(ids.items(), \
                                        x=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
@@ -397,32 +403,33 @@ class Downloader: #pylint: disable = R0902
                 #fout.write(str(downloaded))
                 #fout.close()
 
-    def download_corrections_for_run(self, run_id, downloadpath):
+    
+    #def download_corrections_for_run(self, run_id, downloadpath):
         #pylint: disable = R0201, C0301
-        """
-        @Method download corrections for run 
-        
-        This method gets the detector alignment corrections, for the given run number, from the 
-        database.
-        
-        @param  id The long ID run number for the desired geometry.
-        @param  downloadedpath The path location where the files will be 
-        unpacked to.
-        """
-        if os.path.exists(downloadpath) == False:
-            raise OSError('Path '+downloadpath+' does not exist')
-        else:
-            correction_cdb = cdb.Corrections()
-            try:
-                downloaded = correction_cdb.get_corrections_for_run_xml(run_id)
-                path = downloadpath + "/AlignmentCorrections.gdml"
-                fout = open(path)
-                fout.write(str(downloaded))
-                fout.close()
-                
-            except RuntimeError:
-                exit(1)
-
+    #    """
+    #    @Method download corrections for run 
+    #    
+    #    This method gets the detector alignment corrections, for the given run number, from the 
+    #    database.
+    #    
+    #    @param  id The long ID run number for the desired geometry.
+    #    @param  downloadedpath The path location where the files will be 
+    #    unpacked to.
+    #    """
+    #    if os.path.exists(downloadpath) == False:
+    #        raise OSError('Path '+downloadpath+' does not exist')
+    #    else:
+    #        correction_cdb = cdb.Corrections()
+    #        try:
+    #            downloaded = correction_cdb.get_corrections_for_run_xml(run_id)
+    #            path = downloadpath + "/AlignmentCorrections.gdml"
+    #            fout = open(path)
+    #            fout.write(str(downloaded))
+    #            fout.close()
+    #            
+    #        except RuntimeError:
+    #            exit(1)
+    
 
     def download_beamline_for_tag(self, tag, downloadpath):  #pylint: disable = R0201, C0301
         """
