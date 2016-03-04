@@ -336,6 +336,76 @@ TEST_F(PolynomialMapTest, Covariances) {
   EXPECT_TRUE(fabs(determinant(m3)) < 1e-6);
 }
 
+
+TEST_F(PolynomialMapTest, LeastSquaresFittingErrorHandling) {
+  // Check that the error matrix term does *something* (anything) and handles
+  // correctly bad input (throws)
+  // Maths is checked in python tests... as it requires high stats
+  Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest" << std::endl;
+  int               nX   = 4;
+  int               nY   = 4;
+  int               nZ   = 4;
+  Matrix<double> mat(3, 4, 0.);
+  mat(1, 1) = 1.;
+  mat(2, 1) = 4.;
+  mat(3, 1) = 1.;
+  mat(1, 2) = 2.;
+  mat(2, 2) = 3.;
+  mat(3, 2) = 2.;
+  mat(1, 3) = 7.;
+  mat(2, 3) = 11.;
+  mat(3, 3) = 7.;
+  mat(1, 4) = 13.;
+  mat(2, 4) = 3.;
+  mat(3, 4) = 13.;
+
+  VectorMap* weightFunction = NULL;
+
+  PolynomialMap* vecF = new PolynomialMap(3, mat);
+  std::vector< std::vector<double> > points(nX*nY*nZ, std::vector<double>(3));
+  std::vector< std::vector<double> > values(nX*nY*nZ, std::vector<double>(3));
+  std::vector<double>                weights(nX*nY*nZ, 1);
+  size_t n_coeffs = vecF->NumberOfPolynomialCoefficients();
+  Matrix<double> errs1a(n_coeffs, n_coeffs, 0.);
+  Matrix<double> errs1b(n_coeffs, n_coeffs, 1.);
+  for (int i = 0; i < nX; i++)
+    for (int j = 0; j < nY; j++)
+      for (int k = 0; k < nZ; k++) {
+        int a = k+j*nZ + i*nY*nZ;
+        points[a][0] = i/static_cast<double>(nX)*105.;
+        points[a][1] = j/static_cast<double>(nY)*201.;
+        points[a][2] = k/static_cast<double>(nZ)*105.;
+        vecF->F(&points[a][0], &values[a][0]);
+      }
+  delete vecF;
+  // null weightFunction just tests branching to
+  // PolynomialLeastSquaresFit(points, values, 1)
+  bool testpass = true;
+  PolynomialMap* pVec1a = PolynomialMap::PolynomialLeastSquaresFit(
+                                    points, values, 1, weightFunction, errs1a);
+  PolynomialMap* pVec1b = PolynomialMap::PolynomialLeastSquaresFit(
+                                    points, values, 1, weightFunction, errs1b);
+  Matrix<double> coeff1a = pVec1a->GetCoefficientsAsMatrix();
+  Matrix<double> coeff1b = pVec1b->GetCoefficientsAsMatrix();
+  for (size_t i = 1; i <= coeff1a.number_of_rows(); i++)
+    for (size_t j = 1; j <= coeff1b.number_of_columns(); j++) {
+      if (fabs(coeff1a(i, j) - mat(i, j)) > 1e-6)
+        testpass = false;
+      if (fabs(coeff1b(i, j) - mat(i, j)) < 1e-6)
+        testpass = false;
+    }
+  delete pVec1b;
+  delete pVec1a;
+  EXPECT_TRUE(testpass);
+
+  Matrix<double> errs2(n_coeffs, n_coeffs-1, 0.);
+  EXPECT_THROW(PolynomialMap::PolynomialLeastSquaresFit(
+        points, values, 1, weightFunction, errs2), MAUS::Exception);
+  Matrix<double> errs3(n_coeffs-1, n_coeffs, 0.);
+  EXPECT_THROW(PolynomialMap::PolynomialLeastSquaresFit(
+        points, values, 1, weightFunction, errs3), MAUS::Exception);
+}
+
 TEST_F(PolynomialMapTest, LeastSquaresFitting) {
   Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest" << std::endl;
   int               nX   = 4;

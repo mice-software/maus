@@ -462,25 +462,27 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
     const std::vector< std::vector<double> >& points,
     const std::vector< std::vector<double> >& values,
     unsigned int                              polynomialOrder,
-    const VectorMap*                          weightFunction) {
-
+    const VectorMap*                          weightFunction,
+    Matrix<double>                            point_errors) {
   if (weightFunction == NULL) {
     // use default value for weights defined in PolnomialMap.hh
-    return PolynomialLeastSquaresFit(points, values, polynomialOrder);
+    std::vector<double> dummy;
+    return PolynomialLeastSquaresFit(points, values, polynomialOrder, dummy, point_errors);
   }
 
   std::vector<double> weights(points.size());
   for (size_t i = 0; i < points.size(); ++i) {
     weightFunction->F(&points[i][0], &weights[i]);
   }
-  return PolynomialLeastSquaresFit(points, values, polynomialOrder, weights);
+  return PolynomialLeastSquaresFit(points, values, polynomialOrder, weights, point_errors);
 }
 
 PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
   const std::vector< std::vector<double> >& points,
   const std::vector< std::vector<double> >& values,
   unsigned int                              polynomialOrder,
-  const std::vector<double>&                weights) {
+  const std::vector<double>&                weights,
+  Matrix<double>                            point_errors) {
   // Algorithm: We have F2 = sum_i ( f_k f_l) where f are polynomial terms;
   // FY = sum_i (f_)
 
@@ -489,6 +491,21 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
   size_t nPoints  = points.size();
   size_t nCoeffs  = NumberOfPolynomialCoefficients(pointDim, polynomialOrder);
 
+  if (point_errors.number_of_rows() == 0 &&
+      point_errors.number_of_columns() == 0) {
+      point_errors = Matrix<double>(nCoeffs, nCoeffs, 0.);
+  }
+  if (point_errors.number_of_rows() != nCoeffs ||
+      point_errors.number_of_columns() != nCoeffs) {
+      std::stringstream message;
+      message << "The size of the point_errors (" << point_errors.number_of_rows()
+              << "x" << point_errors.number_of_columns() << ") "
+              << "does not match number of polynomial coefficients (" << nCoeffs
+              << "x" << nCoeffs << ")" << std::endl;
+      throw(Exception(Exception::recoverable,
+                      message.str(),
+                      "PolynomialMap::PolynomialLeastSquaresFit"));
+  }
   // create
   Matrix<double> dummy(valueDim, nCoeffs, 0.);
   for (size_t i = 0; i < valueDim; ++i)
@@ -540,6 +557,9 @@ PolynomialMap* PolynomialMap::PolynomialLeastSquaresFit(
   // F2 = A^T A, where A is the design matrix with linearly independent columns
   Matrix<double> F2(nCoeffs, nCoeffs, 0.);
   F2 = design_matrix_transpose * weight_matrix * design_matrix;
+  for (size_t i = 1; i < nCoeffs+1; ++i)
+    for (size_t j = 1; j < nCoeffs+1; ++j)
+      F2(i, j) -= point_errors(i, j)*nPoints;
 
   // Fy = A^T Y, where A is the design matrix and Y is the value matrix
   Matrix<double> Fy(nCoeffs, valueDim, 0.);
