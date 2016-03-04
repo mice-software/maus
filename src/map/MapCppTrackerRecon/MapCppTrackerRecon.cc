@@ -245,11 +245,6 @@ void MapCppTrackerRecon::_set_field_values(SciFiEvent* event) const {
 
   event->set_range_field_up(_geometry_helper.GetFieldRange(0));
   event->set_range_field_down(_geometry_helper.GetFieldRange(1));
-
-//  std::cerr << _geometry_helper.GetFieldValue(0) << "  " << _geometry_helper.GetFieldValue(1) << "\n" 
-//            << _geometry_helper.GetFieldVariance(0) << "  " << _geometry_helper.GetFieldVariance(1) << "\n" 
-//            << sqrt(_geometry_helper.GetFieldVariance(0)) << "  " << sqrt(_geometry_helper.GetFieldVariance(1)) << "\n" 
-//            << _geometry_helper.GetFieldRange(0) << "  " << _geometry_helper.GetFieldRange(1) << std::endl;
 }
 
 

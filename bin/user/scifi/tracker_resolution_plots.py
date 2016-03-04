@@ -913,9 +913,10 @@ if __name__ == "__main__" :
 
         except ValueError as ex :
           print "An Error Occured: " + str(ex)
-          print "Skipping Event: " + str(file_reader.get_current_event_number()) + \
-                " In Spill: " + str(file_reader.get_current_spill_number()) + \
-                " In File: " + str(file_reader.get_current_filenumber()) + "\n"
+          print "Skipping Event: " +\
+                str(file_reader.get_current_event_number()) + " In Spill: " + \
+                str(file_reader.get_current_spill_number()) + " In File: " + \
+                str(file_reader.get_current_filenumber()) + "\n"
           continue
 
     except KeyboardInterrupt :

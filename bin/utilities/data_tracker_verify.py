@@ -28,19 +28,14 @@
 # pylint: disable = R0912, R0914, R0915
 
 import MAUS
-
-# Generic Python imports
 import sys
 import os
 import math
 import argparse
 import types
-
-# Third Party library import statements
 import event_loader
 from analysis import tools
 import ROOT
-
 
 # Useful Constants and configuration
 REFERENCE_PLANE = 0
@@ -73,7 +68,6 @@ PLOT_OPTIONS = { 'npe_digit' : [ 'logy' ], \
                  'spacepoints' : [ 'colz'],
                  '2_hit_spacepoints' : [ 'colz' ],
                  '3_hit_spacepoints' : [ 'colz' ] }
-
 
 def init_plots_data() :
   """
@@ -139,7 +133,6 @@ def init_plots_data() :
 
     track_plots[shape] = shape_plots
 
-
   reco_plots = {}
   reco_plots['field_mean_up'] = ROOT.TH1F( 'field_mean_up', 
                         "Mean Field in Upstream Tracker", 1000, -5.0, 5.0 )
@@ -170,8 +163,8 @@ def init_plots_data() :
   reco_plots['tof_1_2_cut'] = ROOT.TH1F( 'tof_1_2_cut', 'Time TOF1 - TOF2', \
                                                              1000, 0.0, 100.0 )
 
-  reco_plots['npe_digit'] = ROOT.TH1F( 'npe_digit', "Number of Photo Electrons", \
-                                                              100, 0.0, 100.0 )
+  reco_plots['npe_digit'] = ROOT.TH1F( 'npe_digit',
+                                 "Number of Photo Electrons", 100, 0.0, 100.0 )
   reco_plots['npe_cluster'] = ROOT.TH1F( 'npe_cluster', \
                                              "NPE per Cluster", 75, 0.0, 75.0 )
   reco_plots['npe_spacepoint'] = ROOT.TH1F( 'npe_spacepoint', \
@@ -281,7 +274,7 @@ def init_plots_data() :
     "3-Cluster Spacepoints: Tracker "+str(tracker)+", Station "+str(station), \
                                        200, -200.0, 200.0, 200, -200.0, 200.0 )
       station_plots[dir_name]['kuno_plot'] = ROOT.TH1F( dir_name+'_kuno', \
-                                      "Kuno Plot: "+dir_name, 1001, -0.25, 500.25 )
+                                  "Kuno Plot: "+dir_name, 1001, -0.25, 500.25 )
 
 
   plane_plots = {}
@@ -331,14 +324,12 @@ def init_plots_data() :
                        dir_name+'_adc_channel', "ADC Per Channel: "+dir_name, \
                                              250, 0.0, 250.0, 256, 0.0, 256.0 )
 
-
   plot_dict['track_plots'] = track_plots
   plot_dict['recon_plots'] = reco_plots
   plot_dict['patrec_plots'] = patrec_plots
   plot_dict['comparison_plots'] = comp_plots
   plot_dict['plane_plots'] = plane_plots
   plot_dict['station_plots'] = station_plots
-
 
   data_dict = {}
   data_dict['counters'] = {}
@@ -351,7 +342,6 @@ def init_plots_data() :
   data_dict['counters']['N_tracks_up'] = 0
   data_dict['counters']['N_tracks_down'] = 0
   data_dict['counters']['N_track_pairs'] = 0
-
 
   return plot_dict, data_dict
 
@@ -389,7 +379,6 @@ def cut_tof_event( plot_dict, event ) :
                                         tof1_sp.GetTime() - tof0_sp.GetTime() )
   plot_dict['recon_plots']['tof_1_2_cut'].Fill(\
                                         tof2_sp.GetTime() - tof1_sp.GetTime() )
-
   return False
 
  
@@ -414,14 +403,22 @@ def fill_plots_data(plot_dict, data_dict, event) :
   """
     Fill the plots in the plot dictionary with data
   """
-  plot_dict['recon_plots']['field_mean_up'].Fill(1000.0*event.get_mean_field_up())
-  plot_dict['recon_plots']['field_mean_down'].Fill(1000.0*event.get_mean_field_down())
-  plot_dict['recon_plots']['field_variance_up'].Fill(1.0E+6*event.get_variance_field_up())
-  plot_dict['recon_plots']['field_variance_down'].Fill(1.0E+6*event.get_variance_field_down())
-  plot_dict['recon_plots']['field_rms_up'].Fill(1000.0*math.sqrt(event.get_variance_field_up()))
-  plot_dict['recon_plots']['field_rms_down'].Fill(1000.0*math.sqrt(event.get_variance_field_down()))
-  plot_dict['recon_plots']['field_range_up'].Fill(1000.0*event.get_range_field_up())
-  plot_dict['recon_plots']['field_range_down'].Fill(1000.0*event.get_range_field_down())
+  plot_dict['recon_plots']['field_mean_up'].Fill(\
+                                              1000.0*event.get_mean_field_up())
+  plot_dict['recon_plots']['field_mean_down'].Fill(\
+                                            1000.0*event.get_mean_field_down())
+  plot_dict['recon_plots']['field_variance_up'].Fill(\
+                                          1.0E+6*event.get_variance_field_up())
+  plot_dict['recon_plots']['field_variance_down'].Fill(\
+                                        1.0E+6*event.get_variance_field_down())
+  plot_dict['recon_plots']['field_rms_up'].Fill(\
+                               1000.0*math.sqrt(event.get_variance_field_up()))
+  plot_dict['recon_plots']['field_rms_down'].Fill(\
+                             1000.0*math.sqrt(event.get_variance_field_down()))
+  plot_dict['recon_plots']['field_range_up'].Fill(\
+                                             1000.0*event.get_range_field_up())
+  plot_dict['recon_plots']['field_range_down'].Fill(\
+                                           1000.0*event.get_range_field_down())
 
   scifi_digits = event.digits()
   if not scifi_digits :
@@ -475,7 +472,6 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
       kuno_sums_stations[ station ] = 0.0
     kuno_sums[tracker] = kuno_sums_stations
 
-
   for cluster in clusters :
     tracker = cluster.get_tracker()
     station = cluster.get_station()
@@ -504,7 +500,6 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     else :
       data_dict['counters']['N_fat_clusters'] += 1
 
-
     for digit in clus_digits :
       if digit.get_adc() == 255 :
         break
@@ -512,12 +507,10 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
       reco_plots['npe_cluster'].Fill( cluster.get_npe() )
       plane_plots[dir_name]['npe_cluster'].Fill( cluster.get_npe() )
 
-
   for tracker in [ 0, 1 ] :
     for station in [ 1, 2, 3, 4, 5 ] :
       dir_name = str(tracker)+'.'+str(station)
       station_plots[dir_name]['kuno_plot'].Fill( kuno_sums[tracker][station] )
-
 
   for spacepoint in spacepoints :
     tracker = spacepoint.get_tracker()
@@ -551,7 +544,6 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
       clus_digits = cluster.get_digits_pointers()
       for digit in clus_digits :
         if digit.get_adc() == 255 :
-          flag = False
           break
       else :
         npe += cluster.get_npe()
@@ -561,7 +553,6 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
       reco_plots['npe_spacepoint'].Fill( npe )
       if spacepoint.is_used() :
         reco_plots['npe_fit_spacepoint'].Fill( npe )
-
 
   return True
 
@@ -664,7 +655,8 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
     for tp in trackpoints :
       if tp.has_data() :
         count_trackpoints += 1
-      elif tools.calculate_plane_id( tp.tracker(), tp.station(), tp.plane() ) in IGNORE_PLANES :
+      elif tools.calculate_plane_id( tp.tracker(), tp.station(), tp.plane()) \
+                                                             in IGNORE_PLANES :
         count_trackpoints += 1
     if count_trackpoints < MIN_NUM_TRACKPOINTS :
       continue
@@ -771,7 +763,6 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
 
   track_plots['straight']['tracks_event'].Fill(straight_counter)
   track_plots['helical']['tracks_event'].Fill(helical_counter)
-
 
 
 def analyse_plots(plot_dict, data_dict) :
@@ -1001,7 +992,6 @@ if __name__ == "__main__" :
     save_plots(plot_dict, outfile)
     if namespace.print_plots :
       print_plots(plot_dict, outdir)
-
 
   print 
   print "Complete."

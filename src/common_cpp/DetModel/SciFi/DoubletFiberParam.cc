@@ -67,7 +67,7 @@ void DoubletFiberParam::ComputeDimensions(G4Tubs& fiberElement, G4int copyNo,
 //  if ( sensitiveRadius > fabs( xPos ) ) {
 //    fiberHalfLen = sqrt(sensitiveRadius * sensitiveRadius - xPos * xPos);
 //  }
-  if ( activeRadius > fabs( xPos ) ) {
+  if (activeRadius > fabs(xPos)) {
     fiberHalfLen = sqrt(activeRadius * activeRadius - xPos * xPos);
   }
 

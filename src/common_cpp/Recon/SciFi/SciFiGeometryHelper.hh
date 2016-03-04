@@ -152,8 +152,10 @@ class SciFiGeometryHelper {
   const SciFiTrackerMap& GeometryMap() const { return _geometry_map; }
 
   double GetFieldValue(int tracker) const { return _geometry_map.find(tracker)->second.Field; }
-  double GetFieldVariance(int tracker) const { return _geometry_map.find(tracker)->second.FieldVariance; }
-  double GetFieldRange(int tracker) const { return _geometry_map.find(tracker)->second.FieldRange; }
+  double GetFieldVariance(int tracker) const
+                                      { return _geometry_map.find(tracker)->second.FieldVariance; }
+  double GetFieldRange(int tracker) const
+                                         { return _geometry_map.find(tracker)->second.FieldRange; }
 
   ThreeVector GetReferencePosition(int tracker) const
                                            { return _geometry_map.find(tracker)->second.Position; }

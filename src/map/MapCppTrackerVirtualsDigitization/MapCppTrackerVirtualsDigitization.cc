@@ -369,7 +369,6 @@ namespace MAUS {
             a_cluster->set_alpha(alpha);
             a_cluster->set_id(id);
             a_cluster->set_used(false);
-            std::cerr << "Cluster: " << tracker << "." << station << "." << plane << " : " << channelNumber << ", " << alpha << std::endl;
 
             clusters.push_back(a_cluster);
 
