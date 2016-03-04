@@ -244,6 +244,20 @@ class Downloader: #pylint: disable = R0902
         else:
             downloadedfile = self.geometry_cdb.get_current_gdml()
             self.__write_zip_file(downloadpath, downloadedfile)
+            now = datetime.datetime.now()
+            nowandone = datetime.datetime.now() + datetime.timedelta(1)
+            ids = self.geometry_cdb.get_ids(now, nowandone)
+            if len(ids) == 0:
+                raise OSError('Geometry ID does not exist for '+str(now))
+            else:
+                # the latest applicable key uploaded should be the first key appearing
+                geoid = ids.keys()[0]
+                # in case this is not the case run through the other values to see if there 
+                # is a later applicable creation date
+                sortedids = sorted(ids.items(), \
+                                       x=lambda x:x[1]['created'], reverse=True)
+                geoid = sortedids[0][0]
+                return geoid
 
     def download_geometry_by_id(self, id_num, download_path):
         """
@@ -264,21 +278,25 @@ class Downloader: #pylint: disable = R0902
 
     def download_geometry_by_run(self, run_num, download_path):
         """
-        @Method download geometry for ID 
+        @Method download geometry for run 
 
-        This method gets the geometry, for the given ID, from the database then 
+        This method gets the geometry, for the given run, from the database then 
         passes the string to the unpack method which unpacks it.
         
-        @param  id The integer ID number for the desired geometry.
+        @param  run The integer run number for the desired geometry.
         @param  downloadedpath The path location where the files will be 
                                unpacked to. 
         """
         if not os.path.exists(download_path):
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
-        self.download_beamline_for_run(run_num, download_path)
+        geoid = self.download_beamline_for_run(run_num, download_path)
+        
         self.download_coolingchannel_for_run(run_num, download_path)
         self.__write_zip_file(download_path, downloaded_file)
+        
+        #return the associated geometry id
+        return id
         
 
     def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
@@ -328,7 +346,22 @@ class Downloader: #pylint: disable = R0902
             fout = open(path, 'w')
             fout.write(downloadedfile)
             fout.close()
-
+            # also want to get the geometry ID for record keeping
+            downloadedmap = beamline_cdb.get_beamline_for_run(run_id)
+            startTime = downloadedmap[run_id]['start_time']
+            stopTime = downloadedmap[run_id]['stop_time']
+            ids = self.geometry_cdb.get_ids(startTime, stopTime)
+            if len(ids) == 0:
+                raise OSError('Geometry ID does not exist for run number')
+            else:
+                # the latest applicable key uploaded should be the first key appearing
+                geoid = ids.keys()[0]
+                # in case this is not the case run through the other values to see if there 
+                # is a later applicable creation date
+                sortedids = sorted(ids.items(), \
+                                       x=lambda x:x[1]['created'], reverse=True)
+                geoid = sortedids[0][0]
+                return geoid
   
     def download_coolingchannel_for_run(self, run_id, downloadpath): 
         #pylint: disable = R0201, C0301
