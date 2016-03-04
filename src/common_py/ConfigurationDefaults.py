@@ -714,23 +714,23 @@ pid_bounds = {
     # PIDVarJ
     "XminJ":50, "XmaxJ":350, "YminJ":0, "YmaxJ":140,
     # ComPIDVarA
-    "minComA":30, "maxComA":50,
+    "minComA":20, "maxComA":50,
     # ComPIDVarB
-    "XminComB":30, "XmaxComB":50, "YminComB":0, "YmaxComB":8000,
+    "XminComB":20, "XmaxComB":50, "YminComB":0, "YmaxComB":8000,
     # ComPIDVarC
     "minComC":0, "maxComC":8000,
     # ComPIDVarD
     "minComD":0, "maxComD":1000,
     # ComPIDVarE
-    "XminComE":30, "XmaxComE":50, "YminComE":0, "YmaxComE":1000,
+    "XminComE":20, "XmaxComE":60, "YminComE":0, "YmaxComE":1000,
     # ComPIDVarF
     "minComF":0, "maxComF":1,
     # ComPIDVarG
-    "XminComG":30, "XmaxComG":50, "YminComG":0, "YmaxComG":1,
+    "XminComG":20, "XmaxComG":50, "YminComG":0, "YmaxComG":1,
     # ComPIDVarH
-    "XminComH":30, "XmaxComH":50, "YminComH":0, "YmaxComH":40,
+    "XminComH":20, "XmaxComH":50, "YminComH":0, "YmaxComH":140,
     # ComPIDVarI
-    "XminComI":30, "XmaxComI":50, "YminComI":0, "YmaxComI":140
+    "XminComI":20, "XmaxComI":50, "YminComI":0, "YmaxComI":140
 }
 
 # PID MICE configuration, 'step_4' for Step IV running, 'commissioning' for field free commissioning data
