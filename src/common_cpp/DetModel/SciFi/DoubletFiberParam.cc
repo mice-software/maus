@@ -50,7 +50,7 @@ void DoubletFiberParam::ComputeTransformation(const G4int copyNo, G4VPhysicalVol
 //                  + (activeRadius-fiberDiameter/2);
   G4double xPos = - (copyNo-centralFiber+1)*(fiberPitch/2);
   G4double yPos = 0.0;
-  G4double zPos = (copyNo%2) ? -0.5*zSpacing : 0.5*zSpacing;
+  G4double zPos = (copyNo%2) ? 0.5*zSpacing : -0.5*zSpacing;
 
   physVol->SetRotation(coreRotation);
   physVol->SetTranslation(G4ThreeVector(xPos, yPos, zPos));
