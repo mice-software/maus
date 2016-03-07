@@ -65,7 +65,7 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
   int _process_count;
   bool _got_SOR;
 
-  std::vector<TH1F*> _histos;
+  std::vector<TH1*> _histos;
   std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
   TH1F *_hslabx_0, *_hslabx_1, *_hslabx_2;

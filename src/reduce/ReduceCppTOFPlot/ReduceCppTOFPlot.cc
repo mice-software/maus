@@ -157,6 +157,7 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
     snprintf(tistr, sizeof(tistr), "tof%d: space points;SlabY;SlabX", s);
     snprintf(namestr, sizeof(namestr), "hspxy_%d", s);
     _hspxy[s] = new TH2F(namestr, tistr, nbins, edgelo, edgehi, nbins, edgelo, edgehi);
+    _histos.push_back(_hspxy[s]);
   }
 
   // PMT hits for each PMT[0->1], Plane[0->1]
@@ -437,8 +438,8 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
   int runNum = data->GetSpill()->GetRunNumber();
-  if (!_got_SOR)
-      setHistosTitle(runNum);
+  // if (!_got_SOR)
+  //    setHistosTitle(runNum);
 
   if (ev_type != "physics_event")
      return;
