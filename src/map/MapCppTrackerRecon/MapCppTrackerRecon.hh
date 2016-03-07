@@ -133,9 +133,6 @@ class MapCppTrackerRecon : public MapBase<Data> {
   void calculate_track_rating(SciFiTrack* track) const;
 
  private:
-
-  void _set_field_values(SciFiEvent* event) const;
-
   /// This will contain the configuration
   Json::Value _configJSON;
   ///  Cut value for npe.

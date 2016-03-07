@@ -911,12 +911,10 @@ if __name__ == "__main__" :
                                virtual_plane_dictionary, scifi_event, mc_event)
           fill_plots(plot_dict, data_dict, paired_hits)
 
-        except ValueError as ex :
-          print "An Error Occured: " + str(ex)
-          print "Skipping Event: " +\
-                str(file_reader.get_current_event_number()) + " In Spill: " + \
-                str(file_reader.get_current_spill_number()) + " In File: " + \
-                str(file_reader.get_current_filenumber()) + "\n"
+        except ValueError :
+          print "An Error Occured. Skipping Spill: " + \
+                str(file_reader.get_current_spill_number()) + \
+                " In File: " + str(file_reader.get_current_filenumber()) + "\n"
           continue
 
     except KeyboardInterrupt :
@@ -934,7 +932,7 @@ if __name__ == "__main__" :
 
     sys.stdout.write( "\n- Saving Plots and Data : Running\r" )
     sys.stdout.flush()
-#    save_pretty(plot_dict, namespace.output_directory )
+    save_pretty(plot_dict, namespace.output_directory )
 
     save_plots(plot_dict, namespace.output_directory, \
                               namespace.output_filename, namespace.print_plots)
