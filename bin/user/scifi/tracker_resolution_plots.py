@@ -292,6 +292,9 @@ def init_plots_data() :
   plot_dict['upstream_mc_emittance'] = ROOT.TH2F( 'upstream_mc_emittance', \
            "Upstream MC Emittance Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
                                                                500, 0.0, 20.0 )
+  plot_dict['upstream_mc_momentum'] = ROOT.TH2F( \
+                           'upstream_mc_momentum', "Upstream MC Momentum Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
   plot_dict['upstream_recon_alpha'] = ROOT.TH2F( 'upstream_recon_alpha', \
                   "Upstream Alpha Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
@@ -302,6 +305,9 @@ def init_plots_data() :
   plot_dict['upstream_recon_emittance'] = ROOT.TH2F( \
           'upstream_recon_emittance', "Upstream Emittance Reconstruction Pz", \
                                        PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
+  plot_dict['upstream_recon_momentum'] = ROOT.TH2F( \
+                        'upstream_mc_momentum', "Upstream Recon Momentum Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
   plot_dict['upstream_residual_alpha'] = ROOT.TH2F( \
              'upstream_residual_alpha', "Upstream Alpha Residual Pz", PZ_BIN, \
@@ -311,6 +317,9 @@ def init_plots_data() :
                                    PZ_BIN, PZ_MIN, PZ_MAX, 200, -100.0, 100.0 )
   plot_dict['upstream_residual_emittance'] = ROOT.TH2F( \
              'upstream_residual_emittance', "Upstream Emittance Residual Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+  plot_dict['upstream_residual_momentum'] = ROOT.TH2F( \
+             'upstream_residual_momentum', "Upstream Momentum Residual Pz", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
 
@@ -325,6 +334,9 @@ def init_plots_data() :
   plot_dict['downstream_mc_emittance'] = ROOT.TH2F( \
       'downstream_mc_emittance', "Downstream MC Emittance Reconstruction Pz", \
                                        PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
+  plot_dict['downstream_mc_momentum'] = ROOT.TH2F( \
+                       'downstream_mc_momentum', "Downstream MC Momentum Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
   plot_dict['downstream_recon_alpha'] = ROOT.TH2F( \
               'downstream_recon_alpha', "Downstream Alpha Reconstruction Pz", \
@@ -335,6 +347,9 @@ def init_plots_data() :
   plot_dict['downstream_recon_emittance'] = ROOT.TH2F( \
       'downstream_recon_emittance', "Downstream Emittance Reconstruction Pz", \
                                        PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
+  plot_dict['downstream_recon_momentum'] = ROOT.TH2F( \
+                 'downstream_recon_momentum', "Downstream Recon Momentum Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
   plot_dict['downstream_residual_alpha'] = ROOT.TH2F( \
                  'downstream_residual_alpha', "Downstream Alpha Residual Pz", \
@@ -344,6 +359,9 @@ def init_plots_data() :
                                    PZ_BIN, PZ_MIN, PZ_MAX, 200, -100.0, 100.0 )
   plot_dict['downstream_residual_emittance'] = ROOT.TH2F( \
          'downstream_residual_emittance', "Downstream Emittance Residual Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+  plot_dict['downstream_residual_momentum'] = ROOT.TH2F( \
+           'downstream_residual_momentum', "Downstream Momentum Residual Pz", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
 
@@ -589,6 +607,7 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
       plot_dict['upstream_mc_beta'].Fill(up_pz, UP_COV_MC.get_beta(['x','y']))
       plot_dict['upstream_mc_emittance'].Fill(up_pz, UP_COV_MC.get_emittance(\
                                                           ['x','px','y','py']))
+      plot_dict['upstream_mc_momentum'].Fill(up_pz, UP_COV_MC.get_momentum())
 
       plot_dict['upstream_recon_alpha'].Fill(up_pz, UP_COV_RECON.get_alpha(\
                                                                     ['x','y']))
@@ -596,6 +615,8 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
                                                                     ['x','y']))
       plot_dict['upstream_recon_emittance'].Fill(up_pz, \
                                UP_COV_RECON.get_emittance(['x','px','y','py']))
+      plot_dict['upstream_recon_momentum'].Fill(up_pz, \
+                                                   UP_COV_RECON.get_momentum())
 
       plot_dict['upstream_residual_alpha'].Fill(up_pz, \
             UP_COV_RECON.get_alpha(['x','y']) - UP_COV_MC.get_alpha(['x','y']))
@@ -604,6 +625,8 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
       plot_dict['upstream_residual_emittance'].Fill(up_pz, \
                             UP_COV_RECON.get_emittance(['x','px','y','py']) - \
                                   UP_COV_MC.get_emittance(['x','px','y','py']))
+      plot_dict['upstream_residual_momentum'].Fill(up_pz, \
+                        UP_COV_RECON.get_momentum() - UP_COV_MC.get_momentum())
 
       UP_COV_MC.clear()
       UP_COV_RECON.clear()
@@ -617,6 +640,8 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
                                                DOWN_COV_MC.get_beta(['x','y']))
       plot_dict['downstream_mc_emittance'].Fill(down_pz, \
                                 DOWN_COV_MC.get_emittance(['x','px','y','py']))
+      plot_dict['downstream_mc_momentum'].Fill(down_pz, \
+                                                    DOWN_COV_MC.get_momentum())
 
       plot_dict['downstream_recon_alpha'].Fill(down_pz, \
                                            DOWN_COV_RECON.get_alpha(['x','y']))
@@ -624,6 +649,8 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
                                             DOWN_COV_RECON.get_beta(['x','y']))
       plot_dict['downstream_recon_emittance'].Fill(down_pz, \
                              DOWN_COV_RECON.get_emittance(['x','px','y','py']))
+      plot_dict['downstream_recon_momentum'].Fill(down_pz, \
+                                                 DOWN_COV_RECON.get_momentum())
 
       plot_dict['downstream_residual_alpha'].Fill(down_pz, \
         DOWN_COV_RECON.get_alpha(['x','y']) - DOWN_COV_MC.get_alpha(['x','y']))
@@ -632,6 +659,8 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
       plot_dict['downstream_residual_emittance'].Fill(down_pz, \
                           DOWN_COV_RECON.get_emittance(['x','px','y','py']) - \
                                 DOWN_COV_MC.get_emittance(['x','px','y','py']))
+      plot_dict['downstream_residual_momentum'].Fill(down_pz, \
+                    DOWN_COV_RECON.get_momentum() - DOWN_COV_MC.get_momentum())
 
       DOWN_COV_MC.clear()
       DOWN_COV_RECON.clear()
