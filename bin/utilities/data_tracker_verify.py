@@ -324,6 +324,10 @@ def init_plots_data() :
                        dir_name+'_adc_channel', "ADC Per Channel: "+dir_name, \
                                              250, 0.0, 250.0, 256, 0.0, 256.0 )
 
+        plane_plots[dir_name]['pull'] = ROOT.TH1F(\
+                    dir_name+'_plane_pull', "Kalman Pulls. Plane: "+dir_name, \
+                                                           101, -10.05, 10.05 )
+
   plot_dict['track_plots'] = track_plots
   plot_dict['recon_plots'] = reco_plots
   plot_dict['patrec_plots'] = patrec_plots
@@ -735,6 +739,7 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
       plane_plots[dir_name]['mxmy'].Fill( mom.x() / mom.z(), mom.y() / mom.z() )
       plane_plots[dir_name]['xmx'].Fill( pos.x(), mom.x() / mom.z() )
       plane_plots[dir_name]['ymy'].Fill( pos.y(), mom.y() / mom.z() )
+      plane_plots[dir_name]['pull'].Fill( tp.pull() )
 
       if station == REFERENCE_STATION and plane == REFERENCE_PLANE :
         prefix = ""

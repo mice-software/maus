@@ -397,6 +397,8 @@ def create_virtual_plane_dict(file_reader) :
     if done :
       break
   else :
+    print
+    print virtual_plane_dict
     raise ValueError("Could not locate all virtuals planes")
 
   file_reader.reset()
