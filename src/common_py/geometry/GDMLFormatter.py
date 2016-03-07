@@ -226,9 +226,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 (c[0]*c[2] + s[0]*s[1]*s[2])*pos[1] + s[0]*c[1]*pos[2]
             npos[2] = (s[0]*s[2] + c[0]*s[1]*c[2])*pos[0] + \
                 (-s[0]*c[2] + c[0]*s[1]*s[2])*pos[1] + c[0]*c[1]*pos[2]
-            print c
-            print s
-            print npos
+            # print c
+            # print s
+            # print npos
             
         return npos
 
@@ -252,7 +252,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         step_names = ['TOF0', 'TOF1', 'TOF2', 'KL', 'EMR', 
                       'Ckov1', 'Ckov2', 'Tracker1', 'Tracker0']
         for name in step_names:
-            print name
+            # print name
             # Find the positions from the configuration file
             # first note that the tracker positions exist in the solenoid GDML
             if name.find("Tracker0") >= 0:
@@ -352,8 +352,8 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 # positions if necessary
                 pos_det[i] += sol_pos[i]
                 rot_det[i] += sol_rot[i]
-            print pos
-            print pos_det
+            # print pos
+            # print pos_det
             u = ['x', 'y', 'z']            
             if name.find('Tracker0') >= 0: 
                 rot_det[0] = -rot[0]
@@ -774,7 +774,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                                                   self.maus_information_file))
         runInfo = mausInfo.xpathEval(\
             "MICE_Information/Configuration_Information/run")
-        print runInfo
+        # print runInfo
         diffuserSetting = []
         if len(runInfo) > 0: 
             diffuserSetting.append(runInfo[0].prop("diffuserThickness"))
@@ -793,7 +793,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             "MICE_Information/Detector_Information/Diffuser")
 
         targetname = os.path.join(self.path_in, key+".gdml")
-        print targetname
+        # print targetname
         target = libxml2.parseFile(targetname)
         vol = next(x for x in target.xpathEval("gdml/structure/volume") 
                    if x.prop("name").find(key + "_structvol") >= 0)
@@ -805,9 +805,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                    float(iris.xpathEval("Position")[0].prop("y")), \
                    float(iris.xpathEval("Position")[0].prop("z"))]
             
-            print key, pos[2], modrange
+            # print key, pos[2], modrange
             pos[2] = pos[2] - (modrange[1] + modrange[0])/2.
-            print key, pos[2], modrange
+            # print key, pos[2], modrange
             posUnit = iris.xpathEval("Position")[0].prop("unit")
             rot = [float(iris.xpathEval("Rotation")[0].prop("x")), \
                    float(iris.xpathEval("Rotation")[0].prop("y")), \
@@ -816,7 +816,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             newNode = libxml2.newNode("physvol")
             fileNode = libxml2.newNode("file")
             if len(diffuserSetting) > 0: # test of whether the statement exists.
-                print "Using diffuser setting ", int(diffuserSetting[0])
+                # print "Using diffuser setting ", int(diffuserSetting[0])
                 if (inum == 1 and int(diffuserSetting[0]) % 2 == 0) or \
                        (inum == 2 and (int(diffuserSetting[0]) % 4 == 0 or \
                                      int(diffuserSetting[0]) % 4 == 1)) or \

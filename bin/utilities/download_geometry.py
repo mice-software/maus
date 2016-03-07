@@ -52,8 +52,11 @@ def main(): # pylint: disable = C0103, R0912
     if configuration.geometry_download_by == "run_number":
         geoid = geometry_downloader.download_geometry_by_run \
                         (configuration.geometry_download_run_number, gdml_cache)
+        print "Downloading geometry id ", geoid, " for run number ", \
+            configuration.geometry_download_run_number 
     elif configuration.geometry_download_by == "current":
         geoid = geometry_downloader.download_current(gdml_cache)
+        print "Downloading geometry id ", geoid, " for current run"
     elif configuration.geometry_download_by == "id":
         if configuration.download_beamline_for_run != 0:
             geometry_downloader.download_beamline_for_run\
@@ -72,6 +75,7 @@ def main(): # pylint: disable = C0103, R0912
         else:
             print "Default MICE Channel currents will be used."
         geometry_downloader.download_geometry_by_id(geoid, gdml_cache)
+        print "Downloading geometry id ", geoid
     else:
         raise KeyError("Didn't recognise 'geometry_download_by' option '"+\
                configuration.geometry_download_by+"'. Should be on of\n"+\

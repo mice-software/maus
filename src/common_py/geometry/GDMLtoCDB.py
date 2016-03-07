@@ -258,7 +258,7 @@ class Downloader: #pylint: disable = R0902
                 # values to see if there is a later applicable
                 # creation date
                 sortedids = sorted(ids.items(), \
-                                       x=lambda x:x[1]['created'], reverse=True)
+                                       a=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
                 return geoid
 
@@ -353,7 +353,7 @@ class Downloader: #pylint: disable = R0902
             # also want to get the geometry ID for record keeping
             downloadedmap = beamline_cdb.get_beamline_for_run(run_id)
             start_time = downloadedmap[run_id]['start_time']
-            stop_time = downloadedmap[run_id]['stop_time']
+            stop_time = downloadedmap[run_id]['end_time']
             ids = self.geometry_cdb.get_ids(start_time, stop_time)
             if len(ids) == 0:
                 raise OSError('Geometry ID does not exist for run number')
@@ -365,7 +365,7 @@ class Downloader: #pylint: disable = R0902
                 # values to see if there is a later applicable
                 # creation date
                 sortedids = sorted(ids.items(), \
-                                       x=lambda x:x[1]['created'], reverse=True)
+                                   key=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
                 return geoid
   
