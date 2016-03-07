@@ -26,6 +26,12 @@ SciFiEvent::SciFiEvent() {
   _scifistraightprtracks.resize(0);
   _scifihelicalprtracks.resize(0);
   _scifitracks.resize(0);
+  _mean_Bz_upstream = 0.0;
+  _mean_Bz_downstream = 0.0;
+  _var_Bz_upstream = 0.0;
+  _var_Bz_downstream = 0.0;
+  _range_Bz_upstream = 0.0;
+  _range_Bz_downstream = 0.0;
 }
 
 SciFiEvent::SciFiEvent(const SciFiEvent& old_event) {
@@ -161,6 +167,15 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
     }
     _scifitracks[iTrk]->set_pr_track_pointer(new_pr_track);
   }
+
+  this->_mean_Bz_upstream = rhs._mean_Bz_upstream;
+  this->_mean_Bz_downstream = rhs._mean_Bz_downstream;
+
+  this->_var_Bz_upstream = rhs._var_Bz_upstream;
+  this->_var_Bz_downstream = rhs._var_Bz_downstream;
+
+  this->_range_Bz_upstream = rhs._range_Bz_upstream;
+  this->_range_Bz_downstream = rhs._range_Bz_downstream;
   return *this;
 }
 

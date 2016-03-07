@@ -36,7 +36,7 @@ class DoubletFiberParam : public G4VPVParameterisation {
   /** @brief Constructor taking the parameters that define the doublet planes
    *   the parameters are stored at src/Models/Modules/Tracker/
    */
-  DoubletFiberParam(G4double pSensitiveRadius,
+  DoubletFiberParam(G4double pCentralFibre,
                     G4double pActiveRadius,
                     G4double pOuterDiameter,
                     G4double pInnerDiameter,
@@ -55,20 +55,23 @@ class DoubletFiberParam : public G4VPVParameterisation {
                          const G4int copyNo,
                          const G4VPhysicalVolume* physVol) const;
 
+  G4double   getCentralFiber()    const { return centralFiber;  }
   G4double   getActiveRadius()    const { return activeRadius;  }
-  G4double   getSensitiveRadius() const { return sensitiveRadius; }
+//  G4double   getSensitiveRadius() const { return sensitiveRadius; }
   G4double   getInnerDiameter()   const { return innerDiameter; }
   G4double   getOuterDiameter()   const { return outerDiameter; }
   G4double   getFiberDiameter()   const { return fiberDiameter; }
   G4double   getFiberPitch()      const { return fiberPitch;    }
 
  private:
+  G4double centralFiber;
   G4double activeRadius;
-  G4double sensitiveRadius;
+//  G4double sensitiveRadius;
   G4double innerDiameter;
   G4double outerDiameter;
   G4double fiberDiameter;
   G4double fiberPitch;
+  G4double zSpacing;
   G4RotationMatrix* coreRotation;
 };
 
