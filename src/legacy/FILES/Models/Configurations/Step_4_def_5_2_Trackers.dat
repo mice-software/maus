@@ -59,7 +59,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -85,7 +85,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -111,7 +111,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -176,7 +176,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -202,7 +202,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -228,7 +228,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -293,7 +293,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -319,7 +319,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -345,7 +345,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -410,7 +410,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -436,7 +436,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -462,7 +462,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -527,7 +527,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -553,7 +553,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -579,7 +579,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -747,7 +747,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -773,7 +773,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -799,7 +799,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -864,7 +864,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -890,7 +890,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -916,7 +916,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -981,7 +981,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1007,7 +1007,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1033,7 +1033,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1098,7 +1098,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1124,7 +1124,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1150,7 +1150,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 158.5 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1215,7 +1215,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 0
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1241,7 +1241,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 1
-          PropertyDouble ActiveRadius 160. mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm
@@ -1267,7 +1267,7 @@ Configuration Step_4_def
           PropertyString Material POLYSTYRENE
           PropertyString SensitiveDetector SciFi
           PropertyInt Plane 2
-          PropertyDouble ActiveRadius 160.7 mm
+          PropertyDouble ActiveRadius 161.0 mm
           PropertyDouble Pitch 0.427 mm
           PropertyDouble FibreDiameter 0.350 mm
           PropertyDouble CoreDiameter 0.308 mm

@@ -46,7 +46,6 @@ P_VALUE_CUT = 0.05
 GRAD_CUT = 1.05
 MIN_NUM_TRACKPOINTS = 0
 IGNORE_PLANES = [ -7, -8, -9 ]
-
 PLOT_OPTIONS = { 'npe_digit' : [ 'logy' ], \
                  'npe_cluster' : [ 'logy' ], \
                  'npe_spacepoint' : [ 'logy' ], \
@@ -138,17 +137,14 @@ def init_plots_data() :
                         "Mean Field in Upstream Tracker", 1000, -5.0, 5.0 )
   reco_plots['field_mean_down'] = ROOT.TH1F( 'field_mean_down', 
                         "Mean Field in Upstream Tracker", 1000, -5.0, 5.0 )
-
   reco_plots['field_variance_up'] = ROOT.TH1F( 'field_variance_up', 
                     "Field Variance in Upstream Tracker", 1000, -5.0, 5.0 )
   reco_plots['field_variance_down'] = ROOT.TH1F( 'field_variance_down', 
                     "Field Variance in Upstream Tracker", 1000, -5.0, 5.0 )
-
   reco_plots['field_rms_up'] = ROOT.TH1F( 'field_rms_up', 
                          "Field RMS in Upstream Tracker", 1000, -5.0, 5.0 )
   reco_plots['field_rms_down'] = ROOT.TH1F( 'field_rms_down', 
                          "Field RMS in Upstream Tracker", 1000, -5.0, 5.0 )
-
   reco_plots['field_range_up'] = ROOT.TH1F( 'field_range_up', 
                        "Field Range in Upstream Tracker", 1000, -5.0, 5.0 )
   reco_plots['field_range_down'] = ROOT.TH1F( 'field_range_down', 
@@ -191,8 +187,6 @@ def init_plots_data() :
   reco_plots['saturations_event'] = ROOT.TH1F( 'saturations_event', \
                     "Number of Saturated Digits per Event", 8192, 0.0, 8192.0 )
 
-
-
   patrec_plots = {}
 
   patrec_plots['chi_squared_circle'] = ROOT.TH1F( 'chi_squared_circle', \
@@ -220,7 +214,6 @@ def init_plots_data() :
               "XY Gradients of Pat Rec Track", 100, -0.5, 0.5, 100, -0.5, 0.5 )
   patrec_plots['up_patrec_pxpy'] = ROOT.TH2F( "up_patrec_pxpy", \
         "XY Momenta of Pat Rec Track", 100, -200.0, 200.0, 100, -200.0, 200.0 )
-
   patrec_plots['down_patrec_xy'] = ROOT.TH2F( "down_patrec_xy", \
       "XY Positions of Pat Rec Track", 100, -200.0, 200.0, 100, -200.0, 200.0 )
   patrec_plots['down_patrec_mxmy'] = ROOT.TH2F( "down_patrec_mxmy", \
@@ -323,10 +316,9 @@ def init_plots_data() :
         plane_plots[dir_name]['adc_channel'] = ROOT.TH2F(\
                        dir_name+'_adc_channel', "ADC Per Channel: "+dir_name, \
                                              250, 0.0, 250.0, 256, 0.0, 256.0 )
-
         plane_plots[dir_name]['pull'] = ROOT.TH1F(\
                     dir_name+'_plane_pull', "Kalman Pulls. Plane: "+dir_name, \
-                                                           101, -10.05, 10.05 )
+                                                           201, -10.05, 10.05 )
 
   plot_dict['track_plots'] = track_plots
   plot_dict['recon_plots'] = reco_plots
