@@ -96,31 +96,6 @@ class SciFiEvent {
     /** Clear all data containers */
     void clear_all();
 
-    /** Get The Mean Field Values */
-    double get_mean_field_up() const { return _mean_Bz_upstream; }
-    double get_mean_field_down() const { return _mean_Bz_downstream; }
-
-    /** Set The Mean Field Values */
-    void set_mean_field_up(double val) { _mean_Bz_upstream = val; }
-    void set_mean_field_down(double val) { _mean_Bz_downstream = val; }
-
-    /** Get The Field Variance */
-    double get_variance_field_up() const { return _var_Bz_upstream; }
-    double get_variance_field_down() const { return _var_Bz_downstream; }
-
-    /** Set The Field Variance */
-    void set_variance_field_up(double val) { _var_Bz_upstream = val; }
-    void set_variance_field_down(double val) { _var_Bz_downstream = val; }
-
-    /** Get The Maximum Field Deviation */
-    double get_range_field_up() const { return _range_Bz_upstream; }
-    double get_range_field_down() const { return _range_Bz_downstream; }
-
-    /** Set The Maximum Field Deviation */
-    void set_range_field_up(double val) { _range_Bz_upstream = val; }
-    void set_range_field_down(double val) { _range_Bz_downstream = val; }
-
-
   private:
 
     /** Digits in an event */
@@ -142,25 +117,7 @@ class SciFiEvent {
     SciFiHelicalPRTrackPArray           _scifihelicalprtracks;
 
     /** Kalman tracks */
-    SciFiTrackPArray                    _scifitracks;
-
-    /** Mean Field Upstream */
-    double                              _mean_Bz_upstream;
-
-    /** Mean Field Downstream */
-    double                              _mean_Bz_downstream;
-
-    /** Field Variance Upstream */
-    double                              _var_Bz_upstream;
-
-    /** Field Variance Downstream */
-    double                              _var_Bz_downstream;
-
-    /** Max Field Deviation Upstream */
-    double                              _range_Bz_upstream;
-
-    /** Max Field Deviation Downstream */
-    double                              _range_Bz_downstream;
+    SciFiTrackPArray                     _scifitracks;
 
     MAUS_VERSIONED_CLASS_DEF(SciFiEvent)
 };

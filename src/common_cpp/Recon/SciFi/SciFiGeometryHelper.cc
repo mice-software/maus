@@ -109,8 +109,7 @@ void SciFiGeometryHelper::Build() {
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = reference;
       trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
-//      trackerGeo.Field = FieldValue(trackerModule);
-      FieldValue(trackerModule, trackerGeo);
+      trackerGeo.Field = FieldValue(trackerModule);
       trackerGeo.Planes[plane_id] = this_plane;
 
       _geometry_map[tracker_n] = trackerGeo;
@@ -130,7 +129,7 @@ double SciFiGeometryHelper::FieldValue(ThreeVector global_position,
   return Tracker_Bz;
 }
 
-void SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule, SciFiTrackerGeometry& geom) {
+double SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule ) {
 //  Hep3Vector hepGlobalPos = trackerModule->globalPosition();
   if (trackerModule == NULL) {
     std::cerr << "No tracker module inited!\n";
@@ -150,9 +149,6 @@ void SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule, SciFiTrack
   double halfLength = 0.5*dims[1];
   double z_pos = - halfLength;
   double sumBz = 0.0;
-  double sumBz_sq = 0.0;
-  double maxBz = -1.0E+20;
-  double minBz = 1.0E+20;
   int numSteps = static_cast<int>(2.0 * halfLength / stepSize);
 
   do {
@@ -167,20 +163,12 @@ void SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule, SciFiTrack
     ThreeVector B_field(EMfield[0], EMfield[1], EMfield[2]);
     B_field *= trackerRotation;
     sumBz += B_field[2];
-    sumBz_sq += B_field[2]*B_field[2];
-    if (B_field[2] > maxBz) {
-      maxBz = B_field[2];
-    }
-    if (B_field[2] < minBz) {
-      minBz = B_field[2];
-    }
+//    sumBz += EMfield[2];
 
     z_pos += stepSize;
   } while (z_pos < halfLength);
 
-  geom.Field = sumBz / numSteps;
-  geom.FieldVariance = ( sumBz_sq / numSteps ) - ( geom.Field*geom.Field );
-  geom.FieldRange = maxBz - minBz;
+  return sumBz / numSteps;
 }
 
 const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int plane) const {

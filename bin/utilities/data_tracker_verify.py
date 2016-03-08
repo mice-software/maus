@@ -25,17 +25,20 @@
 """
 
 # pylint: disable = W0311, E1101, W0613, C0111, W0621, C0103, W0702, W0611
-# pylint: disable = C0302, R0912, R0914, R0915
+# pylint: disable = R0912, R0914, R0915
 
 import MAUS
+
+# Generic Python imports
 import sys
 import os
-import math
 import argparse
 import types
+
+# Third Party library import statements
 import event_loader
-from analysis import tools
 import ROOT
+
 
 # Useful Constants and configuration
 REFERENCE_PLANE = 0
@@ -43,14 +46,10 @@ REFERENCE_STATION = 1
 TOF_CUT_LOW = 0.0
 TOF_CUT_HIGH = 1000.0
 P_VALUE_CUT = 0.05
-GRAD_CUT = 1.05
 MIN_NUM_TRACKPOINTS = 0
-IGNORE_PLANES = [ -7, -8, -9 ]
 
-PLOT_OPTIONS = { 'npe_digit' : [ 'logy' ], \
+PLOT_OPTIONS = { 'npe' : [ 'logy' ], \
                  'npe_cluster' : [ 'logy' ], \
-                 'npe_spacepoint' : [ 'logy' ], \
-                 'npe_fit_spacepoint' : [ 'logy' ], \
                  'adc' : [ 'logy' ], \
                  'adc_channel' : [ 'logy', 'colz' ], \
                  'npe_channel' : [ 'logz', 'colz' ], \
@@ -64,10 +63,8 @@ PLOT_OPTIONS = { 'npe_digit' : [ 'logy' ], \
                  'xpx' : [ 'colz' ], \
                  'ypy' : [ 'colz' ], \
                  'pxpy' : [ 'colz' ], \
-                 'spacepoint_road' : [ 'colz' ],
-                 'spacepoints' : [ 'colz'],
-                 '2_hit_spacepoints' : [ 'colz' ],
-                 '3_hit_spacepoints' : [ 'colz' ] }
+                 'spacepoint_road' : [ 'colz' ] }
+
 
 def init_plots_data() :
   """
@@ -76,84 +73,49 @@ def init_plots_data() :
   plot_dict = {}
 
   track_plots = {}
+
+  track_plots['plane_pulls'] = ROOT.TH2F("plane_pulls", "Pulls per Plane", \
+                                       31, -15.5, 15.5, 5001, -200.04, 200.04 )
+  track_plots['plane_residuals'] = ROOT.TH2F("plane_residuals",
+       "Filtered Residuals per Plane", 31, -15.5, 15.5, 5001, -200.04, 200.04 )
+  track_plots['plane_s_residuals'] = ROOT.TH2F("plane_s_residuals",
+       "Smoothed Residuals per Plane", 31, -15.5, 15.5, 5001, -200.04, 200.04 )
+
   track_plots['tracks_event'] = ROOT.TH1F( "tracks_event", \
                                 "Number of Tracks per Event", 100, 0.0, 100.0 )
   track_plots['trackpoints_track'] = ROOT.TH1F( "trackpoints_track", \
                            "Number of Trackpoints per Track", 100, 0.0, 100.0 )
   track_plots['tracks_tracker'] = ROOT.TH1F( "tracks_tracker", \
                                   "Number of Tracks per Tracker", 2, 0.0, 2.0 )
-
-  for shape in [ "helical", "straight" ] :
-    shape_plots = {}
-
-    shape_plots['plane_pulls'] = ROOT.TH2F(shape+"_plane_pulls", \
-                         "Pulls per Plane", 31, -15.5, 15.5, 500, -20.0, 20.0 )
-    shape_plots['plane_residuals'] = ROOT.TH2F(shape+"_plane_residuals",
-            "Filtered Residuals per Plane", 31, -15.5, 15.5, 500, -20.0, 20.0 )
-    shape_plots['plane_s_residuals'] = ROOT.TH2F(shape+"_plane_s_residuals",
-            "Smoothed Residuals per Plane", 31, -15.5, 15.5, 500, -20.0, 20.0 )
-
-    shape_plots['tracks_event'] = ROOT.TH1F( shape+"_tracks_event", \
-                                "Number of Tracks per Event", 100, 0.0, 100.0 )
-    shape_plots['trackpoints_track'] = ROOT.TH1F( shape+"_trackpoints_track", \
-                           "Number of Trackpoints per Track", 100, 0.0, 100.0 )
-    shape_plots['tracks_tracker'] = ROOT.TH1F( shape+"_tracks_tracker", \
-                                  "Number of Tracks per Tracker", 2, 0.0, 2.0 )
-    shape_plots['chi_squared'] = ROOT.TH1F( shape+'_tracks_chi_squared', \
-                                 "Chi Squared Distribution", 5000, 0.0, 100.0 )
-    shape_plots['chi_squared_up'] = ROOT.TH1F( shape+'_tracks_chi_squared_up', \
-                        "Upstream Chi Squared Distribution", 5000, 0.0, 100.0 )
-    shape_plots['chi_squared_down'] = ROOT.TH1F( \
-                                            shape+'_tracks_chi_squared_down', \
-                      "Downstream Chi Squared Distribution", 5000, 0.0, 100.0 )
-    shape_plots['chi_squared_ndf'] = ROOT.TH1F( \
-                                             shape+'_tracks_chi_squared_ndf', \
-           "Chi Squared per Degree of Freedom Distribution", 5000, 0.0, 100.0 )
-    shape_plots['chi_squared_ndf_up'] = ROOT.TH1F( \
-                                         shape+'_tracks_chi_squared_ndf_up',  \
-                   "Upstream Chi Squared per Degree of Freedom Distribution", \
-                                                             5000, 0.0, 100.0 )
-    shape_plots['chi_squared_ndf_down'] = ROOT.TH1F( \
-                                        shape+'_tracks_chi_squared_ndf_down', \
+  track_plots['chi_squared'] = ROOT.TH1F( 'tracks_chi_squared', \
+                                "Chi Squared Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_up'] = ROOT.TH1F( 'tracks_chi_squared_up', \
+                       "Upstream Chi Squared Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_down'] = ROOT.TH1F( 'tracks_chi_squared_down', \
+                     "Downstream Chi Squared Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_ndf'] = ROOT.TH1F( 'tracks_chi_squared_ndf', \
+          "Chi Squared per Degree of Freedom Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_ndf_up'] = ROOT.TH1F( 'tracks_chi_squared_ndf_up', \
+ "Upstream Chi Squared per Degree of Freedom Distribution", 5000, 0.0, 1000.0 )
+  track_plots['chi_squared_ndf_down'] = ROOT.TH1F( \
+                                               'tracks_chi_squared_ndf_down', \
                  "Downstream Chi Squared per Degree of Freedom Distribution", \
-                                                             5000, 0.0, 100.0 )
-    shape_plots['p_value'] = ROOT.TH1F( shape+'_tracks_p_value', \
-                                       "P-Value Distribution", 1000, 0.0, 1.0 )
-    shape_plots['ndf'] = ROOT.TH1F( shape+'_tracks_ndf', \
-                     "Number Degrees of Freedom Distribution", 21, -0.5, 20.5 )
-    shape_plots['p_value_up'] = ROOT.TH1F( shape+'_tracks_p_value_up', \
-                              "Upstream P-Value Distribution", 1000, 0.0, 1.0 )
-    shape_plots['ndf_up'] = ROOT.TH1F( shape+'_tracks_ndf_up', \
-            "Upstream Number Degrees of Freedom Distribution", 21, -0.5, 20.5 )
-    shape_plots['p_value_down'] = ROOT.TH1F( shape+'_tracks_p_value_down', \
-                              "Upstream P-Value Distribution", 1000, 0.0, 1.0 )
-    shape_plots['ndf_down'] = ROOT.TH1F( shape+'_tracks_ndf_down', \
-            "Upstream Number Degrees of Freedom Distribution", 21, -0.5, 20.5 )
+                                                            5000, 0.0, 1000.0 )
+  track_plots['p_value'] = ROOT.TH1F( 'tracks_p_value', \
+                                    "P-Value Distribution", 1000, 0.0, 1.0 )
+  track_plots['p_value_up'] = ROOT.TH1F( 'tracks_p_value_up', \
+                                    "P-Value Distribution", 1000, 0.0, 1.0 )
+  track_plots['p_value_down'] = ROOT.TH1F( 'tracks_p_value_down', \
+                                    "P-Value Distribution", 1000, 0.0, 1.0 )
+  track_plots['ndf'] = ROOT.TH1F( 'tracks_ndf', \
+                                    "NDF Distribution", 21, -0.5, 20.5 )
+  track_plots['ndf_up'] = ROOT.TH1F( 'tracks_ndf_up', \
+                                    "NDF Distribution", 21, -0.5, 20.5 )
+  track_plots['ndf_down'] = ROOT.TH1F( 'tracks_ndf_down', \
+                                    "NDF Distribution", 21, -0.5, 20.5 )
 
-
-    track_plots[shape] = shape_plots
 
   reco_plots = {}
-  reco_plots['field_mean_up'] = ROOT.TH1F( 'field_mean_up', 
-                        "Mean Field in Upstream Tracker", 1000, -5.0, 5.0 )
-  reco_plots['field_mean_down'] = ROOT.TH1F( 'field_mean_down', 
-                        "Mean Field in Upstream Tracker", 1000, -5.0, 5.0 )
-
-  reco_plots['field_variance_up'] = ROOT.TH1F( 'field_variance_up', 
-                    "Field Variance in Upstream Tracker", 1000, -5.0, 5.0 )
-  reco_plots['field_variance_down'] = ROOT.TH1F( 'field_variance_down', 
-                    "Field Variance in Upstream Tracker", 1000, -5.0, 5.0 )
-
-  reco_plots['field_rms_up'] = ROOT.TH1F( 'field_rms_up', 
-                         "Field RMS in Upstream Tracker", 1000, -5.0, 5.0 )
-  reco_plots['field_rms_down'] = ROOT.TH1F( 'field_rms_down', 
-                         "Field RMS in Upstream Tracker", 1000, -5.0, 5.0 )
-
-  reco_plots['field_range_up'] = ROOT.TH1F( 'field_range_up', 
-                       "Field Range in Upstream Tracker", 1000, -5.0, 5.0 )
-  reco_plots['field_range_down'] = ROOT.TH1F( 'field_range_down', 
-                       "Field Range in Upstream Tracker", 1000, -5.0, 5.0 )
-
   reco_plots['tof_0_1'] = ROOT.TH1F( 'tof_0_1', 'Time TOF0 - TOF1', \
                                                              1000, 0.0, 100.0 )
   reco_plots['tof_1_2'] = ROOT.TH1F( 'tof_1_2', 'Time TOF1 - TOF2', \
@@ -163,26 +125,16 @@ def init_plots_data() :
   reco_plots['tof_1_2_cut'] = ROOT.TH1F( 'tof_1_2_cut', 'Time TOF1 - TOF2', \
                                                              1000, 0.0, 100.0 )
 
-  reco_plots['npe_digit'] = ROOT.TH1F( 'npe_digit',
-                                 "Number of Photo Electrons", 100, 0.0, 100.0 )
-  reco_plots['npe_cluster'] = ROOT.TH1F( 'npe_cluster', \
-                                             "NPE per Cluster", 75, 0.0, 75.0 )
-  reco_plots['npe_spacepoint'] = ROOT.TH1F( 'npe_spacepoint', \
-                                       "NPE per Spacepoints", 100, 0.0, 100.0 )
-  reco_plots['npe_fit_spacepoint'] = ROOT.TH1F( 'npe_fit_spacepoint', \
-                                   "NPE per Used Spacepoint", 100, 0.0, 100.0 )
+  reco_plots['npe'] = ROOT.TH1F( 'npe', "Number of Photo Electrons", \
+                                                            101, 0.5, 100.5 )
   reco_plots['adc'] = ROOT.TH1F( 'adc', "ADC Count", 260, 0.0, 260.0 )
   reco_plots['plane_hits'] = ROOT.TH1F("plane_hits", "Hits per Plane", 31, \
                                                                   -15.0, 16.0 )
   reco_plots['channels_cluster'] = ROOT.TH1F( 'channels_cluster', \
                                         "Channels per Cluster", 50, 0.0, 50.0 )
+  reco_plots['npe_cluster'] = ROOT.TH1F( 'npe_cluster', \
+                                             "NPE per Cluster", 75, 0.0, 75.0 )
   reco_plots['spacepoints_station'] = ROOT.TH1F( "spacepoints_station", \
-                           "Spacepoints Found in Each Station", 11, -5.0, 6.0 )
-  reco_plots['2_hit_spacepoints_station'] = ROOT.TH1F( \
-                                                 "2_hit_spacepoints_station", \
-                           "Spacepoints Found in Each Station", 11, -5.0, 6.0 )
-  reco_plots['3_hit_spacepoints_station'] = ROOT.TH1F( \
-                                                 "3_hit_spacepoints_station", \
                            "Spacepoints Found in Each Station", 11, -5.0, 6.0 )
   reco_plots['clusters_plane'] = ROOT.TH1F( "clusters_plane", \
                               "Clusters Found in Each Plane", 31, -15.0, 16.0 )
@@ -196,23 +148,23 @@ def init_plots_data() :
   patrec_plots = {}
 
   patrec_plots['chi_squared_circle'] = ROOT.TH1F( 'chi_squared_circle', \
-                                   "Circle Fit Chi Squared", 1000, 0.0, 100.0 )
+                                  "Circle Fit Chi Squared", 1000, 0.0, 1000.0 )
   patrec_plots['chi_squared_sz'] = ROOT.TH1F( 'chi_squared_sz', \
-                                      "S-Z Fit Chi Squared", 1000, 0.0, 100.0 )
+                                     "S-Z Fit Chi Squared", 1000, 0.0, 1000.0 )
   patrec_plots['chi_squared_x'] = ROOT.TH1F( 'chi_squared_x', \
-                                        "X Fit Chi Squared", 1000, 0.0, 100.0 )
+                                       "X Fit Chi Squared", 1000, 0.0, 1000.0 )
   patrec_plots['chi_squared_y'] = ROOT.TH1F( 'chi_squared_y', \
-                                        "Y Fit Chi Squared", 1000, 0.0, 100.0 )
+                                       "Y Fit Chi Squared", 1000, 0.0, 1000.0 )
   patrec_plots['chi_squared_straight'] = ROOT.TH1F( 'chi_squared_straight', \
-                                 "Straight Fit Chi Squared", 1000, 0.0, 100.0 )
+                                "Straight Fit Chi Squared", 1000, 0.0, 1000.0 )
   patrec_plots['chi_squared_straight_ndf'] = ROOT.TH1F( \
                 'chi_squared_straight_ndf', "Straight Fit Chi Squared / NDF", \
-                                                             1000, 0.0, 100.0 )
+                                                            1000, 0.0, 1000.0 )
   patrec_plots['chi_squared_helical'] = ROOT.TH1F( 'chi_squared_helical', \
-                                  "Helical Fit Chi Squared", 1000, 0.0, 100.0 )
+                                 "Helical Fit Chi Squared", 1000, 0.0, 1000.0 )
   patrec_plots['chi_squared_helical_ndf'] = ROOT.TH1F( \
                   'chi_squared_helical_ndf', "Helical Fit Chi Squared / NDF", \
-                                                             1000, 0.0, 100.0 )
+                                                            1000, 0.0, 1000.0 )
 
   patrec_plots['up_patrec_xy'] = ROOT.TH2F( "up_patrec_xy", \
       "XY Positions of Pat Rec Track", 100, -200.0, 200.0, 100, -200.0, 200.0 )
@@ -264,17 +216,7 @@ def init_plots_data() :
       station_plots[dir_name]['spacepoint_road'] = ROOT.TH2F(
                                                  dir_name+'_spacepoint_road', \
                               "Spacepoint distance from fit: "+str(dir_name), \
-                                           200, -10.0, 10.0, 200, -10.0, 10.0 )
-      station_plots[dir_name]['2_hit_spacepoints'] = ROOT.TH2F(
-                                               dir_name+'_2_hit_spacepoints', \
-    "2-Cluster Spacepoints: Tracker "+str(tracker)+", Station "+str(station), \
-                                       200, -200.0, 200.0, 200, -200.0, 200.0 )
-      station_plots[dir_name]['3_hit_spacepoints'] = ROOT.TH2F(
-                                               dir_name+'_3_hit_spacepoints', \
-    "3-Cluster Spacepoints: Tracker "+str(tracker)+", Station "+str(station), \
-                                       200, -200.0, 200.0, 200, -200.0, 200.0 )
-      station_plots[dir_name]['kuno_plot'] = ROOT.TH1F( dir_name+'_kuno', \
-                                  "Kuno Plot: "+dir_name, 1001, -0.25, 500.25 )
+                                           200, -50.0, 50.0, 200, -50.0, 50.0 )
 
 
   plane_plots = {}
@@ -324,9 +266,6 @@ def init_plots_data() :
                        dir_name+'_adc_channel', "ADC Per Channel: "+dir_name, \
                                              250, 0.0, 250.0, 256, 0.0, 256.0 )
 
-        plane_plots[dir_name]['pull'] = ROOT.TH1F(\
-                    dir_name+'_plane_pull', "Kalman Pulls. Plane: "+dir_name, \
-                                                           101, -10.05, 10.05 )
 
   plot_dict['track_plots'] = track_plots
   plot_dict['recon_plots'] = reco_plots
@@ -334,6 +273,7 @@ def init_plots_data() :
   plot_dict['comparison_plots'] = comp_plots
   plot_dict['plane_plots'] = plane_plots
   plot_dict['station_plots'] = station_plots
+
 
   data_dict = {}
   data_dict['counters'] = {}
@@ -346,6 +286,7 @@ def init_plots_data() :
   data_dict['counters']['N_tracks_up'] = 0
   data_dict['counters']['N_tracks_down'] = 0
   data_dict['counters']['N_track_pairs'] = 0
+
 
   return plot_dict, data_dict
 
@@ -383,6 +324,7 @@ def cut_tof_event( plot_dict, event ) :
                                         tof1_sp.GetTime() - tof0_sp.GetTime() )
   plot_dict['recon_plots']['tof_1_2_cut'].Fill(\
                                         tof2_sp.GetTime() - tof1_sp.GetTime() )
+
   return False
 
  
@@ -397,6 +339,7 @@ def cut_scifi_event( plot_dict, event ) :
     if digit.get_adc() == 255 :
       saturation_counter += 1
 
+  plot_dict['recon_plots']['saturations_event'].Fill( saturation_counter )
   if saturation_counter > 1000 :
     return True
   else :
@@ -407,23 +350,6 @@ def fill_plots_data(plot_dict, data_dict, event) :
   """
     Fill the plots in the plot dictionary with data
   """
-  plot_dict['recon_plots']['field_mean_up'].Fill(\
-                                              1000.0*event.get_mean_field_up())
-  plot_dict['recon_plots']['field_mean_down'].Fill(\
-                                            1000.0*event.get_mean_field_down())
-  plot_dict['recon_plots']['field_variance_up'].Fill(\
-                                          1.0E+6*event.get_variance_field_up())
-  plot_dict['recon_plots']['field_variance_down'].Fill(\
-                                        1.0E+6*event.get_variance_field_down())
-  plot_dict['recon_plots']['field_rms_up'].Fill(\
-                               1000.0*math.sqrt(event.get_variance_field_up()))
-  plot_dict['recon_plots']['field_rms_down'].Fill(\
-                             1000.0*math.sqrt(event.get_variance_field_down()))
-  plot_dict['recon_plots']['field_range_up'].Fill(\
-                                             1000.0*event.get_range_field_up())
-  plot_dict['recon_plots']['field_range_down'].Fill(\
-                                           1000.0*event.get_range_field_down())
-
   scifi_digits = event.digits()
   if not scifi_digits :
     return 
@@ -449,7 +375,6 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
   station_plots = plot_dict['station_plots']
   reco_plots = plot_dict['recon_plots']
 
-  saturation_counter = 0
   for digit in digits :
     tracker = digit.get_tracker()
     station = digit.get_station()
@@ -461,27 +386,16 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     plane_plots[dir_name]['adc_channel'].Fill( digit.get_channel(), \
                                                               digit.get_adc() )
     if digit.get_adc() != 255 :
-      reco_plots['npe_digit'].Fill( digit.get_npe() )
+      reco_plots['npe'].Fill( digit.get_npe() )
       plane_plots[dir_name]['npe_channel'].Fill( digit.get_channel(), \
                                                               digit.get_npe() )
-    else :
-      saturation_counter += 1
 
-  plot_dict['recon_plots']['saturations_event'].Fill( saturation_counter )
-
-  kuno_sums = {}
-  for tracker in [ 0, 1 ] :
-    kuno_sums_stations = {}
-    for station in [ 1, 2, 3, 4, 5 ] :
-      kuno_sums_stations[ station ] = 0.0
-    kuno_sums[tracker] = kuno_sums_stations
 
   for cluster in clusters :
     tracker = cluster.get_tracker()
     station = cluster.get_station()
     plane = cluster.get_plane()
     dir_name = str(tracker) + "." + str(station) + "." + str(plane)
-    kuno_sums[tracker][station] += cluster.get_channel()
 
     plane_plots[dir_name]['cluster_occup'].Fill( cluster.get_channel() + 0.1 )
     plane_plots[dir_name]['cluster_positions'].Fill( cluster.get_alpha() )
@@ -504,6 +418,7 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     else :
       data_dict['counters']['N_fat_clusters'] += 1
 
+
     for digit in clus_digits :
       if digit.get_adc() == 255 :
         break
@@ -511,10 +426,7 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
       reco_plots['npe_cluster'].Fill( cluster.get_npe() )
       plane_plots[dir_name]['npe_cluster'].Fill( cluster.get_npe() )
 
-  for tracker in [ 0, 1 ] :
-    for station in [ 1, 2, 3, 4, 5 ] :
-      dir_name = str(tracker)+'.'+str(station)
-      station_plots[dir_name]['kuno_plot'].Fill( kuno_sums[tracker][station] )
+
 
   for spacepoint in spacepoints :
     tracker = spacepoint.get_tracker()
@@ -528,35 +440,6 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     dir_name = str(tracker)+'.'+str(station)
     station_plots[dir_name]['spacepoints'].Fill( \
                  spacepoint.get_position().x(), spacepoint.get_position().y() )
-
-    sp_clusters = spacepoint.get_channels_pointers()
-
-    if len( sp_clusters ) == 2 :
-      reco_plots['2_hit_spacepoints_station'].Fill( station_id )
-      station_plots[dir_name]['2_hit_spacepoints'].Fill( \
-                 spacepoint.get_position().x(), spacepoint.get_position().y() )
-    elif len( sp_clusters ) == 3 :
-      reco_plots['3_hit_spacepoints_station'].Fill( station_id )
-      station_plots[dir_name]['3_hit_spacepoints'].Fill( \
-                 spacepoint.get_position().x(), spacepoint.get_position().y() )
-    else :
-      raise ValueError( "Unknown Number of spacepoints: " + \
-                               str( sp_clusters ) )
-
-    npe = 0.0
-    for cluster in sp_clusters :
-      clus_digits = cluster.get_digits_pointers()
-      for digit in clus_digits :
-        if digit.get_adc() == 255 :
-          break
-      else :
-        npe += cluster.get_npe()
-        continue
-      break
-    else :
-      reco_plots['npe_spacepoint'].Fill( npe )
-      if spacepoint.is_used() :
-        reco_plots['npe_fit_spacepoint'].Fill( npe )
 
   return True
 
@@ -646,8 +529,6 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
   track_plots['tracks_event'].Fill( len(tracks) )
   upstream_good = 0
   downstream_good = 0
-  straight_counter = 0
-  helical_counter = 0
 
   for track in tracks :
     trackpoints = track.scifitrackpoints()
@@ -659,48 +540,31 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
     for tp in trackpoints :
       if tp.has_data() :
         count_trackpoints += 1
-      elif tools.calculate_plane_id( tp.tracker(), tp.station(), tp.plane()) \
-                                                             in IGNORE_PLANES :
-        count_trackpoints += 1
     if count_trackpoints < MIN_NUM_TRACKPOINTS :
       continue
 
     tracker = track.tracker()
-    track_plots['tracks_tracker'].Fill( track.tracker() )
-
-    shape = track.GetAlgorithmUsed()
-    shape_plots = None
-    pr_track = None
-
-    if shape == 0 :
-      shape_plots = track_plots['straight']
-      pr_track = track.pr_track_pointer_straight()
-      straight_counter += 1
-    elif shape == 1 :
-      shape_plots = track_plots['helical']
-      pr_track = track.pr_track_pointer_helical()
-      helical_counter += 1
 
     data_dict['counters']['N_tracks'] += 1 
 
-    shape_plots['tracks_tracker'].Fill( track.tracker() )
-    shape_plots['chi_squared'].Fill( track.chi2() )
-    shape_plots['chi_squared_ndf'].Fill( track.chi2() / track.ndf() )
-    shape_plots['p_value'].Fill( track.P_value() )
-    shape_plots['ndf'].Fill( track.ndf() )
+    track_plots['tracks_tracker'].Fill( track.tracker() )
+    track_plots['chi_squared'].Fill( track.chi2() )
+    track_plots['chi_squared_ndf'].Fill( track.chi2() / track.ndf() )
+    track_plots['p_value'].Fill( track.P_value() )
+    track_plots['ndf'].Fill( track.ndf() )
 
     if tracker == 0 :
-      shape_plots['chi_squared_up'].Fill( track.chi2() )
-      shape_plots['chi_squared_ndf_up'].Fill( track.chi2() / track.ndf() )
-      shape_plots['p_value_up'].Fill( track.P_value() )
-      shape_plots['ndf_up'].Fill( track.ndf() )
+      track_plots['chi_squared_up'].Fill( track.chi2() )
+      track_plots['chi_squared_ndf_up'].Fill( track.chi2() / track.ndf() )
+      track_plots['p_value_up'].Fill( track.P_value() )
+      track_plots['ndf_up'].Fill( track.ndf() )
       data_dict['counters']['N_tracks_up'] += 1 
       upstream_good += 1
     elif tracker == 1 :
-      shape_plots['chi_squared_down'].Fill( track.chi2() )
-      shape_plots['chi_squared_ndf_down'].Fill( track.chi2() / track.ndf() )
-      shape_plots['p_value_down'].Fill( track.P_value() )
-      shape_plots['ndf_down'].Fill( track.ndf() )
+      track_plots['chi_squared_down'].Fill( track.chi2() )
+      track_plots['chi_squared_ndf_down'].Fill( track.chi2() / track.ndf() )
+      track_plots['p_value_down'].Fill( track.P_value() )
+      track_plots['ndf_down'].Fill( track.ndf() )
       data_dict['counters']['N_tracks_down'] += 1 
       downstream_good += 1
     
@@ -726,9 +590,9 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
       residual = tp.residual()
       s_residual = tp.smoothed_residual()
 
-      shape_plots['plane_pulls'].Fill( plane_id, pull )
-      shape_plots['plane_residuals'].Fill( plane_id, residual )
-      shape_plots['plane_s_residuals'].Fill( plane_id, s_residual )
+      track_plots['plane_pulls'].Fill( plane_id, pull )
+      track_plots['plane_residuals'].Fill( plane_id, residual )
+      track_plots['plane_s_residuals'].Fill( plane_id, s_residual )
 
       pos = tp.pos()
       mom = tp.mom()
@@ -739,7 +603,6 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
       plane_plots[dir_name]['mxmy'].Fill( mom.x() / mom.z(), mom.y() / mom.z() )
       plane_plots[dir_name]['xmx'].Fill( pos.x(), mom.x() / mom.z() )
       plane_plots[dir_name]['ymy'].Fill( pos.y(), mom.y() / mom.z() )
-      plane_plots[dir_name]['pull'].Fill( tp.pull() )
 
       if station == REFERENCE_STATION and plane == REFERENCE_PLANE :
         prefix = ""
@@ -764,10 +627,7 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
     if upstream_good == 1 and downstream_good == 1 :
       data_dict['counters']['N_track_pairs'] += 1
     track_plots['trackpoints_track'].Fill( count_trackpoints )
-    shape_plots['trackpoints_track'].Fill( count_trackpoints )
 
-  track_plots['straight']['tracks_event'].Fill(straight_counter)
-  track_plots['helical']['tracks_event'].Fill(helical_counter)
 
 
 def analyse_plots(plot_dict, data_dict) :
@@ -780,8 +640,6 @@ def analyse_plots(plot_dict, data_dict) :
 
   print "Analysing Data"
   print
-  print "No. of Files                   = ", data_dict['counters']['N_files']
-  print "No. of Spills                  = ", data_dict['counters']['N_spills']
   print "No. of Events                  = ", data_dict['counters']['N_events']
   print
   print "No. of Tracks                  = ", data_dict['counters']['N_tracks']
@@ -804,20 +662,12 @@ def analyse_plots(plot_dict, data_dict) :
   print "No. Events with 2 Tracks       = ", \
                                    track_plots['tracks_event'].GetBinContent(3)
   print
-  print "  Straight Tracks :"
   print
   print "Mean Smoothed Residual         = ", \
-                        track_plots['straight']['plane_s_residuals'].GetMean(2)
+                                    track_plots['plane_s_residuals'].GetMean(2)
   print "RMS  Smoothed Residual         = ", \
-                         track_plots['straight']['plane_s_residuals'].GetRMS(2)
+                                     track_plots['plane_s_residuals'].GetRMS(2)
 
-  print
-  print "  Helical Tracks :"
-  print
-  print "Mean Smoothed Residual         = ", \
-                         track_plots['helical']['plane_s_residuals'].GetMean(2)
-  print "RMS  Smoothed Residual         = ", \
-                          track_plots['helical']['plane_s_residuals'].GetRMS(2)
 
 def save_plots(plot_dict, filename) :
   """
@@ -903,7 +753,7 @@ if __name__ == "__main__" :
                                    help='Maximum number of events to analyse.')
 
   parser.add_argument( '-O', '--output_filename', \
-             default='track_verification', help='Set the output filename')
+             default='track_verification.root', help='Set the output filename')
 
   parser.add_argument( '-P', '--print_plots', action='store_true', \
                         default=False, help='Set flag to print plots to file' )
@@ -923,8 +773,6 @@ if __name__ == "__main__" :
 
   parser.add_argument( '--p_value_cut', type=float, default=0.0, \
                          help='Cut on P-Values less than the specified value' )
-  parser.add_argument( '--gradient_cut', type=float, default=1.0, \
-                                     help='Set the cut on the track gradient' )
   parser.add_argument( '--number_trackpoints_cut', type=int, default=0, \
                          help='Cut on the Number of Trackpoints in the track' )
 
@@ -935,8 +783,6 @@ if __name__ == "__main__" :
     TOF_CUT_HIGH = namespace.tof_cut_high
 
     P_VALUE_CUT = namespace.p_value_cut
-
-    GRAD_CUT = math.fabs( namespace.gradient_cut )
 
     MIN_NUM_TRACKPOINTS = namespace.number_trackpoints_cut
 
@@ -984,8 +830,6 @@ if __name__ == "__main__" :
       print
       print "Keyboard Interrupt"
       print
-    data_dict['counters']['N_files'] = file_reader.get_current_filenumber()
-    data_dict['counters']['N_spills'] = file_reader.get_total_num_spills()
     print "All Spills Loaded                                                  "
     print "\nStarting Analysis"
     analyse_plots(plot_dict, data_dict)
@@ -997,6 +841,7 @@ if __name__ == "__main__" :
     save_plots(plot_dict, outfile)
     if namespace.print_plots :
       print_plots(plot_dict, outdir)
+
 
   print 
   print "Complete."

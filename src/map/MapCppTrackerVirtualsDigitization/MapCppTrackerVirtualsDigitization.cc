@@ -182,9 +182,6 @@ namespace MAUS {
                                                            gmIt != _geometry_map.end(); ++gmIt) {
       const SciFiPlaneMap& planes = gmIt->second.Planes;
       tracker = gmIt->first;
-      HepRotation tracker_rotation = gmIt->second.Rotation;
-      ThreeVector tracker_position = gmIt->second.Position;
-
       if (_make_clusters) {
         for (SciFiPlaneMap::const_iterator plIt = planes.begin(); plIt != planes.end(); ++plIt) {
           id = plIt->first;
@@ -232,20 +229,17 @@ namespace MAUS {
           SciFiPlaneGeometry geo = plIt->second;
           Z = geo.Position.z();
           ThreeVector position(x0 + Z*mx, y0 + Z*my, Z);
+
           double smear_x = CLHEP::RandGauss::shoot(0.0, _smear_value);
           double smear_y = CLHEP::RandGauss::shoot(0.0, _smear_value);
           position.SetX(position.x() + smear_x);
           position.SetY(position.y() + smear_y);
 
-          ThreeVector spoint_pos = position;
-          spoint_pos *= tracker_rotation;
-          spoint_pos.setZ(geo.Position.z());
-
           SciFiSpacePoint* spoint = new SciFiSpacePoint();
           spoint->set_tracker(tracker);
           spoint->set_station(station);
           spoint->set_npe(10);
-          spoint->set_position(spoint_pos);
+          spoint->set_position(position);
           spoint->set_global_position(position);
 
           if (_make_clusters) {
