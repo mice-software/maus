@@ -53,6 +53,7 @@ class SciFiEventProcessor : public ObjectProcessor<SciFiEvent> {
     PointerArrayProcessor<SciFiStraightPRTrack> _sf_sprtrk_array_proc;
     PointerArrayProcessor<SciFiHelicalPRTrack>  _sf_hprtrk_array_proc;
     PointerArrayProcessor<SciFiTrack>           _sf_trk_array_proc;
+    DoubleProcessor                             _double_proc;
 };
 }  // namespace MAUS
 
