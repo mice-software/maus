@@ -258,7 +258,7 @@ class Downloader: #pylint: disable = R0902
                 # values to see if there is a later applicable
                 # creation date
                 sortedids = sorted(ids.items(), \
-                                       a=lambda x:x[1]['created'], reverse=True)
+                                       key=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
                 return geoid
 
