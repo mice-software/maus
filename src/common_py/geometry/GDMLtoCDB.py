@@ -227,7 +227,7 @@ class Downloader: #pylint: disable = R0902
             print 'Warning, server status is '+server_status 
         return self.wsdlurl
             
-    def download_current(self, downloadpath):
+    def download_current(self, downloadpath, geoid=0):
         """
         @Method download_current, this method downloads the current valid 
                                   geometry and writes the files
@@ -260,7 +260,7 @@ class Downloader: #pylint: disable = R0902
                 sortedids = sorted(ids.items(), \
                                        key=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
-                return geoid
+                # return geoid
 
     def download_geometry_by_id(self, id_num, download_path):
         """
@@ -279,7 +279,7 @@ class Downloader: #pylint: disable = R0902
             downloaded_file = self.geometry_cdb.get_gdml_for_id(id_num)
             self.__write_zip_file(download_path, downloaded_file)
 
-    def download_geometry_by_run(self, run_num, download_path):
+    def download_geometry_by_run(self, run_num, download_path, geoid=0):
         """
         @Method download geometry for run 
 
@@ -293,14 +293,14 @@ class Downloader: #pylint: disable = R0902
         if not os.path.exists(download_path):
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
-        geoid = self.download_beamline_for_run(run_num, download_path)
+        self.download_beamline_for_run(run_num, download_path, geoid)
         
         self.download_coolingchannel_for_run(run_num, download_path)
         # self.download_corrections_for_run(run_num, download_path):
         self.__write_zip_file(download_path, downloaded_file)
         
         #return the associated geometry id
-        return geoid
+        # return geoid
         
 
     def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
@@ -330,7 +330,7 @@ class Downloader: #pylint: disable = R0902
                            " valid from " + str(id_dict[id_number]['validFrom'])
         return str(id_number)
     
-    def download_beamline_for_run(self, run_id, downloadpath): #pylint: disable = R0201, C0301
+    def download_beamline_for_run(self, run_id, downloadpath, geoid=0): #pylint: disable = R0201, C0301
         """
         @Method download geometry for run 
 
@@ -351,23 +351,26 @@ class Downloader: #pylint: disable = R0902
             fout.write(downloadedfile)
             fout.close()
             # also want to get the geometry ID for record keeping
-            downloadedmap = beamline_cdb.get_beamline_for_run(run_id)
-            start_time = downloadedmap[run_id]['start_time']
-            stop_time = downloadedmap[run_id]['end_time']
-            ids = self.geometry_cdb.get_ids(start_time, stop_time)
-            if len(ids) == 0:
-                raise OSError('Geometry ID does not exist for run number')
+            downloadedmap = beamline_cdb.get_beamline_for_run(int(run_id))
+            if len(downloadedmap) == 0:
+                raise OSError('Beamline not found for run')
             else:
-                # the latest applicable key uploaded should be the
-                # first key appearing
-                geoid = ids.keys()[0]
-                # in case this is not the case run through the other
-                # values to see if there is a later applicable
-                # creation date
-                sortedids = sorted(ids.items(), \
-                                   key=lambda x:x[1]['created'], reverse=True)
-                geoid = sortedids[0][0]
-                return geoid
+                start_time = downloadedmap[int(run_id)]['start_time']
+                stop_time = downloadedmap[int(run_id)]['end_time']
+                ids = self.geometry_cdb.get_ids(start_time, stop_time)
+                if len(ids) == 0:
+                    raise OSError('Geometry ID does not exist for run number')
+                else:
+                    # the latest applicable key uploaded should be the
+                    # first key appearing
+                    geoid = ids.keys()[0]
+                    # in case this is not the case run through the other
+                    # values to see if there is a later applicable
+                    # creation date
+                    sortedids = sorted(ids.items(), \
+                                  key=lambda x:x[1]['created'], reverse=True)
+                    geoid = sortedids[0][0]
+                # return geoid
   
     def download_coolingchannel_for_run(self, run_id, downloadpath): 
         #pylint: disable = R0201, C0301

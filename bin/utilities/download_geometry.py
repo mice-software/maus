@@ -50,12 +50,12 @@ def main(): # pylint: disable = C0103, R0912
     geometry_downloader = Downloader()
     geoid = configuration.geometry_download_id
     if configuration.geometry_download_by == "run_number":
-        geoid = geometry_downloader.download_geometry_by_run \
-                        (configuration.geometry_download_run_number, gdml_cache)
+        geometry_downloader.download_geometry_by_run \
+            (configuration.geometry_download_run_number, gdml_cache, geoid)
         print "Downloading geometry id ", geoid, " for run number ", \
             configuration.geometry_download_run_number 
     elif configuration.geometry_download_by == "current":
-        geoid = geometry_downloader.download_current(gdml_cache)
+        geometry_downloader.download_current(gdml_cache, geoid)
         print "Downloading geometry id ", geoid, " for current run"
     elif configuration.geometry_download_by == "id":
         if configuration.download_beamline_for_run != 0:
