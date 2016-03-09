@@ -77,8 +77,7 @@ void SciFiGeometryHelper::Build() {
       const MiceModule* plane = module->mother();
       HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // plane
                                                ->mother()));  // tracker/ station??
-
-      direction     *= internal_fibre_rotation;
+      direction     *= internal_fibre_rotation.inverse();
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
