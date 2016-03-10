@@ -67,7 +67,7 @@ class ReduceCppCkovPlot : public ReduceBase<Data, ImageData> {
   std::vector<TCanvas*> _canvs;
 
   TH1F *_htof;
-  std::vector<TH1F *> _hcharge, _htime;
+  std::vector<TH1 *> _hcharge, _htime;
   TH2F *_htof_A, *_htof_B;
 
 // //   TLegend *_legend;
