@@ -58,7 +58,6 @@ namespace global {
       for (eachTP = global_track_points.begin();
 	   eachTP != global_track_points.end(); ++eachTP) {
 	if (!(*eachTP)) continue;
-	if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching-Through") {
 	  if ((*eachTP)->get_detector() >=
 		     MAUS::DataStructure::Global::kTracker1_1 &&
 		     (*eachTP)->get_detector() <=
@@ -67,7 +66,6 @@ namespace global {
 	  } else {
 	    continue;
 	  }
-	}
       }
       if (tracker1_track_points.size() < 1) {
 	Squeak::mout(Squeak::debug) << "Global track contained no downstream" <<

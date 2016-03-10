@@ -18,15 +18,15 @@
 #include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Recon/Global/Tracking.hh"
+#include "src/common_cpp/Recon/Kalman/GlobalErrorTracking.hh"
 
 namespace MAUS {
 Squeak::errorLevel verbose = Squeak::fatal;
 
-TEST(TrackingZTest, GetSetTest) {
-    TrackingZ tz;
-    tz.SetDeviations(1., 2., 3., 4.);
-    std::vector<double> dev = tz.GetDeviations();
+TEST(GlobalErrorTrackingTest, GetSetTest) {
+    GlobalErrorTracking propagator;
+    propagator.SetDeviations(1., 2., 3., 4.);
+    std::vector<double> dev = propagator.GetDeviations();
     ASSERT_EQ(dev.size(), 4);
     for (size_t i = 0; i < dev.size(); ++i) {
         EXPECT_NEAR(dev[i], i+1, 1e-12);
@@ -34,24 +34,24 @@ TEST(TrackingZTest, GetSetTest) {
 
     ::CLHEP::Hep3Vector bvec(1., 1., 1.); 
     BTConstantField test_field(1000., 1000., 1000., bvec);
-    tz.SetField(&test_field);
-    ASSERT_EQ(tz.GetField(), &test_field);
+    propagator.SetField(&test_field);
+    ASSERT_EQ(propagator.GetField(), &test_field);
 
     EXPECT_TRUE(false) << "Missing some accessors/mutators";
 }
 
-TEST(TrackingZTest, FieldDerivativeTest) {
+TEST(GlobalErrorTrackingTest, FieldDerivativeTest) {
     double b0 = 2;
     BTMultipole::TanhEndField* end = new BTMultipole::TanhEndField(10., 5., 9);
     DerivativesSolenoid sol(b0, 10., 20., 9, end);
-    TrackingZ tz;
-    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    tz.SetField(&sol);
+    GlobalErrorTracking propagator;
+    propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    propagator.SetField(&sol);
 
     for (double z = 0.; z < 20.; ++z) {
         double point[4] = {0., 0., z, 0.};
         double deriv[6];
-        tz.FieldDerivative(point, deriv);
+        propagator.FieldDerivative(point, deriv);
         EXPECT_NEAR(deriv[0], deriv[4], 1e-9);
         EXPECT_NEAR(0., deriv[1], 1e-9);
         EXPECT_NEAR(0., deriv[2], 1e-9);
@@ -61,7 +61,7 @@ TEST(TrackingZTest, FieldDerivativeTest) {
     }
 }
 
-void tracking_test(TrackingZ& tz, double* x_in, double dz) {
+void tracking_test(GlobalErrorTracking& propagator, double* x_in, double dz) {
     Squeak::mout(verbose) << "tracking test" << std::endl;
     std::vector<double> test_x(29, 0.);
     std::vector<double> ref_x(8, 0.);
@@ -69,8 +69,8 @@ void tracking_test(TrackingZ& tz, double* x_in, double dz) {
         ref_x[i] = x_in[i];
         test_x[i] = x_in[i];
     }
-    BTTracker::integrate(ref_x[3]+dz, &ref_x[0], tz.GetField(), BTTracker::z, 1., 1.);
-    tz.Propagate(&test_x[0], test_x[3]+dz);
+    BTTracker::integrate(ref_x[3]+dz, &ref_x[0], propagator.GetField(), BTTracker::z, 1., 1.);
+    propagator.Propagate(&test_x[0], test_x[3]+dz);
     for (size_t i = 0; i < 8; ++i) {
         Squeak::mout(verbose) << i << " " << ref_x[i] << " " << test_x[i] << " " << ref_x[i] - test_x[i] << " ** ";
         EXPECT_NEAR(0., ref_x[i] - test_x[i], 1e-9);
@@ -78,7 +78,7 @@ void tracking_test(TrackingZ& tz, double* x_in, double dz) {
     Squeak::mout(verbose) << "Done" << std::endl;
 }
 
-std::vector< std::vector<double> > get_tm_numerical(TrackingZ& tz, double* x_in, double delta, double step) {
+std::vector< std::vector<double> > get_tm_numerical(GlobalErrorTracking& propagator, double* x_in, double delta, double step) {
     std::vector< std::vector<double> > tm_numerical;
     for (size_t i = 0; i < 7; ++i) { // t, x, y, (z), E, px, py
         if (i == 3) // z is not varied
@@ -87,13 +87,13 @@ std::vector< std::vector<double> > get_tm_numerical(TrackingZ& tz, double* x_in,
                           x_in[4], x_in[5], x_in[6], x_in[7]};
         x_pos[i] += delta;
         x_pos[7] = ::sqrt(x_pos[4]*x_pos[4]-x_pos[5]*x_pos[5]-x_pos[6]*x_pos[6]-105.658*105.658);
-        BTTracker::integrate(x_pos[3]+step, x_pos, tz.GetField(), BTTracker::z, step, 1.);
+        BTTracker::integrate(x_pos[3]+step, x_pos, propagator.GetField(), BTTracker::z, step, 1.);
 
         double x_neg[] = {x_in[0], x_in[1], x_in[2], x_in[3],
                           x_in[4], x_in[5], x_in[6], x_in[7]};
         x_neg[i] -= delta;
         x_neg[7] = ::sqrt(x_neg[4]*x_neg[4]-x_neg[5]*x_neg[5]-x_neg[6]*x_neg[6]-105.658*105.658);
-        BTTracker::integrate(x_neg[3]+step, x_neg, tz.GetField(), BTTracker::z, step, 1.);
+        BTTracker::integrate(x_neg[3]+step, x_neg, propagator.GetField(), BTTracker::z, step, 1.);
 
         std::vector<double> dm_row;
         for (size_t j = 0; j < 7; ++j) {
@@ -114,10 +114,10 @@ std::vector< std::vector<double> > get_tm_numerical(TrackingZ& tz, double* x_in,
     return tm_numerical_trans;
 }
 
-void tm_tracking_check(TrackingZ& tz, double* x_in, double delta, double step) {
-    std::vector< std::vector<double> > tm_numerical_fine = get_tm_numerical(tz, x_in, delta, step);
-    std::vector< std::vector<double> > tm_numerical_coarse_1 = get_tm_numerical(tz, x_in, delta, step*10.);
-    std::vector< std::vector<double> > tm_numerical_coarse_2 = get_tm_numerical(tz, x_in, delta*10, step);
+void tm_tracking_check(GlobalErrorTracking& propagator, double* x_in, double delta, double step) {
+    std::vector< std::vector<double> > tm_numerical_fine = get_tm_numerical(propagator, x_in, delta, step);
+    std::vector< std::vector<double> > tm_numerical_coarse_1 = get_tm_numerical(propagator, x_in, delta, step*10.);
+    std::vector< std::vector<double> > tm_numerical_coarse_2 = get_tm_numerical(propagator, x_in, delta*10, step);
     std::vector< std::vector<double> > tm_numerical = tm_numerical_fine;
     for (size_t i = 0; i < 6; ++i) {
         for (size_t j = 0; j < 6; ++j) {
@@ -130,8 +130,8 @@ void tm_tracking_check(TrackingZ& tz, double* x_in, double delta, double step) {
             }
         }
     }
-    tz.UpdateTransferMatrix(x_in);
-    std::vector< std::vector<double> > tm_analytical = tz.GetMatrix();
+    propagator.UpdateTransferMatrix(x_in);
+    std::vector< std::vector<double> > tm_analytical = propagator.GetMatrix();
     Squeak::mout(verbose) << "Analytical" << std::endl;
     for (size_t j = 0; j < 6; ++j) {
         for (size_t k = 0; k < 6; ++k) {
@@ -192,16 +192,16 @@ void tm_tracking_check(TrackingZ& tz, double* x_in, double delta, double step) {
     Squeak::mout(verbose) << "Determinant: " << transverse_determinant << "\n" << std::endl;
 }
 
-TEST(TrackingZTest, TransferMatrixConstFieldTest) {
+TEST(GlobalErrorTrackingTest, TransferMatrixConstFieldTest) {
     ::CLHEP::Hep3Vector brand(0., 0., 3.); 
     BTConstantField field(1000., 1000., 1000., brand);
-    TrackingZ tz;
-    tz.SetField(&field);
+    GlobalErrorTracking propagator;
+    propagator.SetField(&field);
     double x_in[8] = {0., 0., 0., 0., ::sqrt(200.*200.+105.658*105.658), 0., 0., 200.};
     for (double deviation = 1e-3; deviation < 1.1e-3; deviation *= 10.) {
-        tz.SetDeviations(deviation, deviation, deviation, deviation);
+        propagator.SetDeviations(deviation, deviation, deviation, deviation);
         // t, x, y, z, E, px, py, pz
-        tm_tracking_check(tz, x_in, 0.1, 1.);
+        tm_tracking_check(propagator, x_in, 0.1, 1.);
     }
 }
 
@@ -213,7 +213,7 @@ void mass_shell_condition(double x_in[], double mass) {
     x_in[4] = energy;
 }
 
-TEST(TrackingZTest, TransferMatrixSolFieldTest) {
+TEST(GlobalErrorTrackingTest, TransferMatrixSolFieldTest) {
     for (double b0 = 0.001; b0 < 0.0011; b0 *= 10) { // 1 T
         BTMultipole::TanhEndField* end = new BTMultipole::TanhEndField(10., 5., 9);
         DerivativesSolenoid sol(b0, 10., 20., 9, end);
@@ -222,26 +222,26 @@ TEST(TrackingZTest, TransferMatrixSolFieldTest) {
                 Squeak::mout(verbose) << "delta " << delta
                                       << " step " << step
                                       << " b0 " << b0 << std::endl;
-                TrackingZ tz;
-                tz.SetDeviations(delta, delta, delta, delta);
-                tz.SetField(&sol);
+                GlobalErrorTracking propagator;
+                propagator.SetDeviations(delta, delta, delta, delta);
+                propagator.SetField(&sol);
                 // t, x, y, z, E, px, py, pz
                 double x_in_m1[8] = {0., 0., 0., 5., 0., 0., 0., 200.};
                 mass_shell_condition(x_in_m1, 105.658);
-                tm_tracking_check(tz, x_in_m1, delta, step);
+                tm_tracking_check(propagator, x_in_m1, delta, step);
                 double x_in_0[8] = {0., 1., 2., 5., 0., 0., 0., 200.};
                 mass_shell_condition(x_in_0, 105.658);
-                tm_tracking_check(tz, x_in_0, delta, step);
+                tm_tracking_check(propagator, x_in_0, delta, step);
                 double x_in_1[8] = {0., 1., 2., 5., 0., 5., 6., 200.};
                 mass_shell_condition(x_in_1, 105.658);
-                tm_tracking_check(tz, x_in_1, delta, step);
+                tm_tracking_check(propagator, x_in_1, delta, step);
                 double x_in_2[8] = {0., 1., 2., 5., 0., 50., 60., 200.};
                 mass_shell_condition(x_in_2, 105.658);
-                tm_tracking_check(tz, x_in_2, delta, step);
+                tm_tracking_check(propagator, x_in_2, delta, step);
                 double x_in_3[8] = {0., 1., 2., 5., 0., 200., 60., 200.};
                 mass_shell_condition(x_in_3, 105.658);
-                tm_tracking_check(tz, x_in_3, delta, step);
-                tracking_test(tz, x_in_3, 10.);
+                tm_tracking_check(propagator, x_in_3, delta, step);
+                tracking_test(propagator, x_in_3, 10.);
 
         }
     }
@@ -286,18 +286,18 @@ std::vector<double> drift_ellipse(double pz, double mass) {
 } 
 
 // Propagate beam ellipse through a drift space
-TEST(TrackingZTest, PropagateEllipseDriftTest) {
+TEST(GlobalErrorTrackingTest, PropagateEllipseDriftTest) {
     // field
     ::CLHEP::Hep3Vector brand(0., 0., 0.); 
     BTConstantField field(1000., 1000., 1000., brand);
 
-    // trackingZ
-    TrackingZ tz;
-    tz.SetStepSize(100.);
-    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    tz.SetField(&field);
-    tz.SetEnergyLossModel(TrackingZ::no_eloss);
-    tz.SetMCSModel(TrackingZ::no_mcs);
+    // GlobalErrorTracking
+    GlobalErrorTracking propagator;
+    propagator.SetStepSize(100.);
+    propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    propagator.SetField(&field);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
+    propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
 
     double mass = 105.658;
     double pz = 200.;
@@ -310,7 +310,7 @@ TEST(TrackingZTest, PropagateEllipseDriftTest) {
     print_x(&x_in[0]);
     // propagate
     try {
-        tz.Propagate(&x_out[0], dz);
+        propagator.Propagate(&x_out[0], dz);
     } catch (...) {
         ASSERT_TRUE(false) << "Caught an exception";
     }
@@ -343,7 +343,7 @@ TEST(TrackingZTest, PropagateEllipseDriftTest) {
         }
     }
 
-    std::vector< std::vector<double> > tm_analytical = tz.GetMatrix();
+    std::vector< std::vector<double> > tm_analytical = propagator.GetMatrix();
     Squeak::mout(verbose) << "Analytical tE " << de/dz << " xpx " << 1/pz << std::endl; 
     Squeak::mout(verbose) << "Integrated" << std::endl;
     for (size_t j = 0; j < 6; ++j) {
@@ -356,18 +356,18 @@ TEST(TrackingZTest, PropagateEllipseDriftTest) {
 
 // If we set up our beam ellipse right, then propagation through a constant
 // field should yield a constant beam ellipse... let's check
-TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
+TEST(GlobalErrorTrackingTest, PropagateEllipseConstFieldTest) {
     // field
     ::CLHEP::Hep3Vector brand(0., 0., 1e-3*gRandom->Uniform()); // 0-1 T 
     BTConstantField field(1000., 1000., 1000., brand);
 
-    // trackingZ
-    TrackingZ tz;
-    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    tz.SetField(&field);
-    tz.SetEnergyLossModel(TrackingZ::no_eloss);
-    tz.SetMCSModel(TrackingZ::no_mcs);
-    tz.SetEStragModel(TrackingZ::no_estrag);
+    // GlobalErrorTracking
+    GlobalErrorTracking propagator;
+    propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    propagator.SetField(&field);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
+    propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
+    propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
 
     // ellipse and psv
     double norm_trans = 1.+10.*gRandom->Uniform()*105.658;; // 1 - 11 mm emit
@@ -396,7 +396,7 @@ TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
     std::vector<double> x_out(x_in, x_in+sizeof(x_in)/sizeof(double));
     // propagate
     try {
-        tz.Propagate(&x_out[0], 100.);
+        propagator.Propagate(&x_out[0], 100.);
     } catch (...) {
         ASSERT_TRUE(false) << "Caught an exception";
     }
@@ -435,53 +435,53 @@ TEST(TrackingZTest, PropagateEllipseConstFieldTest) {
     }
 }
 
-TEST(TrackingZTest, PropagateDriftELossTest) {
+TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule("Test.dat"));
-    TrackingZ tz;
-    tz.SetStepSize(10.);
-    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    tz.SetEnergyLossModel(TrackingZ::bethebloch_forwards);
-    tz.SetMCSModel(TrackingZ::no_mcs);
-    tz.SetEStragModel(TrackingZ::no_estrag);
+    GlobalErrorTracking propagator;
+    propagator.SetStepSize(10.);
+    propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::bethebloch_forwards);
+    propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
+    propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
     std::vector<double> x_in = drift_ellipse(200., 105.658);
     x_in[3] = -200.;
     std::vector<double> x_out = x_in;
 
     Squeak::mout(verbose) << "BB Forwards" << std::endl;
     print_x(&x_out[0]);
-    tz.Propagate(&x_out[0], 200.);
+    propagator.Propagate(&x_out[0], 200.);
     print_x(&x_out[0]); 
 
     x_out = x_in;
     Squeak::mout(verbose) << "BB Backwards" << std::endl;
     print_x(&x_out[0]);
-    tz.SetEnergyLossModel(TrackingZ::bethebloch_backwards);
-    tz.Propagate(&x_out[0], 200.);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::bethebloch_backwards);
+    propagator.Propagate(&x_out[0], 200.);
     print_x(&x_out[0]); 
 
     x_out = x_in;
     Squeak::mout(verbose) << "No BB" << std::endl;
     print_x(&x_out[0]);
-    tz.SetEnergyLossModel(TrackingZ::no_eloss);
-    tz.Propagate(&x_out[0], 200.);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
+    propagator.Propagate(&x_out[0], 200.);
     print_x(&x_out[0]); 
 
     EXPECT_TRUE(false);
 }
 
-TEST(TrackingZTest, PropagateDriftMCSTest) {
+TEST(GlobalErrorTrackingTest, PropagateDriftMCSTest) {
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule("Test.dat"));
-    TrackingZ tz;
-    tz.SetStepSize(10.);
-    tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    tz.SetEnergyLossModel(TrackingZ::no_eloss);
-    tz.SetMCSModel(TrackingZ::moliere_forwards);
-    tz.SetEStragModel(TrackingZ::no_estrag);
+    GlobalErrorTracking propagator;
+    propagator.SetStepSize(10.);
+    propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
+    propagator.SetMCSModel(GlobalErrorTracking::moliere_forwards);
+    propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
     std::vector<double> x_in = drift_ellipse(200., 105.658);
     std::vector<double> x_out = x_in;
     x_out[3] = -200.;
     print_x(&x_out[0]);
-    tz.Propagate(&x_out[0], 200.);
+    propagator.Propagate(&x_out[0], 200.);
     print_x(&x_out[0]); 
 
     EXPECT_TRUE(false);

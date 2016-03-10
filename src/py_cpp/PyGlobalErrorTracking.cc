@@ -18,11 +18,11 @@
 #include <string>
 
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Recon/Global/Tracking.hh"
-#include "src/py_cpp/PyErrorPropagation.hh"
+#include "src/common_cpp/Recon/Kalman/GlobalErrorTracking.hh"
+#include "src/py_cpp/PyGlobalErrorTracking.hh"
 
 namespace MAUS {
-namespace PyErrorPropagation {
+namespace PyGlobalErrorTracking {
 
 int get_centroid(PyObject* py_centroid, std::vector<double>& x_in) {
     if (!PyList_Check(py_centroid)) {
@@ -142,14 +142,14 @@ static PyObject* propagate_errors
         return NULL;
     }
     try {
-        TrackingZ tz;
-        tz.SetStepSize(step_size);
-        tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-        tz.SetEnergyLossModel(TrackingZ::no_eloss);
-        tz.SetMCSModel(TrackingZ::no_mcs);
-        tz.SetEStragModel(TrackingZ::no_estrag);
-        tz.SetField(Globals::GetInstance()->GetMCFieldConstructor());
-        tz.Propagate(&x_in[0], target_z);
+        GlobalErrorTracking propagator;
+        propagator.SetStepSize(step_size);
+        propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+        propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
+        propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
+        propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
+        propagator.SetField(Globals::GetInstance()->GetMCFieldConstructor());
+        propagator.Propagate(&x_in[0], target_z);
     } catch (MAUS::Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
@@ -178,13 +178,13 @@ static PyObject* get_transfer_matrix
         if (get_centroid(py_centroid, x_in)) {
             return NULL;
         }
-        TrackingZ tz;
-        tz.SetStepSize(10.);
-        tz.SetDeviations(0.001, 0.001, 0.001, 0.001);
-        tz.SetField(Globals::GetInstance()->GetMCFieldConstructor());
-        tz.UpdateTransferMatrix(&x_in[0]);
-        std::vector<std::vector<double> > matrix = tz.GetMatrix();
-        std::cerr << "PyErrorPropagation::get_transfer_matrix" << std::endl;
+        GlobalErrorTracking propagator;
+        propagator.SetStepSize(10.);
+        propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+        propagator.SetField(Globals::GetInstance()->GetMCFieldConstructor());
+        propagator.UpdateTransferMatrix(&x_in[0]);
+        std::vector<std::vector<double> > matrix = propagator.GetMatrix();
+        std::cerr << "PyGlobalErrorPropagator::get_transfer_matrix" << std::endl;
         for (size_t i = 0; i < matrix.size(); ++i) {
             for (size_t j = 0; j < matrix[i].size(); ++j)
                 std::cerr << matrix[i][j] << " ";
@@ -213,11 +213,12 @@ static PyMethodDef _keywdarg_methods[] = {
 
 std::string module_docstring = "DOCSTRING";
 
-PyMODINIT_FUNC initerror_propagation(void) {
-    PyObject* module = Py_InitModule3("error_propagation", _keywdarg_methods,
-                                                     module_docstring.c_str());
+PyMODINIT_FUNC initglobal_error_tracking(void) {
+    PyObject* module = Py_InitModule3("global_error_tracking",
+                                      _keywdarg_methods,
+                                      module_docstring.c_str());
     if (module == NULL) return;
 }
-}  // namespace PyErrorPropagation
+}  // namespace PyGlobalErrorPropagator
 }  // namespace MAUS
 

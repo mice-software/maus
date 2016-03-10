@@ -44,7 +44,6 @@ namespace global {
     int checkCount1 = 0;
     std::vector<const MAUS::DataStructure::Global::TrackPoint*>
       track_points = track->GetTrackPoints();
-    // TODO(Pidcott) check that right detector enums are used
     MAUS::DataStructure::Global::DetectorPoint TOF0_DP =
       MAUS::DataStructure::Global::kTOF0;
     MAUS::DataStructure::Global::DetectorPoint TOF1_DP =
@@ -54,16 +53,12 @@ namespace global {
     for (eachTP = track_points.begin(); eachTP != track_points.end();
 	 ++eachTP) {
       if (!(*eachTP)) continue;
-      if ((*eachTP)->get_mapper_name() == "MapCppGlobalTrackMatching-Through") {
-	if ((*eachTP)->get_detector() == TOF0_DP) {
-	  TOF0_t = (*eachTP)->get_position().T();
-	  ++checkCount0;
-	} else if ((*eachTP)->get_detector() == TOF1_DP) {
-	  TOF1_t = (*eachTP)->get_position().T();
-	  ++checkCount1;
-	}
-      } else {
-	continue;
+      if ((*eachTP)->get_detector() == TOF0_DP) {
+	TOF0_t = (*eachTP)->get_position().T();
+	++checkCount0;
+      } else if ((*eachTP)->get_detector() == TOF1_DP) {
+	TOF1_t = (*eachTP)->get_position().T();
+	++checkCount1;
       }
     }
     if (checkCount0 > 1 || checkCount1 > 1) {

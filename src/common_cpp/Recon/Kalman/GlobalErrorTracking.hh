@@ -1,9 +1,10 @@
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
-#ifndef recon_global_trackingz_hh_
-#define recon_global_trackingz_hh_
+#ifndef recon_kalman_GlobalErrorTracking_hh_
+#define recon_kalman_GlobalErrorTracking_hh_
 
 class G4Material;
 class BTField;
@@ -12,15 +13,16 @@ namespace MAUS {
 
 class MaterialModel;
 
-class TrackingZ {
+class GlobalErrorTracking {
 public:
     enum ELossModel {bethebloch_forwards, bethebloch_backwards, no_eloss};
     enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
     enum EStragModel {estrag_forwards, estrag_backwards, no_estrag};
 
-    TrackingZ();
+    GlobalErrorTracking();
 
-    void Propagate(double* x, double target_z);
+    void Propagate(double x[29], double target_z);
+    void PropagateTransferMatrix(double x[44], double target_z);
 
     void UpdateTransferMatrix(const double point[4]);
 
@@ -29,8 +31,8 @@ public:
     void SetDeviations(double dx, double dy, double dz, double dt);
     std::vector<double> GetDeviations() const;
 
-    /** Set the field for use by TrackingZ
-     *  @param BTField* field:- Set the field used for tracking - TrackingZ
+    /** Set the field for use by GlobalErrorTracking
+     *  @param BTField* field:- Set the field used for tracking - GlobalErrorTracking
      *         cannot handle electric fields properly. If NULL, uses MC field
      *         defined in Globals. This is a borrowed pointer. Caller
      *         maintains ownership of the memory allocated to field. 
@@ -54,7 +56,7 @@ public:
 
 
 private:
-    TrackingZ(const TrackingZ& tz); // disable copy constructor
+    GlobalErrorTracking(const GlobalErrorTracking& tracking); // disable copy constructor
 
     // x_in is a vector of size 8, going like t,x,y,z; E,px,py,pz
     static int EquationsOfMotion(double z, const double x[29], double dxdt[29],
@@ -62,6 +64,8 @@ private:
     static int EMEquationOfMotion(double z, const double x[29], double dxdt[29],
                           void* params);
     static int MaterialEquationOfMotion(double z, const double x[29], double dxdt[29],
+                          void* params);
+    static int MatrixEquationOfMotion(double z, const double x[29], double dxdt[29],
                           void* params);
 
     BTField* _field;
@@ -79,7 +83,7 @@ private:
     double _charge;
     std::vector< std::vector<double> > _matrix;
     MaterialModel _mat_mod;
-    static TrackingZ* _tz_for_propagate;
+    static GlobalErrorTracking* _tz_for_propagate;
 };
 }
 #endif

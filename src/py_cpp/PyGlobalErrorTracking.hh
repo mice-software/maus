@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _SRC_PY_CPP_PYERRORPROPAGATION_HH_
-#define _SRC_PY_CPP_PYERRORPROPAGATION_HH_
+#ifndef _SRC_PY_CPP_PyGlobalErrorTracking_HH_
+#define _SRC_PY_CPP_PyGlobalErrorTracking_HH_
 
 // These ifdefs are required to avoid cpp compiler warning
 #ifdef _POSIX_C_SOURCE
@@ -30,7 +30,7 @@
 #include "Python.h"
 
 namespace MAUS {
-namespace PyErrorPropagation {
+namespace PyGlobalErrorTracking {
 /* @brief Track a central trajectory and error through the Geant4 geometry
  *
  * Track a central trajectory and error through the Geant4 geometry. Return a MC
@@ -45,9 +45,9 @@ static PyObject* propagate_errors
  */
 PyMODINIT_FUNC initerror_propagation(void);
 
-}  // namespace PySimulation
+}  // namespace PyGlobalErrorTracking
 }  // namespace MAUS
 
-#endif  // _SRC_PY_CPP_PYERRORPROPAGATION_HH_
+#endif  // _SRC_PY_CPP_PyGlobalErrorTracking_HH_
 
 

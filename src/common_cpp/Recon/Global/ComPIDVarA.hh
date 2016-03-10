@@ -62,11 +62,11 @@ namespace global {
     /// Name of PID variable
     static const std::string VARIABLE;
     /// Number of bins in PDF
-    static const int numBins = 200;
+    static const int numBins = 120;
     /// Minimum value of range of PDF
-    static const int minBinComA = 25;
+    static const int minBinComA = 20;
     /// Maximum value of range of PDF
-    static const int maxBinComA = 65;
+    static const int maxBinComA = 50;
     /// Minimum value of cut for PID
     static const int minComA = 20;
     /// Maximum value of cur for PID

@@ -164,6 +164,7 @@ class SpacePointDataLoader(object):
             tof2 = tof_sp.GetTOF2SpacePointArray()[0].GetTime()
         except Exception:
             pass
+        global_event = reco_event.GetGlobalEvent()
         scifi_event = reco_event.GetSciFiEvent()
         tof_loaded = self.load_tof_event(tof_event)
         if tof_loaded == None:

@@ -348,6 +348,7 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         """
         gMinuit = ROOT.TMinuit(5)
         gMinuit.SetFCN( self.fcn )
+        gMinuit.SetPrintLevel(-1) # Shut up Minuit - AD 2016-02-11
 
         arglist = array( 'd', 10*[0] )
         ierflag = ROOT.Long(1982)
@@ -371,12 +372,14 @@ class ElementRotationTranslation: #pylint: disable = R0903, R0902, C0103, E1101
         gMinuit.mnexcm( "MIGRAD", arglist, 2, ierflag )
 
         # print results
+        # pylint: disable=W0612
         amin, edm, errdef = \
               ROOT.Double(0.18), ROOT.Double(0.19), ROOT.Double(0.20)
         nvpar, nparx, icstat = \
                ROOT.Long(1981), ROOT.Long(1983), ROOT.Long(1986)
-        gMinuit.mnstat( amin, edm, errdef, nvpar, nparx, icstat )
-        gMinuit.mnprin( 3, amin )
+        # Far too noisy, commenting out - AD 2016-02-11
+        # gMinuit.mnstat( amin, edm, errdef, nvpar, nparx, icstat )
+        # gMinuit.mnprin( 3, amin )
 
         # Get the output parameters
         param, errors = array( 'd' ), array( 'd' )

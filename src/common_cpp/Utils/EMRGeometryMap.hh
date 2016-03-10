@@ -98,16 +98,6 @@ class EMRGeometryMap {
   */
   double Gap() const             { return _gap; }
 
- /** @brief Print the geometry map (debugging)
-  */
-  void Print();
-
- /** @brief This value is returned when the key is not found.
-   */
-  enum {
-    NOGEO = -99999
-  };
-
  private:
 
  /** @brief Make one EMRChannelKey for each channel of the detector.
@@ -122,17 +112,6 @@ class EMRGeometryMap {
  /** @brief Load geometry map from file
   */
   bool LoadGeometryFile(std::string geometryFile);
-
- /** @brief This vector holds one EMRChannelKey for each channel of the detector.
-  */
-  std::vector<EMRChannelKey> _Ckey;
-
- /** @brief These vectors hold the position vectors. IMPORTANT - the order 
-  * 	    of the entries here is the same as the order of the entries in _Ckey. 
-  * 	    This is used when the constants are read.
-  */
-  std::vector<ThreeVector> _Plkey; // Local
-  std::vector<ThreeVector> _Pgkey; // Global
 
  /** @brief Global position and rotation of the EMR sensitive detector
   */

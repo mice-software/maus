@@ -28,7 +28,7 @@ class MCTruthToolsTest : public ::testing::Test {
     _mc_event = new MCEvent;
 
     ThreeVector position(0.0, 0.0, 0.0);
-    
+
     TOFChannelId* tof_channel_id = new TOFChannelId;
     tof_channel_id->SetStation(1);
     tof_channel_id->SetPlane(0);
@@ -46,7 +46,7 @@ class MCTruthToolsTest : public ::testing::Test {
     position.setZ(4000.0);
     tof2_2_hit.SetPosition(position);
     TOFHitArray* tof_hit_array =  new TOFHitArray
-        {tof1_1_hit, tof1_2_hit, tof2_2_hit};
+        {tof1_1_hit, tof1_2_hit, tof2_2_hit}; // NOLINT(readability/braces)
     _mc_event->SetTOFHits(tof_hit_array);
 
     SciFiChannelId* scifi_channel_id = new SciFiChannelId;
@@ -69,7 +69,7 @@ class MCTruthToolsTest : public ::testing::Test {
     position.setZ(3300.0);
     tracker1_5_0_hit.SetPosition(position);
     SciFiHitArray* scifi_hit_array = new SciFiHitArray
-        {tracker1_1_1_hit, tracker1_2_2_hit, tracker1_5_0_hit};
+        {tracker1_1_1_hit, tracker1_2_2_hit, tracker1_5_0_hit}; // NOLINT(readability/braces)
     _mc_event->SetSciFiHits(scifi_hit_array);
 
     KLHit kl_hit1;
@@ -78,7 +78,7 @@ class MCTruthToolsTest : public ::testing::Test {
     KLHit kl_hit2;
     position.SetZ(3502.0);
     kl_hit2.SetPosition(position);
-    KLHitArray* kl_hit_array = new KLHitArray {kl_hit1, kl_hit2};
+    KLHitArray* kl_hit_array = new KLHitArray {kl_hit1, kl_hit2}; // NOLINT(readability/braces)
     _mc_event->SetKLHits(kl_hit_array);
 
     EMRHit emr_hit1;
@@ -87,7 +87,7 @@ class MCTruthToolsTest : public ::testing::Test {
     EMRHit emr_hit2;
     position.SetZ(3720.0);
     emr_hit2.SetPosition(position);
-    EMRHitArray* emr_hit_array = new EMRHitArray {emr_hit1, emr_hit2};
+    EMRHitArray* emr_hit_array = new EMRHitArray {emr_hit1, emr_hit2}; // NOLINT(readability/braces)
     _mc_event->SetEMRHits(emr_hit_array);
   }
   virtual void TearDown() {
@@ -168,7 +168,7 @@ TEST_F(MCTruthToolsTest, GetNearestZHit) {
   TOFHitArray* tof_hits = _mc_event->GetTOFHits();
   KLHitArray* kl_hits = _mc_event->GetKLHits();
   EMRHitArray* emr_hits = _mc_event->GetEMRHits();
-  
+
   TLorentzVector position(0.0, 0.0, 1011.0, 0.0);
   TOFHit tof_hit = MCTruthTools::GetNearestZHit(tof_hits, position);
   EXPECT_FLOAT_EQ(tof_hit.GetPosition().z(), 1010.0);

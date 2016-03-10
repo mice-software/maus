@@ -13,29 +13,29 @@
 
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Recon/Global/Tracking.hh"
+#include "src/common_cpp/Recon/Kalman/GlobalErrorTracking.hh"
 
 namespace MAUS {
 
-TrackingZ* TrackingZ::_tz_for_propagate = NULL;
+GlobalErrorTracking* GlobalErrorTracking::_tz_for_propagate = NULL;
 
-TrackingZ::TrackingZ() : _field(Globals::GetMCFieldConstructor()),
+GlobalErrorTracking::GlobalErrorTracking() : _field(Globals::GetMCFieldConstructor()),
                _dx(1.), _dy(1.), _dz(1.), _dt(1.), _charge(1.),
                _matrix(6, std::vector<double>(6, 0.)) {
 }
 
-void TrackingZ::Propagate(double* x, double target_z) {
+void GlobalErrorTracking::Propagate(double x[29], double target_z) {
   double mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
   if (mass_squared < -1e-6) {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Mass undefined in stepping function",
-          "TrackingZ::Propagate"));
+          "GlobalErrorTracking::Propagate"));
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 29);
   gsl_odeiv_control * control = gsl_odeiv_control_y_new(_absolute_error, _relative_error);
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(29);
-  gsl_odeiv_system    system  = {TrackingZ::EquationsOfMotion, NULL, 29, NULL};
+  gsl_odeiv_system    system  = {GlobalErrorTracking::EquationsOfMotion, NULL, 29, NULL};
 
   double z = x[3];
   double h = _step_size;
@@ -61,7 +61,7 @@ void TrackingZ::Propagate(double* x, double target_z) {
     {
         throw(MAUS::Exception(MAUS::Exception::recoverable,
                             "Failed during tracking",
-                            "TrackingZ::Propagate") );
+                            "GlobalErrorTracking::Propagate") );
         break;
     }
     if(nsteps > _max_n_steps)
@@ -72,7 +72,7 @@ void TrackingZ::Propagate(double* x, double target_z) {
             << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
         throw(MAUS::Exception(MAUS::Exception::recoverable,
                               ios.str()+" Exceeded maximum number of steps\n",
-                              "TrackingZ::Propagate") );
+                              "GlobalErrorTracking::Propagate") );
         break;
     }
   }
@@ -88,11 +88,58 @@ void TrackingZ::Propagate(double* x, double target_z) {
   gsl_odeiv_evolve_free (evolve);
   gsl_odeiv_control_free(control);
   gsl_odeiv_step_free   (step);
+}
+
+void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
+  double mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
+  if (mass_squared < -1e-6) {
+    throw(MAUS::Exception(MAUS::Exception::recoverable,
+          "Mass undefined in stepping function",
+          "GlobalErrorTracking::Propagate"));
+  }
+  const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
+  gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 44);
+  gsl_odeiv_control * control = gsl_odeiv_control_y_new(_absolute_error, _relative_error);
+  gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(44);
+  gsl_odeiv_system    system  = {GlobalErrorTracking::EquationsOfMotion, NULL, 44, NULL};
+
+  double z = x[3];
+  double h = _step_size;
+  int    nsteps = 0;
+  _tz_for_propagate = this;
+  while(fabs(z-target_z) > 1e-6) {
+    nsteps++;
+    
+    int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &z, target_z, &h, x);
+    
+    if(status != GSL_SUCCESS)
+    {
+        throw(MAUS::Exception(MAUS::Exception::recoverable,
+                            "Failed during tracking",
+                            "GlobalErrorTracking::Propagate") );
+        break;
+    }
+    if(nsteps > _max_n_steps)
+    {
+        std::stringstream ios;
+        ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n" 
+            << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
+            << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
+        throw(MAUS::Exception(MAUS::Exception::recoverable,
+                              ios.str()+" Exceeded maximum number of steps\n",
+                              "GlobalErrorTracking::Propagate") );
+        break;
+    }
+  }
+
+  gsl_odeiv_evolve_free (evolve);
+  gsl_odeiv_control_free(control);
+  gsl_odeiv_step_free   (step);
 
 
 }
 
-int TrackingZ::EquationsOfMotion(double z, const double x[29], double dxdz[29],
+int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double dxdz[29],
                                    void* params) {
   if (fabs(x[7]) < 1e-9) {
     // z-momentum is 0
@@ -113,7 +160,7 @@ int TrackingZ::EquationsOfMotion(double z, const double x[29], double dxdz[29],
   return GSL_SUCCESS;
 }
 
-int TrackingZ::EMEquationOfMotion(double z, const double x[29], double dxdz[29],
+int GlobalErrorTracking::EMEquationOfMotion(double z, const double x[29], double dxdz[29],
                                    void* params) {
   double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double xfield[4] = {x[1], x[2], x[3], x[0]};
@@ -178,7 +225,58 @@ int TrackingZ::EMEquationOfMotion(double z, const double x[29], double dxdz[29],
   return GSL_SUCCESS;
 }
 
-int TrackingZ::MaterialEquationOfMotion(double z, const double x[29], double dxdz[29],
+
+int GlobalErrorTracking::MatrixEquationOfMotion(double z, const double x[44], double dxdz[44],
+                                   void* params) {
+  double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double xfield[4] = {x[1], x[2], x[3], x[0]};
+  _tz_for_propagate->_field->GetFieldValue(xfield, field);
+
+  double charge = _tz_for_propagate->_charge;
+  double dtdz = x[4]/x[7];
+  double dir = fabs(x[7])/x[7]; // direction of motion
+  dxdz[0] = dtdz/c_l; // dt/dz
+  dxdz[1] = x[5]/x[7]; // dx/dz = px/pz
+  dxdz[2] = x[6]/x[7]; // dy/dz = py/pz
+  dxdz[3] = 1.0; // dz/dz
+  // dE/dz only contains electric field as B conserves energy, not relevant at
+  // least in step 4 as all fields are static.
+  dxdz[4] = (dxdz[1]*charge*field[3] + dxdz[2]*charge*field[4] +
+             charge*field[5])*dir; // dE/dz
+  // dpx/dz = q*c*(dy/dz*Bz - dz/dz*By) + q*Ex*dt/dz
+  dxdz[5] = charge*c_l*(dxdz[2]*field[2] - dxdz[3]*field[1])
+            + charge*field[3]*dtdz*dir; // dpx/dz
+  dxdz[6] = charge*c_l*(dxdz[3]*field[0] - dxdz[1]*field[2])
+            + charge*field[4]*dtdz*dir; // dpy/dz
+  dxdz[7] = charge*c_l*(dxdz[1]*field[1] - dxdz[2]*field[0])
+            + charge*field[5]*dtdz*dir; // dpz/dz
+
+  _tz_for_propagate->UpdateTransferMatrix(x);
+  std::vector< std::vector<double> > dMdz(6, std::vector<double>(6, 0.));
+  std::vector< std::vector<double> > M(6, std::vector<double>(6, 0.));
+  std::vector< std::vector<double> > dM = _tz_for_propagate->_matrix;
+  // dM/dz = dM M
+  size_t matrix_index = 8;
+  for (size_t i = 0; i < 6; ++i)
+      for (size_t j = 0; j < 6; ++j) {
+          M[i][j] = x[matrix_index];
+          ++matrix_index;
+      }
+  matrix_index = 8;
+  for (size_t i = 0; i < 6; ++i) {
+      for (size_t j = 0; j < 6; ++j) {
+          for (size_t k = 0; k < 6; ++k) {
+              dMdz[i][j] += dM[i][k]*M[k][j];
+          }
+          dxdz[matrix_index] = dMdz[i][j];
+          ++matrix_index;
+      }
+  }
+  return GSL_SUCCESS;
+}
+
+
+int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], double dxdz[29],
                                    void* params) {
     // Must be called after EMEquationOfMotion
     MaterialModel& material = _tz_for_propagate->_mat_mod;
@@ -189,7 +287,7 @@ int TrackingZ::MaterialEquationOfMotion(double z, const double x[29], double dxd
     G4VPhysicalVolume* phys_vol = navigator->LocateGlobalPointAndSetup(pos, &mom);
     G4LogicalVolume* log_vol = phys_vol->GetLogicalVolume();
     material.SetMaterial(log_vol->GetMaterial());
-    // std::cerr << "TrackingZ::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
+    // std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
     //          << " z: " << x[3] << " E: " << x[4] << " pz: " << x[7] << std::endl;
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
@@ -245,7 +343,7 @@ int TrackingZ::MaterialEquationOfMotion(double z, const double x[29], double dxd
     return GSL_SUCCESS;
 }
 
-void TrackingZ::UpdateTransferMatrix(const double* x) {
+void GlobalErrorTracking::UpdateTransferMatrix(const double* x) {
   // dbx/dx, dby/dx, dbz/dx, dbx/dy, dby/dy, dbz/dy
   double xfield[4] = {x[1], x[2], x[3], x[0]};
   double field_value[] = {0., 0., 0., 0., 0., 0.};
@@ -306,7 +404,7 @@ void TrackingZ::UpdateTransferMatrix(const double* x) {
           _matrix[i][j] = matrix[i*6+j];
 }
 
-void TrackingZ::FieldDerivative(const double* point, double* derivative) const {
+void GlobalErrorTracking::FieldDerivative(const double* point, double* derivative) const {
     double pos[4] = {point[0], point[1], point[2], point[3]};
     double field_x_pos[6] = {0, 0, 0, 0, 0, 0};
     double field_x_neg[6] = {0, 0, 0, 0, 0, 0};
@@ -332,23 +430,23 @@ void TrackingZ::FieldDerivative(const double* point, double* derivative) const {
     derivative[5] = (field_y_pos[2] - field_y_neg[2])/2/_dy;
 }
 
-std::vector<double> TrackingZ::GetDeviations() const {
+std::vector<double> GlobalErrorTracking::GetDeviations() const {
   double dev_a[] = {_dx,_dy,_dz,_dt};
   return std::vector<double>(dev_a, dev_a+sizeof(dev_a)/sizeof(double));
 }
 
-void TrackingZ::SetDeviations(double dx, double dy, double dz, double dt) {
+void GlobalErrorTracking::SetDeviations(double dx, double dy, double dz, double dt) {
   _dx = dx;
   _dy = dy;
   _dz = dz;
   _dt = dt;
 }
 
-std::vector<std::vector<double> > TrackingZ::GetMatrix() const {
+std::vector<std::vector<double> > GlobalErrorTracking::GetMatrix() const {
   return _matrix;
 }
 
-void TrackingZ::SetField(BTField* field) {
+void GlobalErrorTracking::SetField(BTField* field) {
     if (field == NULL) {
         _field = Globals::GetMCFieldConstructor();
     } else {

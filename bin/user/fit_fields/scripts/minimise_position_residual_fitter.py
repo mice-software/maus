@@ -7,7 +7,7 @@ import ROOT
 from xboa.hit import Hit
 import xboa.common as common
 import Configuration
-import maus_cpp.error_propagation
+import maus_cpp.global_error_tracking
 import maus_cpp.globals
 import maus_cpp.field
 
@@ -98,7 +98,7 @@ class MinimisePositionResidualFitter(object):
         self.minuit.mnparm(0, "t",self.best_guess["t"], 1., 0., 50., ierr)
         self.minuit.mnparm(1, "x",self.best_guess["x"], 10., -150., 150., ierr)
         self.minuit.mnparm(2, "y",self.best_guess["y"], 10., -150., 150., ierr)
-        self.minuit.mnparm(3, "pz",self.best_guess["energy"], 10., 0., 0., ierr)
+        self.minuit.mnparm(3, "energy",self.best_guess["energy"], 10., 0., 0., ierr)
         self.minuit.mnparm(4, "px",self.best_guess["px"], 10., 0., 0., ierr)
         self.minuit.mnparm(5, "py",self.best_guess["py"], 10., 0., 0., ierr)
         args = numpy.array([self.config.fitter_max_iterations, self.config.fitter_resolution], dtype=numpy.float64)
@@ -177,7 +177,7 @@ class MinimisePositionResidualFitter(object):
         print numpy.linalg.det(numpy.matrix(ellipse))
         print "..."
         while z < z_min_max[1]:
-            values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, z, 10.)
+            values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, z, 10.)
             z += (z_min_max[1] - z_min_max[0])/1000.
             track_list.append([values[1], values[2], values[3]])
             track_pos_list.append([values[1]+abs(ellipse[1][1])**0.5, values[2]+abs(ellipse[2][2])**0.5, values[3]])
@@ -191,7 +191,7 @@ class MinimisePositionResidualFitter(object):
         print "..."
         z = self.best_guess["z"]-1.
         while z > z_min_max[0]:
-            values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, z, -10.)
+            values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, z, -10.)
             z -= (z_min_max[1] - z_min_max[0])/1000.
             track_list.append([values[1], values[2], values[3]])
             track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[3]])
@@ -304,9 +304,9 @@ class MinimisePositionResidualFitter(object):
             if sp["z"] == fitter.best_guess["z"]:
                 pass
             elif sp["z"] > fitter.best_guess["z"]:
-                values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, sp["z"], 10.)
+                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], 10.)
             elif sp["z"] < fitter.best_guess["z"]:
-                values, ellipse = maus_cpp.error_propagation.propagate_errors(values, ellipse, sp["z"], -10.)
+                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], -10.)
             fitter.fitted_track_points[sp_index] = dict(zip(keys, values))
             fitter.fitted_track_points[sp_index]["detector"] = sp["detector"]
             chi2 = 0.
