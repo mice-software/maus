@@ -31,6 +31,11 @@ SIMULATION = os.path.join(MRD, "bin", "simulate_mice.py")
 ROOT_TO_JSON = os.path.join(MRD, "bin", "utilities", "root_to_json.py")
 JSON_TO_ROOT = os.path.join(MRD, "bin", "utilities", "json_to_root.py")
 
+# set a different test file for stepIV
+RUN_NUMBER = "5466"
+if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
+    RUN_NUMBER = "6008"
+
 def run_analyze_offline(root_file_name):
     """
     Run the offline analysis with default dataset
@@ -41,6 +46,7 @@ def run_analyze_offline(root_file_name):
         pass
     subproc = subprocess.Popen([ANALYSIS,
                                 "--output_root_file_name", root_file_name,
+                                "--daq_data_file", RUN_NUMBER,
                                 "--TOF_findTriggerPixelCut", "2.0"])
     subproc.wait()
 
