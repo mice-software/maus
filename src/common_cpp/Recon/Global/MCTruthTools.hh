@@ -80,7 +80,7 @@ SciFiHitArray* GetTrackerHits(MCEvent* mc_event,
  *        from the cooling channel
  */
 SciFiHit* GetTrackerPlaneHit(MCEvent* mc_event,
-    int tracker, int station, int plane);
+    int tracker, int station, int plane, TLorentzVector position);
 
 /**
  * @brief Returns the TOF mc hit nearest to the position TLorentzVector provided

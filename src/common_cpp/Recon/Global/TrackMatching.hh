@@ -166,8 +166,9 @@ namespace global {
 
     void MatchTOF0(
         const TLorentzVector &position, const TLorentzVector &momentum,
+        double tof1_z, double tof1_t,
         const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
-        DataStructure::Global::PID pid,
+        DataStructure::Global::PID pid, BTFieldConstructor* field,
         DataStructure::Global::Track* hypothesis_track);
 
     /**

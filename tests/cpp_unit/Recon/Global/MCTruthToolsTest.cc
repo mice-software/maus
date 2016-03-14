@@ -151,9 +151,10 @@ TEST_F(MCTruthToolsTest, GetTrackerHits) {
 }
 
 TEST_F(MCTruthToolsTest, GetTrackerPlaneHit) {
-  SciFiHit* hit1_1_1 = MCTruthTools::GetTrackerPlaneHit(_mc_event, 1, 1, 1);
-  SciFiHit* hit1_2_2 = MCTruthTools::GetTrackerPlaneHit(_mc_event, 1, 2, 2);
-  SciFiHit* hit0_4_1 = MCTruthTools::GetTrackerPlaneHit(_mc_event, 0, 4, 1);
+  TLorentzVector position(0, 0, 0, 0);
+  SciFiHit* hit1_1_1 = MCTruthTools::GetTrackerPlaneHit(_mc_event, 1, 1, 1, position);
+  SciFiHit* hit1_2_2 = MCTruthTools::GetTrackerPlaneHit(_mc_event, 1, 2, 2, position);
+  SciFiHit* hit0_4_1 = MCTruthTools::GetTrackerPlaneHit(_mc_event, 0, 4, 1, position);
 
   EXPECT_EQ(hit1_1_1->GetChannelId()->GetTrackerNumber(), 1);
   EXPECT_EQ(hit1_1_1->GetChannelId()->GetStationNumber(), 1);
