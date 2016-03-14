@@ -226,7 +226,8 @@ class Downloader: #pylint: disable = R0902
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status 
         return self.wsdlurl
-            
+    
+    #pylint: disable = W0613       
     def download_current(self, downloadpath, geoid=0):
         """
         @Method download_current, this method downloads the current valid 
@@ -258,7 +259,7 @@ class Downloader: #pylint: disable = R0902
                 # values to see if there is a later applicable
                 # creation date
                 sortedids = sorted(ids.items(), \
-                                       key=lambda x:x[1]['created'], reverse=True)
+                                key=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
                 # return geoid
 
@@ -330,7 +331,7 @@ class Downloader: #pylint: disable = R0902
                            " valid from " + str(id_dict[id_number]['validFrom'])
         return str(id_number)
     
-    def download_beamline_for_run(self, run_id, downloadpath, geoid=0): #pylint: disable = R0201, C0301
+    def download_beamline_for_run(self, run_id, downloadpath, geoid=0): #pylint: disable = R0201, C0301, W0613
         """
         @Method download geometry for run 
 

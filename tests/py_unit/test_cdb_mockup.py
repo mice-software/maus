@@ -45,7 +45,8 @@ class Beamline(): #pylint: disable = R0903
     </test>
     """
 
-    bl_dict = {"test1":"bob", "test2":"fred", "start_time":2010, "end_time":2020}
+    bl_dict = {"test1":"bob", "test2":"fred", \
+               "start_time":2010, "end_time":2020}
 
 class Geometry():
     """Mock up of config db geometry downloader"""
