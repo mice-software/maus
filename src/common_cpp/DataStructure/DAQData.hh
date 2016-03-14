@@ -66,14 +66,19 @@ class DAQData {
     DAQData();
 
     /** Copy constructor - any pointers are deep copied */
-    DAQData(const DAQData& _daqdata);
+    DAQData(const DAQData& daqdata);
 
     /** Equality operator - any pointers are deep copied */
-    DAQData& operator=(const DAQData& _daqdata);
+    DAQData& operator=(const DAQData& daqdata);
 
     /** Destructor - any member pointers are deleted */
     virtual ~DAQData();
 
+    /** Gets Event size*/
+    unsigned int GetEventSize() const;
+
+    /** Sets Event size*/
+    void SetEventSize(unsigned int size);
 
     /** Returns V830 */
     V830 GetV830() const;
@@ -248,6 +253,8 @@ class DAQData {
     void SetEMRDaq(EMRDaq emr);
 
   private:
+    unsigned int _event_size;
+
     V830 _V830;
     TriggerRequestArray  _trigger_request;
     TOF1DaqArray         _tof1;

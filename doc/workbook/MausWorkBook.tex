@@ -10,6 +10,14 @@
 \usepackage[parfill]{parskip}
 \usepackage{xcolor}
 
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\footskip}{35mm}
+\lhead{}
+\lfoot{\textit{\textcolor{gray}{Adam Dobbs}}}
+\cfoot{\textit{\textcolor{gray}{The MAUS Workbook}}}
+\rfoot{\textit{\textcolor{gray}{ver. 1.9}}}
+
 \usepackage{listings}
 \lstdefinestyle{customcpp}{
   belowcaptionskip=1\baselineskip,
@@ -67,7 +75,7 @@
 
 \title{\textcolor{blue}{The MAUS Work Book}}
 \author{Adam Dobbs}
-\date{Version 1.8, January 2016}
+\date{Version 1.9, March 2016}
 
 % \pdfinfo{%
 %   /Title    (MAUS Work Book)
@@ -79,6 +87,8 @@
 % }
 
 \begin{document}
+
+\thispagestyle{empty}
 
 \vspace*{1cm}
 
@@ -351,7 +361,7 @@ The CDB is a bitemporal database, that is it stores geometry configurations base
   \end{lstlisting}
   \item By geometry ID  e.g. 
     \begin{lstlisting}
-./bin/utilities/download_geometry.py --geometry_download_id 108
+./bin/utilities/download_geometry.py --geometry_download_id 123
     \end{lstlisting}
   \item By run number e.g.
   \begin{lstlisting}
@@ -366,7 +376,7 @@ Additional beamline settings may also be specified, for example to download a ge
 \begin{lstlisting}
 ./bin/utilities/download_geometry.py 
       --geometry_download_by "id" 
-      --geometry_download_id 108
+      --geometry_download_id 123
       --geometry_download_coolingchannel_tag  "NoField" 
       --geometry_download_beamline_tag "6-200+M0" 
 \end{lstlisting}
@@ -419,7 +429,7 @@ simulation_reference_particle = {"position":{"x":0.0, "y":0.0, "z":1000.0}, "mom
   \subsection{Unpacking and Reconstructing}
     An example script which unpacks the binary data and reconstructs data from all the MICE dectors can be found in the bin directory.  Parameters indicating the location and name of the binary data file must be passed in, together with the appropriate geometry for the run being analysed (the desired geometry must be downloaded first, as described in section~\ref{sec:Geometry}).  For example:
     \begin{lstlisting}
-python ./bin/analyze_data_online.py \
+python ./bin/analyze_data_offline.py \
          --daq_data_path /path/to/data/ \
          --daq_data_file file.name \
          --simulation_geometry_file /path/to/maus/files/geometry/download/ParentGeometryFile.dat

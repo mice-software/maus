@@ -14,7 +14,7 @@
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 """Tests for MapCppTOFSlabHits"""
-# pylint: disable = C0103
+# pylint: disable = C0103, C0301
 
 import os
 import unittest
@@ -64,31 +64,28 @@ class MapCppTOFSlabHitsTestCase(unittest.TestCase):# pylint: disable = R0904
         data = fin.read()
         # test with some crazy events.
         result = self.mapper.process(data)
-        spill = maus_cpp.converter.json_repr(result)
-        self.assertFalse("MapCppTOFSlabHits" in spill["errors"])
-        # no slab hits in tof0 partEv0
-        self.assertFalse('tof_0' in \
-                        spill['recon_events'][0]['tof_event']['tof_slab_hits'])
-        n_slab_hits_part_ev0_tof0 = \
-             len(spill['recon_events'][0]['tof_event']['tof_slab_hits']['tof0'])
+        # get recon event 0
+        rec0 = result.GetSpill().GetReconEvents()[0]
+        # get recon event 1
+        rec1 = result.GetSpill().GetReconEvents()[1]
+        # get # tof0 slab hits for event 0 - should be = 1
+        n_slab_hits_part_ev0_tof0 = rec0.GetTOFEvent().GetTOFEventSlabHit().GetTOF0SlabHitArraySize()
         self.assertEqual(n_slab_hits_part_ev0_tof0, 1)
         # test the calculation of the raw time
         raw_time_part_ev0_sl_hit0 = (416572-420998+1727593-1731992)/ \
                                                      2.*0.025
-        raw_time_part_ev0_sl_hit0_rec = spill['recon_events'][0]['tof_event']\
-                                        ['tof_slab_hits']['tof0'][0]['raw_time']
+        raw_time_part_ev0_sl_hit0_rec = rec0.GetTOFEvent().GetTOFEventSlabHit().GetTOF0SlabHitArrayElement(0).GetRawTime()
         self.assertEqual(raw_time_part_ev0_sl_hit0_rec,
                                                       raw_time_part_ev0_sl_hit0)
         # test the tof1 output
-        n_slab_hits_part_ev0_tof1 = len(spill['recon_events'][0]\
-                                      ['tof_event']['tof_slab_hits']['tof1'])
+        # check the number of slab hits for events 0 and event 1
+        n_slab_hits_part_ev0_tof1 = rec0.GetTOFEvent().GetTOFEventSlabHit().GetTOF1SlabHitArraySize()
+        n_slab_hits_part_ev1_tof1 = rec1.GetTOFEvent().GetTOFEventSlabHit().GetTOF1SlabHitArraySize()
         self.assertEqual(n_slab_hits_part_ev0_tof1, 2)
-        n_slab_hits_part_ev1_tof1 = len(spill['recon_events'][1]\
-                                      ['tof_event']['tof_slab_hits']['tof1'])
         self.assertEqual(n_slab_hits_part_ev1_tof1, 1)
         # test the tof2 output - no slab hits in tof2 partEv1
-        self.assertFalse(spill['recon_events'][1]\
-                                      ['tof_event']['tof_slab_hits']['tof2'])
+        n_slab_hits_part_ev1_tof2 = rec1.GetTOFEvent().GetTOFEventSlabHit().GetTOF2SlabHitArraySize()
+        self.assertEqual(n_slab_hits_part_ev1_tof2, 0)
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103

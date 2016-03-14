@@ -54,7 +54,7 @@ double range_piecewise_error(std::vector<MAUS::ThreeVector> points,
 
     double Rij = sqrt(pow(Pj.x()-Pi.x(), 2)+pow(Pj.y()-Pi.y(), 2)+pow(Pj.z()-Pi.z(), 2));
     if ( !Rij )
-	continue;
+      continue;
 
     double e2x = pow((Pj.x()-Pi.x())/Rij, 2)*(pow(ei.x(), 2)+pow(ej.x(), 2));
     double e2y = pow((Pj.y()-Pi.y())/Rij, 2)*(pow(ei.y(), 2)+pow(ej.y(), 2));
@@ -65,6 +65,8 @@ double range_piecewise_error(std::vector<MAUS::ThreeVector> points,
 
   return sqrt(error2);
 }
+
+TF1* f_path(0);
 
 double range_integral(std::vector<double> parx,
 		      std::vector<double> pary,
@@ -86,10 +88,12 @@ double range_integral(std::vector<double> parx,
   }
 
   // Path function of the 3D track, follows the variations in the two projections
-  TF1* f_path = new TF1("f_path", fpath, zstart, zend, 2*n+1);
+  if (!f_path)
+    f_path = new TF1("f_path", fpath, zstart, zend, 2*n+1);
+
   f_path->SetParameters(par); 			// Tells the function the size of the array
   double range = f_path->Integral(zstart, zend, f_path->GetParameters(), 1e-3);
-  delete f_path;
+//   delete f_path;
 
   return range;
 }

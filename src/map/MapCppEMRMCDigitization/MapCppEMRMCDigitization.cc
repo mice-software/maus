@@ -297,37 +297,32 @@ void MapCppEMRMCDigitization::digitize(EMREventPlaneHitVector mc_events_tmp,
 	    continue;
 
 	// Convert energy to the number of scintillation photons (nsph) according to Birks's law
-	int nsph = static_cast<int>
-		       ((_nph_per_MeV*energy)/(1.0+_birks_constant*energy/xPathLength));
+	double nsph = (_nph_per_MeV*energy)/(1.0+_birks_constant*energy/xPathLength);
 	if ( _do_sampling )
 	    nsph = _rand->Poisson(nsph);
 
 	// Convert nsph to the number of trapped photons (ntph)
-	int ntph = static_cast<int>(nsph*_trap_eff);
+	double ntph = nsph*_trap_eff;
 	if ( _do_sampling )
 	    ntph = _rand->Poisson(ntph);
 
 	// Attenuate ntph according to fibre length (naph) and loss in the connectors
 	// MAPMT (half the PEs)
-	int naph_MAPMT = static_cast<int>
-		             (static_cast<double>(ntph)/2
-			      *_attenMap.fibreAtten(xKey, x, y, "MA")
-			      *_attenMap.connectorAtten(xKey, "MA"));
+	double naph_MAPMT = ntph/2 *_attenMap.fibreAtten(xKey, x, y, "MA")
+			      	   *_attenMap.connectorAtten(xKey, "MA");
 	if ( _do_sampling )
   	    naph_MAPMT = _rand->Poisson(naph_MAPMT);
 
 	// SAPMT (other half of the PEs)
-	int naph_SAPMT_hit = static_cast<int>
-			         (static_cast<double>(ntph)/2
-			          *_attenMap.fibreAtten(xKey, x, y, "SA")
-			          *_attenMap.connectorAtten(xKey, "SA"));
+	double naph_SAPMT_hit = ntph/2 *_attenMap.fibreAtten(xKey, x, y, "SA")
+			               *_attenMap.connectorAtten(xKey, "SA");
 	naph_SAPMT += naph_SAPMT_hit;
 
 	// Simulate crosstalk and misalignment
 	// !!! TODO !!!
 
 	// Convert naph to the number of photoelectrons (npe)
-	int npe = static_cast<int>(naph_MAPMT*_QE_MAPMT);
+	double npe = naph_MAPMT*_QE_MAPMT;
 	if ( _do_sampling )
 	    npe = _rand->Poisson(npe);
 
@@ -335,14 +330,14 @@ void MapCppEMRMCDigitization::digitize(EMREventPlaneHitVector mc_events_tmp,
 	// !!! TODO !!!
 
 	// Correct npe for the gain difference between MAPMTs
-	npe = static_cast<int>(npe*epsilon_MA);
+	npe = npe*epsilon_MA;
 	if ( !npe )
 	    continue;
 
 	// Convert npe to the number of ADC counts
-	int nADC = static_cast<int>(npe*_nADC_per_pe_MAPMT);
+	double nADC = npe*_nADC_per_pe_MAPMT;
 	if ( _do_sampling )
-	    nADC = static_cast<int>(_rand->Gaus(nADC, _electronics_response_spread_MAPMT));
+	    nADC = _rand->Gaus(nADC, _electronics_response_spread_MAPMT);
 
 	// Convert nADC to a time-over-threshold
 	int xTotDigi = static_cast<int>
