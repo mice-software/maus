@@ -48,7 +48,8 @@ custom_pid_set = "PIDVarA"
 
 # Tag used by both MapCppGlobalPID and ReduceCppGlobalPID, determines which
 # PDFs to perform PID against. A typical tag here
-# would be the emittance and momentum, e.g. 3-140, 6-200, etc.
+# would be the emittance and momentum, e.g. 3-140, 6-200, etc. Alternatively,
+# users may choose to enter the run number they are simulating for here.
 # The tag used must match the tag that was provided during PDF production.
 pid_beam_setting = "6-200"
 

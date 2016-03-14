@@ -592,19 +592,11 @@ class CADImport:
                     # to the identity rotation.
                     if len(rotlist):
                         rotation = elem.xpathEval("rotation")[0]
-                        if "Tracker" in moduleName and "Station" in moduleName \
-                          and "120" in rotation.prop('z'):
-                            result.append("Rotation "+\
-                                          rotation.prop('x')+" "+\
-                                          rotation.prop('y')+' '+\
-                                          str(-1.*float(rotation.prop('z')))\
-                                            +" "+rotation.prop('unit')+'\n')
-                        else:
-                            result.append("Rotation "+\
-                                          rotation.prop('x')+" "+\
-                                          rotation.prop('y')+' '+\
-                                          rotation.prop('z')+" "+\
-                                          rotation.prop('unit')+'\n')
+                        result.append("Rotation "+\
+                                      rotation.prop('x')+" "+\
+                                      rotation.prop('y')+' '+\
+                                      rotation.prop('z')+" "+\
+                                      rotation.prop('unit')+'\n')
                     else:
                         # If there is no rotation defined use the
                         # null rotation.

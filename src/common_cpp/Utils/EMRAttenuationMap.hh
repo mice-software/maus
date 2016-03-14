@@ -112,13 +112,17 @@ class EMRAttenuationMap {
  private:
 
  /** @brief Make one EMRChannelKey for each channel of the detector.
-  * 	    All EMRChannelKeys are held in the data member _Ckey.
+  * 	    All EMRChannelKeys are held in the data members _CkeyCA, _CkeyCFL.
   */
   int MakeEMRChannelKeys();
 
- /** @brief Find the position of the channel key in the data member _Ckey.
+ /** @brief Find the position of the channel key in the data member _CkeyCA.
   */
   int FindEMRChannelKey(EMRChannelKey key) const;
+
+ /** @brief Find the position of the channel key in the data member _CkeyCFL.
+  */
+  int FindEMRBarKey(EMRChannelKey key) const;
 
  /** @brief Load connector attenuation factors from text file.
   */
@@ -130,23 +134,24 @@ class EMRAttenuationMap {
 
  /** @brief This vector holds one EMRChannelKey for each channel of the detector.
   */
-  std::vector<EMRChannelKey> _Ckey;
+  std::vector<EMRChannelKey> _CkeyCA;
+  std::vector<EMRChannelKey> _CkeyCFL;
 
  /** @brief These vectors hold the connector attenuation factors. IMPORTANT - the order
-  * 	    of the entries here is the same as the order of the entries in _Ckey.
-  * 	    This is used when the constants are read.
-  * 	    MA = Multi-Anode PMT, SA = Single-Anode PMT
-  */
-  std::vector<double> _cfl_MA;
-  std::vector<double> _cfl_SA;
-
- /** @brief These vectors hold the clear fibre lengths. IMPORTANT - the order
-  * 	    of the entries here is the same as the order of the entries in _Bkey.
+  * 	    of the entries here is the same as the order of the entries in _CkeyCA.
   * 	    This is used when the constants are read.
   * 	    MA = Multi-Anode PMT, SA = Single-Anode PMT
   */
   std::vector<double> _caf_MA;
   std::vector<double> _caf_SA;
+
+ /** @brief These vectors hold the clear fibre lengths. IMPORTANT - the order
+  * 	    of the entries here is the same as the order of the entries in _CkeyCFL.
+  * 	    This is used when the constants are read.
+  * 	    MA = Multi-Anode PMT, SA = Single-Anode PMT
+  */
+  std::vector<double> _cfl_MA;
+  std::vector<double> _cfl_SA;
 
  /** @brief EMR characteristics
   */

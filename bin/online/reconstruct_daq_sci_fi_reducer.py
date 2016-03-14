@@ -46,7 +46,8 @@ def run():
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
 
     # Set up the input that reads from DAQ
-    my_input = MAUS.InputCppDAQOnlineData()  #pylint: disable = E1101
+    #my_input = MAUS.InputCppDAQOnlineData()  #pylint: disable = E1101
+    my_input = MAUS.InputCppDAQOfflineData()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
