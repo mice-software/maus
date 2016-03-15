@@ -26,6 +26,11 @@ MRD = os.getenv('MAUS_ROOT_DIR')
 MTP = os.getenv('MAUS_THIRD_PARTY')
 TMP = os.getenv('MAUS_TMP_DIR')
 
+# set a different test file for stepIV
+DATA_TAR = "04234.tar"
+if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
+    DATA_TAR = "06008.tar"
+
 class CardsUploadTestCase(unittest.TestCase): # pylint: disable=R0904
     """
     test_execute_against_data_cards check that Batch iteration number works
@@ -52,7 +57,7 @@ class CardsUploadTestCase(unittest.TestCase): # pylint: disable=R0904
         print 'Found free row with batch iteration number', i
         bi_super.set_datacards(i, comment, reco_cards, mc_cards)
         ead = MRD+'/bin/utilities/execute_against_data.py'
-        data = MTP+'/third_party/install/share/test_data/04234.tar'
+        data = MTP+'/third_party/install/share/test_data/'+DATA_TAR
         proc = subprocess.Popen(['python', ead, '--test',
                                  '--input-file', data,
                                  '--batch-iteration', str(i)])
@@ -96,7 +101,7 @@ class CardsUploadTestCase(unittest.TestCase): # pylint: disable=R0904
     def test_cards_no_number(self):
         """test_execute_against_data_cards.test_cards_no_number"""
         ead = MRD+'/bin/utilities/execute_against_data.py'
-        data = MTP+'/third_party/install/share/test_data/04234.tar'
+        data = MTP+'/third_party/install/share/test_data/'+DATA_TAR
         proc = subprocess.Popen(['python', ead, '--test',
                                  '--input-file', data,
                                  '--batch-iteration', str(1000000)])

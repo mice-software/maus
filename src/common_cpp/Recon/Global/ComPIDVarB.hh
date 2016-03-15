@@ -80,11 +80,11 @@ namespace global {
     /// Name of PID variable
     static const std::string VARIABLE;
     /// Number of X bins in PDF
-    static const int XnumBins = 80;
+    static const int XnumBins = 60;
     /// Minimum value of X range of PDF
-    static const int XminBinComB = 25;
+    static const int XminBinComB = 20;
     /// Maximum value of X range of PDF
-    static const int XmaxBinComB = 65;
+    static const int XmaxBinComB = 50;
     /// Number of Y bins in PDF
     static const int YnumBins = 200;
     /// Minimum value of Y range of PDF
@@ -94,7 +94,7 @@ namespace global {
     /// Minimum value of X cut for PID
     static const int XminComB = 20;
     /// Maximum value of X cut for PID
-    static const int XmaxComB = 40;
+    static const int XmaxComB = 50;
     /// Minimum value of Y cut for PID
     static const int YminComB = 0;
     /// Maximum value of Y cut for PID

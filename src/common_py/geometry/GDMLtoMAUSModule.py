@@ -34,6 +34,7 @@ MM_XSL = os.environ["MAUS_ROOT_DIR"] + \
 DET_GDML = ['TOF0.gdml', 'TOF1.gdml', 'TOF2.gdml', \
             'Tracker0.gdml', 'Tracker1.gdml',\
             'KL.gdml', 'Ckov1.gdml', 'Ckov2.gdml', 'Disk_LiH.gdml',\
+            'XeAbs.gdml', 'HeAbs.gdml',\
             'Wedge_LiH_90.gdml', 'Wedge_LiH_45.gdml', 'LH2.gdml','EMR.gdml',\
             'HeWindow.gdml', 'HeVolDSCap.gdml', 'HeVolUSCap.gdml',\
             'iris1_closed.gdml', 'iris2_open.gdml', 'iris3_open.gdml',\
@@ -234,7 +235,7 @@ class GDMLtomaus(): #pylint: disable = R0902, R0903
             length = len(self.module_files)
             for fnum in range(0, length):
                 found_file = str(self.module_files[fnum])
-                print found_file
+                # print found_file
                 new_string = found_file.split('/')
                 file_name = new_string[-1]
                 outputfile = output + '/' + file_name[:-4] + 'dat'

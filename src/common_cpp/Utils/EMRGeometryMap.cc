@@ -89,7 +89,7 @@ bool EMRGeometryMap::LoadGeometryFile(std::string geometryFile) {
     // Warn that there will not be any global positions
     Squeak::mout(Squeak::warning)
     << "WARNING in EMRGeometryMap::LoadGeometryFile. The EMR is not included"
-    << "as a sensitive detector !!! Global positions will not be reconstructed."
+    << " as a sensitive detector !!! Global positions will not be reconstructed."
     << std::endl;
 
     // Set the dimensions of EMR bars and the size of the gaps

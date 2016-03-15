@@ -10,7 +10,7 @@ Module TrackerViewX
   PropertyString Material POLYSTYRENE
   PropertyString SensitiveDetector SciFi
   PropertyInt Plane 2
-  PropertyDouble ActiveRadius 160.7 mm
+  PropertyDouble ActiveRadius 161.0 mm
   PropertyDouble Pitch 0.427 mm
   PropertyDouble FibreDiameter 0.350 mm
   PropertyDouble CoreDiameter 0.308 mm
