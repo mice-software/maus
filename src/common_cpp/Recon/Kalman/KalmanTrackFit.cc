@@ -190,6 +190,14 @@ namespace Kalman {
       _smoothed[i].SetVector(vec);
       _smoothed[i].SetCovariance(cov);
     }
+    
+    if ( _smoothed[0].GetVector()(0,0) != _smoothed[0].GetVector()(0, 0) ) {
+      for (int i = track_start; i != track_end; i += increment) {
+        std::cerr << print_track(_predicted, "PREDICTED") << 
+                     print_track(_filtered, "FILTERED" ) <<
+                     print_track(_smoothed, "SMOOTHED" );
+      }
+    }
   }
 
 

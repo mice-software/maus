@@ -399,22 +399,25 @@ def fill_plots_data(plot_dict, data_dict, event) :
   """
     Fill the plots in the plot dictionary with data
   """
-  plot_dict['recon_plots']['field_mean_up'].Fill(\
-                                              1000.0*event.get_mean_field_up())
-  plot_dict['recon_plots']['field_mean_down'].Fill(\
-                                            1000.0*event.get_mean_field_down())
-  plot_dict['recon_plots']['field_variance_up'].Fill(\
-                                          1.0E+6*event.get_variance_field_up())
-  plot_dict['recon_plots']['field_variance_down'].Fill(\
-                                        1.0E+6*event.get_variance_field_down())
-  plot_dict['recon_plots']['field_rms_up'].Fill(\
-                               1000.0*math.sqrt(event.get_variance_field_up()))
-  plot_dict['recon_plots']['field_rms_down'].Fill(\
-                             1000.0*math.sqrt(event.get_variance_field_down()))
-  plot_dict['recon_plots']['field_range_up'].Fill(\
-                                             1000.0*event.get_range_field_up())
-  plot_dict['recon_plots']['field_range_down'].Fill(\
-                                           1000.0*event.get_range_field_down())
+  try :
+    plot_dict['recon_plots']['field_mean_up'].Fill(\
+                                                1000.0*event.get_mean_field_up())
+    plot_dict['recon_plots']['field_mean_down'].Fill(\
+                                              1000.0*event.get_mean_field_down())
+    plot_dict['recon_plots']['field_variance_up'].Fill(\
+                                            1.0E+6*event.get_variance_field_up())
+    plot_dict['recon_plots']['field_variance_down'].Fill(\
+                                          1.0E+6*event.get_variance_field_down())
+    plot_dict['recon_plots']['field_rms_up'].Fill(\
+                                 1000.0*math.sqrt(event.get_variance_field_up()))
+    plot_dict['recon_plots']['field_rms_down'].Fill(\
+                               1000.0*math.sqrt(event.get_variance_field_down()))
+    plot_dict['recon_plots']['field_range_up'].Fill(\
+                                               1000.0*event.get_range_field_up())
+    plot_dict['recon_plots']['field_range_down'].Fill(\
+                                             1000.0*event.get_range_field_down())
+  except :
+    pass
 
   scifi_digits = event.digits()
   if not scifi_digits :
@@ -965,10 +968,13 @@ if __name__ == "__main__" :
 
           fill_plots_data(plot_dict, data_dict, scifi_event)
 
-        except ValueError :
-          print "An Error Occured. Skipping Spill: " + \
-                str(file_reader.get_current_spill_number()) + \
-                " In File: " + str(file_reader.get_current_filenumber()) + "\n"
+        except ValueError as ex :
+          print "An Error Occured: " + str( ex )
+          print \
+        " Skipping Event: " + str(file_reader.get_current_event_number()) + \
+        " In Spill: " + str(file_reader.get_current_spill_number()) + \
+        " In File: " + str(file_reader.get_current_filenumber()) + "\n"
+          print
           continue
 
 ##### 4. Analysis Plots #######################################################

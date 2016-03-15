@@ -61,15 +61,18 @@ import ROOT
 RECON_STATION = 1
 RECON_PLANE = 0
 MIN_NUMBER_TRACKPOINTS = 0
+P_VALUE_CUT = 0.0
 MUON_PID = 13
 
 PT_MIN = 0.0
 PT_MAX = 200.0
 PT_BIN = 200
+PT_BIN_WIDTH = 1.0
 
 PZ_MIN = 120.0
 PZ_MAX = 260.0
-PZ_BIN = 100
+PZ_BIN = 14
+PZ_BIN_WIDTH = 10.0
 
 ALIGNMENT_TOLERANCE = 0.001
 RESOLUTION_BINS = 10
@@ -79,10 +82,20 @@ TRACK_ALGORITHM = 1
 
 ENSEMBLE_SIZE = 2000
 
-UP_COV_MC = covariances.CovarianceMatrix()
-DOWN_COV_MC = covariances.CovarianceMatrix() 
-UP_COV_RECON = covariances.CovarianceMatrix()
-DOWN_COV_RECON = covariances.CovarianceMatrix() 
+#UP_COV_MC = covariances.CovarianceMatrix()
+#DOWN_COV_MC = covariances.CovarianceMatrix() 
+#UP_COV_RECON = covariances.CovarianceMatrix()
+#DOWN_COV_RECON = covariances.CovarianceMatrix() 
+
+UP_COV_MC = []
+DOWN_COV_MC = []
+UP_COV_RECON = []
+DOWN_COV_RECON = []
+
+ 
+def get_pz_bin(pz) :
+  offset = pz - PZ_MIN
+  return int(offset/PZ_BIN_WIDTH)
 
 
 def init_plots_data() :
@@ -90,6 +103,20 @@ def init_plots_data() :
     Initialised all the plots in a dictionary to pass around to the other 
     functions.
   """
+  global UP_COV_MC
+  global DOWN_COV_MC 
+  global UP_COV_RECON
+  global DOWN_COV_RECON
+  global PZ_BN
+  global PT_BIN
+
+  PZ_BIN = int(((PZ_MAX-PZ_MIN) / PZ_BIN_WIDTH) + 0.5)
+  PT_BIN = int(((PT_MAX-PT_MIN) / PT_BIN_WIDTH) + 0.5)
+  UP_COV_MC = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
+  DOWN_COV_MC = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
+  UP_COV_RECON = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
+  DOWN_COV_RECON = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
+
   plot_dict = {}
 
   plot_dict['upstream_ntp'] = ROOT.TH1F('upstream_ntp', \
@@ -306,7 +333,7 @@ def init_plots_data() :
           'upstream_recon_emittance', "Upstream Emittance Reconstruction Pz", \
                                        PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
   plot_dict['upstream_recon_momentum'] = ROOT.TH2F( \
-                        'upstream_mc_momentum', "Upstream Recon Momentum Pz", \
+                     'upstream_recon_momentum', "Upstream Recon Momentum Pz", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
   plot_dict['upstream_residual_alpha'] = ROOT.TH2F( \
@@ -464,6 +491,9 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
   for track in tracks :
     if track.GetAlgorithmUsed() != TRACK_ALGORITHM :
       continue
+    if track.P_value() < P_VALUE_CUT :
+      continue
+
     trackpoints = track.scifitrackpoints()
     trackpoint = None
 
@@ -485,6 +515,9 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
     for trkpt in trackpoints :
       if trkpt.has_data() :
         tp_counter += 1
+
+    if tp_counter < MIN_NUMBER_TRACKPOINTS :
+      continue
 
     if tracker == 0 :
       plot_dict['upstream_ntp'].Fill( tp_counter )
@@ -543,14 +576,21 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
   """
   for scifi_hit, virt_hit in hit_pairs :
     tracker = scifi_hit.tracker()
+    pz_bin = get_pz_bin( virt_hit.GetMomentum().z() )
+    if pz_bin >= PZ_BIN or pz_bin < 0 :
+      continue
+    up_cov_mc = UP_COV_MC[pz_bin]
+    down_cov_mc = DOWN_COV_MC[pz_bin]
+    up_cov_recon = UP_COV_RECON[pz_bin]
+    down_cov_recon = DOWN_COV_RECON[pz_bin]
     if tracker == 0 :
       prefix = 'upstream_'
-      UP_COV_MC.add_hit(hit_types.AnalysisHit(virtual_track_point=virt_hit))
-      UP_COV_RECON.add_hit(hit_types.AnalysisHit(scifi_track_point=scifi_hit))
+      up_cov_mc.add_hit(hit_types.AnalysisHit(virtual_track_point=virt_hit))
+      up_cov_recon.add_hit(hit_types.AnalysisHit(scifi_track_point=scifi_hit))
     else :
       prefix = 'downstream_'
-      DOWN_COV_MC.add_hit(hit_types.AnalysisHit(virtual_track_point=virt_hit))
-      DOWN_COV_RECON.add_hit(hit_types.AnalysisHit(scifi_track_point=scifi_hit))
+      down_cov_mc.add_hit(hit_types.AnalysisHit(virtual_track_point=virt_hit))
+      down_cov_recon.add_hit(hit_types.AnalysisHit(scifi_track_point=scifi_hit))
 
     scifi_pos = [scifi_hit.pos().x(), scifi_hit.pos().y(), scifi_hit.pos().z()]
     scifi_mom = [scifi_hit.mom().x(), scifi_hit.mom().y(), scifi_hit.mom().z()]
@@ -601,69 +641,69 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     plot_dict[prefix+'pt_residual_pz'].Fill( Pz_mc, Pt_res )
     plot_dict[prefix+'pz_residual_pz'].Fill( Pz_mc, res_mom[2] )
 
-    if UP_COV_MC.length() == ENSEMBLE_SIZE :
-      up_pz = UP_COV_MC.get_mean('pz')
-      plot_dict['upstream_mc_alpha'].Fill(up_pz, UP_COV_MC.get_alpha(['x','y']))
-      plot_dict['upstream_mc_beta'].Fill(up_pz, UP_COV_MC.get_beta(['x','y']))
-      plot_dict['upstream_mc_emittance'].Fill(up_pz, UP_COV_MC.get_emittance(\
+    if up_cov_mc.length() == ENSEMBLE_SIZE :
+      up_pz = up_cov_mc.get_mean('pz')
+      plot_dict['upstream_mc_alpha'].Fill(up_pz, up_cov_mc.get_alpha(['x','y']))
+      plot_dict['upstream_mc_beta'].Fill(up_pz, up_cov_mc.get_beta(['x','y']))
+      plot_dict['upstream_mc_emittance'].Fill(up_pz, up_cov_mc.get_emittance(\
                                                           ['x','px','y','py']))
-      plot_dict['upstream_mc_momentum'].Fill(up_pz, UP_COV_MC.get_momentum())
+      plot_dict['upstream_mc_momentum'].Fill(up_pz, up_cov_mc.get_momentum())
 
-      plot_dict['upstream_recon_alpha'].Fill(up_pz, UP_COV_RECON.get_alpha(\
+      plot_dict['upstream_recon_alpha'].Fill(up_pz, up_cov_recon.get_alpha(\
                                                                     ['x','y']))
-      plot_dict['upstream_recon_beta'].Fill(up_pz, UP_COV_RECON.get_beta(\
+      plot_dict['upstream_recon_beta'].Fill(up_pz, up_cov_recon.get_beta(\
                                                                     ['x','y']))
       plot_dict['upstream_recon_emittance'].Fill(up_pz, \
-                               UP_COV_RECON.get_emittance(['x','px','y','py']))
+                               up_cov_recon.get_emittance(['x','px','y','py']))
       plot_dict['upstream_recon_momentum'].Fill(up_pz, \
-                                                   UP_COV_RECON.get_momentum())
+                                                   up_cov_recon.get_momentum())
 
       plot_dict['upstream_residual_alpha'].Fill(up_pz, \
-            UP_COV_RECON.get_alpha(['x','y']) - UP_COV_MC.get_alpha(['x','y']))
+            up_cov_recon.get_alpha(['x','y']) - up_cov_mc.get_alpha(['x','y']))
       plot_dict['upstream_residual_beta'].Fill(up_pz, \
-              UP_COV_RECON.get_beta(['x','y']) - UP_COV_MC.get_beta(['x','y']))
+              up_cov_recon.get_beta(['x','y']) - up_cov_mc.get_beta(['x','y']))
       plot_dict['upstream_residual_emittance'].Fill(up_pz, \
-                            UP_COV_RECON.get_emittance(['x','px','y','py']) - \
-                                  UP_COV_MC.get_emittance(['x','px','y','py']))
+                            up_cov_recon.get_emittance(['x','px','y','py']) - \
+                                  up_cov_mc.get_emittance(['x','px','y','py']))
       plot_dict['upstream_residual_momentum'].Fill(up_pz, \
-                        UP_COV_RECON.get_momentum() - UP_COV_MC.get_momentum())
+                        up_cov_recon.get_momentum() - up_cov_mc.get_momentum())
 
-      UP_COV_MC.clear()
-      UP_COV_RECON.clear()
+      up_cov_mc.clear()
+      up_cov_recon.clear()
 
 
-    if DOWN_COV_MC.length() == ENSEMBLE_SIZE :
-      down_pz = UP_COV_MC.get_mean('pz')
+    if down_cov_mc.length() == ENSEMBLE_SIZE :
+      down_pz = down_cov_mc.get_mean('pz')
       plot_dict['downstream_mc_alpha'].Fill(down_pz, \
-                                              DOWN_COV_MC.get_alpha(['x','y']))
+                                              down_cov_mc.get_alpha(['x','y']))
       plot_dict['downstream_mc_beta'].Fill(down_pz, \
-                                               DOWN_COV_MC.get_beta(['x','y']))
+                                               down_cov_mc.get_beta(['x','y']))
       plot_dict['downstream_mc_emittance'].Fill(down_pz, \
-                                DOWN_COV_MC.get_emittance(['x','px','y','py']))
+                                down_cov_mc.get_emittance(['x','px','y','py']))
       plot_dict['downstream_mc_momentum'].Fill(down_pz, \
-                                                    DOWN_COV_MC.get_momentum())
+                                                    down_cov_mc.get_momentum())
 
       plot_dict['downstream_recon_alpha'].Fill(down_pz, \
-                                           DOWN_COV_RECON.get_alpha(['x','y']))
+                                           down_cov_recon.get_alpha(['x','y']))
       plot_dict['downstream_recon_beta'].Fill(down_pz, \
-                                            DOWN_COV_RECON.get_beta(['x','y']))
+                                            down_cov_recon.get_beta(['x','y']))
       plot_dict['downstream_recon_emittance'].Fill(down_pz, \
-                             DOWN_COV_RECON.get_emittance(['x','px','y','py']))
+                             down_cov_recon.get_emittance(['x','px','y','py']))
       plot_dict['downstream_recon_momentum'].Fill(down_pz, \
-                                                 DOWN_COV_RECON.get_momentum())
+                                                 down_cov_recon.get_momentum())
 
       plot_dict['downstream_residual_alpha'].Fill(down_pz, \
-        DOWN_COV_RECON.get_alpha(['x','y']) - DOWN_COV_MC.get_alpha(['x','y']))
+        down_cov_recon.get_alpha(['x','y']) - down_cov_mc.get_alpha(['x','y']))
       plot_dict['downstream_residual_beta'].Fill(down_pz, \
-          DOWN_COV_RECON.get_beta(['x','y']) - DOWN_COV_MC.get_beta(['x','y']))
+          down_cov_recon.get_beta(['x','y']) - down_cov_mc.get_beta(['x','y']))
       plot_dict['downstream_residual_emittance'].Fill(down_pz, \
-                          DOWN_COV_RECON.get_emittance(['x','px','y','py']) - \
-                                DOWN_COV_MC.get_emittance(['x','px','y','py']))
+                          down_cov_recon.get_emittance(['x','px','y','py']) - \
+                                down_cov_mc.get_emittance(['x','px','y','py']))
       plot_dict['downstream_residual_momentum'].Fill(down_pz, \
-                    DOWN_COV_RECON.get_momentum() - DOWN_COV_MC.get_momentum())
+                    down_cov_recon.get_momentum() - down_cov_mc.get_momentum())
 
-      DOWN_COV_MC.clear()
-      DOWN_COV_RECON.clear()
+      down_cov_mc.clear()
+      down_cov_recon.clear()
 
 
 def analyse_plots(plot_dict, data_dict) :
@@ -705,20 +745,19 @@ def analyse_plots(plot_dict, data_dict) :
       tracker_prefix+component+plot_axis+'_pro_'+str(i), i*width, (i+1)*width )
 
           plot_mean = plot.GetXaxis().GetBinCenter( i*width ) + width*0.5
-#          pro_mean, pro_mean_err, pro_std, pro_std_err = \
           _, _, pro_std, pro_std_err = \
                                         analysis.tools.fit_gaussian(projection)
-
-#          plot.GetXaxis().SetRange( i*width, (i+1)*width )
-#          plot_rms = plot.GetRMS( 2 )
 
           bin_size.append( width*0.5 )
           errors.append( pro_std_err )
           bins.append( plot_mean )
           rms.append( pro_std )
 
-        resolution_graph = ROOT.TGraphErrors( RESOLUTION_BINS-1, \
+        if len(bins) != 0 :
+          resolution_graph = ROOT.TGraphErrors( len(bins), \
                                                   bins, rms, bin_size, errors )
+        else :
+          resolution_graph = None
 
         plot_dict[tracker_prefix+component+plot_axis+'_resolution'] = \
                                                                resolution_graph
@@ -753,8 +792,11 @@ def analyse_plots(plot_dict, data_dict) :
           bins.append( plot_mean )
           eff.append( 100.0 * integral / expected )
 
-        resolution_graph = ROOT.TGraphErrors( EFFICIENCY_BINS-1, \
+        if len(bins) != 0 :
+          resolution_graph = ROOT.TGraphErrors( len(bins), \
                                                   bins, eff, bin_size, errors )
+        else :
+          resolution_graph = None
 
         plot_dict[tracker_prefix+plot_axis+'_efficiency'] = resolution_graph
 
@@ -778,7 +820,8 @@ def save_plots(plot_dict, directory, filename, print_plots=False) :
   else :
     outfile = ROOT.TFile(filename, "RECREATE")
     for plot in sorted(plot_dict) :
-      plot_dict[plot].Write( plot )
+      if plot_dict[plot] is not None :
+        plot_dict[plot].Write( plot )
     outfile.Close()
 
 def save_pretty(plot_dict, output_directory) :
@@ -791,6 +834,8 @@ def save_pretty(plot_dict, output_directory) :
       for plot_axis, axis_title in [ ("residual_pt", "p_{#perp}  [MeV/c]"), \
                                           ("residual_pz", "p_{z}  [MeV/c]") ] :
         plot = plot_dict[tracker_prefix+component+plot_axis+'_resolution']
+        if plot is None : 
+          continue
         canvas = ROOT.TCanvas( tracker_prefix+component+plot_axis+'_canvas' )
 
         plot.Draw()
@@ -883,6 +928,9 @@ if __name__ == "__main__" :
   parser.add_argument( '--cut_number_trackpoints', type=int, default=0, \
           help="Specify the minumum number of trackpoints required per track" )
 
+  parser.add_argument( '--cut_p_value', type=float, default=0.0, \
+  help="Specify the P-Value below which tracks are removed from the analysis" )
+
   parser.add_argument( '--track_algorithm', type=int, default=1, \
                           help="Specify the track reconstruction algorithm. "+\
                              "1 for Helical Tracks and 0 for Straight Tracks" )
@@ -890,6 +938,13 @@ if __name__ == "__main__" :
   parser.add_argument( '--ensemble_size', type=int, default=2000, \
                         help="Specify the size of the ensemble of particles "+\
                                      "to consider per emittance measurement." )
+  parser.add_argument( '--pz_bin', type=float, default=PZ_BIN_WIDTH, \
+             help="Specify the size of the Pz bins which are used to select "+\
+                     "particles for the reconstruction of optical functions." )
+
+  parser.add_argument( '--pz_window', type=float, nargs=2, \
+        default=[PZ_MIN, PZ_MAX], help="Specify the range of Pz to consider "+\
+                               "for the reconstruction of optical functions." )
 
 #  parser.add_argument( '-C', '--configuration_file', help='Configuration '+\
 #      'file for the reconstruction. I need the geometry information' )
@@ -898,8 +953,13 @@ if __name__ == "__main__" :
     namespace = parser.parse_args()
 
     MIN_NUMBER_TRACKPOINTS = namespace.cut_number_trackpoints
+    P_VALUE_CUT = namespace.cut_p_value
     TRACK_ALGORITHM = namespace.track_algorithm
     ENSEMBLE_SIZE = namespace.ensemble_size
+
+    PZ_MIN = namespace.pz_window[0]
+    PZ_MAX = namespace.pz_window[1]
+    PZ_BIN_WIDTH = namespace.pz_bin
   except BaseException as ex:
     raise
   else :

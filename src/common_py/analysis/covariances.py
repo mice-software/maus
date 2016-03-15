@@ -305,7 +305,7 @@ class CovarianceMatrix() :
 
     covariance_sum = 0.0
     for i in range( num ) :
-      covariance_sum += cov_mat[i][num+i]
+      covariance_sum += cov_mat[2*i][(2*num)+i]
 
     return - ( covariance_sum / num ) / ( emitt * mass )
 
