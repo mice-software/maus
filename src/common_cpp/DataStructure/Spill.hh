@@ -152,6 +152,18 @@ class Spill {
   /** Get the run number */
   int GetRunNumber() const;
 
+  /** Set the event Id */
+  void SetEventId(int eid);
+
+  /** Get the event Id */
+  int GetEventId() const;
+
+  /** Set the time stamp */
+  void SetTimeStamp(int st);
+
+  /** Get the time stamp */
+  int GetTimeStamp() const;
+
   /** Set the errors on this spill */
   void SetErrors(ErrorsMap errors);
 
@@ -173,6 +185,8 @@ class Spill {
   EMRSpillData* _emr;
   int _spill_number;
   int _run_number;
+  int _event_id;
+  int _time_stamp;
   std::string _daq_event_type;
   std::map<std::string, std::string> _errors;
   TestBranch* _test;

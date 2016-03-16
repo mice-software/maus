@@ -81,9 +81,10 @@ CanvasWrapper* ReduceCppTools::get_canvas_emr_wrapper(TCanvas *canv,
 
 CanvasWrapper* ReduceCppTools::get_canvas_divide_wrapper(TCanvas *canv,
                                                          int div_x, int div_y, bool log,
-                                                         std::vector<TH1F *> histos,
+                                                         std::vector<TH1 *> histos,
                                                          std::string name,
-                                                         std::string description) {
+                                                         std::string description,
+                                                         Option_t *draw_option) {
 
   CanvasWrapper *wrap = new CanvasWrapper();
   wrap->SetDescription(description);
@@ -94,8 +95,8 @@ CanvasWrapper* ReduceCppTools::get_canvas_divide_wrapper(TCanvas *canv,
   int xPad = 0;
   for (auto &h:histos) {
     canv->cd(++xPad);
-    h->Draw();
-    gPad->SetLogy();
+    h->Draw(draw_option);
+    gPad->SetLogy(log);
 //     gPad->Update();
 //     TPaveStats *pave_stats = static_cast<TPaveStats*>(h->FindObject("stats"));
 //     if ( pave_stats )

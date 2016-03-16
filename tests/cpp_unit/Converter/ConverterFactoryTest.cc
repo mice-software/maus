@@ -41,8 +41,9 @@
 namespace MAUS {
 std::string data_test_str =
     std::string("{\"daq_event_type\":\"\",\"errors\":{},")+
+    std::string("\"event_id\":1,")+
     std::string("\"maus_event_type\":\"Spill\",\"run_number\":99,")+
-    std::string("\"spill_number\":666}");
+    std::string("\"spill_number\":666,\"time_stamp\":1}");
 
 std::string jh_test_str =
   std::string("{")+
@@ -274,6 +275,7 @@ TEST_F(ConverterFactoryTest, TestStringToRunFooter) {
 
 /////////////// JSON TO X /////////////////////////////
 TEST_F(ConverterFactoryTest, TestJsonToX) {
+
     Json::Value* json_data =
                     ConverterFactory().convert<std::string, Json::Value>(_data);
     Json::Value* json_jh =

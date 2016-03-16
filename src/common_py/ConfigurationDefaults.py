@@ -638,7 +638,8 @@ EMR_calib_date_from = 'current'
 EMR_calib_file = "/files/calibration/emrcalib_cosmics_july2015.txt"
 
 daq_data_path = '%s/src/input/InputCppDAQData' % os.environ.get("MAUS_ROOT_DIR") # path to daq data. Multiple locations can be specified with a space
-daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
+# daq_data_file = '05466.001' # file name for daq data; if this is just a integer string, MAUS assumes this is a run number. Multiple entries can be specified separated by a space
+daq_data_file = '06008.000'
 
 maus_version = "" # set at runtime - do not edit this (changes are ignored)
 configuration_file = "" # should be set on the command line only (else ignored)
@@ -714,23 +715,23 @@ pid_bounds = {
     # PIDVarJ
     "XminJ":50, "XmaxJ":350, "YminJ":0, "YmaxJ":140,
     # ComPIDVarA
-    "minComA":30, "maxComA":50,
+    "minComA":20, "maxComA":50,
     # ComPIDVarB
-    "XminComB":30, "XmaxComB":50, "YminComB":0, "YmaxComB":8000,
+    "XminComB":20, "XmaxComB":50, "YminComB":0, "YmaxComB":8000,
     # ComPIDVarC
     "minComC":0, "maxComC":8000,
     # ComPIDVarD
     "minComD":0, "maxComD":1000,
     # ComPIDVarE
-    "XminComE":30, "XmaxComE":50, "YminComE":0, "YmaxComE":1000,
+    "XminComE":20, "XmaxComE":60, "YminComE":0, "YmaxComE":1000,
     # ComPIDVarF
     "minComF":0, "maxComF":1,
     # ComPIDVarG
-    "XminComG":30, "XmaxComG":50, "YminComG":0, "YmaxComG":1,
+    "XminComG":20, "XmaxComG":50, "YminComG":0, "YmaxComG":1,
     # ComPIDVarH
-    "XminComH":30, "XmaxComH":50, "YminComH":0, "YmaxComH":40,
+    "XminComH":20, "XmaxComH":50, "YminComH":0, "YmaxComH":140,
     # ComPIDVarI
-    "XminComI":30, "XmaxComI":50, "YminComI":0, "YmaxComI":140
+    "XminComI":20, "XmaxComI":50, "YminComI":0, "YmaxComI":140
 }
 
 # PID MICE configuration, 'step_4' for Step IV running, 'commissioning' for field free commissioning data

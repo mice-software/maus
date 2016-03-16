@@ -228,9 +228,9 @@ namespace MAUS {
                       "ReduceCppGlobalPID::process");
     }
 
-    if (data_cpp->GetSpill()->GetReconEvents() == NULL)
+    /*if (data_cpp->GetSpill()->GetReconEvents() == NULL)
         throw Exception(Exception::recoverable, "ReconEvents were NULL",
-                        "ReduceCppGlobalPID::_process");
+	"ReduceCppGlobalPID::_process");*/
 
     _spill = data_cpp->GetSpill();
 
@@ -243,11 +243,13 @@ namespace MAUS {
 	      _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
 	    std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
 	      global_event->get_tracks();
+	    bool through_track_check = false;
 	    for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
 		 ++track_i) {
 	      MAUS::DataStructure::Global::Track* track =
 		GlobalTrackArray->at(track_i);
 	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching-Through") continue;
+	      through_track_check = true;
 	      if (_pid_config == "step_4") {
 		// get constituent tracks
 		std::vector<const MAUS::DataStructure::Global::Track*> const_tracks =
@@ -352,6 +354,75 @@ namespace MAUS {
 		} // check straight through track mc pid at DS tracker ref plane
 	      } // change behaviour based on straight or helical tracks
 	    } // loop over global tracks
+	    if (through_track_check == false) {
+	      for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
+		   ++track_i) {
+		MAUS::DataStructure::Global::Track* track =
+		  GlobalTrackArray->at(track_i);
+		if (track->get_mapper_name() == "MapCppGlobalTrackMatching-US") {
+		  if ((_pid_beamline_polarity == "positive" &&
+		       _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
+		      (_pid_beamline_polarity == "negative" &&
+		       _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 13)) {
+		    for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
+			 ++pid_var_count) {
+		      _mu_pid_vars[pid_var_count]->Fill_Hist(track);
+		    } // loop over US mu_pid_vars
+		  } else if ((_pid_beamline_polarity == "positive" &&
+			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == -11) ||
+			     (_pid_beamline_polarity == "negative" &&
+			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == 11)) {
+		    for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
+			 ++pid_var_count) {
+		      _e_pid_vars[pid_var_count]->Fill_Hist(track);
+		    } // loop over US e_pid_vars
+		  } else if ((_pid_beamline_polarity == "positive" &&
+			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == 211) ||
+			     (_pid_beamline_polarity == "negative" &&
+			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == -211)) {
+		    for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
+			 ++pid_var_count) {
+		      _pi_pid_vars[pid_var_count]->Fill_Hist(track);
+		    }
+		  }
+		} // US tracks
+		if (track->get_mapper_name() == "MapCppGlobalTrackMatching-DS") {
+		  if ((_pid_beamline_polarity == "positive" &&
+		       _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
+		      (_pid_beamline_polarity == "negative" &&
+		       _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 13)) {
+		    for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
+			 ++pid_var_count) {
+		      _mu_pid_vars[pid_var_count]->Fill_Hist(track);
+		    } // loop over US mu_pid_vars
+		  } else if ((_pid_beamline_polarity == "positive" &&
+			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == -11) ||
+			     (_pid_beamline_polarity == "negative" &&
+			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == 11)) {
+		    for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
+			 ++pid_var_count) {
+		      _e_pid_vars[pid_var_count]->Fill_Hist(track);
+		    } // loop over US e_pid_vars
+		  } else if ((_pid_beamline_polarity == "positive" &&
+			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == 211) ||
+			     (_pid_beamline_polarity == "negative" &&
+			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
+			      == -211)) {
+		    for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
+			 ++pid_var_count) {
+		      _pi_pid_vars[pid_var_count]->Fill_Hist(track);
+		    }
+		  }
+		} // DS tracks
+	      }
+	    } // temporary measure for when through tracks haven't been formed
 	  } // get global event
 	} // get recon event
       } // get recon event array

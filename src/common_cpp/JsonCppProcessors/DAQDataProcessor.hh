@@ -18,6 +18,7 @@
 #define _SRC_COMMON_CPP_JSONCPPPROCESSORS_DAQDATAPROCESSOR_
 
 #include "src/common_cpp/DataStructure/DAQData.hh"
+#include "src/common_cpp/JsonCppProcessors/PrimitivesProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/CkovDaqProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/KLDaqProcessor.hh"
@@ -58,6 +59,7 @@ class DAQDataProcessor : public ObjectProcessor<DAQData> {
     DAQDataProcessor();
 
   private:
+    UIntProcessor _uint_proc;
     V830Processor _V830_proc;
     PointerArrayProcessor<TriggerRequest> _trigger_request_proc;
     PointerArrayProcessor<TOFDaq> _tof1_proc;

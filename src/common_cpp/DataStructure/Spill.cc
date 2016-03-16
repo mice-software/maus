@@ -22,14 +22,14 @@ int Spill::reference_count = 0;
 
 Spill::Spill()
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL), _emr(NULL),
-          _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
-          _test(NULL) {
+          _spill_number(0), _run_number(0), _event_id(0), _time_stamp(0),
+          _daq_event_type(), _errors(), _test(NULL) {
 }
 
 Spill::Spill(const Spill& md)
         : _daq(NULL), _scalars(NULL), _mc(NULL), _recon(NULL), _emr(NULL),
-          _spill_number(0), _run_number(0), _daq_event_type(), _errors(),
-          _test(NULL) {
+          _spill_number(0), _run_number(0), _event_id(0), _time_stamp(0),
+          _daq_event_type(), _errors(), _test(NULL) {
     *this = md;
 }
 
@@ -96,6 +96,8 @@ Spill& Spill::operator=(const Spill& md) {
     _daq_event_type = md._daq_event_type;
     _spill_number = md._spill_number;
     _run_number = md._run_number;
+    _event_id = md._event_id;
+    _time_stamp = md._time_stamp;
     _errors = md._errors;
     if (md._test == NULL) {
         _test = NULL;
@@ -205,6 +207,22 @@ void Spill::SetRunNumber(int spill) {
 
 int Spill::GetRunNumber() const {
   return _run_number;
+}
+
+void Spill::SetEventId(int eid) {
+  _event_id = eid;
+}
+
+int Spill::GetEventId() const {
+  return _event_id;
+}
+
+void Spill::SetTimeStamp(int ts) {
+  _time_stamp = ts;
+}
+
+int Spill::GetTimeStamp() const {
+  return _time_stamp;
 }
 
 void Spill::SetDaqEventType(std::string type) {
