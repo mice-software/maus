@@ -42,7 +42,8 @@ def print_exception() :
   filename = f.f_code.co_filename
   linecache.checkcache(filename)
   line = linecache.getline(filename, lineno, f.f_globals)
-  print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+  print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, \
+                                                 lineno, line.strip(), exc_obj)
 
 
 

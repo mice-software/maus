@@ -76,7 +76,6 @@ class AnalysisHit() :
 #      else :
 #        self.__reference = reference
       if math.isnan(self.__x) :
-        print self.__x, self.__y, self.__z, self.__px, self.__py, self.__pz, self.__time,  self.__mass, self.__p_value, self.__pid
         raise ValueError("NaN Values Received from Scifi Track Point")
 
     elif scifi_track_point is None and virtual_track_point is not None :

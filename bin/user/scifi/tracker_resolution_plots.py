@@ -36,7 +36,7 @@
 """
 
 # pylint: disable = W0311, E1101, W0613, W0621, C0103, C0111, W0702, W0611
-# pylint: disable = R0914, R0912, R0915
+# pylint: disable = R0914, R0912, R0915, W0603, W0612, C0302
 
 # Import MAUS Framework (Required!)
 import MAUS
@@ -107,15 +107,15 @@ def init_plots_data() :
   global DOWN_COV_MC 
   global UP_COV_RECON
   global DOWN_COV_RECON
-  global PZ_BN
+  global PZ_BIN
   global PT_BIN
 
   PZ_BIN = int(((PZ_MAX-PZ_MIN) / PZ_BIN_WIDTH) + 0.5)
   PT_BIN = int(((PT_MAX-PT_MIN) / PT_BIN_WIDTH) + 0.5)
-  UP_COV_MC = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
-  DOWN_COV_MC = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
-  UP_COV_RECON = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
-  DOWN_COV_RECON = [ covariances.CovarianceMatrix() for i in range(PZ_BIN) ]
+  UP_COV_MC = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
+  DOWN_COV_MC = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
+  UP_COV_RECON = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
+  DOWN_COV_RECON = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
 
   plot_dict = {}
 
