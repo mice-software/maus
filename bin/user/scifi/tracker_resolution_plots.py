@@ -469,10 +469,18 @@ def get_expected_tracks(mc_event, virtual_plane_dict) :
     if station_id in downstream_planes :
       downstream_hits += 1
 
-  if upstream_hits > 10 :
-    upstream_tracks += 1
-  if downstream_hits > 10 :
-    downstream_tracks += 1
+  if TRACK_ALGORITHM == 1 :
+    if upstream_hits > 12 :
+      upstream_tracks += 1
+    if downstream_hits > 12 :
+      downstream_tracks += 1
+  elif TRACK_ALGORITHM == 0 :
+    if upstream_hits > 9 :
+      upstream_tracks += 1
+    if downstream_hits > 9 :
+      downstream_tracks += 1
+  else:
+    raise ValueError("Unknown track algorithm found!")
 
   return upstream_tracks, downstream_tracks
 
