@@ -1,6 +1,7 @@
 import json
 import unittest
 from xboa.hit import Hit
+import xboa.common
 import ROOT 
 import libMausCpp
 import maus_cpp.globals
@@ -32,7 +33,8 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
 
     def transport_straight_track(self, z_pos, seed):
         track = seed.deepcopy()
-        track["t"] = seed["t'"]*(z_pos-seed["z"]) + seed["x"]
+        c_light = xboa.common.constants['c_light']
+        track["t"] = -seed["t'"]*(z_pos-seed["z"])/c_light + seed["x"]
         track["x"] = seed["x'"]*(z_pos-seed["z"]) + seed["x"]
         track["y"] = seed["y'"]*(z_pos-seed["z"]) + seed["y"]
         track["z"] = z_pos
@@ -65,17 +67,27 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
     def make_tof_space_points(self, seed, tof_event):
         space_point_list = []
         for station, z in enumerate([4000., 12000., 22000.]):
-            hit = self.transport_straight_track(4000., seed)
+            hit = self.transport_straight_track(z, seed)
             space_point = ROOT.MAUS.TOFSpacePoint()
             space_point.SetStation(station)
             space_point.SetGlobalPosX(hit["x"])
             space_point.SetGlobalPosY(hit["y"])
             space_point.SetGlobalPosZ(hit["z"])
+            space_point.SetTime(hit["t"])
             space_point_list.append(space_point)
         tof_space_point = ROOT.MAUS.TOFEventSpacePoint()
-        tof_space_point.GetTOF0SpacePointArrayPtr().push_back(space_point_list[0])
-        tof_space_point.GetTOF1SpacePointArrayPtr().push_back(space_point_list[1])
-        tof_space_point.GetTOF2SpacePointArrayPtr().push_back(space_point_list[2])
+        sp_array = tof_space_point.GetTOF0SpacePointArray()
+        sp_array.push_back(space_point_list[0])
+        tof_space_point.SetTOF0SpacePointArray(sp_array)
+
+        sp_array = tof_space_point.GetTOF1SpacePointArray()
+        sp_array.push_back(space_point_list[1])
+        tof_space_point.SetTOF1SpacePointArray(sp_array)
+
+        sp_array = tof_space_point.GetTOF2SpacePointArray()
+        sp_array.push_back(space_point_list[2])
+        tof_space_point.SetTOF2SpacePointArray(sp_array)
+
         tof_event.SetTOFEventSpacePoint(tof_space_point)
 
     def test_straight_track_fit(self):
@@ -83,7 +95,7 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
         spill = ROOT.MAUS.Spill()
         spill.SetDaqEventType("physics_event")
         recon_events = ROOT.MAUS.ReconEventPArray()
-        for i in range(-2, 3):
+        for i in range(-2, -1):
             a_recon_event = ROOT.MAUS.ReconEvent()
             scifi_event = ROOT.MAUS.SciFiEvent()
             tof_event = ROOT.MAUS.TOFEvent()
@@ -101,13 +113,30 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
 
         fit = MapCppGlobalTrackFit()
         fit.birth(self.config_str)
-        fit.process(data)
-        print "Found ", data.GetSpill().GetReconEvents().size(), "recon events"
+        data_out = fit.process(data)
+        print "Found ", data_out.GetSpill().GetReconEvents().size(), "recon events"
 
-        for i, event in enumerate(data.GetSpill().GetReconEvents()):
+        for i, event in enumerate(data_out.GetSpill().GetReconEvents()):
             print event.GetGlobalEvent()
-            print " ", "recon event", i, "found", event.GetGlobalEvent().get_tracks().size(), "global events"
+            print " ", "recon event", i, "found", event.GetGlobalEvent().get_tracks().size(), "global tracks"
+            tof_ev_sp = event.GetTOFEvent().GetTOFEventSpacePoint()
+            tof0 = tof_ev_sp.GetTOF0SpacePointArray()[0]
+            tof1 = tof_ev_sp.GetTOF1SpacePointArray()[0]
+            tof2 = tof_ev_sp.GetTOF2SpacePointArray()[0]
+            print "    tof space points"
+            for j, tof_sp in enumerate([tof0, tof1, tof2]):
+                print "     ", j, tof_sp.GetTime(), tof_sp.GetGlobalPosX(), tof_sp.GetGlobalPosY(), tof_sp.GetGlobalPosZ()
 
+            for j, track in enumerate(event.GetGlobalEvent().get_tracks()):
+                print "   ", "global track", j, "found", track.get_mapper_name(), track.get_pid(), "points", track.get_track_points().GetEntries()
+                for k, track_point in enumerate(track.get_track_points()):
+                    print "     ", "global track point", k, "found position",
+                    for l in range(4):
+                        print track_point.get_position()[l],
+                    print "found momentum",
+                    for l in range(4):
+                        print track_point.get_momentum()[l],
+                    print
                 
     config_str = ""
     mu_mass = 105.658        

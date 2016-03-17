@@ -440,7 +440,7 @@ TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
     GlobalErrorTracking propagator;
     propagator.SetStepSize(10.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    propagator.SetEnergyLossModel(GlobalErrorTracking::bethebloch_forwards);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::bethe_bloch_forwards);
     propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
     propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
     std::vector<double> x_in = drift_ellipse(200., 105.658);
@@ -455,7 +455,7 @@ TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
     x_out = x_in;
     Squeak::mout(verbose) << "BB Backwards" << std::endl;
     print_x(&x_out[0]);
-    propagator.SetEnergyLossModel(GlobalErrorTracking::bethebloch_backwards);
+    propagator.SetEnergyLossModel(GlobalErrorTracking::bethe_bloch_backwards);
     propagator.Propagate(&x_out[0], 200.);
     print_x(&x_out[0]); 
 

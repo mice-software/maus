@@ -125,12 +125,14 @@ static PyObject* propagate_errors
                              const_cast<char*>("ellipse"),
                              const_cast<char*>("target_z"),
                              const_cast<char*>("step_size"),
+                             const_cast<char*>("eloss"),
                              NULL};
     PyObject* py_centroid = NULL;
     PyObject* py_ellipse = NULL;
     double target_z = 0;
     double step_size = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOdd|", kwlist, &py_centroid, &py_ellipse, &target_z, &step_size)) {
+    char* eloss = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOdd|s", kwlist, &py_centroid, &py_ellipse, &target_z, &step_size)) {
         // error message is set in PyArg_Parse...
         return NULL;
     }
@@ -145,9 +147,23 @@ static PyObject* propagate_errors
         GlobalErrorTracking propagator;
         propagator.SetStepSize(step_size);
         propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
-        propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
+        GlobalErrorTracking::ELossModel eloss_model = GlobalErrorTracking::no_eloss;
+        if (eloss != NULL) {
+            if (strcmp(eloss, "no_eloss") == 0) {
+            } else if (strcmp(eloss, "bethe_bloch_forwards") == 0) {
+                eloss_model = GlobalErrorTracking::bethe_bloch_forwards;
+            } else if (strcmp(eloss, "bethe_bloch_backwards") == 0) {
+                eloss_model = GlobalErrorTracking::bethe_bloch_backwards;
+            } else {
+                PyErr_SetString(PyExc_RuntimeError, "Did not recognise energy loss model");
+                return NULL;
+            }
+            std::cerr << "Setting eloss model " << eloss << std::endl;
+        }
+        propagator.SetEnergyLossModel(eloss_model);
         propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
         propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
+        std::cerr << "Getting Eloss model " << propagator.GetEnergyLossModel() << std::endl;
         propagator.SetField(Globals::GetInstance()->GetMCFieldConstructor());
         propagator.Propagate(&x_in[0], target_z);
     } catch (MAUS::Exception exc) {

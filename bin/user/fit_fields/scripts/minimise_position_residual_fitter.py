@@ -304,9 +304,9 @@ class MinimisePositionResidualFitter(object):
             if sp["z"] == fitter.best_guess["z"]:
                 pass
             elif sp["z"] > fitter.best_guess["z"]:
-                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], 10.)
+                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], 10., fitter.config.eloss_model)
             elif sp["z"] < fitter.best_guess["z"]:
-                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], -10.)
+                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], -10., fitter.config.eloss_model)
             fitter.fitted_track_points[sp_index] = dict(zip(keys, values))
             fitter.fitted_track_points[sp_index]["detector"] = sp["detector"]
             chi2 = 0.
