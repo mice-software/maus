@@ -20,10 +20,10 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 #include "TMath.h"
 #include "TMatrixD.h"
-
 
 namespace MAUS {
 namespace Kalman {
@@ -198,6 +198,16 @@ namespace Kalman {
 
       StateArray _track_vector;
   };
+
+  /** Streamer operator for TMatrixD */
+  std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix);
+
+  /** Streamer operator for State */
+  std::ostream& operator<<(std::ostream& out, const State& state);
+
+  /** Streamer operator for Track */
+  std::ostream& operator<<(std::ostream& out, const Track& state);
+
 } // namespace Kalman
 } // namespace MAUS
 

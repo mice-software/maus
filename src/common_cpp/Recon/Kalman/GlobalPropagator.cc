@@ -13,6 +13,9 @@ GlobalPropagator::~GlobalPropagator() {
 
 void GlobalPropagator::Propagate(const State& start_state, State& end_state) {
     double x[29];
+    std::cerr << "GlobalPropagator::Propagate _mass:" << _mass << std::endl;
+    std::cerr << "GlobalPropagator::Propagate start:\n" << start_state << std::endl;
+
     TMatrixD vec = start_state.GetVector();
     TMatrixD cov = start_state.GetCovariance();
     for (size_t i = 0; i < 6; ++i) {
@@ -52,6 +55,7 @@ void GlobalPropagator::Propagate(const State& start_state, State& end_state) {
     }
     end_state.SetVector(vec);
     end_state.SetCovariance(cov);
+    std::cerr << "GlobalPropagator::Propagate end:\n" << end_state << std::endl;
 }
 
 TMatrixD GlobalPropagator::CalculatePropagator(const State& start_state, const State& end_state) {

@@ -1,6 +1,7 @@
 #include <math.h>
 
 #include <sstream>
+#include <iomanip>
 
 #include "gsl/gsl_odeiv.h"
 #include "gsl/gsl_errno.h"
@@ -25,8 +26,10 @@ GlobalErrorTracking::GlobalErrorTracking() : _field(Globals::GetMCFieldConstruct
 }
 
 void GlobalErrorTracking::Propagate(double x[29], double target_z) {
+  std::cerr << "GlobalErrorTracking::Propagate material model " << _tz_for_propagate->_eloss_model << std::endl;
+
   double mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
-  if (mass_squared < -1e-6) {
+  if (mass_squared < -1e-6 || mass_squared != mass_squared) {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Mass undefined in stepping function",
           "GlobalErrorTracking::Propagate"));
@@ -38,18 +41,13 @@ void GlobalErrorTracking::Propagate(double x[29], double target_z) {
   gsl_odeiv_system    system  = {GlobalErrorTracking::EquationsOfMotion, NULL, 29, NULL};
 
   double z = x[3];
-  double h = _step_size;
+  double h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
+  if (z > target_z)
+      h *= -1;  // stepping backwards...
   int    nsteps = 0;
   _tz_for_propagate = this;
-  /*
-  std::cerr << "BEFORE" << std::endl;
-  for (size_t i = 0; i < 8; ++i)
-      std::cerr << x[i] << " ";
-  std::cerr << std::endl;
-  for (size_t i = 8; i < 29; ++i)
-      std::cerr << x[i] << " ";
-  std::cerr << std::endl;
-  */
+  //std::cerr << "GlobalErrorTracking::Propagate BEFORE" << std::endl;
+  //print(std::cerr, x);
   while(fabs(z-target_z) > 1e-6) {
     // std::cerr << "Stepping " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
     nsteps++;
@@ -76,15 +74,8 @@ void GlobalErrorTracking::Propagate(double x[29], double target_z) {
         break;
     }
   }
-  /*
-  std::cerr << "AFTER" << std::endl;
-  for (size_t i = 0; i < 8; ++i)
-      std::cerr << x[i] << " ";
-  std::cerr << std::endl;
-  for (size_t i = 8; i < 29; ++i)
-      std::cerr << x[i] << " ";
-  std::cerr << std::endl;
-  */
+  //std::cerr << "GlobalErrorTracking::Propagate AFTER" << std::endl;
+  //print(std::cerr, x);
   gsl_odeiv_evolve_free (evolve);
   gsl_odeiv_control_free(control);
   gsl_odeiv_step_free   (step);
@@ -92,7 +83,7 @@ void GlobalErrorTracking::Propagate(double x[29], double target_z) {
 
 void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
   double mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
-  if (mass_squared < -1e-6) {
+  if (mass_squared < -1e-6 || mass_squared != mass_squared) {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Mass undefined in stepping function",
           "GlobalErrorTracking::Propagate"));
@@ -104,7 +95,9 @@ void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z)
   gsl_odeiv_system    system  = {GlobalErrorTracking::EquationsOfMotion, NULL, 44, NULL};
 
   double z = x[3];
-  double h = _step_size;
+  double h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
+  if (z > target_z)
+      h *= -1;  // stepping backwards...
   int    nsteps = 0;
   _tz_for_propagate = this;
   while(fabs(z-target_z) > 1e-6) {
@@ -152,8 +145,19 @@ int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double 
   if (em_success != GSL_SUCCESS) {
       return em_success;
   }
-  // Commented as it was giving segv...
-  int material_success = GSL_SUCCESS; //MaterialEquationOfMotion(z, x, dxdz, params);
+
+  // If no material processes are active, don't run MaterialEquationsOfMotion
+  // at all
+  std::cerr << "GlobalErrorTracking::EquationsOFMotion checking material model" << std::endl;
+  if (_tz_for_propagate->_eloss_model == no_eloss &&
+      _tz_for_propagate->_mcs_model == no_mcs &&
+      _tz_for_propagate->_estrag_model == no_estrag) {
+      std::cerr << "GlobalErrorTracking::EquationsOFMotion material models disabled" << std::endl;
+      return GSL_SUCCESS;
+  }
+  std::cerr << "GlobalErrorTracking::EquationsOFMotion material models enabled; proceeding with EqM" << std::endl;
+
+  int material_success = MaterialEquationOfMotion(z, x, dxdz, params);
   if (material_success != GSL_SUCCESS) {
       return material_success;
   }
@@ -279,6 +283,7 @@ int GlobalErrorTracking::MatrixEquationOfMotion(double z, const double x[44], do
 int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], double dxdz[29],
                                    void* params) {
     // Must be called after EMEquationOfMotion
+    std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion" << std::endl;
     MaterialModel& material = _tz_for_propagate->_mat_mod;
     G4ThreeVector pos(x[1], x[2], x[3]);
     G4ThreeVector mom(x[5], x[6], x[7]);
@@ -287,8 +292,8 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     G4VPhysicalVolume* phys_vol = navigator->LocateGlobalPointAndSetup(pos, &mom);
     G4LogicalVolume* log_vol = phys_vol->GetLogicalVolume();
     material.SetMaterial(log_vol->GetMaterial());
-    // std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
-    //          << " z: " << x[3] << " E: " << x[4] << " pz: " << x[7] << std::endl;
+    std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
+              << " z: " << x[3] << " E: " << x[4] << " pz: " << x[7] << std::endl;
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
     double mass = sqrt(energy*energy-p*p);
@@ -297,10 +302,10 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     double d2EdzdE;
     double dtheta2dz;
     double destragdz;
-    if (_tz_for_propagate->_eloss_model == bethebloch_forwards) {
+    if (_tz_for_propagate->_eloss_model == bethe_bloch_forwards) {
         dEdz = material.dEdx(energy, mass, charge); // should be negative
         d2EdzdE =  material.d2EdxdE(energy, mass, charge);
-    } else if (_tz_for_propagate->_eloss_model == bethebloch_backwards) {
+    } else if (_tz_for_propagate->_eloss_model == bethe_bloch_backwards) {
         dEdz = -material.dEdx(energy, mass, charge); // should be positive
         d2EdzdE = -material.d2EdxdE(energy, mass, charge);
     } else {
@@ -452,6 +457,23 @@ void GlobalErrorTracking::SetField(BTField* field) {
     } else {
         _field = field;
     }
+}
+
+ostream& GlobalErrorTracking::print(std::ostream& out, double* x) {
+    out << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
+        << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
+    size_t index = 8;
+    for (size_t i = 0; i < 6; ++i) {
+        for (size_t j = 0; j < i; ++j) {
+            out << "       ";
+        }
+        for (size_t j = i; j < 6; ++j) {
+            out << std::setprecision(6) << std::setw(10) << x[i];
+            ++index;
+        }
+        out << std::endl;
+    }
+    return out;
 }
 
 }

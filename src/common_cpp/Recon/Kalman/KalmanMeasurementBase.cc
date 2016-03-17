@@ -31,19 +31,57 @@ namespace Kalman {
   }
 
   State Measurement_base::Measure(const State& state) {
-    _base_measurement_matrix = this->CalculateMeasurementMatrix(state);
-    _base_measurement_noise = this->CalculateMeasurementNoise(state);
+    std::cerr << "Measurement_base::Measure A" << std::endl;
+    std::cerr << "Base\n" << std::endl;
+    for (int i = 0; i < _base_measurement_matrix.GetNrows(); ++i) {
+        for (int j = 0; j < _base_measurement_matrix.GetNcols(); ++j) {
+            std::cerr << _base_measurement_matrix[i][j] << " ";
+        }
+        std::cerr << std::endl;
+    }
+    std::cerr << "Calc\n" << std::endl;
+    for (int i = 0; i < this->CalculateMeasurementMatrix(state).GetNrows(); ++i) {
+        for (int j = 0; j < this->CalculateMeasurementMatrix(state).GetNcols(); ++j) {
+            std::cerr << this->CalculateMeasurementMatrix(state)[i][j] << " ";
+        }
+        std::cerr << std::endl;
+    }
+    TMatrixD measurement = this->CalculateMeasurementMatrix(state);
+    if (measurement.GetNcols() == 0) {
+        State measured_state(0, state.GetPosition());
+        measured_state.SetId(state.GetId());
+        return measured_state;
+    }
+    TMatrixD noise = this->CalculateMeasurementNoise(state);
+    TMatrixD measurement_transpose(measurement.GetNcols(), measurement.GetNrows());
+    measurement_transpose.Transpose(measurement);
 
-    _base_measurement_matrix_transpose.Transpose(_base_measurement_matrix);
+    _base_measurement_matrix.ResizeTo(measurement.GetNrows(), measurement.GetNcols());
+    _base_measurement_noise.ResizeTo(noise.GetNrows(), noise.GetNcols());
+    _base_measurement_matrix_transpose.ResizeTo(measurement_transpose.GetNrows(), measurement_transpose.GetNcols());
+
+    _base_measurement_matrix = measurement;
+    _base_measurement_noise = noise;
+    _base_measurement_matrix_transpose = measurement_transpose;
+
+    _measurement_dimension = _base_measurement_noise.GetNrows();
+
+
 
     TMatrixD new_vec(_measurement_dimension, 1);
+    std::cerr << "Measurement_base::Measure E" << std::endl;
     TMatrixD new_cov(_measurement_dimension, _measurement_dimension);
+    std::cerr << "Measurement_base::Measure F" << std::endl;
 
     new_vec = _base_measurement_matrix * state.GetVector();
+    std::cerr << "Measurement_base::Measure G" << std::endl;
     new_cov = (_base_measurement_matrix*state.GetCovariance()*_base_measurement_matrix_transpose);
+    std::cerr << "Measurement_base::Measure H" << std::endl;
 
     State measured_state(new_vec, new_cov, state.GetPosition());
+    std::cerr << "Measurement_base::Measure I" << std::endl;
     measured_state.SetId(state.GetId());
+    std::cerr << "Measurement_base::Measure J" << std::endl;
 
     return measured_state;
   }

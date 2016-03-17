@@ -23,6 +23,12 @@ class GlobalPropagator: public Propagator_base {
 
     void SetField(BTField* field) {_tracking.SetField(field);}
 
+    void SetMass(double mass) {_mass = mass;}
+    double GetMass() const {return _mass;}
+
+    /** GlobalPropagator owns memory */
+    GlobalErrorTracking* GetTracking() {return &_tracking;}
+
   private:
     GlobalPropagator& operator=(const GlobalPropagator& rhs);
     GlobalPropagator(const GlobalPropagator& rhs);

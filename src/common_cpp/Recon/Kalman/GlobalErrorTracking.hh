@@ -15,7 +15,7 @@ class MaterialModel;
 
 class GlobalErrorTracking {
 public:
-    enum ELossModel {bethebloch_forwards, bethebloch_backwards, no_eloss};
+    enum ELossModel {bethe_bloch_forwards, bethe_bloch_backwards, no_eloss};
     enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
     enum EStragModel {estrag_forwards, estrag_backwards, no_estrag};
 
@@ -54,6 +54,7 @@ public:
     void SetEStragModel(EStragModel estrag_model) {_estrag_model = estrag_model;}
     bool GetEStragModel() const {return _estrag_model;}
 
+    static ostream& print(std::ostream& out, double* x);
 
 private:
     GlobalErrorTracking(const GlobalErrorTracking& tracking); // disable copy constructor
@@ -74,8 +75,8 @@ private:
     double _step_size = 1.;
     double _absolute_error = 1e-4;
     double _relative_error = 1e-4;
-    ELossModel _eloss_model = bethebloch_forwards;
-    MCSModel _mcs_model = moliere_forwards;
+    ELossModel _eloss_model = no_eloss;
+    MCSModel _mcs_model = no_mcs;
     EStragModel _estrag_model = no_estrag;
     int  _max_n_steps = 100000;
     static constexpr double c_l = 299.792458; // mm*ns^{-1}

@@ -140,24 +140,35 @@ namespace Kalman {
 
 
   void TrackFit::Filter(bool forward) {
+    std::cerr << "TrackFit::Filter A" << std::endl;
     _predicted.Reset(_data);
+    std::cerr << "TrackFit::Filter B" << std::endl;
     _filtered.Reset(_data);
 
+    std::cerr << "TrackFit::Filter C" << std::endl;
     int increment = (forward ? 1 : -1);
     int track_start = (forward ? 1 : _data.GetLength() - 2);
     int track_end = (forward ? _data.GetLength() : -1);
+    std::cerr << "TrackFit::Filter D" << std::endl;
 
     _predicted[track_start-increment].copy(_seed);
+    std::cerr << "TrackFit::Filter E" << std::endl;
+    std::cerr << "TrackFit::Filter copy seed" << _seed << "predicted" << _predicted[track_start-increment] << std::endl;
+
     this->_filter(_data[track_start-increment],
                                         _predicted[track_start-increment],
                                         _filtered[track_start-increment]);
 
+    std::cerr << "TrackFit::Filter F" << std::endl;
     for (int i = track_start; i != track_end; i += increment) {
       this->_propagate(_filtered[i-increment], _predicted[i]);
 
+    std::cerr << "TrackFit::Filter G" << std::endl;
       if (_data[i].HasValue()) {
+        std::cerr << "TrackFit::Filter H" << std::endl;
         this->_filter(_data[i], _predicted[i], _filtered[i]);
       } else {
+        std::cerr << "TrackFit::Filter I" << std::endl;
         _filtered[i] = _predicted[i];
       }
     }
@@ -204,10 +215,10 @@ namespace Kalman {
 
   void TrackFit::SetData(Track data_track) {
     if (data_track.GetDimension() != _measurement->GetMeasurementDimension()) {
-      std::cerr << "data " << data_track.GetDimension() << " meas " << _measurement->GetMeasurementDimension() << std::endl;
-      throw Exception(Exception::nonRecoverable,
-          "Data track dimension does not match the measurement dimension",
-          "Kalman::TrackFit::SetData()");
+      //std::cerr << "data " << data_track.GetDimension() << " meas " << _measurement->GetMeasurementDimension() << std::endl;
+      //throw Exception(Exception::nonRecoverable,
+      //    "Data track dimension does not match the measurement dimension",
+      //    "Kalman::TrackFit::SetData()");
     }
     _data = data_track;
     _predicted = Track(_dimension);
@@ -222,26 +233,57 @@ namespace Kalman {
   }
 
   void TrackFit::_filter(const State& data, const State& predicted, State& filtered) const {
+    std::cerr << "TrackFit::_filter A1" << std::endl;
+    // Define measured vector and covariance M_v, M_c
+    // Predicted vector P_v and covariance P_v, P_c
+    // and "measurement matrix" H which I (Rogers) think is the
+    // transformation to the local coordinates of the measurement. This sets
+    // M_v = H*P_v
+    // M_c = H*P_c*H^T
+    // where T is matrix transpose; i.e. transforms into measurement coordinate
+    // system
     State measured = _measurement->Measure(predicted);
+    if (_measurement->GetMeasurementMatrix().GetNrows() == 0) {
+        std::cerr << "TrackFit::_filter A1A" << std::endl;
+        filtered.SetVector(predicted.GetVector());
+        filtered.SetCovariance(predicted.GetCovariance());
+        std::cerr << "Virtual detector - fitlered\n" << filtered << "Virtual detector - predicted\n" << predicted << std::endl;
+        return;
+    }
+    std::cerr << "TrackFit::_filter A2" << std::endl;
+    // Define data vector and covariance D_v and D_c, 
+    // Pull vector and covariance L_v and L_c
+    // L_v = D_v - M_v
+    // L_c = D_c + M_c
     State pull = CalculateResidual(data, measured);
+    std::cerr << "TrackFit::_filter pull " << pull << std::endl;
+    // Query - what is the difference between the measurement "noise" V and the
+    // data covariance D_c?
     TMatrixD V = _measurement->GetMeasurementNoise();
     TMatrixD H = _measurement->GetMeasurementMatrix();
+    std::cerr << "TrackFit::_filter C" << std::endl;
+
     TMatrixD HT(TMatrixD::kTransposed, H);
 
     TMatrixD cov_inv(TMatrixD::kInverted, pull.GetCovariance());
+    std::cerr << "TrackFit::_filter D" << std::endl;
 
     TMatrixD K = predicted.GetCovariance() * HT * cov_inv;
     TMatrixD KT(TMatrixD::kTransposed, K);
+    std::cerr << "TrackFit::_filter K matrix\n" << K << std::endl;
 
     TMatrixD gain = _identity_matrix - K*H;
     TMatrixD gainT(TMatrixD::kTransposed, gain);
     TMatrixD gain_constant = K * V * KT;
+    std::cerr << "TrackFit::_filter F" << std::endl;
 
     TMatrixD temp_vec = predicted.GetVector() + K * pull.GetVector();
     TMatrixD temp_cov = gain * predicted.GetCovariance() * gainT + gain_constant;
 
+    std::cerr << "TrackFit::_filter G" << std::endl;
     filtered.SetVector(temp_vec);
     filtered.SetCovariance(temp_cov);
+    std::cerr << "TrackFit::_filter H" << std::endl;
   }
 
   void TrackFit::_smooth(State& first, State& second) const {

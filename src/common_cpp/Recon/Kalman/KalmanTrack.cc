@@ -123,9 +123,9 @@ namespace Kalman {
 
   void Track::SetState(unsigned int index, State state) {
     if (state._dimension != this->_dimension) {
-      throw Exception(Exception::nonRecoverable,
-          "State has wrong dimensions",
-          "Kalman::Track::SetState()");
+     // throw Exception(Exception::nonRecoverable,
+     //     "State has wrong dimensions",
+     //     "Kalman::Track::SetState()");
     }
     if (index >= _track_vector.size()) {
       throw Exception(Exception::recoverable,
@@ -137,9 +137,9 @@ namespace Kalman {
 
   void Track::Append(State state) {
     if (state._dimension != this->_dimension) {
-      throw Exception(Exception::nonRecoverable,
-          "State has wrong dimensions",
-          "Kalman::Track::Append()");
+     // throw Exception(Exception::nonRecoverable,
+     //     "State has wrong dimensions",
+     //     "Kalman::Track::Append()");
     }
     _track_vector.push_back(state);
   }
@@ -163,6 +163,34 @@ namespace Kalman {
       _track_vector.push_back(new_state);
     }
   }
+
+  std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix) {
+      for (int i = 0; i < matrix.GetNrows(); ++i) {
+          for (int j = 0; j < matrix.GetNcols(); ++j) {
+              out << matrix[i][j] << " ";
+          }
+          out << "\n";
+      }
+      return out;
+  }
+
+  std::ostream& operator<<(std::ostream& out, const State& state) {
+      out << "State Id: " << state.GetId() << " position: " << state.GetPosition() << "\n";
+      TMatrixD vec_transposed(TMatrixD::kTransposed, state.GetVector());
+      out << "Vector: " << vec_transposed;
+      out << "Covariance:\n" << state.GetCovariance();
+      return out;
+  }
+
+
+  std::ostream& operator<<(std::ostream& out, const Track& track) {
+      out << "Track of length " << track.GetLength() << "\n";
+      for (size_t i = 0; i < track.GetLength(); ++i) {
+          out << track[i];
+      }
+      return out;
+  }
+
 }
 } // namespace MAUS
 
