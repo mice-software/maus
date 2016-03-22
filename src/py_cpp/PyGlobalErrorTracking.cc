@@ -132,7 +132,7 @@ static PyObject* propagate_errors
     double target_z = 0;
     double step_size = 0;
     char* eloss = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOdd|s", kwlist, &py_centroid, &py_ellipse, &target_z, &step_size)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOdd|s", kwlist, &py_centroid, &py_ellipse, &target_z, &step_size, &eloss)) {
         // error message is set in PyArg_Parse...
         return NULL;
     }

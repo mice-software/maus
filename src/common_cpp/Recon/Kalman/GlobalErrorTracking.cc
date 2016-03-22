@@ -12,6 +12,8 @@
 #include "Geant4/G4LogicalVolume.hh"
 #include "Geant4/G4Material.hh"
 
+#include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Simulation/GeometryNavigator.hh"
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Recon/Kalman/GlobalErrorTracking.hh"
@@ -26,7 +28,7 @@ GlobalErrorTracking::GlobalErrorTracking() : _field(Globals::GetMCFieldConstruct
 }
 
 void GlobalErrorTracking::Propagate(double x[29], double target_z) {
-  std::cerr << "GlobalErrorTracking::Propagate material model " << _tz_for_propagate->_eloss_model << std::endl;
+  std::cerr << "GlobalErrorTracking::Propagate material model " << _eloss_model << std::endl;
 
   double mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
   if (mass_squared < -1e-6 || mass_squared != mass_squared) {
@@ -286,14 +288,32 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion" << std::endl;
     MaterialModel& material = _tz_for_propagate->_mat_mod;
     G4ThreeVector pos(x[1], x[2], x[3]);
-    G4ThreeVector mom(x[5], x[6], x[7]);
-    G4Navigator* navigator = G4TransportationManager::
-                          GetTransportationManager()->GetNavigatorForTracking();
-    G4VPhysicalVolume* phys_vol = navigator->LocateGlobalPointAndSetup(pos, &mom);
+    double mom_tot = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
+    G4ThreeVector mom(x[5]/mom_tot, x[6]/mom_tot, x[7]/mom_tot);
+
+    GeometryNavigator* navigator = Globals::GetMCGeometryNavigator();
+    navigator->SetPoint(ThreeVector(x[1], x[2], x[3]));
+    /*
+    if (navigator == NULL) {
+        std::cerr << "Navigator was NULL" << std::endl;
+        return GSL_FAILURE;
+    }
+    G4VPhysicalVolume* phys_vol = navigator->LocateGlobalPointAndSetup(pos, &mom, false);
+    if (phys_vol == NULL) {
+        std::cerr << "Phys_vol was NULL" << std::endl;
+        return GSL_FAILURE;
+    }
     G4LogicalVolume* log_vol = phys_vol->GetLogicalVolume();
-    material.SetMaterial(log_vol->GetMaterial());
-    std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << phys_vol->GetName() << " " << log_vol->GetMaterial()->GetName()
-              << " z: " << x[3] << " E: " << x[4] << " pz: " << x[7] << std::endl;
+    if (log_vol == NULL) {
+        std::cerr << "Log_vol was NULL" << std::endl;
+        return GSL_FAILURE;
+    }
+    */
+    // material.SetMaterial(log_vol->GetMaterial());
+    std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << navigator->GetMaterialName()
+              << " x: " << x[1] << " y: " << x[2] << " z: " << x[3]
+              << " E: " << x[4] << " pz: " << x[7] << std::endl;
+    return GSL_SUCCESS;
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
     double mass = sqrt(energy*energy-p*p);
