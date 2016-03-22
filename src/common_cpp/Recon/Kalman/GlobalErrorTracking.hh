@@ -54,7 +54,7 @@ public:
     void SetEStragModel(EStragModel estrag_model) {_estrag_model = estrag_model;}
     bool GetEStragModel() const {return _estrag_model;}
 
-    static ostream& print(std::ostream& out, double* x);
+    static ostream& print(std::ostream& out, double x[29]);
 
 private:
     GlobalErrorTracking(const GlobalErrorTracking& tracking); // disable copy constructor
@@ -82,9 +82,11 @@ private:
     static constexpr double c_l = 299.792458; // mm*ns^{-1}
     // transient...
     double _charge;
+    double _mass_squared;
     std::vector< std::vector<double> > _matrix;
     MaterialModel _mat_mod;
     static GlobalErrorTracking* _tz_for_propagate;
+    static const double _float_tolerance;
 };
 }
 #endif

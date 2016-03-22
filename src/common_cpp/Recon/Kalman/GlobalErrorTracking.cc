@@ -20,6 +20,8 @@
 
 namespace MAUS {
 
+const double GlobalErrorTracking::_float_tolerance = 1e-15;
+
 GlobalErrorTracking* GlobalErrorTracking::_tz_for_propagate = NULL;
 
 GlobalErrorTracking::GlobalErrorTracking() : _field(Globals::GetMCFieldConstructor()),
@@ -30,8 +32,8 @@ GlobalErrorTracking::GlobalErrorTracking() : _field(Globals::GetMCFieldConstruct
 void GlobalErrorTracking::Propagate(double x[29], double target_z) {
   std::cerr << "GlobalErrorTracking::Propagate material model " << _eloss_model << std::endl;
 
-  double mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
-  if (mass_squared < -1e-6 || mass_squared != mass_squared) {
+  _mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
+  if (_mass_squared < -_float_tolerance || _mass_squared != _mass_squared) {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Mass undefined in stepping function",
           "GlobalErrorTracking::Propagate"));
@@ -50,7 +52,7 @@ void GlobalErrorTracking::Propagate(double x[29], double target_z) {
   _tz_for_propagate = this;
   //std::cerr << "GlobalErrorTracking::Propagate BEFORE" << std::endl;
   //print(std::cerr, x);
-  while(fabs(z-target_z) > 1e-6) {
+  while(fabs(z-target_z) > _float_tolerance) {
     // std::cerr << "Stepping " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
     nsteps++;
     
@@ -84,8 +86,8 @@ void GlobalErrorTracking::Propagate(double x[29], double target_z) {
 }
 
 void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
-  double mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
-  if (mass_squared < -1e-6 || mass_squared != mass_squared) {
+  _mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
+  if (_mass_squared < -_float_tolerance || _mass_squared != _mass_squared) {
     throw(MAUS::Exception(MAUS::Exception::recoverable,
           "Mass undefined in stepping function",
           "GlobalErrorTracking::Propagate"));
@@ -102,26 +104,28 @@ void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z)
       h *= -1;  // stepping backwards...
   int    nsteps = 0;
   _tz_for_propagate = this;
-  while(fabs(z-target_z) > 1e-6) {
+  while(fabs(z-target_z) > _float_tolerance) {
     nsteps++;
     
     int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &z, target_z, &h, x);
     
     if(status != GSL_SUCCESS)
     {
+        std::stringstream ios;
+        ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n";
+        print(ios, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
-                            "Failed during tracking",
+                            ios.str()+"\nFailed during tracking",
                             "GlobalErrorTracking::Propagate") );
         break;
     }
     if(nsteps > _max_n_steps)
     {
         std::stringstream ios;
-        ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n" 
-            << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
-            << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
+        ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n";
+        print(ios, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
-                              ios.str()+" Exceeded maximum number of steps\n",
+                              ios.str()+"\nExceeded maximum number of steps\n",
                               "GlobalErrorTracking::Propagate") );
         break;
     }
@@ -136,9 +140,14 @@ void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z)
 
 int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double dxdz[29],
                                    void* params) {
-  if (fabs(x[7]) < 1e-9) {
+  if (fabs(x[7]) < _float_tolerance) {
     // z-momentum is 0
       return GSL_FAILURE;
+  }
+  for (size_t i = 0; i < 29; ++i) {
+      if (x[i] != x[i]) {
+          return GSL_FAILURE;
+      }
   }
   if (_tz_for_propagate == NULL) {
       return GSL_FAILURE;
@@ -150,14 +159,14 @@ int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double 
 
   // If no material processes are active, don't run MaterialEquationsOfMotion
   // at all
-  std::cerr << "GlobalErrorTracking::EquationsOFMotion checking material model" << std::endl;
+ // std::cerr << "GlobalErrorTracking::EquationsOFMotion checking material model" << std::endl;
   if (_tz_for_propagate->_eloss_model == no_eloss &&
       _tz_for_propagate->_mcs_model == no_mcs &&
       _tz_for_propagate->_estrag_model == no_estrag) {
-      std::cerr << "GlobalErrorTracking::EquationsOFMotion material models disabled" << std::endl;
+      //std::cerr << "GlobalErrorTracking::EquationsOFMotion material models disabled" << std::endl;
       return GSL_SUCCESS;
   }
-  std::cerr << "GlobalErrorTracking::EquationsOFMotion material models enabled; proceeding with EqM" << std::endl;
+  //std::cerr << "GlobalErrorTracking::EquationsOFMotion material models enabled; proceeding with EqM" << std::endl;
 
   int material_success = MaterialEquationOfMotion(z, x, dxdz, params);
   if (material_success != GSL_SUCCESS) {
@@ -170,6 +179,7 @@ int GlobalErrorTracking::EMEquationOfMotion(double z, const double x[29], double
                                    void* params) {
   double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double xfield[4] = {x[1], x[2], x[3], x[0]};
+  std::cerr << "EMEquationOfMotion x: " << x[1] << " y: " << x[2] << " z: " << x[3] << std::endl;
   _tz_for_propagate->_field->GetFieldValue(xfield, field);
 
   double charge = _tz_for_propagate->_charge;
@@ -310,10 +320,9 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     }
     */
     // material.SetMaterial(log_vol->GetMaterial());
-    std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << navigator->GetMaterialName()
-              << " x: " << x[1] << " y: " << x[2] << " z: " << x[3]
-              << " E: " << x[4] << " pz: " << x[7] << std::endl;
-    return GSL_SUCCESS;
+    // std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << navigator->GetMaterialName()
+    //          << " x: " << x[1] << " y: " << x[2] << " z: " << x[3]
+    //          << " E: " << x[4] << " pz: " << x[7] << std::endl;
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
     double mass = sqrt(energy*energy-p*p);
