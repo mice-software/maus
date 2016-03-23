@@ -78,4 +78,31 @@ CanvasWrapper* ReduceCppTools::get_canvas_emr_wrapper(TCanvas *canv,
 
   return wrap;
 }
+
+CanvasWrapper* ReduceCppTools::get_canvas_divide_wrapper(TCanvas *canv,
+                                                         int div_x, int div_y, bool log,
+                                                         std::vector<TH1 *> histos,
+                                                         std::string name,
+                                                         std::string description,
+                                                         Option_t *draw_option) {
+
+  CanvasWrapper *wrap = new CanvasWrapper();
+  wrap->SetDescription(description);
+  wrap->SetFileTag(name);
+  wrap->SetCanvas(canv);
+
+  canv->Divide(div_x, div_y);
+  int xPad = 0;
+  for (auto &h:histos) {
+    canv->cd(++xPad);
+    h->Draw(draw_option);
+    gPad->SetLogy(log);
+//     gPad->Update();
+//     TPaveStats *pave_stats = static_cast<TPaveStats*>(h->FindObject("stats"));
+//     if ( pave_stats )
+//       pave_stats->SetOptStat(10);
+  }
+
+  return wrap;
+}
 }

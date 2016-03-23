@@ -57,15 +57,12 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
 
   void update();
 
-  void update_tof_plots(TOFEvent* tof_event);
-
-  void setHistosTitle(int runNum);
+  void update_tof_plots(TOFEvent* tof_event, int runNum);
 
   int _refresh_rate;
   int _process_count;
-  bool _got_SOR;
 
-  std::vector<TH1F*> _histos;
+  std::vector<TH1*> _histos;
   std::vector<TCanvas*> _canvs;
   TH1F *_h_tof01, *_h_tof12, *_h_tof02;
   TH1F *_hslabx_0, *_hslabx_1, *_hslabx_2;
