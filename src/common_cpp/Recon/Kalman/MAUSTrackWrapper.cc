@@ -209,9 +209,10 @@ namespace MAUS {
 //
     if (seed_cov > 0.0) {
       covariance.Zero();
-      for (int i = 0; i < 4; ++i) {
-        covariance(i, i) = seed_cov;
-      }
+      covariance(0, 0) = seed_cov;
+      covariance(1, 1) = seed_cov/(200.0*200.0); // Rescale for gradients - not momenta!
+      covariance(2, 2) = seed_cov;
+      covariance(3, 3) = seed_cov/(200.0*200.0);
     } else {
 //
 // METHOD = CHRISTOPHER HUNT

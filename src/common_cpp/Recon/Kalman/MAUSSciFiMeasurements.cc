@@ -24,7 +24,6 @@ namespace MAUS {
     _geometry_helper(geo),
     _measurement_noise(1, 1),
     _matrix_map() {
-//    _measurement_noise(0, 0) = 3.5*0.427*3.5*0.427 / 12.0;
     _measurement_noise(0, 0) = _geometry_helper->GetChannelWidth() *
                                                         _geometry_helper->GetChannelWidth() / 12.0;
 
