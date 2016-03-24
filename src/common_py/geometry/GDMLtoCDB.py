@@ -228,7 +228,7 @@ class Downloader: #pylint: disable = R0902
         return self.wsdlurl
     
     #pylint: disable = W0613       
-    def download_current(self, downloadpath, geoid=0):
+    def download_current(self, downloadpath):
         """
         @Method download_current, this method downloads the current valid 
                                   geometry and writes the files
@@ -261,7 +261,7 @@ class Downloader: #pylint: disable = R0902
                 sortedids = sorted(ids.items(), \
                                 key=lambda x:x[1]['created'], reverse=True)
                 geoid = sortedids[0][0]
-                # return geoid
+                return geoid
 
     def download_geometry_by_id(self, id_num, download_path):
         """
@@ -280,7 +280,7 @@ class Downloader: #pylint: disable = R0902
             downloaded_file = self.geometry_cdb.get_gdml_for_id(id_num)
             self.__write_zip_file(download_path, downloaded_file)
 
-    def download_geometry_by_run(self, run_num, download_path, geoid=0):
+    def download_geometry_by_run(self, run_num, download_path):
         """
         @Method download geometry for run 
 
@@ -294,14 +294,14 @@ class Downloader: #pylint: disable = R0902
         if not os.path.exists(download_path):
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
-        self.download_beamline_for_run(run_num, download_path, geoid)
+        geoid = self.download_beamline_for_run(run_num, download_path)
         
         self.download_coolingchannel_for_run(run_num, download_path)
         # self.download_corrections_for_run(run_num, download_path):
         self.__write_zip_file(download_path, downloaded_file)
         
         #return the associated geometry id
-        # return geoid
+        return geoid
         
 
     def __write_zip_file(self, path_to_file, output_string): #pylint: disable = R0201, C0301
@@ -331,7 +331,7 @@ class Downloader: #pylint: disable = R0902
                            " valid from " + str(id_dict[id_number]['validFrom'])
         return str(id_number)
     
-    def download_beamline_for_run(self, run_id, downloadpath, geoid=0): #pylint: disable = R0201, C0301, W0613
+    def download_beamline_for_run(self, run_id, downloadpath): #pylint: disable = R0201, C0301, W0613
         """
         @Method download geometry for run 
 
@@ -371,7 +371,7 @@ class Downloader: #pylint: disable = R0902
                     sortedids = sorted(ids.items(), \
                                   key=lambda x:x[1]['created'], reverse=True)
                     geoid = sortedids[0][0]
-                # return geoid
+                return geoid
   
     def download_coolingchannel_for_run(self, run_id, downloadpath): 
         #pylint: disable = R0201, C0301
