@@ -296,33 +296,8 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
                                    void* params) {
     // Must be called after EMEquationOfMotion
     std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion" << std::endl;
-    MaterialModel& material = _tz_for_propagate->_mat_mod;
-    G4ThreeVector pos(x[1], x[2], x[3]);
-    double mom_tot = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
-    G4ThreeVector mom(x[5]/mom_tot, x[6]/mom_tot, x[7]/mom_tot);
+    MaterialModel material(x[1], x[2], x[3]);
 
-    GeometryNavigator* navigator = Globals::GetMCGeometryNavigator();
-    navigator->SetPoint(ThreeVector(x[1], x[2], x[3]));
-    /*
-    if (navigator == NULL) {
-        std::cerr << "Navigator was NULL" << std::endl;
-        return GSL_FAILURE;
-    }
-    G4VPhysicalVolume* phys_vol = navigator->LocateGlobalPointAndSetup(pos, &mom, false);
-    if (phys_vol == NULL) {
-        std::cerr << "Phys_vol was NULL" << std::endl;
-        return GSL_FAILURE;
-    }
-    G4LogicalVolume* log_vol = phys_vol->GetLogicalVolume();
-    if (log_vol == NULL) {
-        std::cerr << "Log_vol was NULL" << std::endl;
-        return GSL_FAILURE;
-    }
-    */
-    // material.SetMaterial(log_vol->GetMaterial());
-    // std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion phys_vol " << navigator->GetMaterialName()
-    //          << " x: " << x[1] << " y: " << x[2] << " z: " << x[3]
-    //          << " E: " << x[4] << " pz: " << x[7] << std::endl;
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
     double mass = sqrt(energy*energy-p*p);
@@ -373,6 +348,9 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     //            = d<x'^2>/dz p_z^2 + 2 <p_x^2>/p_z dp_z/dz
     dxdz[26] = 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
     dxdz[28] = 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
+
+    std::cerr << "Material EqM x: " << x[1] << " y: " << x[2] << " z: " << x[3] << " E: " << x[4] << std::endl;
+    std::cerr << "         dE/dz: " << dEdz << " estrag: " << destragdz << " dtheta2dz: " << dtheta2dz << std::endl;
 
     return GSL_SUCCESS;
 }

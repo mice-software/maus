@@ -151,11 +151,15 @@ class MinimisePositionResidualFitter(object):
         sp_x_list = [point["x"] for point in self.current_space_points if None not in (point["x"], point["y"]) and point["detector"] in detectors]
         sp_y_list = [point["y"] for point in self.current_space_points if None not in (point["x"], point["y"]) and point["detector"] in detectors]
         sp_z_list = [point["z"] for point in self.current_space_points if None not in (point["x"], point["y"]) and point["detector"] in detectors]
+        sp_t_list = [point["t"] for point in self.current_space_points if point["t"] != None and point["detector"] in detectors]
+        sp_tz_list = [point["z"] for point in self.current_space_points if point["t"] != None and point["detector"] in detectors]
 
         tp_x_list = [point["x"] for point in self.fitted_track_points if "x" in self.config.fit_detectors[point["detector"]] and point["detector"] in detectors]
         tp_xz_list = [point["z"] for point in self.fitted_track_points if "x" in self.config.fit_detectors[point["detector"]] and point["detector"] in detectors]
         tp_y_list = [point["y"] for point in self.fitted_track_points if "y" in self.config.fit_detectors[point["detector"]] and point["detector"] in detectors]
         tp_yz_list = [point["z"] for point in self.fitted_track_points if "y" in self.config.fit_detectors[point["detector"]] and point["detector"] in detectors]
+        tp_t_list = [point["t"] for point in self.fitted_track_points if "t" in self.config.fit_detectors[point["detector"]] and point["detector"] in detectors]
+        tp_tz_list = [point["z"] for point in self.fitted_track_points if "t" in self.config.fit_detectors[point["detector"]] and point["detector"] in detectors]
 
         z_min_max = common.min_max(sp_z_list)
 
@@ -165,9 +169,9 @@ class MinimisePositionResidualFitter(object):
         values = [self.best_guess[key] for key in track_keys]
         ellipse = [[self.errors[i][j] for i in range(6)] for j in range(6)]
 
-        track_list = [[values[1], values[2], values[3]]]
-        track_pos_list = [[values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[3]]]
-        track_neg_list = [[values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[3]]]
+        track_list = [[values[1], values[2], values[0], values[4], values[3]]]
+        track_pos_list = [[values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[0]+ellipse[0][0]**0.5, values[4]+ellipse[3][3]**0.5, values[3]]]
+        track_neg_list = [[values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[0]-ellipse[0][0]**0.5, values[4]-ellipse[3][3]**0.5, values[3]]]
         z = self.best_guess["z"]
         n_step = 1
 
@@ -179,9 +183,9 @@ class MinimisePositionResidualFitter(object):
         while z < z_min_max[1]:
             values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, z, 10.)
             z += (z_min_max[1] - z_min_max[0])/1000.
-            track_list.append([values[1], values[2], values[3]])
-            track_pos_list.append([values[1]+abs(ellipse[1][1])**0.5, values[2]+abs(ellipse[2][2])**0.5, values[3]])
-            track_neg_list.append([values[1]-abs(ellipse[1][1])**0.5, values[2]-abs(ellipse[2][2])**0.5, values[3]])
+            track_list.append([values[1], values[2], values[0], values[4], values[3]])
+            track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[0]+ellipse[0][0]**0.5, values[4]+ellipse[3][3]**0.5, values[3]])
+            track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[0]-ellipse[0][0]**0.5, values[4]-ellipse[3][3]**0.5, values[3]])
             n_step += 1
 
         values = [self.best_guess[key] for key in track_keys]
@@ -193,24 +197,32 @@ class MinimisePositionResidualFitter(object):
         while z > z_min_max[0]:
             values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, z, -10.)
             z -= (z_min_max[1] - z_min_max[0])/1000.
-            track_list.append([values[1], values[2], values[3]])
-            track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[3]])
-            track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[3]])
+            track_list.append([values[1], values[2], values[0], values[4], values[3]])
+            track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[0]+ellipse[0][0]**0.5, values[4]+ellipse[3][3]**0.5, values[3]])
+            track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[0]-ellipse[0][0]**0.5, values[4]-ellipse[3][3]**0.5, values[3]])
 
-        track_list = sorted(track_list, key = lambda x: x[2])
-        track_pos_list = sorted(track_pos_list, key = lambda x: x[2])
-        track_neg_list = sorted(track_neg_list, key = lambda x: x[2])
+        track_list = sorted(track_list, key = lambda x: x[4])
+        track_pos_list = sorted(track_pos_list, key = lambda x: x[4])
+        track_neg_list = sorted(track_neg_list, key = lambda x: x[4])
         track_x_list = [track[0] for track in track_list]
         track_y_list = [track[1] for track in track_list]
-        track_z_list = [track[2] for track in track_list]
+        track_t_list = [track[2] for track in track_list]
+        track_e_list = [track[3] for track in track_list]
+        track_z_list = [track[4] for track in track_list]
 
         track_x_pos_list = [track[0] for track in track_pos_list]
         track_y_pos_list = [track[1] for track in track_pos_list]
+        track_t_pos_list = [track[2] for track in track_pos_list]
+        track_e_pos_list = [track[3] for track in track_pos_list]
         track_x_neg_list = [track[0] for track in track_neg_list]
         track_y_neg_list = [track[1] for track in track_neg_list]
+        track_t_neg_list = [track[2] for track in track_neg_list]
+        track_e_neg_list = [track[3] for track in track_neg_list]
 
         x_min_max = common.min_max(sp_x_list+tp_x_list+track_x_list)
         y_min_max = common.min_max(sp_y_list+tp_y_list+track_y_list)
+        t_min_max = common.min_max(sp_t_list+tp_t_list+track_t_list)
+        e_min_max = common.min_max(track_e_list)
 
         canvas = common.make_root_canvas("Global fit - x")
         hist, graph = common.make_root_graph("Measured space points",
@@ -274,6 +286,62 @@ class MinimisePositionResidualFitter(object):
         canvas.Update()
         canvas.Print(plot_name+"_y.png")
         canvas.Print(plot_name+"_y.root")
+
+        canvas = common.make_root_canvas("Global fit - t")
+        hist, graph = common.make_root_graph("Fitted track",
+                      track_z_list, "z [mm]", track_t_list, "t [ns]")
+        hist.Draw()
+        graph.SetLineColor(4)
+        graph.Draw('l')
+        if len(sp_t_list) > 0:
+            hist, graph = common.make_root_graph("Measured space points",
+                          sp_tz_list, "z [mm]", sp_t_list, "t [ns]",
+                          xmin = z_min_max[0], xmax = z_min_max[1],
+                          ymin = t_min_max[0], ymax = t_min_max[1])
+            hist.Draw()
+            graph.SetMarkerStyle(24)
+            graph.Draw('psame')
+        if len(tp_t_list) > 0:
+            hist, graph = common.make_root_graph("Fitted track points",
+                          tp_tz_list, "z [mm]", tp_t_list, "t [ns]")
+            graph.SetMarkerColor(4)
+            graph.SetMarkerStyle(26)
+            graph.Draw('psame')
+        hist, graph = common.make_root_graph("Fitted track +",
+                      track_z_list, "z [mm]", track_t_pos_list, "t [ns]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
+        graph.Draw('lsame')
+        hist, graph = common.make_root_graph("Fitted track -",
+                      track_z_list, "z [mm]", track_t_neg_list, "t [ns]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
+        graph.Draw('lsame')
+        canvas.Update()
+        canvas.Print(plot_name+"_t.png")
+        canvas.Print(plot_name+"_t.root")
+
+        canvas = common.make_root_canvas("Global fit - energy")
+        hist, graph = common.make_root_graph("Fitted track",
+                      track_z_list, "z [mm]", track_e_list, "E [MeV]",
+                      xmin = z_min_max[0], xmax = z_min_max[1],
+                      ymin = e_min_max[0], ymax = e_min_max[1])
+        hist.Draw()
+        graph.SetLineColor(4)
+        graph.Draw('l')
+        hist, graph = common.make_root_graph("Fitted track +",
+                      track_z_list, "z [mm]", track_e_pos_list, "E [MeV]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
+        graph.Draw('lsame')
+        hist, graph = common.make_root_graph("Fitted track -",
+                      track_z_list, "z [mm]", track_e_neg_list, "E [MeV]")
+        graph.SetLineColor(4)
+        graph.SetLineStyle(7)
+        graph.Draw('lsame')
+        canvas.Update()
+        canvas.Print(plot_name+"_energy.png")
+        canvas.Print(plot_name+"_energy.root")
 
 
     @staticmethod
