@@ -123,14 +123,40 @@ namespace MAUS {
     }
   }
 
+  G4Material* GeometryNavigator::GetMaterial() const {
+    return _current_material;
+  }
 
-  double GeometryNavigator::GetA() const {
-    return _current_material->GetA()/(g/mole);
+  double GeometryNavigator::GetNumberOfElements() const {
+    return _current_material->GetNumberOfElements();
+  }
+
+  double GeometryNavigator::GetFraction(size_t element) const {
+    if (element > _current_material->GetNumberOfElements()) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Lookup element was > number of elements",
+                              "GeometryNavigator::GetFraction()");
+    }
+    return _current_material->GetFractionVector()[element];
+  }
+
+  double GeometryNavigator::GetA(size_t element) const {
+    if (element > _current_material->GetNumberOfElements()) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Lookup element was > number of elements",
+                              "GeometryNavigator::GetA()");
+    }
+    return _current_material->GetElement(element)->GetA()/(g/mole);
   }
 
 
-  double GeometryNavigator::GetZ() const {
-    return _current_material->GetZ();
+  double GeometryNavigator::GetZ(size_t element) const {
+    if (element > _current_material->GetNumberOfElements()) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Lookup element was > number of elements",
+                              "GeometryNavigator::GetZ()");
+    }
+    return _current_material->GetElement(element)->GetZ();
   }
 
 

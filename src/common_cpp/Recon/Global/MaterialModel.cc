@@ -1,6 +1,8 @@
 #include <math.h>
 #include "Geant4/G4Material.hh"
 
+#include "src/common_cpp/Simulation/GeometryNavigator.hh"
+
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
 
 namespace MAUS {
@@ -9,8 +11,36 @@ MaterialModel::MaterialModel(const G4Material* material) {
     SetMaterial(material);
 }
 
+MaterialModel::MaterialModel(double x, double y, double z) {
+    SetMaterial(x, y, z);
+}
+
 MaterialModel::MaterialModel(const MaterialModel& mat) {
-    SetMaterial(mat._material);
+    *this = mat;
+}
+
+MaterialModel& MaterialModel::operator=(const MaterialModel& mat) {
+    if (&mat == this) {
+        return *this;
+    }
+    _material = mat._material;
+    _n_e = mat._n_e;
+    _I = mat._I;
+    _x_0 = mat._x_0;
+    _x_1 = mat._x_1;
+    _C = mat._C;
+    _a = mat._a;
+    _k = mat._k;
+    _rad_len_ratio = mat._rad_len_ratio;
+    _density = mat._density;
+    _z_over_a = mat._z_over_a;
+    return *this;    
+}
+
+void MaterialModel::SetMaterial(double x, double y, double z) {
+    _navigator = Globals::GetMCGeometryNavigator();
+    _navigator->SetPoint(ThreeVector(x, y, z));
+    MaterialModel::SetMaterial(_navigator->GetMaterial());
 }
 
 void MaterialModel::SetMaterial(const G4Material* material) {
@@ -29,24 +59,22 @@ void MaterialModel::SetMaterial(const G4Material* material) {
 double MaterialModel::dEdx(double E, double m, double charge) {
     // bethe bloch formula, see PDG particle data book
     // assume density effect is 0
-    double beta2 = (E*E-m*m)/E/E;
-    double beta = sqrt(beta2);
+    double beta2 = (E*E-m*m)/E/E; // beta = p^2/E^2
     double gamma = E/m;
-    double bg = beta*gamma;
-    double bg2 = bg*bg;
+    double bg2 = beta2*gamma*gamma;
     double mRatio = _m_e/m;
     double T_max = 2.0*_m_e*bg2/(1.0 + 2.0*gamma*mRatio + mRatio*mRatio);
 
-    double delta = 0.;
-    double logterm = std::log(2.0*_m_e*bg2*T_max/(_I*_I));
+    double coefficient = std::log(2.0*_m_e*bg2*T_max/(_I*_I)) - beta2;
+    coefficient *= 0.307075*charge*charge/2/beta2*_density/cm; // 0.307075 is cm^2 per mol; _density is g/cm^3
 
-    double dEdx = -_dedx_constant*_density*charge*charge/beta2*
-                                          (logterm/2. - beta2 - delta)/cm;
-    /*
-    std::cerr << "const " << _dedx_constant << " dens " << _density 
-              << " charge " << charge << " beta2 " << beta2
-              << " log " << logterm << " cm " << cm << " dedx " << dEdx << std::endl;
-    */
+    double dEdx = 0.;
+    for (size_t i = 0; i < _navigator->GetNumberOfElements(); ++i) {
+        double frac = _navigator->GetFraction(i);
+        double z_el = _navigator->GetZ(i);
+        double a_el = _navigator->GetA(i);
+        dEdx += frac*z_el/a_el*coefficient;
+    }
     return dEdx;
 }
 

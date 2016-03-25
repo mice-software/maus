@@ -1,0 +1,32 @@
+
+Configuration PropagationTest
+{
+  Dimensions 2.1 2.1 100. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100.0 mm
+  Module Hydrogen
+  {
+    Position 0. 0. 0. m
+    Rotation 0. 0. 0. degree
+    Volume Box
+    Dimensions 0.5 0.5 0.5 m
+    PropertyString Material lH2
+  }
+  Module Polystyrene
+  {
+    Position 0. 0. 2. m
+    Rotation 0. 0. 0. degree
+    Volume Box
+    Dimensions 0.5 0.5 0.5 m
+    PropertyString Material POLYSTYRENE
+  }
+  Module LiH  // note MICE LiH is different; but we want to compare with PDG LIH
+  {
+    Position 0. 0. 4. m
+    Rotation 0. 0. 0. degree
+    Volume Box
+    Dimensions 0.5 0.5 0.5 m
+    PropertyString Material LITHIUM_HYDRIDE
+  }
+
+}

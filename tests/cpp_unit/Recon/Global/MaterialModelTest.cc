@@ -1,6 +1,6 @@
-#include "Geant4/G4NistManager.hh"
-
 #include "gtest/gtest.h"
+#include "src/legacy/Config/MiceModule.hh"
+#include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
 
 namespace MAUS {
@@ -8,38 +8,49 @@ namespace MAUS {
 class MaterialModelTest : public ::testing::Test {
   protected:
     MaterialModelTest()  {
-        G4NistManager* manager = G4NistManager::Instance();
-//        _galactic.SetMaterial(manager->FindOrBuildMaterial("G4_Galactic"));
-        _hydrogen.SetMaterial(manager->FindOrBuildMaterial("G4_lH2"));
-//        _polystyrene.SetMaterial(manager->FindOrBuildMaterial("G4_POLYSTYRENE"));
-//        _lead.SetMaterial(manager->FindOrBuildMaterial("G4_Pb"));      
+        std::string mod_path = getenv("MAUS_ROOT_DIR");
+        mod_path += "/tests/cpp_unit/Recon/Global/TestGeometries/";
+        MiceModule* materials = new MiceModule(mod_path+"MaterialModelTest.dat");
+        GlobalsManager::SetMonteCarloMiceModules(materials);
+        auto nist_t = {60., 70., 80., 90., 100., 120., 140., 170., 200.};
+        _nist_energy = std::vector<double>(nist_t);
     }
 
     virtual ~MaterialModelTest() {}
     virtual void SetUp()    {}
     virtual void TearDown() {}
 
-    MaterialModel _galactic;
-    MaterialModel _hydrogen;
-    MaterialModel _polystyrene;
-    MaterialModel _lead;
     double _mass = 105.658;
+    std::vector<double> _nist_energy;
 };
 
 TEST_F(MaterialModelTest, dEdxHydrogen) {
-    EXPECT_NEAR(_hydrogen.dEdx( 130.0, _mass, 1.), -20./350., 1.0e-7);
-    EXPECT_NEAR(_hydrogen.dEdx( 230.0, _mass, 1.), -15./350., 1.0e-7);
+    MaterialModel material(0., 0., 0.);
+    auto dedx_auto = {5.409, 5.097, 4.870, 4.699, 4.568,
+                      4.385, 4.267, 4.161, 4.104};  // MeV cm^2/g
+    std::vector<double> pdg_dedx(dedx_auto);
+    double pdg_density = 0.0708;  // g/cm^3
+    for (size_t i = 0; i < _nist_energy.size(); ++i) {
+        double energy = _nist_energy[i] + _mass;
+        std::cerr << _nist_energy[i] << "  "
+                  << material.dEdx(energy, _mass, 1.) << "  "
+                  << pdg_dedx[i]*pdg_density/cm << std::endl;
+    }
 }
 
-TEST_F(MaterialModelTest, dtheta2dxHydrogen) {
-    EXPECT_NEAR(_hydrogen.dtheta2dx( 130.0, _mass, 1.), 4.7386302422092031e-05, 1.0e-7);
-    EXPECT_NEAR(_hydrogen.dtheta2dx( 230.0, _mass, 1.), 2.8463355575589116e-05, 1.0e-7);
+TEST_F(MaterialModelTest, dEdxPolystyrene) {
+    MaterialModel material(0., 0., 2000.);
+    auto dedx_auto = {2.612, 2.466, 2.359, 2.276, 2.211,
+                     2.118, 2.058, 2.003, 1.971};  // MeV cm^2/g
+    std::vector<double> pdg_dedx(dedx_auto);
+    double pdg_density = 1.060;  // g/cm^3
+    for (size_t i = 0; i < _nist_energy.size(); ++i) {
+        double energy = _nist_energy[i] + _mass;
+        std::cerr << _nist_energy[i] << "  "
+                  << material.dEdx(energy, _mass, 1.) << "  "
+                  << pdg_dedx[i]*pdg_density/cm << std::endl;
+    }
 }
-
-TEST_F(MaterialModelTest, estrag2) {
-    EXPECT_NEAR(_hydrogen.estrag2(230.0, _mass, 1.), 0.04404808285535615, 1.0e-7);
-}
-
 
 
 }
