@@ -5,13 +5,13 @@ import ROOT
 analysis_path = os.environ["MAUS_ROOT_DIR"]+"/bin/user/fit_fields/scripts/"
 site.addsitedir(analysis_path)
 
-import scripts.space_point_data_loader
+import scripts.data_loader
 import scripts.minimise_position_residual_fitter
-import scripts.config
+import scripts.config_fit_residuals_both_trackers
 
 def main():
-    config = scripts.config.Config()
-    data_loader = scripts.space_point_data_loader.SpacePointDataLoader(config)
+    config = scripts.config_fit_residuals_both_trackers.Config()
+    data_loader = scripts.data_loader.DataLoader(config)
     data_loader.load_data(config.number_of_events)
     fitter = scripts.minimise_position_residual_fitter.MinimisePositionResidualFitter(config)
     for event in data_loader.events:

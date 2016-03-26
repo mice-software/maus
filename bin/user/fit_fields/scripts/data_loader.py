@@ -11,7 +11,21 @@ class DataLoader(object):
         self.accepted_count = 0
         self.events = []
 
-    def load_data(self, max_number_of_events):
+    def load_cuts(self):
+        file_name = self.config.cuts_file
+        print "Loading ROOT file", file_name
+        root_file = ROOT.TFile(file_name, "READ") # pylint: disable = E1101
+        spill_number = ROOT.Double()
+        event_number = ROOT.Double()
+        tree = root_file.Get("T")
+        #tree.SetBranchAddress("SpillNumber", spill_number)
+        #tree.SetBranchAddress("ReconstructedEventNumber", event_number)
+        for entry in tree:
+          print tree.SpillNumber, tree.ReconstructedEventNumber, tree.cut_allPassed
+
+    def load_data(self, min_spill, max_spill):
+        #self.load_cuts()
+        #raw_input()
         file_name = self.config.reco_file
         print "Loading ROOT file", file_name
         root_file = ROOT.TFile(file_name, "READ") # pylint: disable = E1101
@@ -22,7 +36,7 @@ class DataLoader(object):
         tree.SetBranchAddress("data", data)
 
         print "Getting some data"
-        for i in range(tree.GetEntries()):
+        for i in range(min_spill, min(tree.GetEntries(), max_spill)):
             if i % 100 == 0 or i == tree.GetEntries()-1 or i == 0:
                 print "Spill", i+1, "/", tree.GetEntries(),
                 print "ev:", self.event_count, "tof:", self.tof_cut_count,
@@ -32,45 +46,63 @@ class DataLoader(object):
             tree.GetEntry(i)
             spill = data.GetSpill()
             if spill.GetDaqEventType() == "physics_event":
-                for reco_event in spill.GetReconEvents():
+                for ev_number, reco_event in enumerate(spill.GetReconEvents()):
                     self.event_count += 1
                     event = self.load_reco_event(reco_event)
                     if event != None:
                         event["spill"] = spill.GetSpillNumber()
                         self.accepted_count += 1
                         self.events.append(event)
-                    tof_sp = reco_event.GetTOFEvent().GetTOFEventSpacePoint()
-                    try:
-                        tof1 = tof_sp.GetTOF1SpacePointArray()[0].GetTime()
-                        tof2 = tof_sp.GetTOF2SpacePointArray()[0].GetTime()
-                    except Exception:
-                        pass
-
-            if len(self.events) >= max_number_of_events:
-                break
+                        event["event_number"] = ev_number
 
     def load_tof_event(self, tof_event):
         space_points = tof_event.GetTOFEventSpacePoint()
         if self.will_cut_on_tof(tof_event):
             return None
-        tof1_sp = space_points.GetTOF1SpacePointArray()[0]
-        tof1 = {
-            "x":tof1_sp.GetGlobalPosX(),
-            "y":tof1_sp.GetGlobalPosY(),
-            "z":tof1_sp.GetGlobalPosZ(),
-            "t":tof1_sp.GetTime(),
-            "detector":"tof1"
-        }
-        tof2_sp = space_points.GetTOF2SpacePointArray()[0]
-        tof2 = {
-            "x":tof2_sp.GetGlobalPosX(),
-            "y":tof2_sp.GetGlobalPosY(),
-            "z":tof2_sp.GetGlobalPosZ(),
-            "t":tof2_sp.GetTime(),
-            "detector":"tof2"
-        }
-        delta_t = tof2_sp.GetTime() - tof1_sp.GetTime()
-        return [tof1, tof2]
+        tof_sp = []
+        for tof0_sp in space_points.GetTOF0SpacePointArray():
+            cov = [[0. for i in range(6)] for j in range(6)]
+            cov[0][0] = 0.05
+            cov[1][1] = tof0_sp.GetGlobalPosXErr()
+            cov[2][2] = tof0_sp.GetGlobalPosXErr()
+            tof0 = {
+                "x":tof0_sp.GetGlobalPosX(),
+                "y":tof0_sp.GetGlobalPosY(),
+                "z":tof0_sp.GetGlobalPosZ(),
+                "t":tof0_sp.GetTime(),
+                "covariance":cov,
+                "detector":"tof0"
+            }
+            tof_sp.append(tof0)
+        for tof1_sp in space_points.GetTOF1SpacePointArray():
+            cov = [[0. for i in range(6)] for j in range(6)]
+            cov[0][0] = 0.05
+            cov[1][1] = tof1_sp.GetGlobalPosXErr()
+            cov[2][2] = tof1_sp.GetGlobalPosXErr()
+            tof1 = {
+                "x":tof1_sp.GetGlobalPosX(),
+                "y":tof1_sp.GetGlobalPosY(),
+                "z":tof1_sp.GetGlobalPosZ(),
+                "t":tof1_sp.GetTime(),
+                "covariance":cov,
+                "detector":"tof1"
+            }
+            tof_sp.append(tof1)
+        for tof2_sp in space_points.GetTOF2SpacePointArray():
+            cov = [[0. for i in range(6)] for j in range(6)]
+            cov[0][0] = 0.05
+            cov[1][1] = tof2_sp.GetGlobalPosXErr()
+            cov[2][2] = tof2_sp.GetGlobalPosXErr()           
+            tof2 = {
+                "x":tof2_sp.GetGlobalPosX(),
+                "y":tof2_sp.GetGlobalPosY(),
+                "z":tof2_sp.GetGlobalPosZ(),
+                "t":tof2_sp.GetTime(),
+                "covariance":cov,
+                "detector":"tof2"
+            }
+            tof_sp.append(tof2)
+        return tof_sp
 
     def will_cut_on_tof(self, tof_event):
         if self.config.will_require_tof12 == False:
@@ -82,7 +114,6 @@ class DataLoader(object):
         if space_points.GetTOF2SpacePointArray().size() != 1:
             self.tof_cut_count += 1
             return True
-        
         return False
 
     def load_space_points(self, scifi_event):
@@ -114,39 +145,49 @@ class DataLoader(object):
 
     def load_track_points(self, scifi_event):
         track_points_out = []
-        for track_point in scifi_event.trackpoints():
-            position = track_point.get_global_position()
-            if space_point.get_tracker() == 0:
-                space_points_out.append({
-                  "x":position.x(),
-                  "y":position.y(),
-                  "z":position.z(),
-                  "px":position.x(),
-                  "py":position.y(),
-                  "pz":position.z(),
-                  "t":None,
-                  "detector":"tku"
-                })
+        for track in scifi_event.scifitracks():
+            if track.tracker() == 0:
+                detector = "tku"
             else:
-                space_points_out.append({
+                detector = "tkd"
+            for track_point in track.scifitrackpoints():
+                position = track_point.pos() # maybe global coordinates?
+                momentum = track_point.mom() # maybe global coordinates?
+                index = 0
+                cov = [[0. for i in range(6)] for j in range(6)]
+                index_mapping = [1, 4, 2, 5, 3]
+                if track_point.covariance().size() == 25:
+                    for i in range(5):
+                        k = index_mapping[i]
+                        for j in range(5):
+                            l = index_mapping[j]
+                            cov[k][l] = track_point.covariance()[index]
+                            index += 1
+                track_points_out.append({
                   "x":position.x(),
                   "y":position.y(),
                   "z":position.z(),
+                  "px":momentum.x(),
+                  "py":momentum.y(),
+                  "pz":momentum.z(),
                   "t":None,
-                  "detector":"tkd"
+                  "detector":detector,
+                  "covariance":cov,
                 })
-        space_points_out = sorted(space_points_out, key = lambda sp: sp["z"])
-        return space_points_out
-
+        track_points_out = sorted(track_points_out, key = lambda tp: tp["z"])
+        return track_points_out
 
     def load_scifi_event(self, scifi_event):
-        space_points = scifi_event.spacepoints()
+        points = []
         if self.will_cut_on_scifi_clusters(scifi_event):
             return None
         if self.will_cut_on_scifi_space_points(scifi_event):
             return None
-        self.load_space_points(space_points)
-        return scifi_event
+        if self.config.will_load_tk_space_points:
+            points += self.load_space_points(scifi_event)
+        if self.config.will_load_tk_track_points:
+            points += self.load_track_points(scifi_event)
+        return points
 
     def will_cut_on_scifi_clusters(self, scifi_event):
         """Require exactly one cluster in each plane"""
@@ -158,7 +199,6 @@ class DataLoader(object):
             station = cluster.get_station()-1
             plane = cluster.get_plane()
             n_clusters[tracker][station][plane] += 1
-        print n_clusters[1]
         for i, tracker_cluster in enumerate(n_clusters):
             for station_cluster in tracker_cluster:
                 if station_cluster != [1, 1, 1]:
@@ -189,12 +229,6 @@ class DataLoader(object):
 
     def load_reco_event(self, reco_event):
         tof_event = reco_event.GetTOFEvent()
-        tof_sp = reco_event.GetTOFEvent().GetTOFEventSpacePoint()
-        try:
-            tof1 = tof_sp.GetTOF1SpacePointArray()[0].GetTime()
-            tof2 = tof_sp.GetTOF2SpacePointArray()[0].GetTime()
-        except Exception:
-            pass
         global_event = reco_event.GetGlobalEvent()
         scifi_event = reco_event.GetSciFiEvent()
         tof_loaded = self.load_tof_event(tof_event)
@@ -203,7 +237,7 @@ class DataLoader(object):
         scifi_loaded = self.load_scifi_event(scifi_event)
         if scifi_loaded == None:
             return None
-        event = {"data":scifi_loaded+tof_loaded}
+        event = {"data":sorted(scifi_loaded+tof_loaded, key = lambda tp: tp['z'])}
         event["particle_number"] = reco_event.GetPartEventNumber()
         return event
 
