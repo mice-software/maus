@@ -7,6 +7,8 @@
 
 namespace MAUS {
 
+std::set<std::string> MaterialModel::_enabled_materials;
+
 MaterialModel::MaterialModel(const G4Material* material) {
     SetMaterial(material);
 }
@@ -40,11 +42,18 @@ MaterialModel& MaterialModel::operator=(const MaterialModel& mat) {
 void MaterialModel::SetMaterial(double x, double y, double z) {
     _navigator = Globals::GetMCGeometryNavigator();
     _navigator->SetPoint(ThreeVector(x, y, z));
-    MaterialModel::SetMaterial(_navigator->GetMaterial());
+    if (IsEnabledMaterial(_navigator->GetMaterial()->GetName())) {
+        MaterialModel::SetMaterial(_navigator->GetMaterial());
+    } else {
+      std::cout << "Ignoring " << _navigator->GetMaterial()->GetName()
+                << " as it is disabled" << std::endl;
+      *this = MaterialModel();
+    }
 }
 
 void MaterialModel::SetMaterial(const G4Material* material) {
     _material = material;
+
     _n_e = _material->GetElectronDensity();
     _I = _material->GetIonisation()->GetMeanExcitationEnergy();
     _x_0 = _material->GetIonisation()->GetX0density();
@@ -75,7 +84,7 @@ double MaterialModel::dEdx(double E, double m, double charge) {
         double a_el = _navigator->GetA(i);
         dEdx += frac*z_el/a_el*coefficient;
     }
-    return dEdx;
+    return -dEdx;
 }
 
 double MaterialModel::d2EdxdE(double E, double m, double charge) {
@@ -104,6 +113,22 @@ double MaterialModel::estrag2(double E, double m, double charge) {
     double estrag2 = _estrag_const*gamma2*(1-beta2/2.)/cm; // missing factor Z/A
 
     return estrag2;
+}
+
+bool MaterialModel::IsEnabledMaterial(std::string material_name) {
+    bool found = _enabled_materials.find(material_name) !=
+                                                      _enabled_materials.end();
+    return found;
+}
+
+void MaterialModel::EnableMaterial(std::string material_name) {
+    _enabled_materials.insert(material_name);
+}
+
+void MaterialModel::DisableMaterial(std::string material_name) {
+    std::set<std::string>::iterator it = _enabled_materials.find(material_name);
+    if (it != _enabled_materials.end())
+        _enabled_materials.erase(it);
 }
 
 }

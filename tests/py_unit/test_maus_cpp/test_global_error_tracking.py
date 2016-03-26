@@ -8,7 +8,7 @@ from xboa.bunch import Bunch
 import Configuration
 import maus_cpp.globals
 import maus_cpp.field
-import maus_cpp.error_propagation as err_prop
+import maus_cpp.global_error_tracking as err_prop
 
 class TestErrorPropagation(unittest.TestCase):
 
@@ -17,6 +17,7 @@ class TestErrorPropagation(unittest.TestCase):
         config_str = Configuration.Configuration().getConfigJSON(
                                                          StringIO.StringIO(""), False)
         self.config = json.loads(config_str)
+        self._new_geometry("Test.dat")
 
     def _new_geometry(self, geometry_name):
         self.config["simulation_geometry_filename"] = geometry_name
@@ -36,10 +37,10 @@ class TestErrorPropagation(unittest.TestCase):
                     ellipse_out[i][j] = ellipse_in[k][l]
         return ellipse_out
 
-    def _get_tm_numerical(self, centroid, delta, dz, err_prop):
-        tm_fine = self._tm_matrix(centroid, delta, dz, err_prop)
-        tm_coarse_1 = self._tm_matrix(centroid, delta*10, dz, err_prop)
-        tm_coarse_2 = self._tm_matrix(centroid, delta, dz*10, err_prop)
+    def _get_tm_numerical(self, centroid, delta, dz):
+        tm_fine = self._tm_matrix(centroid, delta, dz)
+        tm_coarse_1 = self._tm_matrix(centroid, delta*10, dz)
+        tm_coarse_2 = self._tm_matrix(centroid, delta, dz*10)
         tm = [[tm_fine[i][j] for j in range(6)] for i in range(6)]
         for i in range(6):
             for j in range(6):
@@ -58,7 +59,7 @@ class TestErrorPropagation(unittest.TestCase):
             print
         return tm
 
-    def _tm_matrix(self, centroid, delta, dz, err_prop):
+    def _tm_matrix(self, centroid, delta, dz):
         mass = xboa.common.pdg_pid_to_mass[13]
         ellipse = [[0. for i in range(6)] for j in range(6)]
         tm_numerical = [[0. for i in range(6)] for j in range(6)]
@@ -68,12 +69,14 @@ class TestErrorPropagation(unittest.TestCase):
             x_pos = [x for x in centroid]
             x_pos[i] += delta;
             x_pos[7] = (x_pos[4]**2-x_pos[5]**2-x_pos[6]**2-mass**2)**0.5
-            x_pos, dummy = err_prop.propagate_errors(x_pos, ellipse, x_pos[3]+dz, 1.)
+            tracking = err_prop.GlobalErrorTracking()
+            tracking.set_step_size(1.)
+            x_pos, dummy = tracking.propagate_errors(x_pos, ellipse, x_pos[3]+dz)
 
             x_neg = [x for x in centroid]
             x_neg[i] -= delta;
             x_neg[7] = (x_pos[4]**2-x_pos[5]**2-x_pos[6]**2-mass**2)**0.5
-            x_neg, dummy = err_prop.propagate_errors(x_neg, ellipse, x_neg[3]+dz, 1.)
+            x_neg, dummy = tracking.propagate_errors(x_neg, ellipse, x_neg[3]+dz)
 
             for j in range(7):
                 if j == 3:
@@ -137,11 +140,50 @@ class TestErrorPropagation(unittest.TestCase):
                     ellipse[i][j] = ellipse_trans[i-2, j-2]
         ellipse = self._convert_matrix(ellipse, True)
         for z_max in range(-4500, 4500, 100):
-            centroid_out, ellipse_out = err_prop.propagate_errors(centroid, ellipse, z_max, 1.)
+            tracking = err_prop.GlobalErrorTracking()
+            tracking.set_step_size(1.)
+            centroid_out, ellipse_out = tracking.propagate_errors(centroid, ellipse, z_max)
             self._print_output(centroid_out, ellipse_out)
 
+    def test_get_set_deviations(self):
+        tracking = err_prop.GlobalErrorTracking()
+        ref_deviations = (0.1, 0.2, 0.3, 0.4)
+        tracking.set_deviations(*ref_deviations)
+        test_deviations = tracking.get_deviations()
+        for i in range(4):
+            self.assertAlmostEqual(test_deviations[i], ref_deviations[i])
 
-    def _test_step_fs2a(self):
+    def test_get_set_step_size(self):
+        tracking = err_prop.GlobalErrorTracking()
+        for step_size in (1.928, -3, 8):
+            tracking.set_step_size(step_size)
+            self.assertAlmostEqual(tracking.get_step_size(), step_size) 
+
+    def test_get_set_mcs_model(self):
+        tracking = err_prop.GlobalErrorTracking()
+        for mcs_model in "no_mcs", "moliere_forwards", "moliere_backwards":
+            tracking.set_scattering_model(mcs_model)
+            self.assertEqual(tracking.get_scattering_model(), mcs_model)
+        try:
+            tracking.set_scattering_model("boaty mcboatface")
+            raise ValueError("Should have thrown")
+        except RuntimeError:
+            pass
+
+    def test_get_set_eloss_model(self):
+        tracking = err_prop.GlobalErrorTracking()
+        for eloss_model in ("no_eloss",
+                            "bethe_bloch_forwards",
+                            "bethe_bloch_backwards"):
+            tracking.set_energy_loss_model(eloss_model)
+            self.assertEqual(tracking.get_energy_loss_model(), eloss_model)
+        try:
+            tracking.set_energy_loss_model("boaty mcboatface")
+            raise ValueError("Should have thrown")
+        except RuntimeError:
+            pass
+
+    def test_step_fs2a(self):
         self._new_geometry("tests/py_unit/test_maus_cpp/fs2a_derivatives.dat")
         centroid = [0. for i in range(8)]
         mass = xboa.common.pdg_pid_to_mass[13]
@@ -161,9 +203,11 @@ class TestErrorPropagation(unittest.TestCase):
                 if i > 1 and j > 1:
                     ellipse[i][j] = ellipse_trans[i-2, j-2]
         ellipse = self._convert_matrix(ellipse, True)
-        for z_max in range(750, 751, 500):
+        for z_max in range(0, 751, 750):
             print "\nz_max:", z_max, "============"
-            centroid_out, ellipse_out = err_prop.propagate_errors(centroid, ellipse, z_max, 1.)
+            tracking = err_prop.GlobalErrorTracking()
+            tracking.set_step_size(1.)
+            centroid_out, ellipse_out = tracking.propagate_errors(centroid, ellipse, z_max)
             self._print_output(centroid_out, ellipse_out)
 
 
@@ -179,10 +223,12 @@ class TestErrorPropagation(unittest.TestCase):
         centroid[6] = 60.
         centroid[7] = 200.
         centroid[4] = (sum([p**2 for p in centroid[5:]])+mass**2)**0.5
-        tm_a = err_prop.get_transfer_matrix(centroid)
+        tracking = err_prop.GlobalErrorTracking()
+        tracking.set_step_size(1.)
+        tm_a = tracking.get_transfer_matrix(centroid)
         delta = 0.01
         zstep = 0.01
-        tm_n = self._get_tm_numerical(centroid, delta, zstep, err_prop)
+        tm_n = self._get_tm_numerical(centroid, delta, zstep)
         for tm in [tm_a, tm_n]:
             print "Transfer Matrix"
             #tm = self._convert_matrix(tm, False)
@@ -193,7 +239,14 @@ class TestErrorPropagation(unittest.TestCase):
                 print
             print "Determinant:", numpy.linalg.det(numpy.array(tm))
         
+    def test_docstring(self):
+        raise RuntimeError("Need to put in docstrings")
 
+    def test_not_implemented(self):
+        raise RuntimeError("Max number of steps")
+        raise RuntimeError("Tracking Error tolerances")
+        raise RuntimeError("Charge")
+        raise RuntimeError("Enable/Disable G4 Volumes")
 
 if __name__ == "__main__":
     unittest.main()

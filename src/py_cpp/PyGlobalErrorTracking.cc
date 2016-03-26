@@ -17,8 +17,20 @@
 
 #include <string>
 
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#include <Python.h>
+#include <structmember.h>
+
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Recon/Kalman/GlobalErrorTracking.hh"
+#include "src/common_cpp/Recon/Global/MaterialModel.hh"
 #include "src/py_cpp/PyGlobalErrorTracking.hh"
 
 namespace MAUS {
@@ -117,6 +129,283 @@ PyObject* set_variance(std::vector<double> x_in) {
     return set_matrix(matrix);
 }
 
+std::string set_deviations_docstring = "DOCSTRING";
+
+static PyObject* set_deviations(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("dx"),
+                             const_cast<char*>("dy"),
+                             const_cast<char*>("dz"),
+                             const_cast<char*>("dt"),
+                             NULL};
+    std::vector<double> delta(4, 0.);
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddd", kwlist,
+                                     &delta[0], &delta[1], &delta[2], &delta[3])) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    glet->SetDeviations(delta[0], delta[1], delta[2], delta[3]);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_deviations_docstring = "DOCSTRING";
+
+static PyObject* get_deviations(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    std::vector<double> dev = glet->GetDeviations();
+    PyObject* value = Py_BuildValue("dddd", dev[0], dev[1], dev[2], dev[3]);
+    return value;
+}
+
+std::string enable_material_docstring = "DOCSTRING";
+
+static PyObject* enable_material(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("material"),
+                             NULL};
+    char* material = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &material)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    MaterialModel::EnableMaterial(std::string(material));
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string disable_material_docstring = "DOCSTRING";
+
+static PyObject* disable_material(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("material"),
+                             NULL};
+    char* material = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &material)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    MaterialModel::DisableMaterial(std::string(material));
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string is_enabled_material_docstring = "DOCSTRING";
+
+static PyObject* is_enabled_material(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("material"),
+                             NULL};
+    char* material = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &material)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    bool enabled = MaterialModel::IsEnabledMaterial(std::string(material));
+    if (enabled) {
+        Py_RETURN_TRUE;
+    } else {
+        Py_RETURN_FALSE;
+    }
+}
+
+std::string set_step_size_docstring = "DOCSTRING";
+
+static PyObject* set_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("step_size"),
+                             NULL};
+    double step_size = 1.;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist,
+                                     &step_size)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    glet->SetStepSize(step_size);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_step_size_docstring = "DOCSTRING";
+
+static PyObject* get_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    double step = glet->GetStepSize();
+    PyObject* value = PyFloat_FromDouble(step);
+    Py_INCREF(value);
+    return value;
+}
+
+std::string set_energy_loss_model_docstring = "DOCSTRING";
+
+static PyObject* set_energy_loss_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("model"),
+                             NULL};
+    char* eloss = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &eloss)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    // now set the eloss model
+    GlobalErrorTracking::ELossModel eloss_model = GlobalErrorTracking::no_eloss;
+    if (strcmp(eloss, "no_eloss") == 0) {
+    } else if (strcmp(eloss, "bethe_bloch_forwards") == 0) {
+        eloss_model = GlobalErrorTracking::bethe_bloch_forwards;
+    } else if (strcmp(eloss, "bethe_bloch_backwards") == 0) {
+        eloss_model = GlobalErrorTracking::bethe_bloch_backwards;
+    } else {
+        PyErr_SetString(PyExc_RuntimeError, "Did not recognise energy loss model");
+        return NULL;
+    }
+    glet->SetEnergyLossModel(eloss_model);
+    // return None
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_energy_loss_model_docstring = "DOCSTRING";
+
+static PyObject* get_energy_loss_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    GlobalErrorTracking::ELossModel eloss_model = glet->GetEnergyLossModel();
+    PyObject* py_eloss_model = NULL;
+    switch (eloss_model) {
+        case GlobalErrorTracking::bethe_bloch_forwards:
+            py_eloss_model = PyString_FromString("bethe_bloch_forwards");
+            break;
+        case GlobalErrorTracking::bethe_bloch_backwards:
+            py_eloss_model = PyString_FromString("bethe_bloch_backwards");
+            break;
+        case GlobalErrorTracking::no_eloss:
+            py_eloss_model = PyString_FromString("no_eloss");
+            break;
+    }
+    if (py_eloss_model != NULL)
+        Py_INCREF(py_eloss_model);
+    return py_eloss_model;
+}
+
+std::string set_scattering_model_docstring = "DOCSTRING";
+// enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
+static PyObject* set_scattering_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("model"),
+                             NULL};
+    char* scat_model_str = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &scat_model_str)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    // now set the eloss model
+    GlobalErrorTracking::MCSModel scat_model = GlobalErrorTracking::no_mcs;
+    if (strcmp(scat_model_str, "no_mcs") == 0) {
+    } else if (strcmp(scat_model_str, "moliere_forwards") == 0) {
+        scat_model = GlobalErrorTracking::moliere_forwards;
+    } else if (strcmp(scat_model_str, "moliere_backwards") == 0) {
+        scat_model = GlobalErrorTracking::moliere_backwards;
+    } else {
+        PyErr_SetString(PyExc_RuntimeError, "Did not recognise scattering model");
+        return NULL;
+    }
+    glet->SetMCSModel(scat_model);
+    // return None
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_scattering_model_docstring = "DOCSTRING";
+
+static PyObject* get_scattering_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    GlobalErrorTracking::MCSModel scat_model = glet->GetMCSModel();
+    PyObject* py_scat_model = NULL;
+    switch (scat_model) {
+        case GlobalErrorTracking::moliere_forwards:
+            py_scat_model = PyString_FromString("moliere_forwards");
+            break;
+        case GlobalErrorTracking::moliere_backwards:
+            py_scat_model = PyString_FromString("moliere_backwards");
+            break;
+        case GlobalErrorTracking::no_mcs:
+            py_scat_model = PyString_FromString("no_mcs");
+            break;
+    }
+    if (py_scat_model != NULL)
+        Py_INCREF(py_scat_model);
+    return py_scat_model;
+}
+
+
 std::string propagate_errors_docstring = "DOCSTRING";
 
 static PyObject* propagate_errors
@@ -124,18 +413,25 @@ static PyObject* propagate_errors
     static char *kwlist[] = {const_cast<char*>("centroid"),
                              const_cast<char*>("ellipse"),
                              const_cast<char*>("target_z"),
-                             const_cast<char*>("step_size"),
-                             const_cast<char*>("eloss"),
                              NULL};
     PyObject* py_centroid = NULL;
     PyObject* py_ellipse = NULL;
     double target_z = 0;
-    double step_size = 0;
-    char* eloss = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOdd|s", kwlist, &py_centroid, &py_ellipse, &target_z, &step_size, &eloss)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOd|", kwlist, &py_centroid, &py_ellipse, &target_z)) {
         // error message is set in PyArg_Parse...
         return NULL;
     }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+
     std::vector<double> x_in(29, 0.);
     if (get_centroid(py_centroid, x_in)) {
         return NULL;
@@ -144,28 +440,8 @@ static PyObject* propagate_errors
         return NULL;
     }
     try {
-        GlobalErrorTracking propagator;
-        propagator.SetStepSize(step_size);
-        propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
-        GlobalErrorTracking::ELossModel eloss_model = GlobalErrorTracking::no_eloss;
-        if (eloss != NULL) {
-            if (strcmp(eloss, "no_eloss") == 0) {
-            } else if (strcmp(eloss, "bethe_bloch_forwards") == 0) {
-                eloss_model = GlobalErrorTracking::bethe_bloch_forwards;
-            } else if (strcmp(eloss, "bethe_bloch_backwards") == 0) {
-                eloss_model = GlobalErrorTracking::bethe_bloch_backwards;
-            } else {
-                PyErr_SetString(PyExc_RuntimeError, "Did not recognise energy loss model");
-                return NULL;
-            }
-            std::cerr << "Setting eloss model " << eloss << std::endl;
-        }
-        propagator.SetEnergyLossModel(eloss_model);
-        propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
-        propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
-        std::cerr << "Getting Eloss model " << propagator.GetEnergyLossModel() << std::endl;
-        propagator.SetField(Globals::GetInstance()->GetMCFieldConstructor());
-        propagator.Propagate(&x_in[0], target_z);
+        glet->SetField(Globals::GetInstance()->GetMCFieldConstructor());
+        glet->Propagate(&x_in[0], target_z);
     } catch (MAUS::Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
@@ -189,24 +465,24 @@ static PyObject* get_transfer_matrix
         // error message is set in PyArg_Parse...
         return NULL;
     }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    GlobalErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+
     try {
         std::vector<double> x_in(8, 0.);
         if (get_centroid(py_centroid, x_in)) {
             return NULL;
         }
-        GlobalErrorTracking propagator;
-        propagator.SetStepSize(10.);
-        propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
-        propagator.SetField(Globals::GetInstance()->GetMCFieldConstructor());
-        propagator.UpdateTransferMatrix(&x_in[0]);
-        std::vector<std::vector<double> > matrix = propagator.GetMatrix();
-        std::cerr << "PyGlobalErrorPropagator::get_transfer_matrix" << std::endl;
-        for (size_t i = 0; i < matrix.size(); ++i) {
-            for (size_t j = 0; j < matrix[i].size(); ++j)
-                std::cerr << matrix[i][j] << " ";
-            std::cerr << std::endl;
-        }
-        std::cerr << "End" << std::endl;
+        glet->UpdateTransferMatrix(&x_in[0]);
+        std::vector<std::vector<double> > matrix = glet->GetMatrix();
         PyObject* ellipse = set_matrix(matrix);
         if (ellipse == NULL) {
             PyErr_SetString(PyExc_RuntimeError, "Error calculating matrix");
@@ -219,22 +495,153 @@ static PyObject* get_transfer_matrix
     }
 }
 
+std::string class_docstring_str = "CLASS DOCUMENTATION";
+const char* class_docstring = class_docstring_str.c_str();
+
+PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
+    void* void_glet = malloc(sizeof(PyGlobalErrorTracking));
+    PyGlobalErrorTracking* glet = reinterpret_cast<PyGlobalErrorTracking*>(void_glet);
+    glet->tracking = NULL;
+    glet->ob_refcnt = 1;
+    glet->ob_type = type;
+    return reinterpret_cast<PyObject*>(glet);
+}
+
+int _init(PyObject* self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    // failed to cast or self was not initialised - something horrible happened
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Failed to resolve self as PyGlobalErrorTracking in __init__");
+        return -1;
+    }
+    // legal python to call initialised_object.__init__() to reinitialise, so
+    // handle this case
+    if (glet->tracking != NULL) {
+        delete glet->tracking;
+    }
+
+    try {
+        glet->tracking = new GlobalErrorTracking();
+    } catch (std::exception& exc) {
+        PyErr_SetString(PyExc_ValueError, (&exc)->what());
+        return -1;
+    }
+
+    return 0;
+}
+
+void _free(PyGlobalErrorTracking * self) {
+    if (self != NULL) {
+        if (self->tracking != NULL)
+            delete self->tracking;
+        free(self);
+    }
+}
+
+PyObject* _str(PyObject * self) {
+    return PyString_FromString("GlobalErrorTracking object");
+}
+
+
+static PyMemberDef _members[] = {
+{NULL}
+};
+
+static PyMethodDef _methods[] = {
+{"propagate_errors", (PyCFunction)propagate_errors,
+  METH_VARARGS|METH_KEYWORDS, propagate_errors_docstring.c_str()},
+{"get_transfer_matrix", (PyCFunction)get_transfer_matrix,
+  METH_VARARGS|METH_KEYWORDS, get_transfer_matrix_docstring.c_str()},
+{"set_deviations", (PyCFunction)set_deviations,
+  METH_VARARGS|METH_KEYWORDS, set_deviations_docstring.c_str()},
+{"get_deviations", (PyCFunction)get_deviations,
+  METH_VARARGS|METH_KEYWORDS, get_deviations_docstring.c_str()},
+{"set_step_size", (PyCFunction)set_step_size,
+  METH_VARARGS|METH_KEYWORDS, set_step_size_docstring.c_str()},
+{"get_step_size", (PyCFunction)get_step_size,
+  METH_VARARGS|METH_KEYWORDS, get_step_size_docstring.c_str()},
+{"set_energy_loss_model", (PyCFunction)set_energy_loss_model,
+  METH_VARARGS|METH_KEYWORDS, set_energy_loss_model_docstring.c_str()},
+{"get_energy_loss_model", (PyCFunction)get_energy_loss_model,
+  METH_VARARGS|METH_KEYWORDS, get_energy_loss_model_docstring.c_str()},
+{"set_scattering_model", (PyCFunction)set_scattering_model,
+  METH_VARARGS|METH_KEYWORDS, set_scattering_model_docstring.c_str()},
+{"get_scattering_model", (PyCFunction)get_scattering_model,
+  METH_VARARGS|METH_KEYWORDS, get_scattering_model_docstring.c_str()},
+{NULL}
+};
+
+static PyTypeObject PyGlobalErrorTrackingType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "global_error_tracking.GlobalErrorTracking",         /*tp_name*/
+    sizeof(PyGlobalErrorTracking),           /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)_free, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    _str,                      /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    _str,                      /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    class_docstring,           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    0,		               /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    _methods,           /* tp_methods */
+    _members,           /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)_init,      /* tp_init */
+    (allocfunc)_alloc,    /* tp_alloc, called by new */
+    PyType_GenericNew,                  /* tp_new */
+    (freefunc)_free, /* tp_free, called by dealloc */
+};
+
 static PyMethodDef _keywdarg_methods[] = {
-    {"propagate_errors", (PyCFunction)propagate_errors,
-    METH_VARARGS|METH_KEYWORDS, propagate_errors_docstring.c_str()},
-    {"get_transfer_matrix", (PyCFunction)get_transfer_matrix,
-    METH_VARARGS|METH_KEYWORDS, get_transfer_matrix_docstring.c_str()},
+    {"enable_material", (PyCFunction)enable_material,
+      METH_VARARGS|METH_KEYWORDS, enable_material_docstring.c_str()},
+    {"disable_material", (PyCFunction)disable_material,
+      METH_VARARGS|METH_KEYWORDS, disable_material_docstring.c_str()},
+    {"is_enabled_material", (PyCFunction)is_enabled_material,
+      METH_VARARGS|METH_KEYWORDS, is_enabled_material_docstring.c_str()},
     {NULL,  NULL}   /* sentinel */
 };
 
-std::string module_docstring = "DOCSTRING";
+const char* module_docstring = "MODULE DOCSTRING";
 
 PyMODINIT_FUNC initglobal_error_tracking(void) {
+    if (PyType_Ready(&PyGlobalErrorTrackingType) < 0)
+        return;
+
     PyObject* module = Py_InitModule3("global_error_tracking",
                                       _keywdarg_methods,
-                                      module_docstring.c_str());
+                                      module_docstring);
     if (module == NULL) return;
+
+    PyTypeObject* tracking_type = &PyGlobalErrorTrackingType;
+    Py_INCREF(tracking_type);
+    PyModule_AddObject(module,
+                       "GlobalErrorTracking",
+                       reinterpret_cast<PyObject*>(tracking_type));
 }
-}  // namespace PyGlobalErrorPropagator
+}  // namespace PyGlobalErrorTracking
 }  // namespace MAUS
 

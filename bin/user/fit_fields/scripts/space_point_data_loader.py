@@ -1,7 +1,7 @@
 import ROOT
 import libMausCpp
 
-class SpacePointDataLoader(object):
+class DataLoader(object):
     def __init__(self, config):
         self.config = config
         self.tof_cut_count = 0
@@ -85,12 +85,7 @@ class SpacePointDataLoader(object):
         
         return False
 
-    def load_scifi_event(self, scifi_event):
-        space_points = scifi_event.spacepoints()
-        if self.will_cut_on_scifi_clusters(scifi_event):
-            return None
-        if self.will_cut_on_scifi_space_points(scifi_event):
-            return None
+    def load_space_points(self, scifi_event):
         space_points_out = []
         for space_point in scifi_event.spacepoints():
             # if we require triplets and space point is not a triplet, skip it
@@ -116,6 +111,42 @@ class SpacePointDataLoader(object):
                 })
         space_points_out = sorted(space_points_out, key = lambda sp: sp["z"])
         return space_points_out
+
+    def load_track_points(self, scifi_event):
+        track_points_out = []
+        for track_point in scifi_event.trackpoints():
+            position = track_point.get_global_position()
+            if space_point.get_tracker() == 0:
+                space_points_out.append({
+                  "x":position.x(),
+                  "y":position.y(),
+                  "z":position.z(),
+                  "px":position.x(),
+                  "py":position.y(),
+                  "pz":position.z(),
+                  "t":None,
+                  "detector":"tku"
+                })
+            else:
+                space_points_out.append({
+                  "x":position.x(),
+                  "y":position.y(),
+                  "z":position.z(),
+                  "t":None,
+                  "detector":"tkd"
+                })
+        space_points_out = sorted(space_points_out, key = lambda sp: sp["z"])
+        return space_points_out
+
+
+    def load_scifi_event(self, scifi_event):
+        space_points = scifi_event.spacepoints()
+        if self.will_cut_on_scifi_clusters(scifi_event):
+            return None
+        if self.will_cut_on_scifi_space_points(scifi_event):
+            return None
+        self.load_space_points(space_points)
+        return scifi_event
 
     def will_cut_on_scifi_clusters(self, scifi_event):
         """Require exactly one cluster in each plane"""

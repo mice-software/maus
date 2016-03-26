@@ -65,6 +65,8 @@ namespace MAUS {
     _navigator = new G4Navigator();
     _navigator->SetWorldVolume(this->_global_volume);
     this->_setPoint(G4ThreeVector(0.0, 0.0, 0.0));
+    // Ack! G4 does some setup at BeamOn time
+    G4RunManager::GetRunManager()->BeamOn(0);
   }
 
 
@@ -87,8 +89,6 @@ namespace MAUS {
                  std::string("Physical volume required"),
                  "GeometryNavigator::_setPoint(G4ThreeVector)"));
     }
-    // Ack! G4 does some setup at BeamOn time
-    G4RunManager::GetRunManager()->BeamOn(0);
     _current_position = pos;
     _navigator->LocateGlobalPointAndSetup(_current_position);
     if (_touchable_history) {

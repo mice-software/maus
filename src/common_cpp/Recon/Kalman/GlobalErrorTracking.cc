@@ -20,6 +20,8 @@
 
 namespace MAUS {
 
+std::stringstream GlobalErrorTracking::tracking_fail;
+
 const double GlobalErrorTracking::_float_tolerance = 1e-15;
 
 GlobalErrorTracking* GlobalErrorTracking::_tz_for_propagate = NULL;
@@ -30,7 +32,6 @@ GlobalErrorTracking::GlobalErrorTracking() : _field(Globals::GetMCFieldConstruct
 }
 
 void GlobalErrorTracking::Propagate(double x[29], double target_z) {
-  std::cerr << "GlobalErrorTracking::Propagate material model " << _eloss_model << std::endl;
 
   _mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
   if (_mass_squared < -_float_tolerance || _mass_squared != _mass_squared) {
@@ -50,36 +51,25 @@ void GlobalErrorTracking::Propagate(double x[29], double target_z) {
       h *= -1;  // stepping backwards...
   int    nsteps = 0;
   _tz_for_propagate = this;
-  //std::cerr << "GlobalErrorTracking::Propagate BEFORE" << std::endl;
-  //print(std::cerr, x);
+  tracking_fail.str("");  // clear the error stream
   while(fabs(z-target_z) > _float_tolerance) {
-    // std::cerr << "Stepping " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
     nsteps++;
-    
+
     int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &z, target_z, &h, x);
-    // std::cerr << "Stepped " << nsteps << " dz: " << h << " z_tot: " << z << std::endl;
     
-    if(status != GSL_SUCCESS)
-    {
-        throw(MAUS::Exception(MAUS::Exception::recoverable,
-                            "Failed during tracking",
-                            "GlobalErrorTracking::Propagate") );
-        break;
+    if (nsteps > _max_n_steps) {
+        tracking_fail << "Exceeded maximum number of steps\n"; 
+        status = GSL_FAILURE;
     }
-    if(nsteps > _max_n_steps)
-    {
-        std::stringstream ios;
-        ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n" 
-            << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
-            << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
+    if (status != GSL_SUCCESS) {
+        tracking_fail << "Killing tracking with step size " << h
+            << " at step " << nsteps << " of " << _max_n_steps << "\n";
+        print(tracking_fail, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
-                              ios.str()+" Exceeded maximum number of steps\n",
-                              "GlobalErrorTracking::Propagate") );
-        break;
+                            tracking_fail.str(),
+                            "GlobalErrorTracking::Propagate") );
     }
   }
-  //std::cerr << "GlobalErrorTracking::Propagate AFTER" << std::endl;
-  //print(std::cerr, x);
   gsl_odeiv_evolve_free (evolve);
   gsl_odeiv_control_free(control);
   gsl_odeiv_step_free   (step);
@@ -111,21 +101,20 @@ void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z)
     
     if(status != GSL_SUCCESS)
     {
-        std::stringstream ios;
-        ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n";
-        print(ios, x);
+        tracking_fail << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n";
+        print(tracking_fail, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
-                            ios.str()+"\nFailed during tracking",
+                            tracking_fail.str(),
                             "GlobalErrorTracking::Propagate") );
         break;
     }
     if(nsteps > _max_n_steps)
     {
-        std::stringstream ios;
-        ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n";
-        print(ios, x);
+        tracking_fail << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n"
+                      << "\nExceeded maximum number of steps\n";
+        print(tracking_fail, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
-                              ios.str()+"\nExceeded maximum number of steps\n",
+                              tracking_fail.str(),
                               "GlobalErrorTracking::Propagate") );
         break;
     }
@@ -142,34 +131,37 @@ int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double 
                                    void* params) {
   if (fabs(x[7]) < _float_tolerance) {
     // z-momentum is 0
+      tracking_fail << "pz " << x[7] << " was less than float tolerance " << _float_tolerance << "\n";
       return GSL_FAILURE;
   }
   for (size_t i = 0; i < 29; ++i) {
       if (x[i] != x[i]) {
+          tracking_fail << "Detected nan in input i: " << i << " value: " << x[i] << "\n";
+          print(tracking_fail, x);
           return GSL_FAILURE;
       }
   }
   if (_tz_for_propagate == NULL) {
+      tracking_fail << "_tz_for_propagate was NULL\n";
       return GSL_FAILURE;
   }
   int em_success = EMEquationOfMotion(z, x, dxdz, params);
   if (em_success != GSL_SUCCESS) {
+      tracking_fail << "EM transport failed\n";
       return em_success;
   }
 
   // If no material processes are active, don't run MaterialEquationsOfMotion
   // at all
- // std::cerr << "GlobalErrorTracking::EquationsOFMotion checking material model" << std::endl;
   if (_tz_for_propagate->_eloss_model == no_eloss &&
       _tz_for_propagate->_mcs_model == no_mcs &&
       _tz_for_propagate->_estrag_model == no_estrag) {
-      //std::cerr << "GlobalErrorTracking::EquationsOFMotion material models disabled" << std::endl;
       return GSL_SUCCESS;
   }
-  //std::cerr << "GlobalErrorTracking::EquationsOFMotion material models enabled; proceeding with EqM" << std::endl;
 
   int material_success = MaterialEquationOfMotion(z, x, dxdz, params);
   if (material_success != GSL_SUCCESS) {
+      tracking_fail << "Material transport failed\n";
       return material_success;
   }
   return GSL_SUCCESS;
@@ -179,7 +171,6 @@ int GlobalErrorTracking::EMEquationOfMotion(double z, const double x[29], double
                                    void* params) {
   double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double xfield[4] = {x[1], x[2], x[3], x[0]};
-  std::cerr << "EMEquationOfMotion x: " << x[1] << " y: " << x[2] << " z: " << x[3] << std::endl;
   _tz_for_propagate->_field->GetFieldValue(xfield, field);
 
   double charge = _tz_for_propagate->_charge;
@@ -295,7 +286,6 @@ int GlobalErrorTracking::MatrixEquationOfMotion(double z, const double x[44], do
 int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], double dxdz[29],
                                    void* params) {
     // Must be called after EMEquationOfMotion
-    std::cerr << "GlobalErrorTracking::MaterialEquationsOfMotion" << std::endl;
     MaterialModel material(x[1], x[2], x[3]);
 
     double energy = sqrt(x[4]*x[4]);
@@ -308,10 +298,10 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     double destragdz;
     if (_tz_for_propagate->_eloss_model == bethe_bloch_forwards) {
         dEdz = material.dEdx(energy, mass, charge); // should be negative
-        d2EdzdE =  material.d2EdxdE(energy, mass, charge);
+        d2EdzdE = 0.; // material.d2EdxdE(energy, mass, charge);
     } else if (_tz_for_propagate->_eloss_model == bethe_bloch_backwards) {
-        dEdz = -material.dEdx(energy, mass, charge); // should be positive
-        d2EdzdE = -material.d2EdxdE(energy, mass, charge);
+        dEdz = material.dEdx(energy, mass, charge); // should be negative; during tracking backwards dz is negative so dEdz gets handled properly
+        d2EdzdE = 0.; // material.d2EdxdE(energy, mass, charge);
     } else {
         dEdz = 0.; // no eloss
         d2EdzdE = 0;
@@ -335,22 +325,19 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
 
     // E^2 = p^2+m^2; 2E dE/dz = 2p dp/dz
     double dpdz = energy/p*dEdz;
-    dxdz[4] = dEdz;
-    dxdz[5] = dpdz*x[5]/p;
-    dxdz[6] = dpdz*x[6]/p;
-    dxdz[7] = dpdz*x[7]/p;
+    dxdz[4] += dEdz;
+    dxdz[5] += dpdz*x[5]/p;
+    dxdz[6] += dpdz*x[6]/p;
+    dxdz[7] += dpdz*x[7]/p;
 
     // d/dz <E^2> = d<estrag2>/dz + 2E d/dE dE/dz
-    dxdz[23] = destragdz+2*x[4]*d2EdzdE;
+    dxdz[23] += destragdz+2*x[4]*d2EdzdE;
 
     // product rule - <p_x^2> = <x'^2> p_z^2
     // d<px^2>/dz = d<x'^2>/dz p_z^2 + 2 <x'^2> p_z dp_z/dz 
     //            = d<x'^2>/dz p_z^2 + 2 <p_x^2>/p_z dp_z/dz
-    dxdz[26] = 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
-    dxdz[28] = 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
-
-    std::cerr << "Material EqM x: " << x[1] << " y: " << x[2] << " z: " << x[3] << " E: " << x[4] << std::endl;
-    std::cerr << "         dE/dz: " << dEdz << " estrag: " << destragdz << " dtheta2dz: " << dtheta2dz << std::endl;
+    dxdz[26] += 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
+    dxdz[28] += 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
 
     return GSL_SUCCESS;
 }
@@ -466,16 +453,16 @@ void GlobalErrorTracking::SetField(BTField* field) {
     }
 }
 
-ostream& GlobalErrorTracking::print(std::ostream& out, double* x) {
+ostream& GlobalErrorTracking::print(std::ostream& out, const double* x) {
     out << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
         << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
     size_t index = 8;
     for (size_t i = 0; i < 6; ++i) {
         for (size_t j = 0; j < i; ++j) {
-            out << "       ";
+            out << "            ";
         }
         for (size_t j = i; j < 6; ++j) {
-            out << std::setprecision(6) << std::setw(10) << x[i];
+            out << std::setprecision(6) << std::setw(12) << x[index];
             ++index;
         }
         out << std::endl;

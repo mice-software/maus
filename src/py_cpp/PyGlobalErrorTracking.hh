@@ -27,10 +27,17 @@
 #undef _XOPEN_SOURCE
 #endif
 
-#include "Python.h"
+#include <Python.h>
 
 namespace MAUS {
 namespace PyGlobalErrorTracking {
+
+typedef struct {
+    PyObject_HEAD;
+    GlobalErrorTracking* tracking;
+} PyGlobalErrorTracking;
+
+
 /* @brief Track a central trajectory and error through the Geant4 geometry
  *
  * Track a central trajectory and error through the Geant4 geometry. Return a MC

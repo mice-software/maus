@@ -1,4 +1,6 @@
 
+#include <set>
+
 #ifndef recon_global_materialmodel_hh_
 #define recon_global_materialmodel_hh_
 
@@ -25,6 +27,10 @@ class MaterialModel {
     void SetMaterial(const G4Material* material);
     const G4Material* GetMaterial() const {return _material;}
 
+    static bool IsEnabledMaterial(std::string material_name);
+    static void EnableMaterial(std::string material_name);
+    static void DisableMaterial(std::string material_name);
+
   private:
     // _material is a borrowed reference; data is owned by G4MaterialTable
     const G4Material* _material = NULL;
@@ -39,7 +45,8 @@ class MaterialModel {
     double _density = 0.;
     double _z_over_a = 0.;
     GeometryNavigator* _navigator = NULL;
-    
+    static std::set<std::string> _enabled_materials;
+
     static constexpr double _d2EdxdE_delta_const = 0.1; //2.1047291091867513e-13; // 4 pi (r_e m_e c^2)^2
     static constexpr double _estrag_const = 0.157; //2.1047291091867513e-13; // 4 pi (r_e m_e c^2)^2
     static constexpr double _dedx_constant = 0.307075;

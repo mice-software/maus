@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 import numpy
 import ROOT
@@ -58,6 +59,15 @@ class MinimisePositionResidualFitter(object):
         self.maus_conf = json.dumps(json_conf)
         maus_cpp.globals.birth(self.maus_conf)
         print maus_cpp.field.str(True)
+        self.tracking = maus_cpp.global_error_tracking.GlobalErrorTracking()
+        self.tracking.set_step_size(10.)
+          
+        maus_cpp.global_error_tracking.enable_material("AIR")
+        maus_cpp.global_error_tracking.enable_material("POLYSTYRENE")
+        maus_cpp.global_error_tracking.enable_material("POLYCARBONATE")
+        maus_cpp.global_error_tracking.enable_material("BC600")
+        # "Al", "STEEL", "lXe", "ALUMINUM" [sic], "Galactic"
+
 
     def setup_minuit(self):
         self.minuit = ROOT.TMinuit(6)
@@ -180,26 +190,41 @@ class MinimisePositionResidualFitter(object):
         print numpy.matrix(ellipse)
         print numpy.linalg.det(numpy.matrix(ellipse))
         print "..."
-        while z < z_min_max[1]:
-            values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, z, 10.)
-            z += (z_min_max[1] - z_min_max[0])/1000.
-            track_list.append([values[1], values[2], values[0], values[4], values[3]])
-            track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[0]+ellipse[0][0]**0.5, values[4]+ellipse[3][3]**0.5, values[3]])
-            track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[0]-ellipse[0][0]**0.5, values[4]-ellipse[3][3]**0.5, values[3]])
-            n_step += 1
-
+        try:
+            while z < z_min_max[1]:
+                self.tracking.set_energy_loss_model("bethe_bloch_forwards")
+                self.tracking.set_scattering_model("moliere_forwards")
+                values, ellipse = self.tracking.propagate_errors(values, ellipse, z)
+                z += (z_min_max[1] - z_min_max[0])/1000.
+                track_list.append([values[1], values[2], values[0], values[4], values[3]])
+                track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[0]+ellipse[0][0]**0.5, values[4]+ellipse[3][3]**0.5, values[3]])
+                track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[0]-ellipse[0][0]**0.5, values[4]-ellipse[3][3]**0.5, values[3]])
+                n_step += 1
+            print
+        except Exception:
+            print
+            sys.excepthook(*sys.exc_info())
+            print "Tracking failed with", values
         values = [self.best_guess[key] for key in track_keys]
         ellipse = [[self.errors[i][j] for i in range(6)] for j in range(6)]
 
         print "Propagating track and errors backwards"
         print "..."
         z = self.best_guess["z"]-1.
-        while z > z_min_max[0]:
-            values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, z, -10.)
-            z -= (z_min_max[1] - z_min_max[0])/1000.
-            track_list.append([values[1], values[2], values[0], values[4], values[3]])
-            track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[0]+ellipse[0][0]**0.5, values[4]+ellipse[3][3]**0.5, values[3]])
-            track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[0]-ellipse[0][0]**0.5, values[4]-ellipse[3][3]**0.5, values[3]])
+        try:
+            while z > z_min_max[0]:
+                self.tracking.set_energy_loss_model("bethe_bloch_backwards")
+                self.tracking.set_scattering_model("moliere_backwards")
+                values, ellipse = self.tracking.propagate_errors(values, ellipse, z)
+                z -= (z_min_max[1] - z_min_max[0])/1000.
+                track_list.append([values[1], values[2], values[0], values[4], values[3]])
+                track_pos_list.append([values[1]+ellipse[1][1]**0.5, values[2]+ellipse[2][2]**0.5, values[0]+ellipse[0][0]**0.5, values[4]+ellipse[3][3]**0.5, values[3]])
+                track_neg_list.append([values[1]-ellipse[1][1]**0.5, values[2]-ellipse[2][2]**0.5, values[0]-ellipse[0][0]**0.5, values[4]-ellipse[3][3]**0.5, values[3]])
+            print
+        except Exception:
+            print
+            sys.excepthook(*sys.exc_info())
+            print "Tracking failed with", values
 
         track_list = sorted(track_list, key = lambda x: x[4])
         track_pos_list = sorted(track_pos_list, key = lambda x: x[4])
@@ -372,9 +397,25 @@ class MinimisePositionResidualFitter(object):
             if sp["z"] == fitter.best_guess["z"]:
                 pass
             elif sp["z"] > fitter.best_guess["z"]:
-                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], 10., fitter.config.eloss_model)
+                try:
+                    fitter.tracking.set_energy_loss_model("bethe_bloch_forwards")
+                    fitter.tracking.set_scattering_model("moliere_forwards")
+                    values, ellipse = fitter.tracking.propagate_errors(values, ellipse, sp["z"])
+                except RuntimeError:
+                    sys.excepthook(*sys.exc_info())
+                    values[0] = 0. # should weight by how far the track progressed...
+                    values[1] = fitter.aperture
+                    values[2] = fitter.aperture
             elif sp["z"] < fitter.best_guess["z"]:
-                values, ellipse = maus_cpp.global_error_tracking.propagate_errors(values, ellipse, sp["z"], -10., fitter.config.eloss_model)
+                try:
+                    fitter.tracking.set_energy_loss_model("bethe_bloch_backwards")
+                    fitter.tracking.set_scattering_model("moliere_backwards")
+                    values, ellipse = fitter.tracking.propagate_errors(values, ellipse, sp["z"])
+                except RuntimeError:
+                    sys.excepthook(*sys.exc_info())
+                    values[0] = 30. # should weight by how far the track progressed...
+                    values[1] = fitter.aperture
+                    values[2] = fitter.aperture
             fitter.fitted_track_points[sp_index] = dict(zip(keys, values))
             fitter.fitted_track_points[sp_index]["detector"] = sp["detector"]
             chi2 = 0.
@@ -387,5 +428,6 @@ class MinimisePositionResidualFitter(object):
 
     mu_mass = common.pdg_pid_to_mass[13]
     c_light = common.constants["c_light"]
+    aperture = 500.
     fitter = None
 

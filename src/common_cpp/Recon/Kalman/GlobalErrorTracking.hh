@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
@@ -46,15 +48,15 @@ public:
     double GetStepSize() const {return _step_size;}
 
     void SetEnergyLossModel(ELossModel eloss_model) {_eloss_model = eloss_model;}
-    bool GetEnergyLossModel() const {return _eloss_model;}
+    ELossModel GetEnergyLossModel() const {return _eloss_model;}
 
     void SetMCSModel(MCSModel mcs_model) {_mcs_model = mcs_model;}
-    bool GetMCSModel() const {return _mcs_model;}
+    MCSModel GetMCSModel() const {return _mcs_model;}
 
     void SetEStragModel(EStragModel estrag_model) {_estrag_model = estrag_model;}
-    bool GetEStragModel() const {return _estrag_model;}
+    EStragModel GetEStragModel() const {return _estrag_model;}
 
-    static ostream& print(std::ostream& out, double x[29]);
+    static ostream& print(std::ostream& out, const double x[29]);
 
 private:
     GlobalErrorTracking(const GlobalErrorTracking& tracking); // disable copy constructor
@@ -87,6 +89,7 @@ private:
     MaterialModel _mat_mod;
     static GlobalErrorTracking* _tz_for_propagate;
     static const double _float_tolerance;
+    static std::stringstream tracking_fail;
 };
 }
 #endif
