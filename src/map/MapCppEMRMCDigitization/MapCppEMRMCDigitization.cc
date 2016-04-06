@@ -168,8 +168,7 @@ void MapCppEMRMCDigitization::_process(Data *data) const {
       return;
 
   // Set the window from the leading time to 20 ADC counts later
-  int lt = static_cast<int>
-	     (*std::min_element(delta_t_array.begin(), delta_t_array.end())/_dbb_count);
+  int lt = static_cast<int>(*std::min_element(delta_t_array.begin(), delta_t_array.end()));
   int deltat_min = lt; // ns
   int deltat_max = lt + 50; // ns, +50 ns
 
