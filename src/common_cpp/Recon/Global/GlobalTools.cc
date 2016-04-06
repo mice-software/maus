@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <cmath>
-
 #include "Geant4/G4Navigator.hh"
 #include "Geant4/G4TransportationManager.hh"
 #include "Geant4/G4NistManager.hh"
@@ -306,6 +305,8 @@ void propagate(double* x, double target_z, const BTField* field,
   size_t max_steps = 10000000;
   size_t n_steps = 0;
   double z = x[3];
+  GeometryNavigator geometry_navigator;
+  geometry_navigator.Initialise(g4navigator->GetWorldVolume());
   while (fabs(z - target_z) > 1e-6) {
     n_steps++;
     h = step_size*prop_dir; // revert step size as large step size problematic for dEdx
@@ -315,8 +316,6 @@ void propagate(double* x, double target_z, const BTField* field,
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
       g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
-      GeometryNavigator geometry_navigator;
-      geometry_navigator.Initialise(g4navigator->GetWorldVolume());
       double safety = 10;
       double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
       if (boundary_dist > 1e6) {
@@ -333,6 +332,7 @@ void propagate(double* x, double target_z, const BTField* field,
           h = z_dist; // will have proper sign from momvector
         }
       }
+      // Making sure we don't get stuck in Zeno's paradox
       if (std::abs(h) < 0.1) {
         h = 0.1*prop_dir;
       }
@@ -374,6 +374,7 @@ void propagate(double* x, double target_z, const BTField* field,
       throw(Exception(Exception::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
+
   }
   gsl_odeiv_evolve_free(evolve);
   gsl_odeiv_control_free(control);

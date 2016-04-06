@@ -8,20 +8,20 @@ import os
 # Change these two paths to the location where you downloaded the
 # CDB geometry. Make sure to use a no-field geometry.
 simulation_geometry_filename = \
-  '%s/files/geometry/download/108-nofield/ParentGeometryFile.dat' \
+  '%s/files/geometry/download/run7469/ParentGeometryFile.dat' \
   % os.environ.get("MAUS_ROOT_DIR")
 reconstruction_geometry_filename = \
-  '%s/files/geometry/download/108-nofield/ParentGeometryFile.dat' \
+  '%s/files/geometry/download/run7469/ParentGeometryFile.dat' \
   % os.environ.get("MAUS_ROOT_DIR")
 
 # Change this to the filename of your unpacked data file
-input_root_file_name = '7157_unpacked.root'
+input_root_file_name = '07469_recon.root'
 # 0 -> debug output (e.g. messages about detector matches) on, 1 -> off
 verbose_level = 0
 
 # Don't change this, there is currently a bug affecting accessing local
 # volumes in a CDB geometry.
-track_matching_energy_loss = False
+track_matching_energy_loss = True
 
 # Matching will be attempted with all pid hypotheses (mu, pi, e +/-)
 # Can be changed to either one (never several) of

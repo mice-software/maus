@@ -78,8 +78,8 @@ beam = {
 }
 
 particle_decay = True
-#~ physics_processes = "standard"
-physics_processes = "mean_energy_loss"
+physics_processes = "standard"
+#~ physics_processes = "mean_energy_loss"
 TOF_calib_by = "date"
 TOF_calib_date_from = "2013-10-01 00:00:00"
 #~ header_and_footer_mode = "dont_append"

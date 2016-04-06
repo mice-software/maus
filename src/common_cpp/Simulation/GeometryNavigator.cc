@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "Geant4/G4RunManager.hh" 
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "src/common_cpp/Utils/Exception.hh"
 
@@ -63,6 +64,8 @@ namespace MAUS {
     }
     _navigator = new G4Navigator();
     _navigator->SetWorldVolume(this->_global_volume);
+    // Needed so Geant4 doesn't segfault when setting up a point
+    G4RunManager::GetRunManager()->BeamOn(0);
     this->_setPoint(G4ThreeVector(0.0, 0.0, 0.0));
   }
 
@@ -147,4 +150,3 @@ namespace MAUS {
     return _current_material->GetDensity()/(g/(cm*cm*cm));
   }
 }
-

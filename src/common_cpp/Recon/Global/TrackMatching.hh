@@ -259,6 +259,20 @@ namespace global {
         DataStructure::Global::TrackPointCPArray trackpoints,
         DataStructure::Global::DetectorPoint detector);
 
+    /**
+     * @brief Only add matched TrackPoints, if hits are consistent with each other
+     *
+     * If only one matche TrackPoint exists, it is added to the track, if multiple
+     * exist, they are only added if they are consistent with each other (i.e.
+     * max. one slab position difference and for TOFs a cut on the difference in t)
+     *
+     * @param trackpoints The TrackPoints which should be checked/added
+     * @param hypothesis_track The Track to which the TrackPoints should be added
+     */
+    void AddIfConsistent(
+        std::vector<DataStructure::Global::TrackPoint*> trackpoints,
+        DataStructure::Global::Track* hypothesis_track);
+
     /// Mapper name passed by the mapper calling this class
     std::string _mapper_name;
 
