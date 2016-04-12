@@ -12,7 +12,7 @@ import scripts.config_fit_residuals_both_trackers
 def main():
     config = scripts.config_fit_residuals_both_trackers.Config()
     data_loader = scripts.data_loader.DataLoader(config)
-    data_loader.load_data(config.number_of_events)
+    data_loader.load_data(0, config.number_of_events)
     fitter = scripts.minimise_position_residual_fitter.MinimisePositionResidualFitter(config)
     for event in data_loader.events:
         print "Space points for spill", event["spill"], "particle", event["particle_number"]

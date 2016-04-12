@@ -27,6 +27,8 @@ class ExtrapolateTrackPoints(object):
         self.setup_maus_config()
         self.residual_dicts = {}
         self.weighted_residual_dicts = {}
+        self.in_cut_residual_dicts = {}
+        self.in_cut_weighted_residual_dicts = {}
        
     def setup_maus_config(self):
         self.tracking = maus_cpp.global_error_tracking.GlobalErrorTracking()
@@ -107,25 +109,40 @@ class ExtrapolateTrackPoints(object):
         return min_max
 
     def append_residual(self, event, detector, axis):
+        if event["passed_cuts"]:
+            passed_cuts = True
+        else:
+            passed_cuts = False
+        event = event["data"]
         if detector not in self.residual_dicts:
             self.residual_dicts[detector] = {}
             self.weighted_residual_dicts[detector] = {}
+            self.in_cut_residual_dicts[detector] = {}
+            self.in_cut_weighted_residual_dicts[detector] = {}
         if axis not in self.residual_dicts[detector]:
             self.residual_dicts[detector][axis] = []
             self.weighted_residual_dicts[detector][axis] = []
+            self.in_cut_residual_dicts[detector][axis] = []
+            self.in_cut_weighted_residual_dicts[detector][axis] = []
         
         residual_list = self.residual_dicts[detector][axis]
         weighted_residual_list = self.weighted_residual_dicts[detector][axis]
+        in_cut_residual_list = self.in_cut_residual_dicts[detector][axis]
+        in_cut_weighted_residual_list = self.in_cut_weighted_residual_dicts[detector][axis]
         try:
             det_rec = self.get_point(event, detector)
             glob_rec = self.get_point(event, self.global_key(detector))
             residual = det_rec[axis]-glob_rec[axis]
             residual_list.append(residual)
+            if passed_cuts:
+                in_cut_residual_list.append(residual)
             if axis in self.cov_key_list:
                 key = self.cov_key_list.index(axis)
                 sigma = (glob_rec["covariance"][key][key]+det_rec["covariance"][key][key])**0.5
                 weighted_residual = residual/sigma
                 weighted_residual_list.append(weighted_residual)
+                if passed_cuts:
+                    in_cut_weighted_residual_list.append(weighted_residual)
         except ValueError:
             pass
 
@@ -134,9 +151,32 @@ class ExtrapolateTrackPoints(object):
         for format in "png", "pdf", "root":
             canvas.Print(plot_name+"."+format)
 
+    text_boxes = []
+    def get_text_box(self, residual_list, in_cut_residual_list):
+        text_box = ROOT.TPaveText(0.6, 0.5, 0.9, 0.9, "NDC")
+        text_box.SetFillColor(0)
+        text_box.SetBorderSize(0)
+        text_box.SetTextSize(0.04)
+        text_box.SetTextAlign(12)
+        text_box.SetTextSize(0.03)
+        text_box.AddText("All events (black)")
+        text_box.AddText("Number: "+str(len(residual_list)))
+        text_box.AddText("Mean:   "+str(numpy.mean(residual_list)))
+        text_box.AddText("Std:    "+str(numpy.std(residual_list)))
+        text_box.AddText("In Cut (blue)")
+        text_box.AddText("Number: "+str(len(in_cut_residual_list)))
+        text_box.AddText("Mean:   "+str(numpy.mean(in_cut_residual_list)))
+        text_box.AddText("Std:    "+str(numpy.std(in_cut_residual_list)))
+        text_box.SetBorderSize(1)
+        text_box.Draw()
+        self.text_boxes.append(text_box)
+        return text_box
+
     def plot_residuals(self, detector, axis):
         residual_list = self.residual_dicts[detector][axis]
         weighted_residual_list = self.weighted_residual_dicts[detector][axis]
+        in_cut_residual_list = self.in_cut_residual_dicts[detector][axis]
+        in_cut_weighted_residual_list = self.in_cut_weighted_residual_dicts[detector][axis]
        
         nbins = self.config.residuals_plots_nbins
         name = "residuals - "+detector+" "+axis
@@ -145,8 +185,12 @@ class ExtrapolateTrackPoints(object):
         canvas = xboa.common.make_root_canvas(name)
         hist = xboa.common.make_root_histogram(name, residual_list, label, nbins, xmin = min_max[0], xmax = min_max[1])
         hist.SetTitle(detector+": "+axis)
-        hist.SetStats(True)
         hist.Draw()
+        hist = xboa.common.make_root_histogram(name, in_cut_residual_list, label, nbins, xmin = min_max[0], xmax = min_max[1])
+        hist.SetTitle(detector+": "+axis)
+        hist.SetLineColor(4)
+        hist.Draw("SAME")
+        self.get_text_box(residual_list, in_cut_residual_list)
         canvas.Update()
         self.print_canvas(canvas, name)
         name = "normalised "+name
@@ -154,9 +198,15 @@ class ExtrapolateTrackPoints(object):
         min_max = self.alt_min_max(weighted_residual_list, 10)
         hist = xboa.common.make_root_histogram(name, weighted_residual_list, "Res("+axis+")/#sigma("+axis+")", nbins, xmin = min_max[0], xmax = min_max[1])
         hist.SetTitle(detector+": "+axis)
-        hist.SetStats(True)
         hist.Draw()
+        hist = xboa.common.make_root_histogram(name, in_cut_weighted_residual_list, "Res("+axis+")/#sigma("+axis+")", nbins, xmin = min_max[0], xmax = min_max[1])
+        hist.SetTitle(detector+": "+axis)
+        hist.SetLineColor(4)
+        hist.Draw("SAME")
+        self.get_text_box(weighted_residual_list, in_cut_weighted_residual_list)
         canvas.Update()
+
+
         self.print_canvas(canvas, name)
         
 
@@ -178,8 +228,9 @@ def main():
     config = scripts.config_extrapolate_through_detectors.Config()
     maus_globals(config)
     extrapolate = ExtrapolateTrackPoints(config)
-    extrapolate_cuts = ExtrapolateTrackPoints(config)
     min_spill = 0
+    all_event_count = 0
+    all_event_in_cut_count = 0
     for max_spill in range(100, config.number_of_spills, 100):
         data_loader = scripts.data_loader.DataLoader(config)
         if max_spill + 100 > config.number_of_spills:
@@ -187,16 +238,23 @@ def main():
         data_loader.load_data(min_spill, max_spill)
         progress = 0.1
         for i, event in enumerate(data_loader.events):
+            all_event_count += 1
             if i/float(len(data_loader.events)) > progress:
                 print "Done", i, "of", len(data_loader.events)
                 progress += 0.1
+            if event["passed_cuts"]:
+                all_event_in_cut_count += 1
             try:
-                event["data"] = extrapolate.extrapolate_event(event["data"])      
+                event["data"] = extrapolate.extrapolate_event(event["data"])     
             except ValueError:
                 pass
             for detector in "tof0", "tof1":
                 for axis in "x", "y", "t":
-                    extrapolate.append_residual(event["data"], detector, axis) 
+                    extrapolate.append_residual(event, detector, axis)
+        print "all events:", all_event_count, \
+              "all events in cuts:", all_event_in_cut_count, \
+              "extrapolated:", len(extrapolate.residual_dicts["tof1"]["t"]), \
+              "extrapolated in cuts:", len(extrapolate.in_cut_residual_dicts["tof1"]["t"])
         xboa.common.clear_root()
         min_spill = max_spill
         for detector in "tof0", "tof1":

@@ -130,7 +130,7 @@ void tm_tracking_check(GlobalErrorTracking& propagator, double* x_in, double del
             }
         }
     }
-    propagator.UpdateTransferMatrix(x_in);
+    propagator.UpdateTransferMatrix(x_in, 1.);
     std::vector< std::vector<double> > tm_analytical = propagator.GetMatrix();
     Squeak::mout(verbose) << "Analytical" << std::endl;
     for (size_t j = 0; j < 6; ++j) {
@@ -242,10 +242,10 @@ TEST(GlobalErrorTrackingTest, TransferMatrixSolFieldTest) {
                 mass_shell_condition(x_in_3, 105.658);
                 tm_tracking_check(propagator, x_in_3, delta, step);
                 tracking_test(propagator, x_in_3, 10.);
-
         }
     }
 }
+
 
 void print_x(double * x_in) {
     Squeak::mout(verbose) << "x: ";
@@ -316,7 +316,7 @@ TEST(GlobalErrorTrackingTest, PropagateEllipseDriftTest) {
     }
 
     print_x(&x_out[0]);
-    EXPECT_NEAR(x_out[0], x_in[4]/x_in[7]/299.792458*dz, 1e-3);
+    EXPECT_NEAR(x_out[0], x_in[4]/x_in[7]/c_l*dz, 1e-3);
     EXPECT_NEAR(x_out[3], dz, 1e-3);
     for (size_t i = 0; i < 8; ++i) {
         if (i == 0 || i == 3)
@@ -435,58 +435,175 @@ TEST(GlobalErrorTrackingTest, PropagateEllipseConstFieldTest) {
     }
 }
 
-TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
-    GlobalsManager::SetMonteCarloMiceModules(new MiceModule("Test.dat"));
+// Propagate ellipse forwards through a solenoid field; then
+// propagate backwards; check inversion is okay
+TEST(GlobalErrorTrackingTest, PropagateSolFieldBackwardsTest) {
+    double pz = 200.;
+    double mass = 105.658;
+    BTMultipole::TanhEndField* end = new BTMultipole::TanhEndField(10., 5., 9);
+    DerivativesSolenoid sol(0.001, 10., 20., 9, end);
     GlobalErrorTracking propagator;
-    propagator.SetStepSize(10.);
+    propagator.SetDeviations(0.1, 0.1, 0.1, 0.1);
+    propagator.SetStepSize(1.);
+    propagator.SetField(&sol);
+    // t, x, y, z, E, px, py, pz
+    std::vector<double> x_in = drift_ellipse(pz, mass);
+    x_in[1] = 0.1;
+    x_in[2] = 0.2;
+    x_in[5] = 0.3;
+    x_in[6] = 0.4;
+
+    // EM FORWARDS (for if e.g. pz > 0)
+    std::vector<double> x_out = x_in;
+    propagator.SetTrackingModel(GlobalErrorTracking::em_forwards);
+    // propagate forwards
+    propagator.print(Squeak::mout(verbose), &x_out[0]);
+    propagator.Propagate(&x_out[0], 50.);
+    propagator.print(Squeak::mout(verbose), &x_out[0]);
+    // propagate backwards
+    propagator.Propagate(&x_out[0], 0.);
+    propagator.print(Squeak::mout(verbose), &x_out[0]);
+    // check for equality
+    for (size_t i = 0; i < x_out.size(); ++i)
+        EXPECT_NEAR(x_in[i], x_out[i], 1e-6);
+
+    // EM BACKWARDS (for if e.g. pz < 0)
+    x_in[7] = -x_in[7];
+    x_out = x_in;
+    // propagate backwards
+    propagator.SetTrackingModel(GlobalErrorTracking::em_backwards);
+    propagator.Propagate(&x_out[0], -50.);
+    propagator.print(Squeak::mout(verbose), &x_out[0]);
+    // propagate forwards
+    propagator.Propagate(&x_out[0], 0.);
+    propagator.print(Squeak::mout(verbose), &x_out[0]);
+    // check for equality
+    for (size_t i = 0; i < x_out.size(); ++i)
+        EXPECT_NEAR(x_in[i], x_out[i], 1e-6);
+}
+
+
+TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
+    // Check that energy loss through block of lead is correct
+    // * dE/dz; dp/dz; mass conservation
+    // * Var(px); Var(py)
+    // * NOT Var(E) but should be added when it is implemented
+
+    std::string mod = getenv("MAUS_ROOT_DIR");
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    MaterialModel::EnableMaterial("G4_Pb");
+    GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
+    double mass = 105.658;
+
+    GlobalErrorTracking propagator;
+    propagator.SetStepSize(1.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    propagator.SetEnergyLossModel(GlobalErrorTracking::bethe_bloch_forwards);
     propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
     propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
-    std::vector<double> x_in = drift_ellipse(200., 105.658);
-    x_in[3] = -200.;
+    std::vector<double> x_in = drift_ellipse(200., mass);
+
+    // Bethe Bloch forwards (energy decreases for h +ve)
     std::vector<double> x_out = x_in;
-
     Squeak::mout(verbose) << "BB Forwards" << std::endl;
+    propagator.SetEnergyLossModel(GlobalErrorTracking::bethe_bloch_forwards);
     print_x(&x_out[0]);
-    propagator.Propagate(&x_out[0], 200.);
-    print_x(&x_out[0]); 
+    propagator.Propagate(&x_out[0], 1200.);
+    EXPECT_NEAR(x_out[4]*x_out[4],
+                x_out[5]*x_out[5]+x_out[6]*x_out[6]+x_out[7]*x_out[7]+mass*mass,
+                1e-9);
+    EXPECT_NEAR(x_out[7], 191.677, 1e-3);
+    EXPECT_NEAR(x_out[26], x_in[26]*(1-2*(1-x_out[7]/x_in[7])), 1e-2);
+    EXPECT_NEAR(x_out[28], x_in[28]*(1-2*(1-x_out[7]/x_in[7])), 1e-2);
+    print_x(&x_out[0]);
+    // Bethe Bloch forwards; when tracking back, should return to original state
+    propagator.Propagate(&x_out[0], 0.);
+    print_x(&x_out[0]);
+    EXPECT_NEAR(x_out[4], x_in[4], 1e-4);
+    EXPECT_NEAR(x_out[7], x_in[7], 1e-4);
+    EXPECT_NEAR(x_out[26], x_in[26], 1e-4);
+    EXPECT_NEAR(x_out[28], x_in[28], 1e-4);
 
+    // Bethe Bloch backwards (energy increases for h +ve)
     x_out = x_in;
     Squeak::mout(verbose) << "BB Backwards" << std::endl;
-    print_x(&x_out[0]);
     propagator.SetEnergyLossModel(GlobalErrorTracking::bethe_bloch_backwards);
-    propagator.Propagate(&x_out[0], 200.);
+    print_x(&x_out[0]);
+    propagator.Propagate(&x_out[0], 1200.);
+    EXPECT_NEAR(x_out[7], 208.323, 1e-3);
+    EXPECT_NEAR(x_out[4]*x_out[4],
+                x_out[5]*x_out[5]+x_out[6]*x_out[6]+x_out[7]*x_out[7]+mass*mass,
+                1e-9);
+    EXPECT_NEAR(x_out[26], x_in[26]*(1-2*(1-x_out[7]/x_in[7])), 1e-2);
+    EXPECT_NEAR(x_out[28], x_in[28]*(1-2*(1-x_out[7]/x_in[7])), 1e-2);
     print_x(&x_out[0]); 
+    // Bethe Bloch backwards; when tracking back, should return to original state
+    propagator.Propagate(&x_out[0], 0.);
+    print_x(&x_out[0]); 
+    EXPECT_NEAR(x_out[4], x_in[4], 1e-4);
+    EXPECT_NEAR(x_out[7], x_in[7], 1e-4);
+    EXPECT_NEAR(x_out[26], x_in[26], 1e-4);
+    EXPECT_NEAR(x_out[28], x_in[28], 1e-4);
 
+    // No Bethe Bloch; should do nothing
     x_out = x_in;
     Squeak::mout(verbose) << "No BB" << std::endl;
-    print_x(&x_out[0]);
     propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
-    propagator.Propagate(&x_out[0], 200.);
-    print_x(&x_out[0]); 
+    print_x(&x_out[0]);
+    propagator.Propagate(&x_out[0], 1200.);
+    print_x(&x_out[0]);
+    EXPECT_NEAR(x_out[7], x_in[7], 1e-9);
 
     EXPECT_TRUE(false);
 }
 
 TEST(GlobalErrorTrackingTest, PropagateDriftMCSTest) {
-    GlobalsManager::SetMonteCarloMiceModules(new MiceModule("Test.dat"));
+    // Check that MCS var(px); var(py); in absence of dE/dz 
+    // through block of lead is correct
+    std::string mod = getenv("MAUS_ROOT_DIR");
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    MaterialModel::EnableMaterial("G4_Pb");
+    GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     GlobalErrorTracking propagator;
-    propagator.SetStepSize(10.);
+    propagator.SetStepSize(1.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
     propagator.SetMCSModel(GlobalErrorTracking::moliere_forwards);
     propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
     std::vector<double> x_in = drift_ellipse(200., 105.658);
+    x_in[3] = -200.;
+    x_in[26] = 500.;
+    x_in[28] = 600.;
+
+    // moliere_forwards propagating forwards should increase Var(px), Var(py)
     std::vector<double> x_out = x_in;
-    x_out[3] = -200.;
     print_x(&x_out[0]);
-    propagator.Propagate(&x_out[0], 200.);
+    propagator.Propagate(&x_out[0], 1200.);
+    print_x(&x_out[0]);
+    EXPECT_LT(fabs(x_out[26] - x_in[26] - 217.786), 1e-3);
+    EXPECT_LT(fabs(x_out[28] - x_in[28] - 217.786), 1e-3);
+    // moliere_forwards propagating backwards should return to original state
+    propagator.Propagate(&x_out[0], -200.);
     print_x(&x_out[0]); 
+    for (size_t i = 0; i < x_out.size(); ++i)
+        EXPECT_LT(fabs(x_out[i] - x_in[i]), 1e-9);
 
-    EXPECT_TRUE(false);
+    // moliere_backwards propagating forwards should decrease Var(px), Var(py)
+    propagator.SetMCSModel(GlobalErrorTracking::moliere_backwards);
+    x_out = x_in;
+    print_x(&x_out[0]);
+    propagator.Propagate(&x_out[0], 1200.);
+    print_x(&x_out[0]); 
+    EXPECT_LT(fabs(x_out[26] - x_in[26] + 217.786), 1e-3);
+    EXPECT_LT(fabs(x_out[28] - x_in[28] + 217.786), 1e-3);
+    // moliere_backwards propagating backwards should return to original state
+    propagator.Propagate(&x_out[0], -200.);
+    print_x(&x_out[0]); 
+    for (size_t i = 0; i < x_out.size(); ++i)
+        EXPECT_LT(fabs(x_out[i] - x_in[i]), 1e-9)
+           << i << " In: " << x_in[i] << " Out: " << x_out[i] 
+           << " Diff: " << x_out[i] - x_in[i];
 }
 
+} // namespace MAUS
 
 
-}

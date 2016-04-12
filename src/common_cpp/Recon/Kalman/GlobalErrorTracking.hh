@@ -15,18 +15,33 @@ namespace MAUS {
 
 class MaterialModel;
 
+/** Propagate a track and accompanying error through materials and fields
+ *
+ *  MCS Models:
+ *    - moliere_forwards: d(theta^2)/dz is positive; RMS theta^2 will grow
+ *                        if step size is positive, irrespective of pz
+ *                        direction.
+ *    - moliere_backwards: d(theta^2)/dz is negative; RMS theta^2 will grow
+ *                        if step size is negative, irrespective of pz
+ *                        direction.
+ *    - no_mcs: d(theta^2)/dz is 0.
+ */
+
 class GlobalErrorTracking {
 public:
     enum ELossModel {bethe_bloch_forwards, bethe_bloch_backwards, no_eloss};
     enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
     enum EStragModel {estrag_forwards, estrag_backwards, no_estrag};
+    enum TrackingModel {em_forwards, em_backwards};
 
     GlobalErrorTracking();
 
     void Propagate(double x[29], double target_z);
+
+    // BUG: Not tested for inversion ( if P V1 = V2; P^-1 V2 = V1 ) 
     void PropagateTransferMatrix(double x[44], double target_z);
 
-    void UpdateTransferMatrix(const double point[4]);
+    void UpdateTransferMatrix(const double point[4], double direction);
 
     void FieldDerivative(const double* point, double* derivative) const;
 
@@ -56,6 +71,9 @@ public:
     void SetEStragModel(EStragModel estrag_model) {_estrag_model = estrag_model;}
     EStragModel GetEStragModel() const {return _estrag_model;}
 
+    void SetTrackingModel(TrackingModel track_model) {_track_model = track_model;}
+    TrackingModel GetTrackingModel() const {return _track_model;}
+
     static ostream& print(std::ostream& out, const double x[29]);
 
 private:
@@ -74,12 +92,14 @@ private:
     BTField* _field;
     // scale for derivative calculation
     double _dx, _dy, _dz, _dt;
-    double _step_size = 1.;
+    double _step_size = 1.;  // magnitude of the step size
+    double _gsl_h = 1.;  // the step that gsl uses (can be negative)
     double _absolute_error = 1e-4;
     double _relative_error = 1e-4;
     ELossModel _eloss_model = no_eloss;
     MCSModel _mcs_model = no_mcs;
     EStragModel _estrag_model = no_estrag;
+    TrackingModel _track_model = em_forwards;
     int  _max_n_steps = 100000;
     static constexpr double c_l = 299.792458; // mm*ns^{-1}
     // transient...

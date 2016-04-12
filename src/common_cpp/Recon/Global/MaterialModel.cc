@@ -43,11 +43,15 @@ void MaterialModel::SetMaterial(double x, double y, double z) {
     _navigator = Globals::GetMCGeometryNavigator();
     _navigator->SetPoint(ThreeVector(x, y, z));
     if (IsEnabledMaterial(_navigator->GetMaterial()->GetName())) {
+        std::cout << "MaterialModel::SetMaterial Setting "
+                  << _navigator->GetMaterial()->GetName()
+                  << " as it is enabled" << std::endl;
         MaterialModel::SetMaterial(_navigator->GetMaterial());
     } else {
-      std::cout << "Ignoring " << _navigator->GetMaterial()->GetName()
-                << " as it is disabled" << std::endl;
-      *this = MaterialModel();
+        std::cout << "MaterialModel::SetMaterial Ignoring "
+                  << _navigator->GetMaterial()->GetName()
+                  << " as it is disabled" << std::endl;
+        *this = MaterialModel();
     }
 }
 

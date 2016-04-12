@@ -1,5 +1,6 @@
 import ROOT
 import libMausCpp
+import blackmore_read_data
 
 class DataLoader(object):
     def __init__(self, config):
@@ -9,23 +10,31 @@ class DataLoader(object):
         self.scifi_space_point_cut_count = 0
         self.event_count = 0
         self.accepted_count = 0
+        self.passed_cuts_count = 0
+        if self.cuts == None:
+            self.load_cuts()  # set up as class data
         self.events = []
 
     def load_cuts(self):
         file_name = self.config.cuts_file
-        print "Loading ROOT file", file_name
+        print "Loading cuts ROOT file", file_name
         root_file = ROOT.TFile(file_name, "READ") # pylint: disable = E1101
-        spill_number = ROOT.Double()
-        event_number = ROOT.Double()
         tree = root_file.Get("T")
-        #tree.SetBranchAddress("SpillNumber", spill_number)
-        #tree.SetBranchAddress("ReconstructedEventNumber", event_number)
-        for entry in tree:
-          print tree.SpillNumber, tree.ReconstructedEventNumber, tree.cut_allPassed
+        blackmore_read_data.print_tree_info(tree)
+        self.cuts = {}
+        for i, entry in enumerate(tree):
+            spill = entry.SpillNumber
+            event = entry.ReconstructedEventNumber
+            cut = entry.cut_allPassed and \
+                  entry.cut_tof1_tku_momentum #and \
+                  #entry.cut_TOF_TKU_momentum
+            self.cuts[(spill, event)] = cut
+            #print i, spill, event, cut
+        print "    ... loaded"
 
     def load_data(self, min_spill, max_spill):
-        #self.load_cuts()
-        #raw_input()
+        if min_spill >= max_spill:
+            return
         file_name = self.config.reco_file
         print "Loading ROOT file", file_name
         root_file = ROOT.TFile(file_name, "READ") # pylint: disable = E1101
@@ -37,23 +46,26 @@ class DataLoader(object):
 
         print "Getting some data"
         for i in range(min_spill, min(tree.GetEntries(), max_spill)):
-            if i % 100 == 0 or i == tree.GetEntries()-1 or i == 0:
-                print "Spill", i+1, "/", tree.GetEntries(),
-                print "ev:", self.event_count, "tof:", self.tof_cut_count,
-                print "clusters:", self.scifi_cluster_cut_count,
-                print "space points:", self.scifi_space_point_cut_count,
-                print "accepted:", self.accepted_count
             tree.GetEntry(i)
             spill = data.GetSpill()
             if spill.GetDaqEventType() == "physics_event":
                 for ev_number, reco_event in enumerate(spill.GetReconEvents()):
                     self.event_count += 1
                     event = self.load_reco_event(reco_event)
-                    if event != None:
-                        event["spill"] = spill.GetSpillNumber()
+                    if event == None:
+                        event = {"data":[]}
+                    else:
                         self.accepted_count += 1
-                        self.events.append(event)
-                        event["event_number"] = ev_number
+                    event["spill"] = spill.GetSpillNumber()
+                    self.events.append(event)
+                    event["event_number"] = ev_number
+                    event["passed_cuts"] = self.cuts[(spill.GetSpillNumber(), ev_number)]
+                    if event["passed_cuts"]:
+                        self.passed_cuts_count += 1
+        print "Spill", i+1, "/", tree.GetEntries(),
+        print "ev:", self.event_count,
+        print "accepted:", self.accepted_count,
+        print "passed cuts:", self.passed_cuts_count
 
     def load_tof_event(self, tof_event):
         space_points = tof_event.GetTOFEventSpacePoint()
@@ -240,5 +252,7 @@ class DataLoader(object):
         event = {"data":sorted(scifi_loaded+tof_loaded, key = lambda tp: tp['z'])}
         event["particle_number"] = reco_event.GetPartEventNumber()
         return event
+
+    cuts = None
 
 

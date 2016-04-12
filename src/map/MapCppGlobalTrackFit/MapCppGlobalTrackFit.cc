@@ -51,6 +51,8 @@
 // * Move Global kalman stuff into subdirectory/namespace
 // * Documentation
 // * Improve test coverage
+// * Dynamic step size to step to volume boundary (using GSL Control type)
+// * Enable/disable material material name/conversion logic
 
 namespace MAUS {
 using namespace MAUS::DataStructure::Global;

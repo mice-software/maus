@@ -459,9 +459,12 @@ static PyObject* get_transfer_matrix
                               (PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {
         const_cast<char*>("centroid"),
+        const_cast<char*>("direction"),
         NULL};
     PyObject* py_centroid = NULL;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|", kwlist, &py_centroid)) {
+    double direction = 1.;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Od|", kwlist,
+                                     &py_centroid, &direction)) {
         // error message is set in PyArg_Parse...
         return NULL;
     }
@@ -481,7 +484,7 @@ static PyObject* get_transfer_matrix
         if (get_centroid(py_centroid, x_in)) {
             return NULL;
         }
-        glet->UpdateTransferMatrix(&x_in[0]);
+        glet->UpdateTransferMatrix(&x_in[0], direction);
         std::vector<std::vector<double> > matrix = glet->GetMatrix();
         PyObject* ellipse = set_matrix(matrix);
         if (ellipse == NULL) {

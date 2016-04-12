@@ -26,9 +26,9 @@ const double GlobalErrorTracking::_float_tolerance = 1e-15;
 
 GlobalErrorTracking* GlobalErrorTracking::_tz_for_propagate = NULL;
 
-GlobalErrorTracking::GlobalErrorTracking() : _field(Globals::GetMCFieldConstructor()),
-               _dx(1.), _dy(1.), _dz(1.), _dt(1.), _charge(1.),
-               _matrix(6, std::vector<double>(6, 0.)) {
+GlobalErrorTracking::GlobalErrorTracking()
+  : _field(Globals::GetMCFieldConstructor()), _dx(1.), _dy(1.), _dz(1.),
+    _dt(1.), _charge(1.), _matrix(6, std::vector<double>(6, 0.)) {
 }
 
 void GlobalErrorTracking::Propagate(double x[29], double target_z) {
@@ -41,28 +41,35 @@ void GlobalErrorTracking::Propagate(double x[29], double target_z) {
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 29);
-  gsl_odeiv_control * control = gsl_odeiv_control_y_new(_absolute_error, _relative_error);
+  gsl_odeiv_control * control = gsl_odeiv_control_y_new
+                                            (_absolute_error, _relative_error);
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(29);
-  gsl_odeiv_system    system  = {GlobalErrorTracking::EquationsOfMotion, NULL, 29, NULL};
+  gsl_odeiv_system    system  =
+                      {GlobalErrorTracking::EquationsOfMotion, NULL, 29, NULL};
 
   double z = x[3];
-  double h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
-  if (z > target_z)
-      h *= -1;  // stepping backwards...
+  _gsl_h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
+  if (z > target_z) {
+      _gsl_h *= -1;  // stepping backwards...
+      _charge = -1; 
+  } else {
+      _charge = 1;  // stepping forwards...
+  }
   int    nsteps = 0;
   _tz_for_propagate = this;
   tracking_fail.str("");  // clear the error stream
   while(fabs(z-target_z) > _float_tolerance) {
     nsteps++;
 
-    int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &z, target_z, &h, x);
+    int status =  gsl_odeiv_evolve_apply
+                        (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
     
     if (nsteps > _max_n_steps) {
         tracking_fail << "Exceeded maximum number of steps\n"; 
         status = GSL_FAILURE;
     }
     if (status != GSL_SUCCESS) {
-        tracking_fail << "Killing tracking with step size " << h
+        tracking_fail << "Killing tracking with step size " <<_gsl_h
             << " at step " << nsteps << " of " << _max_n_steps << "\n";
         print(tracking_fail, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
@@ -84,24 +91,27 @@ void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z)
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 44);
-  gsl_odeiv_control * control = gsl_odeiv_control_y_new(_absolute_error, _relative_error);
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(44);
-  gsl_odeiv_system    system  = {GlobalErrorTracking::EquationsOfMotion, NULL, 44, NULL};
+  gsl_odeiv_system    system  =
+                       {GlobalErrorTracking::EquationsOfMotion, NULL, 44, NULL};
 
   double z = x[3];
-  double h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
+  _gsl_h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
   if (z > target_z)
-      h *= -1;  // stepping backwards...
-  int    nsteps = 0;
+      _gsl_h *= -1;  // stepping backwards...
+  int nsteps = 0;
   _tz_for_propagate = this;
   while(fabs(z-target_z) > _float_tolerance) {
     nsteps++;
     
-    int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &z, target_z, &h, x);
+    int status =  gsl_odeiv_evolve_apply
+                        (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
     
     if(status != GSL_SUCCESS)
     {
-        tracking_fail << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n";
+        tracking_fail << "Killing tracking with step size " << _gsl_h
+                      << " at step " << nsteps
+                      << " of " << _max_n_steps << "\n";
         print(tracking_fail, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
                             tracking_fail.str(),
@@ -110,7 +120,8 @@ void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z)
     }
     if(nsteps > _max_n_steps)
     {
-        tracking_fail << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _max_n_steps << "\n"
+        tracking_fail << "Killing tracking with step size " << _gsl_h
+                      << " at step " << nsteps << " of " << _max_n_steps << "\n"
                       << "\nExceeded maximum number of steps\n";
         print(tracking_fail, x);
         throw(MAUS::Exception(MAUS::Exception::recoverable,
@@ -121,14 +132,15 @@ void GlobalErrorTracking::PropagateTransferMatrix(double x[44], double target_z)
   }
 
   gsl_odeiv_evolve_free (evolve);
-  gsl_odeiv_control_free(control);
   gsl_odeiv_step_free   (step);
 
 
 }
 
-int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double dxdz[29],
-                                   void* params) {
+int GlobalErrorTracking::EquationsOfMotion(double z, 
+                                           const double x[29],
+                                           double dxdz[29],
+                                           void* params) {
   if (fabs(x[7]) < _float_tolerance) {
     // z-momentum is 0
       tracking_fail << "pz " << x[7] << " was less than float tolerance " << _float_tolerance << "\n";
@@ -136,7 +148,8 @@ int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double 
   }
   for (size_t i = 0; i < 29; ++i) {
       if (x[i] != x[i]) {
-          tracking_fail << "Detected nan in input i: " << i << " value: " << x[i] << "\n";
+          tracking_fail << "Detected nan in input i: " << i
+                        << " value: " << x[i] << "\n";
           print(tracking_fail, x);
           return GSL_FAILURE;
       }
@@ -167,12 +180,22 @@ int GlobalErrorTracking::EquationsOfMotion(double z, const double x[29], double 
   return GSL_SUCCESS;
 }
 
-int GlobalErrorTracking::EMEquationOfMotion(double z, const double x[29], double dxdz[29],
-                                   void* params) {
+int GlobalErrorTracking::EMEquationOfMotion(double z,
+                                            const double x[29],
+                                            double dxdz[29],
+                                            void* params) {
   double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double xfield[4] = {x[1], x[2], x[3], x[0]};
   _tz_for_propagate->_field->GetFieldValue(xfield, field);
 
+  double direction = 1.;
+  if (_tz_for_propagate->_track_model == em_forwards &&
+      _tz_for_propagate->_gsl_h < 0.) {
+      direction = -1.;
+  } else if (_tz_for_propagate->_track_model == em_backwards &&
+             _tz_for_propagate->_gsl_h > 0.) {
+      direction = -1.;
+  }
   double charge = _tz_for_propagate->_charge;
   double dtdz = x[4]/x[7];
   double dir = fabs(x[7])/x[7]; // direction of motion
@@ -185,15 +208,14 @@ int GlobalErrorTracking::EMEquationOfMotion(double z, const double x[29], double
   dxdz[4] = (dxdz[1]*charge*field[3] + dxdz[2]*charge*field[4] +
              charge*field[5])*dir; // dE/dz
   // dpx/dz = q*c*(dy/dz*Bz - dz/dz*By) + q*Ex*dt/dz
-  dxdz[5] = charge*c_l*(dxdz[2]*field[2] - dxdz[3]*field[1])
+  dxdz[5] = direction*charge*c_l*(dxdz[2]*field[2] - dxdz[3]*field[1])
             + charge*field[3]*dtdz*dir; // dpx/dz
-  dxdz[6] = charge*c_l*(dxdz[3]*field[0] - dxdz[1]*field[2])
+  dxdz[6] = direction*charge*c_l*(dxdz[3]*field[0] - dxdz[1]*field[2])
             + charge*field[4]*dtdz*dir; // dpy/dz
-  dxdz[7] = charge*c_l*(dxdz[1]*field[1] - dxdz[2]*field[0])
+  dxdz[7] = direction*charge*c_l*(dxdz[1]*field[1] - dxdz[2]*field[0])
             + charge*field[5]*dtdz*dir; // dpz/dz
-
   size_t x_index = 8;
-  _tz_for_propagate->UpdateTransferMatrix(x);
+  _tz_for_propagate->UpdateTransferMatrix(x, direction);
   std::vector< std::vector<double> > var(6, std::vector<double>(6, 0.));
   for (size_t i = 0; i < 6; ++i) {
       for (size_t j = i; j < 6; ++j) {
@@ -233,8 +255,10 @@ int GlobalErrorTracking::EMEquationOfMotion(double z, const double x[29], double
 }
 
 
-int GlobalErrorTracking::MatrixEquationOfMotion(double z, const double x[44], double dxdz[44],
-                                   void* params) {
+int GlobalErrorTracking::MatrixEquationOfMotion(double z,
+                                                const double x[44],
+                                                double dxdz[44],
+                                                void* params) {
   double field[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double xfield[4] = {x[1], x[2], x[3], x[0]};
   _tz_for_propagate->_field->GetFieldValue(xfield, field);
@@ -257,8 +281,16 @@ int GlobalErrorTracking::MatrixEquationOfMotion(double z, const double x[44], do
             + charge*field[4]*dtdz*dir; // dpy/dz
   dxdz[7] = charge*c_l*(dxdz[1]*field[1] - dxdz[2]*field[0])
             + charge*field[5]*dtdz*dir; // dpz/dz
+  double direction = 1.;
+  if (_tz_for_propagate->_track_model == em_forwards &&
+      _tz_for_propagate->_gsl_h < 0.) {
+      direction = -1.;
+  } else if (_tz_for_propagate->_track_model == em_backwards &&
+             _tz_for_propagate->_gsl_h > 0.) {
+      direction = -1.;
+  }
 
-  _tz_for_propagate->UpdateTransferMatrix(x);
+  _tz_for_propagate->UpdateTransferMatrix(x, direction);
   std::vector< std::vector<double> > dMdz(6, std::vector<double>(6, 0.));
   std::vector< std::vector<double> > M(6, std::vector<double>(6, 0.));
   std::vector< std::vector<double> > dM = _tz_for_propagate->_matrix;
@@ -283,8 +315,10 @@ int GlobalErrorTracking::MatrixEquationOfMotion(double z, const double x[44], do
 }
 
 
-int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], double dxdz[29],
-                                   void* params) {
+int GlobalErrorTracking::MaterialEquationOfMotion(double z,
+                                                  const double x[29],
+                                                  double dxdz[29],
+                                                  void* params) {
     // Must be called after EMEquationOfMotion
     MaterialModel material(x[1], x[2], x[3]);
 
@@ -300,7 +334,7 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
         dEdz = material.dEdx(energy, mass, charge); // should be negative
         d2EdzdE = 0.; // material.d2EdxdE(energy, mass, charge);
     } else if (_tz_for_propagate->_eloss_model == bethe_bloch_backwards) {
-        dEdz = material.dEdx(energy, mass, charge); // should be negative; during tracking backwards dz is negative so dEdz gets handled properly
+        dEdz = -material.dEdx(energy, mass, charge); // should be negative; during tracking backwards dz is negative so dEdz gets handled properly
         d2EdzdE = 0.; // material.d2EdxdE(energy, mass, charge);
     } else {
         dEdz = 0.; // no eloss
@@ -310,7 +344,7 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     if (_tz_for_propagate->_estrag_model == estrag_forwards) {
         destragdz = material.estrag2(energy, mass, charge);
     } else if (_tz_for_propagate->_estrag_model == estrag_backwards) {
-        destragdz = material.estrag2(energy, mass, charge);
+        destragdz = -material.estrag2(energy, mass, charge);
     } else {
         destragdz = 0.;
     } 
@@ -339,10 +373,22 @@ int GlobalErrorTracking::MaterialEquationOfMotion(double z, const double x[29], 
     dxdz[26] += 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
     dxdz[28] += 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
 
+    if (fabs(dtheta2dz) < 1e-9)
+        return GSL_SUCCESS;
+    /*
+    std::cerr << "MATERIAL z: " << x[3]
+              << " dEdx " << material.dEdx(energy, mass, charge)
+              << " x26/28: " << x[26] << " " << x[28]
+              << " dxdz26/28: " << dxdz[26] << " " << dxdz[28]
+              << " dpdz: " << dpdz << " pz: " << x[7]
+              << " dt2dz: " << dtheta2dz
+              << " mcs_model: " << _tz_for_propagate->_mcs_model << std::endl;
+    */
     return GSL_SUCCESS;
 }
 
-void GlobalErrorTracking::UpdateTransferMatrix(const double* x) {
+void GlobalErrorTracking::UpdateTransferMatrix(const double* x,
+                                               double direction) {
   // dbx/dx, dby/dx, dbz/dx, dbx/dy, dby/dy, dbz/dy
   double xfield[4] = {x[1], x[2], x[3], x[0]};
   double field_value[] = {0., 0., 0., 0., 0., 0.};
@@ -378,17 +424,17 @@ void GlobalErrorTracking::UpdateTransferMatrix(const double* x) {
 
   // m_3_x = 0; energy is conserved by magnetic fields
 
-  double m_4_1 = _charge*c_l*(py*dbzdx-pz*dbydx)/pz;
-  double m_4_2 = _charge*c_l*(py*dbzdy-pz*dbydy)/pz;
-  double m_4_3 = -_charge*c_l*py*bz*energy/pz/pz/pz;
-  double m_4_4 = _charge*c_l*py*px*bz/pz/pz/pz;
-  double m_4_5 = _charge*c_l*bz/pz+_charge*c_l*py*py*bz/pz/pz/pz;
+  double m_4_1 = direction*_charge*c_l*(py*dbzdx-pz*dbydx)/pz;
+  double m_4_2 = direction*_charge*c_l*(py*dbzdy-pz*dbydy)/pz;
+  double m_4_3 = -direction*_charge*c_l*py*bz*energy/pz/pz/pz;
+  double m_4_4 = direction*_charge*c_l*py*px*bz/pz/pz/pz;
+  double m_4_5 = direction*_charge*c_l*bz/pz+_charge*c_l*py*py*bz/pz/pz/pz;
 
-  double m_5_1 = _charge*c_l*(pz*dbxdx-px*dbzdx)/pz;
-  double m_5_2 = _charge*c_l*(pz*dbxdy-px*dbzdy)/pz;
-  double m_5_3 = _charge*c_l*px*bz*energy/pz/pz/pz;
-  double m_5_4 = -_charge*c_l*bz/pz-_charge*c_l*px*px*bz/pz/pz/pz;
-  double m_5_5 = -_charge*c_l*py*px*bz/pz/pz/pz;
+  double m_5_1 = direction*_charge*c_l*(pz*dbxdx-px*dbzdx)/pz;
+  double m_5_2 = direction*_charge*c_l*(pz*dbxdy-px*dbzdy)/pz;
+  double m_5_3 = direction*_charge*c_l*px*bz*energy/pz/pz/pz;
+  double m_5_4 = -direction*_charge*c_l*bz/pz-_charge*c_l*px*px*bz/pz/pz/pz;
+  double m_5_5 = -direction*_charge*c_l*py*px*bz/pz/pz/pz;
 
   double matrix[36] = {
     0.,    0.,    0., m_0_3, m_0_4, m_0_5,
@@ -403,7 +449,8 @@ void GlobalErrorTracking::UpdateTransferMatrix(const double* x) {
           _matrix[i][j] = matrix[i*6+j];
 }
 
-void GlobalErrorTracking::FieldDerivative(const double* point, double* derivative) const {
+void GlobalErrorTracking::FieldDerivative
+                              (const double* point, double* derivative) const {
     double pos[4] = {point[0], point[1], point[2], point[3]};
     double field_x_pos[6] = {0, 0, 0, 0, 0, 0};
     double field_x_neg[6] = {0, 0, 0, 0, 0, 0};
@@ -434,7 +481,8 @@ std::vector<double> GlobalErrorTracking::GetDeviations() const {
   return std::vector<double>(dev_a, dev_a+sizeof(dev_a)/sizeof(double));
 }
 
-void GlobalErrorTracking::SetDeviations(double dx, double dy, double dz, double dt) {
+void GlobalErrorTracking::SetDeviations
+                                (double dx, double dy, double dz, double dt) {
   _dx = dx;
   _dy = dy;
   _dz = dz;
@@ -459,10 +507,10 @@ ostream& GlobalErrorTracking::print(std::ostream& out, const double* x) {
     size_t index = 8;
     for (size_t i = 0; i < 6; ++i) {
         for (size_t j = 0; j < i; ++j) {
-            out << "            ";
+            out << "              ";
         }
         for (size_t j = i; j < 6; ++j) {
-            out << std::setprecision(6) << std::setw(12) << x[index];
+            out << std::setprecision(6) << std::setw(14) << x[index];
             ++index;
         }
         out << std::endl;

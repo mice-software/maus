@@ -1,6 +1,6 @@
 class Config(object):
     reco_file = "tmp/MAUS-v2.1.0/07469/07469_recon.root"
-    cuts_file = "blackmore_data/run7469_extracted_data__MAUS2pt1b.root"
+    cuts_file = "blackmore_data/rogers_hacks_07469_MAUS-v2.1.0_data.root"
     geometry = "geometry_07469/ParentGeometryFile.dat"
     will_require_triplets = False # require triplet space points
     will_require_clusters = False # require one cluster per plane
