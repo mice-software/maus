@@ -110,10 +110,13 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
     spill->SetDaqEventType(event_type_to_str(event_type));
     spill->SetRunNumber(_dataProcessManager.GetRunNumber());
     spill->SetSpillNumber(_dataProcessManager.GetSpillNumber());
+    spill->SetEventId(_dataProcessManager.GetEventId());
+    spill->SetTimeStamp(_dataProcessManager.GetTimeStamp());
 
     if (event_type == PHYSICS_EVENT) {
       // Create a new DAQData object.
       MAUS::DAQData *daq_data = new MAUS::DAQData;
+      daq_data->SetEventSize(_dataProcessManager.GetSuperEventSize());
       // Set the DAQData object (a static data member) of all the processors.
       MDarranger::set_daq_data(daq_data);
 

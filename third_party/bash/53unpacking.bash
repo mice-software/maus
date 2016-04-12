@@ -3,7 +3,7 @@
 # require python extras for scons
 
 directory=unpacking-mice
-filename=${directory}_4.0.0.tarz
+filename=${directory}_4.0.2.tarz
 # url=http://micewww.pp.rl.ac.uk/maus/third_party/${filename}
 url=http://heplnv152.pp.rl.ac.uk/maus/third_party/${filename}
 
@@ -86,7 +86,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Building StepIV unpacker..."
         cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install -DSTEPIV_DATA=1 \
                ..
-        make
+        make -j$MAUS_NUM_THREADS
         make install
 
 # rename libMDUnpack to a StepIV name 

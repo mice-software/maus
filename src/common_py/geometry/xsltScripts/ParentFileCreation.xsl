@@ -30,7 +30,12 @@
                 </title>
             </head>
             <body>  
-	
+	                    // A Note on Rotations:
+			    // 
+	                    // This is the geometry configuration to be used with a simulated geometry sourced from GDML. All rotations follow the 
+			    // convention used by GEANT4 which applies CLHEP rotations in a "passive" mode rotating the coordinate systems of the 
+			    // simulated objects rather then the objects themselves. As such the rotations are defined such that positive angles 
+			    // produce a counter-clockwise rotation about the rotation axis when viewed in the direction of the axis of rotation.
 
                             //Substitutions
                             <xsl:variable name="run_number" select="MICE_Information/Configuration_Information/run/@runNumber"/>
@@ -269,14 +274,15 @@
                         Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat    
                         { 
                          Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm 
-                         Rotation <xsl:value-of select="rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@z"/> deg
+                         Rotation <xsl:value-of select="rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@unit"/>
                         }
                             </xsl:for-each>
                             <xsl:for-each select="MICE_Information/Detector_Information/*/physvol">
                         Module <xsl:value-of select="ancestor::gdml/MICE_Information/Other_Information/GDML_Files/@location"/><xsl:value-of select="substring-before(file/@name, '.')"/>.dat    
                         { 
                          Position <xsl:value-of select="position/@x"/><xsl:text> </xsl:text><xsl:value-of select="position/@y"/><xsl:text> </xsl:text><xsl:value-of select="position/@z"/> mm 
-                         Rotation <xsl:choose><xsl:when test="rotationref/@ref = 'RotateY90'"> 0.0 90.0 0.0 deg</xsl:when><xsl:when test="rotationref/@ref = 'RotateX90'"> 90.0 0.0 0.0 deg</xsl:when><xsl:when test="physvol/rotationref/@ref = 'RotateX270'"> 270.0 0.0 0.0 deg</xsl:when><xsl:when test="physvol/rotationref/@ref = 'RotateX180'"> 180.0 0.0 0.0 deg</xsl:when><xsl:when test="contains(rotation/@name, 'rotRef')"><xsl:value-of select="rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@z"/> deg </xsl:when><xsl:otherwise> 0.0 0.0 0.0 deg</xsl:otherwise></xsl:choose> 
+                         Rotation <xsl:value-of select="rotation/@x"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@y"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@z"/><xsl:text> </xsl:text><xsl:value-of select="rotation/@unit"/>
+
                         }
                 </xsl:for-each>
                 

@@ -196,6 +196,8 @@ void MapCppTrackerRecon::_process(Data* data) const {
         continue;
       }
 
+      _set_field_values(event);
+
       if ( _clusters_on ) {
       // Clear any exising higher level data
         event->clear_clusters();
@@ -232,6 +234,17 @@ void MapCppTrackerRecon::_process(Data* data) const {
   } else {
     std::cout << "No recon events found\n";
   }
+}
+
+void MapCppTrackerRecon::_set_field_values(SciFiEvent* event) const {
+  event->set_mean_field_up(_geometry_helper.GetFieldValue(0));
+  event->set_mean_field_down(_geometry_helper.GetFieldValue(1));
+
+  event->set_variance_field_up(_geometry_helper.GetFieldVariance(0));
+  event->set_variance_field_down(_geometry_helper.GetFieldVariance(1));
+
+  event->set_range_field_up(_geometry_helper.GetFieldRange(0));
+  event->set_range_field_down(_geometry_helper.GetFieldRange(1));
 }
 
 

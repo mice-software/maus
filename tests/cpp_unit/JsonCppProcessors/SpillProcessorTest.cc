@@ -139,6 +139,7 @@ std::string RECON_EVENT =
 
 std::string SPILL_SEED =
     std::string("{\"spill_number\":1, \"run_number\":-1, ")+
+    std::string("\"event_id\":1, \"time_stamp\":1, ")+
     std::string("\"daq_event_type\":\"physics_event\", ")+
     std::string("\"errors\":{\"an_error\":\"message\"}, ")+
     std::string("\"maus_event_type\":\"Spill\"");

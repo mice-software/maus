@@ -26,6 +26,9 @@ DAQDataProcessor::DAQDataProcessor()
       _tof0_proc(new TOFDaqProcessor), _emr_proc(),
       _trigger_proc(new TriggerProcessor),
       _tracker0_proc(new TrackerDaqProcessor), _tracker1_proc(new TrackerDaqProcessor) {
+
+    RegisterValueBranch("event_size", &_uint_proc, &DAQData::GetEventSize,
+                                                   &DAQData::SetEventSize, false);
     RegisterValueBranch
           ("V830", &_V830_proc, &DAQData::GetV830,
           &DAQData::SetV830, false);

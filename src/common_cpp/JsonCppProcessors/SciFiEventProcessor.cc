@@ -24,7 +24,8 @@ SciFiEventProcessor::SciFiEventProcessor()
                       _sf_spoint_array_proc(new SciFiSpacePointProcessor),
                       _sf_sprtrk_array_proc(new SciFiStraightPRTrackProcessor),
                       _sf_hprtrk_array_proc(new SciFiHelicalPRTrackProcessor),
-                      _sf_trk_array_proc(new SciFiTrackProcessor) {
+                      _sf_trk_array_proc(new SciFiTrackProcessor),
+                      _double_proc() {
   RegisterValueBranch("digits", &_sf_digit_array_proc,
                       &SciFiEvent::digits, &SciFiEvent::set_digits, false);
   RegisterValueBranch("clusters", &_sf_cluster_array_proc,
@@ -37,5 +38,23 @@ SciFiEventProcessor::SciFiEventProcessor()
                       &SciFiEvent::helicalprtracks, &SciFiEvent::set_helicalprtrack, false);
   RegisterValueBranch("tracks", &_sf_trk_array_proc,
                       &SciFiEvent::scifitracks, &SciFiEvent::set_scifitracks, false);
+  RegisterValueBranch("mean_field_up", &_double_proc,
+                      &SciFiEvent::get_mean_field_up,
+                      &SciFiEvent::set_mean_field_up, false);
+  RegisterValueBranch("mean_field_down", &_double_proc,
+                      &SciFiEvent::get_mean_field_down,
+                      &SciFiEvent::set_mean_field_down, false);
+  RegisterValueBranch("variance_field_up", &_double_proc,
+                      &SciFiEvent::get_variance_field_up,
+                      &SciFiEvent::set_variance_field_up, false);
+  RegisterValueBranch("variance_field_down", &_double_proc,
+                      &SciFiEvent::get_variance_field_down,
+                      &SciFiEvent::set_variance_field_down, false);
+  RegisterValueBranch("range_field_up", &_double_proc,
+                      &SciFiEvent::get_range_field_up,
+                      &SciFiEvent::set_range_field_up, false);
+  RegisterValueBranch("range_field_down", &_double_proc,
+                      &SciFiEvent::get_range_field_down,
+                      &SciFiEvent::set_range_field_down, false);
 }
 } // ~namespace MAUS

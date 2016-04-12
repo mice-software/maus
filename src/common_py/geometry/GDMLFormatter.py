@@ -17,7 +17,7 @@ M. Littlefield
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import shutil
-import os
+import os, math
 import libxml2
 from xml.dom import minidom
 from geometry.ConfigReader import Configreader
@@ -60,6 +60,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         self.beamline_file = None
         self.coolingChannel_file = None
         self.maus_information_file = None
+        self.corrections_file = None
         self.configuration_file = None
         self.material_file = None
         self.tracker_file = None
@@ -96,6 +97,8 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 self.maus_information_file = fname
             elif fname.find('Beamline') >= 0:
                 self.beamline_file = fname
+            elif fname.find('AlignmentCorrections') >= 0:
+                self.corrections_file = fname
             elif fname.find('CoolingChannelInfo') >= 0:
                 self.coolingChannel_file = fname
                 print 'Found ', fname
@@ -114,7 +117,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             maus_information_location = os.environ['MAUS_ROOT_DIR'] + \
             '/tests/py_unit/test_geometry/testCases/mausModuleSource'
             shutil.copy(os.path.join(maus_information_location, \
-                                               self.maus_information_file), 
+                                         self.maus_information_file), 
                         os.path.join(self.path_in, self.maus_information_file) )
             print 'Maus_Information file not found' + \
                   'Maus_Information.gdml has been copied from ' + \
@@ -143,13 +146,14 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 if node.hasAttribute("xsi:noNamespaceSchemaLocation"):
                     node.attributes['xsi:noNamespaceSchemaLocation'] = \
                         self.schema
-                    # print "Schema location corrected for ",gdmlfile
+        # print "Schema location corrected for ",gdmlfile
             fout = open(os.path.join(self.path_out, gdmlfile), 'w')
             xmldoc.writexml(fout)
             fout.close()
         else:
             shutil.copy(os.path.join(self.path_in, gdmlfile), \
-                        os.path.join(self.path_out, gdmlfile))
+                            os.path.join(self.path_out, gdmlfile))
+            
 
     def format_gdml_locations(self, gdmlfile):
         """
@@ -199,7 +203,197 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         xmldoc.saveTo(f)
         f.close()
         xmldoc.freeDoc()
+
+    def apply_rotationsMC(self, pos, rot): #pylint: disable = R0201
+        """
+        @method apply_rotationsMC
+
+        Application of rotations for the purpose of placing the 
+        trackers in the global coordinate system from the 
+        solenoid coordinate system.
+        """
+        npos = [x for x in pos]
+        sumrot = 0
+        for u in rot:
+            sumrot += u 
+        if math.fabs(sumrot) > 0:
+            # apply the rotations for the tracker into MC coordinates 
+            k = math.pi/180.
+            c = [math.cos(k*th) for th in rot]
+            s = [math.sin(k*th) for th in rot]
+            npos[0] = c[1]*c[2]*pos[0] - c[1]*s[2]*pos[1] - s[1]*pos[2]
+            npos[1] = (-c[0]*s[2] + s[0]*s[1]*c[2])*pos[0] + \
+                (c[0]*c[2] + s[0]*s[1]*s[2])*pos[1] + s[0]*c[1]*pos[2]
+            npos[2] = (s[0]*s[2] + c[0]*s[1]*c[2])*pos[0] + \
+                (-s[0]*c[2] + c[0]*s[1]*s[2])*pos[1] + c[0]*c[1]*pos[2]
+            # print c
+            # print s
+            # print npos
+            
+        return npos
+
+    def apply_alignment_corrections(self, gdmlFile): #pylint: disable = R0201
+        """
+        @method apply_alignment_corrections
+        
+        This method parses the maus information file into memory (argument) identifies 
+        the detectors towhich the corrections are to be applied, opens the appropriate 
+        GDML file and corrects the detector position (if required).
+        """
+        maus_information = \
+            libxml2.parseFile(os.path.join(self.path_out, \
+                                           self.maus_information_file))
+        corrpath = "gdml/MICE_Information/Configuration_Information/Corrections"
+        corrs = maus_information.xpathEval(corrpath)
+        
+        config = libxml2.parseFile(os.path.join(self.path_out, \
+                                                    self.configuration_file))
+
+        step_names = ['TOF0', 'TOF1', 'TOF2', 'KL', 'EMR', 
+                      'Ckov1', 'Ckov2', 'Tracker1', 'Tracker0']
+        for name in step_names:
+            # print name
+            # Find the positions from the configuration file
+            # first note that the tracker positions exist in the solenoid GDML
+            if name.find("Tracker0") >= 0:
+                solenoid = libxml2.parseFile(os.path.join(self.path_out, \
+                                                            'SolenoidUS.gdml'))
+                tmpphys = [x for x in \
+                           solenoid.xpathEval("gdml/structure/volume/physvol")\
+                           if len(x.xpathEval("file")) > 0]
+                corrphys = \
+                    next(x for x in tmpphys \
+                          if x.xpathEval("file")[0].prop("name").find(name) >=0)
+                solphys = \
+                 next(x for x in \
+                 config.xpathEval("gdml/structure/volume/physvol")\
+                 if x.xpathEval("file")[0].prop('name').find("SolenoidUS") >= 0)
+            elif name.find("Tracker1") >= 0:
+                solenoid = \
+                    libxml2.parseFile(os.path.join(self.path_out, \
+                                                       'SolenoidDS.gdml'))
+                tmpphys = \
+                    [x for x in \
+                         solenoid.xpathEval("gdml/structure/volume/physvol") \
+                         if len(x.xpathEval("file")) > 0]
+                corrphys = \
+                    next(x for x in tmpphys\
+                         if x.xpathEval("file")[0].prop('name').find(name) >= 0)
+                solphys = \
+                 next(x for x in \
+                 config.xpathEval("gdml/structure/volume/physvol")\
+                 if x.xpathEval("file")[0].prop('name').find("SolenoidDS") >= 0)
+            
+            else:
+                tmpphys = [x for x in \
+                           config.xpathEval("gdml/structure/volume/physvol") \
+                           if len(x.xpathEval("file")) > 0]
+                corrphys = \
+                    next(x for x in tmpphys \
+                         if x.xpathEval("file")[0].prop('name').find(name) >= 0)
+                
+            # Everything else is in the base configuration file
+            detinfopath = "gdml/MICE_Information/Detector_Information"
+            if name.find("TOF") >= 0:
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/TOF/"\
+                                                   + str(name) + "/physvol")[0]
+            elif name.find("Ckov") >= 0:
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/Cherenkov/"\
+                                                   + str(name) + "/physvol")[0]
+            elif name.find("Tracker") >= 0:
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/Tracker/"\
+                                                   + str(name) + "/physvol")[0]
+            else:
+                detinfo = \
+                    maus_information.xpathEval(str(detinfopath) + "/"\
+                                                   + str(name) + "/physvol")[0]
+            pos = [float(corrphys.xpathEval("position")[0].prop(u)) \
+                       for u in ['x', 'y', 'z'] ]
+            rot = [float(corrphys.xpathEval("rotation")[0].prop(u)) \
+                       for u in ['x', 'y', 'z'] ]
+            pos_det = [float(corrphys.xpathEval("position")[0].prop(u)) \
+                           for u in ['x', 'y', 'z'] ]
+            rot_det = [float(corrphys.xpathEval("rotation")[0].prop(u)) \
+                           for u in ['x', 'y', 'z'] ]
+            # rec_rot = rot
+            d_pos = [0, 0, 0]
+            d_rot = [0, 0, 0]
+            if len(corrs) > 0:
+                for vol in corrs.xpathEval("Module"):
+                    if vol.prop("name").find(name) >= 0:
+                        # get the corrections with respect to the device centre
+                        d_pos = \
+                            [float(vol.prop(u)) for u in ['dx', 'dy', 'dz'] ]
+                        # rotations are measured in object coordinate system
+                        d_rot = \
+                            [float(vol.prop(u)) for u in ['dx', 'dy', 'dz'] ]
+                        
+            sol_pos = [0, 0, 0]
+            sol_rot = [0, 0, 0]
+            if name.find("Tracker0") >= 0 or name.find("Tracker1") >= 0:
+                sol_pos = [float(solphys.xpathEval("position")[0].prop(u)) \
+                               for u in ['x', 'y', 'z'] ]
+                sol_rot = [float(solphys.xpathEval("rotation")[0].prop(u)) \
+                               for u in ['x', 'y', 'z'] ]
+
+            for i in [0, 1, 2]:
+                pos[i] += d_pos[i]
+                # rotations in the simulation alter the coordinate system 
+                # for the object
+                rot[i] -= d_rot[i]
+            # positions and rotations in the reconstruction rotate the object
+            d_pos_wrot = self.apply_rotationsMC(pos, sol_rot)
+            pos_det = [x for x in d_pos_wrot]
+            for i in [0, 1, 2]:
+                # solenoid positions should be added to the reconstruction 
+                # positions if necessary
+                pos_det[i] += sol_pos[i]
+                rot_det[i] += sol_rot[i]
+            # print pos
+            # print pos_det
+            u = ['x', 'y', 'z']            
+            if name.find('Tracker0') >= 0: 
+                rot_det[0] = -rot_det[0]
+            for i in [0, 1, 2]:
+                corrphys.xpathEval("position")[0].setProp(u[i], \
+                                                          str(pos[i]))
+                detinfo.xpathEval("position")[0].setProp(u[i], \
+                                                         str(pos_det[i]))
+                
+                corrphys.xpathEval("rotation")[0].setProp(u[i], \
+                                                       str(rot[i]))            
+                detinfo.xpathEval("rotation")[0].setProp(u[i], \
+                                                         str(rot_det[i]))
+            
+            if name.find('Tracker0') >= 0:
+                # need to write the results to the solenoid GDML if the 
+                # corrections are applied to the tracker
+                f = open(os.path.join(self.path_out, 'SolenoidUS.gdml'),'w')
+                solenoid.saveTo(f)
+                f.close()
+                solenoid.freeDoc()
+            elif name.find('Tracker1') >= 0:
+                # need to write the results to the solenoid GDML if the 
+                # corrections are applied to the tracker
+                f = open(os.path.join(self.path_out, 'SolenoidDS.gdml'),'w')
+                solenoid.saveTo(f)
+                f.close()
+                solenoid.freeDoc()
+        
+        f0 = open(os.path.join(self.path_out, self.maus_information_file),'w')
+        maus_information.saveTo(f0)
+        f0.close()
+        maus_information.freeDoc()
+        f1 = open(os.path.join(self.path_out, gdmlFile), 'w')
+        config.saveTo(f1)
+        f1.close()
+        config.freeDoc()
                  
+
+
     def add_other_info(self): #pylint: disable = R0914, R0915, C0301
         """
         @method add_other_information
@@ -363,7 +557,8 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             for node in coolingChannel.getElementsByTagName("coolingchannel"):
                 cc_info = node
             if type(cc_info) == bool:
-                raise IOError("Run number you have selected is not on the CDB")
+                raise IOError(\
+                "Run number you have selected is not in the coolingchannel CDB")
             else:
                 root_node = maus_information.childNodes[0].childNodes[1]
                 root_node.insertBefore(cc_info, root_node.childNodes[0])
@@ -373,6 +568,61 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             
         print 'Cooling channel information merged!'
      
+    def merge_alignment_correction_info(self, gdmlfile):
+        """
+        @method merge_alignment_correction_info
+
+        This method adds the correction information to the maus_information_file GDML
+        """
+        #  fin = open(os.path.join(self.path_out, gdmlfile))
+        #  for lines in fin.readlines():
+        maus_information = minidom.parse(os.path.join(self.path_out, gdmlfile))
+        correction_path = os.path.join(self.path_in, self.corrections_file)
+        correction = minidom.parse(correction_path)
+            
+        corr_info = next(node for node in \
+                             correction.getElementsByTagName("correction"))
+        if type(corr_info) == bool:
+            raise IOError(
+                "Run number you have selected is not in the correction CDB")
+        else:
+            root_node = maus_information.childNodes[0].childNodes[1]
+            root_node.insertBefore(corr_info, root_node.childNodes[0])
+            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
+            maus_information.writexml(fout)
+            fout.close()
+
+    def update_geometry_id_number(self, geoid, gdmlfile):
+        """ 
+        @ method update geometry id number
+        
+        This method updates the geometry id number to the number given
+        in the database rather than trusting the number given to the
+        upload files.
+        """
+        if geoid != 0:
+            maus_information = minidom.parse(os.path.join(self.path_out, \
+                                                             gdmlfile))
+            # check if the geometry id already exists in this file
+            geoid_node =  maus_information.getElementsByTagName("GeometryID")
+            if len(geoid_node) == 1:
+                if geoid_node[0].getAttribute("value") != str(geoid):
+                    # update the geometry id
+                    geoid_node[0].setAttribute("value", str(geoid))
+                # else do nothing
+            else:
+                # create the node if it does not exist
+                config_node = \
+                   maus_information.getElementsByTagName(\
+                    "Configuration_Information")[0]
+                newNode = maus_information.createElement("GeometryID")
+                newNode.setAttribute("value", str(geoid))
+                config_node.appendChild(newNode)
+                    
+            fout = open(os.path.join(self.path_out, gdmlfile), 'w')
+            maus_information.writexml(fout)
+            fout.close()
+
     def format_materials(self, gdmlfile):
         """
         @method Format Materials
@@ -476,7 +726,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             self.format_gdml_locations(self.configuration_file)
             self.insert_materials_ref(self.txt_file)
         print "Formatted Configuration File"
-        
+
         if self.tracker_file != None:
             self.format_check(self.tracker_file)
             if self.formatted == False:
@@ -524,7 +774,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                                                   self.maus_information_file))
         runInfo = mausInfo.xpathEval(\
             "MICE_Information/Configuration_Information/run")
-        print runInfo
+        # print runInfo
         diffuserSetting = []
         if len(runInfo) > 0: 
             diffuserSetting.append(runInfo[0].prop("diffuserThickness"))
@@ -543,7 +793,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             "MICE_Information/Detector_Information/Diffuser")
 
         targetname = os.path.join(self.path_in, key+".gdml")
-        print targetname
+        # print targetname
         target = libxml2.parseFile(targetname)
         vol = next(x for x in target.xpathEval("gdml/structure/volume") 
                    if x.prop("name").find(key + "_structvol") >= 0)
@@ -555,9 +805,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                    float(iris.xpathEval("Position")[0].prop("y")), \
                    float(iris.xpathEval("Position")[0].prop("z"))]
             
-            print key, pos[2], modrange
+            # print key, pos[2], modrange
             pos[2] = pos[2] - (modrange[1] + modrange[0])/2.
-            print key, pos[2], modrange
+            # print key, pos[2], modrange
             posUnit = iris.xpathEval("Position")[0].prop("unit")
             rot = [float(iris.xpathEval("Rotation")[0].prop("x")), \
                    float(iris.xpathEval("Rotation")[0].prop("y")), \
@@ -566,7 +816,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             newNode = libxml2.newNode("physvol")
             fileNode = libxml2.newNode("file")
             if len(diffuserSetting) > 0: # test of whether the statement exists.
-                print "Using diffuser setting ", int(diffuserSetting[0])
+                # print "Using diffuser setting ", int(diffuserSetting[0])
                 if (inum == 1 and int(diffuserSetting[0]) % 2 == 0) or \
                        (inum == 2 and (int(diffuserSetting[0]) % 4 == 0 or \
                                      int(diffuserSetting[0]) % 4 == 1)) or \
@@ -640,7 +890,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         doc.freeDoc()
         info.freeDoc()
 
-    def formatForGDML(self):
+    def formatForGDML(self, geoid=0):
         """
         @method FormatForGDML
         
@@ -659,7 +909,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         self.add_other_info()
         if self.coolingChannel_file != None:
             self.merge_cooling_channel_info(self.maus_information_file)
-            
+        if self.corrections_file != None:
+            self.merge_alignment_correction_info(self.maus_information_file)
+        self.update_geometry_id_number(geoid, self.maus_information_file)
             
         # if self.formatted == False:
         print self.configuration_file
@@ -693,8 +945,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             self.format_schema_location(self.stepfiles[num])
             # print "Formatted step file ",self.stepfiles[num]
             # self.correct_gdml_locations(self.stepfiles[num])
-            
-        
+        # now that everything else is formatted and placed, sychronize
+        # the placement of detectors in the output files
+        self.apply_alignment_corrections(self.configuration_file)
         print "Format Complete"
 
 def main():
