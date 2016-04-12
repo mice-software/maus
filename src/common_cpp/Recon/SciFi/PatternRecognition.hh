@@ -84,6 +84,8 @@ class PatternRecognition {
     void add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
                     std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt) const;
 
+    std::vector<SciFiHelicalPRTrack*> select_tracks(std::vector<SciFiHelicalPRTrack*> &htrks) const;
+
 
     void make_all_tracks(const bool track_type, const int trker_no,
                          SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt) const;

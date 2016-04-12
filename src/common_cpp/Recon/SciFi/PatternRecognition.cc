@@ -54,6 +54,20 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
   return (sp1->get_position().z() > sp2->get_position().z());
 }
 
+// Predicate function to sort helical tracks by their combined fit chisq
+bool compare_htracks_ascending_chisq(const SciFiHelicalPRTrack *ht1,
+                                     const SciFiHelicalPRTrack *ht2) {
+  double c_chisq_1 = ht1->get_circle_chisq();
+  double sz_chisq_1 = ht1->get_line_sz_chisq();
+  double full_chisq_1 = c_chisq_1 + sz_chisq_1;
+
+  double c_chisq_2 = ht2->get_circle_chisq();
+  double sz_chisq_2 = ht2->get_line_sz_chisq();
+  double full_chisq_2 = c_chisq_2 + sz_chisq_2;
+
+  return (full_chisq_1 < full_chisq_2);
+}
+
 PatternRecognition::PatternRecognition(): _debug(false),
                                           _up_straight_pr_on(true),
                                           _down_straight_pr_on(true),
@@ -236,15 +250,43 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
 }
 
 void PatternRecognition::add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
-                                std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt ) const {
+                                std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt) const {
   for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
     strks[i]->set_tracker(trker_no);
     evt.add_straightprtrack(strks[i]);
   }
   for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
     htrks[i]->set_tracker(trker_no);
-    evt.add_helicalprtrack(htrks[i]);
   }
+  std::vector<SciFiHelicalPRTrack*> accepted_tracks = select_tracks(htrks);
+  for (auto trk : accepted_tracks) {
+    evt.add_helicalprtrack(trk);
+  }
+}
+
+std::vector<SciFiHelicalPRTrack*>
+  PatternRecognition::select_tracks(std::vector<SciFiHelicalPRTrack*> &htrks) const {
+  // Sort the tracks by combined chisq (cannot do in place due to preserving constness)
+  std::vector<SciFiHelicalPRTrack*> sorted_tracks = htrks;
+  std::sort(sorted_tracks.begin(), sorted_tracks.end(), compare_htracks_ascending_chisq);
+  // Now loop over tracks and pull out highest chisq distinct tracks
+  std::vector<SciFiHelicalPRTrack*> accepted_tracks;
+  for (auto trk : sorted_tracks) {
+    std::vector<SciFiSpacePoint*> spoints = trk->get_spacepoints_pointers();
+    int n_used = 0;
+    for (auto sp : spoints) {
+      if (sp->get_used()) ++n_used;
+    }
+    // Accept the track if it has enough unused spacepoints
+    if (static_cast<size_t>(n_used) < (spoints.size() - 1)) {
+      // Set the spacepoints to used (they are pointers, so applies to all tracks which hold them)
+      for (auto sp : spoints) {
+        sp->set_used(true);
+      }
+      accepted_tracks.push_back(trk);
+    }
+  }
+  return accepted_tracks;
 }
 
 void PatternRecognition::make_5tracks(const bool track_type, const int trker_no,
@@ -598,6 +640,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
   set_ignore_stations(ignore_stations, ignore_st_1, ignore_st_2);
 
   // If we are on an ignore station, move to the next station without doing anything else
+  // (this is the first possible recursive bit)
   if ( stat_num == ignore_st_1 || stat_num == ignore_st_2 ) {
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
       return;
@@ -630,20 +673,22 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
 
       // If we found a track, clear current spacepoints to trigger break out to outer most station
       if ( trk != NULL ) {
-        if (_verb > 0) std::cout << "INFO: Pattern Recognition: Found track, adding" << std::endl;
+        if (_verb > 0) 
+          std::cout << "INFO: Pattern Recognition: Found track candidate, adding" << std::endl;
         htrks.push_back(trk);
-        current_spnts.clear();
-        current_spnts.resize(0);
-        return;
-      } else {
-        current_spnts.pop_back();
-      }
+        // current_spnts.clear();
+        // current_spnts.resize(0);
+        // return;
+      } // else {
+        // current_spnts.pop_back();
+      // }
+      current_spnts.pop_back();
 
-    // If not on the final station, move on to next
+    // If not on the final station, move on to next (the last recursive call)
     } else {
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
 
-// If we are not on the first station and current_spnts is empty, break out as track was found
+      // If not on the first station and current_spnts is empty, break out as track was found
       if ( stat_num != stat_num_min && current_spnts.size() == 0 )
         return;
       // If we we have current spnts, remove the last tried, before trying another
@@ -693,9 +738,9 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   std::vector<double> covariance(a1, &a1[25]);
 
   // Set all the good sp to used and set the track seeds with them
-  for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
-    spnts[i]->set_used(true);
-  }
+//   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
+//     spnts[i]->set_used(true);
+//   }
 
   // Set the charge
 //  int charge = - handedness;

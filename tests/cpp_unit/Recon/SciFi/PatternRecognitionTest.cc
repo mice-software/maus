@@ -371,14 +371,14 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger) {
   EXPECT_EQ(5, htrks[5]->get_num_points());
   EXPECT_EQ(5, htrks[6]->get_num_points());
   EXPECT_EQ(5, htrks[7]->get_num_points());
-  EXPECT_NEAR(-0.1156, htrks[0]->get_dsdz(), 0.001);
-  EXPECT_NEAR(-0.01834, htrks[1]->get_dsdz(), 0.01);
-  EXPECT_NEAR(-0.342, htrks[2]->get_dsdz(), 0.01);
-  EXPECT_NEAR(-0.1178, htrks[3]->get_dsdz(), 0.01);
-  EXPECT_NEAR(0.3126, htrks[4]->get_dsdz(), 0.001);
-  EXPECT_NEAR(0.1257, htrks[5]->get_dsdz(), 0.001);
-  EXPECT_NEAR(0.1504, htrks[6]->get_dsdz(), 0.001);
-  EXPECT_NEAR(0.08396, htrks[7]->get_dsdz(), 0.001);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.342, 0.01);
+  EXPECT_NEAR(htrks[2]->get_dsdz(), -0.01834, 0.01);
+  EXPECT_NEAR(htrks[3]->get_dsdz(), -0.1178, 0.01);
+  EXPECT_NEAR(htrks[4]->get_dsdz(), 0.1504, 0.001);
+  EXPECT_NEAR(htrks[5]->get_dsdz(), 0.3126, 0.001);
+  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.08396, 0.001);
+  EXPECT_NEAR(htrks[7]->get_dsdz(), 0.1257, 0.001);
 
   // evt descoping will delete the spacepoints
 }
