@@ -84,7 +84,8 @@ class PatternRecognition {
     void add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
                     std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt) const;
 
-    std::vector<SciFiHelicalPRTrack*> select_tracks(std::vector<SciFiHelicalPRTrack*> &htrks) const;
+    template<typename T>
+    std::vector<T*> select_tracks(std::vector<T*> &trks) const;
 
 
     void make_all_tracks(const bool track_type, const int trker_no,
@@ -338,6 +339,49 @@ class PatternRecognition {
     TH1D* _hxchisq;  /** histo of chisq of every x-z straight least sq fit tried */
     TH1D* _hychisq;  /** histo of chisq of every y-z straight least sq fit tried */
 };
+
+// Two predicate functions used by the stl sort algorithm to sort spacepoints in vectors
+bool compare_spoints_ascending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_position().z() < sp2->get_position().z());
+}
+
+bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_position().z() > sp2->get_position().z());
+}
+
+// Predicate function to sort tracks by their combined fit chisq
+template<typename T>
+bool compare_tracks_ascending_chisq(const T *trk1,
+                                    const T *trk2) {
+  return (trk1->get_chi_squared() < trk2->get_chi_squared());
+}
+
+template<typename T>
+std::vector<T*> PatternRecognition::select_tracks(std::vector<T*> &trks) const {
+
+    // Sort the tracks by combined chisq (cannot do in place due to preserving constness)
+  std::vector<T*> sorted_tracks = trks;
+  std::sort(sorted_tracks.begin(), sorted_tracks.end(), compare_tracks_ascending_chisq<T>);
+
+  // Now loop over tracks and pull out highest chisq distinct tracks
+  std::vector<T*> accepted_tracks;
+  for (auto trk : sorted_tracks) {
+    std::vector<SciFiSpacePoint*> spoints = trk->get_spacepoints_pointers();
+    int n_used = 0;
+    for (auto sp : spoints) {
+      if (sp->get_used()) ++n_used;
+    }
+    // Accept the track if it has enough unused spacepoints
+    if (static_cast<size_t>(n_used) < (spoints.size() - 1)) {
+      // Set the spacepoints to used (they are pointers, so applies to all tracks which hold them)
+      for (auto sp : spoints) {
+        sp->set_used(true);
+      }
+      accepted_tracks.push_back(trk);
+    }
+  }
+  return accepted_tracks;
+}
 
 } // ~namespace MAUS
 

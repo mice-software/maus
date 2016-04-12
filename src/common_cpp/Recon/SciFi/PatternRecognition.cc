@@ -45,29 +45,6 @@
 
 namespace MAUS {
 
-// Two predicate functions used by the stl sort algorithm to sort spacepoints in vectors
-bool compare_spoints_ascending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
-  return (sp1->get_position().z() < sp2->get_position().z());
-}
-
-bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
-  return (sp1->get_position().z() > sp2->get_position().z());
-}
-
-// Predicate function to sort helical tracks by their combined fit chisq
-bool compare_htracks_ascending_chisq(const SciFiHelicalPRTrack *ht1,
-                                     const SciFiHelicalPRTrack *ht2) {
-  double c_chisq_1 = ht1->get_circle_chisq();
-  double sz_chisq_1 = ht1->get_line_sz_chisq();
-  double full_chisq_1 = c_chisq_1 + sz_chisq_1;
-
-  double c_chisq_2 = ht2->get_circle_chisq();
-  double sz_chisq_2 = ht2->get_line_sz_chisq();
-  double full_chisq_2 = c_chisq_2 + sz_chisq_2;
-
-  return (full_chisq_1 < full_chisq_2);
-}
-
 PatternRecognition::PatternRecognition(): _debug(false),
                                           _up_straight_pr_on(true),
                                           _down_straight_pr_on(true),
@@ -253,40 +230,20 @@ void PatternRecognition::add_tracks(const int trker_no, std::vector<SciFiStraigh
                                 std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt) const {
   for ( int i = 0; i < static_cast<int>(strks.size()); ++i ) {
     strks[i]->set_tracker(trker_no);
-    evt.add_straightprtrack(strks[i]);
   }
+
+  std::vector<SciFiStraightPRTrack*> accepted_stracks = select_tracks(strks);
+  for (auto trk : accepted_stracks) {
+    evt.add_straightprtrack(trk);
+  }
+
   for ( int i = 0; i < static_cast<int>(htrks.size()); ++i ) {
     htrks[i]->set_tracker(trker_no);
   }
-  std::vector<SciFiHelicalPRTrack*> accepted_tracks = select_tracks(htrks);
-  for (auto trk : accepted_tracks) {
+  std::vector<SciFiHelicalPRTrack*> accepted_htracks = select_tracks(htrks);
+  for (auto trk : accepted_htracks) {
     evt.add_helicalprtrack(trk);
   }
-}
-
-std::vector<SciFiHelicalPRTrack*>
-  PatternRecognition::select_tracks(std::vector<SciFiHelicalPRTrack*> &htrks) const {
-  // Sort the tracks by combined chisq (cannot do in place due to preserving constness)
-  std::vector<SciFiHelicalPRTrack*> sorted_tracks = htrks;
-  std::sort(sorted_tracks.begin(), sorted_tracks.end(), compare_htracks_ascending_chisq);
-  // Now loop over tracks and pull out highest chisq distinct tracks
-  std::vector<SciFiHelicalPRTrack*> accepted_tracks;
-  for (auto trk : sorted_tracks) {
-    std::vector<SciFiSpacePoint*> spoints = trk->get_spacepoints_pointers();
-    int n_used = 0;
-    for (auto sp : spoints) {
-      if (sp->get_used()) ++n_used;
-    }
-    // Accept the track if it has enough unused spacepoints
-    if (static_cast<size_t>(n_used) < (spoints.size() - 1)) {
-      // Set the spacepoints to used (they are pointers, so applies to all tracks which hold them)
-      for (auto sp : spoints) {
-        sp->set_used(true);
-      }
-      accepted_tracks.push_back(trk);
-    }
-  }
-  return accepted_tracks;
 }
 
 void PatternRecognition::make_5tracks(const bool track_type, const int trker_no,
@@ -602,14 +559,14 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
 
           if ( _verb > 0 ) {
             std::cout << "INFO: Pattern Recognition: chisq test passed, ";
-            std::cout << "adding " << n_points << "pt track\n";
+            std::cout << "adding " << n_points << "pt candidate track\n";
           }
           SciFiStraightPRTrack* track = new SciFiStraightPRTrack(-1, line_x, line_y, covariance);
 
           // Set all the good sp to used
-          for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
-            good_spnts[i]->set_used(true);
-          }
+          // for ( int i = 0; i < static_cast<int>(good_spnts.size()); ++i ) {
+          //   good_spnts[i]->set_used(true);
+          // }
 
           // Populate the sp of the track and then push the track back into the strks vector
           track->set_spacepoints_pointers(good_spnts);
