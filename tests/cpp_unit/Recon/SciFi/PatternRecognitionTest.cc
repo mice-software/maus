@@ -585,7 +585,7 @@ TEST_F(PatternRecognitionTest, test_make_4pt_tracks) {
   pr.make_4tracks(track_type, tracker_num, spnts_by_station, strks, htrks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(5u, strks.size());
   EXPECT_EQ(0u, htrks.size());
   EXPECT_EQ(num_points, strks[0]->get_num_points());
   EXPECT_NEAR(x0, strks[0]->get_x0(), 3);
@@ -676,7 +676,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.make_3tracks(tracker_num, spnts_by_station, strks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(4u, strks.size());
   EXPECT_EQ(0u, htrks.size());
   EXPECT_EQ(num_points, strks[0]->get_num_points());
   EXPECT_NEAR(x0, strks[0]->get_x0(), 3);
@@ -709,7 +709,7 @@ TEST_F(PatternRecognitionTest, test_make_3pt_tracks) {
   pr.make_3tracks(tracker_num, spnts_by_station, strks);
 
   // Check it matches to within a tolerance
-  EXPECT_EQ(1u, strks.size());
+  EXPECT_EQ(10u, strks.size());
   EXPECT_EQ(0u, htrks.size());
   EXPECT_EQ(num_points, strks[0]->get_num_points());
   EXPECT_NEAR(x0, strks[0]->get_x0(), 3);

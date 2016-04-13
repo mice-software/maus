@@ -630,7 +630,7 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
 
       // If we found a track, clear current spacepoints to trigger break out to outer most station
       if ( trk != NULL ) {
-        if (_verb > 0) 
+        if (_verb > 0)
           std::cout << "INFO: Pattern Recognition: Found track candidate, adding" << std::endl;
         htrks.push_back(trk);
         // current_spnts.clear();

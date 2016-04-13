@@ -29,6 +29,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 // ROOT headers
 #include "TFile.h"
@@ -372,7 +373,8 @@ std::vector<T*> PatternRecognition::select_tracks(std::vector<T*> &trks) const {
       if (sp->get_used()) ++n_used;
     }
     // Accept the track if it has enough unused spacepoints
-    if (static_cast<size_t>(n_used) < (spoints.size() - 1)) {
+    // if (static_cast<size_t>(n_used) < (spoints.size() - 1)) {
+    if (static_cast<size_t>(n_used) < 2) {
       // Set the spacepoints to used (they are pointers, so applies to all tracks which hold them)
       for (auto sp : spoints) {
         sp->set_used(true);
