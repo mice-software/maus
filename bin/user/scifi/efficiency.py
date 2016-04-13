@@ -22,7 +22,9 @@ class PatRecEfficiency():
         self.check_helical = False
         self.check_straight = True
         self.cut_on_tof = True
+        self.cut_on_tof_time = True
         self.cut_on_trackers = True
+        self.cut_on_fiducial_track = True
 
         self.root_files = []
 
@@ -47,14 +49,17 @@ class PatRecEfficiency():
         print 'Check helical\t' + str(self.check_helical)
         print 'Check straight\t' + str(self.check_straight)
         print 'Cut on TOF\t' + str(self.cut_on_tof)
+        print 'Cut on TOF Time\t' + str(self.cut_on_tof_time)
+        print 'Cut on fiducial track\t' + str(self.cut_on_fiducial_track) 
         print 'Cut on trackers\t' + str(self.cut_on_trackers) + '\n'
 
         self.root_files = self.load_data(files)
         if len(self.root_files) < 1:
             return False
 
-        print '\nFile\t\t\t#_Recon_Events\tTkUS_5pt\tTkUS_3-5_pt\t',
-        print 'TkDS_5pt\tTkDS_3-5pt'
+        print '\nFile\t\t\t#_Recon_Events\tTkUS_5pt\tTkUS_5pt_Err\
+          \tTkUS_3-5_pt\tTkUS_3-5_pt_Err\t',
+        print 'TkDS_5pt\tTkDS_5_pt_Err\tTkDS_3-5pt\tTkDS_3-5_pt_Err'
         for root_file_name in self.root_files:
             self.calculate_efficiency(root_file_name)
             self.print_file_info(root_file_name)
@@ -132,13 +137,42 @@ class PatRecEfficiency():
                 #------------------
                 tof_evt = spill.GetReconEvents()[i].GetTOFEvent()
                 tof1 = tof_evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
-                tof2 = tof_evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
+                tof2 = tof_evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
+                scifi_evt = spill.GetReconEvents()[i].GetSciFiEvent()
 
+                # Require a sp in TOF1 and TOF2
                 bool_2tof_spoint_event = True
                 if ((len(tof1) != 1) or (len(tof2) != 1)):
                     bool_2tof_spoint_event = False
                     if self.cut_on_tof:
                         continue
+
+                # Require timing coincidence between TOF1 and TOF2
+                bool_2tof_timing_event = True
+                for j in range(tof1.size()):
+                    if tof1.size() == 1 and tof2.size() == 1:
+                        tof_time_1 = tof1[j].GetTime()
+                        tof_time_2 = tof2[j].GetTime()
+                        if (tof_time_2 - tof_time_1 > 50) \
+                          or (tof_time_2 - tof_time_1 < 27):
+                            bool_2tof_timing_event = False
+                            if self.cut_on_tof_time:
+                                continue
+
+                # Fiducial track cut from upstream tracker:
+                track_ok = False
+                for track in scifi_evt.straightprtracks():
+                    if track.get_tracker() == 0:
+                        # Project to downstream:
+                        z_loc = -3800
+                        x = track.get_x0() + z_loc*track.get_mx()
+                        y = track.get_y0() + z_loc*track.get_my()
+                        if ((x*x+y*y) ** 0.5) < 120:
+                            track_ok = True
+                if not track_ok and self.cut_on_fiducial_track:
+                    continue # remove event from consideration
+
+
 
                 # Pull out tracker data
                 #----------------------
@@ -164,7 +198,8 @@ class PatRecEfficiency():
                 if self.cut_on_trackers and (not bool_10spoint_event):
                     continue
 
-                if bool_2tof_spoint_event and bool_10spoint_event:
+                if bool_2tof_spoint_event and bool_2tof_timing_event \
+                  and bool_10spoint_event:
                     self.num_12spoint_events += 1
                 if bool_10spoint_event:
                     self.num_10spoint_events += 1
@@ -270,29 +305,40 @@ class PatRecEfficiency():
         try:
             us_5pt = float(self.num_5spoint_tkus_tracks) \
               / float(self.num_5spoint_tkus_events)
+            us_5pt_Err = ((us_5pt * (1-us_5pt)) \
+              /float(self.num_5spoint_tkus_events)) ** (0.5)
         except ZeroDivisionError:
             us_5pt = 0.0
         try:
             us_3to5pt = float(self.num_3to5spoint_tkus_tracks) \
               / float(self.num_5spoint_tkus_events)
+            us_3to5pt_Err = ((us_3to5pt * (1-us_3to5pt)) \
+              /float(self.num_5spoint_tkus_events)) ** (0.5)
+            #us_3to5pt_Err = 0.001
         except ZeroDivisionError:
             us_3to5pt = 0.0
         try:
             ds_5pt = float(self.num_5spoint_tkds_tracks) \
               / float(self.num_5spoint_tkds_events)
+            ds_5pt_Err = ((ds_5pt * (1-ds_5pt)) \
+              /float(self.num_5spoint_tkds_events)) ** (0.5)
         except ZeroDivisionError:
             ds_5pt = 0.0
         try:
             ds_3to5pt = float(self.num_3to5spoint_tkds_tracks) \
               / float(self.num_5spoint_tkds_events)
+            ds_3to5pt_Err = ((ds_3to5pt * (1-ds_3to5pt)) \
+              /float(self.num_5spoint_tkds_events)) ** (0.5)
+            #ds_3to5pt_Err = 0.001
         except ZeroDivisionError:
             ds_3to5pt = 0.0
 
         print os.path.basename(root_file_name) + '\t',
         print str(self.num_total_events) + '\t\t',
 
-        print '%.5f \t%.5f \t%.5f \t%.5f' % \
-          (us_5pt, us_3to5pt, ds_5pt, ds_3to5pt)
+        print '%.5f \t%.5f \t%.5f \t%.5f \t%.5f \t%.5f \t%.5f \t%.5f' % \
+          (us_5pt, us_5pt_Err, us_3to5pt, us_3to5pt_Err, \
+            ds_5pt, ds_5pt_Err, ds_3to5pt, ds_3to5pt_Err)
 
 if __name__ == "__main__":
     eff = PatRecEfficiency()
