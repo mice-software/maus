@@ -82,11 +82,21 @@ class PatternRecognition {
       *  @param trker_no - The tracker number
       *  @param evt - The SciFi event
       */
-    void add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
+    void add_tracks(std::vector<SciFiStraightPRTrack*> &strks,
                     std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt) const;
 
     template<typename T>
     std::vector<T*> select_tracks(std::vector<T*> &trks) const;
+
+    void track_processing(const int trker_no,
+                          const int n_points,
+                          std::vector<SciFiStraightPRTrack*> &strks,
+                          std::vector<SciFiHelicalPRTrack*> &htrks) const;
+
+    void check_for_scattering(std::vector<SciFiStraightPRTrack*> &strks) const;
+
+    SciFiStraightPRTrack* fit_straight_track(const int n_points,
+                                             std::vector<SciFiSpacePoint*> spnts) const;
 
 
     void make_all_tracks(const bool track_type, const int trker_no,
@@ -299,6 +309,10 @@ class PatternRecognition {
     /** @brief A function to set all the internal parameters to their default values (for tests) */
     void set_parameters_to_default();
 
+    /** @brief Convenience function to set the tracker number on vectors of tracks */
+    void set_tracker_number(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
+                            std::vector<SciFiHelicalPRTrack*> &htrks) const;
+
     /** @brief Place the different cut value currently being used into the variables supplied */
     void get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
        double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut);
@@ -341,7 +355,7 @@ class PatternRecognition {
     TH1D* _hychisq;  /** histo of chisq of every y-z straight least sq fit tried */
 };
 
-// Two predicate functions used by the stl sort algorithm to sort spacepoints in vectors
+// Four predicate functions used by the stl sort algorithm to sort spacepoints in vectors
 bool compare_spoints_ascending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
   return (sp1->get_position().z() < sp2->get_position().z());
 }
@@ -350,10 +364,17 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
   return (sp1->get_position().z() > sp2->get_position().z());
 }
 
+bool compare_spoints_ascending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_station() < sp2->get_station());
+}
+
+bool compare_spoints_descending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_station() > sp2->get_station());
+}
+
 // Predicate function to sort tracks by their combined fit chisq
 template<typename T>
-bool compare_tracks_ascending_chisq(const T *trk1,
-                                    const T *trk2) {
+bool compare_tracks_ascending_chisq(const T *trk1, const T *trk2) {
   return (trk1->get_chi_squared() < trk2->get_chi_squared());
 }
 
