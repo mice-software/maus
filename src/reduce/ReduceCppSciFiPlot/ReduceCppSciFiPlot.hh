@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef SRC_REDUCECPPTOFPLOT_HH
-#define SRC_REDUCECPPTOFPLOT_HH 1
+#ifndef SRC_ReduceCppSciFiPLOT_HH
+#define SRC_ReduceCppSciFiPLOT_HH 1
 
 #include <string>
 #include <iostream>
@@ -38,10 +38,10 @@
 
 namespace MAUS {
 
-class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
+class ReduceCppSciFiPlot : public ReduceBase<Data, ImageData> {
  public:
-  ReduceCppTOFPlot();
-  ~ReduceCppTOFPlot();
+  ReduceCppSciFiPlot();
+  ~ReduceCppSciFiPlot();
 
   int  getRefreshRate() {return _refresh_rate;}
 
@@ -57,37 +57,21 @@ class ReduceCppTOFPlot : public ReduceBase<Data, ImageData> {
 
   void update();
 
-  void update_tof_plots(TOFEvent* tof_event, int runNum);
+  void update_scifi_plots(SciFiEvent* scifi_event, int runNum);
 
   int _refresh_rate;
   int _process_count;
 
   std::vector<TH1*> _histos;
   std::vector<TCanvas*> _canvs;
-  TH1F *_h_tof01, *_h_tof12, *_h_tof02;
-  TH1F *_hslabx_0, *_hslabx_1, *_hslabx_2;
-  TH1F *_hslaby_0, *_hslaby_1, *_hslaby_2;
-  TH1F *_htof_pmt[3][2][2];
-  TH1F *_hspx_0, *_hspx_1, *_hspx_2;
-  TH1F *_hspy_0, *_hspy_1, *_hspy_2;
-  TH1F *_hnsp_0, *_hnsp_1, *_hnsp_2;
-  TH2F *_hspxy[3];
-  TH2F *_hspxy_0, *_hspxy_1, *_hspxy_2;
-  TH1F *_htof0_nspVspill, *_htof1_nspVspill, *_htof2_nspVspill;
-  THStack *_hstack_spx, *_hstack_spy;
-  THStack *_hstack_nsp;
-  THStack *_hstack_slabx, *_hstack_slaby;
-  THStack *_hstack_pm0pln0, *_hstack_pm0pln1;
-  THStack *_hstack_pm1pln0, *_hstack_pm1pln1;
-  TCanvas *_canv_tof_spx, *_canv_tof_spy;
-  TCanvas *_canv_tof01, *_canv_tof02, *_canv_tof12;
-  TCanvas *_canv_tof0_spxy, *_canv_tof1_spxy, *_canv_tof2_spxy;
-  TCanvas *_canv_tof_nsp;
-  TCanvas *_canv_tof_slabx, *_canv_tof_slaby;
-  TCanvas *_canv_tof_pm0pln0, *_canv_tof_pm0pln1;
-  TCanvas *_canv_tof_pm1pln0, *_canv_tof_pm1pln1;
-  TCanvas *_canv_tof0_nspVspill, *_canv_tof1_nspVspill, *_canv_tof2_nspVspill;
+  std::vector<TH1*> tku_digs, tkd_digs;
+
+  TH1F *_eff_plot, *_track1_2Clus, *_track2_2Clus, *_track1_3Clus, *_track2_3Clus;
+  TH1F *_trp_hist[2][6][3], *_dig_ch_hist_up[6][3], *_dig_ch_hist_dn[6][3];
+  TH1F *_dig_st_hist[2], *_sp_st_hist[2], *_kuno_hist[2];
+
+  TH2F *_spt_hist[2][6], *_spd_hist[2][6];
 };
 }
 
-#endif // SRC_REDUCECPPTOFPLOT_HH
+#endif // SRC_ReduceCppSciFiPLOT_HH

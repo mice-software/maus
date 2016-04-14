@@ -135,6 +135,8 @@ std::string("  - values: list, each entry containing a list of floats\n")+
 std::string("  corresponding to ordinates, with length PointDimension\n")+
 std::string("  - polynomial_order: integer, >= 0, corresponding to the\n")+
 std::string("  polynomial fit.\n")+
+std::string("  - error_matrix = None: integer, >= 0, corresponding to the\n")+
+std::string("  polynomial fit.\n")+
 std::string("Returns a polynomial map.\n");
 
 std::vector<std::vector<double> > get_vectors(PyObject* py_floats) {
@@ -189,14 +191,16 @@ PyObject* least_squares_fit(PyObject *py_class, PyObject *args, PyObject *kwds) 
     PyObject* py_points = NULL;
     PyObject* py_values = NULL;
     int polynomial_order = 0;
+    PyObject* py_error_matrix = Py_None; // borrowed reference
     static char *kwlist[] = {
         const_cast<char*>("points"),
         const_cast<char*>("values"),
         const_cast<char*>("polynomial_order"),
+        const_cast<char*>("error_matrix"),
         NULL
     };
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOi", kwlist, &py_points,
-            &py_values, &polynomial_order)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOi|O", kwlist, &py_points,
+            &py_values, &polynomial_order, &py_error_matrix)) {
         return NULL;
     }
     if (polynomial_order < 0) {
@@ -223,9 +227,25 @@ PyObject* least_squares_fit(PyObject *py_class, PyObject *args, PyObject *kwds) 
                             "points row misaligned with values row");
             return NULL;
         }
+    Matrix<double> error_matrix;
+    if (py_error_matrix != Py_None) {
+        std::vector< std::vector<double> > errs = get_vectors(py_error_matrix);
+        try {
+            size_t num_rows = errs.size();
+            size_t num_cols = errs.at(0).size();
+            error_matrix = Matrix<double>(num_rows, num_cols, 0.);
+            for (size_t i = 0; i < num_rows; ++i)
+                for (size_t j = 0; j < num_rows; ++j)
+                    error_matrix(i+1, j+1) = errs[i][j];
+        } catch (std::exception& exc) {
+            PyErr_SetString(PyExc_ValueError, exc.what());
+            return NULL;
+        }
+    }
     PolynomialMap* test_map = NULL;
     try {
-        test_map = PolynomialMap::PolynomialLeastSquaresFit(points, values, polynomial_order);
+        test_map = PolynomialMap::PolynomialLeastSquaresFit(
+                          points, values, polynomial_order, NULL, error_matrix);
     } catch (std::exception& exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;

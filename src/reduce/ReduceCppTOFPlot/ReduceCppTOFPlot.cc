@@ -77,7 +77,6 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
 
   _refresh_rate = configJSON["reduce_plot_refresh_rate"].asInt();
-  _got_SOR = false;
 
   // Set ROOT to batch mode by default unless specified otherwise
   int root_batch_mode = 1;
@@ -154,9 +153,10 @@ void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
   for (unsigned int s = 0; s < 3; ++s) {
     int nbins = 10, edgelo = -0.5, edgehi = 9.5;
     char tistr[30], namestr[30];
-    snprintf(tistr, sizeof(tistr), "tof%d: space points;SlabY;SlabX", s);
+    snprintf(tistr, sizeof(tistr), "tof%d: spacepoints;SlabY;SlabX", s);
     snprintf(namestr, sizeof(namestr), "hspxy_%d", s);
     _hspxy[s] = new TH2F(namestr, tistr, nbins, edgelo, edgehi, nbins, edgelo, edgehi);
+    _histos.push_back(_hspxy[s]);
   }
 
   // PMT hits for each PMT[0->1], Plane[0->1]
@@ -436,9 +436,6 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
                     "ReduceCppTOFPlot::_process");
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
-  int runNum = data->GetSpill()->GetRunNumber();
-  if (!_got_SOR)
-      setHistosTitle(runNum);
 
   if (ev_type != "physics_event")
      return;
@@ -459,7 +456,7 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
     MAUS::TOFEvent* tof_event = recon_events->at(i)->GetTOFEvent();
     if (tof_event == NULL) continue;
 
-    this->update_tof_plots(tof_event);
+    this->update_tof_plots(tof_event, xRun);
   }
 
   _process_count++;
@@ -481,7 +478,7 @@ void ReduceCppTOFPlot::update() {
   }
 }
 
-void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
+void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event, int runNum) {
   MAUS::TOFEventDigit *digits = tof_event->GetTOFEventDigitPtr();
   MAUS::TOFEventSlabHit *slab_hits = tof_event->GetTOFEventSlabHitPtr();
   MAUS::TOFEventSpacePoint *space_points = tof_event->GetTOFEventSpacePointPtr();
@@ -501,6 +498,8 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
   float t0(0), t1(0), t2(0);
   float spnt_x(0), spnt_y(0);
 
+  std::string htitle;
+
   if (dig_tof0->size()) {
       for (unsigned int s = 0; s < dig_tof0->size(); ++s) {
           TOFDigit tdig = dig_tof0->at(s);
@@ -508,6 +507,9 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
           unsigned int slb = tdig.GetSlab();
           int pln = tdig.GetPlane();
           _htof_pmt[0][pmt][pln]->Fill(slb);
+          htitle = "TOF PMT" + std::to_string(pmt)
+                   + std::to_string(pln) + ", Run " + std::to_string(runNum);
+          _htof_pmt[0][pmt][pln]->SetTitle(htitle.c_str());
       }
   }
   if (dig_tof1->size()) {
@@ -517,6 +519,9 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
           unsigned int slb = tdig.GetSlab();
           int pln = tdig.GetPlane();
           _htof_pmt[1][pmt][pln]->Fill(slb);
+          htitle = "TOF PMT" + std::to_string(pmt)
+                   + std::to_string(pln) + ", Run " + std::to_string(runNum);
+          _htof_pmt[1][pmt][pln]->SetTitle(htitle.c_str());
       }
   }
   if (dig_tof2->size()) {
@@ -526,33 +531,47 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
           unsigned int slb = tdig.GetSlab();
           int pln = tdig.GetPlane();
           _htof_pmt[2][pmt][pln]->Fill(slb);
+          htitle = "TOF PMT" + std::to_string(pmt)
+                   + std::to_string(pln) + ", Run " + std::to_string(runNum);
+          _htof_pmt[2][pmt][pln]->SetTitle(htitle.c_str());
       }
   }
   if (sh_tof0->size()) {
     for (unsigned int s = 0; s < sh_tof0->size(); ++s) {
         TOFSlabHit tsh = sh_tof0->at(s);
-        if (tsh.IsVertical())
+        if (tsh.IsVertical()) {
             _hslaby_0->Fill(tsh.GetSlab());
-        else if (tsh.IsHorizontal())
+            htitle = "Slab Hits Y-view, Run " + std::to_string(runNum);
+            _hslaby_0->SetTitle(htitle.c_str());
+        } else if (tsh.IsHorizontal()) {
             _hslabx_0->Fill(tsh.GetSlab());
+            htitle = "Slab Hits X-view, Run " + std::to_string(runNum);
+            _hslabx_0->SetTitle(htitle.c_str());
+        }
     }
   }
   if (sh_tof1->size()) {
     for (unsigned int s = 0; s < sh_tof1->size(); ++s) {
         TOFSlabHit tsh = sh_tof1->at(s);
-        if (tsh.IsVertical())
+        if (tsh.IsVertical()) {
             _hslaby_1->Fill(tsh.GetSlab());
-        else if (tsh.IsHorizontal())
+        } else if (tsh.IsHorizontal()) {
             _hslabx_1->Fill(tsh.GetSlab());
+            htitle = "Slab Hits X-view, Run " + std::to_string(runNum);
+            _hslabx_1->SetTitle(htitle.c_str());
+        }
     }
   }
   if (sh_tof2->size()) {
     for (unsigned int s = 0; s < sh_tof2->size(); ++s) {
         TOFSlabHit tsh = sh_tof2->at(s);
-        if (tsh.IsVertical())
+        if (tsh.IsVertical()) {
             _hslaby_2->Fill(tsh.GetSlab());
-        else if (tsh.IsHorizontal())
+        } else if (tsh.IsHorizontal()) {
             _hslabx_2->Fill(tsh.GetSlab());
+            htitle = "Slab Hits X-view, Run " + std::to_string(runNum);
+            _hslabx_2->SetTitle(htitle.c_str());
+        }
     }
   }
   if (sp_tof0->size()) {
@@ -560,6 +579,9 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     _hnsp_0->Fill(sp_tof0->size());
     int spillnum = sp_tof0->at(0).GetPhysEventNumber();
     _htof0_nspVspill->Fill(spillnum, sp_tof0->size());
+    htitle = "TOF0 #Spacepoints vs spill, Run "
+             + std::to_string(runNum);
+    _htof0_nspVspill->SetTitle(htitle.c_str());
     for (unsigned int s = 0; s < sp_tof0->size(); ++s) {
         TOFSpacePoint tsp = sp_tof0->at(s);
         spnt_x = tsp.GetSlabx();
@@ -567,6 +589,13 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
         _hspxy[0]->Fill(spnt_y, spnt_x);
         _hspx_0->Fill(spnt_x);
         _hspy_0->Fill(spnt_y);
+        htitle = "Spacepoints X-view, Run " + std::to_string(runNum);
+        _hspx_0->SetTitle(htitle.c_str());
+        htitle = "Spacepoints Y-view, Run " + std::to_string(runNum);
+        _hspy_0->SetTitle(htitle.c_str());
+        _hspxy[0]->Fill(spnt_y, spnt_x);
+        htitle = "tof0 spacepoints, Run " + std::to_string(runNum);
+        _hspxy[0]->SetTitle(htitle.c_str());
     }
   }
 
@@ -575,6 +604,9 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     _hnsp_1->Fill(sp_tof1->size());
     int spillnum = sp_tof1->at(0).GetPhysEventNumber();
     _htof1_nspVspill->Fill(spillnum, sp_tof1->size());
+    htitle = "TOF1 #Spacepoints vs spill, Run "
+             + std::to_string(runNum);
+    _htof1_nspVspill->SetTitle(htitle.c_str());
     for (unsigned int s = 0; s < sp_tof1->size(); ++s) {
         TOFSpacePoint tsp = sp_tof1->at(s);
         spnt_x = tsp.GetSlabx();
@@ -582,6 +614,8 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
         _hspxy[1]->Fill(spnt_y, spnt_x);
         _hspx_1->Fill(spnt_x);
         _hspy_1->Fill(spnt_y);
+        htitle = "tof1 spacepoints, Run " + std::to_string(runNum);
+        _hspxy[1]->SetTitle(htitle.c_str());
     }
   }
 
@@ -590,6 +624,9 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
     _hnsp_2->Fill(sp_tof2->size());
     int spillnum = sp_tof2->at(0).GetPhysEventNumber();
     _htof2_nspVspill->Fill(spillnum, sp_tof2->size());
+    htitle = "TOF2 #Spacepoints vs spill, Run "
+             + std::to_string(runNum);
+    _htof2_nspVspill->SetTitle(htitle.c_str());
     for (unsigned int s = 0; s < sp_tof2->size(); ++s) {
         TOFSpacePoint tsp = sp_tof2->at(s);
         spnt_x = tsp.GetSlabx();
@@ -597,35 +634,27 @@ void ReduceCppTOFPlot::update_tof_plots(TOFEvent* tof_event) {
         _hspxy[2]->Fill(spnt_y, spnt_x);
         _hspx_1->Fill(spnt_x);
         _hspy_1->Fill(spnt_y);
+        htitle = "tof2 spacepoints, Run " + std::to_string(runNum);
+        _hspxy[2]->SetTitle(htitle.c_str());
     }
   }
 
-  if (sp_tof0->size() == 1 && sp_tof1->size() == 1)
+  if (sp_tof0->size() == 1 && sp_tof1->size() == 1) {
     _h_tof01->Fill(t1-t0);
+    htitle = "TOF0->1, Run " + std::to_string(runNum);
+    _h_tof01->SetTitle(htitle.c_str());
+  }
 
-  if (sp_tof0->size() == 1 && sp_tof2->size() == 1)
+  if (sp_tof0->size() == 1 && sp_tof2->size() == 1) {
     _h_tof02->Fill(t2-t0);
+    htitle = "TOF0->2, Run " + std::to_string(runNum);
+    _h_tof02->SetTitle(htitle.c_str());
+  }
 
-  if (sp_tof1->size() == 1 && sp_tof2->size() == 1)
+  if (sp_tof1->size() == 1 && sp_tof2->size() == 1) {
     _h_tof12->Fill(t2-t1);
-}
-
-void ReduceCppTOFPlot::setHistosTitle(int runNum) {
-    std::cerr << ">>>>> SETTING TITLE " << runNum << std::endl;
-    for (unsigned int h = 0; h < _histos.size(); ++h) {
-        std::string orig_ti = std::string(_histos[h]->GetTitle(), strlen(_histos[h]->GetTitle()));
-        char tistr[40];
-        snprintf(tistr, sizeof(tistr), "Run %d: %s", runNum, orig_ti.c_str());
-        _histos[h]->SetTitle(tistr);
-        std::cerr << "h: " << h << " " << orig_ti << " " << tistr << std::endl;
-    }
-    for (unsigned int c = 0; c < _canvs.size(); ++c) {
-        std::string orig_ti = std::string(_canvs[c]->GetTitle(), strlen(_canvs[c]->GetTitle()));
-        char tistr[40];
-        snprintf(tistr, sizeof(tistr), "Run %d: %s", runNum, orig_ti.c_str());
-        _canvs[c]->SetTitle(tistr);
-    }
-    this->update();
-    _got_SOR = true;
+    htitle = "TOF1->2, Run " + std::to_string(runNum);
+    _h_tof12->SetTitle(htitle.c_str());
+  }
 }
 } // MAUS

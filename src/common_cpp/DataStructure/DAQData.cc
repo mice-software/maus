@@ -20,34 +20,35 @@
 namespace MAUS {
 
 DAQData::DAQData()
-    : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
+    : _event_size(0), _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
       _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
 }
 
-DAQData::DAQData(const DAQData& _daqdata)
-    : _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
+DAQData::DAQData(const DAQData& daqdata)
+    : _event_size(0), _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
       _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
-    *this = _daqdata;
+    *this = daqdata;
 }
 
-DAQData& DAQData::operator=(const DAQData& _daqdata) {
+DAQData& DAQData::operator=(const DAQData& daqdata) {
     using DAQDataHelper::VectorDeepcopy;
-    if (this == &_daqdata) {
+    if (this == &daqdata) {
         return *this;
     }
-    SetV830(_daqdata._V830);
-    SetTriggerRequestArray(VectorDeepcopy<>(_daqdata._trigger_request));
-    SetTOF1DaqArray(VectorDeepcopy<>(_daqdata._tof1));
-    SetCkovArray(VectorDeepcopy<>(_daqdata._ckov));
-    SetTOF2DaqArray(VectorDeepcopy<>(_daqdata._tof2));
-    SetUnknownArray(VectorDeepcopy<>(_daqdata._unknown));
-    SetKLArray(VectorDeepcopy<>(_daqdata._kl));
-    SetTagArray(VectorDeepcopy<>(_daqdata._tag));
-    SetTOF0DaqArray(VectorDeepcopy<>(_daqdata._tof0));
-    SetTriggerArray(VectorDeepcopy<>(_daqdata._trigger));
-    SetEMRDaq(_daqdata._emr);
-    SetTracker0DaqArray(VectorDeepcopy<>(_daqdata._tracker0));
-    SetTracker1DaqArray(VectorDeepcopy<>(_daqdata._tracker1));
+    _event_size = daqdata._event_size;
+    SetV830(daqdata._V830);
+    SetTriggerRequestArray(VectorDeepcopy<>(daqdata._trigger_request));
+    SetTOF1DaqArray(VectorDeepcopy<>(daqdata._tof1));
+    SetCkovArray(VectorDeepcopy<>(daqdata._ckov));
+    SetTOF2DaqArray(VectorDeepcopy<>(daqdata._tof2));
+    SetUnknownArray(VectorDeepcopy<>(daqdata._unknown));
+    SetKLArray(VectorDeepcopy<>(daqdata._kl));
+    SetTagArray(VectorDeepcopy<>(daqdata._tag));
+    SetTOF0DaqArray(VectorDeepcopy<>(daqdata._tof0));
+    SetTriggerArray(VectorDeepcopy<>(daqdata._trigger));
+    SetEMRDaq(daqdata._emr);
+    SetTracker0DaqArray(VectorDeepcopy<>(daqdata._tracker0));
+    SetTracker1DaqArray(VectorDeepcopy<>(daqdata._tracker1));
 
     return *this;
 }
@@ -64,6 +65,14 @@ DAQData::~DAQData() {
     SetTriggerArray(TriggerArray());
     SetTracker0DaqArray(Tracker0DaqArray());
     SetTracker1DaqArray(Tracker1DaqArray());
+}
+
+unsigned int DAQData::GetEventSize() const {
+    return _event_size;
+}
+
+void DAQData::SetEventSize(unsigned int size) {
+    _event_size = size;
 }
 
 V830 DAQData::GetV830() const {

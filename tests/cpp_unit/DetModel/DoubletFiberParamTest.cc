@@ -48,11 +48,15 @@ class DoubletFiberParamTest : public ::testing::Test {
     note135_core_diameter = 0.308;  // mm
     note135_fiber_diameter = 0.350; // mm
     note135_fiber_pitch = 0.427;    // mm
-    calculated_fiber_half_length = 152.7126; // mm
+//    calculated_fiber_half_length = 152.7126; // mm
+    calculated_fiber_half_length = 153.76626; // mm
     expected_delta_phi = 6.28319;
-    calculated_X = 47.7375;
+//    calculated_X = 47.7375;
+    calculated_X = 47.71725;
     calculated_Y = 0;
-    calculated_Z = -0.13867;
+//    calculated_Z = -0.13867;
+    calculated_Z = 0.13867;
+    centralFibre = 749.5;
   }
   virtual ~DoubletFiberParamTest() {}
   virtual void SetUp()    {}
@@ -65,6 +69,7 @@ class DoubletFiberParamTest : public ::testing::Test {
   double calculated_X;
   double calculated_Y;
   double calculated_Z;
+  double centralFibre;
 };
 
 TEST_F(DoubletFiberParamTest, test_fiber_parameters) {
@@ -89,28 +94,28 @@ TEST_F(DoubletFiberParamTest, test_fiber_parameters) {
   assert(this_plane != NULL);
 
   // read values from the Mice Module...
-  G4double pSensitiveRadius = this_plane->propertyDouble("ActiveRadius");
+  G4double pCentralChannel  = this_plane->propertyDouble("CentralFibre");
   G4double pActiveRadius    = this_plane->propertyDouble("ActiveRadius");
   G4double pOuterDiameter   = this_plane->propertyDouble("CoreDiameter");
   G4double pInnerDiameter   = 0.0;
   G4double pFiberDiameter   = this_plane->propertyDouble("FibreDiameter");
-  G4double pFiberPitch = ( this_plane->propertyDouble("Pitch") ) /
-                         ( this_plane->propertyDouble("FibreDiameter") );
+  G4double pFiberPitch      = this_plane->propertyDouble("Pitch");
+  G4double cf = pCentralChannel*7.0 + 4; // This is the central fibre!
 
   // .. feed them to DoubletFiberParam()
-  G4double fetched_outer_diameter = DoubletFiberParam(pSensitiveRadius,
+  G4double fetched_outer_diameter = DoubletFiberParam(cf,
                                                       pActiveRadius,
                                                       pOuterDiameter,
                                                       pInnerDiameter,
                                                       pFiberDiameter,
                                                       pFiberPitch).getOuterDiameter();
-  G4double fetched_fiber_diameter = DoubletFiberParam(pSensitiveRadius,
+  G4double fetched_fiber_diameter = DoubletFiberParam(cf,
                                                       pActiveRadius,
                                                       pOuterDiameter,
                                                       pInnerDiameter,
                                                       pFiberDiameter,
                                                       pFiberPitch).getFiberDiameter();
-  G4double fetched_fiber_pitch = DoubletFiberParam(pSensitiveRadius,
+  G4double fetched_fiber_pitch = DoubletFiberParam(cf,
                                                       pActiveRadius,
                                                       pOuterDiameter,
                                                       pInnerDiameter,
@@ -120,8 +125,7 @@ TEST_F(DoubletFiberParamTest, test_fiber_parameters) {
   // ... compare with MICE Note 135
   EXPECT_NEAR(note135_core_diameter, fetched_outer_diameter, 1e-12);
   EXPECT_NEAR(note135_fiber_diameter, fetched_fiber_diameter, 1e-12);
-  EXPECT_NEAR(note135_fiber_pitch/note135_fiber_diameter, fetched_fiber_pitch,
-                                                                         1e-12);
+  EXPECT_NEAR(note135_fiber_pitch, fetched_fiber_pitch, 1e-12);
 }
 
 TEST_F(DoubletFiberParamTest, test_compute_transformation) {
@@ -146,13 +150,13 @@ TEST_F(DoubletFiberParamTest, test_compute_transformation) {
   assert(this_plane != NULL);
 
   // read values from the Mice Module...
-  G4double pSensitiveRadius = this_plane->propertyDouble("ActiveRadius");
+  G4double pCentralChannel  = this_plane->propertyDouble("CentralFibre");
   G4double pActiveRadius    = this_plane->propertyDouble("ActiveRadius");
   G4double pOuterDiameter   = this_plane->propertyDouble("CoreDiameter");
   G4double pInnerDiameter   = 0.0;
   G4double pFiberDiameter   = this_plane->propertyDouble("FibreDiameter");
-  G4double pFiberPitch = ( this_plane->propertyDouble("Pitch") ) /
-                         ( this_plane->propertyDouble("FibreDiameter") );
+  G4double pFiberPitch      = this_plane->propertyDouble("Pitch");
+  G4double cf = pCentralChannel*7.0 + 4; // This is the central fibre!
 
   // Setup up dummy geometry to feed to ComputeDimensions and ComputeTransformation
   G4Tubs* fiberElement = new G4Tubs("testFiber", 0.0, 0.35 * mm, 1.0 * mm, 0.0 * deg, 360.0 * deg);
@@ -166,7 +170,7 @@ TEST_F(DoubletFiberParamTest, test_compute_transformation) {
                                                  nullLogic, name, mother, false, 0);
 
   // Feeding geometries to functions
-  DoubletFiberParam(pSensitiveRadius,
+  DoubletFiberParam(cf,
                     pActiveRadius,
                     pOuterDiameter,
                     pInnerDiameter,
@@ -201,13 +205,13 @@ TEST_F(DoubletFiberParamTest, test_compute_dimension) {
   assert(this_plane != NULL);
 
   // read values from the Mice Module...
-  G4double pSensitiveRadius = this_plane->propertyDouble("ActiveRadius");
+  G4double pCentralChannel  = this_plane->propertyDouble("CentralFibre");
   G4double pActiveRadius    = this_plane->propertyDouble("ActiveRadius");
   G4double pOuterDiameter   = this_plane->propertyDouble("CoreDiameter");
   G4double pInnerDiameter   = 0.0;
   G4double pFiberDiameter   = this_plane->propertyDouble("FibreDiameter");
-  G4double pFiberPitch = ( this_plane->propertyDouble("Pitch") ) /
-                         ( this_plane->propertyDouble("FibreDiameter") );
+  G4double pFiberPitch      = this_plane->propertyDouble("Pitch");
+  G4double cf = pCentralChannel*7.0 + 4; // This is the central fibre!
 
   // Setup up dummy geometry to feed to ComputeDimensions and ComputeTransformation
   G4Tubs* fiberElement = new G4Tubs("testFiber", 0.0, 0.35 * mm, 1.0 * mm, 0.0 * deg, 360.0 * deg);
@@ -220,7 +224,7 @@ TEST_F(DoubletFiberParamTest, test_compute_dimension) {
   G4VPhysicalVolume* physVol = new G4PVPlacement(rot, G4ThreeVector(0., 0., 0.),
                                                  nullLogic, name, mother, false, 0);
 
-  DoubletFiberParam(pSensitiveRadius,
+  DoubletFiberParam(cf,
                     pActiveRadius,
                     pOuterDiameter,
                     pInnerDiameter,
