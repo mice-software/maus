@@ -65,6 +65,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
     # Install python modules with copies pulled down from web - will get 
     # latest versions and overwrite any from third_party tarball
+    ${MAUS_ROOT_DIR}/third_party/bash/38scons.bash
     ${MAUS_ROOT_DIR}/third_party/bash/39numpy.bash
     ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash -gi
     ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash

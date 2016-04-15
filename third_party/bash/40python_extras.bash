@@ -26,22 +26,16 @@ download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 six>=1.4.0 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
- pymongo==2.3 readline matplotlib==1.1.0 scons==2.2.0\
+ pymongo==2.3 readline matplotlib==1.1.0 \
  pil django==1.5.1 magickwand psutil==3.0.1
 "
-# scons v2.2.0 is no longer on pypi
-# temporary hack to specify the download url for scons==2.2.0
-# pending upgrade to 2.3.0
-# DR March 13, 2014
-scons_version="2.2.0"
-scons_url="http://sourceforge.net/projects/scons/files/scons/${scons_version}/scons-${scons_version}.tar.gz"
 
 # these are the packages to install - note the version dependencies
 package_list="\
  anyjson python-dateutil amqplib six kombu \
  logilab-common logilab-astng  suds validictory nose nose-exclude \
  coverage ipython doxypy pylint bitarray celery \
- pymongo scons readline matplotlib \
+ pymongo readline matplotlib \
  pil django magickwand psutil
 "
 # note numpy was installed previously, not in this script. We test it's import
@@ -49,7 +43,6 @@ package_list="\
 module_test_list="numpy suds validictory nose coverage \
  pylint bitarray matplotlib celery pymongo \
  Image django magickwand" #Image is pil bottom level
-binary_test_list="scons"
 cleanup="0"
 get_packages="0"
 install_packages="0"
@@ -88,29 +81,23 @@ if [ "$get_packages" == "1" ]; then
     cd $egg_source
     for package in $download_package_list
     do
-        # tmp hack for scons 2.2.0 which has disappeared from pypi
-        if [[ $package =~ .*scons*. ]]
-        then
-            easy_install -zmaxeb . -f$scons_url $package
-        else
-            echo "easy_install -zmaxeb . $package"
-            easy_install -zmaxeb . $package &
-            # kill the command after <timeout> seconds
-            ((timeout = 120))
-            while ((timeout > 0)); do
-                sleep 1
-                kill -0 $! >& /dev/null
-                if [ "$?" == "0" ]; then # pid is running (can be killed)
-                    ((timeout -= 1))
-                else # pid is finished (can't be killed)
-                    ((timeout = 0))
-                fi
-            done
+        echo "easy_install -zmaxeb . $package"
+        easy_install -zmaxeb . $package &
+        # kill the command after <timeout> seconds
+        ((timeout = 120))
+        while ((timeout > 0)); do
+            sleep 1
             kill -0 $! >& /dev/null
             if [ "$?" == "0" ]; then # pid is running (can be killed)
-                echo "easy_install of $package has timed out - killing"
-                kill -9 $!
+                ((timeout -= 1))
+            else # pid is finished (can't be killed)
+                ((timeout = 0))
             fi
+        done
+        kill -0 $! >& /dev/null
+        if [ "$?" == "0" ]; then # pid is running (can be killed)
+            echo "easy_install of $package has timed out - killing"
+            kill -9 $!
         fi
     done
     downloaded_list=`ls --hide=*.tar.gz`
@@ -143,7 +130,7 @@ if [ "$install_packages" == "1" ]; then
     for module in $module_test_list
     do
         echo "INFO: Checking import of package $module"
-        
+
         python -c "import $module" || { echo "WARNING: Failed to install python module $module from local source"; failed_modules="$failed_modules $module"; }
         echo "INFO: ok"
     done
@@ -158,14 +145,8 @@ if [ "$install_packages" == "1" ]; then
     for module in $module_test_list
     do
         echo "INFO: Checking import of package $module"
-        
+
         python -c "import $module" || { echo "FATAL: Failed to install python module $module"; exit 1; }
-        echo "INFO: ok"
-    done
-    for bin in $binary_test_list
-    do
-        echo "INFO: Checking python script $bin"
-        which $bin || { echo "FATAL: Failed to install python script $bin"; exit 1; }
         echo "INFO: ok"
     done
 
