@@ -57,7 +57,7 @@ class SciFiBasePRTrack : public TObject {
     SciFiBasePRTrack& operator=(const SciFiBasePRTrack& track);
 
     /** Combine the different chi sqs into one final value */
-    virtual void form_total_chi_squared() {};
+    virtual void form_total_chi_squared() {}
 
     /** Get the covariance matrix elements of the least square fit parameters */
     std::vector<double> get_covariance() const { return _covariance; }

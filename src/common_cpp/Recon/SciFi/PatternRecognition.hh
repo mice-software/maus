@@ -29,6 +29,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 // ROOT headers
 #include "TFile.h"
@@ -76,27 +77,70 @@ class PatternRecognition {
     void process(SciFiEvent &evt) const;
 
      /** @brief Small function to add trks to a SciFiEvent & to set the tracker number for them
-      *  @param strks - The straight tracks vector
-      *  @param htrks - The helical tracks vector
-      *  @param trker_no - The tracker number
-      *  @param evt - The SciFi event
+      *  @param[in] strks - The straight tracks vector
+      *  @param[in] htrks - The helical tracks vector
+      *  @param[in] trker_no - The tracker number
+      *  @param[out] evt - The SciFi event
       */
-    void add_tracks(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
+    void add_tracks(std::vector<SciFiStraightPRTrack*> &strks,
                     std::vector<SciFiHelicalPRTrack*> &htrks, SciFiEvent &evt) const;
 
+    /** @brief Function template which selects which tracks out of the candidates are used
+     *
+     * Function template which takes either SciFiStraightPRTrack* or SciFiHelicalPRTrack* and
+     * selects which tracks to use out of all the different candidates based on the highest chisq
+     *  @tparam <T> Either a SciFiStraightPRTrack* or SciFiHelicalPRTrack*
+     *  @param[in] trks A vector containing either SciFiStraightPRTrack* or SciFiHelicalPRTrack*
+     *  @return Returns the selected tracks
+     */
     template<typename T>
     std::vector<T*> select_tracks(std::vector<T*> &trks) const;
 
 
+    /** @brief Final processing for the tracks before adding to the SciFiEvent.
+     *
+     *  Final processing for the tracks before adding to the SciFiEvent. Currently just sets
+     *  the correct tracker number
+     *  @param[in,out] strks Straight tracks to be processed
+     *  @param[in,out] htrks Helical tracks to be processed
+     */
+    void track_processing(const int trker_no, const int n_points,
+                          std::vector<SciFiStraightPRTrack*> &strks,
+                          std::vector<SciFiHelicalPRTrack*> &htrks) const;
+
+    /** @brief Call the least squares fitter and perform the straight track fit to the spacepoints
+     *  @param[in] n_points Number of spacepoints in the track
+     *  @param[in] spnts A vector holding pointers to the spacepoints
+     *  @return Returns the fitted track, NULL if the fit failed
+     */
+    SciFiStraightPRTrack* fit_straight_track(const int n_points,
+                                             std::vector<SciFiSpacePoint*> spnts) const;
+
+    /** @brief A function to call all the different make_tracks rountines.
+     *
+     *  A function to call all the different make_tracks rountines. Calls make_5tracks, 
+     *  make_4tracks and make_3tracks for helical and straight tracks. Also calls select_tracks,
+     *  track_processing and add_tracks.
+     *  @param track_type[in] Helical or Straight. 0 = Straight, 1 = Helical
+     *  @param trker_no[in] The tracker number, 0 for TKU, 1 for TKD
+     *  @param spnts_by_station 2D vector of SciFiSpacePoint*, first index is (station number - 1)
+     *  @param evt The SciFiEvent which will be populated with the tracks
+     */
     void make_all_tracks(const bool track_type, const int trker_no,
                          SpacePoint2dPArray &spnts_by_station, SciFiEvent &evt) const;
 
 
-    /** @brief Make Pattern Recognition tracks with 5 spacepoints
-     *  @param track_type - boolean, 0 for straight tracks, 1 for helical tracks
-     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
-     *  @param strks - A vector of the output Pattern Recognition straight tracks
-     *  @param htrks - A vector of the output Pattern Recognition helical tracks
+    /** @brief Make Pattern Recognition track candidates with 5 spacepoints
+     *
+     *  Make Pattern Recognition track candidates with 5 spacepoints. All possible combinations of
+     *  spacepoints are tried. Any which pass the fit are added as track candidates.
+     *  The select_tracks function may then be used to decided which of these we actually want to
+     *  pick and add to the SciFiEvent before sending to the final kalman track fit.
+     * 
+     *  @param[in] track_type - boolean, 0 for straight tracks, 1 for helical tracks
+     *  @param[in] spnts_by_station - A 2D vector of all the input spacepoints ordered by station
+     *  @param[out] strks - A vector of the output Pattern Recognition straight tracks
+     *  @param[out] htrks - A vector of the output Pattern Recognition helical tracks
      */
     void make_5tracks(const bool track_type, const int trker_no,
                       SpacePoint2dPArray &spnts_by_station,
@@ -104,10 +148,15 @@ class PatternRecognition {
                       std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Make Pattern Recognition tracks with 4 spacepoints
-     *  @param track_type - boolean, 0 for straight tracks, 1 for helical tracks
-     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
-     *  @param strks - A vector of the output Pattern Recognition straight tracks
-     *  @param htrks - A vector of the output Pattern Recognition helical tracks
+     *
+     *  Make Pattern Recognition track candidates with 4 spacepoints. All possible combinations of
+     *  spacepoints are tried. Any which pass the fit are added as track candidates.
+     *  The select_tracks function may then be used to decided which of these we actually want to
+     *  pick and add to the SciFiEvent before sending to the final kalman track fit.
+     *  @param[in] track_type - boolean, 0 for straight tracks, 1 for helical tracks
+     *  @param[in] spnts_by_station - A 2D vector of all the input spacepoints ordered by station
+     *  @param[out] strks - A vector of the output Pattern Recognition straight tracks
+     *  @param[out] htrks - A vector of the output Pattern Recognition helical tracks
      */
     void make_4tracks(const bool track_type, const int trker_no,
                       SpacePoint2dPArray &spnts_by_station,
@@ -115,22 +164,28 @@ class PatternRecognition {
                       std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints (straight only)
-     *  @param trker_no - the tracker number (0 or 1)
-     *  @param spnts - A vector of all the input spacepoints
-     *  @param strks - A vector of the output Pattern Recognition straight tracks
+     * 
+     *  Make Pattern Recognition straight track candidates with 3 spacepoints. All possible
+     *  combinations of spacepoints are tried. Any which pass the fit are added as track candidates.
+     *  The select_tracks function may then be used to decided which of these we actually want to
+     *  pick and add to the SciFiEvent before sending to the final kalman track fit. Note only
+     *  straight tracks may contain 3 points, for helical the minimum allowed is 4 points.
+     *  @param[in] trker_no - the tracker number (0 or 1)
+     *  @param[in] spnts - A vector of all the input spacepoints
+     *  @param[out] strks - A vector of the output Pattern Recognition straight tracks
      */
     void make_3tracks(const int trker_no, SpacePoint2dPArray &spnts_by_station,
                       std::vector<SciFiStraightPRTrack*> &strks) const;
 
     /** @brief Fits a straight track for a given set of stations
      * 
-     *  @param ignore_stations int vector specifying which stations are not to be used for
-     *                         the track fit. 0 - 4 represent stations 1 - 5 respectively,
-     *                         while -1 means use *all* the stations (ignore none of them). 
-     *                         The size of the vector should be 0 for a 5pt track,
-     *                         1 for a 4pt track, and 2 for a 3pt track.
-     *  @param spnts_by_station - A 2D vector of all the input spacepoints ordered by station
-     *  @param trks - A vector of the output Pattern Recognition tracks
+     *  @param[in] ignore_stations int vector specifying which stations are not to be used for
+     *             the track fit. 0 - 4 represent stations 1 - 5 respectively,
+     *             while -1 means use *all* the stations (ignore none of them).
+     *             The size of the vector should be 0 for a 5pt track,
+     *             1 for a 4pt track, and 2 for a 3pt track.
+     *  @param[in] spnts_by_station - A 2D vector of all the input spacepoints ordered by station
+     *  @param[out] trks - A vector of the output Pattern Recognition tracks
      */
     void make_straight_tracks(const int num_points, const int trker_no,
                               const std::vector<int> ignore_stations,
@@ -143,16 +198,15 @@ class PatternRecognition {
      *  Once looping has identified candidate spacepoints, calls form_track which performs the 
      *  circle fit in x-y projection and then the line fit in the s-z projection.
      *
-     *  @param num_points - the number of points in the track (4 or 5)
-     *  @param stat_num - the current station number
-     *  @param ignore_stations - int vector specifying which stations are not to be used for
-     *                           the track fit. 0 - 4 represent stations 1 - 5 respectively,
-     *                           while -1 means use *all* the stations (ignore none of them).
-     *                           The size of the vector should be 0 for a 5pt track or
-     *                           1 for a 4pt track
-     *  @param current_spnts - the spacepoints assembled so far for the trial track
-     *  @param spnts_by_station - 2D vector of spacepoints, sorted by station
-     *  @param htrks - vectors of tracks holding the initial helix parameters and spacepoints used
+     *  @param[in] num_points - the number of points in the track (4 or 5)
+     *  @param[in,out] stat_num - the current station number
+     *  @param[in] ignore_stations - int vector specifying which stations are not to be used for
+     *             the track fit. 0 - 4 represent stations 1 - 5 respectively,
+     *             while -1 means use *all* the stations (ignore none of them).
+     *             The size of the vector should be 0 for a 5pt track or 1 for a 4pt track
+     *  @param[in,out] current_spnts - the spacepoints assembled so far for the trial track
+     *  @param[in] spnts_by_station - 2D vector of spacepoints, sorted by station
+     *  @param[out] htrks - vectors of tracks holding the initial helix parameters and spacepoints used
      *
      */
     void make_helix(const int n_points, const int stat_num, const std::vector<int> ignore_stations,
@@ -162,11 +216,12 @@ class PatternRecognition {
     /** @brief Attempt to fit a helical track to given spacepoints
      * 
      *  Attempt to fit a helical track to given spacepoints. Two part process: (1) circle fit in the
-     *  x-y projection, (2) a line fit in the s-z projection. Returns a pointer to the found 
+     *  x-y projection, (2) a line fit in the s-z projection. Returns a pointer to the found
      *  track if successful, otherwise returns a NULL pointer.
      * 
-     *  @param n_points - the number of points in the track (4 or 5)
-     *  @param spnts - vector holding pointers to the spacepoints
+     *  @param[in] n_points - the number of points in the track (4 or 5)
+     *  @param[in] spnts - vector holding pointers to the spacepoints
+     *  @return Returns a pointer to the track created
      * 
      * */
     SciFiHelicalPRTrack* form_track(const int n_points, std::vector<SciFiSpacePoint*> spnts ) const;
@@ -176,10 +231,11 @@ class PatternRecognition {
      * Find the ds/dz of a helical track. Output is the turning angles of the spacepoints
      * and a line of s vs z, the slope of which is dsdz = 1/tan(lambda).
      *
-     * @param n_points - Number of points in the current track (used for the chi_sq cut)
-     * @param spnts - A vector of all the input spacepoints
-     * @param circle - The circle fit of spacepoints from x-y projection
-     * @param line_sz - The output fitted line in s-z projection.
+     * @param[in] n_points - Number of points in the current track (used for the chi_sq cut)
+     * @param[in] spnts - A vector of all the input spacepoints
+     * @param[in] circle - The circle fit of spacepoints from x-y projection
+     * @param[out] line_sz - The output fitted line in s-z projection
+     * @return Boolean indicating success or failure or the algorithm
      */
     bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
           std::vector<double> &phi_i, SimpleLine &line_sz, TMatrixD& cov_sz, int &handedness) const;
@@ -189,21 +245,22 @@ class PatternRecognition {
      * Find the number of 2pi rotations that occured between each stations. This is
      * necessary in order to later evaluate s, the track path length in x-y, used to find ds/dz.
      *
-     * @param z - the z coord of each spacepoint in the order seen by the beam
-     * @param phi - the turning angle between successive spacepoints in the order seen by the beam
-     * @param true_phi - the corrected turing angles
+     * @param[in] z - the z coord of each spacepoint in the order seen by the beam
+     * @param[in] phi - the turning angle between successive spacepoints in the order seen by the beam
+     * @param[out] true_phi - the corrected turing angles
+     * @return Boolean indicating success or failure or the algorithm
      */
     bool find_n_turns(const std::vector<double> &z, const std::vector<double> &phi,
                       std::vector<double> &true_phi, int &handedness) const;
 
-    /** @brief Checks that the spacepoints in trial track fall within longest acceptable time range
+    /** @brief Checks that the spacepoints in trial track fall within longest acceptable time range.
+     *         Not used at present.
      *
      *  Tracker timing resolution cable of ~2ns. Longest acceptable time of flight through tracker
-     *  was calculated offline for straight and helical tracks
+     *  was calculated offline for straight and helical tracks. Not used at present.
      *
      */
-    bool check_time_consistency(const std::vector<SciFiSpacePoint*>,
-                                                            int tracker_id) const;
+    bool check_time_consistency(const std::vector<SciFiSpacePoint*>, int tracker_id) const;
 
     /** @brief Determine which two stations the initial line should be drawn between
      * 
@@ -298,6 +355,10 @@ class PatternRecognition {
     /** @brief A function to set all the internal parameters to their default values (for tests) */
     void set_parameters_to_default();
 
+    /** @brief Convenience function to set the tracker number on vectors of tracks */
+    void set_tracker_number(const int trker_no, std::vector<SciFiStraightPRTrack*> &strks,
+                            std::vector<SciFiHelicalPRTrack*> &htrks) const;
+
     /** @brief Place the different cut value currently being used into the variables supplied */
     void get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
        double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut);
@@ -340,7 +401,7 @@ class PatternRecognition {
     TH1D* _hychisq;  /** histo of chisq of every y-z straight least sq fit tried */
 };
 
-// Two predicate functions used by the stl sort algorithm to sort spacepoints in vectors
+// Four predicate functions used by the stl sort algorithm to sort spacepoints in vectors
 bool compare_spoints_ascending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
   return (sp1->get_position().z() < sp2->get_position().z());
 }
@@ -349,10 +410,17 @@ bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePo
   return (sp1->get_position().z() > sp2->get_position().z());
 }
 
+bool compare_spoints_ascending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_station() < sp2->get_station());
+}
+
+bool compare_spoints_descending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_station() > sp2->get_station());
+}
+
 // Predicate function to sort tracks by their combined fit chisq
 template<typename T>
-bool compare_tracks_ascending_chisq(const T *trk1,
-                                    const T *trk2) {
+bool compare_tracks_ascending_chisq(const T *trk1, const T *trk2) {
   return (trk1->get_chi_squared() < trk2->get_chi_squared());
 }
 
@@ -372,7 +440,7 @@ std::vector<T*> PatternRecognition::select_tracks(std::vector<T*> &trks) const {
       if (sp->get_used()) ++n_used;
     }
     // Accept the track if it has enough unused spacepoints
-    if (static_cast<size_t>(n_used) < (spoints.size() - 1)) {
+    if (n_used == 0) {
       // Set the spacepoints to used (they are pointers, so applies to all tracks which hold them)
       for (auto sp : spoints) {
         sp->set_used(true);
