@@ -77,7 +77,8 @@ void SciFiGeometryHelper::Build() {
       const MiceModule* plane = module->mother();
       HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // plane
                                                ->mother()));  // tracker/ station??
-      direction     *= internal_fibre_rotation.inverse();
+//      direction     *= internal_fibre_rotation.inverse();
+      direction     *= internal_fibre_rotation;
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
@@ -257,6 +258,35 @@ double SciFiGeometryHelper::BetheBlochStoppingPower(double p, const SciFiMateria
   double log_term = TMath::Log(2.*electron_mass*beta2*gamma2*Tmax/(I2));
   double dEdx = outer_term*(0.5*log_term-beta2-density_correction/2.);
   return density*dEdx;
+}
+
+double SciFiGeometryHelper::LandauVavilovStoppingPower(double p,
+                                              const SciFiMaterialParams* material, double length) {
+  double muon_mass      = Recon::Constants::MuonMass;
+  double electron_mass  = Recon::Constants::ElectronMass;
+  double muon_mass2     = muon_mass*muon_mass;
+
+  double E = TMath::Sqrt(muon_mass2+p*p);
+
+  double beta   = p/E;
+  double beta2  = beta*beta;
+  double gamma  = E/muon_mass;
+  double gamma2 = gamma*gamma;
+
+  double K = Recon::Constants::BetheBlochParameters::K();
+  double A = material->A;
+  double I = material->Mean_Excitation_Energy;
+  double Z = material->Z;
+  double density = material->Density;
+  double density_correction = material->Density_Correction;
+  double j = 0.2;
+
+  double zeta = (K/2.0)*(Z/A)*(length*density/beta2);
+
+  double term1 = TMath::Log(2.0*electron_mass*beta2*gamma2/I);
+  double term2 = TMath::Log(zeta/I);
+
+  return zeta * ( term1 + term2 + j - beta2 - density_correction );
 }
 
 

@@ -27,19 +27,15 @@ namespace Kalman {
 ////////////////////////////////////////////////////////////////////////////////
   // STATE MEMBER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
-  State::State(unsigned int dim, double pos) :
+  State::State(unsigned int dim) :
     _dimension(dim),
-    _id(0),
-    _position(pos),
     _vector(dim, 1),
     _covariance(dim, dim),
     _has_value(false) {
     }
 
-  State::State(TMatrixD vec, TMatrixD cov, double pos) :
+  State::State(TMatrixD vec, TMatrixD cov) :
     _dimension(vec.GetNrows()),
-    _id(0),
-    _position(pos),
     _vector(vec),
     _covariance(cov),
     _has_value(true) {
@@ -54,34 +50,13 @@ namespace Kalman {
 
   State::State(const State& st) :
     _dimension(st._dimension),
-    _id(st._id),
-    _position(st._position),
     _vector(st._vector),
     _covariance(st._covariance),
     _has_value(st._has_value) {
   }
 
   State& State::operator=(const State& st) {
-    if (this->_dimension != st._dimension) {
-      throw Exception(Exception::nonRecoverable,
-          "State has wrong dimensions",
-          "Kalman::State::SetVector()");
-    }
-    this->_id = st._id;
-    this->_position = st._position;
-    this->_vector = st._vector;
-    this->_covariance = st._covariance;
-    this->_has_value = st._has_value;
-
-    return *this;
-  }
-
-  State& State::copy(State st) { // NOTE! ID and Position stay the same!
-    if (this->_dimension != st._dimension) {
-      throw Exception(Exception::nonRecoverable,
-          "State has wrong dimensions",
-          "Kalman::State::SetVector()");
-    }
+    this->_dimension = st._dimension;
     this->_vector = st._vector;
     this->_covariance = st._covariance;
     this->_has_value = st._has_value;
@@ -111,40 +86,149 @@ namespace Kalman {
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+  // TRACKPOINT MEMBER FUNCTIONS
+////////////////////////////////////////////////////////////////////////////////
+
+  TrackPoint::TrackPoint(unsigned int dim, unsigned int meas_dim, double pos, int id) :
+    _predicted(dim),
+    _filtered(dim),
+    _smoothed(dim),
+    _data(meas_dim),
+    _id(id),
+    _position(pos) {
+      _data.SetHasValue(false);
+    }
+
+  TrackPoint::TrackPoint(unsigned int dim, double pos, State data, int id) :
+    _predicted(dim),
+    _filtered(dim),
+    _smoothed(dim),
+    _data(data),
+    _id(id),
+    _position(pos) {
+    }
+
+  TrackPoint::TrackPoint(State pred, State filt, State smoo, State data, double pos, int id) :
+    _predicted(pred),
+    _filtered(filt),
+    _smoothed(smoo),
+    _data(data),
+    _id(id),
+    _position(pos) {
+    }
+
+  TrackPoint::TrackPoint(const TrackPoint& tp) :
+    _predicted(tp._predicted),
+    _filtered(tp._filtered),
+    _smoothed(tp._smoothed),
+    _data(tp._data),
+    _id(tp._id),
+    _position(tp._position) {
+  }
+
+  TrackPoint& TrackPoint::operator=(const TrackPoint& tp) {
+    if (this->GetDimension() != tp.GetDimension()) {
+      throw Exception(Exception::nonRecoverable,
+          "TrackPoint has wrong dimensions",
+          "Kalman::TrackPoint::operator=()");
+    }
+    this->_predicted = tp._predicted;
+    this->_filtered = tp._filtered;
+    this->_smoothed = tp._smoothed;
+    this->_data = tp._data;
+
+    this->_id = tp._id;
+    this->_position = tp._position;
+
+    return *this;
+  }
+
+  TrackPoint& TrackPoint::copy(TrackPoint tp) { // NOTE! ID and Position stay the same!
+    if (this->GetDimension() != tp.GetDimension()) {
+      throw Exception(Exception::nonRecoverable,
+          "TrackPoint has wrong dimensions",
+          "Kalman::TrackPoint::operator=()");
+    }
+    this->_predicted = tp._predicted;
+    this->_filtered = tp._filtered;
+    this->_smoothed = tp._smoothed;
+    this->_data = tp._data;
+
+    return *this;
+  }
+
+
+  State& TrackPoint::GetFiltered() {
+    if (_filtered.HasValue()) {
+      return _filtered;
+    } else {
+      return _predicted;
+    }
+  }
+
+  const State& TrackPoint::GetFiltered() const {
+    if (_filtered.HasValue()) {
+      return _filtered;
+    } else {
+      return _predicted;
+    }
+  }
+
+  State& TrackPoint::GetSmoothed() {
+    if (_smoothed.HasValue()) {
+      return _smoothed;
+    } else if (_filtered.HasValue()) {
+      return _filtered;
+    } else {
+      return _predicted;
+    }
+  }
+
+  const State& TrackPoint::GetSmoothed() const {
+    if (_smoothed.HasValue()) {
+      return _smoothed;
+    } else if (_filtered.HasValue()) {
+      return _filtered;
+    } else {
+      return _predicted;
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
   // TRACK MEMBER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
   Track::Track(unsigned int dim, unsigned int length) :
     _dimension(dim) {
     for (unsigned int i = 0; i < length; ++i) {
-      _track_vector.push_back(State(_dimension));
+      _track_vector.push_back(TrackPoint(_dimension, _dimension, 0.0));
     }
   }
 
-  void Track::SetState(unsigned int index, State state) {
-    if (state._dimension != this->_dimension) {
+  void Track::SetTrackPoint(unsigned int index, TrackPoint tp) {
+    if (tp.GetDimension() != this->_dimension) {
       throw Exception(Exception::nonRecoverable,
-          "State has wrong dimensions",
-          "Kalman::Track::SetState()");
+          "TrackPoint has wrong dimensions",
+          "Kalman::Track::SetTrackPoint()");
     }
     if (index >= _track_vector.size()) {
       throw Exception(Exception::recoverable,
           "Index out of bounds of track",
-          "Kalman::Track::SetState()");
+          "Kalman::Track::SetTrackPoint()");
     }
-    _track_vector[index] = state;
+    _track_vector[index] = tp;
   }
 
-  void Track::Append(State state) {
-    if (state._dimension != this->_dimension) {
+  void Track::Append(TrackPoint tp) {
+    if (tp.GetDimension() != this->_dimension) {
       throw Exception(Exception::nonRecoverable,
-          "State has wrong dimensions",
+          "TrackPoint has wrong dimensions",
           "Kalman::Track::Append()");
     }
-    _track_vector.push_back(state);
+    _track_vector.push_back(tp);
   }
 
-  void Track::DeleteState(unsigned int index) {
+  void Track::DeleteTrackPoint(unsigned int index) {
     if (index >= _track_vector.size()) {
       throw Exception(Exception::recoverable,
           "Index out of bounds of track",
@@ -158,9 +242,10 @@ namespace Kalman {
     _track_vector.clear();
 
     for (unsigned int i = 0; i < similar_track.GetLength(); ++i) {
-      State new_state(_dimension, similar_track[i].GetPosition());
-      new_state.SetId(similar_track[i].GetId());
-      _track_vector.push_back(new_state);
+      TrackPoint new_tp(_dimension, similar_track[i].GetData().GetDimension(),
+                                                                   similar_track[i].GetPosition());
+      new_tp.SetId(similar_track[i].GetId());
+      _track_vector.push_back(new_tp);
     }
   }
 }

@@ -30,13 +30,14 @@ namespace Kalman {
 
   // Class and Function Declarations
   class State;
+  class TrackPoint;
   class Track;
   class TrackFit;
 
   /** @brief Basic Kalman State object
    *
    *  It stores a state vector and associated covariance matrix object.
-   *  Also stores the position of the state and the state id.
+   *  This is the simplest state object.
    *
    *  Users can choose to set the "HasValue" flag to false (default if no vector set)
    *   so that the filtering algorithm ignores the values.
@@ -53,11 +54,11 @@ namespace Kalman {
     public:
       /** @brief Initialise an empty state of the requred dimension and position
        */
-      State(unsigned int dimension, double position = 0.0);
+      explicit State(unsigned int dimension);
 
       /** @brief Initialise state with vector and covariance matrix
        */
-      State(TMatrixD vector, TMatrixD covariance, double position = 0.0);
+      State(TMatrixD vector, TMatrixD covariance);
 
       /** @brief Copy Constructor */
       State(const State& st);
@@ -65,30 +66,10 @@ namespace Kalman {
       /** @brief Assignment Operator */
       State& operator=(const State& st);
 
-      /** @brief Shallow Copy function. Maintains previous ID and Position
-       */
-      State& copy(State state);
-
       /** @brief Destructor
        */
       virtual ~State() {}
 
-
-      /** @brief Get ID of state
-       */
-      int GetId() const { return _id; }
-
-      /** @brief Set ID of state. Should be unique!
-       */
-      void SetId(int new_id) { _id = new_id; }
-
-      /** @brief Return the position of the state
-       */
-      double GetPosition() const { return _position; }
-
-      /** @brief Set the position of the state
-       */
-      void SetPosition(double new_pos) { _position = new_pos; }
 
       /** @brief Return the state vector
        */
@@ -136,8 +117,6 @@ namespace Kalman {
     private:
 
       unsigned int _dimension;
-      int _id;
-      double _position;
       TMatrixD _vector;
       TMatrixD _covariance;
 
@@ -145,10 +124,119 @@ namespace Kalman {
   };
 
 
+
+  /** @brief Kalman TrackPoint object
+   *
+   *  This object stores all the information required for single point on a track.
+   *  The position and trackpoint ID is stored, additionally each of the predicted, filtered and
+   *   smoothed states (and covariances) are stored.
+   */
+  class TrackPoint {
+    public :
+      /** @brief Initialise an empty trackpoint of the requred dimension and position
+       */
+      TrackPoint(unsigned int dimension, unsigned int measurement_dim, double position, int id = 0);
+
+      /** @brief Initialise an empty trackpoint with a measurement
+       */
+      TrackPoint(unsigned int dimension, double position, State data, int id = 0);
+
+      /** @brief Initialise trackpoint with all kalman states + data
+       */
+      TrackPoint(State pred, State filt, State smoo, State data, double position, int id = 0 );
+
+      /** @brief Copy Constructor */
+      TrackPoint(const TrackPoint& trackpoint);
+
+      /** @brief Assignment Operator */
+      TrackPoint& operator=(const TrackPoint& tp);
+
+      /** @brief Shallow Copy function. Maintains previous ID and Position
+       */
+      TrackPoint& copy(TrackPoint tp);
+
+
+      /** @brief Destructor
+       */
+      virtual ~TrackPoint() {}
+
+      int GetDimension() const { return this->_predicted.GetDimension(); }
+
+      /** @brief Get ID of trackpoint
+       */
+      int GetId() const { return _id; }
+
+      /** @brief Set ID of trackpoint. Should be unique!
+       */
+      void SetId(int new_id) { _id = new_id; }
+
+      /** @brief Return the position of the trackpoint
+       */
+      double GetPosition() const { return _position; }
+
+      /** @brief Set the position of the trackpoint
+       */
+      void SetPosition(double new_pos) { _position = new_pos; }
+
+      /** @brief Return the predicted state
+       */
+      State& GetPredicted() { return _predicted; }
+      const State& GetPredicted() const { return _predicted; }
+
+      /** @brief Set the predicted state
+       */
+      void SetPredicted(State state) { _predicted = state; }
+
+      /** @brief Return the filtered state if available, otherwise return predicted
+       */
+      State& GetFiltered();
+      const State& GetFiltered() const;
+
+      /** @brief Set the filtered state
+       */
+      void SetFiltered(State state) { _filtered = state; }
+
+      /** @brief Return the smoothed state if available
+       */
+      State& GetSmoothed();
+      const State& GetSmoothed() const;
+
+      /** @brief Set the smoothed state
+       */
+      void SetSmoothed(State state) { _smoothed = state; }
+
+
+      /** @brief Return the data state
+       */
+      State& GetData() { return _data; }
+      const State& GetData() const { return _data; }
+
+      /** @brief Set the data state
+       */
+      void SetData(State state) { _data = state; }
+
+      /** @brief Shortcut to the data->HasVaiue() function
+       */
+      bool HasData() const { return _data.HasValue(); }
+
+    protected :
+
+    private:
+
+      State _predicted;
+      State _filtered;
+      State _smoothed;
+      State _data;
+
+      int _id;
+      double _position;
+  };
+
+
   /** @brief Stores a vector of states to make a track
    */
   class Track {
-    typedef std::vector< State > StateArray;
+    typedef std::vector< TrackPoint > TrackPointArray;
 
     public:
       /** @brief Initialise track with required dimension
@@ -157,19 +245,19 @@ namespace Kalman {
 
       /** @brief Return the state found at specified index in state array
        */
-      State GetState(unsigned int index) const { return _track_vector[index]; }
+      TrackPoint GetTrackPoint(unsigned int index) const { return _track_vector[index]; }
 
       /** @brief Set the state at the specified index in the state array
        */
-      void SetState(unsigned int index, State state);
+      void SetTrackPoint(unsigned int index, TrackPoint tp);
 
       /** @brief Get a reference to the state at the specified index 
        */
-      State& operator[] (unsigned int index) { return _track_vector[index]; }
+      TrackPoint& operator[] (unsigned int index) { return _track_vector[index]; }
 
       /** @brief Get a const reference to the state at the specified index 
        */
-      const State& operator[] (unsigned int index) const { return _track_vector[index]; }
+      const TrackPoint& operator[] (unsigned int index) const { return _track_vector[index]; }
 
       /** @brief Return the number of states in the state array
        */
@@ -177,11 +265,11 @@ namespace Kalman {
 
       /** @brief Append a state to the state array
        */
-      void Append(State state);
+      void Append(TrackPoint tp);
 
       /** @brief Remove a state from the specified index in the state array
        */
-      void DeleteState(unsigned int index);
+      void DeleteTrackPoint(unsigned int index);
 
       /** @brief (Re)initialise the track using the structure of a similar track
        */
@@ -196,7 +284,7 @@ namespace Kalman {
     private:
       unsigned int _dimension;
 
-      StateArray _track_vector;
+      TrackPointArray _track_vector;
   };
 } // namespace Kalman
 } // namespace MAUS

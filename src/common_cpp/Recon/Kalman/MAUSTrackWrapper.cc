@@ -30,8 +30,9 @@ namespace MAUS {
 
 
 
-  Kalman::Track BuildTrack(SciFiClusterPArray cluster_array, const SciFiGeometryHelper* geom) {
-    Kalman::Track new_track(1);
+  Kalman::Track BuildTrack(SciFiClusterPArray cluster_array,
+                                                        const SciFiGeometryHelper* geom, int dim) {
+    Kalman::Track new_track(dim);
     size_t numbclusters = cluster_array.size();
 
     if (numbclusters < 1) return new_track;
@@ -42,9 +43,8 @@ namespace MAUS {
 
     for (SciFiPlaneMap::const_iterator iter = geom_map.begin(); iter != geom_map.end(); ++iter) {
       int id = iter->first * tracker_const;
-      Kalman::State new_state = Kalman::State(1, iter->second.Position.z());
-      new_state.SetId(id);
-      new_track.Append(new_state);
+      Kalman::TrackPoint new_trackpoint = Kalman::TrackPoint(dim, 1, iter->second.Position.z(), id);
+      new_track.Append(new_trackpoint);
     }
 
     for (size_t j = 0; j < numbclusters; ++j) {
@@ -56,15 +56,12 @@ namespace MAUS {
       TMatrixD covariance(1, 1);
 
       state_vector(0, 0) = - cluster->get_alpha(); // Alpha is defined backwards.
-      covariance(0, 0) = 0.0;
+      covariance(0, 0) = geom->GetChannelWidth() * geom->GetChannelWidth() / 12.0;
 
-      new_track[id].SetVector(state_vector);
-      new_track[id].SetCovariance(covariance);
-      new_track[id].SetHasValue(true);
+      new_track[id].SetData(Kalman::State(state_vector, covariance));
     }
     return new_track;
   }
-
 
 
 
@@ -74,7 +71,6 @@ namespace MAUS {
     TMatrixD covariance(5, 5);
 
     int tracker = h_track->get_tracker();
-    int seed_id = (tracker == 0 ? -15 : 15);
     double seed_pos = geom->GetPlanePosition(tracker, 5, 2);
     double length =  seed_pos;
     double c  = CLHEP::c_light;
@@ -101,7 +97,7 @@ namespace MAUS {
       if (tracker == 0) {
         patrec_bias = (P + 1.4) / P;
       } else {
-        patrec_bias = (P + 1.4) / P;
+        patrec_bias = (P - 1.4) / P;
       }
       patrec_momentum = patrec_bias * patrec_momentum;
     }
@@ -173,9 +169,7 @@ namespace MAUS {
       covariance = jacobian*patrec_covariance*jacobianT;
     }
 
-    Kalman::State seed_state(vector, covariance, seed_pos);
-    seed_state.SetId(seed_id);
-
+    Kalman::State seed_state(vector, covariance);
     return seed_state;
   }
 
@@ -188,7 +182,6 @@ namespace MAUS {
     int tracker = s_track->get_tracker();
     double seed_pos = geom->GetPlanePosition(tracker, 5, 2);
     double length =  seed_pos;
-    int seed_id = (tracker == 0 ? -15 : 15);
 
     double x0 = s_track->get_x0();
     double y0 = s_track->get_y0();
@@ -246,8 +239,7 @@ namespace MAUS {
       covariance = jacobian*patrec_covariance*jacobianT;
     }
 
-    Kalman::State seed_state(vector, covariance, seed_pos);
-    seed_state.SetId(seed_id);
+    Kalman::State seed_state(vector, covariance);
     return seed_state;
   }
 
@@ -255,29 +247,28 @@ namespace MAUS {
   SciFiTrack* ConvertToSciFiTrack(const Kalman::TrackFit* fitter,
                                      const SciFiGeometryHelper* geom, SciFiBasePRTrack* pr_track) {
     SciFiTrack* new_track = new SciFiTrack();
-    const Kalman::Track& smoothed = fitter->Smoothed();
-    const Kalman::Track& data = fitter->Data();
+    const Kalman::Track& the_track = fitter->GetTrack();
     Kalman::State seed = fitter->GetSeed();
     double default_mom = geom->GetDefaultMomentum();
 
-    if (smoothed.GetLength() < 1)
+    if (the_track.GetLength() < 1)
       throw MAUS::Exception(MAUS::Exception::recoverable,
                             "Not enough points in Kalman Track",
                             "ConvertToSciFiTrack()");
 
-    double chi_squared = fitter->CalculateChiSquared(smoothed);
+    double chi_squared = fitter->CalculateSmoothedChiSquared();
     int NDF = fitter->GetNDF();
     double p_value = TMath::Prob(chi_squared, NDF);
 
     int tracker;
-    if (smoothed[0].GetId() > 0) {
+    if (the_track[0].GetId() > 0) {
       tracker = 1;
     } else {
       tracker = 0;
     }
     new_track->set_tracker(tracker);
 
-    int dimension = smoothed.GetDimension();
+    int dimension = the_track.GetDimension();
     if (dimension == 4) {
       new_track->SetAlgorithmUsed(SciFiTrack::kalman_straight);
     } else if (dimension == 5) {
@@ -288,24 +279,22 @@ namespace MAUS {
                             "ConvertToSciFiTrack()");
     }
 
-//    const SciFiGeometryMap& geom_map = geom->GeometryMap();
-
     ThreeVector reference_pos = geom->GetReferencePosition(tracker);
     HepRotation reference_rot = geom->GetReferenceRotation(tracker);
     int charge = 0;
 
-    for (unsigned int i = 0; i < smoothed.GetLength(); ++i) {
-      const Kalman::State& smoothed_state = smoothed[i];
-//      const Kalman::State& filtered_state = filtered[i];
-//      const Kalman::State& predicted_state = predicted[i];
-      const Kalman::State& data_state = data[i];
+    for (unsigned int i = 0; i < the_track.GetLength(); ++i) {
+      int ID = the_track[i].GetId();
+      double position = the_track[i].GetPosition();
+      const Kalman::State& smoothed_state = the_track[i].GetSmoothed();
+      const Kalman::State& data_state = the_track[i].GetData();
 
       SciFiTrackPoint* new_point = new SciFiTrackPoint();
 
       new_point->set_tracker(tracker);
       new_point->set_has_data(data_state.HasValue());
 
-      int id = abs(smoothed_state.GetId());
+      int id = abs(ID);
       new_point->set_station(((id-1)/3)+1);
       new_point->set_plane((id-1)%3);
 
@@ -315,7 +304,7 @@ namespace MAUS {
       TMatrixD state_vector = smoothed_state.GetVector();
 
       if (dimension == 4) {
-        pos.setZ(smoothed_state.GetPosition());
+        pos.setZ(position);
         pos.setX(state_vector(0, 0));
         mom.setX(state_vector(1, 0)*default_mom);
         pos.setY(state_vector(2, 0));
@@ -332,7 +321,7 @@ namespace MAUS {
         mom.setX(state_vector(1, 0));
         pos.setY(state_vector(2, 0));
         mom.setY(state_vector(3, 0));
-        pos.setZ(smoothed_state.GetPosition());
+        pos.setZ(position);
 
         pos *= reference_rot;
         pos += reference_pos;
@@ -391,7 +380,7 @@ namespace MAUS {
     ThreeVector seed_pos;
     ThreeVector seed_mom;
     if (dimension == 4) {
-      seed_pos.setZ(seed.GetPosition());
+      seed_pos.setZ(the_track[0].GetPosition());
       seed_pos.setX(seed_vector(0, 0));
       seed_mom.setX(seed_vector(1, 0)*default_mom);
       seed_pos.setY(seed_vector(2, 0));
@@ -401,7 +390,7 @@ namespace MAUS {
       seed_mom.setX(seed_vector(1, 0));
       seed_pos.setY(seed_vector(2, 0));
       seed_mom.setY(seed_vector(3, 0));
-      seed_pos.setZ(seed.GetPosition());
+      seed_pos.setZ(the_track[0].GetPosition());
     }
     seed_pos *= reference_rot;
     seed_pos += reference_pos;
@@ -426,14 +415,14 @@ namespace MAUS {
 
 
   Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints,
-                                    const SciFiGeometryHelper* geom, int plane_num, double smear) {
-    Kalman::Track new_track(2);
+                           const SciFiGeometryHelper* geom, int dim, int plane_num, double smear) {
+    Kalman::Track new_track(dim);
     int tracker = (*spacepoints.begin())->get_tracker();
 
     for (unsigned int i = 0; i < 5; ++i) {
-      Kalman::State new_state(2, geom->GetPlanePosition(tracker, i+1, plane_num));
-      new_state.SetId((1 + i*3 + plane_num)*(tracker == 0 ? -1 : 1));
-      new_track.Append(new_state);
+      int id = (1 + i*3 + plane_num)*(tracker == 0 ? -1 : 1);
+      Kalman::TrackPoint new_trackpoint(dim, geom->GetPlanePosition(tracker, i+1, plane_num), id);
+      new_track.Append(new_trackpoint);
     }
 
     double variance = geom->GetChannelWidth() * geom->GetChannelWidth() / 12.0;
@@ -447,10 +436,8 @@ namespace MAUS {
       vec(1, 0) = (*it)->get_position().y();
       cov(0, 0) = variance;
       cov(1, 1) = variance;
-      new_track[station-1].SetVector(vec);
-      new_track[station-1].SetCovariance(cov);
+      new_track[station-1].SetData(Kalman::State(vec, cov));
       new_track[station-1].SetPosition((*it)->get_position().z());
-      new_track[station-1].SetHasValue(true);
     }
     return new_track;
   }

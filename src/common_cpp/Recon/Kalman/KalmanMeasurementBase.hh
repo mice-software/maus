@@ -42,13 +42,14 @@ namespace Kalman {
        */
       TMatrixD GetMeasurementMatrix() const { return TMatrixD(MeasurementMatrix()); }
 
-      /** @brief Returns the covariance matrix of measurement noise
-       */
-      virtual TMatrixD CalculateMeasurementNoise(const State& state) = 0;
-
-      /** @brief Returns the covariance matrix of measurement noise
-       */
-      TMatrixD GetMeasurementNoise() const { return TMatrixD(MeasurementNoise()); }
+      // Measurement noise is only attributed to the data, hence that is where it is stored!
+//      /** @brief Returns the covariance matrix of measurement noise
+//       */
+//      virtual TMatrixD CalculateMeasurementNoise(const State& state) = 0;
+//
+//      /** @brief Returns the covariance matrix of measurement noise
+//       */
+//      TMatrixD GetMeasurementNoise() const { return TMatrixD(MeasurementNoise()); }
 
       /** @brief Return dimension of state vector
        */
@@ -71,8 +72,8 @@ namespace Kalman {
       virtual TMatrixD& MeasurementMatrix() { return _base_measurement_matrix; }
       virtual const TMatrixD& MeasurementMatrix() const { return _base_measurement_matrix; }
 
-      virtual TMatrixD& MeasurementNoise() { return _base_measurement_noise; }
-      virtual const TMatrixD& MeasurementNoise() const { return _base_measurement_noise; }
+//      virtual TMatrixD& MeasurementNoise() { return _base_measurement_noise; }
+//      virtual const TMatrixD& MeasurementNoise() const { return _base_measurement_noise; }
     private :
 
       unsigned int _dimension;
@@ -80,7 +81,7 @@ namespace Kalman {
 
       TMatrixD _base_measurement_matrix;
       TMatrixD _base_measurement_matrix_transpose;
-      TMatrixD _base_measurement_noise;
+//      TMatrixD _base_measurement_noise;
   };
 
 } // namespace Kalman

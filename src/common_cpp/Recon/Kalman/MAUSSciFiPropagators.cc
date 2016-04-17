@@ -39,8 +39,8 @@ namespace MAUS {
   }
 
 
-  TMatrixD StraightPropagator::CalculatePropagator(const Kalman::State& start,
-                                                                        const Kalman::State& end) {
+  TMatrixD StraightPropagator::CalculatePropagator(const Kalman::TrackPoint& start,
+                                                                   const Kalman::TrackPoint& end) {
     static TMatrixD prop(4, 4);
 
     // Find dz between sites.
@@ -57,37 +57,42 @@ namespace MAUS {
   }
 
 
-  TMatrixD StraightPropagator::CalculateProcessNoise(const Kalman::State& start,
-                                                                        const Kalman::State& end) {
-    static TMatrixD new_noise(GetDimension(), GetDimension());
+  TMatrixD StraightPropagator::CalculateProcessNoise(const Kalman::TrackPoint& start,
+                                                                   const Kalman::TrackPoint& end) {
+    TMatrixD new_noise(GetDimension(), GetDimension());
     new_noise.Zero();
 
     if (_include_mcs) {
-      // TODO : Should probably finish this one...
-      Kalman::State temp_start(start);
-      Kalman::State temp_end(start);
-
+      Kalman::State temp_state = start.GetFiltered();
       SciFiMaterialsList materials;
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
       int n_steps = materials.size();
 
       for (int i = 0; i < n_steps; i++) {
 
+//        double width = materials.at(i).second;
+//
+//        temp_end.SetPosition(temp_end.GetPosition() + width);
+//
+//        TMatrixD F = CalculatePropagator(temp_start, temp_end);
+//        temp_end.SetVector(F * temp_start.GetVector());
+//
+//        double L = materials.at(i).first->L(width);
+//        TMatrixD Q = BuildQ(temp_end, L, width);
+//
+//        TMatrixD F_transposed(GetDimension(), GetDimension());
+//        F_transposed.Transpose(F);
+//
+//        new_noise = F*new_noise*F_transposed + Q;
+//        temp_start = temp_end;
+
         double width = materials.at(i).second;
 
-        temp_end.SetPosition(temp_end.GetPosition() + width);
-
-        TMatrixD F = CalculatePropagator(temp_start, temp_end);
-        temp_end.SetVector(F * temp_start.GetVector());
-
         double L = materials.at(i).first->L(width);
-        TMatrixD Q = BuildQ(temp_end, L, width);
 
-        TMatrixD F_transposed(GetDimension(), GetDimension());
-        F_transposed.Transpose(F);
+        TMatrixD Q = BuildQ(temp_state, L, width);
 
-        new_noise = F*new_noise*F_transposed + Q;
-        temp_start = temp_end;
+        new_noise += Q;
       }
     } else {
       // Pass
@@ -164,9 +169,10 @@ namespace MAUS {
   }
 
 
-  void HelicalPropagator::Propagate(const Kalman::State& start, Kalman::State& end) {
+  void HelicalPropagator::Propagate(const Kalman::TrackPoint& start, Kalman::TrackPoint& end) {
+    Kalman::State old_filtered = start.GetFiltered();
     TMatrixD old_vec(5, 1);
-    old_vec             = start.GetVector();
+    old_vec             = old_filtered.GetVector();
     double old_x        = old_vec(0, 0);
     double old_px       = old_vec(1, 0);
     double old_y        = old_vec(2, 0);
@@ -212,14 +218,20 @@ namespace MAUS {
       if (end.GetId() > 0) {
         e_loss_sign = -1.0;
       }
+      if (delta_z > 0) {
+        e_loss_sign = 0.0;
+      }
 
       double delta_energy = 0.0;
       double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
       double momentum = old_momentum;
       int n_steps = materials.size();
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
-        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-        delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
+//        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+//        delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
+        double SP = _geometry_helper->LandauVavilovStoppingPower(momentum, materials.at(i).first,
+                                                       materials.at(i).second*0.1*distance_factor);
+        delta_energy = e_loss_sign*SP;
         energy = energy + delta_energy;
         momentum = sqrt(energy*energy - _muon_mass_sq);
       }
@@ -241,17 +253,16 @@ namespace MAUS {
     NoiseMatrix() = CalculateProcessNoise(start, end);
 
     TMatrixD propT(TMatrixD::kTransposed, PropagatorMatrix());
-    TMatrixD end_cov = PropagatorMatrix() * start.GetCovariance() * propT + NoiseMatrix();
+    TMatrixD end_cov = PropagatorMatrix() * old_filtered.GetCovariance() * propT + NoiseMatrix();
 
-    end.SetVector(end_vec);
-    end.SetCovariance(end_cov);
+    end.SetPredicted(Kalman::State(end_vec, end_cov));
   }
 
 
-  TMatrixD HelicalPropagator::CalculatePropagator(const Kalman::State& start,
-                                                                        const Kalman::State& end) {
+  TMatrixD HelicalPropagator::CalculatePropagator(const Kalman::TrackPoint& start,
+                                                                   const Kalman::TrackPoint& end) {
     TMatrixD old_vec(5, 1);
-    old_vec           = start.GetVector();
+    old_vec           = start.GetFiltered().GetVector();
 //  double old_x      = old_vec(0, 0);
     double old_px     = old_vec(1, 0);
 //  double old_y      = old_vec(2, 0);
@@ -291,9 +302,13 @@ namespace MAUS {
       double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
       double momentum = old_momentum;
       int n_steps = materials.size();
+
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
-        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-        delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
+//        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+//        delta_energy = e_loss_sign*SP*materials.at(i).second*0.1*distance_factor;
+        double SP = _geometry_helper->LandauVavilovStoppingPower(momentum, materials.at(i).first,
+                                                       materials.at(i).second*0.1*distance_factor);
+        delta_energy = e_loss_sign*SP;
         energy = energy + delta_energy;
         momentum = sqrt(energy*energy - _muon_mass_sq);
       }
@@ -332,14 +347,14 @@ namespace MAUS {
     if (_correct_Pz) {
       if (start.GetId() < 0) {
         new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
-        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine)*reduction_factor;
+        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine); // *reduction_factor;
         new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
-        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine)*reduction_factor;
+        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine); // *reduction_factor;
       } else {
         new_prop(0, 4) = delta_z*(old_px*cosine - old_py*sine);
-        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine)*reduction_factor;
+        new_prop(1, 4) = -u*delta_z*(old_px*sine + old_py*cosine); // *reduction_factor;
         new_prop(2, 4) = delta_z*(old_px*sine + old_py*cosine);
-        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine)*reduction_factor;
+        new_prop(3, 4) = u*delta_z*(old_px*cosine - old_py*sine); // *reduction_factor;
       }
     } else {
       new_prop(0, 4) = 0.0;
@@ -354,37 +369,41 @@ namespace MAUS {
   }
 
 
-  TMatrixD HelicalPropagator::CalculateProcessNoise(const Kalman::State& start,
-                                                                        const Kalman::State& end) {
-    static TMatrixD new_noise(5, 5);
+  TMatrixD HelicalPropagator::CalculateProcessNoise(const Kalman::TrackPoint& start,
+                                                                   const Kalman::TrackPoint& end) {
+    TMatrixD new_noise(5, 5);
     new_noise.Zero();
 
     if (_include_mcs) {
-      // TODO : Correct this for new system
-      Kalman::State temp_start(start);
-      Kalman::State temp_end(start);
-
       SciFiMaterialsList materials;
       _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
       int n_steps = materials.size();
+      Kalman::State temp_state = start.GetFiltered();
 
       for (int i = 0; i < n_steps; i++) {
+//        double width = materials.at(i).second;
+//
+//        temp_end.SetPosition(temp_end.GetPosition() + width);
+//
+//        TMatrixD F = CalculatePropagator(temp_start, temp_end);
+//        temp_end.SetVector(F * temp_start.GetVector());
+//
+//        double L = materials.at(i).first->L(width);
+//        TMatrixD Q = BuildQ(temp_end, L, width);
+//
+//        TMatrixD F_transposed(GetDimension(), GetDimension());
+//        F_transposed.Transpose(F);
+//
+//        new_noise = F*new_noise*F_transposed + Q;
+//        temp_start = temp_end;
 
         double width = materials.at(i).second;
 
-        temp_end.SetPosition(temp_end.GetPosition() + width);
-
-        TMatrixD F = CalculatePropagator(temp_start, temp_end);
-        temp_end.SetVector(F * temp_start.GetVector());
-
         double L = materials.at(i).first->L(width);
-        TMatrixD Q = BuildQ(temp_end, L, width);
 
-        TMatrixD F_transposed(GetDimension(), GetDimension());
-        F_transposed.Transpose(F);
+        TMatrixD Q = BuildQ(temp_state, L, width);
 
-        new_noise = F*new_noise*F_transposed + Q;
-        temp_start = temp_end;
+        new_noise += Q;
       }
     } else {
       // Pass...

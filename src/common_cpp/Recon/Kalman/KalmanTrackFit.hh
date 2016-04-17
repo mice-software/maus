@@ -20,6 +20,7 @@
 #define KALMAN_TRACKFIT_HH
 
 #include <string>
+#include <map>
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanPropagatorBase.hh"
@@ -30,7 +31,9 @@
 namespace MAUS {
 namespace Kalman {
 
-  std::string print_state(const State& state, const char* detail = 0);
+  std::string print_state(const State& tp, const char* detail = 0);
+
+  std::string print_trackpoint(const TrackPoint& tp, const char* detail = 0);
 
   std::string print_track(const Track& track, const char* name = 0);
 
@@ -51,7 +54,7 @@ namespace Kalman {
 
     /** @brief Intialise with the required measurement and propagator classes.
      */
-    TrackFit(Propagator_base* propagator, Measurement_base* measurement);
+    explicit TrackFit(Propagator_base* propagator);
 
     /** @brief Destructor
      */
@@ -62,7 +65,7 @@ namespace Kalman {
      *  A short cut function to save computations. 
      *  Useful if using this class to stream data through it
      */
-    void AppendFilter(State state);
+    void AppendFilter(TrackPoint tp);
 
     /** @brief Filter all states using supplied propagator and measurement classes
      */
@@ -81,34 +84,19 @@ namespace Kalman {
      */
     void SetSeed(State state);
 
-    /** @brief Set the data track - used to provide the measurments
+    /** @brief Set the track to filter
      */
-    void SetData(Track data_track);
+    void SetTrack(Track track);
 
-    /** @brief Returns a copy of the current data track
+    /** @brief Return a copy of the kalman track
      */
-    Track GetData() const { return _data; }
-    const Track& Data() const { return _data; }
-
-    /** @brief Return a copy of the predicted track
-     */
-    Track GetPredicted() const { return _predicted; }
-    const Track& Predicted() const { return _predicted; }
-
-    /** @brief Return a copy of the filtered track
-     */
-    Track GetFiltered() const { return _filtered; }
-    const Track& Filtered() const { return _filtered; }
-
-    /** @brief Return a copy of the smoothed track
-     */
-    Track GetSmoothed() const { return _smoothed; }
-    const Track& Smoothed() const { return _smoothed; }
+    Track& GetTrack() { return _track; }
+    const Track& GetTrack() const { return _track; }
 
 
     /** @brief Claculate the Chi-Squared value for the track
      */
-    double CalculateChiSquared(const Track&) const;
+    double CalculateSmoothedChiSquared() const;
 
     /** @brief Return the Number of Degrees of Freedom
      */
@@ -130,16 +118,18 @@ namespace Kalman {
      */
     unsigned int GetDimension() const { return _dimension; }
 
-    /** @brief Return the dimension of the measurement state vector
+
+    /** @brief Add a derived measurement class to the lookup
      */
-    unsigned int GetMeasurementDimension() const { return _measurement_dimension; }
+    void AddMeasurement(int id, Measurement_base* measurement)
+                                         { _measurements.insert(std::make_pair(id, measurement)); }
 
   protected:
 
-    void _propagate(State& first, State& second) const;
-    void _filter(const State& data, const State& predicted, State& filtered) const;
-    void _smooth(State& first, State& second) const;
-    void _inverse_filter(const State& data, const State& smoothed, State& cleaned) const;
+    void _propagate(const TrackPoint& from, TrackPoint& to) const;
+    void _filter(TrackPoint& tp) const;
+    void _smooth(TrackPoint& first, TrackPoint& second) const; // NOT IMPLEMENTED YET!
+    State _inverse_filter(const TrackPoint& tp) const;
 
   private:
     // Private copy constructor => No copying!
@@ -150,14 +140,16 @@ namespace Kalman {
     unsigned int _measurement_dimension;
 
     Propagator_base* _propagator;
-    Measurement_base* _measurement;
+    std::map<int, Measurement_base*> _measurements;
 
     State _seed;
 
-    Track _data;
-    Track _predicted;
-    Track _filtered;
-    Track _smoothed;
+    Track _track;
+
+//    Track _data;
+//    Track _predicted;
+//    Track _filtered;
+//    Track _smoothed;
 
     TMatrixD _identity_matrix;
   };

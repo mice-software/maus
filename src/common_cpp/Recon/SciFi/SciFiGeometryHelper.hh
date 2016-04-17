@@ -173,6 +173,8 @@ class SciFiGeometryHelper {
 
   static double HighlandFormula(double L, double beta, double p);
 
+  static double LandauVavilovStoppingPower(double p,
+                                               const SciFiMaterialParams* material, double length);
   static double BetheBlochStoppingPower(double p, const SciFiMaterialParams* material);
 
   void FillMaterialsList(int start_id, int end_id, SciFiMaterialsList& materials_list);

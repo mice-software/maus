@@ -173,7 +173,8 @@ def save_plots(plot_dict, filename) :
       save_plot( plot_dict[key], directory )
       outfile.cd()
     else :
-      plot_dict[key].Write(key)
+      if plot_dict[key] is not None :
+        plot_dict[key].Write(key)
       
   outfile.Close()
 
@@ -189,7 +190,8 @@ def save_plot(plot_dict, outfile) :
       save_plot( plot_dict[key], directory )
       outfile.cd()
     else :
-      plot_dict[key].Write(key)
+      if plot_dict[key] is not None :
+        plot_dict[key].Write(key)
 
 
 def print_plots(plot_dict, location, plot_options={}) :

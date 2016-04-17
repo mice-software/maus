@@ -222,16 +222,6 @@ class CovarianceMatrix() :
       raise ValueError( "Must supply two axis labels to obtain a \
                                                             single component" )
 
-#    row = -1
-#    col = -1
-#    for num, test in enumerate( VARIABLE_LIST ) :
-#      if axes[0] == test :
-#        row = num
-#        break
-#    for num, test in enumerate( VARIABLE_LIST ) :
-#      if axes[1] == test :
-#        col = num
-#        break
     row = VARIABLE_ENUMERATION[axes[0]]
     col = VARIABLE_ENUMERATION[axes[1]]
 
@@ -305,7 +295,7 @@ class CovarianceMatrix() :
 
     covariance_sum = 0.0
     for i in range( num ) :
-      covariance_sum += cov_mat[2*i][(2*num)+i]
+      covariance_sum += cov_mat[i][i+num]
 
     return - ( covariance_sum / num ) / ( emitt * mass )
 
@@ -343,6 +333,53 @@ class CovarianceMatrix() :
       variance_sum += cov_mat[i][i]
 
     return ( variance_sum / num ) * ( momentum / ( emitt * mass ) )
+
+
+  def get_canonical_angular_momentum( self, axes = ['x', 'y'] ) :
+    """
+      Calculats the canonical angular momentum for the axes specified.
+
+      The axes provided should be precisely two positional axes only,
+      e.g. ['x', 'y']
+
+      Canonical Angular Momentum calculated as:
+      Covariance(
+    """
+    check_axes( axes, master_list=POSITION_VARIABLES )
+    if len( axes ) != 2 :
+      raise ValueError( 'Can only determine angular momentum for 2 dimensions' )
+
+    conjugates = get_conjugates( axes )
+    full_axes = axes + conjugates
+    L = 0.0
+
+    x_var = VARIABLE_ENUMERATION[full_axes[0]]
+    px_var = VARIABLE_ENUMERATION[full_axes[2]]
+    y_var = VARIABLE_ENUMERATION[full_axes[1]]
+    py_var = VARIABLE_ENUMERATION[full_axes[3]]
+
+    L = (self._product_matrix[x_var][py_var] - \
+                                       self._product_matrix[y_var][px_var] ) / \
+                                                            self._num_particles
+
+    return L
+
+
+  def get_rms( self, axes=['x'] ) :
+    """
+      Calculates the geometry average of all the RMS' requested
+
+      Calculated as:
+      ( Sum ( Axis Variance ) ) ^ (1/n)
+    """
+    check_axes( axes )
+
+    sum_variances = 0.0
+    for axis in axes :
+      sum_variances = self.get_component([axis, axis])
+
+    return sum_variances**(1.0 / len(axes))
+
 
 
   def get_means( self, axes = ['x', 'px', 'y', 'py', 'z', 'pz', 't', 'E' ] ) :
