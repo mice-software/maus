@@ -131,11 +131,12 @@ double range_integral_error(std::vector<double> parx,
     par[2*n+2] = 0;				// Sets the orientation of the projection
     f_error->SetParameters(par); 		// Tells the function the size of the array
     double integralx = f_error->Integral(zstart, zend, f_error->GetParameters(), 1e-3);
-    error2 += pow(k*eparx[k]*integralx, 2); 	// Increment coming from the error on a_k
+    error2 += pow(k*integralx, 2)*eparx[k*(n+2)];
+
     par[2*n+2] = 1;				// Sets the orientation of the projection
     f_error->SetParameters(par); 		// Tells the function the size of the array
     double integraly = f_error->Integral(zstart, zend, f_error->GetParameters(), 1e-3);
-    error2 += pow(k*epary[k]*integraly, 2); 	// Increment coming from the error on b_k
+    error2 += pow(k*integraly, 2)*epary[k*(n+2)];
   }
   delete f_error;
 
@@ -179,7 +180,8 @@ double fpath_error(double* x, double* par) {
   size_t n = par[0]; 		// Number of derivative parameters
   size_t k = par[2*n+1];	// Order of the parameter
   double p = fpath(x, par);  	// Path function in x
-  double parq[n];
+  double parq[n+1];
+  parq[0] = n;
   for (size_t i = 1; i < n+1; i++) {
     if ( !par[2*n+2] ) {
       parq[i] = par[i];

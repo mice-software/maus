@@ -86,7 +86,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Building StepIV unpacker..."
         cmake  -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install -DSTEPIV_DATA=1 \
                ..
-        make
+        make -j$MAUS_NUM_THREADS
         make install
 
 # rename libMDUnpack to a StepIV name 
