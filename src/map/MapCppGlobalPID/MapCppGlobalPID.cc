@@ -560,7 +560,7 @@ namespace MAUS {
 	      const_cast<MAUS::DataStructure::Global::Track*>
 	      (const_tracks.at(track_j));
 	    perform_pid("MapCppGlobalPID-Final_Through_US",
-			"Through_DS_PID", US_track, _pid_vars,
+			"Through_US_PID", US_track, _pid_vars,
 			_pid_beamline_polarity,
 			_pid_beam_setting, global_event);
 	  }

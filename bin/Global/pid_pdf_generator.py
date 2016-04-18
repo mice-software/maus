@@ -16,7 +16,7 @@ def run():
     """
 
     # Take as input a maus root file.
-    my_input = MAUS.InputCppRoot()
+    my_input = MAUS.InputCppRootData()
 
     my_output = MAUS.OutputPyDoNothing()
 
