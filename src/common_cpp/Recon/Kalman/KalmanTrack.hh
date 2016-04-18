@@ -130,6 +130,13 @@ namespace Kalman {
    *  This object stores all the information required for single point on a track.
    *  The position and trackpoint ID is stored, additionally each of the predicted, filtered and
    *   smoothed states (and covariances) are stored.
+   *
+   *  Note:
+   *  - The TrackPoint::_id variable *MUST* correspond to measurement object ID, as stored in the 
+   *     KalmanTrackFit class. This is how the algorithm performs the correct measurements.
+   *  - The State::_hasValue variables is used to indicate whether the data component of the
+   *     trackpoint is useful or an empty value. Only if the trackpoint contains a data value
+   *     will it be used in the filtering stage.
    */
   class TrackPoint {
     public :
@@ -233,7 +240,7 @@ namespace Kalman {
   };
 
 
-  /** @brief Stores a vector of states to make a track
+  /** @brief Stores a vector of trackpoints to make a track
    */
   class Track {
     typedef std::vector< TrackPoint > TrackPointArray;

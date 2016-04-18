@@ -412,6 +412,117 @@ namespace MAUS {
   }
 
 
+//  TMatrixD HelicalPropagator::BuildQ(const Kalman::State& state, double L, double material_w) {
+//    TMatrixD vec = state.GetVector();
+//    double px    = vec(1, 0);
+//    double py    = vec(3, 0);
+//    double kappa = vec(4, 0);
+//    double pz    = fabs(1./kappa);
+//    double p     = sqrt(px*px+py*py+pz*pz);
+//    double p2    = p*p;
+//
+//    double E    = TMath::Sqrt(_muon_mass_sq+p2);
+//    double beta = p/E;
+//
+//    double theta_mcs  = _geometry_helper->HighlandFormula(L, beta, p);
+//    double theta_mcs2 = theta_mcs*theta_mcs;
+//
+//    double charge = kappa/fabs(kappa);
+//    double c      = CLHEP::c_light;
+//    double u      = charge*c*_Bz;
+//    double delta_theta = u*material_w*fabs(kappa);
+//    double sine   = sin(delta_theta);
+//    double cosine = cos(delta_theta);
+//
+//    double dtheta_dpz = -delta_theta/pz;
+//    // ------------------------------------------------------------
+//    TMatrixD dalpha_dp(GetDimension(), 3);
+//    // dx, dpx
+//    dalpha_dp(0, 0) = sine/u;
+//    // dx, dpy
+//    dalpha_dp(0, 1) = (cosine-1.)/u;
+//    // dx, dpz
+//    dalpha_dp(0, 2) = px*dtheta_dpz*cosine/u - py*dtheta_dpz*sine/u;
+//
+//    // dpx, dpx
+//    dalpha_dp(1, 0) = cosine;
+//    // dpx, dpy
+//    dalpha_dp(1, 1) = -sine;
+//    // dpx, dpz
+//    dalpha_dp(1, 2) = -px*dtheta_dpz*sine - py*dtheta_dpz*cosine;
+//
+//    // dy, dpx
+//    dalpha_dp(2, 0) = (1.-cosine)/u;
+//    // dy, dpy
+//    dalpha_dp(2, 1) = sine/u;
+//    // dy, dpz
+//    dalpha_dp(2, 2) = py*dtheta_dpz*cosine/u + px*dtheta_dpz*sine/u;
+//
+//    // dpy, dpx
+//    dalpha_dp(3, 0) = sine;
+//    // dpy, dpy
+//    dalpha_dp(3, 1) = cosine;
+//    // dpy, dpz
+//    dalpha_dp(3, 2) = -py*dtheta_dpz*sine + px*dtheta_dpz*cosine;
+//
+//    // dkappa, dpx
+//    dalpha_dp(4, 0) = 0.;
+//    // dkappa, dpy
+//    dalpha_dp(4, 1) = 0.;
+//    // dkappa, dpz
+//    dalpha_dp(4, 2) = -charge/(pz*pz);
+//
+//    TMatrixD dalpha_dp_transposed(3, GetDimension());
+//    dalpha_dp_transposed.Transpose(dalpha_dp);
+//
+//    // ------------------------------------------------------------
+//    TMatrixD dalpha_dx(GetDimension(), 3);
+//    dalpha_dx.Zero();
+//    dalpha_dx(0, 0) = 1.;
+//    dalpha_dx(2, 1) = 1.;
+//
+//    TMatrixD dalpha_dx_transposed(3, GetDimension());
+//    dalpha_dx_transposed.Transpose(dalpha_dx);
+//
+//    // ------------------------------------------------------------
+//    TMatrixD P(3, 3);
+//    // Diagonal terms.
+//    P(0, 0) = 1.-px*px/p2;
+//    P(1, 1) = 1.-py*py/p2;
+//    P(2, 2) = 1.-pz*pz/p2;
+//    // Off diagonal, symmetric.
+//    P(0, 1) = px*py/p2;
+//    P(1, 0) = px*py/p2;
+//    P(0, 2) = px*pz/p2;
+//    P(2, 0) = px*pz/p2;
+//    P(1, 2) = py*pz/p2;
+//    P(2, 1) = py*pz/p2;
+//
+//
+//    TMatrixD term_1(GetDimension(), GetDimension());
+//    term_1 = dalpha_dp*P*dalpha_dp_transposed;
+//    term_1 = p2*term_1;
+//
+//    TMatrixD term_2(GetDimension(), GetDimension());
+//    term_2 = dalpha_dp*P*dalpha_dx_transposed;
+//    term_2 = p*material_w*0.5*term_2;
+//
+//    TMatrixD term_3(GetDimension(), GetDimension());
+//    term_3 = dalpha_dx*P*dalpha_dp_transposed;
+//    term_3 = p*material_w*0.5*term_3;
+//
+//    TMatrixD term_4(GetDimension(), GetDimension());
+//    term_4 = dalpha_dx*P*dalpha_dx_transposed;
+//    term_4 = (1./3.)*material_w*material_w*term_4;
+//
+//    TMatrixD Q(GetDimension(), GetDimension());
+//    Q = theta_mcs2*(term_1 + term_2 + term_3 + term_4);
+//
+//    return Q;
+//  }
+
+
+
   TMatrixD HelicalPropagator::BuildQ(const Kalman::State& state, double L, double material_w) {
     TMatrixD vec = state.GetVector();
     double px    = vec(1, 0);
@@ -427,96 +538,38 @@ namespace MAUS {
     double theta_mcs  = _geometry_helper->HighlandFormula(L, beta, p);
     double theta_mcs2 = theta_mcs*theta_mcs;
 
-    double charge = kappa/fabs(kappa);
-    double c      = CLHEP::c_light;
-    double u      = charge*c*_Bz;
-    double delta_theta = u*material_w*fabs(kappa);
-    double sine   = sin(delta_theta);
-    double cosine = cos(delta_theta);
 
-    double dtheta_dpz = -delta_theta/pz;
-    // ------------------------------------------------------------
-    TMatrixD dalpha_dp(GetDimension(), 3);
-    // dx, dpx
-    dalpha_dp(0, 0) = sine/u;
-    // dx, dpy
-    dalpha_dp(0, 1) = (cosine-1.)/u;
-    // dx, dpz
-    dalpha_dp(0, 2) = px*dtheta_dpz*cosine/u - py*dtheta_dpz*sine/u;
+    // Calculate covariance matrix in delta_x, theta_x, delta_y, theta_y coodinates.
 
-    // dpx, dpx
-    dalpha_dp(1, 0) = cosine;
-    // dpx, dpy
-    dalpha_dp(1, 1) = -sine;
-    // dpx, dpz
-    dalpha_dp(1, 2) = -px*dtheta_dpz*sine - py*dtheta_dpz*cosine;
+    TMatrixD scat(4, 4);
 
-    // dy, dpx
-    dalpha_dp(2, 0) = (1.-cosine)/u;
-    // dy, dpy
-    dalpha_dp(2, 1) = sine/u;
-    // dy, dpz
-    dalpha_dp(2, 2) = py*dtheta_dpz*cosine/u + px*dtheta_dpz*sine/u;
+    scat(0, 0) = 1.0; // Var(delta_x, delta_x)
+    scat(2, 2) = 1.0; // Var(delta_y, delta_y)
+    scat(1, 1) = material_w*material_w/3.0; // Var(theta_x, theta_x)
+    scat(3, 3) = material_w*material_w/3.0; // Var(theta_y, theta_y)
 
-    // dpy, dpx
-    dalpha_dp(3, 0) = sine;
-    // dpy, dpy
-    dalpha_dp(3, 1) = cosine;
-    // dpy, dpz
-    dalpha_dp(3, 2) = -py*dtheta_dpz*sine + px*dtheta_dpz*cosine;
+    scat(0, 1) = material_w/2.0; // Cov(delta_x, theta_x)
+    scat(1, 0) = material_w/2.0; // Cov(delta_x, theta_x)
 
-    // dkappa, dpx
-    dalpha_dp(4, 0) = 0.;
-    // dkappa, dpy
-    dalpha_dp(4, 1) = 0.;
-    // dkappa, dpz
-    dalpha_dp(4, 2) = -charge/(pz*pz);
+    scat(2, 3) = material_w/2.0; // Cov(delta_y, theta_y)
+    scat(3, 2) = material_w/2.0; // Cov(delta_y, theta_y)
 
-    TMatrixD dalpha_dp_transposed(3, GetDimension());
-    dalpha_dp_transposed.Transpose(dalpha_dp);
-
-    // ------------------------------------------------------------
-    TMatrixD dalpha_dx(GetDimension(), 3);
-    dalpha_dx.Zero();
-    dalpha_dx(0, 0) = 1.;
-    dalpha_dx(2, 1) = 1.;
-
-    TMatrixD dalpha_dx_transposed(3, GetDimension());
-    dalpha_dx_transposed.Transpose(dalpha_dx);
-
-    // ------------------------------------------------------------
-    TMatrixD P(3, 3);
-    // Diagonal terms.
-    P(0, 0) = 1.-px*px/p2;
-    P(1, 1) = 1.-py*py/p2;
-    P(2, 2) = 1.-pz*pz/p2;
-    // Off diagonal, symmetric.
-    P(0, 1) = px*py/p2;
-    P(1, 0) = px*py/p2;
-    P(0, 2) = px*pz/p2;
-    P(2, 0) = px*pz/p2;
-    P(1, 2) = py*pz/p2;
-    P(2, 1) = py*pz/p2;
+    scat *= theta_mcs2;
 
 
-    TMatrixD term_1(GetDimension(), GetDimension());
-    term_1 = dalpha_dp*P*dalpha_dp_transposed;
-    term_1 = p2*term_1;
+    // Calculate the Jacbian with the state vector space
+    //  (Some HEAVY use of the paraxial approximation here...)
 
-    TMatrixD term_2(GetDimension(), GetDimension());
-    term_2 = dalpha_dp*P*dalpha_dx_transposed;
-    term_2 = p*material_w*0.5*term_2;
+    TMatrixD Jacob(5, 4);
 
-    TMatrixD term_3(GetDimension(), GetDimension());
-    term_3 = dalpha_dx*P*dalpha_dp_transposed;
-    term_3 = p*material_w*0.5*term_3;
+    Jacob(0, 0) = 1.0;
+    Jacob(1, 1) = pz;
+    Jacob(2, 2) = 1.0;
+    Jacob(3, 3) = pz;
 
-    TMatrixD term_4(GetDimension(), GetDimension());
-    term_4 = dalpha_dx*P*dalpha_dx_transposed;
-    term_4 = (1./3.)*material_w*material_w*term_4;
+    TMatrixD JacobT(TMatrixD::kTransposed, Jacob);
 
-    TMatrixD Q(GetDimension(), GetDimension());
-    Q = theta_mcs2*(term_1 + term_2 + term_3 + term_4);
+    TMatrixD Q = Jacob * scat * JacobT;
 
     return Q;
   }

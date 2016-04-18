@@ -48,6 +48,11 @@ namespace Kalman {
    *
    *  @brief TrackFit manages the workflow of the fitting.
    *
+   *  The _measurements variable stores a map of measurement object pointers, the correspond
+   *   to all the different types of measurement in the system.
+   *   The ID of each measurement, the key, *MUST* correspond to a the trackpoint ID, if the 
+   *   measurement object is to be used correctly.
+   *
    */
   class TrackFit {
   public:
@@ -60,7 +65,7 @@ namespace Kalman {
      */
     virtual ~TrackFit();
 
-    /** @brief Append a new data state and filter up to it
+    /** @brief Append a new data state, predict from the previous trackpoint and filter.
      *
      *  A short cut function to save computations. 
      *  Useful if using this class to stream data through it
@@ -120,6 +125,8 @@ namespace Kalman {
 
 
     /** @brief Add a derived measurement class to the lookup
+     *
+     *  The ID *MUST* correspond to the correct trackpoint ID in order for it to be used correctly.
      */
     void AddMeasurement(int id, Measurement_base* measurement)
                                          { _measurements.insert(std::make_pair(id, measurement)); }
