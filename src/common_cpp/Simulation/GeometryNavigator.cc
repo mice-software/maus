@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "Geant4/G4RunManager.hh" 
+#include "Geant4/G4RunManager.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "src/common_cpp/Utils/Exception.hh"
 

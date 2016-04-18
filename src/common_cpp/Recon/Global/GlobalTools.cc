@@ -272,6 +272,14 @@ void propagate(double* x, double target_z, const BTField* field,
     throw(Exception(Exception::recoverable, "Extreme target z",
                     "GlobalTools::propagate"));
   }
+  if (isnan(x[0]) || isnan(x[1]) || isnan(x[2]) || isnan(x[3]) ||
+      isnan(x[4]) || isnan(x[5]) || isnan(x[6]) || isnan(x[7])) {
+    std::stringstream ios;
+    ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
+        << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
+    throw(Exception(Exception::recoverable, ios.str()+
+          "Some components of tracker trackpoint are nan", "GlobalTools::propagate"));
+  }
   int prop_dir = 1;
   _field = field;
   _charge = recon::global::Particle::GetInstance().GetCharge(pid);
@@ -366,6 +374,14 @@ void propagate(double* x, double target_z, const BTField* field,
             "Exceeded maximum number of steps", "GlobalTools::propagate"));
       break;
     }
+    // Terminate if the propagation moves too far from the beamline (should be lost to us anyway)
+    // Appears to fix an irregular and so far not fully explained segfault.
+    if (std::abs(x[1]) > 700 || std::abs(x[2]) > 700) {
+      std::stringstream ios;
+      ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+      throw(Exception(Exception::recoverable, ios.str()+
+            "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
+    }
 
     // Need to catch the case where the particle is stopped
     if (std::abs(x[4]) < (mass + 0.01)) {
@@ -374,7 +390,6 @@ void propagate(double* x, double target_z, const BTField* field,
       throw(Exception(Exception::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
-
   }
   gsl_odeiv_evolve_free(evolve);
   gsl_odeiv_control_free(control);

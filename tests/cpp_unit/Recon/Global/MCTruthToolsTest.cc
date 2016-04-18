@@ -55,6 +55,7 @@ class MCTruthToolsTest : public ::testing::Test {
     scifi_channel_id->SetPlaneNumber(1);
     SciFiHit scifi_hit;
     scifi_hit.SetChannelId(scifi_channel_id);
+    scifi_hit.SetTrackId(1);
     SciFiHit tracker1_1_1_hit(scifi_hit);
     position.setZ(3200.0);
     tracker1_1_1_hit.SetPosition(position);

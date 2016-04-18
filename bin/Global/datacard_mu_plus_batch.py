@@ -94,8 +94,8 @@ track_matching_tolerances = {
   "TOF2x":50.0,
   "TOF2y":50.0,
   "KLy":42.0,
-  "EMRx":1.5, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
+  "EMRx":1.5, # Multiplier for standard tolerance which is recon error*sqrt(12)
   "EMRy":1.5,
-  "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
+  "TOF12maxSpeed":1.0, # fraction of c between TOFs for through matching
   "TOF12minSpeed":0.5,
 }
