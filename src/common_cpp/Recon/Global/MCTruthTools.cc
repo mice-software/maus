@@ -213,22 +213,31 @@ SciFiHitArray* GetTrackerHits(MCEvent* mc_event,
 }
 
 SciFiHit* GetTrackerPlaneHit(MCEvent* mc_event,
-                             int tracker, int station, int plane) {
-  SciFiHitArray* tracker_hits = mc_event->GetSciFiHits();
-  if (tracker_hits) {
-    for (auto tracker_hits_iter = tracker_hits->begin();
-         tracker_hits_iter != tracker_hits->end();
-         ++tracker_hits_iter) {
-      int tracker_number = tracker_hits_iter->GetChannelId()->GetTrackerNumber();
-      int station_number = tracker_hits_iter->GetChannelId()->GetStationNumber();
-      int plane_number = tracker_hits_iter->GetChannelId()->GetPlaneNumber();
+                             int tracker, int station, int plane,
+                             TLorentzVector position) {
+  SciFiHitArray* hits = mc_event->GetSciFiHits();
+  size_t nearest_index = 1000;
+  double z_distance = 1e20;
+  if (hits) {
+    for (size_t i = 0; i < hits->size(); i++) {
+      int tracker_number = hits->at(i).GetChannelId()->GetTrackerNumber();
+      int station_number = hits->at(i).GetChannelId()->GetStationNumber();
+      int plane_number = hits->at(i).GetChannelId()->GetPlaneNumber();
       if ((tracker_number == tracker) and (station_number == station) and
-          (plane_number == plane)) {
-        return &(*tracker_hits_iter);
+          (plane_number == plane) and hits->at(i).GetTrackId() == 1) {
+        if (std::abs(position.Z() - hits->at(i).GetPosition().Z())
+            < z_distance) {
+          nearest_index = i;
+          z_distance = std::abs(position.Z() - hits->at(i).GetPosition().Z());
+        }
       }
     }
   }
-  return 0;
+  if (nearest_index == 1000) {
+    return 0;
+  } else {
+    return &(hits->at(nearest_index));
+  }
 }
 
 TOFHit GetNearestZHit(TOFHitArray* hits, TLorentzVector position) {
@@ -236,11 +245,9 @@ TOFHit GetNearestZHit(TOFHitArray* hits, TLorentzVector position) {
   size_t nearest_index = 0;
   double z_distance = 1e20;
   for (size_t i = 0; i < hits->size(); i++) {
-    if (std::abs(position.Z() - hits->at(i).GetPosition().Z())
-        < z_distance) {
+    if (std::abs(position.Z() - hits->at(i).GetPosition().Z()) < z_distance) {
       nearest_index = i;
-      z_distance =
-          std::abs(position.Z() - hits->at(i).GetPosition().Z());
+      z_distance = std::abs(position.Z() - hits->at(i).GetPosition().Z());
     }
   }
   return hits->at(nearest_index);
@@ -251,11 +258,9 @@ KLHit GetNearestZHit(KLHitArray* hits, TLorentzVector position) {
   size_t nearest_index = 0;
   double z_distance = 1e20;
   for (size_t i = 0; i < hits->size(); i++) {
-    if (std::abs(position.Z() - hits->at(i).GetPosition().Z())
-        < z_distance) {
+    if (std::abs(position.Z() - hits->at(i).GetPosition().Z()) < z_distance) {
       nearest_index = i;
-      z_distance =
-          std::abs(position.Z() - hits->at(i).GetPosition().Z());
+      z_distance = std::abs(position.Z() - hits->at(i).GetPosition().Z());
     }
   }
   return hits->at(nearest_index);
@@ -266,11 +271,9 @@ EMRHit GetNearestZHit(EMRHitArray* hits, TLorentzVector position) {
   size_t nearest_index = 0;
   double z_distance = 1e20;
   for (size_t i = 0; i < hits->size(); i++) {
-    if (std::abs(position.Z() - hits->at(i).GetPosition().Z())
-        < z_distance) {
+    if (std::abs(position.Z() - hits->at(i).GetPosition().Z()) < z_distance) {
       nearest_index = i;
-      z_distance =
-          std::abs(position.Z() - hits->at(i).GetPosition().Z());
+      z_distance = std::abs(position.Z() - hits->at(i).GetPosition().Z());
     }
   }
   return hits->at(nearest_index);
