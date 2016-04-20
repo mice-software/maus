@@ -50,6 +50,8 @@ SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& m
   GasParameters.Mean_Excitation_Energy  = (*json)["GasParams_Mean_Excitation_Energy"].asDouble();
   GasParameters.A                       = (*json)["GasParams_A"].asDouble();
   GasParameters.Density_Correction      = (*json)["GasParams_Density_Correction"].asDouble();
+  
+  UseActiveRotations                    = (*json)["geometry_use_active_rotations"].asBool();
 
   _default_momentum  = (*json)["SciFiDefaultMomentum"].asDouble();
 }
@@ -77,7 +79,10 @@ void SciFiGeometryHelper::Build() {
       const MiceModule* plane = module->mother();
       HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // plane
                                                ->mother()));  // tracker/ station??
-      direction     *= internal_fibre_rotation.inverse();
+      if (UseActiveRotations == true)
+        direction     *= internal_fibre_rotation;
+      else
+        direction     *= internal_fibre_rotation.inverse();
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
@@ -107,7 +112,10 @@ void SciFiGeometryHelper::Build() {
 
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = reference;
-      trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
+      if (UseActiveRotations == true)
+        trackerGeo.Rotation = (trackerModule->globalRotation());
+      else
+        trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
 //      trackerGeo.Field = FieldValue(trackerModule);
       FieldValue(trackerModule, trackerGeo);
       trackerGeo.Planes[plane_id] = this_plane;
@@ -139,7 +147,10 @@ void SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule, SciFiTrack
   }
   Hep3Vector globalPos = trackerModule->globalPosition();
   Hep3Vector relativePos(0., 0., 0.);
-  HepRotation trackerRotation = (trackerModule->globalRotation()).inverse();
+    if (UseActiveRotations == true)
+    HepRotation trackerRotation = (trackerModule->globalRotation());
+  else
+    HepRotation trackerRotation = (trackerModule->globalRotation()).inverse();
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {0., 0., 0., 0.};
   BTFieldConstructor* field = Globals::GetReconFieldConstructor();
