@@ -36,7 +36,7 @@
 """
 
 # pylint: disable = W0311, E1101, W0613, W0621, C0103, C0111, W0702, W0611
-# pylint: disable = R0914, R0912, R0915
+# pylint: disable = R0914, R0912, R0915, W0603, W0612, C0302
 
 # Import MAUS Framework (Required!)
 import MAUS
@@ -60,16 +60,24 @@ import ROOT
 # Useful Constants and configuration
 RECON_STATION = 1
 RECON_PLANE = 0
-MIN_NUMBER_TRACKPOINTS = 0
-MUON_PID = 13
+EXPECTED_STRAIGHT_TRACKPOINTS = 9
+EXPECTED_HELIX_TRACKPOINTS = 12
+REQUIRE_DATA = True
+P_VALUE_CUT = 0.0
+MUON_PID = [13, -13]
+
+P_MIN = 0.0
+P_MAX = 1000.0
 
 PT_MIN = 0.0
 PT_MAX = 200.0
-PT_BIN = 200
+PT_BIN = 20
+PT_BIN_WIDTH = 10.0
 
 PZ_MIN = 120.0
 PZ_MAX = 260.0
-PZ_BIN = 100
+PZ_BIN = 14
+PZ_BIN_WIDTH = 10.0
 
 ALIGNMENT_TOLERANCE = 0.001
 RESOLUTION_BINS = 10
@@ -79,10 +87,24 @@ TRACK_ALGORITHM = 1
 
 ENSEMBLE_SIZE = 2000
 
-UP_COV_MC = covariances.CovarianceMatrix()
-DOWN_COV_MC = covariances.CovarianceMatrix() 
-UP_COV_RECON = covariances.CovarianceMatrix()
-DOWN_COV_RECON = covariances.CovarianceMatrix() 
+#UP_COV_MC = covariances.CovarianceMatrix()
+#DOWN_COV_MC = covariances.CovarianceMatrix() 
+#UP_COV_RECON = covariances.CovarianceMatrix()
+#DOWN_COV_RECON = covariances.CovarianceMatrix() 
+
+UP_COV_MC = []
+DOWN_COV_MC = []
+UP_COV_RECON = []
+DOWN_COV_RECON = []
+
+VIRTUAL_PLANE_DICT = {}
+INVERSE_PLANE_DICT = {}
+TRACKER_PLANE_RADIUS = 150.0
+
+ 
+def get_pz_bin(pz) :
+  offset = pz - PZ_MIN
+  return int(offset/PZ_BIN_WIDTH)
 
 
 def init_plots_data() :
@@ -90,290 +112,277 @@ def init_plots_data() :
     Initialised all the plots in a dictionary to pass around to the other 
     functions.
   """
-  plot_dict = {}
+  global UP_COV_MC
+  global DOWN_COV_MC 
+  global UP_COV_RECON
+  global DOWN_COV_RECON
+  global PZ_BIN
+  global PT_BIN
 
-  plot_dict['upstream_ntp'] = ROOT.TH1F('upstream_ntp', \
-                                    'Upstream No. TrackPoints', 15, 0.5, 15.5 )
-  plot_dict['downstream_ntp'] = ROOT.TH1F('downstream_ntp', \
-                                  'Downstream No. TrackPoints', 15, 0.5, 15.5 )
+  PZ_BIN = int(((PZ_MAX-PZ_MIN) / PZ_BIN_WIDTH) + 0.5)
+  PT_BIN = int(((PT_MAX-PT_MIN) / PT_BIN_WIDTH) + 0.5)
+  UP_COV_MC = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
+  DOWN_COV_MC = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
+  UP_COV_RECON = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
+  DOWN_COV_RECON = [ covariances.CovarianceMatrix() for _ in range(PZ_BIN) ]
 
+  plot_dict = {'upstream' : {}, 'downstream' : {}, \
+                                           'missing_tracks' : {}, 'pulls' : {}}
+  for tracker in [ 'upstream', 'downstream' ] :
+    tracker_dict = {}
 
-  plot_dict['upstream_xy'] = ROOT.TH2F( 'upstream_xy', \
-                  'Upstream Position', 500, -200.0, 200.0, 500, -200.0, 200.0 )
-  plot_dict['downstream_xy'] = ROOT.TH2F( 'downstream_xy', \
-                'Downstream Position', 500, -200.0, 200.0, 500, -200.0, 200.0 )
-
-  plot_dict['upstream_pxpy'] = ROOT.TH2F('upstream_pxpy', \
-                  'Upstream Momentum', 500, -200.0, 200.0, 500, -200.0, 200.0 )
-  plot_dict['downstream_pxpy'] = ROOT.TH2F('downstream_pxpy', \
-                'Downstream Momentum', 500, -200.0, 200.0, 500, -200.0, 200.0 )
-
-  plot_dict['upstream_pt'] = ROOT.TH1F( 'upstream_pt', \
-                              'Upstream Transvere Momentum', 500, -0.0, 200.0 )
-  plot_dict['downstream_pt'] = ROOT.TH1F( 'downstream_pt', \
-                            'Downstream Transvere Momentum', 500, -0.0, 200.0 )
-
-  plot_dict['upstream_pz'] = ROOT.TH1F( 'upstream_pz', \
-                          'Upstream Longitudinal Momentum', 500, 100.0, 300.0 )
-  plot_dict['downstream_pz'] = ROOT.TH1F( 'downstream_pz', \
-                        'Downstream Longitudinal Momentum', 500, 100.0, 300.0 )
+    tracker_dict['ntp'] = ROOT.TH1F(tracker+'_ntp', \
+                                    'No. TrackPoints', 15, 0.5, 15.5 )
 
 
+    tracker_dict['xy'] = ROOT.TH2F( tracker+'_xy', \
+                  'Position', 500, -200.0, 200.0, 500, -200.0, 200.0 )
 
-  plot_dict['upstream_mc_xy'] = ROOT.TH2F( 'upstream_mc_xy', \
-               'Upstream MC Position', 500, -200.0, 200.0, 500, -200.0, 200.0 )
-  plot_dict['downstream_mc_xy'] = ROOT.TH2F( 'downstream_mc_xy', \
-             'Downstream MC Position', 500, -200.0, 200.0, 500, -200.0, 200.0 )
+    tracker_dict['pxpy'] = ROOT.TH2F(tracker+'_pxpy', \
+                  'Momentum', 500, -200.0, 200.0, 500, -200.0, 200.0 )
 
-  plot_dict['upstream_mc_pxpy'] = ROOT.TH2F( 'upstream_mc_pxpy', \
-               'Upstream MC Momentum', 500, -200.0, 200.0, 500, -200.0, 200.0 )
-  plot_dict['downstream_mc_pxpy'] = ROOT.TH2F( 'downstream_mc_pxpy', \
-             'Downstream MC Momentum', 500, -200.0, 200.0, 500, -200.0, 200.0 )
+    tracker_dict['pt'] = ROOT.TH1F( tracker+'_pt', \
+                              'Transvere Momentum', 500, -0.0, 200.0 )
 
-  plot_dict['upstream_mc_pt'] = ROOT.TH1F( 'upstream_mc_pt', \
-                           'Upstream MC Transvere Momentum', 500, -0.0, 200.0 )
-  plot_dict['downstream_mc_pt'] = ROOT.TH1F( 'downstream_mc_pt', \
-                         'Downstream MC Transvere Momentum', 500, -0.0, 200.0 )
-
-  plot_dict['upstream_mc_pz'] = ROOT.TH1F( 'upstream_mc_pz', \
-                       'Upstream MC Longitudinal Momentum', 500, 100.0, 300.0 )
-  plot_dict['downstream_mc_pz'] = ROOT.TH1F( 'downstream_mc_pz', \
-                     'Downstream MC Longitudinal Momentum', 500, 100.0, 300.0 )
+    tracker_dict['pz'] = ROOT.TH1F( tracker+'_pz', \
+                          'Longitudinal Momentum', 500, 100.0, 300.0 )
 
 
 
-  plot_dict['upstream_residual_xy'] = ROOT.TH2F( 'upstream_residual_xy', \
-             'Upstream Residual Position', 500, -50.0, 50.0, 500, -50.0, 50.0 )
-  plot_dict['downstream_residual_xy'] = ROOT.TH2F( 'downstream_residual_xy', \
-           'Downstream Residual Position', 500, -50.0, 50.0, 500, -50.0, 50.0 )
+    tracker_dict['mc_xy'] = ROOT.TH2F( tracker+'_mc_xy', \
+               'MC Position', 500, -200.0, 200.0, 500, -200.0, 200.0 )
 
-  plot_dict['upstream_residual_pxpy'] = ROOT.TH2F( 'upstream_residual_pxpy', \
-             'Upstream Residual Momentum', 500, -50.0, 50.0, 500, -50.0, 50.0 )
-  plot_dict['downstream_residual_pxpy'] = ROOT.TH2F( \
-                  'downstream_residual_pxpy', 'Downstream Residual Momentum', \
-                                           500, -50.0, 50.0, 500, -50.0, 50.0 )
+    tracker_dict['mc_pxpy'] = ROOT.TH2F( tracker+'_mc_pxpy', \
+               'MC Momentum', 500, -200.0, 200.0, 500, -200.0, 200.0 )
 
-  plot_dict['upstream_residual_pt'] = ROOT.TH1F( 'upstream_residual_pt', \
-                                 "Upstream p_{t} Residuals", 500, -50.0, 50.0 )
-  plot_dict['downstream_residual_pt'] = ROOT.TH1F( 'downstream_residual_pt', \
-                               "Downstream p_{t} Residuals", 500, -50.0, 50.0 )
-  plot_dict['upstream_residual_pz'] = ROOT.TH1F( 'upstream_residual_pz', \
-                                 "Upstream p_{z} Residuals", 500, -50.0, 50.0 )
-  plot_dict['downstream_residual_pz'] = ROOT.TH1F( 'downstream_residual_pz', \
-                               "Downstream p_{z} Residuals", 500, -50.0, 50.0 )
+    tracker_dict['mc_pt'] = ROOT.TH1F( tracker+'_mc_pt', \
+                           'MC Transvere Momentum', 500, -0.0, 200.0 )
+
+    tracker_dict['mc_pz'] = ROOT.TH1F( tracker+'_mc_pz', \
+                       'MC Longitudinal Momentum', 500, 100.0, 300.0 )
 
 
 
-  plot_dict['upstream_ntp_pt'] = ROOT.TH2F( \
-                      'upstream_ntp_pt', "Upstream No. Trackpoints in P_{t}", \
+    tracker_dict['residual_xy'] = ROOT.TH2F( tracker+'_residual_xy', \
+             'Residual Position', 500, -50.0, 50.0, 500, -50.0, 50.0 )
+
+    tracker_dict['residual_mxmy'] = ROOT.TH2F( tracker+'_residual_mxmy', \
+             'Residual Gradient', 500, -0.5, 0.5, 500, -0.5, 0.5 )
+
+    tracker_dict['residual_pxpy'] = ROOT.TH2F( tracker+'_residual_pxpy', \
+             'Residual Momentum', 500, -50.0, 50.0, 500, -50.0, 50.0 )
+
+    tracker_dict['residual_pt'] = ROOT.TH1F( tracker+'_residual_pt', \
+                                 "p_{t} Residuals", 500, -50.0, 50.0 )
+    tracker_dict['residual_pz'] = ROOT.TH1F( tracker+'_residual_pz', \
+                                 "p_{z} Residuals", 500, -50.0, 50.0 )
+
+
+
+    tracker_dict['ntp_pt'] = ROOT.TH2F( \
+                      tracker+'_ntp_pt', "No. Trackpoints in P_{t}", \
                                         PT_BIN, PT_MIN, PT_MAX, 15, 0.5, 15.5 )
-  plot_dict['downstream_ntp_pt'] = ROOT.TH2F( \
-                  'downstream_ntp_pt', "Downstream No. Trackpoints in P_{t}", \
+    tracker_dict['ntp_mc_pt'] = ROOT.TH2F( \
+                tracker+'_ntp_mc_pt', "No. MC Trackpoints in P_{t}", \
                                         PT_BIN, PT_MIN, PT_MAX, 15, 0.5, 15.5 )
 
-
-  plot_dict['upstream_x_residual_pt'] = ROOT.TH2F( \
-               'upstream_x_residual_pt', "Upstream X Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-  plot_dict['upstream_y_residual_pt'] = ROOT.TH2F( \
-               'upstream_y_residual_pt', "Upstream Y Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-
-  plot_dict['upstream_px_residual_pt'] = ROOT.TH2F( \
-              'upstream_px_residual_pt', "Upstream p_{x} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-  plot_dict['upstream_py_residual_pt'] = ROOT.TH2F( \
-              'upstream_py_residual_pt', "Upstream p_{y} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-
-  plot_dict['upstream_pt_residual_pt'] = ROOT.TH2F( \
-              'upstream_pt_residual_pt', "Upstream p_{t} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-  plot_dict['upstream_pz_residual_pt'] = ROOT.TH2F( \
-              'upstream_pz_residual_pt', "Upstream p_{z} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-
-
-  plot_dict['downstream_x_residual_pt'] = ROOT.TH2F( \
-               'downstream_x_residual_pt', "Downstream X Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-  plot_dict['downstream_y_residual_pt'] = ROOT.TH2F( \
-               'downstream_y_residual_pt', "Downstream Y Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-
-  plot_dict['downstream_px_residual_pt'] = ROOT.TH2F( \
-          'downstream_px_residual_pt', "Downstream p_{x} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-  plot_dict['downstream_py_residual_pt'] = ROOT.TH2F( \
-          'downstream_py_residual_pt', "Downstream p_{y} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-
-  plot_dict['downstream_pt_residual_pt'] = ROOT.TH2F( \
-          'downstream_pt_residual_pt', "Downstream p_{t} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-  plot_dict['downstream_pz_residual_pt'] = ROOT.TH2F( \
-          'downstream_pz_residual_pt', "Downstream p_{z} Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
-
-
-
-  plot_dict['upstream_ntp_pz'] = ROOT.TH2F( \
-                      'upstream_ntp_pz', "Upstream No. Trackpoints in P_{z}", \
+    tracker_dict['ntp_pz'] = ROOT.TH2F( \
+                      tracker+'_ntp_pz', "No. Trackpoints in P_{z}", \
                                         PZ_BIN, PZ_MIN, PZ_MAX, 15, 0.5, 15.5 )
-  plot_dict['downstream_ntp_pz'] = ROOT.TH2F( \
-                  'downstream_ntp_pz', "Downstream No. Trackpoints in P_{z}", \
+    tracker_dict['ntp_mc_pz'] = ROOT.TH2F( \
+                tracker+'_ntp_mc_pz', "No. MC Trackpoints in P_{z}", \
                                         PZ_BIN, PZ_MIN, PZ_MAX, 15, 0.5, 15.5 )
 
 
-  plot_dict['upstream_x_residual_pz'] = ROOT.TH2F( \
-               'upstream_x_residual_pz', "Upstream X Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-  plot_dict['upstream_y_residual_pz'] = ROOT.TH2F( \
-               'upstream_y_residual_pz', "Upstream Y Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-
-  plot_dict['upstream_px_residual_pz'] = ROOT.TH2F( \
-              'upstream_px_residual_pz', "Upstream p_{x} Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-  plot_dict['upstream_py_residual_pz'] = ROOT.TH2F( \
-              'upstream_py_residual_pz', "Upstream p_{y} Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-
-  plot_dict['upstream_pt_residual_pz'] = ROOT.TH2F( \
-              'upstream_pt_residual_pz', "Upstream p_{t} Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-  plot_dict['upstream_pz_residual_pz'] = ROOT.TH2F( \
-              'upstream_pz_residual_pz', "Upstream p_{z} Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+    tracker_dict['trackpoint_efficiency'] = ROOT.TEfficiency( \
+                                         tracker+'_trackpoint_efficiency', \
+                             "Track Point Efficiency in P_{z} and P_{#perp}", \
+                               PZ_BIN, PZ_MIN, PZ_MAX, PT_BIN, PT_MIN, PT_MAX )
+    tracker_dict['trackpoint_efficiency_pt'] = ROOT.TEfficiency( \
+                                         tracker+'_trackpoint_efficiency_pt', \
+                              "Track Point Efficiency in P_{#perp}", \
+                                                       PT_BIN, PT_MIN, PT_MAX )
+    tracker_dict['trackpoint_efficiency_pz'] = ROOT.TEfficiency( \
+                                         tracker+'_trackpoint_efficiency_pz', \
+                                    "Track Point Efficiency in P_z", \
+                                                       PZ_BIN, PZ_MIN, PZ_MAX )
 
 
-  plot_dict['downstream_x_residual_pz'] = ROOT.TH2F( \
-               'downstream_x_residual_pz', "Downstream X Residuals in p_{z}", \
+    tracker_dict['ntracks_pt'] = ROOT.TH1F( \
+                   tracker+'_ntracks_pt', "No. Tracks in P_{#perp}", \
+                                                       PT_BIN, PT_MIN, PT_MAX )
+    tracker_dict['ntracks_mc_pt'] = ROOT.TH1F( \
+             tracker+'_ntracks_mc_pt', "No. MC Tracks in P_{#perp}", \
+                                                       PT_BIN, PT_MIN, PT_MAX )
+
+    tracker_dict['ntracks_pz'] = ROOT.TH1F( \
+                   tracker+'_ntracks_pz', "No. Tracks in P_{z}", \
+                                                       PZ_BIN, PZ_MIN, PZ_MAX )
+    tracker_dict['ntracks_mc_pz'] = ROOT.TH1F( \
+             tracker+'_ntracks_mc_pz', "No. MC Tracks in P_{z}", \
+                                                       PZ_BIN, PZ_MIN, PZ_MAX )
+
+    tracker_dict['track_efficiency'] = ROOT.TEfficiency( \
+        tracker+'_track_efficiency', "Track Efficiency in P_z and P_{#perp}", \
+                               PZ_BIN, PZ_MIN, PZ_MAX, PT_BIN, PT_MIN, PT_MAX )
+    tracker_dict['track_efficiency_pt'] = ROOT.TEfficiency( \
+    tracker+'_track_efficiency_pt', "Track Efficiency in P_{#perp}", \
+                                                       PT_BIN, PT_MIN, PT_MAX )
+    tracker_dict['track_efficiency_pz'] = ROOT.TEfficiency( \
+          tracker+'_track_efficiency_pz', "Track Efficiency in P_z", \
+                                                       PZ_BIN, PZ_MIN, PZ_MAX )
+
+
+
+    tracker_dict['x_residual_pt'] = ROOT.TH2F( \
+               tracker+'_x_residual_pt', "X Residuals in p_{t}", \
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+    tracker_dict['y_residual_pt'] = ROOT.TH2F( \
+               tracker+'_y_residual_pt', "Y Residuals in p_{t}", \
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+
+    tracker_dict['px_residual_pt'] = ROOT.TH2F( \
+              tracker+'_px_residual_pt', "p_{x} Residuals in p_{t}", \
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+    tracker_dict['py_residual_pt'] = ROOT.TH2F( \
+              tracker+'_py_residual_pt', "p_{y} Residuals in p_{t}", \
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+
+    tracker_dict['pt_residual_pt'] = ROOT.TH2F( \
+              tracker+'_pt_residual_pt', "p_{t} Residuals in p_{t}", \
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+    tracker_dict['pz_residual_pt'] = ROOT.TH2F( \
+              tracker+'_pz_residual_pt', "p_{z} Residuals in p_{t}", \
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+
+
+
+    tracker_dict['x_residual_pz'] = ROOT.TH2F( \
+               tracker+'_x_residual_pz', "X Residuals in p_{z}", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-  plot_dict['downstream_y_residual_pz'] = ROOT.TH2F( \
-               'downstream_y_residual_pz', "Downstream Y Residuals in p_{z}", \
+    tracker_dict['y_residual_pz'] = ROOT.TH2F( \
+               tracker+'_y_residual_pz', "Y Residuals in p_{z}", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
 
-  plot_dict['downstream_px_residual_pz'] = ROOT.TH2F( \
-          'downstream_px_residual_pz', "Downstream p_{x} Residuals in p_{z}", \
+    tracker_dict['mx_residual_pz'] = ROOT.TH2F( \
+               tracker+'_mx_residual_pz', "m_{x} Residuals in p_{z}", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -0.5, 0.5 )
+    tracker_dict['my_residual_pz'] = ROOT.TH2F( \
+               tracker+'_my_residual_pz', "m_{y} Residuals in p_{z}", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -0.5, 0.5 )
+
+    tracker_dict['px_residual_pz'] = ROOT.TH2F( \
+              tracker+'_px_residual_pz', "p_{x} Residuals in p_{z}", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-  plot_dict['downstream_py_residual_pz'] = ROOT.TH2F( \
-          'downstream_py_residual_pz', "Downstream p_{y} Residuals in p_{z}", \
+    tracker_dict['py_residual_pz'] = ROOT.TH2F( \
+              tracker+'_py_residual_pz', "p_{y} Residuals in p_{z}", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
 
-  plot_dict['downstream_pt_residual_pz'] = ROOT.TH2F( \
-          'downstream_pt_residual_pz', "Downstream p_{t} Residuals in p_{z}", \
+    tracker_dict['pt_residual_pz'] = ROOT.TH2F( \
+              tracker+'_pt_residual_pz', "p_{t} Residuals in p_{z}", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
-  plot_dict['downstream_pz_residual_pz'] = ROOT.TH2F( \
-          'downstream_pz_residual_pz', "Downstream p_{z} Residuals in p_{z}", \
+    tracker_dict['pz_residual_pz'] = ROOT.TH2F( \
+              tracker+'_pz_residual_pz', "p_{z} Residuals in p_{z}", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+
+
+    tracker_dict['mc_alpha'] = ROOT.TH2F( tracker+'_mc_alpha', \
+               "MC Alpha Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
+                                                               200, -2.0, 2.0 )
+    tracker_dict['mc_beta'] = ROOT.TH2F( tracker+'_mc_beta', \
+                "MC Beta Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
+                                                            1000, 0.0, 2500.0 )
+    tracker_dict['mc_emittance'] = ROOT.TH2F( tracker+'_mc_emittance', \
+           "MC Emittance Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
+                                                               500, 0.0, 20.0 )
+    tracker_dict['mc_momentum'] = ROOT.TH2F( \
+                           tracker+'_mc_momentum', "MC Momentum Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+
+    tracker_dict['recon_alpha'] = ROOT.TH2F( tracker+'_recon_alpha', \
+                  "Alpha Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
+                                                               200, -2.0, 2.0 )
+    tracker_dict['recon_beta'] = ROOT.TH2F( tracker+'_recon_beta', \
+                   "Beta Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
+                                                            1000, 0.0, 2500.0 )
+    tracker_dict['recon_emittance'] = ROOT.TH2F( \
+          tracker+'_recon_emittance', "Emittance Reconstruction Pz", \
+                                       PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
+    tracker_dict['recon_momentum'] = ROOT.TH2F( \
+                     tracker+'_recon_momentum', "Recon Momentum Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+
+    tracker_dict['residual_alpha'] = ROOT.TH2F( \
+             tracker+'_residual_alpha', "Alpha Residual Pz", PZ_BIN, \
+                                               PZ_MIN, PZ_MAX, 200, -1.0, 1.0 )
+    tracker_dict['residual_beta'] = ROOT.TH2F( \
+                       tracker+'_residual_beta', "Beta Residual Pz", \
+                                   PZ_BIN, PZ_MIN, PZ_MAX, 200, -100.0, 100.0 )
+    tracker_dict['residual_emittance'] = ROOT.TH2F( \
+             tracker+'_residual_emittance', "Emittance Residual Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+    tracker_dict['residual_momentum'] = ROOT.TH2F( \
+             tracker+'_residual_momentum', "Momentum Residual Pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+
+    plot_dict[tracker] = tracker_dict
+
+
+  missing_tracks = {}
+  for tracker in [ 'upstream', 'downstream' ] :
+    missing_tracker = {}
+
+    missing_tracker['x_y'] = ROOT.TH2F(tracker+'_x_y_missing', \
+        "Missing Tracks x:y", 400, -200.0, 200.0, 400, -200.0, 200.0 )
+    missing_tracker['px_py'] = ROOT.TH2F(tracker+'_px_py_missing', \
+        "Missing Tracks p_{x}:p_{y}", 400, -200.0, 200.0, 400, -200.0, 200.0 )
+    missing_tracker['x_px'] = ROOT.TH2F(tracker+'_x_px_missing', \
+        "Missing Tracks x:p_{x}", 400, -200.0, 200.0, 400, -200.0, 200.0 )
+    missing_tracker['y_py'] = ROOT.TH2F(tracker+'_y_py_missing', \
+        "Missing Tracks y:p_{y}", 400, -200.0, 200.0, 400, -200.0, 200.0 )
+    missing_tracker['x_py'] = ROOT.TH2F(tracker+'_x_py_missing', \
+        "Missing Tracks x:p_{y}", 400, -200.0, 200.0, 400, -200.0, 200.0 )
+    missing_tracker['y_px'] = ROOT.TH2F(tracker+'_y_px_missing', \
+        "Missing Tracks y:p_{x}", 400, -200.0, 200.0, 400, -200.0, 200.0 )
+    missing_tracker['pt'] = ROOT.TH1F(tracker+'_pt_missing', \
+                           "Missing Tracks pt", PT_BIN, PT_MIN, PT_MAX )
+    missing_tracker['pz'] = ROOT.TH1F(tracker+'_pz_missing', \
+                           "Missing Tracks pz", PZ_BIN, PZ_MIN, PZ_MAX )
+
+    missing_tracks[tracker] = missing_tracker
+
+  plot_dict['missing_tracks'] = missing_tracks
+
 
   for pl_id in range( -15, 0 ) + range( 1, 16 ) :
     pull_plot_name = 'kalman_pulls_{0:02d}'.format(pl_id)
-    plot_dict[pull_plot_name] = ROOT.TH1F( pull_plot_name, "Kalman Pulls", \
-                                                             101, -5.05, 5.05 )
-#   residual_plot_name = 'plane_residual_{0:02d}_xy'.format(pl_id)
-#   plot_dict[residual_plot_name] = ROOT.TH2F(residual_plot_name, \
-#                                  "Plane {0:02d} XY Residual".format(pl_id), \
-#                                           200, -20.0, 20.0, 200, -20.0, 20.0)
-#   residual_plot_name = 'plane_residual_{0:02d}_pxpy'.format(pl_id)
-#   plot_dict[residual_plot_name] = ROOT.TH2F(residual_plot_name, \
-#                                "Plane {0:02d} PxPy Residual".format(pl_id), \
-#                                           200, -20.0, 20.0, 200, -20.0, 20.0)
-
-
-
-  plot_dict['upstream_mc_alpha'] = ROOT.TH2F( 'upstream_mc_alpha', \
-               "Upstream MC Alpha Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
-                                                               200, -2.0, 2.0 )
-  plot_dict['upstream_mc_beta'] = ROOT.TH2F( 'upstream_mc_beta', \
-                "Upstream MC Beta Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
-                                                            1000, 0.0, 2500.0 )
-  plot_dict['upstream_mc_emittance'] = ROOT.TH2F( 'upstream_mc_emittance', \
-           "Upstream MC Emittance Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
-                                                               500, 0.0, 20.0 )
-  plot_dict['upstream_mc_momentum'] = ROOT.TH2F( \
-                           'upstream_mc_momentum', "Upstream MC Momentum Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
-
-  plot_dict['upstream_recon_alpha'] = ROOT.TH2F( 'upstream_recon_alpha', \
-                  "Upstream Alpha Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
-                                                               200, -2.0, 2.0 )
-  plot_dict['upstream_recon_beta'] = ROOT.TH2F( 'upstream_recon_beta', \
-                   "Upstream Beta Reconstruction Pz", PZ_BIN, PZ_MIN, PZ_MAX, \
-                                                            1000, 0.0, 2500.0 )
-  plot_dict['upstream_recon_emittance'] = ROOT.TH2F( \
-          'upstream_recon_emittance', "Upstream Emittance Reconstruction Pz", \
-                                       PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
-  plot_dict['upstream_recon_momentum'] = ROOT.TH2F( \
-                        'upstream_mc_momentum', "Upstream Recon Momentum Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
-
-  plot_dict['upstream_residual_alpha'] = ROOT.TH2F( \
-             'upstream_residual_alpha', "Upstream Alpha Residual Pz", PZ_BIN, \
-                                               PZ_MIN, PZ_MAX, 200, -1.0, 1.0 )
-  plot_dict['upstream_residual_beta'] = ROOT.TH2F( \
-                       'upstream_residual_beta', "Upstream Beta Residual Pz", \
-                                   PZ_BIN, PZ_MIN, PZ_MAX, 200, -100.0, 100.0 )
-  plot_dict['upstream_residual_emittance'] = ROOT.TH2F( \
-             'upstream_residual_emittance', "Upstream Emittance Residual Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
-  plot_dict['upstream_residual_momentum'] = ROOT.TH2F( \
-             'upstream_residual_momentum', "Upstream Momentum Residual Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+    plot_dict['pulls'][pull_plot_name] = ROOT.TH1F( \
+                             pull_plot_name, "Kalman Pulls", 101, -5.05, 5.05 )
 
 
 
 
-  plot_dict['downstream_mc_alpha'] = ROOT.TH2F( \
-              'downstream_mc_alpha', "Downstream MC Alpha Reconstruction Pz", \
-                                       PZ_BIN, PZ_MIN, PZ_MAX, 200, -2.0, 2.0 )
-  plot_dict['downstream_mc_beta'] = ROOT.TH2F( \
-                'downstream_mc_beta', "Downstream MC Beta Reconstruction Pz", \
-                                    PZ_BIN, PZ_MIN, PZ_MAX, 1000, 0.0, 2500.0 )
-  plot_dict['downstream_mc_emittance'] = ROOT.TH2F( \
-      'downstream_mc_emittance', "Downstream MC Emittance Reconstruction Pz", \
-                                       PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
-  plot_dict['downstream_mc_momentum'] = ROOT.TH2F( \
-                       'downstream_mc_momentum', "Downstream MC Momentum Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
 
-  plot_dict['downstream_recon_alpha'] = ROOT.TH2F( \
-              'downstream_recon_alpha', "Downstream Alpha Reconstruction Pz", \
-                                       PZ_BIN, PZ_MIN, PZ_MAX, 200, -2.0, 2.0 )
-  plot_dict['downstream_recon_beta'] = ROOT.TH2F( \
-                'downstream_recon_beta', "Downstream Beta Reconstruction Pz", \
-                                    PZ_BIN, PZ_MIN, PZ_MAX, 1000, 0.0, 2500.0 )
-  plot_dict['downstream_recon_emittance'] = ROOT.TH2F( \
-      'downstream_recon_emittance', "Downstream Emittance Reconstruction Pz", \
-                                       PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 20.0 )
-  plot_dict['downstream_recon_momentum'] = ROOT.TH2F( \
-                 'downstream_recon_momentum', "Downstream Recon Momentum Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+  data_dict = { 'counters' : {'upstream' : {}, 'downstream' : {} }, \
+                                                                  'data' : {} }
+  data_dict['counters']['number_events'] = 0
 
-  plot_dict['downstream_residual_alpha'] = ROOT.TH2F( \
-                 'downstream_residual_alpha', "Downstream Alpha Residual Pz", \
-                                       PZ_BIN, PZ_MIN, PZ_MAX, 200, -1.0, 1.0 )
-  plot_dict['downstream_residual_beta'] = ROOT.TH2F( \
-                   'downstream_residual_beta', "Downstream Beta Residual Pz", \
-                                   PZ_BIN, PZ_MIN, PZ_MAX, 200, -100.0, 100.0 )
-  plot_dict['downstream_residual_emittance'] = ROOT.TH2F( \
-         'downstream_residual_emittance', "Downstream Emittance Residual Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
-  plot_dict['downstream_residual_momentum'] = ROOT.TH2F( \
-           'downstream_residual_momentum', "Downstream Momentum Residual Pz", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 200, -10.0, 10.0 )
+  for tracker in ['upstream', 'downstream'] :
+    data_dict['counters'][tracker]['number_virtual'] = 0
+    data_dict['counters'][tracker]['missing_virtuals'] = 0
 
+    data_dict['counters'][tracker]['number_tracks'] = 0
+    data_dict['counters'][tracker]['number_candidates'] = 0
+    data_dict['counters'][tracker]['found_tracks'] = 0
+    data_dict['counters'][tracker]['wrong_track_type'] = 0
+    data_dict['counters'][tracker]['p_value_cut'] = 0
+    data_dict['counters'][tracker]['superfluous_track_events'] = 0
+    data_dict['counters'][tracker]['missing_tracks'] = 0
+    data_dict['counters'][tracker]['missing_reference_hits'] = 0
 
+    data_dict['counters'][tracker]['momentum_cut'] = 0
 
-  data_dict = { 'counters' : {}, 'data' : {} }
-  data_dict['counters']['missing_virtual_hits'] = 0
-  data_dict['counters']['missing_reference_hits'] = 0
-  data_dict['counters']['missing_tracks_up'] = 0
-  data_dict['counters']['missing_tracks_down'] = 0
-  data_dict['counters']['found_tracks_up'] = 0
-  data_dict['counters']['found_tracks_down'] = 0
-  data_dict['counters']['found_pairs'] = 0
+    data_dict['counters'][tracker]['found_pairs'] = 0
 
   return plot_dict, data_dict
 
@@ -423,31 +432,112 @@ def create_virtual_plane_dict(file_reader) :
   return virtual_plane_dict
 
 
+def inverse_virtual_plane_dict(virtual_plane_dict) :
+  """
+    Create the inverse lookup.
+  """
+  inverse_dict = {}
+  for num in range( -15, 0, 1 ) :
+    inverse_dict[virtual_plane_dict[num][0]] = num
+  for num in range( 1, 16, 1 ) :
+    inverse_dict[virtual_plane_dict[num][0]] = num
+
+  return inverse_dict
+
+
 def get_expected_tracks(mc_event, virtual_plane_dict) :
   upstream_planes = [ virtual_plane_dict[i][0] for i in range(-15, 0)]
   downstream_planes = [ virtual_plane_dict[i][0] for i in range(1, 16)]
 
-  upstream_hits = 0
-  downstream_hits = 0
+  upstream_track = None
+  downstream_track = None
 
-  upstream_tracks = 0
-  downstream_tracks = 0
+  upstream_hits = {}
+  downstream_hits = {}
 
   for vhit_num in xrange(mc_event.GetVirtualHitsSize()) :
     vhit = mc_event.GetAVirtualHit(vhit_num)
+    if vhit.GetParticleId() not in MUON_PID :
+      continue
+
     station_id = vhit.GetStationId()
+    radius = math.sqrt( vhit.GetPosition().x()**2 + vhit.GetPosition().y()**2 )
+    if radius > TRACKER_PLANE_RADIUS : 
+      continue
 
     if station_id in upstream_planes :
-      upstream_hits += 1
+      plane_id = INVERSE_PLANE_DICT[station_id]
+      upstream_hits[plane_id] = vhit
     if station_id in downstream_planes :
-      downstream_hits += 1
+      plane_id = INVERSE_PLANE_DICT[station_id]
+      downstream_hits[plane_id] = vhit
 
-  if upstream_hits > 10 :
-    upstream_tracks += 1
-  if downstream_hits > 10 :
-    downstream_tracks += 1
+  if TRACK_ALGORITHM == 1 :
+    if len(upstream_hits) > EXPECTED_HELIX_TRACKPOINTS :
+      upstream_track = upstream_hits
+    if len(downstream_hits) > EXPECTED_HELIX_TRACKPOINTS :
+      downstream_track = downstream_hits
+  elif TRACK_ALGORITHM == 0 :
+    if len(upstream_hits) > EXPECTED_STRAIGHT_TRACKPOINTS :
+      upstream_track = upstream_hits
+    if len(downstream_hits) > EXPECTED_STRAIGHT_TRACKPOINTS :
+      downstream_track = downstream_hits
+  else:
+    raise ValueError("Unknown track algorithm found!")
 
-  return upstream_tracks, downstream_tracks
+  return upstream_track, downstream_track
+
+
+def get_found_tracks(scifi_event, plot_dict, data_dict) :
+  """
+    Find all the single tracks that pass the cuts.
+  """
+  upstream_tracks = []
+  downstream_tracks = []
+
+  tracks = scifi_event.scifitracks()
+  for track in tracks :
+    if track.tracker() == 0 :
+      tracker = "upstream"
+    else :
+      tracker = "downstream"
+
+    data_dict['counters'][tracker]['number_tracks'] += 1
+
+    if track.GetAlgorithmUsed() != TRACK_ALGORITHM :
+      data_dict['counters'][tracker]['wrong_track_type'] += 1
+      continue
+
+    if track.P_value() < P_VALUE_CUT :
+      data_dict['counters'][tracker]['p_value_cut'] += 1
+      continue
+
+    data_dict['counters'][tracker]['number_candidates'] += 1
+
+
+    if track.tracker() == 0 :
+      upstream_tracks.append(track)
+    if track.tracker() == 1 :
+      downstream_tracks.append(track)
+
+  if len(upstream_tracks) > 1 :
+    data_dict['counters']['upstream']['superfluous_track_events'] += 1
+  if len(downstream_tracks) > 1 :
+    data_dict['counters']['downstream']['superfluous_track_events'] += 1
+
+  if len(upstream_tracks) == 1 :
+    upstream_track = upstream_tracks[0]
+    data_dict['counters']['upstream']['found_tracks'] += 1
+  else :
+    upstream_track = None
+
+  if len(downstream_tracks) == 1 :
+    downstream_track = downstream_tracks[0]
+    data_dict['counters']['downstream']['found_tracks'] += 1
+  else :
+    downstream_track = None
+
+  return upstream_track, downstream_track
 
 
 
@@ -459,82 +549,140 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
   paired_hits = []
 
   expected_up, expected_down = get_expected_tracks(mc_event, virtual_plane_dict)
+  found_up, found_down = get_found_tracks(scifi_event, plot_dict, data_dict)
 
-  tracks = scifi_event.scifitracks()
-  for track in tracks :
-    if track.GetAlgorithmUsed() != TRACK_ALGORITHM :
-      continue
-    trackpoints = track.scifitrackpoints()
-    trackpoint = None
+  downstream_pt = 0.0
+  downstream_pz = 0.0
 
-# Find a reference trackpoint
-    for trkpt in trackpoints :
-      pl_id = analysis.tools.calculate_plane_id(\
-                               trkpt.tracker(), trkpt.station(), trkpt.plane())
-      plot_name = 'kalman_pulls_{0:02d}'.format(pl_id)
-      plot_dict[plot_name].Fill( trkpt.pull() )
+  data_dict['counters']['number_events'] += 1
 
-      if trkpt.station() == RECON_STATION and trkpt.plane() == RECON_PLANE :
-        trackpoint = trkpt
-
-# Histogram the number of trackpoints
-    tracker = track.tracker()
-    pt = math.sqrt( trackpoint.mom().x()**2 + trackpoint.mom().y()**2 )
-    pz = trackpoint.mom().z()
-    tp_counter = 0
-    for trkpt in trackpoints :
-      if trkpt.has_data() :
-        tp_counter += 1
-
-    if tracker == 0 :
-      plot_dict['upstream_ntp'].Fill( tp_counter )
-      plot_dict['upstream_ntp_pt'].Fill( pt, tp_counter )
-      plot_dict['upstream_ntp_pz'].Fill( pz, tp_counter )
-    else :
-      plot_dict['downstream_ntp'].Fill( tp_counter )
-      plot_dict['downstream_ntp_pt'].Fill( pt, tp_counter )
-      plot_dict['downstream_ntp_pz'].Fill( pz, tp_counter )
-
-# If no data then give up!
-    if not trackpoint.has_data() :
-      data_dict['counters']['missing_reference_hits'] += 1
+  for tracker_num, tracker, scifi_track, virtual_track in \
+                            [ (0, "upstream", found_up, expected_up), \
+                              (1, "downstream", found_down, expected_down) ] :
+    if virtual_track is None :
       continue
 
-    expected_virtual_plane = virtual_plane_dict[\
-            analysis.tools.calculate_plane_id(\
-            trackpoint.tracker(), trackpoint.station(), trackpoint.plane())][0]
+    ref_plane = tools.calculate_plane_id(tracker_num,
+                                                    RECON_STATION, RECON_PLANE)
+    virtual_pt = 0.0
+    virtual_pz = 0.0
+    virtual_hits = 0
+    scifi_hits = 0
 
+    reference_virt = None
+    reference_scifi = None
 
-# Find the virtual hit
-    for vhit_num in xrange(mc_event.GetVirtualHitsSize()) :
-      vhit = mc_event.GetAVirtualHit(vhit_num)
-      if vhit.GetStationId() == expected_virtual_plane and \
-                                        abs(vhit.GetParticleId()) == MUON_PID :
-        virtual_hit = vhit
-        break
-    else :
-      data_dict['counters']['missing_virtual_hits'] += 1
+    for plane in virtual_track :
+      if virtual_track[plane] is not None :
+        hit = virtual_track[plane]
+        virtual_pt += math.sqrt(hit.GetMomentum().x()**2 + \
+                                                      hit.GetMomentum().y()**2)
+        virtual_pz += hit.GetMomentum().z()
+        virtual_hits += 1
+        if plane == ref_plane :
+          reference_virt = virtual_track[plane]
+
+    virtual_pt /= virtual_hits
+    virtual_pz /= virtual_hits
+    virtual_p = math.sqrt( virtual_pt**2 + virtual_pz**2 )
+    if virtual_p > P_MAX or virtual_p < P_MIN :
+      data_dict['counters'][tracker]['momentum_cut'] += 1
       continue
-
-# Add to list
-    paired_hits.append((trackpoint, virtual_hit))
-    data_dict['counters']['found_pairs'] += 1
-
-  found_up = 0
-  found_down = 0
-
-  for scifi_hit, _ in paired_hits :
-    if scifi_hit.tracker() == 0 :
-      found_up += 1
     else :
-      found_down += 1
-    
-  data_dict['counters']['missing_tracks_up'] += (expected_up - found_up)
-  data_dict['counters']['missing_tracks_down'] += (expected_down - found_down)
-  data_dict['counters']['found_tracks_up'] += found_up
-  data_dict['counters']['found_tracks_down'] += found_down
+      data_dict['counters'][tracker]['number_virtual'] += 1
+
+    plot_dict[tracker]['ntracks_mc_pt'].Fill( virtual_pt )
+    plot_dict[tracker]['ntracks_mc_pz'].Fill( virtual_pz )
+    plot_dict[tracker]['ntp_mc_pt'].Fill( virtual_pt, virtual_hits )
+    plot_dict[tracker]['ntp_mc_pz'].Fill( virtual_pz,  virtual_hits )
+
+    if scifi_track is None :
+      plot_dict[tracker]['track_efficiency'].Fill(False, virtual_pz, virtual_pt)
+      plot_dict[tracker]['track_efficiency_pt'].Fill(False, virtual_pt)
+      plot_dict[tracker]['track_efficiency_pz'].Fill(False, virtual_pz)
+      data_dict['counters'][tracker]['missing_tracks'] += 1
+#      for i in range(virtual_hits) :
+#        plot_dict[tracker]['trackpoint_efficiency'].Fill(False, virtual_pz,\
+#                                                                   virtual_pt)
+#        plot_dict[tracker]['trackpoint_efficiency_pt'].Fill(False, virtual_pt)
+#        plot_dict[tracker]['trackpoint_efficiency_pz'].Fill(False, virtual_pz)
+
+      if reference_virt is not None :
+        plot_dict['missing_tracks'][tracker]['x_y'].Fill( \
+            reference_virt.GetPosition().x(), reference_virt.GetPosition().y())
+        plot_dict['missing_tracks'][tracker]['px_py'].Fill( \
+            reference_virt.GetMomentum().x(), reference_virt.GetMomentum().y())
+        plot_dict['missing_tracks'][tracker]['x_px'].Fill( \
+            reference_virt.GetPosition().x(), reference_virt.GetMomentum().x())
+        plot_dict['missing_tracks'][tracker]['y_py'].Fill( \
+            reference_virt.GetPosition().y(), reference_virt.GetMomentum().y())
+        plot_dict['missing_tracks'][tracker]['x_py'].Fill( \
+            reference_virt.GetPosition().x(), reference_virt.GetMomentum().y())
+        plot_dict['missing_tracks'][tracker]['y_px'].Fill( \
+            reference_virt.GetPosition().y(), reference_virt.GetMomentum().x())
+        plot_dict['missing_tracks'][tracker]['pz'].Fill( virtual_pz )
+        plot_dict['missing_tracks'][tracker]['pt'].Fill( virtual_pt )
+
+      continue # Can't do anything else without a scifi track
+
+
+    for scifi_hit in scifi_track.scifitrackpoints() :
+      if scifi_hit.has_data() :
+        scifi_hits += 1
+
+        pl_id = analysis.tools.calculate_plane_id(scifi_hit.tracker(), \
+                                        scifi_hit.station(), scifi_hit.plane())
+        plot_name = 'kalman_pulls_{0:02d}'.format(pl_id)
+        plot_dict['pulls'][plot_name].Fill( scifi_hit.pull() )
+
+        if scifi_hit.station() == RECON_STATION and \
+                                             scifi_hit.plane() == RECON_PLANE :
+          reference_scifi = scifi_hit
+
+
+    plot_dict[tracker]['track_efficiency'].Fill(True, virtual_pz, virtual_pt)
+    plot_dict[tracker]['track_efficiency_pt'].Fill(True, virtual_pt)
+    plot_dict[tracker]['track_efficiency_pz'].Fill(True, virtual_pz)
+
+    plot_dict[tracker]['ntracks_pt'].Fill( virtual_pt )
+    plot_dict[tracker]['ntracks_pz'].Fill( virtual_pz )
+
+    plot_dict[tracker]['ntp'].Fill( scifi_hits )
+    plot_dict[tracker]['ntp_pt'].Fill( virtual_pt, scifi_hits )
+    plot_dict[tracker]['ntp_pz'].Fill( virtual_pz, scifi_hits )
+
+    if scifi_hits >= virtual_hits :
+      for i in range(virtual_hits) :
+        plot_dict[tracker]['trackpoint_efficiency'].Fill(True, \
+                                                        virtual_pz, virtual_pt)
+        plot_dict[tracker]['trackpoint_efficiency_pt'].Fill(True, virtual_pt)
+        plot_dict[tracker]['trackpoint_efficiency_pz'].Fill(True, virtual_pz)
+    else :
+      for i in range( virtual_hits - scifi_hits ) :
+        plot_dict[tracker]['trackpoint_efficiency'].Fill(False, \
+                                                        virtual_pz, virtual_pt)
+        plot_dict[tracker]['trackpoint_efficiency_pt'].Fill(False, virtual_pt)
+        plot_dict[tracker]['trackpoint_efficiency_pz'].Fill(False, virtual_pz)
+      for i in range( scifi_hits ) :
+        plot_dict[tracker]['trackpoint_efficiency'].Fill(True, \
+                                                        virtual_pz, virtual_pt)
+        plot_dict[tracker]['trackpoint_efficiency_pt'].Fill(True, virtual_pt)
+        plot_dict[tracker]['trackpoint_efficiency_pz'].Fill(True, virtual_pz)
+
+
+    if reference_virt is None :
+      data_dict['counters'][tracker]['missing_virtuals'] += 1
+
+    if reference_scifi is None :
+      data_dict['counters'][tracker]['missing_reference_hits'] += 1
+
+    if reference_virt is not None and reference_scifi is not None :
+      paired_hits.append( (reference_scifi, reference_virt) )
+      data_dict['counters'][tracker]['found_pairs'] += 1
+
 
   return paired_hits
+
 
 
 def fill_plots(plot_dict, data_dict, hit_pairs) :
@@ -542,15 +690,25 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     Fill Plots with Track and Residual Data
   """
   for scifi_hit, virt_hit in hit_pairs :
-    tracker = scifi_hit.tracker()
-    if tracker == 0 :
-      prefix = 'upstream_'
-      UP_COV_MC.add_hit(hit_types.AnalysisHit(virtual_track_point=virt_hit))
-      UP_COV_RECON.add_hit(hit_types.AnalysisHit(scifi_track_point=scifi_hit))
+    tracker_num = scifi_hit.tracker()
+    pz_bin = get_pz_bin( virt_hit.GetMomentum().z() )
+    if pz_bin >= PZ_BIN or pz_bin < 0 :
+      continue
+
+    mc_cov = None
+    recon_cov = None
+    if tracker_num == 0 :
+      tracker = 'upstream'
+      mc_cov = UP_COV_MC[pz_bin]
+      recon_cov = UP_COV_RECON[pz_bin]
     else :
-      prefix = 'downstream_'
-      DOWN_COV_MC.add_hit(hit_types.AnalysisHit(virtual_track_point=virt_hit))
-      DOWN_COV_RECON.add_hit(hit_types.AnalysisHit(scifi_track_point=scifi_hit))
+      tracker = 'downstream'
+      mc_cov = DOWN_COV_MC[pz_bin]
+      recon_cov = DOWN_COV_RECON[pz_bin]
+
+    tracker_plots = plot_dict[tracker]
+    mc_cov.add_hit(hit_types.AnalysisHit(virtual_track_point=virt_hit))
+    recon_cov.add_hit(hit_types.AnalysisHit(scifi_track_point=scifi_hit))
 
     scifi_pos = [scifi_hit.pos().x(), scifi_hit.pos().y(), scifi_hit.pos().z()]
     scifi_mom = [scifi_hit.mom().x(), scifi_hit.mom().y(), scifi_hit.mom().z()]
@@ -565,6 +723,8 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     res_mom = [ scifi_mom[0] - virt_mom[0], \
                 scifi_mom[1] - virt_mom[1], \
                 scifi_mom[2] - virt_mom[2] ]
+    res_gra = [ scifi_mom[0]/scifi_mom[2] - virt_mom[0]/virt_mom[2], \
+                scifi_mom[1]/scifi_mom[2] - virt_mom[1]/virt_mom[2] ]
 
     Pt_mc = math.sqrt( virt_mom[0] ** 2 + virt_mom[1] ** 2 )
     Pz_mc = virt_mom[2]
@@ -572,98 +732,68 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     Pt_recon = math.sqrt( scifi_mom[0] ** 2 + scifi_mom[1] ** 2 )
     Pt_res = Pt_recon - Pt_mc
 
-    plot_dict[prefix+'xy'].Fill(scifi_pos[0], scifi_pos[1])
-    plot_dict[prefix+'pxpy'].Fill(scifi_mom[0], scifi_mom[1])
-    plot_dict[prefix+'pt'].Fill(Pt_recon)
-    plot_dict[prefix+'pz'].Fill(scifi_mom[2])
+    tracker_plots['xy'].Fill(scifi_pos[0], scifi_pos[1])
+    tracker_plots['pxpy'].Fill(scifi_mom[0], scifi_mom[1])
+    tracker_plots['pt'].Fill(Pt_recon)
+    tracker_plots['pz'].Fill(scifi_mom[2])
 
-    plot_dict[prefix+'mc_xy'].Fill(virt_pos[0], virt_pos[1])
-    plot_dict[prefix+'mc_pxpy'].Fill(virt_mom[0], virt_mom[1])
-    plot_dict[prefix+'mc_pt'].Fill(Pt_mc)
-    plot_dict[prefix+'mc_pz'].Fill(Pz_mc)
+    tracker_plots['mc_xy'].Fill(virt_pos[0], virt_pos[1])
+    tracker_plots['mc_pxpy'].Fill(virt_mom[0], virt_mom[1])
+    tracker_plots['mc_pt'].Fill(Pt_mc)
+    tracker_plots['mc_pz'].Fill(Pz_mc)
 
-    plot_dict[prefix+'residual_xy'].Fill(res_pos[0], res_pos[1])
-    plot_dict[prefix+'residual_pxpy'].Fill(res_mom[0], res_mom[1])
-    plot_dict[prefix+'residual_pt'].Fill(Pt_res)
-    plot_dict[prefix+'residual_pz'].Fill(res_mom[2])
+    tracker_plots['residual_xy'].Fill(res_pos[0], res_pos[1])
+    tracker_plots['residual_pxpy'].Fill(res_mom[0], res_mom[1])
+    tracker_plots['residual_mxmy'].Fill(res_gra[0], res_gra[1])
+    tracker_plots['residual_pt'].Fill(Pt_res)
+    tracker_plots['residual_pz'].Fill(res_mom[2])
 
-    plot_dict[prefix+'x_residual_pt'].Fill( Pt_mc, res_pos[0] )
-    plot_dict[prefix+'y_residual_pt'].Fill( Pt_mc, res_pos[1] )
-    plot_dict[prefix+'px_residual_pt'].Fill( Pt_mc, res_mom[0] )
-    plot_dict[prefix+'py_residual_pt'].Fill( Pt_mc, res_mom[1] )
-    plot_dict[prefix+'pt_residual_pt'].Fill( Pt_mc, Pt_res )
-    plot_dict[prefix+'pz_residual_pt'].Fill( Pt_mc, res_mom[2] )
+    tracker_plots['x_residual_pt'].Fill( Pt_mc, res_pos[0] )
+    tracker_plots['y_residual_pt'].Fill( Pt_mc, res_pos[1] )
+    tracker_plots['px_residual_pt'].Fill( Pt_mc, res_mom[0] )
+    tracker_plots['py_residual_pt'].Fill( Pt_mc, res_mom[1] )
+    tracker_plots['pt_residual_pt'].Fill( Pt_mc, Pt_res )
+    tracker_plots['pz_residual_pt'].Fill( Pt_mc, res_mom[2] )
 
-    plot_dict[prefix+'x_residual_pz'].Fill( Pz_mc, res_pos[0] )
-    plot_dict[prefix+'y_residual_pz'].Fill( Pz_mc, res_pos[1] )
-    plot_dict[prefix+'px_residual_pz'].Fill( Pz_mc, res_mom[0] )
-    plot_dict[prefix+'py_residual_pz'].Fill( Pz_mc, res_mom[1] )
-    plot_dict[prefix+'pt_residual_pz'].Fill( Pz_mc, Pt_res )
-    plot_dict[prefix+'pz_residual_pz'].Fill( Pz_mc, res_mom[2] )
+    tracker_plots['x_residual_pz'].Fill( Pz_mc, res_pos[0] )
+    tracker_plots['y_residual_pz'].Fill( Pz_mc, res_pos[1] )
+    tracker_plots['mx_residual_pz'].Fill( Pz_mc, res_gra[0] )
+    tracker_plots['my_residual_pz'].Fill( Pz_mc, res_gra[1] )
+    tracker_plots['px_residual_pz'].Fill( Pz_mc, res_mom[0] )
+    tracker_plots['py_residual_pz'].Fill( Pz_mc, res_mom[1] )
+    tracker_plots['pt_residual_pz'].Fill( Pz_mc, Pt_res )
+    tracker_plots['pz_residual_pz'].Fill( Pz_mc, res_mom[2] )
 
-    if UP_COV_MC.length() == ENSEMBLE_SIZE :
-      up_pz = UP_COV_MC.get_mean('pz')
-      plot_dict['upstream_mc_alpha'].Fill(up_pz, UP_COV_MC.get_alpha(['x','y']))
-      plot_dict['upstream_mc_beta'].Fill(up_pz, UP_COV_MC.get_beta(['x','y']))
-      plot_dict['upstream_mc_emittance'].Fill(up_pz, UP_COV_MC.get_emittance(\
-                                                          ['x','px','y','py']))
-      plot_dict['upstream_mc_momentum'].Fill(up_pz, UP_COV_MC.get_momentum())
+    if mc_cov.length() == ENSEMBLE_SIZE :
+      pz = mc_cov.get_mean('pz')
+      tracker_plots['mc_alpha'].Fill(pz, mc_cov.get_alpha(['x','y']))
+      tracker_plots['mc_beta'].Fill(pz, mc_cov.get_beta(['x','y']))
+      tracker_plots['mc_emittance'].Fill(pz, mc_cov.get_emittance(\
+                                                 ['x','px','y','py']))
+      tracker_plots['mc_momentum'].Fill(pz, mc_cov.get_momentum())
 
-      plot_dict['upstream_recon_alpha'].Fill(up_pz, UP_COV_RECON.get_alpha(\
-                                                                    ['x','y']))
-      plot_dict['upstream_recon_beta'].Fill(up_pz, UP_COV_RECON.get_beta(\
-                                                                    ['x','y']))
-      plot_dict['upstream_recon_emittance'].Fill(up_pz, \
-                               UP_COV_RECON.get_emittance(['x','px','y','py']))
-      plot_dict['upstream_recon_momentum'].Fill(up_pz, \
-                                                   UP_COV_RECON.get_momentum())
+      tracker_plots['recon_alpha'].Fill(pz, recon_cov.get_alpha(\
+                                                           ['x','y']))
+      tracker_plots['recon_beta'].Fill(pz, recon_cov.get_beta(\
+                                                           ['x','y']))
+      tracker_plots['recon_emittance'].Fill(pz, \
+                      recon_cov.get_emittance(['x','px','y','py']))
+      tracker_plots['recon_momentum'].Fill(pz, \
+                                                   recon_cov.get_momentum())
 
-      plot_dict['upstream_residual_alpha'].Fill(up_pz, \
-            UP_COV_RECON.get_alpha(['x','y']) - UP_COV_MC.get_alpha(['x','y']))
-      plot_dict['upstream_residual_beta'].Fill(up_pz, \
-              UP_COV_RECON.get_beta(['x','y']) - UP_COV_MC.get_beta(['x','y']))
-      plot_dict['upstream_residual_emittance'].Fill(up_pz, \
-                            UP_COV_RECON.get_emittance(['x','px','y','py']) - \
-                                  UP_COV_MC.get_emittance(['x','px','y','py']))
-      plot_dict['upstream_residual_momentum'].Fill(up_pz, \
-                        UP_COV_RECON.get_momentum() - UP_COV_MC.get_momentum())
+      tracker_plots['residual_alpha'].Fill(pz, \
+            recon_cov.get_alpha(['x','y']) - mc_cov.get_alpha(['x','y']))
+      tracker_plots['residual_beta'].Fill(pz, \
+              recon_cov.get_beta(['x','y']) - mc_cov.get_beta(['x','y']))
+      tracker_plots['residual_emittance'].Fill(pz, \
+                            recon_cov.get_emittance(['x','px','y','py']) - \
+                                  mc_cov.get_emittance(['x','px','y','py']))
+      tracker_plots['residual_momentum'].Fill(pz, \
+                        recon_cov.get_momentum() - mc_cov.get_momentum())
 
-      UP_COV_MC.clear()
-      UP_COV_RECON.clear()
+      mc_cov.clear()
+      recon_cov.clear()
 
-
-    if DOWN_COV_MC.length() == ENSEMBLE_SIZE :
-      down_pz = UP_COV_MC.get_mean('pz')
-      plot_dict['downstream_mc_alpha'].Fill(down_pz, \
-                                              DOWN_COV_MC.get_alpha(['x','y']))
-      plot_dict['downstream_mc_beta'].Fill(down_pz, \
-                                               DOWN_COV_MC.get_beta(['x','y']))
-      plot_dict['downstream_mc_emittance'].Fill(down_pz, \
-                                DOWN_COV_MC.get_emittance(['x','px','y','py']))
-      plot_dict['downstream_mc_momentum'].Fill(down_pz, \
-                                                    DOWN_COV_MC.get_momentum())
-
-      plot_dict['downstream_recon_alpha'].Fill(down_pz, \
-                                           DOWN_COV_RECON.get_alpha(['x','y']))
-      plot_dict['downstream_recon_beta'].Fill(down_pz, \
-                                            DOWN_COV_RECON.get_beta(['x','y']))
-      plot_dict['downstream_recon_emittance'].Fill(down_pz, \
-                             DOWN_COV_RECON.get_emittance(['x','px','y','py']))
-      plot_dict['downstream_recon_momentum'].Fill(down_pz, \
-                                                 DOWN_COV_RECON.get_momentum())
-
-      plot_dict['downstream_residual_alpha'].Fill(down_pz, \
-        DOWN_COV_RECON.get_alpha(['x','y']) - DOWN_COV_MC.get_alpha(['x','y']))
-      plot_dict['downstream_residual_beta'].Fill(down_pz, \
-          DOWN_COV_RECON.get_beta(['x','y']) - DOWN_COV_MC.get_beta(['x','y']))
-      plot_dict['downstream_residual_emittance'].Fill(down_pz, \
-                          DOWN_COV_RECON.get_emittance(['x','px','y','py']) - \
-                                DOWN_COV_MC.get_emittance(['x','px','y','py']))
-      plot_dict['downstream_residual_momentum'].Fill(down_pz, \
-                    DOWN_COV_RECON.get_momentum() - DOWN_COV_MC.get_momentum())
-
-      DOWN_COV_MC.clear()
-      DOWN_COV_RECON.clear()
 
 
 def analyse_plots(plot_dict, data_dict) :
@@ -672,190 +802,98 @@ def analyse_plots(plot_dict, data_dict) :
   """
 # Print out some simple stats
   print
+  print "There were:"
+  print "  {0:0.0f} Events".format( data_dict['counters']['number_events'] )
+  print "  {0:0.0f} Upstream Tracks".format( \
+                           data_dict['counters']['upstream']['number_tracks'] )
+  print "  {0:0.0f} Downstream Tracks".format( \
+                         data_dict['counters']['downstream']['number_tracks'] )
+  print "  {0:0.0f} Upstream Vitual Tracks".format( \
+                          data_dict['counters']['upstream']['number_virtual'] )
+  print "  {0:0.0f} Downstream Virtual Tracks".format( \
+                          data_dict['counters']['upstream']['number_virtual'] )
+  print "  Excluded {0:0.0f} Upstream Tracks outside momentum window".format( \
+                            data_dict['counters']['upstream']['momentum_cut'] )
+  print "  Excluded {0:0.0f} Downstream Tracks outside momentum window".format(\
+                            data_dict['counters']['upstream']['momentum_cut'] )
   print
-  print "Missed {0:0.0f} Virtual Hits".format( \
-                                data_dict['counters']['missing_virtual_hits'] )
-  print "Missed {0:0.0f} Reference Plane Hits".format( \
-                              data_dict['counters']['missing_reference_hits'] )
+  print "Found {0:0.0f} Upstream Tracks of the wrong type".format( \
+                        data_dict['counters']['upstream']['wrong_track_type'] )
+  print "Found {0:0.0f} Downstream Tracks of the wrong type".format( \
+                      data_dict['counters']['downstream']['wrong_track_type'] )
+  print "Cut {0:0.0f} Upstream Tracks (P-Value Cut)".format( \
+                             data_dict['counters']['upstream']['p_value_cut'] )
+  print "Cut {0:0.0f} Downstream Tracks (P-Value Cut)".format( \
+                           data_dict['counters']['downstream']['p_value_cut'] )
+  print
+  print "{0:0.0f} Upstream Tracks for analysis".format( \
+                       data_dict['counters']['upstream']['number_candidates'] )
+  print "{0:0.0f} Downstream Tracks for analysis".format( \
+                     data_dict['counters']['downstream']['number_candidates'] )
+  print
+  print "Missed {0:0.0f} Upstream Virtual Hits".format( \
+                        data_dict['counters']['upstream']['missing_virtuals'] )
+  print "Missed {0:0.0f} Downstream Virtual Hits".format( \
+                      data_dict['counters']['downstream']['missing_virtuals'] )
+  print "Missed {0:0.0f} Upstream Reference Plane Hits".format( \
+                  data_dict['counters']['upstream']['missing_reference_hits'] )
+  print "Missed {0:0.0f} Downstream Reference Plane Hits".format( \
+                data_dict['counters']['downstream']['missing_reference_hits'] )
   print "Missed {0:0.0f} Upstream Tracks".format( \
-                              data_dict['counters']['missing_tracks_up'] )
+                          data_dict['counters']['upstream']['missing_tracks'] )
   print "Missed {0:0.0f} Downstream Tracks".format( \
-                              data_dict['counters']['missing_tracks_down'] )
-  print "Found {0:0.0f} Upstream Tracks".format( \
-                                     data_dict['counters']['found_tracks_up'] )
-  print "Found {0:0.0f} Downstream Tracks".format( \
-                                   data_dict['counters']['found_tracks_down'] )
+                        data_dict['counters']['downstream']['missing_tracks'] )
+  print
+  print "Matched {0:0.0f} Upstream Tracks".format( \
+                            data_dict['counters']['upstream']['found_tracks'] )
+  print "Matched {0:0.0f} Downstream Tracks".format( \
+                          data_dict['counters']['downstream']['found_tracks'] )
+
+  print
+  print "Found {0:0.0f} Upstream Superfluous Track Events".format( \
+                data_dict['counters']['upstream']['superfluous_track_events'] )
+  print "Found {0:0.0f} Downstream Superfluous Track Events".format( \
+              data_dict['counters']['downstream']['superfluous_track_events'] )
   print
 
 # Make the pretty plots
 
-  for tracker_prefix in [ "upstream_", "downstream_" ] :
+  for tracker in [ "upstream", "downstream" ] :
     for component in [ "x_", "y_", "px_", "py_", "pt_", "pz_" ] :
       for plot_axis in [ "residual_pt", "residual_pz" ] :
-        plot = plot_dict[tracker_prefix+component+plot_axis]
+        plot = plot_dict[tracker][component+plot_axis]
 
         errors = array.array( 'd' )
         bin_size = array.array( 'd' )
         bins = array.array( 'd' )
         rms = array.array( 'd' )
 
-        width = int( plot.GetNbinsX() / RESOLUTION_BINS )
-        for i in range( 0, RESOLUTION_BINS-1 ) :
+#        width = int( plot.GetNbinsX() / RESOLUTION_BINS )
+        width = plot.GetXaxis().GetBinWidth(1)
+        for i in range( 0, plot.GetXaxis().GetNbins() ) :
           projection = plot.ProjectionY( \
-      tracker_prefix+component+plot_axis+'_pro_'+str(i), i*width, (i+1)*width )
+      tracker+component+plot_axis+'_pro_'+str(i), i, (i+1) )
+#      tracker+component+plot_axis+'_pro_'+str(i), i*width, (i+1)*width )
 
-          plot_mean = plot.GetXaxis().GetBinCenter( i*width ) + width*0.5
-#          pro_mean, pro_mean_err, pro_std, pro_std_err = \
+#          plot_mean = plot.GetXaxis().GetBinCenter( i*width ) + width*0.5
+          plot_mean = plot.GetXaxis().GetBinCenter( i ) + width
           _, _, pro_std, pro_std_err = \
                                         analysis.tools.fit_gaussian(projection)
-
-#          plot.GetXaxis().SetRange( i*width, (i+1)*width )
-#          plot_rms = plot.GetRMS( 2 )
 
           bin_size.append( width*0.5 )
           errors.append( pro_std_err )
           bins.append( plot_mean )
           rms.append( pro_std )
 
-        resolution_graph = ROOT.TGraphErrors( RESOLUTION_BINS-1, \
+        if len(bins) != 0 :
+          resolution_graph = ROOT.TGraphErrors( len(bins), \
                                                   bins, rms, bin_size, errors )
+        else :
+          resolution_graph = None
 
-        plot_dict[tracker_prefix+component+plot_axis+'_resolution'] = \
+        plot_dict[tracker][component+plot_axis+'_resolution'] = \
                                                                resolution_graph
-
-      for plot_axis in [ "pt", "pz" ] :
-        plot = plot_dict[tracker_prefix+"ntp_"+plot_axis]
-
-        errors = array.array( 'd' )
-        bin_size = array.array( 'd' )
-        bins = array.array( 'd' )
-        eff = array.array( 'd' )
-
-        width = int( plot.GetNbinsX() / EFFICIENCY_BINS )
-        for i in range( 0, EFFICIENCY_BINS-1 ) :
-          projection = plot.ProjectionY( \
-      tracker_prefix+component+plot_axis+'_pro_'+str(i), i*width, (i+1)*width )
-
-          plot_mean = plot.GetXaxis().GetBinCenter( i*width ) + width*0.5
-          plot_entries = projection.GetEntries()
-
-          if plot_entries == 0 :
-            continue
-
-          integral = 0.0
-          expected = plot_entries * 15.0
-          for bin_num in range( 1, 16 ) :
-            val = bin_num * projection.GetBinContent( bin_num )
-            integral += val
-
-          bin_size.append( width*0.5 )
-          errors.append( 100.0 / math.sqrt( plot_entries ) )
-          bins.append( plot_mean )
-          eff.append( 100.0 * integral / expected )
-
-        resolution_graph = ROOT.TGraphErrors( EFFICIENCY_BINS-1, \
-                                                  bins, eff, bin_size, errors )
-
-        plot_dict[tracker_prefix+plot_axis+'_efficiency'] = resolution_graph
-
   return data_dict
-
-
-def save_plots(plot_dict, directory, filename, print_plots=False) :
-  """
-    Save all the plots to file
-  """
-  filename = os.path.join(directory, filename+".root")
-  if print_plots :
-    outfile = ROOT.TFile(filename, "RECREATE")
-    for plot in sorted(plot_dict) :
-      plot_dict[plot].Write()
-      name = plot_dict[plot].GetName()
-      canvas = ROOT.TCanvas(name+"_canvas")
-      plot_dict[plot].Draw()
-      canvas.SaveAs( os.path.join( directory, name+".pdf" ) )
-    outfile.Close()
-  else :
-    outfile = ROOT.TFile(filename, "RECREATE")
-    for plot in sorted(plot_dict) :
-      plot_dict[plot].Write( plot )
-    outfile.Close()
-
-def save_pretty(plot_dict, output_directory) :
-  """
-    Save the required plots after some beautification
-  """
-  for tracker_prefix in [ "upstream_", "downstream_" ] :
-    for component, comp_title in [ ("pt_", "#sigma_{p_{#perp}}  [MeV/c]"), \
-                                         ("pz_", "#sigma_{p_{z}}  [MeV/c]") ] :
-      for plot_axis, axis_title in [ ("residual_pt", "p_{#perp}  [MeV/c]"), \
-                                          ("residual_pz", "p_{z}  [MeV/c]") ] :
-        plot = plot_dict[tracker_prefix+component+plot_axis+'_resolution']
-        canvas = ROOT.TCanvas( tracker_prefix+component+plot_axis+'_canvas' )
-
-        plot.Draw()
-
-        plot.GetXaxis().SetTitle(axis_title)
-        plot.GetYaxis().SetTitle(comp_title)
-      
-        canvas.Update()
-
-        out_file_name = os.path.join( output_directory, \
-                         tracker_prefix+component+plot_axis+'_resolution.pdf' )
-        canvas.SaveAs( out_file_name, 'pdf' )
-        
-
-      for tracker_prefix in [ "upstream_", "downstream_" ] :
-        for plot_axis, axis_title in [ ("pt", "p_{#perp}  [MeV/c]"), \
-                                                   ("pz", "p_{z}  [MeV/c]") ] :
-          plot = plot_dict[tracker_prefix+plot_axis+'_efficiency']
-          canvas = ROOT.TCanvas( tracker_prefix+plot_axis+'_canvas' )
-
-          plot.Draw()
-
-          plot.GetXaxis().SetTitle(axis_title)
-          plot.GetYaxis().SetTitle(comp_title)
-        
-          canvas.Update()
-
-          out_file_name = os.path.join( output_directory, \
-                                   tracker_prefix+plot_axis+'_efficiency.pdf' )
-          canvas.SaveAs( out_file_name, 'pdf' )
-
-
-  ROOT.gStyle.SetOptStat(0)
-  for tracker, mult in [ ("upstream", -1.0), ("downstream", 1.0) ] :
-    canvas = ROOT.TCanvas( tracker+"_pulls" )
-    canvas.Divide(3, 5, 0, 0)
-    for pl_num in range( 1, 16 ) :
-      pl_id = int(mult*pl_num)
-      plot_name = 'kalman_pulls_{0:02d}'.format(pl_id)
-      plot = plot_dict[plot_name]
-
-      canvas.cd(pl_num)
-      plot.Draw()
-      canvas.GetPad(pl_num).SetLogy()
-
-    out_file_name = os.path.join( output_directory, \
-                                                  tracker+'_kalman_pulls.pdf' )
-    canvas.SaveAs(out_file_name, 'pdf')
-
-  for tracker in [ "upstream", "downstream" ] :
-    for component, axis_title in [ ("pt", "p_{#perp}  [MeV/c]"), \
-                                                   ("pz", "p_{z}  [MeV/c]") ] :
-      plot = plot_dict[tracker+'_residual_'+component]
-
-      canvas = ROOT.TCanvas(tracker+'_residual_'+component+'_canvas')
-      plot.Draw()
-
-      plot.GetXaxis().SetTitle(axis_title)
-      plot.GetYaxis().SetTitle("Frequency")
-      canvas.Update()
-
-      out_file_name = os.path.join( output_directory, \
-                                        tracker+'_residual_'+component+'.pdf' )
-      canvas.SaveAs( out_file_name, 'pdf' )
-
 
 
 if __name__ == "__main__" : 
@@ -883,6 +921,9 @@ if __name__ == "__main__" :
   parser.add_argument( '--cut_number_trackpoints', type=int, default=0, \
           help="Specify the minumum number of trackpoints required per track" )
 
+  parser.add_argument( '--cut_p_value', type=float, default=0.0, \
+  help="Specify the P-Value below which tracks are removed from the analysis" )
+
   parser.add_argument( '--track_algorithm', type=int, default=1, \
                           help="Specify the track reconstruction algorithm. "+\
                              "1 for Helical Tracks and 0 for Straight Tracks" )
@@ -891,15 +932,53 @@ if __name__ == "__main__" :
                         help="Specify the size of the ensemble of particles "+\
                                      "to consider per emittance measurement." )
 
+  parser.add_argument( '--pz_bin', type=float, default=PZ_BIN_WIDTH, \
+             help="Specify the size of the Pz bins which are used to select "+\
+                     "particles for the reconstruction of optical functions." )
+  parser.add_argument( '--pz_window', type=float, nargs=2, \
+        default=[PZ_MIN, PZ_MAX], help="Specify the range of Pz to consider "+\
+                               "for the reconstruction of optical functions." )
+
+  parser.add_argument( '--pt_bin', type=float, default=PT_BIN_WIDTH, \
+             help="Specify the size of the Pt bins which are used to select "+\
+                     "particles for the reconstruction of optical functions." )
+  parser.add_argument( '--pt_window', type=float, nargs=2, \
+        default=[PT_MIN, PT_MAX], help="Specify the range of Pt to consider "+\
+                               "for the reconstruction of optical functions." )
+
+  parser.add_argument( '--p_window', type=float, nargs=2, \
+             default=[P_MIN, P_MAX], help="Specify the range of the total " + \
+                                         "momentum to consider for analysis." )
+
+
+
+  parser.add_argument( '--not_require_cluster', action="store_true", \
+        help="Don't require a cluster in the reference plane" )
+
 #  parser.add_argument( '-C', '--configuration_file', help='Configuration '+\
 #      'file for the reconstruction. I need the geometry information' )
 
   try :
     namespace = parser.parse_args()
 
-    MIN_NUMBER_TRACKPOINTS = namespace.cut_number_trackpoints
+    EXPECTED_HELIX_TRACKPOINTS = namespace.cut_number_trackpoints
+    EXPECTED_STRAIGHT_TRACKPOINTS = namespace.cut_number_trackpoints
+    P_VALUE_CUT = namespace.cut_p_value
     TRACK_ALGORITHM = namespace.track_algorithm
     ENSEMBLE_SIZE = namespace.ensemble_size
+    if namespace.not_require_cluster :
+      REQUIRE_DATA = False
+
+    P_MIN = namespace.p_window[0]
+    P_MAX = namespace.p_window[1]
+
+    PZ_MIN = namespace.pz_window[0]
+    PZ_MAX = namespace.pz_window[1]
+    PZ_BIN_WIDTH = namespace.pz_bin
+
+    PT_MIN = namespace.pt_window[0]
+    PT_MAX = namespace.pt_window[1]
+    PT_BIN_WIDTH = namespace.pt_bin
   except BaseException as ex:
     raise
   else :
@@ -918,6 +997,8 @@ if __name__ == "__main__" :
     sys.stdout.write( "\n- Finding Virtual Planes : Running\r" )
     sys.stdout.flush()
     virtual_plane_dictionary = create_virtual_plane_dict(file_reader)
+    VIRTUAL_PLANE_DICT = virtual_plane_dictionary
+    INVERSE_PLANE_DICT = inverse_virtual_plane_dict(virtual_plane_dictionary)
     sys.stdout.write(   "- Finding Virtual Planes : Done   \n" )
 
 ##### 4. Load Events ##########################################################
@@ -967,8 +1048,10 @@ if __name__ == "__main__" :
     sys.stdout.flush()
 #    save_pretty(plot_dict, namespace.output_directory )
 
-    save_plots(plot_dict, namespace.output_directory, \
-                              namespace.output_filename, namespace.print_plots)
+#    save_plots(plot_dict, namespace.output_directory, \
+#                              namespace.output_filename, namespace.print_plots)
+    analysis.tools.save_plots(plot_dict, os.path.join( \
+               namespace.output_directory, namespace.output_filename)+'.root' )
     sys.stdout.write(   "- Saving Plots and Data : Done   \n" )
 
   print 
