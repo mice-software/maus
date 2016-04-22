@@ -208,6 +208,8 @@ class SciFiGeometryHelper {
 
   SciFiMaterialParams MylarParameters;
 
+  bool UseActiveRotations;
+
   double _default_momentum;
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS
