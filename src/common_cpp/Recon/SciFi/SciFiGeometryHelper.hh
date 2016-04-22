@@ -205,7 +205,7 @@ class SciFiGeometryHelper {
   SciFiMaterialParams GasParameters;
 
   SciFiMaterialParams MylarParameters;
-  
+
   bool UseActiveRotations;
 
   double _default_momentum;
