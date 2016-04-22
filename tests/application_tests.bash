@@ -17,18 +17,27 @@ MAUS_TEST_PLOT_DIR=${MAUS_ROOT_DIR}/tests/integration/plots/ \
 python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v \
 --exclude-dir tests/integration/test_simulation/test_physics_model_full \
 --exclude-dir tests/integration/test_utilities/test_execute_against_data \
+--exclude-dir tests/integration/test_utilities/test_geometry \
 ${MAUS_ROOT_DIR}/tests/integration
 
-# We run test_execute_against_data separately so captured logging can be turned off
+# We run a few tests separately so captured logging can be turned off
 # to stop the splurge of suds output when the preprod cdb is unreachable
 
 echo
-echo "INFO: Running test_execute_against_data"
+echo "INFO: Running integration tests : test_execute_against_data"
 echo
 
 python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v --nologcapture \
 ${MAUS_ROOT_DIR}/tests/integration/test_utilities/test_execute_against_data
 
 echo
+echo "INFO: Running integration tests : test_geometry"
+echo
+
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v --nologcapture \
+${MAUS_ROOT_DIR}/tests/integration/test_utilities/test_geometry
+
+echo
 echo "INFO: Integration tests complete"
 echo
+
