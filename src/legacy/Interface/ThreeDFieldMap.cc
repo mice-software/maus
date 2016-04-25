@@ -229,9 +229,11 @@ const double* ThreeDFieldMap::Symmetry(const double Point[4]) const
 	}
 	else if(_symmetry == solenoid)
 	{
-		pointAndScale[0] = fabs(Point[0]);	// f(x) = f(-x)
-		pointAndScale[1] = fabs(Point[1]);	// f(y) = f(-y)
+		pointAndScale[0] = fabs(Point[0]);	// f(x) = f(-x) in the map
+		pointAndScale[1] = fabs(Point[1]);	// f(y) = f(-y) in the map
 		pointAndScale[2] = Point[2];		// The symetry is radial, not along z
+		if(Point[0] < 0) pointAndScale[4] = -1; // Bx(-x) = -Bx(x)
+		if(Point[1] < 0) pointAndScale[5] = -1; // By(-y) = -By(y)
 	}
 
 //	for(int i=0; i<7; i++) std::cout << " @" << pointAndScale[i] << "@ ";

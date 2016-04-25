@@ -356,7 +356,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             # print pos_det
             u = ['x', 'y', 'z']            
             if name.find('Tracker0') >= 0: 
-                rot_det[0] = -rot[0]
+                rot_det[0] = -rot_det[0]
             for i in [0, 1, 2]:
                 corrphys.xpathEval("position")[0].setProp(u[i], \
                                                           str(pos[i]))

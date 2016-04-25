@@ -103,11 +103,6 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   // lenght of the tube of fibre
   G4double tlen = 1.0 * mm;
 
-  // the number of fibres to be simulated
-//  _numFibres = (G4int)floor(2. * ar / (0.5 * fp));
-//  _numFibres = (G4int)(2.0*(cf+0.5)*7.0);
-//  ar = 0.5*((_numFibres)*(fp/2.0)+fd);
-
   // Beginning of the fiber core definitions
   solidCore = new G4Tubs(coreName, 0.0, cd / 2., tlen, 0.0 * deg, 360.0 * deg);
 

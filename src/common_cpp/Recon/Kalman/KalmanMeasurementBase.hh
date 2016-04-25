@@ -26,6 +26,15 @@ namespace Kalman {
   /** @class Measurement_base
    *
    *  @brief Orchastrates the measurement proceedure
+   * 
+   *  Applies a measurement matrix to a state vector such that the measured state vector can be 
+   *   used in the Kalman Filter proceedure.
+   *
+   *  This class does not require knowledge of the value of the measurement-noise, as that is 
+   *   only required when in the presence of data, not prediction.
+   *
+   *  The real data values should be stored with a covariance matrix that describes the noise 
+   *   associated with that measurement.
    */
   class Measurement_base {
     public :
@@ -41,14 +50,6 @@ namespace Kalman {
       /** @brief Returns the last Kalman Measurement Matrix at the current state
        */
       TMatrixD GetMeasurementMatrix() const { return TMatrixD(MeasurementMatrix()); }
-
-      /** @brief Returns the covariance matrix of measurement noise
-       */
-      virtual TMatrixD CalculateMeasurementNoise(const State& state) = 0;
-
-      /** @brief Returns the covariance matrix of measurement noise
-       */
-      TMatrixD GetMeasurementNoise() const { return TMatrixD(MeasurementNoise()); }
 
       /** @brief Return dimension of state vector
        */
@@ -71,8 +72,6 @@ namespace Kalman {
       virtual TMatrixD& MeasurementMatrix() { return _base_measurement_matrix; }
       virtual const TMatrixD& MeasurementMatrix() const { return _base_measurement_matrix; }
 
-      virtual TMatrixD& MeasurementNoise() { return _base_measurement_noise; }
-      virtual const TMatrixD& MeasurementNoise() const { return _base_measurement_noise; }
     private :
 
       unsigned int _dimension;
@@ -80,7 +79,6 @@ namespace Kalman {
 
       TMatrixD _base_measurement_matrix;
       TMatrixD _base_measurement_matrix_transpose;
-      TMatrixD _base_measurement_noise;
   };
 
 } // namespace Kalman

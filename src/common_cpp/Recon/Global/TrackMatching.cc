@@ -85,11 +85,6 @@ void TrackMatching::USTrack() {
           new DataStructure::Global::Track();
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching-US");
       hypothesis_track->set_pid(pids[i]);
-      MatchTrackPoint(position, momentum, TOF0_tp, pids[i], field, "TOF0",
-                      hypothesis_track);
-      MatchTrackPoint(position, momentum, TOF1_tp, pids[i], field, "TOF1",
-                      hypothesis_track);
-
       // No matching criterion for Cherenkov hits, so if they exist, we add them
       if (CkovA_tp.size() > 0) {
         Squeak::mout(Squeak::debug) << "TrackMatching: CkovA Added" << std::endl;
@@ -99,6 +94,19 @@ void TrackMatching::USTrack() {
         Squeak::mout(Squeak::debug) << "TrackMatching: CkovB Added" << std::endl;
         hypothesis_track->AddTrackPoint(CkovB_tp.at(0));
       }
+      MatchTrackPoint(position, momentum, TOF1_tp, pids[i], field, "TOF1",
+                      hypothesis_track);
+
+      std::vector<const MAUS::DataStructure::Global::TrackPoint*> ht_tof1_tps =
+          hypothesis_track->GetTrackPoints(DataStructure::Global::kTOF1);
+      if (ht_tof1_tps.size() > 0) {
+        double tof1_z = ht_tof1_tps[0]->get_position().Z();
+        double tof1_t = ht_tof1_tps[0]->get_position().T();
+        MatchTOF0(position, momentum, tof1_z, tof1_t, TOF0_tp, pids[i], field, hypothesis_track);
+      }
+
+      // We had to add TOF0 before TOF1, so the order isn't right
+      hypothesis_track->SortTrackPointsByZ();
 
       // Now we fill the track with trackpoints from the tracker with energy
       // calculated from p and m, trackpoints are cloned as we want everything
@@ -307,12 +315,15 @@ void TrackMatching::MatchTrackPoint(
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
                              _energy_loss);
+      // Temporary container for trackpoints for checking if multiple matches are compatible
+      std::vector<DataStructure::Global::TrackPoint*> temp_trackpoints;
       for (size_t i = 0; i < trackpoints.size(); i++) {
+        // Check if TrackPoints match and if yes, collect them to later check for consistency
         if (GlobalTools::approx(x_in[1], trackpoints.at(i)->get_position().X(),
                 _matching_tolerances.at(detector_name).first) and
             GlobalTools::approx(x_in[2], trackpoints.at(i)->get_position().Y(),
                 _matching_tolerances.at(detector_name).second)) {
-          hypothesis_track->AddTrackPoint(trackpoints.at(i));
+          temp_trackpoints.push_back(trackpoints.at(i));
           Squeak::mout(Squeak::debug) << "TrackMatching: "
                                       << detector_name << " Match" << std::endl;
         } else {
@@ -322,6 +333,7 @@ void TrackMatching::MatchTrackPoint(
               << x_in[2] - trackpoints.at(i)->get_position().Y() << std::endl;
         }
       }
+      AddIfConsistent(temp_trackpoints, hypothesis_track);
     } catch (Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
@@ -330,29 +342,45 @@ void TrackMatching::MatchTrackPoint(
 
 void TrackMatching::MatchTOF0(
     const TLorentzVector &position, const TLorentzVector &momentum,
+    double tof1_z, double tof1_t,
     const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
-    DataStructure::Global::PID pid,
+    DataStructure::Global::PID pid, BTFieldConstructor* field,
     DataStructure::Global::Track* hypothesis_track) {
+  ofstream tof0file;
+  tof0file.open("match_tof0.csv", std::ios::out | std::ios::app);
   double mass = Particle::GetInstance().GetMass(pid);
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
   if (trackpoints.size() > 0) {
-    double z_distance = position.Z() - trackpoints.at(0)->get_position().Z();
-    double velocity = (momentum.Z() / energy) * CLHEP::c_light;
+
+    double x_in[] = {0., position.X(), position.Y(), position.Z(),
+                     energy, momentum.X(), momentum.Y(), momentum.Z()};
+    try {
+      GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
+                             _energy_loss);
+    } catch (Exception exc) {
+      Squeak::mout(Squeak::error) << exc.what() << std::endl;
+    }
+    double z_distance = tof1_z - trackpoints.at(0)->get_position().Z();
+    double velocity = (x_in[7] / x_in[4]) * CLHEP::c_light;
+
     // Change later to be set by datacards
     double deltaTMin = (z_distance/velocity) - 2.0;
     double deltaTMax = (z_distance/velocity) + 2.0;
+    // Temporary container for trackpoints for checking if multiple matches are compatible
+    std::vector<DataStructure::Global::TrackPoint*> temp_trackpoints;
     for (size_t i = 0; i < trackpoints.size(); i++) {
-      double deltaT = position.T() - trackpoints.at(i)->get_position().T();
+      double deltaT = tof1_t - trackpoints.at(i)->get_position().T();
       if (deltaT > deltaTMin and deltaT < deltaTMax) {
-        hypothesis_track->AddTrackPoint(trackpoints.at(i));
-          Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Match"
-                                      << std::endl;
+        temp_trackpoints.push_back(trackpoints.at(i));
+        Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Match"
+                                    << std::endl;
       } else {
         Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Mismatch, "
             << "dT is " << deltaT << " when expected between " << deltaTMin
             << " and " << deltaTMax << std::endl;
       }
     }
+    AddIfConsistent(temp_trackpoints, hypothesis_track);
   }
 }
 
@@ -364,7 +392,11 @@ void TrackMatching::MatchEMRTrack(
   double mass = Particle::GetInstance().GetMass(pid);
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
   // Here we need to iterate over the EMR tracks first, as they might have
-  // different starting z
+  // different starting z. Given expected particle rates at the EMR and the
+  // way the EMR would handle multiple particles, we don't need to take great
+  // care with multiple matches and will just stop iterating after the first
+  // match
+  bool matched = false;
   for (auto emr_track_iter = emr_track_array->begin();
        emr_track_iter != emr_track_array->end();
        ++emr_track_iter) {
@@ -384,6 +416,7 @@ void TrackMatching::MatchEMRTrack(
           GlobalTools::approx(x_in[2], first_hit_pos.Y(),
                               first_hit_pos_err.Y()*::sqrt(12)*
                               _matching_tolerances.at("EMR").second)) {
+        matched = true;
         Squeak::mout(Squeak::debug) << "TrackMatching: EMR Match" << std::endl;
         hypothesis_track->set_emr_range_primary(
             (*emr_track_iter)->get_emr_range_primary());
@@ -405,6 +438,9 @@ void TrackMatching::MatchEMRTrack(
       }
     } catch (Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
+    }
+    if (matched) {
+      break;
     }
   }
 }
@@ -503,6 +539,57 @@ double TrackMatching::TOFTimeFromTrackPoints(
     }
   }
   return TOF_time;
+}
+
+void TrackMatching::AddIfConsistent(std::vector<DataStructure::Global::TrackPoint*> trackpoints,
+                     DataStructure::Global::Track* hypothesis_track) {
+  bool consistent = true;
+  // If there are no trackpoints, we don't have to add anything, if there is
+  // exactly one, we leave consistent at true so that it gets added in the end
+  if (trackpoints.size() < 1) {
+    consistent = false;
+  } else if (trackpoints.size() > 1) {
+    // For the KL, we can only compare by y position
+    if (trackpoints.at(0)->get_detector() == DataStructure::Global::kCalorimeter) {
+      for (size_t i = 0; i < trackpoints.size() - 1; i++) {
+        for (size_t j = i + 1; j < trackpoints.size(); j++) {
+          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().Y(),
+              trackpoints.at(j)->get_position().Y(), 50.0))) {
+            consistent = false;
+          }
+        }
+      }
+    } else {
+      // Though the detector granularity is different for TOF0, we can use the same
+      // x and y allowance for all TOFs, 70mm is above one slab and below two slabs
+      // for all TOFs
+      for (size_t i = 0; i < trackpoints.size() - 1; i++) {
+        for (size_t j = i + 1; j < trackpoints.size(); j++) {
+          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().X(),
+              trackpoints.at(j)->get_position().X(), 70.0))) {
+            consistent = false;
+          }
+          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().Y(),
+              trackpoints.at(j)->get_position().Y(), 70.0))) {
+            consistent = false;
+          }
+          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().T(),
+              trackpoints.at(j)->get_position().T(), 0.5))) {
+            consistent = false;
+          }
+        }
+      }
+    }
+  }
+  // If we only have one point or multiple consistent ones, we add everything to
+  // the hypothesis track, else we don't add anything as we can't tell which
+  // trackpoint actually belongs to the track
+  if (consistent) {
+    for (size_t i = 0; i < trackpoints.size(); i++) {
+      hypothesis_track->AddTrackPoint(trackpoints.at(i));
+    }
+  }
+  return;
 }
 
 } // ~namespace global

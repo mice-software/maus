@@ -93,9 +93,10 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
     module->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
+  SciFiTrackerMap& geo_map = _geometry_helper.GeometryMap();
 
   // Set up cluster reconstruction
-  _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, _geometry_helper.GeometryMap());
+  _cluster_recon = SciFiClusterRec(_size_exception, _min_npe, geo_map);
 
   // Set up spacepoint reconstruction
   _spacepoint_recon = SciFiSpacePointRec();
@@ -160,13 +161,27 @@ void MapCppTrackerRecon::_birth(const std::string& argJsonConfigDocument) {
   helical_prop->SetCorrectPz(_correct_pz);
   helical_prop->SetIncludeMCS(_use_mcs);
   helical_prop->SetSubtractELoss(_use_eloss);
-  _helical_measurement = new SciFiHelicalMeasurements(&_geometry_helper);
-  _helical_track_fitter = new Kalman::TrackFit(helical_prop, _helical_measurement);
+  _helical_track_fitter = new Kalman::TrackFit(helical_prop);
 
   StraightPropagator* straight_prop = new StraightPropagator(&_geometry_helper);
   straight_prop->SetIncludeMCS(_use_mcs);
-  _straight_measurement = new SciFiStraightMeasurements(&_geometry_helper);
-  _straight_track_fitter = new Kalman::TrackFit(straight_prop, _straight_measurement);
+  _straight_track_fitter = new Kalman::TrackFit(straight_prop);
+
+  // Each measurement plane has a unique alignment and rotation => they all need their own
+  //  measurement object.
+  for (SciFiTrackerMap::iterator track_it = geo_map.begin();
+                                                           track_it != geo_map.end(); ++track_it) {
+    int tracker_const = (track_it->first == 0 ? -1 : 1);
+    for (SciFiPlaneMap::iterator plane_it = track_it->second.Planes.begin();
+                                           plane_it != track_it->second.Planes.end(); ++plane_it) {
+
+      int id = plane_it->first * tracker_const;
+      _helical_track_fitter->AddMeasurement(id,
+                                             new MAUS::SciFiHelicalMeasurements(plane_it->second));
+      _straight_track_fitter->AddMeasurement(id,
+                                            new MAUS::SciFiStraightMeasurements(plane_it->second));
+    }
+  }
 }
 
 
@@ -254,10 +269,10 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
   for (size_t track_i = 0; track_i < number_helical_tracks; track_i++) {
     SciFiHelicalPRTrack* helical = evt.helicalprtracks().at(track_i);
 
-    Kalman::Track data_track = BuildTrack(helical, &_geometry_helper);
+    Kalman::Track data_track = BuildTrack(helical, &_geometry_helper, 5);
     Kalman::State seed = ComputeSeed(helical, &_geometry_helper, _use_eloss, _seed_value);
 
-    _helical_track_fitter->SetData(data_track);
+    _helical_track_fitter->SetTrack(data_track);
     _helical_track_fitter->SetSeed(seed);
 
     _helical_track_fitter->Filter(false);
@@ -270,11 +285,11 @@ void MapCppTrackerRecon::track_fit(SciFiEvent &evt) const {
   }
   for (size_t track_i = 0; track_i < number_straight_tracks; track_i++) {
     SciFiStraightPRTrack* straight = evt.straightprtracks().at(track_i);
-    Kalman::Track data_track = BuildTrack(straight, &_geometry_helper);
+    Kalman::Track data_track = BuildTrack(straight, &_geometry_helper, 4);
 
     Kalman::State seed = ComputeSeed(straight, &_geometry_helper, _seed_value);
 
-    _straight_track_fitter->SetData(data_track);
+    _straight_track_fitter->SetTrack(data_track);
     _straight_track_fitter->SetSeed(seed);
 
     _straight_track_fitter->Filter(false);
