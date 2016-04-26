@@ -275,7 +275,8 @@ class CallG4bl: #pylint: disable=R0903
 
                 self.particles[key].update(position = dict(\
             #    x = math.cos(theta) * float(element[0]) + 392.39,
-	        x = math.cos(theta) * float(element[0]) + 99.92,
+	    #    x = math.cos(theta) * float(element[0]) + 99.92,
+	        x = math.cos(theta) * float(element[0]),
                 y = float(element[1]), 
                 z = math.sin(theta) * float(element[0]) + deltaz + 26.21))
 

@@ -34,6 +34,9 @@ DOC_OUTPUT_DIR = os.path.join(TEMP_DST, 'doc')
 SCP_LOG = TMP+'scp.log'
 COPY_TARGETS = []
 
+THIRDPARTY_URL = 'http://heplnv152.pp.rl.ac.uk/maus/third_party/'
+PYTHON_MODULES_URL = THIRDPARTY_URL + 'easy_install/'
+DEPRECATED_PYTHON_MODULES = ['pil']
 
 def build_test_output():
     """Build test output and coverage, add to copy targets"""
@@ -106,6 +109,9 @@ def build_third_party_tarball():
                                       "/third_party/bash/40python_extras.bash",
                        "-cg"])
     proc.wait() #pylint: disable=E1101
+    print "Restoring deprecated python moodules"
+    restore_deprecated_modules(os.path.join(os.environ['MAUS_ROOT_DIR'], \
+      "third_party/source/easy_install"))
     print "Getting targets for third_party libraries"
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
     glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz",
@@ -154,6 +160,12 @@ def copy_targets():
         else:
             shutil.copy(target, out_dir)
     return out_dir, version
+
+def restore_deprecated_modules(target_dir):
+    """ Pull down python modules no longer on PyPI"""
+    for depmod in DEPRECATED_PYTHON_MODULES:
+        os.system('wget ' + PYTHON_MODULES_URL + depmod + '.tar.gz' + \
+          ' -P ' + target_dir)
 
 def scp(scp_in, scp_out):
     """scp targets across"""

@@ -26,13 +26,11 @@ namespace Kalman {
     _dimension(dim),
     _measurement_dimension(meas_dim),
     _base_measurement_matrix(meas_dim, dim),
-    _base_measurement_matrix_transpose(dim, meas_dim),
-    _base_measurement_noise(meas_dim, meas_dim) {
+    _base_measurement_matrix_transpose(dim, meas_dim) {
   }
 
   State Measurement_base::Measure(const State& state) {
     _base_measurement_matrix = this->CalculateMeasurementMatrix(state);
-    _base_measurement_noise = this->CalculateMeasurementNoise(state);
 
     _base_measurement_matrix_transpose.Transpose(_base_measurement_matrix);
 
@@ -42,9 +40,7 @@ namespace Kalman {
     new_vec = _base_measurement_matrix * state.GetVector();
     new_cov = (_base_measurement_matrix*state.GetCovariance()*_base_measurement_matrix_transpose);
 
-    State measured_state(new_vec, new_cov, state.GetPosition());
-    measured_state.SetId(state.GetId());
-
+    State measured_state(new_vec, new_cov);
     return measured_state;
   }
 }

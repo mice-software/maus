@@ -24,10 +24,32 @@ import os
 import array
 import types
 import itertools
+import sys
+import linecache
 
 STRAIGHT_ALGORITHM_ID = 0
 HELICAL_ALGORITHM_ID = 1
 MUON_MASS = 105.6583715
+
+################################################################################
+## Misc
+################################################################################
+
+def print_exception() :
+  exc_type, exc_obj, tb = sys.exc_info()
+  f = tb.tb_frame
+  lineno = tb.tb_lineno
+  filename = f.f_code.co_filename
+  linecache.checkcache(filename)
+  line = linecache.getline(filename, lineno, f.f_globals)
+  print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, \
+                                                 lineno, line.strip(), exc_obj)
+
+
+
+################################################################################
+## Random Analysis Tasks
+################################################################################
 
 def calculate_plane_id(tracker, station, plane) :
   """
@@ -151,7 +173,8 @@ def save_plots(plot_dict, filename) :
       save_plot( plot_dict[key], directory )
       outfile.cd()
     else :
-      plot_dict[key].Write(key)
+      if plot_dict[key] is not None :
+        plot_dict[key].Write(key)
       
   outfile.Close()
 
@@ -167,7 +190,8 @@ def save_plot(plot_dict, outfile) :
       save_plot( plot_dict[key], directory )
       outfile.cd()
     else :
-      plot_dict[key].Write(key)
+      if plot_dict[key] is not None :
+        plot_dict[key].Write(key)
 
 
 def print_plots(plot_dict, location, plot_options={}) :

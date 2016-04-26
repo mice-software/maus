@@ -86,16 +86,16 @@ class EMRTrack {
   /** @brief Sets the parameters of the fit in the yz plane */
   void SetParametersY(std::vector<double> pary)              { _pary = pary; }
 
-  /** @brief Returns the errors on the parameters of the fit in the xz plane */
+  /** @brief Returns the covariance matrix of the parameters of the fit in the xz plane */
   std::vector<double> GetParametersErrorsX() const           { return _eparx; }
 
-  /** @brief Sets the errors on the parameters of the fit in the xz plane */
+  /** @brief Sets the covariance matrix of the parameters of the fit in the xz plane */
   void SetParametersErrorsX(std::vector<double> eparx)       { _eparx = eparx; }
 
-  /** @brief Returns the errors on the parameters of the fit in the yz plane */
+  /** @brief Returns the covariance matrix of the parameters of the fit in the yz plane */
   std::vector<double> GetParametersErrorsY() const           { return _epary; }
 
-  /** @brief Sets the errors on the parameters of the fit in the yz plane */
+  /** @brief Sets the covariance matrix of the parameters of the fit in the yz plane */
   void SetParametersErrorsY(std::vector<double> epary)       { _epary = epary; }
 
   /** @brief Returns the position of the starting point of the track */

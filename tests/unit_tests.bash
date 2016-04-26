@@ -6,6 +6,15 @@ if [ -z "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
     exit 1;
 fi
 
+echo
+echo "INFO: Running the unit tests"
+echo
+
+if [ -z "${MAUS_ROOT_DIR}" ]; then  # see if the variable exists yet
+    echo "ERROR: \$MAUS_ROOT_DIR not set"
+    exit 1;
+fi
+
 # some naughty devs are spitting out junk into cwd from their tests...
 here=`pwd`
 cd ${MAUS_ROOT_DIR}/tmp/
@@ -42,4 +51,8 @@ if [ $maus_lcov ]; then
 fi
 
 cd $here
+
+echo
+echo "INFO: Unit tests complete"
+echo
 

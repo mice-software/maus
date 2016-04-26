@@ -51,6 +51,8 @@ SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& m
   GasParameters.A                       = (*json)["GasParams_A"].asDouble();
   GasParameters.Density_Correction      = (*json)["GasParams_Density_Correction"].asDouble();
 
+  UseActiveRotations                    = (*json)["geometry_use_active_rotations"].asBool();
+
   _default_momentum  = (*json)["SciFiDefaultMomentum"].asDouble();
 }
 
@@ -78,6 +80,8 @@ void SciFiGeometryHelper::Build() {
       HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // plane
                                                ->mother()));  // tracker/ station??
       direction     *= internal_fibre_rotation.inverse();
+      if (UseActiveRotations == true)
+        direction     *= internal_fibre_rotation;
 
       // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
       // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
@@ -108,6 +112,8 @@ void SciFiGeometryHelper::Build() {
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = reference;
       trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
+      if (UseActiveRotations == true)
+        trackerGeo.Rotation = (trackerModule->globalRotation());
 //      trackerGeo.Field = FieldValue(trackerModule);
       FieldValue(trackerModule, trackerGeo);
       trackerGeo.Planes[plane_id] = this_plane;
@@ -140,6 +146,8 @@ void SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule, SciFiTrack
   Hep3Vector globalPos = trackerModule->globalPosition();
   Hep3Vector relativePos(0., 0., 0.);
   HepRotation trackerRotation = (trackerModule->globalRotation()).inverse();
+  if (UseActiveRotations == true)
+    HepRotation trackerRotation = (trackerModule->globalRotation());
   double EMfield[6]  = {0., 0., 0., 0., 0., 0.};
   double position[4] = {0., 0., 0., 0.};
   BTFieldConstructor* field = Globals::GetReconFieldConstructor();
@@ -257,6 +265,35 @@ double SciFiGeometryHelper::BetheBlochStoppingPower(double p, const SciFiMateria
   double log_term = TMath::Log(2.*electron_mass*beta2*gamma2*Tmax/(I2));
   double dEdx = outer_term*(0.5*log_term-beta2-density_correction/2.);
   return density*dEdx;
+}
+
+double SciFiGeometryHelper::LandauVavilovStoppingPower(double p,
+                                              const SciFiMaterialParams* material, double length) {
+  double muon_mass      = Recon::Constants::MuonMass;
+  double electron_mass  = Recon::Constants::ElectronMass;
+  double muon_mass2     = muon_mass*muon_mass;
+
+  double E = TMath::Sqrt(muon_mass2+p*p);
+
+  double beta   = p/E;
+  double beta2  = beta*beta;
+  double gamma  = E/muon_mass;
+  double gamma2 = gamma*gamma;
+
+  double K = Recon::Constants::BetheBlochParameters::K();
+  double A = material->A;
+  double I = material->Mean_Excitation_Energy;
+  double Z = material->Z;
+  double density = material->Density;
+  double density_correction = material->Density_Correction;
+  double j = 0.2;
+
+  double zeta = (K/2.0)*(Z/A)*(length*density/beta2);
+
+  double term1 = TMath::Log(2.0*electron_mass*beta2*gamma2/I);
+  double term2 = TMath::Log(zeta/I);
+
+  return zeta * ( term1 + term2 + j - beta2 - density_correction );
 }
 
 

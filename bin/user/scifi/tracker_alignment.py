@@ -419,6 +419,7 @@ def main(file_name):
     patrec_alignment = PatternRecognitionAlignment()
     patrec_alignment.measure = "pr_straight_seeds"
     kman_alignment = KalmanAlignment()
+    kman_alignment.measure = "pr_straight_seeds"
 
     # Loop over spills
     for i in range(tree.GetEntries()):

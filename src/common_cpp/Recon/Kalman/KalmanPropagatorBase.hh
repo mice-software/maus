@@ -37,11 +37,12 @@ namespace Kalman {
        *  This function must calculate a new propagator and noise matrix!
        *  Rewrite this function to implement an extended kalman filter
        */
-      virtual void Propagate(const State& start_state, State& end_state);
+      virtual void Propagate(const TrackPoint& start_tp, TrackPoint& end_tp);
 
       /** @brief Calculates a new propagator matrix
        */
-      virtual TMatrixD CalculatePropagator(const State& start_state, const State& end_state) = 0;
+      virtual TMatrixD CalculatePropagator(const TrackPoint& start_tp,
+                                                                     const TrackPoint& end_tp) = 0;
 
       /** @brief Returns the last propagator matrix
        */
@@ -49,7 +50,8 @@ namespace Kalman {
 
       /** @brief Returns the process noise covariance matrix
        */
-      virtual TMatrixD CalculateProcessNoise(const State& start_state, const State& end_state) = 0;
+      virtual TMatrixD CalculateProcessNoise(const TrackPoint& start_tp,
+                                                                     const TrackPoint& end_tp) = 0;
 
       /** @brief Returns the last process noise covariance matrix
        */
