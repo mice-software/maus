@@ -41,7 +41,7 @@ namespace Kalman {
   State CalculateResidual(const State& st1, const State& st2);
 
   /** @brief Fast was to calculate the chis-sq update */
-  double CalculteChiSquaredUpdate(const State st);
+  double CalculateChiSquaredUpdate(const State& st);
 
 
   /** @class TrackFit

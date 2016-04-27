@@ -863,36 +863,41 @@ def analyse_plots(plot_dict, data_dict) :
       for plot_axis in [ "residual_pt", "residual_pz" ] :
         plot = plot_dict[tracker][component+plot_axis]
 
-        errors = array.array( 'd' )
+        rms_error = array.array( 'd' )
         bin_size = array.array( 'd' )
         bins = array.array( 'd' )
         rms = array.array( 'd' )
+        mean = array.array( 'd' )
+        mean_error = array.array( 'd' )
 
-#        width = int( plot.GetNbinsX() / RESOLUTION_BINS )
         width = plot.GetXaxis().GetBinWidth(1)
         for i in range( 0, plot.GetXaxis().GetNbins() ) :
           projection = plot.ProjectionY( \
       tracker+component+plot_axis+'_pro_'+str(i), i, (i+1) )
-#      tracker+component+plot_axis+'_pro_'+str(i), i*width, (i+1)*width )
 
-#          plot_mean = plot.GetXaxis().GetBinCenter( i*width ) + width*0.5
           plot_mean = plot.GetXaxis().GetBinCenter( i ) + width
-          _, _, pro_std, pro_std_err = \
+          pro_mean, pro_mean_err, pro_std, pro_std_err = \
                                         analysis.tools.fit_gaussian(projection)
 
           bin_size.append( width*0.5 )
-          errors.append( pro_std_err )
           bins.append( plot_mean )
           rms.append( pro_std )
+          rms_error.append( pro_std_err )
+          mean.append( pro_mean )
+          mean_error.append( pro_mean_err )
 
         if len(bins) != 0 :
           resolution_graph = ROOT.TGraphErrors( len(bins), \
-                                                  bins, rms, bin_size, errors )
+                                               bins, rms, bin_size, rms_error )
+          bias_graph = ROOT.TGraphErrors( len(bins), \
+                                             bins, mean, bin_size, mean_error )
         else :
           resolution_graph = None
+          bias_graph = None
 
         plot_dict[tracker][component+plot_axis+'_resolution'] = \
                                                                resolution_graph
+        plot_dict[tracker][component+plot_axis+'_bias'] = bias_graph
   return data_dict
 
 

@@ -78,6 +78,12 @@ namespace MAUS {
     protected :
 
     private :
+
+      void _calculateBasePropagator(const Kalman::TrackPoint& start,
+                                                const Kalman::TrackPoint& end, TMatrixD& new_prop);
+
+      void _applyPzCorrections(TMatrixD& propagator, const TMatrixD& vector) const;
+
       double _Bz;
       SciFiGeometryHelper* _geometry_helper;
       bool _subtract_eloss;
@@ -85,6 +91,16 @@ namespace MAUS {
       bool _correct_Pz;
       double _muon_mass;
       double _muon_mass_sq;
+
+      // Cache variables used during the calculation of the propagator.
+      double _delta_z;
+      double _delta_theta;
+      double _u_const;
+      double _cosine_term;
+      double _sine_term;
+      double _momentum_reduction_factor;
+
+      const double _speed_of_light = CLHEP::c_light;
   };
 }
 
