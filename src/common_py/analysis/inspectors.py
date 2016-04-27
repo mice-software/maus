@@ -31,7 +31,7 @@ class PhaseSpace2DInspector() :
     self.plane = plane_id
     self.position = 0.0
     self.ensemble_size = ensemble_size
-    self.covariance = covariances.CovarianceMatrix()
+    self.covariance = analysis.covariances.CovarianceMatrix()
 
     self.position_plot = ROOT.TH2F(\
            'inspected_position_{0}'.format(self.plane), 'Beam Position', \
