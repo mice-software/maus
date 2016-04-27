@@ -55,12 +55,12 @@ namespace MAUS {
   /** @brief Builds a data track using a PR track
    */
   template<class PR_TYPE> Kalman::Track BuildTrack(PR_TYPE* pr_track,
-                                                                  const SciFiGeometryHelper* geom);
+                                                   const SciFiGeometryHelper* geom, int dimension);
 
   /** @brief Builds a data track using an array of spacepoints
    */
   Kalman::Track BuildSpacepointTrack(SciFiSpacePointPArray spacepoints,
-                           const SciFiGeometryHelper* geom, int plane_num = 0, double smear = 0.2);
+            const SciFiGeometryHelper* geom, int dimension, int plane_num = 0, double smear = 0.2);
 
 
 
@@ -70,11 +70,11 @@ namespace MAUS {
 ////////////////////////////////////////////////////////////////////////////////
 
   template<class PR_TYPE>
-  Kalman::Track BuildTrack(PR_TYPE* pr_track, const SciFiGeometryHelper* geom) {
+  Kalman::Track BuildTrack(PR_TYPE* pr_track, const SciFiGeometryHelper* geom, int dim) {
 
     SciFiSpacePointPArray spacepoints = pr_track->get_spacepoints_pointers();
 
-    Kalman::Track new_track(1);
+    Kalman::Track new_track(dim);
 
     const SciFiPlaneMap& geom_map = geom->GeometryMap().find(
                                                            pr_track->get_tracker())->second.Planes;
@@ -82,9 +82,8 @@ namespace MAUS {
 
     for (SciFiPlaneMap::const_iterator iter = geom_map.begin(); iter != geom_map.end(); ++iter) {
       int id = iter->first * tracker_const;
-      Kalman::State new_state = Kalman::State(1, iter->second.Position.z());
-      new_state.SetId(id);
-      new_track.Append(new_state);
+      Kalman::TrackPoint new_trackpoint = Kalman::TrackPoint(dim, 1, iter->second.Position.z(), id);
+      new_track.Append(new_trackpoint);
     }
 
     size_t numb_spacepoints = spacepoints.size();
@@ -100,17 +99,16 @@ namespace MAUS {
         TMatrixD covariance(1, 1);
 
         state_vector(0, 0) = cluster->get_alpha();
-//        covariance(0, 0) = 0.0;
         covariance(0, 0) = geom->GetChannelWidth() * geom->GetChannelWidth() / 12.0;
 
-        new_track[id].SetVector(state_vector);
-        new_track[id].SetCovariance(covariance);
+        new_track[id].SetData(Kalman::State(state_vector, covariance));
       }
     }
     return new_track;
   }
 
-  Kalman::Track BuildTrack(SciFiClusterPArray pr_track, const SciFiGeometryHelper* geom);
+  Kalman::Track BuildTrack(SciFiClusterPArray pr_track,
+                                                   const SciFiGeometryHelper* geom, int dimension);
 } // namespace MAUS
 
 #endif // MAUS_TRACK_WRAPPER_HH

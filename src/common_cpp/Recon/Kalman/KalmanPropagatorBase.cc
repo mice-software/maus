@@ -27,18 +27,17 @@ namespace Kalman {
     _noise_matrix(_dimension, _dimension) {
   }
 
-  void Propagator_base::Propagate(const State& start_state, State& end_state) {
-    _propagator_matrix = this->CalculatePropagator(start_state, end_state);
+  void Propagator_base::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
+    _propagator_matrix = this->CalculatePropagator(start_tp, end_tp);
     TMatrixD propT(TMatrixD::kTransposed, _propagator_matrix);
-    _noise_matrix = this->CalculateProcessNoise(start_state, end_state);
+    _noise_matrix = this->CalculateProcessNoise(start_tp, end_tp);
 
     TMatrixD new_vec(GetDimension(), 1);
-    new_vec = _propagator_matrix * start_state.GetVector();
+    new_vec = _propagator_matrix * start_tp.GetFiltered().GetVector();
     TMatrixD new_cov(GetDimension(), GetDimension());
-    new_cov = _propagator_matrix * start_state.GetCovariance() * propT + _noise_matrix;
+    new_cov = _propagator_matrix * start_tp.GetFiltered().GetCovariance() * propT + _noise_matrix;
 
-    end_state.SetVector(new_vec);
-    end_state.SetCovariance(new_cov);
+    end_tp.SetPredicted(State(new_vec, new_cov));
   }
 }
 }

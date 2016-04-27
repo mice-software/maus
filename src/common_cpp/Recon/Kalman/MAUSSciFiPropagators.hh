@@ -31,9 +31,11 @@ namespace MAUS {
     public :
       explicit StraightPropagator(SciFiGeometryHelper* helper);
 
-      virtual TMatrixD CalculatePropagator(const Kalman::State& start, const Kalman::State& end);
+      virtual TMatrixD CalculatePropagator(const Kalman::TrackPoint& start,
+                                                                    const Kalman::TrackPoint& end);
 
-      virtual TMatrixD CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end);
+      virtual TMatrixD CalculateProcessNoise(const Kalman::TrackPoint& start,
+                                                                    const Kalman::TrackPoint& end);
 
       TMatrixD BuildQ(const Kalman::State& state, double radLen, double width);
 
@@ -55,11 +57,13 @@ namespace MAUS {
     public :
       explicit HelicalPropagator(SciFiGeometryHelper* helper);
 
-      virtual void Propagate(const Kalman::State& start, Kalman::State& end);
+      virtual void Propagate(const Kalman::TrackPoint& start, Kalman::TrackPoint& end);
 
-      virtual TMatrixD CalculatePropagator(const Kalman::State& start, const Kalman::State& end);
+      virtual TMatrixD CalculatePropagator(const Kalman::TrackPoint& start,
+                                                                    const Kalman::TrackPoint& end);
 
-      virtual TMatrixD CalculateProcessNoise(const Kalman::State& start, const Kalman::State& end);
+      virtual TMatrixD CalculateProcessNoise(const Kalman::TrackPoint& start,
+                                                                    const Kalman::TrackPoint& end);
 
       TMatrixD BuildQ(const Kalman::State& state, double radLen, double width);
 

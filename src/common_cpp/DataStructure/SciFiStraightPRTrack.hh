@@ -54,6 +54,8 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
     /** Equality operator - any pointers are deep copied */
     SciFiStraightPRTrack& operator=(const SciFiStraightPRTrack &_strk);
 
+    /** Combine the different chi sqs into one final value */
+    virtual void form_total_chi_squared();
 
     /** Get the x position of the track at z=0 */
     double get_x0() const { return _x0; }

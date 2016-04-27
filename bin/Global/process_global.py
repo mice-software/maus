@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 """
-Process unpacked real data through to TrackMatching. After unpacking the data,
+Process unpacked real data incl. local reconstruction for all detectors
+(see MAUS User Guide for unpacking instructions). After unpacking the data,
 use this script with process_datecard.py and adjust parameters as needed.
 Make sure to use a no-field geometry (only no-field data can be matched
 currently, due to an issue with the Geant4 geometry handling)
@@ -20,7 +21,7 @@ def run():
     """
 
     # This input generates empty spills, to be filled by the beam maker later on
-    my_input = MAUS.InputCppRoot()
+    my_input = MAUS.InputCppRootData()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
