@@ -15,8 +15,6 @@
  *
  */
 
-/** @class SciFiStraightPRTrack Pattern Recognition straight track class */
-
 #ifndef  _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISTRAIGHTPRTRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISTRAIGHTPRTRACK_HH_
 
@@ -31,6 +29,10 @@
 
 namespace MAUS {
 
+/** @class SciFiStraightPRTrack
+ *  @author A. Dobbs
+ *  @brief Class representing straight tracks in the tracker formed by pattern recognition
+ */
 class SciFiStraightPRTrack : public SciFiBasePRTrack {
   public:
     /** Default constructor */

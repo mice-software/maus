@@ -52,16 +52,24 @@
 
 namespace MAUS {
 
+/** @class PatternReconition
+ *  @author A. Dobbs
+ *  @brief Pattern Recognition associates tracker spacepoints to tracks
+ *
+ *  Pattern Recognition associates tracker spacepoints to tracks. Linear least squares fitting
+ *  is used to determine which spacepoints come from the same parent track. Both straight and
+ *  helical tracks may be searched for.
+ */
 class PatternRecognition {
   public:
 
-    /** Macro to allow friendship with the gtests */
+    /** Macros to allow friendship with the gtests */
     FRIEND_TEST(PatternRecognitionTest, test_constructor);
     FRIEND_TEST(PatternRecognitionTest, test_set_parameters_to_default);
     FRIEND_TEST(PatternRecognitionTest, test_setup_debug);
 
-    /** @brief Default constructor. Initialise variables,
-     *         using globals if available, otherwise local defaults 
+    /** @brief Default constructor. Initialise variables, using globals if available,
+               otherwise local defaults
      */
     PatternRecognition();
 
@@ -86,8 +94,8 @@ class PatternRecognition {
 
     /** @brief Function template which selects which tracks out of the candidates are used
      *
-     * Function template which takes either SciFiStraightPRTrack* or SciFiHelicalPRTrack* and
-     * selects which tracks to use out of all the different candidates based on the highest chisq
+     *  Function template which takes either SciFiStraightPRTrack* or SciFiHelicalPRTrack* and
+     *  selects which tracks to use out of all the different candidates based on the highest chisq
      *  @tparam <T> Either a SciFiStraightPRTrack* or SciFiHelicalPRTrack*
      *  @param[in] trks A vector containing either SciFiStraightPRTrack* or SciFiHelicalPRTrack*
      *  @return Returns the selected tracks

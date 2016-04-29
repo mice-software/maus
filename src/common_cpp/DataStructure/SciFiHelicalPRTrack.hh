@@ -15,11 +15,6 @@
  *
  */
 
-/** @class SciFiHelicalPRTrack
- *
- *
- */
-
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIHELICALPRTRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIHELICALPRTRACK_HH_
 
@@ -40,6 +35,10 @@
 
 namespace MAUS {
 
+/** @class SciFiHelicalPRTrack
+ *  @author A. Dobbs
+ *  @brief Class representing helical tracks in the tracker formed by pattern recognition
+ */
 class SciFiHelicalPRTrack : public SciFiBasePRTrack {
   public:
 
