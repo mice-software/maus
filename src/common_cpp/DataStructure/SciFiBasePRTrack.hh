@@ -43,25 +43,25 @@ typedef std::vector<double> DoubleArray;
  */
 class SciFiBasePRTrack : public TObject {
   public:
-    /** Default constructor */
+    /** @brief Default constructor */
     SciFiBasePRTrack();
 
-    /** Construct some variables */
+    /** @brief Construct some variables */
     explicit SciFiBasePRTrack(DoubleArray cov);
 
-    /** Construct some variables */
+    /** @brief Construct some variables */
     SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoints);
 
-    /** Copy constructor */
+    /** @brief Copy constructor */
     SciFiBasePRTrack(const SciFiBasePRTrack& track);
 
-    /** Default destructor */
+    /** @brief Default destructor */
     virtual ~SciFiBasePRTrack();
 
-    /** Assignment operator */
+    /** @brief Assignment operator */
     SciFiBasePRTrack& operator=(const SciFiBasePRTrack& track);
 
-    /** Combine the different chi sqs into one final value */
+    /** @brief Combine the different chi sqs into one final value */
     virtual void form_total_chi_squared() {}
 
     /** Get the covariance matrix elements of the least square fit parameters */
@@ -116,7 +116,6 @@ class SciFiBasePRTrack : public TObject {
 
     /** Get the number of triplet spacepoints */
     int get_num_triplets() const;
-
 
   private:
     TRefArray* _spoints; /** The spacepoints associated with the track (track does not own mem) */
