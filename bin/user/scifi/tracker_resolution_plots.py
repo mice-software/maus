@@ -49,6 +49,7 @@ import math
 import array
 
 # Third Party library import statements
+import json
 import event_loader
 import analysis
 from analysis import tools
@@ -100,6 +101,9 @@ DOWN_COV_RECON = []
 VIRTUAL_PLANE_DICT = {}
 INVERSE_PLANE_DICT = {}
 TRACKER_PLANE_RADIUS = 150.0
+
+SELECT_EVENTS = False
+GOOD_EVENTS = {}
 
  
 def get_pz_bin(pz) :
@@ -956,6 +960,10 @@ if __name__ == "__main__" :
                                          "momentum to consider for analysis." )
 
 
+  parser.add_argument( '--selection_file', default=None, \
+                 help='Name of a JSON file containing the events to analyses' )
+
+
 
   parser.add_argument( '--not_require_cluster', action="store_true", \
         help="Don't require a cluster in the reference plane" )
@@ -984,6 +992,13 @@ if __name__ == "__main__" :
     PT_MIN = namespace.pt_window[0]
     PT_MAX = namespace.pt_window[1]
     PT_BIN_WIDTH = namespace.pt_bin
+
+    if namespace.selection_file is not None :
+      SELECT_EVENTS = True
+      with open(namespace.selection_file, 'r') as infile :
+        GOOD_EVENTS = json.load(infile)
+    else :
+      SELECT_EVENTS = False
   except BaseException as ex:
     raise
   else :
@@ -1011,6 +1026,18 @@ if __name__ == "__main__" :
     try :
       while file_reader.next_event() and \
                file_reader.get_total_num_events() != namespace.max_num_events :
+
+        if SELECT_EVENTS :
+          filename = file_reader.get_current_filename()
+          spill = str(file_reader.get_current_spill_number())
+          event = file_reader.get_current_event_number()
+          if filename not in GOOD_EVENTS :
+            continue
+          if spill not in GOOD_EVENTS[filename] :
+            continue
+          if event not in GOOD_EVENTS[filename][spill] :
+            continue
+
         try :
           sys.stdout.write( 
               '  Spill ' + str(file_reader.get_current_spill_number()) + \

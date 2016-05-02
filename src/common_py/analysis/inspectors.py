@@ -20,6 +20,7 @@
 # pylint: disable = W0102
 
 
+import analysis
 import analysis.covariances
 
 import ROOT

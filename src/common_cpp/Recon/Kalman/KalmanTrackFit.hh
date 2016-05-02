@@ -65,6 +65,16 @@ namespace Kalman {
      */
     virtual ~TrackFit();
 
+    /** @brief Return a pointer to the propagator object
+     */
+    Propagator_base* GetPropagator() { return _propagator; }
+    const Propagator_base* GetPropagator() const { return _propagator; }
+
+    /** @brief Return a pointer to the mapped measurement object
+     */
+    Measurement_base* GetMeasurement(int id) { return _measurements[id]; }
+    const Measurement_base* GetMeasurement(int id) const { return _measurements.at(id); }
+
     /** @brief Append a new data state, predict from the previous trackpoint and filter.
      *
      *  A short cut function to save computations. 
@@ -150,13 +160,7 @@ namespace Kalman {
     std::map<int, Measurement_base*> _measurements;
 
     State _seed;
-
     Track _track;
-
-//    Track _data;
-//    Track _predicted;
-//    Track _filtered;
-//    Track _smoothed;
 
     TMatrixD _identity_matrix;
   };
