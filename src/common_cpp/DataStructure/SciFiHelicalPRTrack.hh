@@ -61,6 +61,9 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Assignment operator - any pointers are deep copied */
     SciFiHelicalPRTrack& operator=(const SciFiHelicalPRTrack &_htrk);
 
+    /** Combine the different chi sqs into one final value */
+    virtual void form_total_chi_squared();
+
     /** Get the vector the turning angles of the spacepoints used by the track  */
     DoubleArray get_phi() const { return _phi; }
 

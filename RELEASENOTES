@@ -5,6 +5,16 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-2.2.0
+  The following changes were made:
+    - Geometry updates
+    - Scifi Kalman fit updates
+    - Scifi pattern recognition updates
+    - Scifi geometry bug fix
+    - EMR updates
+    - Global tracking bug fix
+    - Test framework updates
+    - Third part library SCons version updated to 2.4.1
 MAUS-v2.1.0
   The following changes were made:
     - Final fixes for scifi geometry issues
