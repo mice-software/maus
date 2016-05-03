@@ -120,6 +120,8 @@ class CovarianceMatrix() :
     self._mean_momentum = 0.0
     self._num_particles = 0
 
+    self._correction_matrix = None
+
 
   def length( self ) :
     """
@@ -143,7 +145,7 @@ class CovarianceMatrix() :
       Add a scifi hit and extract the information into the class.
       Accepts both xboa type hits and the local emittance analysis type hits.
     """
-    self.add_hit( analysis.hit_types.hit(scifi_track_point=scifi_hit) )
+    self.add_hit( analysis.hit_types.AnalysisHit(scifi_track_point=scifi_hit) )
 
 
   def add_hit( self, hit ) :
@@ -185,6 +187,55 @@ class CovarianceMatrix() :
     self._num_particles += 1
 
 
+  def set_covariance_correction( self, correction, axes ) :
+    """
+      Store a correction matrix to be applied to the determinant calculations.
+
+      'axes' must describe the rows and columns of the matrix.
+    """
+    check_axes( axes )
+    if correction.shape != (len(axes), len(axes)) :
+      raise ValueError('Expected square correction matrix that '+\
+                                                            'matches the axes')
+
+    self._correction_matrix = numpy.zeros( (len( VARIABLE_LIST ), \
+                                                        len( VARIABLE_LIST )) )
+
+    for covrow, rowvar in enumerate( axes ) :
+      row = -1
+      for num, test in enumerate( VARIABLE_LIST ) :
+        if rowvar == test :
+          row = num
+      for covcol, colvar in enumerate( axes ) :
+        col = -1
+        for num, test in enumerate( VARIABLE_LIST ) :
+          if colvar == test :
+            col = num
+        self._correction_matrix[row][col] = correction[covrow][covcol]
+
+
+  def get_covariance_correction( self, axes ) :
+    """
+      Returns the covariance matrix correction formatted for the supplied axes
+    """
+    check_axes( axes )
+    correction = numpy.zeros( (len( axes ), len( axes )) )
+
+    for covrow, rowvar in enumerate( axes ) :
+      row = -1
+      for num, test in enumerate( VARIABLE_LIST ) :
+        if rowvar == test :
+          row = num
+      for covcol, colvar in enumerate( axes ) :
+        col = -1
+        for num, test in enumerate( VARIABLE_LIST ) :
+          if colvar == test :
+            col = num
+        correction[covrow][covcol] = self._correction_matrix[row][col]
+
+    return correction
+
+
   def get_covariance_matrix( self, axes = [ 'x', 'px', 'y', 'py' ] ) :
     """
       Combines the vector and matrix to form the covariance matrix and returns
@@ -212,6 +263,18 @@ class CovarianceMatrix() :
     return cov_matrix
 
 
+  def get_corrected_covariance_matrix( self, axes = [ 'x', 'px', 'y', 'py' ] ) :
+    """
+      Applies the stored covariance matrix correction to the covariance matrix
+    """
+    if self._correction_matrix is None :
+      return self.get_covariance_matrix( axes )
+
+    cov = self.get_covariance_matrix( axes )
+    cor = self.get_covariance_correction( axes )
+    return cov + cor
+
+
   def get_component( self, axes = [ 'x', 'x' ] ) :
     """
       Returns a single component from the covariance matrix. Length of axes 
@@ -234,7 +297,7 @@ class CovarianceMatrix() :
     """ 
       Returns the determinant of the covariace matrix
     """
-    return numpy.linalg.det( self.get_covariance_matrix( axes ) )
+    return numpy.linalg.det( self.get_corrected_covariance_matrix( axes ) )
 
 
   def get_momentum( self ) :
@@ -291,7 +354,7 @@ class CovarianceMatrix() :
     if emitt is None :
       emitt = self.get_emittance( mass=mass, axes=full_axes )
 
-    cov_mat = self.get_covariance_matrix( full_axes )
+    cov_mat = self.get_corrected_covariance_matrix( full_axes )
 
     covariance_sum = 0.0
     for i in range( num ) :
@@ -323,7 +386,7 @@ class CovarianceMatrix() :
       raise ValueError( 'Expected positive value of momentum' )
 
     num = len( axes )
-    cov_mat = self.get_covariance_matrix( axes )
+    cov_mat = self.get_corrected_covariance_matrix( axes )
     full_axes = axes + get_conjugates( axes )
     if emitt is None :
       emitt = self.get_emittance( mass=mass, axes=full_axes )
@@ -361,7 +424,36 @@ class CovarianceMatrix() :
     L = (self._product_matrix[x_var][py_var] - \
                                        self._product_matrix[y_var][px_var] ) / \
                                                             self._num_particles
+    return L
 
+
+
+  def get_angular_momentum( self, axes = ['x', 'y'] ) :
+    """
+      Calculats the canonical angular momentum for the axes specified.
+
+      The axes provided should be precisely two positional axes only,
+      e.g. ['x', 'y']
+
+      Canonical Angular Momentum calculated as:
+      Covariance(
+    """
+    check_axes( axes, master_list=POSITION_VARIABLES )
+    if len( axes ) != 2 :
+      raise ValueError( 'Can only determine angular momentum for 2 dimensions' )
+
+    conjugates = get_conjugates( axes )
+    full_axes = axes + conjugates
+    L = 0.0
+
+    x_var = VARIABLE_ENUMERATION[full_axes[0]]
+    px_var = VARIABLE_ENUMERATION[full_axes[2]]
+    y_var = VARIABLE_ENUMERATION[full_axes[1]]
+    py_var = VARIABLE_ENUMERATION[full_axes[3]]
+
+    L = (self._product_matrix[x_var][py_var] - \
+                                       self._product_matrix[y_var][px_var] ) / \
+                                                            self._num_particles
     return L
 
 

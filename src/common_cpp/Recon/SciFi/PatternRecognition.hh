@@ -94,8 +94,8 @@ class PatternRecognition {
 
     /** @brief Function template which selects which tracks out of the candidates are used
      *
-     *  Function template which takes either SciFiStraightPRTrack* or SciFiHelicalPRTrack* and
-     *  selects which tracks to use out of all the different candidates based on the highest chisq
+     * Function template which takes either SciFiStraightPRTrack* or SciFiHelicalPRTrack* and
+     * selects which tracks to use out of all the different candidates based on the highest chisq
      *  @tparam <T> Either a SciFiStraightPRTrack* or SciFiHelicalPRTrack*
      *  @param[in] trks A vector containing either SciFiStraightPRTrack* or SciFiHelicalPRTrack*
      *  @return Returns the selected tracks
