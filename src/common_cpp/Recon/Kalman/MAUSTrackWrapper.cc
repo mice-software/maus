@@ -95,9 +95,9 @@ namespace MAUS {
       double P = patrec_momentum.mag();
       double patrec_bias; // Account for two planes of energy loss
       if (tracker == 0) {
-        patrec_bias = (P + 1.4) / P;
+        patrec_bias = (P + 1.3) / P;
       } else {
-        patrec_bias = (P - 1.4) / P;
+        patrec_bias = (P - 1.3) / P;
       }
       patrec_momentum = patrec_bias * patrec_momentum;
     }
@@ -287,6 +287,8 @@ namespace MAUS {
       int ID = the_track[i].GetId();
       double position = the_track[i].GetPosition();
       const Kalman::State& smoothed_state = the_track[i].GetSmoothed();
+//      const Kalman::State& smoothed_state = the_track[i].GetFiltered();
+//      const Kalman::State& smoothed_state = the_track[i].GetPredicted();
       const Kalman::State& data_state = the_track[i].GetData();
 
       SciFiTrackPoint* new_point = new SciFiTrackPoint();
@@ -300,28 +302,51 @@ namespace MAUS {
 
       ThreeVector pos;
       ThreeVector mom;
+      ThreeVector grad;
+      ThreeVector error_pos;
+      ThreeVector error_mom;
+      ThreeVector error_grad;
 
       TMatrixD state_vector = smoothed_state.GetVector();
+      TMatrixD state_covariance = smoothed_state.GetCovariance();
 
       if (dimension == 4) {
         pos.setZ(position);
         pos.setX(state_vector(0, 0));
-        mom.setX(state_vector(1, 0)*default_mom);
         pos.setY(state_vector(2, 0));
+
+        mom.setX(state_vector(1, 0)*default_mom);
         mom.setY(state_vector(3, 0)*default_mom);
 
         pos *= reference_rot;
         pos += reference_pos;
-
         mom *= reference_rot;
+
         if (tracker == 0) mom *= -1.0; // Direction of recon is reveresed upstream.
         mom.setZ(default_mom); // MeV/c
+
+        grad.SetX(mom.x()/mom.z());
+        grad.SetY(mom.y()/mom.z());
+        grad.SetZ(0.0);
+
+        error_pos.SetX(std::sqrt(state_covariance(0, 0)));
+        error_pos.SetY(std::sqrt(state_covariance(2, 2)));
+        error_pos.SetZ(0.0);
+
+        error_mom.SetX(std::sqrt(default_mom*state_covariance(1, 1)));
+        error_mom.SetY(std::sqrt(default_mom*state_covariance(3, 3)));
+        error_mom.SetZ(200.0);
+
+        error_grad.SetX(std::sqrt(state_covariance(1, 1)));
+        error_grad.SetY(std::sqrt(state_covariance(3, 3)));
+        error_grad.SetZ(0.0);
       } else if (dimension == 5) {
         pos.setX(state_vector(0, 0));
-        mom.setX(state_vector(1, 0));
         pos.setY(state_vector(2, 0));
-        mom.setY(state_vector(3, 0));
         pos.setZ(position);
+
+        mom.setX(state_vector(1, 0));
+        mom.setY(state_vector(3, 0));
 
         pos *= reference_rot;
         pos += reference_pos;
@@ -333,15 +358,39 @@ namespace MAUS {
           charge = 1;
         }
         mom.setZ(fabs(1.0/state_vector(4, 0)));
+
+        grad.SetX(mom.x() / mom.z());
+        grad.SetY(mom.y() / mom.z());
+        grad.SetZ(0.0);
+
+        error_pos.SetX(std::sqrt(state_covariance(0, 0)));
+        error_pos.SetY(std::sqrt(state_covariance(2, 2)));
+        error_pos.SetZ(0.0);
+
+        error_mom.SetX(std::sqrt(state_covariance(1, 1)));
+        error_mom.SetY(std::sqrt(state_covariance(3, 3)));
+        error_mom.SetZ(std::sqrt(state_covariance(4, 4)) / (state_vector(4, 0)*state_vector(4, 0)));
+
+        error_grad.SetX(grad.x()*std::sqrt(((error_mom.x()*error_mom.x()) / (mom.x()*mom.x()))
+                                              +(error_mom.z()*error_mom.z() / (mom.z()*mom.z()))));
+        error_grad.SetY(grad.y()*std::sqrt(((error_mom.y()*error_mom.y()) / (mom.y()*mom.y()))
+                                             + (error_mom.z()*error_mom.z() / (mom.z()*mom.z()))));
+        error_grad.SetZ(0.0);
       }
 
       new_point->set_pos(pos);
       new_point->set_mom(mom);
+      new_point->set_gradient(grad);
+      new_point->set_pos_error(error_pos);
+      new_point->set_mom_error(error_mom);
+      new_point->set_gradient_error(error_grad);
 
       // TODO
       // CHARGE!
       if (data_state) {
-        new_point->set_pull(fitter->CalculatePull(i).GetVector()(0, 0));
+        Kalman::State pull = fitter->CalculatePull(i);
+        double weighted_pull = pull.GetVector()(0, 0) / std::sqrt(pull.GetCovariance()(0, 0));
+        new_point->set_pull(weighted_pull);
         new_point->set_residual(fitter->CalculateFilteredResidual(i).GetVector()(0, 0));
         new_point->set_smoothed_residual(fitter->CalculateSmoothedResidual(i).GetVector()(0, 0));
       } else {
