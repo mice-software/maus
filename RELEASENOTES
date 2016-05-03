@@ -10,6 +10,7 @@ MAUS-v2.3.0
     - Minor EMR update
     - Scifi kalman filter updates, pz residual offset fix
     - Scifi trackpoints datastructure update
+    - Geometry test fix
     - Doxygen updates
 MAUS-v2.2.0
   The following changes were made:
