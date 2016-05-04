@@ -136,26 +136,26 @@ void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
   }
 }
 
-//void MapCppTrackerMCDigitization::discriminator(SciFiDigitPArray &digits) const {
-//  std::vector<int> cut_pos;
-//  for (unsigned int i = 0; i < digits.size(); i++) {
-//    if (_SciFiDisCut < digits.at(i)->get_npe()) {
-//	  // std::cerr << "Good Point: " << digits.at(i)->get_npe() << "\n";
-//	  digits.at(i)->set_npe(10.0);
-//	} else {
-//	  // std::cerr << "Bad Point: " << digits.at(i)->get_npe() << "\n";
-//    std::cerr << "This shouldn't run.\n";
-//	  digits.at(i)->set_npe(-10.0);
-//	  cut_pos.push_back(i);
-//	}
-//  }
-//  for (unsigned int j = 0; j < cut_pos.size(); j++) {
-//    int pos_j = cut_pos.size() - j - 1;
-//	// std::cerr<< pos_j << " of " << cut_pos.size() << "\n";
-//	int k = cut_pos.at(pos_j);
-//    digits.erase(digits.begin()+k);
-//  }
-//}
+// void MapCppTrackerMCDigitization::discriminator(SciFiDigitPArray &digits) const {
+//   std::vector<int> cut_pos;
+//   for (unsigned int i = 0; i < digits.size(); i++) {
+//     if (_SciFiDisCut < digits.at(i)->get_npe()) {
+// 	  // std::cerr << "Good Point: " << digits.at(i)->get_npe() << "\n";
+// 	  digits.at(i)->set_npe(10.0);
+// 	} else {
+// 	  // std::cerr << "Bad Point: " << digits.at(i)->get_npe() << "\n";
+//     std::cerr << "This shouldn't run.\n";
+// 	  digits.at(i)->set_npe(-10.0);
+// 	  cut_pos.push_back(i);
+// 	}
+//   }
+//   for (unsigned int j = 0; j < cut_pos.size(); j++) {
+//     int pos_j = cut_pos.size() - j - 1;
+// 	// std::cerr<< pos_j << " of " << cut_pos.size() << "\n";
+// 	int k = cut_pos.at(pos_j);
+//     digits.erase(digits.begin()+k);
+//   }
+// }
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
                                                    int event_num, SciFiDigitPArray &digits) const {
