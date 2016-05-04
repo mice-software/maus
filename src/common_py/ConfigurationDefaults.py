@@ -569,7 +569,7 @@ EMRchargeThreshold = 10 # ADC counts, rejects noise for plane density
 EMRpolynomialOrder = 1 # Order of the polynomial to fit the tracks with
 EMRmaxMotherDaughterTime = 5000 # ADC counts, ~ 6 decay constants, 99.7% of muons
 EMRmaxMotherDaughterDistance = 100 # mm, max distance between mother and daughter
-EMRholeFraction = 0.08467 # percentage of the EMR volume that is not PS
+EMRholeFraction = 0.02117 # percentage of the EMR volume that is not PS
 
 # EMR reducer
 EMRdensityCut = 0.9

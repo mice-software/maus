@@ -15,8 +15,6 @@
  *
  */
 
-/** @class SciFiStraightPRTrack Pattern Recognition straight track class */
-
 #ifndef  _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISTRAIGHTPRTRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFISTRAIGHTPRTRACK_HH_
 
@@ -31,27 +29,45 @@
 
 namespace MAUS {
 
+/** @class SciFiStraightPRTrack
+ *  @author A. Dobbs
+ *  @brief Class representing straight tracks in the tracker formed by pattern recognition
+ */
 class SciFiStraightPRTrack : public SciFiBasePRTrack {
   public:
-    /** Default constructor */
+    /** @brief Default constructor */
     SciFiStraightPRTrack();
 
-    /** Constructor using explicit parameters */
+    /** @brief Constructor using explicit parameters
+     *  @param tracker The tracker number
+     *  @param x0 Intercept of the x-z fit in local tracker coordinates
+     *  @param mx Gradient of the x-z fit in local tracker coordinates
+     *  @param x_chisq ChiSq of the x-z fit
+     *  @param y0 Intercept of the y-z fit in local tracker coordinates
+     *  @param my Gradient of the y-z fit in local tracker coordinates
+     *  @param y_chisq ChiSq of the y-z fit
+     *  @param covariance Covariances of the fit
+     */
     SciFiStraightPRTrack(int tracker, double x0, double mx, double x_chisq,
                          double y0, double my, double y_chisq,
                          const DoubleArray& covariance);
 
-    /** Constructor using SimpleLines */
+    /** @brief Constructor using SimpleLines
+     *  @param tracker The tracker number
+     *  @param line_x SimpleLine used to construct track
+     *  @param line_y SimpleLine used to construct track
+     *  @param covariance Covariances of the fit
+     */
     SciFiStraightPRTrack(int tracker, SimpleLine line_x, SimpleLine line_y,
                          const DoubleArray& covariance);
 
-    /** Copy constructor */
+    /** @brief Copy constructor */
     SciFiStraightPRTrack(const SciFiStraightPRTrack &_strk);
 
-    /** Default destructor */
+    /** @brief Default destructor */
     virtual ~SciFiStraightPRTrack();
 
-    /** Equality operator - any pointers are deep copied */
+    /** @brief Equality operator - any pointers are deep copied */
     SciFiStraightPRTrack& operator=(const SciFiStraightPRTrack &_strk);
 
     /** Combine the different chi sqs into one final value */
@@ -128,19 +144,18 @@ class SciFiStraightPRTrack : public SciFiBasePRTrack {
 
 
   private:
-    int _tracker;
-    static const int _type = 0; // 0 for straight, 1 for helical
-
-    double _x0;
-    double _mx;
-    double _x_chisq;
-    double _y0;
-    double _my;
-    double _y_chisq;
-    double _global_x0;
-    double _global_mx;
-    double _global_y0;
-    double _global_my;
+    int _tracker;                 /** Tracker number, 0 for upstream, 1 for downstream */
+    static const int _type = 0;   /** Track type identifier, 0 for straight, 1 for helical */
+    double _x0;                   /** Intercept of the x-z fit in local tracker coordinates */
+    double _mx;                   /** Gradient of the x-z fit in local tracker coordinates */
+    double _x_chisq;              /** ChiSq of the x-z fit */
+    double _y0;                   /** Intercept of the y-z fit in local tracker coordinates */
+    double _my;                   /** Gradient of the y-z fit in local tracker coordinates */
+    double _y_chisq;              /** ChiSq of the y-z fit */
+    double _global_x0;            /** Intercept of the x-z fit in global coordinates */
+    double _global_mx;            /** Gradient of the x-z fit in global coordinates */
+    double _global_y0;            /** Intercept of the y-z fit in global coordinates */
+    double _global_my;            /** Gradient of the y-z fit in global coordinates */
 
     MAUS_VERSIONED_CLASS_DEF(SciFiStraightPRTrack)
 };

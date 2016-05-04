@@ -22,11 +22,10 @@
 
 namespace MAUS {
 
-/** @class Identifier for the channel where a hit was recorded in the EMR (for MC)
-
+/** @class EMRChannelId
+ *  @brief Identifier for the channel where a hit was recorded in the EMR (for MC)
  *  @var bar	<-- Global bar identifier (0->2831: 48 planes, 59 bars per plane) -->
  */
-
 class EMRChannelId {
   public:
     /** @brief Constructor - allocate to 0 */
