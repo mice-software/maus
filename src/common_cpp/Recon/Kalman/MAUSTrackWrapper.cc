@@ -456,9 +456,6 @@ namespace MAUS {
     new_track->SetSeedMomentum(seed_mom);
     new_track->SetSeedCovariance(seed.GetCovariance().GetMatrixArray(), dimension*dimension);
 
-// TODO:
-// - Init track before the fit?
-
     return new_track;
   }
 

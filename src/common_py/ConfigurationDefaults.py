@@ -278,6 +278,7 @@ SciFitdcFactor = 1.0
 SciFinPlanes = 3
 SciFinStations = 5
 SciFinTrackers = 2
+SciFiCalibrateMC = True
 SciFiNPECut = 2.0 # photoelectrons
 SciFiClustExcept = 100 # exception is thrown
 SciFi_sigma_tracker0_station5 = 0.4298 # Position error associated with station 5 (mm)

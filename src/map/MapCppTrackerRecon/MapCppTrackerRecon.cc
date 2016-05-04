@@ -244,7 +244,7 @@ void MapCppTrackerRecon::_process(Data* data) const {
         event->clear_scifitracks();
         track_fit(*event);
       }
-//      print_event_info(*event);
+      print_event_info(*event);
     }
   } else {
     std::cout << "No recon events found\n";
