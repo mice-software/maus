@@ -93,6 +93,22 @@ class SciFiTrackPoint : public TObject {
    */
   void set_mom(ThreeVector mom)                 { _mom  = mom; }
 
+  /** @brief  Sets the x momentum component.
+   */
+  void set_gradient(ThreeVector grad)           { _gradient  = grad; }
+
+  /** @brief Sets the ThreeVector of position errors
+   */
+  void set_pos_error(ThreeVector err)           { _errors_pos = err; }
+
+  /** @brief Sets the ThreeVector of momentum errors
+   */
+  void set_mom_error(ThreeVector err)           { _errors_mom = err; }
+
+  /** @brief Sets the ThreeVector of gradient errors
+   */
+  void set_gradient_error(ThreeVector err)      { _errors_gradient = err; }
+
   /** @brief  Sets the covariance matrix.
    */
   void set_covariance(std::vector<double> covariance)     { _covariance = covariance; }
@@ -148,13 +164,26 @@ class SciFiTrackPoint : public TObject {
 
   /** @brief  Returns the momentum in a threevector.
    */
-  ThreeVector gradient()   const { return ThreeVector(_mom.x()/_mom.z(), _mom.y()/_mom.z(), 1.0); }
+  ThreeVector gradient()   const { return _gradient; }
+
+  /** @brief Returns a ThreeVector of position errors
+   */
+  ThreeVector pos_error()  const { return _errors_pos; }
+
+  /** @brief Returns a ThreeVector of momentum errors
+   */
+  ThreeVector mom_error()  const { return _errors_mom; }
+
+  /** @brief Returns a ThreeVector of gradient errors
+   */
+  ThreeVector gradient_error()  const { return _errors_gradient; }
 
   /** @brief  Returns the covariance matrix.
    */
   std::vector<double> covariance()   const { return _covariance; }
 
   /** @brief  Returns the covariance matrix.
+   *  LEGACY FUNCTION - DO NOT USE
    */
   std::vector<double> errors()       const { return _errors; }
 
@@ -219,11 +248,29 @@ class SciFiTrackPoint : public TObject {
    */
   ThreeVector _mom;
 
+  /** @brief gradient
+   */
+  ThreeVector _gradient;
+
+  /** @brief position error
+   */
+  ThreeVector _errors_pos;
+
+  /** @brief momentum error
+   */
+  ThreeVector _errors_mom;
+
+  /** @brief gradient error
+   */
+  ThreeVector _errors_gradient;
+
   /** @brief Covariance matrix for the state vector [x, px, y, py, pz]
    */
   std::vector<double> _covariance;
 
   /** @brief Errors vector for the state vector [x, px, y, py, pz]
+   *  
+   *  LEGACY FUNCTION - Do Not Use!
    */
   std::vector<double> _errors;
 

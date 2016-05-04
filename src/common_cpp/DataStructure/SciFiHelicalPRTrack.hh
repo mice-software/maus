@@ -15,11 +15,6 @@
  *
  */
 
-/** @class SciFiHelicalPRTrack
- *
- *
- */
-
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIHELICALPRTRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIHELICALPRTRACK_HH_
 
@@ -40,13 +35,30 @@
 
 namespace MAUS {
 
+/** @class SciFiHelicalPRTrack
+ *  @author A. Dobbs
+ *  @brief Class representing helical tracks in the tracker formed by pattern recognition
+ */
 class SciFiHelicalPRTrack : public SciFiBasePRTrack {
   public:
 
     /** Default constructor */
     SciFiHelicalPRTrack();
 
-    /** Constructor from SimpleCircle and SimpleLine Without explicit chi squared setting */
+    /** @brief Constructor from SimpleCircle and SimpleLine
+     *
+     *  Constructor from SimpleCircle and SimpleLine, without explicit chi squared setting
+     *  @param tracker The tracker number
+     *  @param charge The track charge
+     *  @param pos0 Intercept of helix with tracker reference surface
+     *  @param phi0 Initial turning angle
+     *  @param circle SimpleCircle class used to construct track
+     *  @param line_sz SimpleLine class used to construct track
+     *  @param point_spread Not implemented
+     *  @param phi The spacepoint turning angles
+     *  @param spoints Pointers to the associated spacepoints
+     *  @param covariance Covariances of the fits
+     */
     SciFiHelicalPRTrack(int tracker, int charge, ThreeVector pos0, double phi0,
                         SimpleCircle circle, SimpleLine line_sz, double point_spread,
                         DoubleArray phi, SciFiSpacePointPArray spoints,
@@ -145,24 +157,22 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
-
   private:
-    int _tracker;
-    int _charge;
-    static const int _type = 1; // 0 for straight, 1 for helical
+    int _tracker;                 /** Tracker number, 0 for upstream, 1 for downstream */
+    int _charge;                  /** The charge of the track */
+    static const int _type = 1;   /** Track type identifier, 0 for straight, 1 for helical */
+    double _R;                    /** Radius of the track fit */
+    double _phi0;                 /** Initial turning angle [radians]. Confusing, to be removed. */
+    double _dsdz;                 /** Gradient of the s-z fit in tracker local coordinates */
+    double _line_sz_c;            /** Intercept of the s-z fit in tracker local coordinates */
+    double _line_sz_chisq;        /** ChiSq of the s-z fit */
+    double _circle_x0;            /** x coordo f the circle centre in tracker local coordinates */
+    double _circle_y0;            /** y coord of the circle centre in tracker local coordinates */
+    double _circle_chisq;         /** ChiSq of the circle (x-y) fit */
+    double _point_spread;         /** Not implemented */
 
-    double _R;
-    double _phi0;
-    double _dsdz;
-    double _line_sz_c;
-    double _line_sz_chisq;
-    double _circle_x0;
-    double _circle_y0;
-    double _circle_chisq;
-    double _point_spread;
-
-    ThreeVector _pos0; // Intercept of helix with tracker reference surface, not used at present
-    DoubleArray _phi;
+    ThreeVector _pos0;  /** Intercept of helix with tracker reference surface, not implemented */
+    DoubleArray _phi;   /** The turning angles of the spacepoints [radians] */
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };

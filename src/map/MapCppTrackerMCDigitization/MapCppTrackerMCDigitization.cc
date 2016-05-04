@@ -21,6 +21,7 @@
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
+#include "src/legacy/Interface/Squeak.hh"
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerMCDigitization(void) {
@@ -413,6 +414,19 @@ bool MapCppTrackerMCDigitization::load_mapping(std::string file) {
 }
 
 bool MapCppTrackerMCDigitization::load_bad_channels(std::string file) {
+  for ( int bank = 0; bank < _number_banks; ++bank ) {
+    for ( int chan_ro = 0; chan_ro < _number_channels; ++chan_ro ) {
+      _good_chan[bank][chan_ro] = true;
+    }
+  }
+
+  if ( file.size() == 0 ) {
+    // No file specified - assume no bad channels.
+    std::cerr << "No SciFi Bad Channels File. Assuming no bad channels";
+    return true;
+  }
+
+
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
   std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+file;
 
@@ -422,13 +436,6 @@ bool MapCppTrackerMCDigitization::load_bad_channels(std::string file) {
           "Could not load Tracker bad channel list.",
           "MapCppTrackerMCDigitization::load_bad_channels"));
   }
-
-  for ( int bank = 0; bank < _number_banks; ++bank ) {
-    for ( int chan_ro = 0; chan_ro < _number_channels; ++chan_ro ) {
-      _good_chan[bank][chan_ro] = true;
-    }
-  }
-
 
   int bad_bank, bad_chan_ro;
 

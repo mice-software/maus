@@ -5,7 +5,14 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
-MAUS-2.2.0
+MAUS-v2.3.0
+  The following changes were made:
+    - Minor EMR update
+    - Scifi kalman filter updates, pz residual offset fix
+    - Scifi trackpoints datastructure update
+    - Geometry test fix
+    - Doxygen updates
+MAUS-v2.2.0
   The following changes were made:
     - Geometry updates
     - Scifi Kalman fit updates
