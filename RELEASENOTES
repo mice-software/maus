@@ -5,6 +5,9 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.3.1
+  The following changes were made:
+    - Hot fix - Django version updated
 MAUS-v2.3.0
   The following changes were made:
     - Minor EMR update
