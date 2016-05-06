@@ -54,6 +54,8 @@ SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& m
   UseActiveRotations                    = (*json)["geometry_use_active_rotations"].asBool();
 
   _default_momentum  = (*json)["SciFiDefaultMomentum"].asDouble();
+  _pr_correction = (*json)["SciFiPRCorrection"].asDouble();
+  _pr_bias = (*json)["SciFiPRBias"].asDouble();
 }
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}

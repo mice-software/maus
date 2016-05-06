@@ -340,6 +340,9 @@ SciFiTestVirtualMakeSpacepoints = False
 SciFiTestVirtualSmear = 0.431425 # Simulate measurement error on alpha with Gaussian Smearing this is the Std Dev.
 # Set the smear value to negative to force a quantisation of alpha - like a real measurement
 
+SciFiPRCorrection = 1.275
+SciFiPRBias = 0.224
+
 SciFiSeedCovariance = 1000.0 # Error estimate for Seed values of the Kalman Fit
 SciFiSeedPatRec = True
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit

@@ -73,9 +73,11 @@ MUON_PID = [13, -13]
 P_MIN = 0.0
 P_MAX = 1000.0
 
+MAX_GRADIENT = 2.0
+
 PT_MIN = 0.0
-PT_MAX = 200.0
-PT_BIN = 20
+PT_MAX = 100.0
+PT_BIN = 10
 PT_BIN_WIDTH = 10.0
 
 PZ_MIN = 120.0
@@ -243,6 +245,36 @@ def init_plots_data() :
 
 
 
+
+    tracker_dict['x_residual_p'] = ROOT.TH2F( \
+               tracker+'_x_residual_p', "X Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+    tracker_dict['y_residual_p'] = ROOT.TH2F( \
+               tracker+'_y_residual_p', "Y Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+    tracker_dict['r_residual_p'] = ROOT.TH2F( \
+               tracker+'_r_residual_p', "Radius Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+
+    tracker_dict['px_residual_p'] = ROOT.TH2F( \
+              tracker+'_px_residual_p', "p_{x} Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+    tracker_dict['py_residual_p'] = ROOT.TH2F( \
+              tracker+'_py_residual_p', "p_{y} Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+
+    tracker_dict['pt_residual_p'] = ROOT.TH2F( \
+              tracker+'_p_residual_p', "p_{t} Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+    tracker_dict['pz_residual_p'] = ROOT.TH2F( \
+              tracker+'_pz_residual_p', "p_{z} Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+
+    tracker_dict['p_residual_p'] = ROOT.TH2F( \
+              tracker+'_p_residual_p', "p Residuals in p", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+
+
     tracker_dict['x_residual_pt'] = ROOT.TH2F( \
                tracker+'_x_residual_pt', "X Residuals in p_{t}", \
                                      PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
@@ -265,6 +297,9 @@ def init_plots_data() :
                                      PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
     tracker_dict['pz_residual_pt'] = ROOT.TH2F( \
               tracker+'_pz_residual_pt', "p_{z} Residuals in p_{t}", \
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+    tracker_dict['p_residual_pt'] = ROOT.TH2F( \
+              tracker+'_p_residual_pt', "p Residuals in p_{t}", \
                                      PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
 
 
@@ -299,6 +334,12 @@ def init_plots_data() :
     tracker_dict['pz_residual_pz'] = ROOT.TH2F( \
               tracker+'_pz_residual_pz', "p_{z} Residuals in p_{z}", \
                                      PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+
+    tracker_dict['p_residual_pz'] = ROOT.TH2F( \
+              tracker+'_p_residual_pz', "p Residuals in pz", \
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+
+
 
 
     tracker_dict['mc_alpha'] = ROOT.TH2F( tracker+'_mc_alpha', \
@@ -347,11 +388,14 @@ def init_plots_data() :
 
     tracker_dict['seed_pz_residual'] = ROOT.TH1F( tracker+'_patrec_seed_pz_residual', \
           "Residual: pz", 101, -50.5, 50.5 )
+    tracker_dict['seed_p_residual'] = ROOT.TH1F( tracker+'_patrec_seed_p_residual', \
+          "Residual: p", 101, -50.5, 50.5 )
 
     tracker_dict['seed_pz_residual_pz'] = ROOT.TH2F( tracker+'_patrec_seed_pz-pz', "True p_{z} - Seed p_{z}", PZ_BIN, PZ_MIN, PZ_MAX, 200, -50.0, 50.0 )
     tracker_dict['seed_pt_residual_pt'] = ROOT.TH2F( tracker+'_patrec_seed_pt-pt', "True p_{#perp} - Seed p_{#perp}", PT_BIN, PT_MIN, PT_MAX, 200, -50.0, 50.0 )
     tracker_dict['seed_pz_residual_pt'] = ROOT.TH2F( tracker+'_patrec_seed_pz-pt', "True p_{z} - Seed p_{#perp}", PT_BIN, PT_MIN, PT_MAX, 200, -50.0, 50.0 )
     tracker_dict['seed_pt_residual_pz'] = ROOT.TH2F( tracker+'_patrec_seed_pt-pz', "True p_{#perp} - Seed p_{z}", PZ_BIN, PZ_MIN, PZ_MAX, 200, -50.0, 50.0 )
+    tracker_dict['seed_p_residual_p'] = ROOT.TH2F( tracker+'_patrec_seed_p-p', "True p - Seed p", PZ_BIN, PZ_MIN, PZ_MAX, 200, -50.0, 50.0 )
 
 
     plot_dict[tracker] = tracker_dict
@@ -377,6 +421,8 @@ def init_plots_data() :
                            "Missing Tracks pt", PT_BIN, PT_MIN, PT_MAX )
     missing_tracker['pz'] = ROOT.TH1F(tracker+'_pz_missing', \
                            "Missing Tracks pz", PZ_BIN, PZ_MIN, PZ_MAX )
+    missing_tracker['pz_pt'] = ROOT.TH2F(tracker+'_pz_pt_missing', \
+    "Missing Tracks pz", PZ_BIN, PZ_MIN, PZ_MAX, PT_BIN, PT_MIN, PT_MAX )
 
     missing_tracks[tracker] = missing_tracker
 
@@ -410,6 +456,7 @@ def init_plots_data() :
     data_dict['counters'][tracker]['missing_reference_hits'] = 0
 
     data_dict['counters'][tracker]['momentum_cut'] = 0
+    data_dict['counters'][tracker]['gradient_cut'] = 0
 
     data_dict['counters'][tracker]['found_pairs'] = 0
 
@@ -595,7 +642,7 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
     ref_plane = tools.calculate_plane_id(tracker_num,
                                                     RECON_STATION, RECON_PLANE)
     seed_plane = tools.calculate_plane_id(tracker_num,
-                                                    RECON_STATION, RECON_PLANE)
+                                                    SEED_STATION, SEED_PLANE)
     virtual_pt = 0.0
     virtual_pz = 0.0
     virtual_hits = 0
@@ -622,6 +669,9 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
     virtual_p = math.sqrt( virtual_pt**2 + virtual_pz**2 )
     if virtual_p > P_MAX or virtual_p < P_MIN :
       data_dict['counters'][tracker]['momentum_cut'] += 1
+      continue
+    elif virtual_pt / virtual_p > MAX_GRADIENT :
+      data_dict['counters'][tracker]['gradient_cut'] += 1
       continue
     else :
       data_dict['counters'][tracker]['number_virtual'] += 1
@@ -657,6 +707,7 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
             reference_virt.GetPosition().y(), reference_virt.GetMomentum().x())
         plot_dict['missing_tracks'][tracker]['pz'].Fill( virtual_pz )
         plot_dict['missing_tracks'][tracker]['pt'].Fill( virtual_pt )
+        plot_dict['missing_tracks'][tracker]['pz_pt'].Fill( virtual_pz, virtual_pt )
 
       continue # Can't do anything else without a scifi track
 
@@ -770,9 +821,13 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
 
     Pt_mc = math.sqrt( virt_mom[0] ** 2 + virt_mom[1] ** 2 )
     Pz_mc = virt_mom[2]
+    P_mc = math.sqrt(Pz_mc**2 +Pt_mc**2)
 
     Pt_recon = math.sqrt( scifi_mom[0] ** 2 + scifi_mom[1] ** 2 )
+    P_recon = math.sqrt(Pt_recon**2 + scifi_mom[2]**2)
+
     Pt_res = Pt_recon - Pt_mc
+    P_res = P_recon - P_mc
 
     tracker_plots['xy'].Fill(scifi_pos[0], scifi_pos[1])
     tracker_plots['pxpy'].Fill(scifi_mom[0], scifi_mom[1])
@@ -790,6 +845,7 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['residual_pt'].Fill(Pt_res)
     tracker_plots['residual_pz'].Fill(res_mom[2])
 
+
     tracker_plots['x_residual_pt'].Fill( Pt_mc, res_pos[0] )
     tracker_plots['y_residual_pt'].Fill( Pt_mc, res_pos[1] )
     tracker_plots['r_residual_pt'].Fill( Pt_mc, sqrt(res_pos[1]**2 + res_pos[2]**2) )
@@ -797,6 +853,17 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['py_residual_pt'].Fill( Pt_mc, res_mom[1] )
     tracker_plots['pt_residual_pt'].Fill( Pt_mc, Pt_res )
     tracker_plots['pz_residual_pt'].Fill( Pt_mc, res_mom[2] )
+    tracker_plots['p_residual_pt'].Fill( Pt_mc, P_res )
+
+    tracker_plots['x_residual_p'].Fill( P_mc, res_pos[0] )
+    tracker_plots['y_residual_p'].Fill( P_mc, res_pos[1] )
+    tracker_plots['r_residual_p'].Fill( P_mc, sqrt(res_pos[1]**2 + res_pos[2]**2) )
+    tracker_plots['px_residual_p'].Fill( P_mc, res_mom[0] )
+    tracker_plots['py_residual_p'].Fill( P_mc, res_mom[1] )
+    tracker_plots['pt_residual_p'].Fill( P_mc, Pt_res )
+    tracker_plots['pz_residual_p'].Fill( P_mc, res_mom[2] )
+    tracker_plots['p_residual_p'].Fill( P_mc, P_res )
+
 
     tracker_plots['x_residual_pz'].Fill( Pz_mc, res_pos[0] )
     tracker_plots['y_residual_pz'].Fill( Pz_mc, res_pos[1] )
@@ -807,6 +874,7 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['py_residual_pz'].Fill( Pz_mc, res_mom[1] )
     tracker_plots['pt_residual_pz'].Fill( Pz_mc, Pt_res )
     tracker_plots['pz_residual_pz'].Fill( Pz_mc, res_mom[2] )
+    tracker_plots['p_residual_pz'].Fill( Pz_mc, P_res )
 
     if mc_cov.length() == ENSEMBLE_SIZE :
       pz = mc_cov.get_mean('pz')
@@ -875,10 +943,14 @@ def fill_plots_seeds(plot_dict, data_dict, hit_pairs) :
                 scifi_mom[1]/scifi_mom[2] - virt_mom[1]/virt_mom[2] ]
 
     Pt_mc = math.sqrt( virt_mom[0] ** 2 + virt_mom[1] ** 2 )
+    P_mc = math.sqrt( virt_mom[0] ** 2 + virt_mom[1] ** 2 + virt_mom[2] ** 2 )
     Pz_mc = virt_mom[2]
 
     Pt_recon = math.sqrt( scifi_mom[0] ** 2 + scifi_mom[1] ** 2 )
+    P_recon = math.sqrt( scifi_mom[0] ** 2 + scifi_mom[1] ** 2 + scifi_mom[2] ** 2 )
+
     Pt_res = Pt_recon - Pt_mc
+    P_res = P_recon - P_mc
 
     tracker_plots['seed_x_residual'].Fill(res_pos[0])
     tracker_plots['seed_y_residual'].Fill(res_pos[0])
@@ -891,6 +963,7 @@ def fill_plots_seeds(plot_dict, data_dict, hit_pairs) :
     tracker_plots['seed_pt_residual_pt'].Fill(Pt_mc, Pt_res)
     tracker_plots['seed_pz_residual_pt'].Fill(Pt_mc, res_mom[2])
     tracker_plots['seed_pt_residual_pz'].Fill(Pz_mc, Pt_res)
+    tracker_plots['seed_p_residual_p'].Fill(P_mc, P_res)
 
 
 
@@ -957,8 +1030,8 @@ def analyse_plots(plot_dict, data_dict) :
 # Make the pretty plots
 
   for tracker in [ "upstream", "downstream" ] :
-    for component in [ "x_", "y_", "r_", "px_", "py_", "pt_", "pz_" ] :
-      for plot_axis in [ "residual_pt", "residual_pz" ] :
+    for component in [ "x_", "y_", "r_", "px_", "py_", "pt_", "pz_", "p_" ] :
+      for plot_axis in [ "residual_pt", "residual_pz", "residual_p" ] :
         plot = plot_dict[tracker][component+plot_axis]
 
         rms_error = array.array( 'd' )
@@ -1000,46 +1073,45 @@ def analyse_plots(plot_dict, data_dict) :
 
 
   for tracker in [ "upstream", "downstream" ] :
-    for component in [ "pt_", "pz_" ] :
-      for plot_axis in [ "residual_pt", "residual_pz" ] :
-        plot = plot_dict[tracker]['seed_'+component+plot_axis]
+#    for component in [ "pt_", "pz_", ] :
+#      for plot_axis in [ "residual_pt", "residual_pz" ] :
+    for plot_name in [ "pt_residual_pt", "pt_residual_pz", "pz_residual_pt", "pz_residual_pz", "p_residual_p" ] :
+      plot = plot_dict[tracker]['seed_'+plot_name]
 
-        rms_error = array.array( 'd' )
-        bin_size = array.array( 'd' )
-        bins = array.array( 'd' )
-        rms = array.array( 'd' )
-        mean = array.array( 'd' )
-        mean_error = array.array( 'd' )
+      rms_error = array.array( 'd' )
+      bin_size = array.array( 'd' )
+      bins = array.array( 'd' )
+      rms = array.array( 'd' )
+      mean = array.array( 'd' )
+      mean_error = array.array( 'd' )
 
-        width = plot.GetXaxis().GetBinWidth(1)
-        for i in range( 0, plot.GetXaxis().GetNbins() ) :
-          projection = plot.ProjectionY( \
-      tracker+component+plot_axis+'_pro_'+str(i), i, (i+1) )
+      width = plot.GetXaxis().GetBinWidth(1)
+      for i in range( 0, plot.GetXaxis().GetNbins() ) :
+        projection = plot.ProjectionY( \
+              tracker+plot_name+'_pro_'+str(i), i, (i+1) )
 
-          plot_mean = plot.GetXaxis().GetBinCenter( i ) + width
-          pro_mean, pro_mean_err, pro_std, pro_std_err = \
-                                        analysis.tools.fit_gaussian(projection)
+        plot_mean = plot.GetXaxis().GetBinCenter( i ) + width
+        pro_mean, pro_mean_err, pro_std, pro_std_err = \
+                                      analysis.tools.fit_gaussian(projection)
 
-          bin_size.append( width*0.5 )
-          bins.append( plot_mean )
-          rms.append( pro_std )
-          rms_error.append( pro_std_err )
-          mean.append( pro_mean )
-          mean_error.append( pro_mean_err )
+        bin_size.append( width*0.5 )
+        bins.append( plot_mean )
+        rms.append( pro_std )
+        rms_error.append( pro_std_err )
+        mean.append( pro_mean )
+        mean_error.append( pro_mean_err )
 
-        if len(bins) != 0 :
-          resolution_graph = ROOT.TGraphErrors( len(bins), \
-                                               bins, rms, bin_size, rms_error )
-          bias_graph = ROOT.TGraphErrors( len(bins), \
-                                             bins, mean, bin_size, mean_error )
-        else :
-          resolution_graph = None
-          bias_graph = None
+      if len(bins) != 0 :
+        resolution_graph = ROOT.TGraphErrors( len(bins), \
+                                             bins, rms, bin_size, rms_error )
+        bias_graph = ROOT.TGraphErrors( len(bins), \
+                                           bins, mean, bin_size, mean_error )
+      else :
+        resolution_graph = None
+        bias_graph = None
 
-        plot_dict[tracker]['seed_'+component+plot_axis+'_resolution'] = \
-                                                               resolution_graph
-        plot_dict[tracker]['seed_'+component+plot_axis+'_bias'] = bias_graph
-
+      plot_dict[tracker]['seed_'+plot_name+'_resolution'] = resolution_graph
+      plot_dict[tracker]['seed_'+plot_name+'_bias'] = bias_graph
 
   return data_dict
 
@@ -1098,6 +1170,9 @@ if __name__ == "__main__" :
              default=[P_MIN, P_MAX], help="Specify the range of the total " + \
                                          "momentum to consider for analysis." )
 
+  parser.add_argument( '--max_gradient', type=float, default=MAX_GRADIENT, \
+      help='Specify the maximum gradient to analyse. This eliminates non-physical muons' )
+
   parser.add_argument( '-C', '--save_corrections', action='store_true', \
       help="Flag to create the correction matrix files" )
 
@@ -1126,6 +1201,8 @@ if __name__ == "__main__" :
 
     P_MIN = namespace.p_window[0]
     P_MAX = namespace.p_window[1]
+
+    MAX_GRADIENT = namespace.max_gradient
 
     PZ_MIN = namespace.pz_window[0]
     PZ_MAX = namespace.pz_window[1]

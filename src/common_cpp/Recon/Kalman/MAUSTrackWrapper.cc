@@ -76,6 +76,8 @@ namespace MAUS {
     double c  = CLHEP::c_light;
     double particle_charge = h_track->get_charge();
     double Bz = geom->GetFieldValue(tracker);
+    double PR_correction = geom->GetPRCorrection(tracker);
+    double PR_bias = geom->GetPRBias();
 
     // Get h_track values.
     double r  = h_track->get_R();
@@ -93,12 +95,13 @@ namespace MAUS {
 
     if (correct_energy_loss) {
       double P = patrec_momentum.mag();
-      double patrec_bias; // Account for two planes of energy loss
-      if (tracker == 0) {
-        patrec_bias = (P + 1.3) / P;
-      } else {
-        patrec_bias = (P - 1.3) / P;
-      }
+      double patrec_bias; // Account for two(ish) planes of energy loss
+//      if (tracker == 0) {
+//        patrec_bias = (P + 1.3) / P;
+//      } else {
+//        patrec_bias = (P - 1.3) / P;
+//      }
+      patrec_bias = ((P + PR_correction) + PR_bias) / P;
       patrec_momentum = patrec_bias * patrec_momentum;
     }
 
