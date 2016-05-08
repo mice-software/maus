@@ -70,6 +70,8 @@ REQUIRE_DATA = True
 P_VALUE_CUT = 0.0
 MUON_PID = [13, -13]
 
+RECON_TRACKERS = [0, 1]
+
 P_MIN = 0.0
 P_MAX = 1000.0
 
@@ -110,7 +112,7 @@ INVERSE_PLANE_DICT = {}
 TRACKER_PLANE_RADIUS = 150.0
 
 SELECT_EVENTS = False
-GOOD_EVENTS = {}
+GOOD_EVENTS = None
 
  
 def get_pz_bin(pz) :
@@ -387,9 +389,9 @@ def init_plots_data() :
           "Residual: "+component, 201, -10.05, 10.05 )
 
     tracker_dict['seed_pz_residual'] = ROOT.TH1F( tracker+'_patrec_seed_pz_residual', \
-          "Residual: pz", 101, -50.5, 50.5 )
+          "Residual: pz", 501, -50.1, 50.1 )
     tracker_dict['seed_p_residual'] = ROOT.TH1F( tracker+'_patrec_seed_p_residual', \
-          "Residual: p", 101, -50.5, 50.5 )
+          "Residual: p", 501, -50.1, 50.1 )
 
     tracker_dict['seed_pz_residual_pz'] = ROOT.TH2F( tracker+'_patrec_seed_pz-pz', "True p_{z} - Seed p_{z}", PZ_BIN, PZ_MIN, PZ_MAX, 200, -50.0, 50.0 )
     tracker_dict['seed_pt_residual_pt'] = ROOT.TH2F( tracker+'_patrec_seed_pt-pt', "True p_{#perp} - Seed p_{#perp}", PT_BIN, PT_MIN, PT_MAX, 200, -50.0, 50.0 )
@@ -493,16 +495,20 @@ def create_virtual_plane_dict(file_reader) :
             virtual_plane_dict[ plane_id ] = ( vhit.GetStationId(), diff )
 
     done = True
-    for plane in virtual_plane_dict :
-      if virtual_plane_dict[plane][1] > ALIGNMENT_TOLERANCE :
-#        print plane, virtual_plane_dict[plane]
-        done = False
+    for tracker in RECON_TRACKERS :
+      for station in [1, 2, 3, 4, 5] :
+        for plane in [0, 1, 2] :
+          plane_id = analysis.tools.calculate_plane_id( tracker, station, plane )
+          if virtual_plane_dict[plane_id][1] > ALIGNMENT_TOLERANCE :
+#            print plane_id, virtual_plane_dict[plane]
+            done = False
     if done :
       break
   else :
-    print
-    print virtual_plane_dict
-    raise ValueError("Could not locate all virtuals planes")
+    if REQUIRE_ALL_PLANES :
+      print
+      print virtual_plane_dict
+      raise ValueError("Could not locate all virtuals planes")
 
   file_reader.reset()
   return virtual_plane_dict
@@ -958,13 +964,13 @@ def fill_plots_seeds(plot_dict, data_dict, hit_pairs) :
     tracker_plots['seed_py_residual'].Fill(res_mom[1])
     tracker_plots['seed_pz_residual'].Fill(res_mom[2])
     tracker_plots['seed_pt_residual'].Fill(Pt_res)
+    tracker_plots['seed_p_residual'].Fill(P_res)
 
     tracker_plots['seed_pz_residual_pz'].Fill(Pz_mc, res_mom[2])
     tracker_plots['seed_pt_residual_pt'].Fill(Pt_mc, Pt_res)
     tracker_plots['seed_pz_residual_pt'].Fill(Pt_mc, res_mom[2])
     tracker_plots['seed_pt_residual_pz'].Fill(Pz_mc, Pt_res)
     tracker_plots['seed_p_residual_p'].Fill(P_mc, P_res)
-
 
 
 def analyse_plots(plot_dict, data_dict) :
@@ -1166,6 +1172,9 @@ if __name__ == "__main__" :
         default=[PT_MIN, PT_MAX], help="Specify the range of Pt to consider "+\
                                "for the reconstruction of optical functions." )
 
+  parser.add_argument( '--trackers', type=int, default=RECON_TRACKERS, \
+                          nargs='+', help="Specifies the trackers to analyse" )
+
   parser.add_argument( '--p_window', type=float, nargs=2, \
              default=[P_MIN, P_MAX], help="Specify the range of the total " + \
                                          "momentum to consider for analysis." )
@@ -1198,6 +1207,8 @@ if __name__ == "__main__" :
     ENSEMBLE_SIZE = namespace.ensemble_size
     if namespace.not_require_cluster :
       REQUIRE_DATA = False
+
+    RECON_TRACKERS = namespace.trackers
 
     P_MIN = namespace.p_window[0]
     P_MAX = namespace.p_window[1]
@@ -1238,39 +1249,23 @@ if __name__ == "__main__" :
     virtual_plane_dictionary = create_virtual_plane_dict(file_reader)
     VIRTUAL_PLANE_DICT = virtual_plane_dictionary
     INVERSE_PLANE_DICT = inverse_virtual_plane_dict(virtual_plane_dictionary)
+    file_reader.select_events(GOOD_EVENTS)
+    file_reader.set_max_num_events(namespace.max_num_events)
+    file_reader.set_print_progress('spill')
     sys.stdout.write(   "- Finding Virtual Planes : Done   \n" )
 
 ##### 4. Load Events ##########################################################
     print "\n- Loading Spills...\n"
     try :
-      while file_reader.next_event() and \
-               file_reader.get_total_num_events() != namespace.max_num_events :
-
-        if SELECT_EVENTS :
-          filename = file_reader.get_current_filename()
-          spill = str(file_reader.get_current_spill_number())
-          event = file_reader.get_current_event_number()
-          if filename not in GOOD_EVENTS :
-            continue
-          if spill not in GOOD_EVENTS[filename] :
-            continue
-          if event not in GOOD_EVENTS[filename][spill] :
-            continue
+      while file_reader.next_selected_event() :
 
         try :
-          sys.stdout.write( 
-              '  Spill ' + str(file_reader.get_current_spill_number()) + \
-              ' of ' + str(file_reader.get_current_number_spills()) + \
-              ' in File ' + str(file_reader.get_current_filenumber()) + \
-              ' of ' + str(file_reader.get_number_files()) + '             \r')
-          sys.stdout.flush()
-
           scifi_event = file_reader.get_event( 'scifi' )
           mc_event = file_reader.get_event( 'mc' )
 
 ##### 5. Extract tracks and Fill Plots ########################################
 
-          paired_hits, seed_pairs= make_scifi_mc_pairs(plot_dict, data_dict, \
+          paired_hits, seed_pairs = make_scifi_mc_pairs(plot_dict, data_dict, \
                                virtual_plane_dictionary, scifi_event, mc_event)
           fill_plots(plot_dict, data_dict, paired_hits)
           fill_plots_seeds(plot_dict, data_dict, seed_pairs)

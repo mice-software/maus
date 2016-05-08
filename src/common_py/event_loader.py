@@ -21,6 +21,7 @@
 import ROOT
 
 import gc
+import sys
 
 class maus_reader() :
   """
@@ -33,7 +34,7 @@ class maus_reader() :
     This class does not offer full coverage of the datastructure, purely a
     simplified interface to the higher level objects.
   """
-  def __init__( self, filename ) :
+  def __init__( self, filename, print_progress=None ) :
     """
       Initialise the class variables and load the first file handle
     """
@@ -54,6 +55,16 @@ class maus_reader() :
 
     self.__root_file = None
 
+    self.__print_event_progress = False
+    self.__print_spill_progress = False
+    self.__print_file_progress = False
+    if print_progress == "event" :
+      self.__print_event_progress = True
+    elif print_progress == "spill" :
+      self.__print_spill_progress = True
+    elif print_progress == "file" :
+      self.__print_file_progress = True
+
     self.__current_spill_num = -1
     self.__current_num_spills = 0
     self.__current_event_num = -1
@@ -64,7 +75,9 @@ class maus_reader() :
 
     self.__max_num_events = 0
 
-#    self.next_event()
+    self.__selected_events = None
+
+    self.__saved_events = {}
 
 
   def reset( self ) :
@@ -85,6 +98,66 @@ class maus_reader() :
     self.__total_num_spills = 0
     self.__total_num_events = 0
     gc.collect()
+
+  def set_print_progress( self, print_progress ) :
+    """
+      Automatically print the progress to the sys.stdout handle.
+
+      print_progress must be one of "event", "spill" or "file".
+    """
+    self.__print_event_progress = False
+    self.__print_spill_progress = False
+    self.__print_file_progress = False
+    if print_progress == "event" :
+      self.__print_event_progress = True
+    elif print_progress == "spill" :
+      self.__print_spill_progress = True
+    elif print_progress == "file" :
+      self.__print_file_progress = True
+    else :
+      raise ValueError( "Unknown print progress option: " + \
+                                                  str(print_progress) )
+
+
+  def select_events( self, selected_events_dict ) :
+    """
+      Only loads events that are present in the supplied dictionary.
+      Dictionary must have the structure:
+        { "FILENAME" : { "SPILL" : [ EVENT NUMBERS ], {ANOTHER SPILL...}}}
+    """
+    self.__selected_events = selected_events_dict
+
+
+  def get_select_events( self ) :
+    """
+      Returns True if the instance has a list of good events to select.
+    """
+    if self.__selected_events is not None :
+      return True
+    else :
+      return False
+
+
+  def save_event( self ) :
+    """
+      Add the event location to an internal list of good events.
+    """
+    filename = self.__current_filename
+    spill = self.__current_spill_num
+    event = self.__current_event_num
+    if filename not in self.__saved_events :
+      self.__saved_events[filename] = {}
+    if spill not in self.__saved_events[filename] :
+      self.__saved_events[filename][spill] = []
+
+    self.__saved_events[filename][spill].append(event)
+
+
+  def get_saved_events( self ) :
+    """
+      Returns a reference to the dictionary of saved events.
+    """
+    return self.__saved_events
 
 
   def __load_file( self ) :
@@ -121,6 +194,13 @@ class maus_reader() :
       If one is found return True, else return False.
     """
     self.__current_filenumber += 1
+
+    if self.__print_file_progress :
+      sys.stdout.write( 
+          ' File ' + str(self.__current_filenumber+1) + \
+          ' of ' + str(self.__num_files) + '                      \r')
+      sys.stdout.flush()
+
     if self.__current_filenumber < self.__num_files :
       self.__current_filename = self.__filenames[ self.__current_filenumber ]
       return True
@@ -135,11 +215,23 @@ class maus_reader() :
     """
     self.__max_num_events = max_num
 
+
   def next_event( self ) :
     """
       Load the next event into memory.
     """
     self.__current_event_num += 1
+
+    if self.__print_event_progress :
+      sys.stdout.write( 
+          ' Event ' + str(self.__current_event_num+1) + \
+          ' of ' + str(self.__current_num_events) + \
+          ' in Spill ' + str(self.__current_spill_num+1) + \
+          ' of ' + str(self.__current_num_spills) + \
+          ' in File ' + str(self.__current_filenumber+1) + \
+          ' of ' + str(self.__num_files) + '                      \r')
+      sys.stdout.flush()
+
     if self.__current_event_num >= self.__current_num_events :
       if self.next_spill() is False :
         return False
@@ -151,12 +243,40 @@ class maus_reader() :
       return True
 
 
+  def next_selected_event( self ) :
+    """
+      Loads the next event that is present in the select_events dict if one is present,
+      otherwise the next event is loaded.
+    """
+    if self.get_select_events() is False :
+      return self.next_event()
+    else :
+      while self.next_event():
+        spill = str(self.__current_spill_num)
+        if self.__current_filename in self.__selected_events :
+#          print "HERE File", self.__current_filename, spill, self.__current_event_num, self.__current_num_events
+          if spill in self.__selected_events[self.__current_filename] :
+            if self.__current_event_num in self.__selected_events[self.__current_filename][spill] :
+              return True
+      else :
+        return False
+
+
   def next_spill( self ) :
     """
       Loads the next spill, in the current event into memory.
       If one is available return True, else return False
     """
     self.__current_spill_num += 1
+
+    if self.__print_spill_progress :
+      sys.stdout.write( 
+          ' Spill ' + str(self.__current_spill_num+1) + \
+          ' of ' + str(self.__current_num_spills) + \
+          ' in File ' + str(self.__current_filenumber+1) + \
+          ' of ' + str(self.__num_files) + '                      \r')
+      sys.stdout.flush()
+
 
     if self.__current_spill_num >= self.__current_num_spills :
       if self.__increment_filename() :
@@ -189,11 +309,13 @@ class maus_reader() :
     """
     return self.__current_filename
 
+
   def get_current_filenumber( self ) :
     """
       Return the current position in the list of filenames
     """
-    return self.__current_filenumber + 1
+    return self.__current_filenumber
+
 
   def get_number_files( self ) :
     """
@@ -201,17 +323,20 @@ class maus_reader() :
     """
     return self.__num_files
 
+
   def get_current_number_spills( self ) :
     """
       Return the number of spills in the current file.
     """
     return self.__current_num_spills
 
+
   def get_current_spill_number( self ) :
     """
       Return the current spill number, in the current file.
     """
-    return self.__current_spill_num + 1
+    return self.__current_spill_num
+
 
   def get_current_number_events( self ) :
     """
@@ -219,11 +344,13 @@ class maus_reader() :
     """
     return self.__current_num_events
 
+
   def get_current_event_number( self ) :
     """
       Return the current event number, in the current spill.
     """
-    return self.__current_event_num + 1
+    return self.__current_event_num
+
 
   def get_spill( self ) :
     """
@@ -231,17 +358,20 @@ class maus_reader() :
     """
     return self.__spill
 
+
   def get_total_num_spills( self ) :
     """
       Return the total number of spills read so far.
     """
     return self.__total_num_spills
 
+
   def get_total_num_events( self ) :
     """
       Return the total number of events read so far.
     """
     return self.__total_num_events
+
 
   def is_good( self ) :
     """
