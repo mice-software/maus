@@ -148,8 +148,8 @@ class SciFiGeometryHelper {
    */
   void FieldValue(const MiceModule* trackerModule, SciFiTrackerGeometry& geom);
 
-  double GetPRCorrection(int tracker) const { return _pr_correction * ( tracker == 0 ? 1.0 : -1.0 ); }
-  
+  double GetPRCorrection(int tracker) const { return _pr_correction*( tracker == 0 ? 1.0 : -1.0 ); }
+
   double GetPRBias() const { return _pr_bias; }
 
   SciFiTrackerMap& GeometryMap() { return _geometry_map; }

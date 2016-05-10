@@ -17,6 +17,7 @@
 #
 
 # pylint: disable = W0311, E1101, W0613, C0111, R0911, W0621, C0103, R0902
+# pylint: disable = R0904
 
 import ROOT
 
@@ -245,8 +246,8 @@ class maus_reader() :
 
   def next_selected_event( self ) :
     """
-      Loads the next event that is present in the select_events dict if one is present,
-      otherwise the next event is loaded.
+      Loads the next event that is present in the select_events dict if one is 
+       present, otherwise the next event is loaded.
     """
     if self.get_select_events() is False :
       return self.next_event()
@@ -254,9 +255,9 @@ class maus_reader() :
       while self.next_event():
         spill = str(self.__current_spill_num)
         if self.__current_filename in self.__selected_events :
-#          print "HERE File", self.__current_filename, spill, self.__current_event_num, self.__current_num_events
           if spill in self.__selected_events[self.__current_filename] :
-            if self.__current_event_num in self.__selected_events[self.__current_filename][spill] :
+            if self.__current_event_num in \
+                       self.__selected_events[self.__current_filename][spill] :
               return True
       else :
         return False
