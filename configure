@@ -212,6 +212,10 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export MICEFILES="\${MAUS_ROOT_DIR}/src/legacy/FILES"
 
+     # Event Viewer
+     export EV_DEST_DIR="\${MAUS_ROOT_DIR}/tmp/"
+     export EV_DETGEOM_FILE="\${MAUS_ROOT_DIR}/src/utilities/event-viewer/MICEGeometryMinimal.heprep"
+
      if [ -z "\${maus_no_optimize}" ]; then  # see if the variable exists
         export maus_no_optimize=0 # force gcc not to optimise
      fi
