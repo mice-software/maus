@@ -116,4 +116,8 @@ namespace MAUS {
       return *this;
   }
 
+  void SciFiStraightPRTrack::form_total_chi_squared() {
+    this->set_chi_squared(_x_chisq + _y_chisq);
+  }
+
 } // ~namespace MAUS

@@ -310,25 +310,25 @@ SciFiParams_RMS = 370.
 #SciFiParams_A = 104.15 # g/mol
 SciFiParams_Z = 3.5
 SciFiParams_A = 6.5
-SciFiParams_Plane_Width = 0.6523 # mm
+SciFiParams_Plane_Width = 0.6273 # mm
 SciFiParams_Radiation_Length = 413.124 # mm
 SciFiParams_Density = 1.06 #g/cm3, 0.00106 g/mm3
-SciFiParams_Mean_Excitation_Energy = 68.7 # eV
+SciFiParams_Mean_Excitation_Energy = 68.7 / 1.0E6 # MeV
 SciFiParams_Density_Correction = 0.164541
 #MylarParams_Z = 5.
 #MylarParams_A = 192.2 # g/mol
 MylarParams_Z = 8.727
 MylarParams_A = 4.545 # g/mol
-MylarParams_Plane_Width = 0.025# mm
+MylarParams_Plane_Width = 0.025 # mm
 MylarParams_Radiation_Length = 285.364  # mm
 MylarParams_Density = 1.4 #g/cm3, 0.0014 g/mm3
-MylarParams_Mean_Excitation_Energy = 78.7 # eV
+MylarParams_Mean_Excitation_Energy = 78.7 / 1.0E6 # eV
 MylarParams_Density_Correction = 0.126782
 GasParams_Z = 2.
 GasParams_A = 4. # g/mol
 GasParams_Radiation_Length = 5671130. # mm
 GasParams_Density = 0.000166322 # 1.66322e-04 g/cm3
-GasParams_Mean_Excitation_Energy = 41.8 # eV
+GasParams_Mean_Excitation_Energy = 41.8 / 1.0E6 # eV
 GasParams_Density_Correction  = 0.13443
 SciFiTestVirtualTracksStraight = {"rms_position" : 70.0, "rms_angle" : 0.19}  # Description of straight tracks to simulate
 SciFiTestVirtualTracksHelix = {"rms_position" : 70.0, "rms_pt" : 30.0, "pz" : 200.0}  # Description of helical tracks to simulate
@@ -378,6 +378,7 @@ geometry_download_run_number = 0
 geometry_download_id = 49
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
+geometry_use_active_rotations = False # Changes SciFiGeometryHelper to use active rotations for Mice Moduel only running.
 
 # geometry upload
 geometry_upload_wsdl = "geometrySuperMouse?wsdl" # name of the web service used for uploads
@@ -567,7 +568,7 @@ EMRchargeThreshold = 10 # ADC counts, rejects noise for plane density
 EMRpolynomialOrder = 1 # Order of the polynomial to fit the tracks with
 EMRmaxMotherDaughterTime = 5000 # ADC counts, ~ 6 decay constants, 99.7% of muons
 EMRmaxMotherDaughterDistance = 100 # mm, max distance between mother and daughter
-EMRholeFraction = 0.08467 # percentage of the EMR volume that is not PS
+EMRholeFraction = 0.02117 # percentage of the EMR volume that is not PS
 
 # EMR reducer
 EMRdensityCut = 0.9

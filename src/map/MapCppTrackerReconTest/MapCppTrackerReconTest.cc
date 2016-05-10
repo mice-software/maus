@@ -135,15 +135,13 @@ void MapCppTrackerReconTest::_birth(const std::string& argJsonConfigDocument) {
   spacepoint_helical_prop->SetCorrectPz(_correct_pz);
   spacepoint_helical_prop->SetIncludeMCS(_use_mcs);
   spacepoint_helical_prop->SetSubtractELoss(_use_eloss);
-  _spacepoint_helical_track_fitter = new Kalman::TrackFit(spacepoint_helical_prop,
-      new SciFiSpacepointMeasurements<5>(0.186128));
-//      new SciFiSpacepointMeasurements<5>(0.4));
+  _spacepoint_helical_track_fitter = new Kalman::TrackFit(spacepoint_helical_prop);
+  _spacepoint_helical_track_fitter->AddMeasurement(0, new SciFiSpacepointMeasurements<5>());
 
   StraightPropagator* spacepoint_straight_prop = new StraightPropagator(&_geometry_helper);
   spacepoint_straight_prop->SetIncludeMCS(_use_mcs);
-  _spacepoint_straight_track_fitter = new Kalman::TrackFit(spacepoint_straight_prop,
-      new SciFiSpacepointMeasurements<4>(0.186128));
-//      new SciFiSpacepointMeasurements<4>(0.4));
+  _spacepoint_straight_track_fitter = new Kalman::TrackFit(spacepoint_straight_prop);
+  _spacepoint_straight_track_fitter->AddMeasurement(0, new SciFiSpacepointMeasurements<4>());
 
   _spacepoint_recon_plane = 0;
 }
@@ -223,29 +221,13 @@ void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) const {
     print_helical(helical);
 
     _spacepoint_helical_track_fitter->SetSeed(seed);
-    _spacepoint_helical_track_fitter->SetData(data_track);
+    _spacepoint_helical_track_fitter->SetTrack(data_track);
 
     _spacepoint_helical_track_fitter->Filter(false);
     _spacepoint_helical_track_fitter->Smooth(false);
 
-    Kalman::Track predicted = _spacepoint_helical_track_fitter->GetPredicted();
-    Kalman::Track filtered = _spacepoint_helical_track_fitter->GetFiltered();
-    Kalman::Track smoothed = _spacepoint_helical_track_fitter->GetSmoothed();
-    std::cerr << "Data Track\n";
-    std::cerr << Kalman::print_track(data_track);
-    std::cerr << "Measured Predicted\n";
-    SciFiSpacepointMeasurements<5>* temp_measurement = new SciFiSpacepointMeasurements<5>(1.0);
-    for (unsigned int k = 0; k < predicted.GetLength(); ++k) {
-      Kalman::State temp_state = temp_measurement->Measure(predicted[k]);
-      std::cerr << Kalman::print_state(temp_state);
-    }
-    std::cerr << "Predicted Track\n";
-    std::cerr << Kalman::print_track(predicted);
-    std::cerr << "Filtered Track\n";
-    std::cerr << Kalman::print_track(filtered);
-    std::cerr << "Smoothed Track\n";
-    std::cerr << Kalman::print_track(smoothed);
-    delete temp_measurement;
+    Kalman::Track the_track = _spacepoint_helical_track_fitter->GetTrack();
+    std::cerr << Kalman::print_track(the_track, "Helix Spacepoint Fitted");
 
     SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_helical_track_fitter,
                                                                      &_geometry_helper, helical);
@@ -265,23 +247,14 @@ void MapCppTrackerReconTest::track_fit(SciFiEvent &evt) const {
     print_straight(straight);
 
     _spacepoint_straight_track_fitter->SetSeed(seed);
-    _spacepoint_straight_track_fitter->SetData(data_track);
+    _spacepoint_straight_track_fitter->SetTrack(data_track);
 
     _spacepoint_straight_track_fitter->Filter(false);
     _spacepoint_straight_track_fitter->Smooth(false);
 
-    Kalman::Track predicted = _spacepoint_straight_track_fitter->GetPredicted();
-    Kalman::Track filtered = _spacepoint_straight_track_fitter->GetFiltered();
-    Kalman::Track smoothed = _spacepoint_straight_track_fitter->GetSmoothed();
+    Kalman::Track the_track = _spacepoint_straight_track_fitter->GetTrack();
 
-    std::cerr << "Data Track\n";
-    std::cerr << Kalman::print_track(data_track);
-    std::cerr << "Predicted Track\n";
-    std::cerr << Kalman::print_track(predicted);
-    std::cerr << "Filtered Track\n";
-    std::cerr << Kalman::print_track(filtered);
-    std::cerr << "Smoothed Track\n";
-    std::cerr << Kalman::print_track(smoothed);
+    std::cerr << Kalman::print_track(the_track, "Straight Spacepoint Fitted");
 
     SciFiTrack* track = ConvertToSciFiTrack(_spacepoint_straight_track_fitter,
                                                                     &_geometry_helper, straight);
