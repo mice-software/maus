@@ -336,7 +336,7 @@ void propagate(double* x, double target_z, const BTField* field,
       if (std::abs(z_dist) < std::abs(h)) {
         if (std::abs(z_dist) > 2.0) {
           h = 2.0*prop_dir;
-        } else {
+        } else if (z_dist > 0.00000000001) {
           h = z_dist; // will have proper sign from momvector
         }
       }
@@ -382,7 +382,6 @@ void propagate(double* x, double target_z, const BTField* field,
       throw(Exception(Exception::recoverable, ios.str()+
             "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
-
     // Need to catch the case where the particle is stopped
     if (std::abs(x[4]) < (mass + 0.01)) {
       std::stringstream ios;
@@ -434,6 +433,9 @@ int z_equations_of_motion(double z, const double x[8], double dxdz[8],
 }
 
 void changeEnergy(double* x, double deltaE, double mass) {
+  if (isnan(deltaE)) {
+    deltaE = -x[4];
+  }
   double old_momentum = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
   x[4] += deltaE;
   double new_momentum, momentum_ratio;
