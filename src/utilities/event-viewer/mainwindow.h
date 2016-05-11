@@ -6,13 +6,14 @@
 #include <QString>
 #include <QPen>
 #include <QFont>
+#include <QMap>
 #include "settings.h"
 #include <QTextStream>
 
 #include <DataStructure/Data.hh>
 
-#include "EVExporter.h"
-#include "EVEvent.h"
+#include "EVExporter.hh"
+#include "EVEvent.hh"
 
 
 namespace Ui {
@@ -81,8 +82,8 @@ private:
     std::string exportOpt;
     char* homeDir;
 
-    EVEvent evEvent;
-    EVExporter *exp;
+    EventViewer::EVEvent evEvent;
+    EventViewer::EVExporter *exp;
     QMap<int, double> eventSpillRatio;
 
     void replot();

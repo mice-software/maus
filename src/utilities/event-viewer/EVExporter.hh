@@ -15,9 +15,6 @@
  *
  */
 
-/* Iterates through events of a spill and passes filled EVEvent container for output */
-
-
 #include <string>
 
 #include "DataStructure/Spill.hh"
@@ -28,10 +25,20 @@
 
 namespace EventViewer {
 
+/** @class EVExporter
+ *  @author M. Savic
+ *  @brief Iterates through events of a spill and passes filled EVEvent container for output
+ */
 class EVExporter {
 
  public:
+  /** @brief The constructor
+   *  @param sp The MAUS spill to be processed
+   */
   explicit EVExporter(MAUS::Spill *sp);
+
+  /** @brief The desctructor
+   */
   virtual ~EVExporter();
 
   EVEvent evEvent;

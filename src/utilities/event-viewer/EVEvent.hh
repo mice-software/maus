@@ -15,8 +15,6 @@
  *
  */
 
-/* Container class to hold all information of interest from one particular event */
-
 #ifndef _EVEvent_hh
 #define _EVEvent_hh
 
@@ -26,11 +24,23 @@
 
 namespace EventViewer {
 
+/** @class EVEvent
+ *  @author M. Savic
+ *  @brief Container class to hold all information of interest from one particular event
+ */
 class EVEvent {
  public:
+
+  /** @brief The default constructor
+   */
   EVEvent();
+
+  /** @brief The destructor
+   */
   virtual ~EVEvent();
 
+  /** @brief Reset all member variables back to a set of default values
+   */
   void Reset();
 
   // all these structures could be set to private with addition of appropriate getters and setters

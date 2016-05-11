@@ -1091,7 +1091,7 @@ int MainWindow::ReadEvent()
             if(spill != NULL && spill->GetDaqEventType() == "physics_event") {
                 if (spill->GetSpillNumber() == spillNumber) {
                     //std::cout << std::endl << std::endl << "------->found spill: " << spill->GetSpillNumber() << " event: " << eventNumber << std::endl;//remove after checks
-                    exp = new EVExporter(spill);
+                    exp = new EventViewer::EVExporter(spill);
                     int detectorsHit = exp->ReadOneEvent(eventNumber, exportOpt.c_str(), eventSelection, displayOpt);
                     //std::cout << "--->detectorsHit: " << detectorsHit << "  eventSelection: " << eventSelection << std::endl; //remove after checks
                     if (eventSelection == 0) { //if eventSelectio is 0 every event should be displayed
