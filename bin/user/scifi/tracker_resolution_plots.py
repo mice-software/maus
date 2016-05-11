@@ -109,7 +109,7 @@ DOWN_COV_RECON = []
 UP_CORRECTION = covariances.CorrectionMatrix()
 DOWN_CORRECTION = covariances.CorrectionMatrix()
 
-VIRTUAL_PLANE_DICT = {}
+VIRTUAL_PLANE_DICT = None
 INVERSE_PLANE_DICT = {}
 TRACKER_PLANE_RADIUS = 150.0
 
@@ -1164,6 +1164,10 @@ if __name__ == "__main__" :
   parser.add_argument( '-D', '--output_directory', \
                                  default='./', help='Set the output directory')
 
+  parser.add_argument( '-V', '--virtual_plane_dictionary', default=None, \
+                   help='Specify a json file containing a dictionary of the '+\
+                                                       'virtual plane lookup' )
+
   parser.add_argument( '-P', '--print_plots', action='store_true', \
                         help="Flag to save the plots as individual pdf files" )
 
@@ -1253,6 +1257,10 @@ if __name__ == "__main__" :
         GOOD_EVENTS = json.load(infile)
     else :
       SELECT_EVENTS = False
+
+    if namespace.virtual_plane_dictionary is not None :
+      VIRTUAL_PLANE_DICT = analysis.tools.load_virtual_plane_dict( \
+                                           namespace.virtual_plane_dictionary )
   except BaseException as ex:
     raise
   else :
@@ -1268,15 +1276,17 @@ if __name__ == "__main__" :
 
     file_reader = event_loader.maus_reader(namespace.maus_root_files)
 ##### 3. Initialise Plane Dictionary ##########################################
-    sys.stdout.write( "\n- Finding Virtual Planes : Running\r" )
-    sys.stdout.flush()
-    virtual_plane_dictionary = create_virtual_plane_dict(file_reader)
-    VIRTUAL_PLANE_DICT = virtual_plane_dictionary
-    INVERSE_PLANE_DICT = inverse_virtual_plane_dict(virtual_plane_dictionary)
+    if VIRTUAL_PLANE_DICT is None :
+      sys.stdout.write( "\n- Finding Virtual Planes : Running\r" )
+      sys.stdout.flush()
+      virtual_plane_dictionary = create_virtual_plane_dict(file_reader)
+      VIRTUAL_PLANE_DICT = virtual_plane_dictionary
+      sys.stdout.write(   "- Finding Virtual Planes : Done   \n" )
+
+    INVERSE_PLANE_DICT = inverse_virtual_plane_dict(VIRTUAL_PLANE_DICT)
     file_reader.select_events(GOOD_EVENTS)
     file_reader.set_max_num_events(namespace.max_num_events)
     file_reader.set_print_progress('spill')
-    sys.stdout.write(   "- Finding Virtual Planes : Done   \n" )
 
 ##### 4. Load Events ##########################################################
     print "\n- Loading Spills...\n"
@@ -1290,7 +1300,7 @@ if __name__ == "__main__" :
 ##### 5. Extract tracks and Fill Plots ########################################
 
           paired_hits, seed_pairs = make_scifi_mc_pairs(plot_dict, data_dict, \
-                               virtual_plane_dictionary, scifi_event, mc_event)
+                                     VIRTUAL_PLANE_DICT, scifi_event, mc_event)
           fill_plots(plot_dict, data_dict, paired_hits)
           fill_plots_seeds(plot_dict, data_dict, seed_pairs)
 
