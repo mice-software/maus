@@ -64,6 +64,8 @@ namespace MAUS {
     }
     _navigator = new G4Navigator();
     _navigator->SetWorldVolume(this->_global_volume);
+    // Needed so Geant4 doesn't segfault when setting up a point
+    G4RunManager::GetRunManager()->BeamOn(0);
     this->_setPoint(G4ThreeVector(0.0, 0.0, 0.0));
     // Ack! G4 does some setup at BeamOn time
     G4RunManager::GetRunManager()->BeamOn(0);
@@ -176,4 +178,3 @@ namespace MAUS {
     return _current_material->GetDensity()/(g/(cm*cm*cm));
   }
 }
-

@@ -46,6 +46,18 @@ SciFiTrackPointProcessor::SciFiTrackPointProcessor(): _matrix_proc(new DoublePro
     RegisterValueBranch("mom", &_threevector_proc,
                         &SciFiTrackPoint::mom,
                         &SciFiTrackPoint::set_mom, false);
+    RegisterValueBranch("gradient", &_threevector_proc,
+                        &SciFiTrackPoint::gradient,
+                        &SciFiTrackPoint::set_gradient, false);
+    RegisterValueBranch("pos_err", &_threevector_proc,
+                        &SciFiTrackPoint::pos_error,
+                        &SciFiTrackPoint::set_pos_error, false);
+    RegisterValueBranch("mom_err", &_threevector_proc,
+                        &SciFiTrackPoint::mom_error,
+                        &SciFiTrackPoint::set_mom_error, false);
+    RegisterValueBranch("gradient_err", &_threevector_proc,
+                        &SciFiTrackPoint::gradient_error,
+                        &SciFiTrackPoint::set_gradient_error, false);
     RegisterValueBranch("pull", &_double_proc,
                         &SciFiTrackPoint::pull,
                         &SciFiTrackPoint::set_pull, false);

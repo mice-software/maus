@@ -15,11 +15,6 @@
  *
  */
 
-/** @class SciFiCluster
- *  Digitize events by running Tracker electronics simulation.
- *
- */
-
 #ifndef _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICLUSTER_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFICLUSTER_HH_
 
@@ -38,6 +33,11 @@
 
 namespace MAUS {
 
+/** @class SciFiCluster
+ *  @author E. Santos
+ *  @brief A cluster holds adjacent channel hits (SciFiDigits) in a tracker plane
+ *
+ */
 class SciFiCluster : public TObject {
  public:
 

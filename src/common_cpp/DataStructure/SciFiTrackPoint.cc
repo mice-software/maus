@@ -28,6 +28,10 @@ SciFiTrackPoint::SciFiTrackPoint() : _spill(-1),
                                      _chi2(-1),
                                      _pos(ThreeVector(0, 0, 0)),
                                      _mom(ThreeVector(0, 0, 0)),
+                                     _gradient(ThreeVector(0, 0, 0)),
+                                     _errors_pos(ThreeVector(0, 0, 0)),
+                                     _errors_mom(ThreeVector(0, 0, 0)),
+                                     _errors_gradient(ThreeVector(0, 0, 0)),
                                      _covariance(0),
                                      _errors(0),
                                      _pull(-1),
@@ -53,6 +57,11 @@ SciFiTrackPoint::SciFiTrackPoint(const SciFiTrackPoint &point) {
 
   _pos = point.pos();
   _mom = point.mom();
+  _gradient = point.gradient();
+
+  _errors_pos = point.pos_error();
+  _errors_mom = point.mom_error();
+  _errors_gradient = point.gradient_error();
 
   _covariance = point._covariance;
   _errors = point._errors;
@@ -81,6 +90,11 @@ SciFiTrackPoint& SciFiTrackPoint::operator=(const SciFiTrackPoint &rhs) {
 
   _pos = rhs.pos();
   _mom = rhs.mom();
+  _gradient = rhs.gradient();
+
+  _errors_pos = rhs.pos_error();
+  _errors_mom = rhs.mom_error();
+  _errors_gradient = rhs.gradient_error();
 
   _covariance = rhs._covariance;
   _errors = rhs._errors;

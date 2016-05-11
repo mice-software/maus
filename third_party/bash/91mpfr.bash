@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 directory=mpfr-3.1.3
 filename=${directory}.tar.gz
-url=http://www.mpfr.org/mpfr-current/${filename}
+url=http://www.mpfr.org/${directory}/${filename}
 
 echo
 echo 'INFO: Installing third party library MPFR 3.1.3'

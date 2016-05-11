@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <cmath>
-
 #include "Geant4/G4Navigator.hh"
 #include "Geant4/G4TransportationManager.hh"
 #include "Geant4/G4NistManager.hh"
@@ -273,6 +272,14 @@ void propagate(double* x, double target_z, const BTField* field,
     throw(Exception(Exception::recoverable, "Extreme target z",
                     "GlobalTools::propagate"));
   }
+  if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
+      std::isnan(x[4]) || std::isnan(x[5]) || std::isnan(x[6]) || std::isnan(x[7])) {
+    std::stringstream ios;
+    ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
+        << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
+    throw(Exception(Exception::recoverable, ios.str()+
+          "Some components of tracker trackpoint are nan", "GlobalTools::propagate"));
+  }
   int prop_dir = 1;
   _field = field;
   _charge = recon::global::Particle::GetInstance().GetCharge(pid);
@@ -306,6 +313,8 @@ void propagate(double* x, double target_z, const BTField* field,
   size_t max_steps = 10000000;
   size_t n_steps = 0;
   double z = x[3];
+  GeometryNavigator geometry_navigator;
+  geometry_navigator.Initialise(g4navigator->GetWorldVolume());
   while (fabs(z - target_z) > 1e-6) {
     n_steps++;
     h = step_size*prop_dir; // revert step size as large step size problematic for dEdx
@@ -315,8 +324,6 @@ void propagate(double* x, double target_z, const BTField* field,
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
       g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
-      GeometryNavigator geometry_navigator;
-      geometry_navigator.Initialise(g4navigator->GetWorldVolume());
       double safety = 10;
       double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
       if (boundary_dist > 1e6) {
@@ -333,6 +340,7 @@ void propagate(double* x, double target_z, const BTField* field,
           h = z_dist; // will have proper sign from momvector
         }
       }
+      // Making sure we don't get stuck in Zeno's paradox
       if (std::abs(h) < 0.1) {
         h = 0.1*prop_dir;
       }
@@ -365,6 +373,14 @@ void propagate(double* x, double target_z, const BTField* field,
       throw(Exception(Exception::recoverable, ios.str()+
             "Exceeded maximum number of steps", "GlobalTools::propagate"));
       break;
+    }
+    // Terminate if the propagation moves too far from the beamline (should be lost to us anyway)
+    // Appears to fix an irregular and so far not fully explained segfault.
+    if (std::abs(x[1]) > 700 || std::abs(x[2]) > 700) {
+      std::stringstream ios;
+      ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+      throw(Exception(Exception::recoverable, ios.str()+
+            "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
 
     // Need to catch the case where the particle is stopped

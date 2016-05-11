@@ -17,9 +17,9 @@
 
 #include <iostream>
 
-#include "src/common_cpp/Recon/Kalman/GlobalPropagator.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
-#include "src/common_cpp/Recon/Kalman/GlobalMeasurement.hh"
+#include "src/common_cpp/Recon/Kalman/Global/Propagator.hh"
+#include "src/common_cpp/Recon/Kalman/Global/Measurement.hh"
 
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
@@ -32,7 +32,7 @@
 #include "src/map/MapCppGlobalTrackFit/MapCppGlobalTrackFit.hh"
 
 // TODO: 
-// * Error propogation through fields
+// * -Error propagation through fields-
 // * Integrate into Kalman fitter
 // * Add materials - MCS; dE/dx; energy straggling
 // * TrackPoint errors should be a matrix
@@ -45,18 +45,19 @@
 // * Deal with triplet cut on scifi
 // * Soft code detector errors or import errors correctly
 // * Clear labelled bugs
-// * Add virtual planes/disabled detectors (make a state with 0 length?);
+// * -Add virtual planes/disabled detectors (make a state with 0 length?)-
 // * Interface to event display
 // * Residuals plots (etc) reducer
-// * Move Global kalman stuff into subdirectory/namespace
+// * -Move Global kalman stuff into subdirectory/namespace-
 // * Documentation
 // * Improve test coverage
 // * Dynamic step size to step to volume boundary (using GSL Control type)
-// * Enable/disable material material name/conversion logic
+// * -Enable/disable material name/conversion logic-
+// * Enable/disable volume names
 
 namespace MAUS {
 using namespace MAUS::DataStructure::Global;
-
+/*
 double MapCppGlobalTrackFit::mu_mass = 105.658; // BUG
 double MapCppGlobalTrackFit::c_light = 300.; // BUG
 
@@ -74,7 +75,7 @@ MapCppGlobalTrackFit::MapCppGlobalTrackFit() : MapBase<Data>("MapCppGlobalTrackF
       kVirtual,
     };
     _active_detectors = std::vector<DetectorPoint>(det_list);
-    Kalman::GlobalMeasurement::SetupDetectorToMeasurementMap();
+    Kalman::Global::Measurement::SetupDetectorToMeasurementMap();
 }
 
 
@@ -95,7 +96,7 @@ void MapCppGlobalTrackFit::_birth(const std::string& config_str) {
 
   if (_propagator != NULL)
       delete _propagator;
-  _propagator = new Kalman::GlobalPropagator();
+  _propagator = new Kalman::Global::Propagator();
   _propagator->SetMass(mu_mass); // BUG
   _propagator->SetField(Globals::GetMCFieldConstructor());
 
@@ -112,9 +113,6 @@ void MapCppGlobalTrackFit::_birth(const std::string& config_str) {
 
   if (_measurement != NULL)
       delete _measurement;
-  _measurement = new Kalman::GlobalMeasurement();
-  _measurement->SetTofSigmaT(tof_sigma_t);
-  _measurement->SetSFSigmaX(sf_sigma_x);
 
   if (_kalman_fit != NULL)
       delete _kalman_fit;
@@ -129,7 +127,7 @@ void MapCppGlobalTrackFit::_death() {
 void MapCppGlobalTrackFit::_process(Data* data) const {
   Spill& spill = *(data->GetSpill());
 
-  /* return if not physics spill */
+  // return if not physics spill
   if (spill.GetDaqEventType() != "physics_event")
     return;
 
@@ -208,7 +206,7 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
 }
 
 Kalman::State MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
-    Kalman::GlobalMeasurement* dummy_measurement = new Kalman::GlobalMeasurement();
+    Kalman::Global::Measurement* dummy_measurement = new Kalman::GlobalMeasurement();
     auto tof_seed_list = {kTOF1, kTOF2};
     std::vector<DetectorPoint> tof_seed_points(tof_seed_list);
     DataLoader tof_data(tof_seed_points);
@@ -275,5 +273,5 @@ Kalman::Track MapCppGlobalTrackFit::build_data(ReconEvent& event) const {
     std::cerr << data.get_fit_data() << std::endl;;
     return data.get_fit_data();
 }
-
+*/
 } // ~namespace MAUS

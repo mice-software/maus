@@ -2,7 +2,8 @@
 
 #include "TMatrixD.h" // ROOT
 
-#include "src/common_cpp/Recon/Kalman/GlobalMeasurement.hh"
+#include "src/common_cpp/Recon/Kalman/KalmanMeasurementBase.hh"
+#include "src/common_cpp/Recon/Kalman/Global/Measurement.hh"
 
 #include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
 #include "src/common_cpp/DataStructure/TOFSpacePoint.hh"
@@ -19,30 +20,33 @@
 #include "src/map/MapCppGlobalTrackFit/DataLoader.hh"
 
 using namespace MAUS::DataStructure::Global;
+using namespace MAUS::Kalman;
+using namespace MAUS::Kalman::Global;
 
 namespace MAUS {
 size_t DataLoader::_dimension = 6;
 double DataLoader::_err = 1e6;
 
-DataLoader::DataLoader(std::vector<MAUS::DataStructure::Global::DetectorPoint> detectors)
-  :_all_data(_dimension), _fit_data(_dimension), _detectors(detectors) {
+DataLoader::DataLoader(std::vector<MAUS::DataStructure::Global::DetectorPoint> detectors,
+                       Kalman::TrackFit* fit)
+  : _fitter(fit), _detectors(detectors) {
+    if (_fitter == NULL) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Could not cope with NULL fit",
+                              "MapCppGlobalTrackFit::DataLoader");
+    }
     std::sort(_detectors.begin(), _detectors.end());
     validate_detectors();
 }
 
 
-void DataLoader::load_event(ReconEvent& event, Kalman::GlobalMeasurement* measurement) {
+void DataLoader::load_event(ReconEvent& event) {
     std::cerr << "DataLoader::load_event " << &event << std::endl;
-    _state_to_detector_map =
-                  std::map<int, MAUS::DataStructure::Global::DetectorPoint>();
-    _all_data = Kalman::Track(_dimension);
-    _fit_data = Kalman::Track(_dimension);
     TOFEvent* tof_event = event.GetTOFEvent();
     SciFiEvent* scifi_event = event.GetSciFiEvent();
     load_tof_event(tof_event);
     load_scifi_event(scifi_event);
     load_virtual_event();
-    measurement->SetStateToDetectorMap(_state_to_detector_map);
 }
 
 Kalman::State DataLoader::load_tof_space_point(TOFSpacePoint* sp) {
@@ -52,23 +56,32 @@ Kalman::State DataLoader::load_tof_space_point(TOFSpacePoint* sp) {
     };
     TMatrixD vector(1, 1, pos_arr);
     TMatrixD covariance(1, 1, cov_arr);
-    Kalman::State state(vector, covariance, sp->GetGlobalPosZ());
-    return state;
+    Kalman::State data(vector, covariance);
+    return data;
 }
 
 void DataLoader::load_tof_detector(const MAUS::TOF0SpacePointArray& sp_vector,
                                MAUS::DataStructure::Global::DetectorPoint det) {
     for (size_t i = 0; i < sp_vector.size(); ++i) {
         TOFSpacePoint one_sp = sp_vector.at(i);
-        Kalman::State state = load_tof_space_point(&one_sp);
-        _all_data.Append(state);
-        state.SetId(_all_data.GetLength());
-        _state_to_detector_map[state.GetId()] = det;
-        if (std::find(_detectors.begin(), _detectors.end(), det) != _detectors.end() && i == 0) {
-            _fit_data.Append(state);
+        Kalman::State state(0);
+        int tp_id = _fitter->GetTrack().GetLength();
+        Measurement_base* meas = NULL;
+        if (i == 0 && 
+            std::find(_detectors.begin(), _detectors.end(), det) != _detectors.end()) {
+            meas = Measurement::GetDetectorToMeasurementMap()[det];
+            state = load_tof_space_point(&one_sp);
+        } else { // treat it as a virtual detector instead
+            meas = Measurement::GetDetectorToMeasurementMap()
+                                              [DataStructure::Global::kVirtual];
         }
+        double z_position = one_sp.GetGlobalPosZ();
+        int meas_dim = state.GetDimension();
+        Kalman::TrackPoint track_point(6, meas_dim, z_position, tp_id);
+        track_point.SetData(state);
+        _fitter->GetTrack().Append(track_point);
+        _fitter->AddMeasurement(tp_id, meas);
     }
-
 }
 
 void DataLoader::load_tof_event(TOFEvent* event) {
@@ -81,24 +94,24 @@ void DataLoader::load_tof_event(TOFEvent* event) {
     load_tof_detector(space_points.GetTOF1SpacePointArray(), kTOF1);
     // Load TOF2
     load_tof_detector(space_points.GetTOF2SpacePointArray(), kTOF2);
-
-    std::cerr << "DataLoader::load_tof_event end - size " << _fit_data.GetLength() << std::endl;
 }
 
 void DataLoader::load_virtual_event() {
-    VirtualPlaneManager* virtual_manager = Globals::GetGeant4Manager()->GetVirtualPlanes();
+    VirtualPlaneManager* virtual_manager =
+                               Globals::GetGeant4Manager()->GetVirtualPlanes();
     std::vector<VirtualPlane*> planes = virtual_manager->GetPlanes();
-    bool will_add_to_fit_data = std::find(_detectors.begin(), _detectors.end(), kVirtual) != _detectors.end();
+    Measurement_base* meas = Measurement::GetDetectorToMeasurementMap()
+                                          [DataStructure::Global::kVirtual];
 
     for (size_t i = 0; i < planes.size(); ++i) {
         if (planes[i]->GetPlaneIndependentVariableType() == BTTracker::z) {
+            int tp_id = _fitter->GetTrack().GetLength();
             double z_pos = planes[i]->GetPlaneIndependentVariable();
-            Kalman::State state(0, z_pos);
-            state.SetId(_all_data.GetLength());
-            _all_data.Append(state);
-            _state_to_detector_map[state.GetId()] = kVirtual;
-            if (will_add_to_fit_data)
-                _fit_data.Append(state);
+            Kalman::TrackPoint track_point(6, 0, z_pos, tp_id);
+            track_point.SetData(Kalman::State(0));
+            _fitter->GetTrack().Append(track_point);
+            _fitter->AddMeasurement(tp_id, meas);
+
         }
     }
 }
@@ -113,7 +126,7 @@ Kalman::State DataLoader::load_scifi_space_point(SciFiSpacePoint* sp) {
     };
     TMatrixD vector(2, 1, pos_arr);
     TMatrixD covariance(2, 2, cov_arr);
-    Kalman::State state(vector, covariance, sp->get_global_position().z());
+    Kalman::State state(vector, covariance);
     return state;
 }
 
@@ -166,15 +179,25 @@ void DataLoader::load_scifi_event(SciFiEvent* event) {
             continue;
         }
         std::cerr << " passed triplet check" << std::endl;
-        Kalman::State state = load_scifi_space_point(space_points[i]);
-        _all_data.Append(state);
-        DetectorPoint point = SciFiToDetectorPoint(space_points[i]->get_tracker(), space_points[i]->get_station());        
-        state.SetId(_all_data.GetLength());
-        _state_to_detector_map[state.GetId()] = point;
-        if (std::find(_detectors.begin(), _detectors.end(), point) != _detectors.end()) {
-            _fit_data.Append(state);
+        Kalman::State state(0);
+        int tp_id = _fitter->GetTrack().GetLength();
+        DetectorPoint det = SciFiToDetectorPoint(space_points[i]->get_tracker(),
+                                                 space_points[i]->get_station());       
+        Measurement_base* meas = NULL; 
+        if (std::find(_detectors.begin(), _detectors.end(), det) != _detectors.end()) {
+            meas = Measurement::GetDetectorToMeasurementMap()[det];
+            state = load_scifi_space_point(space_points[i]);
+        } else {
+            meas = Measurement::GetDetectorToMeasurementMap()
+                                              [DataStructure::Global::kVirtual];
         }
-    }
+        double z_position = space_points[i]->get_position().z();
+        int meas_dim = state.GetDimension();
+        Kalman::TrackPoint track_point(6, meas_dim, z_position, tp_id);
+        track_point.SetData(state);
+        _fitter->GetTrack().Append(track_point);
+        _fitter->AddMeasurement(tp_id, meas);
+   }
 }
 
 void DataLoader::validate_detectors() {

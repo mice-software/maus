@@ -18,13 +18,16 @@
 #include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Recon/Kalman/GlobalErrorTracking.hh"
+#include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
 namespace MAUS {
+namespace Kalman {
+namespace Global {
 Squeak::errorLevel verbose = Squeak::fatal;
 
-TEST(GlobalErrorTrackingTest, GetSetTest) {
-    GlobalErrorTracking propagator;
+
+TEST(ErrorTrackingTest, GetSetTest) {
+    ErrorTracking propagator;
     propagator.SetDeviations(1., 2., 3., 4.);
     std::vector<double> dev = propagator.GetDeviations();
     ASSERT_EQ(dev.size(), 4);
@@ -40,11 +43,11 @@ TEST(GlobalErrorTrackingTest, GetSetTest) {
     EXPECT_TRUE(false) << "Missing some accessors/mutators";
 }
 
-TEST(GlobalErrorTrackingTest, FieldDerivativeTest) {
+TEST(ErrorTrackingTest, FieldDerivativeTest) {
     double b0 = 2;
     BTMultipole::TanhEndField* end = new BTMultipole::TanhEndField(10., 5., 9);
     DerivativesSolenoid sol(b0, 10., 20., 9, end);
-    GlobalErrorTracking propagator;
+    ErrorTracking propagator;
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetField(&sol);
 
@@ -61,7 +64,7 @@ TEST(GlobalErrorTrackingTest, FieldDerivativeTest) {
     }
 }
 
-void tracking_test(GlobalErrorTracking& propagator, double* x_in, double dz) {
+void tracking_test(ErrorTracking& propagator, double* x_in, double dz) {
     Squeak::mout(verbose) << "tracking test" << std::endl;
     std::vector<double> test_x(29, 0.);
     std::vector<double> ref_x(8, 0.);
@@ -78,7 +81,7 @@ void tracking_test(GlobalErrorTracking& propagator, double* x_in, double dz) {
     Squeak::mout(verbose) << "Done" << std::endl;
 }
 
-std::vector< std::vector<double> > get_tm_numerical(GlobalErrorTracking& propagator, double* x_in, double delta, double step) {
+std::vector< std::vector<double> > get_tm_numerical(ErrorTracking& propagator, double* x_in, double delta, double step) {
     std::vector< std::vector<double> > tm_numerical;
     for (size_t i = 0; i < 7; ++i) { // t, x, y, (z), E, px, py
         if (i == 3) // z is not varied
@@ -114,7 +117,7 @@ std::vector< std::vector<double> > get_tm_numerical(GlobalErrorTracking& propaga
     return tm_numerical_trans;
 }
 
-void tm_tracking_check(GlobalErrorTracking& propagator, double* x_in, double delta, double step) {
+void tm_tracking_check(ErrorTracking& propagator, double* x_in, double delta, double step) {
     std::vector< std::vector<double> > tm_numerical_fine = get_tm_numerical(propagator, x_in, delta, step);
     std::vector< std::vector<double> > tm_numerical_coarse_1 = get_tm_numerical(propagator, x_in, delta, step*10.);
     std::vector< std::vector<double> > tm_numerical_coarse_2 = get_tm_numerical(propagator, x_in, delta*10, step);
@@ -192,10 +195,10 @@ void tm_tracking_check(GlobalErrorTracking& propagator, double* x_in, double del
     Squeak::mout(verbose) << "Determinant: " << transverse_determinant << "\n" << std::endl;
 }
 
-TEST(GlobalErrorTrackingTest, TransferMatrixConstFieldTest) {
+TEST(ErrorTrackingTest, TransferMatrixConstFieldTest) {
     ::CLHEP::Hep3Vector brand(0., 0., 3.); 
     BTConstantField field(1000., 1000., 1000., brand);
-    GlobalErrorTracking propagator;
+    ErrorTracking propagator;
     propagator.SetField(&field);
     double x_in[8] = {0., 0., 0., 0., ::sqrt(200.*200.+105.658*105.658), 0., 0., 200.};
     for (double deviation = 1e-3; deviation < 1.1e-3; deviation *= 10.) {
@@ -213,7 +216,7 @@ void mass_shell_condition(double x_in[], double mass) {
     x_in[4] = energy;
 }
 
-TEST(GlobalErrorTrackingTest, TransferMatrixSolFieldTest) {
+TEST(ErrorTrackingTest, TransferMatrixSolFieldTest) {
     for (double b0 = 0.001; b0 < 0.0011; b0 *= 10) { // 1 T
         BTMultipole::TanhEndField* end = new BTMultipole::TanhEndField(10., 5., 9);
         DerivativesSolenoid sol(b0, 10., 20., 9, end);
@@ -222,7 +225,7 @@ TEST(GlobalErrorTrackingTest, TransferMatrixSolFieldTest) {
                 Squeak::mout(verbose) << "delta " << delta
                                       << " step " << step
                                       << " b0 " << b0 << std::endl;
-                GlobalErrorTracking propagator;
+                ErrorTracking propagator;
                 propagator.SetDeviations(delta, delta, delta, delta);
                 propagator.SetField(&sol);
                 // t, x, y, z, E, px, py, pz
@@ -286,18 +289,18 @@ std::vector<double> drift_ellipse(double pz, double mass) {
 } 
 
 // Propagate beam ellipse through a drift space
-TEST(GlobalErrorTrackingTest, PropagateEllipseDriftTest) {
+TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
     // field
     ::CLHEP::Hep3Vector brand(0., 0., 0.); 
     BTConstantField field(1000., 1000., 1000., brand);
 
-    // GlobalErrorTracking
-    GlobalErrorTracking propagator;
+    // ErrorTracking
+    ErrorTracking propagator;
     propagator.SetStepSize(100.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetField(&field);
-    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
-    propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
+    propagator.SetEnergyLossModel(ErrorTracking::no_eloss);
+    propagator.SetMCSModel(ErrorTracking::no_mcs);
 
     double mass = 105.658;
     double pz = 200.;
@@ -356,18 +359,18 @@ TEST(GlobalErrorTrackingTest, PropagateEllipseDriftTest) {
 
 // If we set up our beam ellipse right, then propagation through a constant
 // field should yield a constant beam ellipse... let's check
-TEST(GlobalErrorTrackingTest, PropagateEllipseConstFieldTest) {
+TEST(ErrorTrackingTest, PropagateEllipseConstFieldTest) {
     // field
     ::CLHEP::Hep3Vector brand(0., 0., 1e-3*gRandom->Uniform()); // 0-1 T 
     BTConstantField field(1000., 1000., 1000., brand);
 
-    // GlobalErrorTracking
-    GlobalErrorTracking propagator;
+    // ErrorTracking
+    ErrorTracking propagator;
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetField(&field);
-    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
-    propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
-    propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
+    propagator.SetEnergyLossModel(ErrorTracking::no_eloss);
+    propagator.SetMCSModel(ErrorTracking::no_mcs);
+    propagator.SetEStragModel(ErrorTracking::no_estrag);
 
     // ellipse and psv
     double norm_trans = 1.+10.*gRandom->Uniform()*105.658;; // 1 - 11 mm emit
@@ -437,12 +440,12 @@ TEST(GlobalErrorTrackingTest, PropagateEllipseConstFieldTest) {
 
 // Propagate ellipse forwards through a solenoid field; then
 // propagate backwards; check inversion is okay
-TEST(GlobalErrorTrackingTest, PropagateSolFieldBackwardsTest) {
+TEST(ErrorTrackingTest, PropagateSolFieldBackwardsTest) {
     double pz = 200.;
     double mass = 105.658;
     BTMultipole::TanhEndField* end = new BTMultipole::TanhEndField(10., 5., 9);
     DerivativesSolenoid sol(0.001, 10., 20., 9, end);
-    GlobalErrorTracking propagator;
+    ErrorTracking propagator;
     propagator.SetDeviations(0.1, 0.1, 0.1, 0.1);
     propagator.SetStepSize(1.);
     propagator.SetField(&sol);
@@ -455,7 +458,7 @@ TEST(GlobalErrorTrackingTest, PropagateSolFieldBackwardsTest) {
 
     // EM FORWARDS (for if e.g. pz > 0)
     std::vector<double> x_out = x_in;
-    propagator.SetTrackingModel(GlobalErrorTracking::em_forwards);
+    propagator.SetTrackingModel(ErrorTracking::em_forwards);
     // propagate forwards
     propagator.print(Squeak::mout(verbose), &x_out[0]);
     propagator.Propagate(&x_out[0], 50.);
@@ -471,7 +474,7 @@ TEST(GlobalErrorTrackingTest, PropagateSolFieldBackwardsTest) {
     x_in[7] = -x_in[7];
     x_out = x_in;
     // propagate backwards
-    propagator.SetTrackingModel(GlobalErrorTracking::em_backwards);
+    propagator.SetTrackingModel(ErrorTracking::em_backwards);
     propagator.Propagate(&x_out[0], -50.);
     propagator.print(Squeak::mout(verbose), &x_out[0]);
     // propagate forwards
@@ -483,7 +486,7 @@ TEST(GlobalErrorTrackingTest, PropagateSolFieldBackwardsTest) {
 }
 
 
-TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
+TEST(ErrorTrackingTest, PropagateDriftELossTest) {
     // Check that energy loss through block of lead is correct
     // * dE/dz; dp/dz; mass conservation
     // * Var(px); Var(py)
@@ -495,17 +498,17 @@ TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     double mass = 105.658;
 
-    GlobalErrorTracking propagator;
+    ErrorTracking propagator;
     propagator.SetStepSize(1.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    propagator.SetMCSModel(GlobalErrorTracking::no_mcs);
-    propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
+    propagator.SetMCSModel(ErrorTracking::no_mcs);
+    propagator.SetEStragModel(ErrorTracking::no_estrag);
     std::vector<double> x_in = drift_ellipse(200., mass);
 
     // Bethe Bloch forwards (energy decreases for h +ve)
     std::vector<double> x_out = x_in;
     Squeak::mout(verbose) << "BB Forwards" << std::endl;
-    propagator.SetEnergyLossModel(GlobalErrorTracking::bethe_bloch_forwards);
+    propagator.SetEnergyLossModel(ErrorTracking::bethe_bloch_forwards);
     print_x(&x_out[0]);
     propagator.Propagate(&x_out[0], 1200.);
     EXPECT_NEAR(x_out[4]*x_out[4],
@@ -526,7 +529,7 @@ TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
     // Bethe Bloch backwards (energy increases for h +ve)
     x_out = x_in;
     Squeak::mout(verbose) << "BB Backwards" << std::endl;
-    propagator.SetEnergyLossModel(GlobalErrorTracking::bethe_bloch_backwards);
+    propagator.SetEnergyLossModel(ErrorTracking::bethe_bloch_backwards);
     print_x(&x_out[0]);
     propagator.Propagate(&x_out[0], 1200.);
     EXPECT_NEAR(x_out[7], 208.323, 1e-3);
@@ -547,7 +550,7 @@ TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
     // No Bethe Bloch; should do nothing
     x_out = x_in;
     Squeak::mout(verbose) << "No BB" << std::endl;
-    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
+    propagator.SetEnergyLossModel(ErrorTracking::no_eloss);
     print_x(&x_out[0]);
     propagator.Propagate(&x_out[0], 1200.);
     print_x(&x_out[0]);
@@ -556,19 +559,19 @@ TEST(GlobalErrorTrackingTest, PropagateDriftELossTest) {
     EXPECT_TRUE(false);
 }
 
-TEST(GlobalErrorTrackingTest, PropagateDriftMCSTest) {
+TEST(ErrorTrackingTest, PropagateDriftMCSTest) {
     // Check that MCS var(px); var(py); in absence of dE/dz 
     // through block of lead is correct
     std::string mod = getenv("MAUS_ROOT_DIR");
     mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
     MaterialModel::EnableMaterial("G4_Pb");
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
-    GlobalErrorTracking propagator;
+    ErrorTracking propagator;
     propagator.SetStepSize(1.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
-    propagator.SetEnergyLossModel(GlobalErrorTracking::no_eloss);
-    propagator.SetMCSModel(GlobalErrorTracking::moliere_forwards);
-    propagator.SetEStragModel(GlobalErrorTracking::no_estrag);
+    propagator.SetEnergyLossModel(ErrorTracking::no_eloss);
+    propagator.SetMCSModel(ErrorTracking::moliere_forwards);
+    propagator.SetEStragModel(ErrorTracking::no_estrag);
     std::vector<double> x_in = drift_ellipse(200., 105.658);
     x_in[3] = -200.;
     x_in[26] = 500.;
@@ -588,7 +591,7 @@ TEST(GlobalErrorTrackingTest, PropagateDriftMCSTest) {
         EXPECT_LT(fabs(x_out[i] - x_in[i]), 1e-9);
 
     // moliere_backwards propagating forwards should decrease Var(px), Var(py)
-    propagator.SetMCSModel(GlobalErrorTracking::moliere_backwards);
+    propagator.SetMCSModel(ErrorTracking::moliere_backwards);
     x_out = x_in;
     print_x(&x_out[0]);
     propagator.Propagate(&x_out[0], 1200.);
@@ -604,6 +607,8 @@ TEST(GlobalErrorTrackingTest, PropagateDriftMCSTest) {
            << " Diff: " << x_out[i] - x_in[i];
 }
 
+} // namespace Global
+} // namespace Kalman
 } // namespace MAUS
 
 

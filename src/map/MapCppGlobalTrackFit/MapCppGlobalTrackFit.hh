@@ -35,8 +35,10 @@ namespace MAUS {
 
 class Data;
 namespace Kalman {
-  class GlobalMeasurement;
-  class GlobalPropagator;
+namespace Global {
+class Measurement;
+class Propagator;
+}
 }
 
 class MapCppGlobalTrackFit : public MapBase<Data> {
@@ -86,8 +88,8 @@ class MapCppGlobalTrackFit : public MapBase<Data> {
   Kalman::Track build_data(ReconEvent& event) const;
   Kalman::State build_seed(ReconEvent& event) const;
 
-  Kalman::GlobalMeasurement* _measurement = NULL;
-  Kalman::GlobalPropagator* _propagator = NULL;
+  Kalman::Global::Measurement* _measurement = NULL;
+  Kalman::Global::Propagator* _propagator = NULL;
   Kalman::TrackFit* _kalman_fit = NULL;
   std::vector<DataStructure::Global::DetectorPoint> _active_detectors;
   DataStructure::Global::DetectorPoint _position_seed_1;

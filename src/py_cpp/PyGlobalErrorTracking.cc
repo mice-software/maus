@@ -29,12 +29,14 @@
 #include <structmember.h>
 
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/common_cpp/Recon/Kalman/GlobalErrorTracking.hh"
+#include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
 #include "src/py_cpp/PyGlobalErrorTracking.hh"
 
 namespace MAUS {
 namespace PyGlobalErrorTracking {
+
+using namespace Kalman::Global;
 
 int get_centroid(PyObject* py_centroid, std::vector<double>& x_in) {
     if (!PyList_Check(py_centroid)) {
@@ -148,7 +150,7 @@ static PyObject* set_deviations(PyObject *self, PyObject *args, PyObject *kwds) 
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
@@ -166,7 +168,7 @@ static PyObject* get_deviations(PyObject *self, PyObject *args, PyObject *kwds) 
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
@@ -240,7 +242,7 @@ static PyObject* set_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
@@ -258,7 +260,7 @@ static PyObject* get_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
@@ -284,18 +286,18 @@ static PyObject* set_energy_loss_model(PyObject *self, PyObject *args, PyObject 
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
     // now set the eloss model
-    GlobalErrorTracking::ELossModel eloss_model = GlobalErrorTracking::no_eloss;
+    ErrorTracking::ELossModel eloss_model = ErrorTracking::no_eloss;
     if (strcmp(eloss, "no_eloss") == 0) {
     } else if (strcmp(eloss, "bethe_bloch_forwards") == 0) {
-        eloss_model = GlobalErrorTracking::bethe_bloch_forwards;
+        eloss_model = ErrorTracking::bethe_bloch_forwards;
     } else if (strcmp(eloss, "bethe_bloch_backwards") == 0) {
-        eloss_model = GlobalErrorTracking::bethe_bloch_backwards;
+        eloss_model = ErrorTracking::bethe_bloch_backwards;
     } else {
         PyErr_SetString(PyExc_RuntimeError, "Did not recognise energy loss model");
         return NULL;
@@ -314,21 +316,21 @@ static PyObject* get_energy_loss_model(PyObject *self, PyObject *args, PyObject 
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
-    GlobalErrorTracking::ELossModel eloss_model = glet->GetEnergyLossModel();
+    ErrorTracking::ELossModel eloss_model = glet->GetEnergyLossModel();
     PyObject* py_eloss_model = NULL;
     switch (eloss_model) {
-        case GlobalErrorTracking::bethe_bloch_forwards:
+        case ErrorTracking::bethe_bloch_forwards:
             py_eloss_model = PyString_FromString("bethe_bloch_forwards");
             break;
-        case GlobalErrorTracking::bethe_bloch_backwards:
+        case ErrorTracking::bethe_bloch_backwards:
             py_eloss_model = PyString_FromString("bethe_bloch_backwards");
             break;
-        case GlobalErrorTracking::no_eloss:
+        case ErrorTracking::no_eloss:
             py_eloss_model = PyString_FromString("no_eloss");
             break;
     }
@@ -352,18 +354,18 @@ static PyObject* set_scattering_model(PyObject *self, PyObject *args, PyObject *
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
     // now set the eloss model
-    GlobalErrorTracking::MCSModel scat_model = GlobalErrorTracking::no_mcs;
+    ErrorTracking::MCSModel scat_model = ErrorTracking::no_mcs;
     if (strcmp(scat_model_str, "no_mcs") == 0) {
     } else if (strcmp(scat_model_str, "moliere_forwards") == 0) {
-        scat_model = GlobalErrorTracking::moliere_forwards;
+        scat_model = ErrorTracking::moliere_forwards;
     } else if (strcmp(scat_model_str, "moliere_backwards") == 0) {
-        scat_model = GlobalErrorTracking::moliere_backwards;
+        scat_model = ErrorTracking::moliere_backwards;
     } else {
         PyErr_SetString(PyExc_RuntimeError, "Did not recognise scattering model");
         return NULL;
@@ -382,21 +384,21 @@ static PyObject* get_scattering_model(PyObject *self, PyObject *args, PyObject *
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
-    GlobalErrorTracking::MCSModel scat_model = glet->GetMCSModel();
+    ErrorTracking::MCSModel scat_model = glet->GetMCSModel();
     PyObject* py_scat_model = NULL;
     switch (scat_model) {
-        case GlobalErrorTracking::moliere_forwards:
+        case ErrorTracking::moliere_forwards:
             py_scat_model = PyString_FromString("moliere_forwards");
             break;
-        case GlobalErrorTracking::moliere_backwards:
+        case ErrorTracking::moliere_backwards:
             py_scat_model = PyString_FromString("moliere_backwards");
             break;
-        case GlobalErrorTracking::no_mcs:
+        case ErrorTracking::no_mcs:
             py_scat_model = PyString_FromString("no_mcs");
             break;
     }
@@ -426,7 +428,7 @@ static PyObject* propagate_errors
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
@@ -473,7 +475,7 @@ static PyObject* get_transfer_matrix
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
         return NULL;
     }
-    GlobalErrorTracking* glet = py_glet->tracking;
+    ErrorTracking* glet = py_glet->tracking;
     if (glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
@@ -525,7 +527,7 @@ int _init(PyObject* self, PyObject *args, PyObject *kwds) {
     }
 
     try {
-        glet->tracking = new GlobalErrorTracking();
+        glet->tracking = new ErrorTracking();
     } catch (std::exception& exc) {
         PyErr_SetString(PyExc_ValueError, (&exc)->what());
         return -1;

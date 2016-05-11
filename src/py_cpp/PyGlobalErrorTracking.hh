@@ -34,7 +34,7 @@ namespace PyGlobalErrorTracking {
 
 typedef struct {
     PyObject_HEAD;
-    GlobalErrorTracking* tracking;
+    Kalman::Global::ErrorTracking* tracking;
 } PyGlobalErrorTracking;
 
 
