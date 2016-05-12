@@ -45,12 +45,14 @@ void MaterialModel::SetMaterial(double x, double y, double z) {
     if (IsEnabledMaterial(_navigator->GetMaterial()->GetName())) {
         std::cout << "MaterialModel::SetMaterial Setting "
                   << _navigator->GetMaterial()->GetName()
-                  << " as it is enabled" << std::endl;
+                  << " as it is enabled at position "
+                  << "x " << x << " y " << y << " z " << z << std::endl;
         MaterialModel::SetMaterial(_navigator->GetMaterial());
     } else {
         std::cout << "MaterialModel::SetMaterial Ignoring "
                   << _navigator->GetMaterial()->GetName()
-                  << " as it is disabled" << std::endl;
+                  << " as it is disabled at position "
+                  << "x " << x << " y " << y << " z " << z << std::endl;
         *this = MaterialModel();
     }
 }
@@ -122,6 +124,11 @@ double MaterialModel::estrag2(double E, double m, double charge) {
 bool MaterialModel::IsEnabledMaterial(std::string material_name) {
     bool found = _enabled_materials.find(material_name) !=
                                                       _enabled_materials.end();
+    if (!found && material_name.size() > 2 && material_name.substr(0, 3) == std::string("G4_")) {
+        material_name = material_name.substr(3);
+    }
+    found = _enabled_materials.find(material_name) != _enabled_materials.end();
+
     return found;
 }
 
