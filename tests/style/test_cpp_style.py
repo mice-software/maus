@@ -372,7 +372,8 @@ CPP_UNIT_FILES = [
 ]
 
 EV_FILES = [
-'qcustomplot.cpp', 'settings.cpp', 'HepRepXMLWriter.cc', 'mainwindow.cpp',
+'qcustomplot.cpp', 'settings.cpp', 'HepRepXMLWriter.cc', 'mainwindow.cpp', 'moc_settings.cpp',
+'moc_mainwindow.cpp', 'moc_qcustomplot.cpp',
 ]
 
 CPP = os.path.join('src', 'legacy')
