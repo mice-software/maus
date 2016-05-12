@@ -27,7 +27,7 @@ download_package_list="\
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
  coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
  pymongo==2.3 readline matplotlib==1.1.0 \
- pil django==1.5.1 magickwand psutil==3.0.1
+ pil django==1.9.6 magickwand psutil==3.0.1
 "
 
 # these are the packages to install - note the version dependencies

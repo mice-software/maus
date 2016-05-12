@@ -49,6 +49,7 @@ import math
 import array
 
 # Third Party library import statements
+import json
 import event_loader
 import analysis
 from analysis import tools
@@ -100,6 +101,9 @@ DOWN_COV_RECON = []
 VIRTUAL_PLANE_DICT = {}
 INVERSE_PLANE_DICT = {}
 TRACKER_PLANE_RADIUS = 150.0
+
+SELECT_EVENTS = False
+GOOD_EVENTS = {}
 
  
 def get_pz_bin(pz) :
@@ -863,36 +867,41 @@ def analyse_plots(plot_dict, data_dict) :
       for plot_axis in [ "residual_pt", "residual_pz" ] :
         plot = plot_dict[tracker][component+plot_axis]
 
-        errors = array.array( 'd' )
+        rms_error = array.array( 'd' )
         bin_size = array.array( 'd' )
         bins = array.array( 'd' )
         rms = array.array( 'd' )
+        mean = array.array( 'd' )
+        mean_error = array.array( 'd' )
 
-#        width = int( plot.GetNbinsX() / RESOLUTION_BINS )
         width = plot.GetXaxis().GetBinWidth(1)
         for i in range( 0, plot.GetXaxis().GetNbins() ) :
           projection = plot.ProjectionY( \
       tracker+component+plot_axis+'_pro_'+str(i), i, (i+1) )
-#      tracker+component+plot_axis+'_pro_'+str(i), i*width, (i+1)*width )
 
-#          plot_mean = plot.GetXaxis().GetBinCenter( i*width ) + width*0.5
           plot_mean = plot.GetXaxis().GetBinCenter( i ) + width
-          _, _, pro_std, pro_std_err = \
+          pro_mean, pro_mean_err, pro_std, pro_std_err = \
                                         analysis.tools.fit_gaussian(projection)
 
           bin_size.append( width*0.5 )
-          errors.append( pro_std_err )
           bins.append( plot_mean )
           rms.append( pro_std )
+          rms_error.append( pro_std_err )
+          mean.append( pro_mean )
+          mean_error.append( pro_mean_err )
 
         if len(bins) != 0 :
           resolution_graph = ROOT.TGraphErrors( len(bins), \
-                                                  bins, rms, bin_size, errors )
+                                               bins, rms, bin_size, rms_error )
+          bias_graph = ROOT.TGraphErrors( len(bins), \
+                                             bins, mean, bin_size, mean_error )
         else :
           resolution_graph = None
+          bias_graph = None
 
         plot_dict[tracker][component+plot_axis+'_resolution'] = \
                                                                resolution_graph
+        plot_dict[tracker][component+plot_axis+'_bias'] = bias_graph
   return data_dict
 
 
@@ -951,6 +960,10 @@ if __name__ == "__main__" :
                                          "momentum to consider for analysis." )
 
 
+  parser.add_argument( '--selection_file', default=None, \
+                 help='Name of a JSON file containing the events to analyses' )
+
+
 
   parser.add_argument( '--not_require_cluster', action="store_true", \
         help="Don't require a cluster in the reference plane" )
@@ -979,6 +992,13 @@ if __name__ == "__main__" :
     PT_MIN = namespace.pt_window[0]
     PT_MAX = namespace.pt_window[1]
     PT_BIN_WIDTH = namespace.pt_bin
+
+    if namespace.selection_file is not None :
+      SELECT_EVENTS = True
+      with open(namespace.selection_file, 'r') as infile :
+        GOOD_EVENTS = json.load(infile)
+    else :
+      SELECT_EVENTS = False
   except BaseException as ex:
     raise
   else :
@@ -1006,6 +1026,18 @@ if __name__ == "__main__" :
     try :
       while file_reader.next_event() and \
                file_reader.get_total_num_events() != namespace.max_num_events :
+
+        if SELECT_EVENTS :
+          filename = file_reader.get_current_filename()
+          spill = str(file_reader.get_current_spill_number())
+          event = file_reader.get_current_event_number()
+          if filename not in GOOD_EVENTS :
+            continue
+          if spill not in GOOD_EVENTS[filename] :
+            continue
+          if event not in GOOD_EVENTS[filename][spill] :
+            continue
+
         try :
           sys.stdout.write( 
               '  Spill ' + str(file_reader.get_current_spill_number()) + \

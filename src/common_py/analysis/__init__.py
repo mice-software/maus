@@ -29,5 +29,6 @@
 import analysis.tools
 import analysis.covariances
 import analysis.hit_types
+import analysis.inspectors
 
 
