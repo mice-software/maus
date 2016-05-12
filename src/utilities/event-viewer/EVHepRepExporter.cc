@@ -39,8 +39,7 @@ void EVHepRepExporter::Export(int display) {
   if (destDir != NULL)
     ssOutFileName << destDir << "/";
   else
-    std::cerr << "INFO: No destination directory set for HepRep files! "
-              << "Output files will be saved to current working directory!" << std::endl;
+    ssOutFileName << "./";
 
   // - open output heprep file
   ssOutFileName << "MICEEvent_" << event.runNumber << "_" << event.spillNumber
