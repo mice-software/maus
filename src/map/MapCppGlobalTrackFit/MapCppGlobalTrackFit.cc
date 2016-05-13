@@ -57,7 +57,7 @@
 
 namespace MAUS {
 using namespace MAUS::DataStructure::Global;
-/*
+
 double MapCppGlobalTrackFit::mu_mass = 105.658; // BUG
 double MapCppGlobalTrackFit::c_light = 300.; // BUG
 
@@ -116,7 +116,7 @@ void MapCppGlobalTrackFit::_birth(const std::string& config_str) {
 
   if (_kalman_fit != NULL)
       delete _kalman_fit;
-  _kalman_fit = new Kalman::TrackFit(_propagator, _measurement);
+  _kalman_fit = new Kalman::TrackFit(_propagator);
 }
 
 
@@ -148,6 +148,7 @@ void MapCppGlobalTrackFit::_process(Data* data) const {
 }
 
 void MapCppGlobalTrackFit::append_to_data(GlobalEvent& event, Kalman::Track fit) const {
+/*
     using namespace DataStructure;
     Global::Track* track = new Global::Track();
     track->set_pid(Global::kMuPlus);
@@ -168,9 +169,11 @@ void MapCppGlobalTrackFit::append_to_data(GlobalEvent& event, Kalman::Track fit)
     }
     track->SortTrackPointsByZ();
     event.add_track_recursive(track);
+*/
 }
 
 void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
+/*
     std::cerr << "MapCppGlobalTrackFit A" << std::endl;
     Kalman::Track data_track = build_data(event);
     std::cerr << "MapCppGlobalTrackFit B" << std::endl;
@@ -203,9 +206,11 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
     if (event.GetGlobalEvent() == NULL)
         event.SetGlobalEvent(new GlobalEvent());
     append_to_data(*(event.GetGlobalEvent()), smoothed);
+*/
 }
 
 Kalman::State MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
+/*
     Kalman::Global::Measurement* dummy_measurement = new Kalman::GlobalMeasurement();
     auto tof_seed_list = {kTOF1, kTOF2};
     std::vector<DetectorPoint> tof_seed_points(tof_seed_list);
@@ -263,15 +268,18 @@ Kalman::State MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
     delete dummy_measurement;
     std::cerr << "MapCppGlobalTrackFit::build_seed built seed with:\n" << seed_state << std::endl;
     return seed_state;
+*/
 }
 
 Kalman::Track MapCppGlobalTrackFit::build_data(ReconEvent& event) const {
+/*
     DataLoader data(_active_detectors);
     data.SetWillRequireTrackerTriplets(_will_require_triplets);
     data.load_event(event, _measurement);
     std::cerr << "MapCppGlobalTrackFit::build_data built data with:" << std::endl;
     std::cerr << data.get_fit_data() << std::endl;;
     return data.get_fit_data();
-}
 */
+}
+
 } // ~namespace MAUS
