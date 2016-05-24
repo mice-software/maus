@@ -184,7 +184,7 @@ namespace MAUS {
 
     int tracker = s_track->get_tracker();
     double seed_pos = geom->GetPlanePosition(tracker, 5, 2);
-    double length =  seed_pos;
+    double length = seed_pos;
 
     double x0 = s_track->get_x0();
     double y0 = s_track->get_y0();
@@ -320,13 +320,14 @@ namespace MAUS {
 
         mom.setX(state_vector(1, 0)*default_mom);
         mom.setY(state_vector(3, 0)*default_mom);
+        mom.setZ(default_mom);
 
         pos *= reference_rot;
         pos += reference_pos;
         mom *= reference_rot;
 
         if (tracker == 0) mom *= -1.0; // Direction of recon is reveresed upstream.
-        mom.setZ(default_mom); // MeV/c
+        mom.setZ(fabs(mom.z()));
 
         grad.SetX(mom.x()/mom.z());
         grad.SetY(mom.y()/mom.z());
@@ -350,6 +351,7 @@ namespace MAUS {
 
         mom.setX(state_vector(1, 0));
         mom.setY(state_vector(3, 0));
+        mom.setZ(fabs(1.0/state_vector(4, 0)));
 
         pos *= reference_rot;
         pos += reference_pos;
@@ -360,7 +362,7 @@ namespace MAUS {
         } else {
           charge = 1;
         }
-        mom.setZ(fabs(1.0/state_vector(4, 0)));
+        mom.setZ(fabs(mom.z()));
 
         grad.SetX(mom.x() / mom.z());
         grad.SetY(mom.y() / mom.z());
@@ -432,28 +434,27 @@ namespace MAUS {
     ThreeVector seed_pos;
     ThreeVector seed_mom;
     if (dimension == 4) {
-      seed_pos.setZ(the_track[0].GetPosition());
       seed_pos.setX(seed_vector(0, 0));
       seed_mom.setX(seed_vector(1, 0)*default_mom);
       seed_pos.setY(seed_vector(2, 0));
       seed_mom.setY(seed_vector(3, 0)*default_mom);
+      seed_pos.setZ(the_track[14].GetPosition());
+      seed_mom.setZ(default_mom);
     } else if (dimension == 5) {
       seed_pos.setX(seed_vector(0, 0));
       seed_mom.setX(seed_vector(1, 0));
       seed_pos.setY(seed_vector(2, 0));
       seed_mom.setY(seed_vector(3, 0));
-      seed_pos.setZ(the_track[0].GetPosition());
+      seed_pos.setZ(the_track[14].GetPosition());
+      seed_mom.setZ(fabs(1.0/seed_vector(4, 0)));
     }
     seed_pos *= reference_rot;
     seed_pos += reference_pos;
 
     seed_mom *= reference_rot;
 
-    if (dimension == 4) {
-      seed_mom.setZ(default_mom);
-    } else if (dimension == 5) {
-      seed_mom.setZ(fabs(1.0/seed_vector(4, 0)));
-    }
+    if (tracker == 0) seed_mom *= -1.0; // Direction of recon is reveresed upstream.
+    seed_mom.setZ(fabs(seed_mom.z()));
 
     new_track->SetSeedPosition(seed_pos);
     new_track->SetSeedMomentum(seed_mom);

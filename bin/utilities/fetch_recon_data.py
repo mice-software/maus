@@ -19,6 +19,8 @@
   official repository.
 """
 
+# pylint: disable = W0311, C0103, W0611
+
 import MAUS
 
 import tarfile
@@ -38,20 +40,26 @@ DEFAULT_MAX_ATTEMPTS = 3
 
 
 
-def format_run_numbers(run_numbers) :
+def format_run_numbers(numbers) :
+  """
+    Make sure the list of run numbers are correctly formatted.
+  """
   run_strings = []
 
-  for run_number in run_numbers :
+  for run_number in numbers :
     string = str(run_number).zfill(5)
     run_strings.append(string)
 
   return run_strings
 
 
-def construct_filenames(run_numbers, version, server) :
+def construct_filenames(numbers) :
+  """
+    Create a list of filenames using the run numbers.
+  """
   filenames = []
 
-  for run_number in run_numbers :
+  for run_number in numbers :
     filename = str(run_number).zfill(5) + DEFAULT_POSTFIX
     filenames.append(filename)
 
@@ -59,16 +67,22 @@ def construct_filenames(run_numbers, version, server) :
 
 
 def get_file(server, version, file_name, out_path) :
+  """
+    Download the specified recon tar file from the SERVER.
+  """
   url = server + version + '/' + file_name
-  outfile = os.path.join(out_path, file_name)
+  outputfile = os.path.join(out_path, file_name)
   try :
-    urllib.urlretrieve(url, filename=outfile)
+    urllib.urlretrieve(url, filename=outputfile)
   except Exception as ex :
     raise ex
-  return outfile
+  return outputfile
 
 
 def extract_data(filename, outpath) :
+  """
+    Extract all files from the downloaded tar file
+  """
   try :
     with tarfile.open(filename) as tar :
       tar.extractall(path=outpath)
@@ -104,8 +118,7 @@ if __name__ == "__main__" :
 
     run_numbers = format_run_numbers(namespace.run_numbers)
 
-    files = construct_filenames(namespace.run_numbers, \
-                                      namespace.maus_version, namespace.server)
+    files = construct_filenames(namespace.run_numbers)
 
     outdir = namespace.output_directory
 
@@ -134,7 +147,8 @@ if __name__ == "__main__" :
         os.makedirs(data_outpath)
 
         print " - Downloading..."
-        outfile = get_file(namespace.server, namespace.maus_version, files[run_id], tar_outpath)
+        outfile = get_file(namespace.server, namespace.maus_version, \
+                                                    files[run_id], tar_outpath)
         print " - Installing..."
         extract_data(outfile, data_outpath)
         os.remove(outfile)

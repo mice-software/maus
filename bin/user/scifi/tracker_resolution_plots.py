@@ -89,7 +89,7 @@ PZ_MAX = 260.0
 PZ_BIN = 14
 PZ_BIN_WIDTH = 10.0
 
-ALIGNMENT_TOLERANCE = 0.001
+ALIGNMENT_TOLERANCE = 0.01
 RESOLUTION_BINS = 10
 EFFICIENCY_BINS = 10
 
@@ -390,6 +390,11 @@ def init_plots_data() :
       tracker_dict['seed_'+component+'_residual'] = \
                     ROOT.TH1F( tracker+'_patrec_seed_'+component+'_residual', \
                                    "Residual: "+component, 201, -10.05, 10.05 )
+
+    tracker_dict['seed_mx_residual'] = ROOT.TH1F( \
+        tracker+'_patrec_seed_mx_residual', "Residual: m_{x}", 501, -0.5, 0.5 )
+    tracker_dict['seed_my_residual'] = ROOT.TH1F( \
+        tracker+'_patrec_seed_my_residual', "Residual: m_{y}", 501, -0.5, 0.5 )
 
     tracker_dict['seed_pz_residual'] = ROOT.TH1F( \
          tracker+'_patrec_seed_pz_residual', "Residual: pz", 501, -50.1, 50.1 )
@@ -981,10 +986,12 @@ def fill_plots_seeds(plot_dict, data_dict, hit_pairs) :
     P_res = P_recon - P_mc
 
     tracker_plots['seed_x_residual'].Fill(res_pos[0])
-    tracker_plots['seed_y_residual'].Fill(res_pos[0])
+    tracker_plots['seed_y_residual'].Fill(res_pos[1])
     tracker_plots['seed_px_residual'].Fill(res_mom[0])
     tracker_plots['seed_py_residual'].Fill(res_mom[1])
     tracker_plots['seed_pz_residual'].Fill(res_mom[2])
+    tracker_plots['seed_mx_residual'].Fill(res_gra[0])
+    tracker_plots['seed_my_residual'].Fill(res_gra[1])
     tracker_plots['seed_pt_residual'].Fill(Pt_res)
     tracker_plots['seed_p_residual'].Fill(P_res)
 
