@@ -226,7 +226,7 @@ TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
     EXPECT_EQ(emr_array->at(0)->get_mapper_name(), "EMR Primary");
   }
 }
-
+/*
 TEST_F(TrackMatchingTest, GetDetectorTrackPoints) {
   _track_matching = new recon::global::TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0);
@@ -400,7 +400,7 @@ TEST_F(TrackMatchingTest, MatchTrackPoint) {
     EXPECT_FLOAT_EQ(tof1_tps.at(0)->get_position().Y(), -30.0);
   }
 }
-
+*/
 /*
 TEST_F(TrackMatchingTest, MatchTOF0) {
   _track_matching = new recon::global::TrackMatching(_global_event,

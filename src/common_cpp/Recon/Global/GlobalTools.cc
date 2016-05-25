@@ -123,6 +123,7 @@ std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
   if (spill_spacepoints->size() > 0) {
     return spill_spacepoints;
   } else {
+    delete spill_spacepoints;
     return 0;
   }
 }
@@ -197,6 +198,7 @@ std::vector<double> GetTrackerPlaneZPositions(std::string geo_filename) {
     z_positions.push_back(tracker_planes.at(i)->globalPosition().getZ());
   }
   std::sort(z_positions.begin(), z_positions.end());
+  delete geo_module;
   return z_positions;
 }
 
@@ -272,8 +274,8 @@ void propagate(double* x, double target_z, const BTField* field,
     throw(Exception(Exception::recoverable, "Extreme target z",
                     "GlobalTools::propagate"));
   }
-  if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
-      std::isnan(x[4]) || std::isnan(x[5]) || std::isnan(x[6]) || std::isnan(x[7])) {
+  if (isnan(x[0]) || isnan(x[1]) || isnan(x[2]) || isnan(x[3]) ||
+      isnan(x[4]) || isnan(x[5]) || isnan(x[6]) || isnan(x[7])) {
     std::stringstream ios;
     ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
         << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
@@ -333,11 +335,21 @@ void propagate(double* x, double target_z, const BTField* field,
       // Check if z distance to next material boundary is smaller than step size
       // if yes, we impose a tight limit on the step size to avoid issues
       // arising from the track not being straight
-      if (std::abs(z_dist) < std::abs(h)) {
-        if (std::abs(z_dist) > 2.0) {
-          h = 2.0*prop_dir;
-        } else if (z_dist > 0.00000000001) {
+      if (std::abs(z_dist) > 0.00000000001 and
+          std::abs(z_dist) < std::abs(h)) {
+        if (std::abs(z_dist) > 1.0) {
+          h = 1.0*prop_dir;
+        } else {
           h = z_dist; // will have proper sign from momvector
+        }
+      } else {
+        // We need to check if we're in a material with high stopping power, and if yes,
+        // decrease the step size as otherwise the underestimated path length due to the
+        // curved trajectory will cause problems
+        double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
+                            )->GetElectronDensity();
+        if (n_e > 1e+18) {
+          h = 1.0*prop_dir;
         }
       }
       // Making sure we don't get stuck in Zeno's paradox

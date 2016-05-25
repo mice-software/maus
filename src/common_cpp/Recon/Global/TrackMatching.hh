@@ -114,7 +114,7 @@ namespace global {
      *
      * @see GetDetectorTrackArray()
      */
-    std::vector<DataStructure::Global::TrackPoint*> GetDetectorTrackPoints(
+    std::vector<DataStructure::Global::SpacePoint*> GetDetectorSpacePoints(
         DataStructure::Global::DetectorPoint detector, std::string mapper_name);
 
     /**
@@ -159,7 +159,7 @@ namespace global {
      */
     void MatchTrackPoint(
         const TLorentzVector &position, const TLorentzVector &momentum,
-        const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+        const std::vector<DataStructure::Global::SpacePoint*> &spacepoints,
         DataStructure::Global::PID pid, BTFieldConstructor* field,
         std::string detector_name,
         DataStructure::Global::Track* hypothesis_track);
@@ -167,7 +167,7 @@ namespace global {
     void MatchTOF0(
         const TLorentzVector &position, const TLorentzVector &momentum,
         double tof1_z, double tof1_t,
-        const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+        const std::vector<DataStructure::Global::SpacePoint*> &spacepoints,
         DataStructure::Global::PID pid, BTFieldConstructor* field,
         DataStructure::Global::Track* hypothesis_track);
 
@@ -270,7 +270,7 @@ namespace global {
      * @param hypothesis_track The Track to which the TrackPoints should be added
      */
     void AddIfConsistent(
-        std::vector<DataStructure::Global::TrackPoint*> trackpoints,
+        std::vector<DataStructure::Global::SpacePoint*> spacepoints,
         DataStructure::Global::Track* hypothesis_track);
 
     /// Mapper name passed by the mapper calling this class
