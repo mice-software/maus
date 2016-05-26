@@ -73,8 +73,12 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     _space_points = new std::vector<MAUS::DataStructure::Global::SpacePoint*>();
     std::vector<MAUS::DataStructure::Global::SpacePoint*>* old_space_points =
         globalevent._space_points;
-    for (size_t i = 0; i < old_space_points->size(); ++i)
-      _space_points->push_back(old_space_points->at(i)->Clone());
+    for (size_t i = 0; i < old_space_points->size(); ++i) {
+      DataStructure::Global::SpacePoint* sp =
+          new DataStructure::Global::SpacePoint(*old_space_points->at(i));
+      _space_points->push_back(sp);
+      // _space_points->push_back(old_space_points->at(i)->Clone());
+    }
   }
 
   if (_track_points != NULL) {
@@ -89,7 +93,10 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     std::vector<MAUS::DataStructure::Global::TrackPoint*>* old_track_points =
         globalevent._track_points;
     for (size_t i = 0; i < old_track_points->size(); ++i) {
-      _track_points->push_back(old_track_points->at(i)->Clone());
+      DataStructure::Global::TrackPoint* tp =
+          new DataStructure::Global::TrackPoint(*old_track_points->at(i));
+      _track_points->push_back(tp);
+      // _track_points->push_back(old_track_points->at(i)->Clone());
       // copy across also the space point pointer-as-reference to the new
       // structure
       MAUS::DataStructure::Global::SpacePoint* sp =
@@ -117,7 +124,10 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     std::vector<MAUS::DataStructure::Global::Track*>* old_tracks =
         globalevent._tracks;
     for (size_t i = 0; i < old_tracks->size(); ++i) {
-      _tracks->push_back(old_tracks->at(i)->Clone());
+      DataStructure::Global::Track* temp_track =
+          new DataStructure::Global::Track(*old_tracks->at(i));
+      _tracks->push_back(temp_track);
+      // _tracks->push_back(old_tracks->at(i)->Clone());
       TRefArray* old_track_points_on_track = old_tracks->at(i)->get_track_points();
       TRefArray* new_track_points_on_track = _tracks->at(i)->get_track_points();
       for (int j = 0; j < old_track_points_on_track->GetLast()+1; ++j) {
@@ -129,7 +139,6 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       }
     }
   }
-
   return *this;
 }
 
@@ -347,4 +356,3 @@ void GlobalEvent::set_space_points(
   _space_points = space_points;
 };
 }
-

@@ -316,7 +316,7 @@ os.path.join('tests', 'integration', 'test_optics', 'src'),
 
 # exclude_files are files that are explicitly excluded from the style check,
 # usually legacy code that hasn't been cleaned up yet. Note you MUST get
-# explicit approval from Chris Rogers before adding something to
+# explicit approval from Adam Dobbs before adding something to
 # exclude_files.
 #
 # If you do fix a file, please remove the file from this list (so it is included
@@ -371,8 +371,14 @@ CPP_UNIT_FILES = [
 'MeshTest.cc', 'MAUSPrimaryGeneratorActionTest.cc', 'BTSolenoidTest.cc', 'JsonWrapperTest.cc', 'MAUSTrackingActionTest.cc', 'MAUSGeant4ManagerTest.cc', 'BTMultipoleTest.cc', 'MVectorTest.cc', 'DifferentiatorTest.cc', 'BTFieldConstructorTest.cc', 'MMatrixTest.cc', 'MiceModToG4SolidTest.cc', 'PolynomialTest.cc', 'BTTrackerTest.cc', 'MAUSSteppingActionTest.cc', 'CppErrorHandlerTest.cc', 'MiceModuleTest.cc', 'TriangularMeshTest.cc', 'dataCardsTest.cc',
 ]
 
+EV_FILES = [
+'qcustomplot.cpp', 'settings.cpp', 'HepRepXMLWriter.cc', 'mainwindow.cpp', 'moc_settings.cpp',
+'moc_mainwindow.cpp', 'moc_qcustomplot.cpp',
+]
+
 CPP = os.path.join('src', 'legacy')
 TEST = os.path.join('tests', 'cpp_unit')
+UTILS = os.path.join('src', 'utilities')
 
 # glob files here because of
 GLOB_FILES = []
@@ -391,6 +397,7 @@ EXCLUDE_FILES += file_append(os.path.join(CPP, 'Simulation'), SIMULATION_FILES)
 EXCLUDE_FILES += file_append(os.path.join(CPP, 'Calib'), CALIB_FILES)
 EXCLUDE_FILES += file_append(os.path.join(CPP, 'Config'), CONFIG_FILES)
 EXCLUDE_FILES += file_append(os.path.join(CPP, 'Optics'), OPTICS_FILES)
+EXCLUDE_FILES += file_append(os.path.join(UTILS, 'event-viewer'), EV_FILES)
 
 EXCLUDE_FILES += file_append \
   (os.path.join('src', 'common_cpp', 'DataStructure'), ['MausDataStructure.cc'])
