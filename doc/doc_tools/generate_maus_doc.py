@@ -24,7 +24,7 @@ def main():
     maus_rootdir = os.environ['MAUS_ROOT_DIR']
     thirdpartylibs = ['root', 'geant4', 'clhep', 'jsoncpp']
     maus_components = ['framework', 'datastructure', 'input', 'map', 'reduce',
-                      'output']
+                      'output', 'utilities']
     print 'MAUS_THIRD_PARTY path is set to ' + maus_thirdparty
     print 'Checking for existing tag files...'
     tagfiles = []
