@@ -44,18 +44,18 @@ void polynomial_fit(EMRSpacePointArray spacePointArray,
   double chi2x(-1.), chi2y(-1.);	// Normalised chi squared in the two projections
 
   if ( !x.size() ) {
-    for (size_t p = 0; p < n+1; p++) {
-      ax.push_back(0.);
-      eax.push_back(0.);
-    }
+    for (size_t p = 0; p < n+1; p++)
+        ax.push_back(0.);
+    for (size_t p = 0; p < 2*(n+1); p++)
+        eax.push_back(0.);
     chi2x = 0.;
   } else if ( x.size() == 1 ) {
     ax.push_back(x[0]);
-    eax.push_back(ex[0]);
-    for (size_t p = 1; p < n+1; p++) {
-      ax.push_back(0.);
-      eax.push_back(0.);
-    }
+    eax.push_back(ex[0]*ex[0]);
+    for (size_t p = 1; p < n+1; p++)
+        ax.push_back(0.);
+    for (size_t p = 1; p < 2*(n+1); p++)
+        eax.push_back(0.);
     chi2x = 0.;
   } else {
 //      theil_sen_fit(zx, x, ex, ax, eax, chi2x);
@@ -63,18 +63,18 @@ void polynomial_fit(EMRSpacePointArray spacePointArray,
   }
 
   if ( !y.size() ) {
-    for (size_t p = 0; p < n+1; p++) {
-      ay.push_back(0.);
-      eay.push_back(0.);
-    }
+    for (size_t p = 0; p < n+1; p++)
+        ay.push_back(0.);
+    for (size_t p = 0; p < 2*(n+1); p++)
+        eay.push_back(0.);
     chi2y = 0.;
   } else if ( y.size() == 1 ) {
     ay.push_back(y[0]);
-    eay.push_back(ey[0]);
-    for (size_t p = 1; p < n+1; p++) {
-      ay.push_back(0.);
-      eay.push_back(0.);
-    }
+    eay.push_back(ey[0]*ey[0]);
+    for (size_t p = 1; p < n+1; p++)
+        ay.push_back(0.);
+    for (size_t p = 1; p < 2*(n+1); p++)
+        eay.push_back(0.);
     chi2y = 0.;
   } else {
 //      theil_sen_fit(zy, y, ey, ay, eay, chi2y);
@@ -120,10 +120,11 @@ void polynomial_fit_2D(std::vector<double> x,
   V_p.Invert(det);                      // Invert in place
   TMatrixD P(V_p * At * V_m * Y);	// The least sqaures estimate of the parameters
 
-  // Extract the fit parameters
+  // Extract the fit parameters and their covariance matrix
   for (size_t p = 0; p < n+1; p++) {
     a.push_back(P[p][0]);
-    ea.push_back(V_p[p][p]);
+    for (size_t q = 0; q < n+1; q++)
+      ea.push_back(V_p[p][q]);
   }
 
   // Calculate the fit chisq
@@ -187,7 +188,7 @@ void theil_sen_fit(std::vector<double> x,
   a.push_back(b);
   a.push_back(m);
 
-  // Error propagation (uses the mean hear, not such thing for the median)
+  // Error propagation (uses the mean here, no such thing for the median)
   ea.push_back(sqrt(i2mean/intercept.size()-pow(imean/intercept.size(), 2)));
   ea.push_back(sqrt(g2mean/gradient.size()-pow(gmean/gradient.size(), 2)));
 
@@ -321,12 +322,22 @@ double pol(double x, std::vector<double> par) {
 double pol_error(double x, double ex,
 		 std::vector<double> par, std::vector<double> epar) {
 
-  double error2(0.);
-  // Error from the fitting parameters
+  // Build the parameters covariance matrix
+  TMatrixD V_p(par.size(), par.size());
   for (size_t p = 0; p < par.size(); p++)
-      error2 += pow(pow(x, p)*epar[p], 2);
+      for (size_t q = 0; q < par.size(); q++)
+          V_p[p][q] = epar[p*par.size()+q];
 
-  // Error from the uncertainty on x
+  // Calculate the variance on the measurement from the functional matrix
+  TMatrixD A(par.size(), 1);
+  for (size_t p = 0; p < par.size(); p++)
+      A[p][0] = pow(x, p);
+  TMatrixD At(A);
+  At.T();
+  TMatrix V_m(At*V_p*A);
+  double error2 = V_m[0][0];
+
+  // Error from the uncertainty on x, uncorrelated from the paramters
   double dpol = dnpol(x, par, 1);
   error2 += pow(dpol*ex, 2);
 
@@ -345,12 +356,22 @@ double dnpol(double x, std::vector<double> par, unsigned int k) {
 double dnpol_error(double x, double ex,
 		   std::vector<double> par, std::vector<double> epar, unsigned int k) {
 
-  // Error from the fitting parameters
-  double error2(0.);
+  // Build the parameters covariance matrix
+  TMatrixD V_p(par.size()-k, par.size()-k);
   for (size_t p = k; p < par.size(); p++)
-    error2 += pow((factorial(p)/factorial(p-k))*pow(x, p-k)*epar[p], 2);
+      for (size_t q = k; q < par.size(); q++)
+          V_p[p-k][q-k] = epar[p*par.size()+q];
 
-  // Error from the uncertainty on x
+  // Calculate the variance on the measurement from the functional matrix
+  TMatrixD A(par.size()-k, 1);
+  for (size_t p = k; p < par.size(); p++)
+      A[p-k][0] = (factorial(p)/factorial(p-k))*pow(x, p-k);
+  TMatrixD At(A);
+  At.T();
+  TMatrix V_m(At*V_p*A);
+  double error2 = V_m[0][0];
+
+  // Error from the uncertainty on x, uncorrelated from the parameters
   double dpol(0.);
   for (size_t p = k+1; p < par.size(); p++)
     dpol += (factorial(p)/factorial(p-k-1))*pow(x, p-k-1);

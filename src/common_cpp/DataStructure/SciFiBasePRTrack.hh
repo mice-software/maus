@@ -15,7 +15,7 @@
  *
  */
 
-/** @class SciFiBasePRTrack Base class for scifi pattern recogntion tracks.  */
+
 
 #ifndef  _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIBASEPRTRACK_HH_
 #define _SRC_COMMON_CPP_DATASTRUCTURE_SCIFIBASEPRTRACK_HH_
@@ -36,25 +36,33 @@ namespace MAUS {
 
 typedef std::vector<double> DoubleArray;
 
+/** @class SciFiBasePRTrack
+ *  @author A. Dobbs
+ *  @author C. Hunt
+ *  @brief Base class for scifi pattern recogntion tracks
+ */
 class SciFiBasePRTrack : public TObject {
   public:
-    /** Default constructor */
+    /** @brief Default constructor */
     SciFiBasePRTrack();
 
-    /** Construct some variables */
+    /** @brief Construct some variables */
     explicit SciFiBasePRTrack(DoubleArray cov);
 
-    /** Construct some variables */
+    /** @brief Construct some variables */
     SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoints);
 
-    /** Copy constructor */
+    /** @brief Copy constructor */
     SciFiBasePRTrack(const SciFiBasePRTrack& track);
 
-    /** Default destructor */
+    /** @brief Default destructor */
     virtual ~SciFiBasePRTrack();
 
-    /** Assignment operator */
+    /** @brief Assignment operator */
     SciFiBasePRTrack& operator=(const SciFiBasePRTrack& track);
+
+    /** @brief Combine the different chi sqs into one final value */
+    virtual void form_total_chi_squared() {}
 
     /** Get the covariance matrix elements of the least square fit parameters */
     std::vector<double> get_covariance() const { return _covariance; }
@@ -109,9 +117,8 @@ class SciFiBasePRTrack : public TObject {
     /** Get the number of triplet spacepoints */
     int get_num_triplets() const;
 
-
   private:
-    TRefArray* _spoints;
+    TRefArray* _spoints; /** The spacepoints associated with the track (track does not own mem) */
 
     /**
      *  Vector of covariances from the least squared fits.
@@ -121,11 +128,11 @@ class SciFiBasePRTrack : public TObject {
      *  In the straight track case these are the covariances of:
      *  c_x-c_x, c_x-m_x, m_x-c_x, m_x-m_x, c_y-c_y, c_y-m_y, m_y-c_y, m_y-m_y.
      */
-    DoubleArray _covariance; // The covariance matrix derived from the fit
-    ThreeVector _position; // Reconstructed reference plane position
-    ThreeVector _momentum; // Reconstructed reference plane momentum
-    double _chi_sq;
-    int _ndf;
+    DoubleArray _covariance;
+    ThreeVector _position;   /** Reconstructed reference plane position */
+    ThreeVector _momentum;   /** Reconstructed reference plane momentum */
+    double _chi_sq;          /** The chisq of the fit/s which formed the track */
+    int _ndf;                /** The number of degrees of freedom */
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };

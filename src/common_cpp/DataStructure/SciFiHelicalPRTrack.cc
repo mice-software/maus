@@ -91,6 +91,10 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   return *this;
 }
 
+void SciFiHelicalPRTrack::form_total_chi_squared() {
+  this->set_chi_squared(_circle_chisq + _line_sz_chisq);
+}
+
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
   : SciFiBasePRTrack(htrk),
     _tracker(htrk.get_tracker()),
