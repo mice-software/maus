@@ -55,6 +55,12 @@
 // * -Enable/disable material name/conversion logic-
 // * Enable/disable volume names
 
+std::ostream& operator <<(std::ostream& out, MAUS::Kalman::State const& state) {
+    std::string state_str = MAUS::Kalman::print_state(state);
+    out << state_str;
+    return out;
+}
+
 namespace MAUS {
 using namespace MAUS::DataStructure::Global;
 
@@ -85,38 +91,45 @@ MapCppGlobalTrackFit::~MapCppGlobalTrackFit() {
 
 void MapCppGlobalTrackFit::_birth(const std::string& config_str) {
   // Pull out the global settings
+  std::cerr << "birth 1" << std::endl;
   Json::Value config = JsonWrapper::StringToJson(config_str);
   _will_require_triplets = true;
+  std::cerr << "birth 2" << std::endl;
   try {
       _will_require_triplets = JsonWrapper::GetProperty(
         config,
         "global_track_fit_will_require_triplet_space_points",
         JsonWrapper::booleanValue).asBool();
   } catch (MAUS::Exception* exc) {} // do nothing, we take the default
+  std::cerr << "birth 3" << std::endl;
 
   if (_propagator != NULL)
       delete _propagator;
+  std::cerr << "birth 4" << std::endl;
   _propagator = new Kalman::Global::Propagator();
+  std::cerr << "birth 5" << std::endl;
   _propagator->SetMass(mu_mass); // BUG
+  std::cerr << "birth 6" << std::endl;
   _propagator->SetField(Globals::GetMCFieldConstructor());
-
-
+  std::cerr << "birth 7" << std::endl;
   
   double tof_sigma_t = JsonWrapper::GetProperty(
                         config,
                         "global_track_fit_tof_sigma_t",
                         JsonWrapper::realValue).asDouble();
+  std::cerr << "birth 8" << std::endl;
   double sf_sigma_x = JsonWrapper::GetProperty(
                         config,
                         "global_track_fit_scifi_sigma_x",
                         JsonWrapper::realValue).asDouble();
-
-  if (_measurement != NULL)
-      delete _measurement;
+  std::cerr << "birth 9" << std::endl;
 
   if (_kalman_fit != NULL)
       delete _kalman_fit;
+  std::cerr << "birth 10" << std::endl;
   _kalman_fit = new Kalman::TrackFit(_propagator);
+  std::cerr << "birth 11" << std::endl;
+
 }
 
 
@@ -148,19 +161,22 @@ void MapCppGlobalTrackFit::_process(Data* data) const {
 }
 
 void MapCppGlobalTrackFit::append_to_data(GlobalEvent& event, Kalman::Track fit) const {
-/*
     using namespace DataStructure;
     Global::Track* track = new Global::Track();
     track->set_pid(Global::kMuPlus);
     track->set_charge(1.);
     track->set_mapper_name("MapCppGlobalTrackFit");
     for (size_t i = 0; i < fit.GetLength(); ++i) {
-        Kalman::State state = fit[i];
+        Kalman::State state = fit[i].GetFiltered(); // BUG should be smoothed
         Global::TrackPoint* point = new Global::TrackPoint();
         point->set_mapper_name("MapCppGlobalTrackFit");
         point->set_particle_event(-99); // BUG
-        TLorentzVector pos(state.GetVector()[0][0], state.GetVector()[1][0], state.GetVector()[2][0], state.GetPosition());
-        TLorentzVector mom(0., state.GetVector()[4][0], state.GetVector()[5][0], state.GetVector()[3][0]);
+        TLorentzVector pos(state.GetVector()[0][0],
+                           state.GetVector()[1][0],
+                           state.GetVector()[2][0],
+                           fit[i].GetPosition());
+        TLorentzVector mom(0.,
+                           state.GetVector()[4][0], state.GetVector()[5][0], state.GetVector()[3][0]);
         double E = state.GetVector()[3][0];
         mom[0] = ::sqrt(E*E-(mom[0]*mom[0]+mom[1]*mom[1]+mu_mass*mu_mass));
         point->set_position(pos);
@@ -169,87 +185,91 @@ void MapCppGlobalTrackFit::append_to_data(GlobalEvent& event, Kalman::Track fit)
     }
     track->SortTrackPointsByZ();
     event.add_track_recursive(track);
-*/
 }
 
 void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
-/*
     std::cerr << "MapCppGlobalTrackFit A" << std::endl;
-    Kalman::Track data_track = build_data(event);
+    build_data(event);
     std::cerr << "MapCppGlobalTrackFit B" << std::endl;
-    if (data_track.GetLength() == 0)
-        return;
+    build_seed(event);
+
     std::cerr << "MapCppGlobalTrackFit C" << std::endl;
-    Kalman::State seed = build_seed(event);
-
-    std::cerr << "MapCppGlobalTrackFit D" << std::endl;
-    _kalman_fit->SetData(data_track);
-    _kalman_fit->SetSeed(seed);
-
-    std::cerr << "MapCppGlobalTrackFit E1" << std::endl;
     _kalman_fit->Filter(true);
-    std::cerr << "MapCppGlobalTrackFit E2" << std::endl;
+    std::cerr << "MapCppGlobalTrackFit D" << std::endl;
     _kalman_fit->Smooth(true);
-    std::cerr << "MapCppGlobalTrackFit F" << std::endl;
-    Kalman::Track smoothed = _kalman_fit->GetSmoothed();
+    std::cerr << "MapCppGlobalTrackFit E" << std::endl;
 
-    std::cerr << "Fitting to track" << std::endl;
-    Kalman::Track f_track = _kalman_fit->GetFiltered();
-    Kalman::Track s_track = _kalman_fit->GetSmoothed();
-    for (size_t i = 0; i < data_track.GetLength(); ++i) {
-        std::cerr << "Initial track " << i << "\n" << data_track[i] << std::endl;
-        std::cerr << "Filtered track " << i << "\n" << f_track[i] << std::endl;
+    Kalman::Track track = _kalman_fit->GetTrack();
+    for (size_t i = 0; i < track.GetLength(); ++i) {
+        std::cerr << "Initial track " << i << "\n" 
+                  << track[i].GetData() << std::endl;
+        std::cerr << "Filtered track " << i << "\n"
+                  << track[i].GetFiltered() << std::endl;
         //std::cerr << "Smoothed track " << i << "\n" << s_track[i] << std::endl;
         std::cerr << "\n" << std::endl;
     }
 
     if (event.GetGlobalEvent() == NULL)
         event.SetGlobalEvent(new GlobalEvent());
-    append_to_data(*(event.GetGlobalEvent()), smoothed);
-*/
+    append_to_data(*(event.GetGlobalEvent()), track);
 }
 
-Kalman::State MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
-/*
-    Kalman::Global::Measurement* dummy_measurement = new Kalman::GlobalMeasurement();
+void MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
+    std::cerr << "Build seed tof" << std::endl;
     auto tof_seed_list = {kTOF1, kTOF2};
     std::vector<DetectorPoint> tof_seed_points(tof_seed_list);
-    DataLoader tof_data(tof_seed_points);
-    tof_data.load_event(event, dummy_measurement);
-    Kalman::Track tof_track = tof_data.get_fit_data();
+    std::cerr << "  tof container" << std::endl;
+    MAUS::Kalman::TrackFit tof_container(new Kalman::Global::Propagator());
+    std::cerr << "  tof data" << std::endl;
+    DataLoader tof_data(tof_seed_points, &tof_container);
+    std::cerr << "  load tof event" << std::endl;
+    tof_data.load_event(event);
+    std::cerr << "  get tof tracl" << std::endl;
+    Kalman::Track tof_track = tof_container.GetTrack();
+    std::cerr << "  check track length" << std::endl;
     if (tof_track.GetLength() != 2) {
+        std::cerr << "      failed check track length " << tof_track.GetLength() << std::endl;
         throw MAUS::Exception(Exception::recoverable,
                               "tof_track was not of length 2",
                               "MapCppGlobalTrackFit::build_seed");
     }
-    double tof_dt = tof_track[1].GetVector()[0][0]-tof_track[0].GetVector()[0][0];
-    double tof_dz = (tof_track[1].GetPosition() - tof_track[0].GetPosition());
+    std::cerr << "  Get dt" << std::endl;
+    double tof_dt = tof_track[1].GetData().GetVector()[0][0]-
+                    tof_track[0].GetData().GetVector()[0][0];
+    std::cerr << "  Get dz" << std::endl;
+    double tof_dz = (tof_track[1].GetPosition() -
+                     tof_track[0].GetPosition());
     double beta = tof_dz/tof_dt/c_light;
     double gamma = 1/::sqrt(1-beta*beta);
     double seed_pz = mu_mass*beta*gamma;
+    std::cerr << "  Nan check" << std::endl;
     if (seed_pz != seed_pz)
         throw MAUS::Exception(Exception::recoverable,
                               "Failed to calculate seed pz (maybe beta > 1?)",
                               "MapCppGlobalTrackFit::build_seed");
 
+    std::cerr << "Build seed tracker" << std::endl;
     auto pos_seed_list = {kTracker0_1, kTracker0_2};
     std::vector<DetectorPoint> pos_seed_points(pos_seed_list);
-    DataLoader sf_data(pos_seed_points);
+    MAUS::Kalman::TrackFit sf_container(new Kalman::Global::Propagator());
+    DataLoader sf_data(pos_seed_points, &sf_container);
     sf_data.SetWillRequireTrackerTriplets(_will_require_triplets);
-    sf_data.load_event(event, dummy_measurement);
-    Kalman::Track sf_track = sf_data.get_fit_data();
+    sf_data.load_event(event);
+    Kalman::Track sf_track = sf_container.GetTrack();
     if (sf_track.GetLength() != 2) {
         throw MAUS::Exception(Exception::recoverable, "sf_track was not of length 2", "MapCppGlobalTrackFit::build_seed");
     }
-    Kalman::State seed_state(6, sf_track[0].GetPosition());
-    double dx = sf_track[1].GetVector()[0][0]-sf_track[0].GetVector()[0][0];
-    double dy = sf_track[1].GetVector()[1][0]-sf_track[0].GetVector()[1][0];
+    Kalman::State seed_state(6);
+    TMatrixD sf_0 = sf_track[0].GetData().GetVector();
+    TMatrixD sf_1 = sf_track[1].GetData().GetVector();
+    double dx = sf_1[0][0] - sf_0[0][0];
+    double dy = sf_1[1][0] - sf_0[1][0];
     double dz = sf_track[1].GetPosition()-sf_track[0].GetPosition();
 
     TMatrixD vector(6, 1);
     vector[0][0] = tof_dt/tof_dz*(sf_track[0].GetPosition()-tof_track[0].GetPosition());
-    vector[1][0] = sf_track[0].GetVector()[0][0];
-    vector[2][0] = sf_track[0].GetVector()[1][0];
+    vector[1][0] = sf_1[0][0];
+    vector[2][0] = sf_0[1][0];
     vector[4][0] = dx/dz*seed_pz;
     vector[5][0] = dy/dz*seed_pz;
     vector[3][0] = ::sqrt(seed_pz*seed_pz + vector[4][0]*vector[4][0]+vector[5][0]*vector[5][0]+mu_mass*mu_mass);
@@ -265,21 +285,14 @@ Kalman::State MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
     };
     TMatrixD covariance(6, 6, errors);
     seed_state.SetCovariance(covariance);
-    delete dummy_measurement;
     std::cerr << "MapCppGlobalTrackFit::build_seed built seed with:\n" << seed_state << std::endl;
-    return seed_state;
-*/
+    _kalman_fit->SetSeed(seed_state);
 }
 
-Kalman::Track MapCppGlobalTrackFit::build_data(ReconEvent& event) const {
-/*
-    DataLoader data(_active_detectors);
+void MapCppGlobalTrackFit::build_data(ReconEvent& event) const {
+    DataLoader data(_active_detectors, _kalman_fit);
     data.SetWillRequireTrackerTriplets(_will_require_triplets);
-    data.load_event(event, _measurement);
-    std::cerr << "MapCppGlobalTrackFit::build_data built data with:" << std::endl;
-    std::cerr << data.get_fit_data() << std::endl;;
-    return data.get_fit_data();
-*/
+    data.load_event(event);
 }
 
 } // ~namespace MAUS

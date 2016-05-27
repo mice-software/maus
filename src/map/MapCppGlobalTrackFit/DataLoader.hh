@@ -9,6 +9,7 @@ class TOFEvent;
 
 class DataLoader {
   public:
+    /** fit is a borrowed reference (caller owns the memory) */
     DataLoader(std::vector<MAUS::DataStructure::Global::DetectorPoint> detectors,
                Kalman::TrackFit* fit);
     ~DataLoader() {}

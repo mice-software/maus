@@ -17,6 +17,8 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
             Configuration.Configuration().getConfigJSON(command_line_args=False)
         config_json = json.loads(cls.config_str)
         config_json["global_track_fit_will_require_triplet_space_points"] = False
+        config_json["global_track_fit_tof_sigma_t"] = 0.05
+        config_json["global_track_fit_scifi_sigma_x"] = 0.5
         config_json["verbose_level"] = 0
         cls.config_str = json.dumps(config_json)
         if not maus_cpp.globals.has_instance():
@@ -91,11 +93,13 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
         tof_event.SetTOFEventSpacePoint(tof_space_point)
 
     def test_straight_track_fit(self):
+        print "Test straight track fit"
         data = ROOT.MAUS.Data()
         spill = ROOT.MAUS.Spill()
         spill.SetDaqEventType("physics_event")
         recon_events = ROOT.MAUS.ReconEventPArray()
         for i in range(-2, -1):
+            print "i", i
             a_recon_event = ROOT.MAUS.ReconEvent()
             scifi_event = ROOT.MAUS.SciFiEvent()
             tof_event = ROOT.MAUS.TOFEvent()
@@ -108,11 +112,15 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
             self.make_tof_space_points(seed, tof_event)
             a_recon_event.SetTOFEvent(tof_event)
             recon_events.push_back(a_recon_event)
+            print "i done", i
         spill.SetReconEvents(recon_events)
         data.SetSpill(spill)
 
+        print "Init"
         fit = MapCppGlobalTrackFit()
+        print "Birth"
         fit.birth(self.config_str)
+        print "Process"
         data_out = fit.process(data)
         print "Found ", data_out.GetSpill().GetReconEvents().size(), "recon events"
 
@@ -143,5 +151,5 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    raw_input()
+    #raw_input()
 

@@ -167,7 +167,7 @@ namespace Kalman {
        */
       virtual ~TrackPoint() {}
 
-      int GetDimension() const { return this->_predicted.GetDimension(); }
+      unsigned int GetDimension() const { return this->_predicted.GetDimension(); }
 
       /** @brief Get ID of trackpoint
        */
@@ -293,17 +293,22 @@ namespace Kalman {
 
       TrackPointArray _track_vector;
   };
-
-  /** Streamer operator for TMatrixD */
-  std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix);
-
-  /** Streamer operator for State */
-  std::ostream& operator<<(std::ostream& out, const State& state);
-
-  /** Streamer operator for Track */
-  std::ostream& operator<<(std::ostream& out, const Track& state);
-
 } // namespace Kalman
 } // namespace MAUS
+
+/** Streamer operator for TMatrixD */
+std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix);
+
+/** Streamer operator for State */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::State& state);
+
+/** Streamer operator for Track */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::TrackPoint& track_point);
+
+/** Streamer operator for Track */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::Track& track);
 
 #endif

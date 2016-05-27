@@ -85,10 +85,9 @@ class MapCppGlobalTrackFit : public MapBase<Data> {
  private:
 
   void append_to_data(GlobalEvent& event, Kalman::Track fit) const;
-  Kalman::Track build_data(ReconEvent& event) const;
-  Kalman::State build_seed(ReconEvent& event) const;
+  void build_data(ReconEvent& event) const;
+  void build_seed(ReconEvent& event) const;
 
-  Kalman::Global::Measurement* _measurement = NULL;
   Kalman::Global::Propagator* _propagator = NULL;
   Kalman::TrackFit* _kalman_fit = NULL;
   std::vector<DataStructure::Global::DetectorPoint> _active_detectors;

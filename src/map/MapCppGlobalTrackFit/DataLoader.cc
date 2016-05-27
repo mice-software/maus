@@ -63,12 +63,17 @@ Kalman::State DataLoader::load_tof_space_point(TOFSpacePoint* sp) {
 void DataLoader::load_tof_detector(const MAUS::TOF0SpacePointArray& sp_vector,
                                MAUS::DataStructure::Global::DetectorPoint det) {
     for (size_t i = 0; i < sp_vector.size(); ++i) {
+        std::cerr << "    load_tof_detector " << det << " " << sp_vector.size() << " " << i << " detectors: ";
+        for (size_t j = 0; j < _detectors.size(); ++j)
+            std::cerr << " " << _detectors[j];
+        std::cerr << std::endl;
         TOFSpacePoint one_sp = sp_vector.at(i);
         Kalman::State state(0);
         int tp_id = _fitter->GetTrack().GetLength();
         Measurement_base* meas = NULL;
         if (i == 0 && 
             std::find(_detectors.begin(), _detectors.end(), det) != _detectors.end()) {
+            std::cerr << "     adding" << std::endl;
             meas = Measurement::GetDetectorToMeasurementMap()[det];
             state = load_tof_space_point(&one_sp);
         } else { // treat it as a virtual detector instead
