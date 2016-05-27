@@ -103,11 +103,8 @@ namespace global {
         MAUS::DataStructure::Global::DetectorPoint detector);
 
     /**
-     * @brief Returns a vector of TrackPoints in the global event corresponding
+     * @brief Returns a vector of SpacePoints in the global event corresponding
      * to the chosen detector (TOFs or KL).
-     *
-     * As the recon import for these detectors outputs SpacePoints only, these
-     * are first converted into TrackPoints by this function
      *
      * @param detector Chosen detector (kTOF0, kTOF1, kTOF2, or kCalorimeter)
      * @param mapper_name The mapper name to assign to the new TrackPoints
@@ -115,7 +112,7 @@ namespace global {
      * @see GetDetectorTrackArray()
      */
     std::vector<DataStructure::Global::SpacePoint*> GetDetectorSpacePoints(
-        DataStructure::Global::DetectorPoint detector, std::string mapper_name);
+        DataStructure::Global::DetectorPoint detector);
 
     /**
      * @brief Creates a vector of PIDs that designate the PID hypotheses over
@@ -138,15 +135,15 @@ namespace global {
         int charge_hypothesis, std::string pid_hypothesis_string);
 
     /**
-     * @brief Matches hits in TOFs or KL to a tracker track using a wrapper for
-     * the GSL 4th order Runge-Kutta integration to propagate from a tracker
+     * @brief Matches hits in TOFs (1/2) or KL to a tracker track using a wrapper
+     * for the GSL 4th order Runge-Kutta integration to propagate from a tracker
      * TrackPoint to the detector and checking the agreement with TrackPoints
      * in that detector.
      *
      * @param position The position of the tracker TrackPoint to which the
      * detector TrackPoint is matched
      * @param momentum Momentum of the tracker TrackPoint
-     * @param trackpoints A vector of TrackPoints in the target detector to
+     * @param spacepoints A vector of SpacePoints in the target detector to
      * which matching is attempted
      * @param pid The PID setting for the propagation
      * @param field magnetic fields for the geometry
@@ -163,6 +160,20 @@ namespace global {
         DataStructure::Global::PID pid, BTFieldConstructor* field,
         std::string detector_name,
         DataStructure::Global::Track* hypothesis_track);
+
+    /**
+     * @brief Matches hits in TOF0 to a TOF1 hit by comparing the delta T to the
+     * expected travel time given the particle's energy just before TOF1 (obtained
+     * by propagating backwards from a tracker trackpoint)
+     *
+     * @param position The position of the tracker TrackPoint which is propagated
+     * back to TOF1
+     * @param momentum Momentum of the tracker TrackPoint
+     * @param spacepoints A vector of SpacePoints in TOF0 to which matching is attempted
+     * @param pid The PID setting for the propagation
+     * @param field magnetic fields for the geometry
+     * @param hypothesis_track The track that collects the matched points
+     */
 
     void MatchTOF0(
         const TLorentzVector &position, const TLorentzVector &momentum,
@@ -260,13 +271,13 @@ namespace global {
         DataStructure::Global::DetectorPoint detector);
 
     /**
-     * @brief Only add matched TrackPoints, if hits are consistent with each other
+     * @brief Only add matched SpacePoints, if hits are consistent with each other
      *
-     * If only one matche TrackPoint exists, it is added to the track, if multiple
+     * If only one matched SpacePoint exists, it is added to the track, if multiple
      * exist, they are only added if they are consistent with each other (i.e.
      * max. one slab position difference and for TOFs a cut on the difference in t)
      *
-     * @param trackpoints The TrackPoints which should be checked/added
+     * @param spacepoints The SpacePoints which should be checked/added
      * @param hypothesis_track The Track to which the TrackPoints should be added
      */
     void AddIfConsistent(
@@ -294,7 +305,7 @@ namespace global {
 
     /// Declarations required for tests to access private member functions
     FRIEND_TEST(TrackMatchingTest, GetDetectorTrackArray);
-    FRIEND_TEST(TrackMatchingTest, GetDetectorTrackPoints);
+    FRIEND_TEST(TrackMatchingTest, GetDetectorSpacePoints);
     FRIEND_TEST(TrackMatchingTest, PIDHypotheses);
     FRIEND_TEST(TrackMatchingTest, MatchTrackPoint);
     FRIEND_TEST(TrackMatchingTest, MatchTOF0);
@@ -303,6 +314,7 @@ namespace global {
     FRIEND_TEST(TrackMatchingTest, USDSTracks);
     FRIEND_TEST(TrackMatchingTest, MatchUSDS);
     FRIEND_TEST(TrackMatchingTest, TOFTimeFromTrackPoints);
+    FRIEND_TEST(TrackMatchingTest, AddIfConsistent);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon

@@ -71,7 +71,7 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   TLorentzVector tracker1_mom(16.3777, 3.10231, 157.157, 190.105);
   TLorentzVector tof2_pos(0.0, -30.0, 15260.0, 60.0);
   TLorentzVector kl_pos(0.0, 0.0, 15383.0, 61.0);
-  TLorentzVector emr_pos(0.0, -13.2, 16100.0, 64.0);
+  TLorentzVector emr_pos(0.0, -13.0, 16100.0, 64.0);
   TLorentzVector emr_pos_error(2.0, 2.0, 5.0, 10.0);
 
   // Add Spacepoints for TOFs and KL to global event
@@ -226,8 +226,8 @@ TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
     EXPECT_EQ(emr_array->at(0)->get_mapper_name(), "EMR Primary");
   }
 }
-/*
-TEST_F(TrackMatchingTest, GetDetectorTrackPoints) {
+
+TEST_F(TrackMatchingTest, GetDetectorSpacePoints) {
   _track_matching = new recon::global::TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0);
 
@@ -262,45 +262,36 @@ TEST_F(TrackMatchingTest, GetDetectorTrackPoints) {
   _global_event->add_space_point(&tof2_sp);
   _global_event->add_space_point(&kl_sp);
 
-  std::vector<DataStructure::Global::TrackPoint*> tof0_tps;
-  std::vector<DataStructure::Global::TrackPoint*> tof1_tps;
-  std::vector<DataStructure::Global::TrackPoint*> tof2_tps;
-  std::vector<DataStructure::Global::TrackPoint*> kl_tps;
+  std::vector<DataStructure::Global::SpacePoint*> tof0_sps;
+  std::vector<DataStructure::Global::SpacePoint*> tof1_sps;
+  std::vector<DataStructure::Global::SpacePoint*> tof2_sps;
+  std::vector<DataStructure::Global::SpacePoint*> kl_sps;
 
-  tof0_tps = _track_matching->GetDetectorTrackPoints(tof0,
-      "GetDetectorTrackPointsTest");
-  tof1_tps = _track_matching->GetDetectorTrackPoints(tof1,
-      "GetDetectorTrackPointsTest");
-  tof2_tps = _track_matching->GetDetectorTrackPoints(tof2,
-      "GetDetectorTrackPointsTest");
-  kl_tps = _track_matching->GetDetectorTrackPoints(kl,
-      "GetDetectorTrackPointsTest");
+  tof0_sps = _track_matching->GetDetectorSpacePoints(tof0);
+  tof1_sps = _track_matching->GetDetectorSpacePoints(tof1);
+  tof2_sps = _track_matching->GetDetectorSpacePoints(tof2);
+  kl_sps = _track_matching->GetDetectorSpacePoints(kl);
 
-  EXPECT_EQ(tof0_tps.size(), 2);
-  EXPECT_EQ(tof1_tps.size(), 1);
-  EXPECT_EQ(tof2_tps.size(), 1);
-  EXPECT_EQ(kl_tps.size(), 1);
+  EXPECT_EQ(tof0_sps.size(), 2);
+  EXPECT_EQ(tof1_sps.size(), 1);
+  EXPECT_EQ(tof2_sps.size(), 1);
+  EXPECT_EQ(kl_sps.size(), 1);
 
-  if (tof0_tps.size() > 1) {
-    EXPECT_EQ(tof0_tps[0]->get_detector(), tof0);
-    EXPECT_EQ(tof0_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-US");
-    EXPECT_EQ(tof0_tps[1]->get_detector(), tof0);
-    EXPECT_EQ(tof0_tps[1]->get_mapper_name(), "GetDetectorTrackPointsTest-US");
+  if (tof0_sps.size() > 1) {
+    EXPECT_EQ(tof0_sps[0]->get_detector(), tof0);
+    EXPECT_EQ(tof0_sps[1]->get_detector(), tof0);
   }
 
-  if (tof1_tps.size() > 0) {
-    EXPECT_EQ(tof1_tps[0]->get_detector(), tof1);
-    EXPECT_EQ(tof1_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-US");
+  if (tof1_sps.size() > 0) {
+    EXPECT_EQ(tof1_sps[0]->get_detector(), tof1);
   }
 
-  if (tof2_tps.size() > 0) {
-    EXPECT_EQ(tof2_tps[0]->get_detector(), tof2);
-    EXPECT_EQ(tof2_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-DS");
+  if (tof2_sps.size() > 0) {
+    EXPECT_EQ(tof2_sps[0]->get_detector(), tof2);
   }
 
-  if (kl_tps.size() > 0) {
-    EXPECT_EQ(kl_tps[0]->get_detector(), kl);
-    EXPECT_EQ(kl_tps[0]->get_mapper_name(), "GetDetectorTrackPointsTest-DS");
+  if (kl_sps.size() > 0) {
+    EXPECT_EQ(kl_sps[0]->get_detector(), kl);
   }
 }
 
@@ -353,12 +344,12 @@ TEST_F(TrackMatchingTest, MatchTrackPoint) {
   dc->SetMiceModules(geometry);
 
   DataStructure::Global::SpacePoint tof1_sp1;
-  TLorentzVector tof1_position(30.0, -30.0, 100.0, 0.0);
+  TLorentzVector tof1_position(30.0, 0.0, 100.0, 0.0);
   tof1_sp1.set_position(tof1_position);
   tof1_sp1.set_detector(DataStructure::Global::kTOF1);
   _global_event->add_space_point(&tof1_sp1);
   DataStructure::Global::SpacePoint tof1_sp2;
-  tof1_position.SetY(30.0);
+  tof1_position.SetY(60.0);
   tof1_sp2.set_position(tof1_position);
   tof1_sp2.set_detector(DataStructure::Global::kTOF1);
   _global_event->add_space_point(&tof1_sp2);
@@ -368,22 +359,22 @@ TEST_F(TrackMatchingTest, MatchTrackPoint) {
   tof2_sp.set_detector(DataStructure::Global::kTOF2);
   _global_event->add_space_point(&tof2_sp);
 
-  std::vector<DataStructure::Global::TrackPoint*> TOF1_tp =
-      _track_matching->GetDetectorTrackPoints(
-      DataStructure::Global::kTOF1, "MatchTrackPointTest");
-  std::vector<DataStructure::Global::TrackPoint*> TOF2_tp =
-      _track_matching->GetDetectorTrackPoints(
-      DataStructure::Global::kTOF2, "MatchTrackPointTest");
+  std::vector<DataStructure::Global::SpacePoint*> TOF1_sp =
+      _track_matching->GetDetectorSpacePoints(
+      DataStructure::Global::kTOF1);
+  std::vector<DataStructure::Global::SpacePoint*> TOF2_sp =
+      _track_matching->GetDetectorSpacePoints(
+      DataStructure::Global::kTOF2);
   TLorentzVector start_position(0.0, 0.0, 4000.0, 0.0);
   TLorentzVector start_momentum(10.0, 10.0, 150.0, 0.0);
   DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
   BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   DataStructure::Global::Track hypothesis_track;
 
-  _track_matching->MatchTrackPoint(start_position, start_momentum, TOF1_tp, pid,
+  _track_matching->MatchTrackPoint(start_position, start_momentum, TOF1_sp, pid,
       field, "TOF1", &hypothesis_track);
 
-  _track_matching->MatchTrackPoint(start_position, start_momentum, TOF2_tp, pid,
+  _track_matching->MatchTrackPoint(start_position, start_momentum, TOF2_sp, pid,
       field, "TOF2", &hypothesis_track);
 
   std::vector<const DataStructure::Global::TrackPoint*> track_points =
@@ -397,12 +388,14 @@ TEST_F(TrackMatchingTest, MatchTrackPoint) {
   EXPECT_EQ(tof1_tps.size(), 1);
   EXPECT_EQ(tof2_tps.size(), 1);
   if (tof1_tps.size() > 0) {
-    EXPECT_FLOAT_EQ(tof1_tps.at(0)->get_position().Y(), -30.0);
+    EXPECT_FLOAT_EQ(tof1_tps.at(0)->get_position().Y(), 0.0);
   }
 }
-*/
-/*
+
+
 TEST_F(TrackMatchingTest, MatchTOF0) {
+  std::cerr << "Not currently implemented\n";
+/*
   _track_matching = new recon::global::TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0);
 
@@ -425,15 +418,14 @@ TEST_F(TrackMatchingTest, MatchTOF0) {
   _global_event->add_space_point(&tof0_sp2);
 
 
-  std::vector<DataStructure::Global::TrackPoint*> TOF0_tp =
-      _track_matching->GetDetectorTrackPoints(
-      DataStructure::Global::kTOF0, "MatchTOF0Test");
+  std::vector<DataStructure::Global::SpacePoint*> TOF0_sp =
+      _track_matching->GetDetectorSpacePoints(DataStructure::Global::kTOF0);
 
   TLorentzVector position(0.0, 0.0, 7902.0, 41.0);
   TLorentzVector momentum(10.0, 10.0, 150.0, 0.0);
   DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
   DataStructure::Global::Track hypothesis_track;
-  _track_matching->MatchTOF0(position, momentum, TOF0_tp, pid,
+  _track_matching->MatchTOF0(position, momentum, TOF0_sp, pid,
                              &hypothesis_track);
 
   std::vector<const DataStructure::Global::TrackPoint*> track_points =
@@ -443,8 +435,9 @@ TEST_F(TrackMatchingTest, MatchTOF0) {
   if (track_points.size() > 0) {
     EXPECT_FLOAT_EQ(track_points.at(0)->get_position().T(), 10.0);
   }
-}
 */
+}
+
 TEST_F(TrackMatchingTest, MatchEMRTrack) {
   _track_matching = new recon::global::TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0);
@@ -676,6 +669,10 @@ TEST_F(TrackMatchingTest, TOFTimeFromTrackPoints) {
   TOF_time = _track_matching->TOFTimeFromTrackPoints(track_points,
       DataStructure::Global::kTOF2);
   EXPECT_FLOAT_EQ(TOF_time, 15.7);
+}
+
+TEST_F(TrackMatchingTest, AddIfConsistent) {
+  std::cerr << "Not currently implemented\n";
 }
 }
 }
