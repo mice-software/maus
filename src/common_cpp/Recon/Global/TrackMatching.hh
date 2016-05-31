@@ -155,7 +155,7 @@ namespace global {
      * @see MatchEMRTrack()
      */
     void MatchTrackPoint(
-        const TLorentzVector &position, const TLorentzVector &momentum,
+        TLorentzVector &position, TLorentzVector &momentum,
         const std::vector<DataStructure::Global::SpacePoint*> &spacepoints,
         DataStructure::Global::PID pid, BTFieldConstructor* field,
         std::string detector_name,

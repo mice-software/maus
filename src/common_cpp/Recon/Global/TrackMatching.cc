@@ -296,7 +296,7 @@ std::vector<DataStructure::Global::PID> TrackMatching::PIDHypotheses(
 }
 
 void TrackMatching::MatchTrackPoint(
-    const TLorentzVector &position, const TLorentzVector &momentum,
+    TLorentzVector &position, TLorentzVector &momentum,
     const std::vector<DataStructure::Global::SpacePoint*> &spacepoints,
     DataStructure::Global::PID pid, BTFieldConstructor* field,
     std::string detector_name, DataStructure::Global::Track* hypothesis_track) {
@@ -309,6 +309,14 @@ void TrackMatching::MatchTrackPoint(
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
                              _energy_loss);
+      // To avoid doing the same propagation again for the same point, store the propagated
+      // values back in the TLorentzVectors
+      position.SetX(x_in[1]);
+      position.SetY(x_in[2]);
+      position.SetZ(x_in[3]);
+      momentum.SetX(x_in[5]);
+      momentum.SetY(x_in[6]);
+      momentum.SetZ(x_in[7]);
       // Temporary container for trackpoints for checking if multiple matches are compatible
       std::vector<DataStructure::Global::SpacePoint*> temp_spacepoints;
       for (size_t i = 0; i < spacepoints.size(); i++) {
