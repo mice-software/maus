@@ -112,6 +112,17 @@ void MapCppGlobalTrackFit::_birth(const std::string& config_str) {
   std::cerr << "birth 6" << std::endl;
   _propagator->SetField(Globals::GetMCFieldConstructor());
   std::cerr << "birth 7" << std::endl;
+
+  double min_step = JsonWrapper::GetProperty(
+                        config,
+                        "global_track_fit_min_step_size",
+                        JsonWrapper::realValue).asDouble();
+  _propagator->GetTracking()->SetMinStepSize(min_step);
+  double max_step = JsonWrapper::GetProperty(
+                        config,
+                        "global_track_fit_max_step_size",
+                        JsonWrapper::realValue).asDouble();
+  _propagator->GetTracking()->SetMaxStepSize(max_step);
   
   double tof_sigma_t = JsonWrapper::GetProperty(
                         config,
@@ -199,8 +210,8 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
     std::cerr << "MapCppGlobalTrackFit C" << std::endl;
     _kalman_fit->Filter(true);
     std::cerr << "MapCppGlobalTrackFit D" << std::endl;
-    _kalman_fit->Smooth(true);
-    std::cerr << "MapCppGlobalTrackFit E" << std::endl;
+    //_kalman_fit->Smooth(true);
+    std::cerr << "SMOOTHING DISABLED MapCppGlobalTrackFit E" << std::endl;
 
     Kalman::Track track = _kalman_fit->GetTrack();
     for (size_t i = 0; i < track.GetLength(); ++i) {

@@ -63,6 +63,16 @@ namespace MAUS {
        */
       void SetPoint(ThreeVector point);
 
+      /** @brief Compute a safe step size
+       *
+       *  Returns length of step size that does not intersect another volume
+       *  along the direction specified by momentum
+       *  As far as I can tell, G4 ignores momentum
+       */
+      double ComputeStep(ThreeVector point,
+                         ThreeVector momentum,
+                         double step);
+
       /** @brief Increment the current position by the supplied displacement
        * 
        *  Returns the new position. This allows us to use Geant4's intelligent

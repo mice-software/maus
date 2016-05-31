@@ -61,8 +61,11 @@ public:
 
     std::vector<std::vector<double> > GetMatrix() const;
 
-    void SetStepSize(double step_size) {_step_size = step_size;}
-    double GetStepSize() const {return _step_size;}
+    void SetMaxStepSize(double max_step_size) {_max_step_size = max_step_size;}
+    double GetMaxStepSize() const {return _max_step_size;}
+
+    void SetMinStepSize(double min_step_size) {_min_step_size = min_step_size;}
+    double GetMinStepSize() const {return _min_step_size;}
 
     void SetEnergyLossModel(ELossModel eloss_model) {_eloss_model = eloss_model;}
     ELossModel GetEnergyLossModel() const {return _eloss_model;}
@@ -94,7 +97,8 @@ private:
     BTField* _field;
     // scale for derivative calculation
     double _dx, _dy, _dz, _dt;
-    double _step_size = 1.;  // magnitude of the step size
+    double _min_step_size = 0.1;  // magnitude of the step size
+    double _max_step_size = 100.;  // magnitude of the step size
     double _gsl_h = 1.;  // the step that gsl uses (can be negative)
     double _absolute_error = 1e-4;
     double _relative_error = 1e-4;

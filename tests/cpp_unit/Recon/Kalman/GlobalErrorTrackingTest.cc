@@ -296,7 +296,8 @@ TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
 
     // ErrorTracking
     ErrorTracking propagator;
-    propagator.SetStepSize(100.);
+    propagator.SetMinStepSize(0.1);
+    propagator.SetMaxStepSize(1.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetField(&field);
     propagator.SetEnergyLossModel(ErrorTracking::no_eloss);
@@ -447,7 +448,8 @@ TEST(ErrorTrackingTest, PropagateSolFieldBackwardsTest) {
     DerivativesSolenoid sol(0.001, 10., 20., 9, end);
     ErrorTracking propagator;
     propagator.SetDeviations(0.1, 0.1, 0.1, 0.1);
-    propagator.SetStepSize(1.);
+    propagator.SetMinStepSize(0.1);
+    propagator.SetMaxStepSize(1.);
     propagator.SetField(&sol);
     // t, x, y, z, E, px, py, pz
     std::vector<double> x_in = drift_ellipse(pz, mass);
@@ -499,7 +501,8 @@ TEST(ErrorTrackingTest, PropagateDriftELossTest) {
     double mass = 105.658;
 
     ErrorTracking propagator;
-    propagator.SetStepSize(1.);
+    propagator.SetMinStepSize(0.1);
+    propagator.SetMaxStepSize(10.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetMCSModel(ErrorTracking::no_mcs);
     propagator.SetEStragModel(ErrorTracking::no_estrag);
@@ -567,7 +570,8 @@ TEST(ErrorTrackingTest, PropagateDriftMCSTest) {
     MaterialModel::EnableMaterial("G4_Pb");
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     ErrorTracking propagator;
-    propagator.SetStepSize(1.);
+    propagator.SetMinStepSize(0.1);
+    propagator.SetMaxStepSize(1.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetEnergyLossModel(ErrorTracking::no_eloss);
     propagator.SetMCSModel(ErrorTracking::moliere_forwards);

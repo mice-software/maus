@@ -207,6 +207,12 @@ void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {
     Globals::_process->_mc_mods = mc_mods;
     if (mc_mods != NULL)
         Globals::_process->GetGeant4Manager()->SetMiceModules(*mc_mods);
+    G4VPhysicalVolume* world = Globals::_process->_maus_geant4_manager
+                                             ->GetGeometry()->GetWorldVolume();
+    delete Globals::_process->_mc_geometry_navigator;
+    Globals::_process->_mc_geometry_navigator = new GeometryNavigator();
+    Globals::_process->_mc_geometry_navigator->Initialise(world);
+
 }
 
 void GlobalsManager::SetLegacyCards(dataCards* legacy_cards) {

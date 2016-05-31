@@ -1,0 +1,35 @@
+Configuration Box 
+{
+  Dimensions 10. 10. 10. m
+  PropertyString Material Galactic
+  Module Mod1
+  {
+    PropertyString     Volume Box
+    PropertyHep3Vector Dimensions 5. 5. 5. mm
+    PropertyHep3Vector Position 0. 0. 0. mm
+    PropertyString Material Galactic
+  }
+  Module Mod2
+  {
+    PropertyString     Volume Cylinder
+    PropertyHep3Vector Dimensions 30. 50. -1. mm
+    PropertyHep3Vector Position 0. 0. 100. mm
+    PropertyString Material Galactic
+  }
+  Module Mod3
+  {
+    PropertyString     Volume Cylinder
+    PropertyHep3Vector Dimensions 30. 100. -1. mm
+    PropertyHep3Vector Position 0. 0. 300. mm
+    PropertyString Material Galactic
+    Module Mod3
+    {
+      PropertyString     Volume Cylinder
+      PropertyHep3Vector Dimensions 30. 10. -1. mm
+      PropertyHep3Vector Position 0. 0. 20. mm
+      PropertyString Material Galactic
+    }
+  }
+
+}
+

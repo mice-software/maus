@@ -40,7 +40,13 @@ void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
     }
 
     double target_z = end_tp.GetPosition();
+    std::cerr << "Propagate before..." << std::endl;
+    _tracking.print(std::cerr, x);
+    std::cerr << "Propagating to " << target_z << std::endl;
     _tracking.Propagate(x, target_z);
+    std::cerr << "Propagate after..." << std::endl;
+    _tracking.print(std::cerr, x);
+
     for (size_t i = 0; i < 3; ++i) {
         vec[i][0] = x[i]; // t, x, y
         vec[i+3][0] = x[i+4]; // energy, px, py        

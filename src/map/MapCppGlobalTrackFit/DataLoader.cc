@@ -44,10 +44,12 @@ void DataLoader::load_event(ReconEvent& event) {
     std::cerr << "DataLoader::load_event " << &event << std::endl;
     TOFEvent* tof_event = event.GetTOFEvent();
     SciFiEvent* scifi_event = event.GetSciFiEvent();
-    std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
-    load_tof_event(tof_event);
+    // Warning - the order is important... the seed state must correspond to the
+    // first element in track
     std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
     load_scifi_event(scifi_event);
+    std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
+    load_tof_event(tof_event);
     std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
     load_virtual_event();
     std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;

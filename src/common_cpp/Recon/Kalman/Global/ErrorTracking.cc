@@ -16,6 +16,7 @@
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControl.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
 namespace MAUS {
@@ -43,14 +44,14 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 29);
-  gsl_odeiv_control * control = gsl_odeiv_control_y_new
-                                            (_absolute_error, _relative_error);
+  gsl_odeiv_control * control = ErrorTrackingControl::gsl_odeiv_control_et_new(
+                                              _min_step_size, _max_step_size);
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(29);
   gsl_odeiv_system    system  =
                       {ErrorTracking::EquationsOfMotion, NULL, 29, NULL};
 
   double z = x[3];
-  _gsl_h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
+  _gsl_h = fabs(_max_step_size);  // ignore _step_size sign, we "auto detect"
   if (z > target_z) {
       _gsl_h *= -1;  // stepping backwards...
       _charge = -1; 
@@ -64,7 +65,7 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
     nsteps++;
 
     int status =  gsl_odeiv_evolve_apply
-                        (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
+                    (evolve, control, step, &system, &z, target_z, &_gsl_h, x);
     
     if (nsteps > _max_n_steps) {
         tracking_fail << "Exceeded maximum number of steps\n"; 
@@ -98,7 +99,7 @@ void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
                        {ErrorTracking::EquationsOfMotion, NULL, 44, NULL};
 
   double z = x[3];
-  _gsl_h = fabs(_step_size);  // ignore _step_size sign, we "auto detect"
+  _gsl_h = fabs(_max_step_size);  // ignore _step_size sign, we "auto detect"
   if (z > target_z)
       _gsl_h *= -1;  // stepping backwards...
   int nsteps = 0;

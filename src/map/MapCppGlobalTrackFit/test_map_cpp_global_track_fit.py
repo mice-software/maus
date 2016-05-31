@@ -19,6 +19,8 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
         config_json["global_track_fit_will_require_triplet_space_points"] = False
         config_json["global_track_fit_tof_sigma_t"] = 0.05
         config_json["global_track_fit_scifi_sigma_x"] = 0.5
+        config_json["global_track_fit_min_step_size"] = 0.1
+        config_json["global_track_fit_max_step_size"] = 100.
         config_json["verbose_level"] = 0
         cls.config_str = json.dumps(config_json)
         if not maus_cpp.globals.has_instance():
@@ -97,7 +99,7 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
 
         tof_event.SetTOFEventSpacePoint(tof_space_point)
 
-    def test_straight_track_fit(self):
+    def generate_straight_track_data(self):
         print "Test straight track fit"
         data = ROOT.MAUS.Data()
         spill = ROOT.MAUS.Spill()
@@ -121,15 +123,19 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
             print "i done", i
         spill.SetReconEvents(recon_events)
         data.SetSpill(spill)
+        return data
 
+    def test_straight_track_fit(self):
         print "Init"
         fit = MapCppGlobalTrackFit()
         print "Birth"
         fit.birth(self.config_str)
         print "Process"
-        data_out = fit.process(data)
+        data_out = fit.process(self.generate_straight_track_data())
         print "Found ", data_out.GetSpill().GetReconEvents().size(), "recon events"
 
+        pos_keys = ["x", "y", "z", "t"]
+        mom_keys = ["px", "py", "pz", "energy"]
         for i, event in enumerate(data_out.GetSpill().GetReconEvents()):
             print event.GetGlobalEvent()
             print " ", "recon event", i, "found", event.GetGlobalEvent().get_tracks().size(), "global tracks"
@@ -140,25 +146,31 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
             print "    tof space points"
             for j, tof_sp in enumerate([tof0, tof1, tof2]):
                 print "     ", j, tof_sp.GetTime(), tof_sp.GetGlobalPosX(), tof_sp.GetGlobalPosY(), tof_sp.GetGlobalPosZ()
-
+            self.hits[i] = sorted(self.hits[i], key = lambda hit: hit['z'])
             for j, track in enumerate(event.GetGlobalEvent().get_tracks()):
                 print "   ", "global track", j, "found", track.get_mapper_name(), track.get_pid(), "points", track.get_track_points().GetEntries()
                 for k, track_point in enumerate(track.get_track_points()):
                     print "     ", "global track point", k, "found position",
                     for l in range(4):
-                        print track_point.get_position()[l],
+                        print round(track_point.get_position()[l], 3),
                     print "found momentum",
                     for l in range(4):
-                        print track_point.get_momentum()[l],
+                        print round(track_point.get_momentum()[l], 3),
                     print
-            self.hits[i] = sorted(self.hits[i], key = lambda hit: hit['z'])
-            for j, hit in enumerate(self.hits[i]):
-                print "    ", "hit", j,
-                for key in ["x", "y", "z", "t"]:
-                    print key, round(hit[key], 3),
-                for key in ["px", "py", "pz", "energy"]:
-                    print key, round(hit[key], 3),
-                print                
+                    hit = self.hits[i][k]
+                    print "    ", "hit", k,
+                    for key in pos_keys:
+                        print key, round(hit[key], 3),
+                    for key in mom_keys:
+                        print key, round(hit[key], 3),
+                    print
+                    for l in range(4):
+                        self.assertAlmostEqual(hit[pos_keys[l]],
+                                               track_point.get_position()[l],
+                                               delta = 1.)
+                        self.assertAlmostEqual(hit[mom_keys[l]],
+                                               track_point.get_momentum()[l],
+                                               delta = 1.)
     config_str = ""
     mu_mass = 105.658        
 
