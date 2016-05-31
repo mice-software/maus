@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 filename=cloc-1.52.pl
+dir=${MAUS_ROOT_DIR}/third_party/install/bin
 
 echo
 echo 'INFO: Installing third party library Cloc 1.52'
@@ -8,11 +9,17 @@ echo '----------------------------------------------'
 echo
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
-    echo "INFO: Fetching from web..."
-    dir=${MAUS_ROOT_DIR}/third_party/install/bin
     mkdir -p ${dir}
-    rm -f ${dir}/${filename}
-    wget --directory-prefix=${dir} http://downloads.sourceforge.net/project/cloc/cloc/v1.52/${filename} 
+
+    if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
+    then
+        echo "INFO: Found script in 'source' directory"
+        cp ${MAUS_ROOT_DIR}/third_party/source/${filename} ${dir}/
+    else
+        echo "INFO: Downloading script"
+        wget --directory-prefix=${dir} http://downloads.sourceforge.net/project/cloc/cloc/v1.52/${filename}
+    fi
+
     chmod +x ${dir}/${filename}
     echo
     echo "INFO: The package should be locally build now in your"
