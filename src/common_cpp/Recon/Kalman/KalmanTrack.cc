@@ -255,8 +255,8 @@ namespace Kalman {
 
 std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix) {
     for (int i = 0; i < matrix.GetNrows(); ++i) {
-        for (int j = 0; j < matrix.GetNrows(); ++j)
-            out << matrix(i, j);
+        for (int j = 0; j < matrix.GetNcols(); ++j)
+            out << i << " " << j << " " << matrix(i, j);
         out << "\n";
     }
     return out;

@@ -171,14 +171,17 @@ void MapCppGlobalTrackFit::append_to_data(GlobalEvent& event, Kalman::Track fit)
         Global::TrackPoint* point = new Global::TrackPoint();
         point->set_mapper_name("MapCppGlobalTrackFit");
         point->set_particle_event(-99); // BUG
-        TLorentzVector pos(state.GetVector()[0][0],
-                           state.GetVector()[1][0],
+        TLorentzVector pos(state.GetVector()[1][0],  // position
                            state.GetVector()[2][0],
-                           fit[i].GetPosition());
-        TLorentzVector mom(0.,
-                           state.GetVector()[4][0], state.GetVector()[5][0], state.GetVector()[3][0]);
+                           fit[i].GetPosition(),
+                           state.GetVector()[0][0]);  // time
+        TLorentzVector mom(state.GetVector()[4][0], // 3-momentum
+                           state.GetVector()[5][0],
+                           0.,
+                           state.GetVector()[3][0]); // energy
         double E = state.GetVector()[3][0];
-        mom[0] = ::sqrt(E*E-(mom[0]*mom[0]+mom[1]*mom[1]+mu_mass*mu_mass));
+        // pz^2 = E^2 - px^2 - py^2 - mass ^2
+        mom[2] = ::sqrt(E*E-(mom[0]*mom[0]+mom[1]*mom[1]+mu_mass*mu_mass));
         point->set_position(pos);
         point->set_momentum(mom);
         track->AddTrackPoint(point);
@@ -240,6 +243,14 @@ void MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
     double tof_dz = (tof_track[1].GetPosition() -
                      tof_track[0].GetPosition());
     double beta = tof_dz/tof_dt/c_light;
+    std::cerr << "  Beta: " << beta << " dt: " << tof_dt
+                  << " dz: " << tof_dz << " c: " << c_light << std::endl;
+
+    if (fabs(beta) >= 1.) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "beta was >= 1",
+                              "MapCppGlobalTrackFit::build_seed");
+    }
     double gamma = 1/::sqrt(1-beta*beta);
     double seed_pz = mu_mass*beta*gamma;
     std::cerr << "  Nan check" << std::endl;
@@ -265,14 +276,16 @@ void MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
     double dx = sf_1[0][0] - sf_0[0][0];
     double dy = sf_1[1][0] - sf_0[1][0];
     double dz = sf_track[1].GetPosition()-sf_track[0].GetPosition();
+    std::cerr << "  dz " << sf_track[1].GetPosition() << " " << sf_track[0].GetPosition() << std::endl;
 
     TMatrixD vector(6, 1);
     vector[0][0] = tof_dt/tof_dz*(sf_track[0].GetPosition()-tof_track[0].GetPosition());
-    vector[1][0] = sf_1[0][0];
+    vector[1][0] = sf_0[0][0];
     vector[2][0] = sf_0[1][0];
     vector[4][0] = dx/dz*seed_pz;
     vector[5][0] = dy/dz*seed_pz;
-    vector[3][0] = ::sqrt(seed_pz*seed_pz + vector[4][0]*vector[4][0]+vector[5][0]*vector[5][0]+mu_mass*mu_mass);
+    vector[3][0] = ::sqrt(seed_pz*seed_pz + vector[4][0]*vector[4][0] +
+                          vector[5][0]*vector[5][0] + mu_mass*mu_mass);
     seed_state.SetVector(vector);
     double err = 1e6;
     double errors[] = {
@@ -285,7 +298,7 @@ void MapCppGlobalTrackFit::build_seed(ReconEvent& event) const {
     };
     TMatrixD covariance(6, 6, errors);
     seed_state.SetCovariance(covariance);
-    std::cerr << "MapCppGlobalTrackFit::build_seed built seed with:\n" << seed_state << std::endl;
+    std::cerr << "MapCppGlobalTrackFit::build_seed built seed with:\n" << vector << "\n" << seed_state.GetVector() << std::endl;
     _kalman_fit->SetSeed(seed_state);
 }
 

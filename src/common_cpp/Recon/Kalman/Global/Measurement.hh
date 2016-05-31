@@ -18,9 +18,12 @@ class Measurement: public Measurement_base {
   public:
     typedef DataStructure::Global::DetectorPoint DetType;
     Measurement();
+    Measurement(const Measurement& meas);
     Measurement(TMatrixD measurement);
     ~Measurement() {}
     
+    Measurement* Clone() const;
+
     TMatrixD CalculateMeasurementMatrix(const State& state) {return _measurement;}
     void SetMeasurementMatrix(TMatrixD measurement) {_measurement = measurement;}
 

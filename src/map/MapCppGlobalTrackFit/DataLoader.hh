@@ -39,11 +39,17 @@ class DataLoader {
     Kalman::TrackFit* _fitter;
     std::vector<MAUS::DataStructure::Global::DetectorPoint> _detectors;
     bool _will_require_tracker_triplets;
+    inline bool WillUse(MAUS::DataStructure::Global::DetectorPoint det) const;
     // Maps State.GetId() to the detector that made the measurement
 
     static size_t _dimension;
     static double _err;
 };
+
+bool DataLoader::WillUse(MAUS::DataStructure::Global::DetectorPoint det) const {
+    return std::find(_detectors.begin(), _detectors.end(), det)
+                                                      != _detectors.end();
+}
 }
 
 

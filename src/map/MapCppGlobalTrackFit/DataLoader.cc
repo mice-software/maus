@@ -44,9 +44,13 @@ void DataLoader::load_event(ReconEvent& event) {
     std::cerr << "DataLoader::load_event " << &event << std::endl;
     TOFEvent* tof_event = event.GetTOFEvent();
     SciFiEvent* scifi_event = event.GetSciFiEvent();
+    std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
     load_tof_event(tof_event);
+    std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
     load_scifi_event(scifi_event);
+    std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
     load_virtual_event();
+    std::cerr << "    load_event fitter length " << _fitter->GetTrack().GetLength() << std::endl;
 }
 
 Kalman::State DataLoader::load_tof_space_point(TOFSpacePoint* sp) {
@@ -71,21 +75,24 @@ void DataLoader::load_tof_detector(const MAUS::TOF0SpacePointArray& sp_vector,
         Kalman::State state(0);
         int tp_id = _fitter->GetTrack().GetLength();
         Measurement_base* meas = NULL;
-        if (i == 0 && 
-            std::find(_detectors.begin(), _detectors.end(), det) != _detectors.end()) {
+        if (i == 0 && WillUse(det)) {
             std::cerr << "     adding" << std::endl;
             meas = Measurement::GetDetectorToMeasurementMap()[det];
             state = load_tof_space_point(&one_sp);
-        } else { // treat it as a virtual detector instead
+        } else if (WillUse(kVirtual)) { // treat it as a virtual detector instead
             meas = Measurement::GetDetectorToMeasurementMap()
                                               [DataStructure::Global::kVirtual];
+        } else {
+            continue;
         }
         double z_position = one_sp.GetGlobalPosZ();
         int meas_dim = state.GetDimension();
         Kalman::TrackPoint track_point(6, meas_dim, z_position, tp_id);
         track_point.SetData(state);
         _fitter->GetTrack().Append(track_point);
-        _fitter->AddMeasurement(tp_id, meas);
+        // _fitter owns measurement memory
+        _fitter->AddMeasurement(tp_id, meas->Clone());
+        std::cerr << "    fitter length " << _fitter->GetTrack().GetLength() << std::endl;
     }
 }
 
@@ -102,6 +109,8 @@ void DataLoader::load_tof_event(TOFEvent* event) {
 }
 
 void DataLoader::load_virtual_event() {
+    if (!WillUse(kVirtual))
+        return;
     VirtualPlaneManager* virtual_manager =
                                Globals::GetGeant4Manager()->GetVirtualPlanes();
     std::vector<VirtualPlane*> planes = virtual_manager->GetPlanes();
@@ -115,7 +124,8 @@ void DataLoader::load_virtual_event() {
             Kalman::TrackPoint track_point(6, 0, z_pos, tp_id);
             track_point.SetData(Kalman::State(0));
             _fitter->GetTrack().Append(track_point);
-            _fitter->AddMeasurement(tp_id, meas);
+            // fitter owns measurement memory
+            _fitter->AddMeasurement(tp_id, meas->Clone());
 
         }
     }
@@ -189,19 +199,23 @@ void DataLoader::load_scifi_event(SciFiEvent* event) {
         DetectorPoint det = SciFiToDetectorPoint(space_points[i]->get_tracker(),
                                                  space_points[i]->get_station());       
         Measurement_base* meas = NULL; 
-        if (std::find(_detectors.begin(), _detectors.end(), det) != _detectors.end()) {
+        if (WillUse(det)) {
             meas = Measurement::GetDetectorToMeasurementMap()[det];
             state = load_scifi_space_point(space_points[i]);
-        } else {
+        } else if (WillUse(kVirtual)) {
             meas = Measurement::GetDetectorToMeasurementMap()
                                               [DataStructure::Global::kVirtual];
+        } else {
+            continue;
         }
-        double z_position = space_points[i]->get_position().z();
+        double z_position = space_points[i]->get_global_position().z();
+        std::cerr << "   z pos " << z_position << std::endl;
         int meas_dim = state.GetDimension();
         Kalman::TrackPoint track_point(6, meas_dim, z_position, tp_id);
         track_point.SetData(state);
         _fitter->GetTrack().Append(track_point);
-        _fitter->AddMeasurement(tp_id, meas);
+        // fitter owns Measurement memory
+        _fitter->AddMeasurement(tp_id, meas->Clone());
    }
 }
 

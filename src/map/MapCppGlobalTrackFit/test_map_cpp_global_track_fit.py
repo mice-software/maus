@@ -29,6 +29,9 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
 
+    def setUp(self):
+        self.hits = []
+
     def test_init(self):
         fit = MapCppGlobalTrackFit()
         fit.birth(self.config_str)
@@ -55,7 +58,7 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
             tracker = i/5
             hit = self.transport_straight_track(z, seed)
             pos = ROOT.MAUS.ThreeVector(hit["x"], hit["y"], hit["z"])
-
+            print "Make Space Point position", pos.x(), pos.y(), pos.z()
             space_point = ROOT.MAUS.SciFiSpacePoint()
             space_point.set_tracker(tracker)
             space_point.set_station(station)
@@ -63,7 +66,8 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
             space_point.set_channels(array)
             space_point_array.push_back(space_point)
             print "Triplet check", space_point_array[i].get_channels().GetEntries()
-        scifi_event.set_spacepoints(space_point_array)            
+            self.hits[-1].append(hit)
+        scifi_event.set_spacepoints(space_point_array)
 
 
     def make_tof_space_points(self, seed, tof_event):
@@ -77,6 +81,7 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
             space_point.SetGlobalPosZ(hit["z"])
             space_point.SetTime(hit["t"])
             space_point_list.append(space_point)
+            self.hits[-1].append(hit)
         tof_space_point = ROOT.MAUS.TOFEventSpacePoint()
         sp_array = tof_space_point.GetTOF0SpacePointArray()
         sp_array.push_back(space_point_list[0])
@@ -100,6 +105,7 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
         recon_events = ROOT.MAUS.ReconEventPArray()
         for i in range(-2, -1):
             print "i", i
+            self.hits.append([])
             a_recon_event = ROOT.MAUS.ReconEvent()
             scifi_event = ROOT.MAUS.SciFiEvent()
             tof_event = ROOT.MAUS.TOFEvent()
@@ -145,7 +151,14 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
                     for l in range(4):
                         print track_point.get_momentum()[l],
                     print
-                
+            self.hits[i] = sorted(self.hits[i], key = lambda hit: hit['z'])
+            for j, hit in enumerate(self.hits[i]):
+                print "    ", "hit", j,
+                for key in ["x", "y", "z", "t"]:
+                    print key, round(hit[key], 3),
+                for key in ["px", "py", "pz", "energy"]:
+                    print key, round(hit[key], 3),
+                print                
     config_str = ""
     mu_mass = 105.658        
 

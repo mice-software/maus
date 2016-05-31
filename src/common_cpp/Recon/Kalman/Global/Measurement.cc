@@ -19,6 +19,12 @@ Measurement::Measurement(TMatrixD measurement)
       _measurement(measurement) {
 }
 
+Measurement* Measurement::Clone() const {
+    Measurement* meas = new Measurement(_measurement);
+    return meas;
+}
+
+
 void Measurement::SetupDetectorToMeasurementMap() {
     using namespace DataStructure::Global;
     // NB we ignore tof position measurements for now
