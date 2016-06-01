@@ -23,23 +23,18 @@
 #ifndef _SRC_MAP_MAPCPPTrackerRecon_H_
 #define _SRC_MAP_MAPCPPTrackerRecon_H_
 
+#include <vector>
 #include <string>
 
-#include "src/common_cpp/API/MapBase.hh"
+#include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/GlobalEvent.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
-
-
+#include "src/common_cpp/API/MapBase.hh"
 
 namespace MAUS {
 
-class Data;
-namespace Kalman {
-namespace Global {
-class Measurement;
-class Propagator;
-}
-}
 
 class MapCppGlobalTrackFit : public MapBase<Data> {
 
@@ -84,24 +79,29 @@ class MapCppGlobalTrackFit : public MapBase<Data> {
 
  private:
 
-  void append_to_data(GlobalEvent& event, Kalman::Track fit) const;
-  void build_data(ReconEvent& event) const;
-  void build_seed(ReconEvent& event) const;
+  void append_to_data(GlobalEvent& event, Kalman::Track fit, double mass) const;
 
-  Kalman::Global::Propagator* _propagator = NULL;
-  Kalman::TrackFit* _kalman_fit = NULL;
-  std::vector<DataStructure::Global::DetectorPoint> _active_detectors;
-  DataStructure::Global::DetectorPoint _position_seed_1;
-  DataStructure::Global::DetectorPoint _position_seed_2;
-  DataStructure::Global::DetectorPoint _time_seed_1;
-  DataStructure::Global::DetectorPoint _time_seed_2;
-  bool _will_require_triplets;
+  SeedManager _seed_manager;
 
-  static double mu_mass;
   static double c_light;
 
+  class FitInfo {
+    public:
+      FitInfo(Json::Value args, SeedManager& seeds);
+      double mass_hypothesis;
+      double charge_hypothesis;
+      double min_step;
+      double max_step;
+      bool will_smooth;
+      bool will_require_triplet_space_points;
+      SeedBase* seed_algorithm;
+      std::vector<DataStructure::Global::DetectorPoint> active_detectors;
+  };
+  std::vector<FitInfo> _fit_info;
 };
+
 
 } // ~namespace MAUS
 
 #endif
+

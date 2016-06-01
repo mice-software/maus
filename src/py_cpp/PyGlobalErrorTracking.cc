@@ -226,10 +226,10 @@ static PyObject* is_enabled_material(PyObject *self, PyObject *args, PyObject *k
     }
 }
 
-std::string set_step_size_docstring = "DOCSTRING";
+std::string set_max_step_size_docstring = "DOCSTRING";
 
-static PyObject* set_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
-    static char *kwlist[] = {const_cast<char*>("step_size"),
+static PyObject* set_max_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("max_step_size"),
                              NULL};
     double step_size = 1.;
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist,
@@ -247,14 +247,14 @@ static PyObject* set_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
-    glet->SetStepSize(step_size);
+    glet->SetMaxStepSize(step_size);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-std::string get_step_size_docstring = "DOCSTRING";
+std::string get_max_step_size_docstring = "DOCSTRING";
 
-static PyObject* get_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
+static PyObject* get_max_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
     if (py_glet == NULL) {
         PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
@@ -265,8 +265,98 @@ static PyObject* get_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
-    double step = glet->GetStepSize();
+    double step = glet->GetMaxStepSize();
     PyObject* value = PyFloat_FromDouble(step);
+    Py_INCREF(value);
+    return value;
+}
+
+std::string set_min_step_size_docstring = "DOCSTRING";
+
+static PyObject* set_min_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("min_step_size"),
+                             NULL};
+    double step_size = 1.;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist,
+                                     &step_size)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    glet->SetMinStepSize(step_size);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_min_step_size_docstring = "DOCSTRING";
+
+static PyObject* get_min_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    double step = glet->GetMinStepSize();
+    PyObject* value = PyFloat_FromDouble(step);
+    Py_INCREF(value);
+    return value;
+}
+
+std::string set_charge_docstring = "DOCSTRING";
+
+static PyObject* set_charge(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("charge"),
+                             NULL};
+    double charge = 1.;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist,
+                                     &charge)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    glet->SetCharge(charge);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_charge_docstring = "DOCSTRING";
+
+static PyObject* get_charge(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    double charge = glet->GetCharge();
+    PyObject* value = PyFloat_FromDouble(charge);
     Py_INCREF(value);
     return value;
 }
@@ -562,10 +652,18 @@ static PyMethodDef _methods[] = {
   METH_VARARGS|METH_KEYWORDS, set_deviations_docstring.c_str()},
 {"get_deviations", (PyCFunction)get_deviations,
   METH_VARARGS|METH_KEYWORDS, get_deviations_docstring.c_str()},
-{"set_step_size", (PyCFunction)set_step_size,
-  METH_VARARGS|METH_KEYWORDS, set_step_size_docstring.c_str()},
-{"get_step_size", (PyCFunction)get_step_size,
-  METH_VARARGS|METH_KEYWORDS, get_step_size_docstring.c_str()},
+{"set_charge", (PyCFunction)set_charge,
+  METH_VARARGS|METH_KEYWORDS, set_charge_docstring.c_str()},
+{"get_charge", (PyCFunction)get_charge,
+  METH_VARARGS|METH_KEYWORDS, get_charge_docstring.c_str()},
+{"set_max_step_size", (PyCFunction)set_max_step_size,
+  METH_VARARGS|METH_KEYWORDS, set_max_step_size_docstring.c_str()},
+{"get_max_step_size", (PyCFunction)get_max_step_size,
+  METH_VARARGS|METH_KEYWORDS, get_max_step_size_docstring.c_str()},
+{"set_min_step_size", (PyCFunction)set_min_step_size,
+  METH_VARARGS|METH_KEYWORDS, set_min_step_size_docstring.c_str()},
+{"get_min_step_size", (PyCFunction)get_min_step_size,
+  METH_VARARGS|METH_KEYWORDS, get_min_step_size_docstring.c_str()},
 {"set_energy_loss_model", (PyCFunction)set_energy_loss_model,
   METH_VARARGS|METH_KEYWORDS, set_energy_loss_model_docstring.c_str()},
 {"get_energy_loss_model", (PyCFunction)get_energy_loss_model,

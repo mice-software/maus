@@ -16,12 +16,20 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
         cls.config_str = \
             Configuration.Configuration().getConfigJSON(command_line_args=False)
         config_json = json.loads(cls.config_str)
-        config_json["global_track_fit_will_require_triplet_space_points"] = False
-        config_json["global_track_fit_tof_sigma_t"] = 0.05
-        config_json["global_track_fit_scifi_sigma_x"] = 0.5
-        config_json["global_track_fit_min_step_size"] = 0.1
-        config_json["global_track_fit_max_step_size"] = 100.
-        config_json["verbose_level"] = 0
+        config_json["global_track_fits"] = [{
+                "will_require_triplet_space_points":False,
+                "min_step_size":0.1,
+                "max_step_size":100.,
+                "will_smooth":False,
+                "mass_hypothesis":105.658,
+                "charge_hypothesis":1.,
+                "seed":"USTrackerTofSeed",
+                "detectors":["Tracker0_5", "Tracker0_4", "Tracker0_3", "Tracker0_2", "Tracker0_1",
+                             "Tracker1_1", "Tracker1_2", "Tracker1_3", "Tracker1_4", "Tracker1_5",
+                             "TOF0", "TOF1",]
+            },
+        ]
+        config_json["verbose_level"] = 1
         cls.config_str = json.dumps(config_json)
         if not maus_cpp.globals.has_instance():
             maus_cpp.globals.birth(cls.config_str)

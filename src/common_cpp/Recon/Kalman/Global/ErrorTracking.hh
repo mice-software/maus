@@ -79,6 +79,9 @@ public:
     void SetTrackingModel(TrackingModel track_model) {_track_model = track_model;}
     TrackingModel GetTrackingModel() const {return _track_model;}
 
+    void SetCharge(double charge) {_charge = charge;}
+    double GetCharge() const {return _charge;}
+
     static ostream& print(std::ostream& out, const double x[29]);
 
 private:
