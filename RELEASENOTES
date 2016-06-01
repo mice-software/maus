@@ -5,6 +5,14 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.4.0
+  The following changes were made:
+    - Event viewer added
+    - Scifi Kalman filter updates
+    - execute_against_data* tests fixed
+    - Data download helper added: bin/utilities/fetch_recon_data.py
+    - Third party cloc script updated
+    - Third party MPFR script version number bug fixed
 MAUS-v2.3.1
   The following changes were made:
     - Hot fix - Django version updated
