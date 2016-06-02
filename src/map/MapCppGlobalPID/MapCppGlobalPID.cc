@@ -518,7 +518,7 @@ namespace MAUS {
   	GlobalTrackArray->at(track_i);
       if (track->get_mapper_name() == "MapCppGlobalTrackMatching-US") {
 	perform_pid("MapCppGlobalPID-Final_US",
-		    "US_PID", track, _pid_vars,
+		    "US", track, _pid_vars,
 		    _pid_beamline_polarity,
 		    _pid_beam_setting, global_event);
       }
@@ -535,7 +535,7 @@ namespace MAUS {
 	GlobalTrackArray->at(track_i);
       if (track->get_mapper_name() == "MapCppGlobalTrackMatching-DS") {
 	perform_pid("MapCppGlobalPID-Final_DS",
-		    "DS_PID", track, _pid_vars,
+		    "DS", track, _pid_vars,
 		    _pid_beamline_polarity,
 		    _pid_beam_setting, global_event);
       }
@@ -560,7 +560,7 @@ namespace MAUS {
 	      const_cast<MAUS::DataStructure::Global::Track*>
 	      (const_tracks.at(track_j));
 	    perform_pid("MapCppGlobalPID-Final_Through_US",
-			"Through_US_PID", US_track, _pid_vars,
+			"Through_US", US_track, _pid_vars,
 			_pid_beamline_polarity,
 			_pid_beam_setting, global_event);
 	  }
@@ -587,7 +587,7 @@ namespace MAUS {
 	      const_cast<MAUS::DataStructure::Global::Track*>
 	      (const_tracks.at(track_j));
 	    perform_pid("MapCppGlobalPID-Final_Through_DS",
-			"Through_DS_PID", DS_track, _pid_vars,
+			"Through_DS", DS_track, _pid_vars,
 			_pid_beamline_polarity,
 			_pid_beam_setting, global_event);
 	  }
@@ -606,7 +606,7 @@ namespace MAUS {
 	GlobalTrackArray->at(track_i);
       if (track->get_mapper_name() == "MapCppGlobalTrackMatching-Through") {
 	perform_pid("MapCppGlobalPID-Final_Through",
-		    "Through_PID", track, _pid_vars,
+		    "Through", track, _pid_vars,
 		    _pid_beamline_polarity,
 		    _pid_beam_setting, global_event);
       }
