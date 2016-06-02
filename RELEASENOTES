@@ -9,6 +9,7 @@ MAUS-v2.4.0
   The following changes were made:
     - Event viewer added
     - Scifi Kalman filter updates
+    - Scifi spacepoint recon upgraded, better noise discrimination
     - execute_against_data* tests fixed
     - Data download helper added: bin/utilities/fetch_recon_data.py
     - Third party cloc script updated
