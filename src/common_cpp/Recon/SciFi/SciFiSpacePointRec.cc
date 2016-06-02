@@ -21,6 +21,7 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 
 namespace MAUS {
 
@@ -51,7 +52,7 @@ void SciFiSpacePointRec::process(SciFiEvent &event) const {
 
   look_for_triplets(event, clusters);
 
-  look_for_duplets(event, clusters);
+  look_for_duplets_npe(event, clusters);
 }
 
 void SciFiSpacePointRec::make_cluster_container(SciFiEvent &evt,
@@ -130,6 +131,44 @@ void SciFiSpacePointRec::look_for_duplets(SciFiEvent &evt,
                 evt.add_spacepoint(duplet);
               }
             }
+          }
+        }
+      }
+    }
+  }
+}
+
+void SciFiSpacePointRec::look_for_duplets_npe(SciFiEvent &evt,
+                         std::vector<SciFiCluster*> (&clusters)[2][6][3]) const {
+  for ( int Tracker = 0; Tracker < 2; Tracker++ ) {  // for each tracker
+    for ( int Station = 0; Station < 6; Station++ ) {  // for each station
+
+      // Make a list of all clusters in the station:
+      std::vector<SciFiCluster*> station_clusters;
+      for ( int a_plane = 0; a_plane < 3; a_plane++ ) {
+        station_clusters.insert(station_clusters.end(),
+        clusters[Tracker][Station][a_plane].begin(),
+        clusters[Tracker][Station][a_plane].end());
+      }
+
+      // Sort clusters in NPE order:
+      std::sort(station_clusters.begin(), station_clusters.end(),
+          [](const SciFiCluster* a, const SciFiCluster* b) -> bool {
+            return a->get_npe() > b->get_npe();
+          });
+
+      // Iterate over clusters in NPE order to make duplets:
+      for (auto a_it = station_clusters.begin(); a_it != station_clusters.end(); ++a_it) {
+        SciFiCluster* candidate_A = *a_it;
+        for (auto b_it = station_clusters.begin(); b_it != station_clusters.end(); ++b_it) {
+          SciFiCluster* candidate_B = *b_it;
+          if ( clusters_are_not_used(candidate_A, candidate_B) &&
+              candidate_A->get_plane() != candidate_B->get_plane() &&
+              duplet_within_radius(candidate_A, candidate_B) ) {
+            SciFiSpacePoint* duplet = new SciFiSpacePoint(candidate_A, candidate_B);
+            build_duplet(duplet);
+            evt.add_spacepoint(duplet);
+            break;
           }
         }
       }
