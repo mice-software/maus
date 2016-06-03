@@ -179,6 +179,10 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
                         self.assertAlmostEqual(hit[mom_keys[l]],
                                                track_point.get_momentum()[l],
                                                delta = 1.)
+
+    def test_fails(self):
+        raise RuntimeError("Need more tests")
+
     config_str = ""
     mu_mass = 105.658        
 
