@@ -309,6 +309,8 @@ void propagate(double* x, double target_z, const BTField* field,
   size_t max_steps = 10000000;
   size_t n_steps = 0;
   double z = x[3];
+  // The next 2 lines take ~8ms to execute, perhaps consider moving these outside
+  // of this function somehow?
   GeometryNavigator geometry_navigator;
   geometry_navigator.Initialise(g4navigator->GetWorldVolume());
   while (fabs(z - target_z) > 1e-6) {

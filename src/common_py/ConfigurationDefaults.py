@@ -804,3 +804,13 @@ track_matching_tolerances = {
 
 # Whether to use energy loss calculations for global track matching
 track_matching_energy_loss = True
+# Whether propagation matching should not be performed if each detector has no more than one hit
+track_matching_no_single_event_check = True
+# Additional restriction on the above, still perform matching if some of the hits may be noise
+# due to a small charge deposit
+track_matching_check_charge_thresholds = {
+  "TOF0":0.0,
+  "TOF1":0.0,
+  "TOF2":0.0,
+  "KL":0.0
+}

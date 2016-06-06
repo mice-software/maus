@@ -57,6 +57,7 @@ namespace global {
                   std::string pid_hypothesis_string,
                   std::map<std::string, std::pair<double, double> >
                   matching_tolerances, double max_step_size,
+                  std::pair<bool, std::map<std::string, double> > no_check_settings,
                   bool energy_loss = true);
 
     /// Destructor
@@ -293,6 +294,10 @@ namespace global {
 
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
+
+    /// Whether matching should not be performed with only one hit per detector
+    /// + thresholds for possible noise hits that will trigger matching either way
+    std::pair<bool, std::map<std::string, double> > _no_check_settings;
 
     /// Maximum stepsize for the RK4 propagation
     double _max_step_size;
