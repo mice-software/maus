@@ -20,6 +20,7 @@
 # pylint: disable = W0102, W0142, W0612
 
 import ROOT
+import json
 import os
 import array
 import types
@@ -45,6 +46,16 @@ def print_exception() :
   print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, \
                                                  lineno, line.strip(), exc_obj)
 
+def load_virtual_plane_dict( filename ) :
+  temp_dict = None
+  with open(filename, 'r') as infile :
+    temp_dict = json.load(infile)
+
+  new_dict = {}
+  for key in temp_dict :
+    new_dict[int(key)] = temp_dict[key]
+
+  return new_dict
 
 
 ################################################################################

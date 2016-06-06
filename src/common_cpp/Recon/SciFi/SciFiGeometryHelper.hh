@@ -148,6 +148,10 @@ class SciFiGeometryHelper {
    */
   void FieldValue(const MiceModule* trackerModule, SciFiTrackerGeometry& geom);
 
+  double GetPRCorrection(int tracker) const { return _pr_correction*( tracker == 0 ? 1.0 : -1.0 ); }
+
+  double GetPRBias() const { return _pr_bias; }
+
   SciFiTrackerMap& GeometryMap() { return _geometry_map; }
   const SciFiTrackerMap& GeometryMap() const { return _geometry_map; }
 
@@ -211,6 +215,10 @@ class SciFiGeometryHelper {
   bool UseActiveRotations;
 
   double _default_momentum;
+
+  double _pr_correction;
+
+  double _pr_bias;
 }; // Don't forget this trailing colon!!!!
 } // ~namespace MAUS
 

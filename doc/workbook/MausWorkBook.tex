@@ -75,7 +75,7 @@
 
 \title{\textcolor{blue}{The MAUS Work Book}}
 \author{Adam Dobbs}
-\date{Version 1.9, March 2016}
+\date{Version 2.0, May 2016}
 
 % \pdfinfo{%
 %   /Title    (MAUS Work Book)
@@ -750,6 +750,73 @@ cpp_analysis_example : cpp_analysis_example.cc
 clean:
   rm cpp_analysis_example
 \end{lstlisting}
+
+\section{Event Viewer}
+
+MAUS comes bundled with a number of applications for visualising events. Two shall be described here: EVSimpleExporter and EventViewer. EVSimpleExporter is used to process MAUS output files and produce heprep files which visualises both the detector geometry and reconstructed particle tracks and hits. EventViewer is a Qt-based application which visualises reconstructed tracks and hits without the detectors. Both applications share common code and are not built by default in MAUS.
+
+\subsection{Building the Event Viewer Package}
+The dependencies for the event viewer package are as follows:
+
+\begin{itemize}
+ \item MAUS version $\ge$ 2.4.0
+ \item Qt (for EventViewer)
+ \item Java runtime (for the HepRApp viewer)
+\end{itemize}
+
+The package may be built as follows:
+\begin{itemize}
+ \item Navigate to the MAUS root directory and source env.sh
+ \item Navigate to \texttt{src/utilities/event-viewer}
+ \item Run \texttt{build.sh}
+\end{itemize}
+
+More details are available in the package README. This should produce two executables, EVSimpleExporter and EventViewer.
+
+\subsection{The Qt Event Viewer}
+Run the EventViewer executable. Use the elipsis button in the top right of the window to open a file selection box and select the MAUS output root file containing the data to be visualised. Wait while the application scans the file (progress can monitored on the command prompt). Once the file has finished loading different events and spills may be navigated and visualised using the buttons found in the bottom left of the window, or using the number entry boxes in the bottom right. 
+
+Different data views are present in the form of tabs immediately above the plotting area. Currently '``Position'', ``Momentum'' and ``Tracker Clusters'' views are implemented. The plots may be panned and zoomed using the mouse. Data from different detectors may switched on or off using the tick boxes at the bottom of the screen.
+
+A screenshot of the EventViewer is shown in figure~\ref{fig:QtEventViewer}.
+
+\begin{figure}[hbt]
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{./graphics/QtEventViewer.png}
+    \caption{The Qt Event Viewer Application}
+    \label{fig:QtEventViewer}
+  \end{center}
+\end{figure}
+
+\subsection{The EVSimpleExporter}
+The EVSimpleExporter creates heprep files from MAUS output files (other formats may be added in the future). Run the executable with a \texttt{-h} flag to display the different command line options. Spills 0 to 10 from the MAUS output file ``maus\_output.root'' may be output to heprep file using the following command:
+
+ \begin{lstlisting}
+  ./EVSimpleExporter -f maus_output.root -sr 0 10
+ \end{lstlisting}
+
+The heprep files will by default be created in the current working directory, but this may be altered by setting the \texttt{EV\_DEST\_DIR} environment variable to a different directory. It advisable not to store the output heprep files in the event viewer source directory as one of the source files (``MICEGeometryMinimal.heprep'', describing the geometry) has a ``.heprep'' extension and so may get deleted accidently during clean ups. 
+
+The heprep files may be visualised using the HepRApp application (located in \texttt{third\_party/install/} \texttt{heprep}). For example:
+
+\begin{lstlisting}
+ java -jar ${MAUS_THIRD_PARTY}/third_party/install/heprep/HepRApp.jar MICEEvent_7417_9_0.heprep
+\end{lstlisting}
+
+Loading the HepRApp application from the event-viewer source directory will allow the application to find a custom settings file (``user.properties'') which will load useful views into the viewer automatically.
+
+A screenshot showing the HepRApp viewer output is shown in figure~\ref{fig:HepRApp}.
+
+\begin{figure}[hbt]
+  \begin{center}
+    \includegraphics[width=1.0\linewidth]{./graphics/HepRApp.png}
+    \caption{The HepRApp viewer, visualising a file produced by EVSimpleExporter.}
+    \label{fig:HepRApp}
+  \end{center}
+\end{figure}
+
+
+
 
 \appendix
 
