@@ -238,58 +238,68 @@ namespace MAUS {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
 								   _hypotheses[i],
 								   _minA, _maxA));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarB") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
 								   _hypotheses[i],
 								   _XminB, _XmaxB,
 								   _YminB, _YmaxB));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
 								   _hypotheses[i],
 								   _XminC, _XmaxC,
 								   _YminC, _YmaxC));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarD") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarD(_histFile,
 								   _hypotheses[i],
 								   _minD, _maxD));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarE") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarE(_histFile,
 								   _hypotheses[i],
 								   _minE, _maxE));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarF") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarF(_histFile,
 								   _hypotheses[i],
 								   _XminF, _XmaxF,
 								   _YminF, _YmaxF));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarG") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarG(_histFile,
 								   _hypotheses[i],
 								   _minG, _maxG));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarH") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarH(_histFile,
 								   _hypotheses[i],
 								   _XminH, _XmaxH,
 								   _YminH, _YmaxH));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarI") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarI(_histFile,
 								   _hypotheses[i],
 								   _XminI, _XmaxI,
 								   _YminI, _YmaxI));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				 "PIDVarJ") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_histFile,
 								   _hypotheses[i],
 								   _XminJ, _XmaxJ,
 								   _YminJ, _YmaxJ));
-	    } else {
+	    }
+	    if (_pid_vars.size() == 0) {
 	      Squeak::mout(Squeak::warning) << "No valid PID variables given in "
 					    << "custom_pid_set, "
 					    << "MapCppGlobalPID::birth" << std::endl;
@@ -379,52 +389,61 @@ namespace MAUS {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_histFile,
 								      _hypotheses[i],
 								      _minComA, _maxComA));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarB") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_histFile,
 								      _hypotheses[i],
 								      _XminComB, _XmaxComB,
 								      _YminComB, _YmaxComB));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_histFile,
 								      _hypotheses[i],
 								      _minComC, _maxComC));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarD") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_histFile,
 								      _hypotheses[i],
 								      _minComD, _maxComD));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarE") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_histFile,
 								      _hypotheses[i],
 								      _XminComE, _XmaxComE,
 								      _YminComE, _YmaxComE));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarF") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_histFile,
 								      _hypotheses[i],
 								      _minComF, _maxComF));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarG") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_histFile,
 								      _hypotheses[i],
 								      _XminComG, _XmaxComG,
 								      _YminComG, _YmaxComG));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarH") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_histFile,
 								      _hypotheses[i],
 								      _XminComH, _XmaxComH,
 								      _YminComH, _YmaxComH));
-	    } else if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
+	    }
+	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 				"ComPIDVarI") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_histFile,
 								      _hypotheses[i],
 								      _XminComI, _XmaxComI,
 								      _YminComI, _YmaxComI));
-	    } else {
+	    }
+	    if (_pid_vars.size() == 0) {
 	      Squeak::mout(Squeak::warning) << "No valid PID variables given in "
 					  << "custom_pid_set, "
 					  << "MapCppGlobalPID::birth" << std::endl;
@@ -478,6 +497,7 @@ namespace MAUS {
 	  }
 	  if (track_types.size() == 0) {
 	    Squeak::mout(Squeak::warning) << "No tracks have been selected to be ID'd,"
+
 					  << " MapCppGlobalPID::_process" << std::endl;
 	  }
 	  for (unsigned int q = 0; q < track_types.size(); ++q) {
@@ -655,6 +675,7 @@ namespace MAUS {
 	    continue;
 	  } else {
 	    logL_mu += _pid_vars[pid_var_count]->logL(track);
+	    std::cerr << "logL_mu : " << logL_mu << std::endl;
 	    logL_1 = false;
 	    logL_2 = false;
 	  }
