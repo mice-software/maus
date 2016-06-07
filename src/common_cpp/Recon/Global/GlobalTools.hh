@@ -148,7 +148,8 @@ bool approx(double a, double b, double tolerance);
 /**
  * @brief Calculates energy loss according to the Bethe-Bloch equation. This is
  * also implemented in G4hBetheBlochModel but we don't want to have to
- * instantiate a G4DynamicParticle object every time.
+ * instantiate a G4DynamicParticle object every time. Note that the output is in
+ * MeV/mm, not MeV cm^2/g
  *
  * @param material the material the particle is passing through
  * @param the total energy of the particle

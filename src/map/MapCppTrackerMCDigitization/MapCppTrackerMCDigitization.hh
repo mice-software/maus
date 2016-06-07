@@ -105,7 +105,7 @@ class MapCppTrackerMCDigitization : public MapBase<Data> {
    */
   bool check_param(MAUS::SciFiHit *hit1, MAUS::SciFiHit *hit2) const;
 
-  void discriminator(SciFiDigitPArray &digits) const;
+//  void discriminator(SciFiDigitPArray &digits) const;
 
   /** @brief load calibration data
   *
@@ -132,8 +132,9 @@ class MapCppTrackerMCDigitization : public MapBase<Data> {
   double _SciFiFiberTransmissionEff;
   double _SciFiMUXTransmissionEff;
   double _SciFiadcBits;
-  double _SciFiDisCut;
-  int _disc_sim_on;
+//  double _SciFiDisCut;
+//  int _disc_sim_on;
+  bool _SciFiCalibrateMC;
 
   static const int _number_channels       = 128;
   static const int _number_banks          = 64;

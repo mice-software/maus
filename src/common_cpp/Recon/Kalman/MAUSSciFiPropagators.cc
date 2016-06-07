@@ -18,6 +18,8 @@
 
 #include "src/common_cpp/Recon/Kalman/MAUSSciFiPropagators.hh"
 
+#include "src/common_cpp/Utils/Exception.hh"
+
 namespace MAUS {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,8 +149,8 @@ namespace MAUS {
     TMatrixD state_vector(4, 1);
     state_vector = state.GetVector();
 
-    double mx    = state_vector(1, 0);
-    double my    = state_vector(3, 0);
+//    double mx    = state_vector(1, 0);
+//    double my    = state_vector(3, 0);
     double p     = 200.0; // TODO: Extract a more accurate value, somehow...
     double p2    = p*p;
 
@@ -298,33 +300,39 @@ namespace MAUS {
 
     _momentum_reduction_factor = 1.0;
 
-    if (_subtract_eloss) {
-      SciFiMaterialsList materials;
-      _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
+    try {
+      if (_subtract_eloss) {
+        SciFiMaterialsList materials;
+        _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
 
-      // Reduce/increase momentum vector accordingly.
-      double e_loss_sign = 1.0;
-      if (end.GetId() > 0) {
-        e_loss_sign = -1.0;
+        // Reduce/increase momentum vector accordingly.
+        double e_loss_sign = 1.0;
+        if (end.GetId() > 0) {
+          e_loss_sign = -1.0;
+        }
+
+        double delta_energy = 0.0;
+        double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
+        double momentum = old_momentum;
+        int n_steps = materials.size();
+
+        for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
+          double width = materials.at(i).second;
+          double path_length = 0.1 * width * distance_factor;
+          double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+          delta_energy = e_loss_sign*SP*path_length;
+//          double SP = _geometry_helper->LandauVavilovStoppingPower(momentum,
+//                                                             materials.at(i).first, path_length);
+//          delta_energy = e_loss_sign*SP;
+          energy = energy - delta_energy;
+          momentum = sqrt(energy*energy - _muon_mass_sq);
+        }
+        _momentum_reduction_factor = momentum/old_momentum;
       }
-
-      double delta_energy = 0.0;
-      double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
-      double momentum = old_momentum;
-      int n_steps = materials.size();
-
-      for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
-        double width = materials.at(i).second;
-        double path_length = 0.1 * width * distance_factor;
-        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-        delta_energy = e_loss_sign*SP*path_length;
-//        double SP = _geometry_helper->LandauVavilovStoppingPower(momentum, materials.at(i).first,
-//                                                       path_length);
-//        delta_energy = e_loss_sign*SP;
-        energy = energy - delta_energy;
-        momentum = sqrt(energy*energy - _muon_mass_sq);
-      }
-      _momentum_reduction_factor = momentum/old_momentum;
+    } catch (...) {
+      throw Exception(Exception::recoverable,
+          "Error occured during energy loss calculation",
+          "MAUSSciFiPropagactors::_calculateBasePropagator()");
     }
 
 

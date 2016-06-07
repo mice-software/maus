@@ -168,6 +168,7 @@ std::vector<int> GetTrackerPlane(const DataStructure::Global::TrackPoint*
   std::vector<int> tracker_plane(3, 0);
   double z = track_point->get_position().Z();
   int plane = 100;
+  // First we get a plane number as an integer from 0 to 29 (counting from upstream)
   for (size_t i = 0; i < z_positions.size(); i++) {
     if (approx(z, z_positions[i], 0.25)) {
       plane = i;
@@ -175,10 +176,12 @@ std::vector<int> GetTrackerPlane(const DataStructure::Global::TrackPoint*
     }
   }
   if (plane < 15) {
+    // Tracker 0
     tracker_plane[0] = 0;
     tracker_plane[1] = 5 - plane/3;
     tracker_plane[2] = 2 - plane%3;
   } else if (plane < 30) {
+    // Tracker 1
     tracker_plane[0] = 1;
     tracker_plane[1] = plane/3 - 4;
     tracker_plane[2] = plane%3;
@@ -230,7 +233,9 @@ DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
 }
 
 double dEdx(const G4Material* material, double E, double m) {
-  double constant = 2.54955123375e-23;
+  // Equation according to PDG 2014 eq. 32.5
+  // Converted constant so we can use electron number density instead of A/Z
+  double constant = 0.5*100*0.307075/Avogadro;
   double m_e = 0.510998928;
   double beta = std::sqrt(1 - (m*m)/(E*E));
   double beta2 = beta*beta;
@@ -242,23 +247,12 @@ double dEdx(const G4Material* material, double E, double m) {
 
   double n_e = material->GetElectronDensity();
   double I = material->GetIonisation()->GetMeanExcitationEnergy();
-  double x_0 = material->GetIonisation()->GetX0density();
-  double x_1 = material->GetIonisation()->GetX1density();
-  double C = material->GetIonisation()->GetCdensity();
-  double a = material->GetIonisation()->GetAdensity();
-  double k = material->GetIonisation()->GetMdensity();
 
   double logterm = std::log(2.0*m_e*bg2*T_max/(I*I));
-  double x = std::log(bg)/std::log(10);
 
   // density correction
-  double delta = 0.0;
-  if (x > x_0) {
-    delta = 2*std::log(10)*x - C;
-    if (x < x_1) {
-      delta += a*std::pow((x_1 - x), k);
-    }
-  }
+  double x = std::log(bg)/std::log(10);
+  double delta = material->GetIonisation()->DensityCorrection(x);
   double dEdx = -constant*n_e/beta2*(logterm - 2*beta2 - delta);
   return dEdx;
 }
@@ -315,6 +309,8 @@ void propagate(double* x, double target_z, const BTField* field,
   size_t max_steps = 10000000;
   size_t n_steps = 0;
   double z = x[3];
+  // The next 2 lines take ~8ms to execute, perhaps consider moving these outside
+  // of this function somehow?
   GeometryNavigator geometry_navigator;
   geometry_navigator.Initialise(g4navigator->GetWorldVolume());
   while (fabs(z - target_z) > 1e-6) {

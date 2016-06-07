@@ -365,9 +365,10 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
     double my = track->get_my();
     mom.setX(mx*default_mom);
     mom.setY(my*default_mom);
+    mom.setZ(default_mom);
     mom *= rotation;
     if (tracker == 0) mom *= -1.0;
-    mom.setZ(default_mom);
+    mom.setZ(fabs(mom.z()));
 
     track->set_reference_position(pos);
     track->set_reference_momentum(mom);

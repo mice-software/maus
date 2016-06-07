@@ -54,6 +54,8 @@ SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& m
   UseActiveRotations                    = (*json)["geometry_use_active_rotations"].asBool();
 
   _default_momentum  = (*json)["SciFiDefaultMomentum"].asDouble();
+  _pr_correction = (*json)["SciFiPRCorrection"].asDouble();
+  _pr_bias = (*json)["SciFiPRBias"].asDouble();
 }
 
 SciFiGeometryHelper::~SciFiGeometryHelper() {}
@@ -73,48 +75,53 @@ void SciFiGeometryHelper::Build() {
 
       double pitch        = module->propertyDouble("Pitch");
       double centralfibre = module->propertyDouble("CentralFibre");
-      ThreeVector direction(0., 1., 0.);
-
-      // G4RotationMatrix global_fibre_rotation = G4RotationMatrix(module->globalRotation());
-      const MiceModule* plane = module->mother();
-      HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // plane
-                                               ->mother()));  // tracker/ station??
-      direction     *= internal_fibre_rotation.inverse();
-      if (UseActiveRotations == true)
-        direction     *= internal_fibre_rotation;
-
-      // The plane rotation wrt to the solenoid. Identity matrix for tracker 1,
-      // [ -1, 0, 0],[ 0, 1, 0],[ 0, 0, -1] for tracker 0 (180 degrees rot. around y).
-      // const MiceModule* plane = module->mother();
-      HepRotation plane_rotation(plane->relativeRotation(plane->mother()  // tracker
-                                                              ->mother()));    // solenoid
-
-      ThreeVector position  = clhep_to_root(module->globalPosition());
-      ThreeVector reference = FindReferenceFramePosition(tracker_n);
-
-      ThreeVector tracker_ref_frame_pos = position-reference;
-      tracker_ref_frame_pos *= plane_rotation;
 
       int plane_id =  3*(station_n-1) + (plane_n+1);
-//      plane_id     = ( tracker_n == 0 ? -plane_id : plane_id );
+      const MiceModule* station = module->mother();
+      const MiceModule* trackerModule = station->mother();
+      const MiceModule* referencePlane = FindPlane(tracker_n, 1, 0);
 
-      const MiceModule* trackerModule = plane->mother(); // tracker
-      ThreeVector trackerPos = clhep_to_root(trackerModule->globalPosition());
+      ThreeVector referencePos = clhep_to_root(referencePlane->globalPosition());
+//      HepRotation referenceRot;
+//      if (UseActiveRotations == true) {
+//        referenceRot = referencePlane->globalRotation();
+//      } else {
+//        referenceRot = referencePlane->globalRotation().inverse();
+//      }
 
+      HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // station
+                                               ->mother()));  // tracker
+//      HepRotation internal_fibre_rotation(module->relativeRotation(station));
+
+      ThreeVector direction(0., 1., 0.);
+      if (UseActiveRotations == true) {
+        direction     *= internal_fibre_rotation;
+      } else {
+        direction     *= internal_fibre_rotation.inverse();
+      }
+
+//      HepRotation station_rotation(station->relativeRotation(station->mother()  // tracker
+//                                                              ->mother()));    // solenoid
+      HepRotation station_rotation(trackerModule->globalRotation());
+      ThreeVector plane_position = clhep_to_root(module->globalPosition());
+
+      ThreeVector tracker_ref_frame_pos = plane_position-referencePos;
+      if (UseActiveRotations == true) {
+        tracker_ref_frame_pos *= station_rotation.inverse();
+      } else {
+        tracker_ref_frame_pos *= station_rotation;
+      }
 
       SciFiPlaneGeometry this_plane;
       this_plane.Direction      = direction.Unit();
       this_plane.Position       = tracker_ref_frame_pos;
-      this_plane.GlobalPosition = position;
+      this_plane.GlobalPosition = plane_position;
       this_plane.CentralFibre   = centralfibre;
       this_plane.Pitch          = pitch;
 
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
-      trackerGeo.Position = reference;
-      trackerGeo.Rotation = (trackerModule->globalRotation()).inverse();
-      if (UseActiveRotations == true)
-        trackerGeo.Rotation = (trackerModule->globalRotation());
-//      trackerGeo.Field = FieldValue(trackerModule);
+      trackerGeo.Position = referencePos;
+      trackerGeo.Rotation = trackerModule->globalRotation();
       FieldValue(trackerModule, trackerGeo);
       trackerGeo.Planes[plane_id] = this_plane;
 

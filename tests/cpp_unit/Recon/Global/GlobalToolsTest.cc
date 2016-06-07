@@ -392,12 +392,12 @@ TEST_F(GlobalToolsTest, propagate) {
   } catch (Exception exc) {
     std::cerr << exc.what() << std::endl;
   }
-  EXPECT_NEAR(x1[1], 7.861, epsilon);
-  EXPECT_NEAR(x1[2], -21.488, epsilon);
-  EXPECT_NEAR(x1[4], 133.688, epsilon);
-  EXPECT_NEAR(x1[5], -11.078, epsilon);
-  EXPECT_NEAR(x1[6], 2.969, epsilon);
-  EXPECT_NEAR(x1[7], 81.100, epsilon);
+  EXPECT_NEAR(x1[1], 8.345, epsilon);
+  EXPECT_NEAR(x1[2], -21.653, epsilon);
+  EXPECT_NEAR(x1[4], 133.855, epsilon);
+  EXPECT_NEAR(x1[5], -11.217, epsilon);
+  EXPECT_NEAR(x1[6], 2.571, epsilon);
+  EXPECT_NEAR(x1[7], 81.370, epsilon);
 
   // No Energy Loss, Magnetic Field
   try {
@@ -423,10 +423,10 @@ TEST_F(GlobalToolsTest, propagate) {
   }
   EXPECT_NEAR(x3[1], 200.000, epsilon);
   EXPECT_NEAR(x3[2], 200.000, epsilon);
-  EXPECT_NEAR(x3[4], 133.688, epsilon);
-  EXPECT_NEAR(x3[5], 8.110, epsilon);
-  EXPECT_NEAR(x3[6], 8.110, epsilon);
-  EXPECT_NEAR(x3[7], 81.100, epsilon);
+  EXPECT_NEAR(x3[4], 133.855, epsilon);
+  EXPECT_NEAR(x3[5], 8.137, epsilon);
+  EXPECT_NEAR(x3[6], 8.137, epsilon);
+  EXPECT_NEAR(x3[7], 81.370, epsilon);
 
   // No Energy Loss, No Magnetic Field
   try {

@@ -51,31 +51,51 @@ namespace MAUS {
 
 class SciFiSpacePointRec {
  public:
+
+  /** @brief The default constructor */
   SciFiSpacePointRec();
 
+  /** @brief Parameter constructor */
   SciFiSpacePointRec(double aAcceptableRadius, double aKunoSumT1S5,
                      double aKunoSum, double aKunoTolerance);
 
+  /** @brief The destructor */
   ~SciFiSpacePointRec();
 
+  /** @brief Top level  function, process a SciFiEvent
+   *
+   *  @param[in,out] evt The SciFiEvent
+   */
   void process(SciFiEvent &evt) const;
 
   void make_cluster_container(SciFiEvent &evt, std::vector<SciFiCluster*>
-                                                                       (&clusters)[2][6][3]) const;
+                              (&clusters)[2][6][3]) const;
 
   void look_for_triplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
+  /** Deprecated, use look_for_duplets_npe **/
   void look_for_duplets(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
+
+  void look_for_duplets_npe(SciFiEvent &evt, std::vector<SciFiCluster*> (&clusters)[2][6][3]) const;
 
   void build_duplet(SciFiSpacePoint* duplet) const;
 
   void build_triplet(SciFiSpacePoint* triplet) const;
 
+  /** @brief Calculate the crossing position of clusters
+   * 
+   *  @param[in] c1 The first cluster
+   *  @param[in] c2 The second cluster
+   */
   ThreeVector crossing_pos(SciFiCluster* c1, SciFiCluster* c2) const;
 
-  bool kuno_accepts(SciFiCluster* cluster1,
-                    SciFiCluster* cluster2,
-                    SciFiCluster* cluster3) const;
+  /** @brief Do these clusters pass Kuno's conjecture (i.e. originate from the same track)
+   * 
+   *  @param[in] cluster1 The first cluster
+   *  @param[in] cluster2 The second cluster
+   *  @param[in] cluster3 The third cluster
+   */
+  bool kuno_accepts(SciFiCluster* cluster1, SciFiCluster* cluster2, SciFiCluster* cluster3) const;
 
 
   bool clusters_are_not_used(SciFiCluster* candidate_A,
@@ -88,16 +108,16 @@ class SciFiSpacePointRec {
   bool duplet_within_radius(SciFiCluster* candidate_A,
                             SciFiCluster* candidate_B) const;
 
-  /** Return the radius cut */
+  /** @brief Return the radius cut */
   double get_acceptable_radius() { return _acceptable_radius; }
 
-  /** Return the Kuno conjecture sum for Tracker 1 Station 5 */
+  /** @brief Return the Kuno conjecture sum for Tracker 1 Station 5 */
   double get_kuno_1_5() { return _kuno_1_5; }
 
-  /** Return the Kuno conjecture sum for the other tracker stations */
+  /** @brief Return the Kuno conjecture sum for the other tracker stations */
   double get_kuno_else() { return _kuno_else; }
 
-  /** Return the Kuno conjecture tolerance */
+  /** @brief Return the Kuno conjecture tolerance */
   double get_kuno_tolerance() { return _kuno_toler; }
 
  private:
