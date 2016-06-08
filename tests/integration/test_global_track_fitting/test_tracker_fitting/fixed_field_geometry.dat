@@ -13,12 +13,12 @@ Configuration Step_3pi_2_alt
 
   Module VirtualPlane
   {
-    Position 0. 0. -5000.0+@RepeatNumber*100 mm
+    Position 0. 0. -1000.0+@RepeatNumber*100 mm
     Rotation 0. 0. 0. degree
     Volume None
     PropertyString SensitiveDetector Virtual
     PropertyBool RepeatModule2 True
-    PropertyInt NumberOfRepeats 90
+    PropertyInt NumberOfRepeats 20
     PropertyString IndependentVariable z
   }
 
@@ -36,7 +36,7 @@ Configuration Step_3pi_2_alt
 
   Module TrackerSolenoid0
   {
-    Position 0. 0. -3446.9 mm
+    Position 0. 0. 0.0 mm
     Rotation 0. 0. 0. degree
     Volume Cylinder
     Dimensions 702.0 2923.0 mm
@@ -44,67 +44,13 @@ Configuration Step_3pi_2_alt
     PropertyDouble Length       5. m
     PropertyDouble FieldRadius  1. m
     PropertyHep3Vector ConstantField 0.0 0.0 4.0 tesla // this is for FieldType CylindricalField
-    PropertyHep3Vector MagneticField 0.0 0.0 -4.0 tesla // this is for tracker, not for field generation
+    PropertyHep3Vector MagneticField 0.0 0.0 -4.0 tesla // this is for tracker?, not for field generation
     PropertyString Material Galactic
     PropertyBool Invisible 1
     PropertyInt KalmanSolenoid 1
-    Module Cryostat0
-    {
-      Position 0.0 0.0 0.0 cm
-      Rotation 0.0 0.0 0.0 degree
-      Volume Tube
-      Dimensions 200.5 702. 2923. mm
-      PropertyDouble BlueColour 0.87
-      PropertyDouble GreenColour 0.17
-      PropertyDouble RedColour 0.
-      PropertyString Material He
-      Module CryostatOuterVessel
-      {
-        Position 0.0 0.0 0.0 cm
-        Rotation 0.0 0.0 0.0 degree
-        Volume Tube
-        Dimensions 687.0 701.9 2922.9 mm
-        PropertyString Material STEEL304
-        PropertyDouble BlueColour 0.87
-        PropertyDouble GreenColour 0.77
-        PropertyDouble RedColour 0.69
-      }
-      Module CryostatInnerTube
-      {
-        Position 0.0 0.0 0.0 mm
-        Rotation 0.0 0.0 0.0 degree
-        Volume Tube
-        Dimensions 200.5 202.0 2923.0 mm
-        PropertyString Material STEEL304
-        PropertyDouble BlueColour 0.87
-        PropertyDouble GreenColour 0.77
-        PropertyDouble RedColour 0.69
-      }
-      Module CryostatFrontEndPlate
-      {
-        Position 0.0 0.0 -1452.5 mm
-        Rotation 0.0 0.0 0.0 degree
-        Volume Tube
-        Dimensions 202.0 687.0 18.0 mm
-        PropertyString Material STEEL304
-        PropertyDouble BlueColour 0.87
-        PropertyDouble GreenColour 0.77
-        PropertyDouble RedColour 0.69
-      }
-      Module CryostatBackEndPlate
-      {
-        Position 0.0 0.0 1452.5 mm
-        Rotation 0.0 0.0 0.0 degree
-        Volume Tube
-        Dimensions 202.0 687.0 18.0 mm
-        PropertyString Material STEEL304
-        PropertyDouble BlueColour 0.87
-        PropertyDouble GreenColour 0.77
-        PropertyDouble RedColour 0.69
-      }
     Module Tracker0
     {
-      Position 0.0 0.0 -575.5 mm
+      Position 0.0 0.0 0.0 mm
       Rotation 0.0 180.0 0.0 degree
       Volume Cylinder
       Dimensions 20.0 113.0 cm
@@ -697,83 +643,6 @@ Configuration Step_3pi_2_alt
           PropertyDouble RedColour 1.0
         }
       }
-    }
-    Module HeWindow
-    {
-      Position 0.0 0.0 399.0 mm
-      Rotation 0.0 0.0 0.0 degree
-
-      Volume Cylinder
-      Dimensions 187.5 185.0 mm
-      PropertyString Material Galactic
-      Module HeWindowInnerMaterial
-      {
-        Volume Boolean
-        PropertyString BaseModule Tracker/HeWindowInnerCylinder.dat
-        PropertyString BooleanModule1 Tracker/HeWindowOuterSphere.dat
-        PropertyString BooleanModule1Type Intersection
-        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 -171.85 mm
-        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
-        PropertyString BooleanModule2 Tracker/HeWindowInnerSphere.dat
-        PropertyString BooleanModule2Type Subtraction
-        PropertyHep3Vector BooleanModule2Pos 0.0 0.0 -169.09 mm
-        PropertyHep3Vector BooleanModule2Rot 0.0 0.0 0.0 degree
-        PropertyString Material Al
-        Position 0.0 0.0 0.0 mm
-        Rotation 0.0 0.0 0.0 degree
-      } // EndHeWindowInnerMaterial
-
-      Module HeWindowOuterMaterial
-      {
-        Volume Boolean
-        PropertyString BaseModule Tracker/HeWindowOuterCylinder.dat
-        PropertyString BooleanModule1 Tracker/HeWindowOuterTorus.dat
-        PropertyString BooleanModule1Type Intersection
-        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 62.07 mm
-        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
-        PropertyString BooleanModule2 Tracker/HeWindowInnerTorus.dat
-        PropertyString BooleanModule2Type Subtraction
-        PropertyHep3Vector BooleanModule2Pos 0.0 0.0 62.07 mm
-        PropertyHep3Vector BooleanModule2Rot 0.0 0.0 0.0 degree
-        PropertyString Material Al
-        Position 0.0 0.0 0.0 mm
-        Rotation 0.0 0.0 0.0 degree
-      } // EndHeWindowOuterMaterial
-
-      Module HeWindowOuterHe
-      {
-        Volume Boolean
-        PropertyString BaseModule Tracker/HeWindowOuterCylinder.dat
-        PropertyString BooleanModule1 Tracker/HeWindowOuterTorus.dat
-        PropertyString BooleanModule1Type Subtraction
-        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 62.07 mm
-        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
-        PropertyString Material He
-        Position 0.0 0.0 0.0 mm
-        Rotation 0.0 0.0 0.0 degree
-      } // EndHeWindowOuterHe
-
-      Module HeWindowInnerHe
-      {
-        Volume Boolean
-        PropertyString BaseModule Tracker/HeWindowInnerCylinder.dat
-        PropertyString BooleanModule1 Tracker/HeWindowInnerSphere.dat
-        PropertyString BooleanModule1Type Intersection
-        PropertyHep3Vector BooleanModule1Pos 0.0 0.0 -169.09 mm
-        PropertyHep3Vector BooleanModule1Rot 0.0 0.0 0.0 degree
-        PropertyString Material He
-        Position 0.0 0.0 0.0 mm
-        Rotation 0.0 0.0 0.0 degree
-      } // EndHeWindowInnerHe
-
-      Module HeWindowCase
-      {
-        Volume Tube
-        Dimensions 182.5 187.5 185.0 mm
-        PropertyString Material Al
-        Position 0.0 0.0 0.0 mm
-        Rotation 0.0 0.0 0.0 degree
-      } // EndHeWindowCase
     }
   }
 }
