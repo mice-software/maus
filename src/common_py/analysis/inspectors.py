@@ -106,7 +106,8 @@ class PhaseSpace2DInspector() :
   def add_hit(self, hit) :
     if self.momentum_bias is not None :
       p = hit.get_p()
-      correction = 1.0 + (self.momentum_bias + self.momentum_correlation*p) / p
+#      correction = 1.0 + (self.momentum_bias + self.momentum_correlation*p) / p
+      correction = ((p - self.momentum_bias)/(1.0 - self.momentum_correlation)) / p
       hit.set_px(hit.get_px()*correction)
       hit.set_py(hit.get_py()*correction)
       hit.set_pz(hit.get_pz()*correction)
