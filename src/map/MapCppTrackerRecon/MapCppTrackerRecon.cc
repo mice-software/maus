@@ -198,27 +198,39 @@ void MapCppTrackerRecon::_death() {
 
 
 void MapCppTrackerRecon::_process(Data* data) const {
+  std::cerr << "MapCppTrackerRecon::_process 1" << std::endl;
   Spill& spill = *(data->GetSpill());
 
   /* return if not physics spill */
   if (spill.GetDaqEventType() != "physics_event")
     return;
+  std::cerr << "MapCppTrackerRecon::_process 2" << std::endl;
 
   if (spill.GetReconEvents()) {
+      std::cerr << "MapCppTrackerRecon::_process 3" << std::endl;
+
     for (unsigned int k = 0; k < spill.GetReconEvents()->size(); k++) {
+      std::cerr << "MapCppTrackerRecon::_process 4 ... "   << k << std::endl;
+
       SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
       if (!event) {
         continue;
       }
+      std::cerr << "MapCppTrackerRecon::_process 5 ... "   << k << std::endl;
 
       _set_field_values(event);
+      std::cerr << "MapCppTrackerRecon::_process 6 ... "   << k << std::endl;
 
       if ( _clusters_on ) {
       // Clear any exising higher level data
+        std::cerr << "MapCppTrackerRecon::_process 7 ... "   << k << std::endl;
         event->clear_clusters();
         // Build Clusters.
+        std::cerr << "MapCppTrackerRecon::_process 8 ... "   << k << " ... " << event->digits().size() << std::endl;
         if (event->digits().size()) {
+          std::cerr << "MapCppTrackerRecon::_process 9 ... "   << k << std::endl;
           _cluster_recon.process(*event);
+          std::cerr << "   ... clusters size " << event->clusters().size() << std::endl;
         }
       }
       if ( _spacepoints_on ) {
@@ -365,9 +377,10 @@ void MapCppTrackerRecon::extrapolate_straight_reference(SciFiEvent& event) const
     double my = track->get_my();
     mom.setX(mx*default_mom);
     mom.setY(my*default_mom);
+    mom.setZ(default_mom);
     mom *= rotation;
     if (tracker == 0) mom *= -1.0;
-    mom.setZ(default_mom);
+    mom.setZ(fabs(mom.z()));
 
     track->set_reference_position(pos);
     track->set_reference_momentum(mom);

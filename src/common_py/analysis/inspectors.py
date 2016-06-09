@@ -34,6 +34,9 @@ class PhaseSpace2DInspector() :
     self.ensemble_size = ensemble_size
     self.covariance = analysis.covariances.CovarianceMatrix()
 
+    self.momentum_bias = None
+    self.momentum_correlation = None
+
     self.position_plot = ROOT.TH2F(\
            'inspected_position_{0}'.format(self.plane), 'Beam Position', \
                                         400, -200.0, 200.0, 400, -200.0, 200.0)
@@ -95,7 +98,19 @@ class PhaseSpace2DInspector() :
     self.covariance.set_covariance_correction( correction, axes )
 
 
+  def set_momentum_correction(self, constant, gradient) :
+    self.momentum_bias = constant
+    self.momentum_correlation = gradient
+
+
   def add_hit(self, hit) :
+    if self.momentum_bias is not None :
+      p = hit.get_p()
+      correction = 1.0 + (self.momentum_bias + self.momentum_correlation*p) / p
+      hit.set_px(hit.get_px()*correction)
+      hit.set_py(hit.get_py()*correction)
+      hit.set_pz(hit.get_pz()*correction)
+
     self.covariance.add_hit(hit)
 
     self.position_plot.Fill(hit.get_x(), hit.get_y())

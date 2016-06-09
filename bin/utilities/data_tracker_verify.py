@@ -117,15 +117,15 @@ def init_plots_data() :
                  "Downstream Chi Squared per Degree of Freedom Distribution", \
                                                              5000, 0.0, 100.0 )
     shape_plots['p_value'] = ROOT.TH1F( shape+'_tracks_p_value', \
-                                       "P-Value Distribution", 1000, 0.0, 1.0 )
+                                        "P-Value Distribution", 200, 0.0, 1.0 )
     shape_plots['ndf'] = ROOT.TH1F( shape+'_tracks_ndf', \
                      "Number Degrees of Freedom Distribution", 21, -0.5, 20.5 )
     shape_plots['p_value_up'] = ROOT.TH1F( shape+'_tracks_p_value_up', \
-                              "Upstream P-Value Distribution", 1000, 0.0, 1.0 )
+                               "Upstream P-Value Distribution", 200, 0.0, 1.0 )
     shape_plots['ndf_up'] = ROOT.TH1F( shape+'_tracks_ndf_up', \
             "Upstream Number Degrees of Freedom Distribution", 21, -0.5, 20.5 )
     shape_plots['p_value_down'] = ROOT.TH1F( shape+'_tracks_p_value_down', \
-                              "Upstream P-Value Distribution", 1000, 0.0, 1.0 )
+                               "Upstream P-Value Distribution", 200, 0.0, 1.0 )
     shape_plots['ndf_down'] = ROOT.TH1F( shape+'_tracks_ndf_down', \
             "Upstream Number Degrees of Freedom Distribution", 21, -0.5, 20.5 )
 
@@ -318,6 +318,9 @@ def init_plots_data() :
                                              250, 0.0, 250.0, 256, 0.0, 256.0 )
         plane_plots[dir_name]['pull'] = ROOT.TH1F(\
                     dir_name+'_plane_pull', "Kalman Pulls. Plane: "+dir_name, \
+                                                           201, -10.05, 10.05 )
+        plane_plots[dir_name]['s_residual'] = ROOT.TH1F(\
+               dir_name+'_s_residual', "Smoothed Residual. Plane: "+dir_name, \
                                                            201, -10.05, 10.05 )
 
   plot_dict['track_plots'] = track_plots
@@ -717,13 +720,16 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
                                               ( -1.0 if tracker == 0 else 1.0 )
       reco_plots['plane_hits'].Fill( plane_id )
 
-      pull = tp.pull()
-      residual = tp.residual()
-      s_residual = tp.smoothed_residual()
+      if tp.has_data() :
+        pull = tp.pull()
+        residual = tp.residual()
+        s_residual = tp.smoothed_residual()
+        shape_plots['plane_pulls'].Fill( plane_id, pull )
+        shape_plots['plane_residuals'].Fill( plane_id, residual )
+        shape_plots['plane_s_residuals'].Fill( plane_id, s_residual )
 
-      shape_plots['plane_pulls'].Fill( plane_id, pull )
-      shape_plots['plane_residuals'].Fill( plane_id, residual )
-      shape_plots['plane_s_residuals'].Fill( plane_id, s_residual )
+        plane_plots[dir_name]['pull'].Fill( pull )
+        plane_plots[dir_name]['s_residual'].Fill( s_residual )
 
       pos = tp.pos()
       mom = tp.mom()
@@ -734,7 +740,6 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
       plane_plots[dir_name]['mxmy'].Fill( mom.x() / mom.z(), mom.y() / mom.z() )
       plane_plots[dir_name]['xmx'].Fill( pos.x(), mom.x() / mom.z() )
       plane_plots[dir_name]['ymy'].Fill( pos.y(), mom.y() / mom.z() )
-      plane_plots[dir_name]['pull'].Fill( tp.pull() )
 
       if station == REFERENCE_STATION and plane == REFERENCE_PLANE :
         prefix = ""

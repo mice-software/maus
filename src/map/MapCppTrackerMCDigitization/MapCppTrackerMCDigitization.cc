@@ -44,8 +44,9 @@ void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocumen
   modules = mice_modules->findModulesByPropertyString("SensitiveDetector", "SciFi");
   Json::Value *json = Globals::GetConfigurationCards();
   // Load constants.
-  _disc_sim_on = (*json)["SciFi_DiscOn"].asInt();
-  _SciFiDisCut  = (*json)["SciFiDisCut"].asDouble();
+//  _disc_sim_on = (*json)["SciFi_DiscOn"].asInt();
+//  _SciFiDisCut  = (*json)["SciFiDisCut"].asDouble();
+  _SciFiCalibrateMC = (*json)["SciFiCalibrateMC"].asBool();
   _SciFiadcBits = (*json)["SciFiadcBits"].asDouble();
   _SciFivlpcRes = (*json)["SciFivlpcRes"].asDouble();
   _SciFiNPECut        = (*json)["SciFiNoiseNPECut"].asDouble();
@@ -110,13 +111,15 @@ void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
       add_noise(mc_evt->GetSciFiNoiseHits(), digits);
     }
     // Smearing NPE results from ADC resolution
-    for (size_t digit_j = 0; digit_j < digits.size(); digit_j++) {
-      digits.at(digit_j)->set_npe(compute_adc_counts(digits.at(digit_j)));
+    if ( _SciFiCalibrateMC ) {
+      for (size_t digit_j = 0; digit_j < digits.size(); digit_j++) {
+        digits.at(digit_j)->set_npe(compute_adc_counts(digits.at(digit_j)));
+      }
     }
 	  // For running with discriminators only
-    if (_disc_sim_on == 1) {
-  	  discriminator(digits);
-    }
+//    if (_disc_sim_on == 1) {
+//  	  discriminator(digits);
+//    }
     // Make a SciFiEvent to hold the digits produced
     SciFiEvent *sf_evt = new SciFiEvent();
     sf_evt->set_digits(digits);
@@ -133,26 +136,26 @@ void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
   }
 }
 
-void MapCppTrackerMCDigitization::discriminator(SciFiDigitPArray &digits) const {
-  std::vector<int> cut_pos;
-  for (unsigned int i = 0; i < digits.size(); i++) {
-    if (_SciFiDisCut < digits.at(i)->get_npe()) {
-	  // std::cerr << "Good Point: " << digits.at(i)->get_npe() << "\n";
-	  digits.at(i)->set_npe(10.0);
-	} else {
-	  // std::cerr << "Bad Point: " << digits.at(i)->get_npe() << "\n";
-    std::cerr << "This shouldn't run.\n";
-	  digits.at(i)->set_npe(-10.0);
-	  cut_pos.push_back(i);
-	}
-  }
-  for (unsigned int j = 0; j < cut_pos.size(); j++) {
-    int pos_j = cut_pos.size() - j - 1;
-	// std::cerr<< pos_j << " of " << cut_pos.size() << "\n";
-	int k = cut_pos.at(pos_j);
-    digits.erase(digits.begin()+k);
-  }
-}
+// void MapCppTrackerMCDigitization::discriminator(SciFiDigitPArray &digits) const {
+//   std::vector<int> cut_pos;
+//   for (unsigned int i = 0; i < digits.size(); i++) {
+//     if (_SciFiDisCut < digits.at(i)->get_npe()) {
+// 	  // std::cerr << "Good Point: " << digits.at(i)->get_npe() << "\n";
+// 	  digits.at(i)->set_npe(10.0);
+// 	} else {
+// 	  // std::cerr << "Bad Point: " << digits.at(i)->get_npe() << "\n";
+//     std::cerr << "This shouldn't run.\n";
+// 	  digits.at(i)->set_npe(-10.0);
+// 	  cut_pos.push_back(i);
+// 	}
+//   }
+//   for (unsigned int j = 0; j < cut_pos.size(); j++) {
+//     int pos_j = cut_pos.size() - j - 1;
+// 	// std::cerr<< pos_j << " of " << cut_pos.size() << "\n";
+// 	int k = cut_pos.at(pos_j);
+//     digits.erase(digits.begin()+k);
+//   }
+// }
 
 void MapCppTrackerMCDigitization::construct_digits(SciFiHitArray *hits, int spill_num,
                                                    int event_num, SciFiDigitPArray &digits) const {
