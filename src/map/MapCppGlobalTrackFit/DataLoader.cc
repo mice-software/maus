@@ -52,7 +52,6 @@ void DataLoader::load_event(ReconEvent& event) {
 }
 
 void DataLoader::set_kalman_track() {
-    std::cerr << "set_kalman_track" << std::endl;
     for (size_t i = 0; i < _detectors.size(); ++i) {
         if (_points.find(_detectors[i]) == _points.end())
             continue;
@@ -62,7 +61,6 @@ void DataLoader::set_kalman_track() {
             det[j]._point.SetId(tp_id);
             _fitter->GetTrack().Append(det[j]._point);
             _fitter->AddMeasurement(tp_id, det[j]._meas->Clone());
-            std::cerr << "    Append detection " << _detectors[i] << " " << tp_id << std::endl;
         }
     }
     

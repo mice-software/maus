@@ -115,7 +115,13 @@ void MapCppGlobalTrackFit::_process(Data* data) const {
       if (!event) {
         continue;
       }
-      track_fit(*event);
+      try {
+          track_fit(*event);
+      } catch (MAUS::Exception& exc) {
+          Squeak::mout(Squeak::debug) << exc.GetMessage() << " at "
+                                      << exc.GetLocation() << std::endl;
+          Squeak::mout(Squeak::debug) << exc.GetStackTrace() << std::endl;
+      }
   }
 }
 

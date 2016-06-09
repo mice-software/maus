@@ -23,10 +23,8 @@ class TestMapCppGlobalTrackFit(unittest.TestCase):
                 "will_smooth":False,
                 "mass_hypothesis":105.658,
                 "charge_hypothesis":1.,
-                "seed":"USTrackerTofSeed",
-                "detectors":["Tracker0_5", "Tracker0_4", "Tracker0_3", "Tracker0_2", "Tracker0_1",
-                             "Tracker1_1", "Tracker1_2", "Tracker1_3", "Tracker1_4", "Tracker1_5",
-                             "TOF0", "TOF1",]
+                "seed":"USTrackerTrackFitSeed",
+                "detectors":["Tracker0_5", "Tracker0_4", "Tracker0_3", "Tracker0_2", "Tracker0_1"]
             },
         ]
         config_json["verbose_level"] = 1

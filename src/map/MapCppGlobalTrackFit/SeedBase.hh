@@ -33,14 +33,13 @@ class Tof01Seed : public SeedBase {
     virtual Kalman::State GetSeed(ReconEvent* reco_event);
 };
 
-class USTrackerPRSeed : public SeedBase {
+class USTrackerTrackFitSeed : public SeedBase {
   public:
-    USTrackerPRSeed() {}
-    ~USTrackerPRSeed() {}
+    USTrackerTrackFitSeed() {}
+    ~USTrackerTrackFitSeed() {}
     virtual Kalman::State GetSeed(ReconEvent* reco_event);
 
   private:
-    void LoadPR(ReconEvent* reco_event);
 };
 
 

@@ -33,12 +33,56 @@ void SeedManager::RegisterAlgorithm(std::string name, SeedBase* algorithm) {
 void SeedManager::RegisterAll() {
     RegisterAlgorithm("USTrackerTofSeed", new USTrackerTofSeed());
     RegisterAlgorithm("Tof01Seed", new Tof01Seed());
+    RegisterAlgorithm("USTrackerTrackFitSeed", new USTrackerTrackFitSeed());
 }
 
 SeedManager::~SeedManager() {
     for (iterator it = _seed_algorithms.begin(); it != _seed_algorithms.end(); ++it) {
         delete it->second;
     }
+}
+
+Kalman::State USTrackerTrackFitSeed::GetSeed(ReconEvent* reco_event) {
+    SciFiTrackPArray sf_tracks = reco_event->GetSciFiEvent()->scifitracks();
+    for (size_t i = 0; i < sf_tracks.size(); ++i) {
+        SciFiTrack* track = sf_tracks.at(i);
+        if (track->tracker() != 0)
+            continue;
+        for (size_t j = 0; j < track->scifitrackpoints().size(); ++j) {
+            SciFiTrackPoint* sf_trackpoint = track->scifitrackpoints().at(i);
+            if (sf_trackpoint->station() != 5)
+                continue;
+            if (sf_trackpoint->plane() != 2)
+                continue;
+            double p = sf_trackpoint->mom().mag();
+            double vector_arr[] = {
+                0., // time
+                sf_trackpoint->pos().x(),
+                sf_trackpoint->pos().y(),
+                sqrt(p*p+mu_mass*mu_mass),
+                sf_trackpoint->mom().x(),
+                sf_trackpoint->mom().y(),
+            };
+            TMatrixD vector(6, 1, vector_arr);
+            double err = 1.;
+            double cov_arr[] = {
+                err, 0., 0., 0., 0., 0.,
+                0., err, 0., 0., 0., 0.,
+                0., 0., err, 0., 0., 0.,
+                0., 0., 0., err, 0., 0.,
+                0., 0., 0., 0., err, 0.,
+                0., 0., 0., 0., 0., err,
+
+            };
+            TMatrixD cov(6, 6, cov_arr);
+
+            Kalman::State seed(vector, cov);
+            return seed;
+        }
+    }
+    throw MAUS::Exception(Exception::recoverable,
+                          "Did not find track point in the right place",
+                          "USTrackerTrackFitSeed::build_seed");
 }
 
 
@@ -81,7 +125,9 @@ Kalman::State USTrackerTofSeed::GetSeed(ReconEvent* reco_event) {
     sf_data.load_event(*reco_event);
     Kalman::Track sf_track = sf_container.GetTrack();
     if (sf_track.GetLength() != 2) {
-        throw MAUS::Exception(Exception::recoverable, "sf_track was not of length 2", "USTrackerTofSeed::build_seed");
+        throw MAUS::Exception(Exception::recoverable,
+                              "sf_track was not of length 2",
+                              "USTrackerTofSeed::build_seed");
     }
     Kalman::State seed_state(6);
     TMatrixD sf_0 = sf_track[0].GetData().GetVector();
