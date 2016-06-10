@@ -493,7 +493,7 @@ void MapCppEMRRecon::match_daughters(MAUS::Spill* spill,
 
       double mxi = evtTrackM->GetEMRTrack().GetParametersX()[1];
       double myi = evtTrackM->GetEMRTrack().GetParametersY()[1];
-      int bw = mxi*(maxP.x()-vertex.x())-myi*(maxP.y()-vertex.y())+(maxP.z()-vertex.z()) < 0;
+      int bw = mxi*(maxP.x()-vertex.x())+myi*(maxP.y()-vertex.y())+(maxP.z()-vertex.z()) < 0;
 
       // Define the gradient vector of the decay particle and rotate it to bring it into
       // the mother reference frame. A backward decay has a negative z increment
