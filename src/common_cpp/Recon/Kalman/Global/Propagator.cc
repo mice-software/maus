@@ -14,8 +14,10 @@ Propagator::~Propagator() {
 
 void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
     double x[29];
-    std::cerr << "Global::Propagator::Propagate _mass:" << _mass << std::endl;
-    //std::cerr << "Global::Propagator::Propagate start:\n" << start_tp << std::endl;
+    Squeak::mout(Squeak::debug) << "Global::Propagator::Propagate start:\n"
+                                << start_tp << std::endl;
+    Squeak::mout(Squeak::debug) << "Global::Propagator::Propagate _mass:"
+                                << _mass << std::endl;
 
     TMatrixD vec = start_tp.GetPredicted().GetVector();
     TMatrixD cov = start_tp.GetPredicted().GetCovariance();
@@ -40,12 +42,13 @@ void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
     }
 
     double target_z = end_tp.GetPosition();
-    std::cerr << "Propagate before..." << std::endl;
-    _tracking.print(std::cerr, x);
-    std::cerr << "Propagating to " << target_z << std::endl;
+
+    Squeak::mout(Squeak::debug) << "Propagate before..." << std::endl;
+    _tracking.print(Squeak::mout(Squeak::debug), x);
+    Squeak::mout(Squeak::debug) << "Propagating to " << target_z << std::endl;
     _tracking.Propagate(x, target_z);
-    std::cerr << "Propagate after..." << std::endl;
-    _tracking.print(std::cerr, x);
+    Squeak::mout(Squeak::debug) << "Propagate after..." << std::endl;
+    _tracking.print(Squeak::mout(Squeak::debug), x);
 
     for (size_t i = 0; i < 3; ++i) {
         vec[i][0] = x[i]; // t, x, y
@@ -62,7 +65,7 @@ void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
     }
     end_tp.GetPredicted().SetVector(vec);
     end_tp.GetPredicted().SetCovariance(cov);
-    //std::cerr << "Global::Propagator::Propagate end:\n" << end_tp << std::endl;
+    Squeak::mout(Squeak::debug) << "Global::Propagator::Propagate end:\n" << end_tp << std::endl;
 }
 
 TMatrixD Propagator::CalculatePropagator(const TrackPoint& start_tp, const TrackPoint& end_tp) {

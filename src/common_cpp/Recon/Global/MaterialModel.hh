@@ -30,6 +30,7 @@ class MaterialModel {
     static bool IsEnabledMaterial(std::string material_name);
     static void EnableMaterial(std::string material_name);
     static void DisableMaterial(std::string material_name);
+    static void DisableAllMaterials();
 
   private:
     // _material is a borrowed reference; data is owned by G4MaterialTable

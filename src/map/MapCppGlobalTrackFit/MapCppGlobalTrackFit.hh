@@ -32,6 +32,7 @@
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 #include "src/common_cpp/API/MapBase.hh"
+#include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
 namespace MAUS {
 
@@ -84,6 +85,8 @@ class MapCppGlobalTrackFit : public MapBase<Data> {
   SeedManager _seed_manager;
 
   static double c_light;
+  MAUS::Kalman::Global::ErrorTracking::MCSModel _scat_model = MAUS::Kalman::Global::ErrorTracking::moliere_forwards;
+  MAUS::Kalman::Global::ErrorTracking::ELossModel _eloss_model = MAUS::Kalman::Global::ErrorTracking::bethe_bloch_forwards;
 
   class FitInfo {
     public:

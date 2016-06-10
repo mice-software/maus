@@ -237,12 +237,15 @@ void MapCppTrackerRecon::_process(Data* data) const {
         // Build SpacePoints.
         event->clear_spacepoints();
         if (event->clusters().size()) {
+          std::cerr << "MapCppTrackerRecon::_process 10 ... "   << k << std::endl;
           _spacepoint_recon.process(*event);
           set_spacepoint_global_output(event->spacepoints());
+          std::cerr << "   ... sp size " << event->spacepoints().size() << std::endl;
         }
       }
       // Pattern Recognition.
       if (_patrec_on && event->spacepoints().size()) {
+          std::cerr << "MapCppTrackerRecon::_process 11 ... "   << k << std::endl;
         event->clear_seeds();
         event->clear_stracks();
         event->clear_htracks();
@@ -250,11 +253,15 @@ void MapCppTrackerRecon::_process(Data* data) const {
         set_straight_prtrack_global_output(event->straightprtracks());
         extrapolate_helical_reference(*event);
         extrapolate_straight_reference(*event);
+        std::cerr << "   ... straight pr size " << event->straightprtracks().size() << std::endl;
+        std::cerr << "   ... helical pr size  " << event->helicalprtracks().size() << std::endl;
       }
       // Kalman Track Fit.
       if (_kalman_on) {
+        std::cerr << "MapCppTrackerRecon::_process 12 ... "   << k << std::endl;
         event->clear_scifitracks();
         track_fit(*event);
+         std::cerr << "   ... kalman size  " << event->scifitracks().size() << std::endl;
       }
 //      print_event_info(*event);
     }

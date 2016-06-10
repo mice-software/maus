@@ -88,15 +88,19 @@ class TestAnalysis(object):
                 print "spill", spill_number
                 for ev_number, reco_event in enumerate(spill.GetReconEvents()):
                     scifi_event = reco_event.GetSciFiEvent()
+                    global_event = reco_event.GetGlobalEvent()
                     sf_hit = self.load_scifi_event(scifi_event)
+                    glob_hit = self.load_global_event(global_event)
                     mc_event = spill.GetMCEvents()[ev_number]
                     vhit = self.load_virtual_hits(mc_event)
-                    if sf_hit == None or vhit == None:
-                        print "    Failed for spill", spill_number, "event", ev_number, "sf ok?", sf_hit != None, "vhit ok?", vhit != None
+                    if sf_hit == None or vhit == None or glob_hit == None:
+                        print "    Failed for spill", spill_number, "event", ev_number, "sf ok?", sf_hit != None, "glob ok?", glob_hit != None, "vhit ok?", vhit != None
                         continue
-                    residual = [(key, sf_hit[key] - vhit[key]) for key in vhit.keys()]
-                    residual = dict(residual)
-                    self.events.append({"virtual_hit":vhit, "sf_hit":sf_hit, "residual":residual})
+                    sf_residual = [(key, sf_hit[key] - vhit[key]) for key in vhit.keys()]
+                    sf_residual = dict(sf_residual)
+                    glob_residual = [(key, glob_hit[key] - vhit[key]) for key in vhit.keys()]
+                    glob_residual = dict(glob_residual)
+                    self.events.append({"virtual_hit":vhit, "sf_hit":sf_hit, "sf_residual":sf_residual, "glob_residual":glob_residual})
                     if self.verbose or (spill_number == 0 and ev_number == 0):
                         print "virtual hit",
                         for key in sorted(vhit.keys()):
@@ -104,48 +108,45 @@ class TestAnalysis(object):
                         print "\nscifi hit",
                         for key in sorted(sf_hit.keys()):
                             print key, str(round(sf_hit[key], 4)).rjust(8),
-                        print "\nresidual hit",
-                        for key in sorted(residual.keys()):
-                            print key, str(round(residual[key], 4)).rjust(8),
+                        print "\nscifi residual hit",
+                        for key in sorted(sf_residual.keys()):
+                            print key, str(round(sf_residual[key], 4)).rjust(8),
+                        print "\nglobal residual hit",
+                        for key in sorted(glob_residual.keys()):
+                            print key, str(round(glob_residual[key], 4)).rjust(8),
                         print
 
     def load_global_event(self, global_event):
         z_list = []
-        for i, track in enumerate(global_event.get_tracks()):
-            for j, track_point in enumerate(track.GetTrackPoints()):
-                pos = track_point.pos()
-                z_list.append([abs(pos.z()-self.target_z), track_point])
-                if self.verbose:
-                    print "sf hit", pos.x(), pos.y(), pos.z()
+        for i, track_point in enumerate(global_event.get_track_points()):
+            if self.verbose:
+                print "global track"
+            pos = track_point.get_position()
+            z_list.append([abs(pos.Z()-self.target_z), track_point])
+            if self.verbose:
+                print "global hit", pos.X(), pos.Y(), pos.Z()
         z_list = sorted(z_list)
         if len(z_list) > 0 and z_list[0][0] < 1.:
             track_point = z_list[0][1]
-            pos = track_point.pos()
-            mom = track_point.mom()
-            return {"x":pos.x(), "y":pos.y(), "z":pos.z(), "xp":mom.x()/mom.z(), "yp":mom.y()/mom.z()}
+            pos = track_point.get_position()
+            mom = track_point.get_momentum()
+            return {"x":pos.X(), "y":pos.Y(), "z":pos.Z(), "px":mom.X(), "py":mom.Y(), "pz":mom.Z()}
 
 
     def load_scifi_event(self, scifi_event):
         z_list = []
-        for i, digit in enumerate(scifi_event.digits()):
-            print "sf digit", digit.get_tracker(), digit.get_station(), digit.get_plane()
-        for i, cluster in enumerate(scifi_event.clusters()):
-            print "sf cluster", cluster.get_tracker(), cluster.get_station(), cluster.get_plane()
-        for i, spacepoint in enumerate(scifi_event.spacepoints()):
-            pos = spacepoint.get_position()
-            print "sf spacepoint hit", pos.x(), pos.y(), pos.z()
         for i, track in enumerate(scifi_event.scifitracks()):
             for j, track_point in enumerate(track.scifitrackpoints()):
                 pos = track_point.pos()
                 z_list.append([abs(pos.z()-self.target_z), track_point])
                 if self.verbose:
-                    print "sf hit", pos.x(), pos.y(), pos.z()
+                    pass #print "sf hit", pos.x(), pos.y(), pos.z()
         z_list = sorted(z_list)
         if len(z_list) > 0 and z_list[0][0] < 1.:
             track_point = z_list[0][1]
             pos = track_point.pos()
             mom = track_point.mom()
-            return {"x":pos.x(), "y":pos.y(), "z":pos.z(), "xp":mom.x()/mom.z(), "yp":mom.y()/mom.z()}
+            return {"x":pos.x(), "y":pos.y(), "z":pos.z(), "px":mom.x(), "py":mom.y(), "pz":mom.z()}
 
     def load_virtual_hits(self, mc_event):
         z_list = []
@@ -159,23 +160,32 @@ class TestAnalysis(object):
             vhit = z_list[0][1]
             pos = vhit.GetPosition()
             mom = vhit.GetMomentum()
-            return {"x":pos.x(), "y":pos.y(), "z":pos.z(), "xp":mom.x()/mom.z(), "yp":mom.y()/mom.z()}
+            return {"x":pos.x(), "y":pos.y(), "z":pos.z(), "px":mom.x(), "py":mom.y(), "pz":mom.z()}
 
 class FixedFieldGeometryTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.here = os.getcwd()
         cls.test_dir = os.path.expandvars("${MAUS_ROOT_DIR}/tests/"+\
                    "integration/test_global_track_fitting/test_tracker_fitting")
         cls.sim = os.path.join(cls.test_dir, "fixed_field_mc.py")
         cls.out = os.path.expandvars("${MAUS_TMP_DIR}/tmp/test_fixed_field_geometry.root")
+        cls.log = os.path.expandvars("${MAUS_TMP_DIR}/tmp/test_fixed_field_geometry.log")
+        os.chdir(cls.test_dir)
+
+    def tearDownClass(cls):
+        os.chdir(here)
 
     def generate_dataset(self):
-        config = os.path.join(self.test_dir, "fixed_field_config.py")
-        geometry = os.path.join(self.test_dir, "fixed_field_geometry.dat")
+        log = open(self.log, "w")
+        config = os.path.join("fixed_field_config.py")
+        geometry = os.path.join("geometry_07469/ParentGeometryFile.dat")
         proc = subprocess.Popen(["python", self.sim,
                                     "--configuration_file", config,
                                     "--simulation_geometry_filename", geometry,
-                                    "--output_root_file_name", self.out])
+                                    "--output_root_file_name", self.out],
+                      #stdout=log, stderr = subprocess.STDOUT
+                )
         proc.wait()
         
 
@@ -184,17 +194,18 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
         print "Generating data"
         self.generate_dataset()
         print "Generated data"
+        analysis = TestAnalysis(self.out, 15062.)
+        analysis.plot_1d("sf_residual", "x")
+        analysis.plot_1d("sf_residual", "y")
+        analysis.plot_1d("sf_residual", "px")
+        analysis.plot_1d("sf_residual", "py")
+        analysis.plot_1d("sf_residual", "pz")
+        analysis.plot_1d("glob_residual", "x")
+        analysis.plot_1d("glob_residual", "y")
+        analysis.plot_1d("glob_residual", "px")
+        analysis.plot_1d("glob_residual", "py")
+        analysis.plot_1d("glob_residual", "pz")
         raw_input()
-        analysis = TestAnalysis(self.out, -550.)
-        analysis.plot_1d("residual", "x")
-        analysis.plot_1d("residual", "y")
-        analysis.plot_1d("residual", "xp")
-        analysis.plot_1d("residual", "yp")
-        analysis.plot_2d("virtual_hit", "x", "residual", "x")
-        analysis.plot_2d("virtual_hit", "y", "residual", "y")
-        analysis.plot_2d("virtual_hit", "xp", "residual", "xp")
-        analysis.plot_2d("virtual_hit", "yp", "residual", "yp")
-
 
 if __name__ == "__main__":
     unittest.main()

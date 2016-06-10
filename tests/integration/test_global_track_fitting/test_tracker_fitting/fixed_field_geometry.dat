@@ -44,7 +44,7 @@ Configuration Step_3pi_2_alt
     PropertyDouble Length       5. m
     PropertyDouble FieldRadius  1. m
     PropertyHep3Vector ConstantField 0.0 0.0 4.0 T // this is for FieldType CylindricalField
-    PropertyHep3Vector MagneticField 0.0 0.0 -4.0 T // this is for tracker?, not for field generation
+    //PropertyHep3Vector MagneticField 0.0 0.0 -4.0 T // this is for tracker?, not for field generation
     PropertyString Material Galactic
     PropertyBool Invisible 1
     PropertyInt KalmanSolenoid 1

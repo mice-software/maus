@@ -232,7 +232,6 @@ DataLoader::Detection::Detection(Kalman::Measurement_base* meas, Kalman::TrackPo
 }
 
 void DataLoader::AddDetection(Kalman::Measurement_base* meas, Kalman::TrackPoint point, DetectorPoint det) {
-    std::cerr << "Detection " << det << std::endl;
     Detection detection(meas, point);
     if (_points.find(det) == _points.end()) {
         _points[det] = std::vector<Detection>(1, detection);

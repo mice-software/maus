@@ -49,11 +49,12 @@ Kalman::State USTrackerTrackFitSeed::GetSeed(ReconEvent* reco_event) {
         if (track->tracker() != 0)
             continue;
         for (size_t j = 0; j < track->scifitrackpoints().size(); ++j) {
-            SciFiTrackPoint* sf_trackpoint = track->scifitrackpoints().at(i);
+            SciFiTrackPoint* sf_trackpoint = track->scifitrackpoints().at(j);
             if (sf_trackpoint->station() != 5)
                 continue;
             if (sf_trackpoint->plane() != 2)
                 continue;
+            
             double p = sf_trackpoint->mom().mag();
             double vector_arr[] = {
                 0., // time

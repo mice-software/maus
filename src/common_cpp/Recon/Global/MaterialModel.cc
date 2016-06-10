@@ -2,6 +2,7 @@
 #include "Geant4/G4Material.hh"
 
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+#include "src/legacy/Interface/Squeak.hh"
 
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
 
@@ -43,13 +44,13 @@ void MaterialModel::SetMaterial(double x, double y, double z) {
     _navigator = Globals::GetMCGeometryNavigator();
     _navigator->SetPoint(ThreeVector(x, y, z));
     if (IsEnabledMaterial(_navigator->GetMaterial()->GetName())) {
-        std::cout << "MaterialModel::SetMaterial Setting "
+        Squeak::mout(Squeak::debug) << "MaterialModel::SetMaterial Setting "
                   << _navigator->GetMaterial()->GetName()
                   << " as it is enabled at position "
                   << "x " << x << " y " << y << " z " << z << std::endl;
         MaterialModel::SetMaterial(_navigator->GetMaterial());
     } else {
-        std::cout << "MaterialModel::SetMaterial Ignoring "
+        Squeak::mout(Squeak::debug) << "MaterialModel::SetMaterial Ignoring "
                   << _navigator->GetMaterial()->GetName()
                   << " as it is disabled at position "
                   << "x " << x << " y " << y << " z " << z << std::endl;
@@ -134,6 +135,10 @@ bool MaterialModel::IsEnabledMaterial(std::string material_name) {
 
 void MaterialModel::EnableMaterial(std::string material_name) {
     _enabled_materials.insert(material_name);
+}
+
+void MaterialModel::DisableAllMaterials() {
+    _enabled_materials = std::set<std::string>();
 }
 
 void MaterialModel::DisableMaterial(std::string material_name) {

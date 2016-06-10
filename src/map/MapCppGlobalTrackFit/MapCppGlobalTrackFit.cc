@@ -36,7 +36,11 @@
 // TODO: 
 // * -Error propagation through fields-
 // * -Integrate into Kalman fitter-
-// * Add materials - -MCS-; -dE/dx-; energy straggling
+// * Material processes:
+// ** -MCS-; may want integration test
+// ** -dE/dx-; may want to add density effect
+// ** energy straggling
+// ** set from datacards
 // * TrackPoint errors should be a matrix
 // * -Fix muon assumption-
 // * -Fix positive charge assumption-
@@ -57,6 +61,9 @@
 // * -Enable/disable material name/conversion logic-
 // * -Seed from TOF01-; seed from tracker; -seed from TOF+tracker-
 // * Enable/disable volume names
+// * General profile/optimisation
+// * Non-unity determinant
+// * Electric fields
 
 std::ostream& operator <<(std::ostream& out, MAUS::Kalman::State const& state) {
     std::string state_str = MAUS::Kalman::print_state(state);
@@ -95,6 +102,28 @@ void MapCppGlobalTrackFit::_birth(const std::string& config_str) {
   for (size_t i = 0; i < track_fits.size(); ++i) {
       _fit_info.push_back(FitInfo(track_fits[int(i)], _seed_manager));
   }
+
+  MaterialModel::DisableAllMaterials();
+  Json::Value materials = JsonWrapper::GetProperty(
+                              config,
+                              "global_track_fit_materials",
+                              JsonWrapper::arrayValue);
+  for (size_t i = 0; i < materials.size(); ++i) {
+      std::string a_material = JsonWrapper::GetItem(
+                                materials,
+                                i,
+                                JsonWrapper::stringValue).asString();
+      MaterialModel::EnableMaterial(a_material);
+  }
+
+  for (size_t i = 0; i < materials.size(); ++i) {
+      std::string a_material = JsonWrapper::GetItem(
+                                materials,
+                                i,
+                                JsonWrapper::stringValue).asString();
+      MaterialModel::EnableMaterial(a_material);
+  }
+
 }
 
 
@@ -118,7 +147,7 @@ void MapCppGlobalTrackFit::_process(Data* data) const {
       try {
           track_fit(*event);
       } catch (MAUS::Exception& exc) {
-          Squeak::mout(Squeak::debug) << exc.GetMessage() << " at "
+          Squeak::mout(Squeak::info) << exc.GetMessage() << " at "
                                       << exc.GetLocation() << std::endl;
           Squeak::mout(Squeak::debug) << exc.GetStackTrace() << std::endl;
       }
@@ -150,9 +179,10 @@ void MapCppGlobalTrackFit::append_to_data(GlobalEvent& event, Kalman::Track fit,
         point->set_position(pos);
         point->set_momentum(mom);
         track->AddTrackPoint(point);
+        event.add_track_point(point);
     }
     track->SortTrackPointsByZ();
-    event.add_track_recursive(track);
+    event.add_track(track);
 }
 
 void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
@@ -163,9 +193,11 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
         Kalman::Global::Propagator* propagator = new Kalman::Global::Propagator();
         propagator->SetField(Globals::GetMCFieldConstructor());
         propagator->SetMass(info.mass_hypothesis);
-        //propagator->SetCharge(fit_info.charge_hypothesis); // BUG
         propagator->GetTracking()->SetMinStepSize(info.min_step);
         propagator->GetTracking()->SetMaxStepSize(info.max_step);
+        propagator->GetTracking()->SetCharge(info.charge_hypothesis);
+        propagator->GetTracking()->SetMCSModel(_scat_model);
+        propagator->GetTracking()->SetEnergyLossModel(_eloss_model);
         propagator->GetTracking()->SetCharge(info.charge_hypothesis);
 
         Kalman::TrackFit kalman_fit(propagator);
@@ -173,7 +205,7 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
         data.SetWillRequireTrackerTriplets(info.will_require_triplet_space_points);
         // will_require_triplet_space_points // BUG
         data.load_event(event);
-        
+
         Kalman::State seed_state = info.seed_algorithm->GetSeed(&event);
         kalman_fit.SetSeed(seed_state);
 
