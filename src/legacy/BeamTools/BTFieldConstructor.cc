@@ -305,8 +305,10 @@ BTField * BTFieldConstructor::GetRFCavity(const MiceModule * theModule)
 	}
 	if(newPillBox==NULL)
 		throw(MAUS::Exception(MAUS::Exception::recoverable, "Unrecognised CavityMode", "BTFieldConstructor::GetRFCavity" ));
-	if(theModule->propertyExistsThis("ReferenceParticlePhase", "double"))
+	if (theModule->propertyExistsThis("ReferenceParticlePhase", "double"))
 		newPillBox->SetRefParticlePhase(theModule->propertyDoubleThis("ReferenceParticlePhase"));
+  if (theModule->propertyExistsThis("FieldRadius", "double"))
+		newPillBox->SetCavityRadius(theModule->propertyDoubleThis("FieldRadius"));
 	return newPillBox;
 }
 
