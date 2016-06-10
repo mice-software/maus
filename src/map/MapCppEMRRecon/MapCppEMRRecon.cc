@@ -390,7 +390,7 @@ void MapCppEMRRecon::reconstruct_tracks(MAUS::Spill* spill,
 
     // Estimate the momentum of the mothers from the CSDA range (default=muon)
     if ( iPe < nPartEvents ) {
-      // Correct the range to account for the holes and gaps (TODO better)
+      // Correct the range to account for the holes and gaps
       int lPlane = track.GetEMRTrackPointArray().back().GetChannel()/_number_of_bars;
       xRange -= lPlane*_geoMap.Gap();
       xRange *= (1-_hole_fraction);
@@ -422,9 +422,6 @@ void MapCppEMRRecon::match_daughters(MAUS::Spill* spill,
 	continue;
     if ( !evtTrackM->GetEMRTrack().GetEMRTrackPointArraySize() )
 	continue;
-
-//    std::cerr << std::endl;
-//    std::cerr << "Mother in the EMR" << std::endl;
 
     double aTime = evtTrackM->GetEMRSpacePointArray().front()->GetTime();
     EMRTrack aTrack = evtTrackM->GetEMRTrack();
@@ -463,96 +460,56 @@ void MapCppEMRRecon::match_daughters(MAUS::Spill* spill,
       }
     }
 
-    // If a daughter is found, deep copy the candidate into the EMREvent
+    // If a daughter is found close enough, deep copy the candidate into the EMREvent
+    // as a daughter and set the relevant EMREvent level parameters
     if ( xDist < _max_distance ) {
-//      std::cerr << "Decay found" << std::endl;
-//      std::cerr << "xPe: " << xPe << std::endl;
-//      std::cerr << "xTime: " << xTime << " ns" << std::endl;
-//      std::cerr << "xDist: " << xDist << " mm" << std::endl;
 
+      // Deep copy, set the type as "daughter" and store
       EMREventTrack* evtTrackX = spill->GetEMRSpillData()->GetEMREventTrackArray()[xPe];
-      EMREventTrack* evtTrackD = new EMREventTrack;
-
-      // Deep copy all the plane hits
-      for (size_t i = 0; i < evtTrackX->GetEMRPlaneHitArraySize(); i++) {
-	EMRPlaneHit* planeHit = new EMRPlaneHit;
-        planeHit->SetEMRBarHitArray(evtTrackX->GetEMRPlaneHitArray()[i]->GetEMRBarHitArray());
-        planeHit->SetPlane(evtTrackX->GetEMRPlaneHitArray()[i]->GetPlane());
-        planeHit->SetOrientation(evtTrackX->GetEMRPlaneHitArray()[i]->GetOrientation());
-        planeHit->SetTime(evtTrackX->GetEMRPlaneHitArray()[i]->GetTime());
-        planeHit->SetDeltaT(evtTrackX->GetEMRPlaneHitArray()[i]->GetDeltaT());
-        planeHit->SetCharge(evtTrackX->GetEMRPlaneHitArray()[i]->GetCharge());
-        planeHit->SetPedestalArea(evtTrackX->GetEMRPlaneHitArray()[i]->GetPedestalArea());
-        planeHit->SetSampleArray(evtTrackX->GetEMRPlaneHitArray()[i]->GetSampleArray());
-	evtTrackD->AddEMRPlaneHit(planeHit);
-      }
-
-      // Deep copy all the space points
-      for (size_t i = 0; i < evtTrackX->GetEMRSpacePointArraySize(); i++) {
-	EMRSpacePoint* spacePoint = new EMRSpacePoint;
-	spacePoint->SetPosition(evtTrackX->GetEMRSpacePointArray()[i]->GetPosition());
-	spacePoint->SetGlobalPosition(evtTrackX->GetEMRSpacePointArray()[i]->GetGlobalPosition());
-	spacePoint->SetPositionErrors(evtTrackX->GetEMRSpacePointArray()[i]->GetPositionErrors());
-	spacePoint->SetChannel(evtTrackX->GetEMRSpacePointArray()[i]->GetChannel());
-	spacePoint->SetTime(evtTrackX->GetEMRSpacePointArray()[i]->GetTime());
-	spacePoint->SetDeltaT(evtTrackX->GetEMRSpacePointArray()[i]->GetDeltaT());
-	spacePoint->SetChargeMA(evtTrackX->GetEMRSpacePointArray()[i]->GetChargeMA());
-	spacePoint->SetChargeSA(evtTrackX->GetEMRSpacePointArray()[i]->GetChargeSA());
-	evtTrackD->AddEMRSpacePoint(spacePoint);
-      }
-
-      // Deep copy all the PID variables
+      EMREventTrack* evtTrackD = new EMREventTrack(*evtTrackX);
       evtTrackD->SetType("daughter");
       evtTrackD->SetTrackId(0);
-      evtTrackD->SetTime(evtTrackX->GetTime());
-      evtTrackD->SetPlaneDensityMA(evtTrackX->GetPlaneDensityMA());
-      evtTrackD->SetPlaneDensitySA(evtTrackX->GetPlaneDensitySA());
-      evtTrackD->SetTotalChargeMA(evtTrackX->GetTotalChargeMA());
-      evtTrackD->SetTotalChargeSA(evtTrackX->GetTotalChargeSA());
-      evtTrackD->SetChargeRatioMA(evtTrackX->GetChargeRatioMA());
-      evtTrackD->SetChargeRatioSA(evtTrackX->GetChargeRatioSA());
-
-      // Reconstruct the Michel electron/positron momentum (TODO beam polarity)
-      EMRTrack track = evtTrackX->GetEMRTrack();
-      double xMomentum = TrackMomentum::csda_momentum(track.GetRange(), "electron");
-      double xMomentumError = TrackMomentum::csda_momentum_error(track.GetRange(),
-						  		 track.GetRangeError(),
-						   		 "electron");
-      track.SetMomentum(xMomentum);
-      track.SetMomentumError(xMomentumError);
-      evtTrackD->SetEMRTrack(track);
-
       evt->AddEMREventTrack(evtTrackD);
-    } else {
-//      std::cerr << "NO DECAY FOUND" << std::endl;
-//      std::cerr << "Closest candidate" << std::endl;
-//      std::cerr << "xPe: " << xPe << std::endl;
-//      std::cerr << "xTime: " << xTime << " ns" << std::endl;
-//      std::cerr << "xDist: " << xDist << " mm" << std::endl;
-    }
 
-    // If a daughter is found, set the EMREvent parameters
-    // TODO When the daughter track recon is improved, improve vertex recon
-    if ( evt->GetDaughterPtr() ) {
-      EMREventTrack* evtTrackD = evt->GetDaughterPtr();
-      evt->SetVertex(evtTrackD->GetEMRTrack().GetEMRTrackPointArray().back().GetGlobalPosition());
-      evt->SetVertexErrors(ThreeVector(0., 0., 0.));
-      evt->SetDeltaT(evtTrackD->GetTime()-evtTrackM->GetTime());
+      // Set the distance and time difference between the particle tracks
+      evt->SetDistance(xDist);
+      evt->SetDeltaT(xTime);
 
-      ThreeVector e1 = evtTrackD->GetEMRTrack().GetEMRTrackPointArray().back().GetPosition();
-      ThreeVector s2 = evtTrackD->GetEMRTrack().GetEMRTrackPointArray().front().GetPosition();
-      ThreeVector e2 = evtTrackD->GetEMRTrack().GetEMRTrackPointArray().back().GetPosition();
-      evt->SetDistance(std::min(dist(e1, s2), dist(e1, s2)));
+      // Set the vertex as the end point of the mother
+      ThreeVector vertex = aTrack.GetEMRTrackPointArray().back().GetPosition();
+      evt->SetVertex(vertex);
+      evt->SetVertexErrors(aTrack.GetEMRTrackPointArray().back().GetPositionErrors());
 
-      double mx1 = evtTrackM->GetEMRTrack().GetParametersX()[1];
-      double my1 = evtTrackM->GetEMRTrack().GetParametersY()[1];
-      double mx2 = evtTrackM->GetEMRTrack().GetParametersX()[1];
-      double my2 = evtTrackM->GetEMRTrack().GetParametersY()[1];
-      double mx = tan(atan(mx2)-atan(mx1));
-      double my = tan(atan(my2)-atan(my1));
+      // Reconstruct the decay angles
+      // First figure out whether we have a forward or backward decay
+      EMRTrackPointArray trackPointsD = evtTrackD->GetEMRTrack().GetEMRTrackPointArray();
+      double maxDist(0);
+      ThreeVector maxP(0., 0., 0.);
+      for (size_t iTP = 0; iTP < trackPointsD.size(); iTP++)
+	  if ( dist(vertex, trackPointsD[iTP].GetPosition()) > maxDist ) {
+	    maxDist = dist(vertex, trackPointsD[iTP].GetPosition());
+	    maxP = trackPointsD[iTP].GetPosition();
+	  }
 
-      evt->SetPolar(TrackFitter::polar(mx, my));
-      evt->SetAzimuth(TrackFitter::azimuth(mx, my));
+      double mxi = evtTrackM->GetEMRTrack().GetParametersX()[1];
+      double myi = evtTrackM->GetEMRTrack().GetParametersY()[1];
+      int bw = mxi*(maxP.x()-vertex.x())-myi*(maxP.y()-vertex.y())+(maxP.z()-vertex.z()) < 0;
+
+      // Define the gradient vector of the decay particle and rotate it to bring it into
+      // the mother reference frame. A backward decay has a negative z increment
+      double mxo = evtTrackD->GetEMRTrack().GetParametersX()[1];
+      double myo = evtTrackD->GetEMRTrack().GetParametersY()[1];
+      ThreeVector grad(mxo, myo, pow(-1, bw));
+
+      double thM = evtTrackM->GetEMRTrack().GetPolar();
+      double phiM = evtTrackM->GetEMRTrack().GetAzimuth();
+      grad.RotateY(thM);
+      grad.RotateZ(phiM);
+
+      // Set the angles of the decay
+      double thD = TrackFitter::polar(grad.x()/grad.z(), grad.y()/grad.z()); // Forward angle
+      evt->SetPolar(thD*pow(-1, bw)+bw*M_PI);
+      evt->SetAzimuth(TrackFitter::azimuth(grad.x()/grad.z(), grad.y()/grad.z()));
     }
   }
 }
