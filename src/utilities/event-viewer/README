@@ -1,0 +1,67 @@
+MICE off-line Event Viewer comes in two flavours: EVSimpleExporter (command line application) and EventViewer (GUI application). They share many features but also have specific functionalities
+
+
+EVSimpleExporter is a command line mode for MICE Event Viewer. It is designed to export events from selected spills to heprep format files which can then be viewed using HepRApp java app. HepRApp can display detector geometry along with MICE data and features multiple views.
+
+Event selection is available in EVSimpleExporter by passing proper command line arguments. 
+For usage and full set of options type ./EVSimpleExporter -h.
+
+Dependencies
+------------
+MAUS
+Qt
+Java runtime (for the HepRApp viewer)
+
+You have two build options:
+
+Auto Build
+----------
+  - Make sure MAUS is installed and the environment has been sourced.
+  - Navigate to src/utilities/event-viewer
+  - Type: 
+
+    bash build.sh
+
+Manual Build
+------------
+  - Make sure MAUS is installed and the environment has been sourced.
+  - Download the HepRepXMLWriter by running 'bash third_party/bash/82heprep.bash' (also pulls down the HepRApp viewer).
+    The files are installed in third_party/install/heprep.
+  - Navigate to src/utilities/event-viewer
+
+  EVExporter:
+  - To build EVSimpleExporter type: 
+  
+    make -f EVExporter-Makefile 
+ 
+  - To clean the EVExporter build type: 
+
+    make -f EVExporter-Makefile clean
+
+   EventViewer:
+   EventViewer is a GUI application. It displays MICE events in two planes in detector coordinate system. Detector geometry representation is not available.
+   However, option to export and even display desired events in heprep format is supported.
+
+  - To build EventViewer type: 
+ 
+    qmake
+    make
+
+Notes
+-----
+
+ (*) To run HepRapp app you will need Java runtime environment on your computer. Suggested one is jre1.6.0_33 and it can be downloaded from:
+  http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase6-419409.html
+
+ (*) HepRApp app can be downloaded from:
+  http://www.slac.stanford.edu/~perl/HepRApp/HepRApp.jar
+
+ (*) To run HepRApp type: /Path_To_JRE/bin/java -jar /Path_To_HepRApp/HepRApp.jar
+
+ You can customize various HepRApp options editing user.properties file in your working directory. Here example user.properties is provided 
+
+ (*) For any additional information, suggestions or potential bugs please write to msavic@ipb.ac.rs
+
+
+ (*) Known bugs
+   - Successive clicking on checkbox in QT can cause buggy selection

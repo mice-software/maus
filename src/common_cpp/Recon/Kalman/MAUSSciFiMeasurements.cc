@@ -37,6 +37,21 @@ namespace MAUS {
     _alignment(2, 0) = pos.y();
   }
 
+  Kalman::State SciFiStraightMeasurements::Measure(const Kalman::State& state) {
+    TMatrixD measurement_matrix = CalculateMeasurementMatrix(state);
+    TMatrixD measurement_matrix_transpose = TMatrixD(TMatrixD::kTransposed, measurement_matrix);
+
+    TMatrixD new_vec(GetMeasurementDimension(), 1);
+    TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
+
+    new_vec = measurement_matrix * (state.GetVector() - _alignment);
+    new_cov = (measurement_matrix*state.GetCovariance()*measurement_matrix_transpose);
+
+    this->MeasurementMatrix() = measurement_matrix;
+    Kalman::State measured_state(new_vec, new_cov);
+
+    return measured_state;
+  }
 
   TMatrixD SciFiStraightMeasurements::CalculateMeasurementMatrix(const Kalman::State& state) {
     return _matrix;
@@ -62,6 +77,21 @@ namespace MAUS {
     _alignment(2, 0) = pos.y();
   }
 
+  Kalman::State SciFiHelicalMeasurements::Measure(const Kalman::State& state) {
+    TMatrixD measurement_matrix = CalculateMeasurementMatrix(state);
+    TMatrixD measurement_matrix_transpose = TMatrixD(TMatrixD::kTransposed, measurement_matrix);
+
+    TMatrixD new_vec(GetMeasurementDimension(), 1);
+    TMatrixD new_cov(GetMeasurementDimension(), GetMeasurementDimension());
+
+    new_vec = measurement_matrix * (state.GetVector() - _alignment);
+    new_cov = (measurement_matrix*state.GetCovariance()*measurement_matrix_transpose);
+
+    this->MeasurementMatrix() = measurement_matrix;
+    Kalman::State measured_state(new_vec, new_cov);
+
+    return measured_state;
+  }
 
   TMatrixD SciFiHelicalMeasurements::CalculateMeasurementMatrix(const Kalman::State& state) {
     return _matrix;
