@@ -1,0 +1,110 @@
+\chapter{Global Track Matching}
+\label{chapter:globaltrackmatching}
+
+\section{Introduction}\label{sec:tmintro}
+
+\section{Purpose}\label{sec:tmpurpose}
+
+The purpose of Track Matching is to assembly hits and tracks in the various detectors into global tracks,
+(upstream, downstream, and through-going) by determining which hits belong together and creating new tracks
+containing them. PID (see next section) can then be performed on the resulting tracks.
+
+\section{Process}\label{sec:tmprocess}
+
+Track Matching is performed in several steps. First, tracks for the upstream and downstream sections of the
+beamline are assembled by matching hits and tracks from the various other detectors to tracks produced by the
+trackers (if no tracker track exists, no matching is performed). Then, upstream and downstream tracks from the
+event are matched together.
+
+As particle masses and charges are required for propagation (see section \ref{subsec:tmrk4}), multiple tracks
+are created for the various PID hypotheses. If the tracker can produce a charge hypothesis due to the direction
+of the helical track, three tracks are created (in case of pion, muon, or electron of the corresponding charge),
+otherwise six.
+
+Note that in the default setting, the upstream and downstream tracks are only created by explicit matching if
+one of the detectors has more than one hit (or track), otherwise all it is simply assumed that the hits come from
+the same particle and tracks are assembled accordingly.
+
+\subsection{4th Order Runge-Kutta Propagation}\label{subsec:tmrk4}
+
+Matching to the various detectors (see below) is generally done using a 4th order Runge-Kutta propagation routine
+(implemented as a wrapper for the GSL RK4 Integration). A trackpoint from the outermost tracker station (most
+upstream for the upstream beamline, most downstream for the downstream beamline) provides the input which is then
+propagated backwards / forwards to the other detectors. A maximum allowed disagreement between x and y position of
+propagated vs. reconstructed hits (detector resolution plus an additional allowance for multiple scattering) is
+typically used as matching criterion (see below).
+
+Energy loss is included in the propagation and implemented as follows:
+
+After every step, the midpoint between previous and current position is calculated and the material at that point
+obtained from the geometry. This, together with PID, energy, and distance between previous and current positions
+is used to calculate energy loss (or energy gain for backwards-propagation) via the Bethe-Bloch formula. Furthermore,
+at every step, the distance to the nearest material boundary is determined, and if lower than the step size, the
+step size is reduced significantly, both to minimize inaccuracies arising from an underestimated straight-line step
+distance in materials with high stopping power (Material layers in the beamline are all relatively thin, so in such
+materials the nearest boundary will always be close) and to ensure that the material during a step is uniform.
+
+\subsection{TOF1, TOF2, KL}\label{subsec:tmtof12kl}
+
+For TOF1, TOF2, and the KL, the matching tolerance is a fixed value that can be configured for each detector in the
+datacards (see section \ref{sec:tmconfig}).
+
+\subsection{TOF0}\label{subsec:tmtof0}
+
+The beamline optics between TOF1 and TOF0 make propagation-based matching to TOF0 unfeasible (typical position and
+momentum errors in the tracker are vastly magnified once propagation has reached TOF0), so a slightly different method
+is used: First, propagation is performed to the upstream end of TOF1. Then, based on the momentum components at this
+point, the travel distance from TOF0 is estimated and used to calculate an approximate energy loss over that distance.
+By applying half of this as an energy-gain to the particle on the upstream edge of TOF1, we obtain an approximate
+(as we do not account for fringe-field effects from Q7-9) average energy for the travel between the TOFs. From this,
+we can obtain an expected $\Delta t$ between TOF0 and TOF1, which is then compared to the reconstructed $\Delta t$.
+The maximum allowed discrepancy between the two can be configured in the datacards.
+
+Note that TOF0 matching can only be performed if TOF1 matching was successful.
+
+\subsection{Cherenkov Detectors}\label{subsec:tmckovs}
+
+As the Cherenkov detectors don't have the time resolution to resolve multiple particles within a trigger window,
+Cherenkov hits are added to the track without any checks.
+
+\subsection{EMR}\label{subsec:tmemr}
+
+Matching to the EMR (specifically to the most upstream trackpoint of an EMR track) works similar to matching to TOF1,
+TOF2, and KL, but rather than using a fixed distance as a matching tolerance, the tolernace is scaled by the position
+error reported by the EMR. A scaling coefficient can be configured in the datacards.
+
+\subsection{Upstream-Downstream Matching}\label{subsec:tmusdsmatching}
+
+For Upstream-Downstream matching, a cut is imposed on the maximum and minimum average $\beta_{z}$ (where
+$\beta = \frac{v}{c}$, not the beta function) between TOF1 and TOF2. The maximum and minimum can be configured in the
+datacards.
+
+\section{Usage}\label{sec:tmusage}
+
+To use Track Matching in a MAUS module chain, simply include the mappers \texttt{MapCppGlobalReconImport} (which
+imports all locally reconstructed data into a global event) and \texttt{MapCppGlobalTrackMatching} in your mapper chain
+just after all local reconstruction mappers (or as the first mappers if you are working with data that is already unpacked).
+
+\section{Configuration}\label{sec:tmconfig}
+
+\begin{description}
+  \item[track\_matching\_pid\_hypothesis] If the PID hypotheses used for track matching should be limited to a single PID,
+      change to either one (never several) of "kEPlus", "kEMinus", "kMuPlus", "kMuMinus", "kPiPlus", "kPiMinus".
+  \item[track\_matching\_tolerances] Global Track Matching tolerances for the various subdetectors
+  \begin{description}
+    \item[TOF0t] Tolerance in ns for matching to TOF0.
+    \item[TOF1x, TOF1y, TOF2x, TOF2y, KLy] Tolerance in mm. For the KL, only the y coordinate is used, as the KL does not
+        resolve the x-position.
+    \item[EMRx, EMRy] Multiplier for the standard tolerance for the EMR which is the reconstructed error $\times \sqrt{12}$
+    \item[TOF12maxSpeed, TOF12minSpeed] Maximum and minimum average speed of the particle between TOF1 and TOF2 as a fraction
+        of $c$ in order to match an upstream and a downstream track.
+  \end{description}
+  \item[track\_matching\_energy\_loss] Whether to use energy calculations for Global Track Matching. If for a given run
+      there are no fields between TOF1 and EMR, this can be set to \texttt{False} for a slight speed-up, though the TOF0
+      tolerance would have to be increased. Safer to leave on.
+  \item[track\_matching\_no\_single\_event] Whether propagation matching (for individual detectors, this does not affect the
+      Upstream-Downstream Matching (see section \ref{subsec:tmusdsmatching}) should not be performed if each detector has no
+      more than one hit (significantly increases execution speed).
+  \item[track\_matching\_charge\_thresholds] If \texttt{track\_matching\_no\_single\_event} is activated, this will cause propagation
+      matching to still occur if one of the hits has a charge deposit below the threshold (i.e. is likely noise). \textbf{NOT CURRENTLY IMPLEMENTED}
+\end{description}

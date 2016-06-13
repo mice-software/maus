@@ -58,8 +58,12 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
         new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
     std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chain =
         globalevent._primary_chains;
-    for (size_t i = 0; i < old_primary_chain->size(); ++i)
-      _primary_chains->push_back(old_primary_chain->at(i)->Clone());
+    for (size_t i = 0; i < old_primary_chain->size(); ++i) {
+      DataStructure::Global::PrimaryChain* pchain =
+          new DataStructure::Global::PrimaryChain(*old_primary_chain->at(i));
+      _primary_chains->push_back(pchain);
+      //~ _primary_chains->push_back(old_primary_chain->at(i)->Clone());
+    }
   }
 
   if (_space_points != NULL) {
