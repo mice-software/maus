@@ -275,39 +275,26 @@ double polar(double ax, double ay) {
 
 double polar_error(double ax, double ay, double eax, double eay) {
 
-  double dthetadax(0.), dthetaday(0.);
-  if ( ax )
-      dthetadax = ax/(1.+pow(polar(ax, ay), 2))/polar(ax, ay);
-  if ( ay )
-      dthetaday = ay/(1.+pow(polar(ax, ay), 2))/polar(ax, ay);
+  if ( ax || ay )
+      return sqrt((pow(ax*eax, 2)+pow(ay*eay, 2))/((ax*ax+ay*ay)*(1+ax*ax+ay*ay)));
 
-  return sqrt(pow(dthetadax*eax, 2) + pow(dthetaday*eay, 2));
+  return 0;
 }
 
 double azimuth(double ax, double ay) {
 
-  double phi(0.);
-  if ( ax ) {
-    phi = atan(ay/ax);
-  } else if ( ay ) {
-    phi = M_PI/2;
-  }
-  if ( ax < 0 && ay >= 0 ) {
-    phi += M_PI;
-  } else if ( ax <= 0 && ay < 0 ) {
-    phi -= M_PI;
-  }
-  return phi;
+  if ( ay )
+      return (.5+(ay < 0))*M_PI - atan(ax/ay);
+
+  return (ax < 0)*M_PI;
 }
 
 double azimuth_error(double ax, double ay, double eax, double eay) {
 
-  if ( ax ) {
-    double dphidax = pow(ax*(1+pow(ay/ax, 2)), -1);
-    double dphiday = -pow(pow(ax, 2)*(1+pow(ay/ax, 2))/ay, -1);
-    return sqrt(pow(dphidax*eax, 2) + pow(dphiday*eay, 2));
-  }
-  return 0.;
+  if ( ax || ay )
+      return sqrt((pow(ay*eax, 2)+pow(ax*eay, 2))/(ax*ax+ay*ay));
+
+  return 0;
 }
 
 double pol(double x, std::vector<double> par) {
@@ -380,9 +367,6 @@ double dnpol_error(double x, double ex,
   return sqrt(error2);
 }
 
-
-TF1* fdist(0);
-
 double pol_closest(std::vector<double> par, double xp, double yp, double xmin, double xmax) {
 
   double p[par.size()+3];
@@ -392,16 +376,12 @@ double pol_closest(std::vector<double> par, double xp, double yp, double xmin, d
   p[par.size()+1] = xp;
   p[par.size()+2] = yp;
 
-  if (!fdist)
-    fdist = new TF1("fdist", fdistance, xmin, xmax, par.size()+3);
-
-  fdist->SetParameters(p);
-  double xopt = fdist->GetMinimumX(xmin, xmax, pow(10, -3));
-//   delete fdist;
+  TF1 fdist("fdist", fdistance, xmin, xmax, par.size()+3);
+  fdist.SetParameters(p);
+  double xopt = fdist.GetMinimumX(xmin, xmax, pow(10, -3));
 
   return xopt;
 }
-
 
 unsigned int factorial(unsigned int n) {
 
@@ -420,7 +400,6 @@ double fpol(double* x, double* par) {
 
   return y;
 }
-
 
 double fdistance(double *x, double *par) {
 
