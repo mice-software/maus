@@ -28,12 +28,12 @@ namespace MAUS {
 
   PyMODINIT_FUNC init_MapCppGlobalPID(void) {
     PyWrapMapBase<MAUS::MapCppGlobalPID>::PyWrapMapBaseModInit
-                                            ("MapCppGlobalPID", "", "", "", "");
+      ("MapCppGlobalPID", "", "", "", "");
   }
 
 
   MapCppGlobalPID::MapCppGlobalPID()
-     : MapBase<Data>("MapCppGlobalPID"), _configCheck(false) {
+    : MapBase<Data>("MapCppGlobalPID"), _configCheck(false) {
   }
 
   MapCppGlobalPID::~MapCppGlobalPID() {
@@ -45,28 +45,27 @@ namespace MAUS {
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
       throw MAUS::Exception(Exception::recoverable,
-	                          "Failed to parse Json configuration file",
+			    "Failed to parse Json configuration file",
                             "MapCppGlobalPID::_birth");
     }
 
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
     if (!pMAUS_ROOT_DIR) {
       throw MAUS::Exception(Exception::recoverable,
-	          std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
-            std::string("Did you try running: source env.sh?"),
-            "MapCppGlobalPID::_birth");
+			    std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
+			    std::string("Did you try running: source env.sh?"),
+			    "MapCppGlobalPID::_birth");
     }
 
 
     _hypotheses.clear();
     _pid_vars.clear();
-
+    // Get the name of the PDF file from the config file and open
     PDF_file = _configJSON["PID_PDFs_file"].asString();
-
     _histFile = new TFile(PDF_file.c_str(), "READ");
 
+    // Get variable cut values used in PID from the config file
     Json::Value pid_bounds = _configJSON["pid_bounds"];
-
     _minA = pid_bounds["minA"].asDouble();
     _maxA = pid_bounds["maxA"].asDouble();
     _XminB = pid_bounds["XminB"].asDouble();
@@ -128,6 +127,9 @@ namespace MAUS {
     _YminComI = pid_bounds["YminComI"].asDouble();
     _YmaxComI = pid_bounds["YmaxComI"].asDouble();
 
+    // Get settings from config file that determine which PID variables are
+    // used, which tracks to perform pid against, and what confidence level
+    // cut to use.
     _pid_config = _configJSON["pid_config"].asString();
     _pid_mode = _configJSON["pid_mode"].asString();
     _custom_pid_set = _configJSON["custom_pid_set"].asString();
@@ -136,21 +138,24 @@ namespace MAUS {
     _pid_beam_setting = _configJSON["pid_beam_setting"].asString();
     _pid_track_selection = _configJSON["pid_track_selection"].asString();
 
-    // vector of hypotheses
+    // vector of pid hypotheses
     if (_pid_beamline_polarity == "positive") {
-    	_hypotheses.push_back((_pid_beam_setting + "_mu_plus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_e_plus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_pi_plus"));
+      _hypotheses.push_back((_pid_beam_setting + "_mu_plus"));
+      _hypotheses.push_back((_pid_beam_setting + "_e_plus"));
+      _hypotheses.push_back((_pid_beam_setting + "_pi_plus"));
     } else if (_pid_beamline_polarity == "negative") {
-    	_hypotheses.push_back((_pid_beam_setting + "_mu_minus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_e_minus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_pi_minus"));
+      _hypotheses.push_back((_pid_beam_setting + "_mu_minus"));
+      _hypotheses.push_back((_pid_beam_setting + "_e_minus"));
+      _hypotheses.push_back((_pid_beam_setting + "_pi_minus"));
     } else {
-	    Squeak::mout(Squeak::warning) << "Invalid pid_beamline_polarity "
-				  << "set in ConfigurationDefaults, "
-				  << "MapCppGlobalPID::_birth" << std::endl;
-	  }
+      Squeak::mout(Squeak::warning) << "Invalid pid_beamline_polarity "
+				    << "set in ConfigurationDefaults, "
+				    << "MapCppGlobalPID::_birth" << std::endl;
+    }
 
+    // PIDVar selection if Step IV running is selected. Different sets of
+    // variables are used depending on whether the user selects an offline
+    // set, online set, or a custom set
     if (_pid_config == "step_4") {
       if (_pid_mode == "online") {
 	for (unsigned int i =0; i < _hypotheses.size(); ++i) {
@@ -221,6 +226,7 @@ namespace MAUS {
 							       _YminJ, _YmaxJ));
 	}
       } else if (_pid_mode == "custom") {
+	// read in space separated list of custom selection of PIDVars
 	std::istringstream ss(_custom_pid_set);
 	std::string token;
 	std::vector<std::string> input_pid_vars;
@@ -232,7 +238,8 @@ namespace MAUS {
 					<< " MapCppGlobalPID::birth" << std::endl;
 	} else {
 	  for (unsigned int i =0; i < _hypotheses.size(); ++i) {
-	    // vector of pid vars
+	    // for each member of hypotheses vector, check if custom PIDVar list
+	    // contained a given variable before adding it to vector
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
 			  "PIDVarA") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarA(_histFile,
@@ -240,60 +247,60 @@ namespace MAUS {
 								   _minA, _maxA));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarB") != input_pid_vars.end()) {
+			  "PIDVarB") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarB(_histFile,
 								   _hypotheses[i],
 								   _XminB, _XmaxB,
 								   _YminB, _YmaxB));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarC") != input_pid_vars.end()) {
+			  "PIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarC(_histFile,
 								   _hypotheses[i],
 								   _XminC, _XmaxC,
 								   _YminC, _YmaxC));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarD") != input_pid_vars.end()) {
+			  "PIDVarD") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarD(_histFile,
 								   _hypotheses[i],
 								   _minD, _maxD));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarE") != input_pid_vars.end()) {
+			  "PIDVarE") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarE(_histFile,
 								   _hypotheses[i],
 								   _minE, _maxE));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarF") != input_pid_vars.end()) {
+			  "PIDVarF") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarF(_histFile,
 								   _hypotheses[i],
 								   _XminF, _XmaxF,
 								   _YminF, _YmaxF));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarG") != input_pid_vars.end()) {
+			  "PIDVarG") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarG(_histFile,
 								   _hypotheses[i],
 								   _minG, _maxG));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarH") != input_pid_vars.end()) {
+			  "PIDVarH") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarH(_histFile,
 								   _hypotheses[i],
 								   _XminH, _XmaxH,
 								   _YminH, _YmaxH));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarI") != input_pid_vars.end()) {
+			  "PIDVarI") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarI(_histFile,
 								   _hypotheses[i],
 								   _XminI, _XmaxI,
 								   _YminI, _YmaxI));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				 "PIDVarJ") != input_pid_vars.end()) {
+			  "PIDVarJ") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_histFile,
 								   _hypotheses[i],
 								   _XminJ, _XmaxJ,
@@ -308,8 +315,11 @@ namespace MAUS {
 	}
       } else {
 	Squeak::mout(Squeak::warning) << "Invalid pid_mode, "
-				    << " MapCppGlobalPID::birth" << std::endl;
+				      << " MapCppGlobalPID::birth" << std::endl;
       }
+      // PIDVar selection if commissioning running is selected. Different sets of
+      // variables are used depending on whether the user selects an offline
+      // set, online set, or a custom set
     } else if (_pid_config == "commissioning") {
       if (_pid_mode == "online") {
 	for (unsigned int i =0; i < _hypotheses.size(); ++i) {
@@ -339,29 +349,29 @@ namespace MAUS {
 	for (unsigned int i =0; i < _hypotheses.size(); ++i) {
 	  // vector of pid vars
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_histFile,
-							       _hypotheses[i],
-							       _minComA, _maxComA));
+								  _hypotheses[i],
+								  _minComA, _maxComA));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_histFile,
-							       _hypotheses[i],
-							       _XminComB, _XmaxComB,
-							       _YminComB, _YmaxComB));
+								  _hypotheses[i],
+								  _XminComB, _XmaxComB,
+								  _YminComB, _YmaxComB));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_histFile,
-							       _hypotheses[i],
-							       _minComC, _maxComC));
+								  _hypotheses[i],
+								  _minComC, _maxComC));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_histFile,
-							       _hypotheses[i],
-							       _minComD, _maxComD));
+								  _hypotheses[i],
+								  _minComD, _maxComD));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_histFile,
-							       _hypotheses[i],
-							       _minComF, _maxComF));
+								  _hypotheses[i],
+								  _minComF, _maxComF));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_histFile,
-							       _hypotheses[i],
-							       _XminComE, _XmaxComE,
-							       _YminComE, _YmaxComE));
+								  _hypotheses[i],
+								  _XminComE, _XmaxComE,
+								  _YminComE, _YmaxComE));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_histFile,
-							       _hypotheses[i],
-							       _XminComG, _XmaxComG,
-							       _YminComG, _YmaxComG));
+								  _hypotheses[i],
+								  _XminComG, _XmaxComG,
+								  _YminComG, _YmaxComG));
 	  _pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_histFile,
 								  _hypotheses[i],
 								  _XminComH, _XmaxComH,
@@ -372,6 +382,7 @@ namespace MAUS {
 								  _YminComI, _YmaxComI));
 	}
       } else if (_pid_mode == "custom") {
+	// read in space separated list of custom selection of PIDVars
 	std::istringstream ss(_custom_pid_set);
 	std::string token;
 	std::vector<std::string> input_pid_vars;
@@ -383,61 +394,62 @@ namespace MAUS {
 					<< " MapCppGlobalPID::birth" << std::endl;
 	} else {
 	  for (unsigned int i =0; i < _hypotheses.size(); ++i) {
-	    // vector of pid vars
+	    // for each member of hypotheses vector, check if custom PIDVar list
+	    // contained a given variable before adding it to vector
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-			 "ComPIDVarA") != input_pid_vars.end()) {
+			  "ComPIDVarA") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_histFile,
 								      _hypotheses[i],
 								      _minComA, _maxComA));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarB") != input_pid_vars.end()) {
+			  "ComPIDVarB") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_histFile,
 								      _hypotheses[i],
 								      _XminComB, _XmaxComB,
 								      _YminComB, _YmaxComB));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarC") != input_pid_vars.end()) {
+			  "ComPIDVarC") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_histFile,
 								      _hypotheses[i],
 								      _minComC, _maxComC));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarD") != input_pid_vars.end()) {
+			  "ComPIDVarD") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_histFile,
 								      _hypotheses[i],
 								      _minComD, _maxComD));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarE") != input_pid_vars.end()) {
+			  "ComPIDVarE") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_histFile,
 								      _hypotheses[i],
 								      _XminComE, _XmaxComE,
 								      _YminComE, _YmaxComE));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarF") != input_pid_vars.end()) {
+			  "ComPIDVarF") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_histFile,
 								      _hypotheses[i],
 								      _minComF, _maxComF));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarG") != input_pid_vars.end()) {
+			  "ComPIDVarG") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_histFile,
 								      _hypotheses[i],
 								      _XminComG, _XmaxComG,
 								      _YminComG, _YmaxComG));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarH") != input_pid_vars.end()) {
+			  "ComPIDVarH") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_histFile,
 								      _hypotheses[i],
 								      _XminComH, _XmaxComH,
 								      _YminComH, _YmaxComH));
 	    }
 	    if (std::find(input_pid_vars.begin(), input_pid_vars.end(),
-				"ComPIDVarI") != input_pid_vars.end()) {
+			  "ComPIDVarI") != input_pid_vars.end()) {
 	      _pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_histFile,
 								      _hypotheses[i],
 								      _XminComI, _XmaxComI,
@@ -445,14 +457,14 @@ namespace MAUS {
 	    }
 	    if (_pid_vars.size() == 0) {
 	      Squeak::mout(Squeak::warning) << "No valid PID variables given in "
-					  << "custom_pid_set, "
-					  << "MapCppGlobalPID::birth" << std::endl;
+					    << "custom_pid_set, "
+					    << "MapCppGlobalPID::birth" << std::endl;
 	    }
 	  }
 	}
       } else {
 	Squeak::mout(Squeak::warning) << "Invalid pid_mode, "
-				    << " MapCppGlobalPID::birth" << std::endl;
+				      << " MapCppGlobalPID::birth" << std::endl;
       }
     } else {
       Squeak::mout(Squeak::warning) << "Invalid pid_config, "

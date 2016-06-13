@@ -2,15 +2,15 @@
 \label{chapter:globalpid}
 
 \section{Introduction}
-\label{intro}
+\label{pid_intro}
 
 The global PID framework is designed to use sets of PID variables to 1) use MC data to create PDFs of these variables for a range of particle hypotheses, and 2) to use the PDFs as part of a log-likelihood method to determine the PID of reconstructed global tracks from data. The framework is designed such that new PID variables can be added as they are developed. Section 1 of this document will explain how to use the PID to produce PDFs, and how to perform PID on spill data contained within a Json document. Section 2 will detail how these two actions are performed within the code, and in Section 3 the PID variables, their structure, how new ones can be added to the framework, and details of those already in place, will be discussed. This document will be updated as the PID framework and variables continue to be developed.
 
 \subsection{Using the PID scripts}
-\label{use}
+\label{pid_usage}
 
 \subsection{Producing PDFs}
-\label{PDFs}
+\label{pid_PDFs}
 Whilst the PID framework will eventually come with PDFs provided (for the standard MICE beam settings) in  PIDhists.root, it is possible for a user to produce PDFs for hypotheses not included within this file. Due to current MC availability, users currently need to produce their own PDFs. The following describes how this should be done.
 \begin{figure}[h!]
 \begin{center} 
@@ -83,7 +83,7 @@ pid_beamline_polarity = "positive"
 
 
 \subsubsection{Performing PID with pre-existing hypotheses}
-\label{perf}
+\label{pid_perf}
 To perform PID on data, the steps shown figure ~\ref{pidperf} should be followed.
 
 \begin{figure}[h!]
@@ -171,9 +171,9 @@ pid_track_selection = "Through"
 As the framework currently stands, the output file would now contain the global tracks with the PID set (where it has been possible to do so) to whichever particle hypothesis had the highest confidence (if it passes the confidence level cut), and the mapper name of the track will have been set to MapCppGlobalPID-<pid\_track\_selection>, e.g. if the datacard setting was pid\_track\_selection = "Through", the mapper name would be MapCppGlobalPID-Through.
 
 \section{MapCppGlobalPID and ReduceCppGlobalPID}
-\label{mapred}
+\label{pid_mapred}
 \subsection{MapCppGlobaPID}
-\label{map}
+\label{pid_map}
 The steps taken in MapCppGlobalPID for a single track are shown in 
 figure \ref{mapflow}. To express this more fully, the data, having passed through the global reconstruction, is then passed to the PID. For each track, the values of each PID variable are calculated. Each of these values is then compared to the corresponding PDFs for all particle hypotheses, the number of entries in the corresponding bin providing the probability from which the log-likelihood is calculated. For each particle hypothesis, the log-likelihoods of all of the PID variables are summed to give a log-likelihood for that hypothesis. The PID of the track is then obtained by comparing the log-likelihoods of the hypotheses.
 \begin{figure}[h!]
@@ -185,7 +185,7 @@ figure \ref{mapflow}. To express this more fully, the data, having passed throug
 \end{figure}
 
 \section{ReduceCppGlobalPID}
-\label{reducer}
+\label{pid_reducer}
 The steps taken in ReduceCppGlobalPID are shown in figure ~\ref{reduceflow}. MC data for a given particle hypothesis, having passed through the global reconstruction, is then passed to the PID. For each track, the values of each PID variable are calculated. A histogram is filled with these values. If the behaviour has been turned on in the PID variable class, then a single event is spread over all bins in the histogram, to ensure that when the PDF is used by the PID, there will no empty bins, thus avoiding cases where the log-likelihood takes the log of zero. The histogram is then normalised to create the PDF, which is then written and saved to file.
 If a MC track returns a variable value outside of the allowed range of the histogram (as defined within the variable class) then the value for that track is not included.
 \begin{figure}[h!]

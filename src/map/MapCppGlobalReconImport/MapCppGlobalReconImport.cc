@@ -27,7 +27,7 @@ namespace MAUS {
 
   PyMODINIT_FUNC init_MapCppGlobalReconImport(void) {
     PyWrapMapBase<MAUS::MapCppGlobalReconImport>::PyWrapMapBaseModInit
-                                    ("MapCppGlobalReconImport", "", "", "", "");
+      ("MapCppGlobalReconImport", "", "", "", "");
   }
 
   MapCppGlobalReconImport::MapCppGlobalReconImport()
@@ -50,9 +50,9 @@ namespace MAUS {
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
     if (!pMAUS_ROOT_DIR) {
       throw MAUS::Exception(Exception::recoverable,
-	          std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
-            std::string("Did you try running: source env.sh?"),
-            "MapCppGlobalReconImport::_birth");
+			    std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
+			    std::string("Did you try running: source env.sh?"),
+			    "MapCppGlobalReconImport::_birth");
     }
 
     _configCheck = true;
@@ -65,14 +65,14 @@ namespace MAUS {
   void MapCppGlobalReconImport::_process(MAUS::Data* data_cpp) const {
     // Read string and convert to a Json object
     if (!data_cpp) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "data_cpp was NULL",
-                              "MapCppGlobalReconImport::_process");
+      throw MAUS::Exception(Exception::recoverable,
+			    "data_cpp was NULL",
+			    "MapCppGlobalReconImport::_process");
     }
     if (!_configCheck) {
-        throw MAUS::Exception(Exception::recoverable,
-                              "Birth has not been successfully called",
-                              "MapCppGlobalReconImport::_process");
+      throw MAUS::Exception(Exception::recoverable,
+			    "Birth has not been successfully called",
+			    "MapCppGlobalReconImport::_process");
     }
 
     const MAUS::Spill* spill = data_cpp->GetSpill();
@@ -91,26 +91,31 @@ namespace MAUS {
       MAUS::ReconEvent* recon_event = (*recon_event_iter);
       if (recon_event->GetGlobalEvent()) {
 	MAUS::GlobalEvent* global_event = recon_event->GetGlobalEvent();
+	// Import TOF spacepoints into global event
 	if (recon_event->GetTOFEvent()) {
 	  MAUS::TOFEvent* tof_event = recon_event->GetTOFEvent();
 	  MAUS::recon::global::ImportTOFRecon tofrecon_importer;
 	  tofrecon_importer.process((*tof_event), global_event, _classname);
 	}
+	// Import tracker tracks into global event
 	if (recon_event->GetSciFiEvent()) {
 	  MAUS::SciFiEvent* scifi_event = recon_event->GetSciFiEvent();
 	  MAUS::recon::global::ImportSciFiRecon scifirecon_importer;
 	  scifirecon_importer.process((*scifi_event), global_event, _classname);
 	}
+	// Import Ckov information into spacepoints for global event
 	if (recon_event->GetCkovEvent()) {
 	  MAUS::CkovEvent* ckov_event = recon_event->GetCkovEvent();
 	  MAUS::recon::global::ImportCkovRecon ckovrecon_importer;
 	  ckovrecon_importer.process((*ckov_event), global_event, _classname);
 	}
+	// Import KL information into spacepoints for global event
 	if (recon_event->GetKLEvent()) {
 	  MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
 	  MAUS::recon::global::ImportKLRecon klrecon_importer;
 	  klrecon_importer.process((*kl_event), global_event, _classname);
 	}
+	// Import EMR tracks into global event
 	if (recon_event->GetEMREvent()) {
 	  MAUS::EMREvent* emr_event = recon_event->GetEMREvent();
 	  MAUS::recon::global::ImportEMRRecon emrrecon_importer;
