@@ -121,7 +121,11 @@ void SciFiGeometryHelper::Build() {
 
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = referencePos;
-      trackerGeo.Rotation = trackerModule->globalRotation();
+      if (UseActiveRotations == true) {
+        trackerGeo.Rotation = trackerModule->globalRotation();
+      } else {
+        trackerGeo.Rotation = trackerModule->globalRotation().inverse();
+      }
       FieldValue(trackerModule, trackerGeo);
       trackerGeo.Planes[plane_id] = this_plane;
 
