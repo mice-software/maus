@@ -34,6 +34,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cmath>
 
 // MAUS
 #include "Utils/EMRChannelMap.hh"

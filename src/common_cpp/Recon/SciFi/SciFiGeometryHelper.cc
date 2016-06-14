@@ -19,10 +19,24 @@
 
 namespace MAUS {
 
-SciFiGeometryHelper::SciFiGeometryHelper() {}
+SciFiGeometryHelper::SciFiGeometryHelper() : _modules {},
+                                             _module {NULL},
+                                             _geometry_map {},
+                                             UseActiveRotations {true},
+                                             _default_momentum {0.0},
+                                             _pr_correction {0.0},
+                                             _pr_bias {0.0} {
+  // Do nothing
+}
 
 SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& modules)
-                                        : _modules(modules) {
+                                        : _modules {modules},
+                                          _module {NULL},
+                                          _geometry_map {},
+                                          UseActiveRotations {true},
+                                          _default_momentum {0.0},
+                                          _pr_correction {0.0},
+                                          _pr_bias {0.0} {
   Json::Value *json = Globals::GetConfigurationCards();
 
   // Set Fibre Parameters.

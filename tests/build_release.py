@@ -84,20 +84,30 @@ def build_user_guide():
     here = os.getcwd()
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], 'doc', 'doc_src'))
     latex_log = open(LATEX_LOG, 'w')
+    pdf_good = True
+    html_good = True
     for index in range(2): #pylint: disable = W0612
         latexproc = subprocess.Popen(['pdflatex', 'maus_user_guide.tex'],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
         latexproc.wait() # pylint: disable=E1101
         if latexproc.returncode != 0: # pylint: disable=E1101
             print "ERROR - latex failed"
+            pdf_good = False
         latexproc = subprocess.Popen(['latex2html', 'maus_user_guide.tex',
                                          "-split", "4", "-html_version", "3.2"],
                                      stdout=latex_log, stderr=subprocess.STDOUT)
         latexproc.wait() # pylint: disable=E1101
         if latexproc.returncode != 0: # pylint: disable=E1101
-            print "ERROR - latex failed"
-    COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide.pdf'))
-    COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide'))
+            print "ERROR - latex to html conversion failed"
+            html_good = False
+    if pdf_good:
+        COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide.pdf'))
+    else:
+        print "WARNING: Not copying maus_user_guide.pdf"
+    if html_good:
+        COPY_TARGETS.append(os.path.join(os.getcwd(), 'maus_user_guide'))
+    else:
+        print "WARNING: Not copying maus_user_guide html"
     os.chdir(here)
 
 def build_third_party_tarball():
