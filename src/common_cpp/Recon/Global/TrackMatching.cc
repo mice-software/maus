@@ -433,7 +433,6 @@ void TrackMatching::MatchTOF0(
   if (spacepoints.size() > 0) {
     double x_in[] = {0., position.X(), position.Y(), position.Z(),
                      energy, momentum.X(), momentum.Y(), momentum.Z()};
-    double propDeltaT;
     // First propagate to just upstream of TOF1 to get the energy during TOF0-1 transit
     try {
       GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
@@ -455,8 +454,8 @@ void TrackMatching::MatchTOF0(
 
     // Compare reconstructed delta T with expected travel time
     // Change later to be set by datacards
-    double deltaTMin = (z_distance/velocity) - 2.0;
-    double deltaTMax = (z_distance/velocity) + 2.0;
+    double deltaTMin = (z_distance/velocity) - _matching_tolerances.at("TOF0").first;
+    double deltaTMax = (z_distance/velocity) + _matching_tolerances.at("TOF0").first;
     // Temporary container for trackpoints for checking if multiple matches are compatible
     std::vector<DataStructure::Global::SpacePoint*> temp_spacepoints;
     for (size_t i = 0; i < spacepoints.size(); i++) {

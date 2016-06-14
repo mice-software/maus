@@ -60,8 +60,7 @@ namespace MAUS {
     _pid_hypothesis_string = _configJSON["track_matching_pid_hypothesis"].asString();
     Json::Value track_matching_tolerances = _configJSON["track_matching_tolerances"];
     _matching_tolerances["TOF0"] = std::make_pair(
-        track_matching_tolerances["TOF0x"].asDouble(),
-        track_matching_tolerances["TOF0y"].asDouble());
+        track_matching_tolerances["TOF0t"].asDouble(), 10000);
     _matching_tolerances["TOF1"] = std::make_pair(
         track_matching_tolerances["TOF1x"].asDouble(),
         track_matching_tolerances["TOF1y"].asDouble());

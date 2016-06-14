@@ -793,8 +793,7 @@ track_matching_pid_hypothesis = "all"
 # y coordinate, hence x does not need to be configurable. EMR uses reconstructed error
 # so a multiplier is used.
 track_matching_tolerances = {
-  "TOF0x":30.0,
-  "TOF0y":30.0,
+  "TOF0t":2.0, # ns between actual and expected TOF0-1 Delta t
   "TOF1x":40.0,
   "TOF1y":40.0,
   "TOF2x":40.0,

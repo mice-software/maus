@@ -62,7 +62,7 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       DataStructure::Global::PrimaryChain* pchain =
           new DataStructure::Global::PrimaryChain(*old_primary_chain->at(i));
       _primary_chains->push_back(pchain);
-      //~ _primary_chains->push_back(old_primary_chain->at(i)->Clone());
+      // _primary_chains->push_back(old_primary_chain->at(i)->Clone());
     }
   }
 
