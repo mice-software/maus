@@ -16,8 +16,9 @@ reconstruction_geometry_filename = \
 
 # Change this to the filename of your unpacked data file
 input_root_file_name = '07469_recon.root'
+
 # 0 -> debug output (e.g. messages about detector matches) on, 1 -> off
-verbose_level = 0
+verbose_level = 1
 
 # Don't change this, there is currently a bug affecting accessing local
 # volumes in a CDB geometry.
@@ -33,8 +34,7 @@ track_matching_pid_hypothesis = "all"
 # When editing, keep in mind the fundamental limit imposed by detector
 # resolution.
 track_matching_tolerances = {
-  "TOF0x":30.0,
-  "TOF0y":30.0,
+  "TOF0t":2.0,
   "TOF1x":40.0,
   "TOF1y":40.0,
   "TOF2x":40.0,

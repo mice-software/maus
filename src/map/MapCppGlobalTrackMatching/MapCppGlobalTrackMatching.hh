@@ -82,6 +82,9 @@ namespace MAUS {
     std::string _pid_hypothesis_string;
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
+    /// Whether matching should not be performed with only one hit per detector
+    /// + thresholds for possible noise hits that will trigger matching either way
+    std::pair<bool, std::map<std::string, double> > _no_check_settings;
     /// Should the RK4 include energy loss
     bool _energy_loss;
     /// Mapper name
