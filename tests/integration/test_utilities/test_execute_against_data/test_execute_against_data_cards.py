@@ -50,17 +50,12 @@ class CardsUploadTestCase(unittest.TestCase): # pylint: disable=R0904
         """test_execute_against_data_cards.run_cards"""
         bi_super = cdb.BatchIterationSuperMouse(
                                               "http://preprodcdb.mice.rl.ac.uk")
-        i = 0
-        for i in range(bi_hint, bi_hint+50000):
-            if bi_super.get_mc_datacards(i)['mc'] == 'null':
-                break # the bi number does not exist - we can set it
-        print 'Found free row with batch iteration number', i
-        bi_super.set_datacards(i, comment, reco_cards, mc_cards)
+        bi_index = bi_super.set_datacards(comment, reco_cards, mc_cards)
         ead = MRD+'/bin/utilities/execute_against_data.py'
         data = MTP+'/third_party/install/share/test_data/'+DATA_TAR
         proc = subprocess.Popen(['python', ead, '--test',
                                  '--input-file', data,
-                                 '--batch-iteration', str(i)])
+                                 '--batch-iteration', str(bi_index)])
         proc.wait()
         return proc
 
