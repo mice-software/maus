@@ -17,6 +17,8 @@
 test_execute_against_data_cards check that Batch iteration number works
 """
 
+# pylint: disable=W0613
+
 import os
 import subprocess
 import unittest
