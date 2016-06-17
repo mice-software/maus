@@ -41,15 +41,15 @@
 // ** -dE/dx-; may want to add density effect
 // ** energy straggling
 // ** set from datacards
-// * TrackPoint errors should be a matrix
+// * TrackPoint errors should be a matrix <--
 // * -Fix muon assumption-
 // * -Fix positive charge assumption-
 // * Clean up event/space point selection (load from Global event importer
-//   stuff); add in extra detector/hit types (e.g. tracker tracks)
+//   stuff); add in extra detector/hit types (e.g. tracker tracks) <--
 // * Properly write the output Global event stuff (check I understand the datastructure)
 // * -Do u/s fit, d/s fit, global fit-
 // * -Deal with triplet cut on scifi-
-// * Soft code detector errors or import errors correctly
+// * Soft code detector errors or import errors correctly <--
 // * Clear labelled bugs
 // * -Add virtual planes/disabled detectors (make a state with 0 length?)-
 // * Interface to event display
@@ -145,6 +145,9 @@ void MapCppGlobalTrackFit::_process(Data* data) const {
         continue;
       }
       try {
+          Squeak::mout(Squeak::info) << "  MapCppGlobalTrackFit::_process "
+              << "fitting spill " << spill.GetSpillNumber()
+              << " recon event " << i << std::endl;
           track_fit(*event);
       } catch (MAUS::Exception& exc) {
           Squeak::mout(Squeak::info) << exc.GetMessage() << " at "
@@ -152,6 +155,7 @@ void MapCppGlobalTrackFit::_process(Data* data) const {
           Squeak::mout(Squeak::debug) << exc.GetStackTrace() << std::endl;
       }
   }
+  MaterialModel::PrintMaterials(Squeak::mout(Squeak::debug));
 }
 
 void MapCppGlobalTrackFit::append_to_data(GlobalEvent& event, Kalman::Track fit, double mass) const {
@@ -203,15 +207,39 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
         Kalman::TrackFit kalman_fit(propagator);
         DataLoader data(info.active_detectors, &kalman_fit);
         data.SetWillRequireTrackerTriplets(info.will_require_triplet_space_points);
+        data.SetMinZ(info.min_z);
+        data.SetMaxZ(info.max_z);
         // will_require_triplet_space_points // BUG
         data.load_event(event);
 
         Kalman::State seed_state = info.seed_algorithm->GetSeed(&event);
+        TMatrixD vec = seed_state.GetVector(); // BUG
+        //vec[3][0] = 226.;
+        seed_state.SetVector(vec);
         kalman_fit.SetSeed(seed_state);
 
-        kalman_fit.Filter(true);
-        if (info.will_smooth) {
-            kalman_fit.Smooth(true);
+        for (size_t j = 0; j < info.max_iteration; ++j) {
+            std::cerr << "MapCppGlobalTrackFit::track_fit iteration " << j << std::endl;
+            kalman_fit.Filter(true);
+            if (info.will_smooth) {
+                kalman_fit.Smooth(true);
+            }
+            // now propagate the track back to the beginning
+            Kalman::Track track = kalman_fit.GetTrack();
+            Kalman::TrackPoint first = track[0];
+            Kalman::TrackPoint last = track[track.GetLength()-1];
+            propagator->Propagate(last, first);
+            std::cerr << "    First ";
+            for (size_t k = 0; k < 6; ++k)
+                std::cerr << first.GetPredicted().GetVector()[k][0] << " ";
+            std::cerr << std::endl;
+            std::cerr << "    Last  ";
+            for (size_t k = 0; k < 6; ++k)
+                std::cerr << last.GetPredicted().GetVector()[k][0] << " ";
+            std::cerr << std::endl;
+            Kalman::State this_seed_state = first.GetPredicted();
+            this_seed_state.SetCovariance(seed_state.GetCovariance());
+            kalman_fit.SetSeed(first.GetPredicted());
         }
         Kalman::Track track = kalman_fit.GetTrack();
         append_to_data(*(event.GetGlobalEvent()), track, info.mass_hypothesis);
@@ -244,11 +272,25 @@ MapCppGlobalTrackFit::FitInfo::FitInfo(Json::Value fit_info, SeedManager& seeds)
                         "max_step_size",
                         JsonWrapper::realValue).asDouble();
 
+  min_z = JsonWrapper::GetProperty(
+                        fit_info,
+                        "min_z",
+                        JsonWrapper::realValue).asDouble();
+
+  max_z = JsonWrapper::GetProperty(
+                        fit_info,
+                        "max_z",
+                        JsonWrapper::realValue).asDouble();
+
   will_smooth = JsonWrapper::GetProperty(
                         fit_info,
                         "will_smooth",
                         JsonWrapper::booleanValue).asBool();
 
+  max_iteration = JsonWrapper::GetProperty(
+                        fit_info,
+                        "max_iteration",
+                        JsonWrapper::intValue).asUInt();
   
   std::string seed = JsonWrapper::GetProperty(
                           fit_info,

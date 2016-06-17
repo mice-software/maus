@@ -95,6 +95,9 @@ class MapCppGlobalTrackFit : public MapBase<Data> {
       double charge_hypothesis;
       double min_step;
       double max_step;
+      double min_z;
+      double max_z;
+      size_t max_iteration;
       bool will_smooth;
       bool will_require_triplet_space_points;
       SeedBase* seed_algorithm;

@@ -9,6 +9,7 @@
 namespace MAUS {
 
 std::set<std::string> MaterialModel::_enabled_materials;
+std::set<std::string> MaterialModel::_disabled_materials;
 
 MaterialModel::MaterialModel(const G4Material* material) {
     SetMaterial(material);
@@ -43,7 +44,8 @@ MaterialModel& MaterialModel::operator=(const MaterialModel& mat) {
 void MaterialModel::SetMaterial(double x, double y, double z) {
     _navigator = Globals::GetMCGeometryNavigator();
     _navigator->SetPoint(ThreeVector(x, y, z));
-    if (IsEnabledMaterial(_navigator->GetMaterial()->GetName())) {
+    std::string material_name = _navigator->GetMaterial()->GetName();
+    if (IsEnabledMaterial(material_name)) {
         Squeak::mout(Squeak::debug) << "MaterialModel::SetMaterial Setting "
                   << _navigator->GetMaterial()->GetName()
                   << " as it is enabled at position "
@@ -54,6 +56,7 @@ void MaterialModel::SetMaterial(double x, double y, double z) {
                   << _navigator->GetMaterial()->GetName()
                   << " as it is disabled at position "
                   << "x " << x << " y " << y << " z " << z << std::endl;
+        //_disabled_materials.insert(material_name);
         *this = MaterialModel();
     }
 }
@@ -147,5 +150,19 @@ void MaterialModel::DisableMaterial(std::string material_name) {
         _enabled_materials.erase(it);
 }
 
+std::ostream& MaterialModel::PrintMaterials(std::ostream& out) {
+    out << "Enabled materials:\n";
+    for (std::set<std::string>::iterator it = _enabled_materials.begin();
+         it != _enabled_materials.end(); ++it) {
+        out << "    " << *it << "\n";
+    }
+    out << "Disabled materials:\n";
+    for (std::set<std::string>::iterator it = _disabled_materials.begin();
+         it != _disabled_materials.end(); ++it) {
+        out << "    " << *it << std::endl;
+    }
+    return out;
 }
+
+} // namespace MAUS
 

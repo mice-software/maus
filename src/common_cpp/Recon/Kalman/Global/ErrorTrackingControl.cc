@@ -5,6 +5,7 @@
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+#include "src/legacy/Interface/Squeak.hh"
 
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControl.hh"
 
@@ -49,6 +50,7 @@ static int et_control_hadjust(void * vstate, size_t dim, unsigned int ord,
                               const double yp[], double * h) {
     et_control_state_t* state = static_cast<et_control_state_t *>(vstate);
 
+
     ThreeVector pos(y[1], y[2], y[3]);
     ThreeVector dir(y[5], y[6], y[7]);
     dir /= dir.mag();
@@ -76,6 +78,19 @@ static int et_control_hadjust(void * vstate, size_t dim, unsigned int ord,
     //          << " navigator " << state->_navigator->ComputeStep(pos, dir, state->_max_step_size)
     //          << " max " << state->_max_step_size << std::endl;
     *h = step;
+
+    Squeak::mout(Squeak::debug) << "    ErrorTrackingControl::hadjust"
+              << " Pos " << y[1] << " " << y[2] << " " << y[3]
+              << " Mom " << y[5] << " " << y[6] << " " << y[7] << std::endl;
+    Squeak::mout(Squeak::debug) << "                                 "
+              << " Pos' " << yp[1] << " " << yp[2] << " " << yp[3]
+              << " Mom' " << yp[5] << " " << yp[6] << " " << yp[7] << std::endl;
+    Squeak::mout(Squeak::debug) << "                                 "
+              << " Pos err " << yerr[1] << " " << yerr[2] << " " << yerr[3]
+              << " Mom err " << yerr[5] << " " << yerr[6] << " " << yerr[7]
+              << std::endl;
+    Squeak::mout(Squeak::debug) << "                                 "
+                                << " step " << step << std::endl;
     return return_value;
 }
 

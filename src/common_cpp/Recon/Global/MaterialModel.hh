@@ -1,8 +1,9 @@
 
-#include <set>
-
 #ifndef recon_global_materialmodel_hh_
 #define recon_global_materialmodel_hh_
+
+#include <set>
+#include <iostream>
 
 class G4Material;
 
@@ -31,6 +32,7 @@ class MaterialModel {
     static void EnableMaterial(std::string material_name);
     static void DisableMaterial(std::string material_name);
     static void DisableAllMaterials();
+    static std::ostream& PrintMaterials(std::ostream& out);
 
   private:
     // _material is a borrowed reference; data is owned by G4MaterialTable
@@ -47,6 +49,7 @@ class MaterialModel {
     double _z_over_a = 0.;
     GeometryNavigator* _navigator = NULL;
     static std::set<std::string> _enabled_materials;
+    static std::set<std::string> _disabled_materials;
 
     static constexpr double _d2EdxdE_delta_const = 0.1; //2.1047291091867513e-13; // 4 pi (r_e m_e c^2)^2
     static constexpr double _estrag_const = 0.157; //2.1047291091867513e-13; // 4 pi (r_e m_e c^2)^2

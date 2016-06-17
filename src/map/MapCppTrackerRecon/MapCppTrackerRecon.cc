@@ -198,54 +198,41 @@ void MapCppTrackerRecon::_death() {
 
 
 void MapCppTrackerRecon::_process(Data* data) const {
-  std::cerr << "MapCppTrackerRecon::_process 1" << std::endl;
   Spill& spill = *(data->GetSpill());
 
   /* return if not physics spill */
   if (spill.GetDaqEventType() != "physics_event")
     return;
-  std::cerr << "MapCppTrackerRecon::_process 2" << std::endl;
 
   if (spill.GetReconEvents()) {
-      std::cerr << "MapCppTrackerRecon::_process 3" << std::endl;
 
     for (unsigned int k = 0; k < spill.GetReconEvents()->size(); k++) {
-      std::cerr << "MapCppTrackerRecon::_process 4 ... "   << k << std::endl;
 
       SciFiEvent *event = spill.GetReconEvents()->at(k)->GetSciFiEvent();
       if (!event) {
         continue;
       }
-      std::cerr << "MapCppTrackerRecon::_process 5 ... "   << k << std::endl;
 
       _set_field_values(event);
-      std::cerr << "MapCppTrackerRecon::_process 6 ... "   << k << std::endl;
 
       if ( _clusters_on ) {
       // Clear any exising higher level data
-        std::cerr << "MapCppTrackerRecon::_process 7 ... "   << k << std::endl;
         event->clear_clusters();
         // Build Clusters.
-        std::cerr << "MapCppTrackerRecon::_process 8 ... "   << k << " ... " << event->digits().size() << std::endl;
         if (event->digits().size()) {
-          std::cerr << "MapCppTrackerRecon::_process 9 ... "   << k << std::endl;
           _cluster_recon.process(*event);
-          std::cerr << "   ... clusters size " << event->clusters().size() << std::endl;
         }
       }
       if ( _spacepoints_on ) {
         // Build SpacePoints.
         event->clear_spacepoints();
         if (event->clusters().size()) {
-          std::cerr << "MapCppTrackerRecon::_process 10 ... "   << k << std::endl;
           _spacepoint_recon.process(*event);
           set_spacepoint_global_output(event->spacepoints());
-          std::cerr << "   ... sp size " << event->spacepoints().size() << std::endl;
         }
       }
       // Pattern Recognition.
       if (_patrec_on && event->spacepoints().size()) {
-          std::cerr << "MapCppTrackerRecon::_process 11 ... "   << k << std::endl;
         event->clear_seeds();
         event->clear_stracks();
         event->clear_htracks();
@@ -253,15 +240,11 @@ void MapCppTrackerRecon::_process(Data* data) const {
         set_straight_prtrack_global_output(event->straightprtracks());
         extrapolate_helical_reference(*event);
         extrapolate_straight_reference(*event);
-        std::cerr << "   ... straight pr size " << event->straightprtracks().size() << std::endl;
-        std::cerr << "   ... helical pr size  " << event->helicalprtracks().size() << std::endl;
       }
       // Kalman Track Fit.
       if (_kalman_on) {
-        std::cerr << "MapCppTrackerRecon::_process 12 ... "   << k << std::endl;
         event->clear_scifitracks();
         track_fit(*event);
-         std::cerr << "   ... kalman size  " << event->scifitracks().size() << std::endl;
       }
 //      print_event_info(*event);
     }

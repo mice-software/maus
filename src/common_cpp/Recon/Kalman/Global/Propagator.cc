@@ -14,7 +14,7 @@ Propagator::~Propagator() {
 
 void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
     double x[29];
-    Squeak::mout(Squeak::debug) << "Global::Propagator::Propagate start:\n"
+    Squeak::mout(Squeak::info) << "Global::Propagator::Propagate start:\n"
                                 << start_tp << std::endl;
     Squeak::mout(Squeak::debug) << "Global::Propagator::Propagate _mass:"
                                 << _mass << std::endl;
@@ -45,7 +45,8 @@ void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
 
     Squeak::mout(Squeak::debug) << "Propagate before..." << std::endl;
     _tracking.print(Squeak::mout(Squeak::debug), x);
-    Squeak::mout(Squeak::debug) << "Propagating to " << target_z << std::endl;
+    Squeak::mout(Squeak::info) << "   Global::Propagator::Propagating to "
+                               << target_z << std::endl;
     _tracking.Propagate(x, target_z);
     Squeak::mout(Squeak::debug) << "Propagate after..." << std::endl;
     _tracking.print(Squeak::mout(Squeak::debug), x);

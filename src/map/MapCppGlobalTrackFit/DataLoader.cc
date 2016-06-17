@@ -233,6 +233,11 @@ DataLoader::Detection::Detection(Kalman::Measurement_base* meas, Kalman::TrackPo
 
 void DataLoader::AddDetection(Kalman::Measurement_base* meas, Kalman::TrackPoint point, DetectorPoint det) {
     Detection detection(meas, point);
+    // we can't add detections if they are out of the z range
+    if (point.GetPosition() < _min_z || point.GetPosition() > _max_z)
+        return;
+    // if the detector is not yet in _points, add it; else append to the
+    // existing entry in _points
     if (_points.find(det) == _points.end()) {
         _points[det] = std::vector<Detection>(1, detection);
     } else {

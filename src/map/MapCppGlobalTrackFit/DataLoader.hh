@@ -21,6 +21,13 @@ class DataLoader {
 
     void SetWillRequireTrackerTriplets(bool will_require) {_will_require_tracker_triplets = will_require;}
     bool GetWillRequireTrackerTriplets() {return _will_require_tracker_triplets;}
+
+    void SetMinZ(double min_z) {_min_z = min_z;}
+    double GetMinZ() const {return _min_z;}
+
+    void SetMaxZ(double max_z) {_max_z = max_z;}
+    double GetMaxZ() const {return _max_z;}
+
   private:
     void load_virtual_event();
     void load_tof_event(TOFEvent* event);
@@ -35,7 +42,9 @@ class DataLoader {
 
     Kalman::TrackFit* _fitter;
     std::vector<MAUS::DataStructure::Global::DetectorPoint> _detectors;
-    bool _will_require_tracker_triplets;
+    bool _will_require_tracker_triplets = false;
+    double _min_z = -1e-5;
+    double _max_z = 1e5;
     inline bool WillUse(MAUS::DataStructure::Global::DetectorPoint det) const;
     // Maps State.GetId() to the detector that made the measurement
 

@@ -51,10 +51,10 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
                       {ErrorTracking::EquationsOfMotion, NULL, 29, NULL};
 
   double z = x[3];
-  _gsl_h = fabs(_max_step_size);  // ignore _step_size sign, we "auto detect"
+  _gsl_h = fabs(_min_step_size);  // ignore _step_size sign, we "auto detect"
   if (z > target_z) {
       _gsl_h *= -1;  // stepping backwards...
-      _charge = -1; 
+      _charge = -1;
   } else {
       _charge = 1;  // stepping forwards...
   }
@@ -180,6 +180,13 @@ int ErrorTracking::EquationsOfMotion(double z,
       tracking_fail << "Material transport failed\n";
       return material_success;
   }
+  Squeak::mout(Squeak::debug) << "    ErrorTracking::EquationsOfMotion Values ";
+  for (size_t i = 0; i < 8; ++i)
+    Squeak::mout(Squeak::debug) << x[i] << " ";
+  Squeak::mout(Squeak::debug) << "\n    ErrorTracking::EquationsOfMotion Derivatives ";
+  for (size_t i = 0; i < 8; ++i)
+      Squeak::mout(Squeak::debug) << dxdz[i] << " ";
+  Squeak::mout(Squeak::debug) << std::endl;
   return GSL_SUCCESS;
 }
 
