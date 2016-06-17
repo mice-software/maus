@@ -152,12 +152,7 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         """
         bi_super = cdb.BatchIterationSuperMouse(
                                               "http://preprodcdb.mice.rl.ac.uk")
-        bi_index = 0
-        for bi_index in range(50000):
-            if bi_super.get_mc_datacards(bi_index)['mc'] == 'null':
-                break # the bi number does not exist - we can set it
-        print 'Found free row with batch iteration number', bi_index
-        bi_super.set_datacards(bi_index, "test data", "", "")
+        bi_index = bi_super.set_datacards("test data", "", "")
 
         if not get_data():
             # raise RuntimeError('Error downloading file - abort test')

@@ -60,8 +60,7 @@ namespace MAUS {
     _pid_hypothesis_string = _configJSON["track_matching_pid_hypothesis"].asString();
     Json::Value track_matching_tolerances = _configJSON["track_matching_tolerances"];
     _matching_tolerances["TOF0"] = std::make_pair(
-        track_matching_tolerances["TOF0x"].asDouble(),
-        track_matching_tolerances["TOF0y"].asDouble());
+        track_matching_tolerances["TOF0t"].asDouble(), 10000);
     _matching_tolerances["TOF1"] = std::make_pair(
         track_matching_tolerances["TOF1x"].asDouble(),
         track_matching_tolerances["TOF1y"].asDouble());
@@ -83,6 +82,14 @@ namespace MAUS {
     _matching_tolerances["TOF12dT"] = std::make_pair(
         tof12_cdt/track_matching_tolerances["TOF12maxSpeed"].asDouble(),
         tof12_cdt/track_matching_tolerances["TOF12minSpeed"].asDouble());
+    bool no_check = _configJSON["track_matching_no_single_event_check"].asBool();
+    Json::Value charge_thresholds = _configJSON["track_matching_check_charge_thresholds"];
+    std::map<std::string, double> no_check_thresholds;
+    no_check_thresholds["TOF0"] = charge_thresholds["TOF0"].asDouble();
+    no_check_thresholds["TOF1"] = charge_thresholds["TOF1"].asDouble();
+    no_check_thresholds["TOF2"] = charge_thresholds["TOF2"].asDouble();
+    no_check_thresholds["KL"] = charge_thresholds["KL"].asDouble();
+    _no_check_settings = std::make_pair(no_check, no_check_thresholds);
   }
 
   void MapCppGlobalTrackMatching::_death() {
@@ -117,7 +124,7 @@ namespace MAUS {
       if (global_event) {
         recon::global::TrackMatching
             track_matching(global_event, _mapper_name, _pid_hypothesis_string,
-                           _matching_tolerances, 10.0, _energy_loss);
+                           _matching_tolerances, 10.0, _no_check_settings, _energy_loss);
         track_matching.USTrack();
         track_matching.DSTrack();
         track_matching.throughTrack();

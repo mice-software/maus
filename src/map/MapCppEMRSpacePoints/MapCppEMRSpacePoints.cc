@@ -248,7 +248,8 @@ void MapCppEMRSpacePoints::reconstruct_coordinates(EMREventVector& emr_events_tm
       // Look backwards for hits in the other projection
       int aPlane(0);
       for (aPlane = iPlane-1; aPlane >= 0; aPlane--) {
-	if ( emr_events_tmp[iPe][aPlane]._barhits.size() && aPlane%2 != xOri ) {
+	if ( emr_events_tmp[iPe][aPlane]._barhits.size() &&
+	     emr_events_tmp[iPe][aPlane]._plane%2 != xOri ) {
 	  v1 = get_weighted_position(emr_events_tmp[iPe][aPlane]._barhits);
 	  Hit1 = true;
 	  break;
@@ -257,7 +258,8 @@ void MapCppEMRSpacePoints::reconstruct_coordinates(EMREventVector& emr_events_tm
 
       // Look forwards for hits in the other projection
       for (size_t bPlane = iPlane+1; bPlane < emr_events_tmp[iPe].size(); bPlane++) {
-	if ( emr_events_tmp[iPe][bPlane]._barhits.size() && static_cast<int>(bPlane%2) != xOri ) {
+	if ( emr_events_tmp[iPe][bPlane]._barhits.size() &&
+	     emr_events_tmp[iPe][bPlane]._plane%2 != xOri ) {
 	  if ( !Hit2 ) {
 	    v2 = get_weighted_position(emr_events_tmp[iPe][bPlane]._barhits);
 	    Hit2 = true;
@@ -274,7 +276,8 @@ void MapCppEMRSpacePoints::reconstruct_coordinates(EMREventVector& emr_events_tm
       // Look backwards for the second hit if nothing found in the forward direction
       if ( Hit1 && !Hit2 ) {
         for (int cPlane = aPlane-1; cPlane >= 0; cPlane--) {
-	  if ( emr_events_tmp[iPe][cPlane]._barhits.size() && cPlane%2 != xOri ) {
+	  if ( emr_events_tmp[iPe][cPlane]._barhits.size() &&
+	       emr_events_tmp[iPe][cPlane]._plane%2 != xOri ) {
 	    v2 = get_weighted_position(emr_events_tmp[iPe][cPlane]._barhits);
 	    Hit2 = true;
 	    break;

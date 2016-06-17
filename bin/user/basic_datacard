@@ -90,6 +90,7 @@ Keyword: database, download, geometry, cdb, url,
 """
 # geometry used by the simulation
 simulation_geometry_filename = "Test.dat" # dummy legacy geometry
+simulation_geometry_filename = "/srv/localstage/adobbs/MAUS/geometry/by-run/07469/ParentGeometryFile.dat"
 # simulation_geometry_filename = "Stage4.dat" # Stage 4 legacy geometry
 # cdb geometry - needs to be downloaded for specific run needed
 # simulation_geometry_filename = "files/geometry/download/ParentGeometryFile.dat"
@@ -131,7 +132,7 @@ Keyword: start, begin, beam, pions, muons, electrons
 """
 # used for setting particle phase
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":-6400.0},
+    "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10,
     "spin":{"x":0.0, "y":0.0, "z":1.0}

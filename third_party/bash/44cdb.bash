@@ -3,8 +3,12 @@
 
 #http://bazaar.launchpad.net/~antony-wilson/mcdb/mice.cdb.client.api-python/download/head:/cdb1.0.0.0.tar.gz-20130212090645-5dg2axdjmtby60vz-1/cdb-1.0.0.0.tar.gz
 
-version=1.1.3
-unique_id=20150903113311-myc75whjxkh6manr-1
+#http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-python/download/head:/cdb1.1.6.tar.gz-20160616111012-v21zb1a7ecag6j1g-1/cdb-1.1.6.tar.gz
+
+#version=1.1.3
+#unique_id=20150903113311-myc75whjxkh6manr-1
+version=1.1.6
+unique_id=20160616111012-v21zb1a7ecag6j1g-1
 directory=cdb-${version}
 filename=cdb-${version}.tar.gz
 filename_mash=cdb${version}.tar.gz-${unique_id}/${filename}

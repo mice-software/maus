@@ -392,12 +392,12 @@ TEST_F(GlobalToolsTest, propagate) {
   } catch (Exception exc) {
     std::cerr << exc.what() << std::endl;
   }
-  EXPECT_NEAR(x1[1], 10.015, epsilon);
-  EXPECT_NEAR(x1[2], -22.047, epsilon);
-  EXPECT_NEAR(x1[4], 134.410, epsilon);
-  EXPECT_NEAR(x1[5], -11.571, epsilon);
-  EXPECT_NEAR(x1[6], 1.203, epsilon);
-  EXPECT_NEAR(x1[7], 82.262, epsilon);
+  EXPECT_NEAR(x1[1], 8.345, epsilon);
+  EXPECT_NEAR(x1[2], -21.653, epsilon);
+  EXPECT_NEAR(x1[4], 133.855, epsilon);
+  EXPECT_NEAR(x1[5], -11.217, epsilon);
+  EXPECT_NEAR(x1[6], 2.571, epsilon);
+  EXPECT_NEAR(x1[7], 81.370, epsilon);
 
   // No Energy Loss, Magnetic Field
   try {
@@ -409,7 +409,7 @@ TEST_F(GlobalToolsTest, propagate) {
   EXPECT_NEAR(x2[2], -13.779, epsilon);
   EXPECT_NEAR(x2[4], 184.700, epsilon);
   EXPECT_NEAR(x2[5], -1.896, epsilon);
-  EXPECT_NEAR(x2[6], 21.128, epsilon);
+  EXPECT_NEAR(x2[6], 21.129, epsilon);
   EXPECT_NEAR(x2[7], 150.000, epsilon);
 
   dc->SetMiceModules(geometry2);
@@ -423,10 +423,10 @@ TEST_F(GlobalToolsTest, propagate) {
   }
   EXPECT_NEAR(x3[1], 200.000, epsilon);
   EXPECT_NEAR(x3[2], 200.000, epsilon);
-  EXPECT_NEAR(x3[4], 134.410, epsilon);
-  EXPECT_NEAR(x3[5], 8.226, epsilon);
-  EXPECT_NEAR(x3[6], 8.226, epsilon);
-  EXPECT_NEAR(x3[7], 82.262, epsilon);
+  EXPECT_NEAR(x3[4], 133.855, epsilon);
+  EXPECT_NEAR(x3[5], 8.137, epsilon);
+  EXPECT_NEAR(x3[6], 8.137, epsilon);
+  EXPECT_NEAR(x3[7], 81.370, epsilon);
 
   // No Energy Loss, No Magnetic Field
   try {
