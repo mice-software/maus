@@ -1,5 +1,5 @@
 # coding=ASCII
-"""The basic setups - changing this file will not be pushed to bzr.
+""" A basic configuration datacard
 
 The parameters in this file are the most frequently changed ones. The file
 is organized in blocks so it can be easily used.
@@ -90,7 +90,6 @@ Keyword: database, download, geometry, cdb, url,
 """
 # geometry used by the simulation
 simulation_geometry_filename = "Test.dat" # dummy legacy geometry
-simulation_geometry_filename = "/srv/localstage/adobbs/MAUS/geometry/by-run/07469/ParentGeometryFile.dat"
 # simulation_geometry_filename = "Stage4.dat" # Stage 4 legacy geometry
 # cdb geometry - needs to be downloaded for specific run needed
 # simulation_geometry_filename = "files/geometry/download/ParentGeometryFile.dat"

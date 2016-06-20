@@ -7,8 +7,9 @@ Release Notes
 =============
 MAUS-v2.5.0
   The following changes were made:
-    - Global reconstruction updates, memory leak fixed
+    - Global reconstruction updates
     - EMR updates
+    - Kalman updates
     - Workbook updated
     - Third party CDB interface updated, old interface is no longer supported
 MAUS-v2.4.0
