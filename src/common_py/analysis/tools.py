@@ -102,23 +102,22 @@ def gaussian_profile_x(hist, fit_min=0, fit_max=0) :
     projection = hist.ProjectionY( \
                    name+'_pro_'+str(i), i, i )
     if projection.GetEntries() == 0 :
-      x_pos.append( 0.0 )
-      y_pos.append( 0.0 )
-      x_error.append( 0.0 )
-      y_error.append( 0.0 )
+      continue
 
     pro_mean, pro_mean_err, pro_std, pro_std_err = \
                                    fit_gaussian( projection, fit_min, fit_max )
 
     x_pos.append( hist.GetXaxis().GetBinCenter( i ) )
     y_pos.append( pro_mean )
-    x_error.append( hist.GetXaxis().GetBinWidth( i ) )
+    x_error.append( 0.5*hist.GetXaxis().GetBinWidth( i ) )
     y_error.append( pro_mean_err )
 
-  profile = ROOT.TGraphErrors( len( x_pos ), x_pos, y_pos, x_error, y_error )
-  profile.SetName( name+'_profile' )
-
-  return profile
+  if len( x_pos ) < 1 :
+    return None 
+  else :
+    profile = ROOT.TGraphErrors( len( x_pos ), x_pos, y_pos, x_error, y_error )
+    profile.SetName( name+'_profile' )
+    return profile
 
 
 def gaussian_profile_y(hist, fit_min=0, fit_max=0) :
@@ -137,10 +136,7 @@ def gaussian_profile_y(hist, fit_min=0, fit_max=0) :
     projection = hist.ProjectionX( \
                    name+'_pro_'+str(i), i, i )
     if projection.GetEntries() == 0 :
-      x_pos.append( 0.0 )
-      y_pos.append( 0.0 )
-      x_error.append( 0.0 )
-      y_error.append( 0.0 )
+      continue
 
     pro_mean, pro_mean_err, pro_std, pro_std_err = \
                                    fit_gaussian( projection, fit_min, fit_max )
@@ -148,12 +144,14 @@ def gaussian_profile_y(hist, fit_min=0, fit_max=0) :
     x_pos.append( pro_mean )
     y_pos.append( hist.GetYaxis().GetBinCenter( i ) )
     x_error.append( pro_mean_err )
-    y_error.append( hist.GetYaxis().GetBinWidth( i ) )
+    y_error.append( 0.5*hist.GetYaxis().GetBinWidth( i ) )
 
-  profile = ROOT.TGraphErrors( len( x_pos ), x_pos, y_pos, x_error, y_error )
-  profile.SetName( name+'_profile' )
-
-  return profile
+  if len( x_pos ) < 1 :
+    return None 
+  else :
+    profile = ROOT.TGraphErrors( len( x_pos ), x_pos, y_pos, x_error, y_error )
+    profile.SetName( name+'_profile' )
+    return profile
 
 
 def sort_arrays(array_lists, key_list=0, descending=True) :

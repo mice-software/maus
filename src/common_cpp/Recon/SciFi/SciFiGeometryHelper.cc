@@ -19,10 +19,24 @@
 
 namespace MAUS {
 
-SciFiGeometryHelper::SciFiGeometryHelper() {}
+SciFiGeometryHelper::SciFiGeometryHelper() : _modules {},
+                                             _module {NULL},
+                                             _geometry_map {},
+                                             UseActiveRotations {true},
+                                             _default_momentum {0.0},
+                                             _pr_correction {0.0},
+                                             _pr_bias {0.0} {
+  // Do nothing
+}
 
 SciFiGeometryHelper::SciFiGeometryHelper(const std::vector<const MiceModule*>& modules)
-                                        : _modules(modules) {
+                                        : _modules {modules},
+                                          _module {NULL},
+                                          _geometry_map {},
+                                          UseActiveRotations {true},
+                                          _default_momentum {0.0},
+                                          _pr_correction {0.0},
+                                          _pr_bias {0.0} {
   Json::Value *json = Globals::GetConfigurationCards();
 
   // Set Fibre Parameters.
@@ -121,7 +135,11 @@ void SciFiGeometryHelper::Build() {
 
       SciFiTrackerGeometry trackerGeo = _geometry_map[tracker_n];
       trackerGeo.Position = referencePos;
-      trackerGeo.Rotation = trackerModule->globalRotation();
+      if (UseActiveRotations == true) {
+        trackerGeo.Rotation = trackerModule->globalRotation();
+      } else {
+        trackerGeo.Rotation = trackerModule->globalRotation().inverse();
+      }
       FieldValue(trackerModule, trackerGeo);
       trackerGeo.Planes[plane_id] = this_plane;
 

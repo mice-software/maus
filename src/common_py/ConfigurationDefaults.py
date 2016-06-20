@@ -793,8 +793,7 @@ track_matching_pid_hypothesis = "all"
 # y coordinate, hence x does not need to be configurable. EMR uses reconstructed error
 # so a multiplier is used.
 track_matching_tolerances = {
-  "TOF0x":30.0,
-  "TOF0y":30.0,
+  "TOF0t":2.0, # ns between actual and expected TOF0-1 Delta t
   "TOF1x":40.0,
   "TOF1y":40.0,
   "TOF2x":40.0,
@@ -808,3 +807,13 @@ track_matching_tolerances = {
 
 # Whether to use energy loss calculations for global track matching
 track_matching_energy_loss = True
+# Whether propagation matching should not be performed if each detector has no more than one hit
+track_matching_no_single_event_check = True
+# Additional restriction on the above, still perform matching if some of the hits may be noise
+# due to a small charge deposit
+track_matching_check_charge_thresholds = {
+  "TOF0":0.0,
+  "TOF1":0.0,
+  "TOF2":0.0,
+  "KL":0.0
+}

@@ -5,6 +5,13 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.5.0
+  The following changes were made:
+    - Global reconstruction updates
+    - EMR updates
+    - Kalman updates
+    - Workbook updated
+    - Third party CDB interface updated, old interface is no longer supported
 MAUS-v2.4.0
   The following changes were made:
     - Event viewer added
