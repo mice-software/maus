@@ -446,11 +446,12 @@ namespace MAUS {
     double channelNumber = 0.5 + ((7.0 * geometry.CentralFibre) -
                                                              (2.0 * alpha / geometry.Pitch)) / 7.0;
 
-    channelNumber = floor( channelNumber*2.0 ) / 2.0; // Force half integer binning
+    channelNumber = floor(channelNumber*2.0) / 2.0; // Force half integer binning
 
     double new_alpha;
     if (_smear_value < 0.0) {
-      new_alpha = 3.5 * geometry.Pitch * (static_cast<double>(geometry.CentralFibre) - channelNumber);
+      new_alpha = 3.5 * geometry.Pitch *
+                                      (static_cast<double>(geometry.CentralFibre) - channelNumber);
     } else {
       double smear_amount = CLHEP::RandGauss::shoot(0.0, _smear_value);
       new_alpha = alpha + smear_amount;

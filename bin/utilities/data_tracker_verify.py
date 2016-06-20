@@ -182,13 +182,14 @@ def init_plots_data() :
                            "Spacepoints Found in Each Station", 11, -5.5, 5.5 )
   reco_plots['clusters_plane'] = ROOT.TH1F( "clusters_plane", \
                               "Clusters Found in Each Plane", 31, -15.5, 15.5 )
-  reco_plots['spacepoints_station_used'] = ROOT.TH1F( "spacepoints_station_used", \
+  reco_plots['spacepoints_station_used'] = ROOT.TH1F( \
+                                                  "spacepoints_station_used", \
                            "Spacepoints Found in Each Station", 11, -5.5, 5.5 )
   reco_plots['2_hit_spacepoints_station_used'] = ROOT.TH1F( \
-                                                 "2_hit_spacepoints_station_used", \
+                                            "2_hit_spacepoints_station_used", \
                            "Spacepoints Found in Each Station", 11, -5.5, 5.5 )
   reco_plots['3_hit_spacepoints_station_used'] = ROOT.TH1F( \
-                                                 "3_hit_spacepoints_station_used", \
+                                            "3_hit_spacepoints_station_used", \
                            "Spacepoints Found in Each Station", 11, -5.5, 5.5 )
   reco_plots['clusters_plane_used'] = ROOT.TH1F( "clusters_plane_used", \
                               "Clusters Found in Each Plane", 31, -15.5, 15.5 )
@@ -278,7 +279,8 @@ def init_plots_data() :
                                        200, -200.0, 200.0, 200, -200.0, 200.0 )
       station_plots[dir_name]['kuno_plot'] = ROOT.TH1F( dir_name+'_kuno', \
                                   "Kuno Plot: "+dir_name, 1001, -0.25, 500.25 )
-      station_plots[dir_name]['kuno_plot_used'] = ROOT.TH1F( dir_name+'_kuno_used', \
+      station_plots[dir_name]['kuno_plot_used'] = ROOT.TH1F( \
+                                                       dir_name+'_kuno_used', \
                                   "Kuno Plot: "+dir_name, 1001, -0.25, 500.25 )
 
 
@@ -561,7 +563,8 @@ def fill_plots_recon(plot_dict, data_dict, digits, clusters, spacepoints) :
     for station in [ 1, 2, 3, 4, 5 ] :
       dir_name = str(tracker)+'.'+str(station)
       station_plots[dir_name]['kuno_plot'].Fill( kuno_sums[tracker][station] )
-      station_plots[dir_name]['kuno_plot_used'].Fill( kuno_sums_used[tracker][station] )
+      station_plots[dir_name]['kuno_plot_used'].Fill( \
+                                             kuno_sums_used[tracker][station] )
 
   for spacepoint in spacepoints :
     tracker = spacepoint.get_tracker()
