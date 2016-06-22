@@ -16,7 +16,7 @@
 \lhead{}
 \lfoot{\textit{\textcolor{gray}{Adam Dobbs}}}
 \cfoot{\textit{\textcolor{gray}{The MAUS Workbook}}}
-\rfoot{\textit{\textcolor{gray}{ver. 1.9}}}
+\rfoot{\textit{\textcolor{gray}{ver. 2.1}}}
 
 \usepackage{listings}
 \lstdefinestyle{customcpp}{
@@ -75,7 +75,7 @@
 
 \title{\textcolor{blue}{The MAUS Work Book}}
 \author{Adam Dobbs}
-\date{Version 2.0, May 2016}
+\date{Version 2.1, June 2016}
 
 % \pdfinfo{%
 %   /Title    (MAUS Work Book)
@@ -395,19 +395,19 @@ By default, downloaded CDB geometries are stored in \texttt{files/geometry/downl
 \label{sec:Simulation}
   An example script for running a full MC simulation of MICE can be found in the bin directory:
   \begin{lstlisting}
-./bin/simulate_mice.py
+./bin/simulate_mice.py 
   \end{lstlisting}
-  This will produce a ROOT output file which can be used for analysis.  
+  Running this with no arguments will produce a ROOT output file with no data (an empty geometry used for testing is used by default). 
 
-  It is generally desirable to customise the simulation in some way by passing datacard variables. For example to specify a particular geometry to use from the CDB, first download the desired geometry as described in section~\ref{sec:Geometry}. A new reference simulation particle must also then be defined (due to differences between the local legacy geometry and the CDB geometries) via a datacard parameter. This can be defined in a datacard file as:
+  In order to customise the simulation datacard variables may be used. For example to specify a particular geometry to use from the CDB, first download the desired geometry as described in section~\ref{sec:Geometry}. A new reference simulation particle must also then be defined (due to differences between the local legacy geometry and the CDB geometries) via a datacard parameter. This can be defined in a datacard file as:
   \begin{lstlisting}
-simulation_reference_particle = {"position":{"x":0.0, "y":0.0, "z":1000.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10, "spin":{"x":0.0, "y":0.0, "z":1.0}}
+simulation_reference_particle = {"position":{"x":0.0, "y":0.0, "z":11000.0}, "momentum":{"x":0.0, "y":0.0, "z":1.0}, "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":0, "spin":{"x":0.0, "y":0.0, "z":1.0}}
   \end{lstlisting}
-  This gives a reference particle starting at coordinates (0, 0, 1000) (in mm), $p_z = 1$~MeV/c, species $\mu^+$ with energy 226~MeV. If the above line is stored in a file ``datacard.py'', the new simulation can be run with:
+  This gives a reference particle starting at coordinates (0, 0, 11000) (in mm, just upstream of TOF1 in Step IV geometries), species $\mu^+$ with energy 226~MeV (which is used to calculate the momentum, overriding the values supplied). If the above line is stored in a file ``datacard.py'', the new simulation can be run with:
   \begin{lstlisting}
 ./bin/simulate_mice.py --simulation_geometry_file /path/to/maus/files/geometry/download/ParentGeometryFile.dat --configuration_file datacard.py 
   \end{lstlisting}
-  For details on the rest of the options available when performing simulations, see the full MAUS user guide.
+  A basic example datacard can be found in \texttt{bin/user/basic\_datacard}. For details on the rest of the options available when performing simulations, see the full MAUS user guide.
 
 \section{Reconstructing Real MICE Data}
 \label{sec:Reconstruction}

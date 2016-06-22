@@ -15,10 +15,6 @@
  *
  */
 
-/** @class SciFiLookup
- * Class used to link between SciFiDigits and the MC hits used to make them
- */
-
 #ifndef SCIFILOOKUP_HH
 #define SCIFILOOKUP_HH
 
@@ -35,6 +31,11 @@
 
 namespace MAUS {
 
+/** @class SciFiLookup
+ *  @author A. Dobbs
+ *  @brief Class used to link between SciFiDigits and the MC hits
+ *         used to make them
+ */
 class SciFiLookup {
   public:
     /** @brief Default constructor */

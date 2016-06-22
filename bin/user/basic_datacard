@@ -1,5 +1,5 @@
 # coding=ASCII
-"""The basic setups - changing this file will not be pushed to bzr.
+""" A basic configuration datacard
 
 The parameters in this file are the most frequently changed ones. The file
 is organized in blocks so it can be easily used.
@@ -131,7 +131,7 @@ Keyword: start, begin, beam, pions, muons, electrons
 """
 # used for setting particle phase
 simulation_reference_particle = {
-    "position":{"x":0.0, "y":-0.0, "z":-6400.0},
+    "position":{"x":0.0, "y":-0.0, "z":11000.0},
     "momentum":{"x":0.0, "y":0.0, "z":1.0},
     "particle_id":-13, "energy":226.0, "time":0.0, "random_seed":10,
     "spin":{"x":0.0, "y":0.0, "z":1.0}

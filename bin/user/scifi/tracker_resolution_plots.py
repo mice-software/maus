@@ -179,7 +179,7 @@ def init_plots_data() :
 
 
     tracker_dict['residual_xy'] = ROOT.TH2F( tracker+'_residual_xy', \
-             'Residual Position', 500, -50.0, 50.0, 500, -50.0, 50.0 )
+             'Residual Position', 800, -20.0, 20.0, 800, -20.0, 20.0 )
 
     tracker_dict['residual_mxmy'] = ROOT.TH2F( tracker+'_residual_mxmy', \
              'Residual Gradient', 500, -0.5, 0.5, 500, -0.5, 0.5 )
@@ -252,13 +252,13 @@ def init_plots_data() :
 
     tracker_dict['x_residual_p'] = ROOT.TH2F( \
                tracker+'_x_residual_p', "X Residuals in p", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -20.0, 20.0 )
     tracker_dict['y_residual_p'] = ROOT.TH2F( \
                tracker+'_y_residual_p', "Y Residuals in p", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -20.0, 20.0 )
     tracker_dict['r_residual_p'] = ROOT.TH2F( \
                tracker+'_r_residual_p', "Radius Residuals in p", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+                                       PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 50.0 )
 
     tracker_dict['px_residual_p'] = ROOT.TH2F( \
               tracker+'_px_residual_p', "p_{x} Residuals in p", \
@@ -281,13 +281,13 @@ def init_plots_data() :
 
     tracker_dict['x_residual_pt'] = ROOT.TH2F( \
                tracker+'_x_residual_pt', "X Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -20.0, 20.0 )
     tracker_dict['y_residual_pt'] = ROOT.TH2F( \
                tracker+'_y_residual_pt', "Y Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+                                     PT_BIN, PT_MIN, PT_MAX, 500, -20.0, 20.0 )
     tracker_dict['r_residual_pt'] = ROOT.TH2F( \
                tracker+'_r_residual_pt', "Radius Residuals in p_{t}", \
-                                     PT_BIN, PT_MIN, PT_MAX, 500, -50.0, 50.0 )
+                                       PT_BIN, PT_MIN, PT_MAX, 500, 0.0, 50.0 )
 
     tracker_dict['px_residual_pt'] = ROOT.TH2F( \
               tracker+'_px_residual_pt', "p_{x} Residuals in p_{t}", \
@@ -310,13 +310,13 @@ def init_plots_data() :
 
     tracker_dict['x_residual_pz'] = ROOT.TH2F( \
                tracker+'_x_residual_pz', "X Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -20.0, 20.0 )
     tracker_dict['y_residual_pz'] = ROOT.TH2F( \
                tracker+'_y_residual_pz', "Y Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -20.0, 20.0 )
     tracker_dict['r_residual_pz'] = ROOT.TH2F( \
                tracker+'_r_residual_pz', "Radius Residuals in p_{z}", \
-                                     PZ_BIN, PZ_MIN, PZ_MAX, 500, -50.0, 50.0 )
+                                       PZ_BIN, PZ_MIN, PZ_MAX, 500, 0.0, 50.0 )
 
     tracker_dict['mx_residual_pz'] = ROOT.TH2F( \
                tracker+'_mx_residual_pz', "m_{x} Residuals in p_{z}", \

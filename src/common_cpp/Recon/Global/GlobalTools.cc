@@ -123,6 +123,7 @@ std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
   if (spill_spacepoints->size() > 0) {
     return spill_spacepoints;
   } else {
+    delete spill_spacepoints;
     return 0;
   }
 }
@@ -167,6 +168,7 @@ std::vector<int> GetTrackerPlane(const DataStructure::Global::TrackPoint*
   std::vector<int> tracker_plane(3, 0);
   double z = track_point->get_position().Z();
   int plane = 100;
+  // First we get a plane number as an integer from 0 to 29 (counting from upstream)
   for (size_t i = 0; i < z_positions.size(); i++) {
     if (approx(z, z_positions[i], 0.25)) {
       plane = i;
@@ -174,10 +176,12 @@ std::vector<int> GetTrackerPlane(const DataStructure::Global::TrackPoint*
     }
   }
   if (plane < 15) {
+    // Tracker 0
     tracker_plane[0] = 0;
     tracker_plane[1] = 5 - plane/3;
     tracker_plane[2] = 2 - plane%3;
   } else if (plane < 30) {
+    // Tracker 1
     tracker_plane[0] = 1;
     tracker_plane[1] = plane/3 - 4;
     tracker_plane[2] = plane%3;
@@ -197,6 +201,7 @@ std::vector<double> GetTrackerPlaneZPositions(std::string geo_filename) {
     z_positions.push_back(tracker_planes.at(i)->globalPosition().getZ());
   }
   std::sort(z_positions.begin(), z_positions.end());
+  delete geo_module;
   return z_positions;
 }
 
@@ -228,7 +233,9 @@ DataStructure::Global::TrackPoint* GetNearestZTrackPoint(
 }
 
 double dEdx(const G4Material* material, double E, double m) {
-  double constant = 2.54955123375e-23;
+  // Equation according to PDG 2014 eq. 32.5
+  // Converted constant so we can use electron number density instead of A/Z
+  double constant = 0.5*100*0.307075/Avogadro;
   double m_e = 0.510998928;
   double beta = std::sqrt(1 - (m*m)/(E*E));
   double beta2 = beta*beta;
@@ -240,23 +247,12 @@ double dEdx(const G4Material* material, double E, double m) {
 
   double n_e = material->GetElectronDensity();
   double I = material->GetIonisation()->GetMeanExcitationEnergy();
-  double x_0 = material->GetIonisation()->GetX0density();
-  double x_1 = material->GetIonisation()->GetX1density();
-  double C = material->GetIonisation()->GetCdensity();
-  double a = material->GetIonisation()->GetAdensity();
-  double k = material->GetIonisation()->GetMdensity();
 
   double logterm = std::log(2.0*m_e*bg2*T_max/(I*I));
-  double x = std::log(bg)/std::log(10);
 
   // density correction
-  double delta = 0.0;
-  if (x > x_0) {
-    delta = 2*std::log(10)*x - C;
-    if (x < x_1) {
-      delta += a*std::pow((x_1 - x), k);
-    }
-  }
+  double x = std::log(bg)/std::log(10);
+  double delta = material->GetIonisation()->DensityCorrection(x);
   double dEdx = -constant*n_e/beta2*(logterm - 2*beta2 - delta);
   return dEdx;
 }
@@ -313,6 +309,8 @@ void propagate(double* x, double target_z, const BTField* field,
   size_t max_steps = 10000000;
   size_t n_steps = 0;
   double z = x[3];
+  // The next 2 lines take ~8ms to execute, perhaps consider moving these outside
+  // of this function somehow?
   GeometryNavigator geometry_navigator;
   geometry_navigator.Initialise(g4navigator->GetWorldVolume());
   while (fabs(z - target_z) > 1e-6) {
@@ -333,11 +331,21 @@ void propagate(double* x, double target_z, const BTField* field,
       // Check if z distance to next material boundary is smaller than step size
       // if yes, we impose a tight limit on the step size to avoid issues
       // arising from the track not being straight
-      if (std::abs(z_dist) < std::abs(h)) {
-        if (std::abs(z_dist) > 2.0) {
-          h = 2.0*prop_dir;
+      if (std::abs(z_dist) > 0.00000000001 and
+          std::abs(z_dist) < std::abs(h)) {
+        if (std::abs(z_dist) > 1.0) {
+          h = 1.0*prop_dir;
         } else {
           h = z_dist; // will have proper sign from momvector
+        }
+      } else {
+        // We need to check if we're in a material with high stopping power, and if yes,
+        // decrease the step size as otherwise the underestimated path length due to the
+        // curved trajectory will cause problems
+        double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
+                            )->GetElectronDensity();
+        if (n_e > 1e+18) {
+          h = 1.0*prop_dir;
         }
       }
       // Making sure we don't get stuck in Zeno's paradox
@@ -382,7 +390,6 @@ void propagate(double* x, double target_z, const BTField* field,
       throw(Exception(Exception::recoverable, ios.str()+
             "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
-
     // Need to catch the case where the particle is stopped
     if (std::abs(x[4]) < (mass + 0.01)) {
       std::stringstream ios;
@@ -434,6 +441,9 @@ int z_equations_of_motion(double z, const double x[8], double dxdz[8],
 }
 
 void changeEnergy(double* x, double deltaE, double mass) {
+  if (std::isnan(deltaE)) {
+    deltaE = -x[4];
+  }
   double old_momentum = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
   x[4] += deltaE;
   double new_momentum, momentum_ratio;

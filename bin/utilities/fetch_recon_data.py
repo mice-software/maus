@@ -32,7 +32,7 @@ import shutil
 MAUS_ROOT_DIR = os.environ["MAUS_ROOT_DIR"]
 
 DEFAULT_SERVER = "http://reco.mice.rl.ac.uk/"
-DEFAULT_MAUS_VERSION = "MAUS-v2.3.1"
+DEFAULT_MAUS_VERSION = "MAUS-v2.5.0"
 DEFAULT_OUT_DIRECTORY = os.path.join(MAUS_ROOT_DIR, "files/recon/")
 
 DEFAULT_POSTFIX = "_offline.tar"

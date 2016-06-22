@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "CLHEP/Units/PhysicalConstants.h"
+#include "Geant4/G4NistManager.hh"
 
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
@@ -36,13 +37,15 @@ namespace global {
 TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
     std::string pid_hypothesis_string,
     std::map<std::string, std::pair<double, double> > matching_tolerances,
-    double max_step_size, bool energy_loss) {
+    double max_step_size, std::pair<bool, std::map<std::string, double> > no_check_settings,
+    bool energy_loss) {
   _global_event = global_event;
   _mapper_name = mapper_name;
   _pid_hypothesis_string = pid_hypothesis_string;
   _matching_tolerances = matching_tolerances;
   _max_step_size = max_step_size;
   _energy_loss = energy_loss;
+  _no_check_settings = no_check_settings;
 }
 
 void TrackMatching::USTrack() {
@@ -50,18 +53,29 @@ void TrackMatching::USTrack() {
   DataStructure::Global::TrackPArray *scifi_track_array =
       GetDetectorTrackArray(DataStructure::Global::kTracker0);
   // Get Spacepoints for TOF0/1 and convert them to TrackPoints
-  std::vector<DataStructure::Global::TrackPoint*> TOF0_tp =
-      GetDetectorTrackPoints(DataStructure::Global::kTOF0, _mapper_name);
-  std::vector<DataStructure::Global::TrackPoint*> TOF1_tp =
-      GetDetectorTrackPoints(DataStructure::Global::kTOF1, _mapper_name);
+  std::vector<DataStructure::Global::SpacePoint*> TOF0_sp =
+      GetDetectorSpacePoints(DataStructure::Global::kTOF0);
+  std::vector<DataStructure::Global::SpacePoint*> TOF1_sp =
+      GetDetectorSpacePoints(DataStructure::Global::kTOF1);
   // Ckov Spacepoints
-  std::vector<DataStructure::Global::TrackPoint*> CkovA_tp =
-      GetDetectorTrackPoints(DataStructure::Global::kCherenkovA, _mapper_name);
-  std::vector<DataStructure::Global::TrackPoint*> CkovB_tp =
-      GetDetectorTrackPoints(DataStructure::Global::kCherenkovB, _mapper_name);
-
-  // Load the magnetic field for RK4 propagation
-  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
+  std::vector<DataStructure::Global::SpacePoint*> CkovA_sp =
+      GetDetectorSpacePoints(DataStructure::Global::kCherenkovA);
+  std::vector<DataStructure::Global::SpacePoint*> CkovB_sp =
+      GetDetectorSpacePoints(DataStructure::Global::kCherenkovB);
+  // Here we check whether we actually want to use propagation for TrackMatching
+  // or if we can just assume that all hits are from the same particle
+  bool no_check = false;
+  if (_no_check_settings.first) {
+    if (scifi_track_array->size() == 1 and TOF0_sp.size() < 2 and TOF1_sp.size() < 2 and
+        CkovA_sp.size() < 2 and CkovB_sp.size() < 2) {
+      no_check = true;
+    }
+  }
+  BTFieldConstructor* field;
+  if (!no_check) {
+    // Load the magnetic field for RK4 propagation
+    field = Globals::GetMCFieldConstructor();
+  }
   // Iterate over all Tracker0 Tracks (typically 1)
   for (auto scifi_track_iter = scifi_track_array->begin();
        scifi_track_iter != scifi_track_array->end();
@@ -70,11 +84,15 @@ void TrackMatching::USTrack() {
     DataStructure::Global::Track* tracker0_track = (*scifi_track_iter);
     // Extract four-position and momentum from first track point (i.e. most
     // upstream)
-    DataStructure::Global::TrackPoint* first_tracker_tp =
-        GlobalTools::GetNearestZTrackPoint(tracker0_track, 0);
-    TLorentzVector position = first_tracker_tp->get_position();
-    TLorentzVector momentum = first_tracker_tp->get_momentum();
-    delete first_tracker_tp;
+    TLorentzVector position;
+    TLorentzVector momentum;
+    if (!no_check) {
+      DataStructure::Global::TrackPoint* first_tracker_tp =
+          GlobalTools::GetNearestZTrackPoint(tracker0_track, 0);
+      position = first_tracker_tp->get_position();
+      momentum = first_tracker_tp->get_momentum();
+      delete first_tracker_tp;
+    }
     // Create the list of PIDs for which we want to create hypothesis tracks
     int charge_hypothesis = tracker0_track->get_charge();
     std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
@@ -86,23 +104,43 @@ void TrackMatching::USTrack() {
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching-US");
       hypothesis_track->set_pid(pids[i]);
       // No matching criterion for Cherenkov hits, so if they exist, we add them
-      if (CkovA_tp.size() > 0) {
+      if (CkovA_sp.size() > 0) {
         Squeak::mout(Squeak::debug) << "TrackMatching: CkovA Added" << std::endl;
-        hypothesis_track->AddTrackPoint(CkovA_tp.at(0));
+        DataStructure::Global::TrackPoint* CkovA_tp =
+            new DataStructure::Global::TrackPoint(CkovA_sp.at(0));
+        hypothesis_track->AddTrackPoint(CkovA_tp);
       }
-      if (CkovB_tp.size() > 0) {
+      if (CkovB_sp.size() > 0) {
         Squeak::mout(Squeak::debug) << "TrackMatching: CkovB Added" << std::endl;
-        hypothesis_track->AddTrackPoint(CkovB_tp.at(0));
+        DataStructure::Global::TrackPoint* CkovB_tp =
+            new DataStructure::Global::TrackPoint(CkovB_sp.at(0));
+        hypothesis_track->AddTrackPoint(CkovB_tp);
       }
-      MatchTrackPoint(position, momentum, TOF1_tp, pids[i], field, "TOF1",
-                      hypothesis_track);
+      // Now match TOF1 and then TOF0
+      if (!no_check) {
+        MatchTrackPoint(position, momentum, TOF1_sp, pids[i], field, "TOF1",
+                        hypothesis_track);
 
-      std::vector<const MAUS::DataStructure::Global::TrackPoint*> ht_tof1_tps =
-          hypothesis_track->GetTrackPoints(DataStructure::Global::kTOF1);
-      if (ht_tof1_tps.size() > 0) {
-        double tof1_z = ht_tof1_tps[0]->get_position().Z();
-        double tof1_t = ht_tof1_tps[0]->get_position().T();
-        MatchTOF0(position, momentum, tof1_z, tof1_t, TOF0_tp, pids[i], field, hypothesis_track);
+        std::vector<const MAUS::DataStructure::Global::TrackPoint*> ht_tof1_tps =
+            hypothesis_track->GetTrackPoints(DataStructure::Global::kTOF1);
+        if (ht_tof1_tps.size() > 0) {
+          double tof1_z = ht_tof1_tps[0]->get_position().Z();
+          double tof1_t = ht_tof1_tps[0]->get_position().T();
+          MatchTOF0(position, momentum, tof1_z, tof1_t, TOF0_sp, pids[i], field, hypothesis_track);
+        }
+      } else {
+        if (TOF0_sp.size() == 1) {
+          Squeak::mout(Squeak::debug) << "TrackMatching: TOF 0 Added (No Check)" << std::endl;
+          DataStructure::Global::TrackPoint* TOF0_tp =
+              new DataStructure::Global::TrackPoint(TOF0_sp.at(0));
+          hypothesis_track->AddTrackPoint(TOF0_tp);
+        }
+        if (TOF1_sp.size() == 1) {
+          Squeak::mout(Squeak::debug) << "TrackMatching: TOF 1 Added (No Check)" << std::endl;
+          DataStructure::Global::TrackPoint* TOF1_tp =
+              new DataStructure::Global::TrackPoint(TOF1_sp.at(0));
+          hypothesis_track->AddTrackPoint(TOF1_tp);
+        }
       }
 
       // We had to add TOF0 before TOF1, so the order isn't right
@@ -119,6 +157,7 @@ void TrackMatching::USTrack() {
     }
     _global_event->add_track_recursive(tracker0_track);
   }
+  delete scifi_track_array;
 }
 
 void TrackMatching::DSTrack() {
@@ -129,12 +168,24 @@ void TrackMatching::DSTrack() {
   DataStructure::Global::TrackPArray *emr_track_array =
       GetDetectorTrackArray(DataStructure::Global::kEMR);
   // Get Spacepoints for TOF0/1 and convert them to TrackPoints
-  std::vector<DataStructure::Global::TrackPoint*> TOF2_tp =
-      GetDetectorTrackPoints(DataStructure::Global::kTOF2, _mapper_name);
-  std::vector<DataStructure::Global::TrackPoint*> KL_tp =
-      GetDetectorTrackPoints(DataStructure::Global::kCalorimeter, _mapper_name);
-  // Load the magnetic field for RK4 propagation
-  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
+  std::vector<DataStructure::Global::SpacePoint*> TOF2_sp =
+      GetDetectorSpacePoints(DataStructure::Global::kTOF2);
+  std::vector<DataStructure::Global::SpacePoint*> KL_sp =
+      GetDetectorSpacePoints(DataStructure::Global::kCalorimeter);
+  // Here we check whether we actually want to use propagation for TrackMatching
+  // or if we can just assume that all hits are from the same particle
+  bool no_check = false;
+  if (_no_check_settings.first) {
+    if (scifi_track_array->size() == 1 and TOF2_sp.size() < 2 and KL_sp.size() < 2 and
+        emr_track_array->size() < 2) {
+      no_check = true;
+    }
+  }
+  BTFieldConstructor* field;
+  if (!no_check) {
+    // Load the magnetic field for RK4 propagation
+    field = Globals::GetMCFieldConstructor();
+  }
   // Iterate over all Tracker1 Tracks (typically 1)
   for (auto scifi_track_iter = scifi_track_array->begin();
        scifi_track_iter != scifi_track_array->end();
@@ -143,10 +194,15 @@ void TrackMatching::DSTrack() {
     DataStructure::Global::Track* tracker1_track = (*scifi_track_iter);
     // Extract four-position and momentum from last track point (i.e. most
     // downstream
-    DataStructure::Global::TrackPoint* last_tracker_tp =
-        GlobalTools::GetNearestZTrackPoint(tracker1_track, 100000);
-    TLorentzVector position = last_tracker_tp->get_position();
-    TLorentzVector momentum = last_tracker_tp->get_momentum();
+    TLorentzVector position;
+    TLorentzVector momentum;
+    if (!no_check) {
+      DataStructure::Global::TrackPoint* last_tracker_tp =
+          GlobalTools::GetNearestZTrackPoint(tracker1_track, 100000);
+      position = last_tracker_tp->get_position();
+      momentum = last_tracker_tp->get_momentum();
+      delete last_tracker_tp;
+    }
     // Create the list of PIDs for which we want to create hypothesis tracks
     int charge_hypothesis = tracker1_track->get_charge();
     std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
@@ -162,18 +218,50 @@ void TrackMatching::DSTrack() {
       double mass = Particle::GetInstance().GetMass(pids[i]);
       AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching-DS",
                             mass, hypothesis_track);
-      // TOF2
-      MatchTrackPoint(position, momentum, TOF2_tp, pids[i], field, "TOF2",
+      if (!no_check) {
+        // TOF2
+        MatchTrackPoint(position, momentum, TOF2_sp, pids[i], field, "TOF2",
+                        hypothesis_track);
+        // KL
+        MatchTrackPoint(position, momentum, KL_sp, pids[i], field, "KL",
+                        hypothesis_track);
+        // EMR
+        MatchEMRTrack(position, momentum, emr_track_array, pids[i], field,
                       hypothesis_track);
-      // KL
-      MatchTrackPoint(position, momentum, KL_tp, pids[i], field, "KL",
-                      hypothesis_track);
-      // EMR
-      MatchEMRTrack(position, momentum, emr_track_array, pids[i], field,
-                    hypothesis_track);
+      } else {
+        if (TOF2_sp.size() == 1) {
+          Squeak::mout(Squeak::debug) << "TrackMatching: TOF 2 Added (No Check)" << std::endl;
+          DataStructure::Global::TrackPoint* TOF2_tp =
+              new DataStructure::Global::TrackPoint(TOF2_sp.at(0));
+          hypothesis_track->AddTrackPoint(TOF2_tp);
+        }
+        if (KL_sp.size() == 1) {
+          Squeak::mout(Squeak::debug) << "TrackMatching: KL Added (No Check)" << std::endl;
+          DataStructure::Global::TrackPoint* KL_tp =
+              new DataStructure::Global::TrackPoint(KL_sp.at(0));
+          hypothesis_track->AddTrackPoint(KL_tp);
+        }
+        if (emr_track_array->size() == 1) {
+          hypothesis_track->set_emr_range_primary(emr_track_array->at(0)->get_emr_range_primary());
+          std::vector<const DataStructure::Global::TrackPoint*> emr_trackpoints =
+              emr_track_array->at(0)->GetTrackPoints();
+          for (size_t i = 0; i < emr_trackpoints.size(); i++) {
+            DataStructure::Global::TrackPoint* emr_tp =
+                emr_trackpoints[i]->Clone();
+            emr_tp->set_mapper_name("MapCppGlobalTrackMatching-DS");
+            TLorentzVector momentum = emr_tp->get_momentum();
+            double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
+            momentum.SetE(energy);
+            emr_tp->set_momentum(momentum);
+            hypothesis_track->AddTrackPoint(emr_tp);
+          }
+        }
+      }
       _global_event->add_track_recursive(hypothesis_track);
     }
   }
+  delete scifi_track_array;
+  delete emr_track_array;
 }
 
 void TrackMatching::throughTrack() {
@@ -240,33 +328,18 @@ DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(
   return track_array;
 }
 
-std::vector<DataStructure::Global::TrackPoint*>
-    TrackMatching::GetDetectorTrackPoints(
-    DataStructure::Global::DetectorPoint detector, std::string mapper_name) {
-  std::vector<DataStructure::Global::TrackPoint*> track_points;
+std::vector<DataStructure::Global::SpacePoint*>
+    TrackMatching::GetDetectorSpacePoints(
+    DataStructure::Global::DetectorPoint detector) {
+  std::vector<DataStructure::Global::SpacePoint*> space_points;
   std::vector<DataStructure::Global::SpacePoint*> *global_spacepoint_array =
       _global_event->get_space_points();
   for (size_t i = 0; i < global_spacepoint_array->size(); i++) {
-    DataStructure::Global::SpacePoint* space_point =
-        global_spacepoint_array->at(i);
-    if (!space_point) {
-      continue;
-    }
-    if (space_point->get_detector() == detector) {
-      DataStructure::Global::TrackPoint* track_point =
-          new DataStructure::Global::TrackPoint(space_point);
-      std::string blsection_mapper_name = mapper_name;
-      if ((detector == DataStructure::Global::kTOF2) or
-          (detector == DataStructure::Global::kCalorimeter)) {
-        blsection_mapper_name.append("-DS");
-      } else {
-        blsection_mapper_name.append("-US");
-      }
-      track_point->set_mapper_name(blsection_mapper_name);
-      track_points.push_back(track_point);
+    if (global_spacepoint_array->at(i)->get_detector() == detector) {
+      space_points.push_back(global_spacepoint_array->at(i));
     }
   }
-  return track_points;
+  return space_points;
 }
 
 std::vector<DataStructure::Global::PID> TrackMatching::PIDHypotheses(
@@ -302,38 +375,47 @@ std::vector<DataStructure::Global::PID> TrackMatching::PIDHypotheses(
 }
 
 void TrackMatching::MatchTrackPoint(
-    const TLorentzVector &position, const TLorentzVector &momentum,
-    const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+    TLorentzVector &position, TLorentzVector &momentum,
+    const std::vector<DataStructure::Global::SpacePoint*> &spacepoints,
     DataStructure::Global::PID pid, BTFieldConstructor* field,
     std::string detector_name, DataStructure::Global::Track* hypothesis_track) {
   double mass = Particle::GetInstance().GetMass(pid);
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
   double x_in[] = {0., position.X(), position.Y(), position.Z(),
                    energy, momentum.X(), momentum.Y(), momentum.Z()};
-  if (trackpoints.size() > 0) {
-    double target_z = trackpoints.at(0)->get_position().Z();
+  if (spacepoints.size() > 0) {
+    double target_z = spacepoints.at(0)->get_position().Z();
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
                              _energy_loss);
+      // To avoid doing the same propagation again for the same point, store the propagated
+      // values back in the TLorentzVectors
+      position.SetX(x_in[1]);
+      position.SetY(x_in[2]);
+      position.SetZ(x_in[3]);
+      momentum.SetX(x_in[5]);
+      momentum.SetY(x_in[6]);
+      momentum.SetZ(x_in[7]);
       // Temporary container for trackpoints for checking if multiple matches are compatible
-      std::vector<DataStructure::Global::TrackPoint*> temp_trackpoints;
-      for (size_t i = 0; i < trackpoints.size(); i++) {
+      std::vector<DataStructure::Global::SpacePoint*> temp_spacepoints;
+      for (size_t i = 0; i < spacepoints.size(); i++) {
         // Check if TrackPoints match and if yes, collect them to later check for consistency
-        if (GlobalTools::approx(x_in[1], trackpoints.at(i)->get_position().X(),
+        if (GlobalTools::approx(x_in[1], spacepoints.at(i)->get_position().X(),
                 _matching_tolerances.at(detector_name).first) and
-            GlobalTools::approx(x_in[2], trackpoints.at(i)->get_position().Y(),
+            GlobalTools::approx(x_in[2], spacepoints.at(i)->get_position().Y(),
                 _matching_tolerances.at(detector_name).second)) {
-          temp_trackpoints.push_back(trackpoints.at(i));
+          temp_spacepoints.push_back(spacepoints.at(i));
           Squeak::mout(Squeak::debug) << "TrackMatching: "
                                       << detector_name << " Match" << std::endl;
         } else {
           Squeak::mout(Squeak::debug) << "TrackMatching: " << detector_name
               << " Mismatch, dx, dy are:\n"
-              << x_in[1] - trackpoints.at(i)->get_position().X() << " "
-              << x_in[2] - trackpoints.at(i)->get_position().Y() << std::endl;
+              << x_in[1] - spacepoints.at(i)->get_position().X() << " "
+              << x_in[2] - spacepoints.at(i)->get_position().Y() << std::endl;
         }
       }
-      AddIfConsistent(temp_trackpoints, hypothesis_track);
+      // If there are multiple matches, this checks if they could have been from the same particle
+      AddIfConsistent(temp_spacepoints, hypothesis_track);
     } catch (Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
@@ -343,35 +425,43 @@ void TrackMatching::MatchTrackPoint(
 void TrackMatching::MatchTOF0(
     const TLorentzVector &position, const TLorentzVector &momentum,
     double tof1_z, double tof1_t,
-    const std::vector<DataStructure::Global::TrackPoint*> &trackpoints,
+    const std::vector<DataStructure::Global::SpacePoint*> &spacepoints,
     DataStructure::Global::PID pid, BTFieldConstructor* field,
     DataStructure::Global::Track* hypothesis_track) {
-  ofstream tof0file;
-  tof0file.open("match_tof0.csv", std::ios::out | std::ios::app);
   double mass = Particle::GetInstance().GetMass(pid);
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
-  if (trackpoints.size() > 0) {
-
+  if (spacepoints.size() > 0) {
     double x_in[] = {0., position.X(), position.Y(), position.Z(),
                      energy, momentum.X(), momentum.Y(), momentum.Z()};
+    // First propagate to just upstream of TOF1 to get the energy during TOF0-1 transit
     try {
       GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
                              _energy_loss);
     } catch (Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
-    double z_distance = tof1_z - trackpoints.at(0)->get_position().Z();
+    // Calculate the distance to TOF0 and the approximate distance the particle travelled
+    double z_distance = tof1_z - spacepoints.at(0)->get_position().Z();
+    double approx_travel_distance =
+        z_distance*std::sqrt(x_in[5]*x_in[5] + x_in[6]*x_in[6] + x_in[7]*x_in[7])/x_in[7];
+    // To account for energy loss in air, calculate approximate energy loss for half the distance
+    // travelled (to obtain ~average velocity)
+    G4NistManager* manager = G4NistManager::Instance();
+    G4Material* air = manager->FindOrBuildMaterial("G4_AIR");
+    double air_E_loss = GlobalTools::dEdx(air, energy, mass)*approx_travel_distance*0.5;
+    GlobalTools::changeEnergy(x_in, air_E_loss, mass);
     double velocity = (x_in[7] / x_in[4]) * CLHEP::c_light;
 
+    // Compare reconstructed delta T with expected travel time
     // Change later to be set by datacards
-    double deltaTMin = (z_distance/velocity) - 2.0;
-    double deltaTMax = (z_distance/velocity) + 2.0;
+    double deltaTMin = (z_distance/velocity) - _matching_tolerances.at("TOF0").first;
+    double deltaTMax = (z_distance/velocity) + _matching_tolerances.at("TOF0").first;
     // Temporary container for trackpoints for checking if multiple matches are compatible
-    std::vector<DataStructure::Global::TrackPoint*> temp_trackpoints;
-    for (size_t i = 0; i < trackpoints.size(); i++) {
-      double deltaT = tof1_t - trackpoints.at(i)->get_position().T();
+    std::vector<DataStructure::Global::SpacePoint*> temp_spacepoints;
+    for (size_t i = 0; i < spacepoints.size(); i++) {
+      double deltaT = tof1_t - spacepoints.at(i)->get_position().T();
       if (deltaT > deltaTMin and deltaT < deltaTMax) {
-        temp_trackpoints.push_back(trackpoints.at(i));
+        temp_spacepoints.push_back(spacepoints.at(i));
         Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Match"
                                     << std::endl;
       } else {
@@ -380,7 +470,7 @@ void TrackMatching::MatchTOF0(
             << " and " << deltaTMax << std::endl;
       }
     }
-    AddIfConsistent(temp_trackpoints, hypothesis_track);
+    AddIfConsistent(temp_spacepoints, hypothesis_track);
   }
 }
 
@@ -495,6 +585,8 @@ void TrackMatching::MatchUSDS(
       us_track->GetTrackPoints();
   DataStructure::Global::TrackPointCPArray ds_trackpoints =
       ds_track->GetTrackPoints();
+  // Obtain TOF1 and TOF2 times to calculate the effective speed of the particle
+  // between the detectors
   double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
                                             DataStructure::Global::kTOF1);
   double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
@@ -508,6 +600,7 @@ void TrackMatching::MatchUSDS(
     through_track->set_pid(pid);
     Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched"
                                 << std::endl;
+    // Assemble through track from trackpoints from the matched US and DS tracks
     for (auto trackpoint_iter = us_trackpoints.begin();
          trackpoint_iter != us_trackpoints.end();
          ++trackpoint_iter) {
@@ -524,6 +617,11 @@ void TrackMatching::MatchUSDS(
     through_track->AddTrack(us_track);
     through_track->AddTrack(ds_track);
     _global_event->add_track(through_track);
+  } else {
+    // There is a small memory leak here, but deleting the tracks here won't work
+    // Might require a fair bit of rewrite, so not sure right now if worth it.
+    // delete us_track;
+    // delete ds_track;
   }
 }
 
@@ -541,20 +639,20 @@ double TrackMatching::TOFTimeFromTrackPoints(
   return TOF_time;
 }
 
-void TrackMatching::AddIfConsistent(std::vector<DataStructure::Global::TrackPoint*> trackpoints,
+void TrackMatching::AddIfConsistent(std::vector<DataStructure::Global::SpacePoint*> spacepoints,
                      DataStructure::Global::Track* hypothesis_track) {
   bool consistent = true;
   // If there are no trackpoints, we don't have to add anything, if there is
   // exactly one, we leave consistent at true so that it gets added in the end
-  if (trackpoints.size() < 1) {
+  if (spacepoints.size() < 1) {
     consistent = false;
-  } else if (trackpoints.size() > 1) {
+  } else if (spacepoints.size() > 1) {
     // For the KL, we can only compare by y position
-    if (trackpoints.at(0)->get_detector() == DataStructure::Global::kCalorimeter) {
-      for (size_t i = 0; i < trackpoints.size() - 1; i++) {
-        for (size_t j = i + 1; j < trackpoints.size(); j++) {
-          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().Y(),
-              trackpoints.at(j)->get_position().Y(), 50.0))) {
+    if (spacepoints.at(0)->get_detector() == DataStructure::Global::kCalorimeter) {
+      for (size_t i = 0; i < spacepoints.size() - 1; i++) {
+        for (size_t j = i + 1; j < spacepoints.size(); j++) {
+          if (!(GlobalTools::approx(spacepoints.at(i)->get_position().Y(),
+              spacepoints.at(j)->get_position().Y(), 50.0))) {
             consistent = false;
           }
         }
@@ -563,18 +661,18 @@ void TrackMatching::AddIfConsistent(std::vector<DataStructure::Global::TrackPoin
       // Though the detector granularity is different for TOF0, we can use the same
       // x and y allowance for all TOFs, 70mm is above one slab and below two slabs
       // for all TOFs
-      for (size_t i = 0; i < trackpoints.size() - 1; i++) {
-        for (size_t j = i + 1; j < trackpoints.size(); j++) {
-          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().X(),
-              trackpoints.at(j)->get_position().X(), 70.0))) {
+      for (size_t i = 0; i < spacepoints.size() - 1; i++) {
+        for (size_t j = i + 1; j < spacepoints.size(); j++) {
+          if (!(GlobalTools::approx(spacepoints.at(i)->get_position().X(),
+              spacepoints.at(j)->get_position().X(), 70.0))) {
             consistent = false;
           }
-          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().Y(),
-              trackpoints.at(j)->get_position().Y(), 70.0))) {
+          if (!(GlobalTools::approx(spacepoints.at(i)->get_position().Y(),
+              spacepoints.at(j)->get_position().Y(), 70.0))) {
             consistent = false;
           }
-          if (!(GlobalTools::approx(trackpoints.at(i)->get_position().T(),
-              trackpoints.at(j)->get_position().T(), 0.5))) {
+          if (!(GlobalTools::approx(spacepoints.at(i)->get_position().T(),
+              spacepoints.at(j)->get_position().T(), 0.5))) {
             consistent = false;
           }
         }
@@ -585,8 +683,11 @@ void TrackMatching::AddIfConsistent(std::vector<DataStructure::Global::TrackPoin
   // the hypothesis track, else we don't add anything as we can't tell which
   // trackpoint actually belongs to the track
   if (consistent) {
-    for (size_t i = 0; i < trackpoints.size(); i++) {
-      hypothesis_track->AddTrackPoint(trackpoints.at(i));
+    for (size_t i = 0; i < spacepoints.size(); i++) {
+      DataStructure::Global::TrackPoint* trackpoint =
+          new DataStructure::Global::TrackPoint(spacepoints.at(i));
+      trackpoint->set_mapper_name(_mapper_name);
+      hypothesis_track->AddTrackPoint(trackpoint);
     }
   }
   return;
