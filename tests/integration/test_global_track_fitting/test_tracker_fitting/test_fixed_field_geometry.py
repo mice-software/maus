@@ -12,7 +12,7 @@ import libMausCpp
 
 
 class TestAnalysis(object):
-    def __init__(self, file_name, target_z, do_event_display, max_entry):
+    def __init__(self, file_name, target_z, do_event_display, max_entry, do_global, suffix):
         self.events = []
         self.target_z = target_z
         self.root_objects = []
@@ -23,7 +23,9 @@ class TestAnalysis(object):
         self.do_event_display = do_event_display
         self.event_display_event = {}
         self.bounds_from_fit = False
-        self.plots = "plots/"+str(round(target_z, 0))+"/"
+        self.suffix = suffix
+        self.plots = "plots"+self.suffix+"/"+str(round(target_z, 0))+"/"
+        self.do_global = do_global
         try:
             shutil.rmtree(self.plots)
         except OSError:
@@ -39,8 +41,12 @@ class TestAnalysis(object):
             raise RuntimeError("Failed to load any data")
 
 
-    def plot_1d(self, var_1, el_1, canvas = None, color = 1, n = 0):
+    def plot_1d(self, var_1, el_1, canvas = None, color = 1, n = 0, title = ""):
+        if var_1 == "global" and not self.do_global:
+            return canvas
         name = el_1
+        if title != "":
+            name += "_-_"+title
         values_1 = [event[var_1][el_1] for event in self.events]
         axis_1 = el_1
         fit = ROOT.TF1("fit", "gaus")
@@ -69,7 +75,7 @@ class TestAnalysis(object):
         if canvas == None:
             canvas = xboa.common.make_root_canvas(name)
             canvas.Draw()
-            hist.SetTitle("z = "+str(round(event["virtual_hit"]["z"], 0))+" mm")
+            hist.SetTitle(title+"z = "+str(round(event["virtual_hit"]["z"], 0))+" mm")
             hist.Draw()
         else:
             canvas.cd()
@@ -103,6 +109,8 @@ class TestAnalysis(object):
         canvas.Update()
         for format in "root", "png", "pdf":
             name = name.replace(' ', '_')
+            for key in ['#', '{' ,'}', 'circ']:
+                name = name.replace(key, '')
             canvas.Print(self.plots+name+"."+format)
         fout = open(self.plots+name+".json", "w")
         print >> fout, json.dumps(text_json)
@@ -146,11 +154,14 @@ class TestAnalysis(object):
                     self.setup_event_display(spill_number, ev_number)
                     scifi_event = reco_event.GetSciFiEvent()
                     global_event = reco_event.GetGlobalEvent()
+                    mc_event = spill.GetMCEvents()[ev_number]
                     sf_hit = self.load_scifi_event(scifi_event)
                     sf_point = self.load_scifi_event_space_points(scifi_event)
-                    glob_hit = self.load_global_event(global_event)
-                    mc_event = spill.GetMCEvents()[ev_number]
                     vhit = self.load_virtual_hits(mc_event)
+                    if self.do_global:
+                        glob_hit = self.load_global_event(global_event)
+                    else:
+                        glob_hit = vhit
                     if self.do_event_display_this_event:
                         self.make_event_display(spill_number, ev_number)
                     if sf_hit == None or vhit == None or sf_point == None or glob_hit == None:
@@ -223,7 +234,7 @@ class TestAnalysis(object):
                 graph.Draw("SAMEPL")
                 canvas.Update()
                 for format in "png", "root", "pdf":
-                    canvas.Print("plots/event-display_"+str(spill_number)+"-"+str(event_number)+"_"+x_axis+"-"+y_axis+"."+format)
+                    canvas.Print("plots"+self.suffix+"/event-display_"+str(spill_number)+"-"+str(event_number)+"_"+x_axis+"-"+y_axis+"."+format)
 
     def load_global_event(self, global_event):
         z_list = []
@@ -322,16 +333,21 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
     def tearDownClass(cls):
         os.chdir(cls.here)
 
-    def generate_dataset(self, verbose):
+    def rotate_mc(self, qx, qy, scale):
+        xboa.common.substitute("geometry_07469/ParentGeometryFile_pry_mc.in",
+                               "geometry_07469/ParentGeometryFile_pry_mc.dat",
+                               {"__qx__":qx, "__qy__":qy, "__scale__":scale})
+
+    def generate_dataset(self, verbose, suffix):
         mc_config = os.path.join("fixed_field_mc_config.py")
         mc_proc_list = ["python", self.sim,
                         "--configuration_file", mc_config,
-                        "--output_root_file_name", self.out+"_mc.root"]
+                        "--output_root_file_name", self.out+suffix+"_mc.root"]
         recon_config = os.path.join("fixed_field_recon_config.py")
         recon_proc_list = ["python", self.recon,
                         "--configuration_file", recon_config,
-                        "--input_root_file_name", self.out+"_mc.root",
-                        "--output_root_file_name", self.out+"_recon.root"]
+                        "--input_root_file_name", self.out+suffix+"_mc.root",
+                        "--output_root_file_name", self.out+suffix+"_recon.root"]
         if verbose:
             proc = subprocess.Popen(mc_proc_list)
             proc.wait()
@@ -348,30 +364,48 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
                                     stderr = subprocess.STDOUT)
             proc.wait()
 
-    def plots(self, analysis):
-        x_canvas = analysis.plot_1d("scifi", "x", color = 2, n = 0)
-        y_canvas = analysis.plot_1d("scifi", "y", color = 2, n = 0)
-        px_canvas = analysis.plot_1d("scifi", "px", color = 2, n = 0)
-        py_canvas = analysis.plot_1d("scifi", "py", color = 2, n = 0)
-        pz_canvas = analysis.plot_1d("scifi", "pz", color = 2, n = 0)
-        analysis.plot_1d("global", "x", x_canvas, color = 4, n = 1)
-        analysis.plot_1d("global", "y", y_canvas, color = 4, n = 1)
-        analysis.plot_1d("global", "px", px_canvas, color = 4, n = 1)
-        analysis.plot_1d("global", "py", py_canvas, color = 4, n = 1)
-        analysis.plot_1d("global", "pz", pz_canvas, color = 4, n = 1)
-        analysis.plot_1d("scifi_space_point", "x", x_canvas, color = 6, n = 2)
-        analysis.plot_1d("scifi_space_point", "y", y_canvas, color = 6, n = 2)
+    def plots(self, analysis, tit):
+        x_canvas = analysis.plot_1d("scifi", "x", color = 2, n = 0, title = tit)
+        y_canvas = analysis.plot_1d("scifi", "y", color = 2, n = 0, title = tit)
+        px_canvas = analysis.plot_1d("scifi", "px", color = 2, n = 0, title = tit)
+        py_canvas = analysis.plot_1d("scifi", "py", color = 2, n = 0, title = tit)
+        pz_canvas = analysis.plot_1d("scifi", "pz", color = 2, n = 0, title = tit)
+        analysis.plot_1d("global", "x", x_canvas, color = 4, n = 1, title = tit)
+        analysis.plot_1d("global", "y", y_canvas, color = 4, n = 1, title = tit)
+        analysis.plot_1d("global", "px", px_canvas, color = 4, n = 1, title = tit)
+        analysis.plot_1d("global", "py", py_canvas, color = 4, n = 1, title = tit)
+        analysis.plot_1d("global", "pz", pz_canvas, color = 4, n = 1, title = tit)
+        analysis.plot_1d("scifi_space_point", "x", x_canvas, color = 6, n = 2, title = tit)
+        analysis.plot_1d("scifi_space_point", "y", y_canvas, color = 6, n = 2, title = tit)
 
     def test_fixed_field(self):
         print "Generating data"
-        self.generate_dataset(True)
-        print "Generated data"
+        for qx in [round(i/20., 2) for i in range(1)]:
+            for qy in [round(j/1.) for j in range(1)]:
+                for scale in [0.9, 0.95, 1.0, 1.05, 1.10]:
+                    scale = round(scale, 2)
+                    xboa.common.clear_root()
+                    self.rotate_mc(qx, qy, scale)
+                    suffix = "_"+str(qx)+"_"+str(qy)+"_"+str(scale)
+                    self.generate_dataset(True, suffix)
+                    print "Generated data"
+                    for i, z in enumerate([13962., 14312., 14612., 14861., 15062.]):
+                        xboa.common.clear_root()
+                        analysis = TestAnalysis(self.out+suffix+"_recon.root", z, False, 10, True, suffix)
+                        tit = "#theta_{x} = "+str(qx)+"#circ "
+                        tit += "#theta_{y} = "+str(qy)+"#circ "
+                        tit += "~J = "+str(scale)+" "
+                        self.plots(analysis, tit)
+
+    def _test_mc_field(self):
+        fname = "reco/MAUS-v2.5.0/mc/mc_3mm200_07469_MAUS-v250_1.root"
         for i, z in enumerate([13962., 14312., 14612., 14861., 15062.]):
             xboa.common.clear_root()
-
-            analysis = TestAnalysis(self.out+"_recon.root", z, False, 10)
+            analysis = TestAnalysis(fname, z, False, 10, False)
             self.plots(analysis)
         raw_input()
+
+
 
 if __name__ == "__main__":
     unittest.main()
