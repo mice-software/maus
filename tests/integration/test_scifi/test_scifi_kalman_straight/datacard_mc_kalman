@@ -1,0 +1,58 @@
+twiss_transverse =  {
+       "reference":{
+            "position":{"x":0.0, "y":0.0, "z":13900.0},
+            "momentum":{"x":0.0, "y":0.0, "z":1.0},
+            "particle_id":-13, "energy":200., "time":0.0, "random_seed":10,
+            "spin":{"x":0.0, "y":0.0, "z":1.0}
+        },
+       "random_seed_algorithm":"incrementing_random",
+       "n_particles_per_spill":100,
+       "transverse":{
+          "transverse_mode":"twiss",
+          "beta_x":1000.,
+          "alpha_x":0.,
+          "emittance_x":2,
+          "beta_y":1000.,
+          "alpha_y":0.,
+          "emittance_y":2,
+       },
+       "longitudinal":{"longitudinal_mode":"pencil",
+                   "momentum_variable":"p",
+        },
+       "coupling":{"coupling_mode":"none"}
+    }
+
+pencil_transverse =  {
+       "reference":{
+            "position":{"x":-100.0, "y":-90.0, "z":13900.0},
+            "momentum":{"x":0.025, "y":0.02, "z":1.0},
+            "particle_id":-13, "energy":200., "time":0.0, "random_seed":10,
+            "spin":{"x":0.0, "y":0.0, "z":1.0}
+        },
+       "random_seed_algorithm":"incrementing_random",
+       "n_particles_per_spill":1,
+       "transverse":{
+          "transverse_mode":"pencil"
+       },
+       "longitudinal":{"longitudinal_mode":"pencil",
+                   "momentum_variable":"p",
+        },
+       "coupling":{"coupling_mode":"none"}
+    }
+
+spill_generator_number_of_spills = 50
+simulation_geometry_filename = "%s/tests/integration/test_scifi/test_scifi_kalman_straight/geometry_07417/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
+verbose_level = 1
+physics_processes = "mean_energy_loss"
+SciFiKalmanVerbose = True
+SciFiPRHelicalTkUSOn = 1 # 0 = automatic, 1 = off, 2 = on
+SciFiPRHelicalTkDSOn = 1
+SciFiPRStraightTkUSOn = 2
+SciFiPRStraightTkDSOn = 2
+beam = {
+    "particle_generator":"counter",
+    "random_seed":0,
+    "definitions":[
+       twiss_transverse
+    ]
+}
