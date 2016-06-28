@@ -243,6 +243,7 @@ void TrackMatching::DSTrack() {
         }
         if (emr_track_array->size() == 1) {
           hypothesis_track->set_emr_range_primary(emr_track_array->at(0)->get_emr_range_primary());
+          hypothesis_track->set_emr_plane_density(emr_track_array->at(0)->get_emr_plane_density());
           std::vector<const DataStructure::Global::TrackPoint*> emr_trackpoints =
               emr_track_array->at(0)->GetTrackPoints();
           for (size_t i = 0; i < emr_trackpoints.size(); i++) {
@@ -294,11 +295,9 @@ void TrackMatching::throughTrack() {
              ++ds_track_iter) {
           // Going to assume that if several TrackPoints for the same TOF are in
           // the track that they have been checked to be sensible (TODO above)
-          double emr_range_primary = (*ds_track_iter)->get_emr_range_primary();
           if (((*us_track_iter)->GetTrackPoints().size() > 0) and
               ((*ds_track_iter)->GetTrackPoints().size() > 0)) {
-            MatchUSDS((*us_track_iter), (*ds_track_iter), pids[i],
-                      emr_range_primary);
+            MatchUSDS((*us_track_iter), (*ds_track_iter), pids[i]);
           }
         }
       }
@@ -580,7 +579,7 @@ void TrackMatching::USDSTracks(
 void TrackMatching::MatchUSDS(
     DataStructure::Global::Track* us_track,
     DataStructure::Global::Track* ds_track,
-    DataStructure::Global::PID pid, double emr_range_primary) {
+    DataStructure::Global::PID pid) {
   DataStructure::Global::TrackPointCPArray us_trackpoints =
       us_track->GetTrackPoints();
   DataStructure::Global::TrackPointCPArray ds_trackpoints =
@@ -613,7 +612,8 @@ void TrackMatching::MatchUSDS(
       through_track->AddTrackPoint(
           const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
     }
-    through_track->set_emr_range_primary(emr_range_primary);
+    through_track->set_emr_range_primary(ds_track->get_emr_range_primary());
+    through_track->set_emr_plane_density(ds_track->get_emr_plane_density());
     through_track->AddTrack(us_track);
     through_track->AddTrack(ds_track);
     _global_event->add_track(through_track);

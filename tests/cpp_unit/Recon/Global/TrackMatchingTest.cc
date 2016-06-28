@@ -618,10 +618,11 @@ TEST_F(TrackMatchingTest, MatchUSDS) {
   tof1_track->AddTrackPoint(&tof1_tp);
   DataStructure::Global::Track* tof2_track = new DataStructure::Global::Track;
   tof2_track->AddTrackPoint(&tof2_tp);
+  tof2_track->set_emr_range_primary(15.0);
 
   DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
 
-  _track_matching->MatchUSDS(tof1_track, tof2_track, pid, 15.0);
+  _track_matching->MatchUSDS(tof1_track, tof2_track, pid);
 
   std::vector<DataStructure::Global::Track*>* through_tracks =
       GlobalTools::GetTracksByMapperName(_global_event,
