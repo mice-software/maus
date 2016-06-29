@@ -36,6 +36,8 @@ straight_datacard_name = os.path.join(wrk_dir, "datacard_mc_kalman")
 straight_root_file_name = os.path.join(wrk_dir, "maus_output_kalman.root")
 simulation = os.path.join(wrk_dir, "simulate_scifi.py")
 run_number = 7417
+tolerance = 4.0
+plane_sep = 0.1
 
 
 def download_geometry():
@@ -76,7 +78,7 @@ def run_straight_simulation():
 class TestSciFiKalmanStraight(unittest.TestCase): # pylint: disable=R0904
     """ Run the scifi straight kalman and check output """
 
-    def test_straight_kalman(self, tolerance=4.0):
+    def test_straight_kalman(self):
         """ TestSciFiKalmanStraight: histogram residuals & check properties """
 
         # Download the geometry
@@ -88,23 +90,31 @@ class TestSciFiKalmanStraight(unittest.TestCase): # pylint: disable=R0904
         proc, log_file_name = run_straight_simulation()
         self.assertEqual(proc.returncode, 0, msg="Check log "+log_file_name)
 
-        print "Data generated - now check"
+        print "Data generated - now check, tolerance = " + str(tolerance)
         dataloader = DataLoader(straight_root_file_name, 15063.)
 
         mean, std, entries = dataloader.plot_1d("residual", "x")
         errorOnMean = std/numpy.sqrt(entries)
+        print str(errorOnMean) + ' ' + str(mean) + ' ' \
+          + str(std) + ' ' + str(entries)
         self.assertLess(numpy.abs(mean), tolerance*errorOnMean)
 
         mean, std, entries = dataloader.plot_1d("residual", "y")
         errorOnMean = std/numpy.sqrt(entries)
+        print str(errorOnMean) + ' ' + str(mean) + ' ' \
+          + str(std) + ' ' + str(entries)
         self.assertLess(numpy.abs(mean), tolerance*errorOnMean)
 
         mean, std, entries = dataloader.plot_1d("residual", "xp")
         errorOnMean = std/numpy.sqrt(entries)
+        print str(errorOnMean) + ' ' + str(mean) + ' ' \
+          + str(std) + ' ' + str(entries)
         self.assertLess(numpy.abs(mean), tolerance*errorOnMean)
 
         mean, std, entries = dataloader.plot_1d("residual", "yp")
         errorOnMean = std/numpy.sqrt(entries)
+        print str(errorOnMean) + ' ' + str(mean) + ' ' \
+          + str(std) + ' ' + str(entries)
         self.assertLess(numpy.abs(mean), tolerance*errorOnMean)
 
 class DataLoader(object):
@@ -168,7 +178,6 @@ class DataLoader(object):
             tree.GetEntry(spill_number)
             spill = data.GetSpill()
             if spill.GetDaqEventType() == "physics_event":
-                print "spill", spill_number
                 for ev_number, reco_event in enumerate(spill.GetReconEvents()):
                     scifi_event = reco_event.GetSciFiEvent()
                     recon_data = self.load_scifi_event(scifi_event)
@@ -223,7 +232,7 @@ class DataLoader(object):
                 print "vhit", pos.x(), pos.y(), pos.z()
             z_list.append([abs(pos.z()-self.target_z), vhit])
         z_list = sorted(z_list)
-        if len(z_list) > 0 and z_list[0][0] < 1.:
+        if len(z_list) > 0 and z_list[0][0] < plane_sep:
             vhit = z_list[0][1]
             pos = vhit.GetPosition()
             mom = vhit.GetMomentum()

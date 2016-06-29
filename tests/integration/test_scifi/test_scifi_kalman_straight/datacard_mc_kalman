@@ -40,7 +40,7 @@ pencil_transverse =  {
        "coupling":{"coupling_mode":"none"}
     }
 
-spill_generator_number_of_spills = 50
+spill_generator_number_of_spills = 5
 simulation_geometry_filename = "%s/tests/integration/test_scifi/test_scifi_kalman_straight/geometry_07417/ParentGeometryFile.dat" % os.environ.get("MAUS_ROOT_DIR")
 verbose_level = 1
 physics_processes = "mean_energy_loss"
