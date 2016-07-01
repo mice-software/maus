@@ -196,6 +196,12 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
   /** Processor for DBBChain data. */
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
 
+  /** Processor for TriggerEngine data. */
+  TriggerEngineCppDataProcessor  *_TriggerEngineFragmentProc_cpp;
+
+  /** Processor for EpicsInterface data. */
+  EpicsInterfaceCppDataProcessor  *_EpicsInterfaceFragmentProc_cpp;
+
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.
   * \return The type of the event as string.

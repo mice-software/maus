@@ -40,6 +40,8 @@ InputCppDAQData::InputCppDAQData() : InputBase<MAUS::Data>("InputCppDAQData") {
   _vLSBFragmentProc_cpp   = NULL;
   _DBBFragmentProc_cpp     = NULL;
   _DBBChainFragmentProc_cpp = NULL;
+  _TriggerEngineFragmentProc_cpp = NULL;
+  _EpicsInterfaceFragmentProc_cpp = NULL;
 }
 
 
@@ -81,6 +83,12 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
 
   // Comfigure the DBB Chain (chain of 6 EMR boards) data processor.
   initProcessor(_DBBChainFragmentProc_cpp, configJSON);
+
+  // Comfigure the _Trigger Engine data processor.
+  initProcessor(_TriggerEngineFragmentProc_cpp, configJSON);
+
+  // Comfigure the _Epics Interface data processor.
+  initProcessor(_EpicsInterfaceFragmentProc_cpp, configJSON);
 
   // frankliuao: moved the _map.InitFromCards(configJSON) to InputCppDAQOnlineData
   // and InputCppDAQOfflineData. There, daq_cabling_source is forced to be "CDB"
@@ -141,6 +149,12 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
 
       if (_vLSBFragmentProc_cpp)
         _vLSBFragmentProc_cpp->fill_daq_data();
+
+      if (_TriggerEngineFragmentProc_cpp)
+        _TriggerEngineFragmentProc_cpp->fill_daq_data();
+
+      if (_EpicsInterfaceFragmentProc_cpp)
+        _EpicsInterfaceFragmentProc_cpp->fill_daq_data();
 
       // Set the DAQData object of the spill.
       spill->SetDAQData(daq_data);
@@ -228,24 +242,28 @@ std::string InputCppDAQData::getCurEvent() {
 
 void InputCppDAQData::_death() {
   // Free the memory.
-  if (_v1290PartEventProc_cpp)    delete _v1290PartEventProc_cpp;
-  if (_v1724PartEventProc_cpp)    delete _v1724PartEventProc_cpp;
-  if (_v1731PartEventProc_cpp)    delete _v1731PartEventProc_cpp;
-  if (_v830FragmentProc_cpp)      delete _v830FragmentProc_cpp;
-  if (_vLSBFragmentProc_cpp)     delete _vLSBFragmentProc_cpp;
-  if (_DBBFragmentProc_cpp)       delete _DBBFragmentProc_cpp;
-  if (_DBBChainFragmentProc_cpp)  delete _DBBChainFragmentProc_cpp;
+  if (_v1290PartEventProc_cpp)        delete _v1290PartEventProc_cpp;
+  if (_v1724PartEventProc_cpp)        delete _v1724PartEventProc_cpp;
+  if (_v1731PartEventProc_cpp)        delete _v1731PartEventProc_cpp;
+  if (_v830FragmentProc_cpp)          delete _v830FragmentProc_cpp;
+  if (_vLSBFragmentProc_cpp)          delete _vLSBFragmentProc_cpp;
+  if (_DBBFragmentProc_cpp)           delete _DBBFragmentProc_cpp;
+  if (_DBBChainFragmentProc_cpp)      delete _DBBChainFragmentProc_cpp;
+  if (_TriggerEngineFragmentProc_cpp) delete _TriggerEngineFragmentProc_cpp;
+  if (_EpicsInterfaceFragmentProc_cpp) delete _EpicsInterfaceFragmentProc_cpp;
 }
 
 void InputCppDAQData::resetAllProcessors() {
   // Reset all the processors.
-  if (_v1290PartEventProc_cpp)     _v1290PartEventProc_cpp->reset();
-  if (_v1724PartEventProc_cpp)     _v1724PartEventProc_cpp->reset();
-  if (_v1731PartEventProc_cpp)     _v1731PartEventProc_cpp->reset();
-  if (_v830FragmentProc_cpp)       _v830FragmentProc_cpp->reset();
-  if (_vLSBFragmentProc_cpp)       _vLSBFragmentProc_cpp->reset();
-  if (_DBBFragmentProc_cpp)        _DBBFragmentProc_cpp->reset();
-  if (_DBBChainFragmentProc_cpp)   _DBBChainFragmentProc_cpp->reset();
+  if (_v1290PartEventProc_cpp)        _v1290PartEventProc_cpp->reset();
+  if (_v1724PartEventProc_cpp)        _v1724PartEventProc_cpp->reset();
+  if (_v1731PartEventProc_cpp)        _v1731PartEventProc_cpp->reset();
+  if (_v830FragmentProc_cpp)          _v830FragmentProc_cpp->reset();
+  if (_vLSBFragmentProc_cpp)          _vLSBFragmentProc_cpp->reset();
+  if (_DBBFragmentProc_cpp)           _DBBFragmentProc_cpp->reset();
+  if (_DBBChainFragmentProc_cpp)      _DBBChainFragmentProc_cpp->reset();
+  if (_TriggerEngineFragmentProc_cpp) _TriggerEngineFragmentProc_cpp->reset();
+  if (_EpicsInterfaceFragmentProc_cpp) _EpicsInterfaceFragmentProc_cpp->reset();
 }
 
 template <class procType>
