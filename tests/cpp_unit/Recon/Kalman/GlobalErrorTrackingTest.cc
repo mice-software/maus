@@ -460,7 +460,7 @@ TEST(ErrorTrackingTest, PropagateSolFieldBackwardsTest) {
 
     // EM FORWARDS (for if e.g. pz > 0)
     std::vector<double> x_out = x_in;
-    propagator.SetTrackingModel(ErrorTracking::em_forwards);
+    propagator.SetTrackingModel(ErrorTracking::em_forwards_dynamic);
     // propagate forwards
     propagator.print(Squeak::mout(verbose), &x_out[0]);
     propagator.Propagate(&x_out[0], 50.);
@@ -476,7 +476,7 @@ TEST(ErrorTrackingTest, PropagateSolFieldBackwardsTest) {
     x_in[7] = -x_in[7];
     x_out = x_in;
     // propagate backwards
-    propagator.SetTrackingModel(ErrorTracking::em_backwards);
+    propagator.SetTrackingModel(ErrorTracking::em_backwards_dynamic);
     propagator.Propagate(&x_out[0], -50.);
     propagator.print(Squeak::mout(verbose), &x_out[0]);
     // propagate forwards

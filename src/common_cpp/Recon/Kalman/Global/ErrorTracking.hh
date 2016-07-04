@@ -34,7 +34,8 @@ public:
     enum ELossModel {bethe_bloch_forwards, bethe_bloch_backwards, no_eloss};
     enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
     enum EStragModel {estrag_forwards, estrag_backwards, no_estrag};
-    enum TrackingModel {em_forwards, em_backwards};
+    enum TrackingModel {em_forwards_dynamic, em_backwards_dynamic,
+                        em_forwards_static, em_backwards_static};
 
     ErrorTracking();
 
@@ -108,7 +109,7 @@ private:
     ELossModel _eloss_model = no_eloss;
     MCSModel _mcs_model = no_mcs;
     EStragModel _estrag_model = no_estrag;
-    TrackingModel _track_model = em_forwards;
+    TrackingModel _track_model = em_forwards_dynamic;
     int  _max_n_steps = 100000;
     static constexpr double c_l = 299.792458; // mm*ns^{-1}
     // transient...

@@ -15,7 +15,6 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
 #include "src/legacy/Interface/Squeak.hh"
-#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControl.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
@@ -44,8 +43,12 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 29);
-  gsl_odeiv_control * control = ErrorTrackingControl::gsl_odeiv_control_et_new(
-                                              _min_step_size, _max_step_size);
+  gsl_odeiv_control * control = NULL;
+  if (_track_model == em_forwards_dynamic ||
+      _track_model == em_backwards_dynamic) {
+      ErrorTrackingControl::gsl_odeiv_control_et_new(
+                                               _min_step_size, _max_step_size);
+  }
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(29);
   gsl_odeiv_system    system  =
                       {ErrorTracking::EquationsOfMotion, NULL, 29, NULL};
@@ -199,11 +202,11 @@ int ErrorTracking::EMEquationOfMotion(double z,
   _tz_for_propagate->_field->GetFieldValue(xfield, field);
 
   double direction = 1.;
-  if (_tz_for_propagate->_track_model == em_forwards &&
+  if ((_tz_for_propagate->_track_model == em_forwards_dynamic || 
+      _tz_for_propagate->_track_model == em_backwards_dynamic) &&
       _tz_for_propagate->_gsl_h < 0.) {
       direction = -1.;
-  } else if (_tz_for_propagate->_track_model == em_backwards &&
-             _tz_for_propagate->_gsl_h > 0.) {
+  } else if (_tz_for_propagate->_gsl_h > 0.) {
       direction = -1.;
   }
   double charge = _tz_for_propagate->_charge;
@@ -292,11 +295,11 @@ int ErrorTracking::MatrixEquationOfMotion(double z,
   dxdz[7] = charge*c_l*(dxdz[1]*field[1] - dxdz[2]*field[0])
             + charge*field[5]*dtdz*dir; // dpz/dz
   double direction = 1.;
-  if (_tz_for_propagate->_track_model == em_forwards &&
+  if ((_tz_for_propagate->_track_model == em_forwards_dynamic || 
+      _tz_for_propagate->_track_model == em_backwards_dynamic) &&
       _tz_for_propagate->_gsl_h < 0.) {
       direction = -1.;
-  } else if (_tz_for_propagate->_track_model == em_backwards &&
-             _tz_for_propagate->_gsl_h > 0.) {
+  } else if (_tz_for_propagate->_gsl_h > 0.) {
       direction = -1.;
   }
 
