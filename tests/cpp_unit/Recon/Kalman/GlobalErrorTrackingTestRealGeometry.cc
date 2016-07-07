@@ -35,7 +35,7 @@ std::vector<double> ellipse(double x, double y, double z,
 // Is not intended to run normally (MAUS attempts to load the geometry, finds it
 // does not exist and bails)
 TEST(ErrorTrackingRealGeometryTest, PropagateTrackTest) {
-    clock_t t0, t1, t2;
+    clock_t t0, t1, t2, t3;
     t0 = clock();
     typedef Kalman::Global::ErrorTracking ErrorTracking;
 

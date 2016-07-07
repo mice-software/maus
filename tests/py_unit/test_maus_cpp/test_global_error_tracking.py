@@ -70,7 +70,7 @@ class TestErrorPropagation(unittest.TestCase):
             x_pos[i] += delta;
             x_pos[7] = (x_pos[4]**2-x_pos[5]**2-x_pos[6]**2-mass**2)**0.5
             tracking = err_prop.GlobalErrorTracking()
-            tracking.set_step_size(1.)
+            tracking.set_min_step_size(1.)
             x_pos, dummy = tracking.propagate_errors(x_pos, ellipse, x_pos[3]+dz)
 
             x_neg = [x for x in centroid]
@@ -156,8 +156,17 @@ class TestErrorPropagation(unittest.TestCase):
     def test_get_set_step_size(self):
         tracking = err_prop.GlobalErrorTracking()
         for step_size in (1.928, -3, 8):
-            tracking.set_step_size(step_size)
-            self.assertAlmostEqual(tracking.get_step_size(), step_size) 
+            tracking.set_min_step_size(step_size)
+            self.assertAlmostEqual(tracking.get_min_step_size(), step_size) 
+            tracking.set_max_step_size(step_size)
+            self.assertAlmostEqual(tracking.get_max_step_size(), step_size) 
+
+    def test_get_set_tracking_model(self):
+        tracking = err_prop.GlobalErrorTracking()
+        for model in ["em_rk4_forwards_static", "em_rk4_backwards_static",
+                      "em_rk4_forwards_dynamic", "em_rk4_backwards_dynamic"]:
+            tracking.set_tracking_model(model)
+            self.assertAlmostEqual(tracking.get_tracking_model(), model) 
 
     def test_get_set_mcs_model(self):
         tracking = err_prop.GlobalErrorTracking()
@@ -206,7 +215,7 @@ class TestErrorPropagation(unittest.TestCase):
         for z_max in range(0, 751, 750):
             print "\nz_max:", z_max, "============"
             tracking = err_prop.GlobalErrorTracking()
-            tracking.set_step_size(1.)
+            tracking.set_min_step_size(1.)
             centroid_out, ellipse_out = tracking.propagate_errors(centroid, ellipse, z_max)
             self._print_output(centroid_out, ellipse_out)
 
@@ -224,8 +233,8 @@ class TestErrorPropagation(unittest.TestCase):
         centroid[7] = 200.
         centroid[4] = (sum([p**2 for p in centroid[5:]])+mass**2)**0.5
         tracking = err_prop.GlobalErrorTracking()
-        tracking.set_step_size(1.)
-        tm_a = tracking.get_transfer_matrix(centroid)
+        tracking.set_min_step_size(1.)
+        tm_a = tracking.get_transfer_matrix(centroid, 1.)
         delta = 0.01
         zstep = 0.01
         tm_n = self._get_tm_numerical(centroid, delta, zstep)

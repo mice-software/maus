@@ -158,6 +158,8 @@ class TestAnalysis(object):
                     sf_hit = self.load_scifi_event(scifi_event)
                     sf_point = self.load_scifi_event_space_points(scifi_event)
                     vhit = self.load_virtual_hits(mc_event)
+                    if vhit['px'] < 0.:
+                        vhit = None
                     if self.do_global:
                         glob_hit = self.load_global_event(global_event)
                     else:
@@ -334,8 +336,8 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
         os.chdir(cls.here)
 
     def rotate_mc(self, qx, qy, scale):
-        xboa.common.substitute("geometry_07469/ParentGeometryFile_pry_mc.in",
-                               "geometry_07469/ParentGeometryFile_pry_mc.dat",
+        xboa.common.substitute("parent_geometries/ParentGeometryFile_pry_mc.in",
+                               "parent_geometries/ParentGeometryFile_pry_mc.dat",
                                {"__qx__":qx, "__qy__":qy, "__scale__":scale})
 
     def generate_dataset(self, verbose, suffix):
@@ -378,24 +380,28 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
         analysis.plot_1d("scifi_space_point", "x", x_canvas, color = 6, n = 2, title = tit)
         analysis.plot_1d("scifi_space_point", "y", y_canvas, color = 6, n = 2, title = tit)
 
-    def test_fixed_field(self):
+    def test_opera_field(self):
         print "Generating data"
-        for qx in [round(i/20., 2) for i in range(1)]:
+        job_list = [(0., 0., 1.)]
+        for qx in [round(i/20., 2) for i in range(2, 11, 2)]:
             for qy in [round(j/1.) for j in range(1)]:
-                for scale in [0.9, 0.95, 1.0, 1.05, 1.10]:
-                    scale = round(scale, 2)
-                    xboa.common.clear_root()
-                    self.rotate_mc(qx, qy, scale)
-                    suffix = "_"+str(qx)+"_"+str(qy)+"_"+str(scale)
-                    self.generate_dataset(True, suffix)
-                    print "Generated data"
-                    for i, z in enumerate([13962., 14312., 14612., 14861., 15062.]):
-                        xboa.common.clear_root()
-                        analysis = TestAnalysis(self.out+suffix+"_recon.root", z, False, 10, True, suffix)
-                        tit = "#theta_{x} = "+str(qx)+"#circ "
-                        tit += "#theta_{y} = "+str(qy)+"#circ "
-                        tit += "~J = "+str(scale)+" "
-                        self.plots(analysis, tit)
+                pass # job_list.append((qx, qy, 1.))
+        for scale in [0.9, 0.95, 1.0, 1.05, 1.10]:
+            pass # job_list.append((0., 0., round(scale, 2)))
+
+        for qx, qy, scale in job_list:
+            xboa.common.clear_root()
+            self.rotate_mc(qx, qy, scale)
+            suffix = "_"+str(qx)+"_"+str(qy)+"_"+str(scale)
+            self.generate_dataset(True, suffix)
+            print "Generated data"
+            for i, z in enumerate([13962., 14312., 14612., 14861., 15062.]):
+                xboa.common.clear_root()
+                analysis = TestAnalysis(self.out+suffix+"_recon.root", z, False, 10, True, suffix)
+                tit = "#theta_{x} = "+str(qx)+"#circ "
+                tit += "#theta_{y} = "+str(qy)+"#circ "
+                tit += "~J = "+str(scale)+" "
+                self.plots(analysis, tit)
 
     def _test_mc_field(self):
         fname = "reco/MAUS-v2.5.0/mc/mc_3mm200_07469_MAUS-v250_1.root"

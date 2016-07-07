@@ -497,6 +497,78 @@ static PyObject* get_scattering_model(PyObject *self, PyObject *args, PyObject *
     return py_scat_model;
 }
 
+std::string set_tracking_model_docstring = "DOCSTRING";
+// enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
+static PyObject* set_tracking_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("model"),
+                             NULL};
+    char* track_model_str = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &track_model_str)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    // now set the eloss model
+    ErrorTracking::TrackingModel track_model = ErrorTracking::em_forwards_dynamic;
+    if (strcmp(track_model_str, "em_rk4_forwards_dynamic") == 0) {
+    } else if (strcmp(track_model_str, "em_rk4_backwards_dynamic") == 0) {
+        track_model = ErrorTracking::em_backwards_dynamic;
+    } else if (strcmp(track_model_str, "em_rk4_forwards_static") == 0) {
+        track_model = ErrorTracking::em_forwards_static;
+    } else if (strcmp(track_model_str, "em_rk4_backwards_static") == 0) {
+        track_model = ErrorTracking::em_backwards_static;
+    } else {
+        PyErr_SetString(PyExc_RuntimeError, "Did not recognise tracking model");
+        return NULL;
+    }
+    glet->SetTrackingModel(track_model);
+    // return None
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_tracking_model_docstring = "DOCSTRING";
+
+static PyObject* get_tracking_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    ErrorTracking::TrackingModel track_model = glet->GetTrackingModel();
+    PyObject* py_track_model = NULL;
+    switch (track_model) {
+        case ErrorTracking::em_forwards_dynamic:
+            py_track_model = PyString_FromString("em_rk4_forwards_dynamic");
+            break;
+        case ErrorTracking::em_backwards_dynamic:
+            py_track_model = PyString_FromString("em_rk4_backwards_dynamic");
+            break;
+        case ErrorTracking::em_forwards_static:
+            py_track_model = PyString_FromString("em_rk4_forwards_static");
+            break;
+        case ErrorTracking::em_backwards_static:
+            py_track_model = PyString_FromString("em_rk4_backwards_static");
+            break;
+    }
+    if (py_track_model != NULL)
+        Py_INCREF(py_track_model);
+    return py_track_model;
+}
 
 std::string propagate_errors_docstring = "DOCSTRING";
 
@@ -672,6 +744,10 @@ static PyMethodDef _methods[] = {
   METH_VARARGS|METH_KEYWORDS, set_scattering_model_docstring.c_str()},
 {"get_scattering_model", (PyCFunction)get_scattering_model,
   METH_VARARGS|METH_KEYWORDS, get_scattering_model_docstring.c_str()},
+{"set_tracking_model", (PyCFunction)set_tracking_model,
+  METH_VARARGS|METH_KEYWORDS, set_tracking_model_docstring.c_str()},
+{"get_tracking_model", (PyCFunction)get_tracking_model,
+  METH_VARARGS|METH_KEYWORDS, get_tracking_model_docstring.c_str()},
 {NULL}
 };
 
