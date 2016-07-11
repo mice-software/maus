@@ -140,15 +140,15 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if (((*global_track_iter)->get_mapper_name() ==
-            "MapCppGlobalTrackMatching-US") and
+            "MapCppGlobalTrackMatching_US") and
         ((*global_track_iter)->get_pid() == pid)) {
       us_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching-DS") and
+                   "MapCppGlobalTrackMatching_DS") and
                ((*global_track_iter)->get_pid() == pid)) {
       ds_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching-Through") and
+                   "MapCppGlobalTrackMatching_Through") and
                ((*global_track_iter)->get_pid() == pid)) {
       through_tracks->push_back(*global_track_iter);
     }
@@ -547,11 +547,11 @@ TEST_F(TrackMatchingTest, USDSTracks) {
   DataStructure::Global::Track us_muplus_track3;
   DataStructure::Global::Track ds_muplus_track;
   DataStructure::Global::Track ds_piminus_track;
-  us_muplus_track1.set_mapper_name("MapCppGlobalTrackMatching-US");
-  us_muplus_track2.set_mapper_name("MapCppGlobalTrackMatching-US");
-  us_muplus_track3.set_mapper_name("MapCppGlobalTrackMatching-US");
-  ds_muplus_track.set_mapper_name("MapCppGlobalTrackMatching-DS");
-  ds_piminus_track.set_mapper_name("MapCppGlobalTrackMatching-DS");
+  us_muplus_track1.set_mapper_name("MapCppGlobalTrackMatching_US");
+  us_muplus_track2.set_mapper_name("MapCppGlobalTrackMatching_US");
+  us_muplus_track3.set_mapper_name("MapCppGlobalTrackMatching_US");
+  ds_muplus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
+  ds_piminus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
   us_muplus_track1.set_pid(DataStructure::Global::kMuPlus);
   us_muplus_track2.set_pid(DataStructure::Global::kMuPlus);
   us_muplus_track3.set_pid(DataStructure::Global::kMuPlus);
@@ -578,22 +578,22 @@ TEST_F(TrackMatchingTest, USDSTracks) {
   EXPECT_EQ(ds_tracks2.size(), 1);
 
   if (us_tracks1.size() > 1) {
-    EXPECT_EQ(us_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching-US");
+    EXPECT_EQ(us_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
     EXPECT_EQ(us_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
     EXPECT_TRUE(us_tracks1[0]->HasDetector(DataStructure::Global::kTOF1));
-    EXPECT_EQ(us_tracks1[1]->get_mapper_name(), "MapCppGlobalTrackMatching-US");
+    EXPECT_EQ(us_tracks1[1]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
     EXPECT_EQ(us_tracks1[1]->get_pid(), DataStructure::Global::kMuPlus);
     EXPECT_TRUE(us_tracks1[1]->HasDetector(DataStructure::Global::kTOF1));
   }
 
   if (ds_tracks1.size() > 0) {
-    EXPECT_EQ(ds_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching-DS");
+    EXPECT_EQ(ds_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
     EXPECT_EQ(ds_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
     EXPECT_TRUE(ds_tracks1[0]->HasDetector(DataStructure::Global::kTOF2));
   }
 
   if (ds_tracks2.size() > 0) {
-    EXPECT_EQ(ds_tracks2[0]->get_mapper_name(), "MapCppGlobalTrackMatching-DS");
+    EXPECT_EQ(ds_tracks2[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
     EXPECT_EQ(ds_tracks2[0]->get_pid(), DataStructure::Global::kPiMinus);
     EXPECT_TRUE(ds_tracks2[0]->HasDetector(DataStructure::Global::kTOF2));
   }
@@ -626,7 +626,7 @@ TEST_F(TrackMatchingTest, MatchUSDS) {
 
   std::vector<DataStructure::Global::Track*>* through_tracks =
       GlobalTools::GetTracksByMapperName(_global_event,
-      "MapCppGlobalTrackMatching-Through");
+      "MapCppGlobalTrackMatching_Through");
 
   EXPECT_EQ(through_tracks->size(), 1);
   if (through_tracks->size() > 0) {

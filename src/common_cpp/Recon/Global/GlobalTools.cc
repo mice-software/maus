@@ -98,6 +98,28 @@ std::vector<DataStructure::Global::Track*>* GetSpillDetectorTracks(Spill* spill,
   return detector_tracks;
 }
 
+std::vector<DataStructure::Global::Track*>* GetEventDetectorTracks(GlobalEvent* global_event,
+    DataStructure::Global::DetectorPoint detector, std::string mapper_name) {
+  std::vector<DataStructure::Global::Track*>* detector_tracks = new
+      std::vector<DataStructure::Global::Track*>;
+  if (global_event) {
+    std::vector<DataStructure::Global::Track*>* global_tracks =
+        global_event->get_tracks();
+    for (auto track_iter = global_tracks->begin();
+         track_iter != global_tracks->end();
+         ++track_iter) {
+      // The third condition is a bit of a dirty hack here to make sure that
+      // if we select for EMR tracks, we only get primaries.
+      if (((*track_iter)->HasDetector(detector)) and
+          ((*track_iter)->get_mapper_name() == mapper_name) and
+          ((*track_iter)->get_emr_range_secondary() < 0.001)) {
+        detector_tracks->push_back((*track_iter));
+      }
+    }
+  }
+  return detector_tracks;
+}
+
 std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     Spill* spill, DataStructure::Global::DetectorPoint detector) {
   std::vector<DataStructure::Global::SpacePoint*>* spill_spacepoints =
@@ -124,6 +146,28 @@ std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     return spill_spacepoints;
   } else {
     delete spill_spacepoints;
+    return 0;
+  }
+}
+
+std::vector<DataStructure::Global::SpacePoint*>* GetEventSpacePoints(
+    GlobalEvent* global_event, DataStructure::Global::DetectorPoint detector) {
+  std::vector<DataStructure::Global::SpacePoint*>* spacepoints =
+      new std::vector<DataStructure::Global::SpacePoint*>;
+  if (global_event) {
+    std::vector<DataStructure::Global::SpacePoint*>* temp_spacepoints =
+        global_event->get_space_points();
+    for (auto sp_iter = temp_spacepoints->begin(); sp_iter != temp_spacepoints->end();
+         ++sp_iter) {
+      if ((*sp_iter)->get_detector() == detector) {
+        spacepoints->push_back(*sp_iter);
+      }
+    }
+  }
+  if (spacepoints->size() > 0) {
+    return spacepoints;
+  } else {
+    delete spacepoints;
     return 0;
   }
 }

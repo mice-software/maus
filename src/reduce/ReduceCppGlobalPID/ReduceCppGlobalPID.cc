@@ -248,7 +248,7 @@ namespace MAUS {
 		 ++track_i) {
 	      MAUS::DataStructure::Global::Track* track =
 		GlobalTrackArray->at(track_i);
-	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching-Through") continue;
+	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching_Through") continue;
 	      through_track_check = true;
 	      if (_pid_config == "step_4") {
 		// get constituent tracks
@@ -257,7 +257,7 @@ namespace MAUS {
 		for (unsigned int track_j = 0; track_j < const_tracks.size();
 		     ++track_j) {
 		  if (const_tracks.at(track_j)->get_mapper_name() ==
-		      "MapCppGlobalTrackMatching-US") {
+		      "MapCppGlobalTrackMatching_US") {
 		    MAUS::DataStructure::Global::Track* US_track =
 		      const_cast<MAUS::DataStructure::Global::Track*>
 		      (const_tracks.at(track_j));
@@ -291,7 +291,7 @@ namespace MAUS {
 		      } // loop over US pi_pid_vars
 		    } // US mc pid check
 		  } else if (const_tracks.at(track_j)->get_mapper_name() ==
-			     "MapCppGlobalTrackMatching-DS") {
+			     "MapCppGlobalTrackMatching_DS") {
 		    MAUS::DataStructure::Global::Track* DS_track =
 		      const_cast<MAUS::DataStructure::Global::Track*>
 		      (const_tracks.at(track_j));
@@ -359,7 +359,7 @@ namespace MAUS {
 		   ++track_i) {
 		MAUS::DataStructure::Global::Track* track =
 		  GlobalTrackArray->at(track_i);
-		if (track->get_mapper_name() == "MapCppGlobalTrackMatching-US") {
+		if (track->get_mapper_name() == "MapCppGlobalTrackMatching_US") {
 		  if ((_pid_beamline_polarity == "positive" &&
 		       _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
 		      (_pid_beamline_polarity == "negative" &&
@@ -390,7 +390,7 @@ namespace MAUS {
 		    }
 		  }
 		} // US tracks
-		if (track->get_mapper_name() == "MapCppGlobalTrackMatching-DS") {
+		if (track->get_mapper_name() == "MapCppGlobalTrackMatching_DS") {
 		  if ((_pid_beamline_polarity == "positive" &&
 		       _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
 		      (_pid_beamline_polarity == "negative" &&

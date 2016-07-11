@@ -755,9 +755,9 @@ custom_pid_set = "PIDVarB"
 pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
 # setting to "all", or on all downstream tracks (set to "DS"), all upstream (set to "US"), through tracks (set to 
-# "Through"), or the upstream or downstream components of the throught track (set to "Through_US" or "Through_DS"
+# "Through"), or the upstream or downstream components of the throught track (set to "Through-US" or "Through-DS"
 # respectively). Or a combination of the above can be used, entered as a space separated list, e.g
-# "Through Through_US Through_DS"
+# "Through Through-US Through-DS"
 pid_track_selection = "Through"
 
 
