@@ -38,6 +38,7 @@ def run():
     my_map.append(MAUS.MapCppTrackerClusterRecon())
     my_map.append(MAUS.MapCppTrackerSpacePointRecon())
     my_map.append(MAUS.MapCppTrackerPatternRecognition())
+    my_map.append(MAUS.MapCppTrackerTrackFit())
     # my_map.append(MAUS.MapCppTrackerRecon())
 
     my_map.append(MAUS.MapCppEMRPlaneHits())
