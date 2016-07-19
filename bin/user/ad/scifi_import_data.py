@@ -26,7 +26,8 @@ def run():
     # my_map.append(MAUS.MapCppReconSetup())
 
     # Detectors
-    my_map.append(MAUS.MapCppTrackerRecon())
+    # my_map.append(MAUS.MapCppTrackerRecon())
+    my_map.append(MAUS.MapCppTrackerPatternRecognition())
 
     # Reducers
     my_reduce = MAUS.ReducePyDoNothing()
