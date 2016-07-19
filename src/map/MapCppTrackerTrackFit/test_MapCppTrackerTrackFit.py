@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Tests for MapCppTrackerRecon"""
+"""Tests for MapCppTrackerTrackFit"""
 
 # pylint: disable = C0103
 
@@ -26,8 +26,8 @@ import maus_cpp.globals
 import maus_cpp.converter
 import maus_cpp.mice_module
 
-class MapCppTrackerPatternRecognitionTestCase(unittest.TestCase): # pylint: disable = R0904
-    """Tests for MapCppTrackerPatternRecognition"""
+class MapCppTrackerTrackFitTestCase(unittest.TestCase): # pylint: disable = R0904
+    """Tests for MapCppTrackerTrackFit"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
 
@@ -61,10 +61,7 @@ class MapCppTrackerPatternRecognitionTestCase(unittest.TestCase): # pylint: disa
         self.cfg['reconstruction_geometry_filename'] = self.straight_geom
         self.cfg['SciFiPRHelicalOn'] = 0
         self.cfg['SciFiPRStraightOn'] = 1
-        # self.cfg['SciFiPatRecVerbosity'] = 1
-        # print "Flags passed: "
-        # print self.cfg['SciFiPRHelicalOn']
-        # print self.cfg['SciFiPRStraightOn']
+
         maus_cpp.globals.birth(json.dumps(self.cfg))
         maus_cpp.globals.set_reconstruction_mice_modules(
             maus_cpp.mice_module.MiceModule(self.straight_geom))
@@ -89,7 +86,6 @@ class MapCppTrackerPatternRecognitionTestCase(unittest.TestCase): # pylint: disa
         self.assertEqual(1, len(spill_out['recon_events']))
         # Check the first event
         revt = spill_out['recon_events'][0]
-
         self.assertTrue('sci_fi_event' in revt)
         self.assertTrue('digits' in revt['sci_fi_event'])
         self.assertEqual(31, len(revt['sci_fi_event']['digits']))
