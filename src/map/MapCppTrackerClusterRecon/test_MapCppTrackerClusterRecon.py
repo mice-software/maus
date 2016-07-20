@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Tests for MapCppTrackerRecon"""
+"""Tests for MapCppTrackerClusterRecon"""
 
 # pylint: disable = C0103
 
@@ -26,23 +26,20 @@ import maus_cpp.globals
 import maus_cpp.converter
 import maus_cpp.mice_module
 
-class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
-    """Tests for MapCppTrackerRecon"""
+class MapCppTrackerClusterReconTestCase(unittest.TestCase): # pylint: disable = R0904
+    """Tests for MapCppTrackerClusterRecon"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
-#    geom = os.getenv("MAUS_ROOT_DIR")+"/src/map/"+\
-#           "MapCppTrackerMCDigitization/MapCppTrackerMCDigitizationTest.dat"
+
     helical_geom = "TrackerTest.dat"
     straight_geom = "TrackerTest_NoField.dat"
     cfg['simulation_geometry_filename'] = helical_geom
     cfg['reconstruction_geometry_filename'] = helical_geom
-    cfg['SciFiPRHelicalOn'] = 0
-    cfg['SciFiStraightOn'] = 0
 
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
-        cls.mapper = MAUS.MapCppTrackerRecon()
+        cls.mapper = MAUS.MapCppTrackerClusterRecon()
         cls.test_config = ""
         if maus_cpp.globals.has_instance():
             cls.test_config = maus_cpp.globals.get_configuration_cards()
@@ -54,33 +51,30 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         #self.assertTrue(success)
 
     def testGoodStraightProcess(self):
-        """Check that tracker recon process produces expected
+        """Check that the mapper process function produces expected
            output with good straight track data"""
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
         self.cfg['simulation_geometry_filename'] = self.straight_geom
         self.cfg['reconstruction_geometry_filename'] = self.straight_geom
-        self.cfg['SciFiPRHelicalOn'] = 0
-        self.cfg['SciFiPRStraightOn'] = 1
-        # self.cfg['SciFiPatRecVerbosity'] = 1
-        # print "Flags passed: "
-        # print self.cfg['SciFiPRHelicalOn']
-        # print self.cfg['SciFiPRStraightOn']
+
         maus_cpp.globals.birth(json.dumps(self.cfg))
         maus_cpp.globals.set_reconstruction_mice_modules(
             maus_cpp.mice_module.MiceModule(self.straight_geom))
         self.mapper.birth(json.dumps(self.cfg))
+
         # Read in a spill of mc data containing 5 straight tracks
         test1 = ('%s/tests/test_data/scifi_test_data/test_straight_digits.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
-        # Check the first spill (straights)
         fin.readline()
         fin.readline()
         fin.readline()
         data = fin.readline()
+
         result = self.mapper.process(data)
         spill_out = maus_cpp.converter.json_repr(result)
+
         self.assertTrue('recon_events' in spill_out)
         self.assertEqual(1, len(spill_out['recon_events']))
         # Check the first event
@@ -90,16 +84,11 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(31, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
         self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
-        self.assertTrue('spacepoints' in revt['sci_fi_event'])
-        self.assertEqual(10, len(revt['sci_fi_event']['spacepoints']))
-        self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
-        self.assertEqual(2, len(revt['sci_fi_event']['straight_pr_tracks']))
-        self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
-        self.assertEqual(0, len(revt['sci_fi_event']['helical_pr_tracks']))
+
         maus_cpp.globals.death()
 
     def testGoodHelicalProcess(self):
-        """Check that tracker recon  process produces expected
+        """Check that the mapper process function produces expected
         output with good helical track data"""
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
@@ -112,18 +101,17 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         maus_cpp.globals.set_reconstruction_mice_modules(
             maus_cpp.mice_module.MiceModule(self.helical_geom))
         self.mapper.birth(json.dumps(self.cfg))
-        # Read in a spill of mc data containing 5 straight tracks
-        # test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
-        #          os.environ.get("MAUS_ROOT_DIR"))
+        
         test1 = ('%s/tests/test_data/scifi_test_data/test_helical_digits.json' %
                 os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
-        # Check the first spill (helices)
         fin.readline()
         fin.readline()
+
         data = fin.readline()
         result = self.mapper.process(data)
         spill_out = maus_cpp.converter.json_repr(result)
+
         self.assertTrue('recon_events' in spill_out)
         self.assertEqual(1, len(spill_out['recon_events']))
         # Check the first event
@@ -132,19 +120,14 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertEqual(34, len(revt['sci_fi_event']['digits']))
         self.assertTrue('clusters' in revt['sci_fi_event'])
         self.assertEqual(30, len(revt['sci_fi_event']['clusters']))
-        self.assertTrue('spacepoints' in revt['sci_fi_event'])
-        self.assertEqual(10, len(revt['sci_fi_event']['spacepoints']))
-        self.assertTrue('straight_pr_tracks' in revt['sci_fi_event'])
-        self.assertEqual(0, len(revt['sci_fi_event']['straight_pr_tracks']))
-        self.assertTrue('helical_pr_tracks' in revt['sci_fi_event'])
-        self.assertEqual(2, len(revt['sci_fi_event']['helical_pr_tracks']))
+
         maus_cpp.globals.death()
 
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration,
-        and checks that we can death() MapCppTrackerRecon"""
-        cls.mapper = MAUS.MapCppTrackerRecon()
+        and checks that we can death() MapCppTrackerClusterRecon"""
+        cls.mapper = MAUS.MapCppTrackerClusterRecon()
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
         if cls.test_config != "":

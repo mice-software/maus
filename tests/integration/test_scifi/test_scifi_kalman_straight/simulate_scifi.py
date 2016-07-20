@@ -31,7 +31,10 @@ def run():
 
     # SciFi
     my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
-    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+    my_map.append(MAUS.MapCppTrackerClusterRecon()) # SciFi channel clustering
+    my_map.append(MAUS.MapCppTrackerSpacePointRecon()) # SciFi spacepoint recon
+    my_map.append(MAUS.MapCppTrackerPatternRecognition()) # SciFi track finding
+    my_map.append(MAUS.MapCppTrackerTrackFit()) # SciFi track fit
 
     # Then construct a MAUS output component - filename comes from datacards
     my_output = MAUS.OutputCppRoot()
