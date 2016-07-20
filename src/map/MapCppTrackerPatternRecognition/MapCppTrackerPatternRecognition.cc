@@ -27,14 +27,14 @@ PyMODINIT_FUNC init_MapCppTrackerPatternRecognition(void) {
 }
 
 
-MapCppTrackerPatternRecognition::MapCppTrackerPatternRecognition() : 
-                                           MapBase<Data>("MapCppTrackerPatternRecognition"),
-                                           _up_straight_pr_on(true),
-                                           _down_straight_pr_on(true),
-                                           _up_helical_pr_on(true),
-                                           _down_helical_pr_on(true),
-                                           _patrec_on(true),
-                                           _patrec_debug_on(false) {
+MapCppTrackerPatternRecognition::MapCppTrackerPatternRecognition()
+                                          : MapBase<Data>("MapCppTrackerPatternRecognition"),
+                                            _up_straight_pr_on(true),
+                                            _down_straight_pr_on(true),
+                                            _up_helical_pr_on(true),
+                                            _down_helical_pr_on(true),
+                                            _patrec_on(true),
+                                            _patrec_debug_on(false) {
   // Do nothing
 }
 

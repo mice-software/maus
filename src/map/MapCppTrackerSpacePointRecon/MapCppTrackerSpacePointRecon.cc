@@ -27,9 +27,9 @@ PyMODINIT_FUNC init_MapCppTrackerSpacePointRecon(void) {
 }
 
 
-MapCppTrackerSpacePointRecon::MapCppTrackerSpacePointRecon() :
-                                           MapBase<Data>("MapCppTrackerSpacePointRecon"),
-                                           _spacepoints_on(true) {
+MapCppTrackerSpacePointRecon::MapCppTrackerSpacePointRecon()
+                                          : MapBase<Data>("MapCppTrackerSpacePointRecon"),
+                                            _spacepoints_on(true) {
   // Do nothing
 }
 

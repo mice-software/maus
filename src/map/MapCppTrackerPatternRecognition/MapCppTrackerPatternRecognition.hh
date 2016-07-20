@@ -124,7 +124,6 @@ class MapCppTrackerPatternRecognition : public MapBase<Data> {
 
   ///  Map of the planes geometry.
   SciFiGeometryHelper _geometry_helper;
-
 }; // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS

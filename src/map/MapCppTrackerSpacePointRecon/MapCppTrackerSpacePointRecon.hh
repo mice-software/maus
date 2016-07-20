@@ -103,7 +103,6 @@ class MapCppTrackerSpacePointRecon : public MapBase<Data> {
   SciFiSpacePointRec _spacepoint_recon;
   ///  Map of the planes geometry.
   SciFiGeometryHelper _geometry_helper;
-
 }; // Don't forget this trailing colon!!!!
 
 } // ~namespace MAUS
