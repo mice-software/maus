@@ -4,7 +4,6 @@
 
 import sys
 import os
-import operator
 import ROOT
 import libMausCpp #pylint: disable = W0611
 import scifi_lookup
@@ -305,7 +304,8 @@ class PatRecEfficiency():
         self.num_3to5spoint_tkus_tracks = 0
         self.num_3to5spoint_tkds_tracks = 0
 
-    def find_mc_track(self, mc_evt, spoints, trker_num):
+    @staticmethod
+    def find_mc_track(mc_evt, spoints, trker_num):
         """ Find all the digits associated with these spacepoints
             then all the mc scifi hits associated with these digits.
             Look to see if a single mc track id occurs in these hits
@@ -323,15 +323,15 @@ class PatRecEfficiency():
             if sp.get_tracker() != trker_num:
                 continue
             for clus in sp.get_channels_pointers():
-               for dig in clus.get_digits_pointers():
-                   hits = lkup.get_hits(dig)
-                   for hit in hits:
-                       num_hits += 1
-                       mc_track_id = hit.GetTrackId()
-                       if mc_track_id in mc_track_counter:
-                           mc_track_counter[mc_track_id] += 1
-                       else:
-                           mc_track_counter[mc_track_id] = 1
+                for dig in clus.get_digits_pointers():
+                    hits = lkup.get_hits(dig)
+                    for hit in hits:
+                        num_hits += 1
+                        mc_track_id = hit.GetTrackId()
+                        if mc_track_id in mc_track_counter:
+                            mc_track_counter[mc_track_id] += 1
+                        else:
+                            mc_track_counter[mc_track_id] = 1
 
         # Does any one mc track id appear more than 50% of the time?
         most_frequent_id = 0

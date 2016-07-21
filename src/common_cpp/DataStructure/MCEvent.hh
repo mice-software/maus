@@ -112,6 +112,9 @@ class MCEvent {
    */
   void SetSciFiHits(SciFiHitArray* hits);
 
+  /** Add a single scifi hit (needed for PyROOT access) */
+  void AddSciFiHit(SciFiHit& hit);
+
   /** Get the hits pertaining to this event MCEvent still owns NoiseHitArray */
   SciFiNoiseHitArray* GetSciFiNoiseHits() const;
 
@@ -119,6 +122,9 @@ class MCEvent {
    *  memory pointed to by noise_hits.
    */
   void SetSciFiNoiseHits(SciFiNoiseHitArray* noise_hits);
+
+  /** Add a single scifi noise hit (needed for PyROOT access) */
+  void AddSciFiNoiseHit(SciFiNoiseHit& hit);
 
   /** Get the TOF hits pertaining to this event MCEvent still owns HitArray*.
    */
