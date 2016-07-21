@@ -4,8 +4,10 @@
 
 import sys
 import os
+import operator
 import ROOT
 import libMausCpp #pylint: disable = W0611
+import scifi_lookup
 
 #pylint: disable = R0902
 #pylint: disable = R0912
@@ -24,7 +26,12 @@ class PatRecEfficiency():
         self.cut_on_tof = True
         self.cut_on_tof_time = True
         self.cut_on_trackers = True
-        self.cut_on_fiducial_track = True
+        self.cut_on_fiducial_track = False # Do not use for now
+        self.use_mc_truth = False
+
+        self.tof_upper_cut = 50.0
+        self.tof_lower_cut = 27.0
+        self.fiducial_cut = 150.0
 
         self.root_files = []
 
@@ -111,12 +118,7 @@ class PatRecEfficiency():
         self.clear_counters() # Start clean each time
 
         # Load the ROOT file
-        # print "Loading ROOT file", root_file_name
         root_file = ROOT.TFile(root_file_name, "READ") # pylint: disable = E1101
-
-        # Set up the data tree to be filled by ROOT IO
-        # print "Setting up data tree"
-
         tree = root_file.Get("Spill")
         data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree.SetBranchAddress("data", data)
@@ -133,14 +135,14 @@ class PatRecEfficiency():
             for i in range(spill.GetReconEvents().size()):
                 self.num_total_events += 1
 
-                # Pull out tof data
-                #------------------
+                # Pull out tof data and examine
+                #------------------------------
                 tof_evt = spill.GetReconEvents()[i].GetTOFEvent()
                 tof1 = tof_evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
                 tof2 = tof_evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
-                scifi_evt = spill.GetReconEvents()[i].GetSciFiEvent()
 
-                # Require a sp in TOF1 and TOF2
+
+                # Require 1 and only 1 sp in both TOF1 and TOF2
                 bool_2tof_spoint_event = True
                 if ((len(tof1) != 1) or (len(tof2) != 1)):
                     bool_2tof_spoint_event = False
@@ -153,41 +155,40 @@ class PatRecEfficiency():
                     if tof1.size() == 1 and tof2.size() == 1:
                         tof_time_1 = tof1[j].GetTime()
                         tof_time_2 = tof2[j].GetTime()
-                        if (tof_time_2 - tof_time_1 > 50) \
-                          or (tof_time_2 - tof_time_1 < 27):
+                        if (tof_time_2 - tof_time_1 > self.tof_upper_cut) \
+                          or (tof_time_2 - tof_time_1 < self.tof_lower_cut):
                             bool_2tof_timing_event = False
                             if self.cut_on_tof_time:
                                 continue
 
+                # Pull out tracker data and examine
+                #----------------------------------
+                tk_evt = spill.GetReconEvents()[i].GetSciFiEvent()
+
                 # Fiducial track cut from upstream tracker:
                 track_ok = False
-                for track in scifi_evt.straightprtracks():
+                for track in tk_evt.straightprtracks():
                     if track.get_tracker() == 0:
                         # Project to downstream:
                         z_loc = -3800
                         x = track.get_x0() + z_loc*track.get_mx()
                         y = track.get_y0() + z_loc*track.get_my()
-                        if ((x*x+y*y) ** 0.5) < 120:
+                        if ((x*x+y*y) ** 0.5) < self.fiducial_cut:
                             track_ok = True
                 if not track_ok and self.cut_on_fiducial_track:
                     continue # remove event from consideration
 
-
-
-                # Pull out tracker data
-                #----------------------
-
-                # All spacepoint data
-                tk_evt = spill.GetReconEvents()[i].GetSciFiEvent()
+                # Look at spacepoint data to see if we expect a track/s
                 tk_spoints = tk_evt.spacepoints()
-                bool_10spoint_event = True
-                bool_tkus_5spoint_event = True
-                bool_tkds_5spoint_event = True
+                bool_10spoint_event = True # Expect one 5pt track in each trcker
+                bool_tkus_5spoint_event = True # Expect one 5pt track in TkUS
+                bool_tkds_5spoint_event = True # Expect one 5pt track in TkDS
                 for i in range(2):
                     tracker = [sp for sp in tk_spoints if sp.get_tracker() == i]
                     for j in range(1, 6):
                         station = \
                           [sp for sp in tracker if sp.get_station() == j]
+                        # Does each station have one and only one sp
                         if len(station) != 1:
                             bool_10spoint_event = False
                             if i == 0:
@@ -221,8 +222,12 @@ class PatRecEfficiency():
                     prtracks.append(tk_evt.straightprtracks())
                     # print 'Looking at helical and straight tracks'
                 else:
-                    print 'Both track options set, aborting'
+                    print 'Both track type options not set, aborting'
                     return
+
+                # Now switch from calculating expected tracks to what
+                # was actually reconstructed
+                # ---------------------------------------------------
 
                 # Is there at least 1 track present in either tracker
                 bool_tkus_1track = False
@@ -299,6 +304,52 @@ class PatRecEfficiency():
         self.num_5spoint_tkds_tracks = 0
         self.num_3to5spoint_tkus_tracks = 0
         self.num_3to5spoint_tkds_tracks = 0
+
+    def find_mc_track(self, mc_evt, spoints, trker_num):
+        """ Find all the digits associated with these spacepoints
+            then all the mc scifi hits associated with these digits.
+            Look to see if a single mc track id occurs in these hits
+            more than 50% of the time, and if so return that track """
+
+        # Initialise the lookup to link recon to the MC
+        lkup = scifi_lookup.SciFiLookup()
+        lkup.make_hits_map(mc_evt)
+
+        mc_track_counter = {} # Dict mapping track id to frequency it occurs
+
+        # Loop over all spoints, then clusters, then digits, then scifi hits
+        num_hits = 0
+        for sp in spoints:
+            if sp.get_tracker() != trker_num:
+                continue
+            for clus in sp.get_channels_pointers():
+               for dig in clus.get_digits_pointers():
+                   hits = lkup.get_hits(dig)
+                   for hit in hits:
+                       num_hits += 1
+                       mc_track_id = hit.GetTrackId()
+                       if mc_track_id in mc_track_counter:
+                           mc_track_counter[mc_track_id] += 1
+                       else:
+                           mc_track_counter[mc_track_id] = 1
+
+        # Does any one mc track id appear more than 50% of the time?
+        most_frequent_id = 0
+        highest_counter = 0
+        for mc_track_id, counter in mc_track_counter.iteritems():
+            if counter > highest_counter:
+                most_frequent_id = mc_track_id
+                highest_counter = counter
+
+        # If such a track id was found return the associated mc track
+        mc_track = None
+        if  mc_track_counter[most_frequent_id] > (num_hits / 2.0):
+            for track in mc_evt.GetTracks():
+                if most_frequent_id == track.GetTrackId():
+                    mc_track = track
+                    break
+
+        return mc_track
 
     def print_file_info(self, root_file_name):
         """ Calculate the efficiencies and print """
