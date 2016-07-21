@@ -26,7 +26,8 @@ import maus_cpp.globals
 import maus_cpp.converter
 import maus_cpp.mice_module
 
-class MapCppTrackerSpacePointReconTestCase(unittest.TestCase): # pylint: disable = R0904
+# pylint: disable = R0904
+class MapCppTrackerSpacePointReconTestCase(unittest.TestCase):
     """Tests for MapCppTrackerSpacePointRecon"""
 
     cfg = json.loads(Configuration.Configuration().getConfigJSON())
@@ -40,7 +41,8 @@ class MapCppTrackerSpacePointReconTestCase(unittest.TestCase): # pylint: disable
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
 
-        cls.mappers = [MAUS.MapCppTrackerClusterRecon(), MAUS.MapCppTrackerSpacePointRecon()]
+        cls.mappers = [MAUS.MapCppTrackerClusterRecon(), \
+          MAUS.MapCppTrackerSpacePointRecon()]
         cls.test_config = ""
         if maus_cpp.globals.has_instance():
             cls.test_config = maus_cpp.globals.get_configuration_cards()
@@ -68,8 +70,9 @@ class MapCppTrackerSpacePointReconTestCase(unittest.TestCase): # pylint: disable
             m.birth(json.dumps(self.cfg))
 
         # Read in a spill of mc data containing 5 straight tracks
-        test1 = ('%s/tests/test_data/scifi_test_data/test_straight_digits.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
+        test1 = \
+          ('%s/tests/test_data/scifi_test_data/test_straight_digits.json' %
+          os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         fin.readline()
         fin.readline()
