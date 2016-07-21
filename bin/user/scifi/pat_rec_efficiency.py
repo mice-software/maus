@@ -6,7 +6,7 @@ import sys
 import os
 import ROOT
 import libMausCpp #pylint: disable = W0611
-import scifi_lookup
+from analysis.scifi_lookup import SciFiLookup
 
 #pylint: disable = R0902
 #pylint: disable = R0912
@@ -312,7 +312,7 @@ class PatRecEfficiency():
             more than 50% of the time, and if so return that track """
 
         # Initialise the lookup to link recon to the MC
-        lkup = scifi_lookup.SciFiLookup()
+        lkup = SciFiLookup()
         lkup.make_hits_map(mc_evt)
 
         mc_track_counter = {} # Dict mapping track id to frequency it occurs
