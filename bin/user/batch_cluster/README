@@ -1,0 +1,68 @@
+#  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+#
+#  MAUS is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MAUS is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+
+A. Dobbs
+August 2016
+
+The code in this directory is for use on a Sun Grid Engine (SGE) batch system,
+having been designed and tested on the Imperial College HEP batch cluster by
+C. Hunt and adapted for inclusion in MAUS by A. Dobbs.
+
+The code runs a large number of MAUS simulations in order to evaluate the
+performance of the tracker software, particularly the Kalman filter. Scripts to 
+analyse the resulting data are also present.
+
+Description:
+
+The following top level directories are present:
+
+* beams - to contain pre-generated MICE beams for use in the simulations
+* datacards - MAUS configuration files used by the simulations
+* geometry - a few simple geometries used by the simulations
+* output - the output from the simulation, analysis, and all the messages
+           returned by the SGE
+* scripts - the scripts used to launch the batch jobs, run the simulations, 
+            analyse the output and create the plots
+
+Instructions:
+
+* source env.sh in a MAUS installation capable of running on the batch nodes
+* Link pre-generated beam files into the beams directory:
+** Download the beam data:
+*** Move to the beams directory and create a directory called test_beams
+*** In this directory download the beam data: 
+    wget http://heplnv152.pp.rl.ac.uk/maus/beams/uniform_momentum_zero_position.tar.gz
+*** Untar the tarball
+** Alternatively, Imperial lx cluster users can just create the following soft
+   link in the beams directory:
+   ln -s /vols/mice/mice-data/maus-beams/test_beams test_beams
+** The paths and data files used are listed in the datacards:
+   beams/test_beams/uniform_momentum_zero_position/uniform_2000_XXX.dat
+   or beams/test_beams/uniform_momentum_zero_position/uniform_1000_XXX.dat,
+   where XXX is in the range 000 - 999 (should all work by default).
+* Run scripts/execute_all_simulations.sh and wait for the jobs to finish
+* Check the output ROOT files are present under the output/simulation directory
+* Run scripts/analysis/analyse_all.sh
+* Check the output ROOT files are present under the output/analysis directory
+* Run scripts/analysis/make_plots.sh
+* Check the output pdf files are present under the output/analysis/plots directory
+
+Notes:
+
+* The status of batch jobs can be checked with the qstat command
+* The messages from the batch system are stored in output/batch_messages
+* The plots used in the tracker software paper are generated in the folder
+  resolution_reqCluster_helix_complete in the plots directory
+  
