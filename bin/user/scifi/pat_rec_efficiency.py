@@ -6,7 +6,7 @@ import sys
 import os
 import ROOT
 import libMausCpp #pylint: disable = W0611
-from analysis.scifi_lookup import SciFiLookup
+import analysis.scifitools as tools
 
 #pylint: disable = R0902
 #pylint: disable = R0912
@@ -31,8 +31,12 @@ class PatRecEfficiency():
         self.tof_upper_cut = 50.0
         self.tof_lower_cut = 27.0
         self.fiducial_cut = 150.0
+        self.id_frequency_cut = 0.5
 
         self.root_files = []
+        self.pt_hist = ROOT.TH1D("pt_hist", "pt", 100, -100.0, 100.0);
+        # self.py_hist = ROOT.TH1D("py_hist", "py", 100, -100.0, 100.0);
+        self.pz_hist = ROOT.TH1D("pz_hist", "pz", 100, -100.0, 100.0);
 
         self.num_total_events = 0
         self.num_12spoint_events = 0
@@ -228,6 +232,15 @@ class PatRecEfficiency():
                 # was actually reconstructed
                 # ---------------------------------------------------
 
+                # If we find no tracks, record the mc truth momentum to see if
+                # it correlates with failure of the reconstruction
+                mc_evt = spill.GetMCEvents()[i];
+                lkup = tools.SciFiLookup(mc_evt) # Lookup to link recon to MC
+                for trker_num in [0, 1]:
+                    hits = tools.find_mc_hits(lkup, tk_spoints, trker_num)
+                    mc_track = tools.find_mc_track(hits, self.id_frequency_cut)
+
+
                 # Is there at least 1 track present in either tracker
                 bool_tkus_1track = False
                 bool_tkds_1track = False
@@ -303,53 +316,6 @@ class PatRecEfficiency():
         self.num_5spoint_tkds_tracks = 0
         self.num_3to5spoint_tkus_tracks = 0
         self.num_3to5spoint_tkds_tracks = 0
-
-    @staticmethod
-    def find_mc_track(mc_evt, spoints, trker_num):
-        """ Find all the digits associated with these spacepoints
-            then all the mc scifi hits associated with these digits.
-            Look to see if a single mc track id occurs in these hits
-            more than 50% of the time, and if so return that track """
-
-        # Initialise the lookup to link recon to the MC
-        lkup = SciFiLookup()
-        lkup.make_hits_map(mc_evt)
-
-        mc_track_counter = {} # Dict mapping track id to frequency it occurs
-
-        # Loop over all spoints, then clusters, then digits, then scifi hits
-        num_hits = 0
-        for sp in spoints:
-            if sp.get_tracker() != trker_num:
-                continue
-            for clus in sp.get_channels_pointers():
-                for dig in clus.get_digits_pointers():
-                    hits = lkup.get_hits(dig)
-                    for hit in hits:
-                        num_hits += 1
-                        mc_track_id = hit.GetTrackId()
-                        if mc_track_id in mc_track_counter:
-                            mc_track_counter[mc_track_id] += 1
-                        else:
-                            mc_track_counter[mc_track_id] = 1
-
-        # Does any one mc track id appear more than 50% of the time?
-        most_frequent_id = 0
-        highest_counter = 0
-        for mc_track_id, counter in mc_track_counter.iteritems():
-            if counter > highest_counter:
-                most_frequent_id = mc_track_id
-                highest_counter = counter
-
-        # If such a track id was found return the associated mc track
-        mc_track = None
-        if  mc_track_counter[most_frequent_id] > (num_hits / 2.0):
-            for track in mc_evt.GetTracks():
-                if most_frequent_id == track.GetTrackId():
-                    mc_track = track
-                    break
-
-        return mc_track
 
     def print_file_info(self, root_file_name):
         """ Calculate the efficiencies and print """
