@@ -87,6 +87,9 @@ class MCEvent {
    */
   void SetTracks(TrackArray* tracks);
 
+  /** Add a single MC track (needed for PyROOT access) */
+  void AddTrack(Track& track);
+
   /** Get the virtual hits pertaining to this event. MCEvent still owns
    *  VirtualHitArray*.
    */

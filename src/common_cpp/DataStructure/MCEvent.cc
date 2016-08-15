@@ -187,6 +187,13 @@ void MCEvent::SetTracks(TrackArray* tracks) {
     _tracks = tracks;
 }
 
+void MCEvent::AddTrack(Track& track) {
+  if (!_tracks) {
+    _tracks = new TrackArray();
+  }
+  _tracks->push_back(track);
+}
+
 VirtualHitArray* MCEvent::GetVirtualHits() const {
     return _virtuals;
 }

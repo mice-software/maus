@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Tests for workers module.
+Tests for the SciFiLookup python module (not the C++ module)
 """
 
 #  This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
@@ -34,7 +34,17 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     """
     def setUp(self): # pylint: disable=C0103
 
-        # Set up some scifihits
+        # Make an MC event
+        self.mcevt = maus.MCEvent()
+
+        # Set up some mc tracks and add to the mc event
+        mctracks = []
+        for i in range(2):
+          mctracks.append(maus.Track())
+          mctracks[i].SetTrackId(i)
+          self.mcevt.AddTrack(mctracks[i])
+
+        # Set up some scifihits and add to the mc event
         hits = []
         chan_ids = []
         for i in range(7):
@@ -42,7 +52,15 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             chan_ids.append(maus.SciFiChannelId())
             hits[i].SetChannelId(chan_ids[i])
             hits[i].SetMass(i*10.0)
-
+            # Associate hits 1 - 3 with track 0, hits 4 - 6 with track 1,
+            # and hit0 with no existing track
+            if i > 0 and i < 4:
+                hits[i].SetTrackId(0)
+            elif i > 3:
+                hits[i].SetTrackId(1)
+            else:
+                hits[i].SetTrackId(-1)
+            self.mcevt.AddSciFiHit(hits[i])
 
         # Make some recon objects
         self.spoints = []
@@ -52,30 +70,32 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
           self.spoints.append(maus.SciFiSpacePoint())
           self.clusters.append(maus.SciFiCluster())
           self.digits.append(maus.SciFiDigit())
-          self.digits[i].set_tracker(1)
+          self.digits[i].set_tracker(i)
           self.digits[i].set_station(2)
           self.digits[i].set_plane(0)
           self.digits[i].set_channel(2**i)
           self.clusters[i].add_digit(self.digits[i])
+          self.clusters[i].set_tracker(i)
+          self.clusters[i].set_station(2)
+          self.clusters[i].set_plane(0)
           self.spoints[i].add_channel(self.clusters[i])
-
-        # Make an MC event with the hits
-        self.mcevt = maus.MCEvent()
-        for i in range(7):
-            self.mcevt.AddSciFiHit(hits[i])
+          self.spoints[i].set_tracker(i)
+          self.spoints[i].set_station(2)
 
         # Make a lookup
         self.lookup = tools.SciFiLookup(self.mcevt)
         dig_id0 = self.lookup.get_digit_id(self.digits[0])
         dig_id1 = self.lookup.get_digit_id(self.digits[1])
 
-        # Let hits 1 and 2 correspond to the digit, but not hit0
-        self.mcevt.GetSciFiHits()[0].GetChannelId().SetID(1)
+        # Let hits 1 to 3 correspond to digit 0, hits 4 - 6 to digit 1
+        # and hit 0 to no digit at all
+        self.mcevt.GetSciFiHits()[0].GetChannelId().SetID(0)
         self.mcevt.GetSciFiHits()[1].GetChannelId().SetID(dig_id0)
         self.mcevt.GetSciFiHits()[2].GetChannelId().SetID(dig_id0)
-        self.mcevt.GetSciFiHits()[3].GetChannelId().SetID(dig_id1)
+        self.mcevt.GetSciFiHits()[3].GetChannelId().SetID(dig_id0)
         self.mcevt.GetSciFiHits()[4].GetChannelId().SetID(dig_id1)
         self.mcevt.GetSciFiHits()[5].GetChannelId().SetID(dig_id1)
+        self.mcevt.GetSciFiHits()[6].GetChannelId().SetID(dig_id1)
 
         # Update the lookup
         self.lookup.make_hits_map(self.mcevt)
@@ -87,15 +107,53 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         hits = self.lookup.get_hits(self.digits[0])
         dig_id = self.lookup.get_digit_id(self.digits[0])
 
-        self.assertEqual(2, len(hits))
+        self.assertEqual(3, len(hits))
         self.assertEqual(dig_id, int(hits[0].GetChannelId().GetID()))
         self.assertEqual(10.0, hits[0].GetMass())
         self.assertEqual(dig_id, int(hits[1].GetChannelId().GetID()))
         self.assertEqual(20.0, hits[1].GetMass())
+        self.assertEqual(dig_id, int(hits[2].GetChannelId().GetID()))
+        self.assertEqual(30.0, hits[2].GetMass())
 
     def test_find_mc_hits(self):
         """ Test the find_mc_hits function """
+        # Check the first spacepoint (which is in tracker 0)
+        hits = tools.find_mc_hits(self.lookup, self.spoints, \
+          plane=-1, station=-1, tracker=0)
+        self.assertEqual(3, len(hits))
+        self.assertEqual(10.0, hits[0].GetMass())
+        self.assertEqual(20.0, hits[1].GetMass())
+        self.assertEqual(30.0, hits[2].GetMass())
+        # Check the other spacepoint (which is in tracker 1)
+        hits = tools.find_mc_hits(self.lookup, self.spoints, \
+          plane=-1, station=-1, tracker=1)
+        self.assertEqual(3, len(hits))
+        self.assertEqual(40.0, hits[0].GetMass())
+        self.assertEqual(50.0, hits[1].GetMass())
+        self.assertEqual(60.0, hits[2].GetMass())
+
+    def test_find_mc_track(self):
+        """ Test the find_mc_track function """
+        # Pull out the mc tracks and hits
+        tracks = tools.vector_to_list(self.mcevt.GetTracks())
+        all_hits = tools.vector_to_list(self.mcevt.GetSciFiHits())
+
+        # Select first 4 hits, 3 of which match track id 0
+        hits = all_hits[:4]
+        track = tools.find_mc_track(hits, tracks)
+        self.assertEqual(0, track.GetTrackId())
         
+        # Select the last 3 hits, all of which should match track id 1
+        hits = all_hits[-3:]
+        track = tools.find_mc_track(hits, tracks)
+        self.assertEqual(1, track.GetTrackId())
+        
+        # Now choose 1 hit from each track - no track should then be selected
+        hits = []
+        hits.append(all_hits[1])
+        hits.append(all_hits[4])
+        track = tools.find_mc_track(hits, tracks)
+        self.assertFalse(track)
 
 if __name__ == '__main__':
     unittest.main()
