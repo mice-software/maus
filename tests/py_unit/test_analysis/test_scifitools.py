@@ -46,6 +46,9 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
 
         # Set up some scifihits and add to the mc event
         hits = []
+        mom0 = maus.ThreeVector(0.0, 0.0, 0.0)
+        mom1 = maus.ThreeVector(1.0, 2.0, 3.0)
+        mom2 = maus.ThreeVector(4.0, 5.0, 6.0)
         chan_ids = []
         for i in range(7):
             hits.append(SciFiHit())
@@ -56,10 +59,13 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
             # and hit0 with no existing track
             if i > 0 and i < 4:
                 hits[i].SetTrackId(0)
+                hits[i].SetMomentum(mom1)
             elif i > 3:
                 hits[i].SetTrackId(1)
+                hits[i].SetMomentum(mom2)
             else:
                 hits[i].SetTrackId(-1)
+                hits[i].SetMomentum(mom0)
             self.mcevt.AddSciFiHit(hits[i])
 
         # Make some recon objects
@@ -71,16 +77,16 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
           self.clusters.append(maus.SciFiCluster())
           self.digits.append(maus.SciFiDigit())
           self.digits[i].set_tracker(i)
-          self.digits[i].set_station(2)
+          self.digits[i].set_station(5)
           self.digits[i].set_plane(0)
           self.digits[i].set_channel(2**i)
           self.clusters[i].add_digit(self.digits[i])
           self.clusters[i].set_tracker(i)
-          self.clusters[i].set_station(2)
+          self.clusters[i].set_station(5)
           self.clusters[i].set_plane(0)
           self.spoints[i].add_channel(self.clusters[i])
           self.spoints[i].set_tracker(i)
-          self.spoints[i].set_station(2)
+          self.spoints[i].set_station(5)
 
         # Make a lookup
         self.lookup = tools.SciFiLookup(self.mcevt)
@@ -154,6 +160,16 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         hits.append(all_hits[4])
         track = tools.find_mc_track(hits, tracks)
         self.assertFalse(track)
+
+    def test_find_mc_momentum(self):
+        mom = tools.find_mc_momentum(self.lookup, [self.spoints[0]], 0, 0)
+        self.assertEqual(1.0, mom[0])
+        self.assertEqual(2.0, mom[1])
+        self.assertEqual(3.0, mom[2])
+        mom = tools.find_mc_momentum(self.lookup, [self.spoints[1]], 1, 1)
+        self.assertEqual(4.0, mom[0])
+        self.assertEqual(5.0, mom[1])
+        self.assertEqual(6.0, mom[2])
 
 if __name__ == '__main__':
     unittest.main()

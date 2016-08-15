@@ -68,7 +68,7 @@ def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
 def find_mc_momentum(lkup, spoints, mc_track_id, trker_num):
     """ Find the mc truth momentum of the track that made the
         spacepoints at the tracker reference surface """
-    hits = find_mc_hits(lkup, spoints, trker_num, 5, 0)
+    hits = find_mc_hits(lkup, spoints, 0, 5, trker_num)
     num_matched_hits = 0
     px = 0
     py = 0
@@ -80,9 +80,12 @@ def find_mc_momentum(lkup, spoints, mc_track_id, trker_num):
             py += hit.GetMomentum().y()
             pz += hit.GetMomentum().z()
     if num_matched_hits != 0:
+      print str(num_matched_hits) + " matched"
       px = px / num_matched_hits
       py = py / num_matched_hits
       pz = pz / num_matched_hits
+    else:
+      print "No matches"
     return px, py, pz
 
 class SciFiLookup:
