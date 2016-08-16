@@ -7,7 +7,14 @@ import os
 import ROOT
 import libMausCpp #pylint: disable = W0611
 
-def find_mc_track(hits, id_frequency_cut=0.5):
+def vector_to_list(vec):
+    """ Convert a std vector to a python list """
+    pylist = []
+    for i in range(vec.size()):
+        pylist.append(vec[i])
+    return pylist
+
+def find_mc_track(hits, mc_tracks, id_frequency_cut=0.5):
     """ Look to see if a single mc track id occurs in these hits
         more than 50% (by default) of the time, and if so return
         that track """
@@ -31,15 +38,15 @@ def find_mc_track(hits, id_frequency_cut=0.5):
             highest_counter = counter
 
     # If such a track id was found, set the mc track
-    mc_track = None
+    found_track = None
     if  mc_track_counter[most_frequent_id] > \
-      (len(all_hits) * id_frequency_cut):
-        for track in mc_evt.GetTracks():
+      (len(hits) * id_frequency_cut):
+        for track in mc_tracks:
             if most_frequent_id == track.GetTrackId():
-                mc_track = track
+                found_track = track
                 break
 
-    return mc_track
+    return found_track
 
 def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
     """ Find the mc hits used create the spoints,
@@ -61,7 +68,7 @@ def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
 def find_mc_momentum(lkup, spoints, mc_track_id, trker_num):
     """ Find the mc truth momentum of the track that made the
         spacepoints at the tracker reference surface """
-    hits = find_mc_hits(lkup, spoints, trker_num, 5, 0)
+    hits = find_mc_hits(lkup, spoints, 0, 5, trker_num)
     num_matched_hits = 0
     px = 0
     py = 0
@@ -73,9 +80,12 @@ def find_mc_momentum(lkup, spoints, mc_track_id, trker_num):
             py += hit.GetMomentum().y()
             pz += hit.GetMomentum().z()
     if num_matched_hits != 0:
+      print str(num_matched_hits) + " matched"
       px = px / num_matched_hits
       py = py / num_matched_hits
       pz = pz / num_matched_hits
+    else:
+      print "No matches"
     return px, py, pz
 
 class SciFiLookup:
