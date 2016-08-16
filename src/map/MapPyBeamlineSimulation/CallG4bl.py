@@ -286,7 +286,7 @@ class CallG4bl: #pylint: disable=R0903
                 z = math.sin(theta) * float(element[3]) + math.cos(theta) * float(element[5]))) #pylint: disable = C0301
                 self.particles[key].update(time = float(element[6]), \
                 particle_id = int(element[7]))
-                self.particles[key].update(random_seed = random_seed, \
+                self.particles[key].update(random_seed = random_seed+i, \
                 energy = part_energy)    
             except IOError as err:
                 print('Bad G4beamline file, not enough elements or empty file')

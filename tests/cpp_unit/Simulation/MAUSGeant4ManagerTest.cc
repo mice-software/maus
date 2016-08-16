@@ -70,68 +70,68 @@ TEST(MAUSGeant4ManagerTest, SetPhasesTest) {
     MAUSGeant4Manager::GetInstance()->SetPhases();  // just check it runs
 }
 
-TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
-    MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
-    part_in.x = 1.;
-    part_in.y = 2.;
-    part_in.z = 3.;
-    part_in.time = 4.;
-    part_in.px = 5.;
-    part_in.py = 6.;
-    part_in.pz = 100.;
-    part_in.energy = 200.;
-    part_in.seed = 10;
-    part_in.pid = -11; // e- so no decays etc
-    MAUSGeant4Manager* g4manager = MAUSGeant4Manager::GetInstance();
-    g4manager->GetPhysicsList()->BeginOfReferenceParticleAction();
-    // test that track is set ok
-    MCEvent* event = g4manager->RunParticle(part_in);
-    ASSERT_EQ(event->GetTracks()->size(), 1);
-    Track track = event->GetTracks()->at(0);
-    EXPECT_NEAR(track.GetInitialPosition().x(), 1., 1e-9);
-    EXPECT_NEAR(track.GetInitialPosition().y(), 2., 1e-9);
-    EXPECT_NEAR(track.GetInitialPosition().z(), 3., 1e-9);
-    delete event;
-
-    // test that tracks can be switched on and off
-    g4manager->GetTracking()->SetWillKeepTracks(false);
-    g4manager->GetStepping()->SetWillKeepSteps(false);
-    event = g4manager->RunParticle(part_in);
-    ASSERT_FALSE(event->GetTracks() == NULL);
-    EXPECT_EQ(event->GetTracks()->size(), 0);
-    MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
-    delete event;
-    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_FALSE(event->GetTracks() == NULL);
-    ASSERT_EQ(event->GetTracks()->size(), 1);
-    ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
-    EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
-    delete event;
-
-    // test that steps can be switched on and off
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
-    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
-    EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
-    delete event;
-    MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(true);
-    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    ASSERT_TRUE(event->GetTracks()->at(0).GetSteps() != NULL);
-    EXPECT_GT(event->GetTracks()->at(0).GetSteps()->size(), 0);
-    delete event;
-
-    // Not such a good test as we don't have any virtual planes in the geometry
-    // test that virtuals can be switched on and off
-    g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
-    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_EQ(event->GetVirtualHits()->size(), 0);
-    delete event;
-    g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
-    event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
-    EXPECT_EQ(event->GetVirtualHits()->size(), 0);
-    delete event;
-    g4manager->GetPhysicsList()->BeginOfRunAction();
-}
+// TEST(MAUSGeant4ManagerTest, RunParticlePGTest) {
+//     MAUS::MAUSPrimaryGeneratorAction::PGParticle part_in;
+//     part_in.x = 1.;
+//     part_in.y = 2.;
+//     part_in.z = 3.;
+//     part_in.time = 4.;
+//     part_in.px = 5.;
+//     part_in.py = 6.;
+//     part_in.pz = 100.;
+//     part_in.energy = 200.;
+//     part_in.seed = 10;
+//     part_in.pid = -11; // e- so no decays etc
+//     MAUSGeant4Manager* g4manager = MAUSGeant4Manager::GetInstance();
+//     g4manager->GetPhysicsList()->BeginOfReferenceParticleAction();
+//     // test that track is set ok
+//     MCEvent* event = g4manager->RunParticle(part_in);
+//     ASSERT_EQ(event->GetTracks()->size(), 1);
+//     Track track = event->GetTracks()->at(0);
+//     EXPECT_NEAR(track.GetInitialPosition().x(), 1., 1e-9);
+//     EXPECT_NEAR(track.GetInitialPosition().y(), 2., 1e-9);
+//     EXPECT_NEAR(track.GetInitialPosition().z(), 3., 1e-9);
+//     delete event;
+// 
+//     // test that tracks can be switched on and off
+//     g4manager->GetTracking()->SetWillKeepTracks(false);
+//     g4manager->GetStepping()->SetWillKeepSteps(false);
+//     event = g4manager->RunParticle(part_in);
+//     ASSERT_FALSE(event->GetTracks() == NULL);
+//     EXPECT_EQ(event->GetTracks()->size(), 0);
+//     MAUSGeant4Manager::GetInstance()->GetTracking()->SetWillKeepTracks(true);
+//     delete event;
+//     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+//     ASSERT_FALSE(event->GetTracks() == NULL);
+//     ASSERT_EQ(event->GetTracks()->size(), 1);
+//     ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
+//     EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
+//     delete event;
+// 
+//     // test that steps can be switched on and off
+//     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(false);
+//     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+//     ASSERT_FALSE(event->GetTracks()->at(0).GetSteps() == NULL);
+//     EXPECT_EQ(event->GetTracks()->at(0).GetSteps()->size(), 0);
+//     delete event;
+//     MAUSGeant4Manager::GetInstance()->GetStepping()->SetWillKeepSteps(true);
+//     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+//     ASSERT_TRUE(event->GetTracks()->at(0).GetSteps() != NULL);
+//     EXPECT_GT(event->GetTracks()->at(0).GetSteps()->size(), 0);
+//     delete event;
+// 
+//     // Not such a good test as we don't have any virtual planes in the geometry
+//     // test that virtuals can be switched on and off
+//     g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(false);
+//     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+//     EXPECT_EQ(event->GetVirtualHits()->size(), 0);
+//     delete event;
+//     g4manager->GetVirtualPlanes()->SetWillUseVirtualPlanes(true);
+//     event = MAUSGeant4Manager::GetInstance()->RunParticle(part_in);
+//     EXPECT_EQ(event->GetVirtualHits()->size(), 0);
+//     delete event;
+//     g4manager->GetPhysicsList()->BeginOfRunAction();
+// }
 
 TEST(MAUSGeant4ManagerTest, RunParticleCppTest) {
     MAUSGeant4Manager* g4manager = MAUSGeant4Manager::GetInstance();
