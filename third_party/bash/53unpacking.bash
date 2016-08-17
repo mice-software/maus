@@ -3,7 +3,8 @@
 # require python extras for scons
 
 directory=unpacking-mice
-filename=${directory}_4.0.2.tarz
+release=4.0.0
+filename=${directory}_4.0.3.tar.gz
 # url=http://micewww.pp.rl.ac.uk/maus/third_party/${filename}
 url=http://heplnv152.pp.rl.ac.uk/maus/third_party/${filename}
 
@@ -59,7 +60,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
 #         cp SConstruct_unpacking ${MAUS_ROOT_DIR}/third_party/build/${directory}/SConstruct
-        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}-${release}
         echo
         echo "INFO: Making and installing"
         echo

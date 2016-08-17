@@ -90,7 +90,9 @@ g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2
         "d_s":3.837,"particles_per_spill":0,"rotation_angle":0,"translation_z":1000.0,\
         "protonabsorberin":1,"proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,\
         "particle_charge":'all',"file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',\
-        "get_magnet_currents_pa_cdb":False,"random_seed":1}
+    "get_magnet_currents_pa_cdb":False,"random_seed":1,
+    "seed_algorithm":"random_seed_and_spill_number",
+}
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
@@ -442,6 +444,8 @@ Number_of_DAQ_Events = -1
 Input_Use_JSON = False
 Phys_Events_Only = False
 Calib_Events_Only = False
+Enable_V1495_Unpacking = False
+Enable_EI_Unpacking = True
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True

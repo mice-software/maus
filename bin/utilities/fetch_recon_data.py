@@ -32,7 +32,7 @@ import shutil
 MAUS_ROOT_DIR = os.environ["MAUS_ROOT_DIR"]
 
 DEFAULT_SERVER = "http://reco.mice.rl.ac.uk/"
-DEFAULT_MAUS_VERSION = "MAUS-v2.3.1"
+DEFAULT_MAUS_VERSION = "MAUS-v2.5.1"
 DEFAULT_OUT_DIRECTORY = os.path.join(MAUS_ROOT_DIR, "files/recon/")
 
 DEFAULT_POSTFIX = "_offline.tar"
@@ -65,6 +65,14 @@ def construct_filenames(numbers) :
 
   return filenames
 
+def construct_by_hundreds_name(run_number) :
+  """
+    Make a folder name to store runs sorted by hundreds
+    e.g. 07400. Return this value as a string.
+  """
+  folder_name = run_number[0:3]
+  folder_name = folder_name + '00'
+  return folder_name
 
 def get_file(server, version, file_name, out_path) :
   """
@@ -135,7 +143,8 @@ if __name__ == "__main__" :
         print
         print "Run Number:", run_numbers[run_id]
         tar_outpath = os.path.join(outdir, namespace.maus_version)
-        data_outpath = os.path.join(tar_outpath, run_numbers[run_id])
+        data_outpath = os.path.join(tar_outpath, \
+          construct_by_hundreds_name(run_numbers[run_id]), run_numbers[run_id])
         if os.path.isdir(data_outpath) :
           if namespace.overwrite :
             print " - Removing existing directory..."
@@ -150,7 +159,11 @@ if __name__ == "__main__" :
         outfile = get_file(namespace.server, namespace.maus_version, \
                                                     files[run_id], tar_outpath)
         print " - Installing..."
-        extract_data(outfile, data_outpath)
+        try :
+          extract_data(outfile, data_outpath)
+        except BaseException as ex :
+          # error_list.append(ex)
+          os.rmdir(data_outpath)
         os.remove(outfile)
 
       except KeyboardInterrupt :

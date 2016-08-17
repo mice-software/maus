@@ -125,6 +125,9 @@
 #pragma link C++ class std::vector<V1731>;
 #pragma link C++ class MAUS::TOFDigit+;
 #pragma link C++ class MAUS::V830+;
+#pragma link C++ class MAUS::TriggerEngine+;
+#pragma link C++ class MAUS::ParticleTrigger+;
+#pragma link C++ class MAUS::EpicsInterface+;
 #pragma link C++ class MAUS::TOFSlabHit+;
 #pragma link C++ class MAUS::CkovDigit+;
 #pragma link C++ class MAUS::V1724+;
