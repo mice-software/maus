@@ -14,20 +14,56 @@
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "Interface/Squeak.hh"
-#include "Utils/Exception.hh"
+
+#include <Python.h>
+#include <stdlib.h>
+
+#include <vector>
+#include <iostream>
+#include <string>
+
+#include "TCanvas.h"
+#include "TH1D.h"
+#include "TMinuit.h"
+#include "TFitResult.h"
+#include "TF1.h"
+#include "TLatex.h"
+#include "TPaveText.h"
+#include "TPaveStats.h"
+
+#include "src/common_cpp/DataStructure/Data.hh"
+#include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/ReconEvent.hh"
+#include "src/common_cpp/DataStructure/TOFEvent.hh"
+#include "src/common_cpp/DataStructure/TOFEventSpacePoint.hh"
+#include "src/common_cpp/DataStructure/TOFSpacePoint.hh"
+
+#include "src/legacy/Interface/STLUtils.hh"
+#include "src/legacy/Interface/Squeak.hh"
 
 #include "src/reduce/ReduceCppTofCalib/ReduceCppTofCalib.hh"
-#include "src/common_cpp/JsonCppProcessors/SpillProcessor.hh"
 
 namespace MAUS {
-bool ReduceCppTofCalib::birth(std::string argJsonConfigDocument) {
-  // Check if the JSON document can be parsed, else return error only
-  _classname = "ReduceCppTofCalib";
-  _filename = "tofcalibdata.root";
-  _filepath = ".";
+
+PyMODINIT_FUNC init_ReduceCppTofCalib(void) {
+    PyWrapReduceBase<ReduceCppTofCalib>::PyWrapReduceBaseModInit(
+                                  "ReduceCppTofCalib", "", "", "", "");
+}
+
+ReduceCppTofCalib::ReduceCppTofCalib()
+  : ReduceBase<Data, Data>("ReduceCppTofCalib") {}
+
+ReduceCppTofCalib::~ReduceCppTofCalib() {
+  // Everything will be deleted by the ImageData destructor.
+}
+
+void ReduceCppTofCalib::_birth(const std::string& argJsonConfigDocument) {
+
+  if (!_output) {
+    throw MAUS::Exception(Exception::nonRecoverable,
+                          "The output is disconnected.",
+                          "ReduceCppTofCalib::_birth");
+  }
 
   if (!MakeTree())
       std::cerr << "Failed to make TTree" << std::endl;
@@ -37,32 +73,39 @@ bool ReduceCppTofCalib::birth(std::string argJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
     // this will contain the configuration
-    return true;
   } catch (Exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
   }
-  return false;
 }
 
-void ReduceCppTofCalib::process(Data *data) {
+void ReduceCppTofCalib::_death() {
+  Save();
+}
+
+void ReduceCppTofCalib::_process(MAUS::Data* data) {
+  if (data == NULL)
+    throw Exception(Exception::recoverable, "Data was NULL",
+                    "ReduceCppTofCalib::_process");
+
+  if (data->GetSpill() == NULL)
+    throw Exception(Exception::recoverable, "Spill was NULL",
+                    "ReduceCppTofCalib::_process");
+
+  std::string ev_type = data->GetSpill()->GetDaqEventType();
+
+  if (ev_type != "physics_event")
+     return;
+
+  if (data->GetSpill()->GetReconEvents() == NULL)
+     throw Exception(Exception::recoverable, "ReconEvents were NULL",
+                        "ReduceCppTofCalib::_process");
+
+
   Spill *spillPtr = data->GetSpill();
   _spill = *spillPtr;
   this->processSpill();
-}
-
-std::string  ReduceCppTofCalib::process(std::string document) {
-  //  JsonCpp setup
-
-  // make sure we can load the json document
-  if (loadSpill(document)) {
-    this->processSpill();
-  } else {
-    std::cerr << "Failed to load JSON\n";
-  }
-  // Draw the beam profile histograms.
-  return JsonWrapper::JsonToString(root);
 }
 
 void ReduceCppTofCalib::processSpill() {
@@ -188,13 +231,11 @@ void ReduceCppTofCalib::processSpill() {
 }
 
 
-bool ReduceCppTofCalib::death()  {
-  // Open a ROOT file to store the data.
-  Save();
-  return true;
+void ReduceCppTofCalib::reset() {
 }
 
-
+void ReduceCppTofCalib::update() {
+}
 void ReduceCppTofCalib::Save() {
   this->Save(_filepath + _filename);
 }
@@ -250,25 +291,4 @@ bool ReduceCppTofCalib::MakeTree() {
 
   return true;
 }
-
-bool ReduceCppTofCalib::loadSpill(std::string jsonDoc) {
-
-  Json::FastWriter writer;
-  Json::Reader reader;
-
-  try {
-    root = JsonWrapper::StringToJson(jsonDoc);
-    SpillProcessor spill_proc;
-    _spill = *spill_proc.JsonToCpp(root);
-    return true;
-  } catch (...) {
-    Json::Value errors;
-    std::stringstream ss;
-    ss << _classname << " says: Failed when importing JSON to Spill";
-    errors["bad_json_document"] = ss.str();
-    root["errors"] = errors;
-    writer.write(root);
-    return false;
-  }
-}
-}
+} // MAUS
