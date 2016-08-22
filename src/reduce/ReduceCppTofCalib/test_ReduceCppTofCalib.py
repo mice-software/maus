@@ -17,7 +17,6 @@
 # pylint: disable = C0103
 
 import os
-import json
 import unittest
 from Configuration import Configuration
 import MAUS
@@ -32,17 +31,11 @@ class ReduceCppTofCalibTestCase(unittest.TestCase):# pylint: disable = R0904
 
     def test_empty(self):
         """Check against configuration is empty"""
-        result = self.reducer.birth("")
-        self.assertFalse(result)
-        result = self.reducer.process("")
-        doc = json.loads(result)
-        self.assertTrue("errors" in doc)
-        self.assertTrue("bad_json_document" in doc["errors"])
+        self.assertRaises(RuntimeError, self.reducer.process, "")
 
     def test_init(self):
         """Check that birth works properly"""
-        success = self.reducer.birth(self. c.getConfigJSON())
-        self.assertTrue(success)
+        self.reducer.birth(self. c.getConfigJSON())
 
     def test_no_data(self):
         """Check that against data stream is empty"""
@@ -51,16 +44,11 @@ class ReduceCppTofCalibTestCase(unittest.TestCase):# pylint: disable = R0904
         fin = open(test1,'r')
         data = fin.read()
         # test with no data.
-        result = self.reducer.process(data)
-        spill = json.loads(result)
-        no_slab_hits = True
-        if 'slab_hits' in spill:
-            no_slab_hits = False
-        self.assertTrue(no_slab_hits)
+        self.assertRaises(RuntimeError, self.reducer.process, data) 
 
     def test_process(self):
         """Check ReduceCppTofCalib process function"""
-        test2 = ('%s/src/reduce/ReduceCppTofCalib/processTest.txt' %
+        test2 = ('%s/src/reduce/ReduceCppTofCalib/processTest.json' %
                                                 os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test2,'r')
         data = fin.read()
@@ -70,9 +58,7 @@ class ReduceCppTofCalibTestCase(unittest.TestCase):# pylint: disable = R0904
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Check that death works ok"""
-        success = cls.reducer.death()
-        if not success:
-            raise Exception('InitializeFail', 'Could not start worker')
+        cls.reducer.death()
         cls.reducer = None
 
 if __name__ == '__main__':
