@@ -110,6 +110,8 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   G4Element* elO = man->FindOrBuildElement("O");
   bc600->AddElement(elO,  2);		//ME - Tamas thinks this should be 2, not 12!!!
   materials_list->addMaterial( bc600, name );
+  materials_list->addMaterial( bc600, "POLYVINYL_TOLUENE" );
+  materials_list->addMaterial( bc600, "POLYVINYL_CHLORIDE_LOWD" );
 
   // Stainless steel, using generic 304 
   density = 8.06*g/cm3;

@@ -21,6 +21,7 @@ Test maus_cpp.mice_module
 
 import unittest
 import os
+import math
 
 from maus_cpp.mice_module import MiceModule
 
@@ -202,6 +203,34 @@ class MiceModuleTestCase(unittest.TestCase): # pylint: disable=R0904
                                                             for mod in mod_list]
             for i, z in enumerate(sorted(z_list)):                
                 self.assertAlmostEqual(i*1000., z)
+
+    def _test_global_coordinates(self):
+        """See comment in PyMiceModule.cc for why this doesnt work"""
+        import maus_cpp.globals
+        import maus_cpp.field
+        import Configuration
+        self.test = os.path.expandvars(
+        "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/test_mice_modules_global_coords.dat")
+        mod = MiceModule(file_name=self.test)
+        maus_cpp.globals.birth(Configuration.Configuration().getConfigJSON())
+        maus_cpp.globals.set_monte_carlo_mice_modules(mod)
+        print "NEW FIELDS"
+        print maus_cpp.field.str(True)
+        children = mod.get_children()
+        for child in children:
+            if child.get_name().find("TestMod4") > -1:
+                break
+        test_mod = child.get_children()[0]
+        pos = test_mod.get_global_position()
+        ref_pos = {"x":500., "y":1100., "z":1100.}
+        for key in ref_pos:
+            print pos, ref_pos
+            self.assertAlmostEqual(pos[key], ref_pos[key])
+        rot = test_mod.get_global_rotation()
+        ref_rot = {"x":0., "y":1., "z":0., "angle":math.pi-math.radians(135.)*1e-9}
+        for key in ref_rot:
+            self.assertAlmostEqual(rot[key], ref_rot[key])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -35,7 +35,7 @@ std::vector<double> ellipse(double x, double y, double z,
 // Is not intended to run normally (MAUS attempts to load the geometry, finds it
 // does not exist and bails)
 TEST(ErrorTrackingRealGeometryTest, PropagateTrackTest) {
-    clock_t t0, t1, t2, t3;
+    clock_t t0, t1, t2, t3, t4, t5, t6, t7, t8;
     t0 = clock();
     typedef Kalman::Global::ErrorTracking ErrorTracking;
 
@@ -70,7 +70,7 @@ TEST(ErrorTrackingRealGeometryTest, PropagateTrackTest) {
     double mass = 105.658;
 
     ErrorTracking propagator;
-    propagator.SetMinStepSize(10.);
+    propagator.SetMinStepSize(1.);
     propagator.SetMaxStepSize(100.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     /*
@@ -101,10 +101,21 @@ TEST(ErrorTrackingRealGeometryTest, PropagateTrackTest) {
     }
     std::cerr << std::endl;
     t3 = clock();
+    propagator.SetEnergyLossModel(ErrorTracking::bethe_bloch_forwards);
+    propagator.SetMCSModel(ErrorTracking::moliere_forwards);
     propagator.SetTrackingModel(ErrorTracking::em_forwards_static);
-    std::cerr << "Set up time                   " << (float)(t1-t0)/CLOCKS_PER_SEC << " s" << std::endl;
-    std::cerr << "Run time dynamic no materials " << (float)(t2-t1)/CLOCKS_PER_SEC << " s" << std::endl;
-    std::cerr << "Run time static no materials  " << (float)(t3-t2)/CLOCKS_PER_SEC << " s" << std::endl;
+    std::cerr << "Propagating static with materials" << std::flush;
+    for (size_t i = 0; i < 20; ++i) {
+        std::cerr << i << " " << std::flush;
+        std::vector<double> x_in = ellipse(0., 0., 13000., 1., 0., 200., mass);
+        propagator.Propagate(&x_in[0], 21000.);
+    }
+    std::cerr << std::endl;
+    t4 = clock();
+    std::cerr << "Set up time                    " << (float)(t1-t0)/CLOCKS_PER_SEC << " s" << std::endl;
+    std::cerr << "Run time dynamic no materials  " << (float)(t2-t1)/CLOCKS_PER_SEC << " s" << std::endl;
+    std::cerr << "Run time static no materials   " << (float)(t3-t2)/CLOCKS_PER_SEC << " s" << std::endl;
+    std::cerr << "Run time static with materials " << (float)(t4-t3)/CLOCKS_PER_SEC << " s" << std::endl;
 }
 
 }

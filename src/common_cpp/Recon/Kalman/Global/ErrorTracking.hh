@@ -36,6 +36,7 @@ public:
     enum EStragModel {estrag_forwards, estrag_backwards, no_estrag};
     enum TrackingModel {em_forwards_dynamic, em_backwards_dynamic,
                         em_forwards_static, em_backwards_static};
+    enum MaterialLookupModel {geant4, axis_lookup};
 
     ErrorTracking();
 

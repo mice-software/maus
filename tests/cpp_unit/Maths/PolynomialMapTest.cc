@@ -406,26 +406,28 @@ TEST_F(PolynomialMapTest, LeastSquaresFittingErrorHandling) {
         points, values, 1, weightFunction, errs3), MAUS::Exception);
 }
 
+CLHEP::HepMatrix get_matrix(size_t n_rows, size_t n_cols) {
+  double mat_arr[] = {1., 2., 7., 13., 200., 500., 800., 1100., 1400., 1700.,
+                      1., 3., 8., 14., 300., 600., 900., 1200., 1500., 1800.,
+                      1., 4., 9., 15., 400., 700., 1000., 1300., 1600., 1900.};
+  CLHEP::HepMatrix mat(n_rows, n_cols, 0);
+  size_t k = 0;
+  for (size_t i = 0; i < n_rows && i < 3; ++i)
+      for (size_t j = 0; j < n_cols && j < 10; ++j) {
+          mat[i][j] = mat_arr[k];
+          ++k;
+      }
+  return mat;
+}
+
 TEST_F(PolynomialMapTest, LeastSquaresFitting) {
   Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest" << std::endl;
   int               nX   = 4;
   int               nY   = 4;
   int               nZ   = 4;
-  CLHEP::HepMatrix mat(3, 4, 0);
-  mat[0][0] = 1.;
-  mat[1][0] = 4.;
-  mat[2][0] = 1.;
-  mat[0][1] = 2.;
-  mat[1][1] = 3.;
-  mat[2][1] = 2.;
-  mat[0][2] = 7.;
-  mat[1][2] = 11.;
-  mat[2][2] = 7.;
-  mat[0][3] = 13.;
-  mat[1][3] = 3.;
-  mat[2][3] = 13.;
 
   VectorMap* weightFunction = NULL;
+  CLHEP::HepMatrix mat = get_matrix(3, 4);
 
   PolynomialMap* vecF = new PolynomialMap(3, Matrix<double>(mat));
   std::vector< std::vector<double> > points(nX*nY*nZ, std::vector<double>(3));
@@ -518,53 +520,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
   EXPECT_TRUE(testpass);
 
   testpass = true;
-  // now take some of the input values, try for a constrained fit
-  PolynomialMap Constraint(2, Matrix<double>(mat.sub(1, 2, 1, 3)));
-  std::vector<PolynomialMap::PolynomialCoefficient> coeffs
-    = Constraint.GetCoefficientsAsVector();
-  for (int i = 0; i < 2; i++)
-    coeffs.erase(coeffs.begin());
-  PolynomialMap* constraintPVec = new PolynomialMap(coeffs);
-  pVec = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
-    points, values, 1, constraintPVec->GetCoefficientsAsVector(), weights);
 
-  // polynomial order should be 1
-  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
-
-  // with polynomial order 1, the number of poly. coeff. is just the number of
-  // variables plus one for the constant term
-  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
-
-  recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
-  Squeak::mout(Squeak::debug) << "Constrained Input\n" << *constraintPVec
-                              << "Constrained Output\n" << *pVec << std::endl;
-  for (int i = 0; i < recCoeff.num_row(); i++)
-    for (int j = 0; j < recCoeff.num_col(); j++)
-      if (fabs(recCoeff[i][j] - mat[i][j]) > 1e-6) testpass = false;
-  delete pVec;
-  EXPECT_TRUE(testpass);
-
-  // bad points size
-  testpass = true;
-  try {
-    const std::vector< std::vector<double> > bad_points;
-    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
-      bad_points, values,
-      1, constraintPVec->GetCoefficientsAsVector(), weights);
-    testpass = false;
-  } catch (MAUS::Exception exc) {}
-  ASSERT_TRUE(testpass);
-
-  // bad values size
-  testpass = true;
-  try {
-    const std::vector< std::vector<double> > bad_values;
-    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
-      points, bad_values,
-      1, constraintPVec->GetCoefficientsAsVector(), weights);
-    testpass = false;
-  } catch (MAUS::Exception exc) {}
-  ASSERT_TRUE(testpass);
 
   testpass = true;
   // should return a copy of
@@ -759,6 +715,96 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
   Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest " << *testF2
                               << testpass << std::endl;
   EXPECT_TRUE(testpass);
+}
+
+TEST_F(PolynomialMapTest, ConstrainedPolynomialLeastSquaresFit) {
+  CLHEP::HepMatrix mat = get_matrix(3, 10);
+  int               nX   = 4;
+  int               nY   = 4;
+  int               nZ   = 4;
+  bool testpass = true;
+
+  PolynomialMap* vecF = new PolynomialMap(3, Matrix<double>(mat));
+  std::vector< std::vector<double> > points(nX*nY*nZ, std::vector<double>(3));
+  std::vector< std::vector<double> > values(nX*nY*nZ, std::vector<double>(3));
+  std::vector<double>                weights(nX*nY*nZ, 1);
+  for (int i = 0; i < nX; i++)
+    for (int j = 0; j < nY; j++)
+      for (int k = 0; k < nZ; k++) {
+        int a = k+j*nZ + i*nY*nZ;
+        points[a][0] = i/static_cast<double>(nX)*105.;
+        points[a][1] = j/static_cast<double>(nY)*201.;
+        points[a][2] = k/static_cast<double>(nZ)*105.;
+        vecF->F(&points[a][0], &values[a][0]);
+      }
+
+  // now take some of the input values, try for a constrained fit
+  PolynomialMap Constraint(2, Matrix<double>(mat.sub(1, 2, 1, 8)));
+  std::vector<PolynomialMap::PolynomialCoefficient> coeffs
+                                         = Constraint.GetCoefficientsAsVector();
+  for (int i = 0; i < 2; i++)
+      coeffs.erase(coeffs.begin());
+  PolynomialMap* constraintPVec = new PolynomialMap(coeffs);
+
+  PolynomialMap* pVec = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+         points, values, 2, constraintPVec->GetCoefficientsAsVector(), weights);
+
+  // polynomial order should be 1
+  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
+
+  // with polynomial order 1, the number of poly. coeff. is just the number of
+  // variables plus one for the constant term
+  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
+
+  std::cerr << "Constraints" << std::endl;
+  for (size_t i = 0; i < constraintPVec->GetCoefficientsAsVector().size(); ++i) {
+      PolynomialMap::PolynomialCoefficient coeff =
+                                   constraintPVec->GetCoefficientsAsVector()[i];
+      std::cerr << "    out: " << coeff.OutVariable() << " in: " << std::flush;
+      // note we deal with case where size == 0 als
+      for (size_t j = 0; j < 3; ++j) {
+          if (j < coeff.InVariables().size())
+              std::cerr << coeff.InVariables()[j];
+          else
+              std::cerr << "-";
+          std::cerr << ".";
+      }
+      std::cerr << " coefficient " << coeff.Coefficient() << std::endl;;
+  }
+
+  Squeak::mout(Squeak::error) << "Constrained Input\n" << *vecF
+                              << "Constrained Output\n" << *pVec << std::endl;
+  CLHEP::HepMatrix recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
+  for (int i = 0; i < recCoeff.num_row(); i++)
+    for (int j = 0; j < recCoeff.num_col(); j++)
+      if (fabs(recCoeff[i][j] - mat[i][j]) > 1e-6) testpass = false;
+  EXPECT_TRUE(testpass);
+
+  // bad points size
+  testpass = true;
+  try {
+    const std::vector< std::vector<double> > bad_points;
+    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+      bad_points, values,
+      1, constraintPVec->GetCoefficientsAsVector(), weights);
+    testpass = false;
+  } catch (MAUS::Exception exc) {}
+  ASSERT_TRUE(testpass);
+
+  // bad values size
+  testpass = true;
+  try {
+    const std::vector< std::vector<double> > bad_values;
+    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+      points, bad_values,
+      1, constraintPVec->GetCoefficientsAsVector(), weights);
+    testpass = false;
+  } catch (MAUS::Exception exc) {}
+  ASSERT_TRUE(testpass);
+  delete constraintPVec;
+  delete vecF;
+  delete pVec;
+
 }
 
 TEST_F(PolynomialMapTest, SpaceTransform) {

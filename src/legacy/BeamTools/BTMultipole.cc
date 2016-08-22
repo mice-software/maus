@@ -82,12 +82,24 @@ void BTMultipole::Init(int pole, double fieldAtWidth,
                                   CLHEP::Hep3Vector(_rCurv, 0, 0);
     }
   }
+  // BUG - this should be as strict as EndFieldValue
+  // note that the EndFieldValue uses _width/2, _height/2, _length; so 
+  // EndFieldValue is factor 2 more strict than BB in each dimension;
   bbMin[0] = -_width;
   bbMax[0] = +_width;
   bbMin[1] = -_height;
   bbMax[1] = +_height;
   bbMin[2] = 0.;
   bbMax[2] = _length*2.;
+  if (_curvature != straight) {
+      // length of the segment with curvature == _rCurv; always longer than the
+      // equivalent box
+      double phi = _length*2/_rCurv;
+      if (phi > pi/2)
+          phi = pi/2;
+      bbMax[2] = (_rCurv+_width)*sin(phi);
+      bbMin[0] = -(_rCurv - (_rCurv-_width)*cos(phi));
+  }
 }
 
 BTMultipole BTMultipole::DipoleFromMomentum
@@ -148,12 +160,12 @@ CLHEP::Hep3Vector BTMultipole::TransformToRotatedMomentumBased
 
 CLHEP::Hep3Vector BTMultipole::TransformToRotatedConstant
                                                   (const double * Point) const {
-  double x      = Point[0];
+  double dx     = Point[0];
+  double x      = dx+_rCurv; // x in coordinates relative to centre of rotation
   double z      = Point[2];
-  if (x == -_rCurv) return CLHEP::Hep3Vector(_rCurv, Point[1], 0.);
-  double q      = atan2(z, x+_rCurv);
-  double deltaS = q*_rCurv/2*pi;
-  double deltaR = sqrt(gsl_sf_pow_int(x+_rCurv, 2)+z*z)-_rCurv;
+  double q      = atan2(z, x);
+  double deltaS = q*_rCurv;
+  double deltaR = sqrt(x*x+z*z)-_rCurv;
   return CLHEP::Hep3Vector(deltaR, Point[1], deltaS);
 }
 
@@ -289,7 +301,6 @@ double BTMultipole::GetConst(int q, int n, int m) {
 
 void BTMultipole::EndFieldValue(CLHEP::Hep3Vector pos, double *field) const {
   if (pos.z() < 0. || pos.z() > _length) return;
-  if (fabs(pos.x()) > _width/2.)    return;
   if (fabs(pos.y()) > _height/2.)   return;
   pos[2] -= _length/2.;
   int    n(_pole);
