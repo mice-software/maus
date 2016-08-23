@@ -68,7 +68,7 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
                 hits[i].SetMomentum(mom0)
             self.mcevt.AddSciFiHit(hits[i])
 
-        # Make some recon objects
+        # Make some recon objects. Set station=1 plane=0 i.e. ref surface
         self.spoints = []
         self.clusters = []
         self.digits = []
@@ -82,11 +82,11 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
           self.digits[i].set_channel(2**i)
           self.clusters[i].add_digit(self.digits[i])
           self.clusters[i].set_tracker(i)
-          self.clusters[i].set_station(5)
+          self.clusters[i].set_station(1)
           self.clusters[i].set_plane(0)
           self.spoints[i].add_channel(self.clusters[i])
           self.spoints[i].set_tracker(i)
-          self.spoints[i].set_station(5)
+          self.spoints[i].set_station(1)
 
         # Make a lookup
         self.lookup = tools.SciFiLookup(self.mcevt)
@@ -141,32 +141,33 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     def test_find_mc_track(self):
         """ Test the find_mc_track function """
         # Pull out the mc tracks and hits
-        tracks = tools.vector_to_list(self.mcevt.GetTracks())
         all_hits = tools.vector_to_list(self.mcevt.GetSciFiHits())
 
         # Select first 4 hits, 3 of which match track id 0
         hits = all_hits[:4]
-        track = tools.find_mc_track(hits, tracks)
-        self.assertEqual(0, track.GetTrackId())
-        
+        track_id = tools.find_mc_track(hits)
+        self.assertEqual(0, track_id)
+
         # Select the last 3 hits, all of which should match track id 1
         hits = all_hits[-3:]
-        track = tools.find_mc_track(hits, tracks)
-        self.assertEqual(1, track.GetTrackId())
-        
+        track_id = tools.find_mc_track(hits)
+        self.assertEqual(1, track_id)
+
         # Now choose 1 hit from each track - no track should then be selected
         hits = []
         hits.append(all_hits[1])
         hits.append(all_hits[4])
-        track = tools.find_mc_track(hits, tracks)
+        track = tools.find_mc_track(hits)
         self.assertFalse(track)
 
-    def test_find_mc_momentum(self):
-        mom = tools.find_mc_momentum(self.lookup, [self.spoints[0]], 0, 0)
+    def test_find_mc_momentum_sfhits(self):
+        mom = \
+          tools.find_mc_momentum_sfhits(self.lookup, [self.spoints[0]], 0, 0)
         self.assertEqual(1.0, mom[0])
         self.assertEqual(2.0, mom[1])
         self.assertEqual(3.0, mom[2])
-        mom = tools.find_mc_momentum(self.lookup, [self.spoints[1]], 1, 1)
+        mom = \
+          tools.find_mc_momentum_sfhits(self.lookup, [self.spoints[1]], 1, 1)
         self.assertEqual(4.0, mom[0])
         self.assertEqual(5.0, mom[1])
         self.assertEqual(6.0, mom[2])

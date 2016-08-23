@@ -7,6 +7,16 @@ import os
 import ROOT
 import libMausCpp #pylint: disable = W0611
 
+def root_files_dir_search(top_dir, root_files):
+    """ Appends any ROOT files found in the directory to root_files """
+    for dir_name, subdir_list, file_list in os.walk(top_dir):
+        print('Searching directory: %s' % dir_name)
+        for fname in file_list:
+            file_suffix, file_extension = os.path.splitext(fname)
+            if file_extension == '.root':
+                print('\t%s' % fname)
+                root_files.append(dir_name + '/' + fname)
+
 def vector_to_list(vec):
     """ Convert a std vector to a python list """
     pylist = []
@@ -14,10 +24,10 @@ def vector_to_list(vec):
         pylist.append(vec[i])
     return pylist
 
-def find_mc_track(hits, mc_tracks, id_frequency_cut=0.5):
+def find_mc_track(hits, id_frequency_cut=0.5):
     """ Look to see if a single mc track id occurs in these hits
         more than 50% (by default) of the time, and if so return
-        that track """
+        that track id """
 
     # Loop over all spoints, then clusters, then digits, then scifi hits
     mc_track_counter = {} # Dict mapping track id to frequency it occurs
@@ -37,16 +47,7 @@ def find_mc_track(hits, mc_tracks, id_frequency_cut=0.5):
             most_frequent_id = mc_track_id
             highest_counter = counter
 
-    # If such a track id was found, set the mc track
-    found_track = None
-    if  mc_track_counter[most_frequent_id] > \
-      (len(hits) * id_frequency_cut):
-        for track in mc_tracks:
-            if most_frequent_id == track.GetTrackId():
-                found_track = track
-                break
-
-    return found_track
+    return most_frequent_id
 
 def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
     """ Find the mc hits used create the spoints,
@@ -65,10 +66,10 @@ def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
                 all_hits += hits
     return all_hits
 
-def find_mc_momentum(lkup, spoints, mc_track_id, trker_num):
+def find_mc_momentum_sfhits(lkup, spoints, mc_track_id, trker_num):
     """ Find the mc truth momentum of the track that made the
         spacepoints at the tracker reference surface """
-    hits = find_mc_hits(lkup, spoints, 0, 5, trker_num)
+    hits = find_mc_hits(lkup, spoints, 0, 1, trker_num)
     num_matched_hits = 0
     px = 0
     py = 0
@@ -93,6 +94,8 @@ class SciFiLookup:
     def __init__(self, mc_evt):
         """ Initialise the lookup (just declare a few members) """
         self.hits_map = self.make_hits_map(mc_evt)
+        if len(self.hits_map) < 1:
+            print "WARNING: SciFiLookup: Building hits map failed"
 
     def clear_maps(self):
         """ Set the member variables to empty """
@@ -117,7 +120,12 @@ class SciFiLookup:
             with the scifi hits in that channel """
         self.hits_map = {}
         hits = mc_evt.GetSciFiHits()
+        print 'Making hits map with ' + str(mc_evt.GetSciFiHits().size()) \
+          + " hits"
+        counter = 0
         for hit in hits:
+            print str(counter)
+            counter += 1
             channel_id = hit.GetChannelId().GetID()
             if not (channel_id in self.hits_map):
                 self.hits_map[channel_id] = [hit]
