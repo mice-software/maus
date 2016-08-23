@@ -50,19 +50,32 @@ class PatRecEfficiency():
         self.bool_tkds_1track = False # Found one track in TkDS
         self.bool_tkus_5spoint_track = False # Found one 5pt track in TkUS
         self.bool_tkds_5spoint_track = False # Found one 5pt track in TkDS
+        self.bool_tkus_good_event = False # Have all the choosen cuts passed?
+        self.bool_tkds_good_event = False # Have all the choosen cuts passed?
 
         self.num_total_events = 0
-        self.num_tof_good_events = 0
-        self.num_tof_spoint_good_events = 0
-        self.num_10spoint_events = 0
-        self.num_5spoint_tkus_events = 0
-        self.num_5spoint_tkds_events = 0
+        self.num_tof_good_events = 0 # Events which pass the time-of-flight cut
+        self.num_tof_spoint_good_events = 0 # Events with 1 sp in TOF1 and TOF2
+        self.num_10spoint_events = 0 # Events with 5 spoints in both TkUS & TkDS
+        self.num_5spoint_tkus_events = 0 # Events with 5 spoints in TkUS
+        self.num_5spoint_tkds_events = 0 # Events with 5 spoints in TkDS
+        self.num_tkus_good_events = 0 # Events which pass all the set cuts
+        self.num_tkds_good_events = 0 # Events which pass all the set cuts
 
         self.num_10spoint_tracks = 0
         self.num_5spoint_tkus_tracks = 0
         self.num_5spoint_tkds_tracks = 0
         self.num_3to5spoint_tkus_tracks = 0
         self.num_3to5spoint_tkds_tracks = 0
+
+        self.eff_tkus_5pt = 0.0
+        self.eff_tkus_5pt_err = 0.0
+        self.eff_tkus_3_5pt = 0.0
+        self.eff_tkus_3_5pt_err = 0.0
+        self.eff_tkds_5pt = 0.0
+        self.eff_tkds_5pt_err = 0.0
+        self.eff_tkds_3_5pt = 0.0
+        self.eff_tkds_3_5pt_err = 0.0
 
     def run(self, files):
         """ Calculate the Pattern Recognition efficiency for the given files """
@@ -81,17 +94,18 @@ class PatRecEfficiency():
         if len(self.root_files) < 1:
             return False
 
-        print '\nFile\t\t\t#_Recon_Events\tTOF\tTOF_SP\tTkUS_5pt\tTkUS_5pt_Err\
-          \tTkUS_3-5_pt\tTkUS_3-5_pt_Err\t',
-        print 'TkDS_5pt\tTkDS_5_pt_Err\tTkDS_3-5pt\tTkDS_3-5_pt_Err'
+        counter = 0
         for root_file_name in self.root_files:
-            self.calculate_efficiency(root_file_name)
+            self.process_file(root_file_name)
+            if (counter == 0):
+                self.print_header()
             self.print_file_info(root_file_name)
             if self.use_mc_truth:
                 self.make_plots(root_file_name)
+            counter += 1
         return True
 
-    def calculate_efficiency(self, root_file_name):
+    def process_file(self, root_file_name):
         """ Calculate the Pattern Recognition efficiency for the input file """
         self.clear() # Start clean each time
 
@@ -105,6 +119,7 @@ class PatRecEfficiency():
         for i in range(tree.GetEntries()):
             tree.GetEntry(i)
             spill = data.GetSpill()
+            print "Spill number " + str(spill.GetSpillNumber())
             if spill.GetDaqEventType() != "physics_event":
                 continue
 
@@ -121,10 +136,13 @@ class PatRecEfficiency():
                 # Pull out tracker data and examine
                 tk_evt = spill.GetReconEvents()[i].GetSciFiEvent()
 
-                # Look at tracker spacepoint data to see if we expect a track/s
-                tracker_spoints_good = \
-                  self.check_tracker_spacepoints(tk_evt.spacepoints())
-                if not tracker_spoints_good:
+                # Look at tracker spacepoint data if we expect tracks in either
+                # tracker
+                self.check_tracker_spacepoints(tk_evt.spacepoints())
+
+                # If we expect good tracks in neither tracker, skip this event
+                if ( not self.bool_tkus_good_event ) and \
+                  ( not self.bool_tkds_good_event ) :
                     continue # remove event from consideration
 
                 # Now switch from calculating expected tracks to what
@@ -133,12 +151,10 @@ class PatRecEfficiency():
                 # Extract the desired pat rec tracks (straight, helical or both)
                 prtracks = self.extract_prtracks(tk_evt)
 
-                # Is there at least 1 track present in either tracker
-                if len(prtracks) < 1:
-                    continue # remove event from consideration
-
                 # Analyse the pat rec tracks and see what we actually found
                 self.analyse_prtracks(prtracks)
+
+        self.calculate_efficiency()
 
         # Close the ROOT file
         root_file.Close()
@@ -204,11 +220,64 @@ class PatRecEfficiency():
                     self.num_5spoint_tkds_tracks += 1
                     self.bool_tkds_5spoint_track = True
 
-        # Lastly see if we found one 5 spoint track in BOTH trackers
+        # Lastly see if we found only one 5 spoint track in BOTH trackers
         if (len(prtracks) == 2 and self.bool_tkus_5spoint_track and \
             self.bool_tkds_5spoint_track):
             self.num_10spoint_tracks += 1
         return True
+
+    def calculate_efficiency(self):
+        """ Calculate the final efficiency figures for a file """
+        self.eff_tkus_5pt = 0.0
+        self.eff_tkus_5pt_err = 0.0
+        self.eff_tkus_3_5pt = 0.0
+        self.eff_tkus_3_5pt_err = 0.0
+        self.eff_tkds_5pt = 0.0
+        self.eff_tkds_5pt_err = 0.0
+        self.eff_tkds_3_5pt = 0.0
+        self.eff_tkds_3_5pt_err = 0.0
+
+        # Upstream tracker
+        try:
+            self.eff_tkus_5pt = float(self.num_5spoint_tkus_tracks) \
+              /float(self.num_tkus_good_events)
+            self.eff_tkus_5pt_err = \
+              (self.eff_tkus_5pt * (1-self.eff_tkus_5pt)) \
+              /(float((self.num_tkus_good_events)) ** (0.5))
+        except ZeroDivisionError, ValueError:
+            self.eff_tkus_5pt = 0.0
+            self.eff_tkus_5pt_err = 0.0
+        try:
+            self.eff_tkus_3_5pt = float(self.num_3to5spoint_tkus_tracks) \
+              /float(self.num_tkus_good_events)
+            self.eff_tkus_3_5pt_err = \
+              (self.eff_tkus_3_5pt * (1-self.eff_tkus_3_5pt)) \
+                /(float((self.num_tkus_good_events)) ** (0.5))
+            self.eff_tkus_3_5pt_err = 0.001
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkus_3_5pt = 0.0
+            self.eff_tkus_3_5pt_err = 0.0
+
+        # Downstream tracker
+        try:
+            self.eff_tkds_5pt = float(self.num_5spoint_tkds_tracks) \
+              / float(self.num_tkds_good_events)
+            self.eff_tkds_5pt_err = \
+              (self.eff_tkds_5pt * (1-self.eff_tkds_5pt)) \
+              /(float((self.num_tkds_good_events)) ** (0.5))
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkds_5pt = 0.0
+            self.eff_tkds_5pt_err = 0.0
+        try:
+            self.eff_tkds_3_5pt = float(self.num_3to5spoint_tkds_tracks) \
+              /float(self.num_tkds_good_events)
+            self.eff_tkds_3_5pt_err = \
+              (self.eff_tkds_3_5pt * (1-self.eff_tkds_3_5pt)) \
+                /(float((self.num_tkds_good_events)) ** (0.5))
+            #self.eff_tkds_3_5pt_err = 0.001
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkds_3_5pt = 0.0
+            self.eff_tkds_3_5pt_err = 0.0
 
     def check_tof(self, tof_evt):
         """ Analyse tof data. Return boolean indicating if tof cuts pass"""
@@ -288,11 +357,29 @@ class PatRecEfficiency():
         if self.bool_tkds_5spoint_event:
             self.num_5spoint_tkds_events += 1
 
-        # Is the tracker spacepoint cut passed?
-        tracker_spoints_good = True
-        if self.cut_on_trackers and not self.bool_10spoint_event:
-            tracker_spoints_good = True
-        return tracker_spoints_good
+        # Are the complete set of tracker spacepoint cuts passed?
+        self.bool_tkus_good_event = False
+        self.bool_tkds_good_event = False
+        if self.cut_on_trackers: # Do we require 5 spoints in BOTH trackers?
+            if self.bool_10spoint_event:
+                self.bool_tkus_good_event = True
+                self.num_tkus_good_events += 1
+                self.bool_tkds_good_event = True
+                self.num_tkds_good_events += 1
+            else:
+                self.bool_tkus_good_event = False
+                self.bool_tkds_good_event = False
+        else: # If not, just see if 5 spoints in each tracker individually
+            if self.bool_tkus_5spoint_event:
+                self.bool_tkus_good_event = True
+                self.num_tkus_good_events += 1
+            else:
+                self.bool_tkus_good_event = False
+            if self.bool_tkds_5spoint_event:
+                self.bool_tkds_good_event = True
+                self.num_tkds_good_events += 1
+            else:
+                self.bool_tkds_good_event = False
 
     def clear(self):
         """ Set the internal counters to zero and booleans to false """
@@ -305,16 +392,32 @@ class PatRecEfficiency():
         self.bool_tkds_1track = False
         self.bool_tkus_5spoint_track = False
         self.bool_tkds_5spoint_track = False
+        self.bool_tkus_good_event = False
+        self.bool_tkds_good_event = False
 
         self.num_total_events = 0
+        self.num_tof_good_events = 0
+        self.num_tof_spoint_good_events = 0
         self.num_10spoint_events = 0
         self.num_5spoint_tkus_events = 0
         self.num_5spoint_tkds_events = 0
+        self.num_tkus_good_events = 0
+        self.num_tkds_good_events = 0
+
         self.num_10spoint_tracks = 0
         self.num_5spoint_tkus_tracks = 0
         self.num_5spoint_tkds_tracks = 0
         self.num_3to5spoint_tkus_tracks = 0
         self.num_3to5spoint_tkds_tracks = 0
+
+        self.eff_tkus_5pt = 0.0
+        self.eff_tkus_5pt_err = 0.0
+        self.eff_tkus_3_5pt = 0.0
+        self.eff_tkus_3_5pt_err = 0.0
+        self.eff_tkds_5pt = 0.0
+        self.eff_tkds_5pt_err = 0.0
+        self.eff_tkds_3_5pt = 0.0
+        self.eff_tkds_3_5pt_err = 0.0
 
     def extract_prtracks(self, tk_evt):
         """ Pull out the pattern recognition tracks selected for analysis -
@@ -371,50 +474,31 @@ class PatRecEfficiency():
         self.pz_hist.Draw()
         c1.SaveAs(file_name_prefix + "_momentum_failed_events.pdf")
 
-    def print_file_info(self, root_file_name):
-        """ Calculate the efficiencies and print """
-        try:
-            us_5pt = float(self.num_5spoint_tkus_tracks) \
-              / float(self.num_5spoint_tkus_events)
-            us_5pt_Err = ((us_5pt * (1-us_5pt)) \
-              /float(self.num_5spoint_tkus_events)) ** (0.5)
-        except (ZeroDivisionError, ValueError):
-            us_5pt = 0.0
-            us_5pt_Err = 0.0
-        try:
-            us_3to5pt = float(self.num_3to5spoint_tkus_tracks) \
-              / float(self.num_5spoint_tkus_events)
-            us_3to5pt_Err = ((us_3to5pt * (1-us_3to5pt)) \
-              /float(self.num_5spoint_tkus_events)) ** (0.5)
-            #us_3to5pt_Err = 0.001
-        except (ZeroDivisionError, ValueError):
-            us_3to5pt = 0.0
-            us_3to5pt_Err = 0.0
-        try:
-            ds_5pt = float(self.num_5spoint_tkds_tracks) \
-              / float(self.num_5spoint_tkds_events)
-            ds_5pt_Err = ((ds_5pt * (1-ds_5pt)) \
-              /float(self.num_5spoint_tkds_events)) ** (0.5)
-        except (ZeroDivisionError, ValueError):
-            ds_5pt = 0.0
-            ds_5pt_Err = 0.0
-        try:
-            ds_3to5pt = float(self.num_3to5spoint_tkds_tracks) \
-              / float(self.num_5spoint_tkds_events)
-            ds_3to5pt_Err = ((ds_3to5pt * (1-ds_3to5pt)) \
-              /float(self.num_5spoint_tkds_events)) ** (0.5)
-            #ds_3to5pt_Err = 0.001
-        except (ZeroDivisionError, ValueError):
-            ds_3to5pt = 0.0
-            ds_3to5pt_Err = 0.0
-        print os.path.basename(root_file_name) + '\t',
-        print str(self.num_total_events) + '\t\t',
-        print str(self.num_tof_spoint_good_events) + '\t' + \
-          str(self.num_tof_good_events) + '\t',
+    @staticmethod
+    def print_header():
+        """ Print the header for the summary efficiency information """
+        print '\nFile\t\tRecon_evt\tTOF\tTOF_SP\tTkUS_5pt\
+          \tTkDS_5pt\tTk_10pt\tGood_TkUS\tGood_TkDS\tTkUS_5trk\tTkUS_5trk_err\
+          \tTkUS_3-5trk\tTkUS_3-5trk_err\t',
+        print 'TkDS_5trk\tTkDS_5trk_err\tTkDS_3-5trk\tTkDS_3-5trk_err'
 
-        f = '%.5f \t%.5f \t%.5f \t%.5f \t%.5f \t%.5f \t%.5f  \t%.5f'
-        print f % (us_5pt, us_5pt_Err, us_3to5pt, \
-          us_3to5pt_Err, ds_5pt, ds_5pt_Err, ds_3to5pt, ds_3to5pt_Err)
+    def print_file_info(self, root_file_name):
+        """ Print the results per file """
+        print os.path.basename(root_file_name) + '  ',
+        print str(self.num_total_events) + '\t',
+        print str(self.num_tof_good_events) + '\t' + \
+          str(self.num_tof_spoint_good_events) + '\t' + \
+          str(self.num_5spoint_tkus_events) + '\t' + \
+          str(self.num_5spoint_tkds_events) + '\t' + \
+          str(self.num_10spoint_events) + '\t' + \
+          str(self.num_tkus_good_events) + '\t' + \
+          str(self.num_tkds_good_events) + '\t',
+
+        f = '%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f  \t%.4f'
+        print f % (self.eff_tkus_5pt, self.eff_tkus_5pt_err, \
+          self.eff_tkus_3_5pt, self.eff_tkus_3_5pt_err, \
+          self.eff_tkds_5pt, self.eff_tkds_5pt_err, \
+          self.eff_tkds_3_5pt, self.eff_tkds_3_5pt_err)
 
 if __name__ == "__main__":
     eff = PatRecEfficiency()
