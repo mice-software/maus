@@ -17,6 +17,9 @@
 #include <algorithm>
 #include <vector>
 
+#include "TRefArray.h"
+#include "TProcessID.h"
+
 #include "src/common_cpp/DataStructure/GlobalEvent.hh"
 
 namespace MAUS {
@@ -133,14 +136,18 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       _tracks->push_back(temp_track);
       // _tracks->push_back(old_tracks->at(i)->Clone());
       TRefArray* old_track_points_on_track = old_tracks->at(i)->get_track_points();
-      TRefArray* new_track_points_on_track = _tracks->at(i)->get_track_points();
+      TRefArray* new_track_points_on_track = new TRefArray(
+          TProcessID::GetProcessWithUID(old_track_points_on_track));
+      new_track_points_on_track->Expand(old_track_points_on_track->GetSize());
       for (int j = 0; j < old_track_points_on_track->GetLast()+1; ++j) {
-          for (size_t k = 0; k < globalevent._track_points->size(); ++k)
-              if (old_track_points_on_track->At(j) == globalevent._track_points->at(k)) {
-                  new_track_points_on_track->AddAt(_track_points->at(k), j);
-                  break;
-              }
+        for (size_t k = 0; k < globalevent._track_points->size(); ++k) {
+          if (old_track_points_on_track->At(j) == globalevent._track_points->at(k)) {
+            new_track_points_on_track->AddAt(_track_points->at(k), j);
+            break;
+          }
+        }
       }
+      _tracks->at(i)->set_track_points(new_track_points_on_track);
     }
   }
   return *this;

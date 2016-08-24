@@ -2,16 +2,16 @@
 \label{chapter:globalpid}
 
 \section{Introduction}
-\label{intro}
+\label{pid_intro}
 
 The global PID framework is designed to use sets of PID variables to 1) use MC data to create PDFs of these variables for a range of particle hypotheses, and 2) to use the PDFs as part of a log-likelihood method to determine the PID of reconstructed global tracks from data. The framework is designed such that new PID variables can be added as they are developed. Section 1 of this document will explain how to use the PID to produce PDFs, and how to perform PID on spill data contained within a Json document. Section 2 will detail how these two actions are performed within the code, and in Section 3 the PID variables, their structure, how new ones can be added to the framework, and details of those already in place, will be discussed. This document will be updated as the PID framework and variables continue to be developed.
 
 \subsection{Using the PID scripts}
-\label{use}
+\label{pid_usage}
 
 \subsection{Producing PDFs}
-\label{PDFs}
-Whilst the PID framework comes with PDFs provided in PIDhists.root, it is possible for a user to produce PDFs for hypotheses not included within this file. The following describes how this should be done.
+\label{pid_PDFs}
+Whilst the PID framework will eventually come with PDFs provided (for the standard MICE beam settings) in  PIDhists.root, it is possible for a user to produce PDFs for hypotheses not included within this file. Due to current MC availability, users currently need to produce their own PDFs. The following describes how this should be done.
 \begin{figure}[h!]
 \begin{center} 
 \includegraphics[width=2in]{reconstruction/globalpid/pdfprodflow.pdf} 
@@ -20,64 +20,26 @@ Whilst the PID framework comes with PDFs provided in PIDhists.root, it is possib
 \end{center} 
 \end{figure}
 \begin{itemize}
-\item Simulation: Production of MC data for a given particle 
-hypothesis.
-\item Global Reconstruction: The MC data should then be passed through 
-the global reconstruction. Detector information is currently to added to global tracks. Simulation and global recon can be performed 
-by using the simulate\_global.py script in \\
-\$\{MAUS\_ROOT\_DIR\}\textbackslash bin\textbackslash Global. As well as performing the simulation
- and TOF and Tracker reconstruction, this script also calls the mappers  
-MapCppGlobalReconImport and MapCppGlobalTrackMatching, which import the detector 
+\item Simulation: Production of MC data for a given beam setting. Ideally G4Beamline input would be used, however input from spill generation in MAUS can be usedm but in the simulation datacards n\_particles\_per\_spill should be set to 1, as global track matching cannot process multiple particles per spill until there exists an MC trigger.
+\item Global Track Reconstruction: The MC data should then be passed through 
+the global track reconstruction, performed by MapCppGlobalReconImport and MapCppGlobalTrackMatching, which import the detector 
 information into the global event and then construct the global tracks required 
-for the calculation of PID variables. The control variable to specify 
-the name of the output Json file that contains the reconstructed tracks can be set at the command line, or by 
-using another datacard, as shown in listing ~\ref{globaldatacard}. To run 
-the global reconstruction with the datacard, the following should be entered at the command line:
-
-
-\begin{verbatim}
-> ${MAUS_ROOT_DIR}/bin/Global/simulate_global.py \
-                    --configuration_file <name_of_datacard>
-\end{verbatim}
-
-which for the example in ~\ref{globaldatacard} would be:
-
-\begin{verbatim}
-> ${MAUS_ROOT_DIR}/bin/Global/simulate_global.py \
-                    --configuration_file ex_global_datacard.py
-\end{verbatim}
-
+for the calculation of PID variables. During the TrackMatching stage, it will have been possible for the user to choose to produce tracks for a single pid hypothesis or for several- for the purposes of PDF production a single hypothesis should be chosen, otherwise tracks will be duplicated. The choice of hypothesis doesn't matter as long as the track\_matching\_tolerances are set to large values (i.e. 10 x larger than those in ConfigurationDefaults.py). This is permissable as long as there is a single particle per spill in the simulation, as mentioned previously, because there will not be extra particles to be mis-matched to, and before the PDFs are populated the MC pid of the track is checked.
 \item PDF Production: To produce the PDFs from the reconstructed MC 
 data, pid\_pdf\_production.py in \$\{MAUS\_ROOT\_DIR\}\textbackslash 
 bin\textbackslash Global is then used. This script calls the reducer 
 ReduceCppGlobalPID. With this script, a datacard, such as that shown 
-given in listing ~\ref{pdfdatacard}, that includes the input Json filename, the global\_pid\_hypothesis for which the PDF(s) are to be produced, and a unique\_identifier (typically the time and date at which the script is run) is used by entering at the command line:
+given in listing ~\ref{pdfdatacard}, that includes the datacards required to be set by the reducer, is used by entering at the command line:
 \begin{verbatim}
 > ${MAUS_ROOT_DIR}/bin/Global/pid_pdf_generator.py \
-                    --configuration_file example_pdf_datacard.py
+                    --configuration_file pdf_example_datacard.py
 \end{verbatim}
-This will create a directory within \$\{MAUS\_ROOT\_DIR\}\textbackslash files\textbackslash PID corresponding to the hypothesis and identifier given by the datacard, which will then contain files for each PID variable, each of which will contain the PDF for that hypothesis and variable.
+This will create a directory within \$\{MAUS\_ROOT\_DIR\}\textbackslash files\textbackslash PID corresponding to the beam setting and identifier given by the datacard, which will then contain files for each PID variable, each of which will contain the PDF for each possible particle type. These can be combined into a single root file using the hadd command (see man pages for command usage).
 \end{itemize}
 
 \vspace*{1\baselineskip}
 
-\begin{lstlisting}[language=Python,basicstyle=\ttfamily,frame=single,breaklines=true,captionpos=b,caption={An example datacard (ex\_global\_datacard.py) for use with GlobalReconImport.py Other configuration flags can be added to this datacard, if they need to differ from those set in ConfigurationDefaults.py},label=globaldatacard]
-import os
-
-# A json document containing spills from MC data
-input_json_file_name = "example_hypothesis.json"
-input_json_file_type = "text"
-
-# The json document that the global tracks will be
-# written to
-output_json_file_name = 
-	"example_hypothesis_Global_Recon.json"
-output_json_file_type = "text"
-\end{lstlisting}
-
-\vspace*{2\baselineskip}
-
-\begin{lstlisting}[language=Python,basicstyle=\ttfamily,frame=single,captionpos=b,caption={An example datacard (example\_pdf\_datacard.py) for use with pid\_pdf\_generator.py},label=pdfdatacard]
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,frame=single,captionpos=b,caption={An example datacard (pdf\_example\_datacard.py) for use with pid\_pdf\_generator.py},label=pdfdatacard]
 import os
 import datetime
 
@@ -89,21 +51,39 @@ now = datetime.datetime.now()
 unique_identifier = 
 	now.strftime("%Y_%m_%dT%H_%M_%S_%f")
 
-# A json document containing global tracks from MC
+# A root file containing global tracks from MC
 # data
 input_json_file_name = 
-	"example_hypothesis_Global_Recon.json"
-input_json_file_type = "text"
+	"global_track_input.root"
 
-# The particle hypothesis that the PDF is being
-# created for. A global_pid_hypothesis is required
-# by the reducer, and PDF production will fail 
-# without one.
-global_pid_hypothesis = "example"
+# PID MICE configuration, 'step_4' for Step IV running,
+# 'commissioning' for field free commissioning data
+# (straight tracks). Default is step_4
+pid_config = "step_4"
+
+# Tag used by both MapCppGlobalPID and
+# ReduceCppGlobalPID, determines which PDFs to
+# perform PID against/which PDFs to produce (in this
+# case, set based upon input MC beam). A typical tag
+# here would be the emittance and momentum, e.g.
+# 3-140, 6-200, etc. Alternatively, users may choose to
+# enter the run number they are simulating for here.
+# The tag used for the PDFs must match the tag you
+# use when doing PID
+pid_beam_setting = "6-200"
+
+# Polarity of running mode, value can be "positive"
+# or "negative".
+pid_beamline_polarity = "positive"
+
 \end{lstlisting}
 
+
+\vspace*{2\baselineskip}
+
+
 \subsubsection{Performing PID with pre-existing hypotheses}
-\label{perf}
+\label{pid_perf}
 To perform PID on data, the steps shown figure ~\ref{pidperf} should be followed.
 
 \begin{figure}[h!]
@@ -115,15 +95,13 @@ To perform PID on data, the steps shown figure ~\ref{pidperf} should be followed
 \end{figure}
 			
 \begin{itemize}
-\item Data: This can be experimental or MC data, however the spill data must be passed to the PID in a Json document.
-\item Global Reconstruction: In the same way as described above, the 
-data should then be passed through the global reconstruction, 
-currently using the GlobalReconImport.py script in \$\{MAUS\_ROOT\_DIR\}\textbackslash 
-bin\textbackslash Global, with a corresponding datacard containing the name of the input Json file and the name of the output file.
+\item Data: This can be experimental or MC data.
+\item Global Reconstruction: In the same way as described above for PDF generation, the 
+data should then be passed through the global reconstruction.
 \item Global PID: To perform the PID on the reconstructed data, GlobalPID.py in \$\{MAUS\_ROOT\_DIR\}\textbackslash 
 bin\textbackslash Global is then used. This script calls the 
 MapCppGlobalPID mapper. With this script, a datacard, such as that 
-shown given in listing ~\ref{piddatacard}, that includes the input and output Json filenames, is used, by entering the following at the command line:
+shown given in listing ~\ref{piddatacard}, that includes the input and output root filenames, is used, by entering the following at the command line:
 \begin{verbatim}
 > ${MAUS_ROOT_DIR}/bin/Global/GlobalPID.py \
                     --configuration_file example_pid_datacard.py
@@ -133,24 +111,69 @@ shown given in listing ~\ref{piddatacard}, that includes the input and output Js
 \begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,frame=single,captionpos=b,caption={An example datacard (example\_pid\_datacard.py) for use with GlobalPID.py},label=piddatacard]
 import os
 
-# A json document containing spills from data
-input_json_file_name = 
-	"example_hypothesis_Global_Recon.json"
-input_json_file_type = "text"
+# A root document containing global tracks
+input_root_file_name = 
+	"global_recon_output.root"
 
-# The json document that the global tracks will be
-# written to
-output_json_file_name = 
-	"example_hypothesis_Global_PID.json"
-output_json_file_type = "text"
+# Output root file with track pid info included
+output_root_file_name = 
+	"output_Global_PID.root"
+
+# Path to PDFs file. Users should enter the path
+# to their own PDFs file here
+PID_PDFs_file = " "
+
+# PID MICE configuration, 'step_4' for StepIV running,
+# 'commissioning' for field free commissioning data
+# (straight tracks). Default is step_4
+pid_config = "step_4"
+
+# PID running mode - selects which PID variables are
+# used. 'online' corresponds to less beam (momentum)
+# dependent variables, 'offline' uses all variables 
+# and requires that specific PDFs already exist for
+# the beam.
+pid_mode = "offline"
+
+# Tag used by both MapCppGlobalPID and
+# ReduceCppGlobalPID, determines which PDFs to
+# perform PID against/which PDFs to produce (in this
+# case, set based upon input MC beam). A typical tag
+# here would be the emittance and momentum, e.g.
+# 3-140, 6-200, etc. Alternatively, users may choose
+# to enter the run number they are simulating for
+# here. The tag used for the PDFs must match the tag
+# you use when doing PID
+pid_beam_setting = "6-200"
+
+# Polarity of running mode, value can be "positive"
+# or "negative".
+pid_beamline_polarity = "positive"
+
+# PID confidence level = set the margin (in percent)
+# between the confidence levels of competing pid
+# hypotheses before they are selected as the correct
+# hypothesis
+pid_confidence_level = 10
+
+# PID track selection - selects which tracks from
+# TrackMatching to perform PID on. Can be set to
+# "all", or all downstream tracks "DS", all upstream
+# "US", through tracks "Through", or the US or DS
+# components of the through tracks "Through_US"
+# or "Through_DS". Or a combination of can be 
+# entered as a space separated list,
+# e.g "Through Through_US"
+pid_track_selection = "Through"
+
 \end{lstlisting}
 
-As the framework currently stands, the output document would now contain the global tracks with the PID set (where it has been possible to do so) to whichever particle hypothesis had the highest log-likelihood. For tracks where the PID could not be determined, the track PID will be left as 0.
+As the framework currently stands, the output file would now contain the global tracks with the PID set (where it has been possible to do so) to whichever particle hypothesis had the highest confidence (if it passes the confidence level cut), and the mapper name of the track will have been set to MapCppGlobalPID-<pid\_track\_selection>, e.g. if the datacard setting was pid\_track\_selection = "Through", the mapper name would be MapCppGlobalPID-Through.
 
 \section{MapCppGlobalPID and ReduceCppGlobalPID}
-\label{mapred}
+\label{pid_mapred}
 \subsection{MapCppGlobaPID}
-\label{map}
+\label{pid_map}
 The steps taken in MapCppGlobalPID for a single track are shown in 
 figure \ref{mapflow}. To express this more fully, the data, having passed through the global reconstruction, is then passed to the PID. For each track, the values of each PID variable are calculated. Each of these values is then compared to the corresponding PDFs for all particle hypotheses, the number of entries in the corresponding bin providing the probability from which the log-likelihood is calculated. For each particle hypothesis, the log-likelihoods of all of the PID variables are summed to give a log-likelihood for that hypothesis. The PID of the track is then obtained by comparing the log-likelihoods of the hypotheses.
 \begin{figure}[h!]
@@ -162,7 +185,7 @@ figure \ref{mapflow}. To express this more fully, the data, having passed throug
 \end{figure}
 
 \section{ReduceCppGlobalPID}
-\label{reducer}
+\label{pid_reducer}
 The steps taken in ReduceCppGlobalPID are shown in figure ~\ref{reduceflow}. MC data for a given particle hypothesis, having passed through the global reconstruction, is then passed to the PID. For each track, the values of each PID variable are calculated. A histogram is filled with these values. If the behaviour has been turned on in the PID variable class, then a single event is spread over all bins in the histogram, to ensure that when the PDF is used by the PID, there will no empty bins, thus avoiding cases where the log-likelihood takes the log of zero. The histogram is then normalised to create the PDF, which is then written and saved to file.
 If a MC track returns a variable value outside of the allowed range of the histogram (as defined within the variable class) then the value for that track is not included.
 \begin{figure}[h!]
@@ -175,7 +198,7 @@ If a MC track returns a variable value outside of the allowed range of the histo
 
 \section{PID Variables}
 \label{PID}
-Information from the MICE detectors will be incorporated into a set of 
+Information from the MICE detectors are incorporated into a set of 
 PID variables that can be used to distinguish between particle 
 hypotheses.
 The Global PID framework has been written such that any number of PID 
@@ -197,9 +220,52 @@ range of PDF).
 function to be defined in the derived classes)
 \end{itemize}
 
+There are separate base classes for single value variables (PIDBase1D) and dual value variables (PIDBase2D).
+
 \subsection{PID Variable Classes}
 \label{PIDVar}
-Each PID variable will be implemented in a derived class of the base PID class. Because of how the framework is designed, new variables can be added as they are developed.
+Each PID variable will be implemented in a derived class of the appropriate base PID class. Because of how the framework is designed, new variables can be added as they are developed. There are currently two sets of variables, those to be used when there is no field in the spectrometer solenoids (commissioning variables, ComPIDVars) and those to be used during Step IV running (PIDVars). 
+
+\subsubsection{ComPIDVars}
+\vspace {0.5cm}
+\begin{tabular}{| l | l | p{5cm} |}
+  \hline                       
+  PID class & Variable name  & Definition \\
+  \hline
+  ComPIDVarA & diffTOF2TOF1 & Uses the time of flight between TOF1 and TOF2. Beam dependent. \\
+  ComPIDVarB & KLChargeProdvsDiffTOF1TOF2 & Uses the KL ADC charge product, and the time of flight between TOF1 and TOF2. \\
+  ComPIDVarC & CommissioningKLADCChargeProduct & Uses the KL ADC charge product . Beam dependent.\\
+  ComPIDVarD & CommissioningEMRrange &Uses the range of the particle as measured in the EMR. Beam dependent. \\
+  ComPIDVarE & CommissioningEMRrangevsDiffTOF1TOF2 & Uses the range of the particle as measured in the EMR, and the time of flight between TOF1 and TOF2.\\
+  ComPIDVarF & CommissioningEMRPlaneDensity & Uses the plane hit density in the EMR. Beam dependent.\\
+  ComPIDVarG & CommissioningEMRPlaneDensityvsDiffTOF1TOF2 & Uses the plane hit density in the EMR, and the time of flight between TOF1 and TOF2.\\
+  ComPIDVarH & CkovAvsDiffTOF1TOF2 & Uses the number of photoelectrons in Cherenkov A, and the time of flight between TOF1 and TOF2.\\
+  ComPIDVarI & CkovBvsDiffTOF1TOF2 & Uses the number of photoelectrons in Cherenkov B, and the time of flight between TOF1 and TOF2.\\
+  \hline 
+\end{tabular}
+
+\vspace {0.5cm}
+
+
+\subsubsection{PIDVars}
+
+\vspace {0.5cm}
+\begin{tabular}{| l | l | p{5cm} |}
+  \hline                       
+  PID class & Variable name  & Definition \\
+  \hline
+  PIDVarA & diffTOF1TOF0 & Uses the upstream time of flight, between TOF0 and TOF1. This variable is beam dependent and so is best used during offline data analysis where PDFs can be produced for specific beam settings. \\
+  PIDVarB & diffTOF0TOF1vsTrackerMom & Uses upstream time of flight, and momentum as measured in the upstream Tracker. \\  
+  PIDVarC & KLChargeProdvsDSTrackerMom & Uses the KL ADC charge product and the momentum measured in the downstream Tracker. \\
+  PIDVarD & KLADCChargeProduct & Uses the KL ADC charge product. This variable is beam dependent, and so is best used during offline data analysis.\\
+  PIDVarE & EMRRange & Uses the range of the particle as measured in the EMR. This variable is beam dependent, and so is best used during offline data analysis. \\
+  PIDVarF & EMRRangevsDSTrackerMom & Uses the range of the particle as measured in the EMR, and the momentum measured in the downstream Tracker. \\
+  PIDVarG & EMRPlaneDensity & Uses the plane hit density in the EMR. This variable is beam dependent, and so is best used during offline data analysis.\\
+  PIDVarH & EMRPlaneDensityvsDSTrackerMom & Uses the plane hit density in the EMR, and the momentum measured in the downstream Tracker.\\
+  PIDVarI & CkovAvsUSTrackerMom & Uses the number of photoelectrons in Cherenkov A, and the momentum measured in the upstream Tracker.\\
+  PIDVarJ & CkovBvsUSTrackerMom & Uses the number of photoelectrons in Cherenkov B, and the momentum measured in the upstream Tracker.\\
+  \hline 
+\end{tabular}
 
 \subsubsection{Adding PID Variables}
 \label{addvar}
@@ -207,6 +273,7 @@ In each derived variable class, the following should be included:
 \begin{itemize}
 \item The variable name should be set
 \item The function to calculate the PID variable should be defined.  
+\item If a valid value of a variable is not returned by the function, for instance due to missing measurements, then the value should be set to -1 so that it falls outside of the range of any PDFs.
 \item The minimum, maximum, and number of bins for PDFs created using 
 the variable should be set. The values of the minimum and maximum 
 define the allowed range of values that the PID variable can take.
@@ -216,51 +283,7 @@ PDF return non zero entries, and so by setting the variable
 will be added
 \end{itemize}
 
-\subsubsection{PIDVarA}
-\label{PIDVarA}
-PIDVarA (see PIDVarA.hh and .cc), uses the difference between the times measured at TOF1 
-and TOF0 as its variable. Only for tracks where there is a single TOF0 
-and a single TOF1 time measurement, and for which the time difference 
-between the detectors falls within the minimum and maximum set within 
-the class, will a valid value of the variable be returned. Otherwise, 
-the value of the variable is set to -1, such that it falls outside of 
-the allowed range for the variable, and so variable for the track is 
-not used in PDF production, or in the PID. 
-A point to note with PIDVarA is that it is momentum dependent, and 
-so may not be included as a final PID variable.
+\subsubsection{Placing cuts on PIDVar value ranges}
+A further option for users when performing PID against the PDFs, is to cut on what range of values within the PDFs to perform PID within. This may allow for greater purity (potentially at the expense of efficiency) depending on the variable. For instance, one could choose to cut harshly on the time of flight in PIDVarA, to reduce the chances of mis-identifying pions as muons. These cuts can be selected through setting the appropriate pid\_bounds datacards found in ConfigurationDefaults.py.
 
-% The PDFs for pions, muons and positrons are 
-% shown on the same plot in figure ~\ref{tofplot}, allowing for the separation between the peaks 
-% for each particle to be seen.
-% 
-% \begin{figure}[h!]
-% \begin{center} 
-% \includegraphics[width=4.5in]{reconstruction/globalpid/tofplot.jpg} 
-% \caption{Difference between times at TOF0 and TOF1, for 200 Mev/c muons, pions and positrons.}
-% \label{tofplot}
-% \end{center} 
-% \end{figure}
 
-\subsubsection{PIDVarB}
-\label{PIDVarB}
-PIDVarB uses the correlation between the momentum measured in the upstream tracker 
-and the difference between the times measured at TOF1 and TOF0 as its variable, returning the two 
-values as a std pair. It places the same constraints on accepted tracks as those used in PIDVarA, that 
-there must be a single TOF0 and TOF1 time measurement, and for which the time difference 
-between the detectors falls within the minimum and maximum set within 
-the class, will a valid value of the variable be returned. The tracker must also return a 
-valid momentum measurement for a valid variable to be returned. Otherwise, 
-the value of the variable is set to (-1,-1), such that it falls outside of 
-the allowed range for the variable, and so variable for the track is 
-not used in PDF production, or in the PID. 
-
-% The PDFs for pions, muons and positrons are 
-% shown on the same plot in figure ~\ref{tofplot}, showing the separation between their distributions.
-% 
-% \begin{figure}[h!]
-% \begin{center} 
-% \includegraphics[width=4.5in]{reconstruction/globalpid/toftrackerplot.jpg} 
-% \caption{Difference between times at TOF0 and TOF1 vs momentum measured in upstream tracker, for 200 Mev/c muons, pions and positrons.}
-% \label{toftrackerplot}
-% \end{center} 
-% \end{figure}

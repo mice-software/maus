@@ -132,9 +132,9 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         #~ num_ds_trackpoints = 0
         #~ for i in revt['global_event']['track_points']:
             #~ self.assertTrue('mapper_name' in i)
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching-US':
+            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_US':
                 #~ num_us_trackpoints += 1
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching-DS':
+            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_DS':
                 #~ num_ds_trackpoints += 1
         #~ self.assertEqual(num_us_trackpoints, 3)
         #~ self.assertEqual(num_ds_trackpoints, 4)
@@ -144,11 +144,11 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         #~ num_through_tracks = 0
         #~ for i in revt['global_event']['tracks']:
             #~ self.assertTrue('mapper_name' in i)
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching-US':
+            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_US':
                 #~ num_us_tracks += 1
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching-DS':
+            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_DS':
                 #~ num_ds_tracks += 1
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching-Through':
+            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_Through':
                 #~ num_through_tracks += 1
         #~ self.assertEqual(num_us_tracks, 1)
         #~ self.assertEqual(num_ds_tracks, 1)

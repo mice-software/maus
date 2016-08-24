@@ -246,12 +246,11 @@ namespace global {
      * @param us_trackpoints Upstream TrackPoints
      * @param ds_trackpoints Downstream TrackPoints
      * @param pid PID to set for the new track
-     * @param emr_range_primary EMR primary Track range to pass to the new track
      */
     void MatchUSDS(
         DataStructure::Global::Track* us_track,
         DataStructure::Global::Track* ds_track,
-        DataStructure::Global::PID pid, double emr_range_primary);
+        DataStructure::Global::PID pid);
 
     /**
      * @brief Returns the time from a TrackPoint in the chosen detector (TOF0,

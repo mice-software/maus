@@ -55,9 +55,6 @@ def run():
     my_map.append(MAUS.MapCppGlobalTrackMatching())
 
     my_reduce = MAUS.ReducePyDoNothing()
-    #~ my_reduce = MAUS.ReduceCppGlobalReconEfficiency()
-    #~ my_reduce = MAUS.ReduceCppReconTesting()
-    #~ my_reduce = MAUS.ReduceCppGlobalPID()
 
     # Then construct a MAUS output component - filename comes from datacards
     #~ my_output = MAUS.OutputCppRoot()

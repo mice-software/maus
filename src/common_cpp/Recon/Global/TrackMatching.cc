@@ -101,7 +101,7 @@ void TrackMatching::USTrack() {
     for (size_t i = 0; i < pids.size(); i++) {
       DataStructure::Global::Track* hypothesis_track =
           new DataStructure::Global::Track();
-      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching-US");
+      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching_US");
       hypothesis_track->set_pid(pids[i]);
       // No matching criterion for Cherenkov hits, so if they exist, we add them
       if (CkovA_sp.size() > 0) {
@@ -150,7 +150,7 @@ void TrackMatching::USTrack() {
       // calculated from p and m, trackpoints are cloned as we want everything
       // in the hypothesis track to be "fresh"
       double mass = Particle::GetInstance().GetMass(pids[i]);
-      AddTrackerTrackPoints(tracker0_track, "MapCppGlobalTrackMatching-US",
+      AddTrackerTrackPoints(tracker0_track, "MapCppGlobalTrackMatching_US",
                             mass, hypothesis_track);
 
       _global_event->add_track_recursive(hypothesis_track);
@@ -211,12 +211,12 @@ void TrackMatching::DSTrack() {
     for (size_t i = 0; i < pids.size(); i++) {
       DataStructure::Global::Track* hypothesis_track =
           new DataStructure::Global::Track();
-      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching-DS");
+      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching_DS");
       hypothesis_track->set_pid(pids[i]);
 
       // This time we add in the tracker trackpoints first
       double mass = Particle::GetInstance().GetMass(pids[i]);
-      AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching-DS",
+      AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching_DS",
                             mass, hypothesis_track);
       if (!no_check) {
         // TOF2
@@ -243,12 +243,13 @@ void TrackMatching::DSTrack() {
         }
         if (emr_track_array->size() == 1) {
           hypothesis_track->set_emr_range_primary(emr_track_array->at(0)->get_emr_range_primary());
+          hypothesis_track->set_emr_plane_density(emr_track_array->at(0)->get_emr_plane_density());
           std::vector<const DataStructure::Global::TrackPoint*> emr_trackpoints =
               emr_track_array->at(0)->GetTrackPoints();
           for (size_t i = 0; i < emr_trackpoints.size(); i++) {
             DataStructure::Global::TrackPoint* emr_tp =
                 emr_trackpoints[i]->Clone();
-            emr_tp->set_mapper_name("MapCppGlobalTrackMatching-DS");
+            emr_tp->set_mapper_name("MapCppGlobalTrackMatching_DS");
             TLorentzVector momentum = emr_tp->get_momentum();
             double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
             momentum.SetE(energy);
@@ -294,11 +295,9 @@ void TrackMatching::throughTrack() {
              ++ds_track_iter) {
           // Going to assume that if several TrackPoints for the same TOF are in
           // the track that they have been checked to be sensible (TODO above)
-          double emr_range_primary = (*ds_track_iter)->get_emr_range_primary();
           if (((*us_track_iter)->GetTrackPoints().size() > 0) and
               ((*ds_track_iter)->GetTrackPoints().size() > 0)) {
-            MatchUSDS((*us_track_iter), (*ds_track_iter), pids[i],
-                      emr_range_primary);
+            MatchUSDS((*us_track_iter), (*ds_track_iter), pids[i]);
           }
         }
       }
@@ -513,7 +512,7 @@ void TrackMatching::MatchEMRTrack(
         for (size_t i = 0; i < emr_trackpoints.size(); i++) {
           DataStructure::Global::TrackPoint* emr_tp =
               emr_trackpoints[i]->Clone();
-          emr_tp->set_mapper_name("MapCppGlobalTrackMatching-DS");
+          emr_tp->set_mapper_name("MapCppGlobalTrackMatching_DS");
           TLorentzVector momentum = emr_tp->get_momentum();
           double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
           momentum.SetE(energy);
@@ -563,12 +562,12 @@ void TrackMatching::USDSTracks(
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if (((*global_track_iter)->get_mapper_name() ==
-            "MapCppGlobalTrackMatching-US") and
+            "MapCppGlobalTrackMatching_US") and
         ((*global_track_iter)->HasDetector(DataStructure::Global::kTOF1)) and
          ((*global_track_iter)->get_pid() == pid)) {
       us_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching-DS") and
+                   "MapCppGlobalTrackMatching_DS") and
                ((*global_track_iter)->HasDetector(
                    DataStructure::Global::kTOF2)) and
                ((*global_track_iter)->get_pid() == pid)) {
@@ -580,7 +579,7 @@ void TrackMatching::USDSTracks(
 void TrackMatching::MatchUSDS(
     DataStructure::Global::Track* us_track,
     DataStructure::Global::Track* ds_track,
-    DataStructure::Global::PID pid, double emr_range_primary) {
+    DataStructure::Global::PID pid) {
   DataStructure::Global::TrackPointCPArray us_trackpoints =
       us_track->GetTrackPoints();
   DataStructure::Global::TrackPointCPArray ds_trackpoints =
@@ -596,7 +595,7 @@ void TrackMatching::MatchUSDS(
       (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
     DataStructure::Global::Track* through_track =
         new DataStructure::Global::Track();
-    through_track->set_mapper_name("MapCppGlobalTrackMatching-Through");
+    through_track->set_mapper_name("MapCppGlobalTrackMatching_Through");
     through_track->set_pid(pid);
     Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched"
                                 << std::endl;
@@ -613,7 +612,8 @@ void TrackMatching::MatchUSDS(
       through_track->AddTrackPoint(
           const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
     }
-    through_track->set_emr_range_primary(emr_range_primary);
+    through_track->set_emr_range_primary(ds_track->get_emr_range_primary());
+    through_track->set_emr_plane_density(ds_track->get_emr_plane_density());
     through_track->AddTrack(us_track);
     through_track->AddTrack(ds_track);
     _global_event->add_track(through_track);

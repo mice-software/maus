@@ -35,12 +35,14 @@ class GlobalEventTestDS : public ::testing::Test {
       _space_point.push_back(new MAUS::DataStructure::Global::SpacePoint());
       _space_point[i]->set_charge(1. * i);
       _track_point[i]->set_space_point(_space_point[i]);
+      _track_point[i]->set_charge(_space_point[i]->get_charge());
     }
 
     for (int i = 0; i < 2; ++i) {
       _track.push_back(new MAUS::DataStructure::Global::Track());
       _track[i]->AddTrackPoint(_track_point[2*i] );
       _track[i]->AddTrackPoint(_track_point[2*i + 1]);
+      _track[i]->set_mapper_name("GETestTrack" + std::to_string(i));
     }
 
     _chain = new MAUS::DataStructure::Global::PrimaryChain();
@@ -267,6 +269,29 @@ TEST_F(GlobalEventTestDS, test_equality_operator) {
   EXPECT_NE(event_equal.get_space_points(), event.get_space_points());
   EXPECT_EQ(event_equal.get_space_points()->size(), space_points->size());
   EXPECT_NE(event_equal.get_space_points()->at(0), space_points->at(0));
+
+  // Test that Global Event fix doesn't disturb deep copying
+  GlobalEvent copied_event = *_event;
+  std::vector<MAUS::DataStructure::Global::Track*>* copied_tracks =
+      copied_event.get_tracks();
+
+  ASSERT_EQ(copied_tracks->size(), 2);
+  if (copied_tracks->size() > 1) {
+    std::vector<const MAUS::DataStructure::Global::TrackPoint*> copied_tps0 =
+        copied_tracks->at(0)->GetTrackPoints();
+    std::vector<const MAUS::DataStructure::Global::TrackPoint*> copied_tps1 =
+        copied_tracks->at(1)->GetTrackPoints();
+    ASSERT_EQ(copied_tracks->at(0)->get_mapper_name(), "GETestTrack0");
+    ASSERT_EQ(copied_tracks->at(1)->get_mapper_name(), "GETestTrack1");
+    ASSERT_EQ(copied_tps0.size(), 2);
+    ASSERT_EQ(copied_tps1.size(), 2);
+    if (copied_tps0.size() == 2 and copied_tps1.size() == 2) {
+      ASSERT_EQ(copied_tps0.at(0)->get_charge(), 0);
+      ASSERT_EQ(copied_tps0.at(1)->get_charge(), 1);
+      ASSERT_EQ(copied_tps1.at(0)->get_charge(), 2);
+      ASSERT_EQ(copied_tps1.at(1)->get_charge(), 3);
+    }
+  }
 }
 
 TEST_F(GlobalEventTestDS, test_null_copy) {
@@ -358,4 +383,3 @@ TEST_F(GlobalEventTestDS, test_recursive_add) {
   EXPECT_EQ(event.get_space_points()->at(0), global_space_point);
 }
 }
-
