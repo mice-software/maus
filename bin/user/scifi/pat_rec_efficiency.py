@@ -12,11 +12,11 @@ import analysis.scifi_efficiency
 def main(args):
     args.pop(0)
     eff = analysis.scifi_efficiency.PatternRecognitionEfficiency()
-    eff.check_helical = False
+    eff.check_helical = True
     eff.check_straight = True
     eff.cut_on_tof = True
     eff.cut_on_tof_time = True
-    eff.cut_on_trackers = True
+    eff.cut_on_tracker_10spnt = False
     eff.use_mc_truth = False
     eff.tof_upper_cut = 50.0
     eff.tof_lower_cut = 27.0

@@ -75,7 +75,7 @@ class SciFiEfficiencyTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         eff.check_straight = True
         eff.cut_on_tof = False
         eff.cut_on_tof_time = False
-        eff.cut_on_trackers = True
+        eff.cut_on_tracker_10spnt = True
         eff.process_spill(spill)
         eff.calculate_efficiency()
 

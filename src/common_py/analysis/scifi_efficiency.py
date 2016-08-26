@@ -27,7 +27,8 @@ class PatternRecognitionEfficiency():
         self.check_straight = True
         self.cut_on_tof = True
         self.cut_on_tof_time = True
-        self.cut_on_trackers = True
+        self.cut_on_tracker_10spnt = True
+        self.cut_on_tracker_5spnt = True # Should always be true
         self.use_mc_truth = False
         self.tof_upper_cut = 50.0
         self.tof_lower_cut = 27.0
@@ -49,17 +50,17 @@ class PatternRecognitionEfficiency():
         self.bool_tkds_1track = False # Found one track in TkDS
         self.bool_tkus_5spoint_track = False # Found one 5pt track in TkUS
         self.bool_tkds_5spoint_track = False # Found one 5pt track in TkDS
-        self.bool_tkus_good_event = False # Have all the choosen cuts passed?
-        self.bool_tkds_good_event = False # Have all the choosen cuts passed?
+        self.bool_passed_tkus_event = False # Have all the choosen cuts passed?
+        self.bool_passed_tkds_event = False # Have all the choosen cuts passed?
 
         self.num_total_events = 0
-        self.num_tof_good_events = 0 # Events which pass the time-of-flight cut
-        self.num_tof_spoint_good_events = 0 # Events with 1 sp in TOF1 and TOF2
+        self.num_passed_tof_timing_events = 0 # Events which pass the time-of-flight cut
+        self.num_passed_tof_spoint_events = 0 # Events with 1 sp in TOF1 and TOF2
         self.num_10spoint_events = 0 # Events with 5 spoints in both TkUS & TkDS
         self.num_5spoint_tkus_events = 0 # Events with 5 spoints in TkUS
         self.num_5spoint_tkds_events = 0 # Events with 5 spoints in TkDS
-        self.num_tkus_good_events = 0 # Events which pass all the set cuts
-        self.num_tkds_good_events = 0 # Events which pass all the set cuts
+        self.num_passed_tkus_events = 0 # Events which pass all the set cuts
+        self.num_passed_tkds_events = 0 # Events which pass all the set cuts
 
         self.num_10spoint_tracks = 0
         self.num_5spoint_tkus_tracks = 0
@@ -91,7 +92,7 @@ class PatternRecognitionEfficiency():
         print 'Cut on TOF\t' + str(self.cut_on_tof)
         print 'Cut on TOF Time\t' + str(self.cut_on_tof_time)
         # print 'Cut on fiducial track\t' + str(self.cut_on_fiducial_track) 
-        print 'Cut on trackers\t' + str(self.cut_on_trackers) + '\n'
+        print 'Cut on trackers\t' + str(self.cut_on_tracker_10spnt) + '\n'
 
         self.root_files = self.load_data(files)
         if len(self.root_files) < 1:
@@ -152,8 +153,8 @@ class PatternRecognitionEfficiency():
             self.check_tracker_spacepoints(tk_evt.spacepoints())
 
             # If we expect good tracks in neither tracker, skip this event
-            if ( not self.bool_tkus_good_event ) and \
-              ( not self.bool_tkds_good_event ) :
+            if ( not self.bool_passed_tkus_event ) and \
+              ( not self.bool_passed_tkds_event ) :
                 continue # remove event from consideration
 
             # Now switch from calculating expected tracks to what
@@ -220,11 +221,11 @@ class PatternRecognitionEfficiency():
         self.bool_tkds_5spoint_track = False
         for trk in prtracks:
             if trk.get_tracker() == 0:
-                if (len(trk.get_spacepoints()) == 5) and self.bool_tkus_1track:
+                if (trk.get_spacepoints_pointers().size() == 5) and self.bool_tkus_1track:
                     self.num_5spoint_tkus_tracks += 1
                     self.bool_tkus_5spoint_track = True
             elif trk.get_tracker() == 1:
-                if (len(trk.get_spacepoints()) == 5) and self.bool_tkds_1track:
+                if (trk.get_spacepoints_pointers().size() == 5) and self.bool_tkds_1track:
                     self.num_5spoint_tkds_tracks += 1
                     self.bool_tkds_5spoint_track = True
 
@@ -248,19 +249,19 @@ class PatternRecognitionEfficiency():
         # Upstream tracker
         try:
             self.eff_tkus_5pt = float(self.num_5spoint_tkus_tracks) \
-              /float(self.num_tkus_good_events)
+              /float(self.num_passed_tkus_events)
             self.eff_tkus_5pt_err = \
               (self.eff_tkus_5pt * (1-self.eff_tkus_5pt)) \
-              /(float((self.num_tkus_good_events)) ** (0.5))
-        except ZeroDivisionError, ValueError:
+              /(float((self.num_passed_tkus_events)) ** (0.5))
+        except (ZeroDivisionError, ValueError):
             self.eff_tkus_5pt = 0.0
             self.eff_tkus_5pt_err = 0.0
         try:
             self.eff_tkus_3_5pt = float(self.num_3to5spoint_tkus_tracks) \
-              /float(self.num_tkus_good_events)
+              /float(self.num_passed_tkus_events)
             self.eff_tkus_3_5pt_err = \
               (self.eff_tkus_3_5pt * (1-self.eff_tkus_3_5pt)) \
-                /(float((self.num_tkus_good_events)) ** (0.5))
+                /(float((self.num_passed_tkus_events)) ** (0.5))
             self.eff_tkus_3_5pt_err = 0.001
         except (ZeroDivisionError, ValueError):
             self.eff_tkus_3_5pt = 0.0
@@ -269,19 +270,19 @@ class PatternRecognitionEfficiency():
         # Downstream tracker
         try:
             self.eff_tkds_5pt = float(self.num_5spoint_tkds_tracks) \
-              / float(self.num_tkds_good_events)
+              / float(self.num_passed_tkds_events)
             self.eff_tkds_5pt_err = \
               (self.eff_tkds_5pt * (1-self.eff_tkds_5pt)) \
-              /(float((self.num_tkds_good_events)) ** (0.5))
+              /(float((self.num_passed_tkds_events)) ** (0.5))
         except (ZeroDivisionError, ValueError):
             self.eff_tkds_5pt = 0.0
             self.eff_tkds_5pt_err = 0.0
         try:
             self.eff_tkds_3_5pt = float(self.num_3to5spoint_tkds_tracks) \
-              /float(self.num_tkds_good_events)
+              /float(self.num_passed_tkds_events)
             self.eff_tkds_3_5pt_err = \
               (self.eff_tkds_3_5pt * (1-self.eff_tkds_3_5pt)) \
-                /(float((self.num_tkds_good_events)) ** (0.5))
+                /(float((self.num_passed_tkds_events)) ** (0.5))
             #self.eff_tkds_3_5pt_err = 0.001
         except (ZeroDivisionError, ValueError):
             self.eff_tkds_3_5pt = 0.0
@@ -289,18 +290,21 @@ class PatternRecognitionEfficiency():
 
     def check_tof(self, tof_evt):
         """ Analyse tof data. Return boolean indicating if tof cuts pass"""
-        tof1 = []
-        tof2 = []
         try:
             tof1 = tof_evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
             tof2 = tof_evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
         except ReferenceError:
             print "Bad TOF data"
-
+            if self.cut_on_tof or self.cut_on_tof_time:
+                return False
+            # The data might be bad, but we aren't cutting on TOF so passes
+            self.num_passed_tof_spoint_events += 1
+            self.num_passed_tof_timing_events += 1
+            return True
 
         # Require 1 and only 1 sp in both TOF1 and TOF2
         self.bool_2tof_spoint_event = True
-        if ((len(tof1) != 1) or (len(tof2) != 1)):
+        if ((tof1.size() != 1) or (tof2.size() != 1)):
             self.bool_2tof_spoint_event = False
 
         # Require timing coincidence between TOF1 and TOF2
@@ -317,14 +321,18 @@ class PatternRecognitionEfficiency():
         # Are the cuts choosen passed?
         tof_good = True
         if self.bool_2tof_spoint_event:
-            self.num_tof_spoint_good_events += 1
+            self.num_passed_tof_spoint_events += 1
         elif self.cut_on_tof:
             tof_good = False
+        else:
+            self.num_passed_tof_spoint_events += 1
 
         if self.bool_2tof_timing_event:
-            self.num_tof_good_events += 1
+            self.num_passed_tof_timing_events += 1
         elif self.cut_on_tof_time:
             tof_good = False
+        else:
+            self.num_passed_tof_timing_events += 1
 
         return tof_good
 
@@ -373,28 +381,36 @@ class PatternRecognitionEfficiency():
             self.num_5spoint_tkds_events += 1
 
         # Are the complete set of tracker spacepoint cuts passed?
-        self.bool_tkus_good_event = False
-        self.bool_tkds_good_event = False
-        if self.cut_on_trackers: # Do we require 5 spoints in BOTH trackers?
+        self.bool_passed_tkus_event = False
+        self.bool_passed_tkds_event = False
+        # Do we require 5 spoints in BOTH trackers?
+        if self.cut_on_tracker_10spnt:
             if self.bool_10spoint_event:
-                self.bool_tkus_good_event = True
-                self.num_tkus_good_events += 1
-                self.bool_tkds_good_event = True
-                self.num_tkds_good_events += 1
+                self.bool_passed_tkus_event = True
+                self.num_passed_tkus_events += 1
+                self.bool_passed_tkds_event = True
+                self.num_passed_tkds_events += 1
             else:
-                self.bool_tkus_good_event = False
-                self.bool_tkds_good_event = False
-        else: # If not, just see if 5 spoints in each tracker individually
+                self.bool_passed_tkus_event = False
+                self.bool_passed_tkds_event = False
+        # If not, just see if have 5 spoints in each tracker individually
+        elif self.cut_on_tracker_5spnt:
             if self.bool_tkus_5spoint_event:
-                self.bool_tkus_good_event = True
-                self.num_tkus_good_events += 1
+                self.bool_passed_tkus_event = True
+                self.num_passed_tkus_events += 1
             else:
-                self.bool_tkus_good_event = False
+                self.bool_passed_tkus_event = False
             if self.bool_tkds_5spoint_event:
-                self.bool_tkds_good_event = True
-                self.num_tkds_good_events += 1
+                self.bool_passed_tkds_event = True
+                self.num_passed_tkds_events += 1
             else:
-                self.bool_tkds_good_event = False
+                self.bool_passed_tkds_event = False
+        # Not cutting on tracker spacepoints so everything passes
+        else:
+            self.bool_passed_tkus_event = True
+            self.num_passed_tkus_events += 1
+            self.bool_passed_tkds_event = True
+            self.num_passed_tkds_events += 1
 
     def clear(self):
         """ Set the internal counters to zero and booleans to false """
@@ -407,17 +423,17 @@ class PatternRecognitionEfficiency():
         self.bool_tkds_1track = False
         self.bool_tkus_5spoint_track = False
         self.bool_tkds_5spoint_track = False
-        self.bool_tkus_good_event = False
-        self.bool_tkds_good_event = False
+        self.bool_passed_tkus_event = False
+        self.bool_passed_tkds_event = False
 
         self.num_total_events = 0
-        self.num_tof_good_events = 0
-        self.num_tof_spoint_good_events = 0
+        self.num_passed_tof_timing_events = 0
+        self.num_passed_tof_spoint_events = 0
         self.num_10spoint_events = 0
         self.num_5spoint_tkus_events = 0
         self.num_5spoint_tkds_events = 0
-        self.num_tkus_good_events = 0
-        self.num_tkds_good_events = 0
+        self.num_passed_tkus_events = 0
+        self.num_passed_tkds_events = 0
 
         self.num_10spoint_tracks = 0
         self.num_5spoint_tkus_tracks = 0
@@ -439,14 +455,15 @@ class PatternRecognitionEfficiency():
             either straight, helical or both """
         prtracks = []
         if (self.check_helical) and (not self.check_straight):
-            prtracks = tk_evt.helicalprtracks()
+            prtracks = tools.vector_to_list(tk_evt.helicalprtracks())
             # print 'Looking at helical tracks'
         elif (not self.check_helical) and (self.check_straight):
-            prtracks = tk_evt.straightprtracks()
+            prtracks = tools.vector_to_list(tk_evt.straightprtracks())
             # print 'Looking at straight tracks'
         elif (self.check_helical) and (self.check_straight):
-            prtracks.append(tk_evt.helicalprtracks())
-            prtracks.append(tk_evt.straightprtracks())
+            htracks = tools.vector_to_list(tk_evt.helicalprtracks())
+            stracks = tools.vector_to_list(tk_evt.straightprtracks())
+            prtracks = htracks + stracks
         else:
             print 'Warning: Both track type options not set'
         return prtracks
@@ -499,13 +516,13 @@ class PatternRecognitionEfficiency():
 
         print os.path.basename(root_file_name) + '  ',
         print str(self.num_total_events) + '\t',
-        print str(self.num_tof_good_events) + '\t' + \
-          str(self.num_tof_spoint_good_events) + '\t' + \
+        print str(self.num_passed_tof_timing_events) + '\t' + \
+          str(self.num_passed_tof_spoint_events) + '\t' + \
           str(self.num_5spoint_tkus_events) + '\t' + \
           str(self.num_5spoint_tkds_events) + '\t' + \
           str(self.num_10spoint_events) + '\t' + \
-          str(self.num_tkus_good_events) + '\t' + \
-          str(self.num_tkds_good_events) + '\t',
+          str(self.num_passed_tkus_events) + '\t' + \
+          str(self.num_passed_tkds_events) + '\t',
 
         f = '%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f  \t%.4f'
         print f % (self.eff_tkus_5pt, self.eff_tkus_5pt_err, \
