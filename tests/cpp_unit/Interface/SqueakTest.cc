@@ -25,7 +25,7 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "src/legacy/Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 
 namespace {
@@ -63,8 +63,8 @@ class SqueakTest : public ::testing::Test {
 // test mout(Squeal::exceptionLevel)
 // TEST_F(SqueakTest, SqueakMoutExceptionTest) {
 //   std::stringstream sstr;
-//   MAUS::Exception::exceptionLevel exc[] = {
-//     MAUS::Exception::recoverable, MAUS::Exception::nonRecoverable};
+//   Exceptions::Exception::exceptionLevel exc[] = {
+//     Exceptions::recoverable, Exceptions::nonRecoverable};
 //   Squeak::errorLevel err[] = {Squeak::error, Squeak::fatal};
 //   for (int i = 0; i < 2; ++i) {
 //     Squeak::setAnOutput(err[i], sstr);

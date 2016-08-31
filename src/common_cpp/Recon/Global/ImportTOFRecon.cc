@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "Recon/Global/ImportTOFRecon.hh"
 

@@ -17,7 +17,7 @@
 
 #include "src/map/MapCppGlobalPID/MapCppGlobalPID.hh"
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
@@ -44,14 +44,14 @@ namespace MAUS {
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
 			    "Failed to parse Json configuration file",
                             "MapCppGlobalPID::_birth");
     }
 
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
     if (!pMAUS_ROOT_DIR) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
 			    std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
 			    std::string("Did you try running: source env.sh?"),
 			    "MapCppGlobalPID::_birth");
@@ -481,12 +481,12 @@ namespace MAUS {
   void MapCppGlobalPID::_process(MAUS::Data* data) const {
     MAUS::Data* data_cpp = data;
     if (!data_cpp) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Data was NULL",
                       "MapCppGlobalPID::process");
     }
     if (!_configCheck) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Birth was not called successfully",
                       "MapCppGlobalPID::process");
     }

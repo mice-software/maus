@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
       TApplication theApp("App", &argc, argv);
       gROOT->SetBatch(true);
       test_out = RUN_ALL_TESTS();
-  } catch (MAUS::Exception exc) {
+  } catch (Exceptions::Exception exc) {
       std::cerr << exc.GetMessage() << "\n" << exc.GetLocation() << "\n"
                 << exc.GetStackTrace() << std::endl;
   } catch (std::exception exc) {

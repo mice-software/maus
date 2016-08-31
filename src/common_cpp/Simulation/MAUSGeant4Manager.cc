@@ -25,7 +25,7 @@
 #include "Geant4/G4UserLimits.hh"
 #include "Geant4/G4Navigator.hh"
 
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/common_cpp/DataStructure/MCEvent.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
@@ -62,8 +62,8 @@ MAUSGeant4Manager* MAUSGeant4Manager::GetInstance() {
 
 MAUSGeant4Manager::MAUSGeant4Manager() : _virtPlanes(NULL) {
     if (_instance != NULL)
-        throw(Exception(
-              Exception::recoverable,
+        throw(Exceptions::Exception(
+              Exceptions::recoverable,
               "Attempt to initialise MAUSGeant4Manager twice",
               "MAUSGeant4Manager::MAUSGeant4Manager"));
     _instance = this;
@@ -214,7 +214,7 @@ MCEvent* MAUSGeant4Manager::Tracking
         for (size_t i = 0; i < event_vector->size(); ++i)
             delete event_vector->at(i);
         delete event_vector;
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                         "More than one event in return",
                         "MAUSGeant4Manager::Tracking"));
     }
@@ -346,7 +346,7 @@ void MAUSGeant4Manager::SetAuxInformation(MiceModule& module, G4LogicalVolume* m
 	}
 	G4Region* region = store->GetRegion(name);
 	if (region == NULL) {
-	  throw MAUS::Exception(Exception::recoverable,
+	  throw MAUS::Exceptions::Exception(Exceptions::recoverable,
 				"Failed to make region",
 				"MAUSgeant4Manager::SetAuxInformation");
 	}
@@ -459,7 +459,7 @@ void MAUSGeant4Manager::BeamOn(int number_of_particles) {
     G4StateManager* stateManager = G4StateManager::GetStateManager();
     G4ApplicationState currentState = stateManager->GetCurrentState();
     if (currentState != G4State_PreInit && currentState != G4State_Idle)
-        throw(MAUS::Exception(Exception::recoverable,
+        throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
               "Geant4 is not ready to run, aborting run",
               "MAUSGeant4Manager::BeamOn"));
     GetRunManager()->BeamOn(number_of_particles);

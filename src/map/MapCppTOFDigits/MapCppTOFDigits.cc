@@ -43,7 +43,7 @@ void MapCppTOFDigits::_birth(const std::string& argJsonConfigDocument) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR)
-    throw Exception(Exception::recoverable,
+    throw Exceptions::Exception(Exceptions::recoverable,
                     "Could not find the $MAUS_ROOT_DIR environmental variable",
                     "MapCppTOFDigits::_birth");
 
@@ -214,7 +214,7 @@ void MapCppTOFDigits::setTdc(MAUS::TOFDigit *digit, MAUS::V1290 &tdc) const {
 
 ////////////////////////////////////////////////////////////
 bool MapCppTOFDigits::findAdc(MAUS::TOFDigit *digit,
-                              MAUS::V1724Array &adc_hits) const throw(Exception) {
+                              MAUS::V1724Array &adc_hits) const throw(Exceptions::Exception) {
   int n_Adc_hits = adc_hits.size();
 
   std::string xTofKey_str = digit->GetTofKey();
@@ -231,12 +231,12 @@ bool MapCppTOFDigits::findAdc(MAUS::TOFDigit *digit,
       digit->SetChargePm(adc_hits[AdcHitCount].GetChargePm());
 
       if (digit->GetPartEventNumber() != adc_hits[AdcHitCount].GetPartEventNumber()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               std::string("Wrong part_event_number!"),
               "MapCppTOFDigits::findAdc"));
       }
       if (digit->GetPhysEventNumber() != adc_hits[AdcHitCount].GetPhysEventNumber()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               std::string("Wrong phys_event_number!"),
               "MapCppTOFDigits::findAdc"));
       }
@@ -250,7 +250,7 @@ bool MapCppTOFDigits::findAdc(MAUS::TOFDigit *digit,
 
 ////////////////////////////////////////////////////////////
 bool MapCppTOFDigits::findTrigger(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
-                                  MAUS::V1290Array &tr_hits) const  throw(Exception) {
+                                  MAUS::V1290Array &tr_hits) const  throw(Exceptions::Exception) {
   int n_tr_hits = tr_hits.size();
 
   int xGeo = tdc.GetGeo();
@@ -262,12 +262,12 @@ bool MapCppTOFDigits::findTrigger(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
       digit->SetTriggerTrailingTime(tr_hits[TrHitCount].GetTrailingTime());
 
       if (digit->GetPartEventNumber() != tr_hits[TrHitCount].GetPartEventNumber()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               std::string("Wrong part_event_number!"),
               "MapCppTOFDigits::findTrigger"));
       }
       if (digit->GetPhysEventNumber() != tr_hits[TrHitCount].GetPhysEventNumber()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               std::string("Wrong phys_event_number!"),
               "MapCppTOFDigits::findTrigger"));
       }
@@ -281,7 +281,7 @@ bool MapCppTOFDigits::findTrigger(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
 
 ////////////////////////////////////////////////////////////
 bool MapCppTOFDigits::findTriggerReq(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
-                                  MAUS::V1290Array &tr_req_hits) const  throw(Exception) {
+                                  MAUS::V1290Array &tr_req_hits) const  throw(Exceptions::Exception) {
   int n_tr_hits = tr_req_hits.size();
 
   int xGeo = tdc.GetGeo();
@@ -293,12 +293,12 @@ bool MapCppTOFDigits::findTriggerReq(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
       digit->SetTriggerRequestTrailingTime(tr_req_hits[TrReqHitCount].GetTrailingTime());
 
       if (digit->GetPartEventNumber() != tr_req_hits[TrReqHitCount].GetPartEventNumber()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               std::string("Wrong part_event_number!"),
               "MapCppTOFDigits::findTriggerReq"));
       }
       if (digit->GetPhysEventNumber() != tr_req_hits[TrReqHitCount].GetPhysEventNumber()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               std::string("Wrong phys_event_number!"),
               "MapCppTOFDigits::findTriggerReq"));
       }
@@ -315,7 +315,7 @@ void MapCppTOFDigits::getTofCabling(int runNumber) {
   runNumberSave = runNumber;
   map_init = _map.InitializeCards(configJSON, runNumber);
   if (!map_init) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to initialize cabling map",
                           "MapCppTOFDigits::_process");
   }

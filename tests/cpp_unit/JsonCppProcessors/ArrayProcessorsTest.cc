@@ -60,7 +60,7 @@ TEST(ArrayProcessorsTest, PointerArrayJsonToCppWrongTypeTest) {
     PointerArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_array(Json::arrayValue);
     json_array.append(Json::Value("string type"));
-    EXPECT_THROW(proc.JsonToCpp(json_array), MAUS::Exception); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_array), Exceptions::Exception); // and should clean up
                                                       // memory allocation
 }
 
@@ -80,7 +80,7 @@ TEST(ArrayProcessorsTest, PointerArrayJsonToCppNullTest) {
 TEST(ArrayProcessorsTest, PointerArrayJsonToCppNotArrayTest) {
     PointerArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_string("string_type");
-    EXPECT_THROW(proc.JsonToCpp(json_string), MAUS::Exception); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_string), Exceptions::Exception); // and should clean up
 }
 
 // test empty vector is handled okay in CppToJson
@@ -175,7 +175,7 @@ TEST(ArrayProcessorsTest, ValueArrayJsonToCppWrongTypeTest) {
     ValueArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_array(Json::arrayValue);
     json_array.append(Json::Value("string type"));
-    EXPECT_THROW(proc.JsonToCpp(json_array), MAUS::Exception); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_array), Exceptions::Exception); // and should clean up
                                                       // memory allocation
 }
 
@@ -183,7 +183,7 @@ TEST(ArrayProcessorsTest, ValueArrayJsonToCppWrongTypeTest) {
 TEST(ArrayProcessorsTest, ValueArrayJsonToCppNotArrayTest) {
     ValueArrayProcessor<double> proc(new DoubleProcessor());
     Json::Value json_string("string_type");
-    EXPECT_THROW(proc.JsonToCpp(json_string), MAUS::Exception); // and should clean up
+    EXPECT_THROW(proc.JsonToCpp(json_string), Exceptions::Exception); // and should clean up
 }
 
 // test empty vector is handled okay in CppToJson

@@ -35,7 +35,7 @@
 #include "TUnixSystem.h"
 #include "TSystem.h"
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "DataStructure/Global/Track.hh"
 

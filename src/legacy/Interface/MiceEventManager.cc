@@ -13,7 +13,7 @@
 #include "Interface/KillHit.hh"
 
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 template <class T>
 std::vector<T*> deepCopyVector(std::vector<T*>& target)

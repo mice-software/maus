@@ -60,7 +60,7 @@ void RFFieldMap::ReadMap(const std::string& mapFile, const std::string& fileType
 	}
 	catch(...)
 	{
-		throw(MAUS::Exception(MAUS::Exception::recoverable, "There was a problem accessing the RFFieldMap", "RFFieldMap::ReadMap"));
+		throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "There was a problem accessing the RFFieldMap", "RFFieldMap::ReadMap"));
 	}
 }
 
@@ -203,7 +203,7 @@ std::string	RFFieldMap::ReplaceVariables( std::string fileName )
       for( int vpos = pos; vpos < end; ++vpos )
         variable += fileName[vpos];
       if(getenv( variable.c_str() ) == NULL) 
-          throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - "+variable+" environment variable was not defined", "RFFieldMap::ReplaceVariables"));
+          throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error - "+variable+" environment variable was not defined", "RFFieldMap::ReplaceVariables"));
       fullName += std::string( getenv( variable.c_str() ) );
       pos = end + 1;
     }

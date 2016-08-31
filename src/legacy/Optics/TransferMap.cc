@@ -136,7 +136,7 @@ PhaseSpaceVector TransferMap::operator*(const PhaseSpaceVector& aPhaseSpaceVecto
 Tensor  TransferMap::GetMap(int order)    const
 {
 	if(order > GetOrder() || order - 2 > int(_higherOrderMaps.size()) ) return Tensor(6, order+1, 0);
-	if(order < 3) throw(MAUS::Exception(MAUS::Exception::recoverable, "Use GetMap for maps of order > 2", "TransferMap::GetOrder(int)"));
+	if(order < 3) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Use GetMap for maps of order > 2", "TransferMap::GetOrder(int)"));
 	return *_higherOrderMaps[order-3];
 }
 
@@ -305,7 +305,7 @@ double TransferMap::PhaseAdvance(int axis) const
   double sin_phi = sqrt(-n00*n00 - subMatrix[0][1]*subMatrix[1][0]); // ((-alpha^2 + beta gamma) sin^2(phi) )^0.5
   double cos_phi = (subMatrix[0][0] + subMatrix[1][1])/2.; // cos(phi)
 	double phaseAdvance = atan2(sin_phi, cos_phi);
-	if(phaseAdvance != phaseAdvance) throw(MAUS::Exception(MAUS::Exception::recoverable, "Complex phase advance", "TransferMap::PhaseAdvance")); 
+	if(phaseAdvance != phaseAdvance) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Complex phase advance", "TransferMap::PhaseAdvance")); 
 	return phaseAdvance;
 }
 

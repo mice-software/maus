@@ -37,7 +37,7 @@
 #include <TTree.h>
 #include <cstring>
 #include <vector>
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 /*!
  * \class rstream
@@ -123,20 +123,20 @@ template<typename T> rstream& rstream::attachBranch(T& d,
 						    bool doublePointer,
 						    bool createNonExistentBranch) {
   if (!strcmp(m_branchName, "")) {
-    Squeak::mout(Squeak::error)
+    MAUS::Squeak::mout(MAUS::Squeak::error)
       << "No branch name set"
       << std::endl;
-    Squeak::mout(Squeak::info)
+    MAUS::Squeak::mout(MAUS::Squeak::info)
       << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")"
       << std::endl;
     strcpy(m_branchName, "");
     return *this;
   }
   if (!m_tree->FindBranch(m_branchName) && !createNonExistentBranch) {
-    Squeak::mout(Squeak::error)
+    MAUS::Squeak::mout(MAUS::Squeak::error)
       << "Branch not found"
       << std::endl;
-    Squeak::mout(Squeak::info)
+    MAUS::Squeak::mout(MAUS::Squeak::info)
       << "Could not find the requested branch in the tree"
       << std::endl;
     strcpy(m_branchName, "");
@@ -177,20 +177,20 @@ template<typename T> rstream& rstream::attachBranch(T* & d,
 						    bool doublePointer,
 						    bool createNonExistentBranch) {
   if (!strcmp(m_branchName, "")) {
-    Squeak::mout(Squeak::error)
+    MAUS::Squeak::mout(MAUS::Squeak::error)
       << "No branch name set"
       << std::endl;
-    Squeak::mout(Squeak::info)
+    MAUS::Squeak::mout(MAUS::Squeak::info)
       << "Setup a branch name before attaching a data object using << branchName(\"MyBranch\")"
       << std::endl;
     strcpy(m_branchName, "");
     return *this;
   }
   if (!m_tree->FindBranch(m_branchName) && !createNonExistentBranch) {
-    Squeak::mout(Squeak::error)
+    MAUS::Squeak::mout(MAUS::Squeak::error)
       << "Branch not found"
       << std::endl;
-    Squeak::mout(Squeak::info)
+    MAUS::Squeak::mout(MAUS::Squeak::info)
       << "Could not find the requested branch in the tree"
       << std::endl;
     strcpy(m_branchName, "");

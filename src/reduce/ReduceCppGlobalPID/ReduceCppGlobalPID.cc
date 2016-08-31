@@ -20,7 +20,7 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
@@ -206,7 +206,7 @@ namespace MAUS {
       }
 
       _configCheck = true;
-    } catch (Exception& exc) {
+    } catch (Exceptions::Exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
     } catch (std::exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
@@ -215,21 +215,21 @@ namespace MAUS {
 
   void ReduceCppGlobalPID::_process(MAUS::Data* data_cpp) {
     if (data_cpp == NULL)
-      throw Exception(Exception::recoverable, "Data was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
 		      "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill() == NULL)
-      throw Exception(Exception::recoverable, "Spill was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
 		      "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill()->GetDaqEventType() != "physics_event") {
     }
     if (!_configCheck) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Birth was not called successfully",
                       "ReduceCppGlobalPID::process");
     }
 
     /*if (data_cpp->GetSpill()->GetReconEvents() == NULL)
-        throw Exception(Exception::recoverable, "ReconEvents were NULL",
+        throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
 	"ReduceCppGlobalPID::_process");*/
 
     _spill = data_cpp->GetSpill();

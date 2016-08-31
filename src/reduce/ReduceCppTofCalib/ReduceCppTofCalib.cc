@@ -39,7 +39,7 @@
 #include "src/common_cpp/DataStructure/TOFSpacePoint.hh"
 
 #include "src/legacy/Interface/STLUtils.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/reduce/ReduceCppTofCalib/ReduceCppTofCalib.hh"
 
@@ -60,7 +60,7 @@ ReduceCppTofCalib::~ReduceCppTofCalib() {
 void ReduceCppTofCalib::_birth(const std::string& argJsonConfigDocument) {
 
   if (!_output) {
-    throw MAUS::Exception(Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
                           "The output is disconnected.",
                           "ReduceCppTofCalib::_birth");
   }
@@ -73,7 +73,7 @@ void ReduceCppTofCalib::_birth(const std::string& argJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
     // this will contain the configuration
-  } catch (Exception exc) {
+  } catch (Exceptions::Exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
   } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
@@ -86,11 +86,11 @@ void ReduceCppTofCalib::_death() {
 
 void ReduceCppTofCalib::_process(MAUS::Data* data) {
   if (data == NULL)
-    throw Exception(Exception::recoverable, "Data was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                     "ReduceCppTofCalib::_process");
 
   if (data->GetSpill() == NULL)
-    throw Exception(Exception::recoverable, "Spill was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                     "ReduceCppTofCalib::_process");
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
@@ -99,7 +99,7 @@ void ReduceCppTofCalib::_process(MAUS::Data* data) {
      return;
 
   if (data->GetSpill()->GetReconEvents() == NULL)
-     throw Exception(Exception::recoverable, "ReconEvents were NULL",
+     throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
                         "ReduceCppTofCalib::_process");
 
 

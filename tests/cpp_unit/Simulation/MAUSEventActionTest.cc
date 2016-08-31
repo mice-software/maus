@@ -63,7 +63,7 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     // _events out of range
     std::vector<MCEvent*>* events = new std::vector<MCEvent*>();
     _g4->GetEventAction()->SetEvents(events);
-    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), MAUS::Exception);
+    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), Exceptions::Exception);
 
     events->push_back(new MCEvent());
     events->push_back(new MCEvent());
@@ -84,7 +84,7 @@ TEST(MAUSEventActionTest, EndOfEventActionTest) {
     EXPECT_EQ(events->at(0)->GetVirtualHits()->size(), 0);
     EXPECT_EQ(events->at(0)->GetTracks()->size(), 0);
     // _events out of range
-    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), MAUS::Exception);
+    EXPECT_THROW(_g4->GetEventAction()->EndOfEventAction(NULL), Exceptions::Exception);
 
     // reset _primary index
     events = new std::vector<MCEvent*>();

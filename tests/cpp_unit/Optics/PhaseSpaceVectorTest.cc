@@ -93,7 +93,7 @@ TEST_F(PhaseSpaceVectorTest, VectorConstructor) {
   try {
     const PhaseSpaceVector bad_ps_vector(bad_vector);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 

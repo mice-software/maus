@@ -239,7 +239,7 @@ TEST_F(LinearApproximationOpticsModelTest, Transport) {
   bool transport_failed = false;
   try {
     optics_model.Transport(off_shell_vector, kPrimaryPlane);
-  } catch (MAUS::Exception exc) {
+  } catch (Exceptions::Exception exc) {
     transport_failed = true;
   }
   EXPECT_TRUE(transport_failed);

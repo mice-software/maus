@@ -76,7 +76,7 @@ VirtualPlane VirtualPlane::BuildVirtualPlane(CLHEP::HepRotation rot,
   vp._allowBackwards       = allowBackwards;
   if (type != BTTracker::tau_field && type != BTTracker::u &&
       type != BTTracker::z && type != BTTracker::t) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Virtual plane type not implemented",
                  "VirtualPlane::BuildVirtualPlane(...)"));
   }
@@ -159,7 +159,7 @@ void VirtualPlane::FillKinematics
   delete [] x_from_beginning;
   delete [] x_from_end;
   if (!InRadialCut(CLHEP::Hep3Vector(x[1], x[2], x[3])))
-    throw(Exception(Exception::recoverable, "Hit outside radial cut",  // appropriate?
+    throw(Exceptions::Exception(Exceptions::recoverable, "Hit outside radial cut",  // appropriate?
                                   "VirtualPlane::FillKinematics"));
 }
 
@@ -298,7 +298,7 @@ void VirtualPlaneManager::VirtualPlanesSteppingAction
           _nHits[i]++;
         }
       }
-    } catch (Exception exc) {}  // do nothing - just dont make a hit
+    } catch (Exceptions::Exception exc) {}  // do nothing - just dont make a hit
 }
 
 void VirtualPlaneManager::SetVirtualHits(std::vector<MAUS::VirtualHit>* hits) {
@@ -349,7 +349,7 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
       else if (m_pass == "SameStation") pass = VirtualPlane::same_station;
       else if (m_pass == "NewStation")  pass = VirtualPlane::new_station;
       else
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                  "Did not recognise MultiplePasses option "+m_pass,
                  "VirtualPlaneManager::ConstructFromModule") );
     }
@@ -371,7 +371,7 @@ VirtualPlane VirtualPlaneManager::ConstructFromModule(const MiceModule* mod) {
     } else if (variable == "u") {
       var_enum = BTTracker::u;
     } else {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
             "Did not recognise IndependentVariable in Virtual detector module "+
             mod->fullName(),
             "VirtualPlaneManager::ConstructFromModule"));
@@ -399,7 +399,7 @@ const MiceModule*  VirtualPlaneManager::GetModuleFromStationNumber
 
 int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   if (_planes.size() == 0)
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "No Virtual planes initialised",
           "VirtualPlaneManager::GetStationNumberFromModule"));
   VirtualPlane* plane = NULL;
@@ -407,13 +407,13 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
   for (map_it it = _mods.begin(); it != _mods.end() && plane == NULL; it++)
     if (it->second == module) plane = it->first;  // find plane from module
   if (plane == NULL) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Module "+module->name()+" not found in VirtualPlaneManager",
           "VirtualPlaneManager::GetStationNumberFromModule"));
   }
   for (size_t i = 0; i < _planes.size(); i++)
     if (plane == _planes[i]) return i+1;  // find station from plane
-  throw(Exception(Exception::recoverable,
+  throw(Exceptions::Exception(Exceptions::recoverable,
         "Module "+module->name()+" not found in VirtualPlaneManager",
         "VirtualPlaneManager::GetStationNumberFromModule"));
 }
@@ -421,8 +421,8 @@ int VirtualPlaneManager::GetStationNumberFromModule(const MiceModule* module) {
 int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
     if (stationNumber-1 >= static_cast<int>(_nHits.size()) ||
         stationNumber-1 < 0)
-      throw(Exception(
-              Exception::recoverable,
+      throw(Exceptions::Exception(
+              Exceptions::recoverable,
               "Station number out of range",
               "VirtualPlaneManager::GetNumberOfHits"));
     return _nHits[stationNumber-1];
@@ -430,10 +430,10 @@ int VirtualPlaneManager::GetNumberOfHits(int stationNumber) {
 
 VirtualPlane* VirtualPlaneManager::PlaneFromStation(int stationNumber) {
     if (_planes.size() == 0)
-      throw(Exception(Exception::recoverable, "No Virtual planes initialised",
+      throw(Exceptions::Exception(Exceptions::recoverable, "No Virtual planes initialised",
                    "VirtualPlaneManager::PlaneFromStation()"));
     if (stationNumber < 1)
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
       "Station number must be > 0",
       "VirtualPlaneManager::PlaneFromStation"));
     // map from module name to _planes index; if stationNumber > planes.size, it

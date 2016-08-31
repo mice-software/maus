@@ -8,7 +8,7 @@
 #include "Config/ModuleConverter.hh"
 #include "BeamTools/BTFieldConstructor.hh"
 #include "BeamTools/BTTracker.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Interface/Differentiator.hh"
 #include "Maths/Matrix.hh"
 #include "Maths/PolynomialMap.hh"

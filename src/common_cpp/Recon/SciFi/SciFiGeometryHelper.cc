@@ -164,7 +164,7 @@ void SciFiGeometryHelper::FieldValue(const MiceModule* trackerModule, SciFiTrack
 //  Hep3Vector hepGlobalPos = trackerModule->globalPosition();
   if (trackerModule == NULL) {
     std::cerr << "No tracker module inited!\n";
-    throw Exception(Exception::nonRecoverable,
+    throw Exceptions::Exception(Exceptions::nonRecoverable,
                     "Invalid MiceModule provided",
                     "SciFiGeometryHelper::FieldValue()");
   }
@@ -233,7 +233,7 @@ const MiceModule* SciFiGeometryHelper::FindPlane(int tracker, int station, int p
     }
   }
   if ( this_plane == NULL ) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
     "Failed to find tracker plane.",
     "SciFiGeometryHelper::find_plane"));
   }

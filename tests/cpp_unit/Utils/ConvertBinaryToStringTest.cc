@@ -62,7 +62,7 @@ TEST(ConvertBinaryToStringTest, ConversionTest) {
     EXPECT_EQ(converter.convert(fname, false), "MQ==");
     EXPECT_EQ(converter.convert(fname, true), "MQ==");
     nanosleep(&start_time, &end_time);
-    EXPECT_THROW(converter.convert(fname, true), MAUS::Exception); // file is gone
+    EXPECT_THROW(converter.convert(fname, true), Exceptions::Exception); // file is gone
 }
 }
 

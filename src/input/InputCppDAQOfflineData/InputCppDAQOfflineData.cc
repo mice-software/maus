@@ -31,7 +31,7 @@ InputCppDAQOfflineData::InputCppDAQOfflineData()
 
 void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   if ( _dataFileManager.GetNFiles() ) {
-    throw(MAUS::Exception(Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to get files - are they open already?",
                           "InputCppDAQOfflineData::_birth"));
   }
@@ -43,7 +43,7 @@ void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    throw(MAUS::Exception(Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to parse datacards",
                           "InputCppDAQOfflineData::_birth"));
   }
@@ -64,7 +64,7 @@ void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   _dataFileManager.OpenFile();
   unsigned int nfiles = _dataFileManager.GetNFiles();
   if (!nfiles) {
-    throw(MAUS::Exception(Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                         "Unable to load any data files. Check your run"+
                         std::string("number (or file name) and data path."),
                         "InputCppDAQOfflineData::_birth"));
@@ -80,7 +80,7 @@ void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   _calib_Events_Only = configJSON["Calib_Events_Only"].asBool();
 
   if (_phys_Events_Only && _calib_Events_Only) {
-     throw(MAUS::Exception(Exception::recoverable,
+     throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "There is a contradiction in the configuration:\n"+
                           std::string("Phys_Events_Only and Calib_Events_Only ")+
                           std::string("are both true!!!"),
@@ -91,7 +91,7 @@ void InputCppDAQOfflineData::_birth(const std::string& jsonDataCards) {
   // Initialize the map from data cards
   bool loaded = _map.InitFromCards(configJSON);
   if (!loaded) {
-    throw(MAUS::Exception(Exception::recoverable, "STRING",
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING",
                           "InputCppDAQOfflineData InitFromCards"));
   }
 

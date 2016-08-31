@@ -31,29 +31,29 @@ PyObject* null = NULL;
 // This does nothing, just checks we can compile the code
 TEST(PyObjectWrapperTest, TestUnwrapNullObject) {
   PyObject* args = NULL;
-  EXPECT_THROW(PyObjectWrapper::unwrap<Data>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<JobHeaderData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<Data>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobHeaderData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exceptions::Exception);
   EXPECT_EQ(PyErr_Occurred(), null);
 }
 
 TEST(PyObjectWrapperTest, TestUnwrapBadObject) {
   PyObject* args = PyLong_FromLong(0);
-  EXPECT_THROW(PyObjectWrapper::unwrap<Data>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<JobHeaderData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exception);
-  EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<Data>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobHeaderData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<JobFooterData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunHeaderData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<RunFooterData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<ImageData>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<std::string>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<PyObject>(args), Exceptions::Exception);
+  EXPECT_THROW(PyObjectWrapper::unwrap<Json::Value>(args), Exceptions::Exception);
   Py_DECREF(args);
   EXPECT_EQ(PyErr_Occurred(), null);
 }
@@ -133,15 +133,15 @@ TEST(PyObjectWrapperTest, TestWrapUnwrapDataObject) {
 }
 
 TEST(PyObjectWrapperTest, TestDeleteJsonCppPyCapsule) {
-  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(NULL), Exception);
+  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(NULL), Exceptions::Exception);
   PyObject* py_int = PyLong_FromLong(0);
-  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(py_int), Exception);
+  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(py_int), Exceptions::Exception);
   Py_DECREF(py_int);
 
   Json::Value* json = new Json::Value();
   void* void_json = static_cast<void*>(json);
   PyObject *py_no_name = PyCapsule_New(void_json, "", NULL);
-  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(py_no_name), Exception);
+  EXPECT_THROW(PyObjectWrapper::delete_jsoncpp_pycapsule(py_no_name), Exceptions::Exception);
   Py_DECREF(py_no_name);
 
   PyObject* py_okay = PyCapsule_New(void_json, "JsonCpp", NULL);

@@ -121,7 +121,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, GeneratePrimariesTest) {
     EXPECT_EQ(part_in.pid,  event->GetPrimaryVertex()->GetPrimary()->GetPDGcode());
 
     for (size_t i=0; i<6; ++i) {
-        EXPECT_THROW(primary->GeneratePrimaries(event), MAUS::Exception);
+        EXPECT_THROW(primary->GeneratePrimaries(event), Exceptions::Exception);
     }
  
     delete event;
@@ -151,7 +151,7 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleReadWriteTest) {
     val["random_seed"] = Json::Value(-1);
     try {
       part_out.ReadJson(val);
-    } catch (MAUS::Exception exc) {
+    } catch (Exceptions::Exception exc) {
       passed = true;
     }
     EXPECT_TRUE(passed);
@@ -206,10 +206,10 @@ TEST_F(MAUSPrimaryGeneratorActionTest, PGParticleMassShellConditionTest) {
     part_in.px = 0.;
     part_in.py = 0.;
     part_in.pz = 0.;
-    EXPECT_THROW(part_in.MassShellCondition(), MAUS::Exception);
+    EXPECT_THROW(part_in.MassShellCondition(), Exceptions::Exception);
     part_in.pz = 1.;
     part_in.energy = 100.;
-    EXPECT_THROW(part_in.MassShellCondition(), MAUS::Exception);
+    EXPECT_THROW(part_in.MassShellCondition(), Exceptions::Exception);
 }
 
 TEST_F(MAUSPrimaryGeneratorActionTest, PGParticlePrimaryTest) {

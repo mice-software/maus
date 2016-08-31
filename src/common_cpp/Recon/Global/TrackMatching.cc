@@ -26,7 +26,7 @@
 #include "src/common_cpp/Utils/Exception.hh"
 
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/common_cpp/Recon/Global/TrackMatching.hh"
 
@@ -415,7 +415,7 @@ void TrackMatching::MatchTrackPoint(
       }
       // If there are multiple matches, this checks if they could have been from the same particle
       AddIfConsistent(temp_spacepoints, hypothesis_track);
-    } catch (Exception exc) {
+    } catch (Exceptions::Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
   }
@@ -436,7 +436,7 @@ void TrackMatching::MatchTOF0(
     try {
       GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
                              _energy_loss);
-    } catch (Exception exc) {
+    } catch (Exceptions::Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
     // Calculate the distance to TOF0 and the approximate distance the particle travelled
@@ -525,7 +525,7 @@ void TrackMatching::MatchEMRTrack(
             << x_in[1] - first_hit_pos.X() << " "
             << x_in[2] - first_hit_pos.Y() << std::endl;
       }
-    } catch (Exception exc) {
+    } catch (Exceptions::Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
     if (matched) {

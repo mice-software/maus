@@ -184,7 +184,7 @@ double Track::get_emr_plane_density() const {
 
 void Track::AddTrackPoint(MAUS::DataStructure::Global::TrackPoint* track_point) {
   if (!track_point) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Attempting to add a NULL TrackPoint",
                  "DataStructure::Global::Track::AddTrackPoint()"));
   }
@@ -205,7 +205,7 @@ void Track::PushBackTrackPoint(
 void Track::RemoveTrackPoint(
     MAUS::DataStructure::Global::TrackPoint* track_point) {
   if (!track_point) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "No matching TrackPoint: pointer is NULL",
                  "DataStructure::Global::Track::RemoveTrackPoint()"));
   }
@@ -213,7 +213,7 @@ void Track::RemoveTrackPoint(
   // Remove track_point from TRefArray
   TObject* result = _track_points->FindObject(track_point);
   if (!result) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "No matching TrackPoint ",
                  "DataStructure::Global::Track::RemoveTrackPoint()"));
   } else {
@@ -382,7 +382,7 @@ void Track::RemoveGeometryPath(std::string geometry_path) {
       find(_geometry_paths.begin(), _geometry_paths.end(), geometry_path);
 
   if (result == _geometry_paths.end()) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Attempting to remove a geometry path not stored in Track",
                  "DataStructure::Global::Track::RemoveGeometryPath()"));
   } else {
@@ -433,7 +433,7 @@ void Track::AddTrack(MAUS::DataStructure::Global::Track* track) {
 void Track::RemoveTrack(MAUS::DataStructure::Global::Track* track) {
   TObject *result = _constituent_tracks->FindObject(track);
   if (!result) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Attempting to remove a constituent track not stored in Track",
                  "DataStructure::Global::Track::RemoveTrack()"));
   } else {

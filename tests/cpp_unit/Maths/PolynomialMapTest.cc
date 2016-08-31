@@ -25,7 +25,7 @@
 #include "CLHEP/Matrix/Matrix.h"
 
 #include "Config/ModuleConverter.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Interface/Differentiator.hh"
 #include "Interface/Interpolator.hh"
 #include "Maths/Matrix.hh"
@@ -229,7 +229,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   for (int i = 0; i < 10; i++) {
@@ -255,7 +255,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // in[i] size != point dimension
@@ -265,7 +265,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // out[i] size != value dimension
@@ -276,7 +276,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 
@@ -400,10 +400,10 @@ TEST_F(PolynomialMapTest, LeastSquaresFittingErrorHandling) {
 
   Matrix<double> errs2(n_coeffs, n_coeffs-1, 0.);
   EXPECT_THROW(PolynomialMap::PolynomialLeastSquaresFit(
-        points, values, 1, weightFunction, errs2), MAUS::Exception);
+        points, values, 1, weightFunction, errs2), Exceptions::Exception);
   Matrix<double> errs3(n_coeffs-1, n_coeffs, 0.);
   EXPECT_THROW(PolynomialMap::PolynomialLeastSquaresFit(
-        points, values, 1, weightFunction, errs3), MAUS::Exception);
+        points, values, 1, weightFunction, errs3), Exceptions::Exception);
 }
 
 TEST_F(PolynomialMapTest, LeastSquaresFitting) {
@@ -552,7 +552,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
       bad_points, values,
       1, constraintPVec->GetCoefficientsAsVector(), weights);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // bad values size
@@ -563,7 +563,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
       points, bad_values,
       1, constraintPVec->GetCoefficientsAsVector(), weights);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   testpass = true;
@@ -786,7 +786,7 @@ TEST_F(PolynomialMapTest, SpaceTransform) {
   try {
     coefficient.SpaceTransform(space_in, space_out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // out variable not in space mapping
@@ -796,7 +796,7 @@ TEST_F(PolynomialMapTest, SpaceTransform) {
   try {
     coefficient.SpaceTransform(space_in, space_out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 
@@ -856,7 +856,7 @@ TEST_F(PolynomialMapTest, UnmakePolynomialVector) {
   try {
     polynomial_map_->UnmakePolynomialVector(polynomial_vector, wrong_size_point);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   double polynomial_vector_data[polynomial_vector.size()];
@@ -891,7 +891,7 @@ TEST_F(PolynomialMapTest, RecentredNotSupported) {
     double * point = NULL;
     polynomial_map_->Recentred(point);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 
@@ -900,6 +900,6 @@ TEST_F(PolynomialMapTest, InverseNotSupported) {
   try {
     polynomial_map_->Inverse();
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }

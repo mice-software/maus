@@ -23,7 +23,7 @@
 #include "Geant4/G4VisManager.hh"
 #include "Geant4/G4UImanager.hh"
 
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 

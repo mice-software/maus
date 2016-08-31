@@ -24,7 +24,7 @@ TriangularMesh::TriangularMesh(int numberOfPoints, int numberOfDimensions, doubl
 		for(int i=0; i<numberOfPoints; i++) AddPoint_Delaunay(thePoints[i]);
 	}
 	else
-		throw(MAUS::Exception(MAUS::Exception::recoverable, "TriangularMesh only implemented for 2d", "TriangularMesh::TriangularMesh(...)"));
+		throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "TriangularMesh only implemented for 2d", "TriangularMesh::TriangularMesh(...)"));
 }
 
 TriangularMesh::~TriangularMesh() 
@@ -56,7 +56,7 @@ void TriangularMesh::ReadPointsFromQHull(std::string fileName)
 		for(int j=0; j<nDims; j++)
 			fin >> points[i]->coords[j];
 	}
-	if(!fin) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error reading file", "QHullIO::ReadQHullInputFile"));
+	if(!fin) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error reading file", "QHullIO::ReadQHullInputFile"));
 	fin.close();
 }
 
@@ -81,7 +81,7 @@ void TriangularMesh::ReadMeshFromQHull(std::string fileName)
 		}
 		simplices.push_back(new Simplex(this, simplexPoints));
 	}
-	if(!fin) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error reading file", "QHullIO::ReadQHullInputFile"));
+	if(!fin) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error reading file", "QHullIO::ReadQHullInputFile"));
 	fin.close();
 }
 
@@ -96,7 +96,7 @@ void TriangularMesh::WriteQHullInput(std::string fileName)
 			fout << points[i]->coords[j] << " ";
 		fout << "\n";
 	}
-	if(!fout) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error writing file", "TriangularMesh::WriteQHullInput"));
+	if(!fout) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error writing file", "TriangularMesh::WriteQHullInput"));
 	fout.close();
 }
 
@@ -137,7 +137,7 @@ void TriangularMesh::ReadTessFromQHull(std::string fileName)
 		hulls[i] = new Hull(this, myHullPoints, NULL);
 	}
 	
-	if(!fin) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error reading file", "QHullIO::ReadQHullInputFile"));
+	if(!fin) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error reading file", "QHullIO::ReadQHullInputFile"));
 	fin.close();
 }
 
@@ -314,7 +314,7 @@ TriangularMesh::Simplex& TriangularMesh::Simplex::FindLeaf(Point& test)
 	if(IsLeaf()) return *this;
 	for(std::list<Simplex*>::const_iterator it = f_children.begin(); it!=f_children.end(); ++it)
 		if( (*it)->IsInside(test) ) return (*it)->FindLeaf(test);
-	throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to find test point", "Simplex::FindLeaf"));
+	throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to find test point", "Simplex::FindLeaf"));
 }
 
 bool TriangularMesh::Simplex::IsInside(Point& test) const
@@ -367,7 +367,7 @@ void TriangularMesh::Simplex::BarycentricCoordinates(Point& test, Point& apex, d
 	if     (apexInt == 0) {end0 = f_point[1]; end1 = f_point[2];}
 	else if(apexInt == 1) {end0 = f_point[0]; end1 = f_point[2];}
 	else if(apexInt == 2) {end0 = f_point[0]; end1 = f_point[1];}
-	else throw(MAUS::Exception(MAUS::Exception::recoverable, "Trying to find BarycentricCoordinates with point not in Simplex", "Simplex::BarycentricCoordinates"));
+	else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Trying to find BarycentricCoordinates with point not in Simplex", "Simplex::BarycentricCoordinates"));
 	TriangularMesh::BarycentricCoordinates(test, apex, *end0, *end1, barys);
 }
 

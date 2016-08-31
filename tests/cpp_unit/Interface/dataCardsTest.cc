@@ -65,7 +65,7 @@ TEST_F(dataCardsTest, readKeysTest)
   EXPECT_EQ(dc.fetchValueInt   (key_int), val_int);
   EXPECT_EQ(dc.fetchValueDouble(key_dub), val_dub);
   EXPECT_EQ(dc.fetchValueString(key_str), val_str);
-  EXPECT_THROW(dc.readKeys(ss_bad_key),   MAUS::Exception);
+  EXPECT_THROW(dc.readKeys(ss_bad_key),   Exceptions::Exception);
 }
 
 

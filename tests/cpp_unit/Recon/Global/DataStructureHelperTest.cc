@@ -128,7 +128,7 @@ TEST_F(DataStructureHelperTest, GetDetectorZPosition) {
     try {
       DataStructureHelper::GetInstance().GetDetectorZPosition(
         detector_ids[index]);
-    } catch (MAUS::Exception& exc) {
+    } catch (Exceptions::Exception& exc) {
       success = true;
     }
     EXPECT_TRUE(success);
@@ -162,7 +162,7 @@ TEST_F(DataStructureHelperTest, GetDetectorZPosition) {
     try {
       DataStructureHelper::GetInstance().GetDetectorZPosition(
         detector_ids[index]);
-    } catch (MAUS::Exception& exc) {
+    } catch (Exceptions::Exception& exc) {
       success = true;
     }
     EXPECT_TRUE(success);
@@ -288,7 +288,7 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors);
-  } catch (MAUS::Exception& exception) {
+  } catch (Exceptions::Exception& exception) {
     success = false;
   } catch (std::exception& exc) {
     success = false;
@@ -342,7 +342,7 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors);
-  } catch (MAUS::Exception& exception) {
+  } catch (Exceptions::Exception& exception) {
     success = true;
   } catch (std::exception& exc) {
     success = true;
@@ -370,7 +370,7 @@ TEST_F(DataStructureHelperTest, GetDetectorAttributes) {
 
     DataStructureHelper::GetInstance().GetDetectorAttributes(
         configuration, detectors);
-  } catch (MAUS::Exception& exception) {
+  } catch (Exceptions::Exception& exception) {
     success = true;
   } catch (std::exception& exc) {
     success = true;

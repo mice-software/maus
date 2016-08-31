@@ -47,12 +47,12 @@ ModuleTextFileIO::ModuleTextFileIO(MiceModule* parent, std::string name, std::is
 ModuleTextFileIO::ModuleTextFileIO( std::string fname ) : _this(NULL), _hasFile("")
 {
   if (fname == "")
-		throw(MAUS::Exception(MAUS::Exception::recoverable,
+		throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                  "Attempting to open MiceModule with no filename",
                  "ModuleTextFileIO::ModuleTextFileIO"));
 	_this = new MiceModule(NULL, stripDirs(fname));
 	if(getenv( "MICEFILES" ) == NULL) 
-		throw(MAUS::Exception(MAUS::Exception::recoverable, "MICEFILES environment variable was not defined", "ModuleTextFileIO::ModuleTextFileIO"));
+		throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "MICEFILES environment variable was not defined", "ModuleTextFileIO::ModuleTextFileIO"));
 	std::string fnam = std::string(getenv( "MICEFILES" )) + "/Models/Configurations/" + fname;
 	std::ifstream fin(fnam.c_str());
 	if(!fin) 
@@ -61,7 +61,7 @@ ModuleTextFileIO::ModuleTextFileIO( std::string fname ) : _this(NULL), _hasFile(
 		if(!fin) 
 		{
 			fin.close(); 
-			throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to open root module file at "+fnam+" or "+fname, "MiceModule::MiceModule(std::string)"));
+			throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to open root module file at "+fnam+" or "+fname, "MiceModule::MiceModule(std::string)"));
 		}
 	}
 	std::stringstream inOut1, inOut2, inOut3;
@@ -91,10 +91,10 @@ void ModuleTextFileIO::readModule(std::string name, std::istream& in)
 			else if(key.find("Module")       != std::string::npos) newModule(line, in);
 			else if(key.find("Substitution") != std::string::npos); //do nothing, should be handled by preprocessor
 			else if(key=="" || key =="//" || key=="!"); //ignore white space and comments  
-			else throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to parse module line "+line+" in module "+name+_hasFile, "MiceModule::setModule(std::istream*)"));
+			else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to parse module line "+line+" in module "+name+_hasFile, "MiceModule::setModule(std::istream*)"));
 		}
-		catch(MAUS::Exception exc) { throw exc;}
-		catch(...) {throw MAUS::Exception(MAUS::Exception::recoverable, "Failed to parse module line "+line+" in module "+name+_hasFile, "MiceModule::setModule(std::istream*)");}
+		catch(MAUS::Exceptions::Exception exc) { throw exc;}
+		catch(...) {throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to parse module line "+line+" in module "+name+_hasFile, "MiceModule::setModule(std::istream*)");}
 	}
 	checkRepeats();
 }
@@ -158,7 +158,7 @@ void ModuleTextFileIO::newModule(std::string lineIn, std::istream & in)
 
 	modLine       = "";
 	if(getenv( "MICEFILES" ) == NULL) 
-		throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - MICEFILES environment variable was not defined", "ModuleTextFileIO::ModuleTextFileIO"));
+		throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error - MICEFILES environment variable was not defined", "ModuleTextFileIO::ModuleTextFileIO"));
 	std::string file = std::string(getenv( "MICEFILES" )) + "/Models/Modules/" + modName;
 	std::ifstream fin(file.c_str());
 	if(!fin) 
@@ -179,14 +179,14 @@ void ModuleTextFileIO::newModule(std::string lineIn, std::istream & in)
 void ModuleTextFileIO::checkRepeats()
 {
 	if     (_this->propertyExistsThis("RepeatModule",  "bool") && _this->propertyExistsThis("RepeatModule2",  "bool"))
-		throw(MAUS::Exception(MAUS::Exception::recoverable, "Multiple repeat module types defined in MiceModule "+_this->fullName()+_hasFile, "ModuleTextFileIO::checkRepeats"));
+		throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Multiple repeat module types defined in MiceModule "+_this->fullName()+_hasFile, "ModuleTextFileIO::checkRepeats"));
 	if     (_this->propertyExistsThis("RepeatModule",  "bool")) {if(!_this->propertyBool("RepeatModule"))  return;}
 	else if(_this->propertyExistsThis("RepeatModule2", "bool")) {if(!_this->propertyBool("RepeatModule2")) return;}
 	else return;
 	int                nReps = _this->propertyInt("NumberOfRepeats");
 	if     (_this->propertyExistsThis("RepeatModule2",  "bool")) 
 	{
-		Squeak::mout(Squeak::debug) << "Repeating module "+_this->name() << " " << nReps << " times" << std::endl;
+		MAUS::Squeak::mout(MAUS::Squeak::debug) << "Repeating module "+_this->name() << " " << nReps << " times" << std::endl;
 		repeatModule2(_this, nReps); 
 		return;
 	}
@@ -201,7 +201,7 @@ void ModuleTextFileIO::checkRepeats()
 		rot = HepRotationX( rTemp.x() ) * HepRotationY( rTemp.y() ) * HepRotationZ( rTemp.z() );
 	}
 	if(_this->propertyExistsThis("RepeatScaleFactor", "double")) scale = _this->propertyDouble    ("RepeatScaleFactor");	
-	Squeak::mout(Squeak::debug) << "Repeating module "+_this->name() << " " << nReps << " times with scale " << scale 
+	MAUS::Squeak::mout(MAUS::Squeak::debug) << "Repeating module "+_this->name() << " " << nReps << " times with scale " << scale 
 	                            << " rot " << _this->propertyHep3Vector("RepeatRotation") << " trans " << trans << std::endl;
 	repeatModule(_this, trans, rot, scale, nReps);
 }
@@ -239,7 +239,7 @@ void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn
       std::string       dimensions;  
       ist >> dimensions;
       if(dimensions != "Dimensions") 
-        throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise dimensions input in module "+_this->fullName()+_hasFile, "MiceModule::setDimensions(string, string)"));
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Did not recognise dimensions input in module "+_this->fullName()+_hasFile, "MiceModule::setDimensions(string, string)"));
       if( volumeType == "Cylinder" || volumeType == "Sphere" || volumeType == "Polycone")
       {
         std::stringstream dimStream;
@@ -275,7 +275,7 @@ void ModuleTextFileIO::readDimensions(std::string volumeType, std::string lineIn
       else if( volumeType == "Multipole" || volumeType == "Quadrupole" 
                || volumeType == "None" || volumeType == "Boolean")
         _this->addPropertyHep3Vector("Dimensions", CLHEP::Hep3Vector(0,0,0));
-      else throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise volume type "+volumeType+" in module "+_this->fullName()+_hasFile, "MiceModule::setDimensions(std::string)"));
+      else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Did not recognise volume type "+volumeType+" in module "+_this->fullName()+_hasFile, "MiceModule::setDimensions(std::string)"));
 }
 
 template <class Temp> Temp        ModuleTextFileIO::fromString(const std::string& source)
@@ -295,8 +295,8 @@ void ModuleTextFileIO::parseString(const std::string& source, int& out)
   try {
       out = static_cast<int>(_evaluator->evaluate(value));
   }
-  catch (MAUS::Exception exc) {
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not convert "+source+" to an int", "ModuleTextFileIO::parseString(const std::string&, int&)"));
+  catch (MAUS::Exceptions::Exception exc) {
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Could not convert "+source+" to an int", "ModuleTextFileIO::parseString(const std::string&, int&)"));
   }
 }
 
@@ -311,9 +311,9 @@ void ModuleTextFileIO::parseString(const std::string& source, double& out)
   try {
       out = _evaluator->evaluate(value);
   }
-  catch (MAUS::Exception exc) {
+  catch (MAUS::Exceptions::Exception exc) {
       exc.Print();
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not convert "+source+" to a double", "ModuleTextFileIO::parseString(const std::string&, double&)"));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Could not convert "+source+" to a double", "ModuleTextFileIO::parseString(const std::string&, double&)"));
   }
   if (_units == NULL) _units = new MAUS::MAUSEvaluator();
   out *= _units->evaluate(units);
@@ -327,7 +327,7 @@ void ModuleTextFileIO::parseString(const std::string& source, bool& out)
     out = true;
   else if(source_lower == "0" || source_lower == "false" || source_lower == ".false.")
     out = false;
-  else throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not convert "+source+" to a boolean", "ModuleTextFileIO::parseString"));
+  else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Could not convert "+source+" to a boolean", "ModuleTextFileIO::parseString"));
 }
 
 void ModuleTextFileIO::parseString(const std::string& source, std::string&        out) 
@@ -358,7 +358,7 @@ void ModuleTextFileIO::parseString(const std::string& source, CLHEP::Hep3Vector&
     ss >> eval;
     parseString(eval, out[i]); //will call evaluator on each in turn
     if(!ss)
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to parse "+source+" as Hep3Vector", "ModuleTextFileIO::parseString(string, Hep3Vector)"));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to parse "+source+" as Hep3Vector", "ModuleTextFileIO::parseString(string, Hep3Vector)"));
   }
   ss >> units;
   if (_units == NULL) _units = new MAUS::MAUSEvaluator();
@@ -382,7 +382,7 @@ void ModuleTextFileIO::readProperty(std::string lineIn)
       _this->addPropertyString( propName, prop );
     else if( key == "PropertyDouble" )
       _this->addPropertyDouble(propName, prop);
-    else throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise property type "+key+" in module "+_this->fullName()+_hasFile, "ModuleTextFileIO::readProperty(std::string)"));
+    else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Did not recognise property type "+key+" in module "+_this->fullName()+_hasFile, "ModuleTextFileIO::readProperty(std::string)"));
 }
 
 std::string ModuleTextFileIO::stripDirs(std::string name)
@@ -406,15 +406,15 @@ void ModuleTextFileIO::findSubs(std::ostream& out, std::istream& in)
       std::string  name,value;
       linestream >> name >> value;
       if(!linestream)
-        throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to parse substitution "+line, "ModuleTextFileIO::findSubs"));
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to parse substitution "+line, "ModuleTextFileIO::findSubs"));
       if(value.find("$$") != std::string::npos)
-        throw(MAUS::Exception(MAUS::Exception::recoverable, "Value "+value+" for Substitution "+name+" contains reserved character $", "ModuleTextFileIO::findSubs"));
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Value "+value+" for Substitution "+name+" contains reserved character $", "ModuleTextFileIO::findSubs"));
       if(name[0] != '$')
-        throw(MAUS::Exception(MAUS::Exception::recoverable, "Substitution name "+name+" must start with $", "ModuleTextFileIO::findSubs"));
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Substitution name "+name+" must start with $", "ModuleTextFileIO::findSubs"));
       if(name[1] == '$')
-        throw(MAUS::Exception(MAUS::Exception::recoverable, "Substitution name "+name+" must not start with $$ - this is reserved for internal parameters", "ModuleTextFileIO::findSubs"));
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Substitution name "+name+" must not start with $$ - this is reserved for internal parameters", "ModuleTextFileIO::findSubs"));
       _substitutions[name] = value;
-      Squeak::mout(Squeak::debug) << "Substitution "+name+" "+value << std::endl;
+      MAUS::Squeak::mout(MAUS::Squeak::debug) << "Substitution "+name+" "+value << std::endl;
     }
     out << line << "\n";
   }
@@ -469,7 +469,7 @@ void ModuleTextFileIO::repeatModule2 (MiceModule* first, unsigned int numberOfRe
   while (mother != NULL) {
       if (mother->propertyExistsThis("RepeatModule2", "bool") &&
           mother->propertyBoolThis("RepeatModule2")) {
-          throw(MAUS::Exception(MAUS::Exception::recoverable,
+          throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                        "Nested RepeatModule2 is not allowed - found in module "+
                        first->name()+" and ancestor "+mother->name(),
                        "ModuleTextFileIO::repeatModule2"));
@@ -509,7 +509,7 @@ void ModuleTextFileIO::setEvaluator(std::map<std::string, double> parameters)
 void ModuleTextFileIO::MI_alias(std::string& value) {
     static bool warned = false;
     if(value.find("$$") != std::string::npos && !warned) {
-      Squeak::mout(Squeak::warning) << "Warning - please use @ for internal variables. $$ is now deprecated." << std::endl;
+      MAUS::Squeak::mout(MAUS::Squeak::warning) << "Warning - please use @ for internal variables. $$ is now deprecated." << std::endl;
       warned = true;
     }
     substitute(value, "$$", "MI_"); //evaluator can't do $$ so I alias it to MI_ (for internal variables)

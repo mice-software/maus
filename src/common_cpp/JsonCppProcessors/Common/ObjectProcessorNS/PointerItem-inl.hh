@@ -38,7 +38,7 @@ void PointerItem<ParentType, ChildType>::_SetCppChild
                       (const Json::Value& parent_json, ParentType& parent_cpp) {
     if (!parent_json.isMember(_branch)) {
         if (_required) {
-            throw MAUS::Exception(Exception::recoverable,
+            throw MAUS::Exceptions::Exception(Exceptions::recoverable,
             "Missing required branch "+_branch+" converting json->cpp",
             "PointerItem::_SetCppChild");
         } else {
@@ -47,7 +47,7 @@ void PointerItem<ParentType, ChildType>::_SetCppChild
     }
     if (parent_json[_branch].isNull()) {
         if (_required) {
-            throw MAUS::Exception(Exception::recoverable,
+            throw MAUS::Exceptions::Exception(Exceptions::recoverable,
             "Null branch "+_branch+" converting json->cpp",
             "PointerItem::_SetCppChild");
         } else {
@@ -71,7 +71,7 @@ void PointerItem<ParentType, ChildType>::_SetJsonChild
     ChildType* child_cpp = (parent_cpp.*_getter)();
     if (child_cpp == NULL) {
         if (_required) {
-            throw MAUS::Exception(Exception::recoverable,
+            throw MAUS::Exceptions::Exception(Exceptions::recoverable,
             "Failed to find branch "+_branch+": class data was NULL",
             "PointerItem::GetCppChild");
         } else {

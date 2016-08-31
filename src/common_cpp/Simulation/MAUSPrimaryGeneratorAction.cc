@@ -55,26 +55,26 @@ MAUSPrimaryGeneratorAction::PGParticle MAUSPrimaryGeneratorAction::Pop() {
 
 void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   if (_part_q.size() == 0)
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "No primary particles",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   PGParticle part = Pop();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* particle = particleTable->FindParticle(part.pid);
   if ( particle == NULL )
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Particle pid not recognised",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if ( part.energy < particle->GetPDGMass() )
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Particle total energy less than particle mass",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if ( part.px*part.px+part.py*part.py+part.pz*part.pz < 1e-15 )
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Particle total momentum too small",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   if (!isInWorldVolume(part.x, part.y, part.z)) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Particle is outside world volume at position ("+
                  STLUtils::ToString(part.x)+", "+
                  STLUtils::ToString(part.y)+", "+
@@ -96,7 +96,7 @@ void MAUSPrimaryGeneratorAction::GeneratePrimaries(G4Event* argEvent) {
   gun->GeneratePrimaryVertex(argEvent);
   unsigned int uint_max = std::numeric_limits<unsigned int>::max();
   if ( part.seed < 0 || part.seed > uint_max ) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Random seed out of range",
                  "MAUSPrimaryGeneratorAction::GeneratePrimaries"));
   }
@@ -131,7 +131,7 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
     seed = JsonWrapper::GetProperty
                       (particle, "random_seed", JsonWrapper::intValue).asUInt();
   } catch (std::exception stde) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Failed to convert Json::Value integer \"random_seed\" to "
                  "unsigned int.",
                  "MAUSPrimaryGeneratorAction::PGParticle::ReadJson"));
@@ -148,7 +148,7 @@ void MAUSPrimaryGeneratorAction::PGParticle::ReadJson(Json::Value particle) {
       sx = JsonWrapper::GetProperty(spin, "x", JsonWrapper::realValue).asDouble();
       sy = JsonWrapper::GetProperty(spin, "y", JsonWrapper::realValue).asDouble();
       sz = JsonWrapper::GetProperty(spin, "z", JsonWrapper::realValue).asDouble();
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
       // it's okay, caller is not interested in spin
   }
   // theta = px/pz;
@@ -217,11 +217,11 @@ void MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition() {
                                                               FindParticle(pid);
   double mass = particle->GetPDGMass();
   if (energy < mass)
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
             "Attempt to set mass shell condition when (total) energy < mass",
             "MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition");
   if (fabs(px)+fabs(py)+fabs(pz) == 0.)
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
             "Attempt to set mass shell condition when momentum is 0.",
             "MAUSPrimaryGeneratorAction::PGParticle::MassShellCondition");
   double norm = sqrt((energy*energy-mass*mass)/(px*px + py*py + pz*pz));

@@ -49,8 +49,8 @@ namespace MAUS {
 
     private:
       virtual bool _save(PyObject* i) {
-        throw MAUS::Exception(MAUS::Exception::recoverable,
-           "Expected Test MAUS::Exception in _save",
+        throw Exceptions::Exception(Exceptions::recoverable,
+           "Expected Test Exceptions::Exception in _save",
            "int* _save(int* t) const");
       }
   };
@@ -135,7 +135,7 @@ namespace MAUS {
     }
     catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: MAUS::Exception should have been handled"
+        << "Fail: Exceptions::Exception should have been handled"
         << std::endl;
     }
 
@@ -146,7 +146,7 @@ namespace MAUS {
     }
     catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: MAUS::Exception should have been handled"
+        << "Fail: Exceptions::Exception should have been handled"
         << std::endl;
     }
 

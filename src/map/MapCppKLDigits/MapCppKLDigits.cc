@@ -40,7 +40,7 @@ void MapCppKLDigits::_birth(const std::string& argJsonConfigDocument) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
               "Could not find the $MAUS_ROOT_DIR environmental variable.",
               "MapCppKLDigits::_birth");
   }
@@ -60,14 +60,14 @@ void MapCppKLDigits::_birth(const std::string& argJsonConfigDocument) {
   std::string xMapFile = std::string(pMAUS_ROOT_DIR) + map_file_name.asString();
   bool loaded = _map.InitFromFile(xMapFile);
   if (!loaded)
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to initialise map KLChannelMap",
                           "MapCppKLDigits::_birth");
 
     // Load the calibration
     bool loaded_cal = _mapcal.InitializeFromCards(configJSON);
     if (!loaded_cal)
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to initialise map KLChannelMap",
                           "MapCppKLDigits::_birth");
 

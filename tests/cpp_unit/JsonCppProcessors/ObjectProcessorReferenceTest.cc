@@ -133,19 +133,19 @@ TEST(ObjectProcessorReferenceTest, RequiredTest) {
 
   TestObject_4 test_4_cpp;
   test_4_cpp.SetReference(NULL);
-  EXPECT_THROW(test_4_req_proc.CppToJson(test_4_cpp, ""), MAUS::Exception);
+  EXPECT_THROW(test_4_req_proc.CppToJson(test_4_cpp, ""), Exceptions::Exception);
   delete test_4_not_proc.CppToJson(test_4_cpp, "");  // shouldnt throw
 
   Json::Value test_4_json(Json::objectValue);
-  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), MAUS::Exception);
+  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Exceptions::Exception);
   delete test_4_not_proc.JsonToCpp(test_4_json);  // shouldnt throw
 
   test_4_json["reference"] = Json::Value();
-  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), MAUS::Exception);
+  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Exceptions::Exception);
   delete test_4_not_proc.JsonToCpp(test_4_json);  // shouldnt throw
 
   test_4_json["reference"]["$ref"] = Json::Value();
-  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), MAUS::Exception);
+  EXPECT_THROW(test_4_req_proc.JsonToCpp(test_4_json), Exceptions::Exception);
   delete test_4_not_proc.JsonToCpp(test_4_json);  // shouldnt throw
 }
 }

@@ -115,7 +115,7 @@ TOFHitArray* GetTOFHits(MCEvent* mc_event,
            detector == DataStructure::Global::kTOF2 or
            detector == DataStructure::Global::kTOF2_1 or
            detector == DataStructure::Global::kTOF2_2)) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
         "Detector Enum not a TOF", "MAUS::MCTruthTools::GetTOFHits()"));
   }
   TOFHitArray* tof_hits = mc_event->GetTOFHits();
@@ -182,7 +182,7 @@ SciFiHitArray* GetTrackerHits(MCEvent* mc_event,
            detector == DataStructure::Global::kTracker1_3 or
            detector == DataStructure::Global::kTracker1_4 or
            detector == DataStructure::Global::kTracker1_5)) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
         "Detector Enum not a Tracker", "MAUS::MCTruthTools::GetTrackerHits()"));
   }
   SciFiHitArray* tracker_hits = mc_event->GetSciFiHits();

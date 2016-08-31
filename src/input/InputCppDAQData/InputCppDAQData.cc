@@ -47,7 +47,7 @@ InputCppDAQData::InputCppDAQData() : InputBase<MAUS::Data>("InputCppDAQData") {
 
 void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   if ( _dataFileManager.GetNFiles() ) {
-     throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
+     throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }
 
   //  JsonCpp setup
@@ -57,7 +57,7 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING", "InputCppDAQData::_childbirth"));
   }
 
   // Comfigure the V830 (scaler) data processor.
@@ -176,7 +176,7 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
 
     nPartEvts = 0;
   }
-  catch (Exception exc) {
+  catch (Exceptions::Exception exc) {
     Squeak::mout(Squeak::error) << exc.GetLocation() << ": "
     << exc.GetMessage() << std::endl
     << "*** MAUS exception in "
@@ -347,7 +347,7 @@ void InputCppDAQData::configureZeroSupressionTK(ZeroSupressionFilterTK* processo
     std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+calib_file;
     std::ifstream inf(fname.c_str());
     if (!inf) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                       "Could not load Tracker calibration",
                        "InputCppDAQData::configureZeroSupressionTK"));
     } else {
@@ -358,7 +358,7 @@ void InputCppDAQData::configureZeroSupressionTK(ZeroSupressionFilterTK* processo
     Json::Value calibration_data;
     TrackerCalibMap *calibration = processor->get_calibration_ptr();
     if (!reader.parse(calib, calibration_data)) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                       "Could not load Tracker calibration",
                       "InputCppDAQData::configureZeroSupressionTK"));
     } else {

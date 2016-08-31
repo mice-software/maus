@@ -61,7 +61,7 @@
 #endif
 
 #include "src/legacy/Interface/MICERun.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Simulation/MAUSVisManager.hh"
 

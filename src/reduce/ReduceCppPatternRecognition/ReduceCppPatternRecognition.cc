@@ -22,7 +22,7 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
@@ -49,7 +49,7 @@ bool ReduceCppPatternRecognition::birth(std::string aJsonConfigDocument) {
   try {
     configJSON = JsonWrapper::StringToJson(aJsonConfigDocument);
     return true;
-  } catch (Exception exc) {
+  } catch (Exceptions::Exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, mClassname);
   } catch (std::exception exc) {
     MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, mClassname);
@@ -65,7 +65,7 @@ std::string ReduceCppPatternRecognition::process(std::string aDocument) {
         mDataManager.process(mSpill);
         mDataManager.draw(mPlotters);
       }
-    } catch (Exception exc) {
+    } catch (Exceptions::Exception exc) {
       Squeak::mout(Squeak::error) << exc.GetMessage() << std::endl;
       mRoot = MAUS::CppErrorHandler::getInstance()->HandleException(mRoot, exc, mClassname);
     } catch (std::exception exc) {

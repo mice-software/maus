@@ -51,7 +51,7 @@ G4VSolid * MultipoleAperture::BuildBox()
 
 G4VSolid * MultipoleAperture::AddPole(int poleNumber, G4VSolid* inputSolid, bool isCurved)
 {
-	if(isCurved) throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not build curved pole", "MultipoleAperture::AddPole") );
+	if(isCurved) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Could not build curved pole", "MultipoleAperture::AddPole") );
 	double            angle         = (poleNumber+0.5)*360.*degree/double(_numberOfPoles);
 	double            xCentre       = sin(angle)*_poleCenterRadius;
 	double            yCentre       = cos(angle)*_poleCenterRadius;

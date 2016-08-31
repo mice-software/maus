@@ -30,7 +30,7 @@
 #include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
 #include "src/common_cpp/DataStructure/ImageData/Image.hh"
 #include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/reduce/ReduceCppCkovPlot/ReduceCppCkovPlot.hh"
 #include "src/common_cpp/Utils/ReduceCppTools.hh"
 
@@ -52,7 +52,7 @@ ReduceCppCkovPlot::~ReduceCppCkovPlot() {
 void ReduceCppCkovPlot::_birth(const std::string& str_config) {
 
   if (!_output) {
-    throw MAUS::Exception(Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
                           "The output is disconnected.",
                           "ReduceCppCkovPlot::_birth");
   }
@@ -160,11 +160,11 @@ void ReduceCppCkovPlot::_death() {}
 
 void ReduceCppCkovPlot::_process(MAUS::Data* data) {
   if (data == NULL)
-    throw Exception(Exception::recoverable, "Data was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                     "ReduceCppCkovPlot::_process");
 
   if (data->GetSpill() == NULL)
-    throw Exception(Exception::recoverable, "Spill was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                     "ReduceCppCkovPlot::_process");
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
@@ -172,7 +172,7 @@ void ReduceCppCkovPlot::_process(MAUS::Data* data) {
      return;
 
   if (data->GetSpill()->GetReconEvents() == NULL)
-     throw Exception(Exception::recoverable, "ReconEvents were NULL",
+     throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
                         "ReduceCppCkovPlot::_process");
 
   int xRun = data->GetSpill()->GetRunNumber();
