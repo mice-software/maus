@@ -23,6 +23,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <string>
 
 #include "json/value.h"
 
@@ -58,7 +59,7 @@ namespace MAUS {
 class Squeak {
  public:
   /** Error level that determines where the output goes */
-  enum errorLevel {debug, info, warning, error, fatal};
+  enum errorLevel {debug, info, warning, error, fatal, log};
 
   /** Shorthand that returns output to Squeak::mout(Squeak::debug) */
   static std::ostream & mout();
@@ -81,7 +82,7 @@ class Squeak {
    *   - Squeak::fatal then mout(Squeak::fatal) redirects to std::cerr
    *  Note that the redirection is independent of setStandardOutputs status
    */
-  static void setOutputs(int verboseLevel);
+  static void setOutputs(int verboseLevel, int logLevel);
 
   /** Turn on/off std::cout, std::cerr, std::clog
    * Set standard outputs to /dev/null depending on verboseLevel:
@@ -92,6 +93,15 @@ class Squeak {
    * we can just turn it off by redirecting std::cout here.
    */
   static void setStandardOutputs(int verboseLevel);
+
+  /** Set up  the log file stream
+   *  - if logLevel = 0 then Squeak::log will go to /dev/null
+   *  - if logLevel > 0 an output file will be open and streamed to
+   */
+  static void setLog(int logLevel);
+
+  /** Close the log file and free the memory */
+  static void closeLog();
 
   /** Activate std::cout
    *  If isActive is false, redirects std::cout to /dev/null; if isActive is
@@ -153,7 +163,17 @@ class Squeak {
   /** ostream that points to std::err */
   static std::ostream* stderr;
 
+  /** ostream that points to a log file */
+  static std::ofstream* mauslog;
+
+  /** The default error level */
   static const errorLevel default_error_level;
+
+  /** The default log level */
+  static const int default_log_level;
+
+  /** The log file name */
+  static std::string logname;
 
   /** Pointer to the singleton instance of the class */
   static Squeak* instance;

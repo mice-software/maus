@@ -27,8 +27,13 @@ std::ostream* Squeak::stdout    = NULL;
 std::ostream* Squeak::stdlog    = NULL;
 std::ostream* Squeak::stderr    = NULL;
 std::ostream* Squeak::voidout   = NULL;
+std::ofstream* Squeak::mauslog  = NULL;
 Squeak* Squeak::instance        = NULL;
+
 const Squeak::errorLevel Squeak::default_error_level = Squeak::warning;
+const int Squeak::default_log_level = 0;
+std::string Squeak::logname = "tmp/maus.log";
+
 std::map<Squeak::errorLevel, std::ostream*> Squeak::output;
 
 Squeak::Squeak() {
@@ -63,13 +68,13 @@ Squeak * Squeak::getInstance() {
   if (instance  == NULL) {
       instance = new Squeak();
       initialiseOutputs();
-      setOutputs(default_error_level);
+      setOutputs(default_error_level, default_log_level);
       setStandardOutputs(default_error_level);
   }
   return instance;
 }
 
-void Squeak::setOutputs(int verboseLevel) {
+void Squeak::setOutputs(int verboseLevel, int logLevel) {
   getInstance();
   std::ostream* out[5] = {stdout, stdlog, stderr, stderr, stderr};
   for (int i = 0; i <= fatal; ++i) {
@@ -77,6 +82,32 @@ void Squeak::setOutputs(int verboseLevel) {
       output[Squeak::errorLevel(i)] = out[i];
     else
       output[Squeak::errorLevel(i)] = voidout;
+  }
+  // Logging is not determined by the verbosity level so do separately
+  setLog(logLevel);
+}
+
+void Squeak::setLog(int logLevel) {
+  getInstance();
+  // At present, any log level above 0 just goes to a standard file
+  if (logLevel) {
+    if (!mauslog) {
+      mauslog = new std::ofstream(logname.c_str());
+    } else if (!mauslog->is_open()) {
+      mauslog->open(logname.c_str());
+    }
+    output[Squeak::log] = mauslog;
+  } else {
+    output[Squeak::log] = voidout;
+  }
+}
+
+void Squeak::closeLog() {
+  if (mauslog) {
+    if (mauslog->is_open())
+      mauslog->close();
+    delete mauslog;
+    mauslog = NULL;
   }
 }
 

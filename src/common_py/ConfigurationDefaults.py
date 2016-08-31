@@ -67,6 +67,10 @@ end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of
 # >4 = silent
 # Doesnt effect python
 verbose_level = 1
+# Used for switching the general maus running log on or off
+# 0 = off
+# 1 = on
+log_level = 0
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise

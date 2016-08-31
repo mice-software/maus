@@ -79,6 +79,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["keep_tracks"] = true;
   config["keep_steps"] = true;
   config["verbose_level"] = verbose_level;
+  config["log_level"] = 0;
   config["geant4_visualisation"] = false;
   config["physics_model"] = "QGSP_BERT";
   config["reference_physics_processes"] = "mean_energy_loss";

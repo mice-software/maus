@@ -36,8 +36,9 @@ class SqueakTest : public ::testing::Test {
   virtual ~SqueakTest() {
     Json::Value& cards = *MAUS::Globals::GetConfigurationCards();
     int verbose_level = cards["verbose_level"].asInt();
+    int log_level = cards["log_level"].asInt();
     MAUS::Squeak::setStandardOutputs(verbose_level);
-    MAUS::Squeak::setOutputs(verbose_level);
+    MAUS::Squeak::setOutputs(verbose_level, log_level);
   }
 };
 
@@ -205,11 +206,11 @@ void __TestOutputs(int test_value) {
 
 TEST_F(SqueakTest, SetOutputsTest) {
   for (int i = 0; i < 6; ++i) {
-    MAUS::Squeak::setOutputs(i);
+    MAUS::Squeak::setOutputs(i, 0);
     __TestOutputs(i);
   }
   for (int i = 6; i > -1; --i) {
-    MAUS::Squeak::setOutputs(i);
+    MAUS::Squeak::setOutputs(i, 0);
     __TestOutputs(i);
   }
 }

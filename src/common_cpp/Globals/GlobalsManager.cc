@@ -57,6 +57,8 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                  process->_configuration_cards;
         int verbose_level = JsonWrapper::GetProperty
                        (config, "verbose_level", JsonWrapper::intValue).asInt();
+        int log_level = JsonWrapper::GetProperty
+                       (config, "log_level", JsonWrapper::intValue).asInt();
         int max_data_ref = JsonWrapper::GetProperty
                (config, "data_maximum_reference_count", JsonWrapper::intValue).asInt();
         Data::SetMaxReferenceCount(max_data_ref);
@@ -66,7 +68,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         // we set up logging but for now leave singleton-like access
         // meaning that we can't reinitialise the logging
         Logging::setStandardOutputs(verbose_level);
-        Logging::setOutputs(verbose_level);
+        Logging::setOutputs(verbose_level, log_level);
         // we set up CppErrorHandler but for now leave singleton-like access
         // meaning that we can't reinitialise the error handler
         process->_error_handler = CppErrorHandler::getInstance();
@@ -166,6 +168,7 @@ void GlobalsManager::Finally() {
       delete Globals::_process->_maus_geant4_manager;
   }
   GlobalsManager::DeleteGlobals();
+  Squeak::closeLog();
 
 /*
   if (Globals::_process->_error_handler != NULL) {
