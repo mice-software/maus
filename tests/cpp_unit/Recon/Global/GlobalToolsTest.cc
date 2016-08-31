@@ -389,7 +389,7 @@ TEST_F(GlobalToolsTest, propagate) {
   // Energy Loss, Magnetic Field
   try {
     GlobalTools::propagate(x1, 2000.0, field, 10.0, pid);
-  } catch (Exception exc) {
+  } catch (Exceptions::Exception exc) {
     std::cerr << exc.what() << std::endl;
   }
   EXPECT_NEAR(x1[1], 8.345, epsilon);
@@ -402,7 +402,7 @@ TEST_F(GlobalToolsTest, propagate) {
   // No Energy Loss, Magnetic Field
   try {
     GlobalTools::propagate(x2, 2000.0, field, 10.0, pid, false);
-  } catch (Exception exc) {
+  } catch (Exceptions::Exception exc) {
     std::cerr << exc.what() << std::endl;
   }
   EXPECT_NEAR(x2[1], -1.807, epsilon);
@@ -418,7 +418,7 @@ TEST_F(GlobalToolsTest, propagate) {
   // Energy Loss, No Magnetic Field
   try {
     GlobalTools::propagate(x3, 2000.0, field, 10.0, pid);
-  } catch (Exception exc) {
+  } catch (Exceptions::Exception exc) {
     std::cerr << exc.what() << std::endl;
   }
   EXPECT_NEAR(x3[1], 200.000, epsilon);
@@ -431,7 +431,7 @@ TEST_F(GlobalToolsTest, propagate) {
   // No Energy Loss, No Magnetic Field
   try {
     GlobalTools::propagate(x4, 2000.0, field, 10.0, pid, false);
-  } catch (Exception exc) {
+  } catch (Exceptions::Exception exc) {
     std::cerr << exc.what() << std::endl;
   }
   EXPECT_NEAR(x4[1], 200.000, epsilon);

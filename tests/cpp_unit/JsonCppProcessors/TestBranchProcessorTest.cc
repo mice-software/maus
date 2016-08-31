@@ -66,7 +66,7 @@ TEST_F(TestBranchProcessorTestClass, CppToJsonWithNULLRequiredRef) {
   if (json_out) {;} // dummy to kill gcc warning, does nothing
 
   ASSERT_NO_THROW(ReferenceResolver::CppToJson::RefManager::Birth());
-  ASSERT_THROW(json_out = _proc->CppToJson(*_testbranch, ""), Exceptions::Exception);
+  ASSERT_THROW(json_out = _proc->CppToJson(*_testbranch, ""), MAUS::Exceptions::Exception);
   ASSERT_NO_THROW(ReferenceResolver::CppToJson::RefManager::Death());
 }
 

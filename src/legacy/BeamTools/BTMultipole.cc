@@ -112,7 +112,8 @@ CLHEP::Hep3Vector BTMultipole::TransformToRotated(const double * Point) const {
     case momentumBased:
       return TransformToRotatedMomentumBased(Point);
     default:
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable, "Did not recognise curvature model",
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                   "Did not recognise curvature model",
                    "BTMultipole::TransformToRotated(const double*)"));
   }
 }
@@ -187,7 +188,8 @@ double BTMultipole::RadiusOfCurvature(double sRelativeToEnd) const {
       return _momentum/EMfield[1]/CLHEP::eplus/CLHEP::c_light;
     }
     default:
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable, "Did not recognise curvature model",
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                   "Did not recognise curvature model",
                    "BTMultipole::RadiusOfCurvature(double)"));
   }
 }
@@ -204,7 +206,8 @@ void BTMultipole::TransformToRectangular
     case momentumBased:
       return TransformToRectangularMomentumBased(point, value);
     default:
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable, "Did not recognise curvature model",
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                "Did not recognise curvature model",
                 "BTMultipole::TransformToRectangular(const double*, double*)"));
   }
 }
@@ -389,7 +392,8 @@ double BTMultipole::IntegralB(double dxOffset) const {
                                          _length, &h, y);
     if (status != GSL_SUCCESS) {
       Print(MAUS::Squeak::mout(MAUS::Squeak::debug));
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable, "Error integrating reference By",
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                   "Error integrating reference By",
                    "BTMultipole::SetupMagnitude()"));
     }
     step++;

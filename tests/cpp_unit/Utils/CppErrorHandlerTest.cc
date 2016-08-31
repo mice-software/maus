@@ -18,7 +18,7 @@ protected:
   }
   virtual ~CppErrorHandlerTest() {}
   Json::Value obj;
-  Exceptions::Exception      exception;
+  MAUS::Exceptions::Exception      exception;
   std::exception* std_exc;  
 };
 

@@ -80,7 +80,7 @@
     m_file->cd();
     m_tree->Write(m_tree->GetName(), TTree::kWriteDelete);
     m_file->Close();
-    MAUS::Squeak::mout(MAUS::Squeak::info) 
+    MAUS::Squeak::mout(MAUS::Squeak::info)
       << "Written " << m_evtCount << " event(s) to file." << std::endl;
     snprintf(m_branchName, sizeof(m_branchName), "%s", "");
 

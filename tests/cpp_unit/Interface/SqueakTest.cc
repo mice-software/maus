@@ -25,7 +25,7 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/Utils/Globals.hh"
-#include "src/legacy/Utils/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 
 namespace {
@@ -36,26 +36,26 @@ class SqueakTest : public ::testing::Test {
   virtual ~SqueakTest() {
     Json::Value& cards = *MAUS::Globals::GetConfigurationCards();
     int verbose_level = cards["verbose_level"].asInt();
-    Squeak::setStandardOutputs(verbose_level);
-    Squeak::setOutputs(verbose_level);
+    MAUS::Squeak::setStandardOutputs(verbose_level);
+    MAUS::Squeak::setOutputs(verbose_level);
   }
 };
 
 // Commented out as could not get to work with gcc 5
 // A. Dobbs, 16/12/2015
 
-// test mout(Squeak::errorLevel) and SetOutput(Squeak::errorLevel)
+// test mout(MAUS::Squeak::errorLevel) and SetOutput(MAUS::Squeak::errorLevel)
 // TEST_F(SqueakTest, SqueakSetOutputMoutErrorLevelTest) {
 //   std::stringstream sstr;
 //   // debug, info, warning, error, fatal
-//   Squeak::errorLevel err[] = {Squeak::debug, Squeak::info, Squeak::warning,
-//                                                   Squeak::error, Squeak::fatal};
+//   MAUS::Squeak::errorLevel err[] = {MAUS::Squeak::debug, MAUS::Squeak::info,
+//       MAUS::Squeak::warning, MAUS::Squeak::error, MAUS::Squeak::fatal};
 //   for (int i = 0; i < 5; ++i) {
-//     Squeak::setAnOutput(err[i], sstr);
-//     ASSERT_EQ(Squeak::mout(err[i]), sstr) << "errorLevel " << err[i]
+//     MAUS::Squeak::setAnOutput(err[i], sstr);
+//     ASSERT_EQ(MAUS::Squeak::mout(err[i]), sstr) << "errorLevel " << err[i]
 //                                                                    << " failed";
-//     Squeak::setAnOutput(err[i], std::cout);
-//     ASSERT_EQ(Squeak::mout(err[i]), std::cout) << "errorLevel " << err[i]
+//     MAUS::Squeak::setAnOutput(err[i], std::cout);
+//     ASSERT_EQ(MAUS::Squeak::mout(err[i]), std::cout) << "errorLevel " << err[i]
 //                                                                    << " failed";
 //   }
 // }
@@ -63,153 +63,153 @@ class SqueakTest : public ::testing::Test {
 // test mout(Squeal::exceptionLevel)
 // TEST_F(SqueakTest, SqueakMoutExceptionTest) {
 //   std::stringstream sstr;
-//   Exceptions::Exception::exceptionLevel exc[] = {
+//   MAUS::Exceptions::Exception::exceptionLevel exc[] = {
 //     Exceptions::recoverable, Exceptions::nonRecoverable};
-//   Squeak::errorLevel err[] = {Squeak::error, Squeak::fatal};
+//   MAUS::Squeak::errorLevel err[] = {MAUS::Squeak::error, MAUS::Squeak::fatal};
 //   for (int i = 0; i < 2; ++i) {
-//     Squeak::setAnOutput(err[i], sstr);
-//     ASSERT_EQ(Squeak::mout(exc[i]), sstr);
-//     Squeak::setAnOutput(err[i], std::cout);
-//     ASSERT_EQ(Squeak::mout(exc[i]), std::cout);
+//     MAUS::Squeak::setAnOutput(err[i], sstr);
+//     ASSERT_EQ(MAUS::Squeak::mout(exc[i]), sstr);
+//     MAUS::Squeak::setAnOutput(err[i], std::cout);
+//     ASSERT_EQ(MAUS::Squeak::mout(exc[i]), std::cout);
 //   }
 // }
 
 // test mout()
 // TEST_F(SqueakTest, SqueakMoutDefaultTest) {
 //   std::stringstream sstr;
-//   Squeak::setAnOutput(Squeak::debug, sstr);
-//   ASSERT_EQ(Squeak::mout(), sstr);
-//   Squeak::setAnOutput(Squeak::debug, std::cout);
-//   ASSERT_EQ(Squeak::mout(), std::cout);
+//   MAUS::Squeak::setAnOutput(MAUS::Squeak::debug, sstr);
+//   ASSERT_EQ(MAUS::Squeak::mout(), sstr);
+//   MAUS::Squeak::setAnOutput(MAUS::Squeak::debug, std::cout);
+//   ASSERT_EQ(MAUS::Squeak::mout(), std::cout);
 // }
 
 void __TestStdOutputs(int test_value) {
     int i = test_value;
-    if (i > static_cast<int>(Squeak::debug)) {
-      EXPECT_EQ(std::cout.rdbuf(), Squeak::nullOut().rdbuf()) << test_value
-                          << " " << i << " " << static_cast<int>(Squeak::debug);
+    if (i > static_cast<int>(MAUS::Squeak::debug)) {
+      EXPECT_EQ(std::cout.rdbuf(), MAUS::Squeak::nullOut().rdbuf()) << test_value
+                          << " " << i << " " << static_cast<int>(MAUS::Squeak::debug);
     } else {
-      EXPECT_EQ(std::cout.rdbuf(), Squeak::coutOut().rdbuf()) << test_value
-                          << " " << i << " " << static_cast<int>(Squeak::debug);
+      EXPECT_EQ(std::cout.rdbuf(), MAUS::Squeak::coutOut().rdbuf()) << test_value
+                          << " " << i << " " << static_cast<int>(MAUS::Squeak::debug);
     }
-    if (i > static_cast<int>(Squeak::info)) {
-      EXPECT_EQ(std::clog.rdbuf(), Squeak::nullOut().rdbuf()) << test_value
-                          << " " << i << " " << static_cast<int>(Squeak::info);
+    if (i > static_cast<int>(MAUS::Squeak::info)) {
+      EXPECT_EQ(std::clog.rdbuf(), MAUS::Squeak::nullOut().rdbuf()) << test_value
+                          << " " << i << " " << static_cast<int>(MAUS::Squeak::info);
     } else {
-      EXPECT_EQ(std::clog.rdbuf(), Squeak::clogOut().rdbuf()) << test_value
-                          << " " << i << " " << static_cast<int>(Squeak::info);
+      EXPECT_EQ(std::clog.rdbuf(), MAUS::Squeak::clogOut().rdbuf()) << test_value
+                          << " " << i << " " << static_cast<int>(MAUS::Squeak::info);
     }
-    if (i > static_cast<int>(Squeak::error)) {
-      EXPECT_EQ(std::cerr.rdbuf(), Squeak::nullOut().rdbuf()) << test_value
-                          << " " << i << " " << static_cast<int>(Squeak::error);
+    if (i > static_cast<int>(MAUS::Squeak::error)) {
+      EXPECT_EQ(std::cerr.rdbuf(), MAUS::Squeak::nullOut().rdbuf()) << test_value
+                          << " " << i << " " << static_cast<int>(MAUS::Squeak::error);
     } else {
-      EXPECT_EQ(std::cerr.rdbuf(), Squeak::cerrOut().rdbuf()) << test_value
-                          << " " << i << " " << static_cast<int>(Squeak::error);
+      EXPECT_EQ(std::cerr.rdbuf(), MAUS::Squeak::cerrOut().rdbuf()) << test_value
+                          << " " << i << " " << static_cast<int>(MAUS::Squeak::error);
     }
 }
 
 TEST_F(SqueakTest, ActivateCoutTest) {
-  Squeak::activateCout(true);
-  EXPECT_EQ(std::cout.rdbuf(), Squeak::coutOut().rdbuf());
-  EXPECT_EQ(Squeak::coutIsActive(), true);
+  MAUS::Squeak::activateCout(true);
+  EXPECT_EQ(std::cout.rdbuf(), MAUS::Squeak::coutOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::coutIsActive(), true);
 
-  Squeak::activateCout(false);
-  EXPECT_EQ(std::cout.rdbuf(), Squeak::nullOut().rdbuf());
-  EXPECT_EQ(Squeak::coutIsActive(), false);
+  MAUS::Squeak::activateCout(false);
+  EXPECT_EQ(std::cout.rdbuf(), MAUS::Squeak::nullOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::coutIsActive(), false);
   std::cout << "IF YOU SEE THIS THERE IS AN ERROR" << std::endl;
 
-  Squeak::activateCout(true);
-  EXPECT_EQ(std::cout.rdbuf(), Squeak::coutOut().rdbuf());
-  EXPECT_EQ(Squeak::coutIsActive(), true);
+  MAUS::Squeak::activateCout(true);
+  EXPECT_EQ(std::cout.rdbuf(), MAUS::Squeak::coutOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::coutIsActive(), true);
 }
 
 TEST_F(SqueakTest, ActivateClogTest) {
-  Squeak::activateClog(true);
-  EXPECT_EQ(std::clog.rdbuf(), Squeak::clogOut().rdbuf());
-  EXPECT_EQ(Squeak::clogIsActive(), true);
+  MAUS::Squeak::activateClog(true);
+  EXPECT_EQ(std::clog.rdbuf(), MAUS::Squeak::clogOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::clogIsActive(), true);
 
-  Squeak::activateClog(false);
-  EXPECT_EQ(std::clog.rdbuf(), Squeak::nullOut().rdbuf());
-  EXPECT_EQ(Squeak::clogIsActive(), false);
+  MAUS::Squeak::activateClog(false);
+  EXPECT_EQ(std::clog.rdbuf(), MAUS::Squeak::nullOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::clogIsActive(), false);
   std::clog << "IF YOU SEE THIS THERE IS AN ERROR" << std::endl;
 
-  Squeak::activateClog(true);
-  EXPECT_EQ(std::clog.rdbuf(), Squeak::clogOut().rdbuf());
-  EXPECT_EQ(Squeak::clogIsActive(), true);
+  MAUS::Squeak::activateClog(true);
+  EXPECT_EQ(std::clog.rdbuf(), MAUS::Squeak::clogOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::clogIsActive(), true);
 }
 
 TEST_F(SqueakTest, ActivateCerrTest) {
-  Squeak::activateCerr(true);
-  EXPECT_EQ(std::cerr.rdbuf(), Squeak::cerrOut().rdbuf());
-  EXPECT_EQ(Squeak::cerrIsActive(), true);
+  MAUS::Squeak::activateCerr(true);
+  EXPECT_EQ(std::cerr.rdbuf(), MAUS::Squeak::cerrOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::cerrIsActive(), true);
 
-  Squeak::activateCerr(false);
-  EXPECT_EQ(std::cerr.rdbuf(), Squeak::nullOut().rdbuf());
-  EXPECT_EQ(Squeak::cerrIsActive(), false);
+  MAUS::Squeak::activateCerr(false);
+  EXPECT_EQ(std::cerr.rdbuf(), MAUS::Squeak::nullOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::cerrIsActive(), false);
   std::cerr << "IF YOU SEE THIS THERE IS AN ERROR" << std::endl;
 
-  Squeak::activateCerr(true);
-  EXPECT_EQ(std::cerr.rdbuf(), Squeak::cerrOut().rdbuf());
-  EXPECT_EQ(Squeak::cerrIsActive(), true);
+  MAUS::Squeak::activateCerr(true);
+  EXPECT_EQ(std::cerr.rdbuf(), MAUS::Squeak::cerrOut().rdbuf());
+  EXPECT_EQ(MAUS::Squeak::cerrIsActive(), true);
 }
 
 TEST_F(SqueakTest, SetStandardOutputsTest) {
   for (int i = 0; i < 6; ++i) {
-    Squeak::setStandardOutputs(i);
+    MAUS::Squeak::setStandardOutputs(i);
     __TestStdOutputs(i);
   }
   for (int i = 6; i > -1; --i) {
-    Squeak::setStandardOutputs(i);
+    MAUS::Squeak::setStandardOutputs(i);
     __TestStdOutputs(i);
   }
 }
 
 void __TestOutputs(int test_value) {
     int i = test_value;
-    if (i > static_cast<int>(Squeak::debug)) {
-      EXPECT_EQ(Squeak::mout(Squeak::debug).rdbuf(), Squeak::nullOut().rdbuf())
-           << test_value << " " << i << " " << static_cast<int>(Squeak::debug);
+    if (i > static_cast<int>(MAUS::Squeak::debug)) {
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::debug).rdbuf(), MAUS::Squeak::nullOut().rdbuf())
+           << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::debug);
     } else {
-      EXPECT_EQ(Squeak::mout(Squeak::debug).rdbuf(), Squeak::coutOut().rdbuf())
-            << test_value << " " << i << " " << static_cast<int>(Squeak::debug);
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::debug).rdbuf(), MAUS::Squeak::coutOut().rdbuf())
+            << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::debug);
     }
-    if (i > static_cast<int>(Squeak::info)) {
-      EXPECT_EQ(Squeak::mout(Squeak::info).rdbuf(), Squeak::nullOut().rdbuf())
-           << test_value << " " << i << " " << static_cast<int>(Squeak::info);
+    if (i > static_cast<int>(MAUS::Squeak::info)) {
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::info).rdbuf(), MAUS::Squeak::nullOut().rdbuf())
+           << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::info);
     } else {
-      EXPECT_EQ(Squeak::mout(Squeak::info).rdbuf(), Squeak::clogOut().rdbuf())
-            << test_value << " " << i << " " << static_cast<int>(Squeak::info);
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::info).rdbuf(), MAUS::Squeak::clogOut().rdbuf())
+            << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::info);
     }
-    if (i > static_cast<int>(Squeak::warning)) {
-      EXPECT_EQ(Squeak::mout(Squeak::warning).rdbuf(), Squeak::nullOut().rdbuf())
-           << test_value << " " << i << " " << static_cast<int>(Squeak::warning);
+    if (i > static_cast<int>(MAUS::Squeak::warning)) {
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::warning).rdbuf(), MAUS::Squeak::nullOut().rdbuf())
+           << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::warning);
     } else {
-      EXPECT_EQ(Squeak::mout(Squeak::warning).rdbuf(), Squeak::cerrOut().rdbuf())
-            << test_value << " " << i << " " << static_cast<int>(Squeak::warning);
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::warning).rdbuf(), MAUS::Squeak::cerrOut().rdbuf())
+            << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::warning);
     }
-    if (i > static_cast<int>(Squeak::error)) {
-      EXPECT_EQ(Squeak::mout(Squeak::error).rdbuf(), Squeak::nullOut().rdbuf())
-           << test_value << " " << i << " " << static_cast<int>(Squeak::error);
+    if (i > static_cast<int>(MAUS::Squeak::error)) {
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::error).rdbuf(), MAUS::Squeak::nullOut().rdbuf())
+           << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::error);
     } else {
-      EXPECT_EQ(Squeak::mout(Squeak::error).rdbuf(), Squeak::cerrOut().rdbuf())
-            << test_value << " " << i << " " << static_cast<int>(Squeak::error);
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::error).rdbuf(), MAUS::Squeak::cerrOut().rdbuf())
+            << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::error);
     }
-    if (i > static_cast<int>(Squeak::fatal)) {
-      EXPECT_EQ(Squeak::mout(Squeak::fatal).rdbuf(), Squeak::nullOut().rdbuf())
-           << test_value << " " << i << " " << static_cast<int>(Squeak::fatal);
+    if (i > static_cast<int>(MAUS::Squeak::fatal)) {
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::fatal).rdbuf(), MAUS::Squeak::nullOut().rdbuf())
+           << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::fatal);
     } else {
-      EXPECT_EQ(Squeak::mout(Squeak::fatal).rdbuf(), Squeak::cerrOut().rdbuf())
-            << test_value << " " << i << " " << static_cast<int>(Squeak::fatal);
+      EXPECT_EQ(MAUS::Squeak::mout(MAUS::Squeak::fatal).rdbuf(), MAUS::Squeak::cerrOut().rdbuf())
+            << test_value << " " << i << " " << static_cast<int>(MAUS::Squeak::fatal);
     }
 }
 
 TEST_F(SqueakTest, SetOutputsTest) {
   for (int i = 0; i < 6; ++i) {
-    Squeak::setOutputs(i);
+    MAUS::Squeak::setOutputs(i);
     __TestOutputs(i);
   }
   for (int i = 6; i > -1; --i) {
-    Squeak::setOutputs(i);
+    MAUS::Squeak::setOutputs(i);
     __TestOutputs(i);
   }
 }

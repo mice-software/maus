@@ -22,8 +22,9 @@
 
 #include "json/json.h"
 
+#include "Utils/Squeak.hh"
+
 // legacy classes outside the MAUS namespace
-class Squeak;
 class dataCards;
 class MICERun;
 class MiceModule;
@@ -31,7 +32,6 @@ class BTFieldConstructor;
 
 namespace MAUS {
 
-typedef Squeak Logging;
 class RunActionManager;
 class CppErrorHandler;
 class GeometryNavigator;

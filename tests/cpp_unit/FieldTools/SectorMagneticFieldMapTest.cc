@@ -33,11 +33,11 @@ TEST(SectorMagneticFieldMapTest, TestReadToscaMapNoSymmetry) {
     std::string map_file = SECTORMAGNETICMAP;
 
     ASSERT_THROW(SectorMagneticFieldMapIO::ReadMap
-                               (map_file, "Nonsense", units, "Dipole"), Exceptions::Exception);
+                  (map_file, "Nonsense", units, "Dipole"), MAUS::Exceptions::Exception);
     ASSERT_THROW(SectorMagneticFieldMapIO::ReadMap
-                         ("Nonsense", "tosca_sector_1", units, "Dipole"), Exceptions::Exception);
+                  ("Nonsense", "tosca_sector_1", units, "Dipole"), MAUS::Exceptions::Exception);
     ASSERT_THROW(SectorMagneticFieldMapIO::ReadMap
-                         (map_file, "tosca_sector_1", units, "nonsense"), Exceptions::Exception);
+                  (map_file, "tosca_sector_1", units, "nonsense"), MAUS::Exceptions::Exception);
 
 
     Interpolator3dGridTo3d* interpolator_none = SectorMagneticFieldMapIO::

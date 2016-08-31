@@ -42,7 +42,7 @@ TEST(ObjectMapProcessorsTest, ObjectMapValueJsonToCppBadValueTest) {
     ObjectMapValueProcessor<int> test(new IntProcessor());
     Json::Value value_in;
     value_in["one"] = "bob";
-    EXPECT_THROW(test.JsonToCpp(value_in), Exceptions::Exception);
+    EXPECT_THROW(test.JsonToCpp(value_in), MAUS::Exceptions::Exception);
 }
 
 TEST(ObjectMapProcessorsTest, ObjectMapValueJsonToCppNullTest) {
@@ -56,7 +56,7 @@ TEST(ObjectMapProcessorsTest, ObjectMapValueJsonToCppNullTest) {
 TEST(ObjectMapProcessorsTest, ObjectMapValueJsonToCppBadTypeTest) {
     ObjectMapValueProcessor<int> test(new IntProcessor());
     Json::Value value_in(1);
-    EXPECT_THROW(test.JsonToCpp(value_in), Exceptions::Exception);
+    EXPECT_THROW(test.JsonToCpp(value_in), MAUS::Exceptions::Exception);
 }
 
 TEST(ObjectMapProcessorsTest, ObjectMapValueCppToJsonTest) {

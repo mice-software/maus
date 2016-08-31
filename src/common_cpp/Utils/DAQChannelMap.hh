@@ -57,7 +57,8 @@ class DAQChannelKey {
   bool operator!=( DAQChannelKey key );
 
   friend std::ostream& operator<< ( std::ostream& stream, DAQChannelKey key );
-  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key )  throw(Exceptions::Exception);
+  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key )
+      throw(Exceptions::Exception);
 
   std::string detector() {return _detector;}
 

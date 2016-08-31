@@ -63,13 +63,13 @@ TEST(RunActionManagerTest, TestPushBack) {
     delete data_run;
     ASSERT_EQ(RunActionTest::reference_count, 0);
     data_run = new RunActionManager();
-    EXPECT_THROW(data_run->PushBack(NULL), Exceptions::Exception);
+    EXPECT_THROW(data_run->PushBack(NULL), MAUS::Exceptions::Exception);
     delete data_run;
 
     RunActionTest* data_run_action = new RunActionTest();
     data_run = new RunActionManager();
     data_run->PushBack(data_run_action);
-    EXPECT_THROW(data_run->PushBack(data_run_action), Exceptions::Exception);
+    EXPECT_THROW(data_run->PushBack(data_run_action), MAUS::Exceptions::Exception);
     delete data_run;
 }
 
@@ -126,10 +126,10 @@ TEST(RunActionManagerTest, TestSwap) {
     EXPECT_EQ(run_action_2->_my_run_number, 11);
 
     // run_action_1 is not in data_run
-    EXPECT_THROW(data_run->Swap(run_action_1, run_action_3), Exceptions::Exception);
+    EXPECT_THROW(data_run->Swap(run_action_1, run_action_3), MAUS::Exceptions::Exception);
     data_run->PushBack(run_action_3);
     // run_action_3 is already in data_run
-    EXPECT_THROW(data_run->Swap(run_action_2, run_action_3), Exceptions::Exception);
+    EXPECT_THROW(data_run->Swap(run_action_2, run_action_3), MAUS::Exceptions::Exception);
     delete data_run;
     delete run_action_1;
 }

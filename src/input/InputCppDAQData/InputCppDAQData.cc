@@ -47,7 +47,8 @@ InputCppDAQData::InputCppDAQData() : InputBase<MAUS::Data>("InputCppDAQData") {
 
 void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   if ( _dataFileManager.GetNFiles() ) {
-     throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING", "InputCppDAQData::_childbirth"));
+     throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING",
+                                      "InputCppDAQData::_childbirth"));
   }
 
   //  JsonCpp setup
@@ -57,7 +58,8 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING", "InputCppDAQData::_childbirth"));
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING",
+                                      "InputCppDAQData::_childbirth"));
   }
 
   // Comfigure the V830 (scaler) data processor.

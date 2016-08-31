@@ -53,8 +53,9 @@ namespace MAUS {
     } else if ( test_method == "helix" ) {
       _test_method = 1;
     } else {
-      throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable, "Unknown Test Method for virtual digitiser",
-                                                 "MapCppTrackerVirtualsDigitization::_birth(...)");
+      throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
+                                        "Unknown Test Method for virtual digitiser",
+                                        "MapCppTrackerVirtualsDigitization::_birth(...)");
     }
 
     Json::Value& straight_desc = (*json)["SciFiTestVirtualTracksStraight"];

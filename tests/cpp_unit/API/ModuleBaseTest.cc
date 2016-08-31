@@ -46,13 +46,13 @@ namespace MAUS {
     testclass_maus_exception(): ModuleBase("TestClass") {}
   private:
     virtual void _birth(const std::string&) {
-      throw Exceptions::Exception(Exceptions::recoverable,
-		   "Expected Test Exceptions::Exception in _birth",
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
+		   "Expected Test MAUS::Exceptions::Exception in _birth",
 		   "void _birth (const std::string&)");
     }
     virtual void _death() {
-      throw Exceptions::Exception(Exceptions::recoverable,
-		   "Expected Test Exceptions::Exception in _death",
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
+		   "Expected Test MAUS::Exceptions::Exception in _death",
 		   "void _death ()");
     }
 

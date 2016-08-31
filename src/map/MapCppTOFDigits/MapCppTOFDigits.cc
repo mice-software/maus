@@ -281,7 +281,7 @@ bool MapCppTOFDigits::findTrigger(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
 
 ////////////////////////////////////////////////////////////
 bool MapCppTOFDigits::findTriggerReq(MAUS::TOFDigit *digit, MAUS::V1290 &tdc,
-                                  MAUS::V1290Array &tr_req_hits) const  throw(Exceptions::Exception) {
+       MAUS::V1290Array &tr_req_hits) const  throw(Exceptions::Exception) {
   int n_tr_hits = tr_req_hits.size();
 
   int xGeo = tdc.GetGeo();

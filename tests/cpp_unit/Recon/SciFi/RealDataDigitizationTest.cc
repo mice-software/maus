@@ -34,7 +34,7 @@ class RealDataDigitizationTest : public ::testing::Test {
 
 TEST_F(RealDataDigitizationTest, test_calibration_load) {
   RealDataDigitization test_case_1;
-  EXPECT_THROW(test_case_1.load_calibration("nonsense.txt"), Exceptions::Exception);
+  EXPECT_THROW(test_case_1.load_calibration("nonsense.txt"), MAUS::Exceptions::Exception);
   RealDataDigitization test_case_2;
   bool good_calib = test_case_2.load_calibration("scifi_calibration_jan2013.txt");
   EXPECT_TRUE(good_calib);
@@ -57,7 +57,7 @@ TEST_F(RealDataDigitizationTest, test_calibration_load) {
 
 TEST_F(RealDataDigitizationTest, test_mapping_load) {
   RealDataDigitization test_case;
-  EXPECT_THROW(test_case.load_mapping("nonsense.txt"), Exceptions::Exception);
+  EXPECT_THROW(test_case.load_mapping("nonsense.txt"), MAUS::Exceptions::Exception);
   bool good_map = test_case.load_mapping("scifi_mapping_7.txt");
   EXPECT_TRUE(good_map);
   int missing_channel_counter = 0;
