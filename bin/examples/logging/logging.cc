@@ -84,6 +84,17 @@ int main(int argc, char *argv[]) {
   irstream infile(filename.c_str(), "Spill");
   MAUS::Data data;
 
+  // Test each stream
+  std::cout << "I am cout" << std::endl;
+  std::clog << "I am clog" << std::endl;
+  std::cerr << "I am cerr" << std::endl;
+
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "I am debug" << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::info) << "I am info" << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::warning) << "I am warning" << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::error) << "I am error" << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::fatal) << "I am fatal" << std::endl;
+
   // Loop over all spills
   while ( infile >> readEvent != NULL ) {
     infile >> branchName("data") >> data;
