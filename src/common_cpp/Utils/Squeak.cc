@@ -32,7 +32,7 @@ Squeak* Squeak::instance        = NULL;
 
 const Squeak::errorLevel Squeak::default_error_level = Squeak::warning;
 const int Squeak::default_log_level = 0;
-std::string Squeak::logname = "tmp/maus.log";
+std::string Squeak::logname = "maus.log";
 
 std::map<Squeak::errorLevel, std::ostream*> Squeak::output;
 
@@ -76,15 +76,16 @@ Squeak * Squeak::getInstance() {
 
 void Squeak::setOutputs(int verboseLevel, int logLevel) {
   getInstance();
+  setLog(logLevel);
   std::ostream* out[5] = {stdout, stdlog, stderr, stderr, stderr};
   for (int i = 0; i <= fatal; ++i) {
     if (i >= verboseLevel)
       output[Squeak::errorLevel(i)] = out[i];
+    else if (logLevel > 1)
+      output[Squeak::errorLevel(i)] = mauslog;
     else
       output[Squeak::errorLevel(i)] = voidout;
   }
-  // Logging is not determined by the verbosity level so do separately
-  setLog(logLevel);
 }
 
 void Squeak::setLog(int logLevel) {

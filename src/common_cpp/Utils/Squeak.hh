@@ -74,7 +74,8 @@ class Squeak {
   static void setAnOutput(errorLevel level, std::ostream& out);
 
   /** Set the ostream for all items below "verboseLevel" to /dev/null
-   *  If verboseLevel is less than or equal to
+   *  or the log file (if the logLevel is set to 2)
+   *  If verboseLevel is less than or equal to:
    *   - Squeak::debug then mout(Squeak::debug) redirects to std::cout
    *   - Squeak::info then mout(Squeak::info) redirects to std::clog
    *   - Squeak::warning then mout(Squeak::warning) redirects to std::cerr
@@ -85,10 +86,10 @@ class Squeak {
   static void setOutputs(int verboseLevel, int logLevel);
 
   /** Turn on/off std::cout, std::cerr, std::clog
-   * Set standard outputs to /dev/null depending on verboseLevel:
-   * - if verboseLevel > int(Squeak::debug), set std::cout to /dev/null
-   * - if verboseLevel > int(Squeak::info), set std::clog to /dev/null
-   * - if verboseLevel > int(Squeak::warning), set std::cerr to /dev/null
+   * Redirect the standard outputs to /dev/null or log file depending on verboseLevel and logLevel:
+   * - if verboseLevel > int(Squeak::debug), set std::cout to /dev/null or log file
+   * - if verboseLevel > int(Squeak::info), set std::clog to /dev/null or log file
+   * - if verboseLevel > int(Squeak::warning), set std::cerr to /dev/null or log file
    * GEANT4 has very verbose output that hides important run control info, so
    * we can just turn it off by redirecting std::cout here.
    */
@@ -96,12 +97,19 @@ class Squeak {
 
   /** Set up  the log file stream
    *  - if logLevel = 0 then Squeak::log will go to /dev/null
-   *  - if logLevel > 0 an output file will be open and streamed to
+   *  - if logLevel = 1 file opened and Squeak::log will go there
+   *  - if logLevel = 2 file opened, Squeak::log and any other streams not going to screen go there
    */
   static void setLog(int logLevel);
 
   /** Close the log file and free the memory */
   static void closeLog();
+
+  /** Return the log file name */
+  static std::string getLogName() { return logname; }
+
+  /** Set the log file name */
+  static void setLogName(std::string aLogname) { logname = aLogname; }
 
   /** Activate std::cout
    *  If isActive is false, redirects std::cout to /dev/null; if isActive is
