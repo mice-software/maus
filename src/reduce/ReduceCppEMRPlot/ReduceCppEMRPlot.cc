@@ -18,7 +18,7 @@
 #include <Python.h>
 
 #include "src/legacy/Interface/STLUtils.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/reduce/ReduceCppEMRPlot/ReduceCppEMRPlot.hh"
 
@@ -39,7 +39,7 @@ ReduceCppEMRPlot::~ReduceCppEMRPlot() {
 void ReduceCppEMRPlot::_birth(const std::string& argJsonConfigDocument) {
 
   if (!_output) {
-    throw MAUS::Exception(Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
                           "The output is disconnected.",
                           "ReduceCppEMRPlot::_birth");
   }
@@ -274,11 +274,11 @@ void ReduceCppEMRPlot::_death() {}
 void ReduceCppEMRPlot::_process(MAUS::Data* data) {
 
   if ( !data )
-    throw Exception(Exception::recoverable, "Data was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                     "ReduceCppEMRPlot::_process");
 
   if ( !data->GetSpill() )
-    throw Exception(Exception::recoverable, "Spill was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                     "ReduceCppEMRPlot::_process");
 
   std::string evType = data->GetSpill()->GetDaqEventType();
@@ -286,7 +286,7 @@ void ReduceCppEMRPlot::_process(MAUS::Data* data) {
      return;
 
   if ( !data->GetSpill()->GetReconEvents() )
-     throw Exception(Exception::recoverable, "ReconEvents were NULL",
+     throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
                         "ReduceCppEMRPlot::_process");
 
   int xRun = data->GetSpill()->GetRunNumber();

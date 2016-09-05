@@ -118,7 +118,7 @@ TEST_F(VectorTest, Subvector) {
   try {
     d_mv0.subvector(0, 1);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   size_t sub1 = 2, sub2 = 3;
@@ -132,7 +132,7 @@ TEST_F(VectorTest, Subvector) {
   try {
     c_mv0.subvector(0, 1);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   Vector<MAUS::complex> c_mv_sub = c_mv4.subvector(sub1, sub2);
@@ -147,27 +147,27 @@ TEST_F(VectorTest, Indexing) {
   try {
     d_mv0[0];
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     const double test_vector = d_mv0[0];
     std::cout << test_vector;  // eliminate unused variable warning
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     d_mv0(1);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     const double test_vector = d_mv0(1);
     std::cout << test_vector;  // eliminate unused variable warning
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   for (size_t i = 0; i < d_mv2.size(); ++i) ASSERT_TRUE(d_mv2(i+1) == 4.);
@@ -186,7 +186,7 @@ TEST_F(VectorTest, Indexing) {
   try {
     c_mv0[0];
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
@@ -194,13 +194,13 @@ TEST_F(VectorTest, Indexing) {
     // eliminate unused variable warning
     std::cout << real(test_vector) << imag(test_vector);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     c_mv0(1);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
@@ -208,7 +208,7 @@ TEST_F(VectorTest, Indexing) {
     // eliminate unused variable warning
     std::cout << real(test_vector) << imag(test_vector);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   for (size_t i = 0; i < c_mv3.size(); ++i) ASSERT_TRUE(c_mv3(i+1) == ca[i]);
@@ -279,7 +279,7 @@ TEST_F(VectorTest, Assignment) {
   try {
     empty_d_vector = d_mv0;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   // bad assignment of differently sized vector
@@ -287,7 +287,7 @@ TEST_F(VectorTest, Assignment) {
   try {
     d_mv2 = d_mv4;  // d_mv2.size() is 4 while d_mv4.size() is 3
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   Vector<double> vector_d0 = d_mv3;
@@ -307,7 +307,7 @@ TEST_F(VectorTest, Assignment) {
   try {
     empty_c_vector = c_mv0;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   // bad assignment of differently sized vector
@@ -315,7 +315,7 @@ TEST_F(VectorTest, Assignment) {
   try {
     c_mv2 = c_mv4;  // c_mv2.size() is 4 while c_mv4.size() is 3
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   Vector<MAUS::complex> vector_c0 = c_mv3;
@@ -339,13 +339,13 @@ TEST_F(VectorTest, Multiplication) {
   try {
     test_d_vector *= d_mv2;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     test_d_vector * d_mv0;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   test_d_vector *= d_mv4;  // {2., 2., 2.} * {1., 2., 3.}
@@ -376,13 +376,13 @@ TEST_F(VectorTest, Multiplication) {
   try {
     test_c_vector *= c_mv2;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     test_c_vector * c_mv0;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   // {(2.,1.), (2.,1.), (2.,1.)} * {(1.,-1.), (2.,0.), (3.,1.)}
@@ -424,13 +424,13 @@ TEST_F(VectorTest, Division) {
   try {
     test_d_vector /= d_mv2;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     test_d_vector / d_mv0;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   test_d_vector /= d_mv4;  // {2., 2., 2.} / {1., 2., 3.}
@@ -457,13 +457,13 @@ TEST_F(VectorTest, Division) {
   try {
     test_c_vector /= c_mv2;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
   testpass = true;
   try {
     test_c_vector / c_mv0;
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   EXPECT_TRUE(testpass);
 
   // {(2.,1.), (2.,1.), (2.,1.)} / {(1.,-1.), (2.,0.), (3.,1.)}

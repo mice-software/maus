@@ -98,6 +98,28 @@ std::vector<DataStructure::Global::Track*>* GetSpillDetectorTracks(Spill* spill,
   return detector_tracks;
 }
 
+std::vector<DataStructure::Global::Track*>* GetEventDetectorTracks(GlobalEvent* global_event,
+    DataStructure::Global::DetectorPoint detector, std::string mapper_name) {
+  std::vector<DataStructure::Global::Track*>* detector_tracks = new
+      std::vector<DataStructure::Global::Track*>;
+  if (global_event) {
+    std::vector<DataStructure::Global::Track*>* global_tracks =
+        global_event->get_tracks();
+    for (auto track_iter = global_tracks->begin();
+         track_iter != global_tracks->end();
+         ++track_iter) {
+      // The third condition is a bit of a dirty hack here to make sure that
+      // if we select for EMR tracks, we only get primaries.
+      if (((*track_iter)->HasDetector(detector)) and
+          ((*track_iter)->get_mapper_name() == mapper_name) and
+          ((*track_iter)->get_emr_range_secondary() < 0.001)) {
+        detector_tracks->push_back((*track_iter));
+      }
+    }
+  }
+  return detector_tracks;
+}
+
 std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     Spill* spill, DataStructure::Global::DetectorPoint detector) {
   std::vector<DataStructure::Global::SpacePoint*>* spill_spacepoints =
@@ -124,6 +146,28 @@ std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     return spill_spacepoints;
   } else {
     delete spill_spacepoints;
+    return 0;
+  }
+}
+
+std::vector<DataStructure::Global::SpacePoint*>* GetEventSpacePoints(
+    GlobalEvent* global_event, DataStructure::Global::DetectorPoint detector) {
+  std::vector<DataStructure::Global::SpacePoint*>* spacepoints =
+      new std::vector<DataStructure::Global::SpacePoint*>;
+  if (global_event) {
+    std::vector<DataStructure::Global::SpacePoint*>* temp_spacepoints =
+        global_event->get_space_points();
+    for (auto sp_iter = temp_spacepoints->begin(); sp_iter != temp_spacepoints->end();
+         ++sp_iter) {
+      if ((*sp_iter)->get_detector() == detector) {
+        spacepoints->push_back(*sp_iter);
+      }
+    }
+  }
+  if (spacepoints->size() > 0) {
+    return spacepoints;
+  } else {
+    delete spacepoints;
     return 0;
   }
 }
@@ -265,7 +309,7 @@ void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
                bool energy_loss) {
   if (std::abs(target_z) > 100000) {
-    throw(Exception(Exception::recoverable, "Extreme target z",
+    throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
                     "GlobalTools::propagate"));
   }
   if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
@@ -273,7 +317,7 @@ void propagate(double* x, double target_z, const BTField* field,
     std::stringstream ios;
     ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
         << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-    throw(Exception(Exception::recoverable, ios.str()+
+    throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
           "Some components of tracker trackpoint are nan", "GlobalTools::propagate"));
   }
   int prop_dir = 1;
@@ -369,7 +413,7 @@ void propagate(double* x, double target_z, const BTField* field,
                                         target_z, &h, x);
     }
     if (status != GSL_SUCCESS) {
-      throw(Exception(Exception::recoverable, "Propagation failed",
+      throw(Exceptions::Exception(Exceptions::recoverable, "Propagation failed",
                             "GlobalTools::propagate"));
     }
 
@@ -378,7 +422,7 @@ void propagate(double* x, double target_z, const BTField* field,
       ios << "Stopping at step " << n_steps << " of " << max_steps << "\n"
           << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
           << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Exceeded maximum number of steps", "GlobalTools::propagate"));
       break;
     }
@@ -387,14 +431,14 @@ void propagate(double* x, double target_z, const BTField* field,
     if (std::abs(x[1]) > 700 || std::abs(x[2]) > 700) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
     // Need to catch the case where the particle is stopped
     if (std::abs(x[4]) < (mass + 0.01)) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
   }

@@ -39,7 +39,7 @@ void MapCppCkovDigits::_birth(const std::string& argJsonConfigDocument) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
               "Could not find the $MAUS_ROOT_DIR environmental variable.",
               "MapCppCkovDigits::_birth");
   }

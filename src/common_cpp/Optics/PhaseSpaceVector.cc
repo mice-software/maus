@@ -39,7 +39,7 @@ PhaseSpaceVector::PhaseSpaceVector()
 PhaseSpaceVector::PhaseSpaceVector(const Vector<double>& original_instance)
     : Vector<double>() {
   if (original_instance.size() < 6) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Attempted to construct with a Vector<double> containing "
                  "fewer than six elements",
                  "PhaseSpaceVector::PhaseSpaceVector(Vector<double>)"));

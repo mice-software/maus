@@ -19,6 +19,7 @@
 #include <string>
 
 #include "JsonCppStreamer/ORStream.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 
   orstream::orstream(const char* fileName,
@@ -35,38 +36,38 @@
 		      const char* treeTitle,
 		      const char* mode) {
 
-    Squeak::mout(Squeak::debug)
+    MAUS::Squeak::mout(MAUS::Squeak::debug)
                     << "Opening TFile " << fileName << std::endl;
     if ( !strcmp(fileName, "") ) {
-      Squeak::mout(Squeak::error)
+      MAUS::Squeak::mout(MAUS::Squeak::error)
         << "Couldn't open ROOT TFile as no filename given"
         << std::endl;
-      throw MAUS::Exception(MAUS::Exception::recoverable,
+      throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
 		   "Cannot open file as null \"\" string passed as filename",
 		   "void orstream::open(const char*, const char*, const char*, const char*)");
     }
 
     m_file = new TFile(fileName, mode);
     if (!m_file) {
-      Squeak::mout(Squeak::error)
+      MAUS::Squeak::mout(MAUS::Squeak::error)
         << "ROOT TFile opened incorrectly"
         << std::endl;
-      throw MAUS::Exception(MAUS::Exception::recoverable,
+      throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
 		   "TFile object not opened properly",
 		   "void orstream::open(const char*, const char*, const char*, const char*)");
     }
     TObject* tree_search = m_file->Get(treeName);
     if (tree_search != NULL) {
         if (strcmp(tree_search->ClassName(), "TTree") != 0)
-            throw(MAUS::Exception(MAUS::Exception::recoverable,
+            throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                  "Attempt to open TTree with existing non-tree object in the way",
                  "void orstream::open(...)"));
-        Squeak::mout(Squeak::debug)
+        MAUS::Squeak::mout(MAUS::Squeak::debug)
                 << "Opening TFile using existing tree " << treeName << std::endl;
         m_tree = static_cast<TTree*>(tree_search);
     } else {
         m_tree = new TTree(treeName, treeTitle);
-        Squeak::mout(Squeak::debug)
+        MAUS::Squeak::mout(MAUS::Squeak::debug)
                     << "Opening TFile using new tree " << treeName << std::endl;
     }
     snprintf(m_branchName, sizeof(m_branchName), "%s", "");
@@ -79,7 +80,8 @@
     m_file->cd();
     m_tree->Write(m_tree->GetName(), TTree::kWriteDelete);
     m_file->Close();
-    Squeak::mout(Squeak::info) << "Written " << m_evtCount << " event(s) to file." << std::endl;
+    MAUS::Squeak::mout(MAUS::Squeak::info)
+      << "Written " << m_evtCount << " event(s) to file." << std::endl;
     snprintf(m_branchName, sizeof(m_branchName), "%s", "");
 
     if (m_file) {

@@ -32,7 +32,7 @@ namespace global {
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
     if (!pMAUS_ROOT_DIR) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
 		      "Could not find the $MAUS_ROOT_DIR environmental ",
 		      "variable, Recon::Global::PIDBase::PIDBase()"));
     }
@@ -56,7 +56,7 @@ namespace global {
     _directory = std::string(hypDirectory);
     _writeFile = new TFile(pidFile, "RECREATE");
     if (_writeFile->IsZombie()) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
 		      "File to write histograms to failed to be created.",
 		      "Recon::Global::PIDBase::PIDBase()"));
     }

@@ -150,7 +150,7 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
     const Json::Value& json_object) {
     if (json_object.type() != Json::objectValue) {
         std::string tp = JsonWrapper::ValueTypeToString(json_object.type());
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Attempt to pass a json "+tp+" type as an object",
                      "ObjectProcessor<ObjectType>::JsonToCpp"));
     }
@@ -163,7 +163,7 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
                 unknown += *it+" ";
             }
         }
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Failed to recognise all json properties "+unknown,
                      "ObjectProcessor<ObjectType>::JsonToCpp"));
     }
@@ -171,7 +171,7 @@ ObjectType* ObjectProcessor<ObjectType>::JsonToCpp(
     for (my_iter it = _items.begin(); it != _items.end(); ++it) {
         try {
             it->second->SetCppChild(json_object, *cpp_object);
-        } catch (Exception exc) {
+        } catch (Exceptions::Exception exc) {
             delete cpp_object;
             exc.SetMessage("In branch "+it->first+"\n"
                             +exc.GetMessage());
@@ -189,7 +189,7 @@ Json::Value* ObjectProcessor<ObjectType>::CppToJson
     for (my_iter it = _items.begin(); it != _items.end(); ++it) {
         try {
             it->second->SetJsonChild(cpp_object, *json_object);
-        } catch (Exception exc) {
+        } catch (Exceptions::Exception exc) {
             delete json_object;
             exc.SetMessage("In branch "+it->first+"\n"
                             +exc.GetMessage());
@@ -211,7 +211,7 @@ bool ObjectProcessor<ObjectType>::HasUnknownBranches
                                               (const Json::Value& value) const {
     if (!value.isObject()) {
         std::string tp = JsonWrapper::ValueTypeToString(value.type());
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Comparison value must be a json object type - found "+tp,
                      "ObjectProcessor::HasUnknownBranches(...)"));
     }

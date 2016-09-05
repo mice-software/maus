@@ -37,7 +37,7 @@
 #include <vector>
 
 // Other headers
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/common_cpp/API/MapBase.hh"
 

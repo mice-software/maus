@@ -49,7 +49,7 @@ class DAQChannelKey {
   DAQChannelKey(int l, int g, int ch, int e, std::string d)
   :_ldcId(l), _geo(g), _channel(ch), _eqType(e), _detector(d) {}
 
-  explicit DAQChannelKey(std::string keyStr) throw(Exception);
+  explicit DAQChannelKey(std::string keyStr) throw(Exceptions::Exception);
 
   virtual ~DAQChannelKey() {}
 
@@ -57,7 +57,8 @@ class DAQChannelKey {
   bool operator!=( DAQChannelKey key );
 
   friend std::ostream& operator<< ( std::ostream& stream, DAQChannelKey key );
-  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key )  throw(Exception);
+  friend std::istream& operator>> ( std::istream& stream, DAQChannelKey &key )
+      throw(Exceptions::Exception);
 
   std::string detector() {return _detector;}
 

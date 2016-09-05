@@ -29,7 +29,7 @@
 #include "src/common_cpp/DataStructure/ImageData/ImageData.hh"
 #include "src/common_cpp/DataStructure/ImageData/Image.hh"
 #include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/reduce/ReduceCppKLPlot/ReduceCppKLPlot.hh"
 
 
@@ -51,7 +51,7 @@ ReduceCppKLPlot::~ReduceCppKLPlot() {
 void ReduceCppKLPlot::_birth(const std::string& str_config) {
 
   if (!_output) {
-    throw MAUS::Exception(Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
                           "The output is disconnected.",
                           "ReduceCppKLPlot::_birth");
   }
@@ -123,11 +123,11 @@ void ReduceCppKLPlot::_death() {}
 
 void ReduceCppKLPlot::_process(MAUS::Data* data) {
   if (data == NULL)
-    throw Exception(Exception::recoverable, "Data was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                     "ReduceCppKLPlot::_process");
 
   if (data->GetSpill() == NULL)
-    throw Exception(Exception::recoverable, "Spill was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                     "ReduceCppKLPlot::_process");
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
@@ -135,7 +135,7 @@ void ReduceCppKLPlot::_process(MAUS::Data* data) {
      return;
 
   if (data->GetSpill()->GetReconEvents() == NULL)
-     throw Exception(Exception::recoverable, "ReconEvents were NULL",
+     throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
                         "ReduceCppKLPlot::_process");
 
   int xRun = data->GetSpill()->GetRunNumber();

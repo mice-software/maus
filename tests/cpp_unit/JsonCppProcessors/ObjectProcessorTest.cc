@@ -84,7 +84,7 @@ TEST_F(ObjectProcessorTest, HasUnknownBranches) {
   EXPECT_TRUE(req_proc.GetThrowsIfUnknownBranches());
 
   Json::Value json_int = Json::Value(1.);
-  EXPECT_THROW(not_req_proc.HasUnknownBranches(json_int), MAUS::Exception);
+  EXPECT_THROW(not_req_proc.HasUnknownBranches(json_int), MAUS::Exceptions::Exception);
 
   Json::Value json_object_1;
   json_object_1["branch_a"] = Json::Value(1.);
@@ -93,7 +93,7 @@ TEST_F(ObjectProcessorTest, HasUnknownBranches) {
   json_object_1["branch_u"] = Json::Value(3.);
   EXPECT_TRUE(not_req_proc.HasUnknownBranches(json_object_1));
 
-  EXPECT_THROW(not_req_proc.JsonToCpp(json_object_1), MAUS::Exception);
+  EXPECT_THROW(not_req_proc.JsonToCpp(json_object_1), MAUS::Exceptions::Exception);
   not_req_proc.SetThrowsIfUnknownBranches(false);
   TestObject* cpp_object = NULL;
   EXPECT_NO_THROW(cpp_object = not_req_proc.JsonToCpp(json_object_1));
@@ -105,7 +105,7 @@ TEST_F(ObjectProcessorTest, HasUnknownBranches) {
 TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   Json::Value json_int(1);
   // should throw if this is not an object at all
-  EXPECT_THROW(req_proc.JsonToCpp(json_int), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_int), MAUS::Exceptions::Exception);
 
   Json::Value json_object(Json::objectValue);
   json_object["branch_a"] = Json::Value(1.);
@@ -124,44 +124,44 @@ TEST_F(ObjectProcessorTest, JsonToCppRequiredTest) {
   json_object["branch_b"] = Json::Value();
   json_object["branch_c"] = Json::Value("const");
   json_object["branch_d"] = Json::Value("const");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exceptions::Exception);
 
   // should throw if object is missing
   Json::Value json_object_missing_a(Json::objectValue);
   json_object_missing_a["branch_b"] = Json::Value(2.);
   json_object_missing_a["branch_c"] = Json::Value("const");
   json_object_missing_a["branch_d"] = Json::Value("const");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_a), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_a), MAUS::Exceptions::Exception);
 
   Json::Value json_object_missing_b(Json::objectValue);
   json_object_missing_b["branch_a"] = Json::Value(2.);
   json_object_missing_b["branch_c"] = Json::Value("const");
   json_object_missing_b["branch_d"] = Json::Value("const");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_b), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_b), MAUS::Exceptions::Exception);
 
   Json::Value json_object_missing_c(Json::objectValue);
   json_object_missing_c["branch_a"] = Json::Value(2.);
   json_object_missing_c["branch_b"] = Json::Value(1.);
   json_object_missing_c["branch_d"] = Json::Value("const");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_c), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_c), MAUS::Exceptions::Exception);
 
   Json::Value json_object_missing_d(Json::objectValue);
   json_object_missing_d["branch_a"] = Json::Value(1.);
   json_object_missing_d["branch_b"] = Json::Value();
   json_object_missing_d["branch_c"] = Json::Value("const");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_d), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object_missing_d), MAUS::Exceptions::Exception);
 
   // should throw if object is present but can't be processed
   json_object["branch_b"] = Json::Value("string");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exceptions::Exception);
 
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_a"] = Json::Value("string");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exceptions::Exception);
 
   json_object["branch_c"] = Json::Value("not_const");
   json_object["branch_a"] = Json::Value(2.);
-  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exceptions::Exception);
 }
 
 TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
@@ -184,15 +184,15 @@ TEST_F(ObjectProcessorTest, JsonToCppNotRequiredTest) {
 
   // should throw if object is present but can't be processed
   json_object["branch_b"] = Json::Value("string");
-  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exception);
+  EXPECT_THROW(req_proc.JsonToCpp(json_object), MAUS::Exceptions::Exception);
 
   json_object["branch_b"] = Json::Value(2.);
   json_object["branch_a"] = Json::Value("string");
-  EXPECT_THROW(not_req_proc.JsonToCpp(json_object), MAUS::Exception);
+  EXPECT_THROW(not_req_proc.JsonToCpp(json_object), MAUS::Exceptions::Exception);
 
   json_object["branch_c"] = Json::Value("not_const");
   json_object["branch_a"] = Json::Value(1.);
-  EXPECT_THROW(not_req_proc.JsonToCpp(json_object), MAUS::Exception);
+  EXPECT_THROW(not_req_proc.JsonToCpp(json_object), MAUS::Exceptions::Exception);
 
   // should return NULL on nullValue
   double* null_value = NULL;
@@ -214,7 +214,7 @@ TEST_F(ObjectProcessorTest, CppToJsonRequiredTest) {
 
   // Check throw on NULL
   test.SetB(NULL);
-  EXPECT_THROW(req_proc.CppToJson(test, ""), MAUS::Exception);
+  EXPECT_THROW(req_proc.CppToJson(test, ""), MAUS::Exceptions::Exception);
 }
 
 TEST_F(ObjectProcessorTest, CppToJsonNotRequiredTest) {

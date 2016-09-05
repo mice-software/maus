@@ -23,7 +23,7 @@
 
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 
@@ -36,7 +36,7 @@ CppErrorHandler* CppErrorHandler::getInstance() {
 }
 
 Json::Value CppErrorHandler::HandleException
-                         (Json::Value val, Exception exc, std::string class_name) {
+                         (Json::Value val, Exceptions::Exception exc, std::string class_name) {
   Squeak::mout(Squeak::debug) << "Stack trace:" << exc.GetStackTrace()
                                                                    << std::endl;
   return getInstance()->ExceptionToPython(exc.what(), val, class_name);
@@ -48,7 +48,7 @@ Json::Value CppErrorHandler::HandleStdExc
   return out;
 }
 
-void CppErrorHandler::HandleExceptionNoJson(Exception exc, std::string class_name) {
+void CppErrorHandler::HandleExceptionNoJson(Exceptions::Exception exc, std::string class_name) {
   Json::Value json = Json::Value();
   HandleException(json, exc, class_name);
 }
@@ -101,7 +101,7 @@ PyObject* CppErrorHandler::GetPyErrorHandler() {
     // import ErrorHandler
     PyObject* py_error_handler_module = PyImport_ImportModule("ErrorHandler");
     if (!py_error_handler_module) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Failed to import ErrorHandler module",
                         "CppErrorHandler::GetPyErrorHandler");
     }
@@ -110,7 +110,7 @@ PyObject* CppErrorHandler::GetPyErrorHandler() {
                                                        "HandleCppException");
     Py_DECREF(py_error_handler_module);
     if (!PyCallable_Check(handle_error_fnc))
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Failed to get HandleCppException function",
                         "CppErrorHandler::GetPyErrorHandler");
     return handle_error_fnc;

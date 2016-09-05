@@ -46,14 +46,14 @@ void MapCppTOFMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to parse Json Configuration",
                           "MapCppTOFMCDigitizer::_birth");
   }
 
   // get the geometry
   if (!_configJSON.isMember("reconstruction_geometry_filename"))
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                    "Could not find geometry file",
                    "MapCppTOFMCDigitizer::birth"));
   std::string filename;
@@ -65,7 +65,7 @@ void MapCppTOFMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // load the TOF calibration map
   bool loaded = _map.InitializeFromCards(_configJSON, 0);
   if (!loaded)
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Could not find TOF calibration map",
                  "MapCppTOFMCDigitizer::birth"));
 }
@@ -150,7 +150,7 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
 
       // make sure we can get the station/slab info
       if (!hit.GetChannelId())
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "No channel_id in hit",
                        "MapCppTOFMCDigitizer::make_tof_digits"));
       ThreeVector mom = hit.GetMomentum();
@@ -201,7 +201,7 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
 
       // make sure we actually found a tof module corresponding to this hit
       if (hit_module == NULL)
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "No TOF module for hit",
                        "MapCppTOFMCDigitizer::make_tof_digits"));
 
@@ -315,15 +315,15 @@ double MapCppTOFMCDigitizer::get_npe(double dist, double edep) const {
       if (fDebug) std::cout << "get_npe::edep= " << edep << std::endl;
 
       if (!_configJSON.isMember("TOFattenuationLength"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                 "Could not find TOFattenauationLength in config",
                 "MapCppTOFMCDigitizer::get_npe"));
       if (!_configJSON.isMember("reconstruction_geometry_filename"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                 "Could not find TOFpmtQuantumEfficiency in config",
                 "MapCppTOFMCDigitizer::get_npe"));
       if (!_configJSON.isMember("TOFconversionFactor"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find TOFconversionFactor in config",
                        "MapCppTOFMCDigitizer::birth"));
       if (fDebug)

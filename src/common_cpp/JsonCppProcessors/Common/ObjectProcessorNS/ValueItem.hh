@@ -50,7 +50,7 @@ class ValueItem : public BaseItem<ParentType> {
      *  associated with this branch
      *  @param SetMethod callback that will set the value of the child data
      *  associated with this branch
-     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exceptions::Exception if
      *  is_required is set to true
      */
     ValueItem(std::string branch_name, ProcessorBase<ChildType>* child_processor,

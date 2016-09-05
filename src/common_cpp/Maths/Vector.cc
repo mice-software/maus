@@ -152,8 +152,8 @@ template <>
 const double& VectorBase<double, gsl_vector>::operator[](const size_t i)
     const {
   if (vector_ == NULL) {
-    throw(Exception(
-      Exception::recoverable,
+    throw(Exceptions::Exception(
+      Exceptions::recoverable,
       "Attempted to index an empty vector.",
       "MAUS::VectorBase<double, gsl_vector>::operator[]()"));
   }
@@ -165,8 +165,8 @@ template <>
 const complex& VectorBase<complex, gsl_vector_complex>::operator[](
     const size_t i) const {
   if (vector_ == NULL) {
-    throw(Exception(
-      Exception::recoverable,
+    throw(Exceptions::Exception(
+      Exceptions::recoverable,
       "Attempted to index an empty vector.",
       "MAUS::VectorBase<complex, gsl_vector_complex>::operator[]()"));
   }
@@ -177,8 +177,8 @@ const complex& VectorBase<complex, gsl_vector_complex>::operator[](
 template <>
 double& VectorBase<double, gsl_vector>::operator[](const size_t i) {
   if (vector_ == NULL) {
-    throw(Exception(
-      Exception::recoverable,
+    throw(Exceptions::Exception(
+      Exceptions::recoverable,
       "Attempted to index an empty vector.",
       "MAUS::VectorBase<double, gsl_vector>::operator[]()"));
   }
@@ -189,8 +189,8 @@ double& VectorBase<double, gsl_vector>::operator[](const size_t i) {
 template <>
 complex& VectorBase<complex, gsl_vector_complex>::operator[](const size_t i) {
   if (vector_ == NULL) {
-    throw(Exception(
-      Exception::recoverable,
+    throw(Exceptions::Exception(
+      Exceptions::recoverable,
       "Attempted to index an empty vector.",
       "MAUS::VectorBase<complex, gsl_vector_complex>::operator[]()"));
   }
@@ -238,8 +238,8 @@ template <>
 VectorBase<double, gsl_vector> VectorBase<double, gsl_vector>::subvector(
     size_t begin_index, size_t end_index) const {
   if (vector_ == NULL) {
-    throw(Exception(
-      Exception::recoverable,
+    throw(Exceptions::Exception(
+      Exceptions::recoverable,
       "Attempted to create a subvector from an empty vector.",
       "MAUS::VectorBase<double, gsl_vector>::subvector()"));
   }
@@ -263,8 +263,8 @@ VectorBase<complex, gsl_vector_complex>::subvector(
     size_t begin_index,
     size_t end_index) const {
   if (vector_ == NULL) {
-    throw(Exception(
-      Exception::recoverable,
+    throw(Exceptions::Exception(
+      Exceptions::recoverable,
       "Attempted to create a subvector from an empty vector.",
       "MAUS::VectorBase<complex, gsl_vector_complex>::subvector()"));
   }
@@ -296,7 +296,7 @@ VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator=(
       // vector is assigned to a null vector
       build_vector(rhs.vector_->size);
     } else if ((rhs.vector_ == NULL) || (vector_->size != rhs.vector_->size)) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                    "Attempted to assign a vector of a different size.",
                    "VectorBase<double>::operator=()"));
     }
@@ -316,7 +316,7 @@ VectorBase<complex, gsl_vector_complex>::operator=(
       // vector is assigned to a null vector
       build_vector(rhs.vector_->size);
     } else if ((rhs.vector_ == NULL) || (vector_->size != rhs.vector_->size)) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                    "Attempted to assign a vector of a different size.",
                    "VectorBase<complex>::operator=()"));
     }
@@ -369,16 +369,16 @@ VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator*=(
   if (rhs.vector_ != NULL) {
     size_t size = this->size();
     if (rhs.size() != size) {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to perform the product of two vectors of different sizes.",
         "MAUS::VectorBase<double, gsl_vector>::operator*="));
     }
 
     gsl_vector_mul(vector_, rhs.vector_);
   } else {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to multiply a vector by an empty vector.",
         "MAUS::VectorBase<double, gsl_vector>::operator*="));
   }
@@ -392,16 +392,16 @@ VectorBase<complex, gsl_vector_complex>::operator*=(
   if (rhs.vector_ != NULL) {
     size_t size = this->size();
     if (rhs.size() != size) {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to perform the product of two vectors of different sizes.",
         "MAUS::VectorBase<complex, gsl_vector_complex>::operator*="));
     }
 
     gsl_vector_complex_mul(vector_, rhs.vector_);
   } else {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to multiply a vector by an empty vector.",
         "MAUS::VectorBase<complex, gsl_vector_complex>::operator*="));
   }
@@ -414,16 +414,16 @@ VectorBase<double, gsl_vector>& VectorBase<double, gsl_vector>::operator/=(
   if (rhs.vector_ != NULL) {
     size_t size = this->size();
     if (rhs.size() != size) {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to perform the product of two vectors of different sizes.",
         "MAUS::VectorBase<double, gsl_vector>::operator/="));
     }
 
     gsl_vector_div(vector_, rhs.vector_);
   } else {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to divide a vector by an empty vector.",
         "MAUS::VectorBase<double, gsl_vector>::operator/="));
   }
@@ -437,16 +437,16 @@ VectorBase<complex, gsl_vector_complex>::operator/=(
   if (rhs.vector_ != NULL) {
     size_t size = this->size();
     if (rhs.size() != size) {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to perform the product of two vectors of different sizes.",
         "MAUS::VectorBase<complex, gsl_vector_complex>::operator/="));
     }
 
     gsl_vector_complex_div(vector_, rhs.vector_);
   } else {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Attempted to divide a vector by an empty vector.",
         "MAUS::VectorBase<complex, gsl_vector_complex>::operator/="));
   }

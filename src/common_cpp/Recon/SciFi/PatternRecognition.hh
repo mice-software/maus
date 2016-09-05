@@ -423,22 +423,6 @@ class PatternRecognition {
     TH1D* _hychisq;  /** histo of chisq of every y-z straight least sq fit tried */
 };
 
-// Four predicate functions used by the stl sort algorithm to sort spacepoints in vectors
-bool compare_spoints_ascending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
-  return (sp1->get_position().z() < sp2->get_position().z());
-}
-
-bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
-  return (sp1->get_position().z() > sp2->get_position().z());
-}
-
-bool compare_spoints_ascending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
-  return (sp1->get_station() < sp2->get_station());
-}
-
-bool compare_spoints_descending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
-  return (sp1->get_station() > sp2->get_station());
-}
 
 // Predicate function to sort tracks by their combined fit chisq
 template<typename T>

@@ -209,7 +209,7 @@ TEST_F(PolynomialOpticsModelTest, Build) {
   bool success = false;
   try {
     bad_optics_model_1.Build();
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     success = true;
   }
   EXPECT_TRUE(success);
@@ -235,7 +235,7 @@ TEST_F(PolynomialOpticsModelTest, AvailablePositions) {
   bool success = false;
   try {
     optics_model.GetAvailableMapPositions();
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     success = true;
   }
   EXPECT_TRUE(success);
@@ -293,7 +293,7 @@ TEST_F(PolynomialOpticsModelTest, Transport) {
     output_vector = optics_model.Transport(input_vector,
                                            kPrimaryPlane+1000.,
                                            kPrimaryPlane+2000.);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     transport_failed = true;
   }
   EXPECT_TRUE(transport_failed);

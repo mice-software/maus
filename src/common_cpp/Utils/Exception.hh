@@ -25,8 +25,11 @@
 #include <string>
 #include <vector>
 
+#include "Utils/ExceptionLevel.hh"
+
 
 namespace MAUS {
+namespace Exceptions {
 /** MAUS exception class
  *
  *  Exception has a severity (exceptionLevel), an error message and a
@@ -39,25 +42,12 @@ namespace MAUS {
  */
 class Exception : public std::exception {
  public:
-  /** ExceptionLevel enumerates the severity of the exception.
-   *
-   *  I use an enumeration to distinguish between different error levels.
-   *  - nonRecoverable means the internal state of the programme is no longer
-   *    well-defined i.e. some memory problem or so.
-   *  - recoverable means that in principle we could keep on running, although
-   *    most of the time this results in end of run (usually indicates typo in
-   *    an input file).
-   *  If we start doing GUIs, then the distinction becomes important. Most stuff
-   *  should be recoverable.
-   */
-  enum exceptionLevel {recoverable, nonRecoverable};
 
   /** constructor - with error level, error message and location
    *
    *  note this makes a stack trace which can be slow.
    */
-  Exception(exceptionLevel level, std::string errorMessage, std::string location)
-                                                                        throw();
+  Exception(exceptionLevel level, std::string errorMessage, std::string location) throw();
   /** constructor - does nothing */
   Exception() throw();
 
@@ -129,6 +119,6 @@ void Exception::SetWhat(std::string what_str) {
     snprintf(&_what[0], what_str.size()+1, "%s", what_str.c_str());
 }
 }
+}
 
 #endif
-

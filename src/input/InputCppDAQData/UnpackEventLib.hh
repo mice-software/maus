@@ -36,6 +36,8 @@
 #include "unpacking/MDfragmentV830.h"
 #include "unpacking/MDfragmentDBB.h"
 #include "unpacking/MDfragmentDBBChain.h"
+#include "unpacking/MDfragmentV1495.h"
+#include "unpacking/MDfragmentEI.h"
 #include "unpacking/MDequipMap.h"
 
 #include "src/input/InputCppDAQData/fADCDataProcessor.hh"
@@ -442,6 +444,66 @@ class DBBChainCppDataProcessor : public MDarranger {
  private:
 
   MAUS::DBBArray _spill;
+};
+
+class TriggerEngineCppDataProcessor : public MDarranger {
+ public:
+  TriggerEngineCppDataProcessor()  {_equipment="V1495";}
+
+  virtual ~TriggerEngineCppDataProcessor() {}
+
+ /** Unpack a single event part to the MAUS Data Structure.
+  *
+  * This function unpacks a single particleevent,
+  * into the MAUS Data Structur tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment a chain of 6 DBBs (EMR boards)
+  * Will be casted to MDfragmentDBBChain.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+ private:
+
+  MAUS::TriggerEngine _tr_spill;
+};
+
+class EpicsInterfaceCppDataProcessor : public MDarranger {
+ public:
+  EpicsInterfaceCppDataProcessor()  {_equipment="EI";}
+
+  virtual ~EpicsInterfaceCppDataProcessor() {}
+
+ /** Unpack a single event part to the MAUS Data Structure.
+  *
+  * This function unpacks a single particleevent,
+  * into the MAUS Data Structur tree.
+  *
+  * \param[in,out] dc Pointer to the event to process.
+  * recorded by equipment a chain of 6 DBBs (EMR boards)
+  * Will be casted to MDfragmentDBBChain.
+  */
+  virtual int Process(MDdataContainer* dc);
+
+ /**
+  * This function uses the Part Event Array of the different detectors
+  * to fill into the DAQData object.
+  */
+  void fill_daq_data();
+
+  void reset();
+
+ private:
+
+  MAUS::EpicsInterface _ei_spill;
 };
 }
 

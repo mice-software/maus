@@ -67,6 +67,10 @@ end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of
 # >4 = silent
 # Doesnt effect python
 verbose_level = 1
+# Used for switching the general maus running log on or off
+# 0 = off
+# 1 = on
+log_level = 0
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
@@ -90,7 +94,9 @@ g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2
         "d_s":3.837,"particles_per_spill":0,"rotation_angle":0,"translation_z":1000.0,\
         "protonabsorberin":1,"proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,\
         "particle_charge":'all',"file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',\
-        "get_magnet_currents_pa_cdb":False,"random_seed":1}
+    "get_magnet_currents_pa_cdb":False,"random_seed":1,
+    "seed_algorithm":"random_seed_and_spill_number",
+}
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
@@ -442,6 +448,8 @@ Number_of_DAQ_Events = -1
 Input_Use_JSON = False
 Phys_Events_Only = False
 Calib_Events_Only = False
+Enable_V1495_Unpacking = False
+Enable_EI_Unpacking = True
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
@@ -755,9 +763,9 @@ custom_pid_set = "PIDVarB"
 pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
 # setting to "all", or on all downstream tracks (set to "DS"), all upstream (set to "US"), through tracks (set to 
-# "Through"), or the upstream or downstream components of the throught track (set to "Through_US" or "Through_DS"
+# "Through"), or the upstream or downstream components of the throught track (set to "Through-US" or "Through-DS"
 # respectively). Or a combination of the above can be used, entered as a space separated list, e.g
-# "Through Through_US Through_DS"
+# "Through Through-US Through-DS"
 pid_track_selection = "Through"
 
 

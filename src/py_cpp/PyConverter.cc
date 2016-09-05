@@ -33,7 +33,7 @@ PyObject* py_wrap(PyObject* self, PyObject* args) {
       data_out = PyObjectWrapper::unwrap<DATAREPR>(py_data_in);
       // now python owns this memory
       py_data_out = PyObjectWrapper::wrap(data_out);
-  } catch (Exception& exc) {
+  } catch (Exceptions::Exception& exc) {
       if (data_out != NULL && py_data_out == NULL)
           throw; // memory was lost, raise it up...
       PyErr_SetString(PyExc_ValueError, (&exc)->what());

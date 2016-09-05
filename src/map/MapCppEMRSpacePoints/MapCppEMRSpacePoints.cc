@@ -33,7 +33,7 @@ void MapCppEMRSpacePoints::_birth(const std::string& argJsonConfigDocument) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                       "Could not resolve ${MAUS_ROOT_DIR} environment variable",
                       "MapCppEMRSpacePoints::birth");
   }
@@ -57,21 +57,21 @@ void MapCppEMRSpacePoints::_birth(const std::string& argJsonConfigDocument) {
   // Load the EMR calibration map
   bool loaded = _calibMap.InitializeFromCards(configJSON);
   if ( !loaded )
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not find EMR calibration map",
           "MapCppEMRRecon::birth"));
 
   // Load the EMR attenuation map
   loaded = _attenMap.InitializeFromCards(configJSON);
   if ( !loaded )
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not find EMR attenuation map",
           "MapCppEMRReccon::birth"));
 
   // Load the EMR geometry map
   loaded = _geoMap.InitializeFromCards(configJSON);
   if ( !loaded )
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not find EMR geometry map",
           "MapCppEMRReccon::birth"));
 }
@@ -83,12 +83,12 @@ void MapCppEMRSpacePoints::_process(Data *data) const {
 
   // Routine data checks before processing it
   if ( !data )
-      throw Exception(Exception::recoverable, "Data was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                     "MapCppEMRSpacePoints::_process");
 
   Spill* spill = data->GetSpill();
   if ( !spill )
-      throw Exception(Exception::recoverable, "Spill was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                     "MapCppEMRSpacePoints::_process");
 
   if ( spill->GetDaqEventType() != "physics_event" )

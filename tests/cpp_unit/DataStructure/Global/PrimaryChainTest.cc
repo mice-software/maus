@@ -314,11 +314,11 @@ TEST_F(PrimaryChainTestDS, test_Throws) {
   MAUS::DataStructure::Global::Track* t9 =
       new MAUS::DataStructure::Global::Track();
 
-  ASSERT_THROW(_primary_chain0->AddTrack(t6, t7), MAUS::Exception);
-  ASSERT_THROW(_primary_chain0->AddPrimaryTrack(t6), MAUS::Exception);
+  ASSERT_THROW(_primary_chain0->AddTrack(t6, t7), MAUS::Exceptions::Exception);
+  ASSERT_THROW(_primary_chain0->AddPrimaryTrack(t6), MAUS::Exceptions::Exception);
 
   ASSERT_NO_THROW(_primary_chain0->AddTrack(t7, t6));
 
-  ASSERT_THROW(_primary_chain0->AddTrack(t9, t8), MAUS::Exception);
+  ASSERT_THROW(_primary_chain0->AddTrack(t9, t8), MAUS::Exceptions::Exception);
 }
 } // ~namespace MAUS

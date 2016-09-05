@@ -501,17 +501,17 @@ TEST_F(TrackTestDS, test_Throws) {
   MAUS::DataStructure::Global::TrackPoint *tp2 =
       new MAUS::DataStructure::Global::TrackPoint();
 
-  ASSERT_THROW(track0.AddTrackPoint(tp0), MAUS::Exception);
+  ASSERT_THROW(track0.AddTrackPoint(tp0), MAUS::Exceptions::Exception);
 
   track0.AddTrackPoint(tp1);
 
-  ASSERT_THROW(track0.RemoveTrackPoint(tp0), MAUS::Exception);
+  ASSERT_THROW(track0.RemoveTrackPoint(tp0), MAUS::Exceptions::Exception);
   ASSERT_NO_THROW(track0.RemoveTrackPoint(tp1));
-  ASSERT_THROW(track0.RemoveTrackPoint(tp2), MAUS::Exception);
+  ASSERT_THROW(track0.RemoveTrackPoint(tp2), MAUS::Exceptions::Exception);
 
-  ASSERT_THROW(track0.RemoveTrack(track1), MAUS::Exception);
-  ASSERT_THROW(track0.RemoveTrack(track2), MAUS::Exception);
+  ASSERT_THROW(track0.RemoveTrack(track1), MAUS::Exceptions::Exception);
+  ASSERT_THROW(track0.RemoveTrack(track2), MAUS::Exceptions::Exception);
 
-  ASSERT_THROW(track0.RemoveGeometryPath("Narnia"), MAUS::Exception);
+  ASSERT_THROW(track0.RemoveGeometryPath("Narnia"), MAUS::Exceptions::Exception);
 }
 } // ~namespace MAUS

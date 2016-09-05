@@ -24,11 +24,12 @@
 #include <ostream>
 #include <sstream>
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/common_cpp/Utils/Exception.hh"
 
 namespace MAUS {
+namespace Exceptions {
 
 const size_t   Exception::_maxStackSize = 100;
 bool Exception::_willDoStackTrace = true;
@@ -84,4 +85,5 @@ std::string Exception::MakeStackTrace(size_t skipTrace) {
 #ifdef NO_STACKTRACE
 std::string Exception::MakeStackTrace(size_t skipTrace) {return "";}
 #endif
+}
 }

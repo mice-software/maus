@@ -1,6 +1,6 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "Interface/ThreeDFieldMap.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -12,11 +12,11 @@ ThreeDFieldMap::ThreeDFieldMap (std::string interpolation, std::string fileName,
               : _symmetry(none)
 {
 	SetSymmetry(symmetry);
-	Squeak::mout(Squeak::debug) << "Loading 3d field map file \'"+fileName+"\'" << std::endl;
-	if(fileType!="g4bl3dGrid") throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise file type \'"+fileType+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
+	MAUS::Squeak::mout(MAUS::Squeak::debug) << "Loading 3d field map file \'"+fileName+"\'" << std::endl;
+	if(fileType!="g4bl3dGrid") throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Did not recognise file type \'"+fileType+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
 	fileName = ReplaceVariables(fileName);
 	std::ifstream in(fileName.c_str());
-	if(!in) throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not open file \'"+fileName+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
+	if(!in) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Could not open file \'"+fileName+"\'", "ThreeDFieldMap::ThreeDFieldMap"));
 	myInterpolator = LoadBeamlineMap(in, Interpolator3dGridTo3d::triLinear);
 }
 
@@ -54,7 +54,7 @@ Interpolator3dGridTo3d* ThreeDFieldMap::LoadBeamlineMap(std::istream& fin, Inter
 		in >> name;
 		in >> name >> scaleStr;
 		if(scaleStr.size() < 2) 
-			throw(MAUS::Exception(MAUS::Exception::recoverable, "Scale \'"+scaleStr+"\' formatting not recognised", "ThreeDFieldMap::LoadBeamlineMap") );
+			throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Scale \'"+scaleStr+"\' formatting not recognised", "ThreeDFieldMap::LoadBeamlineMap") );
 		scaleStr = scaleStr.substr(1,scaleStr.size()-2);
 		std::stringstream scaleStream(scaleStr);
 		scaleStream >> localScale;
@@ -85,7 +85,7 @@ Interpolator3dGridTo3d* ThreeDFieldMap::LoadBeamlineMap(std::istream& fin, Inter
 
 	Interpolator3dGridTo3d* interpol = new Interpolator3dGridTo3d(new ThreeDGrid(xV,yV,zV), Bx, By, Bz, algo);
 
-	Squeak::mout(Squeak::debug) << "Loaded field map with\n  min (x, y, z): "
+	MAUS::Squeak::mout(MAUS::Squeak::debug) << "Loaded field map with\n  min (x, y, z): "
                               << interpol->GetMesh()->MinX() << " "
                               << interpol->GetMesh()->MinY() << " "
                               << interpol->GetMesh()->MinZ() << " "
@@ -131,7 +131,7 @@ void ThreeDFieldMap::StripG4BLComments(std::ostream& out, std::istream& in)
 {
 	std::string       line;
 	std::string       word;
-	Squeak::mout(Squeak::debug) << "Preprocessing beamline map" << std::endl;
+	MAUS::Squeak::mout(MAUS::Squeak::debug) << "Preprocessing beamline map" << std::endl;
 	while(in)
 	{
 		getline(in, line);
@@ -139,7 +139,7 @@ void ThreeDFieldMap::StripG4BLComments(std::ostream& out, std::istream& in)
 		lineIn >> word;
 		if(word.size() == 0);
 		else if(word[0] == '#')      ;
-		else if(word[0] == '*') Squeak::mout(Squeak::debug) << line << "\n";
+		else if(word[0] == '*') MAUS::Squeak::mout(MAUS::Squeak::debug) << line << "\n";
 		else                    out << line << "\n";
 	}
 }
@@ -163,7 +163,7 @@ std::string	ThreeDFieldMap::ReplaceVariables( std::string fileName )
       for( int vpos = pos; vpos < end; ++vpos )
         variable += fileName[vpos];
       if(getenv( variable.c_str() ) == NULL) 
-          throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - "+variable+" environment variable was not defined", "ThreeDFieldMap::ReplaceVariables"));
+          throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error - "+variable+" environment variable was not defined", "ThreeDFieldMap::ReplaceVariables"));
       fullName += std::string( getenv( variable.c_str() ) );
       pos = end + 1;
     }

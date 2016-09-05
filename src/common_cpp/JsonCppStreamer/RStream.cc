@@ -23,20 +23,20 @@ rstream::rstream(const char* filename, const char* mode)
   : m_tree(0),
     m_evtCount(0) {
   if ( !strcmp(filename, "") || !strcmp(mode, "") ) {
-    Squeak::mout(Squeak::fatal)
+    MAUS::Squeak::mout(MAUS::Squeak::fatal)
       << "Couldn't open ROOT TFile as no filename or open mode given"
       << std::endl;
-    throw MAUS::Exception(MAUS::Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
 		 "rstream object not correctly initialised as null \"\" string passed as filename or open mode.",
 		 "rstream::rstream(const char*, const char*)");
   }
 
   m_file = new TFile(filename, mode);
   if (!m_file) {
-    Squeak::mout(Squeak::fatal)
+    MAUS::Squeak::mout(MAUS::Squeak::fatal)
       << "ROOT TFile opened incorrectly"
       << std::endl;
-    throw MAUS::Exception(MAUS::Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
 		 "rstream object not correctly initialised as TFile not opened properly",
 		 "rstream::rstream(const char*, const char*)");
   }

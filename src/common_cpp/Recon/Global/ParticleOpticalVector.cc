@@ -24,7 +24,7 @@
 
 #include "DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Maths/Vector.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Recon/Global/Detector.hh"
 #include "Recon/Global/Particle.hh"
 

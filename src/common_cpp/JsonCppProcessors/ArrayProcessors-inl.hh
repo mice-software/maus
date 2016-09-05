@@ -42,7 +42,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                     "Failed to resolve Json::Value of type "+
                     JsonWrapper::ValueTypeToString(json_array.type())+
                     " to array",
@@ -65,7 +65,7 @@ std::vector<ArrayContents*>* PointerArrayProcessor<ArrayContents>::JsonToCpp
                 if (RefManager::HasInstance())
                     RefManager::GetInstance().SetPointerAsValue(path, (*vec)[i]);
             }
-        } catch (Exception exc) {
+        } catch (Exceptions::Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             for (size_t j = 0; j < vec->size(); ++j) {
                 if ((*vec)[j] != NULL) {
@@ -110,7 +110,7 @@ Json::Value* PointerArrayProcessor<ArrayContents>::
             if (RefManager::HasInstance())
                 RefManager::GetInstance().SetPointerAsValue
                                                (cpp_array[i], GetPath(path, i));
-        } catch (Exception exc) {
+        } catch (Exceptions::Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
             throw exc;
@@ -146,7 +146,7 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
                                                (const Json::Value& json_array) {
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                     "Failed to resolve Json::Value of type "+
                     JsonWrapper::ValueTypeToString(json_array.type())+
                     " to array",
@@ -163,7 +163,7 @@ std::vector<ArrayContents>* ValueArrayProcessor<ArrayContents>::JsonToCpp
                                       Json::Value::ArrayIndex(i)]);
             (*vec)[i] = *data;
             delete data;
-        } catch (Exception exc) {
+        } catch (Exceptions::Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete vec;
             throw exc;
@@ -195,7 +195,7 @@ Json::Value* ValueArrayProcessor<ArrayContents>::
             JsonWrapper::Path::SetPath((*json_array)[Json::Value::ArrayIndex(i)],
                                        GetPath(path, i));
             delete data; // so we need to clean up here
-        } catch (Exception exc) {
+        } catch (Exceptions::Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete json_array;
             throw exc;
@@ -218,7 +218,7 @@ std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
     using ReferenceResolver::JsonToCpp::VectorResolver;
     if (!json_array.isConvertibleTo(Json::arrayValue)) {
         // no memory allocated yet...
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                     "Failed to resolve Json::Value of type "+
                     JsonWrapper::ValueTypeToString(json_array.type())+
                     " to array",
@@ -243,7 +243,7 @@ std::vector<ArrayContents*>* ReferenceArrayProcessor<ArrayContents>::JsonToCpp
                     RefManager::GetInstance().AddReference(res);
                 }
             }
-        } catch (Exception exc) {
+        } catch (Exceptions::Exception exc) {
             // if there's a problem, clean up before rethrowing the exception
             delete vec;
             throw exc;

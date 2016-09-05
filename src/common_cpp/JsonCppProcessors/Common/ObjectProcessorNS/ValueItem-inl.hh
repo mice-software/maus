@@ -38,7 +38,7 @@ void ValueItem<ParentType, ChildType>::_SetCppChild
                       (const Json::Value& parent_json, ParentType& parent_cpp) {
     if (!parent_json.isMember(_branch)) {
         if (_required) {
-            throw MAUS::Exception(Exception::recoverable,
+            throw MAUS::Exceptions::Exception(Exceptions::recoverable,
             "Missing required branch "+_branch+" converting json->cpp",
             "ValueItem::_SetCppChild");
         } else {

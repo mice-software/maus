@@ -2,7 +2,7 @@
 #include "Interface/MagFieldMap.hh"
 #include "Interface/SplineInterpolator.hh"
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Interface/STLUtils.hh"
 
 #include <string>
@@ -60,8 +60,8 @@ void MagFieldMap::ReadMap(const std::string& mapFile, const std::string& fileTyp
 		fMap.open(myFileName.c_str());
 	else if(fileType == "g4micebinary")
 		fMap.open(myFileName.c_str(), std::fstream::in | std::fstream::binary);
-	else throw(MAUS::Exception(MAUS::Exception::recoverable, "Field map type "+fileType+" not supported", "MagFieldMap::ReadMap"));
-	if (!fMap.is_open()) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error opening field map file"+myFileName, 
+	else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Field map type "+fileType+" not supported", "MagFieldMap::ReadMap"));
+	if (!fMap.is_open()) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error opening field map file"+myFileName, 
 	                                                       "MagFieldMap::ReadMap"));
 
 	//Read the field map; built interpolator; read bounds (needed for bound checking) and grid size (needed for write)
@@ -172,7 +172,7 @@ SplineInterpolator MagFieldMap::ReadG4BeamlineMap(std::ifstream &fMap)
 	myRMax = minR + dR * (double)(numberOfRCoords-1);
 
 	if(!fMap) 
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "There was a problem while reading a fieldmap.", "MagFieldMap::ReadG4BeamlineMap" ));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "There was a problem while reading a fieldmap.", "MagFieldMap::ReadG4BeamlineMap" ));
 
 
 	return SplineInterpolator(dR, dZ, minZ, numberOfRCoords, numberOfZCoords,
@@ -225,7 +225,7 @@ SplineInterpolator MagFieldMap::ReadIcoolMap(std::ifstream &fMap)
 	myRMin = inputR[0]*1.e3;
 	myRMax = inputR[numberOfRCoords-1]*1.e3;
 
-//	Squeak::mout(Squeak::debug) << "icool field parameters nZ:" << numberOfZCoords << " dZ: " << dZ << " zMin: " << myZMin << " zMax: " << myZMax << " nR: "
+//	MAUS::Squeak::mout(MAUS::Squeak::debug) << "icool field parameters nZ:" << numberOfZCoords << " dZ: " << dZ << " zMin: " << myZMin << " zMax: " << myZMax << " nR: "
 //                                    << numberOfRCoords << " dR: " << dR << " rMin: " << myRMin << " rMax: " << myRMax << std::endl;
 	delete [] inputZ;
 	delete [] inputR;
@@ -305,7 +305,7 @@ SplineInterpolator MagFieldMap::ReadGregoireMap(std::ifstream &fMap)
 	myRMax = (numberOfRCoords - 1) * dR;
 
 	if(!fMap)
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "There was a problem while loading a field map", "MagFieldMap::LoadGregoireMap"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "There was a problem while loading a field map", "MagFieldMap::LoadGregoireMap"));
 
 	return SplineInterpolator(dR, dZ, minZ, numberOfRCoords, numberOfZCoords,
 	                          inputBz, inputBr);

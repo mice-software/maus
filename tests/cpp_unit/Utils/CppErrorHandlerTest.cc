@@ -13,12 +13,12 @@ using namespace MAUS;
 class CppErrorHandlerTest : public ::testing::Test {
 protected:
   CppErrorHandlerTest() : obj(Json::objectValue), 
-                          exception(MAUS::Exception::recoverable, "a_test", "exc::test"),
+                          exception(Exceptions::recoverable, "a_test", "exc::test"),
                           std_exc(&exception) {
   }
   virtual ~CppErrorHandlerTest() {}
   Json::Value obj;
-  MAUS::Exception      exception;
+  MAUS::Exceptions::Exception      exception;
   std::exception* std_exc;  
 };
 

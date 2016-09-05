@@ -18,15 +18,27 @@
 
 #include <sstream>
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
-std::ostream*                               Squeak::stdout    = NULL;
-std::ostream*                               Squeak::stdlog    = NULL;
-std::ostream*                               Squeak::stderr    = NULL;
-std::ostream*                               Squeak::voidout   = NULL;
-std::map<Squeak::errorLevel, std::ostream*> Squeak::output;
-Squeak *                                    Squeak::instance  = NULL;
+namespace MAUS {
+
+// Initialise the static member variables
+std::ostream* Squeak::stdout    = NULL;
+std::ostream* Squeak::stdlog    = NULL;
+std::ostream* Squeak::stderr    = NULL;
+std::ostream* Squeak::voidout   = NULL;
+std::ofstream* Squeak::mauslog  = NULL;
+Squeak* Squeak::instance        = NULL;
+
 const Squeak::errorLevel Squeak::default_error_level = Squeak::warning;
+const int Squeak::default_log_level = 0;
+std::string Squeak::logname = "maus.log";
+
+std::map<Squeak::errorLevel, std::ostream*> Squeak::output;
+
+Squeak::Squeak() {
+  // Do nothing
+}
 
 std::ostream & Squeak::mout() {
   getInstance();
@@ -38,10 +50,10 @@ std::ostream & Squeak::mout(errorLevel level) {
   return (*output[level]);
 }
 
-std::ostream & Squeak::mout(MAUS::Exception::exceptionLevel level) {
+std::ostream & Squeak::mout(Exceptions::exceptionLevel level) {
   getInstance();
-  // eventually a map or somesuch I suspect
-  if (level == MAUS::Exception::recoverable)
+  // Eventually a map or somesuch I suspect
+  if (level == MAUS::Exceptions::recoverable)
     return (*output[Squeak::error]);
   else
     return (*output[Squeak::fatal]);
@@ -52,26 +64,51 @@ void  Squeak::setAnOutput(errorLevel level, std::ostream& out) {
   output[level] = &out;
 }
 
-
 Squeak * Squeak::getInstance() {
   if (instance  == NULL) {
       instance = new Squeak();
       initialiseOutputs();
-      setOutputs(default_error_level);
+      setOutputs(default_error_level, default_log_level);
       setStandardOutputs(default_error_level);
   }
   return instance;
 }
 
-Squeak::Squeak() {
-}
-
-void Squeak::setOutputs(int verboseLevel) {
+void Squeak::setOutputs(int verboseLevel, int logLevel) {
   getInstance();
+  setLog(logLevel);
   std::ostream* out[5] = {stdout, stdlog, stderr, stderr, stderr};
   for (int i = 0; i <= fatal; ++i) {
-    if (i >= verboseLevel) output[Squeak::errorLevel(i)] = out[i];
-    else                   output[Squeak::errorLevel(i)] = voidout;
+    if (i >= verboseLevel)
+      output[Squeak::errorLevel(i)] = out[i];
+    else if (logLevel > 1)
+      output[Squeak::errorLevel(i)] = mauslog;
+    else
+      output[Squeak::errorLevel(i)] = voidout;
+  }
+}
+
+void Squeak::setLog(int logLevel) {
+  getInstance();
+  // At present, any log level above 0 just goes to a standard file
+  if (logLevel) {
+    if (!mauslog) {
+      mauslog = new std::ofstream(logname.c_str());
+    } else if (!mauslog->is_open()) {
+      mauslog->open(logname.c_str());
+    }
+    output[Squeak::log] = mauslog;
+  } else {
+    output[Squeak::log] = voidout;
+  }
+}
+
+void Squeak::closeLog() {
+  if (mauslog) {
+    if (mauslog->is_open())
+      mauslog->close();
+    delete mauslog;
+    mauslog = NULL;
   }
 }
 
@@ -84,8 +121,10 @@ void Squeak::setStandardOutputs(int verboseLevel) {
 
 void Squeak::activateCout(bool isActive) {
   getInstance();
-  if (isActive) std::cout.rdbuf(stdout->rdbuf());
-  else         std::cout.rdbuf(voidout->rdbuf());
+  if (isActive)
+    std::cout.rdbuf(stdout->rdbuf());
+  else
+    std::cout.rdbuf(voidout->rdbuf());
 }
 
 bool Squeak::coutIsActive() {
@@ -95,8 +134,10 @@ bool Squeak::coutIsActive() {
 
 void Squeak::activateCerr(bool isActive) {
   getInstance();
-  if (isActive) std::cerr.rdbuf(stdlog->rdbuf());
-  else          std::cerr.rdbuf(voidout->rdbuf());
+  if (isActive)
+    std::cerr.rdbuf(stdlog->rdbuf());
+  else
+    std::cerr.rdbuf(voidout->rdbuf());
 }
 
 bool Squeak::cerrIsActive() {
@@ -106,8 +147,10 @@ bool Squeak::cerrIsActive() {
 
 void Squeak::activateClog(bool isActive) {
   getInstance();
-  if (isActive) std::clog.rdbuf(stdlog->rdbuf());
-  else         std::clog.rdbuf(voidout->rdbuf());
+  if (isActive)
+    std::clog.rdbuf(stdlog->rdbuf());
+  else
+    std::clog.rdbuf(voidout->rdbuf());
 }
 
 bool Squeak::clogIsActive() {
@@ -144,5 +187,6 @@ std::ostream& Squeak::clogOut() {
 std::ostream& Squeak::cerrOut() {
   getInstance();
   return *stderr;
+}
 }
 

@@ -128,8 +128,8 @@ MAUS::Data InputCppRootData::_emit_cpp() {
 template <class DataT>
 bool InputCppRootData::load_event(std::string branch_name, DataT& data) {
     if (_infile == NULL) {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "InputCppRootData was not initialised properly",
         "InputCppRootData::load_event"
      ));

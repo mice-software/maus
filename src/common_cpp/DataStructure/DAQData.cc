@@ -20,133 +20,147 @@
 namespace MAUS {
 
 DAQData::DAQData()
-    : _event_size(0), _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
-      _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
+  : _event_size(0), _tr_engine(), _ei(), _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(),
+    _unknown(), _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
 }
 
 DAQData::DAQData(const DAQData& daqdata)
-    : _event_size(0), _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(), _unknown(),
-      _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
-    *this = daqdata;
+  : _event_size(0), _tr_engine(), _ei(), _V830(), _trigger_request(), _tof1(), _ckov(), _tof2(),
+    _unknown(), _kl(), _tag(), _tof0(), _trigger(), _emr(), _tracker0(), _tracker1() {
+  *this = daqdata;
 }
 
 DAQData& DAQData::operator=(const DAQData& daqdata) {
-    using DAQDataHelper::VectorDeepcopy;
-    if (this == &daqdata) {
-        return *this;
-    }
-    _event_size = daqdata._event_size;
-    SetV830(daqdata._V830);
-    SetTriggerRequestArray(VectorDeepcopy<>(daqdata._trigger_request));
-    SetTOF1DaqArray(VectorDeepcopy<>(daqdata._tof1));
-    SetCkovArray(VectorDeepcopy<>(daqdata._ckov));
-    SetTOF2DaqArray(VectorDeepcopy<>(daqdata._tof2));
-    SetUnknownArray(VectorDeepcopy<>(daqdata._unknown));
-    SetKLArray(VectorDeepcopy<>(daqdata._kl));
-    SetTagArray(VectorDeepcopy<>(daqdata._tag));
-    SetTOF0DaqArray(VectorDeepcopy<>(daqdata._tof0));
-    SetTriggerArray(VectorDeepcopy<>(daqdata._trigger));
-    SetEMRDaq(daqdata._emr);
-    SetTracker0DaqArray(VectorDeepcopy<>(daqdata._tracker0));
-    SetTracker1DaqArray(VectorDeepcopy<>(daqdata._tracker1));
+  using DAQDataHelper::VectorDeepcopy;
+  if (this == &daqdata) {
+      return *this;
+  }
+  _event_size = daqdata._event_size;
+  SetV830(daqdata._V830);
+  SetTriggerEngine(daqdata._tr_engine);
+  SetEpicsInterface(daqdata._ei);
+  SetTriggerRequestArray(VectorDeepcopy<>(daqdata._trigger_request));
+  SetTOF1DaqArray(VectorDeepcopy<>(daqdata._tof1));
+  SetCkovArray(VectorDeepcopy<>(daqdata._ckov));
+  SetTOF2DaqArray(VectorDeepcopy<>(daqdata._tof2));
+  SetUnknownArray(VectorDeepcopy<>(daqdata._unknown));
+  SetKLArray(VectorDeepcopy<>(daqdata._kl));
+  SetTagArray(VectorDeepcopy<>(daqdata._tag));
+  SetTOF0DaqArray(VectorDeepcopy<>(daqdata._tof0));
+  SetTriggerArray(VectorDeepcopy<>(daqdata._trigger));
+  SetEMRDaq(daqdata._emr);
+  SetTracker0DaqArray(VectorDeepcopy<>(daqdata._tracker0));
+  SetTracker1DaqArray(VectorDeepcopy<>(daqdata._tracker1));
 
-    return *this;
+  return *this;
 }
 
 DAQData::~DAQData() {
-    SetTriggerRequestArray(TriggerRequestArray());
-    SetTOF1DaqArray(TOF1DaqArray());
-    SetCkovArray(CkovArray());
-    SetTOF2DaqArray(TOF2DaqArray());
-    SetUnknownArray(UnknownArray());
-    SetKLArray(KLArray());
-    SetTagArray(TagArray());
-    SetTOF0DaqArray(TOF0DaqArray());
-    SetTriggerArray(TriggerArray());
-    SetTracker0DaqArray(Tracker0DaqArray());
-    SetTracker1DaqArray(Tracker1DaqArray());
+  SetTriggerRequestArray(TriggerRequestArray());
+  SetTOF1DaqArray(TOF1DaqArray());
+  SetCkovArray(CkovArray());
+  SetTOF2DaqArray(TOF2DaqArray());
+  SetUnknownArray(UnknownArray());
+  SetKLArray(KLArray());
+  SetTagArray(TagArray());
+  SetTOF0DaqArray(TOF0DaqArray());
+  SetTriggerArray(TriggerArray());
+  SetTracker0DaqArray(Tracker0DaqArray());
+  SetTracker1DaqArray(Tracker1DaqArray());
 }
 
 unsigned int DAQData::GetEventSize() const {
-    return _event_size;
+  return _event_size;
 }
 
 void DAQData::SetEventSize(unsigned int size) {
-    _event_size = size;
+  _event_size = size;
 }
 
 V830 DAQData::GetV830() const {
-    return _V830;
+  return _V830;
 }
 
 void DAQData::SetV830(V830 V830) {
-    _V830 = V830;
+  _V830 = V830;
+}
+
+TriggerEngine DAQData::GetTriggerEngine() const {
+  return _tr_engine;
+}
+
+TriggerEngine* DAQData::GetTriggerEnginePtr() {
+  return &_tr_engine;
+}
+
+void DAQData::SetTriggerEngine(TriggerEngine tr) {
+  _tr_engine = tr;
 }
 
 TriggerRequestArray DAQData::GetTriggerRequestArray() const {
-    return _trigger_request;
+  return _trigger_request;
 }
 
 TriggerRequestArray* DAQData::GetTriggerRequestArrayPtr() {
-    return &_trigger_request;
+  return &_trigger_request;
 }
 
 TriggerRequest* DAQData::GetTriggerRequestArrayElement(size_t index) const {
-    return _trigger_request[index];
+  return _trigger_request[index];
 }
 
 size_t DAQData::GetTriggerRequestArraySize() const {
-    return _trigger_request.size();
+  return _trigger_request.size();
 }
 
 void DAQData::SetTriggerRequestArray(TriggerRequestArray trigger_request) {
-    for (size_t i = 0; i < _trigger_request.size(); ++i) {
-        if (_trigger_request[i] != NULL) {
-            delete _trigger_request[i];
-        }
+  for (size_t i = 0; i < _trigger_request.size(); ++i) {
+    if (_trigger_request[i] != NULL) {
+      delete _trigger_request[i];
     }
-    _trigger_request = trigger_request;
+  }
+  _trigger_request = trigger_request;
 }
 
 TOF1DaqArray DAQData::GetTOF1DaqArray() const {
-    return _tof1;
+  return _tof1;
 }
 
 TOF1DaqArray* DAQData::GetTOF1DaqArrayPtr() {
-    return &_tof1;
+  return &_tof1;
 }
 
 TOFDaq* DAQData::GetTOF1DaqArrayElement(size_t index) const {
-    return _tof1[index];
+  return _tof1[index];
 }
 
 size_t DAQData::GetTOF1DaqArraySize() const {
-    return _tof1.size();
+  return _tof1.size();
 }
 
 void DAQData::SetTOF1DaqArray(TOF1DaqArray tof1) {
-    for (size_t i = 0; i < _tof1.size(); ++i) {
-        if (_tof1[i] != NULL) {
-            delete _tof1[i];
-        }
+  for (size_t i = 0; i < _tof1.size(); ++i) {
+    if (_tof1[i] != NULL) {
+      delete _tof1[i];
     }
-    _tof1 = tof1;
+  }
+  _tof1 = tof1;
 }
 
 CkovArray DAQData::GetCkovArray() const {
-    return _ckov;
+  return _ckov;
 }
 
 CkovArray* DAQData::GetCkovArrayPtr() {
-    return &_ckov;
+  return &_ckov;
 }
 
 CkovDaq* DAQData::GetCkovArrayElement(size_t index) const {
-    return _ckov[index];
+  return _ckov[index];
 }
 
 size_t DAQData::GetCkovArraySize() const {
-    return _ckov.size();
+  return _ckov.size();
 }
 
 void DAQData::SetCkovArray(CkovArray ckov) {
@@ -295,70 +309,70 @@ Tag* DAQData::GetTagArrayElement(size_t index) const {
 }
 
 size_t DAQData::GetTagArraySize() const {
-    return _tag.size();
+  return _tag.size();
 }
 
 void DAQData::SetTagArray(TagArray tag) {
-    for (size_t i = 0; i < _tag.size(); ++i) {
-        if (_tag[i] != NULL) {
-            delete _tag[i];
-        }
+  for (size_t i = 0; i < _tag.size(); ++i) {
+    if (_tag[i] != NULL) {
+       delete _tag[i];
     }
-    _tag = tag;
+  }
+  _tag = tag;
 }
 
 TOF0DaqArray DAQData::GetTOF0DaqArray() const {
-    return _tof0;
+  return _tof0;
 }
 
 TOF0DaqArray* DAQData::GetTOF0DaqArrayPtr() {
-    return &_tof0;
+  return &_tof0;
 }
 
 TOFDaq* DAQData::GetTOF0DaqArrayElement(size_t index) const {
-    return _tof0[index];
+  return _tof0[index];
 }
 
 size_t DAQData::GetTOF0DaqArraySize() const {
-    return _tof0.size();
+  return _tof0.size();
 }
 
 void DAQData::SetTOF0DaqArray(TOF0DaqArray tof0) {
-    for (size_t i = 0; i < _tof0.size(); ++i) {
-        if (_tof0[i] != NULL) {
-            delete _tof0[i];
-        }
+  for (size_t i = 0; i < _tof0.size(); ++i) {
+    if (_tof0[i] != NULL) {
+      delete _tof0[i];
     }
-    _tof0 = tof0;
+  }
+  _tof0 = tof0;
 }
 
 TriggerArray DAQData::GetTriggerArray() const {
-    return _trigger;
+  return _trigger;
 }
 
 TriggerArray* DAQData::GetTriggerArrayPtr() {
-    return &_trigger;
+  return &_trigger;
 }
 
 Trigger* DAQData::GetTriggerArrayElement(size_t index) const {
-    return _trigger[index];
+  return _trigger[index];
 }
 
 size_t DAQData::GetTriggerArraySize() const {
-    return _trigger.size();
+  return _trigger.size();
 }
 
 void DAQData::SetTriggerArray(TriggerArray trigger) {
-    for (size_t i = 0; i < _trigger.size(); ++i) {
-        if (_trigger[i] != NULL) {
-            delete _trigger[i];
-        }
+  for (size_t i = 0; i < _trigger.size(); ++i) {
+    if (_trigger[i] != NULL) {
+      delete _trigger[i];
     }
-    _trigger = trigger;
+  }
+  _trigger = trigger;
 }
 
 EMRDaq DAQData::GetEMRDaq() const {
-    return _emr;
+  return _emr;
 }
 
 EMRDaq* DAQData::GetEMRDaqPtr() {
@@ -366,7 +380,19 @@ EMRDaq* DAQData::GetEMRDaqPtr() {
 }
 
 void DAQData::SetEMRDaq(EMRDaq emr) {
-    _emr = emr;
+  _emr = emr;
+}
+
+EpicsInterface DAQData::GetEpicsInterface() const {
+  return _ei;
+}
+
+EpicsInterface* DAQData::GetEpicsInterfacePtr() {
+  return &_ei;
+}
+
+void DAQData::SetEpicsInterface(EpicsInterface ei) {
+  _ei = ei;
 }
 }
 

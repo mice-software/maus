@@ -40,12 +40,15 @@ InputCppDAQData::InputCppDAQData() : InputBase<MAUS::Data>("InputCppDAQData") {
   _vLSBFragmentProc_cpp   = NULL;
   _DBBFragmentProc_cpp     = NULL;
   _DBBChainFragmentProc_cpp = NULL;
+  _TriggerEngineFragmentProc_cpp = NULL;
+  _EpicsInterfaceFragmentProc_cpp = NULL;
 }
 
 
 void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   if ( _dataFileManager.GetNFiles() ) {
-     throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
+     throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING",
+                                      "InputCppDAQData::_childbirth"));
   }
 
   //  JsonCpp setup
@@ -55,7 +58,8 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-    throw(MAUS::Exception(Exception::recoverable, "STRING", "InputCppDAQData::_childbirth"));
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING",
+                                      "InputCppDAQData::_childbirth"));
   }
 
   // Comfigure the V830 (scaler) data processor.
@@ -81,6 +85,12 @@ void InputCppDAQData::_childbirth(const std::string& jsonDataCards) {
 
   // Comfigure the DBB Chain (chain of 6 EMR boards) data processor.
   initProcessor(_DBBChainFragmentProc_cpp, configJSON);
+
+  // Comfigure the _Trigger Engine data processor.
+  initProcessor(_TriggerEngineFragmentProc_cpp, configJSON);
+
+  // Comfigure the _Epics Interface data processor.
+  initProcessor(_EpicsInterfaceFragmentProc_cpp, configJSON);
 
   // frankliuao: moved the _map.InitFromCards(configJSON) to InputCppDAQOnlineData
   // and InputCppDAQOfflineData. There, daq_cabling_source is forced to be "CDB"
@@ -142,6 +152,12 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
       if (_vLSBFragmentProc_cpp)
         _vLSBFragmentProc_cpp->fill_daq_data();
 
+      if (_TriggerEngineFragmentProc_cpp)
+        _TriggerEngineFragmentProc_cpp->fill_daq_data();
+
+      if (_EpicsInterfaceFragmentProc_cpp)
+        _EpicsInterfaceFragmentProc_cpp->fill_daq_data();
+
       // Set the DAQData object of the spill.
       spill->SetDAQData(daq_data);
     }
@@ -162,7 +178,7 @@ int InputCppDAQData::getCurEvent(MAUS::Data *data) {
 
     nPartEvts = 0;
   }
-  catch (Exception exc) {
+  catch (Exceptions::Exception exc) {
     Squeak::mout(Squeak::error) << exc.GetLocation() << ": "
     << exc.GetMessage() << std::endl
     << "*** MAUS exception in "
@@ -228,24 +244,28 @@ std::string InputCppDAQData::getCurEvent() {
 
 void InputCppDAQData::_death() {
   // Free the memory.
-  if (_v1290PartEventProc_cpp)    delete _v1290PartEventProc_cpp;
-  if (_v1724PartEventProc_cpp)    delete _v1724PartEventProc_cpp;
-  if (_v1731PartEventProc_cpp)    delete _v1731PartEventProc_cpp;
-  if (_v830FragmentProc_cpp)      delete _v830FragmentProc_cpp;
-  if (_vLSBFragmentProc_cpp)     delete _vLSBFragmentProc_cpp;
-  if (_DBBFragmentProc_cpp)       delete _DBBFragmentProc_cpp;
-  if (_DBBChainFragmentProc_cpp)  delete _DBBChainFragmentProc_cpp;
+  if (_v1290PartEventProc_cpp)        delete _v1290PartEventProc_cpp;
+  if (_v1724PartEventProc_cpp)        delete _v1724PartEventProc_cpp;
+  if (_v1731PartEventProc_cpp)        delete _v1731PartEventProc_cpp;
+  if (_v830FragmentProc_cpp)          delete _v830FragmentProc_cpp;
+  if (_vLSBFragmentProc_cpp)          delete _vLSBFragmentProc_cpp;
+  if (_DBBFragmentProc_cpp)           delete _DBBFragmentProc_cpp;
+  if (_DBBChainFragmentProc_cpp)      delete _DBBChainFragmentProc_cpp;
+  if (_TriggerEngineFragmentProc_cpp) delete _TriggerEngineFragmentProc_cpp;
+  if (_EpicsInterfaceFragmentProc_cpp) delete _EpicsInterfaceFragmentProc_cpp;
 }
 
 void InputCppDAQData::resetAllProcessors() {
   // Reset all the processors.
-  if (_v1290PartEventProc_cpp)     _v1290PartEventProc_cpp->reset();
-  if (_v1724PartEventProc_cpp)     _v1724PartEventProc_cpp->reset();
-  if (_v1731PartEventProc_cpp)     _v1731PartEventProc_cpp->reset();
-  if (_v830FragmentProc_cpp)       _v830FragmentProc_cpp->reset();
-  if (_vLSBFragmentProc_cpp)       _vLSBFragmentProc_cpp->reset();
-  if (_DBBFragmentProc_cpp)        _DBBFragmentProc_cpp->reset();
-  if (_DBBChainFragmentProc_cpp)   _DBBChainFragmentProc_cpp->reset();
+  if (_v1290PartEventProc_cpp)        _v1290PartEventProc_cpp->reset();
+  if (_v1724PartEventProc_cpp)        _v1724PartEventProc_cpp->reset();
+  if (_v1731PartEventProc_cpp)        _v1731PartEventProc_cpp->reset();
+  if (_v830FragmentProc_cpp)          _v830FragmentProc_cpp->reset();
+  if (_vLSBFragmentProc_cpp)          _vLSBFragmentProc_cpp->reset();
+  if (_DBBFragmentProc_cpp)           _DBBFragmentProc_cpp->reset();
+  if (_DBBChainFragmentProc_cpp)      _DBBChainFragmentProc_cpp->reset();
+  if (_TriggerEngineFragmentProc_cpp) _TriggerEngineFragmentProc_cpp->reset();
+  if (_EpicsInterfaceFragmentProc_cpp) _EpicsInterfaceFragmentProc_cpp->reset();
 }
 
 template <class procType>
@@ -329,7 +349,7 @@ void InputCppDAQData::configureZeroSupressionTK(ZeroSupressionFilterTK* processo
     std::string fname = std::string(pMAUS_ROOT_DIR)+"/files/calibration/"+calib_file;
     std::ifstream inf(fname.c_str());
     if (!inf) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                       "Could not load Tracker calibration",
                        "InputCppDAQData::configureZeroSupressionTK"));
     } else {
@@ -340,7 +360,7 @@ void InputCppDAQData::configureZeroSupressionTK(ZeroSupressionFilterTK* processo
     Json::Value calibration_data;
     TrackerCalibMap *calibration = processor->get_calibration_ptr();
     if (!reader.parse(calib, calibration_data)) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                       "Could not load Tracker calibration",
                       "InputCppDAQData::configureZeroSupressionTK"));
     } else {

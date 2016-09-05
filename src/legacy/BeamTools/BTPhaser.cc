@@ -1,6 +1,6 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTPhaser.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
@@ -35,7 +35,7 @@ bool BTPhaser::SetThePhase(Hep3Vector Position, double time)
 	}
 	else {_thisPhaseSet = false; phase = " failed";}
 
-	Squeak::mout(Squeak::debug) << "Attempt to phase cavity at (x,y,z) " << Position << " [mm] with time " 
+	MAUS::Squeak::mout(MAUS::Squeak::debug) << "Attempt to phase cavity at (x,y,z) " << Position << " [mm] with time " 
 	          << time << " dt " << dt << " dt tolerance " << _phaseTolerance 
 	          << phase << std::endl;
 	return _thisPhaseSet;

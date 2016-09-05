@@ -45,6 +45,24 @@
 
 namespace MAUS {
 
+
+// Four predicate functions used by the stl sort algorithm to sort spacepoints in vectors
+bool compare_spoints_ascending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_position().z() < sp2->get_position().z());
+}
+
+bool compare_spoints_descending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_position().z() > sp2->get_position().z());
+}
+
+bool compare_spoints_ascending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_station() < sp2->get_station());
+}
+
+bool compare_spoints_descending_station(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
+  return (sp1->get_station() > sp2->get_station());
+}
+
 PatternRecognition::PatternRecognition(): _debug(false),
                                           _up_straight_pr_on(true),
                                           _down_straight_pr_on(true),

@@ -84,7 +84,7 @@ PhaseSpaceVector LinearApproximationTransferMap::Transport(
 
   double energy = vector.E();
   if (mass_ > energy) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                  "Attempting to transport a particle that is off mass shell.",
                  "MAUS::LinearApproximationOpticsModel::Transport()"));
   }

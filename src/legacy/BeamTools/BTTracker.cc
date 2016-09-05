@@ -37,7 +37,7 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
     if (y[4]*y[4] - y[5]*y[5] - y[6]*y[6] - y[7]*y[7] > -1e-6) {
       _m = 0.;
     } else {
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Mass undefined in stepping function", "BTTracker::integrate"));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Mass undefined in stepping function", "BTTracker::integrate"));
     }
   }
 
@@ -90,7 +90,7 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
     int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &indie, target_indie, &h, y);
     if(status != GSL_SUCCESS)
     {
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed during tracking", "BTTracker::integrate") );
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed during tracking", "BTTracker::integrate") );
       break;
     }
     if(nsteps > _maxNSteps)
@@ -99,7 +99,7 @@ void BTTracker::integrate(double target_indie, double* y, const BTField* field, 
       ios << "Killing tracking with step size " << h << " at step " << nsteps << " of " << _maxNSteps << "\n" 
           << "t: " << y[0] << " pos: " << y[1] << " " << y[2] << " " << y[3] << "\n"
           << "E: " << y[4] << " mom: " << y[5] << " " << y[6] << " " << y[7] << std::endl; 
-      throw(MAUS::Exception(MAUS::Exception::recoverable, ios.str()+" Exceeded maximum number of steps\n", "BTTracker::integrate") );
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, ios.str()+" Exceeded maximum number of steps\n", "BTTracker::integrate") );
       break;
     }
   }
@@ -285,7 +285,7 @@ void BTTracker::symplecticIntegrate(double end_tau, double* x_in, const BTField*
   }
 
   if(end_tau-tau > step_size/100.)
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error during tracking", "BTTracker::symplecticIntegrate"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error during tracking", "BTTracker::symplecticIntegrate"));
 
   //convert to kinetic momentum
   field->GetVectorPotential(x, potential);
@@ -395,7 +395,7 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
     case t:
     { FuncEqM = &BTTracker::t_equations_motion_many; indie = y[0]; break; }
     default:
-    { throw(MAUS::Exception(MAUS::Exception::recoverable, "Only integration through time implemented in integrate many", "BTTracker::integrateMany") ); }
+    { throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Only integration through time implemented in integrate many", "BTTracker::integrateMany") ); }
   }
   gsl_odeiv_system    system  = {FuncEqM, NULL, 8*n_events, NULL};
 
@@ -407,7 +407,7 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
     int status =  gsl_odeiv_evolve_apply(evolve, control, step, &system, &indie, target_indie, &h, y);
     if(status != GSL_SUCCESS)
     {
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed during tracking", "BTTracker::integrateMany") );
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed during tracking", "BTTracker::integrateMany") );
       break;
     }
     if(nsteps > _maxNSteps)
@@ -416,7 +416,7 @@ void BTTracker::integrateMany(double target_indie, int n_events, double* y, doub
       ios << "Killing tracking with step size " << h << " at step " << nsteps << "Event failed:\n" 
           << "t: " << y[0] << " pos: " << y[1] << " " << y[2] << " " << y[3] << "\n"
           << "E: " << y[4] << " mom: " << y[5] << " " << y[6] << " " << y[7] << std::endl; 
-      throw(MAUS::Exception(MAUS::Exception::recoverable, ios.str()+"Exceeded maximum number of steps\n", "BTTracker::integrateMany") );
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, ios.str()+"Exceeded maximum number of steps\n", "BTTracker::integrateMany") );
       break;
     }
   }

@@ -38,7 +38,7 @@
 #include "DataStructure/Data.hh"
 #include "DataStructure/Spill.hh"
 #include "DataStructure/DAQData.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 
@@ -121,7 +121,7 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
        _eventsCount++;
        return data_cpp;
      } else {
-       throw(MAUS::Exception(Exception::recoverable,
+       throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                              "Failed to read next event",
                              "InputCppDAQData::_emit_cpp()"));
     }
@@ -195,6 +195,12 @@ class InputCppDAQData : public InputBase<MAUS::Data> {
 
   /** Processor for DBBChain data. */
   DBBChainCppDataProcessor  *_DBBChainFragmentProc_cpp;
+
+  /** Processor for TriggerEngine data. */
+  TriggerEngineCppDataProcessor  *_TriggerEngineFragmentProc_cpp;
+
+  /** Processor for EpicsInterface data. */
+  EpicsInterfaceCppDataProcessor  *_EpicsInterfaceFragmentProc_cpp;
 
   /** Convert the DAQ event type (as coded in DATE) into string.
   * \param[in] pType The type of the event to be converted.

@@ -132,7 +132,7 @@ namespace MAUS {
       std::vector<double> cov = h_track->get_covariance();
       TMatrixD patrec_covariance(5, 5);
       if (cov.size() != 25) {
-        throw MAUS::Exception(MAUS::Exception::recoverable,
+        throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                               "Dimension of covariance matrix does not match the state vector",
                               "KalmanSeed::ComputeInitalCovariance(Helical)");
       }
@@ -217,7 +217,7 @@ namespace MAUS {
       TMatrixD patrec_covariance(4, 4);
 
       if (cov.size() != (unsigned int)16) {
-        throw MAUS::Exception(MAUS::Exception::recoverable,
+        throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                               "Dimension of covariance matrix does not match the state vector",
                               "KalmanSeed::ComputeInitalCovariance(Straight)");
       }
@@ -255,7 +255,7 @@ namespace MAUS {
     double default_mom = geom->GetDefaultMomentum();
 
     if (the_track.GetLength() < 1)
-      throw MAUS::Exception(MAUS::Exception::recoverable,
+      throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                             "Not enough points in Kalman Track",
                             "ConvertToSciFiTrack()");
 
@@ -277,7 +277,7 @@ namespace MAUS {
     } else if (dimension == 5) {
       new_track->SetAlgorithmUsed(SciFiTrack::kalman_helical);
     } else {
-      throw MAUS::Exception(MAUS::Exception::recoverable,
+      throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                             "Unexpected dimension of Kalman::Track",
                             "ConvertToSciFiTrack()");
     }

@@ -42,13 +42,13 @@ void MapCppKLMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   Json::Reader reader;
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to parse Json Configuration",
                           "MapCppKLMCDigitizer::_birth");
   }
   // get the geometry
   if (!_configJSON.isMember("simulation_geometry_filename"))
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                    "Could not find geometry file",
                    "MapCppKLMCDigitizer::birth"));
   std::string filename;
@@ -126,7 +126,7 @@ KLTmpDigits MapCppKLMCDigitizer::make_kl_digits(KLHitArray* hits) const {
 
       // make sure we can get the cell info
       if (!hit.GetChannelId())
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "No channel_id in hit",
                        "MapCppKLMCDigitizer::make_kl_digits"));
       double edep = hit.GetEnergyDeposited();
@@ -161,7 +161,7 @@ KLTmpDigits MapCppKLMCDigitizer::make_kl_digits(KLHitArray* hits) const {
 
       // make sure we actually found a kl module corresponding to this hit
       if (hit_module == NULL)
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "No KL module for hit",
                        "MapCppKLMCDigitizer::make_kl_digits"));
 
@@ -238,43 +238,43 @@ int MapCppKLMCDigitizer::calculate_nphe_at_pmt(double dist, double edep) const {
   if (fDebug) std::cout << "edep= " << edep << std::endl;
 
   if (!_configJSON.isMember("KLattLengthLong"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
 		       "Could not find KLattLengthLong in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLattLengthShort"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLattLengthShort in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLattLengthLongNorm"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLattLengthLongNorm in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLattLengthShortNorm"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLattLengthShortNorm in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLconversionFactor"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLconversionFactor in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLlightCollectionEff"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLlightCollectionEff in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLquantumEff"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLquantumEff in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLlightGuideEff"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLlightGuideEff in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLpmtGain"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLpmtGain in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
   if (!_configJSON.isMember("KLpmtSigmaGain"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "Could not find KLpmtSigmaGain in config",
                        "MapCppKLMCDigitizer::calculate_nphe_at_pmt"));
 
@@ -326,11 +326,11 @@ void MapCppKLMCDigitizer::fill_kl_evt(int evnum,
                                       KLTmpDigits& tmpDigits,
                                       KLDigitArray* klDigits) const {
   if (!_configJSON.isMember("Do_V1724_Zero_Suppression"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                 "Could not find Do_V1724_Zero_Suppression",
                 "MapCppKLMCDigitizer::fill_kl_evt"));
   if (!_configJSON.isMember("V1724_Zero_Suppression_Threshold"))
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                 "Could not find V1724_Zero_Suppression_Threshold",
                 "MapCppKLMCDigitizer::fill_kl_evt"));
 

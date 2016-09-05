@@ -75,7 +75,7 @@ TransferMap TransferMapCalculator::GetPolynomialTransferMap(PhaseSpaceVector ref
 
 TransferMap TransferMapCalculator::GetPolynomialTransferMap(std::vector<PhaseSpaceVector> in, std::vector<PhaseSpaceVector> out, int order)
 {
-  if(in.size() < 1 || out.size() != in.size()) throw(MAUS::Exception(MAUS::Exception::recoverable, "Badly conditioned input", "TransferMapCalculator::GetPolynomialTransferMap"));
+  if(in.size() < 1 || out.size() != in.size()) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Badly conditioned input", "TransferMapCalculator::GetPolynomialTransferMap"));
   std::vector< std::vector<double> > in_v (in.size(), std::vector<double>(6,0.));
   std::vector< std::vector<double> > out_v(in.size(), std::vector<double>(6,0.));
   for(size_t i=0; i<in.size(); i++) 
@@ -105,7 +105,7 @@ TransferMap TransferMapCalculator::GetSweepingPolynomialTransferMap(const Vector
   MAUS::PolynomialMap* pvec = MAUS::PolynomialMap::Chi2SweepingLeastSquaresFitVariableWalls(
     *trackingOutput, order, std::vector< MAUS::PolynomialMap::PolynomialCoefficient >(), 
                                chi2Max, deltaV, deltaFactor, maxNumberOfSteps, deltaMaxV);
-  if(!pvec) throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to make any polynomial fit at all - try tweaking control parameters", "TransferMapCalculator::GetSweepingPolynomialTransferMap"));
+  if(!pvec) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to make any polynomial fit at all - try tweaking control parameters", "TransferMapCalculator::GetSweepingPolynomialTransferMap"));
   for(size_t i=0; i<deltaV.size(); i++) delta[i] = deltaV[i];
   TransferMap       map;
   map.SetPolynomialMap(pvec);

@@ -32,8 +32,8 @@ EnumDetectorPointProcessor::JsonToCpp(
             json_int.asInt());
     return dp;
   } else {
-    throw(Exception(
-        Exception::recoverable,
+    throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Failed to convert json value to enumerator: DetectorPoint",
         "EnumDetectorPointProcessor::JsonToCpp"
                  ));
@@ -62,8 +62,8 @@ MAUS::DataStructure::Global::PID* EnumPIDProcessor::JsonToCpp(
     (*pd) = static_cast<MAUS::DataStructure::Global::PID>(json_int.asInt());
     return pd;
   } else {
-    throw(Exception(
-        Exception::recoverable,
+    throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "Failed to convert json value to enumerator: PID",
         "EnumPIDProcessor::JsonToCpp"
                  ));
