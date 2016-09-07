@@ -39,7 +39,7 @@ typedef std::vector<double> DoubleArray;
 /** @class SciFiBasePRTrack
  *  @author A. Dobbs
  *  @author C. Hunt
- *  @brief Base class for scifi pattern recogntion tracks
+ *  @brief Base class for scifi pattern recognition tracks
  */
 class SciFiBasePRTrack : public TObject {
   public:
@@ -50,7 +50,7 @@ class SciFiBasePRTrack : public TObject {
     explicit SciFiBasePRTrack(DoubleArray cov);
 
     /** @brief Construct some variables */
-    SciFiBasePRTrack(DoubleArray cov, SciFiSpacePointPArray spoints);
+    SciFiBasePRTrack(int charge, DoubleArray cov, SciFiSpacePointPArray spoints);
 
     /** @brief Copy constructor */
     SciFiBasePRTrack(const SciFiBasePRTrack& track);
@@ -63,6 +63,12 @@ class SciFiBasePRTrack : public TObject {
 
     /** @brief Combine the different chi sqs into one final value */
     virtual void form_total_chi_squared() {}
+
+    /** Get the charge */
+    int get_charge() const { return _charge; }
+
+    /** Set the charge */
+    void set_charge(int charge) { _charge = charge; }
 
     /** Get the covariance matrix elements of the least square fit parameters */
     std::vector<double> get_covariance() const { return _covariance; }
@@ -133,6 +139,7 @@ class SciFiBasePRTrack : public TObject {
     ThreeVector _momentum;   /** Reconstructed reference plane momentum */
     double _chi_sq;          /** The chisq of the fit/s which formed the track */
     int _ndf;                /** The number of degrees of freedom */
+    int _charge;              /** The track charge, 0 for straights */
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };
