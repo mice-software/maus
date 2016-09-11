@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+
 #include "Geant4/G4Navigator.hh"
 #include "Geant4/G4TransportationManager.hh"
 #include "Geant4/G4NistManager.hh"
@@ -366,7 +367,7 @@ void propagate(double* x, double target_z, const BTField* field,
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
       g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
-      double safety = 10;
+      double safety = std::fabs(step_size);
       double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
       if (boundary_dist > 1e6) {
         boundary_dist = safety;
@@ -378,7 +379,7 @@ void propagate(double* x, double target_z, const BTField* field,
       if (std::abs(z_dist) > 0.00000000001 and
           std::abs(z_dist) < std::abs(h)) {
         if (std::abs(z_dist) > 1.0) {
-          h = 1.0*prop_dir;
+          h = 0.9*z_dist;
         } else {
           h = z_dist; // will have proper sign from momvector
         }

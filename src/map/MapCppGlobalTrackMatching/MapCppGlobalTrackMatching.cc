@@ -58,6 +58,12 @@ namespace MAUS {
     _configCheck = true;
     _mapper_name = "MapCppGlobalTrackMatching";
     _pid_hypothesis_string = _configJSON["track_matching_pid_hypothesis"].asString();
+    std::string beamline_polarity_string = _configJSON["pid_beamline_polarity"].asString();
+    if (beamline_polarity_string == "positive") {
+      _beamline_polarity = 1;
+    } else {
+      _beamline_polarity = -1;
+    }
     Json::Value track_matching_tolerances = _configJSON["track_matching_tolerances"];
     _matching_tolerances["TOF0"] = std::make_pair(
         track_matching_tolerances["TOF0t"].asDouble(), 10000);
@@ -113,7 +119,6 @@ namespace MAUS {
     if (!recon_events) {
       return;
     }
-
     for (auto recon_event_iter = recon_events->begin();
          recon_event_iter != recon_events->end();
          ++recon_event_iter) {
@@ -123,8 +128,8 @@ namespace MAUS {
 
       if (global_event) {
         recon::global::TrackMatching
-            track_matching(global_event, _mapper_name, _pid_hypothesis_string,
-                           _matching_tolerances, 10.0, _no_check_settings, _energy_loss);
+            track_matching(global_event, _mapper_name, _pid_hypothesis_string, _beamline_polarity,
+                           _matching_tolerances, 20.0, _no_check_settings, _energy_loss);
         track_matching.USTrack();
         track_matching.DSTrack();
         track_matching.throughTrack();

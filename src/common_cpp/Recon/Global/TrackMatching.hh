@@ -55,6 +55,7 @@ namespace global {
     TrackMatching(GlobalEvent* global_event,
                   std::string mapper_name,
                   std::string pid_hypothesis_string,
+                  int beamline_polarity,
                   std::map<std::string, std::pair<double, double> >
                   matching_tolerances, double max_step_size,
                   std::pair<bool, std::map<std::string, double> > no_check_settings,
@@ -290,6 +291,8 @@ namespace global {
     /// Configuration setting for which PIDs to consider, can be kEPlus,
     /// kEMinus, kMuPlus, kMuMinus, kPiPlus, kPiMinus, or all
     std::string _pid_hypothesis_string;
+
+    int _beamline_polarity;
 
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
