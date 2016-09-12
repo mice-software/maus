@@ -48,7 +48,7 @@ void FullyTypedResolver<ParentType, ChildType>::ResolveReferences() {
                                 GetPointerAsValue<ChildType>(_ref_json_address);
     (*_ref_cpp_parent.*_cpp_setter)(data_address);
     if (data_address == NULL)
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               "Failed to resolve reference at "+_ref_json_address+
               " on C++ object "+STLUtils::ToString(_ref_cpp_parent),
               "ReferenceResolver::FullyTypedResolver::ResolveReferences"));
@@ -69,7 +69,7 @@ void TRefResolver<ParentType>::ResolveReferences() {
                                 GetPointerAsValue<TObject>(_ref_json_address);
     (*_ref_cpp_parent.*_cpp_setter)(data_address);
     if (data_address == NULL)
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               "Failed to resolve reference at "+_ref_json_address+
               " on C++ object "+STLUtils::ToString(_ref_cpp_parent),
               "ReferenceResolver::TRefResolver::ResolveReferences"));
@@ -90,7 +90,7 @@ void VectorResolver<ChildType>::ResolveReferences() {
     if (_vector == NULL)
         return;
     if (_index >= _vector->size())
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Index out of range while resolving pointer to array "+
                      _ref_json_address,
                      "ReferenceResolver::VectorResolver::ResolveReferences"));
@@ -98,7 +98,7 @@ void VectorResolver<ChildType>::ResolveReferences() {
                                 GetPointerAsValue<ChildType>(_ref_json_address);
     (*_vector)[_index] = data_address;
     if (data_address == NULL)
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               "Failed to resolve reference at "+_ref_json_address+
               " on C++ vector "+STLUtils::ToString(_vector)+" element "+
               STLUtils::ToString(_index),
@@ -120,14 +120,14 @@ inline void TRefArrayResolver::ResolveReferences() {
   if (_tref_array == NULL)
     return;
   if (_index > static_cast<size_t>(_tref_array->GetSize()))
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Index out of range while resolving pointer to array "+
                  _ref_json_address,
                  "ReferenceResolver::TRefArrayResolver::ResolveReferences"));
   TObject* data_address = RefManager::GetInstance().
       GetPointerAsValue<TObject>(_ref_json_address);
   if (data_address == NULL)
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Failed to resolve reference at "+_ref_json_address+
                  " on TRefArray element "+
                  STLUtils::ToString(_index),
@@ -166,7 +166,7 @@ void RefManager::SetPointerAsValue
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
     if (table->_data_hash.find(json_address) != table->_data_hash.end())
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Attempt to add json pointer "+json_address+
                      " to hash table when it was already added",
                      "JsonToCpp::RefManager::SetPointerAsValue(...)"));
@@ -180,7 +180,7 @@ void RefManager::SetPointerAsValue
           GetTypedPointerValueTable<TObject>();
       if (tableTObject->_data_hash.find(json_address) !=
           tableTObject->_data_hash.end())
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Attempt to add json pointer "+json_address+
                      " to TObject hash table when it was already added",
                      "JsonToCpp::RefManager::SetPointerAsValue(...)"));

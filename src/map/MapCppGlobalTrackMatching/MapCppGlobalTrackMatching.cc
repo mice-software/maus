@@ -51,7 +51,7 @@ namespace MAUS {
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Failed to parse configuration",
                         "MapCppGlobalTrackMatching::birth");
     }
@@ -104,12 +104,12 @@ namespace MAUS {
   void MapCppGlobalTrackMatching::_process(Data* data_cpp) const {
     // Read string and convert to a Json object
     if (!data_cpp) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "data_cpp was NULL",
                         "MapCppGlobalTrackMatching::_process");
     }
     if (!_configCheck) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Birth has not been successfully called",
                         "MapCppGlobalTrackMatching::_process");
     }

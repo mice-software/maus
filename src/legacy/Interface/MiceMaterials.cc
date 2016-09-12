@@ -34,9 +34,9 @@ MiceMaterials::MiceMaterials( bool noG4 )
 {
   if( noG4 )
   {
-    if(getenv( "MICEFILES" ) == NULL) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - MICEFILES environment variable was not defined", "MiceMaterials::MiceMaterials"));
-    if(getenv( "COMPILER" )  == NULL) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - COMPILER environment variable was not defined",  "MiceMaterials::MiceMaterials"));
-    if(getenv( "G4VERS" )    == NULL) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error - G4VERS environment variable was not defined",    "MiceMaterials::MiceMaterials"));
+    if(getenv( "MICEFILES" ) == NULL) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error - MICEFILES environment variable was not defined", "MiceMaterials::MiceMaterials"));
+    if(getenv( "COMPILER" )  == NULL) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error - COMPILER environment variable was not defined",  "MiceMaterials::MiceMaterials"));
+    if(getenv( "G4VERS" )    == NULL) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error - G4VERS environment variable was not defined",    "MiceMaterials::MiceMaterials"));
     std::string fname = std::string( getenv( "MICEFILES" ) ) + "/Models/Materials/micematerials_" 
                       + std::string( getenv( "COMPILER" ) ) + "_"
                       + std::string( getenv( "G4VERS" ) ) + ".txt";
@@ -145,13 +145,13 @@ void MiceMaterials::addMaterial( G4Material* mat, std::string name )
 G4Material* MiceMaterials::materialByName( std::string mat ) const
 {
   if ( _materials.find( mat ) == _materials.end() ) {
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
   }
   G4Material* matter = _materials.find( mat )->second;
 
   if( ! matter ) // can't find this material!
   {
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Unable to find material "+mat, "MiceMaterials::materialByName") );
     matter = _materials.find( "Galactic" )->second;
   }
 

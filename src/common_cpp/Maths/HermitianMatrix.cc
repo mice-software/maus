@@ -63,7 +63,7 @@ Vector<double> eigenvalues(const HermitianMatrix& matrix) {
   gsl_eigen_herm_free(workspace);
   if (ierr != 0) {
     gsl_vector_free(eigenvalues);
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvalues"));
   }
@@ -86,7 +86,7 @@ std::pair<Vector<double>, Matrix<complex> > eigensystem(
   if (ierr != 0) {
     gsl_vector_free(eigenvalues);
     gsl_matrix_complex_free(eigenvectors);
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Failed to calculate eigenvalue",
                  "MAUS::eigenvectors"));
   }

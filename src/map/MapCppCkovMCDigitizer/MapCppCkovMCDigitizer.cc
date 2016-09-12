@@ -47,7 +47,7 @@ void MapCppCkovMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to parse Json Configuration",
                           "MapCppCkovMCDigitizer::_birth");
   }
@@ -57,7 +57,7 @@ void MapCppCkovMCDigitizer::_birth(const std::string& argJsonConfigDocument) {
   // The simulation_geometry_filename will be copied to it.
   // So this is normally the simulation geometry.
   if (!_configJSON.isMember("reconstruction_geometry_filename"))
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                    "Could not find geometry file",
                    "MapCppCkovMCDigitizer::birth"));
   std::string filename;
@@ -153,7 +153,7 @@ multi_ckov_dig MapCppCkovMCDigitizer::make_ckov_digits(CkovHitArray* hit_array,
 
       // make sure we can get the station number
       if (!hit.GetChannelId())
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "No channel_id in hit",
                        "MapCppCkovMCDigitizer::make_ckov_digits"));
 
@@ -173,7 +173,7 @@ multi_ckov_dig MapCppCkovMCDigitizer::make_ckov_digits(CkovHitArray* hit_array,
 
       // make sure we actually found a tof module corresponding to this hit
       if (hit_module == NULL)
-          throw(Exception(Exception::recoverable,
+          throw(Exceptions::Exception(Exceptions::recoverable,
                        "No Ckov module for hit",
                        "MapCppCkovMCDigitizer::make_ckov_digits"));
 

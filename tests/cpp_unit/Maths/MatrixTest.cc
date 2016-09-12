@@ -236,7 +236,7 @@ TEST_F(MatrixTest, IndexingElements) {
   try {
     Matrix<double> matrix_d3;
     matrix_d3(20, 20) = 5.0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -245,7 +245,7 @@ TEST_F(MatrixTest, IndexingElements) {
     Matrix<double> matrix_d3;
     const double element_d = matrix_d3(20, 20);
     std::cout << element_d;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -254,7 +254,7 @@ TEST_F(MatrixTest, IndexingElements) {
   caught_exception = false;
   try {
     matrix_d1(-1, 1) = 5.0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -262,7 +262,7 @@ TEST_F(MatrixTest, IndexingElements) {
   try {
     const double element_d = matrix_d1(-1, 1);
     std::cout << element_d;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -271,7 +271,7 @@ TEST_F(MatrixTest, IndexingElements) {
   caught_exception = false;
   try {
     matrix_d1(1, -1) = 5.0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -279,7 +279,7 @@ TEST_F(MatrixTest, IndexingElements) {
   try {
     const double element_d = matrix_d1(1, -1);
     std::cout << element_d;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -308,7 +308,7 @@ TEST_F(MatrixTest, IndexingElements) {
   try {
     Matrix<complex> matrix_c3;
     matrix_c3(20, 20) = some_value;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -316,7 +316,7 @@ TEST_F(MatrixTest, IndexingElements) {
   try {
     Matrix<complex> matrix_c3;
     const MAUS::complex element_c = matrix_c3(20, 20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -325,14 +325,14 @@ TEST_F(MatrixTest, IndexingElements) {
   caught_exception = false;
   try {
     matrix_c1(-1, 1) = some_value;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
   caught_exception = false;
   try {
     const MAUS::complex element_c = matrix_c1(-1, 1);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -341,14 +341,14 @@ TEST_F(MatrixTest, IndexingElements) {
   caught_exception = false;
   try {
     matrix_c1(1, -1) = some_value;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
   caught_exception = false;
   try {
     const MAUS::complex element_c = matrix_c1(1, -1);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -435,7 +435,7 @@ TEST_F(MatrixTest, IndexingRows) {
   try {
     Matrix<double> matrix_d3;
     matrix_d3.row(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -444,7 +444,7 @@ TEST_F(MatrixTest, IndexingRows) {
   caught_exception = false;
   try {
     matrix_d0.row(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -462,7 +462,7 @@ TEST_F(MatrixTest, IndexingRows) {
   try {
     Matrix<double> matrix_c3;
     matrix_c3.row(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -471,7 +471,7 @@ TEST_F(MatrixTest, IndexingRows) {
   caught_exception = false;
   try {
     matrix_c0.row(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -491,7 +491,7 @@ TEST_F(MatrixTest, IndexingColumns) {
   try {
     Matrix<double> matrix_d3;
     matrix_d3.column(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -500,7 +500,7 @@ TEST_F(MatrixTest, IndexingColumns) {
   caught_exception = false;
   try {
     matrix_d0.column(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -518,7 +518,7 @@ TEST_F(MatrixTest, IndexingColumns) {
   try {
     Matrix<double> matrix_c3;
     matrix_c3.column(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -527,7 +527,7 @@ TEST_F(MatrixTest, IndexingColumns) {
   caught_exception = false;
   try {
     matrix_c0.column(20);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -662,7 +662,7 @@ TEST_F(MatrixTest, Assignment) {
   try {
     Matrix<double> matrix_d3(1, 12);
     matrix_d3 = matrix_d0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -685,7 +685,7 @@ TEST_F(MatrixTest, Assignment) {
   try {
     Matrix<complex> matrix_c3(1, 12);
     matrix_c3 = matrix_c0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -707,7 +707,7 @@ TEST_F(MatrixTest, Addition) {
   try {
     Matrix<double> matrix_d3(kRows+1, kColumns);
     matrix_d3 += matrix_d0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -715,7 +715,7 @@ TEST_F(MatrixTest, Addition) {
   try {
     Matrix<double> matrix_d3(kRows, kColumns+1);
     matrix_d3 += matrix_d0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -735,7 +735,7 @@ TEST_F(MatrixTest, Addition) {
   try {
     Matrix<complex> matrix_c3(kRows+1, kColumns);
     matrix_c3 += matrix_c0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -743,7 +743,7 @@ TEST_F(MatrixTest, Addition) {
   try {
     Matrix<complex> matrix_c3(kRows, kColumns+1);
     matrix_c3 += matrix_c0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -766,7 +766,7 @@ TEST_F(MatrixTest, Subtraction) {
   try {
     Matrix<double> matrix_d3(kRows+1, kColumns);
     matrix_d3 -= matrix_d0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -774,7 +774,7 @@ TEST_F(MatrixTest, Subtraction) {
   try {
     Matrix<double> matrix_d3(kRows, kColumns+1);
     matrix_d3 -= matrix_d0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -795,7 +795,7 @@ TEST_F(MatrixTest, Subtraction) {
   try {
     Matrix<complex> matrix_c3(kRows+1, kColumns);
     matrix_c3 -= matrix_c0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -803,7 +803,7 @@ TEST_F(MatrixTest, Subtraction) {
   try {
     Matrix<complex> matrix_c3(kRows, kColumns+1);
     matrix_c3 -= matrix_c0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -833,7 +833,7 @@ TEST_F(MatrixTest, Multiplication) {
   try {
     Matrix<double> matrix_d3(kColumns, kRows+1);
     matrix_d3 *= matrix_d0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -867,7 +867,7 @@ TEST_F(MatrixTest, Multiplication) {
   try {
     Matrix<complex> matrix_c3(kColumns, kRows+1);
     matrix_c3 *= matrix_c0;
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -958,7 +958,7 @@ TEST_F(MatrixTest, ComplexComposition) {
   try {
     Matrix<complex> matrix_c6
       = MAUS::Complex::complex(matrix_real_bad_rows, matrix_imag);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -967,7 +967,7 @@ TEST_F(MatrixTest, ComplexComposition) {
   try {
     Matrix<complex> matrix_c6
       = MAUS::Complex::complex(matrix_real_bad_columns, matrix_imag);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -1029,7 +1029,7 @@ TEST_F(MatrixTest, Determinant) {
   try {
     Matrix<double> matrix_d3(kRows, kColumns);
     determinant(matrix_d3);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -1063,7 +1063,7 @@ TEST_F(MatrixTest, Determinant) {
   try {
     Matrix<complex> matrix_c3(kRows, kColumns);
     determinant(matrix_c3);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -1085,7 +1085,7 @@ TEST_F(MatrixTest, Inverse) {
   try {
     Matrix<double> matrix_d4(kRows, kColumns);
     inverse(matrix_d4);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -1098,7 +1098,7 @@ TEST_F(MatrixTest, Inverse) {
       1,                                        1};
     Matrix<double> matrix_d4(2, 2, bad_array);
     inverse(matrix_d4);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -1207,7 +1207,7 @@ TEST_F(MatrixTest, Eigen) {
   try {
     Matrix<double> matrix_d4(kRows, kColumns);
     eigenvalues(matrix_d4);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);
@@ -1215,7 +1215,7 @@ TEST_F(MatrixTest, Eigen) {
   try {
     Matrix<double> matrix_d4(kRows, kColumns);
     eigensystem(matrix_d4);
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
     caught_exception = true;
   }
   EXPECT_TRUE(caught_exception);

@@ -29,7 +29,7 @@
 
 // MAUS headers
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace TrackMomentum {
 

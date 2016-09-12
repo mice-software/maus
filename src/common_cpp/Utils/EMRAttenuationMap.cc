@@ -94,7 +94,7 @@ bool EMRAttenuationMap::LoadConnectorAttenFile(std::string connectorAttenFile) {
   // Check the calibration file
   std::ifstream file(connectorAttenFile.c_str());
   if ( !file ) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not find EMR connector attenuation map",
           "EMRAttenuationMap::LoadConnectorAtten"));
   }
@@ -116,7 +116,7 @@ bool EMRAttenuationMap::LoadConnectorAttenFile(std::string connectorAttenFile) {
         }
       }
     }
-  } catch (MAUS::Exception e) {
+  } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in EMRAttenuationMap::LoadConnectorAtten : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -131,7 +131,7 @@ bool EMRAttenuationMap::LoadCfLengthFile(std::string cfLengthFile) {
   // Check the calibration file
   ifstream file(cfLengthFile.c_str());
   if ( !file ) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not find EMR clear fibre length",
           "EMRAttenuationMap::LoadCfLength"));
   }
@@ -153,7 +153,7 @@ bool EMRAttenuationMap::LoadCfLengthFile(std::string cfLengthFile) {
         }
       }
     }
-  } catch (MAUS::Exception e) {
+  } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in EMRAttenuationMap::LoadCfLength : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;

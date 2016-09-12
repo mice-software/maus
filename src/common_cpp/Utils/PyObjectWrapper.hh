@@ -70,7 +70,7 @@ class ImageData;
  *   - PyObject* dict -> PyObject* dict; presumed to be a PyJson structure
  * Attempts to wrap or unwrap to other C++ objects will be thrown out at compile
  * time. Attempts to wrap or unwrap from malformed Python objects will result in
- * a MAUS::Exception.
+ * a MAUS::Exceptions::Exception.
  */
 class PyObjectWrapper {
   public:
@@ -84,7 +84,7 @@ class PyObjectWrapper {
      * Caller keeps ownership of memory allocated by args. INPUT* is a new
      * block of memory that is now owned by caller.
      *
-     * @throws MAUS::Exception if input is NULL or any part of the conversion
+     * @throws MAUS::Exceptions::Exception if input is NULL or any part of the conversion
      *         fails
      *
      * e.g. Data* data = unwrap_pyobject<Data>(my_py_object);
@@ -102,7 +102,7 @@ class PyObjectWrapper {
      * @returns a block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(MAUS::Data* data);
 
@@ -114,7 +114,7 @@ class PyObjectWrapper {
      * @returns a block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(MAUS::JobHeaderData* data);
 
@@ -126,7 +126,7 @@ class PyObjectWrapper {
      * @returns a block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(MAUS::JobFooterData* data);
 
@@ -138,7 +138,7 @@ class PyObjectWrapper {
      * @returns a block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(MAUS::RunHeaderData* data);
 
@@ -150,7 +150,7 @@ class PyObjectWrapper {
      * @returns a block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(MAUS::RunFooterData* data);
 
@@ -162,7 +162,7 @@ class PyObjectWrapper {
      * @returns a block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(MAUS::ImageData* data);
 
@@ -174,7 +174,7 @@ class PyObjectWrapper {
      * @returns a new block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(Json::Value* json);
 
@@ -186,13 +186,13 @@ class PyObjectWrapper {
      * @returns a new block of memory that is now owned by Python (Py_INCREF is
      *  called).
      *
-     * @throws MAUS::Exception if output is NULL
+     * @throws MAUS::Exceptions::Exception if output is NULL
      */
     static inline PyObject* wrap(std::string* str);
 
     /* @brief Wrap a PyObject* into a PyObject* (NULL op)
      *
-     * @throws MAUS::Exception if py_object is NULL
+     * @throws MAUS::Exceptions::Exception if py_object is NULL
      */
     static inline PyObject* wrap(PyObject* py_object);
 

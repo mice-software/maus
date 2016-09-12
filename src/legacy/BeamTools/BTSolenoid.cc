@@ -286,7 +286,7 @@ TwoDGrid* BTSolenoid::BuildGrid1(double absoluteTolerance)
 		
 	std::vector<double> newZ(zGrid.size()*2-1, 0);
 	for(unsigned int i=0; i<zGrid.size(); i++) {newZ[zGrid.size()-i-1] = -zGrid[i]; newZ[zGrid.size()+i-1] = +zGrid[i];}
-	Squeak::mout(Squeak::debug) << "Generated grid with " << rGrid.size() << "x" << zGrid.size() << " points extending " 
+	MAUS::Squeak::mout(MAUS::Squeak::debug) << "Generated grid with " << rGrid.size() << "x" << zGrid.size() << " points extending " 
 	                           << (rGrid.back()-rGrid[0])/m << "x" << (zGrid.back()-zGrid[0])/m << " m with tolerance " << absoluteTolerance/tesla
 	                           << " T calculated at (" << rOrder << "," << zOrder << ") order" << std::endl;
 
@@ -349,7 +349,7 @@ TwoDGrid* BTSolenoid::BuildGrid2(double absoluteTolerance)
 		myR.push_back(myR.back()+dR);
 
 	}
-	Squeak::mout(Squeak::info) << "Generated grid with " << myR.size() << "x" << myZ.size() << " points extending " 
+	MAUS::Squeak::mout(MAUS::Squeak::info) << "Generated grid with " << myR.size() << "x" << myZ.size() << " points extending " 
 	                           << (myR.back()-myR[0])/m << "x" << (myZ.back()-myZ[0])/m << " m with tolerance " << absoluteTolerance/tesla
 	                           << " T calculated at (" << rOrder << "," << zOrder << ") order and max (B_r, B_z) (" 
 	                           << bTotR/tesla << ", " << bTotZ/tesla  << ") T on grid edge" << std::endl;
@@ -574,7 +574,7 @@ void BTSolenoid::WriteIcoolSheetFile(std::string filename, Hep3Vector point, std
 	int numberOfSheets=0;
 	if(!fout)
 	{
-		Squeak::mout(Squeak::warning) << "Could not open file " << filename << " for icool output" << std::endl;
+		MAUS::Squeak::mout(MAUS::Squeak::warning) << "Could not open file " << filename << " for icool output" << std::endl;
 		return;
 	}
 	for(unsigned int i=0; i<Solenoids.size(); i++) numberOfSheets+=Solenoids[i]->GetNumberOfSheets();
@@ -584,7 +584,7 @@ void BTSolenoid::WriteIcoolSheetFile(std::string filename, Hep3Vector point, std
 	for(unsigned int i=0; i<Solenoids.size(); i++)
 		firstSheet = Solenoids[i]->WriteIcoolSheets(fout, point, firstSheet);
 	if(!fout) 
-		Squeak::mout(Squeak::warning) << "There was an error while writing " << filename 
+		MAUS::Squeak::mout(MAUS::Squeak::warning) << "There was an error while writing " << filename 
 		                              << " for icool output" << std::endl;
 	fout.close();
 

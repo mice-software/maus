@@ -44,13 +44,13 @@ namespace global {
     std::string histname = variable + "_" + hypothesis;
 
     if (!file || file->IsZombie()) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
 		      "File containing MC PID histograms not found.",
 		      "Recon::Global::PIDBase2D::PIDBase2D()"));
     }
     _hist = static_cast<TH2F*>(file->Get(histname.c_str()));
     if (!_hist) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
 		      "Histogram not found in file.",
 		      "Recon::Global::PIDBase2D::PIDBase2D()"));
     }
@@ -59,7 +59,7 @@ namespace global {
   PIDBase2D::~PIDBase2D() {
     if (_writeFile) {
       if (!_hist) {
-	throw(Exception(Exception::recoverable,
+	throw(Exceptions::Exception(Exceptions::recoverable,
 			"Can't write histogram to file.",
 			"Recon::Global::PIDBase2D::~PIDBase2D()"));
       }

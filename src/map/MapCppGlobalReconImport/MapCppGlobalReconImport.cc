@@ -18,7 +18,7 @@
 #include "src/map/MapCppGlobalReconImport/MapCppGlobalReconImport.hh"
 
 #include "src/common_cpp/DataStructure/Data.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Converter/DataConverters/JsonCppSpillConverter.hh"
 #include "src/common_cpp/Converter/DataConverters/CppJsonSpillConverter.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
@@ -42,14 +42,14 @@ namespace MAUS {
     _configCheck = false;
     bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
     if (!parsingSuccessful) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
 			    "Failed to parse configuration",
 			    "MapCppGlobalReconImport::birth");
     }
 
     char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
     if (!pMAUS_ROOT_DIR) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
 			    std::string("Could not find the $MAUS_ROOT_DIR env variable. ")+\
 			    std::string("Did you try running: source env.sh?"),
 			    "MapCppGlobalReconImport::_birth");
@@ -65,12 +65,12 @@ namespace MAUS {
   void MapCppGlobalReconImport::_process(MAUS::Data* data_cpp) const {
     // Read string and convert to a Json object
     if (!data_cpp) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
 			    "data_cpp was NULL",
 			    "MapCppGlobalReconImport::_process");
     }
     if (!_configCheck) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
 			    "Birth has not been successfully called",
 			    "MapCppGlobalReconImport::_process");
     }

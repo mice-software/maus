@@ -30,7 +30,7 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
   using ReferenceResolver::JsonToCpp::TRefArrayResolver;
   if (!json_array.isConvertibleTo(Json::arrayValue)) {
     // no memory allocated yet...
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Failed to resolve Json::Value of type "+
                  JsonWrapper::ValueTypeToString(json_array.type())+
                  " to array",
@@ -52,7 +52,7 @@ inline TRefArray* TRefArrayProcessor::JsonToCpp(
           RefManager::GetInstance().AddReference(res);
         }
       }
-    } catch (Exception exc) {
+    } catch (Exceptions::Exception exc) {
       // if there's a problem, clean up before rethrowing the exception
       throw exc;
     }

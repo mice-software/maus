@@ -46,7 +46,7 @@ bool KLChannelMap::InitFromFile(string filename) {
       _klKey.push_back(klkey);
       _fadcKey.push_back(fadckey);
     }
-  } catch (Exception e) {
+  } catch (Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
       << "Error in KLChannelMap::InitFromFile : Error during loading." << std::endl
       << e.GetMessage() << std::endl;
@@ -82,8 +82,8 @@ KLChannelKey* KLChannelMap::find(std::string daqKeyStr) const {
   try {
     xConv << daqKeyStr;
     xConv >> xDaqKey;
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "KLChannelMap::find(std::string)"));
   }
@@ -94,13 +94,13 @@ KLChannelKey* KLChannelMap::find(std::string daqKeyStr) const {
 
 //////////////////////////////////////////////////////////////////////////
 
-KLChannelKey::KLChannelKey(string keyStr) throw(Exception) {
+KLChannelKey::KLChannelKey(string keyStr) throw(Exceptions::Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted KL Channel Key"),
                  "KLChannelKey::KLChannelKey(std::string)"));
   }
@@ -162,11 +162,11 @@ ostream& operator<<( ostream& stream, KLChannelKey key ) {
   return stream;
 }
 
-istream& operator>>( istream& stream, KLChannelKey &key ) throw(Exception) {
+istream& operator>>( istream& stream, KLChannelKey &key ) throw(Exceptions::Exception) {
   string xLabel;
   stream >> xLabel >> key._cell >> key._pmt >> key._detector;
   if (xLabel != "KLChannelKey") {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted KL Channel Key"),
                  "istream& operator>>(istream& stream, KLChannelKey)"));
   }

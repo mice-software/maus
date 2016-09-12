@@ -36,7 +36,7 @@
 #include <vector>
 
 // Other headers
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Config/MiceModule.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"

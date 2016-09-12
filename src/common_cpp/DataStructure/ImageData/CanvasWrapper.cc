@@ -67,11 +67,11 @@ void CanvasWrapper::SetCanvas(TCanvas* canvas) {
 
 void CanvasWrapper::EmbedCanvas(TRootEmbeddedCanvas* embed) {
     if (embed == NULL) {
-        throw Exception(Exception::recoverable, "EmbeddedCanvas was NULL",
+        throw Exceptions::Exception(Exceptions::recoverable, "EmbeddedCanvas was NULL",
                         "CanvasWrapper::EmbedCanvas");
     }
     if (_canvas == NULL) {
-        throw Exception(Exception::recoverable, "Trying to adopt NULL canvas",
+        throw Exceptions::Exception(Exceptions::recoverable, "Trying to adopt NULL canvas",
                         "CanvasWrapper::EmbedCanvas");
     }
     embed->AdoptCanvas(_canvas);

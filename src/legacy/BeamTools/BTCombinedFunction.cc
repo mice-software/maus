@@ -1,7 +1,7 @@
 // MAUS WARNING: THIS IS LEGACY CODE.
 #include "BTCombinedFunction.hh"
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 BTCombinedFunction::BTCombinedFunction
       (int maxPole, double By, double fieldIndex, double length, double height,
@@ -69,7 +69,7 @@ double BTCombinedFunction::GetFieldAtPoleTip(int pole)
 			return b0 * _fieldIndex*(_fieldIndex+1)/(2*_radiusOfCurvature*_radiusOfCurvature)*_width/2.*_width/2.;
 		}
 		default:
-			throw (MAUS::Exception(MAUS::Exception::nonRecoverable, "Combined Function pole out of range", "BTCombinedFunction::GetFieldAtPoleTip(int)"));
+			throw (MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable, "Combined Function pole out of range", "BTCombinedFunction::GetFieldAtPoleTip(int)"));
 	}
 }
 

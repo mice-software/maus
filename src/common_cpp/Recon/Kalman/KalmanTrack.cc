@@ -42,7 +42,7 @@ namespace Kalman {
       if ((_vector.GetNcols() != 1) ||
           (_covariance.GetNrows() != static_cast<int>(_dimension)) ||
           (_covariance.GetNcols() != static_cast<int>(_dimension))) {
-        throw Exception(Exception::nonRecoverable,
+        throw Exceptions::Exception(Exceptions::nonRecoverable,
             "Vector and covariance matrix have inconsistent dimensions",
             "Kalman::State::State()");
       }
@@ -66,7 +66,7 @@ namespace Kalman {
 
   void State::SetVector(TMatrixD vec) {
     if ((vec.GetNrows() != static_cast<int>(_dimension)) || (vec.GetNcols() != 1)) {
-      throw Exception(Exception::nonRecoverable,
+      throw Exceptions::Exception(Exceptions::nonRecoverable,
           "State vector has wrong dimensions",
           "Kalman::State::SetVector()");
     }
@@ -77,7 +77,7 @@ namespace Kalman {
   void State::SetCovariance(TMatrixD cov) {
     if ((cov.GetNrows() != static_cast<int>(_dimension)) ||
         (cov.GetNcols() != static_cast<int>(_dimension))) {
-      throw Exception(Exception::nonRecoverable,
+      throw Exceptions::Exception(Exceptions::nonRecoverable,
           "Covariance matrix has wrong dimensions",
           "Kalman::State::SetCovariance()");
     }
@@ -128,7 +128,7 @@ namespace Kalman {
 
   TrackPoint& TrackPoint::operator=(const TrackPoint& tp) {
     if (this->GetDimension() != tp.GetDimension()) {
-      throw Exception(Exception::nonRecoverable,
+      throw Exceptions::Exception(Exceptions::nonRecoverable,
           "TrackPoint has wrong dimensions",
           "Kalman::TrackPoint::operator=()");
     }
@@ -145,7 +145,7 @@ namespace Kalman {
 
   TrackPoint& TrackPoint::copy(TrackPoint tp) { // NOTE! ID and Position stay the same!
     if (this->GetDimension() != tp.GetDimension()) {
-      throw Exception(Exception::nonRecoverable,
+      throw Exceptions::Exception(Exceptions::nonRecoverable,
           "TrackPoint has wrong dimensions",
           "Kalman::TrackPoint::operator=()");
     }
@@ -207,12 +207,12 @@ namespace Kalman {
 
   void Track::SetTrackPoint(unsigned int index, TrackPoint tp) {
     if (tp.GetDimension() != this->_dimension) {
-      throw Exception(Exception::nonRecoverable,
+      throw Exceptions::Exception(Exceptions::nonRecoverable,
           "TrackPoint has wrong dimensions",
           "Kalman::Track::SetTrackPoint()");
     }
     if (index >= _track_vector.size()) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "Index out of bounds of track",
           "Kalman::Track::SetTrackPoint()");
     }
@@ -221,7 +221,7 @@ namespace Kalman {
 
   void Track::Append(TrackPoint tp) {
     if (tp.GetDimension() != this->_dimension) {
-      throw Exception(Exception::nonRecoverable,
+      throw Exceptions::Exception(Exceptions::nonRecoverable,
           "TrackPoint has wrong dimensions",
           "Kalman::Track::Append()");
     }
@@ -230,7 +230,7 @@ namespace Kalman {
 
   void Track::DeleteTrackPoint(unsigned int index) {
     if (index >= _track_vector.size()) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "Index out of bounds of track",
           "Kalman::Track::SetState()");
     }

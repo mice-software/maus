@@ -77,7 +77,7 @@ class MausTransform(): # pylint:disable = W0232
         transforms - representing a MapPyGroup. Sub-lists are treated
         as nested MapPyGroups. If None then the current transform is
         deathed and rebirthed. 
-        @throw Exception if there are any problems with the
+        @throw Exceptions::Exception if there are any problems with the
         death or initialisation.
         """
         # Death current transform.

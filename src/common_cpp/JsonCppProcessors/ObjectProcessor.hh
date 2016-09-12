@@ -103,7 +103,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory ownership is given to the ParentType
      *  @param is_required if the branch doesnt exist in json or is NULL in C++,
-     *  throw MAUS::Exception if is_required is set to true
+     *  throw MAUS::Exceptions::Exception if is_required is set to true
      *
      *  Note: don't forget Get method has to be const
      */
@@ -134,7 +134,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory is owned by the PointerBranch parent
      *  @param is_required if the branch doesnt exist in json, is None in json,
-     *  or is NULL in C++, throw MAUS::Exception if is_required is set to true; else set
+     *  or is NULL in C++, throw MAUS::Exceptions::Exception if is_required is set to true; else set
      *  the branch to NULL/None as appropriate
      *item
      *  Note: don't forget Get method has to be const
@@ -162,7 +162,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the child data,
      *  where memory is owned by the PointerBranch parent
      *  @param is_required if the branch doesnt exist in json, is None in json,
-     *  or is NULL in C++, throw MAUS::Exception if is_required is set to true; else set
+     *  or is NULL in C++, throw MAUS::Exceptions::Exception if is_required is set to true; else set
      *  the branch to NULL/None as appropriate
      *item
      *  Note: don't forget Get method has to be const
@@ -192,7 +192,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  @param SetMethod callback that will set a pointer to the TRefArray,
      *  where memory is owned by the PointerBranch parent
      *  @param is_required if the branch doesnt exist in json, is None in json,
-     *  or is NULL in C++, throw MAUS::Exception if is_required is set to true; else set
+     *  or is NULL in C++, throw MAUS::Exceptions::Exception if is_required is set to true; else set
      *  the branch to NULL/None as appropriate
      *item
      *  Note: don't forget Get method has to be const
@@ -215,7 +215,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  associated with this branch
      *  @param SetMethod callback that will set the value of the child data
      *  associated with this branch
-     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exceptions::Exception if
      *  is_required is set to true
      *
      *  Note: don't forget Get method has to be const
@@ -236,7 +236,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *  representation of the child types
      *  @param SetMethod callback that will set the value of the child data
      *  associated with this branch
-     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exceptions::Exception if
      *  is_required is set to true
      *
      *  Note: A Get method is not required, as the inherited class
@@ -252,7 +252,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
      *
      *  @param branch_name name used by json to reference the branch
      *  @param child_value the branch will always be filled with this value
-     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exceptions::Exception if
      *  is_required is set to true
      *
      *  This method will never fill anything in the parent C++ class
@@ -264,7 +264,7 @@ class ObjectProcessor : public ProcessorBase<ObjectType> {
     /** Register a branch for ignoring
      *
      *  @param branch_name name used by json to reference the branch
-     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exceptions::Exception if
      *  is_required is set to true
      *
      *  This method will never fill anything in the parent C++ class or the Json

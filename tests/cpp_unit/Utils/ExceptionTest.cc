@@ -20,16 +20,17 @@
 #include "gtest/gtest.h"
 
 #include "src/common_cpp/Utils/Exception.hh"
+#include "src/common_cpp/Utils/ExceptionLevel.hh"
 
 namespace MAUS {
 
 TEST(ExceptionTest, ConstructorAccessorTest) {
     // just check it doesnt do anything daft
-    Exception* exception = new Exception();
+    Exceptions::Exception* exception = new Exceptions::Exception();
     delete exception;
 
-    exception = new Exception(Exception::recoverable, "error", "location");
-    EXPECT_EQ(exception->GetErrorLevel(), Exception::recoverable);
+    exception = new Exceptions::Exception(Exceptions::recoverable, "error", "location");
+    EXPECT_EQ(exception->GetErrorLevel(), Exceptions::recoverable);
     EXPECT_EQ(exception->GetMessage(), "error");
     EXPECT_EQ(exception->GetLocation(), "location");
     EXPECT_EQ(std::string(exception->what()), std::string("error at location"));
@@ -38,7 +39,7 @@ TEST(ExceptionTest, ConstructorAccessorTest) {
 }
 
 TEST(ExceptionTest, SetGetMessageTest) {
-    Exception exception(Exception::recoverable, "error", "location");
+    Exceptions::Exception exception(Exceptions::recoverable, "error", "location");
     exception.SetMessage("new error");
     EXPECT_EQ(exception.GetMessage(), "new error");
     EXPECT_EQ(std::string(exception.what()), std::string("new error at location"));
@@ -46,7 +47,7 @@ TEST(ExceptionTest, SetGetMessageTest) {
 
 std::string test_make_stack_trace(size_t skips, int recursion_level) {
     if (recursion_level <= 0) {
-        return Exception::MakeStackTrace(skips);
+        return Exceptions::Exception::MakeStackTrace(skips);
     } else {
         return test_make_stack_trace(skips, recursion_level-1);
     }
@@ -70,24 +71,24 @@ TEST(ExceptionTest, MakeStackTraceTest) {
 TEST(ExceptionTest, PrintTest) {
     // just run the code; probably if I was being careful I would check the
     // output by redirecting Squeak...
-    Exception exception(Exception::recoverable, "error", "location");
+    Exceptions::Exception exception(Exceptions::recoverable, "error", "location");
     exception.Print();
 }
 
 TEST(ExceptionTest, TestWillDoStackTrace) {
-    Exception::SetWillDoStackTrace(true);
-    EXPECT_TRUE(Exception::GetWillDoStackTrace());
-    Exception exception_1(Exception::recoverable, "error", "location");
+    Exceptions::Exception::SetWillDoStackTrace(true);
+    EXPECT_TRUE(Exceptions::Exception::GetWillDoStackTrace());
+    Exceptions::Exception exception_1(Exceptions::recoverable, "error", "location");
     EXPECT_TRUE(exception_1.GetStackTrace() != "");
 
-    Exception::SetWillDoStackTrace(false);
-    EXPECT_FALSE(Exception::GetWillDoStackTrace());
-    Exception exception_2(Exception::recoverable, "error", "location");
+    Exceptions::Exception::SetWillDoStackTrace(false);
+    EXPECT_FALSE(Exceptions::Exception::GetWillDoStackTrace());
+    Exceptions::Exception exception_2(Exceptions::recoverable, "error", "location");
     EXPECT_TRUE(exception_2.GetStackTrace() == "");
 
-    Exception::SetWillDoStackTrace(true);
-    EXPECT_TRUE(Exception::GetWillDoStackTrace());
-    Exception exception_3(Exception::recoverable, "error", "location");
+    Exceptions::Exception::SetWillDoStackTrace(true);
+    EXPECT_TRUE(Exceptions::Exception::GetWillDoStackTrace());
+    Exceptions::Exception exception_3(Exceptions::recoverable, "error", "location");
     EXPECT_TRUE(exception_3.GetStackTrace() != "");
 }
 }

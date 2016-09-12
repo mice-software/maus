@@ -171,7 +171,7 @@ static PyObject* create_from_matrix
  *
  *  \returns new CovarianceMatrix; caller owns the memory
  *
- *  \throws MAUS::Exception if array has wrong shape or is not a numpy_array
+ *  \throws MAUS::Exceptions::Exception if array has wrong shape or is not a numpy_array
  */
 static CovarianceMatrix* create_from_numpy_matrix(PyObject *numpy_array);
 }

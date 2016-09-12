@@ -149,7 +149,7 @@ bool KLCalibrationMap::LoadGainFile(std::string gainFile) {
       int n = FindKLChannelKey(key);
       _gain[n] = gain;
     }
-  } catch (MAUS::Exception e) {
+  } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in KLCalibrationMap::LoadKLFile : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;
@@ -234,7 +234,7 @@ void KLCalibrationMap::GetCalib(std::string devname, std::string caltype, std::s
   py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), fromdate.c_str());
   if (py_arg == NULL) {
     PyErr_Clear();
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
               "Failed to resolve arguments to get_calib",
               "MAUSEvaluator::evaluate"));
     }
@@ -247,7 +247,7 @@ void KLCalibrationMap::GetCalib(std::string devname, std::string caltype, std::s
     if (py_value == NULL) {
         PyErr_Clear();
         Py_XDECREF(py_arg);
-        throw(MAUS::Exception(MAUS::Exception::recoverable,
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                      "Failed to parse argument "+devname,
                      "GetCalib::get_calib"));
     }
@@ -267,7 +267,7 @@ bool KLCalibrationMap::LoadGainCalib() {
       int n = FindKLChannelKey(key);
       _gain[n] = gain;
     }
-  } catch (MAUS::Exception e) {
+  } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in KLCalibrationMap::LoadKLCalib : Error during loading. " << std::endl
     << e.GetMessage() << std::endl;

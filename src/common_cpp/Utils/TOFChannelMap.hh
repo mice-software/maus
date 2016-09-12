@@ -34,7 +34,7 @@
 #include "json/json.h"
 #include "src/common_cpp/Utils/DAQChannelMap.hh"
 #include "Utils/Exception.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
@@ -59,7 +59,7 @@ class TOFChannelKey {
   TOFChannelKey(int st, int pl, int sl, int pmt, string d)
   :_station(st), _plane(pl), _slab(sl), _pmt(pmt), _detector(d) {}
 
-  explicit TOFChannelKey(string keyStr) throw(Exception);
+  explicit TOFChannelKey(string keyStr) throw(Exceptions::Exception);
   virtual ~TOFChannelKey() {}
 
   bool operator==( const TOFChannelKey& key ) const;
@@ -79,7 +79,7 @@ class TOFChannelKey {
   string GetOppositeSidePMTStr();
 
   friend ostream& operator<<( ostream& stream, TOFChannelKey key );
-  friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Exception);
+  friend istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Exceptions::Exception);
 
   string detector() const {return _detector;}
 

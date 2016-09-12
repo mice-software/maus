@@ -42,7 +42,7 @@ void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
         _tracking == NULL ||
         _stepping == NULL ||
         _geometry == NULL)
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                         "EventAction::SetEvents not called",
                         "EventAction::BeginOfEventAction"));
     _virtPlanes->StartOfEvent();
@@ -54,7 +54,7 @@ void MAUSEventAction::BeginOfEventAction(const G4Event *anEvent) {
 void MAUSEventAction::EndOfEventAction(const G4Event *anEvent) {
     //  For each detector i
     if (_primary >= _events->size())
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Ran out of space in event array",
                      "MAUSEventAction::EndOfEventAction"));
     _events->at(_primary)->SetSciFiHits(new std::vector<SciFiHit>());

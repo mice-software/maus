@@ -53,7 +53,7 @@ std::string MiceModuleTest::test_module_name = "";
 
 TEST_F(MiceModuleTest, ReadModuleTest) {//name test...
   EXPECT_EQ(moduleTest->fullName(), test_module_name);
-  EXPECT_THROW(MiceModule(""), MAUS::Exception);
+  EXPECT_THROW(MiceModule(""), MAUS::Exceptions::Exception);
 }
 
 TEST_F(MiceModuleTest, GetBoolTest) {//bool test
@@ -61,7 +61,7 @@ TEST_F(MiceModuleTest, GetBoolTest) {//bool test
   EXPECT_EQ(t.size(),(unsigned)1);
   EXPECT_EQ(t["Invisible"], true);
   EXPECT_EQ(moduleTest->propertyBool("Invisible"), true);
-  EXPECT_THROW(moduleTest->propertyBool("NOTEXIST_Invisible"), MAUS::Exception);
+  EXPECT_THROW(moduleTest->propertyBool("NOTEXIST_Invisible"), MAUS::Exceptions::Exception);
 }
 
 TEST_F(MiceModuleTest, GetIntTest) {//int test
@@ -77,7 +77,7 @@ TEST_F(MiceModuleTest, GetStringTest) {//string test
   EXPECT_EQ(t["Volume"], "Box");
   EXPECT_EQ(moduleTest->propertyString("Material"), "AIR");
   EXPECT_EQ(moduleTest->propertyString("Volume"), "Box");
-  EXPECT_THROW(moduleTest->propertyString("NONEXIST_Material"), MAUS::Exception);
+  EXPECT_THROW(moduleTest->propertyString("NONEXIST_Material"), MAUS::Exceptions::Exception);
 }
 
 TEST_F(MiceModuleTest, GetDoubleTest) {//double test
@@ -97,7 +97,7 @@ TEST_F(MiceModuleTest, Get3VecTest) {//Hep3Vec test
   EXPECT_LT(fabs(t["Rotation"].z()-1.5707963267948966),1.e-8);
   EXPECT_EQ(moduleTest->propertyHep3Vector("Dimensions"), Hep3Vector(390,2600,1000));
   EXPECT_EQ(moduleTest->propertyHep3Vector("Position"), Hep3Vector(100,200,300));
-  EXPECT_THROW(moduleTest->propertyHep3Vector("NONEXIST_Position"), MAUS::Exception);
+  EXPECT_THROW(moduleTest->propertyHep3Vector("NONEXIST_Position"), MAUS::Exceptions::Exception);
 }
 
 TEST_F(MiceModuleTest, propertyDoubleAccessors) { //AddPropertyDouble(string, string), AddPropertyDouble(string, double), propertyDouble(string), propertyDoubleThis(string)
@@ -112,8 +112,8 @@ TEST_F(MiceModuleTest, propertyDoubleAccessors) { //AddPropertyDouble(string, st
   EXPECT_EQ   (mod.propertyDouble("MyProp3"), 3000.);
   EXPECT_EQ   (mod.propertyDoubleThis("MyProp3"), 3000.);
   mod.addPropertyDouble("MyProp4", "3000. fish");
-  EXPECT_THROW(mod.propertyDouble("MyProp4"), MAUS::Exception);
-  EXPECT_THROW(mod.addPropertyDouble("MyProp4", "3000."), MAUS::Exception);
+  EXPECT_THROW(mod.propertyDouble("MyProp4"), MAUS::Exceptions::Exception);
+  EXPECT_THROW(mod.addPropertyDouble("MyProp4", "3000."), MAUS::Exceptions::Exception);
 }
 
 TEST_F(MiceModuleTest, propertyHep3VecAccessors) { //AddPropertyHep3Vector(string, string), AddPropertyH3V(string, H3V), propertyh3v(string), propertyH3VThis(string)
@@ -128,10 +128,10 @@ TEST_F(MiceModuleTest, propertyHep3VecAccessors) { //AddPropertyHep3Vector(strin
   EXPECT_EQ   (mod.propertyHep3Vector("MyProp3"), CLHEP::Hep3Vector(1000., 2000., 3000.) );
   EXPECT_EQ   (mod.propertyHep3VectorThis("MyProp3"), CLHEP::Hep3Vector(1000., 2000., 3000.));
   mod.addPropertyHep3Vector("MyProp4", "1000. 2000.");
-  EXPECT_THROW(mod.propertyHep3Vector("MyProp4"), MAUS::Exception);
+  EXPECT_THROW(mod.propertyHep3Vector("MyProp4"), MAUS::Exceptions::Exception);
   mod.addPropertyHep3Vector("MyProp5", "1000. 2000. 3000. fish");
-  EXPECT_THROW(mod.propertyHep3Vector("MyProp5"), MAUS::Exception);
-  EXPECT_THROW(mod.addPropertyHep3Vector("MyProp2", "1000. 2000. 3000."), MAUS::Exception);
+  EXPECT_THROW(mod.propertyHep3Vector("MyProp5"), MAUS::Exceptions::Exception);
+  EXPECT_THROW(mod.addPropertyHep3Vector("MyProp2", "1000. 2000. 3000."), MAUS::Exceptions::Exception);
 }
 
 TEST_F(MiceModuleTest, printTree) {  // printTree doesn't print root module data

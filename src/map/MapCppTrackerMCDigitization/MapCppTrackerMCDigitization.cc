@@ -21,7 +21,7 @@
 #include "src/map/MapCppTrackerMCDigitization/MapCppTrackerMCDigitization.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiLookup.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerMCDigitization(void) {
@@ -74,7 +74,7 @@ void MapCppTrackerMCDigitization::_birth(const std::string& argJsonConfigDocumen
 //  bool calib = load_calibration("scifi_calibration_jan2013.txt");
   bool bad_channels = load_bad_channels(_bad_chan_file);
   if ( !calib || !map || !bad_channels ) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker calibration, mapping or bad channel list.",
           "RealDataDigitization::process"));
   }
@@ -87,7 +87,7 @@ void MapCppTrackerMCDigitization::_process(MAUS::Data* data) const {
   Spill& spill = *(data->GetSpill());
 
   if (!spill.GetMCEvents()) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
             "MC event array not initialised.",
             "MapCppTrackerMCDigitization::process");
   }
@@ -348,7 +348,7 @@ bool MapCppTrackerMCDigitization::load_calibration(std::string file) {
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker Calibration.",
           "MapCppTrackerMCDigitization::load_calibration"));
   }
@@ -385,7 +385,7 @@ bool MapCppTrackerMCDigitization::load_mapping(std::string file) {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker Mapping.",
           "MapCppTrackerMCDigitization::load_mapping"));
   }
@@ -435,7 +435,7 @@ bool MapCppTrackerMCDigitization::load_bad_channels(std::string file) {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker bad channel list.",
           "MapCppTrackerMCDigitization::load_bad_channels"));
   }

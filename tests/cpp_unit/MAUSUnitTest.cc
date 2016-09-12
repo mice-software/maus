@@ -79,6 +79,7 @@ Json::Value SetupConfig(int verbose_level) {
   config["keep_tracks"] = true;
   config["keep_steps"] = true;
   config["verbose_level"] = verbose_level;
+  config["log_level"] = 0;
   config["geant4_visualisation"] = false;
   config["physics_model"] = "QGSP_BERT";
   config["reference_physics_processes"] = "mean_energy_loss";
@@ -132,7 +133,7 @@ int main(int argc, char **argv) {
       TApplication theApp("App", &argc, argv);
       gROOT->SetBatch(true);
       test_out = RUN_ALL_TESTS();
-  } catch (MAUS::Exception exc) {
+  } catch (MAUS::Exceptions::Exception exc) {
       std::cerr << exc.GetMessage() << "\n" << exc.GetLocation() << "\n"
                 << exc.GetStackTrace() << std::endl;
   } catch (std::exception exc) {

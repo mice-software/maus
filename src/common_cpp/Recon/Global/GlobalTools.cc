@@ -310,7 +310,7 @@ void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
                bool energy_loss) {
   if (std::abs(target_z) > 100000) {
-    throw(Exception(Exception::recoverable, "Extreme target z",
+    throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
                     "GlobalTools::propagate"));
   }
   if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
@@ -318,7 +318,7 @@ void propagate(double* x, double target_z, const BTField* field,
     std::stringstream ios;
     ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
         << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-    throw(Exception(Exception::recoverable, ios.str()+
+    throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
           "Some components of tracker trackpoint are nan", "GlobalTools::propagate"));
   }
   int prop_dir = 1;
@@ -373,6 +373,15 @@ void propagate(double* x, double target_z, const BTField* field,
         boundary_dist = safety;
       }
       double z_dist = boundary_dist*momvector.z();
+      // We need to check if we're in a material with high stopping power, and if yes,
+      // decrease the step size as otherwise the underestimated path length due to the
+      // curved trajectory will cause problems
+      double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
+          )->GetElectronDensity();
+      double max_h = 100.0;
+      if (n_e > 1e+18) {
+        max_h = 1.0*prop_dir;
+      }
       // Check if z distance to next material boundary is smaller than step size
       // if yes, we impose a tight limit on the step size to avoid issues
       // arising from the track not being straight
@@ -383,15 +392,9 @@ void propagate(double* x, double target_z, const BTField* field,
         } else {
           h = z_dist; // will have proper sign from momvector
         }
-      } else {
-        // We need to check if we're in a material with high stopping power, and if yes,
-        // decrease the step size as otherwise the underestimated path length due to the
-        // curved trajectory will cause problems
-        double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
-                            )->GetElectronDensity();
-        if (n_e > 1e+18) {
-          h = 1.0*prop_dir;
-        }
+      }
+      if (std::abs(h) > std::abs (max_h)) {
+        h = max_h;
       }
       // Making sure we don't get stuck in Zeno's paradox
       if (std::abs(h) < 0.1) {
@@ -414,7 +417,7 @@ void propagate(double* x, double target_z, const BTField* field,
                                         target_z, &h, x);
     }
     if (status != GSL_SUCCESS) {
-      throw(Exception(Exception::recoverable, "Propagation failed",
+      throw(Exceptions::Exception(Exceptions::recoverable, "Propagation failed",
                             "GlobalTools::propagate"));
     }
 
@@ -423,7 +426,7 @@ void propagate(double* x, double target_z, const BTField* field,
       ios << "Stopping at step " << n_steps << " of " << max_steps << "\n"
           << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
           << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Exceeded maximum number of steps", "GlobalTools::propagate"));
       break;
     }
@@ -432,14 +435,14 @@ void propagate(double* x, double target_z, const BTField* field,
     if (std::abs(x[1]) > 700 || std::abs(x[2]) > 700) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
     // Need to catch the case where the particle is stopped
     if (std::abs(x[4]) < (mass + 0.01)) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
   }
