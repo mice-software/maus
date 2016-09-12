@@ -294,12 +294,15 @@ class Downloader: #pylint: disable = R0902
         if not os.path.exists(download_path):
             raise OSError('Path '+download_path+' does not exist')
         downloaded_file = self.geometry_cdb.get_gdml_for_run(long(run_num))
+        
         geoid = self.download_beamline_for_run(run_num, download_path)
         
         self.download_coolingchannel_for_run(run_num, download_path)
-        # self.download_corrections_for_run(run_num, download_path):
-        self.__write_zip_file(download_path, downloaded_file)
         
+
+        self.download_corrections_for_run(run_num, download_path)
+        self.__write_zip_file(download_path, downloaded_file)
+
         #return the associated geometry id
         return geoid
         
@@ -387,20 +390,32 @@ class Downloader: #pylint: disable = R0902
         """
         if os.path.exists(downloadpath) == False:
             raise OSError('Path '+downloadpath+' does not exist')
-        else:        
-            coolingchannel_cdb = cdb.CoolingChannel()
+        else:   
+            path = os.path.join(downloadpath, 'CoolingChannelInfo.gdml')
+            if os.path.exists(path):
+                os.remove(path)
+            
+            
+            coolingchannel_cdb = cdb.CoolingChannel(self.ccurl)
             try:
                 downloaded = \
-                           coolingchannel_cdb.get_coolingchannel_for_run(run_id)
+                    coolingchannel_cdb.get_coolingchannel_for_run(run_id)
+                print downloadpath
                 
-                path = downloadpath + '/CoolingChannelInfo.gdml'
                 
                 downloadedfile = \
                      self.generate_coolingchannel_xml_from_string(downloaded)
-                fout = open(path, 'w')
-                fout.write(str(downloadedfile))
-                fout.close()
                 
+                fout = open(path, 'w+')
+                # print downloadedfile
+                # print "Writing to", path
+                fout.write(str(downloadedfile))
+                # fout.read()
+                fout.close()
+                fout = open(path, 'r')
+                print fout.read()
+                fout.close()
+    
             except RuntimeError:
                 exit(1)
                 #fout = open(path, 'w')
@@ -408,31 +423,33 @@ class Downloader: #pylint: disable = R0902
                 #fout.close()
 
     
-    #def download_corrections_for_run(self, run_id, downloadpath):
+    def download_corrections_for_run(self, run_id, downloadpath):
         #pylint: disable = R0201, C0301
-    #    """
-    #    @Method download corrections for run 
-    #    
-    #    This method gets the detector alignment corrections, for the given run number, from the 
-    #    database.
-    #    
-    #    @param  id The long ID run number for the desired geometry.
-    #    @param  downloadedpath The path location where the files will be 
-    #    unpacked to.
-    #    """
-    #    if os.path.exists(downloadpath) == False:
-    #        raise OSError('Path '+downloadpath+' does not exist')
-    #    else:
-    #        correction_cdb = cdb.Corrections()
-    #        try:
-    #            downloaded = correction_cdb.get_corrections_for_run_xml(run_id)
-    #            path = downloadpath + "/AlignmentCorrections.gdml"
-    #            fout = open(path)
-    #            fout.write(str(downloaded))
-    #            fout.close()
-    #            
-    #        except RuntimeError:
-    #            exit(1)
+        """
+        @Method download corrections for run 
+        
+        This method gets the detector alignment corrections, for the given run number, from the 
+        database.
+        
+        @param  id The long ID run number for the desired geometry.
+        @param  downloadedpath The path location where the files will be 
+        unpacked to.
+        """
+        if os.path.exists(downloadpath) == False:
+            raise OSError('Path '+downloadpath+' does not exist')
+        else:
+            correction_cdb = cdb.Geometry()
+            correction_cdb.set_url(self.wsdlurl)
+            try:
+                downloaded = correction_cdb.get_corrections_for_run_xml(run_id)
+                print downloaded
+                path = os.path.join(downloadpath, "AlignmentCorrections.gdml")
+                fout = open(path, 'w')
+                fout.write(str(downloaded))
+                fout.close()
+                
+            except RuntimeError:
+                exit(1)
     
 
     def download_beamline_for_tag(self, tag, downloadpath):  #pylint: disable = R0201, C0301

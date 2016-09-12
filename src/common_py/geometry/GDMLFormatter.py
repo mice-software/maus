@@ -102,6 +102,9 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             elif fname.find('CoolingChannelInfo') >= 0:
                 self.coolingChannel_file = fname
                 print 'Found ', fname
+                fout = open(os.path.join(self.path_in, fname), 'r')
+                print fout.read()
+                fout.close()
             elif fname.find('Quad') >= 0 \
                      or fname.find('Dipole') >= 0 \
                      or fname.find('Solenoid') >= 0 \
@@ -243,7 +246,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         maus_information = \
             libxml2.parseFile(os.path.join(self.path_out, \
                                            self.maus_information_file))
-        corrpath = "gdml/MICE_Information/Configuration_Information/Corrections"
+        corrpath = "gdml/MICE_Information/Configuration_Information/GeometryID"
         corrs = maus_information.xpathEval(corrpath)
         
         config = libxml2.parseFile(os.path.join(self.path_out, \
@@ -322,15 +325,21 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
             d_pos = [0, 0, 0]
             d_rot = [0, 0, 0]
             if len(corrs) > 0:
-                for vol in corrs.xpathEval("Module"):
-                    if vol.prop("name").find(name) >= 0:
-                        # get the corrections with respect to the device centre
-                        d_pos = \
-                            [float(vol.prop(u)) for u in ['dx', 'dy', 'dz'] ]
-                        # rotations are measured in object coordinate system
-                        d_rot = \
-                            [float(vol.prop(u)) for u in ['dx', 'dy', 'dz'] ]
-                        
+                for node in corrs:
+                    for vol in node.xpathEval("ModuleName"):
+                        if vol.prop("name").find(name) >= 0:
+                            # get the corrections with 
+                            # respect to the device centre
+                            d_pos = \
+                                [float(vol.prop(u)) \
+                                     for u in ['dx', 'dy', 'dz'] ]
+                            # rotations are measured in 
+                            # object coordinate system
+                            d_rot = \
+                                [float(vol.prop(u)) \
+                                     for u in ['dx_rot', 'dy_rot', 'dz_rot'] ]
+                            # print name, d_pos, d_rot
+
             sol_pos = [0, 0, 0]
             sol_rot = [0, 0, 0]
             if name.find("Tracker0") >= 0 or name.find("Tracker1") >= 0:
@@ -338,12 +347,12 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                                for u in ['x', 'y', 'z'] ]
                 sol_rot = [float(solphys.xpathEval("rotation")[0].prop(u)) \
                                for u in ['x', 'y', 'z'] ]
-
+            # print name, sol_pos, sol_rot
             for i in [0, 1, 2]:
                 pos[i] += d_pos[i]
                 # rotations in the simulation alter the coordinate system 
                 # for the object
-                rot[i] -= d_rot[i]
+                rot[i] += d_rot[i]
             # positions and rotations in the reconstruction rotate the object
             d_pos_wrot = self.apply_rotationsMC(pos, sol_rot)
             pos_det = [x for x in d_pos_wrot]
@@ -352,9 +361,10 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                 # positions if necessary
                 pos_det[i] += sol_pos[i]
                 rot_det[i] += sol_rot[i]
+                rot_det[i] += d_rot[i]
             # print pos
             # print pos_det
-            u = ['x', 'y', 'z']            
+            u = ['x', 'y', 'z']         
             if name.find('Tracker0') >= 0: 
                 rot_det[0] = -rot_det[0]
             for i in [0, 1, 2]:
@@ -581,7 +591,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         correction = minidom.parse(correction_path)
             
         corr_info = next(node for node in \
-                             correction.getElementsByTagName("correction"))
+                             correction.getElementsByTagName("GeometryID"))
         if type(corr_info) == bool:
             raise IOError(
                 "Run number you have selected is not in the correction CDB")
@@ -605,7 +615,7 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
                                                              gdmlfile))
             # check if the geometry id already exists in this file
             geoid_node =  maus_information.getElementsByTagName("GeometryID")
-            if len(geoid_node) == 1:
+            if len(geoid_node) > 0:
                 if geoid_node[0].getAttribute("value") != str(geoid):
                     # update the geometry id
                     geoid_node[0].setAttribute("value", str(geoid))
@@ -909,9 +919,10 @@ class Formatter: #pylint: disable = R0902, R0912, R0914, R0915, C0103
         self.add_other_info()
         if self.coolingChannel_file != None:
             self.merge_cooling_channel_info(self.maus_information_file)
+        self.update_geometry_id_number(geoid, self.maus_information_file)
         if self.corrections_file != None:
             self.merge_alignment_correction_info(self.maus_information_file)
-        self.update_geometry_id_number(geoid, self.maus_information_file)
+        
             
         # if self.formatted == False:
         print self.configuration_file
