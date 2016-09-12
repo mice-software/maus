@@ -393,7 +393,7 @@ void propagate(double* x, double target_z, const BTField* field,
           h = z_dist; // will have proper sign from momvector
         }
       }
-      if (std::abs(h) > std::abs (max_h)) {
+      if (std::abs(h) > std::abs(max_h)) {
         h = max_h;
       }
       // Making sure we don't get stuck in Zeno's paradox
