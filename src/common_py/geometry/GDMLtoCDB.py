@@ -450,7 +450,8 @@ class Downloader: #pylint: disable = R0902
                 fout = open(path, 'w')
                 fout.write(str(downloaded))
                 fout.close()
-                
+    
+            #pylint: disable = W0212
             except (RuntimeError, cdb._exceptions.CdbPermanentError):
                 print "Failed to download corrections for ", run_id
                 print "Will continue without the application of analysis corrections."
