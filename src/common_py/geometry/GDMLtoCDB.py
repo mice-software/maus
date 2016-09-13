@@ -208,6 +208,7 @@ class Downloader: #pylint: disable = R0902
         self.wsdlurl = ""
         self.geometry_cdb = None
         self.ccurl = ""
+        self.use_geometry_corrections = True
         self.set_up_server()
 
     def set_up_server(self):
@@ -222,6 +223,7 @@ class Downloader: #pylint: disable = R0902
         self.geometry_cdb = cdb.Geometry()
         self.geometry_cdb.set_url(self.wsdlurl)
         self.ccurl = config.cdb_cc_download_url
+        self.use_geometry_corrections = config.apply_corrections_by_run
         server_status = self.geometry_cdb.get_status()
         if not server_status in SERVER_OK:
             print 'Warning, server status is '+server_status 
@@ -299,8 +301,9 @@ class Downloader: #pylint: disable = R0902
         
         self.download_coolingchannel_for_run(run_num, download_path)
         
+        if self.use_geometry_corrections:
+            self.download_corrections_for_run(run_num, download_path)
 
-        self.download_corrections_for_run(run_num, download_path)
         self.__write_zip_file(download_path, downloaded_file)
 
         #return the associated geometry id
@@ -368,9 +371,9 @@ class Downloader: #pylint: disable = R0902
                     # the latest applicable key uploaded should be the
                     # first key appearing
                     geoid = ids.keys()[0]
-                    # in case this is not the case run through the other
-                    # values to see if there is a later applicable
-                    # creation date
+                    # in the event that this is not the case run
+                    # through the other values to see if there is a
+                    # later applicable creation date
                     sortedids = sorted(ids.items(), \
                                   key=lambda x:x[1]['created'], reverse=True)
                     geoid = sortedids[0][0]
@@ -448,9 +451,14 @@ class Downloader: #pylint: disable = R0902
                 fout.write(str(downloaded))
                 fout.close()
                 
-            except RuntimeError:
-                exit(1)
-    
+            except (RuntimeError, cdb._exceptions.CdbPermanentError):
+                print "Failed to download corrections for ", run_id
+                print "Will continue without the application of analysis corrections."
+                path = os.path.join(downloadpath, "AlignmentCorrections.gdml")
+                fout = open(path, 'w')
+                fout.write('<GeometryID value=\"678\"/>')
+                fout.close()
+
 
     def download_beamline_for_tag(self, tag, downloadpath):  #pylint: disable = R0201, C0301
         """
