@@ -8,6 +8,7 @@ Release Notes
 MAUS-v2.6.0
   The following changes were made:
     - Global reconstruction TRef issue fixed, solving issue #1858
+    - Global reconstruction other updates
     - TrackerRecon mapper deprecated, split into new mappers for each stage
     - Tracker Kalman integration tests added
     - ReduceCppTofCalib now inherits from ReduceBase
@@ -21,6 +22,7 @@ MAUS-v2.6.0
     - Disabled MAUSGeant4ManagerTest.RunParticlePGTest due to intermittent failures
     - Third party G4BL random number fix for issue #1852
     - Third party unpacker version upgraded to 4.0.3
+    - Third party MAUS side CDB code update, geometry corrections may now be downloaded from CDB
   Known issues:
     - Tracker Kalman fit sometimes produces NaNs
   Notes:
