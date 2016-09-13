@@ -35,13 +35,14 @@ namespace recon {
 namespace global {
 
 TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
-    std::string pid_hypothesis_string,
+    std::string pid_hypothesis_string, int beamline_polarity,
     std::map<std::string, std::pair<double, double> > matching_tolerances,
     double max_step_size, std::pair<bool, std::map<std::string, double> > no_check_settings,
     bool energy_loss) {
   _global_event = global_event;
   _mapper_name = mapper_name;
   _pid_hypothesis_string = pid_hypothesis_string;
+  _beamline_polarity = beamline_polarity;
   _matching_tolerances = matching_tolerances;
   _max_step_size = max_step_size;
   _energy_loss = energy_loss;
@@ -82,19 +83,11 @@ void TrackMatching::USTrack() {
        ++scifi_track_iter) {
     // Pull out the track so we're not making a mess with ressources
     DataStructure::Global::Track* tracker0_track = (*scifi_track_iter);
-    // Extract four-position and momentum from first track point (i.e. most
-    // upstream)
-    TLorentzVector position;
-    TLorentzVector momentum;
-    if (!no_check) {
-      DataStructure::Global::TrackPoint* first_tracker_tp =
-          GlobalTools::GetNearestZTrackPoint(tracker0_track, 0);
-      position = first_tracker_tp->get_position();
-      momentum = first_tracker_tp->get_momentum();
-      delete first_tracker_tp;
-    }
     // Create the list of PIDs for which we want to create hypothesis tracks
     int charge_hypothesis = tracker0_track->get_charge();
+    if (charge_hypothesis == 0) {
+      charge_hypothesis = _beamline_polarity;
+    }
     std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
         charge_hypothesis, _pid_hypothesis_string);
     // Iterate over all possible PIDs and create an hypothesis track for each
@@ -118,6 +111,15 @@ void TrackMatching::USTrack() {
       }
       // Now match TOF1 and then TOF0
       if (!no_check) {
+        // Extract four-position and momentum from first track point (i.e. most
+        // upstream)
+        TLorentzVector position;
+        TLorentzVector momentum;
+        DataStructure::Global::TrackPoint* first_tracker_tp =
+            GlobalTools::GetNearestZTrackPoint(tracker0_track, 0);
+        position = first_tracker_tp->get_position();
+        momentum = first_tracker_tp->get_momentum();
+        delete first_tracker_tp;
         MatchTrackPoint(position, momentum, TOF1_sp, pids[i], field, "TOF1",
                         hypothesis_track);
 
@@ -192,19 +194,11 @@ void TrackMatching::DSTrack() {
        ++scifi_track_iter) {
     // Pull out the track so we're not making a mess with ressources
     DataStructure::Global::Track* tracker1_track = (*scifi_track_iter);
-    // Extract four-position and momentum from last track point (i.e. most
-    // downstream
-    TLorentzVector position;
-    TLorentzVector momentum;
-    if (!no_check) {
-      DataStructure::Global::TrackPoint* last_tracker_tp =
-          GlobalTools::GetNearestZTrackPoint(tracker1_track, 100000);
-      position = last_tracker_tp->get_position();
-      momentum = last_tracker_tp->get_momentum();
-      delete last_tracker_tp;
-    }
     // Create the list of PIDs for which we want to create hypothesis tracks
     int charge_hypothesis = tracker1_track->get_charge();
+    if (charge_hypothesis == 0) {
+      charge_hypothesis = _beamline_polarity;
+    }
     std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
         charge_hypothesis, _pid_hypothesis_string);
     // Iterate over all possible PIDs and create an hypothesis track for each
@@ -219,6 +213,15 @@ void TrackMatching::DSTrack() {
       AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching_DS",
                             mass, hypothesis_track);
       if (!no_check) {
+    // Extract four-position and momentum from last track point (i.e. most
+    // downstream
+        TLorentzVector position;
+        TLorentzVector momentum;
+        DataStructure::Global::TrackPoint* last_tracker_tp =
+            GlobalTools::GetNearestZTrackPoint(tracker1_track, 100000);
+        position = last_tracker_tp->get_position();
+        momentum = last_tracker_tp->get_momentum();
+        delete last_tracker_tp;
         // TOF2
         MatchTrackPoint(position, momentum, TOF2_sp, pids[i], field, "TOF2",
                         hypothesis_track);

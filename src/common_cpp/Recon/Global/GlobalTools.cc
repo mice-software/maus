@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+
 #include "Geant4/G4Navigator.hh"
 #include "Geant4/G4TransportationManager.hh"
 #include "Geant4/G4NistManager.hh"
@@ -366,31 +367,34 @@ void propagate(double* x, double target_z, const BTField* field,
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
       g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
-      double safety = 10;
+      double safety = std::fabs(step_size);
       double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
       if (boundary_dist > 1e6) {
         boundary_dist = safety;
       }
       double z_dist = boundary_dist*momvector.z();
+      // We need to check if we're in a material with high stopping power, and if yes,
+      // decrease the step size as otherwise the underestimated path length due to the
+      // curved trajectory will cause problems
+      double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
+          )->GetElectronDensity();
+      double max_h = 100.0;
+      if (n_e > 1e+18) {
+        max_h = 1.0*prop_dir;
+      }
       // Check if z distance to next material boundary is smaller than step size
       // if yes, we impose a tight limit on the step size to avoid issues
       // arising from the track not being straight
       if (std::abs(z_dist) > 0.00000000001 and
           std::abs(z_dist) < std::abs(h)) {
         if (std::abs(z_dist) > 1.0) {
-          h = 1.0*prop_dir;
+          h = 0.9*z_dist;
         } else {
           h = z_dist; // will have proper sign from momvector
         }
-      } else {
-        // We need to check if we're in a material with high stopping power, and if yes,
-        // decrease the step size as otherwise the underestimated path length due to the
-        // curved trajectory will cause problems
-        double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
-                            )->GetElectronDensity();
-        if (n_e > 1e+18) {
-          h = 1.0*prop_dir;
-        }
+      }
+      if (std::abs(h) > std::abs(max_h)) {
+        h = max_h;
       }
       // Making sure we don't get stuck in Zeno's paradox
       if (std::abs(h) < 0.1) {
