@@ -84,4 +84,6 @@ class Configreader(): #pylint: disable = R0903, R0902
         self.absorber2_file_number = config_dict['absorber2_file_number']
 
         self.survey_target_detectors = config_dict['survey_target_detectors']
+        self.apply_corrections_by_run = \
+          config_dict['geometry_download_apply_corrections']
         

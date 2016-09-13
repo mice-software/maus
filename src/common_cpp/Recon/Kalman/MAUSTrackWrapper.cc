@@ -284,7 +284,7 @@ namespace MAUS {
 
     ThreeVector reference_pos = geom->GetReferencePosition(tracker);
     HepRotation reference_rot = geom->GetReferenceRotation(tracker);
-    int charge = 0;
+    int charge = pr_track->get_charge();
 
     for (unsigned int i = 0; i < the_track.GetLength(); ++i) {
       int ID = the_track[i].GetId();
@@ -357,11 +357,13 @@ namespace MAUS {
         pos += reference_pos;
 
         mom *= reference_rot;
+        /*
         if (mom.z() < 0.0) {
           charge = -1;
         } else {
           charge = 1;
         }
+        */
         mom.setZ(fabs(mom.z()));
 
         grad.SetX(mom.x() / mom.z());

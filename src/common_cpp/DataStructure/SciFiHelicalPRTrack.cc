@@ -26,7 +26,6 @@ namespace MAUS {
 SciFiHelicalPRTrack::SciFiHelicalPRTrack()
   : SciFiBasePRTrack(),
     _tracker(-1),
-    _charge(0),
     _R(-1.0),
     _phi0(-1.0),
     _dsdz(-1.0),
@@ -45,9 +44,8 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int charge, ThreeVector po
                                          double point_spread, DoubleArray phi,
                                          SciFiSpacePointPArray spoints,
                                          const DoubleArray& covariance) :
-    SciFiBasePRTrack(covariance, spoints),
+    SciFiBasePRTrack(charge, covariance, spoints),
     _tracker(tracker),
-    _charge(charge),
     _R(circle.get_R()),
     _phi0(phi0),
     _dsdz(line_sz.get_m()),
@@ -83,7 +81,6 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _circle_chisq = htrk.get_circle_chisq();
   _circle_x0 = htrk.get_circle_x0();
   _circle_y0 = htrk.get_circle_y0();
-  _charge = htrk.get_charge();
   _tracker = htrk.get_tracker();
   _point_spread = htrk.get_point_spread();
   _pos0 = htrk.get_pos0();
@@ -98,7 +95,6 @@ void SciFiHelicalPRTrack::form_total_chi_squared() {
 SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
   : SciFiBasePRTrack(htrk),
     _tracker(htrk.get_tracker()),
-    _charge(htrk.get_charge()),
     _R(htrk.get_R()),
     _phi0(htrk.get_phi0()),
     _dsdz(htrk.get_dsdz()),

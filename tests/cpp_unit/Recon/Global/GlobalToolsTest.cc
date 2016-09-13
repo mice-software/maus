@@ -383,8 +383,6 @@ TEST_F(GlobalToolsTest, propagate) {
   double field2[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double xfield[4] = {x1[1], x1[2], 100, x1[0]};
   field->GetFieldValue(xfield, field2);
-  std::cerr << field2[0] << " " << field2[1] << " " << field2[2] << " "
-            << field2[3] << " " << field2[4] << " " << field2[5] << "\n";
 
   // Energy Loss, Magnetic Field
   try {
