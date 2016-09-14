@@ -34,7 +34,7 @@
 #include <string>
 
 #include "Config/MiceModule.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/DataStructure/Hit.hh"
 #include "src/common_cpp/DataStructure/MCEvent.hh"

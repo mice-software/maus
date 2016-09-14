@@ -33,7 +33,7 @@ template <class ParentType>
 void IgnoreItem<ParentType>::_SetCppChild
                       (const Json::Value& parent_json, ParentType& parent_cpp) {
     if (_required && !parent_json.isMember(_branch)) {
-            throw MAUS::Exception(Exception::recoverable,
+            throw MAUS::Exceptions::Exception(Exceptions::recoverable,
             "Missing required branch "+_branch+" converting json->cpp",
             "IgnoreItem::_SetCppChild");
     }

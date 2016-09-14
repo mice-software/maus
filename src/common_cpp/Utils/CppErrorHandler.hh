@@ -71,7 +71,7 @@ class CppErrorHandler {
    *  @param exc the (MAUS Exception) exception
    *  @param class_name the name of the class that generated the error
    */
-  Json::Value HandleException(Json::Value val, Exception exc, std::string class_name);
+  Json::Value HandleException(Json::Value val, Exceptions::Exception exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *
@@ -81,7 +81,7 @@ class CppErrorHandler {
    *  @param exc the (std) exception
    *  @param class_name the name of the class that generated the error
    */
-  void HandleExceptionNoJson(Exception exc, std::string class_name);
+  void HandleExceptionNoJson(Exceptions::Exception exc, std::string class_name);
 
   /** @brief Call default Cpp exception handler
    *

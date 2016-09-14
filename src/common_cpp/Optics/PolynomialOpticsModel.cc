@@ -30,7 +30,7 @@
 #include <sstream>
 #include <vector>
 
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Maths/PolynomialMap.hh"
 #include "src/common_cpp/DataStructure/Primary.hh"
@@ -104,7 +104,7 @@ void PolynomialOpticsModel::Build() {
   std::cout << "DEBUG PolynomialOpticsModel::Build: "
           << "# virtual tracks: " << virtual_tracks.size() << std::endl;
   if (virtual_tracks.size() == 0) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                  "No events were generated during simulation.",
                  "MAUS::TransferMapOpticsModel::Build()"));
   }
@@ -135,7 +135,7 @@ void PolynomialOpticsModel::Build() {
         const TransferMap* tm
                   = CalculateTransferMap(primary_vectors, station_hits->second);
         transfer_maps_[station_hits->first] = tm;
-    } catch (Exception& exc) {
+    } catch (Exceptions::Exception& exc) {
         Squeak::mout(Squeak::warning) << "Warning: " << exc.what() << std::endl;
     }
   }
@@ -146,7 +146,7 @@ void PolynomialOpticsModel::Build() {
 const std::vector<int64_t> PolynomialOpticsModel::GetAvailableMapPositions()
     const {
   if (!built_) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                   "No transfer maps available since the optics model has not "
                   "been built yet. Call Build() first.",
                   "MAUS::PolynomialOpticsModel::GetAvailableMapPositions()"));
@@ -269,7 +269,7 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     message << "The number of start plane hits (" << start_plane_hits.size()
             << ") is not the same as the number of hits per station ("
             << station_hits.size() << ").";
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                   message.str(),
                   "PolynomialOpticsModel::CalculateTransferMap()"));
   }
@@ -317,7 +317,7 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
 
   switch (algorithm_) {
     case kNone:
-      throw(Exception(Exception::nonRecoverable,
+      throw(Exceptions::Exception(Exceptions::nonRecoverable,
                     "No fitting algorithm specified in configuration.",
                     "PolynomialOpticsModel::CalculateTransferMap()"));
     case kLeastSquares:
@@ -338,33 +338,33 @@ const TransferMap * PolynomialOpticsModel::CalculateTransferMap(
     case kConstrainedLeastSquares:
       // constrained least squares
       // ConstrainedLeastSquaresFit(...);
-      throw(Exception(Exception::nonRecoverable,
+      throw(Exceptions::Exception(Exceptions::nonRecoverable,
                     "Constrained Polynomial fitting algorithm "
                     "is not yet implemented.",
                     "PolynomialOpticsModel::CalculateTransferMap()"));
     case kConstrainedChiSquared:
       // constrained chi squared least squares
       // Chi2ConstrainedLeastSquaresFit(...);
-      throw(Exception(Exception::nonRecoverable,
+      throw(Exceptions::Exception(Exceptions::nonRecoverable,
                     "Constrained Chi Squared fitting algorithm "
                     "is not yet implemented.",
                     "PolynomialOpticsModel::CalculateTransferMap()"));
     case kSweepingChiSquared:
       // sweeping chi squared least squares
       // Chi2SweepingLeastSquaresFit(...);
-      throw(Exception(Exception::nonRecoverable,
+      throw(Exceptions::Exception(Exceptions::nonRecoverable,
                     "Sweeping Chi Squared fitting algorithm "
                     "is not yet implemented.",
                     "PolynomialOpticsModel::CalculateTransferMap()"));
     case kSweepingChiSquaredWithVariableWalls:
       // sweeping chi squared with variable walls
       // Chi2SweepingLeastSquaresFitVariableWalls(...);
-      throw(Exception(Exception::nonRecoverable,
+      throw(Exceptions::Exception(Exceptions::nonRecoverable,
                     "Sweeping Chi Squared Variable Walls fitting algorithm "
                     "is not yet implemented.",
                     "PolynomialOpticsModel::CalculateTransferMap()"));
     default:
-      throw(Exception(Exception::nonRecoverable,
+      throw(Exceptions::Exception(Exceptions::nonRecoverable,
                     "Unrecognized fitting algorithm in configuration.",
                     "PolynomialOpticsModel::CalculateTransferMap()"));
   }

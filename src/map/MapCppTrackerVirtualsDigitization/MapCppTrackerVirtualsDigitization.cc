@@ -53,8 +53,9 @@ namespace MAUS {
     } else if ( test_method == "helix" ) {
       _test_method = 1;
     } else {
-      throw MAUS::Exception(Exception::nonRecoverable, "Unknown Test Method for virtual digitiser",
-                                                 "MapCppTrackerVirtualsDigitization::_birth(...)");
+      throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
+                                        "Unknown Test Method for virtual digitiser",
+                                        "MapCppTrackerVirtualsDigitization::_birth(...)");
     }
 
     Json::Value& straight_desc = (*json)["SciFiTestVirtualTracksStraight"];
@@ -92,7 +93,7 @@ namespace MAUS {
     Spill& spill = *(data->GetSpill());
 
     if (!spill.GetMCEvents()) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
               "MC event array not initialised.",
               "MapCppTrackerVirtualsDigitization::process");
     }

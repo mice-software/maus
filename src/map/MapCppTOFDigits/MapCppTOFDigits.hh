@@ -90,21 +90,21 @@ class MapCppTOFDigits : public MapBase<MAUS::Data> {
   /** @brief Gets the information from the ADC data ascosiated with the current TDC data
    */
   bool findAdc(MAUS::TOFDigit *digit,
-               MAUS::V1724Array &adc_hits) const throw(Exception);
+               MAUS::V1724Array &adc_hits) const throw(Exceptions::Exception);
 
   /** @brief  Gets the Trigger Request information from the TDC data
    * ascosiated with the current TDC data
    */
   bool findTriggerReq(MAUS::TOFDigit *digit,
                       MAUS::V1290 &tdc,
-                      MAUS::V1290Array &tr_req_hits) const  throw(Exception);
+                      MAUS::V1290Array &tr_req_hits) const  throw(Exceptions::Exception);
 
   /** @brief  Gets the Trigger information from the TDC data
    * ascosiated with the current TDC data
    */
   bool findTrigger(MAUS::TOFDigit *digit,
                    MAUS::V1290 &tdc,
-                   MAUS::V1290Array &tr_hits) const throw(Exception);
+                   MAUS::V1290Array &tr_hits) const throw(Exceptions::Exception);
   bool map_init;
   Json::Value configJSON;
   int runNumberSave;

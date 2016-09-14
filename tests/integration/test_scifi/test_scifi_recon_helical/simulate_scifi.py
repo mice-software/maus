@@ -21,7 +21,10 @@ def run():
     my_map.append(MAUS.MapPyBeamMaker()) # beam construction
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
     my_map.append(MAUS.MapCppTrackerMCDigitization())  # SciFi electronics model
-    my_map.append(MAUS.MapCppTrackerRecon())  # SciFi recon
+    my_map.append(MAUS.MapCppTrackerClusterRecon()) # SciFi channel clustering
+    my_map.append(MAUS.MapCppTrackerSpacePointRecon()) # SciFi spacepoint recon
+    my_map.append(MAUS.MapCppTrackerPatternRecognition()) # SciFi track finding
+    my_map.append(MAUS.MapCppTrackerTrackFit()) # SciFi track fit
 
     datacards = io.StringIO(u"")
 

@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+
 #include "Geant4/G4Navigator.hh"
 #include "Geant4/G4TransportationManager.hh"
 #include "Geant4/G4NistManager.hh"
@@ -98,6 +99,28 @@ std::vector<DataStructure::Global::Track*>* GetSpillDetectorTracks(Spill* spill,
   return detector_tracks;
 }
 
+std::vector<DataStructure::Global::Track*>* GetEventDetectorTracks(GlobalEvent* global_event,
+    DataStructure::Global::DetectorPoint detector, std::string mapper_name) {
+  std::vector<DataStructure::Global::Track*>* detector_tracks = new
+      std::vector<DataStructure::Global::Track*>;
+  if (global_event) {
+    std::vector<DataStructure::Global::Track*>* global_tracks =
+        global_event->get_tracks();
+    for (auto track_iter = global_tracks->begin();
+         track_iter != global_tracks->end();
+         ++track_iter) {
+      // The third condition is a bit of a dirty hack here to make sure that
+      // if we select for EMR tracks, we only get primaries.
+      if (((*track_iter)->HasDetector(detector)) and
+          ((*track_iter)->get_mapper_name() == mapper_name) and
+          ((*track_iter)->get_emr_range_secondary() < 0.001)) {
+        detector_tracks->push_back((*track_iter));
+      }
+    }
+  }
+  return detector_tracks;
+}
+
 std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     Spill* spill, DataStructure::Global::DetectorPoint detector) {
   std::vector<DataStructure::Global::SpacePoint*>* spill_spacepoints =
@@ -124,6 +147,28 @@ std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     return spill_spacepoints;
   } else {
     delete spill_spacepoints;
+    return 0;
+  }
+}
+
+std::vector<DataStructure::Global::SpacePoint*>* GetEventSpacePoints(
+    GlobalEvent* global_event, DataStructure::Global::DetectorPoint detector) {
+  std::vector<DataStructure::Global::SpacePoint*>* spacepoints =
+      new std::vector<DataStructure::Global::SpacePoint*>;
+  if (global_event) {
+    std::vector<DataStructure::Global::SpacePoint*>* temp_spacepoints =
+        global_event->get_space_points();
+    for (auto sp_iter = temp_spacepoints->begin(); sp_iter != temp_spacepoints->end();
+         ++sp_iter) {
+      if ((*sp_iter)->get_detector() == detector) {
+        spacepoints->push_back(*sp_iter);
+      }
+    }
+  }
+  if (spacepoints->size() > 0) {
+    return spacepoints;
+  } else {
+    delete spacepoints;
     return 0;
   }
 }
@@ -265,7 +310,7 @@ void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
                bool energy_loss) {
   if (std::abs(target_z) > 100000) {
-    throw(Exception(Exception::recoverable, "Extreme target z",
+    throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
                     "GlobalTools::propagate"));
   }
   if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
@@ -273,7 +318,7 @@ void propagate(double* x, double target_z, const BTField* field,
     std::stringstream ios;
     ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
         << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-    throw(Exception(Exception::recoverable, ios.str()+
+    throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
           "Some components of tracker trackpoint are nan", "GlobalTools::propagate"));
   }
   int prop_dir = 1;
@@ -322,31 +367,34 @@ void propagate(double* x, double target_z, const BTField* field,
       double mommag = std::sqrt(x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
       const CLHEP::Hep3Vector momvector(x[5]/mommag, x[6]/mommag, x[7]/mommag);
       g4navigator->LocateGlobalPointAndSetup(posvector, &momvector);
-      double safety = 10;
+      double safety = std::fabs(step_size);
       double boundary_dist = g4navigator->ComputeStep(posvector, momvector, h, safety);
       if (boundary_dist > 1e6) {
         boundary_dist = safety;
       }
       double z_dist = boundary_dist*momvector.z();
+      // We need to check if we're in a material with high stopping power, and if yes,
+      // decrease the step size as otherwise the underestimated path length due to the
+      // curved trajectory will cause problems
+      double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
+          )->GetElectronDensity();
+      double max_h = 100.0;
+      if (n_e > 1e+18) {
+        max_h = 1.0*prop_dir;
+      }
       // Check if z distance to next material boundary is smaller than step size
       // if yes, we impose a tight limit on the step size to avoid issues
       // arising from the track not being straight
       if (std::abs(z_dist) > 0.00000000001 and
           std::abs(z_dist) < std::abs(h)) {
         if (std::abs(z_dist) > 1.0) {
-          h = 1.0*prop_dir;
+          h = 0.9*z_dist;
         } else {
           h = z_dist; // will have proper sign from momvector
         }
-      } else {
-        // We need to check if we're in a material with high stopping power, and if yes,
-        // decrease the step size as otherwise the underestimated path length due to the
-        // curved trajectory will cause problems
-        double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
-                            )->GetElectronDensity();
-        if (n_e > 1e+18) {
-          h = 1.0*prop_dir;
-        }
+      }
+      if (std::abs(h) > std::abs(max_h)) {
+        h = max_h;
       }
       // Making sure we don't get stuck in Zeno's paradox
       if (std::abs(h) < 0.1) {
@@ -369,7 +417,7 @@ void propagate(double* x, double target_z, const BTField* field,
                                         target_z, &h, x);
     }
     if (status != GSL_SUCCESS) {
-      throw(Exception(Exception::recoverable, "Propagation failed",
+      throw(Exceptions::Exception(Exceptions::recoverable, "Propagation failed",
                             "GlobalTools::propagate"));
     }
 
@@ -378,7 +426,7 @@ void propagate(double* x, double target_z, const BTField* field,
       ios << "Stopping at step " << n_steps << " of " << max_steps << "\n"
           << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
           << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Exceeded maximum number of steps", "GlobalTools::propagate"));
       break;
     }
@@ -387,14 +435,14 @@ void propagate(double* x, double target_z, const BTField* field,
     if (std::abs(x[1]) > 700 || std::abs(x[2]) > 700) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
     // Need to catch the case where the particle is stopped
     if (std::abs(x[4]) < (mass + 0.01)) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
-      throw(Exception(Exception::recoverable, ios.str()+
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
   }

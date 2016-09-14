@@ -156,8 +156,8 @@ TEST(ImageTest, DISABLED_EmbedCanvasWrapperTest) {
     CanvasWrapper cwrap_values;
     TCanvas* canv = new TCanvas("name", "title");
     cwrap_values.SetCanvas(canv);
-    EXPECT_THROW(cwrap_def.EmbedCanvas(&embed), MAUS::Exception);
-    EXPECT_THROW(cwrap_values.EmbedCanvas(NULL), MAUS::Exception);
+    EXPECT_THROW(cwrap_def.EmbedCanvas(&embed), MAUS::Exceptions::Exception);
+    EXPECT_THROW(cwrap_values.EmbedCanvas(NULL), MAUS::Exceptions::Exception);
     cwrap_values.EmbedCanvas(&embed);
     EXPECT_EQ(embed.GetCanvas(), canv);
     gROOT->SetBatch(batch);

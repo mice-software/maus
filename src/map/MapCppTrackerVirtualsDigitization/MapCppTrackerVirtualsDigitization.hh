@@ -34,7 +34,7 @@
 #include <string>
 
 #include "Config/MiceModule.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 #include "src/common_cpp/DataStructure/Data.hh"

@@ -47,7 +47,7 @@ void RealDataDigitization::initialise(double npe_cut,
   bool calib = load_calibration(calib_file.c_str());
   bool bad_channels = load_bad_channels(bad_channels_file.c_str());
   if ( !calib || !map || !bad_channels ) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker calibration, mapping or bad channel list.",
           "RealDataDigitization::process"));
   }
@@ -240,7 +240,7 @@ bool RealDataDigitization::load_calibration(std::string file) {
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker Calibration.",
           "RealDataDigitization::load_calibration"));
   }
@@ -281,7 +281,7 @@ bool RealDataDigitization::load_mapping(std::string file) {
 
   std::ifstream inf(fname.c_str());
   if (!inf) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker Mapping.",
           "RealDataDigitization::load_mapping"));
   }
@@ -365,7 +365,7 @@ bool RealDataDigitization::load_bad_channels(std::string file) {
   std::ifstream inf(fname.c_str());
 
   if (!inf) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Could not load Tracker bad channel list.",
           "RealDataDigitization::load_bad_channels"));
   }

@@ -2,9 +2,9 @@
 #include "Tensor3.hh"
 
 /*
-const Exception Tensor::_outOfRange = MAUS::Exception(MAUS::Exception::recoverable, "Tensor index out of range",       "Tensor::Tensor");
-const Exception Tensor::_outOfRank  = MAUS::Exception(MAUS::Exception::recoverable, "Tensor rank out of range",        "Tensor::Tensor");
-const Exception Tensor::_lowRank    = MAUS::Exception(MAUS::Exception::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor");
+const Exception Tensor::_outOfRange = MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Tensor index out of range",       "Tensor::Tensor");
+const Exception Tensor::_outOfRank  = MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Tensor rank out of range",        "Tensor::Tensor");
+const Exception Tensor::_lowRank    = MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor");
 */
 
 Tensor::Tensor(std::vector<int> size, double val) : _data(NULL), _size(size)
@@ -34,7 +34,7 @@ Tensor::~Tensor()
 void Tensor::SetTensor(std::vector<int> size, double val)
 {
 	_size = size;
-	if(size.size() < 4) throw(MAUS::Exception(MAUS::Exception::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor"));
+	if(size.size() < 4) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Do not use Tensor for rank <= 3", "Tensor::Tensor"));
 	else if(size.size() == 4)
 	{
 		_data = new Tensor*[size[0]];
@@ -185,7 +185,7 @@ std::vector<int> Tensor::IndexToIndices(int index, int tensorSize, int startDime
 
 double Tensor::Get(std::vector<int> position) const
 {
-	if(int(position.size()) != GetRank()) throw(MAUS::Exception(MAUS::Exception::recoverable, "Get rank different to Tensor rank", "Tensor::Get"));
+	if(int(position.size()) != GetRank()) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Get rank different to Tensor rank", "Tensor::Get"));
 	const Tensor* val = this;
 	if(GetRank()>3)
 	{

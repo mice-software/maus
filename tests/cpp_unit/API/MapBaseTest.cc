@@ -78,8 +78,8 @@ namespace MAUS {
 
   private:
     virtual void _process(Data* data) const {
-      throw MAUS::Exception(MAUS::Exception::recoverable,
-		   "Expected Test MAUS::Exception in _process",
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
+		   "Expected Test MAUS::Exceptions::Exception in _process",
 		   "int* _process(double* t) const");
     }
   };
@@ -167,7 +167,7 @@ namespace MAUS {
     PyObject* py_data_0 = data_as_pyobj();
     DataMapper_maus_exception().process_pyobj(py_data_0);
     DataMapper_exception().process_pyobj(py_data_0);
-    EXPECT_THROW(DataMapper_otherexcept().process_pyobj(py_data_0), Exception);
+    EXPECT_THROW(DataMapper_otherexcept().process_pyobj(py_data_0), MAUS::Exceptions::Exception);
   }
 }  // end of namespace
 

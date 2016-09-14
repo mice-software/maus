@@ -22,6 +22,7 @@ import os
 import json
 import Queue
 import random
+import numpy
 from CallG4bl import CallG4bl
 
 class MapPyBeamlineSimulation: #pylint: disable = R0902 
@@ -32,7 +33,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
     G4beamline. The output is written to a json document. This is
     read by BeamMaker allowing the entire MICE experiment to be
     simulated end-to-end.
-    
+
     -q_1,q_2,q_3,d_1 & d_s correspond to the currents in each of the magnets.
     Can be positive or negative to change magnet polarity
     -rotation_angle is the angle with which the MAUS coordinates are rotated
@@ -76,7 +77,6 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.translation_z = 0
         self.run_number = 0
         self.get_magnet_currents_pa_cdb = 0
-        self.random_seed = 0
         self.queue = 0
         self.file_path = ''
         self.path_g4bl = ''
@@ -85,7 +85,11 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
         self.newline = ''
         self.grid_job = 0 
         self.protonabsorberin = 1
-   
+        self.particles = []
+        self.seed_algorithm = "use_random_seed"
+        self.master_seed = 0
+        self.random_seed = 0
+
     def birth(self, json_configuration): #pylint: disable=R0912, R0915
         "birth doc string"      
         good_birth = True 
@@ -238,13 +242,23 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             good_birth = False
 
         try:
+            self.seed_algorithm = config_doc["g4bl"]["seed_algorithm"]
+            if not self.seed_algorithm in ["use_random_seed",
+                                           "random_seed_and_spill_number"]:
+                raise ValueError("Did not recognise seed algorithm "+\
+                                 str(self.seed_algorithm))
+        except KeyError:
+            self.seed_algorithm = "use_random_seed"
+
+        try:
             self.random_seed = config_doc["g4bl"]["random_seed"]
             if self.random_seed == -1:
                 self.random_seed = random.randint(1, 1000000)
         except Exception: #pylint: disable = W0703
             print("Error: random_seed is not found in the config file!")
             good_birth = False
-           
+        self.master_seed = self.random_seed
+
         try:
             self.particle_charge = config_doc["g4bl"]["particle_charge"]
             if self.particle_charge != 'positive' and \
@@ -284,25 +298,51 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
 
         return good_birth               
 
+    def new_random_seed(self, list_of_integers):
+        """
+        Pick a random seed based on the current spill number and the last event
+        generated
+        - spill_number integer spill number
+        - event_number integer event number
+        """
+        # bug - would like to have int64 but that is too hard for the json cpp
+        # conversion
+        maxint = numpy.core.getlimits.iinfo(numpy.int32).max
+        print "Setting random seed from", list_of_integers, ":",
+        numpy.random.seed(0)
+        a_random_seed = 0
+        for integer in list_of_integers:
+            integer = abs(integer)
+            numpy.random.seed(integer+a_random_seed)
+            a_random_seed = numpy.random.randint(maxint-integer)
+        print
+        self.random_seed = a_random_seed
+
     def process(self, json_spill_doc): #pylint: disable=R0912
         """
         Execute G4beamline and create a simulation based on the read in parameters.
         Fill buffer first time spill is called for
         """
-
         spill = {}
         spill = json.loads(json_spill_doc)
 
         if self.queue == 0:
             self.queue = Queue.Queue()
+            if self.seed_algorithm == "random_seed_and_spill_number":
+                seed_list = [self.master_seed,
+                         spill["spill_number"],
+                         self.queue.qsize()]
+                self.new_random_seed(seed_list)
+            print "RANDOM SEED", self.random_seed
             particles = CallG4bl(self.newline, self.file_path, \
-                                 self.rotation_angle, \
-                                 self.translation_z, \
-                                 self.path_g4bl, \
-                                 self.output_path, \
-                                 self.run_number, \
-                                 self.get_magnet_currents_pa_cdb, \
-                                 self.random_seed)
+                             self.rotation_angle, \
+                             self.translation_z, \
+                             self.path_g4bl, \
+                             self.output_path, \
+                             self.run_number, \
+                             self.get_magnet_currents_pa_cdb, \
+                             self.random_seed)
+
             print("Filling buffer. This may take a while...")
             self.particles = particles.particles
             for i in range(len(self.particles)):
@@ -313,7 +353,6 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
             if self.particles_per_spill == 0:
                 spill = {}
                 spill = json.loads(json_spill_doc)
-                print spill
                 spill['mc_events'] = []
                 for i in range(self.queue.qsize()):
                     primary = (self.queue.get_nowait())
@@ -334,16 +373,22 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
                     " %d"%self.queue.qsize()+" ).")
                     print("Generating more particles in buffer. \
                           May take a while...") 
-                    while self.queue.qsize()<self.particles_per_spill:
+                    while self.queue.qsize() < self.particles_per_spill:
                         try:
+                            if self.seed_algorithm == \
+                                              "random_seed_and_spill_number":
+                                seed_list = [self.master_seed,
+                                         spill["spill_number"],
+                                         self.queue.qsize()]
+                                self.new_random_seed(seed_list)
                             particles = CallG4bl(self.newline, \
                                              self.file_path, \
-                                             self.rotation_angle, \
-                                             self.translation_z, \
-                                             self.path_g4bl, \
-                                             self.output_path, \
-                                             self.run_number, \
-                                             self.get_magnet_currents_pa_cdb, \
+                                             self.rotation_angle,
+                                             self.translation_z,
+                                             self.path_g4bl,
+                                             self.output_path,
+                                             self.run_number,
+                                             self.get_magnet_currents_pa_cdb,
                                              self.random_seed)
                             self.particles = particles.particles #pylint: disable = W0201, C0301
                             for i in range(len(self.particles)):
@@ -369,7 +414,7 @@ class MapPyBeamlineSimulation: #pylint: disable = R0902
                     return json.dumps(spill)
         else:
             print("Warning: G4BL simulated zero output particles!")
-            raise SystemExit
+            raise IndexError("G4BL simulated zero output particles")
        
     def death(self): #pylint: disable = R0201
         """

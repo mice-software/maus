@@ -33,7 +33,7 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
   char* pMAUS_ROOT_DIR = getenv("MAUS_ROOT_DIR");
 
   if (!pMAUS_ROOT_DIR) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                       "Could not resolve ${MAUS_ROOT_DIR} environment variable",
                       "MapCppEMRPlaneHits::birth");
   }
@@ -61,7 +61,7 @@ void MapCppEMRPlaneHits::_birth(const std::string& argJsonConfigDocument) {
 			 + configJSON["EMR_cabling_file"].asString();
   bool loaded = _emrMap.InitializeFromFile(xMapFile);
   if ( !loaded )
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to load EMR Channel Map File",
                           "MapCppEMRPlaneHits::birth");
 
@@ -95,12 +95,12 @@ void MapCppEMRPlaneHits::_process(Data *data) const {
 
   // Routine data checks before processing it
   if ( !data )
-      throw Exception(Exception::recoverable, "Data was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                       "MapCppEMRPlaneHits::_process");
 
   Spill* spill = data->GetSpill();
   if ( !spill )
-      throw Exception(Exception::recoverable, "Spill was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                       "MapCppEMRPlaneHits::_process");
 
   if ( spill->GetDaqEventType() != "physics_event" )
@@ -108,7 +108,7 @@ void MapCppEMRPlaneHits::_process(Data *data) const {
 
   DAQData* daqData = spill->GetDAQData();
   if ( !daqData )
-      throw Exception(Exception::recoverable, "DAQData was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "DAQData was NULL",
                       "MapCppEMRPlaneHits::_process");
 
   EMRDaq emrDaq = daqData->GetEMRDaq();

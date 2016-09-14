@@ -15,22 +15,21 @@ def run():
     """ Run the macro
     """
 
-    # This input generates empty spills, to be filled by the beam maker later on
+    # Use the G4BL JSON chunks as an input to the simulation
     my_input = MAUS.InputPyJSON()
 
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
 
-    # G4beamline
-    # my_map.append(MAUS.MapPyBeamlineSimulation())
-
-    # GEANT4
+    # No need for the beam maker, as we use G4BL chunks
     # my_map.append(MAUS.MapPyBeamMaker()) # beam construction
+
+    # Run the GEANT4 simulation
     my_map.append(MAUS.MapCppSimulation())  #  geant4 simulation
 
     # Pre detector set up
-    my_map.append(MAUS.MapPyMCReconSetup())  #  geant4 simulation
+    my_map.append(MAUS.MapCppMCReconSetup())  #  geant4 simulation
 
     # TOF
     my_map.append(MAUS.MapCppTOFMCDigitizer())  # TOF MC Digitizer
@@ -43,7 +42,18 @@ def run():
 
     # SciFi
     my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
-    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
+    my_map.append(MAUS.MapCppTrackerClusterRecon()) # SciFi channel clustering
+    my_map.append(MAUS.MapCppTrackerSpacePointRecon()) # SciFi spacepoint recon
+    my_map.append(MAUS.MapCppTrackerPatternRecognition()) # SciFi track finding
+    my_map.append(MAUS.MapCppTrackerTrackFit()) # SciFi track fit
+
+    # EMR
+    my_map.append(MAUS.MapCppEMRMCDigitization())  # EMR MC Digitization
+    my_map.append(MAUS.MapCppEMRSpacePoints())  # EMR MC Digitization
+    my_map.append(MAUS.MapCppEMRRecon()) # EMR Recon
+
+    # Ckov
+    my_map.append(MAUS.MapCppCkovMCDigitizer())
 
     # Global Digits - post detector digitisation
 

@@ -31,7 +31,7 @@
 #include "Utils/EMRChannelMap.hh"
 #include "Utils/Exception.hh"
 #include "Utils/JsonWrapper.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 

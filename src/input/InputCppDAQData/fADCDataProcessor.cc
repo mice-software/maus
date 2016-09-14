@@ -36,7 +36,7 @@ void fADCDataProcessor::set_pedestal() {
   if (size < SIGNAL_INTEGRATION_WINDOW*2) {
     _pedestal = 0;
 
-     throw(Exception(Exception::recoverable,
+     throw(Exceptions::Exception(Exceptions::recoverable,
            "The data size is too short.",
            "fADCDataProcessor::set_pedestal()"));
   }

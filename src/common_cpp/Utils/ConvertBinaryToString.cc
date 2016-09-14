@@ -59,7 +59,7 @@ void ConvertBinaryToString::reset() {
     _utils_mod = PyImport_ImportModule("framework.utilities");
     if (_utils_mod == NULL) {
         PyErr_PrintEx(1);
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                       "Failed to import framework.utilities module",
                       "Utils::ConvertBinaryToString::reset()"));
     }
@@ -68,7 +68,7 @@ void ConvertBinaryToString::reset() {
     _utils_mod_dict = PyModule_GetDict(_utils_mod);
     if (_utils_mod_dict == NULL) {
         PyErr_PrintEx(1);
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                       "Failed to find framework.utilities.__dict__",
                       "Utils::ConvertBinaryToString::reset()"));
     }
@@ -79,7 +79,7 @@ void ConvertBinaryToString::reset() {
     Py_INCREF(_convert_func); // Apparently PyDict_GetItemString does not INCREF
     if (_convert_func == NULL || !PyCallable_Check(_convert_func)) {
         PyErr_PrintEx(1);
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                       "Failed to find convert_binary_to_string",
                       "Utils::ConvertBinaryToString::reset()"));
     }
@@ -94,7 +94,7 @@ std::string ConvertBinaryToString::convert
     if (py_arg == NULL) {
         PyErr_Clear();
         PyErr_PrintEx(1);
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                    "Failed to build value",
                    "ConvertBinaryToString::convert"));
     }
@@ -103,7 +103,7 @@ std::string ConvertBinaryToString::convert
     // function value; check for errors
     if (_convert_func == NULL || PyCallable_Check(_convert_func) == 0)  {
         Py_DECREF(py_arg);
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                    "Failed to get converter function",
                    "ConvertBinaryToString::convert"));
     }
@@ -114,7 +114,7 @@ std::string ConvertBinaryToString::convert
         PyErr_Clear();
         Py_DECREF(py_arg);
         PyErr_PrintEx(1);
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                    "Failed to convert binary \""+file_name+"\"",
                    "ConvertBinaryToString::convert"));
     }

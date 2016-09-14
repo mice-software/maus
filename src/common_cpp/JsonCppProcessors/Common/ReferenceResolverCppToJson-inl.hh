@@ -47,7 +47,7 @@ void TypedResolver<ChildType>::ResolveReferences(Json::Value& json_root) {
         std::string json_address =
                       RefManager::GetInstance().GetPointerAsValue(_cpp_pointer);
         child["$ref"] = Json::Value(json_address);
-    } catch (MAUS::Exception& exc) {
+    } catch (MAUS::Exceptions::Exception& exc) {
         exc.SetMessage(exc.GetMessage()+"\n"+"Error at address "+_json_pointer);
         throw exc;
     }
@@ -91,7 +91,7 @@ void RefManager::SetPointerAsValue
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
     if (table->_data_hash.find(pointer) != table->_data_hash.end())
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
                      " to C++ hash table at json address "+json_address+
@@ -108,7 +108,7 @@ void RefManager::SetPointerAsValue
           GetTypedPointerValueTable<TObject>();
       if (tableTObject->_data_hash.find(tobject_pointer) !=
           tableTObject->_data_hash.end())
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Attempt to add pointer for C++ address "+
                      STLUtils::ToString(pointer)+
                      " to TObject hash table at json address "+json_address+
@@ -124,14 +124,14 @@ std::string RefManager::GetPointerAsValue(PointerType* pointer) {
     TypedPointerValueTable<PointerType>* table =
                                        GetTypedPointerValueTable<PointerType>();
     if (!table) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Attempt to get pointer for C++ address "+
                      STLUtils::ToString(pointer)+
                      " when no pointers of this type were ever added",
                      "CppToJson::RefManager::GetPointerAsValue(...)"));
     }
     if (table->_data_hash.find(pointer) == table->_data_hash.end())
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Attempt to get pointer for C++ address "+
                      STLUtils::ToString(pointer)+
                      " when it was never added. "+table->Dump(),

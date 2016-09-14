@@ -32,7 +32,7 @@ Globals* Globals::GetInstance() {
         return _process;
     } else {
         // watch out here, error handler not initialised(!)
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      std::string("Attempt to get Globals ")+
                           "instance when it has not been initialised",
                           "Globals::GetInstance()"));

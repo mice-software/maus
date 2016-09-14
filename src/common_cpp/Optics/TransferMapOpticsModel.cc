@@ -142,12 +142,12 @@ void TransferMapOpticsModel::Build() {
   } catch (std::exception ex) {
     std::stringstream message;
     message << "Simulation failed." << std::endl << ex.what() << std::endl;
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                  message.str(),
                  "MAUS::TransferMapOpticsModel::Build()"));
   }
   if (virtual_tracks.size() == 0) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                  "No events were generated during simulation.",
                  "MAUS::TransferMapOpticsModel::Build()"));
   }
@@ -206,7 +206,7 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
         message_buffer << "Mapping detectors are all positioned downstream "
                        << "from one or more hits (Hit z: " << end_plane
                        << ", First Station Plane: " << station_plane << ").";
-        throw(Exception(Exception::nonRecoverable, message_buffer.str(),
+        throw(Exceptions::Exception(Exceptions::nonRecoverable, message_buffer.str(),
                      "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
       }
       double after_delta = station_plane - end_plane;
@@ -230,7 +230,7 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
                        << "detector (z=" << transfer_map_entry->first << ") "
                        << " and target detector " << "(z=" << end_plane << ") "
                        << "exceeds tollerance for accurate mapping.";
-        throw(Exception(Exception::nonRecoverable, message_buffer.str(),
+        throw(Exceptions::Exception(Exceptions::nonRecoverable, message_buffer.str(),
                      "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
       }
 
@@ -248,12 +248,12 @@ const TransferMap * TransferMapOpticsModel::FindTransferMap(
 const TransferMap * TransferMapOpticsModel::GenerateTransferMap(
     const double plane) const {
   if (!built_) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                   "No transfer maps available since the optics model has not "
                   "been built yet. Call Build() first.",
                   "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
   } else if (transfer_maps_.size() == 0) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                  "No transfer maps to choose from.",
                  "MAUS::TransferMapOpticsModel::GenerateTransferMap()"));
   }
@@ -356,7 +356,7 @@ CovarianceMatrix TransferMapOpticsModel::Transport(
     const double end_plane) const {
   TransferMap const * transfer_map = GenerateTransferMap(end_plane);
   if (transfer_map == NULL) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                   "Got NULL transfer map.",
                   "MAUS::TransferMapOpticsModel::Transport()"));
   }
@@ -386,7 +386,7 @@ PhaseSpaceVector TransferMapOpticsModel::Transport(
     const double end_plane) const {
   TransferMap const * transfer_map = GenerateTransferMap(end_plane);
   if (transfer_map == NULL) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                   "Got NULL transfer map.",
                   "MAUS::TransferMapOpticsModel::Transport()"));
   }

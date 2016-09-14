@@ -69,6 +69,10 @@ std::vector<DataStructure::Global::Track*>* GetSpillDetectorTracks(
     Spill* spill, DataStructure::Global::DetectorPoint detector,
     std::string mapper_name);
 
+std::vector<DataStructure::Global::Track*>* GetEventDetectorTracks(
+    GlobalEvent* global_event, DataStructure::Global::DetectorPoint detector,
+    std::string mapper_name);
+
 /**
  * @brief Returns a vector of all SpacePoints in a spill (i.e. across recon
  * events) for a given detector
@@ -78,6 +82,9 @@ std::vector<DataStructure::Global::Track*>* GetSpillDetectorTracks(
  */
 std::vector<DataStructure::Global::SpacePoint*>* GetSpillSpacePoints(
     Spill* spill, DataStructure::Global::DetectorPoint detector);
+
+std::vector<DataStructure::Global::SpacePoint*>* GetEventSpacePoints(
+    GlobalEvent* global_event, DataStructure::Global::DetectorPoint detector);
 
 /**
  * @brief Returns a vector of all Tracks in in the global event with the given

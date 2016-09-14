@@ -67,6 +67,10 @@ end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of
 # >4 = silent
 # Doesnt effect python
 verbose_level = 1
+# Used for switching the general maus running log on or off
+# 0 = off
+# 1 = on
+log_level = 0
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
@@ -90,7 +94,9 @@ g4bl = {"run_number":2873,"q_1":1.066,"q_2":-1.332,"q_3":0.927,"d_1":-1.302,"d_2
         "d_s":3.837,"particles_per_spill":0,"rotation_angle":0,"translation_z":1000.0,\
         "protonabsorberin":1,"proton_absorber_thickness":93,"proton_number":1E9,"proton_weight":1,\
         "particle_charge":'all',"file_path":'MAUS_ROOT_DIR/src/map/MapPyBeamlineSimulation/G4bl',\
-        "get_magnet_currents_pa_cdb":False,"random_seed":1}
+    "get_magnet_currents_pa_cdb":False,"random_seed":1,
+    "seed_algorithm":"random_seed_and_spill_number",
+}
 
 # Used by MapPyRemoveTracks.
 keep_only_muon_tracks = False
@@ -371,15 +377,16 @@ cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for co
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'id' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'run' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
 geometry_download_beamline_for_run = 0
 geometry_download_beamline_tag = ''
 geometry_download_coolingchannel_tag = ''
-geometry_download_run_number = 0
-geometry_download_id = 49
+geometry_download_run_number = 7469
+geometry_download_id = 160
+geometry_download_apply_corrections = True
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 geometry_use_active_rotations = False # Changes SciFiGeometryHelper to use active rotations for Mice Moduel only running.
@@ -442,6 +449,8 @@ Number_of_DAQ_Events = -1
 Input_Use_JSON = False
 Phys_Events_Only = False
 Calib_Events_Only = False
+Enable_V1495_Unpacking = False
+Enable_EI_Unpacking = True
 Enable_V1290_Unpacking = True
 Enable_V1731_Unpacking = True
 Enable_V1724_Unpacking = True
@@ -755,9 +764,9 @@ custom_pid_set = "PIDVarB"
 pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
 # setting to "all", or on all downstream tracks (set to "DS"), all upstream (set to "US"), through tracks (set to 
-# "Through"), or the upstream or downstream components of the throught track (set to "Through_US" or "Through_DS"
+# "Through"), or the upstream or downstream components of the throught track (set to "Through-US" or "Through-DS"
 # respectively). Or a combination of the above can be used, entered as a space separated list, e.g
-# "Through Through_US Through_DS"
+# "Through Through-US Through-DS"
 pid_track_selection = "Through"
 
 

@@ -30,6 +30,8 @@
 #include "DataStructure/TriggerRequest.hh"
 #include "DataStructure/Tag.hh"
 #include "DataStructure/TrackerDaq.hh"
+#include "DataStructure/TriggerEngine.hh"
+#include "DataStructure/EpicsInterface.hh"
 
 namespace MAUS {
 // Needed for ROOT
@@ -85,6 +87,15 @@ class DAQData {
 
     /** Sets V830 */
     void SetV830(V830 V830);
+
+    /** Returns TriggerEngine */
+    TriggerEngine GetTriggerEngine() const;
+
+    /** Returns TriggerEngine */
+    TriggerEngine* GetTriggerEnginePtr();
+
+    /** Sets TriggerEngine */
+    void SetTriggerEngine(TriggerEngine tr);
 
     /** Returns TriggerRequestArray */
     TriggerRequestArray GetTriggerRequestArray() const;
@@ -252,10 +263,21 @@ class DAQData {
     /** Sets EMRDaqArray */
     void SetEMRDaq(EMRDaq emr);
 
+    /** Returns Epics Interface */
+    EpicsInterface GetEpicsInterface() const;
+
+    /** Returns Epics Interface pointer */
+    EpicsInterface* GetEpicsInterfacePtr();
+
+    /** Sets Epics Interface */
+    void SetEpicsInterface(EpicsInterface ei);
+
   private:
     unsigned int _event_size;
 
-    V830 _V830;
+    TriggerEngine        _tr_engine;
+    EpicsInterface       _ei;
+    V830                 _V830;
     TriggerRequestArray  _trigger_request;
     TOF1DaqArray         _tof1;
     CkovArray            _ckov;

@@ -34,7 +34,7 @@
 #include "json/json.h"
 #include "Utils/KLChannelMap.hh"
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {

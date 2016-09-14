@@ -46,7 +46,7 @@ void BTMagFieldMap::WriteG4MiceTextMap(const std::string& fileName, double Z1,
   //open the output stream
   std::ofstream fMap;
   fMap.open(MagFieldMap::ReplaceVariables(fileName).c_str());
-  if (!fMap.is_open()) throw(MAUS::Exception(MAUS::Exception::recoverable, "Error opening field map file"+fileName, 
+  if (!fMap.is_open()) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error opening field map file"+fileName, 
                                                          "BTMagFieldMap::WriteG4MiceTextMap"));
 
   double z, r, b[6], pos[4];

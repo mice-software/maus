@@ -27,8 +27,8 @@ double* DoubleProcessor::JsonToCpp(const Json::Value& json_double) {
   if (json_double.isNumeric()) {
       return new double (json_double.asDouble());
   } else {
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "Failed to convert json value to double",
           "DoubleProcessor::JsonToCpp"
       ));
@@ -51,8 +51,8 @@ std::string* StringProcessor::JsonToCpp(const Json::Value& json_string) {
   if (json_string.isString()) {
       return new std::string (json_string.asString());
   } else {
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "Failed to convert json value to string",
           "StringProcessor::JsonToCpp"
       ));
@@ -74,8 +74,8 @@ int* IntProcessor::JsonToCpp(const Json::Value& json_int) {
   if (json_int.isInt()) {
       return new int (json_int.asInt());
   } else {
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "Failed to convert json value to integer",
           "IntProcessor::JsonToCpp"
       ));
@@ -102,8 +102,8 @@ unsigned int* UIntProcessor::JsonToCpp(const Json::Value& json_uint) {
       std::stringstream message;
       message << "Failed to convert json value \"" << json_uint << "\""
               << " to unsigned int";
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           message.str(),
           "UIntProcessor::JsonToCpp"
       ));
@@ -124,16 +124,16 @@ Json::Value* UIntProcessor::CppToJson
 
 uint64* LLUIntProcessor::JsonToCpp(const Json::Value& json_string) {
     if (!json_string.isString()) {
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "Failed to convert json value to long long int - not a string type",
           "LLUIntProcessor::JsonToCpp"
       ));
     }
     std::string cpp_string = json_string.asString();
     if (cpp_string[0] == '-') {
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "Failed to convert json value to long long int - value was negative",
           "LLUIntProcessor::JsonToCpp"
       ));
@@ -159,8 +159,8 @@ bool* BoolProcessor::JsonToCpp(const Json::Value& json_bool) {
   if (json_bool.isBool()) {
       return new bool (json_bool.asBool());
   } else {
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "Failed to convert json value to bool",
           "BoolProcessor::JsonToCpp"
       ));

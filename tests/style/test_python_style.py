@@ -185,7 +185,9 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
     # folders in maus_root_dir to look at
     include_dirs = ['doc', 'tests', 'src', 'bin', 'doc']
     # exclude if dir path globs to one of the following 
-    exclude_dirs = ['bin/user', 'src/*/*/build']
+    exclude_dirs = ['bin/user', 'bin/user/*', 'bin/user/*/*', \
+      'bin/user/*/*/*', 'bin/user/*/*/*/*', \
+      'bin/user/*/*/*/*/*', 'src/*/*/build']
     # if any of these are in the path, chdir to the directory first
     # don't have nested local_dirs
     local_dirs = ['tests/integration/test_simulation/test_physics_model_full']

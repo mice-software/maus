@@ -76,7 +76,7 @@ void MapCppTrackerMCNoise::_process(Data* data) const {
 
   if ( spill.GetMCEvents() ) {
   } else {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "MC event array not initialised, aborting noise",
                           "MapCppTrackerMCNoise::_process");
   }

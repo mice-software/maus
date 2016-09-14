@@ -76,13 +76,13 @@ TEST_F(DetectorConstructionTest, SetSteppingAlgorithmTest) {
         dc->SetMiceModules(modEM);
     }
     SetStepperType(dc, "error");
-    EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exception);
+    EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exceptions::Exception);
     for (int i = 0; i < 1; ++i) {
         SetStepperType(dc, models[i]);
         dc->SetMiceModules(modMag);
     }
     SetStepperType(dc, "error");
-    EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exception);
+    EXPECT_THROW(dc->SetMiceModules(modMag), MAUS::Exceptions::Exception);
     SetStepperType(dc, "ClassicalRK4");
 }
 
@@ -226,9 +226,9 @@ TEST_F(DetectorConstructionTest, NormalVolumeVisTest) {
 TEST_F(DetectorConstructionTest, NormalVolumeNoneRecursionTest) {
     // Check that recursion through MiceModules does throw an exception
     MiceModule mod(mod_path+"VolumeTestNone.dat");
-    bool cout_alive = Squeak::coutIsActive();
-    EXPECT_THROW(dc->SetMiceModules(mod), MAUS::Exception);
-    EXPECT_EQ(Squeak::coutIsActive(), cout_alive);
+    bool cout_alive = MAUS::Squeak::coutIsActive();
+    EXPECT_THROW(dc->SetMiceModules(mod), MAUS::Exceptions::Exception);
+    EXPECT_EQ(MAUS::Squeak::coutIsActive(), cout_alive);
 }
 
 TEST_F(DetectorConstructionTest, BuildSensitiveDetectorTest) {
@@ -250,10 +250,10 @@ TEST_F(DetectorConstructionTest, BuildSensitiveDetectorTest) {
     for (int i = 0; i < dc->GetSDSize(); ++i) {
         EXPECT_EQ(dc->GetSDHits(i).size(), size_t(0));
     }
-    EXPECT_THROW(dc->GetSDHits(dc->GetSDSize()), MAUS::Exception);
+    EXPECT_THROW(dc->GetSDHits(dc->GetSDSize()), MAUS::Exceptions::Exception);
 
     MiceModule mod_error(mod_path+"SDErrorTest.dat");
-    EXPECT_THROW(dc->SetMiceModules(mod_error), MAUS::Exception);
+    EXPECT_THROW(dc->SetMiceModules(mod_error), MAUS::Exceptions::Exception);
 }
 
 TEST_F(DetectorConstructionTest, SetDatacardVariablesTest) {
@@ -264,7 +264,7 @@ TEST_F(DetectorConstructionTest, BuildG4DetectorVolumeTest) {
     MiceModule mod(mod_path+"G4DetectorTest.dat");
     dc->SetMiceModules(mod);
     MiceModule modError(mod_path+"G4DetectorTestError.dat");
-    EXPECT_THROW(dc->SetMiceModules(modError), MAUS::Exception);
+    EXPECT_THROW(dc->SetMiceModules(modError), MAUS::Exceptions::Exception);
 }
 #endif
 }

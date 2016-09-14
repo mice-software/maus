@@ -87,7 +87,7 @@ CovarianceMatrix::CovarianceMatrix(const Matrix<double>& matrix)
     : SymmetricMatrix() {
   if (   (matrix.number_of_rows() < 6)
       || (matrix.number_of_columns() < 6)) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Attempted to construct with a Matrix<double> containing "
                  "fewer than six rows and/or columns",
                  "CovarianceMatrix::CovarianceMatrix(Matrix<double>)"));
@@ -104,7 +104,7 @@ CovarianceMatrix::CovarianceMatrix(const SymmetricMatrix& symmetric_matrix)
     : SymmetricMatrix() {
   if (   (symmetric_matrix.number_of_rows() < 6)
       || (symmetric_matrix.number_of_columns() < 6)) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Attempted to construct with a SymmetricMatrix containing "
           "fewer than six rows/columns",
           "CovarianceMatrix::CovarianceMatrix(SymmetricMatrix<double>)"));
@@ -121,7 +121,7 @@ CovarianceMatrix::CovarianceMatrix(const ::CLHEP::HepSymMatrix& hep_sym_matrix)
     : SymmetricMatrix() {
   if (   (hep_sym_matrix.num_row() < 6)
       || (hep_sym_matrix.num_col() < 6)) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Attempted to construct with a HepSymMatrix containing fewer "
           "than six rows/columns",
           "CovarianceMatrix::CovarianceMatrix(CLHEP::HepSymMatrix<double>)"));
@@ -141,7 +141,7 @@ CovarianceMatrix::CovarianceMatrix(const TMatrixDSym& root_sym_matrix)
     : SymmetricMatrix(root_sym_matrix) {
   if (   (root_sym_matrix.GetNrows() < 6)
       || (root_sym_matrix.GetNcols() < 6)) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
           "Attempted to construct with a TMatrixDSym containing fewer "
           "than six rows/columns",
           "CovarianceMatrix::CovarianceMatrix(TMatrixDSym<double>)"));

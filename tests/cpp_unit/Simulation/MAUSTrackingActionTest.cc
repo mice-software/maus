@@ -98,7 +98,7 @@ TEST_F(MAUSTrackingActionTest, PostUserTrackingActionTest) {
     EXPECT_EQ(tracks->size(), 2);
 
     end->SetTrackID(4);
-    EXPECT_THROW(tracking->PostUserTrackingAction(end), MAUS::Exception);
+    EXPECT_THROW(tracking->PostUserTrackingAction(end), MAUS::Exceptions::Exception);
 }
 
 } // namespace

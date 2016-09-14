@@ -15,7 +15,7 @@
  *
  */
 
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/common_cpp/API/PyWrapInputBase.hh"
 
@@ -48,7 +48,7 @@ void InputCppDAQOnlineData::_birth(const std::string& jsonDataCards) {
   // frankliuao: Skip the InitFromCards() method, directly use InitFromCurrentCDB()
   bool loaded = _map.InitFromCurrentCDB();
   if (!loaded) {
-    throw(MAUS::Exception(Exception::recoverable, "STRING",
+    throw(MAUS::Exceptions::Exception(Exceptions::recoverable, "STRING",
                           "InputCppDAQOnlineData InitFromCurrentCDB"));
   }
   //  JsonCpp setup
@@ -58,7 +58,7 @@ void InputCppDAQOnlineData::_birth(const std::string& jsonDataCards) {
   // Check if the JSON document can be parsed, else return error only
   bool parsingSuccessful = reader.parse(jsonDataCards, configJSON);
   if (!parsingSuccessful) {
-      throw MAUS::Exception(Exception::recoverable,
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                             "Failed to parse configuration to json",
                             "InputCppDAQOnlineData::_birth(std::string)");
   }

@@ -68,7 +68,7 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON, int rnum) {
       _tof_cabling_by = JsonWrapper::GetProperty(configJSON,
                                            "TOF_cabling_by",
                                            JsonWrapper::stringValue).asString();
-  } catch (MAUS::Exception e) {
+  } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error getting data card TOF_cabling_by" << std::endl
     << e.GetMessage() << std::endl;
@@ -122,7 +122,7 @@ bool TOFChannelMap::InitFromFile(string filename) {
       _tdcKey.push_back(tdckey);
       _fadcKey.push_back(fadckey);
     }
-  } catch (Exception e) {
+  } catch (Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFChannelMap::InitFromFile : Error during loading." << std::endl
     << e.GetMessage() << std::endl;
@@ -153,7 +153,7 @@ bool TOFChannelMap::InitFromCDB() {
       _tdcKey.push_back(tdckey);
       _fadcKey.push_back(fadckey);
     }
-  } catch (Exception e) {
+  } catch (Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in TOFChannelMap::InitFromCDB : Error during loading." << std::endl
     << e.GetMessage() << std::endl;
@@ -196,8 +196,8 @@ TOFChannelKey* TOFChannelMap::find(std::string daqKeyStr) const {
   try {
     xConv << daqKeyStr;
     xConv >> xDaqKey;
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "TOFChannelMap::find(std::string)"));
   }
@@ -211,8 +211,8 @@ DAQChannelKey* TOFChannelMap::findfAdcKey(std::string tdcKeyStr) {
   try {
     xConv << tdcKeyStr;
     xConv >> xDaqKey;
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "TOFChannelMap::findfAdcKey(std::string)"));
   }
@@ -233,8 +233,8 @@ DAQChannelKey* TOFChannelMap::findTdcKey(std::string adcKeyStr) {
   try {
     xConv << adcKeyStr;
     xConv >> xDaqKey;
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "TOFChannelMap::findTdcKey(std::string)"));
   }
@@ -251,13 +251,13 @@ DAQChannelKey* TOFChannelMap::findTdcKey(std::string adcKeyStr) {
 
 //////////////////////////////////////////////////////////////////////////
 
-TOFChannelKey::TOFChannelKey(string keyStr) throw(Exception) {
+TOFChannelKey::TOFChannelKey(string keyStr) throw(Exceptions::Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted TOF Channel Key"),
                  "TOFChannelKey::TOFChannelKey(std::string)"));
   }
@@ -329,12 +329,12 @@ ostream& operator<<( ostream& stream, TOFChannelKey key ) {
   return stream;
 }
 
-istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Exception) {
+istream& operator>>( istream& stream, TOFChannelKey &key ) throw(Exceptions::Exception) {
   string xLabel;
   stream >> xLabel >> key._station >> key._plane >> key._slab >> key._pmt >> key._detector;
 
   if (xLabel != "TOFChannelKey") {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted TOF Channel Key"),
                  "istream& operator>>(istream& stream, TOFChannelKey)"));
   }
@@ -402,7 +402,7 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
   std::cout << "Building" << std::endl;
   if (py_arg == NULL) {
     PyErr_Clear();
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
               "Failed to resolve arguments to get_cabling",
               "MAUSEvaluator::evaluate"));
     }
@@ -415,7 +415,7 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
     if (py_value == NULL) {
         PyErr_Clear();
         Py_XDECREF(py_arg);
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Failed to parse argument "+devname,
                      "GetCabling::get_cabling"));
     }

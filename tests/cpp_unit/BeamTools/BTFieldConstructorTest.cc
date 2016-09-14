@@ -81,33 +81,33 @@ TEST_F(BTFieldConstructorTest, EndFieldTest) {
 
   //This is a UI so check for invalid input
   _mod[0]->setProperty<std::string>("EndFieldType","SomeNonsense");
-  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[0], 1), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[0], 1), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<std::string>("EndFieldType","Tanh");
 
   // tanh //
   _mod[1]->setProperty<double>("EndLength", 0);
-  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[1], 1), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[1], 1), MAUS::Exceptions::Exception);
   _mod[1]->setProperty<double>("EndLength", 1);
 
   _mod[1]->setProperty<double>("CentreLength", 0);
-  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[1], 1), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[1], 1), MAUS::Exceptions::Exception);
   _mod[1]->setProperty<double>("CentreLength", 5);
 
   _mod[1]->setProperty<int>("MaxEndPole", 1);
-  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[1], 2), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[1], 2), MAUS::Exceptions::Exception);
   _mod[1]->setProperty<int>("MaxEndPole", 3);
 
   // enge //
   _mod[2]->setProperty<double>("EndLength", 0);
-  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[2], 1), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[2], 1), MAUS::Exceptions::Exception);
   _mod[2]->setProperty<double>("EndLength", 1);
 
   _mod[2]->setProperty<double>("CentreLength", 0);
-  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[2], 1), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[2], 1), MAUS::Exceptions::Exception);
   _mod[2]->setProperty<double>("CentreLength", 5);
 
   _mod[2]->setProperty<int>("MaxEndPole", 1);
-  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[2], 2), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetEndFieldModel(_mod[2], 2), MAUS::Exceptions::Exception);
   _mod[2]->setProperty<int>("MaxEndPole", 3);
 }
 
@@ -143,19 +143,19 @@ TEST_F(BTFieldConstructorTest, GetMultipoleTest) {
 
   //This is a UI so check for invalid input
   _mod[0]->setProperty<int>("Pole", 0);
-  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<int>("Pole", 1);
 
   _mod[0]->setProperty<double>("Height", 0);
-  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<double>("Height", 2);
 
   _mod[0]->setProperty<double>("Width", 0);
-  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<double>("Width", 3);
 
   _mod[0]->setProperty<double>("Length", 0);
-  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetMultipole(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<double>("Length", 4);
 }
 
@@ -193,23 +193,23 @@ TEST_F(BTFieldConstructorTest, GetCombinedFunctionTest) {
 
   //This is a UI so check for invalid input
   _mod[0]->setProperty<int>("Pole", 0);
-  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<int>("Pole", 1);
 
   _mod[0]->setProperty<double>("FieldIndex", 0);
-  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<double>("FieldIndex", 2);
 
   _mod[0]->setProperty<double>("Height", 0);
-  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<double>("Height", 3);
 
   _mod[0]->setProperty<double>("Width", 0);
-  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<double>("Width", 3);
 
   _mod[0]->setProperty<double>("Length", 0);
-  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(delete _field->GetCombinedFunction(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty<double>("Length", 4);
 }
 
@@ -241,7 +241,7 @@ TEST_F(BTFieldConstructorTest, GetSectorMagneticFieldMapTest) {
   _mod[0]->addPropertyDouble("Unit4", 1.e-4);
   _mod[0]->addPropertyDouble("Unit5", 1.e-4);
   _mod[0]->addPropertyDouble("Unit6", 1.e-4);
-  EXPECT_THROW(_field->GetField(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(_field->GetField(_mod[0]), MAUS::Exceptions::Exception);
   MAUS::SectorMagneticFieldMap::ClearFieldCache();
   map = static_cast<MAUS::SectorMagneticFieldMap*>(_field->GetField(_mod[0]));
   for (int i = 0; i < 3; ++i) {
@@ -287,7 +287,7 @@ TEST_F(BTFieldConstructorTest, GetSolenoidTest) {
   _mod[0]->addPropertyDouble("Thickness", 3.);
   _mod[0]->addPropertyDouble("InnerRadius", 4.);
 
-  EXPECT_THROW(_field->GetField(_mod[0]), MAUS::Exception);
+  EXPECT_THROW(_field->GetField(_mod[0]), MAUS::Exceptions::Exception);
   _mod[0]->setProperty("FileName",
                              "${MAUS_TMP_DIR}/BTFieldConstructorTest2.fld");
   _mod[0]->addPropertyDouble("Current", 5.);

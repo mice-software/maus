@@ -44,7 +44,7 @@ std::string DateTime::GetDateTime() const {
 
 void DateTime::SetDateTime(std::string datetime) {
     if (!CheckFormat(datetime))
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
           "Malformatted date time string "+datetime+\
           " should be like YYYY-MM-DDTHH:MM:SS.mmmmmm", "DateTime::SetDateTime"
         ));
@@ -67,7 +67,7 @@ bool DateTime::CheckFormat(std::string datetime) {
         out &= Check(datetime.substr(20, 6), 0, 1000000); // milliseconds
         out &= CheckSeparators(datetime); // separators
         return out;
-    } catch (Exception exc) {
+    } catch (Exceptions::Exception exc) {
         return false;
     }
 }
@@ -84,7 +84,7 @@ int DateTime::ToInt(std::string some_string) {
     out_test.width(some_string.size());
     out_test << out;
     if (out_test.str() != some_string) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
               "Failed to convert "+some_string+" to an int",
               "DateTime::ToInt"));
     }
@@ -122,7 +122,7 @@ bool DateTime::CheckDay(std::string day, std::string month) {
     } else if (month == "12") {
         return Check(day, 1, 32);
     } else {
-            throw(Exception(Exception::recoverable, "Could not resolve month "+month,
+            throw(Exceptions::Exception(Exceptions::recoverable, "Could not resolve month "+month,
                          "DateTime::CheckDay"));
     }
 }
