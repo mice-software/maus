@@ -5,6 +5,28 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.6.0
+  The following changes were made:
+    - Global reconstruction TRef issue fixed, solving issue #1858
+    - Global reconstruction other updates
+    - TrackerRecon mapper deprecated, split into new mappers for each stage
+    - Tracker Kalman integration tests added
+    - ReduceCppTofCalib now inherits from ReduceBase
+    - EpicsInterface, ParticleTrigger and TriggerEngine added to the data structure
+    - Squeak (the logger) ported out of legacy into main code base and expanded
+    - Squeak example app added, and description added to user guide
+    - Minor refactor of the MAUS exception code
+    - bin/utilities/find-runs.py added, gives run, beamline and cooling channel info from CDB
+    - SGE batch cluster running framework added
+    - Event Viewer updated
+    - Disabled MAUSGeant4ManagerTest.RunParticlePGTest due to intermittent failures
+    - Third party G4BL random number fix for issue #1852
+    - Third party unpacker version upgraded to 4.0.3
+    - Third party MAUS side CDB code update, geometry corrections may now be downloaded from CDB
+  Known issues:
+    - Tracker Kalman fit sometimes produces NaNs
+  Notes:
+    - Particle trigger unpacking is not enabled
 MAUS-v2.5.0
   The following changes were made:
     - Global reconstruction updates
