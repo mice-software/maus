@@ -102,8 +102,8 @@ class PatternRecognitionEfficiency():
         for root_file_name in self.root_files:
             self.process_file(root_file_name)
             self.print_file_info(root_file_name)
-            if self.use_mc_truth:
-                self.make_plots(root_file_name)
+            #if self.use_mc_truth:
+                #self.make_plots(root_file_name)
             counter += 1
         return True
 
@@ -131,7 +131,7 @@ class PatternRecognitionEfficiency():
 
     def process_spill(self, spill):
         """ Process one spill of data """
-        print "Spill number " + str(spill.GetSpillNumber())
+        #print "Spill number " + str(spill.GetSpillNumber())
         if spill.GetDaqEventType() != "physics_event":
             return False # remove event from consideration
 
@@ -168,29 +168,29 @@ class PatternRecognitionEfficiency():
 
         return True
 
-    def analyse_mc_truth_momentum(self, mc_evt, tk_spoints, trker_num):
-        """ Find the mc scifi hits that formed the spacepoints, find the
-            parent primary mc track id, extract the mc truth momentum from
-            scifi hits corresponding to that track """
+    #def analyse_mc_truth_momentum(self, mc_evt, tk_spoints, trker_num):
+        #""" Find the mc scifi hits that formed the spacepoints, find the
+            #parent primary mc track id, extract the mc truth momentum from
+            #scifi hits corresponding to that track """
 
-        # Check the mc event is ok
-        if mc_evt is None:
-          return ()
+        ## Check the mc event is ok
+        #if mc_evt is None:
+          #return ()
 
-        # Create a lookup to find the mc scifi hits that formed the spacepoints
-        lookup = tools.SciFiLookup(mc_evt) # Lookup to link rec to MC
-        if len(lookup.hits_map) < 0:
-          return ()
+        ## Create a lookup to find the mc scifi hits that formed the spacepoints
+        #lookup = tools.SciFiLookup(mc_evt) # Lookup to link rec to MC
+        #if len(lookup.hits_map) < 0:
+          #return ()
 
-        # Try to find the mc primary track
-        hits = tools.find_mc_hits(lookup, tk_spoints, trker_num)
-        parent_track_id = tools.find_mc_track(hits, self.id_frequency_cut)
-        if parent_track_id != 0:
-            # Pull out the mc momentum and fill the histogramms
-            mom = tools.find_mc_momentum_sfhits(lookup, tk_spoints, \
-              parent_track_id, trker_num)
-            return mom
-        return ()
+        ## Try to find the mc primary track
+        #hits = tools.find_mc_hits(lookup, tk_spoints, trker_num)
+        #parent_track_id = tools.find_mc_track(hits, self.id_frequency_cut)
+        #if parent_track_id != 0:
+            ## Pull out the mc momentum and fill the histogramms
+            #mom = tools.find_mc_momentum_sfhits(lookup, tk_spoints, \
+              #parent_track_id, trker_num)
+            #return mom
+        #return ()
 
     def analyse_prtracks(self, prtracks):
         """ Analyse the reconstructed tracks, see how many were found when
