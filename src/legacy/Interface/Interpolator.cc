@@ -133,7 +133,7 @@ const int BiCubicInterpolator::_w[16][16] = {{1,0,0,0,    0,0,0,0,    0,0,0,0,  
 //Compute F(X,Y)
 void BiCubicInterpolator::F(const double point[2], double value[1]) const
 {
-//	throw(MAUS::Exception(MAUS::Exception::recoverable, "BiCubic Interpolator does not work!", "BuCibicInterpolator::F"));
+//	throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "BiCubic Interpolator does not work!", "BuCibicInterpolator::F"));
   std::cout << "Getting field at " << point[0] << " " << point[1] << std::endl;
 	int       xStart;
 	int       yStart;
@@ -272,7 +272,7 @@ Interpolator3dSolenoidalTo3d::Interpolator3dSolenoidalTo3d(TwoDGrid* grid, doubl
 			_interpolator[1] = new BiCubicInterpolator(grid, Bz);
 			break;
 		default:
-			throw(MAUS::Exception(MAUS::Exception::recoverable, "Interpolation algorithm not recognised", "Interpolator3dSolenoidalTo3d::Interpolator3dSolenoidalTo3d"));
+			throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Interpolation algorithm not recognised", "Interpolator3dSolenoidalTo3d::Interpolator3dSolenoidalTo3d"));
 	}
 
 }
@@ -319,7 +319,7 @@ Interpolator3dSolenoidalTo3d::interpolationAlgorithm Interpolator3dSolenoidalTo3
 	for(int i=0; i<3; i++) 
 		if(_interpolationAlgorithmString[i]==algo) 
 			return interpolationAlgorithm(i); 
-	throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise interpolation algorithm "+algo, "Interpolator3dSolenoidalTo3d::Algorithm") );
+	throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Did not recognise interpolation algorithm "+algo, "Interpolator3dSolenoidalTo3d::Algorithm") );
 }
 
 

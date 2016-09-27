@@ -31,14 +31,14 @@ EMRChannelKey::EMRChannelKey(int pl, int o, int b, string d)
 EMRChannelKey::~EMRChannelKey() {
 }
 
-EMRChannelKey::EMRChannelKey(string keyStr) throw(Exception) {
+EMRChannelKey::EMRChannelKey(string keyStr) throw(Exceptions::Exception) {
 
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  } catch (Exception e) {
-    throw(Exception(Exception::recoverable,
+  } catch (Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted EMR Channel Key"),
                  "EMRChannelKey::EMRChannelKey(std::string)"));
   }
@@ -77,13 +77,13 @@ ostream& operator<<( ostream& stream, EMRChannelKey key ) {
   return stream;
 }
 
-istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exception) {
+istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exceptions::Exception) {
 
   string xLabel;
   stream >> xLabel >> key._plane >> key._orientation >> key._bar >> key._detector;
 
   if (xLabel != "EMRChannelKey") {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted EMR Channel Key"),
                  "istream& operator>>(istream& stream, EMRChannelKey)"));
   }
@@ -134,7 +134,7 @@ bool EMRChannelMap::InitializeFromFile(string filename) {
       _emrKey.push_back(emrkey);
       _daqKey.push_back(daqKey);
     }
-  } catch (Exception e) {
+  } catch (Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
       << "Error in EMRChannelMap::InitializeFromFile : Error during loading." << std::endl
       << e.GetMessage() << std::endl;
@@ -171,8 +171,8 @@ EMRChannelKey* EMRChannelMap::Find(std::string daqKeyStr) {
   try {
     xConv << daqKeyStr;
     xConv >> xDaqKey;
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "EMRChannelMap::find(std::string)"));
   }

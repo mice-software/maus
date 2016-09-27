@@ -42,7 +42,7 @@
 #include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
 
 #include "src/legacy/Interface/STLUtils.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/reduce/ReduceCppSciFiPlot/ReduceCppSciFiPlot.hh"
 
@@ -63,7 +63,7 @@ ReduceCppSciFiPlot::~ReduceCppSciFiPlot() {
 void ReduceCppSciFiPlot::_birth(const std::string& argJsonConfigDocument) {
 
   if (!_output) {
-    throw MAUS::Exception(Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
                           "The output is disconnected.",
                           "ReduceCppSciFiPlot::_birth");
   }
@@ -335,11 +335,11 @@ void ReduceCppSciFiPlot::_death() {}
 
 void ReduceCppSciFiPlot::_process(MAUS::Data* data) {
   if (data == NULL)
-    throw Exception(Exception::recoverable, "Data was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                     "ReduceCppSciFiPlot::_process");
 
   if (data->GetSpill() == NULL)
-    throw Exception(Exception::recoverable, "Spill was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                     "ReduceCppSciFiPlot::_process");
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
@@ -348,7 +348,7 @@ void ReduceCppSciFiPlot::_process(MAUS::Data* data) {
      return;
 
   if (data->GetSpill()->GetReconEvents() == NULL)
-     throw Exception(Exception::recoverable, "ReconEvents were NULL",
+     throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
                         "ReduceCppSciFiPlot::_process");
 
   int xRun = data->GetSpill()->GetRunNumber();

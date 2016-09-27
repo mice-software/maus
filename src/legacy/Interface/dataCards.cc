@@ -8,7 +8,7 @@
 #include <Python.h>
 
 #include "Interface/dataCards.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 using CLHEP::ms;
@@ -52,7 +52,7 @@ dataCards::dataCards(const std::string& app) : client(app)
   initializeApplicationCodes();
   std::map<std::string,int>::iterator i = appCode.find(client);
   if (i == appCode.end()) {
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Unrecognized client application for datacards", "dataCards(...)"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Unrecognized client application for datacards", "dataCards(...)"));
   }
   fillCards(i->second);
 }
@@ -110,7 +110,7 @@ void dataCards::fillCards(int app)
   }
   else
   {
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Unrecognized client application for datacards", "dataCards::fillCards"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Unrecognized client application for datacards", "dataCards::fillCards"));
   }
   cs["FileTag"] = ""; //Can be used as a component of output filenames for various applications, being descriptive of the beam and analysis, e.g. 400MeVpions. Convenient for batch scripts.
 
@@ -497,7 +497,7 @@ int dataCards::readKeys(std::istream& in)
       is >> vd;
     }
     else {
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Error reading key "+t+". Bad data format", "dataCards::readKeys"));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error reading key "+t+". Bad data format", "dataCards::readKeys"));
     }
     cvec[i] = vd;
   }
@@ -506,7 +506,7 @@ int dataCards::readKeys(std::istream& in)
       }
     }
     if (ok != 1)
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Failed to recognise datacard "+t+".", "dataCards::readKeys"));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Failed to recognise datacard "+t+".", "dataCards::readKeys"));
   }
   return 1;
 }
@@ -515,19 +515,19 @@ double dataCards::fetchValueDouble(const std::string& key)
 {
   InputDataCardsDouble::iterator i=cd.find(key);
   if (i == cd.end())
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueDouble"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueDouble"));
   return i->second;
 }
 
 int dataCards::fetchValueInt(const std::string& key){
  InputDataCardsInt::iterator i=ci.find(key);
  if( i == ci.end())
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
  else
    return i->second;
  InputDataCardsDouble::iterator i2=cd.find(key); // only gets here if not
  if( i2 == cd.end())                             // stored as int
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueInt"));
  return (int) i->second;
 }
 
@@ -535,7 +535,7 @@ Hep3Vector dataCards::fetchValue3Vector(const std::string& key)
 {
   InputDataCards3Vector::iterator i=c3v.find(key);
   if (i == c3v.end())
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValue3Vector"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValue3Vector"));
   return i->second;
 }
 
@@ -543,7 +543,7 @@ std::string dataCards::fetchValueString(const std::string& key)
 {
   InputDataCardsString::iterator i=cs.find(key);
   if (i == cs.end())
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueString"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueString"));
   return i->second;
 }
 
@@ -551,7 +551,7 @@ std::vector<double> dataCards::fetchValueVector(const std::string& key)
 {
   InputDataCardsVector::iterator i=cv.find(key);
   if (i == cv.end())
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueVector"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Error fetching unknown datacard "+key+".", "dataCards::fetchValueVector"));
   return i->second;
 }
 
@@ -588,7 +588,7 @@ void dataCards::printValue(const std::string& key)
     std::cout << ")";
     return;
   }
-  throw(MAUS::Exception(MAUS::Exception::recoverable, "datacard "+key+" not found.", "dataCards::printValue"));
+  throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "datacard "+key+" not found.", "dataCards::printValue"));
 }
 
 std::ostream& operator<<(std::ostream& o, const dataCards& d)

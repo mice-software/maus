@@ -1,7 +1,7 @@
 #include "CLHEP/Vector/Rotation.h"
 
 #include "PhaseSpaceVector.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/legacy/Config/ModuleConverter.hh"
 #include "Utils/Exception.hh"
 
@@ -160,7 +160,7 @@ double PhaseSpaceVector::get(std::string name) const
 		case 19: return Ey();
 		case 20: return Ez();
 		default: 
-			Squeak::mout(Squeak::debug) << "Variable " << name << " not recognised\n";
+			MAUS::Squeak::mout(MAUS::Squeak::debug) << "Variable " << name << " not recognised\n";
 	}
 
 	return 0.;
@@ -193,7 +193,7 @@ void PhaseSpaceVector::set(double value, std::string name)
 		case 23: setEy(value); break;
 		case 24: setEz(value); break;
 		default: 
-			throw MAUS::Exception(MAUS::Exception::recoverable, "Variable "+name+" not recognised", "PhaseSpaceVector::set(double, string)");
+			throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Variable "+name+" not recognised", "PhaseSpaceVector::set(double, string)");
 	}
 }
 
@@ -214,7 +214,7 @@ void PhaseSpaceVector::setConservingMass(double value, std::string name)
 
 PhaseSpaceVector PhaseSpaceVector::interpolate(std::vector<PhaseSpaceVector> psv, std::string variableName, double variable)
 {
-  if(psv.size() < 1) throw(MAUS::Exception(MAUS::Exception::recoverable, "Interpolating PhaseSpaceVector array with length 0", "PhaseSpaceVector::interpolate"));
+  if(psv.size() < 1) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Interpolating PhaseSpaceVector array with length 0", "PhaseSpaceVector::interpolate"));
 	int    point = -1;
 	int    i     = 0;
 	double delta = 0;

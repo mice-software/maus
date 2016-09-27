@@ -37,7 +37,7 @@ class IgnoreItem : public BaseItem<ParentType> {
     /** Constructor
      *
      *  @param branch_name name used by json to reference the branch
-     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exceptions::Exception if
      *  is_required is set to true
      */
     IgnoreItem(std::string branch_name, bool is_required);

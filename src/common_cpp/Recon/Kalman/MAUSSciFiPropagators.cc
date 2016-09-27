@@ -330,7 +330,7 @@ namespace MAUS {
         _momentum_reduction_factor = momentum/old_momentum;
       }
     } catch (...) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "Error occured during energy loss calculation",
           "MAUSSciFiPropagactors::_calculateBasePropagator()");
     }

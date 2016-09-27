@@ -104,7 +104,7 @@ DetectorConstruction::DetectorConstruction(G4VPhysicalVolume* worldvol,
   SetBTMagneticField();
   _materials = fillMaterials(NULL);
   if (_materials == NULL)
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
 			  "Failed to acquire MiceMaterials",
 			  "DetectorConstruction::DetectorConstruction()"));
 }
@@ -119,7 +119,7 @@ DetectorConstruction::DetectorConstruction(const Json::Value& cards)
   SetBTMagneticField();
   _materials = fillMaterials(NULL);
   if (_materials == NULL)
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                  "Failed to acquire MiceMaterials",
                  "DetectorConstruction::DetectorConstruction()"));
 }
@@ -171,7 +171,7 @@ DetectorConstruction::~DetectorConstruction() {
 
 void DetectorConstruction::SetDatacardVariables(const Json::Value& cards) {
   if (&cards == NULL)
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                  "Failed to acquire datacards",
                  "DetectorConstruction::DetectorConstruction()"));
   _maxModDepth = JsonWrapper::GetProperty
@@ -281,7 +281,7 @@ void DetectorConstruction::ResetGeometry() {
   try {
   for (int i = 0; i < _model->daughters(); ++i)
     AddDaughter(_model->daughter(i), _rootPhysicalVolume);
-  } catch (Exception exc) {
+  } catch (Exceptions::Exception exc) {
     Squeak::activateCout(cout_alive);
     throw exc;
   }
@@ -346,7 +346,7 @@ void DetectorConstruction::BuildG4DetectorVolume(G4PVPlacement** place,
       *logic = _ckovMirrors.back()->logicalMirror();
       *place = _ckovMirrors.back()->placementMirror();
     } else {
-      throw Exception(Exception::nonRecoverable,
+      throw Exceptions::Exception(Exceptions::nonRecoverable,
                       "Unknown G4Detector type "+detector,
                       "DetectorConstruction::AddDaughter");
     }
@@ -400,7 +400,7 @@ void DetectorConstruction::AddToRegion(G4LogicalVolume* logic, MiceModule* mod) 
         }
         G4Region* region = store->GetRegion(name);
         if (region == NULL) {  // just to cross check that G4 is doing its job
-            throw MAUS::Exception(Exception::recoverable,
+            throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                                   "Failed to make region",
                                   "DetectorConstruction::AddToRegion");
         }
@@ -466,7 +466,7 @@ void DetectorConstruction::BuildSensitiveDetector
       _SDs.push_back(ckovSD);
     } else if (sdName != "Virtual" && sdName != "Envelope") {
       // Virtual and Envelope are special cases
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
             "Sensitive detector type "+sdName+" not recognised in module "+
             mod->fullName(),
             "DetectorConstruction::AddDaughter(...)"));
@@ -550,7 +550,7 @@ void DetectorConstruction::SetSteppingAlgorithm() {
   } else if (_stepperType == "CashKarpRKF45") {
     _stepper = new G4CashKarpRKF45(_equation, n_vars);
   } else {
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                 "stepping_algorithm '"+_stepperType+"' not found",
                 "DetectorConstruction::SetSteppingAlgorithm()"));
   }
@@ -580,7 +580,7 @@ void DetectorConstruction::SetSteppingAccuracy() {
 
 void DetectorConstruction::GetSDHits(size_t i, MCEvent* event) {
   if (i >= _SDs.size()) {
-    throw Exception(Exception::recoverable,
+    throw Exceptions::Exception(Exceptions::recoverable,
                     "Attempt to get SD for out-of-range detector",
                     "DetectorConstruction::GetSDHits(...)");
   }
@@ -627,7 +627,7 @@ void DetectorConstruction::CheckForVolumeInChildren
     else
         CheckModuleDepth(recurse);
     if (recurse->volType() != "None") {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
           "MiceModule "+mod->name()+" with Volume None has child module "+
           recurse->name()+" with Volume "+recurse->volType()+
           " - but should be None",
@@ -680,7 +680,7 @@ void DetectorConstruction::CheckModuleDepth(MiceModule* module) {
     ++recursionDepth;
   }
   if (recursionDepth > _maxModDepth) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
         "MiceModule "+module->fullName()+" is more than "+
         STLUtils::ToString(_maxModDepth)+" levels deep",
         "DetectorConstruction::CheckModuleDepth"));

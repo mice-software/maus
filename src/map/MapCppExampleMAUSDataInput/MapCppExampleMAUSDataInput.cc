@@ -34,7 +34,7 @@ void MapCppExampleMAUSDataInput::_birth(const std::string& argJsonConfigDocument
   // Check if the JSON document can be parsed, else return error only.
   bool parsingSuccessful = _reader.parse(argJsonConfigDocument, _configJSON);
   if (!parsingSuccessful) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
                  "Unable to Parse Json Config",
                  "MapCppExampleMAUSDataInput::_birth"));
   }

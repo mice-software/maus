@@ -21,7 +21,7 @@
 #include "CLHEP/Vector/Rotation.h"
 #include "CLHEP/Geometry/Transform3D.h"
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/common_cpp/Utils/MAUSEvaluator.hh"
 

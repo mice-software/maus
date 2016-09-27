@@ -77,7 +77,7 @@ static PyObject* track_particles
         std::string mc_event_str = JsonWrapper::JsonToString(mc_event_json);
         PyObject* mc_event_py = Py_BuildValue("s", mc_event_str.c_str());
         return mc_event_py;
-    } catch (MAUS::Exception exc) {
+    } catch (MAUS::Exceptions::Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }

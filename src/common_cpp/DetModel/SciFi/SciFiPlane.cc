@@ -65,7 +65,7 @@ SciFiPlane::SciFiPlane(MiceModule* mod,
   }
 
   if ((ar < cf*fp/2) || ar < (nf-cf)*fp/2) {
-    throw MAUS::Exception(MAUS::Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
         "Tracker Plane active radius not large enough to simulate all fibres. "+mod->fullName(),
         "SciFiPlane::SciFiPLane(...)");
   }

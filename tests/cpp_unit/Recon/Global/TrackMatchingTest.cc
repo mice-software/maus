@@ -56,7 +56,7 @@ class TrackMatchingTest : public ::testing::Test {
 
 TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   Simulation::DetectorConstruction* dc =
       Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
@@ -140,15 +140,15 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
        global_track_iter != global_tracks->end();
        ++global_track_iter) {
     if (((*global_track_iter)->get_mapper_name() ==
-            "MapCppGlobalTrackMatching-US") and
+            "MapCppGlobalTrackMatching_US") and
         ((*global_track_iter)->get_pid() == pid)) {
       us_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching-DS") and
+                   "MapCppGlobalTrackMatching_DS") and
                ((*global_track_iter)->get_pid() == pid)) {
       ds_tracks->push_back(*global_track_iter);
     } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching-Through") and
+                   "MapCppGlobalTrackMatching_Through") and
                ((*global_track_iter)->get_pid() == pid)) {
       through_tracks->push_back(*global_track_iter);
     }
@@ -175,7 +175,7 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
 
 TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   DataStructure::Global::Track tracker0_track1;
   tracker0_track1.SetDetector(DataStructure::Global::kTracker0);
@@ -232,7 +232,7 @@ TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
 
 TEST_F(TrackMatchingTest, GetDetectorSpacePoints) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   DataStructure::Global::DetectorPoint tof0 = DataStructure::Global::kTOF0;
   DataStructure::Global::DetectorPoint tof1 = DataStructure::Global::kTOF1;
@@ -300,7 +300,7 @@ TEST_F(TrackMatchingTest, GetDetectorSpacePoints) {
 
 TEST_F(TrackMatchingTest, PIDHypotheses) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   std::vector<DataStructure::Global::PID> pids =
       _track_matching->PIDHypotheses(0, "kMuPlus");
@@ -337,7 +337,7 @@ TEST_F(TrackMatchingTest, PIDHypotheses) {
 
 TEST_F(TrackMatchingTest, MatchTrackPoint) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   Simulation::DetectorConstruction* dc =
       Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
@@ -443,7 +443,7 @@ TEST_F(TrackMatchingTest, MatchTOF0) {
 
 TEST_F(TrackMatchingTest, MatchEMRTrack) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   Simulation::DetectorConstruction* dc =
       Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
@@ -495,7 +495,7 @@ TEST_F(TrackMatchingTest, MatchEMRTrack) {
 
 TEST_F(TrackMatchingTest, AddTrackerTrackPoints) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   double mass = 105.65837;
   std::string mapper_name = "AddTrackPointsTest";
@@ -535,7 +535,7 @@ TEST_F(TrackMatchingTest, AddTrackerTrackPoints) {
 
 TEST_F(TrackMatchingTest, USDSTracks) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   std::vector<DataStructure::Global::Track*> global_tracks;
   std::vector<DataStructure::Global::Track*> us_tracks1;
@@ -547,11 +547,11 @@ TEST_F(TrackMatchingTest, USDSTracks) {
   DataStructure::Global::Track us_muplus_track3;
   DataStructure::Global::Track ds_muplus_track;
   DataStructure::Global::Track ds_piminus_track;
-  us_muplus_track1.set_mapper_name("MapCppGlobalTrackMatching-US");
-  us_muplus_track2.set_mapper_name("MapCppGlobalTrackMatching-US");
-  us_muplus_track3.set_mapper_name("MapCppGlobalTrackMatching-US");
-  ds_muplus_track.set_mapper_name("MapCppGlobalTrackMatching-DS");
-  ds_piminus_track.set_mapper_name("MapCppGlobalTrackMatching-DS");
+  us_muplus_track1.set_mapper_name("MapCppGlobalTrackMatching_US");
+  us_muplus_track2.set_mapper_name("MapCppGlobalTrackMatching_US");
+  us_muplus_track3.set_mapper_name("MapCppGlobalTrackMatching_US");
+  ds_muplus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
+  ds_piminus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
   us_muplus_track1.set_pid(DataStructure::Global::kMuPlus);
   us_muplus_track2.set_pid(DataStructure::Global::kMuPlus);
   us_muplus_track3.set_pid(DataStructure::Global::kMuPlus);
@@ -578,22 +578,22 @@ TEST_F(TrackMatchingTest, USDSTracks) {
   EXPECT_EQ(ds_tracks2.size(), 1);
 
   if (us_tracks1.size() > 1) {
-    EXPECT_EQ(us_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching-US");
+    EXPECT_EQ(us_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
     EXPECT_EQ(us_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
     EXPECT_TRUE(us_tracks1[0]->HasDetector(DataStructure::Global::kTOF1));
-    EXPECT_EQ(us_tracks1[1]->get_mapper_name(), "MapCppGlobalTrackMatching-US");
+    EXPECT_EQ(us_tracks1[1]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
     EXPECT_EQ(us_tracks1[1]->get_pid(), DataStructure::Global::kMuPlus);
     EXPECT_TRUE(us_tracks1[1]->HasDetector(DataStructure::Global::kTOF1));
   }
 
   if (ds_tracks1.size() > 0) {
-    EXPECT_EQ(ds_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching-DS");
+    EXPECT_EQ(ds_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
     EXPECT_EQ(ds_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
     EXPECT_TRUE(ds_tracks1[0]->HasDetector(DataStructure::Global::kTOF2));
   }
 
   if (ds_tracks2.size() > 0) {
-    EXPECT_EQ(ds_tracks2[0]->get_mapper_name(), "MapCppGlobalTrackMatching-DS");
+    EXPECT_EQ(ds_tracks2[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
     EXPECT_EQ(ds_tracks2[0]->get_pid(), DataStructure::Global::kPiMinus);
     EXPECT_TRUE(ds_tracks2[0]->HasDetector(DataStructure::Global::kTOF2));
   }
@@ -601,7 +601,7 @@ TEST_F(TrackMatchingTest, USDSTracks) {
 
 TEST_F(TrackMatchingTest, MatchUSDS) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   DataStructure::Global::SpacePoint tof1_sp;
   TLorentzVector tof1_position(0.0, 0.0, 100.0, 20.0);
@@ -618,14 +618,15 @@ TEST_F(TrackMatchingTest, MatchUSDS) {
   tof1_track->AddTrackPoint(&tof1_tp);
   DataStructure::Global::Track* tof2_track = new DataStructure::Global::Track;
   tof2_track->AddTrackPoint(&tof2_tp);
+  tof2_track->set_emr_range_primary(15.0);
 
   DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
 
-  _track_matching->MatchUSDS(tof1_track, tof2_track, pid, 15.0);
+  _track_matching->MatchUSDS(tof1_track, tof2_track, pid);
 
   std::vector<DataStructure::Global::Track*>* through_tracks =
       GlobalTools::GetTracksByMapperName(_global_event,
-      "MapCppGlobalTrackMatching-Through");
+      "MapCppGlobalTrackMatching_Through");
 
   EXPECT_EQ(through_tracks->size(), 1);
   if (through_tracks->size() > 0) {
@@ -646,7 +647,7 @@ TEST_F(TrackMatchingTest, MatchUSDS) {
 
 TEST_F(TrackMatchingTest, TOFTimeFromTrackPoints) {
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   std::vector<const DataStructure::Global::TrackPoint*> track_points;
   DataStructure::Global::SpacePoint sp;

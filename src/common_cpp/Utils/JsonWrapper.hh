@@ -68,7 +68,7 @@ namespace JsonWrapper {
    *  fails to parse the string. The configuration is a dict of Json::Value,
    *  which is in itself a Json::Value.
    */
-  Json::Value StringToJson(const std::string& json_in) throw(MAUS::Exception);
+  Json::Value StringToJson(const std::string& json_in) throw(MAUS::Exceptions::Exception);
 
   /** @brief Convert a Json::Value tree to a std::string
    *
@@ -87,7 +87,7 @@ namespace JsonWrapper {
    */
   Json::Value GetItem(const Json::Value& array,
                       const size_t value_index,
-                      const JsonType value_type) throw(MAUS::Exception);
+                      const JsonType value_type) throw(MAUS::Exceptions::Exception);
 
   /** @brief Get a property from a Json object (hash)
    *
@@ -100,7 +100,7 @@ namespace JsonWrapper {
    */
   Json::Value GetProperty(const Json::Value& object,
                           const std::string& value_name,
-                          const JsonType value_type) throw(MAUS::Exception);
+                          const JsonType value_type) throw(MAUS::Exceptions::Exception);
 
 
   /** @brief Convert from a json three vector to a CLHEP three vector
@@ -109,7 +109,7 @@ namespace JsonWrapper {
    *         an exception if the conversion fails.
    */
   CLHEP::Hep3Vector JsonToThreeVector(const Json::Value& json_vec)
-      throw(MAUS::Exception);
+      throw(MAUS::Exceptions::Exception);
 
   /** @brief Convert from Json::ValueType to JsonType
    */
@@ -121,7 +121,7 @@ namespace JsonWrapper {
 
   /** @brief Convert from JsonType to Json::ValueType
    */
-  Json::ValueType JsonTypeToValueType(const JsonType tp) throw(MAUS::Exception);
+  Json::ValueType JsonTypeToValueType(const JsonType tp) throw(MAUS::Exceptions::Exception);
 
   /** @brief Return true if cast_target can be cast to cast_type in a safe way
    *

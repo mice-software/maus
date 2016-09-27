@@ -21,7 +21,7 @@ namespace ReferenceResolver {
 namespace CppToJson { // humm, could probably abstract out...
 RefManager& RefManager::GetInstance() {
     if (_instance == NULL) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                     "Attempt to get RefManager before initialisation",
                     "ReferenceResolver::CppToJson::RefManager::GetInstance()"));
     }
@@ -34,7 +34,7 @@ bool RefManager::HasInstance() {
 
 void RefManager::Birth() {
     if (_instance != NULL) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                     "Attempt to birth RefManager when it was already birthed",
                     "ReferenceResolver::CppToJson::RefManager::Birth()"));
     }
@@ -43,7 +43,7 @@ void RefManager::Birth() {
 
 void RefManager::Death() {
     if (_instance == NULL) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                     "Attempt to death RefManager before initialisation",
                     "ReferenceResolver::CppToJson::RefManager::Death()"));
     }

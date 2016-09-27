@@ -40,7 +40,7 @@ class ConstantItem : public BaseItem<ParentType> {
      *
      *  @param branch_name name used by json to reference the branch
      *  @param json_value value that will always be filled in this branch
-     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exception if
+     *  @param is_required if the branch doesnt exist in json, throw MAUS::Exceptions::Exception if
      *  is_required is set to true
      */
     ConstantItem(std::string branch_name, Json::Value child_value, bool is_required);

@@ -53,7 +53,7 @@ namespace MAUS {
 
   void GeometryNavigator::Initialise(G4VPhysicalVolume* phys_vol) {
     if (!phys_vol) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("No physical volume could be found "),
                  "GeometryNavigator::GeometryNavigator()"));
     }
@@ -84,7 +84,7 @@ namespace MAUS {
 
   void GeometryNavigator::_setPoint(G4ThreeVector pos) {
     if (!_navigator) {
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("Navigator not correctly set up. ")+
                  std::string("Physical volume required"),
                  "GeometryNavigator::_setPoint(G4ThreeVector)"));

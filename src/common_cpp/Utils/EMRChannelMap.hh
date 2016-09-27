@@ -30,7 +30,7 @@
 
 #include "Utils/DAQChannelMap.hh"
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 
@@ -51,13 +51,13 @@ class EMRChannelKey {
   /** @brief Destructor - any member pointers are deleted */
   virtual ~EMRChannelKey();
 
-  explicit EMRChannelKey(string keyStr) throw(Exception);
+  explicit EMRChannelKey(string keyStr) throw(Exceptions::Exception);
 
   bool operator==( EMRChannelKey key ) const;
   bool operator!=( EMRChannelKey key ) const;
 
   friend ostream& operator<<( ostream& stream, EMRChannelKey key );
-  friend istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exception);
+  friend istream& operator>>( istream& stream, EMRChannelKey &key ) throw(Exceptions::Exception);
 
   /** @brief This function converts the DAQChannelKey into string.
   *

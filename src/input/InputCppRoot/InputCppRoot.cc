@@ -206,8 +206,8 @@ std::string InputCppRoot::_emit_cpp() {
 template <class DataT>
 bool InputCppRoot::load_event(std::string branch_name, DataT& data) {
     if (_infile == NULL) {
-      throw(Exception(
-        Exception::recoverable,
+      throw(Exceptions::Exception(
+        Exceptions::recoverable,
         "InputCppRoot was not initialised properly",
         "InputCppRoot::load_event"
      ));
@@ -259,7 +259,7 @@ std::string InputCppRoot::uncache_event(event_type type) {
 void InputCppRoot::cache_event(event_type type, std::string event) {
     std::map<event_type, std::string>::iterator it = _cache.find(type);
     if (it != _cache.end() && it->second != "")
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Trying to cache event but cannot find event type in map",
                      "InputCppRoot::uncache_event"));
     _cache[type] = event;

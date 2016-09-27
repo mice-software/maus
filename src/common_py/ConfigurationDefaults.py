@@ -67,6 +67,10 @@ end_of_run_output_root_directory = os.environ.get("MAUS_WEB_MEDIA_RAW")+"/end_of
 # >4 = silent
 # Doesnt effect python
 verbose_level = 1
+# Used for switching the general maus running log on or off
+# 0 = off
+# 1 = on
+log_level = 0
 errors_to_stderr = None # None = from verbose_level; else True or False
 errors_to_json = True
 on_error = 'none' # none, halt or raise
@@ -373,15 +377,16 @@ cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for co
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'id' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'run' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
 geometry_download_beamline_for_run = 0
 geometry_download_beamline_tag = ''
 geometry_download_coolingchannel_tag = ''
-geometry_download_run_number = 0
-geometry_download_id = 49
+geometry_download_run_number = 7469
+geometry_download_id = 160
+geometry_download_apply_corrections = True
 geometry_download_cleanup = True # set to True to clean up after download
 g4_step_max = 5.0 # this is the value which shall be placed in the Mice Modules which have been translated from CAD
 geometry_use_active_rotations = False # Changes SciFiGeometryHelper to use active rotations for Mice Moduel only running.
@@ -759,9 +764,9 @@ custom_pid_set = "PIDVarB"
 pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
 # setting to "all", or on all downstream tracks (set to "DS"), all upstream (set to "US"), through tracks (set to 
-# "Through"), or the upstream or downstream components of the throught track (set to "Through_US" or "Through_DS"
+# "Through"), or the upstream or downstream components of the throught track (set to "Through-US" or "Through-DS"
 # respectively). Or a combination of the above can be used, entered as a space separated list, e.g
-# "Through Through_US Through_DS"
+# "Through Through-US Through-DS"
 pid_track_selection = "Through"
 
 

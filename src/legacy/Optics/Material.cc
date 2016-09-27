@@ -78,7 +78,7 @@ CovarianceMatrix Material::TransportBack(CovarianceMatrix covIn) const
 		error << "Error - transport back failed on material at z=" << covOut.GetMean().z() 
 		          << " Likely cause is that the material was too thick. Covariance matrix before material\n" 
 		          << covIn << "and after\n" << covOut << std::endl;
-		throw(MAUS::Exception(MAUS::Exception::recoverable, error.str(), "Material::TransportBack(CovarianceMatrix) const"));
+		throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, error.str(), "Material::TransportBack(CovarianceMatrix) const"));
 	}
 	return covOut;
 }

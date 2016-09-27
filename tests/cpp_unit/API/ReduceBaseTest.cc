@@ -51,8 +51,8 @@ namespace MAUS {
 
   private:
     virtual void _process(std::string* t) {
-      throw MAUS::Exception(MAUS::Exception::recoverable,
-           "Expected Test MAUS::Exception in _process",
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
+           "Expected Test MAUS::Exceptions::Exception in _process",
            "std::string* _process(std::string* t) const");
     }
   };
@@ -149,10 +149,10 @@ namespace MAUS {
     try {
       mm_e.process_pyobj(py_str1);
     }
-    catch (MAUS::Exception& e) {}
+    catch (MAUS::Exceptions::Exception& e) {}
     catch (...) {
       EXPECT_TRUE(false)
-        << "Fail: Expected exception of type MAUS::Exception to be thrown"
+        << "Fail: Expected exception of type MAUS::Exceptions::Exception to be thrown"
         << std::endl;
     }
     Py_DECREF(py_str1);
@@ -166,10 +166,10 @@ namespace MAUS {
     try {
       mm_e.process_pyobj(py_str1);
     }
-    catch (MAUS::Exception& e) {}
+    catch (MAUS::Exceptions::Exception& e) {}
     catch (...) {
       EXPECT_TRUE(false)
-        << "Fail: Expected exception of type MAUS::Exception to be thrown"
+        << "Fail: Expected exception of type MAUS::Exceptions::Exception to be thrown"
         << std::endl;
     }
     Py_DECREF(py_str1);

@@ -71,7 +71,7 @@ TEMP* PyObjectWrapper::unwrap(PyObject *args) {
       cpp_ret = ConverterFactory().convert<ImageData, TEMP>(*image_ret);
       Py_DECREF(*py_ret);
   } else {
-    throw Exception(Exception::recoverable,
+    throw Exceptions::Exception(Exceptions::recoverable,
                     "Failed to do the lazy conversion",
                     "PyObjectWrapper::unwrap_pyobject");
   }
@@ -116,7 +116,7 @@ PyObject* PyObjectWrapper::wrap(MAUS::ImageData* cpp_data) {
 PyObject* PyObjectWrapper::wrap(Json::Value* json_value) {
   // Confirm the object exists.
   if (!json_value) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Json::Value was NULL",
                       "PyObjectWrapper::wrap_pyobject<Json::Value>");
   }
@@ -130,7 +130,7 @@ PyObject* PyObjectWrapper::wrap(Json::Value* json_value) {
 PyObject* PyObjectWrapper::wrap(std::string* str) {
   // Export the std::string as a Python string.
   if (!str) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "str was NULL",
                       "PyObjectWrapper::wrap_pyobject<string>");
   }
@@ -142,7 +142,7 @@ PyObject* PyObjectWrapper::wrap(std::string* str) {
 PyObject* PyObjectWrapper::wrap(PyObject* py_object) {
   // We just do an incref (nothing else to do here)
   if (!py_object) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "py_object was NULL",
                       "PyObjectWrapper::wrap_pyobject<py_object>");
   }
@@ -168,13 +168,13 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
         *rh_ret != NULL ||
         *rf_ret != NULL ||
         *image_ret != NULL) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "return values not initialised to NULL",
                       "PyObjectWrapper::lazy_unwrap");
     }
 
     if (!py_cpp) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "py_cpp was NULL",
                       "PyObjectWrapper::lazy_unwrap");
     }
@@ -183,38 +183,38 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
             unwrap_root_object_proxy(py_cpp, data_ret, "MAUS::Data");
             if (*data_ret != NULL)
                 return;
-        } catch (MAUS::Exception &exc) {}
+        } catch (MAUS::Exceptions::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, jh_ret, "MAUS::JobHeaderData");
             if (*jh_ret != NULL)
                 return;
-        } catch (MAUS::Exception &exc) {}
+        } catch (MAUS::Exceptions::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, jf_ret, "MAUS::JobFooterData");
             if (*jf_ret != NULL)
                 return;
-        } catch (MAUS::Exception &exc) {}
+        } catch (MAUS::Exceptions::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, rh_ret, "MAUS::RunHeaderData");
             if (*rh_ret != NULL)
                 return;
-        } catch (MAUS::Exception &exc) {}
+        } catch (MAUS::Exceptions::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, rf_ret, "MAUS::RunFooterData");
             if (*rf_ret != NULL)
                 return;
-        } catch (MAUS::Exception &exc) {}
+        } catch (MAUS::Exceptions::Exception &exc) {}
         try {
             unwrap_root_object_proxy(py_cpp, image_ret, "MAUS::ImageData");
             if (*image_ret != NULL)
                 return;
-        } catch (MAUS::Exception &exc) {
+        } catch (MAUS::Exceptions::Exception &exc) {
         }
     } else if (PyCapsule_IsValid(py_cpp, "JsonCpp")) {
         void* vptr = PyCapsule_GetPointer(py_cpp, "JsonCpp");
         Json::Value *json_ptr = static_cast<Json::Value*>(vptr);
         if (!json_ptr) {
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "Could not parse JsonCpp capsule to Json::Value",
                             "PyObjectWrapper::lazy_unwrap");
         }
@@ -224,7 +224,7 @@ void PyObjectWrapper::lazy_unwrap(PyObject* py_cpp,
     } else if (PyDict_Check(py_cpp)) {
         *py_ret = PyDict_Copy(py_cpp); // shallow or deep? unclear...
     } else {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Could not parse PyObject as a valid data type",
                         "PyObjectWrapper::lazy_unwrap");
     }
@@ -238,13 +238,13 @@ void PyObjectWrapper::unwrap_root_object_proxy(PyObject* py_cpp,
                                          const_cast<char*>("Class_Name"),
                                          NULL);
     if (!name) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Class_Name method could not be called on ObjectProxy",
                         "PyObjectWrapper::lazy_unwrap");
     }
     char* c_string = NULL;
     if (!PyArg_Parse(name, "s", &c_string)) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Class_Name method did not return a string",
                         "PyObjectWrapper::lazy_unwrap");
     }
@@ -254,14 +254,14 @@ void PyObjectWrapper::unwrap_root_object_proxy(PyObject* py_cpp,
         TEMP* data = static_cast<TEMP*>(vptr); // caller owns this memory
         *data_ret = new TEMP(*data); // we own this memory
         if (!data_ret) {
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                         "Failed to cast py_cpp as a "+class_name,
                         "PyObjectWrapper::lazy_unwrap");
         }
     } else {
         return;
 /*
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                     "Did not recognise ObjectProxy type "+\
                     std::string(c_string),
                     "PyObjectWrapper::lazy_unwrap");
@@ -274,7 +274,7 @@ void PyObjectWrapper::delete_jsoncpp_pycapsule(PyObject* py_capsule) {
     Json::Value* json = static_cast<Json::Value*>(void_json);
     if (!void_json || !json) {
         PyErr_Clear();
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                     "Attempting to delete a JsonCpp capsule but none was found",
                     "PyObjectWrapper::delete_jsoncpp_pycapsule");
     }
@@ -286,14 +286,14 @@ PyObject* PyObjectWrapper::wrap_root_object_proxy(TEMP* cpp_data,
                                                   std::string name) {
   // Confirm the object exists.
   if (!cpp_data) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Cpp data was NULL",
                       "PyObjectWrapper::wrap_root_object_proxy<"+name+">");
   }
   // Require root_module to be imported for this to work (don't ask me why)
   static PyObject* root_module = PyImport_ImportModule("ROOT");
   if (!root_module)
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Failed to import ROOT",
                       "PyObjectWrapper::wrap_root_object_proxy<"+name+">");
 
@@ -304,7 +304,7 @@ PyObject* PyObjectWrapper::wrap_root_object_proxy(TEMP* cpp_data,
                                                        name.c_str(),
                                                        true);
   if (!py_data) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Could not convert "+name+" to PyRoot",
                       "PyObjectWrapper::wrap_root_object_proxy<"+name+">");
   }

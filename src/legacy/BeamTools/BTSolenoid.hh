@@ -41,7 +41,7 @@
 #include "BTField.hh"
 #include "BTSheet.hh"
 #include "Interface/MagFieldMap.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "Interface/SplineInterpolator.hh"
 

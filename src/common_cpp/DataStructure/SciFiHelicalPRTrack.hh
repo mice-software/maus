@@ -88,12 +88,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Set the tracker number */
     void set_tracker(int tracker) { _tracker = tracker; }
 
-    /** Get the track charge */
-    int get_charge() const { return _charge; }
-
-    /** Set the track charge */
-    void set_charge(int charge) { _charge = charge; }
-
     /** Get the position of the intercept of the track with the tracker ref surface */
     ThreeVector get_pos0() const { return _pos0; }
 
@@ -159,7 +153,6 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
 
   private:
     int _tracker;                 /** Tracker number, 0 for upstream, 1 for downstream */
-    int _charge;                  /** The charge of the track */
     static const int _type = 1;   /** Track type identifier, 0 for straight, 1 for helical */
     double _R;                    /** Radius of the track fit */
     double _phi0;                 /** Initial turning angle [radians]. Confusing, to be removed. */

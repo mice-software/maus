@@ -52,7 +52,7 @@ class PointerTRefItem : public BaseItem<ParentType> {
    *  @param SetMethod callback that will set a pointer to the child data,
    *  where memory is given to the ObjectProcessor
    *  @param is_required if the branch doesnt exist in json, is null in json
-   *  or is NULL in C++, throw MAUS::Exception if is_required is set to true when
+   *  or is NULL in C++, throw MAUS::Exceptions::Exception if is_required is set to true when
    *  Set...Child methods are called
    */
   PointerTRefItem(std::string branch_name,

@@ -16,6 +16,7 @@
  */
 
 #include "src/common_cpp/Recon/EMR/TrackMomentum.hh"
+#include "Utils/Squeak.hh"
 
 namespace TrackMomentum {
 
@@ -101,7 +102,7 @@ bool initialize(std::string particle) {
     _m = .511;
     _z = 1.;
   } else {
-    Squeak::mout(Squeak::warning)
+    MAUS::Squeak::mout(MAUS::Squeak::warning)
     << "WARNING in csda_momentum. The particle type is not supported,"
     << " the momentum will not be reconstructed."
     << std::endl;

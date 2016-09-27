@@ -43,7 +43,7 @@
 #include "src/common_cpp/DataStructure/ImageData/CanvasWrapper.hh"
 
 #include "src/legacy/Interface/STLUtils.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 #include "src/reduce/ReduceCppTOFPlot/ReduceCppTOFPlot.hh"
 
@@ -64,7 +64,7 @@ ReduceCppTOFPlot::~ReduceCppTOFPlot() {
 void ReduceCppTOFPlot::_birth(const std::string& argJsonConfigDocument) {
 
   if (!_output) {
-    throw MAUS::Exception(Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::nonRecoverable,
                           "The output is disconnected.",
                           "ReduceCppTOFPlot::_birth");
   }
@@ -428,11 +428,11 @@ void ReduceCppTOFPlot::_death() {}
 
 void ReduceCppTOFPlot::_process(MAUS::Data* data) {
   if (data == NULL)
-    throw Exception(Exception::recoverable, "Data was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                     "ReduceCppTOFPlot::_process");
 
   if (data->GetSpill() == NULL)
-    throw Exception(Exception::recoverable, "Spill was NULL",
+    throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                     "ReduceCppTOFPlot::_process");
 
   std::string ev_type = data->GetSpill()->GetDaqEventType();
@@ -441,7 +441,7 @@ void ReduceCppTOFPlot::_process(MAUS::Data* data) {
      return;
 
   if (data->GetSpill()->GetReconEvents() == NULL)
-     throw Exception(Exception::recoverable, "ReconEvents were NULL",
+     throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
                         "ReduceCppTOFPlot::_process");
 
   int xRun = data->GetSpill()->GetRunNumber();

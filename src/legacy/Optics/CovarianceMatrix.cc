@@ -409,7 +409,7 @@ double  GetSixDAmp(PhaseSpaceVector event, PhaseSpaceVector mean, HepSymMatrix i
 
 CovarianceMatrix CovarianceMatrix::Interpolate(std::vector<CovarianceMatrix> cov, std::string variableName, double variable)
 {
-  if(cov.size() < 1) throw(MAUS::Exception(MAUS::Exception::recoverable, "Interpolating CovarianceMatrix array with length 0", "CovarianceMatrix::interpolate"));
+  if(cov.size() < 1) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Interpolating CovarianceMatrix array with length 0", "CovarianceMatrix::interpolate"));
   int    point = -1;
   int    i     = 0;
   double delta = 0;
@@ -515,7 +515,7 @@ double CovarianceMatrix::BunchVariable(std::string variable) const
     case 21: return GetLCan(); 
     case 22: return GetLKin();
     default:
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "Bunch variable not recognised", "CovarianceMatrix::BunchVariable(std::string)"));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Bunch variable not recognised", "CovarianceMatrix::BunchVariable(std::string)"));
   }
 }
 
@@ -545,7 +545,7 @@ void CovarianceMatrix::SetFullVariable(std::string variable, double value)
   if     (variableType == list[0]) _mean.setConservingMass(aux1, value);
   else if(variableType == list[1]){HepSymMatrix covMatrix = GetKineticCovariances(); covMatrix[aux1Int][aux2Int] = value; SetCovariances(covMatrix);}
   else if(variableType == list[4]) SetBunchVariable(aux1, value);
-  else throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise selection "+varStream.str(), "CovarianceMatrix::SetFullVariable()"));
+  else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Did not recognise selection "+varStream.str(), "CovarianceMatrix::SetFullVariable()"));
   
 
 }
@@ -661,7 +661,7 @@ void CovarianceMatrix::SetBunchVariable(std::string variable, double value)
       cov[3][3]       = cov[5][5] = px2;
       break;
     }
-    default: throw(MAUS::Exception(MAUS::Exception::recoverable, "Bunch variable "+variable+" not recognised", "CovarianceMatrix::SetBunchVariable(string, double)"));
+    default: throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Bunch variable "+variable+" not recognised", "CovarianceMatrix::SetBunchVariable(string, double)"));
   }
   SetCovariances(cov);
 }// return _norm*(_covNorm(3,6) - _covNorm(4,5)); 
@@ -710,7 +710,7 @@ double CovarianceMatrix::FullVariable(std::string variable) const
   else if(variableType == list[3]) return GetKineticCovariances()[aux1Int][aux2Int] / sqrt( GetKineticCovariances()[aux1Int][aux1Int] ) 
                                                                                     / sqrt( GetKineticCovariances()[aux2Int][aux2Int] );
   else if(variableType == list[4]) return BunchVariable(aux1);
-  else throw(MAUS::Exception(MAUS::Exception::recoverable, "Did not recognise selection "+varStream.str(), "CovarianceMatrix::FullVariable()"));
+  else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Did not recognise selection "+varStream.str(), "CovarianceMatrix::FullVariable()"));
 }
 
 bool CovarianceMatrix::isBad()
@@ -730,7 +730,7 @@ std::vector<std::string> CovarianceMatrix::listOfAuxiliaryVariables1(std::string
     if     (LowerCase(list[i]) == LowerCase(variable) && i!=4) return PhaseSpaceVector::listOfVariables();
     else if(LowerCase(list[i]) == LowerCase(variable))         return bunchVariables();
 
-  throw(MAUS::Exception(MAUS::Exception::recoverable, "Unrecognised covariance variable type "+variable, "CovarianceMatrix::listOfAuxiliaryVariables1(std::string)"));
+  throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Unrecognised covariance variable type "+variable, "CovarianceMatrix::listOfAuxiliaryVariables1(std::string)"));
 }
 
 std::vector<std::string> CovarianceMatrix::listOfAuxiliaryVariables2(std::string variable)
@@ -739,7 +739,7 @@ std::vector<std::string> CovarianceMatrix::listOfAuxiliaryVariables2(std::string
   for(unsigned int i=0; i<list.size(); i++)
     if(LowerCase(list[i]) == LowerCase(variable) && (i==1 || i==3) ) return PhaseSpaceVector::listOfVariables();
     else  if(LowerCase(list[i]) == LowerCase(variable))              return std::vector<std::string>();
-  throw(MAUS::Exception(MAUS::Exception::recoverable, "Unrecognised covariance variable type "+variable, "CovarianceMatrix::listOfAuxiliaryVariables2(std::string)"));
+  throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Unrecognised covariance variable type "+variable, "CovarianceMatrix::listOfAuxiliaryVariables2(std::string)"));
 }
 
 
@@ -765,7 +765,7 @@ MomentHeap::~MomentHeap()
 const Tensor* MomentHeap::GetTensor(int order) const
 {
   if(order<=2 || order-2>int(m_higherMoments.size()) )
-    throw(MAUS::Exception(MAUS::Exception::recoverable, "Could not find moment", "MomentHeap::GetTensor"));
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Could not find moment", "MomentHeap::GetTensor"));
   return m_higherMoments[order-3];
 }
 
@@ -774,7 +774,7 @@ void MomentHeap::Add(double value, std::vector<int> place)
   if(place.size() == 2) 
     m_vars[place[0]][place[1]] += value;
   else if(int(place.size()) <= MaxOrder()) m_higherMoments[place.size()-3]->Add(place, value);
-  else throw(MAUS::Exception(MAUS::Exception::recoverable, "Add rank > largest rank on heap or <= 1", "MomentHeap::Add"));
+  else throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Add rank > largest rank on heap or <= 1", "MomentHeap::Add"));
 }
 
 double MomentHeap::GetMoment(std::vector<int> position) const
@@ -788,7 +788,7 @@ double MomentHeap::GetMoment(std::vector<int> position) const
     return m_vars[position[0]][position[1]];
   else if(position.size() == 1)
     return m_mean[position[0]];
-  throw(MAUS::Exception(MAUS::Exception::recoverable, "Index out of range", "MomentHeap::GetMoment"));
+  throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Index out of range", "MomentHeap::GetMoment"));
 }
 
 std::ostream& MomentHeap::Print(std::ostream& out) const

@@ -1,0 +1,79 @@
+\input{rgb}
+
+\lstset{% general command to set parameter(s)
+frame=single,
+basicstyle=\small,
+keywordstyle=\color{DarkViolet}\bfseries,
+identifierstyle=\color{DarkGreen},
+commentstyle=\color{DarkRed},
+stringstyle=\ttfamily,% typewriter type for strings
+showstringspaces=false,% no special string spaces
+captionpos=b% caption at bottom
+}
+
+\chapter{Utilities}
+\label{chapter:logging}
+This chapter describes the various utilties present in MAUS, such as the built-in logger.
+
+\section{Logging}
+The MAUS logging system is built around the Squeak class. The code for the Squeak class is located in \texttt{src/common\_cpp/Utils}. It is implemented as a singleton class, designed to wrap the standard output, log and error streams (cout, clog, cerr). It addition to this the ability to output to a standard log file is present. 
+
+The key interface point with the class for the user is the \texttt{mout} method, which takes an ``error level'' as an argument and returns an output stream which may be streamed to. The error levels themselves are defined in an enum and may take the values described in table~\ref{table:LoggingLevels}.
+
+\begin{table}[htb]
+ \begin{center}
+	\begin{tabular}{| l | l | l |}
+	 \hline
+	 \textbf{Name} & \textbf{Value} & \textbf{Default stream} \\
+	 \hline
+	 debug & 0 & cout \\
+	 info & 1 & clog \\
+	 warning & 2 & cerr \\
+	 error & 3 & cerr \\
+	 fatal & 4 & cerr \\
+	 log & 5 & file \\
+	 \hline
+	\end{tabular}
+  \caption{\label{table:LoggingLevels} The MAUS logging error levels.}
+ \end{center}
+\end{table}
+
+Prior to use Squeal must be configure by calling the following methods:
+
+\begin{lstlisting}
+Squeal::setStandardOutputs(verbose_level);
+Squeal::setOutputs(verbose_level, log_level);
+\end{lstlisting}
+
+\noindent
+where both verbose\_level and log\_level are integers. The first function configures whether cout, clog and cerr point to the screen, the log file or \texttt{/dev/null}. If the verbose level supplied is 0 everything goes to screen, 1 clog and cerr only go to screen, 2 and 3 only cerr goes to screen, >3 none go to screen.
+
+The second function controls where different mout error levels go. If the verbosity level supplied is less than or equal to the enum value (defined in table~\ref{table:LoggingLevels}) of the particular error level then that value goes to screen. The exception to this is \texttt{log} which may only go to file. If an error level does not go to screen then it goes to either \texttt{/dev/null} or the log file, depending on the log level.
+
+The log level defines what data is sent to the log file. When set to 0 no log file is create, streams to \texttt{Squeal::log} are thrown away, together with all other error levels not going to screen. When set to 1 a log file is created which records only explicit calls to \texttt{Squeal::log}. When set to 2 a log file is again created which captures calls to \texttt{Squeal::log} and any other error level which does not make it to screen. 
+
+Both the verbose and log level may be set via datacards using the variables \texttt{verbose\_level} and \texttt{log\_level} (set to 1 and 0 respectively by default). The log file name defaults to ``maus.log''. It may be changed using the method:
+
+\begin{lstlisting}
+Squeal::setLogName("some_name.log")
+\end{lstlisting}
+
+\noindent
+This must be called prior to the log file being initialised with the \texttt{setOutputs} method. If logging has been used the file must be closed prior to programme termination with:
+
+\begin{lstlisting}
+ Squeak::closeLog();
+\end{lstlisting}
+
+When running as part of standard MAUS execution both Squeal initialisation and closing the log are taken care of by the GlobalsManager and the user need do nothing.
+
+An example use of Squeal to send text to standard output:
+
+\begin{lstlisting}
+Squeal::mout(Squeal::debug) << "A message" << std::endl;
+\end{lstlisting}
+
+A short example programme illustrating use of Squeal is present in
+
+\noindent
+\texttt{bin/user/examples/logging/}.

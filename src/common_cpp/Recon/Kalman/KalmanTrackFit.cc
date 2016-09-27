@@ -87,7 +87,7 @@ namespace Kalman {
 
   State CalculateResidual(const State& st1, const State& st2) {
     if (st1._dimension != st2._dimension) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "States have different dimensions",
           "Kalman::CalculateResidual()");
     }
@@ -201,7 +201,7 @@ namespace Kalman {
 
   void TrackFit::SetSeed(State seed) {
     if (seed.GetDimension() != _dimension) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "Seed dimension does not match the track fitter",
           "Kalman::TrackFit::SetSeed()");
     }
@@ -210,7 +210,7 @@ namespace Kalman {
 
   void TrackFit::SetTrack(Track track) {
     if (track.GetDimension() != _dimension) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "Track dimension does not match the track fitter",
           "Kalman::TrackFit::SetTrack()");
     }

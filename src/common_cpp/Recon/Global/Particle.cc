@@ -20,7 +20,7 @@
 #include "Recon/Global/Particle.hh"
 
 #include "src/common_cpp/DataStructure/Global/ReconEnums.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 namespace recon {
