@@ -16,6 +16,132 @@ import analysis.scifitools as tools
 #pylint: disable = C0103
 #pylint: disable = W0612
 
+class EfficiencyData():
+    """ Class to store pattern recognition efficiency data """
+    def __init__(self):
+        """ Initialise member variables """
+        self.n_total_events = 0
+        self.n_passed_tof_timing_events = 0 # Events which pass the TOF cut
+        self.n_passed_tof_spoint_events = 0 # Events with 1 sp in TOF1 & TOF2
+        self.n_10spoint_events = 0 # Events with 5 spoints in both TkUS & TkDS
+        self.n_5spoint_tkus_events = 0 # Events with 5 spoints in TkUS
+        self.n_5spoint_tkds_events = 0 # Events with 5 spoints in TkDS
+        self.n_passed_tkus_events = 0 # Events which pass all the set cuts
+        self.n_passed_tkds_events = 0 # Events which pass all the set cuts
+
+        self.n_10spoint_tracks = 0
+        self.n_5spoint_tkus_tracks = 0
+        self.n_5spoint_tkds_tracks = 0
+        self.n_3to5spoint_tkus_tracks = 0
+        self.n_3to5spoint_tkds_tracks = 0
+
+        # Efficiency numbers
+        self.eff_tkus_5pt = 0.0
+        self.eff_tkus_5pt_err = 0.0
+        self.eff_tkus_3_5pt = 0.0
+        self.eff_tkus_3_5pt_err = 0.0
+        self.eff_tkds_5pt = 0.0
+        self.eff_tkds_5pt_err = 0.0
+        self.eff_tkds_3_5pt = 0.0
+        self.eff_tkds_3_5pt_err = 0.0
+
+    def __iadd__(self, other):
+        """ Add another instance's data to that here,
+            just the totals, not the final efficiency data"""
+        self.n_total_events += other.n_total_events 
+        self.n_passed_tof_timing_events += other.n_passed_tof_timing_events
+        self.n_passed_tof_spoint_events += other.n_passed_tof_spoint_events
+        self.n_10spoint_events += other.n_10spoint_events
+        self.n_5spoint_tkus_events += other.n_5spoint_tkus_events
+        self.n_5spoint_tkds_events += other.n_5spoint_tkds_events
+        self.n_passed_tkus_events += other.n_passed_tkus_events
+        self.n_passed_tkds_events += other.n_passed_tkds_events
+
+        self.n_10spoint_tracks += other.n_10spoint_tracks
+        self.n_5spoint_tkus_tracks += other.n_5spoint_tkus_tracks
+        self.n_5spoint_tkds_tracks += other.n_5spoint_tkds_tracks
+        self.n_3to5spoint_tkus_tracks += other.n_3to5spoint_tkus_tracks
+        self.n_3to5spoint_tkds_tracks += other.n_3to5spoint_tkds_tracks
+
+    def calculate_efficiency(self):
+        """ Calculate the final efficiency figures for a file """
+        self.eff_tkus_5pt = 0.0
+        self.eff_tkus_5pt_err = 0.0
+        self.eff_tkus_3_5pt = 0.0
+        self.eff_tkus_3_5pt_err = 0.0
+        self.eff_tkds_5pt = 0.0
+        self.eff_tkds_5pt_err = 0.0
+        self.eff_tkds_3_5pt = 0.0
+        self.eff_tkds_3_5pt_err = 0.0
+
+        # Upstream tracker
+        try:
+            self.eff_tkus_5pt = float(self.fdata.n_5spoint_tkus_tracks) \
+              /float(self.fdata.n_passed_tkus_events)
+            self.eff_tkus_5pt_err = \
+              (self.eff_tkus_5pt * (1-self.eff_tkus_5pt)) \
+              /(float((self.fdata.n_passed_tkus_events)) ** (0.5))
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkus_5pt = 0.0
+            self.eff_tkus_5pt_err = 0.0
+        try:
+            self.eff_tkus_3_5pt = float(self.fdata.n_3to5spoint_tkus_tracks) \
+              /float(self.fdata.n_passed_tkus_events)
+            self.eff_tkus_3_5pt_err = \
+              (self.eff_tkus_3_5pt * (1-self.eff_tkus_3_5pt)) \
+                /(float((self.fdata.n_passed_tkus_events)) ** (0.5))
+            self.eff_tkus_3_5pt_err = 0.001
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkus_3_5pt = 0.0
+            self.eff_tkus_3_5pt_err = 0.0
+
+        # Downstream tracker
+        try:
+            self.eff_tkds_5pt = float(self.fdata.n_5spoint_tkds_tracks) \
+              / float(self.fdata.n_passed_tkds_events)
+            self.eff_tkds_5pt_err = \
+              (self.eff_tkds_5pt * (1-self.eff_tkds_5pt)) \
+              /(float((self.fdata.n_passed_tkds_events)) ** (0.5))
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkds_5pt = 0.0
+            self.eff_tkds_5pt_err = 0.0
+        try:
+            self.eff_tkds_3_5pt = float(self.fdata.n_3to5spoint_tkds_tracks) \
+              /float(self.fdata.n_passed_tkds_events)
+            self.eff_tkds_3_5pt_err = \
+              (self.eff_tkds_3_5pt * (1-self.eff_tkds_3_5pt)) \
+                /(float((self.fdata.n_passed_tkds_events)) ** (0.5))
+            #self.eff_tkds_3_5pt_err = 0.001
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkds_3_5pt = 0.0
+            self.eff_tkds_3_5pt_err = 0.0
+
+    def clear():
+        """ Clear all data """
+        self.n_total_events = 0
+        self.n_passed_tof_timing_events = 0
+        self.n_passed_tof_spoint_events = 0
+        self.n_10spoint_events = 0
+        self.n_5spoint_tkus_events = 0
+        self.n_5spoint_tkds_events = 0
+        self.n_passed_tkus_events = 0
+        self.n_passed_tkds_events = 0
+
+        self.n_10spoint_tracks = 0
+        self.n_5spoint_tkus_tracks = 0
+        self.n_5spoint_tkds_tracks = 0
+        self.n_3to5spoint_tkus_tracks = 0
+        self.n_3to5spoint_tkds_tracks = 0
+
+        self.eff_tkus_5pt = 0.0
+        self.eff_tkus_5pt_err = 0.0
+        self.eff_tkus_3_5pt = 0.0
+        self.eff_tkus_3_5pt_err = 0.0
+        self.eff_tkds_5pt = 0.0
+        self.eff_tkds_5pt_err = 0.0
+        self.eff_tkds_3_5pt = 0.0
+        self.eff_tkds_3_5pt_err = 0.0
+
 class PatternRecognitionEfficiency():
     """ Class to check Pattern Recognition efficiency with real data """
 
@@ -37,8 +163,8 @@ class PatternRecognitionEfficiency():
 
         # ROOT objects
         self.root_files = []
-        self.pt_hist = ROOT.TH1D("pt_hist", "pt", 100, -100.0, 100.0);
-        self.pz_hist = ROOT.TH1D("pz_hist", "pz", 100, -100.0, 100.0);
+        # self.pt_hist = ROOT.TH1D("pt_hist", "pt", 100, -100.0, 100.0);
+        # self.pz_hist = ROOT.TH1D("pz_hist", "pz", 100, -100.0, 100.0);
 
         # Results
         self.bool_2tof_timing_event = False # Tof timing ok
@@ -53,32 +179,14 @@ class PatternRecognitionEfficiency():
         self.bool_passed_tkus_event = False # Have all the choosen cuts passed?
         self.bool_passed_tkds_event = False # Have all the choosen cuts passed?
 
-        self.num_total_events = 0
-        self.num_passed_tof_timing_events = 0 # Events which pass the time-of-flight cut
-        self.num_passed_tof_spoint_events = 0 # Events with 1 sp in TOF1 and TOF2
-        self.num_10spoint_events = 0 # Events with 5 spoints in both TkUS & TkDS
-        self.num_5spoint_tkus_events = 0 # Events with 5 spoints in TkUS
-        self.num_5spoint_tkds_events = 0 # Events with 5 spoints in TkDS
-        self.num_passed_tkus_events = 0 # Events which pass all the set cuts
-        self.num_passed_tkds_events = 0 # Events which pass all the set cuts
+        # Per file data
+        self.fdata = EfficiencyData()
 
-        self.num_10spoint_tracks = 0
-        self.num_5spoint_tkus_tracks = 0
-        self.num_5spoint_tkds_tracks = 0
-        self.num_3to5spoint_tkus_tracks = 0
-        self.num_3to5spoint_tkds_tracks = 0
+        # Per job data
+        self.jdata = EfficiencyData()
 
-        self.eff_tkus_5pt = 0.0
-        self.eff_tkus_5pt_err = 0.0
-        self.eff_tkus_3_5pt = 0.0
-        self.eff_tkus_3_5pt_err = 0.0
-        self.eff_tkds_5pt = 0.0
-        self.eff_tkds_5pt_err = 0.0
-        self.eff_tkds_3_5pt = 0.0
-        self.eff_tkds_3_5pt_err = 0.0
-
-        # Objects not reset by the clear() function
-        self.num_print_calls = 0
+        # Other objects not reset by the clear() function
+        self.n_print_calls = 0
 
     def run(self, files):
         """ Loop over input root file, send each file for processing, print
@@ -101,10 +209,11 @@ class PatternRecognitionEfficiency():
         counter = 0
         for root_file_name in self.root_files:
             self.process_file(root_file_name)
-            self.print_file_info(root_file_name)
-            #if self.use_mc_truth:
-                #self.make_plots(root_file_name)
+            self.print_info(self.fdata, root_file_name)
+            self.jdata += self.fdata # Accumulate the job data
             counter += 1
+        self.jdata.calculate_efficiency()
+        self.print_info(self.jdata, 'Final job results')
         return True
 
     def process_file(self, root_file_name):
@@ -124,7 +233,7 @@ class PatternRecognitionEfficiency():
             self.process_spill(spill) # Analyse the spill
 
         # Perform final efficiency calculations
-        self.calculate_efficiency()
+        self.fdata.calculate_efficiency()
 
         # Close the ROOT file
         root_file.Close()
@@ -137,7 +246,7 @@ class PatternRecognitionEfficiency():
 
         # Loop over recon events
         for i in range(spill.GetReconEvents().size()):
-            self.num_total_events += 1
+            self.fdata.n_total_events += 1
 
             # Pull out tof data and check if cuts pass
             tof_evt = spill.GetReconEvents()[i].GetTOFEvent()
@@ -197,24 +306,24 @@ class PatternRecognitionEfficiency():
             they were expected """
 
         # Require 1 and only 1 track in a tracker
-        num_tkus_tracks = 0
-        num_tkds_tracks = 0
+        n_tkus_tracks = 0
+        n_tkds_tracks = 0
         for trk in prtracks:
             if trk.get_tracker() == 0:
-                num_tkus_tracks += 1
+                n_tkus_tracks += 1
             elif trk.get_tracker() == 1:
-                num_tkds_tracks += 1
-        if num_tkus_tracks == 1:
+                n_tkds_tracks += 1
+        if n_tkus_tracks == 1:
             self.bool_tkus_1track = True
-        if num_tkds_tracks == 1:
+        if n_tkds_tracks == 1:
             self.bool_tkds_1track = True
 
         # If there were 5 spacepoints in a tracker and 1 track only was
         # found in it, increment the 3 to 5 spoint track counter
         if self.bool_tkus_5spoint_event and self.bool_tkus_1track:
-            self.num_3to5spoint_tkus_tracks += 1
+            self.fdata.n_3to5spoint_tkus_tracks += 1
         if self.bool_tkds_5spoint_event and self.bool_tkds_1track:
-            self.num_3to5spoint_tkds_tracks += 1
+            self.fdata.n_3to5spoint_tkds_tracks += 1
 
         # Now check the tracks found had 5 spoints, 1 from each station
         self.bool_tkus_5spoint_track = False
@@ -222,71 +331,18 @@ class PatternRecognitionEfficiency():
         for trk in prtracks:
             if trk.get_tracker() == 0:
                 if (trk.get_spacepoints_pointers().size() == 5) and self.bool_tkus_1track:
-                    self.num_5spoint_tkus_tracks += 1
+                    self.fdata.n_5spoint_tkus_tracks += 1
                     self.bool_tkus_5spoint_track = True
             elif trk.get_tracker() == 1:
                 if (trk.get_spacepoints_pointers().size() == 5) and self.bool_tkds_1track:
-                    self.num_5spoint_tkds_tracks += 1
+                    self.fdata.n_5spoint_tkds_tracks += 1
                     self.bool_tkds_5spoint_track = True
 
         # Lastly see if we found only one 5 spoint track in BOTH trackers
         if (len(prtracks) == 2 and self.bool_tkus_5spoint_track and \
             self.bool_tkds_5spoint_track):
-            self.num_10spoint_tracks += 1
+            self.fdata.n_10spoint_tracks += 1
         return True
-
-    def calculate_efficiency(self):
-        """ Calculate the final efficiency figures for a file """
-        self.eff_tkus_5pt = 0.0
-        self.eff_tkus_5pt_err = 0.0
-        self.eff_tkus_3_5pt = 0.0
-        self.eff_tkus_3_5pt_err = 0.0
-        self.eff_tkds_5pt = 0.0
-        self.eff_tkds_5pt_err = 0.0
-        self.eff_tkds_3_5pt = 0.0
-        self.eff_tkds_3_5pt_err = 0.0
-
-        # Upstream tracker
-        try:
-            self.eff_tkus_5pt = float(self.num_5spoint_tkus_tracks) \
-              /float(self.num_passed_tkus_events)
-            self.eff_tkus_5pt_err = \
-              (self.eff_tkus_5pt * (1-self.eff_tkus_5pt)) \
-              /(float((self.num_passed_tkus_events)) ** (0.5))
-        except (ZeroDivisionError, ValueError):
-            self.eff_tkus_5pt = 0.0
-            self.eff_tkus_5pt_err = 0.0
-        try:
-            self.eff_tkus_3_5pt = float(self.num_3to5spoint_tkus_tracks) \
-              /float(self.num_passed_tkus_events)
-            self.eff_tkus_3_5pt_err = \
-              (self.eff_tkus_3_5pt * (1-self.eff_tkus_3_5pt)) \
-                /(float((self.num_passed_tkus_events)) ** (0.5))
-            self.eff_tkus_3_5pt_err = 0.001
-        except (ZeroDivisionError, ValueError):
-            self.eff_tkus_3_5pt = 0.0
-            self.eff_tkus_3_5pt_err = 0.0
-
-        # Downstream tracker
-        try:
-            self.eff_tkds_5pt = float(self.num_5spoint_tkds_tracks) \
-              / float(self.num_passed_tkds_events)
-            self.eff_tkds_5pt_err = \
-              (self.eff_tkds_5pt * (1-self.eff_tkds_5pt)) \
-              /(float((self.num_passed_tkds_events)) ** (0.5))
-        except (ZeroDivisionError, ValueError):
-            self.eff_tkds_5pt = 0.0
-            self.eff_tkds_5pt_err = 0.0
-        try:
-            self.eff_tkds_3_5pt = float(self.num_3to5spoint_tkds_tracks) \
-              /float(self.num_passed_tkds_events)
-            self.eff_tkds_3_5pt_err = \
-              (self.eff_tkds_3_5pt * (1-self.eff_tkds_3_5pt)) \
-                /(float((self.num_passed_tkds_events)) ** (0.5))
-            #self.eff_tkds_3_5pt_err = 0.001
-        except (ZeroDivisionError, ValueError):
-            self.eff_tkds_3_5pt = 0.0
-            self.eff_tkds_3_5pt_err = 0.0
 
     def check_tof(self, tof_evt):
         """ Analyse tof data. Return boolean indicating if tof cuts pass"""
@@ -298,8 +354,8 @@ class PatternRecognitionEfficiency():
             if self.cut_on_tof or self.cut_on_tof_time:
                 return False
             # The data might be bad, but we aren't cutting on TOF so passes
-            self.num_passed_tof_spoint_events += 1
-            self.num_passed_tof_timing_events += 1
+            self.fdata.n_passed_tof_spoint_events += 1
+            self.fdata.n_passed_tof_timing_events += 1
             return True
 
         # Require 1 and only 1 sp in both TOF1 and TOF2
@@ -321,33 +377,20 @@ class PatternRecognitionEfficiency():
         # Are the cuts choosen passed?
         tof_good = True
         if self.bool_2tof_spoint_event:
-            self.num_passed_tof_spoint_events += 1
+            self.fdata.n_passed_tof_spoint_events += 1
         elif self.cut_on_tof:
             tof_good = False
         else:
-            self.num_passed_tof_spoint_events += 1
+            self.fdata.n_passed_tof_spoint_events += 1
 
         if self.bool_2tof_timing_event:
-            self.num_passed_tof_timing_events += 1
+            self.fdata.n_passed_tof_timing_events += 1
         elif self.cut_on_tof_time:
             tof_good = False
         else:
-            self.num_passed_tof_timing_events += 1
+            self.fdata.n_passed_tof_timing_events += 1
 
         return tof_good
-
-    def check_tracker_fiducial(self, straight_track):
-        """ Project a straight track for TkUS to TkDS and make sure it falls
-            in the fiducial volume """
-        track_ok = False
-        if track.get_tracker() == 0:
-            # Project to downstream:
-            z_loc = -3800
-            x = track.get_x0() + z_loc*track.get_mx()
-            y = track.get_y0() + z_loc*track.get_my()
-            if ((x*x+y*y) ** 0.5) < self.fiducial_cut:
-                track_ok = True
-        return track_ok
 
     def check_tracker_spacepoints(self, spoints):
         """ Look for 5 spacepoint events in each tracker, increment the internal
@@ -374,11 +417,11 @@ class PatternRecognitionEfficiency():
 
         # Update the internal expected tracks counters
         if self.bool_10spoint_event:
-            self.num_10spoint_events += 1
+            self.fdata.n_10spoint_events += 1
         if self.bool_tkus_5spoint_event:
-            self.num_5spoint_tkus_events += 1
+            self.fdata.n_5spoint_tkus_events += 1
         if self.bool_tkds_5spoint_event:
-            self.num_5spoint_tkds_events += 1
+            self.fdata.n_5spoint_tkds_events += 1
 
         # Are the complete set of tracker spacepoint cuts passed?
         self.bool_passed_tkus_event = False
@@ -387,9 +430,9 @@ class PatternRecognitionEfficiency():
         if self.cut_on_tracker_10spnt:
             if self.bool_10spoint_event:
                 self.bool_passed_tkus_event = True
-                self.num_passed_tkus_events += 1
+                self.fdata.n_passed_tkus_events += 1
                 self.bool_passed_tkds_event = True
-                self.num_passed_tkds_events += 1
+                self.fdata.n_passed_tkds_events += 1
             else:
                 self.bool_passed_tkus_event = False
                 self.bool_passed_tkds_event = False
@@ -397,23 +440,23 @@ class PatternRecognitionEfficiency():
         elif self.cut_on_tracker_5spnt:
             if self.bool_tkus_5spoint_event:
                 self.bool_passed_tkus_event = True
-                self.num_passed_tkus_events += 1
+                self.fdata.n_passed_tkus_events += 1
             else:
                 self.bool_passed_tkus_event = False
             if self.bool_tkds_5spoint_event:
                 self.bool_passed_tkds_event = True
-                self.num_passed_tkds_events += 1
+                self.fdata.n_passed_tkds_events += 1
             else:
                 self.bool_passed_tkds_event = False
         # Not cutting on tracker spacepoints so everything passes
         else:
             self.bool_passed_tkus_event = True
-            self.num_passed_tkus_events += 1
+            self.fdata.n_passed_tkus_events += 1
             self.bool_passed_tkds_event = True
-            self.num_passed_tkds_events += 1
+            self.fdata.n_passed_tkds_events += 1
 
     def clear(self):
-        """ Set the internal counters to zero and booleans to false """
+        """ Set the internal file data counters to zero & booleans to false """
         self.bool_2tof_timing_event = False
         self.bool_2tof_spoint_event = False
         self.bool_10spoint_event = False
@@ -426,29 +469,7 @@ class PatternRecognitionEfficiency():
         self.bool_passed_tkus_event = False
         self.bool_passed_tkds_event = False
 
-        self.num_total_events = 0
-        self.num_passed_tof_timing_events = 0
-        self.num_passed_tof_spoint_events = 0
-        self.num_10spoint_events = 0
-        self.num_5spoint_tkus_events = 0
-        self.num_5spoint_tkds_events = 0
-        self.num_passed_tkus_events = 0
-        self.num_passed_tkds_events = 0
-
-        self.num_10spoint_tracks = 0
-        self.num_5spoint_tkus_tracks = 0
-        self.num_5spoint_tkds_tracks = 0
-        self.num_3to5spoint_tkus_tracks = 0
-        self.num_3to5spoint_tkds_tracks = 0
-
-        self.eff_tkus_5pt = 0.0
-        self.eff_tkus_5pt_err = 0.0
-        self.eff_tkus_3_5pt = 0.0
-        self.eff_tkus_3_5pt_err = 0.0
-        self.eff_tkds_5pt = 0.0
-        self.eff_tkds_5pt_err = 0.0
-        self.eff_tkds_3_5pt = 0.0
-        self.eff_tkds_3_5pt_err = 0.0
+        self.fdata.clear()
 
     def extract_prtracks(self, tk_evt):
         """ Pull out the pattern recognition tracks selected for analysis -
@@ -506,23 +527,23 @@ class PatternRecognitionEfficiency():
         self.pz_hist.Draw()
         c1.SaveAs(file_name_prefix + "_momentum_failed_events.pdf")
 
-    def print_file_info(self, root_file_name):
+    def print_info(self, edata, data_name):
         """ Print the results per file """
-        if self.num_print_calls == 0:
+        if self.n_print_calls == 0:
             print '\nFile\t\tRecon_evt\tTOF\tTOF_SP\tTkUS_5pt\
               \tTkDS_5pt\tTk_10pt\tGood_TkUS\tGood_TkDS\tTkUS_5trk\
               \tTkUS_5trk_err\tTkUS_3-5trk\tTkUS_3-5trk_err\t',
             print 'TkDS_5trk\tTkDS_5trk_err\tTkDS_3-5trk\tTkDS_3-5trk_err'
 
-        print os.path.basename(root_file_name) + '  ',
-        print str(self.num_total_events) + '\t',
-        print str(self.num_passed_tof_timing_events) + '\t' + \
-          str(self.num_passed_tof_spoint_events) + '\t' + \
-          str(self.num_5spoint_tkus_events) + '\t' + \
-          str(self.num_5spoint_tkds_events) + '\t' + \
-          str(self.num_10spoint_events) + '\t' + \
-          str(self.num_passed_tkus_events) + '\t' + \
-          str(self.num_passed_tkds_events) + '\t',
+        print os.path.basename(data_name) + '  ',
+        print str(edata.n_total_events) + '\t',
+        print str(edata.n_passed_tof_timing_events) + '\t' + \
+          str(edata.n_passed_tof_spoint_events) + '\t' + \
+          str(edata.n_5spoint_tkus_events) + '\t' + \
+          str(edata.n_5spoint_tkds_events) + '\t' + \
+          str(edata.n_10spoint_events) + '\t' + \
+          str(edata.n_passed_tkus_events) + '\t' + \
+          str(edata.n_passed_tkds_events) + '\t',
 
         f = '%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f  \t%.4f'
         print f % (self.eff_tkus_5pt, self.eff_tkus_5pt_err, \
@@ -530,4 +551,4 @@ class PatternRecognitionEfficiency():
           self.eff_tkds_5pt, self.eff_tkds_5pt_err, \
           self.eff_tkds_3_5pt, self.eff_tkds_3_5pt_err)
 
-        self.num_print_calls += 1
+        self.n_print_calls += 1
