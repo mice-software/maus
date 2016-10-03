@@ -2,9 +2,7 @@
 
 """  Check tracker efficiency """
 
-import sys
 import os
-import math
 import ROOT
 import libMausCpp #pylint: disable = W0611
 import analysis.scifitools as tools
@@ -62,6 +60,7 @@ class EfficiencyData():
         self.n_5spoint_tkds_tracks += other.n_5spoint_tkds_tracks
         self.n_3to5spoint_tkus_tracks += other.n_3to5spoint_tkus_tracks
         self.n_3to5spoint_tkds_tracks += other.n_3to5spoint_tkds_tracks
+        return self
 
     def calculate_efficiency(self):
         """ Calculate the final efficiency figures for a file """
@@ -76,20 +75,20 @@ class EfficiencyData():
 
         # Upstream tracker
         try:
-            self.eff_tkus_5pt = float(self.fdata.n_5spoint_tkus_tracks) \
-              /float(self.fdata.n_passed_tkus_events)
+            self.eff_tkus_5pt = float(self.n_5spoint_tkus_tracks) \
+              /float(self.n_passed_tkus_events)
             self.eff_tkus_5pt_err = \
               (self.eff_tkus_5pt * (1-self.eff_tkus_5pt)) \
-              /(float((self.fdata.n_passed_tkus_events)) ** (0.5))
+              /(float((self.n_passed_tkus_events)) ** (0.5))
         except (ZeroDivisionError, ValueError):
             self.eff_tkus_5pt = 0.0
             self.eff_tkus_5pt_err = 0.0
         try:
-            self.eff_tkus_3_5pt = float(self.fdata.n_3to5spoint_tkus_tracks) \
-              /float(self.fdata.n_passed_tkus_events)
+            self.eff_tkus_3_5pt = float(self.n_3to5spoint_tkus_tracks) \
+              /float(self.n_passed_tkus_events)
             self.eff_tkus_3_5pt_err = \
               (self.eff_tkus_3_5pt * (1-self.eff_tkus_3_5pt)) \
-                /(float((self.fdata.n_passed_tkus_events)) ** (0.5))
+                /(float((self.n_passed_tkus_events)) ** (0.5))
             self.eff_tkus_3_5pt_err = 0.001
         except (ZeroDivisionError, ValueError):
             self.eff_tkus_3_5pt = 0.0
@@ -97,26 +96,26 @@ class EfficiencyData():
 
         # Downstream tracker
         try:
-            self.eff_tkds_5pt = float(self.fdata.n_5spoint_tkds_tracks) \
-              / float(self.fdata.n_passed_tkds_events)
+            self.eff_tkds_5pt = float(self.n_5spoint_tkds_tracks) \
+              / float(self.n_passed_tkds_events)
             self.eff_tkds_5pt_err = \
               (self.eff_tkds_5pt * (1-self.eff_tkds_5pt)) \
-              /(float((self.fdata.n_passed_tkds_events)) ** (0.5))
+              /(float((self.n_passed_tkds_events)) ** (0.5))
         except (ZeroDivisionError, ValueError):
             self.eff_tkds_5pt = 0.0
             self.eff_tkds_5pt_err = 0.0
         try:
-            self.eff_tkds_3_5pt = float(self.fdata.n_3to5spoint_tkds_tracks) \
-              /float(self.fdata.n_passed_tkds_events)
+            self.eff_tkds_3_5pt = float(self.n_3to5spoint_tkds_tracks) \
+              /float(self.n_passed_tkds_events)
             self.eff_tkds_3_5pt_err = \
               (self.eff_tkds_3_5pt * (1-self.eff_tkds_3_5pt)) \
-                /(float((self.fdata.n_passed_tkds_events)) ** (0.5))
+                /(float((self.n_passed_tkds_events)) ** (0.5))
             #self.eff_tkds_3_5pt_err = 0.001
         except (ZeroDivisionError, ValueError):
             self.eff_tkds_3_5pt = 0.0
             self.eff_tkds_3_5pt_err = 0.0
 
-    def clear():
+    def clear(self):
         """ Clear all data """
         self.n_total_events = 0
         self.n_passed_tof_timing_events = 0
@@ -330,11 +329,13 @@ class PatternRecognitionEfficiency():
         self.bool_tkds_5spoint_track = False
         for trk in prtracks:
             if trk.get_tracker() == 0:
-                if (trk.get_spacepoints_pointers().size() == 5) and self.bool_tkus_1track:
+                if (trk.get_spacepoints_pointers().size() == 5) \
+                  and self.bool_tkus_1track:
                     self.fdata.n_5spoint_tkus_tracks += 1
                     self.bool_tkus_5spoint_track = True
             elif trk.get_tracker() == 1:
-                if (trk.get_spacepoints_pointers().size() == 5) and self.bool_tkds_1track:
+                if (trk.get_spacepoints_pointers().size() == 5) \
+                  and self.bool_tkds_1track:
                     self.fdata.n_5spoint_tkds_tracks += 1
                     self.bool_tkds_5spoint_track = True
 
@@ -489,7 +490,8 @@ class PatternRecognitionEfficiency():
             print 'Warning: Both track type options not set'
         return prtracks
 
-    def load_data(self, files):
+    @staticmethod
+    def load_data(files):
         """ Load data from files. If a dir is given, search recursively """
         if type(files) is not list:
             files = [files]
@@ -517,26 +519,26 @@ class PatternRecognitionEfficiency():
             print f
         return root_files
 
-    def make_plots(self, file_name_prefix):
-        """ Draw the histogramms and save """
-        c1 = ROOT.TCanvas()
-        c1.Divide(2)
-        c1.cd(1)
-        self.pt_hist.Draw()
-        c1.cd(2)
-        self.pz_hist.Draw()
-        c1.SaveAs(file_name_prefix + "_momentum_failed_events.pdf")
+    #def make_plots(self, file_name_prefix):
+        #""" Draw the histogramms and save """
+        #c1 = ROOT.TCanvas()
+        #c1.Divide(2)
+        #c1.cd(1)
+        #self.pt_hist.Draw()
+        #c1.cd(2)
+        #self.pz_hist.Draw()
+        #c1.SaveAs(file_name_prefix + "_momentum_failed_events.pdf")
 
     def print_info(self, edata, data_name):
         """ Print the results per file """
         if self.n_print_calls == 0:
-            print '\nFile\t\tRecon_evt\tTOF\tTOF_SP\tTkUS_5pt\
-              \tTkDS_5pt\tTk_10pt\tGood_TkUS\tGood_TkDS\tTkUS_5trk\
-              \tTkUS_5trk_err\tTkUS_3-5trk\tTkUS_3-5trk_err\t',
-            print 'TkDS_5trk\tTkDS_5trk_err\tTkDS_3-5trk\tTkDS_3-5trk_err'
+            print '\nFile\t\t\tRecon_evt\tTOF\tTOF_SP\tTU_5pt\
+              \tTD_5pt\tT_10pt\tGood_TU\tGood_TD\tTU_5trk\
+              \tTU_5trk_err\tTU_3-5trk\tTU_3-5trk_err\t',
+            print 'TD_5trk\tTD_5trk_err\tTD_3-5trk\tTD_3-5trk_err'
 
-        print os.path.basename(data_name) + '  ',
-        print str(edata.n_total_events) + '\t',
+        print os.path.basename(data_name) + '\t',
+        print str(edata.n_total_events) + '\t\t',
         print str(edata.n_passed_tof_timing_events) + '\t' + \
           str(edata.n_passed_tof_spoint_events) + '\t' + \
           str(edata.n_5spoint_tkus_events) + '\t' + \
@@ -546,9 +548,9 @@ class PatternRecognitionEfficiency():
           str(edata.n_passed_tkds_events) + '\t',
 
         f = '%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f  \t%.4f'
-        print f % (self.eff_tkus_5pt, self.eff_tkus_5pt_err, \
-          self.eff_tkus_3_5pt, self.eff_tkus_3_5pt_err, \
-          self.eff_tkds_5pt, self.eff_tkds_5pt_err, \
-          self.eff_tkds_3_5pt, self.eff_tkds_3_5pt_err)
+        print f % (edata.eff_tkus_5pt, edata.eff_tkus_5pt_err, \
+          edata.eff_tkus_3_5pt, edata.eff_tkus_3_5pt_err, \
+          edata.eff_tkds_5pt, edata.eff_tkds_5pt_err, \
+          edata.eff_tkds_3_5pt, edata.eff_tkds_3_5pt_err)
 
         self.n_print_calls += 1

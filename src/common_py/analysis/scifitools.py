@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-"""  Check tracker efficiency """
+"""  Some tools for tracker MC data analysis """
 
-import sys
 import os
 import ROOT
 import libMausCpp #pylint: disable = W0611
 
 def root_files_dir_search(top_dir, root_files):
     """ Appends any ROOT files found in the directory to root_files """
+    #pylint: disable = W0612
     for dir_name, subdir_list, file_list in os.walk(top_dir):
         print('Searching directory: %s' % dir_name)
         for fname in file_list:
@@ -46,6 +46,8 @@ def find_mc_track(hits, id_frequency_cut=0.5):
         if counter > highest_counter:
             most_frequent_id = mc_track_id
             highest_counter = counter
+    if (highest_counter / len(hits)) < id_frequency_cut:
+        most_frequent_id = -1
 
     return most_frequent_id
 
@@ -53,12 +55,12 @@ def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
     """ Find the mc hits used create the spoints,
         optional arguments to cut on tracker, station, plane """
     all_hits = [] # All the mc hits reconstructed in this trcker in this evt
-    for sp in spoints:
-        if (tracker != -1) and (sp.get_tracker() != tracker):
+    for spoint in spoints:
+        if (tracker != -1) and (spoint.get_tracker() != tracker):
             continue
-        if (station != -1) and (sp.get_station() != station):
+        if (station != -1) and (spoint.get_station() != station):
             continue
-        for clus in sp.get_channels_pointers():
+        for clus in spoint.get_channels_pointers():
             if (plane != -1) and (clus.get_plane() != plane):
                 continue
             for dig in clus.get_digits_pointers():
@@ -71,6 +73,7 @@ def find_mc_momentum_sfhits(lkup, spoints, mc_track_id, trker_num):
         spacepoints at the tracker reference surface """
     hits = find_mc_hits(lkup, spoints, 0, 1, trker_num)
     num_matched_hits = 0
+    #pylint: disable = C0103
     px = 0
     py = 0
     pz = 0
@@ -81,12 +84,12 @@ def find_mc_momentum_sfhits(lkup, spoints, mc_track_id, trker_num):
             py += hit.GetMomentum().y()
             pz += hit.GetMomentum().z()
     if num_matched_hits != 0:
-      print str(num_matched_hits) + " matched"
-      px = px / num_matched_hits
-      py = py / num_matched_hits
-      pz = pz / num_matched_hits
+        print str(num_matched_hits) + " matched"
+        px = px / num_matched_hits
+        py = py / num_matched_hits
+        pz = pz / num_matched_hits
     else:
-      print "No matches"
+        print "No matches"
     return px, py, pz
 
 class SciFiLookup:
