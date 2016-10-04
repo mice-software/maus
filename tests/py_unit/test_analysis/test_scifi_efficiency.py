@@ -21,6 +21,7 @@ Tests for the scifi_efficiency python module
 
 import unittest
 
+#pylint: disable = W0611, E0611, C0103
 import libMausCpp
 from ROOT import MAUS as maus
 import analysis.scifi_efficiency as scifi_efficiency
@@ -30,6 +31,7 @@ class SciFiEfficiencyTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
     Test class for the scifi_efficiency python module
     """
     def test_process_spill(self):
+        """ Test calculating the efficiency for one spill """
         spill = maus.Spill()
         spill.SetSpillNumber(1)
         spill.SetDaqEventType('physics_event')
@@ -42,28 +44,28 @@ class SciFiEfficiencyTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         spoints_us = maus.SciFiSpacePointPArray()
         spoints_ds = maus.SciFiSpacePointPArray()
         for i in range(5):
-          sp = maus.SciFiSpacePoint()
-          sp.set_tracker(0)
-          sp.set_station(i+1)
-          spoints.push_back(sp)
-          spoints_us.push_back(sp)
+            sp = maus.SciFiSpacePoint()
+            sp.set_tracker(0)
+            sp.set_station(i+1)
+            spoints.push_back(sp)
+            spoints_us.push_back(sp)
         for i in range(5):
-          sp = maus.SciFiSpacePoint()
-          sp.set_tracker(1)
-          sp.set_station(i+1)
-          spoints.push_back(sp)
-          spoints_ds.push_back(sp)
+            sp = maus.SciFiSpacePoint()
+            sp.set_tracker(1)
+            sp.set_station(i+1)
+            spoints.push_back(sp)
+            spoints_ds.push_back(sp)
         sfevt.set_spacepoints(spoints)
 
         # Set up tracks
         for i in range(2):
-          trk = maus.SciFiStraightPRTrack()
-          trk.set_tracker(i)
-          if i == 0:
-              trk.set_spacepoints_pointers(spoints_us)
-          else:
-              trk.set_spacepoints_pointers(spoints_ds)
-          sfevt.add_straightprtrack(trk)
+            trk = maus.SciFiStraightPRTrack()
+            trk.set_tracker(i)
+            if i == 0:
+                trk.set_spacepoints_pointers(spoints_us)
+            else:
+                trk.set_spacepoints_pointers(spoints_ds)
+            sfevt.add_straightprtrack(trk)
 
         # Add the tracks and spacepoints to the spill
         revts.at(0).SetSciFiEvent(sfevt)
@@ -77,13 +79,13 @@ class SciFiEfficiencyTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         eff.cut_on_tof_time = False
         eff.cut_on_tracker_10spnt = True
         eff.process_spill(spill)
-        eff.calculate_efficiency()
+        eff.fdata.calculate_efficiency()
 
         # Check the results
-        self.assertEqual(1.0, eff.eff_tkus_5pt)
-        self.assertEqual(1.0, eff.eff_tkus_3_5pt)
-        self.assertEqual(1.0, eff.eff_tkds_5pt)
-        self.assertEqual(1.0, eff.eff_tkds_3_5pt)
+        self.assertEqual(1.0, eff.fdata.eff_tkus_5pt)
+        self.assertEqual(1.0, eff.fdata.eff_tkus_3_5pt)
+        self.assertEqual(1.0, eff.fdata.eff_tkds_5pt)
+        self.assertEqual(1.0, eff.fdata.eff_tkds_3_5pt)
 
 if __name__ == '__main__':
     unittest.main()

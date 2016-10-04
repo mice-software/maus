@@ -3,7 +3,6 @@
 """  Some tools for tracker MC data analysis """
 
 import os
-import ROOT
 import libMausCpp #pylint: disable = W0611
 
 def root_files_dir_search(top_dir, root_files):
@@ -32,7 +31,7 @@ def find_mc_track(hits, id_frequency_cut=0.5):
     # Loop over all spoints, then clusters, then digits, then scifi hits
     mc_track_counter = {} # Dict mapping track id to frequency it occurs
     for hit in hits:
-        mc_track_id = hit.GetTrackId()
+        mc_track_id = int(hit.GetTrackId())
         if mc_track_id in mc_track_counter:
             mc_track_counter[mc_track_id] += 1
         else:
@@ -46,7 +45,7 @@ def find_mc_track(hits, id_frequency_cut=0.5):
         if counter > highest_counter:
             most_frequent_id = mc_track_id
             highest_counter = counter
-    if (highest_counter / len(hits)) < id_frequency_cut:
+    if (float(highest_counter) / float(len(hits))) < id_frequency_cut:
         most_frequent_id = -1
 
     return most_frequent_id
@@ -84,21 +83,21 @@ def find_mc_momentum_sfhits(lkup, spoints, mc_track_id, trker_num):
             py += hit.GetMomentum().y()
             pz += hit.GetMomentum().z()
     if num_matched_hits != 0:
-        print str(num_matched_hits) + " matched"
         px = px / num_matched_hits
         py = py / num_matched_hits
         pz = pz / num_matched_hits
-    else:
-        print "No matches"
     return px, py, pz
 
 class SciFiLookup:
     """ Class to link SciFi recon data to the MC truth """
     def __init__(self, mc_evt):
         """ Initialise the lookup (just declare a few members) """
-        self.hits_map = self.make_hits_map(mc_evt)
-        if len(self.hits_map) < 1:
+        self.hits_map = {}
+        self.make_hits_map(mc_evt)
+        if not self.hits_map:
             print "WARNING: SciFiLookup: Building hits map failed"
+        elif len(self.hits_map) < 1:
+            print "WARNING: SciFiLookup: Hits map has 0 size"
 
     def clear_maps(self):
         """ Set the member variables to empty """
@@ -123,14 +122,13 @@ class SciFiLookup:
             with the scifi hits in that channel """
         self.hits_map = {}
         hits = mc_evt.GetSciFiHits()
-        print 'Making hits map with ' + str(mc_evt.GetSciFiHits().size()) \
-          + " hits"
-        counter = 0
         for hit in hits:
-            print str(counter)
-            counter += 1
-            channel_id = hit.GetChannelId().GetID()
+            channel_id = int(hit.GetChannelId().GetID())
             if not (channel_id in self.hits_map):
+                # print 'Adding new id ' + str(channel_id)
                 self.hits_map[channel_id] = [hit]
+                # print self.hits_map[channel_id]
             else:
+                # print 'Adding to id ' + str(channel_id)
                 self.hits_map[channel_id].append(hit)
+                # print self.hits_map[channel_id]

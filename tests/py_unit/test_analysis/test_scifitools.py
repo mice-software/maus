@@ -21,6 +21,7 @@ Tests for the SciFiLookup python module (not the C++ module)
 
 import unittest
 
+#pylint: disable = W0611, E0611, R0915, C0103
 import libMausCpp
 from ROOT import MAUS as maus
 import analysis.scifitools as tools
@@ -40,9 +41,9 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         # Set up some mc tracks and add to the mc event
         mctracks = []
         for i in range(2):
-          mctracks.append(maus.Track())
-          mctracks[i].SetTrackId(i)
-          self.mcevt.AddTrack(mctracks[i])
+            mctracks.append(maus.Track())
+            mctracks[i].SetTrackId(i)
+            self.mcevt.AddTrack(mctracks[i])
 
         # Set up some scifihits and add to the mc event
         hits = []
@@ -73,25 +74,24 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.clusters = []
         self.digits = []
         for i in range(2):
-          self.spoints.append(maus.SciFiSpacePoint())
-          self.clusters.append(maus.SciFiCluster())
-          self.digits.append(maus.SciFiDigit())
-          self.digits[i].set_tracker(i)
-          self.digits[i].set_station(5)
-          self.digits[i].set_plane(0)
-          self.digits[i].set_channel(2**i)
-          self.clusters[i].add_digit(self.digits[i])
-          self.clusters[i].set_tracker(i)
-          self.clusters[i].set_station(1)
-          self.clusters[i].set_plane(0)
-          self.spoints[i].add_channel(self.clusters[i])
-          self.spoints[i].set_tracker(i)
-          self.spoints[i].set_station(1)
+            self.spoints.append(maus.SciFiSpacePoint())
+            self.clusters.append(maus.SciFiCluster())
+            self.digits.append(maus.SciFiDigit())
+            self.digits[i].set_tracker(i)
+            self.digits[i].set_station(5)
+            self.digits[i].set_plane(0)
+            self.digits[i].set_channel(2**i)
+            self.clusters[i].add_digit(self.digits[i])
+            self.clusters[i].set_tracker(i)
+            self.clusters[i].set_station(1)
+            self.clusters[i].set_plane(0)
+            self.spoints[i].add_channel(self.clusters[i])
+            self.spoints[i].set_tracker(i)
+            self.spoints[i].set_station(1)
 
-        # Make a lookup
-        self.lookup = tools.SciFiLookup(self.mcevt)
-        dig_id0 = self.lookup.get_digit_id(self.digits[0])
-        dig_id1 = self.lookup.get_digit_id(self.digits[1])
+        # Set the digit ids
+        dig_id0 = tools.SciFiLookup.get_digit_id(self.digits[0])
+        dig_id1 = tools.SciFiLookup.get_digit_id(self.digits[1])
 
         # Let hits 1 to 3 correspond to digit 0, hits 4 - 6 to digit 1
         # and hit 0 to no digit at all
@@ -103,8 +103,9 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.mcevt.GetSciFiHits()[5].GetChannelId().SetID(dig_id1)
         self.mcevt.GetSciFiHits()[6].GetChannelId().SetID(dig_id1)
 
-        # Update the lookup
-        self.lookup.make_hits_map(self.mcevt)
+        # Use the lookup
+        self.lookup = tools.SciFiLookup(self.mcevt)
+        # self.lookup.make_hits_map(self.mcevt)
 
     def test_lookup_get_hits(self):
         """
@@ -161,6 +162,7 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertFalse(track)
 
     def test_find_mc_momentum_sfhits(self):
+        """ Test finding the mc momentum of some sf hits via the lookup """
         mom = \
           tools.find_mc_momentum_sfhits(self.lookup, [self.spoints[0]], 0, 0)
         self.assertEqual(1.0, mom[0])
