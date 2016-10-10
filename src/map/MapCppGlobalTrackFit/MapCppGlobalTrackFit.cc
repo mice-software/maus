@@ -21,6 +21,7 @@
 #include "src/common_cpp/Recon/Kalman/Global/Propagator.hh"
 #include "src/common_cpp/Recon/Kalman/Global/Measurement.hh"
 
+#include "src/common_cpp/Recon/Global/MaterialModel.hh"
 #include "src/common_cpp/Recon/Global/DataStructureHelper.hh"
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"

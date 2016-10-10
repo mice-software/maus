@@ -15,6 +15,7 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
 #include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Recon/Global/MaterialModelDynamic.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControl.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
@@ -333,7 +334,7 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
                                                   double dxdz[29],
                                                   void* params) {
     // Must be called after EMEquationOfMotion
-    MaterialModel material(x[1], x[2], x[3]);
+    MaterialModelDynamic material(x[1], x[2], x[3]);
 
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);

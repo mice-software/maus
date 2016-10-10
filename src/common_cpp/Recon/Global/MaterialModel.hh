@@ -13,20 +13,18 @@ class GeometryNavigator;
 class MaterialModel {
   public:
     MaterialModel() {}
-    MaterialModel(const G4Material* material);
-    MaterialModel(double x, double y, double z);
-    MaterialModel(const MaterialModel& mat);
-    ~MaterialModel() {}
     MaterialModel& operator=(const MaterialModel& mat);
+    virtual ~MaterialModel() {}
+    virtual MaterialModel* Clone() = 0;
 
-    double dEdx(double energy, double mass, double charge);
-    double d2EdxdE(double energy, double mass, double charge);
-    double dtheta2dx(double energy, double mass, double charge);
-    double estrag2(double energy, double mass, double charge);
+    virtual void SetMaterial(const G4Material* material);
+    virtual double dEdx(double energy, double mass, double charge);
+    virtual double d2EdxdE(double energy, double mass, double charge);
+    virtual double dtheta2dx(double energy, double mass, double charge);
+    virtual double estrag2(double energy, double mass, double charge);
 
-    void SetMaterial(double x, double y, double z);
-    void SetMaterial(const G4Material* material);
-    const G4Material* GetMaterial() const {return _material;}
+    virtual void SetMaterial(double x, double y, double z) = 0;
+    virtual const G4Material* GetMaterial() const {return _material;}
 
     static bool IsEnabledMaterial(std::string material_name);
     static void EnableMaterial(std::string material_name);
@@ -34,7 +32,7 @@ class MaterialModel {
     static void DisableAllMaterials();
     static std::ostream& PrintMaterials(std::ostream& out);
 
-  private:
+  protected:
     // _material is a borrowed reference; data is owned by G4MaterialTable
     const G4Material* _material = NULL;
     double _n_e = 0.;
@@ -48,6 +46,7 @@ class MaterialModel {
     double _density = 0.;
     double _z_over_a = 0.;
     GeometryNavigator* _navigator = NULL;
+
     static std::set<std::string> _enabled_materials;
     static std::set<std::string> _disabled_materials;
 

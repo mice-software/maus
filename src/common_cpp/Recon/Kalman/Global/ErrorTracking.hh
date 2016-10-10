@@ -2,7 +2,6 @@
 
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
-#include "src/common_cpp/Recon/Global/MaterialModel.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
 
 #ifndef recon_kalman_GlobalErrorTracking_hh_
@@ -117,7 +116,6 @@ private:
     double _charge;
     double _mass_squared;
     std::vector< std::vector<double> > _matrix;
-    MaterialModel _mat_mod;
     static ErrorTracking* _tz_for_propagate;
     static const double _float_tolerance;
     static std::stringstream tracking_fail;

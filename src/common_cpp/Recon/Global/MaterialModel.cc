@@ -11,55 +11,6 @@ namespace MAUS {
 std::set<std::string> MaterialModel::_enabled_materials;
 std::set<std::string> MaterialModel::_disabled_materials;
 
-MaterialModel::MaterialModel(const G4Material* material) {
-    SetMaterial(material);
-}
-
-MaterialModel::MaterialModel(double x, double y, double z) {
-    SetMaterial(x, y, z);
-}
-
-MaterialModel::MaterialModel(const MaterialModel& mat) {
-    *this = mat;
-}
-
-MaterialModel& MaterialModel::operator=(const MaterialModel& mat) {
-    if (&mat == this) {
-        return *this;
-    }
-    _material = mat._material;
-    _n_e = mat._n_e;
-    _I = mat._I;
-    _x_0 = mat._x_0;
-    _x_1 = mat._x_1;
-    _C = mat._C;
-    _a = mat._a;
-    _k = mat._k;
-    _rad_len_ratio = mat._rad_len_ratio;
-    _density = mat._density;
-    _z_over_a = mat._z_over_a;
-    return *this;    
-}
-
-void MaterialModel::SetMaterial(double x, double y, double z) {
-    _navigator = Globals::GetMCGeometryNavigator();
-    _navigator->SetPoint(ThreeVector(x, y, z));
-    std::string material_name = _navigator->GetMaterial()->GetName();
-    if (IsEnabledMaterial(material_name)) {
-        Squeak::mout(Squeak::debug) << "MaterialModel::SetMaterial Setting "
-                  << _navigator->GetMaterial()->GetName()
-                  << " as it is enabled at position "
-                  << "x " << x << " y " << y << " z " << z << std::endl;
-        MaterialModel::SetMaterial(_navigator->GetMaterial());
-    } else {
-        Squeak::mout(Squeak::debug) << "MaterialModel::SetMaterial Ignoring "
-                  << _navigator->GetMaterial()->GetName()
-                  << " as it is disabled at position "
-                  << "x " << x << " y " << y << " z " << z << std::endl;
-        //_disabled_materials.insert(material_name);
-        *this = MaterialModel();
-    }
-}
 
 void MaterialModel::SetMaterial(const G4Material* material) {
     _material = material;
@@ -124,6 +75,8 @@ double MaterialModel::estrag2(double E, double m, double charge) {
 
     return estrag2;
 }
+
+
 
 bool MaterialModel::IsEnabledMaterial(std::string material_name) {
     bool found = _enabled_materials.find(material_name) !=

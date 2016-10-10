@@ -1,13 +1,14 @@
 #include "gtest/gtest.h"
 #include "src/legacy/Config/MiceModule.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
-#include "src/common_cpp/Recon/Global/MaterialModel.hh"
+#include "src/common_cpp/Recon/Global/MaterialModelDynamic.hh"
+#include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
 
 namespace MAUS {
 
-class MaterialModelTest : public ::testing::Test {
+class MaterialModelDynamicTest : public ::testing::Test {
   protected:
-    MaterialModelTest()  {
+    MaterialModelDynamicTest()  {
         std::string mod_path = getenv("MAUS_ROOT_DIR");
         mod_path += "/tests/cpp_unit/Recon/Global/TestGeometries/";
         MiceModule* materials = new MiceModule(mod_path+"MaterialModelTest.dat");
@@ -16,7 +17,7 @@ class MaterialModelTest : public ::testing::Test {
         _nist_energy = std::vector<double>(nist_t);
     }
 
-    virtual ~MaterialModelTest() {}
+    virtual ~MaterialModelDynamicTest() {}
     virtual void SetUp()    {}
     virtual void TearDown() {}
 
@@ -24,8 +25,8 @@ class MaterialModelTest : public ::testing::Test {
     std::vector<double> _nist_energy;
 };
 
-TEST_F(MaterialModelTest, dEdxHydrogen) {
-    MaterialModel material(0., 0., 0.);
+TEST_F(MaterialModelDynamicTest, dEdxHydrogen) {
+    MaterialModelDynamic material(0., 0., 0.);
     auto dedx_auto = {5.409, 5.097, 4.870, 4.699, 4.568,
                       4.385, 4.267, 4.161, 4.104};  // MeV cm^2/g
     std::vector<double> pdg_dedx(dedx_auto);
@@ -38,8 +39,8 @@ TEST_F(MaterialModelTest, dEdxHydrogen) {
     }
 }
 
-TEST_F(MaterialModelTest, dEdxPolystyrene) {
-    MaterialModel material(0., 0., 2000.);
+TEST_F(MaterialModelDynamicTest, dEdxPolystyrene) {
+    MaterialModelDynamic material(0., 0., 2000.);
     auto dedx_auto = {2.612, 2.466, 2.359, 2.276, 2.211,
                      2.118, 2.058, 2.003, 1.971};  // MeV cm^2/g
     std::vector<double> pdg_dedx(dedx_auto);
@@ -52,5 +53,13 @@ TEST_F(MaterialModelTest, dEdxPolystyrene) {
     }
 }
 
+TEST_F(MaterialModelDynamicTest, AxialLookup) {
+    MaterialModelAxialLookup::BuildLookupTable(-1000., 4000.);
+    MaterialModelAxialLookup::PrintLookupTable(std::cerr);
+}
+
+TEST_F(MaterialModelDynamicTest, needModeTests) {
+    EXPECT_TRUE(false) << "Need more tests";
+}
 
 }

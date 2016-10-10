@@ -18,6 +18,7 @@
 #include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Recon/Global/MaterialModel.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
 namespace MAUS {
