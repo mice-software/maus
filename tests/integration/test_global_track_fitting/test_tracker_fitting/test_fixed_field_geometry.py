@@ -341,7 +341,7 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
                                {"__qx__":qx, "__qy__":qy, "__scale__":scale})
 
     def generate_dataset(self, verbose, suffix):
-        mc_config = os.path.join("fixed_field_mc_config.py")
+        mc_config = os.path.join("fixed_field_mc_config.py") # mc just runs simulate
         mc_proc_list = ["python", self.sim,
                         "--configuration_file", mc_config,
                         "--output_root_file_name", self.out+suffix+"_mc.root"]
@@ -382,7 +382,7 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
 
     def test_opera_field(self):
         print "Generating data"
-        job_list = [(0., 0., 1.)]
+        job_list = [(0., 0., 1.)] # (qx, qy, scale)
         for qx in [round(i/20., 2) for i in range(2, 11, 2)]:
             for qy in [round(j/1.) for j in range(1)]:
                 pass # job_list.append((qx, qy, 1.))
