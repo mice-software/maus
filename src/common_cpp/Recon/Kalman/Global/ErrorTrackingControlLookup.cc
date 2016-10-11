@@ -8,7 +8,7 @@
 #include "src/legacy/Interface/Squeak.hh"
 
 #include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
-#include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControlAxialLookup.hh"
+#include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControlLookup.hh"
 
 namespace MAUS {
 namespace Kalman {
@@ -52,7 +52,7 @@ static int et_control_lookup_hadjust(void * vstate, size_t dim, unsigned int ord
     if (state->_lookup == NULL) {
         std::cerr << "Control geometry lookup was NULL in " <<
                       "Recon/Kalman/Global/ErrorTrackingControlAxialLookup.hh" << std::endl;
-        return GSL_FAIL;
+        return GSL_FAILURE;
     }
     double lower_bound = 0;
     double upper_bound = 0;
@@ -95,21 +95,21 @@ static void et_control_lookup_free (void * vstate) {
    free(state);
 }
 
-static const gsl_odeiv_control_lookup_type et_control_lookup_type = {
+static const gsl_odeiv_control_type et_control_lookup_type = {
    "maus_recon_kalman_global_error_tracking", /* name */
    &et_control_lookup_alloc,
    &et_control_lookup_init,
    &et_control_lookup_hadjust,
    &et_control_lookup_free
 };
-const gsl_odeiv_control_lookup_type *gsl_odeiv_control_lookup_et = &et_control_lookup_type;
+const gsl_odeiv_control_type *gsl_odeiv_control_lookup_et = &et_control_lookup_type;
 
 gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double min_step_size,
                                             double max_step_size) {
-  gsl_odeiv_control* control =  gsl_odeiv_control_lookup_alloc(gsl_odeiv_control_lookup_et);
-    int status = gsl_odeiv_control_lookup_init(control, min_step_size, max_step_size, 0., 0.);
+  gsl_odeiv_control* control =  gsl_odeiv_control_alloc(gsl_odeiv_control_lookup_et);
+    int status = gsl_odeiv_control_init(control, min_step_size, max_step_size, 0., 0.);
     if (status != GSL_SUCCESS) {
-        gsl_odeiv_control_lookup_free (control);
+        gsl_odeiv_control_free (control);
         throw MAUS::Exception(Exception::recoverable,
                              "Failed to initialise error tracking control",
                              "ErrorTrackingControlType::gsl_odeiv_control_lookup_et_new");

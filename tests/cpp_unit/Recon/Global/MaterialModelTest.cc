@@ -56,6 +56,19 @@ TEST_F(MaterialModelDynamicTest, dEdxPolystyrene) {
 TEST_F(MaterialModelDynamicTest, AxialLookup) {
     MaterialModelAxialLookup::BuildLookupTable(-1000., 4000.);
     MaterialModelAxialLookup::PrintLookupTable(std::cerr);
+    double lower, upper;
+    MaterialModelAxialLookup::GetBounds(-1500., lower, upper);
+    EXPECT_NEAR(lower, -1500., 0.1);
+    EXPECT_NEAR(upper, -1000., 0.1);
+    MaterialModelAxialLookup::GetBounds(-500., lower, upper);
+    EXPECT_NEAR(lower, -1000., 0.1);
+    EXPECT_NEAR(upper, -250., 0.1);
+    MaterialModelAxialLookup::GetBounds(3500., lower, upper);
+    EXPECT_NEAR(lower, 2250., 0.1);
+    EXPECT_NEAR(upper, 3750., 0.1);
+    MaterialModelAxialLookup::GetBounds(4000., lower, upper);
+    EXPECT_NEAR(lower, 3750., 0.1);
+    EXPECT_NEAR(upper, 4000., 0.1);
 }
 
 TEST_F(MaterialModelDynamicTest, needModeTests) {

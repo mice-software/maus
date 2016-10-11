@@ -37,7 +37,7 @@ class MaterialModelAxialLookup : public MaterialModel {
 
     static constexpr double _z_tolerance = 1e-3;
 
-    static std::vector<std::pair<double, G4Material*> > _lookup;
+    static std::vector<std::pair<double, G4Material*> > _lookup; // references start position of the volume and material
 };
 
 }
