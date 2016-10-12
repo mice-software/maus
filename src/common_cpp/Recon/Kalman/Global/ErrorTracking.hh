@@ -35,7 +35,7 @@ public:
     enum EStragModel {estrag_forwards, estrag_backwards, no_estrag};
     enum TrackingModel {em_forwards_dynamic, em_backwards_dynamic,
                         em_forwards_static, em_backwards_static};
-    enum MaterialLookupModel {geant4, axis_lookup};
+    enum MaterialSetup {geant4, axial_lookup};
 
     ErrorTracking();
 
@@ -80,6 +80,9 @@ public:
     void SetTrackingModel(TrackingModel track_model) {_track_model = track_model;}
     TrackingModel GetTrackingModel() const {return _track_model;}
 
+    void SetMaterialModel(MaterialSetup material) {_material = material;}
+    MaterialSetup GetMaterialModel() const {return _material;}
+
     void SetCharge(double charge) {_charge = charge;}
     double GetCharge() const {return _charge;}
 
@@ -110,6 +113,7 @@ private:
     MCSModel _mcs_model = no_mcs;
     EStragModel _estrag_model = no_estrag;
     TrackingModel _track_model = em_forwards_dynamic;
+    MaterialSetup _material = geant4;
     int  _max_n_steps = 100000;
     static constexpr double c_l = 299.792458; // mm*ns^{-1}
     // transient...

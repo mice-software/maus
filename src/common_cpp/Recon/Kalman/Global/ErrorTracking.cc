@@ -16,7 +16,9 @@
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
 #include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Recon/Global/MaterialModelDynamic.hh"
+#include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControl.hh"
+#include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControlLookup.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
 namespace MAUS {
@@ -47,8 +49,13 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   gsl_odeiv_control * control = NULL;
   if (_track_model == em_forwards_dynamic ||
       _track_model == em_backwards_dynamic) {
-      ErrorTrackingControl::gsl_odeiv_control_et_new(
+      if (_material == geant4) {
+          control = ErrorTrackingControl::gsl_odeiv_control_et_new(
                                                _min_step_size, _max_step_size);
+      } else if (_material == axial_lookup) {
+          control = ErrorTrackingControlLookup::gsl_odeiv_control_lookup_et_new(
+                                               _min_step_size);
+      }
   }
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(29);
   gsl_odeiv_system    system  =
@@ -334,7 +341,16 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
                                                   double dxdz[29],
                                                   void* params) {
     // Must be called after EMEquationOfMotion
-    MaterialModelDynamic material(x[1], x[2], x[3]);
+    MaterialModel* material = NULL;
+    if (_tz_for_propagate->_material == geant4) {
+        material = new MaterialModelDynamic(x[1], x[2], x[3]);
+    } else if (_tz_for_propagate->_material == axial_lookup) {
+        material = new MaterialModelAxialLookup(x[1], x[2], x[3]);
+    } else {
+        throw MAUS::Exception(Exception::recoverable,
+                              "Did not recognise material model",
+                              "ErrorTracking::MaterialEquationOfMotion");
+    }
 
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
@@ -345,28 +361,28 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
     double dtheta2dz;
     double destragdz;
     if (_tz_for_propagate->_eloss_model == bethe_bloch_forwards) {
-        dEdz = material.dEdx(energy, mass, charge); // should be negative
-        d2EdzdE = 0.; // material.d2EdxdE(energy, mass, charge);
+        dEdz = material->dEdx(energy, mass, charge); // should be negative
+        d2EdzdE = 0.; // material->d2EdxdE(energy, mass, charge);
     } else if (_tz_for_propagate->_eloss_model == bethe_bloch_backwards) {
-        dEdz = -material.dEdx(energy, mass, charge); // should be negative; during tracking backwards dz is negative so dEdz gets handled properly
-        d2EdzdE = 0.; // material.d2EdxdE(energy, mass, charge);
+        dEdz = -material->dEdx(energy, mass, charge); // should be negative; during tracking backwards dz is negative so dEdz gets handled properly
+        d2EdzdE = 0.; // material->d2EdxdE(energy, mass, charge);
     } else {
         dEdz = 0.; // no eloss
         d2EdzdE = 0;
     }
 
     if (_tz_for_propagate->_estrag_model == estrag_forwards) {
-        destragdz = material.estrag2(energy, mass, charge);
+        destragdz = material->estrag2(energy, mass, charge);
     } else if (_tz_for_propagate->_estrag_model == estrag_backwards) {
-        destragdz = -material.estrag2(energy, mass, charge);
+        destragdz = -material->estrag2(energy, mass, charge);
     } else {
         destragdz = 0.;
     } 
 
     if (_tz_for_propagate->_mcs_model == moliere_forwards) {
-        dtheta2dz = material.dtheta2dx(energy, mass, charge);
+        dtheta2dz = material->dtheta2dx(energy, mass, charge);
     } else if (_tz_for_propagate->_mcs_model == moliere_backwards) {
-        dtheta2dz = -material.dtheta2dx(energy, mass, charge);
+        dtheta2dz = -material->dtheta2dx(energy, mass, charge);
     } else {
         dtheta2dz = 0.;
     }
@@ -387,11 +403,12 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
     dxdz[26] += 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
     dxdz[28] += 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
 
+    delete material;
     if (fabs(dtheta2dz) < 1e-9)
         return GSL_SUCCESS;
     /*
     std::cerr << "MATERIAL z: " << x[3]
-              << " dEdx " << material.dEdx(energy, mass, charge)
+              << " dEdx " << material->dEdx(energy, mass, charge)
               << " x26/28: " << x[26] << " " << x[28]
               << " dxdz26/28: " << dxdz[26] << " " << dxdz[28]
               << " dpdz: " << dpdz << " pz: " << x[7]

@@ -1,9 +1,12 @@
 #include "gsl/gsl_odeiv.h"
 
-#ifndef _recon_kalman_global_ErrorTrackingControl_hh_
-#define _recon_kalman_global_ErrorTrackingControl_hh_
+#ifndef _recon_kalman_global_ErrorTrackingControlLookup_hh_
+#define _recon_kalman_global_ErrorTrackingControlLookup_hh_
 
 namespace MAUS {
+
+class MaterialModelAxialLookup;
+
 namespace Kalman {
 namespace Global {
 namespace ErrorTrackingControlLookup {
@@ -13,8 +16,7 @@ namespace ErrorTrackingControlLookup {
  *
  *  Sets step size according to ...
  */
-gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(MaterialModelAxialLookup* lookup,
-                                            double step_size);
+gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double step_size);
 
 }
 }

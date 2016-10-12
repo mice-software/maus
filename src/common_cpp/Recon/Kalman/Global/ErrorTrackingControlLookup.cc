@@ -17,7 +17,6 @@ namespace ErrorTrackingControlLookup {
 
 typedef struct {
     double _step_size;
-    MaterialModelAxialLookup* _lookup;
 } et_control_lookup_state_t;
 
 static void* et_control_lookup_alloc() {
@@ -41,7 +40,6 @@ static int et_control_lookup_init(void* vstate, double step_size,
     et_control_lookup_state_t* state =
                                static_cast<et_control_lookup_state_t *>(vstate);
     state->_step_size = step_size;
-    state->_lookup = NULL;
     return GSL_SUCCESS;
 }
 
@@ -49,14 +47,14 @@ static int et_control_lookup_hadjust(void * vstate, size_t dim, unsigned int ord
                               const double y[], const double yerr[],
                               const double yp[], double * h) {
     et_control_lookup_state_t* state = static_cast<et_control_lookup_state_t *>(vstate);
-    if (state->_lookup == NULL) {
-        std::cerr << "Control geometry lookup was NULL in " <<
+    if (!MaterialModelAxialLookup::IsReady()) {
+        std::cerr << "Control geometry lookup was not ready in " <<
                       "Recon/Kalman/Global/ErrorTrackingControlAxialLookup.hh" << std::endl;
         return GSL_FAILURE;
     }
     double lower_bound = 0;
     double upper_bound = 0;
-    state->_lookup->GetBounds(y[3], lower_bound, upper_bound);
+    MaterialModelAxialLookup::GetBounds(y[3], lower_bound, upper_bound);
     // find the largest step size that divides the volume into an integer number
     // of steps and is less than _step_size
     double n_steps = (upper_bound - lower_bound)/state->_step_size;
@@ -104,10 +102,9 @@ static const gsl_odeiv_control_type et_control_lookup_type = {
 };
 const gsl_odeiv_control_type *gsl_odeiv_control_lookup_et = &et_control_lookup_type;
 
-gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double min_step_size,
-                                            double max_step_size) {
+gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double step_size) {
   gsl_odeiv_control* control =  gsl_odeiv_control_alloc(gsl_odeiv_control_lookup_et);
-    int status = gsl_odeiv_control_init(control, min_step_size, max_step_size, 0., 0.);
+    int status = gsl_odeiv_control_init(control, step_size, 0., 0., 0.);
     if (status != GSL_SUCCESS) {
         gsl_odeiv_control_free (control);
         throw MAUS::Exception(Exception::recoverable,

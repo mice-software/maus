@@ -32,6 +32,7 @@ class MaterialModelAxialLookup : public MaterialModel {
     static void GetBounds(double z_pos, double& lower_bound, double& upper_bound);
     static void PrintLookupTable(std::ostream& out);
     static const std::vector<std::pair<double, G4Material*> >* GetLookupTable() {return &_lookup;}
+    static bool IsReady() {return _lookup.size() > 0;}
 
   private:
 
