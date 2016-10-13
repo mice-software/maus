@@ -539,6 +539,19 @@ void ErrorTracking::SetField(BTField* field) {
     }
 }
 
+void ErrorTracking::SetGeometryModel(std::string geometry_model) {
+    if (geometry_model == "geant4") {
+        SetGeometryModel(geant4);
+    } else if (geometry_model == "axial_lookup") {
+        SetGeometryModel(axial_lookup);
+    } else {
+        throw MAUS::Exception(Exception::recoverable,
+                          "Failed to recognise geometry model '"+geometry_model
+                          +"' Should be 'geant4' or 'axial_lookup'",
+                          "ErrorTracking::SetGeometryModel");
+    }
+}
+
 ostream& ErrorTracking::print(std::ostream& out, const double* x) {
     out << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
         << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 

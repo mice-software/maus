@@ -16,6 +16,7 @@ global_track_fits = [
         "detectors":["Tracker0_5", "Tracker0_4", "Tracker0_3", "Tracker0_2", "Tracker0_1"]#, "Virtual"]
     }
 ]
+global_track_fit_geometry_model = "axial_lookup"
 global_track_fit_materials = ["POLYSTYRENE", "He", "AIR"]
 verbose_level = 2
 simulation_geometry_filename = os.path.expandvars("parent_geometries/ParentGeometryFile_pry_mc.dat")

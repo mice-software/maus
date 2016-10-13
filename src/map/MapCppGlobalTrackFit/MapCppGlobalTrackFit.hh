@@ -87,7 +87,7 @@ class MapCppGlobalTrackFit : public MapBase<Data> {
   static double c_light;
   MAUS::Kalman::Global::ErrorTracking::MCSModel _scat_model = MAUS::Kalman::Global::ErrorTracking::moliere_forwards;
   MAUS::Kalman::Global::ErrorTracking::ELossModel _eloss_model = MAUS::Kalman::Global::ErrorTracking::bethe_bloch_forwards;
-  MAUS::Kalman::Global::ErrorTracking::GeometryModel _geom_model = MAUS::Kalman::Global::ErrorTracking::geant4;
+  std::string _geometry_model = "";
 
   class FitInfo {
     public:

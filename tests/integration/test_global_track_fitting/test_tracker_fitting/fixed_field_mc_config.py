@@ -23,7 +23,7 @@ solenoid_transverse =  {
 max_track_length = 3000.
 verbose_level = 2
 physics_processes = "standard"
-spill_generator_number_of_spills = 1
+spill_generator_number_of_spills = 10
 beam = {
     "particle_generator":"counter",
     "random_seed":0,

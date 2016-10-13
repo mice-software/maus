@@ -351,8 +351,8 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
                         "--input_root_file_name", self.out+suffix+"_mc.root",
                         "--output_root_file_name", self.out+suffix+"_recon.root"]
         if verbose:
-            proc = subprocess.Popen(mc_proc_list)
-            proc.wait()
+            #proc = subprocess.Popen(mc_proc_list)
+            #proc.wait()
             proc = subprocess.Popen(recon_proc_list)
             proc.wait()
         else:

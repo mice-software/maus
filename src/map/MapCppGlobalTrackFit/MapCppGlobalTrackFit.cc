@@ -96,6 +96,11 @@ void MapCppGlobalTrackFit::_birth(const std::string& config_str) {
   // Pull out the global settings
   Json::Value config = JsonWrapper::StringToJson(config_str);
 
+  _geometry_model = JsonWrapper::GetProperty(
+                              config,
+                              "global_track_fit_geometry_model",
+                              JsonWrapper::stringValue).asString();
+
   Json::Value track_fits = JsonWrapper::GetProperty(
                               config,
                               "global_track_fits",
@@ -204,7 +209,7 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
         propagator->GetTracking()->SetMCSModel(_scat_model);
         propagator->GetTracking()->SetEnergyLossModel(_eloss_model);
         propagator->GetTracking()->SetCharge(info.charge_hypothesis);
-        propagator->GetTracking()->SetGeometryModel(_geom_model);
+        propagator->GetTracking()->SetGeometryModel(_geometry_model);
 
         Kalman::TrackFit kalman_fit(propagator);
         DataLoader data(info.active_detectors, &kalman_fit);
@@ -221,7 +226,7 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
         kalman_fit.SetSeed(seed_state);
 
         for (size_t j = 0; j < info.max_iteration; ++j) {
-            std::cerr << "MapCppGlobalTrackFit::track_fit iteration " << j << std::endl;
+            Squeak::mout(Squeak::info) << "MapCppGlobalTrackFit::track_fit iteration " << j << std::endl;
             kalman_fit.Filter(true);
             if (info.will_smooth) {
                 kalman_fit.Smooth(true);
@@ -231,14 +236,14 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
             Kalman::TrackPoint first = track[0];
             Kalman::TrackPoint last = track[track.GetLength()-1];
             propagator->Propagate(last, first);
-            std::cerr << "    First ";
+            Squeak::mout(Squeak::info) << "    First ";
             for (size_t k = 0; k < 6; ++k)
-                std::cerr << first.GetPredicted().GetVector()[k][0] << " ";
-            std::cerr << std::endl;
-            std::cerr << "    Last  ";
+                Squeak::mout(Squeak::info) << first.GetPredicted().GetVector()[k][0] << " ";
+            Squeak::mout(Squeak::info) << std::endl;
+            Squeak::mout(Squeak::info) << "    Last  ";
             for (size_t k = 0; k < 6; ++k)
-                std::cerr << last.GetPredicted().GetVector()[k][0] << " ";
-            std::cerr << std::endl;
+                Squeak::mout(Squeak::info) << last.GetPredicted().GetVector()[k][0] << " ";
+            Squeak::mout(Squeak::info) << std::endl;
             Kalman::State this_seed_state = first.GetPredicted();
             this_seed_state.SetCovariance(seed_state.GetCovariance());
             kalman_fit.SetSeed(first.GetPredicted());
