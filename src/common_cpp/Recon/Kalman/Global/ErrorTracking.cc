@@ -74,12 +74,13 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   tracking_fail.str("");  // clear the error stream
   while(fabs(z-target_z) > _float_tolerance) {
     nsteps++;
-    //std::cerr << z << " " << std::endl;
+    // std::cerr << "step in z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
     int status =  gsl_odeiv_evolve_apply
                     (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
     if (control != NULL) {
         control->type->hadjust(control->state, 0, 0, x, NULL, NULL, &_gsl_h);
     }
+    // std::cerr << "step out z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
     if (nsteps > _max_n_steps) {
         tracking_fail << "Exceeded maximum number of steps\n"; 
         status = GSL_FAILURE;

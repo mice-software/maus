@@ -84,7 +84,7 @@ int et_control_lookup_hadjust(void * vstate, size_t dim, unsigned int ord,
     } else if (step_size > *h) { // e.g. we just stepped away from boundary
         return_value = GSL_ODEIV_HADJ_INC;
     }
-    *h = step_size;
+    *h = fabs(step_size)*sign;
 
     return return_value;
 }
