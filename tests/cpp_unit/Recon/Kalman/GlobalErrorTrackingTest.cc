@@ -644,6 +644,8 @@ TEST(ErrorTrackingTest, PropagateDriftGeometryModelTest) {
     std::vector<double> x_out_lookup = x_in;
     propagator.Propagate(&x_out_lookup[0], 1200.);
     print_x(&x_out_lookup[0]);
+    propagator.Propagate(&x_out_lookup[0], -200.);
+    print_x(&x_out_lookup[0]);
 }
 
 } // namespace Global
