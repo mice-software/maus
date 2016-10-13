@@ -16,7 +16,8 @@ namespace Global {
 namespace ErrorTrackingControlLookup {
 
 typedef struct {
-    double _step_size;
+    double _min_step_size;
+    double _max_step_size;
 } et_control_lookup_state_t;
 
 static void* et_control_lookup_alloc() {
@@ -30,61 +31,61 @@ static void* et_control_lookup_alloc() {
     return state;
 }
 
-static int et_control_lookup_init(void* vstate, double step_size, 
-                           double dummy1, double dummy2, double dummy3) {
-    if (step_size < 0) {
+static int et_control_lookup_init(void* vstate, double min_step_size, 
+                           double max_step_size, double dummy2, double dummy3) {
+    if (min_step_size < 0) {
         throw MAUS::Exception(Exception::recoverable,
-                              "et_control_lookup must have positive step size",
+                              "global track fit must have positive step size",
+                              "ErrorTrackingControlType::et_control_lookup_init");
+    }
+    if (min_step_size > max_step_size) {
+        throw MAUS::Exception(Exception::recoverable,
+                              "global track fit must have min step size more than max step size",
                               "ErrorTrackingControlType::et_control_lookup_init");
     }
     et_control_lookup_state_t* state =
                                static_cast<et_control_lookup_state_t *>(vstate);
-    state->_step_size = step_size;
+    state->_min_step_size = min_step_size;
+    state->_max_step_size = max_step_size;
     return GSL_SUCCESS;
 }
 
-static int et_control_lookup_hadjust(void * vstate, size_t dim, unsigned int ord,
+int et_control_lookup_hadjust(void * vstate, size_t dim, unsigned int ord,
                               const double y[], const double yerr[],
                               const double yp[], double * h) {
-    et_control_lookup_state_t* state = static_cast<et_control_lookup_state_t *>(vstate);
+    et_control_lookup_state_t* state =
+                                static_cast<et_control_lookup_state_t*>(vstate);
     if (!MaterialModelAxialLookup::IsReady()) {
         std::cerr << "Control geometry lookup was not ready in " <<
                       "Recon/Kalman/Global/ErrorTrackingControlAxialLookup.hh" << std::endl;
         return GSL_FAILURE;
     }
+
+    int return_value = GSL_ODEIV_HADJ_NIL;
     double lower_bound = 0;
     double upper_bound = 0;
-    MaterialModelAxialLookup::GetBounds(y[3], lower_bound, upper_bound);
-    // find the largest step size that divides the volume into an integer number
-    // of steps and is less than _step_size
-    double n_steps = (upper_bound - lower_bound)/state->_step_size;
-    double step_size = (upper_bound - lower_bound)/(floor(n_steps)+1.);
-    
+    double step_size = state->_max_step_size;
+
     double sign = *h/fabs(*h);
     if (sign != sign)
         sign = 1.;
-    step_size = sign*fabs(step_size);
 
-    int return_value = GSL_ODEIV_HADJ_NIL;
-    if (fabs(step_size) > fabs(*h)) {
-        return_value = GSL_ODEIV_HADJ_INC;
-    } else if (fabs(step_size) < fabs(*h)) {
+    MaterialModelAxialLookup::GetBounds(y[3], lower_bound, upper_bound);
+    double delta = upper_bound - y[3];
+    if (sign < 0) {
+        delta = y[3] - lower_bound;
+    }
+    if (delta < step_size && delta > state->_min_step_size) {
+        step_size = delta - state->_min_step_size/2.;
         return_value = GSL_ODEIV_HADJ_DEC;
+    } else if (delta < state->_max_step_size) {
+        step_size = state->_min_step_size;
+        return_value = GSL_ODEIV_HADJ_DEC;
+    } else if (step_size > *h) { // e.g. we just stepped away from boundary
+        return_value = GSL_ODEIV_HADJ_INC;
     }
     *h = step_size;
 
-    Squeak::mout(Squeak::debug) << "    ErrorTrackingControlAxialLookup::hadjust"
-              << " Pos " << y[1] << " " << y[2] << " " << y[3]
-              << " Mom " << y[5] << " " << y[6] << " " << y[7] << std::endl;
-    Squeak::mout(Squeak::debug) << "                                 "
-              << " Pos' " << yp[1] << " " << yp[2] << " " << yp[3]
-              << " Mom' " << yp[5] << " " << yp[6] << " " << yp[7] << std::endl;
-    Squeak::mout(Squeak::debug) << "                                 "
-              << " Pos err " << yerr[1] << " " << yerr[2] << " " << yerr[3]
-              << " Mom err " << yerr[5] << " " << yerr[6] << " " << yerr[7]
-              << std::endl;
-    Squeak::mout(Squeak::debug) << "                                 "
-                                << " step " << step_size << std::endl;
     return return_value;
 }
 
@@ -102,9 +103,9 @@ static const gsl_odeiv_control_type et_control_lookup_type = {
 };
 const gsl_odeiv_control_type *gsl_odeiv_control_lookup_et = &et_control_lookup_type;
 
-gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double step_size) {
-  gsl_odeiv_control* control =  gsl_odeiv_control_alloc(gsl_odeiv_control_lookup_et);
-    int status = gsl_odeiv_control_init(control, step_size, 0., 0., 0.);
+gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double min_step_size, double max_step_size) {
+    gsl_odeiv_control* control =  gsl_odeiv_control_alloc(gsl_odeiv_control_lookup_et);
+    int status = et_control_lookup_init(control->state, min_step_size, max_step_size, 0., 0.);
     if (status != GSL_SUCCESS) {
         gsl_odeiv_control_free (control);
         throw MAUS::Exception(Exception::recoverable,

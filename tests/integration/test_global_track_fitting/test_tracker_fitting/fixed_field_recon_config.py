@@ -18,5 +18,5 @@ global_track_fits = [
 ]
 global_track_fit_materials = ["POLYSTYRENE", "He", "AIR"]
 verbose_level = 2
-simulation_geometry_filename = os.path.expandvars("parent_geometries/ParentGeometryFile_4T.dat")
+simulation_geometry_filename = os.path.expandvars("parent_geometries/ParentGeometryFile_pry_mc.dat")
 

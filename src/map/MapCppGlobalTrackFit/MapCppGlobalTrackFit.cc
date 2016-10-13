@@ -204,6 +204,7 @@ void MapCppGlobalTrackFit::track_fit(ReconEvent &event) const {
         propagator->GetTracking()->SetMCSModel(_scat_model);
         propagator->GetTracking()->SetEnergyLossModel(_eloss_model);
         propagator->GetTracking()->SetCharge(info.charge_hypothesis);
+        propagator->GetTracking()->SetGeometryModel(_geom_model);
 
         Kalman::TrackFit kalman_fit(propagator);
         DataLoader data(info.active_detectors, &kalman_fit);

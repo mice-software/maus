@@ -16,7 +16,12 @@ namespace ErrorTrackingControlLookup {
  *
  *  Sets step size according to ...
  */
-gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double step_size);
+gsl_odeiv_control* gsl_odeiv_control_lookup_et_new(double min_step_size,
+                                                   double max_step_size);
+
+int et_control_lookup_hadjust(void * vstate, size_t dim, unsigned int ord,
+                              const double y[], const double yerr[],
+                              const double yp[], double * h);
 
 }
 }

@@ -23,7 +23,7 @@ solenoid_transverse =  {
 max_track_length = 3000.
 verbose_level = 2
 physics_processes = "standard"
-spill_generator_number_of_spills = 10
+spill_generator_number_of_spills = 1
 beam = {
     "particle_generator":"counter",
     "random_seed":0,
@@ -31,5 +31,5 @@ beam = {
        solenoid_transverse
     ]
 }
-simulation_geometry_filename = os.path.expandvars("parent_geometries/ParentGeometryFile_4T.dat")
+simulation_geometry_filename = os.path.expandvars("parent_geometries/ParentGeometryFile_pry_mc.dat")
 

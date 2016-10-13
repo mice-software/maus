@@ -1,6 +1,7 @@
 #include <math.h>
 
 #include <algorithm>
+#include <limits>
 
 #include "Geant4/G4Material.hh"
 
@@ -50,7 +51,6 @@ bool compare(std::pair<double, G4Material*> a_pair, double z) {
 }
 
 void MaterialModelAxialLookup::SetMaterial(double x, double y, double z) {
-    std::cerr << "AxialLookup::SetMaterial " << z << std::endl;
     if (_lookup.size() == 0)
         throw MAUS::Exception(MAUS::Exception::recoverable,
                               "Attempt to set material without building lookup table first",
@@ -60,8 +60,11 @@ void MaterialModelAxialLookup::SetMaterial(double x, double y, double z) {
     if (a_pair != _lookup.begin())
         a_pair--;
     MaterialModel::_material = a_pair->second;
-    if (!IsEnabledMaterial(_material->GetName())) // URG... string comparison
+    if (!IsEnabledMaterial(_material->GetName())) { // URG... string comparison
         MaterialModel::_material = NULL;
+    } else {
+        MaterialModel::SetMaterial(_material);
+    }
 }
 
 void MaterialModelAxialLookup::BuildLookupTable(double z_start, double z_end) {
@@ -103,11 +106,11 @@ void MaterialModelAxialLookup::GetBounds(double z_pos, double& lower_bound, doub
     // std::cerr << "GetBounds at " << z_pos << " finds " << a_pair->first
     //           << " " << a_pair->second << std::endl;
     if (a_pair == _lookup.begin()) {
-        lower_bound = z_pos;
+        lower_bound = std::numeric_limits<double>::lowest();
         upper_bound = a_pair->first;
     } else if (a_pair == _lookup.end()) {
         lower_bound = _lookup.back().first;
-        upper_bound = z_pos;
+        upper_bound = std::numeric_limits<double>::max();
     } else {
         upper_bound = a_pair->first;
         lower_bound = (--a_pair)->first;

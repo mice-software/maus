@@ -622,7 +622,7 @@ TEST(ErrorTrackingTest, PropagateDriftGeometryModelTest) {
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     ErrorTracking propagator;
     propagator.SetMinStepSize(0.1);
-    propagator.SetMaxStepSize(1.);
+    propagator.SetMaxStepSize(10.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetEnergyLossModel(ErrorTracking::bethe_bloch_forwards);
     propagator.SetMCSModel(ErrorTracking::moliere_forwards);
@@ -640,7 +640,6 @@ TEST(ErrorTrackingTest, PropagateDriftGeometryModelTest) {
     print_x(&x_out_geant4[0]);
     propagator.Propagate(&x_out_geant4[0], 1200.);
     print_x(&x_out_geant4[0]);
-
     propagator.SetGeometryModel(ErrorTracking::axial_lookup);
     std::vector<double> x_out_lookup = x_in;
     propagator.Propagate(&x_out_lookup[0], 1200.);

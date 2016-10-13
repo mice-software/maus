@@ -79,18 +79,6 @@ static int et_control_hadjust(void * vstate, size_t dim, unsigned int ord,
     //          << " max " << state->_max_step_size << std::endl;
     *h = step;
 
-    Squeak::mout(Squeak::debug) << "    ErrorTrackingControl::hadjust"
-              << " Pos " << y[1] << " " << y[2] << " " << y[3]
-              << " Mom " << y[5] << " " << y[6] << " " << y[7] << std::endl;
-    Squeak::mout(Squeak::debug) << "                                 "
-              << " Pos' " << yp[1] << " " << yp[2] << " " << yp[3]
-              << " Mom' " << yp[5] << " " << yp[6] << " " << yp[7] << std::endl;
-    Squeak::mout(Squeak::debug) << "                                 "
-              << " Pos err " << yerr[1] << " " << yerr[2] << " " << yerr[3]
-              << " Mom err " << yerr[5] << " " << yerr[6] << " " << yerr[7]
-              << std::endl;
-    Squeak::mout(Squeak::debug) << "                                 "
-                                << " step " << step << std::endl;
     return return_value;
 }
 

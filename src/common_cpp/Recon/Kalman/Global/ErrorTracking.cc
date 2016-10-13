@@ -54,7 +54,7 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
                                                _min_step_size, _max_step_size);
       } else if (_geometry == axial_lookup) {
           control = ErrorTrackingControlLookup::gsl_odeiv_control_lookup_et_new(
-                                               _min_step_size);
+                                               _min_step_size, _max_step_size);
       }
   }
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(29);
@@ -74,10 +74,12 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   tracking_fail.str("");  // clear the error stream
   while(fabs(z-target_z) > _float_tolerance) {
     nsteps++;
-
+    //std::cerr << z << " " << std::endl;
     int status =  gsl_odeiv_evolve_apply
-                    (evolve, control, step, &system, &z, target_z, &_gsl_h, x);
-    
+                    (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
+    if (control != NULL) {
+        control->type->hadjust(control->state, 0, 0, x, NULL, NULL, &_gsl_h);
+    }
     if (nsteps > _max_n_steps) {
         tracking_fail << "Exceeded maximum number of steps\n"; 
         status = GSL_FAILURE;
@@ -155,7 +157,6 @@ int ErrorTracking::EquationsOfMotion(double z,
                                            const double x[29],
                                            double dxdz[29],
                                            void* params) {
-  //std::cerr << "." << std::flush;
   if (fabs(x[7]) < _float_tolerance) {
     // z-momentum is 0
       tracking_fail << "pz " << x[7] << " was less than float tolerance " << _float_tolerance << "\n";
@@ -412,17 +413,15 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
     dxdz[28] += 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
 
     delete material;
-    if (fabs(dtheta2dz) < 1e-9)
-        return GSL_SUCCESS;
-    /*
-    std::cerr << "MATERIAL z: " << x[3]
-              << " dEdx " << material->dEdx(energy, mass, charge)
-              << " x26/28: " << x[26] << " " << x[28]
-              << " dxdz26/28: " << dxdz[26] << " " << dxdz[28]
-              << " dpdz: " << dpdz << " pz: " << x[7]
-              << " dt2dz: " << dtheta2dz
-              << " mcs_model: " << _tz_for_propagate->_mcs_model << std::endl;
-    */
+    
+    //std::cerr << "MATERIAL z: " << x[3]
+              //<< " dEdx " << material->dEdx(energy, mass, charge)
+    //          << " x26/28: " << x[26] << " " << x[28]
+    //          << " dxdz26/28: " << dxdz[26] << " " << dxdz[28]
+    //          << " dpdz: " << dpdz << " pz: " << x[7]
+    //          << " dt2dz: " << dtheta2dz << std::endl;
+              //<< " mcs_model: " << _tz_for_propagate->_mcs_model << std::endl;
+    
     return GSL_SUCCESS;
 }
 
