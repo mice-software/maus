@@ -50,14 +50,18 @@ bool compare(std::pair<double, G4Material*> a_pair, double z) {
 }
 
 void MaterialModelAxialLookup::SetMaterial(double x, double y, double z) {
+    std::cerr << "AxialLookup::SetMaterial " << z << std::endl;
     if (_lookup.size() == 0)
         throw MAUS::Exception(MAUS::Exception::recoverable,
                               "Attempt to set material without building lookup table first",
                               "MaterialModelAxialLookup::Clone");
-    std::pair<double, G4Material*> a_pair =
-                  *std::lower_bound(_lookup.begin(), _lookup.end(), z, compare);
-    MaterialModel::_material = a_pair.second;
-
+    typedef std::vector<std::pair<double, G4Material*> >::iterator iter;
+    iter a_pair = std::lower_bound(_lookup.begin(), _lookup.end(), z, compare);
+    if (a_pair != _lookup.begin())
+        a_pair--;
+    MaterialModel::_material = a_pair->second;
+    if (!IsEnabledMaterial(_material->GetName())) // URG... string comparison
+        MaterialModel::_material = NULL;
 }
 
 void MaterialModelAxialLookup::BuildLookupTable(double z_start, double z_end) {
@@ -66,6 +70,7 @@ void MaterialModelAxialLookup::BuildLookupTable(double z_start, double z_end) {
         throw MAUS::Exception(MAUS::Exception::recoverable,
                               "z_start must be less than z_end",
                               "MaterialModelAxialLookup::BuildLookupTable");
+    _lookup = std::vector<std::pair<double, G4Material*> >();
     GeometryNavigator* navigator = Globals::GetMCGeometryNavigator();
     ThreeVector dir(0., 0., 1.);
     G4Material* old_mat = NULL;

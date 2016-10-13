@@ -166,7 +166,25 @@ class TestErrorPropagation(unittest.TestCase):
         for model in ["em_rk4_forwards_static", "em_rk4_backwards_static",
                       "em_rk4_forwards_dynamic", "em_rk4_backwards_dynamic"]:
             tracking.set_tracking_model(model)
-            self.assertAlmostEqual(tracking.get_tracking_model(), model) 
+            self.assertEqual(tracking.get_tracking_model(), model) 
+        try:
+            tracking.set_tracking_model("boaty mcboatface")
+            raise ValueError("Should have thrown")
+        except RuntimeError:
+            pass
+
+
+    def test_get_set_geometry_model(self):
+        tracking = err_prop.GlobalErrorTracking()
+        for model in ["geant4", "axial_lookup", "geant4"]:
+            tracking.set_geometry_model(model)
+            self.assertEqual(tracking.get_geometry_model(), model) 
+        try:
+            tracking.set_geometry_model("boaty mcboatface")
+            raise ValueError("Should have thrown")
+        except RuntimeError:
+            pass
+
 
     def test_get_set_mcs_model(self):
         tracking = err_prop.GlobalErrorTracking()
@@ -218,7 +236,6 @@ class TestErrorPropagation(unittest.TestCase):
             tracking.set_min_step_size(1.)
             centroid_out, ellipse_out = tracking.propagate_errors(centroid, ellipse, z_max)
             self._print_output(centroid_out, ellipse_out)
-
 
     def test_tm(self):
         self._new_geometry("tests/py_unit/test_maus_cpp/fs2a_derivatives.dat")

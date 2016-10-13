@@ -29,6 +29,9 @@ void MaterialModel::SetMaterial(const G4Material* material) {
 double MaterialModel::dEdx(double E, double m, double charge) {
     // bethe bloch formula, see PDG particle data book
     // assume density effect is 0
+    if (_material == NULL) {
+        return 0.;
+    }
     double beta2 = (E*E-m*m)/E/E; // beta = p^2/E^2
     double gamma = E/m;
     double bg2 = beta2*gamma*gamma;
@@ -39,10 +42,15 @@ double MaterialModel::dEdx(double E, double m, double charge) {
     coefficient *= 0.307075*charge*charge/2/beta2*_density/cm; // 0.307075 is cm^2 per mol; _density is g/cm^3
 
     double dEdx = 0.;
-    for (size_t i = 0; i < _navigator->GetNumberOfElements(); ++i) {
-        double frac = _navigator->GetFraction(i);
-        double z_el = _navigator->GetZ(i);
-        double a_el = _navigator->GetA(i);
+    //std::cerr << "dEdX " << _material << std::endl;
+    for (size_t i = 0; i < _material->GetNumberOfElements(); ++i) {
+        //std::cerr << "element " << i << std::flush;
+        double frac = _material->GetFractionVector()[i];
+        //std::cerr << " fraction " << frac << std::flush;
+        double a_el = _material->GetElement(i)->GetA()/(g/mole);
+        //std::cerr << " a " << a_el << std::flush;
+        double z_el = _material->GetElement(i)->GetZ();
+        //std::cerr << " z " << z_el << std::endl;
         dEdx += frac*z_el/a_el*coefficient;
     }
     return -dEdx;

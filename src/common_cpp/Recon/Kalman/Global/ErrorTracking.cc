@@ -49,10 +49,10 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   gsl_odeiv_control * control = NULL;
   if (_track_model == em_forwards_dynamic ||
       _track_model == em_backwards_dynamic) {
-      if (_material == geant4) {
+      if (_geometry == geant4) {
           control = ErrorTrackingControl::gsl_odeiv_control_et_new(
                                                _min_step_size, _max_step_size);
-      } else if (_material == axial_lookup) {
+      } else if (_geometry == axial_lookup) {
           control = ErrorTrackingControlLookup::gsl_odeiv_control_lookup_et_new(
                                                _min_step_size);
       }
@@ -155,6 +155,7 @@ int ErrorTracking::EquationsOfMotion(double z,
                                            const double x[29],
                                            double dxdz[29],
                                            void* params) {
+  //std::cerr << "." << std::flush;
   if (fabs(x[7]) < _float_tolerance) {
     // z-momentum is 0
       tracking_fail << "pz " << x[7] << " was less than float tolerance " << _float_tolerance << "\n";
@@ -342,15 +343,22 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
                                                   void* params) {
     // Must be called after EMEquationOfMotion
     MaterialModel* material = NULL;
-    if (_tz_for_propagate->_material == geant4) {
+    if (_tz_for_propagate->_geometry == geant4) {
         material = new MaterialModelDynamic(x[1], x[2], x[3]);
-    } else if (_tz_for_propagate->_material == axial_lookup) {
+    } else if (_tz_for_propagate->_geometry == axial_lookup) {
         material = new MaterialModelAxialLookup(x[1], x[2], x[3]);
     } else {
         throw MAUS::Exception(Exception::recoverable,
                               "Did not recognise material model",
                               "ErrorTracking::MaterialEquationOfMotion");
     }
+    if (material->GetMaterial() == NULL) { // material is not enabled
+        delete material;
+        return GSL_SUCCESS;
+    }
+    //std::cerr << "ErrorTracking::MAterialEqueationOfMotion MaterierlaModelAxialLookup Getting material" << std::endl;
+    //std::cerr << "    x: " << x[1] << " y: " << x[2] << " z: " << x[3] << std::endl;
+    //std::cerr << "    Found name: " << material << std::flush << " " <<  material->GetMaterial() << std::flush << " " << material->GetMaterial()->GetName() << std::endl;
 
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);

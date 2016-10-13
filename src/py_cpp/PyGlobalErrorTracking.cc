@@ -570,6 +570,69 @@ static PyObject* get_tracking_model(PyObject *self, PyObject *args, PyObject *kw
     return py_track_model;
 }
 
+std::string set_geometry_model_docstring = "DOCSTRING";
+// enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
+static PyObject* set_geometry_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    static char *kwlist[] = {const_cast<char*>("model"),
+                             NULL};
+    char* geometry_model_str = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &geometry_model_str)) {
+        // error message is set in PyArg_Parse...
+        return NULL;
+    }
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    // now set the eloss model
+    ErrorTracking::GeometryModel geometry_model = ErrorTracking::geant4;
+    if (strcmp(geometry_model_str, "geant4") == 0) {
+    } else if (strcmp(geometry_model_str, "axial_lookup") == 0) {
+        geometry_model = ErrorTracking::axial_lookup;
+    } else {
+        PyErr_SetString(PyExc_RuntimeError, "Did not recognise geometry model");
+        return NULL;
+    }
+    glet->SetGeometryModel(geometry_model);
+    // return None
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+std::string get_geometry_model_docstring = "DOCSTRING";
+
+static PyObject* get_geometry_model(PyObject *self, PyObject *args, PyObject *kwds) {
+    PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
+    if (py_glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Could not resolve global error tracking");
+        return NULL;
+    }
+    ErrorTracking* glet = py_glet->tracking;
+    if (glet == NULL) {
+        PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
+        return NULL;
+    }
+    ErrorTracking::GeometryModel geometry_model = glet->GetGeometryModel();
+    PyObject* py_geometry_model = NULL;
+    switch (geometry_model) {
+        case ErrorTracking::geant4:
+            py_geometry_model = PyString_FromString("geant4");
+            break;
+        case ErrorTracking::axial_lookup:
+            py_geometry_model = PyString_FromString("axial_lookup");
+            break;
+    }
+    if (py_geometry_model != NULL)
+        Py_INCREF(py_geometry_model);
+    return py_geometry_model;
+}
+
 std::string propagate_errors_docstring = "DOCSTRING";
 
 static PyObject* propagate_errors
@@ -748,6 +811,10 @@ static PyMethodDef _methods[] = {
   METH_VARARGS|METH_KEYWORDS, set_tracking_model_docstring.c_str()},
 {"get_tracking_model", (PyCFunction)get_tracking_model,
   METH_VARARGS|METH_KEYWORDS, get_tracking_model_docstring.c_str()},
+{"get_geometry_model", (PyCFunction)get_geometry_model,
+  METH_VARARGS|METH_KEYWORDS, get_geometry_model_docstring.c_str()},
+{"set_geometry_model", (PyCFunction)set_geometry_model,
+  METH_VARARGS|METH_KEYWORDS, set_geometry_model_docstring.c_str()},
 {NULL}
 };
 

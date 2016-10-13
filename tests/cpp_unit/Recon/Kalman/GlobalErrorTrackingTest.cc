@@ -19,6 +19,7 @@
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
+#include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
 
 namespace MAUS {
@@ -610,6 +611,40 @@ TEST(ErrorTrackingTest, PropagateDriftMCSTest) {
         EXPECT_LT(fabs(x_out[i] - x_in[i]), 1e-9)
            << i << " In: " << x_in[i] << " Out: " << x_out[i] 
            << " Diff: " << x_out[i] - x_in[i];
+}
+
+TEST(ErrorTrackingTest, PropagateDriftGeometryModelTest) {
+    // Check that MCS var(px); var(py); in absence of dE/dz 
+    // through block of lead is correct
+    std::string mod = getenv("MAUS_ROOT_DIR");
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    MaterialModel::EnableMaterial("G4_Pb");
+    GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
+    ErrorTracking propagator;
+    propagator.SetMinStepSize(0.1);
+    propagator.SetMaxStepSize(1.);
+    propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
+    propagator.SetEnergyLossModel(ErrorTracking::bethe_bloch_forwards);
+    propagator.SetMCSModel(ErrorTracking::moliere_forwards);
+    propagator.SetEStragModel(ErrorTracking::no_estrag);
+    propagator.SetGeometryModel(ErrorTracking::geant4);
+    propagator.SetTrackingModel(ErrorTracking::em_forwards_dynamic);
+    std::vector<double> x_in = drift_ellipse(200., 105.658);
+    x_in[3] = -200.;
+    x_in[26] = 500.;
+    x_in[28] = 600.;
+
+    MaterialModelAxialLookup::PrintLookupTable(std::cerr);
+
+    std::vector<double> x_out_geant4 = x_in;
+    print_x(&x_out_geant4[0]);
+    propagator.Propagate(&x_out_geant4[0], 1200.);
+    print_x(&x_out_geant4[0]);
+
+    propagator.SetGeometryModel(ErrorTracking::axial_lookup);
+    std::vector<double> x_out_lookup = x_in;
+    propagator.Propagate(&x_out_lookup[0], 1200.);
+    print_x(&x_out_lookup[0]);
 }
 
 } // namespace Global

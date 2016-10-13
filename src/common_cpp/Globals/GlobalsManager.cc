@@ -26,6 +26,8 @@
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+
+#include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -106,6 +108,8 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                ->GetGeometry()->GetWorldVolume();
         process->_mc_geometry_navigator = new GeometryNavigator();
         process->_mc_geometry_navigator->Initialise(world);
+        double z_world = process->_recon_mods->propertyHep3Vector("Dimensions").z();
+        MaterialModelAxialLookup::BuildLookupTable(-z_world, z_world);
     } catch (Exception squee) {
         Globals::_process = NULL;
         delete process;
