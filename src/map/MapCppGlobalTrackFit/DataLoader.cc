@@ -101,6 +101,8 @@ void DataLoader::load_tof_detector(const MAUS::TOF0SpacePointArray& sp_vector,
 }
 
 void DataLoader::load_tof_event(TOFEvent* event) {
+    if (event == NULL)
+        return;
     TOFEventSpacePoint space_points = event->GetTOFEventSpacePoint();
 
     // Load TOF0

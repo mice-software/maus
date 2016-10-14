@@ -59,7 +59,7 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   }
   gsl_odeiv_evolve  * evolve  = gsl_odeiv_evolve_alloc(29);
   gsl_odeiv_system    system  =
-                      {ErrorTracking::EquationsOfMotion, NULL, 29, NULL};
+                            {ErrorTracking::EquationsOfMotion, NULL, 29, NULL};
 
   double z = x[3];
   _gsl_h = fabs(_min_step_size);  // ignore _step_size sign, we "auto detect"
@@ -73,14 +73,16 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   _tz_for_propagate = this;
   tracking_fail.str("");  // clear the error stream
   while(fabs(z-target_z) > _float_tolerance) {
+    //std::cerr << "z " << z << " to " << target_z << " " << _charge << " " << _gsl_h << " " << control << "\n";
+    //print(std::cerr, x);
     nsteps++;
-    // std::cerr << "step in z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
+    //std::cerr << "step in z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
     int status =  gsl_odeiv_evolve_apply
                     (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
     if (control != NULL) {
         control->type->hadjust(control->state, 0, 0, x, NULL, NULL, &_gsl_h);
     }
-    // std::cerr << "step out z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
+    //std::cerr << "step out z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
     if (nsteps > _max_n_steps) {
         tracking_fail << "Exceeded maximum number of steps\n"; 
         status = GSL_FAILURE;
@@ -181,6 +183,10 @@ int ErrorTracking::EquationsOfMotion(double z,
       return em_success;
   }
 
+  //std::cerr << "ErrorTracking::derivatives ";
+  //for (size_t i = 0; i < 8; ++i)
+  //  std::cerr << dxdz[i] << " ";
+  //std::cerr << std::endl;
   // If no material processes are active, don't run MaterialEquationsOfMotion
   // at all
   if (_tz_for_propagate->_eloss_model == no_eloss &&
@@ -212,17 +218,19 @@ int ErrorTracking::EMEquationOfMotion(double z,
   double xfield[4] = {x[1], x[2], x[3], x[0]};
   _tz_for_propagate->_field->GetFieldValue(xfield, field);
 
-  double direction = 1.;
+  double direction = -1.;
   if ((_tz_for_propagate->_track_model == em_forwards_dynamic || 
-      _tz_for_propagate->_track_model == em_backwards_dynamic) &&
+      _tz_for_propagate->_track_model == em_forwards_static) &&
       _tz_for_propagate->_gsl_h < 0.) {
+      // forwards track propagating in the backwards direction
       direction = -1.;
   } else if (_tz_for_propagate->_gsl_h > 0.) {
-      direction = -1.;
+      // backwards track propagating in the forwards direction
+      direction = +1.;
   }
+  double dir = fabs(x[7])/x[7];
   double charge = _tz_for_propagate->_charge;
   double dtdz = x[4]/x[7];
-  double dir = fabs(x[7])/x[7]; // direction of motion
   dxdz[0] = dtdz/c_l; // dt/dz
   dxdz[1] = x[5]/x[7]; // dx/dz = px/pz
   dxdz[2] = x[6]/x[7]; // dy/dz = py/pz

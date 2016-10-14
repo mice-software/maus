@@ -326,7 +326,8 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
         cls.test_dir = os.path.expandvars("${MAUS_ROOT_DIR}/tests/"+\
                    "integration/test_global_track_fitting/test_tracker_fitting")
         cls.sim = os.path.join(cls.test_dir, "fixed_field_mc.py")
-        cls.recon = os.path.join(cls.test_dir, "fixed_field_recon.py")
+        cls.tracker_recon = os.path.join(cls.test_dir, "fixed_field_tracker_recon.py")
+        cls.global_recon = os.path.join(cls.test_dir, "fixed_field_global_recon.py")
         cls.out = os.path.expandvars("${MAUS_TMP_DIR}/test_fixed_field_geometry")
         cls.log = os.path.expandvars("${MAUS_TMP_DIR}/test_fixed_field_geometry.log")
         os.chdir(cls.test_dir)
@@ -346,14 +347,20 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
                         "--configuration_file", mc_config,
                         "--output_root_file_name", self.out+suffix+"_mc.root"]
         recon_config = os.path.join("fixed_field_recon_config.py")
-        recon_proc_list = ["python", self.recon,
+        tracker_recon_proc_list = ["python", self.tracker_recon,
                         "--configuration_file", recon_config,
                         "--input_root_file_name", self.out+suffix+"_mc.root",
-                        "--output_root_file_name", self.out+suffix+"_recon.root"]
+                        "--output_root_file_name", self.out+suffix+"_tracker_recon.root"]
+        global_recon_proc_list = ["python", self.global_recon,
+                        "--configuration_file", recon_config,
+                        "--input_root_file_name", self.out+suffix+"_tracker_recon.root",
+                        "--output_root_file_name", self.out+suffix+"_global_recon.root"]
         if verbose:
             #proc = subprocess.Popen(mc_proc_list)
             #proc.wait()
-            proc = subprocess.Popen(recon_proc_list)
+            #proc = subprocess.Popen(tracker_recon_proc_list)
+            #proc.wait()
+            proc = subprocess.Popen(global_recon_proc_list)
             proc.wait()
         else:
             log = open(self.log, "w")
@@ -397,11 +404,12 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
             print "Generated data"
             for i, z in enumerate([13962., 14312., 14612., 14861., 15062.]):
                 xboa.common.clear_root()
-                analysis = TestAnalysis(self.out+suffix+"_recon.root", z, False, 10, True, suffix)
+                analysis = TestAnalysis(self.out+suffix+"_global_recon.root", z, False, 10, True, suffix)
                 tit = "#theta_{x} = "+str(qx)+"#circ "
                 tit += "#theta_{y} = "+str(qy)+"#circ "
                 tit += "~J = "+str(scale)+" "
                 self.plots(analysis, tit)
+        raw_input()
 
     def _test_mc_field(self):
         fname = "reco/MAUS-v2.5.0/mc/mc_3mm200_07469_MAUS-v250_1.root"

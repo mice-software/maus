@@ -72,15 +72,15 @@ public:
     void SetEnergyLossModel(ELossModel eloss_model) {_eloss_model = eloss_model;}
     ELossModel GetEnergyLossModel() const {return _eloss_model;}
 
-    void SetMCSModel(std::string eloss_model);
+    void SetMCSModel(std::string mcs_model);
     void SetMCSModel(MCSModel mcs_model) {_mcs_model = mcs_model;}
     MCSModel GetMCSModel() const {return _mcs_model;}
 
-    void SetEStragModel(std::string eloss_model);
+    void SetEStragModel(std::string estrag_model);
     void SetEStragModel(EStragModel estrag_model) {_estrag_model = estrag_model;}
     EStragModel GetEStragModel() const {return _estrag_model;}
 
-    void SetTrackingModel(std::string eloss_model);
+    void SetTrackingModel(std::string tracking_model);
     void SetTrackingModel(TrackingModel track_model) {_track_model = track_model;}
     TrackingModel GetTrackingModel() const {return _track_model;}
 

@@ -16,6 +16,7 @@ Single-threaded dataflows module.
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 import json
 import maus_cpp.run_action_manager
 import maus_cpp.converter
@@ -105,7 +106,12 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
 
                 # Not Python 3 compatible print() due to backward
                 # compatability. 
-                print "TRANSFORM/MERGE/OUTPUT: ",
+                time = datetime.datetime.now()
+                hour = str(time.hour).rjust(2, '0')
+                minute = str(time.minute).rjust(2, '0')
+                second = str(time.second).rjust(2, '0')
+                ms = str(time.microsecond).rjust(6, '0')
+                print "%s:%s:%s.%s TRANSFORM/MERGE/OUTPUT: " % (hour, minute, second, ms),
                 print "Processed %d events so far," % i,
                 print "%d events in buffer." % (len(map_buffer))
         except:

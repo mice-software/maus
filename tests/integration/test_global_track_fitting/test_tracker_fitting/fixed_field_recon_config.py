@@ -5,7 +5,7 @@ global_track_fits = [
     {
         "will_require_triplet_space_points":False,
         "min_step_size":0.1,
-        "max_step_size":100.,
+        "max_step_size":10.,
         "will_smooth":False,
         "mass_hypothesis":105.658,
         "charge_hypothesis":1.,

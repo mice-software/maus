@@ -21,12 +21,6 @@ def run():
     # Create an empty array of mappers, then populate it
     # with the functionality you want to use.
     my_map = MAUS.MapPyGroup()
-    # GEANT4
-    my_map.append(MAUS.MapCppMCReconSetup())  # Pre detector set up
-    # SciFi
-    my_map.append(MAUS.MapCppTrackerMCDigitization()) # SciFi electronics model
-    my_map.append(MAUS.MapCppTrackerRecon()) # SciFi Recon
-    # Global
     my_map.append(MAUS.MapCppGlobalTrackFit()) # Global track fit
 
     # Then construct a MAUS output component - filename comes from datacards
