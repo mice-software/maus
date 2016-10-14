@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-directory=root_v5.34.30
+directory=root_v5.34.36
 filename=${directory}.source.tar.gz 
-url=ftp://root.cern.ch/root/${filename}
+url=https://root.cern.ch/download/${filename}
 
 echo
-echo 'INFO: Installing third party library ROOT 5.34.30'
+echo 'INFO: Installing third party library ROOT 5.34.36'
 echo '-------------------------------------------------'
 echo
 
@@ -52,29 +52,46 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
       echo
       echo "INFO: Unpacking:"
       echo
+      rm -Rf ${MAUS_ROOT_DIR}/third_party/source/${directory}
       rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
+      mkdir ${MAUS_ROOT_DIR}/third_party/build/${directory}
       sleep 1
-      tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-      mv ${MAUS_ROOT_DIR}/third_party/build/root ${MAUS_ROOT_DIR}/third_party/build/${directory}
+      tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/source > /dev/null
+      mv ${MAUS_ROOT_DIR}/third_party/source/root ${MAUS_ROOT_DIR}/third_party/source/${directory}
+
       cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
 
       echo
       echo "INFO: Configuring:"
       echo
       sleep 1
-      x11=${MAUS_THIRD_PARTY}/third_party/install/lib/
+      # x11=${MAUS_THIRD_PARTY}/third_party/install/lib/
       # hack to find third party libraries - for ubuntu et al where they have
       # weird and wonderful library locations to support multiple architectures.
       # Sticks them in ${x11} directory
-      python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
-      ./configure --disable-xrootd --enable-gsl-shared --enable-minuit2 \
-                --enable-builtin-freetype \
-                --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
-                --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
-                --with-x11-libdir=${x11} \
-                --with-x11-libdir=${x11} \
-                --with-xft-libdir=${x11} \
-                --with-xext-libdir=${x11}
+      # python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
+
+      gcc_bin=`which gcc`
+      gxx_bin=`which g++`
+
+      cmake ${MAUS_ROOT_DIR}/third_party/source/${directory} \
+            -DCMAKE_C_COMPILER=${gcc_bin} \
+            -DCMAKE_CXX_COMPILER=${gxx_bin} \
+            -Dgsl_shared=ON \
+            -DGSL_CONFIG_EXECUTABLE=${MAUS_ROOT_DIR}/third_party/install/bin
+            -Dminuit2=ON \
+            -Dbuiltin_freetype=ON \
+            -Dx11=ON \
+            -Dxrootd=OFF
+
+#       ./configure --disable-xrootd --enable-gsl-shared --enable-minuit2 \
+#                 --enable-builtin-freetype \
+#                 --with-gsl-incdir=${MAUS_ROOT_DIR}/third_party/install/include \
+#                 --with-gsl-libdir=${MAUS_ROOT_DIR}/third_party/install/lib \
+#                 --with-x11-libdir=${x11} \
+#                 --with-x11-libdir=${x11} \
+#                 --with-xft-libdir=${x11} \
+#                 --with-xext-libdir=${x11}
 
       echo
       echo "INFO: Making:"
