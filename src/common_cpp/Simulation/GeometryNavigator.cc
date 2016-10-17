@@ -160,7 +160,7 @@ namespace MAUS {
 
   double GeometryNavigator::GetFraction(size_t element) const {
     if (element > _current_material->GetNumberOfElements()) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Lookup element was > number of elements",
                               "GeometryNavigator::GetFraction()");
     }
@@ -169,7 +169,7 @@ namespace MAUS {
 
   double GeometryNavigator::GetA(size_t element) const {
     if (element > _current_material->GetNumberOfElements()) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Lookup element was > number of elements",
                               "GeometryNavigator::GetA()");
     }
@@ -179,7 +179,7 @@ namespace MAUS {
 
   double GeometryNavigator::GetZ(size_t element) const {
     if (element > _current_material->GetNumberOfElements()) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Lookup element was > number of elements",
                               "GeometryNavigator::GetZ()");
     }

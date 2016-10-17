@@ -35,7 +35,7 @@ namespace MAUS {
 
       virtual TMatrixD CalculateMeasurementMatrix(const Kalman::State& state);
       Kalman::Measurement_base* Clone() const {
-          throw MAUS::Exception(Exception::recoverable,
+          throw Exceptions::Exception(Exceptions::recoverable,
                                 "Not implemented",
                                 "SciFiStraightTrackMeasurements::Clone");
       }
@@ -55,7 +55,7 @@ namespace MAUS {
 
       virtual TMatrixD CalculateMeasurementMatrix(const Kalman::State& state);
       Kalman::Measurement_base* Clone() const {
-          throw MAUS::Exception(Exception::recoverable,
+          throw Exceptions::Exception(Exceptions::recoverable,
                                 "Not implemented",
                                 "SciFiStraightTrackMeasurements::Clone");
       }
@@ -76,7 +76,7 @@ namespace MAUS {
 
       virtual TMatrixD CalculateMeasurementMatrix(const Kalman::State& state);
       Kalman::Measurement_base* Clone() const {
-          throw MAUS::Exception(Exception::recoverable,
+          throw Exceptions::Exception(Exceptions::recoverable,
                                 "Not implemented",
                                 "SciFiStraightTrackMeasurements::Clone");
       }

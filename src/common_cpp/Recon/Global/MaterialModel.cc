@@ -2,7 +2,7 @@
 #include "Geant4/G4Material.hh"
 
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Squeak.hh"
 
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
 

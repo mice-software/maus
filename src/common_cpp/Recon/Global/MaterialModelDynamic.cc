@@ -2,7 +2,7 @@
 #include "Geant4/G4Material.hh"
 
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Squeak.hh"
 
 #include "src/common_cpp/Recon/Global/MaterialModelDynamic.hh"
 
@@ -35,7 +35,8 @@ MaterialModelDynamic& MaterialModelDynamic::operator=(const MaterialModelDynamic
 }
 
 MaterialModelDynamic* MaterialModelDynamic::Clone() {
-    throw MAUS::Exception(MAUS::Exception::recoverable, "Not implemented", "MaterialModelDynamic::Clone");
+    throw Exceptions::Exception(Exceptions::recoverable,
+                              "Not implemented", "MaterialModelDynamic::Clone");
 }
 
 void MaterialModelDynamic::SetMaterial(double x, double y, double z) {

@@ -13,8 +13,8 @@
 #include "Geant4/G4Material.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
+#include "src/common_cpp/Utils/Squeak.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
-#include "src/legacy/Interface/Squeak.hh"
 #include "src/common_cpp/Recon/Global/MaterialModelDynamic.hh"
 #include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControl.hh"
@@ -40,9 +40,9 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
 
   _mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
   if (_mass_squared < -_float_tolerance || _mass_squared != _mass_squared) {
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "Mass undefined in stepping function",
-          "ErrorTracking::Propagate"));
+          "ErrorTracking::Propagate");
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 29);
@@ -91,9 +91,9 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
         tracking_fail << "Killing tracking with step size " <<_gsl_h
             << " at step " << nsteps << " of " << _max_n_steps << "\n";
         print(tracking_fail, x);
-        throw(MAUS::Exception(MAUS::Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                             tracking_fail.str(),
-                            "ErrorTracking::Propagate") );
+                            "ErrorTracking::Propagate");
     }
   }
   gsl_odeiv_evolve_free (evolve);
@@ -104,9 +104,9 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
 void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
   _mass_squared = x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - x[7]*x[7];
   if (_mass_squared < -_float_tolerance || _mass_squared != _mass_squared) {
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
           "Mass undefined in stepping function",
-          "ErrorTracking::Propagate"));
+          "ErrorTracking::Propagate");
   }
   const gsl_odeiv_step_type * T = gsl_odeiv_step_rk4;
   gsl_odeiv_step    * step    = gsl_odeiv_step_alloc(T, 44);
@@ -132,9 +132,9 @@ void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
                       << " at step " << nsteps
                       << " of " << _max_n_steps << "\n";
         print(tracking_fail, x);
-        throw(MAUS::Exception(MAUS::Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                             tracking_fail.str(),
-                            "ErrorTracking::Propagate") );
+                            "ErrorTracking::Propagate");
         break;
     }
     if(nsteps > _max_n_steps)
@@ -143,9 +143,9 @@ void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
                       << " at step " << nsteps << " of " << _max_n_steps << "\n"
                       << "\nExceeded maximum number of steps\n";
         print(tracking_fail, x);
-        throw(MAUS::Exception(MAUS::Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               tracking_fail.str(),
-                              "ErrorTracking::Propagate") );
+                              "ErrorTracking::Propagate");
         break;
     }
   }
@@ -358,7 +358,7 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
     } else if (_tz_for_propagate->_geometry == axial_lookup) {
         material = new MaterialModelAxialLookup(x[1], x[2], x[3]);
     } else {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Did not recognise material model",
                               "ErrorTracking::MaterialEquationOfMotion");
     }
@@ -554,7 +554,7 @@ void ErrorTracking::SetGeometryModel(std::string geometry_model) {
     } else if (geometry_model == "axial_lookup") {
         SetGeometryModel(axial_lookup);
     } else {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                           "Failed to recognise geometry model '"+geometry_model
                           +"' Should be 'geant4' or 'axial_lookup'",
                           "ErrorTracking::SetGeometryModel");

@@ -6,7 +6,6 @@
 #include "Geant4/G4Material.hh"
 
 #include "src/common_cpp/Utils/Exception.hh"
-#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
 
@@ -43,7 +42,8 @@ MaterialModelAxialLookup& MaterialModelAxialLookup::operator=(const MaterialMode
 }
 
 MaterialModelAxialLookup* MaterialModelAxialLookup::Clone() {
-    throw MAUS::Exception(MAUS::Exception::recoverable, "Not implemented", "MaterialModelDynamic::Clone");
+     throw Exceptions::Exception(Exceptions::recoverable,
+                              "Not implemented", "MaterialModelDynamic::Clone");
 }
 
 bool compare(std::pair<double, G4Material*> a_pair, double z) {
@@ -52,7 +52,7 @@ bool compare(std::pair<double, G4Material*> a_pair, double z) {
 
 void MaterialModelAxialLookup::SetMaterial(double x, double y, double z) {
     if (_lookup.size() == 0)
-        throw MAUS::Exception(MAUS::Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                               "Attempt to set material without building lookup table first",
                               "MaterialModelAxialLookup::Clone");
     typedef std::vector<std::pair<double, G4Material*> >::iterator iter;
@@ -70,7 +70,7 @@ void MaterialModelAxialLookup::SetMaterial(double x, double y, double z) {
 void MaterialModelAxialLookup::BuildLookupTable(double z_start, double z_end) {
     //Squeak::mout(Squeak::debug) << "Compliance!" << std::endl;
     if (z_end <= z_start)
-        throw MAUS::Exception(MAUS::Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                               "z_start must be less than z_end",
                               "MaterialModelAxialLookup::BuildLookupTable");
     _lookup = std::vector<std::pair<double, G4Material*> >();

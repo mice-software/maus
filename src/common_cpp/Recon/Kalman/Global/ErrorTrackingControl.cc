@@ -2,10 +2,10 @@
 
 #include "gsl/gsl_errno.h"
 
+#include "src/common_cpp/Utils/Squeak.hh"
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
-#include "src/legacy/Interface/Squeak.hh"
 
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTrackingControl.hh"
 
@@ -24,7 +24,7 @@ static void* et_control_alloc() {
     et_control_state_t* state =
         static_cast<et_control_state_t *> (malloc (sizeof(et_control_state_t)));
     if (state == NULL) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Failed to allocate memory for et_control",
                               "ErrorTrackingControlType::et_control_alloc");
     }
@@ -34,7 +34,7 @@ static void* et_control_alloc() {
 static int et_control_init(void* vstate, double min_step_size, 
                            double max_step_size, double dummy2, double dummy3) {
     if (max_step_size < 0) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "et_control must have positive step size",
                               "ErrorTrackingControlType::et_control_init");
     }
@@ -102,7 +102,7 @@ gsl_odeiv_control* gsl_odeiv_control_et_new(double min_step_size,
     int status = gsl_odeiv_control_init(control, min_step_size, max_step_size, 0., 0.);
     if (status != GSL_SUCCESS) {
         gsl_odeiv_control_free (control);
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                              "Failed to initialise error tracking control",
                              "ErrorTrackingControlType::gsl_odeiv_control_et_new");
     }
