@@ -73,3 +73,4 @@ bin/user/poly_patch/poly_patch
 src/map/MapPyBeamlineSimulation/G4bl/maps/TypeIBend_6InchGap_tapered.map
 bin/user/fit_fields/plots/*.root
 bin/user/fit_fields/plots/*.png
+tests/integration/test_global_track_fitting/test_tracker_fitting/geometry_07469/*
