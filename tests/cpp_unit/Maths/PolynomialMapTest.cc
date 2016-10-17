@@ -25,7 +25,7 @@
 #include "CLHEP/Matrix/Matrix.h"
 
 #include "Config/ModuleConverter.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Interface/Differentiator.hh"
 #include "Interface/Interpolator.hh"
 #include "Maths/Matrix.hh"
@@ -51,16 +51,16 @@ class PolynomialMapTest : public ::testing::Test {
     Vector<double> valueMV(3, 0);
     Vector<double> pointMV(2, 0);
     for (int i = 1; i <= 2; i++) pointMV(i) = point[i-1];
-    Squeak::mout(Squeak::debug) << "PolyVectorFTest" << std::endl;
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "PolyVectorFTest" << std::endl;
     polynomial_map->F(pointMV, valueMV);
-    Squeak::mout(Squeak::debug) << "PolyVectorFTest" << std::endl;
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "PolyVectorFTest" << std::endl;
     for (int i = 0; i < 3; i++) {
       testpass &= fabs(valueMV(i+1) - answer[i]) < 1e-9;
     }
     for (int i = 0; i < 3; i++) {
-      Squeak::mout(Squeak::debug) << valueMV(i+1) << " ";
+      MAUS::Squeak::mout(MAUS::Squeak::debug) << valueMV(i+1) << " ";
     }
-    Squeak::mout(Squeak::debug) << "Hep F(*, *) " << testpass << std::endl;
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Hep F(*, *) " << testpass << std::endl;
 
     std::vector<double> valueVec(3, -2);
     std::vector<double> pointVec(2, 0);
@@ -70,9 +70,9 @@ class PolynomialMapTest : public ::testing::Test {
       testpass &= fabs(valueVec[i] - answer[i]) < 1e-9;
     }
     for (int i = 0; i < 3; i++) {
-      Squeak::mout(Squeak::debug) << valueVec[i] << " ";
+      MAUS::Squeak::mout(MAUS::Squeak::debug) << valueVec[i] << " ";
     }
-    Squeak::mout(Squeak::debug) << "Vec F(*, *) " << testpass << std::endl;
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Vec F(*, *) " << testpass << std::endl;
 
     return testpass;
   }
@@ -156,7 +156,7 @@ TEST_F(PolynomialMapTest, MapEvaluation) {
 
 
   for (int i = 0; i < 5; i++) {
-    Squeak::mout(Squeak::debug)
+    MAUS::Squeak::mout(MAUS::Squeak::debug)
       << "nPCoeffs(3, " << i << ") "
       << PolynomialMap::NumberOfPolynomialCoefficients(3, i) << std::endl;
   }
@@ -166,15 +166,15 @@ TEST_F(PolynomialMapTest, MapEvaluation) {
     std::vector<int> indexP = PolynomialMap::IndexByPower(i, 3);
     std::vector<int> indexV = PolynomialMap::IndexByVector(i, 3);
 
-    Squeak::mout(Squeak::debug) << std::setw(5) << i << "   *|* ";
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << std::setw(5) << i << "   *|* ";
     for (size_t j = 0; j < indexP.size(); j++) {
-      Squeak::mout(Squeak::debug) << std::setw(5) << indexP[j] << " ";
+      MAUS::Squeak::mout(MAUS::Squeak::debug) << std::setw(5) << indexP[j] << " ";
     }
-    Squeak::mout(Squeak::debug) << "  *|*  ";
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "  *|*  ";
     for (size_t j = 0; j < indexV.size(); j++) {
-      Squeak::mout(Squeak::debug) << std::setw(5) << indexV[j] << " ";
+      MAUS::Squeak::mout(MAUS::Squeak::debug) << std::setw(5) << indexV[j] << " ";
     }
-    Squeak::mout(Squeak::debug) << std::endl;
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << std::endl;
   }
 }
 
@@ -207,7 +207,7 @@ TEST_F(PolynomialMapTest, PointBox) {
     }
     if (!on_edge) {
       for (size_t j = 0; j < ps[i].size(); j++) {
-        Squeak::mout(Squeak::debug) << ps[i][j] << " ";
+        MAUS::Squeak::mout(MAUS::Squeak::debug) << ps[i][j] << " ";
       }
     }
     ASSERT_TRUE(on_edge);
@@ -229,7 +229,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   for (int i = 0; i < 10; i++) {
@@ -255,7 +255,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // in[i] size != point dimension
@@ -265,7 +265,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // out[i] size != value dimension
@@ -276,7 +276,7 @@ TEST_F(PolynomialMapTest, GetAvgChi2OfDifference) {
   try {
     pvec.GetAvgChi2OfDifference(in, out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 
@@ -341,7 +341,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFittingErrorHandling) {
   // Check that the error matrix term does *something* (anything) and handles
   // correctly bad input (throws)
   // Maths is checked in python tests... as it requires high stats
-  Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest" << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "PolynomialLeastSquaresTest" << std::endl;
   int               nX   = 4;
   int               nY   = 4;
   int               nZ   = 4;
@@ -400,34 +400,32 @@ TEST_F(PolynomialMapTest, LeastSquaresFittingErrorHandling) {
 
   Matrix<double> errs2(n_coeffs, n_coeffs-1, 0.);
   EXPECT_THROW(PolynomialMap::PolynomialLeastSquaresFit(
-        points, values, 1, weightFunction, errs2), MAUS::Exception);
+        points, values, 1, weightFunction, errs2), MAUS::Exceptions::Exception);
   Matrix<double> errs3(n_coeffs-1, n_coeffs, 0.);
   EXPECT_THROW(PolynomialMap::PolynomialLeastSquaresFit(
-        points, values, 1, weightFunction, errs3), MAUS::Exception);
-}
-
-CLHEP::HepMatrix get_matrix(size_t n_rows, size_t n_cols) {
-  double mat_arr[] = {1., 2., 7., 13., 200., 500., 800., 1100., 1400., 1700.,
-                      1., 3., 8., 14., 300., 600., 900., 1200., 1500., 1800.,
-                      1., 4., 9., 15., 400., 700., 1000., 1300., 1600., 1900.};
-  CLHEP::HepMatrix mat(n_rows, n_cols, 0);
-  size_t k = 0;
-  for (size_t i = 0; i < n_rows && i < 3; ++i)
-      for (size_t j = 0; j < n_cols && j < 10; ++j) {
-          mat[i][j] = mat_arr[k];
-          ++k;
-      }
-  return mat;
+        points, values, 1, weightFunction, errs3), MAUS::Exceptions::Exception);
 }
 
 TEST_F(PolynomialMapTest, LeastSquaresFitting) {
-  Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest" << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "PolynomialLeastSquaresTest" << std::endl;
   int               nX   = 4;
   int               nY   = 4;
   int               nZ   = 4;
+  CLHEP::HepMatrix mat(3, 4, 0);
+  mat[0][0] = 1.;
+  mat[1][0] = 4.;
+  mat[2][0] = 1.;
+  mat[0][1] = 2.;
+  mat[1][1] = 3.;
+  mat[2][1] = 2.;
+  mat[0][2] = 7.;
+  mat[1][2] = 11.;
+  mat[2][2] = 7.;
+  mat[0][3] = 13.;
+  mat[1][3] = 3.;
+  mat[2][3] = 13.;
 
   VectorMap* weightFunction = NULL;
-  CLHEP::HepMatrix mat = get_matrix(3, 4);
 
   PolynomialMap* vecF = new PolynomialMap(3, Matrix<double>(mat));
   std::vector< std::vector<double> > points(nX*nY*nZ, std::vector<double>(3));
@@ -461,7 +459,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
 
   bool testpass = true;
 
-  Squeak::mout(Squeak::debug) << "Input" << mat << "Output" << recCoeff
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "Input" << mat << "Output" << recCoeff
                               << std::endl;
   for (int i = 0; i < recCoeff.num_row(); i++)
     for (int j = 0; j < recCoeff.num_col(); j++)
@@ -485,7 +483,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
   EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
 
   recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
-  Squeak::mout(Squeak::debug) << "Weighted Input" << mat << "Weighted Output"
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "Weighted Input" << mat << "Weighted Output"
                               << recCoeff << std::endl;
   for (int i = 0; i < recCoeff.num_row(); i++)
     for (int j = 0; j < recCoeff.num_col(); j++)
@@ -520,14 +518,60 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
   EXPECT_TRUE(testpass);
 
   testpass = true;
+  // now take some of the input values, try for a constrained fit
+  PolynomialMap Constraint(2, Matrix<double>(mat.sub(1, 2, 1, 3)));
+  std::vector<PolynomialMap::PolynomialCoefficient> coeffs
+    = Constraint.GetCoefficientsAsVector();
+  for (int i = 0; i < 2; i++)
+    coeffs.erase(coeffs.begin());
+  PolynomialMap* constraintPVec = new PolynomialMap(coeffs);
+  pVec = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+    points, values, 1, constraintPVec->GetCoefficientsAsVector(), weights);
 
+  // polynomial order should be 1
+  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
+
+  // with polynomial order 1, the number of poly. coeff. is just the number of
+  // variables plus one for the constant term
+  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
+
+  recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "Constrained Input\n" << *constraintPVec
+                              << "Constrained Output\n" << *pVec << std::endl;
+  for (int i = 0; i < recCoeff.num_row(); i++)
+    for (int j = 0; j < recCoeff.num_col(); j++)
+      if (fabs(recCoeff[i][j] - mat[i][j]) > 1e-6) testpass = false;
+  delete pVec;
+  EXPECT_TRUE(testpass);
+
+  // bad points size
+  testpass = true;
+  try {
+    const std::vector< std::vector<double> > bad_points;
+    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+      bad_points, values,
+      1, constraintPVec->GetCoefficientsAsVector(), weights);
+    testpass = false;
+  } catch (MAUS::Exceptions::Exception exc) {}
+  ASSERT_TRUE(testpass);
+
+  // bad values size
+  testpass = true;
+  try {
+    const std::vector< std::vector<double> > bad_values;
+    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
+      points, bad_values,
+      1, constraintPVec->GetCoefficientsAsVector(), weights);
+    testpass = false;
+  } catch (MAUS::Exceptions::Exception exc) {}
+  ASSERT_TRUE(testpass);
 
   testpass = true;
   // should return a copy of
   double mat2[] = {1., 2., 7., 13., 200., 500., 800., 1100., 1400., 1700.,
                    1., 3., 8., 14., 300., 600., 900., 1200., 1500., 1800.,
                    1., 4., 9., 15., 400., 700., 1000., 1300., 1600., 1900.};
-  Squeak::mout(Squeak::debug) << "Chi2SweepingLeastSquaresFit" << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "Chi2SweepingLeastSquaresFit" << std::endl;
   PolynomialMap* testF
     = new PolynomialMap(3, Matrix<double>(3, 10, mat2));
   std::vector<double> delta(3);
@@ -541,7 +585,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
 
   if (pVec == NULL) {
     testpass = false;
-    Squeak::mout(Squeak::debug) << "Failed to make PolynomialMap when "
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Failed to make PolynomialMap when "
                                 << "PolynomialMap expected " << pVec
                                 << std::endl;
   } else {
@@ -552,7 +596,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     for (size_t i = 1; i <= o2.number_of_rows(); i++)
       for (size_t j = 1; j <= o2.number_of_columns(); j++)
         testpass &= fabs(o1(i, j) - o2(i, j)) < 1e-2;
-    Squeak::mout(Squeak::debug) << "Input should be same as output\nInput\n"
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Input should be same as output\nInput\n"
                                 << *testF
                                 << "Output\n" << *pVec << " testpass "
                                 << testpass << std::endl;
@@ -573,7 +617,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
 
   if (pVec == NULL) {
     testpass = false;
-    Squeak::mout(Squeak::debug) << "Failed to make PolynomialMap when "
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Failed to make PolynomialMap when "
                                 << "PolynomialMap expected " << pVec
                                 << std::endl;
   } else {
@@ -591,7 +635,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     for (size_t i = 1; i <= o1.number_of_rows(); i++)
       for (size_t j = 1; j <= o1.number_of_columns(); j++)
         testpass &= fabs(o1(i, j) - o2(i, j)) < 1e-6;
-    Squeak::mout(Squeak::debug) << "Input should be same as output\nInput\n"
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Input should be same as output\nInput\n"
                                 << *testF << "Output\n" << *pVec
                                 << " testpass " << testpass << std::endl;
   }
@@ -609,7 +653,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
 
   if (pVec != NULL)
     testpass = false;
-  Squeak::mout(Squeak::debug) << "Should be NULL " << pVec << " testpass "
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "Should be NULL " << pVec << " testpass "
                               << testpass << std::endl;
   EXPECT_TRUE(testpass);
 
@@ -625,7 +669,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     1., 4., 9.e6, 15.e3, 400., 700.e6, 1000.e3, 1300.e12, 1600.e9, 1900.e6};
   PolynomialMap* testF2
     = new PolynomialMap(3, Matrix<double>(3, 10, mat3));
-  Squeak::mout(Squeak::debug) << "Chi2SweepingLeastSquaresFitVariableWalls"
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "Chi2SweepingLeastSquaresFitVariableWalls"
                               << std::endl;
   // delta.push_back(0.);
   delta[0] = 1e-50;
@@ -642,11 +686,11 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
   // the number of poly. coeff. is (3+2)!/(3!2!) = 10
   EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(10));
 
-  Squeak::mout(Squeak::debug) << "delta variable walls: ";
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "delta variable walls: ";
   for (size_t i = 0; i < delta.size(); i++) {
-    Squeak::mout(Squeak::debug) << delta[i] << " ";
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << delta[i] << " ";
   }
-  Squeak::mout(Squeak::debug) << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << std::endl;
   delta[0] = 1e-50;
   delta[1] = 1e-50;
   delta[2] = 1e-50;
@@ -654,13 +698,13 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     *testF2, 2, std::vector< PolynomialMap::PolynomialCoefficient >(),
     1e-20, delta, 10., 100);
 
-  Squeak::mout(Squeak::debug) << "delta fixed walls:    ";
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "delta fixed walls:    ";
   for (size_t i = 0; i < delta.size(); i++) {
-    Squeak::mout(Squeak::debug) << delta[i] << " ";
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << delta[i] << " ";
   }
-  Squeak::mout(Squeak::debug) << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << std::endl;
   if (pVec == NULL) {
-    Squeak::mout(Squeak::debug) << "Error - "
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Error - "
                                 << "Chi2SweepingLeastSquaresFitVariableWalls "
                                 << "returns " << pVec << std::endl;
     testpass = false;
@@ -672,7 +716,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     // the number of poly. coeff. is (3+2)!/(3!2!) = 10
     EXPECT_EQ(pVec2->NumberOfPolynomialCoefficients(), static_cast<size_t>(10));
 
-    Squeak::mout(Squeak::debug) << "Input should be same as output\nInput\n"
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Input should be same as output\nInput\n"
                                 << *testF2
                                 << "Output\n" << *pVec
                                 << "For comparison, using normal algorithm\n"
@@ -694,7 +738,7 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
     }
   }
   if (pVec != NULL) delete pVec;
-  Squeak::mout(Squeak::debug) << "testpass " << testpass << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "testpass " << testpass << std::endl;
   EXPECT_TRUE(testpass);
 
   testpass = true;
@@ -709,102 +753,12 @@ TEST_F(PolynomialMapTest, LeastSquaresFitting) {
 
   if (pVec != NULL)
     testpass = false;
-  Squeak::mout(Squeak::debug) << "Should be NULL " << pVec << std::endl;
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "Should be NULL " << pVec << std::endl;
 
   delete testF;
-  Squeak::mout(Squeak::debug) << "PolynomialLeastSquaresTest " << *testF2
+  MAUS::Squeak::mout(MAUS::Squeak::debug) << "PolynomialLeastSquaresTest " << *testF2
                               << testpass << std::endl;
   EXPECT_TRUE(testpass);
-}
-
-TEST_F(PolynomialMapTest, ConstrainedPolynomialLeastSquaresFit) {
-  CLHEP::HepMatrix mat = get_matrix(3, 10);
-  int               nX   = 4;
-  int               nY   = 4;
-  int               nZ   = 4;
-  bool testpass = true;
-
-  PolynomialMap* vecF = new PolynomialMap(3, Matrix<double>(mat));
-  std::vector< std::vector<double> > points(nX*nY*nZ, std::vector<double>(3));
-  std::vector< std::vector<double> > values(nX*nY*nZ, std::vector<double>(3));
-  std::vector<double>                weights(nX*nY*nZ, 1);
-  for (int i = 0; i < nX; i++)
-    for (int j = 0; j < nY; j++)
-      for (int k = 0; k < nZ; k++) {
-        int a = k+j*nZ + i*nY*nZ;
-        points[a][0] = i/static_cast<double>(nX)*105.;
-        points[a][1] = j/static_cast<double>(nY)*201.;
-        points[a][2] = k/static_cast<double>(nZ)*105.;
-        vecF->F(&points[a][0], &values[a][0]);
-      }
-
-  // now take some of the input values, try for a constrained fit
-  PolynomialMap Constraint(2, Matrix<double>(mat.sub(1, 2, 1, 8)));
-  std::vector<PolynomialMap::PolynomialCoefficient> coeffs
-                                         = Constraint.GetCoefficientsAsVector();
-  for (int i = 0; i < 2; i++)
-      coeffs.erase(coeffs.begin());
-  PolynomialMap* constraintPVec = new PolynomialMap(coeffs);
-
-  PolynomialMap* pVec = PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
-         points, values, 2, constraintPVec->GetCoefficientsAsVector(), weights);
-
-  // polynomial order should be 1
-  EXPECT_EQ(pVec->PolynomialOrder(), static_cast<size_t>(1));
-
-  // with polynomial order 1, the number of poly. coeff. is just the number of
-  // variables plus one for the constant term
-  EXPECT_EQ(pVec->NumberOfPolynomialCoefficients(), static_cast<size_t>(4));
-
-  std::cerr << "Constraints" << std::endl;
-  for (size_t i = 0; i < constraintPVec->GetCoefficientsAsVector().size(); ++i) {
-      PolynomialMap::PolynomialCoefficient coeff =
-                                   constraintPVec->GetCoefficientsAsVector()[i];
-      std::cerr << "    out: " << coeff.OutVariable() << " in: " << std::flush;
-      // note we deal with case where size == 0 als
-      for (size_t j = 0; j < 3; ++j) {
-          if (j < coeff.InVariables().size())
-              std::cerr << coeff.InVariables()[j];
-          else
-              std::cerr << "-";
-          std::cerr << ".";
-      }
-      std::cerr << " coefficient " << coeff.Coefficient() << std::endl;;
-  }
-
-  Squeak::mout(Squeak::error) << "Constrained Input\n" << *vecF
-                              << "Constrained Output\n" << *pVec << std::endl;
-  CLHEP::HepMatrix recCoeff = MAUS::CLHEP::HepMatrix(pVec->GetCoefficientsAsMatrix());
-  for (int i = 0; i < recCoeff.num_row(); i++)
-    for (int j = 0; j < recCoeff.num_col(); j++)
-      if (fabs(recCoeff[i][j] - mat[i][j]) > 1e-6) testpass = false;
-  EXPECT_TRUE(testpass);
-
-  // bad points size
-  testpass = true;
-  try {
-    const std::vector< std::vector<double> > bad_points;
-    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
-      bad_points, values,
-      1, constraintPVec->GetCoefficientsAsVector(), weights);
-    testpass = false;
-  } catch (MAUS::Exception exc) {}
-  ASSERT_TRUE(testpass);
-
-  // bad values size
-  testpass = true;
-  try {
-    const std::vector< std::vector<double> > bad_values;
-    PolynomialMap::ConstrainedPolynomialLeastSquaresFit(
-      points, bad_values,
-      1, constraintPVec->GetCoefficientsAsVector(), weights);
-    testpass = false;
-  } catch (MAUS::Exception exc) {}
-  ASSERT_TRUE(testpass);
-  delete constraintPVec;
-  delete vecF;
-  delete pVec;
-
 }
 
 TEST_F(PolynomialMapTest, SpaceTransform) {
@@ -832,7 +786,7 @@ TEST_F(PolynomialMapTest, SpaceTransform) {
   try {
     coefficient.SpaceTransform(space_in, space_out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   // out variable not in space mapping
@@ -842,7 +796,7 @@ TEST_F(PolynomialMapTest, SpaceTransform) {
   try {
     coefficient.SpaceTransform(space_in, space_out);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 
@@ -902,7 +856,7 @@ TEST_F(PolynomialMapTest, UnmakePolynomialVector) {
   try {
     polynomial_map_->UnmakePolynomialVector(polynomial_vector, wrong_size_point);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 
   double polynomial_vector_data[polynomial_vector.size()];
@@ -937,7 +891,7 @@ TEST_F(PolynomialMapTest, RecentredNotSupported) {
     double * point = NULL;
     polynomial_map_->Recentred(point);
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }
 
@@ -946,6 +900,6 @@ TEST_F(PolynomialMapTest, InverseNotSupported) {
   try {
     polynomial_map_->Inverse();
     testpass = false;
-  } catch (MAUS::Exception exc) {}
+  } catch (MAUS::Exceptions::Exception exc) {}
   ASSERT_TRUE(testpass);
 }

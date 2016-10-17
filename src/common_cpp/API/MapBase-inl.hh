@@ -18,7 +18,7 @@
 #define _SRC_COMMON_CPP_API_MAPBASE_INL_
 
 #include <string>
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/API/APIExceptions.hh"
 #include "src/common_cpp/Utils/PyObjectWrapper.hh"
 #include "src/common_cpp/Utils/Exception.hh"
@@ -45,14 +45,14 @@ namespace MAUS {
     try {
         cpp_data = PyObjectWrapper::unwrap<TYPE>(py_input);
         _process(cpp_data);
-    } catch (MAUS::Exception& exc) {
+    } catch (MAUS::Exceptions::Exception& exc) {
         Squeak::mout(Squeak::debug) << "Stack trace:" << exc.GetStackTrace()
                                                                    << std::endl;
         HandleException(&cpp_data, &exc, _classname);
     } catch (std::exception& exc) {
         HandleException(&cpp_data, &exc, _classname);
     } catch (...) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         _classname+" threw an unhandled exception",
                         "MapBase::process_pyobj");
     }

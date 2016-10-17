@@ -1225,5 +1225,83 @@ int DBBChainCppDataProcessor::Process(MDdataContainer* aFragPtr) {
 void DBBChainCppDataProcessor::fill_daq_data() {
   _daq_data->GetEMRDaqPtr()->SetDBBArray(_spill);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+int TriggerEngineCppDataProcessor::Process(MDdataContainer* aFragPtr) {
+  /**
+   * Cast the argument to structure it points to.
+   * This process should be called only with MDfragmentV1495 argument.
+   */
+//   cerr << "This is TriggerEngineCppDataProcessor::Process " << endl;
+
+  if ( typeid(*aFragPtr) != typeid(MDfragmentV1495) ) return CastError;
+  MDfragmentV1495* xV1495Fragment = static_cast<MDfragmentV1495*>(aFragPtr);
+
+  if ( !xV1495Fragment->IsValid() )
+    return GenericError;
+
+  _tr_spill.SetLdcId(this->GetLdcId());
+  _tr_spill.SetTimeStamp(this->GetTimeStamp());
+  _tr_spill.SetPhysEventNumber(this->GetPhysEventNumber());
+
+  ParticleTrigger xPT;
+  int nTr = xV1495Fragment->GetNumTriggers();
+  for (int i = 0; i < nTr; ++i) {
+    xPT.SetTimeStamp(xV1495Fragment->GetTriggerTime(i));
+    xPT.SetTof0Pattern(xV1495Fragment->GetPatternTOF0(i));
+    xPT.SetTof1Pattern(xV1495Fragment->GetPatternTOF1(i));
+    xPT.SetTof2Pattern(xV1495Fragment->GetPatternTOF2(i));
+    _tr_spill.GetParticleTriggerArrayPtr()->push_back(xPT);
+  }
+
+  return OK;
+}
+
+void TriggerEngineCppDataProcessor::fill_daq_data() {
+  _daq_data->SetTriggerEngine(_tr_spill);
+}
+
+void TriggerEngineCppDataProcessor::reset() {
+  _tr_spill.GetParticleTriggerArrayPtr()->clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int EpicsInterfaceCppDataProcessor::Process(MDdataContainer* aFragPtr) {
+  /**
+   * Cast the argument to structure it points to.
+   * This process should be called only with MDfragmentEpicsInterface argument.
+   */
+//   cerr << "This is EpicsInterfaceCppDataProcessor::Process " << endl;
+
+  if ( typeid(*aFragPtr) != typeid(MDfragmentEI) ) return CastError;
+  MDfragmentEI* xEIFragment = static_cast<MDfragmentEI*>(aFragPtr);
+
+  if ( !xEIFragment->IsValid() )
+    return GenericError;
+
+  _ei_spill.SetLdcId(this->GetLdcId());
+  _ei_spill.SetGeo(xEIFragment->GetGeo());
+  _ei_spill.SetPhysEventNumber(this->GetPhysEventNumber());
+
+  int nPVs = xEIFragment->GetNPVs();
+  for (int i = 0; i < nPVs; ++i) {
+    _ei_spill.AddHallProbe(xEIFragment->GetPvId(i),
+                           xEIFragment->GetPvValue(i));
+  }
+
+  return OK;
+}
+
+void EpicsInterfaceCppDataProcessor::fill_daq_data() {
+  _daq_data->SetEpicsInterface(_ei_spill);
+}
+
+void EpicsInterfaceCppDataProcessor::reset() {
+  _ei_spill.GetPvIdArrayPtr()->clear();
+  _ei_spill.GetPvValueArrayPtr()->clear();
+}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////

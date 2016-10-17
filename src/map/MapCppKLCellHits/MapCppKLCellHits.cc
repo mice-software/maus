@@ -19,7 +19,7 @@
 #include <string>
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 #include "Config/MiceModule.hh"
@@ -47,7 +47,7 @@ void MapCppKLCellHits::_birth(const std::string& argJsonConfigDocument) {
 
   // get the geometry
   if (!configJSON.isMember("reconstruction_geometry_filename"))
-      throw(Exception(Exception::recoverable,
+      throw(Exceptions::Exception(Exceptions::recoverable,
                    "Could not find geometry file",
                    "MapCppKLCellHits::birth"));
   std::string filename;

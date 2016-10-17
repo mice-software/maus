@@ -16,20 +16,20 @@
  */
 
 #include "Utils/DAQChannelMap.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Globals/PyLibMausCpp.hh"
 
 namespace MAUS {
 
 ////////////////////////////////////////////////////////////
 
-DAQChannelKey::DAQChannelKey(std::string keyStr) throw(Exception) {
+DAQChannelKey::DAQChannelKey(std::string keyStr) throw(Exceptions::Exception) {
   std::stringstream xConv;
   try {
     xConv << keyStr;
     xConv >> (*this);
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "DAQChannelKey::DAQChannelKey(std::string)"));
   }
@@ -68,12 +68,12 @@ std::ostream& operator<<( std::ostream& stream, const DAQChannelKey key ) {
   return stream;
 }
 
-std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) throw(Exception) {
+std::istream& operator>>( std::istream& stream, DAQChannelKey &key ) throw(Exceptions::Exception) {
   std::string xLabel;
   stream >> xLabel >> key._ldcId >> key._geo >> key._channel >> key._eqType >> key._detector;
 
   if (xLabel != "DAQChannelKey") {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "istream& operator>>(istream&, DAQChannelKey)"));
   }
@@ -116,7 +116,7 @@ bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
                                    JsonWrapper::stringValue).asString();
 
   if (_cabling_source != "CDB" && _cabling_source != "file")
-      throw(MAUS::Exception(Exception::recoverable,
+      throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                   std::string("DAQChannelMap::InitFromCards"),
                   "Invalid DAQ_cabling_source card"));
 
@@ -125,7 +125,7 @@ bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
                                              JsonWrapper::stringValue).asString();
 
   if (_daq_cabling_by != "run_number" && _daq_cabling_by != "date")
-      throw(MAUS::Exception(Exception::recoverable,
+      throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                   std::string("DAQChannelMap::InitFromCards"),
                   "Invalid DAQ_cabling_by card"));
 
@@ -178,7 +178,7 @@ bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
             << std::endl;
             Squeak::mout(Squeak::error)
             << "Did you try running: source env.sh ?" << std::endl;
-            throw(MAUS::Exception(Exception::recoverable,
+            throw(MAUS::Exceptions::Exception(Exceptions::recoverable,
                         "STRING", "DAQChannelMap::_InitFromCards"));
       }
       // Initialize the map by using text file.
@@ -205,7 +205,7 @@ bool DAQChannelMap::InitFromFile(std::string filename) {
       _chKey.push_back(key);
       lineNum++;
     }
-  }catch(Exception e) {
+  }catch(Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in DAQChannelMap::InitFromFile : Error during loading." << std::endl
     << "in file : " << filename << " line " << lineNum
@@ -236,7 +236,7 @@ bool DAQChannelMap::InitFromCurrentCDB() {
       _chKey.push_back(key);
       lineNum++;
     }
-  } catch (MAUS::Exception e) {
+  } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in DAQChannelMap::InitFromCDB : Error during loading map." << std::endl
     << e.GetMessage() << std::endl;
@@ -263,7 +263,7 @@ bool DAQChannelMap::InitFromCDB() {
       _chKey.push_back(key);
       lineNum++;
     }
-  } catch (MAUS::Exception e) {
+  } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error in DAQChannelMap::InitFromCDB : Error during loading map." << std::endl
     << e.GetMessage() << std::endl;
@@ -297,8 +297,8 @@ DAQChannelKey* DAQChannelMap::find(std::string daqKeyStr) {
   try {
     xKeyConv << daqKeyStr;
     xKeyConv >> xKey;
-  }catch(Exception e) {
-    throw(Exception(Exception::recoverable,
+  }catch(Exceptions::Exception e) {
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  std::string("corrupted DAQ Channel Key"),
                  "DAQChannelKey::DAQChannelKey(std::string)"));
   }
@@ -361,19 +361,19 @@ void DAQChannelMap::GetCabling(std::string devname) {
       py_arg = Py_BuildValue("(si)", devname.c_str(), runNumber);
       _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling_for_run");
   } else {
-      throw(MAUS::Exception(MAUS::Exception::recoverable,
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                      "Invalid daq_cabling_by type "+_daq_cabling_by,
                      "DAQChannelMap::GetCalib"));
   }
 
   if (_get_cabling_func == NULL)
-      throw(MAUS::Exception(MAUS::Exception::recoverable,
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                      "Failed to find get_calib function",
                      "DAQChannelMap::GetCalib"));
 
   if (py_arg == NULL) {
     PyErr_Clear();
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
               "Failed to resolve arguments to get_cabling",
               "MAUSEvaluator::evaluate"));
     }
@@ -386,7 +386,7 @@ void DAQChannelMap::GetCabling(std::string devname) {
     if (py_value == NULL) {
         PyErr_Clear();
         Py_XDECREF(py_arg);
-        throw(MAUS::Exception(MAUS::Exception::recoverable,
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                      "Failed to parse argument "+devname,
                      "GetCalib::get_calib"));
     }

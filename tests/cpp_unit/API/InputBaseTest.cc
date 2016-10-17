@@ -47,8 +47,8 @@ namespace MAUS {
 
   private:
     virtual int* _emit_cpp() {
-      throw MAUS::Exception(MAUS::Exception::recoverable,
-                   "Expected Test MAUS::Exception in _emit_cpp",
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
+                   "Expected Test MAUS::Exceptions::Exception in _emit_cpp",
                    "int* _emit_cpp()");
     }
   };
@@ -129,7 +129,7 @@ namespace MAUS {
     catch (NoInputException& e) {}  // A MAUS exception stops the inputter
     catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: MAUS::Exception should have been handled"
+        << "Fail: MAUS::Exceptions::Exception should have been handled"
         << std::endl;
     }
 
@@ -141,7 +141,7 @@ namespace MAUS {
     catch (NoInputException& e) {}  // A MAUS exception stops the inputter
     catch (...) {
       ASSERT_TRUE(false)
-        << "Fail: MAUS::Exception should have been handled"
+        << "Fail: MAUS::Exceptions::Exception should have been handled"
         << std::endl;
     }
 

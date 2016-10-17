@@ -74,18 +74,18 @@ int Data::GetSizeOf() const {
 void Data::IncreaseRefCount() {
     _reference_count++;
     if (_reference_count > _max_reference_count) {
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Too many data references",
                         "Data::IncreaseRefCount");
     }
 //    std::cerr << "Data " << this << " ref: " << _reference_count << std::endl;
-//    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
+//    std::cerr << MAUS::Exceptions::Exception().MakeStackTrace(1) << std::endl;
 }
 
 void Data::DecreaseRefCount() {
     _reference_count--;
 //    std::cerr << "~Data " << this << " ref: " << _reference_count << std::endl;
-//    std::cerr << MAUS::Exception().MakeStackTrace(1) << std::endl;
+//    std::cerr << MAUS::Exceptions::Exception().MakeStackTrace(1) << std::endl;
 }
 }
 

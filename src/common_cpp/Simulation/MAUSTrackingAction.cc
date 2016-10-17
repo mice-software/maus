@@ -65,7 +65,7 @@ void MAUSTrackingAction::PreUserTrackingAction(const G4Track* aTrack) {
 void MAUSTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
     if (_keepTracks && aTrack) {
         if (_tracks->back().GetTrackId() != aTrack->GetTrackID()) {
-            throw MAUS::Exception(Exception::recoverable,
+            throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                          "Track ID misalignment",
                          "MAUSTrackingAction::PostUserTrackingAction");
         }

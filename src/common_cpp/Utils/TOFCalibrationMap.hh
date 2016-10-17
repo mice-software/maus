@@ -34,7 +34,7 @@
 #include "json/json.h"
 #include "Utils/TOFChannelMap.hh"
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 
 namespace MAUS {
@@ -52,7 +52,7 @@ class TOFPixelKey {
   TOFPixelKey(int st, int slX, int slY, string d)
   :_station(st), _slabX(slX), _slabY(slY), _detector(d) {}
 
-  explicit TOFPixelKey(string keyStr) throw(Exception);
+  explicit TOFPixelKey(string keyStr) throw(Exceptions::Exception);
 
   virtual ~TOFPixelKey() {}
 
@@ -60,7 +60,7 @@ class TOFPixelKey {
   bool operator!=( const TOFPixelKey& key ) const;
 
   friend ostream& operator<<( ostream& stream, TOFPixelKey key );
-  friend istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Exception);
+  friend istream& operator>>( istream& stream, TOFPixelKey &key ) throw(Exceptions::Exception);
 
   string detector() {return _detector;}
 

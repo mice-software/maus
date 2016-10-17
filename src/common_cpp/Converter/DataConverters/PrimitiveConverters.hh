@@ -37,7 +37,7 @@ class DisallowedConverter : public ConverterBase<TEMP1, TEMP2> {
 
   private:
     TEMP2* _convert(const TEMP1* input) const {
-        throw MAUS::Exception(MAUS::Exception::recoverable,
+        throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                           "Attempt to make disallowed conversion between types",
                           "DisallowedConverter::convert");
     }
@@ -157,13 +157,13 @@ class PyDictPyDictConverter : public ConverterBase<PyObject, PyObject> {
 
 PyObject* StringPyDictConverter::_convert(const std::string* str) const {
         if (!str)
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "string was NULL",
                             "StringPyDictConverter::_convert");
         // import json
         PyObject* json_module = PyImport_ImportModule("json");
         if (!json_module) {
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "Failed to import json",
                             "StringPyDictConverter::_convert");
         }
@@ -171,7 +171,7 @@ PyObject* StringPyDictConverter::_convert(const std::string* str) const {
         PyObject* loads_function = PyObject_GetAttrString(json_module, "loads");
         Py_DECREF(json_module);
         if (!PyCallable_Check(loads_function))
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "Failed to get loads function",
                             "StringPyDictConverter::_convert");
         // json.loads(str)
@@ -184,7 +184,7 @@ PyObject* StringPyDictConverter::_convert(const std::string* str) const {
         if (!py_dict || !PyDict_Check(py_dict)) {
             if (py_dict)
                 Py_DECREF(py_dict);
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "Failed to call loads and extract a dict",
                             "StringPyDictConverter::_convert");
         }
@@ -193,13 +193,13 @@ PyObject* StringPyDictConverter::_convert(const std::string* str) const {
 
 std::string* PyDictStringConverter::_convert(const PyObject* py_dict) const {
         if (!PyDict_Check(py_dict))
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "PyDict was NULL",
                             "PyDictStringConverter::_convert");
         // import json
         PyObject* json_module = PyImport_ImportModule("json");
         if (!json_module) {
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "Failed to import json",
                             "PyDictStringConverter::_convert");
         }
@@ -207,7 +207,7 @@ std::string* PyDictStringConverter::_convert(const PyObject* py_dict) const {
         PyObject* dumps_function = PyObject_GetAttrString(json_module, "dumps");
         Py_DECREF(json_module);
         if (!PyCallable_Check(dumps_function))
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "Failed to get dumps function",
                             "PyDictStringConverter::_convert");
         char* format = const_cast<char*>("O");
@@ -218,7 +218,7 @@ std::string* PyDictStringConverter::_convert(const PyObject* py_dict) const {
         // memory owned by py_str; py_str checking done as part of this call
         char* c_string = PyString_AsString(py_str);
         if (!c_string)
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "Failed to extract string from dumps output",
                             "PyDictStringConverter::_convert");
         std::string* cpp_string = new std::string(c_string);

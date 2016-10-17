@@ -20,7 +20,7 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 #include "API/PyWrapMapBase.hh"
@@ -72,7 +72,7 @@ void MapCppTOFSpacePoints::_birth(const std::string& argJsonConfigDocument) {
   } else if (_triggerStation == "tof2") {
       _trigStn = 2;
   } else {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "TOF trigger station invalid. Must be tof0/tof1/tof2",
                           "MapCppTOFSpacePoints::_birth");
   }
@@ -421,7 +421,7 @@ void MapCppTOFSpacePoints::getTofCalib(int runNumber) {
   runNumberSave = runNumber;
   _map_init = _map.InitializeFromCards(configJSON, runNumber);
   if (!_map_init) {
-    throw MAUS::Exception(Exception::recoverable,
+    throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                           "Failed to initialize calibration map",
                           "MapCppTOFSpacePoints::_process");
   }

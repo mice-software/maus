@@ -20,7 +20,7 @@
 
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/Exception.hh"
 #include "Interface/dataCards.hh"
 
@@ -206,7 +206,7 @@ namespace MAUS {
       }
 
       _configCheck = true;
-    } catch (Exception& exc) {
+    } catch (Exceptions::Exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
     } catch (std::exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleStdExcNoJson(exc, _classname);
@@ -215,21 +215,21 @@ namespace MAUS {
 
   void ReduceCppGlobalPID::_process(MAUS::Data* data_cpp) {
     if (data_cpp == NULL)
-      throw Exception(Exception::recoverable, "Data was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
 		      "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill() == NULL)
-      throw Exception(Exception::recoverable, "Spill was NULL",
+      throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
 		      "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill()->GetDaqEventType() != "physics_event") {
     }
     if (!_configCheck) {
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Birth was not called successfully",
                       "ReduceCppGlobalPID::process");
     }
 
     /*if (data_cpp->GetSpill()->GetReconEvents() == NULL)
-        throw Exception(Exception::recoverable, "ReconEvents were NULL",
+        throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
 	"ReduceCppGlobalPID::_process");*/
 
     _spill = data_cpp->GetSpill();
@@ -248,7 +248,7 @@ namespace MAUS {
 		 ++track_i) {
 	      MAUS::DataStructure::Global::Track* track =
 		GlobalTrackArray->at(track_i);
-	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching-Through") continue;
+	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching_Through") continue;
 	      through_track_check = true;
 	      if (_pid_config == "step_4") {
 		// get constituent tracks
@@ -257,7 +257,7 @@ namespace MAUS {
 		for (unsigned int track_j = 0; track_j < const_tracks.size();
 		     ++track_j) {
 		  if (const_tracks.at(track_j)->get_mapper_name() ==
-		      "MapCppGlobalTrackMatching-US") {
+		      "MapCppGlobalTrackMatching_US") {
 		    MAUS::DataStructure::Global::Track* US_track =
 		      const_cast<MAUS::DataStructure::Global::Track*>
 		      (const_tracks.at(track_j));
@@ -291,7 +291,7 @@ namespace MAUS {
 		      } // loop over US pi_pid_vars
 		    } // US mc pid check
 		  } else if (const_tracks.at(track_j)->get_mapper_name() ==
-			     "MapCppGlobalTrackMatching-DS") {
+			     "MapCppGlobalTrackMatching_DS") {
 		    MAUS::DataStructure::Global::Track* DS_track =
 		      const_cast<MAUS::DataStructure::Global::Track*>
 		      (const_tracks.at(track_j));
@@ -359,7 +359,7 @@ namespace MAUS {
 		   ++track_i) {
 		MAUS::DataStructure::Global::Track* track =
 		  GlobalTrackArray->at(track_i);
-		if (track->get_mapper_name() == "MapCppGlobalTrackMatching-US") {
+		if (track->get_mapper_name() == "MapCppGlobalTrackMatching_US") {
 		  if ((_pid_beamline_polarity == "positive" &&
 		       _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
 		      (_pid_beamline_polarity == "negative" &&
@@ -390,7 +390,7 @@ namespace MAUS {
 		    }
 		  }
 		} // US tracks
-		if (track->get_mapper_name() == "MapCppGlobalTrackMatching-DS") {
+		if (track->get_mapper_name() == "MapCppGlobalTrackMatching_DS") {
 		  if ((_pid_beamline_polarity == "positive" &&
 		       _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
 		      (_pid_beamline_polarity == "negative" &&

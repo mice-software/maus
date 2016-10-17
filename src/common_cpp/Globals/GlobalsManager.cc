@@ -42,7 +42,7 @@ namespace MAUS {
 // then legacy cards and run data
 void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
     if (Globals::_process != NULL) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
       "Attempt to initialise Globals when it was already initialised",
                       "GlobalsManager::InitialiseGlobals"));
     }
@@ -59,16 +59,18 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                  process->_configuration_cards;
         int verbose_level = JsonWrapper::GetProperty
                        (config, "verbose_level", JsonWrapper::intValue).asInt();
+        int log_level = JsonWrapper::GetProperty
+                       (config, "log_level", JsonWrapper::intValue).asInt();
         int max_data_ref = JsonWrapper::GetProperty
                (config, "data_maximum_reference_count", JsonWrapper::intValue).asInt();
         Data::SetMaxReferenceCount(max_data_ref);
         bool stack = JsonWrapper::GetProperty
                (config, "will_do_stack_trace", JsonWrapper::booleanValue).asBool();
-        Exception::SetWillDoStackTrace(stack);
+        Exceptions::Exception::SetWillDoStackTrace(stack);
         // we set up logging but for now leave singleton-like access
         // meaning that we can't reinitialise the logging
         Logging::setStandardOutputs(verbose_level);
-        Logging::setOutputs(verbose_level);
+        Logging::setOutputs(verbose_level, log_level);
         // we set up CppErrorHandler but for now leave singleton-like access
         // meaning that we can't reinitialise the error handler
         process->_error_handler = CppErrorHandler::getInstance();
@@ -94,7 +96,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         // requires process->_mc_field_constructor to be set
         process->_maus_geant4_manager->SetPhases();
         if (process->_mc_field_constructor == NULL)
-            throw(Exception(Exception::nonRecoverable,
+            throw(Exceptions::Exception(Exceptions::nonRecoverable,
                             "No field map was found in geant4 manager",
                             "GlobalsManager::InitialiseGlobals(...)"));
         process->_mc_field_constructor->Print(Squeak::mout(Squeak::info));
@@ -110,7 +112,7 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         process->_mc_geometry_navigator->Initialise(world);
         double z_world = process->_recon_mods->propertyHep3Vector("Dimensions").z();
         MaterialModelAxialLookup::BuildLookupTable(-z_world, z_world);
-    } catch (Exception squee) {
+    } catch (Exceptions::Exception squee) {
         Globals::_process = NULL;
         delete process;
         throw squee;
@@ -121,7 +123,7 @@ void GlobalsManager::DeleteGlobals() {
     // we don't delete the MICERun as this isn't really meant to be deleted
     // (it's legacy anyway)
     if (Globals::_process == NULL) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
              "Attempt to delete Globals when it was not initialised",
                       "GlobalsManager::DeleteGlobals"));
     }
@@ -170,6 +172,7 @@ void GlobalsManager::Finally() {
       delete Globals::_process->_maus_geant4_manager;
   }
   GlobalsManager::DeleteGlobals();
+  Squeak::closeLog();
 
 /*
   if (Globals::_process->_error_handler != NULL) {

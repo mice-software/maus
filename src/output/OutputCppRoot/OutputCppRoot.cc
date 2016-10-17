@@ -90,8 +90,8 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
     _fname = JsonWrapper::GetProperty(datacards,
                   "output_root_file_name", JsonWrapper::stringValue).asString();
     if (_fname == "") {
-        throw(Exception(
-          Exception::recoverable,
+        throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "output_root_file_name is empty",
           "OutputCppRoot::birth"
         ));
@@ -105,8 +105,8 @@ void OutputCppRoot::_birth(const std::string& json_datacards) {
     } else if (mode == "end_of_run_file_per_run") {
         _mode = end_of_run_file_per_run;
     } else {
-        throw(Exception(
-          Exception::recoverable,
+        throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "output_root_file_name '"+mode+"' is not valid; should be one of\n"+
           std::string("   one_big_file\n")+
           std::string("   one_file_per_run\n")+
@@ -139,8 +139,8 @@ bool OutputCppRoot::write_event(PyObject* py_data) {
     }
     check_file_exists(data_cpp);
     if (_outfile == NULL) {
-        throw(Exception(
-          Exception::recoverable,
+        throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "OutputCppRoot was not initialised properly",
           "OutputCppRoot::write_event"
         ));
@@ -245,7 +245,7 @@ void OutputCppRoot::check_file_exists(DataT* data_cpp) {
     if (stat(dir.c_str(), &attributes) < 0 || !S_ISDIR(attributes.st_mode)) {
         // if stat fails, maybe the directory doesnt exists
         if (mkdir(dir.c_str(), ACCESSPERMS) == -1) {
-            throw Exception(Exception::recoverable, "Failed to make directory "+dir,
+            throw Exceptions::Exception(Exceptions::recoverable, "Failed to make directory "+dir,
                          "OutputCppRoot::check_file_exists");
         }
     }

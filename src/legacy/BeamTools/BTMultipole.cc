@@ -26,7 +26,7 @@
 #include "BeamTools/BTMultipole.hh"
 
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 
 const BTMultipole * BTMultipole::staticMultipole = NULL;
 double              BTMultipole::staticDX        = 0.;
@@ -69,11 +69,11 @@ void BTMultipole::Init(int pole, double fieldAtWidth,
       if (curvature == "StraightEnds") _curvature = straightEnds;
       if (curvature == "Constant" || curvature == "") _curvature = constant;
       if (_width >= fabs(_rCurv))
-        throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
               "Multipole with width > radius of curvature",
               "BTMultipole::BTMultipole"));
       if (_length > fabs(2*pi*_rCurv))
-        throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
                      "Multipole with bending angle > 360 degrees",
                      "BTMultipole::BTMultipole"));
       _endRotation = CLHEP::HepRotation(CLHEP::Hep3Vector(0, 1, 0),
@@ -124,7 +124,8 @@ CLHEP::Hep3Vector BTMultipole::TransformToRotated(const double * Point) const {
     case momentumBased:
       return TransformToRotatedMomentumBased(Point);
     default:
-      throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Did not recognise curvature model",
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                   "Did not recognise curvature model",
                    "BTMultipole::TransformToRotated(const double*)"));
   }
 }
@@ -199,7 +200,8 @@ double BTMultipole::RadiusOfCurvature(double sRelativeToEnd) const {
       return _momentum/EMfield[1]/CLHEP::eplus/CLHEP::c_light;
     }
     default:
-      throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Did not recognise curvature model",
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                   "Did not recognise curvature model",
                    "BTMultipole::RadiusOfCurvature(double)"));
   }
 }
@@ -216,7 +218,8 @@ void BTMultipole::TransformToRectangular
     case momentumBased:
       return TransformToRectangularMomentumBased(point, value);
     default:
-      throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Did not recognise curvature model",
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                "Did not recognise curvature model",
                 "BTMultipole::TransformToRectangular(const double*, double*)"));
   }
 }
@@ -359,8 +362,8 @@ void BTMultipole::SetupReferenceTrajectory() {
       int status =  gsl_odeiv_evolve_apply(evolve, control, stepper, &system,
                                            &s, sMax, &h, y);
       if (status != GSL_SUCCESS) {
-        Print(Squeak::mout(Squeak::debug));
-        throw(MAUS::Exception(MAUS::Exception::nonRecoverable,
+        Print(MAUS::Squeak::mout(MAUS::Squeak::debug));
+        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
                     "Error calculating reference trajectory",
                     "BTMultipole::SetupReferenceTrajectory()"));
       }
@@ -391,7 +394,7 @@ double BTMultipole::IntegralB(double dxOffset) const {
   int    step = 0;
   while (s < _length) {
     if (step > 10000) {
-      Squeak::mout(Squeak::warning) << "Stepper stuck while calculating "
+      MAUS::Squeak::mout(MAUS::Squeak::warning) << "Stepper stuck while calculating "
                                     << "BTMultipole Effective Length"
                                     << std::endl;
       return 0.;
@@ -399,8 +402,9 @@ double BTMultipole::IntegralB(double dxOffset) const {
     int status =  gsl_odeiv_evolve_apply(evolve, control, stepper, &system, &s,
                                          _length, &h, y);
     if (status != GSL_SUCCESS) {
-      Print(Squeak::mout(Squeak::debug));
-      throw(MAUS::Exception(MAUS::Exception::nonRecoverable, "Error integrating reference By",
+      Print(MAUS::Squeak::mout(MAUS::Squeak::debug));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
+                   "Error integrating reference By",
                    "BTMultipole::SetupMagnitude()"));
     }
     step++;

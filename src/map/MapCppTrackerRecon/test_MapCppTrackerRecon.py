@@ -71,8 +71,9 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
             maus_cpp.mice_module.MiceModule(self.straight_geom))
         self.mapper.birth(json.dumps(self.cfg))
         # Read in a spill of mc data containing 5 straight tracks
-        test1 = ('%s/src/map/MapCppTrackerRecon/test_straight_digits.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
+        test1 = \
+          ('%s/tests/test_data/scifi_test_data/test_straight_digits.json' %
+          os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (straights)
         fin.readline()
@@ -115,7 +116,7 @@ class MapCppTrackerReconTestCase(unittest.TestCase): # pylint: disable = R0904
         # Read in a spill of mc data containing 5 straight tracks
         # test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
         #          os.environ.get("MAUS_ROOT_DIR"))
-        test1 = ('%s/src/map/MapCppTrackerRecon/test_helical_digits.json' %
+        test1 = ('%s/tests/test_data/scifi_test_data/test_helical_digits.json' %
                 os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         # Check the first spill (helices)

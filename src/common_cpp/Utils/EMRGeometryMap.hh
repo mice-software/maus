@@ -29,7 +29,7 @@
 #include "Utils/EMRChannelMap.hh"
 #include "Utils/JsonWrapper.hh"
 #include "Utils/Exception.hh"
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Config/MiceModule.hh"
 #include "DataStructure/ThreeVector.hh"
 

@@ -165,7 +165,7 @@ std::vector<CLHEP::Hep3Vector> BTFieldGroup::GetBBVertices(int index)
 
 void BTFieldGroup::GetFieldValue( const double Point[4], double *EMfield ) const
 {
-	if(!_closed) throw(MAUS::Exception(MAUS::Exception::recoverable, "Attempt to GetFieldValue when mesh not closed (internal error)", "BTFieldGroup::GetFieldValue"));
+	if(!_closed) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "Attempt to GetFieldValue when mesh not closed (internal error)", "BTFieldGroup::GetFieldValue"));
 	double * LocalPoint;
 	double   LocalEMField[6];
 	double   scaleFactor=1;

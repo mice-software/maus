@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include "JsonCppStreamer/IRStream.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 
 irstream::irstream(const char* fileName,
@@ -27,12 +28,12 @@ irstream::irstream(const char* fileName,
 
   m_tree = reinterpret_cast<TTree*>(m_file->GetObjectChecked(treeName, "TTree"));
   if (!m_tree) {
-    Squeak::mout(Squeak::fatal)
+    MAUS::Squeak::mout(MAUS::Squeak::fatal)
       << "The requested tree '"
       << treeName
       << "' was not found in the tree."
       <<std::endl;
-    throw MAUS::Exception(MAUS::Exception::nonRecoverable,
+    throw MAUS::Exceptions::Exception(MAUS::Exceptions::nonRecoverable,
 		 "irstream object not correctly initialised as couldn;t find requested TTree.",
 		 "irstream::irstream(const char*, const char*, const char*)");
   }
@@ -43,32 +44,32 @@ void irstream::open(const char* fileName,
 		    const char* treeName,
 		    const char* mode) {
   if ( !strcmp(fileName, "") ) {
-    Squeak::mout(Squeak::error)
+    MAUS::Squeak::mout(MAUS::Squeak::error)
       << "Couldn't open ROOT TFile as no filename given"
       << std::endl;
-    throw MAUS::Exception(MAUS::Exception::recoverable,
+    throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
 		 "Cannot open file as null \"\" string passed as filename",
 		 "void irstream::open(const char*, const char*, const char*)");
   }
 
   m_file = new TFile(fileName, mode);
   if (!m_file) {
-    Squeak::mout(Squeak::error)
+    MAUS::Squeak::mout(MAUS::Squeak::error)
       << "ROOT TFile opened incorrectly"
       << std::endl;
-    throw MAUS::Exception(MAUS::Exception::recoverable,
+    throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
 		 "TFile object not opened properly",
 		 "void irstream::open(const char*, const char*, const char*)");
   }
 
   m_tree = reinterpret_cast<TTree*>(m_file->GetObjectChecked(treeName, "TTree"));
   if (!m_tree) {
-    Squeak::mout(Squeak::error)
+    MAUS::Squeak::mout(MAUS::Squeak::error)
       << "The requested tree '"
       << treeName
       << "' was not found in the tree."
       << std::endl;
-    throw MAUS::Exception(MAUS::Exception::recoverable,
+    throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
 		 "Could not find requested TTree.",
 		 "void irstream::open(const char*, const char*, const char*)");
   }
@@ -100,7 +101,7 @@ irstream* irstream::operator>>(irstream* (*manip_pointer)(irstream&)) {
 
 irstream* readEvent(irstream& irs) {
   if (irs.m_evtCount >= irs.m_tree->GetEntries()) {
-    Squeak::mout(Squeak::info)
+    MAUS::Squeak::mout(MAUS::Squeak::info)
       << "Failed to find event "
       << irs.m_evtCount
       << " in file."

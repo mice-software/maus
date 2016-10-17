@@ -29,7 +29,7 @@ std::string STLUtils::ReplaceVariables(std::string fileName) {
           if (fileName[pos] == '{') {
               ++pos;
           } else {
-              throw(MAUS::Exception(MAUS::Exception::recoverable,
+              throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                 "Error - environment variable must be written like ${VARIABLE}"+
                 std::string(" in file "+fileName),
                 "STLUtils::ReplaceVariables"));
@@ -40,7 +40,7 @@ std::string STLUtils::ReplaceVariables(std::string fileName) {
               ++end;
           }
           if (end == static_cast<int>(fileName.size())) {
-              throw(MAUS::Exception(MAUS::Exception::recoverable,
+              throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                 "Error - environment variable must be written like ${VARIABLE}"+
                 std::string(" in file "+fileName),
                 "STLUtils::ReplaceVariables"));
@@ -50,7 +50,7 @@ std::string STLUtils::ReplaceVariables(std::string fileName) {
               variable += fileName[vpos];
           }
           if (getenv(variable.c_str()) == NULL) {
-              throw(MAUS::Exception(MAUS::Exception::recoverable,
+              throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                     "Error - "+variable+" environment variable was not defined",
                     "STLUtils::ReplaceVariables"));
           }

@@ -23,7 +23,7 @@
 #include "gsl/gsl_sf_gamma.h"
 #include "gsl/gsl_sf_pow_int.h"
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/FieldTools/DerivativesSolenoid.hh"
 
 namespace MAUS {

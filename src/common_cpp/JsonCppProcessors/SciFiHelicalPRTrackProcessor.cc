@@ -24,9 +24,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("tracker", &_int_proc,
                         &SciFiHelicalPRTrack::get_tracker,
                         &SciFiHelicalPRTrack::set_tracker, true);
-    RegisterValueBranch("charge", &_int_proc,
-                        &SciFiHelicalPRTrack::get_charge,
-                        &SciFiHelicalPRTrack::set_charge, true);
+    RegisterValueBranch<int>("charge", &_int_proc,
+                    &SciFiHelicalPRTrack::SciFiBasePRTrack::get_charge,
+                    &SciFiHelicalPRTrack::SciFiBasePRTrack::set_charge, true);
     RegisterValueBranch("phi0", &_double_proc,
                         &SciFiHelicalPRTrack::get_phi0,
                         &SciFiHelicalPRTrack::set_phi0, true);

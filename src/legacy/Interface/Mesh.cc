@@ -13,7 +13,7 @@ TwoDGrid::TwoDGrid() : _x(2,0), _y(2,0), _xSize(2), _ySize(2), _maps(), _constan
 TwoDGrid::TwoDGrid(double dX, double dY, double minX, double minY, int numberOfXCoords, int numberOfYCoords)
         :  _x(), _y(), _xSize(numberOfXCoords), _ySize(numberOfYCoords), _maps(), _constantSpacing(true)
 {
-    if(numberOfXCoords < 2 || numberOfYCoords < 2) throw(MAUS::Exception(MAUS::Exception::recoverable, "2D Grid must be at least 2x2 grid", "TwoDGrid::TwoDGrid(...)"));
+    if(numberOfXCoords < 2 || numberOfYCoords < 2) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "2D Grid must be at least 2x2 grid", "TwoDGrid::TwoDGrid(...)"));
     for(int i=0; i<numberOfXCoords; i++) _x.push_back(minX+i*dX);
     for(int j=0; j<numberOfYCoords; j++) _y.push_back(minY+j*dY);
     SetConstantSpacing();
@@ -21,7 +21,7 @@ TwoDGrid::TwoDGrid(double dX, double dY, double minX, double minY, int numberOfX
 
 TwoDGrid::TwoDGrid(int xSize, const double *x, int ySize, const double *y)  : _x(x, x+xSize), _y(y, y+ySize), _xSize(xSize), _ySize(ySize), _maps(), _constantSpacing(false) 
 {
-  if(xSize < 2 || ySize < 2) throw(MAUS::Exception(MAUS::Exception::recoverable, "2D Grid must be at least 2x2 grid", "TwoDGrid::TwoDGrid(...)"));
+  if(xSize < 2 || ySize < 2) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "2D Grid must be at least 2x2 grid", "TwoDGrid::TwoDGrid(...)"));
   SetConstantSpacing();
   delete [] x;
   delete [] y; 
@@ -29,7 +29,7 @@ TwoDGrid::TwoDGrid(int xSize, const double *x, int ySize, const double *y)  : _x
 
 TwoDGrid::TwoDGrid(std::vector<double> x, std::vector<double> y)  : _x (x), _y(y), _xSize(x.size()), _ySize(y.size()), _maps(), _constantSpacing(false)
 {
-  if(_xSize < 2 || _ySize < 2) throw(MAUS::Exception(MAUS::Exception::recoverable, "2D Grid must be at least 2x2 grid", "TwoDGrid::TwoDGrid(...)"));
+  if(_xSize < 2 || _ySize < 2) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "2D Grid must be at least 2x2 grid", "TwoDGrid::TwoDGrid(...)"));
   SetConstantSpacing();
 }
 
@@ -173,7 +173,7 @@ NDGrid::NDGrid(std::vector<int> size, std::vector<const double *> gridCoordinate
   for(unsigned int i=0; i<size.size(); i++) 
   {
     if(size[i] < 2) 
-      throw(MAUS::Exception(MAUS::Exception::recoverable, "ND Grid must be at least 2x2x...x2 grid", "NDGrid::NDGrid(...)"));
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "ND Grid must be at least 2x2x...x2 grid", "NDGrid::NDGrid(...)"));
     _coord.push_back(std::vector<double>(gridCoordinates[i], gridCoordinates[i] + size[i]) ); 
   }
   SetConstantSpacing();
@@ -183,7 +183,7 @@ NDGrid::NDGrid(int nDimensions, int* size, double* spacing, double* min)  : _coo
 {
     for(int i=0; i<nDimensions; i++) 
     {
-        if(size[i] < 2) throw(MAUS::Exception(MAUS::Exception::recoverable, "ND Grid must be at least 2x2x...x2 grid", "NDGrid::NDGrid(...)"));
+        if(size[i] < 2) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "ND Grid must be at least 2x2x...x2 grid", "NDGrid::NDGrid(...)"));
         _coord[i] = std::vector<double>(size[i]);
         for(unsigned int j=0; j<_coord[i].size(); j++) _coord[i][j] = min[i] + j*spacing[i];
     }
@@ -192,7 +192,7 @@ NDGrid::NDGrid(int nDimensions, int* size, double* spacing, double* min)  : _coo
 NDGrid::NDGrid(std::vector< std::vector<double> > gridCoordinates) : _coord(gridCoordinates), _maps(), _constantSpacing(false) 
 {
   for(unsigned int i=0; i<gridCoordinates.size(); i++) 
-      if(gridCoordinates[i].size() < 2) throw(MAUS::Exception(MAUS::Exception::recoverable, "ND Grid must be at least 2x2x...x2 grid", "NDGrid::NDGrid(...)"));
+      if(gridCoordinates[i].size() < 2) throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable, "ND Grid must be at least 2x2x...x2 grid", "NDGrid::NDGrid(...)"));
   SetConstantSpacing();
 }
 

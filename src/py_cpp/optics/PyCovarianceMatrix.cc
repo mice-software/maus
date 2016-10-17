@@ -222,17 +222,17 @@ PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
 CovarianceMatrix* create_from_numpy_matrix(PyObject* numpy_array) {
     PyArrayObject* array = reinterpret_cast<PyArrayObject*>(numpy_array);
     if (array == NULL) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                         "Attempting to pass an object that is not a numpy array",
                         "PyCovarianceMatrix::create_from_numpy_matrix"));
     }
     if (PyArray_NDIM(array) != 2) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                         "numpy_array had wrong dimension - should be matrix",
                         "PyCovarianceMatrix::create_from_numpy_matrix"));
     }
     if (PyArray_DIM(array, 0) != 6 || PyArray_DIM(array, 1) != 6) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                         "numpy_array had wrong size - should be 6x6 matrix",
                         "PyCovarianceMatrix::create_from_numpy_matrix"));
     }
@@ -242,7 +242,7 @@ CovarianceMatrix* create_from_numpy_matrix(PyObject* numpy_array) {
             double* value =
                   reinterpret_cast<double*>(PyArray_GETPTR2(numpy_array, i, j));
             if (value == NULL) {
-                throw(Exception(Exception::recoverable,
+                throw(Exceptions::Exception(Exceptions::recoverable,
                                "numpy_array had wrong data type",
                                "PyCovarianceMatrix::create_from_numpy_matrix"));
             }

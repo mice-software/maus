@@ -25,7 +25,7 @@
 #include "Geant4/G4ParticleTable.hh"
 #include "Geant4/G4VUserPrimaryGeneratorAction.hh"  // inherit from
 
-#include "src/legacy/Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
 #include "src/common_cpp/DataStructure/Primary.hh"
 #include "src/common_cpp/DataStructure/VirtualHit.hh"

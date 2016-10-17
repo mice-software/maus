@@ -15,54 +15,47 @@
  *
  */
 
-
-/** @class 
- *
- */
-
-#ifndef _REDUCECPPTOFCALIB_H
-#define _REDUCECPPTOFCALIB_H
+#ifndef SRC_REDUCECPPTOFCALIB_HH
+#define SRC_REDUCECPPTOFCALIB_HH 1
 
 #include <string>
+#include <iostream>
 #include <vector>
-#include <map>
-#include "json/json.h"
-#include "TTree.h"
-#include "TH1I.h"
-#include "TFile.h"
-#include "TStyle.h"
-#include "TROOT.h"
 
+#include "TROOT.h"
+#include "TTree.h"
+#include "TFile.h"
+
+#include "src/common_cpp/API/ReduceBase.hh"
+#include "src/common_cpp/API/PyWrapReduceBase.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
-#include "src/common_cpp/DataStructure/Spill.hh"
-#include "Utils/TOFChannelMap.hh"
+#include "src/common_cpp/Utils/ReduceCppTools.hh"
 
 namespace MAUS {
-class ReduceCppTofCalib {
 
+class ReduceCppTofCalib : public ReduceBase<Data, Data> {
  public:
+  ReduceCppTofCalib();
+  ~ReduceCppTofCalib();
 
- /** @brief Sets up the worker
-  *
-  *  @param argJsonConfigDocument a JSON document with
-  *         the configuration.
-  */
-  bool birth(std::string argJsonConfigDocument);
+  int  getRefreshRate() {return _refresh_rate;}
 
- /** @brief Shutdowns the worker
-  *
-  *  This takes no arguments and does nothing.
-  */
-  bool death();
+  void reset();
 
- /** @brief process JSON document
-  *
-  *  @param document Receive a document with slab hits and return
-  *  a document with space points.
-  */
-  std::string process(std::string document);
+ private:
 
-  void process(MAUS::Data *data);
+  void _birth(const std::string& argJsonConfigDocument);
+
+  void _death();
+
+  void _process(Data* data);
+
+  void update();
+
+  void update_tof_plots(TOFEvent* tof_event, int runNum);
+
+  int _refresh_rate;
+  int _process_count;
 
   MAUS::Spill get_spill() { return _spill; }
 
@@ -73,13 +66,6 @@ class ReduceCppTofCalib {
   void Save();
   void Save(std::string n);
 
- private:
-
-  /** @brief Check if this particle event is useful or not. 
-   *  @param xPartEvent Json document containing a particle event.
-   */
-
-  Json::Value root;
   // initialize the root tree for storing slab hits
   bool MakeTree();
 
@@ -88,7 +74,6 @@ class ReduceCppTofCalib {
 
   void processSpill();
 
-  std::string _classname;
   // output root file name
   std::string _filename;
   std::string _filepath;
@@ -134,6 +119,6 @@ class ReduceCppTofCalib {
   int adc10;
   int adc11;
 };
-} // end namespace
-#endif
+}
 
+#endif // SRC_REDUCECPPTofCalib_HH

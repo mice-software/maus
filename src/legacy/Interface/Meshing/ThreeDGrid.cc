@@ -32,7 +32,7 @@ ThreeDGrid::ThreeDGrid(int xSize, const double *x,
       _maps(), _constantSpacing(false) {
   SetConstantSpacing();
   if (_xSize < 2 || _ySize < 2 || _zSize < 2)
-    throw(MAUS::Exception(MAUS::Exception::recoverable,
+    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                           "3D Grid must be at least 2x2x2 grid",
                           "ThreeDGrid::ThreeDGrid(...)")
     );
@@ -46,7 +46,7 @@ ThreeDGrid::ThreeDGrid(std::vector<double> x,
       _maps(), _constantSpacing(false) {
   SetConstantSpacing();
   if (_xSize < 2 || _ySize < 2 || _zSize < 2)
-      throw(MAUS::Exception(MAUS::Exception::recoverable,
+      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
                             "3D Grid must be at least 2x2x2 grid",
                             "ThreeDGrid::ThreeDGrid(...)")
       );

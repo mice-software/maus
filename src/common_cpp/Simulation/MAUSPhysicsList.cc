@@ -47,7 +47,7 @@
 #include "Geant4/G4Region.hh"
 #include "Geant4/G4RegionStore.hh"
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Interface/STLUtils.hh"
 
 #include "src/common_cpp/Utils/Globals.hh"
@@ -102,12 +102,12 @@ MAUSPhysicsList* MAUSPhysicsList::GetMAUSPhysicsList() {
         mpl->Setup();
         return mpl;
     }
-    catch (Exception exc) {
+    catch (Exceptions::Exception exc) {
         delete mpl;
         throw exc;
     }
   } else {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
         "Failed to recognise physics list model "+physModel,
         "MAUSPhysicsList::GetMAUSPhysicsList()")
     );
@@ -334,7 +334,7 @@ void MAUSPhysicsList::SetHalfLife(double pionHalfLife,  double muonHalfLife) {
 void MAUSPhysicsList::SetParticleHalfLife(std::string particleName,
                                           double halfLife) {
   if (halfLife <= 0.)
-      throw Exception(Exception::recoverable,
+      throw Exceptions::Exception(Exceptions::recoverable,
                       "Negative half life",
                       "MAUSPhysicsList::SetParticleHalfLife");
   std::stringstream ss_in;
@@ -417,7 +417,7 @@ void MAUSPhysicsList::SetProductionThresholdByVolume(
                           std::map<std::string, double> particleIdToThreshold) {
     G4Region* region = G4RegionStore::GetInstance()->GetRegion(volumeName);
     if (region == NULL) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw MAUS::Exceptions::Exception(Exceptions::recoverable,
                               "Failed to find region "+volumeName+" for G4Cuts",
                               "MAUSPhysicsList::SetProductionThresholdByVolume");
     }

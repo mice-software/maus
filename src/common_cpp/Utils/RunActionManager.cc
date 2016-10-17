@@ -50,12 +50,12 @@ void RunActionManager::EndOfRun(RunFooter* run_footer) {
 
 void RunActionManager::PushBack(RunActionBase* datum) {
     if (datum == NULL) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Trying to append a NULL to the RunActionManager",
                      "RunActionManager::PushBack"));
     } else if (std::find(_run_actions.begin(), _run_actions.end(), datum) !=
                                                            _run_actions.end()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                  "Trying to append same item twice to the RunActionManager",
                  "RunActionManager::PushBack"));
     } else {
@@ -69,14 +69,14 @@ void RunActionManager::Swap(RunActionBase* current_item,
     RunDataIt place = std::find
                        (_run_actions.begin(), _run_actions.end(), current_item);
     if (place == _run_actions.end()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Failed to find item in per run data list",
                      "RunActionManager::Swap"));
     }
     RunDataIt check = std::find
                            (_run_actions.begin(), _run_actions.end(), new_item);
     if (check != _run_actions.end()) {
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "New item already in per run data list",
                      "RunActionManager::Swap"));
     }

@@ -148,14 +148,14 @@ double DataStructureHelper::GetDetectorZPosition(
         std::stringstream message;
         message << "Found multiple detector geometry modules named \""
                 << detector_name.str() << "\".";
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                       message.str(),
                       "DataStructureHelper::GetDetectorZPosition()"));
       } else {
         std::stringstream message;
         message << "Couldn't find detector geometry module \""
                 << detector_name.str() << "\".";
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                       message.str(),
                       "DataStructureHelper::GetDetectorZPosition()"));
       }
@@ -170,14 +170,14 @@ double DataStructureHelper::GetDetectorZPosition(
     std::stringstream message;
     message << "Couldn't find reconstruction mapping detector \""
             << detector_name.str() << "\".";
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                   message.str(),
                   "DataStructureHelper::GetDetectorZPosition()"));
   } else if (modules.size() > 1) {
     std::stringstream message;
     message << "Found multiple reconstruction mapping detectors named \""
             << detector_name.str() << "\".";
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                   message.str(),
                   "DataStructureHelper::GetDetectorZPosition()"));
   }
@@ -267,7 +267,7 @@ std::vector<PrimaryChain*>* DataStructureHelper::GetPrimaryChains(
 CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
     const Json::Value& value) const {
   if (value.size() < static_cast<Json::Value::UInt>(6)) {
-    throw(Exception(Exception::recoverable,
+    throw(Exceptions::Exception(Exceptions::recoverable,
                  "Not enough row elements to convert JSON to CovarianceMatrix",
                  "DataStructureHelper::GetJsonCovarianceMatrix()"));
   }
@@ -277,8 +277,8 @@ CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
   for (int row = 0; row < 6; ++row) {
     const Json::Value row_json = value[row];
     if (row_json.size() < static_cast<Json::Value::UInt>(6)) {
-      throw(Exception(
-          Exception::recoverable,
+      throw(Exceptions::Exception(
+          Exceptions::recoverable,
           "Not enough column elements to convert JSON to CovarianceMatrix",
           "DataStructureHelper::GetJsonCovarianceMatrix()"));
     }

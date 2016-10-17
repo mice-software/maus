@@ -41,7 +41,7 @@ namespace MAUS {
     try {
       o = _emit_cpp();
     }
-    catch (Exception& s) {
+    catch (Exceptions::Exception& s) {
       CppErrorHandler::getInstance()->HandleExceptionNoJson(s, _classname);
       throw NoInputException();
     }

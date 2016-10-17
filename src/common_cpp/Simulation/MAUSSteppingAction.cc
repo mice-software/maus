@@ -18,7 +18,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Interface/Squeak.hh"
+#include "Utils/Squeak.hh"
 #include "Utils/Exception.hh"
 #include "Interface/MICERun.hh"
 
@@ -42,7 +42,7 @@ MAUSSteppingAction::MAUSSteppingAction() : _steps(NULL), _keepSteps(false),
 void MAUSSteppingAction::UserSteppingAction(const G4Step * aStep) {
     // record all step points if keep steps flag is set
     if (_keepSteps && _steps == NULL)
-        throw Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                         "Attempt to do stepping action when steps were NULL",
                         "MAUSSteppingAction::UserSteppingAction");
     if (_keepSteps) {
@@ -80,7 +80,7 @@ Step MAUSSteppingAction::StepToMaus(const G4Step* aStep, bool prestep) const {
     G4StepPoint* point = aStep->GetPostStepPoint();
     if (prestep) point = aStep->GetPreStepPoint();
     if (!aTrack || !point || !aStep)
-        throw(Exception(Exception::recoverable,
+        throw(Exceptions::Exception(Exceptions::recoverable,
                      "Failed to resolve step point",
                      "MAUSSteppingAction::StepPointToJson"));
     Step step;

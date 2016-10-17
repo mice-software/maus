@@ -117,7 +117,7 @@ void SciFiClusterRec::process_cluster(SciFiCluster *clust) const {
   // Throw if the plane isn't found.
 //  if ( iterator == _geometry_map.end() ) {
   if ( iterator == _geometry_map.find(tracker)->second.Planes.end() ) {
-    throw(Exception(Exception::nonRecoverable,
+    throw(Exceptions::Exception(Exceptions::nonRecoverable,
     "Failed to find SciFi plane in _geometry_map.",
     "SciFiClusterRec::process_cluster"));
   }
