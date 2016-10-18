@@ -20,7 +20,7 @@ void SeedManager::RegisterAlgorithm(std::string name, SeedBase* algorithm) {
             delete it->second;
             _seed_algorithms.erase(it);
         } else {
-            throw MAUS::Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                   "Registering NULL to name "+name+
                   " - normally this removes an entry, but no entry was found",
                   "SeedBase::RegisterAlgorithm");
@@ -81,7 +81,7 @@ Kalman::State USTrackerTrackFitSeed::GetSeed(ReconEvent* reco_event) {
             return seed;
         }
     }
-    throw MAUS::Exception(Exception::recoverable,
+    throw Exceptions::Exception(Exceptions::recoverable,
                           "Did not find track point in the right place",
                           "USTrackerTrackFitSeed::build_seed");
 }
@@ -96,7 +96,7 @@ Kalman::State USTrackerTofSeed::GetSeed(ReconEvent* reco_event) {
     tof_data.load_event(*reco_event);
     Kalman::Track tof_track = tof_container.GetTrack();
     if (tof_track.GetLength() != 2) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "tof_track was not of length 2",
                               "USTrackerTofSeed::build_seed");
     }
@@ -107,14 +107,14 @@ Kalman::State USTrackerTofSeed::GetSeed(ReconEvent* reco_event) {
 
     double beta = tof_dz/tof_dt/c_light;
     if (fabs(beta) >= 1.) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "beta was >= 1",
                               "USTrackerTofSeed::build_seed");
     }
     double gamma = 1/::sqrt(1-beta*beta);
     double seed_pz = mu_mass*beta*gamma;
     if (seed_pz != seed_pz)
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Failed to calculate seed pz (maybe beta > 1?)",
                               "USTrackerTofSeed::build_seed");
 
@@ -126,7 +126,7 @@ Kalman::State USTrackerTofSeed::GetSeed(ReconEvent* reco_event) {
     sf_data.load_event(*reco_event);
     Kalman::Track sf_track = sf_container.GetTrack();
     if (sf_track.GetLength() != 2) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "sf_track was not of length 2",
                               "USTrackerTofSeed::build_seed");
     }
@@ -169,7 +169,7 @@ Kalman::State Tof01Seed::GetSeed(ReconEvent* reco_event) {
     tof_data.load_event(*reco_event);
     Kalman::Track tof_track = tof_container.GetTrack();
     if (tof_track.GetLength() != 2) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "tof_track was not of length 2",
                               "Tof01Seed::build_seed");
     }
@@ -185,14 +185,14 @@ Kalman::State Tof01Seed::GetSeed(ReconEvent* reco_event) {
     double dy = 0.;
 
     if (fabs(beta) >= 1.) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "beta was >= 1",
                               "Tof01Seed::build_seed");
     }
     double gamma = 1/::sqrt(1-beta*beta);
     double seed_pz = mu_mass*beta*gamma;
     if (seed_pz != seed_pz)
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Failed to calculate seed pz (maybe beta > 1?)",
                               "Tof01Seed::build_seed");
 

@@ -155,7 +155,7 @@ void MapCppGlobalTrackFit::_process(Data* data) const {
               << "fitting spill " << spill.GetSpillNumber()
               << " recon event " << i << std::endl;
           track_fit(*event);
-      } catch (MAUS::Exception& exc) {
+      } catch (Exceptions::Exception& exc) {
           Squeak::mout(Squeak::info) << exc.GetMessage() << " at "
                                       << exc.GetLocation() << std::endl;
           Squeak::mout(Squeak::debug) << exc.GetStackTrace() << std::endl;

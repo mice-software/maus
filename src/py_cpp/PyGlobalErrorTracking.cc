@@ -669,7 +669,7 @@ static PyObject* propagate_errors
     try {
         glet->SetField(Globals::GetInstance()->GetMCFieldConstructor());
         glet->Propagate(&x_in[0], target_z);
-    } catch (MAUS::Exception exc) {
+    } catch (Exceptions::Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }
@@ -719,7 +719,7 @@ static PyObject* get_transfer_matrix
             return NULL;
         }
         return ellipse;
-    } catch (MAUS::Exception exc) {
+    } catch (Exceptions::Exception exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }

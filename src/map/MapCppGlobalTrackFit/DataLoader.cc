@@ -31,7 +31,7 @@ DataLoader::DataLoader(std::vector<MAUS::DataStructure::Global::DetectorPoint> d
                        Kalman::TrackFit* fit)
   : _fitter(fit), _detectors(detectors) {
     if (_fitter == NULL) {
-        throw MAUS::Exception(Exception::recoverable,
+        throw Exceptions::Exception(Exceptions::recoverable,
                               "Could not cope with NULL fit",
                               "MapCppGlobalTrackFit::DataLoader");
     }
@@ -161,7 +161,7 @@ DetectorPoint DataLoader::SciFiToDetectorPoint(int tracker, int station) const {
                 case 5:
                     return kTracker0_5;
                 default:
-                    throw MAUS::Exception(MAUS::Exception::recoverable, "Bad station id", "DataLoader::SciFiToDetectorPoint");
+                    throw Exceptions::Exception(Exceptions::recoverable, "Bad station id", "DataLoader::SciFiToDetectorPoint");
             }
             break;
         case 1:
@@ -177,11 +177,11 @@ DetectorPoint DataLoader::SciFiToDetectorPoint(int tracker, int station) const {
                 case 5:
                     return kTracker1_5;
                 default:
-                    throw MAUS::Exception(MAUS::Exception::recoverable, "Bad station id", "DataLoader::SciFiToDetectorPoint");
+                    throw Exceptions::Exception(Exceptions::recoverable, "Bad station id", "DataLoader::SciFiToDetectorPoint");
             }
             break;
         default:
-            throw MAUS::Exception(MAUS::Exception::recoverable, "Bad tracker id", "DataLoader::SciFiToDetectorPoint");
+            throw Exceptions::Exception(Exceptions::recoverable, "Bad tracker id", "DataLoader::SciFiToDetectorPoint");
     }
 }
 
@@ -222,7 +222,7 @@ void DataLoader::validate_detectors() {
     std::vector<DetectorPoint> det_vector(det_list);
     for (size_t i = 0; i < _detectors.size(); ++i) {
         if (std::find(det_vector.begin(), det_vector.end(), _detectors[i]) == det_vector.end()) {
-            throw MAUS::Exception(MAUS::Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                                   "Global track fit detector type not implemented",
                                   "DataLoader::validate_detectors");            
         }
