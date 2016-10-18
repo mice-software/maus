@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-directory=gtest-1.5.0
+ver=1.8.0
+directory=googletest-release-${ver}
 filename=${directory}.tar.gz
-url=http://googletest.googlecode.com/files/${filename}
+download_filename=release-${ver}.tar.gz
+url=https://github.com/google/googletest/archive/${download_filename}
 
 echo
-echo 'INFO: Installing third party library GTest 1.5.0'
+echo 'INFO: Installing third party library GTest 1.8.0'
 echo '------------------------------------------------'
 echo
 
@@ -30,17 +32,18 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
-	echo "INFO: Found source archive in 'source' directory"
+        echo "INFO: Found source archive in 'source' directory"
     else
-	echo "INFO: Source archive doesn't exist.  Downloading..."
+        echo "INFO: Source archive doesn't exist.  Downloading..."
 
-	wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source/ ${url}
+  wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source/ ${url}
+  mv ${MAUS_ROOT_DIR}/third_party/source/${download_filename} ${MAUS_ROOT_DIR}/third_party/source/${filename}
 
     fi
-	
+
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
-	    echo "INFO: Source archive exists."
+      echo "INFO: Source archive exists."
       echo
       echo "INFO: Checking MD5 checksum (otherwise the file didn't"
       echo "INFO: download properly):"
@@ -51,22 +54,32 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
       echo
       echo "INFO: Unpacking:"
       echo
-      rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
+      rm -Rf ${MAUS_ROOT_DIR}/third_party/source/${directory}
       sleep 1
-      tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/build > /dev/null
-      cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+      tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/source > /dev/null
+
 
       echo
       echo "INFO: Configuring"
       echo
-      ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install
+      rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${directory}
+      mkdir ${MAUS_ROOT_DIR}/third_party/build/${directory}
+      cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+
+      gcc_bin=`which gcc`
+      gxx_bin=`which g++`
+      cmake ${MAUS_ROOT_DIR}/third_party/source/${directory} \
+            -DCMAKE_C_COMPILER=${gcc_bin} \
+            -DCMAKE_CXX_COMPILER=${gxx_bin} \
+            -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install
+
       echo
       echo "INFO: Making"
       echo
       make -j$MAUS_NUM_THREADS
       echo
       echo "INFO: Installing within MAUS's third party directory:"
-	    echo
+      echo
       make install
       echo "INFO: The package should be locally build now in your"
       echo "INFO: third_party directory, which the rest of MAUS will"

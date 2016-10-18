@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-directory=xerces-c-3.1.2
-filename=${directory}.tar.gz 
-url=http://apache.mirror.anlx.net//xerces/c/3/sources/${filename}
+directory=xerces-c-3.1.4
+filename=${directory}.tar.gz
+url=http://www-eu.apache.org/dist//xerces/c/3/sources/${filename}
 
 echo
-echo 'INFO: Installing third party library Xerces-c 3.1.2'
+echo 'INFO: Installing third party library Xerces-c 3.1.4'
 echo '---------------------------------------------------'
 echo
 
