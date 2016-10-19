@@ -78,7 +78,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
             -DCMAKE_C_COMPILER=${gcc_bin} \
             -DCMAKE_CXX_COMPILER=${gxx_bin} \
             -Dgsl_shared=ON \
-            -DGSL_CONFIG_EXECUTABLE=${MAUS_ROOT_DIR}/third_party/install/bin
+            -DGSL_CONFIG_EXECUTABLE=${MAUS_ROOT_DIR}/third_party/install/bin/gsl-config \
             -Dminuit2=ON \
             -Dbuiltin_freetype=ON \
             -Dx11=ON \
