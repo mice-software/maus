@@ -20,9 +20,7 @@ namespace MAUS {
 namespace Processor {
 namespace Global {
 
-PrimaryChainProcessor::PrimaryChainProcessor()
-    : _treftrackpair_array_proc(new TRefTrackPairProcessor()),
-      _comments_proc(new StringProcessor()) {
+PrimaryChainProcessor::PrimaryChainProcessor() {
 
   RegisterValueBranch(
       "mapper_name", &_string_proc,
@@ -30,29 +28,24 @@ PrimaryChainProcessor::PrimaryChainProcessor()
       &MAUS::DataStructure::Global::PrimaryChain::set_mapper_name,
       true);
 
-  RegisterPointerBranch(
-      "track_parent_pairs", &_treftrackpair_array_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_track_parent_pairs,
-      &MAUS::DataStructure::Global::PrimaryChain::set_track_parent_pairs,
+  RegisterTRefArray(
+      "lr_spacepoints", &_lr_sp_trefarray_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_lr_spacepoints,
+      &MAUS::DataStructure::Global::PrimaryChain::set_lr_spacepoints,
       true);
-
-  RegisterValueBranch(
-      "goodness_of_fit", &_double_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_goodness_of_fit,
-      &MAUS::DataStructure::Global::PrimaryChain::set_goodness_of_fit, true);
 
   RegisterTRefArray(
-      "preceeding_pchains",
-      &_primary_chain_trefarray_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_parent_primary_chains,
-      &MAUS::DataStructure::Global::PrimaryChain::set_parent_primary_chains,
+      "lr_tracks", &_lr_track_trefarray_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_lr_tracks,
+      &MAUS::DataStructure::Global::PrimaryChain::set_lr_tracks,
       true);
 
-  RegisterValueBranch("comments",
-                      &_comments_proc,
-                      &MAUS::DataStructure::Global::PrimaryChain::get_comments,
-                      &MAUS::DataStructure::Global::PrimaryChain::set_comments,
-                      true);
+  RegisterTRefArray(
+      "tracks", &_track_trefarray_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_tracks,
+      &MAUS::DataStructure::Global::PrimaryChain::set_tracks,
+      true);
+
 }
 } // ~namespace Global
 } // ~namespace Processor

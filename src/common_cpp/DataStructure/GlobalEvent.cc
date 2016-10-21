@@ -188,41 +188,6 @@ void GlobalEvent::add_primary_chain(
   _primary_chains->push_back(pchain);
 };
 
-bool GlobalEvent::add_primary_chain_check(
-    MAUS::DataStructure::Global::PrimaryChain* pchain) {
-  // Check if the provided pchain matches an existing entry (this is
-  // to save repeated entries and wasted disk space).
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*>::iterator pc_iter =
-      std::find(_primary_chains->begin(), _primary_chains->end(), pchain);
-
-  bool exists = (pc_iter != _primary_chains->end());
-  if (!exists)
-    add_primary_chain(pchain);
-
-  return exists;
-}
-
-void GlobalEvent::add_primary_chain_recursive(
-    MAUS::DataStructure::Global::PrimaryChain* pchain) {
-  // Add the primary chain, checking if it already exists in chain.
-  bool already_added = add_primary_chain_check(pchain);
-
-  // If the chain had been added, then we will loop over the tracks
-  // and add them too.
-  if (!already_added) {
-    std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator
-        iter_track;
-    std::vector<MAUS::DataStructure::Global::TRefTrackPair*> *track_pair
-        = pchain->get_track_parent_pairs();
-    MAUS::DataStructure::Global::Track* track = NULL;
-    for (iter_track = track_pair->begin();
-        iter_track != track_pair->end(); ++iter_track) {
-      track = (*iter_track)->GetTrack();
-      add_track_recursive(track);
-    }
-  }
-}
-
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
 GlobalEvent::get_primary_chains() const {
   return _primary_chains;

@@ -52,17 +52,6 @@ class GlobalEvent {
    * are ignored. */
   void add_primary_chain(MAUS::DataStructure::Global::PrimaryChain* pchain);
 
-  /** If a MAUS::DataStructure::Global::PrimaryChain object is not already a
-   *  member of the GlobalEvent, add it in.  Otherwise, return false,
-   *  to signify already added.*/
-  bool add_primary_chain_check(
-      MAUS::DataStructure::Global::PrimaryChain* pchain);
-
-  /** Recursively add a MAUS::DataStructure::Global::PrimaryChain object and
-   *  the associated daughter objects */
-  void add_primary_chain_recursive(
-      MAUS::DataStructure::Global::PrimaryChain* pchain);
-
   /** Return the std::vector of MAUS::DataStructure::Global::PrimaryChain*,
    *  #_primary_chains. */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
@@ -165,4 +154,3 @@ class GlobalEvent {
 } // ~MAUS
 
 #endif  // _SRC_COMMON_CPP_DATASTRUCTURE_GLOBALEVENT_
-
