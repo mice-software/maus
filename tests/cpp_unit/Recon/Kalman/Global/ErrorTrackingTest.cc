@@ -11,7 +11,7 @@
 #include "src/legacy/BeamTools/BTMultipole.hh"
 #include "src/legacy/BeamTools/BTConstantField.hh"
 #include "src/legacy/BeamTools/BTTracker.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Squeak.hh"
 #include "src/legacy/Config/MiceModule.hh"
 
 #include "src/common_cpp/Maths/Matrix.hh"
@@ -27,8 +27,7 @@ namespace Kalman {
 namespace Global {
 Squeak::errorLevel verbose = Squeak::fatal;
 
-
-TEST(ErrorTrackingTest, GetSetTest) {
+TEST(ErrorTrackingTest, GetSetDeviationsTest) {
     ErrorTracking propagator;
     propagator.SetDeviations(1., 2., 3., 4.);
     std::vector<double> dev = propagator.GetDeviations();
@@ -36,7 +35,10 @@ TEST(ErrorTrackingTest, GetSetTest) {
     for (size_t i = 0; i < dev.size(); ++i) {
         EXPECT_NEAR(dev[i], i+1, 1e-12);
     }
+}
 
+TEST(ErrorTrackingTest, GetSetFieldTest) {
+    ErrorTracking propagator;
     ::CLHEP::Hep3Vector bvec(1., 1., 1.); 
     BTConstantField test_field(1000., 1000., 1000., bvec);
     propagator.SetField(&test_field);
@@ -44,6 +46,140 @@ TEST(ErrorTrackingTest, GetSetTest) {
 
     EXPECT_TRUE(false) << "Missing some accessors/mutators";
 }
+
+TEST(ErrorTrackingTest, GetSetStepSizesTest) {
+    ErrorTracking propagator;
+    propagator.SetMaxStepSize(99.);
+    EXPECT_NEAR(propagator.GetMaxStepSize(), 99., 1e-12);
+    propagator.SetMinStepSize(9.);
+    EXPECT_NEAR(propagator.GetMinStepSize(), 9., 1e-12);
+    try {
+        propagator.SetMaxStepSize(8.); // max < min
+        EXPECT_TRUE(false) << "Should have thrown";
+    } catch (Exceptions::Exception& exc) {
+        // pass
+    }
+    try {
+        propagator.SetMinStepSize(100.); // min > max
+        EXPECT_TRUE(false) << "Should have thrown";
+    } catch (Exceptions::Exception& exc) {
+        // pass
+    }
+}
+
+TEST(ErrorTrackingTest, GetSetELossModelTest) {
+    ErrorTracking::ELossModel loss_enum[] = {ErrorTracking::bethe_bloch_forwards,
+                                             ErrorTracking::bethe_bloch_backwards,
+                                             ErrorTracking::no_eloss};
+    std::string loss_str[] =
+                  {"bethe_bloch_forwards", "bethe_bloch_backwards", "no_eloss"};
+    ErrorTracking propagator;
+    for (size_t i = 0; i < 3; ++i) {
+        propagator.SetEnergyLossModel(loss_str[i]);
+        EXPECT_EQ(propagator.GetEnergyLossModel(), loss_enum[i]);
+    }
+    for (size_t i = 0; i < 3; ++i) {
+        propagator.SetEnergyLossModel(loss_enum[i]);
+        EXPECT_EQ(propagator.GetEnergyLossModel(), loss_enum[i]);
+    }
+    try {
+        propagator.SetEnergyLossModel("error no such model");
+        EXPECT_TRUE(false) << "Should have thrown";
+    } catch (Exceptions::Exception& exc) {
+        // pass
+    }
+}
+
+TEST(ErrorTrackingTest, GetSetMCSTest) {
+    ErrorTracking::MCSModel mcs_enum[] = {ErrorTracking::moliere_forwards,
+                                          ErrorTracking::moliere_backwards,
+                                          ErrorTracking::no_mcs};
+    std::string mcs_str[] = {"moliere_forwards", "moliere_backwards", "no_mcs"};
+    ErrorTracking propagator;
+    for (size_t i = 0; i < 3; ++i) {
+        propagator.SetMCSModel(mcs_str[i]);
+        EXPECT_EQ(propagator.GetMCSModel(), mcs_enum[i]);
+    }
+    for (size_t i = 0; i < 3; ++i) {
+        propagator.SetMCSModel(mcs_enum[i]);
+        EXPECT_EQ(propagator.GetMCSModel(), mcs_enum[i]);
+    }
+    try {
+        propagator.SetMCSModel("error no such model");
+        EXPECT_TRUE(false) << "Should have thrown";
+    } catch (Exceptions::Exception& exc) {
+        // pass
+    }
+}
+
+TEST(ErrorTrackingTest, GetSetEStragTest) {
+    ErrorTracking::EStragModel estrag_enum[] = {ErrorTracking::no_estrag,
+                                         };
+    std::string estrag_str[] = {"no_estrag"};  // "estrag_forwards", "estrag_backwards", 
+    ErrorTracking propagator;
+    for (size_t i = 0; i < 1; ++i) {
+        propagator.SetEStragModel(estrag_str[i]);
+        EXPECT_EQ(propagator.GetEStragModel(), estrag_enum[i]);
+    }
+    for (size_t i = 0; i < 1; ++i) {
+        propagator.SetEStragModel(estrag_enum[i]);
+        EXPECT_EQ(propagator.GetEStragModel(), estrag_enum[i]);
+    }
+    try {
+        propagator.SetEStragModel("estrag_forwards");
+        EXPECT_TRUE(false) << "Should have thrown";
+    } catch (Exceptions::Exception& exc) {
+        // pass
+    }
+}
+
+TEST(ErrorTrackingTest, GetSetTrackingTest) {
+    ErrorTracking::TrackingModel tracking_enum[] = {
+                                          ErrorTracking::em_forwards_dynamic,
+                                          ErrorTracking::em_backwards_dynamic,
+                                          ErrorTracking::em_forwards_static,
+                                          ErrorTracking::em_backwards_static};
+    std::string tracking_str[] = {"em_forwards_dynamic", "em_backwards_dynamic",
+                             "em_forwards_static", "em_backwards_static"};
+    ErrorTracking propagator;
+    for (size_t i = 0; i < 4; ++i) {
+        propagator.SetTrackingModel(tracking_str[i]);
+        EXPECT_EQ(propagator.GetTrackingModel(), tracking_enum[i]);
+    }
+    for (size_t i = 0; i < 4; ++i) {
+        propagator.SetTrackingModel(tracking_enum[i]);
+        EXPECT_EQ(propagator.GetTrackingModel(), tracking_enum[i]);
+    }
+    try {
+        propagator.SetTrackingModel("error no such model");
+        EXPECT_TRUE(false) << "Should have thrown";
+    } catch (Exceptions::Exception& exc) {
+        // pass
+    }
+}
+
+TEST(ErrorTrackingTest, GetSetGeometryTest) {
+    ErrorTracking::GeometryModel geometry_enum[] = {
+                                          ErrorTracking::geant4,
+                                          ErrorTracking::axial_lookup};
+    std::string geometry_str[] = {"geant4", "axial_lookup"};
+    ErrorTracking propagator;
+    for (size_t i = 0; i < 2; ++i) {
+        propagator.SetGeometryModel(geometry_str[i]);
+        EXPECT_EQ(propagator.GetGeometryModel(), geometry_enum[i]);
+    }
+    for (size_t i = 0; i < 2; ++i) {
+        propagator.SetGeometryModel(geometry_enum[i]);
+        EXPECT_EQ(propagator.GetGeometryModel(), geometry_enum[i]);
+    }
+    try {
+        propagator.SetGeometryModel("error no such model");
+        EXPECT_TRUE(false) << "Should have thrown";
+    } catch (Exceptions::Exception& exc) {
+        // pass
+    }
+}
+
 
 TEST(ErrorTrackingTest, FieldDerivativeTest) {
     double b0 = 2;

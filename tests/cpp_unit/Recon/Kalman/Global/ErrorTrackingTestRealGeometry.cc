@@ -45,7 +45,7 @@ TEST(ErrorTrackingRealGeometryTest, PropagateTrackTest) {
     MiceModule* mod = NULL;
     try {
         mod = new MiceModule(mod_name);
-    } catch (MAUS::Exception exc) {
+    } catch (Exceptions::Exception& exc) {
         std::cerr << "Didn't find a real geometry - this is normal so we skip "
                   << "ErrorTrackingRealGeometryTest" << std::endl;
         return;

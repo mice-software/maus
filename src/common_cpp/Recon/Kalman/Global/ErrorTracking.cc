@@ -162,7 +162,8 @@ int ErrorTracking::EquationsOfMotion(double z,
                                            void* params) {
   if (fabs(x[7]) < _float_tolerance) {
     // z-momentum is 0
-      tracking_fail << "pz " << x[7] << " was less than float tolerance " << _float_tolerance << "\n";
+      tracking_fail << "pz " << x[7] << " was less than float tolerance "
+                    << _float_tolerance << "\n";
       return GSL_FAILURE;
   }
   for (size_t i = 0; i < 29; ++i) {
@@ -285,7 +286,6 @@ int ErrorTracking::EMEquationOfMotion(double z,
   }
   return GSL_SUCCESS;
 }
-
 
 int ErrorTracking::MatrixEquationOfMotion(double z,
                                                 const double x[44],
@@ -576,6 +576,82 @@ ostream& ErrorTracking::print(std::ostream& out, const double* x) {
         out << std::endl;
     }
     return out;
+}
+
+void ErrorTracking::SetMinStepSize(double min_step_size) {
+    if (min_step_size > _max_step_size) {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                          "Min step size should be < max step size",
+                          "ErrorTracking::SetMinStepSize");
+    }
+   _min_step_size = min_step_size;
+}
+
+void ErrorTracking::SetMaxStepSize(double max_step_size) {
+    if (_min_step_size > max_step_size) {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                          "Min step size should be < max step size",
+                          "ErrorTracking::SetMaxStepSize");
+    }
+    _max_step_size = max_step_size;
+}
+
+void ErrorTracking::SetEnergyLossModel(std::string eloss_model) {
+    if (eloss_model == "bethe_bloch_forwards") {
+        SetEnergyLossModel(bethe_bloch_forwards);
+    } else if (eloss_model == "bethe_bloch_backwards") {
+        SetEnergyLossModel(bethe_bloch_backwards);
+    } else if (eloss_model == "no_eloss") {
+        SetEnergyLossModel(no_eloss);
+    } else {
+        throw Exceptions::Exception(
+                            Exceptions::recoverable,
+                            "Did not recognise energy loss model "+eloss_model,
+                            "ErrorTracking::SetEnergyLossModel");
+    }
+}
+
+void ErrorTracking::SetMCSModel(std::string mcs_model) {
+    if (mcs_model == "moliere_forwards") {
+        SetMCSModel(moliere_forwards);
+    } else if (mcs_model == "moliere_backwards") {
+        SetMCSModel(moliere_backwards);
+    } else if (mcs_model == "no_mcs") {
+        SetMCSModel(no_mcs);
+    } else {
+        throw Exceptions::Exception(
+                            Exceptions::recoverable,
+                            "Did not recognise mcs model "+mcs_model,
+                            "ErrorTracking::SetMCSModel");
+    }
+}
+
+void ErrorTracking::SetTrackingModel(std::string tracking_model) {
+    if (tracking_model == "em_forwards_dynamic") {
+        SetTrackingModel(em_forwards_dynamic);
+    } else if (tracking_model == "em_backwards_dynamic") {
+        SetTrackingModel(em_backwards_dynamic);
+    } else if (tracking_model == "em_forwards_static") {
+        SetTrackingModel(em_forwards_static);
+    } else if (tracking_model == "em_backwards_static") {
+        SetTrackingModel(em_backwards_static);
+    } else {
+        throw Exceptions::Exception(
+                            Exceptions::recoverable,
+                            "Did not recognise tracking model "+tracking_model,
+                            "ErrorTracking::SetTrackingModel");
+    }
+}
+
+void ErrorTracking::SetEStragModel(std::string estrag_model) {
+    if (estrag_model == "no_estrag") {
+        SetEStragModel(no_estrag);
+    } else {
+        throw Exceptions::Exception(
+                            Exceptions::recoverable,
+                            "Did not recognise estrag model "+estrag_model,
+                            "ErrorTracking::SetEStragModel");
+    }
 }
 
 } // namespace Global

@@ -60,7 +60,7 @@
 // * Improve test coverage
 // * -Dynamic step size to step to volume boundary (using GSL Control type)-
 // * -Enable/disable material name/conversion logic-
-// * -Seed from TOF01-; seed from tracker; -seed from TOF+tracker-
+// * -Seed from TOF01-; -seed from tracker-; -seed from TOF+tracker-
 // * Enable/disable volume names
 // * General profile/optimisation
 // * Non-unity determinant
