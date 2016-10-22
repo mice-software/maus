@@ -98,11 +98,11 @@ public:
      *  @param x: array of length 29; first 8 parameters are 
      *            (time, x, y, z), (total energy, px, py, pz)
      *     next 21 parameters are
-     *             V_tt,  V_tE,  V_tx,  V_tpx,  V_ty,  V_tpy
-     *                    V_EE,  V_Ex,  V_Epx,  V_Ey,  V_Epy
-     *                           V_xx,  V_xpx,  V_xy,  V_xpy
-     *                                  V_pxpx, V_pxy, V_pxpy
-     *                                          V_yy,  V_ypy
+     *             V_tt,  V_tx,  V_ty,  V_tE,  V_tpx,  V_tpy
+     *                    V_xx,  V_xy,  V_xE,  V_xpx,  V_xpy
+     *                           V_yy,  V_yE,  V_ypx,  V_ypy
+     *                                  V_EE,  V_Epx,  V_Epy
+     *                                         V_pxpx, V_pxpy
      *                                                 V_pypy
      *      x is a borrowed pointer; caller owns memory allocated to x.
      *      Propagation is done "in-place" i.e. x will be updated.

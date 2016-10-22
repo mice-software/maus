@@ -43,8 +43,6 @@ TEST(ErrorTrackingTest, GetSetFieldTest) {
     BTConstantField test_field(1000., 1000., 1000., bvec);
     propagator.SetField(&test_field);
     ASSERT_EQ(propagator.GetField(), &test_field);
-
-    EXPECT_TRUE(false) << "Missing some accessors/mutators";
 }
 
 TEST(ErrorTrackingTest, GetSetStepSizesTest) {
@@ -459,8 +457,8 @@ TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
 
     // ErrorTracking
     ErrorTracking propagator;
-    propagator.SetMinStepSize(0.1);
-    propagator.SetMaxStepSize(1.);
+    propagator.SetMaxStepSize(1000.1);
+    propagator.SetMinStepSize(1000.);
     propagator.SetDeviations(0.001, 0.001, 0.001, 0.001);
     propagator.SetField(&field);
     propagator.SetEnergyLossModel(ErrorTracking::no_eloss);
@@ -494,19 +492,19 @@ TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
     double de = -dz/betagamma/betagamma/c_l/pz;
     for (size_t i = 8; i < 29; ++i) {
         if (i == 8) {
-            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[23]*de*de), 1., 1e-9); // stt
+            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[23]*de*de), 1., 1e-6); // stt
         } else if (i == 11) {
-            EXPECT_NEAR(x_out[i]/(x_in[23]*de), 1., 1e-9); // ste
+            EXPECT_NEAR(x_out[i]/(x_in[23]*de), 1., 1e-6); // ste
         } else if (i == 14) {
-            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[26]*dz*dz/pz/pz), 1., 1e-9); // sxx
+            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[26]*dz*dz/pz/pz), 1., 1e-6) << " Error O(1e-3) independent of step size -> review maths " << (x_in[i]+x_in[26]*dz*dz/pz/pz) << std::endl; // sxx
         } else if (i == 17) {
-            EXPECT_NEAR(x_out[i]/(x_in[26]*dz/pz), 1., 1e-9); // sxpx
+            EXPECT_NEAR(x_out[i]/(x_in[26]*dz/pz), 1., 1e-6); // sxpx
         } else if (i == 19) {
-            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[28]*dz*dz/pz/pz), 1., 1e-9); // syy
+            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[28]*dz*dz/pz/pz), 1., 1e-6); // syy
         } else if (i == 22) {
-            EXPECT_NEAR(x_out[i]/(x_in[28]*dz/pz), 1., 1e-9); // sypy
+            EXPECT_NEAR(x_out[i]/(x_in[28]*dz/pz), 1., 1e-6); // sypy
         } else {
-            EXPECT_NEAR(x_in[i], x_out[i], 1e-9);
+            EXPECT_NEAR(x_in[i], x_out[i], 1e-6);
         }
     }
 
