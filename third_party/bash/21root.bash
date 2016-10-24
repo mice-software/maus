@@ -65,18 +65,17 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
       echo "INFO: Configuring:"
       echo
       sleep 1
-      # x11=${MAUS_THIRD_PARTY}/third_party/install/lib/
-      # hack to find third party libraries - for ubuntu et al where they have
-      # weird and wonderful library locations to support multiple architectures.
-      # Sticks them in ${x11} directory
-      # python ${MAUS_THIRD_PARTY}/third_party/install/bin/library_finder.py X11 Xext Xft
+      # Tell cmake explicitly about third_party/install/include, third_party/install/lib and third_party/install/lib64  to look for headers and libs
+      sed -i "s@include(MacroEnsureVersion)@include(MacroEnsureVersion)\ninclude_directories(${MAUS_ROOT_DIR}/third_party/install/include)\nlink_directories(${MAUS_ROOT_DIR}/third_party/install/lib ${MAUS_ROOT_DIR}/third_party/install/lib64)@" ${MAUS_ROOT_DIR}/third_party/source/${directory}/CMakeLists.txt
 
+      # Used to force cmake to pick up the correct gcc
       gcc_bin=`which gcc`
       gxx_bin=`which g++`
 
       cmake ${MAUS_ROOT_DIR}/third_party/source/${directory} \
             -DCMAKE_C_COMPILER=${gcc_bin} \
             -DCMAKE_CXX_COMPILER=${gxx_bin} \
+            -DEO_SOURCE_DIR:PATH=${MAUS_ROOT_DIR}/third_party/install/include \
             -Dgsl_shared=ON \
             -DGSL_CONFIG_EXECUTABLE=${MAUS_ROOT_DIR}/third_party/install/bin/gsl-config \
             -Dminuit2=ON \
