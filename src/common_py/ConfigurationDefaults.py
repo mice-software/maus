@@ -826,3 +826,7 @@ track_matching_check_charge_thresholds = {
   "TOF2":0.0,
   "KL":0.0
 }
+
+# Whether multiple adjacent cell hits in the KL should be merged into single spacepoints on import
+# into the global datastructure
+global_merge_kl_cell_hits = True
