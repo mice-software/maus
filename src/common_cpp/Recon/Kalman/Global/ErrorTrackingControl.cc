@@ -1,3 +1,21 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ * 
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://   www.gnu.org/licenses/>.
+ *
+ * Copyright Chris Rogers, 2016
+ */
+
 #include <iostream>
 
 #include "gsl/gsl_errno.h"
@@ -14,12 +32,14 @@ namespace Kalman {
 namespace Global {
 namespace ErrorTrackingControl {
 
+// control state struct
 typedef struct {
     double _max_step_size;
     double _min_step_size;
     GeometryNavigator* _navigator;
 } et_control_state_t;
 
+// Allocate memory
 static void* et_control_alloc() {
     et_control_state_t* state =
         static_cast<et_control_state_t *> (malloc (sizeof(et_control_state_t)));
@@ -31,6 +51,8 @@ static void* et_control_alloc() {
     return state;
 }
 
+// Initialise min/max step size; the geometry navigator comes from
+// Globals::GetMCGeometryNavigator
 static int et_control_init(void* vstate, double min_step_size, 
                            double max_step_size, double dummy2, double dummy3) {
     if (max_step_size < 0) {
@@ -45,6 +67,7 @@ static int et_control_init(void* vstate, double min_step_size,
     return GSL_SUCCESS;
 }
 
+// Actually choose a step size
 static int et_control_hadjust(void * vstate, size_t dim, unsigned int ord,
                               const double y[], const double yerr[],
                               const double yp[], double * h) {
@@ -73,20 +96,18 @@ static int et_control_hadjust(void * vstate, size_t dim, unsigned int ord,
     }
 
     step = sign*fabs(step);
-    // std::cerr << "Revise step size from " << *h
-    //          << " to " << step
-    //          << " navigator " << state->_navigator->ComputeStep(pos, dir, state->_max_step_size)
-    //          << " max " << state->_max_step_size << std::endl;
     *h = step;
 
     return return_value;
 }
 
+// Free memory
 static void et_control_free (void * vstate) {
    et_control_state_t *state = (et_control_state_t *) vstate;
    free(state);
 }
 
+// In C, we define vtable literally
 static const gsl_odeiv_control_type et_control_type = {
    "maus_recon_kalman_global_error_tracking", /* name */
    &et_control_alloc,
@@ -96,6 +117,7 @@ static const gsl_odeiv_control_type et_control_type = {
 };
 const gsl_odeiv_control_type *gsl_odeiv_control_et = &et_control_type;
 
+// Allocate memory and assign data
 gsl_odeiv_control* gsl_odeiv_control_et_new(double min_step_size,
                                             double max_step_size) {
   gsl_odeiv_control* control =  gsl_odeiv_control_alloc(gsl_odeiv_control_et);
