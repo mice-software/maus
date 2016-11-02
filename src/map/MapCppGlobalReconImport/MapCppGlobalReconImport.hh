@@ -95,6 +95,8 @@ namespace MAUS {
     Json::Value _configJSON;
     ///  JsonCpp setup
     Json::Reader _reader;
+    /// Whether adjacent cell hits should be merged into single spacepoints
+    bool _merge_cell_hits;
     /// Mapper name, useful for tracking results...
     std::string _classname;
     // Geometry file name
