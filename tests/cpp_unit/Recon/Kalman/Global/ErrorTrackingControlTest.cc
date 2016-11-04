@@ -30,7 +30,30 @@ TEST(ErrorTrackingControlTest, SetStepSizeTest) {
     MAUS::GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     std::vector<double> point(44., 0.);
     double step = 50.;
-    gsl_odeiv_control* control = MAUS::Kalman::Global::ErrorTrackingControl::gsl_odeiv_control_et_new(10., 100.);
-    control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);
-    COMPILES AND RUNS; NOW ADD TESTS(!)
+    gsl_odeiv_control* control = MAUS::Kalman::Global::ErrorTrackingControl::gsl_odeiv_control_et_new(1., 100.);
+    // boundaries at 1 m +/- 0.0025 m (transverse +/- 1 m)
+    // no where near a boundary; take max value
+    int ret_val = control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);
+    EXPECT_NEAR(step, 100., 1e-9);
+    EXPECT_EQ(ret_val, GSL_ODEIV_HADJ_INC);
+    // no change, return NIL
+    ret_val = control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);
+    EXPECT_NEAR(step, 100., 1e-9);
+    EXPECT_EQ(ret_val, GSL_ODEIV_HADJ_NIL);
+    // near a boundary, take distance to boundary (50 mm)
+    point[3] = 1000.-2.5-50.;
+    ret_val = control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);
+    EXPECT_NEAR(step, 50., 1e-9);
+    EXPECT_EQ(ret_val, GSL_ODEIV_HADJ_DEC);
+    // before a boundary, take min step size
+    point[3] = 1000.-2.5-0.1;
+    ret_val = control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);
+    EXPECT_NEAR(step, 1., 1e-9);
+    EXPECT_EQ(ret_val, GSL_ODEIV_HADJ_DEC);
+    // after a boundary, take min step size
+    point[3] = 1000.-2.5+0.1;
+    ret_val = control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);
+    EXPECT_NEAR(step, 1., 1e-9);
+    EXPECT_EQ(ret_val, GSL_ODEIV_HADJ_NIL);
+    gsl_odeiv_control_free(control);
 }
