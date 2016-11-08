@@ -255,8 +255,10 @@ namespace Kalman {
 
 std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix) {
     for (int i = 0; i < matrix.GetNrows(); ++i) {
-        for (int j = 0; j < matrix.GetNcols(); ++j)
-            out << i << " " << j << " " << matrix(i, j);
+        for (int j = 0; j < matrix.GetNcols(); ++j) {
+            out.width(12);
+            out << std::right << matrix(i, j) << " ";
+        }
         out << "\n";
     }
     return out;
@@ -264,16 +266,17 @@ std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix) {
 
 std::ostream& operator<<(std::ostream& out,
                          const MAUS::Kalman::State& state) {
-    out << state.GetVector();
+    out << state.GetVector() << "\n";
+    out << state.GetCovariance(); 
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out,
                          const MAUS::Kalman::TrackPoint& track_point) {
     out << "Track point at " << track_point.GetPosition() << "\n"
-        << "    data " << track_point.GetData() << "\n"
-        << "    filtered " << track_point.GetFiltered() << "\n"
-        << "    smoothed " << track_point.GetSmoothed();
+        << "    data:\n" << track_point.GetData() << "\n"
+        << "    filtered:\n" << track_point.GetFiltered() << "\n"
+        << "    smoothed:\n" << track_point.GetSmoothed();
     return out;
 }
 

@@ -77,9 +77,9 @@ class Propagator: public Propagator_base {
      *                   the neighbourhood of the state vector defined here.
      *  @param end_tp: only purpose is to define the z-position to which the
      *                 propagator is calculated.
-     *  @returns a propagator matrix (which transforms state vector from one
-     *  measurement site to another). This is like an accelerator physics
-     *  transfer matrix.
+     *  @returns the process noise. This is calculated by propagating the track
+     *  without any noise (i.e. just using the propagator), then propagating the
+     *  track with noise, and taking the difference.
      */
     virtual TMatrixD CalculateProcessNoise(const TrackPoint& start_tp,
                                            const TrackPoint& end_tp);
