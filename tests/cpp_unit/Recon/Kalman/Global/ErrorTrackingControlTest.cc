@@ -56,5 +56,4 @@ TEST(ErrorTrackingControlTest, SetStepSizeTest) {
     EXPECT_NEAR(step, 1., 1e-9);
     EXPECT_EQ(ret_val, GSL_ODEIV_HADJ_NIL);
     gsl_odeiv_control_free(control);
->>>>>>> MERGE-SOURCE
 }
