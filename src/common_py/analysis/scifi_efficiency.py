@@ -3,6 +3,7 @@
 """  Check tracker efficiency """
 
 import os
+import abc
 import ROOT
 import libMausCpp #pylint: disable = W0611
 import analysis.scifitools as tools
@@ -14,7 +15,7 @@ import analysis.scifitools as tools
 #pylint: disable = C0103
 #pylint: disable = W0612
 
-class EfficiencyData():
+class EfficiencyDataReal():
     """ Class to store pattern recognition efficiency data """
     def __init__(self):
         """ Initialise member variables """
@@ -141,78 +142,31 @@ class EfficiencyData():
         self.eff_tkds_3_5pt = 0.0
         self.eff_tkds_3_5pt_err = 0.0
 
-class PatternRecognitionEfficiency():
-    """ Class to check Pattern Recognition efficiency with real data """
+class PatternRecognitionEfficiencyBase():
+    """ Base class for other Pattern Recognition Efficiency classes """
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self):
         """ Initialise member variables """
-
-        # Options for the user
-        self.check_helical = True
-        self.check_straight = True
-        self.cut_on_tof = True
-        self.cut_on_tof_time = True
-        self.cut_on_tracker_10spnt = True
-        self.cut_on_tracker_5spnt = True # Should always be true
-        self.use_mc_truth = False
-        self.tof_upper_cut = 50.0
-        self.tof_lower_cut = 27.0
-        self.fiducial_cut = 150.0 # Not currently used
-        self.id_frequency_cut = 0.5
-
-        # ROOT objects
         self.root_files = []
-        # self.pt_hist = ROOT.TH1D("pt_hist", "pt", 100, -100.0, 100.0);
-        # self.pz_hist = ROOT.TH1D("pz_hist", "pz", 100, -100.0, 100.0);
-
-        # Results
-        self.bool_2tof_timing_event = False # Tof timing ok
-        self.bool_2tof_spoint_event = False # 1 spacepoint only in each tof
-        self.bool_10spoint_event = False # Expect one 5pt track in each trcker
-        self.bool_tkus_5spoint_event = False # Expect one 5pt track in TkUS
-        self.bool_tkds_5spoint_event = False # Expect one 5pt track in TkDS
-        self.bool_tkus_1track = False # Found one track in TkUS
-        self.bool_tkds_1track = False # Found one track in TkDS
-        self.bool_tkus_5spoint_track = False # Found one 5pt track in TkUS
-        self.bool_tkds_5spoint_track = False # Found one 5pt track in TkDS
-        self.bool_passed_tkus_event = False # Have all the choosen cuts passed?
-        self.bool_passed_tkds_event = False # Have all the choosen cuts passed?
-
-        # Per file data
-        self.fdata = EfficiencyData()
-
-        # Per job data
-        self.jdata = EfficiencyData()
-
-        # Other objects not reset by the clear() function
-        self.n_print_calls = 0
 
     def run(self, files):
         """ Loop over input root file, send each file for processing, print
             summary information and produce any plots"""
-        print '\nPattern Recognition Efficiency Calculator'
-        print '*****************************************\n'
+        self.print_welcome()
 
-        print 'Parameters:'
-        print 'Check helical\t' + str(self.check_helical)
-        print 'Check straight\t' + str(self.check_straight)
-        print 'Cut on TOF\t' + str(self.cut_on_tof)
-        print 'Cut on TOF Time\t' + str(self.cut_on_tof_time)
-        # print 'Cut on fiducial track\t' + str(self.cut_on_fiducial_track) 
-        print 'Cut on trackers\t' + str(self.cut_on_tracker_10spnt) + '\n'
-
-        self.root_files = self.load_data(files)
+        self.root_files = tools.load_data(files)
         if len(self.root_files) < 1:
             return False
 
         counter = 0
         for root_file_name in self.root_files:
             self.process_file(root_file_name)
-            self.print_info(self.fdata, root_file_name)
-            self.jdata += self.fdata # Accumulate the job data
+            self.print_info(root_file_name, 'file')
+            self.accumulate_job_data()
             counter += 1
-        self.jdata.calculate_efficiency()
-        self.print_info(self.jdata, 'Final job results')
+        self.calculate_job_efficiency()
+        self.print_info('Final job results', 'job')
         return True
 
     def process_file(self, root_file_name):
@@ -232,10 +186,106 @@ class PatternRecognitionEfficiency():
             self.process_spill(spill) # Analyse the spill
 
         # Perform final efficiency calculations
-        self.fdata.calculate_efficiency()
+        self.calculate_file_efficiency()
 
         # Close the ROOT file
         root_file.Close()
+
+    @abc.abstractmethod
+    def accumulate_job_data(self):
+        """ Accumulate the job data """
+        pass
+
+    @abc.abstractmethod
+    def caluclate_file_efficiency(self):
+        """ Calculate the file efficiency """
+        pass
+
+    @abc.abstractmethod
+    def calculate_job_efficiency(self):
+        """ Calculate the job efficiency """
+        pass
+
+    @abc.abstractmethod
+    def clear(self):
+        """ Set the internal data counters to zero & booleans to false """
+        pass
+
+    @abc.abstractmethod
+    def print_info(self, data_name, info_type='file'):
+        """ Print the results """
+        pass
+
+    @abc.abstractmethod
+    def print_welcome(self):
+      """ Message to be printed at programme start """
+      pass
+
+    @abc.abstractmethod
+    def process_spill(self, spill):
+      """ Process one spill of data """
+      pass
+
+class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
+    """ Class to check Pattern Recognition efficiency with real data """
+
+    def __init__(self):
+        """ Initialise member variables """
+        # Options for the user
+        self.check_helical = True
+        self.check_straight = True
+        self.cut_on_tof = True
+        self.cut_on_tof_time = True
+        self.cut_on_tracker_10spnt = True
+        self.cut_on_tracker_5spnt = True # Should always be true
+        self.use_mc_truth = False
+        self.tof_upper_cut = 50.0
+        self.tof_lower_cut = 27.0
+        self.fiducial_cut = 150.0 # Not currently used
+        self.id_frequency_cut = 0.5
+
+        # Results
+        self.bool_2tof_timing_event = False # Tof timing ok
+        self.bool_2tof_spoint_event = False # 1 spacepoint only in each tof
+        self.bool_10spoint_event = False # Expect one 5pt track in each trcker
+        self.bool_tkus_5spoint_event = False # Expect one 5pt track in TkUS
+        self.bool_tkds_5spoint_event = False # Expect one 5pt track in TkDS
+        self.bool_tkus_1track = False # Found one track in TkUS
+        self.bool_tkds_1track = False # Found one track in TkDS
+        self.bool_tkus_5spoint_track = False # Found one 5pt track in TkUS
+        self.bool_tkds_5spoint_track = False # Found one 5pt track in TkDS
+        self.bool_passed_tkus_event = False # Have all the choosen cuts passed?
+        self.bool_passed_tkds_event = False # Have all the choosen cuts passed?
+
+        self.fdata = EfficiencyDataReal() # Per file data
+        self.jdata = EfficiencyDataReal() # Per job data
+
+        # Other objects not reset by the clear() function
+        self.n_print_calls = 0
+
+    def accumulate_job_data(self):
+        """ Accumulate the job data """
+        self.jdata += self.fdata
+
+    def caluclate_file_efficiency(self):
+        """ Calculate the file efficiency """
+        self.fdata.calculate_efficiency()
+
+    def calculate_job_efficiency(self):
+        """ Calculate the job efficiency """
+        self.jdata.calculate_efficiency()
+
+    def print_welcome(self):
+        """ Message to be printed at programme start """
+        print '\nPattern Recognition Efficiency Calculator (Real Data)'
+        print '*******************************************************\n'
+
+        print 'Parameters:'
+        print 'Check helical\t' + str(self.check_helical)
+        print 'Check straight\t' + str(self.check_straight)
+        print 'Cut on TOF\t' + str(self.cut_on_tof)
+        print 'Cut on TOF Time\t' + str(self.cut_on_tof_time)
+        print 'Cut on trackers\t' + str(self.cut_on_tracker_10spnt) + '\n'
 
     def process_spill(self, spill):
         """ Process one spill of data """
@@ -490,35 +540,6 @@ class PatternRecognitionEfficiency():
             print 'Warning: Both track type options not set'
         return prtracks
 
-    @staticmethod
-    def load_data(files):
-        """ Load data from files. If a dir is given, search recursively """
-        if type(files) is not list:
-            files = [files]
-
-        root_files = []
-        for file_name in files:
-            # Check if file_name is a ROOT file
-            if os.path.isfile(file_name):
-                file_suffix, file_extension = os.path.splitext(file_name)
-                if file_extension == '.root':
-                    root_files.append(file_name)
-                else:
-                    print 'Bad file name, aborting'
-                    return root_files
-
-            # If file_name is a directory, walk it and save any ROOT files found
-            if os.path.isdir(file_name):
-                tools.root_files_dir_search(file_name, root_files)
-            if len(root_files) < 1:
-                print 'No data files found'
-                return root_files
-
-        print '\nFound ' + str(len(root_files)) + ' ROOT files:'
-        for f in root_files:
-            print f
-        return root_files
-
     #def make_plots(self, file_name_prefix):
         #""" Draw the histogramms and save """
         #c1 = ROOT.TCanvas()
@@ -529,8 +550,13 @@ class PatternRecognitionEfficiency():
         #self.pz_hist.Draw()
         #c1.SaveAs(file_name_prefix + "_momentum_failed_events.pdf")
 
-    def print_info(self, edata, data_name):
-        """ Print the results per file """
+    def print_info(self, data_name, info_type='file'):
+        """ Print the results """
+        if info_type == 'file':
+            edata = self.fdata
+        elif info_type == 'job':
+            edata = self.jdata
+
         if self.n_print_calls == 0:
             print '\nFile\t\t\tRecon_evt\tTOF\tTOF_SP\tTU_5pt\
               \tTD_5pt\tT_10pt\tGood_TU\tGood_TD\tTU_5trk\
@@ -554,3 +580,108 @@ class PatternRecognitionEfficiency():
           edata.eff_tkds_3_5pt, edata.eff_tkds_3_5pt_err)
 
         self.n_print_calls += 1
+
+class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
+    """ Class to check Pattern Recognition efficiency with MC data """
+
+    def __init__(self, nstations_tku=4, nstations_tkd=3):
+        """ Initialise member variables """
+        self.nstations_tku = nstations_tku
+        self.nstations_tkd = nstations_tkd
+        self.hit_id_frequency_cut = 0.5
+        
+        self.fdata = [] # Per file data
+        self.jdata = [] # Per job data
+
+        # Other objects not reset by the clear() function
+        self.n_print_calls = 0
+
+    def process_spill(self, spill):
+        """ Process one spill of data """
+        if spill.GetDaqEventType() != "physics_event":
+            return False # remove event from consideration
+
+        # Loop over events
+        for i in range(spill.GetReconEvents().size()):
+             revent = spill.GetReconEvents()[i]
+             mcevent = spill.GetMCEvents()[i]
+             self.process_event(revt, mcevt)
+
+    def process_event(self, revent, mcevent):
+        """ Process the data for one event """
+        sfevent = revent.GetSciFiEvent()
+
+        # Calculate the expected number of tracks by calculating how many
+        # MC tracks produced spacepoints in every station
+        spoints_tku = \
+          [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 0]
+        spoints_tkd = \
+          [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 1]
+        lkup = SciFiLookup(mcevent)
+        tracks_tku = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
+          self.nstations_tku, self.hit_id_frequency_cut)
+        tracks_tkd = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
+          self.nstations_tku, self.hit_id_frequency_cut)
+
+        # Find the number of tracks actually recontructed by pattern recognition
+        stracks_tku = [trk for trk in sfevent.get_straight_tracks() \
+          if trk.get_tracker() == 0]
+        stracks_tkd = [trk for trk in sfevent.get_straight_tracks() \
+          if trk.get_tracker() == 1]
+        htracks_tku = [trk for trk in sfevent.get_helical_tracks() \
+          if trk.get_tracker() == 0]
+        htracks_tkd = [trk for trk in sfevent.get_helical_tracks() \
+          if trk.get_tracker() == 1]
+
+        # Do these tracks come from 1 MC track each? Are there mixed tracks?
+        tracks_tku = htracks_tku + stracks_tku
+        tracks_tkd = htracks_tkd + stracks_tkd
+        results_tku = check_tracks(lkup, self.nstations_tku, tracks_tku)
+        results_tkd = check_tracks(lkup, self.nstations_tkd, tracks_tkd)
+
+    def accumulate_job_data(self):
+        """ Accumulate the job data """
+        self.jdata += self.fdata
+
+    def caluclate_file_efficiency(self):
+        """ Calculate the file efficiency """
+        self.fdata.calculate_efficiency()
+
+    def calculate_job_efficiency(self):
+        """ Calculate the job efficiency """
+        self.jdata.calculate_efficiency()
+
+    def check_tracks(self, lkup, nstations, recon_tracks):
+        """ Are the recon tracks found good tracks wrt the MC data?
+            nstations is the number of seed spacepoints originating from
+            the same MC track required for a recon track to be classed as
+            good. Hence if nstations = the actual number fo tracker stations,
+            only perfect recon tracks will count as good """
+        n_good_tracks = 0 # tracks which can be associated with an MC track
+        # tracks generated from spoints from different MC tracks
+        n_mixed_tracks = 0
+        n_bad_tracks = 0 # tracks generated from mixed spacepoints
+        for trk in recon_tracks:
+            spoints = trk.get_spacepoints_pointers():
+            mc_tids = tools.find_mc_tracks_from_spoints(lkup, spoints, \
+              nstations, self.hit_id_frequency_cut)
+            if len(mc_tids) == 1:
+                n_good_tracks = n_good_tracks + 1
+            elif len(mc_tids) > 1:
+                n_mixed_tracks = n_mixed_tracks + 1
+            elif len(mc_tids) < 1:
+                n_bad_tracks = n_bad_tracks + 1
+        return n_good_tracks, n_mixed_tracks, n_bad_tracks
+
+    def clear(self):
+        """ Set the internal file data counters to zero & booleans to false """
+
+    def print_info(self, data_name, info_type='file'):
+        """ Print the results """
+        print "Implement me!"
+        self.n_print_calls += 1
+
+    def print_welcome(self):
+        """ Message to be printed at programme start """
+        print '\nPattern Recognition Efficiency Calculator (MC)'
+        print '************************************************\n'

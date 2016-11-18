@@ -188,8 +188,16 @@
                         </xsl:text></xsl:when>
                                     </xsl:choose>
                                 </xsl:for-each>
-                            </xsl:when>    
-
+                            </xsl:when>
+                            <xsl:when test="contains(@name, 'FCM') and ( contains(@mode, 'Off') or contains(@mode, 'off'))">
+                        Substitution $FCMMode +1<xsl:text>
+                                        
+                        </xsl:text>Substitution $FCMUPolarity +1<xsl:text>
+                                        
+                        </xsl:text>Substitution $FCMDPolarity +1<xsl:text>
+                                        
+                        </xsl:text>
+			</xsl:when>    
                             <xsl:when test="contains(@name, 'FCU') and ( contains(@mode, 'Solenoid') or contains(@mode, 'solenoid'))">
                         Substitution $FCMMode +1<xsl:text>
                                         
@@ -222,6 +230,15 @@
                                         </xsl:choose>
                                     </xsl:for-each>
                                 </xsl:when>
+                            <xsl:when test="contains(@name, 'FCU') and ( contains(@mode, 'Off') or contains(@mode, 'off'))">
+                        Substitution $FCMMode +0<xsl:text>
+                                        
+                        </xsl:text>Substitution $FCMUPolarity +1<xsl:text>
+                                        
+                        </xsl:text>Substitution $FCMDPolarity +1<xsl:text>
+                                        
+                        </xsl:text>
+			</xsl:when>    
                                 <xsl:when test="contains(@name, 'SSD')">
                                   <xsl:for-each select="coil">
                                     <xsl:choose>

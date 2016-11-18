@@ -55,6 +55,7 @@ namespace MAUS {
 			    "MapCppGlobalReconImport::_birth");
     }
 
+    _merge_cell_hits = _configJSON["global_merge_kl_cell_hits"].asBool();
     _configCheck = true;
     _classname = "MapCppGlobalReconImport";
   }
@@ -113,7 +114,7 @@ namespace MAUS {
 	if (recon_event->GetKLEvent()) {
 	  MAUS::KLEvent* kl_event = recon_event->GetKLEvent();
 	  MAUS::recon::global::ImportKLRecon klrecon_importer;
-	  klrecon_importer.process((*kl_event), global_event, _classname);
+	  klrecon_importer.process((*kl_event), global_event, _classname, _merge_cell_hits);
 	}
 	// Import EMR tracks into global event
 	if (recon_event->GetEMREvent()) {
