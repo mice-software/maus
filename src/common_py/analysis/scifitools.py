@@ -5,6 +5,34 @@
 import os
 import libMausCpp #pylint: disable = W0611
 
+def load_data(files):
+    """ Load data from files. If a dir is given, search recursively """
+    if type(files) is not list:
+        files = [files]
+
+    root_files = []
+    for file_name in files:
+        # Check if file_name is a ROOT file
+        if os.path.isfile(file_name):
+            file_suffix, file_extension = os.path.splitext(file_name)
+            if file_extension == '.root':
+                root_files.append(file_name)
+            else:
+                print 'Bad file name, aborting'
+                return root_files
+
+        # If file_name is a directory, walk it and save any ROOT files found
+        if os.path.isdir(file_name):
+            tools.root_files_dir_search(file_name, root_files)
+        if len(root_files) < 1:
+            print 'No data files found'
+            return root_files
+
+    print '\nFound ' + str(len(root_files)) + ' ROOT files:'
+    for f in root_files:
+        print f
+    return root_files
+
 def root_files_dir_search(top_dir, root_files):
     """ Appends any ROOT files found in the directory to root_files """
     #pylint: disable = W0612
@@ -101,16 +129,16 @@ def find_mc_tracks_from_spoints(lkup, spoints, nstations=5, \
 
     for sp in spoints:
         station = sp.get_station() # station number
-        hits = find_mc_hits(lkup, sp) #  The hits which formed the spoint
+        hits = find_mc_hits(lkup, [sp]) #  The hits which formed the spoint
         track_id = find_mc_track(hits, hit_id_frequency_cut)
-        if track_id != -1 # if we have a good track id for this spoint
+        if track_id != -1: # if we have a good track id for this spoint
             if not track_id in track_ids:
-                tracks_ids[track_id] = {station : 1}
-            elif not station in tracks_ids[track_id]:
-                tracks_ids[track_id][station] = 1
+                track_ids[track_id] = {station : 1}
+            elif not station in track_ids[track_id]:
+                track_ids[track_id][station] = 1
             else:
-                tracks_ids[track_id][station] = \
-                  tracks_ids[track_id][station] + 1
+                track_ids[track_id][station] = \
+                  track_ids[track_id][station] + 1
             ntracks = ntracks + 1
 
     good_tracks = []

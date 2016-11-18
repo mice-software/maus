@@ -16,7 +16,7 @@ import analysis.scifitools as tools
 #pylint: disable = W0612
 
 class EfficiencyDataReal():
-    """ Class to store pattern recognition efficiency data """
+    """ Class to store pattern recognition efficiency data from real data """
     def __init__(self):
         """ Initialise member variables """
         self.n_total_events = 0
@@ -47,7 +47,7 @@ class EfficiencyDataReal():
     def __iadd__(self, other):
         """ Add another instance's data to that here,
             just the totals, not the final efficiency data"""
-        self.n_total_events += other.n_total_events 
+        self.n_total_events += other.n_total_events
         self.n_passed_tof_timing_events += other.n_passed_tof_timing_events
         self.n_passed_tof_spoint_events += other.n_passed_tof_spoint_events
         self.n_10spoint_events += other.n_10spoint_events
@@ -64,7 +64,7 @@ class EfficiencyDataReal():
         return self
 
     def calculate_efficiency(self):
-        """ Calculate the final efficiency figures for a file """
+        """ Calculate the final efficiency figures """
         self.eff_tkus_5pt = 0.0
         self.eff_tkus_5pt_err = 0.0
         self.eff_tkus_3_5pt = 0.0
@@ -142,6 +142,76 @@ class EfficiencyDataReal():
         self.eff_tkds_3_5pt = 0.0
         self.eff_tkds_3_5pt_err = 0.0
 
+class EfficiencyDataMC():
+    """ Class to store pattern recognition efficiency data from MC data """
+    def __init__(self):
+        """ Initialise member variables """
+        self.n_total_events = 0 # Total number of events
+        self.n_total_tkus_tracks = 0 # Total number of tkus tracks
+        self.n_total_tkds_tracks = 0 # Total number of tkus tracks
+        self.n_mc_tkus_tracks = 0 # MC tracks which created a viable # of spoints
+        self.n_mc_tkds_tracks = 0 # MC tracks which created a viable # of spoints
+        self.n_good_rec_tkus_tracks = 0 # Number of good recon tracks found in tkus
+        self.n_good_rec_tkds_tracks = 0 # Number of good recon tracks found in tkus
+        self.n_mixed_rec_tkus_tracks = 0 # Number of mixed recon tracks found in tkus
+        self.n_mixed_rec_tkds_tracks = 0 # Number of mixed recon tracks found in tkus
+        self.n_bad_rec_tkus_tracks = 0 # Number of back recon tracks found in tkus
+        self.n_bad_rec_tkds_tracks = 0 # Number of back recon tracks found in tkus
+
+        self.eff_tkus_tracks = 0.0 # Efficiency of finding good tracks in tkus
+        self.eff_tkds_tracks = 0.0 # Efficiency of finding good tracks in tkds
+
+    def __iadd__(self, other):
+        """ Add another instance's data to that here,
+            just the totals, not the final efficiency data"""
+        self.n_total_events += other.n_total_events
+        self.n_total_tkus_tracks += other.n_total_tkus_tracks
+        self.n_total_tkds_tracks += other.n_total_tkds_tracks
+        self.n_mc_tkus_tracks += other.n_mc_tkus_tracks
+        self.n_mc_tkds_tracks += other.n_mc_tkds_tracks
+        self.n_good_rec_tkus_tracks += other.n_good_rec_tkus_tracks
+        self.n_good_rec_tkds_tracks += other.n_good_rec_tkds_tracks
+        self.n_mixed_rec_tkus_tracks += other.n_mixed_rec_tkus_tracks
+        self.n_mixed_rec_tkds_tracks += other.n_mixed_rec_tkds_tracks
+        self.n_bad_rec_tkus_tracks += other.n_bad_rec_tkus_tracks
+        self.n_bad_rec_tkds_tracks += other.n_bad_rec_tkds_tracks
+        return self
+
+    def calculate_efficiency(self):
+        """ Calculate the final efficiency figures """
+        self.eff_tkus_tracks = 0.0
+        self.eff_tkds_tracks = 0.0
+
+        # Upstream tracker
+        try:
+            self.eff_tkus_tracks = float(self.n_good_rec_tkus_tracks) \
+              / float(self.n_mc_tkus_tracks)
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkus_tracks = 0.0
+        # Downstream tracker
+        try:
+            self.eff_tkds_tracks = float(self.n_good_rec_tkds_tracks) \
+              / float(self.n_mc_tkds_tracks)
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkds_tracks = 0.0
+
+    def clear(self):
+        """ Clear all data """
+        self.n_total_events = 0
+        self.n_total_tkus_tracks = 0
+        self.n_total_tkds_tracks = 0
+        self.n_mc_tkus_tracks = 0
+        self.n_mc_tkds_tracks = 0
+        self.n_good_rec_tkus_tracks = 0
+        self.n_good_rec_tkds_tracks = 0
+        self.n_mixed_rec_tkus_tracks = 0
+        self.n_mixed_rec_tkds_tracks = 0
+        self.n_bad_rec_tkus_tracks = 0
+        self.n_bad_rec_tkds_tracks = 0
+
+        self.eff_tkus_tracks = 0.0
+        self.eff_tkds_tracks = 0.0
+
 class PatternRecognitionEfficiencyBase():
     """ Base class for other Pattern Recognition Efficiency classes """
     __metaclass__ = abc.ABCMeta
@@ -197,7 +267,7 @@ class PatternRecognitionEfficiencyBase():
         pass
 
     @abc.abstractmethod
-    def caluclate_file_efficiency(self):
+    def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
         pass
 
@@ -584,14 +654,14 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
 class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
     """ Class to check Pattern Recognition efficiency with MC data """
 
-    def __init__(self, nstations_tku=4, nstations_tkd=3):
+    def __init__(self, nstations_tku=5, nstations_tkd=5):
         """ Initialise member variables """
         self.nstations_tku = nstations_tku
         self.nstations_tkd = nstations_tkd
         self.hit_id_frequency_cut = 0.5
-        
-        self.fdata = [] # Per file data
-        self.jdata = [] # Per job data
+
+        self.fdata = EfficiencyDataMC() # Per file data
+        self.jdata = EfficiencyDataMC() # Per job data
 
         # Other objects not reset by the clear() function
         self.n_print_calls = 0
@@ -601,11 +671,14 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         if spill.GetDaqEventType() != "physics_event":
             return False # remove event from consideration
 
+        print 'Processing spill ' + str(spill.GetSpillNumber())
+
         # Loop over events
         for i in range(spill.GetReconEvents().size()):
              revent = spill.GetReconEvents()[i]
              mcevent = spill.GetMCEvents()[i]
-             self.process_event(revt, mcevt)
+             self.process_event(revent, mcevent)
+             print '  Processing event ' + str(i)
 
     def process_event(self, revent, mcevent):
         """ Process the data for one event """
@@ -617,33 +690,50 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
           [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 0]
         spoints_tkd = \
           [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 1]
-        lkup = SciFiLookup(mcevent)
+        print 'Found ' +str(len(spoints_tku)) + ' spoints in TKU'
+        print 'Found ' +str(len(spoints_tkd)) + ' spoints in TKD'
+        lkup = tools.SciFiLookup(mcevent)
         tracks_tku = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
           self.nstations_tku, self.hit_id_frequency_cut)
         tracks_tkd = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
           self.nstations_tku, self.hit_id_frequency_cut)
 
+        print 'Found ' + str(len(tracks_tku)) + ' MC tracks in TKU'
+        print 'Found ' + str(len(tracks_tkd)) + ' MC tracks in TKD'
+
+        # Update internal counters
+        self.fdata.n_mc_tkus_tracks += len(tracks_tku)
+        self.fdata.n_mc_tkds_tracks += len(tracks_tkd)
+
         # Find the number of tracks actually recontructed by pattern recognition
-        stracks_tku = [trk for trk in sfevent.get_straight_tracks() \
+        stracks_tku = [trk for trk in sfevent.straightprtracks() \
           if trk.get_tracker() == 0]
-        stracks_tkd = [trk for trk in sfevent.get_straight_tracks() \
+        stracks_tkd = [trk for trk in sfevent.straightprtracks() \
           if trk.get_tracker() == 1]
-        htracks_tku = [trk for trk in sfevent.get_helical_tracks() \
+        htracks_tku = [trk for trk in sfevent.helicalprtracks() \
           if trk.get_tracker() == 0]
-        htracks_tkd = [trk for trk in sfevent.get_helical_tracks() \
+        htracks_tkd = [trk for trk in sfevent.helicalprtracks() \
           if trk.get_tracker() == 1]
 
         # Do these tracks come from 1 MC track each? Are there mixed tracks?
         tracks_tku = htracks_tku + stracks_tku
         tracks_tkd = htracks_tkd + stracks_tkd
-        results_tku = check_tracks(lkup, self.nstations_tku, tracks_tku)
-        results_tkd = check_tracks(lkup, self.nstations_tkd, tracks_tkd)
+        results_tku = self.check_tracks(lkup, self.nstations_tku, tracks_tku)
+        results_tkd = self.check_tracks(lkup, self.nstations_tkd, tracks_tkd)
+
+        # Update internal counters
+        self.fdata.n_good_rec_tkus_tracks += results_tku[0]
+        self.fdata.n_good_rec_tkds_tracks += results_tkd[0]
+        self.fdata.n_mixed_rec_tkus_tracks += results_tku[1]
+        self.fdata.n_mixed_rec_tkds_tracks += results_tkd[1]
+        self.fdata.n_bad_rec_tkus_tracks += results_tku[2]
+        self.fdata.n_bad_rec_tkds_tracks += results_tkd[2]
 
     def accumulate_job_data(self):
         """ Accumulate the job data """
         self.jdata += self.fdata
 
-    def caluclate_file_efficiency(self):
+    def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
         self.fdata.calculate_efficiency()
 
@@ -662,7 +752,7 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         n_mixed_tracks = 0
         n_bad_tracks = 0 # tracks generated from mixed spacepoints
         for trk in recon_tracks:
-            spoints = trk.get_spacepoints_pointers():
+            spoints = trk.get_spacepoints_pointers()
             mc_tids = tools.find_mc_tracks_from_spoints(lkup, spoints, \
               nstations, self.hit_id_frequency_cut)
             if len(mc_tids) == 1:
@@ -675,13 +765,36 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
 
     def clear(self):
         """ Set the internal file data counters to zero & booleans to false """
+        self.fdata.clear()
 
     def print_info(self, data_name, info_type='file'):
         """ Print the results """
-        print "Implement me!"
+        if info_type == 'file':
+            edata = self.fdata
+        elif info_type == 'job':
+            edata = self.jdata
+
+        if self.n_print_calls == 0:
+            print '\nFile\t\t\tRecon_evt\tTU_MC\tTD_MC\tTU_Good\tTD_Good\t\
+              TU_Mixed\tTD_Mixed\tTU_Bad\tTD_Bad'
+
+        print os.path.basename(data_name) + '\t',
+        print str(edata.n_total_events) + '\t\t',
+        print str(edata.n_mc_tkus_tracks) + '\t' + \
+          str(edata.n_mc_tkds_tracks) + '\t' + \
+          str(edata.n_good_rec_tkus_tracks) + '\t' + \
+          str(edata.n_good_rec_tkds_tracks) + '\t' + \
+          str(edata.n_mixed_rec_tkus_tracks) + '\t' + \
+          str(edata.n_mixed_rec_tkds_tracks) + '\t' + \
+          str(edata.n_bad_rec_tkus_tracks) + '\t' + \
+          str(edata.n_bad_rec_tkds_tracks)
         self.n_print_calls += 1
 
     def print_welcome(self):
         """ Message to be printed at programme start """
         print '\nPattern Recognition Efficiency Calculator (MC)'
         print '************************************************\n'
+
+        print 'Parameters:'
+        print 'Stations matched required for good track TkUS \t' + str(self.nstations_tku)
+        print 'Stations matched required for good track TkDS \t' + str(self.nstations_tkd)
