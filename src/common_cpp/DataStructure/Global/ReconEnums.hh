@@ -128,6 +128,16 @@ enum PID {
   kHelium3              =  1000020030,
   kHelium4              =  1000020040
 };
+
+
+enum ChainType {
+  kNoChainType = 0,
+  kUS          = 1,
+  kDS          = 2,
+  kUSOrphan    = 3,
+  kDSOrphan    = 4,
+  kThrough     = 5
+};
 /** @} */ // end of globalrecon
 
 } // ~namespace Global

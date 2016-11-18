@@ -28,17 +28,22 @@ PrimaryChainProcessor::PrimaryChainProcessor() {
       &MAUS::DataStructure::Global::PrimaryChain::set_mapper_name,
       true);
 
-  RegisterTRefArray(
-      "lr_spacepoints", &_lr_sp_trefarray_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_lr_spacepoints,
-      &MAUS::DataStructure::Global::PrimaryChain::set_lr_spacepoints,
-      true);
+  RegisterValueBranch(
+      "type", &_chain_type_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_chain_type,
+      &MAUS::DataStructure::Global::PrimaryChain::set_chain_type, true);
 
-  RegisterTRefArray(
-      "lr_tracks", &_lr_track_trefarray_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_lr_tracks,
-      &MAUS::DataStructure::Global::PrimaryChain::set_lr_tracks,
-      true);
+  RegisterTRef(
+      "us_daughter",
+      &MAUS::DataStructure::Global::PrimaryChain::get_us_daughter,
+      &MAUS::DataStructure::Global::PrimaryChain::set_us_daughter,
+      false);
+
+  RegisterTRef(
+      "ds_daughter",
+      &MAUS::DataStructure::Global::PrimaryChain::get_ds_daughter,
+      &MAUS::DataStructure::Global::PrimaryChain::set_us_daughter,
+      false);
 
   RegisterTRefArray(
       "tracks", &_track_trefarray_proc,

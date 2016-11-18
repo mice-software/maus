@@ -25,6 +25,7 @@
 #include "TObject.h"
 #include "TRefArray.h"
 #include "Rtypes.h"
+#include "TRef.h"
 
 // MAUS headers
 #include "src/common_cpp/Utils/VersionNumber.hh"
@@ -55,38 +56,74 @@ class PrimaryChain : public TObject {
   /// Assignment operator
   PrimaryChain& operator=(const PrimaryChain &primary_chain);
 
-  void AddLRSpacePoint(MAUS::DataStructure::Global::SpacePoint* spacepoint);
 
-  void AddLRTrack(MAUS::DataStructure::Global::Track* track);
+  // Getters & Setters
+  /// Get the upstream daughter chain, if current chain is not a through chain,
+  /// NULL is returned
+  MAUS::DataStructure::Global::PrimaryChain* GetUSDaughter() const;
 
-  void AddTrack(MAUS::DataStructure::Global::Track* track);
+  /// Set the upstream daughter chain, if current chain is not a through chain,
+  /// nothing will be done and an error message sent to Squeak::error
+  void SetUSDaughter(MAUS::DataStructure::Global::PrimaryChain* us_daughter);
 
-  std::vector<MAUS::DataStructure::Global::SpacePoint*> GetLRSpacePoints() const;
+  /// Get the downstream daughter chain, if current chain is not a through chain,
+  /// NULL is returned
+  MAUS::DataStructure::Global::PrimaryChain* GetDSDaughter() const;
 
-  std::vector<MAUS::DataStructure::Global::Track*> GetLRTracks() const;
+  /// Set the downstream daughter chain, if current chain is not a through chain,
+  /// nothing will be done and an error message sent to Squeak::error
+  void SetDSDaughter(MAUS::DataStructure::Global::PrimaryChain* ds_daughter);
 
-  std::vector<MAUS::DataStructure::Global::Track*> GetTracks() const;
+  /// Get the matched track with the requested PID. If no such track exists, NULL is returned
+  MAUS::DataStructure::Global::Track* GetMatchedTrack(MAUS::DataStructure::Global::PID pid) const;
 
-  std::vector<MAUS::DataStructure::Global::Track*> GetTracks(std::string mapper_name) const;
+  /// Get all matched tracks in the chain, for a through chain this will only be through-matched
+  /// tracks, the US and DS tracks can be accessed via the daughter chains
+  std::vector<MAUS::DataStructure::Global::Track*> GetMatchedTracks() const;
 
-  TRefArray* get_lr_spacepoints() const { return _lr_spacepoints; }
+  /// Add a matched track to the chain
+  void AddMatchedTrack(MAUS::DataStructure::Global::Track* track);
 
-  void set_lr_spacepoints(TRefArray* lr_spacepoints) {
-    _lr_spacepoints = lr_spacepoints; }
+  /// Retrieve the PID'd track from the chain, if it doesn't exist, NULL is returned
+  MAUS::DataStructure::Global::Track* GetPIDTrack() const;
 
-  TRefArray* get_lr_tracks() const { return _lr_tracks; }
+  /// Add the PID track to the chain. Only one can exist for each chain, so if it is already
+  /// set, it is overwritten and a warning sent to Squeak::debug
+  void SetPIDTrack(MAUS::DataStructure::Global::Track* track);
 
-  void set_lr_tracks(TRefArray* lr_tracks) { _lr_tracks = lr_tracks; }
+  /// Retrieve the Fitted track from the chain, if it doesn't exist, NULL is returned
+  MAUS::DataStructure::Global::Track* GetFittedTrack() const;
 
-  TRefArray* get_tracks() const { return _tracks; }
+  /// Add the fitted track to the chain. Only one can exist for each chain, so if it is already
+  /// set, it is overwritten and a warning sent to Squeak::debug
+  void SetFittedTrack(MAUS::DataStructure::Global::Track* track);
+  
+
+  // Getters and setters for serialization
+  TRefArray* get_tracks() const {return _tracks; }
 
   void set_tracks(TRefArray* tracks) { _tracks = tracks; }
 
+  TObject* get_us_daughter() const { return _us_daughter.GetObject(); }
+
+  void set_us_daughter(TObject* us_daughter) { _us_daughter = us_daughter; }
+
+  TObject* get_ds_daughter() const { return _ds_daughter.GetObject(); }
+
+  void set_ds_daughter(TObject* ds_daughter) { _ds_daughter = ds_daughter; }
+
   // Getters and Setters for the member variables
   /// Set the name for the mapper which produced the result, #_mapper_name.
-  void set_mapper_name(std::string mapper_name);
+  void set_mapper_name(std::string mapper_name) { _mapper_name = mapper_name; }
   /// Get the name for the mapper which produced the result, #_mapper_name.
-  std::string get_mapper_name() const;
+  std::string get_mapper_name() const { return _mapper_name; }
+
+  /// Get the type of the chain
+  MAUS::DataStructure::Global::ChainType get_chain_type() const { return _type; }
+
+  /// Set the type of the chain, options in the enum are
+  /// kNoChainType, kUS, kDS, kUSOrphan, kDSOrphan, kThrough
+  void set_chain_type(MAUS::DataStructure::Global::ChainType type) { _type = type; }
 
 
  private:
@@ -94,14 +131,17 @@ class PrimaryChain : public TObject {
   /// The name of the mapper that last edited this object
   std::string _mapper_name;
 
-  /// All SpacePoints in the Event from Local Reconstruction (TOFs, CKovs, KL)
-  TRefArray* _lr_spacepoints;
+  /// Type of the chain, i.e. whether it is US, DS, Orphan US, OrphanDS, or Through
+  MAUS::DataStructure::Global::ChainType _type;
 
-  /// All Tracks in the Event from Local Reconstruction (Trackers, EMR)
-  TRefArray* _lr_tracks;
-
-  /// All Tracks created in the track-matching, PID, and track-fitting
+  /// Tracks contained in the chain
   TRefArray* _tracks;
+
+  /// US daughter primary chain (only if this is a through chain)
+  TRef _us_daughter;
+
+  /// DS daughter primary chain (only if this is a through chain)
+  TRef _ds_daughter;
 
 
   MAUS_VERSIONED_CLASS_DEF(PrimaryChain);

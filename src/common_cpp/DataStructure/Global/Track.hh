@@ -218,6 +218,11 @@ class Track : public TObject {
   std::vector<const MAUS::DataStructure::Global::Track*> GetConstituentTracks()
       const;
 
+  /// User method for accessing the constituent tracks.  These are
+  /// returned as const, so that they can't be changed.
+  std::vector<const MAUS::DataStructure::Global::Track*>
+      GetConstituentTracks(MAUS::DataStructure::Global::DetectorPoint detector) const;
+
   /// Directly set the #_constituent_tracks TRefArray.  This passes
   /// ownership of the pointer to the Track, and is mostly for use by
   /// the Json/Cpp Processor.  Users should use Add/Remove Track

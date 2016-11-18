@@ -331,4 +331,95 @@ void GlobalEvent::set_space_points(
     std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points) {
   _space_points = space_points;
 };
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetThroughPrimaryChains() const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> through_chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    if (_primary_chains->at(i)->get_chain_type() == MAUS::DataStructure::Global::kThrough) {
+      through_chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return through_chains;
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetPrimaryChainOrphans() const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> orphan_chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    MAUS::DataStructure::Global::ChainType chain_type = _primary_chains->at(i)->get_chain_type();
+    if (chain_type == MAUS::DataStructure::Global::kUSOrphan or
+        chain_type == MAUS::DataStructure::Global::kDSOrphan) {
+      orphan_chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return orphan_chains;
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetPrimaryChainOrphansUS() const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> usorphan_chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    if (_primary_chains->at(i)->get_chain_type() == MAUS::DataStructure::Global::kUSOrphan) {
+      usorphan_chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return usorphan_chains;
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetPrimaryChainOrphansDS() const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> dsorphan_chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    if (_primary_chains->at(i)->get_chain_type() == MAUS::DataStructure::Global::kDSOrphan) {
+      dsorphan_chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return dsorphan_chains;
+}
+
+std::vector<MAUS::DataStructure::Global::Track*> GlobalEvent::GetLRTracks() const {
+  std::vector<MAUS::DataStructure::Global::Track*> lr_tracks;
+  for (size_t i = 0; i < _tracks->size(); i++) {
+    if (_tracks->at(i)->get_mapper_name() == "MapCppGlobalReconImport") {
+      lr_tracks.push_back(_tracks->at(i));
+    }
+  }
+  return lr_tracks;
+}
+
+std::vector<MAUS::DataStructure::Global::Track*>
+    GlobalEvent::GetLRTracks(MAUS::DataStructure::Global::DetectorPoint detector) const {
+  std::vector<MAUS::DataStructure::Global::Track*> lr_tracks;
+  for (size_t i = 0; i < _tracks->size(); i++) {
+    if (_tracks->at(i)->get_mapper_name() == "MapCppGlobalReconImport" and
+        _tracks->at(i)->HasDetector(detector)) {
+      lr_tracks.push_back(_tracks->at(i));
+    }
+  }
+  return lr_tracks;
+}
+
+std::vector<MAUS::DataStructure::Global::SpacePoint*> GlobalEvent::GetLRSpacePoints() const {
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> lr_spacepoints;
+  for (size_t i = 0; i < _space_points->size(); i++) {
+    if (_space_points->at(i)->get_mapper_name() == "MapCppGlobalReconImport") {
+      lr_spacepoints.push_back(_space_points->at(i));
+    }
+  }
+  return lr_spacepoints;
+}
+
+std::vector<MAUS::DataStructure::Global::SpacePoint*>
+    GlobalEvent::GetLRSpacePoints(MAUS::DataStructure::Global::DetectorPoint detector) const {
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> lr_spacepoints;
+  for (size_t i = 0; i < _space_points->size(); i++) {
+    if (_space_points->at(i)->get_mapper_name() == "MapCppGlobalReconImport" and
+        _space_points->at(i)->get_detector() == detector) {
+      lr_spacepoints.push_back(_space_points->at(i));
+    }
+  }
+  return lr_spacepoints;
+}
+
 }

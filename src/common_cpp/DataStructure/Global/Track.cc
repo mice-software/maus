@@ -448,13 +448,27 @@ bool Track::HasTrack(MAUS::DataStructure::Global::Track* track) const {
 }
 
 std::vector<const MAUS::DataStructure::Global::Track*>
-Track::GetConstituentTracks() const {
+    Track::GetConstituentTracks() const {
   std::vector<const MAUS::DataStructure::Global::Track*> temp_tracks;
   const MAUS::DataStructure::Global::Track* t = NULL;
   for (int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
     t = (const MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
     if (!t) continue;
     temp_tracks.push_back(t);
+  }
+  return temp_tracks;
+}
+
+std::vector<const MAUS::DataStructure::Global::Track*>
+    Track::GetConstituentTracks(MAUS::DataStructure::Global::DetectorPoint detector) const {
+  std::vector<const MAUS::DataStructure::Global::Track*> temp_tracks;
+  const MAUS::DataStructure::Global::Track* t = NULL;
+  for (int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
+    t = (const MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
+    if (!t) continue;
+    if (t->HasDetector(detector)) {
+      temp_tracks.push_back(t);
+    }
   }
   return temp_tracks;
 }

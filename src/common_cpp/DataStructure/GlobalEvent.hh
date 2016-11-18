@@ -124,6 +124,24 @@ class GlobalEvent {
   void set_space_points(
       std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points);
 
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetThroughPrimaryChains() const;
+
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetPrimaryChainOrphans() const;
+
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetPrimaryChainOrphansUS() const;
+
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetPrimaryChainOrphansDS() const;
+
+  std::vector<MAUS::DataStructure::Global::Track*> GetLRTracks() const;
+
+  std::vector<MAUS::DataStructure::Global::Track*>
+      GetLRTracks(MAUS::DataStructure::Global::DetectorPoint detector) const;
+
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> GetLRSpacePoints() const;
+
+  std::vector<MAUS::DataStructure::Global::SpacePoint*>
+      GetLRSpacePoints(MAUS::DataStructure::Global::DetectorPoint detector) const;
+
  private:
 
   /** A vector of MAUS::DataStructure::Global::PrimaryChain pointers

@@ -20,6 +20,7 @@
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectMapProcessors.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
 
 #include "src/common_cpp/DataStructure/Global/PrimaryChain.hh"
 
@@ -43,8 +44,7 @@ class PrimaryChainProcessor
 
  private:
   StringProcessor _string_proc;
-  TRefArrayProcessor _lr_sp_trefarray_proc;
-  TRefArrayProcessor _lr_track_trefarray_proc;
+  EnumChainTypeProcessor _chain_type_proc;
   TRefArrayProcessor _track_trefarray_proc;
 };
 } // ~namespace Global

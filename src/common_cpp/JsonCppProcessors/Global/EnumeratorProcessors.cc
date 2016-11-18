@@ -83,8 +83,37 @@ Json::Value* EnumPIDProcessor::CppToJson(
   return json_int;
 }
 
+
+
+MAUS::DataStructure::Global::ChainType* EnumChainTypeProcessor::JsonToCpp(
+    const Json::Value& json_int) {
+  if (json_int.isNumeric()) {
+    MAUS::DataStructure::Global::ChainType* ct =
+        new MAUS::DataStructure::Global::ChainType();
+    (*ct) = static_cast<MAUS::DataStructure::Global::ChainType>(json_int.asInt());
+    return ct;
+  } else {
+    throw(Exceptions::Exception(
+        Exceptions::recoverable,
+        "Failed to convert json value to enumerator: ChainType",
+        "EnumChainTypeProcessor::JsonToCpp"
+                 ));
+  }
+  return NULL; // appease gcc
+}
+
+Json::Value* EnumChainTypeProcessor::CppToJson(
+    const MAUS::DataStructure::Global::ChainType& cpp_enum) {
+  return new Json::Value(static_cast<int>(cpp_enum));
+}
+
+Json::Value* EnumChainTypeProcessor::CppToJson(
+    const MAUS::DataStructure::Global::ChainType& cpp_enum, std::string path) {
+  Json::Value* json_int = new Json::Value(static_cast<int>(cpp_enum));
+  JsonWrapper::Path::SetPath(*json_int, path);
+  return json_int;
+}
+
 } // ~namespace Global
 } // ~namespace Processor
 } // ~namespace MAUS
-
-

@@ -26,6 +26,12 @@ SpacePointProcessor::SpacePointProcessor() {
       &MAUS::DataStructure::Global::SpacePoint::get_charge,
       &MAUS::DataStructure::Global::SpacePoint::set_charge, true);
 
+  RegisterValueBranch(
+      "mapper_name", &_string_proc,
+      &MAUS::DataStructure::Global::SpacePoint::get_mapper_name,
+      &MAUS::DataStructure::Global::SpacePoint::set_mapper_name,
+      true);
+
   RegisterBaseClass(
       "basepoint", &_base_proc,
       &MAUS::DataStructure::Global::BasePoint::set_base, true);
