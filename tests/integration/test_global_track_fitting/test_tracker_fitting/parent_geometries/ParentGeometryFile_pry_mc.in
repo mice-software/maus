@@ -3,7 +3,7 @@ Configuration Structure
                            Dimensions 15000.0 10000.0 50000.0 mm
                            PropertyString Material AIR 
                            PropertyDouble G4StepMax 5.0 mm
-                           // PropertyString GDMLFile geometry_07469/Step_IV.gdml  
+                           PropertyString GDMLFile geometry_07469/Step_IV.gdml  
 	                    // A Note on Rotations:
 			    // 
 	                    // This is the geometry configuration to be used with a simulated geometry sourced from GDML. All rotations follow the 

@@ -158,6 +158,8 @@ class TestAnalysis(object):
                     sf_hit = self.load_scifi_event(scifi_event)
                     sf_point = self.load_scifi_event_space_points(scifi_event)
                     vhit = self.load_virtual_hits(mc_event)
+                    if vhit == None or sf_hit == None or sf_point == None:
+                        continue
                     if vhit['px'] < 0.:
                         vhit = None
                     if self.do_global:
@@ -356,10 +358,10 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
                         "--input_root_file_name", self.out+suffix+"_tracker_recon.root",
                         "--output_root_file_name", self.out+suffix+"_global_recon.root"]
         if verbose:
-            #proc = subprocess.Popen(mc_proc_list)
-            #proc.wait()
-            #proc = subprocess.Popen(tracker_recon_proc_list)
-            #proc.wait()
+            proc = subprocess.Popen(mc_proc_list)
+            proc.wait()
+            proc = subprocess.Popen(tracker_recon_proc_list)
+            proc.wait()
             proc = subprocess.Popen(global_recon_proc_list)
             proc.wait()
         else:
@@ -412,11 +414,11 @@ class FixedFieldGeometryTestCase(unittest.TestCase):
         raw_input()
 
     def _test_mc_field(self):
-        fname = "reco/MAUS-v2.5.0/mc/mc_3mm200_07469_MAUS-v250_1.root"
+        fname = "reco/MAUS-v2.5.0/mc/mc_3mm200_07469_MAUS-v250_2.root"
         for i, z in enumerate([13962., 14312., 14612., 14861., 15062.]):
             xboa.common.clear_root()
-            analysis = TestAnalysis(fname, z, False, 10, False)
-            self.plots(analysis)
+            analysis = TestAnalysis(fname, z, False, 10, False, "_full_mc")
+            self.plots(analysis, "mc_3mm200_07469_MAUS-v250_2.root")
         raw_input()
 
 

@@ -50,9 +50,9 @@ PyMODINIT_FUNC init_InputCppRootData(void) {
                   "InputCppRootData", "", "", "", "");
 }
 
-InputCppRootData::InputCppRootData(std::string filename)
+InputCppRootData::InputCppRootData()
             : InputBase<MAUS::Data>("InputCppRootData"), _infile(NULL),
-              _infile_tree(""), _filename(filename),
+              _infile_tree(""), _filename_list(),
               _event_type(_job_header_tp),
               _select_spills(false) {
 }
@@ -61,13 +61,27 @@ InputCppRootData::~InputCppRootData() {
   death();
 }
 
+void InputCppRootData::parse_file_name(Json::Value json_fnames) {
+  _filename_list = std::vector<std::string>();
+  Json::Value json_fnames = json_dc["input_root_file_name"];
+  if (json_fnames.isArray()) {
+      for (size_t i = 0; i < json_fnames.size(); ++i) {
+          if (!json_fnames[i].isString()) {
+              throw Exceptions::Exception(Exceptions::recoverable,
+                      "File name was not a string",
+                      "InputCppRootData::_parse_file_name");
+          }
+          _filename_list.push_back(JsonWrapper::GetItem(json_fnames[i].asString()));
+      }
+  } else if (json_fnames.isString()) {
+      _filename_list.push_back(json_fnames.asString());
+  }
+
+}
+
 void InputCppRootData::_birth(const std::string& json_datacards) {
   Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
-  if (_filename == "") {
-    _filename = JsonWrapper::GetProperty(json_dc,
-               "input_root_file_name", JsonWrapper::stringValue).asString();
-  }
-  _infile = new irstream(_filename.c_str(), "Spill");
+  _infile = new IRStream(_filename_list.c_str());
   _infile_tree = "Spill";
 
   if (json_dc.isMember("selected_spills")) {
@@ -85,7 +99,7 @@ void InputCppRootData::_birth(const std::string& json_datacards) {
       if (_selected_spill_numbers.size() == 0) {
         _select_spills = false;
         Squeak::mout(Squeak::info) << "Loading all spills from data file"
-          << std::endl;
+                                   << std::endl;
       } else {
         _highest_spill_number = *std::max_element(_selected_spill_numbers.begin(),
                                                  _selected_spill_numbers.end());
@@ -137,11 +151,11 @@ bool InputCppRootData::load_event(std::string branch_name, DataT& data) {
     if (_infile_tree != data.GetEventType()) {
         _infile->close();
         _infile_tree = data.GetEventType();
-        _infile->open(_filename.c_str(), data.GetEventType().c_str());
+        _infile->open((*it).c_str(), data.GetEventType().c_str());
     }
     (*_infile) >> branchName(branch_name.c_str()) >> data;
-    // if there was no branch of this type at all then we might get an exception
-    // - let's just try the next type
+    // if there was no branch of this type at all then we might get an
+    // exception - let's just try the next type
     if ((*_infile) >> readEvent == NULL) {
         return false;
     }

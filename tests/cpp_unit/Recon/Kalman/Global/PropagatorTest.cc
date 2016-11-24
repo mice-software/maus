@@ -68,7 +68,7 @@ std::vector<double> tp_to_vector(MAUS::Kalman::TrackPoint tp, double mass) {
     return x;
 }
 
-TEST(PropagatorTest, TestCalculatePropagator) {
+TEST(PropagatorTest, TestPropagate) {
     std::string mod = getenv("MAUS_ROOT_DIR");
     mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
     MAUS::GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
@@ -76,7 +76,6 @@ TEST(PropagatorTest, TestCalculatePropagator) {
     double mass = 105.658;
     double energy = 226.;
     double z = 100.;
-
 
     MAUS::Kalman::Global::Propagator propagator;
     MAUS::Kalman::TrackPoint start_tp = get_tp(0., energy);
@@ -96,7 +95,38 @@ TEST(PropagatorTest, TestCalculatePropagator) {
         EXPECT_NEAR(ref_vec[i], test_vec[i], 1e-9);
     }
 
+    MAUS::Kalman::TrackPoint end_tp_2 = get_tp(z, energy);
+    propagator.Propagate(start_tp, end_tp_2);
+    test_vec = tp_to_vector(end_tp_2, mass);
+    for (size_t i = 0; i < 29; ++i) {
+        EXPECT_NEAR(ref_vec[i], test_vec[i], 1e-9);
+    }
+
+    MAUS::Kalman::TrackPoint start_tp_2 = get_tp(z, 100.); // energy < mass
+    propagator.Propagate(start_tp, end_tp_2);
+  
 }
+
+TEST(PropagatorTest, TestCalculatePropagator) {
+    std::string mod = getenv("MAUS_ROOT_DIR");
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    MAUS::GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
+
+    double mass = 105.658;
+    double energy = 226.;
+    double z = 100.;
+
+    MAUS::Kalman::Global::Propagator propagator;
+    MAUS::Kalman::TrackPoint start_tp = get_tp(0., energy);
+    MAUS::Kalman::TrackPoint end_tp = get_tp(100., energy);
+    propagator.SetMass(mass);
+
+    // I just check that the propagator applies to the Predicted vector
+    TMatrixD test = propagator.CalculatePropagator(start_tp, end_tp);
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "Start\n" << start_tp << std::endl;
+    MAUS::Squeak::mout(MAUS::Squeak::debug) << "End\n" << end_tp << std::endl;
+}
+
 
 }
 

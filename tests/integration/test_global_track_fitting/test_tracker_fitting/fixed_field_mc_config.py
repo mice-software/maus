@@ -31,5 +31,5 @@ beam = {
        solenoid_transverse
     ]
 }
-simulation_geometry_filename = os.path.expandvars("parent_geometries/ParentGeometryFile_pry_mc.dat")
+simulation_geometry_filename = os.path.expandvars("parent_geometries/ParentGeometryFile_4T.dat")
 

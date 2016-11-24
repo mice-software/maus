@@ -49,6 +49,11 @@ void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
     x[3] = start_tp.GetPosition();
     // pz = e^2 - px^2 - py^2 - m^2
     x[7] = std::sqrt(x[4]*x[4] - x[5]*x[5] - x[6]*x[6] - _mass*_mass);
+    if (x[7] != x[7]) {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                                    "Event not on mass shell",
+                                    "Propagator::Propagate");
+    }
 
     size_t cov_index = 8;
     for (size_t i = 0; i < 6; ++i) {
