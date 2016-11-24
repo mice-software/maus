@@ -47,17 +47,15 @@ namespace MAUS {
       _configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
       _pid_beam_setting = _configJSON["pid_beam_setting"].asString();
       _unique_identifier = _configJSON["unique_identifier"].asString();
-      if (_pid_beam_setting.empty() ||
-          !_configJSON.isMember("pid_beam_setting")) {
+      if (_pid_beam_setting.empty() || !_configJSON.isMember("pid_beam_setting")) {
         Squeak::mout(Squeak::error) << "Config did not contain a valid "
-	    << "pid_beam_setting, which is required for PDF production, "
-	    << "ReduceCppGlobalPID::birth" << std::endl;
+                                    << "pid_beam_setting, which is required for PDF production, "
+                                    << "ReduceCppGlobalPID::birth" << std::endl;
       }
-      if (_unique_identifier.empty() ||
-          !_configJSON.isMember("unique_identifier")) {
+      if (_unique_identifier.empty() || !_configJSON.isMember("unique_identifier")) {
         Squeak::mout(Squeak::error) << "Config did not contain a valid "
-            << "unique_identifier, which is required for PDF production, "
-	    << "ReduceCppGlobalPID::birth" << std::endl;
+                                    << "unique_identifier, which is required for PDF production, "
+                                    << "ReduceCppGlobalPID::birth" << std::endl;
       }
 
       _pid_config = _configJSON["pid_config"].asString();
@@ -65,146 +63,83 @@ namespace MAUS {
 
       // vector of hypotheses
       if (_pid_beamline_polarity == "positive") {
-    	_hypotheses.push_back((_pid_beam_setting + "_mu_plus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_e_plus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_pi_plus"));
+        _hypotheses.push_back((_pid_beam_setting + "_mu_plus"));
+        _hypotheses.push_back((_pid_beam_setting + "_e_plus"));
+        _hypotheses.push_back((_pid_beam_setting + "_pi_plus"));
       } else if (_pid_beamline_polarity == "negative") {
-    	_hypotheses.push_back((_pid_beam_setting + "_mu_minus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_e_minus"));
-    	_hypotheses.push_back((_pid_beam_setting + "_pi_minus"));
+        _hypotheses.push_back((_pid_beam_setting + "_mu_minus"));
+        _hypotheses.push_back((_pid_beam_setting + "_e_minus"));
+        _hypotheses.push_back((_pid_beam_setting + "_pi_minus"));
       } else {
-	Squeak::mout(Squeak::warning) << "Invalid pid_beamline_polarity "
-				      << "set in ConfigurationDefaults, "
-				      << "ReduceCppGlobalPID::_birth" << std::endl;
+        Squeak::mout(Squeak::warning) << "Invalid pid_beamline_polarity "
+                                      << "set in ConfigurationDefaults, "
+                                      << "ReduceCppGlobalPID::_birth" << std::endl;
       }
 
       if (_pid_config == "step_4") {
-	// vector of mu pid vars
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarA(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarB(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarC(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarD(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarE(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarF(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarG(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarH(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarI(_hypotheses[0],
-								_unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_hypotheses[0],
-								_unique_identifier));
-	// vector of e pid vars
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarA(_hypotheses[1],
-								_unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarB(_hypotheses[1],
-								_unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarC(_hypotheses[1],
-								_unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarD(_hypotheses[1],
-								_unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarE(_hypotheses[1],
-								_unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarF(_hypotheses[1],
-								_unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarG(_hypotheses[1],
-								_unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarH(_hypotheses[1],
-							       _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarI(_hypotheses[1],
-							       _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_hypotheses[1],
-							       _unique_identifier));
-	// vector of pi pid vars
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarA(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarB(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarC(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarD(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarE(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarF(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarG(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarH(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarI(_hypotheses[2],
-								_unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_hypotheses[2],
-								_unique_identifier));
+        for (size_t i = 0; i < 3; i++) {
+          std::vector<MAUS::recon::global::PIDBase*> particle_pid_vars;
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarA(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarB(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarC(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarD(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarE(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarF(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarG(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarH(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarI(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::PIDVarJ(_hypotheses[i],
+              _unique_identifier));
+          if (i == 0) {
+            _mu_pid_vars = particle_pid_vars;
+          } else if (i == 1) {
+            _e_pid_vars = particle_pid_vars;
+          } else if (i == 2) {
+            _pi_pid_vars = particle_pid_vars;
+          }
+        }
       } else if (_pid_config == "commissioning") {
-	// vector of mu pid vars
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_hypotheses[0],
-								   _unique_identifier));
-	_mu_pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_hypotheses[0],
-								   _unique_identifier));
-	// vector of e pid vars
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_hypotheses[1],
-								  _unique_identifier));
-	_e_pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_hypotheses[1],
-								  _unique_identifier));
-	// vector of pi pid vars
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_hypotheses[2],
-								   _unique_identifier));
-	_pi_pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_hypotheses[2],
-								   _unique_identifier));
+        for (size_t i = 0; i < 3; i++) {
+          std::vector<MAUS::recon::global::PIDBase*> particle_pid_vars;
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarA(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarB(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarC(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarD(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarE(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarF(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarG(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarH(_hypotheses[i],
+              _unique_identifier));
+          particle_pid_vars.push_back(new MAUS::recon::global::ComPIDVarI(_hypotheses[i],
+              _unique_identifier));
+          if (i == 0) {
+            _mu_pid_vars = particle_pid_vars;
+          } else if (i == 1) {
+            _e_pid_vars = particle_pid_vars;
+          } else if (i == 2) {
+            _pi_pid_vars = particle_pid_vars;
+          }
+        }
       } else {
-	Squeak::mout(Squeak::warning) << "Invalid pid_config, "
-				      << " ReduceCppGlobalPID::birth" << std::endl;
+        Squeak::mout(Squeak::warning) << "Invalid pid_config, "
+                                      << " ReduceCppGlobalPID::birth" << std::endl;
       }
-
       _configCheck = true;
     } catch (Exceptions::Exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
@@ -234,197 +169,136 @@ namespace MAUS {
 
     _spill = data_cpp->GetSpill();
 
-    if (_spill) {
-      if ( _spill->GetReconEvents() ) {
-        for ( unsigned int event_i = 0;
-              event_i < _spill->GetReconEvents()->size(); ++event_i) {
-	  if (_spill->GetReconEvents()->at(event_i)->GetGlobalEvent()) {
-	    MAUS::GlobalEvent* global_event =
-	      _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
-	    std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
-	      global_event->get_tracks();
-	    bool through_track_check = false;
-	    for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
-		 ++track_i) {
-	      MAUS::DataStructure::Global::Track* track =
-		GlobalTrackArray->at(track_i);
-	      if (track->get_mapper_name() != "MapCppGlobalTrackMatching_Through") continue;
-	      through_track_check = true;
-	      if (_pid_config == "step_4") {
-		// get constituent tracks
-		std::vector<const MAUS::DataStructure::Global::Track*> const_tracks =
-		  track->GetConstituentTracks();
-		for (unsigned int track_j = 0; track_j < const_tracks.size();
-		     ++track_j) {
-		  if (const_tracks.at(track_j)->get_mapper_name() ==
-		      "MapCppGlobalTrackMatching_US") {
-		    MAUS::DataStructure::Global::Track* US_track =
-		      const_cast<MAUS::DataStructure::Global::Track*>
-		      (const_tracks.at(track_j));
-		    if ((_pid_beamline_polarity == "positive" &&
-			 _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
-			(_pid_beamline_polarity == "negative" &&
-			 _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 13)) {
-		      for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-			   ++pid_var_count) {
-			_mu_pid_vars[pid_var_count]->Fill_Hist(US_track);
-		      } // loop over US mu_pid_vars
-		    } else if ((_pid_beamline_polarity == "positive" &&
-				_mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== -11) ||
-			       (_pid_beamline_polarity == "negative" &&
-				_mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== 11)) {
-		      for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-			   ++pid_var_count) {
-			_e_pid_vars[pid_var_count]->Fill_Hist(US_track);
-		      } // loop over US e_pid_vars
-		    } else if ((_pid_beamline_polarity == "positive" &&
-				_mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== 211) ||
-			       (_pid_beamline_polarity == "negative" &&
-				_mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== -211)) {
-		      for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-			   ++pid_var_count) {
-			_pi_pid_vars[pid_var_count]->Fill_Hist(US_track);
-		      } // loop over US pi_pid_vars
-		    } // US mc pid check
-		  } else if (const_tracks.at(track_j)->get_mapper_name() ==
-			     "MapCppGlobalTrackMatching_DS") {
-		    MAUS::DataStructure::Global::Track* DS_track =
-		      const_cast<MAUS::DataStructure::Global::Track*>
-		      (const_tracks.at(track_j));
-		    if ((_pid_beamline_polarity == "positive" &&
-			 _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
-			(_pid_beamline_polarity == "negative" &&
-			 _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 13)) {
-		      for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-			   ++pid_var_count) {
-			_mu_pid_vars[pid_var_count]->Fill_Hist(DS_track);
-		      } // loop over DS mu_pid_vars
-		    } else if ((_pid_beamline_polarity == "positive" &&
-				_mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== -11) ||
-			       (_pid_beamline_polarity == "negative" &&
-				_mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== 11)) {
-		      for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-			   ++pid_var_count) {
-			_e_pid_vars[pid_var_count]->Fill_Hist(DS_track);
-		      } // loop over DS e_pid_vars
-		    } else if ((_pid_beamline_polarity == "positive" &&
-				_mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== 211) ||
-			       (_pid_beamline_polarity == "negative" &&
-				_mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-				== -211)) {
-		      for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-			   ++pid_var_count) {
-			_pi_pid_vars[pid_var_count]->Fill_Hist(DS_track);
-		      } // loop over DS pi_pid_vars
-		    } // DS mc pid check
-		  } // get DS TM track
-		} // loop over constituent tracks
-	      } else if (_pid_config == "commissioning") {
-		if ((_pid_beamline_polarity == "positive" &&
-		     _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
-		    (_pid_beamline_polarity == "negative" &&
-		     _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 13)) {
-		  for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-		       ++pid_var_count) {
-		    _mu_pid_vars[pid_var_count]->Fill_Hist(track);
-		  } // loop over mu_pid_vars
-		} else if ((_pid_beamline_polarity == "positive" &&
-			    _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -11) ||
-			   (_pid_beamline_polarity == "negative" &&
-			    _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 11)) {
-		  for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-		       ++pid_var_count) {
-		    _e_pid_vars[pid_var_count]->Fill_Hist(track);
-		  } // loop over e_pid_vars
-		} else if ((_pid_beamline_polarity == "positive" &&
-			    _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 211) ||
-			   (_pid_beamline_polarity == "negative" &&
-			    _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -211)) {
-		  for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-		       ++pid_var_count) {
-		    _pi_pid_vars[pid_var_count]->Fill_Hist(track);
-		  } // loop over pi_pid_vars
-		} // check straight through track mc pid at DS tracker ref plane
-	      } // change behaviour based on straight or helical tracks
-	    } // loop over global tracks
-	    if (through_track_check == false) {
-	      for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
-		   ++track_i) {
-		MAUS::DataStructure::Global::Track* track =
-		  GlobalTrackArray->at(track_i);
-		if (track->get_mapper_name() == "MapCppGlobalTrackMatching_US") {
-		  if ((_pid_beamline_polarity == "positive" &&
-		       _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
-		      (_pid_beamline_polarity == "negative" &&
-		       _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 13)) {
-		    for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-			 ++pid_var_count) {
-		      _mu_pid_vars[pid_var_count]->Fill_Hist(track);
-		    } // loop over US mu_pid_vars
-		  } else if ((_pid_beamline_polarity == "positive" &&
-			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == -11) ||
-			     (_pid_beamline_polarity == "negative" &&
-			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == 11)) {
-		    for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-			 ++pid_var_count) {
-		      _e_pid_vars[pid_var_count]->Fill_Hist(track);
-		    } // loop over US e_pid_vars
-		  } else if ((_pid_beamline_polarity == "positive" &&
-			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == 211) ||
-			     (_pid_beamline_polarity == "negative" &&
-			      _mc_pid_US_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == -211)) {
-		    for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-			 ++pid_var_count) {
-		      _pi_pid_vars[pid_var_count]->Fill_Hist(track);
-		    }
-		  }
-		} // US tracks
-		if (track->get_mapper_name() == "MapCppGlobalTrackMatching_DS") {
-		  if ((_pid_beamline_polarity == "positive" &&
-		       _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == -13) ||
-		      (_pid_beamline_polarity == "negative" &&
-		       _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i)) == 13)) {
-		    for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-			 ++pid_var_count) {
-		      _mu_pid_vars[pid_var_count]->Fill_Hist(track);
-		    } // loop over US mu_pid_vars
-		  } else if ((_pid_beamline_polarity == "positive" &&
-			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == -11) ||
-			     (_pid_beamline_polarity == "negative" &&
-			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == 11)) {
-		    for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-			 ++pid_var_count) {
-		      _e_pid_vars[pid_var_count]->Fill_Hist(track);
-		    } // loop over US e_pid_vars
-		  } else if ((_pid_beamline_polarity == "positive" &&
-			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == 211) ||
-			     (_pid_beamline_polarity == "negative" &&
-			      _mc_pid_DS_tracker_ref(_spill->GetMCEvents()->at(event_i))
-			      == -211)) {
-		    for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-			 ++pid_var_count) {
-		      _pi_pid_vars[pid_var_count]->Fill_Hist(track);
-		    }
-		  }
-		} // DS tracks
-	      }
-	    } // temporary measure for when through tracks haven't been formed
-	  } // get global event
-	} // get recon event
+    if (_spill and _spill->GetReconEvents()) {
+      for (size_t event_i = 0;
+            event_i < _spill->GetReconEvents()->size(); ++event_i) {
+        if (_spill->GetReconEvents()->at(event_i)->GetGlobalEvent()) {
+          // FOR EACH GLOBAL EVENT
+          MAUS::GlobalEvent* global_event =
+              _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
+          // Get Tracks
+          std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
+          global_event->get_tracks();
+          bool through_track_check = false;
+          for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
+              ++track_i) {
+            // FOR EACH TRACK
+            MAUS::DataStructure::Global::Track* track = GlobalTrackArray->at(track_i);
+            // only deal with through tracks
+            if (track->get_mapper_name() != "MapCppGlobalTrackMatching_Through") continue;
+            through_track_check = true;
+            if (_pid_config == "step_4") {
+              // get constituent tracks
+              std::vector<const MAUS::DataStructure::Global::Track*> const_tracks =
+                  track->GetConstituentTracks();
+              for (unsigned int track_j = 0; track_j < const_tracks.size();
+                   ++track_j) {
+                int tracker_num;
+                std::string track_mapper_name = const_tracks.at(track_j)->get_mapper_name();
+                if (track_mapper_name == "MapCppGlobalTrackMatching_US") {
+                  tracker_num = 0;
+                } else if (track_mapper_name == "MapCppGlobalTrackMatching_DS") {
+                  tracker_num = 1;
+                } else {
+                  continue;
+                }
+                MAUS::DataStructure::Global::Track* segment_track =
+                    const_cast<MAUS::DataStructure::Global::Track*> (const_tracks.at(track_j));
+                if ((_pid_beamline_polarity == "positive" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -13) ||
+                    (_pid_beamline_polarity == "negative" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 13)) {
+                  for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
+                       ++pid_var_count) {
+                    _mu_pid_vars[pid_var_count]->Fill_Hist(segment_track);
+                  } // loop over mu_pid_vars
+                } else if ((_pid_beamline_polarity == "positive" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -11) ||
+                    (_pid_beamline_polarity == "negative" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 11)) {
+                  for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
+                       ++pid_var_count) {
+                    _e_pid_vars[pid_var_count]->Fill_Hist(segment_track);
+                  } // loop over e_pid_vars
+                } else if ((_pid_beamline_polarity == "positive" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 211) ||
+                    (_pid_beamline_polarity == "negative" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -211)) {
+                  for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
+                       ++pid_var_count) {
+                    _pi_pid_vars[pid_var_count]->Fill_Hist(segment_track);
+                  } // loop over pi_pid_vars
+                } // Beamline segment mc pid check
+              } // loop over constituent tracks
+            } else if (_pid_config == "commissioning") {
+              if ((_pid_beamline_polarity == "positive" &&
+                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == -13) ||
+                  (_pid_beamline_polarity == "negative" &&
+                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == 13)) {
+                for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
+                    ++pid_var_count) {
+                  _mu_pid_vars[pid_var_count]->Fill_Hist(track);
+                } // loop over mu_pid_vars
+              } else if ((_pid_beamline_polarity == "positive" &&
+                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == -11) ||
+                  (_pid_beamline_polarity == "negative" &&
+                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == 11)) {
+                for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
+                    ++pid_var_count) {
+                  _e_pid_vars[pid_var_count]->Fill_Hist(track);
+                } // loop over e_pid_vars
+              } else if ((_pid_beamline_polarity == "positive" &&
+                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == 211) ||
+                  (_pid_beamline_polarity == "negative" &&
+                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == -211)) {
+                for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
+                    ++pid_var_count) {
+                  _pi_pid_vars[pid_var_count]->Fill_Hist(track);
+                } // loop over pi_pid_vars
+              } // check straight through track mc pid at DS tracker ref plane
+            } // change behaviour based on straight or helical tracks
+          } // loop over global tracks
+          if (through_track_check == false) {
+            for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
+                ++track_i) {
+              MAUS::DataStructure::Global::Track* track = GlobalTrackArray->at(track_i);
+              int tracker_num;
+              std::string track_mapper_name = track->get_mapper_name();
+              if (track_mapper_name == "MapCppGlobalTrackMatching_US") {
+                tracker_num = 0;
+              } else if (track_mapper_name == "MapCppGlobalTrackMatching_DS") {
+                tracker_num = 1;
+              } else {
+                continue;
+              }
+              if ((_pid_beamline_polarity == "positive" &&
+                   _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -13) ||
+                  (_pid_beamline_polarity == "negative" &&
+                   _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 13)) {
+                for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
+                     ++pid_var_count) {
+                  _mu_pid_vars[pid_var_count]->Fill_Hist(track);
+                } // loop over mu_pid_vars
+              } else if ((_pid_beamline_polarity == "positive" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -11) ||
+                   (_pid_beamline_polarity == "negative" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 11)) {
+                for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
+                     ++pid_var_count) {
+                  _e_pid_vars[pid_var_count]->Fill_Hist(track);
+                } // loop over e_pid_vars
+              } else if ((_pid_beamline_polarity == "positive" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 211) ||
+                   (_pid_beamline_polarity == "negative" &&
+                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -211)) {
+                for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
+                     ++pid_var_count) {
+                  _pi_pid_vars[pid_var_count]->Fill_Hist(track);
+                } // loop over pi_pid_vars
+              }
+            } // temporary measure for when through tracks haven't been formed
+          } // get global event
+        } // get recon event
       } // get recon event array
     } else {
       Squeak::mout(Squeak::error) << "Failed to import spill from data\n";
@@ -435,54 +309,38 @@ namespace MAUS {
     if (_configCheck) {
       // _pid_vars.clear();
       for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-      	   ++pid_var_count) {
-      	delete _mu_pid_vars[pid_var_count];
+           ++pid_var_count) {
+        delete _mu_pid_vars[pid_var_count];
       }
       for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-      	   ++pid_var_count) {
-      	delete _e_pid_vars[pid_var_count];
+           ++pid_var_count) {
+        delete _e_pid_vars[pid_var_count];
       }
       for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-      	   ++pid_var_count) {
-      	delete _pi_pid_vars[pid_var_count];
+           ++pid_var_count) {
+        delete _pi_pid_vars[pid_var_count];
       }
     }
   }
 
-  int ReduceCppGlobalPID::_mc_pid_US_tracker_ref(MAUS::MCEvent* mc_event) {
-    int us_pid = 0;
+  int ReduceCppGlobalPID::_mc_pid_tracker_ref(MAUS::MCEvent* mc_event, int tracker_number) {
+    int pid = 0;
     MAUS::SciFiHitArray* scifihits = mc_event->GetSciFiHits();
     std::vector<MAUS::SciFiHit*>::iterator scifihit;
-    for ( size_t s = 0; s < scifihits->size(); ++s ) {
-      MAUS::SciFiHit scifihit = scifihits->at(s);
-      if (scifihit.GetChannelId()->GetTrackerNumber() == 0 &&
-	  scifihit.GetChannelId()->GetStationNumber() == 1 &&
-	  scifihit.GetChannelId()->GetPlaneNumber() == 0) {
-	us_pid = scifihit.GetParticleId();
-	break;
+    for ( size_t i = 0; i < scifihits->size(); ++i ) {
+      MAUS::SciFiHit scifihit = scifihits->at(i);
+      if (scifihit.GetChannelId()->GetTrackerNumber() == tracker_number &&
+          scifihit.GetChannelId()->GetStationNumber() == 1 &&
+          scifihit.GetChannelId()->GetPlaneNumber() == 0) {
+        pid = scifihit.GetParticleId();
+        break;
       }
     }
-    return us_pid;
-  }
-
-  int ReduceCppGlobalPID::_mc_pid_DS_tracker_ref(MAUS::MCEvent* mc_event) {
-    int ds_pid = 0;
-    MAUS::SciFiHitArray* scifihits = mc_event->GetSciFiHits();
-    std::vector<MAUS::SciFiHit*>::iterator scifihit;
-    for ( size_t s = 0; s < scifihits->size(); ++s ) {
-      MAUS::SciFiHit scifihit = scifihits->at(s);
-      if (scifihit.GetChannelId()->GetTrackerNumber() == 1 &&
-	  scifihit.GetChannelId()->GetStationNumber() == 1 &&
-	  scifihit.GetChannelId()->GetPlaneNumber() == 0) {
-	ds_pid = scifihit.GetParticleId();
-	break;
-      }
-    }
-    return ds_pid;
+    return pid;
   }
 
   PyMODINIT_FUNC init_ReduceCppGlobalPID(void) {
     PyWrapReduceBase<ReduceCppGlobalPID>::PyWrapReduceBaseModInit(
                                   "ReduceCppGlobalPID", "", "", "", "");
-}
+  }
 } // ~namespace MAUS

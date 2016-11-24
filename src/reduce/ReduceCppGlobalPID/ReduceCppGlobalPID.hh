@@ -98,23 +98,12 @@ class ReduceCppGlobalPID : public ReduceBase<Data, Data> {
      */
     void _process(MAUS::Data* data);
 
-    /** @brief find pid of MC particle at US tracker ref. plane
-     *
-     *   
-     *
+    /** @brief find pid of MC particle at segment tracker ref. plane
      *  @param mc_event MC event
-     *  
+     *  @param tracker_number 0 or 1 to designate upstream or downstream tracker
      */
-    int _mc_pid_US_tracker_ref(MAUS::MCEvent* mc_event);
 
-    /** @brief find pid of MC particle at DS tracker ref. plane
-     *
-     *   
-     *
-     *  @param mc_event MC event
-     *  
-     */
-    int _mc_pid_DS_tracker_ref(MAUS::MCEvent* mc_event);
+    int _mc_pid_tracker_ref(MAUS::MCEvent* mc_event, int tracker_number);
 
     /// Check that a valid configuration is passed to the process
     bool _configCheck;

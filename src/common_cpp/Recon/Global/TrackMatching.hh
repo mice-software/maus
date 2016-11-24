@@ -222,38 +222,6 @@ namespace global {
         double mass, DataStructure::Global::Track* hypothesis_track);
 
     /**
-     * @brief Returns all matched upstream and downstream tracks from the global
-     * tracks given in the supplied TrackPArrays.
-     *
-     * The tracks are selected based on aggreement with the mapper names set in
-     * USTrack() and DSTrack() as well as the supplied PIDs.
-     *
-     * @param global_tracks Tracks from the global event from which to pick out
-     * the upstream and downstream tracks.
-     * @param pid The PID for which the tracks are picked out
-     * @param us_tracks The container for the upstream tracks to be returned
-     * @param ds_tracks The container for the downstream tracks to be returned
-     */
-    void USDSTracks(
-        DataStructure::Global::TrackPArray* global_tracks,
-        DataStructure::Global::PID pid,
-        DataStructure::Global::TrackPArray* us_tracks,
-        DataStructure::Global::TrackPArray* ds_tracks);
-
-    /**
-     * @brief Produces a through-going track from the supplied upstream and
-     * downstream TrackPoints based on a cut in the TOF1/2 travel time
-     *
-     * @param us_trackpoints Upstream TrackPoints
-     * @param ds_trackpoints Downstream TrackPoints
-     * @param pid PID to set for the new track
-     */
-    void MatchUSDS(
-        DataStructure::Global::Track* us_track,
-        DataStructure::Global::Track* ds_track,
-        DataStructure::Global::PID pid);
-
-    /**
      * @brief Returns the time from a TrackPoint in the chosen detector (TOF0,
      * TOF1, TOF2).
      *

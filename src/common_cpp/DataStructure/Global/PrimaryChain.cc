@@ -44,6 +44,13 @@ PrimaryChain::PrimaryChain(std::string mapper_name)
   _tracks = new TRefArray();
 }
 
+// Constructor setting mapper name and chain type
+PrimaryChain::PrimaryChain(std::string mapper_name,
+    MAUS::DataStructure::Global::ChainType chain_type)
+    : _mapper_name(mapper_name), _type(chain_type), _us_daughter(NULL), _ds_daughter(NULL) {
+  _tracks = new TRefArray();
+}
+
 // Destructor
 PrimaryChain::~PrimaryChain() {
   delete _tracks;
@@ -121,7 +128,7 @@ std::vector<MAUS::DataStructure::Global::Track*> PrimaryChain::GetMatchedTracks(
 
 void PrimaryChain::AddMatchedTrack(MAUS::DataStructure::Global::Track* track) {
   track->set_mapper_name("MapCppGlobalTrackMatching");
-  
+  _tracks->Add(track);
 }
 
 MAUS::DataStructure::Global::Track* PrimaryChain::GetPIDTrack() const {

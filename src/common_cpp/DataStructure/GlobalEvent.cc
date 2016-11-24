@@ -333,14 +333,29 @@ void GlobalEvent::set_space_points(
 };
 
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>
-    GlobalEvent::GetThroughPrimaryChains() const {
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*> through_chains;
+    GlobalEvent::GetPrimaryChains(MAUS::DataStructure::Global::ChainType chain_type) const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> chains;
   for (size_t i = 0; i < _primary_chains->size(); i++) {
-    if (_primary_chains->at(i)->get_chain_type() == MAUS::DataStructure::Global::kThrough) {
-      through_chains.push_back(_primary_chains->at(i));
+    if (_primary_chains->at(i)->get_chain_type() == chain_type) {
+      chains.push_back(_primary_chains->at(i));
     }
   }
-  return through_chains;
+  return chains;
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetUSPrimaryChains() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kUS);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetDSPrimaryChains() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kDS);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetThroughPrimaryChains() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kThrough);
 }
 
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>
@@ -357,25 +372,13 @@ std::vector<MAUS::DataStructure::Global::PrimaryChain*>
 }
 
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>
-    GlobalEvent::GetPrimaryChainOrphansUS() const {
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*> usorphan_chains;
-  for (size_t i = 0; i < _primary_chains->size(); i++) {
-    if (_primary_chains->at(i)->get_chain_type() == MAUS::DataStructure::Global::kUSOrphan) {
-      usorphan_chains.push_back(_primary_chains->at(i));
-    }
-  }
-  return usorphan_chains;
+    GlobalEvent::GetUSPrimaryChainOrphans() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kUSOrphan);
 }
 
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>
-    GlobalEvent::GetPrimaryChainOrphansDS() const {
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*> dsorphan_chains;
-  for (size_t i = 0; i < _primary_chains->size(); i++) {
-    if (_primary_chains->at(i)->get_chain_type() == MAUS::DataStructure::Global::kDSOrphan) {
-      dsorphan_chains.push_back(_primary_chains->at(i));
-    }
-  }
-  return dsorphan_chains;
+    GlobalEvent::GetDSPrimaryChainOrphans() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kUSOrphan);
 }
 
 std::vector<MAUS::DataStructure::Global::Track*> GlobalEvent::GetLRTracks() const {

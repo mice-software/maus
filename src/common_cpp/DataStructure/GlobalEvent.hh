@@ -124,13 +124,17 @@ class GlobalEvent {
   void set_space_points(
       std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points);
 
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetUSPrimaryChains() const;
+
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetDSPrimaryChains() const;
+
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetThroughPrimaryChains() const;
 
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetPrimaryChainOrphans() const;
 
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetPrimaryChainOrphansUS() const;
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetUSPrimaryChainOrphans() const;
 
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetPrimaryChainOrphansDS() const;
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetDSPrimaryChainOrphans() const;
 
   std::vector<MAUS::DataStructure::Global::Track*> GetLRTracks() const;
 
@@ -143,6 +147,10 @@ class GlobalEvent {
       GetLRSpacePoints(MAUS::DataStructure::Global::DetectorPoint detector) const;
 
  private:
+
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+      GetPrimaryChains(MAUS::DataStructure::Global::ChainType chain_type) const;
+ 
 
   /** A vector of MAUS::DataStructure::Global::PrimaryChain pointers
    *  associated with this event. Different reconstruction steps can

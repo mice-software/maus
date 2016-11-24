@@ -50,6 +50,9 @@ class PrimaryChain : public TObject {
   /// 0/NULL
   explicit PrimaryChain(std::string mapper_name);
 
+  /// Constructor setting mapper name and chain type
+  PrimaryChain(std::string mapper_name, MAUS::DataStructure::Global::ChainType chain_type);
+
   /// Destructor
   virtual ~PrimaryChain();
 

@@ -90,11 +90,16 @@ void TrackMatching::USTrack() {
     }
     std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
         charge_hypothesis, _pid_hypothesis_string);
+    // Create Primary Chain for this tracker track, declare as orphan initially,
+    // change later if matched
+    DataStructure::Global::PrimaryChain* us_primary_chain =
+        new DataStructure::Global::PrimaryChain("MapCppGlobalTrackMatching",
+            DataStructure::Global::kUSOrphan);
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
       DataStructure::Global::Track* hypothesis_track =
           new DataStructure::Global::Track();
-      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching_US");
+      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching");
       hypothesis_track->set_pid(pids[i]);
       // No matching criterion for Cherenkov hits, so if they exist, we add them
       if (CkovA_sp.size() > 0) {
@@ -152,12 +157,17 @@ void TrackMatching::USTrack() {
       // calculated from p and m, trackpoints are cloned as we want everything
       // in the hypothesis track to be "fresh"
       double mass = Particle::GetInstance().GetMass(pids[i]);
-      AddTrackerTrackPoints(tracker0_track, "MapCppGlobalTrackMatching_US",
+      AddTrackerTrackPoints(tracker0_track, "MapCppGlobalTrackMatching",
                             mass, hypothesis_track);
-
+      // Add reference to the tracker track to the hypothesis track
+      hypothesis_track->AddTrack(tracker0_track);
+      us_primary_chain->AddMatchedTrack(hypothesis_track);
       _global_event->add_track_recursive(hypothesis_track);
     }
-    _global_event->add_track_recursive(tracker0_track);
+    // Only add to global event if we have at least one matched track
+    if (us_primary_chain->GetMatchedTracks().size() > 0) {
+      _global_event->add_primary_chain(us_primary_chain);
+    }
   }
   delete scifi_track_array;
 }
@@ -201,16 +211,21 @@ void TrackMatching::DSTrack() {
     }
     std::vector<DataStructure::Global::PID> pids = PIDHypotheses(
         charge_hypothesis, _pid_hypothesis_string);
+    // Create Primary Chain for this tracker track, declare as orphan initially,
+    // change later if matched
+    DataStructure::Global::PrimaryChain* ds_primary_chain =
+        new DataStructure::Global::PrimaryChain("MapCppGlobalTrackMatching",
+            DataStructure::Global::kDSOrphan);
     // Iterate over all possible PIDs and create an hypothesis track for each
     for (size_t i = 0; i < pids.size(); i++) {
       DataStructure::Global::Track* hypothesis_track =
           new DataStructure::Global::Track();
-      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching_DS");
+      hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching");
       hypothesis_track->set_pid(pids[i]);
 
       // This time we add in the tracker trackpoints first
       double mass = Particle::GetInstance().GetMass(pids[i]);
-      AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching_DS",
+      AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching",
                             mass, hypothesis_track);
       if (!no_check) {
     // Extract four-position and momentum from last track point (i.e. most
@@ -261,7 +276,14 @@ void TrackMatching::DSTrack() {
           }
         }
       }
+      // Add reference to the tracker track to the hypothesis track
+      hypothesis_track->AddTrack(tracker1_track);
+      ds_primary_chain->AddMatchedTrack(hypothesis_track);
       _global_event->add_track_recursive(hypothesis_track);
+    }
+    // Only add to global event if we have at least one matched track
+    if (ds_primary_chain->GetMatchedTracks().size() > 0) {
+      _global_event->add_primary_chain(ds_primary_chain);
     }
   }
   delete scifi_track_array;
@@ -269,40 +291,81 @@ void TrackMatching::DSTrack() {
 }
 
 void TrackMatching::throughTrack() {
-  // import tracks already created by tracker recon
-  DataStructure::Global::TrackPArray* global_tracks =
-      _global_event->get_tracks();
-  // Typically used for no fields so we can't discriminate by charge hypothesis
-  std::vector<DataStructure::Global::PID> pids = PIDHypotheses(0,
-      _pid_hypothesis_string);
-  // Iterate over all PIDs
-  for (size_t i = 0; i < pids.size(); i++) {
-    DataStructure::Global::TrackPArray* us_tracks =
-        new DataStructure::Global::TrackPArray();
-    DataStructure::Global::TrackPArray* ds_tracks =
-        new DataStructure::Global::TrackPArray();
-
-    // Loop over all global tracks and sort into US and DS tracks by mapper name
-    // provided they have the correct PID and hits in TOF1/2 to match by dT
-    USDSTracks(global_tracks, pids[i], us_tracks, ds_tracks);
-
-    // Do we have both US and DS tracks in the event?
-    if ((us_tracks->size() > 0) and
-        (ds_tracks->size() > 0)) {
-      // Iterate over all possible combinations of US and DS tracks
-      for (auto us_track_iter = us_tracks->begin();
-           us_track_iter != us_tracks->end();
-           ++us_track_iter) {
-        for (auto ds_track_iter = ds_tracks->begin();
-             ds_track_iter != ds_tracks->end();
-             ++ds_track_iter) {
-          // Going to assume that if several TrackPoints for the same TOF are in
-          // the track that they have been checked to be sensible (TODO above)
-          if (((*us_track_iter)->GetTrackPoints().size() > 0) and
-              ((*ds_track_iter)->GetTrackPoints().size() > 0)) {
-            MatchUSDS((*us_track_iter), (*ds_track_iter), pids[i]);
-          }
+  std::vector<DataStructure::Global::PrimaryChain*> us_chains =
+      _global_event->GetUSPrimaryChainOrphans();
+  std::vector<DataStructure::Global::PrimaryChain*> ds_chains =
+      _global_event->GetDSPrimaryChainOrphans();
+  // NOTE: It is possible that for example the muon track from a US primary
+  // chain is matched with one from a DS primary chain, while the pion track
+  // is matched with one from a different primary chain. In this case, 3 chains
+  // would give rise to 2 mutually exclusive through chains. This is extremely
+  // unlikely though as it would require two separate TOF spacepoints that are
+  // each compatible with a different PID hypothesis, as well as two tracker tracks
+  // on one side of the beamline where each one is matched to a TOF hit that is
+  // compatible with a physical TOF1-2 time-of-flight to the corresponding TOF
+  // spacepoint on the other side of the beamline. A slightly more likely but less
+  // problematic situation arises when the tracks from two chains on one side are
+  // both compatible with a chain from the other side, in which case we would have
+  // two mutually exclusive through chains. TODO(?): Perhaps add a comment field
+  // or flag to the PrimaryChain object.
+  for (auto us_chain_iter = us_chains.begin();
+       us_chain_iter != us_chains.end(); ++us_chain_iter) {
+    for (auto ds_chain_iter = ds_chains.begin();
+         ds_chain_iter != ds_chains.end(); ++ds_chain_iter) {
+      DataStructure::Global::PrimaryChain* through_primary_chain =
+          new DataStructure::Global::PrimaryChain("MapCppGlobalTrackMatching",
+          MAUS::DataStructure::Global::kThrough);
+      std::vector<DataStructure::Global::PID> pids = PIDHypotheses(0, _pid_hypothesis_string);
+      for (size_t i = 0; i < pids.size(); i++) {
+        DataStructure::Global::Track* us_track = (*us_chain_iter)->GetMatchedTrack(pids[i]);
+        DataStructure::Global::Track* ds_track = (*ds_chain_iter)->GetMatchedTrack(pids[i]);
+        if (!us_track or !us_track->HasDetector(DataStructure::Global::kTOF1) or
+            !ds_track or !ds_track->HasDetector(DataStructure::Global::kTOF2)) {
+          continue;
         }
+        DataStructure::Global::TrackPointCPArray us_trackpoints = us_track->GetTrackPoints();
+        DataStructure::Global::TrackPointCPArray ds_trackpoints = ds_track->GetTrackPoints();
+        // Get TOF1&2 times to calculate effective particle speed between detectors
+        double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
+            DataStructure::Global::kTOF1);
+        double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
+            DataStructure::Global::kTOF2);
+        double TOFdT = TOF2_time - TOF1_time;
+        if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
+            (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
+          DataStructure::Global::Track* through_track = new DataStructure::Global::Track();
+          through_track->set_mapper_name("MapCppGlobalTrackMatching");
+          through_track->set_pid(pids[i]);
+          through_track->set_emr_range_primary(ds_track->get_emr_range_primary());
+          through_track->set_emr_plane_density(ds_track->get_emr_plane_density());
+          Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched" << std::endl;
+          // Assemble through track from trackpoints from the matched US and DS tracks
+          for (auto trackpoint_iter = us_trackpoints.begin();
+               trackpoint_iter != us_trackpoints.end();
+               ++trackpoint_iter) {
+            through_track->AddTrackPoint(
+                const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
+          }
+          for (auto trackpoint_iter = ds_trackpoints.begin();
+               trackpoint_iter != ds_trackpoints.end();
+               ++trackpoint_iter) {
+            through_track->AddTrackPoint(
+                const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
+          }
+          // Add references back to the original tracks
+          through_track->AddTrack(us_track);
+          through_track->AddTrack(ds_track);
+          _global_event->add_track(through_track);
+          through_primary_chain->AddMatchedTrack(through_track);
+        } else {
+          // There may be a small memory leak here because the US and DS tracks don't get
+          // deleted, deleting them here manually causes a segfault. TODO: Investigate
+        }
+      }
+      if (through_primary_chain->GetMatchedTracks().size() > 0) {
+        through_primary_chain->SetUSDaughter(*us_chain_iter);
+        through_primary_chain->SetDSDaughter(*ds_chain_iter);
+        _global_event->add_primary_chain(through_primary_chain);
       }
     }
   }
@@ -553,78 +616,6 @@ void TrackMatching::AddTrackerTrackPoints(
     momentum.SetE(energy);
     tracker_tp->set_momentum(momentum);
     hypothesis_track->AddTrackPoint(tracker_tp);
-  }
-}
-
-void TrackMatching::USDSTracks(
-    DataStructure::Global::TrackPArray* global_tracks,
-    DataStructure::Global::PID pid,
-    DataStructure::Global::TrackPArray* us_tracks,
-    DataStructure::Global::TrackPArray* ds_tracks) {
-  for (auto global_track_iter = global_tracks->begin();
-       global_track_iter != global_tracks->end();
-       ++global_track_iter) {
-    if (((*global_track_iter)->get_mapper_name() ==
-            "MapCppGlobalTrackMatching_US") and
-        ((*global_track_iter)->HasDetector(DataStructure::Global::kTOF1)) and
-         ((*global_track_iter)->get_pid() == pid)) {
-      us_tracks->push_back(*global_track_iter);
-    } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching_DS") and
-               ((*global_track_iter)->HasDetector(
-                   DataStructure::Global::kTOF2)) and
-               ((*global_track_iter)->get_pid() == pid)) {
-      ds_tracks->push_back(*global_track_iter);
-    }
-  }
-}
-
-void TrackMatching::MatchUSDS(
-    DataStructure::Global::Track* us_track,
-    DataStructure::Global::Track* ds_track,
-    DataStructure::Global::PID pid) {
-  DataStructure::Global::TrackPointCPArray us_trackpoints =
-      us_track->GetTrackPoints();
-  DataStructure::Global::TrackPointCPArray ds_trackpoints =
-      ds_track->GetTrackPoints();
-  // Obtain TOF1 and TOF2 times to calculate the effective speed of the particle
-  // between the detectors
-  double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
-                                            DataStructure::Global::kTOF1);
-  double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
-                                            DataStructure::Global::kTOF2);
-  double TOFdT = TOF2_time - TOF1_time;
-  if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
-      (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
-    DataStructure::Global::Track* through_track =
-        new DataStructure::Global::Track();
-    through_track->set_mapper_name("MapCppGlobalTrackMatching_Through");
-    through_track->set_pid(pid);
-    Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched"
-                                << std::endl;
-    // Assemble through track from trackpoints from the matched US and DS tracks
-    for (auto trackpoint_iter = us_trackpoints.begin();
-         trackpoint_iter != us_trackpoints.end();
-         ++trackpoint_iter) {
-      through_track->AddTrackPoint(
-          const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
-    }
-    for (auto trackpoint_iter = ds_trackpoints.begin();
-         trackpoint_iter != ds_trackpoints.end();
-         ++trackpoint_iter) {
-      through_track->AddTrackPoint(
-          const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
-    }
-    through_track->set_emr_range_primary(ds_track->get_emr_range_primary());
-    through_track->set_emr_plane_density(ds_track->get_emr_plane_density());
-    through_track->AddTrack(us_track);
-    through_track->AddTrack(ds_track);
-    _global_event->add_track(through_track);
-  } else {
-    // There is a small memory leak here, but deleting the tracks here won't work
-    // Might require a fair bit of rewrite, so not sure right now if worth it.
-    // delete us_track;
-    // delete ds_track;
   }
 }
 

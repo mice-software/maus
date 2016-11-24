@@ -533,117 +533,117 @@ TEST_F(TrackMatchingTest, AddTrackerTrackPoints) {
   }
 }
 
-TEST_F(TrackMatchingTest, USDSTracks) {
-  _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
+//~ TEST_F(TrackMatchingTest, USDSTracks) {
+  //~ _track_matching = new recon::global::TrackMatching(_global_event,
+      //~ "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
-  std::vector<DataStructure::Global::Track*> global_tracks;
-  std::vector<DataStructure::Global::Track*> us_tracks1;
-  std::vector<DataStructure::Global::Track*> us_tracks2;
-  std::vector<DataStructure::Global::Track*> ds_tracks1;
-  std::vector<DataStructure::Global::Track*> ds_tracks2;
-  DataStructure::Global::Track us_muplus_track1;
-  DataStructure::Global::Track us_muplus_track2;
-  DataStructure::Global::Track us_muplus_track3;
-  DataStructure::Global::Track ds_muplus_track;
-  DataStructure::Global::Track ds_piminus_track;
-  us_muplus_track1.set_mapper_name("MapCppGlobalTrackMatching_US");
-  us_muplus_track2.set_mapper_name("MapCppGlobalTrackMatching_US");
-  us_muplus_track3.set_mapper_name("MapCppGlobalTrackMatching_US");
-  ds_muplus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
-  ds_piminus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
-  us_muplus_track1.set_pid(DataStructure::Global::kMuPlus);
-  us_muplus_track2.set_pid(DataStructure::Global::kMuPlus);
-  us_muplus_track3.set_pid(DataStructure::Global::kMuPlus);
-  ds_muplus_track.set_pid(DataStructure::Global::kMuPlus);
-  ds_piminus_track.set_pid(DataStructure::Global::kPiMinus);
-  us_muplus_track1.SetDetector(DataStructure::Global::kTOF1);
-  us_muplus_track2.SetDetector(DataStructure::Global::kTOF1);
-  ds_muplus_track.SetDetector(DataStructure::Global::kTOF2);
-  ds_piminus_track.SetDetector(DataStructure::Global::kTOF2);
-  global_tracks.push_back(&us_muplus_track1);
-  global_tracks.push_back(&us_muplus_track2);
-  global_tracks.push_back(&us_muplus_track3);
-  global_tracks.push_back(&ds_muplus_track);
-  global_tracks.push_back(&ds_piminus_track);
+  //~ std::vector<DataStructure::Global::Track*> global_tracks;
+  //~ std::vector<DataStructure::Global::Track*> us_tracks1;
+  //~ std::vector<DataStructure::Global::Track*> us_tracks2;
+  //~ std::vector<DataStructure::Global::Track*> ds_tracks1;
+  //~ std::vector<DataStructure::Global::Track*> ds_tracks2;
+  //~ DataStructure::Global::Track us_muplus_track1;
+  //~ DataStructure::Global::Track us_muplus_track2;
+  //~ DataStructure::Global::Track us_muplus_track3;
+  //~ DataStructure::Global::Track ds_muplus_track;
+  //~ DataStructure::Global::Track ds_piminus_track;
+  //~ us_muplus_track1.set_mapper_name("MapCppGlobalTrackMatching_US");
+  //~ us_muplus_track2.set_mapper_name("MapCppGlobalTrackMatching_US");
+  //~ us_muplus_track3.set_mapper_name("MapCppGlobalTrackMatching_US");
+  //~ ds_muplus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
+  //~ ds_piminus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
+  //~ us_muplus_track1.set_pid(DataStructure::Global::kMuPlus);
+  //~ us_muplus_track2.set_pid(DataStructure::Global::kMuPlus);
+  //~ us_muplus_track3.set_pid(DataStructure::Global::kMuPlus);
+  //~ ds_muplus_track.set_pid(DataStructure::Global::kMuPlus);
+  //~ ds_piminus_track.set_pid(DataStructure::Global::kPiMinus);
+  //~ us_muplus_track1.SetDetector(DataStructure::Global::kTOF1);
+  //~ us_muplus_track2.SetDetector(DataStructure::Global::kTOF1);
+  //~ ds_muplus_track.SetDetector(DataStructure::Global::kTOF2);
+  //~ ds_piminus_track.SetDetector(DataStructure::Global::kTOF2);
+  //~ global_tracks.push_back(&us_muplus_track1);
+  //~ global_tracks.push_back(&us_muplus_track2);
+  //~ global_tracks.push_back(&us_muplus_track3);
+  //~ global_tracks.push_back(&ds_muplus_track);
+  //~ global_tracks.push_back(&ds_piminus_track);
 
-  _track_matching->USDSTracks(&global_tracks,
-      DataStructure::Global::kMuPlus, &us_tracks1, &ds_tracks1);
-  _track_matching->USDSTracks(&global_tracks,
-      DataStructure::Global::kPiMinus, &us_tracks2, &ds_tracks2);
+  //~ _track_matching->USDSTracks(&global_tracks,
+      //~ DataStructure::Global::kMuPlus, &us_tracks1, &ds_tracks1);
+  //~ _track_matching->USDSTracks(&global_tracks,
+      //~ DataStructure::Global::kPiMinus, &us_tracks2, &ds_tracks2);
 
-  EXPECT_EQ(us_tracks1.size(), 2);
-  EXPECT_EQ(ds_tracks1.size(), 1);
-  EXPECT_EQ(us_tracks2.size(), 0);
-  EXPECT_EQ(ds_tracks2.size(), 1);
+  //~ EXPECT_EQ(us_tracks1.size(), 2);
+  //~ EXPECT_EQ(ds_tracks1.size(), 1);
+  //~ EXPECT_EQ(us_tracks2.size(), 0);
+  //~ EXPECT_EQ(ds_tracks2.size(), 1);
 
-  if (us_tracks1.size() > 1) {
-    EXPECT_EQ(us_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
-    EXPECT_EQ(us_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
-    EXPECT_TRUE(us_tracks1[0]->HasDetector(DataStructure::Global::kTOF1));
-    EXPECT_EQ(us_tracks1[1]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
-    EXPECT_EQ(us_tracks1[1]->get_pid(), DataStructure::Global::kMuPlus);
-    EXPECT_TRUE(us_tracks1[1]->HasDetector(DataStructure::Global::kTOF1));
-  }
+  //~ if (us_tracks1.size() > 1) {
+    //~ EXPECT_EQ(us_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
+    //~ EXPECT_EQ(us_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
+    //~ EXPECT_TRUE(us_tracks1[0]->HasDetector(DataStructure::Global::kTOF1));
+    //~ EXPECT_EQ(us_tracks1[1]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
+    //~ EXPECT_EQ(us_tracks1[1]->get_pid(), DataStructure::Global::kMuPlus);
+    //~ EXPECT_TRUE(us_tracks1[1]->HasDetector(DataStructure::Global::kTOF1));
+  //~ }
 
-  if (ds_tracks1.size() > 0) {
-    EXPECT_EQ(ds_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
-    EXPECT_EQ(ds_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
-    EXPECT_TRUE(ds_tracks1[0]->HasDetector(DataStructure::Global::kTOF2));
-  }
+  //~ if (ds_tracks1.size() > 0) {
+    //~ EXPECT_EQ(ds_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
+    //~ EXPECT_EQ(ds_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
+    //~ EXPECT_TRUE(ds_tracks1[0]->HasDetector(DataStructure::Global::kTOF2));
+  //~ }
 
-  if (ds_tracks2.size() > 0) {
-    EXPECT_EQ(ds_tracks2[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
-    EXPECT_EQ(ds_tracks2[0]->get_pid(), DataStructure::Global::kPiMinus);
-    EXPECT_TRUE(ds_tracks2[0]->HasDetector(DataStructure::Global::kTOF2));
-  }
-}
+  //~ if (ds_tracks2.size() > 0) {
+    //~ EXPECT_EQ(ds_tracks2[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
+    //~ EXPECT_EQ(ds_tracks2[0]->get_pid(), DataStructure::Global::kPiMinus);
+    //~ EXPECT_TRUE(ds_tracks2[0]->HasDetector(DataStructure::Global::kTOF2));
+  //~ }
+//~ }
 
-TEST_F(TrackMatchingTest, MatchUSDS) {
-  _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
+//~ TEST_F(TrackMatchingTest, MatchUSDS) {
+  //~ _track_matching = new recon::global::TrackMatching(_global_event,
+      //~ "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
-  DataStructure::Global::SpacePoint tof1_sp;
-  TLorentzVector tof1_position(0.0, 0.0, 100.0, 20.0);
-  tof1_sp.set_position(tof1_position);
-  tof1_sp.set_detector(DataStructure::Global::kTOF1);
-  DataStructure::Global::TrackPoint tof1_tp(&tof1_sp);
-  DataStructure::Global::SpacePoint tof2_sp;
-  TLorentzVector tof2_position(0.0, 0.0, 8300.0, 65.0);
-  tof2_sp.set_position(tof2_position);
-  tof2_sp.set_detector(DataStructure::Global::kTOF2);
-  DataStructure::Global::TrackPoint tof2_tp(&tof2_sp);
+  //~ DataStructure::Global::SpacePoint tof1_sp;
+  //~ TLorentzVector tof1_position(0.0, 0.0, 100.0, 20.0);
+  //~ tof1_sp.set_position(tof1_position);
+  //~ tof1_sp.set_detector(DataStructure::Global::kTOF1);
+  //~ DataStructure::Global::TrackPoint tof1_tp(&tof1_sp);
+  //~ DataStructure::Global::SpacePoint tof2_sp;
+  //~ TLorentzVector tof2_position(0.0, 0.0, 8300.0, 65.0);
+  //~ tof2_sp.set_position(tof2_position);
+  //~ tof2_sp.set_detector(DataStructure::Global::kTOF2);
+  //~ DataStructure::Global::TrackPoint tof2_tp(&tof2_sp);
 
-  DataStructure::Global::Track* tof1_track = new DataStructure::Global::Track;
-  tof1_track->AddTrackPoint(&tof1_tp);
-  DataStructure::Global::Track* tof2_track = new DataStructure::Global::Track;
-  tof2_track->AddTrackPoint(&tof2_tp);
-  tof2_track->set_emr_range_primary(15.0);
+  //~ DataStructure::Global::Track* tof1_track = new DataStructure::Global::Track;
+  //~ tof1_track->AddTrackPoint(&tof1_tp);
+  //~ DataStructure::Global::Track* tof2_track = new DataStructure::Global::Track;
+  //~ tof2_track->AddTrackPoint(&tof2_tp);
+  //~ tof2_track->set_emr_range_primary(15.0);
 
-  DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
+  //~ DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
 
-  _track_matching->MatchUSDS(tof1_track, tof2_track, pid);
+  //~ _track_matching->MatchUSDS(tof1_track, tof2_track, pid);
 
-  std::vector<DataStructure::Global::Track*>* through_tracks =
-      GlobalTools::GetTracksByMapperName(_global_event,
-      "MapCppGlobalTrackMatching_Through");
+  //~ std::vector<DataStructure::Global::Track*>* through_tracks =
+      //~ GlobalTools::GetTracksByMapperName(_global_event,
+      //~ "MapCppGlobalTrackMatching_Through");
 
-  EXPECT_EQ(through_tracks->size(), 1);
-  if (through_tracks->size() > 0) {
-    EXPECT_FLOAT_EQ(through_tracks->at(0)->get_emr_range_primary(), 15.0);
-    EXPECT_EQ(through_tracks->at(0)->get_pid(),
-        DataStructure::Global::kMuPlus);
-    EXPECT_EQ(through_tracks->at(0)->GetTrackPoints().size(), 2);
-    if (through_tracks->at(0)->GetTrackPoints().size() > 1) {
-      const DataStructure::Global::TrackPoint* tof1_tp =
-          through_tracks->at(0)->GetTrackPoints().at(0);
-      const DataStructure::Global::TrackPoint* tof2_tp =
-          through_tracks->at(0)->GetTrackPoints().at(1);
-      EXPECT_FLOAT_EQ(tof1_tp->get_position().Z(), 100.0);
-      EXPECT_FLOAT_EQ(tof2_tp->get_position().Z(), 8300.0);
-    }
-  }
-}
+  //~ EXPECT_EQ(through_tracks->size(), 1);
+  //~ if (through_tracks->size() > 0) {
+    //~ EXPECT_FLOAT_EQ(through_tracks->at(0)->get_emr_range_primary(), 15.0);
+    //~ EXPECT_EQ(through_tracks->at(0)->get_pid(),
+        //~ DataStructure::Global::kMuPlus);
+    //~ EXPECT_EQ(through_tracks->at(0)->GetTrackPoints().size(), 2);
+    //~ if (through_tracks->at(0)->GetTrackPoints().size() > 1) {
+      //~ const DataStructure::Global::TrackPoint* tof1_tp =
+          //~ through_tracks->at(0)->GetTrackPoints().at(0);
+      //~ const DataStructure::Global::TrackPoint* tof2_tp =
+          //~ through_tracks->at(0)->GetTrackPoints().at(1);
+      //~ EXPECT_FLOAT_EQ(tof1_tp->get_position().Z(), 100.0);
+      //~ EXPECT_FLOAT_EQ(tof2_tp->get_position().Z(), 8300.0);
+    //~ }
+  //~ }
+//~ }
 
 TEST_F(TrackMatchingTest, TOFTimeFromTrackPoints) {
   _track_matching = new recon::global::TrackMatching(_global_event,
