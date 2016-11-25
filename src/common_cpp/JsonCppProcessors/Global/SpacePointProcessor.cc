@@ -30,7 +30,7 @@ SpacePointProcessor::SpacePointProcessor() {
       "mapper_name", &_string_proc,
       &MAUS::DataStructure::Global::SpacePoint::get_mapper_name,
       &MAUS::DataStructure::Global::SpacePoint::set_mapper_name,
-      true);
+      false); // Make this not required so that existing data can still be loaded
 
   RegisterBaseClass(
       "basepoint", &_base_proc,
