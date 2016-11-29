@@ -53,9 +53,9 @@ void ana_mc(char* ifname, char* ofname) {
   int nmc;
   int ntof0_sp, ntof1_sp, ntof2_sp;
   TFile* fout = new TFile(ofname, "recreate");
-  TH1F* tof01 = new TH1F("tof01", ";TOF0-1 time;", 120, 28., 36.);
-  TH1F* tof12 = new TH1F("tof12", ";TOF1-2 time;", 600, 25., 60.);
-  TH1F* tof01_2 = new TH1F("tof01_2", ";TOF0-1 time;", 65, 28., 32.);
+  TH1F* tof01 = new TH1F("tof01", ";TOF0-1 time;", 5000, 28., 36.);
+  TH1F* tof12 = new TH1F("tof12", ";TOF1-2 time;", 5000, 25., 60.);
+  TH1F* tof01_2 = new TH1F("tof01_2", ";TOF0-1 time;", 5000, 28., 32.);
 
   // get the number of entries in the tree
   int nspills = t1->GetEntries();

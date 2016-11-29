@@ -239,13 +239,15 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
       if (fDebug) printf("npe# %3.15f %3.4f %3.4f\n", edep, npe1, npe2);
 
       // get the hit time
-      double csp = _configJSON["TOFscintLightSpeed"].asDouble();
+      // double csp = _configJSON["TOFscintLightSpeed"].asDouble();
       double tres = _configJSON["TOFpmtTimeResolution"].asDouble();
       double htime = hit.GetTime() - gentime;
 
       // propagate time to pmt & smear by the resolution
-      double time1 = CLHEP::RandGauss::shoot((htime + dist1/csp) , tres);
-      double time2 = CLHEP::RandGauss::shoot((htime + dist2/csp) , tres);
+      double time1 = CLHEP::RandGauss::shoot(htime, tres);
+      double time2 = CLHEP::RandGauss::shoot(htime, tres);
+      // double time1 = CLHEP::RandGauss::shoot((htime + dist1/csp) , tres);
+      // double time2 = CLHEP::RandGauss::shoot((htime + dist2/csp) , tres);
       double tdc2time = _configJSON["TOFtdcConversionFactor"].asDouble();
 
       // convert to tdc
