@@ -65,6 +65,14 @@ class Hit {
     /** Destructor - cleans memory associated with channel ID
      */
     virtual ~Hit();
+    
+    /** Returns the particle event ID of the track that made the hit
+     */
+    virtual int GetPartEvId() const;
+
+    /** Sets the track number of the track that made the hit
+     */
+    virtual void SetPartEvId(int id);
 
     /** Returns the track number of the track that made the hit
      */
@@ -160,6 +168,7 @@ class Hit {
     virtual void AddPathLength(double path);
 
   private:
+    int _part_ev_id;
     int _track_id;
     int _particle_id;
     double _energy;

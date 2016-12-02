@@ -54,6 +54,9 @@ typedef HitProcessor<SpecialVirtualChannelId> SpecialVirtualHitProcessor;
 
 template <class ChannelId>
 void HitProcessor<ChannelId>::RegisterBranches() {
+    this->RegisterValueBranch("part_ev_id", &_int_proc,
+                        &Hit<ChannelId>::GetPartEvId,
+                        &Hit<ChannelId>::SetPartEvId, true);
     this->RegisterValueBranch("track_id", &_int_proc,
                         &Hit<ChannelId>::GetTrackId,
                         &Hit<ChannelId>::SetTrackId, true);

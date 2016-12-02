@@ -20,16 +20,16 @@
 namespace MAUS {
 
 template <class ChannelId>
-Hit<ChannelId>::Hit() : _track_id(0), _particle_id(0), _energy(0), _mass(0), _charge(0), _time(0),
-             _energy_deposited(0), _path_length(0), _position(0, 0, 0), _momentum(0, 0, 0),
-             _channel_id(NULL) {
+Hit<ChannelId>::Hit() : _part_ev_id(-1), _track_id(0), _particle_id(0), _energy(0), _mass(0),
+             _charge(0), _time(0), _energy_deposited(0), _path_length(0), _position(0, 0, 0),
+             _momentum(0, 0, 0), _channel_id(NULL) {
 }
 
 template <class ChannelId>
 Hit<ChannelId>::Hit(const Hit<ChannelId>& md)
-           : _track_id(0), _particle_id(0), _energy(0), _mass(0), _charge(0), _time(0),
-             _energy_deposited(0), _path_length(0), _position(0, 0, 0), _momentum(0, 0, 0),
-             _channel_id(NULL) {
+           : _part_ev_id(-1), _track_id(0), _particle_id(0), _energy(0), _mass(0), _charge(0),
+             _time(0), _energy_deposited(0), _path_length(0), _position(0, 0, 0),
+             _momentum(0, 0, 0), _channel_id(NULL) {
     *this = md;
 }
 
@@ -38,6 +38,7 @@ Hit<ChannelId>& Hit<ChannelId>::operator=(const Hit<ChannelId>& md) {
     if (this == &md) {
         return *this;
     }
+    _part_ev_id = md._part_ev_id;
     _track_id = md._track_id;
     _particle_id = md._particle_id;
     _energy = md._energy;
@@ -66,6 +67,17 @@ Hit<ChannelId>::~Hit() {
         _channel_id = NULL;
     }
 }
+
+template <class ChannelId>
+int Hit<ChannelId>::GetPartEvId() const {
+    return _part_ev_id;
+}
+
+template <class ChannelId>
+void Hit<ChannelId>::SetPartEvId(int id) {
+    _part_ev_id = id;
+}
+
 
 template <class ChannelId>
 int Hit<ChannelId>::GetTrackId() const {

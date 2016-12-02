@@ -11,17 +11,20 @@ import analysis.scifi_efficiency
 
 def main(args):
     args.pop(0)
-    eff = analysis.scifi_efficiency.PatternRecognitionEfficiencyReal()
-    eff.check_helical = True
-    eff.check_straight = True
-    eff.cut_on_tof = True
-    eff.cut_on_tof_time = True
-    eff.cut_on_tracker_10spnt = False
-    eff.use_mc_truth = False
-    eff.tof_upper_cut = 50.0
-    eff.tof_lower_cut = 27.0
-    eff.id_frequency_cut = 0.5
-    eff.run(args)
+    eff_real = analysis.scifi_efficiency.PatternRecognitionEfficiencyReal()
+    eff_real.check_helical = True
+    eff_real.check_straight = True
+    eff_real.cut_on_tof = False
+    eff_real.cut_on_tof_time = False
+    eff_real.cut_on_tracker_10spnt = False
+    eff_real.use_mc_truth = False
+    eff_real.tof_upper_cut = 50.0
+    eff_real.tof_lower_cut = 27.0
+
+    eff_mc = analysis.scifi_efficiency.PatternRecognitionEfficiencyMC(5, 5, 5, 5)
+    eff_mc.n_hits_cut = 5
+
+    eff_mc.run(args)
 
 if __name__ == "__main__":
     args = sys.argv

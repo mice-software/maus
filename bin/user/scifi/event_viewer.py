@@ -51,6 +51,8 @@ class info_box():
         self.p_label.AddText("Digits")
         self.p_label.AddText("Clusters")
         self.p_label.AddText("Spacepoints")
+        self.p_label.AddText("3C Spoints")
+        self.p_label.AddText("2C Spoints")
         self.p_label.AddText("Str Tracks")
         self.p_label.AddText("Helical Tracks")
         self.p_label.AddText("Total Spoints")
@@ -72,6 +74,8 @@ class info_box():
         self.p_t1.AddText( str(t1.num_digits) )
         self.p_t1.AddText( str(t1.num_clusters) )
         self.p_t1.AddText( str(t1.num_spoints) )
+        self.p_t1.AddText( str(t1.num_triplet_spoints) )
+        self.p_t1.AddText( str(t1.num_doublet_spoints) )
         self.p_t1.AddText( str(t1.num_stracks) )
         self.p_t1.AddText( str(t1.num_htracks) )
         self.tot_spoints[0] = self.tot_spoints[0] + t1.num_spoints
@@ -87,6 +91,8 @@ class info_box():
         self.p_t2.AddText( str(t2.num_digits) )
         self.p_t2.AddText( str(t2.num_clusters) )
         self.p_t2.AddText( str(t2.num_spoints) )
+        self.p_t2.AddText( str(t2.num_triplet_spoints) )
+        self.p_t2.AddText( str(t2.num_doublet_spoints) )
         self.p_t2.AddText( str(t2.num_stracks) )
         self.p_t2.AddText( str(t2.num_htracks) )
         self.tot_spoints[1] = self.tot_spoints[1] + t2.num_spoints

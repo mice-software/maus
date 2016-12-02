@@ -3,6 +3,7 @@
 """  Check tracker efficiency """
 
 import os
+import math
 import abc
 import ROOT
 import libMausCpp #pylint: disable = W0611
@@ -16,10 +17,10 @@ import analysis.scifitools as tools
 #pylint: disable = W0612
 
 class EfficiencyDataReal():
-    """ Class to store pattern recognition efficiency data """
+    """ Class to store pattern recognition efficiency data from real data """
     def __init__(self):
         """ Initialise member variables """
-        self.n_total_events = 0
+        self.n_events_total = 0
         self.n_passed_tof_timing_events = 0 # Events which pass the TOF cut
         self.n_passed_tof_spoint_events = 0 # Events with 1 sp in TOF1 & TOF2
         self.n_10spoint_events = 0 # Events with 5 spoints in both TkUS & TkDS
@@ -47,7 +48,7 @@ class EfficiencyDataReal():
     def __iadd__(self, other):
         """ Add another instance's data to that here,
             just the totals, not the final efficiency data"""
-        self.n_total_events += other.n_total_events 
+        self.n_events_total += other.n_events_total
         self.n_passed_tof_timing_events += other.n_passed_tof_timing_events
         self.n_passed_tof_spoint_events += other.n_passed_tof_spoint_events
         self.n_10spoint_events += other.n_10spoint_events
@@ -64,7 +65,7 @@ class EfficiencyDataReal():
         return self
 
     def calculate_efficiency(self):
-        """ Calculate the final efficiency figures for a file """
+        """ Calculate the final efficiency figures """
         self.eff_tkus_5pt = 0.0
         self.eff_tkus_5pt_err = 0.0
         self.eff_tkus_3_5pt = 0.0
@@ -118,7 +119,7 @@ class EfficiencyDataReal():
 
     def clear(self):
         """ Clear all data """
-        self.n_total_events = 0
+        self.n_events_total = 0
         self.n_passed_tof_timing_events = 0
         self.n_passed_tof_spoint_events = 0
         self.n_10spoint_events = 0
@@ -141,6 +142,98 @@ class EfficiencyDataReal():
         self.eff_tkds_5pt_err = 0.0
         self.eff_tkds_3_5pt = 0.0
         self.eff_tkds_3_5pt_err = 0.0
+
+class EfficiencyDataMC():
+    """ Class to store pattern recognition efficiency data from MC data """
+    def __init__(self):
+        """ Initialise member variables """
+        self.n_events_total = 0 # Total number of events
+        self.n_mc_tku_tracks_total = 0 # Total number of tkus tracks
+        self.n_mc_tkd_tracks_total = 0 # Total number of tkus tracks
+
+        # MC tracks which created a viable # of spoints
+        self.n_mc_tku_tracks_5pt = 0
+        self.n_mc_tku_tracks_4to5pt = 0
+        self.n_mc_tku_tracks_3to5pt = 0
+        self.n_mc_tkd_tracks_5pt = 0
+        self.n_mc_tkd_tracks_4to5pt = 0
+        self.n_mc_tkd_tracks_3to5pt = 0
+
+        # Number of good recon tracks found
+        self.n_rec_tku_tracks_5pt_good = 0
+        self.n_rec_tkd_tracks_5pt_good = 0
+        self.n_rec_tku_tracks_4to5pt_good = 0
+        self.n_rec_tkd_tracks_4to5pt_good = 0
+        self.n_rec_tku_tracks_3to5pt_good = 0
+        self.n_rec_tkd_tracks_3to5pt_good = 0
+
+        self.eff_tkus_tracks = 0.0 # Efficiency of finding good tracks in tkus
+        self.eff_tkds_tracks = 0.0 # Efficiency of finding good tracks in tkds
+
+    def __iadd__(self, other):
+        """ Add another instance's data to that here,
+            just the totals, not the final efficiency data"""
+        self.n_events_total += other.n_events_total
+        self.n_mc_tku_tracks_total += other.n_mc_tku_tracks_total
+        self.n_mc_tkd_tracks_total += other.n_mc_tkd_tracks_total
+
+        self.n_mc_tku_tracks_5pt += other.n_mc_tku_tracks_5pt
+        self.n_mc_tku_tracks_4to5pt += other.n_mc_tku_tracks_4to5pt
+        self.n_mc_tku_tracks_3to5pt += other.n_mc_tku_tracks_3to5pt
+
+        self.n_mc_tkd_tracks_5pt += other.n_mc_tkd_tracks_5pt
+        self.n_mc_tkd_tracks_4to5pt += other.n_mc_tkd_tracks_4to5pt
+        self.n_mc_tkd_tracks_3to5pt += other.n_mc_tkd_tracks_3to5pt
+
+        self.n_rec_tku_tracks_5pt_good += other.n_rec_tku_tracks_5pt_good
+        self.n_rec_tkd_tracks_5pt_good += other.n_rec_tkd_tracks_5pt_good
+        self.n_rec_tku_tracks_4to5pt_good += other.n_rec_tku_tracks_4to5pt_good
+        self.n_rec_tkd_tracks_4to5pt_good += other.n_rec_tkd_tracks_4to5pt_good
+        self.n_rec_tku_tracks_3to5pt_good += other.n_rec_tku_tracks_3to5pt_good
+        self.n_rec_tkd_tracks_3to5pt_good += other.n_rec_tkd_tracks_3to5pt_good
+
+        return self
+
+    def calculate_efficiency(self):
+        """ Calculate the final efficiency figures """
+        self.eff_tkus_tracks = 0.0
+        self.eff_tkds_tracks = 0.0
+
+        # Upstream tracker
+        try:
+            self.eff_tkus_tracks = float(self.n_rec_tku_tracks_user_good) \
+              / float(self.n_mc_tku_tracks_user)
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkus_tracks = 0.0
+        # Downstream tracker
+        try:
+            self.eff_tkds_tracks = float(self.n_rec_tkd_tracks_user_good) \
+              / float(self.n_mc_tkd_tracks_user)
+        except (ZeroDivisionError, ValueError):
+            self.eff_tkds_tracks = 0.0
+
+    def clear(self):
+        """ Clear all data """
+        self.n_events_total = 0
+        self.n_mc_tku_tracks_total = 0
+        self.n_mc_tkd_tracks_total = 0
+
+        self.n_mc_tku_tracks_5pt = 0
+        self.n_mc_tku_tracks_4to5pt = 0
+        self.n_mc_tku_tracks_3to5pt = 0
+        self.n_mc_tkd_tracks_5pt = 0
+        self.n_mc_tkd_tracks_4to5pt = 0
+        self.n_mc_tkd_tracks_3to5pt = 0
+
+        self.n_rec_tku_tracks_5pt_good = 0
+        self.n_rec_tkd_tracks_5pt_good = 0
+        self.n_rec_tku_tracks_4to5pt_good = 0
+        self.n_rec_tkd_tracks_4to5pt_good = 0
+        self.n_rec_tku_tracks_3to5pt_good = 0
+        self.n_rec_tkd_tracks_3to5pt_good = 0
+
+        self.eff_tkus_tracks = 0.0
+        self.eff_tkds_tracks = 0.0
 
 class PatternRecognitionEfficiencyBase():
     """ Base class for other Pattern Recognition Efficiency classes """
@@ -197,7 +290,7 @@ class PatternRecognitionEfficiencyBase():
         pass
 
     @abc.abstractmethod
-    def caluclate_file_efficiency(self):
+    def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
         pass
 
@@ -241,8 +334,6 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
         self.use_mc_truth = False
         self.tof_upper_cut = 50.0
         self.tof_lower_cut = 27.0
-        self.fiducial_cut = 150.0 # Not currently used
-        self.id_frequency_cut = 0.5
 
         # Results
         self.bool_2tof_timing_event = False # Tof timing ok
@@ -267,7 +358,7 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
         """ Accumulate the job data """
         self.jdata += self.fdata
 
-    def caluclate_file_efficiency(self):
+    def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
         self.fdata.calculate_efficiency()
 
@@ -295,7 +386,7 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
 
         # Loop over recon events
         for i in range(spill.GetReconEvents().size()):
-            self.fdata.n_total_events += 1
+            self.fdata.n_events_total += 1
 
             # Pull out tof data and check if cuts pass
             tof_evt = spill.GetReconEvents()[i].GetTOFEvent()
@@ -325,30 +416,6 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
             self.analyse_prtracks(prtracks)
 
         return True
-
-    #def analyse_mc_truth_momentum(self, mc_evt, tk_spoints, trker_num):
-        #""" Find the mc scifi hits that formed the spacepoints, find the
-            #parent primary mc track id, extract the mc truth momentum from
-            #scifi hits corresponding to that track """
-
-        ## Check the mc event is ok
-        #if mc_evt is None:
-          #return ()
-
-        ## Create a lookup to find the mc scifi hits that formed the spacepoints
-        #lookup = tools.SciFiLookup(mc_evt) # Lookup to link rec to MC
-        #if len(lookup.hits_map) < 0:
-          #return ()
-
-        ## Try to find the mc primary track
-        #hits = tools.find_mc_hits(lookup, tk_spoints, trker_num)
-        #parent_track_id = tools.find_mc_track(hits, self.id_frequency_cut)
-        #if parent_track_id != 0:
-            ## Pull out the mc momentum and fill the histogramms
-            #mom = tools.find_mc_momentum_sfhits(lookup, tk_spoints, \
-              #parent_track_id, trker_num)
-            #return mom
-        #return ()
 
     def analyse_prtracks(self, prtracks):
         """ Analyse the reconstructed tracks, see how many were found when
@@ -444,9 +511,9 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
         return tof_good
 
     def check_tracker_spacepoints(self, spoints):
-        """ Look for 5 spacepoint events in each tracker, increment the internal
-            good event counters, and return if the tracker spacepoint data
-            passes the selected cuts """
+        """ Look for 5 spacepoint events in each tracker, increment the
+            internal good event counters, and return if the tracker spacepoint
+            data passes the selected cuts """
         self.bool_10spoint_event = True
         self.bool_tkus_5spoint_event = True
         self.bool_tkds_5spoint_event = True
@@ -558,13 +625,13 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
             edata = self.jdata
 
         if self.n_print_calls == 0:
-            print '\nFile\t\t\tRecon_evt\tTOF\tTOF_SP\tTU_5pt\
-              \tTD_5pt\tT_10pt\tGood_TU\tGood_TD\tTU_5trk\
-              \tTU_5trk_err\tTU_3-5trk\tTU_3-5trk_err\t',
+            print '\nFile\t\t\tRecon_evt\tTOF\tTOF_SP\tTU_5pt' + \
+              '\tTD_5pt\tT_10pt\tGood_TU\tGood_TD\tTU_5trk' + \
+              '\tTU_5trk_err\tTU_3-5trk\tTU_3-5trk_err\t',
             print 'TD_5trk\tTD_5trk_err\tTD_3-5trk\tTD_3-5trk_err'
 
         print os.path.basename(data_name) + '\t',
-        print str(edata.n_total_events) + '\t\t',
+        print str(edata.n_events_total) + '\t\t',
         print str(edata.n_passed_tof_timing_events) + '\t' + \
           str(edata.n_passed_tof_spoint_events) + '\t' + \
           str(edata.n_5spoint_tkus_events) + '\t' + \
@@ -584,14 +651,16 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
 class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
     """ Class to check Pattern Recognition efficiency with MC data """
 
-    def __init__(self, nstations_tku=4, nstations_tkd=3):
+    def __init__(self, nstations_mc_tku=5, nstations_mc_tkd=5, \
+      nstations_rec_tku=5, nstations_rec_tkd=5):
         """ Initialise member variables """
-        self.nstations_tku = nstations_tku
-        self.nstations_tkd = nstations_tkd
-        self.hit_id_frequency_cut = 0.5
-        
-        self.fdata = [] # Per file data
-        self.jdata = [] # Per job data
+        self.n_hits_cut = 5
+        self.nstations_rec_tku = nstations_rec_tku
+        self.nstations_rec_tkd = nstations_rec_tkd
+        self.nstations_mc_tku = nstations_mc_tku
+        self.nstations_mc_tkd = nstations_mc_tkd
+        self.fdata = EfficiencyDataMC() # Per file data
+        self.jdata = EfficiencyDataMC() # Per job data
 
         # Other objects not reset by the clear() function
         self.n_print_calls = 0
@@ -601,11 +670,14 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         if spill.GetDaqEventType() != "physics_event":
             return False # remove event from consideration
 
+        # print 'Processing spill ' + str(spill.GetSpillNumber())
+
         # Loop over events
         for i in range(spill.GetReconEvents().size()):
+             # print '  Processing event ' + str(i)
              revent = spill.GetReconEvents()[i]
              mcevent = spill.GetMCEvents()[i]
-             self.process_event(revt, mcevt)
+             self.process_event(revent, mcevent)
 
     def process_event(self, revent, mcevent):
         """ Process the data for one event """
@@ -613,37 +685,75 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
 
         # Calculate the expected number of tracks by calculating how many
         # MC tracks produced spacepoints in every station
+        # ***************************************************************
+
+        #  Separate the spacepoints by tracker
         spoints_tku = \
           [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 0]
         spoints_tkd = \
           [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 1]
-        lkup = SciFiLookup(mcevent)
-        tracks_tku = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
-          self.nstations_tku, self.hit_id_frequency_cut)
-        tracks_tkd = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
-          self.nstations_tku, self.hit_id_frequency_cut)
 
-        # Find the number of tracks actually recontructed by pattern recognition
-        stracks_tku = [trk for trk in sfevent.get_straight_tracks() \
+        # Create the MC lookup
+        lkup = tools.SciFiLookup(mcevent)
+
+        # Find the number of expected 5, 4, and 3 point tracks from the MC
+        tracks_tku_5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tku, 5, self.n_hits_cut)
+        tracks_tkd_5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tkd, 5, self.n_hits_cut)
+        tracks_tku_4to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tku, 4, self.n_hits_cut)
+        tracks_tkd_4to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tkd, 4, self.n_hits_cut)
+        tracks_tku_3to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tku, 3, self.n_hits_cut)
+        tracks_tkd_3to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tkd, 3, self.n_hits_cut)
+
+        # Update internal counters
+        self.fdata.n_mc_tku_tracks_5pt += len(tracks_tku_5pt)
+        self.fdata.n_mc_tkd_tracks_5pt += len(tracks_tkd_5pt)
+        self.fdata.n_mc_tku_tracks_4to5pt += len(tracks_tku_4to5pt)
+        self.fdata.n_mc_tkd_tracks_4to5pt += len(tracks_tkd_4to5pt)
+        self.fdata.n_mc_tku_tracks_3to5pt += len(tracks_tku_3to5pt)
+        self.fdata.n_mc_tkd_tracks_3to5pt += len(tracks_tkd_3to5pt)
+
+        # Find the number of tracks actually reconstructed by pat rec
+        # ***********************************************************
+
+        # Sort tracks by type and tracker
+        stracks_tku = [trk for trk in sfevent.straightprtracks() \
           if trk.get_tracker() == 0]
-        stracks_tkd = [trk for trk in sfevent.get_straight_tracks() \
+        stracks_tkd = [trk for trk in sfevent.straightprtracks() \
           if trk.get_tracker() == 1]
-        htracks_tku = [trk for trk in sfevent.get_helical_tracks() \
+        htracks_tku = [trk for trk in sfevent.helicalprtracks() \
           if trk.get_tracker() == 0]
-        htracks_tkd = [trk for trk in sfevent.get_helical_tracks() \
+        htracks_tkd = [trk for trk in sfevent.helicalprtracks() \
           if trk.get_tracker() == 1]
 
-        # Do these tracks come from 1 MC track each? Are there mixed tracks?
+        # How many 5, 4-5, 3-5 point tracks were reconstructed
         tracks_tku = htracks_tku + stracks_tku
         tracks_tkd = htracks_tkd + stracks_tkd
-        results_tku = check_tracks(lkup, self.nstations_tku, tracks_tku)
-        results_tkd = check_tracks(lkup, self.nstations_tkd, tracks_tkd)
+        results_tku_5pt = self.check_tracks(lkup, 5, tracks_tku)
+        results_tkd_5pt = self.check_tracks(lkup, 5, tracks_tkd)
+        results_tku_4pt = self.check_tracks(lkup, 4, tracks_tku)
+        results_tkd_4pt = self.check_tracks(lkup, 4, tracks_tkd)
+        results_tku_3pt = self.check_tracks(lkup, 3, tracks_tku)
+        results_tkd_3pt = self.check_tracks(lkup, 3, tracks_tkd)
+
+        # Update internal counters
+        self.fdata.n_rec_tku_tracks_5pt_good += results_tku_5pt[0]
+        self.fdata.n_rec_tkd_tracks_5pt_good += results_tkd_5pt[0]
+        self.fdata.n_rec_tku_tracks_4to5pt_good += results_tku_4pt[0]
+        self.fdata.n_rec_tkd_tracks_4to5pt_good += results_tkd_4pt[0]
+        self.fdata.n_rec_tku_tracks_3to5pt_good += results_tku_3pt[0]
+        self.fdata.n_rec_tkd_tracks_3to5pt_good += results_tkd_3pt[0]
 
     def accumulate_job_data(self):
         """ Accumulate the job data """
         self.jdata += self.fdata
 
-    def caluclate_file_efficiency(self):
+    def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
         self.fdata.calculate_efficiency()
 
@@ -651,34 +761,58 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         """ Calculate the job efficiency """
         self.jdata.calculate_efficiency()
 
-    def check_tracks(self, lkup, nstations, recon_tracks):
+    def check_tracks(self, lkup, nstations, recon_tracks, purity_cut=0.99):
         """ Are the recon tracks found good tracks wrt the MC data?
-            nstations is the number of seed spacepoints originating from
-            the same MC track required for a recon track to be classed as
-            good. Hence if nstations = the actual number fo tracker stations,
-            only perfect recon tracks will count as good """
-        n_good_tracks = 0 # tracks which can be associated with an MC track
-        # tracks generated from spoints from different MC tracks
+            nstations is the number of tracker stations, it can be used
+            to control the minimum number of stations the recon track
+            has correct spacepoints for, to count as a good track """
+
+        # good = tracks with a correctly found fraction of spoints > purity_cut
+        # mixed = tracks with a correctly found fraction of spoints > 0.5
+        # bad = any other tracks (badly messed up ones)
+        n_good_tracks = 0
         n_mixed_tracks = 0
-        n_bad_tracks = 0 # tracks generated from mixed spacepoints
+        n_bad_tracks = 0
         for trk in recon_tracks:
-            spoints = trk.get_spacepoints_pointers():
-            mc_tids = tools.find_mc_tracks_from_spoints(lkup, spoints, \
-              nstations, self.hit_id_frequency_cut)
-            if len(mc_tids) == 1:
-                n_good_tracks = n_good_tracks + 1
-            elif len(mc_tids) > 1:
-                n_mixed_tracks = n_mixed_tracks + 1
-            elif len(mc_tids) < 1:
-                n_bad_tracks = n_bad_tracks + 1
+            purity = \
+              tools.calculate_purity(lkup, trk, nstations, self.n_hits_cut)
+            if purity >= purity_cut:
+                n_good_tracks += 1
+            elif purity > 0.5:
+                n_mixed_tracks += 1
+            else:
+                n_bad_tracks += 1
         return n_good_tracks, n_mixed_tracks, n_bad_tracks
 
     def clear(self):
         """ Set the internal file data counters to zero & booleans to false """
+        self.fdata.clear()
 
     def print_info(self, data_name, info_type='file'):
         """ Print the results """
-        print "Implement me!"
+        if info_type == 'file':
+            edata = self.fdata
+        elif info_type == 'job':
+            edata = self.jdata
+
+        if self.n_print_calls == 0:
+            print '\nFile\t\t\tRecon_evt\tTUMC5\tTDMC5\tTUMC45\tTDMC45\t' + \
+              'TUMC35\tTDMC35\tTURG5\tTDRG5\tTURG45\tTDRG45\tTURG35\tTDRG35\t'
+
+        print os.path.basename(data_name) + '\t',
+        print str(edata.n_events_total) + '\t\t',
+        print str(edata.n_mc_tku_tracks_5pt) + '\t' + \
+          str(edata.n_mc_tkd_tracks_5pt) + '\t' + \
+          str(edata.n_mc_tku_tracks_4to5pt) + '\t' + \
+          str(edata.n_mc_tkd_tracks_4to5pt) + '\t' + \
+          str(edata.n_mc_tku_tracks_3to5pt) + '\t' + \
+          str(edata.n_mc_tkd_tracks_3to5pt) + '\t' + \
+          str(edata.n_rec_tku_tracks_5pt_good) + '\t' + \
+          str(edata.n_rec_tkd_tracks_5pt_good) + '\t' + \
+          str(edata.n_rec_tku_tracks_4to5pt_good) + '\t' + \
+          str(edata.n_rec_tkd_tracks_4to5pt_good) + '\t' + \
+          str(edata.n_rec_tku_tracks_3to5pt_good) + '\t' + \
+          str(edata.n_rec_tkd_tracks_3to5pt_good)
         self.n_print_calls += 1
 
     def print_welcome(self):
