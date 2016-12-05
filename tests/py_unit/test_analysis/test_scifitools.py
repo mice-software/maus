@@ -174,34 +174,6 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         self.assertEqual(5.0, mom[1])
         self.assertEqual(6.0, mom[2])
 
-    def load_data(files):
-        """ Load data from files. If a dir is given, search recursively """
-        if type(files) is not list:
-            files = [files]
-
-        root_files = []
-        for file_name in files:
-            # Check if file_name is a ROOT file
-            if os.path.isfile(file_name):
-                file_suffix, file_extension = os.path.splitext(file_name)
-                if file_extension == '.root':
-                    root_files.append(file_name)
-                else:
-                    print 'Bad file name, aborting'
-                    return root_files
-
-            # If file_name is a directory, walk it and save any ROOT files found
-            if os.path.isdir(file_name):
-                tools.root_files_dir_search(file_name, root_files)
-            if len(root_files) < 1:
-                print 'No data files found'
-                return root_files
-
-        print '\nFound ' + str(len(root_files)) + ' ROOT files:'
-        for f in root_files:
-            print f
-        return root_files
-
 if __name__ == '__main__':
     unittest.main()
 

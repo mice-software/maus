@@ -109,65 +109,27 @@ def find_mc_momentum_sfhits(lkup, spoints, track_id, trker_num):
         pz = pz / num_matched_hits
     return px, py, pz
 
-def calculate_purity(lkup, track, nstations=5, n_hits_cut=5):
-    """ Find the MC track ID of the input recon track, then calculate
-        the spacepoint purity, that is how many seed spacepoints come
-        from the right MC track """
-    spoints = track.get_spacepoints_pointers()
-    tid_freq = find_track_id_frequency(lkup, spoints, n_hits_cut)
-
-    best_tid = -1
-    most_stations_hit = 0
-    for tid, freq in tid_freq.iteritems():
-        if freq > most_stations_hit:
-            best_tid = tid
-            most_stations_hit = freq
-
-    if most_stations_hit > 0:
-        return float(most_stations_hit) / float(nstations)
-    return -1
-
 def find_mc_tracks_from_spoints(lkup, spoints, nstations=5, n_hits_cut=5):
     """ Find how many MC tracks produced a set of spacepoints which could be
-        reconstructed to pat rec tracks.
+        reconstructed to pat rec tracks. 
         A spacepoint is identified with a track if (n_hits_cut) or more scifi
         hits produced it (mutliple tracks can be associated with one spoint).
         Then any track ids that are associated with spacepoints in (nstations) 
         or more stations are returned as good MC tracks.
     """
-    track_ids = find_track_id_frequency_by_station(lkup, spoints, n_hits_cut)
-    good_tracks = []
-    for tid, stations_hit in track_ids.iteritems():
-        if (len(stations_hit)) >= float(nstations):
-            good_tracks.append(tid)
-    return good_tracks
 
-def find_track_id_frequency(lkup, spoints, n_hits_cut=5):
-    """ Calculate how many stations each mc tid produced at least 1
-        spacepoint in. Returns a dict of tid to nstations """
-   freq_dict = {}
-   track_ids = find_track_id_frequency_by_station(lkup, spoints, n_hits_cut)
-   for tid, stations_hit in track_ids.iteritems():
-       freq_dict[tid] = len(stations_hit)
-   return freq_dict
-
-def find_track_id_frequency_by_station(lkup, spoints, n_hits_cut=5):
-    """ Find each MC track id which went into producing the input spacepoints.
-        Return the track ids mapped to the number of spacepoints they helped
-        create in each station. Returns a dict mapping track id (a tuple)
-        to a dict mapping station number to number of spacepoints created """
-
-    # Dict to hold what stations the track caused spoints in, & how many spoints
+    # Dict to hold what stations the track caused spoints in, and
+    # how many spoints
     track_ids = {}
 
     for sp in spoints:
         station = sp.get_station() # station number
         hits = find_mc_hits(lkup, [sp]) #  The hits which formed the spoint
+
         found_tracks = find_mc_track(hits, n_hits_cut) # list of tuples
 
         for trk in found_tracks: # trk is a tuple, hence can use as dict key
-            # if we have a good track id for this spoint
-            if trk[0] != -1 and trk[1] != -1:
+            if trk[0] != -1 and trk[1] != -1: # if we have a good track id for this spoint
                 if not trk in track_ids:
                     track_ids[trk] = {station : 1}
                 elif not station in track_ids[trk]:
@@ -175,7 +137,17 @@ def find_track_id_frequency_by_station(lkup, spoints, n_hits_cut=5):
                 else:
                     track_ids[trk][station] = \
                       track_ids[trk][station] + 1
-    return track_ids
+
+    good_tracks = []
+    # if nstations == 5: print 'Found ' + str(len(track_ids)) + ' tracks, ',
+    for tid, stations_hit in track_ids.iteritems():
+        # if this track formed a spoint in at least
+        # the number of stations specified
+        # if nstations == 5: print ' stations hit = ' + str(len(stations_hit)) + ', ',
+        if (len(stations_hit)) >= float(nstations):
+            good_tracks.append(tid)
+    # if nstations == 5: print  'with ' + str(len(good_tracks)) + ' of which is good'
+    return good_tracks
 
 class SciFiLookup:
     """ Class to link SciFi recon data to the MC truth """
