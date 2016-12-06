@@ -127,9 +127,9 @@ namespace MAUS {
      *
      *  Calculate the confidence of a track having a given pid from the log likelihoods.
      *  @param LL_x log-likelihood of pid x
-     *  @param sum_L sum of likelihoods for all pids
+     *  @param sum_exp_LL sum of exponentials of log-likelihoods for all pids
      */
-    double ConfidenceLevel(double LL_x, double sum_L) const;
+    double ConfidenceLevel(double LL_x, double sum_exp_LL) const;
 
     bool _configCheck;
     /// This will contain the configuration

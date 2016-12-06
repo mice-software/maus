@@ -338,8 +338,8 @@ namespace MAUS {
     }
   }
 
-  double MapCppGlobalPID::ConfidenceLevel(double LL_x, double sum_L) const {
-    return (exp(LL_x)/sum_L)*100;
+  double MapCppGlobalPID::ConfidenceLevel(double LL_x, double sum_exp_LL) const {
+    return (exp(LL_x)/sum_exp_LL)*100;
   }
 
   void MapCppGlobalPID::Segment_PID(
@@ -364,9 +364,9 @@ namespace MAUS {
         for (size_t track_j = 0; track_j < const_tracks.size(); ++track_j) {
           if (const_tracks.at(track_j)->get_mapper_name() ==
               "MapCppGlobalTrackMatching_" + segment) {
-            MAUS::DataStructure::Global::Track* Segment_track =
+            MAUS::DataStructure::Global::Track* segment_track =
                 const_cast<MAUS::DataStructure::Global::Track*> (const_tracks.at(track_j));
-            perform_pid("Through-" + segment, Segment_track, global_event);
+            perform_pid("Through-" + segment, segment_track, global_event);
           }
         }
       }
@@ -386,13 +386,10 @@ namespace MAUS {
     double logL_mu = 0;
     double logL_e = 0;
     double logL_pi = 0;
-    /// Bools to check if log likelihood for PID variable returned an
-    /// "error value" logL, 1 for an unsuitable track, 2 for a track
-    /// that fails the PID due to a user defined cut on the variable
-    /// value. Only used for the purposes of efficiency calculations,
-    /// does not affect PID performance
-    bool logL_1 = false;
-    bool logL_2 = false;
+    /// Keeping track of whether the log likelihood for the PID variable
+    /// returned an error value. Only used for the purposes of efficiency
+    /// calculations, does not affect PID performance
+    size_t logL_1_sum = 0;
     for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
          ++pid_var_count) {
       std::string polarity_sign;
@@ -401,61 +398,52 @@ namespace MAUS {
       } else if (_pid_beamline_polarity == "negative") {
         polarity_sign = "minus";
       }
-      logL_1 = false;
-      logL_2 = false;
+      logL_1_sum = 0;
       std::string hyp = _pid_vars[pid_var_count]->Get_hyp();
       if (hyp == (_pid_beam_setting + "_mu_" + polarity_sign)) {
         if (_pid_vars[pid_var_count]->logL(track) == 1) {
-          logL_1 = true;
+          logL_1_sum++;
           continue;
         } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
-          logL_2 = true;
           continue;
         } else {
           logL_mu += _pid_vars[pid_var_count]->logL(track);
           std::cerr << "logL_mu : " << logL_mu << std::endl;
-          logL_1 = false;
-          logL_2 = false;
         }
       } else if (hyp == (_pid_beam_setting + "_e_" + polarity_sign)) {
         if (_pid_vars[pid_var_count]->logL(track) == 1) {
-          logL_1 = true;
+          logL_1_sum++;
           continue;
         } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
-          logL_2 = true;
           continue;
         } else {
           logL_e += _pid_vars[pid_var_count]->logL(track);
-          logL_1 = false;
-          logL_2 = false;
         }
       } else if (hyp == (_pid_beam_setting + "_pi_" + polarity_sign)) {
         if (_pid_vars[pid_var_count]->logL(track) == 1) {
-          logL_1 = true;
+          logL_1_sum++;
           continue;
         } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
-          logL_2 = true;
           continue;
         } else {
           logL_pi += _pid_vars[pid_var_count]->logL(track);
-          logL_1 = false;
-          logL_2 = false;
         }
       } else {
         Squeak::mout(Squeak::debug) << "Unrecognised particle hypothesis,"
                   << " MapCppGlobalPID::perform_pid" << std::endl;
       }
     }
-    if ((logL_mu == 0 || logL_pi == 0 || logL_e == 0) && logL_1 == true) {
+    if ((logL_1_sum/3) == _pid_vars.size()) {
       logL_mu = 1;
       logL_pi = 1;
       logL_e = 1;
-    } else if ((logL_mu == 0 || logL_pi == 0 || logL_e == 0) && logL_2 == true) {
+    } else if (logL_mu == 0 || logL_pi == 0 || logL_e == 0) {
       logL_mu = 2;
       logL_pi = 2;
       logL_e = 2;
     }
     // make pid_ll_values
+    // creates object in data structure with loglikelihoods for each particle hypothesis
     if (_pid_beamline_polarity == "positive") {
       MAUS::DataStructure::Global::PIDLogLPair mu_LL(-13, logL_mu);
       MAUS::DataStructure::Global::PIDLogLPair e_LL(-11, logL_e);
@@ -479,7 +467,7 @@ namespace MAUS {
       double CL_pi = ConfidenceLevel(logL_pi, sum_exp_LLs);
       // compare CLs and select winning hypothesis. set g.o.f. of track to CL
 
-      MAUS::DataStructure::Global::PID track_pid;
+      MAUS::DataStructure::Global::PID track_pid = MAUS::DataStructure::Global::kNoPID;
       double CL;
       
       if (CL_mu - CL_e > _pid_confidence_level && CL_mu - CL_pi > _pid_confidence_level) {

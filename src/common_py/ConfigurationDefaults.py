@@ -690,6 +690,28 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
                                  "y":0.1, "Py":0.01}
 
+root_document_store_timeout = 10
+root_document_store_poll_time = 1
+
+geometry_validation = { # see bin/utilities/geometry_validation.py for docs
+    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
+    "will_plot":True,
+    "will_track":True,
+    "z_start":-6000.,
+    "z_end":6000.,
+    "x_start":0.,
+    "x_step":1.,
+    "y_start":0.,
+    "y_step":0.,
+    "n_steps":301,
+    "plot_formats":["root", "png"],
+    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
+    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
+    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
+    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
+    "2d_volume_plot_label_size":0.25,
+}
+
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
 #PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
@@ -768,29 +790,6 @@ pid_confidence_level = 10
 # respectively). Or a combination of the above can be used, entered as a space separated list, e.g
 # "Through Through-US Through-DS"
 pid_track_selection = "Through"
-
-
-root_document_store_timeout = 10
-root_document_store_poll_time = 1
-
-geometry_validation = { # see bin/utilities/geometry_validation.py for docs
-    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
-    "will_plot":True,
-    "will_track":True,
-    "z_start":-6000.,
-    "z_end":6000.,
-    "x_start":0.,
-    "x_step":1.,
-    "y_start":0.,
-    "y_step":0.,
-    "n_steps":301,
-    "plot_formats":["root", "png"],
-    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
-    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
-    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
-    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
-    "2d_volume_plot_label_size":0.25,
-}
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"
 # meaning electrons, muons, and pions of both charges (unless tracker recon produces a

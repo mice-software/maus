@@ -15,9 +15,8 @@ using pid_pdf_generator.py, found in bin/Global, and run PID against those
 
 import os
 
-# The input root file/json document containing global tracks
+# The input root file containing global tracks you wish to PID
 input_root_file_name = "maus_output.root"
-input_json_file_name = "200MeV_mu_plus_hypothesis_Global_Recon.json"
 
 # Output root file with track pid information included
 output_root_file_name = "output_Global_PID.json"
