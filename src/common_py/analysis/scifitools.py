@@ -129,7 +129,8 @@ def find_mc_tracks_from_spoints(lkup, spoints, nstations=5, n_hits_cut=5):
         found_tracks = find_mc_track(hits, n_hits_cut) # list of tuples
 
         for trk in found_tracks: # trk is a tuple, hence can use as dict key
-            if trk[0] != -1 and trk[1] != -1: # if we have a good track id for this spoint
+            # if trk[0] != -1 and trk[1] != -1: # if we have a good track id for this spoint
+            if trk[1] != -1:
                 if not trk in track_ids:
                     track_ids[trk] = {station : 1}
                 elif not station in track_ids[trk]:
@@ -155,10 +156,10 @@ class SciFiLookup:
         """ Initialise the lookup (just declare a few members) """
         self.hits_map = {}
         self.make_hits_map(mc_evt)
-        if not self.hits_map:
-            print "WARNING: SciFiLookup: Building hits map failed"
-        elif len(self.hits_map) < 1:
-            print "WARNING: SciFiLookup: Hits map has 0 size"
+        #if not self.hits_map:
+            # print "WARNING: SciFiLookup: Building hits map failed"
+        #elif len(self.hits_map) < 1:
+            #print "WARNING: SciFiLookup: Hits map has 0 size"
 
     def clear_maps(self):
         """ Set the member variables to empty """

@@ -3,6 +3,7 @@
 """  Check tracker efficiency """
 
 import os
+import math
 import abc
 import ROOT
 import libMausCpp #pylint: disable = W0611
@@ -158,16 +159,6 @@ class EfficiencyDataMC():
         self.n_mc_tkd_tracks_4to5pt = 0
         self.n_mc_tkd_tracks_3to5pt = 0
 
-        self.n_mc_tku_tracks_user = 0 # MC tracks which created a viable # of spoints
-        self.n_mc_tkd_tracks_user = 0 # MC tracks which created a viable # of spoints
-
-        self.n_rec_tku_tracks_user_good = 0 # Number of good recon tracks found in tkus
-        self.n_rec_tkd_tracks_user_good = 0 # Number of good recon tracks found in tkus
-        self.n_rec_tku_tracks_user_mixed = 0 # Number of mixed recon tracks found in tkus
-        self.n_rec_tkd_tracks_user_mixed = 0 # Number of mixed recon tracks found in tkus
-        self.n_rec_tku_tracks_user_bad = 0 # Number of back recon tracks found in tkus
-        self.n_rec_tkd_tracks_user_bad = 0 # Number of back recon tracks found in tkus
-
         self.n_rec_tku_tracks_5pt_good = 0
         self.n_rec_tkd_tracks_5pt_good = 0
         self.n_rec_tku_tracks_4to5pt_good = 0
@@ -193,16 +184,6 @@ class EfficiencyDataMC():
         self.n_mc_tkd_tracks_4to5pt += other.n_mc_tkd_tracks_4to5pt
         self.n_mc_tkd_tracks_3to5pt += other.n_mc_tkd_tracks_3to5pt
 
-        self.n_mc_tku_tracks_user += other.n_mc_tku_tracks_user
-        self.n_mc_tkd_tracks_user += other.n_mc_tkd_tracks_user
-
-        self.n_rec_tku_tracks_user_good += other.n_rec_tku_tracks_user_good
-        self.n_rec_tkd_tracks_user_good += other.n_rec_tkd_tracks_user_good
-        self.n_rec_tku_tracks_user_mixed += other.n_rec_tku_tracks_user_mixed
-        self.n_rec_tkd_tracks_user_mixed += other.n_rec_tkd_tracks_user_mixed
-        self.n_rec_tku_tracks_user_bad += other.n_rec_tku_tracks_user_bad
-        self.n_rec_tkd_tracks_user_bad += other.n_rec_tkd_tracks_user_bad
-
         self.n_rec_tku_tracks_5pt_good += other.n_rec_tku_tracks_5pt_good
         self.n_rec_tkd_tracks_5pt_good += other.n_rec_tkd_tracks_5pt_good
         self.n_rec_tku_tracks_4to5pt_good += other.n_rec_tku_tracks_4to5pt_good
@@ -219,14 +200,14 @@ class EfficiencyDataMC():
 
         # Upstream tracker
         try:
-            self.eff_tkus_tracks = float(self.n_rec_tku_tracks_user_good) \
-              / float(self.n_mc_tku_tracks_user)
+            self.eff_tkus_tracks = float(self.n_rec_tku_tracks_5pt_good) \
+              / float(self.n_mc_tku_tracks_5pt)
         except (ZeroDivisionError, ValueError):
             self.eff_tkus_tracks = 0.0
         # Downstream tracker
         try:
-            self.eff_tkds_tracks = float(self.n_rec_tkd_tracks_user_good) \
-              / float(self.n_mc_tkd_tracks_user)
+            self.eff_tkds_tracks = float(self.n_rec_tkd_tracks_5pt_good) \
+              / float(self.n_mc_tkd_tracks_5pt)
         except (ZeroDivisionError, ValueError):
             self.eff_tkds_tracks = 0.0
 
@@ -242,15 +223,6 @@ class EfficiencyDataMC():
         self.n_mc_tkd_tracks_5pt = 0
         self.n_mc_tkd_tracks_4to5pt = 0
         self.n_mc_tkd_tracks_3to5pt = 0
-
-        self.n_mc_tku_tracks_user = 0
-        self.n_mc_tkd_tracks_user = 0
-
-        self.n_rec_tkd_tracks_user_good = 0
-        self.n_rec_tku_tracks_user_mixed = 0
-        self.n_rec_tkd_tracks_user_mixed = 0
-        self.n_rec_tku_tracks_user_bad = 0
-        self.n_rec_tkd_tracks_user_bad = 0
 
         self.n_rec_tku_tracks_5pt_good = 0
         self.n_rec_tkd_tracks_5pt_good = 0
@@ -678,19 +650,23 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
 class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
     """ Class to check Pattern Recognition efficiency with MC data """
 
-    def __init__(self, nstations_mc_tku=5, nstations_mc_tkd=5, \
-      nstations_rec_tku=5, nstations_rec_tkd=5):
+    def __init__(self):
         """ Initialise member variables """
         self.n_hits_cut = 5
-        self.nstations_rec_tku = nstations_rec_tku
-        self.nstations_rec_tkd = nstations_rec_tkd
-        self.nstations_mc_tku = nstations_mc_tku
-        self.nstations_mc_tkd = nstations_mc_tkd
         self.fdata = EfficiencyDataMC() # Per file data
         self.jdata = EfficiencyDataMC() # Per job data
 
         # Other objects not reset by the clear() function
         self.n_print_calls = 0
+
+        self.hpt_m_tku = \
+          ROOT.TH1F('hpt_m_tku', 'pt of missed tracks TKU', 100, 0.0, 100.0)
+        self.hpt_m_tkd = \
+          ROOT.TH1F('hpt_m_tkd', 'pt of missed tracks TKD', 100, 0.0, 100.0)
+        self.hpz_m_tku = \
+          ROOT.TH1F('hpz_m_tku', 'pz of missed tracks TKU', 100, 0.0, 260.0)
+        self.hpz_m_tkd = \
+          ROOT.TH1F('hpz_m_tkd', 'pz of missed tracks TKD', 100, 0.0, 260.0)
 
     def process_spill(self, spill):
         """ Process one spill of data """
@@ -718,14 +694,10 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
           [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 0]
         spoints_tkd = \
           [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 1]
-        # print '    Found ' +str(len(spoints_tku)) + ' spoints in TKU'
-        # print '    Found ' +str(len(spoints_tkd)) + ' spoints in TKD'
+        #print '    Found ' +str(len(spoints_tku)) + ' spoints in TKU'
+        #print '    Found ' +str(len(spoints_tkd)) + ' spoints in TKD'
         lkup = tools.SciFiLookup(mcevent)
 
-        tracks_tku = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
-          self.nstations_mc_tku, self.n_hits_cut)
-        tracks_tkd = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
-          self.nstations_mc_tkd, self.n_hits_cut)
         tracks_tku_5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
           5, self.n_hits_cut)
         tracks_tkd_5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
@@ -739,16 +711,14 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         tracks_tkd_3to5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
           3, self.n_hits_cut)
 
-        # print '    Found ' + str(len(tracks_tku_5pt)) + ' 5pt MC tracks in TKU'
-        # print '    Found ' + str(len(tracks_tkd_5pt)) + ' 5pt MC tracks in TKD'
-        # print '    Found ' + str(len(tracks_tku_4to5pt)) + ' 4pt+ MC tracks in TKU'
-        # print '    Found ' + str(len(tracks_tkd_4to5pt)) + ' 4pt+ MC tracks in TKD'
-        # print '    Found ' + str(len(tracks_tku_3to5pt)) + ' 3pt+ MC tracks in TKU'
-        # print '    Found ' + str(len(tracks_tkd_3to5pt)) + ' 3pt+ MC tracks in TKD'
+        #print '    Found ' + str(len(tracks_tku_5pt)) + ' 5pt MC tracks in TKU'
+        #print '    Found ' + str(len(tracks_tkd_5pt)) + ' 5pt MC tracks in TKD'
+        #print '    Found ' + str(len(tracks_tku_4to5pt)) + ' 4pt+ MC tracks in TKU'
+        #print '    Found ' + str(len(tracks_tkd_4to5pt)) + ' 4pt+ MC tracks in TKD'
+        #print '    Found ' + str(len(tracks_tku_3to5pt)) + ' 3pt+ MC tracks in TKU'
+        #print '    Found ' + str(len(tracks_tkd_3to5pt)) + ' 3pt+ MC tracks in TKD'
 
         # Update internal counters
-        self.fdata.n_mc_tku_tracks_user += len(tracks_tku)
-        self.fdata.n_mc_tkd_tracks_user += len(tracks_tkd)
         self.fdata.n_mc_tku_tracks_5pt += len(tracks_tku_5pt) # 5pt MC tracks
         self.fdata.n_mc_tkd_tracks_5pt += len(tracks_tkd_5pt) # 5pt MC tracks
         self.fdata.n_mc_tku_tracks_4to5pt += len(tracks_tku_4to5pt) # 4pt+ MC tracks
@@ -772,9 +742,6 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         tracks_tku = htracks_tku + stracks_tku
         tracks_tkd = htracks_tkd + stracks_tkd
 
-        results_tku_user = self.check_tracks(lkup, self.nstations_rec_tku, tracks_tku)
-        results_tkd_user = self.check_tracks(lkup, self.nstations_rec_tkd, tracks_tkd)
-
         results_tku_5pt = self.check_tracks(lkup, 5, tracks_tku)
         results_tkd_5pt = self.check_tracks(lkup, 5, tracks_tkd)
         results_tku_4pt = self.check_tracks(lkup, 4, tracks_tku)
@@ -783,19 +750,30 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         results_tkd_3pt = self.check_tracks(lkup, 3, tracks_tkd)
 
         # Update internal counters
-        self.fdata.n_rec_tku_tracks_user_good += results_tku_user[0]
-        self.fdata.n_rec_tkd_tracks_user_good += results_tkd_user[0]
-        self.fdata.n_rec_tku_tracks_user_mixed += results_tku_user[1]
-        self.fdata.n_rec_tkd_tracks_user_mixed += results_tkd_user[1]
-        self.fdata.n_rec_tku_tracks_user_bad += results_tku_user[2]
-        self.fdata.n_rec_tkd_tracks_user_bad += results_tkd_user[2]
-
         self.fdata.n_rec_tku_tracks_5pt_good += results_tku_5pt[0]
         self.fdata.n_rec_tkd_tracks_5pt_good += results_tkd_5pt[0]
         self.fdata.n_rec_tku_tracks_4to5pt_good += results_tku_4pt[0]
         self.fdata.n_rec_tkd_tracks_4to5pt_good += results_tkd_4pt[0]
         self.fdata.n_rec_tku_tracks_3to5pt_good += results_tku_3pt[0]
         self.fdata.n_rec_tkd_tracks_3to5pt_good += results_tkd_3pt[0]
+
+        # Update histos, require that only 1 MC track is present
+        if (len(tracks_tku_5pt) == 1):
+          # Need the 2nd index to get track id rather than particle event id
+          track_id = tracks_tku_5pt[0][1]
+          mom = \
+            tools.find_mc_momentum_sfhits(lkup, spoints_tku, track_id, 0)
+          if (results_tku_3pt[0] < 1): # Fill if no rec track found
+              self.hpt_m_tku.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
+              self.hpz_m_tku.Fill(mom[2])
+
+        if (len(tracks_tkd_5pt) == 1):
+          track_id = tracks_tkd_5pt[0][1]
+          mom = \
+            tools.find_mc_momentum_sfhits(lkup, spoints_tkd, track_id, 1)
+          if (results_tkd_3pt[0] < 1): # Fill if no rec track found
+              self.hpt_m_tkd.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
+              self.hpz_m_tkd.Fill(mom[2])
 
     def accumulate_job_data(self):
         """ Accumulate the job data """
@@ -813,7 +791,7 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         """ Are the recon tracks found good tracks wrt the MC data?
             nstations is the number of seed spacepoints originating from
             the same MC track required for a recon track to be classed as
-            good. Hence if nstations = the actual number fo tracker stations,
+            good. Hence if nstations = the actual number of tracker stations,
             only perfect recon tracks will count as good """
         n_good_tracks = 0 # tracks which can be associated with an MC track
         # tracks generated from spoints from different MC tracks
@@ -843,23 +821,23 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
             edata = self.jdata
 
         if self.n_print_calls == 0:
-            print '\nFile\t\t\tRecon_evt\tTUMC5\tTURG5\tTDMC5\tTDRG5\tTUMC45',
-            print '\tTURG45\tTDMC45\tTDRG45\tTUMC35\tTURG35\tTDMC35\tTDRG35\t'
+            print '\nRecon_evt\tTUMC5\tTURG5\tTUMC45\tTURG45\tTUMC35\tTURG35',
+            print '\tTDMC5\tTDRG5\tTDMC45\tTDRG45\tTDMC35\tTDRG35\tFile'
 
-        print os.path.basename(data_name) + '\t',
         print str(edata.n_events_total) + '\t\t',
         print str(edata.n_mc_tku_tracks_5pt) + '\t' + \
           str(edata.n_rec_tku_tracks_5pt_good) + '\t' + \
-          str(edata.n_mc_tkd_tracks_5pt) + '\t' + \
-          str(edata.n_rec_tkd_tracks_5pt_good) + '\t' + \
           str(edata.n_mc_tku_tracks_4to5pt) + '\t' + \
           str(edata.n_rec_tku_tracks_4to5pt_good) + '\t' + \
-          str(edata.n_mc_tkd_tracks_4to5pt) + '\t' + \
-          str(edata.n_rec_tkd_tracks_4to5pt_good) + '\t' + \
           str(edata.n_mc_tku_tracks_3to5pt) + '\t' + \
           str(edata.n_rec_tku_tracks_3to5pt_good) + '\t' + \
+          str(edata.n_mc_tkd_tracks_5pt) + '\t' + \
+          str(edata.n_rec_tkd_tracks_5pt_good) + '\t' + \
+          str(edata.n_mc_tkd_tracks_4to5pt) + '\t' + \
+          str(edata.n_rec_tkd_tracks_4to5pt_good) + '\t' + \
           str(edata.n_mc_tkd_tracks_3to5pt) + '\t' + \
-          str(edata.n_rec_tkd_tracks_3to5pt_good)
+          str(edata.n_rec_tkd_tracks_3to5pt_good) + '\t' + \
+          os.path.basename(data_name)
         self.n_print_calls += 1
 
     def print_welcome(self):
@@ -867,6 +845,6 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         print '\nPattern Recognition Efficiency Calculator (MC)'
         print '************************************************\n'
 
-        print 'Parameters:'
-        print 'Stations matched required for good track TkUS \t' + str(self.nstations_mc_tku)
-        print 'Stations matched required for good track TkDS \t' + str(self.nstations_mc_tkd)
+        # print 'Parameters:'
+        # print 'Stations matched required for good track TkUS \t' + str(self.nstations_mc_tku)
+        # print 'Stations matched required for good track TkDS \t' + str(self.nstations_mc_tkd)
