@@ -61,27 +61,23 @@ InputCppRootData::~InputCppRootData() {
   death();
 }
 
-void InputCppRootData::parse_file_name(Json::Value json_fnames) {
+void InputCppRootData::parse_file_name(Json::Value json_dc) {
   _filename_list = std::vector<std::string>();
   Json::Value json_fnames = json_dc["input_root_file_name"];
   if (json_fnames.isArray()) {
       for (size_t i = 0; i < json_fnames.size(); ++i) {
-          if (!json_fnames[i].isString()) {
-              throw Exceptions::Exception(Exceptions::recoverable,
-                      "File name was not a string",
-                      "InputCppRootData::_parse_file_name");
-          }
-          _filename_list.push_back(JsonWrapper::GetItem(json_fnames[i].asString()));
+          _filename_list.push_back(JsonWrapper::GetItem(json_fnames, i, JsonWrapper::stringValue).asString());
       }
   } else if (json_fnames.isString()) {
       _filename_list.push_back(json_fnames.asString());
   }
-
+  _filename_it = _filename_list.begin();
 }
 
 void InputCppRootData::_birth(const std::string& json_datacards) {
   Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
-  _infile = new IRStream(_filename_list.c_str());
+  parse_file_name(json_dc);
+  _infile = new irstream(_filename_it->c_str());
   _infile_tree = "Spill";
 
   if (json_dc.isMember("selected_spills")) {
@@ -151,13 +147,17 @@ bool InputCppRootData::load_event(std::string branch_name, DataT& data) {
     if (_infile_tree != data.GetEventType()) {
         _infile->close();
         _infile_tree = data.GetEventType();
-        _infile->open((*it).c_str(), data.GetEventType().c_str());
+        _infile->open((*_filename_it).c_str(), data.GetEventType().c_str());
     }
     (*_infile) >> branchName(branch_name.c_str()) >> data;
     // if there was no branch of this type at all then we might get an
     // exception - let's just try the next type
     if ((*_infile) >> readEvent == NULL) {
-        return false;
+        ++_filename_it;
+        if (_filename_it == _filename_list.end())
+            return false;
+        _infile_tree = ""; // force into the "open new file" branch on recurse
+        return load_event(branch_name, data); // try again (recurse)
     }
     return true;
 }

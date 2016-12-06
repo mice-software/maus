@@ -110,6 +110,7 @@ class InputCppRootData : public InputBase<MAUS::Data> {
     irstream* _infile;
     std::string _infile_tree;
     std::vector<std::string> _filename_list;
+    std::vector<std::string>::iterator _filename_it;
     std::string _classname;
 
     event_type _event_type;
