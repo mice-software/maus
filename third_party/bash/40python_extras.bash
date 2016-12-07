@@ -25,7 +25,7 @@ egg_source=${MAUS_THIRD_PARTY}/third_party/source/easy_install
 download_package_list="\
  anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 six>=1.4.0 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
- coverage ipython doxypy pylint==0.25.1 bitarray celery==2.5.5 \
+ coverage ipython doxypy astroid isort pylint==1.6.3 bitarray celery==2.5.5 \
  pymongo==2.3 readline matplotlib==1.1.0 \
  pil django==1.9.6 magickwand psutil==3.0.1
 "

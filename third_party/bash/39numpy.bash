@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-vers="1.6.0"
+vers="1.11.2"
 filename="numpy-${vers}.tar.gz"
 directory="numpy-${vers}"
-# url="http://sourceforge.net/projects/numpy/files/NumPy/${vers}/${filename}/download"
-url="http://heplnv152.pp.rl.ac.uk/maus/third_party/${filename}"
+url="http://downloads.sourceforge.net/project/numpy/NumPy/${vers}/${filename}"
+arc=`uname -p`
+opsys="linux"
+# url="http://heplnv152.pp.rl.ac.uk/maus/third_party/${filename}"
 echo
 echo 'INFO: Installing third party library NumPy' $vers
 echo '-------------------------------------------------'
@@ -42,9 +44,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         sleep 1
         python setup.py install
         cd ${MAUS_ROOT_DIR}/third_party/install/include/
-        ln -s ../lib/python2.7/site-packages/numpy/core/include/numpy/
+        ln -sf ../lib/python2.7/site-packages/numpy-1.11.2-py2.7-${opsys}-${arc}.egg/numpy/core/include/numpy
         cd ${MAUS_ROOT_DIR}/third_party/install/lib/
-        ln -s ../lib/python2.7/site-packages/numpy/core/lib/libnpymath.a
+        ln -sf ../lib/python2.7/site-packages/numpy-1.11.2-py2.7-${opsys}-${arc}.egg/numpy/core/lib/libnpymath.a
         echo "INFO: Listing of numpy includes and libs"
         sleep 1
         cd ${MAUS_ROOT_DIR}
