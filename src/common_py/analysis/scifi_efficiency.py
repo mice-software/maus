@@ -234,13 +234,62 @@ class EfficiencyDataMC():
         self.eff_tkus_tracks = 0.0
         self.eff_tkds_tracks = 0.0
 
-class PatternRecognitionEfficiencyBase():
+class EfficiencyBase(object):
     """ Base class for other Pattern Recognition Efficiency classes """
-    __metaclass__ = abc.ABCMeta
+    #__metaclass__ = abc.ABCMeta
 
     def __init__(self):
         """ Initialise member variables """
+        print 'Running init base ',
         self.root_files = []
+
+        # Options for the user
+        self.cut_on_tof = True
+        self.cut_on_tof_time = True
+        self.tof_upper_cut = 50.0
+        self.tof_lower_cut = 27.0
+        print self.cut_on_tof
+
+        # Results
+        self.bool_2tof_timing_event = False # Tof timing ok
+        self.bool_2tof_spoint_event = False # 1 spacepoint only in each tof
+
+    def check_tof(self, tof_evt):
+        """ Analyse tof data. Return boolean indicating if tof cuts pass"""
+        try:
+            tof1 = tof_evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
+            tof2 = tof_evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
+        except ReferenceError:
+            print "Bad TOF data"
+            if self.cut_on_tof or self.cut_on_tof_time:
+                return False
+            # The data might be bad, but we aren't cutting on TOF so passes
+            return True
+
+        # Require 1 and only 1 sp in both TOF1 and TOF2
+        self.bool_2tof_spoint_event = True
+        if ((tof1.size() != 1) or (tof2.size() != 1)):
+            self.bool_2tof_spoint_event = False
+
+        # Require timing coincidence between TOF1 and TOF2
+        self.bool_2tof_timing_event = False
+        if self.bool_2tof_spoint_event:
+            for j in range(tof1.size()):
+                if (tof1.size() != 1) or (tof2.size() != 1): continue
+                dt = tof2[j].GetTime() - tof1[j].GetTime()
+
+                if (dt < self.tof_upper_cut) and (dt > self.tof_lower_cut):
+                    self.bool_2tof_timing_event = True
+
+        # Are the cuts choosen passed?
+        tof_good = True
+        if (not self.bool_2tof_spoint_event) and self.cut_on_tof:
+            tof_good = False
+
+        if (not self.bool_2tof_timing_event) and self.cut_on_tof_time:
+            tof_good = False
+
+        return tof_good
 
     def run(self, files):
         """ Loop over input root file, send each file for processing, print
@@ -283,56 +332,57 @@ class PatternRecognitionEfficiencyBase():
         # Close the ROOT file
         root_file.Close()
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def accumulate_job_data(self):
         """ Accumulate the job data """
         pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
         pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def calculate_job_efficiency(self):
         """ Calculate the job efficiency """
         pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def clear(self):
         """ Set the internal data counters to zero & booleans to false """
         pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def print_info(self, data_name, info_type='file'):
         """ Print the results """
         pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def print_welcome(self):
       """ Message to be printed at programme start """
       pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def process_spill(self, spill):
       """ Process one spill of data """
       pass
 
-class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
+class PatternRecognitionEfficiencyReal(EfficiencyBase):
     """ Class to check Pattern Recognition efficiency with real data """
 
     def __init__(self):
         """ Initialise member variables """
+        EfficiencyBase.__init__(self)
+
         # Options for the user
-        self.check_helical = True
-        self.check_straight = True
         self.cut_on_tof = True
         self.cut_on_tof_time = True
-        self.cut_on_tracker_10spnt = True
-        self.cut_on_tracker_5spnt = True # Should always be true
-        self.use_mc_truth = False
         self.tof_upper_cut = 50.0
         self.tof_lower_cut = 27.0
+        self.check_helical = True
+        self.check_straight = True
+        self.cut_on_tracker_10spnt = True
+        self.cut_on_tracker_5spnt = True # Should always be true
 
         # Results
         self.bool_2tof_timing_event = False # Tof timing ok
@@ -364,6 +414,55 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
     def calculate_job_efficiency(self):
         """ Calculate the job efficiency """
         self.jdata.calculate_efficiency()
+
+    def check_tof(self, tof_evt):
+        """ Analyse tof data. Return boolean indicating if tof cuts pass"""
+        try:
+            tof1 = tof_evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
+            tof2 = tof_evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
+        except ReferenceError:
+            print "Bad TOF data"
+            if self.cut_on_tof or self.cut_on_tof_time:
+                return False
+            # The data might be bad, but we aren't cutting on TOF so passes
+            self.fdata.n_passed_tof_spoint_events += 1
+            self.fdata.n_passed_tof_timing_events += 1
+            return True
+
+        # Require 1 and only 1 sp in both TOF1 and TOF2
+        self.bool_2tof_spoint_event = True
+        if ((tof1.size() != 1) or (tof2.size() != 1)):
+            self.bool_2tof_spoint_event = False
+
+        # Require timing coincidence between TOF1 and TOF2
+        self.bool_2tof_timing_event = False
+        if self.bool_2tof_spoint_event:
+            for j in range(tof1.size()):
+                if (tof1.size() != 1) or (tof2.size() != 1):
+                    continue
+                dt = tof2[j].GetTime() - tof1[j].GetTime()
+
+                if (dt < self.tof_upper_cut) and \
+                  (dt > self.tof_lower_cut):
+                    self.bool_2tof_timing_event = True
+
+        # Are the cuts choosen passed?
+        tof_good = True
+        if self.bool_2tof_spoint_event:
+            self.fdata.n_passed_tof_spoint_events += 1
+        elif self.cut_on_tof:
+            tof_good = False
+        else:
+            self.fdata.n_passed_tof_spoint_events += 1
+
+        if self.bool_2tof_timing_event:
+            self.fdata.n_passed_tof_timing_events += 1
+        elif self.cut_on_tof_time:
+            tof_good = False
+        else:
+            self.fdata.n_passed_tof_timing_events += 1
+
+        return tof_good
 
     def print_welcome(self):
         """ Message to be printed at programme start """
@@ -461,53 +560,6 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
             self.fdata.n_10spoint_tracks += 1
         return True
 
-    def check_tof(self, tof_evt):
-        """ Analyse tof data. Return boolean indicating if tof cuts pass"""
-        try:
-            tof1 = tof_evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
-            tof2 = tof_evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
-        except ReferenceError:
-            print "Bad TOF data"
-            if self.cut_on_tof or self.cut_on_tof_time:
-                return False
-            # The data might be bad, but we aren't cutting on TOF so passes
-            self.fdata.n_passed_tof_spoint_events += 1
-            self.fdata.n_passed_tof_timing_events += 1
-            return True
-
-        # Require 1 and only 1 sp in both TOF1 and TOF2
-        self.bool_2tof_spoint_event = True
-        if ((tof1.size() != 1) or (tof2.size() != 1)):
-            self.bool_2tof_spoint_event = False
-
-        # Require timing coincidence between TOF1 and TOF2
-        self.bool_2tof_timing_event = False
-        if self.bool_2tof_spoint_event:
-            for j in range(tof1.size()):
-                if tof1.size() == 1 and tof2.size() == 1:
-                    tof_time_1 = tof1[j].GetTime()
-                    tof_time_2 = tof2[j].GetTime()
-                    if ((tof_time_2 - tof_time_1) < self.tof_upper_cut) \
-                      and ((tof_time_2 - tof_time_1) > self.tof_lower_cut):
-                        self.bool_2tof_timing_event = True
-
-        # Are the cuts choosen passed?
-        tof_good = True
-        if self.bool_2tof_spoint_event:
-            self.fdata.n_passed_tof_spoint_events += 1
-        elif self.cut_on_tof:
-            tof_good = False
-        else:
-            self.fdata.n_passed_tof_spoint_events += 1
-
-        if self.bool_2tof_timing_event:
-            self.fdata.n_passed_tof_timing_events += 1
-        elif self.cut_on_tof_time:
-            tof_good = False
-        else:
-            self.fdata.n_passed_tof_timing_events += 1
-
-        return tof_good
 
     def check_tracker_spacepoints(self, spoints):
         """ Look for 5 spacepoint events in each tracker, increment the internal
@@ -647,12 +699,19 @@ class PatternRecognitionEfficiencyReal(PatternRecognitionEfficiencyBase):
 
         self.n_print_calls += 1
 
-class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
+class PatternRecognitionEfficiencyMC(EfficiencyBase):
     """ Class to check Pattern Recognition efficiency with MC data """
 
     def __init__(self):
         """ Initialise member variables """
+        EfficiencyBase.__init__(self)
+
+        # Parameters
         self.n_hits_cut = 5
+
+        # Internal counters
+
+        # Data storage
         self.fdata = EfficiencyDataMC() # Per file data
         self.jdata = EfficiencyDataMC() # Per job data
 
@@ -684,12 +743,22 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
 
     def process_event(self, revent, mcevent):
         """ Process the data for one event """
-        sfevent = revent.GetSciFiEvent()
 
         # Calculate the expected number of tracks by calculating how many
         # MC tracks produced spacepoints in every station
         # ***************************************************************
 
+        # Pull out tof data and check if cuts pass
+        tof_evt = revent.GetTOFEvent()
+        tof_good = self.check_tof(tof_evt)
+        if not tof_good:
+            return False # remove event from consideration
+
+        # Now the tracker data
+        bool_tkus_5spoint_event = False
+        bool_tkds_5spoint_event = False
+
+        sfevent = revent.GetSciFiEvent()
         spoints_tku = \
           [sp for sp in sfevent.spacepoints() if sp.get_tracker() == 0]
         spoints_tkd = \
@@ -698,36 +767,55 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         #print '    Found ' +str(len(spoints_tkd)) + ' spoints in TKD'
         lkup = tools.SciFiLookup(mcevent)
 
-        tracks_tku_5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
-          5, self.n_hits_cut)
-        tracks_tkd_5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
-          5, self.n_hits_cut)
-        tracks_tku_4to5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
-          4, self.n_hits_cut)
-        tracks_tkd_4to5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
-          4, self.n_hits_cut)
-        tracks_tku_3to5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tku, \
-          3, self.n_hits_cut)
-        tracks_tkd_3to5pt = tools.find_mc_tracks_from_spoints(lkup, spoints_tkd, \
-          3, self.n_hits_cut)
+        tracks_tku_5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tku, 5, self.n_hits_cut)
+        tracks_tkd_5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tkd, 5, self.n_hits_cut)
+        tracks_tku_4to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tku, 4, self.n_hits_cut)
+        tracks_tkd_4to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tkd, 4, self.n_hits_cut)
+        tracks_tku_3to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tku, 3, self.n_hits_cut)
+        tracks_tkd_3to5pt = tools.find_mc_tracks_from_spoints(lkup, \
+          spoints_tkd, 3, self.n_hits_cut)
 
-        #print '    Found ' + str(len(tracks_tku_5pt)) + ' 5pt MC tracks in TKU'
-        #print '    Found ' + str(len(tracks_tkd_5pt)) + ' 5pt MC tracks in TKD'
-        #print '    Found ' + str(len(tracks_tku_4to5pt)) + ' 4pt+ MC tracks in TKU'
-        #print '    Found ' + str(len(tracks_tkd_4to5pt)) + ' 4pt+ MC tracks in TKD'
-        #print '    Found ' + str(len(tracks_tku_3to5pt)) + ' 3pt+ MC tracks in TKU'
-        #print '    Found ' + str(len(tracks_tkd_3to5pt)) + ' 3pt+ MC tracks in TKD'
+        # Only use the event for each detector if we have one 5pt track only
+        if len(tracks_tku_5pt) == 1 and len(tracks_tku_4to5pt) == 1 and \
+            len(tracks_tku_3to5pt) == 1:
+            bool_tkus_5spoint_event = True
+        else:
+            bool_tkus_5spoint_event = False
+
+        if len(tracks_tkd_5pt) == 1 and len(tracks_tkd_4to5pt) == 1 and \
+            len(tracks_tkd_3to5pt) == 1:
+            bool_tkds_5spoint_event = True
+        else:
+            bool_tkds_5spoint_event = False
+
+        # If we do not have good events in either tracker, save time and stop
+        if (not bool_tkus_5spoint_event) and (not bool_tkds_5spoint_event):
+            return False
+
+        #print 'Found ' + str(len(tracks_tku_5pt)) + ' 5pt MC tracks in TKU'
+        #print 'Found ' + str(len(tracks_tkd_5pt)) + ' 5pt MC tracks in TKD'
+        #print 'Found ' + str(len(tracks_tku_4to5pt)) + ' 4pt+ MC tracks in TKU'
+        #print 'Found ' + str(len(tracks_tkd_4to5pt)) + ' 4pt+ MC tracks in TKD'
+        #print 'Found ' + str(len(tracks_tku_3to5pt)) + ' 3pt+ MC tracks in TKU'
+        #print 'Found ' + str(len(tracks_tkd_3to5pt)) + ' 3pt+ MC tracks in TKD'
 
         # Update internal counters
-        self.fdata.n_mc_tku_tracks_5pt += len(tracks_tku_5pt) # 5pt MC tracks
-        self.fdata.n_mc_tkd_tracks_5pt += len(tracks_tkd_5pt) # 5pt MC tracks
-        self.fdata.n_mc_tku_tracks_4to5pt += len(tracks_tku_4to5pt) # 4pt+ MC tracks
-        self.fdata.n_mc_tkd_tracks_4to5pt += len(tracks_tkd_4to5pt) # 4pt+ MC tracks
-        self.fdata.n_mc_tku_tracks_3to5pt += len(tracks_tku_3to5pt) # 3pt+ MC tracks
-        self.fdata.n_mc_tkd_tracks_3to5pt += len(tracks_tkd_3to5pt) # 3pt+ MC tracks
+        if bool_tkus_5spoint_event:
+            self.fdata.n_mc_tku_tracks_5pt += len(tracks_tku_5pt)
+            self.fdata.n_mc_tku_tracks_4to5pt += len(tracks_tku_4to5pt)
+            self.fdata.n_mc_tku_tracks_3to5pt += len(tracks_tku_3to5pt)
+        if bool_tkds_5spoint_event:
+            self.fdata.n_mc_tkd_tracks_5pt += len(tracks_tkd_5pt)
+            self.fdata.n_mc_tkd_tracks_4to5pt += len(tracks_tkd_4to5pt)
+            self.fdata.n_mc_tkd_tracks_3to5pt += len(tracks_tkd_3to5pt)
 
-        # Find the number of tracks actually reconstructed by pattern recognition
-        # ***********************************************************************
+        # Find the number of tracks actually reconstructed by pat rec
+        # ***********************************************************
 
         stracks_tku = [trk for trk in sfevent.straightprtracks() \
           if trk.get_tracker() == 0]
@@ -750,30 +838,34 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         results_tkd_3pt = self.check_tracks(lkup, 3, tracks_tkd)
 
         # Update internal counters
-        self.fdata.n_rec_tku_tracks_5pt_good += results_tku_5pt[0]
-        self.fdata.n_rec_tkd_tracks_5pt_good += results_tkd_5pt[0]
-        self.fdata.n_rec_tku_tracks_4to5pt_good += results_tku_4pt[0]
-        self.fdata.n_rec_tkd_tracks_4to5pt_good += results_tkd_4pt[0]
-        self.fdata.n_rec_tku_tracks_3to5pt_good += results_tku_3pt[0]
-        self.fdata.n_rec_tkd_tracks_3to5pt_good += results_tkd_3pt[0]
+        if bool_tkus_5spoint_event:
+            self.fdata.n_rec_tku_tracks_5pt_good += results_tku_5pt[0]
+            self.fdata.n_rec_tku_tracks_4to5pt_good += results_tku_4pt[0]
+            self.fdata.n_rec_tku_tracks_3to5pt_good += results_tku_3pt[0]
+        if bool_tkds_5spoint_event:
+            self.fdata.n_rec_tkd_tracks_5pt_good += results_tkd_5pt[0]
+            self.fdata.n_rec_tkd_tracks_4to5pt_good += results_tkd_4pt[0]
+            self.fdata.n_rec_tkd_tracks_3to5pt_good += results_tkd_3pt[0]
 
         # Update histos, require that only 1 MC track is present
-        if (len(tracks_tku_5pt) == 1):
+        if bool_tkus_5spoint_event:
           # Need the 2nd index to get track id rather than particle event id
-          track_id = tracks_tku_5pt[0][1]
+          track_id = tracks_tku_5pt[0]
           mom = \
             tools.find_mc_momentum_sfhits(lkup, spoints_tku, track_id, 0)
           if (results_tku_3pt[0] < 1): # Fill if no rec track found
               self.hpt_m_tku.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
               self.hpz_m_tku.Fill(mom[2])
 
-        if (len(tracks_tkd_5pt) == 1):
-          track_id = tracks_tkd_5pt[0][1]
+        if bool_tkds_5spoint_event:
+          track_id = tracks_tkd_5pt[0]
           mom = \
             tools.find_mc_momentum_sfhits(lkup, spoints_tkd, track_id, 1)
           if (results_tkd_3pt[0] < 1): # Fill if no rec track found
               self.hpt_m_tkd.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
               self.hpz_m_tkd.Fill(mom[2])
+
+        return True
 
     def accumulate_job_data(self):
         """ Accumulate the job data """
@@ -796,7 +888,7 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         n_good_tracks = 0 # tracks which can be associated with an MC track
         # tracks generated from spoints from different MC tracks
         n_mixed_tracks = 0
-        n_bad_tracks = 0 # tracks with mixed spoints or less than expected spoints
+        n_bad_tracks = 0 # tracks with mixed spoints or < expected spoints
         for trk in recon_tracks:
             spoints = trk.get_spacepoints_pointers()
             mc_tids = tools.find_mc_tracks_from_spoints(lkup, spoints, \
@@ -821,21 +913,19 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
             edata = self.jdata
 
         if self.n_print_calls == 0:
-            print '\nRecon_evt\tTUMC5\tTURG5\tTUMC45\tTURG45\tTUMC35\tTURG35',
-            print '\tTDMC5\tTDRG5\tTDMC45\tTDRG45\tTDMC35\tTDRG35\tFile'
+            # print '\nRecon_evt\tTUMC5\tTURG5\tTUMC45\tTURG45\tTUMC35\tTURG35',
+            # print '\tTDMC5\tTDRG5\tTDMC45\tTDRG45\tTDMC35\tTDRG35\tFile'
+            print '\nRecon_evt\tTUMC5\tTURG5\tTURG45\tTURG35',
+            print '\tTDMC5\tTDRG5\tTDRG45\tTDRG35\tFile'
 
         print str(edata.n_events_total) + '\t\t',
         print str(edata.n_mc_tku_tracks_5pt) + '\t' + \
           str(edata.n_rec_tku_tracks_5pt_good) + '\t' + \
-          str(edata.n_mc_tku_tracks_4to5pt) + '\t' + \
           str(edata.n_rec_tku_tracks_4to5pt_good) + '\t' + \
-          str(edata.n_mc_tku_tracks_3to5pt) + '\t' + \
           str(edata.n_rec_tku_tracks_3to5pt_good) + '\t' + \
           str(edata.n_mc_tkd_tracks_5pt) + '\t' + \
           str(edata.n_rec_tkd_tracks_5pt_good) + '\t' + \
-          str(edata.n_mc_tkd_tracks_4to5pt) + '\t' + \
           str(edata.n_rec_tkd_tracks_4to5pt_good) + '\t' + \
-          str(edata.n_mc_tkd_tracks_3to5pt) + '\t' + \
           str(edata.n_rec_tkd_tracks_3to5pt_good) + '\t' + \
           os.path.basename(data_name)
         self.n_print_calls += 1
@@ -846,5 +936,3 @@ class PatternRecognitionEfficiencyMC(PatternRecognitionEfficiencyBase):
         print '************************************************\n'
 
         # print 'Parameters:'
-        # print 'Stations matched required for good track TkUS \t' + str(self.nstations_mc_tku)
-        # print 'Stations matched required for good track TkDS \t' + str(self.nstations_mc_tkd)

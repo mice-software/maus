@@ -52,18 +52,17 @@ def vector_to_list(vec):
     return pylist
 
 def find_mc_track(hits, n_hits_cut=5):
-    """ Any MC track ids which produce more than (n_hits_cut) hits
+    """ Any MC track ids which produce (n_hits_cut) hits or more
         are accepted and returned """
 
     # Loop over all spoints, then clusters, then digits, then scifi hits
-    track_counter = {} # Dict mapping partev id & track id pair to frequency occurs
+    track_counter = {} # Dict mapping track id pair to frequency occurs
     for hit in hits:
         track_id = int(hit.GetTrackId())
-        part_ev_id = int(hit.GetPartEvId())
-        if (part_ev_id, track_id) in track_counter:
-            track_counter[(part_ev_id, track_id)] += 1
+        if track_id in track_counter:
+            track_counter[track_id] += 1
         else:
-            track_counter[(part_ev_id, track_id)] = 1
+            track_counter[track_id] = 1
 
     accepted_tracks = []
     for tid, counter in track_counter.iteritems():
@@ -114,23 +113,20 @@ def find_mc_tracks_from_spoints(lkup, spoints, nstations=5, n_hits_cut=5):
         reconstructed to pat rec tracks. 
         A spacepoint is identified with a track if (n_hits_cut) or more scifi
         hits produced it (mutliple tracks can be associated with one spoint).
-        Then any track ids that are associated with spacepoints in (nstations) 
+        Then any track ids that are associated with spacepoints in (nstations)
         or more stations are returned as good MC tracks.
     """
 
-    # Dict to hold what stations the track caused spoints in, and
-    # how many spoints
+    # Dict to hold what stations the track caused spoints in, & how many spoints
     track_ids = {}
 
     for sp in spoints:
         station = sp.get_station() # station number
         hits = find_mc_hits(lkup, [sp]) #  The hits which formed the spoint
-
         found_tracks = find_mc_track(hits, n_hits_cut) # list of tuples
 
-        for trk in found_tracks: # trk is a tuple, hence can use as dict key
-            # if trk[0] != -1 and trk[1] != -1: # if we have a good track id for this spoint
-            if trk[1] != -1:
+        for trk in found_tracks:
+            if trk != -1:
                 if not trk in track_ids:
                     track_ids[trk] = {station : 1}
                 elif not station in track_ids[trk]:
