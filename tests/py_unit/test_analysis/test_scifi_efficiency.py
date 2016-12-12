@@ -72,7 +72,7 @@ class SciFiEfficiencyTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
         spill.SetReconEvents(revts)
 
         # Set up and run the pat rec efficiency class
-        eff = scifi_efficiency.PatternRecognitionEfficiency()
+        eff = scifi_efficiency.PatternRecognitionEfficiencyReal()
         eff.check_helical = False
         eff.check_straight = True
         eff.cut_on_tof = False
