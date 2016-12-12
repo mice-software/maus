@@ -4,7 +4,7 @@
 
 import os
 import math
-import abc
+# import abc
 import ROOT
 import libMausCpp #pylint: disable = W0611
 import analysis.scifitools as tools
@@ -15,6 +15,7 @@ import analysis.scifitools as tools
 #pylint: disable = R0915
 #pylint: disable = C0103
 #pylint: disable = W0612
+#pylint: disable = E1101
 
 class EfficiencyDataReal():
     """ Class to store pattern recognition efficiency data from real data """
@@ -275,7 +276,8 @@ class EfficiencyBase(object):
         self.bool_2tof_timing_event = False
         if self.bool_2tof_spoint_event:
             for j in range(tof1.size()):
-                if (tof1.size() != 1) or (tof2.size() != 1): continue
+                if (tof1.size() != 1) or (tof2.size() != 1):
+                    continue
                 dt = tof2[j].GetTime() - tof1[j].GetTime()
 
                 if (dt < self.tof_upper_cut) and (dt > self.tof_lower_cut):
@@ -359,13 +361,13 @@ class EfficiencyBase(object):
 
     #@abc.abstractmethod
     def print_welcome(self):
-      """ Message to be printed at programme start """
-      pass
+        """ Message to be printed at programme start """
+        pass
 
     #@abc.abstractmethod
     def process_spill(self, spill):
-      """ Process one spill of data """
-      pass
+        """ Process one spill of data """
+        pass
 
 class PatternRecognitionEfficiencyReal(EfficiencyBase):
     """ Class to check Pattern Recognition efficiency with real data """
@@ -736,10 +738,10 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
 
         # Loop over events
         for i in range(spill.GetReconEvents().size()):
-             # print '  Processing event ' + str(i)
-             revent = spill.GetReconEvents()[i]
-             mcevent = spill.GetMCEvents()[i]
-             self.process_event(revent, mcevent)
+            # print '  Processing event ' + str(i)
+            revent = spill.GetReconEvents()[i]
+            mcevent = spill.GetMCEvents()[i]
+            self.process_event(revent, mcevent)
 
     def process_event(self, revent, mcevent):
         """ Process the data for one event """
@@ -849,21 +851,21 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
 
         # Update histos, require that only 1 MC track is present
         if bool_tkus_5spoint_event:
-          # Need the 2nd index to get track id rather than particle event id
-          track_id = tracks_tku_5pt[0]
-          mom = \
-            tools.find_mc_momentum_sfhits(lkup, spoints_tku, track_id, 0)
-          if (results_tku_3pt[0] < 1): # Fill if no rec track found
-              self.hpt_m_tku.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
-              self.hpz_m_tku.Fill(mom[2])
+            # Need the 2nd index to get track id rather than particle event id
+            track_id = tracks_tku_5pt[0]
+            mom = \
+              tools.find_mc_momentum_sfhits(lkup, spoints_tku, track_id, 0)
+            if (results_tku_3pt[0] < 1): # Fill if no rec track found
+                self.hpt_m_tku.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
+                self.hpz_m_tku.Fill(mom[2])
 
         if bool_tkds_5spoint_event:
-          track_id = tracks_tkd_5pt[0]
-          mom = \
-            tools.find_mc_momentum_sfhits(lkup, spoints_tkd, track_id, 1)
-          if (results_tkd_3pt[0] < 1): # Fill if no rec track found
-              self.hpt_m_tkd.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
-              self.hpz_m_tkd.Fill(mom[2])
+            track_id = tracks_tkd_5pt[0]
+            mom = \
+              tools.find_mc_momentum_sfhits(lkup, spoints_tkd, track_id, 1)
+            if (results_tkd_3pt[0] < 1): # Fill if no rec track found
+                self.hpt_m_tkd.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
+                self.hpz_m_tkd.Fill(mom[2])
 
         return True
 

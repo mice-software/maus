@@ -14,6 +14,7 @@ def load_data(files):
     for file_name in files:
         # Check if file_name is a ROOT file
         if os.path.isfile(file_name):
+            #pylint: disable = W0612
             file_suffix, file_extension = os.path.splitext(file_name)
             if file_extension == '.root':
                 root_files.append(file_name)
@@ -23,14 +24,14 @@ def load_data(files):
 
         # If file_name is a directory, walk it and save any ROOT files found
         if os.path.isdir(file_name):
-            tools.root_files_dir_search(file_name, root_files)
+            root_files_dir_search(file_name, root_files)
         if len(root_files) < 1:
             print 'No data files found'
             return root_files
 
     print '\nFound ' + str(len(root_files)) + ' ROOT files:'
-    for f in root_files:
-        print f
+    for rfile in root_files:
+        print rfile
     return root_files
 
 def root_files_dir_search(top_dir, root_files):
@@ -120,9 +121,9 @@ def find_mc_tracks_from_spoints(lkup, spoints, nstations=5, n_hits_cut=5):
     # Dict to hold what stations the track caused spoints in, & how many spoints
     track_ids = {}
 
-    for sp in spoints:
-        station = sp.get_station() # station number
-        hits = find_mc_hits(lkup, [sp]) #  The hits which formed the spoint
+    for spoint in spoints:
+        station = spoint.get_station() # station number
+        hits = find_mc_hits(lkup, [spoint]) #  The hits which formed the spoint
         found_tracks = find_mc_track(hits, n_hits_cut) # list of tuples
 
         for trk in found_tracks:
@@ -140,10 +141,8 @@ def find_mc_tracks_from_spoints(lkup, spoints, nstations=5, n_hits_cut=5):
     for tid, stations_hit in track_ids.iteritems():
         # if this track formed a spoint in at least
         # the number of stations specified
-        # if nstations == 5: print ' stations hit = ' + str(len(stations_hit)) + ', ',
         if (len(stations_hit)) >= float(nstations):
             good_tracks.append(tid)
-    # if nstations == 5: print  'with ' + str(len(good_tracks)) + ' of which is good'
     return good_tracks
 
 class SciFiLookup:
