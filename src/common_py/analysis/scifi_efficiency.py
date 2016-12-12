@@ -524,6 +524,8 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         # Require 1 and only 1 track in a tracker
         n_tkus_tracks = 0
         n_tkds_tracks = 0
+        self.bool_tkus_1track = False
+        self.bool_tkds_1track = False
         for trk in prtracks:
             if trk.get_tracker() == 0:
                 n_tkus_tracks += 1
