@@ -49,7 +49,7 @@
 #include "src/common_cpp/ReduceCppTiltedHelix_NS/PatternRecognition.hh"
 
 #include "src/legacy/Interface/STLUtils.hh"
-#include "src/legacy/Interface/Squeak.hh"
+#include "src/common_cpp/Utils/Squeak.hh"
 
 #include "src/reduce/ReduceCppTiltedHelix/ReduceCppTiltedHelix.hh"
 
@@ -141,9 +141,9 @@ bool ReduceCppTiltedHelix::will_cut_sps(std::vector<SciFiSpacePoint*> space_poin
     }
     for (size_t i = 0; i < space_points.size(); ++i) {
           if (space_points[i] == NULL)
-              throw(Exception(Exception::recoverable,
-                              "Space points were NULL",
-                              "ReduceCppTiltedHelix::cut"));
+              throw(Exceptions::Exception(Exceptions::recoverable,
+                                          "Space points were NULL",
+                                          "ReduceCppTiltedHelix::cut"));
     }
     return false;
 }
@@ -209,10 +209,8 @@ std::string ReduceCppTiltedHelix::fit_caption(TH1* hist, TF1* result) {
     return strstr.str();
 }
 
-ImageData* ReduceCppTiltedHelix::get_image_data() {
-    ImageData* image_data = new ImageData();
-    Image * image = new Image();
-    image_data->SetImage(image);
+void ReduceCppTiltedHelix::get_image_data() {
+    clear_image_data();
 
     std::vector<CanvasWrapper*> canvas_wrappers;
     canvas_wrappers.push_back(new_canvas_wrapper(tof_hist_, "tof12", "TOF", "", NULL));
@@ -268,10 +266,9 @@ ImageData* ReduceCppTiltedHelix::get_image_data() {
         TF1* fit_wy = new TF1("fit_wy", formula.c_str(), -_fit_range, _fit_range);
         canvas_wrappers.push_back(new_canvas_wrapper(w_ty_hist_[i], "w_ty"+tracker_str, "TKD w coefficient #theta_{y}; only valid if #theta_{x} reconstruction is disabled", "", fit_wy));
     }
-    image->SetCanvasWrappers(canvas_wrappers);
+    _output->GetImage()->SetCanvasWrappers(canvas_wrappers);
 
     fout.close();
-    return image_data;
 }
 
 double ReduceCppTiltedHelix::calculate_residual_tilted(SciFiSpacePoint* point, SimpleCircle circle) {
@@ -338,30 +335,32 @@ void PrintEventData(MAUS::Data* data) {
     if (true);
 }
 
-MAUS::ImageData* empty_image_data() {
-    ImageData * image_data = new ImageData();
-    image_data->SetImage(new Image());
-    return image_data;
+void ReduceCppTiltedHelix::clear_image_data() {
+    if (_output != NULL) {
+        delete _output;
+    }
+    _output = new ImageData();
+    _output->SetImage(new Image());
 }
 
-MAUS::ImageData* ReduceCppTiltedHelix::_process(MAUS::Data* data) {
+void ReduceCppTiltedHelix::_process(MAUS::Data* data) {
     if (data == NULL)
-        throw Exception(Exception::recoverable, "Data was NULL",
+        throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
                         "ReduceCppTiltedHelix::_process");
     if (data->GetSpill() == NULL)
-        throw Exception(Exception::recoverable, "Spill was NULL",
+        throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
                         "ReduceCppTiltedHelix::_process");
     if (data->GetSpill()->GetDaqEventType() != "physics_event")
-        return empty_image_data();
+        return;
     PrintEventData(data);
     if (data->GetSpill()->GetReconEvents() == NULL)
-        throw Exception(Exception::recoverable, "ReconEvents were NULL",
+        throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
                         "ReduceCppTiltedHelix::_process");
     std::vector<ReconEvent*>* recon_events = data->GetSpill()->GetReconEvents();
     run = data->GetSpill()->GetRunNumber();
     for (size_t i = 0; i < recon_events->size(); ++i) {
         if (recon_events->at(i)->GetSciFiEvent() == NULL) {
-            throw Exception(Exception::recoverable,
+            throw Exceptions::Exception(Exceptions::recoverable,
                             "SciFiEvent was NULL",
                             "ReduceCppTiltedHelix::_process");
         }
@@ -376,13 +375,12 @@ MAUS::ImageData* ReduceCppTiltedHelix::_process(MAUS::Data* data) {
         }
         do_fit(space_points, will_cut_tracker);
     }
-    ImageData* image_data = NULL;
+
     if (data->GetSpill()->GetSpillNumber() % _fit_refresh_rate == 0) {
-        image_data = get_image_data();
+        get_image_data();
     } else {
-        image_data = empty_image_data();
+        return;
     }
-    return image_data;
 }
 
 void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,

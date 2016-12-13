@@ -46,7 +46,7 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     void _death();
 
-    ImageData* _process(Data* data);
+    void _process(Data* data);
 
     bool will_cut_sps(std::vector<SciFiSpacePoint*> space_points, size_t tracker);
 
@@ -66,7 +66,8 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     std::vector<double> calculate_residual(size_t i, SciFiSpacePoint* space_point, MAUS::ReduceCppTiltedHelix_NS::SciFiHelicalPRTrack* pr_track);
 
-    ImageData* get_image_data();
+    void get_image_data();
+    void clear_image_data();
 
     std::string fit_caption(TH1* hist, TF1* result);
 
