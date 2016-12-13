@@ -1,3 +1,4 @@
+import sys
 import os
 import unittest
 import ROOT
@@ -60,21 +61,31 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
         config["SciFiPatRecSZChi2Cut"] = 1e6
         config["SciFiMaxPt"] = 1e6
         config["SciFiMinPz"] = 1e6
+        config["fit_range"] = 0.1
+        config["fit_do_cuts"] = True
+        config["fit_tx"] = True
+        config["fit_ty"] = True
+        config["fit_nbins"] = 50 
+        config["fit_refresh_rate"] = 10
+        config["fit_file"] = "fit.txt"
+        config["fit_w_tx_seed"] = 0.
+        config["fit_w_ty_seed"] = 0.
         maus_cpp.globals.birth(json.dumps(config))
-
+        self.config = json.dumps(config)
+  
     def tearDown(self):
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
 
-    def test_init(self):
+    def _test_init(self):
         reducer = ReduceCppTiltedHelix()
-        reducer.birth("")
+        reducer.birth(self.config)
         reducer.death()
         reducer.death()
 
-    def test_reduce_bad_event(self):
+    def _test_reduce_bad_event(self):
         reducer = ReduceCppTiltedHelix()
-        reducer.birth("")
+        reducer.birth(self.config)
         try:
             image = reducer.process(None)
             self.assertTrue(False, msg="Should have thrown")
@@ -84,10 +95,13 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
     def test_reduce_perfect_helix(self):
         for dq in [1, 3, 10]:
             reducer = ReduceCppTiltedHelix()
-            reducer.birth("")
+            reducer.birth(self.config)
             for i in range(10):
                 data = generate_scifi_data(1000, 20., 800., [30., 40., 200.], 0.5, dq*1.e-3, 0.)
-                image = reducer.process(data)
+                print "processing"
+                sys.stdout.flush()
+                reducer.process(data)
+
             canvas_wrappers = image.GetImage().GetCanvasWrappers()
             for wrap in canvas_wrappers:
                 print wrap.GetFileTag()

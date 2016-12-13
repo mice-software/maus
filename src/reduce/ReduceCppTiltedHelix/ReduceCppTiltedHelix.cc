@@ -87,15 +87,15 @@ ReduceCppTiltedHelix::~ReduceCppTiltedHelix() {}
 
 void ReduceCppTiltedHelix::_birth(const std::string& str_config) {
     Json::Value config = JsonWrapper::StringToJson(str_config);
-    _fit_range = JsonWrapper::GetProperty(config, "fit_range", JsonWrapper::realValue).asDouble();
-    _will_do_cuts = JsonWrapper::GetProperty(config, "fit_do_cuts", JsonWrapper::booleanValue).asBool();
-    _fit_tx = JsonWrapper::GetProperty(config, "fit_tx", JsonWrapper::booleanValue).asBool();
-    _fit_ty = JsonWrapper::GetProperty(config, "fit_ty", JsonWrapper::booleanValue).asBool();
-    _nbins = JsonWrapper::GetProperty(config, "fit_nbins", JsonWrapper::intValue).asInt();
-    _fit_refresh_rate = JsonWrapper::GetProperty(config, "fit_refresh_rate", JsonWrapper::intValue).asInt();
-    _fit_file = std::string(JsonWrapper::GetProperty(config, "fit_file", JsonWrapper::stringValue).asString());
-    _fit_w_tx_seed = JsonWrapper::GetProperty(config, "fit_w_tx_seed", JsonWrapper::realValue).asDouble();
-    _fit_w_ty_seed = JsonWrapper::GetProperty(config, "fit_w_ty_seed", JsonWrapper::realValue).asDouble();
+    _fit_range = JsonWrapper::GetProperty(config, "fit_range", JsonWrapper::realValue).asDouble(); // fit histograms in range +/- fit_range [rad]
+    _will_do_cuts = JsonWrapper::GetProperty(config, "fit_do_cuts", JsonWrapper::booleanValue).asBool(); // if true, require exactly one TOF1 and one TOF2 event; 15 clusters per tracker; 1 space point per tracker station in a given tracker 
+    _fit_tx = JsonWrapper::GetProperty(config, "fit_tx", JsonWrapper::booleanValue).asBool(); // float theta x as a free parameter
+    _fit_ty = JsonWrapper::GetProperty(config, "fit_ty", JsonWrapper::booleanValue).asBool(); // float theta y as a free parameter
+    _nbins = JsonWrapper::GetProperty(config, "fit_nbins", JsonWrapper::intValue).asInt(); // number of bins in the histograms
+    _fit_refresh_rate = JsonWrapper::GetProperty(config, "fit_refresh_rate", JsonWrapper::intValue).asInt(); // histogram refresh rate
+    _fit_file = std::string(JsonWrapper::GetProperty(config, "fit_file", JsonWrapper::stringValue).asString()); // file to write data to
+    _fit_w_tx_seed = JsonWrapper::GetProperty(config, "fit_w_tx_seed", JsonWrapper::realValue).asDouble(); // put in a seed value; all things being equal, the fit should converge on 0
+    _fit_w_ty_seed = JsonWrapper::GetProperty(config, "fit_w_ty_seed", JsonWrapper::realValue).asDouble(); // put in a seed value; all things being equal, the fit should converge on 0
     th_hist_vector_.push_back(new TH1D("station_0_theta_x", "TKU #theta_{x}; #theta_{x} = a_{4}/(2a_{2}) [rad]", _nbins, -0.2, +0.2));
     th_hist_vector_.push_back(new TH1D("station_0_theta_y", "TKU #theta_{y}; #theta_{y} = a_{5}/(2a_{2}) [rad]", _nbins, -0.2, +0.2));
     th_hist_vector_.push_back(new TH1D("station_1_theta_x", "TKD uw #theta_{x}; a_{4}/2 = #delta#theta_{x} [rad]", _nbins, -0.2, +0.2));
@@ -153,11 +153,18 @@ size_t ReduceCppTiltedHelix::get_hist_index(size_t tracker, size_t station) {
 }
 
 CanvasWrapper* ReduceCppTiltedHelix::new_canvas_wrapper(TH1* hist, std::string name, std::string description, std::string text_box_str, TF1* fit) {
+    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 0" << std::endl;
     std::vector<std::string> lines;
+    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 19" << std::endl;
     TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1600, 1200);
     canvas->cd();
+    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 29 " << hist << std::endl;
+    hist->Fill(0.);
+    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 35 " << hist << std::endl;
     hist->Draw();
+    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 39" << std::endl;
     if (fit != NULL) {
+        std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 49" << std::endl;
         hist->Fit(fit, "", "", -_fit_range, _fit_range);
         text_box_str = fit_caption(hist, fit);
         hist->SetStats(false);
@@ -167,6 +174,7 @@ CanvasWrapper* ReduceCppTiltedHelix::new_canvas_wrapper(TH1* hist, std::string n
         text_box->SetTextSize(0.04);
         text_box->SetTextAlign(12);
         text_box->SetTextSize(0.03);
+        std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 69" << std::endl;
 
         size_t pos = 0;
         while (pos < std::string::npos && pos < 1000) {
@@ -177,11 +185,13 @@ CanvasWrapper* ReduceCppTiltedHelix::new_canvas_wrapper(TH1* hist, std::string n
         }
         text_box->Draw();
     }
+    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 89" << std::endl;
     canvas->Update();
     CanvasWrapper* wrap = new CanvasWrapper();
     wrap->SetDescription(description);
     wrap->SetFileTag(name);
     wrap->SetCanvas(canvas);
+    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 99" << std::endl;
     return wrap;
 }
 
@@ -210,7 +220,7 @@ std::string ReduceCppTiltedHelix::fit_caption(TH1* hist, TF1* result) {
 }
 
 void ReduceCppTiltedHelix::get_image_data() {
-    clear_image_data();
+    clear_image_data(); Need to think about this ... probably clear_image_data needs to be called at birth; so need to be able to iterate through the histos, redo the fit, then update the canvas; may need a map to canvas
 
     std::vector<CanvasWrapper*> canvas_wrappers;
     canvas_wrappers.push_back(new_canvas_wrapper(tof_hist_, "tof12", "TOF", "", NULL));
@@ -386,18 +396,15 @@ void ReduceCppTiltedHelix::_process(MAUS::Data* data) {
 void ReduceCppTiltedHelix::do_fit(std::vector<SciFiSpacePoint*> space_points,
                                   std::vector<bool> will_cut_tracker) {
     for (size_t tracker = 0; tracker < n_trackers; ++tracker) {
-        std::cerr << "Do Fit " << tracker << std::endl;
         if (will_cut_tracker[tracker])
             continue;
         std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station(n_stations, std::vector<SciFiSpacePoint*>());
         for (size_t j = 0; j < space_points.size(); ++j) {
-            std::cerr << "Do Fit AA " << tracker << " " << j << std::endl;
             if (space_points[j]->get_tracker() == int(tracker)) {
                int station = space_points[j]->get_station();
                space_points_by_station[station-1].push_back(space_points[j]);
             }
         }
-        std::cerr << "Do Fit tilted circiel " << tracker << std::endl;
         do_fit_tilted_circle(tracker, space_points_by_station);
     }
 }

@@ -129,7 +129,9 @@ class PatternRecognition {
     void make_straight_tracks(const int num_points, const int trker_no,
                               const std::vector<int> ignore_stations,
                               SpacePoint2dPArray &spnts_by_station,
-                              std::vector<SciFiStraightPRTrack*> &strks) const;
+                              std::vector<SciFiStraightPRTrack*> &strks) const {
+        std::cerr << "CANT DO STRIAGT TRACKS BLAME ROGERS" << std::endl;
+    }
 
     /** @brief Make a helical track from spacepoints
      *
