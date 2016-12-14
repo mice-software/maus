@@ -66,6 +66,8 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
   : ReduceBase<Data, ImageData>("ReduceCppTiltedHelix") {
     for (size_t i = 0; i < n_trackers; ++i) {
         std::string i_str = STLUtils::ToString(i);
+        hist_canvas_ = new TCanvas(name_x.c_str(), name_x.c_str()));
+        hist_canvas_->Divide(5, 1);
         for (size_t j = 0; j < n_stations; ++j) {
             std::string j_str = STLUtils::ToString(j);
             std::string name_x = "tracker_"+i_str+"_station_"+j_str;
@@ -75,6 +77,7 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
             );
             hist_vector_.back()->SetLineWidth(2);
         }
+        tof_canvas_ = new TCanvas("tof12", "tof12");
         tof_hist_ = new TH1D("tof12", "TOF between 1 and 2;tof 2-tof1 [ns]", 100, 25., 50.);
         tof_hist_->SetLineWidth(2);
         w_coeff_hist_ = std::vector<TH1D*>(n_trackers, NULL);
@@ -86,6 +89,7 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
 ReduceCppTiltedHelix::~ReduceCppTiltedHelix() {}
 
 void ReduceCppTiltedHelix::_birth(const std::string& str_config) {
+    clear_image_data();
     Json::Value config = JsonWrapper::StringToJson(str_config);
     _fit_range = JsonWrapper::GetProperty(config, "fit_range", JsonWrapper::realValue).asDouble(); // fit histograms in range +/- fit_range [rad]
     _will_do_cuts = JsonWrapper::GetProperty(config, "fit_do_cuts", JsonWrapper::booleanValue).asBool(); // if true, require exactly one TOF1 and one TOF2 event; 15 clusters per tracker; 1 space point per tracker station in a given tracker 
@@ -96,13 +100,20 @@ void ReduceCppTiltedHelix::_birth(const std::string& str_config) {
     _fit_file = std::string(JsonWrapper::GetProperty(config, "fit_file", JsonWrapper::stringValue).asString()); // file to write data to
     _fit_w_tx_seed = JsonWrapper::GetProperty(config, "fit_w_tx_seed", JsonWrapper::realValue).asDouble(); // put in a seed value; all things being equal, the fit should converge on 0
     _fit_w_ty_seed = JsonWrapper::GetProperty(config, "fit_w_ty_seed", JsonWrapper::realValue).asDouble(); // put in a seed value; all things being equal, the fit should converge on 0
+    
+
+    for (size_t i = 0; i < 4; ++i_
+        th_canvas_vector_.push_back(new TCanvas("theta", "theta"));
     th_hist_vector_.push_back(new TH1D("station_0_theta_x", "TKU #theta_{x}; #theta_{x} = a_{4}/(2a_{2}) [rad]", _nbins, -0.2, +0.2));
     th_hist_vector_.push_back(new TH1D("station_0_theta_y", "TKU #theta_{y}; #theta_{y} = a_{5}/(2a_{2}) [rad]", _nbins, -0.2, +0.2));
     th_hist_vector_.push_back(new TH1D("station_1_theta_x", "TKD uw #theta_{x}; a_{4}/2 = #delta#theta_{x} [rad]", _nbins, -0.2, +0.2));
     th_hist_vector_.push_back(new TH1D("station_1_theta_y", "TKD vw #theta_{y}; a_{5}/2 = #delta#theta_{y} [rad]", _nbins, -0.2, +0.2));
     for (size_t i = 0; i < n_trackers; ++i) {
+        w_coeff_canvas_.push_back(new TCanvas("w_coeff", "w_coeff"));
         w_coeff_hist_[i] = new TH1D("w_coeff", "TKD w coefficient;a_{3}/(a_{0}a_{4}+a_{1}a_{5})", _nbins, -100, 100);
+        w_tx_canvas_.push_back(new TCanvas("w_tx", "w_tx"));
         w_tx_hist_[i] = new TH1D("w_tx", "TKD w #theta_{x};#theta_{x} = a_{3}/a_{0} [rad]", _nbins, -0.2, +0.2);
+        w_ty_canvas_.push_back(new TCanvas("w_ty", "w_ty"));
         w_ty_hist_[i] = new TH1D("w_ty", "TKD w #theta_{y};#theta_{y} = a_{3}/a_{1} [rad]", _nbins, -0.2, +0.2);
     }
 }
@@ -152,11 +163,8 @@ size_t ReduceCppTiltedHelix::get_hist_index(size_t tracker, size_t station) {
     return (tracker*n_stations + station-1);
 }
 
-CanvasWrapper* ReduceCppTiltedHelix::new_canvas_wrapper(TH1* hist, std::string name, std::string description, std::string text_box_str, TF1* fit) {
-    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 0" << std::endl;
+CanvasWrapper* ReduceCppTiltedHelix::update_canvas(TCanvas* canvas, TH1* hist, std::string name, std::string description, std::string text_box_str, TF1* fit) {
     std::vector<std::string> lines;
-    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 19" << std::endl;
-    TCanvas* canvas = new TCanvas(name.c_str(), name.c_str(), 1600, 1200);
     canvas->cd();
     std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 29 " << hist << std::endl;
     hist->Fill(0.);
@@ -187,10 +195,6 @@ CanvasWrapper* ReduceCppTiltedHelix::new_canvas_wrapper(TH1* hist, std::string n
     }
     std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 89" << std::endl;
     canvas->Update();
-    CanvasWrapper* wrap = new CanvasWrapper();
-    wrap->SetDescription(description);
-    wrap->SetFileTag(name);
-    wrap->SetCanvas(canvas);
     std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 99" << std::endl;
     return wrap;
 }
@@ -220,10 +224,14 @@ std::string ReduceCppTiltedHelix::fit_caption(TH1* hist, TF1* result) {
 }
 
 void ReduceCppTiltedHelix::get_image_data() {
-    clear_image_data(); Need to think about this ... probably clear_image_data needs to be called at birth; so need to be able to iterate through the histos, redo the fit, then update the canvas; may need a map to canvas
-
-    std::vector<CanvasWrapper*> canvas_wrappers;
-    canvas_wrappers.push_back(new_canvas_wrapper(tof_hist_, "tof12", "TOF", "", NULL));
+    std::cerr << "get_image_data tof hist" << std::endl;
+    tof_hist_->Draw();
+    std::cerr << "ASDS" << std::endl;
+    std::cerr << "ASDSasdas" << std::endl;
+    tof_hist_->Draw();
+    std::cerr << "ASDSpingping" << std::endl;
+    std::cerr << "get_image_data tof hist new wrap" << std::endl;
+    update_canvas(tof_canvas_, tof_hist_, "tof12", "TOF", "", NULL));
     std::string formula = "[0]/(1+[1]*(x-[2])**2)";
 
     std::ofstream fout(_fit_file.c_str());
@@ -231,10 +239,8 @@ void ReduceCppTiltedHelix::get_image_data() {
     for (size_t i = 0; i < n_trackers; ++i) {
         std::string tracker_str = "_tracker_"+STLUtils::ToString(i);
         std::string name = "residuals"+tracker_str;
-        TCanvas* canvas1 = new TCanvas(name.c_str(), name.c_str(), 1600, 1200);
-        canvas1->Divide(n_stations, 1);
         for (size_t station = 1; station <= n_stations; ++station) {
-            canvas1->cd(station);
+            hist_canvas_->cd(station);
             hist_vector_[get_hist_index(i, station)]->Draw();
         }
         canvas1->Update();
@@ -245,6 +251,7 @@ void ReduceCppTiltedHelix::get_image_data() {
         canvas_wrappers.push_back(wrap1);
         fout << "{\"tracker\" : " << i << ", \"run\" : " << run;
         TF1* fit_x = new TF1("fit_x", formula.c_str(), -_fit_range, _fit_range);
+        std::cerr << "get_image_data" << i*2 << std::endl;
         canvas_wrappers.push_back(new_canvas_wrapper(
               th_hist_vector_[i*2],
               "tx"+tracker_str,
@@ -269,14 +276,13 @@ void ReduceCppTiltedHelix::get_image_data() {
              << "}" << std::endl;
 
         canvas_wrappers.push_back(new_canvas_wrapper(w_coeff_hist_[i], "w_coeff"+tracker_str, "TKD w coefficient", "", NULL));
-
         TF1* fit_wx = new TF1("fit_wx", formula.c_str(), -_fit_range, _fit_range);
         canvas_wrappers.push_back(new_canvas_wrapper(w_tx_hist_[i], "w_tx"+tracker_str, "TKD w coefficient #theta_{x}; only valid if #theta_{y} reconstruction is disabled", "", fit_wx));
 
         TF1* fit_wy = new TF1("fit_wy", formula.c_str(), -_fit_range, _fit_range);
         canvas_wrappers.push_back(new_canvas_wrapper(w_ty_hist_[i], "w_ty"+tracker_str, "TKD w coefficient #theta_{y}; only valid if #theta_{x} reconstruction is disabled", "", fit_wy));
     }
-    _output->GetImage()->SetCanvasWrappers(canvas_wrappers);
+    //_output->GetImage()->SetCanvasWrappers(canvas_wrappers);
 
     fout.close();
 }

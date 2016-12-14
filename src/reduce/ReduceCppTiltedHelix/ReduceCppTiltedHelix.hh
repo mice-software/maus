@@ -71,20 +71,26 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     std::string fit_caption(TH1* hist, TF1* result);
 
-    CanvasWrapper* new_canvas_wrapper(TH1* hist, std::string name, std::string description, std::string text_box, TF1* fit);
+    CanvasWrapper* update_canvas(TCanvas* canvas, TH1* hist, std::string name, std::string description, std::string text_box, TF1* fit);
 
     size_t get_hist_index(size_t tracker, size_t station);
 
     void rotate_space_point(SciFiSpacePoint* data);
 
     int run;
+    TCanvas* hist_canvas_;
     std::vector<TH1D*> hist_vector_;
     std::vector< std::vector<double> > hist_data_;
+    std::vector<TCanvas*> th_canvas_vector_;
     std::vector<TH1D*> th_hist_vector_;
     std::vector< std::vector<double> > th_hist_data_;
+    std::vector<TCanvas*> w_coeff_canvas_;
     std::vector<TH1D*> w_coeff_hist_;
+    std::vector<TCanvas*> w_tx_canvas_;
     std::vector<TH1D*> w_tx_hist_;
+    std::vector<TCanvas*> w_ty_canvas_;
     std::vector<TH1D*> w_ty_hist_;
+    TCanvas* tof_canvas_
     TH1D* tof_hist_;
     static std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station_;
     static TMinuit* minimiser;
@@ -104,6 +110,7 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
     double _fit_w_tx_seed;
     double _fit_w_ty_seed;
     double _track_count[2];
+    int _canvas_pointer;
 };
 
 PyMODINIT_FUNC init_ReduceCppTiltedHelix(void) {
