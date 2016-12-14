@@ -28,6 +28,8 @@ import beam
 import os
 from xboa.hit import Hit #pylint: disable=F0401
 
+#pylint: disable=E1101
+
 class MapPyBeamMaker: #pylint: disable=R0902
     """
     MapPyBeamMaker generates primaries for simulation in Geant4
