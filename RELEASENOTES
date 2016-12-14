@@ -5,6 +5,21 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.7.0
+  The following changes were made:
+    - TOF: digitiser bug fix
+    - Tracker: pattern recognition efficiency analysis code upgraded
+    - Tracker: python mc-recon bridge module added
+    - Tracker: calibration script update
+    - Global recon: various updated, including better KL data processing
+    - Geometry: ParentFileCreation updated to handle focus coil off mode
+    - Utilities: New utils added for offline reconstruction (analyze_data_fast_turnaround)
+    - Third party: CMake added
+    - Third party: gtest upgraded to version 1.8.0
+    - Third party: Xerces upgraded to version 3.1.4
+    - Third party: Numpy upgraded to version 1.11.2
+    - Third party: pylint upgraded to version 1.6.3
+    - Third party: ROOT upgraded to 5.34.36, now uses CMake
 MAUS-v2.6.0
   The following changes were made:
     - Global reconstruction TRef issue fixed, solving issue #1858

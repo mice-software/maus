@@ -187,6 +187,13 @@ void MCEvent::SetTracks(TrackArray* tracks) {
     _tracks = tracks;
 }
 
+void MCEvent::AddTrack(Track& track) {
+  if (!_tracks) {
+    _tracks = new TrackArray();
+  }
+  _tracks->push_back(track);
+}
+
 VirtualHitArray* MCEvent::GetVirtualHits() const {
     return _virtuals;
 }
@@ -217,6 +224,13 @@ void MCEvent::SetSciFiHits(SciFiHitArray* hits) {
     _sci_fi_hits = hits;
 }
 
+void MCEvent::AddSciFiHit(SciFiHit& hit) {
+  if (!_sci_fi_hits) {
+    _sci_fi_hits = new SciFiHitArray();
+  }
+  _sci_fi_hits->push_back(hit);
+}
+
 SciFiNoiseHitArray* MCEvent::GetSciFiNoiseHits() const {
     return _sci_fi_noise_hits;
 }
@@ -226,6 +240,13 @@ void MCEvent::SetSciFiNoiseHits(SciFiNoiseHitArray* noise_hits) {
         delete _sci_fi_noise_hits;
     }
     _sci_fi_noise_hits = noise_hits;
+}
+
+void MCEvent::AddSciFiNoiseHit(SciFiNoiseHit& hit) {
+  if (!_sci_fi_noise_hits) {
+    _sci_fi_noise_hits = new SciFiNoiseHitArray();
+  }
+  _sci_fi_noise_hits->push_back(hit);
 }
 
 TOFHitArray* MCEvent::GetTOFHits() const {
