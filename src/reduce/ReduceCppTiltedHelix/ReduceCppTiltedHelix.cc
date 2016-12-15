@@ -64,6 +64,7 @@ std::vector<std::vector<SciFiSpacePoint*> > ReduceCppTiltedHelix::space_points_b
 
 ReduceCppTiltedHelix::ReduceCppTiltedHelix()
   : ReduceBase<Data, ImageData>("ReduceCppTiltedHelix") {
+    clear_image_data();
     for (size_t i = 0; i < n_trackers; ++i) {
         std::string i_str = STLUtils::ToString(i);
         hist_canvas_ = new TCanvas("tracker_residuals", "tracker_residuals");
@@ -86,7 +87,7 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
 ReduceCppTiltedHelix::~ReduceCppTiltedHelix() {}
 
 void ReduceCppTiltedHelix::_birth(const std::string& str_config) {
-    // clear_image_data();
+    // 
     Json::Value config = JsonWrapper::StringToJson(str_config);
     _fit_range = JsonWrapper::GetProperty(config, "fit_range", JsonWrapper::realValue).asDouble(); // fit histograms in range +/- fit_range [rad]
     _will_do_cuts = JsonWrapper::GetProperty(config, "fit_do_cuts", JsonWrapper::booleanValue).asBool(); // if true, require exactly one TOF1 and one TOF2 event; 15 clusters per tracker; 1 space point per tracker station in a given tracker 
