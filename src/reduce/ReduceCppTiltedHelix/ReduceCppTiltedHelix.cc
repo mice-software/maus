@@ -68,7 +68,7 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
     for (size_t i = 0; i < n_trackers; ++i) {
         std::string i_str = STLUtils::ToString(i);
         hist_canvas_ = new TCanvas("tracker_residuals", "tracker_residuals");
-        hist_canvas_->Divide(5, 1);
+        hist_canvas_->Divide(n_stations, 2);
         for (size_t j = 0; j < n_stations; ++j) {
             std::string j_str = STLUtils::ToString(j);
             std::string name_x = "tracker_"+i_str+"_station_"+j_str;
@@ -81,6 +81,9 @@ ReduceCppTiltedHelix::ReduceCppTiltedHelix()
         tof_canvas_ = new TCanvas("tof12", "tof12");
         tof_hist_ = new TH1D("tof12", "TOF between 1 and 2;tof 2-tof1 [ns]", 100, 25., 50.);
         tof_hist_->SetLineWidth(2);
+        tof_hist_->SetLineColor(4);
+        tof_hist_all_ = new TH1D("tof12", "TOF between 1 and 2;tof 2-tof1 [ns]", 100, 25., 50.);
+        tof_hist_all_->SetLineWidth(2);
     }
 }
 
@@ -92,6 +95,9 @@ void ReduceCppTiltedHelix::_birth(const std::string& str_config) {
     _fit_range = JsonWrapper::GetProperty(config, "fit_range", JsonWrapper::realValue).asDouble(); // fit histograms in range +/- fit_range [rad]
     _will_do_cuts = JsonWrapper::GetProperty(config, "fit_do_cuts", JsonWrapper::booleanValue).asBool(); // if true, require exactly one TOF1 and one TOF2 event; 15 clusters per tracker; 1 space point per tracker station in a given tracker 
     _fit_tx = JsonWrapper::GetProperty(config, "fit_tx", JsonWrapper::booleanValue).asBool(); // float theta x as a free parameter
+    _fit_ty = JsonWrapper::GetProperty(config, "fit_ty", JsonWrapper::booleanValue).asBool(); // float theta y as a free parameter
+    _tof12_lower = JsonWrapper::GetProperty(config, "fit_tof12_lower_limit", JsonWrapper::realValue).asDouble();
+    _tof12_upper = JsonWrapper::GetProperty(config, "fit_tof12_upper_limit", JsonWrapper::realValue).asDouble();
     _fit_ty = JsonWrapper::GetProperty(config, "fit_ty", JsonWrapper::booleanValue).asBool(); // float theta y as a free parameter
     _nbins = JsonWrapper::GetProperty(config, "fit_nbins", JsonWrapper::intValue).asInt(); // number of bins in the histograms
     _fit_refresh_rate = JsonWrapper::GetProperty(config, "fit_refresh_rate", JsonWrapper::intValue).asInt(); // histogram refresh rate
@@ -132,10 +138,17 @@ void ReduceCppTiltedHelix::_death() {}
 bool ReduceCppTiltedHelix::will_cut_tof(ReconEvent* event) {
     std::vector<TOFSpacePoint>* tof1_sps = event->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF1SpacePointArrayPtr();
     std::vector<TOFSpacePoint>* tof2_sps = event->GetTOFEvent()->GetTOFEventSpacePointPtr()->GetTOF2SpacePointArrayPtr();
-    if (tof2_sps->size() != 1 || tof1_sps->size() != 1) {
+    if (tof2_sps->size() == 0 || tof1_sps->size() == 0) {
         return true; // require exactly one space point in tof1 and tof2
     }
     double delta_t = tof2_sps->at(0).GetTime() - tof1_sps->at(0).GetTime();
+    tof_hist_all_->Fill(delta_t);
+    if (tof2_sps->size() != 1 || tof1_sps->size() != 1) {
+        return true; // require exactly one space point in tof1 and tof2
+    }
+    if (delta_t > _tof12_upper ||  delta_t < _tof12_lower) { // require tof12 in range
+        return true;
+    }
     tof_hist_->Fill(delta_t);
     return false;
 }
@@ -175,11 +188,7 @@ size_t ReduceCppTiltedHelix::get_hist_index(size_t tracker, size_t station) {
 void ReduceCppTiltedHelix::update_canvas(TCanvas* canvas, TH1* hist, std::string name, std::string description, std::string text_box_str, TF1* fit) {
     std::vector<std::string> lines;
     canvas->cd();
-    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 29 " << hist << std::endl;
-    hist->Fill(0.);
-    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 35 " << hist << std::endl;
     hist->Draw();
-    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 39" << std::endl;
     if (fit != NULL) {
         std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 49" << std::endl;
         hist->Fit(fit, "", "", -_fit_range, _fit_range);
@@ -191,7 +200,6 @@ void ReduceCppTiltedHelix::update_canvas(TCanvas* canvas, TH1* hist, std::string
         text_box->SetTextSize(0.04);
         text_box->SetTextAlign(12);
         text_box->SetTextSize(0.03);
-        std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 69" << std::endl;
 
         size_t pos = 0;
         while (pos < std::string::npos && pos < 1000) {
@@ -202,9 +210,7 @@ void ReduceCppTiltedHelix::update_canvas(TCanvas* canvas, TH1* hist, std::string
         }
         text_box->Draw();
     }
-    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 89" << std::endl;
     canvas->Update();
-    std::cerr << "ReduceCppTiltedHelix::new_canvas_wrapper 99" << std::endl;
 }
 
 std::string ReduceCppTiltedHelix::fit_caption(TH1* hist, TF1* result) {
@@ -231,27 +237,34 @@ std::string ReduceCppTiltedHelix::fit_caption(TH1* hist, TF1* result) {
     return strstr.str();
 }
 
+void ReduceCppTiltedHelix::print_canvas(TCanvas* canvas) {
+    std::string formats[] = {
+        "png",
+        "root",
+    };
+    for (size_t i = 0; i < 2; ++i) {
+        canvas->Print((std::string(canvas->GetName())+"."+formats[i]).c_str());
+    }
+}
+
+
 void ReduceCppTiltedHelix::get_image_data() {
-    std::cerr << "get_image_data tof hist" << std::endl;
+    tof_canvas_->cd();
     tof_hist_->Draw();
-    std::cerr << "ASDS" << std::endl;
-    std::cerr << "ASDSasdas" << std::endl;
-    tof_hist_->Draw();
-    std::cerr << "ASDSpingping" << std::endl;
-    std::cerr << "get_image_data tof hist new wrap" << std::endl;
-    update_canvas(tof_canvas_, tof_hist_, "tof12", "TOF", "", NULL);
-    std::string formula = "[0]/(1+[1]*(x-[2])**2)";
+    tof_hist_all_->Draw("SAME");
+    print_canvas(tof_canvas_);
 
     std::ofstream fout(_fit_file.c_str());
-
+    std::string formula = "[0]/(1+[1]*(x-[2])**2)";
     for (size_t i = 0; i < n_trackers; ++i) {
         std::string tracker_str = "_tracker_"+STLUtils::ToString(i);
         std::string name = "residuals"+tracker_str;
         for (size_t station = 1; station <= n_stations; ++station) {
-            hist_canvas_->cd(station);
+            hist_canvas_->cd(get_hist_index(i, station)+1);
             hist_vector_[get_hist_index(i, station)]->Draw();
         }
         hist_canvas_->Update();
+        print_canvas(hist_canvas_);
         fout << "{\"tracker\" : " << i << ", \"run\" : " << run;
         TF1* fit_x = new TF1("fit_x", formula.c_str(), -_fit_range, _fit_range);
         std::cerr << "get_image_data " << i*2 << std::endl;
@@ -263,6 +276,7 @@ void ReduceCppTiltedHelix::get_image_data() {
               "",
               fit_x
         );
+        print_canvas(th_canvas_vector_[i*2]);
 
         std::cerr << "get_image_data " << i*2+1 << std::endl;
         TF1* fit_y = new TF1("fit_y", formula.c_str(), -_fit_range, _fit_range);
@@ -274,6 +288,7 @@ void ReduceCppTiltedHelix::get_image_data() {
               "",
               fit_y
         );
+        print_canvas(th_canvas_vector_[i*2+1]);
         fout << ", \"w_tx\" : " << fit_x->GetParameter(2)
              << ", \"sw_tx\" : " << fit_x->GetParError(2)
              << ", \"w_ty\" : " << fit_y->GetParameter(2)
@@ -283,13 +298,16 @@ void ReduceCppTiltedHelix::get_image_data() {
 
         std::cerr << "get_image_data coeffs" << std::endl;
         update_canvas(w_coeff_canvas_[i], w_coeff_hist_[i], "w_coeff"+tracker_str, "TKD w coefficient", "", NULL);
+        print_canvas(w_coeff_canvas_[i]);
+
         TF1* fit_wx = new TF1("fit_wx", formula.c_str(), -_fit_range, _fit_range);
         update_canvas(w_tx_canvas_[i], w_tx_hist_[i], "w_tx"+tracker_str, "TKD w coefficient #theta_{x}; only valid if #theta_{y} reconstruction is disabled", "", fit_wx);
+        print_canvas(w_tx_canvas_[i]);
 
         TF1* fit_wy = new TF1("fit_wy", formula.c_str(), -_fit_range, _fit_range);
         update_canvas(w_ty_canvas_[i], w_ty_hist_[i], "w_ty"+tracker_str, "TKD w coefficient #theta_{y}; only valid if #theta_{x} reconstruction is disabled", "", fit_wy);
+        print_canvas(w_ty_canvas_[i]);
     }
-    //_output->GetImage()->SetCanvasWrappers(canvas_wrappers);
 
     fout.close();
 }

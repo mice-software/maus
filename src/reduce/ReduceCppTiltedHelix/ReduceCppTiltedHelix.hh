@@ -77,6 +77,8 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
 
     void rotate_space_point(SciFiSpacePoint* data);
 
+    void print_canvas(TCanvas* canvas);
+
     int run;
     TCanvas* hist_canvas_;
     std::vector<TH1D*> hist_vector_;
@@ -92,6 +94,7 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
     std::vector<TH1D*> w_ty_hist_;
     TCanvas* tof_canvas_;
     TH1D* tof_hist_;
+    TH1D* tof_hist_all_;
     static std::vector<std::vector<SciFiSpacePoint*> > space_points_by_station_;
     static TMinuit* minimiser;
     static const size_t n_stations;
@@ -101,6 +104,8 @@ class ReduceCppTiltedHelix : public ReduceBase<Data, ImageData> {
     friend void reduce_cpp_tilted_helix_minuit_function(int& n_pars, double* pars, double& score, double* buff, int err);
 
     double _fit_range;
+    double _tof12_upper;
+    double _tof12_lower;
     bool _fit_tx;
     bool _fit_ty;
     bool _will_do_cuts;

@@ -77,7 +77,8 @@ void InputCppRootData::parse_file_name(Json::Value json_dc) {
 void InputCppRootData::_birth(const std::string& json_datacards) {
   Json::Value json_dc = JsonWrapper::StringToJson(json_datacards);
   parse_file_name(json_dc);
-  _infile = new irstream(_filename_it->c_str());
+  std::cerr << "InputCppRootData opening " << *_filename_it << std::endl;
+  _infile = new irstream(_filename_it->c_str(), "Spill");
   _infile_tree = "Spill";
 
   if (json_dc.isMember("selected_spills")) {
