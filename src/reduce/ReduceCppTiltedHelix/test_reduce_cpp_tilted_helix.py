@@ -77,13 +77,13 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
 
-    def _test_init(self):
+    def test_init(self):
         reducer = ReduceCppTiltedHelix()
         reducer.birth(self.config)
         reducer.death()
         reducer.death()
 
-    def _test_reduce_bad_event(self):
+    def test_reduce_bad_event(self):
         reducer = ReduceCppTiltedHelix()
         reducer.birth(self.config)
         try:
@@ -100,7 +100,8 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
                 data = generate_scifi_data(1000, 20., 800., [30., 40., 200.], 0.5, dq*1.e-3, 0.)
                 print "processing"
                 sys.stdout.flush()
-                reducer.process(data)
+                image = reducer.process(data)
+                print image
 
             canvas_wrappers = image.GetImage().GetCanvasWrappers()
             for wrap in canvas_wrappers:
@@ -108,7 +109,7 @@ class TestReduceCppTiltedHelix(unittest.TestCase):
                 wrap.GetCanvas().SetCanvasSize(1840, 1000)
                 wrap.GetCanvas().Update()
                 wrap.GetCanvas().Print(self.image_path+wrap.GetFileTag()+"_dq="+str(dq)+".png")
-            raw_input()
+
 
 if __name__ == "__main__":
     unittest.main()
