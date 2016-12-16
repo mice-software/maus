@@ -7,7 +7,7 @@ Release Notes
 =============
 MAUS-v2.7.0
   The following changes were made:
-    - TOF: digitiser bug fix
+    - Tracker: pattern recognition sz cut increased -> performance boost
     - Tracker: pattern recognition efficiency analysis code upgraded
     - Tracker: python mc-recon bridge module added
     - Tracker: calibration script update

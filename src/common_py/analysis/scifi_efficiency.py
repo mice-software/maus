@@ -549,12 +549,12 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         for trk in prtracks:
             if trk.get_tracker() == 0:
                 if (trk.get_spacepoints_pointers().size() == 5) \
-                  and self.bool_tkus_1track:
+                  and self.bool_tkus_5spoint_event and self.bool_tkus_1track:
                     self.fdata.n_5spoint_tkus_tracks += 1
                     self.bool_tkus_5spoint_track = True
             elif trk.get_tracker() == 1:
                 if (trk.get_spacepoints_pointers().size() == 5) \
-                  and self.bool_tkds_1track:
+                  and self.bool_tkds_5spoint_event and self.bool_tkds_1track:
                     self.fdata.n_5spoint_tkds_tracks += 1
                     self.bool_tkds_5spoint_track = True
 
