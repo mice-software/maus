@@ -785,11 +785,10 @@ custom_pid_set = "PIDVarB"
 # are selected as the correct hypothesis
 pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
-# setting to "all", or on all downstream tracks (set to "DS"), all upstream (set to "US"), through tracks (set to 
-# "Through"), or the upstream or downstream components of the throught track (set to "Through-US" or "Through-DS"
-# respectively). Or a combination of the above can be used, entered as a space separated list, e.g
-# "Through Through-US Through-DS"
-pid_track_selection = "Through"
+# setting to "all", on through tracks only (constituent tracks will be PID'd, so this excludes orphans) with
+# "through" or on all upstream and downstream tracks (ignoring whether tracks have been through-matched) with
+# "constituents"
+pid_track_selection = "all"
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"
 # meaning electrons, muons, and pions of both charges (unless tracker recon produces a
@@ -818,10 +817,12 @@ track_matching_energy_loss = True
 # Whether propagation matching should not be performed if each detector has no more than one hit
 track_matching_no_single_event_check = True
 # Additional restriction on the above, still perform matching if some of the hits may be noise
-# due to a small charge deposit
+# due to a small charge deposit. CURRENTLY NOT IN USE
 track_matching_check_charge_thresholds = {
   "TOF0":0.0,
   "TOF1":0.0,
   "TOF2":0.0,
   "KL":0.0
 }
+
+track_matching_through_matching = True

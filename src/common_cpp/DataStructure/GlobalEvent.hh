@@ -136,6 +136,8 @@ class GlobalEvent {
 
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetDSPrimaryChainOrphans() const;
 
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetNonThroughPrimaryChains() const;
+
   std::vector<MAUS::DataStructure::Global::Track*> GetLRTracks() const;
 
   std::vector<MAUS::DataStructure::Global::Track*>

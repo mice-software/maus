@@ -88,6 +88,8 @@ namespace MAUS {
     std::pair<bool, std::map<std::string, double> > _no_check_settings;
     /// Should the RK4 include energy loss
     bool _energy_loss;
+
+    bool _through_matching;
     /// Mapper name
     std::string _mapper_name;
   }; // Don't forget this trailing colon!!!!

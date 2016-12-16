@@ -253,6 +253,9 @@ namespace global {
         std::vector<DataStructure::Global::SpacePoint*> spacepoints,
         DataStructure::Global::Track* hypothesis_track);
 
+
+    void CheckChainMultiplicity();
+
     /// Mapper name passed by the mapper calling this class
     std::string _mapper_name;
 

@@ -128,6 +128,13 @@ class PrimaryChain : public TObject {
   /// kNoChainType, kUS, kDS, kUSOrphan, kDSOrphan, kThrough
   void set_chain_type(MAUS::DataStructure::Global::ChainType type) { _type = type; }
 
+  MAUS::DataStructure::Global::ChainChildMultiplicity get_multiplicity() const {
+    return _multiplicity;
+  }
+
+  void set_multiplicity(MAUS::DataStructure::Global::ChainChildMultiplicity multiplicity) {
+    _multiplicity = multiplicity;
+  }
 
  private:
 
@@ -136,6 +143,10 @@ class PrimaryChain : public TObject {
 
   /// Type of the chain, i.e. whether it is US, DS, Orphan US, OrphanDS, or Through
   MAUS::DataStructure::Global::ChainType _type;
+
+  /// Whether the chain's daughter chains are non-unique (i.e. this and at least one
+  /// other chain are mutually exclusive
+  MAUS::DataStructure::Global::ChainChildMultiplicity _multiplicity;
 
   /// Tracks contained in the chain
   TRefArray* _tracks;

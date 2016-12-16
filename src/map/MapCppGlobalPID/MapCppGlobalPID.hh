@@ -102,34 +102,22 @@ namespace MAUS {
      */
     void _process(MAUS::Data* data) const;
 
-    /** @brief perform pid on all beamline segment (US / DS / Through) tracks
-     *  @param 
-     */
-    void Segment_PID(std::vector<MAUS::DataStructure::Global::Track*>* GlobalTrackArray,
-        MAUS::GlobalEvent* global_event, std::string segment) const;
-
-    /** @brief perform pid on beamline segment (US or DS) tracks from a through track
-     *  @param 
-     */
-    void Through_Segment_PID(std::vector<MAUS::DataStructure::Global::Track*>* GlobalTrackArray,
-        MAUS::GlobalEvent* global_event, std::string segment) const;
-
     /** @brief function to perform pid
      *
      *  
      *  @param 
      */
-    void perform_pid(std::string function_name,
-                     MAUS::DataStructure::Global::Track* track,
-                     MAUS::GlobalEvent* global_event) const;
+    void PerformPID(std::vector<MAUS::DataStructure::Global::PrimaryChain*> primary_chains,
+                    MAUS::GlobalEvent* global_event) const;
 
-    /** @brief calculate Confidence Level
-     *
-     *  Calculate the confidence of a track having a given pid from the log likelihoods.
-     *  @param LL_x log-likelihood of pid x
-     *  @param sum_exp_LL sum of exponentials of log-likelihoods for all pids
-     */
-    double ConfidenceLevel(double LL_x, double sum_exp_LL) const;
+
+    void ThroughPID(MAUS::DataStructure::Global::Track* through_track,
+                    MAUS::DataStructure::Global::PrimaryChain* through_chain,
+                    MAUS::GlobalEvent* global_event) const;
+
+    double CLandPID(MAUS::DataStructure::Global::PID &track_pid,
+                    MAUS::DataStructure::Global::PID pid_hypothesis,
+                    double logL_e, double logL_mu, double logL_pi) const;
 
     bool _configCheck;
     /// This will contain the configuration
@@ -228,6 +216,9 @@ namespace MAUS {
     /// PID beamline polarity- set in ConfigurationDefaults to select
     /// positive or negative particles
     std::string _pid_beamline_polarity;
+
+    /// Polarity multiplier set from _pid_beamline_polarity, 1 (positive) or -1 (negative)
+    int _pol_mult;
 
     /// PID beam setting- set in ConfigurationDefaults to select
     /// beam setting, i.e. emittance and momentum

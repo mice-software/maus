@@ -96,6 +96,7 @@ namespace MAUS {
     no_check_thresholds["TOF2"] = charge_thresholds["TOF2"].asDouble();
     no_check_thresholds["KL"] = charge_thresholds["KL"].asDouble();
     _no_check_settings = std::make_pair(no_check, no_check_thresholds);
+    _through_matching = _configJSON["track_matching_through_matching"].asBool();
   }
 
   void MapCppGlobalTrackMatching::_death() {
@@ -132,7 +133,9 @@ namespace MAUS {
                            _matching_tolerances, 20.0, _no_check_settings, _energy_loss);
         track_matching.USTrack();
         track_matching.DSTrack();
-        track_matching.throughTrack();
+        if (_through_matching) {
+          track_matching.throughTrack();
+        }
       }
     }
   }

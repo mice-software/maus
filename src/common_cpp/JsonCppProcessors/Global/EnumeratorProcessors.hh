@@ -122,6 +122,33 @@ class EnumChainTypeProcessor
         std::string path);
 };
 
+/** Processor to convert between MAUS::DataStructure::Global::ChainChildMultiplicity and
+ *  Json::numericValue
+ */
+class EnumChainChildMultiplicityProcessor
+    : public ProcessorBase<MAUS::DataStructure::Global::ChainChildMultiplicity> {
+  public:
+    /** Convert from Json::numericValue to MAUS::DataStructure::Global::ChainChildMultiplicity
+     *
+     *  If json_double cannot be converted to a
+     *  MAUS::DataStructure::Global::ChainChildMultiplicity, throw a Exception
+     */
+    virtual MAUS::DataStructure::Global::ChainChildMultiplicity* JsonToCpp(
+        const Json::Value& json_double);
+
+    /** Convert from MAUS::DataStructure::Global::ChainChildMultiplicity to Json::numericValue
+     */
+    virtual Json::Value* CppToJson(
+        const MAUS::DataStructure::Global::ChainChildMultiplicity& cpp_enum);
+
+    /** Convert from MAUS::DataStructure::Global::ChainChildMultiplicity to
+     *  Json::numericValue passing path
+     */
+    virtual Json::Value* CppToJson(
+        const MAUS::DataStructure::Global::ChainChildMultiplicity& cpp_enum,
+        std::string path);
+};
+
 } // ~namespace Global
 } // ~namespace Processor
 } // ~namespace MAUS

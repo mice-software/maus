@@ -17,6 +17,8 @@
 
 #include "src/map/MapCppGlobalPID/MapCppGlobalPID.hh"
 
+#include <set>
+
 #include "Utils/Squeak.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 #include "src/common_cpp/API/PyWrapMapBase.hh"
@@ -136,19 +138,26 @@ namespace MAUS {
     _pid_beam_setting = _configJSON["pid_beam_setting"].asString();
     _pid_track_selection = _configJSON["pid_track_selection"].asString();
 
+    if (_pid_track_selection != "all" and _pid_track_selection != "through"
+                                      and _pid_track_selection != "constituents") {
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
+          "Invalid pid_track_selection set in configuration", "MapCppGlobalPID::birth");
+    }
+
     // vector of pid hypotheses
     if (_pid_beamline_polarity == "positive") {
-      _hypotheses.push_back((_pid_beam_setting + "_mu_plus"));
       _hypotheses.push_back((_pid_beam_setting + "_e_plus"));
+      _hypotheses.push_back((_pid_beam_setting + "_mu_plus"));
       _hypotheses.push_back((_pid_beam_setting + "_pi_plus"));
+      _pol_mult = 1;
     } else if (_pid_beamline_polarity == "negative") {
-      _hypotheses.push_back((_pid_beam_setting + "_mu_minus"));
       _hypotheses.push_back((_pid_beam_setting + "_e_minus"));
+      _hypotheses.push_back((_pid_beam_setting + "_mu_minus"));
       _hypotheses.push_back((_pid_beam_setting + "_pi_minus"));
+      _pol_mult = -1;
     } else {
-      Squeak::mout(Squeak::warning) << "Invalid pid_beamline_polarity "
-                                    << "set in ConfigurationDefaults, "
-                                    << "MapCppGlobalPID::_birth" << std::endl;
+      throw MAUS::Exceptions::Exception(Exceptions::recoverable,
+          "Invalid pid_beamline_polarity set in configuration", "MapCppGlobalPID::birth");
     }
 
     // PIDVar selection if Step IV running is selected. Different sets of
@@ -298,211 +307,233 @@ namespace MAUS {
     }
 
     const MAUS::Spill* _spill = data_cpp->GetSpill();
-    if (_spill->GetReconEvents()) {
-      for (size_t event_i = 0; event_i < _spill->GetReconEvents()->size(); ++event_i ) {
-        if (_spill->GetReconEvents()->at(event_i)->GetGlobalEvent()) {
-          MAUS::GlobalEvent* global_event = _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
-          std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
-              global_event->get_tracks();
-          std::istringstream track_selector(_pid_track_selection);
-          std::string token;
-          std::vector<std::string> track_types;
-          while (std::getline(track_selector, token, ' ')) {
-            track_types.push_back(token);
-          }
-          if (track_types.size() == 0) {
-            Squeak::mout(Squeak::warning) << "No tracks have been selected to be ID'd,"
-                  << " MapCppGlobalPID::_process" << std::endl;
-          }
-          for (unsigned int q = 0; q < track_types.size(); ++q) {
-            if (track_types[q] == "all") {
-              Segment_PID(GlobalTrackArray, global_event, "US");
-              Segment_PID(GlobalTrackArray, global_event, "DS");
-              Through_Segment_PID(GlobalTrackArray, global_event, "US");
-              Through_Segment_PID(GlobalTrackArray, global_event, "DS");
-              Segment_PID(GlobalTrackArray, global_event, "Through");
-            } else if (track_types[q] == "US") {
-              Segment_PID(GlobalTrackArray, global_event, "US");
-            } else if (track_types[q] == "DS") {
-              Segment_PID(GlobalTrackArray, global_event, "DS");
-            } else if (track_types[q] == "Through-US") {
-              Through_Segment_PID(GlobalTrackArray, global_event, "US");
-            } else if (track_types[q] == "Through-DS") {
-              Through_Segment_PID(GlobalTrackArray, global_event, "DS");
-            } else if (track_types[q] == "Through") {
-              Segment_PID(GlobalTrackArray, global_event, "Through");
-            }
+    if (!_spill->GetReconEvents()) {
+      return;
+    }
+    for (size_t event_i = 0; event_i < _spill->GetReconEvents()->size(); ++event_i ) {
+      MAUS::GlobalEvent* global_event = _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
+      if (!global_event) {
+        continue;
+      }
+      // Regardless of whether we PID through tracks or not, we first have to PID the constituents
+      if (_pid_track_selection == "all" or _pid_track_selection == "constituents") {
+        PerformPID(global_event->GetNonThroughPrimaryChains(), global_event);
+      } else if (_pid_track_selection == "through") {
+        PerformPID(global_event->GetUSPrimaryChains(), global_event);
+        PerformPID(global_event->GetDSPrimaryChains(), global_event);
+      }
+      // Selecting through chains now means all constituent tracks are already PID'd
+      if (_pid_track_selection == "all" or _pid_track_selection == "through") {
+        std::vector<MAUS::DataStructure::Global::PrimaryChain*> through_chains =
+            global_event->GetThroughPrimaryChains();
+        for (MAUS::DataStructure::Global::PrimaryChain* through_chain: through_chains) {
+          std::vector<MAUS::DataStructure::Global::Track*> through_tracks =
+              through_chain->GetMatchedTracks();
+          for (MAUS::DataStructure::Global::Track* through_track: through_tracks) {
+            ThroughPID(through_track, through_chain, global_event);
           }
         }
       }
     }
   }
 
-  double MapCppGlobalPID::ConfidenceLevel(double LL_x, double sum_exp_LL) const {
-    return (exp(LL_x)/sum_exp_LL)*100;
-  }
-
-  void MapCppGlobalPID::Segment_PID(
-      std::vector<MAUS::DataStructure::Global::Track*>* GlobalTrackArray,
-      MAUS::GlobalEvent* global_event, std::string segment) const {
-    for (size_t track_i = 0; track_i < GlobalTrackArray->size(); ++track_i) {
-      MAUS::DataStructure::Global::Track* track = GlobalTrackArray->at(track_i);
-      if (track->get_mapper_name() == "MapCppGlobalTrackMatching_" + segment) {
-        perform_pid(segment, track, global_event);
-      }
-    }
-  }
-
-  void MapCppGlobalPID::Through_Segment_PID(
-      std::vector<MAUS::DataStructure::Global::Track*>* GlobalTrackArray,
-      MAUS::GlobalEvent* global_event, std::string segment) const {
-    for (size_t track_i = 0; track_i < GlobalTrackArray->size(); ++track_i) {
-      MAUS::DataStructure::Global::Track* track = GlobalTrackArray->at(track_i);
-      if (track->get_mapper_name() == "MapCppGlobalTrackMatching_Through") {
-        std::vector<const MAUS::DataStructure::Global::Track*> const_tracks =
-          track->GetConstituentTracks();
-        for (size_t track_j = 0; track_j < const_tracks.size(); ++track_j) {
-          if (const_tracks.at(track_j)->get_mapper_name() ==
-              "MapCppGlobalTrackMatching_" + segment) {
-            MAUS::DataStructure::Global::Track* segment_track =
-                const_cast<MAUS::DataStructure::Global::Track*> (const_tracks.at(track_j));
-            perform_pid("Through-" + segment, segment_track, global_event);
+  void MapCppGlobalPID::PerformPID(
+      std::vector<MAUS::DataStructure::Global::PrimaryChain*> primary_chains,
+      MAUS::GlobalEvent* global_event) const {
+    for (MAUS::DataStructure::Global::PrimaryChain* primary_chain : primary_chains) {
+      std::vector<MAUS::DataStructure::Global::Track*> tracks = primary_chain->GetMatchedTracks();
+      for (MAUS::DataStructure::Global::Track* track : tracks) {
+        // doubles to hold cumulative log likelihoods for each hypothesis
+        std::map<std::string, double> logL_values = {{"e", 0.0}, {"mu", 0.0}, {"pi", 0.0}};
+        // Keeping track of whether the log likelihood for the PID variable
+        // returned an error value. Only used for the purposes of efficiency
+        // calculations, does not affect PID performance
+        size_t logL_1_sum = 0;
+        // loop over all PID vars with all particle hypotheses
+        for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
+             ++pid_var_count) {
+          std::string polarity_sign;
+          if (_pid_beamline_polarity == "positive") {
+            polarity_sign = "plus";
+          } else if (_pid_beamline_polarity == "negative") {
+            polarity_sign = "minus";
+          }
+          logL_1_sum = 0;
+          std::string hyp = _pid_vars[pid_var_count]->Get_hyp();
+          std::string pidstring;
+          if (hyp == (_pid_beam_setting + "_e_" + polarity_sign)) {
+            pidstring = "e";
+          } else if (hyp == (_pid_beam_setting + "_mu_" + polarity_sign)) {
+            pidstring = "mu";
+          } else if (hyp == (_pid_beam_setting + "_pi_" + polarity_sign)) {
+            pidstring = "pi";
+          } else {
+            Squeak::mout(Squeak::debug) << "Unrecognised particle hypothesis,"
+                                        << " MapCppGlobalPID::perform_pid" << std::endl;
+            continue;
+          }
+          // Increment logL values if current value does not indicate an error
+          if (_pid_vars[pid_var_count]->logL(track) == 1) {
+            logL_1_sum++;
+            continue;
+          } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
+            continue;
+          } else {
+            logL_values[pidstring] += _pid_vars[pid_var_count]->logL(track);
+          }
+        }
+        if ((logL_1_sum/3) == _pid_vars.size()) {
+          // error value for unsuitable track
+          logL_values["e"] = 1;
+          logL_values["mu"] = 1;
+          logL_values["pi"] = 1;
+        } else if (logL_values["e"] == 0 or logL_values["mu"] == 0 or logL_values["pi"] == 0) {
+          // error value for track that failed PID due to user-defined cut on variable value
+          logL_values["e"] = 2;
+          logL_values["mu"] = 2;
+          logL_values["pi"] = 2;
+        }
+        // make pid_ll_values
+        // creates object in data structure with loglikelihoods for each particle hypothesis
+        MAUS::DataStructure::Global::PIDLogLPair e_LL(_pol_mult*(-11), logL_values["e"]);
+        MAUS::DataStructure::Global::PIDLogLPair mu_LL(_pol_mult*(-13), logL_values["mu"]);
+        MAUS::DataStructure::Global::PIDLogLPair pi_LL(_pol_mult*211, logL_values["pi"]);
+        track->AddPIDLogLValues(e_LL);
+        track->AddPIDLogLValues(mu_LL);
+        track->AddPIDLogLValues(pi_LL);
+        if (logL_values["e"] < 0 and logL_values["mu"] < 0 and logL_values["pi"] < 0) {
+          MAUS::DataStructure::Global::PID track_pid = MAUS::DataStructure::Global::kNoPID;
+          double CL = CLandPID(track_pid, track->get_pid(),
+                               logL_values["e"], logL_values["mu"], logL_values["pi"]);
+          track->set_pid_confidence_level(CL);
+          if (track->get_pid() == track_pid) {
+            MAUS::DataStructure::Global::Track* final_pidtrack = track->Clone();
+            global_event->add_track_recursive(final_pidtrack);
+            // It is in principle conceivable (though EXTREMELY unlikely), that the following line
+            // is called twice for the same chain. In this case, SetPIDTrack() will throw an error
+            // message and the track will not be added to the chain.
+            primary_chain->SetPIDTrack(final_pidtrack);
           }
         }
       }
     }
   }
 
-  void MapCppGlobalPID::perform_pid(std::string function_name,
-                                    MAUS::DataStructure::Global::Track* track,
-                                    MAUS::GlobalEvent* global_event) const {
-
-    MAUS::DataStructure::Global::Track* pidtrack = track->Clone();
-    global_event->add_track_recursive(pidtrack);
-    std::string candidate_name = "MapCppGlobalPID_" + function_name + "_Candidate";
-    pidtrack->set_mapper_name(candidate_name);
-    pidtrack->set_pid(MAUS::DataStructure::Global::kNoPID);
-    // doubles to hold cumulative log likelihoods for each hypothesis
-    double logL_mu = 0;
-    double logL_e = 0;
-    double logL_pi = 0;
-    /// Keeping track of whether the log likelihood for the PID variable
-    /// returned an error value. Only used for the purposes of efficiency
-    /// calculations, does not affect PID performance
-    size_t logL_1_sum = 0;
-    for (size_t pid_var_count = 0; pid_var_count < _pid_vars.size();
-         ++pid_var_count) {
-      std::string polarity_sign;
-      if (_pid_beamline_polarity == "positive") {
-        polarity_sign = "plus";
-      } else if (_pid_beamline_polarity == "negative") {
-        polarity_sign = "minus";
-      }
-      logL_1_sum = 0;
-      std::string hyp = _pid_vars[pid_var_count]->Get_hyp();
-      if (hyp == (_pid_beam_setting + "_mu_" + polarity_sign)) {
-        if (_pid_vars[pid_var_count]->logL(track) == 1) {
-          logL_1_sum++;
-          continue;
-        } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
-          continue;
-        } else {
-          logL_mu += _pid_vars[pid_var_count]->logL(track);
-          std::cerr << "logL_mu : " << logL_mu << std::endl;
-        }
-      } else if (hyp == (_pid_beam_setting + "_e_" + polarity_sign)) {
-        if (_pid_vars[pid_var_count]->logL(track) == 1) {
-          logL_1_sum++;
-          continue;
-        } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
-          continue;
-        } else {
-          logL_e += _pid_vars[pid_var_count]->logL(track);
-        }
-      } else if (hyp == (_pid_beam_setting + "_pi_" + polarity_sign)) {
-        if (_pid_vars[pid_var_count]->logL(track) == 1) {
-          logL_1_sum++;
-          continue;
-        } else if (_pid_vars[pid_var_count]->logL(track) == 2) {
-          continue;
-        } else {
-          logL_pi += _pid_vars[pid_var_count]->logL(track);
-        }
-      } else {
-        Squeak::mout(Squeak::debug) << "Unrecognised particle hypothesis,"
-                  << " MapCppGlobalPID::perform_pid" << std::endl;
+  void MapCppGlobalPID::ThroughPID(MAUS::DataStructure::Global::Track* through_track,
+                                   MAUS::DataStructure::Global::PrimaryChain* through_chain,
+                                   MAUS::GlobalEvent* global_event) const {
+    std::vector<const MAUS::DataStructure::Global::Track*> constituent_tracks =
+        through_track->GetConstituentTracks();
+    // Make sure that we have an intact through-constituent set. There should be exactly two
+    // constituents and the through track should have all the detectors the constituents have
+    // with no overlaps
+    if (!(constituent_tracks.size() == 2 and
+        (constituent_tracks.at(0)->get_detectorpoints() +
+         constituent_tracks.at(1)->get_detectorpoints() ==
+         through_track->get_detectorpoints()))) {
+      return;
+    }
+    std::vector<MAUS::DataStructure::Global::PIDLogLPair> pairs_0 =
+        constituent_tracks.at(0)->get_pid_logL_values();
+    std::vector<MAUS::DataStructure::Global::PIDLogLPair> pairs_1 =
+        constituent_tracks.at(1)->get_pid_logL_values();
+    if (!(pairs_0.size() == 3 and pairs_1.size() == 3)) {
+      Squeak::mout(Squeak::error) << "Through PID failed due to incorrect number of PIDLogLPairs "
+                                  << "in constituents. MapCppGlobalPID::ThroughPID()" << std::endl;
+      return;
+    }
+    // Assemble all logL pairs into a single vector so we can iterate over it
+    std::vector<MAUS::DataStructure::Global::PIDLogLPair> pairs_through;
+    pairs_through.push_back(pairs_0.at(0));
+    pairs_through.push_back(pairs_0.at(1));
+    pairs_through.push_back(pairs_0.at(2));
+    pairs_through.push_back(pairs_1.at(0));
+    pairs_through.push_back(pairs_1.at(1));
+    pairs_through.push_back(pairs_1.at(2));
+    double e_LL_sum = 0.0, mu_LL_sum = 0.0, pi_LL_sum = 0.0;
+    // Add corresponding values together
+    for (MAUS::DataStructure::Global::PIDLogLPair pair: pairs_through) {
+      if (std::abs(pair.get_PID()) == 11) {
+        e_LL_sum += pair.get_logL();
+      } else if (std::abs(pair.get_PID()) == 13) {
+        mu_LL_sum += pair.get_logL();
+      } else if (std::abs(pair.get_PID()) == 211) {
+        pi_LL_sum += pair.get_logL();
       }
     }
-    if ((logL_1_sum/3) == _pid_vars.size()) {
-      logL_mu = 1;
-      logL_pi = 1;
-      logL_e = 1;
-    } else if (logL_mu == 0 || logL_pi == 0 || logL_e == 0) {
-      logL_mu = 2;
-      logL_pi = 2;
-      logL_e = 2;
-    }
-    // make pid_ll_values
-    // creates object in data structure with loglikelihoods for each particle hypothesis
-    if (_pid_beamline_polarity == "positive") {
-      MAUS::DataStructure::Global::PIDLogLPair mu_LL(-13, logL_mu);
-      MAUS::DataStructure::Global::PIDLogLPair e_LL(-11, logL_e);
-      MAUS::DataStructure::Global::PIDLogLPair pi_LL(211, logL_pi);
-      pidtrack->AddPIDLogLValues(mu_LL);
-      pidtrack->AddPIDLogLValues(pi_LL);
-      pidtrack->AddPIDLogLValues(e_LL);
-    } else if (_pid_beamline_polarity == "negative") {
-      MAUS::DataStructure::Global::PIDLogLPair mu_LL(13, logL_mu);
-      MAUS::DataStructure::Global::PIDLogLPair e_LL(11, logL_e);
-      MAUS::DataStructure::Global::PIDLogLPair pi_LL(-211, logL_pi);
-      pidtrack->AddPIDLogLValues(mu_LL);
-      pidtrack->AddPIDLogLValues(pi_LL);
-      pidtrack->AddPIDLogLValues(e_LL);
-    }
-    if (logL_mu < 0 || logL_pi < 0 || logL_e < 0) {
-      // calculate CLs
-      double sum_exp_LLs = exp(logL_mu) + exp(logL_e) + exp(logL_pi);
-      double CL_mu = ConfidenceLevel(logL_mu, sum_exp_LLs);
-      double CL_e = ConfidenceLevel(logL_e, sum_exp_LLs);
-      double CL_pi = ConfidenceLevel(logL_pi, sum_exp_LLs);
-      // compare CLs and select winning hypothesis. set g.o.f. of track to CL
-
+    MAUS::DataStructure::Global::PIDLogLPair e_LL(_pol_mult*(-11), e_LL_sum);
+    MAUS::DataStructure::Global::PIDLogLPair mu_LL(_pol_mult*(-13), mu_LL_sum);
+    MAUS::DataStructure::Global::PIDLogLPair pi_LL(_pol_mult*211, pi_LL_sum);
+    through_track->AddPIDLogLValues(e_LL);
+    through_track->AddPIDLogLValues(mu_LL);
+    through_track->AddPIDLogLValues(pi_LL);
+    if (e_LL_sum < 0 and mu_LL_sum < 0 and pi_LL_sum < 0) {
       MAUS::DataStructure::Global::PID track_pid = MAUS::DataStructure::Global::kNoPID;
-      double CL;
-      
-      if (CL_mu - CL_e > _pid_confidence_level && CL_mu - CL_pi > _pid_confidence_level) {
-        CL = CL_mu;
-        if (_pid_beamline_polarity == "positive") {
-          track_pid = MAUS::DataStructure::Global::kMuPlus;
-        } else if (_pid_beamline_polarity == "negative") {
-          track_pid = MAUS::DataStructure::Global::kMuMinus;
+      double CL = CLandPID(track_pid, through_track->get_pid(), e_LL_sum, mu_LL_sum, pi_LL_sum);
+      through_track->set_pid_confidence_level(CL);
+      if (through_track->get_pid() == track_pid) {
+        MAUS::DataStructure::Global::Track* final_pidtrack = through_track->Clone();
+        // Remove constituent tracks
+        final_pidtrack->ClearTracks();
+        // Get daughter chains and obtain PID'd tracks from those
+        MAUS::DataStructure::Global::PrimaryChain* us_chain = through_chain->GetUSDaughter();
+        MAUS::DataStructure::Global::PrimaryChain* ds_chain = through_chain->GetDSDaughter();
+        MAUS::DataStructure::Global::Track* us_track = us_chain->GetPIDTrack();
+        MAUS::DataStructure::Global::Track* ds_track = ds_chain->GetPIDTrack();
+        // These should always have the same PID as the through track, but check just to make sure
+        if (us_track->get_pid() == track_pid and ds_track->get_pid() == track_pid) {
+          final_pidtrack->AddTrack(us_track);
+          final_pidtrack->AddTrack(ds_track);
+          global_event->add_track_recursive(final_pidtrack);
+          through_chain->SetPIDTrack(final_pidtrack);
         }
-      } else if (CL_pi - CL_e > _pid_confidence_level && CL_pi - CL_mu > _pid_confidence_level) {
-        CL = CL_pi;
-        if (_pid_beamline_polarity == "positive") {
-          track_pid = MAUS::DataStructure::Global::kPiPlus;
-        } else if (_pid_beamline_polarity == "negative") {
-          track_pid = MAUS::DataStructure::Global::kPiMinus;
-        }
-      } else if (CL_e - CL_mu > _pid_confidence_level && CL_e - CL_pi > _pid_confidence_level) {
-        CL = CL_e;
-        if (_pid_beamline_polarity == "positive") {
-          track_pid = MAUS::DataStructure::Global::kEPlus;
-        } else if (_pid_beamline_polarity == "negative") {
-          track_pid = MAUS::DataStructure::Global::kEMinus;
-        }
-      } else {
-        Squeak::mout(Squeak::debug) << "PID for track could not be determined." << std::endl;
-        return;
-      }
-
-      pidtrack->set_pid(track_pid);
-      pidtrack->set_goodness_of_fit(CL);
-      if (track->get_pid() == track_pid) {
-        MAUS::DataStructure::Global::Track* final_pidtrack = pidtrack->Clone();
-        global_event->add_track_recursive(final_pidtrack);
-        final_pidtrack->set_mapper_name("MapCppGlobalPID_" + function_name);
       }
     }
   }
+
+  double MapCppGlobalPID::CLandPID(MAUS::DataStructure::Global::PID &track_pid,
+                                   MAUS::DataStructure::Global::PID pid_hypothesis,
+                                   double logL_e, double logL_mu, double logL_pi) const {
+    double sum_exp_LLs = exp(logL_e) + exp(logL_mu) + exp(logL_pi);
+    double CL_e = (exp(logL_e)/sum_exp_LLs)*100;
+    double CL_mu = (exp(logL_mu)/sum_exp_LLs)*100;
+    double CL_pi = (exp(logL_pi)/sum_exp_LLs)*100;
+    double CL = 0.0;
+    if (CL_e - CL_mu > _pid_confidence_level and
+        CL_e - CL_pi > _pid_confidence_level) {
+      if (_pid_beamline_polarity == "positive") {
+        track_pid = MAUS::DataStructure::Global::kEPlus;
+      } else if (_pid_beamline_polarity == "negative") {
+        track_pid = MAUS::DataStructure::Global::kEMinus;
+      }
+    } else if (CL_mu - CL_e > _pid_confidence_level and
+               CL_mu - CL_pi > _pid_confidence_level) {
+      if (_pid_beamline_polarity == "positive") {
+        track_pid = MAUS::DataStructure::Global::kMuPlus;
+      } else if (_pid_beamline_polarity == "negative") {
+        track_pid = MAUS::DataStructure::Global::kMuMinus;
+      }
+    } else if (CL_pi - CL_e > _pid_confidence_level and
+               CL_pi - CL_mu > _pid_confidence_level) {
+      if (_pid_beamline_polarity == "positive") {
+        track_pid = MAUS::DataStructure::Global::kPiPlus;
+      } else if (_pid_beamline_polarity == "negative") {
+        track_pid = MAUS::DataStructure::Global::kPiMinus;
+      }
+    } else {
+      Squeak::mout(Squeak::debug) << "PID for track could not be determined." << std::endl;
+    }
+    if (pid_hypothesis == MAUS::DataStructure::Global::kEPlus or
+        pid_hypothesis == MAUS::DataStructure::Global::kEMinus) {
+      CL = CL_e;
+    } else if (pid_hypothesis == MAUS::DataStructure::Global::kMuPlus or
+               pid_hypothesis == MAUS::DataStructure::Global::kMuMinus) {
+      CL = CL_mu;
+    } else if (pid_hypothesis == MAUS::DataStructure::Global::kPiPlus or
+               pid_hypothesis == MAUS::DataStructure::Global::kPiMinus) {
+      CL = CL_pi;
+    }
+    return CL;
+  }
+  
 } // ~MAUS

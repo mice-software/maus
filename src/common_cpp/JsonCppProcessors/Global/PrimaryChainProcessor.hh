@@ -45,6 +45,7 @@ class PrimaryChainProcessor
  private:
   StringProcessor _string_proc;
   EnumChainTypeProcessor _chain_type_proc;
+  EnumChainChildMultiplicityProcessor _chain_child_multiplicity_proc;
   TRefArrayProcessor _track_trefarray_proc;
 };
 } // ~namespace Global

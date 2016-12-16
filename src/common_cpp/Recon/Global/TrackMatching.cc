@@ -369,6 +369,33 @@ void TrackMatching::throughTrack() {
       }
     }
   }
+  CheckChainMultiplicity();
+}
+
+void TrackMatching::CheckChainMultiplicity() {
+  std::vector<DataStructure::Global::PrimaryChain*> through_chains =
+      _global_event->GetThroughPrimaryChains();
+  std::vector<std::pair<bool, bool> > multiplicities
+      (through_chains.size(), std::make_pair(false, false));
+  for (size_t i = 0; i < through_chains.size() - 1; i++) {
+    for (size_t j = i + 1; j < through_chains.size(); j++) {
+      if (through_chains.at(i)->GetUSDaughter() == through_chains.at(j)->GetUSDaughter()) {
+        multiplicities.at(i).first = true;
+        multiplicities.at(j).first = true;
+      }
+      if (through_chains.at(i)->GetDSDaughter() == through_chains.at(j)->GetDSDaughter()) {
+        multiplicities.at(i).second = true;
+        multiplicities.at(j).second = true;
+      }
+    }
+    if (multiplicities.at(i).first and multiplicities.at(i).second) {
+      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleBoth);
+    } else if (multiplicities.at(i).first) {
+      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleUS);
+    } else if (multiplicities.at(i).second) {
+      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleDS);
+    }
+  }  
 }
 
 DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(

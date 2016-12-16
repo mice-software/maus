@@ -381,6 +381,21 @@ std::vector<MAUS::DataStructure::Global::PrimaryChain*>
   return GetPrimaryChains(MAUS::DataStructure::Global::kUSOrphan);
 }
 
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetNonThroughPrimaryChains() const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> segment_chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    MAUS::DataStructure::Global::ChainType chain_type = _primary_chains->at(i)->get_chain_type();
+    if (chain_type == MAUS::DataStructure::Global::kUSOrphan or
+        chain_type == MAUS::DataStructure::Global::kDSOrphan or
+        chain_type == MAUS::DataStructure::Global::kUS or
+        chain_type == MAUS::DataStructure::Global::kDS) {
+      segment_chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return segment_chains;
+}
+
 std::vector<MAUS::DataStructure::Global::Track*> GlobalEvent::GetLRTracks() const {
   std::vector<MAUS::DataStructure::Global::Track*> lr_tracks;
   for (size_t i = 0; i < _tracks->size(); i++) {

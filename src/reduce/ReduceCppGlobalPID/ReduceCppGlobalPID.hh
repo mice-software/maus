@@ -105,6 +105,8 @@ class ReduceCppGlobalPID : public ReduceBase<Data, Data> {
 
     int _mc_pid_tracker_ref(MAUS::MCEvent* mc_event, int tracker_number);
 
+    void _fill_pid_histograms(MAUS::DataStructure::Global::Track* track, int pid);
+
     /// Check that a valid configuration is passed to the process
     bool _configCheck;
 

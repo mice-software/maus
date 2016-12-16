@@ -48,14 +48,14 @@ namespace MAUS {
       _pid_beam_setting = _configJSON["pid_beam_setting"].asString();
       _unique_identifier = _configJSON["unique_identifier"].asString();
       if (_pid_beam_setting.empty() || !_configJSON.isMember("pid_beam_setting")) {
-        Squeak::mout(Squeak::error) << "Config did not contain a valid "
-                                    << "pid_beam_setting, which is required for PDF production, "
-                                    << "ReduceCppGlobalPID::birth" << std::endl;
+        throw Exceptions::Exception(Exceptions::recoverable,
+            "Config did not contain a valid pid_beam_setting, which is required for PDF production",
+            "ReduceCppGlobalPID::birth");
       }
       if (_unique_identifier.empty() || !_configJSON.isMember("unique_identifier")) {
-        Squeak::mout(Squeak::error) << "Config did not contain a valid "
-                                    << "unique_identifier, which is required for PDF production, "
-                                    << "ReduceCppGlobalPID::birth" << std::endl;
+        throw Exceptions::Exception(Exceptions::recoverable,
+            "Config did not contain valid unique_identifier, which is required for PDF production",
+            "ReduceCppGlobalPID::birth");
       }
 
       _pid_config = _configJSON["pid_config"].asString();
@@ -71,9 +71,8 @@ namespace MAUS {
         _hypotheses.push_back((_pid_beam_setting + "_e_minus"));
         _hypotheses.push_back((_pid_beam_setting + "_pi_minus"));
       } else {
-        Squeak::mout(Squeak::warning) << "Invalid pid_beamline_polarity "
-                                      << "set in ConfigurationDefaults, "
-                                      << "ReduceCppGlobalPID::_birth" << std::endl;
+        throw Exceptions::Exception(Exceptions::recoverable,
+          "Invalid pid_beamline_polarity set in configuration", "ReduceCppGlobalPID::birth");
       }
 
       if (_pid_config == "step_4") {
@@ -137,8 +136,8 @@ namespace MAUS {
           }
         }
       } else {
-        Squeak::mout(Squeak::warning) << "Invalid pid_config, "
-                                      << " ReduceCppGlobalPID::birth" << std::endl;
+        throw Exceptions::Exception(Exceptions::recoverable,
+          "Invalid pid_config set in configuration", "ReduceCppGlobalPID::birth");
       }
       _configCheck = true;
     } catch (Exceptions::Exception& exc) {
@@ -151,158 +150,51 @@ namespace MAUS {
   void ReduceCppGlobalPID::_process(MAUS::Data* data_cpp) {
     if (data_cpp == NULL)
       throw Exceptions::Exception(Exceptions::recoverable, "Data was NULL",
-		      "ReduceCppMCProp::_process");
+          "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill() == NULL)
       throw Exceptions::Exception(Exceptions::recoverable, "Spill was NULL",
-		      "ReduceCppMCProp::_process");
+          "ReduceCppMCProp::_process");
     if (data_cpp->GetSpill()->GetDaqEventType() != "physics_event") {
     }
     if (!_configCheck) {
       throw Exceptions::Exception(Exceptions::recoverable,
-                      "Birth was not called successfully",
-                      "ReduceCppGlobalPID::process");
+          "Birth was not called successfully", "ReduceCppGlobalPID::process");
     }
-
-    /*if (data_cpp->GetSpill()->GetReconEvents() == NULL)
-        throw Exceptions::Exception(Exceptions::recoverable, "ReconEvents were NULL",
-	"ReduceCppGlobalPID::_process");*/
-
     _spill = data_cpp->GetSpill();
-
-    if (_spill and _spill->GetReconEvents()) {
-      for (size_t event_i = 0;
-            event_i < _spill->GetReconEvents()->size(); ++event_i) {
-        if (_spill->GetReconEvents()->at(event_i)->GetGlobalEvent()) {
-          // FOR EACH GLOBAL EVENT
-          MAUS::GlobalEvent* global_event =
-              _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
-          // Get Tracks
-          std::vector<MAUS::DataStructure::Global::Track*> *GlobalTrackArray =
-          global_event->get_tracks();
-          bool through_track_check = false;
-          for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
-              ++track_i) {
-            // FOR EACH TRACK
-            MAUS::DataStructure::Global::Track* track = GlobalTrackArray->at(track_i);
-            // only deal with through tracks
-            if (track->get_mapper_name() != "MapCppGlobalTrackMatching_Through") continue;
-            through_track_check = true;
-            if (_pid_config == "step_4") {
-              // get constituent tracks
-              std::vector<const MAUS::DataStructure::Global::Track*> const_tracks =
-                  track->GetConstituentTracks();
-              for (unsigned int track_j = 0; track_j < const_tracks.size();
-                   ++track_j) {
-                int tracker_num;
-                std::string track_mapper_name = const_tracks.at(track_j)->get_mapper_name();
-                if (track_mapper_name == "MapCppGlobalTrackMatching_US") {
-                  tracker_num = 0;
-                } else if (track_mapper_name == "MapCppGlobalTrackMatching_DS") {
-                  tracker_num = 1;
-                } else {
-                  continue;
-                }
-                MAUS::DataStructure::Global::Track* segment_track =
-                    const_cast<MAUS::DataStructure::Global::Track*> (const_tracks.at(track_j));
-                if ((_pid_beamline_polarity == "positive" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -13) ||
-                    (_pid_beamline_polarity == "negative" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 13)) {
-                  for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-                       ++pid_var_count) {
-                    _mu_pid_vars[pid_var_count]->Fill_Hist(segment_track);
-                  } // loop over mu_pid_vars
-                } else if ((_pid_beamline_polarity == "positive" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -11) ||
-                    (_pid_beamline_polarity == "negative" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 11)) {
-                  for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-                       ++pid_var_count) {
-                    _e_pid_vars[pid_var_count]->Fill_Hist(segment_track);
-                  } // loop over e_pid_vars
-                } else if ((_pid_beamline_polarity == "positive" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 211) ||
-                    (_pid_beamline_polarity == "negative" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -211)) {
-                  for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-                       ++pid_var_count) {
-                    _pi_pid_vars[pid_var_count]->Fill_Hist(segment_track);
-                  } // loop over pi_pid_vars
-                } // Beamline segment mc pid check
-              } // loop over constituent tracks
-            } else if (_pid_config == "commissioning") {
-              if ((_pid_beamline_polarity == "positive" &&
-                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == -13) ||
-                  (_pid_beamline_polarity == "negative" &&
-                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == 13)) {
-                for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-                    ++pid_var_count) {
-                  _mu_pid_vars[pid_var_count]->Fill_Hist(track);
-                } // loop over mu_pid_vars
-              } else if ((_pid_beamline_polarity == "positive" &&
-                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == -11) ||
-                  (_pid_beamline_polarity == "negative" &&
-                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == 11)) {
-                for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-                    ++pid_var_count) {
-                  _e_pid_vars[pid_var_count]->Fill_Hist(track);
-                } // loop over e_pid_vars
-              } else if ((_pid_beamline_polarity == "positive" &&
-                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == 211) ||
-                  (_pid_beamline_polarity == "negative" &&
-                  _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), 1) == -211)) {
-                for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-                    ++pid_var_count) {
-                  _pi_pid_vars[pid_var_count]->Fill_Hist(track);
-                } // loop over pi_pid_vars
-              } // check straight through track mc pid at DS tracker ref plane
-            } // change behaviour based on straight or helical tracks
-          } // loop over global tracks
-          if (through_track_check == false) {
-            for (unsigned int track_i = 0; track_i < GlobalTrackArray->size();
-                ++track_i) {
-              MAUS::DataStructure::Global::Track* track = GlobalTrackArray->at(track_i);
-              int tracker_num;
-              std::string track_mapper_name = track->get_mapper_name();
-              if (track_mapper_name == "MapCppGlobalTrackMatching_US") {
-                tracker_num = 0;
-              } else if (track_mapper_name == "MapCppGlobalTrackMatching_DS") {
-                tracker_num = 1;
-              } else {
-                continue;
-              }
-              if ((_pid_beamline_polarity == "positive" &&
-                   _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -13) ||
-                  (_pid_beamline_polarity == "negative" &&
-                   _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 13)) {
-                for (size_t pid_var_count = 0; pid_var_count < _mu_pid_vars.size();
-                     ++pid_var_count) {
-                  _mu_pid_vars[pid_var_count]->Fill_Hist(track);
-                } // loop over mu_pid_vars
-              } else if ((_pid_beamline_polarity == "positive" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -11) ||
-                   (_pid_beamline_polarity == "negative" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 11)) {
-                for (size_t pid_var_count = 0; pid_var_count < _e_pid_vars.size();
-                     ++pid_var_count) {
-                  _e_pid_vars[pid_var_count]->Fill_Hist(track);
-                } // loop over e_pid_vars
-              } else if ((_pid_beamline_polarity == "positive" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == 211) ||
-                   (_pid_beamline_polarity == "negative" &&
-                    _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num) == -211)) {
-                for (size_t pid_var_count = 0; pid_var_count < _pi_pid_vars.size();
-                     ++pid_var_count) {
-                  _pi_pid_vars[pid_var_count]->Fill_Hist(track);
-                } // loop over pi_pid_vars
-              }
-            } // temporary measure for when through tracks haven't been formed
-          } // get global event
-        } // get recon event
-      } // get recon event array
-    } else {
+    if (!(_spill and _spill->GetReconEvents())) {
       Squeak::mout(Squeak::error) << "Failed to import spill from data\n";
-    } // check for spill
+      return;
+    }
+    for (size_t event_i = 0; event_i < _spill->GetReconEvents()->size(); ++event_i) {
+      MAUS::GlobalEvent* global_event = _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
+      if (!global_event) {
+        continue;
+      }
+      std::vector<MAUS::DataStructure::Global::PrimaryChain*> primary_chains;
+      if (_pid_config == "step_4") {
+        // Get Primary Chains (through tracks don't matter here, so we pick all types of
+        // non-through primary chains
+        primary_chains = global_event->GetNonThroughPrimaryChains();
+      } else if (_pid_config == "commissioning") {
+        // For straight track PID we need through tracks
+        primary_chains = global_event->GetThroughPrimaryChains();
+      }
+      for (MAUS::DataStructure::Global::PrimaryChain* primary_chain: primary_chains) {
+        std::vector<MAUS::DataStructure::Global::Track*> tracks = primary_chain->GetMatchedTracks();
+        MAUS::DataStructure::Global::ChainType chain_type = primary_chain->get_chain_type();
+        size_t tracker_num = 1;
+        if (chain_type == MAUS::DataStructure::Global::kUSOrphan or
+            chain_type == MAUS::DataStructure::Global::kUS) {
+          tracker_num = 0;
+        } else if (chain_type == MAUS::DataStructure::Global::kNoChainType) {
+          continue;
+        }
+        for (MAUS::DataStructure::Global::Track* track: tracks) {
+          int pid = _mc_pid_tracker_ref(_spill->GetMCEvents()->at(event_i), tracker_num);
+          _fill_pid_histograms(track, pid);
+        }
+      }
+    }
   }
 
   void ReduceCppGlobalPID::_death()  {
@@ -320,6 +212,26 @@ namespace MAUS {
            ++pid_var_count) {
         delete _pi_pid_vars[pid_var_count];
       }
+    }
+  }
+
+  void ReduceCppGlobalPID::_fill_pid_histograms(
+      MAUS::DataStructure::Global::Track* track, int pid) {
+    std::vector<MAUS::recon::global::PIDBase*> pid_vars;
+    if ((_pid_beamline_polarity == "positive" and pid == -13) or
+        (_pid_beamline_polarity == "negative" and pid == 13)) {
+      pid_vars = _mu_pid_vars;
+    } else if ((_pid_beamline_polarity == "positive" and pid == -11) or
+        (_pid_beamline_polarity == "negative" and pid == 11)) {
+      pid_vars = _e_pid_vars;
+    } else if ((_pid_beamline_polarity == "positive" and pid == 211) or
+        (_pid_beamline_polarity == "negative" and pid == -211)) {
+      pid_vars = _pi_pid_vars;
+    } else {
+      return;
+    }
+    for (MAUS::recon::global::PIDBase* pid_var: pid_vars) {
+      pid_var->Fill_Hist(track);
     }
   }
 

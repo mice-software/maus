@@ -235,6 +235,9 @@ class Track : public TObject {
   /// returns a vector of Track pointers.
   TRefArray* get_constituent_tracks() const;
 
+  void set_pid_confidence_level(double confidence_level);
+
+  double get_pid_confidence_level() const;
   /// Set the goodness of fit varialbe, #_goodness_of_fit.
   void set_goodness_of_fit(double goodness_of_fit);
 
@@ -297,6 +300,7 @@ class Track : public TObject {
   /// depend on the Track's conformity to the hypothesised particle
   /// and trajectory.
   double _goodness_of_fit;
+  double _pid_confidence_level;
 
   MAUS_VERSIONED_CLASS_DEF(Track);
 }; // ~class Track

@@ -33,6 +33,11 @@ PrimaryChainProcessor::PrimaryChainProcessor() {
       &MAUS::DataStructure::Global::PrimaryChain::get_chain_type,
       &MAUS::DataStructure::Global::PrimaryChain::set_chain_type, true);
 
+  RegisterValueBranch(
+      "child_multiplicity", &_chain_child_multiplicity_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_chain_child_multiplicity,
+      &MAUS::DataStructure::Global::PrimaryChain::set_chain_child_multiplicity, true);
+
   RegisterTRef(
       "us_daughter",
       &MAUS::DataStructure::Global::PrimaryChain::get_us_daughter,

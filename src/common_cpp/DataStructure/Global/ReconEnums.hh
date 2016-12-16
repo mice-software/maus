@@ -138,6 +138,13 @@ enum ChainType {
   kDSOrphan    = 4,
   kThrough     = 5
 };
+
+enum ChainChildMultiplicity {
+  kUnique       = 0,
+  kMultipleUS   = 1,
+  kMultipleDS   = 2,
+  kMultipleBoth = 3
+};
 /** @} */ // end of globalrecon
 
 } // ~namespace Global

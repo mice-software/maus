@@ -44,6 +44,7 @@ Track::Track()
       _emr_range_primary(0.),
       _emr_range_secondary(0.),
       _emr_plane_density(0.),
+      _pid_confidence_level(0.),
       _goodness_of_fit(0.) {
   _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
@@ -62,6 +63,7 @@ Track::Track(const Track &track)
       _emr_range_primary(track.get_emr_range_primary()),
       _emr_range_secondary(track.get_emr_range_secondary()),
       _emr_plane_density(track.get_emr_plane_density()),
+      _pid_confidence_level(track.get_pid_confidence_level()),
       _goodness_of_fit(track.get_goodness_of_fit()) {
   _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
@@ -78,18 +80,19 @@ Track& Track::operator=(const Track &track) {
   if (this == &track) {
     return *this;
   }
-  _mapper_name         = track.get_mapper_name();
-  _pid                 = track.get_pid();
-  _charge              = track.get_charge();
-  _track_points = new TRefArray(*track.get_track_points());
-  _constituent_tracks  = new TRefArray(*track.get_constituent_tracks());
-  _detectorpoints      = track.get_detectorpoints();
-  _geometry_paths      = track.get_geometry_paths();
-  _pid_logL_values     = track.get_pid_logL_values();
-  _emr_range_primary   = track.get_emr_range_primary();
-  _emr_range_secondary = track.get_emr_range_secondary();
-  _emr_plane_density   = track.get_emr_plane_density();
-  _goodness_of_fit     = track.get_goodness_of_fit();
+  _mapper_name          = track.get_mapper_name();
+  _pid                  = track.get_pid();
+  _charge               = track.get_charge();
+  _track_points         = new TRefArray(*track.get_track_points());
+  _constituent_tracks   = new TRefArray(*track.get_constituent_tracks());
+  _detectorpoints       = track.get_detectorpoints();
+  _geometry_paths       = track.get_geometry_paths();
+  _pid_logL_values      = track.get_pid_logL_values();
+  _emr_range_primary    = track.get_emr_range_primary();
+  _emr_range_secondary  = track.get_emr_range_secondary();
+  _emr_plane_density    = track.get_emr_plane_density();
+  _pid_confidence_level = track.get_pid_confidence_level();
+  _goodness_of_fit      = track.get_goodness_of_fit();
 
   return *this;
 }
@@ -127,6 +130,7 @@ Track* Track::Clone() const {
     trackNew->AddTrack(t);
   }
 
+  trackNew->set_pid_confidence_level(this->get_pid_confidence_level());
   trackNew->set_goodness_of_fit(this->get_goodness_of_fit());
 
   return trackNew;
@@ -483,6 +487,14 @@ void Track::set_constituent_tracks(TRefArray* constituent_tracks) {
 
 TRefArray* Track::get_constituent_tracks() const {
   return _constituent_tracks;
+}
+
+void Track::set_pid_confidence_level(double confidence_level) {
+  _pid_confidence_level = confidence_level;
+}
+
+double Track::get_pid_confidence_level() const {
+  return _pid_confidence_level;
 }
 
 void Track::set_goodness_of_fit(double goodness_of_fit) {

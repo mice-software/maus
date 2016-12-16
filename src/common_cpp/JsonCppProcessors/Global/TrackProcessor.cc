@@ -87,6 +87,11 @@ TrackProcessor::TrackProcessor()
         &MAUS::DataStructure::Global::Track::set_emr_plane_density, true);
 
     RegisterValueBranch(
+        "pid_confidence_level", &_double_proc,
+        &MAUS::DataStructure::Global::Track::get_pid_confidence_level,
+        &MAUS::DataStructure::Global::Track::set_pid_confidence_level, true);
+
+    RegisterValueBranch(
         "goodness_of_fit", &_double_proc,
         &MAUS::DataStructure::Global::Track::get_goodness_of_fit,
         &MAUS::DataStructure::Global::Track::set_goodness_of_fit, true);
