@@ -51,6 +51,8 @@ class info_box():
         self.p_label.AddText("Digits")
         self.p_label.AddText("Clusters")
         self.p_label.AddText("Spacepoints")
+        self.p_label.AddText("3C Spoints")
+        self.p_label.AddText("2C Spoints")
         self.p_label.AddText("Str Tracks")
         self.p_label.AddText("Helical Tracks")
         self.p_label.AddText("Total Spoints")
@@ -72,6 +74,8 @@ class info_box():
         self.p_t1.AddText( str(t1.num_digits) )
         self.p_t1.AddText( str(t1.num_clusters) )
         self.p_t1.AddText( str(t1.num_spoints) )
+        self.p_t1.AddText( str(t1.num_triplet_spoints) )
+        self.p_t1.AddText( str(t1.num_doublet_spoints) )
         self.p_t1.AddText( str(t1.num_stracks) )
         self.p_t1.AddText( str(t1.num_htracks) )
         self.tot_spoints[0] = self.tot_spoints[0] + t1.num_spoints
@@ -87,6 +91,8 @@ class info_box():
         self.p_t2.AddText( str(t2.num_digits) )
         self.p_t2.AddText( str(t2.num_clusters) )
         self.p_t2.AddText( str(t2.num_spoints) )
+        self.p_t2.AddText( str(t2.num_triplet_spoints) )
+        self.p_t2.AddText( str(t2.num_doublet_spoints) )
         self.p_t2.AddText( str(t2.num_stracks) )
         self.p_t2.AddText( str(t2.num_htracks) )
         self.tot_spoints[1] = self.tot_spoints[1] + t2.num_spoints
@@ -124,8 +130,8 @@ def main(file_name):
     c_sp_xyz.Divide(3, 2)
 
     # The PatRec s-z fit
-    # c_trk_sz = ROOT.TCanvas("trk_sz", "Track s-z", 770, 0, 600, 500)
-    # c_trk_sz.Divide(1, 2)
+    c_trk_sz = ROOT.TCanvas("trk_sz", "Track s-z", 770, 0, 600, 500)
+    c_trk_sz.Divide(1, 2)
 
      # Spacepoints and Trackpoints in global coordinates
     c_sp_gxyz = ROOT.TCanvas("sp_gxyz", "Space and Track Point Global x-y", \
@@ -225,10 +231,10 @@ def main(file_name):
 
                 c_sp_xyz.Update()
 
-                # mg = draw_sz(tkus.seeds_z, tkus.seeds_s, tkds.seeds_z, \
-                #              tkds.seeds_s, tkus.helix_sz_fits, \
-                #              tkds.helix_sz_fits, c_trk_sz)
-                # c_trk_sz.Update()
+                mg = draw_sz(tkus.seeds_z, tkus.seeds_s, tkds.seeds_z, \
+                             tkds.seeds_s, tkus.helix_sz_fits, \
+                             tkds.helix_sz_fits, c_trk_sz)
+                c_trk_sz.Update()
 
                 # Make plots - global coordinates
                 tk_spoint_data = [tkus.spoints_global_x, tkus.spoints_global_y,
@@ -312,9 +318,9 @@ def main(file_name):
                 # Pause between events
                 raw_input("Press any key to move to the next event...")
 
-                # mg[0].Clear()
-                # mg[1].Clear()
-                # del mg
+                mg[0].Clear()
+                mg[1].Clear()
+                del mg
                 del tkus
                 del tkds
                 del tof0

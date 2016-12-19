@@ -38,13 +38,6 @@ echo
 # 2. Any existing environment variable called "maus_third_party" e.g. if set by user's .bashrc file
 # 3. The current maus working directory, as held by the variable MAUS_ROOT_DIR
 # If not location is found then the script aborts 
-cmake --version
-if [ $? != 0 ]; then
-    echo "FATAL: Require cmake to build g4.9.6.p02"
-    echo "FATAL: Exiting. Install cmake and try again"
-    exit 1
-fi
-
 
 while [[ $# > 1 ]]
 do

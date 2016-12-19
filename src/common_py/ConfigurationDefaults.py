@@ -305,7 +305,7 @@ SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
 SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
 SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
-SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecSZChi2Cut = 24.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiPatRecDebugOn = False # Set Pattern Recogntition to debug mode
@@ -826,3 +826,7 @@ track_matching_check_charge_thresholds = {
   "TOF2":0.0,
   "KL":0.0
 }
+
+# Whether multiple adjacent cell hits in the KL should be merged into single spacepoints on import
+# into the global datastructure
+global_merge_kl_cell_hits = True
