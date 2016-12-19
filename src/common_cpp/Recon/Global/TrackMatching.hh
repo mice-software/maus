@@ -253,7 +253,13 @@ namespace global {
         std::vector<DataStructure::Global::SpacePoint*> spacepoints,
         DataStructure::Global::Track* hypothesis_track);
 
-
+    /**
+     * @brief Checks whether mutually exclusive through Primary Chains exist in this event
+     *
+     * If two through chains contain the same daughter chain, they will be marked as
+     * kMultipleUS for same US daughters, kMultipleDS for same DS daughters, or kMultipleBoth
+     * if both are the same. If no such multiplicity exists, the value is kUnique
+     */
     void CheckChainMultiplicity();
 
     /// Mapper name passed by the mapper calling this class
@@ -263,6 +269,7 @@ namespace global {
     /// kEMinus, kMuPlus, kMuMinus, kPiPlus, kPiMinus, or all
     std::string _pid_hypothesis_string;
 
+    /// The beamline polarity, 1 for positive, -1 for negative
     int _beamline_polarity;
 
     /// Matching tolerances for the various detectors that are matched
@@ -293,6 +300,7 @@ namespace global {
     FRIEND_TEST(TrackMatchingTest, MatchUSDS);
     FRIEND_TEST(TrackMatchingTest, TOFTimeFromTrackPoints);
     FRIEND_TEST(TrackMatchingTest, AddIfConsistent);
+    FRIEND_TEST(TrackMatchingTest, CheckChainMultiplicity);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon

@@ -36,7 +36,7 @@ class TrackMatchingTest : public ::testing::Test {
   virtual ~TrackMatchingTest() {}
   virtual void SetUp() {
     _global_event = new GlobalEvent;
-    _matching_tolerances["TOF0"] = std::make_pair(30.0, 30.0);
+    _matching_tolerances["TOF0"] = std::make_pair(2.0, 0.0);
     _matching_tolerances["TOF1"] = std::make_pair(40.0, 40.0);
     _matching_tolerances["TOF2"] = std::make_pair(40.0, 40.0);
     _matching_tolerances["KL"] = std::make_pair(10000, 32.0);
@@ -65,7 +65,6 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   MiceModule geometry(mod_path+"SimpleBeamline.dat");
   dc->SetMiceModules(geometry);
 
-  DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
   TLorentzVector tof0_pos(0.0, 0.0, 100.0, 0.0);
   TLorentzVector tof1_pos(30.0, 0.0, 7902.0, 31.0);
   TLorentzVector tracker0_pos(-1.11, -20.74, 8537.0, 33.0);
@@ -126,51 +125,32 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   _track_matching->DSTrack();
   _track_matching->throughTrack();
 
-  DataStructure::Global::TrackPArray* us_tracks =
-      new DataStructure::Global::TrackPArray();
-  DataStructure::Global::TrackPArray* ds_tracks =
-      new DataStructure::Global::TrackPArray();
-  DataStructure::Global::TrackPArray* through_tracks =
-      new DataStructure::Global::TrackPArray();
+  std::vector<DataStructure::Global::PrimaryChain*> us_chains = _global_event->GetUSPrimaryChains();
+  std::vector<DataStructure::Global::PrimaryChain*> ds_chains = _global_event->GetDSPrimaryChains();
+  std::vector<DataStructure::Global::PrimaryChain*> through_chains =
+      _global_event->GetThroughPrimaryChains();
 
-  DataStructure::Global::TrackPArray* global_tracks =
-    _global_event->get_tracks();
-  DataStructure::Global::TrackPArray::iterator global_track_iter;
-  for (global_track_iter = global_tracks->begin();
-       global_track_iter != global_tracks->end();
-       ++global_track_iter) {
-    if (((*global_track_iter)->get_mapper_name() ==
-            "MapCppGlobalTrackMatching_US") and
-        ((*global_track_iter)->get_pid() == pid)) {
-      us_tracks->push_back(*global_track_iter);
-    } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching_DS") and
-               ((*global_track_iter)->get_pid() == pid)) {
-      ds_tracks->push_back(*global_track_iter);
-    } else if (((*global_track_iter)->get_mapper_name() ==
-                   "MapCppGlobalTrackMatching_Through") and
-               ((*global_track_iter)->get_pid() == pid)) {
-      through_tracks->push_back(*global_track_iter);
-    }
-  }
-  EXPECT_EQ(us_tracks->size(), 1);
-  EXPECT_EQ(ds_tracks->size(), 1);
-  EXPECT_EQ(through_tracks->size(), 1);
-  if (us_tracks->size() > 0) {
-    EXPECT_EQ(us_tracks->at(0)->GetTrackPoints().size(), 3);
-  }
-  if (ds_tracks->size() > 0) {
-    EXPECT_EQ(ds_tracks->at(0)->GetTrackPoints().size(), 4);
-    EXPECT_FLOAT_EQ(ds_tracks->at(0)->get_emr_range_primary(), 20.0);
-  }
-  if (through_tracks->size() > 0) {
-    EXPECT_EQ(through_tracks->at(0)->GetTrackPoints().size(), 7);
-    EXPECT_FLOAT_EQ(ds_tracks->at(0)->get_emr_range_primary(), 20.0);
-  }
+  EXPECT_EQ(us_chains.size(), 1);
+  EXPECT_EQ(ds_chains.size(), 1);
+  EXPECT_EQ(through_chains.size(), 1);
 
-  delete us_tracks;
-  delete ds_tracks;
-  delete through_tracks;
+  if (us_chains.size() == 1 and ds_chains.size() == 1 and through_chains.size() == 1) {
+    DataStructure::Global::PrimaryChain* us_chain = us_chains.at(0);
+    DataStructure::Global::PrimaryChain* ds_chain = ds_chains.at(0);
+    DataStructure::Global::PrimaryChain* through_chain = through_chains.at(0);
+    EXPECT_EQ(through_chain->GetUSDaughter(), us_chain);
+    EXPECT_EQ(through_chain->GetDSDaughter(), ds_chain);
+    EXPECT_EQ(us_chain->GetMatchedTrack(
+        DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 3);
+    EXPECT_EQ(ds_chain->GetMatchedTrack(
+        DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 4);
+    EXPECT_EQ(through_chain->GetMatchedTrack(
+        DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 7);
+    EXPECT_FLOAT_EQ(ds_chain->GetMatchedTrack(
+        DataStructure::Global::kMuPlus)->get_emr_range_primary(), 20.0);
+    EXPECT_FLOAT_EQ(through_chain->GetMatchedTrack(
+        DataStructure::Global::kMuPlus)->get_emr_range_primary(), 20.0);
+  }
 }
 
 TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
@@ -395,12 +375,9 @@ TEST_F(TrackMatchingTest, MatchTrackPoint) {
   }
 }
 
-
 TEST_F(TrackMatchingTest, MatchTOF0) {
-  std::cerr << "Not currently implemented\n";
-/*
   _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", _matching_tolerances, 10.0, _no_check_settings);
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
 
   Simulation::DetectorConstruction* dc =
       Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
@@ -410,12 +387,12 @@ TEST_F(TrackMatchingTest, MatchTOF0) {
   dc->SetMiceModules(geometry);
 
   DataStructure::Global::SpacePoint tof0_sp1;
-  TLorentzVector tof0_position(0.0, 0.0, 100.0, 10.0);
+  TLorentzVector tof0_position(0.0, 0.0, 100.0, 0.0);
   tof0_sp1.set_position(tof0_position);
   tof0_sp1.set_detector(DataStructure::Global::kTOF0);
   _global_event->add_space_point(&tof0_sp1);
   DataStructure::Global::SpacePoint tof0_sp2;
-  tof0_position.SetT(13.0);
+  tof0_position.SetT(5.0);
   tof0_sp2.set_position(tof0_position);
   tof0_sp2.set_detector(DataStructure::Global::kTOF0);
   _global_event->add_space_point(&tof0_sp2);
@@ -424,11 +401,12 @@ TEST_F(TrackMatchingTest, MatchTOF0) {
   std::vector<DataStructure::Global::SpacePoint*> TOF0_sp =
       _track_matching->GetDetectorSpacePoints(DataStructure::Global::kTOF0);
 
-  TLorentzVector position(0.0, 0.0, 7902.0, 41.0);
+  TLorentzVector position(0.0, 0.0, 8537.0, 41.0);
   TLorentzVector momentum(10.0, 10.0, 150.0, 0.0);
   DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
+  BTFieldConstructor* field = Globals::GetMCFieldConstructor();
   DataStructure::Global::Track hypothesis_track;
-  _track_matching->MatchTOF0(position, momentum, TOF0_sp, pid,
+  _track_matching->MatchTOF0(position, momentum, 7902.0, 35.0, TOF0_sp, pid, field,
                              &hypothesis_track);
 
   std::vector<const DataStructure::Global::TrackPoint*> track_points =
@@ -436,9 +414,8 @@ TEST_F(TrackMatchingTest, MatchTOF0) {
 
   EXPECT_EQ(track_points.size(), 1);
   if (track_points.size() > 0) {
-    EXPECT_FLOAT_EQ(track_points.at(0)->get_position().T(), 10.0);
+    EXPECT_FLOAT_EQ(track_points.at(0)->get_position().T(), 5.0);
   }
-*/
 }
 
 TEST_F(TrackMatchingTest, MatchEMRTrack) {
@@ -533,118 +510,6 @@ TEST_F(TrackMatchingTest, AddTrackerTrackPoints) {
   }
 }
 
-//~ TEST_F(TrackMatchingTest, USDSTracks) {
-  //~ _track_matching = new recon::global::TrackMatching(_global_event,
-      //~ "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
-
-  //~ std::vector<DataStructure::Global::Track*> global_tracks;
-  //~ std::vector<DataStructure::Global::Track*> us_tracks1;
-  //~ std::vector<DataStructure::Global::Track*> us_tracks2;
-  //~ std::vector<DataStructure::Global::Track*> ds_tracks1;
-  //~ std::vector<DataStructure::Global::Track*> ds_tracks2;
-  //~ DataStructure::Global::Track us_muplus_track1;
-  //~ DataStructure::Global::Track us_muplus_track2;
-  //~ DataStructure::Global::Track us_muplus_track3;
-  //~ DataStructure::Global::Track ds_muplus_track;
-  //~ DataStructure::Global::Track ds_piminus_track;
-  //~ us_muplus_track1.set_mapper_name("MapCppGlobalTrackMatching_US");
-  //~ us_muplus_track2.set_mapper_name("MapCppGlobalTrackMatching_US");
-  //~ us_muplus_track3.set_mapper_name("MapCppGlobalTrackMatching_US");
-  //~ ds_muplus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
-  //~ ds_piminus_track.set_mapper_name("MapCppGlobalTrackMatching_DS");
-  //~ us_muplus_track1.set_pid(DataStructure::Global::kMuPlus);
-  //~ us_muplus_track2.set_pid(DataStructure::Global::kMuPlus);
-  //~ us_muplus_track3.set_pid(DataStructure::Global::kMuPlus);
-  //~ ds_muplus_track.set_pid(DataStructure::Global::kMuPlus);
-  //~ ds_piminus_track.set_pid(DataStructure::Global::kPiMinus);
-  //~ us_muplus_track1.SetDetector(DataStructure::Global::kTOF1);
-  //~ us_muplus_track2.SetDetector(DataStructure::Global::kTOF1);
-  //~ ds_muplus_track.SetDetector(DataStructure::Global::kTOF2);
-  //~ ds_piminus_track.SetDetector(DataStructure::Global::kTOF2);
-  //~ global_tracks.push_back(&us_muplus_track1);
-  //~ global_tracks.push_back(&us_muplus_track2);
-  //~ global_tracks.push_back(&us_muplus_track3);
-  //~ global_tracks.push_back(&ds_muplus_track);
-  //~ global_tracks.push_back(&ds_piminus_track);
-
-  //~ _track_matching->USDSTracks(&global_tracks,
-      //~ DataStructure::Global::kMuPlus, &us_tracks1, &ds_tracks1);
-  //~ _track_matching->USDSTracks(&global_tracks,
-      //~ DataStructure::Global::kPiMinus, &us_tracks2, &ds_tracks2);
-
-  //~ EXPECT_EQ(us_tracks1.size(), 2);
-  //~ EXPECT_EQ(ds_tracks1.size(), 1);
-  //~ EXPECT_EQ(us_tracks2.size(), 0);
-  //~ EXPECT_EQ(ds_tracks2.size(), 1);
-
-  //~ if (us_tracks1.size() > 1) {
-    //~ EXPECT_EQ(us_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
-    //~ EXPECT_EQ(us_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
-    //~ EXPECT_TRUE(us_tracks1[0]->HasDetector(DataStructure::Global::kTOF1));
-    //~ EXPECT_EQ(us_tracks1[1]->get_mapper_name(), "MapCppGlobalTrackMatching_US");
-    //~ EXPECT_EQ(us_tracks1[1]->get_pid(), DataStructure::Global::kMuPlus);
-    //~ EXPECT_TRUE(us_tracks1[1]->HasDetector(DataStructure::Global::kTOF1));
-  //~ }
-
-  //~ if (ds_tracks1.size() > 0) {
-    //~ EXPECT_EQ(ds_tracks1[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
-    //~ EXPECT_EQ(ds_tracks1[0]->get_pid(), DataStructure::Global::kMuPlus);
-    //~ EXPECT_TRUE(ds_tracks1[0]->HasDetector(DataStructure::Global::kTOF2));
-  //~ }
-
-  //~ if (ds_tracks2.size() > 0) {
-    //~ EXPECT_EQ(ds_tracks2[0]->get_mapper_name(), "MapCppGlobalTrackMatching_DS");
-    //~ EXPECT_EQ(ds_tracks2[0]->get_pid(), DataStructure::Global::kPiMinus);
-    //~ EXPECT_TRUE(ds_tracks2[0]->HasDetector(DataStructure::Global::kTOF2));
-  //~ }
-//~ }
-
-//~ TEST_F(TrackMatchingTest, MatchUSDS) {
-  //~ _track_matching = new recon::global::TrackMatching(_global_event,
-      //~ "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
-
-  //~ DataStructure::Global::SpacePoint tof1_sp;
-  //~ TLorentzVector tof1_position(0.0, 0.0, 100.0, 20.0);
-  //~ tof1_sp.set_position(tof1_position);
-  //~ tof1_sp.set_detector(DataStructure::Global::kTOF1);
-  //~ DataStructure::Global::TrackPoint tof1_tp(&tof1_sp);
-  //~ DataStructure::Global::SpacePoint tof2_sp;
-  //~ TLorentzVector tof2_position(0.0, 0.0, 8300.0, 65.0);
-  //~ tof2_sp.set_position(tof2_position);
-  //~ tof2_sp.set_detector(DataStructure::Global::kTOF2);
-  //~ DataStructure::Global::TrackPoint tof2_tp(&tof2_sp);
-
-  //~ DataStructure::Global::Track* tof1_track = new DataStructure::Global::Track;
-  //~ tof1_track->AddTrackPoint(&tof1_tp);
-  //~ DataStructure::Global::Track* tof2_track = new DataStructure::Global::Track;
-  //~ tof2_track->AddTrackPoint(&tof2_tp);
-  //~ tof2_track->set_emr_range_primary(15.0);
-
-  //~ DataStructure::Global::PID pid = DataStructure::Global::kMuPlus;
-
-  //~ _track_matching->MatchUSDS(tof1_track, tof2_track, pid);
-
-  //~ std::vector<DataStructure::Global::Track*>* through_tracks =
-      //~ GlobalTools::GetTracksByMapperName(_global_event,
-      //~ "MapCppGlobalTrackMatching_Through");
-
-  //~ EXPECT_EQ(through_tracks->size(), 1);
-  //~ if (through_tracks->size() > 0) {
-    //~ EXPECT_FLOAT_EQ(through_tracks->at(0)->get_emr_range_primary(), 15.0);
-    //~ EXPECT_EQ(through_tracks->at(0)->get_pid(),
-        //~ DataStructure::Global::kMuPlus);
-    //~ EXPECT_EQ(through_tracks->at(0)->GetTrackPoints().size(), 2);
-    //~ if (through_tracks->at(0)->GetTrackPoints().size() > 1) {
-      //~ const DataStructure::Global::TrackPoint* tof1_tp =
-          //~ through_tracks->at(0)->GetTrackPoints().at(0);
-      //~ const DataStructure::Global::TrackPoint* tof2_tp =
-          //~ through_tracks->at(0)->GetTrackPoints().at(1);
-      //~ EXPECT_FLOAT_EQ(tof1_tp->get_position().Z(), 100.0);
-      //~ EXPECT_FLOAT_EQ(tof2_tp->get_position().Z(), 8300.0);
-    //~ }
-  //~ }
-//~ }
-
 TEST_F(TrackMatchingTest, TOFTimeFromTrackPoints) {
   _track_matching = new recon::global::TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
@@ -676,8 +541,89 @@ TEST_F(TrackMatchingTest, TOFTimeFromTrackPoints) {
 }
 
 TEST_F(TrackMatchingTest, AddIfConsistent) {
-  std::cerr << "Not currently implemented\n";
+  _track_matching = new recon::global::TrackMatching(_global_event,
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
+  TLorentzVector position(0.0, 0.0, 0.0, 0.0);
+  DataStructure::Global::SpacePoint tof0_sp0;
+  tof0_sp0.set_position(position);
+  DataStructure::Global::SpacePoint tof1_sp0;
+  tof1_sp0.set_position(position);
+  DataStructure::Global::SpacePoint tof1_sp1;
+  position.SetX(60.0);
+  position.SetT(0.4);
+  tof1_sp1.set_position(position);
+  DataStructure::Global::SpacePoint tof1_sp2;
+  position.SetT(0.6);
+  tof1_sp2.set_position(position);
+  DataStructure::Global::SpacePoint kl_sp0;
+  kl_sp0.set_position(position);
+  kl_sp0.set_detector(DataStructure::Global::kCalorimeter);
+  DataStructure::Global::SpacePoint kl_sp1;
+  position.SetY(45.0);
+  kl_sp1.set_position(position);
+  kl_sp1.set_detector(DataStructure::Global::kCalorimeter);
+  std::vector<DataStructure::Global::SpacePoint*> tof0_sps;
+  std::vector<DataStructure::Global::SpacePoint*> tof1_sps;
+  std::vector<DataStructure::Global::SpacePoint*> kl_sps;
+  tof0_sps.push_back(&tof0_sp0);
+  tof1_sps.push_back(&tof1_sp0);
+  tof1_sps.push_back(&tof1_sp1);
+  tof1_sps.push_back(&tof1_sp2);
+  kl_sps.push_back(&kl_sp0);
+  kl_sps.push_back(&kl_sp1);
+  DataStructure::Global::Track tof0_track;
+  DataStructure::Global::Track tof1_track;
+  DataStructure::Global::Track kl_track;
+  _track_matching->AddIfConsistent(tof0_sps, &tof0_track);
+  _track_matching->AddIfConsistent(tof1_sps, &tof1_track);
+  _track_matching->AddIfConsistent(kl_sps, &kl_track);
+  EXPECT_EQ(tof0_track.GetTrackPoints().size(), 1);
+  EXPECT_EQ(tof1_track.GetTrackPoints().size(), 0);
+  EXPECT_EQ(kl_track.GetTrackPoints().size(), 2);
 }
+
+TEST_F(TrackMatchingTest, CheckChainMultiplicity) {
+  _track_matching = new recon::global::TrackMatching(_global_event,
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0, _no_check_settings);
+  DataStructure::Global::PrimaryChain chain_us0("TrackMatchingTest", DataStructure::Global::kUS);
+  DataStructure::Global::PrimaryChain chain_us1("TrackMatchingTest", DataStructure::Global::kUS);
+  DataStructure::Global::PrimaryChain chain_us2("TrackMatchingTest", DataStructure::Global::kUS);
+  DataStructure::Global::PrimaryChain chain_ds0("TrackMatchingTest", DataStructure::Global::kDS);
+  DataStructure::Global::PrimaryChain chain_ds1("TrackMatchingTest", DataStructure::Global::kDS);
+  DataStructure::Global::PrimaryChain chain_ds2("TrackMatchingTest", DataStructure::Global::kDS);
+  DataStructure::Global::PrimaryChain chain_through0(
+      "TrackMatchingTest", DataStructure::Global::kThrough);
+  DataStructure::Global::PrimaryChain chain_through1(
+      "TrackMatchingTest", DataStructure::Global::kThrough);
+  DataStructure::Global::PrimaryChain chain_through2(
+      "TrackMatchingTest", DataStructure::Global::kThrough);
+  DataStructure::Global::PrimaryChain chain_through3(
+      "TrackMatchingTest", DataStructure::Global::kThrough);
+  chain_through0.SetUSDaughter(&chain_us0);
+  chain_through0.SetDSDaughter(&chain_ds0);
+  chain_through1.SetUSDaughter(&chain_us2);
+  chain_through1.SetDSDaughter(&chain_ds1);
+  chain_through2.SetUSDaughter(&chain_us1);
+  chain_through2.SetDSDaughter(&chain_ds2);
+  chain_through3.SetUSDaughter(&chain_us2);
+  chain_through3.SetDSDaughter(&chain_ds2);
+  _global_event->add_primary_chain(&chain_us0);
+  _global_event->add_primary_chain(&chain_us1);
+  _global_event->add_primary_chain(&chain_us2);
+  _global_event->add_primary_chain(&chain_ds0);
+  _global_event->add_primary_chain(&chain_ds1);
+  _global_event->add_primary_chain(&chain_ds2);
+  _global_event->add_primary_chain(&chain_through0);
+  _global_event->add_primary_chain(&chain_through1);
+  _global_event->add_primary_chain(&chain_through2);
+  _global_event->add_primary_chain(&chain_through3);
+  _track_matching->CheckChainMultiplicity();
+  EXPECT_EQ(chain_through0.get_multiplicity(), DataStructure::Global::kUnique);
+  EXPECT_EQ(chain_through1.get_multiplicity(), DataStructure::Global::kMultipleUS);
+  EXPECT_EQ(chain_through2.get_multiplicity(), DataStructure::Global::kMultipleDS);
+  EXPECT_EQ(chain_through3.get_multiplicity(), DataStructure::Global::kMultipleBoth);
+}
+
 }
 }
 } // ~namespace MAUS

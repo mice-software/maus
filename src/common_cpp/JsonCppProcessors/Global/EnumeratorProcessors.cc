@@ -112,7 +112,7 @@ Json::Value* EnumChainTypeProcessor::CppToJson(
   return json_int;
 }
 
-MAUS::DataStructure::Global::ChainType* EnumChainChildMultiplicityProcessor::JsonToCpp(
+MAUS::DataStructure::Global::ChainChildMultiplicity* EnumChainChildMultiplicityProcessor::JsonToCpp(
     const Json::Value& json_int) {
   if (json_int.isNumeric()) {
     MAUS::DataStructure::Global::ChainChildMultiplicity* ccm =

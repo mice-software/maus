@@ -144,6 +144,7 @@ void PrimaryChain::AddMatchedTrack(MAUS::DataStructure::Global::Track* track) {
 }
 
 MAUS::DataStructure::Global::Track* PrimaryChain::GetPIDTrack() const {
+  MAUS::DataStructure::Global::Track* track = 0;
   int n = _tracks->GetEntries();
   for (int i = 0; i < n; i++) {
     track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
@@ -155,6 +156,7 @@ MAUS::DataStructure::Global::Track* PrimaryChain::GetPIDTrack() const {
 }
 
 void PrimaryChain::SetPIDTrack(MAUS::DataStructure::Global::Track* track) {
+  MAUS::DataStructure::Global::Track* chain_track = 0;
   // Need to check whether a PID track exists
   int n = _tracks->GetEntries();
   for (int i = 0; i < n; i++) {
@@ -171,6 +173,7 @@ void PrimaryChain::SetPIDTrack(MAUS::DataStructure::Global::Track* track) {
 }
 
 MAUS::DataStructure::Global::Track* PrimaryChain::GetFittedTrack() const {
+  MAUS::DataStructure::Global::Track* track = 0;
   int n = _tracks->GetEntries();
   for (int i = 0; i < n; i++) {
     track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
@@ -182,7 +185,8 @@ MAUS::DataStructure::Global::Track* PrimaryChain::GetFittedTrack() const {
 }
 
 void PrimaryChain::SetFittedTrack(MAUS::DataStructure::Global::Track* track) {
-  // Need to check whether a PID track exists
+  MAUS::DataStructure::Global::Track* chain_track = 0;
+  // Need to check whether a fitted track exists
   int n = _tracks->GetEntries();
   for (int i = 0; i < n; i++) {
     chain_track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);

@@ -378,7 +378,7 @@ std::vector<MAUS::DataStructure::Global::PrimaryChain*>
 
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>
     GlobalEvent::GetDSPrimaryChainOrphans() const {
-  return GetPrimaryChains(MAUS::DataStructure::Global::kUSOrphan);
+  return GetPrimaryChains(MAUS::DataStructure::Global::kDSOrphan);
 }
 
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>

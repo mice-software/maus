@@ -35,8 +35,8 @@ PrimaryChainProcessor::PrimaryChainProcessor() {
 
   RegisterValueBranch(
       "child_multiplicity", &_chain_child_multiplicity_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_chain_child_multiplicity,
-      &MAUS::DataStructure::Global::PrimaryChain::set_chain_child_multiplicity, true);
+      &MAUS::DataStructure::Global::PrimaryChain::get_multiplicity,
+      &MAUS::DataStructure::Global::PrimaryChain::set_multiplicity, true);
 
   RegisterTRef(
       "us_daughter",

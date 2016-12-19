@@ -295,19 +295,6 @@ void TrackMatching::throughTrack() {
       _global_event->GetUSPrimaryChainOrphans();
   std::vector<DataStructure::Global::PrimaryChain*> ds_chains =
       _global_event->GetDSPrimaryChainOrphans();
-  // NOTE: It is possible that for example the muon track from a US primary
-  // chain is matched with one from a DS primary chain, while the pion track
-  // is matched with one from a different primary chain. In this case, 3 chains
-  // would give rise to 2 mutually exclusive through chains. This is extremely
-  // unlikely though as it would require two separate TOF spacepoints that are
-  // each compatible with a different PID hypothesis, as well as two tracker tracks
-  // on one side of the beamline where each one is matched to a TOF hit that is
-  // compatible with a physical TOF1-2 time-of-flight to the corresponding TOF
-  // spacepoint on the other side of the beamline. A slightly more likely but less
-  // problematic situation arises when the tracks from two chains on one side are
-  // both compatible with a chain from the other side, in which case we would have
-  // two mutually exclusive through chains. TODO(?): Perhaps add a comment field
-  // or flag to the PrimaryChain object.
   for (auto us_chain_iter = us_chains.begin();
        us_chain_iter != us_chains.end(); ++us_chain_iter) {
     for (auto ds_chain_iter = ds_chains.begin();
@@ -363,6 +350,8 @@ void TrackMatching::throughTrack() {
         }
       }
       if (through_primary_chain->GetMatchedTracks().size() > 0) {
+        (*us_chain_iter)->set_chain_type(DataStructure::Global::kUS);
+        (*ds_chain_iter)->set_chain_type(DataStructure::Global::kDS);
         through_primary_chain->SetUSDaughter(*us_chain_iter);
         through_primary_chain->SetDSDaughter(*ds_chain_iter);
         _global_event->add_primary_chain(through_primary_chain);
@@ -370,32 +359,6 @@ void TrackMatching::throughTrack() {
     }
   }
   CheckChainMultiplicity();
-}
-
-void TrackMatching::CheckChainMultiplicity() {
-  std::vector<DataStructure::Global::PrimaryChain*> through_chains =
-      _global_event->GetThroughPrimaryChains();
-  std::vector<std::pair<bool, bool> > multiplicities
-      (through_chains.size(), std::make_pair(false, false));
-  for (size_t i = 0; i < through_chains.size() - 1; i++) {
-    for (size_t j = i + 1; j < through_chains.size(); j++) {
-      if (through_chains.at(i)->GetUSDaughter() == through_chains.at(j)->GetUSDaughter()) {
-        multiplicities.at(i).first = true;
-        multiplicities.at(j).first = true;
-      }
-      if (through_chains.at(i)->GetDSDaughter() == through_chains.at(j)->GetDSDaughter()) {
-        multiplicities.at(i).second = true;
-        multiplicities.at(j).second = true;
-      }
-    }
-    if (multiplicities.at(i).first and multiplicities.at(i).second) {
-      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleBoth);
-    } else if (multiplicities.at(i).first) {
-      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleUS);
-    } else if (multiplicities.at(i).second) {
-      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleDS);
-    }
-  }  
 }
 
 DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(
@@ -712,6 +675,33 @@ void TrackMatching::AddIfConsistent(std::vector<DataStructure::Global::SpacePoin
     }
   }
   return;
+}
+
+void TrackMatching::CheckChainMultiplicity() {
+  std::vector<DataStructure::Global::PrimaryChain*> through_chains =
+      _global_event->GetThroughPrimaryChains();
+  std::vector<std::pair<bool, bool> > multiplicities
+      (through_chains.size(), std::make_pair(false, false));
+  // Last execution won't reach the inner loop but is necessary for assignment of enums at the end
+  for (size_t i = 0; i < through_chains.size(); i++) {
+    for (size_t j = i + 1; j < through_chains.size(); j++) {
+      if (through_chains.at(i)->GetUSDaughter() == through_chains.at(j)->GetUSDaughter()) {
+        multiplicities.at(i).first = true;
+        multiplicities.at(j).first = true;
+      }
+      if (through_chains.at(i)->GetDSDaughter() == through_chains.at(j)->GetDSDaughter()) {
+        multiplicities.at(i).second = true;
+        multiplicities.at(j).second = true;
+      }
+    }
+    if (multiplicities.at(i).first and multiplicities.at(i).second) {
+      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleBoth);
+    } else if (multiplicities.at(i).first) {
+      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleUS);
+    } else if (multiplicities.at(i).second) {
+      through_chains.at(i)->set_multiplicity(DataStructure::Global::kMultipleDS);
+    }
+  }
 }
 
 } // ~namespace global
