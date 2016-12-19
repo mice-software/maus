@@ -80,6 +80,7 @@ namespace MAUS {
     Json::Reader _reader;
     /// String denoting what PID hypotheses track matching should run with
     std::string _pid_hypothesis_string;
+    /// Beamline polarity, 1 for positive, -1 for negative
     int _beamline_polarity;
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
