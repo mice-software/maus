@@ -100,6 +100,16 @@ class MapCppTrackerPatternRecognition : public MapBase<Data> {
     */
   void extrapolate_straight_reference(SciFiEvent& event) const;
 
+  /** Deduce and fill the seed plane position and momentum for
+   * helical tracks
+   */
+  void extrapolate_helical_seed(SciFiEvent& event) const;
+
+  /** Deduce and fill the seed plane position and momentum for
+    * straight tracks
+    */
+  void extrapolate_straight_seed(SciFiEvent& event) const;
+
   /**
    * @brief Populate global parameter output for the straight pat rec tracks
    */

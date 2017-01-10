@@ -145,7 +145,9 @@ void MapCppTrackerPatternRecognition::_process(Data* data) const {
         _pattern_recognition.process(*event);
         set_straight_prtrack_global_output(event->straightprtracks());
         extrapolate_helical_reference(*event);
+        extrapolate_helical_seed(*event);
         extrapolate_straight_reference(*event);
+        extrapolate_straight_seed(*event);
       }
     }
   } else {
@@ -163,6 +165,7 @@ void MapCppTrackerPatternRecognition::_set_field_values(SciFiEvent* event) const
   event->set_range_field_up(_geometry_helper.GetFieldRange(0));
   event->set_range_field_down(_geometry_helper.GetFieldRange(1));
 }
+
 
 void MapCppTrackerPatternRecognition::extrapolate_helical_reference(SciFiEvent& event) const {
   SciFiHelicalPRTrackPArray helicals = event.helicalprtracks();
@@ -233,6 +236,72 @@ void MapCppTrackerPatternRecognition::extrapolate_straight_reference(SciFiEvent&
 
     track->set_reference_position(pos);
     track->set_reference_momentum(mom);
+  }
+}
+
+
+void MapCppTrackerPatternRecognition::extrapolate_helical_seed(SciFiEvent& event) const {
+  SciFiHelicalPRTrackPArray helicals = event.helicalprtracks();
+  size_t num_tracks = helicals.size();
+
+  for (size_t i = 0; i < num_tracks; ++i) {
+    SciFiHelicalPRTrack* track = helicals[i];
+    ThreeVector pos;
+    ThreeVector mom;
+
+    int tracker = track->get_tracker();
+    double length = _geometry_helper.GetPlanePosition(tracker, 5, 2);
+
+    double r  = track->get_R();
+    double pt = - track->get_charge()*CLHEP::c_light*_geometry_helper.GetFieldValue(tracker)*r;
+    double dsdz = - track->get_dsdz();
+    double x0 = track->get_circle_x0();
+    double y0 = track->get_circle_y0();
+    double s = (track->get_line_sz_c() - length*dsdz);
+    double phi = s / r;
+
+    pos.setX(x0 + r*cos(phi));
+    pos.setY(y0 + r*sin(phi));
+    pos.setZ(length);
+
+    mom.setX(-pt*sin(phi));
+    mom.setY(pt*cos(phi));
+    mom.setZ(-pt/dsdz);
+
+    track->set_seed_position(pos);
+    track->set_seed_momentum(mom);
+  }
+}
+
+
+void MapCppTrackerPatternRecognition::extrapolate_straight_seed(SciFiEvent& event) const {
+  SciFiStraightPRTrackPArray straights = event.straightprtracks();
+  size_t num_tracks = straights.size();
+
+  for (size_t i = 0; i < num_tracks; ++i) {
+    SciFiStraightPRTrack* track = straights[i];
+    ThreeVector pos;
+    ThreeVector mom;
+    double default_mom = _geometry_helper.GetDefaultMomentum();
+
+    int tracker = track->get_tracker();
+    double length = _geometry_helper.GetPlanePosition(tracker, 5, 2);
+    ThreeVector reference = _geometry_helper.GetReferencePosition(tracker);
+
+    pos.setX(track->get_x0());
+    pos.setY(track->get_y0());
+    pos.setZ(length);
+
+    double mx = track->get_mx();
+    double my = track->get_my();
+    mom.setX(mx*default_mom);
+    mom.setY(my*default_mom);
+    mom.setZ(default_mom);
+    if (tracker == 0) mom *= -1.0;
+    mom.setZ(fabs(mom.z()));
+
+    track->set_seed_position(pos);
+    track->set_seed_momentum(mom);
   }
 }
 
