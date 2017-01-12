@@ -29,6 +29,8 @@ PyMODINIT_FUNC init_MapCppTrackerPatternRecognition(void) {
 
 MapCppTrackerPatternRecognition::MapCppTrackerPatternRecognition()
                                           : MapBase<Data>("MapCppTrackerPatternRecognition"),
+                                            _upstream_correction(2),
+                                            _downstream_correction(2),
                                             _up_straight_pr_on(true),
                                             _down_straight_pr_on(true),
                                             _up_helical_pr_on(true),
@@ -56,6 +58,11 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   int user_down_straight_pr_on = (*json)["SciFiPRStraightTkDSOn"].asInt();
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
   _patrec_debug_on    = (*json)["SciFiPatRecDebugOn"].asBool();
+
+  _correct_seed_momentum = (bool)(*json)["SciFiPRCorrectSeed"].asInt();
+  if (_correct_seed_momentum) {
+    _load_momentum_corrections((*json)["SciFiPRCorrectionsFile"].asString());
+  } 
 
   // Build the geometery helper instance
   MiceModule* module = Globals::GetReconstructionMiceModules();
@@ -268,6 +275,17 @@ void MapCppTrackerPatternRecognition::extrapolate_helical_seed(SciFiEvent& event
     mom.setY(pt*cos(phi));
     mom.setZ(-pt/dsdz);
 
+    if (_correct_seed_momentum) {
+      double old_p = sqrt(mom.x()*mom.x() + mom.y()*mom.y() + mom.z()*mom.z());
+      if (tracker == 0) {
+        double new_p = _upstream_correction[0] + _upstream_correction[1]*old_p;
+        mom *= new_p/old_p;
+      } else {
+        double new_p = _downstream_correction[0] + _downstream_correction[1]*old_p;
+        mom *= new_p/old_p;
+      }
+    }
+
     track->set_seed_position(pos);
     track->set_seed_momentum(mom);
   }
@@ -319,6 +337,19 @@ void MapCppTrackerPatternRecognition::set_straight_prtrack_global_output(
     trk->set_global_y0(global_params[2]);
     trk->set_global_my(global_params[3]);
   }
+}
+
+
+void MapCppTrackerPatternRecognition::_load_momentum_corrections(std::string filename) {
+  TFile corrections_file(filename.c_str(), "READ");
+
+  TVectorD* upstream = (TVectorD*)corrections_file.Get("upstream_correction_parameters");
+  TVectorD* downstream = (TVectorD*)corrections_file.Get("downstream_correction_parameters");
+
+  _upstream_correction = (*upstream);
+  _downstream_correction = (*downstream);
+
+  corrections_file.Close();
 }
 
 } // ~namespace MAUS

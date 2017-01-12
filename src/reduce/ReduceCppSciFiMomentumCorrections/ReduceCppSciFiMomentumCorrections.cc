@@ -39,12 +39,13 @@ namespace MAUS {
 
   void ReduceCppSciFiMomentumCorrections::_birth(const std::string& argJsonConfigDocument) {
     _classname = "ReduceCppSciFiMomentumCorrections";
-    _corrections_filename = "SciFiMomentumCorrections.root";
+//    _corrections_filename = "SciFiMomentumCorrections.root";
 
     // JsonCpp setup - check file parses correctly, if not return false
     Json::Value _configJSON;
     try {
       _configJSON = JsonWrapper::StringToJson(argJsonConfigDocument);
+      _corrections_filename = _configJSON["SciFiPRCorrectionsOutputFile"].asString();
     } catch (Exceptions::Exception& exc) {
       MAUS::CppErrorHandler::getInstance()->HandleExceptionNoJson(exc, _classname);
     } catch (std::exception& exc) {
@@ -75,13 +76,36 @@ namespace MAUS {
                                                            200, 100.0, 300.0, 200, -100.0, 100.0 );
 
     _up_p_residual_pt = TH2F( "SMC_up_p_residual_pt", "Upstream p Residual vs p_{#perp}",
-                                                           200, 0.0, 200.0, 200, -100.0, 100.0 );
+                                                             200, 0.0, 200.0, 200, -100.0, 100.0 );
     _down_p_residual_pt = TH2F( "SMC_down_p_residual_pt", "Downstream p Residual vs p_{#perp}",
-                                                           200, 0.0, 200.0, 200, -100.0, 100.0 );
+                                                             200, 0.0, 200.0, 200, -100.0, 100.0 );
     _up_p_residual_pz = TH2F( "SMC_up_p_residual_pz", "Upstream p Residual vs p_{z}",
                                                            200, 100.0, 300.0, 200, -100.0, 100.0 );
     _down_p_residual_pz = TH2F( "SMC_down_p_residual_pz", "Downstream p Residual vs p_{z}",
                                                            200, 100.0, 300.0, 200, -100.0, 100.0 );
+
+    _up_profile_p = TProfile( "SMC_up_profile_p", "Upstream p Profile vs p",
+                                                                200, 100.0, 300.0, -100.0, 100.0 );
+    _up_profile_pz = TProfile( "SMC_up_profile_pz", "Upstream p_{z} Profile vs p_{z}", 
+                                                                200, 100.0, 300.0, -100.0, 100.0 );
+    _up_profile_pt = TProfile( "SMC_up_profile_pt", "Upstream p_{#perp} Profile vs p_{#perp}", 
+                                                                  200, 0.0, 200.0, -100.0, 100.0 );
+    _down_profile_p = TProfile( "SMC_down_profile_p", "Downstream p Profile vs p",
+                                                                200, 100.0, 300.0, -100.0, 100.0 );
+    _down_profile_pz = TProfile( "SMC_down_profile_pz", "Downstream p_{z} Profile vs p_{z}",
+                                                                200, 100.0, 300.0, -100.0, 100.0 );
+    _down_profile_pt = TProfile( "SMC_down_profile_pt", "Upstream p_{#perp} Profile vs p_{#perp}", 
+                                                                  200, 0.0, 200.0, -100.0, 100.0 );
+
+    _up_p_profile_pt = TProfile( "SMC_up_p_profile_pt", "Upstream p Profile vs p_{#perp}",
+                                                                  200, 0.0, 200.0, -100.0, 100.0 );
+    _down_p_profile_pt = TProfile( "SMC_down_p_profile_pt", "Downstream p Profile vs p_{#perp}",
+                                                                  200, 0.0, 200.0, -100.0, 100.0 );
+    _up_p_profile_pz = TProfile( "SMC_up_p_profile_pz", "Upstream p Profile vs p_{z}",
+                                                                200, 100.0, 300.0, -100.0, 100.0 );
+    _down_p_profile_pz = TProfile( "SMC_down_p_profile_pz", "Downstream p Profile vs p_{z}",
+                                                                200, 100.0, 300.0, -100.0, 100.0 );
+
   }
 
 
@@ -116,20 +140,28 @@ namespace MAUS {
           SciFiHelicalPRTrack* upstream_track = 0;
           SciFiHelicalPRTrack* downstream_track = 0;
           if (!_getHelicalTracks(scifi_event, upstream_track, downstream_track)) {
-            std::cerr << "HERE1 : " << upstream_track << " | " << downstream_track << "\n";
             continue;
           }
 
           VirtualHit* upstream_truth = 0;
           VirtualHit* downstream_truth = 0;
           if (!_getMCTracks(mc_event, upstream_truth, downstream_truth)) {
-            std::cerr << "HERE2 : " << upstream_truth << " | " << downstream_truth << "\n";
             continue;
           }
 
-          double up_pr_px = upstream_track->get_seed_momentum().x(); // LOCAL TO TRACKER COORDINATES!!!
-          double up_pr_py = upstream_track->get_seed_momentum().y(); // FIX THIS!
-          double up_pr_pz = upstream_track->get_seed_momentum().z();
+          ThreeVector upstream_PR_mom = upstream_track->get_seed_momentum(); // Local Coordinates for Kalman
+          ThreeVector downstream_PR_mom = downstream_track->get_seed_momentum(); // Local Coordinates for Kalman
+
+          CLHEP::HepRotation up_reference_rot = _geometry_helper.GetReferenceRotation(0);
+          CLHEP::HepRotation down_reference_rot = _geometry_helper.GetReferenceRotation(1);
+
+          upstream_PR_mom *= up_reference_rot; // Global Coordinates to compare to truth
+          downstream_PR_mom *= down_reference_rot; // Global Coordinates to compare to truth
+
+
+          double up_pr_px = upstream_PR_mom.x();
+          double up_pr_py = upstream_PR_mom.y();
+          double up_pr_pz = upstream_PR_mom.z();
           double up_pr_pt = sqrt(up_pr_px*up_pr_px + up_pr_py*up_pr_py);
           double up_pr_p = sqrt(up_pr_pt*up_pr_pt + up_pr_pz*up_pr_pz);
           double up_true_px = upstream_truth->GetMomentum().x();
@@ -139,13 +171,19 @@ namespace MAUS {
           double up_true_p = sqrt(up_true_pt*up_true_pt + up_true_pz*up_true_pz);
 
           _up_residual_p.Fill( up_true_p, up_pr_p-up_true_p);
-          _up_residual_pz.Fill( up_true_pz, -up_pr_pz+up_true_pz);
+          _up_residual_pz.Fill( up_true_pz, up_pr_pz-up_true_pz);
           _up_p_residual_pt.Fill( up_true_pt, up_pr_p-up_true_p);
           _up_p_residual_pz.Fill( up_true_pz, up_pr_p-up_true_p);
+          
+          _up_profile_p.Fill(up_true_p, up_pr_p-up_true_p);
+          _up_profile_pz.Fill( up_true_pz, -up_pr_pz+up_true_pz);
+          _up_profile_pt.Fill( up_true_pt, up_pr_pt-up_true_pt);
+          _up_p_profile_pt.Fill( up_true_pt, up_pr_p-up_true_p);
+          _up_p_profile_pz.Fill( up_true_pz, up_pr_p-up_true_p);
 
-          double down_pr_px = downstream_track->get_seed_momentum().x();
-          double down_pr_py = downstream_track->get_seed_momentum().y();
-          double down_pr_pz = downstream_track->get_seed_momentum().z();
+          double down_pr_px = downstream_PR_mom.x();
+          double down_pr_py = downstream_PR_mom.y();
+          double down_pr_pz = downstream_PR_mom.z();
           double down_pr_pt = sqrt(down_pr_px*down_pr_px + down_pr_py*down_pr_py);
           double down_pr_p = sqrt(down_pr_pt*down_pr_pt + down_pr_pz*down_pr_pz);
           double down_true_px = downstream_truth->GetMomentum().x();
@@ -158,6 +196,12 @@ namespace MAUS {
           _down_residual_pz.Fill( down_true_pz, down_pr_pz-down_true_pz);
           _down_p_residual_pt.Fill( down_true_pt, down_pr_p-down_true_p);
           _down_p_residual_pz.Fill( down_true_pz, down_pr_p-down_true_p);
+
+          _down_profile_p.Fill( down_true_p, down_pr_p-down_true_p);
+          _down_profile_pz.Fill( down_true_pz, down_pr_pz-down_true_pz);
+          _down_profile_pt.Fill( down_true_pt, down_pr_pt-down_true_pt);
+          _down_p_profile_pt.Fill( down_true_pt, down_pr_p-down_true_p);
+          _down_p_profile_pz.Fill( down_true_pz, down_pr_p-down_true_p);
 
           delete upstream_track;
           delete downstream_track;
@@ -182,6 +226,39 @@ namespace MAUS {
     _up_p_residual_pz.Write();
     _down_p_residual_pt.Write();
     _down_p_residual_pz.Write();
+
+    _up_profile_p.Write();
+    _up_profile_pz.Write();
+    _up_profile_pt.Write();
+    _down_profile_p.Write();
+    _down_profile_pz.Write();
+    _down_profile_pt.Write();
+
+    _up_p_profile_pt.Write();
+    _up_p_profile_pz.Write();
+    _down_p_profile_pt.Write();
+    _down_p_profile_pz.Write();
+
+    _up_profile_p.Fit("pol1", "QFS");
+    TF1* upstream_func = _up_profile_p.GetFunction("pol1");
+
+    _down_profile_p.Fit("pol1", "QFS");
+    TF1* downstream_func = _down_profile_p.GetFunction("pol1");
+
+    TVectorD up_correction(2);
+    up_correction[0] = -upstream_func->GetParameter(0)/(upstream_func->GetParameter(1) + 1.0);
+    up_correction[1] = 1.0/(upstream_func->GetParameter(1) + 1.0);
+
+    TVectorD down_correction(2);
+    down_correction[0] = -downstream_func->GetParameter(0)/(downstream_func->GetParameter(1) + 1.0);
+    down_correction[1] = 1.0/(downstream_func->GetParameter(1) + 1.0);
+
+    upstream_func->Write("upstream_fit_function");
+    downstream_func->Write("downstream_fit_function");
+
+    up_correction.Write("upstream_correction_parameters");
+    down_correction.Write("downstream_correction_parameters");
+
     outfile.Close();
   }
 

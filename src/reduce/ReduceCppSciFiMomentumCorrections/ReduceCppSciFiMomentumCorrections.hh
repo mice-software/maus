@@ -41,6 +41,9 @@
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
 
 
+#include "TProfile.h"
+#include "TF1.h"
+#include "TVectorD.h"
 #include "TH2F.h"
 #include "TFile.h"
 
@@ -119,6 +122,18 @@ class ReduceCppSciFiMomentumCorrections : public ReduceBase<Data, Data> {
     TH2F _down_p_residual_pt;
     TH2F _up_p_residual_pz;
     TH2F _down_p_residual_pz;
+
+    TProfile _up_profile_p;
+    TProfile _down_profile_p;
+    TProfile _up_profile_pz;
+    TProfile _down_profile_pz;
+    TProfile _up_profile_pt;
+    TProfile _down_profile_pt;
+    TProfile _up_p_profile_pt;
+    TProfile _down_p_profile_pt;
+    TProfile _up_p_profile_pz;
+    TProfile _down_p_profile_pz;
+
     int _upstream_virtual_plane;
     int _downstream_virtual_plane;
 };

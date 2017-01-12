@@ -41,6 +41,9 @@
 #include "Utils/Squeak.hh"
 #include "Config/MiceModule.hh"
 
+#include "TFile.h"
+#include "TVectorD.h"
+
 #include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -118,9 +121,14 @@ class MapCppTrackerPatternRecognition : public MapBase<Data> {
 
  private:
   void _set_field_values(SciFiEvent* event) const;
+  void _load_momentum_corrections(std::string filename);
 
   /// This will contain the configuration
   Json::Value _configJSON;
+
+  bool _correct_seed_momentum;
+  TVectorD _upstream_correction;
+  TVectorD _downstream_correction;
 
   bool _up_straight_pr_on;
   bool _down_straight_pr_on;
