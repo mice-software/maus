@@ -24,6 +24,8 @@
 #ifndef _REDUCECPPSCIFIMOMCORRECTIONS_H
 #define _REDUCECPPSCIFIMOMCORRECTIONS_H
 
+#include <string>
+
 #include "json/json.h"
 
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -40,7 +42,6 @@
 #include "src/common_cpp/API/ReduceBase.hh"
 #include "src/common_cpp/API/PyWrapReduceBase.hh"
 
-
 #include "TProfile.h"
 #include "TF1.h"
 #include "TVectorD.h"
@@ -55,7 +56,7 @@ class Data;
 class ReduceCppSciFiMomentumCorrections : public ReduceBase<Data, Data> {
 
   public:
-    ReduceCppSciFiMomentumCorrections() : 
+    ReduceCppSciFiMomentumCorrections() :
       ReduceBase<Data, Data>("ReduceCppSciFiMomentumCorrections") {}
 
     ~ReduceCppSciFiMomentumCorrections();

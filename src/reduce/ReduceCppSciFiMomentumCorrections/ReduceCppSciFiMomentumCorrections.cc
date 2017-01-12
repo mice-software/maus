@@ -17,6 +17,7 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "src/reduce/ReduceCppSciFiMomentumCorrections/ReduceCppSciFiMomentumCorrections.hh"
 
@@ -66,46 +67,45 @@ namespace MAUS {
     _downstream_virtual_plane = _findVirtualPlane(downstream_z);
 
     // Setup some histograms to fill
-    _up_residual_p = TH2F( "SMC_up_residual_p", "Upstream p Residual vs p",
-                                                           200, 100.0, 300.0, 200, -100.0, 100.0 );
-    _up_residual_pz = TH2F( "SMC_up_residual_pz", "Upstream p_{z} Residual vs p_{z}", 
-                                                           200, 100.0, 300.0, 200, -100.0, 100.0 );
-    _down_residual_p = TH2F( "SMC_down_residual_p", "Downstream p Residual vs p",
-                                                           200, 100.0, 300.0, 200, -100.0, 100.0 );
-    _down_residual_pz = TH2F( "SMC_down_residual_pz", "Downstream p_{z} Residual vs p_{z}",
-                                                           200, 100.0, 300.0, 200, -100.0, 100.0 );
+    _up_residual_p = TH2F("SMC_up_residual_p", "Upstream p Residual vs p",
+                                                           200, 100.0, 300.0, 200, -100.0, 100.0);
+    _up_residual_pz = TH2F("SMC_up_residual_pz", "Upstream p_{z} Residual vs p_{z}",
+                                                           200, 100.0, 300.0, 200, -100.0, 100.0);
+    _down_residual_p = TH2F("SMC_down_residual_p", "Downstream p Residual vs p",
+                                                           200, 100.0, 300.0, 200, -100.0, 100.0);
+    _down_residual_pz = TH2F("SMC_down_residual_pz", "Downstream p_{z} Residual vs p_{z}",
+                                                           200, 100.0, 300.0, 200, -100.0, 100.0);
 
-    _up_p_residual_pt = TH2F( "SMC_up_p_residual_pt", "Upstream p Residual vs p_{#perp}",
-                                                             200, 0.0, 200.0, 200, -100.0, 100.0 );
-    _down_p_residual_pt = TH2F( "SMC_down_p_residual_pt", "Downstream p Residual vs p_{#perp}",
-                                                             200, 0.0, 200.0, 200, -100.0, 100.0 );
-    _up_p_residual_pz = TH2F( "SMC_up_p_residual_pz", "Upstream p Residual vs p_{z}",
-                                                           200, 100.0, 300.0, 200, -100.0, 100.0 );
-    _down_p_residual_pz = TH2F( "SMC_down_p_residual_pz", "Downstream p Residual vs p_{z}",
-                                                           200, 100.0, 300.0, 200, -100.0, 100.0 );
+    _up_p_residual_pt = TH2F("SMC_up_p_residual_pt", "Upstream p Residual vs p_{#perp}",
+                                                             200, 0.0, 200.0, 200, -100.0, 100.0);
+    _down_p_residual_pt = TH2F("SMC_down_p_residual_pt", "Downstream p Residual vs p_{#perp}",
+                                                             200, 0.0, 200.0, 200, -100.0, 100.0);
+    _up_p_residual_pz = TH2F("SMC_up_p_residual_pz", "Upstream p Residual vs p_{z}",
+                                                           200, 100.0, 300.0, 200, -100.0, 100.0);
+    _down_p_residual_pz = TH2F("SMC_down_p_residual_pz", "Downstream p Residual vs p_{z}",
+                                                           200, 100.0, 300.0, 200, -100.0, 100.0);
 
-    _up_profile_p = TProfile( "SMC_up_profile_p", "Upstream p Profile vs p",
-                                                                200, 100.0, 300.0, -100.0, 100.0 );
-    _up_profile_pz = TProfile( "SMC_up_profile_pz", "Upstream p_{z} Profile vs p_{z}", 
-                                                                200, 100.0, 300.0, -100.0, 100.0 );
-    _up_profile_pt = TProfile( "SMC_up_profile_pt", "Upstream p_{#perp} Profile vs p_{#perp}", 
-                                                                  200, 0.0, 200.0, -100.0, 100.0 );
-    _down_profile_p = TProfile( "SMC_down_profile_p", "Downstream p Profile vs p",
-                                                                200, 100.0, 300.0, -100.0, 100.0 );
-    _down_profile_pz = TProfile( "SMC_down_profile_pz", "Downstream p_{z} Profile vs p_{z}",
-                                                                200, 100.0, 300.0, -100.0, 100.0 );
-    _down_profile_pt = TProfile( "SMC_down_profile_pt", "Upstream p_{#perp} Profile vs p_{#perp}", 
-                                                                  200, 0.0, 200.0, -100.0, 100.0 );
+    _up_profile_p = TProfile("SMC_up_profile_p", "Upstream p Profile vs p",
+                                                                200, 100.0, 300.0, -100.0, 100.0);
+    _up_profile_pz = TProfile("SMC_up_profile_pz", "Upstream p_{z} Profile vs p_{z}",
+                                                                200, 100.0, 300.0, -100.0, 100.0);
+    _up_profile_pt = TProfile("SMC_up_profile_pt", "Upstream p_{#perp} Profile vs p_{#perp}",
+                                                                  200, 0.0, 200.0, -100.0, 100.0);
+    _down_profile_p = TProfile("SMC_down_profile_p", "Downstream p Profile vs p",
+                                                                200, 100.0, 300.0, -100.0, 100.0);
+    _down_profile_pz = TProfile("SMC_down_profile_pz", "Downstream p_{z} Profile vs p_{z}",
+                                                                200, 100.0, 300.0, -100.0, 100.0);
+    _down_profile_pt = TProfile("SMC_down_profile_pt", "Upstream p_{#perp} Profile vs p_{#perp}",
+                                                                  200, 0.0, 200.0, -100.0, 100.0);
 
-    _up_p_profile_pt = TProfile( "SMC_up_p_profile_pt", "Upstream p Profile vs p_{#perp}",
-                                                                  200, 0.0, 200.0, -100.0, 100.0 );
-    _down_p_profile_pt = TProfile( "SMC_down_p_profile_pt", "Downstream p Profile vs p_{#perp}",
-                                                                  200, 0.0, 200.0, -100.0, 100.0 );
-    _up_p_profile_pz = TProfile( "SMC_up_p_profile_pz", "Upstream p Profile vs p_{z}",
-                                                                200, 100.0, 300.0, -100.0, 100.0 );
-    _down_p_profile_pz = TProfile( "SMC_down_p_profile_pz", "Downstream p Profile vs p_{z}",
-                                                                200, 100.0, 300.0, -100.0, 100.0 );
-
+    _up_p_profile_pt = TProfile("SMC_up_p_profile_pt", "Upstream p Profile vs p_{#perp}",
+                                                                  200, 0.0, 200.0, -100.0, 100.0);
+    _down_p_profile_pt = TProfile("SMC_down_p_profile_pt", "Downstream p Profile vs p_{#perp}",
+                                                                  200, 0.0, 200.0, -100.0, 100.0);
+    _up_p_profile_pz = TProfile("SMC_up_p_profile_pz", "Upstream p Profile vs p_{z}",
+                                                                200, 100.0, 300.0, -100.0, 100.0);
+    _down_p_profile_pz = TProfile("SMC_down_p_profile_pz", "Downstream p Profile vs p_{z}",
+                                                                200, 100.0, 300.0, -100.0, 100.0);
   }
 
 
@@ -148,9 +148,9 @@ namespace MAUS {
           if (!_getMCTracks(mc_event, upstream_truth, downstream_truth)) {
             continue;
           }
-
-          ThreeVector upstream_PR_mom = upstream_track->get_seed_momentum(); // Local Coordinates for Kalman
-          ThreeVector downstream_PR_mom = downstream_track->get_seed_momentum(); // Local Coordinates for Kalman
+          // These are in Local Coordinates for Kalman
+          ThreeVector upstream_PR_mom = upstream_track->get_seed_momentum();
+          ThreeVector downstream_PR_mom = downstream_track->get_seed_momentum();
 
           CLHEP::HepRotation up_reference_rot = _geometry_helper.GetReferenceRotation(0);
           CLHEP::HepRotation down_reference_rot = _geometry_helper.GetReferenceRotation(1);
@@ -170,16 +170,16 @@ namespace MAUS {
           double up_true_pt = sqrt(up_true_px*up_true_px + up_true_py*up_true_py);
           double up_true_p = sqrt(up_true_pt*up_true_pt + up_true_pz*up_true_pz);
 
-          _up_residual_p.Fill( up_true_p, up_pr_p-up_true_p);
-          _up_residual_pz.Fill( up_true_pz, up_pr_pz-up_true_pz);
-          _up_p_residual_pt.Fill( up_true_pt, up_pr_p-up_true_p);
-          _up_p_residual_pz.Fill( up_true_pz, up_pr_p-up_true_p);
-          
+          _up_residual_p.Fill(up_true_p, up_pr_p-up_true_p);
+          _up_residual_pz.Fill(up_true_pz, up_pr_pz-up_true_pz);
+          _up_p_residual_pt.Fill(up_true_pt, up_pr_p-up_true_p);
+          _up_p_residual_pz.Fill(up_true_pz, up_pr_p-up_true_p);
+
           _up_profile_p.Fill(up_true_p, up_pr_p-up_true_p);
-          _up_profile_pz.Fill( up_true_pz, -up_pr_pz+up_true_pz);
-          _up_profile_pt.Fill( up_true_pt, up_pr_pt-up_true_pt);
-          _up_p_profile_pt.Fill( up_true_pt, up_pr_p-up_true_p);
-          _up_p_profile_pz.Fill( up_true_pz, up_pr_p-up_true_p);
+          _up_profile_pz.Fill(up_true_pz, -up_pr_pz+up_true_pz);
+          _up_profile_pt.Fill(up_true_pt, up_pr_pt-up_true_pt);
+          _up_p_profile_pt.Fill(up_true_pt, up_pr_p-up_true_p);
+          _up_p_profile_pz.Fill(up_true_pz, up_pr_p-up_true_p);
 
           double down_pr_px = downstream_PR_mom.x();
           double down_pr_py = downstream_PR_mom.y();
@@ -192,16 +192,16 @@ namespace MAUS {
           double down_true_pt = sqrt(down_true_px*down_true_px + down_true_py*down_true_py);
           double down_true_p = sqrt(down_true_pt*down_true_pt + down_true_pz*down_true_pz);
 
-          _down_residual_p.Fill( down_true_p, down_pr_p-down_true_p);
-          _down_residual_pz.Fill( down_true_pz, down_pr_pz-down_true_pz);
-          _down_p_residual_pt.Fill( down_true_pt, down_pr_p-down_true_p);
-          _down_p_residual_pz.Fill( down_true_pz, down_pr_p-down_true_p);
+          _down_residual_p.Fill(down_true_p, down_pr_p-down_true_p);
+          _down_residual_pz.Fill(down_true_pz, down_pr_pz-down_true_pz);
+          _down_p_residual_pt.Fill(down_true_pt, down_pr_p-down_true_p);
+          _down_p_residual_pz.Fill(down_true_pz, down_pr_p-down_true_p);
 
-          _down_profile_p.Fill( down_true_p, down_pr_p-down_true_p);
-          _down_profile_pz.Fill( down_true_pz, down_pr_pz-down_true_pz);
-          _down_profile_pt.Fill( down_true_pt, down_pr_pt-down_true_pt);
-          _down_p_profile_pt.Fill( down_true_pt, down_pr_p-down_true_p);
-          _down_p_profile_pz.Fill( down_true_pz, down_pr_p-down_true_p);
+          _down_profile_p.Fill(down_true_p, down_pr_p-down_true_p);
+          _down_profile_pz.Fill(down_true_pz, down_pr_pz-down_true_pz);
+          _down_profile_pt.Fill(down_true_pt, down_pr_pt-down_true_pt);
+          _down_p_profile_pt.Fill(down_true_pt, down_pr_p-down_true_p);
+          _down_p_profile_pz.Fill(down_true_pz, down_pr_p-down_true_p);
 
           delete upstream_track;
           delete downstream_track;
@@ -212,6 +212,12 @@ namespace MAUS {
     } else {
       Squeak::mout(Squeak::error) << "Failed to import spill from data\n";
     } // check for spill
+
+    if (_output && _own_output) {
+      delete _output;
+    }
+    _output = data_cpp;
+    _own_output = false;
   }
 
 
@@ -263,10 +269,10 @@ namespace MAUS {
   }
 
 
-  bool ReduceCppSciFiMomentumCorrections::_getHelicalTracks(SciFiEvent* event, 
+  bool ReduceCppSciFiMomentumCorrections::_getHelicalTracks(SciFiEvent* event,
                                             SciFiHelicalPRTrack*& up, SciFiHelicalPRTrack*& down) {
     SciFiHelicalPRTrackPArray tracks = event->helicalprtracks();
-    if (tracks.size() == 2 ) {
+    if (tracks.size() == 2) {
       for (unsigned int i = 0; i < 2; ++i) {
         if (tracks[i]->get_tracker() == 0) {
           up = new SciFiHelicalPRTrack(*tracks[i]);
@@ -292,11 +298,11 @@ namespace MAUS {
   }
 
 
-  bool ReduceCppSciFiMomentumCorrections::_getMCTracks(MCEvent* event, 
+  bool ReduceCppSciFiMomentumCorrections::_getMCTracks(MCEvent* event,
                                                               VirtualHit*& up, VirtualHit*& down) {
     VirtualHitArray* virts = event->GetVirtualHits();
 
-    for (VirtualHitArray::iterator it = virts->begin(); it != virts->end(); ++it ) {
+    for (VirtualHitArray::iterator it = virts->begin(); it != virts->end(); ++it) {
       if (it->GetStationId() == _upstream_virtual_plane) {
         up = new VirtualHit((*it));
       }
@@ -316,7 +322,7 @@ namespace MAUS {
       delete down;
       down = 0;
     }
-    
+
     return false;
   }
 

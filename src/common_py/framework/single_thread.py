@@ -196,6 +196,7 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
         # if we converted to a different representation, delete the old one
         try:
             maus_cpp.converter.del_data_repr(event)
+            maus_cpp.converter.del_data_repr(redevent)
         except: # pylint: disable = W0702
             pass
 

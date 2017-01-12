@@ -59,10 +59,10 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
   _patrec_debug_on    = (*json)["SciFiPatRecDebugOn"].asBool();
 
-  _correct_seed_momentum = (bool)(*json)["SciFiPRCorrectSeed"].asInt();
+  _correct_seed_momentum = static_cast<bool>((*json)["SciFiPRCorrectSeed"].asInt());
   if (_correct_seed_momentum) {
     _load_momentum_corrections((*json)["SciFiPRCorrectionsFile"].asString());
-  } 
+  }
 
   // Build the geometery helper instance
   MiceModule* module = Globals::GetReconstructionMiceModules();
@@ -343,8 +343,10 @@ void MapCppTrackerPatternRecognition::set_straight_prtrack_global_output(
 void MapCppTrackerPatternRecognition::_load_momentum_corrections(std::string filename) {
   TFile corrections_file(filename.c_str(), "READ");
 
-  TVectorD* upstream = (TVectorD*)corrections_file.Get("upstream_correction_parameters");
-  TVectorD* downstream = (TVectorD*)corrections_file.Get("downstream_correction_parameters");
+  TVectorD* upstream = reinterpret_cast<TVectorD*>(
+                                           corrections_file.Get("upstream_correction_parameters"));
+  TVectorD* downstream = reinterpret_cast<TVectorD*>(
+                                         corrections_file.Get("downstream_correction_parameters"));
 
   _upstream_correction = (*upstream);
   _downstream_correction = (*downstream);
