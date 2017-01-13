@@ -142,6 +142,7 @@ class Beam(): # pylint: disable=R0902
         self.range_radius = 0.0
         self.range_pt = 0.0
         self.range_p = [0.0, 0.0]
+        self.bz = None
         self.beam_seed = 0
         self.particle_seed_algorithm = ""
         #############################################
@@ -245,7 +246,10 @@ class Beam(): # pylint: disable=R0902
               ref['p'], beam_def['normalised_angular_momentum'], beam_def['bz'],
               ref['charge'])
         elif self.transverse_mode == "uniform" :
-            self.range_radius = beam_def['range_radius']
+            if 'fit_solenoid' in beam_def:
+                self.bz = beam_def['fit_solenoid']
+            else:
+                self.range_radius = beam_def['range_radius']
             self.range_pt = beam_def['range_pt']
         else:
             raise ValueError('Did not recognise beam transverse mode '+\
@@ -448,14 +452,18 @@ class Beam(): # pylint: disable=R0902
             particle_array[5] = self.beam_mean[5]
         # time distribution is special
         if self.transverse_mode == "uniform":
-            r = numpy.random.random()*self.range_radius
             pt = numpy.random.random()*self.range_pt
-            theta_r = numpy.random.random()*2.0*math.pi
             theta_pt = numpy.random.random()*2.0*math.pi
-            particle_array[0] = r*math.cos(theta_r)
             particle_array[1] = pt*math.cos(theta_pt)
-            particle_array[2] = r*math.sin(theta_r)
             particle_array[3] = pt*math.sin(theta_pt)
+            if self.bz is None :
+                r = numpy.random.random()*self.range_radius
+                theta_r = numpy.random.random()*2.0*math.pi
+                particle_array[0] = r*math.cos(theta_r)
+                particle_array[2] = r*math.sin(theta_r)
+            else:
+                particle_array[0] = particle_array[1] / (self.bz*300.0)
+                particle_array[2] = -particle_array[3] / (self.bz*300.0)
         if self.longitudinal_mode == "uniform":
             p = numpy.random.random()*(self.range_p[1]-self.range_p[0]) \
                                                               + self.range_p[0]
