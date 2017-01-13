@@ -17,7 +17,7 @@ Configuration TrackerTest
     Volume None
     PropertyString SensitiveDetector Virtual
     PropertyBool RepeatModule2 True
-    PropertyInt NumberOfRepeats 100
+    PropertyInt NumberOfRepeats 200
     PropertyString IndependentVariable z
   }
 

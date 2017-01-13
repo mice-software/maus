@@ -462,8 +462,8 @@ class Beam(): # pylint: disable=R0902
                 particle_array[0] = r*math.cos(theta_r)
                 particle_array[2] = r*math.sin(theta_r)
             else:
-                particle_array[0] = particle_array[1] / (self.bz*300.0)
-                particle_array[2] = -particle_array[3] / (self.bz*300.0)
+                particle_array[0] = -particle_array[3] / (self.bz*300.0)
+                particle_array[2] = particle_array[1] / (self.bz*300.0)
         if self.longitudinal_mode == "uniform":
             p = numpy.random.random()*(self.range_p[1]-self.range_p[0]) \
                                                               + self.range_p[0]
