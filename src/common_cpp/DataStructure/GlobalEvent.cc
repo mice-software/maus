@@ -45,30 +45,6 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     return *this;
   }
 
-  // This is a deep copy operation; we go through, deepcopying data and
-  // processing any cross links (pointer-as-reference) so that they point into
-  // the new data structure
-  if (_primary_chains != NULL) {
-    if (!_primary_chains->empty())
-      for (size_t i = 0; i < _primary_chains->size(); ++i)
-        delete _primary_chains->at(i);
-    delete _primary_chains;
-  }
-  if (globalevent._primary_chains == NULL) {
-    _primary_chains = NULL;
-  } else {
-    _primary_chains =
-        new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
-    std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chain =
-        globalevent._primary_chains;
-    for (size_t i = 0; i < old_primary_chain->size(); ++i) {
-      DataStructure::Global::PrimaryChain* pchain =
-          new DataStructure::Global::PrimaryChain(*old_primary_chain->at(i));
-      _primary_chains->push_back(pchain);
-      // _primary_chains->push_back(old_primary_chain->at(i)->Clone());
-    }
-  }
-
   if (_space_points != NULL) {
     for (size_t i = 0; i < _space_points->size(); ++i)
       delete _space_points->at(i);
@@ -84,7 +60,6 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       DataStructure::Global::SpacePoint* sp =
           new DataStructure::Global::SpacePoint(*old_space_points->at(i));
       _space_points->push_back(sp);
-      // _space_points->push_back(old_space_points->at(i)->Clone());
     }
   }
 
@@ -103,11 +78,10 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       DataStructure::Global::TrackPoint* tp =
           new DataStructure::Global::TrackPoint(*old_track_points->at(i));
       _track_points->push_back(tp);
-      // _track_points->push_back(old_track_points->at(i)->Clone());
       // copy across also the space point pointer-as-reference to the new
       // structure
       MAUS::DataStructure::Global::SpacePoint* sp =
-                                        _track_points->at(i)->get_space_point();
+          _track_points->at(i)->get_space_point();
       if (!sp)
           continue;
       for (size_t j = 0; j < globalevent._space_points->size(); ++j) {
@@ -134,7 +108,7 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       DataStructure::Global::Track* temp_track =
           new DataStructure::Global::Track(*old_tracks->at(i));
       _tracks->push_back(temp_track);
-      // _tracks->push_back(old_tracks->at(i)->Clone());
+
       TRefArray* old_track_points_on_track = old_tracks->at(i)->get_track_points();
       TRefArray* new_track_points_on_track = new TRefArray(
           TProcessID::GetProcessWithUID(old_track_points_on_track));
@@ -147,7 +121,57 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
           }
         }
       }
+
+      TRefArray* old_constituent_tracks = old_tracks->at(i)->get_constituent_tracks();
+      TRefArray* new_constituent_tracks = new TRefArray(
+          TProcessID::GetProcessWithUID(old_constituent_tracks));
+      new_constituent_tracks->Expand(old_constituent_tracks->GetSize());
+      for (int j = 0; j < old_constituent_tracks->GetLast()+1; ++j) {
+        for (size_t k = 0; k < globalevent._tracks->size(); ++k) {
+          if (old_constituent_tracks->At(j) == globalevent._tracks->at(k)) {
+            new_constituent_tracks->AddAt(_tracks->at(k), j);
+            break;
+          }
+        }
+      }
+
       _tracks->at(i)->set_track_points(new_track_points_on_track);
+      _tracks->at(i)->set_constituent_tracks(new_constituent_tracks);
+    }
+  }
+
+  // This is a deep copy operation; we go through, deepcopying data and
+  // processing any cross links (pointer-as-reference) so that they point into
+  // the new data structure
+  if (_primary_chains != NULL) {
+    if (!_primary_chains->empty())
+      for (size_t i = 0; i < _primary_chains->size(); ++i)
+        delete _primary_chains->at(i);
+    delete _primary_chains;
+  }
+  if (globalevent._primary_chains == NULL) {
+    _primary_chains = NULL;
+  } else {
+    _primary_chains =
+        new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
+    std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chains =
+        globalevent._primary_chains;
+    for (size_t i = 0; i < old_primary_chains->size(); ++i) {
+      DataStructure::Global::PrimaryChain* pchain =
+          new DataStructure::Global::PrimaryChain(*old_primary_chains->at(i));
+      _primary_chains->push_back(pchain);
+      TRefArray* old_tracks = old_primary_chains->at(i)->get_tracks();
+      TRefArray* new_tracks = new TRefArray(TProcessID::GetProcessWithUID(old_tracks));
+      new_tracks->Expand(old_tracks->GetSize());
+      for (int j = 0; j < old_tracks->GetLast()+1; j++) {
+        for (size_t k = 0; k < globalevent._tracks->size(); k++) {
+          if (old_tracks->At(j) == globalevent._tracks->at(k)) {
+            new_tracks->AddAt(_tracks->at(k), j);
+            break;
+          }
+        }
+      }
+      _primary_chains->at(i)->set_tracks(new_tracks);
     }
   }
   return *this;
@@ -219,7 +243,6 @@ void GlobalEvent::add_track_recursive(
     MAUS::DataStructure::Global::Track* track) {
   // Add the Track, checking if it already exists in the GlobalEvent.
   bool already_added = add_track_check(track);
-
   // If the chain had been added, then we will loop over the
   // constituent tracks and track_points, adding them too.
   if (!already_added) {
