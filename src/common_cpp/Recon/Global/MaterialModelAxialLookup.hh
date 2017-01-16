@@ -124,10 +124,14 @@ class MaterialModelAxialLookup : public MaterialModel {
      */
     static double GetZTolerance() {return _z_tolerance;}
 
+    /** Set the z tolerance used to construct the lookup table
+     */
+    static void SetZTolerance(double z_tolerance) {_z_tolerance = z_tolerance;}
+
 
   private:
 
-    static constexpr double _z_tolerance = 1e-3;
+    static double _z_tolerance;
 
     static std::vector<std::pair<double, G4Material*> > _lookup; // references start position of the volume and material
 };

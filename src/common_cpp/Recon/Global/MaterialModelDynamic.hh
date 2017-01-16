@@ -72,9 +72,6 @@ class MaterialModelDynamic : public MaterialModel {
      */
     void SetMaterial(double x, double y, double z);
 
-    /** Return the stored material */
-    const G4Material* GetMaterial() const {return _material;}
-
   private:
 };
 

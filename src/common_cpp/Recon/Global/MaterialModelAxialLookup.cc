@@ -30,6 +30,7 @@
 
 namespace MAUS {
 
+double MaterialModelAxialLookup::_z_tolerance = 1e-3;
 std::vector<std::pair<double, G4Material*> > MaterialModelAxialLookup::_lookup;
 
 MaterialModelAxialLookup::MaterialModelAxialLookup(double x, double y, double z) {
