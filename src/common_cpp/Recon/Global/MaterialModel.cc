@@ -1,3 +1,20 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include <math.h>
 #include "Geant4/G4Material.hh"
 
@@ -9,7 +26,6 @@
 namespace MAUS {
 
 std::set<std::string> MaterialModel::_enabled_materials;
-std::set<std::string> MaterialModel::_disabled_materials;
 
 
 void MaterialModel::SetMaterial(const G4Material* material) {
@@ -116,11 +132,6 @@ std::ostream& MaterialModel::PrintMaterials(std::ostream& out) {
     for (std::set<std::string>::iterator it = _enabled_materials.begin();
          it != _enabled_materials.end(); ++it) {
         out << "    " << *it << "\n";
-    }
-    out << "Disabled materials:\n";
-    for (std::set<std::string>::iterator it = _disabled_materials.begin();
-         it != _disabled_materials.end(); ++it) {
-        out << "    " << *it << std::endl;
     }
     return out;
 }
