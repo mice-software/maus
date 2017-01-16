@@ -172,6 +172,21 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
         }
       }
       _primary_chains->at(i)->set_tracks(new_tracks);
+      MAUS::DataStructure::Global::PrimaryChain* us_daughter_chain =
+          _primary_chains->at(i)->GetUSDaughter();
+      MAUS::DataStructure::Global::PrimaryChain* ds_daughter_chain =
+          _primary_chains->at(i)->GetDSDaughter();
+      // A chain will always either have two or no daughters, never one
+      if (!us_daughter_chain) {
+        continue;
+      }
+      for (size_t j = 0; j < globalevent._primary_chains->size(); j++) {
+        if (globalevent._primary_chains->at(j) == us_daughter_chain) {
+          _primary_chains->at(i)->SetUSDaughter(_primary_chains->at(j));
+        } else if (globalevent._primary_chains->at(j) == ds_daughter_chain) {
+          _primary_chains->at(i)->SetDSDaughter(_primary_chains->at(j));
+        }
+      }
     }
   }
   return *this;
