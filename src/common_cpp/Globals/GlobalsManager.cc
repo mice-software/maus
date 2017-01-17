@@ -26,6 +26,8 @@
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+
+#include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
 
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -108,6 +110,8 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
                                                ->GetGeometry()->GetWorldVolume();
         process->_mc_geometry_navigator = new GeometryNavigator();
         process->_mc_geometry_navigator->Initialise(world);
+        double z_world = process->_recon_mods->propertyHep3Vector("Dimensions").z();
+        MaterialModelAxialLookup::BuildLookupTable(-z_world, z_world);
     } catch (Exceptions::Exception squee) {
         Globals::_process = NULL;
         delete process;
@@ -210,6 +214,13 @@ void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {
     Globals::_process->_mc_mods = mc_mods;
     if (mc_mods != NULL)
         Globals::_process->GetGeant4Manager()->SetMiceModules(*mc_mods);
+    G4VPhysicalVolume* world = Globals::_process->_maus_geant4_manager
+                                             ->GetGeometry()->GetWorldVolume();
+    delete Globals::_process->_mc_geometry_navigator;
+    Globals::_process->_mc_geometry_navigator = new GeometryNavigator();
+    Globals::_process->_mc_geometry_navigator->Initialise(world);
+    double z_world = mc_mods->propertyHep3Vector("Dimensions").z();
+    MaterialModelAxialLookup::BuildLookupTable(-z_world, z_world);
 }
 
 void GlobalsManager::SetLegacyCards(dataCards* legacy_cards) {

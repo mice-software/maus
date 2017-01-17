@@ -1,0 +1,460 @@
+Configuration Structure
+                       { 
+                           Dimensions 15000.0 10000.0 50000.0 mm
+                           PropertyString Material AIR 
+                           PropertyDouble G4StepMax 5.0 mm
+                           PropertyString GDMLFile geometry_07469/Step_IV.gdml  
+	                    // A Note on Rotations:
+			    // 
+	                    // This is the geometry configuration to be used with a simulated geometry sourced from GDML. All rotations follow the 
+			    // convention used by GEANT4 which applies CLHEP rotations in a "passive" mode rotating the coordinate systems of the 
+			    // simulated objects rather then the objects themselves. As such the rotations are defined such that positive angles 
+			    // produce a counter-clockwise rotation about the rotation axis when viewed in the direction of the axis of rotation.
+
+                            //Substitutions
+                            
+                            Substitution $beamStop true
+                            
+                            Substitution $diffuserThickness 0
+                            Substitution $protonAbsorberThickness true
+                                
+                            Substitution $D1Current 304.98999
+			    Substitution $D1Polarity 1
+                                
+                            Substitution $D2Current 91.484001
+			    Substitution $D2Polarity 1
+                                
+                            Substitution $DSCurrent 637.553101
+			    Substitution $DSPolarity 1
+                                
+                            Substitution $Q1Current 97.709999
+			    Substitution $Q1Polarity 1
+                                
+                            Substitution $Q2Current 122.129997
+			    Substitution $Q2Polarity 1
+                                
+                            Substitution $Q3Current 84.910004
+			    Substitution $Q3Polarity 1
+                                
+                            Substitution $Q4Current 153.524002
+			    Substitution $Q4Polarity 1
+                                
+                                
+                            Substitution $Q5Current 205.759995
+			    Substitution $Q5Polarity 1
+
+                            Substitution $Q6Current 136.395996
+			    Substitution $Q6Polarity 1
+                                
+                            Substitution $Q7Current 133.908005
+			    Substitution $Q7Polarity 1
+                                
+                            Substitution $Q8Current 202.576004
+			    Substitution $Q8Polarity 1
+                              
+                            Substitution $Q9Current 172.960007
+			    Substitution $Q9Polarity 1
+                                
+                                
+			    Substitution $SSUCCurrent 278.0
+                        Substitution $SSUCPolarity +1 
+                        
+                        Substitution $SSUM2Current 0.0
+                                Substitution $SSUM2Polarity +1
+                            
+                        Substitution $SSUM1Current 0.0
+                        Substitution $SSUM1Polarity +1
+                            
+                        Substitution $SSUE2Current 249.0
+                        Substitution $SSUE2Polarity +1
+                            
+                        Substitution $SSUE1Current 234.0
+                        Substitution $SSUE1Polarity +1
+                            
+                        
+                        Substitution $FCMMode +1
+                                        
+                        Substitution $FCMUCurrent 0.0
+                        Substitution $FCMUPolarity +1
+                                        
+                        Substitution $FCMDCurrent 0.0
+                        Substitution $FCMDPolarity +1
+                            
+                        Substitution $SSDCCurrent 0.0
+                        Substitution $SSDCPolarity +1 
+                        
+                        Substitution $SSDM2Current 0.0
+                        Substitution $SSDM2Polarity +1
+                            
+                        Substitution $SSDM1Current 0.0
+                        Substitution $SSDM1Polarity +1
+                            
+                        Substitution $SSDE1Current 0.0
+                        Substitution $SSDE1Polarity +1
+                            
+                        Substitution $SSDE2Current 0.0
+                        Substitution $SSDE2Polarity +1
+                            
+                        
+                
+     	                Module Virtuals
+                        {
+                         Volume None
+                         Position 0.0 0.0 0.0+0.5*@RepeatNumber m
+                         PropertyString SensitiveDetector Virtual
+                         PropertyBool RepeatModule2 True
+                         PropertyInt NumberOfRepeats 48
+                        }
+                            
+                            // Detectors
+                 
+                        Module geometry_07469/TOF0.dat    
+                        { 
+                         Position 2.76675071866 3.19287235876 5285.66355082 mm 
+                         Rotation -0.00598520313469 -0.00524968135246 -0.00372856240085 radian
+                        }
+                            
+                        Module geometry_07469/TOF1.dat    
+                        { 
+                         Position -5.56291058383 -0.0698853408816 12929.4396274 mm 
+                         Rotation 0.00575850467949 -7.92125275178e-05 -0.000323566634277 radian
+                        }
+                            
+                        Module geometry_07469/TOF2.dat    
+                        { 
+                         Position 13.5900583506 -9.30419442345 21152.2794927 mm 
+                         Rotation -0.0020695127151 -0.00679948255154 0.000238379044008 radian
+                        }
+                            
+                        Module geometry_07469/Ckov1.dat    
+                        { 
+                         Position 0.0510192993339 -0.113389733858 5647.91911366 mm 
+                         Rotation 0.000168889577888 -0.00530544036562 -0.00288344635933 radian
+                        }
+                            
+                        Module geometry_07469/Ckov2.dat    
+                        { 
+                         Position 0.135845248619 4.94966520593 6081.81830129 mm 
+                         Rotation 0.00200520736551 -0.00350215691878 -0.000610072441942 radian
+                        }
+                            
+                        Module geometry_07469/Tracker0.dat    
+                        { 
+                         Position 0.0589946505328 -1.60391610486 14512.331837 mm 
+                         Rotation 0.186095008576 179.952970001 0.0 degree
+                        }
+                            
+                        Module geometry_07469/Tracker1.dat    
+                        { 
+                         Position -2.18123662201 2.28264868154 19398.9717609 mm 
+                         Rotation 0.0379904400027 -0.0629099952483 0.0 degree
+                        }
+                            
+                        Module geometry_07469/KL.dat    
+                        { 
+                         Position 16.7272030219 -11.8911755946 21234.5517151 mm 
+                         Rotation 0.000141968167008 -0.00795598432592 0.00860757800543 radian
+
+                        }
+                
+                        Module geometry_07469/EMR.dat    
+                        { 
+                         Position -86.6225638602 7.64359049714 21962.4445932 mm 
+                         Rotation 0.00205898947009 0.00234298548902 -2.14020684288e-05 radian
+
+                        }
+                
+                
+                            
+                
+                             
+                            // Fields
+                
+                        Module D2
+                        {
+        		PropertyString FieldName D2
+                        Position 99.94 0.0 26.21  
+                        Rotation 0 15.0 0.0 deg
+                        ScaleFactor 0.71415/0.391*(3.58/1000.0+$D2Polarity*$D2Current*3.88/1000.0+$D2Current*$D2Current*2.619/1000.0/1000.0-$D2Polarity*$D2Current*$D2Current*$D2Current*1.55/1000.0/1000.0/1000.0)
+                        Volume None
+                        PropertyString FieldType MagneticFieldMap
+                        PropertyString FieldMapMode Read
+                        PropertyString FileType g4bl3dGrid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/src/legacy/FILES/Models/Modules/BeamLine/B2_6inch.table
+                        PropertyString Symmetry Dipole
+                        }
+                
+                        Module Q4
+                        {
+			PropertyString FieldName Q4
+                        Position 0.0 4.99999998738e-07 867.308 mm 
+                        Rotation 0 0 0 deg
+                        ScaleFactor 1
+                        Volume None
+                        PropertyString FieldType Multipole
+                        PropertyDouble Height 0.5 m
+                        PropertyDouble Width 0.5 m
+                        PropertyDouble Length 2.0 m                     
+                        PropertyDouble FieldStrength $Q4Polarity*$Q4Current/174.0 T/m
+                        PropertyInt Pole 2
+                        PropertyInt MaxEndPole 4
+                        PropertyString EndFieldType Tanh
+                        PropertyDouble EndLength 0.12528 m
+                        PropertyDouble CentreLength 0.3309 m
+                        }
+                
+                        Module Q5
+                        {
+			PropertyString FieldName Q5
+                        Position 0.0 4.99999998738e-07 2027.308 mm 
+                        Rotation 0 0 90 deg
+                        ScaleFactor 1
+                        Volume None
+                        PropertyString FieldType Multipole
+                        PropertyDouble Height 0.5 m
+                        PropertyDouble Width 0.5 m
+                        PropertyDouble Length 2.0 m                     
+                        PropertyDouble FieldStrength $Q5Polarity*$Q5Current/174.0 T/m
+                        PropertyInt Pole 2
+                        PropertyInt MaxEndPole 4
+                        PropertyString EndFieldType Tanh
+                        PropertyDouble EndLength 0.12528 m
+                        PropertyDouble CentreLength 0.3309 m
+                        }
+                
+                        Module Q6
+                        {
+			PropertyString FieldName Q6
+                        Position 0.0 4.99999998738e-07 3187.308 mm 
+                        Rotation 0 0 0 deg
+                        ScaleFactor 1
+                        Volume None
+                        PropertyString FieldType Multipole
+                        PropertyDouble Height 0.5 m
+                        PropertyDouble Width 0.5 m
+                        PropertyDouble Length 2.0 m                     
+                        PropertyDouble FieldStrength $Q6Polarity*$Q6Current/174.0 T/m
+                        PropertyInt Pole 2
+                        PropertyInt MaxEndPole 4
+                        PropertyString EndFieldType Tanh
+                        PropertyDouble EndLength 0.12528 m
+                        PropertyDouble CentreLength 0.3309 m
+                        }
+                
+                        Module Q7
+                        {
+			PropertyString FieldName Q7
+                        Position 0.0 4.99999998738e-07 8499.408 mm 
+                        Rotation 0 0 0 deg
+                        ScaleFactor 1
+                        Volume None
+                        PropertyString FieldType Multipole
+                        PropertyDouble Height 0.5 m
+                        PropertyDouble Width 0.5 m
+                        PropertyDouble Length 2.0 m                     
+                        PropertyDouble FieldStrength $Q7Polarity*$Q7Current/174.0 T/m
+                        PropertyInt Pole 2
+                        PropertyInt MaxEndPole 4
+                        PropertyString EndFieldType Tanh
+                        PropertyDouble EndLength 0.12528 m
+                        PropertyDouble CentreLength 0.3309 m
+                        }
+                
+                        Module Q8
+                        {
+			PropertyString FieldName Q8
+                        Position 0.0 4.99999998738e-07 9659.408 mm 
+                        Rotation 0 0 90.0 deg
+                        ScaleFactor 1
+                        Volume None
+                        PropertyString FieldType Multipole
+                        PropertyDouble Height 0.5 m
+                        PropertyDouble Width 0.5 m
+                        PropertyDouble Length 2.0 m                     
+                        PropertyDouble FieldStrength $Q8Polarity*$Q8Current/174.0 T/m
+                        PropertyInt Pole 2
+                        PropertyInt MaxEndPole 4
+                        PropertyString EndFieldType Tanh
+                        PropertyDouble EndLength 0.12528 m
+                        PropertyDouble CentreLength 0.3309 m
+                        }
+                
+                        Module Q9
+                        {
+			PropertyString FieldName Q9
+                        Position 0.0 4.99999998738e-07 10819.408 mm 
+                        Rotation 0 0 0 deg
+                        ScaleFactor 1
+                        Volume None
+                        PropertyString FieldType Multipole
+                        PropertyDouble Height 0.5 m
+                        PropertyDouble Width 0.5 m
+                        PropertyDouble Length 2.0 m                     
+                        PropertyDouble FieldStrength $Q9Polarity*$Q9Current/174.0 T/m
+                        PropertyInt Pole 2
+                        PropertyInt MaxEndPole 4
+                        PropertyString EndFieldType Tanh
+                        PropertyDouble EndLength 0.12528 m
+                        PropertyDouble CentreLength 0.3309 m
+                        }
+                
+
+                        Module MatchCoil2_0
+                        {
+			PropertyString FieldName MatchCoil2_0
+                        Position -0.401 -1.0999 15655.45 mm
+	                Rotation -0.0458 0.0196 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/match2.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 199.492
+                        PropertyDouble Thickness 30.925
+                        PropertyDouble InnerRadius 258.
+                        ScaleFactor $SSUM2Polarity*$SSUM2Current*0.5176
+                            }
+                
+
+                        Module MatchCoil1_0
+                        {
+			PropertyString FieldName MatchCoil1_0
+                        Position -0.552 -1.4512 16095.095 mm
+	                Rotation -0.0458 0.0196 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/match1.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 201.268
+                        PropertyDouble Thickness 46.165
+                        PropertyDouble InnerRadius 258.
+                        ScaleFactor $SSUM1Polarity*$SSUM1Current*0.52
+                            }
+                
+
+                        Module MatchCoil2_1
+                        {
+			PropertyString FieldName MatchCoil2_1
+                        Position -1.2129 -8.1456 18256.03 mm
+	                Rotation -0.01443 0.0409 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/match2.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 199.492
+                        PropertyDouble Thickness 30.608
+                        PropertyDouble InnerRadius 258.
+                        ScaleFactor $SSDM2Polarity*$FCMMode*$SSDM2Current*0.5174
+                            }
+                
+
+                        Module CenterCoil_1
+                        {
+			PropertyString FieldName CenterCoil_1
+                        Position -2.2034 -8.4351 19406.015 mm
+	                Rotation -0.0144 0.0409 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/center.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 1314.3
+                        PropertyDouble Thickness 22.416
+                        PropertyDouble InnerRadius 258.
+                        ScaleFactor $SSDCPolarity*$FCMMode*$SSDCCurrent*0.52817
+                            }
+                
+
+                        Module EndCoil1_1
+                        {
+			PropertyString FieldName EndCoil1_1
+                        Position -1.4985 -8.2462 18656.03 mm
+	                Rotation -0.0144 0.0409 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/end1.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 110.642
+                        PropertyDouble Thickness 61.638
+                        PropertyDouble InnerRadius 258.
+                        ScaleFactor $SSDE1Polarity*$FCMMode*$SSDE1Current*0.5316
+                            }
+                
+
+                        Module EndCoil2_1
+                        {
+			PropertyString FieldName EndCoil2_1
+                        Position -2.569 -8.6239 20156.02 mm
+	                Rotation -0.0144 0.0409 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/end2.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 110.642
+                        PropertyDouble Thickness 68.22
+                        PropertyDouble InnerRadius 258.
+                        ScaleFactor $SSDE2Polarity*$FCMMode*$SSDE2Current*0.5291
+                            }
+                
+
+                        Module MatchCoil1_1
+                        {
+			PropertyString FieldName MatchCoil1_1
+                        Position -0.899 -8.035 17816.385 mm
+	                Rotation -0.0144 0.0409 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/match1.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 201.268
+                        PropertyDouble Thickness 46.483
+                        PropertyDouble InnerRadius 258.
+                        ScaleFactor $SSDM1Polarity*$FCMMode*$SSDM1Current*0.52
+                            }
+                
+
+                        Module FCoil_0
+                        {
+			PropertyString FieldName FCoil_0
+                        Position -1.0727 -1.6783 16753.54 mm
+	                Rotation 0.0723 0.0649 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/focus.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 213.3
+                        PropertyDouble Thickness 94.3
+                        PropertyDouble InnerRadius 267.6
+                        ScaleFactor $FCMUPolarity*$FCMUCurrent*0.5565
+                            }
+                
+
+                        Module FCoil_1
+                        {
+			PropertyString FieldName FCoil_1
+                        Position -1.5308 -1.1677 17157.94 mm
+	                Rotation 0.0723 0.0649 0 degree
+                        Volume None
+                        PropertyString FieldType Solenoid
+                        PropertyString FileName ${MAUS_ROOT_DIR}/tmp/focus.fld
+                        PropertyDouble CurrentDensity 1.
+                        PropertyDouble Length 213.3
+                        PropertyDouble Thickness 94.3
+                        PropertyDouble InnerRadius 267.6
+                        ScaleFactor $FCMUPolarity*$FCMMode*$FCMDCurrent*0.5565
+                            }
+                
+
+		        Module ECE_0
+			{
+    			PropertyString FieldName ECE_0
+          Position 0.0 0.0 14505.465-1314.3/2+5854.7-5000. mm
+          Rotation 0.0 0.0 0 degree
+          Volume None
+          PropertyString FieldType CylindricalField
+          PropertyDouble Length    20000 mm
+          PropertyDouble FieldRadius 1000 mm
+          PropertyHep3Vector ConstantField 0.0 0.0 4.0 T
+          PropertyDouble ScaleFactor 1
+			}
+		
+		}        
+            

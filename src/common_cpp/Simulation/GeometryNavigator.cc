@@ -67,6 +67,8 @@ namespace MAUS {
     // Needed so Geant4 doesn't segfault when setting up a point
     G4RunManager::GetRunManager()->BeamOn(0);
     this->_setPoint(G4ThreeVector(0.0, 0.0, 0.0));
+    // Ack! G4 does some setup at BeamOn time
+    G4RunManager::GetRunManager()->BeamOn(0);
   }
 
 
@@ -75,6 +77,32 @@ namespace MAUS {
     this->_setPoint(pos);
   }
 
+  double GeometryNavigator::ComputeStep(ThreeVector point,
+                                        ThreeVector momentum,
+                                        double step) {
+    G4ThreeVector pos = ToG4Vec(point);
+    ThreeVector direction = momentum/momentum.mag();
+    G4ThreeVector dir = ToG4Vec(direction);
+    _setPoint(pos);
+    double new_step = 0.;
+    _current_position = pos;
+    //_navigator->ResetHierarchyAndLocate(pos,
+    //                                    dir,
+    //                                    *_touchable_history);
+    _navigator->LocateGlobalPointAndSetup(pos, &dir, false, false);
+    //std::cerr << "ComputeStep pos: " << pos << " dir: " << dir << " step: " << step << std::endl;
+    _navigator->ComputeStep(pos, dir, step, new_step);
+    //std::cerr << "            new_step: " << new_step << std::endl;
+    if (_touchable_history) {
+      delete _touchable_history;
+      _touchable_history = NULL;
+    }
+    _touchable_history = _navigator->CreateTouchableHistory();
+    _current_volume = _touchable_history->GetVolume();
+    _current_material = _current_volume->GetLogicalVolume()->GetMaterial();
+
+    return new_step;
+  }
 
   ThreeVector GeometryNavigator::Step(ThreeVector displacement) {
     G4ThreeVector disp = ToG4Vec(displacement);
@@ -100,7 +128,6 @@ namespace MAUS {
     _current_material = _current_volume->GetLogicalVolume()->GetMaterial();
   }
 
-
   G4ThreeVector GeometryNavigator::_step(G4ThreeVector dir) {
     _current_position = _current_position + dir;
     _navigator->LocateGlobalPointAndUpdateTouchable(
@@ -123,14 +150,40 @@ namespace MAUS {
     }
   }
 
+  G4Material* GeometryNavigator::GetMaterial() const {
+    return _current_material;
+  }
 
-  double GeometryNavigator::GetA() const {
-    return _current_material->GetA()/(g/mole);
+  double GeometryNavigator::GetNumberOfElements() const {
+    return _current_material->GetNumberOfElements();
+  }
+
+  double GeometryNavigator::GetFraction(size_t element) const {
+    if (element > _current_material->GetNumberOfElements()) {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                              "Lookup element was > number of elements",
+                              "GeometryNavigator::GetFraction()");
+    }
+    return _current_material->GetFractionVector()[element];
+  }
+
+  double GeometryNavigator::GetA(size_t element) const {
+    if (element > _current_material->GetNumberOfElements()) {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                              "Lookup element was > number of elements",
+                              "GeometryNavigator::GetA()");
+    }
+    return _current_material->GetElement(element)->GetA()/(g/mole);
   }
 
 
-  double GeometryNavigator::GetZ() const {
-    return _current_material->GetZ();
+  double GeometryNavigator::GetZ(size_t element) const {
+    if (element > _current_material->GetNumberOfElements()) {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                              "Lookup element was > number of elements",
+                              "GeometryNavigator::GetZ()");
+    }
+    return _current_material->GetElement(element)->GetZ();
   }
 
 

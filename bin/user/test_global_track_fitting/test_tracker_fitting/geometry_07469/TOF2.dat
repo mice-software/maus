@@ -1,0 +1,500 @@
+Module TOF2
+{
+Volume Box
+Dimensions 60.01 60.01 5.01 cm
+PropertyString Material AIR
+Module TOF2Detector
+{
+Volume Box
+Dimensions 60.0 60.0 5.00001 cm
+PropertyBool UseDaughtersInOptics 0
+PropertyString Detector TOF
+PropertyInt Station 2
+PropertyInt numPlanes 2
+PropertyString SensitiveDetector SpecialVirtual
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertPlane
+{
+Volume Box
+Dimensions 60.0 60.0 2.5 cm
+PropertyInt Plane 1.0
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab0
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 0
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab0Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab0Sci
+
+Position 27.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab0
+
+Module TOF2VertSlab1
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 1
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab1Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab1Sci
+
+Position 21.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab1
+
+Module TOF2VertSlab2
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 2
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab2Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab2Sci
+
+Position 15.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab2
+
+Module TOF2VertSlab3
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 3
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab3Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab3Sci
+
+Position 9.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab3
+
+Module TOF2VertSlab4
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 4
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab4Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab4Sci
+
+Position 3.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab4
+
+Module TOF2VertSlab5
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 5
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab5Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab5Sci
+
+Position -3.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab5
+
+Module TOF2VertSlab6
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 6
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab6Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab6Sci
+
+Position -9.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab6
+
+Module TOF2VertSlab7
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 7
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab7Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab7Sci
+
+Position -15.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab7
+
+Module TOF2VertSlab8
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 8
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab8Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab8Sci
+
+Position -21.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab8
+
+Module TOF2VertSlab9
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyInt Slab 9
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 0.0 30.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 0.0 -30.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2VertSlab9Sci
+{
+Volume Box
+Dimensions 6.0 60.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab9Sci
+
+Position -27.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertSlab9
+
+Position 0.0 0.0 -1.25 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2VertPlane
+
+Module TOF2HorizPlane
+{
+Volume Box
+Dimensions 60.0 60.0 2.5 cm
+PropertyInt Plane 0
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab0
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 0
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab0Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab0Sci
+
+Position 0.0 -27.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab0
+
+Module TOF2HorizSlab1
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 1
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab1Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab1Sci
+
+Position 0.0 -21.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab1
+
+Module TOF2HorizSlab2
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 2
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab2Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab2Sci
+
+Position 0.0 -15.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab2
+
+Module TOF2HorizSlab3
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 3
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab3Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab3Sci
+
+Position 0.0 -9.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab3
+
+Module TOF2HorizSlab4
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 4
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab4Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab4Sci
+
+Position 0.0 -3.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab4
+
+Module TOF2HorizSlab5
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 5
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab5Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab5Sci
+
+Position 0.0 3.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab5
+
+Module TOF2HorizSlab6
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 6
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab6Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab6Sci
+
+Position 0.0 9.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab6
+
+Module TOF2HorizSlab7
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 7
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab7Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab7Sci
+
+Position 0.0 15.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab7
+
+Module TOF2HorizSlab8
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 8
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab8Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab8Sci
+
+Position 0.0 21.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab8
+
+Module TOF2HorizSlab9
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyInt Slab 9
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos 30.0 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos -30.0 0.0 0.0 cm
+PropertyString Material POLYVINYL_TOLUENE
+Module TOF2HorizSlab9Sci
+{
+Volume Box
+Dimensions 60.0 6.0 2.5 cm
+PropertyString SensitiveDetector TOF
+PropertyString Material POLYVINYL_TOLUENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab9Sci
+
+Position 0.0 27.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizSlab9
+
+Position 0.0 0.0 1.25 cm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2HorizPlane
+
+Position 0.0 0.0 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End TOF2Detector
+
+}

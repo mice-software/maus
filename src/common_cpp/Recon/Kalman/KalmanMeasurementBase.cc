@@ -21,6 +21,15 @@
 
 namespace MAUS {
 namespace Kalman {
+/*
+  Measurement_base* Measurement_base::Clone() const {
+  }
+
+      Measurement_base* meas(_dimension, _measurement_dimension);
+      meas->_base_measurement_matrix = this->_base_measurement_matrix;
+      meas->_base_measurement_matrix_transpose = this->_base_measurement_matrix_transpose;
+  }
+*/
 
   Measurement_base::Measurement_base(unsigned int dim, unsigned int meas_dim) :
     _dimension(dim),

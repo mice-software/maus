@@ -9,7 +9,7 @@ Configuration PropagationTest_NoField
     Position 0. 0. 1. m
     Rotation 0. 0. 0. degree
     Volume Box
-    Dimensions 2. 2. 0.03 m
+    Dimensions 2. 2. 0.005 m
     PropertyString Material Pb
   }
   Module TestField

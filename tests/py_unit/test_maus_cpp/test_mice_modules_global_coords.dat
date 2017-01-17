@@ -1,0 +1,25 @@
+Configuration Test
+{
+  Dimensions 1. 1. 1.
+  PropertyString Material Galactic
+
+  MiceModule TestMod4
+  {
+      Position 800.0 900.0 1000.0 mm
+      Rotation 0.0   0.0  0.0 degree
+      Volume None
+
+      MiceModule TestMod5
+      {
+          Position 100.0 200.0 300.0 mm
+          Rotation 0.0   0.0  0.0 degree
+          Volume None
+          PropertyString FieldType  CylindricalField
+          PropertyHep3Vector ConstantField 1. 1. 1.
+          PropertyDouble Length      0.
+          PropertyDouble FieldRadius 0.
+      }
+  }
+
+}
+

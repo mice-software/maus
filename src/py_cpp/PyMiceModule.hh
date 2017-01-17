@@ -126,9 +126,27 @@ static PyObject *get_property(PyObject* self, PyObject *args, PyObject *kwds);
  *    - kwds takes three arguments, name (PyString name of the property),
  *      type (PyString type of the property), value (PyString value to set the
  *      property to)
- *  Returns PyNone
+ *  Returns the property value
  */
 static PyObject *set_property(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** Get the position of the PyMiceModule in the global (top level) coordinates
+ *    - self a PyObject of type PyMiceModule
+ *    - args not used
+ *    - kwds not used
+ *  Returns a dict like {"x":x, "y":y, "z":z} corresponding to the module
+ *  position
+ */
+static PyObject *get_global_position(PyObject* self, PyObject *args, PyObject *kwds);
+
+/** Get the rotation of the PyMiceModule in the global (top level) coordinates
+ *    - self a PyObject of type PyMiceModule
+ *    - args not used
+ *    - kwds not used
+ *  Returns a dict like {"x":x, "y":y, "z":z} corresponding to the module
+ *  rotation; see MiceModule docs for definition
+ */
+static PyObject *get_global_rotation(PyObject* self, PyObject *args, PyObject *kwds);
 
 /** _alloc allocates memory for PyMiceModule
  *

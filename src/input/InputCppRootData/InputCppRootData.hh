@@ -47,7 +47,7 @@ class InputCppRootData : public InputBase<MAUS::Data> {
      *  @param filename if set forces the Inputter to use the filename rather than
      *         pulling a filename from the datacards at birth
      */
-    explicit InputCppRootData(std::string filename = "");
+    explicit InputCppRootData();
 
     /** Destructor for InputCppRootData - calls death()
      */
@@ -100,11 +100,17 @@ class InputCppRootData : public InputBase<MAUS::Data> {
      */
     bool is_selected_spill(int spillNum) const;
 
+    /** Parse the root file name - either a json array or a json string
+     */
+    void parse_file_name(Json::Value json_fnames);
+
+
     /** _irstream holds root TFile.
      */
     irstream* _infile;
     std::string _infile_tree;
-    std::string _filename;
+    std::vector<std::string> _filename_list;
+    std::vector<std::string>::iterator _filename_it;
     std::string _classname;
 
     event_type _event_type;

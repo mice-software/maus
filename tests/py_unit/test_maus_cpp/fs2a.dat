@@ -1,0 +1,29 @@
+
+Configuration FS2A
+{
+  Substitution $FieldMapMode Read
+  Substitution $Current +106.666
+  Dimensions 5. 5. 20. m
+  PropertyString Material Galactic
+
+
+  Module FCoil
+  {
+    Volume None
+    Position 0.0 0.0 -3750.-375.+750.*@RepeatNumber mm
+    Rotation 0.0 0.0 0.0 degree
+    ScaleFactor $Current*(-1)**@RepeatNumber
+      //field
+    PropertyString FieldType       Solenoid
+    PropertyString FieldMapMode     $FieldMapMode
+    PropertyString FileName        ${MAUS_ROOT_DIR}/tmp/fs2a.fld
+    PropertyDouble CurrentDensity      1.
+    PropertyDouble Length            150.
+    PropertyDouble Thickness         100.
+    PropertyDouble InnerRadius       350.
+    PropertyBool   RepeatModule2     True
+    PropertyInt    NumberOfRepeats   20
+  }
+
+}
+
