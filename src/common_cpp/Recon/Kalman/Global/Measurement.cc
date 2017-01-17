@@ -1,3 +1,19 @@
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
+ *
+ * MAUS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MAUS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Recon/Kalman/MAUSSciFiMeasurements.hh"
@@ -19,11 +35,28 @@ Measurement::Measurement(TMatrixD measurement)
       _measurement(measurement) {
 }
 
+Measurement::Measurement(const Measurement& meas)
+    : Measurement_base(meas._measurement.GetNcols(), meas._measurement.GetNrows()),
+      _measurement(meas._measurement) {
+    
+}
+
 Measurement* Measurement::Clone() const {
     Measurement* meas = new Measurement(_measurement);
     return meas;
 }
 
+/*
+void Measurement::SetMeasurementMatrix(TMatrixD measurement) {
+    if (measurement.GetNcols() != _measurement.GetNcols() ||
+        measurement.GetNrows() != _measurement.GetNrows()) {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                    "Can't change matrix dimension dynamically.",
+                    "Measurement::SetMeasurementMatrix");
+    }
+    _measurement = measurement;
+}
+*/
 
 void Measurement::SetupDetectorToMeasurementMap() {
     using namespace DataStructure::Global;
@@ -32,7 +65,7 @@ void Measurement::SetupDetectorToMeasurementMap() {
     tof_matrix[0][0] = 1.;
     Measurement* t_meas = new Measurement(tof_matrix);
 
-    _detector_to_measurement_map[kTOF0] = t_meas;
+    _detector_to_measurement_map[DataStructure::Global::kTOF0] = t_meas;
     _detector_to_measurement_map[DataStructure::Global::kTOF1] = t_meas;
     _detector_to_measurement_map[DataStructure::Global::kTOF2] = t_meas;
 
