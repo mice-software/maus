@@ -110,8 +110,9 @@ class PipelineSingleThreadDataflowExecutor: # pylint: disable=R0902
                 hour = str(time.hour).rjust(2, '0')
                 minute = str(time.minute).rjust(2, '0')
                 second = str(time.second).rjust(2, '0')
-                ms = str(time.microsecond).rjust(6, '0')
-                print "%s:%s:%s.%s TRANSFORM/MERGE/OUTPUT: " % (hour, minute, second, ms),
+                millis = str(time.microsecond).rjust(6, '0')
+                print "%s:%s:%s.%s TRANSFORM/MERGE/OUTPUT: " % \
+                                              (hour, minute, second, millis),
                 print "Processed %d events so far," % i,
                 print "%d events in buffer." % (len(map_buffer))
         except:

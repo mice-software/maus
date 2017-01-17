@@ -61,7 +61,6 @@ def build_lib_maus_cpp(env):
     Build libMausCpp.so shared object - containing all the code in 
     src/common_cpp/* and src/legacy/*
     """
-    global MAX_DIR_DEPTH
     # Magic to sort scons quirk when building object files first
     env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
     

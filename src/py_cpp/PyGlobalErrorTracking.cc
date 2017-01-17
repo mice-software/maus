@@ -37,7 +37,7 @@
 namespace MAUS {
 namespace PyGlobalErrorTracking {
 
-using namespace Kalman::Global;
+using Kalman::Global::ErrorTracking;
 
 int get_centroid(PyObject* py_centroid, std::vector<double>& x_in) {
     if (!PyList_Check(py_centroid)) {

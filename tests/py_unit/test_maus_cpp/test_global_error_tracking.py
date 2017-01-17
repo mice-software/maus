@@ -11,7 +11,6 @@ import maus_cpp.field
 import maus_cpp.global_error_tracking as err_prop
 
 class TestErrorPropagation(unittest.TestCase):
-
     def setUp(self): # pylint: disable=C0103
         """Set up test"""
         config_str = Configuration.Configuration().getConfigJSON(

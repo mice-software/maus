@@ -66,12 +66,12 @@ TEST(MeasurementTest, ConstructorTest) {
 }
 
 TEST(MeasurementTest, DetectorToMeasurementMapTest) {
-    using namespace DataStructure::Global;
+    namespace DG = DataStructure::Global;
     Measurement::DetType type_list[] = {
-        kTOF0, kTOF1, kTOF2,
-        kTracker0_1, kTracker0_2, kTracker0_3, kTracker0_4, kTracker0_5,
-        kTracker1_1, kTracker1_2, kTracker1_3, kTracker1_4, kTracker1_5,
-        kVirtual
+        DG::kTOF0, DG::kTOF1, DG::kTOF2,
+        DG::kTracker0_1, DG::kTracker0_2, DG::kTracker0_3, DG::kTracker0_4, DG::kTracker0_5,
+        DG::kTracker1_1, DG::kTracker1_2, DG::kTracker1_3, DG::kTracker1_4, DG::kTracker1_5,
+        DG::kVirtual
     };
     Measurement::SetupDetectorToMeasurementMap();
     std::map<Measurement::DetType, Measurement_base*>& map =
