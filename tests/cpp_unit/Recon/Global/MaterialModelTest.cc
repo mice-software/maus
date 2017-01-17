@@ -25,6 +25,8 @@ class MaterialModelTest : public ::testing::Test {
         MaterialModel::EnableMaterial("lH2");
         MaterialModel::EnableMaterial("POLYSTYRENE");
         MaterialModel::EnableMaterial("LITHIUM_HYDRIDE");
+        MaterialModel::EnableMaterial("MICE_LITHIUM_HYDRIDE");
+        MaterialModelAxialLookup::SetZTolerance(0.1);
     }
 
     virtual ~MaterialModelTest() {}
@@ -38,17 +40,48 @@ class MaterialModelTest : public ::testing::Test {
 
 bool MaterialModelTest::is_setup = false;
 
+TEST_F(MaterialModelTest, d2EdEdxTest) {
+    std::cerr << "Need test here" << std::endl;
+}
+
+TEST_F(MaterialModelTest, estrag2Test) {
+    std::cerr << "Need test here" << std::endl;
+}
+
+TEST_F(MaterialModelTest, scatPolystyrene) {
+    MaterialModelDynamic material(0., 0., 6000.);
+    auto p_auto = {172., 200., 240.};
+    // MICE LiH, PDG results from Table 1 MICE Note 497
+    auto scat_auto = {23.2, 19.3, 15.5};
+    std::vector<double> mice_scat(scat_auto);
+    std::vector<double> mice_p(p_auto);
+    std::cerr << "p     calc theta    ref theta" << std::endl;
+    for (size_t i = 0; i < mice_p.size(); ++i) {
+        double energy = sqrt(_mass*_mass+mice_p[i]*mice_p[i]);
+        double scat = sqrt(material.dtheta2dx(energy, _mass, 1.)*65.)*1e3;
+        std::cerr << mice_p[i] << "  "
+                  << scat << "  "
+                  << mice_scat[i] << std::endl;
+        EXPECT_LT(fabs(scat-mice_scat[i]), scat/10.); // good to 10 %?
+    }
+}
+
 TEST_F(MaterialModelTest, dEdxHydrogen) {
     MaterialModelDynamic material(0., 0., 0.);
     auto dedx_auto = {5.409, 5.097, 4.870, 4.699, 4.568,
                       4.385, 4.267, 4.161, 4.104};  // MeV cm^2/g
     std::vector<double> pdg_dedx(dedx_auto);
     double pdg_density = 0.0708;  // g/cm^3
+    std::cerr << "E     calc dEdx    ref dEdx" << std::endl;
     for (size_t i = 0; i < _nist_energy.size(); ++i) {
         double energy = _nist_energy[i] + _mass;
+        double dedx = material.dEdx(energy, _mass, 1.);
+        double ref_dedx = -pdg_dedx[i]*pdg_density/cm;
         std::cerr << _nist_energy[i] << "  "
-                  << material.dEdx(energy, _mass, 1.) << "  "
-                  << pdg_dedx[i]*pdg_density/cm << std::endl;
+                  << dedx << "  "
+                  << ref_dedx << std::endl;
+        EXPECT_LT(fabs(dedx-ref_dedx), fabs(dedx)/10.); // good to 10 %?
+        
     }
 }
 
@@ -58,11 +91,15 @@ TEST_F(MaterialModelTest, dEdxPolystyrene) {
                      2.118, 2.058, 2.003, 1.971};  // MeV cm^2/g
     std::vector<double> pdg_dedx(dedx_auto);
     double pdg_density = 1.060;  // g/cm^3
+    std::cerr << "E     calc dEdx    ref dEdx" << std::endl;
     for (size_t i = 0; i < _nist_energy.size(); ++i) {
         double energy = _nist_energy[i] + _mass;
+        double dedx = material.dEdx(energy, _mass, 1.);
+        double ref_dedx = -pdg_dedx[i]*pdg_density/cm;
         std::cerr << _nist_energy[i] << "  "
-                  << material.dEdx(energy, _mass, 1.) << "  "
-                  << pdg_dedx[i]*pdg_density/cm << std::endl;
+                  << dedx << "  "
+                  << ref_dedx << std::endl;
+        EXPECT_LT(fabs(dedx-ref_dedx), fabs(dedx)/10.); // good to 10 %?
     }
 }
 
@@ -206,19 +243,19 @@ TEST_F(MaterialModelTest, AxialLookupSetMaterial) {
     ASSERT_NE(test.GetMaterial(), null);
     EXPECT_EQ(test.GetMaterial()->GetName(), "G4_Galactic");
 
-    // boundary to polystyrene
-    test.SetMaterial(0., 0., 1749.998);
+    // boundary to polystyrene; nb tolerance is set to 0.1 mm
+    test.SetMaterial(0., 0., 1749.8);
     ASSERT_NE(test.GetMaterial(), null);
     EXPECT_EQ(test.GetMaterial()->GetName(), "G4_Galactic");
-    test.SetMaterial(0., 0., 1750.002);
+    test.SetMaterial(0., 0., 1750.2);
     ASSERT_NE(test.GetMaterial(), null);
     EXPECT_EQ(test.GetMaterial()->GetName(), "G4_POLYSTYRENE");
 
     // boundary to LiH
-    test.SetMaterial(0., 0., 3749.998);
+    test.SetMaterial(0., 0., 3749.8);
     ASSERT_NE(test.GetMaterial(), null);
     EXPECT_EQ(test.GetMaterial()->GetName(), "G4_Galactic");
-    test.SetMaterial(0., 0., 3750.002);
+    test.SetMaterial(0., 0., 3750.2);
     ASSERT_NE(test.GetMaterial(), null);
     EXPECT_EQ(test.GetMaterial()->GetName(), "G4_LITHIUM_HYDRIDE");
 
@@ -226,12 +263,6 @@ TEST_F(MaterialModelTest, AxialLookupSetMaterial) {
     test.SetMaterial(0., 0., 5000.);
     ASSERT_NE(test.GetMaterial(), null);
     EXPECT_EQ(test.GetMaterial()->GetName(), "G4_LITHIUM_HYDRIDE");
-}
-
-
-
-TEST_F(MaterialModelTest, needMoreTests) {
-    EXPECT_TRUE(false) << "Need more tests";
 }
 
 }

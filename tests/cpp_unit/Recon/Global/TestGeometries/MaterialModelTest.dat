@@ -20,13 +20,21 @@ Configuration PropagationTest
     Dimensions 0.5 0.5 0.5 m
     PropertyString Material POLYSTYRENE
   }
-  Module LiH  // note MICE LiH is different; but we want to compare with PDG LIH
+  Module LiH
   {
     Position 0. 0. 4. m
     Rotation 0. 0. 0. degree
     Volume Box
     Dimensions 0.5 0.5 0.5 m
     PropertyString Material LITHIUM_HYDRIDE
+  }
+  Module MICE_LiH  // note MICE LiH is different
+  {
+    Position 0. 0. 6. m
+    Rotation 0. 0. 0. degree
+    Volume Box
+    Dimensions 0.5 0.5 0.5 m
+    PropertyString Material MICE_LITHIUM_HYDRIDE
   }
 
 }
