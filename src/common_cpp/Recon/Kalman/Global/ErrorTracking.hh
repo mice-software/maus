@@ -78,7 +78,7 @@ namespace Global {
  *  done
  *    - em_forwards_dynamic: track forwards, using dynamic step size routine to
  *      determine step size (where we choose smaller step size near materials)
- *    - em_forwards_dynamic: track backwards, using dynamic step size routine to
+ *    - em_backwards_dynamic: track backwards, using dynamic step size routine to
  *      determine step size (where we choose smaller step size near materials)
  *    - em_forwards_static: track forwards, using fixed step size
  *    - em_backwards_static: track forwards, using fixed step size
@@ -92,9 +92,7 @@ namespace Global {
  *  Other things:-
  *    - dx, dy, dz, dt: in order to do the tracking, we need derivatives of the
  *      field. These are found numerically, with scale set by these parameters.
- *    - min_step_size, max_step_size: in order to do the tracking, we need 
- *      derivatives of the field. These are found numerically, with scale set by
- *      these parameters. Stepping starts at min_step_size.
+ *    - min_step_size, max_step_size: stepping starts at min_step_size.
  *    - max_n_steps: maximum number of steps. If tracking goes for more steps,
  *      tracking will abort with GSL_FAILURE.
  */

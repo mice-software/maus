@@ -484,7 +484,23 @@ static PyObject* get_energy_loss_model(PyObject *self, PyObject *args, PyObject 
     return py_eloss_model;
 }
 
-std::string set_scattering_model_docstring = "DOCSTRING";
+std::string set_scattering_model_docstring =
+std::string("Set the scattering model that will be used by the tracking.\n")+
+std::string("Scattering results in a systematic change in the propagated\n")+
+std::string("errors. The mean trajectory is not deviated.\n")+
+std::string(" - model: string corresponding to the scattering model.\n")+
+std::string("   Options are:\n")+
+std::string("     'no_mcs' propagated errors are not affected by scattering.\n")+
+std::string("     'moliere_forwards' error associated with forwards-travelling\n")+
+std::string("      particles grows according to the pdg formula. Error\n")+
+std::string("      associated with backwards-travelling particles shrinks\n")+
+std::string("      according to the pdg formula\n")+
+std::string("     'moliere_backwards' error associated with forwards-travelling\n")+
+std::string("      particles shrinks according to the pdg formula. Error\n")+
+std::string("      associated with backwards-travelling particles grows\n")+
+std::string("      according to the pdg formula\n")+
+std::string("Returns None.\n");
+
 
 // enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
 static PyObject* set_scattering_model(PyObject *self, PyObject *args, PyObject *kwds) {
@@ -522,7 +538,9 @@ static PyObject* set_scattering_model(PyObject *self, PyObject *args, PyObject *
     return Py_None;
 }
 
-std::string get_scattering_model_docstring = "DOCSTRING";
+std::string get_scattering_model_docstring =
+std::string("Returns a string corresponding to the scattering model that\n")+
+std::string("will be used by the tracking.\n");
 
 static PyObject* get_scattering_model(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -553,7 +571,19 @@ static PyObject* get_scattering_model(PyObject *self, PyObject *args, PyObject *
     return py_scat_model;
 }
 
-std::string set_tracking_model_docstring = "DOCSTRING";
+std::string set_tracking_model_docstring =
+std::string("Set the tracking model that will be used for integration.\n")+
+std::string(" - model: string corresponding to the tracking model.\n")+
+std::string("   Options are:\n")+
+std::string("     'em_rk4_forwards_dynamic' integrate the particle
+std::string("      trajectory downstream, choosing step size dynamically.\n")+
+std::string("     'em_rk4_backwards_dynamic' integrate the particle
+std::string("      trajectory upstream, choosing step size dynamically.\n")+
+std::string("     'em_rk4_forwards_static' integrate the particle
+std::string("      trajectory downstream, using a fixed step size.\n")+
+std::string("     'em_rk4_backwards_static' integrate the particle
+std::string("      trajectory upstream, choosing step size dynamically.\n")+
+std::string("Returns None.\n");
 // enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
 static PyObject* set_tracking_model(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("model"),
@@ -592,7 +622,8 @@ static PyObject* set_tracking_model(PyObject *self, PyObject *args, PyObject *kw
     return Py_None;
 }
 
-std::string get_tracking_model_docstring = "DOCSTRING";
+std::string get_tracking_model_docstring =
+std::string("Returns a string corresponding to the tracking model.\n");
 
 static PyObject* get_tracking_model(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -626,7 +657,16 @@ static PyObject* get_tracking_model(PyObject *self, PyObject *args, PyObject *kw
     return py_track_model;
 }
 
-std::string set_geometry_model_docstring = "DOCSTRING";
+std::string set_geometry_model_docstring = 
+std::string("Set the geometry model that will be used for materials lookups.\n")+
+std::string(" - model: string corresponding to the geometry model.\n")+
+std::string("   Options are:\n")+
+std::string("     'geant4' use the full geant4 geometry.\n")+
+std::string("     'axial_lookup' use a lookup table constructed at runtime,\n")+
+std::string("     corresponding to the on-axis materials assuming the world\n")+
+std::string("     is made of infinite radius cylinders.")+
+std::string("Returns None.\n");
+
 // enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
 static PyObject* set_geometry_model(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("model"),
@@ -661,7 +701,8 @@ static PyObject* set_geometry_model(PyObject *self, PyObject *args, PyObject *kw
     return Py_None;
 }
 
-std::string get_geometry_model_docstring = "DOCSTRING";
+std::string get_geometry_model_docstring =
+std::string("Get the geometry model that will be used for materials lookups.");
 
 static PyObject* get_geometry_model(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -689,7 +730,18 @@ static PyObject* get_geometry_model(PyObject *self, PyObject *args, PyObject *kw
     return py_geometry_model;
 }
 
-std::string propagate_errors_docstring = "DOCSTRING";
+std::string propagate_errors_docstring =
+std::string("Propagate a trajectory and associated errors.\n")+
+std::string(" - centroid: list of length 8, corresponding to initial\n")+
+std::string("  position of the trajectory. elements are:\n")+
+std::string("  t, x, y, z, (total) energy, px, py, pz\n")+
+std::string(" - ellipse: list of lists, corresponding to a 6x6 matrix with\n")+
+std::string("  elements defining the initial error covariance matrix, given\n")+
+std::string("  by Cov(u_i, u_j) with u = (t, x, y, energy, px, py) and\n")+
+std::string("  Cov(u_i, u_j) is the covariance.\n")+
+std::string(" - target_z: target z position to which trajectory should be\n")+
+std::string("  integrated.\n")+
+std::string("Returns None.\n")+
 
 static PyObject* propagate_errors
                               (PyObject *self, PyObject *args, PyObject *kwds) {
