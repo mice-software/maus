@@ -11,9 +11,9 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with MAUS.  If not, see <http://   www.gnu.org/licenses/>.
+ * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright Chris Rogers, 2016
+ * Copyright Chris Rogers, 2016-2017
  */
 
 #include <iostream>
@@ -42,7 +42,7 @@ typedef struct {
 // Allocate memory
 static void* et_control_alloc() {
     et_control_state_t* state =
-        static_cast<et_control_state_t *> (malloc (sizeof(et_control_state_t)));
+        static_cast<et_control_state_t *>(malloc(sizeof(et_control_state_t)));
     if (state == NULL) {
         throw Exceptions::Exception(Exceptions::recoverable,
                               "Failed to allocate memory for et_control",
@@ -53,7 +53,7 @@ static void* et_control_alloc() {
 
 // Initialise min/max step size; the geometry navigator comes from
 // Globals::GetMCGeometryNavigator
-static int et_control_init(void* vstate, double min_step_size, 
+static int et_control_init(void* vstate, double min_step_size,
                            double max_step_size, double dummy2, double dummy3) {
     if (max_step_size < 0) {
         throw Exceptions::Exception(Exceptions::recoverable,
@@ -102,18 +102,18 @@ static int et_control_hadjust(void * vstate, size_t dim, unsigned int ord,
 }
 
 // Free memory
-static void et_control_free (void * vstate) {
-   et_control_state_t *state = (et_control_state_t *) vstate;
-   free(state);
+static void et_control_free(void * vstate) {
+    et_control_state_t *state = reinterpret_cast<et_control_state_t *>(vstate);
+    free(state);
 }
 
 // In C, we define vtable literally
 static const gsl_odeiv_control_type et_control_type = {
-   "maus_recon_kalman_global_error_tracking", /* name */
-   &et_control_alloc,
-   &et_control_init,
-   &et_control_hadjust,
-   &et_control_free
+    "maus_recon_kalman_global_error_tracking", /* name */
+    &et_control_alloc,
+    &et_control_init,
+    &et_control_hadjust,
+    &et_control_free
 };
 const gsl_odeiv_control_type *gsl_odeiv_control_et = &et_control_type;
 
@@ -123,7 +123,7 @@ gsl_odeiv_control* gsl_odeiv_control_et_new(double min_step_size,
   gsl_odeiv_control* control =  gsl_odeiv_control_alloc(gsl_odeiv_control_et);
     int status = gsl_odeiv_control_init(control, min_step_size, max_step_size, 0., 0.);
     if (status != GSL_SUCCESS) {
-        gsl_odeiv_control_free (control);
+        gsl_odeiv_control_free(control);
         throw Exceptions::Exception(Exceptions::recoverable,
                              "Failed to initialise error tracking control",
                              "ErrorTrackingControlType::gsl_odeiv_control_et_new");

@@ -104,7 +104,6 @@ TEST(PropagatorTest, TestPropagate) {
 
     MAUS::Kalman::TrackPoint start_tp_2 = get_tp(z, 100.); // energy < mass
     propagator.Propagate(start_tp, end_tp_2);
-  
 }
 
 TEST(PropagatorTest, TestCalculatePropagator) {
@@ -126,7 +125,5 @@ TEST(PropagatorTest, TestCalculatePropagator) {
     MAUS::Squeak::mout(MAUS::Squeak::debug) << "Start\n" << start_tp << std::endl;
     MAUS::Squeak::mout(MAUS::Squeak::debug) << "End\n" << end_tp << std::endl;
 }
-
-
 }
 

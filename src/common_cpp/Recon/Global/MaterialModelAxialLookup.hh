@@ -18,6 +18,7 @@
 #ifndef recon_global_materialmodelaxiallookup_hh_
 #define recon_global_materialmodelaxiallookup_hh_
 
+#include <utility>
 #include <vector>
 
 #include "src/common_cpp/Recon/Global/MaterialModel.hh"
@@ -133,9 +134,9 @@ class MaterialModelAxialLookup : public MaterialModel {
 
     static double _z_tolerance;
 
-    static std::vector<std::pair<double, G4Material*> > _lookup; // references start position of the volume and material
+    // references start position of the volume and material
+    static std::vector<std::pair<double, G4Material*> > _lookup;
 };
-
 }
 
 #endif

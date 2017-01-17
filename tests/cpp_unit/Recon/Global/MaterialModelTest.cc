@@ -98,7 +98,6 @@ TEST_F(MaterialModelTest, dEdxHydrogen) {
                   << dedx << "  "
                   << ref_dedx << std::endl;
         EXPECT_LT(fabs(dedx-ref_dedx), fabs(dedx)/10.); // good to 10 %?
-        
     }
 }
 
@@ -281,5 +280,4 @@ TEST_F(MaterialModelTest, AxialLookupSetMaterial) {
     ASSERT_NE(test.GetMaterial(), null);
     EXPECT_EQ(test.GetMaterial()->GetName(), "G4_LITHIUM_HYDRIDE");
 }
-
 }

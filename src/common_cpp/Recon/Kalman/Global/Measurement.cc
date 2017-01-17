@@ -30,7 +30,7 @@ Measurement::Measurement()
     : Measurement_base(0, 0), _measurement() {
 }
 
-Measurement::Measurement(TMatrixD measurement) 
+Measurement::Measurement(TMatrixD measurement)
     : Measurement_base(measurement.GetNcols(), measurement.GetNrows()),
       _measurement(measurement) {
 }
@@ -38,7 +38,6 @@ Measurement::Measurement(TMatrixD measurement)
 Measurement::Measurement(const Measurement& meas)
     : Measurement_base(meas._measurement.GetNcols(), meas._measurement.GetNrows()),
       _measurement(meas._measurement) {
-    
 }
 
 Measurement* Measurement::Clone() const {
@@ -59,7 +58,6 @@ void Measurement::SetMeasurementMatrix(TMatrixD measurement) {
 */
 
 void Measurement::SetupDetectorToMeasurementMap() {
-    using namespace DataStructure::Global;
     // NB we ignore tof position measurements for now
     TMatrixD tof_matrix(1, 6);
     tof_matrix[0][0] = 1.;
@@ -86,7 +84,6 @@ void Measurement::SetupDetectorToMeasurementMap() {
     _detector_to_measurement_map[DataStructure::Global::kTracker1_4] = sf_sp_meas;
     _detector_to_measurement_map[DataStructure::Global::kTracker1_5] = sf_sp_meas;
 
-    
     // virtuals are for writing only, we make no measurements here
     Measurement* virt_meas = new Measurement(TMatrixD());
     _detector_to_measurement_map[DataStructure::Global::kVirtual] = virt_meas;

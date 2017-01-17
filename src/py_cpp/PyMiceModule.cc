@@ -524,9 +524,9 @@ static PyMethodDef _methods[] = {
   METH_VARARGS|METH_KEYWORDS, get_property_docstring.c_str()},
 {"set_property", (PyCFunction)set_property,
   METH_VARARGS|METH_KEYWORDS, set_property_docstring.c_str()},
-//{"get_global_position", (PyCFunction)get_global_position,
+// {"get_global_position", (PyCFunction)get_global_position,
 //  METH_VARARGS|METH_KEYWORDS, get_global_position_docstring.c_str()},
-//{"get_global_rotation", (PyCFunction)get_global_rotation,
+// {"get_global_rotation", (PyCFunction)get_global_rotation,
 //  METH_VARARGS|METH_KEYWORDS, get_global_rotation_docstring.c_str()},
 {NULL}
 };

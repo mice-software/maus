@@ -18,6 +18,8 @@
 
 #include <math.h>
 
+#include <string>
+#include <vector>
 #include <sstream>
 #include <iomanip>
 
@@ -90,19 +92,16 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
   int    nsteps = 0;
   _tz_for_propagate = this;
   tracking_fail.str("");  // clear the error stream
-  while(fabs(z-target_z) > _float_tolerance) {
-    //std::cerr << "z " << z << " to " << target_z << " " << _charge << " " << _gsl_h << " " << control << "\n";
-    //print(std::cerr, x);
+  while (fabs(z-target_z) > _float_tolerance) {
     nsteps++;
-    //std::cerr << "step in z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
     int status =  gsl_odeiv_evolve_apply
                     (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
     if (control != NULL) {
         control->type->hadjust(control->state, 0, 0, x, NULL, NULL, &_gsl_h);
     }
-    //std::cerr << "step out z " << z << " dz " << _gsl_h << " target " << target_z << std::endl;
+
     if (nsteps > _max_n_steps) {
-        tracking_fail << "Exceeded maximum number of steps\n"; 
+        tracking_fail << "Exceeded maximum number of steps\n";
         status = GSL_FAILURE;
     }
     if (status != GSL_SUCCESS) {
@@ -114,9 +113,9 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
                             "ErrorTracking::Propagate");
     }
   }
-  gsl_odeiv_evolve_free (evolve);
+  gsl_odeiv_evolve_free(evolve);
   gsl_odeiv_control_free(control);
-  gsl_odeiv_step_free   (step);
+  gsl_odeiv_step_free(step);
 }
 
 void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
@@ -138,14 +137,11 @@ void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
       _gsl_h *= -1;  // stepping backwards...
   int nsteps = 0;
   _tz_for_propagate = this;
-  while(fabs(z-target_z) > _float_tolerance) {
+  while (fabs(z-target_z) > _float_tolerance) {
     nsteps++;
-    
     int status =  gsl_odeiv_evolve_apply
                         (evolve, NULL, step, &system, &z, target_z, &_gsl_h, x);
-    
-    if(status != GSL_SUCCESS)
-    {
+    if (status != GSL_SUCCESS) {
         tracking_fail << "Killing tracking with step size " << _gsl_h
                       << " at step " << nsteps
                       << " of " << _max_n_steps << "\n";
@@ -155,8 +151,7 @@ void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
                             "ErrorTracking::Propagate");
         break;
     }
-    if(nsteps > _max_n_steps)
-    {
+    if (nsteps > _max_n_steps) {
         tracking_fail << "Killing tracking with step size " << _gsl_h
                       << " at step " << nsteps << " of " << _max_n_steps << "\n"
                       << "\nExceeded maximum number of steps\n";
@@ -168,16 +163,14 @@ void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
     }
   }
 
-  gsl_odeiv_evolve_free (evolve);
-  gsl_odeiv_step_free   (step);
-
-
+  gsl_odeiv_evolve_free(evolve);
+  gsl_odeiv_step_free(step);
 }
 
-int ErrorTracking::EquationsOfMotion(double z, 
-                                           const double x[29],
-                                           double dxdz[29],
-                                           void* params) {
+int ErrorTracking::EquationsOfMotion(double z,
+                                     const double x[29],
+                                     double dxdz[29],
+                                     void* params) {
   if (fabs(x[7]) < _float_tolerance) {
     // z-momentum is 0
       tracking_fail << "pz " << x[7] << " was less than float tolerance "
@@ -202,12 +195,6 @@ int ErrorTracking::EquationsOfMotion(double z,
       return em_success;
   }
 
-  //std::cerr << "ErrorTracking::derivatives ";
-  //for (size_t i = 0; i < 8; ++i)
-  //  std::cerr << dxdz[i] << " ";
-  //std::cerr << std::endl;
-  // If no material processes are active, don't run MaterialEquationsOfMotion
-  // at all
   if (_tz_for_propagate->_eloss_model == no_eloss &&
       _tz_for_propagate->_mcs_model == no_mcs &&
       _tz_for_propagate->_estrag_model == no_estrag) {
@@ -238,7 +225,7 @@ int ErrorTracking::EMEquationOfMotion(double z,
   _tz_for_propagate->_field->GetFieldValue(xfield, field);
 
   double direction = -1.;
-  if ((_tz_for_propagate->_track_model == em_forwards_dynamic || 
+  if ((_tz_for_propagate->_track_model == em_forwards_dynamic ||
       _tz_for_propagate->_track_model == em_forwards_static) &&
       _tz_for_propagate->_gsl_h < 0.) {
       // forwards track propagating in the backwards direction
@@ -332,7 +319,7 @@ int ErrorTracking::MatrixEquationOfMotion(double z,
   dxdz[7] = charge*c_l*(dxdz[1]*field[1] - dxdz[2]*field[0])
             + charge*field[5]*dtdz*dir; // dpz/dz
   double direction = 1.;
-  if ((_tz_for_propagate->_track_model == em_forwards_dynamic || 
+  if ((_tz_for_propagate->_track_model == em_forwards_dynamic ||
       _tz_for_propagate->_track_model == em_backwards_dynamic) &&
       _tz_for_propagate->_gsl_h < 0.) {
       direction = -1.;
@@ -384,9 +371,6 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
         delete material;
         return GSL_SUCCESS;
     }
-    //std::cerr << "ErrorTracking::MAterialEqueationOfMotion MaterierlaModelAxialLookup Getting material" << std::endl;
-    //std::cerr << "    x: " << x[1] << " y: " << x[2] << " z: " << x[3] << std::endl;
-    //std::cerr << "    Found name: " << material << std::flush << " " <<  material->GetMaterial() << std::flush << " " << material->GetMaterial()->GetName() << std::endl;
 
     double energy = sqrt(x[4]*x[4]);
     double p = sqrt(x[5]*x[5]+x[6]*x[6]+x[7]*x[7]);
@@ -400,7 +384,9 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
         dEdz = material->dEdx(energy, mass, charge); // should be negative
         d2EdzdE = 0.; // material->d2EdxdE(energy, mass, charge);
     } else if (_tz_for_propagate->_eloss_model == bethe_bloch_backwards) {
-        dEdz = -material->dEdx(energy, mass, charge); // should be negative; during tracking backwards dz is negative so dEdz gets handled properly
+        // should be negative; during tracking backwards dz is negative so dEdz
+        // gets handled properly
+        dEdz = -material->dEdx(energy, mass, charge);
         d2EdzdE = 0.; // material->d2EdxdE(energy, mass, charge);
     } else {
         dEdz = 0.; // no eloss
@@ -413,7 +399,7 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
         destragdz = -material->estrag2(energy, mass, charge);
     } else {
         destragdz = 0.;
-    } 
+    }
 
     if (_tz_for_propagate->_mcs_model == moliere_forwards) {
         dtheta2dz = material->dtheta2dx(energy, mass, charge);
@@ -434,21 +420,13 @@ int ErrorTracking::MaterialEquationOfMotion(double z,
     dxdz[23] += destragdz+2*x[4]*d2EdzdE;
 
     // product rule - <p_x^2> = <x'^2> p_z^2
-    // d<px^2>/dz = d<x'^2>/dz p_z^2 + 2 <x'^2> p_z dp_z/dz 
+    // d<px^2>/dz = d<x'^2>/dz p_z^2 + 2 <x'^2> p_z dp_z/dz
     //            = d<x'^2>/dz p_z^2 + 2 <p_x^2>/p_z dp_z/dz
     dxdz[26] += 2*dpdz/x[7]*x[26] + dtheta2dz*x[7]*x[7];
     dxdz[28] += 2*dpdz/x[7]*x[28] + dtheta2dz*x[7]*x[7];
 
     delete material;
-    
-    //std::cerr << "MATERIAL z: " << x[3]
-              //<< " dEdx " << material->dEdx(energy, mass, charge)
-    //          << " x26/28: " << x[26] << " " << x[28]
-    //          << " dxdz26/28: " << dxdz[26] << " " << dxdz[28]
-    //          << " dpdz: " << dpdz << " pz: " << x[7]
-    //          << " dt2dz: " << dtheta2dz << std::endl;
-              //<< " mcs_model: " << _tz_for_propagate->_mcs_model << std::endl;
-    
+
     return GSL_SUCCESS;
 }
 
@@ -475,7 +453,8 @@ void ErrorTracking::UpdateTransferMatrix(const double* x,
   double dbydy = dbdx[4];
   double dbzdy = dbdx[5];
 
-  double m_0_3 = 1./pz/c_l - energy*energy/pz/pz/pz/c_l; // 1/(beta gamma)^2 /c_l / pz when px, py = 0
+  // 1/(beta gamma)^2 /c_l / pz when px, py = 0
+  double m_0_3 = 1./pz/c_l - energy*energy/pz/pz/pz/c_l;
   double m_0_4 = energy*px/pz/pz/pz/c_l;
   double m_0_5 = energy*py/pz/pz/pz/c_l;
 
@@ -542,7 +521,7 @@ void ErrorTracking::FieldDerivative
 }
 
 std::vector<double> ErrorTracking::GetDeviations() const {
-  double dev_a[] = {_dx,_dy,_dz,_dt};
+  double dev_a[] = {_dx, _dy, _dz, _dt};
   return std::vector<double>(dev_a, dev_a+sizeof(dev_a)/sizeof(double));
 }
 
@@ -579,9 +558,9 @@ void ErrorTracking::SetGeometryModel(std::string geometry_model) {
     }
 }
 
-ostream& ErrorTracking::print(std::ostream& out, const double* x) {
+std::ostream& ErrorTracking::print(std::ostream& out, const double* x) {
     out << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << "\n"
-        << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl; 
+        << "E: " << x[4] << " mom: " << x[5] << " " << x[6] << " " << x[7] << std::endl;
     size_t index = 8;
     for (size_t i = 0; i < 6; ++i) {
         for (size_t j = 0; j < i; ++j) {
@@ -599,10 +578,10 @@ ostream& ErrorTracking::print(std::ostream& out, const double* x) {
 void ErrorTracking::SetMinStepSize(double min_step_size) {
     if (min_step_size > _max_step_size) {
         throw Exceptions::Exception(Exceptions::recoverable,
-                          "Min step size should be < max step size",
-                          "ErrorTracking::SetMinStepSize");
+                         "Min step size should be < max step size",
+                         "ErrorTracking::SetMinStepSize");
     }
-   _min_step_size = min_step_size;
+    _min_step_size = min_step_size;
 }
 
 void ErrorTracking::SetMaxStepSize(double max_step_size) {

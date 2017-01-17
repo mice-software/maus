@@ -55,11 +55,11 @@ class Measurement: public Measurement_base {
     Measurement(const Measurement& meas);
 
     /** Constructor taking a measurement matrix as an argument */
-    Measurement(TMatrixD measurement);
+    explicit Measurement(TMatrixD measurement);
 
     /** Destructor does nothing */
     ~Measurement() {}
-    
+
     /** Inheritable copy constructor */
     Measurement* Clone() const;
 
@@ -92,9 +92,8 @@ class Measurement: public Measurement_base {
 
     TMatrixD _measurement;
 };
+}
+}
+}
+
 #endif
-
-}
-}
-}
-

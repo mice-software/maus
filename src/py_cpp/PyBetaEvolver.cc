@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <vector>
 
 #include "src/common_cpp/FieldTools/BetaEvolver.hh"
 
@@ -55,7 +56,9 @@ PyObject* ScaleStep4Fields(PyObject *dummy, PyObject *args, PyObject *kwds) {
 
   double e2_us, cc_us, e1_us, m2_us, m1_us, fc_us, fc_ds, m1_ds, m2_ds, e1_ds, cc_ds, e2_ds;
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddddddddd", kwlist,
-      &e2_us, &cc_us, &e1_us, &m2_us, &m1_us, &fc_us, &fc_ds, &m1_ds, &m2_ds, &e1_ds, &cc_ds, &e2_ds)) {
+      &e2_us, &cc_us, &e1_us, &m2_us, &m1_us,
+      &fc_us, &fc_ds,
+      &m1_ds, &m2_ds, &e1_ds, &cc_ds, &e2_ds)) {
       return NULL;
   }
   try {
@@ -78,7 +81,6 @@ PyObject* CheckStep4Names(PyObject *dummy, PyObject *args, PyObject *kwds) {
   }
   Py_INCREF(Py_None);
   return Py_None;
-  
 }
 
 PyObject* EvolveBeta(PyObject *dummy, PyObject *args, PyObject *kwds) {

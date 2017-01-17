@@ -81,7 +81,6 @@ TEST(MeasurementTest, DetectorToMeasurementMapTest) {
         map.at(type_list[i]);
     }
 }
-
 }
 }
 }

@@ -16,6 +16,9 @@
  */
 
 #include <math.h>
+
+#include <string>
+
 #include "Geant4/G4Material.hh"
 
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
@@ -55,18 +58,14 @@ double MaterialModel::dEdx(double E, double m, double charge) {
     double T_max = 2.0*_m_e*bg2/(1.0 + 2.0*gamma*mRatio + mRatio*mRatio);
 
     double coefficient = std::log(2.0*_m_e*bg2*T_max/(_I*_I)) - beta2;
-    coefficient *= 0.307075*charge*charge/2/beta2*_density/cm; // 0.307075 is cm^2 per mol; _density is g/cm^3
+    // 0.307075 is cm^2 per mol; _density is g/cm^3
+    coefficient *= 0.307075*charge*charge/2/beta2*_density/cm;
 
     double dEdx = 0.;
-    //std::cerr << "dEdX " << _material << std::endl;
     for (size_t i = 0; i < _material->GetNumberOfElements(); ++i) {
-        //std::cerr << "element " << i << std::flush;
         double frac = _material->GetFractionVector()[i];
-        //std::cerr << " fraction " << frac << std::flush;
         double a_el = _material->GetElement(i)->GetA()/(g/mole);
-        //std::cerr << " a " << a_el << std::flush;
         double z_el = _material->GetElement(i)->GetZ();
-        //std::cerr << " z " << z_el << std::endl;
         dEdx += frac*z_el/a_el*coefficient;
     }
     return -dEdx;

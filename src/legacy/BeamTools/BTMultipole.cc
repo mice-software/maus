@@ -83,7 +83,7 @@ void BTMultipole::Init(int pole, double fieldAtWidth,
     }
   }
   // BUG - this should be as strict as EndFieldValue
-  // note that the EndFieldValue uses _width/2, _height/2, _length; so 
+  // note that the EndFieldValue uses _width/2, _height/2, _length; so
   // EndFieldValue is factor 2 more strict than BB in each dimension;
   bbMin[0] = -_width;
   bbMax[0] = +_width;

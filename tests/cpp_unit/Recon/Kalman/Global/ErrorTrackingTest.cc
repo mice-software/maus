@@ -1,15 +1,15 @@
 /* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
- * 
+ *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MAUS is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -57,7 +57,7 @@ TEST(ErrorTrackingTest, GetSetDeviationsTest) {
 
 TEST(ErrorTrackingTest, GetSetFieldTest) {
     ErrorTracking propagator;
-    ::CLHEP::Hep3Vector bvec(1., 1., 1.); 
+    ::CLHEP::Hep3Vector bvec(1., 1., 1.);
     BTConstantField test_field(1000., 1000., 1000., bvec);
     propagator.SetField(&test_field);
     ASSERT_EQ(propagator.GetField(), &test_field);
@@ -131,7 +131,7 @@ TEST(ErrorTrackingTest, GetSetMCSTest) {
 TEST(ErrorTrackingTest, GetSetEStragTest) {
     ErrorTracking::EStragModel estrag_enum[] = {ErrorTracking::no_estrag,
                                          };
-    std::string estrag_str[] = {"no_estrag"};  // "estrag_forwards", "estrag_backwards", 
+    std::string estrag_str[] = {"no_estrag"};  // "estrag_forwards", "estrag_backwards",
     ErrorTracking propagator;
     for (size_t i = 0; i < 1; ++i) {
         propagator.SetEStragModel(estrag_str[i]);
@@ -244,13 +244,15 @@ void tracking_test(ErrorTracking& propagator, double* x_in, double dz) {
     }
     Squeak::mout(verbose) << std::endl << "AKA\n";
     for (size_t i = 0; i < 8; ++i) {
-        Squeak::mout(verbose) << i << " " << ref_x[i] << " " << test_x[i] << " " << ref_x[i] - test_x[i] << " ** ";
+        Squeak::mout(verbose) << i << " " << ref_x[i] << " " << test_x[i]
+                              << " " << ref_x[i] - test_x[i] << " ** ";
         // EXPECT_NEAR(0., ref_x[i] - test_x[i], 1e-9);
     }
     Squeak::mout(verbose) << "Done" << std::endl;
 }
 
-std::vector< std::vector<double> > get_tm_numerical(ErrorTracking& propagator, double* x_in, double delta, double step) {
+std::vector< std::vector<double> > get_tm_numerical(ErrorTracking& propagator,
+                                     double* x_in, double delta, double step) {
     std::vector< std::vector<double> > tm_numerical;
     for (size_t i = 0; i < 7; ++i) { // t, x, y, (z), E, px, py
         if (i == 3) // z is not varied
@@ -287,9 +289,12 @@ std::vector< std::vector<double> > get_tm_numerical(ErrorTracking& propagator, d
 }
 
 void tm_tracking_check(ErrorTracking& propagator, double* x_in, double delta, double step) {
-    std::vector< std::vector<double> > tm_numerical_fine = get_tm_numerical(propagator, x_in, delta, step);
-    std::vector< std::vector<double> > tm_numerical_coarse_1 = get_tm_numerical(propagator, x_in, delta, step*10.);
-    std::vector< std::vector<double> > tm_numerical_coarse_2 = get_tm_numerical(propagator, x_in, delta*10, step);
+    std::vector< std::vector<double> > tm_numerical_fine =
+                                get_tm_numerical(propagator, x_in, delta, step);
+    std::vector< std::vector<double> > tm_numerical_coarse_1 =
+                            get_tm_numerical(propagator, x_in, delta, step*10.);
+    std::vector< std::vector<double> > tm_numerical_coarse_2 =
+                             get_tm_numerical(propagator, x_in, delta*10, step);
     std::vector< std::vector<double> > tm_numerical = tm_numerical_fine;
     for (size_t i = 0; i < 6; ++i) {
         for (size_t j = 0; j < 6; ++j) {
@@ -325,14 +330,16 @@ void tm_tracking_check(ErrorTracking& propagator, double* x_in, double delta, do
     Squeak::mout(verbose) << "Numerical step*10 " << step*10. << " delta " << delta << std::endl;
     for (size_t j = 0; j < 6; ++j) {
         for (size_t k = 0; k < 6; ++k) {
-            Squeak::mout(verbose) << std::right << std::setw(13) << tm_numerical_coarse_1[j][k] << " ";
+            Squeak::mout(verbose) << std::right << std::setw(13)
+                                  << tm_numerical_coarse_1[j][k] << " ";
         }
         Squeak::mout(verbose) << std::endl;
     }
     Squeak::mout(verbose) << "Numerical step " << step << " delta*10 " << delta*10. << std::endl;
     for (size_t j = 0; j < 6; ++j) {
         for (size_t k = 0; k < 6; ++k) {
-            Squeak::mout(verbose) << std::right << std::setw(13) << tm_numerical_coarse_2[j][k] << " ";
+            Squeak::mout(verbose) << std::right << std::setw(13)
+                                  << tm_numerical_coarse_2[j][k] << " ";
         }
         Squeak::mout(verbose) << std::endl;
     }
@@ -343,7 +350,7 @@ void tm_tracking_check(ErrorTracking& propagator, double* x_in, double delta, do
             } else {
                 // 1 % tolerance between analytical and numerical solution
                // EXPECT_LT(fabs(tm_analytical[j][k]/tm_numerical[j][k] - 1), 1e-2);
-            } 
+            }
         }
     }
     MAUS::Matrix<double> matrix(4, 4, 0.);
@@ -354,7 +361,6 @@ void tm_tracking_check(ErrorTracking& propagator, double* x_in, double delta, do
             size_t k = mat_index[i];
             size_t l = mat_index[j];
             matrix(i, j) = tm_analytical[k][l]*100.;
-            // Squeak::mout(verbose) << i << " " << j << " ** " << k << " " << l << " " << matrix(i, j) << std::endl;
             if (i == j)
                 matrix(i, j) += 1.;
         }
@@ -365,7 +371,7 @@ void tm_tracking_check(ErrorTracking& propagator, double* x_in, double delta, do
 }
 
 TEST(ErrorTrackingTest, TransferMatrixConstFieldTest) {
-    ::CLHEP::Hep3Vector brand(0., 0., 3.); 
+    ::CLHEP::Hep3Vector brand(0., 0., 3.);
     BTConstantField field(1000., 1000., 1000., brand);
     ErrorTracking propagator;
     propagator.SetField(&field);
@@ -397,9 +403,9 @@ TEST(ErrorTrackingTest, TransferMatrixSolFieldTest) {
                 ErrorTracking propagator;
                 propagator.SetDeviations(delta, delta, delta, delta);
                 propagator.SetField(&sol);
-//BTTracker got 0.051625 10.3659 6.30369 15 307.837 149.384 156.591 191.74 
-//ErrorTracker got 0.0554901 12.6051 3.82044 15 307.837 244.952 -21.5023 152.106 
-//ErrorTracker got 0.0556614 12.6594 3.79158 15 307.837 245.883 -23.2551 150.346 
+// BTTracker got 0.051625 10.3659 6.30369 15 307.837 149.384 156.591 191.74
+// ErrorTracker got 0.0554901 12.6051 3.82044 15 307.837 244.952 -21.5023 152.106
+// ErrorTracker got 0.0556614 12.6594 3.79158 15 307.837 245.883 -23.2551 150.346
 
                 propagator.SetMinStepSize(0.1);
                 propagator.SetMaxStepSize(0.1001);
@@ -448,7 +454,6 @@ void print_x(double * x_in) {
         Squeak::mout(verbose) << std::endl;
     }
     Squeak::mout(verbose) << std::endl;
-
 }
 
 std::vector<double> drift_ellipse(double pz, double mass) {
@@ -465,12 +470,12 @@ std::vector<double> drift_ellipse(double pz, double mass) {
 
     std::vector<double> x_out(x_in, x_in+sizeof(x_in)/sizeof(double));
     return x_out;
-} 
+}
 
 // Propagate beam ellipse through a drift space
 TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
     // field
-    ::CLHEP::Hep3Vector brand(0., 0., 0.); 
+    ::CLHEP::Hep3Vector brand(0., 0., 0.);
     BTConstantField field(1000., 1000., 1000., brand);
 
     // ErrorTracking
@@ -506,7 +511,7 @@ TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
             continue;
         EXPECT_NEAR(x_in[i], x_out[i], 1e-3);
     }
-    
+
     double de = -dz/betagamma/betagamma/c_l/pz;
     for (size_t i = 8; i < 29; ++i) {
         if (i == 8) {
@@ -514,7 +519,9 @@ TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
         } else if (i == 11) {
             EXPECT_NEAR(x_out[i]/(x_in[23]*de), 1., 1e-6); // ste
         } else if (i == 14) {
-            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[26]*dz*dz/pz/pz), 1., 1e-6) << " Error O(1e-3) independent of step size -> review maths " << (x_in[i]+x_in[26]*dz*dz/pz/pz) << std::endl; // sxx
+            EXPECT_NEAR(x_out[i]/(x_in[i]+x_in[26]*dz*dz/pz/pz), 1., 1e-6)
+                << " Error O(1e-3) independent of step size -> review maths "
+                << (x_in[i]+x_in[26]*dz*dz/pz/pz) << std::endl; // sxx
         } else if (i == 17) {
             EXPECT_NEAR(x_out[i]/(x_in[26]*dz/pz), 1., 1e-6); // sxpx
         } else if (i == 19) {
@@ -527,7 +534,7 @@ TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
     }
 
     std::vector< std::vector<double> > tm_analytical = propagator.GetMatrix();
-    Squeak::mout(verbose) << "Analytical tE " << de/dz << " xpx " << 1/pz << std::endl; 
+    Squeak::mout(verbose) << "Analytical tE " << de/dz << " xpx " << 1/pz << std::endl;
     Squeak::mout(verbose) << "Integrated" << std::endl;
     for (size_t j = 0; j < 6; ++j) {
         for (size_t k = 0; k < 6; ++k) {
@@ -541,7 +548,7 @@ TEST(ErrorTrackingTest, PropagateEllipseDriftTest) {
 // field should yield a constant beam ellipse... let's check
 TEST(ErrorTrackingTest, PropagateEllipseConstFieldTest) {
     // field
-    ::CLHEP::Hep3Vector brand(0., 0., 1e-3*gRandom->Uniform()); // 0-1 T 
+    ::CLHEP::Hep3Vector brand(0., 0., 1e-3*gRandom->Uniform()); // 0-1 T
     BTConstantField field(1000., 1000., 1000., brand);
 
     // ErrorTracking
@@ -583,7 +590,7 @@ TEST(ErrorTrackingTest, PropagateEllipseConstFieldTest) {
     } catch (...) {
         ASSERT_TRUE(false) << "Caught an exception";
     }
-    Squeak::mout(verbose) << "Bz " << brand.z() << " kappa " << kappa 
+    Squeak::mout(verbose) << "Bz " << brand.z() << " kappa " << kappa
                           << " beta " << beta << " L~ " << ltwiddle << std::endl;
     Squeak::mout(verbose) << "x_in" << std::endl;
     print_x(x_in);
@@ -593,7 +600,7 @@ TEST(ErrorTrackingTest, PropagateEllipseConstFieldTest) {
     EXPECT_NEAR(x_out[0], x_in[4]/x_in[7]/299.792458*100., 1e-3);
     EXPECT_NEAR(x_out[3], 100., 1e-3);
     for (size_t i = 0; i < 8; ++i) {
-        if (i==0 || i == 3)
+        if (i == 0 || i == 3)
             continue;
         EXPECT_NEAR(x_in[i], x_out[i], 1e-3);
     }
@@ -720,10 +727,10 @@ TEST(ErrorTrackingTest, PropagateDriftELossTest) {
                 1e-9);
     EXPECT_NEAR(x_out[26], x_in[26]*(1-2*(1-x_out[7]/x_in[7])), 1e-2);
     EXPECT_NEAR(x_out[28], x_in[28]*(1-2*(1-x_out[7]/x_in[7])), 1e-2);
-    print_x(&x_out[0]); 
+    print_x(&x_out[0]);
     // Bethe Bloch backwards; when tracking back, should return to original state
     propagator.Propagate(&x_out[0], 0.);
-    print_x(&x_out[0]); 
+    print_x(&x_out[0]);
     EXPECT_NEAR(x_out[4], x_in[4], 1e-4);
     EXPECT_NEAR(x_out[7], x_in[7], 1e-4);
     EXPECT_NEAR(x_out[26], x_in[26], 1e-4);
@@ -742,7 +749,7 @@ TEST(ErrorTrackingTest, PropagateDriftELossTest) {
 }
 
 TEST(ErrorTrackingTest, PropagateDriftMCSTest) {
-    // Check that MCS var(px); var(py); in absence of dE/dz 
+    // Check that MCS var(px); var(py); in absence of dE/dz
     // through block of lead is correct
     std::string mod = getenv("MAUS_ROOT_DIR");
     mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
@@ -769,7 +776,7 @@ TEST(ErrorTrackingTest, PropagateDriftMCSTest) {
     EXPECT_LT(fabs(x_out[28] - x_in[28] - 217.786), 1e-3);
     // moliere_forwards propagating backwards should return to original state
     propagator.Propagate(&x_out[0], -200.);
-    print_x(&x_out[0]); 
+    print_x(&x_out[0]);
     for (size_t i = 0; i < x_out.size(); ++i)
         EXPECT_LT(fabs(x_out[i] - x_in[i]), 1e-9);
 
@@ -778,20 +785,20 @@ TEST(ErrorTrackingTest, PropagateDriftMCSTest) {
     x_out = x_in;
     print_x(&x_out[0]);
     propagator.Propagate(&x_out[0], 1200.);
-    print_x(&x_out[0]); 
+    print_x(&x_out[0]);
     EXPECT_LT(fabs(x_out[26] - x_in[26] + 217.786), 1e-3);
     EXPECT_LT(fabs(x_out[28] - x_in[28] + 217.786), 1e-3);
     // moliere_backwards propagating backwards should return to original state
     propagator.Propagate(&x_out[0], -200.);
-    print_x(&x_out[0]); 
+    print_x(&x_out[0]);
     for (size_t i = 0; i < x_out.size(); ++i)
         EXPECT_LT(fabs(x_out[i] - x_in[i]), 1e-9)
-           << i << " In: " << x_in[i] << " Out: " << x_out[i] 
+           << i << " In: " << x_in[i] << " Out: " << x_out[i]
            << " Diff: " << x_out[i] - x_in[i];
 }
 
 TEST(ErrorTrackingTest, PropagateDriftGeometryModelTest) {
-    // Check that MCS var(px); var(py); in absence of dE/dz 
+    // Check that MCS var(px); var(py); in absence of dE/dz
     // through block of lead is correct
     std::string mod = getenv("MAUS_ROOT_DIR");
     mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";

@@ -17,6 +17,7 @@
 
 #include <math.h>
 
+#include <utility>
 #include <algorithm>
 #include <limits>
 
@@ -56,7 +57,7 @@ MaterialModelAxialLookup& MaterialModelAxialLookup::operator=(const MaterialMode
     _rad_len_ratio = mat._rad_len_ratio;
     _density = mat._density;
     _z_over_a = mat._z_over_a;
-    return *this;    
+    return *this;
 }
 
 MaterialModelAxialLookup* MaterialModelAxialLookup::Clone() {
@@ -86,7 +87,6 @@ void MaterialModelAxialLookup::SetMaterial(double x, double y, double z) {
 }
 
 void MaterialModelAxialLookup::BuildLookupTable(double z_start, double z_end) {
-    //Squeak::mout(Squeak::debug) << "Compliance!" << std::endl;
     if (z_end <= z_start)
       throw Exceptions::Exception(Exceptions::recoverable,
                               "z_start must be less than z_end",

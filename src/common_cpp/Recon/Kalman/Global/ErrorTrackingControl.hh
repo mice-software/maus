@@ -43,7 +43,6 @@ namespace ErrorTrackingControl {
  */
 gsl_odeiv_control* gsl_odeiv_control_et_new(double min_step_size,
                                             double max_step_size);
-
 }
 }
 }

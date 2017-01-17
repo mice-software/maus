@@ -17,6 +17,8 @@
  */
 
 #include <sstream>
+#include <vector>
+#include <string>
 
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/BeamTools/BTFieldConstructor.hh"
@@ -97,7 +99,7 @@ namespace Global {
  *      tracking will abort with GSL_FAILURE.
  */
 class ErrorTracking {
-public:
+ public:
     enum ELossModel {bethe_bloch_forwards, bethe_bloch_backwards, no_eloss};
     enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
     enum EStragModel {estrag_forwards, estrag_backwards, no_estrag};
@@ -151,7 +153,7 @@ public:
      *  screwed up
      */
 
-    // BUG: Not tested for inversion ( if P V1 = V2; P^-1 V2 = V1 ) 
+    // BUG: Not tested for inversion ( if P V1 = V2; P^-1 V2 = V1 )
     void PropagateTransferMatrix(double x[44], double target_z);
 
     /** Calculate the infinitesimal transfer matrix
@@ -282,7 +284,7 @@ public:
      */
     void FieldDerivative(const double* point, double* derivative) const;
 
-private:
+ private:
     ErrorTracking(const ErrorTracking& tracking); // disable copy constructor
 
     // x_in is a vector of size 8, going like t,x,y,z; E,px,py,pz
@@ -294,8 +296,6 @@ private:
                           void* params);
     static int MatrixEquationOfMotion(double z, const double x[29], double dxdt[29],
                           void* params);
-
-
 
     BTField* _field;
     // scale for derivative calculation

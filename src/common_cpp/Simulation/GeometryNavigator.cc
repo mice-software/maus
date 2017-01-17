@@ -86,13 +86,11 @@ namespace MAUS {
     _setPoint(pos);
     double new_step = 0.;
     _current_position = pos;
-    //_navigator->ResetHierarchyAndLocate(pos,
+    // _navigator->ResetHierarchyAndLocate(pos,
     //                                    dir,
     //                                    *_touchable_history);
     _navigator->LocateGlobalPointAndSetup(pos, &dir, false, false);
-    //std::cerr << "ComputeStep pos: " << pos << " dir: " << dir << " step: " << step << std::endl;
     _navigator->ComputeStep(pos, dir, step, new_step);
-    //std::cerr << "            new_step: " << new_step << std::endl;
     if (_touchable_history) {
       delete _touchable_history;
       _touchable_history = NULL;

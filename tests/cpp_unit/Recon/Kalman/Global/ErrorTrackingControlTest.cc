@@ -30,7 +30,8 @@ TEST(ErrorTrackingControlTest, SetStepSizeTest) {
     MAUS::GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     std::vector<double> point(44., 0.);
     double step = 50.;
-    gsl_odeiv_control* control = MAUS::Kalman::Global::ErrorTrackingControl::gsl_odeiv_control_et_new(1., 100.);
+    gsl_odeiv_control* control = MAUS::Kalman::Global::ErrorTrackingControl::
+                                            gsl_odeiv_control_et_new(1., 100.);
     // boundaries at 1 m +/- 0.0025 m (transverse +/- 1 m)
     // no where near a boundary; take max value
     int ret_val = control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);
@@ -65,7 +66,8 @@ TEST(ErrorTrackingControlTest, SetStepSizeTest_) {
     MAUS::GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     std::vector<double> point(44., 0.);
     double step = 50.;
-    gsl_odeiv_control* control = MAUS::Kalman::Global::ErrorTrackingControl::gsl_odeiv_control_et_new(1., 100.);
+    gsl_odeiv_control* control = MAUS::Kalman::Global::ErrorTrackingControl::
+                                             gsl_odeiv_control_et_new(1., 100.);
     // boundaries at 1 m +/- 0.0025 m (transverse +/- 1 m)
     // no where near a boundary; take max value
     int ret_val = control->type->hadjust(control->state, 0, 0, &point[0], NULL, NULL, &step);

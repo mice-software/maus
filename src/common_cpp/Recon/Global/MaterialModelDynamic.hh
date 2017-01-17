@@ -74,7 +74,6 @@ class MaterialModelDynamic : public MaterialModel {
 
   private:
 };
-
 }
 
 #endif

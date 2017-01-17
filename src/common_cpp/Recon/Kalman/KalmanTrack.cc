@@ -267,7 +267,7 @@ std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix) {
 std::ostream& operator<<(std::ostream& out,
                          const MAUS::Kalman::State& state) {
     out << state.GetVector() << "\n";
-    out << state.GetCovariance(); 
+    out << state.GetCovariance();
     return out;
 }
 

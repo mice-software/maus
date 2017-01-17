@@ -15,8 +15,6 @@
  *
  */
 
-#include <string>
-
 #ifdef _XOPEN_SOURCE
 #undef _XOPEN_SOURCE
 #endif
@@ -27,6 +25,9 @@
 
 #include <Python.h>
 #include <structmember.h>
+
+#include <string>
+#include <vector>
 
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Recon/Kalman/Global/ErrorTracking.hh"
@@ -131,7 +132,14 @@ PyObject* set_variance(std::vector<double> x_in) {
     return set_matrix(matrix);
 }
 
-std::string set_deviations_docstring = "DOCSTRING";
+std::string set_deviations_docstring =
+std::string("Set the deviations used for calculating field map derivatives\n")+
+std::string(" - dx: horizontal deviation\n")+
+std::string(" - dy: vertical deviation\n")+
+std::string(" - dz: longitudinal deviation\n")+
+std::string(" - dt: time deviation\n")+
+std::string("Returns None\n");
+
 
 static PyObject* set_deviations(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("dx"),
@@ -160,7 +168,10 @@ static PyObject* set_deviations(PyObject *self, PyObject *args, PyObject *kwds) 
     return Py_None;
 }
 
-std::string get_deviations_docstring = "DOCSTRING";
+std::string get_deviations_docstring =
+std::string("Get the deviations used for calculating field map derivatives\n")+
+std::string(" - Takes no arguments\n")+
+std::string("Returns a tuple of the deviations in x, y, z, time\n");
 
 static PyObject* get_deviations(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -178,7 +189,11 @@ static PyObject* get_deviations(PyObject *self, PyObject *args, PyObject *kwds) 
     return value;
 }
 
-std::string enable_material_docstring = "DOCSTRING";
+std::string enable_material_docstring =
+std::string("Enable a material so that it exerts energy loss and scattering\n")+
+std::string(" - material: string name of the material to be enabled. By\n")+
+std::string("   default materials are disabled.\n")+
+std::string("Returns None\n");
 
 static PyObject* enable_material(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("material"),
@@ -193,7 +208,12 @@ static PyObject* enable_material(PyObject *self, PyObject *args, PyObject *kwds)
     return Py_None;
 }
 
-std::string disable_material_docstring = "DOCSTRING";
+std::string disable_material_docstring =
+std::string("Disable a material\n")+
+std::string(" - material: string name of the material to be disabled. By\n")+
+std::string("   default materials are disabled. Volumes with disabled\n")+
+std::string("   materials do not affect the tracking.\n")+
+std::string("Returns None\n");
 
 static PyObject* disable_material(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("material"),
@@ -208,7 +228,10 @@ static PyObject* disable_material(PyObject *self, PyObject *args, PyObject *kwds
     return Py_None;
 }
 
-std::string is_enabled_material_docstring = "DOCSTRING";
+std::string is_enabled_material_docstring =
+std::string("Return true if a material is enabled\n")+
+std::string(" - material: string name of the material to check.\n")+
+std::string("Returns a boolean True if the material was enabled, else False.\n");
 
 static PyObject* is_enabled_material(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("material"),
@@ -226,7 +249,12 @@ static PyObject* is_enabled_material(PyObject *self, PyObject *args, PyObject *k
     }
 }
 
-std::string set_max_step_size_docstring = "DOCSTRING";
+std::string set_max_step_size_docstring =
+std::string("Set the maximum step size that will be used by the tracking\n")+
+std::string(" - max_step_size: float corresponding to the maximum step\n")+
+std::string("   size. Steps can be smaller if the step might intersect a\n")+
+std::string("   physical volume.\n")+
+std::string("Returns None.\n");
 
 static PyObject* set_max_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("max_step_size"),
@@ -252,7 +280,8 @@ static PyObject* set_max_step_size(PyObject *self, PyObject *args, PyObject *kwd
     return Py_None;
 }
 
-std::string get_max_step_size_docstring = "DOCSTRING";
+std::string get_max_step_size_docstring =
+std::string("Returns the maximum step size that will be used by the tracking\n");
 
 static PyObject* get_max_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -271,7 +300,12 @@ static PyObject* get_max_step_size(PyObject *self, PyObject *args, PyObject *kwd
     return value;
 }
 
-std::string set_min_step_size_docstring = "DOCSTRING";
+std::string set_min_step_size_docstring =
+std::string("Set the minimum step size that will be used by the tracking\n")+
+std::string(" - min_step_size: float corresponding to the minimum step\n")+
+std::string("   size. Steps cannot be smaller even if there is a nearby\n")+
+std::string("   physical volume.\n")+
+std::string("Returns None.\n");
 
 static PyObject* set_min_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("min_step_size"),
@@ -297,7 +331,8 @@ static PyObject* set_min_step_size(PyObject *self, PyObject *args, PyObject *kwd
     return Py_None;
 }
 
-std::string get_min_step_size_docstring = "DOCSTRING";
+std::string get_min_step_size_docstring =
+std::string("Returns the minimum step size that will be used by the tracking\n");
 
 static PyObject* get_min_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -316,7 +351,12 @@ static PyObject* get_min_step_size(PyObject *self, PyObject *args, PyObject *kwd
     return value;
 }
 
-std::string set_charge_docstring = "DOCSTRING";
+std::string set_charge_docstring =
+std::string("Set the particle charge that will be used by the tracking\n")+
+std::string(" - charge: float corresponding to the particle that will be\n")+
+std::string("  used by the tracking.\n")+
+std::string("Returns None.\n");
+
 
 static PyObject* set_charge(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("charge"),
@@ -342,7 +382,8 @@ static PyObject* set_charge(PyObject *self, PyObject *args, PyObject *kwds) {
     return Py_None;
 }
 
-std::string get_charge_docstring = "DOCSTRING";
+std::string get_charge_docstring =
+std::string("Returns the particle charge that will be used by the tracking\n");
 
 static PyObject* get_charge(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -361,7 +402,18 @@ static PyObject* get_charge(PyObject *self, PyObject *args, PyObject *kwds) {
     return value;
 }
 
-std::string set_energy_loss_model_docstring = "DOCSTRING";
+std::string set_energy_loss_model_docstring =
+std::string("Set the energy loss model that will be used by the tracking\n")+
+std::string(" - model: string corresponding to the energy loss model.\n")+
+std::string("   Options are:\n")+
+std::string("     'no_eloss' particles never lose energy in material.\n")+
+std::string("     'bethe_bloch_forwards' forwards-travelling particles lose\n")+
+std::string("      energy in material; backwards-travelling particles gain\n")+
+std::string("      energy in material.\n")+
+std::string("     'bethe_bloch_backwards' backwards-travelling particles lose\n")+
+std::string("      energy in material; forwards-travelling particles gain\n")+
+std::string("      energy in material.\n")+
+std::string("Returns None.\n");
 
 static PyObject* set_energy_loss_model(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("model"),
@@ -398,7 +450,10 @@ static PyObject* set_energy_loss_model(PyObject *self, PyObject *args, PyObject 
     return Py_None;
 }
 
-std::string get_energy_loss_model_docstring = "DOCSTRING";
+std::string get_energy_loss_model_docstring =
+std::string("Returns a string corresponding to the energy loss model that\n")+
+std::string("will be used by the tracking\n");
+
 
 static PyObject* get_energy_loss_model(PyObject *self, PyObject *args, PyObject *kwds) {
     PyGlobalErrorTracking* py_glet = reinterpret_cast<PyGlobalErrorTracking*>(self);
@@ -430,6 +485,7 @@ static PyObject* get_energy_loss_model(PyObject *self, PyObject *args, PyObject 
 }
 
 std::string set_scattering_model_docstring = "DOCSTRING";
+
 // enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
 static PyObject* set_scattering_model(PyObject *self, PyObject *args, PyObject *kwds) {
     static char *kwlist[] = {const_cast<char*>("model"),
@@ -644,7 +700,8 @@ static PyObject* propagate_errors
     PyObject* py_centroid = NULL;
     PyObject* py_ellipse = NULL;
     double target_z = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOd|", kwlist, &py_centroid, &py_ellipse, &target_z)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOd|", kwlist,
+                                     &py_centroid, &py_ellipse, &target_z)) {
         // error message is set in PyArg_Parse...
         return NULL;
     }

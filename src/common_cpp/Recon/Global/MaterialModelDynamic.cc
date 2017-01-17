@@ -16,6 +16,8 @@
  */
 
 #include <math.h>
+#include <string>
+
 #include "Geant4/G4Material.hh"
 
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
@@ -48,7 +50,7 @@ MaterialModelDynamic& MaterialModelDynamic::operator=(const MaterialModelDynamic
     _rad_len_ratio = mat._rad_len_ratio;
     _density = mat._density;
     _z_over_a = mat._z_over_a;
-    return *this;    
+    return *this;
 }
 
 MaterialModelDynamic* MaterialModelDynamic::Clone() {

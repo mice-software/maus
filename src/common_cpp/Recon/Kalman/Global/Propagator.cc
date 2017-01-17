@@ -22,7 +22,7 @@ namespace MAUS {
 namespace Kalman {
 namespace Global {
 
-Propagator::Propagator() 
+Propagator::Propagator()
   : Propagator_base(6), _tracking(), _mass(0.) {
 }
 
@@ -75,7 +75,7 @@ void Propagator::Propagate(const TrackPoint& start_tp, TrackPoint& end_tp) {
 
     for (size_t i = 0; i < 3; ++i) {
         vec[i][0] = x[i]; // t, x, y
-        vec[i+3][0] = x[i+4]; // energy, px, py        
+        vec[i+3][0] = x[i+4]; // energy, px, py
     }
 
     cov_index = 8;

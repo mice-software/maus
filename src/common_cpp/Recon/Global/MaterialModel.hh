@@ -18,6 +18,7 @@
 #ifndef recon_global_materialmodel_hh_
 #define recon_global_materialmodel_hh_
 
+#include <string>
 #include <set>
 #include <iostream>
 
@@ -72,7 +73,7 @@ class MaterialModel {
      *  @param mass: mass of the incident particle
      *  @param charge: charge of the incident particle
      *
-     *  Performs numerical derivative of the Bethe Bloch curve by doing 
+     *  Performs numerical derivative of the Bethe Bloch curve by doing
      *  d2E/dEdz = [dE/dz(E+dE) - dE/dz(E-dE)]/2/dE with dE given by the
      *  d2EdxdE_delta_const.
      */
@@ -154,13 +155,13 @@ class MaterialModel {
 
     static std::set<std::string> _enabled_materials;
 
-    static constexpr double _d2EdxdE_delta_const = 0.1; 
-    static constexpr double _estrag_const = 0.157; //2.1047291091867513e-13; // 4 pi (r_e m_e c^2)^2
+    static constexpr double _d2EdxdE_delta_const = 0.1;
+    // 2.1047291091867513e-13; // 4 pi (r_e m_e c^2)^2
+    static constexpr double _estrag_const = 0.157;
     static constexpr double _dedx_constant = 0.307075;
     static constexpr double _m_e = 0.510998928;
     static constexpr double c_l = 299.792458; // mm*ns^{-1}
 };
-
 }
 
 #endif

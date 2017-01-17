@@ -84,7 +84,8 @@ void FieldPhaser::SetPhases() {
             Squeak::mout(Squeak::info) << "." << std::flush;
             Squeak::mout(Squeak::debug) << "Firing "
                 << "x:" << ref.x << " y: " << ref.y << " z: " << ref.z << " t: " << ref.time
-                << "px:" << ref.px << " py: " << ref.py << " pz: " << ref.pz << " energy: " << ref.energy << std::endl;
+                << "px:" << ref.px << " py: " << ref.py << " pz: " << ref.pz
+                << " energy: " << ref.energy << std::endl;
 
             MCEvent* event = mgm->RunParticle(ref);
             std::vector<VirtualHit>* v_hits = event->GetVirtualHits();

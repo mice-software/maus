@@ -15,6 +15,7 @@
  *
  */
 
+#include <vector>
 #include <algorithm>
 
 #include "TFile.h"
@@ -66,7 +67,8 @@ void InputCppRootData::parse_file_name(Json::Value json_dc) {
   Json::Value json_fnames = json_dc["input_root_file_name"];
   if (json_fnames.isArray()) {
       for (size_t i = 0; i < json_fnames.size(); ++i) {
-          _filename_list.push_back(JsonWrapper::GetItem(json_fnames, i, JsonWrapper::stringValue).asString());
+          _filename_list.push_back(JsonWrapper::GetItem(
+                        json_fnames, i, JsonWrapper::stringValue).asString());
       }
   } else if (json_fnames.isString()) {
       _filename_list.push_back(json_fnames.asString());
