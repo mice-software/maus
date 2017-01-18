@@ -14,7 +14,7 @@ Configuration Box
     PropertyString     Volume Cylinder
     PropertyHep3Vector Dimensions 30. 50. -1. mm
     PropertyHep3Vector Position 0. 0. 100. mm
-    PropertyString Material Galactic
+    PropertyString Material POLYSTYRENE
   }
   Module Mod3
   {

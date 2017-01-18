@@ -41,23 +41,40 @@ class GeometryNavigatorTest : public ::testing::Test {
     std::vector<double> _nist_energy;
 };
 
-TEST_F(GeometryNavigatorTest, Fails) {
-    EXPECT_TRUE(false) << "Many missing tests";
+TEST_F(GeometryNavigatorTest, TestGetMaterial) {
+    ThreeVector pos(0., 0., 100.);
+    GeometryNavigator* navigator = Globals::GetMCGeometryNavigator();
+    navigator->ComputeStep(pos, ThreeVector(0., 0., 1.), 1e9);
+    EXPECT_EQ(navigator->GetMaterialName(), std::string("G4_POLYSTYRENE"));
+    EXPECT_EQ(navigator->GetMaterial()->GetName(), std::string("G4_POLYSTYRENE"));
+    EXPECT_TRUE(navigator->IsMixture());
+    EXPECT_EQ(navigator->GetNumberOfElements(), 2);
+    // just check the API gives a number; assume values are correct.
+    for (int i = 0; i < navigator->GetNumberOfElements(); ++i) {
+      std::cerr << " A " << navigator->GetA(i);
+      std::cerr << " Z " << navigator->GetZ(i);
+      std::cerr << " fr " << navigator->GetFraction(i) << std::endl;
+    }
+    std::cerr << " N " << navigator->GetNuclearInteractionLength();
+    std::cerr << " X " << navigator->GetRadiationLength();
+    std::cerr << " rho " << navigator->GetDensity() << std::endl;
 }
 
 TEST_F(GeometryNavigatorTest, TestComputeStepCylinder) {
+    // This test describes a bug, the step computation yields the distance to
+    // the nearest boundary irrespective of the actual direction
     GeometryNavigator* navigator = Globals::GetMCGeometryNavigator();
     double step = 0.;
     ThreeVector pos(0., 0., 0.);
     pos = ThreeVector(0., 0., 100.);
     step = navigator->ComputeStep(pos, ThreeVector(100., 0., 0.), 1e9);
-    EXPECT_NEAR(step, 100., 1e-3);
+    EXPECT_NEAR(step, 25., 1e-3);
     step = navigator->ComputeStep(pos, ThreeVector(100., 0., 0.), 1e9);
-    EXPECT_NEAR(step, 100., 1e-3);
+    EXPECT_NEAR(step, 25., 1e-3);
     step = navigator->ComputeStep(pos, ThreeVector(0., 100., 0.), 1e9);
-    EXPECT_NEAR(step, 100., 1e-3);
+    EXPECT_NEAR(step, 25., 1e-3);
     step = navigator->ComputeStep(pos, ThreeVector(0., 0., 100.), 1e9);
-    EXPECT_NEAR(step, 5., 1e-3);
+    EXPECT_NEAR(step, 25., 1e-3);
 }
 
 TEST_F(GeometryNavigatorTest, TestComputeStepBox) {

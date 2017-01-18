@@ -96,9 +96,6 @@ namespace MAUS {
        *  - element: indexes the element in the material
        *
        *  Units: g/mole
-       *
-       *  WARNING: This function will throw an exception if the current material
-       *  is a mixture
        */
       double GetA(size_t element = 0) const;
 
@@ -106,9 +103,6 @@ namespace MAUS {
        *  - element: indexes the element in the material
        *
        *  Unitless
-       *
-       *  WARNING: This function will throw an exception if the current material
-       *  is a mixture
        */
       double GetZ(size_t element = 0) const;
 
