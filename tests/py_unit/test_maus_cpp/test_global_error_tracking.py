@@ -18,6 +18,7 @@
 import StringIO
 import unittest
 import json
+import os
 
 import numpy
 import xboa.common
@@ -225,7 +226,6 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
         except RuntimeError:
             pass
 
-
     def test_get_set_geometry_model(self):
         """Check get/set geometry model"""
         tracking = err_prop.GlobalErrorTracking()
@@ -267,7 +267,9 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
 
     def test_step_fs2a(self):
         """Check fs2a lattice"""
-        self._new_geometry("tests/py_unit/test_maus_cpp/fs2a_derivatives.dat")
+        self._new_geometry(os.path.expandvars(
+            "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/fs2a_derivatives.dat"
+        ))
         centroid = [0. for i in range(8)]
         mass = xboa.common.pdg_pid_to_mass[13]
         mom = 200.
@@ -298,7 +300,9 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
 
     def test_tm(self):
         """Test transfer matrix calculation"""
-        self._new_geometry("tests/py_unit/test_maus_cpp/fs2a_derivatives.dat")
+        self._new_geometry(os.path.expandvars(
+            "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/fs2a_derivatives.dat"
+        ))
         mass = xboa.common.pdg_pid_to_mass[13]
         centroid = [0. for i in range(8)]
         centroid[1] = 1.
