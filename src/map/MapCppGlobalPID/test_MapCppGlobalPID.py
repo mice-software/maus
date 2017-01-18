@@ -106,11 +106,13 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalPID-Final':
-                    track = i
+            num_tracks = 0;
+            for track in tracksarray:
+                if track['mapper_name'] == 'MapCppGlobalPID':
                     self.assertTrue('pid' in track)
                     self.assertEqual(-13, track['pid'])
+                    num_tracks += 1
+            self.assertEqual(num_tracks, 3)
 
     def test_positron_PID(self):
         """Check that process can identify positrons"""
@@ -130,11 +132,13 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalPID-Final':
-                    track = i
+            num_tracks = 0;
+            for track in tracksarray:
+                if track['mapper_name'] == 'MapCppGlobalPID':
                     self.assertTrue('pid' in track)
                     self.assertEqual(-11, track['pid'])
+                    num_tracks += 1
+            self.assertEqual(num_tracks, 3)
 
     def test_pion_PID(self):
         """Check that process can identify pions"""
@@ -154,34 +158,13 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalPID-Final':
-                    track = i
+            num_tracks = 0;
+            for track in tracksarray:
+                if track['mapper_name'] == 'MapCppGlobalPID':
                     self.assertTrue('pid' in track)
                     self.assertEqual(211, track['pid'])
-
-    def test_undef_PID(self):
-        """Check that PID set to 0 for indistinguishable particles"""
-        test7 = ('%s/src/map/MapCppGlobalPID/undef_pid_test.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        self.mapper.birth(json.dumps(self.config0))
-        fin = open(test7,'r')
-        for line in fin:
-            result = self.mapper.process(line)
-            spill_out = maus_cpp.converter.json_repr(result)
-            self.assertTrue('recon_events' in spill_out)
-            revtarray = spill_out['recon_events']
-            self.assertEqual(1, len(revtarray))
-            revt = revtarray[0]
-            self.assertTrue('global_event' in revt)
-            gevt = revt['global_event']
-            self.assertTrue('tracks' in gevt)
-            tracksarray = gevt['tracks']
-            for i in tracksarray:
-                if i['mapper_name'] == 'MapCppGlobalPID-Final':
-                    track = i
-                    self.assertTrue('pid' in track)
-                    self.assertEqual(0, track['pid'])
+                    num_tracks += 1
+            self.assertEqual(num_tracks, 3)
 
     def test_invalid_logL(self):
         """Check that a track that returns an invalid logL does not get
@@ -202,10 +185,12 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            self.assertEqual(3, len(gevt['tracks']))
-            track = tracksarray[0]
-            self.assertTrue('pid' in track)
-            self.assertEqual(0, track['pid'])
+            self.assertEqual(2, len(gevt['tracks']))
+            num_tracks = 0;
+            for track in tracksarray:
+                if track['mapper_name'] == 'MapCppGlobalPID':
+                    num_tracks += 1
+            self.assertEqual(num_tracks, 0)
     
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103

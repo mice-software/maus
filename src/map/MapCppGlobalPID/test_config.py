@@ -81,7 +81,7 @@ pid_config = "step_4"
 pid_mode = "custom"
 # If pid_mode = "custom", variables to use should be set here as a space
 # separated list, i.e. custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
-custom_pid_set = "PIDVarA"
+custom_pid_set = "PIDVarA PIDVarB PIDVarC PIDVarD PIDVarE PIDVarF"
 # PID confidence level- set the margin (in %) between the confidence levels of
 # competing pid hypotheses before they are selected as the correct hypothesis
 pid_confidence_level = 10
@@ -92,4 +92,4 @@ pid_confidence_level = 10
 # "Through-US" or "Through-DS" respectively). Or a combination of the above can
 # be used, entered as a space separated list,
 # e.g. "Through Through-US Through-DS"
-pid_track_selection = "Through"
+pid_track_selection = "all"

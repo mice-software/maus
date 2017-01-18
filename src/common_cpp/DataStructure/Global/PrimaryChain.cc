@@ -88,9 +88,9 @@ void PrimaryChain::SetUSDaughter(MAUS::DataStructure::Global::PrimaryChain* us_d
 }
 
 MAUS::DataStructure::Global::PrimaryChain* PrimaryChain::GetDSDaughter() const {
-  MAUS::DataStructure::Global::PrimaryChain* ds_daughter_chain =
+  MAUS::DataStructure::Global::PrimaryChain* ds_daughter =
     (MAUS::DataStructure::Global::PrimaryChain*) _ds_daughter.GetObject();
-  return ds_daughter_chain;
+  return ds_daughter;
 }
 
 void PrimaryChain::SetDSDaughter(MAUS::DataStructure::Global::PrimaryChain* ds_daughter) {

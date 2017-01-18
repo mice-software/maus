@@ -91,8 +91,7 @@ verbose_level = 0
 track_matching_pid_hypothesis = "kMuPlus"
 track_matching_energy_loss = True
 track_matching_tolerances = {
-  "TOF0x":40.0,
-  "TOF0y":40.0,
+  "TOF0t":2.0,
   "TOF1x":50.0,
   "TOF1y":50.0,
   "TOF2x":50.0,

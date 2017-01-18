@@ -274,6 +274,7 @@ void TrackMatching::DSTrack() {
             emr_tp->set_momentum(momentum);
             hypothesis_track->AddTrackPoint(emr_tp);
           }
+          Squeak::mout(Squeak::debug) << "TrackMatching: EMR Added (No Check)" << std::endl;
         }
       }
       // Add reference to the tracker track to the hypothesis track

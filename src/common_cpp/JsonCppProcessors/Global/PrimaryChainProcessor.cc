@@ -47,7 +47,7 @@ PrimaryChainProcessor::PrimaryChainProcessor() {
   RegisterTRef(
       "ds_daughter",
       &MAUS::DataStructure::Global::PrimaryChain::get_ds_daughter,
-      &MAUS::DataStructure::Global::PrimaryChain::set_us_daughter,
+      &MAUS::DataStructure::Global::PrimaryChain::set_ds_daughter,
       false);
 
   RegisterTRefArray(

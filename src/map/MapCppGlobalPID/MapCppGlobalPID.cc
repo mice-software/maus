@@ -481,7 +481,8 @@ namespace MAUS {
         MAUS::DataStructure::Global::Track* us_track = us_chain->GetPIDTrack();
         MAUS::DataStructure::Global::Track* ds_track = ds_chain->GetPIDTrack();
         // These should always have the same PID as the through track, but check just to make sure
-        if (us_track->get_pid() == track_pid and ds_track->get_pid() == track_pid) {
+        if (us_track and ds_track and
+            us_track->get_pid() == track_pid and ds_track->get_pid() == track_pid) {
           final_pidtrack->AddTrack(us_track);
           final_pidtrack->AddTrack(ds_track);
           global_event->add_track_recursive(final_pidtrack);

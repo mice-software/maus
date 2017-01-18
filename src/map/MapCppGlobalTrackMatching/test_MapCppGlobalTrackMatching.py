@@ -70,22 +70,6 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         self.assertFalse('global_event' in spill_out)
         maus_cpp.globals.death()
 
-    def test_invalid_json_birth(self):
-        """Check birth with an invalid json input"""
-        test2 = ('%s/src/map/MapCppGlobalTrackMatching/invalid.json' % 
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin1 = open(test2,'r')
-        data = fin1.read()
-        self.assertRaises(ValueError, self.mapper.birth, data)
-        # test with valid data but invalid configuration
-        test3 = ('%s/src/map/MapCppGlobalTrackMatching/testdata.json' %
-                 os.environ.get("MAUS_ROOT_DIR"))
-        fin2 = open(test3,'r')
-        line = fin2.readline()
-        result = self.mapper.process(line)
-        doc = maus_cpp.converter.json_repr(result)
-        self.assertTrue("MapCppGlobalTrackMatching" in doc["errors"])
-
     def test_invalid_json_process(self):
         """Check process with an invalid json input"""
         if maus_cpp.globals.has_instance():
@@ -121,22 +105,35 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         fin = open(test4,'r')
         line = fin.read()
         result = self.mapper.process(line)
-        # Something is going wrong here, will have to come back to check
-        #~ spill_out = maus_cpp.converter.json_repr(result)
-        #~ self.assertTrue('recon_events' in spill_out)
-        #~ revtarray = spill_out['recon_events']
-        #~ self.assertEqual(1, len(revtarray))
-        #~ revt = revtarray[0]
-        #~ self.assertTrue('global_event' in revt)
-        #~ self.assertTrue('track_points' in revt['global_event'])
-        #~ num_us_trackpoints = 0
-        #~ num_ds_trackpoints = 0
-        #~ for i in revt['global_event']['track_points']:
-            #~ self.assertTrue('mapper_name' in i)
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_US':
-                #~ num_us_trackpoints += 1
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_DS':
-                #~ num_ds_trackpoints += 1
+        spill_out = maus_cpp.converter.json_repr(result)
+        self.assertEqual(result.GetSpill().GetReconEvents().size(), 1)
+        global_event = result.GetSpill().GetReconEvents()[0].GetGlobalEvent()
+        self.assertEqual(global_event.get_primary_chains().size(), 3)
+        self.assertEqual(global_event.GetThroughPrimaryChains().size(), 1)
+        self.assertEqual(global_event.GetUSPrimaryChains().size(), 1)
+        self.assertEqual(global_event.GetDSPrimaryChains().size(), 1)
+        through_chain = global_event.GetThroughPrimaryChains()[0]
+        self.assertEqual(through_chain.GetUSDaughter(), global_event.GetUSPrimaryChains()[0])
+        self.assertEqual(through_chain.GetDSDaughter(), global_event.GetDSPrimaryChains()[0])
+        print "###"
+        constituent_tracks = result.GetSpill().GetReconEvents()[0].GetGlobalEvent().GetThroughPrimaryChains()[0].GetMatchedTracks()[0].GetConstituentTracks()
+        self.assertTrue('recon_events' in spill_out)
+        revtarray = spill_out['recon_events']
+        self.assertEqual(1, len(revtarray))
+        revt = revtarray[0]
+        self.assertTrue('global_event' in revt)
+        self.assertTrue('track_points' in revt['global_event'])
+        num_us_trackpoints = 0
+        num_ds_trackpoints = 0
+        self.assertEqual(len(revt['global_event']['track_points']), 10)
+        self.assertEqual(len(revt['global_event']['tracks']), 6)
+        self.assertEqual(len(revt['global_event']['primary_chains']), 3)
+        #~ print len(revt['global_event']['primary_chains'][2]['tracks'])
+        #~ self.assertEqual(revt['global_event']['primary_chains'][2]['us_daughter']['type'], 1)
+        #~ self.assertEqual(revt['global_event']['primary_chains'][2]['ds_daughter']['type'], 2)
+        #~ for chain in revt['global_event']['primary_chains']:
+            #~ print chain['us_daughter']
+
         #~ self.assertEqual(num_us_trackpoints, 3)
         #~ self.assertEqual(num_ds_trackpoints, 4)
         #~ self.assertTrue('tracks' in revt['global_event'])
@@ -154,7 +151,7 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         #~ self.assertEqual(num_us_tracks, 1)
         #~ self.assertEqual(num_ds_tracks, 1)
         #~ self.assertEqual(num_through_tracks, 1)
-        #~ maus_cpp.globals.death()
+        maus_cpp.globals.death()
 
     def test_reset_geometry(self):
         """Attempt at a hack to fix issues with geometry not being reset"""
