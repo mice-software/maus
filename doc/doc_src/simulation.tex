@@ -142,7 +142,8 @@ Name & Meaning \\
 \verb|transverse_mode| & Options are
                           \begin{itemize}
                             \setlength{\itemsep}{0mm}
-                            \item \verb|pencil|: x, py, y, py taken from \verb|reference|
+                            \item \verb|pencil|: x, px, y, py taken from \verb|reference|
+                            \item \verb|uniform|: Radius and $p_{t}$ randomly selected from uniform distribution for testing and systematic studies.
                             \item \verb|penn|: cylindrical beam symmetric in x and y
                             \item \verb|constant_solenoid|: cylindrical beam symmetric in x and y, with beam radius calculated from on-axis B-field to give constant beam radius along a solenoid.
                             \item \verb|twiss|: beam with decoupled x and y beam ellipses.
@@ -160,6 +161,10 @@ Name & Meaning \\
 \verb|beta_y| & if \verb|transverse_mode| is \verb|twiss|, set $\beta_y$.\\
 \verb|alpha_y| & if \verb|transverse_mode| is \verb|twiss|, set $\alpha_y$.\\
 \verb|emittance_y| & if \verb|transverse_mode| is \verb|twiss|, set $\epsilon_y$.\\
+\hline
+\verb|range_radius| & if \verb|transverse_mode| is \verb|uniform|, set the radial extent of the beam.\\
+\verb|range_pt| & if \verb|transverse_mode| is \verb|uniform|, set the range of transverse momenta.\\
+\verb|fit_solenoid| & if \verb|transverse_mode| is \verb|uniform|, specify the magnetic into which the beam is being simulation. It ignores \verb|range_radius| and sets the x and y values such that the particles do no rotate outside their initial radius due to the larmor rotations.\\
 \begin{makeimage} % force latex2html to render as an html table 
 \end{makeimage} 
 \end{tabularx}
@@ -181,6 +186,7 @@ Name & Meaning \\
                             \item \verb|pencil|: time, energy/p/pz taken from \verb|reference|
                             \item \verb|gaussian|: uncorrelated gaussians in time and energy/p/pz
                             \item \verb|twiss|: multivariate gaussian in time and energy/p/pz
+                            \item \verb|uniform|: uniform in energy/p/pz and time taken from reference.
                             \item \verb|uniform_time|: gaussian in energy/p/pz and uniform in time.
                             \item \verb|sawtooth_time|: gaussian in energy/p/pz and sawtooth in time.
                           \end{itemize} \\
@@ -194,6 +200,8 @@ Name & Meaning \\
 \begin{tabular}{l} \verb|sigma_p| \\ \verb|sigma_energy| \\ \verb|sigma_pz| \end{tabular} & In \verb|gaussian|, \verb|uniform_time|, \verb|sawtooth_time| mode, set the RMS energy/p/pz. \\
 \hline
 \begin{tabular}{l} \verb|cov(t,p)| \\ \verb|cov(t,energy)| \\ \verb|cov(t,pz)| \end{tabular} & In \verb|gaussian| mode, set the covariance between p/energy/pz and time and energy. It is an error if this results in a matrix that is not positive definite (eigenvalues positive).\\
+\hline
+\verb|range_pz| & In \verb|uniform| mode, set the window of momenta that can be sample from from, like: \verb|[100.0, 300.0]|\\
 \hline
 \verb|t_start| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the start time of the parent distribution \\
 \verb|t_end| & In \verb|uniform_time| and \verb|sawtooth_time| mode, set the end time of the parent distribution \\
