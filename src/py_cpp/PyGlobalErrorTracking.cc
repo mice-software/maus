@@ -1,4 +1,4 @@
-/* This file is part of MAUS: http://micewww.pp.rl.ac.uk:8080/projects/maus
+/* This file is part of MAUS: http://micewww.pp.rl.ac.uk/projects/maus
  *
  * MAUS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -278,7 +278,7 @@ static PyObject* set_max_step_size(PyObject *self, PyObject *args, PyObject *kwd
     }
     try {
         glet->SetMaxStepSize(step_size);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }
@@ -335,7 +335,7 @@ static PyObject* set_min_step_size(PyObject *self, PyObject *args, PyObject *kwd
     }
     try {
         glet->SetMinStepSize(step_size);
-    } catch(std::exception& exc) {
+    } catch (std::exception& exc) {
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }
