@@ -219,8 +219,10 @@ void GlobalsManager::SetMonteCarloMiceModules(MiceModule* mc_mods) {
     delete Globals::_process->_mc_geometry_navigator;
     Globals::_process->_mc_geometry_navigator = new GeometryNavigator();
     Globals::_process->_mc_geometry_navigator->Initialise(world);
-    double z_world = mc_mods->propertyHep3Vector("Dimensions").z();
-    MaterialModelAxialLookup::BuildLookupTable(-z_world, z_world);
+    if (mc_mods != NULL) {
+        double z_world = mc_mods->propertyHep3Vector("Dimensions").z();
+        MaterialModelAxialLookup::BuildLookupTable(-z_world, z_world);
+    }
 }
 
 void GlobalsManager::SetLegacyCards(dataCards* legacy_cards) {
