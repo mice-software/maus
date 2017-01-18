@@ -82,7 +82,7 @@ void ErrorTracking::Propagate(double x[29], double target_z) {
                             {ErrorTracking::EquationsOfMotion, NULL, 29, NULL};
 
   double z = x[3];
-  _gsl_h = fabs(_min_step_size);  // ignore _step_size sign, we "auto detect"
+  _gsl_h = _min_step_size;
   if (z > target_z) {
       _gsl_h *= -1;  // stepping backwards...
       _charge = -1;
@@ -132,7 +132,7 @@ void ErrorTracking::PropagateTransferMatrix(double x[44], double target_z) {
                        {ErrorTracking::EquationsOfMotion, NULL, 44, NULL};
 
   double z = x[3];
-  _gsl_h = fabs(_max_step_size);  // ignore _step_size sign, we "auto detect"
+  _gsl_h = _min_step_size;  // ignore _step_size sign, we "auto detect"
   if (z > target_z)
       _gsl_h *= -1;  // stepping backwards...
   int nsteps = 0;
@@ -576,6 +576,8 @@ std::ostream& ErrorTracking::print(std::ostream& out, const double* x) {
 }
 
 void ErrorTracking::SetMinStepSize(double min_step_size) {
+    // step size is always positive (direction is determined automatically)
+    min_step_size = fabs(min_step_size);
     if (min_step_size > _max_step_size) {
         throw Exceptions::Exception(Exceptions::recoverable,
                          "Min step size should be < max step size",
@@ -585,6 +587,8 @@ void ErrorTracking::SetMinStepSize(double min_step_size) {
 }
 
 void ErrorTracking::SetMaxStepSize(double max_step_size) {
+    // step size is always positive (direction is determined automatically)
+    max_step_size = fabs(max_step_size);
     if (_min_step_size > max_step_size) {
         throw Exceptions::Exception(Exceptions::recoverable,
                           "Min step size should be < max step size",

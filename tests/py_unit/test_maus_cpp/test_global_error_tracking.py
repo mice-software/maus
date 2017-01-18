@@ -154,11 +154,25 @@ class TestErrorPropagation(unittest.TestCase):
 
     def test_get_set_step_size(self):
         tracking = err_prop.GlobalErrorTracking()
-        for step_size in (1.928, -3, 8):
+        step_size_list = (1.928, -3, 8)
+        tracking.set_max_step_size(1e6)
+        for step_size in step_size_list:
             tracking.set_min_step_size(step_size)
-            self.assertAlmostEqual(tracking.get_min_step_size(), step_size) 
+            self.assertAlmostEqual(tracking.get_min_step_size(), abs(step_size)) 
+        tracking.set_min_step_size(1e-6)
+        for step_size in step_size_list:
             tracking.set_max_step_size(step_size)
-            self.assertAlmostEqual(tracking.get_max_step_size(), step_size) 
+            self.assertAlmostEqual(tracking.get_max_step_size(), abs(step_size)) 
+        try:
+            tracking.set_min_step_size(tracking.get_max_step_size()*2.)
+            self.assertTrue(False, msg="Should have raised exception")
+        except RuntimeError:
+            pass
+        try:
+            tracking.set_max_step_size(tracking.get_min_step_size()/2.)
+            self.assertTrue(False, msg="Should have raised exception")
+        except RuntimeError:
+            pass
 
     def test_get_set_tracking_model(self):
         tracking = err_prop.GlobalErrorTracking()
@@ -263,15 +277,6 @@ class TestErrorPropagation(unittest.TestCase):
                     print str(round(tm[i][j], 10)).rjust(12),
                 print
             print "Determinant:", numpy.linalg.det(numpy.array(tm))
-        
-    def test_docstring(self):
-        raise RuntimeError("Need to put in docstrings")
-
-    def test_not_implemented(self):
-        raise RuntimeError("Max number of steps")
-        raise RuntimeError("Tracking Error tolerances")
-        raise RuntimeError("Charge")
-        raise RuntimeError("Enable/Disable G4 Volumes")
 
 if __name__ == "__main__":
     unittest.main()

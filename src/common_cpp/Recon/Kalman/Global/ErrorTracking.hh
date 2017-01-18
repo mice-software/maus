@@ -95,6 +95,9 @@ namespace Global {
  *    - min_step_size, max_step_size: stepping starts at min_step_size.
  *    - max_n_steps: maximum number of steps. If tracking goes for more steps,
  *      tracking will abort with GSL_FAILURE.
+ *
+ *  TODO: hard coded max_n_steps, no "error tolerance" in dynamic step size
+ *        routines
  */
 class ErrorTracking {
  public:
@@ -196,7 +199,8 @@ class ErrorTracking {
      */
     BTField* GetField() const {return _field;}
 
-    /** Set the maximum step size used by the tracking
+    /** Set the maximum step size used by the tracking. Will always take the
+     *  absolute value (tracking determines direction).
      *
      *  @throws Exception if _min_step_size > max_step_size
      */
@@ -204,7 +208,8 @@ class ErrorTracking {
     /** Get the maximum step size used by the tracking */
     double GetMaxStepSize() const {return _max_step_size;}
 
-    /** Set the minimum step size used by the tracking.
+    /** Set the minimum step size used by the tracking. Will always take the
+     *  absolute value (tracking determines direction).
      *
      *  @throws Exception if min_step_size > _max_step_size
      */

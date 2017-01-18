@@ -253,7 +253,8 @@ std::string set_max_step_size_docstring =
 std::string("Set the maximum step size that will be used by the tracking\n")+
 std::string(" - max_step_size: float corresponding to the maximum step\n")+
 std::string("   size. Steps can be smaller if the step might intersect a\n")+
-std::string("   physical volume.\n")+
+std::string("   physical volume. Always takes absolute value (tracking\n")+
+std::string("   determines direction).\n")+
 std::string("Returns None.\n");
 
 static PyObject* set_max_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
@@ -275,7 +276,12 @@ static PyObject* set_max_step_size(PyObject *self, PyObject *args, PyObject *kwd
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
-    glet->SetMaxStepSize(step_size);
+    try {
+        glet->SetMaxStepSize(step_size);
+    } catch(std::exception& exc) {
+        PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -304,7 +310,8 @@ std::string set_min_step_size_docstring =
 std::string("Set the minimum step size that will be used by the tracking\n")+
 std::string(" - min_step_size: float corresponding to the minimum step\n")+
 std::string("   size. Steps cannot be smaller even if there is a nearby\n")+
-std::string("   physical volume.\n")+
+std::string("   physical volume. Always takes absolute value (tracking\n")+
+std::string("   determines direction).\n")+
 std::string("Returns None.\n");
 
 static PyObject* set_min_step_size(PyObject *self, PyObject *args, PyObject *kwds) {
@@ -326,7 +333,12 @@ static PyObject* set_min_step_size(PyObject *self, PyObject *args, PyObject *kwd
         PyErr_SetString(PyExc_TypeError, "GlobalErrorTracking was not initialised properly");
         return NULL;
     }
-    glet->SetMinStepSize(step_size);
+    try {
+        glet->SetMinStepSize(step_size);
+    } catch(std::exception& exc) {
+        PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -354,7 +366,7 @@ static PyObject* get_min_step_size(PyObject *self, PyObject *args, PyObject *kwd
 std::string set_charge_docstring =
 std::string("Set the particle charge that will be used by the tracking\n")+
 std::string(" - charge: float corresponding to the particle that will be\n")+
-std::string("  used by the tracking.\n")+
+std::string("   used by the tracking.\n")+
 std::string("Returns None.\n");
 
 
@@ -575,13 +587,13 @@ std::string set_tracking_model_docstring =
 std::string("Set the tracking model that will be used for integration.\n")+
 std::string(" - model: string corresponding to the tracking model.\n")+
 std::string("   Options are:\n")+
-std::string("     'em_rk4_forwards_dynamic' integrate the particle
+std::string("     'em_rk4_forwards_dynamic' integrate the particle\n")+
 std::string("      trajectory downstream, choosing step size dynamically.\n")+
-std::string("     'em_rk4_backwards_dynamic' integrate the particle
+std::string("     'em_rk4_backwards_dynamic' integrate the particle\n")+
 std::string("      trajectory upstream, choosing step size dynamically.\n")+
-std::string("     'em_rk4_forwards_static' integrate the particle
+std::string("     'em_rk4_forwards_static' integrate the particle\n")+
 std::string("      trajectory downstream, using a fixed step size.\n")+
-std::string("     'em_rk4_backwards_static' integrate the particle
+std::string("     'em_rk4_backwards_static' integrate the particle\n")+
 std::string("      trajectory upstream, choosing step size dynamically.\n")+
 std::string("Returns None.\n");
 // enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
@@ -657,14 +669,14 @@ static PyObject* get_tracking_model(PyObject *self, PyObject *args, PyObject *kw
     return py_track_model;
 }
 
-std::string set_geometry_model_docstring = 
+std::string set_geometry_model_docstring =
 std::string("Set the geometry model that will be used for materials lookups.\n")+
 std::string(" - model: string corresponding to the geometry model.\n")+
 std::string("   Options are:\n")+
 std::string("     'geant4' use the full geant4 geometry.\n")+
 std::string("     'axial_lookup' use a lookup table constructed at runtime,\n")+
 std::string("     corresponding to the on-axis materials assuming the world\n")+
-std::string("     is made of infinite radius cylinders.")+
+std::string("     is made of infinite radius cylinders.\n")+
 std::string("Returns None.\n");
 
 // enum MCSModel {moliere_forwards, moliere_backwards, no_mcs};
@@ -733,15 +745,15 @@ static PyObject* get_geometry_model(PyObject *self, PyObject *args, PyObject *kw
 std::string propagate_errors_docstring =
 std::string("Propagate a trajectory and associated errors.\n")+
 std::string(" - centroid: list of length 8, corresponding to initial\n")+
-std::string("  position of the trajectory. elements are:\n")+
-std::string("  t, x, y, z, (total) energy, px, py, pz\n")+
+std::string("   position of the trajectory. elements are:\n")+
+std::string("   t, x, y, z, (total) energy, px, py, pz\n")+
 std::string(" - ellipse: list of lists, corresponding to a 6x6 matrix with\n")+
-std::string("  elements defining the initial error covariance matrix, given\n")+
-std::string("  by Cov(u_i, u_j) with u = (t, x, y, energy, px, py) and\n")+
-std::string("  Cov(u_i, u_j) is the covariance.\n")+
+std::string("   elements defining the initial error covariance matrix, given\n")+
+std::string("   by Cov(u_i, u_j) with u = (t, x, y, energy, px, py) and\n")+
+std::string("   Cov(u_i, u_j) is the covariance.\n")+
 std::string(" - target_z: target z position to which trajectory should be\n")+
-std::string("  integrated.\n")+
-std::string("Returns None.\n")+
+std::string("   integrated.\n")+
+std::string("Returns None.\n");
 
 static PyObject* propagate_errors
                               (PyObject *self, PyObject *args, PyObject *kwds) {
@@ -789,7 +801,14 @@ static PyObject* propagate_errors
     return ret_tuple;
 }
 
-std::string get_transfer_matrix_docstring = "DOCSTRING";
+std::string get_transfer_matrix_docstring =
+std::string("Calculate the infinitesimal transfer matrix.\n")+
+std::string("    - centroid: The central trajectory around which the transfer\n")+
+std::string("      matrix is calculated. List of length 8, as per propagate.\n")+
+std::string("    - direction: Either +1 or -1; if +1, calculate the matrix\n")+
+std::string("      for a forwards-going particle. If -1 calculate the matrix\n")+
+std::string("      for a backwards-going particle.\n")+
+std::string("Returns a 6x6 matrix formatted as a list of lists.\n");
 
 static PyObject* get_transfer_matrix
                               (PyObject *self, PyObject *args, PyObject *kwds) {
@@ -834,7 +853,15 @@ static PyObject* get_transfer_matrix
     }
 }
 
-std::string class_docstring_str = "CLASS DOCUMENTATION";
+std::string class_docstring_str =
+std::string("The GlobalErrorTracking module provides routines to propagate\n")+
+std::string("tracks and associated errors through an arbitrary MAUS\n")+
+std::string("geometry. A track is represented by a vector of time, position,\n")+
+std::string("energy and momentum. Errors are represented by a covariance\n")+
+std::string("matrix in time, transverse position, energy and transverse\n")+
+std::string("momentum. Routines are provided to propagate tracks through EM\n")+
+std::string("fields and materials.\n");
+
 const char* class_docstring = class_docstring_str.c_str();
 
 PyObject *_alloc(PyTypeObject *type, Py_ssize_t nitems) {
@@ -980,7 +1007,9 @@ static PyMethodDef _keywdarg_methods[] = {
     {NULL,  NULL}   /* sentinel */
 };
 
-const char* module_docstring = "MODULE DOCSTRING";
+std::string module_docstring =
+std::string("The global_error_tracking module provides routines for\n")+
+std::string("propagating tracks and errors through an arbitrary MAUS geometry.\n");
 
 PyMODINIT_FUNC initglobal_error_tracking(void) {
     if (PyType_Ready(&PyGlobalErrorTrackingType) < 0)
@@ -988,7 +1017,7 @@ PyMODINIT_FUNC initglobal_error_tracking(void) {
 
     PyObject* module = Py_InitModule3("global_error_tracking",
                                       _keywdarg_methods,
-                                      module_docstring);
+                                      module_docstring.c_str());
     if (module == NULL) return;
 
     PyTypeObject* tracking_type = &PyGlobalErrorTrackingType;
