@@ -26,6 +26,8 @@ class Tracker:
         self.num_digits = 0
         self.num_clusters = 0
         self.num_spoints = 0
+        self.num_doublet_spoints = 0
+        self.num_triplet_spoints = 0
         self.num_sseeds = 0
         self.num_hseeds = 0
         self.num_stracks = 0
@@ -98,6 +100,10 @@ class Tracker:
                 self.spoints_global_z.append(gz)
                 self.spoints_npe.append(sp.get_npe())
                 self.num_spoints = self.num_spoints + 1
+                if sp.get_channels_pointers().size() == 3:
+                    self.num_triplet_spoints += 1
+                elif sp.get_channels_pointers().size() == 2:
+                    self.num_doublet_spoints += 1
 
         # Loop over pat rec straight tracks and pull out data
         for trk in evt.straightprtracks():
@@ -312,6 +318,8 @@ class Tracker:
         self.num_digits = 0
         self.num_clusters = 0
         self.num_spoints = 0
+        self.num_doublet_spoints = 0
+        self.num_triplet_spoints = 0
         self.num_stracks = 0
         self.num_htracks = 0
         self.spoints_x = array.array('d')
@@ -345,6 +353,8 @@ class TrackerStation:
         self.station_num = station_num
         self.num_events = 0
         self.num_spoints = 0
+        self.num_doublet_spoints = 0
+        self.num_triplet_spoints = 0
         self.num_straight_seeds = 0
         self.num_helical_seeds = 0
         # Spacepoints (All)
@@ -394,6 +404,10 @@ class TrackerStation:
                 self.spoints_global_z.append(gz)
                 self.spoints_npe.append(sp.get_npe())
                 self.num_spoints = self.num_spoints + 1
+                if sp.get_channels_pointers().size() == 3:
+                    self.num_triplet_spoints += 1
+                elif sp.get_channels_pointers().size() == 2:
+                    self.num_doublet_spoints += 1
 
         # Loop over straight tracks and pull out data
         for trk in evt.straightprtracks():

@@ -90,7 +90,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
     echo "ROOTSYS: " $ROOTSYS
     ${MAUS_ROOT_DIR}/third_party/bash/81G4beamline.bash -j $MAUS_NUM_THREADS
-    ${MAUS_ROOT_DIR}/third_party/bash/82heprep.bash
+    # ${MAUS_ROOT_DIR}/third_party/bash/82heprep.bash
 
     # Doxygen for code documentation, requires a recent version of flex
     ${MAUS_ROOT_DIR}/third_party/bash/54flex.bash -j $MAUS_NUM_THREADS

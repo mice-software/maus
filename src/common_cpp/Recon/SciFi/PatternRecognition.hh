@@ -421,6 +421,8 @@ class PatternRecognition {
     TH1D* _hy;       /** histo of y residuals taken during straight road cut stage */
     TH1D* _hxchisq;  /** histo of chisq of every x-z straight least sq fit tried */
     TH1D* _hychisq;  /** histo of chisq of every y-z straight least sq fit tried */
+    TH1D* _hxychisq; /** histo of chisq of every x-y circle least sq fit tried */
+    TH1D* _hszchisq; /** histo of chisq of every s-z least sq fit tried */
 };
 
 

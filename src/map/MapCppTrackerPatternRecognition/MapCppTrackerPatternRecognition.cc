@@ -112,7 +112,10 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   _pattern_recognition.set_down_straight_pr_on(_down_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
-  if (_patrec_debug_on) _pattern_recognition.setup_debug();
+  if (_patrec_debug_on) {
+    std::cerr << "INFO::MapCppTrackerPatternRecognition: Debug mode on\n";
+    _pattern_recognition.setup_debug();
+  }
 }
 
 

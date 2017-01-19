@@ -47,14 +47,26 @@ namespace global {
     /// Destructor
     ~ImportKLRecon() {}
 
-    /**  Main process, accepting the MAUS::KLEvent and importing
+    /** @brief Main process, accepting the MAUS::KLEvent and importing
      *   space points into an existing MAUS::GlobalEvent
      *  @param kl_event  The reconstructed KL Event
      *  @param global_event The Global Event, which will be changed
      */
-    void process(const MAUS::KLEvent &kl_event,
-		 MAUS::GlobalEvent* global_event,
-		 std::string mapper_name);
+    void process(const MAUS::KLEvent &kl_event, MAUS::GlobalEvent* global_event,
+                 std::string mapper_name, bool merge_cell_hits);
+
+    /** @brief Determine whether groupings of adjacent cells exist in the KLCellHits.
+     *    Returns a vector of vectors of cell numbers appropriately grouped, e.g. [[4],[7,8]]
+     *    If merge_cell_hits is false, all are separated, e.g. [[4],[7],[8]]
+     */
+    std::vector<std::vector<size_t> > AdjacentCellGroupings(std::vector<KLCellHit> kl_cell_hits,
+        bool merge_cell_hits);
+
+    /**
+     * @brief Returns whether the first KLCellHit has a lower cell number than the
+     * second one. Used to perform an std::sort on a vector of KLCellHits.
+     */
+    static bool KLCellHitSort(KLCellHit hit1, KLCellHit hit2);
 
   private:
     /// Disallow copy constructor as unnecessary
