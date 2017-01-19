@@ -89,15 +89,13 @@ static int et_control_hadjust(void * vstate, size_t dim, unsigned int ord,
     }
 
     int return_value = GSL_ODEIV_HADJ_NIL;
-    if (state->_max_step_size > *h) {
+    if (fabs(step) > fabs(*h)) {
         return_value = GSL_ODEIV_HADJ_INC;
-    } else if (state->_max_step_size < *h) {
+    } else if (fabs(step) < fabs(*h)) {
         return_value = GSL_ODEIV_HADJ_DEC;
     }
 
-    step = sign*fabs(step);
-    *h = step;
-
+    *h = sign*fabs(step);
     return return_value;
 }
 

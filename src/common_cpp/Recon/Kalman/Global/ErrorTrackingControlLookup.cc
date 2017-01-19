@@ -79,31 +79,32 @@ int et_control_lookup_hadjust(void * vstate, size_t dim, unsigned int ord,
         return GSL_FAILURE;
     }
 
-    int return_value = GSL_ODEIV_HADJ_NIL;
     double lower_bound = 0;
     double upper_bound = 0;
-    double step_size = state->_max_step_size;
 
     double sign = *h/fabs(*h);
     if (sign != sign)
         sign = 1.;
 
     MaterialModelAxialLookup::GetBounds(y[3], lower_bound, upper_bound);
-    double delta = upper_bound - y[3];
+    double step_size = upper_bound - y[3];
     if (sign < 0) {
-        delta = y[3] - lower_bound;
+        step_size = y[3] - lower_bound;
     }
-    if (delta < step_size && delta > state->_min_step_size) {
-        step_size = delta - state->_min_step_size/2.;
-        return_value = GSL_ODEIV_HADJ_DEC;
-    } else if (delta < state->_max_step_size) {
+    if (step_size < state->_min_step_size) {
         step_size = state->_min_step_size;
-        return_value = GSL_ODEIV_HADJ_DEC;
-    } else if (step_size > *h) { // e.g. we just stepped away from boundary
-        return_value = GSL_ODEIV_HADJ_INC;
+    } else if (step_size > state->_max_step_size) {
+        step_size = state->_max_step_size;
     }
-    *h = fabs(step_size)*sign;
 
+    int return_value = GSL_ODEIV_HADJ_NIL;
+    if (fabs(step_size) > fabs(*h)) {
+        return_value = GSL_ODEIV_HADJ_INC;
+    } else if (fabs(step_size) < fabs(*h)) {
+        return_value = GSL_ODEIV_HADJ_DEC;
+    }
+
+    *h = sign*fabs(step_size);
     return return_value;
 }
 
