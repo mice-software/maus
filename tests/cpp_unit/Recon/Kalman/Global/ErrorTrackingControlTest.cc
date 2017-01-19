@@ -33,7 +33,7 @@ namespace MAUS {
 TEST(ErrorTrackingControlTest, SetStepSizeG4Test) {
     Squeak::errorLevel err = Squeak::debug;
     std::string mod = getenv("MAUS_ROOT_DIR");
-    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField_2.dat";
     MaterialModelAxialLookup::SetZTolerance(0.001);
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     std::vector<double> point(44, 0.);
@@ -81,7 +81,7 @@ TEST(ErrorTrackingControlTest, SetStepSizeG4Test) {
 TEST(ErrorTrackingControlTest, SetStepSizeLookupTest) {
     Squeak::errorLevel err = Squeak::debug;
     std::string mod = getenv("MAUS_ROOT_DIR");
-    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField_2.dat";
     MaterialModelAxialLookup::SetZTolerance(0.001);
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     std::vector<double> point(44, 0.);

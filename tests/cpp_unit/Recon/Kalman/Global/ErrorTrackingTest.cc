@@ -693,7 +693,7 @@ TEST(ErrorTrackingTest, PropagateDriftELossTest) {
     // * NOT Var(E) but should be added when it is implemented
 
     std::string mod = getenv("MAUS_ROOT_DIR");
-    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField_2.dat";
     MaterialModel::EnableMaterial("G4_Pb");
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     double mass = 105.658;
@@ -762,7 +762,7 @@ TEST(ErrorTrackingTest, PropagateDriftMCSTest) {
     // Check that MCS var(px); var(py); in absence of dE/dz
     // through block of lead is correct
     std::string mod = getenv("MAUS_ROOT_DIR");
-    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField_2.dat";
     MaterialModel::EnableMaterial("G4_Pb");
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     ErrorTracking propagator;
@@ -811,7 +811,7 @@ TEST(ErrorTrackingTest, PropagateDriftGeometryModelTest) {
     // Check that MCS var(px); var(py); in absence of dE/dz
     // through block of lead is correct
     std::string mod = getenv("MAUS_ROOT_DIR");
-    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField.dat";
+    mod += "/tests/cpp_unit/Recon/Global/TestGeometries/PropagationTest_NoField_2.dat";
     MaterialModel::EnableMaterial("G4_Pb");
     GlobalsManager::SetMonteCarloMiceModules(new MiceModule(mod));
     ErrorTracking propagator;
