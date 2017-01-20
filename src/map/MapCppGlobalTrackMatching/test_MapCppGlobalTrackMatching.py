@@ -115,42 +115,15 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         through_chain = global_event.GetThroughPrimaryChains()[0]
         self.assertEqual(through_chain.GetUSDaughter(), global_event.GetUSPrimaryChains()[0])
         self.assertEqual(through_chain.GetDSDaughter(), global_event.GetDSPrimaryChains()[0])
-        print "###"
-        constituent_tracks = result.GetSpill().GetReconEvents()[0].GetGlobalEvent().GetThroughPrimaryChains()[0].GetMatchedTracks()[0].GetConstituentTracks()
-        self.assertTrue('recon_events' in spill_out)
-        revtarray = spill_out['recon_events']
-        self.assertEqual(1, len(revtarray))
-        revt = revtarray[0]
-        self.assertTrue('global_event' in revt)
-        self.assertTrue('track_points' in revt['global_event'])
-        num_us_trackpoints = 0
-        num_ds_trackpoints = 0
-        self.assertEqual(len(revt['global_event']['track_points']), 10)
-        self.assertEqual(len(revt['global_event']['tracks']), 6)
-        self.assertEqual(len(revt['global_event']['primary_chains']), 3)
-        #~ print len(revt['global_event']['primary_chains'][2]['tracks'])
-        #~ self.assertEqual(revt['global_event']['primary_chains'][2]['us_daughter']['type'], 1)
-        #~ self.assertEqual(revt['global_event']['primary_chains'][2]['ds_daughter']['type'], 2)
-        #~ for chain in revt['global_event']['primary_chains']:
-            #~ print chain['us_daughter']
-
-        #~ self.assertEqual(num_us_trackpoints, 3)
-        #~ self.assertEqual(num_ds_trackpoints, 4)
-        #~ self.assertTrue('tracks' in revt['global_event'])
-        #~ num_us_tracks = 0
-        #~ num_ds_tracks = 0
-        #~ num_through_tracks = 0
-        #~ for i in revt['global_event']['tracks']:
-            #~ self.assertTrue('mapper_name' in i)
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_US':
-                #~ num_us_tracks += 1
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_DS':
-                #~ num_ds_tracks += 1
-            #~ if i['mapper_name'] == 'MapCppGlobalTrackMatching_Through':
-                #~ num_through_tracks += 1
-        #~ self.assertEqual(num_us_tracks, 1)
-        #~ self.assertEqual(num_ds_tracks, 1)
-        #~ self.assertEqual(num_through_tracks, 1)
+        self.assertEqual(through_chain.GetMatchedTracks().size(), 1)
+        self.assertEqual(through_chain.GetUSDaughter().GetMatchedTracks().size(), 1)
+        self.assertEqual(through_chain.GetDSDaughter().GetMatchedTracks().size(), 1)
+        constituent_tracks = through_chain.GetMatchedTracks()[0].GetConstituentTracks()
+        self.assertEqual(constituent_tracks[0], through_chain.GetUSDaughter().GetMatchedTracks()[0])
+        self.assertEqual(constituent_tracks[1], through_chain.GetDSDaughter().GetMatchedTracks()[0])
+        self.assertEqual(through_chain.GetMatchedTracks()[0].GetTrackPoints().size(), 7)
+        self.assertEqual(through_chain.GetUSDaughter().GetMatchedTracks()[0].GetTrackPoints().size(), 3)
+        self.assertEqual(through_chain.GetDSDaughter().GetMatchedTracks()[0].GetTrackPoints().size(), 4)
         maus_cpp.globals.death()
 
     def test_reset_geometry(self):

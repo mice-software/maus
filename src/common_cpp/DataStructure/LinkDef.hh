@@ -192,7 +192,9 @@
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::BasePoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::SpacePoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::TrackPoint*>+;
+#pragma link C++ class std::vector<const MAUS::DataStructure::Global::TrackPoint*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::Track*>+;
+#pragma link C++ class std::vector<const MAUS::DataStructure::Global::Track*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::PrimaryChain*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::TRefTrackPair*>+;
 #pragma link C++ class std::vector<MAUS::DataStructure::Global::PIDLogLPair*>+;
@@ -218,6 +220,3 @@
 #pragma link C++ global gEnv;
 
 #endif
-
-
-
