@@ -72,6 +72,9 @@ bin/user/poly_patch/*.png
 bin/user/poly_patch/*.root
 bin/user/poly_patch/poly_patch
 src/map/MapPyBeamlineSimulation/G4bl/maps/TypeIBend_6InchGap_tapered.map
+bin/user/fit_fields/plots/*.root
+bin/user/fit_fields/plots/*.png
+tests/integration/test_global_track_fitting/test_tracker_fitting/geometry_07469/*
 tests/integration/test_scifi/test_scifi_kalman_straight/geometry_07417/*
 third_party/install/share/test_data/*.00?
 third_party/install/share/test_data/*.md5
@@ -93,3 +96,4 @@ files/PID/test_test/
 third_party/install/heprep/
 third_party/install/lib64/
 third_party/install/share/test_data/test_data.cat
+

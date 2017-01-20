@@ -112,21 +112,25 @@ PyObject* get_string(MiceModule* mod, std::string name) {
     }
 }
 
+PyObject* hep3vector_to_dict(CLHEP::Hep3Vector out) {
+    PyObject* py_out = PyDict_New();
+    Py_INCREF(py_out);
+    PyObject* x = Py_BuildValue("d", out[0]);
+    Py_INCREF(x);
+    PyObject* y = Py_BuildValue("d", out[1]);
+    Py_INCREF(y);
+    PyObject* z = Py_BuildValue("d", out[2]);
+    Py_INCREF(z);
+    PyDict_SetItemString(py_out, "x", x);
+    PyDict_SetItemString(py_out, "y", y);
+    PyDict_SetItemString(py_out, "z", z);
+    return py_out;
+}
+
 PyObject* get_hep3vector(MiceModule* mod, std::string name) {
     try {
         CLHEP::Hep3Vector out = mod->propertyHep3VectorThis(name);
-        PyObject* py_out = PyDict_New();
-        Py_INCREF(py_out);
-        PyObject* x = Py_BuildValue("d", out[0]);
-        Py_INCREF(x);
-        PyObject* y = Py_BuildValue("d", out[1]);
-        Py_INCREF(y);
-        PyObject* z = Py_BuildValue("d", out[2]);
-        Py_INCREF(z);
-        PyDict_SetItemString(py_out, "x", x);
-        PyDict_SetItemString(py_out, "y", y);
-        PyDict_SetItemString(py_out, "z", z);
-        return py_out;
+        return hep3vector_to_dict(out);
     } catch (std::exception& exc) {
         PyErr_SetString(PyExc_KeyError, (&exc)->what());
         return NULL;
@@ -169,6 +173,56 @@ PyObject *get_property(PyObject* self, PyObject *args, PyObject *kwds) {
         message << "Did not recognise type '" << type << "' ";
         message << " - should be one of bool, int, string, double, hep3vector";
         PyErr_SetString(PyExc_TypeError, message.str().c_str());
+        return NULL;
+    }
+}
+
+std::string get_global_position_docstring =
+std::string("Returns the position of the MiceModule in the global (top\n")+
+std::string("level) coordinates\n\n")+
+std::string("Takes no arguments. Returns a dict like {'x':x, 'y':y, 'z':z}\n")+
+std::string("corresponding to the global position of the module.");
+
+static PyObject *get_global_position(PyObject* self, PyObject *args, PyObject *kwds) {
+    MiceModule* mod = C_API::get_mice_module(self);
+    if (mod == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "MiceModule was not properly initialised");
+        return NULL;
+    }
+    try {
+        CLHEP::Hep3Vector out = mod->globalPosition();
+        return hep3vector_to_dict(out);
+    } catch (std::exception& exc) {
+        PyErr_SetString(PyExc_KeyError, (&exc)->what());
+        return NULL;
+    }
+}
+
+std::string get_global_rotation_docstring =
+std::string("Returns the rotation of the MiceModule in the global (top\n")+
+std::string("level) coordinates\n\n")+
+std::string("Takes no arguments. Returns a dict like\n")+
+std::string("{'x':x, 'y':y, 'z':z, 'angle':angle} where x,y,z is the axis\n")+
+std::string("of rotation and angle is the angle of rotation [radians], in \n")+
+std::string("the global (top level) coordinate system.");
+
+static PyObject *get_global_rotation(PyObject* self, PyObject *args, PyObject *kwds) {
+    MiceModule* mod = C_API::get_mice_module(self);
+    if (mod == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "MiceModule was not properly initialised");
+        return NULL;
+    }
+    try {
+        CLHEP::HepRotation rot = mod->globalRotation();
+        PyObject* py_rotation = hep3vector_to_dict(rot.getAxis());
+        PyObject* angle = Py_BuildValue("d", rot.getDelta());
+        Py_INCREF(angle);
+        PyDict_SetItemString(py_rotation, "angle", angle);
+        return py_rotation;
+    } catch (std::exception& exc) {
+        PyErr_SetString(PyExc_KeyError, (&exc)->what());
         return NULL;
     }
 }
@@ -441,6 +495,24 @@ static PyMemberDef _members[] = {
 {NULL}
 };
 
+/* Comment on why global position and rotation are hard:
+ * Python owns the memory allocated to the module. Because python can delete
+ * things without warning, we make a deep copy of the module when it gets taken
+ * over by python and cut it out of the module tree (mother points to NULL).
+ * So just calling globalPosition() doesn't work because the module doesn't know
+ * who its mother is. 
+ *
+ * I toyed with the idea of making a temporary pointer to the mother, but here
+ * we can run into trouble. Say we do (python) 
+ * mod_1 = mod_0.get_children()[0]
+ * mod_2 = mod_1.get_children()[0]
+ * we have no way to guarantee that mod_1 has not been deleted. So 
+ * mod_2.get_global_position() would try to get the global position of mod_1;
+ * by which point mod_1 has been deleted, and we get a segv. I guess child 
+ * module has to hold a INCREF and it would work okay... more work than I want
+ * right now. I left the code in.
+ */
+
 static PyMethodDef _methods[] = {
 {"get_name", (PyCFunction)get_name,
   METH_VARARGS|METH_KEYWORDS, get_name_docstring.c_str()},
@@ -452,6 +524,10 @@ static PyMethodDef _methods[] = {
   METH_VARARGS|METH_KEYWORDS, get_property_docstring.c_str()},
 {"set_property", (PyCFunction)set_property,
   METH_VARARGS|METH_KEYWORDS, set_property_docstring.c_str()},
+// {"get_global_position", (PyCFunction)get_global_position,
+//  METH_VARARGS|METH_KEYWORDS, get_global_position_docstring.c_str()},
+// {"get_global_rotation", (PyCFunction)get_global_rotation,
+//  METH_VARARGS|METH_KEYWORDS, get_global_rotation_docstring.c_str()},
 {NULL}
 };
 

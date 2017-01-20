@@ -790,6 +790,7 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
     "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
     "2d_volume_plot_label_size":0.25,
+    "volume_bounding_box_dump":"geometry_validation_bb_dump.json",
 }
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"

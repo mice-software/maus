@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _SRC_PY_CPP_PYGLOBALS_HH_
-#define _SRC_PY_CPP_PYGLOBALS_HH_
+#ifndef _SRC_PY_CPP_PYSIMULATION_HH_
+#define _SRC_PY_CPP_PYSIMULATION_HH_
 
 // These ifdefs are required to avoid cpp compiler warning
 #ifdef _POSIX_C_SOURCE
@@ -48,4 +48,4 @@ PyMODINIT_FUNC initsimulation(void);
 }  // namespace PySimulation
 }  // namespace MAUS
 
-#endif  // _SRC_PY_CPP_PYGLOBALS_HH_
+#endif  // _SRC_PY_CPP_PYSIMULATION_HH_
