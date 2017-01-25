@@ -1,0 +1,24 @@
+Module EMR
+{
+Volume Box
+Dimensions 158.40 158.40 100.00 cm
+PropertyString Material AIR
+Module EMRDetector
+{
+Volume Box
+Dimensions 158.40 158.40 100.00 cm
+PropertyString SensitiveDetector EMR
+PropertyDouble NbOfBars 2832
+PropertyDouble BarWidth 3.3 cm
+PropertyDouble BarHeight 1.7 cm
+PropertyDouble BarLength 110.0 cm
+PropertyDouble Gap 0.05 cm
+PropertyDouble HoleRad 0.3 cm
+PropertyDouble FiberCladdingExtRadius 0.12 cm
+PropertyBool AddWLSFiber 1
+PropertyString Material AIR
+Position 0.0 0.0 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End EMRDetector
+
+}

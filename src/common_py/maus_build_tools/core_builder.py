@@ -25,6 +25,7 @@ import json
 import string # pylint: disable=W0402
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
+MAX_DIR_DEPTH = 10
 
 def install_python_tests(maus_root_dir, env):
     """
@@ -60,15 +61,16 @@ def build_lib_maus_cpp(env):
     Build libMausCpp.so shared object - containing all the code in 
     src/common_cpp/* and src/legacy/*
     """
-    
     # Magic to sort scons quirk when building object files first
     env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
     
     # Find the common_cpp and legacy cpp source files
     legacy_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc")
-    common_cpp_files = glob.glob("src/common_cpp/*/*cc") + \
-        glob.glob("src/common_cpp/*/*/*cc")
+    common_cpp_files = []
+    for i in range(1, MAX_DIR_DEPTH):
+        cpp_name = "src/common_cpp/"+"*/"*i+"*cc"
+        common_cpp_files += glob.glob(cpp_name)
     
     # Set up environments for both common_cpp and legacy
     legacy_obj_env = env.Clone()
@@ -155,9 +157,10 @@ def build_cpp_tests(env, module_list):
     if 'Darwin' in os.environ.get('G4SYSTEM'):
         env.Append(LINKFLAGS=['-undefined', 'suppress','-flat_namespace'])
 
-    test_cpp_files = glob.glob("tests/cpp_unit/*/*cc")+\
-                     glob.glob("tests/cpp_unit/*cc")+\
-                     glob.glob("tests/cpp_unit/*/*/*cc")
+    test_cpp_files = glob.glob("tests/cpp_unit/*cc")+\
+                     glob.glob("tests/cpp_unit/*/*cc")+\
+                     glob.glob("tests/cpp_unit/*/*/*cc")+\
+                     glob.glob("tests/cpp_unit/*/*/*/*cc")
 
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \

@@ -20,10 +20,10 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 #include "TMath.h"
 #include "TMatrixD.h"
-
 
 namespace MAUS {
 namespace Kalman {
@@ -167,7 +167,7 @@ namespace Kalman {
        */
       virtual ~TrackPoint() {}
 
-      int GetDimension() const { return this->_predicted.GetDimension(); }
+      unsigned int GetDimension() const { return this->_predicted.GetDimension(); }
 
       /** @brief Get ID of trackpoint
        */
@@ -295,5 +295,20 @@ namespace Kalman {
   };
 } // namespace Kalman
 } // namespace MAUS
+
+/** Streamer operator for TMatrixD */
+std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix);
+
+/** Streamer operator for State */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::State& state);
+
+/** Streamer operator for Track */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::TrackPoint& track_point);
+
+/** Streamer operator for Track */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::Track& track);
 
 #endif

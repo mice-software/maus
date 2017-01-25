@@ -1,0 +1,27 @@
+
+Configuration PropagationTest_NoField
+{
+  Dimensions 2.1 2.1 10. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 100.0 mm
+  Module LeadPlate
+  {
+    Position 0. 0. 1. m
+    Rotation 0. 0. 0. degree
+    Volume Box
+    Dimensions 2. 2. 0.005 m
+    PropertyString Material Pb
+  }
+  Module TestField
+  {
+    Volume None
+    Position 0.0 0.0 0.0 mm
+    Rotation 0.0 0.0 0.0 degree
+    PropertyString FieldType RectangularField
+    PropertyDouble Length 9.9 m
+    PropertyDouble Width 2.0 m
+    PropertyDouble Height 2.0 m
+    PropertyHep3Vector ConstantField 0. 0. 0. T
+    PropertyString FieldName Test_Field
+  }
+}

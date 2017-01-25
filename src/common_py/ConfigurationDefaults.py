@@ -305,7 +305,7 @@ SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
 SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
 SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
-SciFiPatRecSZChi2Cut = 4.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecSZChi2Cut = 24.0 # Chi^2 cut on pat rec s-z fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiPatRecDebugOn = False # Set Pattern Recogntition to debug mode
@@ -790,6 +790,7 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
     "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
     "2d_volume_plot_label_size":0.25,
+    "volume_bounding_box_dump":"geometry_validation_bb_dump.json",
 }
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"
