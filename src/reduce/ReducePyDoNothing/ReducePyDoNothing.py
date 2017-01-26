@@ -19,6 +19,7 @@
 """ReducePyDoNothing.py"""
 # import json
 # import types
+import copy
 
 class ReducePyDoNothing:
     """ReducePyDoNothing"""
@@ -32,7 +33,8 @@ class ReducePyDoNothing:
 
     def process(self, spill):#pylint: disable =R0201
         """process"""
-        return spill
+        new_spill = copy.deepcopy(spill)
+        return new_spill
 
     def death(self):#pylint: disable =R0201
         """death"""
