@@ -24,7 +24,9 @@
 #include <vector>
 
 // MAUS headers
+#include "src/common_cpp/Utils/VersionNumber.hh"
 #include "src/common_cpp/DataStructure/SciFiTrackPoint.hh"
+#include "src/common_cpp/DataStructure/SciFiSeed.hh"
 #include "src/common_cpp/DataStructure/SciFiBasePRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
@@ -171,6 +173,15 @@ class SciFiTrack {
    */
   int IsGood() const { return (this->GetRating() <= 2); }
 
+
+  /** @brief  Returns the mother seed as a TObject pointer
+   */
+  SciFiSeed* scifi_seed()     const { return static_cast<SciFiSeed*>(_scifi_seed->GetObject()); }
+
+  TObject* scifi_seed_tobject()     const { return _scifi_seed->GetObject(); }
+
+  void set_scifi_seed_tobject(TObject* const seed) { *_scifi_seed = seed; }
+
  private:
   int _tracker;
 
@@ -194,6 +205,7 @@ class SciFiTrack {
 
   // Pointer to the seed track. This does not assume memory
   TRef* _pr_track;
+  TRef* _scifi_seed;
 
   MAUS_VERSIONED_CLASS_DEF(SciFiTrack)
 };

@@ -41,9 +41,9 @@ TEST_F(SciFiEventTestDS, test_default_contructor) {
   EXPECT_TRUE(evt->digits().empty());
   EXPECT_TRUE(evt->clusters().empty());
   EXPECT_TRUE(evt->spacepoints().empty());
-  EXPECT_TRUE(evt->seeds().empty());
   EXPECT_TRUE(evt->straightprtracks().empty());
   EXPECT_TRUE(evt->helicalprtracks().empty());
+  EXPECT_TRUE(evt->scifiseeds().empty());
 }
 
 TEST_F(SciFiEventTestDS, test_copy_constructor) {
@@ -65,17 +65,17 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   // Set up clusters, spacepoints, seeds, straight and helical pr tracks using defaults only
   SciFiCluster *cluster = new SciFiCluster();
   SciFiSpacePoint *spoint = new SciFiSpacePoint();
-  SciFiSpacePoint *seed = new SciFiSpacePoint();
   SciFiStraightPRTrack *strk = new SciFiStraightPRTrack();
   SciFiHelicalPRTrack *htrk =  new SciFiHelicalPRTrack();
+  SciFiSeed *seed = new SciFiSeed();
 
   // Add the hits etc to the first event
   evt1->add_digit(digit);
   evt1->add_cluster(cluster);
   evt1->add_spacepoint(spoint);
-  evt1->add_seeds(seed);
   evt1->add_straightprtrack(strk);
   evt1->add_helicalprtrack(htrk);
+  evt1->add_seed(seed);
 
   // Create a second event using the first
   SciFiEvent evt2(*evt1);
@@ -101,14 +101,14 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   ASSERT_EQ(evt2.spacepoints().size(), 1u);
   EXPECT_EQ(evt2.spacepoints()[0]->get_tracker(), 0);
 
-  ASSERT_EQ(evt2.seeds().size(), 1u);
-  EXPECT_EQ(evt2.seeds()[0]->get_tracker(), 0);
-
   ASSERT_EQ(evt2.straightprtracks().size(), 1u);
   EXPECT_EQ(evt2.straightprtracks()[0]->get_tracker(), -1);
 
   ASSERT_EQ(evt2.helicalprtracks().size(), 1u);
   EXPECT_EQ(evt2.helicalprtracks()[0]->get_tracker(), -1);
+
+  ASSERT_EQ(evt2.scifiseeds().size(), 1u);
+  EXPECT_EQ(evt2.scifiseeds()[0]->getTracker(), 0); 
 }
 
 TEST_F(SciFiEventTestDS, test_assignment_operator) {
@@ -210,10 +210,10 @@ TEST_F(SciFiEventTestDS, test_spoint_set_used_flag) {
 
 TEST_F(SciFiEventTestDS, test_seed_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
-  SciFiSpacePoint* seed = new SciFiSpacePoint();
-  evt->add_seeds(seed);
-  EXPECT_EQ(1u, evt->seeds().size());
-  EXPECT_EQ(seed, evt->seeds()[0]);
+  SciFiSeed* seed = new SciFiSeed();
+  evt->add_seed(seed);
+  EXPECT_EQ(1u, evt->scifiseeds().size());
+  EXPECT_EQ(seed, evt->scifiseeds()[0]);
 }
 
 TEST_F(SciFiEventTestDS, test_add_straightprtrack_getters_setters) {

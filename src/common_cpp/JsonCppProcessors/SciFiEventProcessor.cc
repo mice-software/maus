@@ -24,6 +24,7 @@ SciFiEventProcessor::SciFiEventProcessor()
                       _sf_spoint_array_proc(new SciFiSpacePointProcessor),
                       _sf_sprtrk_array_proc(new SciFiStraightPRTrackProcessor),
                       _sf_hprtrk_array_proc(new SciFiHelicalPRTrackProcessor),
+                      _sf_seed_array_proc(new SciFiSeedProcessor),
                       _sf_trk_array_proc(new SciFiTrackProcessor),
                       _double_proc() {
   RegisterValueBranch("digits", &_sf_digit_array_proc,
@@ -36,6 +37,8 @@ SciFiEventProcessor::SciFiEventProcessor()
                       &SciFiEvent::straightprtracks, &SciFiEvent::set_straightprtrack, false);
   RegisterValueBranch("helical_pr_tracks", &_sf_hprtrk_array_proc,
                       &SciFiEvent::helicalprtracks, &SciFiEvent::set_helicalprtrack, false);
+  RegisterValueBranch("scifiseeds", &_sf_seed_array_proc,
+                      &SciFiEvent::scifiseeds, &SciFiEvent::set_seeds, false);
   RegisterValueBranch("tracks", &_sf_trk_array_proc,
                       &SciFiEvent::scifitracks, &SciFiEvent::set_scifitracks, false);
   RegisterValueBranch("mean_field_up", &_double_proc,
