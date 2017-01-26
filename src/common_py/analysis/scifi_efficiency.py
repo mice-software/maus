@@ -413,7 +413,7 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         self.tof_lower_cut = 27.0
         self.check_helical = True
         self.check_straight = True
-        self.cut_on_tracker_10spnt = True
+        self.cut_on_both_tracker_num_spnts = True
         self.cut_on_tracker_5spnt = True # Should always be true
         self.cut_tkus_num_spnts = 5
         self.cut_tkds_num_spnts = 5
