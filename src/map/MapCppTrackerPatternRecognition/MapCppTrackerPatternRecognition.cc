@@ -70,7 +70,6 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
     module->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
-  SciFiTrackerMap& geo_map = _geometry_helper.GeometryMap();
 
   // Setup Pattern Recognition
   double up_field = _geometry_helper.GetFieldValue(0);
