@@ -65,186 +65,186 @@ namespace MAUS {
 
 
 
-  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom,
-                                                       bool correct_energy_loss, double seed_cov) {
-    TMatrixD vector(5, 1);
-    TMatrixD covariance(5, 5);
-
-    int tracker = h_track->get_tracker();
-    double seed_pos = geom->GetPlanePosition(tracker, 5, 2);
-    double length =  seed_pos;
-    double c  = CLHEP::c_light;
-    double particle_charge = h_track->get_charge();
-    double Bz = geom->GetFieldValue(tracker);
-    double PR_correction = geom->GetPRCorrection(tracker);
-    double PR_bias = geom->GetPRBias();
-
-    // Get h_track values.
-    double r  = h_track->get_R();
-    double pt = - c*Bz*r*particle_charge;
-    double dsdz = - h_track->get_dsdz();
-    double x0 = h_track->get_circle_x0(); // Circle Center x
-    double y0 = h_track->get_circle_y0(); // Circle Center y
-    double s = (h_track->get_line_sz_c() - length*dsdz); // Path length at start plane
-    double phi_0 = s / r; // Phi at start plane
-    double phi = phi_0 + TMath::PiOver2(); // Direction of momentum
-
-    // TODO: Actually propagate the track parrameters and covariance matrix back to start plane.
-    //       This is an approximation.
-    ThreeVector patrec_momentum(-pt*sin(phi_0), pt*cos(phi_0), - pt/dsdz);
-
-    if (correct_energy_loss) {
-      double P = patrec_momentum.mag();
-      double patrec_bias; // Account for two(ish) planes of energy loss
-//      if (tracker == 0) {
-//        patrec_bias = (P + 1.3) / P;
-//      } else {
-//        patrec_bias = (P - 1.3) / P;
+//  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom,
+//                                                       bool correct_energy_loss, double seed_cov) {
+//    TMatrixD vector(5, 1);
+//    TMatrixD covariance(5, 5);
+//
+//    int tracker = h_track->get_tracker();
+//    double seed_pos = geom->GetPlanePosition(tracker, 5, 2);
+//    double length =  seed_pos;
+//    double c  = CLHEP::c_light;
+//    double particle_charge = h_track->get_charge();
+//    double Bz = geom->GetFieldValue(tracker);
+//    double PR_correction = geom->GetPRCorrection(tracker);
+//    double PR_bias = geom->GetPRBias();
+//
+//    // Get h_track values.
+//    double r  = h_track->get_R();
+//    double pt = - c*Bz*r*particle_charge;
+//    double dsdz = - h_track->get_dsdz();
+//    double x0 = h_track->get_circle_x0(); // Circle Center x
+//    double y0 = h_track->get_circle_y0(); // Circle Center y
+//    double s = (h_track->get_line_sz_c() - length*dsdz); // Path length at start plane
+//    double phi_0 = s / r; // Phi at start plane
+//    double phi = phi_0 + TMath::PiOver2(); // Direction of momentum
+//
+//    // TODO: Actually propagate the track parrameters and covariance matrix back to start plane.
+//    //       This is an approximation.
+//    ThreeVector patrec_momentum(-pt*sin(phi_0), pt*cos(phi_0), - pt/dsdz);
+//
+//    if (correct_energy_loss) {
+//      double P = patrec_momentum.mag();
+//      double patrec_bias; // Account for two(ish) planes of energy loss
+////      if (tracker == 0) {
+////        patrec_bias = (P + 1.3) / P;
+////      } else {
+////        patrec_bias = (P - 1.3) / P;
+////      }
+//      patrec_bias = ((P + PR_correction) + PR_bias) / P;
+//      patrec_momentum = patrec_bias * patrec_momentum;
+//    }
+//
+//    double x = x0 + r*cos(phi_0);
+//    double px = patrec_momentum.x();
+//    double y = y0 + r*sin(phi_0);
+//    double py = patrec_momentum.y();
+//    double kappa = particle_charge / patrec_momentum.z();
+//
+//    vector(0, 0) = x;
+//    vector(1, 0) = px;
+//    vector(2, 0) = y;
+//    vector(3, 0) = py;
+//    vector(4, 0) = kappa;
+//
+////
+//// METHOD = ED SANTOS
+////
+//    if (seed_cov > 0.0) {
+//      covariance.Zero();
+//      for (int i = 0; i < 5; ++i) {
+//        covariance(i, i) = seed_cov;
 //      }
-      patrec_bias = ((P + PR_correction) + PR_bias) / P;
-      patrec_momentum = patrec_bias * patrec_momentum;
-    }
-
-    double x = x0 + r*cos(phi_0);
-    double px = patrec_momentum.x();
-    double y = y0 + r*sin(phi_0);
-    double py = patrec_momentum.y();
-    double kappa = particle_charge / patrec_momentum.z();
-
-    vector(0, 0) = x;
-    vector(1, 0) = px;
-    vector(2, 0) = y;
-    vector(3, 0) = py;
-    vector(4, 0) = kappa;
-
+//    } else {
+////
+//// METHOD = CHRISTOPHER HUNT
+////
+//      std::vector<double> cov = h_track->get_covariance();
+//      TMatrixD patrec_covariance(5, 5);
+//      if (cov.size() != 25) {
+//        throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
+//                              "Dimension of covariance matrix does not match the state vector",
+//                              "KalmanSeed::ComputeInitalCovariance(Helical)");
+//      }
 //
-// METHOD = ED SANTOS
+//      double mc = particle_charge*c*Bz; // Magnetic constant
+//      double sin = std::sin(phi_0);
+//      double cos = std::cos(phi_0);
+//      double sin_plus = std::sin(phi);
+//      double cos_plus = std::cos(phi);
 //
-    if (seed_cov > 0.0) {
-      covariance.Zero();
-      for (int i = 0; i < 5; ++i) {
-        covariance(i, i) = seed_cov;
-      }
-    } else {
+//      TMatrixD jacobian(5, 5);
+//      jacobian(0, 0) = 1.0;
+//      jacobian(0, 2) = cos + phi*sin;
+//      jacobian(0, 3) = -sin;
 //
-// METHOD = CHRISTOPHER HUNT
+//      jacobian(1, 2) = mc*cos_plus + mc*phi*sin_plus;
+//      jacobian(1, 3) = -mc*sin_plus;
 //
-      std::vector<double> cov = h_track->get_covariance();
-      TMatrixD patrec_covariance(5, 5);
-      if (cov.size() != 25) {
-        throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                              "Dimension of covariance matrix does not match the state vector",
-                              "KalmanSeed::ComputeInitalCovariance(Helical)");
-      }
-
-      double mc = particle_charge*c*Bz; // Magnetic constant
-      double sin = std::sin(phi_0);
-      double cos = std::cos(phi_0);
-      double sin_plus = std::sin(phi);
-      double cos_plus = std::cos(phi);
-
-      TMatrixD jacobian(5, 5);
-      jacobian(0, 0) = 1.0;
-      jacobian(0, 2) = cos + phi*sin;
-      jacobian(0, 3) = -sin;
-
-      jacobian(1, 2) = mc*cos_plus + mc*phi*sin_plus;
-      jacobian(1, 3) = -mc*sin_plus;
-
-      jacobian(2, 1) = 1.0;
-      jacobian(2, 2) = sin - phi*cos;
-      jacobian(2, 3) = cos;
-
-      jacobian(3, 2) = mc*sin_plus - mc*phi*cos_plus;
-      jacobian(1, 3) = mc*cos_plus;
-
-      jacobian(4, 3) = -dsdz / (mc*r*r);
-      jacobian(4, 4) = 1.0 / (mc*r);
-
-      TMatrixD jacobianT(5, 5);
-      jacobianT.Transpose(jacobian);
-
-      for (int i = 0; i < 5; ++i) {
-        for (int j = 0; j < 5; ++j) {
-          patrec_covariance(i, j) = cov.at(i*5 + j);
-        }
-      }
-      covariance = jacobian*patrec_covariance*jacobianT;
-    }
-
-    Kalman::State seed_state(vector, covariance);
-    return seed_state;
-  }
-
-
-  Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, const SciFiGeometryHelper* geom,
-                                                                                 double seed_cov) {
-    TMatrixD vector(4, 1);
-    TMatrixD covariance(4, 4);
-
-    int tracker = s_track->get_tracker();
-    double seed_pos = geom->GetPlanePosition(tracker, 5, 2);
-    double length = seed_pos;
-
-    double x0 = s_track->get_x0();
-    double y0 = s_track->get_y0();
-    double mx = s_track->get_mx();
-    double my = s_track->get_my();
-
-    // Get position at the starting end of tracker
-    double x = x0 + mx*length;
-    double y = y0 + my*length;
-
-    vector(0, 0) = x;
-    vector(1, 0) = mx;
-    vector(2, 0) = y;
-    vector(3, 0) = my;
-
+//      jacobian(2, 1) = 1.0;
+//      jacobian(2, 2) = sin - phi*cos;
+//      jacobian(2, 3) = cos;
 //
-// METHOD = ED SANTOS
+//      jacobian(3, 2) = mc*sin_plus - mc*phi*cos_plus;
+//      jacobian(1, 3) = mc*cos_plus;
 //
-    if (seed_cov > 0.0) {
-      covariance.Zero();
-      covariance(0, 0) = seed_cov;
-      covariance(1, 1) = seed_cov/(200.0*200.0); // Rescale for gradients - not momenta!
-      covariance(2, 2) = seed_cov;
-      covariance(3, 3) = seed_cov/(200.0*200.0);
-    } else {
+//      jacobian(4, 3) = -dsdz / (mc*r*r);
+//      jacobian(4, 4) = 1.0 / (mc*r);
 //
-// METHOD = CHRISTOPHER HUNT
+//      TMatrixD jacobianT(5, 5);
+//      jacobianT.Transpose(jacobian);
 //
-      std::vector<double> cov = s_track->get_covariance();
-      TMatrixD patrec_covariance(4, 4);
+//      for (int i = 0; i < 5; ++i) {
+//        for (int j = 0; j < 5; ++j) {
+//          patrec_covariance(i, j) = cov.at(i*5 + j);
+//        }
+//      }
+//      covariance = jacobian*patrec_covariance*jacobianT;
+//    }
+//
+//    Kalman::State seed_state(vector, covariance);
+//    return seed_state;
+//  }
 
-      if (cov.size() != (unsigned int)16) {
-        throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                              "Dimension of covariance matrix does not match the state vector",
-                              "KalmanSeed::ComputeInitalCovariance(Straight)");
-      }
 
-      TMatrixD jacobian(4, 4);
-      jacobian(0, 0) = 1.0;
-      jacobian(1, 1) = 1.0;
-      jacobian(2, 2) = 1.0;
-      jacobian(3, 3) = 1.0;
-      jacobian(0, 1) = length;
-      jacobian(2, 3) = length;
-
-      TMatrixD jacobianT(4, 4);
-      jacobianT.Transpose(jacobian);
-
-      for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-          patrec_covariance(i, j) = cov.at(i*4 + j);
-        }
-      }
-
-      covariance = jacobian*patrec_covariance*jacobianT;
-    }
-
-    Kalman::State seed_state(vector, covariance);
-    return seed_state;
-  }
+//  Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, const SciFiGeometryHelper* geom,
+//                                                                                 double seed_cov) {
+//    TMatrixD vector(4, 1);
+//    TMatrixD covariance(4, 4);
+//
+//    int tracker = s_track->get_tracker();
+//    double seed_pos = geom->GetPlanePosition(tracker, 5, 2);
+//    double length = seed_pos;
+//
+//    double x0 = s_track->get_x0();
+//    double y0 = s_track->get_y0();
+//    double mx = s_track->get_mx();
+//    double my = s_track->get_my();
+//
+//    // Get position at the starting end of tracker
+//    double x = x0 + mx*length;
+//    double y = y0 + my*length;
+//
+//    vector(0, 0) = x;
+//    vector(1, 0) = mx;
+//    vector(2, 0) = y;
+//    vector(3, 0) = my;
+//
+////
+//// METHOD = ED SANTOS
+////
+//    if (seed_cov > 0.0) {
+//      covariance.Zero();
+//      covariance(0, 0) = seed_cov;
+//      covariance(1, 1) = seed_cov/(200.0*200.0); // Rescale for gradients - not momenta!
+//      covariance(2, 2) = seed_cov;
+//      covariance(3, 3) = seed_cov/(200.0*200.0);
+//    } else {
+////
+//// METHOD = CHRISTOPHER HUNT
+////
+//      std::vector<double> cov = s_track->get_covariance();
+//      TMatrixD patrec_covariance(4, 4);
+//
+//      if (cov.size() != (unsigned int)16) {
+//        throw MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
+//                              "Dimension of covariance matrix does not match the state vector",
+//                              "KalmanSeed::ComputeInitalCovariance(Straight)");
+//      }
+//
+//      TMatrixD jacobian(4, 4);
+//      jacobian(0, 0) = 1.0;
+//      jacobian(1, 1) = 1.0;
+//      jacobian(2, 2) = 1.0;
+//      jacobian(3, 3) = 1.0;
+//      jacobian(0, 1) = length;
+//      jacobian(2, 3) = length;
+//
+//      TMatrixD jacobianT(4, 4);
+//      jacobianT.Transpose(jacobian);
+//
+//      for (int i = 0; i < 4; ++i) {
+//        for (int j = 0; j < 4; ++j) {
+//          patrec_covariance(i, j) = cov.at(i*4 + j);
+//        }
+//      }
+//
+//      covariance = jacobian*patrec_covariance*jacobianT;
+//    }
+//
+//    Kalman::State seed_state(vector, covariance);
+//    return seed_state;
+//  }
 
 
   SciFiTrack* ConvertToSciFiTrack(const Kalman::TrackFit* fitter,
@@ -440,14 +440,14 @@ namespace MAUS {
       seed_mom.setX(seed_vector(1, 0)*default_mom);
       seed_pos.setY(seed_vector(2, 0));
       seed_mom.setY(seed_vector(3, 0)*default_mom);
-      seed_pos.setZ(the_track[14].GetPosition());
+      seed_pos.setZ(the_track.GetLastTrackPoint().GetPosition());
       seed_mom.setZ(default_mom);
     } else if (dimension == 5) {
       seed_pos.setX(seed_vector(0, 0));
       seed_mom.setX(seed_vector(1, 0));
       seed_pos.setY(seed_vector(2, 0));
       seed_mom.setY(seed_vector(3, 0));
-      seed_pos.setZ(the_track[14].GetPosition());
+      seed_pos.setZ(the_track.GetLastTrackPoint().GetPosition());
       seed_mom.setZ(fabs(1.0/seed_vector(4, 0)));
     }
     seed_pos *= reference_rot;
@@ -455,7 +455,7 @@ namespace MAUS {
 
     seed_mom *= reference_rot;
 
-    if (tracker == 0) seed_mom *= -1.0; // Direction of recon is reveresed upstream.
+//    if (tracker == 0) seed_mom *= -1.0; // Direction of recon is reveresed upstream.
     seed_mom.setZ(fabs(seed_mom.z()));
 
     new_track->SetSeedPosition(seed_pos);

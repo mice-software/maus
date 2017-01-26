@@ -259,7 +259,7 @@ void MapCppTrackerPatternRecognition::extrapolate_helical_seed(SciFiEvent& event
     ThreeVector mom;
 
     int tracker = track->get_tracker();
-    double length = _geometry_helper.GetPlanePosition(tracker, 5, 2);
+    double length = _geometry_helper.GetSeedDistance(tracker);
 
     double r  = track->get_R();
     double pt = - track->get_charge()*CLHEP::c_light*_geometry_helper.GetFieldValue(tracker)*r;
@@ -305,20 +305,18 @@ void MapCppTrackerPatternRecognition::extrapolate_straight_seed(SciFiEvent& even
     double default_mom = _geometry_helper.GetDefaultMomentum();
 
     int tracker = track->get_tracker();
-    double length = _geometry_helper.GetPlanePosition(tracker, 5, 2);
-    ThreeVector reference = _geometry_helper.GetReferencePosition(tracker);
-
-    pos.setX(track->get_x0());
-    pos.setY(track->get_y0());
-    pos.setZ(length);
+    double length = _geometry_helper.GetSeedDistance(tracker);
 
     double mx = track->get_mx();
     double my = track->get_my();
+
+    pos.setX(track->get_x0() + mx*length);
+    pos.setY(track->get_y0() + my*length);
+    pos.setZ(length);
+
     mom.setX(mx*default_mom);
     mom.setY(my*default_mom);
-    mom.setZ(default_mom);
-    if (tracker == 0) mom *= -1.0;
-    mom.setZ(fabs(mom.z()));
+    mom.setZ(fabs(default_mom));
 
     track->set_seed_position(pos);
     track->set_seed_momentum(mom);

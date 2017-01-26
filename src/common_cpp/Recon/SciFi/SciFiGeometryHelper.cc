@@ -96,16 +96,9 @@ void SciFiGeometryHelper::Build() {
       const MiceModule* referencePlane = FindPlane(tracker_n, 1, 0);
 
       ThreeVector referencePos = clhep_to_root(referencePlane->globalPosition());
-//      HepRotation referenceRot;
-//      if (UseActiveRotations == true) {
-//        referenceRot = referencePlane->globalRotation();
-//      } else {
-//        referenceRot = referencePlane->globalRotation().inverse();
-//      }
 
       HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // station
                                                ->mother()));  // tracker
-//      HepRotation internal_fibre_rotation(module->relativeRotation(station));
 
       ThreeVector direction(0., 1., 0.);
       if (UseActiveRotations == true) {
@@ -114,8 +107,6 @@ void SciFiGeometryHelper::Build() {
         direction     *= internal_fibre_rotation.inverse();
       }
 
-//      HepRotation station_rotation(station->relativeRotation(station->mother()  // tracker
-//                                                              ->mother()));    // solenoid
       HepRotation station_rotation(trackerModule->globalRotation());
       ThreeVector plane_position = clhep_to_root(module->globalPosition());
 
@@ -255,6 +246,15 @@ ThreeVector SciFiGeometryHelper::FindReferenceFramePosition(int tracker) const {
   ThreeVector reference_pos = clhep_to_root(reference_plane->globalPosition());
   return reference_pos;
 }
+
+
+double SciFiGeometryHelper::GetSeedDistance(int tracker) const {
+  SciFiPlaneMap::const_reverse_iterator last_plane =
+                                               _geometry_map.find(tracker)->second.Planes.rbegin();
+
+  return last_plane->second.Position.z();
+}
+
 
 double SciFiGeometryHelper::HighlandFormula(double L, double beta, double p) {
   static double HighlandConstant = Recon::Constants::HighlandConstant;
