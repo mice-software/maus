@@ -245,7 +245,6 @@ class EfficiencyBase(object):
 
     def __init__(self):
         """ Initialise member variables """
-        print 'Running init base ',
         self.root_files = []
         self.current_run_number = -1
 
@@ -416,6 +415,8 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         self.check_straight = True
         self.cut_on_tracker_10spnt = True
         self.cut_on_tracker_5spnt = True # Should always be true
+        self.cut_tkus_num_spnts = 5
+        self.cut_tkds_num_spnts = 5
 
         # Results
         self.bool_2tof_timing_event = False # Tof timing ok
