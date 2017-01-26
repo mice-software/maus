@@ -44,7 +44,7 @@ namespace global {
 
 class DataStructureHelper {
  public:
-  ~DataStructureHelper() { }
+  ~DataStructureHelper() {}
   static const DataStructureHelper& GetInstance();
   std::vector<const MiceModule *> FindModulesByName(const MiceModule * module,
                                                     std::string name) const;
@@ -61,30 +61,38 @@ class DataStructureHelper {
       const double z,
       const MAUS::DataStructure::Global::PID particle_id) const;
 
-  /*
-  void GetGlobalRawTracks(const Json::Value& recon_event,
-                          const DetectorMap& detectors,
-                          std::vector<MAUS::recon::global::Track>& raw_tracks);
-  void GetGlobalTracks(const Json::Value& recon_event,
-                       const DetectorMap& detectors,
-                       std::vector<MAUS::recon::global::Track>& raw_tracks);
-  void GetGlobalTracks(const Json::Value& recon_event,
-                       const std::string& json_node_name,
-                       const DetectorMap& detectors,
-                       std::vector<MAUS::recon::global::Track>& raw_tracks);
 
-  Json::Value TrackToJson(const MAUS::recon::global::Track& track);
-  GlobalTrackPoint TrackPointToGlobalTrackPoint(
-      const MAUS::recon::global::TrackPoint& track_point);
-  GlobalTrackPoint TrackPointToGlobalTrackPoint(
-      const MAUS::recon::global::TrackPoint& track_point,
-      const bool on_mass_shell);
-  */
+  /** Convert from a string name to a Detector type
+   *  - name: string name for a given detector
+   *  Returns a DetectorPoint corresponding to the given name. Throws a
+   *  MAUS::Exception if name was not recognised.
+   */
+  inline GlobalDS::DetectorPoint StringToDetectorPoint(std::string name) const;
+
+  /** Convert from a Detector type to a string name
+   *  - point: detector type
+   *  Returns a string name corresponding to the given type. Throws a
+   *  MAUS::Exception if name was not recognised.
+   */
+  inline std::string DetectorPointToString(GlobalDS::DetectorPoint point) const;
  protected:
-  DataStructureHelper() { }
+  void InitialiseNames();
+  DataStructureHelper() {InitialiseNames();}
   CovarianceMatrix GetJsonCovarianceMatrix(
       const Json::Value& value) const;
+  // These have to be static because std::map does not support key lookup on
+  // const std::map (not sure why)
+  static std::map<std::string, GlobalDS::DetectorPoint> _names_to_points;
+  static std::map<GlobalDS::DetectorPoint, std::string> _points_to_names;
 };
+
+GlobalDS::DetectorPoint DataStructureHelper::StringToDetectorPoint(std::string name) const {
+    return _names_to_points[name];
+}
+
+std::string DataStructureHelper::DetectorPointToString(GlobalDS::DetectorPoint point) const {
+    return _points_to_names[point];
+}
 
 }  // namespace global
 }  // namespace recon

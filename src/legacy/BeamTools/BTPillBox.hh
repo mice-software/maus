@@ -53,6 +53,14 @@ public:
 	void SetSkinDepth(double skinDepth) {_skinDepth = skinDepth;}
 	CLHEP::HepLorentzVector GetVectorPotential(CLHEP::HepLorentzVector position) const;
 
+  /** Set the maximum radius of the field, overriding calculation based on
+   *  Bessel functions
+   */
+  void SetCavityRadius(double radius) {_cavityRadius = radius;}
+  /** Return the maximum radius of the field
+   */
+  double GetCavityRadius() const {return _cavityRadius;}
+
 	enum phasingFieldModel{noField, electrostatic, normal, bestGuess};
 	static phasingFieldModel StringToPhaseModel(std::string phaseModel);
 

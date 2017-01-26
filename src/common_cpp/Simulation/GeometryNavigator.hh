@@ -27,6 +27,7 @@
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
+class G4Material;
 
 namespace MAUS {
 
@@ -62,6 +63,16 @@ namespace MAUS {
        */
       void SetPoint(ThreeVector point);
 
+      /** @brief Compute a safe step size
+       *
+       *  Returns length of step size that does not intersect another volume
+       *  along the direction specified by momentum
+       *  As far as I can tell, G4 ignores momentum
+       */
+      double ComputeStep(ThreeVector point,
+                         ThreeVector momentum,
+                         double step);
+
       /** @brief Increment the current position by the supplied displacement
        * 
        *  Returns the new position. This allows us to use Geant4's intelligent
@@ -81,23 +92,27 @@ namespace MAUS {
        */
       bool IsMixture() const;
 
-      /** @brief Gets the Mass Number
+      /** @brief Gets the Mass Number for a given element in the material
+       *  - element: indexes the element in the material
        *
        *  Units: g/mole
-       *
-       *  WARNING: This function will throw an exception if the current material
-       *  is a mixture
        */
-      double GetA() const;
+      double GetA(size_t element = 0) const;
 
-      /** @brief Gets the Atomic Number
+      /** @brief Gets the Atomic Number for a given element in the material
+       *  - element: indexes the element in the material
        *
        *  Unitless
-       *
-       *  WARNING: This function will throw an exception if the current material
-       *  is a mixture
        */
-      double GetZ() const;
+      double GetZ(size_t element = 0) const;
+
+      /** Get the number of elements in the current material
+       */
+      double GetNumberOfElements() const;
+
+      /** Get the mass fraction of a given element in the current material
+       */
+      double GetFraction(size_t element) const;
 
       /** @brief Gets the Nuclear interaction length
        *
@@ -116,6 +131,10 @@ namespace MAUS {
        *  Units: g/cm^3
        */
       double GetDensity() const;
+
+      /** @brief Get the Geant4 material
+       */
+      G4Material* GetMaterial() const;
 
     private:
 
