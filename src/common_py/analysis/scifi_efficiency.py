@@ -422,8 +422,8 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         self.bool_2tof_timing_event = False # Tof timing ok
         self.bool_2tof_spoint_event = False # 1 spacepoint only in each tof
         self.bool_10spoint_event = False # Expect one 5pt track in each trcker
-        self.bool_tkus_5spoint_event = False # Expect one 5pt track in TkUS
-        self.bool_tkds_5spoint_event = False # Expect one 5pt track in TkDS
+        self.bool_tkus_good_nspoint_event = False # Expect one 5pt track in TkUS
+        self.bool_tkds_good_nspoint_event = False # Expect one 5pt track in TkDS
         self.bool_tkus_1track = False # Found one track in TkUS
         self.bool_tkds_1track = False # Found one track in TkDS
         self.bool_tkus_5spoint_track = False # Found one 5pt track in TkUS
@@ -570,9 +570,9 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
 
         # If there were 5 spacepoints in a tracker and 1 track only was
         # found in it, increment the 3 to 5 spoint track counter
-        if self.bool_tkus_5spoint_event and self.bool_tkus_1track:
+        if self.bool_tkus_good_nspoint_event and self.bool_tkus_1track:
             self.fdata.n_3to5spoint_tkus_tracks += 1
-        if self.bool_tkds_5spoint_event and self.bool_tkds_1track:
+        if self.bool_tkds_good_nspoint_event and self.bool_tkds_1track:
             self.fdata.n_3to5spoint_tkds_tracks += 1
 
         # Now check the tracks found had 5 spoints, 1 from each station
@@ -581,12 +581,12 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         for trk in prtracks:
             if trk.get_tracker() == 0:
                 if (trk.get_spacepoints_pointers().size() == 5) \
-                  and self.bool_tkus_5spoint_event and self.bool_tkus_1track:
+                  and self.bool_tkus_good_nspoint_event and self.bool_tkus_1track:
                     self.fdata.n_5spoint_tkus_tracks += 1
                     self.bool_tkus_5spoint_track = True
             elif trk.get_tracker() == 1:
                 if (trk.get_spacepoints_pointers().size() == 5) \
-                  and self.bool_tkds_5spoint_event and self.bool_tkds_1track:
+                  and self.bool_tkds_good_nspoint_event and self.bool_tkds_1track:
                     self.fdata.n_5spoint_tkds_tracks += 1
                     self.bool_tkds_5spoint_track = True
 
@@ -602,8 +602,8 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
             good event counters, and return if the tracker spacepoint data
             passes the selected cuts """
         self.bool_10spoint_event = True
-        self.bool_tkus_5spoint_event = True
-        self.bool_tkds_5spoint_event = True
+        self.bool_tkus_good_nspoint_event = True
+        self.bool_tkds_good_nspoint_event = True
 
         # Loop over trackers
         for i in range(2):
@@ -616,16 +616,16 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
                 if len(station) != 1:
                     self.bool_10spoint_event = False
                     if i == 0:
-                        self.bool_tkus_5spoint_event = False
+                        self.bool_tkus_good_nspoint_event = False
                     elif i == 1:
-                        self.bool_tkds_5spoint_event = False
+                        self.bool_tkds_good_nspoint_event = False
 
         # Update the internal expected tracks counters
         if self.bool_10spoint_event:
             self.fdata.n_10spoint_events += 1
-        if self.bool_tkus_5spoint_event:
+        if self.bool_tkus_good_nspoint_event:
             self.fdata.n_5spoint_tkus_events += 1
-        if self.bool_tkds_5spoint_event:
+        if self.bool_tkds_good_nspoint_event:
             self.fdata.n_5spoint_tkds_events += 1
 
         # Are the complete set of tracker spacepoint cuts passed?
@@ -643,12 +643,12 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
                 self.bool_passed_tkds_event = False
         # If not, just see if have 5 spoints in each tracker individually
         elif self.cut_on_tracker_5spnt:
-            if self.bool_tkus_5spoint_event:
+            if self.bool_tkus_good_nspoint_event:
                 self.bool_passed_tkus_event = True
                 self.fdata.n_passed_tkus_events += 1
             else:
                 self.bool_passed_tkus_event = False
-            if self.bool_tkds_5spoint_event:
+            if self.bool_tkds_good_nspoint_event:
                 self.bool_passed_tkds_event = True
                 self.fdata.n_passed_tkds_events += 1
             else:
@@ -665,8 +665,8 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         self.bool_2tof_timing_event = False
         self.bool_2tof_spoint_event = False
         self.bool_10spoint_event = False
-        self.bool_tkus_5spoint_event = False
-        self.bool_tkds_5spoint_event = False
+        self.bool_tkus_good_nspoint_event = False
+        self.bool_tkds_good_nspoint_event = False
         self.bool_tkus_1track = False
         self.bool_tkds_1track = False
         self.bool_tkus_5spoint_track = False
@@ -791,8 +791,8 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
             return False # remove event from consideration
 
         # Now the tracker data
-        bool_tkus_5spoint_event = False
-        bool_tkds_5spoint_event = False
+        bool_tkus_good_nspoint_event = False
+        bool_tkds_good_nspoint_event = False
 
         sfevent = revent.GetSciFiEvent()
         spoints_tku = \
@@ -819,18 +819,22 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
         # Only use the event for each detector if we have one 5pt track only
         if len(tracks_tku_5pt) == 1 and len(tracks_tku_4to5pt) == 1 and \
             len(tracks_tku_3to5pt) == 1:
-            bool_tkus_5spoint_event = True
+            bool_tkus_good_nspoint_event = True
         else:
-            bool_tkus_5spoint_event = False
+            bool_tkus_good_nspoint_event = False
 
-        if len(tracks_tkd_5pt) == 1 and len(tracks_tkd_4to5pt) == 1 and \
+        # NOTE: *** Code currently running to check 4 station tkds in DEMO ***
+
+        # if len(tracks_tkd_5pt) == 1 and len(tracks_tkd_4to5pt) == 1 and \
+        if  len(tracks_tkd_4to5pt) == 1 and \
             len(tracks_tkd_3to5pt) == 1:
-            bool_tkds_5spoint_event = True
+            bool_tkds_good_nspoint_event = True
         else:
-            bool_tkds_5spoint_event = False
+            bool_tkds_good_nspoint_event = False
 
         # If we do not have good events in either tracker, save time and stop
-        if (not bool_tkus_5spoint_event) and (not bool_tkds_5spoint_event):
+        if (not bool_tkus_good_nspoint_event) and \
+          (not bool_tkds_good_nspoint_event):
             return False
 
         #print 'Found ' + str(len(tracks_tku_5pt)) + ' 5pt MC tracks in TKU'
@@ -841,11 +845,11 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
         #print 'Found ' + str(len(tracks_tkd_3to5pt)) + ' 3pt+ MC tracks in TKD'
 
         # Update internal counters
-        if bool_tkus_5spoint_event:
+        if bool_tkus_good_nspoint_event:
             self.fdata.n_mc_tku_tracks_5pt += len(tracks_tku_5pt)
             self.fdata.n_mc_tku_tracks_4to5pt += len(tracks_tku_4to5pt)
             self.fdata.n_mc_tku_tracks_3to5pt += len(tracks_tku_3to5pt)
-        if bool_tkds_5spoint_event:
+        if bool_tkds_good_nspoint_event:
             self.fdata.n_mc_tkd_tracks_5pt += len(tracks_tkd_5pt)
             self.fdata.n_mc_tkd_tracks_4to5pt += len(tracks_tkd_4to5pt)
             self.fdata.n_mc_tkd_tracks_3to5pt += len(tracks_tkd_3to5pt)
@@ -874,17 +878,17 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
         results_tkd_3pt = self.check_tracks(lkup, 3, tracks_tkd)
 
         # Update internal counters
-        if bool_tkus_5spoint_event:
+        if bool_tkus_good_nspoint_event:
             self.fdata.n_rec_tku_tracks_5pt_good += results_tku_5pt[0]
             self.fdata.n_rec_tku_tracks_4to5pt_good += results_tku_4pt[0]
             self.fdata.n_rec_tku_tracks_3to5pt_good += results_tku_3pt[0]
-        if bool_tkds_5spoint_event:
+        if bool_tkds_good_nspoint_event:
             self.fdata.n_rec_tkd_tracks_5pt_good += results_tkd_5pt[0]
             self.fdata.n_rec_tkd_tracks_4to5pt_good += results_tkd_4pt[0]
             self.fdata.n_rec_tkd_tracks_3to5pt_good += results_tkd_3pt[0]
 
         # Update histos, require that only 1 MC track is present
-        if bool_tkus_5spoint_event:
+        if bool_tkus_good_nspoint_event:
             # Need the 2nd index to get track id rather than particle event id
             track_id = tracks_tku_5pt[0]
             mom = \
@@ -893,7 +897,7 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
                 self.hpt_m_tku.Fill(math.sqrt(mom[0]**2 + mom[1]**2))
                 self.hpz_m_tku.Fill(mom[2])
 
-        if bool_tkds_5spoint_event:
+        if bool_tkds_good_nspoint_event:
             track_id = tracks_tkd_5pt[0]
             mom = \
               tools.find_mc_momentum_sfhits(lkup, spoints_tkd, track_id, 1)

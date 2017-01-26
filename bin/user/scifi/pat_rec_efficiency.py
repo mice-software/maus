@@ -13,14 +13,9 @@ import analysis.scifi_efficiency
 
 def main(args):
     args.pop(0)
-    results = efficiency_real(args)
-    # efficiency_mc(args)
-
-    print ' '
-    print 'Plotting results...'
-    print ' '
-    print results
-    plot_data(results)
+    # results = efficiency_real(args)
+    efficiency_mc(args)
+    # plot_data(results)
 
 
 def efficiency_real(args):
@@ -61,6 +56,10 @@ def efficiency_mc(args):
 
 def plot_data(data):
     """ Plot the efficiency results vs run number """
+    print ' '
+    print 'Plotting results...'
+    print ' '
+
     runs = data['run_numbers']
     xmin = np.amin(runs) - 1
     xmax = np.amax(runs) + 1
