@@ -13,9 +13,9 @@ import analysis.scifi_efficiency
 
 def main(args):
     args.pop(0)
-    # results = efficiency_real(args)
-    efficiency_mc(args)
-    # plot_data(results)
+    results = efficiency_real(args)
+    # efficiency_mc(args)
+    plot_data(results)
 
 
 def efficiency_real(args):
