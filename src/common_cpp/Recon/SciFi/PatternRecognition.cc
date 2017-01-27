@@ -196,31 +196,32 @@ void PatternRecognition::process(SciFiEvent &evt) const {
 
     int trker_no = 0;
     // Split spacepoints according to which station they occured in
-    SpacePoint2dPArray spnts_by_station(_n_stations);
-    SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+    SpacePoint2dPArray spnts_by_station_tku(_n_stations);
+    SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station_tku);
 
     // Make the helical and straight tracks, depending on flags
     if ( _up_helical_pr_on ) {
       bool track_type = 1;
-      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+      make_all_tracks(track_type, trker_no, spnts_by_station_tku, evt);
     }
     if ( _up_straight_pr_on ) {
       bool track_type = 0;
-      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+      make_all_tracks(track_type, trker_no, spnts_by_station_tku, evt);
     }
 
     trker_no = 1;
     // Split spacepoints according to which station they occured in
-    SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station);
+    SpacePoint2dPArray spnts_by_station_tkd(_n_stations);
+    SciFiTools::sort_by_station(spnts_by_tracker[trker_no], spnts_by_station_tkd);
 
     // Make the helical and straight tracks, depending on flags
     if ( _down_helical_pr_on ) {
       bool track_type = 1;
-      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+      make_all_tracks(track_type, trker_no, spnts_by_station_tkd, evt);
     }
     if ( _down_straight_pr_on ) {
       bool track_type = 0;
-      make_all_tracks(track_type, trker_no, spnts_by_station, evt);
+      make_all_tracks(track_type, trker_no, spnts_by_station_tkd, evt);
     }
   } else {
     if (_verb > 0) std::cerr << "No spacepoints in event" << std::endl;
