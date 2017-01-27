@@ -187,8 +187,6 @@ SciFiTrack* MapCppTrackerTrackFit::track_fit_helix(SciFiSeed* seed) const {
 
   ThreeVector seed_pos = track->GetSeedPosition();
   ThreeVector seed_mom = track->GetSeedMomentum();
-  std::cerr << "SciFi Track Seed : " << seed_pos.x() << ", " << seed_pos.y() << ", " << seed_pos.z() << " | " <<
-    seed_mom.x() << ", " << seed_mom.y() << ", " << seed_mom.z() << std::endl;
 
   return track;
 }
