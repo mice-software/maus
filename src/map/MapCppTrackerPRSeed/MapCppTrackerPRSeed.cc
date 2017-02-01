@@ -111,7 +111,7 @@ SciFiSeed* MapCppTrackerPRSeed::_make_helical_seed(SciFiHelicalPRTrack* helical)
   covariance(1, 1) = 100.0;
   covariance(2, 2) = 100.0;
   covariance(3, 3) = 100.0;
-  covariance(4, 4) = 0.01;
+  covariance(4, 4) = 2.5e-7;
 
   SciFiSeed* seed = new SciFiSeed();
 
@@ -141,9 +141,9 @@ SciFiSeed* MapCppTrackerPRSeed::_make_straight_seed(SciFiStraightPRTrack* straig
     }
   }
   covariance(0, 0) = 100.0;
-  covariance(1, 1) = 10.0;
+  covariance(1, 1) = 100.0;
   covariance(2, 2) = 100.0;
-  covariance(3, 3) = 10.0;
+  covariance(3, 3) = 1.0;
 
   SciFiSeed* seed = new SciFiSeed();
 

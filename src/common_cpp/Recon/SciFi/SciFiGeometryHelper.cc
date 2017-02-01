@@ -265,6 +265,11 @@ double SciFiGeometryHelper::HighlandFormula(double L, double beta, double p) {
 }
 
 double SciFiGeometryHelper::BetheBlochStoppingPower(double p, const SciFiMaterialParams* material) {
+//  if ( p < 5.0 ) {
+//    throw Exceptions::Exception(Exceptions::recoverable,
+//        "Track Momentum Outside region modelled by Bethe-Bloch",
+//        "SciFiGeometryHelper::BetheBlochStoppingPower()");
+//  }
   double muon_mass      = Recon::Constants::MuonMass;
   double electron_mass  = Recon::Constants::ElectronMass;
   double muon_mass2     = muon_mass*muon_mass;

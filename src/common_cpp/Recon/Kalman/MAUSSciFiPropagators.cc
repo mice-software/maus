@@ -300,39 +300,65 @@ namespace MAUS {
 
     _momentum_reduction_factor = 1.0;
 
-    try {
-      if (_subtract_eloss) {
-        SciFiMaterialsList materials;
-        _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
+    if (_subtract_eloss) {
+      SciFiMaterialsList materials;
+      _geometry_helper->FillMaterialsList(start.GetId(), end.GetId(), materials);
 
-        // Reduce/increase momentum vector accordingly.
-        double e_loss_sign = 1.0;
-        if (end.GetId() > 0) {
-          e_loss_sign = -1.0;
-        }
+      // Reduce/increase momentum vector accordingly.
+      double e_loss_sign = 1.0;
+      if (end.GetId() > 0) {
+        e_loss_sign = -1.0;
+      }
 
-        double delta_energy = 0.0;
-        double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
-        double momentum = old_momentum;
-        int n_steps = materials.size();
+      double delta_energy = 0.0;
+      double energy = sqrt(old_momentum*old_momentum + _muon_mass_sq);
+      double momentum = old_momentum;
+      int n_steps = materials.size();
 
-        for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
-          double width = materials.at(i).second;
-          double path_length = 0.1 * width * distance_factor;
-          double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-          delta_energy = e_loss_sign*SP*path_length;
+      for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
+        double width = materials.at(i).second;
+        double path_length = 0.1 * width * distance_factor;
+        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+        delta_energy = e_loss_sign*SP*path_length;
+
+
 //          double SP = _geometry_helper->LandauVavilovStoppingPower(momentum,
 //                                                             materials.at(i).first, path_length);
 //          delta_energy = e_loss_sign*SP;
-          energy = energy - delta_energy;
-          momentum = sqrt(energy*energy - _muon_mass_sq);
+
+//          if (delta_energy != delta_energy) {
+//            std::cerr << "E-Loss = " << delta_energy << ", E = " << energy << ", path_length = " << path_length << ", SP = " << SP << ", old P = " << old_momentum << std::endl;
+//            std::cerr << "Px = " << old_px << ", Py = " << old_py << ", Pz = " << old_pz << std::endl;
+//
+//            std::ostringstream converter("");
+//            converter << start.GetPosition() << ", " << start.GetId() << '\n';
+//
+//            converter << "FILTERED : ";
+//            TMatrixD vec = start.GetFiltered().GetVector();
+//            TMatrixD cov = start.GetFiltered().GetCovariance();
+//            for (unsigned int i = 0; i < start.GetDimension(); ++i) {
+//              converter << "(" << vec(i, 0) << " +/- " << sqrt(cov(i, i)) << "), ";
+//            }
+//            converter << "\nPREDICTED : ";
+//            TMatrixD vecp = start.GetPredicted().GetVector();
+//            TMatrixD covp = start.GetPredicted().GetCovariance();
+//            for (unsigned int i = 0; i < start.GetDimension(); ++i) {
+//              converter << "(" << vecp(i, 0) << " +/- " << sqrt(covp(i, i)) << "), ";
+//            }
+//
+//            std::cerr << converter.str() << std::endl;
+//
+//          }
+
+        energy = energy - delta_energy;
+        if (energy < _muon_mass) {
+          throw Exceptions::Exception(Exceptions::recoverable,
+              "Mass Shell condition failed",
+              "HelicalPropagator::_calculateBasePropagator()");
         }
-        _momentum_reduction_factor = momentum/old_momentum;
+        momentum = sqrt(energy*energy - _muon_mass_sq);
       }
-    } catch (...) {
-      throw Exceptions::Exception(Exceptions::recoverable,
-          "Error occured during energy loss calculation",
-          "MAUSSciFiPropagactors::_calculateBasePropagator()");
+      _momentum_reduction_factor = momentum/old_momentum;
     }
 
 
@@ -345,7 +371,6 @@ namespace MAUS {
     _cosine_term   = cos(_delta_theta);
 
     if (start.GetId() < 0) _u_const = - _u_const;
-
 
     new_prop(0, 0) = 1.;
     new_prop(0, 1) = (_sine_term/_u_const);
