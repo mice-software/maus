@@ -39,22 +39,22 @@ class PhaseSpace2DInspector() :
 
     self.position_plot = ROOT.TH2F(\
            'inspected_position_{0}'.format(self.plane), 'Beam Position', \
-                                        400, -200.0, 200.0, 400, -200.0, 200.0)
+                                        800, -400.0, 400.0, 800, -400.0, 400.0)
     self.momentum_plot = ROOT.TH2F(\
            'inspected_momentum_{0}'.format(self.plane), 'Beam Momentum', \
-                                        400, -200.0, 200.0, 400, -200.0, 200.0)
+                                        800, -400.0, 400.0, 800, -400.0, 400.0)
     self.x_phasespace_plot = ROOT.TH2F(\
         'inspected_x_phasespace_{0}'.format(self.plane), 'X-Phasespace', \
-                                        400, -200.0, 200.0, 400, -200.0, 200.0)
+                                        800, -400.0, 400.0, 800, -400.0, 400.0)
     self.y_phasespace_plot = ROOT.TH2F(\
         'inspected_y_phasespace_{0}'.format(self.plane), 'Y-Phasespace', \
-                                        400, -200.0, 200.0, 400, -200.0, 200.0)
+                                        800, -400.0, 400.0, 800, -400.0, 400.0)
     self.xy_phasespace_plot = ROOT.TH2F(\
         'inspected_xpy_phasespace_{0}'.format(self.plane), 'X-Py-Phasespace', \
-                                        400, -200.0, 200.0, 400, -200.0, 200.0)
+                                        800, -400.0, 400.0, 800, -400.0, 400.0)
     self.yx_phasespace_plot = ROOT.TH2F(\
         'inspected_ypx_phasespace_{0}'.format(self.plane), 'Y-Px-Phasespace', \
-                                        400, -200.0, 200.0, 400, -200.0, 200.0)
+                                        800, -400.0, 400.0, 800, -400.0, 400.0)
 
     self.pz_plot = ROOT.TH1F(\
               'inspected_pz_{0}'.format(self.plane), 'p_{z}', 400, 0.0, 400.0 )
