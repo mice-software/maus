@@ -226,6 +226,7 @@ void PatternRecognition::process(SciFiEvent &evt) const {
   } else {
     if (_verb > 0) std::cerr << "No spacepoints in event" << std::endl;
   }
+  std::cerr << "Event finished" << std::endl;
 };
 
 void PatternRecognition::make_all_tracks(const bool track_type, const int trker_no,
@@ -721,11 +722,11 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   // Perform a circle fit now that we have found a set of spacepoints
   SimpleCircle c_trial;
   TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
-  bool good_radius = LeastSquaresFitter::circle_fit(_sd_1to4, _sd_5, _R_res_cut, spnts, c_trial,
-                                                    cov_circle);
+  bool good_radius = LeastSquaresFitter::circle_fit(_sd_1to4, _sd_5, _R_res_cut,
+                                                    spnts, c_trial, cov_circle);
 
   // If the radius calculated is too large or chisq fails, return NULL
-  if ( !good_radius || !( c_trial.get_chisq() / ( n_points - 2 ) < _circle_chisq_cut ) ) {
+  if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
     if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: Failed circle cut, chisq = "
                                << c_trial.get_chisq() << "\n";
     return NULL;
@@ -739,7 +740,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   for (auto sp : spnts) {
     double sig = sigma_on_s(c_trial, cov_circle, sp);
     sigma_s.push_back(sig);
-    // std::cerr << "Adding sigma_s: " << sig << std::endl; 
+    std::cerr << "Adding sigma_s: " << sig;
   }
 
   // Perform the s - z fit
@@ -752,6 +753,12 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: dsdz fit failed, looping...\n";
     return NULL;
   }
+
+  std::cerr << "Final covariance matrices of candidate track in tracker " << spnts[0]->get_tracker() << ":\n";
+  cov_circle.Print();
+  cov_sz.Print();
+
+  std::cerr << "chisqs: " << c_trial.get_chisq() << " " << line_sz.get_chisq() << std::endl;
 
   // Squash the covariances of each fit into one vector
   std::vector<double> covariance;
@@ -796,7 +803,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   // Form the track and return it
   SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, charge, pos_0, phi_0, c_trial, line_sz,
-                                                                  -1.0, phi_i, spnts, covariance);
+                                                       -1.0, phi_i, spnts, covariance);
   return track;
 }
 
@@ -1231,8 +1238,8 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
     sigma_y = _sd_1to4;
   }
 
-   std::cerr << "Input circle parameters: " << xc << " " << yc << " " << rad << " " << x << " "
-             << y << " " << sigma_x << " " << sigma_y << std::endl;
+  // std::cerr << "Input circle parameters: " << xc << " " << yc << " " << rad << " " << x << " "
+  //           << y << " " << sigma_x << " " << sigma_y << std::endl;
 
   // Set up the full covariance matrix for circle fit, including station resolutions
   TMatrixD covariance(5,5);
@@ -1252,8 +1259,8 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
   covariance[4][3] = cov_circ[2][1];
   covariance[4][4] = cov_circ[2][2];
 
-   std::cerr << "Full covariance matrix: " << std::endl;
-   covariance.Print();
+  // std::cerr << "Full covariance matrix: " << std::endl;
+  // covariance.Print();
 
   // Now form delta, a vector holding the partial differentials of s wrt  x, y, r, xc, yc
   double denom = xc*xc - 2*xc*x + yc*yc - 2*yc*y + x*x + y*y;
@@ -1264,9 +1271,9 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
   double dsxc = (rad*(yc-y)) / denom;
   double dsyc = (rad*(xc-x)) / denom;
 
-   std::cerr << "denom: " << denom << std::endl;
-   std::cerr << "Delta differentials: " << dsx << " " << dsy << " " << dsr << " " << dsxc << " "
-             << dsyc << std::endl;
+  // std::cerr << "denom: " << denom << std::endl;
+  // std::cerr << "Delta differentials: " << dsx << " " << dsy << " " << dsr << " " << dsxc << " "
+  //           << dsyc << std::endl;
 
   TMatrixD delta(5,1);
   delta[0] = dsx;
@@ -1275,23 +1282,23 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
   delta[3] = dsxc;
   delta[4] = dsyc;
 
-   std::cerr << "Delta matrix: " << std::endl;
-   delta.Print();
+  // std::cerr << "Delta matrix: " << std::endl;
+  //  delta.Print();
 
   // Next the transpose
   TMatrixD deltaT(1,5);
   deltaT.Transpose(delta);
 
-   std::cerr << "Delta matrix: " << std::endl;
-   delta.Print();
-   std::cerr << "DeltaT matrix: " << std::endl;
-   deltaT.Print();
+  // std::cerr << "Delta matrix: " << std::endl;
+  // delta.Print();
+  // std::cerr << "DeltaT matrix: " << std::endl;
+  // deltaT.Print();
 
   // Now finally calculate the variance of s, and return the sqrt for the standard deviation
   TMatrix var_s = deltaT * (covariance * delta);
 
-   std::cerr << "var_s matrix: " << std::endl;
-   var_s.Print();
+  // std::cerr << "var_s matrix: " << std::endl;
+  // var_s.Print();
 
   return sqrt(var_s[0][0]);
 }
