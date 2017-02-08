@@ -63,7 +63,7 @@ void linear_fit(const std::vector<double> &_x, const std::vector<double> &_y,
   Ct.T();
   TMatrixD result(Ct * V_m * C);
   line.set_chisq(result[0][0]);
-  line.set_chisq_dof(result[0][0] / n_points);
+  line.set_chisq_dof(result[0][0] / (n_points - 2));
 } // ~linear_fit(...)
 
 bool circle_fit(const double sd_1to4, const double sd_5, const double R_res_cut,
