@@ -246,13 +246,15 @@ class PatternRecognition {
      * @param[in] n_points Number of points in the current track (used for the chi_sq cut)
      * @param[in] spnts A vector of all the input spacepoints
      * @param[in] circle The circle fit of spacepoints from x-y projection
+     * @param[in] var_s The variance on each value of s
      * @param[out] phi_i Vector containing the output turning angles of the spacepoints
      * @param[out] line_sz The output fitted line in s-z projection
      * @param[out] cov_sz Output covariance matrix from the s-z fit
      * @return Boolean indicating success or failure or the algorithm
      */
     bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-          std::vector<double> &phi_i, SimpleLine &line_sz, TMatrixD& cov_sz, int &handedness) const;
+          const std::vector<double>& var_s, std::vector<double> &phi_i, SimpleLine &line_sz,
+          TMatrixD& cov_sz, int &handedness) const;
 
     /** @brief Find the number of 2pi rotations that occured between each station
      *
@@ -391,6 +393,10 @@ class PatternRecognition {
 
     /** @brief Activate debug mode (set up the output ROOT file, histos, etc) */
     void setup_debug();
+
+    /** @brief Calculate the the standard deviation on the s coordinate for a given spacepoint */
+    double sigma_on_s(const SimpleCircle& circ, const TMatrixD& cov_circ,
+                      const SciFiSpacePoint* const spnt) const;
 
   private:
     bool _debug;                /** Run in debug mode */
