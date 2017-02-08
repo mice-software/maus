@@ -80,9 +80,9 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _res_cut(7.0),
                                           _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
-                                          _circle_chisq_cut(15.0),
+                                          _circle_chisq_cut(2.0),
                                           _n_turns_cut(0.75),
-                                          _sz_chisq_cut(24.0),
+                                          _sz_chisq_cut(3.0),
                                           _Pt_max(180.0),
                                           _Pz_min(50.0),
                                           _rfile(NULL),
@@ -113,9 +113,9 @@ void PatternRecognition::set_parameters_to_default() {
   _res_cut = 7.0;
   _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
-  _circle_chisq_cut = 15.0;
+  _circle_chisq_cut = 2.0;
   _n_turns_cut = 0.75;
-  _sz_chisq_cut = 24.0;
+  _sz_chisq_cut = 3.0;
   _Pt_max = 180.0;
   _Pz_min = 50.0;
 }
@@ -226,7 +226,7 @@ void PatternRecognition::process(SciFiEvent &evt) const {
   } else {
     if (_verb > 0) std::cerr << "No spacepoints in event" << std::endl;
   }
-  std::cerr << "Event finished" << std::endl;
+  // std::cerr << "Event finished" << std::endl;
 };
 
 void PatternRecognition::make_all_tracks(const bool track_type, const int trker_no,
@@ -605,15 +605,18 @@ SciFiStraightPRTrack* PatternRecognition::fit_straight_track(const int n_points,
   LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
   LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
 
-  // Squash the covariances of each fit into one matrix
-  cov_x.ResizeTo(4, 4);
+  // Squash the covariances of each fit into one vector
+  std::vector<double> covariance;
   for ( int i = 0; i < 2; ++i ) {
     for ( int j = 0; j < 2; ++j ) {
-      cov_x(i+2, j+2) = cov_y(i, j);
+      covariance.push_back(cov_x[i][j]);
     }
   }
-  double* a1 = cov_x.GetMatrixArray();
-  std::vector<double> covariance(a1, &a1[16]);
+  for ( int i = 0; i < 2; ++i ) {
+    for ( int j = 0; j < 2; ++j ) {
+      covariance.push_back(cov_y[i][j]);
+    }
+  }
 
   // Check track passes chisq test, then create SciFiStraightPRTrack
   if (_hxchisq && _debug) _hxchisq->Fill(( line_x.get_chisq() / ( n_points - 2 )));
@@ -740,7 +743,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   for (auto sp : spnts) {
     double sig = sigma_on_s(c_trial, cov_circle, sp);
     sigma_s.push_back(sig);
-    std::cerr << "Adding sigma_s: " << sig;
+    // std::cerr << "Adding sigma_s: " << sig;
   }
 
   // Perform the s - z fit
@@ -754,11 +757,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     return NULL;
   }
 
-  std::cerr << "Final covariance matrices of candidate track in tracker " << spnts[0]->get_tracker() << ":\n";
-  cov_circle.Print();
-  cov_sz.Print();
-
-  std::cerr << "chisqs: " << c_trial.get_chisq() << " " << line_sz.get_chisq() << std::endl;
+  // std::cerr << "chisqs: " << c_trial.get_chisq() << " " << line_sz.get_chisq() << std::endl;
 
   // Squash the covariances of each fit into one vector
   std::vector<double> covariance;
@@ -1242,7 +1241,7 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
   //           << y << " " << sigma_x << " " << sigma_y << std::endl;
 
   // Set up the full covariance matrix for circle fit, including station resolutions
-  TMatrixD covariance(5,5);
+  TMatrixD covariance(5, 5);
 
   // Initially all entries are 0.0, set automatically when matrix was intialised
   // Top right 2*2 entries are the covariance matrix of the station resolutions (diagonal)
@@ -1275,7 +1274,7 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
   // std::cerr << "Delta differentials: " << dsx << " " << dsy << " " << dsr << " " << dsxc << " "
   //           << dsyc << std::endl;
 
-  TMatrixD delta(5,1);
+  TMatrixD delta(5, 1);
   delta[0] = dsx;
   delta[1] = dsy;
   delta[2] = dsr;
@@ -1286,7 +1285,7 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
   //  delta.Print();
 
   // Next the transpose
-  TMatrixD deltaT(1,5);
+  TMatrixD deltaT(1, 5);
   deltaT.Transpose(delta);
 
   // std::cerr << "Delta matrix: " << std::endl;
