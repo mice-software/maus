@@ -419,6 +419,8 @@ class PatternRecognition {
     double _circle_chisq_cut;   /** Cut on the chi^2 of the circle least sqs fit in mm */
     double _n_turns_cut;        /** Cut to decide if a given n turns value is good */
     double _sz_chisq_cut;       /** Cut on the sz chi^2 from least sqs fit in mm */
+    double _circle_error_w;     /** Weight to artificially scale the error going to xy fit */
+    double _sz_error_w;         /** Weight to artificially scale the error going to sz fit */
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
