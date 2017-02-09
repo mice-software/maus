@@ -25,7 +25,7 @@ SciFiSeed::SciFiSeed()
     _state_vector(),
     _covariance(),
     _algorithm(-1),
-    _pr_track(new TRef()){
+    _pr_track(new TRef()) {
 }
 
 // Copy contructor
@@ -68,7 +68,7 @@ void SciFiSeed::setStateVector(TMatrixD vector) {
 TMatrixD SciFiSeed::getStateVector() const {
   TMatrixD newVec(_state_vector.size(), 1);
   for (int i = 0; i < _state_vector.size(); ++i) {
-    newVec(i,0) = _state_vector[i];
+    newVec(i, 0) = _state_vector[i];
   }
   return newVec;
 }
@@ -89,7 +89,7 @@ TMatrixD SciFiSeed::getCovariance() const {
 
   for (int i = 0; i < length; ++i) {
     for (int j = 0; j < length; ++j) {
-      newCov(i,j) = _covariance[i*length + j];
+      newCov(i, j) = _covariance[i*length + j];
     }
   }
   return newCov;

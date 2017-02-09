@@ -81,7 +81,7 @@ class SciFiSeed : public TObject {
 
   void setPRTrackTobject(TObject* const pr_track) { *_pr_track = pr_track; }
 
-  TObject* getPRTrackTobject() const 
+  TObject* getPRTrackTobject() const
                                  { return static_cast<SciFiBasePRTrack*>(_pr_track->GetObject()); }
 
 

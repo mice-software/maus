@@ -327,9 +327,6 @@ namespace MAUS {
 //          delta_energy = e_loss_sign*SP;
 
 //          if (delta_energy != delta_energy) {
-//            std::cerr << "E-Loss = " << delta_energy << ", E = " << energy << ", path_length = " << path_length << ", SP = " << SP << ", old P = " << old_momentum << std::endl;
-//            std::cerr << "Px = " << old_px << ", Py = " << old_py << ", Pz = " << old_pz << std::endl;
-//
 //            std::ostringstream converter("");
 //            converter << start.GetPosition() << ", " << start.GetId() << '\n';
 //

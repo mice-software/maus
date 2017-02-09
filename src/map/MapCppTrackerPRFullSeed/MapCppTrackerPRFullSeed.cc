@@ -70,15 +70,15 @@ void MapCppTrackerPRFullSeed::_process(Data* data) const {
 
       const SciFiHelicalPRTrackPArray& helical = event->helicalprtracks();
       const SciFiStraightPRTrackPArray& straight = event->straightprtracks();
-  
+
       SciFiSeedPArray seeds;
 
-      for (SciFiHelicalPRTrackPArray::const_iterator it = helical.begin(); 
+      for (SciFiHelicalPRTrackPArray::const_iterator it = helical.begin();
           it != helical.end(); ++it) {
         seeds.push_back(_make_helical_seed(*it));
       }
 
-      for (SciFiStraightPRTrackPArray::const_iterator it = straight.begin(); 
+      for (SciFiStraightPRTrackPArray::const_iterator it = straight.begin();
           it != straight.end(); ++it) {
         seeds.push_back(_make_straight_seed(*it));
       }
@@ -106,14 +106,14 @@ SciFiSeed* MapCppTrackerPRFullSeed::_make_helical_seed(SciFiHelicalPRTrack* heli
   vector(3, 0) = momentum.y();
   vector(4, 0) = helical->get_charge() / momentum.z();
 
-  //Format: x_0x_0, x_0y_0, x_0r, y_0x_0, y_0y_0, y_0r, rx_0, ry_0, rr, z_0z_0, z_0m, mz_0, mm
-  for (int i = 0; i < 3; ++i ) {
+  // Format: x_0x_0, x_0y_0, x_0r, y_0x_0, y_0y_0, y_0r, rx_0, ry_0, rr, z_0z_0, z_0m, mz_0, mm
+  for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       PR_cov(i, j) = PR_cov_vector[i*3 + j];
     }
   }
   for (int i = 0; i < 2; ++i) {
-    for (int j = 0; j < 2; ++j) { 
+    for (int j = 0; j < 2; ++j) {
       PR_cov(i+3, j+3) = PR_cov_vector[9 + i*2 + j];
     }
   }

@@ -69,15 +69,15 @@ void MapCppTrackerPRSeed::_process(Data* data) const {
 
       const SciFiHelicalPRTrackPArray& helical = event->helicalprtracks();
       const SciFiStraightPRTrackPArray& straight = event->straightprtracks();
-  
+
       SciFiSeedPArray seeds;
 
-      for (SciFiHelicalPRTrackPArray::const_iterator it = helical.begin(); 
+      for (SciFiHelicalPRTrackPArray::const_iterator it = helical.begin();
           it != helical.end(); ++it) {
         seeds.push_back(_make_helical_seed(*it));
       }
 
-      for (SciFiStraightPRTrackPArray::const_iterator it = straight.begin(); 
+      for (SciFiStraightPRTrackPArray::const_iterator it = straight.begin();
           it != straight.end(); ++it) {
         seeds.push_back(_make_straight_seed(*it));
       }

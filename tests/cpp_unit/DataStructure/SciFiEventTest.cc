@@ -108,7 +108,7 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   EXPECT_EQ(evt2.helicalprtracks()[0]->get_tracker(), -1);
 
   ASSERT_EQ(evt2.scifiseeds().size(), 1u);
-  EXPECT_EQ(evt2.scifiseeds()[0]->getTracker(), 0); 
+  EXPECT_EQ(evt2.scifiseeds()[0]->getTracker(), 0);
 }
 
 TEST_F(SciFiEventTestDS, test_assignment_operator) {

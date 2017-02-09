@@ -15,6 +15,8 @@
  *
  */
 
+#include <vector>
+
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Config/MiceModule.hh"
 

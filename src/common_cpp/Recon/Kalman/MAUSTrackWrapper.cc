@@ -66,7 +66,7 @@ namespace MAUS {
 
 
 //  Kalman::State ComputeSeed(SciFiHelicalPRTrack* h_track, const SciFiGeometryHelper* geom,
-//                                                       bool correct_energy_loss, double seed_cov) {
+//                                                     bool correct_energy_loss, double seed_cov) {
 //    TMatrixD vector(5, 1);
 //    TMatrixD covariance(5, 5);
 //
@@ -96,11 +96,11 @@ namespace MAUS {
 //    if (correct_energy_loss) {
 //      double P = patrec_momentum.mag();
 //      double patrec_bias; // Account for two(ish) planes of energy loss
-////      if (tracker == 0) {
-////        patrec_bias = (P + 1.3) / P;
-////      } else {
-////        patrec_bias = (P - 1.3) / P;
-////      }
+// //      if (tracker == 0) {
+// //        patrec_bias = (P + 1.3) / P;
+// //      } else {
+// //        patrec_bias = (P - 1.3) / P;
+// //      }
 //      patrec_bias = ((P + PR_correction) + PR_bias) / P;
 //      patrec_momentum = patrec_bias * patrec_momentum;
 //    }
@@ -117,18 +117,18 @@ namespace MAUS {
 //    vector(3, 0) = py;
 //    vector(4, 0) = kappa;
 //
-////
-//// METHOD = ED SANTOS
-////
+// //
+// // METHOD = ED SANTOS
+// //
 //    if (seed_cov > 0.0) {
 //      covariance.Zero();
 //      for (int i = 0; i < 5; ++i) {
 //        covariance(i, i) = seed_cov;
 //      }
 //    } else {
-////
-//// METHOD = CHRISTOPHER HUNT
-////
+// //
+// // METHOD = CHRISTOPHER HUNT
+// //
 //      std::vector<double> cov = h_track->get_covariance();
 //      TMatrixD patrec_covariance(5, 5);
 //      if (cov.size() != 25) {
@@ -178,7 +178,7 @@ namespace MAUS {
 
 
 //  Kalman::State ComputeSeed(SciFiStraightPRTrack* s_track, const SciFiGeometryHelper* geom,
-//                                                                                 double seed_cov) {
+//                                                                               double seed_cov) {
 //    TMatrixD vector(4, 1);
 //    TMatrixD covariance(4, 4);
 //
@@ -200,9 +200,9 @@ namespace MAUS {
 //    vector(2, 0) = y;
 //    vector(3, 0) = my;
 //
-////
-//// METHOD = ED SANTOS
-////
+// //
+// // METHOD = ED SANTOS
+// //
 //    if (seed_cov > 0.0) {
 //      covariance.Zero();
 //      covariance(0, 0) = seed_cov;
@@ -210,9 +210,9 @@ namespace MAUS {
 //      covariance(2, 2) = seed_cov;
 //      covariance(3, 3) = seed_cov/(200.0*200.0);
 //    } else {
-////
-//// METHOD = CHRISTOPHER HUNT
-////
+// //
+// // METHOD = CHRISTOPHER HUNT
+// //
 //      std::vector<double> cov = s_track->get_covariance();
 //      TMatrixD patrec_covariance(4, 4);
 //
