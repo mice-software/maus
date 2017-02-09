@@ -28,6 +28,7 @@
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
+#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 namespace MAUS {
 PyMODINIT_FUNC init_MapCppTrackerPRFullSeed(void) {
@@ -93,8 +94,10 @@ void MapCppTrackerPRFullSeed::_process(Data* data) const {
 SciFiSeed* MapCppTrackerPRFullSeed::_make_helical_seed(SciFiHelicalPRTrack* helical) const {
   ThreeVector position = helical->get_seed_position();
   ThreeVector momentum = helical->get_seed_momentum();
-  std::vector<double> PR_cov = helical->get_covariance();
+  std::vector<double> PR_cov_vector = helical->get_covariance();
   TMatrixD vector(5, 1);
+  TMatrixD jacobian(5, 5);
+  TMatrixD PR_cov(5, 5);
   TMatrixD covariance(5, 5);
 
   vector(0, 0) = position.x();
@@ -103,11 +106,68 @@ SciFiSeed* MapCppTrackerPRFullSeed::_make_helical_seed(SciFiHelicalPRTrack* heli
   vector(3, 0) = momentum.y();
   vector(4, 0) = helical->get_charge() / momentum.z();
 
-  for (int i = 0; i < 5; ++i) {
-    for (int j = 0; j < 5; ++j) {
-      covariance(i, j) = PR_cov[i*5 + j];
+  //Format: x_0x_0, x_0y_0, x_0r, y_0x_0, y_0y_0, y_0r, rx_0, ry_0, rr, z_0z_0, z_0m, mz_0, mm
+  for (int i = 0; i < 3; ++i ) {
+    for (int j = 0; j < 3; ++j) {
+      PR_cov(i, j) = PR_cov_vector[i*3 + j];
     }
   }
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 2; ++j) { 
+      PR_cov(i+3, j+3) = PR_cov_vector[9 + i*2 + j];
+    }
+  }
+
+
+  int tracker = helical->get_tracker();
+  double length = Globals::GetSciFiGeometryHelper()->GetSeedDistance(tracker);
+
+  double r  = helical->get_R();
+  double Bz = Globals::GetSciFiGeometryHelper()->GetFieldValue(tracker);
+  double pt = - helical->get_charge()*CLHEP::c_light*Bz*r;
+  double m = - helical->get_dsdz();
+  double x0 = helical->get_circle_x0();
+  double y0 = helical->get_circle_y0();
+  double s = (helical->get_line_sz_c() - length*m);
+  double phi = s / r;
+
+  double C = cos(phi);
+  double S = sin(phi);
+
+  double dphi_dr = -s/(r*r);
+  double dphi_dz = 1.0/r;
+  double dphi_dm = length/r;
+  double dpt_dr = helical->get_charge()*CLHEP::c_light*Bz;
+
+  jacobian(0, 0) = 1.0;
+  jacobian(0, 1) = 0.0;
+  jacobian(0, 2) = C - r*S*dphi_dr;
+  jacobian(0, 3) = -r*S*dphi_dz;
+  jacobian(0, 4) = -r*S*dphi_dm;
+  jacobian(1, 0) = 0.0;
+  jacobian(1, 1) = 0.0;
+  jacobian(1, 2) = -S*dpt_dr - pt*C*dphi_dr;
+  jacobian(1, 3) = -pt*C*dphi_dz;
+  jacobian(1, 4) = -pt*C*dphi_dm;
+  jacobian(2, 0) = 0.0;
+  jacobian(2, 1) = 1.0;
+  jacobian(2, 2) = S + r*C*dphi_dr;
+  jacobian(2, 3) = r*C*dphi_dz;
+  jacobian(2, 4) = r*C*dphi_dm;
+  jacobian(3, 0) = 0.0;
+  jacobian(3, 1) = 0.0;
+  jacobian(3, 2) = C*dpt_dr - pt*S*dphi_dr;
+  jacobian(3, 3) = -pt*S*dphi_dz;
+  jacobian(3, 4) = -pt*S*dphi_dm;
+  jacobian(4, 0) = 0.0;
+  jacobian(4, 1) = 0.0;
+  jacobian(4, 2) = -(m/(pt*pt))*dpt_dr;
+  jacobian(4, 3) = 0.0;
+  jacobian(4, 4) = 1.0/pt;
+
+  TMatrixD jacobianT(TMatrixD::kTransposed, jacobian);
+
+  covariance = jacobian*PR_cov*jacobianT;
 
   SciFiSeed* seed = new SciFiSeed();
 
@@ -132,9 +192,15 @@ SciFiSeed* MapCppTrackerPRFullSeed::_make_straight_seed(SciFiStraightPRTrack* st
   vector(2, 0) = position.y();
   vector(3, 0) = momentum.y()/momentum.z();
 
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      covariance(i, j) = PR_cov[i*4 + j];
+  // Format: xx, xm_x, m_xx, m_xm_x, yy, ym_y, m_yy, m_ym_y
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 2; ++j) {
+      covariance(i, j) = PR_cov[i*2 + j];
+    }
+  }
+  for (int i = 2; i < 4; ++i) {
+    for (int j = 0; j < 2; ++j) {
+      covariance(i, j+2) = PR_cov[i*2 + j];
     }
   }
 
