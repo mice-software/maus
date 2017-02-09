@@ -46,6 +46,7 @@ def run():
     my_map.append(MAUS.MapCppTrackerSpacePointRecon()) # SciFi spacepoint recon
     my_map.append(MAUS.MapCppTrackerPatternRecognition()) # SciFi track finding
     my_map.append(MAUS.MapCppTrackerPRSeed()) # Set the Seed from PR
+#    my_map.append(MAUS.MapCppTrackerPRFullSeed()) # Set the Seed from PR
     my_map.append(MAUS.MapCppTrackerTrackFit()) # SciFi track fit
 
     # EMR
