@@ -181,7 +181,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
                                                       (centroid, ellipse, z_max)
             self._print_output(centroid_out, ellipse_out)
 
-    def _test_get_set_deviations(self):
+    def test_get_set_deviations(self):
         """Check get/set deviations"""
         tracking = err_prop.GlobalErrorTracking()
         ref_deviations = (0.1, 0.2, 0.3, 0.4)
@@ -190,7 +190,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
         for i in range(4):
             self.assertAlmostEqual(test_deviations[i], ref_deviations[i])
 
-    def _test_get_set_step_size(self):
+    def test_get_set_step_size(self):
         """Check get/set step size"""
         tracking = err_prop.GlobalErrorTracking()
         step_size_list = (1.928, -3, 8)
@@ -213,7 +213,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
         except RuntimeError:
             pass
 
-    def _test_get_set_tracking_model(self):
+    def test_get_set_tracking_model(self):
         """Check get/set tracking model"""
         tracking = err_prop.GlobalErrorTracking()
         for model in ["em_rk4_forwards_static", "em_rk4_backwards_static",
@@ -226,7 +226,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
         except RuntimeError:
             pass
 
-    def _test_get_set_geometry_model(self):
+    def test_get_set_geometry_model(self):
         """Check get/set geometry model"""
         tracking = err_prop.GlobalErrorTracking()
         for model in ["geant4", "axial_lookup", "geant4"]:
@@ -239,7 +239,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
             pass
 
 
-    def _test_get_set_mcs_model(self):
+    def test_get_set_mcs_model(self):
         """Check get/set mcs model"""
         tracking = err_prop.GlobalErrorTracking()
         for mcs_model in "no_mcs", "moliere_forwards", "moliere_backwards":
@@ -251,7 +251,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
         except RuntimeError:
             pass
 
-    def _test_get_set_eloss_model(self):
+    def test_get_set_eloss_model(self):
         """Check get/set eloss model"""
         tracking = err_prop.GlobalErrorTracking()
         for eloss_model in ("no_eloss",
@@ -299,7 +299,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
                                                           (centroid, ellipse, z_max)
                 self._print_output(centroid_out, ellipse_out)
 
-    def _test_tm(self):
+    def test_tm(self):
         """Test transfer matrix calculation"""
         self._new_geometry(os.path.expandvars(
             "${MAUS_ROOT_DIR}/tests/py_unit/test_maus_cpp/fs2a_derivatives.dat"
