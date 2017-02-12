@@ -794,11 +794,16 @@ static PyObject* propagate_errors
         PyErr_SetString(PyExc_RuntimeError, (&exc)->what());
         return NULL;
     }
-    // who owns memory?
+    // py_centroid/py_ellipse own all of their memory
     py_centroid = set_centroid(x_in);
     py_ellipse = set_variance(x_in);
+    // initialises with a refcnt 1
     PyObject* ret_tuple = Py_BuildValue("OO", py_centroid, py_ellipse);
-    return ret_tuple;
+    // py_centroid and py_ellipse are initialised with a ref count = 1;
+    // BuildValue then adds a ref count; but only ret_tuple holds a reference
+    Py_DECREF(py_centroid);
+    Py_DECREF(py_ellipse);
+    return ret_tuple; //ret_tuple;
 }
 
 std::string get_transfer_matrix_docstring =
