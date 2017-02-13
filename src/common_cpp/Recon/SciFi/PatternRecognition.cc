@@ -235,7 +235,6 @@ void PatternRecognition::process(SciFiEvent &evt) const {
   } else {
     if (_verb > 0) std::cerr << "No spacepoints in event" << std::endl;
   }
-  // std::cerr << "Event finished" << std::endl;
 };
 
 void PatternRecognition::make_all_tracks(const bool track_type, const int trker_no,
@@ -775,8 +774,6 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     return NULL;
   }
 
-  // std::cerr << "chisqs: " << c_trial.get_chisq() << " " << line_sz.get_chisq() << std::endl;
-
   // Squash the covariances of each fit into one vector
   std::vector<double> covariance;
   for ( int i = 0; i < 3; ++i ) {
@@ -891,7 +888,6 @@ bool PatternRecognition::find_n_turns(const std::vector<double> &z, const std::v
                                       std::vector<double> &true_phi, int &handedness) const {
   // Sanity checks
   if ( (z.size() != phi.size()) || (z.size() < 3) || (z.size() > 5) ) {
-    std::cerr << "WARNING: Pattern Recognition:find_n_turns: bad arguments supplied, aborting\n";
     return false;
   }
 
@@ -1236,7 +1232,6 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
                                       const SciFiSpacePoint* const spnt) const {
   // Check the spnt pointer
   if (!spnt) {
-    std::cerr << "WARNING:PatternRecognition:sigma_on_s: Bad spacepoint pointer" << std::endl;
     return 0.0;
   }
   // Set up the variables needed

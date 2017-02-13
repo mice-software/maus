@@ -136,7 +136,19 @@ void MapCppTrackerTrackFit::_process(Data* data) const {
       // Kalman Track Fit.
       if (_kalman_on) {
         event->clear_scifitracks();
-        track_fit(*event);
+        SciFiSeedPArray seeds = event->scifiseeds();
+        for (SciFiSeedPArray::iterator it = seeds.begin(); it != seeds.end(); ++it) {
+          switch ((*it)->getAlgorithm()) {
+            case 0 :
+              event->add_scifitrack(track_fit_straight((*it)));
+              break;
+            case 1 :
+              event->add_scifitrack(track_fit_helix((*it)));
+              break;
+            default:
+              break;
+          }
+        }
       }
     }
   } else {
@@ -156,44 +168,92 @@ void MapCppTrackerTrackFit::_set_field_values(SciFiEvent* event) const {
 }
 
 
-void MapCppTrackerTrackFit::track_fit(SciFiEvent &evt) const {
-  size_t number_helical_tracks = evt.helicalprtracks().size();
-  size_t number_straight_tracks = evt.straightprtracks().size();
-  for (size_t track_i = 0; track_i < number_helical_tracks; track_i++) {
-    SciFiHelicalPRTrack* helical = evt.helicalprtracks().at(track_i);
+SciFiTrack* MapCppTrackerTrackFit::track_fit_helix(SciFiSeed* seed) const {
 
-    Kalman::Track data_track = BuildTrack(helical, &_geometry_helper, 5);
-    Kalman::State seed = ComputeSeed(helical, &_geometry_helper, _use_eloss, _seed_value);
+  SciFiHelicalPRTrack* helical = static_cast<SciFiHelicalPRTrack*>(seed->getPRTrackTobject());
 
-    _helical_track_fitter->SetTrack(data_track);
-    _helical_track_fitter->SetSeed(seed);
+  Kalman::Track data_track = BuildTrack(helical, &_geometry_helper, 5);
+  Kalman::State kalman_seed(seed->getStateVector(), seed->getCovariance());
 
-    _helical_track_fitter->Filter(false);
-    _helical_track_fitter->Smooth(false);
+  _helical_track_fitter->SetTrack(data_track);
+  _helical_track_fitter->SetSeed(kalman_seed);
 
-    SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
-    calculate_track_rating(track);
+  _helical_track_fitter->Filter(false);
+  _helical_track_fitter->Smooth(false);
 
-    evt.add_scifitrack(track);
-  }
-  for (size_t track_i = 0; track_i < number_straight_tracks; track_i++) {
-    SciFiStraightPRTrack* straight = evt.straightprtracks().at(track_i);
-    Kalman::Track data_track = BuildTrack(straight, &_geometry_helper, 4);
+  SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
+  calculate_track_rating(track);
+  track->set_scifi_seed_tobject(seed);
 
-    Kalman::State seed = ComputeSeed(straight, &_geometry_helper, _seed_value);
+  ThreeVector seed_pos = track->GetSeedPosition();
+  ThreeVector seed_mom = track->GetSeedMomentum();
 
-    _straight_track_fitter->SetTrack(data_track);
-    _straight_track_fitter->SetSeed(seed);
-
-    _straight_track_fitter->Filter(false);
-    _straight_track_fitter->Smooth(false);
-
-    SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
-    calculate_track_rating(track);
-
-    evt.add_scifitrack(track);
-  }
+  return track;
 }
+
+
+SciFiTrack* MapCppTrackerTrackFit::track_fit_straight(SciFiSeed* seed) const {
+
+  SciFiStraightPRTrack* straight = static_cast<SciFiStraightPRTrack*>(seed->getPRTrackTobject());
+
+  Kalman::Track data_track = BuildTrack(straight, &_geometry_helper, 4);
+  Kalman::State kalman_seed(seed->getStateVector(), seed->getCovariance());
+
+  _straight_track_fitter->SetTrack(data_track);
+  _straight_track_fitter->SetSeed(kalman_seed);
+
+  _straight_track_fitter->Filter(false);
+  _straight_track_fitter->Smooth(false);
+
+  SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
+  calculate_track_rating(track);
+  track->set_scifi_seed_tobject(seed);
+
+  return track;
+}
+
+
+
+//
+//  size_t number_helical_tracks = evt.helicalprtracks().size();
+//  size_t number_straight_tracks = evt.straightprtracks().size();
+//  for (size_t track_i = 0; track_i < number_helical_tracks; track_i++) {
+//    SciFiHelicalPRTrack* helical = evt.helicalprtracks().at(track_i);
+//
+//    Kalman::Track data_track = BuildTrack(helical, &_geometry_helper, 5);
+//    Kalman::State seed = ComputeSeed(helical, &_geometry_helper, _use_eloss, _seed_value);
+//
+//    _helical_track_fitter->SetTrack(data_track);
+//    _helical_track_fitter->SetSeed(seed);
+//
+//    _helical_track_fitter->Filter(false);
+//    _helical_track_fitter->Smooth(false);
+//
+//    SciFiTrack* track = ConvertToSciFiTrack(_helical_track_fitter, &_geometry_helper, helical);
+//    calculate_track_rating(track);
+//
+//    evt.add_scifitrack(track);
+//  }
+//  for (size_t track_i = 0; track_i < number_straight_tracks; track_i++) {
+//    SciFiStraightPRTrack* straight = evt.straightprtracks().at(track_i);
+//    Kalman::Track data_track = BuildTrack(straight, &_geometry_helper, 4);
+//
+//    Kalman::State seed = ComputeSeed(straight, &_geometry_helper, _seed_value);
+//
+//    _straight_track_fitter->SetTrack(data_track);
+//    _straight_track_fitter->SetSeed(seed);
+//
+//    _straight_track_fitter->Filter(false);
+//    _straight_track_fitter->Smooth(false);
+//
+//    SciFiTrack* track = ConvertToSciFiTrack(_straight_track_fitter, &_geometry_helper, straight);
+//    calculate_track_rating(track);
+//
+//    evt.add_scifitrack(track);
+//  }
+//
+
+
 
 void MapCppTrackerTrackFit::calculate_track_rating(SciFiTrack* track) const {
   SciFiBasePRTrack* pr_track = track->pr_track_pointer();

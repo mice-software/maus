@@ -161,6 +161,11 @@ def init_plots_data() :
 
     tracker_dict['pz'] = ROOT.TH1F( tracker+'_pz', \
                           'Longitudinal Momentum', 500, 100.0, 300.0 )
+    tracker_dict['L'] = ROOT.TH1F( tracker+'_L', \
+                       'Angular Momentum', 1000, -25000.0, 25000.0 )
+
+    tracker_dict['L_r'] = ROOT.TH2F( tracker+'_L_r', "L in r", \
+                                     6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
 
 
 
@@ -175,6 +180,8 @@ def init_plots_data() :
 
     tracker_dict['mc_pz'] = ROOT.TH1F( tracker+'_mc_pz', \
                        'MC Longitudinal Momentum', 500, 100.0, 300.0 )
+    tracker_dict['mc_L'] = ROOT.TH1F( tracker+'_mc_L', \
+                       'MC Angular Momentum', 1000, -25000.0, 25000.0 )
 
 
 
@@ -191,6 +198,8 @@ def init_plots_data() :
                                  "p_{t} Residuals", 500, -50.0, 50.0 )
     tracker_dict['residual_pz'] = ROOT.TH1F( tracker+'_residual_pz', \
                                  "p_{z} Residuals", 500, -50.0, 50.0 )
+    tracker_dict['residual_L'] = ROOT.TH1F( tracker+'_residual_L', \
+                                 "L Residuals", 1000, -1000.0, 1000.0 )
 
 
 
@@ -249,6 +258,9 @@ def init_plots_data() :
 
 
 
+    tracker_dict['L_residual_r'] = ROOT.TH2F( \
+               tracker+'_L_residual_r', "L Residuals in r", \
+                                     1000, -250.0, 250.0, 300, 0.0, 150.0 )
 
     tracker_dict['x_residual_p'] = ROOT.TH2F( \
                tracker+'_x_residual_p', "X Residuals in p", \
@@ -849,9 +861,11 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     Pt_mc = math.sqrt( virt_mom[0] ** 2 + virt_mom[1] ** 2 )
     Pz_mc = virt_mom[2]
     P_mc = math.sqrt(Pz_mc**2 +Pt_mc**2)
+    L_mc = virt_pos[0]*virt_mom[1] - virt_pos[1]*virt_mom[0]
 
     Pt_recon = math.sqrt( scifi_mom[0] ** 2 + scifi_mom[1] ** 2 )
     P_recon = math.sqrt(Pt_recon**2 + scifi_mom[2]**2)
+    L_recon = scifi_pos[0]*scifi_mom[1] - scifi_pos[1]*scifi_mom[0]
 
     Pt_res = Pt_recon - Pt_mc
     P_res = P_recon - P_mc
@@ -860,23 +874,29 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['pxpy'].Fill(scifi_mom[0], scifi_mom[1])
     tracker_plots['pt'].Fill(Pt_recon)
     tracker_plots['pz'].Fill(scifi_mom[2])
+    tracker_plots['L'].Fill(L_recon)
 
     tracker_plots['mc_xy'].Fill(virt_pos[0], virt_pos[1])
     tracker_plots['mc_pxpy'].Fill(virt_mom[0], virt_mom[1])
     tracker_plots['mc_pt'].Fill(Pt_mc)
     tracker_plots['mc_pz'].Fill(Pz_mc)
+    tracker_plots['mc_L'].Fill(L_mc)
+
+    tracker_plots['L_r'].Fill( L_recon,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
 
     tracker_plots['residual_xy'].Fill(res_pos[0], res_pos[1])
     tracker_plots['residual_pxpy'].Fill(res_mom[0], res_mom[1])
     tracker_plots['residual_mxmy'].Fill(res_gra[0], res_gra[1])
     tracker_plots['residual_pt'].Fill(Pt_res)
     tracker_plots['residual_pz'].Fill(res_mom[2])
+    tracker_plots['residual_L'].Fill(L_recon-L_mc)
 
+    tracker_plots['L_residual_r'].Fill( L_recon-L_mc,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
 
     tracker_plots['x_residual_pt'].Fill( Pt_mc, res_pos[0] )
     tracker_plots['y_residual_pt'].Fill( Pt_mc, res_pos[1] )
     tracker_plots['r_residual_pt'].Fill( Pt_mc, \
-                                          sqrt(res_pos[1]**2 + res_pos[2]**2) )
+                                          sqrt(res_pos[0]**2 + res_pos[1]**2) )
     tracker_plots['px_residual_pt'].Fill( Pt_mc, res_mom[0] )
     tracker_plots['py_residual_pt'].Fill( Pt_mc, res_mom[1] )
     tracker_plots['pt_residual_pt'].Fill( Pt_mc, Pt_res )
@@ -886,7 +906,7 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['x_residual_p'].Fill( P_mc, res_pos[0] )
     tracker_plots['y_residual_p'].Fill( P_mc, res_pos[1] )
     tracker_plots['r_residual_p'].Fill( P_mc, \
-                                          sqrt(res_pos[1]**2 + res_pos[2]**2) )
+                                          sqrt(res_pos[0]**2 + res_pos[1]**2) )
     tracker_plots['px_residual_p'].Fill( P_mc, res_mom[0] )
     tracker_plots['py_residual_p'].Fill( P_mc, res_mom[1] )
     tracker_plots['pt_residual_p'].Fill( P_mc, Pt_res )
@@ -897,7 +917,7 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['x_residual_pz'].Fill( Pz_mc, res_pos[0] )
     tracker_plots['y_residual_pz'].Fill( Pz_mc, res_pos[1] )
     tracker_plots['r_residual_pz'].Fill( Pz_mc, \
-                                          sqrt(res_pos[1]**2 + res_pos[2]**2) )
+                                          sqrt(res_pos[0]**2 + res_pos[1]**2) )
     tracker_plots['mx_residual_pz'].Fill( Pz_mc, res_gra[0] )
     tracker_plots['my_residual_pz'].Fill( Pz_mc, res_gra[1] )
     tracker_plots['px_residual_pz'].Fill( Pz_mc, res_mom[0] )

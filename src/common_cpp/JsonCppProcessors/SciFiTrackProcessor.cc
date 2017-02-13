@@ -57,5 +57,7 @@ SciFiTrackProcessor::SciFiTrackProcessor()
                         &SciFiTrack::SetSeedCovariance, false);
     ObjectProcessor<SciFiTrack>::RegisterTRef("pr_track",
         &SciFiTrack::pr_track_tobject, &SciFiTrack::set_pr_track_tobject, false);
+    ObjectProcessor<SciFiTrack>::RegisterTRef("scifi_seed",
+        &SciFiTrack::scifi_seed_tobject, &SciFiTrack::set_scifi_seed_tobject, false);
 }
 } // ~namespace MAUS

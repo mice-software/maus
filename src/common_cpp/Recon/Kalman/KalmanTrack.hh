@@ -266,6 +266,22 @@ namespace Kalman {
        */
       const TrackPoint& operator[] (unsigned int index) const { return _track_vector[index]; }
 
+      /** @brief Get a const reference to the first track point
+       */
+      TrackPoint& GetFirstTrackPoint() { return _track_vector[0]; }
+
+      /** @brief Get a const reference to the first track point
+       */
+      const TrackPoint& GetFirstTrackPoint() const { return _track_vector[0]; }
+
+      /** @brief Get a reference to the last track point
+       */
+      TrackPoint& GetLastTrackPoint() { return _track_vector[_track_vector.size()-1]; }
+
+      /** @brief Get a reference to the last track point
+       */
+      const TrackPoint& GetLastTrackPoint() const { return _track_vector[_track_vector.size()-1]; }
+
       /** @brief Return the number of states in the state array
        */
       unsigned int GetLength() const { return _track_vector.size(); }

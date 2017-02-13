@@ -15,6 +15,8 @@
  *
  */
 
+#include <vector>
+
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Config/MiceModule.hh"
 
@@ -26,6 +28,8 @@
 #include "src/common_cpp/Simulation/DetectorConstruction.hh"
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+
+#include "src/common_cpp/Recon/SciFi/SciFiGeometryHelper.hh"
 
 #include "src/common_cpp/Recon/Global/MaterialModelAxialLookup.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -112,6 +116,12 @@ void GlobalsManager::InitialiseGlobals(std::string json_datacards) {
         process->_mc_geometry_navigator->Initialise(world);
         double z_world = process->_recon_mods->propertyHep3Vector("Dimensions").z();
         MaterialModelAxialLookup::BuildLookupTable(-z_world, z_world);
+
+        // Build the geometery helper instance
+        std::vector<const MiceModule*> modules =
+          process->_recon_mods->findModulesByPropertyString("SensitiveDetector", "SciFi");
+        process->_scifi_geometry_helper = new SciFiGeometryHelper(modules);
+        process->_scifi_geometry_helper->Build();
     } catch (Exceptions::Exception squee) {
         Globals::_process = NULL;
         delete process;
@@ -149,6 +159,9 @@ void GlobalsManager::DeleteGlobals() {
     }
     if (Globals::_process->_legacy_cards != NULL) {
         delete Globals::_process->_legacy_cards;
+    }
+    if (Globals::_process->_scifi_geometry_helper != NULL) {
+        delete Globals::_process->_scifi_geometry_helper;
     }
     if (Globals::_process->_error_handler != NULL) {
         // won't delete

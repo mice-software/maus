@@ -96,16 +96,9 @@ void SciFiGeometryHelper::Build() {
       const MiceModule* referencePlane = FindPlane(tracker_n, 1, 0);
 
       ThreeVector referencePos = clhep_to_root(referencePlane->globalPosition());
-//      HepRotation referenceRot;
-//      if (UseActiveRotations == true) {
-//        referenceRot = referencePlane->globalRotation();
-//      } else {
-//        referenceRot = referencePlane->globalRotation().inverse();
-//      }
 
       HepRotation internal_fibre_rotation(module->relativeRotation(module->mother() // station
                                                ->mother()));  // tracker
-//      HepRotation internal_fibre_rotation(module->relativeRotation(station));
 
       ThreeVector direction(0., 1., 0.);
       if (UseActiveRotations == true) {
@@ -114,8 +107,6 @@ void SciFiGeometryHelper::Build() {
         direction     *= internal_fibre_rotation.inverse();
       }
 
-//      HepRotation station_rotation(station->relativeRotation(station->mother()  // tracker
-//                                                              ->mother()));    // solenoid
       HepRotation station_rotation(trackerModule->globalRotation());
       ThreeVector plane_position = clhep_to_root(module->globalPosition());
 
@@ -256,6 +247,15 @@ ThreeVector SciFiGeometryHelper::FindReferenceFramePosition(int tracker) const {
   return reference_pos;
 }
 
+
+double SciFiGeometryHelper::GetSeedDistance(int tracker) const {
+  SciFiPlaneMap::const_reverse_iterator last_plane =
+                                               _geometry_map.find(tracker)->second.Planes.rbegin();
+
+  return last_plane->second.Position.z();
+}
+
+
 double SciFiGeometryHelper::HighlandFormula(double L, double beta, double p) {
   static double HighlandConstant = Recon::Constants::HighlandConstant;
   // Note that the z factor (charge of the incoming particle) is omitted.
@@ -265,6 +265,11 @@ double SciFiGeometryHelper::HighlandFormula(double L, double beta, double p) {
 }
 
 double SciFiGeometryHelper::BetheBlochStoppingPower(double p, const SciFiMaterialParams* material) {
+//  if ( p < 5.0 ) {
+//    throw Exceptions::Exception(Exceptions::recoverable,
+//        "Track Momentum Outside region modelled by Bethe-Bloch",
+//        "SciFiGeometryHelper::BetheBlochStoppingPower()");
+//  }
   double muon_mass      = Recon::Constants::MuonMass;
   double electron_mass  = Recon::Constants::ElectronMass;
   double muon_mass2     = muon_mass*muon_mass;

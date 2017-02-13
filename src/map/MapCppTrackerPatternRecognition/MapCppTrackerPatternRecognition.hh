@@ -41,6 +41,9 @@
 #include "Utils/Squeak.hh"
 #include "Config/MiceModule.hh"
 
+#include "TFile.h"
+#include "TVectorD.h"
+
 #include "src/common_cpp/API/MapBase.hh"
 #include "src/common_cpp/Utils/CppErrorHandler.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
@@ -100,6 +103,16 @@ class MapCppTrackerPatternRecognition : public MapBase<Data> {
     */
   void extrapolate_straight_reference(SciFiEvent& event) const;
 
+  /** Deduce and fill the seed plane position and momentum for
+   * helical tracks
+   */
+  void extrapolate_helical_seed(SciFiEvent& event) const;
+
+  /** Deduce and fill the seed plane position and momentum for
+    * straight tracks
+    */
+  void extrapolate_straight_seed(SciFiEvent& event) const;
+
   /**
    * @brief Populate global parameter output for the straight pat rec tracks
    */
@@ -108,9 +121,14 @@ class MapCppTrackerPatternRecognition : public MapBase<Data> {
 
  private:
   void _set_field_values(SciFiEvent* event) const;
+  void _load_momentum_corrections(std::string filename);
 
   /// This will contain the configuration
   Json::Value _configJSON;
+
+  bool _correct_seed_momentum;
+  TVectorD _upstream_correction;
+  TVectorD _downstream_correction;
 
   bool _up_straight_pr_on;
   bool _down_straight_pr_on;

@@ -352,6 +352,10 @@ SciFiTestVirtualSmear = 0.431425 # Simulate measurement error on alpha with Gaus
 SciFiPRCorrection = 1.1776
 SciFiPRBias = 0.2269
 
+SciFiPRCorrectionsOutputFile = "SciFiMomentumCorrections.root" #File to output momentum correction data to (produced by reducer)
+SciFiPRCorrectSeed = 0 # 0 : Don't correct PR seed, 1 : apply corretions from corrections file
+SciFiPRCorrectionsFile = "SciFiMomentumCorrections.root" # File to use to apply seed corrections (used in PR Mapper)
+
 SciFiSeedCovariance = 1000.0 # Error estimate for Seed values of the Kalman Fit
 SciFiSeedPatRec = True
 SciFiKalmanOn = True # Flag to turn on the tracker Kalman Fit
