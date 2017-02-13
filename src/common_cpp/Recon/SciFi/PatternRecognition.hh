@@ -246,13 +246,15 @@ class PatternRecognition {
      * @param[in] n_points Number of points in the current track (used for the chi_sq cut)
      * @param[in] spnts A vector of all the input spacepoints
      * @param[in] circle The circle fit of spacepoints from x-y projection
+     * @param[in] var_s The variance on each value of s
      * @param[out] phi_i Vector containing the output turning angles of the spacepoints
      * @param[out] line_sz The output fitted line in s-z projection
      * @param[out] cov_sz Output covariance matrix from the s-z fit
      * @return Boolean indicating success or failure or the algorithm
      */
     bool find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &spnts, const SimpleCircle &circle,
-          std::vector<double> &phi_i, SimpleLine &line_sz, TMatrixD& cov_sz, int &handedness) const;
+          const std::vector<double>& var_s, std::vector<double> &phi_i, SimpleLine &line_sz,
+          TMatrixD& cov_sz, int &handedness) const;
 
     /** @brief Find the number of 2pi rotations that occured between each station
      *
@@ -392,12 +394,17 @@ class PatternRecognition {
     /** @brief Activate debug mode (set up the output ROOT file, histos, etc) */
     void setup_debug();
 
+    /** @brief Calculate the the standard deviation on the s coordinate for a given spacepoint */
+    double sigma_on_s(const SimpleCircle& circ, const TMatrixD& cov_circ,
+                      const SciFiSpacePoint* const spnt) const;
+
   private:
     bool _debug;                /** Run in debug mode */
     bool _up_straight_pr_on;    /** Upstream straight pattern recogntion on or off */
     bool _down_straight_pr_on;  /** Downstream straight pattern recogntion on or off */
     bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
+    int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
     int _n_trackers;            /** Number of trackers */
     int _n_stations;            /** Number of stations per tracker */
@@ -413,6 +420,8 @@ class PatternRecognition {
     double _circle_chisq_cut;   /** Cut on the chi^2 of the circle least sqs fit in mm */
     double _n_turns_cut;        /** Cut to decide if a given n turns value is good */
     double _sz_chisq_cut;       /** Cut on the sz chi^2 from least sqs fit in mm */
+    double _circle_error_w;     /** Weight to artificially scale the error going to xy fit */
+    double _sz_error_w;         /** Weight to artificially scale the error going to sz fit */
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
