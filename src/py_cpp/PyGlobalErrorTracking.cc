@@ -795,6 +795,7 @@ static PyObject* propagate_errors
         return NULL;
     }
     // py_centroid/py_ellipse own all of their memory
+    // Memory - issue #1909
     py_centroid = set_centroid(x_in);
     py_ellipse = set_variance(x_in);
     // initialises with a refcnt 1
@@ -803,7 +804,7 @@ static PyObject* propagate_errors
     // BuildValue then adds a ref count; but only ret_tuple holds a reference
     Py_DECREF(py_centroid);
     Py_DECREF(py_ellipse);
-    return ret_tuple; //ret_tuple;
+    return ret_tuple;  // ret_tuple;
 }
 
 std::string get_transfer_matrix_docstring =

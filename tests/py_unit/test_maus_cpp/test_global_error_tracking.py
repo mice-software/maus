@@ -290,14 +290,13 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
                 if i > 1 and j > 1:
                     ellipse[i][j] = ellipse_trans[i-2, j-2]
         ellipse = self._convert_matrix(ellipse, True)
-        while True:
-            for z_max in range(0, 751, 750):
-                print "\nz_max:", z_max, "============"
-                tracking = err_prop.GlobalErrorTracking()
-                tracking.set_min_step_size(1.)
-                centroid_out, ellipse_out = tracking.propagate_errors\
-                                                          (centroid, ellipse, z_max)
-                self._print_output(centroid_out, ellipse_out)
+        for z_max in range(0, 751, 750):
+            print "\nz_max:", z_max, "============"
+            tracking = err_prop.GlobalErrorTracking()
+            tracking.set_min_step_size(1.)
+            centroid_out, ellipse_out = tracking.propagate_errors\
+                                                      (centroid, ellipse, z_max)
+            self._print_output(centroid_out, ellipse_out)
 
     def test_tm(self):
         """Test transfer matrix calculation"""
