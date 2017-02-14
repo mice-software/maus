@@ -28,6 +28,9 @@ import xboa.hit
 # goes to 4294967295 in both 32 bit and 64 bit.
 NUMPY_RAND_MAX = 2147483647 
 
+# pylint: disable = C0103
+# pylint: disable = R0912
+
 class Beam(): # pylint: disable=R0902
     """
     @brief Beam holds functions necessary to make a single MAUS beam and add
@@ -317,7 +320,7 @@ class Beam(): # pylint: disable=R0902
                                  " "+str(long_matrix[0, 0])+" must be > 0")
         elif self.longitudinal_mode == "uniform":
             self.range_p = numpy.array(beam_def['range_p'])
-            if self.range_p.shape != (2,):
+            if self.range_p.shape != (2,): # pylint: disable = E1103
                 raise ValueError("Longitudinal momentum range must an array "+\
                                                         "like, [100.0, 300.0]")
             elif self.range_p[0] > self.range_p[1]:

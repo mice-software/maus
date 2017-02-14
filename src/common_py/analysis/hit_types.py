@@ -26,7 +26,7 @@
 # pylint: disable = W0311, R0902, R0904, R0913, C0103
 
 import math
-import tools
+import analysis.tools as tools
 
 class AnalysisHit() :
   """
