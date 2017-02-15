@@ -7,8 +7,8 @@ echo
 
 # Setup some variables
 wheel_version=0.30.0a0
-wheel_directory=wheel-${version}
-wheel_filename=${directory}.tar.gz
+wheel_directory=wheel-${wheel_version}
+wheel_filename=${wheel_directory}.tar.gz
 wheel_url=https://pypi.python.org/packages/a7/37/947b4329c4a3c72093b6c8e9b4be8c7f10c32dbb78848d3a234ce01c059d/${wheel_filename}
 
 pip_version=9.0.1
@@ -26,17 +26,20 @@ rm -rf ${build_dir}/pip
 # python ${MAUS_ROOT_DIR}/third_party/source/get-pip.py --no-cache-dir -d $source_dir -b $build_dir
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 
+    echo
+    echo "INFO: Looking for ${wheel_filename} and ${pip_filename}"
+
     # First get the wheel source
     if [ -e "${source_dir}/${wheel_filename}" ]
     then
         echo "INFO: Found source archive in ${source_dir} directory"
     else
-        echo "INFO: Pip source archive doesn't exist.  Downloading..."
+        echo "INFO: Wheel source archive doesn't exist.  Downloading..."
         wget --no-check-certificate --directory-prefix="${source_dir}" ${wheel_url}
     fi
     if [ -e "${source_dir}/${wheel_filename}" ]
     then
-        echo "INFO: Pip source archive exists."
+        echo "INFO: Wheel source archive exists."
         echo
         echo "INFO: Checking MD5 checksum (otherwise the file didn't"
         echo "INFO: download properly):"
@@ -45,7 +48,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         md5sum -c ${wheel_filename}.md5 || { echo "FATAL: Failed to download:" >&2; echo "FATAL: ${wheel_filename}." >&2; echo "FATAL: MD5 checksum failed.">&2; echo "FATAL: Try rerunning this command to redownload, or check" >&2; echo "FATAL: internet connection"  >&2; rm -f ${wheel_filename}; exit 1; }
         sleep 1
     else
-        echo "FATAL: Pip source archive still doesn't exist.  Please file a bug report with your operating system,">&2
+        echo "FATAL: Wheel source archive still doesn't exist.  Please file a bug report with your operating system,">&2
         echo "FATAL: distribution, and any other useful information at:" >&2
         echo "FATAL: " >&2
         echo "FATAL: http://micewww.pp.rl.ac.uk:8080/projects/maus/issues/" >&2
