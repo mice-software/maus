@@ -802,24 +802,24 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
       plane_plots[dir_name]['xmx'].Fill( pos.x(), mom.x() / mom.z() )
       plane_plots[dir_name]['ymy'].Fill( pos.y(), mom.y() / mom.z() )
 
-      if station == REFERENCE_STATION and plane == REFERENCE_PLANE :
-        prefix = ""
-        if tracker == 0 :
-          prefix = 'up_'
-        elif tracker == 1 :
-          prefix = 'down_'
-        pr_pos = pr_track.get_reference_position()
-        pr_mom = pr_track.get_reference_momentum()
-
-        diff_pos = [ pos.x() - pr_pos.x(), pos.y() - pr_pos.y() ]
-        diff_mom = [ mom.x() - pr_mom.x(), mom.y() - pr_mom.y() ]
- 
-        comp_plots[prefix+'patrec_kalman_xy'].Fill( \
-                                                     diff_pos[0], diff_pos[1] )
-        comp_plots[prefix+'patrec_kalman_mxmy'].Fill( \
-                                 diff_mom[0] / mom.z(), diff_mom[1] / mom.z() )
-        comp_plots[prefix+'patrec_kalman_pxpy'].Fill( \
-                                                     diff_mom[0], diff_mom[1] )
+#      if station == REFERENCE_STATION and plane == REFERENCE_PLANE :
+#        prefix = ""
+#        if tracker == 0 :
+#          prefix = 'up_'
+#        elif tracker == 1 :
+#          prefix = 'down_'
+#        pr_pos = pr_track.get_reference_position()
+#        pr_mom = pr_track.get_reference_momentum()
+#
+#        diff_pos = [ pos.x() - pr_pos.x(), pos.y() - pr_pos.y() ]
+#        diff_mom = [ mom.x() - pr_mom.x(), mom.y() - pr_mom.y() ]
+# 
+#        comp_plots[prefix+'patrec_kalman_xy'].Fill( \
+#                                                     diff_pos[0], diff_pos[1] )
+#        comp_plots[prefix+'patrec_kalman_mxmy'].Fill( \
+#                                 diff_mom[0] / mom.z(), diff_mom[1] / mom.z() )
+#        comp_plots[prefix+'patrec_kalman_pxpy'].Fill( \
+#                                                     diff_mom[0], diff_mom[1] )
 
 
     if upstream_good == 1 and downstream_good == 1 :

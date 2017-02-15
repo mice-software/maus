@@ -318,13 +318,11 @@ namespace MAUS {
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
         double width = materials.at(i).second;
         double path_length = 0.1 * width * distance_factor;
-        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-        delta_energy = e_loss_sign*SP*path_length;
-
-
-//          double SP = _geometry_helper->LandauVavilovStoppingPower(momentum,
-//                                                             materials.at(i).first, path_length);
-//          delta_energy = e_loss_sign*SP;
+//        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+//        delta_energy = e_loss_sign*SP*path_length;
+        double SP = _geometry_helper->LandauVavilovStoppingPower(momentum,
+                                                            materials.at(i).first, path_length);
+        delta_energy = e_loss_sign*SP;
 
 //          if (delta_energy != delta_energy) {
 //            std::ostringstream converter("");
