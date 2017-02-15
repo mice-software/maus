@@ -1,0 +1,129 @@
+{
+   python_suppression
+   Memcheck:Cond
+   fun:PyObject_Free
+   ...
+}
+{
+   python_suppression
+   Memcheck:Addr4
+   fun:PyObject_Free
+   ...
+}
+{
+   python_suppression
+   Memcheck:Value8
+   fun:PyObject_Free
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:PyObject_Realloc
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN7TObjectD1Ev
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN7TObjectC1Ev
+   ...
+}
+{
+   <MAUSG4Manager is leaky in initialisation - but only ever initialised once>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS17MAUSGeant4ManagerC1Ev
+   ...
+}
+{
+   <ROOT seems to be leaky in initialisation>
+   Memcheck:Leak
+   ...
+   fun:_ZN6TClass4InitEPKcsPKSt9type_infoP16TVirtualIsAProxyPFvPvR16TMemberInspectorES1_S1_iib
+   ...
+}
+{
+   <Xerces seems to be leaky in initialisation>
+   Memcheck:Leak
+   ...
+   fun:_ZN11xercesc_3_117MemoryManagerImpl8allocateEm
+   ...
+}
+{
+   <MAUS Physics list is leaky at initialisation>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS15MAUSPhysicsList16ConstructProcessEv
+   ...
+}
+{
+   <MAUS Globals manager is leaky at initialisation>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS14GlobalsManager17InitialiseGlobalsESs
+   ...
+}
+{
+   <BuildSensitiveDetector is leaky>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS10Simulation20DetectorConstruction13ResetGeometryEv
+   ...
+}
+{
+   <MAUSPhysicsList setup>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS15MAUSPhysicsList17ConstructParticleEv
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS6MAUSSDC1EP10MiceModule
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS15MAUSPhysicsList18GetMAUSPhysicsListEv
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS17MAUSGeant4Manager9SetPhasesEv
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS15MAUSPhysicsList14SetStochasticsENS0_4scatENS0_5elossENS0_8hadronicEb
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:_ZN4MAUS15MAUSPhysicsList14UIApplyCommandESs
+}
+

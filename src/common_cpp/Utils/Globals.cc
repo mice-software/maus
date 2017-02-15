@@ -51,7 +51,8 @@ Globals::Globals()
   : _configuration_cards(NULL), _legacy_mice_run(NULL), _error_handler(NULL),
     _legacy_cards(NULL), _run_action_manager(NULL), _mc_mods(NULL),
     _recon_mods(NULL), _mc_field_constructor(NULL),
-    _recon_field_constructor(NULL), _maus_geant4_manager(NULL) {
+    _recon_field_constructor(NULL), _maus_geant4_manager(NULL),
+    _scifi_geometry_helper(NULL) {
 }
 
 // in all the below I call GetInstance() to check that _process is initialised
@@ -93,6 +94,10 @@ MiceModule* Globals::GetReconstructionMiceModules() {
 
 GeometryNavigator* Globals::GetMCGeometryNavigator() {
     return GetInstance()->_mc_geometry_navigator;
+}
+
+SciFiGeometryHelper* Globals::GetSciFiGeometryHelper() {
+    return GetInstance()->_scifi_geometry_helper;
 }
 
 std::string Globals::GetVersionNumberString() {

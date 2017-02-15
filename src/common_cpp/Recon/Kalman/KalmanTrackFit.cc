@@ -192,10 +192,6 @@ namespace Kalman {
 
       _track[i].SetSmoothed(State(vec, cov));
     }
-
-//  if ( _track[0].GetSmoothed().GetVector()(0, 0) != _track[0].GetSmoothed().GetVector()(0, 0) ) {
-//    std::cerr << print_track(_track, "SMOOTHING ERROR");
-//  }
   }
 
 

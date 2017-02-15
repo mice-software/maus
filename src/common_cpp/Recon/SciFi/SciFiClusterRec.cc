@@ -51,7 +51,7 @@ void SciFiClusterRec::process(SciFiEvent &evt) const {
     std::string root_dir = std::getenv("MAUS_ROOT_DIR");
     std::string path = root_dir + "/tmp/digit_exception.log";
     logfile.open(path.c_str(), ios::app);
-    logfile << "spill: " << seeds[0]->get_spill() << "  digit: "
+    logfile << "spill: " << seeds[0]->get_spill() << "  event: "
             << seeds[0]->get_event()
             << "  total number of seed digits: " << seeds.size() << "\n";
     logfile.close();

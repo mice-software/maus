@@ -19,15 +19,14 @@
 
 #include "gtest/gtest.h"
 
-#include "Utils/Exception.hh"
 #include "src/legacy/Interface/MICERun.hh"
 #include "src/legacy/Interface/dataCards.hh"
-
 #include "src/legacy/Config/MiceModule.hh"
 
+#include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/JsonWrapper.hh"
-#include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Utils/RunActionManager.hh"
+#include "src/common_cpp/Utils/Globals.hh"
 
 #include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 

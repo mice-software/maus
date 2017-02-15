@@ -299,13 +299,16 @@ SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 
 SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPatRecSErrorMethod = 0 # How to calc error on s, 0 = station res, 1 = error prop
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
-SciFiPatRecCircleChi2Cut = 15.0 # Chi^2 on pat rec circle fit
-SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
-SciFiPatRecSZChi2Cut = 24.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec circle fit
+SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
+SciFiPatRecSZChi2Cut = 150.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecCircleErrorWeight = 1.0 # Weight to artificially scale the error going to xy fit
+SciFiPatRecSZErrorWeight = 1.0 # Weight to artificially scale the error going to sz fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiPatRecDebugOn = False # Set Pattern Recogntition to debug mode
@@ -348,6 +351,10 @@ SciFiTestVirtualSmear = 0.431425 # Simulate measurement error on alpha with Gaus
 
 SciFiPRCorrection = 1.1776
 SciFiPRBias = 0.2269
+
+SciFiPRCorrectionsOutputFile = "SciFiMomentumCorrections.root" #File to output momentum correction data to (produced by reducer)
+SciFiPRCorrectSeed = 0 # 0 : Don't correct PR seed, 1 : apply corretions from corrections file
+SciFiPRCorrectionsFile = "SciFiMomentumCorrections.root" # File to use to apply seed corrections (used in PR Mapper)
 
 SciFiSeedCovariance = 1000.0 # Error estimate for Seed values of the Kalman Fit
 SciFiSeedPatRec = True
@@ -790,6 +797,7 @@ geometry_validation = { # see bin/utilities/geometry_validation.py for docs
     "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
     "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
     "2d_volume_plot_label_size":0.25,
+    "volume_bounding_box_dump":"geometry_validation_bb_dump.json",
 }
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"

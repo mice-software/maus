@@ -82,6 +82,11 @@ void FieldPhaser::SetPhases() {
                n_attempts < BTPhaser::GetInstance()->NumberOfCavities()*5) {
             ++n_attempts;
             Squeak::mout(Squeak::info) << "." << std::flush;
+            Squeak::mout(Squeak::debug) << "Firing "
+                << "x:" << ref.x << " y: " << ref.y << " z: " << ref.z << " t: " << ref.time
+                << "px:" << ref.px << " py: " << ref.py << " pz: " << ref.pz
+                << " energy: " << ref.energy << std::endl;
+
             MCEvent* event = mgm->RunParticle(ref);
             std::vector<VirtualHit>* v_hits = event->GetVirtualHits();
             if (v_hits == NULL || v_hits->size() == 0)
@@ -116,11 +121,16 @@ MAUSPrimaryGeneratorAction::PGParticle FieldPhaser::TryToPhase
     std::vector<std::pair<VirtualHit, bool> > phased_hits;
 
     MAUSPrimaryGeneratorAction::PGParticle ref = mgm->GetReferenceParticle();
+
     for (unsigned int j = 0; j < v_hits->size(); ++j) {
         VirtualHit hit = v_hits->at(j);
         CLHEP::Hep3Vector pos(hit.GetPosition().x(),
                               hit.GetPosition().y(),
                               hit.GetPosition().z());
+        MAUS::ThreeVector mom = hit.GetMomentum();
+        Squeak::mout(Squeak::debug) << "    station: " << hit.GetStationId() << " "
+            << "x:" << pos.x() << " y: " << pos.y() << " z: " << pos.z() << " t: " << hit.GetTime()
+            << " px:" << mom.x() << " py: " << mom.y() << " pz: " << mom.z() << std::endl;
         bool is_phased = BTPhaser::GetInstance()->SetThePhase(
                                                           pos,
                                                           hit.GetTime());

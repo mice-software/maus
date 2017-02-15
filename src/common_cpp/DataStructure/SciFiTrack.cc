@@ -29,6 +29,7 @@ SciFiTrack::SciFiTrack(): _tracker(-1),
                           _seed_momentum(),
                           _seed_covariance_matrix(0) {
   _pr_track = new TRef();
+  _scifi_seed = new TRef();
 }
 
 SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
@@ -62,6 +63,7 @@ SciFiTrack::SciFiTrack(const SciFiTrack &a_track): _tracker(-1),
   }
 
   _pr_track = new TRef(*a_track.pr_track());
+  _scifi_seed = new TRef(*a_track._scifi_seed);
 }
 
 SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
@@ -88,7 +90,9 @@ SciFiTrack& SciFiTrack::operator=(const SciFiTrack &a_track) {
     _seed_covariance_matrix[i] = a_track._seed_covariance_matrix[i];
   }
   if (_pr_track) delete _pr_track;
+  if (_scifi_seed) delete _scifi_seed;
   _pr_track = new TRef(*a_track.pr_track());
+  _scifi_seed = new TRef(*a_track._scifi_seed);
 
   return *this;
 }
@@ -103,6 +107,7 @@ SciFiTrack::~SciFiTrack() {
   }
 
   delete _pr_track;
+  delete _scifi_seed;
 }
 
 

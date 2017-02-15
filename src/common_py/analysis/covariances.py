@@ -297,7 +297,10 @@ class CovarianceMatrix() :
     """ 
       Returns the determinant of the covariace matrix
     """
-    return numpy.linalg.det( self.get_corrected_covariance_matrix( axes ) )
+    determinant = numpy.linalg.det( self.get_corrected_covariance_matrix(axes) )
+    if math.isnan(determinant) :
+      determinant = 0.0
+    return determinant
 
 
   def get_momentum( self ) :

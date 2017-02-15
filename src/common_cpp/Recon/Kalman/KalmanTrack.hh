@@ -20,10 +20,10 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 #include "TMath.h"
 #include "TMatrixD.h"
-
 
 namespace MAUS {
 namespace Kalman {
@@ -167,7 +167,7 @@ namespace Kalman {
        */
       virtual ~TrackPoint() {}
 
-      int GetDimension() const { return this->_predicted.GetDimension(); }
+      unsigned int GetDimension() const { return this->_predicted.GetDimension(); }
 
       /** @brief Get ID of trackpoint
        */
@@ -266,6 +266,22 @@ namespace Kalman {
        */
       const TrackPoint& operator[] (unsigned int index) const { return _track_vector[index]; }
 
+      /** @brief Get a const reference to the first track point
+       */
+      TrackPoint& GetFirstTrackPoint() { return _track_vector[0]; }
+
+      /** @brief Get a const reference to the first track point
+       */
+      const TrackPoint& GetFirstTrackPoint() const { return _track_vector[0]; }
+
+      /** @brief Get a reference to the last track point
+       */
+      TrackPoint& GetLastTrackPoint() { return _track_vector[_track_vector.size()-1]; }
+
+      /** @brief Get a reference to the last track point
+       */
+      const TrackPoint& GetLastTrackPoint() const { return _track_vector[_track_vector.size()-1]; }
+
       /** @brief Return the number of states in the state array
        */
       unsigned int GetLength() const { return _track_vector.size(); }
@@ -295,5 +311,20 @@ namespace Kalman {
   };
 } // namespace Kalman
 } // namespace MAUS
+
+/** Streamer operator for TMatrixD */
+std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix);
+
+/** Streamer operator for State */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::State& state);
+
+/** Streamer operator for Track */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::TrackPoint& track_point);
+
+/** Streamer operator for Track */
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::Track& track);
 
 #endif

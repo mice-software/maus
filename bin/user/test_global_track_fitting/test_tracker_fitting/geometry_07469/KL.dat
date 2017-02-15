@@ -1,0 +1,1113 @@
+Module KL
+{
+Volume Box
+Dimensions 932 927.2 40.2 mm
+PropertyInt numPlanes 1
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLFoilModule0
+{
+Volume Box
+Dimensions 932 132.2 40.2 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Al
+Module KLModule0
+{
+Volume Box
+Dimensions 932 132 40 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLCell0Module0
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber0_0
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 0
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber0_0
+
+Position 0.0 -4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell0Module0
+
+Module KLCell1Module0
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 1
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber1_0
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 1
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber1_0
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell1Module0
+
+Module KLCell2Module0
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 2
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber2_0
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 2
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber2_0
+
+Position 0.0 4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell2Module0
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLModule0
+
+Position 0.0 -397.5 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFoilModule0
+
+Module KLFoilModule1
+{
+Volume Box
+Dimensions 932 132.2 40.2 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Al
+Module KLModule1
+{
+Volume Box
+Dimensions 932 132 40 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLCell3Module1
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 3
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber3_1
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 3
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber3_1
+
+Position 0.0 -4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell3Module1
+
+Module KLCell4Module1
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 4
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber4_1
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 4
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber4_1
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell4Module1
+
+Module KLCell5Module1
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 5
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber5_1
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 5
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber5_1
+
+Position 0.0 4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell5Module1
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLModule1
+
+Position 0.0 -265 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFoilModule1
+
+Module KLFoilModule2
+{
+Volume Box
+Dimensions 932 132.2 40.2 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Al
+Module KLModule2
+{
+Volume Box
+Dimensions 932 132 40 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLCell6Module2
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 6
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber6_2
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 6
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber6_2
+
+Position 0.0 -4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell6Module2
+
+Module KLCell7Module2
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 7
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber7_2
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 7
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber7_2
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell7Module2
+
+Module KLCell8Module2
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 8
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber8_2
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 8
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber8_2
+
+Position 0.0 4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell8Module2
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLModule2
+
+Position 0.0 -132.5 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFoilModule2
+
+Module KLFoilModule3
+{
+Volume Box
+Dimensions 932 132.2 40.2 mm
+PropertyString Material Al
+Module KLModule3
+{
+Volume Box
+Dimensions 932 132 40 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLCell9Module3
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 9
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber9_3
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 9
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber9_3
+
+Position 0.0 -4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell9Module3
+
+Module KLCell10Module3
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 10
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber10_3
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 10
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber10_3
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell10Module3
+
+Module KLCell11Module3
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 11
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber11_3
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 11
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber11_3
+
+Position 0.0 4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell11Module3
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLModule3
+
+Position 0.0 0.0 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFoilModule3
+
+Module KLFoilModule4
+{
+Volume Box
+Dimensions 932 132.2 40.2 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Al
+Module KLModule4
+{
+Volume Box
+Dimensions 932 132 40 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLCell12Module4
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 12
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber12_4
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 12
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber12_4
+
+Position 0.0 -4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell12Module4
+
+Module KLCell13Module4
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 13
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber13_4
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 13
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber13_4
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell13Module4
+
+Module KLCell14Module4
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 14
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber14_4
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 14
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber14_4
+
+Position 0.0 4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell14Module4
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLModule4
+
+Position 0.0 132.5 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFoilModule4
+
+Module KLFoilModule5
+{
+Volume Box
+Dimensions 932 132.2 40.2 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Al
+Module KLModule5
+{
+Volume Box
+Dimensions 932 132 40 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLCell15Module5
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 15
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber15_5
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 15
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber15_5
+
+Position 0.0 -4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell15Module5
+
+Module KLCell16Module5
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 16
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber16_5
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 16
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber16_5
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell16Module5
+
+Module KLCell17Module5
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 17
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber17_5
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 17
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber17_5
+
+Position 0.0 4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell17Module5
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLModule5
+
+Position 0.0 265 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFoilModule5
+
+Module KLFoilModule6
+{
+Volume Box
+Dimensions 932 132.2 40.2 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Al
+Module KLModule6
+{
+Volume Box
+Dimensions 932 132 40 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material AIR
+Module KLCell18Module6
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 18
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber18_6
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 18
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber18_6
+
+Position 0.0 -4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell18Module6
+
+Module KLCell19Module6
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 19
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber19_6
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 19
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber19_6
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell19Module6
+
+Module KLCell20Module6
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 20
+PropertyInt numPMTs 2
+PropertyHep3Vector Pmt1Pos -70 0.0 0.0 cm
+PropertyHep3Vector Pmt2Pos 70 0.0 0.0 cm
+PropertyDouble G4StepMax 5.0
+PropertyString Material Pb
+Module KLGlue
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyInt Cell 0
+PropertyDouble GlueThickness 0.09 mm
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material BC600
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLGlue
+
+Module KLFiber20_6
+{
+Volume Box
+Dimensions 932 44 40 mm
+PropertyString SensitiveDetector KL
+PropertyInt Cell 20
+PropertyDouble FibreDiameter 1.0 mm
+PropertyDouble FibreLength 1000.0 mm
+PropertyDouble FibreSpacingY 1.34 mm
+PropertyDouble FibreSpacingZ 0.98 mm
+PropertyDouble G4StepMax 5.0
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFiber20_6
+
+Position 0.0 4.4 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLCell20Module6
+
+Position 0.0 0.0 0.0 cm
+Rotation 0.0 0.0 0.0 degree
+} // End KLModule6
+
+Position 0.0 397.5 0.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End KLFoilModule6
+
+}
