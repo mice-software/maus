@@ -168,6 +168,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
 
      export $DYLIB_VAR="\$MAUS_THIRD_PARTY/build:\$$DYLIB_VAR"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/build:\$$DYLIB_VAR"
+     export $DYLIB_VAR="\$MAUS_THIRD_PARTY/third_party/install/lib/python2.7/site-packages/numpy/core/lib:\$$DYLIB_VAR"
 
      # Setup ROOT
      export PYTHONPATH="\$MAUS_THIRD_PARTY/third_party/build/root/lib:\$PYTHONPATH"
