@@ -1,0 +1,27 @@
+// Dummy configuration for most unit tests
+//
+// For testing details of MiceModules, tracking, field maps, detector models you
+// will want obviously something more sophisticated.
+
+Configuration ElossTest
+{
+  Dimensions 1. 1. 50. m
+  PropertyString Material Galactic
+  PropertyDouble G4StepMax 10.0 mm
+  Module Box
+  {
+    PropertyHep3Vector Position 0. 0. 1000. mm
+    PropertyHep3Vector Rotation 0. 0. 0. mm
+    PropertyString     Volume   Box
+    PropertyHep3Vector Dimensions 10. 10. 6.5 cm
+    PropertyString Material MICE_LITHIUM_HYDRIDE
+  }
+  Module Virtual
+  {
+    PropertyHep3Vector Position 0. 0. 2000. mm
+    PropertyHep3Vector Rotation 0. 0. 0. mm
+    PropertyString     Volume   None
+    PropertyString     SensitiveDetector Virtual
+  }
+}
+

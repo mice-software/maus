@@ -1,0 +1,449 @@
+Module Tracker0
+{
+Volume Cylinder
+Dimensions 195. 1130. mm
+PropertyInt Tracker 0
+PropertyString Material AIR
+Module TrackerRef0
+{
+Volume Cylinder
+Dimensions 195. 1. mm
+PropertyInt Station 9001
+PropertyInt Plane 9001
+PropertyString SensitiveDetector SpecialVirtual
+PropertyString Material AIR
+Position 0.0 0.0 -560.0 mm
+Rotation 0.0 0.0 0.0 degree
+} // End TrackerRef0
+
+Module TrackerStation1
+{
+Volume Cylinder
+Dimensions 190. 2. mm
+PropertyInt Station 1
+PropertyDouble OpticsMaterialLength 0 mm
+PropertyString Material POLYSTYRENE
+Module Tracker0ViewVStation1
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 0
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 -0.6398 mm
+Rotation 0.0 0.0 -120 degree
+} // End Tracker0ViewVStation1
+
+Module Tracker0ViewWStation1
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 1
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0125 mm
+Rotation 0.0 0.0 120 degree
+} // End Tracker0ViewWStation1
+
+Module Tracker0ViewUStation1
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 2
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 105.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.6648 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Tracker0ViewUStation1
+
+Position 0.0 0.0 -549.9513 mm
+Rotation 0.0 0.0 0.0 degree
+} // End TrackerStation1
+
+Module TrackerStation2
+{
+Volume Cylinder
+Dimensions 190. 2. mm
+PropertyInt Station 2
+PropertyDouble OpticsMaterialLength 0 mm
+PropertyString Material POLYSTYRENE
+Module Tracker0ViewVStation2
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 0
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 -0.6398 mm
+Rotation 0.0 0.0 -120 degree
+} // End Tracker0ViewVStation2
+
+Module Tracker0ViewWStation2
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 1
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0125 mm
+Rotation 0.0 0.0 120 degree
+} // End Tracker0ViewWStation2
+
+Module Tracker0ViewUStation2
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 2
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 105.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.6648 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Tracker0ViewUStation2
+
+Position -0.4698 0.0052 -349.0577 mm
+Rotation 0.0 0.0 0.0 degree
+} // End TrackerStation2
+
+Module TrackerStation3
+{
+Volume Cylinder
+Dimensions 190. 2. mm
+PropertyInt Station 3
+PropertyDouble OpticsMaterialLength 0 mm
+PropertyString Material POLYSTYRENE
+Module Tracker0ViewVStation3
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 0
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 -0.6398 mm
+Rotation 0.0 0.0 -120 degree
+} // End Tracker0ViewVStation3
+
+Module Tracker0ViewWStation3
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 1
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0125 mm
+Rotation 0.0 0.0 120 degree
+} // End Tracker0ViewWStation3
+
+Module Tracker0ViewUStation3
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 2
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 105.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.6648 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Tracker0ViewUStation3
+
+Position -0.6717 -0.1759 -100.0523 mm
+Rotation 0.0 0.0 0.0 degree
+} // End TrackerStation3
+
+Module TrackerStation4
+{
+Volume Cylinder
+Dimensions 190. 2. mm
+PropertyInt Station 4
+PropertyDouble OpticsMaterialLength 0 mm
+PropertyString Material POLYSTYRENE
+Module Tracker0ViewVStation4
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 0
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 -0.6398 mm
+Rotation 0.0 0.0 -120 degree
+} // End Tracker0ViewVStation4
+
+Module Tracker0ViewWStation4
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 1
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0125 mm
+Rotation 0.0 0.0 120 degree
+} // End Tracker0ViewWStation4
+
+Module Tracker0ViewUStation4
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 2
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 105.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.6648 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Tracker0ViewUStation4
+
+Position 0.1722 -0.2912 199.8771 mm
+Rotation 0.0 0.0 0.0 degree
+} // End TrackerStation4
+
+Module TrackerStation5
+{
+Volume Cylinder
+Dimensions 190. 2. mm
+PropertyInt Station 5
+PropertyDouble OpticsMaterialLength 0 mm
+PropertyString Material POLYSTYRENE
+Module Tracker0ViewVStation5
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 0
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 -0.6398 mm
+Rotation 0.0 0.0 -120 degree
+} // End Tracker0ViewVStation5
+
+Module Tracker0ViewWStation5
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 1
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 106.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.0125 mm
+Rotation 0.0 0.0 120 degree
+} // End Tracker0ViewWStation5
+
+Module Tracker0ViewUStation5
+{
+Volume Cylinder
+Dimensions 189. 0.6273 mm
+PropertyString SensitiveDetector SciFi
+PropertyInt Plane 2
+PropertyDouble ActiveRadius 161.0 mm
+PropertyDouble Pitch 0.427 mm
+PropertyDouble FibreDiameter 0.350 mm
+PropertyDouble CoreDiameter 0.308 mm
+PropertyDouble CentralFibre 105.5 mm
+PropertyDouble G4StepMax 0.1
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 0.6648 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Tracker0ViewUStation5
+
+Position 0.0 0.0 549.9513 mm
+Rotation 0.0 0.0 0.0 degree
+} // End TrackerStation5
+
+}

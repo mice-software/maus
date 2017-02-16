@@ -57,7 +57,9 @@ namespace Kalman {
 
   State& State::operator=(const State& st) {
     this->_dimension = st._dimension;
+    this->_vector.ResizeTo(st._vector.GetNrows(), st._vector.GetNcols());
     this->_vector = st._vector;
+    this->_covariance.ResizeTo(st._covariance.GetNrows(), st._covariance.GetNcols());
     this->_covariance = st._covariance;
     this->_has_value = st._has_value;
 
@@ -250,4 +252,41 @@ namespace Kalman {
   }
 }
 } // namespace MAUS
+
+std::ostream& operator<<(std::ostream& out, const TMatrixD& matrix) {
+    for (int i = 0; i < matrix.GetNrows(); ++i) {
+        for (int j = 0; j < matrix.GetNcols(); ++j) {
+            out.width(12);
+            out << std::right << matrix(i, j) << " ";
+        }
+        out << "\n";
+    }
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::State& state) {
+    out << state.GetVector() << "\n";
+    out << state.GetCovariance();
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::TrackPoint& track_point) {
+    out << "Track point at " << track_point.GetPosition() << "\n"
+        << "    data:\n" << track_point.GetData() << "\n"
+        << "    filtered:\n" << track_point.GetFiltered() << "\n"
+        << "    smoothed:\n" << track_point.GetSmoothed();
+    return out;
+}
+
+
+std::ostream& operator<<(std::ostream& out,
+                         const MAUS::Kalman::Track& track) {
+    out << "Track with " << track.GetLength() << " points\n";
+    for (size_t i = 0; i < track.GetLength(); ++i)
+        out << track[i] << std::endl;
+    return out;
+}
+
 

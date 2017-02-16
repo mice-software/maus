@@ -29,6 +29,8 @@ PyMODINIT_FUNC init_MapCppTrackerPatternRecognition(void) {
 
 MapCppTrackerPatternRecognition::MapCppTrackerPatternRecognition()
                                           : MapBase<Data>("MapCppTrackerPatternRecognition"),
+                                            _upstream_correction(2),
+                                            _downstream_correction(2),
                                             _up_straight_pr_on(true),
                                             _down_straight_pr_on(true),
                                             _up_helical_pr_on(true),
@@ -57,13 +59,17 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
   _patrec_debug_on    = (*json)["SciFiPatRecDebugOn"].asBool();
 
+  _correct_seed_momentum = static_cast<bool>((*json)["SciFiPRCorrectSeed"].asInt());
+  if (_correct_seed_momentum) {
+    _load_momentum_corrections((*json)["SciFiPRCorrectionsFile"].asString());
+  }
+
   // Build the geometery helper instance
   MiceModule* module = Globals::GetReconstructionMiceModules();
   std::vector<const MiceModule*> modules =
     module->findModulesByPropertyString("SensitiveDetector", "SciFi");
   _geometry_helper = SciFiGeometryHelper(modules);
   _geometry_helper.Build();
-  SciFiTrackerMap& geo_map = _geometry_helper.GeometryMap();
 
   // Setup Pattern Recognition
   double up_field = _geometry_helper.GetFieldValue(0);
@@ -112,7 +118,10 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   _pattern_recognition.set_down_straight_pr_on(_down_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
-  if (_patrec_debug_on) _pattern_recognition.setup_debug();
+  if (_patrec_debug_on) {
+    std::cerr << "INFO::MapCppTrackerPatternRecognition: Debug mode on\n";
+    _pattern_recognition.setup_debug();
+  }
 }
 
 
@@ -145,7 +154,9 @@ void MapCppTrackerPatternRecognition::_process(Data* data) const {
         _pattern_recognition.process(*event);
         set_straight_prtrack_global_output(event->straightprtracks());
         extrapolate_helical_reference(*event);
+        extrapolate_helical_seed(*event);
         extrapolate_straight_reference(*event);
+        extrapolate_straight_seed(*event);
       }
     }
   } else {
@@ -163,6 +174,7 @@ void MapCppTrackerPatternRecognition::_set_field_values(SciFiEvent* event) const
   event->set_range_field_up(_geometry_helper.GetFieldRange(0));
   event->set_range_field_down(_geometry_helper.GetFieldRange(1));
 }
+
 
 void MapCppTrackerPatternRecognition::extrapolate_helical_reference(SciFiEvent& event) const {
   SciFiHelicalPRTrackPArray helicals = event.helicalprtracks();
@@ -236,6 +248,81 @@ void MapCppTrackerPatternRecognition::extrapolate_straight_reference(SciFiEvent&
   }
 }
 
+
+void MapCppTrackerPatternRecognition::extrapolate_helical_seed(SciFiEvent& event) const {
+  SciFiHelicalPRTrackPArray helicals = event.helicalprtracks();
+  size_t num_tracks = helicals.size();
+
+  for (size_t i = 0; i < num_tracks; ++i) {
+    SciFiHelicalPRTrack* track = helicals[i];
+    ThreeVector pos;
+    ThreeVector mom;
+
+    int tracker = track->get_tracker();
+    double length = _geometry_helper.GetSeedDistance(tracker);
+
+    double r  = track->get_R();
+    double pt = - track->get_charge()*CLHEP::c_light*_geometry_helper.GetFieldValue(tracker)*r;
+    double dsdz = - track->get_dsdz();
+    double x0 = track->get_circle_x0();
+    double y0 = track->get_circle_y0();
+    double s = (track->get_line_sz_c() - length*dsdz);
+    double phi = s / r;
+
+    pos.setX(x0 + r*cos(phi));
+    pos.setY(y0 + r*sin(phi));
+    pos.setZ(length);
+
+    mom.setX(-pt*sin(phi));
+    mom.setY(pt*cos(phi));
+    mom.setZ(-pt/dsdz);
+
+    if (_correct_seed_momentum) {
+      double old_p = sqrt(mom.x()*mom.x() + mom.y()*mom.y() + mom.z()*mom.z());
+      if (tracker == 0) {
+        double new_p = _upstream_correction[0] + _upstream_correction[1]*old_p;
+        mom *= new_p/old_p;
+      } else {
+        double new_p = _downstream_correction[0] + _downstream_correction[1]*old_p;
+        mom *= new_p/old_p;
+      }
+    }
+
+    track->set_seed_position(pos);
+    track->set_seed_momentum(mom);
+  }
+}
+
+
+void MapCppTrackerPatternRecognition::extrapolate_straight_seed(SciFiEvent& event) const {
+  SciFiStraightPRTrackPArray straights = event.straightprtracks();
+  size_t num_tracks = straights.size();
+
+  for (size_t i = 0; i < num_tracks; ++i) {
+    SciFiStraightPRTrack* track = straights[i];
+    ThreeVector pos;
+    ThreeVector mom;
+    double default_mom = _geometry_helper.GetDefaultMomentum();
+
+    int tracker = track->get_tracker();
+    double length = _geometry_helper.GetSeedDistance(tracker);
+
+    double mx = track->get_mx();
+    double my = track->get_my();
+
+    pos.setX(track->get_x0() + mx*length);
+    pos.setY(track->get_y0() + my*length);
+    pos.setZ(length);
+
+    mom.setX(mx*default_mom);
+    mom.setY(my*default_mom);
+    mom.setZ(fabs(default_mom));
+
+    track->set_seed_position(pos);
+    track->set_seed_momentum(mom);
+  }
+}
+
 void MapCppTrackerPatternRecognition::set_straight_prtrack_global_output(
   const SciFiStraightPRTrackPArray& trks) const {
   for (auto trk : trks) {
@@ -250,6 +337,21 @@ void MapCppTrackerPatternRecognition::set_straight_prtrack_global_output(
     trk->set_global_y0(global_params[2]);
     trk->set_global_my(global_params[3]);
   }
+}
+
+
+void MapCppTrackerPatternRecognition::_load_momentum_corrections(std::string filename) {
+  TFile corrections_file(filename.c_str(), "READ");
+
+  TVectorD* upstream = reinterpret_cast<TVectorD*>(
+                                           corrections_file.Get("upstream_correction_parameters"));
+  TVectorD* downstream = reinterpret_cast<TVectorD*>(
+                                         corrections_file.Get("downstream_correction_parameters"));
+
+  _upstream_correction = (*upstream);
+  _downstream_correction = (*downstream);
+
+  corrections_file.Close();
 }
 
 } // ~namespace MAUS

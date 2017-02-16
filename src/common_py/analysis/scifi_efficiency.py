@@ -4,6 +4,7 @@
 
 import os
 import math
+import numpy as np
 # import abc
 import ROOT
 import libMausCpp #pylint: disable = W0611
@@ -117,6 +118,9 @@ class EfficiencyDataReal():
         except (ZeroDivisionError, ValueError):
             self.eff_tkds_3_5pt = 0.0
             self.eff_tkds_3_5pt_err = 0.0
+
+        return [self.eff_tkus_5pt, -1.0, self.eff_tkus_3_5pt, \
+          self.eff_tkds_5pt, -1.0, self.eff_tkds_3_5pt]
 
     def clear(self):
         """ Clear all data """
@@ -241,8 +245,8 @@ class EfficiencyBase(object):
 
     def __init__(self):
         """ Initialise member variables """
-        print 'Running init base ',
         self.root_files = []
+        self.current_run_number = -1
 
         # Options for the user
         self.cut_on_tof = True
@@ -251,9 +255,39 @@ class EfficiencyBase(object):
         self.tof_lower_cut = 27.0
         print self.cut_on_tof
 
-        # Results
+        # Event Results
         self.bool_2tof_timing_event = False # Tof timing ok
         self.bool_2tof_spoint_event = False # 1 spacepoint only in each tof
+
+        # Job level results
+        self.data = {}
+        self.data['run_numbers']  = np.array([])
+        self.data['tkus_5spoint'] = np.array([])
+        self.data['tkus_4to5spoint'] = np.array([])
+        self.data['tkus_3to5spoint'] = np.array([])
+        self.data['tkds_5spoint'] = np.array([])
+        self.data['tkds_4to5spoint'] = np.array([])
+        self.data['tkds_3to5spoint'] = np.array([])
+
+    def accumulate_job_data(self, data):
+        """ Accumulate job level data in arrays by run number. data should
+            be a list containing 7 entries:
+            run number, tkus_5spoint, tkus_4to5spoint, tkus_3to5spoint,
+            tkds_5spoint, tkds_4to5spoint, tkds_3to5spoint
+        """
+        self.data['run_numbers'] = np.append(self.data['run_numbers'], data[0])
+        self.data['tkus_5spoint'] = \
+          np.append(self.data['tkus_5spoint'], data[1])
+        self.data['tkus_4to5spoint'] = \
+          np.append(self.data['tkus_4to5spoint'], data[2])
+        self.data['tkus_3to5spoint'] = \
+          np.append(self.data['tkus_3to5spoint'], data[3])
+        self.data['tkds_5spoint'] = \
+          np.append(self.data['tkds_5spoint'], data[4])
+        self.data['tkds_4to5spoint'] = \
+          np.append(self.data['tkds_4to5spoint'], data[5])
+        self.data['tkds_3to5spoint'] = \
+          np.append(self.data['tkds_3to5spoint'], data[6])
 
     def check_tof(self, tof_evt):
         """ Analyse tof data. Return boolean indicating if tof cuts pass"""
@@ -306,15 +340,15 @@ class EfficiencyBase(object):
         for root_file_name in self.root_files:
             self.process_file(root_file_name)
             self.print_info(root_file_name, 'file')
-            self.accumulate_job_data()
             counter += 1
-        self.calculate_job_efficiency()
-        self.print_info('Final job results', 'job')
+        self.calculate_average_efficiency()
+        self.print_info('Final job results', 'average')
         return True
 
     def process_file(self, root_file_name):
         """ Process one root file of data"""
         self.clear() # Start clean each time
+        self.current_run_number = tools.extract_run_number(root_file_name)
 
         # Load the ROOT file
         root_file = ROOT.TFile(root_file_name, "READ") # pylint: disable = E1101
@@ -329,14 +363,16 @@ class EfficiencyBase(object):
             self.process_spill(spill) # Analyse the spill
 
         # Perform final efficiency calculations
-        self.calculate_file_efficiency()
+        self.accumulate_average_data()
+        results = [self.current_run_number] + self.calculate_file_efficiency()
+        self.accumulate_job_data(results)
 
         # Close the ROOT file
         root_file.Close()
 
     #@abc.abstractmethod
-    def accumulate_job_data(self):
-        """ Accumulate the job data """
+    def accumulate_average_data(self):
+        """ Accumulate data in job averages """
         pass
 
     #@abc.abstractmethod
@@ -345,7 +381,7 @@ class EfficiencyBase(object):
         pass
 
     #@abc.abstractmethod
-    def calculate_job_efficiency(self):
+    def calculate_average_efficiency(self):
         """ Calculate the job efficiency """
         pass
 
@@ -383,7 +419,7 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         self.tof_lower_cut = 27.0
         self.check_helical = True
         self.check_straight = True
-        self.cut_on_tracker_10spnt = True
+        self.cut_on_both_tracker_num_spnts = True
         self.cut_on_tracker_5spnt = True # Should always be true
 
         # Results
@@ -400,22 +436,22 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         self.bool_passed_tkds_event = False # Have all the choosen cuts passed?
 
         self.fdata = EfficiencyDataReal() # Per file data
-        self.jdata = EfficiencyDataReal() # Per job data
+        self.adata = EfficiencyDataReal() # Per job data
 
         # Other objects not reset by the clear() function
         self.n_print_calls = 0
 
-    def accumulate_job_data(self):
+    def accumulate_average_data(self):
         """ Accumulate the job data """
-        self.jdata += self.fdata
+        self.adata += self.fdata
 
     def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
-        self.fdata.calculate_efficiency()
+        return self.fdata.calculate_efficiency()
 
-    def calculate_job_efficiency(self):
+    def calculate_average_efficiency(self):
         """ Calculate the job efficiency """
-        self.jdata.calculate_efficiency()
+        return self.adata.calculate_efficiency()
 
     def check_tof(self, tof_evt):
         """ Analyse tof data. Return boolean indicating if tof cuts pass"""
@@ -676,8 +712,8 @@ class PatternRecognitionEfficiencyReal(EfficiencyBase):
         """ Print the results """
         if info_type == 'file':
             edata = self.fdata
-        elif info_type == 'job':
-            edata = self.jdata
+        elif info_type == 'average':
+            edata = self.adata
 
         if self.n_print_calls == 0:
             print '\nFile\t\t\tRecon_evt\tTOF\tTOF_SP\tTU_5pt' + \
@@ -717,7 +753,7 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
 
         # Data storage
         self.fdata = EfficiencyDataMC() # Per file data
-        self.jdata = EfficiencyDataMC() # Per job data
+        self.adata = EfficiencyDataMC() # Per job data
 
         # Other objects not reset by the clear() function
         self.n_print_calls = 0
@@ -871,17 +907,18 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
 
         return True
 
-    def accumulate_job_data(self):
-        """ Accumulate the job data """
-        self.jdata += self.fdata
+    def accumulate_average_data(self):
+        """ Accumulate data for averging over job """
+        self.adata += self.fdata
 
     def calculate_file_efficiency(self):
         """ Calculate the file efficiency """
         self.fdata.calculate_efficiency()
+        return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # NOTE Placeholder
 
-    def calculate_job_efficiency(self):
-        """ Calculate the job efficiency """
-        self.jdata.calculate_efficiency()
+    def calculate_average_efficiency(self):
+        """ Calculate the average job efficiency """
+        self.adata.calculate_efficiency()
 
     def check_tracks(self, lkup, nstations, recon_tracks):
         """ Are the recon tracks found good tracks wrt the MC data?
@@ -913,8 +950,8 @@ class PatternRecognitionEfficiencyMC(EfficiencyBase):
         """ Print the results """
         if info_type == 'file':
             edata = self.fdata
-        elif info_type == 'job':
-            edata = self.jdata
+        elif info_type == 'average':
+            edata = self.adata
 
         if self.n_print_calls == 0:
             # print '\nRecon_evt\tTUMC5\tTURG5\tTUMC45\tTURG45\tTUMC35\tTURG35',

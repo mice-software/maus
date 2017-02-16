@@ -105,6 +105,20 @@ class SciFiBasePRTrack : public TObject {
     /** Get the reconstructed reference frame momentum */
     ThreeVector get_reference_momentum() const { return _momentum; }
 
+
+    /** Set the reconstructed seed frame position */
+    void set_seed_position(ThreeVector pos) { _seed_position = pos; }
+
+    /** Get the reconstructed seed frame position */
+    ThreeVector get_seed_position() const { return _seed_position; }
+
+    /** Set the reconstructed seed frame momentum */
+    void set_seed_momentum(ThreeVector mom) { _seed_momentum = mom; }
+
+    /** Get the reconstructed seed frame momentum */
+    ThreeVector get_seed_momentum() const { return _seed_momentum; }
+
+
     /** Get the global chi-squared value */
     double get_chi_squared() const { return _chi_sq; }
 
@@ -137,6 +151,8 @@ class SciFiBasePRTrack : public TObject {
     DoubleArray _covariance;
     ThreeVector _position;   /** Reconstructed reference plane position */
     ThreeVector _momentum;   /** Reconstructed reference plane momentum */
+    ThreeVector _seed_position;   /** Reconstructed seed plane position */
+    ThreeVector _seed_momentum;   /** Reconstructed seed plane momentum */
     double _chi_sq;          /** The chisq of the fit/s which formed the track */
     int _ndf;                /** The number of degrees of freedom */
     int _charge;              /** The track charge, 0 for straights */

@@ -5,14 +5,18 @@
 import sys
 import os
 import math
+import matplotlib.pyplot as plt
+import numpy as np
 import ROOT
 import libMausCpp #pylint: disable = W0611
 import analysis.scifi_efficiency
 
 def main(args):
     args.pop(0)
-    efficiency_real(args)
+    results = efficiency_real(args)
     # efficiency_mc(args)
+    plot_data(results)
+
 
 def efficiency_real(args):
     eff_real = analysis.scifi_efficiency.PatternRecognitionEfficiencyReal()
@@ -24,6 +28,7 @@ def efficiency_real(args):
     eff_real.tof_lower_cut = 27.0
     eff_real.cut_on_tracker_10spnt = False
     eff_real.run(args)
+    return eff_real.data
 
 def efficiency_mc(args):
     eff_mc = analysis.scifi_efficiency.PatternRecognitionEfficiencyMC()
@@ -48,6 +53,34 @@ def efficiency_mc(args):
     raw_input("Press any key to finish...")
 
     return eff_mc, can
+
+def plot_data(data):
+    """ Plot the efficiency results vs run number """
+    print ' '
+    print 'Plotting results...'
+    print ' '
+
+    runs = data['run_numbers']
+    xmin = np.amin(runs) - 1
+    xmax = np.amax(runs) + 1
+    ymin = 0.0
+    ymax = 1.0
+
+    f, ax = plt.subplots()
+    ax.plot(runs, data['tkus_5spoint'], 'r+', label='TkUS 5pt')
+    ax.plot(runs, data['tkus_3to5spoint'], 'm+', label='TkUS 3-5pt')
+    ax.plot(runs, data['tkds_5spoint'], 'bo', label='TkDS 5pt')
+    ax.plot(runs, data['tkds_3to5spoint'], 'co', label='TkDS 3-5pt')
+
+    ax.set_title('Pattern Recognition Efficiency vs Run Number')
+    ax.set_xlabel('Run Number')
+    ax.set_ylabel('Efficiency')
+    ax.set_xbound(xmin, xmax)
+    ax.set_ybound(ymin, ymax)
+    ax.get_xaxis().get_major_formatter().set_useOffset(False)
+    ax.legend(loc='lower left')
+    plt.show()
+    plt.savefig('efficiency.pdf')
 
 if __name__ == "__main__":
     args = sys.argv
