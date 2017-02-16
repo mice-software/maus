@@ -18,7 +18,7 @@ This file defines the interface for all Reducers
 
 from API.IModule import IModule
 
-class IReduce(IModule):#pylint: disable=R0921
+class IReduce(IModule):
     """
     @class IReduce
     Interface for all reducer modules.

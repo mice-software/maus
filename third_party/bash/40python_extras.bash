@@ -37,7 +37,7 @@ download_package_list="\
 package_list="\
  numpy anyjson python-dateutil amqplib six \
  logilab-common logilab-astng  suds validictory nose==1.1 nose-exclude \
- coverage doxypy pylint bitarray \
+ coverage doxypy pylint==1.6.3 bitarray \
  pymongo readline matplotlib \
  pil django magickwand psutil celery \
 "

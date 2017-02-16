@@ -27,9 +27,11 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         """
         if file_name_in in TestPythonStyle.ignore_files:
             return 0
+        print 'INFO: Analysing ' + file_name_in + ', ',
         my_args = ['pylint', file_name_in, '--rcfile='+self.pylintrc]
         errors = subprocess.call(args=my_args, stdout=fout, \
                                  stderr=subprocess.STDOUT)
+        print str(errors) + ' errors found'
         return errors
 
     def in_place_filter(self, file_name): # pylint: disable=R0201
@@ -216,6 +218,4 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
 
 if __name__ == '__main__':
     unittest.main()
-
-
 
