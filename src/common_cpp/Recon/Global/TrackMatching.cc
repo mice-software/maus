@@ -505,8 +505,9 @@ void TrackMatching::MatchTOF0(
     G4NistManager* manager = G4NistManager::Instance();
     G4Material* air = manager->FindOrBuildMaterial("G4_AIR");
     double air_E_loss = GlobalTools::dEdx(air, energy, mass)*approx_travel_distance*0.5;
-    GlobalTools::changeEnergy(x_in, air_E_loss, mass);
+    GlobalTools::changeEnergy(x_in, -air_E_loss, mass);
     double velocity = (x_in[7] / x_in[4]) * CLHEP::c_light;
+
 
     // Compare reconstructed delta T with expected travel time
     // Change later to be set by datacards

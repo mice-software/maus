@@ -445,6 +445,13 @@ void propagate(double* x, double target_z, const BTField* field,
       throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
     }
+    // When propagating backwards, can get caught in material and massively increase energy
+    if (std::abs(x[4]) > 1000) {
+      std::stringstream ios;
+      ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
+            "Particle caught in material during backwards propagation", "GlobalTools::propagate"));
+    }
   }
   gsl_odeiv_evolve_free(evolve);
   gsl_odeiv_control_free(control);

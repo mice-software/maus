@@ -316,7 +316,7 @@ The GEANT4 \emph{Action} objects provide interfaces for MAUS-specific function c
 \item MAUSEventAction: sets up the running for a particular inbound particle. At the beginning of each event, the virtual planes, tracking, detectors and stepping are all cleared. After the event the event data is pulled into the event data from each element.
 \item MAUSTrackingAction: is called when a new track is created or destroyed. If \verb|keep_tracks| datacard is set to True, on particle creation, MAUSTrackingAction writes the initial and final track position and momentum to the output data tree. If \verb|keep_steps| is set to True MAUSTrackingAction gets step data from MAUSSteppingAction and writes this also.
 \item MAUSSteppingAction: is called at each step of the particle. If \verb|keep_steps| datacard is set to True, output step data is recorded. MAUSSteppingAction kills particles if they exceed the \verb|maximum_number_of_steps| datacard. MAUSSteppingAction calls the VirtualPlanes routines on each step.
-\item MAUSStackingAction: is called when a new track is created, prioritising particle tracking. Handles killing particles based on the \verb|kinetic_energy_threshold|, \verb|default_keep_or_kill| and \verb|keep_or_kill_particles| datacards.
+\item MAUSStackingAction: is called when a new track is created, prioritising particle tracking. Handles killing particles based on the \verb|kinetic_energy_threshold|, \verb|default_keep_or_kill| and\linebreak\verb|keep_or_kill_particles| datacards.
 \item MAUSPrimaryGeneratorAction: is called at the start of every event and sets the particle data for each event. In MAUS, this particle generation is handled externally and so the MAUSPrimaryGeneratorAction role is to look for the primary object on the Monte Carlo event and convert this into a GEANT4 event object.
 \end{itemize}
 
@@ -424,5 +424,3 @@ Name & Meaning \\
 \end{tabularx}
 \end{center}
 \end{table*}
-
-

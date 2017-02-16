@@ -129,7 +129,14 @@ enum PID {
   kHelium4              =  1000020040
 };
 
-
+//////////////////////////////////////////////////////////////////////
+///  @brief Defines the type of a primary chain
+///
+///  An enum to define the type of a primary chain. kUSOrphan and kDSOrphan
+///  are upstream and downstream chains whose tracks have not (yet) been matched
+///  into a through track. Once matching has occurred, matched chains will be of
+///  types kUS and kDS and a chain with type kThrough is created which has the
+///  matched US and DS chains as daughters.
 enum ChainType {
   kNoChainType = 0,
   kUS          = 1,
@@ -139,6 +146,17 @@ enum ChainType {
   kThrough     = 5
 };
 
+//////////////////////////////////////////////////////////////////////
+///  @brief Defines the multiplicity of chain children, i.e. whether there exist
+///  other chains that due to shared children are mutually exclusive with this one.
+///
+///  This attribute is only set for through chains. Most chains should be of type
+///  kUnique, meaning that that their daughter chains are theirs alone. If a chain's
+///  US daughter is shared with another chain, they will both have type kMultipleUS,
+///  for a shared DS daughter kMultipleDS. If both daughters of a chain are shared
+///  with other chains, it will have type kMultipleBoth. Note that constellations
+///  are possible where e.g. there are 3 chains, one of type kMultipleUS, one of
+///  type kMultipleDS, and the last of type kMultipleBoth.
 enum ChainChildMultiplicity {
   kUnique       = 0,
   kMultipleUS   = 1,

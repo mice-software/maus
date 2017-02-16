@@ -16,6 +16,9 @@
 """Tests for MapCppGlobalTrackMatching"""
 
 # pylint: disable = C0103
+# File is renamed because of an issue in the testing framework with geometries
+# not being reinitialized properly, that makes the test execution-order
+# dependent
 
 import os
 import json

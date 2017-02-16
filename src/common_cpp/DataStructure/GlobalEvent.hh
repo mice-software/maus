@@ -124,35 +124,53 @@ class GlobalEvent {
   void set_space_points(
       std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points);
 
+  /** Return a vector of all upstream primary chains that are not orphans */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetUSPrimaryChains() const;
 
+  /** Return a vector of all downstream primary chains that are not orphans */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetDSPrimaryChains() const;
 
+  /** Return a vector of all through primary chains */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetThroughPrimaryChains() const;
 
+  /** Return a vector of all primary chain orphans, i.e. chains whose tracks have
+   *  not been matched into a through track */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetPrimaryChainOrphans() const;
 
+  /** Return a vector of all upstream primary chain orphans, i.e. upstream chains whose tracks
+   *  have not been matched into a through track */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetUSPrimaryChainOrphans() const;
 
+  /** Return a vector of all downstream primary chain orphans, i.e. upstream chains whose tracks
+   *  have not been matched into a through track */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetDSPrimaryChainOrphans() const;
 
+  /** Return a vector of all non-through primary chains, i.e. all upstream and downstream
+   *  chains, whether they are orphans or not. */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*> GetNonThroughPrimaryChains() const;
 
+  /** Return a vector of tracks from local reconstruction, i.e. tracker and EMR tracks */
   std::vector<MAUS::DataStructure::Global::Track*> GetLRTracks() const;
 
+  /** Return a vector of tracks from local reconstruction, i.e. tracker and EMR tracks, if they
+   *  contain a hit in the selected detector. */
   std::vector<MAUS::DataStructure::Global::Track*>
       GetLRTracks(MAUS::DataStructure::Global::DetectorPoint detector) const;
 
+  /** Return a vector of space points from local reconstruction, i.e. from the
+   *  TOFs, Chkovs, and KL */
   std::vector<MAUS::DataStructure::Global::SpacePoint*> GetLRSpacePoints() const;
 
+  /** Return a vector of space points from local reconstruction corresponding to the chosen
+   *  DetectorPoint (corresponding to one of the TOFs or Chkovs or the KL */
   std::vector<MAUS::DataStructure::Global::SpacePoint*>
       GetLRSpacePoints(MAUS::DataStructure::Global::DetectorPoint detector) const;
 
  private:
-
+  /** Return all primary chains corresponding to the given type. Is called by the respective
+   *  public functions */
   std::vector<MAUS::DataStructure::Global::PrimaryChain*>
       GetPrimaryChains(MAUS::DataStructure::Global::ChainType chain_type) const;
- 
 
   /** A vector of MAUS::DataStructure::Global::PrimaryChain pointers
    *  associated with this event. Different reconstruction steps can

@@ -14,14 +14,11 @@ When the mapper MapCppTrackerMCNoise is included in the MC each channel is teste
 \subsection{Building Digits}
 When a particle crosses a scintillating fibre in the MC it may deposits some amount of energy in passing determined by Geant4.  The digitization process takes this deposited energy and transforms it into a number of PE as follows: 
 
-\begin{equation}
-NPE = Energy* SciFiFiberConvFactor *
-                 SciFiFiberTrappingEff *
-                 ( 1.0 + SciFiFiberMirrorEff ) *
-                 SciFiFiberTransmissionEff *
-                 SciFiMUXTransmissionEff *
-                 SciFivlpcQE;
-\end{equation}
+\begin{multline}
+NPE = Energy \times SciFiFiberConvFactor \times SciFiFiberTrappingEff \times \\
+      ( 1.0 + SciFiFiberMirrorEff ) \times SciFiFiberTransmissionEff \times \\
+      SciFiMUXTransmissionEff * SciFivlpcQE;
+\end{multline}
 
 \noindent
 Where the value of each of these variable other than the deposited energy is given in the data cards.

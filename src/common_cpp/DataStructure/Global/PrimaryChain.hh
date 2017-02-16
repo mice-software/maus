@@ -100,19 +100,24 @@ class PrimaryChain : public TObject {
   /// Add the fitted track to the chain. Only one can exist for each chain, so if it is already
   /// set, it is overwritten and a warning sent to Squeak::debug
   void SetFittedTrack(MAUS::DataStructure::Global::Track* track);
-  
 
   // Getters and setters for serialization
+  /// Get chain's tracks as TRefArray. This should only be used for serialization.
   TRefArray* get_tracks() const {return _tracks; }
 
+  /// Set chain's tracks as TRefArray. This should only be used for serialization.
   void set_tracks(TRefArray* tracks) { _tracks = tracks; }
 
+  /// Get chain's upstream daughter as TObject. This should only be used for serialization.
   TObject* get_us_daughter() const { return _us_daughter.GetObject(); }
 
+  /// Set chain's upstream daughter as TObject. This should only be used for serialization.
   void set_us_daughter(TObject* us_daughter) { _us_daughter = us_daughter; }
 
+  /// Get chain's downstream daughter as TObject. This should only be used for serialization.
   TObject* get_ds_daughter() const { return _ds_daughter.GetObject(); }
 
+  /// Set chain's downstream daughter as TObject. This should only be used for serialization.
   void set_ds_daughter(TObject* ds_daughter) { _ds_daughter = ds_daughter; }
 
   // Getters and Setters for the member variables
@@ -128,10 +133,13 @@ class PrimaryChain : public TObject {
   /// kNoChainType, kUS, kDS, kUSOrphan, kDSOrphan, kThrough
   void set_chain_type(MAUS::DataStructure::Global::ChainType type) { _type = type; }
 
+  /// Get the chain multiplicity
   MAUS::DataStructure::Global::ChainChildMultiplicity get_multiplicity() const {
     return _multiplicity;
   }
 
+  /// Set the chain multiplicity, options in the enum are
+  /// kUnique, kMultipleUS, kMultipleDS, kMultipleBoth
   void set_multiplicity(MAUS::DataStructure::Global::ChainChildMultiplicity multiplicity) {
     _multiplicity = multiplicity;
   }
@@ -145,7 +153,7 @@ class PrimaryChain : public TObject {
   MAUS::DataStructure::Global::ChainType _type;
 
   /// Whether the chain's daughter chains are non-unique (i.e. this and at least one
-  /// other chain are mutually exclusive
+  /// other chain are mutually exclusive)
   MAUS::DataStructure::Global::ChainChildMultiplicity _multiplicity;
 
   /// Tracks contained in the chain
@@ -156,7 +164,6 @@ class PrimaryChain : public TObject {
 
   /// DS daughter primary chain (only if this is a through chain)
   TRef _ds_daughter;
-
 
   MAUS_VERSIONED_CLASS_DEF(PrimaryChain);
 }; // ~class PrimaryChain

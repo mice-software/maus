@@ -183,22 +183,27 @@ the following:
 \begin{verbatim}
 [...]
 Geometry Number = 46
-Geometry Note   = Step I geometry consistent with the October 2011 data run. All detector descriptions consistent and up to date.
+Geometry Note   = Step I geometry consistent with the October 2011 data run. All detector
+                  descriptions consistent and up to date.
 ValidFrom       = 2011-12-01 19:17:00
 Date Created    = 2015-01-07 14:19:51.055000
 
 Geometry Number = 47
-Geometry Note   = Step I geometry consistent with the October 2013 EMR comissioning run. All detector descriptions consistent and up to date.
+Geometry Note   = Step I geometry consistent with the October 2013 EMR comissioning run.
+                  All detector descriptions consistent and up to date.
 ValidFrom       = 2013-10-06 19:17:00
 Date Created    = 2015-01-07 14:30:32.987000
 
 Geometry Number = 49
-Geometry Note   = Step IV geometry with detectors including the TOFs, Ckov, EMR, Tracker, and KL included as GDML files. Update to the EMR geometry.
+Geometry Note   = Step IV geometry with detectors including the TOFs, Ckov, EMR, Tracker,
+                  and KL included as GDML files. Update to the EMR geometry.
 ValidFrom       = 2034-01-03 19:17:00
 Date Created    = 2015-03-23 17:24:23.079000
 
 Geometry Number = 50
-Geometry Note   = Step IV geometry with detectors including the TOFs, Ckov, EMR, Tracker, and KL included as GDML files. Written for GDMLParser. Diffuser corrected to match design specification.
+Geometry Note   = Step IV geometry with detectors including the TOFs, Ckov, EMR, Tracker,
+                  and KL included as GDML files. Written for GDMLParser. Diffuser
+                  corrected to match design specification.
 ValidFrom       = 2034-05-13 19:17:00
 Date Created    = 2015-05-14 16:29:01.124000
 \end{verbatim}
@@ -231,19 +236,22 @@ removing the unformatted GDML files because that user wants to run a systematic
 study requiring reprocessing the geometry then the following command
 should be used:
 \begin{verbatim}
-> python bin/utilities/download_geometry.py --geometry_download_id 50 --geometry_download_cleanup False
+> python bin/utilities/download_geometry.py --geometry_download_id 50
+  --geometry_download_cleanup False
 \end{verbatim}
 A more complicated use is to test a prospective geometry with a
 predefined beamline setting as defined using a ``tagged'' beamline:
 \begin{verbatim}
-> python bin/utilities/download_geometry.py --geometry_download_id 50 --geometry_download_beamline_tag '6-200+M0'
+> python bin/utilities/download_geometry.py --geometry_download_id 50
+  --geometry_download_beamline_tag '6-200+M0'
 \end{verbatim}
 
 A common usage for the geometry download is to reproduce a given
 run. To simulate a representative run from the 2013 EMR run the
 following command should be used:
 \begin{verbatim}
-> python bin/utilities/download_fit_geometry.py --geometry_download_by run_number --geometry_download_run 5519
+> python bin/utilities/download_fit_geometry.py --geometry_download_by run_number
+  --geometry_download_run 5519
 \end{verbatim}
 This function reads the beamline currents from the configuration
 database and adjusts the fields of the beamline magnets appropriately.
@@ -254,10 +262,10 @@ function can be completed using the following command:
 > python bin/utilities/download_fit_geometry.py --geometry_download_by current
 \end{verbatim}
 All of these commands described will by default place the geometry in
-the directory \${MAUS\_ROOT\_DIR}/files/geometry/download. This
-directory may be changed using the
+the directory\linebreak\${MAUS\_ROOT\_DIR}/files/geometry/download. This
+directory may be changed using the\linebreak
 \verb+--geometry_download_directory+ flag. To use the downloaded
-geometry in the simulation, the \verb+--simulation_geometry_filename+
+geometry in the simulation, the\linebreak\verb+--simulation_geometry_filename+
 flag must be set to the download directory. 
 
 

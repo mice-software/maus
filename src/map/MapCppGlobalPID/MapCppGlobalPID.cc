@@ -18,6 +18,7 @@
 #include "src/map/MapCppGlobalPID/MapCppGlobalPID.hh"
 
 #include <set>
+#include <map>
 
 #include "Utils/Squeak.hh"
 #include "src/common_cpp/DataStructure/Data.hh"
@@ -175,7 +176,7 @@ namespace MAUS {
         // read in space separated list of custom selection of PIDVars
         std::istringstream ss(_custom_pid_set);
         std::string token;
-        while(std::getline(ss, token, ' ')) {
+        while (std::getline(ss, token, ' ')) {
           input_pid_vars.push_back(token);
         }
       } else {
@@ -239,7 +240,7 @@ namespace MAUS {
         // read in space separated list of custom selection of PIDVars
         std::istringstream ss(_custom_pid_set);
         std::string token;
-        while(std::getline(ss, token, ' ')) {
+        while (std::getline(ss, token, ' ')) {
           input_pid_vars.push_back(token);
         }
       } else {
@@ -310,7 +311,7 @@ namespace MAUS {
     if (!_spill->GetReconEvents()) {
       return;
     }
-    for (size_t event_i = 0; event_i < _spill->GetReconEvents()->size(); ++event_i ) {
+    for (size_t event_i = 0; event_i < _spill->GetReconEvents()->size(); ++event_i) {
       MAUS::GlobalEvent* global_event = _spill->GetReconEvents()->at(event_i)->GetGlobalEvent();
       if (!global_event) {
         continue;
@@ -344,7 +345,7 @@ namespace MAUS {
       std::vector<MAUS::DataStructure::Global::Track*> tracks = primary_chain->GetMatchedTracks();
       for (MAUS::DataStructure::Global::Track* track : tracks) {
         // doubles to hold cumulative log likelihoods for each hypothesis
-        std::map<std::string, double> logL_values = {{"e", 0.0}, {"mu", 0.0}, {"pi", 0.0}};
+        std::map<std::string, double> logL_values = { {"e", 0.0}, {"mu", 0.0}, {"pi", 0.0} };
         // Keeping track of whether the log likelihood for the PID variable
         // returned an error value. Only used for the purposes of efficiency
         // calculations, does not affect PID performance
@@ -413,6 +414,7 @@ namespace MAUS {
             // is called twice for the same chain. In this case, SetPIDTrack() will throw an error
             // message and the track will not be added to the chain.
             primary_chain->SetPIDTrack(final_pidtrack);
+            primary_chain->set_mapper_name("MapCppGlobalPID");
           }
         }
       }
@@ -487,6 +489,7 @@ namespace MAUS {
           final_pidtrack->AddTrack(ds_track);
           global_event->add_track_recursive(final_pidtrack);
           through_chain->SetPIDTrack(final_pidtrack);
+          through_chain->set_mapper_name("MapCppGlobalPID");
         }
       }
     }
@@ -536,5 +539,4 @@ namespace MAUS {
     }
     return CL;
   }
-  
 } // ~MAUS

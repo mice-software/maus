@@ -135,53 +135,27 @@ be avoided by adding windows (probably made of vacuum material) to force GEANT4 
 over the field boundary, and then restart tracking inside the field. However, such details are left for the user to
 implement.
 
-\begin{center}
-\tablefirsthead{\hline
-{\bfseries Volume} &
-\multicolumn{1}{m{4.321cm}|}{{\bfseries Dimension1}} &
-\multicolumn{1}{m{4.564cm}|}{{\bfseries Dimension2}} &
-{\bfseries Dimension3}\\}
-\tablehead{\hline
-{\bfseries Volume} &
-\multicolumn{1}{m{4.321cm}|}{{\bfseries Dimension1}} &
-\multicolumn{1}{m{4.564cm}|}{{\bfseries Dimension2}} &
-{\bfseries Dimension3}\\}
-\tabletail{}
-\tablelasttail{}
-\begin{supertabular}{|m{2.659cm}|m{4.321cm}m{4.564cm}m{5.25cm}|}
+
+\begin{table}[]
+\centering
+\caption{My caption}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|}
 \hline
-None &
-\multicolumn{3}{m{14.535cm}|}{No dimensions required. Note cannot define daughter Modules for this volume type.}\\\hline
-Cylinder &
-\multicolumn{1}{m{4.321cm}|}{Radius} &
-\multicolumn{1}{m{4.564cm}|}{Length in z} &
-Not used (leave blank)\\\hline
-Box &
-\multicolumn{1}{m{4.321cm}|}{Width in x} &
-\multicolumn{1}{m{4.564cm}|}{Height in y} &
-Length along z\\\hline
-Tube &
-\multicolumn{1}{m{4.321cm}|}{Inner Radius} &
-\multicolumn{1}{m{4.564cm}|}{Outer Radius} &
-Length in z\\\hline
-Trapezoid &
-\multicolumn{1}{m{4.321cm}|}{Half Width in x} &
-\multicolumn{1}{m{4.564cm}|}{Half Height in y} &
-Half Length in z\\\hline
-Wedge &
-\multicolumn{3}{m{14.535cm}|}{See documentation below.}\\\hline
-Polycone &
-\multicolumn{3}{m{14.535cm}|}{No dimensions required. Volume defined from external file.}\\\hline
-Quadrupole &
-\multicolumn{3}{m{14.535cm}|}{No dimensions required. Dimensions defined from module properties.}\\\hline
-Multipole &
-\multicolumn{3}{m{14.535cm}|}{No dimensions required. Dimensions defined from module properties.}\\\hline
-Boolean &
-\multicolumn{3}{m{14.535cm}|}{No dimensions required. Dimensions defined from module properties.}\\\hline
-Sphere &
-\multicolumn{3}{m{14.535cm}|}{See documentation below.}\\\hline
-\end{supertabular}
-\end{center}
+\textbf{Volume} & \textbf{Dimension1}             & \textbf{Dimension2}             & \textbf{Dimension3}                \\ \hline
+None            & \multicolumn{3}{l|}{No dimensions required. Note cannot define daughter Modules for this volume type.} \\ \hline
+Cylinder        & Radius                          & Length in z                     & Not used (leave blank)             \\ \hline
+Box             & Width in x                      & Height in y                     & Length along z                     \\ \hline
+Tube            & Inner Radius                    & Outer Radius                    & Length in z                        \\ \hline
+Trapezoid       & Half Width in x                 & Half Height in y                & Half length in z                   \\ \hline
+Wedge           & \multicolumn{3}{l|}{See documentation below.}                                                          \\ \hline
+Polycone        & \multicolumn{3}{l|}{No dimensions required. Volume defined from external file.}                        \\ \hline
+Quadrupole      & \multicolumn{3}{l|}{No dimensions required. Dimensions defined from module properties.}                \\ \hline
+Multipole       & \multicolumn{3}{l|}{No dimensions required. Dimensions defined from module properties.}                \\ \hline
+Boolean         & \multicolumn{3}{l|}{No dimensions required. Dimensions defined from module properties.}                \\ \hline
+Sphere          & \multicolumn{3}{l|}{See documentation below.}                                                          \\ \hline
+\end{tabular}
+\end{table}
 
 \subsection{Properties}
 Many of the features of MAUS that can be enabled in a module are described using properties. For example, properties
@@ -317,4 +291,3 @@ define the field.
         PropertyDouble InnerRadius    263. mm
     }
 \end{verbatim}
-
