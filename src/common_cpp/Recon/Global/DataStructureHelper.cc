@@ -53,6 +53,11 @@ using MAUS::DataStructure::Global::TrackPoint;
 using MAUS::recon::global::Detector;
 using MAUS::recon::global::Particle;
 
+std::map<std::string, GlobalDS::DetectorPoint> DataStructureHelper::_names_to_points
+                             = std::map<std::string, GlobalDS::DetectorPoint>();
+std::map<GlobalDS::DetectorPoint, std::string> DataStructureHelper::_points_to_names
+                             = std::map<GlobalDS::DetectorPoint, std::string>();
+
 const DataStructureHelper& DataStructureHelper::GetInstance() {
   static DataStructureHelper instance;
   return instance;
@@ -286,6 +291,42 @@ CovarianceMatrix DataStructureHelper::GetJsonCovarianceMatrix(
   CovarianceMatrix matrix(matrix_data);
   return matrix;
 }
+
+void DataStructureHelper::InitialiseNames() {
+    namespace Global = MAUS::DataStructure::Global;
+    _names_to_points["Undefined"] = Global::kUndefined;
+    _names_to_points["Virtual"] = Global::kVirtual;
+    _names_to_points["TOF0"] = Global::kTOF0;
+    _names_to_points["TOF0_1"] = Global::kTOF0_1;
+    _names_to_points["TOF0_2"] = Global::kTOF0_2;
+    _names_to_points["CherenkovA"] = Global::kCherenkovA;
+    _names_to_points["CherenkovB"] = Global::kCherenkovB;
+    _names_to_points["TOF1"] = Global::kTOF1;
+    _names_to_points["TOF1_1"] = Global::kTOF1_1;
+    _names_to_points["TOF1_2"] = Global::kTOF1_2;
+    _names_to_points["Tracker0"] = Global::kTracker0;
+    _names_to_points["Tracker0_1"] = Global::kTracker0_1;
+    _names_to_points["Tracker0_2"] = Global::kTracker0_2;
+    _names_to_points["Tracker0_3"] = Global::kTracker0_3;
+    _names_to_points["Tracker0_4"] = Global::kTracker0_4;
+    _names_to_points["Tracker0_5"] = Global::kTracker0_5;
+    _names_to_points["Tracker1"] = Global::kTracker1;
+    _names_to_points["Tracker1_1"] = Global::kTracker1_1;
+    _names_to_points["Tracker1_2"] = Global::kTracker1_2;
+    _names_to_points["Tracker1_3"] = Global::kTracker1_3;
+    _names_to_points["Tracker1_4"] = Global::kTracker1_4;
+    _names_to_points["Tracker1_5"] = Global::kTracker1_5;
+    _names_to_points["TOF2"] = Global::kTOF2;
+    _names_to_points["TOF2_1"] = Global::kTOF2_1;
+    _names_to_points["TOF2_2"] = Global::kTOF2_2;
+    _names_to_points["Calorimeter"] = Global::kCalorimeter;
+    _names_to_points["EMR"] = Global::kEMR;
+    typedef std::map<std::string, GlobalDS::DetectorPoint>::iterator names_it;
+    for (names_it it = _names_to_points.begin(); it != _names_to_points.end(); ++it) {
+        _points_to_names[it->second] = it->first;
+    }
+}
+
 
 }  // namespace global
 }  // namespace recon

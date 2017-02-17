@@ -327,7 +327,6 @@ void propagate(double* x, double target_z, const BTField* field,
   double mass = recon::global::Particle::GetInstance().GetMass(pid);
   G4Navigator* g4navigator = G4TransportationManager::GetTransportationManager()
       ->GetNavigatorForTracking();
-  G4NistManager* manager = G4NistManager::Instance();
   bool backwards = false;
   // If we propagate backwards, reverse momentum 4-vector
   if (target_z < x[3]) {
@@ -356,8 +355,7 @@ void propagate(double* x, double target_z, const BTField* field,
   double z = x[3];
   // The next 2 lines take ~8ms to execute, perhaps consider moving these outside
   // of this function somehow?
-  GeometryNavigator geometry_navigator;
-  geometry_navigator.Initialise(g4navigator->GetWorldVolume());
+  GeometryNavigator* geometry_navigator = Globals::GetMCGeometryNavigator();
   while (fabs(z - target_z) > 1e-6) {
     n_steps++;
     h = step_size*prop_dir; // revert step size as large step size problematic for dEdx
@@ -376,8 +374,7 @@ void propagate(double* x, double target_z, const BTField* field,
       // We need to check if we're in a material with high stopping power, and if yes,
       // decrease the step size as otherwise the underestimated path length due to the
       // curved trajectory will cause problems
-      double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
-          )->GetElectronDensity();
+      double n_e = geometry_navigator->GetMaterial()->GetElectronDensity();
       double max_h = 100.0;
       if (n_e > 1e+18) {
         max_h = 1.0*prop_dir;
@@ -404,12 +401,12 @@ void propagate(double* x, double target_z, const BTField* field,
       status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
                                         target_z, &h, x);
       // Calculate energy loss for the step
-      geometry_navigator.SetPoint(ThreeVector((x[1] + x_prev[1])/2,
+      geometry_navigator->SetPoint(ThreeVector((x[1] + x_prev[1])/2,
                                   (x[2] + x_prev[2])/2, (x[3] + x_prev[3])/2));
       double step_distance = std::sqrt((x[1]-x_prev[1])*(x[1]-x_prev[1]) +
                                        (x[2]-x_prev[2])*(x[2]-x_prev[2]) +
                                        (x[3]-x_prev[3])*(x[3]-x_prev[3]));
-      G4Material* material = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName());
+      G4Material* material = geometry_navigator->GetMaterial();
       double step_energy_loss = dEdx(material, x[4], mass)*step_distance;
       changeEnergy(x, step_energy_loss, mass);
     } else {

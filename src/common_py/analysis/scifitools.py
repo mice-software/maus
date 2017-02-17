@@ -5,6 +5,20 @@
 import os
 import libMausCpp #pylint: disable = W0611
 
+def extract_run_number(filename):
+    """ Extract the run number from the file name assuming a format 
+        xxxx_recon.root where xxxx is the run number """
+    # Check if a directory appears in the string, and if so remove
+    splitname = os.path.split(filename)
+    fname = splitname[1]
+    run_number = -1
+    try:
+        run_number = int(fname[0:5])
+    except ValueError:
+        print 'WARNING: Unexpected file name format, ',
+        print 'will not be able to extract run number'
+    return run_number
+
 def load_data(files):
     """ Load data from files. If a dir is given, search recursively """
     if type(files) is not list:

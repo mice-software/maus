@@ -169,6 +169,8 @@ class SciFiGeometryHelper {
 
   ThreeVector FindReferenceFramePosition(int tracker) const;
 
+  double GetSeedDistance(int tracker) const;
+
   double GetChannelWidth() const { return FibreParameters.Pitch; }
 
   const SciFiMaterialParams& GetFibreParameters() const { return FibreParameters; }

@@ -22,9 +22,9 @@ SciFiEvent::SciFiEvent() {
   _scifidigits.resize(0);
   _scificlusters.resize(0);
   _scifispacepoints.resize(0);
-  _scifiseeds.resize(0);
   _scifistraightprtracks.resize(0);
   _scifihelicalprtracks.resize(0);
+  _scifiseeds.resize(0);
   _scifitracks.resize(0);
   _mean_Bz_upstream = 0.0;
   _mean_Bz_downstream = 0.0;
@@ -85,24 +85,6 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
     _scifispacepoints[i]->set_channels_pointers(new_clusters);
   }
 
-  // Deep copy the seeds
-  _scifiseeds.resize(rhs._scifiseeds.size());
-  for (unsigned int i = 0; i < rhs._scifiseeds.size(); ++i) {
-    _scifiseeds[i] = new SciFiSpacePoint(*rhs._scifiseeds[i]);
-    // Now set cross-pointers so they point to correct place in the new copy of the datastructure
-    SciFiClusterPArray new_clusters(rhs._scifiseeds[i]->get_channels()->GetLast() + 1);
-    for (unsigned int j = 0; j < new_clusters.size(); ++j) {
-        new_clusters[j] = NULL;
-        for (unsigned int k = 0; k < rhs._scificlusters.size(); ++k) {
-            if (rhs._scifiseeds[i]->get_channels()->At(j) == rhs._scificlusters[k]) {
-                new_clusters[j] = _scificlusters[k];
-                break;
-            }
-        }
-    }
-    _scifiseeds[i]->set_channels_pointers(new_clusters);
-  }
-
   // Deep copy the straight pattern recognition tracks
   _scifistraightprtracks.resize(rhs._scifistraightprtracks.size());
   for (unsigned int i = 0; i < rhs._scifistraightprtracks.size(); ++i) {
@@ -138,6 +120,12 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
       }
     }
     _scifihelicalprtracks[i]->set_spacepoints_pointers(new_sps);
+  }
+
+  // Deep copy the seeds
+  _scifiseeds.resize(rhs._scifiseeds.size());
+  for (unsigned int i = 0; i < rhs._scifiseeds.size(); ++i) {
+    _scifiseeds[i] = new SciFiSeed(*rhs._scifiseeds[i]);
   }
 
   // Deep copy the kalman tracks
@@ -195,11 +183,6 @@ SciFiEvent::~SciFiEvent() {
     delete (*spoint);
   }
 
-  std::vector<SciFiSpacePoint*>::iterator seed;
-  for (seed = _scifiseeds.begin(); seed!= _scifiseeds.end(); ++seed) {
-    delete (*seed);
-  }
-
   std::vector<SciFiStraightPRTrack*>::iterator strack;
   for (strack = _scifistraightprtracks.begin();
        strack!= _scifistraightprtracks.end(); ++strack) {
@@ -210,6 +193,11 @@ SciFiEvent::~SciFiEvent() {
   for (htrack = _scifihelicalprtracks.begin();
        htrack!= _scifihelicalprtracks.end(); ++htrack) {
     delete (*htrack);
+  }
+
+  std::vector<SciFiSeed*>::iterator seed;
+  for (seed = _scifiseeds.begin(); seed!= _scifiseeds.end(); ++seed) {
+    delete (*seed);
   }
 
   std::vector<SciFiTrack*>::iterator track;
@@ -253,14 +241,6 @@ void SciFiEvent::clear_spacepoints() {
   _scifispacepoints.resize(0);
 }
 
-void SciFiEvent::clear_seeds() {
-  std::vector<SciFiSpacePoint*>::iterator it;
-  for (it = _scifiseeds.begin(); it != _scifiseeds.end(); ++it) {
-    delete (*it);
-  }
-  _scifiseeds.resize(0);
-}
-
 void SciFiEvent::clear_stracks() {
   std::vector<SciFiStraightPRTrack*>::iterator it;
   for (it = _scifistraightprtracks.begin(); it != _scifistraightprtracks.end(); ++it) {
@@ -275,6 +255,14 @@ void SciFiEvent::clear_htracks() {
     delete (*it);
   }
   _scifihelicalprtracks.resize(0);
+}
+
+void SciFiEvent::clear_seeds() {
+  std::vector<SciFiSeed*>::iterator it;
+  for (it = _scifiseeds.begin(); it != _scifiseeds.end(); ++it) {
+    delete (*it);
+  }
+  _scifiseeds.resize(0);
 }
 
 void SciFiEvent::clear_scifitracks() {

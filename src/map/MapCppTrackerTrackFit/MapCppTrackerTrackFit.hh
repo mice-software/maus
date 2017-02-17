@@ -44,6 +44,7 @@
 
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/Spill.hh"
+#include "src/common_cpp/DataStructure/SciFiSeed.hh"
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrackFit.hh"
 #include "src/common_cpp/Recon/Kalman/KalmanTrack.hh"
@@ -98,7 +99,9 @@ class MapCppTrackerTrackFit : public MapBase<Data> {
    *
    *  \param evt the current SciFiEvent
    */
-  void track_fit(MAUS::SciFiEvent &evt) const;
+  SciFiTrack* track_fit_helix(MAUS::SciFiSeed* seed) const;
+
+  SciFiTrack* track_fit_straight(MAUS::SciFiSeed* seed) const;
 
   /** 
     * @brief Rates the track based on the outcome of the reconstruction

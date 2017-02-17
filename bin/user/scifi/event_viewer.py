@@ -821,6 +821,9 @@ def draw_sz(t1_z, t1_s, t2_z, t2_s, t1_fits, t2_fits, can):
     mg1 = ROOT.TMultiGraph()
     if ( len(t1_fits) > 0 ):
         for i, z_per_track in enumerate(t1_z):
+            if ( i > (len(t1_s) - 1) ):
+                print 'WARNING: draw_sz: s array range exceed'
+                break
             t1_sz_graph = ROOT.TGraph(len(z_per_track), z_per_track, t1_s[i])
             t1_sz_graph.SetMarkerStyle(20)
             t1_sz_graph.SetMarkerColor(ROOT.kBlack)
@@ -836,6 +839,9 @@ def draw_sz(t1_z, t1_s, t2_z, t2_s, t1_fits, t2_fits, can):
     mg2 = ROOT.TMultiGraph()
     if ( len(t2_fits) > 0 ):
         for i, z_per_track in enumerate(t2_z):
+            if ( i > (len(t2_s) - 1) ):
+                print 'WARNING: draw_sz: s array range exceed'
+                break
             t2_sz_graph = ROOT.TGraph(len(z_per_track), z_per_track, t2_s[i])
             t2_sz_graph.SetMarkerStyle(20)
             t2_sz_graph.SetMarkerColor(ROOT.kBlack)
