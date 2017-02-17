@@ -60,6 +60,7 @@ class test_cad_import(unittest.TestCase): #pylint: disable = C0103, R0904
         second,  test it raises an error when it isn't an xml or gdml file
         """
         try:
+            # pylint: disable = E1120
             self.constuctor = CADImport(xsl = self.xslt)
             self.assertTrue(False, "should have raised an exception")
         except: #pylint: disable = W0702

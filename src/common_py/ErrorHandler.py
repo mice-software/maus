@@ -85,7 +85,7 @@ class ErrorHandler:
         branch is appended with <exception type>: <exception message>.
         """
         if doc == None:
-            raise
+            raise # pylint: disable = E0704
         class_name = "<unknown caller>"
         if caller == None:
             pass

@@ -17,7 +17,7 @@ def extract_run_number(filename):
     except ValueError:
         print 'WARNING: Unexpected file name format, ',
         print 'will not be able to extract run number'
-      return run_number
+    return run_number
 
 def load_data(files):
     """ Load data from files. If a dir is given, search recursively """
