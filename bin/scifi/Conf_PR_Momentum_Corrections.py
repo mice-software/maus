@@ -19,7 +19,7 @@ import os
 
 output_root_file_name = "maus_output_PR_momentum_corrections.root"
 
-simulation_geometry_filename = "bin/SciFi/SciFi_Test_Geometry.dat"
+simulation_geometry_filename = "bin/scifi/SciFi_Test_Geometry.dat"
 geometry_use_active_rotations = True
 
 

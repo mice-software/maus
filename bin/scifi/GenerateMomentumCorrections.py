@@ -15,7 +15,7 @@ import MAUS # MAUS libraries
 
 # pylint: disable = C0103
 config_file = os.path.join(os.getenv("MAUS_ROOT_DIR"),
-                                   "bin/SciFi/Conf_PR_Momentum_Corrections.py")
+                                   "bin/scifi/Conf_PR_Momentum_Corrections.py")
 
 def run():
     """ Run the macro
