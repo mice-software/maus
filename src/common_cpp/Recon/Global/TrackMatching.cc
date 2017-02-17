@@ -37,8 +37,8 @@ namespace global {
 TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
     std::string pid_hypothesis_string, int beamline_polarity,
     std::map<std::string, std::pair<double, double> > matching_tolerances,
-    double max_step_size, std::pair<bool, std::map<std::string, double> > no_check_settings,
-    bool energy_loss) {
+    double max_step_size, std::pair<bool, bool> no_check_settings,
+    bool energy_loss, bool residuals) {
   _global_event = global_event;
   _mapper_name = mapper_name;
   _pid_hypothesis_string = pid_hypothesis_string;
@@ -47,6 +47,7 @@ TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
   _max_step_size = max_step_size;
   _energy_loss = energy_loss;
   _no_check_settings = no_check_settings;
+  _residuals = residuals;
 }
 
 void TrackMatching::USTrack() {
@@ -101,6 +102,7 @@ void TrackMatching::USTrack() {
           new DataStructure::Global::Track();
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching");
       hypothesis_track->set_pid(pids[i]);
+      hypothesis_track->set_p_value(tracker0_track->get_p_value());
       // No matching criterion for Cherenkov hits, so if they exist, we add them
       if (CkovA_sp.size() > 0) {
         Squeak::mout(Squeak::debug) << "TrackMatching: CkovA Added" << std::endl;
@@ -187,7 +189,7 @@ void TrackMatching::DSTrack() {
   // Here we check whether we actually want to use propagation for TrackMatching
   // or if we can just assume that all hits are from the same particle
   bool no_check = false;
-  if (_no_check_settings.first) {
+  if (_no_check_settings.second) {
     if (scifi_track_array->size() == 1 and TOF2_sp.size() < 2 and KL_sp.size() < 2 and
         emr_track_array->size() < 2) {
       no_check = true;
@@ -222,6 +224,7 @@ void TrackMatching::DSTrack() {
           new DataStructure::Global::Track();
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching");
       hypothesis_track->set_pid(pids[i]);
+      hypothesis_track->set_p_value(tracker1_track->get_p_value());
 
       // This time we add in the tracker trackpoints first
       double mass = Particle::GetInstance().GetMass(pids[i]);
@@ -292,6 +295,10 @@ void TrackMatching::DSTrack() {
 }
 
 void TrackMatching::throughTrack() {
+  ofstream throughfile;
+  if (_residuals) {
+    throughfile.open("match_through.csv", std::ios::out | std::ios::app);
+  }
   std::vector<DataStructure::Global::PrimaryChain*> us_chains =
       _global_event->GetUSPrimaryChainOrphans();
   std::vector<DataStructure::Global::PrimaryChain*> ds_chains =
@@ -319,6 +326,9 @@ void TrackMatching::throughTrack() {
         double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
             DataStructure::Global::kTOF2);
         double TOFdT = TOF2_time - TOF1_time;
+        if (_residuals) {
+          throughfile << TOFdT/_matching_tolerances.at("TOF12dT").second << "\n";
+        }
         if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
             (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
           DataStructure::Global::Track* through_track = new DataStructure::Global::Track();
@@ -439,6 +449,14 @@ void TrackMatching::MatchTrackPoint(
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
   double x_in[] = {0., position.X(), position.Y(), position.Z(),
                    energy, momentum.X(), momentum.Y(), momentum.Z()};
+  ofstream tof1file;
+  ofstream tof2file;
+  ofstream klfile;
+  if (_residuals) {
+    tof1file.open("match_tof1.csv", std::ios::out | std::ios::app);
+    tof2file.open("match_tof2.csv", std::ios::out | std::ios::app);
+    klfile.open("match_kl.csv", std::ios::out | std::ios::app);
+  }
   if (spacepoints.size() > 0) {
     double target_z = spacepoints.at(0)->get_position().Z();
     try {
@@ -455,6 +473,15 @@ void TrackMatching::MatchTrackPoint(
       // Temporary container for trackpoints for checking if multiple matches are compatible
       std::vector<DataStructure::Global::SpacePoint*> temp_spacepoints;
       for (size_t i = 0; i < spacepoints.size(); i++) {
+        if (_residuals) {
+          if (detector_name == "TOF1") {
+            tof1file << spacepoints.at(i)->get_position().X() - x_in[1] << " " << spacepoints.at(i)->get_position().Y() - x_in[2] << "\n";
+          } else if (detector_name == "TOF2") {
+            tof2file << spacepoints.at(i)->get_position().X() - x_in[1] << " " << spacepoints.at(i)->get_position().Y() - x_in[2] << "\n";
+          } else if (detector_name == "KL") {
+            klfile << spacepoints.at(i)->get_position().Y() - x_in[2] << " " << x_in[4] << "\n";
+          }
+        }
         // Check if TrackPoints match and if yes, collect them to later check for consistency
         if (GlobalTools::approx(x_in[1], spacepoints.at(i)->get_position().X(),
                 _matching_tolerances.at(detector_name).first) and
@@ -484,6 +511,10 @@ void TrackMatching::MatchTOF0(
     const std::vector<DataStructure::Global::SpacePoint*> &spacepoints,
     DataStructure::Global::PID pid, BTFieldConstructor* field,
     DataStructure::Global::Track* hypothesis_track) {
+  ofstream tof0file;
+  if (_residuals) {
+    tof0file.open("match_tof0.csv", std::ios::out | std::ios::app);
+  }
   double mass = Particle::GetInstance().GetMass(pid);
   double energy = ::sqrt(momentum.Rho()*momentum.Rho() + mass*mass);
   if (spacepoints.size() > 0) {
@@ -517,6 +548,9 @@ void TrackMatching::MatchTOF0(
     std::vector<DataStructure::Global::SpacePoint*> temp_spacepoints;
     for (size_t i = 0; i < spacepoints.size(); i++) {
       double deltaT = tof1_t - spacepoints.at(i)->get_position().T();
+      if (_residuals) {
+        tof0file << deltaT - (z_distance/velocity) << " " << deltaT + x_in[0] << "\n";
+      }
       if (deltaT > deltaTMin and deltaT < deltaTMax) {
         temp_spacepoints.push_back(spacepoints.at(i));
         Squeak::mout(Squeak::debug) << "TrackMatching: TOF0 Match"
@@ -544,6 +578,10 @@ void TrackMatching::MatchEMRTrack(
   // care with multiple matches and will just stop iterating after the first
   // match
   bool matched = false;
+  ofstream emrfile;
+  if (_residuals) {
+    emrfile.open("match_emr.csv", std::ios::out | std::ios::app);
+  }
   for (auto emr_track_iter = emr_track_array->begin();
        emr_track_iter != emr_track_array->end();
        ++emr_track_iter) {
@@ -557,12 +595,11 @@ void TrackMatching::MatchEMRTrack(
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
                              _energy_loss);
-      if (GlobalTools::approx(x_in[1], first_hit_pos.X(),
-                              first_hit_pos_err.X()*::sqrt(12)*
-                              _matching_tolerances.at("EMR").first) and
-          GlobalTools::approx(x_in[2], first_hit_pos.Y(),
-                              first_hit_pos_err.Y()*::sqrt(12)*
-                              _matching_tolerances.at("EMR").second)) {
+      if (_residuals) {
+        emrfile << first_hit_pos.X() - x_in[1] << " " << first_hit_pos.Y() - x_in[2] << "\n";
+      }
+      if (GlobalTools::approx(x_in[1], first_hit_pos.X(), _matching_tolerances.at("EMR").first) and
+          GlobalTools::approx(x_in[2], first_hit_pos.Y(), _matching_tolerances.at("EMR").second)) {
         matched = true;
         Squeak::mout(Squeak::debug) << "TrackMatching: EMR Match" << std::endl;
         hypothesis_track->set_emr_range_primary(

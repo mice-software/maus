@@ -38,6 +38,7 @@ namespace global {
 	new MAUS::DataStructure::Global::Track();
       ImportSciFiTrack(scifi_track, GlobalSciFiTrack, mapper_name);
       GlobalSciFiTrack->set_mapper_name(mapper_name);
+      GlobalSciFiTrack->set_p_value(scifi_track->P_value());
       global_event->add_track_recursive(GlobalSciFiTrack);
     }
   }

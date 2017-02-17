@@ -85,10 +85,12 @@ namespace MAUS {
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
     /// Whether matching should not be performed with only one hit per detector
-    /// + thresholds for possible noise hits that will trigger matching either way
-    std::pair<bool, std::map<std::string, double> > _no_check_settings;
+    /// (first value for upstream, second for downstream)
+    std::pair<bool, bool> _no_check_settings;
     /// Should the RK4 include energy loss
     bool _energy_loss;
+    /// Should residuals be generated during track matching
+    bool _residuals;
 
     bool _through_matching;
     /// Mapper name

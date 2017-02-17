@@ -95,6 +95,11 @@ TrackProcessor::TrackProcessor()
         "goodness_of_fit", &_double_proc,
         &MAUS::DataStructure::Global::Track::get_goodness_of_fit,
         &MAUS::DataStructure::Global::Track::set_goodness_of_fit, true);
+
+    RegisterValueBranch(
+        "p_value", &_double_proc,
+        &MAUS::DataStructure::Global::Track::get_p_value,
+        &MAUS::DataStructure::Global::Track::set_p_value, false);
 }
 
 } // ~namespace Global

@@ -58,8 +58,9 @@ namespace global {
                   int beamline_polarity,
                   std::map<std::string, std::pair<double, double> >
                   matching_tolerances, double max_step_size,
-                  std::pair<bool, std::map<std::string, double> > no_check_settings,
-                  bool energy_loss = true);
+                  std::pair<bool, bool> no_check_settings,
+                  bool energy_loss = true,
+                  bool residuals = false);
 
     /// Destructor
     ~TrackMatching() {}
@@ -276,14 +277,17 @@ namespace global {
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
 
     /// Whether matching should not be performed with only one hit per detector
-    /// + thresholds for possible noise hits that will trigger matching either way
-    std::pair<bool, std::map<std::string, double> > _no_check_settings;
+    /// (first value for upstream, second for downstream)
+    std::pair<bool, bool> _no_check_settings;
 
     /// Maximum stepsize for the RK4 propagation
     double _max_step_size;
 
     /// Should the RK4 include energy loss
     bool _energy_loss;
+
+    /// Should residuals be generated during track matching
+    bool _residuals;
 
     /// The global event to be processed
     GlobalEvent* _global_event;

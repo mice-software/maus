@@ -45,7 +45,8 @@ Track::Track()
       _emr_range_secondary(0.),
       _emr_plane_density(0.),
       _pid_confidence_level(0.),
-      _goodness_of_fit(0.) {
+      _goodness_of_fit(0.),
+      _p_value(0.) {
   _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
 }
@@ -64,7 +65,8 @@ Track::Track(const Track &track)
       _emr_range_secondary(track.get_emr_range_secondary()),
       _emr_plane_density(track.get_emr_plane_density()),
       _pid_confidence_level(track.get_pid_confidence_level()),
-      _goodness_of_fit(track.get_goodness_of_fit()) {
+      _goodness_of_fit(track.get_goodness_of_fit()),
+      _p_value(track.get_p_value()) {
   _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
 }
@@ -93,6 +95,7 @@ Track& Track::operator=(const Track &track) {
   _emr_plane_density    = track.get_emr_plane_density();
   _pid_confidence_level = track.get_pid_confidence_level();
   _goodness_of_fit      = track.get_goodness_of_fit();
+  _p_value              = track.get_p_value();
 
   return *this;
 }
@@ -132,6 +135,7 @@ Track* Track::Clone() const {
 
   trackNew->set_pid_confidence_level(this->get_pid_confidence_level());
   trackNew->set_goodness_of_fit(this->get_goodness_of_fit());
+  trackNew->set_p_value(this->get_p_value());
 
   return trackNew;
 }
@@ -503,6 +507,14 @@ void Track::set_goodness_of_fit(double goodness_of_fit) {
 
 double Track::get_goodness_of_fit() const {
   return _goodness_of_fit;
+}
+
+void Track::set_p_value(double p_value) {
+  _p_value = p_value;
+}
+
+double Track::get_p_value() const {
+  return _p_value;
 }
 
 } // ~namespace Global

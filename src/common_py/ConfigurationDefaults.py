@@ -44,7 +44,7 @@ output_root_file_name = "maus_output.root"
 # (Note present version emits selected spills for all input run numbers)
 # e.g. selected_spills = [ 2, 34, 432, 3464 ]
 selected_spills = []
-data_maximum_reference_count = 200
+data_maximum_reference_count = 110
 
 # one_big_file - puts everything in output_root_file_name
 # one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like
@@ -806,8 +806,8 @@ track_matching_tolerances = {
   "TOF2x":40.0,
   "TOF2y":40.0,
   "KLy":32.0,
-  "EMRx":1.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
-  "EMRy":1.0,
+  "EMRx":40.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
+  "EMRy":40.0,
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
   "TOF12minSpeed":0.5,
 }
@@ -815,18 +815,18 @@ track_matching_tolerances = {
 # Whether to use energy loss calculations for global track matching
 track_matching_energy_loss = True
 # Whether propagation matching should not be performed if each detector has no more than one hit
-track_matching_no_single_event_check = True
-# Additional restriction on the above, still perform matching if some of the hits may be noise
-# due to a small charge deposit. CURRENTLY NOT IN USE
-track_matching_check_charge_thresholds = {
-  "TOF0":0.0,
-  "TOF1":0.0,
-  "TOF2":0.0,
-  "KL":0.0
+track_matching_no_single_event_check = {
+  "Upstream":False,
+  "Downstream":False
 }
 
 # Whether through matchings should be performed
 track_matching_through_matching = True
+
+# Whether residuals should be generated during track matching. In this case,
+# track_matching_pid_hypothesis should be set to the most common PID expected in the beam.
+# Output files will be placed in the directory in which MAUS is executed.
+track_matching_residuals = False
 
 # Whether multiple adjacent cell hits in the KL should be merged into single spacepoints on import
 # into the global datastructure

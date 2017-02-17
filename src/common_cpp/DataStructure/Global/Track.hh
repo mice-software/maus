@@ -251,6 +251,12 @@ class Track : public TObject {
   /// Get the goodness of fit variable, #_goodness_of_fit.
   double get_goodness_of_fit() const;
 
+  /// Set the p-value of the tracker track from which this track came
+  void set_p_value(double p_value);
+
+  /// Get the p-value of the tracker track from which this track came
+  double get_p_value() const;
+
  private:
 
   /// Push a MAUS::DataStructure::Global::TrackPoint* into the #_track_points
@@ -310,6 +316,9 @@ class Track : public TObject {
 
   /// The confidence level of the PID assigned to this track
   double _pid_confidence_level;
+
+  /// The p-value of the tracker track from which this track came (only for non-through tracks)
+  double _p_value;
 
   MAUS_VERSIONED_CLASS_DEF(Track);
 }; // ~class Track
