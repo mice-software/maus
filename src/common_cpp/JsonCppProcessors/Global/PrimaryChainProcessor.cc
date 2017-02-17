@@ -55,7 +55,6 @@ PrimaryChainProcessor::PrimaryChainProcessor() {
       &MAUS::DataStructure::Global::PrimaryChain::get_tracks,
       &MAUS::DataStructure::Global::PrimaryChain::set_tracks,
       true);
-
 }
 } // ~namespace Global
 } // ~namespace Processor

@@ -477,5 +477,4 @@ std::vector<MAUS::DataStructure::Global::SpacePoint*>
   }
   return lr_spacepoints;
 }
-
 }

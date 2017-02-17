@@ -623,7 +623,6 @@ TEST_F(TrackMatchingTest, CheckChainMultiplicity) {
   EXPECT_EQ(chain_through2.get_multiplicity(), DataStructure::Global::kMultipleDS);
   EXPECT_EQ(chain_through3.get_multiplicity(), DataStructure::Global::kMultipleBoth);
 }
-
 }
 }
 } // ~namespace MAUS
