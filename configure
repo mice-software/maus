@@ -178,7 +178,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
      
      # maus common
-     export PYTHONPATH="\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
+     export PYTHONPATH="\$MAUS_ROOT_DIR/src/:\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
 
      # python scripts for running doxygen
