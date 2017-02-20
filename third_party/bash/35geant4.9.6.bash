@@ -60,11 +60,16 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         mkdir ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         tar xfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/source/
-        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+
+        echo
+        echo "INFO: Fix the data download url"
+        echo
+        sed -i 's/http:\/\/geant4.cern.ch\//http:\/\/cern.ch\/geant4\//g' ${MAUS_ROOT_DIR}/third_party/source/${directory}/cmake/Modules/Geant4InstallData.cmake
 
         echo
         echo "INFO: Generating make files:"
         echo
+        cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
         sleep 1
         cmake -DCMAKE_INSTALL_PREFIX=${MAUS_ROOT_DIR}/third_party/install/ -DEXPAT_INCLUDE_DIR=${MAUS_ROOT_DIR}/third_party/install/include -DEXPAT_LIBRARY=${MAUS_ROOT_DIR}/third_party/install/lib/libexpat.so -DXERCESC_ROOT_DIR=${MAUS_ROOT_DIR}/third_party/install -DGEANT4_INSTALL_DATA=ON ${MAUS_ROOT_DIR}/third_party/source/${directory}
         echo
