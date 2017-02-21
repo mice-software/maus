@@ -5,6 +5,10 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.8.2
+  The following changes were made:
+    - Tracker: Kalman: speed improvement by catching unhandled exception
+    - analyze_data_offline: bug fix - added new tracker module
 MAUS-v2.8.1
   The following changes were made:
     - Third party: GEANT4: updated data download url
