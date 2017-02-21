@@ -224,7 +224,11 @@ namespace MAUS {
     start_vector = old_filtered.GetVector();
     start_cov = old_filtered.GetCovariance();
 
-    _calculateBasePropagator(start, end, propagator);
+    try {
+      _calculateBasePropagator(start, end, propagator);
+    } catch (Exceptions::Exception& e) {
+      std::cerr << e.what();
+    }
 
     end_vector = propagator * start_vector;
 
@@ -249,7 +253,11 @@ namespace MAUS {
 
     start_vector = old_filtered.GetVector();
 
-    _calculateBasePropagator(start, end, propagator);
+    try {
+      _calculateBasePropagator(start, end, propagator);
+    }  catch (Exceptions::Exception& e) {
+      std::cerr << e.what();
+    }
     if (_correct_Pz) {
       _applyPzCorrections(propagator, start_vector);
     }
