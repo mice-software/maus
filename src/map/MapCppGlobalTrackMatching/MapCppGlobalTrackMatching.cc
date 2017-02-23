@@ -125,8 +125,9 @@ namespace MAUS {
 
       if (global_event) {
         recon::global::TrackMatching
-            track_matching(global_event, _mapper_name, _pid_hypothesis_string, _beamline_polarity,
-                           _matching_tolerances, 20.0, _no_check_settings, _energy_loss, _residuals);
+            track_matching(global_event, _mapper_name, _pid_hypothesis_string,
+                           _beamline_polarity, _matching_tolerances, 20.0,
+                           _no_check_settings, _energy_loss, _residuals);
         track_matching.USTrack();
         track_matching.DSTrack();
         if (_through_matching) {

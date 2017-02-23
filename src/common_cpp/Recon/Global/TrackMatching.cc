@@ -475,9 +475,11 @@ void TrackMatching::MatchTrackPoint(
       for (size_t i = 0; i < spacepoints.size(); i++) {
         if (_residuals) {
           if (detector_name == "TOF1") {
-            tof1file << spacepoints.at(i)->get_position().X() - x_in[1] << " " << spacepoints.at(i)->get_position().Y() - x_in[2] << "\n";
+            tof1file << spacepoints.at(i)->get_position().X() - x_in[1] << " "
+                     << spacepoints.at(i)->get_position().Y() - x_in[2] << "\n";
           } else if (detector_name == "TOF2") {
-            tof2file << spacepoints.at(i)->get_position().X() - x_in[1] << " " << spacepoints.at(i)->get_position().Y() - x_in[2] << "\n";
+            tof2file << spacepoints.at(i)->get_position().X() - x_in[1] << " "
+                     << spacepoints.at(i)->get_position().Y() - x_in[2] << "\n";
           } else if (detector_name == "KL") {
             klfile << spacepoints.at(i)->get_position().Y() - x_in[2] << " " << x_in[4] << "\n";
           }
