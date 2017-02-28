@@ -18,7 +18,7 @@ There are a number of properties that are applicable to any MiceModule.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\begin{supertabular}{|m{3cm}|m{1.278cm}|m{10.5cm}|}
 \hline
 Material &
 string &
@@ -26,7 +26,7 @@ The material that the volume is made up from\\\hline
 Invisible &
 bool &
 Set to 1 to make the object invisible in visualisation, or 0 to make the object visible.\\\hline
-\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+\multicolumn{2}{m{4.478cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3cm}|m{1.278cm}}
 
 RedColour &
 double\\\hline
@@ -40,7 +40,7 @@ Alter the colour of objects as they are visualised\\\hhline{~~-}
 G4StepMax &
 double &
 The maximum step length that Geant4 can make in the volume. Inherits values from the parent volumes.\\\hline
-\multicolumn{2}{m{5.143cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.278cm}}
+\multicolumn{2}{m{4.478cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3cm}|m{1.278cm}}
 
 G4TrackMax &
 double\\\hline
@@ -91,7 +91,7 @@ properties can be used to parameterise special virtual detectors.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.3579999cm}|m{11.973001cm}|}
+\begin{supertabular}{|m{3.665cm}|m{1.3579999cm}|m{10cm}|}
 \hline
 \multicolumn{2}{m{5.223cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.665cm}|m{1.3579999cm}}
 
@@ -159,7 +159,7 @@ physical plane with some arbitrary rotation and translation.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.3579999cm}|m{11.973001cm}|}
+\begin{supertabular}{|m{3.665cm}|m{1.3579999cm}|m{10cm}|}
 \hline
 {\itshape IndependentVariable} &
 String &
@@ -225,7 +225,7 @@ The The EnvelopeOut properties are used to make output from the envelope for use
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.3579999cm}|m{11.973001cm}|}
+\begin{tabular}{|m{3.665cm}|m{1.3579999cm}|m{10cm}|}
 \hline
 {\itshape EnvelopeOut1\_Name} &
 String &
@@ -237,6 +237,7 @@ Defines the type of variable that will be calculated for the substitution. Optio
 
 \liststyleLviii
 \begin{itemize}
+\setlength\itemsep{-0.2em}
 \item Mean
 \item Covariance
 \item Standard\_Deviation
@@ -250,7 +251,7 @@ Defines the variable that will be calculated for the substitution. Options are f
 
 \liststyleLix
 \begin{itemize}
-\item \begin{itemize}
+\setlength\itemsep{-0.2em}
 \item {\itshape emit\_6d \textup{: 6d emittance}}
 \item {\itshape emit\_4d:\textup{ 4d emittance (in x-y space)}}
 \item {\itshape emit\_t:\textup{ 2d emittance (in time space)}}
@@ -274,11 +275,11 @@ Defines the variable that will be calculated for the substitution. Options are f
 \item {\itshape lkin:\textup{ standard angular momentum}}
 \end{itemize}
 
-\end{itemize}
 For Mean, Standard\_Deviation, Covariance and Correlation, variables should be selected from the options
 
 \liststyleLx
 \begin{itemize}
+\setlength\itemsep{-0.2em}
 \item \textit{x: x-}position
 \item {\itshape y:y-position}
 \item {\itshape t: \textup{time}}
@@ -291,8 +292,9 @@ For Mean, a single variable should be selected and value corresponding to the re
 For Standard\_Deviation, a single variable should be selected and the 1 sigma beam size will be returned.
 
 For Covariance and Correlation, two variables should be selected separated by a comma.\\\hline
-\end{supertabular}
+\end{tabular}
 \end{center}
+
 \section{Unconventional Volumes}
 It is possible to define a number of volumes that use properties rather than the Dimensions keyword to define the volume
 size.
@@ -313,7 +315,7 @@ Volume Trapezoid gives a trapezoid which is not necessarily isosceles. Its dimen
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{10cm}|}
 \hline
 TrapezoidWidthX1 &
 Double &
@@ -356,7 +358,7 @@ line extends along the x-axis.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{10cm}|}
 \hline
 Dimensions &
 Hep3
@@ -386,7 +388,7 @@ interpolation of the points.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{10cm}|}
 \hline
 PolyconeType &
 string &
@@ -411,7 +413,7 @@ Quadrupoles are defined by an empty cylinder with four further cylinders that ar
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{12.052cm}|}
+\begin{supertabular}{|m{3.665cm}|m{1.278cm}|m{10cm}|}
 \hline
 PhysicalLength &
 double &
@@ -454,7 +456,7 @@ defined -- only a curved rectangular aperture will be present.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.892cm}|m{1.333cm}|m{11.77cm}|}
+\begin{supertabular}{|m{3.892cm}|m{1.333cm}|m{9.5cm}|}
 \hline
 {\itshape ApertureCurvature} &
 double &
@@ -513,7 +515,7 @@ alternative technique is to use special virtual detectors to examine hits in boo
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.89cm}|m{1.333cm}|m{11.772cm}|}
+\begin{supertabular}{|m{3.89cm}|m{1.333cm}|m{9.5cm}|}
 \hline
 {\itshape BaseModule} &
 string &
@@ -527,33 +529,19 @@ The first module to add. MAUS will search for the MiceModule with path
 string &
 The type of boolean operation to apply, either ``Union'', ``Intersection'' or ``Subtraction''.\\\hline
 {\itshape BooleanModule1Pos} &
-Hep3
-
-Vector &
+Hep3 Vector &
 The position of the new volume with respect to the Base volume.\\\hline
 {\itshape BooleanModule1Rot} &
-Hep3
-
-Vector &
+Hep3 Vector &
 The rotation of the new volume with respect to the Base volume.\\\hline
 {\itshape BooleanModuleN} &
 string &
 Add extra modules as required. Replace ``N'' with the module number. N must be a continuous series incrementing by 1 for
 each new module. Note that the order in which modules are added is important -- (A-B) \textsf{U }C is different to A-(B
 \textsf{U }C).\\\hline
-{\itshape BooleanModuleNType} &
-\multicolumn{1}{m{1.333cm}}{string} &
-\\\hhline{--~}
-{\itshape BooleanModuleNPos} &
-\multicolumn{1}{m{1.333cm}}{Hep3
-
-Vector} &
-\\\hhline{--~}
-{\itshape BooleanModuleNRot} &
-\multicolumn{1}{m{1.333cm}}{Hep3
-
-Vector} &
-\\\hhline{--~}
+{\itshape BooleanModuleNType} & string & \\\hline
+{\itshape BooleanModuleNPos} & Hep3 Vector & \\\hline
+{\itshape BooleanModuleNRot} & Hep3 Vector & \\\hline
 \end{supertabular}
 \end{center}
 \subsection{Volume Sphere}
@@ -570,24 +558,16 @@ A sphere is a spherical shell, with options for opening angles to make segments.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.89cm}|m{1.333cm}|m{11.772cm}|}
+\begin{supertabular}{|m{3.89cm}|m{1.333cm}|m{9.5cm}|}
 \hline
 {\itshape Dimensions} &
-Hep3
-
-Vector &
+Hep3 Vector &
 The x value defines the inner radius. The y value defines the outer radius of the shell. The z value is not
 used.\\\hline
-Phi &
-Hep3
-
-Vector &
+Phi & Hep3 Vector &
 The x value defines the start opening angle in phi. The y value defines the end opening angle. The z value is not used.
 Phi values must be in the range 0 to 360 degrees. If undefined, defaults to the range 0-360 degrees.\\\hline
-Theta &
-Hep3
-
-Vector &
+Theta & Hep3 Vector &
 The x value defines the start opening angle in theta. The y value defines the end opening angle. The z value is not
 used. Theta values must be in the range 0 to 180 degrees. If undefined, defaults to the range 0-360 degrees.\\\hline
 \end{supertabular}
@@ -612,7 +592,7 @@ previous repetitions, enabling for example alternating lattices.
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.892cm}|m{1.333cm}|m{11.77cm}|}
+\begin{supertabular}{|m{3.892cm}|m{1.333cm}|m{9.5cm}|}
 \hline
 {\itshape RepeatModule} &
 bool &
@@ -621,14 +601,10 @@ Set to 1 to enable repeats in this module.\\\hline
 int &
 Number of times the module will be repeated in addition to the initial placement.\\\hline
 {\itshape RepeatTranslation} &
-Hep3
-
-Vector &
+Hep3 Vector &
 Translation applied to successive repeats, applied in the coordinate system of the previous repetition.\\\hline
 {\itshape RepeatRotation} &
-Hep3
-
-Vector &
+Hep3 Vector &
 Rotation applied to successive repeats, applied in the coordinate system of the previous repetition.\\\hline
 {\itshape RepeatScaleFactor} &
 double &
@@ -650,7 +626,7 @@ This can be used in an expression in to provide a versatile interface between us
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.892cm}|m{1.333cm}|m{11.77cm}|}
+\begin{supertabular}{|m{3.892cm}|m{1.333cm}|m{9.5cm}|}
 \hline
 {\itshape RepeatModule2} &
 bool &
@@ -722,7 +698,7 @@ D'\textsubscript{y} are the dispersions and their derivatives with respect to z 
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.319cm}|m{1.2019999cm}|m{11.974cm}|}
+\begin{supertabular}{|m{3.319cm}|m{1.2019999cm}|m{9.5cm}|}
 \hline
 {\itshape EnvelopeType} &
 string &
@@ -765,7 +741,7 @@ energy E\textsubscript{k} is related to energy E by E\textsubscript{k}+m=E.\\\hh
 string &
 Define the beam ellipse that will be used in calculating the evolution of the Envelope, or used to generate a beam for
 BeamType \textit{Random}. Options are \textit{Twiss, Penn} and\textit{ Matrix}.\\\hline
-\multicolumn{3}{|m{16.894999cm}|}{{\itshape The following properties are only used if EllipseDefinition is set to
+\multicolumn{3}{|m{15cm}|}{{\itshape The following properties are only used if EllipseDefinition is set to
 Twiss}}\\\hline
 \multicolumn{2}{m{4.721cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.319cm}|m{1.2019999cm}}
 
@@ -800,7 +776,7 @@ double\\\hline
 \end{tabular}\hspace*{-\tabcolsep}
 } &
 Twiss a function in each 2d subspace, (x,px), (y,py) and (t,E).\\\hhline{~~-}
-\multicolumn{3}{|m{16.894999cm}|}{{\itshape The following properties are only used if EllipseDefinition is set to
+\multicolumn{3}{|m{15cm}|}{{\itshape The following properties are only used if EllipseDefinition is set to
 Matrix}}\\\hline
 \multicolumn{2}{m{4.721cm}|}{\hspace*{-\tabcolsep}\begin{tabular}{|m{3.319cm}|m{1.2019999cm}}
 
@@ -821,7 +797,7 @@ the matrix (x,Px,y,Py,t,E).
 
 \ This must be a positive definite matrix, i.e. determinant {\textgreater} 0. Note that this means that at least the 6
 terms on the diagonal must be defined. Other terms default to 0.\\\hline
-\multicolumn{3}{|m{16.894999cm}|}{{\itshape The following properties are only used if EllipseDefinition is set to
+\multicolumn{3}{|m{15cm}|}{{\itshape The following properties are only used if EllipseDefinition is set to
 Penn}}\\\hline
 {\itshape Emittance\_T} &
 double &
@@ -849,7 +825,7 @@ Normalised angular momentum for the transverse phase space.\\\hline
 Bz &
 double &
 Nominal magnetic field on the reference particle.\\\hline
-\multicolumn{3}{|m{16.894999cm}|}{{\itshape The following properties are used if EllipseDefinition is set to Penn or
+\multicolumn{3}{|m{15cm}|}{{\itshape The following properties are used if EllipseDefinition is set to Penn or
 Twiss}}\\\hline
 Dispersion\_X &
 double &
@@ -863,7 +839,7 @@ D' in x (Px-energy correlation).\\\hline
 DispersionPrime\_Y &
 double &
 D' in y (Py-energy correlation).\\\hline
-\multicolumn{3}{|m{16.894999cm}|}{{\itshape The following properties are only relevant for generating a beam
+\multicolumn{3}{|m{15cm}|}{{\itshape The following properties are only relevant for generating a beam
 envelope}}\\\hline
 RootOutput &
 string &
@@ -914,7 +890,7 @@ double\\\hline
 } &
 Maximum offsets when polyfit algorithm is used. In some cases the offset can keep increasing without limit unless these
 maximum offsets are defined. Default is no limit.\\\hhline{~~-}
-\multicolumn{3}{|m{16.894999cm}|}{{\itshape The following properties are only relevant for generating a particle
+\multicolumn{3}{|m{15cm}|}{{\itshape The following properties are only relevant for generating a particle
 beam}}\\\hline
 UseAsReference &
 Bool &
@@ -948,7 +924,7 @@ will calculate a score; the optimiser attempts to find a minimum value for this 
 {\bfseries Description}\\}
 \tabletail{}
 \tablelasttail{}
-\begin{supertabular}{|m{3.319cm}|m{1.2019999cm}|m{11.974cm}|}
+\begin{supertabular}{|m{3.319cm}|m{1.2019999cm}|m{9.5cm}|}
 \hline
 {\itshape Optimiser} &
 string &

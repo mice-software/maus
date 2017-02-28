@@ -92,7 +92,7 @@ For python users, some Global objects can be accessed by reference to the \verb|
 \subsection{Global Object Initialisation}
 Global objects are initialised before any modules in Go.py and deleted after all modules are deathed. Global object initialisation and destruction is handled at the Job level by \verb|src/common_cpp/Globals/GlobalManager.hh| and called in python via \verb|maus_cpp.globals| as above.
 
-Run-by-run initialisation is handled by the RunActionManager, defined in \verb|src/common_cpp/Utils/RunActionManager.hh|. The RunActionManager holds a list of objects inheriting from \verb|RunActionBase| each of which defines functions to call at the start and end of each run.
+Run-by-run initialisation is handled by the RunActionManager, defined in\linebreak\verb|src/common_cpp/Utils/RunActionManager.hh|. The RunActionManager holds a list of objects inheriting from \verb|RunActionBase| each of which defines functions to call at the start and end of each run.
 
 \section{Internal Classes}
 The following classes and namespaces are used to provide an interface between
@@ -137,7 +137,7 @@ Data mangling is handled in a variety of layers.
       conversion from one type to another
 \item \verb|src/common_cpp/Converter/DataConverters| provides implementations
       of the data conversions
-\item \verb|src/common_cpp/Converter/ConverterFactory| provides a function like
+\item \verb|src/common_cpp/Converter/ConverterFactory| provides a function like\linebreak
       \verb|TYPE2* convert<TYPE1, TYPE2>(TYPE1* data)| with implementations for
       each of the types. This then provides explicit conversion (i.e. where both
       input and output types are known.
@@ -148,5 +148,3 @@ Data mangling is handled in a variety of layers.
 \item \verb|src/common_cpp/API/PyWrapMapBase| calls unwrap based on the type
       stored in the \verb|PyObject*|.
 \end{itemize}
-
-

@@ -84,7 +84,7 @@ namespace global {
 
   double PIDBase1D::logL(MAUS::DataStructure::Global::Track* track) {
     double var = (Calc_Var(track)).first;
-    if (var < _Xmin || var > _Xmax) {
+    if (var < _XminBin || var > _XmaxBin) {
       Squeak::mout(Squeak::debug) << "Missing/invalid measurements for  " <<
 	"variable, Recon::Global::PIDBase1D::logL()" << std::endl;
       return 1;

@@ -50,9 +50,10 @@ if [ $maus_lcov ]; then
     fi
 fi
 
+python ${MAUS_ROOT_DIR}/src/map/MapCppGlobalTrackMatching/_test_MapCppGlobalTrackMatching.py
+
 cd $here
 
 echo
 echo "INFO: Unit tests complete"
 echo
-
