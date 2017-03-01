@@ -214,7 +214,8 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                       'simulate_particles_in_grid_configuration.py', # data file
       'tests/integration/test_simulation/test_simulate_fs2a_cooling/'+\
                       'simulate_fs2a_configuration.py', # data file
-      'bin/SciFi/Conf_PR_Momentum_Corrections.py', # config file
+      'bin/scifi/Conf_PR_Momentum_Corrections.py', # config file
+      'bin/Global/tmresiduals.py',
     ]
 
 if __name__ == '__main__':

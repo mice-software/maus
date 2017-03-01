@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#pylint: skip-file
+
 import ROOT
 import csv
 import math
