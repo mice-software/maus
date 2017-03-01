@@ -17,7 +17,7 @@
 #
 
 # pylint: disable = W0311, E1101, W0613, C0111, R0911, W0621, C0103, R0902
-# pylint: disable = R0904
+# pylint: disable = R0904,  W0120
 
 import ROOT
 
@@ -186,8 +186,6 @@ class maus_reader() :
     self.__current_spill_num = 0
     self.__current_event_num = 0
     self.__current_num_events = 0
-    
-
 
   def __increment_filename( self ) :
     """
@@ -259,7 +257,7 @@ class maus_reader() :
             if self.__current_event_num in \
                        self.__selected_events[self.__current_filename][spill] :
               return True
-      else :
+      else:
         return False
 
 

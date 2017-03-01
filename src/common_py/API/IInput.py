@@ -18,7 +18,7 @@ This file defines the interface for all Inputters
 
 from API.IModule import IModule
 
-class IInput(IModule):#pylint: disable=R0921
+class IInput(IModule):
     """
     @class IInput
     Interface for all inputter modules.

@@ -21,7 +21,7 @@ Tests for the SciFiLookup python module (not the C++ module)
 
 import unittest
 
-#pylint: disable = W0611, E0611, R0915, C0103
+#pylint: disable = W0611, E0401, E0611, R0915, C0103
 import libMausCpp
 from ROOT import MAUS as maus
 import analysis.scifitools as tools
