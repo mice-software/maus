@@ -606,6 +606,8 @@ void TrackMatching::MatchEMRTrack(
         Squeak::mout(Squeak::debug) << "TrackMatching: EMR Match" << std::endl;
         hypothesis_track->set_emr_range_primary(
             (*emr_track_iter)->get_emr_range_primary());
+        hypothesis_track->set_emr_plane_density(
+            (*emr_track_iter)->get_emr_plane_density());
         for (size_t i = 0; i < emr_trackpoints.size(); i++) {
           DataStructure::Global::TrackPoint* emr_tp =
               emr_trackpoints[i]->Clone();
