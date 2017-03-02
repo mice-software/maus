@@ -71,7 +71,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     # ${MAUS_ROOT_DIR}/third_party/bash/39numpy.bash
     ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash -gi
     # Make the numpy includes findable
-    old_dir = `pwd`
+    old_dir=`pwd`
     cd ${MAUS_THIRD_PARTY}/third_party/install/include
     ln -s ${MAUS_THIRD_PARTY}/third_party/install/lib/python2.7/site-packages/numpy/core/include/numpy numpy
     cd ${old_dir}
