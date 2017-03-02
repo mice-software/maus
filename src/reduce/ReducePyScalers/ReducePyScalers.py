@@ -224,3 +224,4 @@ class ReducePyScalers:
             self._clock.pop(0)
 
         return True
+

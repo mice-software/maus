@@ -11,8 +11,12 @@
 #version=1.1.6
 #unique_id=20160616111012-v21zb1a7ecag6j1g-1
 
-version=1.1.7
-unique_id=20160909160050-ws5u4kwdbx82fzp3-1
+#version=1.1.7
+#unique_id=20160909160050-ws5u4kwdbx82fzp3-1
+
+version=1.1.8
+unique_id=20170227122919-92sgixa32nspboqu-1
+
 directory=cdb-${version}
 filename=cdb-${version}.tar.gz
 filename_mash=cdb${version}.tar.gz-${unique_id}/${filename}

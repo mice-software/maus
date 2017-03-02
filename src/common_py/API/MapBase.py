@@ -20,7 +20,7 @@ from API.IMap import IMap
 from API.ModuleBase import ModuleBase
 from API.Constable import const
 
-class MapBase(ModuleBase, IMap):#pylint: disable=R0921
+class MapBase(ModuleBase, IMap):
     """
     @class MapBase
     Abstract Base class for all maps to derive from which allowes for

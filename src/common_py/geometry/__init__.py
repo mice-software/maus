@@ -12,6 +12,6 @@ from geometry.GDMLtoMAUSModule import GDMLtomaus
 from geometry.LocationFit import ElementRotationTranslation
 
 __all__ = ["CADImport", "Configreader", "Formatter", 
-           "Packer", "Unpacker", "GDMLtocdb", "Downloader", "GDMLtomaus",
+           "Packer", "Unpacker", "Uploader", "Downloader", "GDMLtomaus",
            "ElementRotationTranslation"]
 

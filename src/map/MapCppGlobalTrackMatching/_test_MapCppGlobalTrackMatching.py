@@ -108,7 +108,7 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
         fin = open(test4,'r')
         line = fin.read()
         result = self.mapper.process(line)
-        spill_out = maus_cpp.converter.json_repr(result)
+        maus_cpp.converter.json_repr(result)
         self.assertEqual(result.GetSpill().GetReconEvents().size(), 1)
         global_event = result.GetSpill().GetReconEvents()[0].GetGlobalEvent()
         self.assertEqual(global_event.get_primary_chains().size(), 3)

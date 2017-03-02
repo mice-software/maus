@@ -16,7 +16,6 @@
 """
 Tools to build core library (libMausCpp) and core library unit tests
 """
-# pylint: disable=W0141
 
 import os
 import glob

@@ -30,7 +30,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
                  os.environ.get("MAUS_ROOT_DIR"))
     config0 = json.loads(Configuration.Configuration().getConfigJSON
                          (config_file = (open(config_file,'r'))))
-    
+
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration"""
@@ -106,7 +106,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            num_tracks = 0;
+            num_tracks = 0
             for track in tracksarray:
                 if track['mapper_name'] == 'MapCppGlobalPID':
                     self.assertTrue('pid' in track)
@@ -129,10 +129,10 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             revt = revtarray[0]
             self.assertTrue('global_event' in revt)
             gevt = revt['global_event']
-            self.assertEqual(4, len(gevt)) 
+            self.assertEqual(4, len(gevt))
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            num_tracks = 0;
+            num_tracks = 0
             for track in tracksarray:
                 if track['mapper_name'] == 'MapCppGlobalPID':
                     self.assertTrue('pid' in track)
@@ -158,7 +158,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertEqual(4, len(gevt)) 
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
-            num_tracks = 0;
+            num_tracks = 0
             for track in tracksarray:
                 if track['mapper_name'] == 'MapCppGlobalPID':
                     self.assertTrue('pid' in track)
@@ -186,7 +186,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
             self.assertEqual(2, len(gevt['tracks']))
-            num_tracks = 0;
+            num_tracks = 0
             for track in tracksarray:
                 if track['mapper_name'] == 'MapCppGlobalPID':
                     num_tracks += 1

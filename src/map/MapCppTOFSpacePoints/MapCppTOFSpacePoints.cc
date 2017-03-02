@@ -113,18 +113,13 @@ void MapCppTOFSpacePoints::_process(MAUS::Data* data) const {
         // Cheating -- until I figure out how to handle trig-req-time in MC:
         //   I have to change the triggerpixelcut for MC in order for the
         //   calib corrections to be applied correctly.
-        //   2 options --
-        //   a) change the cut in ConfigDefaults
-        //      but this <may> mess up data -- though I did run on real data
-        //      with this modified cut and things (resol,time) look OK @ 1st
-        //      glance
-        //   b) use a different cut if it's MC
-        //      this breaks the agreement that we'll treat real data/MC same
-        //      way but for now it at least lets MC get reconstructed without
-        //      clobbering real data
-        // For now I have chosen option b)
+        //   For real data, the calibration ensures that TOF1 time is ~0
+        //   This is not true for MC where the time is relative to the beam start
+        //   Hence, setting it to an arbitrarily large value for MC
+        //   Note: this cut is pretty useless for MC,
+        //         and noise etc will be removed by the makeSpacePointCut further below
       if (spill->GetMCEventSize() > 0)
-          const_cast<MapCppTOFSpacePoints*>(this)->_findTriggerPixelCut = 50.0;
+          const_cast<MapCppTOFSpacePoints*>(this)->_findTriggerPixelCut = 1e4;
 
       // std::cerr << tSlabHits->GetTOF0SlabHitArraySize() << " "
       //           << tSlabHits->GetTOF1SlabHitArraySize() << " "

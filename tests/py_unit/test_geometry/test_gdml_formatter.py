@@ -47,7 +47,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         isn't allowed. The Formatter class should raise an error. 
         """
         try:
-            self.constructor = Formatter(1)
+            self.constructor = Formatter(1) # pylint: disable = E1120
             self.assertTrue(False, 'should have raised an exception')
         except: #pylint: disable = W0702
             pass #pylint: disable = W0702
@@ -58,7 +58,7 @@ class  TestGDMLFormatter(unittest.TestCase): #pylint: disable = C0103, R0904
         try:
             path = '/tests/py_unit/test_geometry/testCases/testFormatter'
             test_case = os.environ['MAUS_ROOT_DIR'] + path
-            self.constructor = Formatter(test_case)
+            self.constructor = Formatter(test_case) # pylint: disable = E1120
             self.assertTrue(False, 'Should have raised an exception')
         except: #pylint: disable = W0702
             pass #pylint: disable = W0702
