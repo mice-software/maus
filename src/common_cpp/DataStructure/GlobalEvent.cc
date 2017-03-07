@@ -45,30 +45,6 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
     return *this;
   }
 
-  // This is a deep copy operation; we go through, deepcopying data and
-  // processing any cross links (pointer-as-reference) so that they point into
-  // the new data structure
-  if (_primary_chains != NULL) {
-    if (!_primary_chains->empty())
-      for (size_t i = 0; i < _primary_chains->size(); ++i)
-        delete _primary_chains->at(i);
-    delete _primary_chains;
-  }
-  if (globalevent._primary_chains == NULL) {
-    _primary_chains = NULL;
-  } else {
-    _primary_chains =
-        new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
-    std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chain =
-        globalevent._primary_chains;
-    for (size_t i = 0; i < old_primary_chain->size(); ++i) {
-      DataStructure::Global::PrimaryChain* pchain =
-          new DataStructure::Global::PrimaryChain(*old_primary_chain->at(i));
-      _primary_chains->push_back(pchain);
-      // _primary_chains->push_back(old_primary_chain->at(i)->Clone());
-    }
-  }
-
   if (_space_points != NULL) {
     for (size_t i = 0; i < _space_points->size(); ++i)
       delete _space_points->at(i);
@@ -84,7 +60,6 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       DataStructure::Global::SpacePoint* sp =
           new DataStructure::Global::SpacePoint(*old_space_points->at(i));
       _space_points->push_back(sp);
-      // _space_points->push_back(old_space_points->at(i)->Clone());
     }
   }
 
@@ -103,11 +78,10 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       DataStructure::Global::TrackPoint* tp =
           new DataStructure::Global::TrackPoint(*old_track_points->at(i));
       _track_points->push_back(tp);
-      // _track_points->push_back(old_track_points->at(i)->Clone());
       // copy across also the space point pointer-as-reference to the new
       // structure
       MAUS::DataStructure::Global::SpacePoint* sp =
-                                        _track_points->at(i)->get_space_point();
+          _track_points->at(i)->get_space_point();
       if (!sp)
           continue;
       for (size_t j = 0; j < globalevent._space_points->size(); ++j) {
@@ -134,7 +108,7 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
       DataStructure::Global::Track* temp_track =
           new DataStructure::Global::Track(*old_tracks->at(i));
       _tracks->push_back(temp_track);
-      // _tracks->push_back(old_tracks->at(i)->Clone());
+
       TRefArray* old_track_points_on_track = old_tracks->at(i)->get_track_points();
       TRefArray* new_track_points_on_track = new TRefArray(
           TProcessID::GetProcessWithUID(old_track_points_on_track));
@@ -147,7 +121,72 @@ GlobalEvent& GlobalEvent::operator=(const GlobalEvent& globalevent) {
           }
         }
       }
+
+      TRefArray* old_constituent_tracks = old_tracks->at(i)->get_constituent_tracks();
+      TRefArray* new_constituent_tracks = new TRefArray(
+          TProcessID::GetProcessWithUID(old_constituent_tracks));
+      new_constituent_tracks->Expand(old_constituent_tracks->GetSize());
+      for (int j = 0; j < old_constituent_tracks->GetLast()+1; ++j) {
+        for (size_t k = 0; k < globalevent._tracks->size(); ++k) {
+          if (old_constituent_tracks->At(j) == globalevent._tracks->at(k)) {
+            new_constituent_tracks->AddAt(_tracks->at(k), j);
+            break;
+          }
+        }
+      }
+
       _tracks->at(i)->set_track_points(new_track_points_on_track);
+      _tracks->at(i)->set_constituent_tracks(new_constituent_tracks);
+    }
+  }
+
+  // This is a deep copy operation; we go through, deepcopying data and
+  // processing any cross links (pointer-as-reference) so that they point into
+  // the new data structure
+  if (_primary_chains != NULL) {
+    if (!_primary_chains->empty())
+      for (size_t i = 0; i < _primary_chains->size(); ++i)
+        delete _primary_chains->at(i);
+    delete _primary_chains;
+  }
+  if (globalevent._primary_chains == NULL) {
+    _primary_chains = NULL;
+  } else {
+    _primary_chains =
+        new std::vector<MAUS::DataStructure::Global::PrimaryChain*>();
+    std::vector<MAUS::DataStructure::Global::PrimaryChain*>* old_primary_chains =
+        globalevent._primary_chains;
+    for (size_t i = 0; i < old_primary_chains->size(); ++i) {
+      DataStructure::Global::PrimaryChain* pchain =
+          new DataStructure::Global::PrimaryChain(*old_primary_chains->at(i));
+      _primary_chains->push_back(pchain);
+      TRefArray* old_tracks = old_primary_chains->at(i)->get_tracks();
+      TRefArray* new_tracks = new TRefArray(TProcessID::GetProcessWithUID(old_tracks));
+      new_tracks->Expand(old_tracks->GetSize());
+      for (int j = 0; j < old_tracks->GetLast()+1; j++) {
+        for (size_t k = 0; k < globalevent._tracks->size(); k++) {
+          if (old_tracks->At(j) == globalevent._tracks->at(k)) {
+            new_tracks->AddAt(_tracks->at(k), j);
+            break;
+          }
+        }
+      }
+      _primary_chains->at(i)->set_tracks(new_tracks);
+      MAUS::DataStructure::Global::PrimaryChain* us_daughter_chain =
+          _primary_chains->at(i)->GetUSDaughter();
+      MAUS::DataStructure::Global::PrimaryChain* ds_daughter_chain =
+          _primary_chains->at(i)->GetDSDaughter();
+      // A chain will always either have two or no daughters, never one
+      if (!us_daughter_chain) {
+        continue;
+      }
+      for (size_t j = 0; j < globalevent._primary_chains->size(); j++) {
+        if (globalevent._primary_chains->at(j) == us_daughter_chain) {
+          _primary_chains->at(i)->SetUSDaughter(_primary_chains->at(j));
+        } else if (globalevent._primary_chains->at(j) == ds_daughter_chain) {
+          _primary_chains->at(i)->SetDSDaughter(_primary_chains->at(j));
+        }
+      }
     }
   }
   return *this;
@@ -188,41 +227,6 @@ void GlobalEvent::add_primary_chain(
   _primary_chains->push_back(pchain);
 };
 
-bool GlobalEvent::add_primary_chain_check(
-    MAUS::DataStructure::Global::PrimaryChain* pchain) {
-  // Check if the provided pchain matches an existing entry (this is
-  // to save repeated entries and wasted disk space).
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*>::iterator pc_iter =
-      std::find(_primary_chains->begin(), _primary_chains->end(), pchain);
-
-  bool exists = (pc_iter != _primary_chains->end());
-  if (!exists)
-    add_primary_chain(pchain);
-
-  return exists;
-}
-
-void GlobalEvent::add_primary_chain_recursive(
-    MAUS::DataStructure::Global::PrimaryChain* pchain) {
-  // Add the primary chain, checking if it already exists in chain.
-  bool already_added = add_primary_chain_check(pchain);
-
-  // If the chain had been added, then we will loop over the tracks
-  // and add them too.
-  if (!already_added) {
-    std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator
-        iter_track;
-    std::vector<MAUS::DataStructure::Global::TRefTrackPair*> *track_pair
-        = pchain->get_track_parent_pairs();
-    MAUS::DataStructure::Global::Track* track = NULL;
-    for (iter_track = track_pair->begin();
-        iter_track != track_pair->end(); ++iter_track) {
-      track = (*iter_track)->GetTrack();
-      add_track_recursive(track);
-    }
-  }
-}
-
 std::vector<MAUS::DataStructure::Global::PrimaryChain*>*
 GlobalEvent::get_primary_chains() const {
   return _primary_chains;
@@ -254,7 +258,6 @@ void GlobalEvent::add_track_recursive(
     MAUS::DataStructure::Global::Track* track) {
   // Add the Track, checking if it already exists in the GlobalEvent.
   bool already_added = add_track_check(track);
-
   // If the chain had been added, then we will loop over the
   // constituent tracks and track_points, adding them too.
   if (!already_added) {
@@ -366,4 +369,112 @@ void GlobalEvent::set_space_points(
     std::vector<MAUS::DataStructure::Global::SpacePoint*> *space_points) {
   _space_points = space_points;
 };
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetPrimaryChains(MAUS::DataStructure::Global::ChainType chain_type) const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    if (_primary_chains->at(i)->get_chain_type() == chain_type) {
+      chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return chains;
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetUSPrimaryChains() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kUS);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetDSPrimaryChains() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kDS);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetThroughPrimaryChains() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kThrough);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetPrimaryChainOrphans() const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> orphan_chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    MAUS::DataStructure::Global::ChainType chain_type = _primary_chains->at(i)->get_chain_type();
+    if (chain_type == MAUS::DataStructure::Global::kUSOrphan or
+        chain_type == MAUS::DataStructure::Global::kDSOrphan) {
+      orphan_chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return orphan_chains;
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetUSPrimaryChainOrphans() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kUSOrphan);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetDSPrimaryChainOrphans() const {
+  return GetPrimaryChains(MAUS::DataStructure::Global::kDSOrphan);
+}
+
+std::vector<MAUS::DataStructure::Global::PrimaryChain*>
+    GlobalEvent::GetNonThroughPrimaryChains() const {
+  std::vector<MAUS::DataStructure::Global::PrimaryChain*> segment_chains;
+  for (size_t i = 0; i < _primary_chains->size(); i++) {
+    MAUS::DataStructure::Global::ChainType chain_type = _primary_chains->at(i)->get_chain_type();
+    if (chain_type == MAUS::DataStructure::Global::kUSOrphan or
+        chain_type == MAUS::DataStructure::Global::kDSOrphan or
+        chain_type == MAUS::DataStructure::Global::kUS or
+        chain_type == MAUS::DataStructure::Global::kDS) {
+      segment_chains.push_back(_primary_chains->at(i));
+    }
+  }
+  return segment_chains;
+}
+
+std::vector<MAUS::DataStructure::Global::Track*> GlobalEvent::GetLRTracks() const {
+  std::vector<MAUS::DataStructure::Global::Track*> lr_tracks;
+  for (size_t i = 0; i < _tracks->size(); i++) {
+    if (_tracks->at(i)->get_mapper_name() == "MapCppGlobalReconImport") {
+      lr_tracks.push_back(_tracks->at(i));
+    }
+  }
+  return lr_tracks;
+}
+
+std::vector<MAUS::DataStructure::Global::Track*>
+    GlobalEvent::GetLRTracks(MAUS::DataStructure::Global::DetectorPoint detector) const {
+  std::vector<MAUS::DataStructure::Global::Track*> lr_tracks;
+  for (size_t i = 0; i < _tracks->size(); i++) {
+    if (_tracks->at(i)->get_mapper_name() == "MapCppGlobalReconImport" and
+        _tracks->at(i)->HasDetector(detector)) {
+      lr_tracks.push_back(_tracks->at(i));
+    }
+  }
+  return lr_tracks;
+}
+
+std::vector<MAUS::DataStructure::Global::SpacePoint*> GlobalEvent::GetLRSpacePoints() const {
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> lr_spacepoints;
+  for (size_t i = 0; i < _space_points->size(); i++) {
+    if (_space_points->at(i)->get_mapper_name() == "MapCppGlobalReconImport") {
+      lr_spacepoints.push_back(_space_points->at(i));
+    }
+  }
+  return lr_spacepoints;
+}
+
+std::vector<MAUS::DataStructure::Global::SpacePoint*>
+    GlobalEvent::GetLRSpacePoints(MAUS::DataStructure::Global::DetectorPoint detector) const {
+  std::vector<MAUS::DataStructure::Global::SpacePoint*> lr_spacepoints;
+  for (size_t i = 0; i < _space_points->size(); i++) {
+    if (_space_points->at(i)->get_mapper_name() == "MapCppGlobalReconImport" and
+        _space_points->at(i)->get_detector() == detector) {
+      lr_spacepoints.push_back(_space_points->at(i));
+    }
+  }
+  return lr_spacepoints;
+}
 }

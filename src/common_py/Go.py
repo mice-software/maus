@@ -32,7 +32,7 @@ from framework.merge_output import MergeOutputExecutor # pylint: disable=W0403, 
 from framework.multi_process import MultiProcessExecutor # pylint: disable=W0403, C0301
 from framework.single_thread import PipelineSingleThreadDataflowExecutor # pylint: disable=W0403, C0301
 
-class Go: # pylint: disable=R0921, R0903
+class Go: # pylint: disable=R0903
     """
     @class Go
 

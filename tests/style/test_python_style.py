@@ -27,9 +27,11 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
         """
         if file_name_in in TestPythonStyle.ignore_files:
             return 0
+        # print '  INFO: Analysing ' + file_name_in + ', ',
         my_args = ['pylint', file_name_in, '--rcfile='+self.pylintrc]
         errors = subprocess.call(args=my_args, stdout=fout, \
                                  stderr=subprocess.STDOUT)
+        # print str(errors) + ' errors found'
         return errors
 
     def in_place_filter(self, file_name): # pylint: disable=R0201
@@ -212,11 +214,10 @@ class TestPythonStyle(unittest.TestCase): # pylint: disable=R0904
                       'simulate_particles_in_grid_configuration.py', # data file
       'tests/integration/test_simulation/test_simulate_fs2a_cooling/'+\
                       'simulate_fs2a_configuration.py', # data file
-      'bin/SciFi/Conf_PR_Momentum_Corrections.py', # config file
+      'bin/scifi/Conf_PR_Momentum_Corrections.py', # config file
+      'bin/Global/tmresiduals.py',
     ]
 
 if __name__ == '__main__':
     unittest.main()
-
-
 

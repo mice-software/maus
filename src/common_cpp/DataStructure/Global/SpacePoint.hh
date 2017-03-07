@@ -75,7 +75,16 @@ class SpacePoint : public BasePoint {
   /// detector measurement.
   double get_charge() const;
 
+  /// Set the name for the mapper which produced the track, #_mapper_name.
+  void set_mapper_name(std::string mapper_name);
+
+  /// Get the name for the mapper which produced the track, #_mapper_name.
+  std::string get_mapper_name() const;
+
  private:
+
+  /// The name of the mapper which produced this spacepoint.
+  std::string    _mapper_name;
 
   /// The calibrated 'charge' or energy deposit of the detector
   /// measurement.

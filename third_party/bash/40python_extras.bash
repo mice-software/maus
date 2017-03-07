@@ -7,7 +7,7 @@
 # 
 # options:
 #
-# -c remove any files or directories from $egg_source before doing anything
+# -c remove any files or directories from $source_dir before doing anything
 # -g get packages (will happen after cleaning egg source if -c is set); do not
 #    overwrite any existing packages
 # -i install packages (will happen after getting packages if -g is set)
@@ -19,34 +19,37 @@ echo 'INFO: Installing third party library Python Extras'
 echo '--------------------------------------------------'
 echo
 
+source_dir=${MAUS_THIRD_PARTY}/third_party/source/pip
+build_dir=${MAUS_THIRD_PARTY}/third_party/build/pip
+install_dir=${MAUS_THIRD_PARTY}/third_party/install
 
-egg_source=${MAUS_THIRD_PARTY}/third_party/source/easy_install
-# these are packages in MAUS third party tarball
+# The packages to download for the MAUS third party tarball
 download_package_list="\
- anyjson python-dateutil>=1.5,<2.0 kombu==2.1.8 amqplib>=1.0 six>=1.4.0 \
- logilab-common logilab-astng suds validictory nose==1.1 nose-exclude  \
- coverage ipython doxypy astroid isort pylint==1.6.3 bitarray celery==2.5.5 \
- pymongo==2.3 readline matplotlib==1.1.0 \
- pil django==1.9.6 magickwand psutil==3.0.1
+ numpy anyjson python-dateutil>=1.5,<2.0 amqplib>=1.0 six>=1.4.0 \
+ logilab-common logilab-astng suds validictory nose==1.1 nose-exclude \
+ coverage doxypy astroid isort pylint==1.6.3 bitarray \
+ pymongo==2.3 readline matplotlib==2.0.0 \
+ django==1.9.6 magickwand psutil==3.0.1 celery==2.5.5
 "
 
-# these are the packages to install - note the version dependencies
+# The packages to install
+# Note: pil is no longer on PyPI so we only use our existing tarball
 package_list="\
- anyjson python-dateutil amqplib six kombu \
- logilab-common logilab-astng  suds validictory nose nose-exclude \
- coverage ipython doxypy pylint bitarray celery \
+ numpy anyjson python-dateutil amqplib six \
+ logilab-common logilab-astng  suds validictory nose==1.1 nose-exclude \
+ coverage doxypy pylint==1.6.3 bitarray \
  pymongo readline matplotlib \
- pil django magickwand psutil
+ pil django magickwand psutil celery \
 "
-# note numpy was installed previously, not in this script. We test it's import
-# here for convenience
+
+# The modules to test
 module_test_list="numpy suds validictory nose coverage \
- pylint bitarray matplotlib celery pymongo \
- Image django magickwand" #Image is pil bottom level
+ pylint bitarray matplotlib pymongo \
+ Image django magickwand celery" #Image is pil bottom level
+
 cleanup="0"
 get_packages="0"
 install_packages="0"
-
 while getopts ":cgi" opt; do
   case $opt in
     c)
@@ -71,60 +74,36 @@ if [ -z ${MAUS_THIRD_PARTY} ]; then
 fi
 
 if [ "$cleanup" == "1" ]; then
-    echo "INFO: Cleaning $egg_source directory" 
-    cd $egg_source
-    rm -r *
+    echo "INFO: Cleaning $source_dir directory"
+    echo "INFO: PIL and cdb are excluded"
+    cd $source_dir
+    cp PIL-1.1.7.tar.gz PIL-1.1.7.tar.gz.bak
+    cp cdb-1.1.7.tar.gz cdb-1.1.7.tar.gz.bak
+    rm -r *.tar.gz *.tgz *.zip *.whl 
+    cp PIL-1.1.7.tar.gz.bak PIL-1.1.7.tar.gz
+    cp cdb-1.1.7.tar.gz.bak cdb-1.1.7.tar.gz
 fi
 
 if [ "$get_packages" == "1" ]; then
-    echo "INFO: Attempting to download eggs and pack for distribution"
-    cd $egg_source
+    echo "INFO: Attempting to download wheels for distribution"
+    # pip download --no-cache-dir -d $source_dir -r ${source_dir}/requirements.txt
     for package in $download_package_list
     do
-        echo "easy_install -zmaxeb . $package"
-        easy_install -zmaxeb . $package &
-        # kill the command after <timeout> seconds
-        ((timeout = 120))
-        while ((timeout > 0)); do
-            sleep 1
-            kill -0 $! >& /dev/null
-            if [ "$?" == "0" ]; then # pid is running (can be killed)
-                ((timeout -= 1))
-            else # pid is finished (can't be killed)
-                ((timeout = 0))
-            fi
-        done
-        kill -0 $! >& /dev/null
-        if [ "$?" == "0" ]; then # pid is running (can be killed)
-            echo "easy_install of $package has timed out - killing"
-            kill -9 $!
-        fi
+        pip download --no-cache-dir -d $source_dir $package
     done
-    downloaded_list=`ls --hide=*.tar.gz`
     echo "INFO: Downloaded the following packages"
-    echo "$downloaded_list"
-    echo "INFO: Packing them now - they can be found tarred in $egg_source"
-    echo "INFO: I will skip any packages which are already packed"
-    for item in $downloaded_list
-    do
-        if [ ! -e $item.tar.gz ]; then # ignore existing tarballs
-            echo "INFO:       $item"
-            tar -czf $item.tar.gz $item
-        else
-            echo "INFO:       $item skipped"
-        fi
-        echo ">>>>>removing $item"
-        rm -rf $item # cleanup anything not tarred
-    done
+    pip freeze
 fi
 
 if [ "$install_packages" == "1" ]; then
+
     # first try a local install
     for package in $package_list
     do
         echo "INFO: Installing $package"
-        easy_install -H None -f $egg_source $package
+        pip install --no-index --no-cache-dir -f $source_dir -b $build_dir --prefix $install_dir $package
     done
+
     # now check that packages were installed
     failed_modules=""
     for module in $module_test_list
@@ -134,12 +113,14 @@ if [ "$install_packages" == "1" ]; then
         python -c "import $module" || { echo "WARNING: Failed to install python module $module from local source"; failed_modules="$failed_modules $module"; }
         echo "INFO: ok"
     done
+
     # try installing any packages that failed previously, by using the PyPI repository
     for package in $failed_modules
     do
         echo "INFO: Installing $package from PyPI"
-        easy_install $package
+        pip install -b $build_dir --prefix $install_dir $package
     done
+
     # check that packages were installed again
     failed_modules=""
     for module in $module_test_list
@@ -150,7 +131,7 @@ if [ "$install_packages" == "1" ]; then
         echo "INFO: ok"
     done
 
-    echo "INFO: easy_install libraries were installed in your third party"
+    echo "INFO: pip libraries were installed in your third party"
     echo "INFO: directory $MAUS_THIRD_PARTY"
 fi
 

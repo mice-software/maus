@@ -24,12 +24,12 @@ namespace Global {
 // Default constructor
 SpacePoint::SpacePoint()
     : BasePoint(),
-      _charge(0.) {}
+      _mapper_name(""), _charge(0.) {}
 
 // Copy contructor
 SpacePoint::SpacePoint(const SpacePoint &space_point)
     : BasePoint(space_point),
-      _charge(space_point.get_charge()) {}
+      _mapper_name(space_point.get_mapper_name()), _charge(space_point.get_charge()) {}
 
 // Destructor
 SpacePoint::~SpacePoint() {}
@@ -41,6 +41,7 @@ SpacePoint& SpacePoint::operator=(const SpacePoint &space_point) {
   }
   BasePoint::operator=(space_point);
 
+  _mapper_name     = space_point.get_mapper_name();
   _charge          = space_point.get_charge();
 
   return *this;
@@ -60,6 +61,7 @@ SpacePoint* SpacePoint::Clone() const {
   // Clone the BasePoint elements
   this->BasePoint::Clone(spNew);
 
+  spNew->set_mapper_name(this->get_mapper_name());
   spNew->set_charge(this->get_charge());
 
   return spNew;
@@ -71,6 +73,14 @@ void SpacePoint::set_charge(double charge) {
 
 double SpacePoint::get_charge() const {
   return _charge;
+}
+
+void SpacePoint::set_mapper_name(std::string mapper_name) {
+  _mapper_name = mapper_name;
+}
+
+std::string SpacePoint::get_mapper_name() const {
+  return _mapper_name;
 }
 
 } // ~namespace Global

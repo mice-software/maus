@@ -88,7 +88,7 @@ By default, MAUS writes data as a ROOT file. ROOT is a widely available high ene
 The standard scripting tool in MAUS is python. The ROOT data structure can be loaded in python using the PyROOT package. An example of how to perform a simple analysis with PyROOT is available in \verb|bin/examples/load_root_file.py|. This example runs the reconstruction code to produce an output data file \verb|${MAUS_ROOT_DIR}/tmp/example_load_root_file.root| and then runs a toy analysis that plots digits at TOF1 for plane 0 and plane 1. This example produces two histograms, \verb|tof1_digits_0_load_root_file.png| and \verb|tof1_digits_1_load_root_file.png|.
 
 \subsection{Loading ROOT Files in C++ Compiled Analysis Code}
-The ROOT data structure can be loaded in C++ by compiling the Make file found in \verb|bin/examples/load_root_file_cpp/Makefile|. This compiles the sample analysis in \verb|bin/examples/load_root_file_cpp/load_root_file.cc|. For example,
+The ROOT data structure can be loaded in C++ by compiling the Make file found in\linebreak\verb|bin/examples/load_root_file_cpp/Makefile|. This compiles the sample analysis in\linebreak\verb|bin/examples/load_root_file_cpp/load_root_file.cc|. For example,
 
 \begin{verbatim}
 $ source env.sh
@@ -132,4 +132,3 @@ root [1] TBrowser b
 Note: ROOT infrastructure can only be used to plot data nested within up to two dynamic arrays. Data nested in three or more dynamic arrays is beyond the capabilities of ROOT interactive plotting tools; explicit loops over the data are required in a PyROOT script or C++ code. In general, working through the ROOT command line or ROOT macros is notoriously unreliable and is not supported by the MAUS development team; it is useful as a basic check of data integrity and no more.
 
 More information on the data is available in the data structure chapter \ref{chapter:data_structure}.
-

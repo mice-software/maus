@@ -137,21 +137,24 @@ Name & Meaning & Default\\
 \end{tabularx}
 \end{center}
 \end{table*}
-This is used by the reconstuction of the TOF detectors|
-\verb|#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"|
-\verb|#TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"|
-\verb|#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"|
-\verb|#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"|
-\verb|#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"|
-\verb|#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"|
-\verb|# the date for which we want the cabling and calibration|
-\verb|# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format|
-\verb|#TOF_calib_date_from = 'current'|
-\verb|TOF_calib_date_from = '2010-08-10 00:00:00'|
-\verb|TOF_cabling_date_from = 'current'|
-\verb|Enable_timeWalk_correction = True|
-\verb|Enable_triggerDelay_correction = True|
-\verb|Enable_t0_correction = True|
+
+\begin{verbatim}
+This is used by the reconstuction of the TOF detectors
+#TOF_cabling_file = "/files/cabling/TOFChannelMap.txt"
+#TOF_TW_calibration_file = "/files/calibration/tofcalibTW_dec2011.txt"
+#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF1_dec2011.txt"
+#TOF_T0_calibration_file = "/files/calibration/tofcalibT0_trTOF0.txt"
+#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF1_dec2011.txt"
+#TOF_Trigger_calibration_file = "/files/calibration/tofcalibTrigger_trTOF0.txt"
+# the date for which we want the cabling and calibration
+# date can be 'current' or a date in YYYY-MM-DD hh:mm:ss format
+#TOF_calib_date_from = 'current'
+TOF_calib_date_from = '2010-08-10 00:00:00'
+TOF_cabling_date_from = 'current'
+Enable_timeWalk_correction = True
+Enable_triggerDelay_correction = True
+Enable_t0_correction = True
+\end{verbatim}
 
 \section{Database}
 \begin{itemize}
@@ -173,5 +176,3 @@ Name & Meaning & Default\\
 \end{center}
 \end{table*}
 \end{itemize}
-
-

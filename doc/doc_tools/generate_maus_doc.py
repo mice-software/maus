@@ -65,8 +65,8 @@ def main():
     tagfilesmaus_dict = dict((i, '../doxygen_' + i + '/' + i +
                             '.tag=' + '../../doxygen_' + i +
                             '/html') for i in maus_components)
-    tagfiles = ' '.join(tagfiles_dict.values())
-    
+    tagfiles = ' '.join(tagfiles_dict.values()) # pylint: disable = R0204
+
     for component in maus_components:
         if component == 'framework':
             run_doxygen_framework(tagfiles)

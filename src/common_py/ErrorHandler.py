@@ -64,8 +64,8 @@ class ErrorHandler:
         elif self.on_error == 'halt':
             sys.exit(1)
         elif self.on_error == 'raise':
-            raise
-        else:
+            raise # pylint:disable = E0704
+        else: # pylint:disable = E0704
             raise KeyError('Did not recognise on_error directive '
                                                             +str(self.on_error))
         return doc
@@ -85,7 +85,7 @@ class ErrorHandler:
         branch is appended with <exception type>: <exception message>.
         """
         if doc == None:
-            raise
+            raise # pylint: disable = E0704
         class_name = "<unknown caller>"
         if caller == None:
             pass

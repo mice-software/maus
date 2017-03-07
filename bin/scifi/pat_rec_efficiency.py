@@ -3,15 +3,16 @@
 """  Check tracker efficiency """
 
 import sys
-import os
-import math
 import matplotlib.pyplot as plt
 import numpy as np
 import ROOT
-import libMausCpp #pylint: disable = W0611
+import libMausCpp # pylint: disable = W0611
 import analysis.scifi_efficiency
 
+# pylint: disable = W0621
+
 def main(args):
+    """ Check the efficiency of the tracker pattern recognition """
     args.pop(0)
     results = efficiency_real(args)
     # efficiency_mc(args)
@@ -19,6 +20,8 @@ def main(args):
 
 
 def efficiency_real(args):
+    """ Check the efficiency of the tracker pattern recognition
+        using recontructed data only (no MC truth) """
     eff_real = analysis.scifi_efficiency.PatternRecognitionEfficiencyReal()
     eff_real.check_helical = True
     eff_real.check_straight = True
@@ -31,6 +34,8 @@ def efficiency_real(args):
     return eff_real.data
 
 def efficiency_mc(args):
+    """ Check the efficiency of the tracker pattern recognition 
+        using recontructed data and MC truth """
     eff_mc = analysis.scifi_efficiency.PatternRecognitionEfficiencyMC()
     eff_mc.cut_on_tof = True
     eff_mc.cut_on_tof_time = True
@@ -66,7 +71,7 @@ def plot_data(data):
     ymin = 0.0
     ymax = 1.0
 
-    f, ax = plt.subplots()
+    f, ax = plt.subplots() # pylint: disable = W0612, C0103
     ax.plot(runs, data['tkus_5spoint'], 'r+', label='TkUS 5pt')
     ax.plot(runs, data['tkus_3to5spoint'], 'm+', label='TkUS 3-5pt')
     ax.plot(runs, data['tkds_5spoint'], 'bo', label='TkDS 5pt')
@@ -83,5 +88,5 @@ def plot_data(data):
     plt.savefig('efficiency.pdf')
 
 if __name__ == "__main__":
-    args = sys.argv
+    args = sys.argv # pylint: disable = C0103
     main(args)

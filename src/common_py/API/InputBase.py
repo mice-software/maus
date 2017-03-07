@@ -19,7 +19,7 @@ This file defines the abstract base for all Inputters
 from API.IInput import IInput
 from API.ModuleBase import ModuleBase
 
-class InputBase(ModuleBase, IInput):#pylint: disable=R0921
+class InputBase(ModuleBase, IInput):
     """
     @class InputBase
     Abstract Base class for all inputters to derive from which allowes for
