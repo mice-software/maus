@@ -249,7 +249,11 @@ namespace MAUS {
 
     start_vector = old_filtered.GetVector();
 
-    _calculateBasePropagator(start, end, propagator);
+    try {
+      _calculateBasePropagator(start, end, propagator);
+    }  catch (Exceptions::Exception& e) {
+      std::cerr << e.what();
+    }
     if (_correct_Pz) {
       _applyPzCorrections(propagator, start_vector);
     }
@@ -318,32 +322,11 @@ namespace MAUS {
       for (int i = 0; i < n_steps; i++) {  // In mm => times by 0.1;
         double width = materials.at(i).second;
         double path_length = 0.1 * width * distance_factor;
-//        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
-//        delta_energy = e_loss_sign*SP*path_length;
-        double SP = _geometry_helper->LandauVavilovStoppingPower(momentum,
-                                                            materials.at(i).first, path_length);
-        delta_energy = e_loss_sign*SP;
-
-//          if (delta_energy != delta_energy) {
-//            std::ostringstream converter("");
-//            converter << start.GetPosition() << ", " << start.GetId() << '\n';
-//
-//            converter << "FILTERED : ";
-//            TMatrixD vec = start.GetFiltered().GetVector();
-//            TMatrixD cov = start.GetFiltered().GetCovariance();
-//            for (unsigned int i = 0; i < start.GetDimension(); ++i) {
-//              converter << "(" << vec(i, 0) << " +/- " << sqrt(cov(i, i)) << "), ";
-//            }
-//            converter << "\nPREDICTED : ";
-//            TMatrixD vecp = start.GetPredicted().GetVector();
-//            TMatrixD covp = start.GetPredicted().GetCovariance();
-//            for (unsigned int i = 0; i < start.GetDimension(); ++i) {
-//              converter << "(" << vecp(i, 0) << " +/- " << sqrt(covp(i, i)) << "), ";
-//            }
-//
-//            std::cerr << converter.str() << std::endl;
-//
-//          }
+        double SP = _geometry_helper->BetheBlochStoppingPower(momentum, materials.at(i).first);
+        delta_energy = e_loss_sign*SP*path_length;
+//        double SP = _geometry_helper->LandauVavilovStoppingPower(momentum,
+//                                                            materials.at(i).first, path_length);
+//        delta_energy = e_loss_sign*SP;
 
         energy = energy - delta_energy;
         if (energy < _muon_mass) {

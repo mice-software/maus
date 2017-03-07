@@ -10,13 +10,12 @@ reducer is used to analysis the MC truth and reconstructed tracks in order to
 calculate the required corrections.
 """
 
-import io   #  generic python library for I/O
 import os
-
 import MAUS # MAUS libraries
 
+# pylint: disable = C0103
 config_file = os.path.join(os.getenv("MAUS_ROOT_DIR"),
-                                   "bin/SciFi/Conf_PR_Momentum_Corrections.py")
+                                   "bin/scifi/Conf_PR_Momentum_Corrections.py")
 
 def run():
     """ Run the macro

@@ -299,13 +299,16 @@ SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 
 SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPatRecSErrorMethod = 0 # How to calc error on s, 0 = station res, 1 = error prop
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
-SciFiPatRecCircleChi2Cut = 2.0 # Chi^2 on pat rec circle fit
-SciFiNTurnsCut = 0.75 # Cut used when resolving number of turns between tracker stations (mm)
-SciFiPatRecSZChi2Cut = 3.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec circle fit
+SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
+SciFiPatRecSZChi2Cut = 150.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecCircleErrorWeight = 1.0 # Weight to artificially scale the error going to xy fit
+SciFiPatRecSZErrorWeight = 1.0 # Weight to artificially scale the error going to sz fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiPatRecDebugOn = False # Set Pattern Recogntition to debug mode

@@ -68,6 +68,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _down_straight_pr_on(true),
                                           _up_helical_pr_on(true),
                                           _down_helical_pr_on(true),
+                                          _s_error_method(0),
                                           _verb(0),
                                           _n_trackers(2),
                                           _n_stations(5),
@@ -80,9 +81,11 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _res_cut(7.0),
                                           _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
-                                          _circle_chisq_cut(2.0),
-                                          _n_turns_cut(0.75),
-                                          _sz_chisq_cut(3.0),
+                                          _circle_chisq_cut(5.0),
+                                          _n_turns_cut(1.0),
+                                          _sz_chisq_cut(150.0),
+                                          _circle_error_w(1.0),
+                                          _sz_error_w(1.0),
                                           _Pt_max(180.0),
                                           _Pz_min(50.0),
                                           _rfile(NULL),
@@ -101,6 +104,7 @@ void PatternRecognition::set_parameters_to_default() {
   _down_straight_pr_on = true;
   _up_helical_pr_on = true;
   _down_helical_pr_on = true;
+  _s_error_method = 0;
   _verb = 0;
   _n_trackers = 2;
   _n_stations = 5;
@@ -113,9 +117,11 @@ void PatternRecognition::set_parameters_to_default() {
   _res_cut = 7.0;
   _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
-  _circle_chisq_cut = 2.0;
-  _n_turns_cut = 0.75;
-  _sz_chisq_cut = 3.0;
+  _circle_chisq_cut = 5.0;
+  _n_turns_cut = 1.0;
+  _sz_chisq_cut = 150.0;
+  _circle_error_w = 1.0;
+  _sz_error_w = 1.0;
   _Pt_max = 180.0;
   _Pz_min = 50.0;
 }
@@ -156,6 +162,7 @@ void PatternRecognition::setup_debug() {
 bool PatternRecognition::LoadGlobals() {
   if (Globals::HasInstance()) {
     Json::Value *json = Globals::GetConfigurationCards();
+    _s_error_method = (*json)["SciFiPatRecSErrorMethod"].asInt();
     _verb = (*json)["SciFiPatRecVerbosity"].asInt();
     _n_trackers = (*json)["SciFinTrackers"].asInt();
     _n_stations = (*json)["SciFinStations"].asInt();
@@ -169,6 +176,8 @@ bool PatternRecognition::LoadGlobals() {
     _circle_chisq_cut = (*json)["SciFiPatRecCircleChi2Cut"].asDouble();
     _n_turns_cut = (*json)["SciFiNTurnsCut"].asDouble();
     _sz_chisq_cut = (*json)["SciFiPatRecSZChi2Cut"].asDouble();
+    _circle_error_w = (*json)["SciFiPatRecCircleErrorWeight"].asDouble();
+    _sz_error_w = (*json)["SciFiPatRecSZErrorWeight"].asDouble();
     _Pt_max = (*json)["SciFiMaxPt"].asDouble();
     _Pz_min = (*json)["SciFiMinPz"].asDouble();
     return true;
@@ -724,7 +733,9 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   // Perform a circle fit now that we have found a set of spacepoints
   SimpleCircle c_trial;
   TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
-  bool good_radius = LeastSquaresFitter::circle_fit(_sd_1to4, _sd_5, _R_res_cut,
+  double s1to4_error = _sd_1to4 * _circle_error_w;
+  double s5_error = _sd_5 * _circle_error_w;
+  bool good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
                                                     spnts, c_trial, cov_circle);
 
   // If the radius calculated is too large or chisq fails, return NULL
@@ -740,8 +751,16 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   // Calculate the standard deviations on the values of s found
   std::vector<double> sigma_s;
   for (auto sp : spnts) {
-    double sig = sigma_on_s(c_trial, cov_circle, sp);
-    sigma_s.push_back(sig);
+    double sig = -1.0;
+    if (_s_error_method == 0) {  // 1st method: just use station resolution
+      if ( (sp->get_station() == 5) )
+        sig = _sd_phi_5;
+      else
+        sig = _sd_phi_1to4;
+    } else if (_s_error_method == 1) {
+      sig = sigma_on_s(c_trial, cov_circle, sp); // 2nd method: error propagation
+    }
+    sigma_s.push_back(sig * _sz_error_w);
   }
 
   // Perform the s - z fit

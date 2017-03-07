@@ -276,12 +276,18 @@ class EfficiencyBase(object):
             tkds_5spoint, tkds_4to5spoint, tkds_3to5spoint
         """
         self.data['run_numbers'] = np.append(self.data['run_numbers'], data[0])
-        self.data['tkus_5spoint'] = np.append(self.data['tkus_5spoint'], data[1])
-        self.data['tkus_4to5spoint'] = np.append(self.data['tkus_4to5spoint'], data[2])
-        self.data['tkus_3to5spoint'] = np.append(self.data['tkus_3to5spoint'], data[3])
-        self.data['tkds_5spoint'] = np.append(self.data['tkds_5spoint'], data[4])
-        self.data['tkds_4to5spoint'] = np.append(self.data['tkds_4to5spoint'], data[5])
-        self.data['tkds_3to5spoint'] = np.append(self.data['tkds_3to5spoint'], data[6])
+        self.data['tkus_5spoint'] = \
+          np.append(self.data['tkus_5spoint'], data[1])
+        self.data['tkus_4to5spoint'] = \
+          np.append(self.data['tkus_4to5spoint'], data[2])
+        self.data['tkus_3to5spoint'] = \
+          np.append(self.data['tkus_3to5spoint'], data[3])
+        self.data['tkds_5spoint'] = \
+          np.append(self.data['tkds_5spoint'], data[4])
+        self.data['tkds_4to5spoint'] = \
+          np.append(self.data['tkds_4to5spoint'], data[5])
+        self.data['tkds_3to5spoint'] = \
+          np.append(self.data['tkds_3to5spoint'], data[6])
 
     def check_tof(self, tof_evt):
         """ Analyse tof data. Return boolean indicating if tof cuts pass"""

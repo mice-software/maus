@@ -69,6 +69,8 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   SciFiHelicalPRTrack *htrk =  new SciFiHelicalPRTrack();
   SciFiSeed *seed = new SciFiSeed();
 
+  seed->setTracker(tracker);
+
   // Add the hits etc to the first event
   evt1->add_digit(digit);
   evt1->add_cluster(cluster);
@@ -108,7 +110,7 @@ TEST_F(SciFiEventTestDS, test_copy_constructor) {
   EXPECT_EQ(evt2.helicalprtracks()[0]->get_tracker(), -1);
 
   ASSERT_EQ(evt2.scifiseeds().size(), 1u);
-  EXPECT_EQ(evt2.scifiseeds()[0]->getTracker(), 0);
+  EXPECT_EQ(evt2.scifiseeds()[0]->getTracker(), 1);
 }
 
 TEST_F(SciFiEventTestDS, test_assignment_operator) {
