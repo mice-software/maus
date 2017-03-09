@@ -231,8 +231,8 @@ void TrackMatching::DSTrack() {
       AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching",
                             mass, hypothesis_track);
       if (!no_check) {
-    // Extract four-position and momentum from last track point (i.e. most
-    // downstream
+        // Extract four-position and momentum from last track point (i.e. most
+        // downstream
         TLorentzVector position;
         TLorentzVector momentum;
         DataStructure::Global::TrackPoint* last_tracker_tp =

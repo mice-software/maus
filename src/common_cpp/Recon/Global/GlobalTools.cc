@@ -309,8 +309,12 @@ static int _charge;
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
                bool energy_loss) {
-  if (std::abs(target_z) > 100000) {
+  if (std::abs(target_z) > 50000) {
     throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
+                    "GlobalTools::propagate"));
+  }
+  if (std::abs(x[1]) > 700 or std::abs(x[2]) > 700 or std::abs(x[3]) > 50000) {
+    throw(Exceptions::Exception(Exceptions::recoverable, "Bad input coordinates",
                     "GlobalTools::propagate"));
   }
   if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
