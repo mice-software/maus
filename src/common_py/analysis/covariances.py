@@ -131,6 +131,14 @@ class CovarianceMatrix() :
     return self._num_particles
 
 
+  def save_covariance( self, filename, axes = [ 'x', 'px', 'y', 'py', 'z', 'pz', 't', 'E' ] ) :
+    """
+      Save the covariance matrix to a file called <filename>.
+    """
+    cov = self.get_covariance_matrix(axes)
+    numpy.savetxt(filename, cov)
+
+
   def clear( self ) :
     """ 
       Set our two matrices to zeros.

@@ -27,6 +27,7 @@
 
 import math
 import analysis.tools as tools
+import numpy
 
 class AnalysisHit() :
   """
@@ -323,6 +324,15 @@ class AnalysisHit() :
       return None
     else :
       return AnalysisHit.__hit_get_variables[ string ]( self )
+
+
+  def get_as_vector( self ) :
+    """
+      Returns the 6D phase-space vector corresponding to the particle.
+      [t, E, x, px, y, py, z, pz]
+    """
+    return [self.__time, self.get_energy(), self.__x, self.__px, self.__y,
+            self.__py, self.__z, self.__pz]
 
 
   def get_variable_list() :

@@ -24,6 +24,7 @@ import analysis
 import analysis.covariances
 
 import ROOT
+import numpy
 
 
 class PhaseSpace2DInspector() :
@@ -33,9 +34,13 @@ class PhaseSpace2DInspector() :
     self.position = 0.0
     self.ensemble_size = ensemble_size
     self.covariance = analysis.covariances.CovarianceMatrix()
+    self.covariance_matrix = None
 
     self.momentum_bias = None
     self.momentum_correlation = None
+
+    self.parent_covariance = None
+    self.parent_covariance_inv = None
 
     self.position_plot = ROOT.TH2F(\
            'inspected_position_{0}'.format(self.plane), 'Beam Position', \
@@ -93,9 +98,18 @@ class PhaseSpace2DInspector() :
                 'inspected_momentum_{0}'.format(self.plane), 'Momentum', \
                                                               1000, 0.0, 500.0)
 
+    self.amplitude_plot = ROOT.TH1F(\
+             'single_particle_amplitudes_{0}'.format(self.plane), 'Momentum', \
+                                                              200, 0.0, 100.0)
+
 
   def set_covariance_correction(self, correction, axes=['x', 'px', 'y', 'py']) :
     self.covariance.set_covariance_correction( correction, axes )
+
+
+  def set_parent_covariance(self, matrix) :
+    self.parent_covariance = numpy.array(matrix)
+    self.parent_covariance_inv = numpy.linalg.inv(self.parent_covariance)
 
 
   def set_momentum_correction(self, constant, gradient) :
@@ -112,6 +126,11 @@ class PhaseSpace2DInspector() :
       hit.set_px(hit.get_px()*correction)
       hit.set_py(hit.get_py()*correction)
       hit.set_pz(hit.get_pz()*correction)
+
+    if self.parent_covariance_inv is not None :
+      vector = numpy.array(hit.get_as_vector()[2:6])
+      amplitude = vector.transpose().dot(self.parent_covariance_inv.dot(vector))
+      self.amplitude_plot.Fill(amplitude)
 
     self.covariance.add_hit(hit)
 
@@ -145,6 +164,8 @@ class PhaseSpace2DInspector() :
     self.beta_x_plot.Fill(self.covariance.get_beta(['x']))
     self.beta_y_plot.Fill(self.covariance.get_beta(['y']))
     self.total_momentum_plot.Fill(self.covariance.get_momentum())
+
+    self.covariance_matrix = self.covariance.get_covariance_matrix(['x', 'px', 'y', 'py'])
   
     self.covariance.clear()
 
@@ -177,6 +198,7 @@ class PhaseSpace2DInspector() :
     ins_plots['beta_x'] = self.beta_x_plot
     ins_plots['beta_y'] = self.beta_y_plot
     ins_plots['momentum'] = self.total_momentum_plot
+    ins_plots['amplitude'] = self.amplitude_plot
 
     return ins_plots
 
@@ -213,6 +235,9 @@ class PhaseSpace2DInspector() :
     ins_data['alpha_x_rms'] = self.alpha_x_plot.GetRMS() 
     ins_data['alpha_y_rms'] = self.alpha_y_plot.GetRMS()
     ins_data['momentum_rms'] = self.momentum_plot.GetRMS()
+
+    ins_data['covariance_matrix'] = [ [ self.covariance_matrix[i][j] for j in range(4) ] for i in range(4) ]
+
 
     return ins_data
 
