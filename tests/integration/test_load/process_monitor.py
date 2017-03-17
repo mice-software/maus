@@ -66,7 +66,7 @@ def monitor_step(delta_t, mem_list, graph_dict):
     for i, item in enumerate(mem_list[-1]):
         pid = int(item["pid"])
         mem = print_mem_usage(pid)
-        mem_p = float(mem["%mem"])
+        # mem_p = float(mem["%mem"])
         rsz = float(mem["rsz"])
         index = graph_dict[pid].GetN()
         # if mem and (mem_p > 1e-9 or index == 1):
