@@ -103,6 +103,7 @@ void TrackMatching::USTrack() {
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching");
       hypothesis_track->set_pid(pids[i]);
       hypothesis_track->set_p_value(tracker0_track->get_p_value());
+      hypothesis_track->set_tracker_clusters(tracker0_track->get_tracker_clusters());
       // No matching criterion for Cherenkov hits, so if they exist, we add them
       if (CkovA_sp.size() > 0) {
         Squeak::mout(Squeak::debug) << "TrackMatching: CkovA Added" << std::endl;
@@ -225,7 +226,7 @@ void TrackMatching::DSTrack() {
       hypothesis_track->set_mapper_name("MapCppGlobalTrackMatching");
       hypothesis_track->set_pid(pids[i]);
       hypothesis_track->set_p_value(tracker1_track->get_p_value());
-
+      hypothesis_track->set_tracker_clusters(tracker1_track->get_tracker_clusters());
       // This time we add in the tracker trackpoints first
       double mass = Particle::GetInstance().GetMass(pids[i]);
       AddTrackerTrackPoints(tracker1_track, "MapCppGlobalTrackMatching",
