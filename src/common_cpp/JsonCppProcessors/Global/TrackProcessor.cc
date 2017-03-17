@@ -100,6 +100,11 @@ TrackProcessor::TrackProcessor()
         "p_value", &_double_proc,
         &MAUS::DataStructure::Global::Track::get_p_value,
         &MAUS::DataStructure::Global::Track::set_p_value, false);
+
+    RegisterValueBranch(
+        "tracker_clusters", &_uint_proc,
+        &MAUS::DataStructure::Global::Track::get_tracker_clusters,
+        &MAUS::DataStructure::Global::Track::set_tracker_clusters, false);
 }
 
 } // ~namespace Global
