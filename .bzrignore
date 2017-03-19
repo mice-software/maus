@@ -7,6 +7,7 @@ files/geometry/download/*
 *.os
 *~
 *.tmp
+*.whl
 .coverage
 tmp
 tmp1
@@ -27,6 +28,10 @@ src/output/*/build
 src/map/*/build
 src/reduce/*/build
 tests/cpp_unit/test_cpp_unit
+third_party/source/pip/*.tar.gz
+third_party/source/pip/*.tgz
+third_party/source/pip/*.zip
+third_party/source/pip/PIL-License.txt
 third_party/home
 third_party/build/*
 third_party/install/bin/*
