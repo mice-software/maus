@@ -39,6 +39,7 @@ namespace global {
       ImportSciFiTrack(scifi_track, GlobalSciFiTrack, mapper_name);
       GlobalSciFiTrack->set_mapper_name(mapper_name);
       GlobalSciFiTrack->set_p_value(scifi_track->P_value());
+      GlobalSciFiTrack->set_tracker_clusters(abs(scifi_track->GetNumberDataPoints()));
       global_event->add_track_recursive(GlobalSciFiTrack);
     }
   }
