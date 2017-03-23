@@ -20,7 +20,7 @@
 #include "Globals/PyLibMausCpp.hh"
 #include "cabling/cabling.h"
 #include <exception>
-#include "cabling/CablingImplPortBinding.nsmap"
+#include "generated/CablingImplPortBinding.nsmap"
 
 namespace MAUS {
 
