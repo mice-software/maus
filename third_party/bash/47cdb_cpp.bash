@@ -2,9 +2,10 @@
 
 version=1.0.1
 directory="cdb-C++.${version}"
-filename="cdb.client.api-C++.v1.0.1.tgz"
-md5file="cdb.client.api-C++.v1.0.1.tgz.md5"
+filename="cdb.client.api-C++.v${version}.tgz"
+md5file="cdb.client.api-C++.v${version}.tgz.md5"
 
+# v1.0.1 source url
 url=http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-C++/download/head:/cdb.client.apic.v1.0-20170317175958-b4kkvdo0a734708l-1/cdb.client.api-C%2B%2B.v1.0.1.tgz
 
 
@@ -42,7 +43,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
 
     fi
-   
+  
+    echo "Checking for file..... $filename"
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
         echo "INFO: Source archive exists."
@@ -68,14 +70,23 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo "INFO: Making:"
         echo
         sleep 1
+        # generate soap bindings
         make gen
+        # build
         make
-        cp lib/libcdbc++.${version}.a ${MAUS_THIRD_PARTY}/third_party/install/lib
+
+        # copy library to install location - third_party/install/lib
+        LIBDIR=${MAUS_THIRD_PARTY}/third_party/install/lib
+        cp lib/libcdbc++.${version}.a ${LIBDIR}
+
+        # copy includes to third_party/install/include/cdb-c++
         INCLUDE_DIR=${MAUS_THIRD_PARTY}/third_party/install/include/cdb-c++
         mkdir -p $INCLUDE_DIR
         cp -r include/* $INCLUDE_DIR
-        #cp -p src/generated/CalibrationImplPortBinding.nsmap ${INCLUDE_DIR}/cabling
-        #cp -p src/generated/CalibrationImplPortBinding.nsmap ${INCLUDE_DIR}/calibration
+
+        cd $LIBDIR
+        ln -s libcdbc++.${version}.a libcdbc++.a
+
             ################################################## 
         echo
         echo "INFO: The package should be locally build now in your"
