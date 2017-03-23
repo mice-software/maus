@@ -18,6 +18,9 @@
 
 #include "Utils/TOFChannelMap.hh"
 #include "Globals/PyLibMausCpp.hh"
+#include "cabling/cabling.h"
+#include <exception>
+#include "cabling/CablingImplPortBinding.nsmap"
 
 namespace MAUS {
 
@@ -76,6 +79,19 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON, int rnum) {
   }
 //   std::cout << "TOF cabling date: " << _tof_cablingdate << std::endl;
 //   std::cout << "TOF cabling source: " << _cabling_source << std::endl;
+
+  MAUS::CDB::Cabling cbl;
+  std::string result;
+  try {
+      std::string status;
+      cbl.getStatus(status);
+      std::cerr << " Cabling status returned " << status << std::endl;
+      int run = 8681;
+      cbl.getDetectorCablingForRun("tof1", run, result);
+      std::cerr << result << "(" << result.size() << " characters)" << std::endl;
+  } catch (std::exception &e) {
+      std::cerr << e.what() << std::endl;
+  }
   if (!pymod_ok) return false;
   runNumber = rnum;
 
