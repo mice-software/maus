@@ -43,10 +43,6 @@ void TOFChannelMap::reset() {
 }
 
 TOFChannelMap::TOFChannelMap() {
-    /*
-  pymod_ok = true;
-  if (!this->InitializePyMod()) pymod_ok = false;
-  */
   runNumber = 0;
 }
 
@@ -82,9 +78,6 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON, int rnum) {
 //   std::cout << "TOF cabling date: " << _tof_cablingdate << std::endl;
 //   std::cout << "TOF cabling source: " << _cabling_source << std::endl;
 
-  /*
-  if (!pymod_ok) return false;
-  */
   runNumber = rnum;
 
   bool fromDB = true;
@@ -146,8 +139,7 @@ bool TOFChannelMap::InitFromFile(string filename) {
 }
 
 bool TOFChannelMap::InitFromCDB() {
-  // this->GetCabling(_tof_station, _tof_cablingdate);
-  if (!this->GetCablingCAPI(_tof_station, _tof_cablingdate))
+  if (!this->GetCablingCAPI(_tof_station))
       return false;
   std::cout << "got cabling from CDB" << std::endl;
   TOFChannelKey* tofkey;
@@ -358,41 +350,8 @@ string TOFChannelKey::str() {
   return xConv.str();
 }
 
-/*
-bool TOFChannelMap::InitializePyMod() {
-  // import the get_tof_cabling module
-  // this python module access and gets cabling from the DB
-  PyLibMausCpp::initlibMausCpp();
-  _cabling_mod = PyImport_ImportModule("calibration.get_tof_cabling");
-  if (_cabling_mod == NULL) {
-    std::cerr << "Failed to import get_tof_cabling module" << std::endl;
-    return false;
-  }
 
-  PyObject* cabling_mod_dict = PyModule_GetDict(_cabling_mod);
-  if (cabling_mod_dict != NULL) {
-    PyObject* cabling_init = PyDict_GetItemString
-                                              (cabling_mod_dict, "GetCabling");
-    if (PyCallable_Check(cabling_init)) {
-        _tcabling = PyObject_Call(cabling_init, NULL, NULL);
-    }
-  }
-  if (_tcabling == NULL) {
-    std::cerr << "Failed to instantiate get_tof_cabling" << std::endl;
-    return false;
-  }
-
-    // get the get_cabling_func() function
-  _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling");
-  if (_get_cabling_func == NULL) {
-    std::cerr << "Failed to find get_cabling function" << std::endl;
-    return false;
-  }
-  return true;
-}
-*/
-
-bool TOFChannelMap::GetCablingCAPI(std::string devname, std::string fromdate) {
+bool TOFChannelMap::GetCablingCAPI(std::string devname) {
   // setup the CDB Cabling service
   // default endpoint is the public slave cdb.mice.rl.ac.uk
   // in order to use preprod, do
@@ -409,11 +368,15 @@ bool TOFChannelMap::GetCablingCAPI(std::string devname, std::string fromdate) {
       }
       // std::cerr << " Cabling status returned " << status << std::endl;
       if (_tof_cabling_by == "date") {
-          std::cout << "++++++++ Getting TOF cabling by DATE for " << fromdate.c_str() << std::endl;
-          cbl.getDetectorCablingForDate(devname.c_str(), fromdate.c_str(), result);
+          std::cout << "+++ Getting TOFcabling by DATE: " << _tof_cablingdate.c_str() << std::endl;
+          cbl.getDetectorCablingForDate(devname.c_str(),
+                                        _tof_cablingdate.c_str(),
+                                        result);
       } else if (_tof_cabling_by == "run_number") {
-          std::cout << "++++++++ Getting TOF cabling by RUN# " << runNumber << std::endl;
-          cbl.getDetectorCablingForRun(devname.c_str(), runNumber, result);
+          std::cout << "+++ Getting TOFcabling by RUN# " << runNumber << std::endl;
+          cbl.getDetectorCablingForRun(devname.c_str(),
+                                       runNumber,
+                                       result);
       }
       // std::cout << result << "(" << result.size() << " characters)" << std::endl;
   } catch (std::exception &e) {
@@ -425,48 +388,4 @@ bool TOFChannelMap::GetCablingCAPI(std::string devname, std::string fromdate) {
   return true;
 }
 
-/*
-void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
-  PyObject *py_arg = NULL, *py_value = NULL;
-  // setup the arguments to get_calib_func
-  // the arguments are 2 strings
-  // arg1 = device name (TOF0/TOF1/TOF2) uppercase
-  // this is actually not very meaningful since the cabling is for TOF not TOF0/1/2
-  // however the cabling schema does not have a generic "TOF" device
-  // hence using the trigger station as the default device
-  // arg2 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
-  // default date argument is "current"
-  // this is set via TOF_cabling_date_from card in ConfigurationDefaults
-  if (_tof_cabling_by == "date") {
-      py_arg = Py_BuildValue("(ss)", devname.c_str(), fromdate.c_str());
-      _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling");
-  } else if (_tof_cabling_by == "run_number") {
-      py_arg = Py_BuildValue("(si)", devname.c_str(), runNumber);
-      _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling_for_run");
-  }
-  std::cout << "Building" << std::endl;
-  if (py_arg == NULL) {
-    PyErr_Clear();
-    throw(Exceptions::Exception(Exceptions::recoverable,
-              "Failed to resolve arguments to get_cabling",
-              "MAUSEvaluator::evaluate"));
-    }
-    if (_get_cabling_func != NULL && PyCallable_Check(_get_cabling_func)) {
-        py_value = PyObject_CallObject(_get_cabling_func, py_arg);
-        // setup the stream to hold the cabling
-        if (py_value != NULL)
-            cblstr << PyString_AsString(py_value);
-    }
-    if (py_value == NULL) {
-        PyErr_Clear();
-        Py_XDECREF(py_arg);
-        throw(Exceptions::Exception(Exceptions::recoverable,
-                     "Failed to parse argument "+devname,
-                     "GetCabling::get_cabling"));
-    }
-    // clean up
-    Py_XDECREF(py_value);
-    Py_XDECREF(py_arg);
-}
-*/
-}
+} // end namespace MAUS
