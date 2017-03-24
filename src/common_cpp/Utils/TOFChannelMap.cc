@@ -20,7 +20,7 @@
 #include "Globals/PyLibMausCpp.hh"
 #include "cabling/cabling.h"
 #include <exception>
-#include "generated/CablingImplPortBinding.nsmap"
+//#include "generated/CablingImplPortBinding.nsmap"
 
 namespace MAUS {
 
@@ -43,8 +43,10 @@ void TOFChannelMap::reset() {
 }
 
 TOFChannelMap::TOFChannelMap() {
+    /*
   pymod_ok = true;
   if (!this->InitializePyMod()) pymod_ok = false;
+  */
   runNumber = 0;
 }
 
@@ -80,19 +82,9 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON, int rnum) {
 //   std::cout << "TOF cabling date: " << _tof_cablingdate << std::endl;
 //   std::cout << "TOF cabling source: " << _cabling_source << std::endl;
 
-  MAUS::CDB::Cabling cbl;
-  std::string result;
-  try {
-      std::string status;
-      cbl.getStatus(status);
-      std::cerr << " Cabling status returned " << status << std::endl;
-      int run = 8681;
-      cbl.getDetectorCablingForRun("tof1", run, result);
-      std::cerr << result << "(" << result.size() << " characters)" << std::endl;
-  } catch (std::exception &e) {
-      std::cerr << e.what() << std::endl;
-  }
+  /*
   if (!pymod_ok) return false;
+  */
   runNumber = rnum;
 
   bool fromDB = true;
@@ -154,8 +146,10 @@ bool TOFChannelMap::InitFromFile(string filename) {
 }
 
 bool TOFChannelMap::InitFromCDB() {
-  this->GetCabling(_tof_station, _tof_cablingdate);
-  std::cout << "got cabling" << std::endl;
+  //this->GetCabling(_tof_station, _tof_cablingdate);
+  if (! this->GetCablingCAPI(_tof_station, _tof_cablingdate))
+      return false;
+  std::cout << "got cabling from CDB" << std::endl;
   TOFChannelKey* tofkey;
   DAQChannelKey* tdckey;
   DAQChannelKey* fadckey;
@@ -364,7 +358,7 @@ string TOFChannelKey::str() {
   return xConv.str();
 }
 
-
+/*
 bool TOFChannelMap::InitializePyMod() {
   // import the get_tof_cabling module
   // this python module access and gets cabling from the DB
@@ -396,7 +390,42 @@ bool TOFChannelMap::InitializePyMod() {
   }
   return true;
 }
+*/
 
+bool TOFChannelMap::GetCablingCAPI(std::string devname, std::string fromdate) {
+  // setup the CDB Cabling service
+  // default endpoint is the public slave cdb.mice.rl.ac.uk
+  // in order to use preprod, do
+  //    MAUS::CDB::Cabling cbl("http://preprodcdb.mice.rl.ac.uk")
+  MAUS::CDB::Cabling cbl;
+  // result holds the string returned by the cdb query
+  std::string result;
+  try {
+      std::string status;
+      cbl.getStatus(status);
+      if (status.compare("OK") != 0) {
+          std::cerr << "+++ CDB Error status = " << status << std::endl;
+          return false;
+      }
+      //std::cerr << " Cabling status returned " << status << std::endl;
+      if (_tof_cabling_by == "date") {
+          std::cout << "++++++++ Getting TOF cabling by DATE for " << fromdate.c_str() << std::endl;
+          cbl.getDetectorCablingForDate(devname.c_str(), fromdate.c_str(), result);
+      } else if (_tof_cabling_by == "run_number") {
+          std::cout << "++++++++ Getting TOF cabling by RUN# " << runNumber << std::endl;
+          cbl.getDetectorCablingForRun(devname.c_str(), runNumber, result);
+      }
+      //std::cout << result << "(" << result.size() << " characters)" << std::endl;
+  } catch (std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return false;
+  }
+  // store the result in a stringstream so it can be parsed by the InitFromCDB function
+  cblstr.str(result);
+  return true;
+}
+
+/*
 void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
   PyObject *py_arg = NULL, *py_value = NULL;
   // setup the arguments to get_calib_func
@@ -439,4 +468,5 @@ void TOFChannelMap::GetCabling(std::string devname, std::string fromdate) {
     Py_XDECREF(py_value);
     Py_XDECREF(py_arg);
 }
+*/
 }

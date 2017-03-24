@@ -169,8 +169,9 @@ class TOFChannelMap {
   /* Get data cards from configuration file */
   bool InitializeCards(Json::Value configJSON, int rnum);
   /* interface to the python get_tof_cabling module */
-  void GetCabling(std::string devname, std::string fromdate);
-  bool InitializePyMod();
+  bool GetCablingCAPI(std::string devname, std::string fromdate);
+  //void GetCabling(std::string devname, std::string fromdate);
+  //bool InitializePyMod();
 
  private:
   /** Use this function to reset the map before reloading. */
@@ -179,14 +180,13 @@ class TOFChannelMap {
   std::vector<TOFChannelKey*> _tofKey;
   std::vector<DAQChannelKey*> _tdcKey;
   std::vector<DAQChannelKey*> _fadcKey;
-
   std::string _name;
   std::stringstream cblstr;
   std::string _tof_station, _tof_cablingdate, _tof_cabling_by;
-  PyObject* _cabling_mod;
-  PyObject* _tcabling;
-  PyObject* _get_cabling_func;
-  bool pymod_ok;
+  //PyObject* _cabling_mod;
+  //PyObject* _tcabling;
+  //PyObject* _get_cabling_func;
+  //bool pymod_ok;
   int runNumber;
 };
 
