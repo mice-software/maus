@@ -167,7 +167,7 @@ class TOFChannelMap {
 
   /* Get data cards from configuration file */
   bool InitializeCards(Json::Value configJSON, int rnum);
-  /* interface to the python get_tof_cabling module */
+  /* interface to the CDB-C++ API*/
   bool GetCablingCAPI(std::string devname);
 
  private:

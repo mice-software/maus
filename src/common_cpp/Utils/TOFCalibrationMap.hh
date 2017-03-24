@@ -177,6 +177,7 @@ class TOFCalibrationMap {
   * To be used only for debugging.
   */
   void Print();
+  /* interface to the CDB-C++ API*/
   bool GetCalibCAPI(std::string devname, std::string caltype);
   void SetTriggerStation(int station) {_triggerStation = station;}
   enum {

@@ -17,7 +17,7 @@
 
 #include "Utils/DAQChannelMap.hh"
 #include "Utils/Squeak.hh"
-#include "Globals/PyLibMausCpp.hh"
+#include "cabling/cabling.h"
 
 namespace MAUS {
 
@@ -103,8 +103,6 @@ void DAQChannelMap::reset() {
 }
 
 DAQChannelMap::DAQChannelMap() {
-  pymod_ok = true;
-  if (!this->InitializePyMod()) pymod_ok = false;
 }
 
 // load channel map based on data cards
@@ -132,7 +130,7 @@ bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
   _daq_cablingdate = "current";
   if (_daq_cabling_by == "date")
       _daq_cablingdate = JsonWrapper::GetProperty(configJSON,
-                                               "DAQ_cabling_date_from",
+                                               "DAQ_cabling_date",
                                                JsonWrapper::stringValue).asString();
 
   runNumber = -1;
@@ -151,11 +149,10 @@ bool DAQChannelMap::InitFromCards(Json::Value configJSON) {
   }
 
   bool loaded = false;
-//   std::cout << "#### Getting TOF cabling by " << _cabling_source
+//   std::cout << "#### Getting DAQ cabling by " << _cabling_source
 //             << "  Run " << runNumber << " ####" << std::endl;
 
   if (_cabling_source == "CDB") {
-      if (!pymod_ok) return false;
 //       std::cout << "#### initializing from CDB ####" << std::endl;
       loaded = this->InitFromCDB();
   } else if (_cabling_source == "file") {
@@ -226,7 +223,8 @@ bool DAQChannelMap::InitFromCurrentCDB() {
   _daq_devicename = "DAQ";
   _daq_cabling_by = "date";
   _daq_cablingdate = "current";
-  this->GetCabling(_daq_devicename);
+  if (!this->GetCablingCAPI(_daq_devicename))
+      return false;
   int lineNum = 0;
   DAQChannelKey* key;
   try {
@@ -253,7 +251,8 @@ bool DAQChannelMap::InitFromCurrentCDB() {
 }
 
 bool DAQChannelMap::InitFromCDB() {
-  this->GetCabling(_daq_devicename);
+  if (!this->GetCablingCAPI(_daq_devicename))
+      return false;
   int lineNum = 0;
   DAQChannelKey* key;
   try {
@@ -320,79 +319,46 @@ bool DAQChannelMap::is_number(const std::string& s) {
     return !s.empty() && it == s.end();
 }
 
-bool DAQChannelMap::InitializePyMod() {
-  // import the get_tof_cabling module
-  // this python module access and gets cabling from the DB
-  PyLibMausCpp::initlibMausCpp();
-  _cabling_mod = PyImport_ImportModule("cabling.get_daq_cabling");
-  if (_cabling_mod == NULL) {
-    std::cerr << "Failed to import get_daq_cabling module" << std::endl;
-    return false;
+bool DAQChannelMap::GetCablingCAPI(std::string devname) {
+  // setup the CDB Cabling service
+  // default endpoint is the public slave cdb.mice.rl.ac.uk
+  // in order to use preprod, do
+  //    MAUS::CDB::Cabling cbl("http://preprodcdb.mice.rl.ac.uk")
+  MAUS::CDB::Cabling cbl;
+  // result holds the string returned by the cdb query
+  std::string result;
+  try {
+      std::string status;
+      cbl.getStatus(status);
+      if (status.compare("OK") != 0) {
+          std::cerr << "+++ CDB Error status = " << status << std::endl;
+          return false;
+      }
+      std::cout << " DAQ Cabling status returned " << status << std::endl;
+      if (_daq_cabling_by == "date") {
+          std::cout << "+++ Getting DAQcabling by DATE: " << _daq_cablingdate.c_str() << std::endl;
+          if (_daq_cablingdate.compare("current") == 0) {
+              cbl.getCurrentDetectorCabling(devname.c_str(),
+                                            result);
+          } else {
+              cbl.getDetectorCablingForDate(devname.c_str(),
+                                            _daq_cablingdate.c_str(),
+                                            result);
+          }
+      } else if (_daq_cabling_by == "run_number") {
+          std::cout << "+++ Getting DAQcabling by RUN# " << runNumber << std::endl;
+          cbl.getDetectorCablingForRun(devname.c_str(),
+                                       runNumber,
+                                       result);
+      }
+      // std::cout << result << "(" << result.size() << " characters)" << std::endl;
+  } catch (std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return false;
   }
-
-  PyObject* cabling_mod_dict = PyModule_GetDict(_cabling_mod);
-  if (cabling_mod_dict != NULL) {
-    PyObject* cabling_init = PyDict_GetItemString
-                                              (cabling_mod_dict, "GetCabling");
-    if (PyCallable_Check(cabling_init)) {
-        _tcabling = PyObject_Call(cabling_init, NULL, NULL);
-    }
-  }
-  if (_tcabling == NULL) {
-    std::cerr << "Failed to instantiate get_daq_cabling" << std::endl;
-    return false;
-  }
-
+  // store the result in a stringstream so it can be parsed by the InitFromCDB function
+  cblstr.str(result);
   return true;
-}
-
-void DAQChannelMap::GetCabling(std::string devname) {
-  PyObject *py_arg = NULL, *py_value = NULL;
-  // setup the arguments to get_cabling_func
-  // the functions available are
-  // get_cabling_for_date(DEVICE, DATE)
-  // get_cabling_for_run(DEVICE, RUN)
-
-  _get_cabling_func = NULL;
-  if (_daq_cabling_by == "date") {
-      py_arg = Py_BuildValue("(ss)", devname.c_str(), _daq_cablingdate.c_str());
-      _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling_for_date");
-  } else if (_daq_cabling_by == "run_number") {
-      py_arg = Py_BuildValue("(si)", devname.c_str(), runNumber);
-      _get_cabling_func = PyObject_GetAttrString(_tcabling, "get_cabling_for_run");
-  } else {
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Invalid daq_cabling_by type "+_daq_cabling_by,
-                     "DAQChannelMap::GetCalib"));
-  }
-
-  if (_get_cabling_func == NULL)
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Failed to find get_calib function",
-                     "DAQChannelMap::GetCalib"));
-
-  if (py_arg == NULL) {
-    PyErr_Clear();
-    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-              "Failed to resolve arguments to get_cabling",
-              "MAUSEvaluator::evaluate"));
-    }
-    if (_get_cabling_func != NULL && PyCallable_Check(_get_cabling_func)) {
-        py_value = PyObject_CallObject(_get_cabling_func, py_arg);
-        // setup the streams to hold the different calibs
-        if (py_value != NULL)
-            cblstr << PyString_AsString(py_value);
-    }
-    if (py_value == NULL) {
-        PyErr_Clear();
-        Py_XDECREF(py_arg);
-        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Failed to parse argument "+devname,
-                     "GetCalib::get_calib"));
-    }
-    // clean up
-    Py_XDECREF(py_value);
-    Py_XDECREF(py_arg);
 }
 
 }  // namespace MAUS
