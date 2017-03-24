@@ -485,10 +485,16 @@ bool TOFCalibrationMap::GetCalibCAPI(std::string devname, std::string caltype) {
       // std::cerr << " Calibration status returned " << status << std::endl;
       if (_tof_calib_by == "date") {
           std::cout << "++ Getting Calib by DATE for " << _tof_calibdate.c_str() << std::endl;
-          cali.getDetectorCalibrationForDate(devname.c_str(),
-                                             caltype.c_str(),
-                                             _tof_calibdate.c_str(),
-                                             result);
+          if (_tof_calibdate.compare("current") == 0) {
+              cali.getCurrentDetectorCalibration(devname.c_str(),
+                                                 caltype.c_str(),
+                                                 result);
+          } else {
+              cali.getDetectorCalibrationForDate(devname.c_str(),
+                                                 caltype.c_str(),
+                                                 _tof_calibdate.c_str(),
+                                                 result);
+          }
       } else if (_tof_calib_by == "run_number") {
           std::cout << "++ Getting Calib by RUN# " << runNumber << std::endl;
           cali.getDetectorCalibrationForRun(devname.c_str(),

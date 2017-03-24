@@ -18,7 +18,6 @@
 
 #include <exception>
 #include "Utils/TOFChannelMap.hh"
-#include "Globals/PyLibMausCpp.hh"
 #include "cabling/cabling.h"
 // #include "generated/CablingImplPortBinding.nsmap"
 
@@ -369,9 +368,14 @@ bool TOFChannelMap::GetCablingCAPI(std::string devname) {
       // std::cerr << " Cabling status returned " << status << std::endl;
       if (_tof_cabling_by == "date") {
           std::cout << "+++ Getting TOFcabling by DATE: " << _tof_cablingdate.c_str() << std::endl;
-          cbl.getDetectorCablingForDate(devname.c_str(),
-                                        _tof_cablingdate.c_str(),
-                                        result);
+          if (_tof_cablingdate.compare("current") == 0) {
+              cbl.getCurrentDetectorCabling(devname.c_str(),
+                                            result);
+          } else {
+              cbl.getDetectorCablingForDate(devname.c_str(),
+                                            _tof_cablingdate.c_str(),
+                                            result);
+          }
       } else if (_tof_cabling_by == "run_number") {
           std::cout << "+++ Getting TOFcabling by RUN# " << runNumber << std::endl;
           cbl.getDetectorCablingForRun(devname.c_str(),
