@@ -178,8 +178,8 @@ class TOFCalibrationMap {
   * To be used only for debugging.
   */
   void Print();
-  //bool InitializePyMod();
-  //void GetCalib(std::string devname, std::string caltype);
+  // bool InitializePyMod();
+  // void GetCalib(std::string devname, std::string caltype);
   bool GetCalibCAPI(std::string devname, std::string caltype);
   void SetTriggerStation(int station) {_triggerStation = station;}
   enum {
@@ -269,13 +269,13 @@ class TOFCalibrationMap {
   bool _do_triggerDelay_correction;
   bool _do_t0_correction;
 
-  //PyObject* _calib_mod;
-  //PyObject* _tcalib;
-  //PyObject* _get_calib_func;
+  // PyObject* _calib_mod;
+  // PyObject* _tcalib;
+  // PyObject* _get_calib_func;
   bool LoadT0Calib();
   bool LoadTWCalib();
   bool LoadTriggerCalib();
-  //bool pymod_ok;
+  // bool pymod_ok;
   int runNumber;
 };
 }

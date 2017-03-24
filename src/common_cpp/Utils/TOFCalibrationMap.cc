@@ -15,10 +15,10 @@
  *
  */
 
+#include <exception>
 #include "Utils/TOFCalibrationMap.hh"
 
 #include "calibration/calibration.h"
-#include <exception>
 #include "generated/CalibrationImplPortBinding.nsmap"
 
 namespace MAUS {
@@ -514,15 +514,21 @@ bool TOFCalibrationMap::GetCalibCAPI(std::string devname, std::string caltype) {
           std::cerr << "+++ CDB Error status = " << status << std::endl;
           return false;
       }
-      //std::cerr << " Calibration status returned " << status << std::endl;
+      // std::cerr << " Calibration status returned " << status << std::endl;
       if (_tof_calib_by == "date") {
-          std::cout << "++++++++ Getting Calibration by DATE for " << _tof_calibdate.c_str() << std::endl;
-          cali.getDetectorCalibrationForDate(devname.c_str(), caltype.c_str(), _tof_calibdate.c_str(), result);
+          std::cout << "++ Getting Calib by DATE for " << _tof_calibdate.c_str() << std::endl;
+          cali.getDetectorCalibrationForDate(devname.c_str(),
+                                             caltype.c_str(),
+                                             _tof_calibdate.c_str(),
+                                             result);
       } else if (_tof_calib_by == "run_number") {
-          std::cout << "++++++++ Getting Calibration by RUN# " << runNumber << std::endl;
-          cali.getDetectorCalibrationForRun(devname.c_str(), caltype.c_str(), runNumber, result);
+          std::cout << "++ Getting Calib by RUN# " << runNumber << std::endl;
+          cali.getDetectorCalibrationForRun(devname.c_str(),
+                                            caltype.c_str(),
+                                            runNumber,
+                                            result);
       }
-      //std::cerr << result << "(" << result.size() << " characters)" << std::endl;
+      // std::cerr << result << "(" << result.size() << " characters)" << std::endl;
   } catch (std::exception &e) {
       std::cerr << e.what() << std::endl;
       return false;
@@ -593,8 +599,8 @@ void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype) {
 */
 
 bool TOFCalibrationMap::LoadT0Calib() {
-  //this->GetCalib(_tof_station, "t0");
-  if (! this->GetCalibCAPI(_tof_station, "t0"))
+  // this->GetCalib(_tof_station, "t0");
+  if (!this->GetCalibCAPI(_tof_station, "t0"))
       return false;
   int reff;
   double p0;
@@ -619,8 +625,8 @@ bool TOFCalibrationMap::LoadT0Calib() {
 }
 
 bool TOFCalibrationMap::LoadTWCalib() {
-  //this->GetCalib(_tof_station, "tw");
-  if (! this->GetCalibCAPI(_tof_station, "tw"))
+  // this->GetCalib(_tof_station, "tw");
+  if (!this->GetCalibCAPI(_tof_station, "tw"))
       return false;
   double p0, p1, p2, p3;
   TOFChannelKey key;
@@ -648,8 +654,8 @@ bool TOFCalibrationMap::LoadTWCalib() {
 }
 
 bool TOFCalibrationMap::LoadTriggerCalib() {
-  //this->GetCalib(_tof_station, "trigger");
-  if (! this->GetCalibCAPI(_tof_station, "trigger"))
+  // this->GetCalib(_tof_station, "trigger");
+  if (!this->GetCalibCAPI(_tof_station, "trigger"))
       return false;
   TOFPixelKey Pkey;
   double dt;

@@ -16,11 +16,11 @@
  */
 
 
+#include <exception>
 #include "Utils/TOFChannelMap.hh"
 #include "Globals/PyLibMausCpp.hh"
 #include "cabling/cabling.h"
-#include <exception>
-//#include "generated/CablingImplPortBinding.nsmap"
+// #include "generated/CablingImplPortBinding.nsmap"
 
 namespace MAUS {
 
@@ -146,8 +146,8 @@ bool TOFChannelMap::InitFromFile(string filename) {
 }
 
 bool TOFChannelMap::InitFromCDB() {
-  //this->GetCabling(_tof_station, _tof_cablingdate);
-  if (! this->GetCablingCAPI(_tof_station, _tof_cablingdate))
+  // this->GetCabling(_tof_station, _tof_cablingdate);
+  if (!this->GetCablingCAPI(_tof_station, _tof_cablingdate))
       return false;
   std::cout << "got cabling from CDB" << std::endl;
   TOFChannelKey* tofkey;
@@ -407,7 +407,7 @@ bool TOFChannelMap::GetCablingCAPI(std::string devname, std::string fromdate) {
           std::cerr << "+++ CDB Error status = " << status << std::endl;
           return false;
       }
-      //std::cerr << " Cabling status returned " << status << std::endl;
+      // std::cerr << " Cabling status returned " << status << std::endl;
       if (_tof_cabling_by == "date") {
           std::cout << "++++++++ Getting TOF cabling by DATE for " << fromdate.c_str() << std::endl;
           cbl.getDetectorCablingForDate(devname.c_str(), fromdate.c_str(), result);
@@ -415,7 +415,7 @@ bool TOFChannelMap::GetCablingCAPI(std::string devname, std::string fromdate) {
           std::cout << "++++++++ Getting TOF cabling by RUN# " << runNumber << std::endl;
           cbl.getDetectorCablingForRun(devname.c_str(), runNumber, result);
       }
-      //std::cout << result << "(" << result.size() << " characters)" << std::endl;
+      // std::cout << result << "(" << result.size() << " characters)" << std::endl;
   } catch (std::exception &e) {
       std::cerr << e.what() << std::endl;
       return false;
