@@ -40,7 +40,6 @@
 #include "gtest/gtest_prod.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
@@ -424,7 +423,6 @@ class PatternRecognition {
     double _sz_error_w;         /** Weight to artificially scale the error going to sz fit */
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
-    // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
     TFile* _rfile;   /** A ROOT file pointer for dumping residuals to in debug mode */
     TH1D* _hx;       /** histo of x residuals taken during straight road cut stage */
     TH1D* _hy;       /** histo of y residuals taken during straight road cut stage */

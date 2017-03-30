@@ -38,6 +38,8 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
+#include "src/common_cpp/Recon/SciFi/RootFitter.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -735,8 +737,21 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
   double s1to4_error = _sd_1to4 * _circle_error_w;
   double s5_error = _sd_5 * _circle_error_w;
-  bool good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
-                                                    spnts, c_trial, cov_circle);
+
+  // With a custom linear least squares fit
+  // bool good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
+  //                                                   spnts, c_trial, cov_circle);
+
+  // With a ROOT based fitter
+  std::vector<double> x;
+  std::vector<double> y;
+  for (auto sp : spnts) {
+    x.push_back(sp->get_position().x());
+    y.push_back(sp->get_position().y());
+  }
+  bool good_radius = RootFitter::FitCircle(x, y, c_trial, cov_circle);
+  if (c_trial.get_R() > _R_res_cut)
+    good_radius = false;
 
   // If the radius calculated is too large or chisq fails, return NULL
   if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
