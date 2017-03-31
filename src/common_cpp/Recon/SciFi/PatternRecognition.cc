@@ -71,6 +71,8 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _up_helical_pr_on(true),
                                           _down_helical_pr_on(true),
                                           _s_error_method(0),
+                                          _line_fitter(0),
+                                          _circle_fitter(0),
                                           _verb(0),
                                           _n_trackers(2),
                                           _n_stations(5),
@@ -107,6 +109,8 @@ void PatternRecognition::set_parameters_to_default() {
   _up_helical_pr_on = true;
   _down_helical_pr_on = true;
   _s_error_method = 0;
+  _line_fitter = 0;
+  _circle_fitter = 0;
   _verb = 0;
   _n_trackers = 2;
   _n_stations = 5;
@@ -165,6 +169,8 @@ bool PatternRecognition::LoadGlobals() {
   if (Globals::HasInstance()) {
     Json::Value *json = Globals::GetConfigurationCards();
     _s_error_method = (*json)["SciFiPatRecSErrorMethod"].asInt();
+    _line_fitter = (*json)["SciFiPatRecLineFitter"].asInt();
+    _circle_fitter = (*json)["SciFiPatRecCircleFitter"].asInt();
     _verb = (*json)["SciFiPatRecVerbosity"].asInt();
     _n_trackers = (*json)["SciFinTrackers"].asInt();
     _n_stations = (*json)["SciFinStations"].asInt();
@@ -612,8 +618,13 @@ SciFiStraightPRTrack* PatternRecognition::fit_straight_track(const int n_points,
   // Fit track
   SimpleLine line_x, line_y;
   TMatrixD cov_x(2, 2), cov_y(2, 2);
-  LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
-  LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
+  if (_line_fitter == 0) { // Custom LSQ fitter
+    LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
+    LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
+  } else if (_line_fitter == 1) { // ROOT based linear fitter
+    RootFitter::FitLineLinear(z, x, x_err, line_x, cov_x);
+    RootFitter::FitLineLinear(z, y, y_err, line_y, cov_y);
+  }
 
   // Squash the covariances of each fit into one vector
   std::vector<double> covariance;
@@ -738,20 +749,23 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   double s1to4_error = _sd_1to4 * _circle_error_w;
   double s5_error = _sd_5 * _circle_error_w;
 
-  // With a custom linear least squares fit
-  // bool good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
-  //                                                   spnts, c_trial, cov_circle);
-
-  // With a ROOT based fitter
-  std::vector<double> x;
-  std::vector<double> y;
-  for (auto sp : spnts) {
-    x.push_back(sp->get_position().x());
-    y.push_back(sp->get_position().y());
+  bool good_radius = false;
+  if (_circle_fitter == 0) {
+    // With a custom linear least squares fit
+    good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
+                                                 spnts, c_trial, cov_circle);
+  } else if (_circle_fitter == 1) {
+    // With a ROOT MINUIT based fitter
+    std::vector<double> x;
+    std::vector<double> y;
+    for (auto sp : spnts) {
+        x.push_back(sp->get_position().x());
+        y.push_back(sp->get_position().y());
+    }
+    good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
+    if (c_trial.get_R() > _R_res_cut)
+        good_radius = false;
   }
-  bool good_radius = RootFitter::FitCircle(x, y, c_trial, cov_circle);
-  if (c_trial.get_R() > _R_res_cut)
-    good_radius = false;
 
   // If the radius calculated is too large or chisq fails, return NULL
   if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
@@ -879,7 +893,11 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   }
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
-  LeastSquaresFitter::linear_fit(z_i, s_i, sigma_s, line_sz, cov_sz);
+  if (_line_fitter == 0) { // Custom LSQ fitter
+    LeastSquaresFitter::linear_fit(z_i, s_i, sigma_s, line_sz, cov_sz);
+  } else if (_line_fitter == 1) { // ROOT based linear fitter
+    RootFitter::FitLineLinear(z_i, s_i, sigma_s, line_sz, cov_sz);
+  }
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {

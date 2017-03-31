@@ -404,6 +404,8 @@ class PatternRecognition {
     bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
     int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
+    int _line_fitter;           /** Line fitter, 0 = custom lsq, 1 = ROOT */
+    int _circle_fitter;         /** Circle fitter, 0 = custom lsq, 1 = MINUIT */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
     int _n_trackers;            /** Number of trackers */
     int _n_stations;            /** Number of stations per tracker */
