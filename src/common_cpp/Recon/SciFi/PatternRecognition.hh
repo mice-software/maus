@@ -365,6 +365,18 @@ class PatternRecognition {
     void set_down_helical_pr_on(const bool down_helical_pr_on)
       { _down_helical_pr_on = down_helical_pr_on; }
 
+    /** @brief Return the line fit method */
+    int get_line_fitter() { return _line_fitter; }
+
+    /** @brief Set line fit method */
+    void set_line_fitter(int line_fitter) { _line_fitter = line_fitter; }
+
+    /** @brief Get the circle fit method */
+    int get_circle_fitter() { return _circle_fitter; }
+
+    /** @brief Set circle fit method */
+    void set_circle_fitter(int circle_fitter) { _circle_fitter = circle_fitter; }
+
     /** @brief Return the verbosity level */
     bool get_verbosity() { return _verb; }
 

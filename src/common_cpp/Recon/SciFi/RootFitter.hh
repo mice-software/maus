@@ -52,7 +52,6 @@ bool FitLineLinear(const std::vector<double>& x, const std::vector<double>& y,
   */
 bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
                      MAUS::SimpleCircle& circ, TMatrixD& cov_matrix);
-
 }
 
 #endif

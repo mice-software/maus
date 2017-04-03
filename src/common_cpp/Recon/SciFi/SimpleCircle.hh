@@ -33,9 +33,10 @@ class SimpleCircle {
     SimpleCircle(double x0, double y0, double R);
 
     /** Second parameter constructor */
-    SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R, double R_err,
-                 double alpha, double alpha_err, double beta, double beta_err, double gamma,
-                 double gamma_err, double kappa, double kappa_err, double delta_R, double chisq);
+    SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R,
+                 double R_err, double alpha, double alpha_err, double beta,
+                 double beta_err, double gamma, double gamma_err, double kappa,
+                 double kappa_err, double delta_R, double chisq, double pvalue);
 
     /** Destructor */
     ~SimpleCircle();  // Default destructor

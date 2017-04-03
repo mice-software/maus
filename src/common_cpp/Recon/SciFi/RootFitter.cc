@@ -80,7 +80,7 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
   fitter.Config().ParSettings(1).SetName("y0");
   fitter.Config().ParSettings(2).SetName("R");
 
-  // do the fit 
+  // do the fit
   bool ok = fitter.FitFCN();
   if (!ok) {
     return ok;
@@ -89,7 +89,7 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
   result.Print(std::cout);
 
   // Create a circle object with the results
-  circ = MAUS::SimpleCircle(result.Parameter(0), result.Parameter(1), 
+  circ = MAUS::SimpleCircle(result.Parameter(0), result.Parameter(1),
                             result.Parameter(2));
   circ.set_x0_err(result.Error(0));
   circ.set_y0_err(result.Error(1));
