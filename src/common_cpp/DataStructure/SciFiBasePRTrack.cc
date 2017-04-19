@@ -25,6 +25,8 @@ SciFiBasePRTrack::SciFiBasePRTrack()
     _covariance(0),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0),
+    _seed_position(0.0, 0.0, 0.0),
+    _seed_momentum(0.0, 0.0, 0.0),
     _chi_sq(-1.0),
     _ndf(-1),
 	_charge(0) {
@@ -36,6 +38,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov)
     _covariance(cov),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0),
+    _seed_position(0.0, 0.0, 0.0),
+    _seed_momentum(0.0, 0.0, 0.0),
     _chi_sq(-1.0),
     _ndf(-1),
 	_charge(0) {
@@ -47,6 +51,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(int charge, DoubleArray cov, SciFiSpacePointP
     _covariance(cov),
     _position(0.0, 0.0, 0.0),
     _momentum(0.0, 0.0, 0.0),
+    _seed_position(0.0, 0.0, 0.0),
+    _seed_momentum(0.0, 0.0, 0.0),
     _chi_sq(-1.0),
     _ndf(-1),
 	_charge(charge) {
@@ -61,6 +67,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(const SciFiBasePRTrack& track)
     _covariance(track._covariance),
     _position(track._position),
     _momentum(track._momentum),
+    _seed_position(track._seed_position),
+    _seed_momentum(track._seed_momentum),
     _chi_sq(track._chi_sq),
     _ndf(track._ndf),
 	_charge(track._charge) {
@@ -79,6 +87,8 @@ SciFiBasePRTrack& SciFiBasePRTrack::operator=(const SciFiBasePRTrack& track) {
   _covariance = track._covariance;
   _position = track._position;
   _momentum = track._momentum;
+  _seed_position = track._seed_position;
+  _seed_momentum = track._seed_momentum;
   _chi_sq = track._chi_sq;
   _ndf = track._ndf;
   _charge = track._charge;

@@ -39,6 +39,10 @@ namespace Kalman {
   class Measurement_base {
     public :
 
+      /** @brief Deep copy (member function so that it works with derived classes)
+       */
+      virtual Measurement_base* Clone() const = 0;
+
       /** @brief returns the expected measurement value
        */
       virtual State Measure(const State& state);

@@ -28,6 +28,9 @@ import xboa.hit
 # goes to 4294967295 in both 32 bit and 64 bit.
 NUMPY_RAND_MAX = 2147483647 
 
+# pylint: disable = C0103
+# pylint: disable = R0912
+
 class Beam(): # pylint: disable=R0902
     """
     @brief Beam holds functions necessary to make a single MAUS beam and add
@@ -139,6 +142,10 @@ class Beam(): # pylint: disable=R0902
         self.t_start = 0.
         self.t_end = 0.
         self.momentum_defined_by = "energy"
+        self.range_radius = 0.0
+        self.range_pt = 0.0
+        self.range_p = [0.0, 0.0]
+        self.bz = None
         self.beam_seed = 0
         self.particle_seed_algorithm = ""
         #############################################
@@ -241,6 +248,12 @@ class Beam(): # pylint: disable=R0902
               beam_def['emittance_4d'], ref['mass'], beta_4d, alpha_4d,
               ref['p'], beam_def['normalised_angular_momentum'], beam_def['bz'],
               ref['charge'])
+        elif self.transverse_mode == "uniform" :
+            if 'fit_solenoid' in beam_def:
+                self.bz = beam_def['fit_solenoid']
+            else:
+                self.range_radius = beam_def['range_radius']
+            self.range_pt = beam_def['range_pt']
         else:
             raise ValueError('Did not recognise beam transverse mode '+\
                              str(self.transverse_mode))
@@ -305,6 +318,13 @@ class Beam(): # pylint: disable=R0902
             if beam_def['sigma_'+self.momentum_defined_by] <= 0.:
                 raise ValueError('sigma_'+self.momentum_defined_by+ \
                                  " "+str(long_matrix[0, 0])+" must be > 0")
+        elif self.longitudinal_mode == "uniform":
+            self.range_p = numpy.array(beam_def['range_p'])
+            if self.range_p.shape != (2,): # pylint: disable = E1103
+                raise ValueError("Longitudinal momentum range must an array "+\
+                                                        "like, [100.0, 300.0]")
+            elif self.range_p[0] > self.range_p[1]:
+                raise ValueError("Invalid range_p: "+str(self.range_p))
         else:
             raise ValueError("Did not recognise beam longitudinal_mode "+\
                              str(self.longitudinal_mode))
@@ -434,6 +454,24 @@ class Beam(): # pylint: disable=R0902
             particle_array[4] = self.beam_mean[4]
             particle_array[5] = self.beam_mean[5]
         # time distribution is special
+        if self.transverse_mode == "uniform":
+            pt = numpy.random.random()*self.range_pt
+            theta_pt = numpy.random.random()*2.0*math.pi
+            particle_array[1] = pt*math.cos(theta_pt)
+            particle_array[3] = pt*math.sin(theta_pt)
+            if self.bz is None :
+                r = numpy.random.random()*self.range_radius
+                theta_r = numpy.random.random()*2.0*math.pi
+                particle_array[0] = r*math.cos(theta_r)
+                particle_array[2] = r*math.sin(theta_r)
+            else:
+                particle_array[0] = -particle_array[3] / (self.bz*300.0)
+                particle_array[2] = particle_array[1] / (self.bz*300.0)
+        if self.longitudinal_mode == "uniform":
+            p = numpy.random.random()*(self.range_p[1]-self.range_p[0]) \
+                                                              + self.range_p[0]
+            particle_array[4] = self.beam_mean[4]
+            particle_array[5] = p
         if self.t_dist == "sawtooth_time":
             t_rand = numpy.random.triangular\
                           (self.t_start, self.t_end, 2.*self.t_end-self.t_start)

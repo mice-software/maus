@@ -142,8 +142,8 @@ class MapCppTrackerSpacePointReconTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Sets a mapper and configuration,
-        and checks that we can death() MapCppTrackerRecon"""
-        cls.mapper = MAUS.MapCppTrackerRecon()
+        and checks that we can death() MapCppTrackerSpacePointRecon"""
+        cls.mapper = MAUS.MapCppTrackerSpacePointRecon()
         if maus_cpp.globals.has_instance():
             maus_cpp.globals.death()
         if cls.test_config != "":

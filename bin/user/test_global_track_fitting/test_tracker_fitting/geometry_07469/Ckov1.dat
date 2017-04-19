@@ -1,0 +1,166 @@
+Module Cherenkov1
+{
+Volume Box
+Dimensions 800.0 800.0 400.0 mm
+PropertyInt CkovStation 0
+PropertyString Material AIR
+Module Window
+{
+Volume Box
+Dimensions 450.0 450.0 2.0 mm
+PropertyString Material CELLULOSE_CELLOPHANE
+Position 0.0 0.0 -189.25 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Window
+
+Module Mirrorbase
+{
+Volume Box
+Dimensions 450.0 450.0 2.0 mm
+PropertyString Material POLYSTYRENE
+Position 0.0 0.0 -187.25 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Mirrorbase
+
+Module Mirror
+{
+Volume Box
+Dimensions 450.0 450.0 2.0 mm
+PropertyString Material AIR
+Position 0.0 0.0 -185.25 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Mirror
+
+Module Acc1
+{
+Volume Box
+Dimensions 450.0 450.0 23.0 mm
+PropertyString SensitiveDetector CKOV
+PropertyHep3Vector PMT0Pos 375.0 0.0 0.0 cm
+PropertyHep3Vector PMT1Pos 0.0 375.0 0.0 cm
+PropertyHep3Vector PMT2Pos -375.0 0.0 0.0 cm
+PropertyHep3Vector PMT3Pos 0.0 -375.0 0.0 cm
+Module Virtual
+ {
+     Volume None
+     Position 0.0 0.0 0.0 mm
+     Rotation 0.0 0.0 0.0 degree
+     PropertyString SensitiveDetector Virtual
+     PropertyString IndependentVariable z
+ }
+PropertyString Material AEROGEL_112a
+Position 0.0 0.0 -172.75 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Acc1
+
+Module AcetateWindow
+{
+Volume Box
+Dimensions 450.0 450.0 0.1 mm
+PropertyString Material POLYVINYL_ACETATE
+Position 0.0 0.0 -161.20 mm
+Rotation 0.0 0.0 0.0 degree
+} // End AcetateWindow
+
+Module Reflector
+{
+Volume Trapezoid
+PropertyDouble TrapezoidWidthX1 1.0
+PropertyDouble TrapezoidWidthX2 321.69
+PropertyDouble TrapezoidHeightY1 1.0
+PropertyDouble TrapezoidHeightY2 321.69
+PropertyDouble TrapezoidLengthZ 70.64
+PropertyString Material AIR
+Position 0.0 0.0 70.64 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Reflector
+
+Module Reflector_base
+{
+Volume Box
+Dimensions 643.4 643.4 6.4 mm
+PropertyString Material POLYVINYL_CHLORIDE_LOWD
+Position 0.0 0.0 148.05 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Reflector_base
+
+Module Reflector_base
+{
+Volume Box
+Dimensions 643.4 643.4 6.4 mm
+PropertyString Material POLYVINYL_CHLORIDE_LOWD
+Position 0.0 0.0 154.45 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Reflector_base
+
+Module Reflector_base
+{
+Volume Box
+Dimensions 643.4 643.4 6.4 mm
+PropertyString Material POLYVINYL_CHLORIDE_LOWD
+Position 0.0 0.0 160.85 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Reflector_base
+
+Module Window_rear
+{
+Volume Box
+Dimensions 786.0 786.0 3.2 mm
+PropertyString Material POLYVINYL_CHLORIDE
+Position 0.0 0.0 170.75 mm
+Rotation 0.0 0.0 0.0 degree
+} // End Window_rear
+
+Module PMT0
+{
+Volume Sphere
+Dimensions 100.0 110.0 mm
+PropertyHep3Vector Phi 0.0 360.0 -1.0 deg
+PropertyHep3Vector Theta 0.0 90.0 -1.0 deg
+PropertyInt CkovPmtNum 0
+PropertyHep3Vector PMT0Pos 375.0 0.0 0.0 cm
+PropertyString Material Pyrex_Glass
+Position 375.0 0.0 0.0 mm
+Rotation 0.0 90.0 0.0 degree
+} // End PMT0
+
+Module PMT1
+{
+Volume Sphere
+Dimensions 100.0 110.0 mm
+PropertyHep3Vector Phi 0.0 360.0 -1.0 deg
+PropertyHep3Vector Theta 0.0 90.0 -1.0 deg
+PropertyInt CkovPmtNum 1
+PropertyHep3Vector PMT1Pos 0.0 375.0 0.0 cm
+PropertyString Material Pyrex_Glass
+Position 0.0 375.0 0.0 mm
+Rotation -90.0 0.0 0.0 degree
+} // End PMT1
+
+Module PMT2
+{
+Volume Sphere
+Dimensions 100.0 110.0 mm
+PropertyHep3Vector Phi 0.0 360.0 -1.0 deg
+PropertyHep3Vector Theta 0.0 90.0 -1.0 deg
+PropertyInt CkovPmtNum 2
+PropertyHep3Vector PMT2Pos -375.0 0.0 0.0 cm
+PropertyString Material Pyrex_Glass
+Position -375.0 0.0 0.0 mm
+Rotation 0.0 -90.0 0.0 degree
+} // End PMT2
+
+Module PMT3
+{
+Volume Sphere
+Dimensions 100.0 110.0 mm
+PropertyHep3Vector Phi 0.0 360.0 -1.0 deg
+PropertyHep3Vector Theta 0.0 90.0 -1.0 deg
+PropertyInt CkovPmtNum 3
+PropertyHep3Vector PMT3Pos 0.0 -375.0 0.0 cm
+PropertyString Material Pyrex_Glass
+Position 0.0 -375.0 0.0 mm
+Rotation 90.0 0.0 0.0 degree
+} // End PMT3
+
+}

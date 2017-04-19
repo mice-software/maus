@@ -68,3 +68,4 @@ class MapPyScalersDumpTestCase(unittest.TestCase): # pylint: disable = R0904
 
 if __name__ == '__main__':
     unittest.main()
+

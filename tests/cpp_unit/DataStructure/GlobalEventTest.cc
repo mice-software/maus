@@ -46,13 +46,14 @@ class GlobalEventTestDS : public ::testing::Test {
     }
 
     _chain = new MAUS::DataStructure::Global::PrimaryChain();
-    _chain->AddPrimaryTrack(_track[0]);
-    _chain->AddTrack(_track[1], _track[0]);
+    _chain->AddMatchedTrack(_track[0]);
+    _chain->SetPIDTrack(_track[1]);
 
     _event = new MAUS::GlobalEvent();
-    _event->add_primary_chain_recursive(_chain);
+    _event->add_track_recursive(_track[0]);
+    _event->add_track_recursive(_track[1]);
+    _event->add_primary_chain(_chain);
 
-    local_chain = NULL;
     local_track.resize(2);
     local_track_point.resize(4);
     local_space_point.resize(4);
@@ -65,7 +66,6 @@ class GlobalEventTestDS : public ::testing::Test {
   std::vector<MAUS::DataStructure::Global::TrackPoint*> _track_point;
   std::vector<MAUS::DataStructure::Global::SpacePoint*> _space_point;
 
-  MAUS::DataStructure::Global::PrimaryChain *local_chain;
   std::vector<MAUS::DataStructure::Global::Track*> local_track;
   std::vector<MAUS::DataStructure::Global::TrackPoint*> local_track_point;
   std::vector<MAUS::DataStructure::Global::SpacePoint*> local_space_point;
@@ -281,8 +281,8 @@ TEST_F(GlobalEventTestDS, test_equality_operator) {
         copied_tracks->at(0)->GetTrackPoints();
     std::vector<const MAUS::DataStructure::Global::TrackPoint*> copied_tps1 =
         copied_tracks->at(1)->GetTrackPoints();
-    ASSERT_EQ(copied_tracks->at(0)->get_mapper_name(), "GETestTrack0");
-    ASSERT_EQ(copied_tracks->at(1)->get_mapper_name(), "GETestTrack1");
+    ASSERT_EQ(copied_tracks->at(0)->get_mapper_name(), "MapCppGlobalTrackMatching");
+    ASSERT_EQ(copied_tracks->at(1)->get_mapper_name(), "MapCppGlobalPID");
     ASSERT_EQ(copied_tps0.size(), 2);
     ASSERT_EQ(copied_tps1.size(), 2);
     if (copied_tps0.size() == 2 and copied_tps1.size() == 2) {
@@ -362,9 +362,10 @@ TEST_F(GlobalEventTestDS, test_recursive_add) {
 
   global_track_point->set_space_point(global_space_point);
   global_track->AddTrackPoint(global_track_point);
-  global_chain->AddPrimaryTrack(global_track);
+  global_chain->AddMatchedTrack(global_track);
 
-  event.add_primary_chain_recursive(global_chain);
+  event.add_primary_chain(global_chain);
+  event.add_track_recursive(global_track);
 
   ASSERT_TRUE(event.get_primary_chains());
   EXPECT_EQ(event.get_primary_chains()->size(), 1U);

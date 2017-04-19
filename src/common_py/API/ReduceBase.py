@@ -19,7 +19,7 @@ This file defines the abstract base for all Reducers
 from API.IReduce import IReduce
 from API.ModuleBase import ModuleBase
 
-class ReduceBase(ModuleBase, IReduce):#pylint: disable=R0921
+class ReduceBase(ModuleBase, IReduce):
     """
     @class ReduceBase
     Abstract Base class for all reducers to derive from which allowes for

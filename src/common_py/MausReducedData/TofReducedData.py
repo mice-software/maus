@@ -29,12 +29,18 @@ class TOF:
     def accumulate_data(self, evt, tof_num):
         """ Add data from an event """
         self.tof_num = tof_num
-        if self.tof_num == 0:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF0SpacePointArray()
-        elif self.tof_num == 1:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
-        elif self.tof_num == 2:
-            spoints = evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
+        try:
+            if self.tof_num == 0:
+                spoints = \
+                  evt.GetTOFEventSpacePoint().GetTOF0SpacePointArray()
+            elif self.tof_num == 1:
+                spoints = \
+                  evt.GetTOFEventSpacePoint().GetTOF1SpacePointArray()
+            elif self.tof_num == 2:
+                spoints = \
+                  evt.GetTOFEventSpacePoint().GetTOF2SpacePointArray()
+        except ReferenceError:
+            spoints = []
         for sp in spoints:
             x = sp.GetGlobalPosX()
             y = sp.GetGlobalPosY()

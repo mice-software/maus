@@ -26,7 +26,7 @@
 # pylint: disable = W0311, R0902, R0904, R0913, C0103
 
 import math
-
+import analysis.tools as tools
 
 class AnalysisHit() :
   """
@@ -37,7 +37,7 @@ class AnalysisHit() :
     interface!
   """
   def __init__( self, x = 0.0, y = 0.0, z = 0.0, \
-                      px = 0.0, py = 0.0, pz = 0.0, \
+                      px = 0.0, py = 0.0, pz = 0.0, station = 0, \
                       time = 0.0, mass = 105.6583715, p_value = 1.0, pid = 13, \
                       scifi_track_point = None, virtual_track_point = None ) :
     """
@@ -57,6 +57,7 @@ class AnalysisHit() :
       self.__mass = mass
       self.__p_value = p_value
       self.__pid = pid
+      self.__station = station
 #      self.__reference = reference
 
     elif scifi_track_point is not None and virtual_track_point is None :
@@ -70,6 +71,8 @@ class AnalysisHit() :
       self.__mass = mass
       self.__p_value = p_value
       self.__pid = pid
+      self.__station = tools.calculate_plane_id(scifi_track_point.tracker(), \
+          scifi_track_point.station(), scifi_track_point.plane())
 #      if reference is None :
 #        self.__reference = str(scifi_track_point.tracker())+"."+\
 #            str(scifi_track_point.station())+"."+str(scifi_track_point.plane())
@@ -89,6 +92,7 @@ class AnalysisHit() :
       self.__mass = mass
       self.__p_value = 1.0
       self.__pid = virtual_track_point.GetParticleId()
+      self.__station = virtual_track_point.GetStationId()
 #      self.__reference = reference
 #      if reference is None :
 #        self.__reference = virtual_track_point.GetStationId()
@@ -111,7 +115,8 @@ class AnalysisHit() :
                  str( self.__z ) + '):[' +\
                  str( self.__px ) + ',' +\
                  str( self.__py ) + ',' +\
-                 str( self.__pz ) + ']'
+                 str( self.__pz ) + ']' +\
+                 str( self.__station )
 #                 str( self.__reference )
 
 
@@ -125,7 +130,8 @@ class AnalysisHit() :
                  str( self.__z ) + '):[' +\
                  str( self.__px ) + ',' +\
                  str( self.__py ) + ',' +\
-                 str( self.__pz ) + ']'
+                 str( self.__pz ) + ']' +\
+                 str( self.__station )
 #                 str( self.__reference )
 
 
@@ -189,6 +195,12 @@ class AnalysisHit() :
       Set the particle ID
     """
     self.__pid = val
+
+  def set_station( self, station ) :
+    """
+      Set the station ID
+    """
+    self.__station = station
 
 #  def set_reference( self, string ) :
 #    self.__reference = string
@@ -291,6 +303,12 @@ class AnalysisHit() :
     """
     return self.__pid
 
+  def get_station( self ) :
+    """
+      Get the particle ID
+    """
+    return self.__station
+
 
 #  def get_reference( self ) :
 #    return self.__reference
@@ -321,6 +339,7 @@ class AnalysisHit() :
                               'px':get_px, 'py':get_py, 'pz':get_pz,
                               'mx':get_mx, 'my':get_my,
                               't':get_time, 'p':get_p, 'r':get_r,
+                              'station':get_station,
                               'E':get_energy, 'pt':get_pt, 'm':get_mass,
                               'mass':get_mass, 'energy':get_energy,
                               'pvalue':get_p_value, 'pid':get_pid }

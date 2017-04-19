@@ -106,8 +106,9 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(7.0, pr._res_cut);
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
-  EXPECT_EQ(4.0, pr._sz_chisq_cut);
-  EXPECT_EQ(0.75, pr._n_turns_cut);
+  EXPECT_EQ(5.0, pr._circle_chisq_cut);
+  EXPECT_EQ(150.0, pr._sz_chisq_cut);
+  EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
 }
@@ -130,8 +131,9 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(7.0, pr._res_cut);
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
-  EXPECT_EQ(4.0, pr._sz_chisq_cut);
-  EXPECT_EQ(0.75, pr._n_turns_cut);
+  EXPECT_EQ(5.0, pr._circle_chisq_cut);
+  EXPECT_EQ(150.0, pr._sz_chisq_cut);
+  EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
 }
@@ -1140,8 +1142,13 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   spnts.push_back(sp5);
 
   SimpleCircle circle;
-  TMatrixD cov;
+  TMatrixD cov(3, 3);
   bool good_radius = LeastSquaresFitter::circle_fit(0.3844, 0.4298, 150.0, spnts, circle, cov);
+
+  std::vector<double> sigma_s;
+  for (auto sp : spnts) {
+    sigma_s.push_back(pr.sigma_on_s(circle, cov, sp));
+  }
 
   double epsilon = 0.01;
 
@@ -1157,12 +1164,15 @@ TEST_F(PatternRecognitionTest, test_find_dsdz) {
   int charge = 0;
 
   TMatrixD cov_sz;
-  pr.find_dsdz(n_points, spnts, circle, dphi, line_sz, cov_sz, charge);
+  std::cerr << "Testing find_dsdz now" <<std::endl;
+  pr.find_dsdz(n_points, spnts, circle, sigma_s, dphi, line_sz, cov_sz, charge);
 
   ASSERT_EQ(charge, 1);
-  EXPECT_NEAR(line_sz.get_c(), 15.47, epsilon);
+  // EXPECT_NEAR(line_sz.get_c(), 15.47, epsilon);
+  EXPECT_NEAR(line_sz.get_c(), 15.79, epsilon);
   EXPECT_NEAR(line_sz.get_m(), 0.126, epsilon);
-  EXPECT_NEAR(line_sz.get_chisq(), 1.005 , epsilon);
+  // EXPECT_NEAR(line_sz.get_chisq(), 1.005 , epsilon);
+  EXPECT_NEAR(line_sz.get_chisq(), 0.0646, epsilon);
 
   delete sp1;
   delete sp2;

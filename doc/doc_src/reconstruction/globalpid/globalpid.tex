@@ -98,7 +98,7 @@ To perform PID on data, the steps shown figure ~\ref{pidperf} should be followed
 \item Data: This can be experimental or MC data.
 \item Global Reconstruction: In the same way as described above for PDF generation, the 
 data should then be passed through the global reconstruction.
-\item Global PID: To perform the PID on the reconstructed data, GlobalPID.py in \$\{MAUS\_ROOT\_DIR\}\textbackslash 
+\item Global PID: To perform the PID on the reconstructed data, GlobalPID.py in\linebreak\$\{MAUS\_ROOT\_DIR\}\textbackslash 
 bin\textbackslash Global is then used. This script calls the 
 MapCppGlobalPID mapper. With this script, a datacard, such as that 
 shown given in listing ~\ref{piddatacard}, that includes the input and output root filenames, is used, by entering the following at the command line:
@@ -156,15 +156,14 @@ pid_beamline_polarity = "positive"
 # hypothesis
 pid_confidence_level = 10
 
-# PID track selection - selects which tracks from
-# TrackMatching to perform PID on. Can be set to
-# "all", or all downstream tracks "DS", all upstream
-# "US", through tracks "Through", or the US or DS
-# components of the through tracks "Through_US"
-# or "Through_DS". Or a combination of can be 
-# entered as a space separated list,
-# e.g "Through Through_US"
-pid_track_selection = "Through"
+# PID track selection- select which tracks from
+# TrackMatching to perform PID on. Can perform PID on
+# all tracks by setting to "all", on through tracks
+# only (constituent tracks will be PID'd, so this
+# excludes orphans) with "through" or on all upstream
+# and downstream tracks (ignoring whether tracks have
+# been through-matched) with "constituents"
+pid_track_selection = "all"
 
 \end{lstlisting}
 
@@ -230,16 +229,15 @@ Each PID variable will be implemented in a derived class of the appropriate base
 \vspace {0.5cm}
 \begin{tabular}{| l | l | p{5cm} |}
   \hline                       
-  PID class & Variable name  & Definition \\
-  \hline
-  ComPIDVarA & diffTOF2TOF1 & Uses the time of flight between TOF1 and TOF2. Beam dependent. \\
-  ComPIDVarB & KLChargeProdvsDiffTOF1TOF2 & Uses the KL ADC charge product, and the time of flight between TOF1 and TOF2. \\
-  ComPIDVarC & CommissioningKLADCChargeProduct & Uses the KL ADC charge product . Beam dependent.\\
-  ComPIDVarD & CommissioningEMRrange &Uses the range of the particle as measured in the EMR. Beam dependent. \\
-  ComPIDVarE & CommissioningEMRrangevsDiffTOF1TOF2 & Uses the range of the particle as measured in the EMR, and the time of flight between TOF1 and TOF2.\\
-  ComPIDVarF & CommissioningEMRPlaneDensity & Uses the plane hit density in the EMR. Beam dependent.\\
-  ComPIDVarG & CommissioningEMRPlaneDensityvsDiffTOF1TOF2 & Uses the plane hit density in the EMR, and the time of flight between TOF1 and TOF2.\\
-  ComPIDVarH & CkovAvsDiffTOF1TOF2 & Uses the number of photoelectrons in Cherenkov A, and the time of flight between TOF1 and TOF2.\\
+  \textbf{PID} class & \textbf{Variable name}  & \textbf{Definition} \\\hline
+  ComPIDVarA & diffTOF2TOF1 & Uses the time of flight between TOF1 and TOF2. Beam dependent. \\\hline
+  ComPIDVarB & KLChargeProdvsDiffTOF1TOF2 & Uses the KL ADC charge product, and the time of flight between TOF1 and TOF2. \\\hline
+  ComPIDVarC & CommissioningKLADCChargeProduct & Uses the KL ADC charge product . Beam dependent.\\\hline
+  ComPIDVarD & CommissioningEMRrange &Uses the range of the particle as measured in the EMR. Beam dependent. \\\hline
+  ComPIDVarE & CommissioningEMRrangevsDiffTOF1TOF2 & Uses the range of the particle as measured in the EMR, and the time of flight between TOF1 and TOF2.\\\hline
+  ComPIDVarF & CommissioningEMRPlaneDensity & Uses the plane hit density in the EMR. Beam dependent.\\\hline
+  ComPIDVarG & CommissioningEMRPlaneDensityvsDiffTOF1TOF2 & Uses the plane hit density in the EMR, and the time of flight between TOF1 and TOF2.\\\hline
+  ComPIDVarH & CkovAvsDiffTOF1TOF2 & Uses the number of photoelectrons in Cherenkov A, and the time of flight between TOF1 and TOF2.\\\hline
   ComPIDVarI & CkovBvsDiffTOF1TOF2 & Uses the number of photoelectrons in Cherenkov B, and the time of flight between TOF1 and TOF2.\\
   \hline 
 \end{tabular}
@@ -250,19 +248,18 @@ Each PID variable will be implemented in a derived class of the appropriate base
 \subsubsection{PIDVars}
 
 \vspace {0.5cm}
-\begin{tabular}{| l | l | p{5cm} |}
+\begin{tabular}{| l | l | p{7cm} |}
   \hline                       
-  PID class & Variable name  & Definition \\
-  \hline
-  PIDVarA & diffTOF1TOF0 & Uses the upstream time of flight, between TOF0 and TOF1. This variable is beam dependent and so is best used during offline data analysis where PDFs can be produced for specific beam settings. \\
-  PIDVarB & diffTOF0TOF1vsTrackerMom & Uses upstream time of flight, and momentum as measured in the upstream Tracker. \\  
-  PIDVarC & KLChargeProdvsDSTrackerMom & Uses the KL ADC charge product and the momentum measured in the downstream Tracker. \\
-  PIDVarD & KLADCChargeProduct & Uses the KL ADC charge product. This variable is beam dependent, and so is best used during offline data analysis.\\
-  PIDVarE & EMRRange & Uses the range of the particle as measured in the EMR. This variable is beam dependent, and so is best used during offline data analysis. \\
-  PIDVarF & EMRRangevsDSTrackerMom & Uses the range of the particle as measured in the EMR, and the momentum measured in the downstream Tracker. \\
-  PIDVarG & EMRPlaneDensity & Uses the plane hit density in the EMR. This variable is beam dependent, and so is best used during offline data analysis.\\
-  PIDVarH & EMRPlaneDensityvsDSTrackerMom & Uses the plane hit density in the EMR, and the momentum measured in the downstream Tracker.\\
-  PIDVarI & CkovAvsUSTrackerMom & Uses the number of photoelectrons in Cherenkov A, and the momentum measured in the upstream Tracker.\\
+  \textbf{PID class} & \textbf{Variable name} & \textbf{Definition} \\\hline
+  PIDVarA & diffTOF1TOF0 & Uses the upstream time of flight, between TOF0 and TOF1. This variable is beam dependent and so is best used during offline data analysis where PDFs can be produced for specific beam settings. \\\hline
+  PIDVarB & diffTOF0TOF1vsTrackerMom & Uses upstream time of flight, and momentum as measured in the upstream Tracker. \\\hline
+  PIDVarC & KLChargeProdvsDSTrackerMom & Uses the KL ADC charge product and the momentum measured in the downstream Tracker. \\\hline
+  PIDVarD & KLADCChargeProduct & Uses the KL ADC charge product. This variable is beam dependent, and so is best used during offline data analysis.\\\hline
+  PIDVarE & EMRRange & Uses the range of the particle as measured in the EMR. This variable is beam dependent, and so is best used during offline data analysis. \\\hline
+  PIDVarF & EMRRangevsDSTrackerMom & Uses the range of the particle as measured in the EMR, and the momentum measured in the downstream Tracker. \\\hline
+  PIDVarG & EMRPlaneDensity & Uses the plane hit density in the EMR. This variable is beam dependent, and so is best used during offline data analysis.\\\hline
+  PIDVarH & EMRPlaneDensityvsDSTrackerMom & Uses the plane hit density in the EMR, and the momentum measured in the downstream Tracker.\\\hline
+  PIDVarI & CkovAvsUSTrackerMom & Uses the number of photoelectrons in Cherenkov A, and the momentum measured in the upstream Tracker.\\\hline
   PIDVarJ & CkovBvsUSTrackerMom & Uses the number of photoelectrons in Cherenkov B, and the momentum measured in the upstream Tracker.\\
   \hline 
 \end{tabular}
@@ -285,5 +282,3 @@ will be added
 
 \subsubsection{Placing cuts on PIDVar value ranges}
 A further option for users when performing PID against the PDFs, is to cut on what range of values within the PDFs to perform PID within. This may allow for greater purity (potentially at the expense of efficiency) depending on the variable. For instance, one could choose to cut harshly on the time of flight in PIDVarA, to reduce the chances of mis-identifying pions as muons. These cuts can be selected through setting the appropriate pid\_bounds datacards found in ConfigurationDefaults.py.
-
-

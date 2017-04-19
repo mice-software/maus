@@ -17,11 +17,7 @@
 
 #include "DataStructure/Global/PrimaryChain.hh"
 
-#include <vector>
-#include <algorithm>
-#include <utility>
-
-#include "Utils/Exception.hh"
+#include "Utils/Squeak.hh"
 
 namespace MAUS {
 namespace DataStructure {
@@ -29,331 +25,183 @@ namespace Global {
 
 // Default constructor
 PrimaryChain::PrimaryChain()
-    : _mapper_name(""),
-      _goodness_of_fit(0.) {
-  _tracks = new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>();
-  _parent_primary_chains = new TRefArray();
+    : _mapper_name(""), _type(MAUS::DataStructure::Global::kNoChainType),
+      _multiplicity(MAUS::DataStructure::Global::kUnique), _us_daughter(NULL), _ds_daughter(NULL) {
+  _tracks = new TRefArray();
 }
 
-// Copy contructor
+// Copy constructor
 PrimaryChain::PrimaryChain(const PrimaryChain &primary_chain)
-    : _mapper_name(""),
-      _goodness_of_fit(primary_chain._goodness_of_fit),
-      _comments(primary_chain._comments) {
-  _tracks = new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>();
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = primary_chain._tracks->begin();
-      iter < primary_chain._tracks->end(); iter++) {
-    _tracks->push_back(new MAUS::DataStructure::Global::TRefTrackPair(**iter));
-  }
-  _parent_primary_chains =
-      new TRefArray(*primary_chain.get_parent_primary_chains());
+    : _mapper_name(primary_chain._mapper_name), _type(primary_chain._type),
+      _multiplicity(primary_chain._multiplicity),
+      _us_daughter(primary_chain._us_daughter), _ds_daughter(primary_chain._ds_daughter) {
+  _tracks = new TRefArray(*primary_chain._tracks);
 }
 
-// Constructor setting #_mapper_name
+// Constructor setting mapper name
 PrimaryChain::PrimaryChain(std::string mapper_name)
-    : _mapper_name(mapper_name),
-      _goodness_of_fit(0.) {
-  _tracks = new std::vector<MAUS::DataStructure::Global::TRefTrackPair*>();
-  _parent_primary_chains = new TRefArray();
+    : _mapper_name(mapper_name), _type(MAUS::DataStructure::Global::kNoChainType),
+      _multiplicity(MAUS::DataStructure::Global::kUnique), _us_daughter(NULL), _ds_daughter(NULL) {
+  _tracks = new TRefArray();
+}
+
+// Constructor setting mapper name and chain type
+PrimaryChain::PrimaryChain(std::string mapper_name,
+    MAUS::DataStructure::Global::ChainType chain_type)
+    : _mapper_name(mapper_name), _type(chain_type),
+      _multiplicity(MAUS::DataStructure::Global::kUnique), _us_daughter(NULL), _ds_daughter(NULL) {
+  _tracks = new TRefArray();
 }
 
 // Destructor
 PrimaryChain::~PrimaryChain() {
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++)
-    delete *iter;
-  delete _parent_primary_chains;
+  delete _tracks;
 }
 
-// Assignment operator
+// Assignment Operator
 PrimaryChain& PrimaryChain::operator=(const PrimaryChain &primary_chain) {
   if (this == &primary_chain) {
     return *this;
   }
-  _mapper_name        = primary_chain._mapper_name;
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = primary_chain._tracks->begin();
-      iter < primary_chain._tracks->end(); iter++) {
-    _tracks->push_back(new MAUS::DataStructure::Global::TRefTrackPair(**iter));
-  }
-  _goodness_of_fit    = primary_chain._goodness_of_fit;
-  _parent_primary_chains =
-      new TRefArray(*primary_chain._parent_primary_chains);
-  _comments = primary_chain._comments;
+  _mapper_name = primary_chain._mapper_name;
+  _type = primary_chain._type;
+  _multiplicity = primary_chain._multiplicity;
+  _tracks = new TRefArray(*primary_chain._tracks);
+  _us_daughter = primary_chain._us_daughter;
+  _ds_daughter = primary_chain._ds_daughter;
   return *this;
 }
 
-// Create a new PrimaryChain, identical to the original, but separate.  All
-// constituent tracks are also cloned.
-PrimaryChain* PrimaryChain::Clone() const {
-  MAUS::DataStructure::Global::PrimaryChain* primaryChainNew =
-      new MAUS::DataStructure::Global::PrimaryChain(_mapper_name);
+MAUS::DataStructure::Global::PrimaryChain* PrimaryChain::GetUSDaughter() const {
+  MAUS::DataStructure::Global::PrimaryChain* us_daughter =
+    (MAUS::DataStructure::Global::PrimaryChain*) _us_daughter.GetObject();
+  return us_daughter;
+}
 
-  MAUS::DataStructure::Global::Track *track;
-  MAUS::DataStructure::Global::Track *parent;
-  // MAUS::DataStructure::Global::Track const *track;
-  // MAUS::DataStructure::Global::Track const *parent;
-
-  // First, we loop through all of the tracks, cloning each, and
-  // placing the clones in a temporary map...
-  std::map<const MAUS::DataStructure::Global::Track*,
-           MAUS::DataStructure::Global::Track*> tempMap;
-  for (size_t i = 0; i < _tracks->size(); i++) {
-    track = _tracks->at(i)->GetTrack();
-    tempMap[track] = track->Clone();
+void PrimaryChain::SetUSDaughter(MAUS::DataStructure::Global::PrimaryChain* us_daughter) {
+  if (_type == MAUS::DataStructure::Global::kThrough) {
+    _us_daughter = us_daughter;
+  } else {
+    Squeak::mout(Squeak::error)
+        << "Attempting to add an upstream daughter chain to a non-through primary chain";
   }
+}
 
-  // Second, we loop through again.  Clones are added to the new
-  // PrimaryChain, either as Primaries or with the appropriate
-  // Clone...
-  for (size_t i = 0; i < _tracks->size(); i++) {
-    track = _tracks->at(i)->GetTrack();
-    if (!_tracks->at(i)->second.IsValid()) {
-      primaryChainNew->AddPrimaryTrack(tempMap[track]);
-    } else {
-      parent = _tracks->at(i)->GetParent();
-      primaryChainNew->AddTrack(tempMap[track],
-                                tempMap[parent]);
+MAUS::DataStructure::Global::PrimaryChain* PrimaryChain::GetDSDaughter() const {
+  MAUS::DataStructure::Global::PrimaryChain* ds_daughter =
+    (MAUS::DataStructure::Global::PrimaryChain*) _ds_daughter.GetObject();
+  return ds_daughter;
+}
+
+void PrimaryChain::SetDSDaughter(MAUS::DataStructure::Global::PrimaryChain* ds_daughter) {
+  if (_type == MAUS::DataStructure::Global::kThrough) {
+    _ds_daughter = ds_daughter;
+  } else {
+    Squeak::mout(Squeak::error)
+        << "Attempting to add a downstream daughter chain to a non-through primary chain";
+  }
+}
+
+MAUS::DataStructure::Global::Track*
+    PrimaryChain::GetMatchedTrack(MAUS::DataStructure::Global::PID pid) const {
+  MAUS::DataStructure::Global::Track* track = NULL;
+  int n = _tracks->GetEntries();
+  for (int i = 0; i < n; i++) {
+    track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
+    if (track and track->get_mapper_name() == "MapCppGlobalTrackMatching"
+        and track->get_pid() == pid) {
+      return track;
     }
   }
-
-  primaryChainNew->set_goodness_of_fit(_goodness_of_fit);
-
-  primaryChainNew->set_parent_primary_chains(
-      new TRefArray(*_parent_primary_chains));
-
-  primaryChainNew->set_comments(_comments);
-
-  return primaryChainNew;
+  return 0;
 }
 
-bool PrimaryChain::AddTrack(MAUS::DataStructure::Global::Track* track,
-                            MAUS::DataStructure::Global::Track* parent) {
-  // Check track is valid
-  if (!track) {
-    throw(Exceptions::Exception(Exceptions::recoverable,
-                 "Attempting to add a NULL Track",
-                 "DataStructure::Global::PrimaryChain::AddTrack()"));
-  }
-
-  // Check parent is valid.  If not, then add the track as a primary
-  if (!parent)
-    return AddPrimaryTrack(track);
-
-  // Check parent is already in the _track vector.
-  bool found = false;
-  for (size_t i = 0; i < _tracks->size(); i++) {
-    if (_tracks->at(i)->GetTrack() == parent) {
-      found = true;
-      break;
+std::vector<MAUS::DataStructure::Global::Track*> PrimaryChain::GetMatchedTracks() const {
+  std::vector<MAUS::DataStructure::Global::Track*> tracks;
+  MAUS::DataStructure::Global::Track* track = NULL;
+  int n = _tracks->GetEntries();
+  for (int i = 0; i < n; i++) {
+    track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
+    if (track and track->get_mapper_name() == "MapCppGlobalTrackMatching") {
+      tracks.push_back(track);
     }
   }
-
-  if (!found) {
-    throw(Exceptions::Exception(Exceptions::recoverable,
-                 "Proposed Parent not in Primary Chain",
-                 "DataStructure::Global::PrimaryChain::AddTrack()"));
-  }
-
-  // Add the track with parent
-  MAUS::DataStructure::Global::TRefTrackPair* newPair =
-      new MAUS::DataStructure::Global::TRefTrackPair(track, parent);
-  _tracks->push_back(newPair);
-  return true;
+  return tracks;
 }
 
-bool PrimaryChain::AddPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
-  // Check track is valid
-  if (!track) {
-    throw(Exceptions::Exception(Exceptions::recoverable,
-                 "Attempting to add a NULL Track",
-                 "DataStructure::Global::PrimaryChain::AddPrimaryTrack()"));
-  }
-
-  // Add the track with a NULL parent
-  MAUS::DataStructure::Global::TRefTrackPair* newPair =
-      new MAUS::DataStructure::Global::TRefTrackPair(track, NULL);
-  _tracks->push_back(newPair);
-  return true;
-}
-
-bool PrimaryChain::HasTrack(MAUS::DataStructure::Global::Track* track) {
-  // Find track in vector
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    if ((*iter)->GetTrack() == track) {
-      return true;
+void PrimaryChain::AddMatchedTrack(MAUS::DataStructure::Global::Track* track) {
+  track->set_mapper_name("MapCppGlobalTrackMatching");
+  _tracks->Add(track);
+  int n = _tracks->GetEntries();
+  for (int i = 0; i < n; i++) {
+    track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
+    if (track and track->get_mapper_name() == "MapCppGlobalPID") {
+      Squeak::mout(Squeak::error) << "Attempting to add a PID'd track to a primary chain "
+                                  << "that already contains one." << std::endl;
+      return;
     }
   }
-  return false;
 }
 
-bool PrimaryChain::HasTrackAsParent(
-    MAUS::DataStructure::Global::Track* parent) {
-  // Find track as parent vector
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    if ((*iter)->GetParent() == parent) {
-      return true;
+MAUS::DataStructure::Global::Track* PrimaryChain::GetPIDTrack() const {
+  MAUS::DataStructure::Global::Track* track = 0;
+  int n = _tracks->GetEntries();
+  for (int i = 0; i < n; i++) {
+    track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
+    if (track and track->get_mapper_name() == "MapCppGlobalPID") {
+      return track;
     }
   }
-  return false;
+  return 0;
 }
 
-bool PrimaryChain::IsPrimaryTrack(MAUS::DataStructure::Global::Track* track) {
-  // Find track in vector
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    if ((*iter)->GetTrack() == track) {
-      return !((*iter)->second.IsValid());
+void PrimaryChain::SetPIDTrack(MAUS::DataStructure::Global::Track* track) {
+  MAUS::DataStructure::Global::Track* chain_track = 0;
+  // Need to check whether a PID track exists
+  int n = _tracks->GetEntries();
+  for (int i = 0; i < n; i++) {
+    chain_track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
+    if (chain_track and chain_track->get_mapper_name() == "MapCppGlobalPID") {
+      Squeak::mout(Squeak::error) << "Attempting to add a PID'd track to a primary chain "
+                                  << "that already contains one." << std::endl;
+      return;
     }
   }
-  return false;
+  // Only add if no PID track already exists
+  track->set_mapper_name("MapCppGlobalPID");
+  _tracks->Add(track);
 }
 
-std::vector<MAUS::DataStructure::Global::Track*> PrimaryChain::GetTracks() {
-  std::vector<MAUS::DataStructure::Global::Track*> result;
-
-  // Get a pointer for each of the tracks stored.
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    result.push_back((*iter)->GetTrack());
-  }
-
-  return result;
-}
-
-std::vector<MAUS::DataStructure::Global::Track*>
-PrimaryChain::GetPrimaryTracks() {
-  std::vector<MAUS::DataStructure::Global::Track*> result;
-
-  // Get a pointer for each of the tracks that is primary
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    if ((*iter)->second.IsValid() == false)
-      result.push_back((*iter)->GetTrack());
-  }
-
-  return result;
-}
-
-MAUS::DataStructure::Global::Track* PrimaryChain::GetTrackParent(
-    MAUS::DataStructure::Global::Track* track) {
-  // Find track, and return parent
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    if ((*iter)->GetTrack() == track) {
-      return (*iter)->GetParent();
+MAUS::DataStructure::Global::Track* PrimaryChain::GetFittedTrack() const {
+  MAUS::DataStructure::Global::Track* track = 0;
+  int n = _tracks->GetEntries();
+  for (int i = 0; i < n; i++) {
+    track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
+    if (track and track->get_mapper_name() == "MapCppGlobalTrackFitting") {
+      return track;
     }
   }
-  return NULL;
+  return 0;
 }
 
-std::vector<MAUS::DataStructure::Global::Track*>
-PrimaryChain::GetTrackDaughters(MAUS::DataStructure::Global::Track* track) {
-  std::vector<MAUS::DataStructure::Global::Track*> result;
-
-  // Find all tracks with this track as a parent
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++) {
-    if ((*iter)->GetParent() == track) {
-      result.push_back((*iter)->GetTrack());
+void PrimaryChain::SetFittedTrack(MAUS::DataStructure::Global::Track* track) {
+  MAUS::DataStructure::Global::Track* chain_track = 0;
+  // Need to check whether a fitted track exists
+  int n = _tracks->GetEntries();
+  for (int i = 0; i < n; i++) {
+    chain_track = (MAUS::DataStructure::Global::Track*) _tracks->At(i);
+    if (chain_track and chain_track->get_mapper_name() == "MapCppGlobalTrackFitting") {
+      Squeak::mout(Squeak::error) << "Attempting to add a Fitted track to a primary chain "
+                                  << "that already contains one." << std::endl;
+      return;
     }
   }
-
-  return result;
-}
-
-void PrimaryChain::ClearTracks() {
-  std::vector<MAUS::DataStructure::Global::TRefTrackPair*>::iterator iter;
-  for (iter = _tracks->begin(); iter < _tracks->end(); iter++)
-    delete *iter;
-  _tracks->clear();
-}
-
-void PrimaryChain::AddParentChain(
-    MAUS::DataStructure::Global::PrimaryChain* chain) {
-  // Check primary chain is valid
-  if (!chain) {
-    throw(Exceptions::Exception(Exceptions::recoverable,
-                 "Attempting to add a NULL PrimaryChain",
-                 "DataStructure::Global::PrimaryChain::AddParentChain()"));
-  }
-
-  _parent_primary_chains->Add(chain);
-}
-
-std::vector<MAUS::DataStructure::Global::PrimaryChain*>
-PrimaryChain::GetParentChains() {
-  std::vector<MAUS::DataStructure::Global::PrimaryChain*> result;
-  // Not a fast function, ROOT recommends avoiding unnecessary repeats
-  int n = _parent_primary_chains->GetEntries();
-  for (int i = 0; i < n; ++i) {
-    // Cast the TObject* into a PrimaryChain*, and add to result
-    result.push_back((MAUS::DataStructure::Global::PrimaryChain*)
-                     _parent_primary_chains->At(i));
-  }
-  return result;
-}
-
-void PrimaryChain::set_track_parent_pairs(
-    std::vector<MAUS::DataStructure::Global::TRefTrackPair*>* tracks) {
-  if (_tracks != NULL) {
-    // These TRefTrackPair's are unique to this PrimaryChain, and
-    // owned by it.  Delete them before we replace the vector.
-    for (size_t i = 0; i < _tracks->size(); ++i)
-      delete _tracks->at(i);
-    delete _tracks;
-  }
-  _tracks = tracks;
-}
-
-std::vector<MAUS::DataStructure::Global::TRefTrackPair*>*
-PrimaryChain::get_track_parent_pairs() const {
-  return _tracks;
-}
-
-void PrimaryChain::set_goodness_of_fit(double goodness_of_fit) {
-  _goodness_of_fit = goodness_of_fit;
-}
-
-double PrimaryChain::get_goodness_of_fit() const {
-  return _goodness_of_fit;
+  // Only add if no Fitted track already exists
+  track->set_mapper_name("MapCppGlobalTrackFitting");
+  _tracks->Add(track);
 }
 
 
-void PrimaryChain::set_parent_primary_chains(TRefArray* parent_primary_chains) {
-  if (_parent_primary_chains != NULL) {
-    delete _parent_primary_chains;
-  }
-  _parent_primary_chains = parent_primary_chains;
-}
-
-TRefArray* PrimaryChain::get_parent_primary_chains() const {
-  return _parent_primary_chains;
-}
-
-void PrimaryChain::AddComment(std::string key, std::string comment) {
-  _comments[key] = comment;
-}
-
-void PrimaryChain::ClearComments() {
-  _comments.clear();
-}
-
-void PrimaryChain::RemoveComment(std::string key) {
-  _comments.erase(key);
-}
-
-void PrimaryChain::set_comments(
-    std::map<std::string, std::string> comments) {
-  _comments = comments;
-}
-
-std::map<std::string, std::string> PrimaryChain::get_comments() const {
-  return _comments;
-}
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

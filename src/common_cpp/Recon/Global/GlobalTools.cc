@@ -309,8 +309,12 @@ static int _charge;
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
                bool energy_loss) {
-  if (std::abs(target_z) > 100000) {
+  if (std::abs(target_z) > 50000) {
     throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
+                    "GlobalTools::propagate"));
+  }
+  if (std::abs(x[1]) > 700 or std::abs(x[2]) > 700 or std::abs(x[3]) > 50000) {
+    throw(Exceptions::Exception(Exceptions::recoverable, "Bad input coordinates",
                     "GlobalTools::propagate"));
   }
   if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
@@ -327,7 +331,6 @@ void propagate(double* x, double target_z, const BTField* field,
   double mass = recon::global::Particle::GetInstance().GetMass(pid);
   G4Navigator* g4navigator = G4TransportationManager::GetTransportationManager()
       ->GetNavigatorForTracking();
-  G4NistManager* manager = G4NistManager::Instance();
   bool backwards = false;
   // If we propagate backwards, reverse momentum 4-vector
   if (target_z < x[3]) {
@@ -356,8 +359,7 @@ void propagate(double* x, double target_z, const BTField* field,
   double z = x[3];
   // The next 2 lines take ~8ms to execute, perhaps consider moving these outside
   // of this function somehow?
-  GeometryNavigator geometry_navigator;
-  geometry_navigator.Initialise(g4navigator->GetWorldVolume());
+  GeometryNavigator* geometry_navigator = Globals::GetMCGeometryNavigator();
   while (fabs(z - target_z) > 1e-6) {
     n_steps++;
     h = step_size*prop_dir; // revert step size as large step size problematic for dEdx
@@ -376,8 +378,7 @@ void propagate(double* x, double target_z, const BTField* field,
       // We need to check if we're in a material with high stopping power, and if yes,
       // decrease the step size as otherwise the underestimated path length due to the
       // curved trajectory will cause problems
-      double n_e = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName()
-          )->GetElectronDensity();
+      double n_e = geometry_navigator->GetMaterial()->GetElectronDensity();
       double max_h = 100.0;
       if (n_e > 1e+18) {
         max_h = 1.0*prop_dir;
@@ -404,12 +405,12 @@ void propagate(double* x, double target_z, const BTField* field,
       status = gsl_odeiv_evolve_apply(evolve, control, step, &system, &z,
                                         target_z, &h, x);
       // Calculate energy loss for the step
-      geometry_navigator.SetPoint(ThreeVector((x[1] + x_prev[1])/2,
+      geometry_navigator->SetPoint(ThreeVector((x[1] + x_prev[1])/2,
                                   (x[2] + x_prev[2])/2, (x[3] + x_prev[3])/2));
       double step_distance = std::sqrt((x[1]-x_prev[1])*(x[1]-x_prev[1]) +
                                        (x[2]-x_prev[2])*(x[2]-x_prev[2]) +
                                        (x[3]-x_prev[3])*(x[3]-x_prev[3]));
-      G4Material* material = manager->FindOrBuildMaterial(geometry_navigator.GetMaterialName());
+      G4Material* material = geometry_navigator->GetMaterial();
       double step_energy_loss = dEdx(material, x[4], mass)*step_distance;
       changeEnergy(x, step_energy_loss, mass);
     } else {
@@ -444,6 +445,13 @@ void propagate(double* x, double target_z, const BTField* field,
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
       throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
+    }
+    // When propagating backwards, can get caught in material and massively increase energy
+    if (std::abs(x[4]) > 1000) {
+      std::stringstream ios;
+      ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
+            "Particle caught in material during backwards propagation", "GlobalTools::propagate"));
     }
   }
   gsl_odeiv_evolve_free(evolve);

@@ -60,15 +60,22 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         ${MAUS_ROOT_DIR}/third_party/bash/93gcc.bash -j $MAUS_NUM_THREADS
     fi
     ${MAUS_ROOT_DIR}/third_party/bash/01python.bash -j $MAUS_NUM_THREADS
+    ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
     python ${MAUS_ROOT_DIR}/third_party/check_path.py
     ${MAUS_ROOT_DIR}/third_party/bash/02swig.bash -j $MAUS_NUM_THREADS
     ${MAUS_ROOT_DIR}/third_party/bash/03cmake.bash -j $MAUS_NUM_THREADS
-    ${MAUS_ROOT_DIR}/third_party/bash/10setuptools.bash
+    ${MAUS_ROOT_DIR}/third_party/bash/04pip.bash
     # Install python modules with copies pulled down from web - will get 
     # latest versions and overwrite any from third_party tarball
     ${MAUS_ROOT_DIR}/third_party/bash/38scons.bash
-    ${MAUS_ROOT_DIR}/third_party/bash/39numpy.bash
+    # ${MAUS_ROOT_DIR}/third_party/bash/39numpy.bash
     ${MAUS_ROOT_DIR}/third_party/bash/40python_extras.bash -gi
+    # Make the numpy includes findable
+    old_dir=`pwd`
+    cd ${MAUS_THIRD_PARTY}/third_party/install/include
+    ln -s ../lib/python2.7/site-packages/numpy/core/include/numpy numpy
+    cd ${old_dir}
+
     ${MAUS_ROOT_DIR}/third_party/bash/51xboa.bash
     ${MAUS_ROOT_DIR}/third_party/bash/42libxml2.bash -j $MAUS_NUM_THREADS
     ${MAUS_ROOT_DIR}/third_party/bash/43libxslt.bash -j $MAUS_NUM_THREADS
@@ -90,7 +97,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
     source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
     echo "ROOTSYS: " $ROOTSYS
     ${MAUS_ROOT_DIR}/third_party/bash/81G4beamline.bash -j $MAUS_NUM_THREADS
-    ${MAUS_ROOT_DIR}/third_party/bash/82heprep.bash
+    # ${MAUS_ROOT_DIR}/third_party/bash/82heprep.bash
 
     # Doxygen for code documentation, requires a recent version of flex
     ${MAUS_ROOT_DIR}/third_party/bash/54flex.bash -j $MAUS_NUM_THREADS

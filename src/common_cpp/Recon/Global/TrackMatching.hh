@@ -58,8 +58,9 @@ namespace global {
                   int beamline_polarity,
                   std::map<std::string, std::pair<double, double> >
                   matching_tolerances, double max_step_size,
-                  std::pair<bool, std::map<std::string, double> > no_check_settings,
-                  bool energy_loss = true);
+                  std::pair<bool, bool> no_check_settings,
+                  bool energy_loss = true,
+                  bool residuals = false);
 
     /// Destructor
     ~TrackMatching() {}
@@ -222,38 +223,6 @@ namespace global {
         double mass, DataStructure::Global::Track* hypothesis_track);
 
     /**
-     * @brief Returns all matched upstream and downstream tracks from the global
-     * tracks given in the supplied TrackPArrays.
-     *
-     * The tracks are selected based on aggreement with the mapper names set in
-     * USTrack() and DSTrack() as well as the supplied PIDs.
-     *
-     * @param global_tracks Tracks from the global event from which to pick out
-     * the upstream and downstream tracks.
-     * @param pid The PID for which the tracks are picked out
-     * @param us_tracks The container for the upstream tracks to be returned
-     * @param ds_tracks The container for the downstream tracks to be returned
-     */
-    void USDSTracks(
-        DataStructure::Global::TrackPArray* global_tracks,
-        DataStructure::Global::PID pid,
-        DataStructure::Global::TrackPArray* us_tracks,
-        DataStructure::Global::TrackPArray* ds_tracks);
-
-    /**
-     * @brief Produces a through-going track from the supplied upstream and
-     * downstream TrackPoints based on a cut in the TOF1/2 travel time
-     *
-     * @param us_trackpoints Upstream TrackPoints
-     * @param ds_trackpoints Downstream TrackPoints
-     * @param pid PID to set for the new track
-     */
-    void MatchUSDS(
-        DataStructure::Global::Track* us_track,
-        DataStructure::Global::Track* ds_track,
-        DataStructure::Global::PID pid);
-
-    /**
      * @brief Returns the time from a TrackPoint in the chosen detector (TOF0,
      * TOF1, TOF2).
      *
@@ -285,6 +254,15 @@ namespace global {
         std::vector<DataStructure::Global::SpacePoint*> spacepoints,
         DataStructure::Global::Track* hypothesis_track);
 
+    /**
+     * @brief Checks whether mutually exclusive through Primary Chains exist in this event
+     *
+     * If two through chains contain the same daughter chain, they will be marked as
+     * kMultipleUS for same US daughters, kMultipleDS for same DS daughters, or kMultipleBoth
+     * if both are the same. If no such multiplicity exists, the value is kUnique
+     */
+    void CheckChainMultiplicity();
+
     /// Mapper name passed by the mapper calling this class
     std::string _mapper_name;
 
@@ -292,20 +270,24 @@ namespace global {
     /// kEMinus, kMuPlus, kMuMinus, kPiPlus, kPiMinus, or all
     std::string _pid_hypothesis_string;
 
+    /// The beamline polarity, 1 for positive, -1 for negative
     int _beamline_polarity;
 
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
 
     /// Whether matching should not be performed with only one hit per detector
-    /// + thresholds for possible noise hits that will trigger matching either way
-    std::pair<bool, std::map<std::string, double> > _no_check_settings;
+    /// (first value for upstream, second for downstream)
+    std::pair<bool, bool> _no_check_settings;
 
     /// Maximum stepsize for the RK4 propagation
     double _max_step_size;
 
     /// Should the RK4 include energy loss
     bool _energy_loss;
+
+    /// Should residuals be generated during track matching
+    bool _residuals;
 
     /// The global event to be processed
     GlobalEvent* _global_event;
@@ -322,6 +304,7 @@ namespace global {
     FRIEND_TEST(TrackMatchingTest, MatchUSDS);
     FRIEND_TEST(TrackMatchingTest, TOFTimeFromTrackPoints);
     FRIEND_TEST(TrackMatchingTest, AddIfConsistent);
+    FRIEND_TEST(TrackMatchingTest, CheckChainMultiplicity);
   }; // ~class TrackMatching
 } // ~namespace global
 } // ~namespace recon

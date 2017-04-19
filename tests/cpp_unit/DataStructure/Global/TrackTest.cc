@@ -68,6 +68,7 @@ TEST_F(TrackTestDS, test_getters_setters) {
     constituent_tracks->Add(new MAUS::DataStructure::Global::Track());
 
   double goodness_of_fit = 7.0;
+  double p_value = 0.05;
 
   track.set_mapper_name(mapper_name);
   track.set_pid(pid);
@@ -77,12 +78,14 @@ TEST_F(TrackTestDS, test_getters_setters) {
   track.set_track_points(track_points);
   track.set_constituent_tracks(constituent_tracks);
   track.set_goodness_of_fit(goodness_of_fit);
+  track.set_p_value(p_value);
 
   EXPECT_EQ(mapper_name, track.get_mapper_name());
   EXPECT_EQ(pid, track.get_pid());
   EXPECT_EQ(charge, track.get_charge());
   EXPECT_EQ(detectorpoints, track.get_detectorpoints());
   EXPECT_EQ(goodness_of_fit, track.get_goodness_of_fit());
+  EXPECT_EQ(p_value, track.get_p_value());
 
   // Check size and contents of geometry_paths
   ASSERT_EQ(geometry_paths.size(), track.get_geometry_paths().size());
@@ -276,6 +279,7 @@ TEST_F(TrackTestDS, test_default_constructor) {
   EXPECT_TRUE(track.get_geometry_paths().empty());
   EXPECT_TRUE(track.get_constituent_tracks()->GetEntries() == 0);
   EXPECT_EQ(0., track.get_goodness_of_fit());
+  EXPECT_EQ(0., track.get_p_value());
 }
 
 TEST_F(TrackTestDS, test_copy_constructor) {
@@ -312,6 +316,7 @@ TEST_F(TrackTestDS, test_copy_constructor) {
       new MAUS::DataStructure::Global::Track();
 
   double goodness_of_fit = 7.0;
+  double p_value = 0.05;
 
   track1->set_mapper_name(mapper_name);
   track1->set_pid(pid);
@@ -324,6 +329,7 @@ TEST_F(TrackTestDS, test_copy_constructor) {
   track1->AddTrack(conTrack1);
   track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
+  track1->set_p_value(p_value);
 
   MAUS::DataStructure::Global::Track *track2 =
       new MAUS::DataStructure::Global::Track(*track1);
@@ -340,6 +346,7 @@ TEST_F(TrackTestDS, test_copy_constructor) {
   EXPECT_EQ(conTrack1, track2->get_constituent_tracks()->At(1));
   EXPECT_EQ(conTrack2, track2->get_constituent_tracks()->At(2));
   EXPECT_EQ(goodness_of_fit, track2->get_goodness_of_fit());
+  EXPECT_EQ(p_value, track2->get_p_value());
 }
 
 TEST_F(TrackTestDS, test_assignment_operator) {
@@ -376,6 +383,7 @@ TEST_F(TrackTestDS, test_assignment_operator) {
       new MAUS::DataStructure::Global::Track();
 
   double goodness_of_fit = 7.0;
+  double p_value = 0.05;
 
   track1->set_mapper_name(mapper_name);
   track1->set_pid(pid);
@@ -388,6 +396,7 @@ TEST_F(TrackTestDS, test_assignment_operator) {
   track1->AddTrack(conTrack1);
   track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
+  track1->set_p_value(p_value);
 
   MAUS::DataStructure::Global::Track track2;
   track2 = (*track1);
@@ -404,6 +413,7 @@ TEST_F(TrackTestDS, test_assignment_operator) {
   EXPECT_EQ(conTrack1, track2.get_constituent_tracks()->At(1));
   EXPECT_EQ(conTrack2, track2.get_constituent_tracks()->At(2));
   EXPECT_EQ(goodness_of_fit, track2.get_goodness_of_fit());
+  EXPECT_EQ(p_value, track2.get_p_value());
 }
 
 TEST_F(TrackTestDS, test_clone_method) {
@@ -440,6 +450,7 @@ TEST_F(TrackTestDS, test_clone_method) {
       new MAUS::DataStructure::Global::Track();
 
   double goodness_of_fit = 7.0;
+  double p_value = 0.05;
 
   track1->set_mapper_name(mapper_name);
   track1->set_pid(pid);
@@ -452,6 +463,7 @@ TEST_F(TrackTestDS, test_clone_method) {
   track1->AddTrack(conTrack1);
   track1->AddTrack(conTrack2);
   track1->set_goodness_of_fit(goodness_of_fit);
+  track1->set_p_value(p_value);
 
   MAUS::DataStructure::Global::Track *track2 = track1->Clone();
 
@@ -487,6 +499,7 @@ TEST_F(TrackTestDS, test_clone_method) {
   EXPECT_EQ(conTrack2, track2->get_constituent_tracks()->At(2));
 
   EXPECT_EQ(goodness_of_fit, track2->get_goodness_of_fit());
+  EXPECT_EQ(p_value, track2->get_p_value());
 }
 
 TEST_F(TrackTestDS, test_Throws) {

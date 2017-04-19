@@ -5,6 +5,49 @@
 import os
 import libMausCpp #pylint: disable = W0611
 
+def extract_run_number(filename):
+    """ Extract the run number from the file name assuming a format 
+        xxxx_recon.root where xxxx is the run number """
+    # Check if a directory appears in the string, and if so remove
+    splitname = os.path.split(filename)
+    fname = splitname[1]
+    run_number = -1
+    try:
+        run_number = int(fname[0:5])
+    except ValueError:
+        print 'WARNING: Unexpected file name format, ',
+        print 'will not be able to extract run number'
+    return run_number
+
+def load_data(files):
+    """ Load data from files. If a dir is given, search recursively """
+    if type(files) is not list:
+        files = [files]
+
+    root_files = []
+    for file_name in files:
+        # Check if file_name is a ROOT file
+        if os.path.isfile(file_name):
+            #pylint: disable = W0612
+            file_suffix, file_extension = os.path.splitext(file_name)
+            if file_extension == '.root':
+                root_files.append(file_name)
+            else:
+                print 'Bad file name, aborting'
+                return root_files
+
+        # If file_name is a directory, walk it and save any ROOT files found
+        if os.path.isdir(file_name):
+            root_files_dir_search(file_name, root_files)
+        if len(root_files) < 1:
+            print 'No data files found'
+            return root_files
+
+    print '\nFound ' + str(len(root_files)) + ' ROOT files:'
+    for rfile in root_files:
+        print rfile
+    return root_files
+
 def root_files_dir_search(top_dir, root_files):
     """ Appends any ROOT files found in the directory to root_files """
     #pylint: disable = W0612
@@ -23,32 +66,24 @@ def vector_to_list(vec):
         pylist.append(vec[i])
     return pylist
 
-def find_mc_track(hits, id_frequency_cut=0.5):
-    """ Look to see if a single mc track id occurs in these hits
-        more than 50% (by default) of the time, and if so return
-        that track id """
+def find_mc_track(hits, n_hits_cut=5):
+    """ Any MC track ids which produce (n_hits_cut) hits or more
+        are accepted and returned """
 
     # Loop over all spoints, then clusters, then digits, then scifi hits
-    mc_track_counter = {} # Dict mapping track id to frequency it occurs
+    track_counter = {} # Dict mapping track id pair to frequency occurs
     for hit in hits:
-        mc_track_id = int(hit.GetTrackId())
-        if mc_track_id in mc_track_counter:
-            mc_track_counter[mc_track_id] += 1
+        track_id = int(hit.GetTrackId())
+        if track_id in track_counter:
+            track_counter[track_id] += 1
         else:
-            mc_track_counter[mc_track_id] = 1
+            track_counter[track_id] = 1
 
-    # Does any one mc track id appear more than a factor of
-    # (id_frequency_cut)of the time?
-    most_frequent_id = 0
-    highest_counter = 0
-    for mc_track_id, counter in mc_track_counter.iteritems():
-        if counter > highest_counter:
-            most_frequent_id = mc_track_id
-            highest_counter = counter
-    if (float(highest_counter) / float(len(hits))) < id_frequency_cut:
-        most_frequent_id = -1
-
-    return most_frequent_id
+    accepted_tracks = []
+    for tid, counter in track_counter.iteritems():
+        if counter >= n_hits_cut:
+            accepted_tracks.append(tid)
+    return accepted_tracks
 
 def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
     """ Find the mc hits used create the spoints,
@@ -67,7 +102,7 @@ def find_mc_hits(lkup, spoints, plane=-1, station=-1, tracker=-1):
                 all_hits += hits
     return all_hits
 
-def find_mc_momentum_sfhits(lkup, spoints, mc_track_id, trker_num):
+def find_mc_momentum_sfhits(lkup, spoints, track_id, trker_num):
     """ Find the mc truth momentum of the track that made the
         spacepoints at the tracker reference surface """
     hits = find_mc_hits(lkup, spoints, 0, 1, trker_num)
@@ -77,7 +112,7 @@ def find_mc_momentum_sfhits(lkup, spoints, mc_track_id, trker_num):
     py = 0
     pz = 0
     for hit in hits:
-        if hit.GetTrackId() == mc_track_id:
+        if hit.GetTrackId() == track_id:
             num_matched_hits += 1
             px += hit.GetMomentum().x()
             py += hit.GetMomentum().y()
@@ -88,16 +123,52 @@ def find_mc_momentum_sfhits(lkup, spoints, mc_track_id, trker_num):
         pz = pz / num_matched_hits
     return px, py, pz
 
+def find_mc_tracks_from_spoints(lkup, spoints, nstations=5, n_hits_cut=5):
+    """ Find how many MC tracks produced a set of spacepoints which could be
+        reconstructed to pat rec tracks. 
+        A spacepoint is identified with a track if (n_hits_cut) or more scifi
+        hits produced it (mutliple tracks can be associated with one spoint).
+        Then any track ids that are associated with spacepoints in (nstations)
+        or more stations are returned as good MC tracks.
+    """
+
+    # Dict to hold what stations the track caused spoints in, & how many spoints
+    track_ids = {}
+
+    for spoint in spoints:
+        station = spoint.get_station() # station number
+        hits = find_mc_hits(lkup, [spoint]) #  The hits which formed the spoint
+        found_tracks = find_mc_track(hits, n_hits_cut) # list of tuples
+
+        for trk in found_tracks:
+            if trk != -1:
+                if not trk in track_ids:
+                    track_ids[trk] = {station : 1}
+                elif not station in track_ids[trk]:
+                    track_ids[trk][station] = 1
+                else:
+                    track_ids[trk][station] = \
+                      track_ids[trk][station] + 1
+
+    good_tracks = []
+    # if nstations == 5: print 'Found ' + str(len(track_ids)) + ' tracks, ',
+    for tid, stations_hit in track_ids.iteritems():
+        # if this track formed a spoint in at least
+        # the number of stations specified
+        if (len(stations_hit)) >= float(nstations):
+            good_tracks.append(tid)
+    return good_tracks
+
 class SciFiLookup:
     """ Class to link SciFi recon data to the MC truth """
     def __init__(self, mc_evt):
         """ Initialise the lookup (just declare a few members) """
         self.hits_map = {}
         self.make_hits_map(mc_evt)
-        if not self.hits_map:
-            print "WARNING: SciFiLookup: Building hits map failed"
-        elif len(self.hits_map) < 1:
-            print "WARNING: SciFiLookup: Hits map has 0 size"
+        #if not self.hits_map:
+            # print "WARNING: SciFiLookup: Building hits map failed"
+        #elif len(self.hits_map) < 1:
+            #print "WARNING: SciFiLookup: Hits map has 0 size"
 
     def clear_maps(self):
         """ Set the member variables to empty """

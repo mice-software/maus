@@ -26,7 +26,7 @@
   to the reconstructed covariance matrix; in additiona to some useful functions.
 """
 
-# pylint: disable = W0311, E1101, W0102, R0902, C0103, W0141
+# pylint: disable = W0311, E1101, W0102, R0902, C0103
 
 import numpy
 import math
@@ -297,7 +297,10 @@ class CovarianceMatrix() :
     """ 
       Returns the determinant of the covariace matrix
     """
-    return numpy.linalg.det( self.get_corrected_covariance_matrix( axes ) )
+    determinant = numpy.linalg.det( self.get_corrected_covariance_matrix(axes) )
+    if math.isnan(determinant) :
+      determinant = 0.0
+    return determinant
 
 
   def get_momentum( self ) :
@@ -492,7 +495,7 @@ class CovarianceMatrix() :
       Returns an array of mean values for each of the parameters in the axis
       list.
     """
-    if not axis in VARIABLE_LIST :
+    if axis not in VARIABLE_LIST :
       raise ValueError( 'Could not find axis with label: '+str(axis) )
     rownum = VARIABLE_ENUMERATION[axis]
     return self._mean_vector[rownum] / self._num_particles

@@ -20,8 +20,7 @@
 #include "src/common_cpp/JsonCppProcessors/ObjectProcessor.hh"
 #include "src/common_cpp/JsonCppProcessors/ArrayProcessors.hh"
 #include "src/common_cpp/JsonCppProcessors/ObjectMapProcessors.hh"
-
-#include "src/common_cpp/JsonCppProcessors/Global/TRefTrackPairProcessor.hh"
+#include "src/common_cpp/JsonCppProcessors/Global/EnumeratorProcessors.hh"
 
 #include "src/common_cpp/DataStructure/Global/PrimaryChain.hh"
 
@@ -34,10 +33,9 @@ namespace Global {
 
 /** @class PrimaryChainProcessor processor for
  *  MAUS::DataStructure::Global::PrimaryChain
- *  @author Ian Taylor, University of Warwick
- *  @date 2013/03/01
- *
+ *  @author Jan Greis, University of Warwick
  */
+
 class PrimaryChainProcessor
     : public ObjectProcessor<MAUS::DataStructure::Global::PrimaryChain> {
  public:
@@ -45,12 +43,10 @@ class PrimaryChainProcessor
   PrimaryChainProcessor();
 
  private:
-  DoubleProcessor _double_proc;
   StringProcessor _string_proc;
-  PointerArrayProcessor<MAUS::DataStructure::Global::TRefTrackPair>
-  _treftrackpair_array_proc;
-  TRefArrayProcessor _primary_chain_trefarray_proc;
-  ObjectMapValueProcessor<std::string> _comments_proc;
+  EnumChainTypeProcessor _chain_type_proc;
+  EnumChainChildMultiplicityProcessor _chain_child_multiplicity_proc;
+  TRefArrayProcessor _track_trefarray_proc;
 };
 } // ~namespace Global
 } // ~namespace Processor

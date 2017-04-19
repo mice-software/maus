@@ -31,6 +31,8 @@ class GetTrackerCalib:
         cable_cdb_url = self.config['cdb_download_url'] + 'cabling?wsdl'
         self._cable = cdb.Cabling()
         self._cable.set_url(cable_cdb_url)
+        self._method = None
+        self._rnum = 0
         print "Connected to cabling"
 
     def Process(self):
@@ -38,16 +40,17 @@ class GetTrackerCalib:
         Needs datafile set to Run/Date/Current; date formate: "1984-09-14 00:10:00.0"
         """
         print "Starting process"
-        method = self.config["SciFiCalibMethod"]
+        self._method = self.config["SciFiCalibMethod"]
         _input = self.config["SciFiCalibSrc"]
-        if method == "Date":
+        self._rnum = _input
+        if self._method == "Date":
             self.Date(_input)
-        if method == "Run":
+        if self._method == "Run":
             try:
                 self.Run(_input)
             except CdbPermanentError:
                 self.Date(self.Convert_Run(_input))
-        if method == "Current":
+        if self._method == "Current":
             self.Current()
 
     def Current(self):
@@ -112,10 +115,23 @@ class GetTrackerCalib:
         path = os.environ["MAUS_ROOT_DIR"]
         path_calib = path + "/files/calibration/"
         path_cable = path + "/files/cabling/"
-        print path
-        calib_out = open(path_calib+"scifi_calibration.txt","w")
-        badchan_out = open(path_calib+"scifi_bad_channels.txt","w")
-        cable_out = open(path_cable+"scifi_mapping.txt","w")
+        calib_out = None
+        badchan_out = None
+        cable_out = None
+        if self._method == "Run":
+            calib_rpath = path_calib + str(self._rnum)
+            cable_rpath = path_cable + str(self._rnum)
+            if not os.path.exists(calib_rpath):
+                os.mkdir(calib_rpath, 0755)
+            if not os.path.exists(cable_rpath):
+                os.mkdir(cable_rpath, 0755)
+            calib_out = open(calib_rpath+"/scifi_calibration.txt","w")
+            badchan_out = open(calib_rpath+"/scifi_bad_channels.txt","w")
+            cable_out = open(cable_rpath+"/scifi_mapping.txt","w")
+        else:
+            calib_out = open(path_calib+"scifi_calibration.txt","w")
+            badchan_out = open(path_calib+"scifi_bad_channels.txt","w")
+            cable_out = open(path_cable+"scifi_mapping.txt","w")
 
         calib_out.write(CAL)
         badchan_out.write(BC)

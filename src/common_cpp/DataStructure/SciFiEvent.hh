@@ -27,6 +27,7 @@
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
 #include "src/common_cpp/DataStructure/SciFiStraightPRTrack.hh"
 #include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
+#include "src/common_cpp/DataStructure/SciFiSeed.hh"
 #include "src/common_cpp/DataStructure/SciFiTrack.hh"
 
 namespace MAUS {
@@ -69,10 +70,10 @@ class SciFiEvent {
     void set_spacepoints_used_flag(bool flag);
     void clear_spacepoints();
 
-    /** Seeds */
-    void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
-    SciFiSpacePointPArray seeds() const { return _scifiseeds; }
-    void clear_seeds();
+//    /** Seeds */
+//    void add_seeds(SciFiSpacePoint* seed) { _scifiseeds.push_back(seed); }
+//    SciFiSpacePointPArray seeds() const { return _scifiseeds; }
+//    void clear_seeds();
 
     /** Straight Pattern Recognition tracks */
     void add_straightprtrack(SciFiStraightPRTrack* track) {
@@ -86,6 +87,12 @@ class SciFiEvent {
     void set_helicalprtrack(SciFiHelicalPRTrackPArray tracks) { _scifihelicalprtracks = tracks; }
     SciFiHelicalPRTrackPArray helicalprtracks() const { return _scifihelicalprtracks; }
     void clear_htracks();
+
+    /** Seeds data for track fit */
+    void add_seed(SciFiSeed* a_seed) { _scifiseeds.push_back(a_seed); }
+    void set_seeds(SciFiSeedPArray seeds) { _scifiseeds = seeds; }
+    SciFiSeedPArray scifiseeds() const { return _scifiseeds; }
+    void clear_seeds();
 
     /** Kalman tracks */
     void add_scifitrack(SciFiTrack *a_track) { _scifitracks.push_back(a_track); }
@@ -132,14 +139,14 @@ class SciFiEvent {
     /** SpacePoints in an event */
     SciFiSpacePointPArray               _scifispacepoints;
 
-    /** Seeds for track fitting */
-    SciFiSpacePointPArray               _scifiseeds;
-
     /** Straight tracks */
     SciFiStraightPRTrackPArray          _scifistraightprtracks;
 
     /** Helical tracks */
     SciFiHelicalPRTrackPArray           _scifihelicalprtracks;
+
+    /** Seeds for track fitting */
+    SciFiSeedPArray                     _scifiseeds;
 
     /** Kalman tracks */
     SciFiTrackPArray                    _scifitracks;

@@ -21,7 +21,7 @@ Tests for the SciFiLookup python module (not the C++ module)
 
 import unittest
 
-#pylint: disable = W0611, E0611, R0915, C0103
+#pylint: disable = W0611, E0401, E0611, R0915, C0103
 import libMausCpp
 from ROOT import MAUS as maus
 import analysis.scifitools as tools
@@ -146,20 +146,23 @@ class SciFiToolsTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
 
         # Select first 4 hits, 3 of which match track id 0
         hits = all_hits[:4]
-        track_id = tools.find_mc_track(hits)
-        self.assertEqual(0, track_id)
+        track_id = tools.find_mc_track(hits, n_hits_cut=3)
+        self.assertEqual(0, track_id[0])
 
         # Select the last 3 hits, all of which should match track id 1
         hits = all_hits[-3:]
-        track_id = tools.find_mc_track(hits)
-        self.assertEqual(1, track_id)
+        track_id = tools.find_mc_track(hits, n_hits_cut=3)
+        self.assertEqual(1, track_id[0])
 
-        # Now choose 1 hit from each track - no track should then be selected
-        hits = []
-        hits.append(all_hits[1])
-        hits.append(all_hits[4])
-        track = tools.find_mc_track(hits)
-        self.assertFalse(track)
+        # Try all the hits, both tracks should be found
+        track_id = tools.find_mc_track(all_hits, n_hits_cut=3)
+        self.assertEqual(2, len(track_id))
+        self.assertEqual(0, track_id[0])
+        self.assertEqual(1, track_id[1])
+
+        # Require more hits than any one track has, should find no tracks
+        track_id = tools.find_mc_track(all_hits, n_hits_cut=4)
+        self.assertEqual(0, len(track_id))
 
     def test_find_mc_momentum_sfhits(self):
         """ Test finding the mc momentum of some sf hits via the lookup """

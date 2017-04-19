@@ -9,14 +9,15 @@
 \usepackage{geometry}
 \usepackage[parfill]{parskip}
 \usepackage{xcolor}
+\usepackage{enumitem}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \setlength{\footskip}{35mm}
 \lhead{}
-\lfoot{\textit{\textcolor{gray}{Adam Dobbs}}}
-\cfoot{\textit{\textcolor{gray}{The MAUS Workbook}}}
-\rfoot{\textit{\textcolor{gray}{ver. 2.1}}}
+\lfoot{\textit{\textcolor{gray}{A. Dobbs et al.}}}
+\cfoot{\textit{\textcolor{gray}{The MAUS Workbook v3.0}}}
+\rfoot{\textit{\textcolor{gray}{\thepage}}}
 
 \usepackage{listings}
 \lstdefinestyle{customcpp}{
@@ -74,12 +75,12 @@
 \makeatother
 
 \title{\textcolor{blue}{The MAUS Work Book}}
-\author{Adam Dobbs}
-\date{Version 2.1, June 2016}
+\author{Adam Dobbs and the MAUS Developers}
+\date{Version 3.0, February 2017}
 
 % \pdfinfo{%
 %   /Title    (MAUS Work Book)
-%   /Author   (Adam Dobbs)
+%   /Author   (Adam Dobbs and the MAUS Developers)
 %   /Creator  (Adam Dobbs)
 %   /Producer (Adam Dobbs)
 %   /Subject  (MAUS)
@@ -196,9 +197,13 @@ bzr branch lp:maus/merge
     \begin{lstlisting}
 ./install_build_test.sh -t /path/to/other/maus
     \end{lstlisting}
-
+    By default MAUS will build gcc as a third party library. If you system runs gcc > 4.8, then the system gcc may used instead by adding the following flag:
+    \begin{lstlisting}
+./install_build_test.sh --use-system-gcc true
+    \end{lstlisting}  
+    
   \subsection{Preparing to run}
-    Prior to running, the MAUS envionment variables must be loaded into the local shell environment each time a new shell is used.  This is done by sourcing the script ``env.sh'' found in the MAUS root directory:
+    Prior to running, the MAUS environment variables must be loaded into the local shell environment each time a new shell is used.  This is done by sourcing the script ``env.sh'' found in the MAUS root directory:
     \begin{lstlisting}
 source env.sh
     \end{lstlisting}
@@ -371,6 +376,13 @@ The CDB is a bitemporal database, that is it stores geometry configurations base
   \end{lstlisting}
 \end{enumerate}
 
+To specify the output directory of the geometry files use
+\begin{lstlisting}
+--geometry_download_directory ../files/geometry/download/08276/
+\end{lstlisting}
+
+If putting them in the MAUS/files/geometry/ structure (and especially if you want to store multiple geometries) remember to make a directory in download for your geometry to be stored.
+
 Additional beamline settings may also be specified, for example to download a geometry by ID for a particular beamline line mometum with all cooling channel magnet currents set to zero:
 
 \begin{lstlisting}
@@ -424,7 +436,7 @@ simulation_reference_particle = {"position":{"x":0.0, "y":0.0, "z":11000.0}, "mo
 
     For those with GRID credentials who are members of the MICE virtual organisation, the data may also be obtained from the GRID at LFC location \texttt{/grid/mice/MICE/}.
 
-    The data is distributed as tar archives. Once extracted the binary data files can be identified by their filenames, which follow the format \texttt{<run\_number>.nnn} where \texttt{nnn} is a number corresponding to the data block of the run respresented by the file, beginning at \texttt{000}.
+    The data is distributed as tar archives. Once extracted the binary data files can be identified by their filenames, which follow the format \texttt{<run\_number>.nnn} where \texttt{nnn} is a number corresponding to the data block of the run represented by the file, beginning at \texttt{000}.
 
   \subsection{Unpacking and Reconstructing}
     An example script which unpacks the binary data and reconstructs data from all the MICE dectors can be found in the bin directory.  Parameters indicating the location and name of the binary data file must be passed in, together with the appropriate geometry for the run being analysed (the desired geometry must be downloaded first, as described in section~\ref{sec:Geometry}).  For example:
@@ -435,6 +447,113 @@ python ./bin/analyze_data_offline.py \
          --simulation_geometry_file /path/to/maus/files/geometry/download/ParentGeometryFile.dat
     \end{lstlisting}
     (Note we specify the simulation geometry file, as the reconstruction geometry will default to the same value.) This will produce a ROOT file containing all the unpacked raw data and the reconstrucuted data, ready for analysis.
+
+\subsection{Global Event Reconstruction and PID}
+\label{sec:GlobalAnalysis}
+
+Global reconstruction consists of two parts: Track matching and PID (in the future track fitting will be added too).  
+
+Track matching assembles hits and tracks in the various detectors into global tracks, (upstream, downstream, and through-going) by determining which hits belong together and creating new tracks containing them.
+
+PID is performed on the resulting tracks from track matching and uses particle density functions (PDFs) produced from MC (of the relevant beam and geometry) to determine the particle species.  The global PID framework uses sets of PID variables to: 
+\begin{enumerate}
+\item use MC data to create PDFs of these variables for a range of particle hypotheses; and
+\item to use the PDFs as part of a log-likelihood method to determine the PID of reconstructed global tracks from data. 
+\end{enumerate}
+
+In this section you will learn how to run the global track matching and PID.
+
+In the future a set of pre-produced PDFs will be packaged with MAUS and the end user can run PID against these.  In the mean time, and in the future in cases where a PDF does not exist for your particular beam/optics, you should make you own.  
+
+\subsubsection{Making PDFs from scratch}
+Assuming you have already produced MC input which has been passed through the local reconstruction, producing file \texttt{inputMC.root}.
+
+\begin{enumerate}
+\item Go the global tracking executables directory:
+\begin{lstlisting}
+cd bin/Global
+\end{lstlisting}
+
+\item Copy \texttt{process\_datacard.py} to a new file (e.g. \texttt{new\_process\_datacard.py}) and edit:
+\begin{enumerate}[label=(\alph*)]
+\item{\texttt{simulation\_geometry\_filename} and \texttt{reconstruction\_geometry\_filename} to the
+appropriate geometry.  These will usually be the same (unless there was a mix up with some of the processing) and so \texttt{reconstruction\_geometry\_filename} can be commented out in most cases.}
+\item{set \texttt{input\_root\_file\_name} to \texttt{inputMC.root}.}
+\item{set \texttt{track\_matching\_pid\_hypothesis} to \texttt{kMuPlus} (it could be set to anything really but let's go with this).}
+\end{enumerate} 
+\item At the command line, run:
+\begin{lstlisting}
+python process_global.py --configuration_file new_process_datacard.py
+\end{lstlisting}
+\end{enumerate}
+
+You will now have a new output file \texttt{PDF\_input.root} created in the directory in which you stated or the current directory if you did not specify the path.  Now to make the PDF's.
+
+\begin{enumerate}[resume]
+\item{Copy \texttt{pdf\_example\_datacard.py} to a new file (e.g. \texttt{edited\_pdf\_example\_datacard.py}) and edit as follows:}
+\begin{enumerate}[label=(\alph*)]
+\item{set \texttt{input\_root\_file\_name to PDF\_input.root}}
+\item{if running against straight tracks, set \texttt{pid\_config} to \texttt{commissioning}, if against helical, set to \texttt{step\_4"}.}
+\item{set \texttt{pid\_beam\_setting} to a tag of your choosing, we suggest either a specific run number or a beam setting, e.g. 6-200, if you want to use it against all beams of that type. 
+
+\textbf{NOTE: The \texttt{pid\_beam\_setting} you set here must be the same as the one you use when running the actual PID}}
+\item{set \texttt{pid\_beamline\_polarity} to \texttt{positive} or \texttt{negative} depending on beamline polarity (In the CDB \texttt{1} = \texttt{positive}).}
+\end{enumerate}
+\item{While the \texttt{output\_root\_file\_name} card is not included in \texttt{process\_datacard.py}, I suggest that you add it in and set it to something like \texttt{PDF\_input.root}.}
+\item At the command line, run:
+\begin{lstlisting}
+python pid_pdf_generator.py --configuration_file edited_pdf_example_datacard.py
+\end{lstlisting}
+\item This will create a set of directories (one for each particle hypothesis, 3 total) in \texttt{MAUS\_ROOT\_DIR/files/PID/} each contain the root files with the PDFs in them.
+\item Combine PDFs from the three particle type directories created above into a single root file
+using \texttt{hadd}. At command line enter:
+\begin{lstlisting}
+hadd single_PDF_filename.root muon_PDFs_directory/*pion_PDFs_directory/*positron_PDFs_directory/*
+\end{lstlisting}
+\end{enumerate}
+
+You now have a full set of PDFs for each PID variable and particle type in the one root file and can run PID against this.
+
+\subsubsection{Performing PID}
+This section assumes that you have already processed your data file through the local reconstruction,
+producing file local\_recon\_input.root.
+
+\begin{enumerate}
+\item Go the global tracking executables directory:
+\begin{lstlisting}
+cd bin/Global
+\end{lstlisting}
+
+\item{Copy \texttt{process\_datacard.py} to a new file (e.g. \texttt{edited\_process\_datacard.py}) and edit:}
+\begin{enumerate}[label=(\alph*)]
+\item{\texttt{simulation\_geometry\_filename and reconstruction\_geometry\_filename} to the
+appropriate geometry.}
+\item{set \texttt{input\_root\_file\_name to local\_recon\_input.root}.}
+\item{set \texttt{track\_matching\_pid\_hypothesis} to \texttt{all}}
+\end{enumerate}
+
+\item At the command line, run:
+\begin{lstlisting}
+ python process_global.py --configuration_file edited_process_datacard.py
+\end{lstlisting}
+\end{enumerate}
+
+You now have a sample of MC/data which has been processed through track-matching (above). In our case that is \texttt{trackmatched\_data.root}, and you are ready to perform PID.
+
+\begin{enumerate}[resume]
+\item{Copy \texttt{pid\_example\_datacard.py} to a new file (e.g. \texttt{new\_pid\_example\_datacard.py}) and edit:}
+\begin{enumerate}[label=(\alph*)]
+\item{set \texttt{input\_root\_file\_name to trackmatched\_data.root}.}
+\item{change \texttt{PID\_PDFs\_file} to point to \texttt{single\_PDF\_filename.root} from above.}
+\item{\texttt{pid\_config}, \texttt{pid\_beam\_setting} and \texttt{pid\_beamline\_polarity} must also be set (to match those set when the PDFs were made).}
+\end{enumerate}
+\item At the command line, run:
+\begin{lstlisting}
+python GlobalPID.py --configuration_file edited_pid_example_datacard.py
+\end{lstlisting}
+\end{enumerate}
+
+Congratulations,you now have an output root file with PID'd global tracks in it, that can be analysed with a C++/python script or a reducer in MAUS.
 
 \section{Analysing Output Data}
 \label{sec:Analysis}
@@ -814,9 +933,6 @@ A screenshot showing the HepRApp viewer output is shown in figure~\ref{fig:HepRA
     \label{fig:HepRApp}
   \end{center}
 \end{figure}
-
-
-
 
 \appendix
 

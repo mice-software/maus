@@ -35,6 +35,7 @@ namespace MAUS {
 class RunActionManager;
 class CppErrorHandler;
 class GeometryNavigator;
+class SciFiGeometryHelper;
 
 class MAUSGeant4Manager;
 
@@ -175,6 +176,15 @@ class Globals {
      */
     static GeometryNavigator* GetMCGeometryNavigator();
 
+    /** Get the SciFi Geometry Helper
+     *  
+     *  Stores shortcut routines, helper functions and a map of the tracker
+     *  construction for use during reconstruction routines.
+     *
+     *  Globals retains ownership of this memory
+     */
+    static SciFiGeometryHelper* GetSciFiGeometryHelper();
+
     /** Get the version number like x.y.z
      *
      *  Return the version number x.y.z
@@ -199,6 +209,7 @@ class Globals {
     BTFieldConstructor* _recon_field_constructor;
     MAUSGeant4Manager* _maus_geant4_manager;
     GeometryNavigator* _mc_geometry_navigator;
+    SciFiGeometryHelper* _scifi_geometry_helper;
     static Globals* _process;
     // responsible for construction etc
     friend class GlobalsManager;

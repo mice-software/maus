@@ -229,6 +229,7 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
       // find distances from hit to pmt geom
       double dist1 = ( hpos - (slabPos + pmt1Pos) ).mag();
       double dist2 = ( hpos - (slabPos + pmt2Pos) ).mag();
+      double dist_average = (dist1 + dist2)/2;
 
       // convert edep to photoelectrons for this slab/pmt
       // can't convert to adc yet since we need to add up ph.el's
@@ -244,13 +245,13 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
       double htime = hit.GetTime() - gentime;
 
       // propagate time to pmt & smear by the resolution
-      double time1 = CLHEP::RandGauss::shoot((htime + dist1/csp) , tres);
-      double time2 = CLHEP::RandGauss::shoot((htime + dist2/csp) , tres);
+      double time1 = CLHEP::RandGauss::shoot((htime + (dist1-dist_average)/csp) , tres);
+      double time2 = CLHEP::RandGauss::shoot((htime + (dist2-dist_average)/csp) , tres);
       double tdc2time = _configJSON["TOFtdcConversionFactor"].asDouble();
 
       // convert to tdc
-      int tdc1 = static_cast<int>(time1 / tdc2time);
-      int tdc2 = static_cast<int>(time2 / tdc2time);
+      int tdc1 = static_cast<int>(std::round(time1 / tdc2time));
+      int tdc2 = static_cast<int>(std::round(time2 / tdc2time));
       if (fDebug) {
          std::cout << "time: " << hit.GetTime() << " now: " <<
 	           time1 << " " << time2 << " " << (time1+time2)/2 << std::endl;
@@ -408,7 +409,8 @@ void MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       } // end loop over secondary digits
 
       // convert light yield to adc & set the charge
-      int adc = static_cast<int>(npe / (_configJSON["TOFadcConversionFactor"].asDouble()));
+      int adc = static_cast<int>
+          (std::round(npe / (_configJSON["TOFadcConversionFactor"].asDouble())));
 /*    
       double adcs = npe / (_configJSON["TOFadcConversionFactor"].asDouble());
       double adcw = 0.5;
@@ -446,7 +448,7 @@ void MapCppTOFMCDigitizer::fill_tof_evt(int evnum, int snum,
       double rt = raw + dT;
 
       // convert to tdc
-      int tdc = static_cast<int>(rt/(_configJSON["TOFtdcConversionFactor"].asDouble()));
+      int tdc = static_cast<int>(std::round(rt/(_configJSON["TOFtdcConversionFactor"].asDouble())));
       if (fDebug) {
          std::cout << "times: raw=  " << raw << " dT= " << dT
                    << " corr= " << rt << " tdc= " << tdc << std::endl;

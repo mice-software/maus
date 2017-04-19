@@ -85,7 +85,8 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         source ${MAUS_ROOT_DIR}/third_party/build/root/bin/thisroot.sh
         echo $LD_LIBRARY_PATH
 
-        ./configure --disable-visual --with-root=${MAUS_ROOT_DIR}/third_party/build/root/
+        # ./configure --disable-visual --with-root=${MAUS_ROOT_DIR}/third_party/build/root/
+        ./configure --disable-visual --disable-root
 
         cd ${MAUS_ROOT_DIR}/third_party/build/${directory}/source/bin
         mv g4bl-config ${MAUS_ROOT_DIR}/third_party/build/${directory}/bin/g4bl-config
