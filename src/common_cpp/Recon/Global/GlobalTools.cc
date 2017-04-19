@@ -325,6 +325,14 @@ void propagate(double* x, double target_z, const BTField* field,
     throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
           "Some components of tracker trackpoint are nan", "GlobalTools::propagate"));
   }
+  if (std::isinf(x[0]) || std::isinf(x[1]) || std::isinf(x[2]) || std::isinf(x[3]) ||
+      std::isinf(x[4]) || std::isinf(x[5]) || std::isinf(x[6]) || std::isinf(x[7])) {
+    std::stringstream ios;
+    ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
+        << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
+    throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
+          "Some components of tracker trackpoint are inf", "GlobalTools::propagate"));
+  }
   int prop_dir = 1;
   _field = field;
   _charge = recon::global::Particle::GetInstance().GetCharge(pid);
