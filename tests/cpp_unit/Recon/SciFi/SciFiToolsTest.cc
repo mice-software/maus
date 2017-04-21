@@ -30,6 +30,17 @@ class SciFiToolsTest : public ::testing::Test {
   virtual ~SciFiToolsTest() {}
 };
 
+TEST_F(SciFiToolsTest, test_calc_circle_residual) {
+  SciFiSpacePoint *sp = new SciFiSpacePoint();
+  ThreeVector pos(1.0, 4.0, 0.0);
+  sp->set_position(pos);
+  double xc = 3.0;
+  double yc = 2.0;
+  double r = 2.0;
+  double delta = SciFiTools::calc_circle_residual(sp, xc, yc, r);
+  EXPECT_NEAR(0.8284, delta, 0.01);
+}
+
 TEST_F(SciFiToolsTest, test_make_3pt_circle) {
   SciFiSpacePoint *sp1 = new SciFiSpacePoint();
   SciFiSpacePoint *sp2 = new SciFiSpacePoint();

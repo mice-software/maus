@@ -59,10 +59,12 @@ namespace SciFiTools {
 
     /** @brief Calculate the residual of a circle to a spacepoint
      *  @param[in] sp - The spacepoint
-     *  @param[in] c - The circle (x0, y0 and rho must be set)
+     *  @param[in] xc - The circle centre x coordinate
+     *  @param[in] yc - The circle centre y coordinate
+     *  @param[in] r - The circle radius
      *  @return The residual
      */
-    double calc_circle_residual(const MAUS::SciFiSpacePoint *sp, const MAUS::SimpleCircle &c);
+    double calc_circle_residual(const MAUS::SciFiSpacePoint *sp, double xc, double yc, double r);
 
     /** @brief Take two spoints and return 2 straight lines connecting them, 1 in x-z, 1 in y-z
      *  @param[in] sp1 - The first spacepoint

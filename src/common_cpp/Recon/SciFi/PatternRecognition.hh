@@ -112,6 +112,7 @@ class PatternRecognition {
      *  @param[in,out] htrks Helical tracks to be processed
      */
     void track_processing(const int trker_no, const int n_points,
+                          std::vector<SciFiSpacePoint*> &spnts,
                           std::vector<SciFiStraightPRTrack*> &strks,
                           std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
@@ -398,6 +399,11 @@ class PatternRecognition {
     double sigma_on_s(const SimpleCircle& circ, const TMatrixD& cov_circ,
                       const SciFiSpacePoint* const spnt) const;
 
+    /** @brief Look for any spacepoints which are not used, but are close to the track and from
+               a station for which the track does not have a spacepoint */
+    bool missing_sp_search_helical(std::vector<SciFiSpacePoint*>& spnts,
+                                   SciFiHelicalPRTrack* trk) const;
+
   private:
     bool _debug;                /** Run in debug mode */
     bool _up_straight_pr_on;    /** Upstream straight pattern recogntion on or off */
@@ -424,6 +430,7 @@ class PatternRecognition {
     double _sz_error_w;         /** Weight to artificially scale the error going to sz fit */
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
+    double _missing_sp_cut;     /** Dist (mm) below which a missing spoint should be added to trk*/
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
     TFile* _rfile;   /** A ROOT file pointer for dumping residuals to in debug mode */
     TH1D* _hx;       /** histo of x residuals taken during straight road cut stage */

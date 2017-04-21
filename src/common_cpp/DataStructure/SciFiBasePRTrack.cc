@@ -29,7 +29,8 @@ SciFiBasePRTrack::SciFiBasePRTrack()
     _seed_momentum(0.0, 0.0, 0.0),
     _chi_sq(-1.0),
     _ndf(-1),
-	_charge(0) {
+    _charge(0),
+    _n_fit_points(-1) {
   _spoints = new TRefArray();
 }
 
@@ -42,7 +43,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(DoubleArray cov)
     _seed_momentum(0.0, 0.0, 0.0),
     _chi_sq(-1.0),
     _ndf(-1),
-	_charge(0) {
+    _charge(0),
+    _n_fit_points(-1) {
   _spoints = new TRefArray();
 }
 
@@ -55,7 +57,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(int charge, DoubleArray cov, SciFiSpacePointP
     _seed_momentum(0.0, 0.0, 0.0),
     _chi_sq(-1.0),
     _ndf(-1),
-	_charge(charge) {
+    _charge(charge),
+    _n_fit_points(-1) {
   _spoints = new TRefArray();
   for (std::vector<SciFiSpacePoint*>::iterator sp = spoints.begin(); sp != spoints.end(); ++sp) {
     _spoints->Add(*sp);
@@ -71,7 +74,8 @@ SciFiBasePRTrack::SciFiBasePRTrack(const SciFiBasePRTrack& track)
     _seed_momentum(track._seed_momentum),
     _chi_sq(track._chi_sq),
     _ndf(track._ndf),
-	_charge(track._charge) {
+    _charge(track._charge),
+    _n_fit_points(track._n_fit_points) {
   _spoints = new TRefArray(*track._spoints);
 }
 
@@ -92,6 +96,7 @@ SciFiBasePRTrack& SciFiBasePRTrack::operator=(const SciFiBasePRTrack& track) {
   _chi_sq = track._chi_sq;
   _ndf = track._ndf;
   _charge = track._charge;
+  _n_fit_points = track._n_fit_points;
 
   return *this;
 }
@@ -110,6 +115,10 @@ SciFiSpacePointPArray SciFiBasePRTrack::get_spacepoints_pointers() const {
     sp_pointers.push_back(static_cast<SciFiSpacePoint*>(_spoints->At(i)));
   }
   return sp_pointers;
+}
+
+void SciFiBasePRTrack::add_spacepoint_pointer(SciFiSpacePoint* sp) {
+  _spoints->Add(sp);
 }
 
 void SciFiBasePRTrack::set_spacepoints(TRefArray* spoints) {

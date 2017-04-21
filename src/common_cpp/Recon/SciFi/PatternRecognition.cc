@@ -21,7 +21,6 @@
 #include <json/json.h>
 
 // C++ headers
-// #include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
@@ -42,9 +41,7 @@
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
 
-
 namespace MAUS {
-
 
 // Four predicate functions used by the stl sort algorithm to sort spacepoints in vectors
 bool compare_spoints_ascending_z(const SciFiSpacePoint *sp1, const SciFiSpacePoint *sp2) {
@@ -88,6 +85,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
                                           _Pz_min(50.0),
+                                          _missing_sp_cut(2.0),
                                           _rfile(NULL),
                                           _hx(NULL),
                                           _hy(NULL),
@@ -124,6 +122,7 @@ void PatternRecognition::set_parameters_to_default() {
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
   _Pz_min = 50.0;
+  _missing_sp_cut = 2.0;
 }
 
 PatternRecognition::~PatternRecognition() {
@@ -180,6 +179,7 @@ bool PatternRecognition::LoadGlobals() {
     _sz_error_w = (*json)["SciFiPatRecSZErrorWeight"].asDouble();
     _Pt_max = (*json)["SciFiMaxPt"].asDouble();
     _Pz_min = (*json)["SciFiMinPz"].asDouble();
+    _missing_sp_cut = (*json)["SciFiPatRecMissingSpCut"].asDouble();
     return true;
   } else {
     return false;
@@ -243,6 +243,8 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
   // Count how many stations have at least one *unused* spacepoint
   int num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
 
+  std::vector<SciFiSpacePoint*> spnts = evt.spacepoints();
+
   // Make the tracks
   if (num_stations_hit == 5) {
     std::vector<SciFiStraightPRTrack*> strks;
@@ -250,7 +252,7 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     make_5tracks(track_type, trker_no, spnts_by_station, strks, htrks);
     std::vector<SciFiStraightPRTrack*> accepted_strks = select_tracks(strks);
     std::vector<SciFiHelicalPRTrack*> accepted_htrks = select_tracks(htrks);
-    track_processing(trker_no, 5, strks, htrks);
+    track_processing(trker_no, 5, spnts, strks, htrks);
     add_tracks(accepted_strks, accepted_htrks, evt);
   }
   num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
@@ -260,7 +262,7 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     make_4tracks(track_type, trker_no, spnts_by_station, strks, htrks);
     std::vector<SciFiStraightPRTrack*> accepted_strks = select_tracks(strks);
     std::vector<SciFiHelicalPRTrack*> accepted_htrks = select_tracks(htrks);
-    track_processing(trker_no, 4, strks, htrks);
+    track_processing(trker_no, 4, spnts, strks, htrks);
     add_tracks(accepted_strks, accepted_htrks, evt);
   }
   num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
@@ -270,7 +272,7 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     make_3tracks(trker_no, spnts_by_station, strks);
     std::vector<SciFiStraightPRTrack*> accepted_strks = select_tracks(strks);
     std::vector<SciFiHelicalPRTrack*> accepted_htrks = select_tracks(htrks);
-    track_processing(trker_no, 3, strks, htrks);
+    track_processing(trker_no, 3, spnts, strks, htrks);
     add_tracks(accepted_strks, accepted_htrks, evt);
   }
 }
@@ -286,9 +288,18 @@ void PatternRecognition::add_tracks(std::vector<SciFiStraightPRTrack*> &strks,
 }
 
 void PatternRecognition::track_processing(const int trker_no, const int n_points,
+                                          std::vector<SciFiSpacePoint*> &spnts,
                                           std::vector<SciFiStraightPRTrack*> &strks,
                                           std::vector<SciFiHelicalPRTrack*> &htrks) const {
+  // Set the tracker number
   set_tracker_number(trker_no, strks, htrks);
+
+  // Looking for any spacepoint seed candidates that the fit may have missed
+  if (n_points == 4) {
+    for (SciFiHelicalPRTrack* trk : htrks) {
+      missing_sp_search_helical(spnts, trk);
+    }
+  }
 }
 
 void PatternRecognition::set_tracker_number(const int trker_no,
@@ -637,6 +648,7 @@ SciFiStraightPRTrack* PatternRecognition::fit_straight_track(const int n_points,
       std::cout << "adding " << n_points << "pt candidate track\n";
     }
     track = new SciFiStraightPRTrack(-1, line_x, line_y, covariance);
+    track->set_n_fit_points(n_points);
 
     // Set all the good sp to used
     // for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
@@ -818,6 +830,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   // Form the track and return it
   SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, charge, pos_0, phi_0, c_trial, line_sz,
                                                        -1.0, phi_i, spnts, covariance);
+  track->set_n_fit_points(n_points);
   return track;
 }
 
@@ -1313,6 +1326,54 @@ double PatternRecognition::sigma_on_s(const SimpleCircle& circ, const TMatrixD& 
   // var_s.Print();
 
   return sqrt(var_s[0][0]);
+}
+
+bool PatternRecognition::missing_sp_search_helical(std::vector<SciFiSpacePoint*>& spnts,
+                                                   SciFiHelicalPRTrack* trk) const {
+  if (trk->get_num_points() != 4)  // Must have a 4 point helical track to search for missing sp
+    return false;
+
+  // Search for a station for which the track does not have a spacepoint
+  int empty_station_num = -1;
+  for (int i = 1; i < 6; ++i) {
+    bool found = false;
+    for (SciFiSpacePoint* sp : trk->get_spacepoints_pointers()) {
+      if (sp->get_station() == i) {
+        found = true;
+        break;
+      }
+    }
+    if (found == false) {
+      empty_station_num = i;
+      break;
+    }
+  }
+
+  if (empty_station_num == -1) // No station for which track does not have a sp, so give up
+    return false;
+
+  // Do we have 1 and only 1 unused sp in the missed station which passes the closeness cut?
+  SciFiSpacePoint* the_missing_sp = NULL;
+  int nfound = 0;
+  for (SciFiSpacePoint* sp : spnts) {
+    if ((sp->get_tracker() != trk->get_tracker()) || (sp->get_station() != empty_station_num))
+      continue;
+    if (sp->get_used() == false) {
+      double delta = SciFiTools::calc_circle_residual(sp, trk->get_circle_x0(),
+                                                      trk->get_circle_y0(), trk->get_R());
+      if (fabs(delta) < _missing_sp_cut) {
+        ++nfound;
+        the_missing_sp = sp;
+      }
+    }
+  }
+  if (nfound != 1) { // Require one candidate only, otherwise give up
+    return false;
+  } else { // Got one, add to the track
+    the_missing_sp->set_used(true);
+    trk->add_spacepoint_pointer(the_missing_sp);
+  }
+  return true;
 }
 
 } // ~namespace MAUS
