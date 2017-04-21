@@ -448,7 +448,7 @@ void propagate(double* x, double target_z, const BTField* field,
             "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
     // Need to catch the case where the particle is stopped
-    if (std::abs(x[4]) < (mass + 0.01)) {
+    if (std::abs(x[4]) < (mass + 0.1)) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
       throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
