@@ -24,6 +24,7 @@ import json
 import string # pylint: disable=W0402
 
 MAUS_ROOT_DIR = os.environ['MAUS_ROOT_DIR']
+MAUS_THIRD_PARTY = os.environ['MAUS_THIRD_PARTY']
 MAX_DIR_DEPTH = 10
 
 def install_python_tests(maus_root_dir, env):
@@ -77,6 +78,9 @@ def build_lib_maus_cpp(env):
     
     common_obj_env = env.Clone()
     common_obj_env.Append(CCFLAGS=["""-fPIC""", """-std=c++11"""])
+    common_obj_env.Append(CPPPATH=["%s/third_party/install/include/cdb-c++" % MAUS_THIRD_PARTY])
+#   common_obj_env.Append(LIBS = ['cdbc++'])
+    env.Append(LIBS = ['cdbc++', 'gsoap++', 'xml2'])
     
     # Build the object files
     common_cpp_obj = common_obj_env.Object(common_cpp_files)
