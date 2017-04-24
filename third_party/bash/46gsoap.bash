@@ -7,11 +7,13 @@ version=2.8.30
 directory=gsoap_${version}
 filename="gsoap_${version}.zip"
 
-url=https://downloads.sourceforge.net/project/gsoap2/gsoap-${top_version}/gsoap_${version}.zip
+# there seems to be flakiness with the sourceforge link at times
+# the source and md5 are on micemine as well - see below
+# url=https://downloads.sourceforge.net/project/gsoap2/gsoap-${top_version}/gsoap_${version}.zip
 
-# NOTE: In case sourceforge croaks, the gsoap zip file and the MD5 can also be accessed from MICEMine:
-## http://micewww.pp.rl.ac.uk/attachments/8593/gsoap_2.8.30.zip
-## http://micewww.pp.rl.ac.uk/attachments/8594/gsoap_2.8.30.zip.md5
+url=http://micewww.pp.rl.ac.uk/attachments/8593/gsoap_2.8.30.zip
+## md5 - already bundled with the maus source
+#http://micewww.pp.rl.ac.uk/attachments/8594/gsoap_2.8.30.zip.md5
 
 
 echo
