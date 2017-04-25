@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-version=1.0.3
+version=v1.0.3
 directory="cdb-C++.${version}"
-filename="cdb.client.api-C++.v${version}.tgz"
-md5file="cdb.client.api-C++.v${version}.tgz.md5"
+filename="cdb.client.api-cpp.${version}.tgz"
+md5file=${filename}.md5
 
 # v1.0.1 source url
 #url=http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-C++/download/head:/cdb.client.apic.v1.0-20170317175958-b4kkvdo0a734708l-1/cdb.client.api-C%2B%2B.v1.0.1.tgz
@@ -12,7 +12,13 @@ md5file="cdb.client.api-C++.v${version}.tgz.md5"
 #url=http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-C++/download/head:/cdb.client.apic.v1.0-20170324143648-18c50lgzb1mcmktm-1/cdb.client.api-C%2B%2B.v1.0.2.tgz
 
 # v1.0.3 source url
-url=http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-C++/download/head:/cdb.client.apic.v1.0-20170324164701-p8iga6fy9tvk0417-1/cdb.client.api-C%2B%2B.v1.0.3.tgz
+## there seems to be some issue with doing a wget of this from the test server
+# url=http://bazaar.launchpad.net/~janusz-martyniak/mcdb/mice.cdb.client.api-C++/download/head:/cdb.client.apic.v1.0-20170324164701-p8iga6fy9tvk0417-1/cdb.client.api-C%2B%2B.v1.0.3.tgz
+
+# safer in any case to get the source from micemine
+# v1.0.3
+url=http://micewww.pp.rl.ac.uk/attachments/8738/${filename}
+
 echo
 echo 'INFO: Installing third party library CDB-C++' $version
 echo '--------------------------------------------------'
