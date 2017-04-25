@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-version=v1.0.3
-directory="cdb-C++.${version}"
-filename="cdb.client.api-cpp.${version}.tgz"
+version=1.0.3
+directory="cdb-C++.v${version}"
+filename="cdb.client.api-cpp.v${version}.tgz"
 md5file=${filename}.md5
 
 # v1.0.1 source url
@@ -95,7 +95,7 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         cp -r include/* $INCLUDE_DIR
 
         cd $LIBDIR
-        ln -s libcdbc++.${version}.a libcdbc++.a
+        ln -sf libcdbc++.${version}.a libcdbc++.a
 
             ################################################## 
         echo
