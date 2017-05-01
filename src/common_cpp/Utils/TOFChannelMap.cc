@@ -68,6 +68,8 @@ bool TOFChannelMap::InitializeCards(Json::Value configJSON, int rnum) {
       _tof_cabling_by = JsonWrapper::GetProperty(configJSON,
                                            "TOF_cabling_by",
                                            JsonWrapper::stringValue).asString();
+      if (_tof_cabling_by == "run_number" && rnum == 0)
+          _tof_cabling_by = "date";
   } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error getting data card TOF_cabling_by" << std::endl

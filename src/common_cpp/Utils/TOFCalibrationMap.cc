@@ -70,6 +70,8 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
       _tof_calib_by = JsonWrapper::GetProperty(configJSON,
                                            "TOF_calib_by",
                                            JsonWrapper::stringValue).asString();
+      if (_tof_calib_by == "run_number" && rnum == 0)
+          _tof_calib_by = "date";
   } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error getting data card TOF_calib_by" << std::endl
@@ -126,8 +128,8 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
     return false;
   }
   runNumber = rnum;
-//   std::cout << "#### Getting TOF calibration by " << _tof_calib_by
-//             << "  Run " << runNumber << " ####" << std::endl;
+  // std::cerr << "#### Getting TOF calibration by " << _tof_calib_by
+  //          << "  Run " << runNumber << " ####" << std::endl;
 
   bool loaded;
   if (!fromDB) {

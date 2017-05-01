@@ -47,7 +47,10 @@ class AnalyzeOfflineTest(unittest.TestCase): # pylint: disable = R0904
             valgrind = []
         subproc = subprocess.Popen(valgrind+['python', ANA_PATH,
                                     "--output_root_file_name", OUT_PATH+".root",
-                                    "--daq_data_file=6008"])
+                                    "--daq_data_file=6008",
+                                    "--DAQ_cabling_by", "date",
+                                    "--TOF_cabling_by", "date",
+                                    "--TOF_calib_by", "date"])
         subproc.wait()
         self.assertEqual(subproc.returncode, 0)
         subproc = subprocess.Popen([CONV_PATH,
