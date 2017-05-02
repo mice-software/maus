@@ -19,6 +19,7 @@
 
 import os
 import unittest
+import json
 
 from Configuration import Configuration
 
@@ -36,13 +37,15 @@ class MapPyScalersDumpTestCase(unittest.TestCase): # pylint: disable = R0904
         # It would be nicer to test with a smaller data file!
         cls._datapath = '%s/src/input/InputCppDAQData' % \
                             os.environ.get("MAUS_ROOT_DIR")
-        cls._datafile = '02873'
+        cls._datafile = '06008'
         cls._c = Configuration()
 
     def test_something(self):
         """ Check against different issues"""
         inputter = MAUS.InputCppDAQOfflineData(self._datapath, self._datafile)
-        inputter.birth( self._c.getConfigJSON() )
+        conf_json = json.loads(self._c.getConfigJSON())
+        conf_json["DAQ_cabling_by"] = "date"
+        inputter.birth(json.dumps(conf_json))
 
         success = self.mapper.birth("{}")
         self.assertFalse(success)
@@ -68,4 +71,3 @@ class MapPyScalersDumpTestCase(unittest.TestCase): # pylint: disable = R0904
 
 if __name__ == '__main__':
     unittest.main()
-

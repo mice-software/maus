@@ -15,15 +15,15 @@
  *
  */
 
+#include <exception>
 #include "Utils/TOFCalibrationMap.hh"
 
-#include "Utils/TOFChannelMap.hh"
+#include "calibration/calibration.h"
+#include "generated/CalibrationImplPortBinding.nsmap"
 
 namespace MAUS {
 
 TOFCalibrationMap::TOFCalibrationMap() {
-  pymod_ok = true;
-  if (!this->InitializePyMod()) pymod_ok = false;
   runNumber = 0;
 }
 
@@ -70,6 +70,8 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
       _tof_calib_by = JsonWrapper::GetProperty(configJSON,
                                            "TOF_calib_by",
                                            JsonWrapper::stringValue).asString();
+      if (_tof_calib_by == "run_number" && rnum == 0)
+          _tof_calib_by = "date";
   } catch (MAUS::Exceptions::Exception e) {
     Squeak::mout(Squeak::error)
     << "Error getting data card TOF_calib_by" << std::endl
@@ -126,8 +128,8 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
     return false;
   }
   runNumber = rnum;
-//   std::cout << "#### Getting TOF calibration by " << _tof_calib_by
-//             << "  Run " << runNumber << " ####" << std::endl;
+  // std::cerr << "#### Getting TOF calibration by " << _tof_calib_by
+  //          << "  Run " << runNumber << " ####" << std::endl;
 
   bool loaded;
   if (!fromDB) {
@@ -140,7 +142,6 @@ bool TOFCalibrationMap::InitializeFromCards(Json::Value configJSON, int rnum) {
   } else {
 //       std::cout << "#### initializing from CDB ####" << std::endl;
       // get calib from DB instead of file, the above line is replaced by the one below
-      if (!pymod_ok) return false;
       loaded = this->InitializeFromCDB();
   }
   if (!loaded)
@@ -473,85 +474,54 @@ string TOFPixelKey::str() {
   return xConv.str();
 }
 
-bool TOFCalibrationMap::InitializePyMod() {
-  // import the get_tof_calib module
-  // this python module access and gets calibrations from the DB
-  _calib_mod = PyImport_ImportModule("calibration.get_tof_calib");
-  if (_calib_mod == NULL) {
-    std::cerr << "Failed to import get_tof_calib module" << std::endl;
-    return false;
+bool TOFCalibrationMap::GetCalibCAPI(std::string devname, std::string caltype) {
+  MAUS::CDB::Calibration cali;
+  std::string result;
+  try {
+      std::string status;
+      cali.getStatus(status);
+      if (status.compare("OK") != 0) {
+          std::cerr << "+++ CDB Error status = " << status << std::endl;
+          return false;
+      }
+      // std::cerr << " Calibration status returned " << status << std::endl;
+      if (_tof_calib_by == "date") {
+          std::cout << "++ Getting Calib by DATE for " << _tof_calibdate.c_str() << std::endl;
+          if (_tof_calibdate.compare("current") == 0) {
+              cali.getCurrentDetectorCalibration(devname.c_str(),
+                                                 caltype.c_str(),
+                                                 result);
+          } else {
+              cali.getDetectorCalibrationForDate(devname.c_str(),
+                                                 caltype.c_str(),
+                                                 _tof_calibdate.c_str(),
+                                                 result);
+          }
+      } else if (_tof_calib_by == "run_number") {
+          std::cout << "++ Getting Calib by RUN# " << runNumber << std::endl;
+          cali.getDetectorCalibrationForRun(devname.c_str(),
+                                            caltype.c_str(),
+                                            runNumber,
+                                            result);
+      }
+      // std::cerr << result << "(" << result.size() << " characters)" << std::endl;
+  } catch (std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return false;
   }
+  if (strcmp(caltype.c_str(), "t0") == 0)
+      t0str.str(result);
+  else if (strcmp(caltype.c_str(), "tw") == 0)
+      twstr.str(result);
+  else if (strcmp(caltype.c_str(), "trigger") == 0)
+      trigstr.str(result);
 
-  PyObject* calib_mod_dict = PyModule_GetDict(_calib_mod);
-  if (calib_mod_dict != NULL) {
-    PyObject* calib_init = PyDict_GetItemString
-                                              (calib_mod_dict, "GetCalib");
-    if (PyCallable_Check(calib_init)) {
-        _tcalib = PyObject_Call(calib_init, NULL, NULL);
-    }
-  }
-  if (_tcalib == NULL) {
-    std::cerr << "Failed to instantiate get_tof_calib" << std::endl;
-    return false;
-  }
   return true;
 }
 
-void TOFCalibrationMap::GetCalib(std::string devname, std::string caltype) {
-  PyObject *py_arg = NULL, *py_value = NULL;
-  // setup the arguments to get_calib_func
-  // the arguments are 3 strings
-  // arg1 = device name (TOF0/TOF1/TOF2) uppercase
-  // arg2 = calibration type (tw/t0/trigger) lowercase
-
-  _get_calib_func = NULL;
-  if (_tof_calib_by == "date") {
-      py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), _tof_calibdate.c_str());
-      _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib");
-  } else if (_tof_calib_by == "run_number") {
-      py_arg = Py_BuildValue("(sis)", devname.c_str(), runNumber, caltype.c_str());
-      _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib_for_run");
-  } else {
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Invalid tof_calib_by type "+_tof_calib_by,
-                     "TOFCalibrationMap::GetCalib"));
-  }
-
-  if (_get_calib_func == NULL)
-      throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Failed to find get_calib function",
-                     "TOFCalibrationMap::GetCalib"));
-
-  if (py_arg == NULL) {
-    PyErr_Clear();
-    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-              "Failed to resolve arguments to get_calib",
-              "MAUSEvaluator::evaluate"));
-    }
-    if (_get_calib_func != NULL && PyCallable_Check(_get_calib_func)) {
-        py_value = PyObject_CallObject(_get_calib_func, py_arg);
-        // setup the streams to hold the different calibs
-        if (py_value != NULL && strcmp(caltype.c_str(), "t0") == 0)
-            t0str << PyString_AsString(py_value);
-        if (strcmp(caltype.c_str(), "tw") == 0)
-            twstr << PyString_AsString(py_value);
-        if (strcmp(caltype.c_str(), "trigger") == 0)
-            trigstr << PyString_AsString(py_value);
-    }
-    if (py_value == NULL) {
-        PyErr_Clear();
-        Py_XDECREF(py_arg);
-        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Failed to parse argument "+devname,
-                     "GetCalib::get_calib"));
-    }
-    // clean up
-    Py_XDECREF(py_value);
-    Py_XDECREF(py_arg);
-}
-
 bool TOFCalibrationMap::LoadT0Calib() {
-  this->GetCalib(_tof_station, "t0");
+  if (!this->GetCalibCAPI(_tof_station, "t0"))
+      return false;
   int reff;
   double p0;
   TOFChannelKey key;
@@ -575,7 +545,8 @@ bool TOFCalibrationMap::LoadT0Calib() {
 }
 
 bool TOFCalibrationMap::LoadTWCalib() {
-  this->GetCalib(_tof_station, "tw");
+  if (!this->GetCalibCAPI(_tof_station, "tw"))
+      return false;
   double p0, p1, p2, p3;
   TOFChannelKey key;
   try {
@@ -602,7 +573,8 @@ bool TOFCalibrationMap::LoadTWCalib() {
 }
 
 bool TOFCalibrationMap::LoadTriggerCalib() {
-  this->GetCalib(_tof_station, "trigger");
+  if (!this->GetCalibCAPI(_tof_station, "trigger"))
+      return false;
   TOFPixelKey Pkey;
   double dt;
   try {
@@ -624,4 +596,5 @@ bool TOFCalibrationMap::LoadTriggerCalib() {
 
   return true;
 }
-}
+
+} // end namespace MAUS
