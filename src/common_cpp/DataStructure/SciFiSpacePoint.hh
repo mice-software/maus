@@ -118,6 +118,14 @@ class SciFiSpacePoint : public TObject {
 
   bool get_used() const { return _used; }
 
+  bool get_add_on() const { return _add_on; }
+
+  void set_add_on(bool add_on) { _add_on = add_on; }
+
+  double get_prxy_pull() const { return _prxy_pull; }
+
+  void set_prxy_pull(double prxy_pull) { _prxy_pull = prxy_pull; }
+
   void add_channel(SciFiCluster *channel);
 
   void set_channels(TRefArray* channels) { _channels = channels; }
@@ -130,12 +138,11 @@ class SciFiSpacePoint : public TObject {
 
  private:
   bool _used;
-
+  bool _add_on; /** If used, was this spacepoint part of the patrec fit */
   int _spill, _event, _tracker, _station;
-
   double _time, _time_error, _time_res;
-
   double _npe, _chi2;
+  double _prxy_pull; /** Distance of spoint from patrec circle fit */
 
   std::string _type;
 

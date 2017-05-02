@@ -21,6 +21,7 @@ namespace MAUS {
 
 // Default constructor
 SciFiSpacePoint::SciFiSpacePoint(): _used(false),
+                                    _add_on(false),
                                     _spill(0),
                                     _event(0),
                                     _tracker(0),
@@ -30,6 +31,7 @@ SciFiSpacePoint::SciFiSpacePoint(): _used(false),
                                     _time_res(0.),
                                     _npe(0.),
                                     _chi2(0.),
+                                    _prxy_pull(0.),
                                     _type(""),
                                     _position(ThreeVector(0, 0, 0)),
                                     _global_position(ThreeVector(0, 0, 0)) {
@@ -39,6 +41,7 @@ SciFiSpacePoint::SciFiSpacePoint(): _used(false),
 // Copy contructor
 SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &sp)
     : _used(false),
+      _add_on(false),
       _spill(0),
       _event(0),
       _tracker(0),
@@ -48,10 +51,12 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &sp)
       _time_res(0.),
       _npe(0.),
       _chi2(0.),
+      _prxy_pull(0.),
       _type(""),
       _position(ThreeVector(0, 0, 0)),
       _global_position(ThreeVector(0, 0, 0)) {
   _used      = sp.is_used();
+  _add_on    = sp.get_add_on();
   _spill     = sp.get_spill();
   _event     = sp.get_event();
   _tracker   = sp.get_tracker();
@@ -61,6 +66,7 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &sp)
   _time_res  = sp.get_time_res();
   _npe       = sp.get_npe();
   _chi2      = sp.get_chi2();
+  _prxy_pull = sp.get_prxy_pull();
   _type      = sp.get_type();
   _position  = sp.get_position();
   _global_position = sp.get_global_position();
@@ -69,8 +75,13 @@ SciFiSpacePoint::SciFiSpacePoint(const SciFiSpacePoint &sp)
 
 // Three cluster constructor
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, SciFiCluster *clust3)
-                : _time(0.0), _chi2(0.0), _position(ThreeVector(0, 0, 0)) {
-  _used = false;
+    : _used(false),
+      _add_on(false),
+      _time(0.0),
+      _chi2(0.0),
+      _prxy_pull(0.0),
+      _position(ThreeVector(0, 0, 0)) {
+
   _type = "triplet";
   clust1->set_used(true);
   clust2->set_used(true);
@@ -86,13 +97,17 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2, Sci
   _npe = clust1->get_npe()+clust2->get_npe()+clust3->get_npe();
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
-  // std::cerr << "SP: " << clust1 << " " << clust2 << " " << clust3 << std::endl;
 }
 
 // Two cluster constructor
 SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2)
-                : _time(0.0), _chi2(0.0), _position(ThreeVector(0, 0, 0)) {
-  _used = false;
+    : _used(false),
+      _add_on(false),
+      _time(0.0),
+      _chi2(0.0),
+      _prxy_pull(0.0),
+      _position(ThreeVector(0, 0, 0)) {
+
   _type = "duplet";
   clust1->set_used(true);
   clust2->set_used(true);
@@ -106,7 +121,6 @@ SciFiSpacePoint::SciFiSpacePoint(SciFiCluster *clust1, SciFiCluster *clust2)
   _tracker = clust1->get_tracker();
   _station = clust1->get_station();
   _npe = clust1->get_npe()+clust2->get_npe();
-  // std::cerr << "SP: " << clust1 << " " << clust2 << std::endl;
 }
 
 SciFiSpacePoint::~SciFiSpacePoint() {
@@ -118,6 +132,7 @@ SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &sp) {
     return *this;
   }
   _used      = sp.is_used();
+  _add_on    = sp.get_add_on();
   _spill     = sp.get_spill();
   _event     = sp.get_event();
   _tracker   = sp.get_tracker();
@@ -127,6 +142,7 @@ SciFiSpacePoint& SciFiSpacePoint::operator=(const SciFiSpacePoint &sp) {
   _time_res  = sp.get_time_res();
   _npe       = sp.get_npe();
   _chi2      = sp.get_chi2();
+  _prxy_pull = sp.get_prxy_pull();
   _type      = sp.get_type();
   _position  = sp.get_position();
   _global_position  = sp.get_global_position();

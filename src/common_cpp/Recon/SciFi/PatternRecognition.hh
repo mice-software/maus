@@ -104,10 +104,12 @@ class PatternRecognition {
     std::vector<T*> select_tracks(std::vector<T*> &trks) const;
 
 
-    /** @brief Final processing for the tracks before adding to the SciFiEvent.
+    /** @brief Final processing for the tracks before adding to the SciFiEvent
      *
-     *  Final processing for the tracks before adding to the SciFiEvent. Currently just sets
-     *  the correct tracker number
+     *  Final processing for the tracks before adding to the SciFiEvent. Does the following:
+     *    - sets the correct tracker number
+     *    - seraches for any close spoints which helical fit missed
+     *    - calculates the pulls in x-y projection of seed spacepoints from the helical track fit
      *  @param[in,out] strks Straight tracks to be processed
      *  @param[in,out] htrks Helical tracks to be processed
      */
@@ -367,6 +369,12 @@ class PatternRecognition {
     void set_down_helical_pr_on(const bool down_helical_pr_on)
       { _down_helical_pr_on = down_helical_pr_on; }
 
+    /** @brief Return the boolean controlling if we search for missed helical seed spacepoints */
+    bool get_sp_search_on() const { return _sp_search_on; }
+
+    /** @brief Set the boolean controlling if we search for missed helical seed spacepoints */
+    void set_sp_search_on(bool sp_search_on) { _sp_search_on = sp_search_on; }
+
     /** @brief Return the verbosity level */
     bool get_verbosity() { return _verb; }
 
@@ -410,6 +418,7 @@ class PatternRecognition {
     bool _down_straight_pr_on;  /** Downstream straight pattern recogntion on or off */
     bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
+    bool _sp_search_on;         /** Do we seach for seed spoints missed by helical fit? */
     int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
     int _n_trackers;            /** Number of trackers */

@@ -19,7 +19,9 @@
 
 #include "gtest/gtest.h"
 
+#include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
 
 namespace MAUS {
@@ -39,6 +41,41 @@ TEST_F(SciFiToolsTest, test_calc_circle_residual) {
   double r = 2.0;
   double delta = SciFiTools::calc_circle_residual(sp, xc, yc, r);
   EXPECT_NEAR(0.8284, delta, 0.01);
+}
+
+TEST_F(SciFiToolsTest, test_calc_xy_pulls) {
+  // Test the spacepoint pull calculation using a circle of rad = 5, centered on (0, 0)
+  SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
+  trk->set_circle_x0(0.0);
+  trk->set_circle_y0(0.0);
+  trk->set_R(5.0);
+
+  // Set up spacepoints which lie exactly (to 4 sig fig) on this circle
+  std::vector<SciFiSpacePoint*> spnts;
+  for (int i = 0; i < 4; ++i) {
+    spnts.push_back(new SciFiSpacePoint);
+    spnts[i]->set_prxy_pull(-1.0);
+  }
+  spnts[0]->set_position(ThreeVector(1.0, 4.899, 0.0));
+  spnts[1]->set_position(ThreeVector(2.0, 4.583, 0.0));
+  spnts[2]->set_position(ThreeVector(3.0, 4.0, 0.0));
+  spnts[3]->set_position(ThreeVector(4.0, 3.0, 0.0));
+
+  trk->set_spacepoints_pointers(spnts);
+
+  bool result = SciFiTools::calc_xy_pulls(trk);
+  EXPECT_TRUE(result);
+
+  // Check the pulls are all 0
+  for (auto sp : spnts) {
+    EXPECT_NEAR(0.0, sp->get_prxy_pull(), 0.1);
+  }
+
+  // Clean up
+  for (auto sp : spnts) {
+    delete sp;
+  }
+  delete trk;
 }
 
 TEST_F(SciFiToolsTest, test_make_3pt_circle) {

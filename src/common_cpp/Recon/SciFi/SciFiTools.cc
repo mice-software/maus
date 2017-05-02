@@ -46,6 +46,17 @@ double calc_phi(double xpos, double ypos, const MAUS::SimpleCircle &circle) {
     return angle;
 } // ~calculate_phi(...)
 
+bool calc_xy_pulls(MAUS::SciFiHelicalPRTrack* trk) {
+  if (!trk)
+    return NULL;
+  for (auto sp : trk->get_spacepoints_pointers()) {
+    double delta = calc_circle_residual(sp, trk->get_circle_x0(),
+                                        trk->get_circle_y0(), trk->get_R());
+    sp->set_prxy_pull(delta);
+  }
+  return true;
+}
+
 void draw_line(const MAUS::SciFiSpacePoint *sp1, const MAUS::SciFiSpacePoint *sp2,
                            MAUS::SimpleLine &line_x, MAUS::SimpleLine &line_y) {
   MAUS::ThreeVector pos_outer = sp1->get_position();

@@ -65,6 +65,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _down_straight_pr_on(true),
                                           _up_helical_pr_on(true),
                                           _down_helical_pr_on(true),
+                                          _sp_search_on(false),
                                           _s_error_method(0),
                                           _verb(0),
                                           _n_trackers(2),
@@ -102,6 +103,7 @@ void PatternRecognition::set_parameters_to_default() {
   _down_straight_pr_on = true;
   _up_helical_pr_on = true;
   _down_helical_pr_on = true;
+  _sp_search_on = false;
   _s_error_method = 0;
   _verb = 0;
   _n_trackers = 2;
@@ -161,6 +163,7 @@ void PatternRecognition::setup_debug() {
 bool PatternRecognition::LoadGlobals() {
   if (Globals::HasInstance()) {
     Json::Value *json = Globals::GetConfigurationCards();
+    _sp_search_on = (*json)["SciFiPatRecMissingSpSearchOn"].asBool();
     _s_error_method = (*json)["SciFiPatRecSErrorMethod"].asInt();
     _verb = (*json)["SciFiPatRecVerbosity"].asInt();
     _n_trackers = (*json)["SciFinTrackers"].asInt();
@@ -294,11 +297,15 @@ void PatternRecognition::track_processing(const int trker_no, const int n_points
   // Set the tracker number
   set_tracker_number(trker_no, strks, htrks);
 
-  // Looking for any spacepoint seed candidates that the fit may have missed
-  if (n_points == 4) {
-    for (SciFiHelicalPRTrack* trk : htrks) {
+  for (SciFiHelicalPRTrack* trk : htrks) {
+
+    // Look for any spacepoint seed candidates that the helical fit may have missed
+    if (_sp_search_on && (n_points == 4)) {
       missing_sp_search_helical(spnts, trk);
     }
+
+    // Calculate the seed spacepoint x-y pulls for helical tracks
+    SciFiTools::calc_xy_pulls(trk);
   }
 }
 
@@ -1371,6 +1378,7 @@ bool PatternRecognition::missing_sp_search_helical(std::vector<SciFiSpacePoint*>
     return false;
   } else { // Got one, add to the track
     the_missing_sp->set_used(true);
+    the_missing_sp->set_add_on(true);
     trk->add_spacepoint_pointer(the_missing_sp);
   }
   return true;
