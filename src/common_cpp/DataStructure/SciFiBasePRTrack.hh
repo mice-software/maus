@@ -88,6 +88,9 @@ class SciFiBasePRTrack : public TObject {
      */
     SciFiSpacePointPArray get_spacepoints_pointers() const;
 
+    /** @brief Add a spacepoint by pointer to the track, track does not take ownership of memory */
+    void add_spacepoint_pointer(SciFiSpacePoint* sp);
+
     /** Set the vector holding pointers to the spacepoints
      *  used by the track from a vector  of spacepoint pointers */
     void set_spacepoints_pointers(const SciFiSpacePointPArray &spoints);
@@ -118,7 +121,6 @@ class SciFiBasePRTrack : public TObject {
     /** Get the reconstructed seed frame momentum */
     ThreeVector get_seed_momentum() const { return _seed_momentum; }
 
-
     /** Get the global chi-squared value */
     double get_chi_squared() const { return _chi_sq; }
 
@@ -130,6 +132,12 @@ class SciFiBasePRTrack : public TObject {
 
     /** Set the Number of Degrees of Freedom */
     void set_ndf(int ndf) { _ndf = ndf; }
+
+    /** Get the number of spacepoints used in the fit */
+    int get_n_fit_points() const { return _n_fit_points; }
+
+    /** Set the number of spacepoints which was used in the fit */
+    void set_n_fit_points(int n_fit_points) { _n_fit_points = n_fit_points; }
 
     /** Get the number of points in a track (method recommended by ROOT */
     int get_num_points() const { return (_spoints->GetLast() + 1); }
@@ -155,7 +163,8 @@ class SciFiBasePRTrack : public TObject {
     ThreeVector _seed_momentum;   /** Reconstructed seed plane momentum */
     double _chi_sq;          /** The chisq of the fit/s which formed the track */
     int _ndf;                /** The number of degrees of freedom */
-    int _charge;              /** The track charge, 0 for straights */
+    int _charge;             /** The track charge, 0 for straights */
+    int _n_fit_points;       /** The number of spacepoints used in the fit */
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };

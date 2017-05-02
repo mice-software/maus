@@ -96,6 +96,7 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_TRUE(pr._down_straight_pr_on);
   EXPECT_TRUE(pr._up_helical_pr_on);
   EXPECT_TRUE(pr._down_helical_pr_on);
+  EXPECT_FALSE(pr._sp_search_on);
   EXPECT_EQ(0, pr._verb);
   EXPECT_EQ(2, pr._n_trackers);
   EXPECT_EQ(5, pr._n_stations);
@@ -111,6 +112,7 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
+  EXPECT_EQ(2.0, pr._missing_sp_cut);
 }
 
 TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
@@ -121,6 +123,7 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_TRUE(pr._down_straight_pr_on);
   EXPECT_TRUE(pr._up_helical_pr_on);
   EXPECT_TRUE(pr._down_helical_pr_on);
+  EXPECT_FALSE(pr._sp_search_on);
   EXPECT_EQ(0, pr._verb);
   EXPECT_EQ(2, pr._n_trackers);
   EXPECT_EQ(5, pr._n_stations);
@@ -136,6 +139,7 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
+  EXPECT_EQ(2.0, pr._missing_sp_cut);
 }
 
 /*

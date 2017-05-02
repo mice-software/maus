@@ -32,6 +32,7 @@ class SciFiSpacePointTestDS : public ::testing::Test {
 
 TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
   bool used = true;
+  bool add_on = true;
   int spill = 1;
   int event = 2;
   int tracker = 1;
@@ -39,6 +40,7 @@ TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
   double npe = 4.0;
   double time = 5.0;
   double chi2 = 6.0;
+  double prxy_pull = 7.0;
 
   double x = 7.0;
   double y = 8.0;
@@ -60,6 +62,7 @@ TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
 
   SciFiSpacePoint sp;
   sp.set_used(used);
+  sp.set_add_on(add_on);
   sp.set_spill(spill);
   sp.set_event(event);
   sp.set_tracker(tracker);
@@ -67,11 +70,13 @@ TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
   sp.set_npe(npe);
   sp.set_time(time);
   sp.set_chi2(chi2);
+  sp.set_prxy_pull(prxy_pull);
   sp.set_position(pos);
   sp.set_channels_pointers(cvec);
   sp.set_type(type);
 
   EXPECT_EQ(used, sp.get_used());
+  EXPECT_EQ(add_on, sp.get_add_on());
   EXPECT_EQ(spill, sp.get_spill());
   EXPECT_EQ(event, sp.get_event());
   EXPECT_EQ(tracker, sp.get_tracker());
@@ -79,6 +84,7 @@ TEST_F(SciFiSpacePointTestDS, test_getters_setters) {
   EXPECT_EQ(npe, sp.get_npe());
   EXPECT_EQ(time, sp.get_time());
   EXPECT_EQ(chi2, sp.get_chi2());
+  EXPECT_EQ(prxy_pull, sp.get_prxy_pull());
   EXPECT_EQ(x, sp.get_position().x());
   EXPECT_EQ(y, sp.get_position().y());
   EXPECT_EQ(z, sp.get_position().z());
@@ -92,6 +98,7 @@ TEST_F(SciFiSpacePointTestDS, test_default_constructor) {
   unsigned int size = 0;
   SciFiSpacePoint sp;
   EXPECT_FALSE(sp.get_used());
+  EXPECT_FALSE(sp.get_add_on());
   EXPECT_EQ(0, sp.get_spill());
   EXPECT_EQ(0, sp.get_event());
   EXPECT_EQ(0, sp.get_tracker());
@@ -99,6 +106,7 @@ TEST_F(SciFiSpacePointTestDS, test_default_constructor) {
   EXPECT_EQ(0.0, sp.get_npe());
   EXPECT_EQ(0.0, sp.get_time());
   EXPECT_EQ(0.0, sp.get_chi2());
+  EXPECT_EQ(0.0, sp.get_prxy_pull());
   EXPECT_EQ(0.0, sp.get_position().x());
   EXPECT_EQ(0.0, sp.get_position().y());
   EXPECT_EQ(0.0, sp.get_position().z());
@@ -108,6 +116,7 @@ TEST_F(SciFiSpacePointTestDS, test_default_constructor) {
 
 TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
   bool used = true;
+  bool add_on = true;
   int spill = 1;
   int event = 2;
   int tracker = 1;
@@ -115,6 +124,7 @@ TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
   double npe = 4.0;
   double time = 5.0;
   double chi2 = 6.0;
+  double prxy_pull = 7.0;
 
   double x = 7.0;
   double y = 8.0;
@@ -136,6 +146,7 @@ TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
 
   SciFiSpacePoint * sp1 = new SciFiSpacePoint();
   sp1->set_used(used);
+  sp1->set_add_on(add_on);
   sp1->set_spill(spill);
   sp1->set_event(event);
   sp1->set_tracker(tracker);
@@ -143,6 +154,7 @@ TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
   sp1->set_npe(npe);
   sp1->set_time(time);
   sp1->set_chi2(chi2);
+  sp1->set_prxy_pull(prxy_pull);
   sp1->set_position(pos);
   sp1->set_channels_pointers(cvec);
   sp1->set_type(type);
@@ -151,6 +163,7 @@ TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
   delete sp1;
 
   EXPECT_EQ(used, sp2->get_used());
+  EXPECT_EQ(used, sp2->get_add_on());
   EXPECT_EQ(spill, sp2->get_spill());
   EXPECT_EQ(event, sp2->get_event());
   EXPECT_EQ(tracker, sp2->get_tracker());
@@ -158,6 +171,7 @@ TEST_F(SciFiSpacePointTestDS, test_copy_constructor) {
   EXPECT_EQ(npe, sp2->get_npe());
   EXPECT_EQ(time, sp2->get_time());
   EXPECT_EQ(chi2, sp2->get_chi2());
+  EXPECT_EQ(prxy_pull, sp2->get_prxy_pull());
   EXPECT_EQ(x, sp2->get_position().x());
   EXPECT_EQ(y, sp2->get_position().y());
   EXPECT_EQ(z, sp2->get_position().z());
@@ -193,12 +207,14 @@ TEST_F(SciFiSpacePointTestDS, test_two_cluster_constructor) {
 
   SciFiSpacePoint sp(c1, c2);
   EXPECT_FALSE(sp.get_used());
+  EXPECT_FALSE(sp.get_add_on());
   EXPECT_EQ(spill, sp.get_spill());
   EXPECT_EQ(event, sp.get_event());
   EXPECT_EQ(tracker, sp.get_tracker());
   EXPECT_EQ(station, sp.get_station());
   EXPECT_EQ(npe1+npe2, sp.get_npe());
   EXPECT_EQ(0.0, sp.get_time());
+  EXPECT_EQ(0.0, sp.get_prxy_pull());
   EXPECT_EQ(0.0, sp.get_position().x());
   EXPECT_EQ(0.0, sp.get_position().y());
   EXPECT_EQ(0.0, sp.get_position().z());
@@ -245,12 +261,14 @@ TEST_F(SciFiSpacePointTestDS, test_three_cluster_constructor) {
 
   SciFiSpacePoint sp(c1, c2, c3);
   EXPECT_FALSE(sp.get_used());
+  EXPECT_FALSE(sp.get_add_on());
   EXPECT_EQ(spill, sp.get_spill());
   EXPECT_EQ(event, sp.get_event());
   EXPECT_EQ(tracker, sp.get_tracker());
   EXPECT_EQ(station, sp.get_station());
   EXPECT_EQ(npe1+npe2+npe3, sp.get_npe());
   EXPECT_EQ(0.0, sp.get_time());
+  EXPECT_EQ(0.0, sp.get_prxy_pull());
   EXPECT_EQ(0.0, sp.get_position().x());
   EXPECT_EQ(0.0, sp.get_position().y());
   EXPECT_EQ(0.0, sp.get_position().z());
@@ -268,6 +286,7 @@ TEST_F(SciFiSpacePointTestDS, test_three_cluster_constructor) {
 
 TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
   bool used = true;
+  bool add_on = true;
   int spill = 1;
   int event = 2;
   int tracker = 1;
@@ -275,6 +294,7 @@ TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
   double npe = 4.0;
   double time = 5.0;
   double chi2 = 6.0;
+  double prxy_pull = 7.0;
 
   double x = 7.0;
   double y = 8.0;
@@ -297,6 +317,7 @@ TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
 
   SciFiSpacePoint * sp1 = new SciFiSpacePoint();
   sp1->set_used(used);
+  sp1->set_add_on(add_on);
   sp1->set_spill(spill);
   sp1->set_event(event);
   sp1->set_tracker(tracker);
@@ -304,6 +325,7 @@ TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
   sp1->set_npe(npe);
   sp1->set_time(time);
   sp1->set_chi2(chi2);
+  sp1->set_prxy_pull(prxy_pull);
   sp1->set_position(pos);
   sp1->set_channels_pointers(cvec);
   sp1->set_type(type);
@@ -313,6 +335,7 @@ TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
   delete sp1;
 
   EXPECT_EQ(used, sp2->get_used());
+  EXPECT_EQ(add_on, sp2->get_add_on());
   EXPECT_EQ(spill, sp2->get_spill());
   EXPECT_EQ(event, sp2->get_event());
   EXPECT_EQ(tracker, sp2->get_tracker());
@@ -320,6 +343,7 @@ TEST_F(SciFiSpacePointTestDS, test_assignment_operator) {
   EXPECT_EQ(npe, sp2->get_npe());
   EXPECT_EQ(time, sp2->get_time());
   EXPECT_EQ(chi2, sp2->get_chi2());
+  EXPECT_EQ(prxy_pull, sp2->get_prxy_pull());
   EXPECT_EQ(x, sp2->get_position().x());
   EXPECT_EQ(y, sp2->get_position().y());
   EXPECT_EQ(z, sp2->get_position().z());
