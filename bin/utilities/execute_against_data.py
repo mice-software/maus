@@ -195,7 +195,7 @@ class RunManager:
         download_dir = self.run_setup.download_target
         if os.path.isdir(download_dir):
             shutil.rmtree(download_dir)
-        clean_target = glob.glob(self.run_setup.run_number_as_string+'*')
+        clean_target = glob.glob('*'+str(self.run_setup.run_number)+'*')
         for item in clean_target:
             if item[-3:] != 'tar':
                 os.remove(item)
@@ -257,13 +257,14 @@ class RunManager:
         proc = subprocess.Popen(download, stdout=self.logs.download_log, \
                                                        stderr=subprocess.STDOUT)
         proc.wait()
-        if self.run_setup.test_mode:
-            test_path_in = os.path.join(self.run_setup.maus_root_dir, 'src',
-                    'legacy', 'FILES', 'Models', 'Configurations', 'Test.dat')
-            test_path_out = os.path.join(self.run_setup.download_target, \
-                                                       'ParentGeometryFile.dat')
-            shutil.copy(test_path_in, test_path_out)
-        elif proc.returncode != 0:
+        # if self.run_setup.test_mode:
+        #     test_path_in = os.path.join(self.run_setup.maus_root_dir, 'src',
+        #             'legacy', 'FILES', 'Models', 'Configurations', 'Test.dat')
+        #     test_path_out = os.path.join(self.run_setup.download_target, \
+        #                                                'ParentGeometryFile.dat')
+        #     shutil.copy(test_path_in, test_path_out)
+        # elif proc.returncode != 0:
+        if proc.returncode != 0:
             raise DownloadError("Failed to download geometry successfully")
 
 
@@ -389,6 +390,8 @@ class RunSettings: #pylint: disable = R0902
         @return list of command line arguments for reconstruction
         """
         return [
+            '-simulation_geometry_filename', \
+                   os.path.join(self.download_target, 'ParentGeometryFile.dat'),
             '-reconstruction_geometry_filename', os.path.join \
                                (self.download_target, 'ParentGeometryFile.dat'),
             '-output_root_file_name', str(self.recon_file_name),
