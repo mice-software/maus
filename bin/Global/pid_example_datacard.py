@@ -19,7 +19,7 @@ import os
 input_root_file_name = "maus_output.root"
 
 # Output root file with track pid information included
-output_root_file_name = "output_Global_PID.json"
+output_root_file_name = "output_Global_PID.root"
 
 # Path to PDF file. The one currently listed (on 16/02/2016) is outdated
 # and will be replaced, and this card updated.
