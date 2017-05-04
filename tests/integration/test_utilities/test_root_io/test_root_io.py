@@ -47,6 +47,9 @@ def run_analyze_offline(root_file_name):
     subproc = subprocess.Popen([ANALYSIS,
                                 "--output_root_file_name", root_file_name,
                                 "--daq_data_file", RUN_NUMBER,
+                                "--DAQ_cabling_by", "date",
+                                "--TOF_cabling_by", "date",
+                                "--TOF_calib_by", "date",
                                 "--TOF_findTriggerPixelCut", "2.0"])
     subproc.wait()
 

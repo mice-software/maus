@@ -46,7 +46,8 @@ Track::Track()
       _emr_plane_density(0.),
       _pid_confidence_level(0.),
       _goodness_of_fit(0.),
-      _p_value(0.) {
+      _p_value(0.),
+      _tracker_clusters(0) {
   _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
 }
@@ -66,7 +67,8 @@ Track::Track(const Track &track)
       _emr_plane_density(track.get_emr_plane_density()),
       _pid_confidence_level(track.get_pid_confidence_level()),
       _goodness_of_fit(track.get_goodness_of_fit()),
-      _p_value(track.get_p_value()) {
+      _p_value(track.get_p_value()),
+      _tracker_clusters(track.get_tracker_clusters()) {
   _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
 }
@@ -96,6 +98,7 @@ Track& Track::operator=(const Track &track) {
   _pid_confidence_level = track.get_pid_confidence_level();
   _goodness_of_fit      = track.get_goodness_of_fit();
   _p_value              = track.get_p_value();
+  _tracker_clusters     = track.get_tracker_clusters();
 
   return *this;
 }
@@ -136,6 +139,7 @@ Track* Track::Clone() const {
   trackNew->set_pid_confidence_level(this->get_pid_confidence_level());
   trackNew->set_goodness_of_fit(this->get_goodness_of_fit());
   trackNew->set_p_value(this->get_p_value());
+  trackNew->set_tracker_clusters(this->get_tracker_clusters());
 
   return trackNew;
 }
@@ -515,6 +519,14 @@ void Track::set_p_value(double p_value) {
 
 double Track::get_p_value() const {
   return _p_value;
+}
+
+void Track::set_tracker_clusters(unsigned int tracker_clusters) {
+  _tracker_clusters = tracker_clusters;
+}
+
+unsigned int Track::get_tracker_clusters() const {
+  return _tracker_clusters;
 }
 
 } // ~namespace Global

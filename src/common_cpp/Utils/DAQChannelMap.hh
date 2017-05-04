@@ -18,7 +18,6 @@
 #ifndef _MAUS_INPUTCPPREALDATA_CA_HH_
 #define _MAUS_INPUTCPPREALDATA_CA_HH_
 
-#include <Python.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -28,6 +27,7 @@
 #include <sstream>
 #include <algorithm>
 #include <fstream>
+#include <exception>
 
 #include "json/json.h"
 #include "unpacking/MDfileManager.h"
@@ -118,9 +118,8 @@ class DAQChannelMap {
   bool InitFromCDB();
   bool InitFromCurrentCDB();
 
-  /* interface to the python get_tof_cabling module */
-  void GetCabling(std::string devname);
-  bool InitializePyMod();
+  /* interface to the CDB-C++ API */
+  bool GetCablingCAPI(std::string devname);
 
   // date file manager
   MDfileManager _dataFileManager;
@@ -158,10 +157,6 @@ class DAQChannelMap {
   std::string _daq_devicename;
   std::stringstream cblstr;
   std::string _daq_cabling_source, _daq_cabling_by, _daq_cablingdate;
-  PyObject* _cabling_mod;
-  PyObject* _tcabling;
-  PyObject* _get_cabling_func;
-  bool pymod_ok;
   int runNumber;
 };
 

@@ -229,6 +229,7 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
       // find distances from hit to pmt geom
       double dist1 = ( hpos - (slabPos + pmt1Pos) ).mag();
       double dist2 = ( hpos - (slabPos + pmt2Pos) ).mag();
+      double dist_average = (dist1 + dist2)/2;
 
       // convert edep to photoelectrons for this slab/pmt
       // can't convert to adc yet since we need to add up ph.el's
@@ -244,8 +245,8 @@ TofTmpDigits MapCppTOFMCDigitizer::make_tof_digits(TOFHitArray* hits,
       double htime = hit.GetTime() - gentime;
 
       // propagate time to pmt & smear by the resolution
-      double time1 = CLHEP::RandGauss::shoot((htime + dist1/csp) , tres);
-      double time2 = CLHEP::RandGauss::shoot((htime + dist2/csp) , tres);
+      double time1 = CLHEP::RandGauss::shoot((htime + (dist1-dist_average)/csp) , tres);
+      double time2 = CLHEP::RandGauss::shoot((htime + (dist2-dist_average)/csp) , tres);
       double tdc2time = _configJSON["TOFtdcConversionFactor"].asDouble();
 
       // convert to tdc

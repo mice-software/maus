@@ -257,6 +257,12 @@ class Track : public TObject {
   /// Get the p-value of the tracker track from which this track came
   double get_p_value() const;
 
+  /// Set the number of tracker clusters
+  void set_tracker_clusters(unsigned int tracker_clusters);
+
+  /// Get the number of tracker clusters
+  unsigned int get_tracker_clusters() const;
+
  private:
 
   /// Push a MAUS::DataStructure::Global::TrackPoint* into the #_track_points
@@ -319,6 +325,10 @@ class Track : public TObject {
 
   /// The p-value of the tracker track from which this track came (only for non-through tracks)
   double _p_value;
+
+  /// The number of clusters that formed the tracker track from which this track came
+  /// (only for non-through tracks)
+  unsigned int _tracker_clusters;
 
   MAUS_VERSIONED_CLASS_DEF(Track);
 }; // ~class Track

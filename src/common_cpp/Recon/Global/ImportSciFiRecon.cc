@@ -26,8 +26,8 @@ namespace recon {
 namespace global {
 
   void ImportSciFiRecon::process(const MAUS::SciFiEvent &scifi_event,
-				 MAUS::GlobalEvent* global_event,
-				 std::string mapper_name) {
+                                 MAUS::GlobalEvent* global_event,
+                                 std::string mapper_name) {
 
     // Get array of scifi tracks
     SciFiTrackPArray scifi_track_array = scifi_event.scifitracks();
@@ -35,10 +35,11 @@ namespace global {
     for (size_t i = 0; i < scifi_track_array.size(); i++) {
       SciFiTrack* scifi_track = scifi_track_array[i];
       MAUS::DataStructure::Global::Track* GlobalSciFiTrack =
-	new MAUS::DataStructure::Global::Track();
+          new MAUS::DataStructure::Global::Track();
       ImportSciFiTrack(scifi_track, GlobalSciFiTrack, mapper_name);
       GlobalSciFiTrack->set_mapper_name(mapper_name);
       GlobalSciFiTrack->set_p_value(scifi_track->P_value());
+      GlobalSciFiTrack->set_tracker_clusters(abs(scifi_track->GetNumberDataPoints()));
       global_event->add_track_recursive(GlobalSciFiTrack);
     }
   }
@@ -46,10 +47,9 @@ namespace global {
 
   // Loop through trackpoints, make global tp and add to global track
   void ImportSciFiRecon::ImportSciFiTrack(const MAUS::SciFiTrack* scifi_track,
-					  MAUS::DataStructure::Global::Track*
-					  GlobalSciFiTrack,
-					  std::string mapper_name) {
-
+                                          MAUS::DataStructure::Global::Track*
+                                          GlobalSciFiTrack,
+                                          std::string mapper_name) {
     int charge = scifi_track->charge();
     // Get trackpoint array
     SciFiTrackPointPArray scifi_tp_array = scifi_track->scifitrackpoints();
@@ -57,18 +57,18 @@ namespace global {
     for (size_t i = 0; i < scifi_tp_array.size(); i++) {
       SciFiTrackPoint* scifi_tp = scifi_tp_array[i];
       MAUS::DataStructure::Global::TrackPoint* GlobalSciFiTrackPoint =
-	new MAUS::DataStructure::Global::TrackPoint();
+          new MAUS::DataStructure::Global::TrackPoint();
       MAUS::DataStructure::Global::SpacePoint* GlobalSciFiSpacePoint =
-	new MAUS::DataStructure::Global::SpacePoint();
+          new MAUS::DataStructure::Global::SpacePoint();
       int tracker = scifi_tp->tracker();
       int station = scifi_tp->station();
-      SetStationEnum(GlobalSciFiTrackPoint, GlobalSciFiTrack, tracker,
-		     station);
-      std::vector<double> errors = scifi_tp->errors();
+      SetStationEnum(GlobalSciFiTrackPoint, GlobalSciFiTrack, tracker, station);
+      ThreeVector pos_errors = scifi_tp->pos_error();
+      ThreeVector mom_errors = scifi_tp->mom_error();
       double x = scifi_tp->pos().x();
-      double x_err = errors[0];
+      double x_err = pos_errors.x();
       double y = scifi_tp->pos().y();
-      double y_err = errors[2];
+      double y_err = pos_errors.y();
       double z = scifi_tp->pos().z();
       double z_err = 0.6273;
       // time not provided by tracker, set to unphysical value
@@ -77,11 +77,11 @@ namespace global {
       TLorentzVector pos(x, y, z, t);
       TLorentzVector pos_err(x_err, y_err, z_err, t_err);
       double px = scifi_tp->mom().x();
-      double px_err = errors[1];
+      double px_err = mom_errors.x();
       double py = scifi_tp->mom().y();
-      double py_err = errors[3];
+      double py_err = mom_errors.y();
       double pz = scifi_tp->mom().z();
-      double pz_err = errors[4];
+      double pz_err = mom_errors.z();
       // Energy unknown, set to unphysical value
       double E = -1000000.0;
       double E_err = 1000000.0;
@@ -113,58 +113,58 @@ namespace global {
     if (tracker == 0) {
       switch (station) {
       case 1:
-	detector = MAUS::DataStructure::Global::kTracker0_1;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker0_1;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
+        break;
       case 2:
-	detector = MAUS::DataStructure::Global::kTracker0_2;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker0_2;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
+        break;
       case 3:
-	detector = MAUS::DataStructure::Global::kTracker0_3;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker0_3;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
+        break;
       case 4:
-	detector = MAUS::DataStructure::Global::kTracker0_4;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker0_4;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
+        break;
       case 5:
-	detector = MAUS::DataStructure::Global::kTracker0_5;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker0_5;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker0);
+        break;
       }
     } else if (tracker == 1) {
       switch (station) {
       case 1:
-	detector = MAUS::DataStructure::Global::kTracker1_1;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker1_1;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
+        break;
       case 2:
-	detector = MAUS::DataStructure::Global::kTracker1_2;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker1_2;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
+        break;
       case 3:
-	detector = MAUS::DataStructure::Global::kTracker1_3;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker1_3;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
+        break;
       case 4:
-	detector = MAUS::DataStructure::Global::kTracker1_4;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker1_4;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
+        break;
       case 5:
-	detector = MAUS::DataStructure::Global::kTracker1_5;
-	GlobalSciFiTrackPoint->set_detector(detector);
-	GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
-	break;
+        detector = MAUS::DataStructure::Global::kTracker1_5;
+        GlobalSciFiTrackPoint->set_detector(detector);
+        GlobalSciFiTrack->SetDetector(MAUS::DataStructure::Global::kTracker1);
+        break;
       }
     }
   }

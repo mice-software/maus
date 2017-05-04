@@ -52,6 +52,7 @@ class InputCppDAQOfflineDataTestCase(unittest.TestCase): #pylint:disable=R0904
         config_json = json.loads(config)
         config_json["daq_data_path"] = self._datapath
         config_json["daq_data_file"] = self._datafile
+        config_json["DAQ_cabling_by"] = "date"
         self._config = json.dumps(config_json)
         self.mapper = None
 

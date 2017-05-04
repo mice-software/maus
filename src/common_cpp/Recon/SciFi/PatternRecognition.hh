@@ -104,14 +104,17 @@ class PatternRecognition {
     std::vector<T*> select_tracks(std::vector<T*> &trks) const;
 
 
-    /** @brief Final processing for the tracks before adding to the SciFiEvent.
+    /** @brief Final processing for the tracks before adding to the SciFiEvent
      *
-     *  Final processing for the tracks before adding to the SciFiEvent. Currently just sets
-     *  the correct tracker number
+     *  Final processing for the tracks before adding to the SciFiEvent. Does the following:
+     *    - sets the correct tracker number
+     *    - seraches for any close spoints which helical fit missed
+     *    - calculates the pulls in x-y projection of seed spacepoints from the helical track fit
      *  @param[in,out] strks Straight tracks to be processed
      *  @param[in,out] htrks Helical tracks to be processed
      */
     void track_processing(const int trker_no, const int n_points,
+                          std::vector<SciFiSpacePoint*> &spnts,
                           std::vector<SciFiStraightPRTrack*> &strks,
                           std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
@@ -366,6 +369,12 @@ class PatternRecognition {
     void set_down_helical_pr_on(const bool down_helical_pr_on)
       { _down_helical_pr_on = down_helical_pr_on; }
 
+    /** @brief Return the boolean controlling if we search for missed helical seed spacepoints */
+    bool get_sp_search_on() const { return _sp_search_on; }
+
+    /** @brief Set the boolean controlling if we search for missed helical seed spacepoints */
+    void set_sp_search_on(bool sp_search_on) { _sp_search_on = sp_search_on; }
+
     /** @brief Return the verbosity level */
     bool get_verbosity() { return _verb; }
 
@@ -398,12 +407,18 @@ class PatternRecognition {
     double sigma_on_s(const SimpleCircle& circ, const TMatrixD& cov_circ,
                       const SciFiSpacePoint* const spnt) const;
 
+    /** @brief Look for any spacepoints which are not used, but are close to the track and from
+               a station for which the track does not have a spacepoint */
+    bool missing_sp_search_helical(std::vector<SciFiSpacePoint*>& spnts,
+                                   SciFiHelicalPRTrack* trk) const;
+
   private:
     bool _debug;                /** Run in debug mode */
     bool _up_straight_pr_on;    /** Upstream straight pattern recogntion on or off */
     bool _down_straight_pr_on;  /** Downstream straight pattern recogntion on or off */
     bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
+    bool _sp_search_on;         /** Do we seach for seed spoints missed by helical fit? */
     int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
     int _n_trackers;            /** Number of trackers */
@@ -424,6 +439,7 @@ class PatternRecognition {
     double _sz_error_w;         /** Weight to artificially scale the error going to sz fit */
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
+    double _missing_sp_cut;     /** Dist (mm) below which a missing spoint should be added to trk*/
     // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
     TFile* _rfile;   /** A ROOT file pointer for dumping residuals to in debug mode */
     TH1D* _hx;       /** histo of x residuals taken during straight road cut stage */

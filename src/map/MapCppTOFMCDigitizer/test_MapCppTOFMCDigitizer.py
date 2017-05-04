@@ -26,6 +26,7 @@ class MapCppTOFMCDigitizer(unittest.TestCase):  #pylint: disable = R0904
         cls.mapper = MAUS.MapCppTOFMCDigitizer()
         conf_json = json.loads(Configuration().getConfigJSON())
         conf_json["reconstruction_geometry_filename"] = "Stage6.dat"
+        conf_json["TOF_calib_by"] = "date"
         # Test whether the configuration files were loaded correctly at birth
         cls.mapper.birth(json.dumps(conf_json))
 
