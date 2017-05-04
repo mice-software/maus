@@ -148,7 +148,7 @@ void MapCppTrackerTrackFit::_process(Data* data) const {
                 break;
               default:
                 break;
-            } 
+            }
           } catch (Exceptions::Exception& e) {
             std::cerr << "Track Fit Failed: " << e.what();
           }
