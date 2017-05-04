@@ -194,7 +194,7 @@ class maus_reader() :
     """
     self.__current_filenumber += 1
 
-    if self.__print_file_progress :
+    if self.__print_file_progress == True :
       sys.stdout.write( 
           ' File ' + str(self.__current_filenumber+1) + \
           ' of ' + str(self.__num_files) + '                      \r')
@@ -221,7 +221,7 @@ class maus_reader() :
     """
     self.__current_event_num += 1
 
-    if self.__print_event_progress :
+    if self.__print_event_progress == True :
       sys.stdout.write( 
           ' Event ' + str(self.__current_event_num+1) + \
           ' of ' + str(self.__current_num_events) + \
@@ -266,34 +266,36 @@ class maus_reader() :
       Loads the next spill, in the current event into memory.
       If one is available return True, else return False
     """
-    self.__current_spill_num += 1
+    while True :
+      self.__current_spill_num += 1
 
-    if self.__print_spill_progress :
-      sys.stdout.write( 
-          ' Spill ' + str(self.__current_spill_num+1) + \
-          ' of ' + str(self.__current_num_spills) + \
-          ' in File ' + str(self.__current_filenumber+1) + \
-          ' of ' + str(self.__num_files) + '                      \r')
-      sys.stdout.flush()
+      if self.__print_spill_progress == True :
+        sys.stdout.write( 
+            ' Spill ' + str(self.__current_spill_num+1) + \
+            ' of ' + str(self.__current_num_spills) + \
+            ' in File ' + str(self.__current_filenumber+1) + \
+            ' of ' + str(self.__num_files) + '                      \r')
+        sys.stdout.flush()
 
 
-    if self.__current_spill_num >= self.__current_num_spills :
-      if self.__increment_filename() :
-        try :
-          self.__load_file()
-        except IOError as ex:
-          print ex
-          return self.next_spill()
-      else :
-        return False
+      if self.__current_spill_num >= self.__current_num_spills :
+        if self.__increment_filename() :
+          try :
+            self.__load_file()
+          except IOError as ex:
+            print ex
+            return self.next_spill()
+        else :
+          return False
 
-    self.__tree.GetEntry( self.__current_spill_num )
-    self.__spill = self.__data.GetSpill()
-    self.__current_num_events = self.__spill.GetReconEvents().size()
-    self.__current_event_num = 0
+      self.__tree.GetEntry( self.__current_spill_num )
+      self.__spill = self.__data.GetSpill()
+      self.__current_num_events = self.__spill.GetReconEvents().size()
+      self.__current_event_num = 0
 
-    if self.__spill.GetDaqEventType() != "physics_event" :
-      return self.next_spill()
+      if self.__spill.GetDaqEventType() == "physics_event" :
+        break
+
 
     if self.__current_num_events == 0 :
       return self.next_spill()

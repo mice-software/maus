@@ -262,6 +262,18 @@ class AnalysisHit() :
     """
     return math.sqrt( self.__x**2 + self.__y**2 )
 
+  def get_phi( self ) :
+    """
+      Get the Phi angle (Position)
+    """
+    return math.atan2( self.__y, self.__x )
+
+  def get_theta( self ) :
+    """
+      Get the Theta angle (momentum)
+    """
+    return math.atan2( self.__py, self.__px )
+
   def get_energy( self ) :
     """
       Get the total energy

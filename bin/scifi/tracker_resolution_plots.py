@@ -170,7 +170,8 @@ def init_plots_data() :
     tracker_dict['L_r'] = ROOT.TH2F( tracker+'_L_r', "L in r", \
                             6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
 
-    tracker_dict['L_canon_r'] = ROOT.TH2F( tracker+'_L_canon_r', "L_{canon} in r", \
+    tracker_dict['L_canon_r'] = ROOT.TH2F( \
+                             tracker+'_L_canon_r', "L_{canon} in r", \
                             6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
 
 
@@ -193,7 +194,8 @@ def init_plots_data() :
 
     tracker_dict['mc_L_r'] = ROOT.TH2F( tracker+'_mc_L_r', "L_{mc} in r", \
                             6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
-    tracker_dict['mc_L_canon_r'] = ROOT.TH2F( tracker+'_mc_L_canon_r', "L_{canon} in r", \
+    tracker_dict['mc_L_canon_r'] = ROOT.TH2F( \
+                          tracker+'_mc_L_canon_r', "L_{canon} in r", \
                             6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
 
 
@@ -271,7 +273,7 @@ def init_plots_data() :
           tracker+'_track_efficiency_pz', "Track Efficiency in P_z", \
                                                        PZ_BIN, PZ_MIN, PZ_MAX )
     tracker_dict['track_efficiency_L_canon'] = ROOT.TEfficiency( \
-          tracker+'_track_efficiency_L_canon', "Track Efficiency in L_{canon}", \
+         tracker+'_track_efficiency_L_canon', "Track Efficiency in L_{canon}", \
                                                        200, -100.0, 100.0 )
 
 
@@ -965,10 +967,12 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['mc_L'].Fill(L_mc)
     tracker_plots['mc_L_canon'].Fill(L_mc + C_mc)
 
-    tracker_plots['L_r'].Fill( L_recon,  sqrt(scifi_pos[0]**2 + scifi_pos[1]**2))
-    tracker_plots['L_canon_r'].Fill( L_recon+C,  sqrt(scifi_pos[0]**2 + scifi_pos[1]**2))
+    tracker_plots['L_r'].Fill( L_recon, sqrt(scifi_pos[0]**2 + scifi_pos[1]**2))
+    tracker_plots['L_canon_r'].Fill( L_recon+C, 
+                                       sqrt(scifi_pos[0]**2 + scifi_pos[1]**2))
     tracker_plots['mc_L_r'].Fill( L_mc,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
-    tracker_plots['mc_L_canon_r'].Fill( L_mc+C_mc,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
+    tracker_plots['mc_L_canon_r'].Fill( L_mc+C_mc, \
+                                         sqrt(virt_pos[0]**2 + virt_pos[1]**2))
 
     tracker_plots['residual_xy'].Fill(res_pos[0], res_pos[1])
     tracker_plots['residual_pxpy'].Fill(res_mom[0], res_mom[1])
@@ -978,8 +982,10 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['residual_L'].Fill(L_recon-L_mc)
     tracker_plots['residual_L_canon'].Fill((L_recon+C)-(L_mc+C_mc))
 
-    tracker_plots['L_residual_r'].Fill( L_recon-L_mc,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
-    tracker_plots['L_canon_residual_r'].Fill( (L_recon+C)-(L_mc+C_mc),  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
+    tracker_plots['L_residual_r'].Fill( L_recon-L_mc,  \
+                                         sqrt(virt_pos[0]**2 + virt_pos[1]**2))
+    tracker_plots['L_canon_residual_r'].Fill( (L_recon+C)-(L_mc+C_mc), \
+                                         sqrt(virt_pos[0]**2 + virt_pos[1]**2))
 
     tracker_plots['x_residual_pt'].Fill( Pt_mc, res_pos[0] )
     tracker_plots['y_residual_pt'].Fill( Pt_mc, res_pos[1] )
@@ -1333,6 +1339,8 @@ if __name__ == "__main__" :
                  help='Name of a JSON file containing the events to analyses' )
 
 
+  parser.add_argument( '--not_require_all_planes', action="store_true", \
+                    help="Don't require all the virtual planes to be located" )
 
   parser.add_argument( '--not_require_cluster', action="store_true", \
                         help="Don't require a cluster in the reference plane" )
@@ -1350,6 +1358,9 @@ if __name__ == "__main__" :
     ENSEMBLE_SIZE = namespace.ensemble_size
     if namespace.not_require_cluster :
       REQUIRE_DATA = False
+
+    if namespace.not_require_all_planes :
+      REQUIRE_ALL_PLANES = False
 
     RECON_TRACKERS = namespace.trackers
 
@@ -1390,6 +1401,7 @@ if __name__ == "__main__" :
     sys.stdout.write(   "- Initialising Plots : Done   \n" )
 
     file_reader = event_loader.maus_reader(namespace.maus_root_files)
+    file_reader.set_max_num_events(1000)
 ##### 3. Initialise Plane Dictionary ##########################################
     if VIRTUAL_PLANE_DICT is None :
       sys.stdout.write( "\n- Finding Virtual Planes : Running\r" )
