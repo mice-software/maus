@@ -31,8 +31,8 @@ if [ "$#" -gt 0 ]; then
     cat_list=$@
 else
     # if there are no command line arguments we generate default data set
-    run_list="04234 04258 04235 06008"
-    cat_list="06008"
+    run_list="04234 04258 04235 08944"
+    cat_list="08944"
 fi
 
 echo "INFO: Building test data set"

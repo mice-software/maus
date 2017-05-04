@@ -31,7 +31,7 @@ TMP = os.getenv('MAUS_TMP_DIR')
 # set a different test file for stepIV
 DATA_TAR = "04234.tar"
 if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
-    DATA_TAR = "06008.tar"
+    DATA_TAR = "08944.tar"
 
 class CardsUploadTestCase(unittest.TestCase): # pylint: disable=R0904
     """
