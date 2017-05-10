@@ -700,7 +700,7 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
   """
   track_plots = plot_dict['track_plots']
   reco_plots = plot_dict['recon_plots']
-  comp_plots = plot_dict['comparison_plots']
+#  comp_plots = plot_dict['comparison_plots']
 
   track_plots['tracks_event'].Fill( len(tracks) )
   upstream_good = 0
@@ -729,7 +729,7 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
 
     shape = track.GetAlgorithmUsed()
     shape_plots = None
-    pr_track = None
+#    pr_track = None
 
     if shape == 0 :
       shape_plots = track_plots['straight']

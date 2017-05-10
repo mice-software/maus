@@ -17,7 +17,7 @@
 #
 
 # pylint: disable = W0311, E1101, W0613, C0111, R0911, W0621, C0103, R0902
-# pylint: disable = W0102
+# pylint: disable = W0102, R0915
 
 
 import analysis

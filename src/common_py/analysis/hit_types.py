@@ -27,7 +27,6 @@
 
 import math
 import analysis.tools as tools
-import numpy
 
 class AnalysisHit() :
   """

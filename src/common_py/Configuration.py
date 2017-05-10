@@ -21,7 +21,7 @@ for the old G4MICE datacards.
 
 import os
 import json
-import ErrorHandler
+import common_py.ErrorHandler
 import argparse
 
 class Configuration:

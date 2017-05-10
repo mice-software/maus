@@ -26,7 +26,7 @@
   to the reconstructed covariance matrix; in additiona to some useful functions.
 """
 
-# pylint: disable = W0311, E1101, W0102, R0902, C0103
+# pylint: disable = W0311, E1101, W0102, R0902, C0103, R0904
 
 import numpy
 import math
