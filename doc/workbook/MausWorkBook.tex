@@ -546,7 +546,9 @@ You now have a sample of MC/data which has been processed through track-matching
 \item{set \texttt{input\_root\_file\_name to trackmatched\_data.root}.}
 \item{change \texttt{PID\_PDFs\_file} to point to \texttt{single\_PDF\_filename.root} from above.}
 \item{\texttt{pid\_config}, \texttt{pid\_beam\_setting} and \texttt{pid\_beamline\_polarity} must also be set (to match those set when the PDFs were made).}
+\item{Set \texttt{pid\_track\_selection} to select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by setting to ``all'' which will give you PID'd Through and unmatched US and DS tracks, on through tracks only (constituent tracks will be PID'd, so this excludes orphans) with ``through'' or on all upstream and downstream tracks (ignoring whether tracks have been through-matched) with "us\_and\_ds"}
 \end{enumerate}
+
 \item At the command line, run:
 \begin{lstlisting}
 python GlobalPID.py --configuration_file edited_pid_example_datacard.py

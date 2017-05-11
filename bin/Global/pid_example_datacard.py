@@ -60,11 +60,10 @@ pid_beamline_polarity = "positive"
 # competing pid hypotheses before they are selected as the correct hypothesis
 pid_confidence_level = 10
 
-# PID track selection- select which tracks from TrackMatching to perform PID on.
-# Can perform PID on all tracks by setting to "all", or on all downstream tracks
-# (set to "DS"), all upstream (set to "US"), through tracks (set to "Through"),
-# or the upstream or downstream components of the throught track (set to
-# "Through_US" or "Through_DS" respectively). Or a combination of the above can
-# be used, entered as a space separated list,
-# e.g. "Through Through_US Through_DS"
-pid_track_selection = "Through"
+# PID track selection- select which tracks from TrackMatching to perform PID on. 
+# Can perform PID on all tracks by setting to "all" which will give you PID'd 
+# through and unmatched US and DS tracks, 
+# on "through" tracks only (constituent tracks will be PID'd, so this excludes orphans) 
+# with through or on all upstream and downstream tracks (ignoring whether tracks have 
+# been through-matched) with "us\_and\_ds"
+pid_track_selection = "all"

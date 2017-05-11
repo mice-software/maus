@@ -796,7 +796,7 @@ pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
 # setting to "all", on through tracks only (constituent tracks will be PID'd, so this excludes orphans) with
 # "through" or on all upstream and downstream tracks (ignoring whether tracks have been through-matched) with
-# "constituents"
+# "us_and_ds"
 pid_track_selection = "all"
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"
