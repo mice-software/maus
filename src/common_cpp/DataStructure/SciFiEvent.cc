@@ -126,6 +126,23 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
   _scifiseeds.resize(rhs._scifiseeds.size());
   for (unsigned int i = 0; i < rhs._scifiseeds.size(); ++i) {
     _scifiseeds[i] = new SciFiSeed(*rhs._scifiseeds[i]);
+    SciFiBasePRTrack* new_pr_track = NULL;
+    if (_scifiseeds[i]->getAlgorithm() == 0) {
+      for (unsigned int iRst = 0; iRst < rhs._scifistraightprtracks.size(); ++iRst) {
+        if (rhs._scifiseeds[i]->getPRTrack() == rhs._scifistraightprtracks[iRst]) {
+          new_pr_track = _scifistraightprtracks[iRst];
+          break;
+        }
+      }
+    } else {
+      for (unsigned int iRhe = 0; iRhe < rhs._scifihelicalprtracks.size(); ++iRhe) {
+        if (rhs._scifiseeds[i]->getPRTrack() == rhs._scifihelicalprtracks[iRhe]) {
+          new_pr_track = _scifihelicalprtracks[iRhe];
+          break;
+        }
+      }
+    }
+    _scifiseeds[i]->setPRTrack(new_pr_track);
   }
 
   // Deep copy the kalman tracks
@@ -154,6 +171,19 @@ SciFiEvent& SciFiEvent::operator=(const SciFiEvent& rhs) {
       }
     }
     _scifitracks[iTrk]->set_pr_track_pointer(new_pr_track);
+
+    // Now set the cross-pointer to the Seed within the track so that it points to correct
+    // place in the new copy of the datastructure, by searching for the Seed index in rhs
+    // event, which matches the pointer address of the Seed in the rhs track. Use this to set
+    // new track Seed to pointer to the correct Seed in the new event.
+    SciFiSeed* new_seed = NULL;
+    for (unsigned int iRst = 0; iRst < rhs._scifiseeds.size(); ++iRst) {
+      if (rhs._scifitracks[iTrk]->scifi_seed() == rhs._scifiseeds[iRst]) {
+        new_seed = _scifiseeds[iRst];
+        break;
+      }
+    }
+    _scifitracks[iTrk]->set_scifi_seed(new_seed);
   }
 
   this->_mean_Bz_upstream = rhs._mean_Bz_upstream;

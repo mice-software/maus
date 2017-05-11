@@ -78,23 +78,23 @@ class SciFiSeed : public TObject {
 
   TMatrixD getCovariance() const;
 
+  void setPRTrackTRef(TRef* pr_track) { _pr_track = pr_track; }
+  TRef* getPRTrackTRef() { return _pr_track; }
 
   void setPRTrackTobject(TObject* const pr_track) { *_pr_track = pr_track; }
+  TObject* getPRTrackTobject() const { return _pr_track->GetObject(); }
 
-  TObject* getPRTrackTobject() const
-                                 { return static_cast<SciFiBasePRTrack*>(_pr_track->GetObject()); }
-
+  void setPRTrack(SciFiBasePRTrack* pr_track) { *_pr_track = static_cast<TObject*>(pr_track); }
+  SciFiBasePRTrack* getPRTrack() const
+      { return static_cast<SciFiBasePRTrack*>(_pr_track->GetObject()); }
 
   void setAlgorithm(int algo) { _algorithm = algo; }
 
   int getAlgorithm() const { return _algorithm; }
 
-
-
   void setStateVector_vector(std::vector<double> vector) { _state_vector = vector; }
 
   std::vector<double> getStateVector_vector() const { return _state_vector; }
-
 
   void setCovariance_vector(std::vector<double> covariance) { _covariance = covariance; }
 

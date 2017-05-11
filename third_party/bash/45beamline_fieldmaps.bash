@@ -2,7 +2,8 @@
 
 version=1
 filename=beamline_fieldmaps_v$version.tar.gz
-url=http://micewww.pp.rl.ac.uk/maus/$filename
+# url=http://micewww.pp.rl.ac.uk/maus/$filename
+url=http://heplnv152.pp.rl.ac.uk/maus/$filename
 
 echo
 echo 'INFO: Installing beamline field maps' $version
