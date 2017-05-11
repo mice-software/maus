@@ -733,11 +733,11 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
 
     if shape == 0 :
       shape_plots = track_plots['straight']
-      pr_track = track.pr_track_pointer_straight()
+#      pr_track = track.pr_track_pointer_straight()
       straight_counter += 1
     elif shape == 1 :
       shape_plots = track_plots['helical']
-      pr_track = track.pr_track_pointer_helical()
+#      pr_track = track.pr_track_pointer_helical()
       helical_counter += 1
 
     data_dict['counters']['N_tracks'] += 1 
@@ -763,12 +763,12 @@ def fill_plots_tracks(plot_dict, data_dict, tracks) :
       data_dict['counters']['N_tracks_down'] += 1 
       downstream_good += 1
     
-    pr_track = None
+#    pr_track = None
 
-    if track.GetAlgorithmUsed() == 0 :
-      pr_track = track.pr_track_pointer_straight()
-    elif track.GetAlgorithmUsed() == 1 :
-      pr_track = track.pr_track_pointer_helical()
+#    if track.GetAlgorithmUsed() == 0 :
+#      pr_track = track.pr_track_pointer_straight()
+#    elif track.GetAlgorithmUsed() == 1 :
+#      pr_track = track.pr_track_pointer_helical()
 
     for tp in trackpoints :
 

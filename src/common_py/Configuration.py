@@ -21,7 +21,7 @@ for the old G4MICE datacards.
 
 import os
 import json
-import ErrorHandler
+import ErrorHandler # pylint: disable = W0403
 import argparse
 
 class Configuration:
