@@ -140,7 +140,7 @@ namespace MAUS {
     _pid_track_selection = _configJSON["pid_track_selection"].asString();
 
     if (_pid_track_selection != "all" and _pid_track_selection != "through"
-                                      and _pid_track_selection != "constituents") {
+                                      and _pid_track_selection != "us_and_ds") {
       throw MAUS::Exceptions::Exception(Exceptions::recoverable,
           "Invalid pid_track_selection set in configuration", "MapCppGlobalPID::birth");
     }
@@ -316,8 +316,16 @@ namespace MAUS {
       if (!global_event) {
         continue;
       }
-      // Regardless of whether we PID through tracks or not, we first have to PID the constituents
-      if (_pid_track_selection == "all" or _pid_track_selection == "constituents") {
+
+      // For comissioning, we ignore pid_track_selection as PIDing us_and_ds doesn't make sense
+      // due to cross-channel PID variables
+      if (_pid_config == "commissioning") {
+        PerformPID(global_event->GetThroughPrimaryChains(), global_event);
+        continue;
+      }
+
+      // Regardless of whether we PID through tracks or not, we first have to PID the us_and_ds
+      if (_pid_track_selection == "all" or _pid_track_selection == "us_and_ds") {
         PerformPID(global_event->GetNonThroughPrimaryChains(), global_event);
       } else if (_pid_track_selection == "through") {
         PerformPID(global_event->GetUSPrimaryChains(), global_event);
@@ -427,7 +435,7 @@ namespace MAUS {
     std::vector<const MAUS::DataStructure::Global::Track*> constituent_tracks =
         through_track->GetConstituentTracks();
     // Make sure that we have an intact through-constituent set. There should be exactly two
-    // constituents and the through track should have all the detectors the constituents have
+    // us_and_ds and the through track should have all the detectors the us_and_ds have
     // with no overlaps
     if (!(constituent_tracks.size() == 2 and
         (constituent_tracks.at(0)->get_detectorpoints() +
@@ -441,7 +449,7 @@ namespace MAUS {
         constituent_tracks.at(1)->get_pid_logL_values();
     if (!(pairs_0.size() == 3 and pairs_1.size() == 3)) {
       Squeak::mout(Squeak::error) << "Through PID failed due to incorrect number of PIDLogLPairs "
-                                  << "in constituents. MapCppGlobalPID::ThroughPID()" << std::endl;
+                                  << "in us_and_ds. MapCppGlobalPID::ThroughPID()" << std::endl;
       return;
     }
     // Assemble all logL pairs into a single vector so we can iterate over it

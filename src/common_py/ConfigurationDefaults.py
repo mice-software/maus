@@ -796,7 +796,7 @@ pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
 # setting to "all", on through tracks only (constituent tracks will be PID'd, so this excludes orphans) with
 # "through" or on all upstream and downstream tracks (ignoring whether tracks have been through-matched) with
-# "constituents"
+# "us_and_ds"
 pid_track_selection = "all"
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"
@@ -810,13 +810,13 @@ track_matching_pid_hypothesis = "all"
 # so a multiplier is used.
 track_matching_tolerances = {
   "TOF0t":2.0, # ns between actual and expected TOF0-1 Delta t
-  "TOF1x":40.0,
-  "TOF1y":40.0,
-  "TOF2x":40.0,
-  "TOF2y":40.0,
-  "KLy":32.0,
-  "EMRx":40.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
-  "EMRy":40.0,
+  "TOF1x":60.0,
+  "TOF1y":60.0,
+  "TOF2x":50.0,
+  "TOF2y":50.0,
+  "KLy":50.0,
+  "EMRx":75.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
+  "EMRy":75.0,
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
   "TOF12minSpeed":0.5,
 }
