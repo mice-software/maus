@@ -22,7 +22,7 @@ param -unset positives=0 negatives=0
 if $positives
 #####	param piplus=1 piminus=0 eplus=1 eminus=0 proton=1 gamma=0
 #####   I do not GENERATE protons
-	param piplus=1 piminus=0 eplus=0 eminus=0 proton=0 gamma=0
+	param piplus=1 piminus=0 eplus=1 eminus=0 proton=0 gamma=0
 endif
 if $negatives
 	param piplus=0 piminus=1 eplus=0 eminus=1 proton=0 gamma=0

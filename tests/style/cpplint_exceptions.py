@@ -214,17 +214,7 @@ exceptions[os.path.join('src', 'py_cpp', 'PyMiceModule.hh')] = [
 'rogers')
 ]
 
-exceptions[os.path.join(CPP_CM, 'Analysis', 'SciFi',
-                        'SciFiDisplayDataInterface.hh')] = [
-('  return dynamic_cast<T*>(mSpillData);',
- 'Google does not permit RTTI, but it is needed here', 'dobbs'),
-('  if ( dynamic_cast<T*>(data) ) {',
+exceptions[os.path.join(CPP_CM, 'Analysis', 'AnalyserTrackerAngularMomentum.cc')] = [
+('      seed = dynamic_cast<SciFiSeed*>(seed_obj);',
  'Google does not permit RTTI, but it is needed here', 'dobbs')
 ]
-
-exceptions[os.path.join(CPP_CM, 'Analysis', 'SciFi',
-                        'SciFiDisplayBase.cc')] = [
-('    mSpillData = dynamic_cast<SciFiDataBase*>(MakeDataObject());',
- 'Google does not permit RTTI, but it is needed here', 'dobbs')
-]
-

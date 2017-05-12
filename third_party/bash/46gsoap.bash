@@ -1,24 +1,54 @@
 #!/usr/bin/env bash
 
-version=1
-filename=beamline_fieldmaps_v$version.tar.gz
-# url=http://micewww.pp.rl.ac.uk/maus/$filename
-url=http://heplnv152.pp.rl.ac.uk/maus/$filename
+top_version=2.8
+topdir=gsoap-${top_version}
+
+version=2.8.30
+directory=gsoap_${version}
+filename="gsoap_${version}.zip"
+
+# there seems to be flakiness with the sourceforge link at times
+# the source and md5 are on micemine as well - see below
+# url=https://downloads.sourceforge.net/project/gsoap2/gsoap-${top_version}/gsoap_${version}.zip
+
+url=http://micewww.pp.rl.ac.uk/attachments/8593/gsoap_2.8.30.zip
+## md5 - already bundled with the maus source
+#http://micewww.pp.rl.ac.uk/attachments/8594/gsoap_2.8.30.zip.md5
+
 
 echo
-echo 'INFO: Installing beamline field maps' $version
-echo '----------------------------------------------'
+echo 'INFO: Installing third party library gSOAP' $version
+echo '--------------------------------------------------'
 echo
 
-echo $version $filename $url
+while [[ $# > 1 ]]
+do
+key="$1"
+case $key in
+    -j|--num-threads)
+    if expr "$2" : '-\?[0-9]\+$' >/dev/null
+    then
+        MAUS_NUM_THREADS="$2"
+    fi
+    shift
+    ;;
+esac
+shift
+done
+if [ -z "$MAUS_NUM_THREADS" ]; then
+  MAUS_NUM_THREADS=1
+fi
 
 if [ -n "${MAUS_ROOT_DIR+x}" ]; then
+
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
     then
         echo "INFO: Found source archive in 'source' directory"
     else  
         echo "INFO: Source archive doesn't exist.  Downloading..."
+
         wget --directory-prefix=${MAUS_ROOT_DIR}/third_party/source ${url}
+
     fi
    
     if [ -e "${MAUS_ROOT_DIR}/third_party/source/${filename}" ]
@@ -34,17 +64,38 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
         echo
         echo "INFO: Unpacking:"
         echo
-        tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/src/legacy/FILES/Models/Modules/BeamLine/
-
-        ################################################## 
+        rm -Rf ${MAUS_ROOT_DIR}/third_party/build/${topdir}
+        sleep 1
+        unzip ${MAUS_ROOT_DIR}/third_party/source/${filename} -d ${MAUS_ROOT_DIR}/third_party/build > /dev/null
+        cd ${MAUS_ROOT_DIR}/third_party/build/${topdir}
         echo
-        echo "INFO: The package should be locally installed now in your"
-        echo "INFO: FILES directory, which the rest of MAUS will find"
+        echo "INFO: Configuring:"
+        echo
+        sleep 1
+        # make sure we can see libpython2.7.so - libxml2 build doesnt seem to see LD_LIBRARY_PATH
+        export LDFLAGS=-L${MAUS_ROOT_DIR}/third_party/install/lib 
+
+        # make sure we generate position independent code for static archive linking
+        export CXXFLAGS="-fPIC"
+        export CFLAGS="-fPIC"
+        ./configure --prefix=${MAUS_ROOT_DIR}/third_party/install 
+        echo
+        echo "INFO: Making:"
+        echo
+        sleep 1
+        make -j$MAUS_NUM_THREADS
+        make install
+
+            ################################################## 
+        echo
+        echo "INFO: The package should be locally build now in your"
+        echo "INFO: third_party directory, which the rest of MAUS will"
+        echo "INFO: find."
     else
         echo "FATAL: Source archive still doesn't exist.  Please file a bug report with your operating system,">&2
         echo "FATAL: distribution, and any other useful information at:" >&2
         echo "FATAL: " >&2
-        echo "FATAL: http://micewww.pp.rl.ac.uk/projects/maus/issues/" >&2
+        echo "FATAL: http://micewww.pp.rl.ac.uk:8080/projects/maus/issues/" >&2
         echo "FATAL:" >&2
         echo "FATAL: Giving up, sorry..." >&2
         exit 1

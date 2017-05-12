@@ -43,14 +43,14 @@ track_matching_pid_hypothesis = "all"
 # When editing, keep in mind the fundamental limit imposed by detector
 # resolution.
 track_matching_tolerances = {
-  "TOF0t":2.0,
-  "TOF1x":40.0,
-  "TOF1y":40.0,
-  "TOF2x":40.0,
-  "TOF2y":40.0,
-  "KLy":32.0, # KL only reconstructs y position
-  "EMRx":40.0, # Multiplier for the standard tolerance which is the
-  "EMRy":40.0, # reconstructed error*sqrt(12)
+  "TOF0t":2.0, #ns between actual and expected TOF0-1 Delta t
+  "TOF1x":60.0,
+  "TOF1y":60.0,
+  "TOF2x":50.0,
+  "TOF2y":50.0,
+  "KLy":50.0, # KL only reconstructs y position
+  "EMRx":75.0, # Multiplier for the standard tolerance which is the
+  "EMRy":75.0, # reconstructed error*sqrt(12)
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs
   "TOF12minSpeed":0.5, # for through matching
 }

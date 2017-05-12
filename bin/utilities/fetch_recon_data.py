@@ -21,24 +21,19 @@
 
 # pylint: disable = W0311, C0103, W0611
 
-import MAUS
-
 import tarfile
 import urllib
 import argparse
 import os
 import shutil
 
-MAUS_ROOT_DIR = os.environ["MAUS_ROOT_DIR"]
-
 DEFAULT_SERVER = "http://reco.mice.rl.ac.uk/"
-DEFAULT_MAUS_VERSION = "MAUS-v2.5.1"
-DEFAULT_OUT_DIRECTORY = os.path.join(MAUS_ROOT_DIR, "files/recon/")
+DEFAULT_LFN = "lfn://grid/mice/RECO/"
+DEFAULT_MAUS_VERSION = "MAUS-v2.8.5"
+DEFAULT_OUT_DIRECTORY = "."
 
 DEFAULT_POSTFIX = "_offline.tar"
 DEFAULT_MAX_ATTEMPTS = 3
-
-
 
 def format_run_numbers(numbers) :
   """
@@ -86,13 +81,28 @@ def get_file(server, version, file_name, out_path) :
     raise ex
   return outputfile
 
+def get_file_grid(server, version, run_number, out_path) :
+  """ Pull down a recon file from the grid """
+  filename = str(run_number) + '_offline.tar'
+  outputfile = os.path.join(out_path, filename)
+  url = server + version + '/1/Step4/' + \
+    construct_by_hundreds_name(run_number) + '/' + filename
+  cmd = 'lcg-cp'
+  opts = '--vo mice'
+  local = 'file://' + outputfile
+
+  try :
+    os.system(cmd + ' ' + opts + ' ' + url + ' ' + local)
+  except Exception as ex :
+    raise ex
+  return outputfile
 
 def extract_data(filename, outpath) :
   """
     Extract all files from the downloaded tar file
   """
   try :
-    with tarfile.open(filename) as tar :
+      tar = tarfile.open(filename)
       tar.extractall(path=outpath)
 
   except Exception as ex :
@@ -116,10 +126,16 @@ if __name__ == "__main__" :
 
   parser.add_argument( '-D', '--output_directory', metavar='OUT', \
                                                default=DEFAULT_OUT_DIRECTORY, \
-     help='Specify the location of the directory in which to store the data.' )
+      help='Specify the location of the directory in which to store the data.' )
 
   parser.add_argument( '-O', '--overwrite', action='store_true', \
       help='Flag to overwrite data if the directory structure alread exists.' )
+
+  parser.add_argument( '-G', '--grid', action='store_true', \
+      help='Flag to specify the grid should be used as the data source' )
+
+  parser.add_argument( '--lfn', metavar='lfn', default=DEFAULT_LFN, \
+      help='Specify the grid download lfn e.g. lfn://grid/mice/RECO/')
 
   try :
     namespace = parser.parse_args()
@@ -134,9 +150,9 @@ if __name__ == "__main__" :
 
     print
     if len(run_numbers) == 1 :
-      print "Downlading", len(run_numbers), "Run"
+      print "Downloading", len(run_numbers), "Run"
     else :
-      print "Downlading", len(run_numbers), "Runs"
+      print "Downloading", len(run_numbers), "Runs"
 
     for run_id in range(len(files)) :
       try :
@@ -156,8 +172,12 @@ if __name__ == "__main__" :
         os.makedirs(data_outpath)
 
         print " - Downloading..."
-        outfile = get_file(namespace.server, namespace.maus_version, \
-                                                    files[run_id], tar_outpath)
+        if namespace.grid:
+            outfile = get_file_grid(namespace.lfn, namespace.maus_version, \
+                                    run_numbers[run_id], tar_outpath)
+        else:
+            outfile = get_file(namespace.server, namespace.maus_version, \
+                               files[run_id], tar_outpath)
         print " - Installing..."
         try :
           extract_data(outfile, data_outpath)
