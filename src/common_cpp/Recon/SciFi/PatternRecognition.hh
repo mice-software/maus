@@ -460,7 +460,7 @@ bool compare_tracks_ascending_chisq(const T *trk1, const T *trk2) {
 template<typename T>
 std::vector<T*> PatternRecognition::select_tracks(std::vector<T*> &trks) const {
 
-    // Sort the tracks by combined chisq (cannot do in place due to preserving constness)
+  // Sort the tracks by combined chisq (cannot do in place due need to preserve constness)
   std::vector<T*> sorted_tracks = trks;
   std::sort(sorted_tracks.begin(), sorted_tracks.end(), compare_tracks_ascending_chisq<T>);
 
@@ -479,6 +479,9 @@ std::vector<T*> PatternRecognition::select_tracks(std::vector<T*> &trks) const {
         sp->set_used(true);
       }
       accepted_tracks.push_back(trk);
+    } else {
+      delete trk; // This track is not for use, so free the memory
+      trk = NULL;
     }
   }
   return accepted_tracks;
