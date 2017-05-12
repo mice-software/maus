@@ -106,7 +106,6 @@ class MausSetup(CodeSetup):
             self._version = maus_version
         else:
             self._version = os.getenv('MAUS_VERSION')
-            
 
     def __str__(self):
         """Return name of this code"""
@@ -175,7 +174,7 @@ class IcoolSetup(CodeSetup):
             self._version = icool_version
 
         else:
-            
+
             self._version = os.getenv('ICOOL')
 
 
@@ -219,9 +218,9 @@ class IcoolSetup(CodeSetup):
 
     def get_executable(self):
         """Executable is simulate_mice.py"""
-    
+
         return os.path.join('/home/hep/sm1208/icool','icool')
-       
+
 
     def get_parameters(self):
         """Command line parameter to specify control files"""
@@ -333,7 +332,7 @@ class Muon1Setup(CodeSetup):
     def convert_material(self, value):
         """Does nothing"""
         conversions = {
-            'lH2':'LH2lumped\probarray%03d.dat'
+            'lH2':'LH2lumped\probarray%03d.dat' # pylint: disable = W1401
         }
         return conversions[value]
 

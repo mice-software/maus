@@ -17,13 +17,15 @@
 #
 
 # pylint: disable = W0311, E1101, W0613, C0111, R0911, W0621, C0103, R0902
-# pylint: disable = W0102
+# pylint: disable = W0102, R0915
 
 
 import analysis
 import analysis.covariances
 
 import ROOT
+import math
+import numpy
 
 
 class PhaseSpace2DInspector() :
@@ -33,28 +35,48 @@ class PhaseSpace2DInspector() :
     self.position = 0.0
     self.ensemble_size = ensemble_size
     self.covariance = analysis.covariances.CovarianceMatrix()
+    self.ensemble_covariance = analysis.covariances.CovarianceMatrix()
+    self.covariance_matrix = None
 
     self.momentum_bias = None
     self.momentum_correlation = None
 
+    self.parent_covariance = None
+    self.parent_covariance_inv = None
+    self.parent_emittance = None
+
     self.position_plot = ROOT.TH2F(\
            'inspected_position_{0}'.format(self.plane), 'Beam Position', \
-                                        800, -400.0, 400.0, 800, -400.0, 400.0)
+                                        100, -400.0, 400.0, 100, -400.0, 400.0)
     self.momentum_plot = ROOT.TH2F(\
            'inspected_momentum_{0}'.format(self.plane), 'Beam Momentum', \
-                                        800, -400.0, 400.0, 800, -400.0, 400.0)
+                                        100, -400.0, 400.0, 100, -400.0, 400.0)
+
     self.x_phasespace_plot = ROOT.TH2F(\
         'inspected_x_phasespace_{0}'.format(self.plane), 'X-Phasespace', \
-                                        800, -400.0, 400.0, 800, -400.0, 400.0)
+                                        100, -400.0, 400.0, 100, -400.0, 400.0)
     self.y_phasespace_plot = ROOT.TH2F(\
         'inspected_y_phasespace_{0}'.format(self.plane), 'Y-Phasespace', \
-                                        800, -400.0, 400.0, 800, -400.0, 400.0)
+                                        100, -400.0, 400.0, 100, -400.0, 400.0)
     self.xy_phasespace_plot = ROOT.TH2F(\
         'inspected_xpy_phasespace_{0}'.format(self.plane), 'X-Py-Phasespace', \
-                                        800, -400.0, 400.0, 800, -400.0, 400.0)
+                                        100, -400.0, 400.0, 100, -400.0, 400.0)
     self.yx_phasespace_plot = ROOT.TH2F(\
         'inspected_ypx_phasespace_{0}'.format(self.plane), 'Y-Px-Phasespace', \
-                                        800, -400.0, 400.0, 800, -400.0, 400.0)
+                                        100, -400.0, 400.0, 100, -400.0, 400.0)
+    self.rpt_phasespace_plot = ROOT.TH2F(\
+        'inspected_rpt_phasespace_{0}'.format(self.plane), 'r-Pt-Phasespace', \
+                                        100, 0.0, 400.0, 100, 0.0, 400.0)
+    self.phi_phasespace_plot = ROOT.TH1F(\
+      'inspected_phi_phasespace_{0}'.format(self.plane), '#phi-Phasespace', \
+                                                               100, -4.0, 4.0 )
+    self.theta_phasespace_plot = ROOT.TH1F(\
+      'inspected_phi_phasespace_{0}'.format(self.plane), '#theta-Phasespace', \
+                                                               100, -4.0, 4.0 )
+
+    self.amplitude_momentum_plot = ROOT.TH2F(\
+        'inspected_A_p_phasespace_{0}'.format(self.plane), 'A-p-Phasespace' , \
+                                           200, 0.0, 100.0, 260, 130.0, 260.0 )
 
     self.pz_plot = ROOT.TH1F(\
               'inspected_pz_{0}'.format(self.plane), 'p_{z}', 400, 0.0, 400.0 )
@@ -93,9 +115,24 @@ class PhaseSpace2DInspector() :
                 'inspected_momentum_{0}'.format(self.plane), 'Momentum', \
                                                               1000, 0.0, 500.0)
 
+    self.amplitude_plot = ROOT.TH1F(\
+            'single_particle_amplitudes_{0}'.format(self.plane), 'Amplitude', \
+                                                              200, 0.0, 100.0)
+    self.amplitude_momentum_plot = ROOT.TH2F(\
+        'inspected_A_p_phasespace_{0}'.format(self.plane), 'A-p-Phasespace' , \
+                                           200, 0.0, 100.0, 260, 130.0, 260.0 )
+
+
 
   def set_covariance_correction(self, correction, axes=['x', 'px', 'y', 'py']) :
     self.covariance.set_covariance_correction( correction, axes )
+    self.ensemble_covariance.set_covariance_correction( correction, axes )
+
+
+  def set_parent_covariance(self, matrix) :
+    self.parent_covariance = numpy.array(matrix)
+    self.parent_covariance_inv = numpy.linalg.inv(self.parent_covariance)
+    self.parent_emittance = analysis.covariances.emittance_from_matrix(self.parent_covariance)
 
 
   def set_momentum_correction(self, constant, gradient) :
@@ -113,6 +150,12 @@ class PhaseSpace2DInspector() :
       hit.set_py(hit.get_py()*correction)
       hit.set_pz(hit.get_pz()*correction)
 
+    if self.parent_covariance_inv is not None :
+      vector = numpy.array(hit.get_as_vector()[2:6])
+      amplitude = self.parent_emittance*vector.transpose().dot(self.parent_covariance_inv.dot(vector))
+      self.amplitude_plot.Fill(amplitude)
+      self.amplitude_momentum_plot.Fill(amplitude, hit.get_p())
+
     self.covariance.add_hit(hit)
 
     self.position_plot.Fill(hit.get_x(), hit.get_y())
@@ -121,35 +164,45 @@ class PhaseSpace2DInspector() :
     self.y_phasespace_plot.Fill(hit.get_y(), hit.get_py())
     self.xy_phasespace_plot.Fill(hit.get_x(), hit.get_py())
     self.yx_phasespace_plot.Fill(hit.get_y(), hit.get_px())
+    self.rpt_phasespace_plot.Fill(hit.get_r(), hit.get_pt())
+    self.phi_phasespace_plot.Fill(hit.get_phi())
+    self.theta_phasespace_plot.Fill(hit.get_theta())
     self.pz_plot.Fill(hit.get_pz())
     self.p_plot.Fill(hit.get_p())
     self.position = hit.get_z()
 
-    if self.ensemble_size > 1 and \
-                               self.covariance.length() > self.ensemble_size :
-      self.fill_plots()
+    if self.ensemble_size > 1 :
+      self.ensemble_covariance.add_hit(hit)
+
+      if self.covariance.length() > self.ensemble_size :
+        self.fill_plots()
 
 
   def fill_plots(self) :
-    if self.covariance.length() < (self.ensemble_size / 2) :
+    if ( self.covariance.length() < (self.ensemble_size / 2) ) or self.ensemble_size < 2 :
       return
 
     self.emittance_plot.Fill(self.covariance.get_emittance(\
                                                           ['x','px','y','py']))
-    self.emittance_x_plot.Fill(self.covariance.get_emittance(['x','px']))
-    self.emittance_y_plot.Fill(self.covariance.get_emittance(['y','py']))
-    self.alpha_plot.Fill(self.covariance.get_alpha(['x','y']))
-    self.alpha_x_plot.Fill(self.covariance.get_alpha(['x']))
-    self.alpha_y_plot.Fill(self.covariance.get_alpha(['y']))
-    self.beta_plot.Fill(self.covariance.get_beta(['x','y']))
-    self.beta_x_plot.Fill(self.covariance.get_beta(['x']))
-    self.beta_y_plot.Fill(self.covariance.get_beta(['y']))
-    self.total_momentum_plot.Fill(self.covariance.get_momentum())
-  
-    self.covariance.clear()
+    self.emittance_x_plot.Fill(self.ensemble_covariance.get_emittance(['x','px']))
+    self.emittance_y_plot.Fill(self.ensemble_covariance.get_emittance(['y','py']))
+    self.alpha_plot.Fill(self.ensemble_covariance.get_alpha(['x','y']))
+    self.alpha_x_plot.Fill(self.ensemble_covariance.get_alpha(['x']))
+    self.alpha_y_plot.Fill(self.ensemble_covariance.get_alpha(['y']))
+    self.beta_plot.Fill(self.ensemble_covariance.get_beta(['x','y']))
+    self.beta_x_plot.Fill(self.ensemble_covariance.get_beta(['x']))
+    self.beta_y_plot.Fill(self.ensemble_covariance.get_beta(['y']))
+    self.total_momentum_plot.Fill(self.ensemble_covariance.get_momentum())
+
+    self.covariance_matrix = self.ensemble_covariance.get_covariance_matrix(['x', 'px', 'y', 'py'])
+    self.ensemble_covariance.clear()
 
 
   def get_current_ensemble_size(self) :
+    return self.ensemble_covariance.length()
+
+
+  def get_length(self) :
     return self.covariance.length()
 
 
@@ -165,6 +218,9 @@ class PhaseSpace2DInspector() :
     ins_plots['y_py'] = self.y_phasespace_plot
     ins_plots['x_py'] = self.xy_phasespace_plot
     ins_plots['y_px'] = self.yx_phasespace_plot
+    ins_plots['r_pt'] = self.rpt_phasespace_plot
+    ins_plots['phi'] = self.phi_phasespace_plot
+    ins_plots['theta'] = self.theta_phasespace_plot
     ins_plots['pz'] = self.pz_plot
     ins_plots['p'] = self.p_plot
     ins_plots['emittance'] = self.emittance_plot
@@ -177,6 +233,8 @@ class PhaseSpace2DInspector() :
     ins_plots['beta_x'] = self.beta_x_plot
     ins_plots['beta_y'] = self.beta_y_plot
     ins_plots['momentum'] = self.total_momentum_plot
+    ins_plots['amplitude'] = self.amplitude_plot
+    ins_plots['amplitude_momentum'] = self.amplitude_momentum_plot
 
     return ins_plots
 
@@ -184,35 +242,72 @@ class PhaseSpace2DInspector() :
   def get_data_dictionary(self) :
     ins_data = {}
     ins_data['position'] = self.position
+    ins_data['plane'] = self.plane
+
     ins_data['x_mean'] = self.position_plot.GetMean(1)
     ins_data['y_mean'] = self.position_plot.GetMean(2)
     ins_data['px_mean'] = self.momentum_plot.GetMean(1)
     ins_data['py_mean'] = self.momentum_plot.GetMean(2)
-    ins_data['emittance_mean'] = self.emittance_plot.GetMean()
-    ins_data['emittance_x_mean'] = self.emittance_x_plot.GetMean()
-    ins_data['emittance_y_mean'] = self.emittance_y_plot.GetMean()
-    ins_data['beta_mean'] = self.beta_plot.GetMean()
-    ins_data['beta_x_mean'] = self.beta_x_plot.GetMean()
-    ins_data['beta_y_mean'] = self.beta_y_plot.GetMean()
-    ins_data['alpha_mean'] = self.alpha_plot.GetMean()
-    ins_data['alpha_x_mean'] = self.alpha_x_plot.GetMean() 
-    ins_data['alpha_y_mean'] = self.alpha_y_plot.GetMean()
-    ins_data['momentum_mean'] = self.momentum_plot.GetMean()
-
     ins_data['x_rms'] = self.position_plot.GetRMS(1)
     ins_data['y_rms'] = self.position_plot.GetRMS(2)
     ins_data['px_rms'] = self.momentum_plot.GetRMS(1)
     ins_data['py_rms'] = self.momentum_plot.GetRMS(2)
-    ins_data['emittance_rms'] = self.emittance_plot.GetRMS()
-    ins_data['emittance_x_rms'] = self.emittance_x_plot.GetRMS()
-    ins_data['emittance_y_rms'] = self.emittance_y_plot.GetRMS()
-    ins_data['beta_rms'] = self.beta_plot.GetRMS()
-    ins_data['beta_x_rms'] = self.beta_x_plot.GetRMS()
-    ins_data['beta_y_rms'] = self.beta_y_plot.GetRMS()
-    ins_data['alpha_rms'] = self.alpha_plot.GetRMS()
-    ins_data['alpha_x_rms'] = self.alpha_x_plot.GetRMS() 
-    ins_data['alpha_y_rms'] = self.alpha_y_plot.GetRMS()
-    ins_data['momentum_rms'] = self.momentum_plot.GetRMS()
+
+    number = self.covariance.length()
+    if number > 1 :
+      ins_data['emittance'] = self.covariance.get_emittance(['x', 'px', 'y', 'py'])
+      ins_data['emittance_x'] = self.covariance.get_emittance(['x', 'px'])
+      ins_data['emittance_y'] = self.covariance.get_emittance(['y', 'py'])
+      ins_data['beta'] = self.covariance.get_beta(['x', 'y'])
+      ins_data['beta_x'] = self.covariance.get_beta(['x'])
+      ins_data['beta_y'] = self.covariance.get_beta(['y'])
+      ins_data['alpha'] = self.covariance.get_alpha(['x', 'y'])
+      ins_data['alpha_x'] = self.covariance.get_alpha(['x'])
+      ins_data['alpha_y'] = self.covariance.get_alpha(['y'])
+      ins_data['momentum'] = self.p_plot.GetMean()
+      ins_data['number_particles'] = number
+
+      ins_data['emittance_error'] = ins_data['emittance'] / math.sqrt(2.0*(number - 1))
+      ins_data['emittance_x_error'] = ins_data['emittance_x'] / math.sqrt(number - 1)
+      ins_data['emittance_y_error'] = ins_data['emittance_y'] / math.sqrt(number - 1)
+      ins_data['beta_error'] = 0.0
+      ins_data['beta_x_error'] = 0.0
+      ins_data['beta_y_error'] = 0.0
+      ins_data['alpha_error'] = 0.0
+      ins_data['alpha_x_error'] = 0.0
+      ins_data['alpha_y_error'] = 0.0
+      ins_data['momentum_error'] = self.p_plot.GetRMS() / math.sqrt(number)
+
+      cov = self.covariance.get_covariance_matrix(['x', 'px', 'y', 'py'])
+
+    else :
+      ins_data['emittance'] = 0.0
+      ins_data['emittance_x'] = 0.0
+      ins_data['emittance_y'] = 0.0
+      ins_data['beta'] = 0.0
+      ins_data['beta_x'] = 0.0
+      ins_data['beta_y'] = 0.0
+      ins_data['alpha'] = 0.0
+      ins_data['alpha_x'] = 0.0
+      ins_data['alpha_y'] = 0.0
+      ins_data['momentum'] = 0.0
+      ins_data['number_particles'] = 0
+
+      ins_data['emittance_error'] = 0.0
+      ins_data['emittance_x_error'] = 0.0
+      ins_data['emittance_y_error'] = 0.0
+      ins_data['beta_error'] = 0.0
+      ins_data['beta_x_error'] = 0.0
+      ins_data['beta_y_error'] = 0.0
+      ins_data['alpha_error'] = 0.0
+      ins_data['alpha_x_error'] = 0.0
+      ins_data['alpha_y_error'] = 0.0
+      ins_data['momentum_error'] = 0.0
+
+      cov = [ [ 0.0 for i in range(4) ] for j in range(4) ]
+
+    ins_data['covariance_matrix'] = [ [ cov[i][j] for i in range(4) ] for j in range(4) ]
+
 
     return ins_data
 

@@ -99,6 +99,20 @@ namespace Kalman {
     return residual;
   }
 
+  State CalculateFilteredResidual(const State& data, const State& measured) {
+    if (data._dimension != measured._dimension) {
+      throw Exceptions::Exception(Exceptions::recoverable,
+          "States have different dimensions",
+          "Kalman::CalculateFilteredResidual()");
+    }
+    TMatrixD vector = data._vector - measured._vector;
+    TMatrixD covariance = data._covariance - measured._covariance;
+
+    State residual(vector, covariance);
+
+    return residual;
+  }
+
   double CalculateChiSquaredUpdate(const State& st) {
     TMatrixD rT(TMatrixD::kTransposed, st._vector);// rT.Transpose(r);
     TMatrixD RI(TMatrixD::kInverted, st._covariance);
@@ -289,7 +303,7 @@ namespace Kalman {
     for (unsigned int i = 0; i < _track.GetLength(); ++i) {
       if (_track[i].HasData()) {
         State measured = _measurements.at(_track[i].GetId())->Measure(_track[i].GetSmoothed());
-        State chisq = CalculateResidual(measured, _track[i].GetData());
+        State chisq = Kalman::CalculateFilteredResidual(_track[i].GetData(), measured);
         double update = CalculateChiSquaredUpdate(chisq);
         chi_squared += update;
       }
@@ -325,12 +339,12 @@ namespace Kalman {
 
   State TrackFit::CalculateFilteredResidual(unsigned int i) const {
     State measured = _measurements.at(_track[i].GetId())->Measure(_track[i].GetFiltered());
-    return CalculateResidual(measured, _track[i].GetData());
+    return Kalman::CalculateFilteredResidual(_track[i].GetData(), measured);
   }
 
   State TrackFit::CalculateSmoothedResidual(unsigned int i) const {
     State measured = _measurements.at(_track[i].GetId())->Measure(_track[i].GetSmoothed());
-    return CalculateResidual(measured, _track[i].GetData());
+    return Kalman::CalculateFilteredResidual(_track[i].GetData(), measured);
   }
 
 

@@ -43,6 +43,7 @@ class SpacePointProcessor
  private:
   BasePointProcessor _base_proc;
   DoubleProcessor _double_proc;
+  StringProcessor _string_proc;
 };
 } // ~namespace Global
 } // ~namespace Processor

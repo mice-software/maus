@@ -8,7 +8,7 @@ import numpy as np
 # import abc
 import ROOT
 import libMausCpp #pylint: disable = W0611
-import analysis.scifitools as tools
+import analysis.scifitools as tools # pylint: disable = E0401
 
 #pylint: disable = R0902
 #pylint: disable = R0912

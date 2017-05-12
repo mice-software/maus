@@ -30,11 +30,9 @@ void calc_straight_residual(const MAUS::SciFiSpacePoint *sp,
     dy = pos.y() - ( line_y.get_c() + ( pos.z() * line_y.get_m() ) );
 } // ~calc_straight_residual(...)
 
-double calc_circle_residual(const MAUS::SciFiSpacePoint *sp,
-                                        const MAUS::SimpleCircle &c) {
+double calc_circle_residual(const MAUS::SciFiSpacePoint *sp, double xc, double yc, double r) {
     MAUS::ThreeVector pos = sp->get_position();
-    double delta = sqrt(((pos.x()-c.get_x0()) * (pos.x()-c.get_x0())) +
-                        ((pos.y()-c.get_y0()) * (pos.y()-c.get_y0()))) - c.get_R();
+    double delta = sqrt(((pos.x()-xc) * (pos.x()-xc)) + ((pos.y()-yc) * (pos.y()-yc))) - r;
     return delta;
 } // ~calc_circle_residual(...)
 
@@ -47,6 +45,17 @@ double calc_phi(double xpos, double ypos, const MAUS::SimpleCircle &circle) {
     // std::cerr << ", phi is " << angle << "\n";
     return angle;
 } // ~calculate_phi(...)
+
+bool calc_xy_pulls(MAUS::SciFiHelicalPRTrack* trk) {
+  if (!trk)
+    return NULL;
+  for (auto sp : trk->get_spacepoints_pointers()) {
+    double delta = calc_circle_residual(sp, trk->get_circle_x0(),
+                                        trk->get_circle_y0(), trk->get_R());
+    sp->set_prxy_pull(delta);
+  }
+  return true;
+}
 
 void draw_line(const MAUS::SciFiSpacePoint *sp1, const MAUS::SciFiSpacePoint *sp2,
                            MAUS::SimpleLine &line_x, MAUS::SimpleLine &line_y) {

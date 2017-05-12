@@ -75,7 +75,8 @@ def write_json(sys_args):
           and line != '':
         try:
             json_in = json.loads(line)
-            json_out = json.dumps(json_in, indent=sys_args.indent)
+            json_out = json.dumps(json_in, indent=sys_args.indent, \
+                                                                sort_keys=True)
         except ValueError:
             if line != "\n" and line != "":
                 raise IOError("Input file could not be parsed into json "+\

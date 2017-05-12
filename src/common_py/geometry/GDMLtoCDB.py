@@ -651,11 +651,17 @@ class Downloader: #pylint: disable = R0902
         @Method convert string to formatable xml format
 
         borrowed from cdb._cooling_channel_supermouse.set_coolingchannel(data)
+
+        For CDB versions <= 1.1.7: 
+            the xml returned by get_coolingchannel_for_run is a list of magnets
+        For versions >= 1.1.8, the xml returned is a dict with the keys:
+            valid_from_time, valid_until_time, tag, run, and a list of magnets
         """
         try:
             xml = ("<coolingchannels><coolingchannel>")
-            
-            for magnet in data:
+
+            magnet_data = data['magnets'] if isinstance(data, dict) else data 
+            for magnet in magnet_data:
                 if (str(magnet['polarity']) != "-1"
                     and str(magnet['polarity']) != "0"
                     and str(magnet['polarity']) != "1"

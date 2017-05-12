@@ -18,7 +18,7 @@ This file defines the interface for all Outputters
 
 from API.IModule import IModule
 
-class IOutput(IModule):#pylint: disable=R0921
+class IOutput(IModule):
     """
     @class IOutput
     Interface for all outputter modules.

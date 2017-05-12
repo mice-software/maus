@@ -17,7 +17,8 @@ M. Littlefield
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
 import shutil
-import os, math
+import os
+import math
 import libxml2
 from xml.dom import minidom
 from geometry.ConfigReader import Configreader

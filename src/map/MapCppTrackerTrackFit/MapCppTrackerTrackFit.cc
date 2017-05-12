@@ -138,15 +138,19 @@ void MapCppTrackerTrackFit::_process(Data* data) const {
         event->clear_scifitracks();
         SciFiSeedPArray seeds = event->scifiseeds();
         for (SciFiSeedPArray::iterator it = seeds.begin(); it != seeds.end(); ++it) {
-          switch ((*it)->getAlgorithm()) {
-            case 0 :
-              event->add_scifitrack(track_fit_straight((*it)));
-              break;
-            case 1 :
-              event->add_scifitrack(track_fit_helix((*it)));
-              break;
-            default:
-              break;
+          try {
+            switch ((*it)->getAlgorithm()) {
+              case 0 :
+                event->add_scifitrack(track_fit_straight((*it)));
+                break;
+              case 1 :
+                event->add_scifitrack(track_fit_helix((*it)));
+                break;
+              default:
+                break;
+            }
+          } catch (Exceptions::Exception& e) {
+            std::cerr << "Track Fit Failed: " << e.what();
           }
         }
       }

@@ -51,6 +51,12 @@ namespace MAUS {
 namespace DataStructure {
 namespace Global {
 
+class Track;
+
+typedef std::vector<MAUS::DataStructure::Global::Track> TrackArray;
+typedef std::vector<MAUS::DataStructure::Global::Track *> TrackPArray;
+typedef std::vector<const MAUS::DataStructure::Global::Track *> ConstTrackPArray;
+
 // Only elements in the DataStructure should inherit from TObject.
 class Track : public TObject {
  public:
@@ -215,8 +221,11 @@ class Track : public TObject {
 
   /// User method for accessing the constituent tracks.  These are
   /// returned as const, so that they can't be changed.
-  std::vector<const MAUS::DataStructure::Global::Track*> GetConstituentTracks()
-      const;
+  ConstTrackPArray GetConstituentTracks() const;
+
+  /// User method for accessing the constituent tracks.  These are
+  /// returned as const, so that they can't be changed.
+  ConstTrackPArray GetConstituentTracks(MAUS::DataStructure::Global::DetectorPoint detector) const;
 
   /// Directly set the #_constituent_tracks TRefArray.  This passes
   /// ownership of the pointer to the Track, and is mostly for use by
@@ -230,11 +239,29 @@ class Track : public TObject {
   /// returns a vector of Track pointers.
   TRefArray* get_constituent_tracks() const;
 
-  /// Set the goodness of fit varialbe, #_goodness_of_fit.
+  /// Set PID Confidence Level
+  void set_pid_confidence_level(double confidence_level);
+
+  /// Get PID Confidence Level
+  double get_pid_confidence_level() const;
+
+  /// Set the goodness of fit variable, #_goodness_of_fit.
   void set_goodness_of_fit(double goodness_of_fit);
 
   /// Get the goodness of fit variable, #_goodness_of_fit.
   double get_goodness_of_fit() const;
+
+  /// Set the p-value of the tracker track from which this track came
+  void set_p_value(double p_value);
+
+  /// Get the p-value of the tracker track from which this track came
+  double get_p_value() const;
+
+  /// Set the number of tracker clusters
+  void set_tracker_clusters(unsigned int tracker_clusters);
+
+  /// Get the number of tracker clusters
+  unsigned int get_tracker_clusters() const;
 
  private:
 
@@ -293,13 +320,19 @@ class Track : public TObject {
   /// and trajectory.
   double _goodness_of_fit;
 
+  /// The confidence level of the PID assigned to this track
+  double _pid_confidence_level;
+
+  /// The p-value of the tracker track from which this track came (only for non-through tracks)
+  double _p_value;
+
+  /// The number of clusters that formed the tracker track from which this track came
+  /// (only for non-through tracks)
+  unsigned int _tracker_clusters;
+
   MAUS_VERSIONED_CLASS_DEF(Track);
 }; // ~class Track
 
-typedef std::vector<MAUS::DataStructure::Global::Track> TrackArray;
-typedef std::vector<MAUS::DataStructure::Global::Track *> TrackPArray;
-typedef
-std::vector<const MAUS::DataStructure::Global::Track *> ConstTrackPArray;
 } // ~namespace Global
 } // ~namespace DataStructure
 } // ~namespace MAUS

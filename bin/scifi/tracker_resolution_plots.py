@@ -62,8 +62,8 @@ import ROOT
 # Useful Constants and configuration
 RECON_STATION = 1
 RECON_PLANE = 0
-SEED_STATION = 5
-SEED_PLANE = 2
+SEED_STATION = 1
+SEED_PLANE = 0
 EXPECTED_STRAIGHT_TRACKPOINTS = 9
 EXPECTED_HELIX_TRACKPOINTS = 12
 REQUIRE_DATA = True
@@ -163,9 +163,16 @@ def init_plots_data() :
                           'Longitudinal Momentum', 500, 100.0, 300.0 )
     tracker_dict['L'] = ROOT.TH1F( tracker+'_L', \
                        'Angular Momentum', 1000, -25000.0, 25000.0 )
+    tracker_dict['L_canon'] = ROOT.TH1F( tracker+'_L_canon', \
+               'Canonical Angular Momentum', 1000, -25000.0, 25000.0 )
+
 
     tracker_dict['L_r'] = ROOT.TH2F( tracker+'_L_r', "L in r", \
-                                     6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
+                            6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
+
+    tracker_dict['L_canon_r'] = ROOT.TH2F( \
+                             tracker+'_L_canon_r', "L_{canon} in r", \
+                            6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
 
 
 
@@ -181,7 +188,15 @@ def init_plots_data() :
     tracker_dict['mc_pz'] = ROOT.TH1F( tracker+'_mc_pz', \
                        'MC Longitudinal Momentum', 500, 100.0, 300.0 )
     tracker_dict['mc_L'] = ROOT.TH1F( tracker+'_mc_L', \
-                       'MC Angular Momentum', 1000, -25000.0, 25000.0 )
+                      'MC Angular Momentum', 1000, -25000.0, 25000.0 )
+    tracker_dict['mc_L_canon'] = ROOT.TH1F( tracker+'_mc_L_canon', \
+            'MC Canonical Angular Momentum', 1000, -25000.0, 25000.0 )
+
+    tracker_dict['mc_L_r'] = ROOT.TH2F( tracker+'_mc_L_r', "L_{mc} in r", \
+                            6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
+    tracker_dict['mc_L_canon_r'] = ROOT.TH2F( \
+                          tracker+'_mc_L_canon_r', "L_{canon} in r", \
+                            6000, -30000.0, 30000.0, 300, 0.0, 200.0 )
 
 
 
@@ -199,6 +214,8 @@ def init_plots_data() :
     tracker_dict['residual_pz'] = ROOT.TH1F( tracker+'_residual_pz', \
                                  "p_{z} Residuals", 500, -50.0, 50.0 )
     tracker_dict['residual_L'] = ROOT.TH1F( tracker+'_residual_L', \
+                                 "L Residuals", 1000, -1000.0, 1000.0 )
+    tracker_dict['residual_L_canon'] = ROOT.TH1F( tracker+'_residual_L_canon', \
                                  "L Residuals", 1000, -1000.0, 1000.0 )
 
 
@@ -255,12 +272,19 @@ def init_plots_data() :
     tracker_dict['track_efficiency_pz'] = ROOT.TEfficiency( \
           tracker+'_track_efficiency_pz', "Track Efficiency in P_z", \
                                                        PZ_BIN, PZ_MIN, PZ_MAX )
+    tracker_dict['track_efficiency_L_canon'] = ROOT.TEfficiency( \
+         tracker+'_track_efficiency_L_canon', "Track Efficiency in L_{canon}", \
+                                                       200, -100.0, 100.0 )
 
 
 
     tracker_dict['L_residual_r'] = ROOT.TH2F( \
                tracker+'_L_residual_r', "L Residuals in r", \
                                      1000, -250.0, 250.0, 300, 0.0, 150.0 )
+    tracker_dict['L_canon_residual_r'] = ROOT.TH2F( \
+               tracker+'_L_canon_residual_r', "L_{canon} Residuals in r", \
+                                     1000, -250.0, 250.0, 300, 0.0, 150.0 )
+
 
     tracker_dict['x_residual_p'] = ROOT.TH2F( \
                tracker+'_x_residual_p', "X Residuals in p", \
@@ -511,6 +535,8 @@ def create_virtual_plane_dict(file_reader) :
 
     tracks = scifi_event.scifitracks()
     for track in tracks :
+      if track.tracker() not in RECON_TRACKERS :
+        continue
       trackpoints = track.scifitrackpoints()
       for trkpt in trackpoints :
         z_pos = trkpt.pos().z()
@@ -682,6 +708,12 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
                                                     SEED_STATION, SEED_PLANE)
     virtual_pt = 0.0
     virtual_pz = 0.0
+    virtual_field = 0.0
+    virtual_charge = 0.0
+    virtual_L = 0.0
+    virtual_X_0 = 0.0
+    virtual_Y_0 = 0.0
+    virtual_radius = 0.0
     virtual_hits = 0
     scifi_hits = 0
 
@@ -692,18 +724,57 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
     for plane in virtual_track :
       if virtual_track[plane] is not None :
         hit = virtual_track[plane]
-        virtual_pt += math.sqrt(hit.GetMomentum().x()**2 + \
-                                                      hit.GetMomentum().y()**2)
+        px = hit.GetMomentum().x()
+        py = hit.GetMomentum().y()
+        pt = math.sqrt( px**2 + py**2)
+        field = hit.GetBField().z() * 1000.0
+        q = hit.GetCharge()
+        virtual_pt += pt
         virtual_pz += hit.GetMomentum().z()
+        virtual_field += field
+        virtual_charge += q
+        virtual_L += hit.GetPosition().x()*py - \
+                     hit.GetPosition().y()*px
+        virtual_radius += pt/(q*field)
+        virtual_X_0 += hit.GetPosition().x() - py / (q*field)
+        virtual_Y_0 += hit.GetPosition().y() + px / (q*field)
+
         virtual_hits += 1
         if plane == ref_plane :
           reference_virt = virtual_track[plane]
         if plane == seed_plane :
           seed_virt = virtual_track[plane]
 
+
+
     virtual_pt /= virtual_hits
     virtual_pz /= virtual_hits
+    virtual_field /= virtual_hits
+    virtual_charge /= virtual_hits
+    virtual_L /= virtual_hits
     virtual_p = math.sqrt( virtual_pt**2 + virtual_pz**2 )
+    virtual_X_0 /= virtual_hits
+    virtual_Y_0 /= virtual_hits
+    virtual_radius /= virtual_hits
+    rho = virtual_pt / (virtual_charge*virtual_field)
+    C = virtual_charge*(virtual_field * rho*rho) / 2.0
+    virtual_L_canon = virtual_L + C
+#    virtual_L_canon = virtual_radius**2 - (virtual_X_0**2 + virtual_Y_0**2)
+#    print
+#    print
+#    print virtual_pt
+#    print virtual_pz
+#    print virtual_field
+#    print virtual_charge
+#    print virtual_L
+#    print virtual_L_canon
+#    print virtual_X_0
+#    print virtual_Y_0
+#    print virtual_radius
+#    print
+#    print
+
+
     if virtual_p > P_MAX or virtual_p < P_MIN :
       data_dict['counters'][tracker]['momentum_cut'] += 1
       continue
@@ -767,6 +838,7 @@ def make_scifi_mc_pairs(plot_dict, data_dict, virtual_plane_dict, \
     plot_dict[tracker]['track_efficiency'].Fill(True, virtual_pz, virtual_pt)
     plot_dict[tracker]['track_efficiency_pt'].Fill(True, virtual_pt)
     plot_dict[tracker]['track_efficiency_pz'].Fill(True, virtual_pz)
+    plot_dict[tracker]['track_efficiency_L_canon'].Fill(True, virtual_L_canon)
 
     plot_dict[tracker]['ntracks_pt'].Fill( virtual_pt )
     plot_dict[tracker]['ntracks_pz'].Fill( virtual_pz )
@@ -870,19 +942,37 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     Pt_res = Pt_recon - Pt_mc
     P_res = P_recon - P_mc
 
+
+    B_field = virt_hit.GetBField().z() * 1000.0
+    q = virt_hit.GetCharge()
+
+    rho = sqrt(scifi_pos[0]**2 + scifi_pos[1]**2)
+    rho_mc = sqrt(virt_pos[0]**2 + virt_pos[1]**2)
+
+    C = q*(B_field * rho*rho) / 2.0
+    C_mc = q*(B_field * rho_mc*rho_mc) / 2.0
+
+
     tracker_plots['xy'].Fill(scifi_pos[0], scifi_pos[1])
     tracker_plots['pxpy'].Fill(scifi_mom[0], scifi_mom[1])
     tracker_plots['pt'].Fill(Pt_recon)
     tracker_plots['pz'].Fill(scifi_mom[2])
     tracker_plots['L'].Fill(L_recon)
+    tracker_plots['L_canon'].Fill(L_recon + C)
 
     tracker_plots['mc_xy'].Fill(virt_pos[0], virt_pos[1])
     tracker_plots['mc_pxpy'].Fill(virt_mom[0], virt_mom[1])
     tracker_plots['mc_pt'].Fill(Pt_mc)
     tracker_plots['mc_pz'].Fill(Pz_mc)
     tracker_plots['mc_L'].Fill(L_mc)
+    tracker_plots['mc_L_canon'].Fill(L_mc + C_mc)
 
-    tracker_plots['L_r'].Fill( L_recon,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
+    tracker_plots['L_r'].Fill( L_recon, sqrt(scifi_pos[0]**2 + scifi_pos[1]**2))
+    tracker_plots['L_canon_r'].Fill( L_recon+C, 
+                                       sqrt(scifi_pos[0]**2 + scifi_pos[1]**2))
+    tracker_plots['mc_L_r'].Fill( L_mc,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
+    tracker_plots['mc_L_canon_r'].Fill( L_mc+C_mc, \
+                                         sqrt(virt_pos[0]**2 + virt_pos[1]**2))
 
     tracker_plots['residual_xy'].Fill(res_pos[0], res_pos[1])
     tracker_plots['residual_pxpy'].Fill(res_mom[0], res_mom[1])
@@ -890,8 +980,12 @@ def fill_plots(plot_dict, data_dict, hit_pairs) :
     tracker_plots['residual_pt'].Fill(Pt_res)
     tracker_plots['residual_pz'].Fill(res_mom[2])
     tracker_plots['residual_L'].Fill(L_recon-L_mc)
+    tracker_plots['residual_L_canon'].Fill((L_recon+C)-(L_mc+C_mc))
 
-    tracker_plots['L_residual_r'].Fill( L_recon-L_mc,  sqrt(virt_pos[0]**2 + virt_pos[1]**2))
+    tracker_plots['L_residual_r'].Fill( L_recon-L_mc,  \
+                                         sqrt(virt_pos[0]**2 + virt_pos[1]**2))
+    tracker_plots['L_canon_residual_r'].Fill( (L_recon+C)-(L_mc+C_mc), \
+                                         sqrt(virt_pos[0]**2 + virt_pos[1]**2))
 
     tracker_plots['x_residual_pt'].Fill( Pt_mc, res_pos[0] )
     tracker_plots['y_residual_pt'].Fill( Pt_mc, res_pos[1] )
@@ -1245,6 +1339,8 @@ if __name__ == "__main__" :
                  help='Name of a JSON file containing the events to analyses' )
 
 
+  parser.add_argument( '--not_require_all_planes', action="store_true", \
+                    help="Don't require all the virtual planes to be located" )
 
   parser.add_argument( '--not_require_cluster', action="store_true", \
                         help="Don't require a cluster in the reference plane" )
@@ -1262,6 +1358,9 @@ if __name__ == "__main__" :
     ENSEMBLE_SIZE = namespace.ensemble_size
     if namespace.not_require_cluster :
       REQUIRE_DATA = False
+
+    if namespace.not_require_all_planes :
+      REQUIRE_ALL_PLANES = False
 
     RECON_TRACKERS = namespace.trackers
 
@@ -1302,6 +1401,7 @@ if __name__ == "__main__" :
     sys.stdout.write(   "- Initialising Plots : Done   \n" )
 
     file_reader = event_loader.maus_reader(namespace.maus_root_files)
+    file_reader.set_max_num_events(1000)
 ##### 3. Initialise Plane Dictionary ##########################################
     if VIRTUAL_PLANE_DICT is None :
       sys.stdout.write( "\n- Finding Virtual Planes : Running\r" )

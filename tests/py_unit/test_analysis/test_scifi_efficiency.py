@@ -89,3 +89,4 @@ class SciFiEfficiencyTestCase(unittest.TestCase): # pylint: disable=R0904, C0301
 
 if __name__ == '__main__':
     unittest.main()
+

@@ -16,7 +16,7 @@ This file defines the interface for all Modules
 #  You should have received a copy of the GNU General Public License
 #  along with MAUS.  If not, see <http://www.gnu.org/licenses/>.
 
-class IModule(object):#pylint: disable=R0921
+class IModule(object):
     """
     @class IModule
     Interface for all types of modules, be they maps or outputters etc.

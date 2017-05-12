@@ -41,8 +41,8 @@ UNPACK_STEP4 = False
 
 # set a different test file for stepIV
 if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
-    RUN_NUMBER = "06008"
-    TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step4/06000/"
+    RUN_NUMBER = "08944"
+    TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step4/08900/"
     TEST_FILE = RUN_NUMBER+".tar"
     TEST_OUT  = RUN_NUMBER+"_offline.tar"
     UNPACK_STEP4 = True
@@ -131,9 +131,11 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", data)
         self.assertGreater(tree.GetEntries(), 0)
-        tree.GetEntry(3)
-        self.assertEqual(data.GetSpill().GetDaqEventType(), "physics_event")
-        self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
+        for ient in range(tree.GetEntries()):
+            tree.GetEntry(ient)
+            if data.GetSpill().GetDaqEventType() != "physics_event":
+                continue
+            self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
         # not yet ready to test detector hits in the step4 test file
         # this will have to wait for meaningful data to come out of step4
         if not UNPACK_STEP4:

@@ -30,5 +30,5 @@ import analysis.tools
 import analysis.covariances
 import analysis.hit_types
 import analysis.inspectors
-import analysis.scifitools
+import analysis.scifitools # pylint: disable = E0401
 

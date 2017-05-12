@@ -24,6 +24,7 @@
 // MAUS headers
 #include "src/common_cpp/DataStructure/SciFiEvent.hh"
 #include "src/common_cpp/DataStructure/SciFiSpacePoint.hh"
+#include "src/common_cpp/DataStructure/SciFiHelicalPRTrack.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
 
@@ -59,10 +60,20 @@ namespace SciFiTools {
 
     /** @brief Calculate the residual of a circle to a spacepoint
      *  @param[in] sp - The spacepoint
-     *  @param[in] c - The circle (x0, y0 and rho must be set)
+     *  @param[in] xc - The circle centre x coordinate
+     *  @param[in] yc - The circle centre y coordinate
+     *  @param[in] r - The circle radius
      *  @return The residual
      */
-    double calc_circle_residual(const MAUS::SciFiSpacePoint *sp, const MAUS::SimpleCircle &c);
+    double calc_circle_residual(const MAUS::SciFiSpacePoint *sp, double xc, double yc, double r);
+
+    /** @brief calculate the pulls of the seed spacepoints from the circle fit 
+     *         and update the seeds NB: Make sure this is done on final pr tracks only,
+     *         not candidate tracks (i.e. not before sorting by chisq)!
+     *  @param[in] trk The helical pr track
+     *  @return Boolean if calculation worked or failed
+     */
+    bool calc_xy_pulls(MAUS::SciFiHelicalPRTrack* trk);
 
     /** @brief Take two spoints and return 2 straight lines connecting them, 1 in x-z, 1 in y-z
      *  @param[in] sp1 - The first spacepoint

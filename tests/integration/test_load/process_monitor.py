@@ -50,9 +50,9 @@ def make_graphs(pid_list, wait_time, max_time):
         hist, graph = xboa.common.make_root_graph(
                            "pid "+str(pid),
                            [0.], "time [s]", 
-                           [0.], "memory usage %", 
+                           [0.], "memory usage (rsz)", 
                            xmin=wait_time/2, xmax=max_time, 
-                           ymin=-5, ymax=105)
+                           ymin=0, ymax=600000)
         graph_dict[pid] = graph
     hist.Draw()
     xboa.common.make_root_legend(canvas, graph_dict.values())
@@ -66,14 +66,16 @@ def monitor_step(delta_t, mem_list, graph_dict):
     for i, item in enumerate(mem_list[-1]):
         pid = int(item["pid"])
         mem = print_mem_usage(pid)
-        mem_p = float(mem["%mem"])
+        # mem_p = float(mem["%mem"])
+        rsz = float(mem["rsz"])
         index = graph_dict[pid].GetN()
-        if mem and (mem_p > 1e-9 or index == 1):
+        # if mem and (mem_p > 1e-9 or index == 1):
+        if mem and (rsz > 1e-9 or index == 1):
             mem_list_step.append(mem)
             graph_dict[pid].Expand(index+1)
             graph_dict[pid].SetPoint(index,
                                     delta_t.seconds,
-                                    mem_p)
+                                    rsz)
         graph_dict[pid].SetLineStyle(i+1)
         graph_dict[pid].Draw()
     return mem_list_step
