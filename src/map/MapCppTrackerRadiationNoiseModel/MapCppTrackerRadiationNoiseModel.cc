@@ -106,8 +106,8 @@ void MapCppTrackerRadiationNoiseModel::_birth(const std::string& argJsonConfigDo
 //    _planeNoiseRates[plane_it] = 100.0;
 //  }
 
-  _npe_mean = 5.0;
-  _npe_rms = 4.0;
+  _npe_mean = 10.0;
+  _npe_rms = 5.0;
   _centralFibre = 106.5;
 }
 
