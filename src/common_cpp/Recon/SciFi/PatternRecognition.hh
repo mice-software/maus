@@ -481,6 +481,7 @@ std::vector<T*> PatternRecognition::select_tracks(std::vector<T*> &trks) const {
       accepted_tracks.push_back(trk);
     } else {
       delete trk; // This track is not for use, so free the memory
+      trk = NULL;
     }
   }
   return accepted_tracks;

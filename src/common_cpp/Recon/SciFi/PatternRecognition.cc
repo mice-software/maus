@@ -265,7 +265,7 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     make_4tracks(track_type, trker_no, spnts_by_station, strks, htrks);
     std::vector<SciFiStraightPRTrack*> accepted_strks = select_tracks(strks);
     std::vector<SciFiHelicalPRTrack*> accepted_htrks = select_tracks(htrks);
-    track_processing(trker_no, 4, spnts, strks, htrks);
+    track_processing(trker_no, 4, spnts, accepted_strks, accepted_htrks);
     add_tracks(accepted_strks, accepted_htrks, evt);
   }
   num_stations_hit = SciFiTools::num_stations_with_unused_spnts(spnts_by_station);
@@ -275,7 +275,7 @@ void PatternRecognition::make_all_tracks(const bool track_type, const int trker_
     make_3tracks(trker_no, spnts_by_station, strks);
     std::vector<SciFiStraightPRTrack*> accepted_strks = select_tracks(strks);
     std::vector<SciFiHelicalPRTrack*> accepted_htrks = select_tracks(htrks);
-    track_processing(trker_no, 3, spnts, strks, htrks);
+    track_processing(trker_no, 3, spnts, accepted_strks, accepted_htrks);
     add_tracks(accepted_strks, accepted_htrks, evt);
   }
 }
