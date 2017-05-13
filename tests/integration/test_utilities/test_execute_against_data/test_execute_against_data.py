@@ -30,8 +30,8 @@ import ROOT
 import cdb
 import libMausCpp # pylint: disable=W0611
 
-RUN_NUMBER = "03541"
-TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/03500/"
+RUN_NUMBER = "05466"
+TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/05400/"
 TEST_FILE = RUN_NUMBER+".tar"
 TEST_OUT  = RUN_NUMBER+"_offline.tar"
 TEST_DIR = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
@@ -136,10 +136,10 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
             if data.GetSpill().GetDaqEventType() != "physics_event":
                 continue
             self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
-        # not yet ready to test detector hits in the step4 test file
-        # this will have to wait for meaningful data to come out of step4
-        if not UNPACK_STEP4:
-            self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTOFEvent().\
+            # not yet ready to test detector hits in the step4 test file
+            # this will have to wait for meaningful data to come out of step4
+            if not UNPACK_STEP4 and ient == 0:
+                self.assertGreater(data.GetSpill().GetAReconEvent(ient).GetTOFEvent().\
                                   GetTOFEventDigit().GetTOF1DigitArraySize(), 0)
         root_file.Close()
 
