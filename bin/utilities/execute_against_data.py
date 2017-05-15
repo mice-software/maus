@@ -251,12 +251,21 @@ class RunManager:
         @raises DownloadError on failure
         """
         print 'Getting geometry'
-        download = [os.path.join(self.run_setup.maus_root_dir, 'bin', 
+        if os.environ['MAUS_UNPACKER_VERSION'] == "StepI":
+            test_path_in = os.path.join(self.run_setup.maus_root_dir, 'src',
+                      'legacy', 'FILES', 'Models', 'Configurations', 'Test.dat')
+            test_path_out = os.path.join(self.run_setup.download_target, \
+                                                         'ParentGeometryFile.dat')
+            shutil.copy(test_path_in, test_path_out)
+        else:
+            download = [os.path.join(self.run_setup.maus_root_dir, 'bin', 
                                            'utilities', 'download_geometry.py')]
-        download += self.run_setup.get_download_parameters()
-        proc = subprocess.Popen(download, stdout=self.logs.download_log, \
-                                                       stderr=subprocess.STDOUT)
-        proc.wait()
+            download += self.run_setup.get_download_parameters()
+            proc = subprocess.Popen(download, stdout=self.logs.download_log, \
+                                              stderr=subprocess.STDOUT)
+            proc.wait()
+            if proc.returncode != 0:
+                raise DownloadError("Failed to download geometry successfully")
         # if self.run_setup.test_mode:
         #     test_path_in = os.path.join(self.run_setup.maus_root_dir, 'src',
         #             'legacy', 'FILES', 'Models', 'Configurations', 'Test.dat')
@@ -264,8 +273,6 @@ class RunManager:
         #                                                'ParentGeometryFile.dat')
         #     shutil.copy(test_path_in, test_path_out)
         # elif proc.returncode != 0:
-        if proc.returncode != 0:
-            raise DownloadError("Failed to download geometry successfully")
 
 
     def execute_simulation(self):
@@ -389,6 +396,23 @@ class RunSettings: #pylint: disable = R0902
 
         @return list of command line arguments for reconstruction
         """
+        if os.environ['MAUS_UNPACKER_VERSION'] == "StepI":
+            return [
+                '-simulation_geometry_filename', \
+                       os.path.join(self.download_target, 'ParentGeometryFile.dat'),
+                '-reconstruction_geometry_filename', os.path.join \
+                               (self.download_target, 'ParentGeometryFile.dat'),
+                '-output_root_file_name', str(self.recon_file_name),
+                '-daq_data_file', str(self.run_number),
+                '-daq_data_path', './',
+                '-verbose_level', '0',
+                '-will_do_stack_trace', 'False',
+                '-configuration_file', self.reco_cards,
+                '-DAQ_cabling_by', "date",
+                '-TOF_calib_by', "date",
+                '-TOF_cabling_by', "date",
+            ]
+       
         return [
             '-simulation_geometry_filename', \
                    os.path.join(self.download_target, 'ParentGeometryFile.dat'),
