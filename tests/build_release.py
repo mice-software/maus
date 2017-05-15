@@ -35,8 +35,8 @@ SCP_LOG = TMP+'scp.log'
 COPY_TARGETS = []
 
 THIRDPARTY_URL = 'http://heplnv152.pp.rl.ac.uk/maus/third_party/'
-PYTHON_MODULES_URL = THIRDPARTY_URL + 'easy_install/'
-DEPRECATED_PYTHON_MODULES = ['pil']
+PYTHON_MODULES_URL = THIRDPARTY_URL + 'pip/'
+DEPRECATED_PYTHON_MODULES = []
 
 def build_test_output():
     """Build test output and coverage, add to copy targets"""
@@ -121,12 +121,14 @@ def build_third_party_tarball():
     proc.wait() #pylint: disable=E1101
     print "Restoring deprecated python moodules"
     restore_deprecated_modules(os.path.join(os.environ['MAUS_ROOT_DIR'], \
-      "third_party/source/easy_install"))
+      "third_party/source/pip"))
     print "Getting targets for third_party libraries"
     os.chdir(os.path.join(os.environ['MAUS_ROOT_DIR'], "third_party"))
-    glob_list = ["source/*.tar.gz", "source/easy_install/", "source/*.tgz",
-                 "source/*.egg", "source/*.tar", "source/*.tarz",
-                 "source/*.bz2", "source/*.pl"]
+    glob_list = ["source/*.tar.gz", "source/easy_install/", "source/pip/*.whl",
+                 "source/pip/*.tar.gz", "source/pip/*.tgz", "source/pip/*.zip",
+                 "source/pip/*License.txt",
+                 "source/*.tgz", "source/*.egg", "source/*.tar",
+                 "source/*.tarz", "source/*.bz2", "source/*.pl"]
     tarball_targets = []
     tarball_name = "third_party_libraries_incl_python.tar.gz"
     for targets in glob_list:
