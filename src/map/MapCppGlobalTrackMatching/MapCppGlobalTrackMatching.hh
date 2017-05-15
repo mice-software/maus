@@ -80,14 +80,19 @@ namespace MAUS {
     Json::Reader _reader;
     /// String denoting what PID hypotheses track matching should run with
     std::string _pid_hypothesis_string;
+    /// Beamline polarity, 1 for positive, -1 for negative
     int _beamline_polarity;
     /// Matching tolerances for the various detectors that are matched
     std::map<std::string, std::pair<double, double> > _matching_tolerances;
     /// Whether matching should not be performed with only one hit per detector
-    /// + thresholds for possible noise hits that will trigger matching either way
-    std::pair<bool, std::map<std::string, double> > _no_check_settings;
+    /// (first value for upstream, second for downstream)
+    std::pair<bool, bool> _no_check_settings;
     /// Should the RK4 include energy loss
     bool _energy_loss;
+    /// Should residuals be generated during track matching
+    bool _residuals;
+
+    bool _through_matching;
     /// Mapper name
     std::string _mapper_name;
   }; // Don't forget this trailing colon!!!!

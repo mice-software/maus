@@ -26,7 +26,7 @@
   to the reconstructed covariance matrix; in additiona to some useful functions.
 """
 
-# pylint: disable = W0311, E1101, W0102, R0902, C0103, W0141
+# pylint: disable = W0311, E1101, W0102, R0902, C0103, R0904
 
 import numpy
 import math
@@ -36,6 +36,7 @@ import analysis.hit_types
 
 VARIABLE_LIST = [ 'x', 'px', 'y', 'py', 'z', 'pz', 't', 'E' ]
 POSITION_VARIABLES = [ 'x', 'y', 'z', 't' ]
+MOMENTUM_VARIABLES = [ 'px', 'py', 'pz', 'E' ]
 CONJUGATE_PAIRS = { 'x':'px', 'y':'py', 'z':'pz', 't':'E', \
                                         'px':'x', 'py':'y', 'pz':'z', 'E':'t' }
 
@@ -128,6 +129,14 @@ class CovarianceMatrix() :
       Return the number of particles added to the matrix
     """
     return self._num_particles
+
+
+  def save_covariance( self, filename, axes = [ 'x', 'px', 'y', 'py', 'z', 'pz', 't', 'E' ] ) :
+    """
+      Save the covariance matrix to a file called <filename>.
+    """
+    cov = self.get_covariance_matrix(axes)
+    numpy.savetxt(filename, cov)
 
 
   def clear( self ) :
@@ -401,6 +410,42 @@ class CovarianceMatrix() :
     return ( variance_sum / num ) * ( momentum / ( emitt * mass ) )
 
 
+  def get_gamma( self, axes = ['px', 'py'], mass = None, momentum = None, \
+                                                               emitt = None ) :
+    """
+      Calculats gamma for the axes specified.
+
+      The axes provided should be momentum axes only, e.g. ['px', 'py']
+
+      Beta function calculated as:
+      ( Sum( Axis Variances ) * momentum / ( emittance * mass * len( axes ) )
+    """
+    check_axes( axes, master_list=MOMENTUM_VARIABLES )
+    if mass == 0.0 :
+      raise ZeroDivisionError( 'Cannot divide by a mass of zero.' )
+
+    if mass is None :
+      mass = MUON_MASS
+    if momentum is None :
+      momentum = self._mean_momentum / self._num_particles
+#      raise ValueError( 'Please provide a value of mean beam momentum' )
+    if momentum <= 0.0 :
+      raise ValueError( 'Expected positive value of momentum' )
+
+    num = len( axes )
+    cov_mat = self.get_corrected_covariance_matrix( axes )
+    full_axes = axes + get_conjugates( axes )
+    if emitt is None :
+      emitt = self.get_emittance( mass=mass, axes=full_axes )
+
+    variance_sum = 0.0
+    for i in range( len( axes ) ) :
+      variance_sum += cov_mat[i][i]
+
+    return ( variance_sum / num ) * ( 1.0 / ( momentum * emitt * mass ) )
+
+
+
   def get_canonical_angular_momentum( self, axes = ['x', 'y'] ) :
     """
       Calculats the canonical angular momentum for the axes specified.
@@ -495,7 +540,7 @@ class CovarianceMatrix() :
       Returns an array of mean values for each of the parameters in the axis
       list.
     """
-    if not axis in VARIABLE_LIST :
+    if axis not in VARIABLE_LIST :
       raise ValueError( 'Could not find axis with label: '+str(axis) )
     rownum = VARIABLE_ENUMERATION[axis]
     return self._mean_vector[rownum] / self._num_particles

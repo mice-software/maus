@@ -19,7 +19,7 @@ This file defines the abstract base for all Outputters
 from API.IOutput import IOutput
 from API.ModuleBase import ModuleBase
 
-class OutputBase(ModuleBase, IOutput):#pylint: disable=R0921
+class OutputBase(ModuleBase, IOutput):
     """
     @class OutputBase
     Abstract Base class for all ouputters to derive from which allowes for

@@ -44,7 +44,7 @@ output_root_file_name = "maus_output.root"
 # (Note present version emits selected spills for all input run numbers)
 # e.g. selected_spills = [ 2, 34, 432, 3464 ]
 selected_spills = []
-data_maximum_reference_count = 100
+data_maximum_reference_count = 110
 
 # one_big_file - puts everything in output_root_file_name
 # one_file_per_run - splits and inserts xxx_<run_number>.xxx for each run, like
@@ -299,6 +299,8 @@ SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 
 SciFiPRHelicalTkDSOn = 0 # TkDS helical pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkUSOn = 0 # TkUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
 SciFiPRStraightTkDSOn = 0 # TDUS straight pattern recognition: 0 = auto, 1 = off, 2 = on
+SciFiPatRecMissingSpSearchOn = False # Do we seach for seed spoints missed by helical fit?
+SciFiPatRecMissingSpCut = 2 # Distance (mm) below which a missing spoint should added to a track
 SciFiPatRecSErrorMethod = 0 # How to calc error on s, 0 = station res, 1 = error prop
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
@@ -351,7 +353,6 @@ SciFiTestVirtualSmear = 0.431425 # Simulate measurement error on alpha with Gaus
 
 SciFiPRCorrection = 1.1776
 SciFiPRBias = 0.2269
-
 SciFiPRCorrectionsOutputFile = "SciFiMomentumCorrections.root" #File to output momentum correction data to (produced by reducer)
 SciFiPRCorrectSeed = 0 # 0 : Don't correct PR seed, 1 : apply corretions from corrections file
 SciFiPRCorrectionsFile = "SciFiMomentumCorrections.root" # File to use to apply seed corrections (used in PR Mapper)
@@ -697,6 +698,29 @@ TransferMapOpticsModel_Deltas = {"t":0.01, "E":0.1,
                                  "x":0.1, "Px":0.1,
                                  "y":0.1, "Py":0.01}
 
+root_document_store_timeout = 10
+root_document_store_poll_time = 1
+
+geometry_validation = { # see bin/utilities/geometry_validation.py for docs
+    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
+    "will_plot":True,
+    "will_track":True,
+    "z_start":-6000.,
+    "z_end":6000.,
+    "x_start":0.,
+    "x_step":1.,
+    "y_start":0.,
+    "y_step":0.,
+    "n_steps":301,
+    "plot_formats":["root", "png"],
+    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
+    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
+    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
+    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
+    "2d_volume_plot_label_size":0.25,
+    "volume_bounding_box_dump":"geometry_validation_bb_dump.json",
+}
+
 # Default location of root file containing PDF histograms used for Global PID
 PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/PIDhists.root' % os.environ.get("MAUS_ROOT_DIR")
 #PID_PDFs_file =  '%s/src/map/MapCppGlobalPID/com_pid_hists.root' % os.environ.get("MAUS_ROOT_DIR")
@@ -770,35 +794,10 @@ custom_pid_set = "PIDVarB"
 # are selected as the correct hypothesis
 pid_confidence_level = 10
 # PID track selection- select which tracks from TrackMatching to perform PID on. Can perform PID on all tracks by
-# setting to "all", or on all downstream tracks (set to "DS"), all upstream (set to "US"), through tracks (set to 
-# "Through"), or the upstream or downstream components of the throught track (set to "Through-US" or "Through-DS"
-# respectively). Or a combination of the above can be used, entered as a space separated list, e.g
-# "Through Through-US Through-DS"
-pid_track_selection = "Through"
-
-
-root_document_store_timeout = 10
-root_document_store_poll_time = 1
-
-geometry_validation = { # see bin/utilities/geometry_validation.py for docs
-    "file_name":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation.json"),
-    "will_plot":True,
-    "will_track":True,
-    "z_start":-6000.,
-    "z_end":6000.,
-    "x_start":0.,
-    "x_step":1.,
-    "y_start":0.,
-    "y_step":0.,
-    "n_steps":301,
-    "plot_formats":["root", "png"],
-    "1d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_1d"),
-    "2d_material_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_materials_2d"),
-    "1d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_1d"),
-    "2d_volume_plot":os.path.expandvars("${MAUS_TMP_DIR}/geometry_validation_volumes_2d"),
-    "2d_volume_plot_label_size":0.25,
-    "volume_bounding_box_dump":"geometry_validation_bb_dump.json",
-}
+# setting to "all", on through tracks only (constituent tracks will be PID'd, so this excludes orphans) with
+# "through" or on all upstream and downstream tracks (ignoring whether tracks have been through-matched) with
+# "us_and_ds"
+pid_track_selection = "all"
 
 # Determines for which pid hypotheses track matching should be attempted. Default is "all"
 # meaning electrons, muons, and pions of both charges (unless tracker recon produces a
@@ -811,13 +810,13 @@ track_matching_pid_hypothesis = "all"
 # so a multiplier is used.
 track_matching_tolerances = {
   "TOF0t":2.0, # ns between actual and expected TOF0-1 Delta t
-  "TOF1x":40.0,
-  "TOF1y":40.0,
-  "TOF2x":40.0,
-  "TOF2y":40.0,
-  "KLy":32.0,
-  "EMRx":1.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
-  "EMRy":1.0,
+  "TOF1x":60.0,
+  "TOF1y":60.0,
+  "TOF2x":50.0,
+  "TOF2y":50.0,
+  "KLy":50.0,
+  "EMRx":75.0, # Multiplier for the standard tolerance which is the reconstructed error*sqrt(12)
+  "EMRy":75.0,
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
   "TOF12minSpeed":0.5,
 }
@@ -825,15 +824,18 @@ track_matching_tolerances = {
 # Whether to use energy loss calculations for global track matching
 track_matching_energy_loss = True
 # Whether propagation matching should not be performed if each detector has no more than one hit
-track_matching_no_single_event_check = True
-# Additional restriction on the above, still perform matching if some of the hits may be noise
-# due to a small charge deposit
-track_matching_check_charge_thresholds = {
-  "TOF0":0.0,
-  "TOF1":0.0,
-  "TOF2":0.0,
-  "KL":0.0
+track_matching_no_single_event_check = {
+  "Upstream":False,
+  "Downstream":False
 }
+
+# Whether through matchings should be performed
+track_matching_through_matching = True
+
+# Whether residuals should be generated during track matching. In this case,
+# track_matching_pid_hypothesis should be set to the most common PID expected in the beam.
+# Output files will be placed in the directory in which MAUS is executed.
+track_matching_residuals = False
 
 # Whether multiple adjacent cell hits in the KL should be merged into single spacepoints on import
 # into the global datastructure

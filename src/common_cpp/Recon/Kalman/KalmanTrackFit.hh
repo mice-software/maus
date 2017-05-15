@@ -40,6 +40,9 @@ namespace Kalman {
   /** @brief Calculates the residual between two states */
   State CalculateResidual(const State& st1, const State& st2);
 
+  /** @brief Calculates the residual between two states */
+  State CalculateFilteredResidual(const State& st1, const State& st2);
+
   /** @brief Fast was to calculate the chis-sq update */
   double CalculateChiSquaredUpdate(const State& st);
 

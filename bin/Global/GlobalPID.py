@@ -18,7 +18,7 @@ def run():
 
     # Take as input spills from pre-existing json document, as defined in
     # datacard
-    my_input = MAUS.InputCppRoot()
+    my_input = MAUS.InputCppRootData()
 
     my_output = MAUS.OutputCppRoot()
     

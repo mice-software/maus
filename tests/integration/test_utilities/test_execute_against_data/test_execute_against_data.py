@@ -30,8 +30,8 @@ import ROOT
 import cdb
 import libMausCpp # pylint: disable=W0611
 
-RUN_NUMBER = "03541"
-TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/03500/"
+RUN_NUMBER = "05466"
+TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step1/05400/"
 TEST_FILE = RUN_NUMBER+".tar"
 TEST_OUT  = RUN_NUMBER+"_offline.tar"
 TEST_DIR = os.path.join(os.environ["MAUS_ROOT_DIR"], "tmp",
@@ -41,8 +41,8 @@ UNPACK_STEP4 = False
 
 # set a different test file for stepIV
 if os.environ['MAUS_UNPACKER_VERSION'] == "StepIV":
-    RUN_NUMBER = "06008"
-    TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step4/06000/"
+    RUN_NUMBER = "08944"
+    TEST_URL = "http://www.hep.ph.ic.ac.uk/micedata/MICE/Step4/08900/"
     TEST_FILE = RUN_NUMBER+".tar"
     TEST_OUT  = RUN_NUMBER+"_offline.tar"
     UNPACK_STEP4 = True
@@ -131,13 +131,15 @@ class TestMain(unittest.TestCase): # pylint: disable = R0904
         tree = root_file.Get("Spill")
         tree.SetBranchAddress("data", data)
         self.assertGreater(tree.GetEntries(), 0)
-        tree.GetEntry(3)
-        self.assertEqual(data.GetSpill().GetDaqEventType(), "physics_event")
-        self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
-        # not yet ready to test detector hits in the step4 test file
-        # this will have to wait for meaningful data to come out of step4
-        if not UNPACK_STEP4:
-            self.assertGreater(data.GetSpill().GetAReconEvent(0).GetTOFEvent().\
+        for ient in range(tree.GetEntries()):
+            tree.GetEntry(ient)
+            if data.GetSpill().GetDaqEventType() != "physics_event":
+                continue
+            self.assertGreater(data.GetSpill().GetReconEventSize(), 0)
+            # not yet ready to test detector hits in the step4 test file
+            # this will have to wait for meaningful data to come out of step4
+            if not UNPACK_STEP4 and ient == 0:
+                self.assertGreater(data.GetSpill().GetAReconEvent(ient).GetTOFEvent().\
                                   GetTOFEventDigit().GetTOF1DigitArraySize(), 0)
         root_file.Close()
 

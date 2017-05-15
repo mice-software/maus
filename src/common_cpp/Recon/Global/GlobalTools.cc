@@ -309,8 +309,12 @@ static int _charge;
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
                bool energy_loss) {
-  if (std::abs(target_z) > 100000) {
+  if (std::abs(target_z) > 50000) {
     throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
+                    "GlobalTools::propagate"));
+  }
+  if (std::abs(x[1]) > 700 or std::abs(x[2]) > 700 or std::abs(x[3]) > 50000) {
+    throw(Exceptions::Exception(Exceptions::recoverable, "Bad input coordinates",
                     "GlobalTools::propagate"));
   }
   if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
@@ -320,6 +324,14 @@ void propagate(double* x, double target_z, const BTField* field,
         << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
     throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
           "Some components of tracker trackpoint are nan", "GlobalTools::propagate"));
+  }
+  if (std::isinf(x[0]) || std::isinf(x[1]) || std::isinf(x[2]) || std::isinf(x[3]) ||
+      std::isinf(x[4]) || std::isinf(x[5]) || std::isinf(x[6]) || std::isinf(x[7])) {
+    std::stringstream ios;
+    ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
+        << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
+    throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
+          "Some components of tracker trackpoint are inf", "GlobalTools::propagate"));
   }
   int prop_dir = 1;
   _field = field;
@@ -436,11 +448,18 @@ void propagate(double* x, double target_z, const BTField* field,
             "Particle terminated: Too far from beam center", "GlobalTools::propagate"));
     }
     // Need to catch the case where the particle is stopped
-    if (std::abs(x[4]) < (mass + 0.01)) {
+    if (std::abs(x[4]) < (mass + 0.1)) {
       std::stringstream ios;
       ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
       throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
             "Particle terminated with 0 momentum", "GlobalTools::propagate"));
+    }
+    // When propagating backwards, can get caught in material and massively increase energy
+    if (std::abs(x[4]) > 1000) {
+      std::stringstream ios;
+      ios << "t: " << x[0] << " pos: " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+      throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
+            "Particle caught in material during backwards propagation", "GlobalTools::propagate"));
     }
   }
   gsl_odeiv_evolve_free(evolve);

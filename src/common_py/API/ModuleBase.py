@@ -18,7 +18,7 @@ This file defines the abstract base for all Mappers
 
 from API.IModule import IModule
 
-class ModuleBase(IModule):#pylint: disable=R0921
+class ModuleBase(IModule):
     """
     @class ModuleBase
     Abstract Base class for all Modules to derive from which allowes for

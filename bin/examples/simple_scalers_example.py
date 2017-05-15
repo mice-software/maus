@@ -35,6 +35,7 @@ def run():
     data_cards_list.append("output_file_auto_number=%s\n" % True)
     data_cards_list.append("daq_data_path='%s'\n" % datapath)
     data_cards_list.append("daq_data_file='%s'\n" % datafile)
+    data_cards_list.append("DAQ_cabling_by='%s'\n" % "date")
     data_cards = io.StringIO(unicode("".join(data_cards_list)))
     print data_cards
 
@@ -42,7 +43,6 @@ def run():
     # inputter = InputCppDAQOfflineData(datapath, datafile)
     # inputter.birth(json.dumps(config_json))
     inputter = InputCppDAQOfflineData()
-
     mappers = MAUS.MapPyGroup()
     mappers.append(MAUS.MapPyDoNothing())  
 

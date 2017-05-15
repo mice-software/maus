@@ -185,7 +185,7 @@ class TestErrorPropagation(unittest.TestCase): #pylint: disable=R0904
         """Check get/set deviations"""
         tracking = err_prop.GlobalErrorTracking()
         ref_deviations = (0.1, 0.2, 0.3, 0.4)
-        tracking.set_deviations(*ref_deviations) #pylint: disable=W0142
+        tracking.set_deviations(*ref_deviations)
         test_deviations = tracking.get_deviations()
         for i in range(4):
             self.assertAlmostEqual(test_deviations[i], ref_deviations[i])

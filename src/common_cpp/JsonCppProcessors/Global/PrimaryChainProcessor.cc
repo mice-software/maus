@@ -20,9 +20,7 @@ namespace MAUS {
 namespace Processor {
 namespace Global {
 
-PrimaryChainProcessor::PrimaryChainProcessor()
-    : _treftrackpair_array_proc(new TRefTrackPairProcessor()),
-      _comments_proc(new StringProcessor()) {
+PrimaryChainProcessor::PrimaryChainProcessor() {
 
   RegisterValueBranch(
       "mapper_name", &_string_proc,
@@ -30,29 +28,33 @@ PrimaryChainProcessor::PrimaryChainProcessor()
       &MAUS::DataStructure::Global::PrimaryChain::set_mapper_name,
       true);
 
-  RegisterPointerBranch(
-      "track_parent_pairs", &_treftrackpair_array_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_track_parent_pairs,
-      &MAUS::DataStructure::Global::PrimaryChain::set_track_parent_pairs,
-      true);
+  RegisterValueBranch(
+      "type", &_chain_type_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_chain_type,
+      &MAUS::DataStructure::Global::PrimaryChain::set_chain_type, true);
 
   RegisterValueBranch(
-      "goodness_of_fit", &_double_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_goodness_of_fit,
-      &MAUS::DataStructure::Global::PrimaryChain::set_goodness_of_fit, true);
+      "child_multiplicity", &_chain_child_multiplicity_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_multiplicity,
+      &MAUS::DataStructure::Global::PrimaryChain::set_multiplicity, true);
+
+  RegisterTRef(
+      "us_daughter",
+      &MAUS::DataStructure::Global::PrimaryChain::get_us_daughter,
+      &MAUS::DataStructure::Global::PrimaryChain::set_us_daughter,
+      false);
+
+  RegisterTRef(
+      "ds_daughter",
+      &MAUS::DataStructure::Global::PrimaryChain::get_ds_daughter,
+      &MAUS::DataStructure::Global::PrimaryChain::set_ds_daughter,
+      false);
 
   RegisterTRefArray(
-      "preceeding_pchains",
-      &_primary_chain_trefarray_proc,
-      &MAUS::DataStructure::Global::PrimaryChain::get_parent_primary_chains,
-      &MAUS::DataStructure::Global::PrimaryChain::set_parent_primary_chains,
+      "tracks", &_track_trefarray_proc,
+      &MAUS::DataStructure::Global::PrimaryChain::get_tracks,
+      &MAUS::DataStructure::Global::PrimaryChain::set_tracks,
       true);
-
-  RegisterValueBranch("comments",
-                      &_comments_proc,
-                      &MAUS::DataStructure::Global::PrimaryChain::get_comments,
-                      &MAUS::DataStructure::Global::PrimaryChain::set_comments,
-                      true);
 }
 } // ~namespace Global
 } // ~namespace Processor

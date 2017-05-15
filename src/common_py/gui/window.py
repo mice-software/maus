@@ -231,7 +231,7 @@ class FunctionWrapper: #pylint: disable=R0903
         """
         try:
             return self.function(*args, **keywdargs)
-        except: # pylint: disable=W0702, W0142
+        except: # pylint: disable=W0702
             sys.excepthook(*sys.exc_info())
 
 class Window(): # pylint: disable=R0201

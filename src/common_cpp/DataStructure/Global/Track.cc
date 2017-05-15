@@ -44,7 +44,10 @@ Track::Track()
       _emr_range_primary(0.),
       _emr_range_secondary(0.),
       _emr_plane_density(0.),
-      _goodness_of_fit(0.) {
+      _pid_confidence_level(0.),
+      _goodness_of_fit(0.),
+      _p_value(0.),
+      _tracker_clusters(0) {
   _track_points = new TRefArray();
   _constituent_tracks = new TRefArray();
 }
@@ -62,7 +65,10 @@ Track::Track(const Track &track)
       _emr_range_primary(track.get_emr_range_primary()),
       _emr_range_secondary(track.get_emr_range_secondary()),
       _emr_plane_density(track.get_emr_plane_density()),
-      _goodness_of_fit(track.get_goodness_of_fit()) {
+      _pid_confidence_level(track.get_pid_confidence_level()),
+      _goodness_of_fit(track.get_goodness_of_fit()),
+      _p_value(track.get_p_value()),
+      _tracker_clusters(track.get_tracker_clusters()) {
   _track_points = new TRefArray(*track.get_track_points());
   _constituent_tracks = new TRefArray(*track.get_constituent_tracks());
 }
@@ -78,18 +84,21 @@ Track& Track::operator=(const Track &track) {
   if (this == &track) {
     return *this;
   }
-  _mapper_name         = track.get_mapper_name();
-  _pid                 = track.get_pid();
-  _charge              = track.get_charge();
-  _track_points = new TRefArray(*track.get_track_points());
-  _constituent_tracks  = new TRefArray(*track.get_constituent_tracks());
-  _detectorpoints      = track.get_detectorpoints();
-  _geometry_paths      = track.get_geometry_paths();
-  _pid_logL_values     = track.get_pid_logL_values();
-  _emr_range_primary   = track.get_emr_range_primary();
-  _emr_range_secondary = track.get_emr_range_secondary();
-  _emr_plane_density   = track.get_emr_plane_density();
-  _goodness_of_fit     = track.get_goodness_of_fit();
+  _mapper_name          = track.get_mapper_name();
+  _pid                  = track.get_pid();
+  _charge               = track.get_charge();
+  _track_points         = new TRefArray(*track.get_track_points());
+  _constituent_tracks   = new TRefArray(*track.get_constituent_tracks());
+  _detectorpoints       = track.get_detectorpoints();
+  _geometry_paths       = track.get_geometry_paths();
+  _pid_logL_values      = track.get_pid_logL_values();
+  _emr_range_primary    = track.get_emr_range_primary();
+  _emr_range_secondary  = track.get_emr_range_secondary();
+  _emr_plane_density    = track.get_emr_plane_density();
+  _pid_confidence_level = track.get_pid_confidence_level();
+  _goodness_of_fit      = track.get_goodness_of_fit();
+  _p_value              = track.get_p_value();
+  _tracker_clusters     = track.get_tracker_clusters();
 
   return *this;
 }
@@ -127,7 +136,10 @@ Track* Track::Clone() const {
     trackNew->AddTrack(t);
   }
 
+  trackNew->set_pid_confidence_level(this->get_pid_confidence_level());
   trackNew->set_goodness_of_fit(this->get_goodness_of_fit());
+  trackNew->set_p_value(this->get_p_value());
+  trackNew->set_tracker_clusters(this->get_tracker_clusters());
 
   return trackNew;
 }
@@ -448,13 +460,27 @@ bool Track::HasTrack(MAUS::DataStructure::Global::Track* track) const {
 }
 
 std::vector<const MAUS::DataStructure::Global::Track*>
-Track::GetConstituentTracks() const {
+    Track::GetConstituentTracks() const {
   std::vector<const MAUS::DataStructure::Global::Track*> temp_tracks;
   const MAUS::DataStructure::Global::Track* t = NULL;
   for (int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
     t = (const MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
     if (!t) continue;
     temp_tracks.push_back(t);
+  }
+  return temp_tracks;
+}
+
+std::vector<const MAUS::DataStructure::Global::Track*>
+    Track::GetConstituentTracks(MAUS::DataStructure::Global::DetectorPoint detector) const {
+  std::vector<const MAUS::DataStructure::Global::Track*> temp_tracks;
+  const MAUS::DataStructure::Global::Track* t = NULL;
+  for (int i = 0; i < _constituent_tracks->GetLast()+1; ++i) {
+    t = (const MAUS::DataStructure::Global::Track*) _constituent_tracks->At(i);
+    if (!t) continue;
+    if (t->HasDetector(detector)) {
+      temp_tracks.push_back(t);
+    }
   }
   return temp_tracks;
 }
@@ -471,12 +497,36 @@ TRefArray* Track::get_constituent_tracks() const {
   return _constituent_tracks;
 }
 
+void Track::set_pid_confidence_level(double confidence_level) {
+  _pid_confidence_level = confidence_level;
+}
+
+double Track::get_pid_confidence_level() const {
+  return _pid_confidence_level;
+}
+
 void Track::set_goodness_of_fit(double goodness_of_fit) {
   _goodness_of_fit = goodness_of_fit;
 }
 
 double Track::get_goodness_of_fit() const {
   return _goodness_of_fit;
+}
+
+void Track::set_p_value(double p_value) {
+  _p_value = p_value;
+}
+
+double Track::get_p_value() const {
+  return _p_value;
+}
+
+void Track::set_tracker_clusters(unsigned int tracker_clusters) {
+  _tracker_clusters = tracker_clusters;
+}
+
+unsigned int Track::get_tracker_clusters() const {
+  return _tracker_clusters;
 }
 
 } // ~namespace Global

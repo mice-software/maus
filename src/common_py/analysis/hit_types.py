@@ -261,6 +261,18 @@ class AnalysisHit() :
     """
     return math.sqrt( self.__x**2 + self.__y**2 )
 
+  def get_phi( self ) :
+    """
+      Get the Phi angle (Position)
+    """
+    return math.atan2( self.__y, self.__x )
+
+  def get_theta( self ) :
+    """
+      Get the Theta angle (momentum)
+    """
+    return math.atan2( self.__py, self.__px )
+
   def get_energy( self ) :
     """
       Get the total energy
@@ -323,6 +335,15 @@ class AnalysisHit() :
       return None
     else :
       return AnalysisHit.__hit_get_variables[ string ]( self )
+
+
+  def get_as_vector( self ) :
+    """
+      Returns the 6D phase-space vector corresponding to the particle.
+      [t, E, x, px, y, py, z, pz]
+    """
+    return [self.__time, self.get_energy(), self.__x, self.__px, self.__y,
+            self.__py, self.__z, self.__pz]
 
 
   def get_variable_list() :

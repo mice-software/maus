@@ -5,6 +5,21 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.9.0
+  The following changes were made:
+    - TOF calibration updates
+    - TOF digitisation updates
+    - Tracker pattern recognition updates (efficiency enhancements)
+    - Tracker Kalman filter updates
+    - Tracker analysis updates
+    - Extensive Global reconstruction updates
+    - Geometry GDML handler update
+    - Third party: python package installer upgrade to pip
+    - Third party: pylint upgraded
+    - Third party: CDB client updated
+    - Third party: gSOAP added
+    - Third party: G4BL beam in updated
+    - Various other smaller updates
 MAUS-v2.8.3
   The following changes were made:
     - analyze_data_offline: Encoding corruption fixed

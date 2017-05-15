@@ -1,8 +1,6 @@
 \chapter{Global Track Matching}
 \label{chapter:globaltrackmatching}
 
-\section{Introduction}\label{sec:tmintro}
-
 \section{Purpose}\label{sec:tmpurpose}
 
 The purpose of Track Matching is to assembly hits and tracks in the various detectors into global tracks,
@@ -70,7 +68,7 @@ Cherenkov hits are added to the track without any checks.
 \subsection{EMR}\label{subsec:tmemr}
 
 Matching to the EMR (specifically to the most upstream trackpoint of an EMR track) works similar to matching to TOF1,
-TOF2, and KL, but rather than using a fixed distance as a matching tolerance, the tolernace is scaled by the position
+TOF2, and KL, but rather than using a fixed distance as a matching tolerance, the tolerance is scaled by the position
 error reported by the EMR. A scaling coefficient can be configured in the datacards.
 
 \subsection{Upstream-Downstream Matching}\label{subsec:tmusdsmatching}
@@ -89,7 +87,8 @@ just after all local reconstruction mappers (or as the first mappers if you are 
 
 \begin{description}
   \item[track\_matching\_pid\_hypothesis] If the PID hypotheses used for track matching should be limited to a single PID,
-      change to either one (never several) of "kEPlus", "kEMinus", "kMuPlus", "kMuMinus", "kPiPlus", "kPiMinus".
+      change to either one (never several) of "kEPlus", "kEMinus", "kMuPlus", "kMuMinus", "kPiPlus", "kPiMinus". Otherwise,
+      leave at "all".
   \item[track\_matching\_tolerances] Global Track Matching tolerances for the various subdetectors
   \begin{description}
     \item[TOF0t] Tolerance in ns for matching to TOF0.
@@ -102,9 +101,13 @@ just after all local reconstruction mappers (or as the first mappers if you are 
   \item[track\_matching\_energy\_loss] Whether to use energy calculations for Global Track Matching. If for a given run
       there are no fields between TOF1 and EMR, this can be set to \texttt{False} for a slight speed-up, though the TOF0
       tolerance would have to be increased. Safer to leave on.
-  \item[track\_matching\_no\_single\_event] Whether propagation matching (for individual detectors, this does not affect the
-      Upstream-Downstream Matching (see section \ref{subsec:tmusdsmatching}) should not be performed if each detector has no
+  \item[track\_matching\_no\_single\_event\_check] Whether propagation matching (for individual detectors, this does not affect the
+      Upstream-Downstream Matching (see section \ref{subsec:tmusdsmatching})) should not be performed if each detector has no
       more than one hit (significantly increases execution speed).
   \item[track\_matching\_charge\_thresholds] If \texttt{track\_matching\_no\_single\_event} is activated, this will cause propagation
       matching to still occur if one of the hits has a charge deposit below the threshold (i.e. is likely noise). \textbf{NOT CURRENTLY IMPLEMENTED}
+  \item[track\_matching\_through\_matching] Whether upstream and downstream tracks should be assembled into through tracks
+      (contingient upon meeting a time-of-flight cut, see above).
+  \item[global\_merge\_kl\_cell\_hits] Whether if multiple adjacent hits in the KL exist, these should be merged upon import into the
+      global datastructure.
 \end{description}

@@ -176,11 +176,17 @@ class SciFiTrack {
 
   /** @brief  Returns the mother seed as a TObject pointer
    */
-  SciFiSeed* scifi_seed()     const { return static_cast<SciFiSeed*>(_scifi_seed->GetObject()); }
+  SciFiSeed* scifi_seed() const { return static_cast<SciFiSeed*>(_scifi_seed->GetObject()); }
 
-  TObject* scifi_seed_tobject()     const { return _scifi_seed->GetObject(); }
+  TObject* scifi_seed_tobject() const { return _scifi_seed->GetObject(); }
+
+  TRef* scifi_seed_tref() const { return _scifi_seed; }
+
+  void set_scifi_seed(SciFiSeed* seed) { *_scifi_seed = static_cast<TObject*>(seed); }
 
   void set_scifi_seed_tobject(TObject* const seed) { *_scifi_seed = seed; }
+
+  void set_scifi_seed_tref(TRef* const seed) { _scifi_seed = seed; }
 
  private:
   int _tracker;

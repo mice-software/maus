@@ -59,9 +59,9 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
 	echo "INFO: Configuring:"
         sleep 1
 	if [ `uname -s` == "Darwin" ]; then
-            ./configure --enable-framework="${MAUS_ROOT_DIR}/third_party/install" --prefix="${MAUS_ROOT_DIR}/third_party/install"
+            ./configure --enable-framework="${MAUS_ROOT_DIR}/third_party/install" --prefix="${MAUS_ROOT_DIR}/third_party/install" --with-tcltk-libs=/usr/lib/x86_64-linux-gnu/ --with-tcltk-includes=/usr/include/
 	else
-            ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install"
+            ./configure --enable-shared --prefix="${MAUS_ROOT_DIR}/third_party/install" --with-tcltk-libs=/usr/lib/x86_64-linux-gnu/ --with-tcltk-includes=/usr/include/
 	fi
 
 	echo "HACK: Enabling zlib (again?)"
