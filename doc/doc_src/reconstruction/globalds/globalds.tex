@@ -1,0 +1,91 @@
+\chapter{Accessing Global Tracks}
+\label{chapter:globalds}
+
+The global datastructure is set up so that the state of tracks at any point in the processing chain, import,
+track matching, pid, and track fitting, can easily be accessed in order to understand where a given track
+came from and what lead to its current state.
+
+To achieve this, tracks are packaged together in PrimaryChain objects which retain copies of the
+tracks at every step along the way. There will generally be one primary chain for every tracker track that
+has been matched to at least one additional detector, plus possible through primary chains for tracks
+that have been matched through the absorber.
+
+\section{The PrimaryChain Object}\label{sec:primarychain}
+
+A primary chain (\texttt{MAUS::DataStructure::Global::PrimaryChain}) has a number of member functions
+for accessing parameters describing the chain as well as the variety of tracks that are contained in it:
+
+\begin{description}
+  \item [get\_chain\_type()] A chain can hold either upstream tracks, downstream tracks, or through tracks. The chain type is an enumerator with the following values
+  \begin{description}
+    \item [kNoChainType] Used for initialization only
+    \item [kUS] A chain containing upstream tracks. This value furthermore implies that a track in the chain has been matched into a through chain.
+    \item [kDS] A chain containing downstream tracks. This value furthermore implies that a track in the chain has been matched into a through chain.
+    \item [kUSOrphan] A chain containing upstream tracks none of which has been matched into a through track
+    \item [kDSOrphan] A chain containing downstream tracks none of which has been matched into a through track
+    \item [kThrough] A chain containing through tracks. It will also reference daughter upstream and downstream chains
+  \end{description}
+  \item [get\_chain\_multiplicity] This is only a meaningful property for through chains. It describes whether this and another through chain are mutually exclusive
+        because they share daughter chains, for example if the same upstream track has been matched to multiple downstream tracks. The possible values of the enumerator are
+  \begin{description}
+    \item [kUnique] This chain does not share daughter chains with any other through chains
+    \item [kMultipleUS] This chain shares an upstream chain with at least one other through chain
+    \item [kMultipleDS] This chain shares a downstream chain with at least one other through chain
+    \item [kMultipleBoth] This chain shares both its upstream and downstream chains with other through chains
+  \end{description}
+  Note that constellations are possible where e.g. there are 3 chains, one of type \texttt{kMultipleUS}, one of type \texttt{kMultipleDS},
+  and the last of type \texttt{kMultipleBoth}.
+  \item [get\_mapper\_name()] The name of the mapper that last modified this primary chain object.
+  \item [GetUSDaughter()] For a through chain returns the upstream daughter chain.
+  \item [GetDSDaughter()] For a through chain returns the downstream daughter chain.
+  \item [GetMatchedTracks()] Returns a vector of all matched tracks for this chain. There is not a single matched track since as described in section ref{sec:tmprocess},
+        tracks for all feasible PID hypotheses have to be created.
+  \item [GetPIDTrack()] Returns the PID'd track (if one exists in the chain).
+  \item [GetFittedTrack()] Returns the fitted track (if one exists in the chain).
+\end{description}
+
+Note that the global track object also holds references to constituent tracks, so there are two different
+ways one could obtain upstream and downstream tracks from a through primary chain. For example to obtain PID'd tracks:
+\begin{verbatim}
+through_chain->GetPIDTrack()->GetConstituentTracks()
+\end{verbatim}
+or
+\begin{verbatim}
+through_chain->GetUSDaughter()->GetPIDTrack()
+through_chain->GetDSDaughter()->GetPIDTrack()
+\end{verbatim}
+
+\subsection{Identifying Decay Candidates}\label{subsec:decay_candidates}
+
+Primary chains also allow identifying events that may contain a $\pi \rightarrow \mu$ or $\mu \rightarrow e$ decay. If an upstream
+and downstream track come out of Particle ID with different PIDs, no PID'd through track can be created, so an existing through
+chain will return NULL from \texttt{through\_chain->GetPIDTrack()}. In this case, a decay candidate can be identified e.g. by testing that
+\begin{verbatim}
+through_chain->GetUSDaughter()->GetPIDTrack()->get_pid()
+    == MAUS::DataStructure::Global::kPiPlus
+\end{verbatim}
+and
+\begin{verbatim}
+through_chain->GetDSDaughter()->GetPIDTrack()->get_pid()
+    == MAUS::DataStructure::Global::kMuPlus
+\end{verbatim}
+
+Additional candidates could be identified from orphan chains, but caution is advised, as there is a good chance these might be from different particles rather than decays.
+
+\section{Tracks and Space Points from Local Reconstruction}\label{sec:lr_tracks_spacepoints}
+
+While tracks and space points from the local reconstruction which have ended up in matched tracks can be accessed as constituent tracks of matched tracks and
+as space points linked to by the track points in matched tracks, there might be a need to access all tracks and spacepoints from local reconstruction,
+including those that were not successfully matched. Since they can't be associated with a primary chain, they can be accessed direcly from the global event via
+\begin{verbatim}
+std::vector<MAUS::DataStructure::Global::Track*> GetLRTracks()
+std::vector<MAUS::DataStructure::Global::Track*>
+    GetLRTracks(MAUS::DataStructure::Global::DetectorPoint detector)
+\end{verbatim}
+and
+\begin{verbatim}
+std::vector<MAUS::DataStructure::Global::SpacePoint*> GetLRSpacePoints()
+std::vector<MAUS::DataStructure::Global::SpacePoint*>
+    GetLRSpacePoints(MAUS::DataStructure::Global::DetectorPoint detector)
+\end{verbatim}
+where the optional argument detector allows specifying from which detectors tracks or space points should be retrieved.
