@@ -40,7 +40,6 @@
 #include "gtest/gtest_prod.h"
 
 // MAUS headers
-#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
 #include "src/common_cpp/Recon/SciFi/SciFiTools.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
@@ -375,6 +374,18 @@ class PatternRecognition {
     /** @brief Set the boolean controlling if we search for missed helical seed spacepoints */
     void set_sp_search_on(bool sp_search_on) { _sp_search_on = sp_search_on; }
 
+    /** @brief Return the line fit method */
+    int get_line_fitter() { return _line_fitter; }
+
+    /** @brief Set line fit method */
+    void set_line_fitter(int line_fitter) { _line_fitter = line_fitter; }
+
+    /** @brief Get the circle fit method */
+    int get_circle_fitter() { return _circle_fitter; }
+
+    /** @brief Set circle fit method */
+    void set_circle_fitter(int circle_fitter) { _circle_fitter = circle_fitter; }
+
     /** @brief Return the verbosity level */
     bool get_verbosity() { return _verb; }
 
@@ -420,6 +431,8 @@ class PatternRecognition {
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
     bool _sp_search_on;         /** Do we seach for seed spoints missed by helical fit? */
     int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
+    int _line_fitter;           /** Line fitter, 0 = custom lsq, 1 = ROOT */
+    int _circle_fitter;         /** Circle fitter, 0 = custom lsq, 1 = MINUIT */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
     int _n_trackers;            /** Number of trackers */
     int _n_stations;            /** Number of stations per tracker */
@@ -440,7 +453,7 @@ class PatternRecognition {
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     double _missing_sp_cut;     /** Dist (mm) below which a missing spoint should be added to trk*/
-    // LeastSquaresFitter _lsq;  /** The linear least squares fitting class instance */
+
     TFile* _rfile;   /** A ROOT file pointer for dumping residuals to in debug mode */
     TH1D* _hx;       /** histo of x residuals taken during straight road cut stage */
     TH1D* _hy;       /** histo of y residuals taken during straight road cut stage */

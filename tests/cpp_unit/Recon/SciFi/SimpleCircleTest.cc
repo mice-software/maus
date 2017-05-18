@@ -92,9 +92,10 @@ TEST_F(SimpleCircleTestDS, test_second_parameter_constructor) {
   double kappa_err = 0.8;
   double delta_R = 9;
   double chisq = 10;
+  double pvalue = 11.0;
 
   SimpleCircle circ1(x0, x0_err, y0, y0_err, R, R_err, alpha, alpha_err, beta, beta_err,
-                     gamma, gamma_err, kappa, kappa_err, delta_R, chisq);
+                     gamma, gamma_err, kappa, kappa_err, delta_R, chisq, pvalue);
 
   EXPECT_EQ(circ1.get_x0(), x0);
   EXPECT_EQ(circ1.get_x0_err(), x0_err);
@@ -112,6 +113,7 @@ TEST_F(SimpleCircleTestDS, test_second_parameter_constructor) {
   EXPECT_EQ(circ1.get_kappa_err(), kappa_err);
   EXPECT_EQ(circ1.get_delta_R(), delta_R);
   EXPECT_EQ(circ1.get_chisq(), chisq);
+  EXPECT_EQ(circ1.get_pvalue(), pvalue);
 }
 
 TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
@@ -131,6 +133,7 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   double kappa_err = 0.8;
   double delta_R = 9.0;
   double chisq = 10.0;
+  double pvalue = 11.0;
 
   SimpleCircle circ1;
 
@@ -150,6 +153,7 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   circ1.set_kappa_err(kappa_err);
   circ1.set_delta_R(delta_R);
   circ1.set_chisq(chisq);
+  circ1.set_pvalue(pvalue);
 
   EXPECT_EQ(circ1.get_x0(), x0);
   EXPECT_EQ(circ1.get_x0_err(), x0_err);
@@ -167,6 +171,7 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   EXPECT_EQ(circ1.get_kappa_err(), kappa_err);
   EXPECT_EQ(circ1.get_delta_R(), delta_R);
   EXPECT_EQ(circ1.get_chisq(), chisq);
+  EXPECT_EQ(circ1.get_pvalue(), pvalue);
 
   circ1.clear();
 
@@ -186,9 +191,10 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   EXPECT_EQ(circ1.get_kappa_err(), 0.0);
   EXPECT_EQ(circ1.get_delta_R(), 0.0);
   EXPECT_EQ(circ1.get_chisq(), 0.0);
+  EXPECT_EQ(circ1.get_pvalue(), 0.0);
 
   circ1.set_parameters(x0, x0_err, y0, y0_err, R, R_err, alpha, alpha_err, beta, beta_err,
-                       gamma, gamma_err, kappa, kappa_err, delta_R, chisq);
+                       gamma, gamma_err, kappa, kappa_err, delta_R, chisq, pvalue);
 
   EXPECT_EQ(circ1.get_x0(), x0);
   EXPECT_EQ(circ1.get_x0_err(), x0_err);
@@ -206,6 +212,7 @@ TEST_F(SimpleCircleTestDS, test_getters_setters_clear) {
   EXPECT_EQ(circ1.get_kappa_err(), kappa_err);
   EXPECT_EQ(circ1.get_delta_R(), delta_R);
   EXPECT_EQ(circ1.get_chisq(), chisq);
+  EXPECT_EQ(circ1.get_pvalue(), pvalue);
 }
 
 } // ~namespace MAUS

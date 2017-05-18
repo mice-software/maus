@@ -33,9 +33,10 @@ class SimpleCircle {
     SimpleCircle(double x0, double y0, double R);
 
     /** Second parameter constructor */
-    SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R, double R_err,
-                 double alpha, double alpha_err, double beta, double beta_err, double gamma,
-                 double gamma_err, double kappa, double kappa_err, double delta_R, double chisq);
+    SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R,
+                 double R_err, double alpha, double alpha_err, double beta,
+                 double beta_err, double gamma, double gamma_err, double kappa,
+                 double kappa_err, double delta_R, double chisq, double pvalue);
 
     /** Destructor */
     ~SimpleCircle();  // Default destructor
@@ -57,6 +58,7 @@ class SimpleCircle {
     double get_kappa_err() const { return _kappa_err; }
 
     double get_chisq() const { return _chisq; }
+    double get_pvalue() const { return _pvalue; }
     double get_delta_R() const { return _delta_R; }
 
     // Setters
@@ -76,12 +78,14 @@ class SimpleCircle {
     void set_kappa(double kappa) { _kappa = kappa; }
     void set_kappa_err(double kappa_err) { _kappa_err = kappa_err; }
     void set_chisq(double chisq) { _chisq = chisq; }
+    void set_pvalue(double pvalue) { _pvalue = pvalue; }
     void set_delta_R(double delta_R) { _delta_R = delta_R; }
 
     void set_parameters(double x0, double x0_err, double y0, double y0_err,
                         double R, double R_err, double alpha, double alpha_err,
                         double beta, double beta_err, double gamma, double gamma_err,
-                        double kappa, double kappa_err, double delta_R, double chisq);
+                        double kappa, double kappa_err, double delta_R,
+                        double chisq, double pvalue);
 
   private:
     double _x0;
@@ -100,6 +104,7 @@ class SimpleCircle {
     double _kappa_err;
     double _delta_R;
     double _chisq;
+    double _pvalue;
 };
 
 } // ~namespace MAUS
