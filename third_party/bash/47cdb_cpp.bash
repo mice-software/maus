@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-version=1.0.3
+version=1.0.4
 directory="cdb-C++.v${version}"
 filename="cdb.client.api-cpp.v${version}.tgz"
 md5file=${filename}.md5
@@ -17,7 +17,7 @@ md5file=${filename}.md5
 
 # safer in any case to get the source from micemine
 # v1.0.3
-url=http://micewww.pp.rl.ac.uk/attachments/8738/${filename}
+url=https://micewww.pp.rl.ac.uk/attachments/download/8954/${filename}
 
 echo
 echo 'INFO: Installing third party library CDB-C++' $version
