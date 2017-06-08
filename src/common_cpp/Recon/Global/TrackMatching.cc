@@ -503,7 +503,7 @@ void TrackMatching::MatchTrackPoint(
       // If there are multiple matches, this checks if they could have been from the same particle
       AddIfConsistent(temp_spacepoints, hypothesis_track);
     } catch (Exceptions::Exception exc) {
-      Squeak::mout(Squeak::error) << exc.what() << std::endl;
+      Squeak::mout(Squeak::debug) << exc.what() << std::endl;
     }
   }
 }
@@ -528,7 +528,7 @@ void TrackMatching::MatchTOF0(
       GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
                              _energy_loss);
     } catch (Exceptions::Exception exc) {
-      Squeak::mout(Squeak::error) << exc.what() << std::endl;
+      Squeak::mout(Squeak::debug) << exc.what() << std::endl;
     }
     // Calculate the distance to TOF0 and the approximate distance the particle travelled
     double z_distance = tof1_z - spacepoints.at(0)->get_position().Z();
@@ -626,7 +626,7 @@ void TrackMatching::MatchEMRTrack(
             << x_in[2] - first_hit_pos.Y() << std::endl;
       }
     } catch (Exceptions::Exception exc) {
-      Squeak::mout(Squeak::error) << exc.what() << std::endl;
+      Squeak::mout(Squeak::debug) << exc.what() << std::endl;
     }
     if (matched) {
       break;
