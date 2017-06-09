@@ -49,8 +49,16 @@ namespace MAUS {
      *
      * Pure virtual function to process the input data
      * and return the results
-     * \param INPUT* Pointer to the input data
-     * \return OUTPUT* Pointer to the output data
+     * \param TYPE* Pointer to the input data to be tranformed
+     */
+    virtual void process(TYPE* i) const = 0;
+
+    /*!\brief Python hook: process data
+     *
+     * Python hook. Pure virtual function to process the input data 
+     * and return the results
+     * \param i Pointer to the input data
+     * \return Pointer to the output data
      */
     virtual PyObject* process_pyobj(PyObject* i) const = 0;
   };

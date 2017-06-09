@@ -60,7 +60,7 @@ class MapBase : public virtual IMap<TYPE>, public ModuleBase {
   // ! Destructor
   virtual ~MapBase();
 
-  void process(TYPE* data) {
+  void process(TYPE* data) const {
     this->_process(data);
   }
 
