@@ -92,12 +92,13 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _Pz_min(50.0),
                                           _missing_sp_cut(2.0),
                                           _rfile(NULL),
-                                          _hx(NULL),
-                                          _hy(NULL),
-                                          _hxchisq(NULL),
-                                          _hychisq(NULL),
-                                          _hxychisq(NULL),
-                                          _hszchisq(NULL) {
+                                          _hx_line(NULL),
+                                          _hy_line(NULL),
+                                          _hxchisq_line(NULL),
+                                          _hychisq_line(NULL),
+                                          _hxychisq_line(NULL),
+                                          _hszchisq_line(NULL),
+                                          _fail_helix(NULL) {
   // Do nothing
 }
 
@@ -135,35 +136,43 @@ void PatternRecognition::set_parameters_to_default() {
 
 PatternRecognition::~PatternRecognition() {
   if (_debug) {
+    std::cerr << "INFO: Pattern Recognition: writing debug info\n";
     if (_rfile) _rfile->cd();
-    if (_hx) _hx->Write();
-    if (_hy) _hy->Write();
-    if (_hxchisq) _hxchisq->Write();
-    if (_hychisq) _hychisq->Write();
-    if (_hxychisq) _hxychisq->Write();
-    if (_hszchisq) _hszchisq->Write();
+    if (_hx_line) _hx_line->Write();
+    if (_hy_line) _hy_line->Write();
+    if (_hxchisq_line) _hxchisq_line->Write();
+    if (_hychisq_line) _hychisq_line->Write();
+    if (_hxychisq_line) _hxychisq_line->Write();
+    if (_hszchisq_line) _hszchisq_line->Write();
+    if (_fail_helix) _fail_helix->Write();
   }
 }
 
 void PatternRecognition::setup_debug() {
   _debug = true;
   _rfile = new TFile("pattern_recongition_debug.root", "RECREATE");
-  _hx = new TH1D("hx", "Pattern Recognition Road (mm) X Residuals All Candidates", 200, -150, 150);
-  _hy = new TH1D("hy", "Pattern Recognition Road (mm) Y Residuals All Candidates", 500, -150, 150);
-  _hxchisq =
-    new TH1D("hxchisq", "Pattern Recognition Straight Fit x ChiSq/DoF All Candidates", 200, 0, 500);
-  _hychisq =
-    new TH1D("hychisq", "Pattern Recognition Straight Fit y ChiSq/DoF All Candidates", 200, 0, 500);
-  _hxychisq =
-    new TH1D("hxychisq", "Pattern Recognition Circle Fit ChiSq/DoF All Candidates", 200, 0, 10);
-  _hszchisq =
-    new TH1D("hszchisq", "Pattern Recognition s-z Fit ChiSq/DoF All Candidates", 200, 0, 400);
-  _hx->Write();
-  _hy->Write();
-  _hxchisq->Write();
-  _hychisq->Write();
-  _hxychisq->Write();
-  _hszchisq->Write();
+  _hx_line = new TH1D("hx_line", "Pattern Recognition Road (mm) X Residuals All Candidates", \
+                      200, -150, 150);
+  _hy_line = new TH1D("hy_line", "Pattern Recognition Road (mm) Y Residuals All Candidates",
+                      500, -150, 150);
+  _hxchisq_line = new TH1D("hxchisq_line", \
+      "Pattern Recognition Straight Fit x ChiSq/DoF All Candidates", 200, 0, 500);
+  _hychisq_line = new TH1D("hychisq_line", \
+      "Pattern Recognition Straight Fit y ChiSq/DoF All Candidates", 200, 0, 500);
+  _hxychisq_line = new TH1D("hxychisq_line", \
+      "Pattern Recognition Circle Fit ChiSq/DoF All Candidates", 200, 0, 10);
+  _hszchisq_line = new TH1D("hszchisq_line", \
+      "Pattern Recognition s-z Fit ChiSq/DoF All Candidates", 200, 0, 400);
+  _fail_helix = new TH1D("fail_helix", "Pattern Recognition Helix Fit Failure Point", 5, 0, 5);
+
+  _hx_line->Write();
+  _hy_line->Write();
+  _hxchisq_line->Write();
+  _hychisq_line->Write();
+  _hxychisq_line->Write();
+  _hszchisq_line->Write();
+  _fail_helix->Write();
+  std::cerr << "INFO: Pattern Recognition debug mode setup complete\n";
 }
 
 bool PatternRecognition::LoadGlobals() {
@@ -574,8 +583,11 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
               // Perpendicular residuals
               // double dx = fabs(pos.x() - (cx + mx*pos.z())) / sqrt(1.0 + mx*mx);
               // double dy = fabs(pos.y() - (cy + my*pos.z())) / sqrt(1.0 + my*my);
-              if (_hx && _debug) _hx->Fill(dx);
-              if (_hy && _debug) _hy->Fill(dy);
+              if (_hx_line && _debug) {
+                _hx_line->Fill(dx);
+                std::cerr << "Filling debug histogram hx\n";
+              }
+              if (_hy_line && _debug) _hy_line->Fill(dy);
               if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
                 if ( delta_sq > (dx*dx + dy*dy) ) {
                   delta_sq = dx*dx + dy*dy;
@@ -658,8 +670,8 @@ SciFiStraightPRTrack* PatternRecognition::fit_straight_track(const int n_points,
   }
 
   // Check track passes chisq test, then create SciFiStraightPRTrack
-  if (_hxchisq && _debug) _hxchisq->Fill(( line_x.get_chisq() / ( n_points - 2 )));
-  if (_hychisq && _debug) _hychisq->Fill(( line_y.get_chisq() / ( n_points - 2 )));
+  if (_hxchisq_line && _debug) _hxchisq_line->Fill(( line_x.get_chisq() / ( n_points - 2 )));
+  if (_hychisq_line && _debug) _hychisq_line->Fill(( line_y.get_chisq() / ( n_points - 2 )));
   if ( ( line_x.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) &&
       ( line_y.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) ) {
 
@@ -788,6 +800,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   // If the radius calculated is too large or chisq fails, return NULL
   if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
+    if (n_points == 5 && _debug) _fail_helix->Fill(1);
     if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: Failed circle cut, chisq = "
                                << c_trial.get_chisq() << "\n";
     return NULL;
@@ -898,6 +911,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   if (success) {
     phi_i = true_phi_i;
   } else {
+    if (n_points == 5 && _debug) _fail_helix->Fill(2);
     if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: Failed to find n turns\n";
     return false;
   }
@@ -921,6 +935,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
+    if (n_points == 5 && _debug) _fail_helix->Fill(3);
     if ( _verb > 0 ) {
       std::cout << "INFO: Pattern Recognition: Failed s-z cut, ds/dz = " << line_sz.get_m() << ", "
                 << "intercept = " << line_sz.get_c() << ", "

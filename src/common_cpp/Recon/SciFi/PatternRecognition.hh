@@ -454,13 +454,15 @@ class PatternRecognition {
     double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
     double _missing_sp_cut;     /** Dist (mm) below which a missing spoint should be added to trk*/
 
-    TFile* _rfile;   /** A ROOT file pointer for dumping residuals to in debug mode */
-    TH1D* _hx;       /** histo of x residuals taken during straight road cut stage */
-    TH1D* _hy;       /** histo of y residuals taken during straight road cut stage */
-    TH1D* _hxchisq;  /** histo of chisq of every x-z straight least sq fit tried */
-    TH1D* _hychisq;  /** histo of chisq of every y-z straight least sq fit tried */
-    TH1D* _hxychisq; /** histo of chisq of every x-y circle least sq fit tried */
-    TH1D* _hszchisq; /** histo of chisq of every s-z least sq fit tried */
+    TFile* _rfile;        /** A ROOT file pointer for dumping residuals to in debug mode */
+    TH1D* _hx_line;       /** histo of x residuals taken during straight road cut stage */
+    TH1D* _hy_line;       /** histo of y residuals taken during straight road cut stage */
+    TH1D* _hxchisq_line;  /** histo of chisq of every x-z straight least sq fit tried */
+    TH1D* _hychisq_line;  /** histo of chisq of every y-z straight least sq fit tried */
+    TH1D* _hxychisq_line; /** histo of chisq of every x-y circle least sq fit tried */
+    TH1D* _hszchisq_line; /** histo of chisq of every s-z least sq fit tried */
+
+    TH1D* _fail_helix;    /** Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
 };
 
 
