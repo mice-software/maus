@@ -43,6 +43,9 @@ namespace Kalman {
   /** @brief Calculates the residual between two states */
   State CalculateFilteredResidual(const State& st1, const State& st2);
 
+  /** @brief Calculates the residual between two for a chi-squared calculation */
+  State CalculateChiSquaredResidual(const State& data, const State& measured);
+
   /** @brief Fast was to calculate the chis-sq update */
   double CalculateChiSquaredUpdate(const State& st);
 
@@ -112,13 +115,23 @@ namespace Kalman {
     const Track& GetTrack() const { return _track; }
 
 
-    /** @brief Claculate the Chi-Squared value for the track
+    /** @brief Calculate the Chi-Squared value for the smoothed track
      */
     double CalculateSmoothedChiSquared() const;
+
+    /** @brief Calculate the classical Chi-Squared value for the track
+     */
+    double CalculateChiSquared() const;
+
+    double CalculatePullChiSquared() const;
 
     /** @brief Return the Number of Degrees of Freedom
      */
     int GetNDF() const;
+
+    /** @brief Return the Number of Measurements
+     */
+    int GetNumberMeasurements() const;
 
     State CalculateCleanedState(unsigned int i) const;
     State CalculatePull(unsigned int i) const;

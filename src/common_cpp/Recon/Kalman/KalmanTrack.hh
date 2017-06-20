@@ -50,6 +50,7 @@ namespace Kalman {
 
     friend State CalculateResidual(const State& st1, const State& st2);
     friend State CalculateFilteredResidual(const State& data, const State& measured);
+    friend State CalculateChiSquaredResidual(const State& data, const State& measured);
     friend double CalculateChiSquaredUpdate(const State& st);
 
     public:
