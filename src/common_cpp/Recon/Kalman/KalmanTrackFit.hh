@@ -123,6 +123,8 @@ namespace Kalman {
      */
     double CalculateChiSquared() const;
 
+    /** @brief Calculate a Chi-Squared value for the track using the pulls
+     */
     double CalculatePullChiSquared() const;
 
     /** @brief Return the Number of Degrees of Freedom
