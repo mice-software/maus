@@ -1360,7 +1360,7 @@ TEST_F(PatternRecognitionTest, test_setup_debug) {
 
   PatternRecognition* pr = new PatternRecognition();
   pr->set_parameters_to_default();
-  pr->setup_debug();
+  pr->setup_debug("test.root");
 
   EXPECT_TRUE(pr->_debug);
   EXPECT_TRUE(pr->_rfile);

@@ -412,7 +412,7 @@ class PatternRecognition {
         double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut);
 
     /** @brief Activate debug mode (set up the output ROOT file, histos, etc) */
-    void setup_debug();
+    void setup_debug(std::string debug_fname = "pattern_recognition_debug.root");
 
     /** @brief Calculate the the standard deviation on the s coordinate for a given spacepoint */
     double sigma_on_s(const SimpleCircle& circ, const TMatrixD& cov_circ,

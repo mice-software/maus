@@ -150,9 +150,9 @@ PatternRecognition::~PatternRecognition() {
   }
 }
 
-void PatternRecognition::setup_debug() {
+void PatternRecognition::setup_debug(std::string debug_fname) {
   _debug = true;
-  _rfile = new TFile("pattern_recongition_debug.root", "RECREATE");
+  _rfile = new TFile(debug_fname.c_str(), "RECREATE");
   _hx_line = new TH1D("hx_line", "Pattern Recognition Road (mm) X Residuals All Candidates", \
                       200, -150, 150);
   _hy_line = new TH1D("hy_line", "Pattern Recognition Road (mm) Y Residuals All Candidates",

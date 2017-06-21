@@ -31,7 +31,6 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 // C++ headers
-#include <string>
 #include <sstream>
 #include <vector>
 #include <map>

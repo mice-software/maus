@@ -17,6 +17,7 @@
 
 #include "src/map/MapCppTrackerPatternRecognition/MapCppTrackerPatternRecognition.hh"
 #include <sstream>
+#include <string>
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 
 namespace MAUS {
@@ -58,6 +59,7 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   int user_down_straight_pr_on = (*json)["SciFiPRStraightTkDSOn"].asInt();
   _patrec_on          = (*json)["SciFiPatRecOn"].asBool();
   _patrec_debug_on    = (*json)["SciFiPatRecDebugOn"].asBool();
+  std::string debug_fname  = (*json)["SciFiPatRecDebugFileName"].asString();
 
   _correct_seed_momentum = static_cast<bool>((*json)["SciFiPRCorrectSeed"].asInt());
   if (_correct_seed_momentum) {
@@ -120,7 +122,7 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   _pattern_recognition.set_bz_t2(down_field);
   if (_patrec_debug_on) {
     std::cerr << "INFO::MapCppTrackerPatternRecognition: Debug mode on\n";
-    _pattern_recognition.setup_debug();
+    _pattern_recognition.setup_debug(debug_fname);
   }
 }
 
