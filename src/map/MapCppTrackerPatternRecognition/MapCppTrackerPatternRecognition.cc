@@ -17,7 +17,6 @@
 
 #include "src/map/MapCppTrackerPatternRecognition/MapCppTrackerPatternRecognition.hh"
 #include <sstream>
-#include <string>
 #include "src/common_cpp/API/PyWrapMapBase.hh"
 
 namespace MAUS {
