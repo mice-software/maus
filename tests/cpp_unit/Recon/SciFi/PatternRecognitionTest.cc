@@ -1368,7 +1368,8 @@ TEST_F(PatternRecognitionTest, test_setup_debug) {
   EXPECT_TRUE(pr->_hy_line);
   EXPECT_TRUE(pr->_hxchisq_line);
   EXPECT_TRUE(pr->_hychisq_line);
-  EXPECT_TRUE(pr->_fail_helix);
+  EXPECT_TRUE(pr->_fail_helix_tku);
+  EXPECT_TRUE(pr->_fail_helix_tkd);
 
   delete pr;
 }

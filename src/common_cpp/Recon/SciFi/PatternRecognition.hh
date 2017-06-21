@@ -462,7 +462,8 @@ class PatternRecognition {
     TH1D* _hxychisq_line; /** histo of chisq of every x-y circle least sq fit tried */
     TH1D* _hszchisq_line; /** histo of chisq of every s-z least sq fit tried */
 
-    TH1D* _fail_helix;    /** Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
+    TH1D* _fail_helix_tku;  /** Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
+    TH1D* _fail_helix_tkd;  /** Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
 };
 
 
