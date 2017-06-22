@@ -260,7 +260,7 @@ namespace MAUS {
                             "ConvertToSciFiTrack()");
 
     double chi_squared = fitter->CalculateSmoothedChiSquared();
-    int NDF = fitter->GetNDF();
+    int NDF = fitter->GetNumberMeasurements(); // Smoothed ChiSquared NDF = No. Measurements
     double p_value = TMath::Prob(chi_squared, NDF);
 
     int tracker;
