@@ -37,6 +37,8 @@
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/PatternRecognition.hh"
+#include "src/common_cpp/Recon/SciFi/LeastSquaresFitter.hh"
+#include "src/common_cpp/Recon/SciFi/RootFitter.hh"
 #include "src/common_cpp/DataStructure/ThreeVector.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 #include "src/common_cpp/Globals/GlobalsManager.hh"
@@ -67,6 +69,8 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _down_helical_pr_on(true),
                                           _sp_search_on(false),
                                           _s_error_method(0),
+                                          _line_fitter(0),
+                                          _circle_fitter(0),
                                           _verb(0),
                                           _n_trackers(2),
                                           _n_stations(5),
@@ -88,12 +92,14 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _Pz_min(50.0),
                                           _missing_sp_cut(2.0),
                                           _rfile(NULL),
-                                          _hx(NULL),
-                                          _hy(NULL),
-                                          _hxchisq(NULL),
-                                          _hychisq(NULL),
-                                          _hxychisq(NULL),
-                                          _hszchisq(NULL) {
+                                          _hx_line(NULL),
+                                          _hy_line(NULL),
+                                          _hxchisq_line(NULL),
+                                          _hychisq_line(NULL),
+                                          _hxychisq_line(NULL),
+                                          _hszchisq_line(NULL),
+                                          _fail_helix_tku(NULL),
+                                          _fail_helix_tkd(NULL) {
   // Do nothing
 }
 
@@ -105,6 +111,8 @@ void PatternRecognition::set_parameters_to_default() {
   _down_helical_pr_on = true;
   _sp_search_on = false;
   _s_error_method = 0;
+  _line_fitter = 0;
+  _circle_fitter = 0;
   _verb = 0;
   _n_trackers = 2;
   _n_stations = 5;
@@ -129,35 +137,48 @@ void PatternRecognition::set_parameters_to_default() {
 
 PatternRecognition::~PatternRecognition() {
   if (_debug) {
+    std::cerr << "INFO: Pattern Recognition: writing debug info\n";
     if (_rfile) _rfile->cd();
-    if (_hx) _hx->Write();
-    if (_hy) _hy->Write();
-    if (_hxchisq) _hxchisq->Write();
-    if (_hychisq) _hychisq->Write();
-    if (_hxychisq) _hxychisq->Write();
-    if (_hszchisq) _hszchisq->Write();
+    if (_hx_line) _hx_line->Write();
+    if (_hy_line) _hy_line->Write();
+    if (_hxchisq_line) _hxchisq_line->Write();
+    if (_hychisq_line) _hychisq_line->Write();
+    if (_hxychisq_line) _hxychisq_line->Write();
+    if (_hszchisq_line) _hszchisq_line->Write();
+    if (_fail_helix_tku) _fail_helix_tku->Write();
+    if (_fail_helix_tkd) _fail_helix_tkd->Write();
   }
 }
 
-void PatternRecognition::setup_debug() {
+void PatternRecognition::setup_debug(std::string debug_fname) {
   _debug = true;
-  _rfile = new TFile("pattern_recongition_debug.root", "RECREATE");
-  _hx = new TH1D("hx", "Pattern Recognition Road (mm) X Residuals All Candidates", 200, -150, 150);
-  _hy = new TH1D("hy", "Pattern Recognition Road (mm) Y Residuals All Candidates", 500, -150, 150);
-  _hxchisq =
-    new TH1D("hxchisq", "Pattern Recognition Straight Fit x ChiSq/DoF All Candidates", 200, 0, 500);
-  _hychisq =
-    new TH1D("hychisq", "Pattern Recognition Straight Fit y ChiSq/DoF All Candidates", 200, 0, 500);
-  _hxychisq =
-    new TH1D("hxychisq", "Pattern Recognition Circle Fit ChiSq/DoF All Candidates", 200, 0, 10);
-  _hszchisq =
-    new TH1D("hszchisq", "Pattern Recognition s-z Fit ChiSq/DoF All Candidates", 200, 0, 400);
-  _hx->Write();
-  _hy->Write();
-  _hxchisq->Write();
-  _hychisq->Write();
-  _hxychisq->Write();
-  _hszchisq->Write();
+  _rfile = new TFile(debug_fname.c_str(), "RECREATE");
+  _hx_line = new TH1D("hx_line", "Pattern Recognition Road (mm) X Residuals All Candidates", \
+                      200, -150, 150);
+  _hy_line = new TH1D("hy_line", "Pattern Recognition Road (mm) Y Residuals All Candidates",
+                      500, -150, 150);
+  _hxchisq_line = new TH1D("hxchisq_line", \
+      "Pattern Recognition Straight Fit x ChiSq/DoF All Candidates", 200, 0, 500);
+  _hychisq_line = new TH1D("hychisq_line", \
+      "Pattern Recognition Straight Fit y ChiSq/DoF All Candidates", 200, 0, 500);
+  _hxychisq_line = new TH1D("hxychisq_line", \
+      "Pattern Recognition Circle Fit ChiSq/DoF All Candidates", 200, 0, 10);
+  _hszchisq_line = new TH1D("hszchisq_line", \
+      "Pattern Recognition s-z Fit ChiSq/DoF All Candidates", 200, 0, 400);
+  _fail_helix_tku = new TH1D("fail_helix_tku", \
+                             "Pattern Recognition Helix Fit Failure Point TkU", 5, 0, 5);
+  _fail_helix_tkd = new TH1D("fail_helix_tkd", \
+                             "Pattern Recognition Helix Fit Failure Point TkD", 5, 0, 5);
+
+  _hx_line->Write();
+  _hy_line->Write();
+  _hxchisq_line->Write();
+  _hychisq_line->Write();
+  _hxychisq_line->Write();
+  _hszchisq_line->Write();
+  _fail_helix_tku->Write();
+  _fail_helix_tkd->Write();
+  std::cerr << "INFO: Pattern Recognition debug mode setup complete\n";
 }
 
 bool PatternRecognition::LoadGlobals() {
@@ -165,6 +186,8 @@ bool PatternRecognition::LoadGlobals() {
     Json::Value *json = Globals::GetConfigurationCards();
     _sp_search_on = (*json)["SciFiPatRecMissingSpSearchOn"].asBool();
     _s_error_method = (*json)["SciFiPatRecSErrorMethod"].asInt();
+    _line_fitter = (*json)["SciFiPatRecLineFitter"].asInt();
+    _circle_fitter = (*json)["SciFiPatRecCircleFitter"].asInt();
     _verb = (*json)["SciFiPatRecVerbosity"].asInt();
     _n_trackers = (*json)["SciFinTrackers"].asInt();
     _n_stations = (*json)["SciFinStations"].asInt();
@@ -566,8 +589,11 @@ void PatternRecognition::make_straight_tracks(const int n_points, const int trke
               // Perpendicular residuals
               // double dx = fabs(pos.x() - (cx + mx*pos.z())) / sqrt(1.0 + mx*mx);
               // double dy = fabs(pos.y() - (cy + my*pos.z())) / sqrt(1.0 + my*my);
-              if (_hx && _debug) _hx->Fill(dx);
-              if (_hy && _debug) _hy->Fill(dy);
+              if (_hx_line && _debug) {
+                _hx_line->Fill(dx);
+                std::cerr << "Filling debug histogram hx\n";
+              }
+              if (_hy_line && _debug) _hy_line->Fill(dy);
               if ( fabs(dx) < _res_cut && fabs(dy) < _res_cut )  {
                 if ( delta_sq > (dx*dx + dy*dy) ) {
                   delta_sq = dx*dx + dy*dy;
@@ -628,8 +654,13 @@ SciFiStraightPRTrack* PatternRecognition::fit_straight_track(const int n_points,
   // Fit track
   SimpleLine line_x, line_y;
   TMatrixD cov_x(2, 2), cov_y(2, 2);
-  LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
-  LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
+  if (_line_fitter == 0) { // Custom LSQ fitter
+    LeastSquaresFitter::linear_fit(z, x, x_err, line_x, cov_x);
+    LeastSquaresFitter::linear_fit(z, y, y_err, line_y, cov_y);
+  } else if (_line_fitter == 1) { // ROOT based linear fitter
+    RootFitter::FitLineLinear(z, x, x_err, line_x, cov_x);
+    RootFitter::FitLineLinear(z, y, y_err, line_y, cov_y);
+  }
 
   // Squash the covariances of each fit into one vector
   std::vector<double> covariance;
@@ -645,8 +676,8 @@ SciFiStraightPRTrack* PatternRecognition::fit_straight_track(const int n_points,
   }
 
   // Check track passes chisq test, then create SciFiStraightPRTrack
-  if (_hxchisq && _debug) _hxchisq->Fill(( line_x.get_chisq() / ( n_points - 2 )));
-  if (_hychisq && _debug) _hychisq->Fill(( line_y.get_chisq() / ( n_points - 2 )));
+  if (_hxchisq_line && _debug) _hxchisq_line->Fill(( line_x.get_chisq() / ( n_points - 2 )));
+  if (_hychisq_line && _debug) _hychisq_line->Fill(( line_y.get_chisq() / ( n_points - 2 )));
   if ( ( line_x.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) &&
       ( line_y.get_chisq() / ( n_points - 2 ) < _straight_chisq_cut ) ) {
 
@@ -754,11 +785,34 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
   double s1to4_error = _sd_1to4 * _circle_error_w;
   double s5_error = _sd_5 * _circle_error_w;
-  bool good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
-                                                    spnts, c_trial, cov_circle);
+
+  bool good_radius = false;
+  if (_circle_fitter == 0) {
+    // With a custom linear least squares fit
+    good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
+                                                 spnts, c_trial, cov_circle);
+  } else if (_circle_fitter == 1) {
+    // With a ROOT MINUIT based fitter
+    std::vector<double> x;
+    std::vector<double> y;
+    for (auto sp : spnts) {
+        x.push_back(sp->get_position().x());
+        y.push_back(sp->get_position().y());
+    }
+    good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
+    if (c_trial.get_R() > _R_res_cut)
+        good_radius = false;
+  }
 
   // If the radius calculated is too large or chisq fails, return NULL
   if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
+    if (n_points == 5 && _debug) {
+      if (spnts[0]->get_tracker() == 0) {
+        _fail_helix_tku->Fill(1);
+      } else if (spnts[0]->get_tracker() == 1) {
+        _fail_helix_tkd->Fill(1);
+      }
+    }
     if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: Failed circle cut, chisq = "
                                << c_trial.get_chisq() << "\n";
     return NULL;
@@ -869,6 +923,13 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   if (success) {
     phi_i = true_phi_i;
   } else {
+    if (n_points == 5 && _debug) {
+      if (spnts[0]->get_tracker() == 0) {
+        _fail_helix_tku->Fill(2);
+      } else if (spnts[0]->get_tracker() == 1) {
+        _fail_helix_tkd->Fill(2);
+      }
+    }
     if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: Failed to find n turns\n";
     return false;
   }
@@ -884,10 +945,21 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   }
 
   // Fit ds and dz to a straight line, to get the gradient, which equals ds/dz
-  LeastSquaresFitter::linear_fit(z_i, s_i, sigma_s, line_sz, cov_sz);
+  if (_line_fitter == 0) { // Custom LSQ fitter
+    LeastSquaresFitter::linear_fit(z_i, s_i, sigma_s, line_sz, cov_sz);
+  } else if (_line_fitter == 1) { // ROOT based linear fitter
+    RootFitter::FitLineLinear(z_i, s_i, sigma_s, line_sz, cov_sz);
+  }
 
   // Check linear fit passes chisq test
   if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
+    if (n_points == 5 && _debug) {
+      if (spnts[0]->get_tracker() == 0) {
+        _fail_helix_tku->Fill(3);
+      } else if (spnts[0]->get_tracker() == 1) {
+        _fail_helix_tkd->Fill(3);
+      }
+    }
     if ( _verb > 0 ) {
       std::cout << "INFO: Pattern Recognition: Failed s-z cut, ds/dz = " << line_sz.get_m() << ", "
                 << "intercept = " << line_sz.get_c() << ", "

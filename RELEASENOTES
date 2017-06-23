@@ -5,6 +5,15 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v2.9.1
+  The following changes were made:
+    - Small update map module to conform to API design
+    - Global recon update
+    - Tracker pattern recognition MINUIT fit option added
+    - Tracker Kalman filter p-value fix
+    - Tests: optics model test fix
+    - Third party: CDB-C++ build fix
+    - Third party: ROOT5 patch added for GCC6 compatibilty (MAUS now GCC6 compatible)
 MAUS-v2.9.0
   The following changes were made:
     - TOF calibration updates

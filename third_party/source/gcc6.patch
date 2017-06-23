@@ -1,0 +1,74 @@
+diff --git a/cint/cint/Module.mk b/cint/cint/Module.mk
+index 0293321..99a729b 100644
+--- a/cint/cint/Module.mk
++++ b/cint/cint/Module.mk
+@@ -165,6 +165,10 @@ ifeq ($(GCC_MAJOR),5)
+ CINTS2       := $(filter-out $(MODDIRSD)/libstrm.%,$(CINTS2))
+ CINTS2       += $(MODDIRSD)/gcc4strm.cxx
+ endif
++ifeq ($(GCC_MAJOR),6)
++CINTS2       := $(filter-out $(MODDIRSD)/libstrm.%,$(CINTS2))
++CINTS2       += $(MODDIRSD)/gcc4strm.cxx
++endif
+ ifneq ($(CLANG_MAJOR),)
+ CINTS2       := $(filter-out $(MODDIRSD)/libstrm.%,$(CINTS2))
+ CINTS2       += $(MODDIRSD)/gcc4strm.cxx
+@@ -207,6 +211,9 @@ IOSENUMC     := $(CINTDIRIOSEN)/iosenum.cxx
+ ifneq ($(CLANG_MAJOR),)
+ IOSENUMA     := $(CINTDIRIOSEN)/iosenum.$(ARCH)3
+ else
++ifeq ($(GCC_MAJOR),6)
++IOSENUMA     := $(CINTDIRIOSEN)/iosenum.$(ARCH)3
++else
+ ifeq ($(GCC_MAJOR),5)
+ IOSENUMA     := $(CINTDIRIOSEN)/iosenum.$(ARCH)3
+ else
+@@ -221,6 +228,7 @@ endif
+ endif
+ endif
+ endif
++endif
+ 
+ # used in the main Makefile
+ ALLHDRS     += $(CINTHT) $(CINTINCLUDES)
+@@ -355,6 +363,9 @@ endif
+ ifeq ($(GCC_MAJOR),5)
+ $(call stripsrc,$(CINTDIRSD)/gcc4strm.o): CINTCXXFLAGS += -Wno-strict-aliasing
+ endif
++ifeq ($(GCC_MAJOR),6)
++$(call stripsrc,$(CINTDIRSD)/gcc4strm.o): CINTCXXFLAGS += -Wno-strict-aliasing
++endif
+ 
+ 
+ $(MAKECINTO) $(CINTO): $(CINTCONF) $(ORDER_) $(CINTINCLUDES)
+@@ -389,8 +400,12 @@ endif
+ ##### configcint.h
+ ifeq ($(CPPPREP),)
+ # cannot use "CPPPREP?=", as someone might set "CPPPREP="
++ifeq ($(GCC_MAJOR),6)
++  CPPPREP = $(CXX) -std=c++98 -E -C
++else
+   CPPPREP = $(CXX) -E -C
+ endif
++endif
+ 
+ include $(CINTCONFMK)
+ ##### configcint.h - END
+diff --git a/cmake/modules/SetUpLinux.cmake b/cmake/modules/SetUpLinux.cmake
+index cc389b4..01b3b62 100644
+--- a/cmake/modules/SetUpLinux.cmake
++++ b/cmake/modules/SetUpLinux.cmake
+@@ -69,7 +69,12 @@ if(CMAKE_COMPILER_IS_GNUCXX)
+   set(CMAKE_C_FLAGS_PROFILE          "-g3 -fno-inline -ftest-coverage -fprofile-arcs")
+ 
+   #Settings for cint
+-  set(CPPPREP "${CXX} -E -C")
++  if (GCC_MAJOR EQUAL 6)
++    set(CPPPREP "${CXX} -std=c++98 -E -C")
++  else()
++    set(CPPPREP "${CXX} -E -C")
++  endif()
++
+   set(CXXOUT "-o ")
+   set(EXPLICITLINK "no") #TODO
+ 

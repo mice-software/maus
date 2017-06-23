@@ -41,7 +41,14 @@ if [ $maus_pycov ]; then
     maus_coverage_extra="--with-coverage --cover-html --cover-html-dir=${MAUS_ROOT_DIR}/doc/python_coverage --cover-inclusive"
 fi
 
-python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build $maus_coverage_extra
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build $maus_coverage_extra \
+--exclude-dir build/test_maus_cpp/test_optics/
+
+python ${MAUS_ROOT_DIR}/src/map/MapCppGlobalTrackMatching/_test_MapCppGlobalTrackMatching.py
+
+echo 'Testing optics separately as it corrupts globals singleton'
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/test_maus_cpp/test_optics/ $maus_coverage_extra
+
 if [ $maus_lcov ]; then
     if [ $maus_lcov -ne "0" ]; then
         echo Building lcov output
@@ -49,8 +56,6 @@ if [ $maus_lcov ]; then
         genhtml -o ${MAUS_ROOT_DIR}/doc/cpp_coverage/ maus.info
     fi
 fi
-
-python ${MAUS_ROOT_DIR}/src/map/MapCppGlobalTrackMatching/_test_MapCppGlobalTrackMatching.py
 
 cd $here
 

@@ -37,6 +37,7 @@ SimpleCircle::SimpleCircle() {
   _kappa_err = 0.0;
   _delta_R = 0.0;
   _chisq = 0.0;
+  _pvalue = 0.0;
 }
 
 SimpleCircle::SimpleCircle(double x0, double y0, double R) {
@@ -56,12 +57,13 @@ SimpleCircle::SimpleCircle(double x0, double y0, double R) {
   _kappa_err = 0.0;
   _delta_R = 0.0;
   _chisq = 0.0;
+  _pvalue = 0.0;
 }
 
 SimpleCircle::SimpleCircle(double x0, double x0_err, double y0, double y0_err, double R,
                            double R_err, double alpha, double alpha_err, double beta,
                            double beta_err, double gamma, double gamma_err, double kappa,
-                           double kappa_err, double delta_R, double chisq) {
+                           double kappa_err, double delta_R, double chisq, double pvalue) {
   _x0 = x0;
   _x0_err = x0_err;
   _y0 = y0;
@@ -78,6 +80,7 @@ SimpleCircle::SimpleCircle(double x0, double x0_err, double y0, double y0_err, d
   _kappa_err = kappa_err;
   _delta_R = delta_R;
   _chisq = chisq;
+  _pvalue = pvalue;
 }
 
 // Destructor
@@ -100,12 +103,14 @@ void SimpleCircle::clear() {
   _kappa_err = 0.0;
   _delta_R = 0.0;
   _chisq = 0.0;
+  _pvalue = 0.0;
 }
 
 void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0_err,
                                   double R, double R_err, double alpha, double alpha_err,
                                   double beta, double beta_err, double gamma, double gamma_err,
-                                  double kappa, double kappa_err, double delta_R, double chisq) {
+                                  double kappa, double kappa_err, double delta_R,
+                                  double chisq, double pvalue) {
   _x0 = x0;
   _x0_err = x0_err;
   _y0 = y0;
@@ -122,6 +127,7 @@ void SimpleCircle::set_parameters(double x0, double x0_err, double y0, double y0
   _kappa_err = kappa_err;
   _delta_R = delta_R;
   _chisq = chisq;
+  _pvalue = pvalue;
 }
 
 } // ~namespace MAUS

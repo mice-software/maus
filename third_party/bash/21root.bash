@@ -59,11 +59,18 @@ if [ -n "${MAUS_ROOT_DIR+x}" ]; then
       tar xvfz ${MAUS_ROOT_DIR}/third_party/source/${filename} -C ${MAUS_ROOT_DIR}/third_party/source > /dev/null
       mv ${MAUS_ROOT_DIR}/third_party/source/root ${MAUS_ROOT_DIR}/third_party/source/${directory}
 
-      cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
+
+      echo
+      echo "INFO: Patching:"
+      echo
+      cd ${MAUS_ROOT_DIR}/third_party/source/${directory}
+      patch -p1 < ${MAUS_ROOT_DIR}/third_party/source/gcc6.patch
+
 
       echo
       echo "INFO: Configuring:"
       echo
+      cd ${MAUS_ROOT_DIR}/third_party/build/${directory}
       sleep 1
       # Tell cmake explicitly about third_party/install/include, third_party/install/lib and third_party/install/lib64  to look for headers and libs
       sed -i "s@include(MacroEnsureVersion)@include(MacroEnsureVersion)\ninclude_directories(${MAUS_ROOT_DIR}/third_party/install/include)\nlink_directories(${MAUS_ROOT_DIR}/third_party/install/lib ${MAUS_ROOT_DIR}/third_party/install/lib64)@" ${MAUS_ROOT_DIR}/third_party/source/${directory}/CMakeLists.txt
