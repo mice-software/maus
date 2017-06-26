@@ -101,4 +101,56 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
 
   return true;
 }
+
+bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
+                    SimpleHelix& helix) {
+
+  // TODO: Check x0 = x[0] and y0 = y[0] is correct (tracker ref surface)
+  double x0 = x[0];
+  double y0 = y[0];
+  auto Chi2Function = [&x, &z, &x0, &y0](const double *par) {
+    // Minimisation function computing the sum of squares of residuals
+    // looping over the points
+    double chisq = 0.0;
+    for (size_t i = 0; i < x.size(); i++) {
+        double dx = x[i] - ((x0 - par[0])*cos((z[i]*par[3]) / par[2]) - \
+            (y0 - par[1])*sin((z[i]*par[3]) / par[2]) - par[0]);
+        double dy = y[i] - ((y0 - par[1])*cos((z[i]*par[3]) / par[2]) + \
+            (x0 - par[0])*sin((z[i]*par[3]) / par[2]) - par[1]);
+        chisq += (dx+dy) * (dx+dy);
+    }
+    return chisq;
+  };
+
+  // Wrap chi2 function in a function object for the fit
+  // 3 is the number of fit parameters (size of array par)
+  ROOT::Math::Functor fcn(Chi2Function, 4);
+  ROOT::Fit::Fitter fitter;
+  double pStart[4] = {0, 0, 1, 0};
+  fitter.SetFCN(fcn, pStart);
+  fitter.Config().ParSettings(0).SetName("xc");
+  fitter.Config().ParSettings(1).SetName("yc");
+  fitter.Config().ParSettings(2).SetName("R");
+  fitter.Config().ParSettings(3).SetName("lambda");
+
+  // do the fit
+  bool ok = fitter.FitFCN();
+  if (!ok) {
+    return ok;
+  }
+  const ROOT::Fit::FitResult & result = fitter.Result();
+  result.Print(std::cout);
+
+  // Create a helix object with the results
+  TMatrixD cov;
+  result.GetCovarianceMatrix(&cov);
+  helix = MAUS::SimpleHelix(result.Parameter(0), result.Error(0), \
+                            result.Parameter(1), result.Error(1), \
+                            result.Parameter(2), result.Error(2), \
+                            result.Parameter(3), result.Error(3), \
+                            0.0, 0.0, result.MinFcnValue(), 0.0, result.Prob(), cov);
+
+  return true;
+}
+
 }

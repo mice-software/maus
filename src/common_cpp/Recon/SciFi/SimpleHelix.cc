@@ -20,69 +20,79 @@
 namespace MAUS {
 
 // Constructors
-SimpleHelix::SimpleHelix() {
-  _Phi_0 = 0.0;
-  _Phi_0_err = 0.0;
-  _R = 0.0;
-  _R_err = 0.0;
-  _tan_lambda = 0.0;
-  _tan_lambda_err = 0.0;
-  _Psi_0 = 0.0;
-  _Psi_0_err = 0.0;
-  _chisq = 0.0;
-  _chisq_dof = 0.0;
-  _dsdz = 0.0;
-  _dsdz_err = 0.0;
+SimpleHelix::SimpleHelix() : _xc(0.0),
+                             _xc_err(0.0),
+                             _yc(0.0),
+                             _yc_err(0.0),
+                             _R(0.0),
+                             _R_err(0.0),
+                             _lambda(0.0),
+                             _lambda_err(0.0),
+                             _s0(0.0),
+                             _s0_err(0.0),
+                             _chisq(0.0),
+                             _chisq_dof(0.0),
+                             _pvalue(0.0) {
+  // Do nothing
 }
 
-SimpleHelix::SimpleHelix(double Phi_0, double Phi_0_err, double R, double R_err, double tan_lambda,
-                         double tan_lambda_err, double Psi_0, double Psi_0_err, double chisq,
-                         double chisq_dof) {
-  _Phi_0 = Phi_0;
-  _Phi_0_err = Phi_0_err;
-  _R = R;
-  _R_err = R_err;
-  _tan_lambda = tan_lambda;
-  _tan_lambda_err = tan_lambda_err;
-  _Psi_0 = Psi_0;
-  _Psi_0_err = Psi_0_err;
-  _chisq = chisq;
-  _chisq_dof = chisq_dof;
-  _dsdz = 0.0;
-  _dsdz_err = 0.0;
+SimpleHelix::SimpleHelix(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
+                         double lambda, double lambda_err, double s0, double s0_err, double chisq,
+                         double chisq_dof, double pvalue, TMatrixD cov) : _xc(xc),
+                                                                          _xc_err(xc_err),
+                                                                          _yc(yc),
+                                                                          _yc_err(yc_err),
+                                                                          _R(R),
+                                                                          _R_err(R_err),
+                                                                          _lambda(lambda),
+                                                                          _lambda_err(lambda_err),
+                                                                          _s0(s0),
+                                                                          _s0_err(s0_err),
+                                                                          _chisq(chisq),
+                                                                          _chisq_dof(chisq_dof),
+                                                                          _pvalue(pvalue),
+                                                                          _cov(cov) {
+  // Do nothing
 }
 
 // Destructor
 SimpleHelix::~SimpleHelix() {}
 
 void SimpleHelix::clear() {
-  _Phi_0 = 0.0;
-  _Phi_0_err = 0.0;
+  _xc = 0.0;
+  _xc_err = 0.0;
+  _yc = 0.0;
+  _yc_err = 0.0;
   _R = 0.0;
   _R_err = 0.0;
-  _tan_lambda = 0.0;
-  _tan_lambda_err = 0.0;
-  _Psi_0 = 0.0;
-  _Psi_0_err = 0.0;
+  _lambda = 0.0;
+  _lambda_err = 0.0;
+  _s0 = 0.0;
+  _s0_err = 0.0;
   _chisq = 0.0;
   _chisq_dof = 0.0;
-  _dsdz = 0.0;
-  _dsdz_err = 0.0;
+  _pvalue = 0.0;
+  _cov = TMatrixD();
 }
 
-void SimpleHelix::set_parameters(double Phi_0, double Phi_0_err, double R, double R_err,
-                                 double tan_lambda, double tan_lambda_err, double Psi_0,
-                                 double Psi_0_err, double chisq, double chisq_dof) {
-  _Phi_0 = Phi_0;
-  _Phi_0_err = Phi_0_err;
+void SimpleHelix::set_parameters(double xc, double xc_err, double yc, double yc_err,
+                                 double R, double R_err, double lambda, double lambda_err,
+                                 double s0, double s0_err, double chisq, double chisq_dof,
+                                 double pvalue, TMatrixD& cov) {
+  _xc = xc;
+  _xc_err = xc_err;
+  _yc = yc;
+  _yc_err = yc_err;
   _R = R;
   _R_err = R_err;
-  _tan_lambda = tan_lambda;
-  _tan_lambda_err = tan_lambda_err;
-  _Psi_0 = Psi_0;
-  _Psi_0_err = Psi_0_err;
+  _lambda = lambda;
+  _lambda_err = lambda_err;
+  _s0 = s0;
+  _s0_err = s0_err;
   _chisq = chisq;
   _chisq_dof = chisq_dof;
+  _pvalue = pvalue;
+  _cov = cov;
 }
 
 } // ~namespace MAUS
