@@ -1360,14 +1360,16 @@ TEST_F(PatternRecognitionTest, test_setup_debug) {
 
   PatternRecognition* pr = new PatternRecognition();
   pr->set_parameters_to_default();
-  pr->setup_debug();
+  pr->setup_debug("test.root");
 
   EXPECT_TRUE(pr->_debug);
   EXPECT_TRUE(pr->_rfile);
-  EXPECT_TRUE(pr->_hx);
-  EXPECT_TRUE(pr->_hy);
-  EXPECT_TRUE(pr->_hxchisq);
-  EXPECT_TRUE(pr->_hychisq);
+  EXPECT_TRUE(pr->_hx_line);
+  EXPECT_TRUE(pr->_hy_line);
+  EXPECT_TRUE(pr->_hxchisq_line);
+  EXPECT_TRUE(pr->_hychisq_line);
+  EXPECT_TRUE(pr->_fail_helix_tku);
+  EXPECT_TRUE(pr->_fail_helix_tkd);
 
   delete pr;
 }

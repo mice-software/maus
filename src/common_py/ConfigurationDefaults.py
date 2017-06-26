@@ -316,6 +316,7 @@ SciFiPatRecSZErrorWeight = 1.0 # Weight to artificially scale the error going to
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
 SciFiMinPz = 50.0 # Longitudinal momentum lower limit cut used in pattern recognition
 SciFiPatRecDebugOn = False # Set Pattern Recogntition to debug mode
+SciFiPatRecDebugFileName = "pattern_recognition_debug.root" # Output file name for patrec debug
 SciFiParams_Pitch = 1.4945
 SciFiParams_Station_Radius = 160. # Used as cut by SpacePointReconstruction
 SciFiParams_RMS = 370.
