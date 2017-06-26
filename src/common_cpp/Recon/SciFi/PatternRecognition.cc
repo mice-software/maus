@@ -778,95 +778,97 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
 
 SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
                                                     std::vector<SciFiSpacePoint*> spnts ) const {
-  // SciFiTools::print_spacepoint_xyz(spnts);
-
-  // Perform a circle fit now that we have found a set of spacepoints
-  SimpleCircle c_trial;
-  TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
-  double s1to4_error = _sd_1to4 * _circle_error_w;
-  double s5_error = _sd_5 * _circle_error_w;
-
   bool good_radius = false;
-  if (_circle_fitter == 0) {
-    // With a custom linear least squares fit
-    good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
-                                                 spnts, c_trial, cov_circle);
-  } else if (_circle_fitter == 1) {
-    // With a ROOT MINUIT based fitter
-    std::vector<double> x;
-    std::vector<double> y;
-    for (auto sp : spnts) {
-        x.push_back(sp->get_position().x());
-        y.push_back(sp->get_position().y());
-    }
-    good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
-    if (c_trial.get_R() > _R_res_cut)
-        good_radius = false;
-  }
+  int handedness = 0; // The particle track handedness
 
-  // If the radius calculated is too large or chisq fails, return NULL
-  if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
-    if (n_points == 5 && _debug) {
-      if (spnts[0]->get_tracker() == 0) {
-        _fail_helix_tku->Fill(1);
-      } else if (spnts[0]->get_tracker() == 1) {
-        _fail_helix_tkd->Fill(1);
+  if (_helix_fitter == 0) {
+    // Perform a circle fit now that we have found a set of spacepoints
+    SimpleCircle c_trial;
+    TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
+    double s1to4_error = _sd_1to4 * _circle_error_w;
+    double s5_error = _sd_5 * _circle_error_w;
+
+    if (_circle_fitter == 0) {
+      // With a custom linear least squares fit
+      good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
+                                                   spnts, c_trial, cov_circle);
+    } else if (_circle_fitter == 1) {
+      // With a ROOT MINUIT based fitter
+      std::vector<double> x;
+      std::vector<double> y;
+      for (auto sp : spnts) {
+          x.push_back(sp->get_position().x());
+          y.push_back(sp->get_position().y());
+      }
+      good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
+      if (c_trial.get_R() > _R_res_cut)
+          good_radius = false;
+    }
+
+    // If the radius calculated is too large or chisq fails, return NULL
+    if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
+      if (n_points == 5 && _debug) {
+        if (spnts[0]->get_tracker() == 0) {
+          _fail_helix_tku->Fill(1);
+        } else if (spnts[0]->get_tracker() == 1) {
+          _fail_helix_tkd->Fill(1);
+        }
+      }
+      if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: Failed circle cut, chisq = "
+                                 << c_trial.get_chisq() << "\n";
+      return NULL;
+    }
+
+    // std::cerr << "cov_circle: " << std::endl;
+    // cov_circle.Print();
+
+    // Calculate the standard deviations on the values of s found
+    std::vector<double> sigma_s;
+    for (auto sp : spnts) {
+      double sig = -1.0;
+      if (_s_error_method == 0) {  // 1st method: just use station resolution
+        if ( (sp->get_station() == 5) )
+          sig = _sd_phi_5;
+        else
+          sig = _sd_phi_1to4;
+      } else if (_s_error_method == 1) {
+        sig = sigma_on_s(c_trial, cov_circle, sp); // 2nd method: error propagation
+      }
+      sigma_s.push_back(sig * _sz_error_w);
+    }
+
+    // Perform the s - z fit
+    SimpleLine line_sz;
+    std::vector<double> phi_i;  // The change between turning angles wrt first spacepoint
+    TMatrixD cov_sz(2, 2);      // The covariance matrix of the sz fit paramters c_sz, dsdz
+    bool good_dsdz = find_dsdz(n_points, spnts, c_trial, sigma_s, phi_i, line_sz, cov_sz, handedness);
+    if (!good_dsdz) {
+      if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: dsdz fit failed, looping...\n";
+      return NULL;
+    }
+
+    // Squash the covariances of each fit into one vector
+    std::vector<double> covariance;
+    for ( int i = 0; i < 3; ++i ) {
+      for ( int j = 0; j < 3; ++j ) {
+        covariance.push_back(cov_circle[i][j]);
       }
     }
-    if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: Failed circle cut, chisq = "
-                               << c_trial.get_chisq() << "\n";
-    return NULL;
-  }
-
-  // std::cerr << "cov_circle: " << std::endl;
-  // cov_circle.Print();
-
-  // Calculate the standard deviations on the values of s found
-  std::vector<double> sigma_s;
-  for (auto sp : spnts) {
-    double sig = -1.0;
-    if (_s_error_method == 0) {  // 1st method: just use station resolution
-      if ( (sp->get_station() == 5) )
-        sig = _sd_phi_5;
-      else
-        sig = _sd_phi_1to4;
-    } else if (_s_error_method == 1) {
-      sig = sigma_on_s(c_trial, cov_circle, sp); // 2nd method: error propagation
+    for ( int i = 0; i < 2; ++i ) {
+      for ( int j = 0; j < 2; ++j ) {
+        covariance.push_back(cov_sz[i][j]);
+      }
     }
-    sigma_s.push_back(sig * _sz_error_w);
+  } else if (_helix_fitter == 1) {
+    SimpleHelix helix;
+    bool result = RootFitter::FitCircleMinuit(x, y, helix);
+    double dsdz = tan(helix.get_lambda());
+    handedness = 1;
+    if (dsdz < 0)
+      handedness = -1;
   }
-
-  // Perform the s - z fit
-  SimpleLine line_sz;
-  std::vector<double> phi_i;  // The change between turning angles wrt first spacepoint
-  int handedness = 0;         // The particle track handedness
-  TMatrixD cov_sz(2, 2);      // The covariance matrix of the sz fit paramters c_sz, dsdz
-  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, sigma_s, phi_i, line_sz, cov_sz, handedness);
-  if (!good_dsdz) {
-    if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: dsdz fit failed, looping...\n";
-    return NULL;
-  }
-
-  // Squash the covariances of each fit into one vector
-  std::vector<double> covariance;
-  for ( int i = 0; i < 3; ++i ) {
-    for ( int j = 0; j < 3; ++j ) {
-      covariance.push_back(cov_circle[i][j]);
-    }
-  }
-  for ( int i = 0; i < 2; ++i ) {
-    for ( int j = 0; j < 2; ++j ) {
-      covariance.push_back(cov_sz[i][j]);
-    }
-  }
-
-  // Set all the good sp to used and set the track seeds with them
-//   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
-//     spnts[i]->set_used(true);
-//   }
 
   // Set the charge
-//  int charge = - handedness;
   int charge;
   if (spnts[0]->get_tracker() == 0) {
     if ( _bz_t1 > 0 ) {
