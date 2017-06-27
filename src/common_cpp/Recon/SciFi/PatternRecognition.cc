@@ -69,6 +69,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _down_helical_pr_on(true),
                                           _sp_search_on(false),
                                           _s_error_method(0),
+                                          _helix_fitter(0),
                                           _line_fitter(0),
                                           _circle_fitter(0),
                                           _verb(0),
@@ -111,6 +112,7 @@ void PatternRecognition::set_parameters_to_default() {
   _down_helical_pr_on = true;
   _sp_search_on = false;
   _s_error_method = 0;
+  _helix_fitter = 0;
   _line_fitter = 0;
   _circle_fitter = 0;
   _verb = 0;
@@ -186,6 +188,7 @@ bool PatternRecognition::LoadGlobals() {
     Json::Value *json = Globals::GetConfigurationCards();
     _sp_search_on = (*json)["SciFiPatRecMissingSpSearchOn"].asBool();
     _s_error_method = (*json)["SciFiPatRecSErrorMethod"].asInt();
+    _helix_fitter = (*json)["SciFiPatRecHelixFitter"].asInt();
     _line_fitter = (*json)["SciFiPatRecLineFitter"].asInt();
     _circle_fitter = (*json)["SciFiPatRecCircleFitter"].asInt();
     _verb = (*json)["SciFiPatRecVerbosity"].asInt();
@@ -710,7 +713,6 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
                                     std::vector<SciFiSpacePoint*> &current_spnts,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack*> &htrks) const {
-// if (_verb > 0) std::cout << "make_helix: # of current spnts: " << current_spnts.size() << "\n";
 
   // Set variables to hold which stations are to be ignored
   int ignore_st_1 = -1, ignore_st_2 = -1;
@@ -735,41 +737,29 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
   for ( size_t sp_num = 0; sp_num < spnts_by_station[stat_num].size(); ++sp_num ) {
     // If the current sp is used, skip it
     if ( spnts_by_station[stat_num][sp_num]->get_used() ) {
-    // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipin\n";
       continue;
     }
-
-  // Add the current spnt to the list being tried at present
-  // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding ";
     current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
-  // if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
 
     // If we are on the last station, attempt to form a track using the spacepoints collected
     if (stat_num == stat_num_max) {
       SciFiHelicalPRTrack* trk = form_track(n_points, current_spnts);
 
-      // If we found a track, clear current spacepoints to trigger break out to outer most station
+      // If we found a track, add it to the list of candidates
       if ( trk != NULL ) {
         if (_verb > 0)
           std::cout << "INFO: Pattern Recognition: Found track candidate, adding" << std::endl;
         htrks.push_back(trk);
-        // current_spnts.clear();
-        // current_spnts.resize(0);
-        // return;
-      } // else {
-        // current_spnts.pop_back();
-      // }
+      }
+      // Remove the last spacepoint tried to make room for another from the same station
       current_spnts.pop_back();
 
     // If not on the final station, move on to next (the last recursive call)
     } else {
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
 
-      // If not on the first station and current_spnts is empty, break out as track was found
-      if ( stat_num != stat_num_min && current_spnts.size() == 0 )
-        return;
-      // If we we have current spnts, remove the last tried, before trying another
-      else if ( current_spnts.size() != 0 )
+      // If we have current spnts, remove the last tried, before trying another from this station
+      if ( current_spnts.size() != 0 )
         current_spnts.pop_back();
     }
   }
@@ -778,9 +768,21 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
 
 SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
                                                     std::vector<SciFiSpacePoint*> spnts ) const {
+  // Some initial set up
+  SciFiHelicalPRTrack* track = NULL;
   bool good_radius = false;
   int handedness = 0; // The particle track handedness
+  std::vector<double> x;
+  std::vector<double> y;
+  std::vector<double> z;
+  for (auto sp : spnts) {
+      x.push_back(sp->get_position().x());
+      y.push_back(sp->get_position().y());
+      z.push_back(sp->get_position().z());
+  }
 
+  // Fit transverse and longitudinal separately
+  // ------------------------------------------
   if (_helix_fitter == 0) {
     // Perform a circle fit now that we have found a set of spacepoints
     SimpleCircle c_trial;
@@ -794,12 +796,6 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
                                                    spnts, c_trial, cov_circle);
     } else if (_circle_fitter == 1) {
       // With a ROOT MINUIT based fitter
-      std::vector<double> x;
-      std::vector<double> y;
-      for (auto sp : spnts) {
-          x.push_back(sp->get_position().x());
-          y.push_back(sp->get_position().y());
-      }
       good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
       if (c_trial.get_R() > _R_res_cut)
           good_radius = false;
@@ -859,13 +855,26 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
         covariance.push_back(cov_sz[i][j]);
       }
     }
+
+    track = new SciFiHelicalPRTrack(-1, 0.0, c_trial, line_sz, spnts, covariance);
+
+  // Do a full 3D helix fit
+  // ----------------------
   } else if (_helix_fitter == 1) {
     SimpleHelix helix;
-    bool result = RootFitter::FitCircleMinuit(x, y, helix);
-    double dsdz = tan(helix.get_lambda());
+    bool result = RootFitter::FitHelixMinuit(x, y, z, helix);
+    if (!result) {
+      return NULL;
+    }
+    if (helix.get_R() > _R_res_cut) {
+      return NULL;
+    }
+
+    double dsdz = helix.get_dsdz();
     handedness = 1;
     if (dsdz < 0)
       handedness = -1;
+    track = new SciFiHelicalPRTrack(helix, spnts);
   }
 
   // Set the charge
@@ -883,17 +892,11 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
       charge = handedness;
     }
   }
+  track->set_charge(charge);
 
-  // Set the remaining track parameters
-  double phi_0 = phi_i[0];
-  double x0 = c_trial.get_x0() + c_trial.get_R()*cos(phi_0);
-  double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);
-  ThreeVector pos_0(x0, y0, -1);
-
-  // Form the track and return it
-  SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, charge, pos_0, phi_0, c_trial, line_sz,
-                                                       -1.0, phi_i, spnts, covariance);
+  // Set the number of points fitted
   track->set_n_fit_points(n_points);
+
   return track;
 }
 

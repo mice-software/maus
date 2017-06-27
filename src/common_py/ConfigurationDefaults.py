@@ -303,6 +303,7 @@ SciFiPatRecMissingSpSearchOn = False # Do we seach for seed spoints missed by he
 SciFiPatRecMissingSpCut = 2 # Distance (mm) below which a missing spoint should added to a track
 SciFiPatRecSErrorMethod = 0 # How to calc error on s, 0 = station res, 1 = error prop
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
+SciFiPatRecHelixFitter = 0 # 0 - fit tranverse and longitudinal separately, 1 - full 3D fit
 SciFiPatRecLineFitter = 0 # Choose the patrec straight line fitter, 0 = custom lsq, 1 = ROOT
 SciFiPatRecCircleFitter = 0 # Choose the patrec circle fitter, 0 = custom lsq, 1 = MINUIT
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
@@ -689,7 +690,7 @@ end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default image types of OutputCppRootImage
-image_types = ['png'] 
+image_types = ['png']
 
 PolynomialOpticsModel_order = 1
 PolynomialOpticsModel_algorithms = ["LeastSquares",
@@ -791,7 +792,7 @@ pid_config = "step_4"
 # the Global PID.
 pid_mode = "offline"
 # If pid_mode = "custom", variables to use should be set here as a space separated list, i.e.
-# custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
+# custom_pid_set = "PIDVarA PIDVarC PIDVarD".
 custom_pid_set = "PIDVarB"
 # PID confidence level- set the margin (in %) between the confidence levels of competing pid hypotheses before they
 # are selected as the correct hypothesis

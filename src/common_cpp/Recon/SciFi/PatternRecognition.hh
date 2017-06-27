@@ -127,7 +127,7 @@ class PatternRecognition {
 
     /** @brief A function to call all the different make_tracks rountines.
      *
-     *  A function to call all the different make_tracks rountines. Calls make_5tracks, 
+     *  A function to call all the different make_tracks rountines. Calls make_5tracks,
      *  make_4tracks and make_3tracks for helical and straight tracks. Also calls select_tracks,
      *  track_processing and add_tracks.
      *  @param[in] track_type Helical or Straight. 0 = Straight, 1 = Helical
@@ -145,7 +145,7 @@ class PatternRecognition {
      *  spacepoints are tried. Any which pass the fit are added as track candidates.
      *  The select_tracks function may then be used to decided which of these we actually want to
      *  pick and add to the SciFiEvent before sending to the final kalman track fit.
-     * 
+     *
      *  @param[in] track_type Boolean, 0 for straight tracks, 1 for helical tracks
      *  @param[in] trker_no The tracker number, 0 for TKU, 1 for TKD
      *  @param[in] spnts_by_station A 2D vector of all the input spacepoints ordered by station
@@ -176,7 +176,7 @@ class PatternRecognition {
                       std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints (straight only)
-     * 
+     *
      *  Make Pattern Recognition straight track candidates with 3 spacepoints. All possible
      *  combinations of spacepoints are tried. Any which pass the fit are added as track candidates.
      *  The select_tracks function may then be used to decided which of these we actually want to
@@ -191,7 +191,7 @@ class PatternRecognition {
                       std::vector<SciFiStraightPRTrack*> &strks) const;
 
     /** @brief Fits a straight track for a given set of stations
-     * 
+     *
      *  @param[in] ignore_stations Int vector specifying which stations are not to be used for
      *             the track fit. 0 - 4 represent stations 1 - 5 respectively,
      *             while -1 means use *all* the stations (ignore none of them).
@@ -208,7 +208,7 @@ class PatternRecognition {
     /** @brief Make a helical track from spacepoints
      *
      *  Recursive function holding the looping structure for making helical tracks from spacepoints.
-     *  Once looping has identified candidate spacepoints, calls form_track which performs the 
+     *  Once looping has identified candidate spacepoints, calls form_track which performs the
      *  circle fit in x-y projection and then the line fit in the s-z projection.
      *
      *  @param[in] num_points The number of points in the track (4 or 5)
@@ -228,15 +228,15 @@ class PatternRecognition {
              SpacePoint2dPArray &spnts_by_station, std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Attempt to fit a helical track to given spacepoints
-     * 
+     *
      *  Attempt to fit a helical track to given spacepoints. Two part process: (1) circle fit in the
      *  x-y projection, (2) a line fit in the s-z projection. Returns a pointer to the found
      *  track if successful, otherwise returns a NULL pointer.
-     * 
+     *
      *  @param[in] n_points The number of points in the track (4 or 5)
      *  @param[in] spnts Vector holding pointers to the spacepoints
      *  @return Returns a pointer to the track created
-     * 
+     *
      * */
     SciFiHelicalPRTrack* form_track(const int n_points, std::vector<SciFiSpacePoint*> spnts ) const;
 
@@ -281,13 +281,13 @@ class PatternRecognition {
     bool check_time_consistency(const std::vector<SciFiSpacePoint*>, int tracker_id) const;
 
     /** @brief Determine which two stations the initial line should be drawn between
-     * 
+     *
      *  The initial line is to be drawn between the two outermost stations being used.
      *  This in turn depends on which stations are presently being ignored
      *  e.g. for a 5 pt track, station 5 and station 1 are always  the outer and inner
      *  stations respectively.  This function returns the correct outer and inner
      *  station numbers, given which stations are presently being ignored.
-     * 
+     *
      *  NB Stations are number 0 - 4 in the code, not 1 - 5 as in the outside world
      *
      *  Returns true if successful, false if fails (due to a bad argument being passed)
@@ -374,6 +374,12 @@ class PatternRecognition {
     /** @brief Set the boolean controlling if we search for missed helical seed spacepoints */
     void set_sp_search_on(bool sp_search_on) { _sp_search_on = sp_search_on; }
 
+    /** @brief Return the overall helix fit method */
+    int get_helix_fitter() { return _helix_fitter; }
+
+    /** @brief Set helix fit method */
+    void set_helix_fitter(int helix_fitter) { _helix_fitter = helix_fitter; }
+
     /** @brief Return the line fit method */
     int get_line_fitter() { return _line_fitter; }
 
@@ -395,7 +401,7 @@ class PatternRecognition {
     /** @brief A function to set all the internal parameters to their default values (for tests) */
     void set_parameters_to_default();
 
-    /** @brief Convenience function to set the tracker number on vectors of tracks 
+    /** @brief Convenience function to set the tracker number on vectors of tracks
      *  @param[in] trker_no The tracker number, 0 for TKU, 1 for TKD
      *  @param[out] strks A vector of straight tracks
      *  @param[out] htrks A vector of helical tracks
@@ -431,6 +437,7 @@ class PatternRecognition {
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
     bool _sp_search_on;         /** Do we seach for seed spoints missed by helical fit? */
     int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
+    int _helix_fitter;          /** Helix fitter, 0 = transverse and sz separate, 1 = full 3D fit */
     int _line_fitter;           /** Line fitter, 0 = custom lsq, 1 = ROOT */
     int _circle_fitter;         /** Circle fitter, 0 = custom lsq, 1 = MINUIT */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */

@@ -32,8 +32,8 @@ class SimpleHelix {
 
     /** Parameter constructor */
     SimpleHelix(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
-                double lambda, double lambda_err, double s0, double s0_err,
-                double chisq, double chisq_dof, double pvalue, TMatrix& cov);
+                double dsdz, double dsdz_err, double s0, double s0_err,
+                double chisq, double chisq_dof, double pvalue, TMatrixD cov);
 
     /** Destructor */
     ~SimpleHelix();
@@ -41,18 +41,18 @@ class SimpleHelix {
     // Getters
     double get_xc() const { return _xc; }
     double get_xc_err() const { return _xc_err; }
-    double get_yc() const { return _xc; }
-    double get_yc_err() const { return _xc_err; }
+    double get_yc() const { return _yc; }
+    double get_yc_err() const { return _yc_err; }
     double get_R() const { return _R; }
     double get_R_err() const { return _R_err; }
-    double get_lambda() const { return _lambda; }
-    double get_lambda_err() const { return _lambda_err;}
+    double get_dsdz() const { return _dsdz; }
+    double get_dsdz_err() const { return _dsdz_err;}
     double get_s0() const { return _s0; }
     double get_s0_err() const { return _s0_err; }
     double get_chisq() const { return _chisq; }
     double get_chisq_dof() const { return _chisq_dof; }
     double get_pvalue() const { return _pvalue; }
-    TMatrix get_cov() const { return _cov; }
+    TMatrixD get_cov() const { return _cov; }
 
     // Setters
     void clear();
@@ -62,8 +62,8 @@ class SimpleHelix {
     void set_yc_err(double yc_err) { _yc_err = yc_err; }
     void set_R(double R) { _R = R; }
     void set_R_err(double R_err) { _R_err = R_err; }
-    void set_lambda(double lambda) { _lambda = lambda; }
-    void set_lambda_err(double lambda_err) { _lambda_err = lambda_err; }
+    void set_dsdz(double dsdz) { _dsdz = dsdz; }
+    void set_dsdz_err(double dsdz_err) { _dsdz_err = dsdz_err; }
     void set_s0(double s0) { _s0 = s0; }
     void set_s0_err(double s0_err) { _s0_err = s0_err; }
     void set_chisq(double chisq) { _chisq = chisq; }
@@ -71,7 +71,7 @@ class SimpleHelix {
     void set_pvalue(double pvalue) { _pvalue = pvalue; }
     void set_cov(TMatrixD cov) { _cov = cov; }
     void set_parameters(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
-                        double lambda, double lambda_err, double s0, double s0_err,
+                        double dsdz, double dsdz_err, double s0, double s0_err,
                         double chisq, double chisq_dof, double pvalue, TMatrixD& cov);
 
   private:
@@ -81,8 +81,8 @@ class SimpleHelix {
     double _yc_err;
     double _R;
     double _R_err;
-    double _lambda;
-    double _lambda_err;
+    double _dsdz;
+    double _dsdz_err;
     double _s0;
     double _s0_err;
     double _chisq;

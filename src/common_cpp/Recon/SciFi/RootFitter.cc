@@ -103,12 +103,12 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
 }
 
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
-                    SimpleHelix& helix) {
+                    const std::vector<double>& z, MAUS::SimpleHelix& helix) {
 
   // TODO: Check x0 = x[0] and y0 = y[0] is correct (tracker ref surface)
   double x0 = x[0];
   double y0 = y[0];
-  auto Chi2Function = [&x, &z, &x0, &y0](const double *par) {
+  auto Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
     // Minimisation function computing the sum of squares of residuals
     // looping over the points
     double chisq = 0.0;
@@ -131,24 +131,34 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   fitter.Config().ParSettings(0).SetName("xc");
   fitter.Config().ParSettings(1).SetName("yc");
   fitter.Config().ParSettings(2).SetName("R");
-  fitter.Config().ParSettings(3).SetName("lambda");
+  fitter.Config().ParSettings(3).SetName("dsdz");
 
   // do the fit
   bool ok = fitter.FitFCN();
   if (!ok) {
+    std::cerr << "Full helix fit did not converge\n";
     return ok;
   }
+  std::cerr << "Full helix fit successfully converged\n";
+
   const ROOT::Fit::FitResult & result = fitter.Result();
   result.Print(std::cout);
 
   // Create a helix object with the results
-  TMatrixD cov;
-  result.GetCovarianceMatrix(&cov);
+  std::cerr << "Setting cov matrix...";
+  TMatrixD cov(4, 4);
+  result.GetCovarianceMatrix(cov);
+  std::cerr << " done\n";
+
+  // Calculate s0
+  double s0 = result.Parameter(2) * tan((y0 - result.Parameter(1))/(x0 - result.Parameter(0)));
+
+  // Fill the helix object to return the results
   helix = MAUS::SimpleHelix(result.Parameter(0), result.Error(0), \
                             result.Parameter(1), result.Error(1), \
                             result.Parameter(2), result.Error(2), \
                             result.Parameter(3), result.Error(3), \
-                            0.0, 0.0, result.MinFcnValue(), 0.0, result.Prob(), cov);
+                            s0, 0.0, result.MinFcnValue(), 0.0, result.Prob(), cov);
 
   return true;
 }

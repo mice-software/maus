@@ -26,26 +26,26 @@ SimpleHelix::SimpleHelix() : _xc(0.0),
                              _yc_err(0.0),
                              _R(0.0),
                              _R_err(0.0),
-                             _lambda(0.0),
-                             _lambda_err(0.0),
+                             _dsdz(0.0),
+                             _dsdz_err(0.0),
                              _s0(0.0),
                              _s0_err(0.0),
                              _chisq(0.0),
                              _chisq_dof(0.0),
                              _pvalue(0.0) {
-  // Do nothing
+  _cov.ResizeTo(4, 4);
 }
 
 SimpleHelix::SimpleHelix(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
-                         double lambda, double lambda_err, double s0, double s0_err, double chisq,
+                         double dsdz, double dsdz_err, double s0, double s0_err, double chisq,
                          double chisq_dof, double pvalue, TMatrixD cov) : _xc(xc),
                                                                           _xc_err(xc_err),
                                                                           _yc(yc),
                                                                           _yc_err(yc_err),
                                                                           _R(R),
                                                                           _R_err(R_err),
-                                                                          _lambda(lambda),
-                                                                          _lambda_err(lambda_err),
+                                                                          _dsdz(dsdz),
+                                                                          _dsdz_err(dsdz_err),
                                                                           _s0(s0),
                                                                           _s0_err(s0_err),
                                                                           _chisq(chisq),
@@ -65,18 +65,18 @@ void SimpleHelix::clear() {
   _yc_err = 0.0;
   _R = 0.0;
   _R_err = 0.0;
-  _lambda = 0.0;
-  _lambda_err = 0.0;
+  _dsdz = 0.0;
+  _dsdz_err = 0.0;
   _s0 = 0.0;
   _s0_err = 0.0;
   _chisq = 0.0;
   _chisq_dof = 0.0;
   _pvalue = 0.0;
-  _cov = TMatrixD();
+  _cov = TMatrixD(4, 4);
 }
 
 void SimpleHelix::set_parameters(double xc, double xc_err, double yc, double yc_err,
-                                 double R, double R_err, double lambda, double lambda_err,
+                                 double R, double R_err, double dsdz, double dsdz_err,
                                  double s0, double s0_err, double chisq, double chisq_dof,
                                  double pvalue, TMatrixD& cov) {
   _xc = xc;
@@ -85,8 +85,8 @@ void SimpleHelix::set_parameters(double xc, double xc_err, double yc, double yc_
   _yc_err = yc_err;
   _R = R;
   _R_err = R_err;
-  _lambda = lambda;
-  _lambda_err = lambda_err;
+  _dsdz = dsdz;
+  _dsdz_err = dsdz_err;
   _s0 = s0;
   _s0_err = s0_err;
   _chisq = chisq;

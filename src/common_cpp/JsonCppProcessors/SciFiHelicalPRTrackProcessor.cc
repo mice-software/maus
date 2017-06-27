@@ -27,9 +27,6 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch<int>("charge", &_int_proc,
                     &SciFiHelicalPRTrack::SciFiBasePRTrack::get_charge,
                     &SciFiHelicalPRTrack::SciFiBasePRTrack::set_charge, true);
-    RegisterValueBranch("phi0", &_double_proc,
-                        &SciFiHelicalPRTrack::get_phi0,
-                        &SciFiHelicalPRTrack::set_phi0, true);
     RegisterValueBranch("dsdz", &_double_proc,
                         &SciFiHelicalPRTrack::get_dsdz,
                         &SciFiHelicalPRTrack::set_dsdz, true);
@@ -57,18 +54,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch<int>("ndf", &_int_proc,
                         &SciFiHelicalPRTrack::get_ndf,
                         &SciFiHelicalPRTrack::set_ndf, false);
-    RegisterValueBranch("point_spread", &_double_proc,
-                        &SciFiHelicalPRTrack::get_point_spread,
-                        &SciFiHelicalPRTrack::set_point_spread, true);
-    RegisterValueBranch("pos0", &_threevector_proc,
-                        &SciFiHelicalPRTrack::get_pos0,
-                        &SciFiHelicalPRTrack::set_pos0, true);
     RegisterTRefArray("spacepoints", &_spoint_tref_proc,
                         &SciFiHelicalPRTrack::get_spacepoints,
                         &SciFiHelicalPRTrack::set_spacepoints, true);
-    RegisterValueBranch("phi", &_double_array_proc,
-                        &SciFiHelicalPRTrack::get_phi,
-                        &SciFiHelicalPRTrack::set_phi, false);
     RegisterValueBranch<ThreeVector>("reference_position",
                         &_threevector_proc,
                         &SciFiHelicalPRTrack::get_reference_position,
