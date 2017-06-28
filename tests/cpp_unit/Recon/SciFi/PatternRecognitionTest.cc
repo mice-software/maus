@@ -390,40 +390,10 @@ TEST_F(PatternRecognitionTest, test_process_good) {
 }
 */
 
-// TEST_F(PatternRecognitionTest, test_single_evt_lsq) {
-//   PatternRecognition pr;
-//   pr.set_parameters_to_default();
-//   pr.set_circle_fitter(0);
-//
-//   // Set up the spacepoints vector
-//   std::vector<SciFiSpacePoint*> spnts = set_up_single_helical_track_spacepoints();
-//   SciFiEvent evt1;
-//   evt1.set_spacepoints(spnts);
-//
-//   // Perform the recon
-//   pr.set_up_helical_pr_on(true);
-//   pr.set_down_helical_pr_on(true);
-//   pr.set_up_straight_pr_on(false);
-//   pr.set_down_straight_pr_on(false);
-//   pr.process(evt1);
-//
-//   std::vector<SciFiStraightPRTrack*> strks;
-//   std::vector<SciFiHelicalPRTrack*> htrks;
-//   strks = evt1.straightprtracks();
-//   htrks = evt1.helicalprtracks();
-//
-//   ASSERT_EQ(2u, htrks.size());
-//   EXPECT_EQ(0u, strks.size());
-//   EXPECT_EQ(5, htrks[0]->get_num_points());
-//   EXPECT_EQ(5, htrks[1]->get_num_points());
-//   EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
-//   EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
-// }
-
-TEST_F(PatternRecognitionTest, test_single_evt_full_helix) {
+TEST_F(PatternRecognitionTest, test_single_evt_lsq) {
   PatternRecognition pr;
   pr.set_parameters_to_default();
-  pr.set_helix_fitter(1);
+  pr.set_circle_fitter(0);
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts = set_up_single_helical_track_spacepoints();
@@ -442,12 +412,52 @@ TEST_F(PatternRecognitionTest, test_single_evt_full_helix) {
   strks = evt1.straightprtracks();
   htrks = evt1.helicalprtracks();
 
-  ASSERT_LT(1u, htrks.size());
-  EXPECT_EQ(2u, htrks.size());
+  ASSERT_EQ(2u, htrks.size());
   EXPECT_EQ(0u, strks.size());
+
   EXPECT_EQ(5, htrks[0]->get_num_points());
-  EXPECT_EQ(5, htrks[1]->get_num_points());
+  EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.002);
+  EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
+  EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
   EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+
+  EXPECT_EQ(5, htrks[1]->get_num_points());
+  EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
+}
+
+TEST_F(PatternRecognitionTest, test_single_evt_full_helix) {
+  PatternRecognition pr;
+  pr.set_parameters_to_default();
+  pr.set_helix_fitter(1);
+
+  // Set up the spacepoints vector
+  std::vector<SciFiSpacePoint*> spnts = \
+      set_up_single_helical_track_spacepoints();
+  SciFiEvent evt1;
+  evt1.set_spacepoints(spnts);
+
+  // Perform the recon
+  pr.set_up_helical_pr_on(true);
+  pr.set_down_helical_pr_on(true);
+  pr.set_up_straight_pr_on(false);
+  pr.set_down_straight_pr_on(false);
+  pr.process(evt1);
+
+  std::vector<SciFiStraightPRTrack*> strks;
+  std::vector<SciFiHelicalPRTrack*> htrks;
+  strks = evt1.straightprtracks();
+  htrks = evt1.helicalprtracks();
+
+  ASSERT_EQ(2u, htrks.size());
+  EXPECT_EQ(0u, strks.size());
+
+  EXPECT_EQ(5, htrks[0]->get_num_points());
+  EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.002);
+  EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
+  EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+
+  EXPECT_EQ(5, htrks[1]->get_num_points());
   EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
 }
 

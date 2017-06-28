@@ -111,12 +111,15 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   auto Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
     // Minimisation function computing the sum of squares of residuals
     // looping over the points
+    double xc = par[0];
+    double yc = par[1];
+    double rad = par[2];
+    double dsdz = par[3];
     double chisq = 0.0;
     for (size_t i = 0; i < x.size(); i++) {
-        double dx = x[i] - ((x0 - par[0])*cos((z[i]*par[3]) / par[2]) - \
-            (y0 - par[1])*sin((z[i]*par[3]) / par[2]) - par[0]);
-        double dy = y[i] - ((y0 - par[1])*cos((z[i]*par[3]) / par[2]) + \
-            (x0 - par[0])*sin((z[i]*par[3]) / par[2]) - par[1]);
+        double theta = (z[i]*dsdz) / rad;
+        double dx = x[i] - xc - ((x0 - xc)*cos(theta) - (y0 - yc)*sin(theta));
+        double dy = y[i] - yc - ((y0 - yc)*cos(theta) + (x0 - xc)*sin(theta));
         chisq += (dx+dy) * (dx+dy);
     }
     return chisq;
@@ -132,6 +135,18 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   fitter.Config().ParSettings(1).SetName("yc");
   fitter.Config().ParSettings(2).SetName("R");
   fitter.Config().ParSettings(3).SetName("dsdz");
+
+  fitter.Config().ParSettings(0).SetLimits(-200.0, 200.0);
+  fitter.Config().ParSettings(1).SetLimits(-200.0, 200.0);
+  fitter.Config().ParSettings(2).SetLimits(-150.0, 150.0);
+  fitter.Config().ParSettings(3).SetLimits(-1.0, 1.0);
+
+  fitter.Config().ParSettings(0).SetValue(-5.951);
+  fitter.Config().ParSettings(1).SetValue(48.85);
+  fitter.Config().ParSettings(2).SetValue(20.44);
+  fitter.Config().ParSettings(0).Fix();
+  fitter.Config().ParSettings(1).Fix();
+  fitter.Config().ParSettings(2).Fix();
 
   // do the fit
   bool ok = fitter.FitFCN();
