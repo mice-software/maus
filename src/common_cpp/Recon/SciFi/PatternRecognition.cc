@@ -862,7 +862,22 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   // ----------------------
   } else if (_helix_fitter == 1) {
     SimpleHelix helix;
-    bool result = RootFitter::FitHelixMinuit(x, y, z, helix);
+    // Hand the spacepoint positions to the fitter order by ascending z
+    std::vector<SciFiSpacePoint*> ordered_spnts = spnts;
+    std::sort(ordered_spnts.begin(), ordered_spnts.end(), [](SciFiSpacePoint* a, SciFiSpacePoint* b) {
+        return a->get_position().z() < b->get_position().z();
+    });
+    std::vector<double> ox;
+    std::vector<double> oy;
+    std::vector<double> oz;
+    for (auto sp : ordered_spnts) {
+      ox.push_back(sp->get_position().x());
+      oy.push_back(sp->get_position().y());
+      oz.push_back(sp->get_position().z());
+    }
+
+    // Call the fitter
+    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, helix);
     if (!result) {
       return NULL;
     }

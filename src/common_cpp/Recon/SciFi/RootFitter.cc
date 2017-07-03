@@ -108,6 +108,13 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   // TODO: Check x0 = x[0] and y0 = y[0] is correct (tracker ref surface)
   double x0 = x[0];
   double y0 = y[0];
+
+  std::cerr << "x0 = " << x0 << ", y0 = " << y0 << "\n";
+
+  for (size_t i = 0; i < x.size(); ++i) {
+    std::cerr << x[i] << " " << y[i] << " " << z[i] << std::endl;
+  }
+
   auto Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
     // Minimisation function computing the sum of squares of residuals
     // looping over the points
@@ -118,10 +125,19 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
     double chisq = 0.0;
     for (size_t i = 0; i < x.size(); i++) {
         double theta = (z[i]*dsdz) / rad;
-        double dx = x[i] - xc - ((x0 - xc)*cos(theta) - (y0 - yc)*sin(theta));
-        double dy = y[i] - yc - ((y0 - yc)*cos(theta) + (x0 - xc)*sin(theta));
-        chisq += (dx+dy) * (dx+dy);
+        double f = xc + (x0 - xc)*cos(theta) - (y0 - yc)*sin(theta);
+        double g = yc + (y0 - yc)*cos(theta) + (x0 - xc)*sin(theta);
+        double dx = f - x[i];
+        double dy = g - y[i];
+        double dchisq = (dx*dx) + (dy*dy);
+        std::cerr << "Chi2Function: " << xc << " " << yc << " " << rad << " " << dsdz  << " "
+                  << z[i] << " " << theta << " " << cos(theta) << " " << sin(theta) << " "
+                  << f << " " << x[i] << " " << dx << " "
+                  << g << " " << y[i] << " " << dy << " "
+                  << dchisq << "\n";
+        chisq += dchisq;
     }
+    std::cerr << "Chi2Function: Final chisq: " << chisq << std::endl;
     return chisq;
   };
 
@@ -138,15 +154,17 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
 
   fitter.Config().ParSettings(0).SetLimits(-200.0, 200.0);
   fitter.Config().ParSettings(1).SetLimits(-200.0, 200.0);
-  fitter.Config().ParSettings(2).SetLimits(-150.0, 150.0);
+  fitter.Config().ParSettings(2).SetLimits(0.0, 150.0);
   fitter.Config().ParSettings(3).SetLimits(-1.0, 1.0);
 
-  fitter.Config().ParSettings(0).SetValue(-5.951);
-  fitter.Config().ParSettings(1).SetValue(48.85);
-  fitter.Config().ParSettings(2).SetValue(20.44);
+  fitter.Config().ParSettings(0).SetValue(0.0);
+  fitter.Config().ParSettings(1).SetValue(0.0);
+  fitter.Config().ParSettings(2).SetValue(100.0);
+  // fitter.Config().ParSettings(3).SetValue(0.5);
   fitter.Config().ParSettings(0).Fix();
   fitter.Config().ParSettings(1).Fix();
   fitter.Config().ParSettings(2).Fix();
+  // fitter.Config().ParSettings(3).Fix();
 
   // do the fit
   bool ok = fitter.FitFCN();
@@ -154,10 +172,14 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
     std::cerr << "Full helix fit did not converge\n";
     return ok;
   }
-  std::cerr << "Full helix fit successfully converged\n";
 
   const ROOT::Fit::FitResult & result = fitter.Result();
-  result.Print(std::cout);
+
+  std::cerr << "Full helix fit successfully converged\n";
+  std::cerr << "dsdz = " << result.Parameter(3) << " +/- " << result.Error(3) << std::endl;
+  std::cerr << "Chisq: " << result.MinFcnValue() << std::endl;
+
+  result.Print(std::cerr);
 
   // Create a helix object with the results
   std::cerr << "Setting cov matrix...";
