@@ -21,6 +21,8 @@
 #include "TMath.h"
 #include "Math/Functor.h"
 #include "Fit/Fitter.h"
+#include "Minuit2/Minuit2Minimizer.h"
+#include "Math/Functor.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/RootFitter.hh"
@@ -103,21 +105,13 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
 }
 
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
-                    const std::vector<double>& z, MAUS::SimpleHelix& helix) {
+                    const std::vector<double>& z, const double* pStart, MAUS::SimpleHelix& helix) {
 
-  // TODO: Check x0 = x[0] and y0 = y[0] is correct (tracker ref surface)
   double x0 = x[0];
   double y0 = y[0];
 
-  std::cerr << "x0 = " << x0 << ", y0 = " << y0 << "\n";
-
-  for (size_t i = 0; i < x.size(); ++i) {
-    std::cerr << x[i] << " " << y[i] << " " << z[i] << std::endl;
-  }
-
   auto Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
-    // Minimisation function computing the sum of squares of residuals
-    // looping over the points
+    // Minimisation function computing the sum of squares of residuals looping over the points
     double xc = par[0];
     double yc = par[1];
     double rad = par[2];
@@ -130,74 +124,144 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
         double dx = f - x[i];
         double dy = g - y[i];
         double dchisq = (dx*dx) + (dy*dy);
-        std::cerr << "Chi2Function: " << xc << " " << yc << " " << rad << " " << dsdz  << " "
-                  << z[i] << " " << theta << " " << cos(theta) << " " << sin(theta) << " "
-                  << f << " " << x[i] << " " << dx << " "
-                  << g << " " << y[i] << " " << dy << " "
-                  << dchisq << "\n";
+        // std::cerr << "Chi2Function: " << xc << " " << yc << " " << rad << " " << dsdz  << " "
+        //           << z[i] << " " << theta << " " << cos(theta) << " " << sin(theta) << " "
+        //           << f << " " << x[i] << " " << dx << " "
+        //           << g << " " << y[i] << " " << dy << " "
+        //           << dchisq << "\n";
         chisq += dchisq;
     }
-    std::cerr << "Chi2Function: Final chisq: " << chisq << std::endl;
+    // std::cerr << "Chi2Function: Final chisq: " << chisq << std::endl;
     return chisq;
   };
 
-  // Wrap chi2 function in a function object for the fit
-  // 3 is the number of fit parameters (size of array par)
+  // Scan the function to seed the minimiser
+  double nsteps = 100.0;
+  if (pStart[2] < 10.0) nsteps = 200.0;
+  const double lower_limit = -1.0;
+  const double upper_limit = 1.0;
+  double step_size = (upper_limit - lower_limit) / nsteps;
+  double min_chisq = 10000000000.0;
+  double dsdz_seed = pStart[3];
+  for (double seed = lower_limit; seed < upper_limit + step_size; seed += step_size ) {
+    const double params[4] = {pStart[0], pStart[1], pStart[2], seed};
+    double resid = Chi2Function(params);
+    if (resid < min_chisq) {
+      min_chisq = resid;
+      dsdz_seed = seed;
+    }
+  }
+  // std::cerr << "dsdz_seed = " << dsdz_seed << ", with chisq = " << min_chisq << std::endl;
+
+  // Perform the minimisation with ROOT::Math::Minimizer interface to MINUIT2, Migrad algorithm
+  ROOT::Minuit2::Minuit2Minimizer min (ROOT::Minuit2::kMigrad);
+  min.SetMaxFunctionCalls(1000000);
+  min.SetMaxIterations(100000);
+  min.SetTolerance(0.001);
+
   ROOT::Math::Functor fcn(Chi2Function, 4);
-  ROOT::Fit::Fitter fitter;
-  double pStart[4] = {0, 0, 1, 0};
-  fitter.SetFCN(fcn, pStart);
-  fitter.Config().ParSettings(0).SetName("xc");
-  fitter.Config().ParSettings(1).SetName("yc");
-  fitter.Config().ParSettings(2).SetName("R");
-  fitter.Config().ParSettings(3).SetName("dsdz");
+  min.SetFunction(fcn);
 
-  fitter.Config().ParSettings(0).SetLimits(-200.0, 200.0);
-  fitter.Config().ParSettings(1).SetLimits(-200.0, 200.0);
-  fitter.Config().ParSettings(2).SetLimits(0.0, 150.0);
-  fitter.Config().ParSettings(3).SetLimits(-1.0, 1.0);
+  double step[4] = {0.01, 0.01, 0.01, 0.01};
 
-  fitter.Config().ParSettings(0).SetValue(0.0);
-  fitter.Config().ParSettings(1).SetValue(0.0);
-  fitter.Config().ParSettings(2).SetValue(100.0);
-  // fitter.Config().ParSettings(3).SetValue(0.5);
-  fitter.Config().ParSettings(0).Fix();
-  fitter.Config().ParSettings(1).Fix();
-  fitter.Config().ParSettings(2).Fix();
-  // fitter.Config().ParSettings(3).Fix();
+  // Set the variables to be minimized
+  min.SetFixedVariable(0, "xc", pStart[0]);
+  min.SetFixedVariable(1, "yc", pStart[1]);
+  min.SetFixedVariable(2, "R",  pStart[2]);
+  min.SetLimitedVariable(3, "dsdz", dsdz_seed, step[3], -1.0, 1.0);
 
-  // do the fit
-  bool ok = fitter.FitFCN();
+  // Do the fit
+  bool ok = min.Minimize();
   if (!ok) {
-    std::cerr << "Full helix fit did not converge\n";
+    // std::cerr << "Full helix fit did not converge\n";
     return ok;
   }
-
-  const ROOT::Fit::FitResult & result = fitter.Result();
-
-  std::cerr << "Full helix fit successfully converged\n";
-  std::cerr << "dsdz = " << result.Parameter(3) << " +/- " << result.Error(3) << std::endl;
-  std::cerr << "Chisq: " << result.MinFcnValue() << std::endl;
-
-  result.Print(std::cerr);
-
-  // Create a helix object with the results
-  std::cerr << "Setting cov matrix...";
-  TMatrixD cov(4, 4);
-  result.GetCovarianceMatrix(cov);
-  std::cerr << " done\n";
+  const double *xs = min.X();
+  const double *errors = min.Errors();
 
   // Calculate s0
-  double s0 = result.Parameter(2) * tan((y0 - result.Parameter(1))/(x0 - result.Parameter(0)));
+  double s0 = xs[2] * tan((y0 - xs[1])/(x0 - xs[0]));
+
+  // Pull out the covariance matrix
+  TMatrixD cov(4, 4);
+  for (size_t i = 0; i < 4; ++i) {
+    for (size_t j = 0; j < 4; ++j) {
+      cov(i, j) = min.CovMatrix(i, j);
+    }
+  }
+
+  // std::cerr << "Full helix fit successfully converged\n";
+  // std::cerr << "dsdz = " << xs[3] << " +/- " << errors[3] << std::endl;
+  // std::cerr << "Chisq: " << min.MinValue() << std::endl;
+
+  // Populate the helix
+  helix = MAUS::SimpleHelix(xs[0], errors[0], \
+                            xs[1], errors[1], \
+                            xs[2], errors[2], \
+                            xs[3], errors[3], \
+                            s0, 0.0, min.MinValue(), 0.0, 0.0, cov);
+  return true;
+
+  // // Wrap chi2 function in a function object for the fit
+  // // 3 is the number of fit parameters (size of array par)
+  // ROOT::Math::Functor fcn(Chi2Function, 4);
+  // ROOT::Fit::Fitter fitter;
+  // double pStart[4] = {0, 0, 1, 0};
+  // fitter.SetFCN(fcn, pStart);
+  // fitter.Config().ParSettings(0).SetName("xc");
+  // fitter.Config().ParSettings(1).SetName("yc");
+  // fitter.Config().ParSettings(2).SetName("R");
+  // fitter.Config().ParSettings(3).SetName("dsdz");
+  //
+  // fitter.Config().ParSettings(0).SetLimits(-200.0, 200.0);
+  // fitter.Config().ParSettings(1).SetLimits(-200.0, 200.0);
+  // fitter.Config().ParSettings(2).SetLimits(0.0, 150.0);
+  // fitter.Config().ParSettings(3).SetLimits(-1.0, 1.0);
+  //
+  // fitter.Config().ParSettings(0).SetValue(0.0);
+  // fitter.Config().ParSettings(1).SetValue(0.0);
+  // fitter.Config().ParSettings(2).SetValue(100.0);
+  // // fitter.Config().ParSettings(3).SetValue(0.5);
+  // fitter.Config().ParSettings(0).Fix();
+  // fitter.Config().ParSettings(1).Fix();
+  // fitter.Config().ParSettings(2).Fix();
+  // fitter.Config().ParSettings(3).Fix();
+
+  // // do the fit
+  // bool ok = fitter.FitFCN();
+  // if (!ok) {
+  //   std::cerr << "Full helix fit did not converge\n";
+  //   return ok;
+  // }
+  //
+  // std::cerr << "Chi2Function: " << xc << " " << yc << " " << rad << " " << dsdz  << " "
+  //           << z[i] << " " << theta << " " << cos(theta) << " " << sin(theta) << " "
+  //           << f << " " << x[i] << " " << dx << " "
+  //           << g << " " << y[i] << " " << dy << " "
+  //           << dchisq << "\n";ROOT::Fit::FitResult & result = fitter.Result();
+  //
+  // std::cerr << "Full helix fit successfully converged\n";
+  // std::cerr << "dsdz = " << result.Parameter(3) << " +/- " << result.Error(3) << std::endl;
+  // std::cerr << "Chisq: " << result.MinFcnValue() << std::endl;
+
+  // result.Print(std::cerr);
+
+  // // Create a helix object with the results
+  // std::cerr << "Setting cov matrix...";
+  // TMatrixD cov(4, 4);
+  // result.GetCovarianceMatrix(cov);
+  // std::cerr << " done\n";
+  //
+  // // Calculate s0
+  // double s0 = result.Parameter(2) * tan((y0 - result.Parameter(1))/(x0 - result.Parameter(0)));
 
   // Fill the helix object to return the results
-  helix = MAUS::SimpleHelix(result.Parameter(0), result.Error(0), \
-                            result.Parameter(1), result.Error(1), \
-                            result.Parameter(2), result.Error(2), \
-                            result.Parameter(3), result.Error(3), \
-                            s0, 0.0, result.MinFcnValue(), 0.0, result.Prob(), cov);
+  // helix = MAUS::SimpleHelix(result.Parameter(0), result.Error(0), \
+  //                           result.Parameter(1), result.Error(1), \
+  //                           result.Parameter(2), result.Error(2), \
+  //                           result.Parameter(3), result.Error(3), \
+  //                           s0, 0.0, result.MinFcnValue(), 0.0, result.Prob(), cov);
 
-  return true;
 }
 
 }

@@ -375,10 +375,10 @@ class PatternRecognition {
     void set_sp_search_on(bool sp_search_on) { _sp_search_on = sp_search_on; }
 
     /** @brief Return the overall helix fit method */
-    int get_helix_fitter() { return _helix_fitter; }
+    int get_longitudinal_fitter() { return _longitudinal_fitter; }
 
     /** @brief Set helix fit method */
-    void set_helix_fitter(int helix_fitter) { _helix_fitter = helix_fitter; }
+    void set_longitudinal_fitter(int longitudinal_fitter) { _longitudinal_fitter = longitudinal_fitter; }
 
     /** @brief Return the line fit method */
     int get_line_fitter() { return _line_fitter; }
@@ -437,7 +437,7 @@ class PatternRecognition {
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
     bool _sp_search_on;         /** Do we seach for seed spoints missed by helical fit? */
     int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
-    int _helix_fitter;          /** Helix fitter, 0 = transverse and sz separate, 1 = full 3D fit */
+    int _longitudinal_fitter;   /** Longitud fitter, 0=nturns & linear s-z fit, 1=ROOT (MINUIT2) */
     int _line_fitter;           /** Line fitter, 0 = custom lsq, 1 = ROOT */
     int _circle_fitter;         /** Circle fitter, 0 = custom lsq, 1 = MINUIT */
     int _verb;                  /** Verbosity: 0=little, 1=more couts */
@@ -455,6 +455,7 @@ class PatternRecognition {
     double _circle_chisq_cut;   /** Cut on the chi^2 of the circle least sqs fit in mm */
     double _n_turns_cut;        /** Cut to decide if a given n turns value is good */
     double _sz_chisq_cut;       /** Cut on the sz chi^2 from least sqs fit in mm */
+    double _long_minuit_cut;    /** Cut on the MINUIT longitudinal fit chisq */
     double _circle_error_w;     /** Weight to artificially scale the error going to xy fit */
     double _sz_error_w;         /** Weight to artificially scale the error going to sz fit */
     double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */

@@ -19,7 +19,7 @@ Tools for setting up the environment for SCons
 A whole bunch of tools for setting up each of the external c++ libraries from
 third_party - adding libraries, plus any extra directives for the path, etc.
 These can be called individually, by calling set_*(conf, env) functions, or by
-calling set_lib(lib_name, conf, env) where lib_name is a string naming the 
+calling set_lib(lib_name, conf, env) where lib_name is a string naming the
 library.
 
 A few helper functions also in there.
@@ -109,12 +109,12 @@ def get_environment():
     """
     Set up the SCons environment
 
-    Setup the environment with bindings for SWIG, llvm, Darwin, some 
+    Setup the environment with bindings for SWIG, llvm, Darwin, some
     third_party_libs
 
     @returns the scons environment
     """
- 
+
    #  NOTE: SHLIBPREFIX means that shared libraries don't
     # have a 'lib' prefix, which is needed for python to find SWIG generated
     # libraries
@@ -128,7 +128,7 @@ def get_environment():
     env.Tool \
           ('swig', '%s/third_party/swig-2.0.1' % os.environ['MAUS_THIRD_PARTY'])
     # tell SWIG to make python bindings for C++
-    env.Append(SWIGFLAGS=['-python', '-c++']) 
+    env.Append(SWIGFLAGS=['-python', '-c++'])
 
     # useful to set for root-config
     env['ENV']['PATH'] =  os.environ.get('PATH')
@@ -216,7 +216,7 @@ def set_cpp(conf, env):
 
 def cpp_extras(env):
     """
-    Sets compilation to include coverage, debugger, profiler depending on 
+    Sets compilation to include coverage, debugger, profiler depending on
     environment variable flags. Following controls are enabled:
         if maus_lcov is set, sets gcov flags (for subsequent use in lcov); also
         disables inlining
@@ -229,11 +229,11 @@ def cpp_extras(env):
     debug = 'maus_debug' in os.environ and os.environ['maus_debug'] != '0'
     gprof = 'maus_gprof' in os.environ and os.environ['maus_gprof'] != '0'
     # optimise by default
-    optimise = not ('maus_no_optimize' in os.environ 
+    optimise = not ('maus_no_optimize' in os.environ
                   and os.environ['maus_no_optimize'] != '0')
     assert_active = 'maus_assert_active' in os.environ \
                     and os.environ['maus_assert_active'] != '0'
-    
+
     if lcov:
         env.Append(LIBS=['gcov'])
         env.Append(CCFLAGS=["""-fprofile-arcs""", """-ftest-coverage""",
@@ -247,7 +247,7 @@ def cpp_extras(env):
         env.Append(LINKFLAGS=["""-pg"""])
 
     if not (lcov or debug or gprof) and optimise:
-        env.Append(CCFLAGS=["""-O3"""])        
+        env.Append(CCFLAGS=["""-O3"""])
 
     if not assert_active: # disable debug flags
         env.Append(CCFLAGS=["""-DNDEBUG"""])
@@ -258,7 +258,7 @@ def set_python(conf, env): # pylint: disable=W0613
     """
     if sys.version[0:3] != '2.7':
         my_exit(1)
-    
+
     if not conf.CheckCommand('python'):
         my_exit(1)
 
@@ -313,6 +313,7 @@ def get_root_libs():
                 'Gui', \
                 'MathCore', \
                 'Minuit', \
+                'Minuit2', \
                 'Hist', \
                 'Matrix', \
                 'Spectrum',\
@@ -378,7 +379,7 @@ def get_g4_libs(): # pylint: disable=W0511
     List of geant4 libraries
     """
     if os.environ['G4VERS'] == 'geant4.9.2.p04':
-        return [ 'G4FR', 
+        return [ 'G4FR',
              'G4RayTracer',
              'G4Tree',
              'G4UIGAG',
