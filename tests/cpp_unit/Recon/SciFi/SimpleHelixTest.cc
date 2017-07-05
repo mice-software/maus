@@ -44,9 +44,11 @@ TEST_F(SimpleHelixTestDS, test_default_constructor) {
   EXPECT_EQ(h1.get_dsdz_err(), 0.0);
   EXPECT_EQ(h1.get_s0(), 0.0);
   EXPECT_EQ(h1.get_s0_err(), 0.0);
-  EXPECT_EQ(h1.get_chisq(), 0.0);
-  EXPECT_EQ(h1.get_chisq_dof(), 0.0);
-  EXPECT_EQ(h1.get_pvalue(), 0.0);
+  EXPECT_EQ(h1.get_transverse_chisq(), -1.0);
+  EXPECT_EQ(h1.get_longitudinal_chisq(), -1.0);
+  EXPECT_EQ(h1.get_chisq(), -1.0);
+  EXPECT_EQ(h1.get_chisq_dof(), -1.0);
+  EXPECT_EQ(h1.get_pvalue(), -1.0);
 
 }
 
@@ -61,13 +63,16 @@ TEST_F(SimpleHelixTestDS, test_parameter_constructor) {
   double dsdz_err = 0.4;
   double s0 = 5.0;
   double s0_err = 0.5;
+  double transverse_chisq = 7.0;
+  double longitudinal_chisq = 8.0;
   double chisq = 6.0;
   double chisq_dof = 1.0;
   double pvalue = 0.5;
   TMatrixD cov;
 
   SimpleHelix h1(xc, xc_err, yc, yc_err, R, R_err, dsdz, dsdz_err, s0, s0_err,
-                 chisq, chisq_dof, pvalue, cov);
+                 transverse_chisq, longitudinal_chisq, chisq, chisq_dof,
+                 pvalue, cov);
 
   EXPECT_EQ(h1.get_xc(), xc);
   EXPECT_EQ(h1.get_xc_err(), xc_err);
@@ -79,6 +84,8 @@ TEST_F(SimpleHelixTestDS, test_parameter_constructor) {
   EXPECT_EQ(h1.get_dsdz_err(), dsdz_err);
   EXPECT_EQ(h1.get_s0(), s0);
   EXPECT_EQ(h1.get_s0_err(), s0_err);
+  EXPECT_EQ(h1.get_transverse_chisq(), transverse_chisq);
+  EXPECT_EQ(h1.get_longitudinal_chisq(), longitudinal_chisq);
   EXPECT_EQ(h1.get_chisq(), chisq);
   EXPECT_EQ(h1.get_chisq_dof(), chisq_dof);
   EXPECT_EQ(h1.get_pvalue(), pvalue);
@@ -95,6 +102,8 @@ TEST_F(SimpleHelixTestDS, test_getters_setters_clear) {
   double dsdz_err = 0.4;
   double s0 = 5.0;
   double s0_err = 0.5;
+  double transverse_chisq = 7.0;
+  double longitudinal_chisq = 8.0;
   double chisq = 6.0;
   double chisq_dof = 1.0;
   double pvalue = 0.5;
@@ -112,6 +121,8 @@ TEST_F(SimpleHelixTestDS, test_getters_setters_clear) {
   h1.set_dsdz_err(dsdz_err);
   h1.set_s0(s0);
   h1.set_s0_err(s0_err);
+  h1.set_transverse_chisq(transverse_chisq);
+  h1.set_longitudinal_chisq(longitudinal_chisq);
   h1.set_chisq(chisq);
   h1.set_chisq_dof(chisq_dof);
   h1.set_pvalue(pvalue);
@@ -127,6 +138,8 @@ TEST_F(SimpleHelixTestDS, test_getters_setters_clear) {
   EXPECT_EQ(h1.get_dsdz_err(), dsdz_err);
   EXPECT_EQ(h1.get_s0(), s0);
   EXPECT_EQ(h1.get_s0_err(), s0_err);
+  EXPECT_EQ(h1.get_transverse_chisq(), transverse_chisq);
+  EXPECT_EQ(h1.get_longitudinal_chisq(), longitudinal_chisq);
   EXPECT_EQ(h1.get_chisq(), chisq);
   EXPECT_EQ(h1.get_chisq_dof(), chisq_dof);
   EXPECT_EQ(h1.get_pvalue(), pvalue);
@@ -143,13 +156,16 @@ TEST_F(SimpleHelixTestDS, test_getters_setters_clear) {
   EXPECT_EQ(h1.get_dsdz_err(), 0.0);
   EXPECT_EQ(h1.get_s0(), 0.0);
   EXPECT_EQ(h1.get_s0_err(), 0.0);
-  EXPECT_EQ(h1.get_chisq(), 0.0);
-  EXPECT_EQ(h1.get_chisq_dof(), 0.0);
-  EXPECT_EQ(h1.get_pvalue(), 0.0);
+  EXPECT_EQ(h1.get_transverse_chisq(), -1.0);
+  EXPECT_EQ(h1.get_longitudinal_chisq(), -1.0);
+  EXPECT_EQ(h1.get_chisq(), -1.0);
+  EXPECT_EQ(h1.get_chisq_dof(), -1.0);
+  EXPECT_EQ(h1.get_pvalue(), -1.0);
 
 
   h1.set_parameters(xc, xc_err, yc, yc_err, R, R_err, dsdz, dsdz_err,
-                    s0, s0_err, chisq, chisq_dof, pvalue, cov);
+                    s0, s0_err, transverse_chisq, longitudinal_chisq,
+                    chisq, chisq_dof, pvalue, cov);
 
   EXPECT_EQ(h1.get_xc(), xc);
   EXPECT_EQ(h1.get_xc_err(), xc_err);
@@ -161,6 +177,8 @@ TEST_F(SimpleHelixTestDS, test_getters_setters_clear) {
   EXPECT_EQ(h1.get_dsdz_err(), dsdz_err);
   EXPECT_EQ(h1.get_s0(), s0);
   EXPECT_EQ(h1.get_s0_err(), s0_err);
+  EXPECT_EQ(h1.get_transverse_chisq(), transverse_chisq);
+  EXPECT_EQ(h1.get_longitudinal_chisq(), longitudinal_chisq);
   EXPECT_EQ(h1.get_chisq(), chisq);
   EXPECT_EQ(h1.get_chisq_dof(), chisq_dof);
   EXPECT_EQ(h1.get_pvalue(), pvalue);

@@ -87,7 +87,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _circle_chisq_cut(5.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
-                                          _long_minuit_cut(20.0),
+                                          _long_minuit_cut(30.0),
                                           _circle_error_w(1.0),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
@@ -131,7 +131,7 @@ void PatternRecognition::set_parameters_to_default() {
   _circle_chisq_cut = 5.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
-  _long_minuit_cut = 20.0;
+  _long_minuit_cut = 30.0;
   _circle_error_w = 1.0;
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
@@ -883,7 +883,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     if (!result) {
       return NULL;
     }
-    if (helix.get_chisq() > _long_minuit_cut) {
+    if (helix.get_longitudinal_chisq() > _long_minuit_cut) {
       return NULL;
     }
     if (helix.get_R() > _R_res_cut) {
@@ -896,6 +896,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
       handedness = -1;
 
     // Make the track
+    helix.set_transverse_chisq(c_trial.get_chisq());
     track = new SciFiHelicalPRTrack(helix, spnts);
   }
 
@@ -1141,23 +1142,27 @@ bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoin
 }
 
 void PatternRecognition::get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
-       double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut) {
+                                  double& circle_chisq_cut, double& n_turns_cut,
+                                  double& sz_chisq_cut, double& long_minuit_cut) {
   res_cut = _res_cut;
   straight_chisq_cut = _straight_chisq_cut;
   R_res_cut = _R_res_cut;
   circle_chisq_cut = _circle_chisq_cut;
   n_turns_cut = _n_turns_cut;
   sz_chisq_cut = _sz_chisq_cut;
+  long_minuit_cut = _long_minuit_cut;
 }
 
 void PatternRecognition::set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
-       double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut) {
+                                  double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut,
+                                  double long_minuit_cut) {
   _res_cut = res_cut;
   _straight_chisq_cut = straight_chisq_cut;
   _R_res_cut = R_res_cut;
   _circle_chisq_cut = circle_chisq_cut;
   _n_turns_cut = n_turns_cut;
   _sz_chisq_cut = sz_chisq_cut;
+  _long_minuit_cut = long_minuit_cut;
 }
 
 // For linear Pattern Recognition use

@@ -42,10 +42,10 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SimpleHelix& helix, SciFiSpacePoi
     _R(helix.get_R()),
     _dsdz(helix.get_dsdz()),
     _line_sz_c(helix.get_s0()),
-    _line_sz_chisq(-1.0),
+    _line_sz_chisq(helix.get_longitudinal_chisq()),
     _circle_x0(helix.get_xc()),
     _circle_y0(helix.get_yc()),
-    _circle_chisq(-1.0) {
+    _circle_chisq(helix.get_transverse_chisq()) {
   this->set_spacepoints_pointers(spoints);
   this->set_chi_squared(helix.get_chisq());
   this->set_ndf((2*this->get_num_points()) - 5);

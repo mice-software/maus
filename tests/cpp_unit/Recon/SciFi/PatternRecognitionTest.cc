@@ -53,17 +53,17 @@ class PatternRecognitionTest : public ::testing::Test {
       spnts_t2_trk1[i]->set_used(false);
       spnts_t2_trk1[i]->set_npe(21);
     }
-    // spnts_t1_trk1[0]->set_position(ThreeVector(0.0, 66.44, 1100.0));
-    // spnts_t1_trk1[1]->set_position(ThreeVector(-26.4, 47.46, 750.5));
-    // spnts_t1_trk1[2]->set_position(ThreeVector(-2.491, 28.47, 450.5));
-    // spnts_t1_trk1[3]->set_position(ThreeVector(14.45, 49.18, 200.6));
-    // spnts_t1_trk1[4]->set_position(ThreeVector(1.993, 69.03, 0.6523));
-    //
-    // spnts_t2_trk1[0]->set_position(ThreeVector(-26.4, 56.09, 0.6523));
-    // spnts_t2_trk1[1]->set_position(ThreeVector(-25.9, -1.726, 200.7));
-    // spnts_t2_trk1[2]->set_position(ThreeVector(43.84, -17.26, 450.7));
-    // spnts_t2_trk1[3]->set_position(ThreeVector(57.79, 63.85, 750.7));
-    // spnts_t2_trk1[4]->set_position(ThreeVector(-32.38, 47.46, 1101));
+    spnts_t1_trk1[0]->set_position(ThreeVector(0.0, 66.44, 1100.0));
+    spnts_t1_trk1[1]->set_position(ThreeVector(-26.4, 47.46, 750.5));
+    spnts_t1_trk1[2]->set_position(ThreeVector(-2.491, 28.47, 450.5));
+    spnts_t1_trk1[3]->set_position(ThreeVector(14.45, 49.18, 200.6));
+    spnts_t1_trk1[4]->set_position(ThreeVector(1.993, 69.03, 0.6523));
+
+    spnts_t2_trk1[0]->set_position(ThreeVector(-26.4, 56.09, 0.6523));
+    spnts_t2_trk1[1]->set_position(ThreeVector(-25.9, -1.726, 200.7));
+    spnts_t2_trk1[2]->set_position(ThreeVector(43.84, -17.26, 450.7));
+    spnts_t2_trk1[3]->set_position(ThreeVector(57.79, 63.85, 750.7));
+    spnts_t2_trk1[4]->set_position(ThreeVector(-32.38, 47.46, 1101));
 
     // xc = 0.0, yc = 0.0, rad = 100, dsdz = 0.5, phi0 = 45deg
     // spnts_t1_trk1[0]->set_position(ThreeVector(70.71, 70.71, 0.0));
@@ -73,14 +73,14 @@ class PatternRecognitionTest : public ::testing::Test {
     // spnts_t1_trk1[4]->set_position(ThreeVector(100.0, 0.22, 1100.0));
 
     // // xc = 10.0, yc = -50.0 , rad = 15, dsdz = -0.2, phi0 = 20deg
-    spnts_t1_trk1[0]->set_position(ThreeVector(24.1, -44.87, 0.0));
-    spnts_t1_trk1[1]->set_position(ThreeVector(-0.19, -61.01, 200.0));
-    spnts_t1_trk1[2]->set_position(ThreeVector(22.1, -41.14, 450.0));
-    spnts_t1_trk1[3]->set_position(ThreeVector(-4.62, -46.64, 750.0));
-    spnts_t1_trk1[4]->set_position(ThreeVector(7.31, -64.76, 1100.0));
+    // spnts_t1_trk1[0]->set_position(ThreeVector(24.1, -44.87, 0.0));
+    // spnts_t1_trk1[1]->set_position(ThreeVector(-0.19, -61.01, 200.0));
+    // spnts_t1_trk1[2]->set_position(ThreeVector(22.1, -41.14, 450.0));
+    // spnts_t1_trk1[3]->set_position(ThreeVector(-4.62, -46.64, 750.0));
+    // spnts_t1_trk1[4]->set_position(ThreeVector(7.31, -64.76, 1100.0));
 
     std::vector<SciFiSpacePoint*> spnts(spnts_t1_trk1);
-    // spnts.insert(spnts.end(), spnts_t2_trk1.begin(), spnts_t2_trk1.end());
+    spnts.insert(spnts.end(), spnts_t2_trk1.begin(), spnts_t2_trk1.end());
 
     return spnts;
   }
@@ -426,32 +426,33 @@ TEST_F(PatternRecognitionTest, test_single_evt_lsq) {
   strks = evt1.straightprtracks();
   htrks = evt1.helicalprtracks();
 
-  // ASSERT_EQ(2u, htrks.size());
-  // EXPECT_EQ(0u, strks.size());
-  //
-  // EXPECT_EQ(5, htrks[0]->get_num_points());
-  // EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.002);
-  // EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
-  // EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
-  // EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
-
-  // EXPECT_EQ(5, htrks[1]->get_num_points());
-  // EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
-
-  ASSERT_EQ(1u, htrks.size());
+  ASSERT_EQ(2u, htrks.size());
   EXPECT_EQ(0u, strks.size());
+
+  EXPECT_EQ(5, htrks[0]->get_num_points());
+  EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.002);
+  EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
+  EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+
+  EXPECT_EQ(5, htrks[1]->get_num_points());
+  EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
+
+
+  // ASSERT_EQ(1u, htrks.size());
+  // EXPECT_EQ(0u, strks.size());
 
   // EXPECT_EQ(5, htrks[0]->get_num_points());
   // EXPECT_NEAR(htrks[0]->get_circle_x0(), 0.0, 0.005);
   // EXPECT_NEAR(htrks[0]->get_circle_y0(), 0.0, 0.005);
   // EXPECT_NEAR(htrks[0]->get_R(), 100.0, 0.02);
   // EXPECT_NEAR(htrks[0]->get_dsdz(), 0.5, 0.01);
-
-  EXPECT_EQ(5, htrks[0]->get_num_points());
-  EXPECT_NEAR(htrks[0]->get_circle_x0(), 10.0, 0.005);
-  EXPECT_NEAR(htrks[0]->get_circle_y0(), -50.0, 0.005);
-  EXPECT_NEAR(htrks[0]->get_R(), 15.0, 0.02);
-  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.2, 0.01);
+  //
+  // EXPECT_EQ(5, htrks[0]->get_num_points());
+  // EXPECT_NEAR(htrks[0]->get_circle_x0(), 10.0, 0.005);
+  // EXPECT_NEAR(htrks[0]->get_circle_y0(), -50.0, 0.005);
+  // EXPECT_NEAR(htrks[0]->get_R(), 15.0, 0.02);
+  // EXPECT_NEAR(htrks[0]->get_dsdz(), -0.2, 0.01);
 }
 
 TEST_F(PatternRecognitionTest, test_single_evt_minuit_longitudinal) {
@@ -476,32 +477,33 @@ TEST_F(PatternRecognitionTest, test_single_evt_minuit_longitudinal) {
   strks = evt1.straightprtracks();
   htrks = evt1.helicalprtracks();
 
-  // ASSERT_EQ(2u, htrks.size());
-  // EXPECT_EQ(0u, strks.size());
-  //
-  // EXPECT_EQ(5, htrks[0]->get_num_points());
-  // EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.002);
-  // EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
-  // EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
-  // EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
-
-  // EXPECT_EQ(5, htrks[1]->get_num_points());
-  // EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
-
-  ASSERT_EQ(1u, htrks.size());
+  ASSERT_EQ(2u, htrks.size());
   EXPECT_EQ(0u, strks.size());
+
+  EXPECT_EQ(5, htrks[0]->get_num_points());
+  EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.002);
+  EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
+  EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+
+  EXPECT_EQ(5, htrks[1]->get_num_points());
+  EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
+
+
+  // ASSERT_EQ(1u, htrks.size());
+  // EXPECT_EQ(0u, strks.size());
 
   // EXPECT_EQ(5, htrks[0]->get_num_points());
   // EXPECT_NEAR(htrks[0]->get_circle_x0(), 0.0, 0.005);
   // EXPECT_NEAR(htrks[0]->get_circle_y0(), 0.0, 0.005);
   // EXPECT_NEAR(htrks[0]->get_R(), 100.0, 0.02);
   // EXPECT_NEAR(htrks[0]->get_dsdz(), 0.5, 0.01);
-
-  EXPECT_EQ(5, htrks[0]->get_num_points());
-  EXPECT_NEAR(htrks[0]->get_circle_x0(), 10.0, 0.005);
-  EXPECT_NEAR(htrks[0]->get_circle_y0(), -50.0, 0.005);
-  EXPECT_NEAR(htrks[0]->get_R(), 15.0, 0.02);
-  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.2, 0.01);
+  //
+  // EXPECT_EQ(5, htrks[0]->get_num_points());
+  // EXPECT_NEAR(htrks[0]->get_circle_x0(), 10.0, 0.005);
+  // EXPECT_NEAR(htrks[0]->get_circle_y0(), -50.0, 0.005);
+  // EXPECT_NEAR(htrks[0]->get_R(), 15.0, 0.02);
+  // EXPECT_NEAR(htrks[0]->get_dsdz(), -0.2, 0.01);
 }
 
 TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_lsq) {
@@ -682,13 +684,13 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
     EXPECT_NEAR(spnts[3]->get_npe(), spnts[0]->get_npe(), 0.01);
     EXPECT_NEAR(spnts[4]->get_npe(), spnts[0]->get_npe(), 0.01);
   }
-  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.342, 0.01);
-  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.1156, 0.005);
+  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.342, 0.01);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.005);
   EXPECT_NEAR(htrks[2]->get_dsdz(), -0.01834, 0.01);
   EXPECT_NEAR(htrks[3]->get_dsdz(), -0.1178, 0.01);
   EXPECT_NEAR(htrks[4]->get_dsdz(), 0.08396, 0.001);
-  EXPECT_NEAR(htrks[5]->get_dsdz(), 0.3126, 0.001);
-  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.1257, 0.001);
+  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.3126, 0.001);
+  EXPECT_NEAR(htrks[5]->get_dsdz(), 0.1257, 0.0015);
   EXPECT_NEAR(htrks[7]->get_dsdz(), 0.1504, 0.001);
 }
 

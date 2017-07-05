@@ -199,7 +199,7 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
                             xs[1], errors[1], \
                             xs[2], errors[2], \
                             xs[3], errors[3], \
-                            s0, 0.0, min.MinValue(), 0.0, 0.0, cov);
+                            s0, 0.0, -1.0, min.MinValue(), -1.0, -1.0, 1.0, cov);
   return true;
 
   // // Wrap chi2 function in a function object for the fit

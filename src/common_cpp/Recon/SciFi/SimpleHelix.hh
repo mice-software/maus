@@ -33,6 +33,7 @@ class SimpleHelix {
     /** Parameter constructor */
     SimpleHelix(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
                 double dsdz, double dsdz_err, double s0, double s0_err,
+                double transverse_chisq, double longitudinal_chisq,
                 double chisq, double chisq_dof, double pvalue, TMatrixD cov);
 
     /** Destructor */
@@ -49,6 +50,8 @@ class SimpleHelix {
     double get_dsdz_err() const { return _dsdz_err;}
     double get_s0() const { return _s0; }
     double get_s0_err() const { return _s0_err; }
+    double get_transverse_chisq() const { return _transverse_chisq; }
+    double get_longitudinal_chisq() const { return _longitudinal_chisq; }
     double get_chisq() const { return _chisq; }
     double get_chisq_dof() const { return _chisq_dof; }
     double get_pvalue() const { return _pvalue; }
@@ -66,12 +69,16 @@ class SimpleHelix {
     void set_dsdz_err(double dsdz_err) { _dsdz_err = dsdz_err; }
     void set_s0(double s0) { _s0 = s0; }
     void set_s0_err(double s0_err) { _s0_err = s0_err; }
+    void set_transverse_chisq(double transverse_chisq) { _transverse_chisq = transverse_chisq; }
+    void set_longitudinal_chisq(double longitudinal_chisq) { _longitudinal_chisq = \
+                                                             longitudinal_chisq; }
     void set_chisq(double chisq) { _chisq = chisq; }
     void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
     void set_pvalue(double pvalue) { _pvalue = pvalue; }
     void set_cov(TMatrixD cov) { _cov = cov; }
     void set_parameters(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
                         double dsdz, double dsdz_err, double s0, double s0_err,
+                        double transverse_chisq, double longitudinal_chisq,
                         double chisq, double chisq_dof, double pvalue, TMatrixD& cov);
 
   private:
@@ -85,6 +92,8 @@ class SimpleHelix {
     double _dsdz_err;
     double _s0;
     double _s0_err;
+    double _transverse_chisq;
+    double _longitudinal_chisq;
     double _chisq;
     double _chisq_dof;
     double _pvalue;
