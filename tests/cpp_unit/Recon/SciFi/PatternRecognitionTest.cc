@@ -684,14 +684,14 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
     EXPECT_NEAR(spnts[3]->get_npe(), spnts[0]->get_npe(), 0.01);
     EXPECT_NEAR(spnts[4]->get_npe(), spnts[0]->get_npe(), 0.01);
   }
-  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.342, 0.01);
-  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.005);
-  EXPECT_NEAR(htrks[2]->get_dsdz(), -0.01834, 0.01);
-  EXPECT_NEAR(htrks[3]->get_dsdz(), -0.1178, 0.01);
-  EXPECT_NEAR(htrks[4]->get_dsdz(), 0.08396, 0.001);
-  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.3126, 0.001);
+  EXPECT_NEAR(htrks[2]->get_dsdz(), -0.342, 0.001);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.01834, 0.001);
+  EXPECT_NEAR(htrks[3]->get_dsdz(), -0.1178, 0.001);
+  EXPECT_NEAR(htrks[7]->get_dsdz(), 0.08396, 0.001);
+  EXPECT_NEAR(htrks[4]->get_dsdz(), 0.3126, 0.001);
   EXPECT_NEAR(htrks[5]->get_dsdz(), 0.1257, 0.0015);
-  EXPECT_NEAR(htrks[7]->get_dsdz(), 0.1504, 0.001);
+  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.1504, 0.001);
 }
 
 // TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_helixfit) {

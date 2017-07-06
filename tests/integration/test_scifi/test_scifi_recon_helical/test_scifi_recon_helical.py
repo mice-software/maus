@@ -31,21 +31,22 @@ wrk_dir = os.path.join(mrd,
           "tests/integration/test_scifi/test_scifi_recon_helical/")
 lsq_datacard_name = os.path.join(wrk_dir, "datacard_mc_helical")
 lsq_root_file_name = os.path.join(wrk_dir, "output_helical_lsq.root")
+lsq_log_file_name = "tmp/test_scifi_recon_helical_lsq.log"
 minuit_datacard_name = os.path.join(wrk_dir, "datacard_mc_helical_minuit")
 minuit_root_file_name = os.path.join(wrk_dir, "output_helical_minuit.root")
+minuit_log_file_name = "tmp/test_scifi_recon_helical_minuit.log"
 simulation = os.path.join(wrk_dir, "simulate_scifi.py")
 
-def run_simulation(datacard_name, output_file_name ):
+def run_simulation(datacard_name, output_file_name, log_file_name ):
     """ Run the simulation """
 
     print "Using " + simulation
 
     call_options = [simulation,
-                    "-configuration_file", atacard_name,
+                    "-configuration_file", datacard_name,
                     "-output_root_file_name", output_file_name,
                     "-verbose_level", "0"]
 
-    log_file_name = os.path.join(mrd, "tmp/test_scifi_recon.log")
     log_file = open(log_file_name, 'w')
     print 'Running simulate_scifi, logging in', log_file_name
     proc = sub.Popen(call_options, stdout=log_file, stderr=sub.STDOUT)
@@ -61,8 +62,8 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         """ TestSciFiRecon: Run helical simulation & check the output (LSQ) """
 
         # Run the simulation and check it completes with return code 0
-        proc, log_file_name = run_helical_simulation(lsq_datacard_name, \
-          lsq_root_file_name)
+        proc, log_file_name = run_simulation(lsq_datacard_name, \
+          lsq_root_file_name, lsq_log_file_name)
         self.assertEqual(proc.returncode, 0, msg="Check log "+log_file_name)
 
         # Check the ROOT output is as expected
@@ -92,8 +93,8 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
             the output (MINUIT) """
 
         # Run the simulation and check it completes with return code 0
-        proc, log_file_name = run_helical_simulation(minuit_datacard_name, \
-          minuit_root_file_name)
+        proc, log_file_name = run_simulation(minuit_datacard_name, \
+          minuit_root_file_name, minuit_log_file_name)
         self.assertEqual(proc.returncode, 0, msg="Check log "+log_file_name)
 
         # Check the ROOT output is as expected
