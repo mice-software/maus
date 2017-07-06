@@ -839,7 +839,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     SimpleLine line_sz;
     std::vector<double> phi_i;  // The change between turning angles wrt first spacepoint
     TMatrixD cov_sz(2, 2);      // The covariance matrix of the sz fit paramters c_sz, dsdz
-    bool good_dsdz = find_dsdz(n_points, spnts, c_trial, sigma_s, phi_i, line_sz, cov_sz, handedness);
+    bool good_dsdz = find_dsdz(n_points, spnts, c_trial, sigma_s, phi_i, line_sz, cov_sz, \
+                               handedness);
     if (!good_dsdz) {
       if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: dsdz fit failed, looping...\n";
       return NULL;
@@ -865,9 +866,10 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     SimpleHelix helix;
     // Hand the spacepoint positions to the fitter order by ascending z
     std::vector<SciFiSpacePoint*> ordered_spnts = spnts;
-    std::sort(ordered_spnts.begin(), ordered_spnts.end(), [](SciFiSpacePoint* a, SciFiSpacePoint* b) {
-        return a->get_position().z() < b->get_position().z();
-    });
+    std::sort(ordered_spnts.begin(), ordered_spnts.end(), \
+        [](SciFiSpacePoint* a, SciFiSpacePoint* b) {
+          return a->get_position().z() < b->get_position().z();
+        });
     std::vector<double> ox;
     std::vector<double> oy;
     std::vector<double> oz;

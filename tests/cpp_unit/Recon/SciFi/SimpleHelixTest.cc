@@ -49,7 +49,6 @@ TEST_F(SimpleHelixTestDS, test_default_constructor) {
   EXPECT_EQ(h1.get_chisq(), -1.0);
   EXPECT_EQ(h1.get_chisq_dof(), -1.0);
   EXPECT_EQ(h1.get_pvalue(), -1.0);
-
 }
 
 TEST_F(SimpleHelixTestDS, test_parameter_constructor) {

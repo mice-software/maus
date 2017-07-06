@@ -15,8 +15,8 @@
  *
  */
 
- // ROOT headers
- #include "TMatrixD.h"
+// ROOT headers
+#include "TMatrixD.h"
 
 /** @class SimpleHelix */
 

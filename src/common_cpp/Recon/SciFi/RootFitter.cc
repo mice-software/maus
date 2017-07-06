@@ -15,6 +15,8 @@
  *
  */
 
+#include <algorithm>
+
 // ROOT headers
 #include "TLinearFitter.h"
 #include "TMatrixTBase.h"
@@ -22,7 +24,6 @@
 #include "Math/Functor.h"
 #include "Fit/Fitter.h"
 #include "Minuit2/Minuit2Minimizer.h"
-#include "Math/Functor.h"
 
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/RootFitter.hh"
@@ -143,7 +144,7 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   double step_size = (upper_limit - lower_limit) / nsteps;
   double min_chisq = 10000000000.0;
   double dsdz_seed = pStart[3];
-  for (double seed = lower_limit; seed < upper_limit + step_size; seed += step_size ) {
+  for (double seed = lower_limit; seed < upper_limit + step_size; seed += step_size) {
     const double params[4] = {pStart[0], pStart[1], pStart[2], seed};
     double resid = Chi2Function(params);
     if (resid < min_chisq) {
@@ -154,7 +155,7 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   // std::cerr << "dsdz_seed = " << dsdz_seed << ", with chisq = " << min_chisq << std::endl;
 
   // Perform the minimisation with ROOT::Math::Minimizer interface to MINUIT2, Migrad algorithm
-  ROOT::Minuit2::Minuit2Minimizer min (ROOT::Minuit2::kMigrad);
+  ROOT::Minuit2::Minuit2Minimizer min(ROOT::Minuit2::kMigrad);
   min.SetMaxFunctionCalls(1000000);
   min.SetMaxIterations(100000);
   min.SetTolerance(0.001);
@@ -261,7 +262,5 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   //                           result.Parameter(2), result.Error(2), \
   //                           result.Parameter(3), result.Error(3), \
   //                           s0, 0.0, result.MinFcnValue(), 0.0, result.Prob(), cov);
-
 }
-
 }

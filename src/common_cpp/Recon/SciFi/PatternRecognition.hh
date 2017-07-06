@@ -378,7 +378,8 @@ class PatternRecognition {
     int get_longitudinal_fitter() { return _longitudinal_fitter; }
 
     /** @brief Set helix fit method */
-    void set_longitudinal_fitter(int longitudinal_fitter) { _longitudinal_fitter = longitudinal_fitter; }
+    void set_longitudinal_fitter(int longitudinal_fitter) {
+        _longitudinal_fitter = longitudinal_fitter; }
 
     /** @brief Return the line fit method */
     int get_line_fitter() { return _line_fitter; }
