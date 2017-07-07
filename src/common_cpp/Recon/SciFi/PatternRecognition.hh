@@ -412,13 +412,13 @@ class PatternRecognition {
 
     /** @brief Place the different cut value currently being used into the variables supplied */
     void get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
-                  double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut,
-                  double& long_minuit_cut);
+                  double& circle_chisq_cut, double& _circle_minuit_cut,
+                  double& n_turns_cut, double& sz_chisq_cut, double& long_minuit_cut);
 
     /** @brief Set the various cuts used in Pattern Recognition */
     void set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
-                  double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut,
-                  double long_minuit_cut);
+                  double circle_chisq_cut, double _circle_minuit_cut,
+                  double n_turns_cut, double sz_chisq_cut, double long_minuit_cut);
 
     /** @brief Activate debug mode (set up the output ROOT file, histos, etc) */
     void setup_debug(std::string debug_fname = "pattern_recognition_debug.root");
@@ -456,6 +456,7 @@ class PatternRecognition {
     double _straight_chisq_cut; /** Cut on the chi^2 of the least sqs fit in mm */
     double _R_res_cut;          /** Cut on the radius of the track helix in mm */
     double _circle_chisq_cut;   /** Cut on the chi^2 of the circle least sqs fit in mm */
+    double _circle_minuit_cut;  /** Cut on the chi^2 of the circle minuit fit */
     double _n_turns_cut;        /** Cut to decide if a given n turns value is good */
     double _sz_chisq_cut;       /** Cut on the sz chi^2 from least sqs fit in mm */
     double _long_minuit_cut;    /** Cut on the MINUIT longitudinal fit chisq */

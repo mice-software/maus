@@ -309,10 +309,11 @@ SciFiPatRecCircleFitter = 0 # Choose the patrec circle fitter, 0 = custom lsq, 1
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
-SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec circle fit
+SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec least squares circle fit
+SciFiPatRecCircleMinuitChi2Cut = 30 # Chi^2 on pat rec minuit circle fit
 SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
 SciFiPatRecSZChi2Cut = 150.0 # Chi^2 cut on pat rec s-z fit
-SciFiPatRecLongMinuitChi2Cut = 30.0 # Chi^2 cut on pat rec MINUIT longitudinal fit
+SciFiPatRecLongMinuitChi2Cut = 5.0 # Chi^2 cut on pat rec minuit longitudinal fit
 SciFiPatRecCircleErrorWeight = 1.0 # Weight to artificially scale the error going to xy fit
 SciFiPatRecSZErrorWeight = 1.0 # Weight to artificially scale the error going to sz fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition

@@ -51,6 +51,9 @@ class SimpleHelix {
     double get_dsdz_err() const { return _errors[3]; }
     double get_s0() const { return _params[4]; }
     double get_s0_err() const { return _errors[4]; }
+    double get_transverse_ndf() const { return _ndfs[0]; }
+    double get_longitudinal_ndf() const { return _ndfs[1]; }
+    double get_ndf() const { return _ndfs[2]; }
     double get_transverse_chisq() const { return _chisqs[0]; }
     double get_longitudinal_chisq() const { return _chisqs[1]; }
     double get_chisq() const { return _chisqs[2]; }
@@ -69,6 +72,9 @@ class SimpleHelix {
     void set_dsdz_err(double dsdz_err) { _errors[3] = dsdz_err; }
     void set_s0(double s0) { _params[4] = s0; }
     void set_s0_err(double s0_err) { _errors[4] = s0_err; }
+    void set_transverse_ndf(double transverse_ndf) { _ndfs[0] = transverse_ndf; }
+    void set_longitudinal_ndf(double longitudinal_ndf) { _ndfs[1] = longitudinal_ndf; }
+    void set_ndf(double ndf) { _ndfs[2] = ndf; }
     void set_transverse_chisq(double transverse_chisq) { _chisqs[0] = transverse_chisq; }
     void set_longitudinal_chisq(double longitudinal_chisq) { _chisqs[1] = longitudinal_chisq; }
     void set_chisq(double chisq) { _chisqs[2] = chisq; }

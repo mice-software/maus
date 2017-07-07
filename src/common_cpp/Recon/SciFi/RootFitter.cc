@@ -196,11 +196,11 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   // std::cerr << "Chisq: " << min.MinValue() << std::endl;
 
   // Populate the helix
-  helix = MAUS::SimpleHelix(xs[0], errors[0], \
-                            xs[1], errors[1], \
-                            xs[2], errors[2], \
-                            xs[3], errors[3], \
-                            s0, 0.0, -1.0, min.MinValue(), -1.0, -1.0, 1.0, cov);
+  std::vector<double> params = {xs[0], xs[1], xs[2], xs[3], s0};
+  std::vector<double> errs = {errors[0], errors[1], errors[2], errors[3], 0.0};
+  std::vector<int> ndfs = {(2*z.size() - 3), (2*z.size() - 1), (2*z.size() - 5)};
+  std::vector<double> chisqs = {-1.0, min.MinValue(), -1.0};
+  helix = MAUS::SimpleHelix(params, errs, ndfs, chisqs, -1.0, cov);
   return true;
 
   // // Wrap chi2 function in a function object for the fit

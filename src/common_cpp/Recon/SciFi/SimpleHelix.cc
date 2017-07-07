@@ -20,11 +20,11 @@
 namespace MAUS {
 
 // Constructors
-SimpleHelix::SimpleHelix() : _params{ {0.0, 0.0, 0.0, 0.0, 0.0} },
-                             _errors{ {0.0, 0.0, 0.0, 0.0, 0.0} },
-                             _ndfs{ {0, 0, 0} },
-                             _chisqs{ {0.0, 0.0, 0.0} },
-                             _pvalue{-1.0} {
+SimpleHelix::SimpleHelix() : _params {0.0, 0.0, 0.0, 0.0, 0.0},
+                             _errors {0.0, 0.0, 0.0, 0.0, 0.0},
+                             _ndfs {0, 0, 0},
+                             _chisqs {0.0, 0.0, 0.0},
+                             _pvalue {0.0} {
   _cov.ResizeTo(4, 4);
 }
 
@@ -33,12 +33,12 @@ SimpleHelix::SimpleHelix(const std::vector<double>& params,
                          const std::vector<int>& ndfs,
                          const std::vector<double>& chisqs,
                          double pvalue,
-                         TMatrixD& cov) : _params{params},
-                                          _errors{errors},
-                                          _ndfs{ndfs},
-                                          _chisqs{chisqs},
-                                          _pvalue{pvalue},
-                                          _cov{cov} {
+                         TMatrixD& cov) : _params {params},
+                                          _errors {errors},
+                                          _ndfs {ndfs},
+                                          _chisqs {chisqs},
+                                          _pvalue {pvalue},
+                                          _cov {cov} {
   // Do nothing
 }
 
@@ -50,7 +50,7 @@ void SimpleHelix::clear() {
   _errors = {0.0, 0.0, 0.0, 0.0, 0.0},
   _ndfs = {0, 0, 0},
   _chisqs = {0.0, 0.0, 0.0},
-  _pvalue = -1.0,
+  _pvalue = {0.0},
   _cov = TMatrixD(4, 4);
 }
 

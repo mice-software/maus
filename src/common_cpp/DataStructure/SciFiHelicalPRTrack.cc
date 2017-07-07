@@ -48,7 +48,7 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SimpleHelix& helix, SciFiSpacePoi
     _circle_chisq(helix.get_transverse_chisq()) {
   this->set_spacepoints_pointers(spoints);
   this->set_chi_squared(helix.get_chisq());
-  this->set_ndf((2*this->get_num_points()) - 5);
+  this->set_ndf((2*this->get_num_points()) - 5); // TODO: Should this be fit number of points?
 }
 
 

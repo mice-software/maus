@@ -85,9 +85,10 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
                                           _circle_chisq_cut(5.0),
+                                          _circle_minuit_cut(30.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
-                                          _long_minuit_cut(30.0),
+                                          _long_minuit_cut(5.0),
                                           _circle_error_w(1.0),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
@@ -129,9 +130,10 @@ void PatternRecognition::set_parameters_to_default() {
   _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
   _circle_chisq_cut = 5.0;
+  _circle_minuit_cut = 30.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
-  _long_minuit_cut = 30.0;
+  _long_minuit_cut = 5.0;
   _circle_error_w = 1.0;
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
@@ -204,6 +206,7 @@ bool PatternRecognition::LoadGlobals() {
     _straight_chisq_cut = (*json)["SciFiStraightChi2Cut"].asDouble();
     _R_res_cut = (*json)["SciFiRadiusResCut"].asDouble();
     _circle_chisq_cut = (*json)["SciFiPatRecCircleChi2Cut"].asDouble();
+    _circle_minuit_cut = (*json)["SciFiPatRecCircleMinuitChi2Cut"].asDouble();
     _n_turns_cut = (*json)["SciFiNTurnsCut"].asDouble();
     _sz_chisq_cut = (*json)["SciFiPatRecSZChi2Cut"].asDouble();
     _long_minuit_cut = (*json)["SciFiPatRecLongMinuitChi2Cut"].asDouble();
@@ -728,10 +731,6 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
       return;
   }
 
-  // Set the minimum station number to 0, unless that is an ignore station
-  int stat_num_min = 0;
-  if ( ignore_st_1 == 0 || ignore_st_2 == 0 ) stat_num_min = 1;
-
   // Set the maximum station number to 4, unless that is an ignore station
   int stat_num_max = 4;
   if ( ignore_st_1 == 4 || ignore_st_2 == 4 ) stat_num_max = 3;
@@ -885,7 +884,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     if (!result) {
       return NULL;
     }
-    if (helix.get_longitudinal_chisq() > _long_minuit_cut) {
+    if ((helix.get_longitudinal_chisq() / ((2*n_points) - 1))  > _long_minuit_cut) {
       return NULL;
     }
     if (helix.get_R() > _R_res_cut) {
@@ -1144,8 +1143,9 @@ bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoin
 }
 
 void PatternRecognition::get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
-                                  double& circle_chisq_cut, double& n_turns_cut,
-                                  double& sz_chisq_cut, double& long_minuit_cut) {
+                                  double& circle_chisq_cut, double& _circle_minuit_cut,
+                                  double& n_turns_cut, double& sz_chisq_cut,
+                                  double& long_minuit_cut) {
   res_cut = _res_cut;
   straight_chisq_cut = _straight_chisq_cut;
   R_res_cut = _R_res_cut;
@@ -1156,8 +1156,8 @@ void PatternRecognition::get_cuts(double& res_cut, double& straight_chisq_cut, d
 }
 
 void PatternRecognition::set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
-                                  double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut,
-                                  double long_minuit_cut) {
+                                  double circle_chisq_cut, double _circle_minuit_cut,
+                                  double n_turns_cut, double sz_chisq_cut, double long_minuit_cut) {
   _res_cut = res_cut;
   _straight_chisq_cut = straight_chisq_cut;
   _R_res_cut = R_res_cut;
