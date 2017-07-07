@@ -15,6 +15,8 @@
  *
  */
 
+#include <vector>
+
 // ROOT headers
 #include "TMatrixD.h"
 
@@ -31,71 +33,56 @@ class SimpleHelix {
     SimpleHelix();
 
     /** Parameter constructor */
-    SimpleHelix(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
-                double dsdz, double dsdz_err, double s0, double s0_err,
-                double transverse_chisq, double longitudinal_chisq,
-                double chisq, double chisq_dof, double pvalue, TMatrixD cov);
+    SimpleHelix(const std::vector<double>& params, const std::vector<double>& errors,
+                const std::vector<int>& ndfs, const std::vector<double>& chisqs,
+                double pvalue, TMatrixD& cov);
 
     /** Destructor */
     ~SimpleHelix();
 
     // Getters
-    double get_xc() const { return _xc; }
-    double get_xc_err() const { return _xc_err; }
-    double get_yc() const { return _yc; }
-    double get_yc_err() const { return _yc_err; }
-    double get_R() const { return _R; }
-    double get_R_err() const { return _R_err; }
-    double get_dsdz() const { return _dsdz; }
-    double get_dsdz_err() const { return _dsdz_err;}
-    double get_s0() const { return _s0; }
-    double get_s0_err() const { return _s0_err; }
-    double get_transverse_chisq() const { return _transverse_chisq; }
-    double get_longitudinal_chisq() const { return _longitudinal_chisq; }
-    double get_chisq() const { return _chisq; }
-    double get_chisq_dof() const { return _chisq_dof; }
+    double get_xc() const { return _params[0]; }
+    double get_xc_err() const { return _errors[0]; }
+    double get_yc() const { return _params[1]; }
+    double get_yc_err() const { return _errors[1]; }
+    double get_R() const { return _params[2]; }
+    double get_R_err() const { return _errors[2]; }
+    double get_dsdz() const { return _params[3]; }
+    double get_dsdz_err() const { return _errors[3]; }
+    double get_s0() const { return _params[4]; }
+    double get_s0_err() const { return _errors[4]; }
+    double get_transverse_chisq() const { return _chisqs[0]; }
+    double get_longitudinal_chisq() const { return _chisqs[1]; }
+    double get_chisq() const { return _chisqs[2]; }
     double get_pvalue() const { return _pvalue; }
     TMatrixD get_cov() const { return _cov; }
 
     // Setters
     void clear();
-    void set_xc(double xc) { _xc = xc; }
-    void set_xc_err(double xc_err) { _xc_err = xc_err; }
-    void set_yc(double yc) { _yc = yc; }
-    void set_yc_err(double yc_err) { _yc_err = yc_err; }
-    void set_R(double R) { _R = R; }
-    void set_R_err(double R_err) { _R_err = R_err; }
-    void set_dsdz(double dsdz) { _dsdz = dsdz; }
-    void set_dsdz_err(double dsdz_err) { _dsdz_err = dsdz_err; }
-    void set_s0(double s0) { _s0 = s0; }
-    void set_s0_err(double s0_err) { _s0_err = s0_err; }
-    void set_transverse_chisq(double transverse_chisq) { _transverse_chisq = transverse_chisq; }
-    void set_longitudinal_chisq(double longitudinal_chisq) { _longitudinal_chisq = \
-                                                             longitudinal_chisq; }
-    void set_chisq(double chisq) { _chisq = chisq; }
-    void set_chisq_dof(double chisq_dof) { _chisq_dof = chisq_dof; }
+    void set_xc(double xc) { _params[0] = xc; }
+    void set_xc_err(double xc_err) { _errors[0] = xc_err; }
+    void set_yc(double yc) { _params[1] = yc; }
+    void set_yc_err(double yc_err) { _errors[1] = yc_err; }
+    void set_R(double R) { _params[2] = R; }
+    void set_R_err(double R_err) { _errors[2] = R_err; }
+    void set_dsdz(double dsdz) { _params[3] = dsdz; }
+    void set_dsdz_err(double dsdz_err) { _errors[3] = dsdz_err; }
+    void set_s0(double s0) { _params[4] = s0; }
+    void set_s0_err(double s0_err) { _errors[4] = s0_err; }
+    void set_transverse_chisq(double transverse_chisq) { _chisqs[0] = transverse_chisq; }
+    void set_longitudinal_chisq(double longitudinal_chisq) { _chisqs[1] = longitudinal_chisq; }
+    void set_chisq(double chisq) { _chisqs[2] = chisq; }
     void set_pvalue(double pvalue) { _pvalue = pvalue; }
     void set_cov(TMatrixD cov) { _cov = cov; }
-    void set_parameters(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
-                        double dsdz, double dsdz_err, double s0, double s0_err,
-                        double transverse_chisq, double longitudinal_chisq,
-                        double chisq, double chisq_dof, double pvalue, TMatrixD& cov);
+    void set_parameters(const std::vector<double>& params, const std::vector<double>& _errors,
+                        const std::vector<int>& ndfs, const std::vector<double>& _chisqs,
+                        double pvalue, TMatrixD& cov);
 
   private:
-    double _xc;
-    double _xc_err;
-    double _yc;
-    double _yc_err;
-    double _R;
-    double _R_err;
-    double _dsdz;
-    double _dsdz_err;
-    double _s0;
-    double _s0_err;
-    double _transverse_chisq;
-    double _longitudinal_chisq;
-    double _chisq;
-    double _chisq_dof;
+    std::vector<double> _params;   // xc, yc, rad, dsdz, s0
+    std::vector<double> _errors;   // xc, yc, rad, dsdz, s0
+    std::vector<int> _ndfs;        // tranverse ndf, longitudinal ndf, overall ndf
+    std::vector<double> _chisqs;   // tranverse chisq, longitudinal chisq, overall chisq
     double _pvalue;
     TMatrixD _cov;
 };

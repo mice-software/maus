@@ -20,44 +20,25 @@
 namespace MAUS {
 
 // Constructors
-SimpleHelix::SimpleHelix() : _xc(0.0),
-                             _xc_err(0.0),
-                             _yc(0.0),
-                             _yc_err(0.0),
-                             _R(0.0),
-                             _R_err(0.0),
-                             _dsdz(0.0),
-                             _dsdz_err(0.0),
-                             _s0(0.0),
-                             _s0_err(0.0),
-                             _transverse_chisq(-1.0),
-                             _longitudinal_chisq(-1.0),
-                             _chisq(-1.0),
-                             _chisq_dof(-1.0),
-                             _pvalue(-1.0) {
+SimpleHelix::SimpleHelix() : _params{ {0.0, 0.0, 0.0, 0.0, 0.0} },
+                             _errors{ {0.0, 0.0, 0.0, 0.0, 0.0} },
+                             _ndfs{ {0, 0, 0} },
+                             _chisqs{ {0.0, 0.0, 0.0} },
+                             _pvalue{-1.0} {
   _cov.ResizeTo(4, 4);
 }
 
-SimpleHelix::SimpleHelix(double xc, double xc_err, double yc, double yc_err, double R, double R_err,
-                         double dsdz, double dsdz_err, double s0, double s0_err,
-                         double transverse_chisq, double longitudinal_chisq,
-                         double chisq, double chisq_dof, double pvalue, TMatrixD cov)
-    : _xc(xc),
-      _xc_err(xc_err),
-      _yc(yc),
-      _yc_err(yc_err),
-      _R(R),
-      _R_err(R_err),
-      _dsdz(dsdz),
-      _dsdz_err(dsdz_err),
-      _s0(s0),
-      _s0_err(s0_err),
-      _transverse_chisq(transverse_chisq),
-      _longitudinal_chisq(longitudinal_chisq),
-      _chisq(chisq),
-      _chisq_dof(chisq_dof),
-      _pvalue(pvalue),
-      _cov(cov) {
+SimpleHelix::SimpleHelix(const std::vector<double>& params,
+                         const std::vector<double>& errors,
+                         const std::vector<int>& ndfs,
+                         const std::vector<double>& chisqs,
+                         double pvalue,
+                         TMatrixD& cov) : _params{params},
+                                          _errors{errors},
+                                          _ndfs{ndfs},
+                                          _chisqs{chisqs},
+                                          _pvalue{pvalue},
+                                          _cov{cov} {
   // Do nothing
 }
 
@@ -65,43 +46,24 @@ SimpleHelix::SimpleHelix(double xc, double xc_err, double yc, double yc_err, dou
 SimpleHelix::~SimpleHelix() {}
 
 void SimpleHelix::clear() {
-  _xc = 0.0;
-  _xc_err = 0.0;
-  _yc = 0.0;
-  _yc_err = 0.0;
-  _R = 0.0;
-  _R_err = 0.0;
-  _dsdz = 0.0;
-  _dsdz_err = 0.0;
-  _s0 = 0.0;
-  _s0_err = 0.0;
-  _transverse_chisq = -1.0;
-  _longitudinal_chisq = -1.0;
-  _chisq = -1.0;
-  _chisq_dof = -1.0;
-  _pvalue = -1.0;
+  _params = {0.0, 0.0, 0.0, 0.0, 0.0},
+  _errors = {0.0, 0.0, 0.0, 0.0, 0.0},
+  _ndfs = {0, 0, 0},
+  _chisqs = {0.0, 0.0, 0.0},
+  _pvalue = -1.0,
   _cov = TMatrixD(4, 4);
 }
 
-void SimpleHelix::set_parameters(double xc, double xc_err, double yc, double yc_err,
-                                 double R, double R_err, double dsdz, double dsdz_err,
-                                 double s0, double s0_err, double transverse_chisq,
-                                 double longitudinal_chisq, double chisq, double chisq_dof,
-                                 double pvalue, TMatrixD& cov) {
-  _xc = xc;
-  _xc_err = xc_err;
-  _yc = yc;
-  _yc_err = yc_err;
-  _R = R;
-  _R_err = R_err;
-  _dsdz = dsdz;
-  _dsdz_err = dsdz_err;
-  _s0 = s0;
-  _s0_err = s0_err;
-  _transverse_chisq = transverse_chisq;
-  _longitudinal_chisq = longitudinal_chisq;
-  _chisq = chisq;
-  _chisq_dof = chisq_dof;
+void SimpleHelix::set_parameters(const std::vector<double>& params,
+                                 const std::vector<double>& errors,
+                                 const std::vector<int>& ndfs,
+                                 const std::vector<double>& chisqs,
+                                 double pvalue,
+                                 TMatrixD& cov) {
+  _params = params;
+  _errors = errors;
+  _ndfs = ndfs;
+  _chisqs = chisqs;
   _pvalue = pvalue;
   _cov = cov;
 }
