@@ -88,6 +88,12 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         self.assertLess(h6.GetRMS(), 2)
         self.assertGreater(h6.GetEntries(), 190)
 
+        tree.Draw(
+          "_spill._recon._scifi_event._scifihelicalprtracks._charge>>h10")
+        h10 = ROOT.gDirectory.Get('h10')
+        self.assertLess(h10.GetMean(), -0.95)
+        self.assertGreater(h10.GetMean(), -1.05)
+
     def test_helical_recon_minuit(self):
         """ TestSciFiRecon: Run helical simulation & check \
             the output (MINUIT) """
@@ -108,7 +114,7 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         tree.Draw(
           "_spill._recon._scifi_event._scifihelicalprtracks._line_sz_chisq>>h7")
         h7 = ROOT.gDirectory.Get('h7')
-        self.assertLess(h7.GetMean(), 12)
+        self.assertLess(h7.GetMean(), 18)
         self.assertLess(h7.GetRMS(), 50)
         self.assertGreater(h7.GetEntries(), 190)
 
@@ -118,6 +124,12 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         self.assertLess(h8.GetMean(), 1.0)
         self.assertLess(h8.GetRMS(), 2)
         self.assertGreater(h8.GetEntries(), 190)
+
+        tree.Draw(
+          "_spill._recon._scifi_event._scifihelicalprtracks._charge>>h9")
+        h9 = ROOT.gDirectory.Get('h9')
+        self.assertLess(h9.GetMean(), -0.95)
+        self.assertGreater(h9.GetMean(), -1.05)
 
 if __name__ == "__main__":
     unittest.main()
