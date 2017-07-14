@@ -106,6 +106,12 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Set the chi^2 of the straight line fit in s-z */
     void set_line_sz_chisq(double line_sz_chisq) { _line_sz_chisq = line_sz_chisq; }
 
+    /** Get the ndf of the straight line fit in s-z */
+    int get_line_sz_ndf() const { return _line_sz_ndf; }
+
+    /** Set the ndf of the straight line fit in s-z */
+    void set_line_sz_ndf(int line_sz_ndf) { _line_sz_ndf = line_sz_ndf; }
+
     /** Get the x coordinate of the centre of the circle */
     double get_circle_x0() const { return _circle_x0; }
 
@@ -124,6 +130,12 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Set the chi^2 of the circle fit in x-y */
     void set_circle_chisq(double circle_chisq) { _circle_chisq = circle_chisq; }
 
+    /** Get the ndf of the circle fit in x-y */
+    int get_circle_ndf() const { return _circle_ndf; }
+
+    /** Set the ndf of the circle fit in x-y */
+    void set_circle_ndf(int circle_ndf) { _circle_ndf = circle_ndf; }
+
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
@@ -131,12 +143,14 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     int _tracker;                 /** Tracker number, 0 for upstream, 1 for downstream */
     static const int _type = 1;   /** Track type identifier, 0 for straight, 1 for helical */
     double _R;                    /** Radius of the track fit */
-    double _dsdz;                 /** Gradient of the s-z fit in tracker local coordinates */
-    double _line_sz_c;            /** Intercept of the s-z fit in tracker local coordinates */
-    double _line_sz_chisq;        /** ChiSq of the s-z fit */
+    double _dsdz;                 /** Gradient of longitudinal fit in tracker local coordinates */
+    double _line_sz_c;            /** Intercept of longitudinal fit in tracker local coordinates */
+    double _line_sz_chisq;        /** ChiSq of the longitudinal fit */
+    int _line_sz_ndf;             /** Number of degrees of freedom of the longitudunal fit */
     double _circle_x0;            /** x coord of the circle centre in tracker local coordinates */
     double _circle_y0;            /** y coord of the circle centre in tracker local coordinates */
     double _circle_chisq;         /** ChiSq of the circle (x-y) fit */
+    int _circle_ndf;              /** Number of degrees of freedom of the circle fit */
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };

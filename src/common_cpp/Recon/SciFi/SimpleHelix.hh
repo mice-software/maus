@@ -32,10 +32,16 @@ class SimpleHelix {
     /** Default constructor */
     SimpleHelix();
 
+    /** Copy constructor */
+    SimpleHelix(const SimpleHelix &helix);
+
     /** Parameter constructor */
     SimpleHelix(const std::vector<double>& params, const std::vector<double>& errors,
                 const std::vector<int>& ndfs, const std::vector<double>& chisqs,
                 double pvalue, TMatrixD& cov);
+
+    /** Assignment operator */
+    SimpleHelix& operator=(const SimpleHelix& rhs);
 
     /** Destructor */
     ~SimpleHelix();
@@ -59,6 +65,10 @@ class SimpleHelix {
     double get_chisq() const { return _chisqs[2]; }
     double get_pvalue() const { return _pvalue; }
     TMatrixD get_cov() const { return _cov; }
+    std::vector<double> get_parameters() const { return _params; }
+    std::vector<double> get_errors() const { return _errors; }
+    std::vector<int> get_ndfs() const { return _ndfs; }
+    std::vector<double> get_chisqs() const { return _chisqs; }
 
     // Setters
     void clear();
@@ -80,9 +90,13 @@ class SimpleHelix {
     void set_chisq(double chisq) { _chisqs[2] = chisq; }
     void set_pvalue(double pvalue) { _pvalue = pvalue; }
     void set_cov(TMatrixD cov) { _cov = cov; }
-    void set_parameters(const std::vector<double>& params, const std::vector<double>& _errors,
-                        const std::vector<int>& ndfs, const std::vector<double>& _chisqs,
-                        double pvalue, TMatrixD& cov);
+    void set_parameters(std::vector<double>& params) { _params = params; }
+    void set_errors(std::vector<double>& errors) { _errors = errors; }
+    void set_ndfs(std::vector<int>& ndfs) { _ndfs = ndfs; }
+    void set_chisqs(std::vector<double>& chisqs) { _chisqs = chisqs; }
+    void set_all(const std::vector<double>& params, const std::vector<double>& _errors,
+                 const std::vector<int>& ndfs, const std::vector<double>& _chisqs,
+                 double pvalue, TMatrixD& cov);
 
   private:
     std::vector<double> _params;   // xc, yc, rad, dsdz, s0

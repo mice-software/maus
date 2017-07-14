@@ -432,6 +432,15 @@ class PatternRecognition {
     bool missing_sp_search_helical(std::vector<SciFiSpacePoint*>& spnts,
                                    SciFiHelicalPRTrack* trk) const;
 
+    /** @brief Simple function to make sure we calc the circle ndf consistently */
+    int calc_circle_ndf(int npoints) const { return (2*npoints - 1); }
+
+    /** @brief Simple function to make sure we calc the lsq longitudinal ndf consistently */
+    int calc_lsq_longitudinal_ndf(int npoints) const  { return (npoints - 2); }
+
+    /** @brief Simple function to make sure we calc the minuit longitudinal ndf consistently */
+    int calc_minuit_longitudinal_ndf(int npoints) const { return (npoints - 1); }
+
   private:
     bool _debug;                /** Run in debug mode */
     bool _up_straight_pr_on;    /** Upstream straight pattern recogntion on or off */

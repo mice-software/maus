@@ -39,6 +39,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("line_sz_chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_line_sz_chisq,
                         &SciFiHelicalPRTrack::set_line_sz_chisq, true);
+    RegisterValueBranch<int>("line_sz_ndf", &_int_proc,
+                        &SciFiHelicalPRTrack::get_line_sz_ndf,
+                        &SciFiHelicalPRTrack::set_line_sz_ndf, false);
     RegisterValueBranch("circle_x0", &_double_proc,
                         &SciFiHelicalPRTrack::get_circle_x0,
                         &SciFiHelicalPRTrack::set_circle_x0, true);
@@ -48,6 +51,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("circle_chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_circle_chisq,
                         &SciFiHelicalPRTrack::set_circle_chisq, true);
+    RegisterValueBranch<int>("circle_ndf", &_int_proc,
+                        &SciFiHelicalPRTrack::get_circle_ndf,
+                        &SciFiHelicalPRTrack::set_circle_ndf, false);
     RegisterValueBranch<double>("chi_squared", &_double_proc,
                         &SciFiHelicalPRTrack::get_chi_squared,
                         &SciFiHelicalPRTrack::set_chi_squared, false);

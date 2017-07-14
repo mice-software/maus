@@ -19,7 +19,7 @@
 
 namespace MAUS {
 
-// Constructors
+// Default constructor
 SimpleHelix::SimpleHelix() : _params {0.0, 0.0, 0.0, 0.0, 0.0},
                              _errors {0.0, 0.0, 0.0, 0.0, 0.0},
                              _ndfs {0, 0, 0},
@@ -27,6 +27,27 @@ SimpleHelix::SimpleHelix() : _params {0.0, 0.0, 0.0, 0.0, 0.0},
                              _pvalue {0.0} {
   _cov.ResizeTo(4, 4);
 }
+
+// Assignment operator
+SimpleHelix& SimpleHelix::operator=(const SimpleHelix& rhs) {
+  if (this == &rhs) {
+      return *this;
+  }
+  _params = rhs.get_parameters();
+  _errors = rhs.get_errors();
+  _ndfs = rhs.get_ndfs();
+  _chisqs = rhs.get_chisqs();
+  _pvalue = rhs.get_pvalue();
+  _cov = rhs.get_cov();
+
+  return *this;
+}
+
+// Copy constructor
+SimpleHelix::SimpleHelix(const SimpleHelix &helix) {
+  *this = helix;
+}
+
 
 SimpleHelix::SimpleHelix(const std::vector<double>& params,
                          const std::vector<double>& errors,
@@ -54,12 +75,12 @@ void SimpleHelix::clear() {
   _cov = TMatrixD(4, 4);
 }
 
-void SimpleHelix::set_parameters(const std::vector<double>& params,
-                                 const std::vector<double>& errors,
-                                 const std::vector<int>& ndfs,
-                                 const std::vector<double>& chisqs,
-                                 double pvalue,
-                                 TMatrixD& cov) {
+void SimpleHelix::set_all(const std::vector<double>& params,
+                          const std::vector<double>& errors,
+                          const std::vector<int>& ndfs,
+                          const std::vector<double>& chisqs,
+                          double pvalue,
+                          TMatrixD& cov) {
   _params = params;
   _errors = errors;
   _ndfs = ndfs;

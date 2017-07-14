@@ -30,9 +30,11 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack()
     _dsdz(-1.0),
     _line_sz_c(-1.0),
     _line_sz_chisq(-1.0),
+    _line_sz_ndf(-1),
     _circle_x0(-1.0),
     _circle_y0(-1.0),
-    _circle_chisq(-1.0) {
+    _circle_chisq(-1.0),
+    _circle_ndf(-1) {
   // Do nothing
 }
 
@@ -43,9 +45,11 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SimpleHelix& helix, SciFiSpacePoi
     _dsdz(helix.get_dsdz()),
     _line_sz_c(helix.get_s0()),
     _line_sz_chisq(helix.get_longitudinal_chisq()),
+    _line_sz_ndf(helix.get_longitudinal_ndf()),
     _circle_x0(helix.get_xc()),
     _circle_y0(helix.get_yc()),
-    _circle_chisq(helix.get_transverse_chisq()) {
+    _circle_chisq(helix.get_transverse_chisq()),
+    _circle_ndf(helix.get_transverse_ndf()) {
   this->set_spacepoints_pointers(spoints);
   this->set_chi_squared(helix.get_chisq());
   this->set_ndf((2*this->get_num_points()) - 5); // TODO: Should this be fit number of points?
@@ -62,9 +66,11 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int charge,
     _dsdz(line_sz.get_m()),
     _line_sz_c(line_sz.get_c()),
     _line_sz_chisq(line_sz.get_chisq()),
+    _line_sz_ndf(-1),
     _circle_x0(circle.get_x0()),
     _circle_y0(circle.get_y0()),
-    _circle_chisq(circle.get_chisq()) {
+    _circle_chisq(circle.get_chisq()),
+    _circle_ndf(-1) {
   this->set_chi_squared(_circle_chisq + _line_sz_chisq);
   this->set_ndf((2*this->get_num_points()) - 5);
 }
@@ -85,9 +91,11 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _dsdz = htrk.get_dsdz();
   _line_sz_c = htrk.get_line_sz_c();
   _line_sz_chisq = htrk.get_line_sz_chisq();
+  _line_sz_ndf = htrk.get_line_sz_ndf();
   _circle_chisq = htrk.get_circle_chisq();
   _circle_x0 = htrk.get_circle_x0();
   _circle_y0 = htrk.get_circle_y0();
+  _circle_ndf = htrk.get_circle_ndf();
   _tracker = htrk.get_tracker();
   return *this;
 }
@@ -103,8 +111,10 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _dsdz(htrk.get_dsdz()),
     _line_sz_c(htrk.get_line_sz_c()),
     _line_sz_chisq(htrk.get_line_sz_chisq()),
+    _line_sz_ndf(htrk.get_line_sz_ndf()),
     _circle_x0(htrk.get_circle_x0()),
     _circle_y0(htrk.get_circle_y0()),
-    _circle_chisq(htrk.get_circle_chisq()) {
+    _circle_chisq(htrk.get_circle_chisq()),
+    _circle_ndf(htrk.get_circle_ndf()) {
 }
 } // ~namespace MAUS

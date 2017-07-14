@@ -88,7 +88,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _circle_minuit_cut(30.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
-                                          _long_minuit_cut(5.0),
+                                          _long_minuit_cut(10.0),
                                           _circle_error_w(1.0),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
@@ -133,7 +133,7 @@ void PatternRecognition::set_parameters_to_default() {
   _circle_minuit_cut = 30.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
-  _long_minuit_cut = 5.0;
+  _long_minuit_cut = 10.0;
   _circle_error_w = 1.0;
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
@@ -803,7 +803,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   }
 
   // If the radius calculated is too large or chisq fails, return NULL
-  if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
+  if ( !good_radius || !((c_trial.get_chisq() / calc_circle_ndf(n_points)) < _circle_chisq_cut) ) {
     if (n_points == 5 && _debug) {
       if (spnts[0]->get_tracker() == 0) {
         _fail_helix_tku->Fill(1);
@@ -860,6 +860,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
     // Make the track
     track = new SciFiHelicalPRTrack(-1, 0.0, c_trial, line_sz, spnts, covariance);
+    track->set_circle_ndf(calc_circle_ndf(n_points));
+    track->set_line_sz_ndf(n_points - 2);
 
   } else if (_longitudinal_fitter == 1) { // Fit the longitudinal parameters via ROOT (MINUIT2)
     SimpleHelix helix;
@@ -884,7 +886,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     if (!result) {
       return NULL;
     }
-    if ((helix.get_longitudinal_chisq() / ((2*n_points) - 1))  > _long_minuit_cut) {
+    if ((helix.get_longitudinal_chisq() / calc_minuit_longitudinal_ndf(n_points))  \
+        > _long_minuit_cut) {
       return NULL;
     }
     if (helix.get_R() > _R_res_cut) {
@@ -898,6 +901,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
     // Make the track
     helix.set_transverse_chisq(c_trial.get_chisq());
+    helix.set_transverse_ndf(calc_circle_ndf(n_points));
+    helix.set_longitudinal_ndf(calc_minuit_longitudinal_ndf(n_points));
     track = new SciFiHelicalPRTrack(helix, spnts);
   }
 
@@ -981,7 +986,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   }
 
   // Check linear fit passes chisq test
-  if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
+  if ( !((line_sz.get_chisq() / calc_lsq_longitudinal_ndf(n_points)) < _sz_chisq_cut) ) {
     if (n_points == 5 && _debug) {
       if (spnts[0]->get_tracker() == 0) {
         _fail_helix_tku->Fill(3);

@@ -296,7 +296,7 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(30.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(5.0, pr._long_minuit_cut);
+  EXPECT_EQ(10.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
@@ -328,7 +328,7 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(30.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(5.0, pr._long_minuit_cut);
+  EXPECT_EQ(10.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
