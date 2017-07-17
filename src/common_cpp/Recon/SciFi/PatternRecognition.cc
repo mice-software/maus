@@ -774,6 +774,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   SciFiHelicalPRTrack* track = NULL;
   bool good_radius = false;
   int handedness = 0; // The particle track handedness
+
+  // Pull out spacepoints coordinates in order given
   std::vector<double> x;
   std::vector<double> y;
   std::vector<double> z;
@@ -782,7 +784,22 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
       y.push_back(sp->get_position().y());
       z.push_back(sp->get_position().z());
   }
-
+  // Pull out spacepoints coordinates in order of ascending tracker local z
+  std::vector<SciFiSpacePoint*> ordered_spnts = spnts;
+  std::sort(ordered_spnts.begin(), ordered_spnts.end(), \
+      [](SciFiSpacePoint* a, SciFiSpacePoint* b) {
+        return a->get_position().z() < b->get_position().z();
+      });
+  std::vector<double> ox;
+  std::vector<double> oy;
+  std::vector<double> oz;
+  for (auto sp : ordered_spnts) {
+    ox.push_back(sp->get_position().x());
+    oy.push_back(sp->get_position().y());
+    oz.push_back(sp->get_position().z());
+  }
+  // Create a vector of the measurement errors in order of ascending tracker local z
+  std::vector<double> err = {_sd_1to4, _sd_1to4, _sd_1to4, _sd_1to4, _sd_5};
 
   // Fit the transverse projection (a circle)
   // ----------------------------------------
@@ -797,7 +814,7 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
                                                  spnts, c_trial, cov_circle);
   } else if (_circle_fitter == 1) {
     // With a ROOT MINUIT based fitter
-    good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
+    good_radius = RootFitter::FitCircleMinuit(x, y, err, err, c_trial, cov_circle);
     if (c_trial.get_R() > _R_res_cut)
         good_radius = false;
   }
@@ -865,24 +882,10 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   } else if (_longitudinal_fitter == 1) { // Fit the longitudinal parameters via ROOT (MINUIT2)
     SimpleHelix helix;
-    // Hand the spacepoint positions to the fitter order by ascending z
-    std::vector<SciFiSpacePoint*> ordered_spnts = spnts;
-    std::sort(ordered_spnts.begin(), ordered_spnts.end(), \
-        [](SciFiSpacePoint* a, SciFiSpacePoint* b) {
-          return a->get_position().z() < b->get_position().z();
-        });
-    std::vector<double> ox;
-    std::vector<double> oy;
-    std::vector<double> oz;
-    for (auto sp : ordered_spnts) {
-      ox.push_back(sp->get_position().x());
-      oy.push_back(sp->get_position().y());
-      oz.push_back(sp->get_position().z());
-    }
 
     // Call the fitter
     const double pStart[4] = {c_trial.get_x0(), c_trial.get_y0(), c_trial.get_R(), 0.0};
-    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, pStart, helix);
+    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, err, err, pStart, helix);
     if (!result) {
       return NULL;
     }

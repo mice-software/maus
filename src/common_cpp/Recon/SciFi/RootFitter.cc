@@ -58,9 +58,10 @@ bool FitLineLinear(const std::vector<double>& x, const std::vector<double>& y,
 }
 
 bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
+                     const std::vector<double>& xerr, const std::vector<double>& yerr,
                      MAUS::SimpleCircle& circ, TMatrixD& cov_matrix) {
 
-  auto Chi2Function = [&x, &y](const double *par) {
+  auto Chi2Function = [&x, &y, &xerr, &yerr](const double *par) {
     // Minimisation function computing the sum of squares of residuals
     // looping over the points
     double f = 0.0;
@@ -68,7 +69,7 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
         double u = x[i] - par[0];
         double v = y[i] - par[1];
         double dr = par[2] - std::sqrt(u*u+v*v);
-        f += dr*dr;
+        f += (dr*dr) / (xerr[i]*yerr[i]);
     }
     return f;
   };
@@ -105,13 +106,14 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
   return true;
 }
 
-bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
-                    const std::vector<double>& z, const double* pStart, MAUS::SimpleHelix& helix) {
+bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,const std::vector<double>& z,
+                    const std::vector<double>& xerr, const std::vector<double>& yerr,
+                    const double* pStart, MAUS::SimpleHelix& helix) {
 
   double x0 = x[0];
   double y0 = y[0];
 
-  auto Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
+  auto Chi2Function = [&x, &y, &z, &xerr, &yerr, &x0, &y0](const double *par) {
     // Minimisation function computing the sum of squares of residuals looping over the points
     double xc = par[0];
     double yc = par[1];
@@ -124,7 +126,7 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
         double g = yc + (y0 - yc)*cos(theta) + (x0 - xc)*sin(theta);
         double dx = f - x[i];
         double dy = g - y[i];
-        double dchisq = (dx*dx) + (dy*dy);
+        double dchisq = ((dx*dx) + (dy*dy)) / (xerr[i]*yerr[i]);
         // std::cerr << "Chi2Function: " << xc << " " << yc << " " << rad << " " << dsdz  << " "
         //           << z[i] << " " << theta << " " << cos(theta) << " " << sin(theta) << " "
         //           << f << " " << x[i] << " " << dx << " "

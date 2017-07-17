@@ -52,6 +52,7 @@ bool FitLineLinear(const std::vector<double>& x, const std::vector<double>& y,
   * @param[out] cov_matrix The 3*3 covariance matrix of the returned parameters
   */
 bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
+                     const std::vector<double>& xerr, const std::vector<double>& yerr,
                      MAUS::SimpleCircle& circ, TMatrixD& cov_matrix);
 
 /** @brief Fit a helix using the ROOT MINUIT minimiser class
@@ -60,6 +61,7 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
   * @param[out] helix The fit result
   */
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
+                    const std::vector<double>& xerr, const std::vector<double>& yerr,
                     const std::vector<double>& z, const double* pStart, MAUS::SimpleHelix& helix);
 }
 
