@@ -554,7 +554,7 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_lsq) {
   EXPECT_EQ(5, htrks[4]->get_num_points());
   EXPECT_EQ(5, htrks[5]->get_num_points());
   EXPECT_EQ(5, htrks[6]->get_num_points());
-  ASSERT_EQ(5, htrks[7]->get_num_points());
+  EXPECT_EQ(5, htrks[7]->get_num_points());
   // Check npe, which we used to encode which sp belongs to which tracks
   for (SciFiHelicalPRTrack* trk : htrks) {
     std::vector<SciFiSpacePoint*> spnts = trk->get_spacepoints_pointers();
@@ -616,7 +616,7 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_circle_minuit) {
   EXPECT_EQ(5, htrks[4]->get_num_points());
   EXPECT_EQ(5, htrks[5]->get_num_points());
   EXPECT_EQ(5, htrks[6]->get_num_points());
-  ASSERT_EQ(5, htrks[7]->get_num_points());
+  EXPECT_EQ(5, htrks[7]->get_num_points());
   // Check npe, which we used to encode which sp belongs to which tracks
   for (SciFiHelicalPRTrack* trk : htrks) {
     std::vector<SciFiSpacePoint*> spnts = trk->get_spacepoints_pointers();
@@ -625,13 +625,13 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_circle_minuit) {
     EXPECT_NEAR(spnts[3]->get_npe(), spnts[0]->get_npe(), 0.01);
     EXPECT_NEAR(spnts[4]->get_npe(), spnts[0]->get_npe(), 0.01);
   }
-  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.342, 0.01);
-  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.005);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.342, 0.01);
+  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.1156, 0.005);
   EXPECT_NEAR(htrks[2]->get_dsdz(), -0.01834, 0.01);
   EXPECT_NEAR(htrks[3]->get_dsdz(), -0.1178, 0.01);
   EXPECT_NEAR(htrks[4]->get_dsdz(), 0.08396, 0.001);
-  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.3126, 0.001);
-  EXPECT_NEAR(htrks[5]->get_dsdz(), 0.1257, 0.001);
+  EXPECT_NEAR(htrks[5]->get_dsdz(), 0.3126, 0.001);
+  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.1257, 0.001);
   EXPECT_NEAR(htrks[7]->get_dsdz(), 0.1504, 0.001);
 }
 
