@@ -60,6 +60,15 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch<int>("ndf", &_int_proc,
                         &SciFiHelicalPRTrack::get_ndf,
                         &SciFiHelicalPRTrack::set_ndf, false);
+    RegisterValueBranch<int>("alg_used_circle", &_int_proc,
+                        &SciFiHelicalPRTrack::get_alg_used_circle,
+                        &SciFiHelicalPRTrack::set_alg_used_circle, false);
+    RegisterValueBranch<int>("alg_used_longitudinal", &_int_proc,
+                        &SciFiHelicalPRTrack::get_alg_used_longitudinal,
+                        &SciFiHelicalPRTrack::set_alg_used_longitudinal, false);
+    RegisterValueBranch<int>("alg_used_full", &_int_proc,
+                        &SciFiHelicalPRTrack::get_alg_used_full,
+                        &SciFiHelicalPRTrack::set_alg_used_full, false);
     RegisterTRefArray("spacepoints", &_spoint_tref_proc,
                         &SciFiHelicalPRTrack::get_spacepoints,
                         &SciFiHelicalPRTrack::set_spacepoints, true);

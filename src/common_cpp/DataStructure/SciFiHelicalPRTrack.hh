@@ -139,6 +139,28 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     /** Get the track type, for straight, 1 for helical */
     int get_type() const { return _type; }
 
+    /** Get the circle fit algorithm used  -1 = None, 0 - LSQ, 1 - MINUIT */
+    int get_alg_used_circle() const { return _alg_used_circle; }
+
+    /** Set the circle fit algorithm used  -1 = None, 0 - LSQ, 1 - MINUIT.
+      * NB: this will NOT set the fit to come, only records what fit already happened! */
+    void set_alg_used_circle(int alg_used_circle) { _alg_used_circle = alg_used_circle; }
+
+    /** Get the longitudinal fit algorithm used  -1 = None, 0 - LSQ, 1 - MINUIT */
+    int get_alg_used_longitudinal() const { return _alg_used_longitudinal; }
+
+    /** Set the longitudinal fit algorithm used  -1 = None, 0 - LSQ, 1 - MINUIT.
+      * NB: this will NOT set the fit to come, only records what fit already happened! */
+    void set_alg_used_longitudinal(int alg_used_longitudinal) { \
+      _alg_used_longitudinal = alg_used_longitudinal; }
+
+    /** Get the full fit algorithm used  -1 = None, 0 - LSQ, 1 - MINUIT */
+    int get_alg_used_full() const { return _alg_used_full; }
+
+    /** Set the full fit algorithm used  -1 = None, 0 - LSQ, 1 - MINUIT.
+      * NB: this will NOT set the fit to come, only records what fit already happened! */
+    void set_alg_used_full(int alg_used_full) { _alg_used_full = alg_used_full; }
+
   private:
     int _tracker;                 /** Tracker number, 0 for upstream, 1 for downstream */
     static const int _type = 1;   /** Track type identifier, 0 for straight, 1 for helical */
@@ -151,6 +173,9 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     double _circle_y0;            /** y coord of the circle centre in tracker local coordinates */
     double _circle_chisq;         /** ChiSq of the circle (x-y) fit */
     int _circle_ndf;              /** Number of degrees of freedom of the circle fit */
+    int _alg_used_circle;         /** Circle fit algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
+    int _alg_used_longitudinal;   /** Longitudinal algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
+    int _alg_used_full;           /** Full 3D fit algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };

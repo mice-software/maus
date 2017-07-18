@@ -34,7 +34,10 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack()
     _circle_x0(-1.0),
     _circle_y0(-1.0),
     _circle_chisq(-1.0),
-    _circle_ndf(-1) {
+    _circle_ndf(-1),
+    _alg_used_circle(0),
+    _alg_used_longitudinal(0),
+    _alg_used_full(-1)  {
   // Do nothing
 }
 
@@ -49,7 +52,10 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SimpleHelix& helix, SciFiSpacePoi
     _circle_x0(helix.get_xc()),
     _circle_y0(helix.get_yc()),
     _circle_chisq(helix.get_transverse_chisq()),
-    _circle_ndf(helix.get_transverse_ndf()) {
+    _circle_ndf(helix.get_transverse_ndf()),
+    _alg_used_circle(0),
+    _alg_used_longitudinal(0),
+    _alg_used_full(-1) {
   this->set_spacepoints_pointers(spoints);
   this->set_chi_squared(helix.get_chisq());
   this->set_ndf((2*this->get_num_points()) - 5); // TODO: Should this be fit number of points?
@@ -70,7 +76,10 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int charge,
     _circle_x0(circle.get_x0()),
     _circle_y0(circle.get_y0()),
     _circle_chisq(circle.get_chisq()),
-    _circle_ndf(-1) {
+    _circle_ndf(-1),
+    _alg_used_circle(0),
+    _alg_used_longitudinal(0),
+    _alg_used_full(-1) {
   this->set_chi_squared(_circle_chisq + _line_sz_chisq);
   this->set_ndf((2*this->get_num_points()) - 5);
 }
@@ -97,6 +106,9 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _circle_y0 = htrk.get_circle_y0();
   _circle_ndf = htrk.get_circle_ndf();
   _tracker = htrk.get_tracker();
+  _alg_used_circle = htrk.get_alg_used_circle();
+  _alg_used_longitudinal = htrk.get_alg_used_longitudinal();
+  _alg_used_full = htrk.get_alg_used_full();
   return *this;
 }
 
@@ -115,6 +127,9 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _circle_x0(htrk.get_circle_x0()),
     _circle_y0(htrk.get_circle_y0()),
     _circle_chisq(htrk.get_circle_chisq()),
-    _circle_ndf(htrk.get_circle_ndf()) {
+    _circle_ndf(htrk.get_circle_ndf()),
+    _alg_used_circle(htrk.get_alg_used_circle()),
+    _alg_used_longitudinal(htrk.get_alg_used_longitudinal()),
+    _alg_used_full(htrk.get_alg_used_full()) {
 }
 } // ~namespace MAUS

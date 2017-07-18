@@ -862,7 +862,6 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     track = new SciFiHelicalPRTrack(-1, 0.0, c_trial, line_sz, spnts, covariance);
     track->set_circle_ndf(calc_circle_ndf(n_points));
     track->set_line_sz_ndf(n_points - 2);
-
   } else if (_longitudinal_fitter == 1) { // Fit the longitudinal parameters via ROOT (MINUIT2)
     SimpleHelix helix;
     // Hand the spacepoint positions to the fitter order by ascending z
@@ -923,8 +922,10 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
   }
   track->set_charge(charge);
 
-  // Set the number of points fitted
+  // Set the number of points fitted and the fit algorithms used
   track->set_n_fit_points(n_points);
+  track->set_alg_used_circle(_circle_fitter);
+  track->set_alg_used_longitudinal(_longitudinal_fitter);
 
   return track;
 }

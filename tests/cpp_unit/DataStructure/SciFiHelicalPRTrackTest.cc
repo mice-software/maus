@@ -49,6 +49,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_default_constructor) {
   EXPECT_EQ(prtrack.get_charge(), 0);
   EXPECT_EQ(prtrack.get_spacepoints()->GetEntries(), size);
   EXPECT_EQ(prtrack.get_covariance().size(), 0);
+  EXPECT_EQ(prtrack.get_alg_used_circle(), 0);
+  EXPECT_EQ(prtrack.get_alg_used_longitudinal(), 0);
+  EXPECT_EQ(prtrack.get_alg_used_full(), -1);
 }
 
 // TEST_F(SciFiHelicalPRTrackTestDS, test_parameter_constructor) {
@@ -79,7 +82,7 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   double circ_chisq = 6.0;
   double chisq = sz_chisq + circ_chisq;
   int ndf = 5.0;
-  double point_spread = 10.0;
+
   std::vector<double> cov(0);
   cov.push_back(10.0);
 
@@ -114,6 +117,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_simplefit_constructor) {
   EXPECT_EQ(trk.get_charge(), charge);
   EXPECT_EQ(trk.get_chi_squared(), chisq);
   EXPECT_EQ(trk.get_ndf(), ndf);
+  EXPECT_EQ(trk.get_alg_used_circle(), 0);
+  EXPECT_EQ(trk.get_alg_used_longitudinal(), 0);
+  EXPECT_EQ(trk.get_alg_used_full(), -1);
   EXPECT_EQ(trk.get_spacepoints()->GetEntries(), num_points);
   EXPECT_EQ(static_cast<SciFiSpacePoint*>(trk.get_spacepoints()->At(0))->get_tracker(), tracker);
   ASSERT_EQ(trk.get_covariance().size(), 1);
@@ -139,6 +145,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   double circle_y0 = 7.0;
   double circle_chisq = 8.0;
   int circle_ndf = 12;
+  int alg_used_circle = 1;
+  int alg_used_longitudinal = 1;
+  int alg_used_full = 0;
   std::vector<double> cov(0);
   cov.push_back(10.0);
 
@@ -155,6 +164,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   trk1->set_circle_y0(circle_y0);
   trk1->set_circle_chisq(circle_chisq);
   trk1->set_circle_ndf(circle_ndf);
+  trk1->set_alg_used_circle(alg_used_circle);
+  trk1->set_alg_used_longitudinal(alg_used_longitudinal);
+  trk1->set_alg_used_full(alg_used_full);
   trk1->set_covariance(cov);
 
   SciFiSpacePointPArray spoints;
@@ -188,6 +200,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_copy_constructor) {
   EXPECT_EQ(trk2.get_num_points(), num_points);
   EXPECT_EQ(trk2.get_num_triplets(), num_points);
   EXPECT_EQ(trk2.get_charge(), charge);
+  EXPECT_EQ(trk2.get_alg_used_circle(), alg_used_circle);
+  EXPECT_EQ(trk2.get_alg_used_longitudinal(), alg_used_longitudinal);
+  EXPECT_EQ(trk2.get_alg_used_full(), alg_used_full);
   EXPECT_EQ(static_cast<SciFiSpacePoint*>(trk2.get_spacepoints()->At(0))->get_tracker(), tracker);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
   EXPECT_EQ(trk2.get_covariance()[0], 10.0);
@@ -256,6 +271,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   double circle_y0 = 7.0;
   double circle_chisq = 8.0;
   int circle_ndf = 12;
+  int alg_used_circle = 1;
+  int alg_used_longitudinal = 1;
+  int alg_used_full = 0;
   std::vector<double> cov(0);
   cov.push_back(10.0);
 
@@ -272,6 +290,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   trk1->set_circle_y0(circle_y0);
   trk1->set_circle_chisq(circle_chisq);
   trk1->set_circle_ndf(circle_ndf);
+  trk1->set_alg_used_circle(alg_used_circle);
+  trk1->set_alg_used_longitudinal(alg_used_longitudinal);
+  trk1->set_alg_used_full(alg_used_full);
   trk1->set_covariance(cov);
 
   SciFiSpacePointPArray spoints;
@@ -301,6 +322,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_assignment_operator) {
   EXPECT_EQ(trk2.get_num_points(), num_points);
   EXPECT_EQ(trk2.get_num_triplets(), num_points);
   EXPECT_EQ(trk2.get_charge(), charge);
+  EXPECT_EQ(trk2.get_alg_used_circle(), alg_used_circle);
+  EXPECT_EQ(trk2.get_alg_used_longitudinal(), alg_used_longitudinal);
+  EXPECT_EQ(trk2.get_alg_used_full(), alg_used_full);
   EXPECT_EQ(static_cast<SciFiSpacePoint*>(trk2.get_spacepoints()->At(0))->get_tracker(), tracker);
   ASSERT_EQ(trk2.get_covariance().size(), 1);
   EXPECT_EQ(trk2.get_covariance()[0], 10.0);
@@ -320,6 +344,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   double circle_y0 = 7.0;
   double circle_chisq = 8.0;
   int circle_ndf = 12;
+  int alg_used_circle = 1;
+  int alg_used_longitudinal = 1;
+  int alg_used_full = 0;
   std::vector<double> cov(0);
   cov.push_back(10.0);
 
@@ -350,6 +377,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   trk.set_circle_y0(circle_y0);
   trk.set_circle_chisq(circle_chisq);
   trk.set_circle_ndf(circle_ndf);
+  trk.set_alg_used_circle(alg_used_circle);
+  trk.set_alg_used_longitudinal(alg_used_longitudinal);
+  trk.set_alg_used_full(alg_used_full);
   trk.set_spacepoints_pointers(spoints);
   trk.set_covariance(cov);
 
@@ -367,6 +397,9 @@ TEST_F(SciFiHelicalPRTrackTestDS, test_setters_getters) {
   EXPECT_EQ(trk.get_circle_y0(), circle_y0);
   EXPECT_EQ(trk.get_circle_chisq(), circle_chisq);
   EXPECT_EQ(trk.get_circle_ndf(), circle_ndf);
+  EXPECT_EQ(trk.get_alg_used_circle(), alg_used_circle);
+  EXPECT_EQ(trk.get_alg_used_longitudinal(), alg_used_longitudinal);
+  EXPECT_EQ(trk.get_alg_used_full(), alg_used_full);
   EXPECT_EQ(
     static_cast<SciFiSpacePoint*>(trk.get_spacepoints()->At(0))->get_tracker(), tracker);
   EXPECT_EQ(trk.get_spacepoints_pointers()[0]->get_tracker(), tracker);
