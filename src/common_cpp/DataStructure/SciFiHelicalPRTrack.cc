@@ -37,7 +37,11 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack()
     _circle_ndf(-1),
     _alg_used_circle(0),
     _alg_used_longitudinal(0),
-    _alg_used_full(-1)  {
+    _alg_used_full(-1),
+    _phi0(-1.0),
+    _point_spread(-1.0),
+    _pos0(-1.0, -1.0, -1.0),
+    _phi(0)  {
   // Do nothing
 }
 
@@ -55,7 +59,11 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SimpleHelix& helix, SciFiSpacePoi
     _circle_ndf(helix.get_transverse_ndf()),
     _alg_used_circle(0),
     _alg_used_longitudinal(0),
-    _alg_used_full(-1) {
+    _alg_used_full(-1),
+    _phi0(-1.0),
+    _point_spread(-1.0),
+    _pos0(-1.0, -1.0, -1.0),
+    _phi(0) {
   this->set_spacepoints_pointers(spoints);
   this->set_chi_squared(helix.get_chisq());
   this->set_ndf((2*this->get_num_points()) - 5); // TODO: Should this be fit number of points?
@@ -79,7 +87,11 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(int tracker, int charge,
     _circle_ndf(-1),
     _alg_used_circle(0),
     _alg_used_longitudinal(0),
-    _alg_used_full(-1) {
+    _alg_used_full(-1),
+    _phi0(-1.0),
+    _point_spread(-1.0),
+    _pos0(-1.0, -1.0, -1.0),
+    _phi(0) {
   this->set_chi_squared(_circle_chisq + _line_sz_chisq);
   this->set_ndf((2*this->get_num_points()) - 5);
 }
@@ -109,6 +121,10 @@ SciFiHelicalPRTrack &SciFiHelicalPRTrack::operator=(const SciFiHelicalPRTrack &h
   _alg_used_circle = htrk.get_alg_used_circle();
   _alg_used_longitudinal = htrk.get_alg_used_longitudinal();
   _alg_used_full = htrk.get_alg_used_full();
+  _phi0 = htrk.get_phi0();
+  _point_spread = htrk.get_point_spread();
+  _pos0 = htrk.get_pos0();
+  _phi = htrk.get_phi();
   return *this;
 }
 
@@ -130,6 +146,10 @@ SciFiHelicalPRTrack::SciFiHelicalPRTrack(const SciFiHelicalPRTrack &htrk)
     _circle_ndf(htrk.get_circle_ndf()),
     _alg_used_circle(htrk.get_alg_used_circle()),
     _alg_used_longitudinal(htrk.get_alg_used_longitudinal()),
-    _alg_used_full(htrk.get_alg_used_full()) {
+    _alg_used_full(htrk.get_alg_used_full()),
+    _phi0(htrk.get_phi0()),
+    _point_spread(htrk.get_point_spread()),
+    _pos0(htrk.get_pos0()),
+    _phi(htrk.get_phi()) {
 }
 } // ~namespace MAUS

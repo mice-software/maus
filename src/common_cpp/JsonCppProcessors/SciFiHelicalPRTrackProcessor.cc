@@ -69,6 +69,18 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch<int>("alg_used_full", &_int_proc,
                         &SciFiHelicalPRTrack::get_alg_used_full,
                         &SciFiHelicalPRTrack::set_alg_used_full, false);
+    RegisterValueBranch("phi0", &_double_proc,
+                        &SciFiHelicalPRTrack::get_phi0,
+                        &SciFiHelicalPRTrack::set_phi0, false);
+    RegisterValueBranch("point_spread", &_double_proc,
+                        &SciFiHelicalPRTrack::get_point_spread,
+                        &SciFiHelicalPRTrack::set_point_spread, false);
+    RegisterValueBranch("pos0", &_threevector_proc,
+                        &SciFiHelicalPRTrack::get_pos0,
+                        &SciFiHelicalPRTrack::set_pos0, false);
+    RegisterValueBranch("phi", &_double_array_proc,
+                        &SciFiHelicalPRTrack::get_phi,
+                        &SciFiHelicalPRTrack::set_phi, false);
     RegisterTRefArray("spacepoints", &_spoint_tref_proc,
                         &SciFiHelicalPRTrack::get_spacepoints,
                         &SciFiHelicalPRTrack::set_spacepoints, true);
