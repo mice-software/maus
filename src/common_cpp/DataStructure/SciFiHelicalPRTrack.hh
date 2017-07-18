@@ -161,7 +161,7 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
       * NB: this will NOT set the fit to come, only records what fit already happened! */
     void set_alg_used_full(int alg_used_full) { _alg_used_full = alg_used_full; }
 
-    // ------ Methods for deprecated members left for backwards compatibility, do not use ------ 
+    // ------ Methods for deprecated members left for backwards compatibility, do not use ------
 
     /** Deprecated -  Get the vector the turning angles of the spacepoints used by the track  */
     DoubleArray get_phi() const { return _phi; }
@@ -191,6 +191,7 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     int _tracker;                 /** Tracker number, 0 for upstream, 1 for downstream */
     static const int _type = 1;   /** Track type identifier, 0 for straight, 1 for helical */
     double _R;                    /** Radius of the track fit */
+    double _phi0;                 /** Deprecated - Initial turning angle [radians]. */
     double _dsdz;                 /** Gradient of longitudinal fit in tracker local coordinates */
     double _line_sz_c;            /** Intercept of longitudinal fit in tracker local coordinates */
     double _line_sz_chisq;        /** ChiSq of the longitudinal fit */
@@ -199,15 +200,12 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     double _circle_y0;            /** y coord of the circle centre in tracker local coordinates */
     double _circle_chisq;         /** ChiSq of the circle (x-y) fit */
     int _circle_ndf;              /** Number of degrees of freedom of the circle fit */
+    double _point_spread;         /** Deprecated - Not implemented */
+    ThreeVector _pos0;            /** Deprecated - Intercept of helix with tracker reference surface */
+    DoubleArray _phi;             /** Deprecated - The turning angles of the spacepoints [radians] */
     int _alg_used_circle;         /** Circle fit algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
     int _alg_used_longitudinal;   /** Longitudinal algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
     int _alg_used_full;           /** Full 3D fit algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
-
-    /** Deprecated members, left for backwards compatibility, do not use */
-    double _phi0;                 /** Initial turning angle [radians]. Confusing, to be removed. */
-    double _point_spread;         /** Not implemented */
-    ThreeVector _pos0;            /** Intercept of helix with tracker reference surface, not implemented */
-    DoubleArray _phi;             /** The turning angles of the spacepoints [radians] */
 
     MAUS_VERSIONED_CLASS_DEF(SciFiHelicalPRTrack)
 };
