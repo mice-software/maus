@@ -293,10 +293,10 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(30.0, pr._circle_minuit_cut);
+  EXPECT_EQ(35.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(10.0, pr._long_minuit_cut);
+  EXPECT_EQ(100.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
@@ -325,10 +325,10 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(30.0, pr._circle_minuit_cut);
+  EXPECT_EQ(35.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(10.0, pr._long_minuit_cut);
+  EXPECT_EQ(100.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
@@ -639,8 +639,10 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
 
   PatternRecognition pr;
   pr.set_parameters_to_default();
-  pr.set_circle_fitter(0);
+  pr.set_circle_fitter(1);
   pr.set_longitudinal_fitter(1);
+  pr._circle_minuit_cut = 35.0;
+  pr._long_minuit_cut = 45.0;
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts = set_up_multiple_track_spacepoints();
@@ -670,24 +672,18 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
   strks = evt1.straightprtracks();
   htrks = evt1.helicalprtracks();
 
-  ASSERT_EQ(8u, htrks.size());
-  EXPECT_EQ(0u, strks.size());
-  ASSERT_EQ(5, htrks[0]->get_num_points());
-  ASSERT_EQ(5, htrks[1]->get_num_points());
-  ASSERT_EQ(5, htrks[2]->get_num_points());
-  ASSERT_EQ(5, htrks[3]->get_num_points());
-  ASSERT_EQ(5, htrks[4]->get_num_points());
-  ASSERT_EQ(5, htrks[5]->get_num_points());
-  ASSERT_EQ(5, htrks[6]->get_num_points());
-  ASSERT_EQ(5, htrks[7]->get_num_points());
-  // Check npe, which we used to encode which sp belongs to which tracks
-  for (SciFiHelicalPRTrack* trk : htrks) {
+  for (auto trk : htrks) {
+    ASSERT_EQ(5, trk->get_num_points());
     std::vector<SciFiSpacePoint*> spnts = trk->get_spacepoints_pointers();
     EXPECT_NEAR(spnts[1]->get_npe(), spnts[0]->get_npe(), 0.01);
     EXPECT_NEAR(spnts[2]->get_npe(), spnts[0]->get_npe(), 0.01);
     EXPECT_NEAR(spnts[3]->get_npe(), spnts[0]->get_npe(), 0.01);
     EXPECT_NEAR(spnts[4]->get_npe(), spnts[0]->get_npe(), 0.01);
   }
+
+  ASSERT_EQ(8u, htrks.size());
+  EXPECT_EQ(0u, strks.size());
+
   EXPECT_NEAR(htrks[2]->get_dsdz(), -0.342, 0.001);
   EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
   EXPECT_NEAR(htrks[1]->get_dsdz(), -0.01834, 0.001);
