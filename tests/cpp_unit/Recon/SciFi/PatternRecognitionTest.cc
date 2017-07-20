@@ -293,10 +293,10 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(35.0, pr._circle_minuit_cut);
+  EXPECT_EQ(100.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(100.0, pr._long_minuit_cut);
+  EXPECT_EQ(40.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
@@ -325,10 +325,10 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(35.0, pr._circle_minuit_cut);
+  EXPECT_EQ(100.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(100.0, pr._long_minuit_cut);
+  EXPECT_EQ(40.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
@@ -564,13 +564,23 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_lsq) {
     EXPECT_NEAR(spnts[4]->get_npe(), spnts[0]->get_npe(), 0.01);
   }
   EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
-  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.342, 0.01);
-  EXPECT_NEAR(htrks[2]->get_dsdz(), -0.01834, 0.01);
+  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.342, 0.001);
+  EXPECT_NEAR(htrks[2]->get_dsdz(), -0.01834, 0.001);
   EXPECT_NEAR(htrks[3]->get_dsdz(), -0.1178, 0.01);
   EXPECT_NEAR(htrks[4]->get_dsdz(), 0.1504, 0.001);
   EXPECT_NEAR(htrks[5]->get_dsdz(), 0.3126, 0.001);
   EXPECT_NEAR(htrks[6]->get_dsdz(), 0.08396, 0.001);
   EXPECT_NEAR(htrks[7]->get_dsdz(), 0.1257, 0.001);
+  for (auto trk : htrks) {
+    std::cerr << "LSQ: NPE: " << trk->get_spacepoints_pointers().at(0)->get_npe()
+              << ", xc = " << trk->get_circle_x0() << ", yc = " << trk->get_circle_y0()
+              << ", R = " << trk->get_R() << ", ds/dz = " << trk->get_dsdz() << "  ";
+    for (auto sp : trk->get_spacepoints_pointers()) {
+      std::cerr << sp->get_position().x() << " " << sp->get_position().y() << " "
+                << sp->get_position().z() << "  ";
+    }
+    std::cerr << std::endl;
+  }
 }
 
 TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_circle_minuit) {
@@ -641,8 +651,12 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
   pr.set_parameters_to_default();
   pr.set_circle_fitter(1);
   pr.set_longitudinal_fitter(1);
-  pr._circle_minuit_cut = 35.0;
-  pr._long_minuit_cut = 45.0;
+  pr._circle_minuit_cut = 200.0;
+  pr._long_minuit_cut = 40.0;
+  pr.calculate_expected_handedness(4.0, 4.0, -1);
+
+  ASSERT_EQ(pr._expected_handedness_t1, -1);
+  ASSERT_EQ(pr._expected_handedness_t2, 1);
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts = set_up_multiple_track_spacepoints();
@@ -673,6 +687,17 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
   htrks = evt1.helicalprtracks();
 
   for (auto trk : htrks) {
+    std::cerr << "MINUIT: NPE: " << trk->get_spacepoints_pointers().at(0)->get_npe()
+              << ", xc = " << trk->get_circle_x0() << ", yc = " << trk->get_circle_y0()
+              << ", R = " << trk->get_R() << ", ds/dz = " << trk->get_dsdz() << "  ";
+    for (auto sp : trk->get_spacepoints_pointers()) {
+      std::cerr << sp->get_position().x() << " " << sp->get_position().y() << " "
+                << sp->get_position().z() << "  ";
+    }
+    std::cerr << std::endl;
+  }
+
+  for (auto trk : htrks) {
     ASSERT_EQ(5, trk->get_num_points());
     std::vector<SciFiSpacePoint*> spnts = trk->get_spacepoints_pointers();
     EXPECT_NEAR(spnts[1]->get_npe(), spnts[0]->get_npe(), 0.01);
@@ -691,7 +716,7 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
   EXPECT_NEAR(htrks[7]->get_dsdz(), 0.08396, 0.001);
   EXPECT_NEAR(htrks[4]->get_dsdz(), 0.3126, 0.001);
   EXPECT_NEAR(htrks[5]->get_dsdz(), 0.1257, 0.0015);
-  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.1504, 0.001);
+  EXPECT_NEAR(htrks[6]->get_dsdz(), 0.1504, 0.002);
 }
 
 // TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_helixfit) {

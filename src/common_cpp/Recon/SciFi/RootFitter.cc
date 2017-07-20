@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 
 // ROOT headers
 #include "TLinearFitter.h"
@@ -106,7 +107,8 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
 }
 
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
-                    const std::vector<double>& z, const double* pStart, MAUS::SimpleHelix& helix) {
+                    const std::vector<double>& z, const double* pStart,
+                    MAUS::SimpleHelix& helix, int handedness, double cut) {
 
   double x0 = x[0];
   double y0 = y[0];
@@ -136,20 +138,51 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
     return chisq;
   };
 
-  // Scan the function to seed the minimiser
+  // Scan the function to seed the minimiser.
+  // Will take minimum chisq value, unless we have an expected handedness (i.e. dsdz sign) supplied
+  // in which case we will use that exclude wrong sign candidates
   double nsteps = 100.0;
   if (pStart[2] < 10.0) nsteps = 200.0;
-  const double lower_limit = -1.0;
-  const double upper_limit = 1.0;
+  double lower_limit = -1.0;
+  double upper_limit = 1.0;
+  if (handedness == 1) {
+    lower_limit = 0.0;
+    upper_limit = 1.0;
+  } else if (handedness == -1) {
+    lower_limit = -1.0;
+    upper_limit = 0.0;
+  }
   double step_size = (upper_limit - lower_limit) / nsteps;
   double min_chisq = 10000000000.0;
   double dsdz_seed = pStart[3];
+  double threshold = 50.0; // min chisq for dsdz to be considered as candidate
+  if (threshold < cut) threshold = cut; // Musn't have a lower value than the patrec level cut
+  std::vector<double> candidate_seeds;
   for (double seed = lower_limit; seed < upper_limit + step_size; seed += step_size) {
     const double params[4] = {pStart[0], pStart[1], pStart[2], seed};
     double resid = Chi2Function(params);
     if (resid < min_chisq) {
       min_chisq = resid;
       dsdz_seed = seed;
+    }
+    // Can only look for other candidates if we have the expected dsdz sign (the handedness)
+    if ((handedness == 1 || handedness == -1) && (resid < threshold)) {
+      candidate_seeds.push_back(seed);
+    }
+  }
+  // Check if we have other viable dsdz_seed values which are better based on proximity to 0
+  // (in value of the actual seed, not the corresponding chisq). If no candidates pass the
+  // threshold cut just stick with the smallest chisq value from above
+  if (candidate_seeds.size() > 0) {
+    double new_dsdz_seed = 2.0; // outside allowed range to start
+    for (auto cs : candidate_seeds) {
+      // If candidate value has the expected handedness
+      if (((cs < 0.0) && (handedness < 0)) || ((cs > 0.0) && (handedness > 0))) {
+          if (fabs(cs) < fabs(new_dsdz_seed)) new_dsdz_seed = cs;
+      }
+    }
+    if (new_dsdz_seed <= 1.0) { // Check we are not still on new_dsdz_seed = 2.0
+      dsdz_seed = new_dsdz_seed;
     }
   }
   // std::cerr << "dsdz_seed = " << dsdz_seed << ", with chisq = " << min_chisq << std::endl;

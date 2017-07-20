@@ -443,6 +443,14 @@ class PatternRecognition {
     /** @brief Simple function to make sure we calc the minuit longitudinal ndf consistently */
     int calc_minuit_longitudinal_ndf(int npoints) const { return (npoints - 1); }
 
+    /** @brief Calculate the rotation direction we expect in each tracker using magnet polarities,
+     *         call this method to help the longitudinal MINUIT fit give the right answer
+     *  @param bz_t1 TkU solenoidal z component field value
+     *  @param bz_t2 TkD solenoidal z component field value
+     *  @param D2_polarity, D2 dipole magnet polarity, -1, 0, +1
+     */
+    void calculate_expected_handedness(double bz_t1, double bz_t2, int D2_polarity);
+
   private:
     bool _debug;                /** Run in debug mode */
     bool _up_straight_pr_on;    /** Upstream straight pattern recogntion on or off */
@@ -450,6 +458,8 @@ class PatternRecognition {
     bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
     bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
     bool _sp_search_on;         /** Do we seach for seed spoints missed by helical fit? */
+    int _expected_handedness_t1;  /** Rotation direction we expect for TkU particles */
+    int _expected_handedness_t2;  /** Rotation direction we expect for TkD particles */
     int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
     int _longitudinal_fitter;   /** Longitud fitter, 0=nturns & linear s-z fit, 1=ROOT (MINUIT2) */
     int _line_fitter;           /** Line fitter, 0 = custom lsq, 1 = ROOT */

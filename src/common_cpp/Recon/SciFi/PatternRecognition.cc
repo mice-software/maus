@@ -68,6 +68,8 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _up_helical_pr_on(true),
                                           _down_helical_pr_on(true),
                                           _sp_search_on(false),
+                                          _expected_handedness_t1(0),
+                                          _expected_handedness_t2(0),
                                           _s_error_method(0),
                                           _longitudinal_fitter(0),
                                           _line_fitter(0),
@@ -85,10 +87,10 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
                                           _circle_chisq_cut(5.0),
-                                          _circle_minuit_cut(35.0),
+                                          _circle_minuit_cut(100.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
-                                          _long_minuit_cut(45.0),
+                                          _long_minuit_cut(40.0),
                                           _circle_error_w(1.0),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
@@ -113,6 +115,8 @@ void PatternRecognition::set_parameters_to_default() {
   _up_helical_pr_on = true;
   _down_helical_pr_on = true;
   _sp_search_on = false;
+  _expected_handedness_t1 = 0;
+  _expected_handedness_t2 = 0;
   _s_error_method = 0;
   _longitudinal_fitter = 0;
   _line_fitter = 0;
@@ -130,10 +134,10 @@ void PatternRecognition::set_parameters_to_default() {
   _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
   _circle_chisq_cut = 5.0;
-  _circle_minuit_cut = 35.0;
+  _circle_minuit_cut = 100.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
-  _long_minuit_cut = 100.0;
+  _long_minuit_cut = 40.0;
   _circle_error_w = 1.0;
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
@@ -880,8 +884,15 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     }
 
     // Call the fitter
+    int expected_handedness = 0;
+    if (spnts[0]->get_tracker() == 0)
+      expected_handedness = _expected_handedness_t1;
+    else
+      expected_handedness = _expected_handedness_t2;
+
     const double pStart[4] = {c_trial.get_x0(), c_trial.get_y0(), c_trial.get_R(), 0.0};
-    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, pStart, helix);
+    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, pStart, helix,
+                                             expected_handedness, _long_minuit_cut);
     if (!result) {
       return NULL;
     }
@@ -1496,4 +1507,14 @@ bool PatternRecognition::missing_sp_search_helical(std::vector<SciFiSpacePoint*>
   return true;
 }
 
+void PatternRecognition::calculate_expected_handedness(double bz_t1, double bz_t2,
+                                                       int D2_polarity) {
+  int t1_field_polarity = (bz_t1 > 0.00001) - (bz_t1 < -0.00001); // 10 Gauss
+  int t2_field_polarity = (bz_t2 > 0.00001) - (bz_t2 < -0.00001);
+
+  _expected_handedness_t1 = t1_field_polarity * D2_polarity;
+  _expected_handedness_t2 = - t2_field_polarity * D2_polarity;
+  std::cerr << "PatternRecognition: Expected TkU & TkD handedness: " << _expected_handedness_t1
+            << " " << _expected_handedness_t2 << "\n";
+}
 } // ~namespace MAUS
