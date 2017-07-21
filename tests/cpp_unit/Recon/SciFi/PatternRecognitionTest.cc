@@ -293,7 +293,7 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(100.0, pr._circle_minuit_cut);
+  EXPECT_EQ(1.5, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(40.0, pr._long_minuit_cut);
@@ -325,7 +325,7 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(100.0, pr._circle_minuit_cut);
+  EXPECT_EQ(1.5, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(40.0, pr._long_minuit_cut);
@@ -651,8 +651,8 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
   pr.set_parameters_to_default();
   pr.set_circle_fitter(1);
   pr.set_longitudinal_fitter(1);
-  pr._circle_minuit_cut = 200.0;
-  pr._long_minuit_cut = 40.0;
+  // pr._circle_minuit_cut = 1.5;
+  // pr._long_minuit_cut = 40.0;
   pr.calculate_expected_handedness(4.0, 4.0, -1);
 
   ASSERT_EQ(pr._expected_handedness_t1, -1);
