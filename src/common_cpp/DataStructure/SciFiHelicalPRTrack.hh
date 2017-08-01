@@ -201,8 +201,8 @@ class SciFiHelicalPRTrack : public SciFiBasePRTrack {
     double _circle_chisq;         /** ChiSq of the circle (x-y) fit */
     int _circle_ndf;              /** Number of degrees of freedom of the circle fit */
     double _point_spread;         /** Deprecated - Not implemented */
-    ThreeVector _pos0;            /** Deprecated - Intercept of helix with tracker reference surface */
-    DoubleArray _phi;             /** Deprecated - The turning angles of the spacepoints [radians] */
+    ThreeVector _pos0;            /** Deprecated - Intercept of helix with tracker ref surface */
+    DoubleArray _phi;             /** Deprecated - The turning angles of the spacepoints [rads] */
     int _alg_used_circle;         /** Circle fit algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
     int _alg_used_longitudinal;   /** Longitudinal algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */
     int _alg_used_full;           /** Full 3D fit algorithm used, -1 = None, 0 - LSQ, 1 - MINUIT */

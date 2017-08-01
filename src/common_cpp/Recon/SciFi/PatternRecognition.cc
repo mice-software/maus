@@ -176,9 +176,9 @@ void PatternRecognition::setup_debug(std::string debug_fname) {
   _hszchisq_line = new TH1D("hszchisq_line", \
       "Pattern Recognition s-z Fit ChiSq/DoF All Candidates", 200, 0, 400);
   _fail_helix_tku = new TH1D("fail_helix_tku", \
-                             "Pattern Recognition Helix Fit Failure Point TkU", 5, 0, 5);
+                             "Pattern Recognition Helix Fit Failure Point TkU", 6, 0, 6);
   _fail_helix_tkd = new TH1D("fail_helix_tkd", \
-                             "Pattern Recognition Helix Fit Failure Point TkD", 5, 0, 5);
+                             "Pattern Recognition Helix Fit Failure Point TkD", 6, 0, 6);
 
   _hx_line->Write();
   _hy_line->Write();
@@ -899,13 +899,34 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     bool result = RootFitter::FitHelixMinuit(ox, oy, oz, pStart, helix,
                                              expected_handedness, _long_minuit_cut);
     if (!result) {
+      if (n_points == 5 && _debug) {
+        if (spnts[0]->get_tracker() == 0) {
+          _fail_helix_tku->Fill(2);
+        } else if (spnts[0]->get_tracker() == 1) {
+          _fail_helix_tkd->Fill(2);
+        }
+      }
       return NULL;
     }
     if ((helix.get_longitudinal_chisq() / calc_minuit_longitudinal_ndf(n_points))  \
         > _long_minuit_cut) {
+      if (n_points == 5 && _debug) {
+        if (spnts[0]->get_tracker() == 0) {
+          _fail_helix_tku->Fill(3);
+        } else if (spnts[0]->get_tracker() == 1) {
+          _fail_helix_tkd->Fill(3);
+        }
+      }
       return NULL;
     }
     if (helix.get_R() > _R_res_cut) {
+            if (n_points == 5 && _debug) {
+        if (spnts[0]->get_tracker() == 0) {
+          _fail_helix_tku->Fill(4);
+        } else if (spnts[0]->get_tracker() == 1) {
+          _fail_helix_tkd->Fill(4);
+        }
+      }
       return NULL;
     }
 

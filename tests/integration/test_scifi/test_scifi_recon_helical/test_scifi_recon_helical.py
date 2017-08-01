@@ -95,8 +95,7 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         self.assertGreater(h10.GetMean(), -1.05)
 
     def test_helical_recon_minuit(self):
-        """ TestSciFiRecon: Run helical simulation & check \
-            the output (MINUIT) """
+        """ TestSciFiRecon: Run helical sim & check the output (MINUIT) """
 
         # Run the simulation and check it completes with return code 0
         proc, log_file_name = run_simulation(minuit_datacard_name, \

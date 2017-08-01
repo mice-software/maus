@@ -61,7 +61,7 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
   */
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
                     const std::vector<double>& z, const double* pStart,
-                    MAUS::SimpleHelix& helix, int handedness=0, double cut=-1.0);
+                    MAUS::SimpleHelix& helix, int handedness = 0, double cut = -1.0);
 }
 
 #endif
