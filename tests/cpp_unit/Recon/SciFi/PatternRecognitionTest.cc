@@ -462,7 +462,10 @@ TEST_F(PatternRecognitionTest, test_single_evt_lsq) {
 TEST_F(PatternRecognitionTest, test_single_evt_minuit_longitudinal) {
   PatternRecognition pr;
   pr.set_parameters_to_default();
+  pr.set_circle_fitter(1);
   pr.set_longitudinal_fitter(1);
+  // pr._circle_minuit_cut = 10.0;
+  // pr._long_minuit_cut = 250.0;
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts = set_up_single_helical_track_spacepoints();
@@ -485,9 +488,9 @@ TEST_F(PatternRecognitionTest, test_single_evt_minuit_longitudinal) {
   EXPECT_EQ(0u, strks.size());
 
   EXPECT_EQ(5, htrks[0]->get_num_points());
-  EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.002);
-  EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
-  EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
+  EXPECT_NEAR(htrks[0]->get_circle_x0(), -5.951, 0.005);
+  EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.4);
+  EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.03);
   EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
 
   EXPECT_EQ(5, htrks[1]->get_num_points());
@@ -651,7 +654,7 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minui
   pr.set_parameters_to_default();
   pr.set_circle_fitter(1);
   pr.set_longitudinal_fitter(1);
-  // pr._circle_minuit_cut = 1.5;
+  // pr._circle_minuit_cut = 10.0;
   // pr._long_minuit_cut = 40.0;
   pr.calculate_expected_handedness(4.0, 4.0, -1);
 

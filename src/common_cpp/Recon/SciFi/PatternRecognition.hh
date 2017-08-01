@@ -64,6 +64,7 @@ class PatternRecognition {
 
     /** Macros to allow friendship with the gtests */
     FRIEND_TEST(PatternRecognitionTest, test_constructor);
+    FRIEND_TEST(PatternRecognitionTest, test_single_evt_minuit_longitudinal);
     FRIEND_TEST(PatternRecognitionTest, test_multiple_evts_per_trigger_circle_minuit);
     FRIEND_TEST(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minuit);
     FRIEND_TEST(PatternRecognitionTest, test_set_parameters_to_default);
