@@ -27,6 +27,7 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/SimpleLine.hh"
 #include "src/common_cpp/Recon/SciFi/SimpleCircle.hh"
+#include "src/common_cpp/Recon/SciFi/SimpleHelix.hh"
 
 /** @namespace RootFitter
  *
@@ -52,6 +53,15 @@ bool FitLineLinear(const std::vector<double>& x, const std::vector<double>& y,
   */
 bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
                      MAUS::SimpleCircle& circ, TMatrixD& cov_matrix);
+
+/** @brief Fit a helix using the ROOT MINUIT minimiser class
+  * @param[in] x x coordinates (a dependent variable)
+  * @param[in] y y coordinates (a depepndent variable)
+  * @param[out] helix The fit result
+  */
+bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
+                    const std::vector<double>& z, const double* pStart,
+                    MAUS::SimpleHelix& helix, int handedness = 0, double cut = -1.0);
 }
 
 #endif

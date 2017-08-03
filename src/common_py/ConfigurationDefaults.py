@@ -303,14 +303,17 @@ SciFiPatRecMissingSpSearchOn = False # Do we seach for seed spoints missed by he
 SciFiPatRecMissingSpCut = 2 # Distance (mm) below which a missing spoint should added to a track
 SciFiPatRecSErrorMethod = 0 # How to calc error on s, 0 = station res, 1 = error prop
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
+SciFiPatRecLongitudinalFitter = 0 # 0 - ntruns and linear s-z fit, 1 - ROOT and MINUIT
 SciFiPatRecLineFitter = 0 # Choose the patrec straight line fitter, 0 = custom lsq, 1 = ROOT
 SciFiPatRecCircleFitter = 0 # Choose the patrec circle fitter, 0 = custom lsq, 1 = MINUIT
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
-SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec circle fit
+SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec least squares circle fit
+SciFiPatRecCircleMinuitChi2Cut = 160 # Chi^2 on pat rec minuit circle fit
 SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
 SciFiPatRecSZChi2Cut = 150.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecLongMinuitChi2Cut = 1000.0 # Chi^2 cut on pat rec minuit longitudinal fit
 SciFiPatRecCircleErrorWeight = 1.0 # Weight to artificially scale the error going to xy fit
 SciFiPatRecSZErrorWeight = 1.0 # Weight to artificially scale the error going to sz fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
@@ -689,7 +692,7 @@ end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default image types of OutputCppRootImage
-image_types = ['png'] 
+image_types = ['png']
 
 PolynomialOpticsModel_order = 1
 PolynomialOpticsModel_algorithms = ["LeastSquares",
@@ -791,7 +794,7 @@ pid_config = "step_4"
 # the Global PID.
 pid_mode = "offline"
 # If pid_mode = "custom", variables to use should be set here as a space separated list, i.e.
-# custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
+# custom_pid_set = "PIDVarA PIDVarC PIDVarD".
 custom_pid_set = "PIDVarB"
 # PID confidence level- set the margin (in %) between the confidence levels of competing pid hypotheses before they
 # are selected as the correct hypothesis

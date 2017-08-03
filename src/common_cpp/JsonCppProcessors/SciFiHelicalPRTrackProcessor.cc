@@ -27,9 +27,6 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch<int>("charge", &_int_proc,
                     &SciFiHelicalPRTrack::SciFiBasePRTrack::get_charge,
                     &SciFiHelicalPRTrack::SciFiBasePRTrack::set_charge, true);
-    RegisterValueBranch("phi0", &_double_proc,
-                        &SciFiHelicalPRTrack::get_phi0,
-                        &SciFiHelicalPRTrack::set_phi0, true);
     RegisterValueBranch("dsdz", &_double_proc,
                         &SciFiHelicalPRTrack::get_dsdz,
                         &SciFiHelicalPRTrack::set_dsdz, true);
@@ -42,6 +39,9 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("line_sz_chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_line_sz_chisq,
                         &SciFiHelicalPRTrack::set_line_sz_chisq, true);
+    RegisterValueBranch<int>("line_sz_ndf", &_int_proc,
+                        &SciFiHelicalPRTrack::get_line_sz_ndf,
+                        &SciFiHelicalPRTrack::set_line_sz_ndf, false);
     RegisterValueBranch("circle_x0", &_double_proc,
                         &SciFiHelicalPRTrack::get_circle_x0,
                         &SciFiHelicalPRTrack::set_circle_x0, true);
@@ -51,24 +51,39 @@ SciFiHelicalPRTrackProcessor::SciFiHelicalPRTrackProcessor()
     RegisterValueBranch("circle_chisq", &_double_proc,
                         &SciFiHelicalPRTrack::get_circle_chisq,
                         &SciFiHelicalPRTrack::set_circle_chisq, true);
+    RegisterValueBranch<int>("circle_ndf", &_int_proc,
+                        &SciFiHelicalPRTrack::get_circle_ndf,
+                        &SciFiHelicalPRTrack::set_circle_ndf, false);
     RegisterValueBranch<double>("chi_squared", &_double_proc,
                         &SciFiHelicalPRTrack::get_chi_squared,
                         &SciFiHelicalPRTrack::set_chi_squared, false);
     RegisterValueBranch<int>("ndf", &_int_proc,
                         &SciFiHelicalPRTrack::get_ndf,
                         &SciFiHelicalPRTrack::set_ndf, false);
+    RegisterValueBranch<int>("alg_used_circle", &_int_proc,
+                        &SciFiHelicalPRTrack::get_alg_used_circle,
+                        &SciFiHelicalPRTrack::set_alg_used_circle, false);
+    RegisterValueBranch<int>("alg_used_longitudinal", &_int_proc,
+                        &SciFiHelicalPRTrack::get_alg_used_longitudinal,
+                        &SciFiHelicalPRTrack::set_alg_used_longitudinal, false);
+    RegisterValueBranch<int>("alg_used_full", &_int_proc,
+                        &SciFiHelicalPRTrack::get_alg_used_full,
+                        &SciFiHelicalPRTrack::set_alg_used_full, false);
+    RegisterValueBranch("phi0", &_double_proc,
+                        &SciFiHelicalPRTrack::get_phi0,
+                        &SciFiHelicalPRTrack::set_phi0, false);
     RegisterValueBranch("point_spread", &_double_proc,
                         &SciFiHelicalPRTrack::get_point_spread,
-                        &SciFiHelicalPRTrack::set_point_spread, true);
+                        &SciFiHelicalPRTrack::set_point_spread, false);
     RegisterValueBranch("pos0", &_threevector_proc,
                         &SciFiHelicalPRTrack::get_pos0,
-                        &SciFiHelicalPRTrack::set_pos0, true);
-    RegisterTRefArray("spacepoints", &_spoint_tref_proc,
-                        &SciFiHelicalPRTrack::get_spacepoints,
-                        &SciFiHelicalPRTrack::set_spacepoints, true);
+                        &SciFiHelicalPRTrack::set_pos0, false);
     RegisterValueBranch("phi", &_double_array_proc,
                         &SciFiHelicalPRTrack::get_phi,
                         &SciFiHelicalPRTrack::set_phi, false);
+    RegisterTRefArray("spacepoints", &_spoint_tref_proc,
+                        &SciFiHelicalPRTrack::get_spacepoints,
+                        &SciFiHelicalPRTrack::set_spacepoints, true);
     RegisterValueBranch<ThreeVector>("reference_position",
                         &_threevector_proc,
                         &SciFiHelicalPRTrack::get_reference_position,

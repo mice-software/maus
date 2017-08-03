@@ -29,39 +29,45 @@ import libMausCpp #pylint: disable = W0611
 mrd = os.environ["MAUS_ROOT_DIR"]
 wrk_dir = os.path.join(mrd,
           "tests/integration/test_scifi/test_scifi_recon_helical/")
-helical_datacard_name = os.path.join(wrk_dir, "datacard_mc_helical")
-helical_root_file_name = os.path.join(wrk_dir, "maus_output_helical.root")
+lsq_datacard_name = os.path.join(wrk_dir, "datacard_mc_helical")
+lsq_root_file_name = os.path.join(wrk_dir, "output_helical_lsq.root")
+lsq_log_file_name = "tmp/test_scifi_recon_helical_lsq.log"
+minuit_datacard_name = os.path.join(wrk_dir, "datacard_mc_helical_minuit")
+minuit_root_file_name = os.path.join(wrk_dir, "output_helical_minuit.root")
+minuit_log_file_name = "tmp/test_scifi_recon_helical_minuit.log"
 simulation = os.path.join(wrk_dir, "simulate_scifi.py")
 
-def run_helical_simulation():
-    """ Run the helical tracks simulation """
+def run_simulation(datacard_name, output_file_name, log_file_name ):
+    """ Run the simulation """
 
     print "Using " + simulation
 
     call_options = [simulation,
-                    "-configuration_file", helical_datacard_name,
-                    "-output_root_file_name", helical_root_file_name,
+                    "-configuration_file", datacard_name,
+                    "-output_root_file_name", output_file_name,
                     "-verbose_level", "0"]
 
-    log_file_name = os.path.join(mrd, "tmp/test_scifi_recon.log")
     log_file = open(log_file_name, 'w')
     print 'Running simulate_scifi, logging in', log_file_name
     proc = sub.Popen(call_options, stdout=log_file, stderr=sub.STDOUT)
     proc.wait()
     return proc, log_file_name
 
+
+
 class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
     """ Run the scifi helical recon and check output """
 
-    def test_helical_recon(self):
-        """ TestSciFiRecon: Run the helical simulation and check the output """
+    def test_helical_recon_lsq(self):
+        """ TestSciFiRecon: Run helical simulation & check the output (LSQ) """
 
         # Run the simulation and check it completes with return code 0
-        proc, log_file_name = run_helical_simulation()
+        proc, log_file_name = run_simulation(lsq_datacard_name, \
+          lsq_root_file_name, lsq_log_file_name)
         self.assertEqual(proc.returncode, 0, msg="Check log "+log_file_name)
 
         # Check the ROOT output is as expected
-        root_file = ROOT.TFile(helical_root_file_name, "READ")
+        root_file = ROOT.TFile(lsq_root_file_name, "READ")
         data = ROOT.MAUS.Data() # pylint: disable = E1101
         tree = ROOT.TTree()
         tree = root_file.Get("Spill")
@@ -71,8 +77,6 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         tree.Draw(
           "_spill._recon._scifi_event._scifihelicalprtracks._line_sz_chisq>>h5")
         h5 = ROOT.gDirectory.Get('h5')
-        # self.assertLess(h5.GetMean(), 5)
-        # self.assertLess(h5.GetRMS(), 8)
         self.assertLess(h5.GetMean(), 12)
         self.assertLess(h5.GetRMS(), 50)
         self.assertGreater(h5.GetEntries(), 190)
@@ -84,24 +88,47 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
         self.assertLess(h6.GetRMS(), 2)
         self.assertGreater(h6.GetEntries(), 190)
 
-        print "WARNING: Track Fit still under development."+\
-          "Disabling remaining tests for now"
+        tree.Draw(
+          "_spill._recon._scifi_event._scifihelicalprtracks._charge>>h10")
+        h10 = ROOT.gDirectory.Get('h10')
+        self.assertLess(h10.GetMean(), -0.95)
+        self.assertGreater(h10.GetMean(), -1.05)
 
-#        # Check the mean and standard deviation of some final track data
-#        tree.Draw("_spill._recon._scifi_event._scifitracks._P_value>>h1")
-#        h1 = ROOT.gDirectory.Get('h1')
-#        self.assertAlmostEqual(h1.GetMean(), 0.50, delta=0.1)
-#        self.assertLess(h1.GetRMS(), 0.35)
-#
-#        tree.Draw("_spill._recon._scifi_event._scifitracks._chi2>>h2")
-#        h2 = ROOT.gDirectory.Get('h2')
-#        self.assertLess(h2.GetMean(), 15)
-#        self.assertLess(h2.GetRMS(), 10)
-#
-#        # Most particles should be identified correctly as positives
-#        tree.Draw("_spill._recon._scifi_event._scifitracks._charge>>h4")
-#        h4 = ROOT.gDirectory.Get('h4')
-#        self.assertGreater(h4.GetMean(), 0.95)
+    def test_helical_recon_minuit(self):
+        """ TestSciFiRecon: Run helical sim & check the output (MINUIT) """
+
+        # Run the simulation and check it completes with return code 0
+        proc, log_file_name = run_simulation(minuit_datacard_name, \
+          minuit_root_file_name, minuit_log_file_name)
+        self.assertEqual(proc.returncode, 0, msg="Check log "+log_file_name)
+
+        # Check the ROOT output is as expected
+        root_file = ROOT.TFile(minuit_root_file_name, "READ")
+        data = ROOT.MAUS.Data() # pylint: disable = E1101
+        tree = ROOT.TTree()
+        tree = root_file.Get("Spill")
+        tree.SetBranchAddress("data", data)
+
+        # Check chi^2 average is reasonably low for helical pat rec tracks
+        tree.Draw(
+          "_spill._recon._scifi_event._scifihelicalprtracks._line_sz_chisq>>h7")
+        h7 = ROOT.gDirectory.Get('h7')
+        self.assertLess(h7.GetMean(), 18)
+        self.assertLess(h7.GetRMS(), 50)
+        self.assertGreater(h7.GetEntries(), 190)
+
+        tree.Draw(
+          "_spill._recon._scifi_event._scifihelicalprtracks._circle_chisq>>h8")
+        h8 = ROOT.gDirectory.Get('h8')
+        self.assertLess(h8.GetMean(), 1.0)
+        self.assertLess(h8.GetRMS(), 2)
+        self.assertGreater(h8.GetEntries(), 190)
+
+        tree.Draw(
+          "_spill._recon._scifi_event._scifihelicalprtracks._charge>>h9")
+        h9 = ROOT.gDirectory.Get('h9')
+        self.assertLess(h9.GetMean(), -0.95)
+        self.assertGreater(h9.GetMean(), -1.05)
 
 if __name__ == "__main__":
     unittest.main()
