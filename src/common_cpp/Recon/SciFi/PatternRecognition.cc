@@ -87,10 +87,10 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
                                           _circle_chisq_cut(5.0),
-                                          _circle_minuit_cut(1.5),
+                                          _circle_minuit_cut(160.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
-                                          _long_minuit_cut(40.0),
+                                          _long_minuit_cut(1000.0),
                                           _circle_error_w(1.0),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
@@ -134,10 +134,10 @@ void PatternRecognition::set_parameters_to_default() {
   _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
   _circle_chisq_cut = 5.0;
-  _circle_minuit_cut = 1.5;
+  _circle_minuit_cut = 160.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
-  _long_minuit_cut = 40.0;
+  _long_minuit_cut = 1000.0;
   _circle_error_w = 1.0;
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
