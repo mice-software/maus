@@ -31,7 +31,7 @@
 
 /** @namespace RootFitter
  *
- * ROOT fitting routines
+ * ROOT fitting routines written for the scifi pattern recognition.
  */
 namespace RootFitter {
 
@@ -54,10 +54,25 @@ bool FitLineLinear(const std::vector<double>& x, const std::vector<double>& y,
 bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
                      MAUS::SimpleCircle& circ, TMatrixD& cov_matrix);
 
-/** @brief Fit a helix using the ROOT MINUIT minimiser class
+/** @brief Fit a helix using the ROOT MINUIT minimiser class.
+  *
+  * Fit a helix using the ROOT MINUIT minimiser class.
+  * pStart holds xc (circle centre in x), yc (circle centre in y), the radius and dsdz, which
+  * seed MINUIT. xc, yc and radius are fixed, that is MINUIT will not improve them, just use them
+  * to help fit dsdz. The dsdz seed is not currently used by the algorithm, as a scan of the dsdz
+  * chisq function is performed to find the approximate global minima which then seeds MINUIT. If
+  * the track handedness (rotation direction) is supplied, this will be used by the scan function
+  * to exclude unphysical minima (those where dsdz has the wrong sign).
+  *
+  * The MINUIT algorithm used for the minimisation in MIGRAD.
+  *
   * @param[in] x x coordinates (a dependent variable)
   * @param[in] y y coordinates (a depepndent variable)
+  * @param[in] z z coordinates (the independent variable)
+  * @param[in] pStart double array of xc, yc, R, dsdz which seeds the parameters for MINUIT
   * @param[out] helix The fit result
+  * @param[in] handedness Track rotation direction, if set to 1 or -1 used to help dsdz scan func
+  * @param[in] cut The pattern recongition longitundal chisq cut, used by the dsdz scan function
   */
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
                     const std::vector<double>& z, const double* pStart,

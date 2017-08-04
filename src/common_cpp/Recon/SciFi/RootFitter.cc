@@ -110,11 +110,13 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
                     const std::vector<double>& z, const double* pStart,
                     MAUS::SimpleHelix& helix, int handedness, double cut) {
 
+  // Pull out x and y at the tracker reference station
   double x0 = x[0];
   double y0 = y[0];
 
+  // This is a C++11 lambda function, which defines the quantity to be minimised by MINUIT,
+  // using a sum over squared residuals looping over the seed spacepoints
   auto Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
-    // Minimisation function computing the sum of squares of residuals looping over the points
     double xc = par[0];
     double yc = par[1];
     double rad = par[2];
@@ -122,28 +124,23 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
     double chisq = 0.0;
     for (size_t i = 0; i < x.size(); i++) {
         double theta = (z[i]*dsdz) / rad;
-        double f = xc + (x0 - xc)*cos(theta) - (y0 - yc)*sin(theta);
-        double g = yc + (y0 - yc)*cos(theta) + (x0 - xc)*sin(theta);
+        double f = xc + (x0 - xc)*cos(theta) - (y0 - yc)*sin(theta); // x model prediction
+        double g = yc + (y0 - yc)*cos(theta) + (x0 - xc)*sin(theta); // y model prediction
         double dx = f - x[i];
         double dy = g - y[i];
         double dchisq = (dx*dx) + (dy*dy);
-        // std::cerr << "Chi2Function: " << xc << " " << yc << " " << rad << " " << dsdz  << " "
-        //           << z[i] << " " << theta << " " << cos(theta) << " " << sin(theta) << " "
-        //           << f << " " << x[i] << " " << dx << " "
-        //           << g << " " << y[i] << " " << dy << " "
-        //           << dchisq << "\n";
         chisq += dchisq;
     }
-    // std::cerr << "Chi2Function: Final chisq: " << chisq << std::endl;
     return chisq;
   };
 
-  // Scan the function to seed the minimiser.
-  // Will take minimum chisq value, unless we have an expected handedness (i.e. dsdz sign) supplied
-  // in which case we will use that exclude wrong sign candidates
-  double nsteps = 100.0;
-  if (pStart[2] < 10.0) nsteps = 200.0;
-  double lower_limit = -1.0;
+  // Scan the chisq function to find the rough location of the global minimum to seed MINUIT
+  // (otherwise it gets stuck in local minima).
+  // It will take minimum chisq value, unless we have an expected handedness (i.e. dsdz sign)
+  // supplied in which case we will use that exclude wrong sign candidates.
+  double nsteps = 100.0; // How many pieces do we slice the chisq function into
+  if (pStart[2] < 10.0) nsteps = 200.0; // Search more carefully when the radius is below 10mm
+  double lower_limit = -1.0;  // dsdz bounds
   double upper_limit = 1.0;
   if (handedness == 1) {
     lower_limit = 0.0;
@@ -153,7 +150,7 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
     upper_limit = 0.0;
   }
   double step_size = (upper_limit - lower_limit) / nsteps;
-  double min_chisq = 10000000000.0;
+  double min_chisq = 10000000000.0; // Just a huge number to start
   double dsdz_seed = pStart[3];
   double threshold = 50.0; // min chisq for dsdz to be considered as candidate
   if (threshold < cut) threshold = cut; // Musn't have a lower value than the patrec level cut
@@ -185,7 +182,6 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
       dsdz_seed = new_dsdz_seed;
     }
   }
-  // std::cerr << "dsdz_seed = " << dsdz_seed << ", with chisq = " << min_chisq << std::endl;
 
   // Perform the minimisation with ROOT::Math::Minimizer interface to MINUIT2, Migrad algorithm
   ROOT::Minuit2::Minuit2Minimizer min(ROOT::Minuit2::kMigrad);
@@ -224,10 +220,6 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
     }
   }
 
-  // std::cerr << "Full helix fit successfully converged\n";
-  // std::cerr << "dsdz = " << xs[3] << " +/- " << errors[3] << std::endl;
-  // std::cerr << "Chisq: " << min.MinValue() << std::endl;
-
   // Populate the helix
   std::vector<double> params = {xs[0], xs[1], xs[2], xs[3], s0};
   std::vector<double> errs = {errors[0], errors[1], errors[2], errors[3], 0.0};
@@ -235,65 +227,5 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   std::vector<double> chisqs = {-1.0, min.MinValue(), -1.0};
   helix = MAUS::SimpleHelix(params, errs, ndfs, chisqs, -1.0, cov);
   return true;
-
-  // // Wrap chi2 function in a function object for the fit
-  // // 3 is the number of fit parameters (size of array par)
-  // ROOT::Math::Functor fcn(Chi2Function, 4);
-  // ROOT::Fit::Fitter fitter;
-  // double pStart[4] = {0, 0, 1, 0};
-  // fitter.SetFCN(fcn, pStart);
-  // fitter.Config().ParSettings(0).SetName("xc");
-  // fitter.Config().ParSettings(1).SetName("yc");
-  // fitter.Config().ParSettings(2).SetName("R");
-  // fitter.Config().ParSettings(3).SetName("dsdz");
-  //
-  // fitter.Config().ParSettings(0).SetLimits(-200.0, 200.0);
-  // fitter.Config().ParSettings(1).SetLimits(-200.0, 200.0);
-  // fitter.Config().ParSettings(2).SetLimits(0.0, 150.0);
-  // fitter.Config().ParSettings(3).SetLimits(-1.0, 1.0);
-  //
-  // fitter.Config().ParSettings(0).SetValue(0.0);
-  // fitter.Config().ParSettings(1).SetValue(0.0);
-  // fitter.Config().ParSettings(2).SetValue(100.0);
-  // // fitter.Config().ParSettings(3).SetValue(0.5);
-  // fitter.Config().ParSettings(0).Fix();
-  // fitter.Config().ParSettings(1).Fix();
-  // fitter.Config().ParSettings(2).Fix();
-  // fitter.Config().ParSettings(3).Fix();
-
-  // // do the fit
-  // bool ok = fitter.FitFCN();
-  // if (!ok) {
-  //   std::cerr << "Full helix fit did not converge\n";
-  //   return ok;
-  // }
-  //
-  // std::cerr << "Chi2Function: " << xc << " " << yc << " " << rad << " " << dsdz  << " "
-  //           << z[i] << " " << theta << " " << cos(theta) << " " << sin(theta) << " "
-  //           << f << " " << x[i] << " " << dx << " "
-  //           << g << " " << y[i] << " " << dy << " "
-  //           << dchisq << "\n";ROOT::Fit::FitResult & result = fitter.Result();
-  //
-  // std::cerr << "Full helix fit successfully converged\n";
-  // std::cerr << "dsdz = " << result.Parameter(3) << " +/- " << result.Error(3) << std::endl;
-  // std::cerr << "Chisq: " << result.MinFcnValue() << std::endl;
-
-  // result.Print(std::cerr);
-
-  // // Create a helix object with the results
-  // std::cerr << "Setting cov matrix...";
-  // TMatrixD cov(4, 4);
-  // result.GetCovarianceMatrix(cov);
-  // std::cerr << " done\n";
-  //
-  // // Calculate s0
-  // double s0 = result.Parameter(2) * tan((y0 - result.Parameter(1))/(x0 - result.Parameter(0)));
-
-  // Fill the helix object to return the results
-  // helix = MAUS::SimpleHelix(result.Parameter(0), result.Error(0), \
-  //                           result.Parameter(1), result.Error(1), \
-  //                           result.Parameter(2), result.Error(2), \
-  //                           result.Parameter(3), result.Error(3), \
-  //                           s0, 0.0, result.MinFcnValue(), 0.0, result.Prob(), cov);
 }
 }

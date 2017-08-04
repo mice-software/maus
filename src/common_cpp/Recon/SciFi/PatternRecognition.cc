@@ -888,13 +888,16 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
       oz.push_back(sp->get_position().z());
     }
 
-    // Call the fitter
+    // Help the fitter with the handedness if the radius is small
     int expected_handedness = 0;
-    if (spnts[0]->get_tracker() == 0)
-      expected_handedness = _expected_handedness_t1;
-    else
-      expected_handedness = _expected_handedness_t2;
+    if (c_trial.get_R() < _low_radius) {
+      if (spnts[0]->get_tracker() == 0)
+        expected_handedness = _expected_handedness_t1;
+      else
+        expected_handedness = _expected_handedness_t2;
+    }
 
+    // Call the fitter
     const double pStart[4] = {c_trial.get_x0(), c_trial.get_y0(), c_trial.get_R(), 0.0};
     bool result = RootFitter::FitHelixMinuit(ox, oy, oz, pStart, helix,
                                              expected_handedness, _long_minuit_cut);
