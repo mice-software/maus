@@ -87,7 +87,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
                                           _circle_chisq_cut(5.0),
-                                          _circle_minuit_cut(160.0),
+                                          _circle_minuit_cut(10.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
                                           _long_minuit_cut(1000.0),
@@ -130,11 +130,12 @@ void PatternRecognition::set_parameters_to_default() {
   _sd_5 = 0.4298;
   _sd_phi_1to4 = 1.0;
   _sd_phi_5 = 1.0;
+  _sd_mcs = 2.0;
   _res_cut = 7.0;
   _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
   _circle_chisq_cut = 5.0;
-  _circle_minuit_cut = 160.0;
+  _circle_minuit_cut = 10.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
   _long_minuit_cut = 1000.0;
@@ -206,6 +207,7 @@ bool PatternRecognition::LoadGlobals() {
     _sd_5 = (*json)["SciFi_sigma_tracker0_station5"].asDouble();
     _sd_phi_1to4 = (*json)["SciFi_sigma_phi_1to4"].asDouble();
     _sd_phi_5 = (*json)["SciFi_sigma_phi_5"].asDouble();
+    _sd_mcs = (*json)["SciFiMCSStationError"].asDouble();
     _res_cut = (*json)["SciFiStraightRoadCut"].asDouble();
     _straight_chisq_cut = (*json)["SciFiStraightChi2Cut"].asDouble();
     _R_res_cut = (*json)["SciFiRadiusResCut"].asDouble();
@@ -803,8 +805,13 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
       good_radius = false;
 
   } else if (_circle_fitter == 1) {
+    // Set up a position error vector (constant error, estimated to account for MCS)
+    std::vector<double> err;
+    for (int i = 0; i < n_points; ++i) {
+      err.push_back(_sd_mcs);
+    }
     // With a ROOT MINUIT based fitter
-    good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
+    good_radius = RootFitter::FitCircleMinuit(x, y, err, c_trial, cov_circle);
     if ( (c_trial.get_R() > _R_res_cut) || \
          (c_trial.get_chisq() / calc_circle_ndf(n_points)) > _circle_minuit_cut) {
       good_radius = false;

@@ -59,17 +59,18 @@ bool FitLineLinear(const std::vector<double>& x, const std::vector<double>& y,
 }
 
 bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
+                     const std::vector<double>& err,
                      MAUS::SimpleCircle& circ, TMatrixD& cov_matrix) {
 
-  auto Chi2Function = [&x, &y](const double *par) {
+  auto Chi2Function = [&x, &y, &err](const double *par) {
     // Minimisation function computing the sum of squares of residuals
     // looping over the points
     double f = 0.0;
     for (size_t i = 0; i < x.size(); i++) {
-        double u = x[i] - par[0];
+        double u = (x[i] - par[0]);
         double v = y[i] - par[1];
         double dr = par[2] - std::sqrt(u*u+v*v);
-        f += dr*dr;
+        f += (dr*dr) / (err[i]*err[i]);
     }
     return f;
   };
