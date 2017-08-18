@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 
 // ROOT headers
 #include "TLinearFitter.h"
@@ -117,7 +118,8 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
 
   // This is a C++11 lambda function, which defines the quantity to be minimised by MINUIT,
   // using a sum over squared residuals looping over the seed spacepoints
-  auto Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
+  std::function<double(const double*)> //NOLINT(*)
+      Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
     double xc = par[0];
     double yc = par[1];
     double rad = par[2];
@@ -135,10 +137,56 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
     return chisq;
   };
 
-  // Scan the chisq function to find the rough location of the global minimum to seed MINUIT
-  // (otherwise it gets stuck in local minima).
-  // It will take minimum chisq value, unless we have an expected handedness (i.e. dsdz sign)
-  // supplied in which case we will use that exclude wrong sign candidates.
+  // Set up the minimiser - ROOT::Math::Minimizer interface to MINUIT2, Migrad algorithm
+  ROOT::Minuit2::Minuit2Minimizer min(ROOT::Minuit2::kMigrad);
+  min.SetMaxFunctionCalls(1000000);
+  min.SetMaxIterations(100000);
+  min.SetTolerance(0.001);
+  ROOT::Math::Functor fcn(Chi2Function, 4);
+  min.SetFunction(fcn);
+
+  // Determine the approximate dsdz value which corresponds to the global minimum of the chisq func
+  double dsdz_seed = LocateGlobalChiSqMinimum(pStart, handedness, cut, Chi2Function);
+
+  // Set the variables to be minimized
+  min.SetFixedVariable(0, "xc", pStart[0]);
+  min.SetFixedVariable(1, "yc", pStart[1]);
+  min.SetFixedVariable(2, "R",  pStart[2]);
+  double step[4] = {0.01, 0.01, 0.01, 0.01};
+  min.SetLimitedVariable(3, "dsdz", dsdz_seed, step[3], -1.0, 1.0);
+
+  // Do the fit
+  bool ok = min.Minimize();
+  if (!ok) {
+    // std::cerr << "Full helix fit did not converge\n";
+    return ok;
+  }
+  const double *xs = min.X();
+  const double *errors = min.Errors();
+
+  // Calculate s0
+  double s0 = xs[2] * tan((y0 - xs[1])/(x0 - xs[0]));
+
+  // Pull out the covariance matrix
+  TMatrixD cov(4, 4);
+  for (size_t i = 0; i < 4; ++i) {
+    for (size_t j = 0; j < 4; ++j) {
+      cov(i, j) = min.CovMatrix(i, j);
+    }
+  }
+
+  // Populate the helix
+  std::vector<double> params = {xs[0], xs[1], xs[2], xs[3], s0};
+  std::vector<double> errs = {errors[0], errors[1], errors[2], errors[3], 0.0};
+  int zsize = static_cast<int>(z.size());
+  std::vector<int> ndfs = {(2*zsize - 3), (2*zsize - 1), (2*zsize - 5)};
+  std::vector<double> chisqs = {-1.0, min.MinValue(), -1.0};
+  helix = MAUS::SimpleHelix(params, errs, ndfs, chisqs, -1.0, cov);
+  return true;
+}
+
+double LocateGlobalChiSqMinimum(const double* pStart, int handedness, double cut,
+                                std::function<double(const double*)> Chi2Function) { //NOLINT(*)
   double nsteps = 100.0; // How many pieces do we slice the chisq function into
   if (pStart[2] < 10.0) nsteps = 200.0; // Search more carefully when the radius is below 10mm
   double lower_limit = -1.0;  // dsdz bounds
@@ -183,50 +231,6 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
       dsdz_seed = new_dsdz_seed;
     }
   }
-
-  // Perform the minimisation with ROOT::Math::Minimizer interface to MINUIT2, Migrad algorithm
-  ROOT::Minuit2::Minuit2Minimizer min(ROOT::Minuit2::kMigrad);
-  min.SetMaxFunctionCalls(1000000);
-  min.SetMaxIterations(100000);
-  min.SetTolerance(0.001);
-
-  ROOT::Math::Functor fcn(Chi2Function, 4);
-  min.SetFunction(fcn);
-
-  double step[4] = {0.01, 0.01, 0.01, 0.01};
-
-  // Set the variables to be minimized
-  min.SetFixedVariable(0, "xc", pStart[0]);
-  min.SetFixedVariable(1, "yc", pStart[1]);
-  min.SetFixedVariable(2, "R",  pStart[2]);
-  min.SetLimitedVariable(3, "dsdz", dsdz_seed, step[3], -1.0, 1.0);
-
-  // Do the fit
-  bool ok = min.Minimize();
-  if (!ok) {
-    // std::cerr << "Full helix fit did not converge\n";
-    return ok;
-  }
-  const double *xs = min.X();
-  const double *errors = min.Errors();
-
-  // Calculate s0
-  double s0 = xs[2] * tan((y0 - xs[1])/(x0 - xs[0]));
-
-  // Pull out the covariance matrix
-  TMatrixD cov(4, 4);
-  for (size_t i = 0; i < 4; ++i) {
-    for (size_t j = 0; j < 4; ++j) {
-      cov(i, j) = min.CovMatrix(i, j);
-    }
-  }
-
-  // Populate the helix
-  std::vector<double> params = {xs[0], xs[1], xs[2], xs[3], s0};
-  std::vector<double> errs = {errors[0], errors[1], errors[2], errors[3], 0.0};
-  std::vector<int> ndfs = {(2*z.size() - 3), (2*z.size() - 1), (2*z.size() - 5)};
-  std::vector<double> chisqs = {-1.0, min.MinValue(), -1.0};
-  helix = MAUS::SimpleHelix(params, errs, ndfs, chisqs, -1.0, cov);
-  return true;
+  return dsdz_seed;
 }
 }

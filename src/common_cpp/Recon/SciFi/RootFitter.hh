@@ -20,6 +20,7 @@
 
 // C++ headers
 #include <vector>
+#include <functional>
 
 // ROOT headers
 #include "TMatrixD.h"
@@ -78,6 +79,20 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
                     const std::vector<double>& z, const double* pStart,
                     MAUS::SimpleHelix& helix, int handedness = 0, double cut = -1.0);
+
+/** Scan the chisq function to find the rough location of the global minimum to seed MINUIT
+  * (otherwise it gets stuck in local minima).
+  * It will take minimum chisq value, unless we have an expected handedness (i.e. dsdz sign)
+  * supplied in which case we will use that to exclude wrong sign candidates.
+  *
+  * @param[in] pStart 4D double array holding xc, yx, radius, dsdz_initial_seed
+  * @param[in] handedness Particle rotation direction
+  * @param[in] cut The chisq per dof cut from pattern recognition
+  * @param[in] Chi2Function std::function used to calculate the chisq
+  * @return The optimised dsdz_seed (hopefully for the rough global minimum of the chisq func)
+  */
+double LocateGlobalChiSqMinimum(const double* pStart, int handedness, double cut,
+                                std::function<double(const double*)> Chi2Function); //NOLINT(*)
 }
 
 #endif
