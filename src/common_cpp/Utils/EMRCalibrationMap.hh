@@ -19,7 +19,6 @@
 #define _SRC_COMMON_CPP_UTILS_EMRCALIBRATIONMAP_HH_
 
 // C++ headers
-#include <Python.h>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -79,10 +78,6 @@ class EMRCalibrationMap {
   */
   void Print();
 
- /** @brief Import the get_emr_calib module which accesses and gets calibrations from the CDB
-  */
-  bool InitializePyMod();
-
  /** @brief This value is returned when the correction can not be found.
   */
   enum {
@@ -112,9 +107,8 @@ class EMRCalibrationMap {
   */
   bool LoadFromCDB();
 
- /** @brief Fetch the calibration string in the CDB
-  */
-  void GetCalib(std::string devname, std::string caltype, std::string fromdate);
+  /* interface to the CDB-C++ API*/
+  bool GetCalibCAPI(std::string devname, std::string caltype, std::string fromdate);
 
  /** @brief This vector holds one EMRChannelKey for each channel of the detector.
   */
@@ -145,10 +139,6 @@ class EMRCalibrationMap {
   */
   std::stringstream epsstr;
 
- /** @brief Python function to fetch the calibration string
-  */
-  bool pymod_ok;
-  PyObject* _get_calib_func;
 };
 } // namespace MAUS
 

@@ -27,7 +27,7 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
 
   // fill materials from the list of NIST materials
 
-  std::string materials[285] = {
+  std::string materials[286] = {
   "H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca","Sc","Ti","V",
   "Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru",
   "Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe","Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb",
@@ -61,11 +61,11 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   "TETRACHLOROETHYLENE","THALLIUM_CHLORIDE","TISSUE_SOFT_ICRP","TISSUE_SOFT_ICRU-4","TISSUE-METHANE",
   "TISSUE-PROPANE","TITANIUM_DIOXIDE","TOLUENE","TRICHLOROETHYLENE","TRIETHYL_PHOSPHATE","TUNGSTEN_HEXAFLUORIDE",
   "URANIUM_DICARBIDE","URANIUM_MONOCARBIDE","URANIUM_OXIDE","UREA","VALINE","VITON","WATER","WATER_VAPOR",
-  "XYLENE","lH2","lAr","lKr","lXe","PbWO4","Galactic" };
+  "XYLENE","lH2","lAr","lKr","lXe","PbWO4","Galactic","gNe" };
 
   G4NistManager* man = G4NistManager::Instance();
 
-  for( int i = 0; i < 284; ++i )
+  for( int i = 0; i < 285; ++i )
   {
     std::string g4name = "G4_" + materials[i];
     G4Material* mater = man->FindOrBuildMaterial( g4name );
@@ -312,6 +312,15 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   G4Material* pdglHe = new G4Material(name,density, nComp=1, kStateLiquid, temp);
   pdglHe->AddElement(elHe, 100*perCent);
   materials_list->addMaterial( pdglHe, name);
+
+ // gaseous Neon
+  G4Element* elNe = man->FindOrBuildElement("Ne");
+  density = 0.0104 * g/cm3; //at stp
+  name = "gNe";
+  temp=27.00 * kelvin;//in K
+  G4Material* pdggNe = new G4Material(name,density, nComp=1, kStateGas, temp);
+  pdggNe->AddElement(elNe, 100*perCent);
+  materials_list->addMaterial( pdggNe, name );
 
   // Al with PDG properties
   density = 2.700 * g/cm3;//at r.t

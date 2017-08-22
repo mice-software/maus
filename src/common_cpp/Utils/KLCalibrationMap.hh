@@ -19,7 +19,6 @@
 #define _MAUS_KLCALIBRATIONMAP_HH_
 
 
-#include <Python.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string>
@@ -70,13 +69,14 @@ class KLCalibrationMap {
   * If no calibration for this channel the function returns NOCALIB (-99999).
   */
   double Gain(KLChannelKey key) const;
-  bool InitializePyMod();
 
  /** Print the calibration map;
   * To be used only for debugging.
   */
   void Print();
-  void GetCalib(std::string devname, std::string caltype, std::string fromdate);
+
+  /* interface to the CDB-C++ API*/
+  bool GetCalibCAPI(std::string devname, std::string caltype, std::string fromdate);
 
   enum {
    /** This value is returned when the correction can not be calculated.
@@ -119,11 +119,7 @@ class KLCalibrationMap {
 
   /** Flags for switching On/Off gain corrections.
   */
-  PyObject* _calib_mod;
-  PyObject* _tcalib;
-  PyObject* _get_calib_func;
   bool LoadGainCalib();
-  bool pymod_ok;
   bool _do_gain_correction;
 };
 }
