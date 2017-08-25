@@ -157,7 +157,9 @@ bool EMRCalibrationMap::LoadFromCDB() {
   return true;
 }
 
-bool EMRCalibrationMap::GetCalibCAPI(std::string devname, std::string caltype, std::string fromdate) {
+bool EMRCalibrationMap::GetCalibCAPI(std::string devname,
+                                     std::string caltype,
+                                     std::string fromdate) {
   MAUS::CDB::Calibration cali;
   std::string result;
   try {

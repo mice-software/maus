@@ -138,7 +138,6 @@ class EMRCalibrationMap {
  /** @brief CDB string that harbours the calibration constants
   */
   std::stringstream epsstr;
-
 };
 } // namespace MAUS
 

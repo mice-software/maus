@@ -191,7 +191,9 @@ void KLCalibrationMap::Print() {
   std::cout << "=================================================================" << std::endl;
 }
 
-bool KLCalibrationMap::GetCalibCAPI(std::string devname, std::string caltype, std::string fromdate) {
+bool KLCalibrationMap::GetCalibCAPI(std::string devname,
+                                    std::string caltype,
+                                    std::string fromdate) {
   MAUS::CDB::Calibration cali;
   std::string result;
   try {
