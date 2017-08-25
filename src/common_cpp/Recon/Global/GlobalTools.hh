@@ -175,10 +175,17 @@ double dEdx(const G4Material* material, double energy, double mass);
  * @param step_size the maximum step size in mm for the propagation
  * @param pid the PID of the particle being propagated
  * @param energy_loss whether energy loss should be calculated
+ * @param algorithm - choose how the geometry lookup is done; 0 is full geant4
+ *        lookup; 1 is axial_lookup; 2 is alternative full geant4 lookup.
  */
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
-               bool energy_loss = true);
+               bool energy_loss = true, int geometry_algorithm = 0);
+
+/** As per propage(...), but using CentroidTracking routine */
+void propagate2(double* x, double target_z, const BTField* field,
+               double step_size, DataStructure::Global::PID pid,
+               bool energy_loss, int geometry_algorithm);
 
 /**
  * @brief Required by GlobalTools::propagate()

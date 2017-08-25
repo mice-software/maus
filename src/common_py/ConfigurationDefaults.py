@@ -834,6 +834,8 @@ track_matching_no_single_event_check = {
   "Upstream":False,
   "Downstream":False
 }
+# Controls how geometry lookups (and tracking dynamic stepping) are done: "geant4"; "axial"; "geant4_alt"
+track_matching_geometry_algorithm = "geant4"
 
 # Whether through matchings should be performed
 track_matching_through_matching = True

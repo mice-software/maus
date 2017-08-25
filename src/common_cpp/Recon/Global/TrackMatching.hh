@@ -50,7 +50,11 @@ namespace global {
 
   class TrackMatching {
   public:
-
+    enum geometry_algorithm {
+        kClassicG4 = 0,
+        kAxialLookup = 1,
+        kAltG4 = 2
+    };
     /// Constructor
     TrackMatching(GlobalEvent* global_event,
                   std::string mapper_name,
@@ -60,7 +64,8 @@ namespace global {
                   matching_tolerances, double max_step_size,
                   std::pair<bool, bool> no_check_settings,
                   bool energy_loss = true,
-                  bool residuals = false);
+                  bool residuals = false,
+                  geometry_algorithm algo = kClassicG4);
 
     /// Destructor
     ~TrackMatching() {}
@@ -292,6 +297,8 @@ namespace global {
     /// The global event to be processed
     GlobalEvent* _global_event;
 
+    /// Controls how the track propagation is done
+    geometry_algorithm _geo_algo;
     /// Declarations required for tests to access private member functions
     FRIEND_TEST(TrackMatchingTest, GetDetectorTrackArray);
     FRIEND_TEST(TrackMatchingTest, GetDetectorSpacePoints);
