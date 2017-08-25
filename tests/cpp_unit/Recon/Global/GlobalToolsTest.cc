@@ -474,4 +474,30 @@ TEST_F(GlobalToolsTest, TrackPointSort) {
   delete tp2;
 }
 
+TEST_F(GlobalToolsTest, ProfileTest) {
+    // this is used for profiling the tracking
+    int number_of_events_to_profile = 0.;
+    std::string geometry_file = "geometry_08681/ParentGeometryFile.dat";
+    if (number_of_events_to_profile < 1) {
+        return;
+    }
+    Json::Value config = (*Globals::GetInstance()->GetConfigurationCards());
+    config["reconstruction_geometry_filename"] = geometry_file;
+    config["simulation_geometry_filename"] = geometry_file;
+    if (Globals::HasInstance()) {
+      GlobalsManager::DeleteGlobals();
+    }
+    MAUS::GlobalsManager::InitialiseGlobals(JsonWrapper::JsonToString(config));
+    double energy = ::sqrt(105.658*105.658+140.*140.);
+    BTField* field = dynamic_cast<BTField*>(MAUS::Globals::GetMCFieldConstructor());
+    for (double i = 0; i < number_of_events_to_profile + 0.5; ++i) {
+        std::cerr << i << " ";
+        double xin[8] = {0., i/10., 0., 12000., energy, 0., 0., 140.};
+        MAUS::GlobalTools::propagate(xin, 21000., field,
+                                     20., MAUS::DataStructure::Global::kMuPlus,
+                                     true);
+    }
+}
+
+
 } // ~namespace MAUS

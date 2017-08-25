@@ -96,6 +96,19 @@ namespace MAUS {
     no_check_thresholds["TOF2"] = charge_thresholds["TOF2"].asDouble();
     no_check_thresholds["KL"] = charge_thresholds["KL"].asDouble();
     _no_check_settings = std::make_pair(no_check, no_check_thresholds);
+    std::string geometry_lookup =
+                    _configJSON["track_matching_geometry_algorithm"].asString();
+    if (geometry_lookup == "geant4") {
+        _geom_algo = recon::global::TrackMatching::kClassicG4;
+    } else if (geometry_lookup == "axial") {
+        _geom_algo = recon::global::TrackMatching::kAxialLookup;
+    } else if (geometry_lookup == "geant4_alt") {
+        _geom_algo = recon::global::TrackMatching::kAltG4;
+    } else {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                        "Did not recognise track_matching_geometry_algorithm "+
+                        geometry_lookup, "MapCppGlobalTrackMatching::_process");
+    }
   }
 
   void MapCppGlobalTrackMatching::_death() {
@@ -129,7 +142,7 @@ namespace MAUS {
       if (global_event) {
         recon::global::TrackMatching
             track_matching(global_event, _mapper_name, _pid_hypothesis_string, _beamline_polarity,
-                           _matching_tolerances, 20.0, _no_check_settings, _energy_loss);
+                           _matching_tolerances, 20.0, _no_check_settings, _energy_loss, _geom_algo);
         track_matching.USTrack();
         track_matching.DSTrack();
         track_matching.throughTrack();

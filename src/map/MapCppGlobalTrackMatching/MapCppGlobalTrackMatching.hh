@@ -90,6 +90,9 @@ namespace MAUS {
     bool _energy_loss;
     /// Mapper name
     std::string _mapper_name;
+    /// Controls internal geometry lookup of the track matching
+    recon::global::TrackMatching::geometry_algorithm _geom_algo;
+
   }; // Don't forget this trailing colon!!!!
 } // ~MAUS
 

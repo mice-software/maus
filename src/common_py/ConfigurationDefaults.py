@@ -826,6 +826,8 @@ track_matching_tolerances = {
 track_matching_energy_loss = True
 # Whether propagation matching should not be performed if each detector has no more than one hit
 track_matching_no_single_event_check = True
+# Controls how geometry lookups (and tracking dynamic stepping) are done: "geant4"; "axial"; "geant4_alt"
+track_matching_geometry_algorithm = "geant4"
 # Additional restriction on the above, still perform matching if some of the hits may be noise
 # due to a small charge deposit
 track_matching_check_charge_thresholds = {

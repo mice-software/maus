@@ -38,7 +38,7 @@ TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
     std::string pid_hypothesis_string, int beamline_polarity,
     std::map<std::string, std::pair<double, double> > matching_tolerances,
     double max_step_size, std::pair<bool, std::map<std::string, double> > no_check_settings,
-    bool energy_loss) {
+    bool energy_loss, TrackMatching::geometry_algorithm algo) {
   _global_event = global_event;
   _mapper_name = mapper_name;
   _pid_hypothesis_string = pid_hypothesis_string;
@@ -47,6 +47,7 @@ TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
   _max_step_size = max_step_size;
   _energy_loss = energy_loss;
   _no_check_settings = no_check_settings;
+  _geo_algo = algo;
 }
 
 void TrackMatching::USTrack() {
@@ -389,7 +390,7 @@ void TrackMatching::MatchTrackPoint(
     double target_z = spacepoints.at(0)->get_position().Z();
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
-                             _energy_loss);
+                             _energy_loss, int(_geo_algo));
       // To avoid doing the same propagation again for the same point, store the propagated
       // values back in the TLorentzVectors
       position.SetX(x_in[1]);
@@ -438,7 +439,7 @@ void TrackMatching::MatchTOF0(
     // First propagate to just upstream of TOF1 to get the energy during TOF0-1 transit
     try {
       GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
-                             _energy_loss);
+                             _energy_loss, int(_geo_algo));
     } catch (Exceptions::Exception exc) {
       Squeak::mout(Squeak::error) << exc.what() << std::endl;
     }
@@ -501,7 +502,7 @@ void TrackMatching::MatchEMRTrack(
     double target_z = first_hit_pos.Z();
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
-                             _energy_loss);
+                             _energy_loss, int(_geo_algo));
       if (GlobalTools::approx(x_in[1], first_hit_pos.X(),
                               first_hit_pos_err.X()*::sqrt(12)*
                               _matching_tolerances.at("EMR").first) and
