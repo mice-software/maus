@@ -392,7 +392,7 @@ cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for co
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'run' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
@@ -835,6 +835,8 @@ track_matching_no_single_event_check = {
   "Upstream":False,
   "Downstream":False
 }
+# Controls how geometry lookups (and tracking dynamic stepping) are done: "geant4"; "axial"; "geant4_alt"
+track_matching_geometry_algorithm = "geant4"
 
 # Whether through matchings should be performed
 track_matching_through_matching = True

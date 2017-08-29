@@ -38,7 +38,7 @@ TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
     std::string pid_hypothesis_string, int beamline_polarity,
     std::map<std::string, std::pair<double, double> > matching_tolerances,
     double max_step_size, std::pair<bool, bool> no_check_settings,
-    bool energy_loss, bool residuals) {
+    bool energy_loss, bool residuals, TrackMatching::geometry_algorithm algo) {
   _global_event = global_event;
   _mapper_name = mapper_name;
   _pid_hypothesis_string = pid_hypothesis_string;
@@ -48,6 +48,7 @@ TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
   _energy_loss = energy_loss;
   _no_check_settings = no_check_settings;
   _residuals = residuals;
+  _geo_algo = algo;
 }
 
 void TrackMatching::USTrack() {
@@ -73,7 +74,7 @@ void TrackMatching::USTrack() {
       no_check = true;
     }
   }
-  BTFieldConstructor* field;
+  BTFieldConstructor* field = NULL;
   if (!no_check) {
     // Load the magnetic field for RK4 propagation
     field = Globals::GetMCFieldConstructor();
@@ -196,7 +197,7 @@ void TrackMatching::DSTrack() {
       no_check = true;
     }
   }
-  BTFieldConstructor* field;
+  BTFieldConstructor* field = NULL;
   if (!no_check) {
     // Load the magnetic field for RK4 propagation
     field = Globals::GetMCFieldConstructor();
@@ -462,7 +463,7 @@ void TrackMatching::MatchTrackPoint(
     double target_z = spacepoints.at(0)->get_position().Z();
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
-                             _energy_loss);
+                             _energy_loss, static_cast<int>(_geo_algo));
       // To avoid doing the same propagation again for the same point, store the propagated
       // values back in the TLorentzVectors
       position.SetX(x_in[1]);
@@ -526,7 +527,7 @@ void TrackMatching::MatchTOF0(
     // First propagate to just upstream of TOF1 to get the energy during TOF0-1 transit
     try {
       GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
-                             _energy_loss);
+                             _energy_loss, static_cast<int>(_geo_algo));
     } catch (Exceptions::Exception exc) {
       Squeak::mout(Squeak::debug) << exc.what() << std::endl;
     }
@@ -597,7 +598,7 @@ void TrackMatching::MatchEMRTrack(
     double target_z = first_hit_pos.Z();
     try {
       GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
-                             _energy_loss);
+                             _energy_loss, static_cast<int>(_geo_algo));
       if (_residuals) {
         emrfile << first_hit_pos.X() - x_in[1] << " " << first_hit_pos.Y() - x_in[2] << "\n";
       }
