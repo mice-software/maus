@@ -32,38 +32,38 @@ def install_python_tests(maus_root_dir, env):
     Install python test files
 
     Installs files tests/py_unit/test_*.py tests/py_unit/*/test_*.py. Installs
-    into build/, preserving directory structure below tests/py_unit. Also 
-    installs files tests/style/*.py into build/ 
+    into build/tests, preserving directory structure below tests/py_unit. Also
+    installs files tests/style/*.py into build/tests
     """
     target = "%s/tests/py_unit/" % maus_root_dir
-    build  = "%s/build/" % maus_root_dir
+    testsdir  = "%s/build/tests/" % maus_root_dir
     files = glob.glob(target+'test_*.py')
-    env.Install(build, files)
+    env.Install(testsdir, files)
 
     test_subdirs = glob.glob(target+"*")
     for dirpath, dirnames, filenames in os.walk(target): # pylint: disable=W0612
-        test_files = glob.glob(dirpath+"/*.py")                   
+        test_files = glob.glob(dirpath+"/*.py")
         relative_path = dirpath[len(target):]
-        env.Install(build+relative_path, test_files)
+        env.Install(testsdir+relative_path, test_files)
 
 
     for subdir in test_subdirs:
         if os.path.isdir(subdir):
             pos = len(target)
             subdir_mod = subdir[pos:]
-            test_files = glob.glob(subdir+"/*.py")                   
-            env.Install(build+subdir_mod, test_files)
+            test_files = glob.glob(subdir+"/*.py")
+            env.Install(testsdir+subdir_mod, test_files)
 
 def build_lib_maus_cpp(env):
     """
     Build main cpp library
 
-    Build libMausCpp.so shared object - containing all the code in 
+    Build libMausCpp.so shared object - containing all the code in
     src/common_cpp/* and src/legacy/*
     """
     # Magic to sort scons quirk when building object files first
     env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
-    
+
     # Find the common_cpp and legacy cpp source files
     legacy_cpp_files = glob.glob("src/legacy/*/*cc") + \
         glob.glob("src/legacy/*/*/*cc")
@@ -71,22 +71,22 @@ def build_lib_maus_cpp(env):
     for i in range(1, MAX_DIR_DEPTH):
         cpp_name = "src/common_cpp/"+"*/"*i+"*cc"
         common_cpp_files += glob.glob(cpp_name)
-    
+
     # Set up environments for both common_cpp and legacy
     legacy_obj_env = env.Clone()
     legacy_obj_env.Append(CCFLAGS=["""-fpermissive""", """-fPIC"""])
-    
+
     common_obj_env = env.Clone()
     common_obj_env.Append(CCFLAGS=["""-fPIC""", """-std=c++11"""])
     common_obj_env.Append(CPPPATH=["%s/third_party/install/include/cdb-c++" % MAUS_THIRD_PARTY])
 #   common_obj_env.Append(LIBS = ['cdbc++'])
     env.Append(LIBS = ['cdbc++', 'gsoap++', 'xml2'])
-    
+
     # Build the object files
     common_cpp_obj = common_obj_env.Object(common_cpp_files)
     legacy_cpp_obj = legacy_obj_env.Object(legacy_cpp_files)
-   
-    # Build the shared library and install 
+
+    # Build the shared library and install
     all_cpp_obj = common_cpp_obj + legacy_cpp_obj
     targetpath = 'src/common_cpp/libMausCpp'
     maus_cpp = common_obj_env.SharedLibrary(target = targetpath,
@@ -168,7 +168,7 @@ def build_cpp_tests(env, module_list):
     env.Program(target = 'tests/cpp_unit/test_cpp_unit', \
                 source = test_cpp_files, \
                 LIBS= env['LIBS'] + ['MausCpp'])#+module_list)
-    env.Install('build', ['tests/cpp_unit/test_cpp_unit'])
+    env.Install('build/tests', ['tests/cpp_unit/test_cpp_unit'])
 
     test_tof_files = glob.glob\
                 ("tests/integration/test_simulation/test_tof/src/*cc")
@@ -176,7 +176,7 @@ def build_cpp_tests(env, module_list):
                 'tests/integration/test_simulation/test_tof/tof_mc_plotter', \
                 source = test_tof_files, \
                 LIBS= env['LIBS'] + ['MausCpp'] + module_list)
-    env.Install('build', tof_mc_plotter)
+    env.Install('build/tests', tof_mc_plotter)
 
 def build_data_structure(env):
     """
@@ -184,11 +184,11 @@ def build_data_structure(env):
 
     ROOT needs a .so containing the data structure
     class symbols and this needs to be ported to wherever the data structure is
-    called. We build this by calling root and letting it do it's dynamic linker 
+    called. We build this by calling root and letting it do it's dynamic linker
     stuff
     """
     maus_root_dir = os.environ['MAUS_ROOT_DIR']
-    data_struct = os.path.join(maus_root_dir, 'src/common_cpp/DataStructure/') 
+    data_struct = os.path.join(maus_root_dir, 'src/common_cpp/DataStructure/')
     here = os.getcwd()
     os.chdir(maus_root_dir)
     data_items = glob.glob(data_struct+'*.hh')
@@ -196,7 +196,7 @@ def build_data_structure(env):
     data_items.extend(glob.glob(data_struct+'ImageData/*.hh'))
     data_items = [item for item in data_items if item[-7:] != '-inl.hh']
     # LinkDef.hh must be last
-    data_items.sort(key = lambda x: x.find('LinkDef.hh')) 
+    data_items.sort(key = lambda x: x.find('LinkDef.hh'))
     data_items = filter(lambda x: x[-7:] != '-inl.hh', data_items)
     dict_target = (data_struct+'/MausDataStructure.cc')
     proc_target = ['rootcint']+['-f', dict_target, '-c']
@@ -207,5 +207,3 @@ def build_data_structure(env):
     proc = subprocess.Popen(proc_target)
     proc.wait()
     os.chdir(here)
-
-
