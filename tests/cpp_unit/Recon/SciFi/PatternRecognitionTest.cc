@@ -293,7 +293,7 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(160.0, pr._circle_minuit_cut);
+  EXPECT_EQ(10.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(1000.0, pr._long_minuit_cut);
@@ -325,7 +325,7 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(150.0, pr._R_res_cut);
   EXPECT_EQ(50.0, pr._straight_chisq_cut);
   EXPECT_EQ(5.0, pr._circle_chisq_cut);
-  EXPECT_EQ(160.0, pr._circle_minuit_cut);
+  EXPECT_EQ(10.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
   EXPECT_EQ(1000.0, pr._long_minuit_cut);
@@ -591,6 +591,8 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_circle_minuit) {
   PatternRecognition pr;
   pr.set_parameters_to_default();
   pr.set_circle_fitter(1);
+  pr._sd_mcs = 2.0;
+  pr._circle_minuit_cut = 10.0;
 
   // Set up the spacepoints vector
   std::vector<SciFiSpacePoint*> spnts = set_up_multiple_track_spacepoints();
@@ -638,9 +640,9 @@ TEST_F(PatternRecognitionTest, test_multiple_evts_per_trigger_circle_minuit) {
     EXPECT_NEAR(spnts[3]->get_npe(), spnts[0]->get_npe(), 0.01);
     EXPECT_NEAR(spnts[4]->get_npe(), spnts[0]->get_npe(), 0.01);
   }
-  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.342, 0.01);
-  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.1156, 0.005);
-  EXPECT_NEAR(htrks[2]->get_dsdz(), -0.01834, 0.01);
+  EXPECT_NEAR(htrks[1]->get_dsdz(), -0.342, 0.01);
+  EXPECT_NEAR(htrks[2]->get_dsdz(), -0.1156, 0.005);
+  EXPECT_NEAR(htrks[0]->get_dsdz(), -0.01834, 0.01);
   EXPECT_NEAR(htrks[3]->get_dsdz(), -0.1178, 0.01);
   EXPECT_NEAR(htrks[4]->get_dsdz(), 0.08396, 0.001);
   EXPECT_NEAR(htrks[5]->get_dsdz(), 0.3126, 0.001);

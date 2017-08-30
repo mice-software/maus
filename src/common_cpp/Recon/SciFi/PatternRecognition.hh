@@ -482,6 +482,7 @@ class PatternRecognition {
     double _sd_5;               /**< Position error associated with station 5 */
     double _sd_phi_1to4;        /**< Rotation error associated with stations 1 t0 4 */
     double _sd_phi_5;           /**< Rotation error associated with station 5 */
+    double _sd_mcs;             /** Estimated multiple coulomb scattering spacepoint pos error */
     double _res_cut;            /**< Road cut for linear fit in mm */
     double _straight_chisq_cut; /**< Cut on the chi^2 of the least sqs fit in mm */
     double _R_res_cut;          /**< Cut on the radius of the track helix in mm */

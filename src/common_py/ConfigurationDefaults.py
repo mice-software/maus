@@ -293,6 +293,7 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
+SciFiMCSStationError = 2.0 # mm
 SciFiClusterReconOn = True
 SciFiSpacepointReconOn = True
 SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
@@ -310,7 +311,7 @@ SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
 SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec least squares circle fit
-SciFiPatRecCircleMinuitChi2Cut = 160 # Chi^2 on pat rec minuit circle fit
+SciFiPatRecCircleMinuitChi2Cut = 10 # Chi^2 on pat rec minuit circle fit
 SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
 SciFiPatRecSZChi2Cut = 150.0 # Chi^2 cut on pat rec s-z fit
 SciFiPatRecLongMinuitChi2Cut = 1000.0 # Chi^2 cut on pat rec minuit longitudinal fit
