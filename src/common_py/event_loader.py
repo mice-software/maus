@@ -49,6 +49,7 @@ class maus_reader() :
       self.__filenames = [ filename ]
 
     self.__current_filenumber = -1
+    self.__current_statistical_weight = 1.0
 
     self.__tree = None
     self.__data = None
@@ -120,6 +121,13 @@ class maus_reader() :
                                                   str(print_progress) )
 
 
+  def get_current_statistical_weight( self ) :
+    """
+      Returns the statistical weight of the last loaded event.
+    """
+    return self.__current_statistical_weight
+
+
   def select_events( self, selected_events_dict ) :
     """
       Only loads events that are present in the supplied dictionary.
@@ -139,7 +147,7 @@ class maus_reader() :
       return False
 
 
-  def save_event( self ) :
+  def save_event( self, weight=1.0 ) :
     """
       Add the event location to an internal list of good events.
     """
@@ -149,9 +157,9 @@ class maus_reader() :
     if filename not in self.__saved_events :
       self.__saved_events[filename] = {}
     if spill not in self.__saved_events[filename] :
-      self.__saved_events[filename][spill] = []
+      self.__saved_events[filename][spill] = {}
 
-    self.__saved_events[filename][spill].append(event)
+    self.__saved_events[filename][spill][event] = weight
 
 
   def get_saved_events( self ) :
@@ -252,10 +260,13 @@ class maus_reader() :
     else :
       while self.next_event():
         spill = str(self.__current_spill_num)
+        event = str(self.__current_event_num)
         if self.__current_filename in self.__selected_events :
           if spill in self.__selected_events[self.__current_filename] :
-            if self.__current_event_num in \
+            if event in \
                        self.__selected_events[self.__current_filename][spill] :
+              weight = self.__selected_events[self.__current_filename][spill][event]
+              self.__current_statistical_weight = weight
               return True
       else:
         return False
@@ -290,7 +301,8 @@ class maus_reader() :
 
       self.__tree.GetEntry( self.__current_spill_num )
       self.__spill = self.__data.GetSpill()
-      self.__current_num_events = self.__spill.GetReconEvents().size()
+      self.__current_num_events = max( self.__spill.GetReconEvents().size(), \
+                                            self.__spill.GetMCEvents().size() )
       self.__current_event_num = 0
 
       if self.__spill.GetDaqEventType() == "physics_event" :

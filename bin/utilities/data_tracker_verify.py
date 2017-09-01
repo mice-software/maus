@@ -36,6 +36,7 @@ import types
 import event_loader
 from analysis import tools
 import ROOT
+import glob
 
 # Useful Constants and configuration
 REFERENCE_PLANE = 0
@@ -1010,7 +1011,11 @@ if __name__ == "__main__" :
 
 ##### 2. Load SciFi Events ####################################################
     print "\nLoading Spills...\n"
-    file_reader = event_loader.maus_reader(namespace.maus_root_files)
+    files = []
+    for filename in namespace.maus_root_files :
+      files += glob.glob(filename)
+
+    file_reader = event_loader.maus_reader(files)
 
     try :
       while file_reader.next_event() and \
