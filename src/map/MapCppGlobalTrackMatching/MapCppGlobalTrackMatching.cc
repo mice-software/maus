@@ -29,8 +29,10 @@
 #include "src/common_cpp/Utils/Globals.hh"
 
 #include "src/legacy/Config/MiceModule.hh"
+#include "src/common_cpp/Recon/Global/GlobalTools.hh"
 
 #include "src/map/MapCppGlobalTrackMatching/MapCppGlobalTrackMatching.hh"
+
 
 namespace MAUS {
 
@@ -90,7 +92,7 @@ namespace MAUS {
         tof12_cdt/track_matching_tolerances["TOF12minSpeed"].asDouble());
     Json::Value no_check = _configJSON["track_matching_no_single_event_check"];
     _no_check_settings = std::make_pair(no_check["Upstream"].asBool(),
-                                        no_check["Downstream"].asBool());
+              no_check["Downstream"].asBool());
     _through_matching = _configJSON["track_matching_through_matching"].asBool();
     _residuals = _configJSON["track_matching_residuals"].asBool();
     std::string geometry_lookup =
@@ -106,6 +108,18 @@ namespace MAUS {
                         "Did not recognise track_matching_geometry_algorithm "+
                         geometry_lookup, "MapCppGlobalTrackMatching::_process");
     }
+    std::string extra_z_planes =
+                    _configJSON["track_matching_z_planes"].asString();
+    if (extra_z_planes == "none") {
+        // do nothing;
+    } else if (extra_z_planes == "virtual") {
+        _extra_z_planes = GlobalTools::getVirtualZPlanes();
+    } else {
+        throw Exceptions::Exception(Exceptions::recoverable,
+                        "Did not recognise track_matching_z_planes "+
+                        extra_z_planes, "MapCppGlobalTrackMatching::_process");
+    }
+
   }
 
   void MapCppGlobalTrackMatching::_death() {
@@ -140,7 +154,8 @@ namespace MAUS {
         recon::global::TrackMatching
             track_matching(global_event, _mapper_name, _pid_hypothesis_string,
                            _beamline_polarity, _matching_tolerances, 20.0,
-                           _no_check_settings, _energy_loss, _residuals, _geom_algo);
+                           _no_check_settings, _energy_loss, _residuals, _geom_algo,
+                           _extra_z_planes);
         track_matching.USTrack();
         track_matching.DSTrack();
         if (_through_matching) {

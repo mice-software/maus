@@ -203,6 +203,14 @@ int z_equations_of_motion(double z, const double x[8], double dxdt[8],
 void changeEnergy(double* x, double deltaE, double mass);
 
 /**
+ *  @brief Returns a list of z positions of virtual planes
+ *
+ *  This will only return the z positions of virtual planes that are z slices;
+ *  virtual planes that are rotated or time slices will be ignored.
+ */
+std::vector<double> getVirtualZPlanes();
+
+/**
  * @brief Returns whether the first TrackPoint has a lower z-position than the
  * second one. Used to perform an std::sort on a vector of TrackPoints.
  */

@@ -28,6 +28,7 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
@@ -571,6 +572,24 @@ void changeEnergy(double* x, double deltaE, double mass) {
 bool TrackPointSort(const DataStructure::Global::TrackPoint* tp1,
                     const DataStructure::Global::TrackPoint* tp2) {
   return (tp1->get_position().Z() < tp2->get_position().Z());
+}
+
+std::vector<double> getVirtualZPlanes() {
+    Squeak::mout(Squeak::debug) << "Virtual Planes for track matching z: " << std::flush;
+    VirtualPlaneManager* man = Globals::GetGeant4Manager()->GetVirtualPlanes();
+    std::vector<VirtualPlane*> planeVec = man->GetPlanes();
+    std::vector<double> virtualZPlanes;
+    for (size_t i = 0; i < planeVec.size(); ++i) {
+        Squeak::mout(Squeak::debug) << planeVec[i]->GetPlaneIndependentVariable() << " ";
+        // we only want the virtual planes that are slices in z (it is also
+        // possible to define slices in time and rotated planes)
+        if (planeVec[i]->GetPlaneIndependentVariableType() == BTTracker::z) {
+            double z = planeVec[i]->GetPlaneIndependentVariable();
+            virtualZPlanes.push_back(z);
+        }
+    }
+    Squeak::mout(Squeak::debug) << std::endl;
+    return virtualZPlanes;
 }
 
 } // ~namespace GlobalTools

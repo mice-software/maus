@@ -65,7 +65,8 @@ namespace global {
                   std::pair<bool, bool> no_check_settings,
                   bool energy_loss = true,
                   bool residuals = false,
-                  geometry_algorithm algo = kClassicG4);
+                  geometry_algorithm algo = kClassicG4,
+                  std::vector<double> extra_z_planes = std::vector<double>());
 
     /// Destructor
     ~TrackMatching() {}
@@ -227,6 +228,14 @@ namespace global {
         DataStructure::Global::Track* tracker_track, std::string mapper_name,
         double mass, DataStructure::Global::Track* hypothesis_track);
 
+    /** 
+     *  @brief Adds TrackPoints stored in the virtual_track_points list to the
+     *  hypothesis_track
+     *
+     *  @param hypothesis_track the track to which track points are added
+     */
+    void AddVirtualTrackPoints(DataStructure::Global::Track* hypothesis_track);
+
     /**
      * @brief Returns the time from a TrackPoint in the chosen detector (TOF0,
      * TOF1, TOF2).
@@ -268,6 +277,53 @@ namespace global {
      */
     void CheckChainMultiplicity();
 
+    /**
+     *  @brief Propagate tracks to given z position, recording extra hits
+     *
+     *  Figure out the positions of any extra z planes between z and target_z;
+     *  propagate through the z planes,  recording any extra track points in
+     *  the extra track points vector
+     *
+     *  @param x_in 8-vector t, x, y, z, energy, px, py, pz for tracking
+     *  @param field the field to use for track propagation
+     *  @param pid the particle type (PDG number) of particle propagated
+     *  @param target_z z-position to propagate to 
+     */
+    void Propagate(double* x_in,
+                   BTFieldConstructor* field,
+                   DataStructure::Global::PID pid,
+                   double target_z);
+
+    /**
+     *  @brief Match through-going track using a simple TOF12 window
+     *
+     *  If TOF12 is within the range in TOF12dT matching tolerances, assumes a
+     *  match for us_track and ds_track.
+     *
+     *  @param us_track Track with TOF1 data (or matching fails)
+     *  @param ds_track Track with TOF2 data (or matching fails)
+     *  @param pid PID hypothesis of the through-going track
+     */
+    DataStructure::Global::Track* throughMatchTOF(
+                                DataStructure::Global::Track* us_track,
+                                DataStructure::Global::Track* ds_track,
+                                DataStructure::Global::PID pid);
+
+    /**
+     *  @brief Add child track and track points to the parent track
+     *
+     *  Adds the child track to the parent and each TrackPoint on the child
+     *  track to the parent.
+     *
+     *  @param parent The parent track.
+     *  @param child The child track.
+     *  @param doEmr Set to true to overwrite the parent emr_primary and
+     *         emr_density with data from the child.
+     */
+    void addTrackRecursive(DataStructure::Global::Track* parent,
+                           DataStructure::Global::Track* child,
+                           bool doEmr);
+
     /// Mapper name passed by the mapper calling this class
     std::string _mapper_name;
 
@@ -296,6 +352,10 @@ namespace global {
 
     /// The global event to be processed
     GlobalEvent* _global_event;
+
+    /// Track matching will report a hit at each of the extra z planes
+    std::vector<double> _extra_z_planes;
+    std::vector<DataStructure::Global::TrackPoint> _virtual_track_points;
 
     /// Controls how the track propagation is done
     geometry_algorithm _geo_algo;
