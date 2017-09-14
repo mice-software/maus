@@ -34,7 +34,7 @@ class ModuleBuilder:
     """
     SCons "Dev" class responsible for build subprojects, in this case each of
     the submodules are a "subproject"
-    
+
     sconscript files call these functions
     """
 
@@ -93,7 +93,8 @@ class ModuleBuilder:
 
         name = project.split('/')[-1]
         builddir = 'build'
-        # ack - build the module twice, once for lib*.so and once for _*.so 
+        testdir = 'tests'
+        # ack - build the module twice, once for lib*.so and once for _*.so
         # needed by SWIG - could use a symlink here (but that seems quite hard
         # to do for SCons novice)
         lib_path = os.path.join('build', 'lib%s' % name)
@@ -115,6 +116,7 @@ class ModuleBuilder:
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
         full_build_dir = os.path.join(MAUS_ROOT_DIR, builddir)
+        full_test_dir = os.path.join(full_build_dir, testdir)
 
         srclst = [builddir + '/' + x for x in glob.glob('*.cc')]
         srclst += [builddir + '/' + x for x in glob.glob('*.i')]
@@ -134,7 +136,7 @@ class ModuleBuilder:
         self.env.Install(full_build_dir, "build/%s.py" % name)
         self.env.Install(full_build_dir, swig_lib)
         self.env.Install(full_build_dir, normal_lib)
-        self.env.Install(full_build_dir, tests)
+        self.env.Install(full_test_dir, tests)
         return True
 
     #sets up the build for a given project, using the C/Python API
@@ -153,7 +155,7 @@ class ModuleBuilder:
 
         # Determine the name of the project
         name = project.split('/')[-1]
-        
+
         # Find the sources
         ccpath = [x for x in glob.glob('*.cc')]
 
@@ -171,9 +173,11 @@ class ModuleBuilder:
 
         #specify the build directory
         builddir = 'build'
+        testdir = 'tests'
         localenv.VariantDir(variant_dir=builddir, src_dir='.', duplicate=0)
         localenv.Append(CPPPATH='.')
         full_build_dir = os.path.join(MAUS_ROOT_DIR, builddir)
+        full_test_dir = os.path.join(full_build_dir, testdir)
 
         # Build the library, and set the dependencies
         lib1_path = os.path.join(builddir, 'lib%s' % name)
@@ -201,7 +205,7 @@ class ModuleBuilder:
         print 'Installing', project
         self.env.Install(full_build_dir, normal_lib1)
         self.env.Install(full_build_dir, normal_lib2)
-        self.env.Install(full_build_dir, tests)
+        self.env.Install(full_test_dir, tests)
         return True
 
     def register_modules(self):
@@ -224,8 +228,13 @@ class ModuleBuilder:
 
             if 'Py' in parts[2] and 'Cpp' not in parts[2]:
                 print 'Found Python module: %s' % parts[2]
-                files = glob.glob('%s/*.py' % directory) 
-                self.env.Install("build", files)
+                files = glob.glob('%s/*.py' % directory)
+                tests = [f for f in files if \
+                  os.path.split(f)[1].startswith('test') \
+                  or os.path.split(f)[1].startswith('Test')]
+                sources = [f for f in files if f not in tests]
+                self.env.Install("build", sources)
+                self.env.Install("build/tests", tests)
                 py_libs.append(parts[2])
 
             for my_type in types:
@@ -265,7 +274,7 @@ def cleanup_extras():
         for basename in dirs:
             dirname = os.path.join(root, basename)
             if os.path.isdir(dirname):
-                shutil.rmtree(dirname) 
+                shutil.rmtree(dirname)
 
 def build_maus_lib(filename, import_module_list):
     """
@@ -290,7 +299,7 @@ try:
 except ImportError:
     from _%%MODULE%% import %%MODULE%%
 """
-        import_string = import_string.replace("%%MODULE%%", import_module) 
+        import_string = import_string.replace("%%MODULE%%", import_module)
         file_to_import.write(import_string)
     file_to_import.close()
 
@@ -313,4 +322,3 @@ def build_okay(directory):
     <project>_failed_build in sconscript and then look for it here.
     """
     return not os.path.exists(fail_path(directory))
-

@@ -385,6 +385,25 @@ MiceMaterials* fillMaterials(MiceMaterials* materials_list)
   TufsetPU->AddElement(elO, 20.60*perCent);
   materials_list->addMaterial( TufsetPU, name );
 
+  // POLYVINYL_TOLUENE_
+  density = 1.032 * g/cm3;
+  name = "POLYVINYL_TOLUENE";
+  G4Material* PVT = new G4Material(name, density, nComp=2, kStateSolid);
+  PVT->AddElement(elC, 91.5023*perCent);
+  PVT->AddElement(elH,  8.4977*perCent);
+  materials_list->addMaterial( PVT, name );
+
+  G4Element* elCl = man->FindOrBuildElement("Cl");
+
+  // POLYVINYL_CHLORIDE_LOWD
+  density = 0.12 * g/cm3;
+  name = "POLYVINYL_CHLORIDE_LOWD";
+  G4Material* PVC_LD = new G4Material(name, density, nComp=3, kStateSolid);
+  PVC_LD->AddElement(elC,  38.436*perCent);
+  PVC_LD->AddElement(elH,   4.838*perCent);
+  PVC_LD->AddElement(elCl, 56.726*perCent);
+  materials_list->addMaterial( PVC_LD, name );
+
   // TUFNOL 
 
   // now fill in the other maps of the material properties

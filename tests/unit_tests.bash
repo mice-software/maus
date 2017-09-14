@@ -31,7 +31,7 @@ if [ $maus_lcov ]; then
     fi
 fi
 
-# force nosetests here otherwise use easy_install default python - which is 
+# force nosetests here otherwise use easy_install default python - which is
 # hard coded to whatever easy_install was set up with (not right if we move code)
 # Issue #819
 
@@ -41,13 +41,18 @@ if [ $maus_pycov ]; then
     maus_coverage_extra="--with-coverage --cover-html --cover-html-dir=${MAUS_ROOT_DIR}/doc/python_coverage --cover-inclusive"
 fi
 
-python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build $maus_coverage_extra \
---exclude-dir build/test_maus_cpp/test_optics/
+# Some tests which don't play nice with nosetests first
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/tests/test_maus_cpp/test_simulation.py $maus_coverage_extra
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/tests/test_maus_cpp/test_field.py $maus_coverage_extra
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/tests/test_MapCppGlobalTrackMatching.py $maus_coverage_extra
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/tests/test_MapCppSimulation.py $maus_coverage_extra
 
-python ${MAUS_ROOT_DIR}/src/map/MapCppGlobalTrackMatching/_test_MapCppGlobalTrackMatching.py
+# The main nosetests run
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/tests $maus_coverage_extra \
+--exclude-dir build/tests/test_maus_cpp/test_optics/ --exclude test_simulation.py --exclude test_field.py --exclude test_MapCppSimulation.py --exclude test_MapCppGlobalTrackMatching.py
 
 echo 'Testing optics separately as it corrupts globals singleton'
-python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/test_maus_cpp/test_optics/ $maus_coverage_extra
+python ${MAUS_THIRD_PARTY}/third_party/install/bin/nosetests -v ${MAUS_ROOT_DIR}/build/tests/test_maus_cpp/test_optics/ $maus_coverage_extra
 
 if [ $maus_lcov ]; then
     if [ $maus_lcov -ne "0" ]; then
