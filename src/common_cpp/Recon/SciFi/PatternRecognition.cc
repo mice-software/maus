@@ -90,7 +90,7 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _circle_minuit_cut(10.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
-                                          _long_minuit_cut(1000.0),
+                                          _long_minuit_cut(65.0),
                                           _circle_error_w(1.0),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
@@ -138,7 +138,7 @@ void PatternRecognition::set_parameters_to_default() {
   _circle_minuit_cut = 10.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
-  _long_minuit_cut = 1000.0;
+  _long_minuit_cut = 65.0;
   _circle_error_w = 1.0;
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
@@ -806,10 +806,8 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
 
   } else if (_circle_fitter == 1) {
     // Set up a position error vector (constant error, estimated to account for MCS)
-    std::vector<double> err;
-    for (int i = 0; i < n_points; ++i) {
-      err.push_back(_sd_mcs);
-    }
+    std::vector<double> err(n_points, _sd_mcs);
+
     // With a ROOT MINUIT based fitter
     good_radius = RootFitter::FitCircleMinuit(x, y, err, c_trial, cov_circle);
     if ( (c_trial.get_R() > _R_res_cut) || \
@@ -904,9 +902,12 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
         expected_handedness = _expected_handedness_t2;
     }
 
+    // Set up a position error vector (constant error, estimated to account for MCS)
+    std::vector<double> err(n_points, _sd_mcs);
+
     // Call the fitter
     const double pStart[4] = {c_trial.get_x0(), c_trial.get_y0(), c_trial.get_R(), 0.0};
-    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, pStart, helix,
+    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, err, pStart, helix,
                                              expected_handedness, _long_minuit_cut);
     if (!result) {
       if (n_points == 5 && _debug) {
