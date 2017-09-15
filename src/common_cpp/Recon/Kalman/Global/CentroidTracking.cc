@@ -165,13 +165,6 @@ int CentroidTracking::EquationsOfMotion(double z,
       tracking_fail << "Material transport failed\n";
       return material_success;
   }
-  Squeak::mout(Squeak::debug) << "    CentroidTracking::EquationsOfMotion Values ";
-  for (size_t i = 0; i < 8; ++i)
-    Squeak::mout(Squeak::debug) << x[i] << " ";
-  Squeak::mout(Squeak::debug) << "\n    CentroidTracking::EquationsOfMotion Derivatives ";
-  for (size_t i = 0; i < 8; ++i)
-      Squeak::mout(Squeak::debug) << dxdz[i] << " ";
-  Squeak::mout(Squeak::debug) << std::endl;
   return GSL_SUCCESS;
 }
 

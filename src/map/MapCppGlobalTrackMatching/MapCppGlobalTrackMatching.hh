@@ -32,6 +32,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 // external libraries
 #include "json/json.h"
@@ -98,9 +99,11 @@ namespace MAUS {
     bool _through_matching;
     /// Mapper name
     std::string _mapper_name;
-    /// Controls internal geometry lookup of the track matching
+    /// Controls internal geometry lookup of the track propagation
     recon::global::TrackMatching::geometry_algorithm _geom_algo;
-  }; // Don't forget this trailing colon!!!!
+    /// Controls the logic of the through-going track matching
+    recon::global::TrackMatching::through_track_algorithm _through_matching_algo;
+  };
 } // ~MAUS
 
 #endif

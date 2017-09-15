@@ -826,6 +826,8 @@ track_matching_tolerances = {
   "EMRy":75.0,
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
   "TOF12minSpeed":0.5,
+  "TKDpos":300.0, # position 
+  "TKDp":200.0, # momentum
 }
 
 # Whether to use energy loss calculations for global track matching
@@ -835,16 +837,41 @@ track_matching_no_single_event_check = {
   "Upstream":False,
   "Downstream":False
 }
-# Controls how geometry lookups (and tracking dynamic stepping) are done: "geant4"; "axial"; "geant4_alt"
-track_matching_geometry_algorithm = "geant4"
+# Controls how geometry lookups (and tracking dynamic stepping) are done:
+# "geant4" use full geant4 lookup
+# "axial" assume cylindrical symmetry with materials and thicknesses determined by materials detected on-axis
+# "geant4_alt" alternative version of the full geant4 lookup
+track_matching_geometry_algorithm = "axial"
 
-# Whether through matchings should be performed
+# Set to false to disable through matching (track matching between TKU and TKD)
+# Set to true to enable through matching
 track_matching_through_matching = True
+
+# Controls the through matching logic
+# no_through_matching - don't do any through matching
+# tof12 - Match tracks if they have a tof1 space point, tof2 space point and the
+#         delta tof12 is compatible with track_matching_tolerances
+# propagate - Match tracks if they have a tku st 1 space point, a tku st2 space
+#         point and the residual position and momentum between propagated tku
+#         tracks and tkd tracks is compatible with track_matching_tolerances
+# propagate_requiring_tof12 - if tof12 matching is successful, attempt to do a
+#         propagate matching. Record the propagate matching if it is successful,
+#         else the tof12 matching
+# propagate_and_tof12 - do a propagate matching and a tof12 matching. Record the
+#         propagate matching if it is successful, else the tof12 matching
+track_matching_through_matching_logic = "propagate_and_tof12"
 
 # Whether residuals should be generated during track matching. In this case,
 # track_matching_pid_hypothesis should be set to the most common PID expected in the beam.
 # Output files will be placed in the directory in which MAUS is executed.
 track_matching_residuals = False
+
+# Choose to add additional z positions for tracking output
+# "none": don't add any additional z-positions
+# "virtual": use virtual planes as additional z-positions
+# Will add track points to the matched tracking output when track propagation crosses
+# a virtual plane
+track_matching_z_planes = "virtual"
 
 # Whether multiple adjacent cell hits in the KL should be merged into single spacepoints on import
 # into the global datastructure

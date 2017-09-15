@@ -29,7 +29,6 @@ namespace MAUS {
 namespace recon {
 namespace global {
 
-
 class TrackMatchingTest : public ::testing::Test {
  protected:
   TrackMatchingTest()  {}
@@ -42,12 +41,19 @@ class TrackMatchingTest : public ::testing::Test {
     _matching_tolerances["KL"] = std::make_pair(10000, 32.0);
     _matching_tolerances["EMR"] = std::make_pair(40.0, 40.0);
     _matching_tolerances["TOF12dT"] = std::make_pair(27.0, 54.0);
+    _matching_tolerances["TKD"] = std::make_pair(20.0, 20.0);
     _no_check_settings = std::make_pair(false, false);
     _residuals = false;
   }
   virtual void TearDown() {}
 
+
  public:
+  void BuildGlobalEvent();
+  void run_one(bool propagate_x, bool propagate_p, bool tof12,
+               recon::global::TrackMatching::through_track_algorithm,
+               recon::global::TrackMatching::geometry_algorithm algo);
+
   GlobalEvent* _global_event;
   recon::global::TrackMatching* _track_matching;
   std::map<std::string, std::pair<double, double> > _matching_tolerances;
@@ -55,17 +61,9 @@ class TrackMatchingTest : public ::testing::Test {
   bool _residuals;
 };
 
-TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
-  _track_matching = new recon::global::TrackMatching(_global_event,
-      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0,
-      _no_check_settings, _residuals);
-
-  Simulation::DetectorConstruction* dc =
-      Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
-  std::string mod_path = std::string(getenv("MAUS_ROOT_DIR"))+
-      "/tests/cpp_unit/Recon/Global/TestGeometries/";
-  MiceModule geometry(mod_path+"SimpleBeamline.dat");
-  dc->SetMiceModules(geometry);
+void TrackMatchingTest::BuildGlobalEvent() {
+  delete _global_event;
+  _global_event = new GlobalEvent;
 
   TLorentzVector tof0_pos(0.0, 0.0, 100.0, 0.0);
   TLorentzVector tof1_pos(30.0, 0.0, 7902.0, 31.0);
@@ -79,49 +77,72 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
   TLorentzVector emr_pos_error(2.0, 2.0, 5.0, 10.0);
 
   // Add Spacepoints for TOFs and KL to global event
-  DataStructure::Global::SpacePoint tof0_sp;
-  tof0_sp.set_position(tof0_pos);
-  tof0_sp.set_detector(DataStructure::Global::kTOF0);
-  _global_event->add_space_point(&tof0_sp);
-  DataStructure::Global::SpacePoint tof1_sp;
-  tof1_sp.set_position(tof1_pos);
-  tof1_sp.set_detector(DataStructure::Global::kTOF1);
-  _global_event->add_space_point(&tof1_sp);
-  DataStructure::Global::SpacePoint tof2_sp;
-  tof2_sp.set_position(tof2_pos);
-  tof2_sp.set_detector(DataStructure::Global::kTOF2);
-  _global_event->add_space_point(&tof2_sp);
-  DataStructure::Global::SpacePoint kl_sp;
-  kl_sp.set_position(kl_pos);
-  kl_sp.set_detector(DataStructure::Global::kCalorimeter);
-  _global_event->add_space_point(&kl_sp);
+  DataStructure::Global::SpacePoint* tof0_sp = new DataStructure::Global::SpacePoint();
+  tof0_sp->set_position(tof0_pos);
+  tof0_sp->set_detector(DataStructure::Global::kTOF0);
+  _global_event->add_space_point(tof0_sp);
+  DataStructure::Global::SpacePoint* tof1_sp = new DataStructure::Global::SpacePoint();
+  tof1_sp->set_position(tof1_pos);
+  tof1_sp->set_detector(DataStructure::Global::kTOF1);
+  _global_event->add_space_point(tof1_sp);
+  DataStructure::Global::SpacePoint* tof2_sp = new DataStructure::Global::SpacePoint();
+  tof2_sp->set_position(tof2_pos);
+  tof2_sp->set_detector(DataStructure::Global::kTOF2);
+  _global_event->add_space_point(tof2_sp);
+  DataStructure::Global::SpacePoint* kl_sp = new DataStructure::Global::SpacePoint();
+  kl_sp->set_position(kl_pos);
+  kl_sp->set_detector(DataStructure::Global::kCalorimeter);
+  _global_event->add_space_point(kl_sp);
 
   // For Tracker and EMR make trackpoints and tracks
-  DataStructure::Global::SpacePoint sp;
-  sp.set_position(tracker0_pos);
-  DataStructure::Global::TrackPoint tracker0_tp(&sp);
-  tracker0_tp.set_momentum(tracker0_mom);
-  tracker0_tp.set_detector(DataStructure::Global::kTracker0);
-  DataStructure::Global::Track tracker0_track;
-  tracker0_track.AddTrackPoint(&tracker0_tp);
-  _global_event->add_track_recursive(&tracker0_track);
+  DataStructure::Global::Track* tracker0_track = new DataStructure::Global::Track();
+  DataStructure::Global::SpacePoint* sp = new DataStructure::Global::SpacePoint();
+  sp->set_position(tracker0_pos);
+  DataStructure::Global::TrackPoint* tracker0_tp = new DataStructure::Global::TrackPoint(sp);
+  tracker0_tp->set_momentum(tracker0_mom);
+  tracker0_tp->set_detector(DataStructure::Global::kTracker0);
+  tracker0_track->AddTrackPoint(tracker0_tp);
+  tracker0_tp = new DataStructure::Global::TrackPoint(sp);
+  tracker0_tp->set_momentum(tracker0_mom);
+  tracker0_tp->set_detector(DataStructure::Global::kTracker0_1);
+  tracker0_track->AddTrackPoint(tracker0_tp);
+  _global_event->add_track_recursive(tracker0_track);
 
-  sp.set_position(tracker1_pos);
-  DataStructure::Global::TrackPoint tracker1_tp(&sp);
-  tracker1_tp.set_momentum(tracker1_mom);
-  tracker1_tp.set_detector(DataStructure::Global::kTracker1);
-  DataStructure::Global::Track tracker1_track;
-  tracker1_track.AddTrackPoint(&tracker1_tp);
-  _global_event->add_track_recursive(&tracker1_track);
+  DataStructure::Global::Track* tracker1_track = new DataStructure::Global::Track();
+  sp->set_position(tracker1_pos);
+  DataStructure::Global::TrackPoint* tracker1_tp = new DataStructure::Global::TrackPoint(sp);
+  tracker1_tp->set_momentum(tracker1_mom);
+  tracker1_tp->set_detector(DataStructure::Global::kTracker1);
+  tracker1_track->AddTrackPoint(tracker1_tp);
+  tracker1_tp = new DataStructure::Global::TrackPoint(sp);
+  tracker1_tp->set_momentum(tracker1_mom);
+  tracker1_tp->set_detector(DataStructure::Global::kTracker1_1);
+  tracker1_track->AddTrackPoint(tracker1_tp);
+  _global_event->add_track_recursive(tracker1_track);
 
-  sp.set_position(emr_pos);
-  sp.set_position_error(emr_pos_error);
-  DataStructure::Global::TrackPoint emr_tp(&sp);
-  emr_tp.set_detector(DataStructure::Global::kEMR);
-  DataStructure::Global::Track emr_track;
-  emr_track.AddTrackPoint(&emr_tp);
-  emr_track.set_emr_range_primary(20.0);
-  _global_event->add_track_recursive(&emr_track);
+  sp->set_position(emr_pos);
+  sp->set_position_error(emr_pos_error);
+  DataStructure::Global::TrackPoint* emr_tp = new DataStructure::Global::TrackPoint(sp);
+  emr_tp->set_detector(DataStructure::Global::kEMR);
+  DataStructure::Global::Track* emr_track = new DataStructure::Global::Track();
+  emr_track->AddTrackPoint(emr_tp);
+  emr_track->set_emr_range_primary(20.0);
+  _global_event->add_track_recursive(emr_track);
+}
+
+TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrackTOF01) {
+  _track_matching = new recon::global::TrackMatching(_global_event,
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0,
+      _no_check_settings, _residuals);
+
+  BuildGlobalEvent();
+
+  Simulation::DetectorConstruction* dc =
+      Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
+  std::string mod_path = std::string(getenv("MAUS_ROOT_DIR"))+
+      "/tests/cpp_unit/Recon/Global/TestGeometries/";
+  MiceModule geometry(mod_path+"SimpleBeamline.dat");
+  dc->SetMiceModules(geometry);
 
   _track_matching->USTrack();
   _track_matching->DSTrack();
@@ -143,16 +164,17 @@ TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrack) {
     EXPECT_EQ(through_chain->GetUSDaughter(), us_chain);
     EXPECT_EQ(through_chain->GetDSDaughter(), ds_chain);
     EXPECT_EQ(us_chain->GetMatchedTrack(
-        DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 3);
-    EXPECT_EQ(ds_chain->GetMatchedTrack(
         DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 4);
+    EXPECT_EQ(ds_chain->GetMatchedTrack(
+        DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 5);
     EXPECT_EQ(through_chain->GetMatchedTrack(
-        DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 7);
+        DataStructure::Global::kMuPlus)->GetTrackPoints().size(), 9);
     EXPECT_FLOAT_EQ(ds_chain->GetMatchedTrack(
         DataStructure::Global::kMuPlus)->get_emr_range_primary(), 20.0);
     EXPECT_FLOAT_EQ(through_chain->GetMatchedTrack(
         DataStructure::Global::kMuPlus)->get_emr_range_primary(), 20.0);
   }
+  delete _global_event;
 }
 
 TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
@@ -211,6 +233,109 @@ TEST_F(TrackMatchingTest, GetDetectorTrackArray) {
   if (emr_array->size() > 0) {
     EXPECT_EQ(emr_array->at(0)->get_mapper_name(), "EMR Primary");
   }
+}
+
+void TrackMatchingTest::run_one(bool propagate_x, bool propagate_p, bool tof12,
+               recon::global::TrackMatching::through_track_algorithm through,
+               recon::global::TrackMatching::geometry_algorithm algo) {
+  double x = 5.0;
+  if (propagate_x) {
+      x = 20.0;
+  }
+  double p = 5.0;
+  if (propagate_p) {
+      p = 20.0;
+  }
+  _matching_tolerances["TKD"] = std::make_pair(x, p);
+  if (tof12) {
+    _matching_tolerances["TOF12dT"] = std::make_pair(27.0, 54.0);
+  } else {
+    _matching_tolerances["TOF12dT"] = std::make_pair(0.0, 1.0);
+  }
+  _track_matching = new TrackMatching(_global_event,
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0,
+      _no_check_settings, _residuals, true, algo,
+      std::vector<double>(), through);
+  BuildGlobalEvent();
+  _track_matching->USTrack();
+  _track_matching->DSTrack();
+  _track_matching->throughTrack();
+}
+
+TEST_F(TrackMatchingTest, ThroughMatchPropagate) {
+  using recon::global::TrackMatching;
+
+  Simulation::DetectorConstruction* dc =
+      Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
+  std::string mod_path = std::string(getenv("MAUS_ROOT_DIR"))+
+      "/tests/cpp_unit/Recon/Global/TestGeometries/";
+  MiceModule geometry(mod_path+"SimpleBeamline.dat");
+  dc->SetMiceModules(geometry);
+
+
+  // axial lookup
+  run_one(true, true, false, TrackMatching::kPropagate, TrackMatching::kAxialLookup);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 1);
+
+  // classic g4 lookup
+  run_one(true, true, false, TrackMatching::kPropagate, TrackMatching::kClassicG4);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 1);
+
+  // track out of tolerance (p)
+  run_one(true, false, true, TrackMatching::kPropagate, TrackMatching::kAxialLookup);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 0);
+
+  // track out of tolerance (x)
+  run_one(false, true, true, TrackMatching::kPropagate, TrackMatching::kAxialLookup);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 0);
+
+  // propagate and TOF12 (should make a through chain even though propagate fails)
+  run_one(false, false, true, TrackMatching::kTOF12, TrackMatching::kAxialLookup);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 1);
+
+  // propagate and TOF12 (should make a through chain even though tof12 fails)
+  run_one(true, true, false, TrackMatching::kPropagateAndTOF12, TrackMatching::kAxialLookup);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 1);
+
+  // propagate requiring TOF12 (should make a through chain even though propagate fails)
+  run_one(false, false, true, TrackMatching::kPropagateRequiringTOF12, TrackMatching::kAxialLookup);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 1);
+
+  // propagate requiring TOF12 (should fail a through chain as TOF12 fails)
+  run_one(true, true, false, TrackMatching::kPropagateRequiringTOF12, TrackMatching::kAxialLookup);
+  ASSERT_EQ(_global_event->GetThroughPrimaryChains().size(), 0);
+}
+
+TEST_F(TrackMatchingTest, VirtualPlanes) {
+  using recon::global::TrackMatching;
+  _track_matching = new TrackMatching(_global_event,
+      "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0,
+      _no_check_settings, _residuals, true, TrackMatching::kClassicG4,
+      std::vector<double>(1, 10000.), TrackMatching::kPropagate);
+
+  BuildGlobalEvent();
+
+  Simulation::DetectorConstruction* dc =
+      Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
+  std::string mod_path = std::string(getenv("MAUS_ROOT_DIR"))+
+      "/tests/cpp_unit/Recon/Global/TestGeometries/";
+  MiceModule geometry(mod_path+"SimpleBeamline.dat");
+  dc->SetMiceModules(geometry);
+
+  _track_matching->USTrack();
+  _track_matching->DSTrack();
+  _track_matching->throughTrack();
+
+  std::vector<DataStructure::Global::PrimaryChain*> through_chains =
+      _global_event->GetThroughPrimaryChains();
+
+  ASSERT_EQ(through_chains.size(), 1);
+  DataStructure::Global::Track* track = through_chains.at(0)->GetMatchedTrack
+                                              (DataStructure::Global::kMuPlus);
+  ASSERT_EQ(track->GetTrackPoints(DataStructure::Global::kVirtual).size(), 1);
+  const DataStructure::Global::TrackPoint* tp =
+                  track->GetTrackPoints(DataStructure::Global::kVirtual).at(0);
+  EXPECT_NEAR(tp->get_position().Z(), 10000., 1.);
 }
 
 TEST_F(TrackMatchingTest, GetDetectorSpacePoints) {

@@ -55,6 +55,15 @@ namespace global {
         kAxialLookup = 1,
         kAltG4 = 2
     };
+
+    enum through_track_algorithm {
+        kNoThroughMatching,
+        kTOF12,
+        kPropagate,
+        kPropagateRequiringTOF12,
+        kPropagateAndTOF12
+    };
+
     /// Constructor
     TrackMatching(GlobalEvent* global_event,
                   std::string mapper_name,
@@ -66,7 +75,9 @@ namespace global {
                   bool energy_loss = true,
                   bool residuals = false,
                   geometry_algorithm algo = kClassicG4,
-                  std::vector<double> extra_z_planes = std::vector<double>());
+                  std::vector<double> extra_z_planes = std::vector<double>(),
+                  through_track_algorithm = kTOF12
+    );
 
     /// Destructor
     ~TrackMatching() {}
@@ -295,6 +306,11 @@ namespace global {
                    double target_z);
 
     /**
+     *  @brief Clear the virtual track points before attempting to match a track
+     */
+    void ClearVirtualTrackPoints();
+
+    /**
      *  @brief Match through-going track using a simple TOF12 window
      *
      *  If TOF12 is within the range in TOF12dT matching tolerances, assumes a
@@ -303,11 +319,35 @@ namespace global {
      *  @param us_track Track with TOF1 data (or matching fails)
      *  @param ds_track Track with TOF2 data (or matching fails)
      *  @param pid PID hypothesis of the through-going track
+     *  @param through_track hypothesised through-going track is written here
+     *
+     *  @returns false if the tracks dont match; true if the tracks match
      */
-    DataStructure::Global::Track* throughMatchTOF(
+    bool throughMatchTOF(
                                 DataStructure::Global::Track* us_track,
                                 DataStructure::Global::Track* ds_track,
-                                DataStructure::Global::PID pid);
+                                DataStructure::Global::PID pid,
+                                DataStructure::Global::Track* through_track);
+
+
+    /**
+     *  @brief Match through-going track using track propagation
+     *
+     *  If extrapolated track is within position tolerance, assumes a match for
+     *  us_track and ds_track.
+     *
+     *  @param us_track Track with tku_tp1 data (or matching fails)
+     *  @param ds_track Track with tkd_tp1 data (or matching fails)
+     *  @param pid PID hypothesis of the through-going track
+     *  @param through_track hypothesised through-going track is written here
+     *
+     *  @returns false if the tracks dont match; true if the tracks match
+     */
+    bool throughMatchPropagate(
+                            DataStructure::Global::Track* us_track,
+                            DataStructure::Global::Track* ds_track,
+                            DataStructure::Global::PID pid,
+                            DataStructure::Global::Track* through_track);
 
     /**
      *  @brief Add child track and track points to the parent track
@@ -357,8 +397,15 @@ namespace global {
     std::vector<double> _extra_z_planes;
     std::vector<DataStructure::Global::TrackPoint> _virtual_track_points;
 
+    /// The field for track matching
+    BTFieldConstructor* _field;
+
     /// Controls how the track propagation is done
     geometry_algorithm _geo_algo;
+
+    /// Controls logic of the through track matching
+    through_track_algorithm _through_algo = kTOF12;
+
     /// Declarations required for tests to access private member functions
     FRIEND_TEST(TrackMatchingTest, GetDetectorTrackArray);
     FRIEND_TEST(TrackMatchingTest, GetDetectorSpacePoints);
