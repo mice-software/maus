@@ -121,7 +121,7 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
           "_spill._recon._scifi_event._scifihelicalprtracks._circle_chisq>>h8")
         h8 = ROOT.gDirectory.Get('h8')
         self.assertLess(h8.GetMean(), 1.0)
-        self.assertLess(h8.GetRMS(), 2)
+        self.assertLess(h8.GetRMS(), 2.1)
         self.assertGreater(h8.GetEntries(), 190)
 
         tree.Draw(
