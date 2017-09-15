@@ -304,9 +304,9 @@ SciFiPatRecMissingSpSearchOn = False # Do we seach for seed spoints missed by he
 SciFiPatRecMissingSpCut = 2 # Distance (mm) below which a missing spoint should added to a track
 SciFiPatRecSErrorMethod = 0 # How to calc error on s, 0 = station res, 1 = error prop
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
-SciFiPatRecLongitudinalFitter = 0 # 0 - ntruns and linear s-z fit, 1 - ROOT and MINUIT
+SciFiPatRecLongitudinalFitter = 1 # 0 - ntruns and linear s-z fit, 1 - ROOT and MINUIT
 SciFiPatRecLineFitter = 0 # Choose the patrec straight line fitter, 0 = custom lsq, 1 = ROOT
-SciFiPatRecCircleFitter = 0 # Choose the patrec circle fitter, 0 = custom lsq, 1 = MINUIT
+SciFiPatRecCircleFitter = 1 # Choose the patrec circle fitter, 0 = custom lsq, 1 = MINUIT
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
