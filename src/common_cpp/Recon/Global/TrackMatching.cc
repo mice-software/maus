@@ -415,18 +415,13 @@ bool TrackMatching::throughMatchTOF(
     if (_residuals) {
       throughfile.open("match_through.csv", std::ios::out | std::ios::app);
     }
-    through_track->set_mapper_name("MapCppGlobalTrackMatching");
-    through_track->set_pid(pid);
-    Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched" << std::endl;
-    addTrackRecursive(through_track, us_track, false);
-    addTrackRecursive(through_track, ds_track, true);
     if (!us_track->HasDetector(DataStructure::Global::kTOF1) or
         !ds_track->HasDetector(DataStructure::Global::kTOF2)) {
       return false;
     }
+    // Get TOF1&2 times to calculate effective particle speed between detectors
     DataStructure::Global::TrackPointCPArray us_trackpoints = us_track->GetTrackPoints();
     DataStructure::Global::TrackPointCPArray ds_trackpoints = ds_track->GetTrackPoints();
-    // Get TOF1&2 times to calculate effective particle speed between detectors
     double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
                                               DataStructure::Global::kTOF1);
     double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
@@ -437,6 +432,11 @@ bool TrackMatching::throughMatchTOF(
     }
     if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
         (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
+      Squeak::mout(Squeak::debug) << "TrackMatching (TOF12): US & DS Matched" << std::endl;
+      through_track->set_mapper_name("MapCppGlobalTrackMatching");
+      through_track->set_pid(pid);
+      addTrackRecursive(through_track, us_track, false);
+      addTrackRecursive(through_track, ds_track, true);
       _global_event->add_track(through_track);
       return true;
     } else {
@@ -834,6 +834,10 @@ void TrackMatching::Propagate(double* x_in,
 }
 
 void TrackMatching::AddVirtualTrackPoints(DataStructure::Global::Track* hypothesis_track) {
+    int particle_event = -1;
+    if (hypothesis_track->GetTrackPoints().size() > 0) {
+        particle_event = hypothesis_track->GetTrackPoints()[0]->get_particle_event();
+    }
     for (size_t i = 0; i < _virtual_track_points.size(); ++i) {
         DataStructure::Global::SpacePoint* sp =
                                         new DataStructure::Global::SpacePoint();
@@ -846,7 +850,7 @@ void TrackMatching::AddVirtualTrackPoints(DataStructure::Global::Track* hypothes
         tp->set_charge(hypothesis_track->get_charge());
         tp->set_mapper_name(_mapper_name);
         tp->set_space_point(sp);
-        tp->set_particle_event(-1); // BUG
+        tp->set_particle_event(particle_event);
         hypothesis_track->AddTrackPoint(tp);
     }
 }
