@@ -527,7 +527,10 @@ DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(
   DataStructure::Global::TrackPArray *imported_tracks =
       _global_event->get_tracks();
   DataStructure::Global::TrackPArray *track_array =
-      new DataStructure::Global::TrackPArray();
+                                      new DataStructure::Global::TrackPArray();
+  if (imported_tracks == NULL) {
+      return track_array;
+  }
   for (auto imported_track_iter = imported_tracks->begin();
        imported_track_iter != imported_tracks->end();
        ++imported_track_iter) {
@@ -550,6 +553,9 @@ std::vector<DataStructure::Global::SpacePoint*>
   std::vector<DataStructure::Global::SpacePoint*> space_points;
   std::vector<DataStructure::Global::SpacePoint*> *global_spacepoint_array =
       _global_event->get_space_points();
+  if (global_spacepoint_array == NULL) {
+    return space_points;
+  }
   for (size_t i = 0; i < global_spacepoint_array->size(); i++) {
     if (global_spacepoint_array->at(i) &&
         global_spacepoint_array->at(i)->get_detector() == detector) {

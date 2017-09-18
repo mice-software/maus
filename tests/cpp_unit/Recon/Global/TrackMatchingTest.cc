@@ -131,11 +131,11 @@ void TrackMatchingTest::BuildGlobalEvent() {
 }
 
 TEST_F(TrackMatchingTest, USTrack_DSTrack_throughTrackTOF01) {
+  BuildGlobalEvent();
+
   _track_matching = new recon::global::TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0,
       _no_check_settings, _residuals);
-
-  BuildGlobalEvent();
 
   Simulation::DetectorConstruction* dc =
       Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
@@ -252,11 +252,11 @@ void TrackMatchingTest::run_one(bool propagate_x, bool propagate_p, bool tof12,
   } else {
     _matching_tolerances["TOF12dT"] = std::make_pair(0.0, 1.0);
   }
+  BuildGlobalEvent();
   _track_matching = new TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0,
       _no_check_settings, _residuals, true, algo,
       std::vector<double>(), through);
-  BuildGlobalEvent();
   _track_matching->USTrack();
   _track_matching->DSTrack();
   _track_matching->throughTrack();
@@ -308,12 +308,11 @@ TEST_F(TrackMatchingTest, ThroughMatchPropagate) {
 
 TEST_F(TrackMatchingTest, VirtualPlanes) {
   using recon::global::TrackMatching;
+  BuildGlobalEvent();
   _track_matching = new TrackMatching(_global_event,
       "TrackMatchingTest", "kMuPlus", 1, _matching_tolerances, 10.0,
       _no_check_settings, _residuals, true, TrackMatching::kClassicG4,
       std::vector<double>(1, 10000.), TrackMatching::kPropagate);
-
-  BuildGlobalEvent();
 
   Simulation::DetectorConstruction* dc =
       Globals::GetInstance()->GetGeant4Manager()->GetGeometry();
