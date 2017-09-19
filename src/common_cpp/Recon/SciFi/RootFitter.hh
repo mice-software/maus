@@ -77,8 +77,9 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
   * @param[in] cut The pattern recongition longitundal chisq cut, used by the dsdz scan function
   */
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
-                    const std::vector<double>& z, const double* pStart,
-                    MAUS::SimpleHelix& helix, int handedness = 0, double cut = -1.0);
+                    const std::vector<double>& z, const std::vector<double>& err,
+                    const double* pStart, MAUS::SimpleHelix& helix, int handedness = 0,
+                    double cut = -1.0);
 
 /** Scan the chisq function to find the rough location of the global minimum to seed MINUIT
   * (otherwise it gets stuck in local minima).

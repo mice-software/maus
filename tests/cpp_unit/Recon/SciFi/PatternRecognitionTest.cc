@@ -296,7 +296,7 @@ TEST_F(PatternRecognitionTest, test_constructor) {
   EXPECT_EQ(10.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(1000.0, pr._long_minuit_cut);
+  EXPECT_EQ(65.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
@@ -328,7 +328,7 @@ TEST_F(PatternRecognitionTest, test_set_parameters_to_default) {
   EXPECT_EQ(10.0, pr._circle_minuit_cut);
   EXPECT_EQ(150.0, pr._sz_chisq_cut);
   EXPECT_EQ(1.0, pr._n_turns_cut);
-  EXPECT_EQ(1000.0, pr._long_minuit_cut);
+  EXPECT_EQ(65.0, pr._long_minuit_cut);
   EXPECT_EQ(180.0, pr._Pt_max);
   EXPECT_EQ(50.0, pr._Pz_min);
   EXPECT_EQ(2.0, pr._missing_sp_cut);
@@ -438,10 +438,11 @@ TEST_F(PatternRecognitionTest, test_single_evt_lsq) {
   EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.02);
   EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.02);
   EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+  EXPECT_NEAR(htrks[0]->get_line_sz_c(), 24.0, 1.0);
 
   EXPECT_EQ(5, htrks[1]->get_num_points());
   EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
-
+  EXPECT_NEAR(htrks[1]->get_line_sz_c(), 137.0, 1.0);
 
   // ASSERT_EQ(1u, htrks.size());
   // EXPECT_EQ(0u, strks.size());
@@ -492,10 +493,11 @@ TEST_F(PatternRecognitionTest, test_single_evt_minuit_longitudinal) {
   EXPECT_NEAR(htrks[0]->get_circle_y0(), 48.85, 0.4);
   EXPECT_NEAR(htrks[0]->get_R(), 20.44, 0.03);
   EXPECT_NEAR(htrks[0]->get_dsdz(), -0.1156, 0.001);
+  EXPECT_NEAR(htrks[0]->get_line_sz_c(), 24.0, 1.0);
 
   EXPECT_EQ(5, htrks[1]->get_num_points());
   EXPECT_NEAR(htrks[1]->get_dsdz(), 0.3126, 0.01);
-
+  EXPECT_NEAR(htrks[1]->get_line_sz_c(), 137.0, 1.0);
 
   // ASSERT_EQ(1u, htrks.size());
   // EXPECT_EQ(0u, strks.size());

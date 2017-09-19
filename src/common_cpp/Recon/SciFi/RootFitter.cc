@@ -30,6 +30,8 @@
 // MAUS headers
 #include "src/common_cpp/Recon/SciFi/RootFitter.hh"
 
+#define PI 3.14159265
+
 namespace RootFitter {
 
 bool FitLineLinear(const std::vector<double>& x, const std::vector<double>& y,
@@ -109,8 +111,8 @@ bool FitCircleMinuit(const std::vector<double>& x, const std::vector<double>& y,
 }
 
 bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
-                    const std::vector<double>& z, const double* pStart,
-                    MAUS::SimpleHelix& helix, int handedness, double cut) {
+                    const std::vector<double>& z, const std::vector<double>& err,
+                    const double* pStart, MAUS::SimpleHelix& helix, int handedness, double cut) {
 
   // Pull out x and y at the tracker reference station
   double x0 = x[0];
@@ -119,19 +121,24 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   // This is a C++11 lambda function, which defines the quantity to be minimised by MINUIT,
   // using a sum over squared residuals looping over the seed spacepoints
   std::function<double(const double*)> //NOLINT(*)
-      Chi2Function = [&x, &y, &z, &x0, &y0](const double *par) {
+      Chi2Function = [&x, &y, &z, &err, &x0, &y0](const double *par) {
     double xc = par[0];
     double yc = par[1];
     double rad = par[2];
     double dsdz = par[3];
+    // s0 set to 0 as not presently used in minimisation, calculated analytically afterwards
+    double s0 = 0.0;
     double chisq = 0.0;
     for (size_t i = 0; i < x.size(); i++) {
         double theta = (z[i]*dsdz) / rad;
         double f = xc + (x0 - xc)*cos(theta) - (y0 - yc)*sin(theta); // x model prediction
         double g = yc + (y0 - yc)*cos(theta) + (x0 - xc)*sin(theta); // y model prediction
+        // double theta = (z[i]*dsdz + s0) / rad;
+        // double f = xc + rad*cos(theta); // x model prediction
+        // double g = yc + rad*sin(theta); // y model prediction
         double dx = f - x[i];
         double dy = g - y[i];
-        double dchisq = (dx*dx) + (dy*dy);
+        double dchisq = ((dx*dx) + (dy*dy)) / (err[i]*err[i]);
         chisq += dchisq;
     }
     return chisq;
@@ -165,7 +172,11 @@ bool FitHelixMinuit(const std::vector<double>& x, const std::vector<double>& y,
   const double *errors = min.Errors();
 
   // Calculate s0
-  double s0 = xs[2] * tan((y0 - xs[1])/(x0 - xs[0]));
+  double phi = atan2((y0 - xs[1]), (x0 - xs[0])); // Use atan2 not atan, or lose half circle range
+  if (phi < 0.0) {
+    phi = phi + 2*PI;
+  }
+  double s0 = xs[2] * phi;
 
   // Pull out the covariance matrix
   TMatrixD cov(4, 4);

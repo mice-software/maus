@@ -121,14 +121,14 @@ class TestSciFiReconHelical(unittest.TestCase): # pylint: disable=R0904
           "_spill._recon._scifi_event._scifihelicalprtracks._circle_chisq>>h8")
         h8 = ROOT.gDirectory.Get('h8')
         self.assertLess(h8.GetMean(), 1.0)
-        self.assertLess(h8.GetRMS(), 2)
+        self.assertLess(h8.GetRMS(), 2.1)
         self.assertGreater(h8.GetEntries(), 190)
 
         tree.Draw(
           "_spill._recon._scifi_event._scifihelicalprtracks._charge>>h9")
         h9 = ROOT.gDirectory.Get('h9')
-        self.assertLess(h9.GetMean(), -0.95)
-        self.assertGreater(h9.GetMean(), -1.05)
+        self.assertLess(h9.GetMean(), -0.93)
+        self.assertGreater(h9.GetMean(), -1.08)
 
 if __name__ == "__main__":
     unittest.main()
