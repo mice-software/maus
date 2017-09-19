@@ -392,8 +392,6 @@ bool TrackMatching::throughMatchPropagate(
       through_track->SortTrackPointsByZ();
       through_track->set_emr_range_primary(ds_track->get_emr_range_primary());
       through_track->set_emr_plane_density(ds_track->get_emr_plane_density());
-      _global_event->add_track_recursive(through_track);
-      tp_vecs = through_track->GetTrackPoints();
       return true;
     } else {
       // There may be a small memory leak here because the US and DS tracks don't get
@@ -437,7 +435,6 @@ bool TrackMatching::throughMatchTOF(
       through_track->set_pid(pid);
       addTrackRecursive(through_track, us_track, false);
       addTrackRecursive(through_track, ds_track, true);
-      _global_event->add_track(through_track);
       return true;
     } else {
       return false;
@@ -499,9 +496,11 @@ void TrackMatching::throughTrack() {
             propagate_match = throughMatchPropagate(us_track, ds_track, pids[i], propagate_track);
         }
         if (propagate_match) {
+            _global_event->add_track_recursive(propagate_track);
             through_primary_chain->AddMatchedTrack(propagate_track);
             delete tof12_track;
         } else if (tof12_match) {
+            _global_event->add_track(tof12_track);
             through_primary_chain->AddMatchedTrack(tof12_track);
             delete propagate_track;
         } else {
