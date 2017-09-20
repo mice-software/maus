@@ -161,9 +161,9 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      fi
 
      if [ -z "\${PYTHONPATH}" ]; then  # see if the variable exists yet
-          export PYTHONPATH="\$MAUS_ROOT_DIR/build" #initialize it
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$MAUS_ROOT_DIR/build/tests" #initialize it
      else
-          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$PYTHONPATH" # else add it
+          export PYTHONPATH="\$MAUS_ROOT_DIR/build:\$MAUS_ROOT_DIR/build/tests:\$PYTHONPATH" # else add it
      fi
 
      export $DYLIB_VAR="\$MAUS_THIRD_PARTY/build:\$$DYLIB_VAR"
@@ -176,7 +176,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
      if [ -f \$MAUS_THIRD_PARTY/third_party/build/root/bin/thisroot.sh ]; then
          source \$MAUS_THIRD_PARTY/third_party/build/root/bin/thisroot.sh
      fi
-     
+
      # maus common
      export PYTHONPATH="\$MAUS_ROOT_DIR/src/:\$MAUS_ROOT_DIR/src/common_py:\$PYTHONPATH"
      export $DYLIB_VAR="\$MAUS_ROOT_DIR/src/common_py:\$$DYLIB_VAR"
@@ -229,7 +229,7 @@ if [ -z "\$MAUS_ROOT_DIR" ]; then
         export maus_debug=0 # enable debugging
      fi
      if [ -z "\${maus_gprof}" ]; then  # see if the variable exists
-        export maus_gprof=0 # enable cpp profiling of cpp unit tests 
+        export maus_gprof=0 # enable cpp profiling of cpp unit tests
                             # requires gprof
      fi
      if [ -z "\${maus_assert_active}" ]; then  # see if the variable exists

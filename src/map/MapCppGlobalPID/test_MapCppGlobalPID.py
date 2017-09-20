@@ -26,7 +26,7 @@ from _MapCppGlobalPID import MapCppGlobalPID
 
 class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
     """Tests for MapCppGlobalPID"""
-    config_file = ('%s/src/map/MapCppGlobalPID/test_config.py' % 
+    config_file = ('%s/src/map/MapCppGlobalPID/test_config.py' %
                  os.environ.get("MAUS_ROOT_DIR"))
     config0 = json.loads(Configuration.Configuration().getConfigJSON
                          (config_file = (open(config_file,'r'))))
@@ -51,7 +51,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_no_data(self):
         """Check that nothing happens in absence of data"""
-        test1 = ('%s/src/map/MapCppGlobalPID/noDataTest.json' % 
+        test1 = ('%s/src/map/MapCppGlobalPID/noDataTest.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test1,'r')
         data = fin.read()
@@ -63,7 +63,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
 
     def test_invalid_json_birth(self):
         """Check birth with an invalid json input"""
-        test2 = ('%s/src/map/MapCppGlobalPID/invalid.json' % 
+        test2 = ('%s/src/map/MapCppGlobalPID/invalid.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin1 = open(test2,'r')
         data = fin1.read()
@@ -80,7 +80,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
     def test_invalid_json_process(self):
         """Check process with an invalid json input"""
         self.mapper.birth(json.dumps(self.config0))
-        test3 = ('%s/src/map/MapCppGlobalPID/invalid.json' % 
+        test3 = ('%s/src/map/MapCppGlobalPID/invalid.json' %
                  os.environ.get("MAUS_ROOT_DIR"))
         fin = open(test3,'r')
         data = fin.read()
@@ -103,7 +103,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             revt = revtarray[0]
             self.assertTrue('global_event' in revt)
             gevt = revt['global_event']
-            self.assertEqual(4, len(gevt)) 
+            self.assertEqual(4, len(gevt))
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
             num_tracks = 0
@@ -155,7 +155,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             revt = revtarray[0]
             self.assertTrue('global_event' in revt)
             gevt = revt['global_event']
-            self.assertEqual(4, len(gevt)) 
+            self.assertEqual(4, len(gevt))
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
             num_tracks = 0
@@ -182,7 +182,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
             revt = revtarray[0]
             self.assertTrue('global_event' in revt)
             gevt = revt['global_event']
-            self.assertEqual(4, len(gevt)) 
+            self.assertEqual(4, len(gevt))
             self.assertTrue('tracks' in gevt)
             tracksarray = gevt['tracks']
             self.assertEqual(2, len(gevt['tracks']))
@@ -191,7 +191,7 @@ class MapCppGlobalPIDTestCase(unittest.TestCase): # pylint: disable = R0904
                 if track['mapper_name'] == 'MapCppGlobalPID':
                     num_tracks += 1
             self.assertEqual(num_tracks, 0)
-    
+
     @classmethod
     def tearDownClass(cls): # pylint: disable = C0103
         """Check that we can death() MapCppGlobalPID"""

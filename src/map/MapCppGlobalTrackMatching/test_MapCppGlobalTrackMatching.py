@@ -36,6 +36,8 @@ class MapCppGlobalTMTestCase(unittest.TestCase): # pylint: disable = R0904
             "/tests/cpp_unit/Recon/Global/TestGeometries/SimpleBeamline.dat")
     cfg['simulation_geometry_filename'] = geom
     cfg['reconstruction_geometry_filename'] = geom
+    cfg['through_tracks'] = 'tof12'
+    cfg['verbose_level'] = 0
 
     @classmethod
     def setUpClass(cls): # pylint: disable = C0103

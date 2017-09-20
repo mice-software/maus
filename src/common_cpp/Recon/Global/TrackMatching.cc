@@ -38,7 +38,8 @@ TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
     std::string pid_hypothesis_string, int beamline_polarity,
     std::map<std::string, std::pair<double, double> > matching_tolerances,
     double max_step_size, std::pair<bool, bool> no_check_settings,
-    bool energy_loss, bool residuals) {
+    bool energy_loss, bool residuals, TrackMatching::geometry_algorithm geo_algo,
+    std::vector<double> extra_z_planes, TrackMatching::through_track_algorithm through_algo) {
   _global_event = global_event;
   _mapper_name = mapper_name;
   _pid_hypothesis_string = pid_hypothesis_string;
@@ -48,6 +49,9 @@ TrackMatching::TrackMatching(GlobalEvent* global_event, std::string mapper_name,
   _energy_loss = energy_loss;
   _no_check_settings = no_check_settings;
   _residuals = residuals;
+  _geo_algo = geo_algo;
+  _extra_z_planes = extra_z_planes;
+  _through_algo = through_algo;
 }
 
 void TrackMatching::USTrack() {
@@ -73,10 +77,11 @@ void TrackMatching::USTrack() {
       no_check = true;
     }
   }
-  BTFieldConstructor* field;
+  BTFieldConstructor* field = NULL;
   if (!no_check) {
     // Load the magnetic field for RK4 propagation
     field = Globals::GetMCFieldConstructor();
+    _field = field;
   }
   // Iterate over all Tracker0 Tracks (typically 1)
   for (auto scifi_track_iter = scifi_track_array->begin();
@@ -196,7 +201,7 @@ void TrackMatching::DSTrack() {
       no_check = true;
     }
   }
-  BTFieldConstructor* field;
+  BTFieldConstructor* field = NULL;
   if (!no_check) {
     // Load the magnetic field for RK4 propagation
     field = Globals::GetMCFieldConstructor();
@@ -295,10 +300,167 @@ void TrackMatching::DSTrack() {
   delete emr_track_array;
 }
 
+std::ostream& operator<<(std::ostream& out, const TLorentzVector& vec) {
+    out << vec.X() << " " << vec.Y() << " " << vec.Z() << "; " << vec.T();
+    return out;
+}
+
+bool TrackMatching::throughMatchPropagate(
+                            DataStructure::Global::Track* us_track,
+                            DataStructure::Global::Track* ds_track,
+                            DataStructure::Global::PID pid,
+                            DataStructure::Global::Track* through_track) {
+    if (!us_track or !us_track->HasDetector(DataStructure::Global::kTracker0_1)) {
+      Squeak::mout(Squeak::debug) << "ThroughMatch (Propagate) missing TKU track" << std::endl;
+      return false;
+    }
+    if (through_track == NULL) {
+      return false;
+    }
+    const MAUS::DataStructure::Global::TrackPoint* us_tp =
+            us_track->GetTrackPoints(DataStructure::Global::kTracker0_1).back();
+
+    TLorentzVector pos_us = us_tp->get_position();
+    TLorentzVector mom_us = us_tp->get_momentum();
+
+    through_track->set_mapper_name("MapCppGlobalTrackMatching");
+    through_track->set_pid(pid);
+    std::vector<const DataStructure::Global::TrackPoint*> tp_vecs =
+                                                     ds_track->GetTrackPoints();
+    double mass = Particle::GetInstance().GetMass(pid);
+    double energy = ::sqrt(mom_us.Rho()*mom_us.Rho() + mass*mass);
+    double x_in[] = {pos_us.T(), pos_us.X(), pos_us.Y(), pos_us.Z(),
+                     energy, mom_us.X(), mom_us.Y(), mom_us.Z()};
+    ClearVirtualTrackPoints();
+    for (size_t i = 0; i < tp_vecs.size(); ++i) {
+        if (tp_vecs[i]->get_detector() ==  DataStructure::Global::kVirtual) {
+            // we propagate to real detectors only; we should pick up
+            // virtuals anyway by the "AddVirtualTrackPoints" mechanism
+            continue;
+        }
+        double target_z = tp_vecs[i]->get_position().Z();
+        try {
+            Propagate(x_in, _field, pid, target_z);
+        } catch (std::exception& exc) {
+            break;
+        }
+        if (fabs(x_in[3] - target_z) > 1e-9) {
+            break;
+        }
+        TLorentzVector pos_ds(x_in[1], x_in[2], x_in[3], x_in[0]); // x, y, z, t
+        TLorentzVector mom_ds(x_in[5], x_in[6], x_in[7], x_in[4]); // px, py, pz, E
+        MAUS::DataStructure::Global::TrackPoint* tp =
+                                  new MAUS::DataStructure::Global::TrackPoint();
+        tp->set_position(pos_ds);
+        tp->set_momentum(mom_ds);
+        tp->set_charge(through_track->get_charge());
+        tp->set_mapper_name(through_track->get_mapper_name());
+        tp->set_space_point(tp_vecs[i]->get_space_point());
+        tp->set_detector(tp_vecs[i]->get_detector());
+        tp->set_particle_event(tp_vecs[i]->get_particle_event());
+        through_track->AddTrackPoint(tp);
+    }
+    if (not through_track->HasDetector(DataStructure::Global::kTracker1_1)) {
+       Squeak::mout(Squeak::debug) << "ThroughMatch (Propagate) missing TKD track" << std::endl;
+        return false; // tracking failed
+    }
+    double pos_tolerance = _matching_tolerances.at("TKD").first;
+    double mom_tolerance = _matching_tolerances.at("TKD").second;
+    const MAUS::DataStructure::Global::TrackPoint* ds_recon =
+          ds_track->GetTrackPoints(DataStructure::Global::kTracker1_1)[0];
+    const MAUS::DataStructure::Global::TrackPoint* ds_through =
+          through_track->GetTrackPoints(DataStructure::Global::kTracker1_1)[0];
+    TVector3 dpos = ds_recon->get_position().Vect() -  ds_through->get_position().Vect();
+    TVector3 dmom = ds_recon->get_momentum().Vect() -  ds_through->get_momentum().Vect();
+    Squeak::mout(Squeak::debug) << "ThroughMatch (Propagate) "
+                                << "checking tolerances " << std::endl;
+    Squeak::mout(Squeak::debug) << "    Recon Pos: " << ds_recon->get_position()
+                               << " Mom: " <<ds_recon->get_momentum() << std::endl;
+    Squeak::mout(Squeak::debug) << "    Thru  Pos: " << ds_through->get_position()
+                               << " Mom: " <<ds_through->get_momentum() << std::endl;
+    Squeak::mout(Squeak::debug) << "    Deltas r: " << dpos.Mag()
+                               << " p: " << dmom.Mag() << std::endl;
+    Squeak::mout(Squeak::debug) << "    Tolerances r: " << pos_tolerance
+                               << " p: " << mom_tolerance << std::endl;
+    dpos.SetZ(0.);
+    if (dpos.Mag() < pos_tolerance and dmom.Mag() < mom_tolerance) {
+      Squeak::mout(Squeak::debug) << "    Accepted" << std::endl;
+      // Assemble through track from trackpoints from the matched US and DS tracks
+      Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched" << std::endl;
+      addTrackRecursive(through_track, us_track, false);
+      AddVirtualTrackPoints(through_track);
+      through_track->SortTrackPointsByZ();
+      through_track->set_emr_range_primary(ds_track->get_emr_range_primary());
+      through_track->set_emr_plane_density(ds_track->get_emr_plane_density());
+      return true;
+    } else {
+      // There may be a small memory leak here because the US and DS tracks don't get
+      // deleted, deleting them here manually causes a segfault. TODO: Investigate
+      Squeak::mout(Squeak::debug) << "    Rejected" << std::endl;
+      return false;
+    }
+}
+
+bool TrackMatching::throughMatchTOF(
+                            DataStructure::Global::Track* us_track,
+                            DataStructure::Global::Track* ds_track,
+                            DataStructure::Global::PID pid,
+                            DataStructure::Global::Track* through_track) {
+    if (!us_track or !ds_track) {
+        return false;
+    }
+    ofstream throughfile;
+    if (_residuals) {
+      throughfile.open("match_through.csv", std::ios::out | std::ios::app);
+    }
+    if (!us_track->HasDetector(DataStructure::Global::kTOF1) or
+        !ds_track->HasDetector(DataStructure::Global::kTOF2)) {
+      return false;
+    }
+    // Get TOF1&2 times to calculate effective particle speed between detectors
+    DataStructure::Global::TrackPointCPArray us_trackpoints = us_track->GetTrackPoints();
+    DataStructure::Global::TrackPointCPArray ds_trackpoints = ds_track->GetTrackPoints();
+    double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
+                                              DataStructure::Global::kTOF1);
+    double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
+                                              DataStructure::Global::kTOF2);
+    double TOFdT = TOF2_time - TOF1_time;
+    if (_residuals) {
+      throughfile << TOFdT/_matching_tolerances.at("TOF12dT").second << "\n";
+    }
+    if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
+        (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
+      Squeak::mout(Squeak::debug) << "TrackMatching (TOF12): US & DS Matched" << std::endl;
+      through_track->set_mapper_name("MapCppGlobalTrackMatching");
+      through_track->set_pid(pid);
+      addTrackRecursive(through_track, us_track, false);
+      addTrackRecursive(through_track, ds_track, true);
+      return true;
+    } else {
+      return false;
+    }
+}
+
+void TrackMatching::addTrackRecursive(DataStructure::Global::Track* parent,
+                                      DataStructure::Global::Track* child,
+                                      bool doEMR) {
+    parent->AddTrack(child);
+    DataStructure::Global::TrackPointCPArray tps = child->GetTrackPoints();
+    for (auto trackpoint_iter = tps.begin();
+         trackpoint_iter != tps.end();
+         ++trackpoint_iter) {
+        parent->AddTrackPoint(
+              const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
+    }
+    if (doEMR) {
+        parent->set_emr_range_primary(child->get_emr_range_primary());
+        parent->set_emr_plane_density(child->get_emr_plane_density());
+    }
+}
+
 void TrackMatching::throughTrack() {
-  ofstream throughfile;
-  if (_residuals) {
-    throughfile.open("match_through.csv", std::ios::out | std::ios::app);
+  if (_through_algo == kNoThroughMatching) {
+      return;
   }
   std::vector<DataStructure::Global::PrimaryChain*> us_chains =
       _global_event->GetUSPrimaryChainOrphans();
@@ -313,54 +475,40 @@ void TrackMatching::throughTrack() {
           MAUS::DataStructure::Global::kThrough);
       std::vector<DataStructure::Global::PID> pids = PIDHypotheses(0, _pid_hypothesis_string);
       for (size_t i = 0; i < pids.size(); i++) {
-        DataStructure::Global::Track* us_track = (*us_chain_iter)->GetMatchedTrack(pids[i]);
-        DataStructure::Global::Track* ds_track = (*ds_chain_iter)->GetMatchedTrack(pids[i]);
-        if (!us_track or !us_track->HasDetector(DataStructure::Global::kTOF1) or
-            !ds_track or !ds_track->HasDetector(DataStructure::Global::kTOF2)) {
-          continue;
+        DataStructure::Global::Track* us_track =
+                                    (*us_chain_iter)->GetMatchedTrack(pids[i]);
+        DataStructure::Global::Track* ds_track =
+                                    (*ds_chain_iter)->GetMatchedTrack(pids[i]);
+        DataStructure::Global::Track* propagate_track =
+                                             new DataStructure::Global::Track();
+        DataStructure::Global::Track* tof12_track =
+                                             new DataStructure::Global::Track();
+        bool tof12_match = false;
+        bool propagate_match = false;
+        if (_through_algo == kTOF12 ||
+            _through_algo == kPropagateRequiringTOF12 ||
+            _through_algo == kPropagateAndTOF12) {
+            tof12_match = throughMatchTOF(us_track, ds_track, pids[i], tof12_track);
         }
-        DataStructure::Global::TrackPointCPArray us_trackpoints = us_track->GetTrackPoints();
-        DataStructure::Global::TrackPointCPArray ds_trackpoints = ds_track->GetTrackPoints();
-        // Get TOF1&2 times to calculate effective particle speed between detectors
-        double TOF1_time = TOFTimeFromTrackPoints(us_trackpoints,
-            DataStructure::Global::kTOF1);
-        double TOF2_time = TOFTimeFromTrackPoints(ds_trackpoints,
-            DataStructure::Global::kTOF2);
-        double TOFdT = TOF2_time - TOF1_time;
-        if (_residuals) {
-          throughfile << TOFdT/_matching_tolerances.at("TOF12dT").second << "\n";
+        if ((_through_algo == kPropagateRequiringTOF12 && tof12_match) ||
+            _through_algo == kPropagate ||
+            _through_algo == kPropagateAndTOF12) {
+            propagate_match = throughMatchPropagate(us_track, ds_track, pids[i], propagate_track);
         }
-        if ((TOFdT > _matching_tolerances.at("TOF12dT").first) and
-            (TOFdT < _matching_tolerances.at("TOF12dT").second)) {
-          DataStructure::Global::Track* through_track = new DataStructure::Global::Track();
-          through_track->set_mapper_name("MapCppGlobalTrackMatching");
-          through_track->set_pid(pids[i]);
-          through_track->set_emr_range_primary(ds_track->get_emr_range_primary());
-          through_track->set_emr_plane_density(ds_track->get_emr_plane_density());
-          Squeak::mout(Squeak::debug) << "TrackMatching: US & DS Matched" << std::endl;
-          // Assemble through track from trackpoints from the matched US and DS tracks
-          for (auto trackpoint_iter = us_trackpoints.begin();
-               trackpoint_iter != us_trackpoints.end();
-               ++trackpoint_iter) {
-            through_track->AddTrackPoint(
-                const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
-          }
-          for (auto trackpoint_iter = ds_trackpoints.begin();
-               trackpoint_iter != ds_trackpoints.end();
-               ++trackpoint_iter) {
-            through_track->AddTrackPoint(
-                const_cast<DataStructure::Global::TrackPoint*>(*trackpoint_iter));
-          }
-          // Add references back to the original tracks
-          through_track->AddTrack(us_track);
-          through_track->AddTrack(ds_track);
-          _global_event->add_track(through_track);
-          through_primary_chain->AddMatchedTrack(through_track);
+        if (propagate_match) {
+            _global_event->add_track_recursive(propagate_track);
+            through_primary_chain->AddMatchedTrack(propagate_track);
+            delete tof12_track;
+        } else if (tof12_match) {
+            _global_event->add_track(tof12_track);
+            through_primary_chain->AddMatchedTrack(tof12_track);
+            delete propagate_track;
         } else {
-          // There may be a small memory leak here because the US and DS tracks don't get
-          // deleted, deleting them here manually causes a segfault. TODO: Investigate
+            delete tof12_track;
+            delete propagate_track;
         }
       }
+
       if (through_primary_chain->GetMatchedTracks().size() > 0) {
         (*us_chain_iter)->set_chain_type(DataStructure::Global::kUS);
         (*ds_chain_iter)->set_chain_type(DataStructure::Global::kDS);
@@ -378,7 +526,10 @@ DataStructure::Global::TrackPArray* TrackMatching::GetDetectorTrackArray(
   DataStructure::Global::TrackPArray *imported_tracks =
       _global_event->get_tracks();
   DataStructure::Global::TrackPArray *track_array =
-      new DataStructure::Global::TrackPArray();
+                                      new DataStructure::Global::TrackPArray();
+  if (imported_tracks == NULL) {
+      return track_array;
+  }
   for (auto imported_track_iter = imported_tracks->begin();
        imported_track_iter != imported_tracks->end();
        ++imported_track_iter) {
@@ -401,8 +552,12 @@ std::vector<DataStructure::Global::SpacePoint*>
   std::vector<DataStructure::Global::SpacePoint*> space_points;
   std::vector<DataStructure::Global::SpacePoint*> *global_spacepoint_array =
       _global_event->get_space_points();
+  if (global_spacepoint_array == NULL) {
+    return space_points;
+  }
   for (size_t i = 0; i < global_spacepoint_array->size(); i++) {
-    if (global_spacepoint_array->at(i)->get_detector() == detector) {
+    if (global_spacepoint_array->at(i) &&
+        global_spacepoint_array->at(i)->get_detector() == detector) {
       space_points.push_back(global_spacepoint_array->at(i));
     }
   }
@@ -461,8 +616,8 @@ void TrackMatching::MatchTrackPoint(
   if (spacepoints.size() > 0) {
     double target_z = spacepoints.at(0)->get_position().Z();
     try {
-      GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
-                             _energy_loss);
+      ClearVirtualTrackPoints();
+      Propagate(x_in, field, pid, target_z);
       // To avoid doing the same propagation again for the same point, store the propagated
       // values back in the TLorentzVectors
       position.SetX(x_in[1]);
@@ -525,8 +680,8 @@ void TrackMatching::MatchTOF0(
                      energy, momentum.X(), momentum.Y(), momentum.Z()};
     // First propagate to just upstream of TOF1 to get the energy during TOF0-1 transit
     try {
-      GlobalTools::propagate(x_in, tof1_z - 25.0, field, _max_step_size, pid,
-                             _energy_loss);
+      ClearVirtualTrackPoints();
+      Propagate(x_in, field, pid, tof1_z - 25.0);
     } catch (Exceptions::Exception exc) {
       Squeak::mout(Squeak::debug) << exc.what() << std::endl;
     }
@@ -596,8 +751,8 @@ void TrackMatching::MatchEMRTrack(
     TLorentzVector first_hit_pos_err = emr_trackpoints[0]->get_position_error();
     double target_z = first_hit_pos.Z();
     try {
-      GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
-                             _energy_loss);
+      ClearVirtualTrackPoints();
+      Propagate(x_in, field, pid, target_z);
       if (_residuals) {
         emrfile << first_hit_pos.X() - x_in[1] << " " << first_hit_pos.Y() - x_in[2] << "\n";
       }
@@ -619,6 +774,7 @@ void TrackMatching::MatchEMRTrack(
           emr_tp->set_momentum(momentum);
           hypothesis_track->AddTrackPoint(emr_tp);
         }
+        AddVirtualTrackPoints(hypothesis_track);
       } else {
         Squeak::mout(Squeak::debug)
             << "TrackMatching: EMR Mismatch, dx, dy are:\n"
@@ -651,8 +807,62 @@ void TrackMatching::AddTrackerTrackPoints(
     tracker_tp->set_momentum(momentum);
     hypothesis_track->AddTrackPoint(tracker_tp);
   }
+  AddVirtualTrackPoints(hypothesis_track);
 }
 
+void TrackMatching::Propagate(double* x_in,
+                              BTFieldConstructor* field,
+                              DataStructure::Global::PID pid,
+                              double target_z) {
+    std::vector<double>::iterator start, end;
+    if (target_z > x_in[3]) {
+        start = std::lower_bound(_extra_z_planes.begin(),
+                                 _extra_z_planes.end(), x_in[3]);
+        end = std::upper_bound(_extra_z_planes.begin(),
+                               _extra_z_planes.end(), target_z);
+    } else {
+        start = std::lower_bound(_extra_z_planes.begin(),
+                                 _extra_z_planes.end(), target_z);
+        end = std::upper_bound(_extra_z_planes.begin(),
+                               _extra_z_planes.end(), x_in[3]);
+    }
+    for (/*start defined above*/; start < end && start < _extra_z_planes.end(); ++start) {
+        GlobalTools::propagate(x_in, *start, field, _max_step_size, pid,
+                           _energy_loss, static_cast<int>(_geo_algo));
+        DataStructure::Global::TrackPoint tp;
+        tp.set_position(TLorentzVector(x_in[1], x_in[2], x_in[3], x_in[0]));
+        tp.set_momentum(TLorentzVector(x_in[5], x_in[6], x_in[7], x_in[4]));
+        _virtual_track_points.push_back(tp);
+    }
+    GlobalTools::propagate(x_in, target_z, field, _max_step_size, pid,
+                       _energy_loss, static_cast<int>(_geo_algo));
+}
+
+void TrackMatching::AddVirtualTrackPoints(DataStructure::Global::Track* hypothesis_track) {
+    int particle_event = -1;
+    if (hypothesis_track->GetTrackPoints().size() > 0) {
+        particle_event = hypothesis_track->GetTrackPoints()[0]->get_particle_event();
+    }
+    for (size_t i = 0; i < _virtual_track_points.size(); ++i) {
+        DataStructure::Global::SpacePoint* sp =
+                                        new DataStructure::Global::SpacePoint();
+        sp->set_detector(DataStructure::Global::kVirtual);
+        sp->set_charge(hypothesis_track->get_charge());
+        sp->set_mapper_name(_mapper_name);
+        DataStructure::Global::TrackPoint* tp =
+                new DataStructure::Global::TrackPoint(_virtual_track_points[i]);
+        tp->set_detector(DataStructure::Global::kVirtual);
+        tp->set_charge(hypothesis_track->get_charge());
+        tp->set_mapper_name(_mapper_name);
+        tp->set_space_point(sp);
+        tp->set_particle_event(particle_event);
+        hypothesis_track->AddTrackPoint(tp);
+    }
+}
+
+void TrackMatching::ClearVirtualTrackPoints() {
+    _virtual_track_points = std::vector<DataStructure::Global::TrackPoint>();
+}
 double TrackMatching::TOFTimeFromTrackPoints(
     DataStructure::Global::TrackPointCPArray trackpoints,
     DataStructure::Global::DetectorPoint detector) {
@@ -717,6 +927,7 @@ void TrackMatching::AddIfConsistent(std::vector<DataStructure::Global::SpacePoin
       trackpoint->set_mapper_name(_mapper_name);
       hypothesis_track->AddTrackPoint(trackpoint);
     }
+    AddVirtualTrackPoints(hypothesis_track);
   }
   return;
 }

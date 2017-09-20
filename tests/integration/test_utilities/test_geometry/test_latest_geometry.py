@@ -65,7 +65,7 @@ def validate_geometry(geometry_id = None):
         while proc.poll() == None:
             mem_usage = process_monitor.print_mem_usage(proc.pid)
             print >> fout, process_monitor.print_mem_usage(proc.pid)
-            if int(mem_usage['rsz']) > 2.7e6:
+            if int(mem_usage['rsz']) > 2.9e6:
                 testpass = False
             if int(mem_usage['rsz']) > max_mem:
                 max_mem = int(mem_usage['rsz'])

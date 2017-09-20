@@ -32,6 +32,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 // external libraries
 #include "json/json.h"
@@ -72,6 +73,8 @@ namespace MAUS {
     void _process(Data* data) const;
 
   private:
+    /// fill the _extra_z_planes with virtual planes
+    void getVirtualPlanes();
     /// Check that a valid configuration is passed to the process
     bool _configCheck;
     /// This will contain the configuration
@@ -92,10 +95,15 @@ namespace MAUS {
     /// Should residuals be generated during track matching
     bool _residuals;
 
+    std::vector<double> _extra_z_planes;
     bool _through_matching;
     /// Mapper name
     std::string _mapper_name;
-  }; // Don't forget this trailing colon!!!!
+    /// Controls internal geometry lookup of the track propagation
+    recon::global::TrackMatching::geometry_algorithm _geom_algo;
+    /// Controls the logic of the through-going track matching
+    recon::global::TrackMatching::through_track_algorithm _through_matching_algo;
+  };
 } // ~MAUS
 
 #endif

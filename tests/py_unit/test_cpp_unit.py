@@ -7,7 +7,7 @@ class CppUnitTests(unittest.TestCase):#pylint: disable =R0904
     def test_run_test_cpp_unit(self):
         """test_run_test_cpp_unit"""
         cpp_exe = os.path.join(os.environ['MAUS_ROOT_DIR'],
-                               'build',
+                               'build/tests',
                                'test_cpp_unit')
         cpp_test = os.system(cpp_exe)
 
@@ -24,6 +24,3 @@ class CppUnitTests(unittest.TestCase):#pylint: disable =R0904
 
 if __name__ == '__main__':
     unittest.main()
-
-
-

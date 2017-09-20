@@ -216,6 +216,10 @@ def print_plots(plot_dict, location, plot_options={}) :
       new_location = os.path.join( location, key )
       print_plots( plot_dict[key], new_location )
       
+    elif type( plot_dict[key] ) is ROOT.TH2F :
+      canvas = ROOT.TCanvas( key+'_canvas' )
+      plot_dict[key].Draw("COL")
+      canvas.SaveAs( os.path.join(location, key ) + ".pdf", "pdf" )
     else :
       canvas = ROOT.TCanvas( key+'_canvas' )
       plot_dict[key].Draw()

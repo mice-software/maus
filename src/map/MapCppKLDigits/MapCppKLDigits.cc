@@ -68,7 +68,7 @@ void MapCppKLDigits::_birth(const std::string& argJsonConfigDocument) {
     bool loaded_cal = _mapcal.InitializeFromCards(configJSON);
     if (!loaded_cal)
     throw MAUS::Exceptions::Exception(Exceptions::recoverable,
-                          "Failed to initialise map KLChannelMap",
+                          "Failed to initialise map KLCalibrationMap",
                           "MapCppKLDigits::_birth");
 
 

@@ -84,7 +84,7 @@ class SciFiBasePRTrack : public TObject {
     void set_spacepoints(TRefArray* spoints);
 
    /** Return a vector holding pointers to the spacepoints
-     * (requires extracting them from the TRefArray holder 
+     * (requires extracting them from the TRefArray holder
      */
     SciFiSpacePointPArray get_spacepoints_pointers() const;
 
@@ -157,14 +157,14 @@ class SciFiBasePRTrack : public TObject {
      *  c_x-c_x, c_x-m_x, m_x-c_x, m_x-m_x, c_y-c_y, c_y-m_y, m_y-c_y, m_y-m_y.
      */
     DoubleArray _covariance;
-    ThreeVector _position;   /** Reconstructed reference plane position */
-    ThreeVector _momentum;   /** Reconstructed reference plane momentum */
+    ThreeVector _position;        /** Reconstructed reference plane position */
+    ThreeVector _momentum;        /** Reconstructed reference plane momentum */
     ThreeVector _seed_position;   /** Reconstructed seed plane position */
     ThreeVector _seed_momentum;   /** Reconstructed seed plane momentum */
-    double _chi_sq;          /** The chisq of the fit/s which formed the track */
-    int _ndf;                /** The number of degrees of freedom */
-    int _charge;             /** The track charge, 0 for straights */
-    int _n_fit_points;       /** The number of spacepoints used in the fit */
+    double _chi_sq;               /** The chisq of the fit/s which formed the track */
+    int _ndf;                     /** The number of degrees of freedom */
+    int _charge;                  /** The track charge, 0 for straights */
+    int _n_fit_points;            /** The number of spacepoints used in the fit */
 
   MAUS_VERSIONED_CLASS_DEF(SciFiBasePRTrack)
 };
@@ -175,4 +175,3 @@ typedef std::vector<SciFiBasePRTrack> SciFiBasePRTrackArray;
 } // ~namespace MAUS
 
 #endif
-
