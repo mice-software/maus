@@ -16,19 +16,26 @@ public:
 	~BT3dFieldMap() {if(myFieldMap) delete myFieldMap;}
 	//Copy
 	BT3dFieldMap * Clone() const {return new BT3dFieldMap(*this);}
-	BT3dFieldMap           (const BT3dFieldMap &rhs) : myFieldMap(new ThreeDFieldMap(*rhs.myFieldMap)) {;}
-	BT3dFieldMap& operator=(const BT3dFieldMap& rhs) {myFieldMap = new ThreeDFieldMap(*rhs.myFieldMap); return *this;}
+	BT3dFieldMap           (const BT3dFieldMap &rhs);
+	BT3dFieldMap& operator=(const BT3dFieldMap& rhs);
 
 	// Method to retrieve the field of the field map at Point[4]
-	inline void GetFieldValue( const double Point[4], double *Bfield ) const
-	{myFieldMap->GetFieldValue(Point, Bfield);}
+	inline void GetFieldValue( const double Point[4], double *Bfield ) const;
+
 	//Write output
 	void Print(std::ostream& out) const;
 	//VectorPotential not implemented!!!
 	CLHEP::HepLorentzVector GetVectorPotential(CLHEP::HepLorentzVector position) const {return HepLorentzVector();}
 
 private:
+  void SetBoundingBox();
+
 	ThreeDFieldMap* myFieldMap;
 };
+
+void BT3dFieldMap::GetFieldValue( const double Point[4], double *Bfield ) const {
+    myFieldMap->GetFieldValue(Point, Bfield);
+}
+
 
 #endif

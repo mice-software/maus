@@ -119,7 +119,7 @@ class CovarianceMatrix() :
     self._mean_vector = numpy.zeros( self._numVars )
     self._product_matrix = numpy.zeros( ( self._numVars, self._numVars ) )
     self._mean_momentum = 0.0
-    self._num_particles = 0
+    self._num_particles = 0.0
 
     self._correction_matrix = None
 
@@ -147,7 +147,7 @@ class CovarianceMatrix() :
     self._mean_vector = numpy.zeros( self._numVars )
     self._product_matrix = numpy.zeros( ( self._numVars, self._numVars ) )
     self._mean_momentum = 0.0
-    self._num_particles = 0
+    self._num_particles = 0.0
 
   def add_hit_scifi( self, scifi_hit ) :
     """
@@ -162,15 +162,16 @@ class CovarianceMatrix() :
       Add a hit and extract the information into the class.
       Accepts both xboa type hits and the local emittance analysis type hits.
     """
+    weight = hit.get_weight()
     for row, rowvar in enumerate( VARIABLE_LIST ) :
       for col, colvar in enumerate( VARIABLE_LIST ) :
         self._product_matrix[row][col] += hit.get( rowvar ) *\
-                                           hit.get( colvar )
+                                           hit.get( colvar ) * weight**2.0
 
-      self._mean_vector[row] += hit.get( rowvar )
+      self._mean_vector[row] += hit.get( rowvar ) * weight
 
-    self._mean_momentum += hit.get_p()
-    self._num_particles += 1
+    self._mean_momentum += hit.get_p()*weight
+    self._num_particles += 1.0*weight
 
 
   def add_dict( self, dictionary ) :

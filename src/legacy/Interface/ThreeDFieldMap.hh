@@ -5,6 +5,8 @@
 #include "Interface/Mesh.hh"
 #include "Interface/Interpolator.hh"
 
+class ThreeDGrid;
+
 class ThreeDFieldMap
 {
 public:
@@ -17,6 +19,9 @@ public:
 	static void StripG4BLComments(std::ostream& out, std::istream& in);
 
 	enum symmetry{none, dipole, quadrupole, solenoid};
+
+  // for bounding box
+  inline ThreeDGrid* GetMesh();
 
 private:
 	VectorMap*              myInterpolator;
@@ -35,6 +40,15 @@ private:
 
 
 };
+
+ThreeDGrid* ThreeDFieldMap::GetMesh() {
+    Interpolator3dGridTo3d* interpolator =
+            dynamic_cast<Interpolator3dGridTo3d*>(myInterpolator);
+    if (interpolator == NULL) {
+        return NULL;
+    }
+    return interpolator->GetMesh();
+}
 
 
 #endif

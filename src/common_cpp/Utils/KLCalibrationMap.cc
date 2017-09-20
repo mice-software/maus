@@ -15,14 +15,15 @@
  *
  */
 
+#include <exception>
 #include "Utils/KLCalibrationMap.hh"
 #include "Utils/KLChannelMap.hh"
+
+#include "calibration/calibration.h"
 
 namespace MAUS {
 
 KLCalibrationMap::KLCalibrationMap() {
-  pymod_ok = true;
-  if (!this->InitializePyMod()) pymod_ok = false;
 }
 
 KLCalibrationMap::~KLCalibrationMap() {
@@ -90,7 +91,6 @@ bool KLCalibrationMap::InitializeFromCards(Json::Value configJSON) {
       loaded = this->Initialize(xMapGainFile);
   } else {
       // get calib from DB instead of file, the above line is replaced by the one below
-      if (!pymod_ok) return false;
       loaded = this->InitializeFromCDB();
   }
   if (!loaded)
@@ -191,73 +191,40 @@ void KLCalibrationMap::Print() {
   std::cout << "=================================================================" << std::endl;
 }
 
-bool KLCalibrationMap::InitializePyMod() {
-  // import the get_kl_calib module
-  // this python module access and gets calibrations from the DB
-  _calib_mod = PyImport_ImportModule("calibration.get_kl_calib");
-  if (_calib_mod == NULL) {
-    std::cerr << "Failed to import get_kl_calib module" << std::endl;
-    return false;
-  }
-
-  PyObject* calib_mod_dict = PyModule_GetDict(_calib_mod);
-  if (calib_mod_dict != NULL) {
-    PyObject* calib_init = PyDict_GetItemString
-                                              (calib_mod_dict, "GetCalib");
-    if (PyCallable_Check(calib_init)) {
-        _tcalib = PyObject_Call(calib_init, NULL, NULL);
-    }
-  }
-  if (_tcalib == NULL) {
-    std::cerr << "Failed to instantiate get_kl_calib" << std::endl;
-    return false;
-  }
-
-    // get the get_calib_func() function
-  _get_calib_func = PyObject_GetAttrString(_tcalib, "get_calib");
-  if (_get_calib_func == NULL) {
-    std::cerr << "Failed to find get_calib function" << std::endl;
-    return false;
-  }
+bool KLCalibrationMap::GetCalibCAPI(std::string devname,
+                                    std::string caltype,
+                                    std::string fromdate) {
+  MAUS::CDB::Calibration cali;
+  std::string result;
+  try {
+      std::string status;
+      cali.getStatus(status);
+      if (status.compare("OK") != 0) {
+          std::cerr << "+++ CDB Error status = " << status << std::endl;
+          return false;
+      }
+      // std::cerr << " Calibration status returned " << status << std::endl;
+      std::cout << "++ Getting KL Calib by DATE for " << fromdate.c_str() << std::endl;
+      if (fromdate.compare("current") == 0)
+          cali.getCurrentDetectorCalibration(devname.c_str(),
+                                             caltype.c_str(),
+                                             result);
+      else
+          cali.getDetectorCalibrationForDate(devname.c_str(),
+                                             caltype.c_str(),
+                                             fromdate.c_str(),
+                                             result);
+      // std::cerr << result << "(" << result.size() << " characters)" << std::endl;
+  } catch (std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return false;
+  } // end try-catch
+  gainstr.str(result);
   return true;
 }
 
-void KLCalibrationMap::GetCalib(std::string devname, std::string caltype, std::string fromdate) {
-  PyObject *py_arg = NULL, *py_value = NULL;
-  // setup the arguments to get_calib_func
-  // the arguments are 3 strings
-  // arg1 = device name (KL) uppercase
-  // arg2 = calibration type (gain) lowercase
-  // arg3 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
-  // default date argument is "current"
-  // this is set via KL_calib_date_from card in ConfigurationDefaults
-  py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), fromdate.c_str());
-  if (py_arg == NULL) {
-    PyErr_Clear();
-    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-              "Failed to resolve arguments to get_calib",
-              "MAUSEvaluator::evaluate"));
-    }
-    if (_get_calib_func != NULL && PyCallable_Check(_get_calib_func)) {
-        py_value = PyObject_CallObject(_get_calib_func, py_arg);
-        // setup the streams to hold the different calibs
-        if (py_value != NULL && strcmp(caltype.c_str(), "gain") == 0)
-            gainstr << PyString_AsString(py_value);
-    }
-    if (py_value == NULL) {
-        PyErr_Clear();
-        Py_XDECREF(py_arg);
-        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Failed to parse argument "+devname,
-                     "GetCalib::get_calib"));
-    }
-    // clean up
-    Py_XDECREF(py_value);
-    Py_XDECREF(py_arg);
-}
-
 bool KLCalibrationMap::LoadGainCalib() {
-  this->GetCalib("KL", "gain", _kl_calibdate);
+  this->GetCalibCAPI("KL", "gain", _kl_calibdate);
   double gain;
   KLChannelKey key;
   try {

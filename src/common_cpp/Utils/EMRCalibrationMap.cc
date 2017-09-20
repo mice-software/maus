@@ -15,16 +15,16 @@
  *
  */
 
+#include <exception>
 #include "Utils/EMRCalibrationMap.hh"
 #include "Utils/EMRChannelMap.hh"
+
+#include "calibration/calibration.h"
+// #include "generated/CalibrationImplPortBinding.nsmap"
 
 namespace MAUS {
 
 EMRCalibrationMap::EMRCalibrationMap() {
-
-  pymod_ok = true;
-  if ( !this->InitializePyMod() )
-      pymod_ok = false;
 }
 
 EMRCalibrationMap::~EMRCalibrationMap() {
@@ -93,9 +93,6 @@ bool EMRCalibrationMap::InitializeFromCards(Json::Value configJSON) {
   if ( !fromDB ) {
       loaded = this->Initialize(calibFile);
   } else {
-      // Get calib from CDB instead of file
-      if ( !pymod_ok )
-	  return false;
       loaded = this->InitializeFromCDB();
   }
   if ( !loaded )
@@ -131,7 +128,7 @@ int EMRCalibrationMap::MakeEMRChannelKeys() {
 
 bool EMRCalibrationMap::LoadFromCDB() {
 
-  this->GetCalib("EMR", "eps", _calibDate);
+  this->GetCalibCAPI("EMR", "eps", _calibDate);
 
   try {
     while ( !epsstr.eof() ) {
@@ -160,40 +157,36 @@ bool EMRCalibrationMap::LoadFromCDB() {
   return true;
 }
 
-void EMRCalibrationMap::GetCalib(std::string devname, std::string caltype, std::string fromdate) {
-
-  PyObject *py_arg = NULL, *py_value = NULL;
-  // setup the arguments to get_calib_func
-  // the arguments are 3 strings
-  // arg1 = device name (EMR) uppercase
-  // arg2 = calibration type (eps) lowercase
-  // arg3 = valid_from_date == either "current" or an actual date 'YYYY-MM-DD HH:MM:SS'
-  // default date argument is "current"
-  // this is set via EMR_calib_date_from card in ConfigurationDefaults
-  py_arg = Py_BuildValue("(sss)", devname.c_str(), caltype.c_str(), fromdate.c_str());
-  if ( !py_arg ) {
-    PyErr_Clear();
-    throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-              "Failed to resolve arguments to get_calib",
-              "MAUSEvaluator::evaluate"));
-    }
-    if ( _get_calib_func && PyCallable_Check(_get_calib_func) ) {
-        py_value = PyObject_CallObject(_get_calib_func, py_arg);
-        // setup the streams to hold the different calibs
-        if ( py_value && strcmp(caltype.c_str(), "eps") == 0 )
-            epsstr << PyString_AsString(py_value);
-    }
-    if ( !py_value ) {
-        PyErr_Clear();
-        Py_XDECREF(py_arg);
-        throw(MAUS::Exceptions::Exception(MAUS::Exceptions::recoverable,
-                     "Failed to parse argument "+devname,
-                     "GetCalib::get_calib"));
-    }
-
-  // clean up
-  Py_XDECREF(py_value);
-  Py_XDECREF(py_arg);
+bool EMRCalibrationMap::GetCalibCAPI(std::string devname,
+                                     std::string caltype,
+                                     std::string fromdate) {
+  MAUS::CDB::Calibration cali;
+  std::string result;
+  try {
+      std::string status;
+      cali.getStatus(status);
+      if (status.compare("OK") != 0) {
+          std::cerr << "+++ CDB Error status = " << status << std::endl;
+          return false;
+      }
+      // std::cerr << " Calibration status returned " << status << std::endl;
+      std::cout << "++ Getting EMR Calib by DATE for " << fromdate.c_str() << std::endl;
+      if (fromdate.compare("current") == 0)
+          cali.getCurrentDetectorCalibration(devname.c_str(),
+                                             caltype.c_str(),
+                                             result);
+      else
+          cali.getDetectorCalibrationForDate(devname.c_str(),
+                                             caltype.c_str(),
+                                             fromdate.c_str(),
+                                             result);
+      // std::cerr << result << "(" << result.size() << " characters)" << std::endl;
+  } catch (std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return false;
+  } // end try-catch
+  epsstr.str(result);
+  return true;
 }
 
 bool EMRCalibrationMap::Load(std::string calibFile) {
@@ -276,32 +269,4 @@ void EMRCalibrationMap::Print() {
   std::cerr<< "===================================================================" << std::endl;
 }
 
-bool EMRCalibrationMap::InitializePyMod() {
-  PyObject* calib_mod = PyImport_ImportModule("calibration.get_emr_calib");
-  if ( !calib_mod ) {
-    std::cerr << "Failed to import get_emr_calib module" << std::endl;
-    return false;
-  }
-
-  PyObject* calib_mod_dict = PyModule_GetDict(calib_mod);
-  PyObject* t_calib = NULL;
-  if ( calib_mod_dict ) {
-    PyObject* calib_init = PyDict_GetItemString(calib_mod_dict, "GetCalib");
-    if ( PyCallable_Check(calib_init) ) {
-        t_calib = PyObject_Call(calib_init, NULL, NULL);
-    }
-  }
-  if ( !t_calib ) {
-    std::cerr << "Failed to instantiate get_emr_calib" << std::endl;
-    return false;
-  }
-
-  // Get the get_calib_func() function
-  _get_calib_func = PyObject_GetAttrString(t_calib, "get_calib");
-  if ( !_get_calib_func ) {
-    std::cerr << "Failed to find get_calib function" << std::endl;
-    return false;
-  }
-  return true;
-}
 } // namespace MAUS

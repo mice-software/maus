@@ -293,6 +293,7 @@ SciFi_sigma_z = 0.081 # mm
 SciFi_sigma_duplet =  0.6197 # mm
 SciFi_sigma_phi_1to4 = 1.0
 SciFi_sigma_phi_5 = 1.0
+SciFiMCSStationError = 2.0 # mm
 SciFiClusterReconOn = True
 SciFiSpacepointReconOn = True
 SciFiPRHelicalTkUSOn = 0 # TkUS helical pattern recognition: 0 = auto, 1 = off, 2 = on
@@ -303,14 +304,17 @@ SciFiPatRecMissingSpSearchOn = False # Do we seach for seed spoints missed by he
 SciFiPatRecMissingSpCut = 2 # Distance (mm) below which a missing spoint should added to a track
 SciFiPatRecSErrorMethod = 0 # How to calc error on s, 0 = station res, 1 = error prop
 SciFiPatRecVerbosity = 0 # The verbosity of the pat rec (0 - quiet, 1 - more)
+SciFiPatRecLongitudinalFitter = 1 # 0 - ntruns and linear s-z fit, 1 - ROOT and MINUIT
 SciFiPatRecLineFitter = 0 # Choose the patrec straight line fitter, 0 = custom lsq, 1 = ROOT
-SciFiPatRecCircleFitter = 0 # Choose the patrec circle fitter, 0 = custom lsq, 1 = MINUIT
+SciFiPatRecCircleFitter = 1 # Choose the patrec circle fitter, 0 = custom lsq, 1 = MINUIT
 SciFiStraightRoadCut = 7.0 # The road cut in pat rec for straights (mm)
 SciFiStraightChi2Cut = 50.0 # Chi^2 on pat rec straight track fit
 SciFiRadiusResCut = 150.0 # Helix radius cut (mm) for pattern recognition
-SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec circle fit
+SciFiPatRecCircleChi2Cut = 5.0 # Chi^2 on pat rec least squares circle fit
+SciFiPatRecCircleMinuitChi2Cut = 10 # Chi^2 on pat rec minuit circle fit
 SciFiNTurnsCut = 1.0 # Cut used when resolving number of turns between tracker stations (mm)
 SciFiPatRecSZChi2Cut = 150.0 # Chi^2 cut on pat rec s-z fit
+SciFiPatRecLongMinuitChi2Cut = 65.0 # Chi^2 cut on pat rec minuit longitudinal fit
 SciFiPatRecCircleErrorWeight = 1.0 # Weight to artificially scale the error going to xy fit
 SciFiPatRecSZErrorWeight = 1.0 # Weight to artificially scale the error going to sz fit
 SciFiMaxPt = 180.0 # Transverse momentum upper limit cut used in pattern recognition
@@ -388,7 +392,7 @@ cdb_cc_download_url = "" # "http://preprodcdb.mice.rl.ac.uk" # target URL for co
 # geometry download
 geometry_download_wsdl = "geometry?wsdl" # name of the web service used for downloads
 geometry_download_directory   = "%s/files/geometry/download" % os.environ.get("MAUS_ROOT_DIR") # name of the local directory where downloads will be placed
-geometry_download_by = 'run' # choose 'run_number' to download by run number, 'current' to use
+geometry_download_by = 'run_number' # choose 'run_number' to download by run number, 'current' to use
                                     # the currently valid geometry or 'id' to use the cdb internal id
                                     # (e.g. if it is desired to access an old version of a particular
                                     # geometry)
@@ -689,7 +693,7 @@ end_of_run_image_directory = ''
 # Default OutputPyFile output directory. MAUS web application directory.
 output_file_directory = os.environ.get("MAUS_WEB_MEDIA_RAW") if (os.environ.get("MAUS_WEB_MEDIA_RAW") != None) else os.getcwd()
 # Default image types of OutputCppRootImage
-image_types = ['png'] 
+image_types = ['png']
 
 PolynomialOpticsModel_order = 1
 PolynomialOpticsModel_algorithms = ["LeastSquares",
@@ -791,7 +795,7 @@ pid_config = "step_4"
 # the Global PID.
 pid_mode = "offline"
 # If pid_mode = "custom", variables to use should be set here as a space separated list, i.e.
-# custom_pid_set = "PIDVarA PIDVarC PIDVarD". 
+# custom_pid_set = "PIDVarA PIDVarC PIDVarD".
 custom_pid_set = "PIDVarB"
 # PID confidence level- set the margin (in %) between the confidence levels of competing pid hypotheses before they
 # are selected as the correct hypothesis
@@ -822,6 +826,8 @@ track_matching_tolerances = {
   "EMRy":75.0,
   "TOF12maxSpeed":1.0, # fraction of c to calculate travel time between TOFs for through matching
   "TOF12minSpeed":0.5,
+  "TKDpos":300.0, # position 
+  "TKDp":200.0, # momentum
 }
 
 # Whether to use energy loss calculations for global track matching
@@ -831,14 +837,41 @@ track_matching_no_single_event_check = {
   "Upstream":False,
   "Downstream":False
 }
+# Controls how geometry lookups (and tracking dynamic stepping) are done:
+# "geant4" use full geant4 lookup
+# "axial" assume cylindrical symmetry with materials and thicknesses determined by materials detected on-axis
+# "geant4_alt" alternative version of the full geant4 lookup
+track_matching_geometry_algorithm = "axial"
 
-# Whether through matchings should be performed
+# Set to false to disable through matching (track matching between TKU and TKD)
+# Set to true to enable through matching
 track_matching_through_matching = True
+
+# Controls the through matching logic
+# no_through_matching - don't do any through matching
+# tof12 - Match tracks if they have a tof1 space point, tof2 space point and the
+#         delta tof12 is compatible with track_matching_tolerances
+# propagate - Match tracks if they have a tku st 1 space point, a tku st2 space
+#         point and the residual position and momentum between propagated tku
+#         tracks and tkd tracks is compatible with track_matching_tolerances
+# propagate_requiring_tof12 - if tof12 matching is successful, attempt to do a
+#         propagate matching. Record the propagate matching if it is successful,
+#         else the tof12 matching
+# propagate_and_tof12 - do a propagate matching and a tof12 matching. Record the
+#         propagate matching if it is successful, else the tof12 matching
+track_matching_through_matching_logic = "propagate_and_tof12"
 
 # Whether residuals should be generated during track matching. In this case,
 # track_matching_pid_hypothesis should be set to the most common PID expected in the beam.
 # Output files will be placed in the directory in which MAUS is executed.
 track_matching_residuals = False
+
+# Choose to add additional z positions for tracking output
+# "none": don't add any additional z-positions
+# "virtual": use virtual planes as additional z-positions
+# Will add track points to the matched tracking output when track propagation crosses
+# a virtual plane
+track_matching_z_planes = "virtual"
 
 # Whether multiple adjacent cell hits in the KL should be merged into single spacepoints on import
 # into the global datastructure

@@ -39,6 +39,7 @@ class AnalysisHit() :
   def __init__( self, x = 0.0, y = 0.0, z = 0.0, \
                       px = 0.0, py = 0.0, pz = 0.0, station = 0, \
                       time = 0.0, mass = 105.6583715, p_value = 1.0, pid = 13, \
+                      weight = 1.0, \
                       scifi_track_point = None, virtual_track_point = None ) :
     """
       Initialise the object. this can be done in three ways:
@@ -58,6 +59,7 @@ class AnalysisHit() :
       self.__p_value = p_value
       self.__pid = pid
       self.__station = station
+      self.__weight = weight
 #      self.__reference = reference
 
     elif scifi_track_point is not None and virtual_track_point is None :
@@ -73,13 +75,12 @@ class AnalysisHit() :
       self.__pid = pid
       self.__station = tools.calculate_plane_id(scifi_track_point.tracker(), \
           scifi_track_point.station(), scifi_track_point.plane())
+      self.__weight = weight
 #      if reference is None :
 #        self.__reference = str(scifi_track_point.tracker())+"."+\
 #            str(scifi_track_point.station())+"."+str(scifi_track_point.plane())
 #      else :
 #        self.__reference = reference
-      if math.isnan(self.__x) :
-        raise ValueError("NaN Values Received from Scifi Track Point")
 
     elif scifi_track_point is None and virtual_track_point is not None :
       self.__x = virtual_track_point.GetPosition().x()
@@ -93,6 +94,7 @@ class AnalysisHit() :
       self.__p_value = 1.0
       self.__pid = virtual_track_point.GetParticleId()
       self.__station = virtual_track_point.GetStationId()
+      self.__weight = weight
 #      self.__reference = reference
 #      if reference is None :
 #        self.__reference = virtual_track_point.GetStationId()
@@ -103,6 +105,10 @@ class AnalysisHit() :
       print "WTF!"
       raise ValueError( 'Please supply precisely one of "virtual_track_point"'+\
                  ' or "scifi_track_point", or specify all values explicitly.' )
+
+#    if math.isnan(self.__x) or math.isnan(self.__px) or math.isnan(self.__y) or math.isnan(self.__py) :
+    if math.isnan(self.__x) or math.isnan(self.__px) or math.isinf(self.__x) or math.isinf(self.__px) :
+      raise ValueError("NaN Values Received from Scifi Track Point")
 
 
   def __str__( self ) :
@@ -202,8 +208,15 @@ class AnalysisHit() :
     """
     self.__station = station
 
+  def set_weight( self, w ) :
+    """
+      Set the statistical weight of the hit
+    """
+    self.__weight = w
+
 #  def set_reference( self, string ) :
 #    self.__reference = string
+
 
   def get_x( self ) :
     """
@@ -253,6 +266,7 @@ class AnalysisHit() :
     """
     if math.isnan(math.sqrt( self.__px**2 + self.__py**2 + self.__pz**2 )) :
       print "ISNAN!!!", self
+      raise ValueError("NaN Values Received from Scifi Track Point")
     return math.sqrt( self.__px**2 + self.__py**2 + self.__pz**2 )
 
   def get_r( self ) :
@@ -320,6 +334,13 @@ class AnalysisHit() :
       Get the particle ID
     """
     return self.__station
+
+
+  def get_weight( self ) :
+    """
+      Return the statistical weight of the hit
+    """
+    return self.__weight
 
 
 #  def get_reference( self ) :

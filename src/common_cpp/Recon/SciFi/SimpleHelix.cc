@@ -19,70 +19,74 @@
 
 namespace MAUS {
 
-// Constructors
-SimpleHelix::SimpleHelix() {
-  _Phi_0 = 0.0;
-  _Phi_0_err = 0.0;
-  _R = 0.0;
-  _R_err = 0.0;
-  _tan_lambda = 0.0;
-  _tan_lambda_err = 0.0;
-  _Psi_0 = 0.0;
-  _Psi_0_err = 0.0;
-  _chisq = 0.0;
-  _chisq_dof = 0.0;
-  _dsdz = 0.0;
-  _dsdz_err = 0.0;
+// Default constructor
+SimpleHelix::SimpleHelix() : _params {0.0, 0.0, 0.0, 0.0, 0.0},
+                             _errors {0.0, 0.0, 0.0, 0.0, 0.0},
+                             _ndfs {0, 0, 0},
+                             _chisqs {0.0, 0.0, 0.0},
+                             _pvalue {0.0} {
+  _cov.ResizeTo(4, 4);
 }
 
-SimpleHelix::SimpleHelix(double Phi_0, double Phi_0_err, double R, double R_err, double tan_lambda,
-                         double tan_lambda_err, double Psi_0, double Psi_0_err, double chisq,
-                         double chisq_dof) {
-  _Phi_0 = Phi_0;
-  _Phi_0_err = Phi_0_err;
-  _R = R;
-  _R_err = R_err;
-  _tan_lambda = tan_lambda;
-  _tan_lambda_err = tan_lambda_err;
-  _Psi_0 = Psi_0;
-  _Psi_0_err = Psi_0_err;
-  _chisq = chisq;
-  _chisq_dof = chisq_dof;
-  _dsdz = 0.0;
-  _dsdz_err = 0.0;
+// Assignment operator
+SimpleHelix& SimpleHelix::operator=(const SimpleHelix& rhs) {
+  if (this == &rhs) {
+      return *this;
+  }
+  _params = rhs.get_parameters();
+  _errors = rhs.get_errors();
+  _ndfs = rhs.get_ndfs();
+  _chisqs = rhs.get_chisqs();
+  _pvalue = rhs.get_pvalue();
+  _cov = rhs.get_cov();
+
+  return *this;
+}
+
+// Copy constructor
+SimpleHelix::SimpleHelix(const SimpleHelix &helix) {
+  *this = helix;
+}
+
+
+SimpleHelix::SimpleHelix(const std::vector<double>& params,
+                         const std::vector<double>& errors,
+                         const std::vector<int>& ndfs,
+                         const std::vector<double>& chisqs,
+                         double pvalue,
+                         TMatrixD& cov) : _params {params},
+                                          _errors {errors},
+                                          _ndfs {ndfs},
+                                          _chisqs {chisqs},
+                                          _pvalue {pvalue},
+                                          _cov {cov} {
+  // Do nothing
 }
 
 // Destructor
 SimpleHelix::~SimpleHelix() {}
 
 void SimpleHelix::clear() {
-  _Phi_0 = 0.0;
-  _Phi_0_err = 0.0;
-  _R = 0.0;
-  _R_err = 0.0;
-  _tan_lambda = 0.0;
-  _tan_lambda_err = 0.0;
-  _Psi_0 = 0.0;
-  _Psi_0_err = 0.0;
-  _chisq = 0.0;
-  _chisq_dof = 0.0;
-  _dsdz = 0.0;
-  _dsdz_err = 0.0;
+  _params = {0.0, 0.0, 0.0, 0.0, 0.0},
+  _errors = {0.0, 0.0, 0.0, 0.0, 0.0},
+  _ndfs = {0, 0, 0},
+  _chisqs = {0.0, 0.0, 0.0},
+  _pvalue = {0.0},
+  _cov = TMatrixD(4, 4);
 }
 
-void SimpleHelix::set_parameters(double Phi_0, double Phi_0_err, double R, double R_err,
-                                 double tan_lambda, double tan_lambda_err, double Psi_0,
-                                 double Psi_0_err, double chisq, double chisq_dof) {
-  _Phi_0 = Phi_0;
-  _Phi_0_err = Phi_0_err;
-  _R = R;
-  _R_err = R_err;
-  _tan_lambda = tan_lambda;
-  _tan_lambda_err = tan_lambda_err;
-  _Psi_0 = Psi_0;
-  _Psi_0_err = Psi_0_err;
-  _chisq = chisq;
-  _chisq_dof = chisq_dof;
+void SimpleHelix::set_all(const std::vector<double>& params,
+                          const std::vector<double>& errors,
+                          const std::vector<int>& ndfs,
+                          const std::vector<double>& chisqs,
+                          double pvalue,
+                          TMatrixD& cov) {
+  _params = params;
+  _errors = errors;
+  _ndfs = ndfs;
+  _chisqs = chisqs;
+  _pvalue = pvalue;
+  _cov = cov;
 }
 
 } // ~namespace MAUS

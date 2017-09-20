@@ -25,7 +25,7 @@ install_dir=${MAUS_THIRD_PARTY}/third_party/install
 
 # The packages to download for the MAUS third party tarball
 download_package_list="\
- numpy anyjson python-dateutil>=1.5,<2.0 amqplib>=1.0 six>=1.4.0 \
+ numpy scipy anyjson python-dateutil>=1.5,<2.0 amqplib>=1.0 six>=1.4.0 \
  logilab-common logilab-astng suds validictory nose==1.1 nose-exclude \
  coverage doxypy astroid isort pylint==1.6.3 bitarray \
  pymongo==2.3 readline matplotlib==2.0.0 \
@@ -35,7 +35,7 @@ download_package_list="\
 # The packages to install
 # Note: pil is no longer on PyPI so we only use our existing tarball
 package_list="\
- numpy anyjson python-dateutil amqplib six \
+ numpy scipy anyjson python-dateutil amqplib six \
  logilab-common logilab-astng  suds validictory nose==1.1 nose-exclude \
  coverage doxypy pylint==1.6.3 bitarray \
  pymongo readline matplotlib \
@@ -43,7 +43,7 @@ package_list="\
 "
 
 # The modules to test
-module_test_list="numpy suds validictory nose coverage \
+module_test_list="numpy scipy suds validictory nose coverage \
  pylint bitarray matplotlib pymongo \
  Image django magickwand celery" #Image is pil bottom level
 

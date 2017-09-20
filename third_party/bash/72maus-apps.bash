@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-version=0.2
+version=0.3
 dirname=maus-apps-${version}
 filename=${dirname}.tar.gz
-url=http://micewww.pp.rl.ac.uk/maus/maus-apps/${filename}
+# version 0.2
+# url=http://micewww.pp.rl.ac.uk/maus/maus-apps/${filename}
+###### version 0.3
+# NOTE: older version 0.2 is incompatible with the Django version that comes with MAUS
+url=http://micewww.pp.rl.ac.uk/attachments/download/9124/${filename}
 sourcedir=${MAUS_THIRD_PARTY}/third_party/source/
 sourcefile=${sourcedir}/${filename}
 libdir=${MAUS_THIRD_PARTY}/third_party/install/lib/

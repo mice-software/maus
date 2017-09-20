@@ -7,7 +7,7 @@ output_json_file_type = "text"
 
 SciFiHelicalPROn = 1
 SciFiStraightPROn = 0
-SciFiPatRecLongitudinalFitter = 0 # 0 - ntruns and linear s-z fit, 1 - ROOT and MINUIT
+SciFiPatRecLongitudinalFitter = 1 # 0 - ntruns and linear s-z fit, 1 - ROOT and MINUIT
 SciFiPatRecLongMinuitChi2Cut = 30.0 # Chi^2 cut on pat rec MINUIT longitudinal fit
 
 # Used, for now, to determine what level of c++ log messages are reported to the user

@@ -245,29 +245,19 @@ TEST_F(SciFiEventTestDS, test_straightprtrack_getters_setters) {
 TEST_F(SciFiEventTestDS, test_add_helicalprtrack) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
-  trk->set_pos0(ThreeVector(1.0, 2.0, 3.0));
   evt->add_helicalprtrack(trk);
   EXPECT_EQ(1u, evt->helicalprtracks().size());
-  EXPECT_EQ(1.0, evt->helicalprtracks()[0]->get_pos0().x());
 }
 
 TEST_F(SciFiEventTestDS, test_helicalprtrack_getters_setters) {
   SciFiEvent* evt = new SciFiEvent();
   SciFiHelicalPRTrack* trk = new SciFiHelicalPRTrack();
-  trk->set_pos0(ThreeVector(1.0, 2.0, 3.0));
   SciFiHelicalPRTrack* trk2 = new SciFiHelicalPRTrack();
-  trk2->set_pos0(ThreeVector(-1.0, -2.0, -3.0));
   std::vector<SciFiHelicalPRTrack*> trks;
   trks.push_back(trk);
   trks.push_back(trk2);
   evt->set_helicalprtrack(trks);
   EXPECT_EQ(2u, evt->helicalprtracks().size());
-  EXPECT_EQ(1.0, evt->helicalprtracks()[0]->get_pos0().x());
-  EXPECT_EQ(2.0, evt->helicalprtracks()[0]->get_pos0().y());
-  EXPECT_EQ(3.0, evt->helicalprtracks()[0]->get_pos0().z());
-  EXPECT_EQ(-1.0, evt->helicalprtracks()[1]->get_pos0().x());
-  EXPECT_EQ(-2.0, evt->helicalprtracks()[1]->get_pos0().y());
-  EXPECT_EQ(-3.0, evt->helicalprtracks()[1]->get_pos0().z());
 }
 
 } // ~namespace MAUS

@@ -3,7 +3,7 @@
 """Simulate the MICE SciFi Tracker
 
 This will simulate 'number_of_spills' MICE spills  through MICE
-using Geant4.  Tracker hits will be digitized, reconstructed and 
+using Geant4.  Tracker hits will be digitized, reconstructed and
 spacepoints and pattern recognition tracks displayed.
 """
 
@@ -24,6 +24,7 @@ def run():
     my_map.append(MAUS.MapCppTrackerClusterRecon()) # SciFi channel clustering
     my_map.append(MAUS.MapCppTrackerSpacePointRecon()) # SciFi spacepoint recon
     my_map.append(MAUS.MapCppTrackerPatternRecognition()) # SciFi track finding
+    my_map.append(MAUS.MapCppTrackerPRSeed()) # Set the Seed from PR
     my_map.append(MAUS.MapCppTrackerTrackFit()) # SciFi track fit
 
     datacards = io.StringIO(u"")

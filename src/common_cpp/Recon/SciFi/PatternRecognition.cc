@@ -68,7 +68,10 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _up_helical_pr_on(true),
                                           _down_helical_pr_on(true),
                                           _sp_search_on(false),
+                                          _expected_handedness_t1(0),
+                                          _expected_handedness_t2(0),
                                           _s_error_method(0),
+                                          _longitudinal_fitter(0),
                                           _line_fitter(0),
                                           _circle_fitter(0),
                                           _verb(0),
@@ -84,8 +87,10 @@ PatternRecognition::PatternRecognition(): _debug(false),
                                           _straight_chisq_cut(50.0),
                                           _R_res_cut(150.0),
                                           _circle_chisq_cut(5.0),
+                                          _circle_minuit_cut(10.0),
                                           _n_turns_cut(1.0),
                                           _sz_chisq_cut(150.0),
+                                          _long_minuit_cut(65.0),
                                           _circle_error_w(1.0),
                                           _sz_error_w(1.0),
                                           _Pt_max(180.0),
@@ -110,7 +115,10 @@ void PatternRecognition::set_parameters_to_default() {
   _up_helical_pr_on = true;
   _down_helical_pr_on = true;
   _sp_search_on = false;
+  _expected_handedness_t1 = 0;
+  _expected_handedness_t2 = 0;
   _s_error_method = 0;
+  _longitudinal_fitter = 0;
   _line_fitter = 0;
   _circle_fitter = 0;
   _verb = 0;
@@ -122,12 +130,15 @@ void PatternRecognition::set_parameters_to_default() {
   _sd_5 = 0.4298;
   _sd_phi_1to4 = 1.0;
   _sd_phi_5 = 1.0;
+  _sd_mcs = 2.0;
   _res_cut = 7.0;
   _straight_chisq_cut = 50.0;
   _R_res_cut = 150.0;
   _circle_chisq_cut = 5.0;
+  _circle_minuit_cut = 10.0;
   _n_turns_cut = 1.0;
   _sz_chisq_cut = 150.0;
+  _long_minuit_cut = 65.0;
   _circle_error_w = 1.0;
   _sz_error_w = 1.0;
   _Pt_max = 180.0;
@@ -166,9 +177,9 @@ void PatternRecognition::setup_debug(std::string debug_fname) {
   _hszchisq_line = new TH1D("hszchisq_line", \
       "Pattern Recognition s-z Fit ChiSq/DoF All Candidates", 200, 0, 400);
   _fail_helix_tku = new TH1D("fail_helix_tku", \
-                             "Pattern Recognition Helix Fit Failure Point TkU", 5, 0, 5);
+                             "Pattern Recognition Helix Fit Failure Point TkU", 6, 0, 6);
   _fail_helix_tkd = new TH1D("fail_helix_tkd", \
-                             "Pattern Recognition Helix Fit Failure Point TkD", 5, 0, 5);
+                             "Pattern Recognition Helix Fit Failure Point TkD", 6, 0, 6);
 
   _hx_line->Write();
   _hy_line->Write();
@@ -186,6 +197,7 @@ bool PatternRecognition::LoadGlobals() {
     Json::Value *json = Globals::GetConfigurationCards();
     _sp_search_on = (*json)["SciFiPatRecMissingSpSearchOn"].asBool();
     _s_error_method = (*json)["SciFiPatRecSErrorMethod"].asInt();
+    _longitudinal_fitter = (*json)["SciFiPatRecLongitudinalFitter"].asInt();
     _line_fitter = (*json)["SciFiPatRecLineFitter"].asInt();
     _circle_fitter = (*json)["SciFiPatRecCircleFitter"].asInt();
     _verb = (*json)["SciFiPatRecVerbosity"].asInt();
@@ -195,12 +207,15 @@ bool PatternRecognition::LoadGlobals() {
     _sd_5 = (*json)["SciFi_sigma_tracker0_station5"].asDouble();
     _sd_phi_1to4 = (*json)["SciFi_sigma_phi_1to4"].asDouble();
     _sd_phi_5 = (*json)["SciFi_sigma_phi_5"].asDouble();
+    _sd_mcs = (*json)["SciFiMCSStationError"].asDouble();
     _res_cut = (*json)["SciFiStraightRoadCut"].asDouble();
     _straight_chisq_cut = (*json)["SciFiStraightChi2Cut"].asDouble();
     _R_res_cut = (*json)["SciFiRadiusResCut"].asDouble();
     _circle_chisq_cut = (*json)["SciFiPatRecCircleChi2Cut"].asDouble();
+    _circle_minuit_cut = (*json)["SciFiPatRecCircleMinuitChi2Cut"].asDouble();
     _n_turns_cut = (*json)["SciFiNTurnsCut"].asDouble();
     _sz_chisq_cut = (*json)["SciFiPatRecSZChi2Cut"].asDouble();
+    _long_minuit_cut = (*json)["SciFiPatRecLongMinuitChi2Cut"].asDouble();
     _circle_error_w = (*json)["SciFiPatRecCircleErrorWeight"].asDouble();
     _sz_error_w = (*json)["SciFiPatRecSZErrorWeight"].asDouble();
     _Pt_max = (*json)["SciFiMaxPt"].asDouble();
@@ -710,7 +725,6 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
                                     std::vector<SciFiSpacePoint*> &current_spnts,
                                     SpacePoint2dPArray &spnts_by_station,
                                     std::vector<SciFiHelicalPRTrack*> &htrks) const {
-// if (_verb > 0) std::cout << "make_helix: # of current spnts: " << current_spnts.size() << "\n";
 
   // Set variables to hold which stations are to be ignored
   int ignore_st_1 = -1, ignore_st_2 = -1;
@@ -723,10 +737,6 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
       return;
   }
 
-  // Set the minimum station number to 0, unless that is an ignore station
-  int stat_num_min = 0;
-  if ( ignore_st_1 == 0 || ignore_st_2 == 0 ) stat_num_min = 1;
-
   // Set the maximum station number to 4, unless that is an ignore station
   int stat_num_max = 4;
   if ( ignore_st_1 == 4 || ignore_st_2 == 4 ) stat_num_max = 3;
@@ -735,41 +745,29 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
   for ( size_t sp_num = 0; sp_num < spnts_by_station[stat_num].size(); ++sp_num ) {
     // If the current sp is used, skip it
     if ( spnts_by_station[stat_num][sp_num]->get_used() ) {
-    // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num << " used, skipin\n";
       continue;
     }
-
-  // Add the current spnt to the list being tried at present
-  // if (_verb > 0) std::cout << "Stat: " << stat_num << " SP: " << sp_num  << " unused, adding ";
     current_spnts.push_back(spnts_by_station[stat_num][sp_num]);
-  // if (_verb > 0) std::cout << " new number of current spnts: " << current_spnts.size() << "\n";
 
     // If we are on the last station, attempt to form a track using the spacepoints collected
     if (stat_num == stat_num_max) {
       SciFiHelicalPRTrack* trk = form_track(n_points, current_spnts);
 
-      // If we found a track, clear current spacepoints to trigger break out to outer most station
+      // If we found a track, add it to the list of candidates
       if ( trk != NULL ) {
         if (_verb > 0)
           std::cout << "INFO: Pattern Recognition: Found track candidate, adding" << std::endl;
         htrks.push_back(trk);
-        // current_spnts.clear();
-        // current_spnts.resize(0);
-        // return;
-      } // else {
-        // current_spnts.pop_back();
-      // }
+      }
+      // Remove the last spacepoint tried to make room for another from the same station
       current_spnts.pop_back();
 
     // If not on the final station, move on to next (the last recursive call)
     } else {
       make_helix(n_points, stat_num+1, ignore_stations, current_spnts, spnts_by_station, htrks);
 
-      // If not on the first station and current_spnts is empty, break out as track was found
-      if ( stat_num != stat_num_min && current_spnts.size() == 0 )
-        return;
-      // If we we have current spnts, remove the last tried, before trying another
-      else if ( current_spnts.size() != 0 )
+      // If we have current spnts, remove the last tried, before trying another from this station
+      if ( current_spnts.size() != 0 )
         current_spnts.pop_back();
     }
   }
@@ -778,34 +776,48 @@ void PatternRecognition::make_helix(const int n_points, const int stat_num,
 
 SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
                                                     std::vector<SciFiSpacePoint*> spnts ) const {
-  // SciFiTools::print_spacepoint_xyz(spnts);
+  // Some initial set up
+  SciFiHelicalPRTrack* track = NULL;
+  bool good_radius = false;
+  int handedness = 0; // The particle track handedness
+  std::vector<double> x;
+  std::vector<double> y;
+  std::vector<double> z;
+  for (auto sp : spnts) {
+      x.push_back(sp->get_position().x());
+      y.push_back(sp->get_position().y());
+      z.push_back(sp->get_position().z());
+  }
 
-  // Perform a circle fit now that we have found a set of spacepoints
+
+  // Fit the transverse projection (a circle)
+  // ----------------------------------------
   SimpleCircle c_trial;
   TMatrixD cov_circle(3, 3); // The covariance matrix for the circle parameters alpha, beta, gamma
   double s1to4_error = _sd_1to4 * _circle_error_w;
   double s5_error = _sd_5 * _circle_error_w;
 
-  bool good_radius = false;
   if (_circle_fitter == 0) {
     // With a custom linear least squares fit
     good_radius = LeastSquaresFitter::circle_fit(s1to4_error, s5_error, _R_res_cut,
                                                  spnts, c_trial, cov_circle);
+    if ((c_trial.get_chisq() / calc_circle_ndf(n_points)) > _circle_chisq_cut)
+      good_radius = false;
+
   } else if (_circle_fitter == 1) {
+    // Set up a position error vector (constant error, estimated to account for MCS)
+    std::vector<double> err(n_points, _sd_mcs);
+
     // With a ROOT MINUIT based fitter
-    std::vector<double> x;
-    std::vector<double> y;
-    for (auto sp : spnts) {
-        x.push_back(sp->get_position().x());
-        y.push_back(sp->get_position().y());
+    good_radius = RootFitter::FitCircleMinuit(x, y, err, c_trial, cov_circle);
+    if ( (c_trial.get_R() > _R_res_cut) || \
+         (c_trial.get_chisq() / calc_circle_ndf(n_points)) > _circle_minuit_cut) {
+      good_radius = false;
     }
-    good_radius = RootFitter::FitCircleMinuit(x, y, c_trial, cov_circle);
-    if (c_trial.get_R() > _R_res_cut)
-        good_radius = false;
   }
 
   // If the radius calculated is too large or chisq fails, return NULL
-  if ( !good_radius || !( c_trial.get_chisq() / ( (2*n_points) - 3 ) < _circle_chisq_cut ) ) {
+  if (!good_radius) {
     if (n_points == 5 && _debug) {
       if (spnts[0]->get_tracker() == 0) {
         _fail_helix_tku->Fill(1);
@@ -818,55 +830,130 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
     return NULL;
   }
 
-  // std::cerr << "cov_circle: " << std::endl;
-  // cov_circle.Print();
+  // Fit longitudinal parameters
+  // ---------------------------
+  if (_longitudinal_fitter == 0) { // Use the nturns algorithm and s-z linear fit
+    // Calculate the standard deviations on the values of s found
+    std::vector<double> sigma_s;
+    for (auto sp : spnts) {
+      double sig = -1.0;
+      if (_s_error_method == 0) {  // 1st method: just use station resolution
+        if ( (sp->get_station() == 5) )
+          sig = _sd_phi_5;
+        else
+          sig = _sd_phi_1to4;
+      } else if (_s_error_method == 1) {
+        sig = sigma_on_s(c_trial, cov_circle, sp); // 2nd method: error propagation
+      }
+      sigma_s.push_back(sig * _sz_error_w);
+    }
 
-  // Calculate the standard deviations on the values of s found
-  std::vector<double> sigma_s;
-  for (auto sp : spnts) {
-    double sig = -1.0;
-    if (_s_error_method == 0) {  // 1st method: just use station resolution
-      if ( (sp->get_station() == 5) )
-        sig = _sd_phi_5;
+    // Perform the s - z fit
+    SimpleLine line_sz;
+    std::vector<double> phi_i;  // The change between turning angles wrt first spacepoint
+    TMatrixD cov_sz(2, 2);      // The covariance matrix of the sz fit paramters c_sz, dsdz
+    bool good_dsdz = find_dsdz(n_points, spnts, c_trial, sigma_s, phi_i, line_sz, cov_sz, \
+                               handedness);
+    if (!good_dsdz) {
+      if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: dsdz fit failed, looping...\n";
+      return NULL;
+    }
+
+    // Squash the covariances of each fit into one vector
+    std::vector<double> covariance;
+    for ( int i = 0; i < 3; ++i ) {
+      for ( int j = 0; j < 3; ++j ) {
+        covariance.push_back(cov_circle[i][j]);
+      }
+    }
+    for ( int i = 0; i < 2; ++i ) {
+      for ( int j = 0; j < 2; ++j ) {
+        covariance.push_back(cov_sz[i][j]);
+      }
+    }
+
+    // Make the track
+    track = new SciFiHelicalPRTrack(-1, 0.0, c_trial, line_sz, spnts, covariance);
+    track->set_circle_ndf(calc_circle_ndf(n_points));
+    track->set_line_sz_ndf(n_points - 2);
+  } else if (_longitudinal_fitter == 1) { // Fit the longitudinal parameters via ROOT (MINUIT2)
+    SimpleHelix helix;
+    // Hand the spacepoint positions to the fitter order by ascending z
+    std::vector<SciFiSpacePoint*> ordered_spnts = spnts;
+    std::sort(ordered_spnts.begin(), ordered_spnts.end(), \
+        [](SciFiSpacePoint* a, SciFiSpacePoint* b) {
+          return a->get_position().z() < b->get_position().z();
+        });
+    std::vector<double> ox;
+    std::vector<double> oy;
+    std::vector<double> oz;
+    for (auto sp : ordered_spnts) {
+      ox.push_back(sp->get_position().x());
+      oy.push_back(sp->get_position().y());
+      oz.push_back(sp->get_position().z());
+    }
+
+    // Help the fitter with the handedness if the radius is small
+    int expected_handedness = 0;
+    if (c_trial.get_R() < _low_radius) {
+      if (spnts[0]->get_tracker() == 0)
+        expected_handedness = _expected_handedness_t1;
       else
-        sig = _sd_phi_1to4;
-    } else if (_s_error_method == 1) {
-      sig = sigma_on_s(c_trial, cov_circle, sp); // 2nd method: error propagation
+        expected_handedness = _expected_handedness_t2;
     }
-    sigma_s.push_back(sig * _sz_error_w);
-  }
 
-  // Perform the s - z fit
-  SimpleLine line_sz;
-  std::vector<double> phi_i;  // The change between turning angles wrt first spacepoint
-  int handedness = 0;         // The particle track handedness
-  TMatrixD cov_sz(2, 2);      // The covariance matrix of the sz fit paramters c_sz, dsdz
-  bool good_dsdz = find_dsdz(n_points, spnts, c_trial, sigma_s, phi_i, line_sz, cov_sz, handedness);
-  if (!good_dsdz) {
-    if ( _verb > 0 ) std::cout << "INFO: Pattern Recognition: dsdz fit failed, looping...\n";
-    return NULL;
-  }
+    // Set up a position error vector (constant error, estimated to account for MCS)
+    std::vector<double> err(n_points, _sd_mcs);
 
-  // Squash the covariances of each fit into one vector
-  std::vector<double> covariance;
-  for ( int i = 0; i < 3; ++i ) {
-    for ( int j = 0; j < 3; ++j ) {
-      covariance.push_back(cov_circle[i][j]);
+    // Call the fitter
+    const double pStart[4] = {c_trial.get_x0(), c_trial.get_y0(), c_trial.get_R(), 0.0};
+    bool result = RootFitter::FitHelixMinuit(ox, oy, oz, err, pStart, helix,
+                                             expected_handedness, _long_minuit_cut);
+    if (!result) {
+      if (n_points == 5 && _debug) {
+        if (spnts[0]->get_tracker() == 0) {
+          _fail_helix_tku->Fill(2);
+        } else if (spnts[0]->get_tracker() == 1) {
+          _fail_helix_tkd->Fill(2);
+        }
+      }
+      return NULL;
     }
-  }
-  for ( int i = 0; i < 2; ++i ) {
-    for ( int j = 0; j < 2; ++j ) {
-      covariance.push_back(cov_sz[i][j]);
+    if ((helix.get_longitudinal_chisq() / calc_minuit_longitudinal_ndf(n_points))  \
+        > _long_minuit_cut) {
+      if (n_points == 5 && _debug) {
+        if (spnts[0]->get_tracker() == 0) {
+          _fail_helix_tku->Fill(3);
+        } else if (spnts[0]->get_tracker() == 1) {
+          _fail_helix_tkd->Fill(3);
+        }
+      }
+      return NULL;
     }
-  }
+    if (helix.get_R() > _R_res_cut) {
+            if (n_points == 5 && _debug) {
+        if (spnts[0]->get_tracker() == 0) {
+          _fail_helix_tku->Fill(4);
+        } else if (spnts[0]->get_tracker() == 1) {
+          _fail_helix_tkd->Fill(4);
+        }
+      }
+      return NULL;
+    }
 
-  // Set all the good sp to used and set the track seeds with them
-//   for ( int i = 0; i < static_cast<int>(spnts.size()); ++i ) {
-//     spnts[i]->set_used(true);
-//   }
+    double dsdz = helix.get_dsdz();
+    handedness = 1;
+    if (dsdz < 0)
+      handedness = -1;
+
+    // Make the track
+    helix.set_transverse_chisq(c_trial.get_chisq());
+    helix.set_transverse_ndf(calc_circle_ndf(n_points));
+    helix.set_longitudinal_ndf(calc_minuit_longitudinal_ndf(n_points));
+    track = new SciFiHelicalPRTrack(helix, spnts);
+  }
 
   // Set the charge
-//  int charge = - handedness;
   int charge;
   if (spnts[0]->get_tracker() == 0) {
     if ( _bz_t1 > 0 ) {
@@ -881,17 +968,13 @@ SciFiHelicalPRTrack* PatternRecognition::form_track(const int n_points,
       charge = handedness;
     }
   }
+  track->set_charge(charge);
 
-  // Set the remaining track parameters
-  double phi_0 = phi_i[0];
-  double x0 = c_trial.get_x0() + c_trial.get_R()*cos(phi_0);
-  double y0 = c_trial.get_y0() + c_trial.get_R()*sin(phi_0);
-  ThreeVector pos_0(x0, y0, -1);
-
-  // Form the track and return it
-  SciFiHelicalPRTrack *track = new SciFiHelicalPRTrack(-1, charge, pos_0, phi_0, c_trial, line_sz,
-                                                       -1.0, phi_i, spnts, covariance);
+  // Set the number of points fitted and the fit algorithms used
   track->set_n_fit_points(n_points);
+  track->set_alg_used_circle(_circle_fitter);
+  track->set_alg_used_longitudinal(_longitudinal_fitter);
+
   return track;
 }
 
@@ -952,7 +1035,7 @@ bool PatternRecognition::find_dsdz(int n_points, std::vector<SciFiSpacePoint*> &
   }
 
   // Check linear fit passes chisq test
-  if ( !(line_sz.get_chisq() / ( n_points - 2 ) < _sz_chisq_cut ) ) {
+  if ( !((line_sz.get_chisq() / calc_lsq_longitudinal_ndf(n_points)) < _sz_chisq_cut) ) {
     if (n_points == 5 && _debug) {
       if (spnts[0]->get_tracker() == 0) {
         _fail_helix_tku->Fill(3);
@@ -1114,23 +1197,29 @@ bool PatternRecognition::check_time_consistency(const std::vector<SciFiSpacePoin
 }
 
 void PatternRecognition::get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
-       double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut) {
+                                  double& circle_chisq_cut, double& _circle_minuit_cut,
+                                  double& n_turns_cut, double& sz_chisq_cut,
+                                  double& long_minuit_cut) {
   res_cut = _res_cut;
   straight_chisq_cut = _straight_chisq_cut;
   R_res_cut = _R_res_cut;
   circle_chisq_cut = _circle_chisq_cut;
   n_turns_cut = _n_turns_cut;
   sz_chisq_cut = _sz_chisq_cut;
+  long_minuit_cut = _long_minuit_cut;
 }
 
 void PatternRecognition::set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
-       double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut) {
+                                  double circle_chisq_cut, double circle_minuit_cut,
+                                  double n_turns_cut, double sz_chisq_cut, double long_minuit_cut) {
   _res_cut = res_cut;
   _straight_chisq_cut = straight_chisq_cut;
   _R_res_cut = R_res_cut;
   _circle_chisq_cut = circle_chisq_cut;
   _n_turns_cut = n_turns_cut;
   _sz_chisq_cut = sz_chisq_cut;
+  _circle_minuit_cut = circle_minuit_cut;
+  _long_minuit_cut = long_minuit_cut;
 }
 
 // For linear Pattern Recognition use
@@ -1456,4 +1545,14 @@ bool PatternRecognition::missing_sp_search_helical(std::vector<SciFiSpacePoint*>
   return true;
 }
 
+void PatternRecognition::calculate_expected_handedness(double bz_t1, double bz_t2,
+                                                       int D2_polarity) {
+  int t1_field_polarity = (bz_t1 > 0.00001) - (bz_t1 < -0.00001); // 10 Gauss
+  int t2_field_polarity = (bz_t2 > 0.00001) - (bz_t2 < -0.00001);
+
+  _expected_handedness_t1 = t1_field_polarity * D2_polarity;
+  _expected_handedness_t2 = - t2_field_polarity * D2_polarity;
+  std::cerr << "PatternRecognition: Expected TkU & TkD handedness: " << _expected_handedness_t1
+            << " " << _expected_handedness_t2 << "\n";
+}
 } // ~namespace MAUS

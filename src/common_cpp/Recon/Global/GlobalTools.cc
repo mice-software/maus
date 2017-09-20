@@ -28,12 +28,14 @@
 #include "src/common_cpp/DataStructure/ReconEvent.hh"
 #include "src/common_cpp/Recon/Global/Particle.hh"
 #include "src/common_cpp/Simulation/GeometryNavigator.hh"
+#include "src/common_cpp/Simulation/MAUSGeant4Manager.hh"
 #include "src/common_cpp/Utils/Exception.hh"
 #include "src/common_cpp/Utils/Globals.hh"
 
 #include "src/legacy/BeamTools/BTField.hh"
 #include "src/legacy/Config/MiceModule.hh"
 
+#include "src/common_cpp/Recon/Kalman/Global/CentroidTracking.hh"
 #include "src/common_cpp/Recon/Global/GlobalTools.hh"
 
 namespace MAUS {
@@ -306,9 +308,54 @@ double dEdx(const G4Material* material, double E, double m) {
 static const BTField* _field;
 static int _charge;
 
+void propagate2(double* x, double target_z, const BTField* field,
+               double step_size, DataStructure::Global::PID pid,
+               bool energy_loss, int geometry_algorithm) {
+  using Kalman::Global::CentroidTracking;
+  if (std::abs(target_z) > 100000) {
+    throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
+                    "GlobalTools::propagate"));
+  }
+  if (std::isnan(x[0]) || std::isnan(x[1]) || std::isnan(x[2]) || std::isnan(x[3]) ||
+      std::isnan(x[4]) || std::isnan(x[5]) || std::isnan(x[6]) || std::isnan(x[7])) {
+    std::stringstream ios;
+    ios << "pos: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl
+        << "mom: " << x[4] << " " << x[5] << " " << x[6] << " " << x[7] << std::endl;
+    throw(Exceptions::Exception(Exceptions::recoverable, ios.str()+
+          "Some components of tracker trackpoint are nan", "GlobalTools::propagate2"));
+  }
+  CentroidTracking tracking;
+  tracking.SetMaxStepSize(step_size);
+  if (x[3] > target_z) {
+      tracking.SetTrackingModel(CentroidTracking::em_backwards_dynamic);
+      tracking.SetEnergyLossModel(CentroidTracking::bethe_bloch_backwards);
+  } else {
+      tracking.SetTrackingModel(CentroidTracking::em_forwards_dynamic);
+      tracking.SetEnergyLossModel(CentroidTracking::bethe_bloch_forwards);
+  }
+  if (!energy_loss) {
+      tracking.SetEnergyLossModel(CentroidTracking::no_eloss);
+  }
+  if (geometry_algorithm == 1) {
+      tracking.SetGeometryModel(CentroidTracking::axial_lookup);
+  } else if (geometry_algorithm == 2) {
+      tracking.SetGeometryModel(CentroidTracking::geant4);
+  } else {
+    throw(Exceptions::Exception(Exceptions::recoverable,
+          "Did not recognise algorithm lookup", "GlobalTools::propagate2"));
+  }
+  tracking.SetCharge(recon::global::Particle::GetInstance().GetCharge(pid));
+  tracking.Propagate(x, target_z);
+}
+
 void propagate(double* x, double target_z, const BTField* field,
                double step_size, DataStructure::Global::PID pid,
-               bool energy_loss) {
+               bool energy_loss, int algorithm) {
+  if (algorithm != 0) {
+      // we can do axial lookup etc here
+      propagate2(x, target_z, field, step_size, pid, energy_loss, algorithm);
+      return;
+  }
   if (std::abs(target_z) > 50000) {
     throw(Exceptions::Exception(Exceptions::recoverable, "Extreme target z",
                     "GlobalTools::propagate"));
@@ -525,6 +572,24 @@ void changeEnergy(double* x, double deltaE, double mass) {
 bool TrackPointSort(const DataStructure::Global::TrackPoint* tp1,
                     const DataStructure::Global::TrackPoint* tp2) {
   return (tp1->get_position().Z() < tp2->get_position().Z());
+}
+
+std::vector<double> getVirtualZPlanes() {
+    Squeak::mout(Squeak::debug) << "Virtual Planes for track matching z: " << std::flush;
+    VirtualPlaneManager* man = Globals::GetGeant4Manager()->GetVirtualPlanes();
+    std::vector<VirtualPlane*> planeVec = man->GetPlanes();
+    std::vector<double> virtualZPlanes;
+    for (size_t i = 0; i < planeVec.size(); ++i) {
+        Squeak::mout(Squeak::debug) << planeVec[i]->GetPlaneIndependentVariable() << " ";
+        // we only want the virtual planes that are slices in z (it is also
+        // possible to define slices in time and rotated planes)
+        if (planeVec[i]->GetPlaneIndependentVariableType() == BTTracker::z) {
+            double z = planeVec[i]->GetPlaneIndependentVariable();
+            virtualZPlanes.push_back(z);
+        }
+    }
+    Squeak::mout(Squeak::debug) << std::endl;
+    return virtualZPlanes;
 }
 
 } // ~namespace GlobalTools

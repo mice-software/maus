@@ -75,6 +75,7 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   // Setup Pattern Recognition
   double up_field = _geometry_helper.GetFieldValue(0);
   double down_field = _geometry_helper.GetFieldValue(1);
+
   if (user_up_helical_pr_on == 2)
     _up_helical_pr_on = true;
   else if (user_up_helical_pr_on == 1)
@@ -111,6 +112,14 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   else if (user_down_straight_pr_on == 0 && fabs(down_field) >= 0.00001)
     _down_straight_pr_on = false;
 
+  // Find and set the beamline polarity
+  int D2_polarity = 0;
+  std::vector<const MiceModule*> d2 = module->findModulesByName("D2");
+  if (d2.size() == 1) {
+    double scale_factor = d2[0]->propertyDouble("ScaleFactor");
+    D2_polarity = (scale_factor > 0) - (scale_factor < 0); // Nifty, it does work giving -1, 0 or +1
+  }
+
   _pattern_recognition = PatternRecognition();
   _pattern_recognition.LoadGlobals();
   _pattern_recognition.set_up_helical_pr_on(_up_helical_pr_on);
@@ -119,6 +128,7 @@ void MapCppTrackerPatternRecognition::_birth(const std::string& argJsonConfigDoc
   _pattern_recognition.set_down_straight_pr_on(_down_straight_pr_on);
   _pattern_recognition.set_bz_t1(up_field);
   _pattern_recognition.set_bz_t2(down_field);
+  _pattern_recognition.calculate_expected_handedness(up_field, down_field, D2_polarity);
   if (_patrec_debug_on) {
     std::cerr << "INFO::MapCppTrackerPatternRecognition: Debug mode on\n";
     _pattern_recognition.setup_debug(debug_fname);

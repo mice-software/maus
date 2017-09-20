@@ -56,14 +56,17 @@ namespace MAUS {
  *  @brief Pattern Recognition associates tracker spacepoints to tracks
  *
  *  Pattern Recognition associates tracker spacepoints to tracks. Linear least squares fitting
- *  is used to determine which spacepoints come from the same parent track. Both straight and
- *  helical tracks may be searched for.
+ *  or alternately MINUIT is used to determine which spacepoints come from the same parent track.
+ *  Both straight and helical tracks may be searched for.
  */
 class PatternRecognition {
   public:
 
     /** Macros to allow friendship with the gtests */
     FRIEND_TEST(PatternRecognitionTest, test_constructor);
+    FRIEND_TEST(PatternRecognitionTest, test_single_evt_minuit_longitudinal);
+    FRIEND_TEST(PatternRecognitionTest, test_multiple_evts_per_trigger_circle_minuit);
+    FRIEND_TEST(PatternRecognitionTest, test_multiple_evts_per_trigger_longitudinal_minuit);
     FRIEND_TEST(PatternRecognitionTest, test_set_parameters_to_default);
     FRIEND_TEST(PatternRecognitionTest, test_setup_debug);
 
@@ -127,7 +130,7 @@ class PatternRecognition {
 
     /** @brief A function to call all the different make_tracks rountines.
      *
-     *  A function to call all the different make_tracks rountines. Calls make_5tracks, 
+     *  A function to call all the different make_tracks rountines. Calls make_5tracks,
      *  make_4tracks and make_3tracks for helical and straight tracks. Also calls select_tracks,
      *  track_processing and add_tracks.
      *  @param[in] track_type Helical or Straight. 0 = Straight, 1 = Helical
@@ -145,7 +148,7 @@ class PatternRecognition {
      *  spacepoints are tried. Any which pass the fit are added as track candidates.
      *  The select_tracks function may then be used to decided which of these we actually want to
      *  pick and add to the SciFiEvent before sending to the final kalman track fit.
-     * 
+     *
      *  @param[in] track_type Boolean, 0 for straight tracks, 1 for helical tracks
      *  @param[in] trker_no The tracker number, 0 for TKU, 1 for TKD
      *  @param[in] spnts_by_station A 2D vector of all the input spacepoints ordered by station
@@ -176,7 +179,7 @@ class PatternRecognition {
                       std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Make Pattern Recognition tracks with 3 spacepoints (straight only)
-     * 
+     *
      *  Make Pattern Recognition straight track candidates with 3 spacepoints. All possible
      *  combinations of spacepoints are tried. Any which pass the fit are added as track candidates.
      *  The select_tracks function may then be used to decided which of these we actually want to
@@ -191,7 +194,7 @@ class PatternRecognition {
                       std::vector<SciFiStraightPRTrack*> &strks) const;
 
     /** @brief Fits a straight track for a given set of stations
-     * 
+     *
      *  @param[in] ignore_stations Int vector specifying which stations are not to be used for
      *             the track fit. 0 - 4 represent stations 1 - 5 respectively,
      *             while -1 means use *all* the stations (ignore none of them).
@@ -208,8 +211,8 @@ class PatternRecognition {
     /** @brief Make a helical track from spacepoints
      *
      *  Recursive function holding the looping structure for making helical tracks from spacepoints.
-     *  Once looping has identified candidate spacepoints, calls form_track which performs the 
-     *  circle fit in x-y projection and then the line fit in the s-z projection.
+     *  Once looping has identified candidate spacepoints, calls form_track which performs the
+     *  circle fit in x-y projection and then the fit in the s-z projection.
      *
      *  @param[in] num_points The number of points in the track (4 or 5)
      *  @param[in,out] stat_num The current station number
@@ -228,16 +231,18 @@ class PatternRecognition {
              SpacePoint2dPArray &spnts_by_station, std::vector<SciFiHelicalPRTrack*> &htrks) const;
 
     /** @brief Attempt to fit a helical track to given spacepoints
-     * 
+     *
      *  Attempt to fit a helical track to given spacepoints. Two part process: (1) circle fit in the
-     *  x-y projection, (2) a line fit in the s-z projection. Returns a pointer to the found
-     *  track if successful, otherwise returns a NULL pointer.
-     * 
+     *  x-y projection, (2) a longitudinal fit. Returns a pointer to the found
+     *  track if successful, otherwise returns a NULL pointer. The custom linear least squares
+     *  fitter or MINUIT may be chosen for the xy and longitudinal fits separately using the members
+     *  _circle_fitter _longitudinal_fitter.
+     *
      *  @param[in] n_points The number of points in the track (4 or 5)
      *  @param[in] spnts Vector holding pointers to the spacepoints
      *  @return Returns a pointer to the track created
-     * 
-     * */
+     *
+     **/
     SciFiHelicalPRTrack* form_track(const int n_points, std::vector<SciFiSpacePoint*> spnts ) const;
 
     /** @brief Find the ds/dz of a helical track
@@ -281,13 +286,13 @@ class PatternRecognition {
     bool check_time_consistency(const std::vector<SciFiSpacePoint*>, int tracker_id) const;
 
     /** @brief Determine which two stations the initial line should be drawn between
-     * 
+     *
      *  The initial line is to be drawn between the two outermost stations being used.
      *  This in turn depends on which stations are presently being ignored
      *  e.g. for a 5 pt track, station 5 and station 1 are always  the outer and inner
      *  stations respectively.  This function returns the correct outer and inner
      *  station numbers, given which stations are presently being ignored.
-     * 
+     *
      *  NB Stations are number 0 - 4 in the code, not 1 - 5 as in the outside world
      *
      *  Returns true if successful, false if fails (due to a bad argument being passed)
@@ -374,6 +379,13 @@ class PatternRecognition {
     /** @brief Set the boolean controlling if we search for missed helical seed spacepoints */
     void set_sp_search_on(bool sp_search_on) { _sp_search_on = sp_search_on; }
 
+    /** @brief Return the overall helix fit method */
+    int get_longitudinal_fitter() { return _longitudinal_fitter; }
+
+    /** @brief Set helix fit method */
+    void set_longitudinal_fitter(int longitudinal_fitter) {
+        _longitudinal_fitter = longitudinal_fitter; }
+
     /** @brief Return the line fit method */
     int get_line_fitter() { return _line_fitter; }
 
@@ -395,7 +407,7 @@ class PatternRecognition {
     /** @brief A function to set all the internal parameters to their default values (for tests) */
     void set_parameters_to_default();
 
-    /** @brief Convenience function to set the tracker number on vectors of tracks 
+    /** @brief Convenience function to set the tracker number on vectors of tracks
      *  @param[in] trker_no The tracker number, 0 for TKU, 1 for TKD
      *  @param[out] strks A vector of straight tracks
      *  @param[out] htrks A vector of helical tracks
@@ -405,11 +417,13 @@ class PatternRecognition {
 
     /** @brief Place the different cut value currently being used into the variables supplied */
     void get_cuts(double& res_cut, double& straight_chisq_cut, double& R_res_cut,
-       double& circle_chisq_cut, double& n_turns_cut, double& sz_chisq_cut);
+                  double& circle_chisq_cut, double& _circle_minuit_cut,
+                  double& n_turns_cut, double& sz_chisq_cut, double& long_minuit_cut);
 
     /** @brief Set the various cuts used in Pattern Recognition */
     void set_cuts(double res_cut, double straight_chisq_cut, double R_res_cut,
-        double circle_chisq_cut, double n_turns_cut, double sz_chisq_cut);
+                  double circle_chisq_cut, double circle_minuit_cut,
+                  double n_turns_cut, double sz_chisq_cut, double long_minuit_cut);
 
     /** @brief Activate debug mode (set up the output ROOT file, histos, etc) */
     void setup_debug(std::string debug_fname = "pattern_recognition_debug.root");
@@ -423,47 +437,77 @@ class PatternRecognition {
     bool missing_sp_search_helical(std::vector<SciFiSpacePoint*>& spnts,
                                    SciFiHelicalPRTrack* trk) const;
 
+    /** @brief Simple function to make sure we calc the circle ndf consistently
+     *  @param[in] npoints The number of spacepoints in the track
+     */
+    int calc_circle_ndf(int npoints) const { return (2*npoints - 1); }
+
+    /** @brief Simple function to make sure we calc the lsq longitudinal ndf consistently
+     *  @param[in] npoints The number of spacepoints in the track
+     */
+    int calc_lsq_longitudinal_ndf(int npoints) const  { return (npoints - 2); }
+
+    /** @brief Simple function to make sure we calc the minuit longitudinal ndf consistently
+     *  @param[in] npoints The number of spacepoints in the track
+     */
+    int calc_minuit_longitudinal_ndf(int npoints) const { return (npoints - 1); }
+
+    /** @brief Calculate the rotation direction we expect in each tracker using magnet polarities,
+     *         call this method to help the longitudinal MINUIT fit give the right answer
+     *  @param[in] bz_t1 TkU solenoidal z component field value
+     *  @param[in] bz_t2 TkD solenoidal z component field value
+     *  @param[in] D2_polarity, D2 dipole magnet polarity, -1, 0, +1
+     */
+    void calculate_expected_handedness(double bz_t1, double bz_t2, int D2_polarity);
+
   private:
-    bool _debug;                /** Run in debug mode */
-    bool _up_straight_pr_on;    /** Upstream straight pattern recogntion on or off */
-    bool _down_straight_pr_on;  /** Downstream straight pattern recogntion on or off */
-    bool _up_helical_pr_on;     /** Upstream Helical pattern recogntion on or off */
-    bool _down_helical_pr_on;   /** Downstream Helical pattern recogntion on or off */
-    bool _sp_search_on;         /** Do we seach for seed spoints missed by helical fit? */
-    int _s_error_method;        /** How to calc error on s, 0 = station res, 1 = error prop */
-    int _line_fitter;           /** Line fitter, 0 = custom lsq, 1 = ROOT */
-    int _circle_fitter;         /** Circle fitter, 0 = custom lsq, 1 = MINUIT */
-    int _verb;                  /** Verbosity: 0=little, 1=more couts */
-    int _n_trackers;            /** Number of trackers */
-    int _n_stations;            /** Number of stations per tracker */
-    double _bz_t1;              /** Bz field in upstream tracker */
-    double _bz_t2;              /** Bz field in downstream tracker */
-    double _sd_1to4;            /** Position error associated with stations 1 t0 4 */
-    double _sd_5;               /** Position error associated with station 5 */
-    double _sd_phi_1to4;        /** Rotation error associated with stations 1 t0 4 */
-    double _sd_phi_5;           /** Rotation error associated with station 5 */
-    double _res_cut;            /** Road cut for linear fit in mm */
-    double _straight_chisq_cut; /** Cut on the chi^2 of the least sqs fit in mm */
-    double _R_res_cut;          /** Cut on the radius of the track helix in mm */
-    double _circle_chisq_cut;   /** Cut on the chi^2 of the circle least sqs fit in mm */
-    double _n_turns_cut;        /** Cut to decide if a given n turns value is good */
-    double _sz_chisq_cut;       /** Cut on the sz chi^2 from least sqs fit in mm */
-    double _circle_error_w;     /** Weight to artificially scale the error going to xy fit */
-    double _sz_error_w;         /** Weight to artificially scale the error going to sz fit */
-    double _Pt_max;             /** MeV/c max Pt for h tracks (given by R_max = 150mm) */
-    double _Pz_min;             /** MeV/c min Pz for helical tracks (this is a guess) */
-    double _missing_sp_cut;     /** Dist (mm) below which a missing spoint should be added to trk*/
+    bool _debug;                  /**< Run in debug mode */
+    bool _up_straight_pr_on;      /**< Upstream straight pattern recogntion on or off */
+    bool _down_straight_pr_on;    /**< Downstream straight pattern recogntion on or off */
+    bool _up_helical_pr_on;       /**< Upstream Helical pattern recogntion on or off */
+    bool _down_helical_pr_on;     /**< Downstream Helical pattern recogntion on or off */
+    bool _sp_search_on;           /**< Do we seach for seed spoints missed by helical fit? */
+    int _expected_handedness_t1;  /**< Rotation direction we expect for TkU particles */
+    int _expected_handedness_t2;  /**< Rotation direction we expect for TkD particles */
+    int _s_error_method;          /**< How to calc error on s, 0 = station res, 1 = error prop */
+    int _longitudinal_fitter;   /**< Longitud fitter, 0=nturns & linear s-z fit, 1=ROOT (MINUIT2) */
+    int _line_fitter;           /**< Line fitter, 0 = custom lsq, 1 = ROOT */
+    int _circle_fitter;         /**< Circle fitter, 0 = custom lsq, 1 = MINUIT */
+    int _verb;                  /**< Verbosity: 0=little, 1=more couts */
+    int _n_trackers;            /**< Number of trackers */
+    int _n_stations;            /**< Number of stations per tracker */
+    double _bz_t1;              /**< Bz field in upstream tracker */
+    double _bz_t2;              /**< Bz field in downstream tracker */
+    double _sd_1to4;            /**< Position error associated with stations 1 t0 4 */
+    double _sd_5;               /**< Position error associated with station 5 */
+    double _sd_phi_1to4;        /**< Rotation error associated with stations 1 t0 4 */
+    double _sd_phi_5;           /**< Rotation error associated with station 5 */
+    double _sd_mcs;             /** Estimated multiple coulomb scattering spacepoint pos error */
+    double _res_cut;            /**< Road cut for linear fit in mm */
+    double _straight_chisq_cut; /**< Cut on the chi^2 of the least sqs fit in mm */
+    double _R_res_cut;          /**< Cut on the radius of the track helix in mm */
+    double _circle_chisq_cut;   /**< Cut on the chi^2 of the circle least sqs fit in mm */
+    double _circle_minuit_cut;  /**< Cut on the chi^2 of the circle minuit fit */
+    double _n_turns_cut;        /**< Cut to decide if a given n turns value is good */
+    double _sz_chisq_cut;       /**< Cut on the sz chi^2 from least sqs fit in mm */
+    double _long_minuit_cut;    /**< Cut on the MINUIT longitudinal fit chisq */
+    double _circle_error_w;     /**< Weight to artificially scale the error going to xy fit */
+    double _sz_error_w;         /**< Weight to artificially scale the error going to sz fit */
+    double _Pt_max;             /**< MeV/c max Pt for h tracks (given by R_max = 150mm) */
+    double _Pz_min;             /**< MeV/c min Pz for helical tracks (this is a guess) */
+    double _missing_sp_cut;     /**< Dist (mm) below which a missing spoint should be added to trk*/
+    double _low_radius = 15.0;  /**< Radius beneath which we may struggle to find dsdz */
 
-    TFile* _rfile;        /** A ROOT file pointer for dumping residuals to in debug mode */
-    TH1D* _hx_line;       /** histo of x residuals taken during straight road cut stage */
-    TH1D* _hy_line;       /** histo of y residuals taken during straight road cut stage */
-    TH1D* _hxchisq_line;  /** histo of chisq of every x-z straight least sq fit tried */
-    TH1D* _hychisq_line;  /** histo of chisq of every y-z straight least sq fit tried */
-    TH1D* _hxychisq_line; /** histo of chisq of every x-y circle least sq fit tried */
-    TH1D* _hszchisq_line; /** histo of chisq of every s-z least sq fit tried */
+    TFile* _rfile;        /**< A ROOT file pointer for dumping residuals to in debug mode */
+    TH1D* _hx_line;       /**< histo of x residuals taken during straight road cut stage */
+    TH1D* _hy_line;       /**< histo of y residuals taken during straight road cut stage */
+    TH1D* _hxchisq_line;  /**< histo of chisq of every x-z straight least sq fit tried */
+    TH1D* _hychisq_line;  /**< histo of chisq of every y-z straight least sq fit tried */
+    TH1D* _hxychisq_line; /**< histo of chisq of every x-y circle least sq fit tried */
+    TH1D* _hszchisq_line; /**< histo of chisq of every s-z least sq fit tried */
 
-    TH1D* _fail_helix_tku;  /** Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
-    TH1D* _fail_helix_tkd;  /** Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
+    TH1D* _fail_helix_tku;  /**< Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
+    TH1D* _fail_helix_tkd;  /**< Where did helix 5pt fit fail? 1-circle fit, 2-n_turns, 3-sz fit */
 };
 
 

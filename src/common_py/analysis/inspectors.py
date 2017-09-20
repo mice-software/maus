@@ -17,7 +17,7 @@
 #
 
 # pylint: disable = W0311, E1101, W0613, C0111, R0911, W0621, C0103, R0902
-# pylint: disable = W0102, R0915
+# pylint: disable = W0102, R0915, R0201
 
 
 import analysis
@@ -71,12 +71,8 @@ class PhaseSpace2DInspector() :
       'inspected_phi_phasespace_{0}'.format(self.plane), '#phi-Phasespace', \
                                                                100, -4.0, 4.0 )
     self.theta_phasespace_plot = ROOT.TH1F(\
-      'inspected_phi_phasespace_{0}'.format(self.plane), '#theta-Phasespace', \
+      'inspected_theta_phasespace_{0}'.format(self.plane), '#theta-Phasespace', \
                                                                100, -4.0, 4.0 )
-
-    self.amplitude_momentum_plot = ROOT.TH2F(\
-        'inspected_A_p_phasespace_{0}'.format(self.plane), 'A-p-Phasespace' , \
-                                           200, 0.0, 100.0, 260, 130.0, 260.0 )
 
     self.pz_plot = ROOT.TH1F(\
               'inspected_pz_{0}'.format(self.plane), 'p_{z}', 400, 0.0, 400.0 )
@@ -112,7 +108,7 @@ class PhaseSpace2DInspector() :
                'inspected_beta_y_{0}'.format(self.plane), 'Y Beta Function', \
                                                              3000, 0.0, 3000.0)
     self.total_momentum_plot = ROOT.TH1F(\
-                'inspected_momentum_{0}'.format(self.plane), 'Momentum', \
+              'inspected_total_momentum_{0}'.format(self.plane), 'Momentum', \
                                                               1000, 0.0, 500.0)
 
     self.amplitude_plot = ROOT.TH1F(\
@@ -153,22 +149,22 @@ class PhaseSpace2DInspector() :
     if self.parent_covariance_inv is not None :
       vector = numpy.array(hit.get_as_vector()[2:6])
       amplitude = self.parent_emittance*vector.transpose().dot(self.parent_covariance_inv.dot(vector))
-      self.amplitude_plot.Fill(amplitude)
-      self.amplitude_momentum_plot.Fill(amplitude, hit.get_p())
+      self.amplitude_plot.Fill(amplitude, hit.get_weight())
+      self.amplitude_momentum_plot.Fill(amplitude, hit.get_p(), hit.get_weight())
 
     self.covariance.add_hit(hit)
 
-    self.position_plot.Fill(hit.get_x(), hit.get_y())
-    self.momentum_plot.Fill(hit.get_px(), hit.get_py())
-    self.x_phasespace_plot.Fill(hit.get_x(), hit.get_px())
-    self.y_phasespace_plot.Fill(hit.get_y(), hit.get_py())
-    self.xy_phasespace_plot.Fill(hit.get_x(), hit.get_py())
-    self.yx_phasespace_plot.Fill(hit.get_y(), hit.get_px())
-    self.rpt_phasespace_plot.Fill(hit.get_r(), hit.get_pt())
-    self.phi_phasespace_plot.Fill(hit.get_phi())
-    self.theta_phasespace_plot.Fill(hit.get_theta())
-    self.pz_plot.Fill(hit.get_pz())
-    self.p_plot.Fill(hit.get_p())
+    self.position_plot.Fill(hit.get_x(), hit.get_y(), hit.get_weight())
+    self.momentum_plot.Fill(hit.get_px(), hit.get_py(), hit.get_weight())
+    self.x_phasespace_plot.Fill(hit.get_x(), hit.get_px(), hit.get_weight())
+    self.y_phasespace_plot.Fill(hit.get_y(), hit.get_py(), hit.get_weight())
+    self.xy_phasespace_plot.Fill(hit.get_x(), hit.get_py(), hit.get_weight())
+    self.yx_phasespace_plot.Fill(hit.get_y(), hit.get_px(), hit.get_weight())
+    self.rpt_phasespace_plot.Fill(hit.get_r(), hit.get_pt(), hit.get_weight())
+    self.phi_phasespace_plot.Fill(hit.get_phi(), hit.get_weight())
+    self.theta_phasespace_plot.Fill(hit.get_theta(), hit.get_weight())
+    self.pz_plot.Fill(hit.get_pz(), hit.get_weight())
+    self.p_plot.Fill(hit.get_p(), hit.get_weight())
     self.position = hit.get_z()
 
     if self.ensemble_size > 1 :
@@ -311,4 +307,142 @@ class PhaseSpace2DInspector() :
 
     return ins_data
 
+
+####################################################################################################
+
+
+class CoolingInspector() :
+
+  def __init__(self) :
+    self.position = 0.0
+    self.number_particles = 0
+
+#    self.momentum_bias = None
+#    self.momentum_correlation = None
+
+    self.upstream_parent_covariance = None
+    self.upstream_parent_covariance_inv = None
+    self.upstream_parent_emittance = None
+
+    self.downstream_parent_covariance = None
+    self.downstream_parent_covariance_inv = None
+    self.downstream_parent_emittance = None
+
+    self.upstream_amplitude_plot = ROOT.TH1F(\
+                 'upstream_reference_amplitude', 'Amplitude', 200, 0.0, 100.0)
+    self.downstream_amplitude_plot = ROOT.TH1F(\
+                'downstream_reference_amplitude', 'Amplitude', 200, 0.0, 100.0)
+
+    self.upstream_amplitude_transmitted_plot = ROOT.TH1F(\
+                 'upstream_reference_amplitude_transmitted', 'Amplitude', 200, 0.0, 100.0)
+    self.downstream_amplitude_transmitted_plot = ROOT.TH1F(\
+                'downstream_reference_amplitude_transmitted', 'Amplitude', 200, 0.0, 100.0)
+
+    self.upstream_amplitude_scraped_plot = ROOT.TH1F(\
+                 'upstream_reference_amplitude_scraped', 'Amplitude', 200, 0.0, 100.0)
+    self.downstream_amplitude_scraped_plot = ROOT.TH1F(\
+                'downstream_reference_amplitude_scarped', 'Amplitude', 200, 0.0, 100.0)
+
+    self.amplitude_change_plot = ROOT.TH1F(\
+          'reference_amplitude_change', 'Amplitude Change', 200, -100.0, 100.0)
+    self.amplitude_change_amplitude_plot = ROOT.TH2F(\
+                  'reference_amplitude_change_amplitude', 'Amplitude Change', \
+                                          200, 0.0, 100.0, 200, -100.0, 100.0 )
+    self.amplitude_mobility_plot = ROOT.TH2F(\
+                        'reference_amplitude_mobility', 'Amplitude Mobility', \
+                                             100, 0.0, 100.0, 100, 0.0, 100.0 )
+
+
+#  def set_covariance_correction(self, correction, axes=['x', 'px', 'y', 'py']) :
+#    self.covariance.set_covariance_correction( correction, axes )
+#    self.ensemble_covariance.set_covariance_correction( correction, axes )
+
+
+  def set_upstream_covariance(self, matrix) :
+    self.upstream_parent_covariance = numpy.array(matrix)
+    self.upstream_parent_covariance_inv = numpy.linalg.inv(self.upstream_parent_covariance)
+    self.upstream_parent_emittance = analysis.covariances.emittance_from_matrix(self.upstream_parent_covariance)
+
+
+  def set_downstream_covariance(self, matrix) :
+    self.downstream_parent_covariance = numpy.array(matrix)
+    self.downstream_parent_covariance_inv = numpy.linalg.inv(self.downstream_parent_covariance)
+    self.downstream_parent_emittance = analysis.covariances.emittance_from_matrix(self.downstream_parent_covariance)
+
+
+#  def set_momentum_correction(self, constant, gradient) :
+#    self.momentum_bias = constant
+#    self.momentum_correlation = gradient
+
+
+  def add_hits(self, up_hit, down_hit) :
+#    if self.momentum_bias is not None :
+#      p = hit.get_p()
+##      correction = 1.0 + (self.momentum_bias + self.momentum_correlation*p) / p
+#      correction = ((p - self.momentum_bias) / \
+#                                         (1.0 - self.momentum_correlation)) / p
+#      hit.set_px(hit.get_px()*correction)
+#      hit.set_py(hit.get_py()*correction)
+#      hit.set_pz(hit.get_pz()*correction)
+
+    if (self.upstream_parent_covariance_inv is not None) and (self.downstream_parent_covariance_inv is not None) :
+      self.number_particles += 1
+
+      if up_hit is not None :
+        vector = numpy.array(up_hit.get_as_vector()[2:6])
+        up_amplitude = self.upstream_parent_emittance*vector.transpose().dot(self.upstream_parent_covariance_inv.dot(vector))
+        self.upstream_amplitude_plot.Fill(up_amplitude)
+        
+        if down_hit is None :
+          self.upstream_amplitude_scraped_plot.Fill(up_amplitude)
+        else :
+          self.upstream_amplitude_transmitted_plot.Fill(up_amplitude)
+
+      if down_hit is not None :
+        vector = numpy.array(down_hit.get_as_vector()[2:6])
+        down_amplitude = self.downstream_parent_emittance*vector.transpose().dot(self.downstream_parent_covariance_inv.dot(vector))
+        self.downstream_amplitude_plot.Fill(down_amplitude)
+
+        if up_hit is None :
+          self.downstream_amplitude_scraped_plot.Fill(down_amplitude)
+        else :
+          self.downstream_amplitude_transmitted_plot.Fill(down_amplitude)
+
+
+      if (up_hit is not None) and (down_hit is not None) :
+        DA = down_amplitude - up_amplitude
+        self.amplitude_change_plot.Fill( DA )
+        self.amplitude_change_amplitude_plot.Fill( up_amplitude, DA )
+        self.amplitude_mobility_plot.Fill( up_amplitude, down_amplitude )
+
+
+  def fill_plots(self) :
+    pass
+
+
+  def get_length(self) :
+    return self.number_particles
+
+
+  def get_plot_dictionary(self) :
+    ins_plots = {}
+
+    ins_plots['upstream_amplitude'] = self.upstream_amplitude_plot
+    ins_plots['downstream_amplitude'] = self.downstream_amplitude_plot
+    ins_plots['upstream_amplitude_transmitted'] = self.upstream_amplitude_transmitted_plot
+    ins_plots['downstream_amplitude_transmitted'] = self.downstream_amplitude_transmitted_plot
+    ins_plots['upstream_amplitude_scraped'] = self.upstream_amplitude_scraped_plot
+    ins_plots['downstream_amplitude_scraped'] = self.downstream_amplitude_scraped_plot
+
+    ins_plots['amplitude_change'] = self.amplitude_change_plot
+    ins_plots['amplitude_change_amplitude'] = self.amplitude_change_amplitude_plot
+    ins_plots['amplitude_mobility'] = self.amplitude_mobility_plot
+
+    return ins_plots
+
+
+  def get_data_dictionary(self) :
+    ins_data = {}
+
+    return ins_data
 
