@@ -5,6 +5,20 @@ http://micewww.pp.rl.ac.uk/projects/maus/roadmap
 
 Release Notes
 =============
+MAUS-v3.0.0
+  The following changes were made:
+    - Geometry: Support for Neon absorber added
+    - Simulation: Added a few features to BT3dFieldMap
+    - Tracker: pattern recognition MINUIT fit now the default
+    - Tracker: various updates to the analysis tools
+    - Tracker: Removed the old pattern recognition reducer and backend plotting code
+    - EMR: Calibration map updated
+    - KL: Calibration map updated
+    - Global reconstruction: production ready, top level script for runnning added
+    - Global reconstruction: ability to obtain data at virtual planes locations added
+    - Build tools: Tests now installed to build/tests/, rather than just build/
+    - Third party: scipy added
+    - Third party: maus-apps bug fix
 MAUS-v2.9.1
   The following changes were made:
     - Small update map module to conform to API design
