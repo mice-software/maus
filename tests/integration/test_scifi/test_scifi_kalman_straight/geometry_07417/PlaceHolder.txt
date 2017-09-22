@@ -1,0 +1,1 @@
+Git cannot handle empty folders, hence a place holder file.
